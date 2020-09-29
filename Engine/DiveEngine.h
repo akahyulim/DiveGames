@@ -5,3 +5,4 @@
 // ========== Core ==============
 #include "Core/DiveDefs.h"
 #include "Core/Log.h"
+#include "Core/Stopwatch.h"
