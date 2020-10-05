@@ -7,31 +7,18 @@ int main()
 
 	Dive::Log::Initialize();
 
-	CORE_TRACE("INITIALIZE");
-	CORE_INFO("INITIALIZE");
-	CORE_ERROR("INITIALIZE");
-	CORE_WARN("INITIALIZE");
 
-	APP_TRACE("START");
-	APP_INFO("START");
-	APP_ERROR("START");
-	APP_WARN("START");
-	
-	APP_INFO("RUN");
-	APP_INFO("RUN");
-	APP_ERROR("RUN");
-	APP_WARN("RUN");
-	
-	
-	APP_INFO("END");
-	APP_INFO("END");
-	APP_ERROR("END");
-	APP_WARN("END");
-	
-	CORE_TRACE("TERMINATE");
-	CORE_INFO("TERMINATE");
-	CORE_ERROR("TERMINATE");
-	CORE_WARN("TERMINATE");
+	Dive::Engine engine;
+	APP_TRACE("Engine 생성 성공");
+
+	if (engine.Initialize())
+	{
+		APP_TRACE("Engine 초기화 성공");
+		engine.Update();
+		APP_TRACE("Engine Update 성공");
+	}
+
+	APP_TRACE("Engine 종료");
 
 	system("pause");
 	FreeConsole();
