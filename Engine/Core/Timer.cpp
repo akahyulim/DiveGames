@@ -7,16 +7,26 @@ namespace Dive
 	Timer::Timer(SystemManager * pManager)
 		: ISystem(pManager)
 	{
-		m_time = std::chrono::high_resolution_clock::now();
+		m_startup_time = std::chrono::high_resolution_clock::now();
+		m_begin_frame_time = std::chrono::high_resolution_clock::now();
 	}
 
 	void Timer::Update(float deltaTime)
 	{
-		auto oldTime = m_time;
-		m_time = std::chrono::high_resolution_clock::now();
-		
-		std::chrono::duration<double, std::milli> elapseTime = m_time - oldTime;
+		m_end_frame_time = m_begin_frame_time;
+		m_begin_frame_time = std::chrono::high_resolution_clock::now();
 
-		m_deltaTimeMS = elapseTime.count();
+		const std::chrono::duration<double, std::milli> elapsed_time = m_begin_frame_time - m_startup_time;
+		std::chrono::duration<double, std::milli> delta_time = m_begin_frame_time - m_end_frame_time;
+		const std::chrono::duration<double, std::milli> remain_time =
+			std::chrono::duration<double, std::milli>(1000.0 / m_target_fps) - delta_time;
+
+		if (remain_time.count() > 0)
+		{
+
+		}
+
+		m_running_time_ms = static_cast<double>(elapsed_time.count());
+		m_delta_time_ms = static_cast<double>(delta_time.count());
 	}
 }

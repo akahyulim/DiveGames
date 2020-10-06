@@ -1,5 +1,6 @@
 #include "DivePch.h"
 #include "Engine.h"
+#include "DiveDefs.h"
 #include "SystemManager.h"
 #include "Timer.h"
 
@@ -11,6 +12,8 @@ namespace Dive
 
 	Engine::~Engine()
 	{
+		if (m_pSystemManager)
+			SAFE_DELETE(m_pSystemManager);
 	}
 	
 	bool Engine::Initialize()

@@ -13,12 +13,19 @@ int main()
 
 	if (engine.Initialize())
 	{
-		APP_TRACE("Engine 초기화 성공");
-		engine.Update();
-		APP_TRACE("Engine Update 성공");
-	}
+		auto timer = engine.GetSystemManager()->GetSystem<Dive::Timer>();
 
-	APP_TRACE("Engine 종료");
+		APP_TRACE("Engine 초기화 성공");
+
+		for (auto i = 0; i != 22; i++)
+		{	
+			Sleep(1000);
+			engine.Update();
+			APP_TRACE("Engine Update 성공, {:f}초 경과", timer->GetDeltaTime());
+		}
+
+		APP_TRACE("Engine 종료, {:f}초 동안 실행", timer->GetRunningTime());
+	}
 
 	system("pause");
 	FreeConsole();
