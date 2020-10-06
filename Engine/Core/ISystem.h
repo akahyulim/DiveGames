@@ -8,13 +8,13 @@ namespace Dive
 	class ISystem
 	{
 	public:
-		ISystem(SystemManager* pManager) { m_pManager = pManager; }
+		ISystem(SystemManager* manager) { m_manager = manager; }
 		virtual ~ISystem() = default;
 
 		virtual bool Initialize() { return true; }
 		virtual void Update(float deltaTime = 0.0f) {}
 
 	protected:
-		SystemManager* m_pManager = nullptr;
+		SystemManager* m_manager = nullptr;
 	};
 }

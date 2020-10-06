@@ -12,17 +12,17 @@ namespace Dive
 
 	Engine::~Engine()
 	{
-		if (m_pSystemManager)
-			SAFE_DELETE(m_pSystemManager);
+		if (m_system_manager)
+			SAFE_DELETE(m_system_manager);
 	}
 	
 	bool Engine::Initialize()
 	{
-		m_pSystemManager = new SystemManager(this);
+		m_system_manager = new SystemManager(this);
 
-		m_pSystemManager->RegisterSystem(static_cast<ISystem*>(new Timer(m_pSystemManager)));
+		m_system_manager->RegisterSystem(static_cast<ISystem*>(new Timer(m_system_manager)));
 
-		if (!m_pSystemManager->Initialize())
+		if (!m_system_manager->Initialize())
 			return false;
 
 		return true;
@@ -30,11 +30,11 @@ namespace Dive
 	
 	void Engine::Update()
 	{
-		if (!m_pSystemManager)
+		if (!m_system_manager)
 			return;
 
-		auto pTimer = m_pSystemManager->GetSystem<Timer>();
+		auto timer = m_system_manager->GetSystem<Timer>();
 
-		m_pSystemManager->Update(pTimer->GetDeltaTimeMS());
+		m_system_manager->Update(timer->GetDeltaTimeMS());
 	}
 }

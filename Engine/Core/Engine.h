@@ -14,10 +14,10 @@ namespace Dive
 		bool Initialize();
 		void Update();
 
-		SystemManager* GetSystemManager() const { return m_pSystemManager; }
+		SystemManager* GetSystemManager() const { return m_system_manager; }
 
 	private:
-		SystemManager* m_pSystemManager = nullptr;
+		SystemManager* m_system_manager = nullptr;
 	};
 }
 

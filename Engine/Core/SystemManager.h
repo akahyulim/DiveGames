@@ -11,23 +11,23 @@ namespace Dive
 	class SystemManager
 	{
 	public:
-		SystemManager(Engine* pEngine) { m_pEngine = pEngine; }
+		SystemManager(Engine* engine) { m_engine = engine; }
 		~SystemManager()
 		{
-			for (auto& pSystem : m_systems)
+			for (auto& system : m_systems)
 			{
-				SAFE_DELETE(pSystem);
+				SAFE_DELETE(system);
 			}
 			m_systems.clear();
 		}
 
 		bool Initialize()
 		{
-			for (const auto& pSystem : m_systems)
+			for (const auto& system : m_systems)
 			{
-				if (!pSystem->Initialize())
+				if (!system->Initialize())
 				{
-					CORE_ERROR("{:s}의 초기화에 실패하였습니다", typeid(*pSystem).name());
+					CORE_ERROR("{:s}의 초기화에 실패하였습니다", typeid(*system).name());
 					return false;
 				}
 			}
@@ -36,37 +36,37 @@ namespace Dive
 
 		void Update(float deltaTime = 0.0f)
 		{
-			for (const auto& pSystem : m_systems)
-				pSystem->Update(deltaTime);
+			for (const auto& system : m_systems)
+				system->Update(deltaTime);
 		}
 
 		// 생성과 등록을 따로할 필요가 있나?
-		void RegisterSystem(ISystem* pSystem)
+		void RegisterSystem(ISystem* system)
 		{
-			if (!pSystem)
+			if (!system)
 				return;
 
-			m_systems.push_back(pSystem);
+			m_systems.push_back(system);
 		}
 
 		template<typename T>
 		T* GetSystem() const
 		{
-			for (const auto& pSystem : m_systems)
+			for (const auto& system : m_systems)
 			{
-				if (typeid(T) == typeid(*pSystem))
-					return dynamic_cast<T*>(pSystem);
+				if (typeid(T) == typeid(*system))
+					return dynamic_cast<T*>(system);
 			}
 			return nullptr;
 		}
 
 		Engine* GetEngine() const
 		{
-			return m_pEngine;
+			return m_engine;
 		}
 
 	private:
-		Engine* m_pEngine = nullptr;
+		Engine* m_engine = nullptr;
 		std::vector<ISystem*> m_systems;
 	};
 }
