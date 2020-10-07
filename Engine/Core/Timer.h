@@ -1,14 +1,19 @@
 #pragma once
-#include "Isystem.h"
+#include "DiveDefs.h"
+#include "ISystem.h"
 
 namespace Dive
 {
 	class SystemManager;
 
+	constexpr double LOWEST_FRAME	= 15;
+	constexpr double NO_LIMIT_FRAME = 300;
+	constexpr double DELTA_FEEDBACK = 0.2;
+
 	class Timer : public ISystem
 	{
 	public:
-		Timer(SystemManager* pManager);
+		Timer(SystemManager* manager);
 		~Timer() = default;
 
 		void Update(float deltaTime) override;
@@ -24,7 +29,6 @@ namespace Dive
 		// fps
 		void SetTargetFps(double target);
 		float GetTargetFps() const { return static_cast<float>(m_target_fps); }
-		float GetFps() const { return static_cast<float>(m_fps); }
 
 
 	private:
@@ -36,8 +40,7 @@ namespace Dive
 		double m_delta_time_ms			= 0;
 		double m_smooth_delta_time_ms	= 0;
 
-		double m_fps		= 0;
-		double m_target_fps	= 0;
+		double m_target_fps				= NO_LIMIT_FRAME;
 	};
 }
 

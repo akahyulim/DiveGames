@@ -14,17 +14,18 @@ int main()
 	if (engine.Initialize())
 	{
 		auto timer = engine.GetSystemManager()->GetSystem<Dive::Timer>();
+		timer->SetTargetFps(60);
 
 		APP_TRACE("Engine 초기화 성공");
 
-		for (auto i = 0; i != 22; i++)
+		for (auto i = 0; i != 60; i++)
 		{	
-			Sleep(1000);
+			//Sleep(10);
 			engine.Update();
-			APP_TRACE("Engine Update 성공, {:f}초 경과", timer->GetDeltaTime());
+			APP_TRACE("Engine Update 성공, {0:f} : {1:f}", timer->GetDeltaTime(), timer->GetSmoothDeltaTime());
 		}
 
-		APP_TRACE("Engine 종료, {:f}초 동안 실행", timer->GetRunningTime());
+		APP_TRACE("Engine 종료, {0:f}", timer->GetRunningTime());
 	}
 
 	system("pause");
