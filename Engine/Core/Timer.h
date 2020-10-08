@@ -16,7 +16,7 @@ namespace Dive
 		Timer(SystemManager* manager);
 		~Timer() = default;
 
-		void Update(float deltaTime) override;
+		void Update() override;
 
 		// time
 		float GetRunningTimeMS() const { return static_cast<float>(m_running_time_ms); }

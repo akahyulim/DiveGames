@@ -31,8 +31,6 @@ namespace Dive
 		if (!m_system_manager)
 			return;
 
-		auto timer = m_system_manager->GetSystem<Timer>();
-
-		m_system_manager->Update(timer->GetDeltaTimeMS());
+		m_system_manager->Update();
 	}
 }

@@ -11,7 +11,7 @@ namespace Dive
 		m_begin_frame_time = std::chrono::high_resolution_clock::now();
 	}
 
-	void Timer::Update(float deltaTime)
+	void Timer::Update()
 	{
 		m_end_frame_time = m_begin_frame_time;
 		m_begin_frame_time = std::chrono::high_resolution_clock::now();

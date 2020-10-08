@@ -13,7 +13,7 @@ namespace Dive
 		virtual ~ISystem() = default;
 
 		virtual bool Initialize() { return true; }
-		virtual void Update(float deltaTime = 0.0f) {}
+		virtual void Update() {}
 
 		template<typename T>
 		std::shared_ptr<T> GetSharedPtr() { return std::dynamic_pointer_cast<T>(shared_from_this()); }

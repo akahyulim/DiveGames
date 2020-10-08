@@ -34,10 +34,10 @@ namespace Dive
 			return true;
 		}
 
-		void Update(float deltaTime = 0.0f)
+		void Update()
 		{
 			for (const auto& system : m_systems)
-				system->Update(deltaTime);
+				system->Update();
 		}
 
 		template<typename T>
