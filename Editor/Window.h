@@ -13,8 +13,8 @@
 
 namespace Window
 {
-	static HWND g_handleWindow = nullptr;
-	static HINSTANCE g_handleInstance = nullptr;
+	static HWND g_handle_window			= nullptr;
+	static HINSTANCE g_handle_instace	= nullptr;
 
 	std::function<LRESULT(HWND, UINT, WPARAM, LPARAM)> g_OnMessage;
 	std::function<void(int, int)> g_OnResize;
@@ -43,9 +43,9 @@ namespace Window
 
 	bool Create(HINSTANCE handleInstance, const std::wstring& title, int width = 0, int height = 0)
 	{
-		g_handleInstance = handleInstance ? handleInstance : (HINSTANCE)::GetModuleHandle(nullptr);
+		g_handle_instace = handleInstance ? handleInstance : (HINSTANCE)::GetModuleHandle(nullptr);
 
-		LPCWSTR className = L"WndClass";
+		LPCWSTR class_name = L"WndClass";
 
 		if (width == 0 || height == 0)
 		{
@@ -53,21 +53,21 @@ namespace Window
 			height = GetSystemMetrics(SM_CYSCREEN);
 		}
 
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
+		int pos_x = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+		int pos_y = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 
 		WNDCLASSEX wc;
 		wc.style = 0;
 		wc.lpfnWndProc		= WndProc;
 		wc.cbClsExtra		= 0;
 		wc.cbWndExtra		= 0;
-		wc.hInstance		= g_handleInstance;
+		wc.hInstance		= g_handle_instace;
 		wc.hIcon			= LoadIcon(nullptr, IDI_APPLICATION);
 		wc.hIconSm			= wc.hIcon;
 		wc.hCursor			= LoadCursor(nullptr, IDC_ARROW);
 		wc.hbrBackground	= (HBRUSH)COLOR_WINDOW;
 		wc.lpszMenuName		= nullptr;
-		wc.lpszClassName	= className;
+		wc.lpszClassName	= class_name;
 		wc.cbSize			= sizeof(WNDCLASSEX);
 
 		if (!RegisterClassEx(&wc))
@@ -76,16 +76,16 @@ namespace Window
 			return false;
 		}
 
-		g_handleWindow = CreateWindowEx(
+		g_handle_window = CreateWindowEx(
 			WS_EX_CLIENTEDGE,
-			className,
+			class_name,
 			title.c_str(),
 			WS_OVERLAPPEDWINDOW,
-			posX, posY,
+			pos_x, pos_y,
 			width, height,
-			nullptr, nullptr, g_handleInstance, nullptr);
+			nullptr, nullptr, g_handle_instace, nullptr);
 
-		if (!g_handleWindow)
+		if (!g_handle_window)
 		{
 			MessageBox(nullptr, L"윈도우 생성에 실패하였습니다.", L"Error", MB_OK);
 			return false;
@@ -96,18 +96,18 @@ namespace Window
 
 	void Destroy()
 	{
-		DestroyWindow(g_handleWindow);
-		g_handleWindow = NULL;
+		DestroyWindow(g_handle_window);
+		g_handle_window = NULL;
 
-		UnregisterClass(L"WndClass", g_handleInstance);
-		g_handleInstance = NULL;
+		UnregisterClass(L"WndClass", g_handle_instace);
+		g_handle_instace = NULL;
 	}
 
 	void Show()
 	{
-		ShowWindow(g_handleWindow, SW_MAXIMIZE);
-		UpdateWindow(g_handleWindow);
-		SetFocus(g_handleWindow);
+		ShowWindow(g_handle_window, SW_MAXIMIZE);
+		UpdateWindow(g_handle_window);
+		SetFocus(g_handle_window);
 	}
 
 	bool Run()
@@ -127,7 +127,7 @@ namespace Window
 	int GetWidth()
 	{
 		RECT rt;
-		GetClientRect(g_handleWindow, &rt);
+		GetClientRect(g_handle_window, &rt);
 
 		return static_cast<int>(rt.right - rt.left);
 	}
@@ -135,7 +135,7 @@ namespace Window
 	int GetHeight()
 	{
 		RECT rt;
-		GetClientRect(g_handleWindow, &rt);
+		GetClientRect(g_handle_window, &rt);
 
 		return static_cast<int>(rt.bottom - rt.top);
 	}
@@ -143,7 +143,7 @@ namespace Window
 	void GetWindowSize(float* width, float* height)
 	{
 		RECT rt;
-		GetClientRect(g_handleWindow, &rt);
+		GetClientRect(g_handle_window, &rt);
 
 		*width = static_cast<float>(rt.right - rt.left);
 		*height = static_cast<float>(rt.bottom - rt.top);
