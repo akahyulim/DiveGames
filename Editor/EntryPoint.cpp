@@ -5,7 +5,9 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+#ifdef _DEBUG
 	AllocConsole();
+#endif
 
 	if (!Window::Create(hInstance, L"Dive Editor"))
 	{
@@ -14,19 +16,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	Dive::Log::Initialize();
+	Editor edt;
 	APP_TRACE("Editor를 실행합니다.");
 	Window::Show();
 
 	while (Window::Run())
 	{
-
+		edt.Update();
 	}
 
 	Window::Destroy();
 	APP_TRACE("Editor를 종료합니다.");
 
+#ifdef _DEBUG
 	system("pause");
 	FreeConsole();
-	
+#endif
+
 	return 0;
 }
