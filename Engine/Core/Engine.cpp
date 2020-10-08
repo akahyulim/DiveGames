@@ -12,15 +12,13 @@ namespace Dive
 
 	Engine::~Engine()
 	{
-		if (m_system_manager)
-			SAFE_DELETE(m_system_manager);
 	}
 	
 	bool Engine::Initialize()
 	{
-		m_system_manager = new SystemManager(this);
+		m_system_manager = std::make_shared<SystemManager>(this);
 
-		m_system_manager->RegisterSystem(static_cast<ISystem*>(new Timer(m_system_manager)));
+		m_system_manager->RegisterSystem<Timer>();
 
 		if (!m_system_manager->Initialize())
 			return false;

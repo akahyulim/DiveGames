@@ -16,7 +16,7 @@ namespace Dive
 		{
 			for (auto& system : m_systems)
 			{
-				SAFE_DELETE(system);
+				system.reset();
 			}
 			m_systems.clear();
 		}
@@ -40,22 +40,23 @@ namespace Dive
 				system->Update(deltaTime);
 		}
 
-		// 생성과 등록을 따로할 필요가 있나?
-		void RegisterSystem(ISystem* system)
+		template<typename T>
+		void RegisterSystem()
 		{
-			if (!system)
-				return;
+			ValidateSystemType<T>();
 
-			m_systems.push_back(system);
+			m_systems.emplace_back(std::make_shared<T>(this));
 		}
 
 		template<typename T>
 		T* GetSystem() const
 		{
+			ValidateSystemType<T>();
+
 			for (const auto& system : m_systems)
 			{
 				if (typeid(T) == typeid(*system))
-					return dynamic_cast<T*>(system);
+					return static_cast<T*>(system.get());
 			}
 			return nullptr;
 		}
@@ -67,6 +68,6 @@ namespace Dive
 
 	private:
 		Engine* m_engine = nullptr;
-		std::vector<ISystem*> m_systems;
+		std::vector<std::shared_ptr<ISystem>> m_systems;
 	};
 }
