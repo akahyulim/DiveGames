@@ -1,5 +1,5 @@
 #include "Editor.h"
-#include "DiveEngine.h"
+#include "core/DiveEngine.h"
 
 Editor::Editor()
 {
