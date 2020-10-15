@@ -1,4 +1,4 @@
-#include "GoogleTest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 #include "Core/StringUtils.h"
 
 TEST(StringUtils, ToUppercase)
