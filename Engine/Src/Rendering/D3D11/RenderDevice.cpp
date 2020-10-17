@@ -1,5 +1,7 @@
 #include "DivePch.h"
 #include "RenderDevice.h"
+#include "Core/Log.h"
+#include "Core/DiveDefs.h"
 
 namespace Dive
 {
@@ -9,5 +11,111 @@ namespace Dive
 
 	RenderDevice::~RenderDevice()
 	{
+	}
+	
+	bool RenderDevice::Initialize(HWND hwnd, unsigned int width, unsigned int height)
+	{
+		if (!IsWindow(hwnd))
+		{
+			CORE_ERROR("RenderDevice::Initialize >> 유효하지 않은 윈도우 핸들입니다.");
+			return false;
+		}
+
+		//= SwapChain, Device, DeviceContext =======================================================================
+		{
+			DXGI_SWAP_CHAIN_DESC descSwapChain;
+			ZeroMemory(&descSwapChain, sizeof(descSwapChain));
+			descSwapChain.BufferCount							= m_swap_chain_buffer_count;
+			descSwapChain.BufferDesc.Format						= static_cast<DXGI_FORMAT>(m_format);
+			descSwapChain.BufferDesc.Width						= width;
+			descSwapChain.BufferDesc.Height						= height;
+			descSwapChain.BufferDesc.ScanlineOrdering			= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+			descSwapChain.BufferDesc.Scaling					= DXGI_MODE_SCALING_UNSPECIFIED;
+			descSwapChain.BufferDesc.RefreshRate.Numerator		= m_refresh_rate.x;
+			descSwapChain.BufferDesc.RefreshRate.Denominator	= m_refresh_rate.y;
+			descSwapChain.Windowed								= m_is_windowed ? TRUE : FALSE;
+			descSwapChain.BufferUsage							= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+			descSwapChain.OutputWindow							= hwnd;
+			descSwapChain.SampleDesc.Count						= 1;
+			descSwapChain.SampleDesc.Quality					= 0;
+			// 일단 아래 두 항목을 수정하면 생성에 실패한다.
+			descSwapChain.SwapEffect							= DXGI_SWAP_EFFECT_DISCARD;// DXGI_SWAP_EFFECT_FLIP_DISCARD;
+			descSwapChain.Flags									= DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;// | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+
+			UINT deviceFlags;
+#ifdef DEBUG
+			deviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+#else
+			deviceFlags = 0;
+#endif
+			D3D_FEATURE_LEVEL featureLevels[] =
+			{
+				D3D_FEATURE_LEVEL_11_1,
+				D3D_FEATURE_LEVEL_11_0,
+				D3D_FEATURE_LEVEL_10_1,
+				D3D_FEATURE_LEVEL_10_0,
+				D3D_FEATURE_LEVEL_9_3,
+				D3D_FEATURE_LEVEL_9_1,
+			};
+
+			auto swap_chain_ptr = m_swap_chain.get();
+			auto device_ptr = m_device.get();
+			auto immediate_context_ptr = m_immediate_context.get();
+
+			if (FAILED(D3D11CreateDeviceAndSwapChain(
+				nullptr,					// 첫 번째 Adapter를 사용합니다.
+				D3D_DRIVER_TYPE_HARDWARE,
+				nullptr,
+				deviceFlags,
+				featureLevels,
+				ARRAYSIZE(featureLevels),
+				D3D11_SDK_VERSION,
+				&descSwapChain,
+				&swap_chain_ptr,
+				&device_ptr,
+				nullptr,
+				&immediate_context_ptr)))
+			{
+				CORE_ERROR("RenderDevice::Initialize >> D3D11 Device, DeviceContext, SwapChain 생성에 실패하였습니다.");
+				return false;
+			}
+		}
+
+		//= RenderTargetView =======================================================================================
+		if (!createBackBufferRenderTarget())
+			return false;
+
+		m_resolution = DirectX::XMINT2(width, height);
+
+		CORE_TRACE("RenderDevice::RenderDevice >> RenderDevice 초기화에 성공하였습니다.");
+
+		return true;
+	}
+
+	void RenderDevice::Present()
+	{
+	}
+
+	bool RenderDevice::createBackBufferRenderTarget()
+	{
+		if (!m_swap_chain)
+			return false;
+
+		ID3D11Texture2D* back_buffer_ptr = nullptr;
+		if (FAILED(m_swap_chain->GetBuffer(0, IID_PPV_ARGS(&back_buffer_ptr))))
+		{
+			CORE_ERROR("RenderDevice::createBackBufferRenderTarget>> Backbuffer 획득에 실패하였습니다.");
+			return false;
+		}
+
+		if (FAILED(m_device->CreateRenderTargetView(back_buffer_ptr, nullptr, &m_back_buffer_RTV)))
+		{
+			CORE_ERROR("RenderDevice::createBackBufferRenderTarget>> RenderTargetView 생성에 실패하였습니다.");
+			return false;
+		}
+
+		SAFE_RELEASE(back_buffer_ptr);
+
+		return true;
 	}
 }
