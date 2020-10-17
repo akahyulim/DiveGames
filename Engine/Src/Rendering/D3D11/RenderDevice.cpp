@@ -3,5 +3,11 @@
 
 namespace Dive
 {
+	RenderDevice::RenderDevice()
+	{
+	}
 
+	RenderDevice::~RenderDevice()
+	{
+	}
 }

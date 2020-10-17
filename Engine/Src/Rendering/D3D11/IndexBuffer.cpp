@@ -32,17 +32,17 @@ namespace Dive
 
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		desc.ByteWidth = static_cast<unsigned int>(sizeof(unsigned int)) * size;
-		desc.CPUAccessFlags = 0;
-		desc.MiscFlags = 0;
-		desc.StructureByteStride = 0;
-		desc.Usage = D3D11_USAGE_IMMUTABLE;
+		desc.BindFlags				= D3D11_BIND_INDEX_BUFFER;
+		desc.ByteWidth				= static_cast<unsigned int>(sizeof(unsigned int)) * size;
+		desc.CPUAccessFlags			= 0;
+		desc.MiscFlags				= 0;
+		desc.StructureByteStride	= 0;
+		desc.Usage					= D3D11_USAGE_IMMUTABLE;
 
 		D3D11_SUBRESOURCE_DATA data;
-		data.pSysMem = indices.data();
-		data.SysMemPitch = 0;
-		data.SysMemSlicePitch = 0;
+		data.pSysMem			= indices.data();
+		data.SysMemPitch		= 0;
+		data.SysMemSlicePitch	= 0;
 
 		auto buffer_ptr = m_buffer.get();
 		if (FAILED(m_device->GetD3DDevice()->CreateBuffer(&desc, &data, &buffer_ptr)))
@@ -58,12 +58,12 @@ namespace Dive
 	{
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		desc.ByteWidth = static_cast<unsigned int>(sizeof(unsigned int)) * size;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		desc.MiscFlags = 0;
-		desc.StructureByteStride = 0;
-		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.BindFlags				= D3D11_BIND_INDEX_BUFFER;
+		desc.ByteWidth				= static_cast<unsigned int>(sizeof(unsigned int)) * size;
+		desc.CPUAccessFlags			= D3D11_CPU_ACCESS_WRITE;
+		desc.MiscFlags				= 0;
+		desc.StructureByteStride	= 0;
+		desc.Usage					= D3D11_USAGE_DYNAMIC;
 
 		auto buffer_ptr = m_buffer.get();
 		if (FAILED(m_device->GetD3DDevice()->CreateBuffer(&desc, nullptr, &buffer_ptr)))
