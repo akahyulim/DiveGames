@@ -54,7 +54,7 @@ project (ENGINE_NAME)
 
     -- PCH
     pchheader "DivePch.h"
-    pchsource (ENGINE_SRC_DIR .. "/Core/DivePch.cpp")
+    pchsource (ENGINE_SRC_DIR .. "/DivePch.cpp")
 
     -- Files
     files 
@@ -66,7 +66,8 @@ project (ENGINE_NAME)
     -- Includes
     includedirs 
     { 
-        (ENGINE_EXTERNAL_DIR)
+        (ENGINE_EXTERNAL_DIR),
+        (ENGINE_SRC_DIR),
     }
     
     -- Libraries
