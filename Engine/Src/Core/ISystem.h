@@ -12,8 +12,8 @@ namespace Dive
 		ISystem(SystemManager* manager) { m_manager = manager; }
 		virtual ~ISystem() = default;
 
-		virtual bool Initialize() { return true; }
-		virtual void Update() {}
+		virtual bool Initialize()	= 0;
+		virtual void Update()		= 0;
 
 		template<typename T>
 		std::shared_ptr<T> GetSharedPtr() { return std::dynamic_pointer_cast<T>(shared_from_this()); }

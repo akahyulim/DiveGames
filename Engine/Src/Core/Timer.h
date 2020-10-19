@@ -16,6 +16,7 @@ namespace Dive
 		Timer(SystemManager* manager);
 		~Timer() = default;
 
+		bool Initialize() override;
 		void Update() override;
 
 		// time
