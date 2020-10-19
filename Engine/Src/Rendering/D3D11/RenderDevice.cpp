@@ -23,32 +23,32 @@ namespace Dive
 
 		//= SwapChain, Device, DeviceContext =======================================================================
 		{
-			DXGI_SWAP_CHAIN_DESC descSwapChain;
-			ZeroMemory(&descSwapChain, sizeof(descSwapChain));
-			descSwapChain.BufferCount							= m_swap_chain_buffer_count;
-			descSwapChain.BufferDesc.Format						= static_cast<DXGI_FORMAT>(m_format);
-			descSwapChain.BufferDesc.Width						= width;
-			descSwapChain.BufferDesc.Height						= height;
-			descSwapChain.BufferDesc.ScanlineOrdering			= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-			descSwapChain.BufferDesc.Scaling					= DXGI_MODE_SCALING_UNSPECIFIED;
-			descSwapChain.BufferDesc.RefreshRate.Numerator		= m_refresh_rate.x;
-			descSwapChain.BufferDesc.RefreshRate.Denominator	= m_refresh_rate.y;
-			descSwapChain.Windowed								= m_is_windowed ? TRUE : FALSE;
-			descSwapChain.BufferUsage							= DXGI_USAGE_RENDER_TARGET_OUTPUT;
-			descSwapChain.OutputWindow							= hwnd;
-			descSwapChain.SampleDesc.Count						= 1;
-			descSwapChain.SampleDesc.Quality					= 0;
+			DXGI_SWAP_CHAIN_DESC desc_swap_chain;
+			ZeroMemory(&desc_swap_chain, sizeof(desc_swap_chain));
+			desc_swap_chain.BufferCount							= m_swap_chain_buffer_count;
+			desc_swap_chain.BufferDesc.Format					= static_cast<DXGI_FORMAT>(m_format);
+			desc_swap_chain.BufferDesc.Width					= width;
+			desc_swap_chain.BufferDesc.Height					= height;
+			desc_swap_chain.BufferDesc.ScanlineOrdering			= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+			desc_swap_chain.BufferDesc.Scaling					= DXGI_MODE_SCALING_UNSPECIFIED;
+			desc_swap_chain.BufferDesc.RefreshRate.Numerator	= m_refresh_rate.x;
+			desc_swap_chain.BufferDesc.RefreshRate.Denominator	= m_refresh_rate.y;
+			desc_swap_chain.Windowed							= m_is_windowed ? TRUE : FALSE;
+			desc_swap_chain.BufferUsage							= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+			desc_swap_chain.OutputWindow						= hwnd;
+			desc_swap_chain.SampleDesc.Count					= 1;
+			desc_swap_chain.SampleDesc.Quality					= 0;
 			// 일단 아래 두 항목을 수정하면 생성에 실패한다.
-			descSwapChain.SwapEffect							= DXGI_SWAP_EFFECT_DISCARD;// DXGI_SWAP_EFFECT_FLIP_DISCARD;
-			descSwapChain.Flags									= DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;// | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
+			desc_swap_chain.SwapEffect							= DXGI_SWAP_EFFECT_DISCARD;// DXGI_SWAP_EFFECT_FLIP_DISCARD;
+			desc_swap_chain.Flags								= DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;// | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING;
 
-			UINT deviceFlags;
+			UINT device_flags;
 #ifdef DEBUG
-			deviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+			device_flags = D3D11_CREATE_DEVICE_DEBUG;
 #else
-			deviceFlags = 0;
+			device_flags = 0;
 #endif
-			D3D_FEATURE_LEVEL featureLevels[] =
+			D3D_FEATURE_LEVEL feature_levels[] =
 			{
 				D3D_FEATURE_LEVEL_11_1,
 				D3D_FEATURE_LEVEL_11_0,
@@ -58,19 +58,19 @@ namespace Dive
 				D3D_FEATURE_LEVEL_9_1,
 			};
 
-			auto swap_chain_ptr = m_swap_chain.get();
-			auto device_ptr = m_device.get();
-			auto immediate_context_ptr = m_immediate_context.get();
+			auto swap_chain_ptr			= m_swap_chain.get();
+			auto device_ptr				= m_device.get();
+			auto immediate_context_ptr	= m_immediate_context.get();
 
 			if (FAILED(D3D11CreateDeviceAndSwapChain(
 				nullptr,					// 첫 번째 Adapter를 사용합니다.
 				D3D_DRIVER_TYPE_HARDWARE,
 				nullptr,
-				deviceFlags,
-				featureLevels,
-				ARRAYSIZE(featureLevels),
+				device_flags,
+				feature_levels,
+				ARRAYSIZE(feature_levels),
 				D3D11_SDK_VERSION,
-				&descSwapChain,
+				&desc_swap_chain,
 				&swap_chain_ptr,
 				&device_ptr,
 				nullptr,
