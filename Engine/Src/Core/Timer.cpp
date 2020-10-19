@@ -7,8 +7,14 @@ namespace Dive
 	Timer::Timer(SystemManager * manager)
 		: ISystem(manager)
 	{
+	}
+
+	bool Timer::Initialize()
+	{
 		m_startup_time = std::chrono::high_resolution_clock::now();
 		m_begin_frame_time = std::chrono::high_resolution_clock::now();
+
+		return true;
 	}
 
 	void Timer::Update()
