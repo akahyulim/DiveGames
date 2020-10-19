@@ -9,10 +9,6 @@ namespace Dive
 	Renderer::Renderer(SystemManager* manager)
 		: ISystem(manager)
 	{
-
-		// initialize device
-		// window 정보가 필요하다.
-		// 따라서 interface가 정해진 intialize 메서드보다 생성자에서 생성하는 게 낫다.
 	}
 
 	Renderer::~Renderer()
@@ -21,6 +17,9 @@ namespace Dive
 
 	bool Renderer::Initialize()
 	{
+		// initialize device
+		// window 정보가 필요하다.
+	
 		// initialize resource
 
 		// set viewport
@@ -41,5 +40,13 @@ namespace Dive
 		// set constant buffer data
 
 		// rendering path(pass 묶음)
+	}
+
+	void Renderer::Present()
+	{
+		if (!m_render_device)
+			return;
+
+		m_render_device->Present();
 	}
 }

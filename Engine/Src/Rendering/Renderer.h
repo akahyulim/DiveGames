@@ -15,6 +15,8 @@ namespace Dive
 		bool Initialize() override;
 		void Update() override;
 
+		void Present();
+
 		// 개별 객체 전달이 나을까?
 		RenderDevice* GetRenderDevice() const { return m_render_device.get(); }
 

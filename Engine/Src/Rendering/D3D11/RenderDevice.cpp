@@ -94,6 +94,12 @@ namespace Dive
 
 	void RenderDevice::Present()
 	{
+		if (!m_swap_chain)
+			return;
+
+
+		// test rendering
+		m_swap_chain->Present(0, 0);
 	}
 
 	bool RenderDevice::createBackBufferRenderTarget()
