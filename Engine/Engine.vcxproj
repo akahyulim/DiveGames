@@ -105,6 +105,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Events\Event.h" />
     <ClInclude Include="Src\Core\DiveDefs.h" />
     <ClInclude Include="Src\Core\DiveEngine.h" />
     <ClInclude Include="Src\Core\Engine.h" />

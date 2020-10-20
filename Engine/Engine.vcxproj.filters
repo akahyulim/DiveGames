@@ -1,59 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Core">
+    <Filter Include="Src">
+      <UniqueIdentifier>{80048383-51c3-42db-9541-b90db6b1f57f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Core">
       <UniqueIdentifier>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Events">
+      <UniqueIdentifier>{126ce9c7-be93-405c-b8c9-62d469b3602f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\DiveDefs.h">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\DiveEngine.h">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Engine.h">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\ISystem.h">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Log.h">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Object.h">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Stopwatch.h">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\StringUtils.h">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\SystemManager.h">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Timer.h">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\DivePch.h" />
+    <ClInclude Include="Src\DivePch.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Events\Event.h">
+      <Filter>Src\Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Core\Engine.cpp">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Log.cpp">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Stopwatch.cpp">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\StringUtils.cpp">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Timer.cpp">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\DivePch.cpp" />
+    <ClCompile Include="Src\DivePch.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

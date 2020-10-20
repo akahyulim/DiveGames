@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "Core/StringUtils.h"
+#include "Core/DiveEngine.h"
 
 TEST(StringUtils, ToUppercase)
 {

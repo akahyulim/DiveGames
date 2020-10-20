@@ -2,7 +2,7 @@
 
 #include "DivePch.h"
 
-// ========== Core ==============
+//= Core ==================================================
 #include "DiveDefs.h"
 #include "Log.h"
 #include "Stopwatch.h"
@@ -10,3 +10,7 @@
 #include "SystemManager.h"
 #include "Timer.h"
 #include "Engine.h"
+#include "StringUtils.h"
+
+//= Event =================================================
+#include "Events/Event.h"
