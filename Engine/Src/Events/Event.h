@@ -1,9 +1,8 @@
 
 // https://www.gamedev.net/tutorials/_/technical/game-programming/effective-event-handling-in-c-r2459/
 // https://medium.com/@savas/nomad-game-engine-part-7-the-event-system-45a809ccb68f
-// FunctionHandler와 MethodHandler를 구분한 이유는?
-// FunctionHandler::Exec()를 완벽한 전달로?
-// EventDispatcher의 동적 생성 객체들을 처리해야 한다.
+// 완벽한 전달?
+
 #pragma once
 #include "DivePch.h"
 
@@ -15,29 +14,29 @@ namespace Dive
 		virtual ~Event() {}
 	};
 
-	class FucntionHandler
+	class HandlerBase
 	{
 	public:
-		void Exec(Event* evnt)
+		void Exec(const Event* evnt)
 		{
 			call(evnt);
 		}
 
 	protected:
-		virtual void call(Event* evnet) = 0;
+		virtual void call(const Event* evnt) = 0;
 	};
 
 	template<class T, class EventType>
-	class MethodHandler : public FucntionHandler
+	class MethodHandler : public HandlerBase
 	{
-	public:
 		typedef void (T::*MemberFunction)(EventType*);
 
+	public:
 		MethodHandler(T* instance, MemberFunction method)
 			: m_instance(instance), m_method(method)
 		{}
 
-		void call(Event* evnt)
+		void call(const Event* evnt) override
 		{
 			(m_instance->*m_method)(static_cast<EventType*>(evnt));
 		}
@@ -49,7 +48,7 @@ namespace Dive
 
 	class EventDispatcher
 	{
-		using handler_list = std::list<FucntionHandler*>;
+		using handler_list = std::list<std::unique_ptr<HandlerBase>>;
 
 	public:
 		static EventDispatcher& GetInstace()
@@ -61,29 +60,26 @@ namespace Dive
 		template<class T, class EventType>
 		void Subscribe(T* instance, void (T::*Method)(EventType*))
 		{
-			handler_list* handlers = m_subscribers[typeid(EventType)];
+			std::type_index key = typeid(EventType);
 
-			if (handlers == nullptr)
+			if (!m_subscribers[key])
 			{
-				handlers = new handler_list;
-				m_subscribers[typeid(EventType)] = handlers;
+				m_subscribers[key] = std::make_unique<handler_list>();
 			}
 
-			handlers->push_back(new MethodHandler<T, EventType>(instance, Method));
+			m_subscribers[key]->push_back(std::make_unique<MethodHandler<T, EventType>>(instance, Method));
 		}
 
-		template<typename EventType>
-		void Fire(EventType* evnt)
+		void Fire(const Event* evnt)
 		{
-			handler_list * handlers = m_subscribers[typeid(EventType)];
+			std::type_index key = typeid(*evnt);
 
-			if (!handlers)
+			if (!m_subscribers[key])
 				return;
 
-			for (auto& handler : *handlers)
+			for (auto& handler : *m_subscribers[key])
 			{
-				if (handler != nullptr)
-					handler->Exec(evnt);
+				handler->Exec(evnt);
 			}
 		}
 
@@ -91,6 +87,6 @@ namespace Dive
 		EventDispatcher() = default;
 
 	private:
-		std::map<std::type_index, handler_list*> m_subscribers;
+		std::map<std::type_index, std::unique_ptr<handler_list>> m_subscribers;
 	};
 }

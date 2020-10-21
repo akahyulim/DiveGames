@@ -29,12 +29,12 @@ public:
 		dispatcher.Subscribe(this, &Foo::OnMul);
 	}
 
-	void OnAdd(AddEvent* evnt)
+	void OnAdd(const AddEvent* evnt)
 	{
 		m_add = evnt->m_a + evnt->m_b;
 	}
 
-	void OnMul(MulEvent* evnt)
+	void OnMul(const MulEvent* evnt)
 	{
 		m_mul = evnt->m_a * evnt->m_b;
 	}
@@ -52,7 +52,7 @@ public:
 		dispatcher.Subscribe(this, &Boo::OnMul);
 	}
 
-	void OnMul(MulEvent* evnt)
+	void OnMul(const MulEvent* evnt)
 	{
 		m_result = evnt->m_a * evnt->m_b;
 	}
