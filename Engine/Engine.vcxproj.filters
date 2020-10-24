@@ -1,104 +1,120 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Core">
-      <UniqueIdentifier>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Rendering">
-      <UniqueIdentifier>{4782b9c9-698b-4b49-9bcf-5515d4b01956}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Rendering\D3D11">
-      <UniqueIdentifier>{abe9f6c8-d06f-4a6a-a772-5464b4ec6150}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Src\Core\DiveDefs.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\DiveEngine.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Engine.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\ISystem.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Log.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Object.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Stopwatch.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\StringUtils.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\SystemManager.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Timer.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\DivePch.h" />
-    <ClInclude Include="Src\Rendering\D3D11\ConstantBuffer.h">
-      <Filter>Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\IndexBuffer.h">
-      <Filter>Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\RenderDevice.h">
-      <Filter>Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\RenderDeviceEnums.h">
-      <Filter>Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\RenderDeviceTypes.h">
-      <Filter>Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\VertexBuffer.h">
-      <Filter>Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\VertexTypes.h">
-      <Filter>Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\Renderer.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
+    <ClCompile Include="Src\DivePch.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
     <ClCompile Include="Src\Core\Engine.cpp">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Log.cpp">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Stopwatch.cpp">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\StringUtils.cpp">
-      <Filter>Core</Filter>
+      <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Timer.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\DivePch.cpp" />
-    <ClCompile Include="Src\Rendering\D3D11\ConstantBuffer.cpp">
-      <Filter>Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\IndexBuffer.cpp">
-      <Filter>Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\RenderDevice.cpp">
-      <Filter>Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\VertexBuffer.cpp">
-      <Filter>Rendering\D3D11</Filter>
+      <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Rendering\Renderer.cpp">
-      <Filter>Rendering</Filter>
+      <Filter>Src\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Rendering\D3D11\ConstantBuffer.cpp">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Rendering\D3D11\IndexBuffer.cpp">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Rendering\D3D11\RenderDevice.cpp">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Rendering\D3D11\VertexBuffer.cpp">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Src\DivePch.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DiveDefs.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DiveEngine.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Engine.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\ISystem.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Log.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Object.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Stopwatch.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\StringUtils.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\SystemManager.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Timer.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Events\WindowEvent.h">
+      <Filter>Src\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Events\EventSystem.h">
+      <Filter>Src\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\Renderer.h">
+      <Filter>Src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\D3D11\ConstantBuffer.h">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\D3D11\IndexBuffer.h">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\D3D11\RenderDevice.h">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\D3D11\RenderDeviceEnums.h">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\D3D11\RenderDeviceTypes.h">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\D3D11\VertexBuffer.h">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\D3D11\VertexTypes.h">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{085b2de7-57c8-43c4-9816-cb5ea21c67a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Events">
+      <UniqueIdentifier>{0fee6eb3-c724-40c4-81ff-445b69f8b3ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Core">
+      <UniqueIdentifier>{b67b50d6-30bf-4bec-95cd-cd84eae9720a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Rendering">
+      <UniqueIdentifier>{ebe000b5-8dba-47b6-b165-cfb8b562c66a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Rendering\D3D11">
+      <UniqueIdentifier>{6811df3e-5f7f-427f-8eb8-68f6fbb3c8d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>
