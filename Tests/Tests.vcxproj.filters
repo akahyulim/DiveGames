@@ -7,7 +7,7 @@
     <ClCompile Include="Src\main.cpp">
       <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="Test_Events.cpp">
+    <ClCompile Include="Test_EventSystem.cpp">
       <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>

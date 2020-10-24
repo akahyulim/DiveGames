@@ -24,7 +24,7 @@ class Foo
 public:
 	Foo()
 	{
-		auto& dispatcher = Dive::EventDispatcher::GetInstace();
+		auto& dispatcher = Dive::EventSystem::GetInstance();
 		dispatcher.Subscribe(this, &Foo::OnAdd);
 		dispatcher.Subscribe(this, &Foo::OnMul);
 	}
@@ -39,40 +39,54 @@ public:
 		m_mul = evnt->m_a * evnt->m_b;
 	}
 
-	int m_add;
-	int m_mul;
+	int m_add = 0;
+	int m_mul = 0;
 };
 
 class Boo
 {
 public:
-	Boo()
+	void OnAdd(const AddEvent* evnt)
 	{
-		auto& dispatcher = Dive::EventDispatcher::GetInstace();
-		dispatcher.Subscribe(this, &Boo::OnMul);
+		m_add = evnt->m_a + evnt->m_b;
 	}
 
 	void OnMul(const MulEvent* evnt)
 	{
-		m_result = evnt->m_a * evnt->m_b;
+		m_mul = evnt->m_a * evnt->m_b;
 	}
 
-	int m_result;
+	int m_add = 0;
+	int m_mul = 0;
 };
 
 // tests
-TEST(Events, CallMethod)
+TEST(EventSystem, CallMethod)
 {
 	Foo foo;
-	Boo boo;
 	
-	auto& dispatcher = Dive::EventDispatcher::GetInstace();
+	auto& bus = Dive::EventSystem::GetInstance();
 	AddEvent add(22, 33);
 	MulEvent mul(5, 4);
-	dispatcher.Fire(&add);
-	dispatcher.Fire(&mul);
+	bus.Fire(&add);
+	bus.Fire(&mul);
 
 	ASSERT_EQ(55, foo.m_add);
 	ASSERT_EQ(20, foo.m_mul);
-	ASSERT_EQ(20, boo.m_result);
+}
+
+TEST(EventSystem, Subscribe)
+{
+	auto& bus = Dive::EventSystem::GetInstance();
+	Boo boo;
+	bus.Subscribe(&boo, &Boo::OnAdd);
+	bus.Subscribe(&boo, &Boo::OnMul);
+
+	AddEvent add(11, 22);
+	MulEvent mul(7, 4);
+	bus.Fire(&add);
+	bus.Fire(&mul);
+
+	ASSERT_EQ(33, boo.m_add);
+	ASSERT_EQ(28, boo.m_mul);
 }

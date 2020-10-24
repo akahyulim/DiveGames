@@ -1,7 +1,6 @@
 
 // https://www.gamedev.net/tutorials/_/technical/game-programming/effective-event-handling-in-c-r2459/
 // https://medium.com/@savas/nomad-game-engine-part-7-the-event-system-45a809ccb68f
-// 완벽한 전달?
 
 #pragma once
 #include "DivePch.h"
@@ -46,47 +45,45 @@ namespace Dive
 		MemberFunction m_method;
 	};
 
-	class EventDispatcher
+	class EventSystem
 	{
-		using handler_list = std::list<std::unique_ptr<HandlerBase>>;
-
+		using handler_list = std::list < std::unique_ptr<HandlerBase>>;
+	
 	public:
-		static EventDispatcher& GetInstace()
+		static EventSystem& GetInstance()
 		{
-			static EventDispatcher instance;
-			return instance;
+			static EventSystem instance;
+			return instance;	
 		}
 
 		template<class T, class EventType>
 		void Subscribe(T* instance, void (T::*Method)(EventType*))
 		{
-			std::type_index key = typeid(EventType);
+			if (m_subscribers[typeid(EventType)] == nullptr)
+				m_subscribers[typeid(EventType)] = std::make_unique<handler_list>();
 
-			if (!m_subscribers[key])
-			{
-				m_subscribers[key] = std::make_unique<handler_list>();
-			}
-
-			m_subscribers[key]->push_back(std::make_unique<MethodHandler<T, EventType>>(instance, Method));
+			m_subscribers[typeid(EventType)]->push_back(std::make_unique<MethodHandler<T, EventType>>(instance, Method));
 		}
 
 		void Fire(const Event* evnt)
 		{
-			std::type_index key = typeid(*evnt);
-
-			if (!m_subscribers[key])
+			if (m_subscribers.empty() || m_subscribers[typeid(*evnt)] == nullptr)
 				return;
 
-			for (auto& handler : *m_subscribers[key])
+			auto itr = m_subscribers[typeid(*evnt)]->begin();
+			auto itr_end = m_subscribers[typeid(*evnt)]->end();
+			for (itr; itr !=itr_end; itr++)
 			{
-				handler->Exec(evnt);
+				(*itr)->Exec(evnt);
 			}
 		}
 
 	private:
-		EventDispatcher() = default;
+		EventSystem()	= default;
+		~EventSystem()	= default;
+		EventSystem(const EventSystem&) = delete;
 
 	private:
-		std::map<std::type_index, std::unique_ptr<handler_list>> m_subscribers;
+		std::unordered_map<std::type_index, std::unique_ptr<handler_list>> m_subscribers;
 	};
 }

@@ -103,7 +103,7 @@
   <ItemGroup>
     <ClCompile Include="Src\Test_StringUtils.cpp" />
     <ClCompile Include="Src\main.cpp" />
-    <ClCompile Include="Test_Events.cpp" />
+    <ClCompile Include="Test_EventSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
