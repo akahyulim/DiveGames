@@ -3,8 +3,8 @@
 
 Editor::Editor()
 {
-	m_engine = std::make_unique<Dive::Engine>();
-	m_engine->Initialize();
+	m_pEngine = std::make_unique<Dive::Engine>();
+	m_pEngine->Initialize();
 }
 
 Editor::~Editor()
@@ -13,9 +13,9 @@ Editor::~Editor()
 
 void Editor::Update()
 {
-	m_engine->Update();
+	m_pEngine->Update();
 
-	auto timer = m_engine->GetSystemManager()->GetSystem<Dive::Timer>();
+	auto timer = m_pEngine->GetSystemManager()->GetSystem<Dive::Timer>();
 	if (!timer)
 		return;
 

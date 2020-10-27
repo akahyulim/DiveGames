@@ -7,22 +7,22 @@
 
 namespace Dive
 {
-	class Event
+	class IEvent
 	{
 	public:
-		virtual ~Event() {}
+		virtual ~IEvent() {}
 	};
 
 	class HandlerBase
 	{
 	public:
-		void Exec(const Event* evnt)
+		void Exec(const IEvent* pEvent)
 		{
-			call(evnt);
+			call(pEvent);
 		}
 
 	protected:
-		virtual void call(const Event* evnt) = 0;
+		virtual void call(const IEvent* pEvent) = 0;
 	};
 
 	template<class T, class EventType>
@@ -31,18 +31,18 @@ namespace Dive
 		typedef void (T::*MemberFunction)(EventType*);
 
 	public:
-		MethodHandler(T* instance, MemberFunction method)
-			: m_instance(instance), m_method(method)
+		MethodHandler(T* pInstance, MemberFunction method)
+			: m_pInstance(pInstance), m_Method(method)
 		{}
 
-		void call(const Event* evnt) override
+		void call(const IEvent* pEvent) override
 		{
-			(m_instance->*m_method)(static_cast<EventType*>(evnt));
+			(m_pInstance->*m_Method)(static_cast<EventType*>(pEvent));
 		}
 
 	private:
-		T* m_instance;
-		MemberFunction m_method;
+		T* m_pInstance;
+		MemberFunction m_Method;
 	};
 
 	class EventSystem
@@ -57,24 +57,24 @@ namespace Dive
 		}
 
 		template<class T, class EventType>
-		void Subscribe(T* instance, void (T::*Method)(EventType*))
+		void Subscribe(T* pInstance, void (T::*Method)(EventType*))
 		{
-			if (m_subscribers[typeid(EventType)] == nullptr)
-				m_subscribers[typeid(EventType)] = std::make_unique<handler_list>();
+			if (m_Subscribers[typeid(EventType)] == nullptr)
+				m_Subscribers[typeid(EventType)] = std::make_unique<handler_list>();
 
-			m_subscribers[typeid(EventType)]->push_back(std::make_unique<MethodHandler<T, EventType>>(instance, Method));
+			m_Subscribers[typeid(EventType)]->push_back(std::make_unique<MethodHandler<T, EventType>>(pInstance, Method));
 		}
 
-		void Fire(const Event* evnt)
+		void Fire(const IEvent* pEvent)
 		{
-			if (m_subscribers.empty() || m_subscribers[typeid(*evnt)] == nullptr)
+			if (m_Subscribers.empty() || m_Subscribers[typeid(*pEvent)] == nullptr)
 				return;
 
-			auto itr = m_subscribers[typeid(*evnt)]->begin();
-			auto itr_end = m_subscribers[typeid(*evnt)]->end();
+			auto itr = m_Subscribers[typeid(*pEvent)]->begin();
+			auto itr_end = m_Subscribers[typeid(*pEvent)]->end();
 			for (itr; itr !=itr_end; itr++)
 			{
-				(*itr)->Exec(evnt);
+				(*itr)->Exec(pEvent);
 			}
 		}
 
@@ -84,6 +84,6 @@ namespace Dive
 		EventSystem(const EventSystem&) = delete;
 
 	private:
-		std::unordered_map<std::type_index, std::unique_ptr<handler_list>> m_subscribers;
+		std::unordered_map<std::type_index, std::unique_ptr<handler_list>> m_Subscribers;
 	};
 }

@@ -4,51 +4,51 @@
 
 namespace Dive
 {
-	Timer::Timer(SystemManager * manager)
-		: ISystem(manager)
+	Timer::Timer(SystemManager * pManager)
+		: ISystem(pManager)
 	{
 	}
 
 	bool Timer::Initialize()
 	{
-		m_startup_time = std::chrono::high_resolution_clock::now();
-		m_begin_frame_time = std::chrono::high_resolution_clock::now();
+		m_StartupTime = std::chrono::high_resolution_clock::now();
+		m_BeginFrameTime = std::chrono::high_resolution_clock::now();
 
 		return true;
 	}
 
 	void Timer::Update()
 	{
-		m_end_frame_time = m_begin_frame_time;
-		m_begin_frame_time = std::chrono::high_resolution_clock::now();
+		m_EndFrameTime = m_BeginFrameTime;
+		m_BeginFrameTime = std::chrono::high_resolution_clock::now();
 
-		std::chrono::duration<double, std::milli> elapsed_time = m_begin_frame_time - m_startup_time;
-		std::chrono::duration<double, std::milli> delta_time = m_begin_frame_time - m_end_frame_time;
-		const std::chrono::duration<double, std::milli> remain_time =
-			std::chrono::duration<double, std::milli>(1000.0 / m_target_fps) - delta_time;
+		std::chrono::duration<double, std::milli> elapsedTime = m_BeginFrameTime - m_StartupTime;
+		std::chrono::duration<double, std::milli> deltaTime = m_BeginFrameTime - m_EndFrameTime;
+		const std::chrono::duration<double, std::milli> remainTime =
+			std::chrono::duration<double, std::milli>(1000.0 / m_TargetFPS) - deltaTime;
 
-		if (remain_time.count() > 0)
+		if (remainTime.count() > 0)
 		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int64_t>(remain_time.count())));
+			std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int64_t>(remainTime.count())));
 
-			elapsed_time += remain_time;
-			delta_time += remain_time;
+			elapsedTime += remainTime;
+			deltaTime += remainTime;
 		}
 		
-		m_running_time_ms = static_cast<double>(elapsed_time.count());
-		m_delta_time_ms = static_cast<double>(delta_time.count());
+		m_RunningTimeMS = static_cast<double>(elapsedTime.count());
+		m_DeltaTimeMS = static_cast<double>(deltaTime.count());
 
 		// smooth_delta_time °è»ê
-		const double lowest_frame_ms = 1000.0 / LOWEST_FRAME;
-		const double gap_frame_ms = m_delta_time_ms > lowest_frame_ms ? lowest_frame_ms : m_delta_time_ms;
-		m_smooth_delta_time_ms = m_smooth_delta_time_ms * (1.0 - DELTA_FEEDBACK) + gap_frame_ms * DELTA_FEEDBACK;
+		const double lowestFrameMS = 1000.0 / LOWEST_FRAME;
+		const double GapFrameMS = m_DeltaTimeMS > lowestFrameMS ? lowestFrameMS : m_DeltaTimeMS;
+		m_SmoothDeltaTimeMS = m_SmoothDeltaTimeMS * (1.0 - DELTA_FEEDBACK) + GapFrameMS * DELTA_FEEDBACK;
 	}
 
 	void Timer::SetTargetFps(double target)
 	{
 		if (target < 0)
-			m_target_fps = NO_LIMIT_FRAME;
+			m_TargetFPS = NO_LIMIT_FRAME;
 		else
-			m_target_fps = target;
+			m_TargetFPS = target;
 	}
 }

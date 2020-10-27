@@ -18,7 +18,7 @@ public:
 private:
 
 private:
-	std::unique_ptr<Dive::Engine> m_engine;
+	std::unique_ptr<Dive::Engine> m_pEngine;
 
 };
 

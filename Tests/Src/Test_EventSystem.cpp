@@ -2,20 +2,20 @@
 #include "Core/DiveEngine.h"
 
 // events
-class AddEvent : public Dive::Event
+class AddEvent : public Dive::IEvent
 {
 public:
-	AddEvent(int a, int b) : m_a(a), m_b(b) {}
-	int m_a;
-	int m_b;
+	AddEvent(int a, int b) : m_A(a), m_B(b) {}
+	int m_A;
+	int m_B;
 };
 
-class MulEvent : public Dive::Event
+class MulEvent : public Dive::IEvent
 {
 public:
-	MulEvent(int a, int b) : m_a(a), m_b(b) {}
-	int m_a;
-	int m_b;
+	MulEvent(int a, int b) : m_A(a), m_B(b) {}
+	int m_A;
+	int m_B;
 };
 
 // object
@@ -31,16 +31,16 @@ public:
 
 	void OnAdd(const AddEvent* evnt)
 	{
-		m_add = evnt->m_a + evnt->m_b;
+		m_Add = evnt->m_A + evnt->m_B;
 	}
 
 	void OnMul(const MulEvent* evnt)
 	{
-		m_mul = evnt->m_a * evnt->m_b;
+		m_Mul = evnt->m_A * evnt->m_B;
 	}
 
-	int m_add = 0;
-	int m_mul = 0;
+	int m_Add = 0;
+	int m_Mul = 0;
 };
 
 class Boo
@@ -48,16 +48,16 @@ class Boo
 public:
 	void OnAdd(const AddEvent* evnt)
 	{
-		m_add = evnt->m_a + evnt->m_b;
+		m_Add = evnt->m_A + evnt->m_B;
 	}
 
 	void OnMul(const MulEvent* evnt)
 	{
-		m_mul = evnt->m_a * evnt->m_b;
+		m_Mul = evnt->m_A * evnt->m_B;
 	}
 
-	int m_add = 0;
-	int m_mul = 0;
+	int m_Add = 0;
+	int m_Mul = 0;
 };
 
 // tests
@@ -71,8 +71,8 @@ TEST(EventSystem, CallMethod)
 	bus.Fire(&add);
 	bus.Fire(&mul);
 
-	ASSERT_EQ(55, foo.m_add);
-	ASSERT_EQ(20, foo.m_mul);
+	ASSERT_EQ(55, foo.m_Add);
+	ASSERT_EQ(20, foo.m_Mul);
 }
 
 TEST(EventSystem, Subscribe)
@@ -87,6 +87,6 @@ TEST(EventSystem, Subscribe)
 	bus.Fire(&add);
 	bus.Fire(&mul);
 
-	ASSERT_EQ(33, boo.m_add);
-	ASSERT_EQ(28, boo.m_mul);
+	ASSERT_EQ(33, boo.m_Add);
+	ASSERT_EQ(28, boo.m_Mul);
 }

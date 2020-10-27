@@ -14,10 +14,10 @@ namespace Dive
 		bool Initialize();
 		void Update();
 
-		SystemManager* GetSystemManager() const { return m_system_manager.get(); }
+		SystemManager* GetSystemManager() const { return m_pSystemManager.get(); }
 
 	private:
-		std::shared_ptr<SystemManager> m_system_manager;
+		std::shared_ptr<SystemManager> m_pSystemManager;
 	};
 }
 
