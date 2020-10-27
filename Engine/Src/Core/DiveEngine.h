@@ -11,6 +11,8 @@
 #include "Timer.h"
 #include "Engine.h"
 #include "StringUtils.h"
+#include "Settings.h"
+#include "FileSystemHelper.h"
 
 //= Event =================================================
 #include "Events/Event.h"
