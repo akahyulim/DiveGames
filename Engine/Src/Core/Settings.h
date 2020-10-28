@@ -4,14 +4,18 @@ namespace Dive
 {
 	enum class eScreenMode
 	{
-		Windowed,
+		Windowed = 0,
 		Borderless,
 		FullScreen
 	};
 
+	enum class eTargetFrame
+	{
+	};
+
 	enum class eVSync
 	{
-		On,
+		On = 0,
 		Off,
 	};
 	
