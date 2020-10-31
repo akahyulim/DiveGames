@@ -16,8 +16,7 @@ namespace Dive
 {
 	namespace FileSystemHelper
 	{
-
-		bool CreateDirectory_(const std::string& path)
+		bool CreateDirectory_(const std::wstring& path)
 		{
 			try
 			{
@@ -25,12 +24,12 @@ namespace Dive
 			}
 			catch (std::filesystem::filesystem_error& e)
 			{
-				CORE_ERROR("CreateDirectory: {0:s}. {1:s}", e.what(), path);
+				CORE_ERROR("FileSystemHelper::CreateDirectory>> {:s}", e.what());
 				return false;
 			} 
 		}
-
-		bool DeleteDirectory(const std::string& path)
+		
+		bool DeleteDirectory(const std::wstring& path)
 		{
 			try
 			{
@@ -38,12 +37,12 @@ namespace Dive
 			}
 			catch (std::filesystem::filesystem_error& e)
 			{
-				CORE_ERROR("DeleteDirectory: {0:s}. {1:s}", e.what(), path);
+				CORE_ERROR("FileSystemHelper::DeleteDirectory>> {:s}", e.what());
 				return false;
 			}
 		}
 
-		bool DirectoryExists(const std::string& path)
+		bool DirectoryExists(const std::wstring& path)
 		{
 			try
 			{
@@ -51,12 +50,12 @@ namespace Dive
 			}
 			catch (std::filesystem::filesystem_error& e)
 			{
-				CORE_ERROR("DirectoryExists: {0:s}. {1:s}", e.what(), path);
+				CORE_ERROR("FileSystemHelper::DirectoryExists>> {:s}", e.what());
 				return false;
 			}
 		}
 
-		bool IsDirectory(const std::string& path)
+		bool IsDirectory(const std::wstring& path)
 		{
 			try
 			{
@@ -64,41 +63,57 @@ namespace Dive
 			}
 			catch (std::filesystem::filesystem_error& e)
 			{
-				CORE_ERROR("IsDirectory: {0:s}. {1:s}", e.what(), path);
+				CORE_ERROR("FileSystemHelper::IsDirectory>> {:s}", e.what());
 				return false;
 			}
 		}
-
-		bool FileExists(const std::string& filepath)
+		
+		bool FileExists(const std::wstring& name)
 		{
 			try
 			{
-				return std::filesystem::exists(filepath);
+				return std::filesystem::exists(name);
 			}
 			catch (std::filesystem::filesystem_error& e)
 			{
-				CORE_ERROR("FileExists: {0:s}. {1:s}", e.what(), filepath);
+				CORE_ERROR("FileSystemHelper::FileExists>> {:s}", e.what());
 				return false;
 			}
 		}
 
-		bool DeleteFile_(const std::string& filepath)
+		bool RenameFile(const std::wstring & oldname, const std::wstring& newname)
 		{
-			if (!std::filesystem::is_regular_file(filepath))
+			if (!std::filesystem::is_regular_file(oldname))
 				return false;
 
 			try
 			{
-				return remove(filepath.c_str()) == 0;
+				return _wrename(oldname.c_str(), newname.c_str()) == 0;
 			}
-			catch (std::filesystem::filesystem_error& e)
+			catch(std::filesystem::filesystem_error& e)
 			{
-				CORE_ERROR("DeleteFile: {0:s}. {1:s}", e.what(), filepath);
+				CORE_ERROR("FileSystemHelper::RenameFile>> {:s}", e.what());
 				return false;
 			}
 		}
 
-		bool CopyFile_(const std::string& source, const std::string& dest)
+		bool DeleteFile_(const std::wstring& name)
+		{
+			if (!std::filesystem::is_regular_file(name))
+				return false;
+
+			try
+			{
+				return _wremove(name.c_str()) == 0;
+			}
+			catch (std::filesystem::filesystem_error& e)
+			{
+				CORE_ERROR("FileSystemHelper::DeleteFile>> {:s}", e.what());
+				return false;
+			}
+		}
+
+		bool CopyFile_(const std::wstring& source, const std::wstring& dest)
 		{
 			if (source == dest)
 				return false;
@@ -114,20 +129,20 @@ namespace Dive
 			}
 			catch (std::filesystem::filesystem_error& e)
 			{
-				CORE_ERROR("CopyFile: {0:s}. {1:s}", e.what(), source);
+				CORE_ERROR("FileSystemHelper::CopyFile>> {:s}", e.what());
 				return false;
 			}
 		}
-
-		std::string GetFilename(const std::string& filepath)
+	
+		std::wstring GetFilename(const std::wstring& filepath)
 		{
-			auto lastIndex = filepath.find_last_of("\\/");
+			auto lastIndex = filepath.find_last_of(L"\\/");
 			auto filename = filepath.substr(lastIndex + 1, filepath.length());
 
 			return filename;
 		}
 
-		std::string GetFilenameWithoutExtension(const std::string& filepath)
+		std::wstring GetFilenameWithoutExtension(const std::wstring& filepath)
 		{
 			auto filename = GetFilename(filepath);
 			auto lastIndex = filename.find_last_of('.');
@@ -136,7 +151,7 @@ namespace Dive
 			return name;
 		}
 
-		std::string GetFilePathWithoutExtension(const std::string& filepath)
+		std::wstring GetFilePathWithoutExtension(const std::wstring& filepath)
 		{
 			auto lastIndex = filepath.find_last_of('.');
 			auto path = filepath.substr(0, lastIndex);
@@ -144,36 +159,36 @@ namespace Dive
 			return path;
 		}
 
-		std::string GetExtension(const std::string& filepath)
+		std::wstring GetExtension(const std::wstring& filepath)
 		{
 			auto lastIndex = filepath.find_last_of('.');
-			if (std::string::npos != lastIndex)
+			if (std::wstring::npos != lastIndex)
 			{
 				return filepath.substr(lastIndex, filepath.length());
 			} 
 
-			return "";
+			return L"";
 		}
 
-		std::string GetDirectory(const std::string& filepath)
+		std::wstring GetDirectory(const std::wstring& filepath)
 		{
-			auto lastIndex = filepath.find_last_of("\\/");
+			auto lastIndex = filepath.find_last_of(L"\\/");
 			auto dir = filepath.substr(0, lastIndex + 1);
 			
 			return dir;
 		}
 
-		std::string GetWorkingDirectory()
+		std::wstring GetWorkingDirectory()
 		{
-			return std::filesystem::current_path().generic_string() + "/";
+			return std::filesystem::current_path().generic_wstring() + L"/";
 		}
 
-		std::string GetParentDirectory(const std::string& path)
+		std::wstring GetParentDirectory(const std::wstring& path)
 		{
 			auto result = path;
-			auto found = path.find_last_of("/\\");
+			auto found = path.find_last_of(L"/\\");
 
-			if (found == std::string::npos)
+			if (found == std::wstring::npos)
 				return path;
 
 			if (found == path.length() - 1)
@@ -182,19 +197,19 @@ namespace Dive
 				return GetParentDirectory(result);
 			}
 			
-			return result.substr(0, found) + "/";
+			return result.substr(0, found) + L"/";
 		}
 
 		//=============================================================================================
 		// 현재 디렉토리와 root path가 다르다면 인자의 경로 리턴합니다.
 		//=============================================================================================
-		std::string GetRelativeFilePath(const std::string& path)
+		std::wstring GetRelativeFilePath(const std::wstring& path)
 		{
 			std::filesystem::path absWorkingDir = std::filesystem::absolute(GetWorkingDirectory());
 			std::filesystem::path absPath = std::filesystem::absolute(path);
 
 			if (absWorkingDir.root_path() != absPath.root_path())
-				return absPath.generic_string();
+				return absPath.generic_wstring();
 
 			std::filesystem::path::const_iterator itAbsWorkingDir = absWorkingDir.begin();
 			std::filesystem::path::const_iterator itAbsPath = absPath.begin();
@@ -223,12 +238,12 @@ namespace Dive
 				++itAbsPath;
 			}
 
-			return relative.generic_string();
+			return relative.generic_wstring();
 		}
 
-		std::vector<std::string> GetDirectories(const std::string& path)
+		std::vector<std::wstring> GetDirectories(const std::wstring& path)
 		{
-			std::vector<std::string> dirs;
+			std::vector<std::wstring> dirs;
 
 			std::filesystem::directory_iterator itEnd;
 			for (std::filesystem::directory_iterator it(path); it != itEnd; it++)
@@ -236,15 +251,15 @@ namespace Dive
 				if (!std::filesystem::is_directory(it->status()))
 					continue;
 
-				dirs.emplace_back(it->path().generic_string());
+				dirs.emplace_back(it->path().generic_wstring());
 			}
 
 			return dirs;
 		}
 
-		std::vector<std::string> GetFiles(const std::string& path)
+		std::vector<std::wstring> GetFiles(const std::wstring& path)
 		{
-			std::vector<std::string> files;
+			std::vector<std::wstring> files;
 
 			std::filesystem::directory_iterator itEnd;
 			for (std::filesystem::directory_iterator it(path); it != itEnd; it++)
@@ -252,7 +267,7 @@ namespace Dive
 				if (!std::filesystem::is_regular_file(it->status()))
 					continue;
 
-				files.emplace_back(it->path().generic_string());
+				files.emplace_back(it->path().generic_wstring());
 			}
 
 			return files;

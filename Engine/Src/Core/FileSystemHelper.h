@@ -1,8 +1,5 @@
 /*
-	FileSystem 선언부
-
-	- 일단 선언한 모든 함수 구현 완료
-	- 직접 테스트할 여건이 안되다보니 사용하면서 버그를 찾아야....?
+	- wstring를 사용하면 유니코드 문제가 발생할 수 있다.
 
 	제작: 서보윤( akahyulim@gmail.com )
 */
@@ -13,28 +10,29 @@ namespace Dive
 	namespace FileSystemHelper
 	{
 		//= DIRECTORIES ===================================================
-		bool CreateDirectory_(const std::string& path);
-		bool DeleteDirectory(const std::string& path);
-		bool DirectoryExists(const std::string& path);
-		bool IsDirectory(const std::string& path);
+		bool CreateDirectory_(const std::wstring& path);
+		bool DeleteDirectory(const std::wstring& path);
+		bool DirectoryExists(const std::wstring& path);
+		bool IsDirectory(const std::wstring& path);
 
 		//= FILES =========================================================
-		bool FileExists(const std::string& filepath);
-		bool DeleteFile_(const std::string& filepath);
-		bool CopyFile_(const std::string& source, const std::string& dest);
+		bool FileExists(const std::wstring& name);
+		bool RenameFile(const std::wstring& oldname, const std::wstring& newname);
+		bool DeleteFile_(const std::wstring& name);
+		bool CopyFile_(const std::wstring& source, const std::wstring& dest);
 
 		//= PATH PARSING ==================================================
-		std::string GetFilename(const std::string& filepath);
-		std::string GetFilenameWithoutExtension(const std::string& filepath);
-		std::string GetFilePathWithoutExtension(const std::string& filepath);
-		std::string GetExtension(const std::string& filepath);
+		std::wstring GetFilename(const std::wstring& filepath);
+		std::wstring GetFilenameWithoutExtension(const std::wstring& filepath);
+		std::wstring GetFilePathWithoutExtension(const std::wstring& filepath);
+		std::wstring GetExtension(const std::wstring& filepath);
 
-		std::string GetDirectory(const std::string& filepath);
-		std::string GetWorkingDirectory();
-		std::string GetParentDirectory(const std::string& path);
-		std::string GetRelativeFilePath(const std::string& path);
+		std::wstring GetDirectory(const std::wstring& filepath);
+		std::wstring GetWorkingDirectory();
+		std::wstring GetParentDirectory(const std::wstring& path);
+		std::wstring GetRelativeFilePath(const std::wstring& path);
 
-		std::vector<std::string> GetDirectories(const std::string& path);
-		std::vector<std::string> GetFiles(const std::string& path);
+		std::vector<std::wstring> GetDirectories(const std::wstring& path);
+		std::vector<std::wstring> GetFiles(const std::wstring& path);
 	}
 }

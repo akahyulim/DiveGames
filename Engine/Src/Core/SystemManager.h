@@ -27,7 +27,7 @@ namespace Dive
 			{
 				if (!system->Initialize())
 				{
-					CORE_ERROR("{:s}의 초기화에 실패하였습니다", typeid(*system).name());
+					CORE_ERROR("SystemManager::Initialize>> Failed to initialize {:s} object.", typeid(*system).name());
 					return false;
 				}
 			}

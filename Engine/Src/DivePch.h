@@ -12,7 +12,7 @@
 
 #include <cstdint>
 #include <iostream>
-#include <tchar.h>
+#include <wchar.h>
 #include <fstream>
 #include <string>
 #include <filesystem>
