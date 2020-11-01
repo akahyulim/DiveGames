@@ -54,6 +54,9 @@
     <ClInclude Include="Src\Core\FileSystemHelper.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\IniFileHelper.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Core\Engine.cpp">
@@ -78,6 +81,9 @@
       <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\FileSystemHelper.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\IniFileHelper.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>

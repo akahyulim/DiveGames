@@ -13,6 +13,7 @@
 #include "StringUtils.h"
 #include "Settings.h"
 #include "FileSystemHelper.h"
+#include "IniFileHelper.h"
 
 //= Event =================================================
 #include "Events/Event.h"

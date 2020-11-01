@@ -106,6 +106,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h" />
+    <ClInclude Include="Src\Core\IniFileHelper.h" />
     <ClInclude Include="Src\Core\Settings.h" />
     <ClInclude Include="Src\Events\Event.h" />
     <ClInclude Include="Src\Core\DiveDefs.h" />
@@ -123,6 +124,7 @@
   <ItemGroup>
     <ClCompile Include="Src\Core\Engine.cpp" />
     <ClCompile Include="Src\Core\FileSystemHelper.cpp" />
+    <ClCompile Include="Src\Core\IniFileHelper.cpp" />
     <ClCompile Include="Src\Core\Log.cpp" />
     <ClCompile Include="Src\Core\Settings.cpp" />
     <ClCompile Include="Src\Core\Stopwatch.cpp" />

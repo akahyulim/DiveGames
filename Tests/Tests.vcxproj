@@ -104,6 +104,7 @@
     <ClCompile Include="Src\Test_StringUtils.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Test_EventSystem.cpp" />
+    <ClCompile Include="Src\Test_IniFileHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
