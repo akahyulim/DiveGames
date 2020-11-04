@@ -272,5 +272,27 @@ namespace Dive
 
 			return files;
 		}
+
+		bool DeleteFileA(const char* name)
+		{
+			if (!std::filesystem::is_regular_file(name))
+				return false;
+
+			try
+			{
+				return remove(name) == 0;
+			}
+			catch (std::filesystem::filesystem_error& e)
+			{
+				CORE_ERROR("FileSystemHelper::DeleteFileA>> {:s}", e.what());
+				return false;
+			}
+			return true;
+		}
+
+		std::string GetWorkingDirectoryA()
+		{
+			return std::filesystem::current_path().generic_string() + "/";
+		}
 	}
 }

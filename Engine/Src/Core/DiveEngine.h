@@ -10,10 +10,11 @@
 #include "SystemManager.h"
 #include "Timer.h"
 #include "Engine.h"
-#include "StringUtils.h"
 #include "Settings.h"
+#include "IniFileHelper.h"			// 제거 대상
+#include "StringHelper.h"
 #include "FileSystemHelper.h"
-#include "IniFileHelper.h"
+#include "IniHelper.h"
 
 //= Event =================================================
 #include "Events/Event.h"

@@ -34,5 +34,9 @@ namespace Dive
 
 		std::vector<std::wstring> GetDirectories(const std::wstring& path);
 		std::vector<std::wstring> GetFiles(const std::wstring& path);
+
+		//= MBCS ==========================================================
+		bool DeleteFileA(const char* name);
+		std::string GetWorkingDirectoryA();
 	}
 }

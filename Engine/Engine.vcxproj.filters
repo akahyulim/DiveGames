@@ -33,9 +33,6 @@
     <ClInclude Include="Src\Core\Stopwatch.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\StringUtils.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Core\SystemManager.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
@@ -51,10 +48,16 @@
     <ClInclude Include="Src\Core\Settings.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\IniFileHelper.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\IniFileHelper.h">
+    <ClInclude Include="Src\Core\IniHelper.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\StringHelper.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,9 +71,6 @@
     <ClCompile Include="Src\Core\Stopwatch.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\StringUtils.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Core\Timer.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
@@ -80,10 +80,16 @@
     <ClCompile Include="Src\Core\Settings.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Core\IniFileHelper.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
     <ClCompile Include="Src\Core\FileSystemHelper.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\IniFileHelper.cpp">
+    <ClCompile Include="Src\Core\IniHelper.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\StringHelper.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>
