@@ -11,7 +11,6 @@
 #include "Timer.h"
 #include "Engine.h"
 #include "Settings.h"
-#include "IniFileHelper.h"			// 제거 대상
 #include "StringHelper.h"
 #include "FileSystemHelper.h"
 #include "IniHelper.h"

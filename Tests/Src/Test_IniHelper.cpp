@@ -1,12 +1,11 @@
 #include "gtest/gtest.h"
 #include "Core/DiveEngine.h"
 
-using namespace Dive::FileSystemHelper;
 using namespace Dive;
 
 TEST(IniHelper, SetGetInt)
 {
-	auto file = GetWorkingDirectoryA() + "data.ini";
+	auto file = Dir::GetCurrentA() + "data.ini";
 	Dive::IniHelper helper(file.c_str());
 	
 	auto section = helper["Display"];
@@ -29,7 +28,7 @@ TEST(IniHelper, SetGetInt)
 
 TEST(IniHelper, SetGetBool)
 {
-	auto file = GetWorkingDirectoryA() + "data.ini";
+	auto file = Dir::GetCurrentA() + "data.ini";
 	Dive::IniHelper helper(file.c_str());
 
 	helper["Display"]["bVSync"] = false;
@@ -43,7 +42,7 @@ TEST(IniHelper, SetGetBool)
 
 TEST(IniHelper, SetGetDouble)
 {
-	auto file = GetWorkingDirectoryA() + "data.ini";
+	auto file = Dir::GetCurrentA() + "data.ini";
 	Dive::IniHelper helper(file.c_str());
 
 	auto section = helper["Display"];
@@ -66,7 +65,7 @@ TEST(IniHelper, SetGetDouble)
 
 TEST(IniHelper, SetGetString)
 {
-	auto file = GetWorkingDirectoryA() + "data.ini";
+	auto file = Dir::GetCurrentA() + "data.ini";
 	Dive::IniHelper helper(file.c_str());
 
 	auto section = helper["Display"];
@@ -78,7 +77,7 @@ TEST(IniHelper, SetGetString)
 
 TEST(IniHelper, SetGetKorean)
 {
-	auto file = GetWorkingDirectoryA() + "data.ini";
+	auto file = Dir::GetCurrentA() + "data.ini";
 	Dive::IniHelper helper(file.c_str());
 
 	auto section = helper["SCORE"];
@@ -95,7 +94,7 @@ TEST(IniHelper, SetGetKorean)
 //================================================================================//
 TEST(IniHelper, GetReadData)
 {
-	auto file = GetWorkingDirectoryA() + "data.ini";
+	auto file = Dir::GetCurrentA() + "data.ini";
 	Dive::IniHelper helper(file.c_str());
 
 	int width = helper["Display"]["nWidth"] << 1980;
@@ -122,8 +121,8 @@ TEST(IniHelper, GetReadData)
 //================================================================================//
 TEST(IniHelper, SetInitailzeData)
 {
-	auto file = GetWorkingDirectoryA() + "data.ini";
-	EXPECT_TRUE(FileSystemHelper::DeleteFileA(file.c_str()));
+	auto file = Dir::GetCurrentA() + "data.ini";
+	EXPECT_TRUE(File::DeleteA(file.c_str()));
 	
 	Dive::IniHelper helper(file.c_str());
 
