@@ -41,12 +41,14 @@ namespace Window
 		return result;
 	}
 
-	bool Create(HINSTANCE handleInstance, const std::wstring& title, int width = 0, int height = 0)
+	// 스타일도 전달받아야 한다. => 좀 더 정교하고 세련되게 컨트롤 하고 싶다.
+	bool Create(HINSTANCE handleInstance, const std::wstring& title, int width, int height)
 	{
 		g_HandleInstance = handleInstance ? handleInstance : (HINSTANCE)::GetModuleHandle(nullptr);
 
 		LPCWSTR pClassName = L"WndClass";
 
+		// 해상도를 확보해야 한다.
 		if (width == 0 || height == 0)
 		{
 			width = GetSystemMetrics(SM_CXSCREEN);
@@ -140,12 +142,12 @@ namespace Window
 		return static_cast<int>(rt.bottom - rt.top);
 	}
 
-	void GetWindowSize(float* width, float* height)
+	void GetWindowSize(float& width, float& height)
 	{
 		RECT rt;
 		GetClientRect(g_HandleWindow, &rt);
 
-		*width = static_cast<float>(rt.right - rt.left);
-		*height = static_cast<float>(rt.bottom - rt.top);
+		width = static_cast<float>(rt.right - rt.left);
+		height = static_cast<float>(rt.bottom - rt.top);
 	}
 }

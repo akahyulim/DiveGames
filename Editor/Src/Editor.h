@@ -13,6 +13,8 @@ public:
 	Editor();
 	~Editor();
 
+	bool Initialize();
+
 	void Update();
 
 private:

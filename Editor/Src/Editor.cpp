@@ -4,11 +4,18 @@
 Editor::Editor()
 {
 	m_pEngine = std::make_unique<Dive::Engine>();
-	m_pEngine->Initialize();
 }
 
 Editor::~Editor()
 {
+}
+
+bool Editor::Initialize()
+{
+	if (m_pEngine->Initialize())
+		return false;
+
+	return true;
 }
 
 void Editor::Update()

@@ -11,11 +11,13 @@ namespace Dive
 		~Key() = default;
 
 		operator int();
+		operator unsigned int();
 		operator bool();
 		operator double();
 		operator std::string();
 
 		Key& operator=(int value);
+		Key& operator=(unsigned int value);
 		Key& operator=(bool value);
 		Key& operator=(double value);
 		Key& operator=(const char* value);
@@ -26,6 +28,7 @@ namespace Dive
 		//	전달받은 값으로 초기화하지 않습니다.								//
 		//======================================================================//
 		Key& operator<<(int value);
+		Key& operator<<(unsigned int value);
 		Key& operator<<(bool value);
 		Key& operator<<(double value);
 		Key& operator<<(const char* value);
@@ -46,6 +49,7 @@ namespace Dive
 		union
 		{
 			int m_DefaultIntValue;
+			unsigned int m_DfaultUintValue;
 			bool m_bDefaultBoolValue;
 			double m_DefaultDoubleValue;
 		};

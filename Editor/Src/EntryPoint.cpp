@@ -9,20 +9,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	AllocConsole();
 #endif
 
-	if (!Window::Create(hInstance, L"Dive Editor"))
+	Editor editor;
+	auto settingData = Dive::Settings::GetInstance();
+
+	if (!Window::Create(hInstance, L"Dive Editor", settingData.GetResolutionWidth(), settingData.GetResolutionHeight()))
 	{
 		MessageBox(nullptr, L"Editor 윈도우 생성에 실패하였습니다.", L"Error", MB_OK);
 		return 1;
 	}
 
-	Dive::Log::Initialize();
-	Editor edt;
+	// 여기에서 윈도우 데이터를 얻어야 한다.
+	editor.Initialize();
 	APP_TRACE("Editor를 실행합니다.");
 	Window::Show();
 
 	while (Window::Run())
 	{
-		edt.Update();
+		editor.Update();
 	}
 
 	Window::Destroy();

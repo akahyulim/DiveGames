@@ -14,6 +14,7 @@
 #include "StringHelper.h"
 #include "FileSystemHelper.h"
 #include "IniHelper.h"
+#include "Settings.h"
 
 //= Event =================================================
 #include "Events/Event.h"

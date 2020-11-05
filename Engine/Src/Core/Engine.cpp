@@ -9,6 +9,9 @@ namespace Dive
 {
 	Engine::Engine()
 	{
+		// test
+		Log::Initialize();
+		Settings::GetInstance().Initialize();
 	}
 
 	Engine::~Engine()
@@ -17,8 +20,6 @@ namespace Dive
 	
 	bool Engine::Initialize()
 	{
-		Settings::GetInstance().Initialize();
-
 		m_pSystemManager = std::make_shared<SystemManager>(this);
 
 		m_pSystemManager->RegisterSystem<Timer>();

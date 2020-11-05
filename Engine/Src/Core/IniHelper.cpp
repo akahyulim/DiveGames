@@ -15,6 +15,12 @@ namespace Dive
 		return std::stoi(value.c_str());
 	}
 
+	Key::operator unsigned int()
+	{
+		auto value = getKeyValue(m_DefaultIntValue, "%d");
+		return std::stoi(value.c_str());
+	}
+
 	Key::operator bool()
 	{
 		auto value = getKeyValue(m_bDefaultBoolValue, "%d");
@@ -34,6 +40,12 @@ namespace Dive
 	}
 
 	Key& Key::operator=(int value)
+	{
+		setKeyValue(value, "%d");
+		return *this;
+	}
+
+	Key& Key::operator=(unsigned int value)
 	{
 		setKeyValue(value, "%d");
 		return *this;
@@ -64,6 +76,12 @@ namespace Dive
 	}
 
 	Key& Key::operator<<(int value)
+	{
+		m_DefaultIntValue = value;
+		return *this;
+	}
+
+	Key& Key::operator<<(unsigned int value)
 	{
 		m_DefaultIntValue = value;
 		return *this;

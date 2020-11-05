@@ -1,38 +1,48 @@
 #include "DivePch.h"
 #include "Settings.h"
 #include "FileSystemHelper.h"
+#include "IniHelper.h"
 
 namespace Dive
 {
-	const std::string INI_FILE_NAME = "Dive.ini";// FileSystemHelper::GetCurrentDir() + "\\Dive.ini";
-	const unsigned int DEFAULT_SCREEN_MODE = 0;
-	const unsigned int DEFAULT_FRAME_RATE = 0;
-	const bool DEFAULT_VSYNC = true;
-
-	void Settings::Initialize()
+	Settings::Settings()
 	{
+		m_FileName = Dir::GetCurrentA() + "dive_settings.ini";
+		m_ScreenMode = eScreenMode::Windowed;
+		m_ResolutionWidth = 800;
+		m_ResolutionHeight = 600;
+		m_bVSync = false;
+	}
+
+	void Settings::Initialize(const char* fileName)
+	{
+		if (fileName)
+			m_FileName = fileName;
+
 		if (!Load())
 			Save();
 	}
 
-	bool Settings::Save()
+	void Settings::Save()
 	{
-		//WritePrivateProfileStringA("Display", "nResolutionHeight", "900", INI_FILE_NAME.c_str());
-		WritePrivateProfileStringA("Display", "nResolutionWidth", "1600", INI_FILE_NAME.c_str());
-		WritePrivateProfileStringA("Display", "nResolutionHeight", "900", INI_FILE_NAME.c_str());
-		WritePrivateProfileStringA("Display", "bVSync", "true", INI_FILE_NAME.c_str());
-
-		return true;
+		IniHelper ih(m_FileName);
+		ih["Display"]["nScreenMode"] = static_cast<unsigned int>(m_ScreenMode);
+		ih["Display"]["nResolutionWidth"] = m_ResolutionWidth;
+		ih["Display"]["nResolutionHeight"] = m_ResolutionHeight;
+		ih["Display"]["bVSync"] = m_bVSync;
 	}
 	
 	bool Settings::Load()
 	{
-		//if(!FileSystemHelper::FileExists(INI_FILE_NAME))
-		//	return false;
+		if (!File::ExistsA(m_FileName))
+			return false;
 
-		GetPrivateProfileIntA("Display", "nResolutionWidth", 800, INI_FILE_NAME.c_str());
-		GetPrivateProfileIntA("Display", "nResolutionHeight", 600, INI_FILE_NAME.c_str());
-
+		IniHelper ih(m_FileName);
+		unsigned screenMode = ih["Display"]["nScreenMode"];
+		m_ScreenMode = static_cast<eScreenMode>(screenMode);
+		m_ResolutionWidth = ih["Display"]["nResolutionWidth"];
+		m_ResolutionHeight = ih["Display"]["nResolutionHeight"];
+		m_bVSync = ih["Display"]["bVSync"];
 
 		return true;
 	}
