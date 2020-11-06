@@ -11,7 +11,7 @@ namespace Dive
 	class SystemManager
 	{
 	public:
-		SystemManager(Engine* pEngine) { m_pEngine = pEngine; }
+		SystemManager(Engine* engine) : m_Engine(engine) {}
 		~SystemManager()
 		{
 			for (auto& system : m_Systems)
@@ -63,11 +63,11 @@ namespace Dive
 
 		Engine* GetEngine() const
 		{
-			return m_pEngine;
+			return m_Engine;
 		}
 
 	private:
-		Engine* m_pEngine = nullptr;
+		Engine* m_Engine = nullptr;
 		std::vector<std::shared_ptr<ISystem>> m_Systems;
 	};
 }

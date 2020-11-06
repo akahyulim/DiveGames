@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
+#include <Windows.h>
 
 namespace Dive
 {
@@ -13,14 +14,14 @@ public:
 	Editor();
 	~Editor();
 
-	bool Initialize();
+	bool Initialize(HINSTANCE hInstance, HWND hWnd);
 
 	void Update();
 
 private:
 
 private:
-	std::unique_ptr<Dive::Engine> m_pEngine;
+	std::unique_ptr<Dive::Engine> m_Engine;
 
 };
 

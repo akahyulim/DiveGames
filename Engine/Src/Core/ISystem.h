@@ -9,7 +9,7 @@ namespace Dive
 	class ISystem : public std::enable_shared_from_this<ISystem>
 	{
 	public:
-		ISystem(SystemManager* pManager) { m_pManager = pManager; }
+		ISystem(SystemManager* manager) { m_Manager = manager; }
 		virtual ~ISystem() = default;
 
 		virtual bool Initialize()	= 0;
@@ -19,7 +19,7 @@ namespace Dive
 		std::shared_ptr<T> GetSharedPtr() { return std::dynamic_pointer_cast<T>(shared_from_this()); }
 
 	protected:
-		SystemManager* m_pManager = nullptr;
+		SystemManager* m_Manager = nullptr;
 	};
 
 	template<typename T>

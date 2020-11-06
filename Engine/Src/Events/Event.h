@@ -16,13 +16,13 @@ namespace Dive
 	class HandlerBase
 	{
 	public:
-		void Exec(const IEvent* pEvent)
+		void Exec(const IEvent* evnt)
 		{
-			call(pEvent);
+			call(evnt);
 		}
 
 	protected:
-		virtual void call(const IEvent* pEvent) = 0;
+		virtual void call(const IEvent* evnt) = 0;
 	};
 
 	template<class T, class EventType>
@@ -35,9 +35,9 @@ namespace Dive
 			: m_pInstance(pInstance), m_Method(method)
 		{}
 
-		void call(const IEvent* pEvent) override
+		void call(const IEvent* evnt) override
 		{
-			(m_pInstance->*m_Method)(static_cast<EventType*>(pEvent));
+			(m_pInstance->*m_Method)(static_cast<EventType*>(evnt));
 		}
 
 	private:
@@ -65,16 +65,16 @@ namespace Dive
 			m_Subscribers[typeid(EventType)]->push_back(std::make_unique<MethodHandler<T, EventType>>(pInstance, Method));
 		}
 
-		void Fire(const IEvent* pEvent)
+		void Fire(const IEvent* evnt)
 		{
-			if (m_Subscribers.empty() || m_Subscribers[typeid(*pEvent)] == nullptr)
+			if (m_Subscribers.empty() || m_Subscribers[typeid(*evnt)] == nullptr)
 				return;
 
-			auto itr = m_Subscribers[typeid(*pEvent)]->begin();
-			auto itr_end = m_Subscribers[typeid(*pEvent)]->end();
+			auto itr = m_Subscribers[typeid(*evnt)]->begin();
+			auto itr_end = m_Subscribers[typeid(*evnt)]->end();
 			for (itr; itr !=itr_end; itr++)
 			{
-				(*itr)->Exec(pEvent);
+				(*itr)->Exec(evnt);
 			}
 		}
 

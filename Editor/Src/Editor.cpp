@@ -3,16 +3,16 @@
 
 Editor::Editor()
 {
-	m_pEngine = std::make_unique<Dive::Engine>();
+	m_Engine = std::make_unique<Dive::Engine>();
 }
 
 Editor::~Editor()
 {
 }
 
-bool Editor::Initialize()
+bool Editor::Initialize(HINSTANCE hInstance, HWND hWnd)
 {
-	if (m_pEngine->Initialize())
+	if (m_Engine->Initialize(hInstance, hWnd))
 		return false;
 
 	return true;
@@ -20,9 +20,9 @@ bool Editor::Initialize()
 
 void Editor::Update()
 {
-	m_pEngine->Update();
+	m_Engine->Update();
 
-	auto timer = m_pEngine->GetSystemManager()->GetSystem<Dive::Timer>();
+	auto timer = m_Engine->GetSystemManager()->GetSystem<Dive::Timer>();
 	if (!timer)
 		return;
 

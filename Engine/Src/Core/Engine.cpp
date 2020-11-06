@@ -18,13 +18,13 @@ namespace Dive
 	{
 	}
 	
-	bool Engine::Initialize()
+	bool Engine::Initialize(HINSTANCE hInstance, HWND hWnd)
 	{
-		m_pSystemManager = std::make_shared<SystemManager>(this);
+		m_SystemManager = std::make_shared<SystemManager>(this);
 
-		m_pSystemManager->RegisterSystem<Timer>();
+		m_SystemManager->RegisterSystem<Timer>();
 
-		if (!m_pSystemManager->Initialize())
+		if (!m_SystemManager->Initialize())
 			return false;
 
 		return true;
@@ -32,9 +32,9 @@ namespace Dive
 	
 	void Engine::Update()
 	{
-		if (!m_pSystemManager)
+		if (!m_SystemManager)
 			return;
 
-		m_pSystemManager->Update();
+		m_SystemManager->Update();
 	}
 }
