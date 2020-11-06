@@ -17,7 +17,7 @@
 #include "Settings.h"
 
 //= Event =================================================
-#include "Events/Event.h"
+#include "Events/EventSystem.h"
 
 //= Rendering =============================================
 #include "Rendering/D3D11/VertexTypes.h"

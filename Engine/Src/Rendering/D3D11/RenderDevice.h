@@ -19,6 +19,8 @@ namespace Dive
 		ID3D11DeviceContext* GetImmediateContext() const { return m_immediate_context.get(); }
 		IDXGISwapChain* GetSwapChain() const { return m_swap_chain.get(); }
 
+		void ResizeResolution(unsigned int width, unsigned int height);
+
 	private:
 		bool createBackBufferRenderTarget();
 

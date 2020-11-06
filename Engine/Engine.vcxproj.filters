@@ -84,9 +84,6 @@
     <ClInclude Include="Src\Core\Timer.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Events\Event.h">
-      <Filter>Src\Events</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Rendering\D3D11\ConstantBuffer.h">
       <Filter>Src\Rendering\D3D11</Filter>
     </ClInclude>
@@ -113,6 +110,12 @@
     </ClInclude>
     <ClInclude Include="Src\Rendering\Renderer.h">
       <Filter>Src\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Events\EventSystem.h">
+      <Filter>Src\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Events\WindowEvent.h">
+      <Filter>Src\Events</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -102,6 +102,14 @@ namespace Dive
 		m_swap_chain->Present(0, 0);
 	}
 
+	void RenderDevice::ResizeResolution(unsigned int width, unsigned int height)
+	{
+		if (m_resolution.x == width && m_resolution.y == height)
+			return;
+
+		// ResizeTarget();
+	}
+
 	bool RenderDevice::createBackBufferRenderTarget()
 	{
 		if (!m_swap_chain)

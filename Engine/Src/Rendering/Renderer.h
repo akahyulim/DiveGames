@@ -5,6 +5,7 @@ namespace Dive
 {
 	class SystemManager;
 	class RenderDevice;
+	class WindowResizeEvent;
 
 	class Renderer : public ISystem
 	{
@@ -19,6 +20,8 @@ namespace Dive
 
 		// 개별 객체 전달이 나을까?
 		RenderDevice* GetRenderDevice() const { return m_render_device.get(); }
+
+		void OnResize(const WindowResizeEvent* evnt);
 
 	private:
 	private:
