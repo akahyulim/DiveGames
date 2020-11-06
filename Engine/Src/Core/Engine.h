@@ -11,13 +11,13 @@ namespace Dive
 		Engine();
 		~Engine();
 
-		bool Initialize();
+		bool Initialize(HINSTANCE hInstance, HWND hWnd);
 		void Update();
 
-		SystemManager* GetSystemManager() const { return m_system_manager.get(); }
+		SystemManager* GetSystemManager() const { return m_SystemManager.get(); }
 
 	private:
-		std::shared_ptr<SystemManager> m_system_manager;
+		std::shared_ptr<SystemManager> m_SystemManager;
 	};
 }
 

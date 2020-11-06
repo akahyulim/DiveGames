@@ -3,26 +3,28 @@
 #include "DiveDefs.h"
 #include "SystemManager.h"
 #include "Timer.h"
-#include "Rendering/Renderer.h"
+#include "Settings.h"
 
 namespace Dive
 {
 	Engine::Engine()
 	{
+		// test
+		Log::Initialize();
+		Settings::GetInstance().Initialize();
 	}
 
 	Engine::~Engine()
 	{
 	}
 	
-	bool Engine::Initialize()
+	bool Engine::Initialize(HINSTANCE hInstance, HWND hWnd)
 	{
-		m_system_manager = std::make_shared<SystemManager>(this);
+		m_SystemManager = std::make_shared<SystemManager>(this);
 
-		m_system_manager->RegisterSystem<Timer>();
-		m_system_manager->RegisterSystem<Renderer>();
+		m_SystemManager->RegisterSystem<Timer>();
 
-		if (!m_system_manager->Initialize())
+		if (!m_SystemManager->Initialize())
 			return false;
 
 		return true;
@@ -30,9 +32,9 @@ namespace Dive
 	
 	void Engine::Update()
 	{
-		if (!m_system_manager)
+		if (!m_SystemManager)
 			return;
 
-		m_system_manager->Update();
+		m_SystemManager->Update();
 	}
 }

@@ -13,35 +13,35 @@ namespace Dive
 	class Timer : public ISystem
 	{
 	public:
-		Timer(SystemManager* manager);
+		Timer(SystemManager* pManager);
 		~Timer() = default;
 
 		bool Initialize() override;
 		void Update() override;
 
 		// time
-		float GetRunningTimeMS() const { return static_cast<float>(m_running_time_ms); }
-		float GetRunningTime() const { return static_cast<float>(m_running_time_ms / 1000.0); }
-		float GetDeltaTimeMS() const { return static_cast<float>(m_delta_time_ms); }
-		float GetDeltaTime() const { return static_cast<float>(m_delta_time_ms / 1000.0); }
-		float GetSmoothDeltaTimeMS() const { return static_cast<float>(m_smooth_delta_time_ms); }
-		float GetSmoothDeltaTime() const { return static_cast<float>(m_smooth_delta_time_ms / 1000.0); }
+		float GetRunningTimeMS() const { return static_cast<float>(m_RunningTimeMS); }
+		float GetRunningTime() const { return static_cast<float>(m_RunningTimeMS / 1000.0); }
+		float GetDeltaTimeMS() const { return static_cast<float>(m_DeltaTimeMS); }
+		float GetDeltaTime() const { return static_cast<float>(m_DeltaTimeMS / 1000.0); }
+		float GetSmoothDeltaTimeMS() const { return static_cast<float>(m_SmoothDeltaTimeMS); }
+		float GetSmoothDeltaTime() const { return static_cast<float>(m_SmoothDeltaTimeMS / 1000.0); }
 
 		// fps
 		void SetTargetFps(double target);
-		float GetTargetFps() const { return static_cast<float>(m_target_fps); }
+		float GetTargetFps() const { return static_cast<float>(m_TargetFPS); }
 
 
 	private:
-		std::chrono::high_resolution_clock::time_point m_startup_time;
-		std::chrono::high_resolution_clock::time_point m_begin_frame_time;
-		std::chrono::high_resolution_clock::time_point m_end_frame_time;
+		std::chrono::high_resolution_clock::time_point m_StartupTime;
+		std::chrono::high_resolution_clock::time_point m_BeginFrameTime;
+		std::chrono::high_resolution_clock::time_point m_EndFrameTime;
 		
-		double m_running_time_ms		= 0;
-		double m_delta_time_ms			= 0;
-		double m_smooth_delta_time_ms	= 0;
+		double m_RunningTimeMS		= 0;
+		double m_DeltaTimeMS		= 0;
+		double m_SmoothDeltaTimeMS	= 0;
 
-		double m_target_fps				= NO_LIMIT_FRAME;
+		double m_TargetFPS			= NO_LIMIT_FRAME;
 	};
 }
 

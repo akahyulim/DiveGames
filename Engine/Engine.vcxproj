@@ -100,11 +100,15 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>spdlogd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>External\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Core\IniHelper.h" />
+    <ClInclude Include="Src\Core\FileSystemHelper.h" />
+    <ClInclude Include="Src\Core\Settings.h" />
+    <ClInclude Include="Src\Events\Event.h" />
     <ClInclude Include="Src\Core\DiveDefs.h" />
     <ClInclude Include="Src\Core\DiveEngine.h" />
     <ClInclude Include="Src\Core\Engine.h" />
@@ -112,7 +116,7 @@
     <ClInclude Include="Src\Core\Log.h" />
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\Stopwatch.h" />
-    <ClInclude Include="Src\Core\StringUtils.h" />
+    <ClInclude Include="Src\Core\StringHelper.h" />
     <ClInclude Include="Src\Core\SystemManager.h" />
     <ClInclude Include="Src\Core\Timer.h" />
     <ClInclude Include="Src\DivePch.h" />
@@ -126,10 +130,13 @@
     <ClInclude Include="Src\Rendering\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Core\IniHelper.cpp" />
     <ClCompile Include="Src\Core\Engine.cpp" />
+    <ClCompile Include="Src\Core\FileSystemHelper.cpp" />
     <ClCompile Include="Src\Core\Log.cpp" />
+    <ClCompile Include="Src\Core\Settings.cpp" />
     <ClCompile Include="Src\Core\Stopwatch.cpp" />
-    <ClCompile Include="Src\Core\StringUtils.cpp" />
+    <ClCompile Include="Src\Core\StringHelper.cpp" />
     <ClCompile Include="Src\Core\Timer.cpp" />
     <ClCompile Include="Src\DivePch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>

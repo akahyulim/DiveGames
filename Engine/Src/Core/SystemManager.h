@@ -11,23 +11,23 @@ namespace Dive
 	class SystemManager
 	{
 	public:
-		SystemManager(Engine* engine) { m_engine = engine; }
+		SystemManager(Engine* engine) : m_Engine(engine) {}
 		~SystemManager()
 		{
-			for (auto& system : m_systems)
+			for (auto& system : m_Systems)
 			{
 				system.reset();
 			}
-			m_systems.clear();
+			m_Systems.clear();
 		}
 
 		bool Initialize()
 		{
-			for (const auto& system : m_systems)
+			for (const auto& system : m_Systems)
 			{
 				if (!system->Initialize())
 				{
-					CORE_ERROR("{:s}의 초기화에 실패하였습니다", typeid(*system).name());
+					CORE_ERROR("SystemManager::Initialize>> Failed to initialize {:s} object.", typeid(*system).name());
 					return false;
 				}
 			}
@@ -36,7 +36,7 @@ namespace Dive
 
 		void Update()
 		{
-			for (const auto& system : m_systems)
+			for (const auto& system : m_Systems)
 				system->Update();
 		}
 
@@ -45,7 +45,7 @@ namespace Dive
 		{
 			ValidateSystemType<T>();
 
-			m_systems.emplace_back(std::make_shared<T>(this));
+			m_Systems.emplace_back(std::make_shared<T>(this));
 		}
 
 		template<typename T>
@@ -53,7 +53,7 @@ namespace Dive
 		{
 			ValidateSystemType<T>();
 
-			for (const auto& system : m_systems)
+			for (const auto& system : m_Systems)
 			{
 				if (typeid(T) == typeid(*system))
 					return static_cast<T*>(system.get());
@@ -63,11 +63,11 @@ namespace Dive
 
 		Engine* GetEngine() const
 		{
-			return m_engine;
+			return m_Engine;
 		}
 
 	private:
-		Engine* m_engine = nullptr;
-		std::vector<std::shared_ptr<ISystem>> m_systems;
+		Engine* m_Engine = nullptr;
+		std::vector<std::shared_ptr<ISystem>> m_Systems;
 	};
 }

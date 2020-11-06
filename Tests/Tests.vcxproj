@@ -101,8 +101,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Test_StringUtils.cpp" />
+    <ClCompile Include="Src\Test_StringHelper.cpp" />
     <ClCompile Include="Src\main.cpp" />
+    <ClCompile Include="Src\Test_EventSystem.cpp" />
+    <ClCompile Include="Src\Test_IniHelper.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">

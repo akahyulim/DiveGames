@@ -3,26 +3,27 @@
 #include "Window.h"
 #include "Editor.h"
 
+extern HINSTANCE Window::g_hInstance;
+extern HWND Window::g_hWnd;
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 #ifdef _DEBUG
 	AllocConsole();
 #endif
 
+	Editor editor;
 	if (!Window::Create(hInstance, L"Dive Editor"))
-	{
-		MessageBox(nullptr, L"Editor 윈도우 생성에 실패하였습니다.", L"Error", MB_OK);
 		return 1;
-	}
 
-	Dive::Log::Initialize();
-	Editor edt;
-	APP_TRACE("Editor를 실행합니다.");
 	Window::Show();
+
+	editor.Initialize(Window::g_hInstance, Window::g_hWnd);
+	APP_TRACE("Editor를 실행합니다.");
 
 	while (Window::Run())
 	{
-		edt.Update();
+		editor.Update();
 	}
 
 	Window::Destroy();

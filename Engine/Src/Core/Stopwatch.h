@@ -19,6 +19,6 @@ namespace Dive
 		float GetElapsedTimeMS();
 
 	private:
-		std::chrono::high_resolution_clock::time_point m_start_time;
+		std::chrono::high_resolution_clock::time_point m_StartTime;
 	};
 }

@@ -10,7 +10,14 @@
 #include "SystemManager.h"
 #include "Timer.h"
 #include "Engine.h"
-#include "StringUtils.h"
+#include "Settings.h"
+#include "StringHelper.h"
+#include "FileSystemHelper.h"
+#include "IniHelper.h"
+#include "Settings.h"
+
+//= Event =================================================
+#include "Events/Event.h"
 
 //= Rendering =============================================
 #include "Rendering/D3D11/VertexTypes.h"
