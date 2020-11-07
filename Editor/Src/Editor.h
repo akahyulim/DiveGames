@@ -14,7 +14,7 @@ public:
 	Editor();
 	~Editor();
 
-	bool Initialize(HINSTANCE hInstance, HWND hWnd);
+	bool Initialize(HWND hWnd, int width, int height, bool vsync, bool windowed);
 
 	void Update();
 

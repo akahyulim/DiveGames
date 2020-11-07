@@ -4,6 +4,7 @@
 #include "SystemManager.h"
 #include "Timer.h"
 #include "Settings.h"
+#include "Rendering/Renderer.h"
 
 namespace Dive
 {
@@ -18,11 +19,15 @@ namespace Dive
 	{
 	}
 	
-	bool Engine::Initialize(HINSTANCE hInstance, HWND hWnd)
+	bool Engine::Initialize(const WindowData& windowData)
 	{
-		m_SystemManager = std::make_shared<SystemManager>(this);
+		m_WindowData = windowData;
 
+		// 객체 생성은 생성자쪽이 나을 것 같다.====================
+		m_SystemManager = std::make_shared<SystemManager>(this);
 		m_SystemManager->RegisterSystem<Timer>();
+		m_SystemManager->RegisterSystem<Renderer>();
+		// ========================================================
 
 		if (!m_SystemManager->Initialize())
 			return false;

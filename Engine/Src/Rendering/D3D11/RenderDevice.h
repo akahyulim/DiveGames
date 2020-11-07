@@ -11,13 +11,13 @@ namespace Dive
 		RenderDevice();
 		~RenderDevice();
 
-		bool Initialize(HWND hwnd, unsigned int width = 1600, unsigned int height = 900);
+		bool Initialize(HWND hwnd, int width, int height, bool vsync, bool windowed);
 
 		void Present();
 
-		ID3D11Device* GetD3DDevice() const { return m_device.get(); }
-		ID3D11DeviceContext* GetImmediateContext() const { return m_immediate_context.get(); }
-		IDXGISwapChain* GetSwapChain() const { return m_swap_chain.get(); }
+		ID3D11Device* GetD3DDevice() const { return m_D3dDevice.get(); }
+		ID3D11DeviceContext* GetImmediateContext() const { return m_ImmediateContext.get(); }
+		IDXGISwapChain* GetSwapChain() const { return m_SwapChain.get(); }
 
 		void ResizeResolution(unsigned int width, unsigned int height);
 
@@ -25,15 +25,15 @@ namespace Dive
 		bool createBackBufferRenderTarget();
 
 	private:
-		std::shared_ptr<ID3D11Device>			m_device;
-		std::shared_ptr<ID3D11DeviceContext>	m_immediate_context;
-		std::shared_ptr<IDXGISwapChain>			m_swap_chain;
-		ID3D11RenderTargetView*					m_back_buffer_RTV;
+		std::unique_ptr<ID3D11Device>			m_D3dDevice;
+		std::unique_ptr<ID3D11DeviceContext>	m_ImmediateContext;
+		std::unique_ptr<IDXGISwapChain>			m_SwapChain;
+		ID3D11RenderTargetView*					m_BackBuffer;
 
-		DirectX::XMINT2 m_resolution;
-		DirectX::XMINT2 m_refresh_rate;
-
-		bool m_is_windowed;
+		DirectX::XMINT2 m_Resolution;
+		DirectX::XMINT2 m_RefreshRate;
+		bool m_bVSync;
+		bool m_bWindowed;
 
 		unsigned int m_swap_chain_buffer_count;
 

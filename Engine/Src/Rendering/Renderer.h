@@ -19,13 +19,13 @@ namespace Dive
 		void Present();
 
 		// 개별 객체 전달이 나을까?
-		RenderDevice* GetRenderDevice() const { return m_render_device.get(); }
+		RenderDevice* GetRenderDevice() const { return m_RenderDevice.get(); }
 
 		void OnResize(const WindowResizeEvent* evnt);
 
 	private:
 	private:
-		std::shared_ptr<RenderDevice> m_render_device;
+		std::unique_ptr<RenderDevice> m_RenderDevice;
 	};
 }
 

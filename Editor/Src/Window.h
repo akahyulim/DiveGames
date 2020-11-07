@@ -1,5 +1,4 @@
 #pragma once
-
 #include <Windows.h>
 #include <functional>
 #include "core/DiveEngine.h"
@@ -39,6 +38,27 @@ namespace Window
 		g_hInstance = handleInstance ? handleInstance : (HINSTANCE)::GetModuleHandle(nullptr);
 
 		LPCWSTR pClassName	= L"WndClass";
+
+		// width, height, style이 결정된다.
+		auto settings = Dive::Settings::GetInstance();
+		switch (settings.GetScreenMode())
+		{
+		case Dive::eScreenMode::Windowed:
+			break;
+
+		case Dive::eScreenMode::Borderless:
+			break;
+
+		case Dive::eScreenMode::FullScreen:
+			break;
+
+		default:
+			return false;
+		}
+
+		// width, height가 ini 파일에 저장된 값과 다르다면 save하여 갱신이 필요하다.
+		// 그런데 windowed의 경우 client rect을 계산해야 하므로 윈도우가 일단 생성되어야만 한다?
+
 		auto width			= GetSystemMetrics(SM_CXSCREEN);
 		auto height			= GetSystemMetrics(SM_CYSCREEN);
 

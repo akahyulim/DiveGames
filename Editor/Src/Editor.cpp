@@ -10,10 +10,20 @@ Editor::~Editor()
 {
 }
 
-bool Editor::Initialize(HINSTANCE hInstance, HWND hWnd)
+bool Editor::Initialize(HWND hWnd, int width, int height, bool vsync, bool windowed)
 {
-	if (m_Engine->Initialize(hInstance, hWnd))
+	Dive::WindowData windowData;
+	windowData.hWnd				= hWnd;
+	windowData.ResolutionWidth	= width;
+	windowData.ResolutionHeight = height;
+	windowData.bVSync			= vsync;
+	windowData.bWindowed		= windowed;
+
+	if (!m_Engine->Initialize(windowData))
+	{
+		APP_ERROR("Editor Initialize에 실패하였습니다.");
 		return false;
+	}
 
 	return true;
 }

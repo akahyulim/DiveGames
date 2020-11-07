@@ -1,22 +1,21 @@
 #pragma once
-#include <memory>
-#include <type_traits>
+#include "DivePch.h"
 
 namespace Dive
 {
 	class SystemManager;
 
-	class ISystem : public std::enable_shared_from_this<ISystem>
+	class ISystem// : public std::enable_shared_from_this<ISystem>
 	{
 	public:
-		ISystem(SystemManager* manager) { m_Manager = manager; }
+		ISystem(SystemManager* manager) : m_Manager(manager) {}
 		virtual ~ISystem() = default;
 
 		virtual bool Initialize()	= 0;
 		virtual void Update()		= 0;
 
-		template<typename T>
-		std::shared_ptr<T> GetSharedPtr() { return std::dynamic_pointer_cast<T>(shared_from_this()); }
+		//template<typename T>
+		//std::shared_ptr<T> GetSharedPtr() { return std::dynamic_pointer_cast<T>(shared_from_this()); }
 
 	protected:
 		SystemManager* m_Manager = nullptr;
