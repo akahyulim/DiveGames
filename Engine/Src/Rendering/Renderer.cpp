@@ -4,6 +4,7 @@
 #include "Core/SystemManager.h"
 #include "Core/Log.h"
 #include "D3D11/RenderDevice.h"
+#include "D3D11/SwapChain.h"
 #include "Events/WindowEvent.h"
 
 namespace Dive
@@ -11,7 +12,10 @@ namespace Dive
 	Renderer::Renderer(SystemManager* manager)
 		: ISystem(manager)
 	{
+		EventSystem::GetInstance().Subscribe(this, &Renderer::OnResize);
+
 		m_RenderDevice = std::make_unique<RenderDevice>();
+		m_SwapChain = std::make_unique<SwapChain>();
 	}
 
 	Renderer::~Renderer()
@@ -22,19 +26,8 @@ namespace Dive
 	{
 		const auto& windowData = m_Manager->GetEngine()->GetWindowData();
 
-		/*
 		// initialize device
-		if (!m_RenderDevice->Initialize(
-			windowData.hWnd,
-			windowData.ResolutionWidth,
-			windowData.ResolutionHeight,
-			windowData.bVSync,
-			windowData.bWindowed))
-		{
-			CORE_ERROR("Renderer::Initialize>> Renderer 객체 초기화에 실패하였습니다.");
-			return false;
-		}
-	*/
+		// intialize swap chain
 
 		// initialize resource
 
@@ -47,7 +40,7 @@ namespace Dive
 	{
 		if (!m_RenderDevice || !m_RenderDevice->GetImmediateContext())
 		{
-			CORE_WARN("Renderer::Update>> RenderDevice가 준비되지 않았습니다.");
+			//CORE_WARN("Renderer::Update>> RenderDevice가 준비되지 않았습니다.");
 			return;
 		}
 
@@ -68,9 +61,9 @@ namespace Dive
 
 	void Renderer::OnResize(const WindowResizeEvent * evnt)
 	{
-		if (!m_RenderDevice)
+		if (!m_SwapChain || !evnt)
 			return;
 
-		m_RenderDevice->ResizeResolution(evnt->GetHeight(), evnt->GetWidth());
+		m_SwapChain->ResizeResolution(evnt->GetHeight(), evnt->GetWidth());
 	}
 }

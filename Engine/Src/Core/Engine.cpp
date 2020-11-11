@@ -10,9 +10,15 @@ namespace Dive
 {
 	Engine::Engine()
 	{
-		// test
+		// 얘네는 이름을 바꾸고 싶다.
 		Log::Initialize();
 		Settings::GetInstance().Initialize();
+
+		// 객체 생성은 생성자쪽이 나을 것 같다.====================
+		m_SystemManager = std::make_shared<SystemManager>(this);
+		m_SystemManager->RegisterSystem<Timer>();
+		m_SystemManager->RegisterSystem<Renderer>();
+		// ========================================================
 	}
 
 	Engine::~Engine()
@@ -22,12 +28,6 @@ namespace Dive
 	bool Engine::Initialize(const WindowData& windowData)
 	{
 		m_WindowData = windowData;
-
-		// 객체 생성은 생성자쪽이 나을 것 같다.====================
-		m_SystemManager = std::make_shared<SystemManager>(this);
-		m_SystemManager->RegisterSystem<Timer>();
-		m_SystemManager->RegisterSystem<Renderer>();
-		// ========================================================
 
 		if (!m_SystemManager->Initialize())
 			return false;

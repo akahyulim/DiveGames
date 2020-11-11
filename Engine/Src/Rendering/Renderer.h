@@ -6,6 +6,7 @@ namespace Dive
 	class SystemManager;
 	class RenderDevice;
 	class WindowResizeEvent;
+	class SwapChain;
 
 	class Renderer : public ISystem
 	{
@@ -26,6 +27,7 @@ namespace Dive
 	private:
 	private:
 		std::unique_ptr<RenderDevice> m_RenderDevice;
+		std::unique_ptr<SwapChain> m_SwapChain;
 	};
 }
 

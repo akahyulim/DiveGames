@@ -105,6 +105,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Core\AppWindow.h" />
     <ClInclude Include="Src\Core\IniHelper.h" />
     <ClInclude Include="Src\Core\FileSystemHelper.h" />
     <ClInclude Include="Src\Core\Settings.h" />
@@ -129,8 +130,10 @@
     <ClInclude Include="Src\Rendering\D3D11\VertexBuffer.h" />
     <ClInclude Include="Src\Rendering\D3D11\VertexTypes.h" />
     <ClInclude Include="Src\Rendering\Renderer.h" />
+    <ClInclude Include="Src\Rendering\D3D11\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Core\AppWindow.cpp" />
     <ClCompile Include="Src\Core\IniHelper.cpp" />
     <ClCompile Include="Src\Core\Engine.cpp" />
     <ClCompile Include="Src\Core\FileSystemHelper.cpp" />
@@ -147,6 +150,7 @@
     <ClCompile Include="Src\Rendering\D3D11\RenderDevice.cpp" />
     <ClCompile Include="Src\Rendering\D3D11\VertexBuffer.cpp" />
     <ClCompile Include="Src\Rendering\Renderer.cpp" />
+    <ClCompile Include="Src\Rendering\D3D11\SwapChain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

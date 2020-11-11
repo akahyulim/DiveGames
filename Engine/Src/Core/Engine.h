@@ -5,6 +5,9 @@ namespace Dive
 {
 	class SystemManager;
 
+	// 최소한 핸들과 윈도우 모드 정보는 필요하다.
+	// 게다가 윈도우 모드 정보를 갱신될 수 있다....
+	// input에 윈도우 인스턴스도 필요하다. 게다가 메시지까지 저장해놨다...
 	struct WindowData
 	{
 		HWND hWnd;

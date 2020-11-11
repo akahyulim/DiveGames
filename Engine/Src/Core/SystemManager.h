@@ -16,7 +16,9 @@ namespace Dive
 		{
 			for (auto& system : m_Systems)
 			{
-				system.reset();
+				//system.reset();
+				delete system;
+				system = nullptr;
 			}
 			m_Systems.clear();
 		}
@@ -45,7 +47,8 @@ namespace Dive
 		{
 			ValidateSystemType<T>();
 
-			m_Systems.emplace_back(std::make_shared<T>(this));
+			//m_Systems.emplace_back(std::make_shared<T>(this));
+			m_Systems.emplace_back(static_cast<ISystem*>(new T(this)));
 		}
 
 		template<typename T>
@@ -56,7 +59,8 @@ namespace Dive
 			for (const auto& system : m_Systems)
 			{
 				if (typeid(T) == typeid(*system))
-					return static_cast<T*>(system.get());
+					return dynamic_cast<T*>(system);
+					//return static_cast<T*>(system.get());
 			}
 			return nullptr;
 		}
@@ -68,6 +72,7 @@ namespace Dive
 
 	private:
 		Engine* m_Engine = nullptr;
-		std::vector<std::shared_ptr<ISystem>> m_Systems;
+		//std::vector<std::shared_ptr<ISystem>> m_Systems;
+		std::vector<ISystem*> m_Systems;
 	};
 }

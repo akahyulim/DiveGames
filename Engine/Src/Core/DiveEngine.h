@@ -15,6 +15,7 @@
 #include "FileSystemHelper.h"
 #include "IniHelper.h"
 #include "Settings.h"
+#include "AppWindow.h"
 
 //= Event =================================================
 #include "Events/EventSystem.h"
@@ -27,5 +28,6 @@
 #include "Rendering/D3D11/RenderDeviceEnums.h"
 #include "Rendering/D3D11/RenderDeviceTypes.h"
 #include "Rendering/D3D11/RenderDevice.h"
+#include "Rendering/D3D11/SwapChain.h"
 
 #include "Rendering/Renderer.h"
