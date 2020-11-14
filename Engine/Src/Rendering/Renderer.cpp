@@ -13,9 +13,6 @@ namespace Dive
 		: ISystem(manager)
 	{
 		EventSystem::GetInstance().Subscribe(this, &Renderer::OnResize);
-
-		m_RenderDevice = std::make_unique<RenderDevice>();
-		m_SwapChain = std::make_unique<SwapChain>();
 	}
 
 	Renderer::~Renderer()
@@ -24,10 +21,16 @@ namespace Dive
 
 	bool Renderer::Initialize()
 	{
-		const auto& windowData = m_Manager->GetEngine()->GetWindowData();
+		// 어쩔 수 없다. Engine으로부터 WindowData를 얻어와서 초기화하자.
+		const auto& wndData = m_Manager->GetEngine()->GetWindowData();
 
 		// initialize device
+		m_RenderDevice = std::make_unique<RenderDevice>();
+		
+
 		// intialize swap chain
+		// hwnd, resolution, vsync, windowed, target frame, render device
+		m_SwapChain = std::make_unique<SwapChain>();
 
 		// initialize resource
 
@@ -55,8 +58,6 @@ namespace Dive
 	{
 		if (!m_RenderDevice)
 			return;
-
-		m_RenderDevice->Present();
 	}
 
 	void Renderer::OnResize(const WindowResizeEvent * evnt)

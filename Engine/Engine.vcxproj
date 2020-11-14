@@ -105,7 +105,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Core\AppWindow.h" />
     <ClInclude Include="Src\Core\IniHelper.h" />
     <ClInclude Include="Src\Core\FileSystemHelper.h" />
     <ClInclude Include="Src\Core\Settings.h" />
@@ -133,7 +132,6 @@
     <ClInclude Include="Src\Rendering\D3D11\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Core\AppWindow.cpp" />
     <ClCompile Include="Src\Core\IniHelper.cpp" />
     <ClCompile Include="Src\Core\Engine.cpp" />
     <ClCompile Include="Src\Core\FileSystemHelper.cpp" />

@@ -1,42 +1,34 @@
 #include "Editor.h"
 #include "Core/DiveEngine.h"
 
-Editor::Editor()
+
+Editor::Editor(HINSTANCE hInstance, HWND hWnd, int width, int height)
 {
-	m_Engine = std::make_unique<Dive::Engine>();
+	m_Engine = std::make_unique<Dive::Engine>(hInstance, hWnd, width, height);
+
+	// spratan의 경우 SystemManager raw pointer를 멤버 변수로 둔 후 GetSystemManager()로 전달하여 System 객체를 사용토록 한다. 
+
+	// 이하 ImGUI
 }
 
 Editor::~Editor()
 {
 }
 
-// 해상도는 수시로 갱신될 수 있으므로 한 번의 전달로는 부족하다.
-// 그래서 spartan은 wndpoc을 통해 윈도우 메시지가 처리될 때 마다 이를 갱신한다.
-bool Editor::Initialize(HWND hWnd, int width, int height, bool vsync, bool windowed)
-{
-	Dive::WindowData windowData;
-	windowData.hWnd				= hWnd;
-	windowData.ResolutionWidth	= width;
-	windowData.ResolutionHeight = height;
-	windowData.bVSync			= vsync;
-	windowData.bWindowed		= windowed;
-
-	if (!m_Engine->Initialize(windowData))
-	{
-		APP_ERROR("Editor Initialize에 실패하였습니다.");
-		return false;
-	}
-
-	return true;
-}
-
 void Editor::Update()
 {
-	m_Engine->Update();
-
-	auto timer = m_Engine->GetSystemManager()->GetSystem<Dive::Timer>();
-	if (!timer)
+	if (!m_Engine)
 		return;
 
-	//APP_INFO("Elapsed Time: {0:f} / Smooth Elapsed Time: {1:f}", timer->GetDeltaTime(), timer->GetSmoothDeltaTime());
+	m_Engine->Update();
+}
+
+void Editor::OnResize(int width, int height)
+{
+	if (!m_Engine)
+		return;
+
+	// RenderSystem에 전달한다.
+
+	APP_TRACE("Change Winodw Size: {0:d}, {1:d}", width, height);
 }

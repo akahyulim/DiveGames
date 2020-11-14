@@ -15,7 +15,6 @@
 #include "FileSystemHelper.h"
 #include "IniHelper.h"
 #include "Settings.h"
-#include "AppWindow.h"
 
 //= Event =================================================
 #include "Events/EventSystem.h"

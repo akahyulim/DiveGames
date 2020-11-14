@@ -12,6 +12,7 @@
     <ClInclude Include="Src\Editor.h">
       <Filter>Src</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">

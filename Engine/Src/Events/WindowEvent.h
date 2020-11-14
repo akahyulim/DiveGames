@@ -4,6 +4,13 @@
 
 namespace Dive
 {
+	class WindowOnMessageEvent : public IEvent
+	{
+	public:
+	private:
+
+	};
+
 	class WindowResizeEvent : public IEvent
 	{
 	public:

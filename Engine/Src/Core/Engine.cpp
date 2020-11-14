@@ -8,31 +8,26 @@
 
 namespace Dive
 {
-	Engine::Engine()
+	Engine::Engine(HINSTANCE hInstance, HWND hWnd, int width, int height)
 	{
+		m_WindowData.hInstance	= hInstance;
+		m_WindowData.hWnd		= hWnd;
+		m_WindowData.width		= width;
+		m_WindowData.height		= height;
+
 		// 얘네는 이름을 바꾸고 싶다.
 		Log::Initialize();
-		Settings::GetInstance().Initialize();
+		//Settings::GetInstance().Initialize();
 
-		// 객체 생성은 생성자쪽이 나을 것 같다.====================
 		m_SystemManager = std::make_shared<SystemManager>(this);
 		m_SystemManager->RegisterSystem<Timer>();
 		m_SystemManager->RegisterSystem<Renderer>();
-		// ========================================================
+
+		m_SystemManager->Initialize();
 	}
 
 	Engine::~Engine()
 	{
-	}
-	
-	bool Engine::Initialize(const WindowData& windowData)
-	{
-		m_WindowData = windowData;
-
-		if (!m_SystemManager->Initialize())
-			return false;
-
-		return true;
 	}
 	
 	void Engine::Update()

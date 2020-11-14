@@ -42,13 +42,13 @@ namespace Dive
 				system->Update();
 		}
 
+		// 사실 Initialize를 둘 필요가 없다.
 		template<typename T>
 		void RegisterSystem()
 		{
 			ValidateSystemType<T>();
 
-			//m_Systems.emplace_back(std::make_shared<T>(this));
-			m_Systems.emplace_back(static_cast<ISystem*>(new T(this)));
+			m_Systems.emplace_back(new T(this));
 		}
 
 		template<typename T>

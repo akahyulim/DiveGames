@@ -11,12 +11,12 @@ namespace Dive
 class Editor
 {
 public:
-	Editor();
+	Editor(HINSTANCE hInstance, HWND hWnd, int width, int height);
 	~Editor();
 
-	bool Initialize(HWND hWnd, int width, int height, bool vsync, bool windowed);
-
 	void Update();
+
+	void OnResize(int width, int height);
 
 private:
 
