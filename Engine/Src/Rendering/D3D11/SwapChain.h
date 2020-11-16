@@ -2,13 +2,20 @@
 
 namespace Dive
 {
+	class RenderDevice;
+
 	class SwapChain
 	{
 	public:
-		SwapChain();
+		SwapChain(const std::shared_ptr<RenderDevice>& device, HWND hWnd, int width, int height);
 		~SwapChain();
 
-		void ResizeResolution(int width, int height);
+		bool Present();
+
+		void ResizeBuffer(int width, int height);
+
+		IDXGISwapChain* GetSwapChain() const { return m_SwapChain; }
+		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }
 
 	private:
 		HWND m_hWnd;
@@ -24,8 +31,7 @@ namespace Dive
 		ID3D11RenderTargetView* m_RenderTargetView;
 
 		// RenderTargetView 생성에 필요하다. 즉, Resize에도 필요하다?
-		// shared_ptr??
-		ID3D11Device* m_Device;
+		std::shared_ptr<RenderDevice> m_RenderDevice;
 	};
 }
 

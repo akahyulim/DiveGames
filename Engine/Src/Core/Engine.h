@@ -11,6 +11,7 @@ namespace Dive
 		HWND hWnd;
 		int width;
 		int height;
+		bool windowed;
 	};
 
 	class Engine

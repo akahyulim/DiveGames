@@ -21,6 +21,9 @@ void Editor::Update()
 		return;
 
 	m_Engine->Update();
+
+	// 호출 과정이 에반데...
+//	m_Engine->GetSystemManager()->GetSystem<Dive::Renderer>()->GetSwapChain()->Present();
 }
 
 void Editor::OnResize(int width, int height)

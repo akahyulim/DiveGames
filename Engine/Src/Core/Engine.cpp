@@ -14,6 +14,7 @@ namespace Dive
 		m_WindowData.hWnd		= hWnd;
 		m_WindowData.width		= width;
 		m_WindowData.height		= height;
+		//m_WindowData.windowed	= windowed;
 
 		// 얘네는 이름을 바꾸고 싶다.
 		Log::Initialize();
