@@ -21,6 +21,8 @@ namespace Dive
 
 		void OnResize(const WindowResizeEvent* evnt);
 
+		RenderDevice* GetRenderDevice() const { return m_RenderDevice; }
+
 	private:
 
 	private:

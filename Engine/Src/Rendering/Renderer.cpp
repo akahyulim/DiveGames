@@ -44,5 +44,9 @@ namespace Dive
 	// 윈도우로부터 크기가 변경되었다는 메시지
 	void Renderer::OnResize(const WindowResizeEvent * evnt)
 	{
+		if (nullptr == m_RenderDevice)
+			return;
+
+		m_RenderDevice->ResizeBuffer(evnt->GetWidth(), evnt->GetHeight());
 	}
 }

@@ -13,6 +13,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Window::Show();
 
 	Editor editor(hInstance, Window::g_hWnd, Window::GetWidth(), Window::GetHeight(), true);
+	if (!editor.IsInitialized())
+	{
+		APP_CRITICAL("");
+		return 1;
+	}
 
 	Window::g_OnResize = [&editor](int width, int height) {editor.OnResize(width, height); };
 

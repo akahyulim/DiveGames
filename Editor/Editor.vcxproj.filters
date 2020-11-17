@@ -4,19 +4,78 @@
     <ClCompile Include="Src\Editor.cpp">
       <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="Src\EntryPoint.cpp">
+    <ClCompile Include="Src\ImGUI\imgui.cpp">
+      <Filter>Src\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ImGUI\imgui_demo.cpp">
+      <Filter>Src\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ImGUI\imgui_draw.cpp">
+      <Filter>Src\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ImGUI\imgui_impl_dx11.cpp">
+      <Filter>Src\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ImGUI\imgui_impl_win32.cpp">
+      <Filter>Src\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\ImGUI\imgui_widgets.cpp">
+      <Filter>Src\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\main.cpp">
       <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Widgets\MenuBar.cpp">
+      <Filter>Src\Widgets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Editor.h">
       <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Window.h" />
+    <ClInclude Include="Src\ImGUI\imconfig.h">
+      <Filter>Src\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ImGUI\imgui.h">
+      <Filter>Src\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ImGUI\imgui_impl_dx11.h">
+      <Filter>Src\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ImGUI\imgui_impl_win32.h">
+      <Filter>Src\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ImGUI\imgui_internal.h">
+      <Filter>Src\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ImGUI\imstb_rectpack.h">
+      <Filter>Src\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ImGUI\imstb_textedit.h">
+      <Filter>Src\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ImGUI\imstb_truetype.h">
+      <Filter>Src\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Window.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Widgets\IWidget.h">
+      <Filter>Src\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Widgets\MenuBar.h">
+      <Filter>Src\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">
       <UniqueIdentifier>{cec992f8-c49a-430c-af0b-8fac0659edcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\ImGUI">
+      <UniqueIdentifier>{4f3b467b-5f49-494f-815c-475a2c47e2dc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Widgets">
+      <UniqueIdentifier>{abf000c1-fa97-4f48-9475-66023d43a18f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

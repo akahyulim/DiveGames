@@ -135,19 +135,39 @@ namespace Dive
 			return;
 		}
 
+		// 예상과 다른 점
+		// 1. width, height을 0으로 넣어도 desc의 값 변경이 없다.
+		// 2. width, height를 전달받은 값으로 넣어도 desc의 값 변경이 없다.
+		// 즉, 버퍼의 크기가 변경되지 않았다.
 		m_SwapChain->ResizeBuffers(
 			1,
-			0,
-			0,
+			width,
+			height,
 			DXGI_FORMAT_R8G8B8A8_UNORM,
 			0);
 
-		// 사실 위 함수의 2, 3번째 인자를 0으로 전달하면 hWnd의 크기를 자동으로 가져온다.
-		// 따라서 굳이 매개변수를 전달받을 필요가 없다.
-		// 크기 확인 역시 desc를 얻어오면 될 것 같다.
 		m_Width = width;
 		m_Height = height;
 		CORE_TRACE("Resize Resolution Width: {0:d}, Height: {1:d}", m_Width, m_Height);
+
+		DXGI_SWAP_CHAIN_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		m_SwapChain->GetDesc(&desc);
+		CORE_TRACE("desc Resolution Width: {0:d}, Height: {1:d}", desc.BufferDesc.Width, desc.BufferDesc.Height);
+
+		// back buffer 크기가 변경되지 않으니 직접 가져와도 크기의 변화가 없다.
+		ID3D11Texture2D* backBuffer = nullptr;
+		if (FAILED(m_SwapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))))
+		{
+			CORE_ERROR("");
+			return;
+		}
+		D3D11_TEXTURE2D_DESC texDesc;
+		ZeroMemory(&texDesc, sizeof(texDesc));
+		backBuffer->GetDesc(&texDesc);
+		backBuffer->Release();
+		CORE_TRACE("tex Resolution Width: {0:d}, Height: {1:d}", texDesc.Width, texDesc.Height);
+
 
 		// render target view는 새로 생성해야하지 않을까?
 	}

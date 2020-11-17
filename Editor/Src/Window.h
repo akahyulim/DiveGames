@@ -3,6 +3,9 @@
 #include <string>
 #include <functional>
 #include "Core/Engine.h"
+#include "ImGUI/imgui_impl_win32.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Window
 {
@@ -25,6 +28,9 @@ namespace Window
 
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+			return true;
+
 		if (msg == WM_SIZE || msg == WM_DISPLAYCHANGE)
 		{
 				
