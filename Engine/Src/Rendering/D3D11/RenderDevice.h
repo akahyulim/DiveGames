@@ -3,21 +3,34 @@
 
 namespace Dive
 {
-	// 생성 및 객체 반환외엔 딱히 하는 일이 없다.
-	// 멀티 플랫폼 개발을 위한 구분이었던 것인가?
 	class RenderDevice
 	{
 	public:
-		RenderDevice();
+		RenderDevice(HWND hWnd, int width, int height, bool windowed);
 		~RenderDevice();
 
-		ID3D11Device* GetD3DDevice() const { return m_D3dDevice; }	// 추후 이름을 바꾸자.
-		ID3D11DeviceContext* GetImmediateContext() const { return m_ImmediateContext; }
+		bool Present();
+		void ResizeBuffer(int width, int height);
 
+		bool IsInitialized() const { return m_bInitialize; }
+		ID3D11Device* GetD3dDevice() const { return m_D3dDevice; }
+		ID3D11DeviceContext* GetImmediateContext() const { return m_ImmediateContext; }
+		IDXGISwapChain* GetSwapChain() const { return m_SwapChain; }
+		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }
 
 	private:
 		ID3D11Device* m_D3dDevice = nullptr;;
 		ID3D11DeviceContext* m_ImmediateContext = nullptr;
+		IDXGISwapChain* m_SwapChain = nullptr;
+		ID3D11RenderTargetView* m_RenderTargetView = nullptr;
+
+		// window datas
+		HWND m_hWnd;
+		int m_Width = 800;
+		int m_Height = 600;
+		bool m_bWindowed = true;
+
+		bool m_bInitialize = false;
 	};
 }
 

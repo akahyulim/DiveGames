@@ -129,7 +129,6 @@
     <ClInclude Include="Src\Rendering\D3D11\VertexBuffer.h" />
     <ClInclude Include="Src\Rendering\D3D11\VertexTypes.h" />
     <ClInclude Include="Src\Rendering\Renderer.h" />
-    <ClInclude Include="Src\Rendering\D3D11\SwapChain.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Core\IniHelper.cpp" />
@@ -148,7 +147,6 @@
     <ClCompile Include="Src\Rendering\D3D11\RenderDevice.cpp" />
     <ClCompile Include="Src\Rendering\D3D11\VertexBuffer.cpp" />
     <ClCompile Include="Src\Rendering\Renderer.cpp" />
-    <ClCompile Include="Src\Rendering\D3D11\SwapChain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

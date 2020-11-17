@@ -7,7 +7,7 @@ namespace Dive
 {
 	VertexBuffer::VertexBuffer(RenderDevice* device)
 	{
-		if (!device || !device->GetD3DDevice())
+		if (!device || !device->GetD3dDevice())
 		{
 			CORE_ERROR("VertexBuffer::VertexBuffer>> RenderDevice 객체가 유효하지 않습니다.");
 			return;
@@ -78,7 +78,7 @@ namespace Dive
 		data.SysMemSlicePitch	= 0;
 
 		auto buffer_ptr = m_buffer.get();
-		if (FAILED(m_device->GetD3DDevice()->CreateBuffer(&descBuffer, m_is_dynamic ? nullptr : &data, &buffer_ptr)))
+		if (FAILED(m_device->GetD3dDevice()->CreateBuffer(&descBuffer, m_is_dynamic ? nullptr : &data, &buffer_ptr)))
 		{
 			CORE_ERROR("VertexBuffer::Create>> Vertex Buffer 생성에 실패하였습니다.");
 			return false;

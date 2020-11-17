@@ -8,13 +8,13 @@
 
 namespace Dive
 {
-	Engine::Engine(HINSTANCE hInstance, HWND hWnd, int width, int height)
+	Engine::Engine(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed)
 	{
 		m_WindowData.hInstance	= hInstance;
 		m_WindowData.hWnd		= hWnd;
 		m_WindowData.width		= width;
 		m_WindowData.height		= height;
-		//m_WindowData.windowed	= windowed;
+		m_WindowData.windowed	= windowed;
 
 		// 얘네는 이름을 바꾸고 싶다.
 		Log::Initialize();
@@ -24,7 +24,12 @@ namespace Dive
 		m_SystemManager->RegisterSystem<Timer>();
 		m_SystemManager->RegisterSystem<Renderer>();
 
-		m_SystemManager->Initialize();
+		if (!m_SystemManager->Initialize())
+		{
+			return;
+		}
+
+		m_bInitialize = true;
 	}
 
 	Engine::~Engine()

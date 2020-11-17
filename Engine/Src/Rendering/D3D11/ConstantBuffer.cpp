@@ -6,7 +6,7 @@ namespace Dive
 {
 	ConstantBuffer::ConstantBuffer(RenderDevice* device)
 	{
-		if (!device || !device->GetD3DDevice() || !device->GetImmediateContext())
+		if (!device || !device->GetD3dDevice() || !device->GetImmediateContext())
 		{
 			CORE_ERROR("ConstantBuffer::ConstantBuffer>> RenderDevice 객체가 유효하지 않습니다.");
 			return;

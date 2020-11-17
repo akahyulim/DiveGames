@@ -7,7 +7,7 @@ namespace Dive
 {
 	IndexBuffer::IndexBuffer(RenderDevice* device)
 	{
-		if (!device || !device->GetD3DDevice())
+		if (!device || !device->GetD3dDevice())
 		{
 			CORE_ERROR("IndexBuffer::IndexBuffer>> RenderDevice 객체가 유효하지 않습니다.");
 			return;
@@ -45,7 +45,7 @@ namespace Dive
 		data.SysMemSlicePitch	= 0;
 
 		auto buffer_ptr = m_buffer.get();
-		if (FAILED(m_device->GetD3DDevice()->CreateBuffer(&desc, &data, &buffer_ptr)))
+		if (FAILED(m_device->GetD3dDevice()->CreateBuffer(&desc, &data, &buffer_ptr)))
 		{
 			CORE_ERROR("IndexBuffer::Create>> Index Buffer 생성에 실패하였습니다.");
 			return false;
@@ -66,7 +66,7 @@ namespace Dive
 		desc.Usage					= D3D11_USAGE_DYNAMIC;
 
 		auto buffer_ptr = m_buffer.get();
-		if (FAILED(m_device->GetD3DDevice()->CreateBuffer(&desc, nullptr, &buffer_ptr)))
+		if (FAILED(m_device->GetD3dDevice()->CreateBuffer(&desc, nullptr, &buffer_ptr)))
 		{
 			CORE_ERROR("IndexBuffer::CreateDynamic>> Index Buffer 생성에 실패하였습니다.");
 			return false;

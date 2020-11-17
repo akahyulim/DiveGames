@@ -2,9 +2,13 @@
 #include "Core/DiveEngine.h"
 
 
-Editor::Editor(HINSTANCE hInstance, HWND hWnd, int width, int height)
+Editor::Editor(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed)
 {
-	m_Engine = std::make_unique<Dive::Engine>(hInstance, hWnd, width, height);
+	m_Engine = std::make_unique<Dive::Engine>(hInstance, hWnd, width, height, windowed);
+	if (!m_Engine->IsInitialized())
+	{
+		return;
+	}
 
 	// spratan의 경우 SystemManager raw pointer를 멤버 변수로 둔 후 GetSystemManager()로 전달하여 System 객체를 사용토록 한다. 
 

@@ -25,7 +25,7 @@ namespace Dive
 			descBuffer.Usage				= D3D11_USAGE_DYNAMIC;
 
 			auto buffer_ptr = m_buffer.get();
-			if (FAILED(m_device->GetD3DDevice()->CreateBuffer(&descBuffer, nullptr, &buffer_ptr)))
+			if (FAILED(m_device->GetD3dDevice()->CreateBuffer(&descBuffer, nullptr, &buffer_ptr)))
 			{
 				CORE_ERROR("ConstantBuffer::Create >> Buffer 생성에 실패하였습니다.");
 				return false;

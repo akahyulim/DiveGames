@@ -11,7 +11,7 @@ namespace Dive
 class Editor
 {
 public:
-	Editor(HINSTANCE hInstance, HWND hWnd, int width, int height);
+	Editor(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed);
 	~Editor();
 
 	void Update();

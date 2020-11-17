@@ -12,7 +12,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	Window::Create(hInstance, L"Dive Editor");
 	Window::Show();
 
-	Editor editor(hInstance, Window::g_hWnd, Window::GetWidth(), Window::GetHeight());
+	Editor editor(hInstance, Window::g_hWnd, Window::GetWidth(), Window::GetHeight(), true);
 
 	Window::g_OnResize = [&editor](int width, int height) {editor.OnResize(width, height); };
 
