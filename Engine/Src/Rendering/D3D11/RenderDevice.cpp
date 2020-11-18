@@ -118,7 +118,10 @@ namespace Dive
 			return false;
 		}
 
-		if (FAILED(m_SwapChain->Present(0, 0)))
+		UINT syncInterval = 0;
+		if (m_bVSync)
+			syncInterval = 1;
+		if (FAILED(m_SwapChain->Present(syncInterval, 0)))
 		{
 			CORE_ERROR("");
 			return false;

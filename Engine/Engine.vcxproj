@@ -105,6 +105,9 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Rendering\D3D11\BlendState.h" />
+    <ClInclude Include="Src\Rendering\D3D11\RasterizerState.h" />
+    <ClInclude Include="Src\Rendering\D3D11\DepthStencilState.h" />
     <ClInclude Include="Src\Core\IniHelper.h" />
     <ClInclude Include="Src\Core\FileSystemHelper.h" />
     <ClInclude Include="Src\Core\Settings.h" />
@@ -131,6 +134,9 @@
     <ClInclude Include="Src\Rendering\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Rendering\D3D11\BlendState.cpp" />
+    <ClCompile Include="Src\Rendering\D3D11\RasterizerState.cpp" />
+    <ClCompile Include="Src\Rendering\D3D11\DepthStencilState.cpp" />
     <ClCompile Include="Src\Core\IniHelper.cpp" />
     <ClCompile Include="Src\Core\Engine.cpp" />
     <ClCompile Include="Src\Core\FileSystemHelper.cpp" />

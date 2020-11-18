@@ -28,4 +28,7 @@
 #include "Rendering/D3D11/RenderDeviceEnums.h"
 #include "Rendering/D3D11/RenderDeviceTypes.h"
 #include "Rendering/D3D11/RenderDevice.h"
+#include "Rendering/D3D11/DepthStencilState.h"
+#include "Rendering/D3D11/RasterizerState.h"
+#include "Rendering/D3D11/BlendState.h"
 #include "Rendering/Renderer.h"
