@@ -16,11 +16,11 @@ namespace Dive
 		void* Map();
 		bool Unmap();
 
-		ID3D11Buffer* GetBuffer() const { return m_buffer.get(); }
+		ID3D11Buffer* GetBuffer() const { return m_Buffer; }
 
 	private:
-		RenderDevice* m_device;
-		std::shared_ptr<ID3D11Buffer> m_buffer;
+		RenderDevice* m_Device = nullptr;
+		ID3D11Buffer* m_Buffer = nullptr;
 	};
 }
 

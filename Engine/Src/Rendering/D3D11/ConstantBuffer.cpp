@@ -2,35 +2,37 @@
 #include "ConstantBuffer.h"
 #include "RenderDevice.h"
 
+
 namespace Dive
 {
 	ConstantBuffer::ConstantBuffer(RenderDevice* device)
 	{
 		if (!device || !device->GetD3dDevice() || !device->GetImmediateContext())
 		{
-			CORE_ERROR("ConstantBuffer::ConstantBuffer>> RenderDevice 객체가 유효하지 않습니다.");
+			CORE_ERROR("");
 			return;
 		}
 
-		m_device = device;
+		m_Device = device;
 	}
 
 	ConstantBuffer::~ConstantBuffer()
 	{
+		SAFE_RELEASE(m_Buffer);
 	}
 
 	void * ConstantBuffer::Map()
 	{
-		if (!m_buffer)
+		if (!m_Buffer)
 		{
-			CORE_ERROR("ConstantBuffer::Map>> Buffer가 유효하지 않습니다.");
+			CORE_ERROR("");
 			return nullptr;
 		}
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		if (FAILED(m_device->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_buffer.get()), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		if (FAILED(m_Device->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_Buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
-			CORE_ERROR("ConstantBuffer::Map>> Constant Buffer Map에 실패하였습니다.");
+			CORE_ERROR("");
 			return nullptr;
 		}
 
@@ -39,13 +41,13 @@ namespace Dive
 
 	bool ConstantBuffer::Unmap()
 	{
-		if (!m_buffer)
+		if (!m_Buffer)
 		{
-			CORE_ERROR("ConstantBuffer::Unmap>> Buffer가 유효하지 않습니다.");
+			CORE_ERROR("");
 			return false;
 		}
 
-		m_device->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_buffer.get()), 0);
+		m_Device->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_Buffer), 0);
 
 		return true;
 	}

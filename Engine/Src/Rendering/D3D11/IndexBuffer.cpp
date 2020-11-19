@@ -1,7 +1,9 @@
 #include "DivePch.h"
 #include "IndexBuffer.h"
-#include "Core/Log.h"
 #include "RenderDevice.h"
+#include "Core/DiveDefs.h"
+#include "Core/Log.h"
+
 
 namespace Dive
 {
@@ -9,24 +11,27 @@ namespace Dive
 	{
 		if (!device || !device->GetD3dDevice())
 		{
-			CORE_ERROR("IndexBuffer::IndexBuffer>> RenderDevice 객체가 유효하지 않습니다.");
+			CORE_ERROR("");
 			return;
 		}
 
-		m_device = device;
+		m_Device = device;
 	}
 
 	IndexBuffer::~IndexBuffer()
 	{
+		SAFE_RELEASE(m_Buffer);
 	}
 
 	bool IndexBuffer::Create(const std::vector<unsigned int>& indices)
 	{
 		if (indices.empty())
 		{
-			CORE_ERROR("IndexBuffer::Create>> 잘못된 인자를 전달받았습니다.");
+			CORE_ERROR("");
 			return false;
 		}
+
+		SAFE_RELEASE(m_Buffer);
 
 		unsigned int size = static_cast<unsigned int>(indices.size());
 
@@ -44,10 +49,9 @@ namespace Dive
 		data.SysMemPitch		= 0;
 		data.SysMemSlicePitch	= 0;
 
-		auto buffer_ptr = m_buffer.get();
-		if (FAILED(m_device->GetD3dDevice()->CreateBuffer(&desc, &data, &buffer_ptr)))
+		if (FAILED(m_Device->GetD3dDevice()->CreateBuffer(&desc, &data, &m_Buffer)))
 		{
-			CORE_ERROR("IndexBuffer::Create>> Index Buffer 생성에 실패하였습니다.");
+			CORE_ERROR("");
 			return false;
 		}
 
@@ -65,10 +69,9 @@ namespace Dive
 		desc.StructureByteStride	= 0;
 		desc.Usage					= D3D11_USAGE_DYNAMIC;
 
-		auto buffer_ptr = m_buffer.get();
-		if (FAILED(m_device->GetD3dDevice()->CreateBuffer(&desc, nullptr, &buffer_ptr)))
+		if (FAILED(m_Device->GetD3dDevice()->CreateBuffer(&desc, nullptr, &m_Buffer)))
 		{
-			CORE_ERROR("IndexBuffer::CreateDynamic>> Index Buffer 생성에 실패하였습니다.");
+			CORE_ERROR("");
 			return false;
 		}
 
@@ -77,16 +80,16 @@ namespace Dive
 
 	void * IndexBuffer::Map()
 	{
-		if(!m_buffer)
+		if(!m_Buffer)
 		{
-			CORE_ERROR("IndexBuffer::Map>> Buffer가 유효하지 않습니다.");
+			CORE_ERROR("");
 			return nullptr;
 		}
 
 		D3D11_MAPPED_SUBRESOURCE mappedSubRsc;
-		if (FAILED(m_device->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_buffer.get()), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubRsc)))
+		if (FAILED(m_Device->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_Buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubRsc)))
 		{
-			CORE_ERROR("IndexBuffer::Map>> Index Buffer Map에 실패하였습니다.");
+			CORE_ERROR("");
 			return nullptr;
 		}
 
@@ -95,13 +98,13 @@ namespace Dive
 
 	bool IndexBuffer::Unmap()
 	{
-		if(m_buffer)
+		if(!m_Buffer)
 		{
-			CORE_ERROR("IndexBuffer::Unmap >> Buffer가 유효하지 않습니다.");
+			CORE_ERROR("");
 			return false;
 		}
 
-		m_device->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_buffer.get()), 0);
+		m_Device->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_Buffer), 0);
 
 		return true;
 	}

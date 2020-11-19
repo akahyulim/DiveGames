@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Object.h"
 #include "Core/Log.h"
+#include "Core/DiveDefs.h"
 
 namespace Dive
 {
@@ -15,19 +16,26 @@ namespace Dive
 		template<typename T>
 		bool Create()
 		{
-			D3D11_BUFFER_DESC descBuffer;
-			ZeroMemory(&descBuffer, sizeof(descBuffer));
-			descBuffer.BindFlags			= D3D11_BIND_CONSTANT_BUFFER;
-			descBuffer.ByteWidth			= static_cast<UINT>(sizeof(T));
-			descBuffer.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
-			descBuffer.MiscFlags			= 0;
-			descBuffer.StructureByteStride	= 0;
-			descBuffer.Usage				= D3D11_USAGE_DYNAMIC;
-
-			auto buffer_ptr = m_buffer.get();
-			if (FAILED(m_device->GetD3dDevice()->CreateBuffer(&descBuffer, nullptr, &buffer_ptr)))
+			if (!m_Device || !m_Device->GetD3dDevice())
 			{
-				CORE_ERROR("ConstantBuffer::Create >> Buffer 생성에 실패하였습니다.");
+				CORE_ERROR("");
+				return;
+			}
+
+			SAFE_RELEASE(m_Buffer);
+
+			D3D11_BUFFER_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));
+			desc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
+			desc.ByteWidth				= static_cast<UINT>(sizeof(T));
+			desc.CPUAccessFlags			= D3D11_CPU_ACCESS_WRITE;
+			desc.MiscFlags				= 0;
+			desc.StructureByteStride	= 0;
+			desc.Usage					= D3D11_USAGE_DYNAMIC;
+
+			if (FAILED(m_Device->GetD3dDevice()->CreateBuffer(&desc, nullptr, &m_Buffer)))
+			{
+				CORE_ERROR("");
 				return false;
 			}
 
@@ -37,11 +45,11 @@ namespace Dive
 		void* Map();
 		bool Unmap();
 
-		ID3D11Buffer* GetBuffer() { return m_buffer.get(); }
+		ID3D11Buffer* GetBuffer() { return m_Buffer; }
 
 	private:
-		RenderDevice* m_device;
-		std::shared_ptr<ID3D11Buffer> m_buffer;
+		RenderDevice* m_Device = nullptr;
+		ID3D11Buffer* m_Buffer = nullptr;
 	};
 }
 
