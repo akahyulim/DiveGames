@@ -12,8 +12,8 @@ namespace Dive
 		DepthStencilState(RenderDevice* device, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc);
 		~DepthStencilState();
 
-		bool IsInitialized() const					{ return m_bInitialized; }
-		ID3D11DepthStencilState* GetState() const	{ return m_State; }
+		bool IsInitialized()				const { return m_bInitialized; }
+		ID3D11DepthStencilState* GetState() const { return m_State; }
 
 	private:
 		bool m_bInitialized					= false;

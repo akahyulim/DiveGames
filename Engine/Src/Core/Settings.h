@@ -27,17 +27,18 @@ namespace Dive
 		virtual bool Load();
 
 		//= Options =========================================================================
-		std::string GetFileName() const { return m_FileName; }
+		std::string GetFileName()	const { return m_FileName; }
 		eScreenMode GetScreenMode() const { return m_ScreenMode; }
-		void SetScrrenMode(eScreenMode mode) { m_ScreenMode = mode; }
-		int GetResolutionWidth() const { return m_ResolutionWidth; }
-		void SetResolutionWidth(int width) { m_ResolutionWidth = width; }
-		int GetResolutionHeight() const { return m_ResolutionHeight; }
-		void SetResolutionHeight(int height) { m_ResolutionHeight = height; }
+		int GetResolutionWidth()	const { return m_ResolutionWidth; }
+		int GetResolutionHeight()	const { return m_ResolutionHeight; }
 		//unsigned int GetFrameRate() const { return m_FrameRate; }
 		//void SetFrameRate(unsigned int rate) { m_FrameRate = rate; }
-		bool IsVSync() const { return m_bVSync; }
-		void SetVSync(bool vSync) { m_bVSync = vSync; }
+		bool IsVSync()				const { return m_bVSync; }
+
+		void SetResolutionWidth(int width)		{ m_ResolutionWidth = width; }
+		void SetResolutionHeight(int height)	{ m_ResolutionHeight = height; }
+		void SetScrrenMode(eScreenMode mode)	{ m_ScreenMode = mode; }
+		void SetVSync(bool vSync)				{ m_bVSync = vSync; }
 
 	private:
 		Settings();

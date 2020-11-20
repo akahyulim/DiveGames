@@ -44,9 +44,9 @@ namespace Dive
 		void* Map();
 		bool Unmap();
 
-		ID3D11Buffer* GetBuffer() const		{ return m_Buffer; }
-		unsigned int GetStride() const		{ return m_Stride; }
-		unsigned int GetVertexCount() const { return m_VertexCount; }
+		ID3D11Buffer* GetBuffer()		const { return m_Buffer; }
+		unsigned int GetStride()		const { return m_Stride; }
+		unsigned int GetVertexCount()	const { return m_VertexCount; }
 
 	private:
 		bool createBuffer(const void* vertices);

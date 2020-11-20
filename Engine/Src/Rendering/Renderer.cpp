@@ -10,6 +10,8 @@
 #include "D3D11/DepthStencilState.h"
 #include "D3D11/RasterizerState.h"
 #include "D3D11/BlendState.h"
+#include "D3D11/Texture2D.h"
+
 
 namespace Dive
 {

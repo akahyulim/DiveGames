@@ -12,17 +12,17 @@ namespace Dive
 		bool Present();
 		void ResizeBuffer(int width, int height);
 
-		bool IsInitialized() const							{ return m_bInitialize; }
-		ID3D11Device* GetD3dDevice() const					{ return m_D3dDevice; }
-		ID3D11DeviceContext* GetImmediateContext() const	{ return m_ImmediateContext; }
-		IDXGISwapChain* GetSwapChain() const				{ return m_SwapChain; }
-		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }
+		bool IsInitialized()							const { return m_bInitialize; }
+		ID3D11Device* GetD3dDevice()					const { return m_D3dDevice; }
+		ID3D11DeviceContext* GetImmediateContext()		const { return m_ImmediateContext; }
+		IDXGISwapChain* GetSwapChain()					const { return m_SwapChain; }
+		ID3D11RenderTargetView* GetRenderTargetView()	const { return m_RenderTargetView; }
 
 	private:
 		ID3D11Device* m_D3dDevice					= nullptr;;
 		ID3D11DeviceContext* m_ImmediateContext		= nullptr;
 		IDXGISwapChain* m_SwapChain					= nullptr;
-		ID3D11RenderTargetView* m_RenderTargetView	= nullptr;
+		ID3D11RenderTargetView* m_RenderTargetView	= nullptr;	// 이게 이 곳에서 Texture2D가 아닌 방법으로 생성되었다는 것은 backbuffer이기 때문?
 
 		// window datas
 		HWND m_hWnd;

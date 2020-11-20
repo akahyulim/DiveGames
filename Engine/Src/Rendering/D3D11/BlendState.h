@@ -20,9 +20,9 @@ namespace Dive
 			float* blendFactor			= nullptr);
 		~BlendState();
 
-		bool IsInitialized() const			{ return m_bInitialized; }
-		ID3D11BlendState* GetState() const	{ return m_State; }
-		const float* GetBlendFactor() const { return &m_BlendFactor[0]; }
+		bool IsInitialized()			const { return m_bInitialized; }
+		ID3D11BlendState* GetState()	const { return m_State; }
+		const float* GetBlendFactor()	const { return &m_BlendFactor[0]; }
 
 	private:
 		bool m_bInitialized			= false;

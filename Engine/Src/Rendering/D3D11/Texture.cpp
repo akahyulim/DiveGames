@@ -1,0 +1,21 @@
+#include "DivePch.h"
+#include "Texture.h"
+#include "RenderDevice.h"
+#include "Rendering/Renderer.h"
+#include "Core/Log.h"
+#include "Core/SystemManager.h"
+
+
+namespace Dive
+{
+	Texture::Texture(SystemManager* manager)
+		: IResource(eResourceType::Texture)
+	{
+		m_RenderDevice = manager->GetSystem<Renderer>()->GetRenderDevice();
+	}
+
+	Texture::~Texture()
+	{
+
+	}
+}
