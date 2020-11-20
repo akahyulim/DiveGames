@@ -22,7 +22,7 @@ namespace Dive
 		ID3D11Device* m_D3dDevice					= nullptr;;
 		ID3D11DeviceContext* m_ImmediateContext		= nullptr;
 		IDXGISwapChain* m_SwapChain					= nullptr;
-		ID3D11RenderTargetView* m_RenderTargetView	= nullptr;
+		ID3D11RenderTargetView* m_RenderTargetView	= nullptr;	// 이게 이 곳에서 Texture2D가 아닌 방법으로 생성되었다는 것은 backbuffer이기 때문?
 
 		// window datas
 		HWND m_hWnd;

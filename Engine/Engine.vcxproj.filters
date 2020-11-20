@@ -28,9 +28,6 @@
     <ClCompile Include="Src\Rendering\D3D11\ConstantBuffer.cpp">
       <Filter>Src\Rendering\D3D11</Filter>
     </ClCompile>
-    <ClCompile Include="Src\DivePch.cpp">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Rendering\D3D11\IndexBuffer.cpp">
       <Filter>Src\Rendering\D3D11</Filter>
     </ClCompile>
@@ -51,6 +48,15 @@
     </ClCompile>
     <ClCompile Include="Src\Rendering\D3D11\BlendState.cpp">
       <Filter>Src\Rendering\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Rendering\D3D11\Texture.cpp">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Rendering\D3D11\Texture2D.cpp">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\DivePch.cpp">
+      <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -96,9 +102,6 @@
     <ClInclude Include="Src\Rendering\D3D11\ConstantBuffer.h">
       <Filter>Src\Rendering\D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="Src\DivePch.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Rendering\D3D11\IndexBuffer.h">
       <Filter>Src\Rendering\D3D11</Filter>
     </ClInclude>
@@ -135,6 +138,21 @@
     <ClInclude Include="Src\Rendering\D3D11\BlendState.h">
       <Filter>Src\Rendering\D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Resource\IResource.h">
+      <Filter>Src\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\D3D11\Texture.h">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\D3D11\Texture2D.h">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Rendering\D3D11\TextureCube.h">
+      <Filter>Src\Rendering\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\DivePch.h">
+      <Filter>Src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">
@@ -151,6 +169,9 @@
     </Filter>
     <Filter Include="Src\Rendering\D3D11">
       <UniqueIdentifier>{10d22c29-385d-4a6a-917a-fe23c8a16dd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Resource">
+      <UniqueIdentifier>{72064627-bc7f-436c-b2f0-d1e2c7a52f84}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

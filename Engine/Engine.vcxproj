@@ -129,9 +129,13 @@
     <ClInclude Include="Src\Rendering\D3D11\RenderDevice.h" />
     <ClInclude Include="Src\Rendering\D3D11\RenderDeviceEnums.h" />
     <ClInclude Include="Src\Rendering\D3D11\RenderDeviceTypes.h" />
+    <ClInclude Include="Src\Rendering\D3D11\Texture.h" />
+    <ClInclude Include="Src\Rendering\D3D11\Texture2D.h" />
+    <ClInclude Include="Src\Rendering\D3D11\TextureCube.h" />
     <ClInclude Include="Src\Rendering\D3D11\VertexBuffer.h" />
     <ClInclude Include="Src\Rendering\D3D11\VertexTypes.h" />
     <ClInclude Include="Src\Rendering\Renderer.h" />
+    <ClInclude Include="Src\Resource\IResource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Rendering\D3D11\BlendState.cpp" />
@@ -151,6 +155,8 @@
     <ClCompile Include="Src\Rendering\D3D11\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Rendering\D3D11\IndexBuffer.cpp" />
     <ClCompile Include="Src\Rendering\D3D11\RenderDevice.cpp" />
+    <ClCompile Include="Src\Rendering\D3D11\Texture.cpp" />
+    <ClCompile Include="Src\Rendering\D3D11\Texture2D.cpp" />
     <ClCompile Include="Src\Rendering\D3D11\VertexBuffer.cpp" />
     <ClCompile Include="Src\Rendering\Renderer.cpp" />
   </ItemGroup>
