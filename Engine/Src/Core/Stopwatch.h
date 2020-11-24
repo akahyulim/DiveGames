@@ -10,8 +10,8 @@ namespace Dive
 	class Stopwatch
 	{
 	public:
-		Stopwatch() = default;
-		~Stopwatch() = default;
+		Stopwatch()		= default;
+		~Stopwatch()	= default;
 
 		void Start();
 

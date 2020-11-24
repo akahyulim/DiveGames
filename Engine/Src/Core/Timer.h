@@ -20,16 +20,16 @@ namespace Dive
 		void Update() override;
 
 		// time
-		float GetRunningTimeMS() const { return static_cast<float>(m_RunningTimeMS); }
-		float GetRunningTime() const { return static_cast<float>(m_RunningTimeMS / 1000.0); }
-		float GetDeltaTimeMS() const { return static_cast<float>(m_DeltaTimeMS); }
-		float GetDeltaTime() const { return static_cast<float>(m_DeltaTimeMS / 1000.0); }
-		float GetSmoothDeltaTimeMS() const { return static_cast<float>(m_SmoothDeltaTimeMS); }
-		float GetSmoothDeltaTime() const { return static_cast<float>(m_SmoothDeltaTimeMS / 1000.0); }
+		float GetRunningTimeMS()		const { return static_cast<float>(m_RunningTimeMS); }
+		float GetRunningTime()			const { return static_cast<float>(m_RunningTimeMS / 1000.0); }
+		float GetDeltaTimeMS()			const { return static_cast<float>(m_DeltaTimeMS); }
+		float GetDeltaTime()			const { return static_cast<float>(m_DeltaTimeMS / 1000.0); }
+		float GetSmoothDeltaTimeMS()	const { return static_cast<float>(m_SmoothDeltaTimeMS); }
+		float GetSmoothDeltaTime()		const { return static_cast<float>(m_SmoothDeltaTimeMS / 1000.0); }
 
 		// fps
 		void SetTargetFps(double target);
-		float GetTargetFps() const { return static_cast<float>(m_TargetFPS); }
+		float GetTargetFps()			const { return static_cast<float>(m_TargetFPS); }
 
 
 	private:

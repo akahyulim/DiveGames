@@ -14,8 +14,8 @@ namespace Dive
 			BOOL multiSampleEnable, BOOL antialiasedLineEnable);
 		~RasterizerState();
 
-		bool IsInitialized() const				{ return m_bInitialized; }
-		ID3D11RasterizerState* GetState() const { return m_State; }
+		bool IsInitialized()				const { return m_bInitialized; }
+		ID3D11RasterizerState* GetState()	const { return m_State; }
 
 	private:
 		bool m_bInitialized				= false;

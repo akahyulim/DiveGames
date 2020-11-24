@@ -22,9 +22,9 @@ namespace Dive
 
 		void Update();
 
-		bool IsInitialized() const { return m_bInitialize; }
-		SystemManager* GetSystemManager() const { return m_SystemManager.get(); }
-		const WindowData& GetWindowData() const { return m_WindowData; }
+		bool IsInitialized()				const { return m_bInitialize; }
+		SystemManager* GetSystemManager()	const { return m_SystemManager.get(); }
+		const WindowData& GetWindowData()	const { return m_WindowData; }
 
 	private:
 		WindowData m_WindowData;
