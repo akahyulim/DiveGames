@@ -21,7 +21,7 @@ public:
 
 	void OnResize(int width, int height);
 
-	bool IsInitialized() const { return m_bInitialize; }
+	bool IsInitialized() const { return m_bInitialized; }
 
 	template<class T>
 	T* GetWidget()
@@ -45,7 +45,7 @@ private:
 	std::unique_ptr<Dive::Engine> m_Engine;
 	Dive::SystemManager* m_SystemManager = nullptr;
 
-	bool m_bInitialize = false;
+	bool m_bInitialized = false;
 
 	std::vector<std::shared_ptr<IWidget>> m_Widgets;
 };

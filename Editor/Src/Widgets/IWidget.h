@@ -21,14 +21,14 @@ public:
 
 		m_VarCount = 0;
 
-		if (m_position.x != -1.0f && m_position.y != -1.0f)
+		if (m_Position.x != -1.0f && m_Position.y != -1.0f)
 		{
-			ImGui::SetNextWindowPos(ImVec2(m_position.x, m_position.y));
+			ImGui::SetNextWindowPos(ImVec2(m_Position.x, m_Position.y));
 		}
 
-		if (m_padding.x != -1.0f && m_padding.y != -1.0f)
+		if (m_Padding.x != -1.0f && m_Padding.y != -1.0f)
 		{
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(m_padding.x, m_padding.y));
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(m_Padding.x, m_Padding.y));
 			m_VarCount++;
 		}
 
@@ -38,17 +38,17 @@ public:
 			m_VarCount++;
 		}
 
-		if (m_size.x != -1.0f && m_size.y != -1.0f)
+		if (m_Size.x != -1.0f && m_Size.y != -1.0f)
 		{
-			ImGui::SetNextWindowSize(ImVec2(m_size.x, m_size.y), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowSize(ImVec2(m_Size.x, m_Size.y), ImGuiCond_FirstUseEver);
 		}
 
-		if ((m_size.x != -1.0f && m_size.y != -1.0f) || (m_sizeMax.x != FLT_MAX && m_sizeMax.y != FLT_MAX))
+		if ((m_Size.x != -1.0f && m_Size.y != -1.0f) || (m_SizeMax.x != FLT_MAX && m_SizeMax.y != FLT_MAX))
 		{
-			ImGui::SetNextWindowSizeConstraints(ImVec2(m_size.x, m_size.y), ImVec2(m_sizeMax.x, m_sizeMax.y));
+			ImGui::SetNextWindowSizeConstraints(ImVec2(m_Size.x, m_Size.y), ImVec2(m_SizeMax.x, m_SizeMax.y));
 		}
 
-		ImGui::Begin(m_title.c_str(), &m_bVisible, m_WndFlags);
+		ImGui::Begin(m_Title.c_str(), &m_bVisible, m_WndFlags);
 		m_bWindowBegun = true;
 
 		return true;
@@ -81,24 +81,24 @@ public:
 	void SetVisible(bool visible)	{ m_bVisible = visible; }
 	float GetHeight()				{ return m_Height; }
 	ImGuiWindow* GetWindow()		{ return m_Window; }
-	const std::string& GetTitle()	{ return m_title; }
+	const std::string& GetTitle()	{ return m_Title; }
 
 protected:
 	Editor* m_Editor						= nullptr;
 	Dive::SystemManager* m_SystemManager	= nullptr;
 
 	ImGuiWindow* m_Window	= nullptr;
-	std::string m_title		= "no name";
+	std::string m_Title		= "no name";
 	bool m_bVisible			= true;
 	bool m_bWindow			= true;
 	int m_WndFlags			= ImGuiWindowFlags_NoCollapse;
 	float m_Height			= 0;
 	float m_Alpha			= -1.0f;
 
-	DirectX::XMFLOAT2 m_position{ -1.0f, -1.0f };
-	DirectX::XMFLOAT2 m_size{ -1.0f, -1.0f };
-	DirectX::XMFLOAT2 m_sizeMax{ FLT_MAX, FLT_MAX };
-	DirectX::XMFLOAT2 m_padding{ -1.0f, -1.0f };
+	DirectX::XMFLOAT2 m_Position{ -1.0f, -1.0f };
+	DirectX::XMFLOAT2 m_Size{ -1.0f, -1.0f };
+	DirectX::XMFLOAT2 m_SizeMax{ FLT_MAX, FLT_MAX };
+	DirectX::XMFLOAT2 m_Padding{ -1.0f, -1.0f };
 
 private:
 	bool m_bWindowBegun		= false;

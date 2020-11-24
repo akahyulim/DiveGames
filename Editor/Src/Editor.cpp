@@ -5,36 +5,42 @@
 #include "ImGUI/imgui_impl_win32.h"
 #include "ImGUI/imgui_impl_dx11.h"
 #include "Widgets/MenuBar.h"
+#include "Widgets/Scene.h"
 
 
 Editor::Editor(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed)
 {
 	// Engine
-	m_Engine = std::make_unique<Dive::Engine>(hInstance, hWnd, width, height, windowed);
-	if (!m_Engine->IsInitialized())
 	{
-		return;
+		m_Engine = std::make_unique<Dive::Engine>(hInstance, hWnd, width, height, windowed);
+		if (!m_Engine->IsInitialized())
+		{
+			return;
+		}
+		m_SystemManager = m_Engine->GetSystemManager();
 	}
-	m_SystemManager = m_Engine->GetSystemManager();
 
 	// ImGUI
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
+	{
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
 
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	ImGui::StyleColorsDark();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		ImGui::StyleColorsDark();
 
-	auto renderer = m_Engine->GetSystemManager()->GetSystem<Dive::Renderer>();
-	ImGui_ImplWin32_Init(hWnd);
-	ImGui_ImplDX11_Init(renderer->GetRenderDevice()->GetD3dDevice(), renderer->GetRenderDevice()->GetImmediateContext());
+		auto renderer = m_Engine->GetSystemManager()->GetSystem<Dive::Renderer>();
+		ImGui_ImplWin32_Init(hWnd);
+		ImGui_ImplDX11_Init(renderer->GetRenderDevice()->GetD3dDevice(), renderer->GetRenderDevice()->GetImmediateContext());
+	}
 
 	// Widgets
 	{
 		m_Widgets.emplace_back(std::make_shared<MenuBar>(this));
+		m_Widgets.emplace_back(std::make_shared<Scene>(this));
 	}
 
-	m_bInitialize = true;
+	m_bInitialized = true;
 }
 
 Editor::~Editor()
@@ -51,7 +57,7 @@ Editor::~Editor()
 
 void Editor::Update()
 {
-	if (!m_bInitialize)
+	if (!m_bInitialized)
 		return;
 
 	m_Engine->Update();

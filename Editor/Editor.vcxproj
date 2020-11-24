@@ -98,6 +98,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Widgets\Scene.h" />
     <ClInclude Include="Src\Widgets\MenuBar.h" />
     <ClInclude Include="Src\Editor.h" />
     <ClInclude Include="Src\ImGUI\imconfig.h" />
@@ -112,6 +113,7 @@
     <ClInclude Include="Src\Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Widgets\Scene.cpp" />
     <ClCompile Include="Src\Widgets\MenuBar.cpp" />
     <ClCompile Include="Src\Editor.cpp" />
     <ClCompile Include="Src\main.cpp" />
