@@ -5,9 +5,9 @@
 
 namespace Dive
 {
-	ConstantBuffer::ConstantBuffer(RenderDevice* device)
+	ConstantBuffer::ConstantBuffer(const std::shared_ptr<RenderDevice>& device)
 	{
-		if (!device || !device->GetD3dDevice() || !device->GetImmediateContext())
+		if (!device->IsInitialized())
 		{
 			CORE_ERROR("");
 			return;

@@ -7,9 +7,9 @@
 
 namespace Dive
 {
-	DepthStencilState::DepthStencilState(RenderDevice* device, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc)
+	DepthStencilState::DepthStencilState(const std::shared_ptr<RenderDevice>& device, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc)
 	{
-		if (!device || !device->GetD3dDevice())
+		if (!device->IsInitialized())
 		{
 			CORE_ERROR("");
 			return;

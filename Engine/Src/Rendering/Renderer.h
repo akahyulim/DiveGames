@@ -25,29 +25,34 @@ namespace Dive
 
 		void OnResize(const WindowResizeEvent* evnt);
 
-		RenderDevice* GetRenderDevice() const { return m_RenderDevice; }
+		const std::shared_ptr<RenderDevice>& GetRenderDevice()	const { return m_RenderDevice; }
+		const D3D11_VIEWPORT& GetBackbufferViewport()			const { return m_Viewport; }
+
+		// Pipeline Pass
 
 	private:
 
 	private:
-		RenderDevice* m_RenderDevice = nullptr;
+		std::shared_ptr<RenderDevice> m_RenderDevice;
+
+		D3D11_VIEWPORT m_Viewport;
 
 		// DepthStencilStates
-		DepthStencilState* m_DepthStencilStateEnabled	= nullptr;
-		DepthStencilState* m_DepthStencilStateDisabled	= nullptr;
+		std::shared_ptr<DepthStencilState> m_DepthStencilStateEnabled;
+		std::shared_ptr<DepthStencilState> m_DepthStencilStateDisabled;
 
 		// RasterizerStates
-		RasterizerState* m_RasterizerStateCullBackSolid			= nullptr;
-		RasterizerState* m_RasterizerStateCullFrontSolid		= nullptr;
-		RasterizerState* m_RasterizerStateCullNoneSolid			= nullptr;
-		RasterizerState* m_RasterizerStateCullBackWireFrame		= nullptr;
-		RasterizerState* m_RasterizerStateCullFrontWireFrame	= nullptr;
-		RasterizerState* m_RasterizerStateCullNoneWireFrame		= nullptr;
+		std::shared_ptr<RasterizerState> m_RasterizerStateCullBackSolid;
+		std::shared_ptr<RasterizerState> m_RasterizerStateCullFrontSolid;
+		std::shared_ptr<RasterizerState> m_RasterizerStateCullNoneSolid;
+		std::shared_ptr<RasterizerState> m_RasterizerStateCullBackWireFrame;
+		std::shared_ptr<RasterizerState> m_RasterizerStateCullFrontWireFrame;
+		std::shared_ptr<RasterizerState> m_RasterizerStateCullNoneWireFrame;
 
 		// BlendStates
-		BlendState* m_BlendStateEnable		= nullptr;
-		BlendState* m_BlendStateDisable		= nullptr;
-		BlendState* m_BlendStateColorAdd	= nullptr;
+		std::shared_ptr<BlendState> m_BlendStateEnable;
+		std::shared_ptr<BlendState> m_BlendStateDisable;
+		std::shared_ptr<BlendState> m_BlendStateColorAdd;
 	};
 }
 

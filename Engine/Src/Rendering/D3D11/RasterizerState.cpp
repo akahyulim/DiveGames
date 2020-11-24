@@ -7,10 +7,10 @@
 namespace Dive
 {
 
-	RasterizerState::RasterizerState(RenderDevice* device, D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode, BOOL depthClipEnable, BOOL scissorEnable,
+	RasterizerState::RasterizerState(const std::shared_ptr<RenderDevice>& device, D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode, BOOL depthClipEnable, BOOL scissorEnable,
 		BOOL multiSampleEnable, BOOL antialiasedLineEnable)
 	{
-		if (!device || !device->GetD3dDevice())
+		if (!device->IsInitialized())
 		{
 			CORE_ERROR("");
 			return;

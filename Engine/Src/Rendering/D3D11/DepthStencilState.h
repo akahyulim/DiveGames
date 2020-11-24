@@ -9,7 +9,7 @@ namespace Dive
 	class DepthStencilState : public Object
 	{
 	public:
-		DepthStencilState(RenderDevice* device, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc);
+		DepthStencilState(const std::shared_ptr<RenderDevice>& device, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc);
 		~DepthStencilState();
 
 		bool IsInitialized() const					{ return m_bInitialized; }

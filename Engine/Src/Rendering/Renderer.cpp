@@ -23,26 +23,6 @@ namespace Dive
 
 	Renderer::~Renderer()
 	{
-		// RastarizerStates
-		{
-			SAFE_DELETE(m_RasterizerStateCullFrontWireFrame);
-			SAFE_DELETE(m_RasterizerStateCullBackWireFrame);
-			SAFE_DELETE(m_RasterizerStateCullNoneWireFrame);
-			SAFE_DELETE(m_RasterizerStateCullFrontSolid);
-			SAFE_DELETE(m_RasterizerStateCullBackSolid);
-			SAFE_DELETE(m_RasterizerStateCullNoneSolid);
-		}
-
-		// DepthStencilStates
-		{
-			SAFE_DELETE(m_DepthStencilStateEnabled);
-			SAFE_DELETE(m_DepthStencilStateDisabled);
-		}
-
-		// Device & SwapChain
-		{
-			SAFE_DELETE(m_RenderDevice);
-		}
 	}
 
 	bool Renderer::Initialize()
@@ -53,33 +33,55 @@ namespace Dive
 		// IDXGI settings
 
 		// Create Device & SwapChain
-		m_RenderDevice = new RenderDevice(wndData.hWnd, wndData.width, wndData.height, wndData.windowed);
-		if (!m_RenderDevice->IsInitialized())
-			return false;
+		{
+			m_RenderDevice = std::make_shared<RenderDevice>(wndData.hWnd, wndData.width, wndData.height, wndData.windowed);
+			
+			if (!m_RenderDevice->IsInitialized())
+				return false;
+		}
+
+		// CreateViewport
+		{
+			m_Viewport.TopLeftX = 0.0f;
+			m_Viewport.TopLeftY = 0.0f;
+			m_Viewport.Width	= static_cast<float>(wndData.width);
+			m_Viewport.Height	= static_cast<float>(wndData.height);
+			m_Viewport.MinDepth = 0.0f;	// 하드 코딩
+			m_Viewport.MaxDepth = 1.0f;	// 하드 코딩
+		}
 
 		// Create DepthStechilStates
-		m_DepthStencilStateEnabled	= new DepthStencilState(m_RenderDevice, TRUE, D3D11_COMPARISON_LESS);
-		m_DepthStencilStateDisabled	= new DepthStencilState(m_RenderDevice, FALSE, D3D11_COMPARISON_LESS);
-		if (!m_DepthStencilStateEnabled->IsInitialized() || !m_DepthStencilStateDisabled->IsInitialized())
-			return false;
+		{
+			m_DepthStencilStateEnabled	= std::make_shared<DepthStencilState>(m_RenderDevice, TRUE, D3D11_COMPARISON_LESS);
+			m_DepthStencilStateDisabled = std::make_shared<DepthStencilState>(m_RenderDevice, FALSE, D3D11_COMPARISON_LESS);
+
+			if (!m_DepthStencilStateEnabled->IsInitialized() || !m_DepthStencilStateDisabled->IsInitialized())
+				return false;
+		}
 
 		// Create RasterizerStates
-		m_RasterizerStateCullNoneSolid		= new RasterizerState(m_RenderDevice, D3D11_CULL_NONE, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
-		m_RasterizerStateCullBackSolid		= new RasterizerState(m_RenderDevice, D3D11_CULL_BACK, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
-		m_RasterizerStateCullFrontSolid		= new RasterizerState(m_RenderDevice, D3D11_CULL_FRONT, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
-		m_RasterizerStateCullNoneWireFrame	= new RasterizerState(m_RenderDevice, D3D11_CULL_NONE, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
-		m_RasterizerStateCullBackWireFrame	= new RasterizerState(m_RenderDevice, D3D11_CULL_BACK, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
-		m_RasterizerStateCullFrontWireFrame = new RasterizerState(m_RenderDevice, D3D11_CULL_FRONT, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
-		if (!m_RasterizerStateCullNoneSolid->IsInitialized() || !m_RasterizerStateCullBackSolid->IsInitialized() || !m_RasterizerStateCullFrontSolid->IsInitialized()
-			|| !m_RasterizerStateCullNoneWireFrame->IsInitialized() || !m_RasterizerStateCullBackWireFrame->IsInitialized() || !m_RasterizerStateCullFrontWireFrame->IsInitialized())
-			return false;
+		{
+			m_RasterizerStateCullNoneSolid		= std::make_shared<RasterizerState>(m_RenderDevice, D3D11_CULL_NONE, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
+			m_RasterizerStateCullBackSolid		= std::make_shared<RasterizerState>(m_RenderDevice, D3D11_CULL_BACK, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
+			m_RasterizerStateCullFrontSolid		= std::make_shared<RasterizerState>(m_RenderDevice, D3D11_CULL_FRONT, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
+			m_RasterizerStateCullNoneWireFrame	= std::make_shared<RasterizerState>(m_RenderDevice, D3D11_CULL_NONE, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
+			m_RasterizerStateCullBackWireFrame	= std::make_shared<RasterizerState>(m_RenderDevice, D3D11_CULL_BACK, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
+			m_RasterizerStateCullFrontWireFrame = std::make_shared<RasterizerState>(m_RenderDevice, D3D11_CULL_FRONT, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
+			
+			if (!m_RasterizerStateCullNoneSolid->IsInitialized() || !m_RasterizerStateCullBackSolid->IsInitialized() || !m_RasterizerStateCullFrontSolid->IsInitialized()
+				|| !m_RasterizerStateCullNoneWireFrame->IsInitialized() || !m_RasterizerStateCullBackWireFrame->IsInitialized() || !m_RasterizerStateCullFrontWireFrame->IsInitialized())
+				return false;
+		}
 
 		// Create Blend States
-		m_BlendStateEnable		= new BlendState(m_RenderDevice, TRUE);
-		m_BlendStateDisable		= new BlendState(m_RenderDevice);
-		m_BlendStateColorAdd	= new BlendState(m_RenderDevice, TRUE, D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD);
-		if (!m_BlendStateEnable->IsInitialized() || !m_BlendStateDisable->IsInitialized() || !m_BlendStateColorAdd->IsInitialized())
-			return false;
+		{
+			m_BlendStateEnable		= std::make_shared<BlendState>(m_RenderDevice, TRUE);
+			m_BlendStateDisable		= std::make_shared<BlendState>(m_RenderDevice);
+			m_BlendStateColorAdd	= std::make_shared<BlendState>(m_RenderDevice, TRUE, D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD);
+
+			if (!m_BlendStateEnable->IsInitialized() || !m_BlendStateDisable->IsInitialized() || !m_BlendStateColorAdd->IsInitialized())
+				return false;
+		}
 
 		return true;
 	}

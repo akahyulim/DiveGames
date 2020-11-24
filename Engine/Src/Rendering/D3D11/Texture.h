@@ -20,9 +20,11 @@ namespace Dive
 		virtual bool createTextureResource() { return false; }
 
 	protected:
-		RenderDevice* m_RenderDevice					= nullptr;
+		std::shared_ptr<RenderDevice> m_RenderDevice;
+
 		ID3D11RenderTargetView* m_RenderTargetView		= nullptr;
 		ID3D11ShaderResourceView* m_ShaderResourceView	= nullptr;
+
 		std::vector<ID3D11DepthStencilView*> m_DepthStencilViews;
 
 		// texture datas

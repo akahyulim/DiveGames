@@ -10,7 +10,7 @@ namespace Dive
 	class ConstantBuffer : public Object
 	{
 	public:
-		ConstantBuffer(RenderDevice* device);
+		ConstantBuffer(const std::shared_ptr<RenderDevice>& device);
 		~ConstantBuffer();
 
 		template<typename T>
@@ -48,7 +48,7 @@ namespace Dive
 		ID3D11Buffer* GetBuffer() { return m_Buffer; }
 
 	private:
-		RenderDevice* m_Device = nullptr;
+		std::shared_ptr<RenderDevice> m_Device;
 		ID3D11Buffer* m_Buffer = nullptr;
 	};
 }

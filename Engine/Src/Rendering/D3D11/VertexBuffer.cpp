@@ -7,9 +7,9 @@
 
 namespace Dive
 {
-	VertexBuffer::VertexBuffer(RenderDevice* device)
+	VertexBuffer::VertexBuffer(const std::shared_ptr<RenderDevice>& device)
 	{
-		if (!device || !device->GetD3dDevice())
+		if (!device->IsInitialized())
 		{
 			CORE_ERROR("");
 			return;

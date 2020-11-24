@@ -7,11 +7,11 @@
 
 namespace Dive
 {
-	BlendState::BlendState(RenderDevice* device, BOOL enable, D3D11_BLEND source, D3D11_BLEND dest, D3D11_BLEND_OP op,
+	BlendState::BlendState(const std::shared_ptr<RenderDevice>& device, BOOL enable, D3D11_BLEND source, D3D11_BLEND dest, D3D11_BLEND_OP op,
 		D3D11_BLEND sourceAlpha, D3D11_BLEND destAlpha, D3D11_BLEND_OP opAlpha, float* blendFactor)
 		: m_State(nullptr)
 	{
-		if (!device || !device->GetD3dDevice())
+		if (!device->IsInitialized())
 		{
 			CORE_ERROR("");
 			return;

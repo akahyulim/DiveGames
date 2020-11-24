@@ -7,7 +7,7 @@ namespace Dive
 
 	class IndexBuffer : public Object
 	{
-		IndexBuffer(RenderDevice* device);
+		IndexBuffer(const std::shared_ptr<RenderDevice>& device);
 		~IndexBuffer();
 
 		bool Create(const std::vector<unsigned int>& indices);
@@ -19,7 +19,7 @@ namespace Dive
 		ID3D11Buffer* GetBuffer() const { return m_Buffer; }
 
 	private:
-		RenderDevice* m_Device = nullptr;
+		std::shared_ptr<RenderDevice> m_Device;
 		ID3D11Buffer* m_Buffer = nullptr;
 	};
 }

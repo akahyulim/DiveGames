@@ -7,9 +7,9 @@
 
 namespace Dive
 {
-	IndexBuffer::IndexBuffer(RenderDevice* device)
+	IndexBuffer::IndexBuffer(const std::shared_ptr<RenderDevice>& device)
 	{
-		if (!device || !device->GetD3dDevice())
+		if (!device->IsInitialized())
 		{
 			CORE_ERROR("");
 			return;

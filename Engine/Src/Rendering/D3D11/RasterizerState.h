@@ -10,7 +10,7 @@ namespace Dive
 	class RasterizerState : public Object
 	{
 	public:
-		RasterizerState(RenderDevice* device, D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode, BOOL depthClipEnable, BOOL scissorEnable,
+		RasterizerState(const std::shared_ptr<RenderDevice>& device, D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode, BOOL depthClipEnable, BOOL scissorEnable,
 			BOOL multiSampleEnable, BOOL antialiasedLineEnable);
 		~RasterizerState();
 
