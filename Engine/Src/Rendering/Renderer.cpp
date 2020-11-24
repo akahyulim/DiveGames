@@ -15,7 +15,7 @@
 
 namespace Dive
 {
-	Renderer::Renderer(SystemManager* manager)
+	Renderer::Renderer(const std::shared_ptr<SystemManager>& manager)
 		: ISystem(manager)
 	{
 		EventSystem::GetInstance().Subscribe(this, &Renderer::OnResize);
@@ -23,13 +23,14 @@ namespace Dive
 
 	Renderer::~Renderer()
 	{
+		CORE_TRACE("Call Renderer's Desctructor =====================");
 	}
 
 	bool Renderer::Initialize()
 	{
 		// 어쩔 수 없다. Engine으로부터 WindowData를 얻어와서 초기화하자.
-		const auto& wndData = m_Manager->GetEngine()->GetWindowData();
-
+		const auto& wndData = m_Manager.lock()->GetEngine()->GetWindowData();
+	
 		// IDXGI settings
 
 		// Create Device & SwapChain

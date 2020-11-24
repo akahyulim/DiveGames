@@ -8,19 +8,22 @@ namespace Dive
 {
 	class Engine;
 
-	class SystemManager
+	// 여전히 Engine을 raw pointer로 가진다.
+	class SystemManager : public std::enable_shared_from_this<SystemManager>
 	{
 	public:
 		SystemManager(Engine* engine) : m_Engine(engine) {}
+
 		~SystemManager()
 		{
 			for (auto& system : m_Systems)
 			{
-				//system.reset();
-				delete system;
-				system = nullptr;
+				system.reset();
 			}
 			m_Systems.clear();
+
+			CORE_TRACE("Call SystemManager's Destructor ======================");
+			CORE_TRACE("Alive system's count: {:d}", m_Systems.size());
 		}
 
 		bool Initialize()
@@ -29,7 +32,7 @@ namespace Dive
 			{
 				if (!system->Initialize())
 				{
-					CORE_ERROR("SystemManager::Initialize>> Failed to initialize {:s} object.", typeid(*system).name());
+					CORE_ERROR("", typeid(*system).name());
 					return false;
 				}
 			}
@@ -42,13 +45,12 @@ namespace Dive
 				system->Update();
 		}
 
-		// 사실 Initialize를 둘 필요가 없다.
 		template<typename T>
 		void RegisterSystem()
 		{
 			ValidateSystemType<T>();
 
-			m_Systems.emplace_back(new T(this));
+			m_Systems.emplace_back(std::make_shared<T>(shared_from_this()));
 		}
 
 		template<typename T>
@@ -59,8 +61,7 @@ namespace Dive
 			for (const auto& system : m_Systems)
 			{
 				if (typeid(T) == typeid(*system))
-					return dynamic_cast<T*>(system);
-					//return static_cast<T*>(system.get());
+					return static_cast<T*>(system.get());
 			}
 			return nullptr;
 		}
@@ -72,7 +73,6 @@ namespace Dive
 
 	private:
 		Engine* m_Engine = nullptr;
-		//std::vector<std::shared_ptr<ISystem>> m_Systems;
-		std::vector<ISystem*> m_Systems;
+		std::vector<std::shared_ptr<ISystem>> m_Systems;
 	};
 }

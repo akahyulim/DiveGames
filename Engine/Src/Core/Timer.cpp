@@ -1,12 +1,19 @@
 #include "DivePch.h"
 #include "Timer.h"
 #include "SystemManager.h"
+#include "Log.h"
+
 
 namespace Dive
 {
-	Timer::Timer(SystemManager * pManager)
-		: ISystem(pManager)
+	Timer::Timer(const std::shared_ptr<SystemManager>& manager)
+		: ISystem(manager)
 	{
+	}
+
+	Timer::~Timer()
+	{
+		CORE_TRACE("Call Timer's Destructor =========================");
 	}
 
 	bool Timer::Initialize()

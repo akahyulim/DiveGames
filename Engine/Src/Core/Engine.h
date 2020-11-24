@@ -22,15 +22,16 @@ namespace Dive
 
 		void Update();
 
-		bool IsInitialized()				const { return m_bInitialize; }
-		SystemManager* GetSystemManager()	const { return m_SystemManager.get(); }
-		const WindowData& GetWindowData()	const { return m_WindowData; }
+		bool IsInitialized() const { return m_bInitialized; }
+		
+		const std::shared_ptr<SystemManager>& GetSystemManager()	const { return m_SystemManager; }
+		const WindowData& GetWindowData()							const { return m_WindowData; }
 
 	private:
 		WindowData m_WindowData;
 		std::shared_ptr<SystemManager> m_SystemManager;
 
-		bool m_bInitialize = false;
+		bool m_bInitialized = false;
 	};
 }
 

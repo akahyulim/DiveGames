@@ -92,7 +92,7 @@ namespace Dive
 			return;
 		}
 
-		m_bInitialize = true;
+		m_bInitialized = true;
 	}
 	
 	RenderDevice::~RenderDevice()

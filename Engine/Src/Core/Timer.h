@@ -13,8 +13,8 @@ namespace Dive
 	class Timer : public ISystem
 	{
 	public:
-		Timer(SystemManager* pManager);
-		~Timer() = default;
+		Timer(const std::shared_ptr<SystemManager>& manager);
+		~Timer();
 
 		bool Initialize() override;
 		void Update() override;

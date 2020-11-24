@@ -37,13 +37,13 @@ public:
 		}
 	}
 
-	Dive::SystemManager* GetSystemManager() { return m_SystemManager; }
+	const std::shared_ptr<Dive::SystemManager>& GetSystemManager() const { return m_SystemManager; }
 
 private:
 
 private:
 	std::unique_ptr<Dive::Engine> m_Engine;
-	Dive::SystemManager* m_SystemManager = nullptr;
+	std::shared_ptr<Dive::SystemManager> m_SystemManager;
 
 	bool m_bInitialize = false;
 

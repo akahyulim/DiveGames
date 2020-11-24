@@ -15,7 +15,7 @@ namespace Dive
 	class Renderer : public ISystem
 	{
 	public:
-		Renderer(SystemManager* manager);
+		Renderer(const std::shared_ptr<SystemManager>& manager);
 		~Renderer();
 
 		bool Initialize() override;

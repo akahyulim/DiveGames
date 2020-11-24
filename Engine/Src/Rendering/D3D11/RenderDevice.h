@@ -12,7 +12,7 @@ namespace Dive
 		bool Present();
 		void ResizeBuffer(int width, int height);
 
-		bool IsInitialized()							const { return m_bInitialize; }
+		bool IsInitialized()							const { return m_bInitialized; }
 		ID3D11Device* GetD3dDevice()					const { return m_D3dDevice; }
 		ID3D11DeviceContext* GetImmediateContext()		const { return m_ImmediateContext; }
 		IDXGISwapChain* GetSwapChain()					const { return m_SwapChain; }
@@ -30,7 +30,7 @@ namespace Dive
 		int m_Height		= 600;
 		bool m_bWindowed	= true;
 
-		bool m_bInitialize	= false;
+		bool m_bInitialized	= false;
 
 
 		bool m_bVSync		= false;

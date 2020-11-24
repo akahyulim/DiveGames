@@ -85,7 +85,8 @@ public:
 
 protected:
 	Editor* m_Editor						= nullptr;
-	Dive::SystemManager* m_SystemManager	= nullptr;
+	//Dive::SystemManager* m_SystemManager	= nullptr;
+	std::shared_ptr<Dive::SystemManager> m_SystemManager;
 
 	ImGuiWindow* m_Window	= nullptr;
 	std::string m_title		= "no name";
