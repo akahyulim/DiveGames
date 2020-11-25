@@ -3,26 +3,29 @@
 
 namespace Dive
 {
-	class SystemManager;
 	class RenderDevice;
 
 	class Texture : public IResource
 	{
 	public:
-		Texture(SystemManager* manager);
+		Texture(ID3D11Device* device);
 		virtual ~Texture();
+
+		int GetWidth()											const { return m_Width; }
+		int GetHeight()											const { return m_Height; }
+		DXGI_FORMAT GetFormat()									const { return m_Format; }
+
+		const D3D11_VIEWPORT& GetViewport()						const { return m_Viewport; }
 
 		ID3D11RenderTargetView* GetRenderTargetView()			const { return m_RenderTargetView; }
 		ID3D11ShaderResourceView* GetShaderResourceView()		const { return m_ShaderResourceView; }
 		ID3D11DepthStencilView* GetDepthStencilView(int index)	const { return m_DepthStencilViews[index]; }
-		const D3D11_VIEWPORT& GetViewport()						const { return m_Viewport; }
-
+		
 	protected:
 		virtual bool createTextureResource() { return false; }
 
 	protected:
-		std::shared_ptr<RenderDevice> m_RenderDevice;
-
+		ID3D11Device* m_D3dDevice						= nullptr;
 		ID3D11RenderTargetView* m_RenderTargetView		= nullptr;
 		ID3D11ShaderResourceView* m_ShaderResourceView	= nullptr;
 
