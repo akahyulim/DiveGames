@@ -11,7 +11,6 @@ namespace Dive
 	class BlendState;
 	class Texture2D;
 
-	// 굳이 객체들을 구분해 놓을 필요가 있나하는 생각이 든다.
 	class Renderer : public ISystem
 	{
 	public:

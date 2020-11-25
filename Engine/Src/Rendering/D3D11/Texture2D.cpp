@@ -17,6 +17,13 @@ namespace Dive
 		m_Data		= data;
 		m_BindFlags = D3D11_BIND_SHADER_RESOURCE;
 
+		m_Viewport.Width	= static_cast<float>(width);
+		m_Viewport.Height	= static_cast<float>(height);
+		m_Viewport.TopLeftX = 0.0f;
+		m_Viewport.TopLeftY = 0.0f;
+		m_Viewport.MinDepth = 0.0f;
+		m_Viewport.MaxDepth = 1.0f;
+
 		if (!createTextureResource())
 		{
 			CORE_ERROR("");
@@ -35,6 +42,13 @@ namespace Dive
 		m_ArraySize = arraySize;
 		m_BindFlags = (format == DXGI_FORMAT_D32_FLOAT) ?
 					D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE : D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+
+		m_Viewport.Width	= static_cast<float>(width);
+		m_Viewport.Height	= static_cast<float>(height);
+		m_Viewport.TopLeftX = 0.0f;
+		m_Viewport.TopLeftY = 0.0f;
+		m_Viewport.MinDepth = 0.0f;
+		m_Viewport.MaxDepth = 1.0f;
 
 		if (!createTextureResource())
 		{

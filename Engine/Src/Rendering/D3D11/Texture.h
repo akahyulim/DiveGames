@@ -15,6 +15,7 @@ namespace Dive
 		ID3D11RenderTargetView* GetRenderTargetView()			const { return m_RenderTargetView; }
 		ID3D11ShaderResourceView* GetShaderResourceView()		const { return m_ShaderResourceView; }
 		ID3D11DepthStencilView* GetDepthStencilView(int index)	const { return m_DepthStencilViews[index]; }
+		const D3D11_VIEWPORT& GetViewport()						const { return m_Viewport; }
 
 	protected:
 		virtual bool createTextureResource() { return false; }
@@ -37,5 +38,7 @@ namespace Dive
 		unsigned int m_BindFlags	= 0;
 		DXGI_FORMAT m_Format		= DXGI_FORMAT_R8G8B8A8_UNORM;
 		std::vector<std::vector<std::byte>> m_Data;
+
+		D3D11_VIEWPORT m_Viewport;
 	};
 }
