@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "Core/DiveEngine.h"
+#include "Dive.h"
 
 using namespace Dive::StringHelper;
 

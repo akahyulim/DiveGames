@@ -112,7 +112,7 @@
     <ClInclude Include="Src\Core\FileSystemHelper.h" />
     <ClInclude Include="Src\Core\Settings.h" />
     <ClInclude Include="Src\Core\DiveDefs.h" />
-    <ClInclude Include="Src\Core\DiveEngine.h" />
+    <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\Core\Engine.h" />
     <ClInclude Include="Src\Core\ISystem.h" />
     <ClInclude Include="Src\Core\Log.h" />

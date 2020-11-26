@@ -60,12 +60,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Core\DiveDefs.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\DiveEngine.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Core\Engine.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
@@ -152,6 +146,12 @@
     </ClInclude>
     <ClInclude Include="Src\DivePch.h">
       <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Dive.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DiveDefs.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
