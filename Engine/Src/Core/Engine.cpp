@@ -6,6 +6,7 @@
 #include "Settings.h"
 #include "Rendering/Renderer.h"
 
+
 namespace Dive
 {
 	Engine::Engine(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed)

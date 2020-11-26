@@ -9,7 +9,7 @@ namespace Dive
 	class SystemManager;
 }
 
-class IWidget;
+class Widget;
 
 class Editor
 {
@@ -47,6 +47,6 @@ private:
 
 	bool m_bInitialize = false;
 
-	std::vector<std::shared_ptr<IWidget>> m_Widgets;
+	std::vector<std::shared_ptr<Widget>> m_Widgets;
 };
 

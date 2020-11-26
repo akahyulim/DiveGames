@@ -17,11 +17,11 @@ namespace Dive
 		Idle,
 	};
 
-	class IResource : public Object
+	class Resource : public Object
 	{
 	public:
-		IResource(eResourceType type) : m_Type(type) {}
-		virtual ~IResource() = default;
+		Resource(eResourceType type) : m_Type(type) {}
+		virtual ~Resource() = default;
 
 		virtual bool SaveToFile(const std::string& path)	{ return true; }
 		virtual bool LoadFromFile(const std::string& path)	{ return true; }

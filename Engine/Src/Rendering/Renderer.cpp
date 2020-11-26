@@ -16,7 +16,7 @@
 namespace Dive
 {
 	Renderer::Renderer(const std::shared_ptr<SystemManager>& manager)
-		: ISystem(manager)
+		: System(manager)
 	{
 		EventSystem::GetInstance().Subscribe(this, &Renderer::OnResize);
 	}
@@ -29,6 +29,7 @@ namespace Dive
 	bool Renderer::Initialize()
 	{
 		// 어쩔 수 없다. Engine으로부터 WindowData를 얻어와서 초기화하자.
+		// 결국 이게 문제다.
 		const auto& wndData = m_Manager.lock()->GetEngine()->GetWindowData();
 	
 		// IDXGI settings

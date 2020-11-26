@@ -5,14 +5,14 @@
 #include "../ImGUI/imgui_internal.h"
 
 
-class IWidget
+class Widget
 {
 public:
-	IWidget(Editor* editor) : m_Editor(editor) 
+	Widget(Editor* editor) : m_Editor(editor) 
 	{
 		m_SystemManager = m_Editor->GetSystemManager();
 	}
-	virtual ~IWidget() = default;
+	virtual ~Widget() = default;
 
 	bool Begin()
 	{

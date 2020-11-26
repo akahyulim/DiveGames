@@ -1,12 +1,12 @@
 #pragma once
-#include "Resource/IResource.h"
+#include "Resource/Resource.h"
 
 namespace Dive
 {
 	class SystemManager;
 	class RenderDevice;
 
-	class Texture : public IResource
+	class Texture : public Resource
 	{
 	public:
 		Texture(SystemManager* manager);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/ISystem.h"
+#include "Core/System.h"
 
 namespace Dive
 {
@@ -12,7 +12,7 @@ namespace Dive
 	class Texture2D;
 
 	// 굳이 객체들을 구분해 놓을 필요가 있나하는 생각이 든다.
-	class Renderer : public ISystem
+	class Renderer : public System
 	{
 	public:
 		Renderer(const std::shared_ptr<SystemManager>& manager);

@@ -6,11 +6,11 @@ namespace Dive
 {
 	class SystemManager;
 
-	class ISystem : public std::enable_shared_from_this<ISystem>
+	class System : public std::enable_shared_from_this<System>
 	{
 	public:
-		ISystem(const std::shared_ptr<SystemManager>& manager) : m_Manager(manager) {}
-		virtual ~ISystem() = default;
+		System(const std::shared_ptr<SystemManager>& manager) : m_Manager(manager) {}
+		virtual ~System() = default;
 
 		virtual bool Initialize()	= 0;
 		virtual void Update()		= 0;
@@ -22,6 +22,6 @@ namespace Dive
 	template<typename T>
 	constexpr void ValidateSystemType()
 	{
-		static_assert(std::is_base_of<ISystem, T>::value, "");
+		static_assert(std::is_base_of<System, T>::value, "");
 	}
 }

@@ -25,6 +25,8 @@ namespace Dive
 		bool IsInitialized() const { return m_bInitialized; }
 		
 		const std::shared_ptr<SystemManager>& GetSystemManager()	const { return m_SystemManager; }
+
+		// 결국 이것 때문에 SystemManager가 this pointer를 가지게 된다.
 		const WindowData& GetWindowData()							const { return m_WindowData; }
 
 	private:

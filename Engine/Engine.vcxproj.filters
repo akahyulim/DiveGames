@@ -69,9 +69,6 @@
     <ClInclude Include="Src\Core\IniHelper.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\ISystem.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Core\Log.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
@@ -132,9 +129,6 @@
     <ClInclude Include="Src\Rendering\D3D11\BlendState.h">
       <Filter>Src\Rendering\D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Resource\IResource.h">
-      <Filter>Src\Resource</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Rendering\D3D11\Texture.h">
       <Filter>Src\Rendering\D3D11</Filter>
     </ClInclude>
@@ -152,6 +146,12 @@
     </ClInclude>
     <ClInclude Include="Src\Core\DiveDefs.h">
       <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\System.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Resource\Resource.h">
+      <Filter>Src\Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

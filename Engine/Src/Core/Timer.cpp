@@ -7,7 +7,7 @@
 namespace Dive
 {
 	Timer::Timer(const std::shared_ptr<SystemManager>& manager)
-		: ISystem(manager)
+		: System(manager)
 	{
 	}
 

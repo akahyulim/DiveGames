@@ -1,6 +1,6 @@
 #pragma once
 #include "DivePch.h"
-#include "ISystem.h"
+#include "System.h"
 #include "Log.h"
 #include "DiveDefs.h"
 
@@ -73,6 +73,6 @@ namespace Dive
 
 	private:
 		Engine* m_Engine = nullptr;
-		std::vector<std::shared_ptr<ISystem>> m_Systems;
+		std::vector<std::shared_ptr<System>> m_Systems;
 	};
 }

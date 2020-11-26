@@ -1,6 +1,6 @@
 #pragma once
 #include "DiveDefs.h"
-#include "ISystem.h"
+#include "System.h"
 
 namespace Dive
 {
@@ -10,7 +10,7 @@ namespace Dive
 	constexpr double NO_LIMIT_FRAME = 300;
 	constexpr double DELTA_FEEDBACK = 0.2;
 
-	class Timer : public ISystem
+	class Timer : public System
 	{
 	public:
 		Timer(const std::shared_ptr<SystemManager>& manager);

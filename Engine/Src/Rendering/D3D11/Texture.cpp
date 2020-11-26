@@ -9,7 +9,7 @@
 namespace Dive
 {
 	Texture::Texture(SystemManager* manager)
-		: IResource(eResourceType::Texture)
+		: Resource(eResourceType::Texture)
 	{
 		m_RenderDevice = manager->GetSystem<Renderer>()->GetRenderDevice();
 	}
