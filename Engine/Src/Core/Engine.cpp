@@ -9,6 +9,11 @@
 
 namespace Dive
 {
+	Engine::Engine()
+	{
+		Log::Initialize();
+	}
+
 	Engine::Engine(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed)
 	{
 		// Set WindowData

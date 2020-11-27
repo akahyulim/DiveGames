@@ -15,6 +15,8 @@
 #include "Core/FileSystemHelper.h"
 #include "Core/IniHelper.h"
 #include "Core/Settings.h"
+#include "Core/Application.h"
+#include "Core/Main.h"
 
 //= Event =================================================
 #include "Events/EventSystem.h"

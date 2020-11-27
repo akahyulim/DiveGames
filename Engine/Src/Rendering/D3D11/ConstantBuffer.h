@@ -38,7 +38,7 @@ namespace Dive
 				CORE_ERROR("");
 				return false;
 			}
-
+			
 			return true;
 		}
 

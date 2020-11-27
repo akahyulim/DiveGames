@@ -17,6 +17,7 @@ namespace Dive
 	class Engine
 	{
 	public:
+		Engine();
 		Engine(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed);
 		~Engine();
 
