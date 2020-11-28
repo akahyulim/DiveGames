@@ -10,12 +10,12 @@
 Editor::Editor(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed)
 {
 	// Engine
-	m_Engine = std::make_unique<Dive::Engine>(hInstance, hWnd, width, height, windowed);
-	if (!m_Engine->IsInitialized())
+	m_engine = std::make_unique<Dive::Engine>(hInstance, hWnd, width, height, windowed);
+	if (!m_engine->IsInitialized())
 	{
 		return;
 	}
-	m_SystemManager = m_Engine->GetSystemManager();
+	m_systemManager = m_engine->GetSystemManager();
 
 	// ImGUI
 	IMGUI_CHECKVERSION();
@@ -25,13 +25,13 @@ Editor::Editor(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windo
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	ImGui::StyleColorsDark();
 
-	auto renderer = m_Engine->GetSystemManager()->GetSystem<Dive::Renderer>();
+	auto renderer = m_engine->GetSystemManager()->GetSystem<Dive::Renderer>();
 	ImGui_ImplWin32_Init(hWnd);
 	ImGui_ImplDX11_Init(renderer->GetRenderDevice()->GetD3dDevice(), renderer->GetRenderDevice()->GetImmediateContext());
 
 	// Widgets
 	{
-		m_Widgets.emplace_back(std::make_shared<MenuBar>(this));
+		m_widgets.emplace_back(std::make_shared<MenuBar>(this));
 	}
 
 	m_bInitialize = true;
@@ -39,7 +39,7 @@ Editor::Editor(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windo
 
 Editor::~Editor()
 {
-	m_Widgets.clear();
+	m_widgets.clear();
 
 	if (ImGui::GetCurrentContext())
 	{
@@ -54,14 +54,14 @@ void Editor::Update()
 	if (!m_bInitialize)
 		return;
 
-	m_Engine->Update();
+	m_engine->Update();
 
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 	
 	// draw widget
-	for (auto& widget : m_Widgets)
+	for (auto& widget : m_widgets)
 	{
 		widget->Begin();
 		widget->Tick();
@@ -74,7 +74,7 @@ void Editor::Update()
 	{
 		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
 
-		auto renderer = m_Engine->GetSystemManager()->GetSystem<Dive::Renderer>();
+		auto renderer = m_engine->GetSystemManager()->GetSystem<Dive::Renderer>();
 		auto renderTarget = renderer->GetRenderDevice()->GetRenderTargetView();
 		renderer->GetRenderDevice()->GetImmediateContext()->OMSetRenderTargets(1, &renderTarget, nullptr);
 		renderer->GetRenderDevice()->GetImmediateContext()->ClearRenderTargetView(renderTarget, (float*)&clear_color);
@@ -83,12 +83,12 @@ void Editor::Update()
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 	// 호출 과정이 에반데...
-	m_Engine->GetSystemManager()->GetSystem<Dive::Renderer>()->GetRenderDevice()->Present();
+	m_engine->GetSystemManager()->GetSystem<Dive::Renderer>()->GetRenderDevice()->Present();
 }
 
 void Editor::OnResize(int width, int height)
 {
-	if (!m_Engine->IsInitialized())
+	if (!m_engine->IsInitialized())
 		return;
 
 	APP_TRACE("Change Winodw Size: {0:d}, {1:d}", width, height);
@@ -96,7 +96,7 @@ void Editor::OnResize(int width, int height)
 	// 차라리 아래 주석처럼 직접 전달하는 편이 나을지도...
 	Dive::WindowResizeEvent evnt(width, height);
 	Dive::EventSystem::GetInstance().Fire(&evnt);
-	//m_Engine->GetSystemManager()->GetSystem<Dive::Renderer>()->OnResize(width, height);
+	//m_engine->GetSystemManager()->GetSystem<Dive::Renderer>()->OnResize(width, height);
 
 	// 이건 적용되는듯
 	ImGui_ImplDX11_InvalidateDeviceObjects();

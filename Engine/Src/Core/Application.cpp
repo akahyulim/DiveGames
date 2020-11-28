@@ -8,7 +8,7 @@ namespace Dive
 {
 	Application::Application()
 	{
-		m_Engine = std::make_shared<Engine>();
+		m_engine = std::make_shared<Engine>();
 	}
 
 	int Application::Run()

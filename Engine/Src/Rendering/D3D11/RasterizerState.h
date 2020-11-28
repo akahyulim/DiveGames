@@ -15,10 +15,10 @@ namespace Dive
 		~RasterizerState();
 
 		bool IsInitialized()				const { return m_bInitialized; }
-		ID3D11RasterizerState* GetState()	const { return m_State; }
+		ID3D11RasterizerState* GetState()	const { return m_state; }
 
 	private:
 		bool m_bInitialized				= false;
-		ID3D11RasterizerState* m_State	= nullptr;
+		ID3D11RasterizerState* m_state	= nullptr;
 	};
 }

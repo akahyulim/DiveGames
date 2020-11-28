@@ -16,13 +16,13 @@ namespace Dive
 		template<typename T>
 		bool Create()
 		{
-			if (!m_Device || !m_Device->GetD3dDevice())
+			if (!m_renderDevice || !m_renderDevice->GetD3dDevice())
 			{
 				CORE_ERROR("");
 				return;
 			}
 
-			SAFE_RELEASE(m_Buffer);
+			SAFE_RELEASE(m_buffer);
 
 			D3D11_BUFFER_DESC desc;
 			ZeroMemory(&desc, sizeof(desc));
@@ -33,7 +33,7 @@ namespace Dive
 			desc.StructureByteStride	= 0;
 			desc.Usage					= D3D11_USAGE_DYNAMIC;
 
-			if (FAILED(m_Device->GetD3dDevice()->CreateBuffer(&desc, nullptr, &m_Buffer)))
+			if (FAILED(m_renderDevice->GetD3dDevice()->CreateBuffer(&desc, nullptr, &m_buffer)))
 			{
 				CORE_ERROR("");
 				return false;
@@ -45,11 +45,11 @@ namespace Dive
 		void* Map();
 		bool Unmap();
 
-		ID3D11Buffer* GetBuffer() { return m_Buffer; }
+		ID3D11Buffer* GetBuffer() { return m_buffer; }
 
 	private:
-		std::shared_ptr<RenderDevice> m_Device;
-		ID3D11Buffer* m_Buffer = nullptr;
+		std::shared_ptr<RenderDevice> m_renderDevice;
+		ID3D11Buffer* m_buffer = nullptr;
 	};
 }
 

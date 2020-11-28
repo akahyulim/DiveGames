@@ -15,12 +15,12 @@ namespace Dive
 			return;
 		}
 
-		m_Device = device;
+		m_renderDevice = device;
 	}
 
 	IndexBuffer::~IndexBuffer()
 	{
-		SAFE_RELEASE(m_Buffer);
+		SAFE_RELEASE(m_buffer);
 	}
 
 	bool IndexBuffer::Create(const std::vector<unsigned int>& indices)
@@ -31,7 +31,7 @@ namespace Dive
 			return false;
 		}
 
-		SAFE_RELEASE(m_Buffer);
+		SAFE_RELEASE(m_buffer);
 
 		unsigned int size = static_cast<unsigned int>(indices.size());
 
@@ -49,7 +49,7 @@ namespace Dive
 		data.SysMemPitch		= 0;
 		data.SysMemSlicePitch	= 0;
 
-		if (FAILED(m_Device->GetD3dDevice()->CreateBuffer(&desc, &data, &m_Buffer)))
+		if (FAILED(m_renderDevice->GetD3dDevice()->CreateBuffer(&desc, &data, &m_buffer)))
 		{
 			CORE_ERROR("");
 			return false;
@@ -69,7 +69,7 @@ namespace Dive
 		desc.StructureByteStride	= 0;
 		desc.Usage					= D3D11_USAGE_DYNAMIC;
 
-		if (FAILED(m_Device->GetD3dDevice()->CreateBuffer(&desc, nullptr, &m_Buffer)))
+		if (FAILED(m_renderDevice->GetD3dDevice()->CreateBuffer(&desc, nullptr, &m_buffer)))
 		{
 			CORE_ERROR("");
 			return false;
@@ -80,14 +80,14 @@ namespace Dive
 
 	void * IndexBuffer::Map()
 	{
-		if(!m_Buffer)
+		if(!m_buffer)
 		{
 			CORE_ERROR("");
 			return nullptr;
 		}
 
 		D3D11_MAPPED_SUBRESOURCE mappedSubRsc;
-		if (FAILED(m_Device->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_Buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubRsc)))
+		if (FAILED(m_renderDevice->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubRsc)))
 		{
 			CORE_ERROR("");
 			return nullptr;
@@ -98,13 +98,13 @@ namespace Dive
 
 	bool IndexBuffer::Unmap()
 	{
-		if(!m_Buffer)
+		if(!m_buffer)
 		{
 			CORE_ERROR("");
 			return false;
 		}
 
-		m_Device->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_Buffer), 0);
+		m_renderDevice->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_buffer), 0);
 
 		return true;
 	}

@@ -18,7 +18,7 @@ namespace Dive
 		int Run();
 
 	protected:
-		std::shared_ptr<Engine> m_Engine;
+		std::shared_ptr<Engine> m_engine;
 	};
 }
 

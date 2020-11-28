@@ -15,24 +15,24 @@ namespace Dive
 			return;
 		}
 
-		m_Device = device;
+		m_renderDevice = device;
 	}
 
 	VertexBuffer::~VertexBuffer()
 	{
-		SAFE_RELEASE(m_Buffer);
+		SAFE_RELEASE(m_buffer);
 	}
 
 	void * VertexBuffer::Map()
 	{
-		if (!m_Buffer)
+		if (!m_buffer)
 		{
 			CORE_ERROR("");
 			return nullptr;
 		}
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		if (FAILED(m_Device->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_Buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		if (FAILED(m_renderDevice->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
 			CORE_ERROR("");
 			return nullptr;
@@ -43,13 +43,13 @@ namespace Dive
 
 	bool VertexBuffer::Unmap()
 	{
-		if (!m_Buffer)
+		if (!m_buffer)
 		{
 			CORE_ERROR("");
 			return false;
 		}
 
-		m_Device->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_Buffer), 0);
+		m_renderDevice->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_buffer), 0);
 
 		return true;
 	}
@@ -58,18 +58,18 @@ namespace Dive
 	{
 		if (!m_bDynamic)
 		{
-			if (!vertices || m_VertexCount == 0)
+			if (!vertices || m_vertexCount == 0)
 			{
 				CORE_ERROR("");
 				return false;
 			}
 		}
 
-		SAFE_RELEASE(m_Buffer);
+		SAFE_RELEASE(m_buffer);
 
 		D3D11_BUFFER_DESC desc;
 		desc.BindFlags				= D3D11_BIND_VERTEX_BUFFER;
-		desc.ByteWidth				= m_Stride * m_VertexCount;
+		desc.ByteWidth				= m_stride * m_vertexCount;
 		desc.CPUAccessFlags			= m_bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 		desc.Usage					= m_bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_IMMUTABLE;
 		desc.MiscFlags				= 0;
@@ -80,7 +80,7 @@ namespace Dive
 		data.SysMemPitch		= 0;
 		data.SysMemSlicePitch	= 0;
 
-		if (FAILED(m_Device->GetD3dDevice()->CreateBuffer(&desc, m_bDynamic ? nullptr : &data, &m_Buffer)))
+		if (FAILED(m_renderDevice->GetD3dDevice()->CreateBuffer(&desc, m_bDynamic ? nullptr : &data, &m_buffer)))
 		{
 			CORE_ERROR("");
 			return false;

@@ -20,28 +20,28 @@ namespace Dive
 		void Update() override;
 
 		// time
-		float GetRunningTimeMS()		const { return static_cast<float>(m_RunningTimeMS); }
-		float GetRunningTime()			const { return static_cast<float>(m_RunningTimeMS / 1000.0); }
-		float GetDeltaTimeMS()			const { return static_cast<float>(m_DeltaTimeMS); }
-		float GetDeltaTime()			const { return static_cast<float>(m_DeltaTimeMS / 1000.0); }
-		float GetSmoothDeltaTimeMS()	const { return static_cast<float>(m_SmoothDeltaTimeMS); }
-		float GetSmoothDeltaTime()		const { return static_cast<float>(m_SmoothDeltaTimeMS / 1000.0); }
+		float GetRunningTimeMS()		const { return static_cast<float>(m_runningTimeMS); }
+		float GetRunningTime()			const { return static_cast<float>(m_runningTimeMS / 1000.0); }
+		float GetDeltaTimeMS()			const { return static_cast<float>(m_deltaTimeMS); }
+		float GetDeltaTime()			const { return static_cast<float>(m_deltaTimeMS / 1000.0); }
+		float GetSmoothDeltaTimeMS()	const { return static_cast<float>(m_smoothDeltaTimeMS); }
+		float GetSmoothDeltaTime()		const { return static_cast<float>(m_smoothDeltaTimeMS / 1000.0); }
 
 		// fps
 		void SetTargetFps(double target);
-		float GetTargetFps()			const { return static_cast<float>(m_TargetFPS); }
+		float GetTargetFps()			const { return static_cast<float>(m_targetFPS); }
 
 
 	private:
-		std::chrono::high_resolution_clock::time_point m_StartupTime;
-		std::chrono::high_resolution_clock::time_point m_BeginFrameTime;
-		std::chrono::high_resolution_clock::time_point m_EndFrameTime;
+		std::chrono::high_resolution_clock::time_point m_startupTime;
+		std::chrono::high_resolution_clock::time_point m_beginFrameTime;
+		std::chrono::high_resolution_clock::time_point m_endFrameTime;
 		
-		double m_RunningTimeMS		= 0;
-		double m_DeltaTimeMS		= 0;
-		double m_SmoothDeltaTimeMS	= 0;
+		double m_runningTimeMS		= 0;
+		double m_deltaTimeMS		= 0;
+		double m_smoothDeltaTimeMS	= 0;
 
-		double m_TargetFPS			= NO_LIMIT_FRAME;
+		double m_targetFPS			= NO_LIMIT_FRAME;
 	};
 }
 

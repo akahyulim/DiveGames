@@ -7,7 +7,7 @@ namespace Dive
 {
 	// 일단 default adapter로 구현
 	RenderDevice::RenderDevice(HWND hWnd, int width, int height, bool windowed)
-		: m_hWnd(hWnd), m_Width(width), m_Height(height), m_bWindowed(windowed)
+		: m_hWnd(hWnd), m_width(width), m_height(height), m_bWindowed(windowed)
 	{
 		UINT deviceFlags = 0;
 #ifdef _DEBUG
@@ -30,8 +30,8 @@ namespace Dive
 		DXGI_SWAP_CHAIN_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.OutputWindow							= m_hWnd;
-		desc.BufferDesc.Width						= m_Width;
-		desc.BufferDesc.Height						= m_Height;
+		desc.BufferDesc.Width						= m_width;
+		desc.BufferDesc.Height						= m_height;
 		desc.Windowed								= m_bWindowed;
 		desc.BufferCount							= 1;							// 매개변수 대상
 		desc.BufferDesc.Format						= DXGI_FORMAT_R8G8B8A8_UNORM;	// 매개변수 대상
@@ -56,10 +56,10 @@ namespace Dive
 				static_cast<UINT>(featureLevels.size()),
 				D3D11_SDK_VERSION,
 				&desc,
-				&m_SwapChain,
-				&m_D3dDevice,
+				&m_swapChain,
+				&m_d3dDevice,
 				nullptr,
-				&m_ImmediateContext);
+				&m_immediateContext);
 		};
 
 		auto result = createDevice();
@@ -78,13 +78,13 @@ namespace Dive
 
 		// render target view 생성
 		ID3D11Texture2D* backBuffer = nullptr;
-		if (FAILED(m_SwapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))))
+		if (FAILED(m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))))
 		{
 			CORE_ERROR("");
 			return;
 		}
 
-		result = m_D3dDevice->CreateRenderTargetView(backBuffer, nullptr, &m_RenderTargetView);
+		result = m_d3dDevice->CreateRenderTargetView(backBuffer, nullptr, &m_renderTargetView);
 		backBuffer->Release();
 		if (FAILED(result))
 		{
@@ -97,22 +97,22 @@ namespace Dive
 	
 	RenderDevice::~RenderDevice()
 	{
-		if (m_ImmediateContext)
+		if (m_immediateContext)
 		{
-			m_ImmediateContext->Release();
-			m_ImmediateContext = nullptr;
+			m_immediateContext->Release();
+			m_immediateContext = nullptr;
 		}
 
-		if (m_D3dDevice)
+		if (m_d3dDevice)
 		{
-			m_D3dDevice->Release();
-			m_D3dDevice = nullptr;
+			m_d3dDevice->Release();
+			m_d3dDevice = nullptr;
 		}
 	}
 
 	bool RenderDevice::Present()
 	{
-		if (!m_SwapChain)
+		if (!m_swapChain)
 		{
 			CORE_ERROR("");
 			return false;
@@ -121,7 +121,7 @@ namespace Dive
 		UINT syncInterval = 0;
 		if (m_bVSync)
 			syncInterval = 1;
-		if (FAILED(m_SwapChain->Present(syncInterval, 0)))
+		if (FAILED(m_swapChain->Present(syncInterval, 0)))
 		{
 			CORE_ERROR("");
 			return false;
@@ -142,25 +142,25 @@ namespace Dive
 		// 1. width, height을 0으로 넣어도 desc의 값 변경이 없다.
 		// 2. width, height를 전달받은 값으로 넣어도 desc의 값 변경이 없다.
 		// 즉, 버퍼의 크기가 변경되지 않았다.
-		m_SwapChain->ResizeBuffers(
+		m_swapChain->ResizeBuffers(
 			1,
 			width,
 			height,
 			DXGI_FORMAT_R8G8B8A8_UNORM,
 			0);
 
-		m_Width = width;
-		m_Height = height;
-		CORE_TRACE("Resize Resolution Width: {0:d}, Height: {1:d}", m_Width, m_Height);
+		m_width = width;
+		m_height = height;
+		CORE_TRACE("Resize Resolution Width: {0:d}, Height: {1:d}", m_width, m_height);
 
 		DXGI_SWAP_CHAIN_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		m_SwapChain->GetDesc(&desc);
+		m_swapChain->GetDesc(&desc);
 		CORE_TRACE("desc Resolution Width: {0:d}, Height: {1:d}", desc.BufferDesc.Width, desc.BufferDesc.Height);
 
 		// back buffer 크기가 변경되지 않으니 직접 가져와도 크기의 변화가 없다.
 		ID3D11Texture2D* backBuffer = nullptr;
-		if (FAILED(m_SwapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))))
+		if (FAILED(m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))))
 		{
 			CORE_ERROR("");
 			return;

@@ -11,7 +11,7 @@ namespace Dive
 	Texture::Texture(SystemManager* manager)
 		: Resource(eResourceType::Texture)
 	{
-		m_RenderDevice = manager->GetSystem<Renderer>()->GetRenderDevice();
+		m_renderDevice = manager->GetSystem<Renderer>()->GetRenderDevice();
 	}
 
 	Texture::~Texture()

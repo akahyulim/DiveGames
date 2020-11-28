@@ -41,17 +41,17 @@ namespace Dive
 		void setKeyValue(T value, const char* formatSpec);
 
 	private:
-		std::string m_FileName;
-		std::string m_SectionName;
-		std::string m_KeyName;
+		std::string m_fileName;
+		std::string m_sectionName;
+		std::string m_keyName;
 
-		std::string m_DefaultStrValue;
+		std::string m_defaultStrValue;
 		union
 		{
-			int m_DefaultIntValue;
-			unsigned int m_DfaultUintValue;
+			int m_defaultIntValue;
+			unsigned int m_defaultUintValue;
 			bool m_bDefaultBoolValue;
-			double m_DefaultDoubleValue;
+			double m_defaultDoubleValue;
 		};
 	};
 
@@ -61,7 +61,7 @@ namespace Dive
 		char defaultStr[MAX_VALUE_SIZE];
 		sprintf_s(defaultStr, MAX_VALUE_SIZE, formatSpec, defaultValue);
 		std::unique_ptr<char> pBuffer(new char[MAX_VALUE_SIZE]);
-		GetPrivateProfileStringA(m_SectionName.c_str(), m_KeyName.c_str(), defaultStr, pBuffer.get(), MAX_VALUE_SIZE, m_FileName.c_str());
+		GetPrivateProfileStringA(m_sectionName.c_str(), m_keyName.c_str(), defaultStr, pBuffer.get(), MAX_VALUE_SIZE, m_fileName.c_str());
 		
 		return std::string(pBuffer.get());
 	}
@@ -71,7 +71,7 @@ namespace Dive
 	{
 		char valueStr[MAX_VALUE_SIZE];
 		sprintf_s(valueStr, MAX_VALUE_SIZE, formatSpec, value);
-		WritePrivateProfileStringA(m_SectionName.c_str(), m_KeyName.c_str(), valueStr, m_FileName.c_str());
+		WritePrivateProfileStringA(m_sectionName.c_str(), m_keyName.c_str(), valueStr, m_fileName.c_str());
 	}
 
 	class Section
@@ -83,8 +83,8 @@ namespace Dive
 		Key operator[](const std::string& keyName);
 
 	private:
-		std::string m_FileName;
-		std::string m_SectionName;
+		std::string m_fileName;
+		std::string m_sectionName;
 	};
 
 	class IniHelper
@@ -96,7 +96,7 @@ namespace Dive
 		Section operator[](const std::string& sectionName);
 
 	private:
-		std::string m_FileName;
+		std::string m_fileName;
 	};
 }
 

@@ -9,14 +9,14 @@ namespace Dive
 	class System : public std::enable_shared_from_this<System>
 	{
 	public:
-		System(const std::shared_ptr<SystemManager>& manager) : m_Manager(manager) {}
+		System(const std::shared_ptr<SystemManager>& manager) : m_manager(manager) {}
 		virtual ~System() = default;
 
 		virtual bool Initialize()	= 0;
 		virtual void Update()		= 0;
 
 	protected:
-		std::weak_ptr<SystemManager> m_Manager;
+		std::weak_ptr<SystemManager> m_manager;
 	};
 
 	template<typename T>
