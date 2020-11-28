@@ -105,6 +105,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Core\Application.h" />
+    <ClInclude Include="Src\Core\Main.h" />
     <ClInclude Include="Src\Rendering\D3D11\BlendState.h" />
     <ClInclude Include="Src\Rendering\D3D11\RasterizerState.h" />
     <ClInclude Include="Src\Rendering\D3D11\DepthStencilState.h" />
@@ -112,9 +114,9 @@
     <ClInclude Include="Src\Core\FileSystemHelper.h" />
     <ClInclude Include="Src\Core\Settings.h" />
     <ClInclude Include="Src\Core\DiveDefs.h" />
-    <ClInclude Include="Src\Core\DiveEngine.h" />
+    <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\Core\Engine.h" />
-    <ClInclude Include="Src\Core\ISystem.h" />
+    <ClInclude Include="Src\Core\System.h" />
     <ClInclude Include="Src\Core\Log.h" />
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\Stopwatch.h" />
@@ -135,9 +137,10 @@
     <ClInclude Include="Src\Rendering\D3D11\VertexBuffer.h" />
     <ClInclude Include="Src\Rendering\D3D11\VertexTypes.h" />
     <ClInclude Include="Src\Rendering\Renderer.h" />
-    <ClInclude Include="Src\Resource\IResource.h" />
+    <ClInclude Include="Src\Resource\Resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Core\Application.cpp" />
     <ClCompile Include="Src\Rendering\D3D11\BlendState.cpp" />
     <ClCompile Include="Src\Rendering\D3D11\RasterizerState.cpp" />
     <ClCompile Include="Src\Rendering\D3D11\DepthStencilState.cpp" />

@@ -32,17 +32,17 @@ namespace Dive
 
 	public:
 		MethodHandler(T* pInstance, MemberFunction method)
-			: m_pInstance(pInstance), m_Method(method)
+			: m_instance(pInstance), m_method(method)
 		{}
 
 		void call(const IEvent* evnt) override
 		{
-			(m_pInstance->*m_Method)(static_cast<EventType*>(evnt));
+			(m_instance->*m_method)(static_cast<EventType*>(evnt));
 		}
 
 	private:
-		T* m_pInstance;
-		MemberFunction m_Method;
+		T* m_instance;
+		MemberFunction m_method;
 	};
 
 	class EventSystem

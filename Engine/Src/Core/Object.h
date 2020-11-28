@@ -9,15 +9,15 @@ namespace Dive
 	public:
 		Object()
 		{
-			m_ID = GenerateID();
+			m_id = GenerateID();
 		}
 		virtual ~Object() {}
 
-		unsigned int GetID() const { return m_ID; }
+		unsigned int GetID() const { return m_id; }
 
 		static unsigned int GenerateID() { return ++g_InstanceID; }
 
 	protected:
-		unsigned int m_ID = 0;
+		unsigned int m_id = 0;
 	};
 }

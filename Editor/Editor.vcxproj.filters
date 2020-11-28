@@ -63,10 +63,10 @@
     <ClInclude Include="Src\Window.h">
       <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Widgets\IWidget.h">
+    <ClInclude Include="Src\Widgets\MenuBar.h">
       <Filter>Src\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Widgets\MenuBar.h">
+    <ClInclude Include="Src\Widgets\Widget.h">
       <Filter>Src\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="Src\Widgets\Scene.h">

@@ -3,15 +3,15 @@
 
 
 Scene::Scene(Editor* editor)
-	: IWidget(editor)
+	: Widget(editor)
 {
-	m_Title = "Scene";
-	m_Size = DirectX::XMFLOAT2(400.0f, 250.0f);
-	m_WndFlags |= ImGuiWindowFlags_NoScrollbar;
-	m_Padding = DirectX::XMFLOAT2(4.0f, 4.0f);
+	m_title		= "Scene";
+	m_size		= DirectX::XMFLOAT2(400.0f, 250.0f);
+	m_wndFlags	|= ImGuiWindowFlags_NoScrollbar;
+	m_padding	= DirectX::XMFLOAT2(4.0f, 4.0f);
 
 	// shared_ptr을 리턴하도록 수정해야 한다.
-	//m_Renderer = m_Editor->GetSystemManager()->GetSystem<Dive::Renderer>();
+	//m_renderer = m_Editor->GetSystemManager()->GetSystem<Dive::Renderer>();
 }
 
 void Scene::Tick(float deltaTime)

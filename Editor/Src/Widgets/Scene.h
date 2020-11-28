@@ -1,5 +1,5 @@
 #pragma once
-#include "IWidget.h"
+#include "Widget.h"
 
 namespace Dive
 {
@@ -9,7 +9,7 @@ namespace Dive
 
 class Editor;
 
-class Scene : public IWidget
+class Scene : public Widget
 {
 public:
 	Scene(Editor* editor);
@@ -19,7 +19,7 @@ public:
 
 private:
 private:
-	std::shared_ptr<Dive::Renderer> m_Renderer;
-	std::shared_ptr<Dive::Texture2D> m_RenderTex;
+	std::shared_ptr<Dive::Renderer> m_renderer;
+	std::shared_ptr<Dive::Texture2D> m_renderTex;
 };
 

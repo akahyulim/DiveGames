@@ -109,7 +109,7 @@
     <ClInclude Include="Src\ImGUI\imstb_rectpack.h" />
     <ClInclude Include="Src\ImGUI\imstb_textedit.h" />
     <ClInclude Include="Src\ImGUI\imstb_truetype.h" />
-    <ClInclude Include="Src\Widgets\IWidget.h" />
+    <ClInclude Include="Src\Widgets\Widget.h" />
     <ClInclude Include="Src\Window.h" />
   </ItemGroup>
   <ItemGroup>

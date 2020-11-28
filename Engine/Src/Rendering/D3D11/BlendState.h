@@ -21,13 +21,13 @@ namespace Dive
 		~BlendState();
 
 		bool IsInitialized()			const { return m_bInitialized; }
-		ID3D11BlendState* GetState()	const { return m_State; }
-		const float* GetBlendFactor()	const { return &m_BlendFactor[0]; }
+		ID3D11BlendState* GetState()	const { return m_state; }
+		const float* GetBlendFactor()	const { return &m_blendFactor[0]; }
 
 	private:
 		bool m_bInitialized			= false;
-		ID3D11BlendState* m_State	= nullptr;
-		float m_BlendFactor[4]		= { 1, };
+		ID3D11BlendState* m_state	= nullptr;
+		float m_blendFactor[4]		= { 1, };
 	};
 }
 

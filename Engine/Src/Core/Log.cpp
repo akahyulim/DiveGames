@@ -6,8 +6,8 @@
 
 namespace Dive
 {
-	std::shared_ptr<spdlog::logger> Log::s_CoreLogger;
-	std::shared_ptr<spdlog::logger> Log::s_AppLogger;
+	std::shared_ptr<spdlog::logger> Log::s_coreLogger;
+	std::shared_ptr<spdlog::logger> Log::s_appLogger;
 
 	void Log::Initialize()
 	{	
@@ -18,14 +18,14 @@ namespace Dive
 		logSinks[0]->set_pattern("%^[%T] %n: %v%$");
 		logSinks[1]->set_pattern("[%T] [%l] %n: %v");
 
-		s_CoreLogger = std::make_shared<spdlog::logger>("CORE", begin(logSinks), end(logSinks));
-		spdlog::register_logger(s_CoreLogger);
-		s_CoreLogger->set_level(spdlog::level::trace);
-		s_CoreLogger->flush_on(spdlog::level::trace);
+		s_coreLogger = std::make_shared<spdlog::logger>("CORE", begin(logSinks), end(logSinks));
+		spdlog::register_logger(s_coreLogger);
+		s_coreLogger->set_level(spdlog::level::trace);
+		s_coreLogger->flush_on(spdlog::level::trace);
 
-		s_AppLogger = std::make_shared<spdlog::logger>("APP", begin(logSinks), end(logSinks));
-		spdlog::register_logger(s_AppLogger);
-		s_AppLogger->set_level(spdlog::level::trace);
-		s_AppLogger->flush_on(spdlog::level::trace);
+		s_appLogger = std::make_shared<spdlog::logger>("APP", begin(logSinks), end(logSinks));
+		spdlog::register_logger(s_appLogger);
+		s_appLogger->set_level(spdlog::level::trace);
+		s_appLogger->flush_on(spdlog::level::trace);
 	}
 }

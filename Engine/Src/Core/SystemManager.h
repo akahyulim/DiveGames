@@ -1,6 +1,6 @@
 #pragma once
 #include "DivePch.h"
-#include "ISystem.h"
+#include "System.h"
 #include "Log.h"
 #include "DiveDefs.h"
 
@@ -8,28 +8,31 @@ namespace Dive
 {
 	class Engine;
 
-	class SystemManager
+	// 여전히 Engine을 raw pointer로 가진다.
+	class SystemManager : public std::enable_shared_from_this<SystemManager>
 	{
 	public:
-		SystemManager(Engine* engine) : m_Engine(engine) {}
+		SystemManager(Engine* engine) : m_engine(engine) {}
+
 		~SystemManager()
 		{
-			for (auto& system : m_Systems)
+			for (auto& system : m_systems)
 			{
-				//system.reset();
-				delete system;
-				system = nullptr;
+				system.reset();
 			}
-			m_Systems.clear();
+			m_systems.clear();
+
+			CORE_TRACE("Call SystemManager's Destructor ======================");
+			CORE_TRACE("Alive system's count: {:d}", m_systems.size());
 		}
 
 		bool Initialize()
 		{
-			for (const auto& system : m_Systems)
+			for (const auto& system : m_systems)
 			{
 				if (!system->Initialize())
 				{
-					CORE_ERROR("SystemManager::Initialize>> Failed to initialize {:s} object.", typeid(*system).name());
+					CORE_ERROR("", typeid(*system).name());
 					return false;
 				}
 			}
@@ -38,17 +41,16 @@ namespace Dive
 
 		void Update()
 		{
-			for (const auto& system : m_Systems)
+			for (const auto& system : m_systems)
 				system->Update();
 		}
 
-		// 사실 Initialize를 둘 필요가 없다.
 		template<typename T>
 		void RegisterSystem()
 		{
 			ValidateSystemType<T>();
 
-			m_Systems.emplace_back(new T(this));
+			m_systems.emplace_back(std::make_shared<T>(shared_from_this()));
 		}
 
 		template<typename T>
@@ -56,23 +58,21 @@ namespace Dive
 		{
 			ValidateSystemType<T>();
 
-			for (const auto& system : m_Systems)
+			for (const auto& system : m_systems)
 			{
 				if (typeid(T) == typeid(*system))
-					return dynamic_cast<T*>(system);
-					//return static_cast<T*>(system.get());
+					return static_cast<T*>(system.get());
 			}
 			return nullptr;
 		}
 
 		Engine* GetEngine() const
 		{
-			return m_Engine;
+			return m_engine;
 		}
 
 	private:
-		Engine* m_Engine = nullptr;
-		//std::vector<std::shared_ptr<ISystem>> m_Systems;
-		std::vector<ISystem*> m_Systems;
+		Engine* m_engine = nullptr;
+		std::vector<std::shared_ptr<System>> m_systems;
 	};
 }

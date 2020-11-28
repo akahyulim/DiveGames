@@ -1,4 +1,4 @@
-#include "Core/DiveEngine.h"
+#include "Dive.h"
 #include "Window.h"
 #include "Editor.h"
 
@@ -28,7 +28,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 
 	Window::Destroy();
-	APP_TRACE("프로그램을 되었습니다.");
+	APP_TRACE("프로그램이 종료되었습니다.");
 
 #ifdef _DEBUG
 	system("pause");

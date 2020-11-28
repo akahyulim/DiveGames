@@ -29,7 +29,7 @@ namespace Dive
 		desc.MultisampleEnable		= multiSampleEnable;
 		desc.AntialiasedLineEnable	= antialiasedLineEnable;
 
-		if (FAILED(device->GetD3dDevice()->CreateRasterizerState(&desc, &m_State)))
+		if (FAILED(device->GetD3dDevice()->CreateRasterizerState(&desc, &m_state)))
 		{
 			CORE_ERROR("");
 			return;
@@ -40,6 +40,6 @@ namespace Dive
 
 	RasterizerState::~RasterizerState()
 	{
-		SAFE_RELEASE(m_State);
+		SAFE_RELEASE(m_state);
 	}
 }

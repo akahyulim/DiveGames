@@ -1,9 +1,9 @@
 #pragma once
-#include "IWidget.h"
+#include "Widget.h"
 
 class Editor;
 
-class MenuBar : public IWidget
+class MenuBar : public Widget
 {
 public:
 	MenuBar(Editor* editor);

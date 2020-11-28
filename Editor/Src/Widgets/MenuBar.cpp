@@ -2,7 +2,7 @@
 
 
 MenuBar::MenuBar(Editor* editor)
-	: IWidget(editor)
+	: Widget(editor)
 {
 	m_bWindow = false;
 //	m_pSelectedObj = nullptr;

@@ -29,7 +29,7 @@ namespace Dive
 		desc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ALL;
 		desc.DepthEnable					= enable;
 
-		if (FAILED(device->GetD3dDevice()->CreateDepthStencilState(&desc, &m_State)))
+		if (FAILED(device->GetD3dDevice()->CreateDepthStencilState(&desc, &m_state)))
 		{
 			CORE_ERROR("");
 			return;
@@ -40,6 +40,6 @@ namespace Dive
 
 	DepthStencilState::~DepthStencilState()
 	{
-		SAFE_RELEASE(m_State);
+		SAFE_RELEASE(m_state);
 	}
 }

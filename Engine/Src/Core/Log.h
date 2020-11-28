@@ -11,12 +11,12 @@ namespace Dive
 	public:
 		static void Initialize();
 
-		static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
-		static std::shared_ptr<spdlog::logger>& GetAppLogger()	{ return s_AppLogger; }
+		static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_coreLogger; }
+		static std::shared_ptr<spdlog::logger>& GetAppLogger()	{ return s_appLogger; }
 
 	private:
-		static std::shared_ptr<spdlog::logger> s_CoreLogger;
-		static std::shared_ptr<spdlog::logger> s_AppLogger;
+		static std::shared_ptr<spdlog::logger> s_coreLogger;
+		static std::shared_ptr<spdlog::logger> s_appLogger;
 	};
 }
 	

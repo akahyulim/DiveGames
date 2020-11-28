@@ -9,7 +9,7 @@ namespace Dive
 	class SystemManager;
 }
 
-class IWidget;
+class Widget;
 
 class Editor
 {
@@ -26,9 +26,9 @@ public:
 	template<class T>
 	T* GetWidget()
 	{
-		if (!m_Widgets.empty())
+		if (!m_widgets.empty())
 		{
-			for (const auto& widget : m_Widgets)
+			for (const auto& widget : m_widgets)
 			{
 				if (T* targetWidget = std::dynamic_cast<T*>(widget.get()))
 					return targetWidget;
@@ -37,16 +37,16 @@ public:
 		}
 	}
 
-	Dive::SystemManager* GetSystemManager() { return m_SystemManager; }
+	const std::shared_ptr<Dive::SystemManager>& GetSystemManager() const { return m_systemManager; }
 
 private:
 
 private:
-	std::unique_ptr<Dive::Engine> m_Engine;
-	Dive::SystemManager* m_SystemManager = nullptr;
+	std::unique_ptr<Dive::Engine> m_engine;
+	std::shared_ptr<Dive::SystemManager> m_systemManager;
 
 	bool m_bInitialized = false;
 
-	std::vector<std::shared_ptr<IWidget>> m_Widgets;
+	std::vector<std::shared_ptr<Widget>> m_widgets;
 };
 
