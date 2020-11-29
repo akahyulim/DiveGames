@@ -3,13 +3,15 @@
 #include "RenderDevice.h"
 #include "Rendering/Renderer.h"
 #include "Core/Log.h"
+#include "Core/SystemManager.h"
 
 
 namespace Dive
 {
-	Texture::Texture(ID3D11Device* device)
-		: IResource(eResourceType::Texture), m_D3dDevice(device)
+	Texture::Texture(SystemManager* manager)
+		: Resource(eResourceType::Texture)
 	{
+		m_renderDevice = manager->GetSystem<Renderer>()->GetRenderDevice();
 	}
 
 	Texture::~Texture()

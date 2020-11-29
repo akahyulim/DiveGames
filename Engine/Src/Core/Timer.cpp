@@ -7,7 +7,7 @@
 namespace Dive
 {
 	Timer::Timer(const std::shared_ptr<SystemManager>& manager)
-		: ISystem(manager)
+		: System(manager)
 	{
 	}
 
@@ -18,21 +18,21 @@ namespace Dive
 
 	bool Timer::Initialize()
 	{
-		m_StartupTime = std::chrono::high_resolution_clock::now();
-		m_BeginFrameTime = std::chrono::high_resolution_clock::now();
+		m_startupTime = std::chrono::high_resolution_clock::now();
+		m_beginFrameTime = std::chrono::high_resolution_clock::now();
 
 		return true;
 	}
 
 	void Timer::Update()
 	{
-		m_EndFrameTime = m_BeginFrameTime;
-		m_BeginFrameTime = std::chrono::high_resolution_clock::now();
+		m_endFrameTime = m_beginFrameTime;
+		m_beginFrameTime = std::chrono::high_resolution_clock::now();
 
-		std::chrono::duration<double, std::milli> elapsedTime = m_BeginFrameTime - m_StartupTime;
-		std::chrono::duration<double, std::milli> deltaTime = m_BeginFrameTime - m_EndFrameTime;
+		std::chrono::duration<double, std::milli> elapsedTime = m_beginFrameTime - m_startupTime;
+		std::chrono::duration<double, std::milli> deltaTime = m_beginFrameTime - m_endFrameTime;
 		const std::chrono::duration<double, std::milli> remainTime =
-			std::chrono::duration<double, std::milli>(1000.0 / m_TargetFPS) - deltaTime;
+			std::chrono::duration<double, std::milli>(1000.0 / m_targetFPS) - deltaTime;
 
 		if (remainTime.count() > 0)
 		{
@@ -42,20 +42,20 @@ namespace Dive
 			deltaTime += remainTime;
 		}
 		
-		m_RunningTimeMS = static_cast<double>(elapsedTime.count());
-		m_DeltaTimeMS = static_cast<double>(deltaTime.count());
+		m_runningTimeMS = static_cast<double>(elapsedTime.count());
+		m_deltaTimeMS = static_cast<double>(deltaTime.count());
 
 		// smooth_delta_time °è»ê
 		const double lowestFrameMS = 1000.0 / LOWEST_FRAME;
-		const double GapFrameMS = m_DeltaTimeMS > lowestFrameMS ? lowestFrameMS : m_DeltaTimeMS;
-		m_SmoothDeltaTimeMS = m_SmoothDeltaTimeMS * (1.0 - DELTA_FEEDBACK) + GapFrameMS * DELTA_FEEDBACK;
+		const double GapFrameMS = m_deltaTimeMS > lowestFrameMS ? lowestFrameMS : m_deltaTimeMS;
+		m_smoothDeltaTimeMS = m_smoothDeltaTimeMS * (1.0 - DELTA_FEEDBACK) + GapFrameMS * DELTA_FEEDBACK;
 	}
 
 	void Timer::SetTargetFps(double target)
 	{
 		if (target < 0)
-			m_TargetFPS = NO_LIMIT_FRAME;
+			m_targetFPS = NO_LIMIT_FRAME;
 		else
-			m_TargetFPS = target;
+			m_targetFPS = target;
 	}
 }

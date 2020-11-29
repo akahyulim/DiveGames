@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "Core/DiveEngine.h"
+#include "Dive.h"
 
 // events
 class AddEvent : public Dive::IEvent

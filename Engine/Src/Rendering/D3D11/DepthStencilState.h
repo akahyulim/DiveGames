@@ -13,10 +13,10 @@ namespace Dive
 		~DepthStencilState();
 
 		bool IsInitialized()				const { return m_bInitialized; }
-		ID3D11DepthStencilState* GetState() const { return m_State; }
+		ID3D11DepthStencilState* GetState() const { return m_state; }
 
 	private:
 		bool m_bInitialized					= false;
-		ID3D11DepthStencilState* m_State	= nullptr;
+		ID3D11DepthStencilState* m_state	= nullptr;
 	};
 }

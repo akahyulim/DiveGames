@@ -28,6 +28,9 @@
     <ClCompile Include="Src\Widgets\MenuBar.cpp">
       <Filter>Src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Widgets\Scene.cpp">
+      <Filter>Src\Widgets</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Editor.h">
@@ -60,10 +63,13 @@
     <ClInclude Include="Src\Window.h">
       <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Widgets\IWidget.h">
+    <ClInclude Include="Src\Widgets\MenuBar.h">
       <Filter>Src\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Widgets\MenuBar.h">
+    <ClInclude Include="Src\Widgets\Widget.h">
+      <Filter>Src\Widgets</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Widgets\Scene.h">
       <Filter>Src\Widgets</Filter>
     </ClInclude>
   </ItemGroup>

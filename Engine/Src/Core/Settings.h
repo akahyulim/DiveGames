@@ -27,17 +27,17 @@ namespace Dive
 		virtual bool Load();
 
 		//= Options =========================================================================
-		std::string GetFileName()	const { return m_FileName; }
-		eScreenMode GetScreenMode() const { return m_ScreenMode; }
-		int GetResolutionWidth()	const { return m_ResolutionWidth; }
-		int GetResolutionHeight()	const { return m_ResolutionHeight; }
+		std::string GetFileName()	const { return m_fileName; }
+		eScreenMode GetScreenMode() const { return m_screenMode; }
+		int GetResolutionWidth()	const { return m_resolutionWidth; }
+		int GetResolutionHeight()	const { return m_resolutionHeight; }
 		//unsigned int GetFrameRate() const { return m_FrameRate; }
 		//void SetFrameRate(unsigned int rate) { m_FrameRate = rate; }
 		bool IsVSync()				const { return m_bVSync; }
 
-		void SetResolutionWidth(int width)		{ m_ResolutionWidth = width; }
-		void SetResolutionHeight(int height)	{ m_ResolutionHeight = height; }
-		void SetScrrenMode(eScreenMode mode)	{ m_ScreenMode = mode; }
+		void SetResolutionWidth(int width)		{ m_resolutionWidth = width; }
+		void SetResolutionHeight(int height)	{ m_resolutionHeight = height; }
+		void SetScrrenMode(eScreenMode mode)	{ m_screenMode = mode; }
 		void SetVSync(bool vSync)				{ m_bVSync = vSync; }
 
 	private:
@@ -46,10 +46,10 @@ namespace Dive
 
 
 	private:
-		std::string m_FileName;
-		eScreenMode m_ScreenMode = eScreenMode::Windowed;
-		int m_ResolutionWidth = 0;
-		int m_ResolutionHeight = 0;
+		std::string m_fileName;
+		eScreenMode m_screenMode = eScreenMode::Windowed;
+		int m_resolutionWidth = 0;
+		int m_resolutionHeight = 0;
 		//unsigned int m_FrameRate = 60;
 		bool m_bVSync = false;
 	};

@@ -1,25 +1,25 @@
 #pragma once
-#include "Core/DiveEngine.h"
+#include "Dive.h"
 #include "../Editor.h"
 #include "../ImGUI/imgui.h"
 #include "../ImGUI/imgui_internal.h"
 
 
-class IWidget
+class Widget
 {
 public:
-	IWidget(Editor* editor) : m_Editor(editor) 
+	Widget(Editor* editor) : m_editor(editor) 
 	{
-		m_SystemManager = m_Editor->GetSystemManager();
+		m_systemManager = m_editor->GetSystemManager();
 	}
-	virtual ~IWidget() = default;
+	virtual ~Widget() = default;
 
 	bool Begin()
 	{
 		if (!m_bWindow || !m_bVisible)
 			return false;
 
-		m_VarCount = 0;
+		m_varCount = 0;
 
 		if (m_position.x != -1.0f && m_position.y != -1.0f)
 		{
@@ -29,13 +29,13 @@ public:
 		if (m_padding.x != -1.0f && m_padding.y != -1.0f)
 		{
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(m_padding.x, m_padding.y));
-			m_VarCount++;
+			m_varCount++;
 		}
 
-		if (m_Alpha != -1.0f)
+		if (m_alpha != -1.0f)
 		{
-			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, m_Alpha);
-			m_VarCount++;
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, m_alpha);
+			m_varCount++;
 		}
 
 		if (m_size.x != -1.0f && m_size.y != -1.0f)
@@ -43,12 +43,12 @@ public:
 			ImGui::SetNextWindowSize(ImVec2(m_size.x, m_size.y), ImGuiCond_FirstUseEver);
 		}
 
-		if ((m_size.x != -1.0f && m_size.y != -1.0f) || (m_sizeMax.x != FLT_MAX && m_sizeMax.y != FLT_MAX))
+		if ((m_size.x != -1.0f && m_size.y != -1.0f) || (m_maxSize.x != FLT_MAX && m_maxSize.y != FLT_MAX))
 		{
-			ImGui::SetNextWindowSizeConstraints(ImVec2(m_size.x, m_size.y), ImVec2(m_sizeMax.x, m_sizeMax.y));
+			ImGui::SetNextWindowSizeConstraints(ImVec2(m_size.x, m_size.y), ImVec2(m_maxSize.x, m_maxSize.y));
 		}
 
-		ImGui::Begin(m_title.c_str(), &m_bVisible, m_WndFlags);
+		ImGui::Begin(m_title.c_str(), &m_bVisible, m_wndFlags);
 		m_bWindowBegun = true;
 
 		return true;
@@ -61,10 +61,10 @@ public:
 		if (!m_bWindowBegun)
 			return false;
 
-		m_Window = ImGui::GetCurrentWindow();
-		m_Height = ImGui::GetWindowHeight();
+		m_window = ImGui::GetCurrentWindow();
+		m_height = ImGui::GetWindowHeight();
 		ImGui::End();
-		ImGui::PopStyleVar(m_VarCount);
+		ImGui::PopStyleVar(m_varCount);
 
 		return true;
 	}
@@ -79,29 +79,29 @@ public:
 	bool IsWindow()					{ return m_bWindow; }
 	bool& IsVisible()				{ return m_bVisible; }
 	void SetVisible(bool visible)	{ m_bVisible = visible; }
-	float GetHeight()				{ return m_Height; }
-	ImGuiWindow* GetWindow()		{ return m_Window; }
+	float GetHeight()				{ return m_height; }
+	ImGuiWindow* GetWindow()		{ return m_window; }
 	const std::string& GetTitle()	{ return m_title; }
 
 protected:
-	Editor* m_Editor						= nullptr;
-	//Dive::SystemManager* m_SystemManager	= nullptr;
-	std::shared_ptr<Dive::SystemManager> m_SystemManager;
+	Editor* m_editor						= nullptr;
+	//Dive::SystemManager* m_systemManager	= nullptr;
+	std::shared_ptr<Dive::SystemManager> m_systemManager;
 
-	ImGuiWindow* m_Window	= nullptr;
+	ImGuiWindow* m_window	= nullptr;
 	std::string m_title		= "no name";
 	bool m_bVisible			= true;
 	bool m_bWindow			= true;
-	int m_WndFlags			= ImGuiWindowFlags_NoCollapse;
-	float m_Height			= 0;
-	float m_Alpha			= -1.0f;
+	int m_wndFlags			= ImGuiWindowFlags_NoCollapse;
+	float m_height			= 0;
+	float m_alpha			= -1.0f;
 
 	DirectX::XMFLOAT2 m_position{ -1.0f, -1.0f };
 	DirectX::XMFLOAT2 m_size{ -1.0f, -1.0f };
-	DirectX::XMFLOAT2 m_sizeMax{ FLT_MAX, FLT_MAX };
+	DirectX::XMFLOAT2 m_maxSize{ FLT_MAX, FLT_MAX };
 	DirectX::XMFLOAT2 m_padding{ -1.0f, -1.0f };
 
 private:
 	bool m_bWindowBegun		= false;
-	unsigned int m_VarCount = 0;
+	unsigned int m_varCount = 0;
 };

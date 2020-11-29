@@ -6,17 +6,23 @@
 #include "Settings.h"
 #include "Rendering/Renderer.h"
 
+
 namespace Dive
 {
+	Engine::Engine()
+	{
+		Log::Initialize();
+	}
+
 	Engine::Engine(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed)
 	{
 		// Set WindowData
 		{
-			m_WindowData.hInstance	= hInstance;
-			m_WindowData.hWnd		= hWnd;
-			m_WindowData.width		= width;
-			m_WindowData.height		= height;
-			m_WindowData.windowed	= windowed;
+			m_windowData.hInstance	= hInstance;
+			m_windowData.hWnd		= hWnd;
+			m_windowData.width		= width;
+			m_windowData.height		= height;
+			m_windowData.windowed	= windowed;
 		}
 
 		// Initialize Priority Object
@@ -28,11 +34,11 @@ namespace Dive
 
 		// Create & Initialize Systems
 		{
-			m_SystemManager = std::make_shared<SystemManager>(this);
-			m_SystemManager->RegisterSystem<Timer>();
-			m_SystemManager->RegisterSystem<Renderer>();
+			m_systemManager = std::make_shared<SystemManager>(this);
+			m_systemManager->RegisterSystem<Timer>();
+			m_systemManager->RegisterSystem<Renderer>();
 
-			if (!m_SystemManager->Initialize())
+			if (!m_systemManager->Initialize())
 			{
 				return;
 			}
@@ -44,14 +50,14 @@ namespace Dive
 	Engine::~Engine()
 	{
 		CORE_TRACE("Call Engine's Destructor ========================");
-		CORE_TRACE("SystemManager's Use Count : {:d}", m_SystemManager.use_count());
+		CORE_TRACE("SystemManager's Use Count : {:d}", m_systemManager.use_count());
 	}
 	
 	void Engine::Update()
 	{
-		if (!m_SystemManager)
+		if (!m_systemManager)
 			return;
 
-		m_SystemManager->Update();
+		m_systemManager->Update();
 	}
 }

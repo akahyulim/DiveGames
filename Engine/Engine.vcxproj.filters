@@ -58,14 +58,11 @@
     <ClCompile Include="Src\DivePch.cpp">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Core\Application.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Core\DiveDefs.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\DiveEngine.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Core\Engine.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
@@ -73,9 +70,6 @@
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\IniHelper.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\ISystem.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Log.h">
@@ -138,9 +132,6 @@
     <ClInclude Include="Src\Rendering\D3D11\BlendState.h">
       <Filter>Src\Rendering\D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Resource\IResource.h">
-      <Filter>Src\Resource</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Rendering\D3D11\Texture.h">
       <Filter>Src\Rendering\D3D11</Filter>
     </ClInclude>
@@ -152,6 +143,24 @@
     </ClInclude>
     <ClInclude Include="Src\DivePch.h">
       <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Dive.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DiveDefs.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\System.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Resource\Resource.h">
+      <Filter>Src\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Application.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Main.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
