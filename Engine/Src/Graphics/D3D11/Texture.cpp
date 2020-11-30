@@ -1,17 +1,17 @@
 #include "DivePch.h"
 #include "Texture.h"
 #include "RenderDevice.h"
-#include "Rendering/Renderer.h"
+#include "Graphics/Renderer.h"
 #include "Core/Log.h"
-#include "Core/SystemManager.h"
+#include "Core/Context.h"
 
 
 namespace Dive
 {
-	Texture::Texture(SystemManager* manager)
+	Texture::Texture(Context* context)
 		: Resource(eResourceType::Texture)
 	{
-		m_renderDevice = manager->GetSystem<Renderer>()->GetRenderDevice();
+		m_renderDevice = context->GetSubsystem<Renderer>()->GetRenderDevice();
 	}
 
 	Texture::~Texture()

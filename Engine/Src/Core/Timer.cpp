@@ -1,13 +1,12 @@
 #include "DivePch.h"
 #include "Timer.h"
-#include "SystemManager.h"
+#include "Context.h"
 #include "Log.h"
-
 
 namespace Dive
 {
-	Timer::Timer(const std::shared_ptr<SystemManager>& manager)
-		: System(manager)
+	Timer::Timer(Context* context)
+		: Subsystem(context)
 	{
 	}
 

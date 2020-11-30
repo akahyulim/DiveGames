@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Src\Core\Engine.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Core\FileSystemHelper.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
@@ -25,47 +22,48 @@
     <ClCompile Include="Src\Core\Timer.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\ConstantBuffer.cpp">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\IndexBuffer.cpp">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\RenderDevice.cpp">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\VertexBuffer.cpp">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\Renderer.cpp">
-      <Filter>Src\Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\DepthStencilState.cpp">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\RasterizerState.cpp">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\BlendState.cpp">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\Texture.cpp">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Rendering\D3D11\Texture2D.cpp">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClCompile>
     <ClCompile Include="Src\DivePch.cpp">
       <Filter>Src</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Application.cpp">
-      <Filter>Src\Core</Filter>
+      <Filter>Src\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Core\Engine.cpp">
+      <Filter>Src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\BlendState.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\ConstantBuffer.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\DepthStencilState.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\IndexBuffer.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\RasterizerState.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\RenderDevice.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\Texture.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\Texture2D.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\VertexBuffer.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Renderer.cpp">
+      <Filter>Src\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Graphics.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Core\Engine.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
@@ -87,35 +85,8 @@
     <ClInclude Include="Src\Core\StringHelper.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\SystemManager.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Core\Timer.h">
       <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\ConstantBuffer.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\IndexBuffer.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\RenderDevice.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\RenderDeviceEnums.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\RenderDeviceTypes.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\VertexBuffer.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\VertexTypes.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\Renderer.h">
-      <Filter>Src\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Src\Events\EventSystem.h">
       <Filter>Src\Events</Filter>
@@ -123,45 +94,76 @@
     <ClInclude Include="Src\Events\WindowEvent.h">
       <Filter>Src\Events</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\DepthStencilState.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\RasterizerState.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\BlendState.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\Texture.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\Texture2D.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Rendering\D3D11\TextureCube.h">
-      <Filter>Src\Rendering\D3D11</Filter>
-    </ClInclude>
     <ClInclude Include="Src\DivePch.h">
       <Filter>Src</Filter>
     </ClInclude>
     <ClInclude Include="Src\Dive.h">
       <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\DiveDefs.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\System.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Resource\Resource.h">
       <Filter>Src\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Application.h">
-      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Main.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\Application.h">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Engine.h">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DiveDefs.h">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Subsystem.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Context.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\BlendState.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\ConstantBuffer.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\DepthStencilState.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\IndexBuffer.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\RasterizerState.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\RenderDevice.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\RenderDeviceEnums.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\RenderDeviceTypes.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\Texture.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\Texture2D.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\TextureCube.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\VertexBuffer.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\VertexTypes.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\Renderer.h">
+      <Filter>Src\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\Graphics.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">
@@ -173,14 +175,17 @@
     <Filter Include="Src\Events">
       <UniqueIdentifier>{630117e1-83e3-4266-ac98-d50891a381ae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Rendering">
-      <UniqueIdentifier>{d3c33612-54f0-4527-90b9-786557f49704}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Src\Rendering\D3D11">
-      <UniqueIdentifier>{10d22c29-385d-4a6a-917a-fe23c8a16dd7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Resource">
       <UniqueIdentifier>{72064627-bc7f-436c-b2f0-d1e2c7a52f84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Engine">
+      <UniqueIdentifier>{4d075cea-b480-4ec6-a4b7-f1d133c51eef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Graphic">
+      <UniqueIdentifier>{d3c33612-54f0-4527-90b9-786557f49704}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Graphic\D3D11">
+      <UniqueIdentifier>{10d22c29-385d-4a6a-917a-fe23c8a16dd7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

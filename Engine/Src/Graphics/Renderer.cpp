@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "Renderer.h"
 #include "Core/Engine.h"
-#include "Core/SystemManager.h"
+#include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
 #include "Events/WindowEvent.h"
@@ -15,8 +15,9 @@
 
 namespace Dive
 {
-	Renderer::Renderer(const std::shared_ptr<SystemManager>& manager)
-		: System(manager)
+	Renderer::Renderer(Context* context)
+		: Subsystem(context),
+		m_bInitialized(false)
 	{
 		EventSystem::GetInstance().Subscribe(this, &Renderer::OnResize);
 	}
@@ -28,9 +29,9 @@ namespace Dive
 
 	bool Renderer::Initialize()
 	{
-		// 어쩔 수 없다. Engine으로부터 WindowData를 얻어와서 초기화하자.
-		// 결국 이게 문제다.
-		const auto& wndData = m_manager.lock()->GetEngine()->GetWindowData();
+		// 윈도우가 없어 핸들러를 얻을수도 없다.
+		WindowData wndData;
+		
 	
 		// IDXGI settings
 
@@ -84,6 +85,8 @@ namespace Dive
 			if (!m_blendStateEnable->IsInitialized() || !m_blendStateDisable->IsInitialized() || !m_blendStateColorAdd->IsInitialized())
 				return false;
 		}
+
+		m_bInitialized = true;
 
 		return true;
 	}

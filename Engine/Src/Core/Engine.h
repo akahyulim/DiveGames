@@ -3,7 +3,7 @@
 
 namespace Dive
 {
-	class SystemManager;
+	class Context;
 
 	struct WindowData
 	{
@@ -18,23 +18,31 @@ namespace Dive
 	{
 	public:
 		Engine();
-		Engine(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed);
 		~Engine();
 
-		void Update();
+		// setting data를 넘겨줘야 한다.
+		bool Initialize();
 
-		bool IsInitialized() const { return m_bInitialized; }
+		void RunFrame();
+
+		// 사실 애네 둘은 private이어야 한다.
+		void Update();
+		void Render();
+
+		bool IsInitialized()	const { return m_bInitialized; }
+		bool IsExiting()		const { return m_bExiting; }
 		
-		const std::shared_ptr<SystemManager>& GetSystemManager()	const { return m_systemManager; }
+		const std::shared_ptr<Context>& GetContext() const { return m_context; }
 
 		// 결국 이것 때문에 SystemManager가 this pointer를 가지게 된다.
 		const WindowData& GetWindowData()							const { return m_windowData; }
 
 	private:
 		WindowData m_windowData;
-		std::shared_ptr<SystemManager> m_systemManager;
+		std::shared_ptr<Context> m_context;
 
-		bool m_bInitialized = false;
+		bool m_bInitialized;
+		bool m_bExiting;
 	};
 }
 

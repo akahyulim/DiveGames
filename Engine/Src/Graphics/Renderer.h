@@ -1,9 +1,9 @@
 #pragma once
-#include "Core/System.h"
+#include "Core/Subsystem.h"
 
 namespace Dive
 {
-	class SystemManager;
+	class Context;
 	class WindowResizeEvent;
 	class RenderDevice;
 	class DepthStencilState;
@@ -12,18 +12,20 @@ namespace Dive
 	class Texture2D;
 
 	// 굳이 객체들을 구분해 놓을 필요가 있나하는 생각이 든다.
-	class Renderer : public System
+	class Renderer : public Subsystem
 	{
 	public:
-		Renderer(const std::shared_ptr<SystemManager>& manager);
+		Renderer(Context* context);
 		~Renderer();
 
-		bool Initialize() override;
-		void Update() override;
+		bool Initialize();
+		void Update();
 
 		void Present();
 
 		void OnResize(const WindowResizeEvent* evnt);
+
+		bool IsInitialized() const { return m_bInitialized; }
 
 		const std::shared_ptr<RenderDevice>& GetRenderDevice()	const { return m_renderDevice; }
 		const D3D11_VIEWPORT& GetBackbufferViewport()			const { return m_viewport; }
@@ -33,6 +35,8 @@ namespace Dive
 	private:
 
 	private:
+		bool m_bInitialized;
+
 		std::shared_ptr<RenderDevice> m_renderDevice;
 
 		D3D11_VIEWPORT m_viewport;

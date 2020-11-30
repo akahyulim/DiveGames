@@ -1,23 +1,23 @@
 #pragma once
 #include "DiveDefs.h"
-#include "System.h"
+#include "Subsystem.h"
 
 namespace Dive
 {
-	class SystemManager;
+	class Context;
 
 	constexpr double LOWEST_FRAME	= 15;
 	constexpr double NO_LIMIT_FRAME = 300;
 	constexpr double DELTA_FEEDBACK = 0.2;
 
-	class Timer : public System
+	class Timer : public Subsystem
 	{
 	public:
-		Timer(const std::shared_ptr<SystemManager>& manager);
+		Timer(Context* context);
 		~Timer();
 
-		bool Initialize() override;
-		void Update() override;
+		bool Initialize();
+		void Update();
 
 		// time
 		float GetRunningTimeMS()		const { return static_cast<float>(m_runningTimeMS); }
