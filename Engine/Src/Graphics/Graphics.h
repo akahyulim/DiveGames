@@ -5,6 +5,7 @@
 namespace Dive
 {
 	class Context;
+	class Window;
 
 	class Graphics : public Subsystem
 	{
@@ -12,10 +13,16 @@ namespace Dive
 		Graphics(Context* context);
 		~Graphics();
 
-		bool IsInitialized() const { return m_bInitialized; }
+		bool BeginFrame();
+		void EndFrame();
+
+		bool IsInitialized();
+
+		// settings를 얻어와야 한다.
+		bool SetScreenMode();
 
 	private:
 	private:
-		bool m_bInitialized;
+		std::shared_ptr<Window> m_window;
 	};
 }

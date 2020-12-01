@@ -1,6 +1,6 @@
 #include "DivePch.h"
-#include "Engine.h"
-#include "DiveDefs.h"
+#include "Engine/Engine.h"
+#include "Core/DiveDefs.h"
 #include "Core/Log.h"
 #include "Core/Context.h"
 #include "Core/Timer.h"
@@ -11,6 +11,8 @@
 
 namespace Dive
 {
+	Engine* g_engine = nullptr;
+
 	Engine::Engine()
 		: m_bInitialized(false),
 		m_bExiting(false)
@@ -19,6 +21,8 @@ namespace Dive
 		m_context->RegisterSubsystem<Timer>();
 
 		Log::Initialize();
+
+		g_engine = this;
 	}
 
 	Engine::~Engine()
@@ -39,16 +43,31 @@ namespace Dive
 		auto timer = m_context->GetSubsystem<Timer>();
 		timer->Initialize();
 
+
+		auto graphics = m_context->GetSubsystem<Graphics>();
+		if (!graphics->SetScreenMode())
+			return false;
+
 		m_bInitialized = true;
 
+		CORE_TRACE("Initialized Engine.");
+
 		return true;
+	}
+
+	void Engine::DoExit()
+	{
+		// graphic close
+
+		m_bExiting = true;
 	}
 
 	void Engine::RunFrame()
 	{
 		assert(m_bInitialized);
 
-		// graphic이 initialized인가
+		// 이 부분에서 exiting이 되어야 한다.
+		// 지금 의심스러운 부분은 headless이다.
 		if (!m_context->GetSubsystem<Graphics>()->IsInitialized())
 			m_bExiting = true;
 
@@ -68,8 +87,13 @@ namespace Dive
 	void Engine::Render()
 	{
 		// Begin Frame
+		auto graphics = m_context->GetSubsystem<Graphics>();
+		if (!graphics->BeginFrame())
+			return;
+
 		// Renderer Render
 		// UI Render: 이 곳에 imGUI를 넣을 수 있지 않을까?
 		// EndFrame
+		graphics->EndFrame();
 	}
 }

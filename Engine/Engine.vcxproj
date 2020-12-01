@@ -107,7 +107,7 @@
   <ItemGroup>
     <ClInclude Include="Src\Core\Context.h" />
     <ClInclude Include="Src\Core\Subsystem.h" />
-    <ClInclude Include="Src\Core\Application.h" />
+    <ClInclude Include="Src\Engine\Application.h" />
     <ClInclude Include="Src\Core\Main.h" />
     <ClInclude Include="Src\Graphics\D3D11\BlendState.h" />
     <ClInclude Include="Src\Graphics\D3D11\RasterizerState.h" />
@@ -117,7 +117,7 @@
     <ClInclude Include="Src\Core\Settings.h" />
     <ClInclude Include="Src\Core\DiveDefs.h" />
     <ClInclude Include="Src\Dive.h" />
-    <ClInclude Include="Src\Core\Engine.h" />
+    <ClInclude Include="Src\Engine\Engine.h" />
     <ClInclude Include="Src\Core\Log.h" />
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\Stopwatch.h" />
@@ -131,6 +131,7 @@
     <ClInclude Include="Src\Graphics\D3D11\RenderDevice.h" />
     <ClInclude Include="Src\Graphics\D3D11\RenderDeviceEnums.h" />
     <ClInclude Include="Src\Graphics\D3D11\RenderDeviceTypes.h" />
+    <ClInclude Include="Src\Graphics\D3D11\RHI.h" />
     <ClInclude Include="Src\Graphics\D3D11\Texture.h" />
     <ClInclude Include="Src\Graphics\D3D11\Texture2D.h" />
     <ClInclude Include="Src\Graphics\D3D11\TextureCube.h" />
@@ -138,15 +139,16 @@
     <ClInclude Include="Src\Graphics\D3D11\VertexTypes.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\Renderer.h" />
+    <ClInclude Include="Src\Graphics\Window.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Core\Application.cpp" />
+    <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\BlendState.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\RasterizerState.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\DepthStencilState.cpp" />
     <ClCompile Include="Src\Core\IniHelper.cpp" />
-    <ClCompile Include="Src\Core\Engine.cpp" />
+    <ClCompile Include="Src\Engine\Engine.cpp" />
     <ClCompile Include="Src\Core\FileSystemHelper.cpp" />
     <ClCompile Include="Src\Core\Log.cpp" />
     <ClCompile Include="Src\Core\Settings.cpp" />
@@ -159,11 +161,13 @@
     <ClCompile Include="Src\Graphics\D3D11\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\IndexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\RenderDevice.cpp" />
+    <ClCompile Include="Src\Graphics\D3D11\RHI.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\Texture.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\Texture2D.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\VertexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Graphics\Renderer.cpp" />
+    <ClCompile Include="Src\Graphics\Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

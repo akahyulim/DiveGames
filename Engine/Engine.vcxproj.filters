@@ -25,12 +25,6 @@
     <ClCompile Include="Src\DivePch.cpp">
       <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Application.cpp">
-      <Filter>Src\Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\Engine.cpp">
-      <Filter>Src\Engine</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Graphics\D3D11\BlendState.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClCompile>
@@ -62,6 +56,14 @@
       <Filter>Src\Graphic</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
+    <ClCompile Include="Src\Graphics\D3D11\RHI.cpp" />
+    <ClCompile Include="Src\Graphics\Window.cpp" />
+    <ClCompile Include="Src\Engine\Application.cpp">
+      <Filter>Src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Engine\Engine.cpp">
+      <Filter>Src\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
@@ -105,12 +107,6 @@
     </ClInclude>
     <ClInclude Include="Src\Core\Main.h">
       <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Application.h">
-      <Filter>Src\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Engine.h">
-      <Filter>Src\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\DiveDefs.h">
       <Filter>Src\Engine</Filter>
@@ -164,6 +160,14 @@
       <Filter>Src\Graphic</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\Graphics.h" />
+    <ClInclude Include="Src\Graphics\D3D11\RHI.h" />
+    <ClInclude Include="Src\Graphics\Window.h" />
+    <ClInclude Include="Src\Engine\Application.h">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Engine\Engine.h">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">

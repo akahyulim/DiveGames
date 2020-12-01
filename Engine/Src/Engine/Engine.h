@@ -22,6 +22,7 @@ namespace Dive
 
 		// setting data를 넘겨줘야 한다.
 		bool Initialize();
+		void DoExit();
 
 		void RunFrame();
 

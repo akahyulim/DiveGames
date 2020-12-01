@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "Application.h"
 #include "Engine.h"
-#include "Log.h"
+#include "Core/Log.h"
 
 
 namespace Dive
@@ -28,7 +28,8 @@ namespace Dive
 		// 이렇게 구현하면 imgui를 사용할 수 없다...
 		// => virtual로 만들었으므로 변경이 가능해졌다.
 		// 하지만 이 경우 렌더링 부분을 직접 가져와야 한다.
-		while (m_engine->IsExiting())
+		// exiting이 true여야 루프를 탈출하는데 그 방법을 모르겠다.
+		while (!m_engine->IsExiting())
 			m_engine->RunFrame();
 		APP_TRACE("Start Application & Run Engine");
 

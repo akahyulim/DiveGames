@@ -17,8 +17,8 @@
 #include "Core/Context.h"
 
 //= Engine ================================================
-#include "Core/Engine.h"
-#include "Core/Application.h"
+#include "Engine/Engine.h"
+#include "Engine/Application.h"
 
 //= Event =================================================
 #include "Events/EventSystem.h"
@@ -31,8 +31,12 @@
 #include "Graphics/D3D11/ConstantBuffer.h"
 #include "Graphics/D3D11/RenderDeviceEnums.h"
 #include "Graphics/D3D11/RenderDeviceTypes.h"
-#include "Graphics/D3D11/RenderDevice.h"
+#include "Graphics/D3D11/RenderDevice.h"			// rhi∑Œ ¥Î√º
 #include "Graphics/D3D11/DepthStencilState.h"
 #include "Graphics/D3D11/RasterizerState.h"
 #include "Graphics/D3D11/BlendState.h"
+#include "Graphics/D3D11/RHI.h"
 #include "Graphics/Renderer.h"
+#include "Graphics/Graphics.h"
+#include "Graphics/Window.h"
+
