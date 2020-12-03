@@ -124,8 +124,6 @@
     <ClInclude Include="Src\Core\StringHelper.h" />
     <ClInclude Include="Src\Core\Timer.h" />
     <ClInclude Include="Src\DivePch.h" />
-    <ClInclude Include="Src\Events\EventSystem.h" />
-    <ClInclude Include="Src\Events\WindowEvent.h" />
     <ClInclude Include="Src\Graphics\D3D11\ConstantBuffer.h" />
     <ClInclude Include="Src\Graphics\D3D11\IndexBuffer.h" />
     <ClInclude Include="Src\Graphics\D3D11\RenderDevice.h" />

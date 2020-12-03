@@ -20,10 +20,6 @@
 #include "Engine/Engine.h"
 #include "Engine/Application.h"
 
-//= Event =================================================
-#include "Events/EventSystem.h"
-#include "Events/WindowEvent.h"
-
 //= Graphics =============================================
 #include "Graphics/D3D11/VertexTypes.h"
 #include "Graphics/D3D11/VertexTypes.h"

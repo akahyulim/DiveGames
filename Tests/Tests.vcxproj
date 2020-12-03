@@ -103,7 +103,6 @@
   <ItemGroup>
     <ClCompile Include="Src\Test_StringHelper.cpp" />
     <ClCompile Include="Src\main.cpp" />
-    <ClCompile Include="Src\Test_EventSystem.cpp" />
     <ClCompile Include="Src\Test_IniHelper.cpp" />
   </ItemGroup>
   <ItemGroup>

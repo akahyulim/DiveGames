@@ -4,9 +4,6 @@
     <ClCompile Include="Src\main.cpp">
       <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Test_EventSystem.cpp">
-      <Filter>Src</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Test_IniHelper.cpp">
       <Filter>Src</Filter>
     </ClCompile>

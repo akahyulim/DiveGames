@@ -21,6 +21,8 @@ namespace Dive
 		// settings를 얻어와야 한다.
 		bool SetScreenMode();
 
+		std::shared_ptr<Window> GetWindow() const { return m_window; }
+
 	private:
 	private:
 		std::shared_ptr<Window> m_window;

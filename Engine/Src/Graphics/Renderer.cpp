@@ -4,7 +4,6 @@
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
-#include "Events/WindowEvent.h"
 #include "D3D11/RenderDevice.h"
 #include "D3D11/RenderDeviceEnums.h"
 #include "D3D11/DepthStencilState.h"
@@ -19,7 +18,6 @@ namespace Dive
 		: Subsystem(context),
 		m_bInitialized(false)
 	{
-		EventSystem::GetInstance().Subscribe(this, &Renderer::OnResize);
 	}
 
 	Renderer::~Renderer()
@@ -108,7 +106,5 @@ namespace Dive
 	{
 		if (nullptr == m_renderDevice)
 			return;
-
-		m_renderDevice->ResizeBuffer(evnt->GetWidth(), evnt->GetHeight());
 	}
 }
