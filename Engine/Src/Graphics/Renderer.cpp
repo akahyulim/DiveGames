@@ -18,6 +18,7 @@ namespace Dive
 		: Subsystem(context),
 		m_bInitialized(false)
 	{
+		SubscribeEvent(0, DIVE_HANDLER(Renderer, Update));
 	}
 
 	Renderer::~Renderer()
@@ -89,8 +90,9 @@ namespace Dive
 		return true;
 	}
 	
-	void Renderer::Update()
+	void Renderer::Update(size_t eventType)
 	{
+		CORE_TRACE("Renderer - Received Event!!!");
 	}
 
 	void Renderer::Present()

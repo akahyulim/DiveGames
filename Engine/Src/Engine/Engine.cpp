@@ -7,18 +7,23 @@
 #include "Core/Settings.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Renderer.h"
+#include "Input/Input.h"
 
 
 namespace Dive
 {
+	// temp
 	Engine* g_engine = nullptr;
 
+	// event를 보내거나 받으려면 Subsystem을 상속해야 한다.
+	// 아니면 object로 전부 옮기고, 모든 class가 이를 상속토록 변경해야 한다.
 	Engine::Engine()
 		: m_bInitialized(false),
 		m_bExiting(false)
 	{
 		m_context = std::make_shared<Context>();
 		m_context->RegisterSubsystem<Timer>();
+		m_context->RegisterSubsystem<Input>();
 
 		Log::Initialize();
 
@@ -82,6 +87,10 @@ namespace Dive
 	void Engine::Update()
 	{
 		// Update, Post Update, Render, Post Render를 이벤트로 날린다.
+
+		// test
+		auto timer = m_context->GetSubsystem<Timer>();
+		timer->Update();
 	}
 
 	void Engine::Render()

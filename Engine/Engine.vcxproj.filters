@@ -55,14 +55,29 @@
     <ClCompile Include="Src\Graphics\Renderer.cpp">
       <Filter>Src\Graphic</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\Graphics.cpp" />
-    <ClCompile Include="Src\Graphics\D3D11\RHI.cpp" />
-    <ClCompile Include="Src\Graphics\Window.cpp" />
     <ClCompile Include="Src\Engine\Application.cpp">
       <Filter>Src\Engine</Filter>
     </ClCompile>
     <ClCompile Include="Src\Engine\Engine.cpp">
       <Filter>Src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\Subsystem.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\Context.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Graphics.cpp">
+      <Filter>Src\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\RHI.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Window.cpp">
+      <Filter>Src\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Input\Input.cpp">
+      <Filter>Src\Input</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -153,14 +168,23 @@
     <ClInclude Include="Src\Graphics\Renderer.h">
       <Filter>Src\Graphic</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\Graphics.h" />
-    <ClInclude Include="Src\Graphics\D3D11\RHI.h" />
-    <ClInclude Include="Src\Graphics\Window.h" />
     <ClInclude Include="Src\Engine\Application.h">
       <Filter>Src\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Src\Engine\Engine.h">
       <Filter>Src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\Graphics.h">
+      <Filter>Src\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\RHI.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\Window.h">
+      <Filter>Src\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Input\Input.h">
+      <Filter>Src\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -169,9 +193,6 @@
     </Filter>
     <Filter Include="Src\Core">
       <UniqueIdentifier>{be33f786-cde1-4e39-ae76-3e6528910d50}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Src\Events">
-      <UniqueIdentifier>{630117e1-83e3-4266-ac98-d50891a381ae}</UniqueIdentifier>
     </Filter>
     <Filter Include="Src\Resource">
       <UniqueIdentifier>{72064627-bc7f-436c-b2f0-d1e2c7a52f84}</UniqueIdentifier>
@@ -184,6 +205,9 @@
     </Filter>
     <Filter Include="Src\Graphic\D3D11">
       <UniqueIdentifier>{10d22c29-385d-4a6a-917a-fe23c8a16dd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input">
+      <UniqueIdentifier>{ae6ef24e-d596-4cb0-a778-5fc163a32be0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

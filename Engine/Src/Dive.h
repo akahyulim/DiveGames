@@ -20,7 +20,7 @@
 #include "Engine/Engine.h"
 #include "Engine/Application.h"
 
-//= Graphics =============================================
+//= Graphics ==============================================
 #include "Graphics/D3D11/VertexTypes.h"
 #include "Graphics/D3D11/VertexTypes.h"
 #include "Graphics/D3D11/IndexBuffer.h"
@@ -35,4 +35,7 @@
 #include "Graphics/Renderer.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Window.h"
+
+//= Input =================================================
+#include "Input/Input.h"
 

@@ -48,6 +48,14 @@ namespace Dive
 		const double lowestFrameMS = 1000.0 / LOWEST_FRAME;
 		const double GapFrameMS = m_deltaTimeMS > lowestFrameMS ? lowestFrameMS : m_deltaTimeMS;
 		m_smoothDeltaTimeMS = m_smoothDeltaTimeMS * (1.0 - DELTA_FEEDBACK) + GapFrameMS * DELTA_FEEDBACK;
+
+		// event test
+		static int num = 0;
+		if (num != 3)
+		{
+			SendEvent(0);
+			num++;
+		}
 	}
 
 	void Timer::SetTargetFps(double target)

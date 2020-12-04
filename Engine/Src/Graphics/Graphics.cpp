@@ -2,6 +2,7 @@
 #include "Graphics.h"
 #include "Window.h"
 #include "Core/Context.h"
+#include "Core/Log.h"
 
 
 namespace Dive
@@ -11,6 +12,8 @@ namespace Dive
 
 	{
 		m_window = std::make_shared<Window>();
+
+		SubscribeEvent(0, DIVE_HANDLER(Graphics, Update));
 	}
 
 	Graphics::~Graphics()
@@ -33,6 +36,11 @@ namespace Dive
 
 	void Graphics::EndFrame()
 	{
+	}
+
+	void Graphics::Update(size_t eventType)
+	{
+		CORE_TRACE("Graphics - Event Received!!!");
 	}
 
 	bool Graphics::IsInitialized()

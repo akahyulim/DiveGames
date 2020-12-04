@@ -16,6 +16,9 @@ namespace Dive
 		bool BeginFrame();
 		void EndFrame();
 
+		// test
+		void Update(size_t eventType);
+
 		bool IsInitialized();
 
 		// settings를 얻어와야 한다.

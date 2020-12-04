@@ -138,9 +138,12 @@
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\Renderer.h" />
     <ClInclude Include="Src\Graphics\Window.h" />
+    <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Core\Context.cpp" />
+    <ClCompile Include="Src\Core\Subsystem.cpp" />
     <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\BlendState.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\RasterizerState.cpp" />
@@ -166,6 +169,7 @@
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Graphics\Renderer.cpp" />
     <ClCompile Include="Src\Graphics\Window.cpp" />
+    <ClCompile Include="Src\Input\Input.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

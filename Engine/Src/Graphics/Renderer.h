@@ -19,7 +19,7 @@ namespace Dive
 		~Renderer();
 
 		bool Initialize();
-		void Update();
+		void Update(size_t eventType);
 
 		void Present();
 
