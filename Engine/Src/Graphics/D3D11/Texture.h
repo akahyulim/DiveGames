@@ -3,13 +3,13 @@
 
 namespace Dive
 {
-	class Context;
+	class Dive_Context;
 	class RenderDevice;
 
 	class Texture : public Resource
 	{
 	public:
-		Texture(Context* context);
+		Texture(Dive_Context* context);
 		virtual ~Texture();
 
 		ID3D11RenderTargetView* GetRenderTargetView()			const { return m_renderTargetView; }

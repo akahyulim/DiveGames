@@ -1,6 +1,7 @@
 #include "DivePch.h"
 #include "Context.h"
 #include "Subsystem.h"
+#include "Log.h"
 
 
 namespace Dive

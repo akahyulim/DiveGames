@@ -61,12 +61,6 @@
     <ClCompile Include="Src\Engine\Engine.cpp">
       <Filter>Src\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Subsystem.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\Context.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Graphics\Graphics.cpp">
       <Filter>Src\Graphic</Filter>
     </ClCompile>
@@ -78,6 +72,12 @@
     </ClCompile>
     <ClCompile Include="Src\Input\Input.cpp">
       <Filter>Src\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\Dive_Context.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\Dive_Object.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -119,12 +119,6 @@
     </ClInclude>
     <ClInclude Include="Src\Core\DiveDefs.h">
       <Filter>Src\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Subsystem.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Context.h">
-      <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\D3D11\BlendState.h">
       <Filter>Src\Graphic\D3D11</Filter>
@@ -185,6 +179,12 @@
     </ClInclude>
     <ClInclude Include="Src\Input\Input.h">
       <Filter>Src\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Dive_Context.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Dive_Object.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

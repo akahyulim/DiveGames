@@ -1,16 +1,18 @@
 #pragma once
-#include "Core/Subsystem.h"
+#include "Core/Dive_Object.h"
 
 namespace Dive
 {
-	class Context;
+	class DiveContext;
 
-	class Input : public Subsystem
+	class Input : public Dive_Object
 	{
-	public:
-		Input(Context* context);
+		NEW_DIVE_OBJECT(Input);
 
-		void Update(size_t eventType);
+	public:
+		Input(Dive_Context* context);
+
+		void OnUpdate(size_t eventType);
 
 	private:
 	};

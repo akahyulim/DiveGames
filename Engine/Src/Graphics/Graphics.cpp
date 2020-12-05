@@ -1,19 +1,19 @@
 #include "DivePch.h"
 #include "Graphics.h"
 #include "Window.h"
-#include "Core/Context.h"
+#include "Core/Dive_Context.h"
 #include "Core/Log.h"
 
 
 namespace Dive
 {
-	Graphics::Graphics(Context* context)
-		: Subsystem(context)
+	Graphics::Graphics(Dive_Context* context)
+		: Dive_Object(context)
 
 	{
 		m_window = std::make_shared<Window>();
 
-		SubscribeEvent(0, DIVE_HANDLER(Graphics, Update));
+		//SubscribeEvent(0, DIVE_HANDLER(Graphics, Update));
 	}
 
 	Graphics::~Graphics()

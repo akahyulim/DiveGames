@@ -1,16 +1,18 @@
 #pragma once
-#include "Core/Subsystem.h"
+#include "Core/Dive_Object.h"
 
 
 namespace Dive
 {
-	class Context;
+	class Dive_Context;
 	class Window;
 
-	class Graphics : public Subsystem
+	class Graphics : public Dive_Object
 	{
+		NEW_DIVE_OBJECT(Graphics);
+
 	public:
-		Graphics(Context* context);
+		Graphics(Dive_Context* context);
 		~Graphics();
 
 		bool BeginFrame();

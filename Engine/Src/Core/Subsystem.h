@@ -18,6 +18,9 @@ namespace Dive
 
 		void SendEvent(size_t eventType);
 
+		virtual size_t GetType()			const = 0;
+		virtual std::string GetTypeName()	const = 0;
+
 	protected:
 		virtual void onEvent(Subsystem* sender, size_t eventType);
 
@@ -80,6 +83,16 @@ namespace Dive
 		HandlerFunctionPtr m_function;
 	};
 }
+
+#define DIVE_OBJECT(typeName, baseTypeName)												\
+public:																					\
+virtual size_t GetType() const override { return typeid(typeName).hash_code();}			\
+virtual std::string GetTypeName() const override { return typeid(typeName).name();}		\
+static size_t GetStaticType() { return typeid(typeName).hash_code();}					\
+static std::string GetStaticTypeName() { return typeid(typeName).name();}				\
+// + base class의 typeinfo도 획득
+// 그런데 굳이 부모까지 확인할 필요가 있나? 찾아보니 동일 base에서 시작했는지 확인하는 용도인데...
+
 
 
 #define DIVE_HANDLER(className, function) (new Dive::EventHandlerImpl<className>(this, &className::function))

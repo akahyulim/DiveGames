@@ -6,6 +6,8 @@
 #include "Core/DiveDefs.h"
 #include "Core/Log.h"
 #include "Core/Stopwatch.h"
+#include "Core/Dive_Object.h"
+#include "Core/Dive_Context.h"
 #include "Core/Timer.h"
 #include "Core/Settings.h"
 #include "Core/StringHelper.h"
@@ -13,8 +15,6 @@
 #include "Core/IniHelper.h"
 #include "Core/Settings.h"
 #include "Core/Main.h"
-#include "Core/Subsystem.h"
-#include "Core/Context.h"
 
 //= Engine ================================================
 #include "Engine/Engine.h"

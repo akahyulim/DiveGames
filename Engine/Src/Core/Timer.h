@@ -1,19 +1,21 @@
 #pragma once
 #include "DiveDefs.h"
-#include "Subsystem.h"
+#include "Dive_Object.h"
 
 namespace Dive
 {
-	class Context;
+	class Dive_Context;
 
 	constexpr double LOWEST_FRAME	= 15;
 	constexpr double NO_LIMIT_FRAME = 300;
 	constexpr double DELTA_FEEDBACK = 0.2;
 
-	class Timer : public Subsystem
+	class Timer : public Dive_Object
 	{
+		NEW_DIVE_OBJECT(Timer);
+
 	public:
-		Timer(Context* context);
+		Timer(Dive_Context* context);
 		~Timer();
 
 		bool Initialize();

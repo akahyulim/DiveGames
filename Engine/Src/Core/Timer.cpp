@@ -1,12 +1,12 @@
 #include "DivePch.h"
 #include "Timer.h"
-#include "Context.h"
+#include  "Dive_Context.h"
 #include "Log.h"
 
 namespace Dive
 {
-	Timer::Timer(Context* context)
-		: Subsystem(context)
+	Timer::Timer(Dive_Context* context)
+		: Dive_Object(context)
 	{
 	}
 
@@ -49,12 +49,12 @@ namespace Dive
 		const double GapFrameMS = m_deltaTimeMS > lowestFrameMS ? lowestFrameMS : m_deltaTimeMS;
 		m_smoothDeltaTimeMS = m_smoothDeltaTimeMS * (1.0 - DELTA_FEEDBACK) + GapFrameMS * DELTA_FEEDBACK;
 
-		// event test
-		static int num = 0;
-		if (num != 3)
+		// test
+		static int count = 0;
+		if (count < 5)
 		{
 			SendEvent(0);
-			num++;
+			count++;
 		}
 	}
 

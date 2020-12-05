@@ -2,7 +2,7 @@
 #include "Engine/Engine.h"
 #include "Core/DiveDefs.h"
 #include "Core/Log.h"
-#include "Core/Context.h"
+#include "Core/Dive_Context.h"
 #include "Core/Timer.h"
 #include "Core/Settings.h"
 #include "Graphics/Graphics.h"
@@ -21,9 +21,9 @@ namespace Dive
 		: m_bInitialized(false),
 		m_bExiting(false)
 	{
-		m_context = std::make_shared<Context>();
-		m_context->RegisterSubsystem<Timer>();
-		m_context->RegisterSubsystem<Input>();
+		m_dive_context = new Dive_Context;
+		m_dive_context->RegisterSubsystem<Timer>();
+		m_dive_context->RegisterSubsystem<Input>();
 
 		Log::Initialize();
 
@@ -41,15 +41,15 @@ namespace Dive
 		if (m_bInitialized)
 			return true;
 
-		m_context->RegisterSubsystem<Graphics>();
-		m_context->RegisterSubsystem<Renderer>();
+		m_dive_context->RegisterSubsystem<Graphics>();
+		m_dive_context->RegisterSubsystem<Renderer>();
 
 		//= 이하 Subsystem 초기화 =========================================
-		auto timer = m_context->GetSubsystem<Timer>();
+		auto timer = m_dive_context->GetSubsystem<Timer>();
 		timer->Initialize();
 
 
-		auto graphics = m_context->GetSubsystem<Graphics>();
+		auto graphics = m_dive_context->GetSubsystem<Graphics>();
 		if (!graphics->SetScreenMode())
 			return false;
 
@@ -73,7 +73,7 @@ namespace Dive
 
 		// 이 부분에서 exiting이 되어야 한다.
 		// 지금 의심스러운 부분은 headless이다.
-		if (!m_context->GetSubsystem<Graphics>()->IsInitialized())
+		if (!m_dive_context->GetSubsystem<Graphics>()->IsInitialized())
 			m_bExiting = true;
 
 		if (m_bExiting)
@@ -88,15 +88,14 @@ namespace Dive
 	{
 		// Update, Post Update, Render, Post Render를 이벤트로 날린다.
 
-		// test
-		auto timer = m_context->GetSubsystem<Timer>();
+		auto timer = m_dive_context->GetSubsystem<Timer>();
 		timer->Update();
 	}
 
 	void Engine::Render()
 	{
 		// Begin Frame
-		auto graphics = m_context->GetSubsystem<Graphics>();
+		auto graphics = m_dive_context->GetSubsystem<Graphics>();
 		if (!graphics->BeginFrame())
 			return;
 

@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "Renderer.h"
 #include "Engine/Engine.h"
-#include "Core/Context.h"
+#include "Core/Dive_Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
 #include "D3D11/RenderDevice.h"
@@ -14,11 +14,11 @@
 
 namespace Dive
 {
-	Renderer::Renderer(Context* context)
-		: Subsystem(context),
+	Renderer::Renderer(Dive_Context* context)
+		: Dive_Object(context),
 		m_bInitialized(false)
 	{
-		SubscribeEvent(0, DIVE_HANDLER(Renderer, Update));
+		//SubscribeEvent(0, DIVE_HANDLER(Renderer, Update));
 	}
 
 	Renderer::~Renderer()

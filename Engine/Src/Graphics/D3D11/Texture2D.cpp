@@ -7,7 +7,7 @@
 
 namespace Dive
 {
-	Texture2D::Texture2D(Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, const std::vector<std::vector<std::byte>>& data)
+	Texture2D::Texture2D(Dive_Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, const std::vector<std::vector<std::byte>>& data)
 		: Texture(context)
 	{
 		m_type		= eResourceType::Texture2D;
@@ -24,7 +24,7 @@ namespace Dive
 		}
 	}
 
-	Texture2D::Texture2D(Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned int arraySize, unsigned int flags, std::string name)
+	Texture2D::Texture2D(Dive_Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned int arraySize, unsigned int flags, std::string name)
 		: Texture(context)
 	{
 		m_type		= eResourceType::Texture2D;
