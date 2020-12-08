@@ -5,12 +5,15 @@
 
 namespace Dive
 {
+	class Context;
 	class RenderDevice;
 
 	class ConstantBuffer : public Object
 	{
+		DIVE_OBJECT(ConstantBuffer, Object);
+
 	public:
-		ConstantBuffer(const std::shared_ptr<RenderDevice>& device);
+		ConstantBuffer(Context* context, const std::shared_ptr<RenderDevice>& device);
 		~ConstantBuffer();
 
 		template<typename T>

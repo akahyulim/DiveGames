@@ -1,5 +1,6 @@
 #include "DivePch.h"
 #include "RasterizerState.h"
+#include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
 #include "RenderDevice.h"
@@ -7,8 +8,9 @@
 namespace Dive
 {
 
-	RasterizerState::RasterizerState(const std::shared_ptr<RenderDevice>& device, D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode, BOOL depthClipEnable, BOOL scissorEnable,
+	RasterizerState::RasterizerState(Context* context, const std::shared_ptr<RenderDevice>& device, D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode, BOOL depthClipEnable, BOOL scissorEnable,
 		BOOL multiSampleEnable, BOOL antialiasedLineEnable)
+		: Object(context)
 	{
 		if (!device->IsInitialized())
 		{

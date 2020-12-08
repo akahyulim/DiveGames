@@ -1,13 +1,15 @@
 #include "DivePch.h"
 #include "DepthStencilState.h"
 #include "RenderDevice.h"
+#include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
 
 
 namespace Dive
 {
-	DepthStencilState::DepthStencilState(const std::shared_ptr<RenderDevice>& device, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc)
+	DepthStencilState::DepthStencilState(Context* context, const std::shared_ptr<RenderDevice>& device, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc)
+		: Object(context)
 	{
 		if (!device->IsInitialized())
 		{

@@ -5,12 +5,15 @@
 
 namespace Dive
 {
+	class Context;
 	class RenderDevice;
 
 	class RasterizerState : public Object
 	{
+		DIVE_OBJECT(RasterizerState, Object);
+
 	public:
-		RasterizerState(const std::shared_ptr<RenderDevice>& device, D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode, BOOL depthClipEnable, BOOL scissorEnable,
+		RasterizerState(Context* context, const std::shared_ptr<RenderDevice>& device, D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode, BOOL depthClipEnable, BOOL scissorEnable,
 			BOOL multiSampleEnable, BOOL antialiasedLineEnable);
 		~RasterizerState();
 

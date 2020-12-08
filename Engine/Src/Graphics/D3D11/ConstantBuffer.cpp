@@ -1,11 +1,13 @@
 #include "DivePch.h"
 #include "ConstantBuffer.h"
 #include "RenderDevice.h"
+#include "Core/Context.h"
 
 
 namespace Dive
 {
-	ConstantBuffer::ConstantBuffer(const std::shared_ptr<RenderDevice>& device)
+	ConstantBuffer::ConstantBuffer(Context* context, const std::shared_ptr<RenderDevice>& device)
+		: Object(context)
 	{
 		if (!device->IsInitialized())
 		{

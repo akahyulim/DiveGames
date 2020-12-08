@@ -1,25 +1,22 @@
 #pragma once
-#include "Core/Dive_Object.h"
+#include "Core/Object.h"
 
 
 namespace Dive
 {
-	class Dive_Context;
+	class Context;
 	class Window;
 
-	class Graphics : public Dive_Object
+	class Graphics : public Object
 	{
-		NEW_DIVE_OBJECT(Graphics);
+		DIVE_OBJECT(Graphics, Object);
 
 	public:
-		Graphics(Dive_Context* context);
+		Graphics(Context* context);
 		~Graphics();
 
 		bool BeginFrame();
 		void EndFrame();
-
-		// test
-		void Update(size_t eventType);
 
 		bool IsInitialized();
 
@@ -29,7 +26,14 @@ namespace Dive
 		std::shared_ptr<Window> GetWindow() const { return m_window; }
 
 	private:
+		bool createRHI();
+
 	private:
 		std::shared_ptr<Window> m_window;
+
+		ID3D11Device* m_device = nullptr;
+		ID3D11DeviceContext* m_immediateContext = nullptr;
+		IDXGISwapChain* m_swapChain = nullptr;
+		ID3D11RenderTargetView* m_renderTargetView = nullptr;
 	};
 }

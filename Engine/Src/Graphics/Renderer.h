@@ -1,9 +1,9 @@
 #pragma once
-#include "Core/Dive_Object.h"
+#include "Core/Object.h"
 
 namespace Dive
 {
-	class Dive_Context;
+	class Context;
 	class WindowResizeEvent;
 	class RenderDevice;
 	class DepthStencilState;
@@ -12,12 +12,12 @@ namespace Dive
 	class Texture2D;
 
 	// 굳이 객체들을 구분해 놓을 필요가 있나하는 생각이 든다.
-	class Renderer : public Dive_Object
+	class Renderer : public Object
 	{
-		NEW_DIVE_OBJECT(Renderer);
+		DIVE_OBJECT(Renderer, Object);
 
 	public:
-		Renderer(Dive_Context* context);
+		Renderer(Context* context);
 		~Renderer();
 
 		bool Initialize();

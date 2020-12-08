@@ -1,13 +1,15 @@
 #include "DivePch.h"
 #include "IndexBuffer.h"
 #include "RenderDevice.h"
+#include "Core/Context.h"
 #include "Core/DiveDefs.h"
 #include "Core/Log.h"
 
 
 namespace Dive
 {
-	IndexBuffer::IndexBuffer(const std::shared_ptr<RenderDevice>& device)
+	IndexBuffer::IndexBuffer(Context* context, const std::shared_ptr<RenderDevice>& device)
+		: Object(context)
 	{
 		if (!device->IsInitialized())
 		{

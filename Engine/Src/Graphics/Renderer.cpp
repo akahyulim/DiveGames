@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "Renderer.h"
 #include "Engine/Engine.h"
-#include "Core/Dive_Context.h"
+#include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
 #include "D3D11/RenderDevice.h"
@@ -14,8 +14,8 @@
 
 namespace Dive
 {
-	Renderer::Renderer(Dive_Context* context)
-		: Dive_Object(context),
+	Renderer::Renderer(Context* context)
+		: Object(context),
 		m_bInitialized(false)
 	{
 		//SubscribeEvent(0, DIVE_HANDLER(Renderer, Update));
@@ -54,8 +54,8 @@ namespace Dive
 
 		// Create DepthStechilStates
 		{
-			m_depthStencilStateEnabled	= std::make_shared<DepthStencilState>(m_renderDevice, TRUE, D3D11_COMPARISON_LESS);
-			m_depthStencilStateDisabled = std::make_shared<DepthStencilState>(m_renderDevice, FALSE, D3D11_COMPARISON_LESS);
+			m_depthStencilStateEnabled	= std::make_shared<DepthStencilState>(m_context, m_renderDevice, TRUE, D3D11_COMPARISON_LESS);
+			m_depthStencilStateDisabled = std::make_shared<DepthStencilState>(m_context, m_renderDevice, FALSE, D3D11_COMPARISON_LESS);
 
 			if (!m_depthStencilStateEnabled->IsInitialized() || !m_depthStencilStateDisabled->IsInitialized())
 				return false;
@@ -63,12 +63,12 @@ namespace Dive
 
 		// Create RasterizerStates
 		{
-			m_rasterizerStateCullNoneSolid		= std::make_shared<RasterizerState>(m_renderDevice, D3D11_CULL_NONE, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
-			m_rasterizerStateCullBackSolid		= std::make_shared<RasterizerState>(m_renderDevice, D3D11_CULL_BACK, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
-			m_rasterizerStateCullFrontSolid		= std::make_shared<RasterizerState>(m_renderDevice, D3D11_CULL_FRONT, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
-			m_rasterizerStateCullNoneWireFrame	= std::make_shared<RasterizerState>(m_renderDevice, D3D11_CULL_NONE, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
-			m_rasterizerStateCullBackWireFrame	= std::make_shared<RasterizerState>(m_renderDevice, D3D11_CULL_BACK, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
-			m_rasterizerStateCullFrontWireFrame = std::make_shared<RasterizerState>(m_renderDevice, D3D11_CULL_FRONT, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
+			m_rasterizerStateCullNoneSolid		= std::make_shared<RasterizerState>(m_context, m_renderDevice, D3D11_CULL_NONE, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
+			m_rasterizerStateCullBackSolid		= std::make_shared<RasterizerState>(m_context, m_renderDevice, D3D11_CULL_BACK, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
+			m_rasterizerStateCullFrontSolid		= std::make_shared<RasterizerState>(m_context, m_renderDevice, D3D11_CULL_FRONT, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
+			m_rasterizerStateCullNoneWireFrame	= std::make_shared<RasterizerState>(m_context, m_renderDevice, D3D11_CULL_NONE, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
+			m_rasterizerStateCullBackWireFrame	= std::make_shared<RasterizerState>(m_context, m_renderDevice, D3D11_CULL_BACK, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
+			m_rasterizerStateCullFrontWireFrame = std::make_shared<RasterizerState>(m_context, m_renderDevice, D3D11_CULL_FRONT, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
 			
 			if (!m_rasterizerStateCullNoneSolid->IsInitialized() || !m_rasterizerStateCullBackSolid->IsInitialized() || !m_rasterizerStateCullFrontSolid->IsInitialized()
 				|| !m_rasterizerStateCullNoneWireFrame->IsInitialized() || !m_rasterizerStateCullBackWireFrame->IsInitialized() || !m_rasterizerStateCullFrontWireFrame->IsInitialized())
@@ -77,9 +77,9 @@ namespace Dive
 
 		// Create Blend States
 		{
-			m_blendStateEnable		= std::make_shared<BlendState>(m_renderDevice, TRUE);
-			m_blendStateDisable		= std::make_shared<BlendState>(m_renderDevice);
-			m_blendStateColorAdd	= std::make_shared<BlendState>(m_renderDevice, TRUE, D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD);
+			m_blendStateEnable		= std::make_shared<BlendState>(m_context, m_renderDevice, TRUE);
+			m_blendStateDisable		= std::make_shared<BlendState>(m_context, m_renderDevice);
+			m_blendStateColorAdd	= std::make_shared<BlendState>(m_context, m_renderDevice, TRUE, D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD);
 
 			if (!m_blendStateEnable->IsInitialized() || !m_blendStateDisable->IsInitialized() || !m_blendStateColorAdd->IsInitialized())
 				return false;

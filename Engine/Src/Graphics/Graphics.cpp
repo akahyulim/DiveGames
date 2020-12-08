@@ -1,19 +1,17 @@
 #include "DivePch.h"
 #include "Graphics.h"
 #include "Window.h"
-#include "Core/Dive_Context.h"
+#include "Core/Context.h"
 #include "Core/Log.h"
 
 
 namespace Dive
 {
-	Graphics::Graphics(Dive_Context* context)
-		: Dive_Object(context)
+	Graphics::Graphics(Context* context)
+		: Object(context)
 
 	{
 		m_window = std::make_shared<Window>();
-
-		//SubscribeEvent(0, DIVE_HANDLER(Graphics, Update));
 	}
 
 	Graphics::~Graphics()
@@ -31,24 +29,38 @@ namespace Dive
 		if (!m_window->Run())
 			return false;
 
+		// render target clear
+		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
+		m_immediateContext->OMSetRenderTargets(1, &m_renderTargetView, nullptr);
+		m_immediateContext->ClearRenderTargetView(m_renderTargetView, (float*)&clear_color);
+
 		return true;
 	}
 
 	void Graphics::EndFrame()
 	{
-	}
+		if (!m_swapChain)
+		{
+			CORE_ERROR("");
+			return;
+		}
 
-	void Graphics::Update(size_t eventType)
-	{
-		CORE_TRACE("Graphics - Event Received!!!");
+		UINT syncInterval = 0;
+		//if (m_bVSync)
+			syncInterval = 1;
+		if (FAILED(m_swapChain->Present(syncInterval, 0)))
+		{
+			CORE_ERROR("");
+			return;
+		}
 	}
 
 	bool Graphics::IsInitialized()
 	{
-		// device 존재 확인도 필요
-		return m_window != nullptr;
+		return ( m_window != nullptr && m_device != nullptr);
 	}
 
+	// Engine::Initialize -> Graphics::SetMode -> SetDefaultWindowModes -> SetWindowMode -> SetScreenMode(Window 생성, RHI 생성)
 	bool Graphics::SetScreenMode()
 	{
 		// 윈도우 생성
@@ -56,9 +68,8 @@ namespace Dive
 			return false;
 		m_window->Show();
 
-		// swap chain?
-
-		// rhi device
+		if (!createRHI())
+			return false;
 
 		return true;
 	}

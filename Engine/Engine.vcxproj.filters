@@ -64,20 +64,20 @@
     <ClCompile Include="Src\Graphics\Graphics.cpp">
       <Filter>Src\Graphic</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\D3D11\RHI.cpp">
-      <Filter>Src\Graphic\D3D11</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Graphics\Window.cpp">
       <Filter>Src\Graphic</Filter>
     </ClCompile>
     <ClCompile Include="Src\Input\Input.cpp">
       <Filter>Src\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Dive_Context.cpp">
+    <ClCompile Include="Src\Core\Context.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Dive_Object.cpp">
+    <ClCompile Include="Src\Core\Object.cpp">
       <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Graphics_RHI.cpp">
+      <Filter>Src\Graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -88,9 +88,6 @@
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Log.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Object.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Settings.h">
@@ -171,19 +168,22 @@
     <ClInclude Include="Src\Graphics\Graphics.h">
       <Filter>Src\Graphic</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\D3D11\RHI.h">
-      <Filter>Src\Graphic\D3D11</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Graphics\Window.h">
       <Filter>Src\Graphic</Filter>
     </ClInclude>
     <ClInclude Include="Src\Input\Input.h">
       <Filter>Src\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\Dive_Context.h">
+    <ClInclude Include="Src\Core\EventSystem.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\Dive_Object.h">
+    <ClInclude Include="Src\Core\CoreEvents.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Context.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Object.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>

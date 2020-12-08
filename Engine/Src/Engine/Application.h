@@ -23,8 +23,6 @@ namespace Dive
 }
 
 
-// urho의 경우 context를 생성한 후 app을 생성했다. 
-// 사실 모든 class가 object를 상속하고 생성자에서 context를 전달받는다.
 // main function macro
 #define DIVE_APPLICATION_MAIN(className)		\
 int RunApplication()							\

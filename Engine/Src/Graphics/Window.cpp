@@ -1,31 +1,26 @@
 #include "DivePch.h"
 #include "Window.h"
-#include "Engine/Engine.h"
 
 
 namespace Dive
 {
-	extern Engine* g_engine;
-
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-
-		if (msg == WM_SIZE || msg == WM_DISPLAYCHANGE)
+		switch (msg)
 		{
-
-		}
-		else if (msg == WM_CLOSE)
+		case WM_CLOSE:
 		{
 			PostQuitMessage(0);
-			// 여기에서 메시지를 날려줘야 한다.
-			g_engine->DoExit();
 			return 0;
 		}
 
-		return DefWindowProc(hWnd, msg, wParam, lParam);
+		default:
+			return DefWindowProc(hWnd, msg, wParam, lParam);
+		}
 	}
 
 	Window::Window()
+		: m_bFullScreen(false)
 	{
 		m_title = L"no name";
 	}
@@ -33,8 +28,8 @@ namespace Dive
 	bool Dive::Window::Create(int width, int height)
 	{
 		m_hInstance = static_cast<HINSTANCE>(::GetModuleHandle(NULL));
-		m_width = width;
-		m_height = height;
+		m_width		= width;
+		m_height	= height;
 
 		std::wstring className{ L"WndClass" };
 
@@ -100,5 +95,21 @@ namespace Dive
 		ShowWindow(m_hWnd, SW_SHOW);
 		UpdateWindow(m_hWnd);
 		SetFocus(m_hWnd);
+	}
+
+	int Window::GetClientRectWidth()
+	{
+		RECT rt;
+		GetClientRect(m_hWnd, &rt);
+
+		return rt.right - rt.left;
+	}
+	
+	int Window::GetClientRectHeight()
+	{
+		RECT rt;
+		GetClientRect(m_hWnd, &rt);
+
+		return rt.bottom - rt.top;
 	}
 }

@@ -19,6 +19,11 @@ namespace Dive
 		// option
 		// set icon
 		// set title
+		HWND GetHandle() const { return m_hWnd; }
+		bool IsFullScreen() const { return m_bFullScreen; }
+		int GetClientRectWidth();
+		int GetClientRectHeight();
+
 
 	private:
 	private:

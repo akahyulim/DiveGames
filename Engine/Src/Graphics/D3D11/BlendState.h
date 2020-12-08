@@ -4,12 +4,16 @@
 
 namespace Dive
 {
+	class Context;
 	class RenderDevice;
 
-	class BlendState
+	class BlendState : public Object
 	{
+		DIVE_OBJECT(BlendState, Object);
+
 	public:
-		BlendState(const std::shared_ptr<RenderDevice>& device,
+		BlendState(Context* context,
+			const std::shared_ptr<RenderDevice>& device,
 			BOOL enable					= FALSE,
 			D3D11_BLEND source			= D3D11_BLEND_SRC_ALPHA,
 			D3D11_BLEND dest			= D3D11_BLEND_INV_SRC_ALPHA,

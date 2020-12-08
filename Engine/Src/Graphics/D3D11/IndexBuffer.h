@@ -3,11 +3,15 @@
 
 namespace Dive
 {
+	class Context;
 	class RenderDevice;
 
 	class IndexBuffer : public Object
 	{
-		IndexBuffer(const std::shared_ptr<RenderDevice>& device);
+		DIVE_OBJECT(IndexBuffer, Object);
+		
+	public:
+		IndexBuffer(Context* context, const std::shared_ptr<RenderDevice>& device);
 		~IndexBuffer();
 
 		bool Create(const std::vector<unsigned int>& indices);

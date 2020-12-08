@@ -4,6 +4,8 @@
 
 namespace Dive
 {
+	class Context;
+
 	enum class eResourceType
 	{
 		UnKnown,
@@ -19,8 +21,10 @@ namespace Dive
 
 	class Resource : public Object
 	{
+		DIVE_OBJECT(Resource, Object);
+
 	public:
-		Resource(eResourceType type) : m_type(type) {}
+		Resource(Context* context, eResourceType type) : Object(context), m_type(type) {}
 		virtual ~Resource() = default;
 
 		virtual bool SaveToFile(const std::string& path)	{ return true; }

@@ -1,18 +1,20 @@
 #pragma once
-#include "Core/Dive_Object.h"
+#include "Core/Object.h"
+#include "Core/CoreEvents.h"
 
 namespace Dive
 {
 	class DiveContext;
 
-	class Input : public Dive_Object
+	class Input : public Object
 	{
-		NEW_DIVE_OBJECT(Input);
+		DIVE_OBJECT(Input, Object);
 
 	public:
-		Input(Dive_Context* context);
+		Input(Context* context);
+		~Input();
 
-		void OnUpdate(size_t eventType);
+		void OnUpdate(const E_UPDATE* evnt);
 
 	private:
 	};

@@ -1,13 +1,15 @@
 #include "DivePch.h"
 #include "VertexBuffer.h"
 #include "RenderDevice.h"
+#include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
 
 
 namespace Dive
 {
-	VertexBuffer::VertexBuffer(const std::shared_ptr<RenderDevice>& device)
+	VertexBuffer::VertexBuffer(Context* context, const std::shared_ptr<RenderDevice>& device)
+		: Object(context)
 	{
 		if (!device->IsInitialized())
 		{

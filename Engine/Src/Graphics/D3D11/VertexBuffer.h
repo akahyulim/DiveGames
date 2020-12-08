@@ -3,12 +3,15 @@
 
 namespace Dive
 {
+	class Context;
 	class RenderDevice;
 
 	class VertexBuffer : public Object
 	{
+		DIVE_OBJECT(VertexBuffer, Object);
+
 	public:
-		VertexBuffer(const std::shared_ptr<RenderDevice>& device);
+		VertexBuffer(Context* context, const std::shared_ptr<RenderDevice>& device);
 		~VertexBuffer();
 
 		template<class T>

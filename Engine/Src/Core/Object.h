@@ -1,30 +1,39 @@
 #pragma once
 
+
 namespace Dive
 {
-	static unsigned int g_InstanceID = 0;
+	class Context;
 
 	class Object
 	{
 	public:
-		Object()
+		Object(Context* context);
+		virtual ~Object() = default;
+
+		virtual size_t GetTypeHash()			const = 0;
+		virtual std::string GetTypeName()		const = 0;
+		virtual size_t GetBaseTypeHash()		const = 0;
+		virtual std::string GetBaseTypeName()	const = 0;
+
+		template<class T>
+		T* GetSubsystem()
 		{
-			m_id = GenerateID();
+			if (!m_context)
+				return nullptr;
+
+			return static_cast<T*>(m_context->GetSubsystem<T>());
 		}
-		virtual ~Object() {}
-
-		unsigned int GetID() const { return m_id; }
-
-		static unsigned int GenerateID() { return ++g_InstanceID; }
-
-		// 실제 적용을 위해선 pure함수여야 한다.
-		// 일단  subsystem에 적용
-		//virtual size_t GetType() const {}
-		//virtual std::string GetTyepName() const {}
 
 	protected:
-		// Orho3D에선 개별 object에 id가 존재하지 않는다.
-		// 대신 Scene이 Component들에게 특정 범위의 ID를 할당해주는듯 하다.
-		unsigned int m_id = 0;
+		Context* m_context;
 	};
 }
+
+#define DIVE_OBJECT(typeName, baseTypeName)														\
+public:																							\
+virtual size_t GetTypeHash() const override { return typeid(typeName).hash_code(); }			\
+virtual std::string GetTypeName() const override { return typeid(typeName).name(); }			\
+virtual size_t GetBaseTypeHash() const override { return typeid(baseTypeName).hash_code(); }	\
+virtual std::string GetBaseTypeName() const override { return typeid(baseTypeName).name(); }
+// static을 추가하면 타입으로도 위의 값들을 확인할 수 있다.

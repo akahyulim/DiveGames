@@ -4,12 +4,15 @@
 
 namespace Dive
 {
+	class Context;
 	class RenderDevice;
 
 	class DepthStencilState : public Object
 	{
+		DIVE_OBJECT(DepthStencilState, Object);
+
 	public:
-		DepthStencilState(const std::shared_ptr<RenderDevice>& device, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc);
+		DepthStencilState(Context* context, const std::shared_ptr<RenderDevice>& device, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc);
 		~DepthStencilState();
 
 		bool IsInitialized()				const { return m_bInitialized; }
