@@ -105,8 +105,10 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Core\Dive_Context.h" />
+    <ClInclude Include="Src\Core\CoreEvents.h" />
+    <ClInclude Include="Src\Core\Context.h" />
     <ClInclude Include="Src\Core\Dive_Object.h" />
+    <ClInclude Include="Src\Core\EventSystem.h" />
     <ClInclude Include="Src\Engine\Application.h" />
     <ClInclude Include="Src\Core\Main.h" />
     <ClInclude Include="Src\Graphics\D3D11\BlendState.h" />
@@ -142,7 +144,7 @@
     <ClInclude Include="Src\Resource\Resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Core\Dive_Context.cpp" />
+    <ClCompile Include="Src\Core\Context.cpp" />
     <ClCompile Include="Src\Core\Dive_Object.cpp" />
     <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\BlendState.cpp" />

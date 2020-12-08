@@ -4,7 +4,7 @@
 
 namespace Dive
 {
-	class Dive_Context;
+	class Context;
 	class Window;
 
 	class Graphics : public Dive_Object
@@ -12,7 +12,7 @@ namespace Dive
 		NEW_DIVE_OBJECT(Graphics);
 
 	public:
-		Graphics(Dive_Context* context);
+		Graphics(Context* context);
 		~Graphics();
 
 		bool BeginFrame();

@@ -4,7 +4,7 @@
 
 namespace Dive
 {
-	class Dive_Context;
+	class Context;
 
 	constexpr double LOWEST_FRAME	= 15;
 	constexpr double NO_LIMIT_FRAME = 300;
@@ -15,7 +15,7 @@ namespace Dive
 		NEW_DIVE_OBJECT(Timer);
 
 	public:
-		Timer(Dive_Context* context);
+		Timer(Context* context);
 		~Timer();
 
 		bool Initialize();

@@ -2,9 +2,10 @@
 #include "Engine/Engine.h"
 #include "Core/DiveDefs.h"
 #include "Core/Log.h"
-#include "Core/Dive_Context.h"
+#include "Core/Context.h"
 #include "Core/Timer.h"
 #include "Core/Settings.h"
+#include "Core/EventSystem.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Renderer.h"
 #include "Input/Input.h"
@@ -12,16 +13,15 @@
 
 namespace Dive
 {
-	// temp
+	// temp: Window의 종료 메시지 전달을 위해 임시로 구현
+	// 이벤트로 변경해야 한다.
 	Engine* g_engine = nullptr;
 
-	// event를 보내거나 받으려면 Subsystem을 상속해야 한다.
-	// 아니면 object로 전부 옮기고, 모든 class가 이를 상속토록 변경해야 한다.
 	Engine::Engine()
 		: m_bInitialized(false),
 		m_bExiting(false)
 	{
-		m_dive_context = new Dive_Context;
+		m_dive_context = new Context;
 		m_dive_context->RegisterSubsystem<Timer>();
 		m_dive_context->RegisterSubsystem<Input>();
 
@@ -35,7 +35,7 @@ namespace Dive
 		CORE_TRACE("Call Engine's Destructor ========================");
 	}
 	
-	// setting data를 가져와 subsystem들을 초기화한다.
+	// 설정데이터를 받아야 한다.
 	bool Engine::Initialize()
 	{
 		if (m_bInitialized)
@@ -45,6 +45,7 @@ namespace Dive
 		m_dive_context->RegisterSubsystem<Renderer>();
 
 		//= 이하 Subsystem 초기화 =========================================
+		// 초기화는 단순 Initialize호출부터 각 객체에 맞춰 복잡화될 수 있다.
 		auto timer = m_dive_context->GetSubsystem<Timer>();
 		timer->Initialize();
 

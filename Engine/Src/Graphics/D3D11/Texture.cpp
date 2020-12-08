@@ -3,12 +3,12 @@
 #include "RenderDevice.h"
 #include "Graphics/Renderer.h"
 #include "Core/Log.h"
-#include "Core/Dive_Context.h"
+#include "Core/Context.h"
 
 
 namespace Dive
 {
-	Texture::Texture(Dive_Context* context)
+	Texture::Texture(Context* context)
 		: Resource(eResourceType::Texture)
 	{
 		m_renderDevice = context->GetSubsystem<Renderer>()->GetRenderDevice();

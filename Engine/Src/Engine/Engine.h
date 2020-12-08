@@ -3,7 +3,7 @@
 
 namespace Dive
 {
-	class Dive_Context;
+	class Context;
 
 	struct WindowData
 	{
@@ -33,14 +33,14 @@ namespace Dive
 		bool IsInitialized()	const { return m_bInitialized; }
 		bool IsExiting()		const { return m_bExiting; }
 		
-		const Dive_Context* GetContext() const { return m_dive_context; }
+		const Context* GetContext() const { return m_dive_context; }
 
 		// 결국 이것 때문에 SystemManager가 this pointer를 가지게 된다.
 		const WindowData& GetWindowData()			const { return m_windowData; }
 
 	private:
 		WindowData m_windowData;
-		Dive_Context* m_dive_context;
+		Context* m_dive_context;
 
 		bool m_bInitialized;
 		bool m_bExiting;

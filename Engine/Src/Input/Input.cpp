@@ -1,20 +1,25 @@
 #include "DivePch.h"
 #include "Input.h"
-#include "Core/Dive_Context.h"
+#include "Core/Context.h"
 #include "Core/Log.h"
+#include "Core/EventSystem.h"
 
 
 namespace Dive
 {
-	Input::Input(Dive_Context* context)
+	Input::Input(Context* context)
 		: Dive_Object(context)
 	{
-		SubscribeEvent(0, DIVE_HANDLER(Input, OnUpdate));
+		EventDispatcher::GetInstance().SubscribeEvent(this, &Input::OnUpdate);
 	}
 
-	// 사실 이벤트는 eventType과 variantMap을 무조건 받아야 한다.
-	void Input::OnUpdate(size_t eventType)
+	Input::~Input()
 	{
-		CORE_TRACE("Input - Received Event!!!");
+		EventDispatcher::GetInstance().UnsubscibeEvent<Input, E_UPDATE>(this);
+	}
+
+	void Input::OnUpdate(const E_UPDATE* evnt)
+	{
+		CORE_TRACE("Input' deltaTime: {:f} MS", evnt->GetDeltaTime());
 	}
 }

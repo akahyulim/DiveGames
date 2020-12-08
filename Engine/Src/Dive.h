@@ -7,7 +7,7 @@
 #include "Core/Log.h"
 #include "Core/Stopwatch.h"
 #include "Core/Dive_Object.h"
-#include "Core/Dive_Context.h"
+#include "Core/Context.h"
 #include "Core/Timer.h"
 #include "Core/Settings.h"
 #include "Core/StringHelper.h"
@@ -15,10 +15,14 @@
 #include "Core/IniHelper.h"
 #include "Core/Settings.h"
 #include "Core/Main.h"
+#include "Core/EventSystem.h"
+#include "Core/CoreEvents.h"
+
 
 //= Engine ================================================
 #include "Engine/Engine.h"
 #include "Engine/Application.h"
+
 
 //= Graphics ==============================================
 #include "Graphics/D3D11/VertexTypes.h"

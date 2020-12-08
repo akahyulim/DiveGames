@@ -3,7 +3,7 @@
 
 namespace Dive
 {
-	class Dive_Context;
+	class Context;
 	class WindowResizeEvent;
 	class RenderDevice;
 	class DepthStencilState;
@@ -17,7 +17,7 @@ namespace Dive
 		NEW_DIVE_OBJECT(Renderer);
 
 	public:
-		Renderer(Dive_Context* context);
+		Renderer(Context* context);
 		~Renderer();
 
 		bool Initialize();

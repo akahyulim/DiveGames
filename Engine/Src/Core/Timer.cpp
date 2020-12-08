@@ -1,11 +1,13 @@
 #include "DivePch.h"
 #include "Timer.h"
-#include  "Dive_Context.h"
+#include "Context.h"
+#include "EventSystem.h"
+#include "CoreEvents.h"
 #include "Log.h"
 
 namespace Dive
 {
-	Timer::Timer(Dive_Context* context)
+	Timer::Timer(Context* context)
 		: Dive_Object(context)
 	{
 	}
@@ -53,7 +55,9 @@ namespace Dive
 		static int count = 0;
 		if (count < 5)
 		{
-			SendEvent(0);
+			E_UPDATE evnt(static_cast<float>(m_deltaTimeMS));
+			EventDispatcher::GetInstance().Fire(&evnt);
+
 			count++;
 		}
 	}

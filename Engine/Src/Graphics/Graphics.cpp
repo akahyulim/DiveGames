@@ -1,13 +1,13 @@
 #include "DivePch.h"
 #include "Graphics.h"
 #include "Window.h"
-#include "Core/Dive_Context.h"
+#include "Core/Context.h"
 #include "Core/Log.h"
 
 
 namespace Dive
 {
-	Graphics::Graphics(Dive_Context* context)
+	Graphics::Graphics(Context* context)
 		: Dive_Object(context)
 
 	{

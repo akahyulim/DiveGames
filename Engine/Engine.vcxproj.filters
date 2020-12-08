@@ -73,10 +73,10 @@
     <ClCompile Include="Src\Input\Input.cpp">
       <Filter>Src\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Dive_Context.cpp">
+    <ClCompile Include="Src\Core\Dive_Object.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Dive_Object.cpp">
+    <ClCompile Include="Src\Core\Context.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>
@@ -180,10 +180,16 @@
     <ClInclude Include="Src\Input\Input.h">
       <Filter>Src\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\Dive_Context.h">
+    <ClInclude Include="Src\Core\Dive_Object.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\Dive_Object.h">
+    <ClInclude Include="Src\Core\EventSystem.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\CoreEvents.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Context.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>
