@@ -1,6 +1,8 @@
 #pragma once
 #include "RenderDeviceEnums.h"
 
+// 삭제 대상이다.
+// 각종 d3d 리소스에서 사용중이니 Graphics로 변경하자.
 namespace Dive
 {
 	class RenderDevice
