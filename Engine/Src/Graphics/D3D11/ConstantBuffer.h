@@ -6,20 +6,21 @@
 namespace Dive
 {
 	class Context;
-	class RenderDevice;
+	class Graphics;
 
 	class ConstantBuffer : public Object
 	{
 		DIVE_OBJECT(ConstantBuffer, Object);
 
 	public:
-		ConstantBuffer(Context* context, const std::shared_ptr<RenderDevice>& device);
+		ConstantBuffer(Context* context);
 		~ConstantBuffer();
 
 		template<typename T>
 		bool Create()
 		{
-			if (!m_renderDevice || !m_renderDevice->GetD3dDevice())
+			auto graphics = GetSubsystem<Graphics>();
+			if (!graphics || !graphics->IsInitialized())
 			{
 				CORE_ERROR("");
 				return;
@@ -36,7 +37,7 @@ namespace Dive
 			desc.StructureByteStride	= 0;
 			desc.Usage					= D3D11_USAGE_DYNAMIC;
 
-			if (FAILED(m_renderDevice->GetD3dDevice()->CreateBuffer(&desc, nullptr, &m_buffer)))
+			if (FAILED(graphics->GetRHIDevice()->CreateBuffer(&desc, nullptr, &m_buffer)))
 			{
 				CORE_ERROR("");
 				return false;
@@ -51,7 +52,6 @@ namespace Dive
 		ID3D11Buffer* GetBuffer() { return m_buffer; }
 
 	private:
-		std::shared_ptr<RenderDevice> m_renderDevice;
 		ID3D11Buffer* m_buffer = nullptr;
 	};
 }

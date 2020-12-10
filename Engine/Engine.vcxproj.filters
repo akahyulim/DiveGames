@@ -40,9 +40,6 @@
     <ClCompile Include="Src\Graphics\D3D11\RasterizerState.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\D3D11\RenderDevice.cpp">
-      <Filter>Src\Graphic\D3D11</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Graphics\D3D11\Texture.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClCompile>
@@ -75,9 +72,6 @@
     </ClCompile>
     <ClCompile Include="Src\Core\Object.cpp">
       <Filter>Src\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Graphics\Graphics_RHI.cpp">
-      <Filter>Src\Graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -130,9 +124,6 @@
       <Filter>Src\Graphic\D3D11</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\D3D11\RasterizerState.h">
-      <Filter>Src\Graphic\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Graphics\D3D11\RenderDevice.h">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\D3D11\RenderDeviceEnums.h">

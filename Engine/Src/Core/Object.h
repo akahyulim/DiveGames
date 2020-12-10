@@ -16,13 +16,12 @@ namespace Dive
 		virtual size_t GetBaseTypeHash()		const = 0;
 		virtual std::string GetBaseTypeName()	const = 0;
 
-		template<class T>
-		T* GetSubsystem()
+		template<class T> std::shared_ptr<T> GetSubsystem()
 		{
 			if (!m_context)
 				return nullptr;
 
-			return static_cast<T*>(m_context->GetSubsystem<T>());
+			return m_context->GetSubsystem<T>();
 		}
 
 	protected:

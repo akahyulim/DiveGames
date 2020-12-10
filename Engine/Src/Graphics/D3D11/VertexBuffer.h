@@ -4,14 +4,13 @@
 namespace Dive
 {
 	class Context;
-	class RenderDevice;
 
 	class VertexBuffer : public Object
 	{
 		DIVE_OBJECT(VertexBuffer, Object);
 
 	public:
-		VertexBuffer(Context* context, const std::shared_ptr<RenderDevice>& device);
+		VertexBuffer(Context* context);
 		~VertexBuffer();
 
 		template<class T>
@@ -55,7 +54,6 @@ namespace Dive
 		bool createBuffer(const void* vertices);
 
 	private:
-		std::shared_ptr<RenderDevice> m_renderDevice;
 		ID3D11Buffer* m_buffer = nullptr;
 
 		bool m_bDynamic = false;

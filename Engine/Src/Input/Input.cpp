@@ -16,6 +16,8 @@ namespace Dive
 	Input::~Input()
 	{
 		DIVE_UNSUBSCRIBE_FROM_EVENT(Input, E_UPDATE, this);
+
+		CORE_TRACE("Call Input's Destructor =========================");
 	}
 
 	void Input::OnUpdate(const E_UPDATE* evnt)

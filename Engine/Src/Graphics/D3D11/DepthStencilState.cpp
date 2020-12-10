@@ -1,6 +1,6 @@
 #include "DivePch.h"
 #include "DepthStencilState.h"
-#include "RenderDevice.h"
+#include "Graphics/Graphics.h"
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
@@ -8,10 +8,11 @@
 
 namespace Dive
 {
-	DepthStencilState::DepthStencilState(Context* context, const std::shared_ptr<RenderDevice>& device, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc)
+	DepthStencilState::DepthStencilState(Context* context, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc)
 		: Object(context)
 	{
-		if (!device->IsInitialized())
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized())
 		{
 			CORE_ERROR("");
 			return;
@@ -31,7 +32,7 @@ namespace Dive
 		desc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ALL;
 		desc.DepthEnable					= enable;
 
-		if (FAILED(device->GetD3dDevice()->CreateDepthStencilState(&desc, &m_state)))
+		if (FAILED(graphics->GetRHIDevice()->CreateDepthStencilState(&desc, &m_state)))
 		{
 			CORE_ERROR("");
 			return;

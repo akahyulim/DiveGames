@@ -38,13 +38,12 @@ namespace Dive
 		// 결국 이것 때문에 SystemManager가 this pointer를 가지게 된다.
 		const WindowData& GetWindowData()			const { return m_windowData; }
 
-		template<class T>
-		T* GetSubsystem()
+		template<class T> std::shared_ptr<T> GetSubsystem()
 		{
 			if (!m_context)
 				return nullptr;
 
-			return static_cast<T*>(m_context->GetSubsystem<T>());
+			return m_context->GetSubsystem<T>();
 		}
 
 	private:

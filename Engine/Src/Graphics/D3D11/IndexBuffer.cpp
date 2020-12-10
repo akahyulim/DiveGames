@@ -1,6 +1,6 @@
 #include "DivePch.h"
 #include "IndexBuffer.h"
-#include "RenderDevice.h"
+#include "Graphics/Graphics.h"
 #include "Core/Context.h"
 #include "Core/DiveDefs.h"
 #include "Core/Log.h"
@@ -8,16 +8,9 @@
 
 namespace Dive
 {
-	IndexBuffer::IndexBuffer(Context* context, const std::shared_ptr<RenderDevice>& device)
+	IndexBuffer::IndexBuffer(Context* context)
 		: Object(context)
 	{
-		if (!device->IsInitialized())
-		{
-			CORE_ERROR("");
-			return;
-		}
-
-		m_renderDevice = device;
 	}
 
 	IndexBuffer::~IndexBuffer()
@@ -27,7 +20,8 @@ namespace Dive
 
 	bool IndexBuffer::Create(const std::vector<unsigned int>& indices)
 	{
-		if (indices.empty())
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized() || indices.empty())
 		{
 			CORE_ERROR("");
 			return false;
@@ -51,7 +45,7 @@ namespace Dive
 		data.SysMemPitch		= 0;
 		data.SysMemSlicePitch	= 0;
 
-		if (FAILED(m_renderDevice->GetD3dDevice()->CreateBuffer(&desc, &data, &m_buffer)))
+		if (FAILED(graphics->GetRHIDevice()->CreateBuffer(&desc, &data, &m_buffer)))
 		{
 			CORE_ERROR("");
 			return false;
@@ -62,6 +56,13 @@ namespace Dive
 
 	bool IndexBuffer::CreateDynamic(unsigned int size)
 	{
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized())
+		{
+			CORE_ERROR("");
+			return false;
+		}
+
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.BindFlags				= D3D11_BIND_INDEX_BUFFER;
@@ -71,7 +72,7 @@ namespace Dive
 		desc.StructureByteStride	= 0;
 		desc.Usage					= D3D11_USAGE_DYNAMIC;
 
-		if (FAILED(m_renderDevice->GetD3dDevice()->CreateBuffer(&desc, nullptr, &m_buffer)))
+		if (FAILED(graphics->GetRHIDevice()->CreateBuffer(&desc, nullptr, &m_buffer)))
 		{
 			CORE_ERROR("");
 			return false;
@@ -82,14 +83,15 @@ namespace Dive
 
 	void * IndexBuffer::Map()
 	{
-		if(!m_buffer)
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized() || !m_buffer)
 		{
 			CORE_ERROR("");
 			return nullptr;
 		}
 
 		D3D11_MAPPED_SUBRESOURCE mappedSubRsc;
-		if (FAILED(m_renderDevice->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubRsc)))
+		if (FAILED(graphics->GetRHIContext()->Map(static_cast<ID3D11Resource*>(m_buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubRsc)))
 		{
 			CORE_ERROR("");
 			return nullptr;
@@ -100,13 +102,14 @@ namespace Dive
 
 	bool IndexBuffer::Unmap()
 	{
-		if(!m_buffer)
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized() || !m_buffer)
 		{
 			CORE_ERROR("");
 			return false;
 		}
 
-		m_renderDevice->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_buffer), 0);
+		graphics->GetRHIContext()->Unmap(static_cast<ID3D11Resource*>(m_buffer), 0);
 
 		return true;
 	}

@@ -3,16 +3,17 @@
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
-#include "RenderDevice.h"
+#include "Graphics/Graphics.h"
 
 namespace Dive
 {
 
-	RasterizerState::RasterizerState(Context* context, const std::shared_ptr<RenderDevice>& device, D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode, BOOL depthClipEnable, BOOL scissorEnable,
+	RasterizerState::RasterizerState(Context* context, D3D11_CULL_MODE cullMode, D3D11_FILL_MODE fillMode, BOOL depthClipEnable, BOOL scissorEnable,
 		BOOL multiSampleEnable, BOOL antialiasedLineEnable)
 		: Object(context)
 	{
-		if (!device->IsInitialized())
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized())
 		{
 			CORE_ERROR("");
 			return;
@@ -31,7 +32,7 @@ namespace Dive
 		desc.MultisampleEnable		= multiSampleEnable;
 		desc.AntialiasedLineEnable	= antialiasedLineEnable;
 
-		if (FAILED(device->GetD3dDevice()->CreateRasterizerState(&desc, &m_state)))
+		if (FAILED(graphics->GetRHIDevice()->CreateRasterizerState(&desc, &m_state)))
 		{
 			CORE_ERROR("");
 			return;

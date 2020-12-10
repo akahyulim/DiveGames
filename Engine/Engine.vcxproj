@@ -127,7 +127,6 @@
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\D3D11\ConstantBuffer.h" />
     <ClInclude Include="Src\Graphics\D3D11\IndexBuffer.h" />
-    <ClInclude Include="Src\Graphics\D3D11\RenderDevice.h" />
     <ClInclude Include="Src\Graphics\D3D11\RenderDeviceEnums.h" />
     <ClInclude Include="Src\Graphics\D3D11\RenderDeviceTypes.h" />
     <ClInclude Include="Src\Graphics\D3D11\Texture.h" />
@@ -161,12 +160,10 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\D3D11\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\IndexBuffer.cpp" />
-    <ClCompile Include="Src\Graphics\D3D11\RenderDevice.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\Texture.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\Texture2D.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\VertexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
-    <ClCompile Include="Src\Graphics\Graphics_RHI.cpp" />
     <ClCompile Include="Src\Graphics\Renderer.cpp" />
     <ClCompile Include="Src\Graphics\Window.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />

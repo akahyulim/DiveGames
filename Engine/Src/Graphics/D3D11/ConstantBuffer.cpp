@@ -1,21 +1,14 @@
 #include "DivePch.h"
 #include "ConstantBuffer.h"
-#include "RenderDevice.h"
+#include "Graphics/Graphics.h"
 #include "Core/Context.h"
 
 
 namespace Dive
 {
-	ConstantBuffer::ConstantBuffer(Context* context, const std::shared_ptr<RenderDevice>& device)
+	ConstantBuffer::ConstantBuffer(Context* context)
 		: Object(context)
 	{
-		if (!device->IsInitialized())
-		{
-			CORE_ERROR("");
-			return;
-		}
-
-		m_renderDevice = device;
 	}
 
 	ConstantBuffer::~ConstantBuffer()
@@ -25,14 +18,15 @@ namespace Dive
 
 	void * ConstantBuffer::Map()
 	{
-		if (!m_buffer)
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized() || !m_buffer)
 		{
 			CORE_ERROR("");
 			return nullptr;
 		}
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		if (FAILED(m_renderDevice->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		if (FAILED(graphics->GetRHIContext()->Map(static_cast<ID3D11Resource*>(m_buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
 			CORE_ERROR("");
 			return nullptr;
@@ -43,13 +37,14 @@ namespace Dive
 
 	bool ConstantBuffer::Unmap()
 	{
-		if (!m_buffer)
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized() || !m_buffer)
 		{
 			CORE_ERROR("");
 			return false;
 		}
 
-		m_renderDevice->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_buffer), 0);
+		graphics->GetRHIContext()->Unmap(static_cast<ID3D11Resource*>(m_buffer), 0);
 
 		return true;
 	}

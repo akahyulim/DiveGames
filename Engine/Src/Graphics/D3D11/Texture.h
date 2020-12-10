@@ -4,7 +4,7 @@
 namespace Dive
 {
 	class Context;
-	class RenderDevice;
+	class Graphics;
 
 	class Texture : public Resource
 	{
@@ -20,8 +20,8 @@ namespace Dive
 		virtual bool createTextureResource() { return false; }
 
 	protected:
-		std::shared_ptr<RenderDevice> m_renderDevice;
-
+		Graphics* m_graphics;
+		
 		ID3D11RenderTargetView* m_renderTargetView		= nullptr;
 		ID3D11ShaderResourceView* m_ShaderResourceView	= nullptr;
 

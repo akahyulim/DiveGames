@@ -17,12 +17,12 @@ namespace Dive
 			if (IsExist<T>())
 				return;
 
-			m_subsystems.emplace_back(new T(this));
+			m_subsystems.emplace_back(std::make_shared<T>(this));
 		}
 
 		template<class T> void RemoveSubsystem()
 		{
-			auto it = m_subsysems.begin();
+			auto it = m_subsystems.begin();
 			for (it; it != m_subsystems.end();)
 			{
 				if ((*it)->GetTypeHash() == typeid(T).hash_code())
@@ -32,12 +32,12 @@ namespace Dive
 			}
 		}
 
-		template<class T> T* GetSubsystem()
+		template<class T> std::shared_ptr<T> GetSubsystem()
 		{
-			for (const auto& subsystem : m_subsystems)
+			for (auto& subsystem : m_subsystems)
 			{
 				if (subsystem->GetTypeHash() == typeid(T).hash_code())
-					return static_cast<T*>(subsystem);
+					return std::static_pointer_cast<T>(subsystem);
 			}
 
 			return nullptr;
@@ -55,6 +55,6 @@ namespace Dive
 		}
 
 	private:
-		std::vector<Object*> m_subsystems;
+		std::vector<std::shared_ptr<Object>> m_subsystems;
 	};
 }

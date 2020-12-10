@@ -1,8 +1,8 @@
 #include "DivePch.h"
 #include "Texture2D.h"
-#include "RenderDevice.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
+#include "Graphics/Graphics.h"
 
 
 namespace Dive
@@ -45,13 +45,13 @@ namespace Dive
 
 	bool Texture2D::createTextureResource()
 	{
-		if (!m_renderDevice || !m_renderDevice->GetD3dDevice())
+		if (!m_graphics || !m_graphics->IsInitialized())
 		{
 			CORE_ERROR("");
 			return false;
 		}
 
-		auto device = m_renderDevice->GetD3dDevice();
+		auto device = m_graphics->GetRHIDevice();
 		// 이걸 제거해야 하는지, 남겨둬야 하는지 모르겠다.
 		ID3D11Texture2D* texture = nullptr;
 

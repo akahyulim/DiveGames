@@ -1,6 +1,6 @@
 #include "DivePch.h"
 #include "BlendState.h"
-#include "RenderDevice.h"
+#include "Graphics/Graphics.h"
 #include "Core/Context.h"
 #include "Core/DiveDefs.h"
 #include "Core/Log.h"
@@ -8,11 +8,12 @@
 
 namespace Dive
 {
-	BlendState::BlendState(Context* context, const std::shared_ptr<RenderDevice>& device, BOOL enable, D3D11_BLEND source, D3D11_BLEND dest, D3D11_BLEND_OP op,
+	BlendState::BlendState(Context* context, BOOL enable, D3D11_BLEND source, D3D11_BLEND dest, D3D11_BLEND_OP op,
 		D3D11_BLEND sourceAlpha, D3D11_BLEND destAlpha, D3D11_BLEND_OP opAlpha, float* blendFactor)
 		: Object(context), m_state(nullptr)
 	{
-		if (!device->IsInitialized())
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized())
 		{
 			CORE_ERROR("");
 			return;
@@ -34,7 +35,7 @@ namespace Dive
 			renderTarget.RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;
 		}
 
-		if (FAILED(device->GetD3dDevice()->CreateBlendState(&desc, &m_state)))
+		if (FAILED(graphics->GetRHIDevice()->CreateBlendState(&desc, &m_state)))
 		{
 			CORE_ERROR("");
 			return;

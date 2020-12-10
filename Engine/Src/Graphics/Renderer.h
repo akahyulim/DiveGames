@@ -4,6 +4,7 @@
 namespace Dive
 {
 	class Context;
+	class Graphics;
 	
 	class Renderer : public Object
 	{
@@ -13,10 +14,17 @@ namespace Dive
 		Renderer(Context* context);
 		~Renderer();
 
-	
+		void Initialize();
+		void Render();
+
+		bool IsInitialized() const { return m_bInitialized; }
+
 	private:
 
 	private:
+		std::weak_ptr<Graphics> m_graphics;
+
+		bool m_bInitialized;
 	};
 }
 

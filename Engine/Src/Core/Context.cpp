@@ -15,7 +15,7 @@ namespace Dive
 	{
 		for (auto& subsystem : m_subsystems)
 		{
-			SAFE_DELETE(subsystem);
+			subsystem.reset();
 		}
 		m_subsystems.clear();
 	}

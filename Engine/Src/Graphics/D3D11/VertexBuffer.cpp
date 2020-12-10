@@ -1,6 +1,6 @@
 #include "DivePch.h"
 #include "VertexBuffer.h"
-#include "RenderDevice.h"
+#include "Graphics/Graphics.h"
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
@@ -8,16 +8,9 @@
 
 namespace Dive
 {
-	VertexBuffer::VertexBuffer(Context* context, const std::shared_ptr<RenderDevice>& device)
+	VertexBuffer::VertexBuffer(Context* context)
 		: Object(context)
 	{
-		if (!device->IsInitialized())
-		{
-			CORE_ERROR("");
-			return;
-		}
-
-		m_renderDevice = device;
 	}
 
 	VertexBuffer::~VertexBuffer()
@@ -27,14 +20,15 @@ namespace Dive
 
 	void * VertexBuffer::Map()
 	{
-		if (!m_buffer)
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized() || !m_buffer)
 		{
 			CORE_ERROR("");
 			return nullptr;
 		}
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		if (FAILED(m_renderDevice->GetImmediateContext()->Map(static_cast<ID3D11Resource*>(m_buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		if (FAILED(graphics->GetRHIContext()->Map(static_cast<ID3D11Resource*>(m_buffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
 			CORE_ERROR("");
 			return nullptr;
@@ -45,20 +39,22 @@ namespace Dive
 
 	bool VertexBuffer::Unmap()
 	{
-		if (!m_buffer)
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized() || !m_buffer)
 		{
 			CORE_ERROR("");
 			return false;
 		}
 
-		m_renderDevice->GetImmediateContext()->Unmap(static_cast<ID3D11Resource*>(m_buffer), 0);
+		graphics->GetRHIContext()->Unmap(static_cast<ID3D11Resource*>(m_buffer), 0);
 
 		return true;
 	}
 
 	bool VertexBuffer::createBuffer(const void * vertices)
 	{
-		if (!m_bDynamic)
+		auto graphics = GetSubsystem<Graphics>();
+		if (!graphics || !graphics->IsInitialized() || !m_bDynamic)
 		{
 			if (!vertices || m_vertexCount == 0)
 			{
@@ -82,7 +78,7 @@ namespace Dive
 		data.SysMemPitch		= 0;
 		data.SysMemSlicePitch	= 0;
 
-		if (FAILED(m_renderDevice->GetD3dDevice()->CreateBuffer(&desc, m_bDynamic ? nullptr : &data, &m_buffer)))
+		if (FAILED(graphics->GetRHIDevice()->CreateBuffer(&desc, m_bDynamic ? nullptr : &data, &m_buffer)))
 		{
 			CORE_ERROR("");
 			return false;

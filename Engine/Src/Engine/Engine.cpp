@@ -44,13 +44,13 @@ namespace Dive
 		m_context->RegisterSubsystem<Renderer>();
 
 		//= Timer
-		//auto timer = m_context->GetSubsystem<Timer>();
 		auto timer = GetSubsystem<Timer>();
 		timer->Initialize();
 
 		//= Graphics & Renderer
 		auto graphics = m_context->GetSubsystem<Graphics>();
-		if (!graphics->SetScreenMode())
+		// 원래는 setting을 가져와서 비교하며 전달한다.
+		if (!graphics->SetMode(0, 0, false, false, false, false))
 			return false;
 
 		m_bInitialized = true;
@@ -70,8 +70,6 @@ namespace Dive
 	{
 		assert(m_bInitialized);
 
-		// 이 부분에서 exiting이 되어야 한다.
-		// 지금 의심스러운 부분은 headless이다.
 		if (!m_context->GetSubsystem<Graphics>()->IsInitialized())
 			m_bExiting = true;
 
@@ -101,8 +99,9 @@ namespace Dive
 			return;
 		}
 
-		// Renderer Render
+		GetSubsystem<Renderer>()->Render();
 		// UI Render: 이 곳에 imGUI를 넣을 수 있지 않을까?
+			
 		// EndFrame
 		graphics->EndFrame();
 	}

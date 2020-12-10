@@ -31,7 +31,6 @@
 #include "Graphics/D3D11/ConstantBuffer.h"
 #include "Graphics/D3D11/RenderDeviceEnums.h"
 #include "Graphics/D3D11/RenderDeviceTypes.h"
-#include "Graphics/D3D11/RenderDevice.h"			// Graphics¿¡ Æ÷ÇÔ?
 #include "Graphics/D3D11/DepthStencilState.h"
 #include "Graphics/D3D11/RasterizerState.h"
 #include "Graphics/D3D11/BlendState.h"
