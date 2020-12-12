@@ -53,10 +53,7 @@ namespace Dive
 			return;
 		}
 
-		UINT syncInterval = 0;
-		if (m_bVSync)
-			syncInterval = 1;
-		if (FAILED(m_swapChain->Present(syncInterval, 0)))
+		if (FAILED(m_swapChain->Present(m_displayMode.vSync ? 1 : 0, 0)))
 		{
 			CORE_ERROR("");
 			return;
@@ -68,17 +65,16 @@ namespace Dive
 		return ( m_window != nullptr && m_device != nullptr);
 	}
 
-	bool Graphics::SetMode(int width, int height, bool fullScreen, bool borderless, bool resizable, bool vSync)
+	bool Graphics::SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync)
 	{
-		ScreenMode mode;
+		DisplayMode mode;
 		mode.fullScreen = fullScreen;
 		mode.borderless = borderless;
-		mode.resizable = resizable;
 		mode.vSync = vSync;
 
-		bool maximize = (width == 0 || height == 0) && (!fullScreen) && (!borderless) && (resizable);
-
-		return createGraphicsDisplay(width, height, mode, maximize);
+		mode.screenMode = fullScreen ? eScreenMode::FullScreen : (borderless ? eScreenMode::Borderless : eScreenMode::Windowed);
+	
+		return createDisplay(width, height, mode);
 	}
 
 	bool Graphics::SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer)
@@ -97,44 +93,32 @@ namespace Dive
 		return true;
 	}
 
-	bool Graphics::createGraphicsDisplay(int width, int height, ScreenMode screenMode, bool maximize)
+	bool Graphics::createDisplay(int width, int height, DisplayMode displayMode)
 	{
-		adjustScreenMode(width, height, screenMode);
-
 		// 윈도우 생성
-		if (!m_window->Create(width, height))
+		if (!m_window->Create(
+			width, 
+			height, 
+			displayMode.screenMode == eScreenMode::FullScreen, 
+			displayMode.screenMode == eScreenMode::Windowed))
 			return false;
-		m_window->Show();
-
-		if (maximize)
-		{
-			// 최대화
-			// 윈도우의 SW를 변경하는 함수이다.
-			// 즉, 보여질 때 의미를 가진다.
-
-			// 최대화가 아니더라도 클라이언트 크기를 전달해야 하는데...
-			// => adjust에서 수행했어야 한다. 그런데 윈도우 생성 전이다...
-			// => 찾아보니 Adjust ScreenMode와 Window가 나눠져 있다.
-			//width = m_window->GetClientRectWidth();
-			//height = m_window->GetClientRectHeight();
-		}
 
 		m_width = m_window->GetClientRectWidth();
 		m_height = m_window->GetClientRectHeight();
-		m_screenMode = screenMode;
+		m_displayMode = displayMode;
 
 		// d3d11 생성
 		if (!createRHI())
 			return false;
 
-		CORE_TRACE("Window Size: {0:d} x {1:d}", width, height);
+		CORE_TRACE("Window Size: {0:d} x {1:d}", m_window->GetWidth(), m_window->GetHeight());
 		CORE_TRACE("Client Rect Size: {0:d} x {1:d}", m_width, m_height);
 
 		return true;
 	}
 
 	// 용도를 좀 더 명확히 해야 한다.
-	void Graphics::adjustScreenMode(int & width, int & height, ScreenMode & screenMode)
+	void Graphics::adjustDisplayMode(int & width, int & height, DisplayMode & screenMode)
 	{
 		/*
 		HRESULT hResult;
@@ -203,20 +187,6 @@ namespace Dive
 		SAFE_RELEASE(adapter);
 		SAFE_RELEASE(factory);
 		*/
-
-		// 크기를 설정한다.
-		if (width == 0 || height == 0)
-		{
-			if (screenMode.fullScreen || screenMode.borderless)
-			{
-				// 최대화한다.
-			}
-			else
-			{
-				width = 1024;
-				height = 768;
-			}
-		}
 	}
 
 	bool Graphics::createRHI()
@@ -250,11 +220,19 @@ namespace Dive
 		desc.OutputWindow						= m_window->GetHandle();
 		desc.BufferDesc.Width					= m_width;
 		desc.BufferDesc.Height					= m_height;
-		desc.Windowed							= m_window->IsFullScreen() ? false : true;
+		desc.Windowed							= (m_displayMode.screenMode == eScreenMode::FullScreen) ? FALSE : TRUE;
 		desc.BufferCount						= 1;							// 매개변수 대상
 		desc.BufferDesc.Format					= DXGI_FORMAT_R8G8B8A8_UNORM;	// 매개변수 대상
-		desc.BufferDesc.RefreshRate.Denominator = 1;							// 매개변수 대상
-		desc.BufferDesc.RefreshRate.Numerator	= 0;							// 매개변수 대상
+		if (m_displayMode.vSync)
+		{
+			desc.BufferDesc.RefreshRate.Denominator = 1;							// 매개변수 대상
+			desc.BufferDesc.RefreshRate.Numerator = 60;							// 매개변수 대상
+		}
+		else
+		{
+			desc.BufferDesc.RefreshRate.Denominator = 1;							// 매개변수 대상
+			desc.BufferDesc.RefreshRate.Numerator = 0;							// 매개변수 대상
+		}
 		desc.BufferDesc.ScanlineOrdering		= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 		desc.BufferDesc.Scaling					= DXGI_MODE_SCALING_UNSPECIFIED;
 		desc.BufferUsage						= DXGI_USAGE_RENDER_TARGET_OUTPUT;

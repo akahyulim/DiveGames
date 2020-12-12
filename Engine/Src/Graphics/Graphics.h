@@ -10,11 +10,19 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
 
-	struct ScreenMode
+	// 전체 창 화면 같은건 해상도와 이 모드의 조합으로 만든다.
+	enum class eScreenMode
 	{
+		FullScreen,
+		Borderless,
+		Windowed,
+	};
+
+	struct DisplayMode
+	{
+		eScreenMode screenMode;
 		bool fullScreen;
 		bool borderless;
-		bool resizable;
 		bool vSync;
 		// refresh rate
 	};
@@ -25,7 +33,6 @@ namespace Dive
 		int videoMemory;
 	};
 
-	// display mode로 변경
 	struct AdapterInfo
 	{
 		AdapterInfo(unsigned int width, unsigned int height, unsigned int numerator, unsigned int denominator)
@@ -57,7 +64,7 @@ namespace Dive
 		bool IsInitialized();
 
 		// settings를 얻어와야 한다.
-		bool SetMode(int width, int height, bool fullScreen, bool borderless, bool resizable, bool vSync);
+		bool SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync);
 
 		std::shared_ptr<Window> GetWindow() const { return m_window; }
 
@@ -72,8 +79,8 @@ namespace Dive
 		bool SetIndexBuffer();
 
 	private:
-		bool createGraphicsDisplay(int width, int height, ScreenMode screenMode, bool maximize);
-		void adjustScreenMode(int& width, int& height, ScreenMode& screenMode);
+		bool createDisplay(int width, int height, DisplayMode displayMode);
+		void adjustDisplayMode(int& width, int& height, DisplayMode& displayMode);
 		bool createRHI();
 		bool depthStencilStates();
 
@@ -82,7 +89,7 @@ namespace Dive
 
 		int m_width;
 		int m_height;
-		ScreenMode m_screenMode;
+		DisplayMode m_displayMode;
 		VgaInfo m_vgaInfo;
 		std::vector<AdapterInfo> m_adapterInfos;
 
@@ -90,8 +97,6 @@ namespace Dive
 		ID3D11DeviceContext* m_immediateContext = nullptr;
 		IDXGISwapChain* m_swapChain = nullptr;
 		ID3D11RenderTargetView* m_renderTargetView = nullptr;
-
-		bool m_bVSync;
 
 		//= GPU Resources
 		// 다른 곳에 전달하지 않는다면 unique_ptr로 변경

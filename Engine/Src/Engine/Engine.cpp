@@ -4,7 +4,6 @@
 #include "Core/Log.h"
 #include "Core/Context.h"
 #include "Core/Timer.h"
-#include "Core/Settings.h"
 #include "Core/EventSystem.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Renderer.h"
@@ -50,7 +49,7 @@ namespace Dive
 		//= Graphics & Renderer
 		auto graphics = m_context->GetSubsystem<Graphics>();
 		// 원래는 setting을 가져와서 비교하며 전달한다.
-		if (!graphics->SetMode(0, 0, false, false, false, false))
+		if (!graphics->SetMode(0, 0, false, false, true))
 			return false;
 
 		m_bInitialized = true;

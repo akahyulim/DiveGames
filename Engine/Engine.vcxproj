@@ -116,7 +116,6 @@
     <ClInclude Include="Src\Graphics\D3D11\DepthStencilState.h" />
     <ClInclude Include="Src\Core\IniHelper.h" />
     <ClInclude Include="Src\Core\FileSystemHelper.h" />
-    <ClInclude Include="Src\Core\Settings.h" />
     <ClInclude Include="Src\Core\DiveDefs.h" />
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\Engine\Engine.h" />
@@ -151,7 +150,6 @@
     <ClCompile Include="Src\Engine\Engine.cpp" />
     <ClCompile Include="Src\Core\FileSystemHelper.cpp" />
     <ClCompile Include="Src\Core\Log.cpp" />
-    <ClCompile Include="Src\Core\Settings.cpp" />
     <ClCompile Include="Src\Core\Stopwatch.cpp" />
     <ClCompile Include="Src\Core\StringHelper.cpp" />
     <ClCompile Include="Src\Core\Timer.cpp" />

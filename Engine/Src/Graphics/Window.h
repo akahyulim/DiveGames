@@ -8,22 +8,23 @@ namespace Dive
 		Window();
 		~Window() = default;
 
-		bool Create(int width, int height);
+		bool Create(int width, int height, bool fullScreen, bool windowed);
 		void Destroy();
 
 		bool Run();
 
-		void Show();
+		void Show(bool show);
 
-
-		// option
-		// set icon
-		// set title
 		HWND GetHandle() const { return m_hWnd; }
-		bool IsFullScreen() const { return m_bFullScreen; }
+
+		int GetWidth() const { return m_width; }
+		int GetHeight() const { return m_height; }
 		int GetClientRectWidth();
 		int GetClientRectHeight();
 
+		// set icon
+		// set title
+		bool SetTitle(std::wstring title);
 
 	private:
 	private:
@@ -32,6 +33,8 @@ namespace Dive
 		std::wstring m_title;
 		int m_width;
 		int m_height;
-		bool m_bFullScreen;
+		DWORD m_style;
+		int m_positionX;
+		int m_positionY;
 	};
 }

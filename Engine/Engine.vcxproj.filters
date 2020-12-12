@@ -10,9 +10,6 @@
     <ClCompile Include="Src\Core\Log.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Settings.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Core\Stopwatch.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
@@ -82,9 +79,6 @@
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Log.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Settings.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Stopwatch.h">
