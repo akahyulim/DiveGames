@@ -3,7 +3,7 @@
 #include "Core/DiveDefs.h"
 #include "Core/Log.h"
 #include "Core/Context.h"
-#include "Core/Timer.h"
+#include "Core/Time.h"
 #include "Core/EventSystem.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Renderer.h"
@@ -17,7 +17,7 @@ namespace Dive
 		m_bExiting(false)
 	{
 		m_context = new Context;
-		m_context->RegisterSubsystem<Timer>();
+		m_context->RegisterSubsystem<Time>();
 		m_context->RegisterSubsystem<Input>();
 
 		Log::Initialize();
@@ -41,10 +41,6 @@ namespace Dive
 
 		m_context->RegisterSubsystem<Graphics>();
 		m_context->RegisterSubsystem<Renderer>();
-
-		//= Timer
-		auto timer = GetSubsystem<Timer>();
-		timer->Initialize();
 
 		//= Graphics & Renderer
 		auto graphics = m_context->GetSubsystem<Graphics>();
@@ -84,8 +80,8 @@ namespace Dive
 	{
 		// Update, Post Update, Render, Post Render를 이벤트로 날린다.
 
-		auto timer = m_context->GetSubsystem<Timer>();
-		timer->Update();
+		auto time = m_context->GetSubsystem<Time>();
+		time->Update();
 	}
 
 	void Engine::Render()

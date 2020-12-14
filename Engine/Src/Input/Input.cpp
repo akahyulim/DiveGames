@@ -2,7 +2,7 @@
 #include "Input.h"
 #include "Core/Context.h"
 #include "Core/Log.h"
-#include "Core/EventSystem.h"
+#include "Core/CoreEvents.h"
 
 
 namespace Dive
@@ -22,6 +22,8 @@ namespace Dive
 
 	void Input::OnUpdate(const E_UPDATE* evnt)
 	{
-		CORE_TRACE("Input' deltaTime: {:f} MS", evnt->GetDeltaTime());
+		CORE_TRACE("Get E_UPDATE Event ===================================");
+		CORE_TRACE("App Elapsed Time: {:f} sec", evnt->GetElapsedTimeSec());
+		CORE_TRACE("Frame Delta Time: {:f} sec", evnt->GetDeltaTimeSec());
 	}
 }

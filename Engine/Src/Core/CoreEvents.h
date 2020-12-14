@@ -6,11 +6,16 @@ namespace Dive
 	class E_UPDATE :public IEvent
 	{
 	public:
-		E_UPDATE(float deltaTime) : m_deltaTime(deltaTime) {}
+		E_UPDATE(float elapsedTimeSec, float deltaTimeSec)
+			: m_elapsedTimeSec(elapsedTimeSec),
+			m_deltaTimeSec(deltaTimeSec)
+		{}
 
-		float GetDeltaTime() const { return m_deltaTime; }
+		float GetElapsedTimeSec()	const { return m_elapsedTimeSec; }
+		float GetDeltaTimeSec()		const { return m_deltaTimeSec; }
 
 	private:
-		float m_deltaTime;
+		float m_elapsedTimeSec;
+		float m_deltaTimeSec;
 	};
 }

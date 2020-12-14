@@ -122,7 +122,7 @@
     <ClInclude Include="Src\Core\Log.h" />
     <ClInclude Include="Src\Core\Stopwatch.h" />
     <ClInclude Include="Src\Core\StringHelper.h" />
-    <ClInclude Include="Src\Core\Timer.h" />
+    <ClInclude Include="Src\Core\Time.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\D3D11\ConstantBuffer.h" />
     <ClInclude Include="Src\Graphics\D3D11\IndexBuffer.h" />
@@ -152,7 +152,7 @@
     <ClCompile Include="Src\Core\Log.cpp" />
     <ClCompile Include="Src\Core\Stopwatch.cpp" />
     <ClCompile Include="Src\Core\StringHelper.cpp" />
-    <ClCompile Include="Src\Core\Timer.cpp" />
+    <ClCompile Include="Src\Core\Time.cpp" />
     <ClCompile Include="Src\DivePch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

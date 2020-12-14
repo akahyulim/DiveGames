@@ -16,9 +16,6 @@
     <ClCompile Include="Src\Core\StringHelper.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\Timer.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Src\DivePch.cpp">
       <Filter>Src</Filter>
     </ClCompile>
@@ -70,6 +67,9 @@
     <ClCompile Include="Src\Core\Object.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Core\Time.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
@@ -85,9 +85,6 @@
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\StringHelper.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Timer.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\DivePch.h">
@@ -169,6 +166,9 @@
       <Filter>Src\Core</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Object.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Time.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>

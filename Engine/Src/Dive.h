@@ -8,7 +8,7 @@
 #include "Core/Stopwatch.h"
 #include "Core/Object.h"
 #include "Core/Context.h"
-#include "Core/Timer.h"
+#include "Core/Time.h"
 #include "Core/StringHelper.h"
 #include "Core/FileSystemHelper.h"
 #include "Core/IniHelper.h"
