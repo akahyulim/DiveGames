@@ -35,4 +35,3 @@ virtual size_t GetTypeHash() const override { return typeid(typeName).hash_code(
 virtual std::string GetTypeName() const override { return typeid(typeName).name(); }			\
 virtual size_t GetBaseTypeHash() const override { return typeid(baseTypeName).hash_code(); }	\
 virtual std::string GetBaseTypeName() const override { return typeid(baseTypeName).name(); }
-// static을 추가하면 타입으로도 위의 값들을 확인할 수 있다.

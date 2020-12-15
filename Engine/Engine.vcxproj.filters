@@ -70,6 +70,21 @@
     <ClCompile Include="Src\Core\Time.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Scene\GameObject.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\Component.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\Transform.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\Renderable.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Scene.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
@@ -171,6 +186,21 @@
     <ClInclude Include="Src\Core\Time.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Scene\GameObject.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\Component.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\Transform.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\Renderable.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Scene.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">
@@ -193,6 +223,12 @@
     </Filter>
     <Filter Include="Src\Input">
       <UniqueIdentifier>{ae6ef24e-d596-4cb0-a778-5fc163a32be0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Scene">
+      <UniqueIdentifier>{a331e122-f173-4e19-8345-6202bcfba4cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Scene\Components">
+      <UniqueIdentifier>{0d485a41-c5db-4c19-ab69-f451cd017176}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

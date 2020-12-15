@@ -38,7 +38,7 @@ namespace Dive
 
 	Time::~Time()
 	{
-		CORE_TRACE("Call Time's Destructor =========================");
+		CORE_TRACE("Call Time's Destructor ==========================");
 	}
 
 	void Time::Update()

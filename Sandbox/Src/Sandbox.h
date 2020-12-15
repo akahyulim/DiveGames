@@ -14,6 +14,7 @@ public:
 	void Stop() override;
 
 private:
+	Dive::Scene* m_scene;
 };
 
 

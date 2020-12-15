@@ -8,10 +8,13 @@ Sandbox::Sandbox()
 
 Sandbox::~Sandbox()
 {
+	SAFE_DELETE(m_scene);
 }
 
 void Sandbox::Setup()
 {
+	m_scene = new Scene(const_cast<Context*>(m_engine->GetContext()), "Test Scene");
+	m_scene->CreateGameObject("One");
 }
 
 void Sandbox::Start()
@@ -21,6 +24,7 @@ void Sandbox::Start()
 	graphics->GetWindow()->SetTitle(L"Sandbox");
 	graphics->GetWindow()->Show(true);
 	APP_TRACE("Sandbox Start~");
+
 }
 
 void Sandbox::Stop()

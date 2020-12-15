@@ -36,6 +36,14 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Window.h"
 
+
 //= Input =================================================
 #include "Input/Input.h"
 
+
+//= Scene =================================================
+#include "Scene/Scene.h"
+#include "Scene/GameObject.h"
+#include "Scene/Components/Component.h"
+#include "Scene/Components/Transform.h"
+#include "Scene/Components/Renderable.h"
