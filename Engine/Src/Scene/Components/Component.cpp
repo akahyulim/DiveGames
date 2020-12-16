@@ -1,7 +1,6 @@
 #include "DivePch.h"
 #include "Component.h"
 #include "Core/Context.h"
-#include "Scene/GameObject.h"
 
 
 namespace Dive
@@ -10,5 +9,6 @@ namespace Dive
 		: Object(context),
 		m_owner(owner)
 	{
+		assert(m_owner);
 	}
 }

@@ -14,7 +14,7 @@ Sandbox::~Sandbox()
 void Sandbox::Setup()
 {
 	m_scene = new Scene(const_cast<Context*>(m_engine->GetContext()), "Test Scene");
-	m_scene->CreateGameObject("One");
+	m_scene->CreateGameObject()->SetName("Knave");
 }
 
 void Sandbox::Start()

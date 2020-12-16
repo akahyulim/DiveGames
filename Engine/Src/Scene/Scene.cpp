@@ -1,6 +1,7 @@
 #include "DivePch.h"
 #include "Scene.h"
 #include "GameObject.h"
+#include "Components/Transform.h"
 #include "Core/Context.h"
 #include "Core/Log.h"
 
@@ -26,19 +27,6 @@ namespace Dive
 		CORE_TRACE("Destroy Scene - {:s}", m_name);
 	}
 
-	bool Scene::SaveToFile(const std::string & filename)
-	{
-		return true;
-	}
-
-	bool Scene::LoadFromFile(const std::string & filename)
-	{
-
-		m_bDirty = true;
-
-		return true;
-	}
-
 	void Scene::Unload()
 	{
 		m_gameObjects.clear();
@@ -47,15 +35,12 @@ namespace Dive
 		m_bDirty = true;
 	}
 
-	std::shared_ptr<GameObject>& Scene::CreateGameObject(const std::string& name)
+	std::shared_ptr<GameObject>& Scene::CreateGameObject()
 	{
-		// 이름으로 검색이 필요하다.
-
-		auto gameObject =  m_gameObjects.emplace_back(std::make_shared<GameObject>(m_context, name));
-
+		auto& gameObject = m_gameObjects.emplace_back(std::make_shared<GameObject>(m_context));
 		m_bDirty = true;
-
 		return gameObject;
+
 	}
 
 	void Scene::AddGameObject(const std::shared_ptr<GameObject>& gameObject)
@@ -113,9 +98,17 @@ namespace Dive
 
 	std::vector<std::shared_ptr<GameObject>> Scene::GetRootGameObjects()
 	{
-		// root gameObject들로 vector를 꾸려 전달한다.
-		// 이를 위해선 transform이 필요하다.
+		std::vector<std::shared_ptr<GameObject>> targetObjects;
+		for (const auto& gameObject : m_gameObjects)
+		{
+			auto transform = gameObject->GetComponent<Transform>();
+			if (transform)
+			{
+				if (transform->IsRoot())
+					targetObjects.emplace_back(gameObject);
+			}
+		}
 
-		return std::vector<std::shared_ptr<GameObject>>();
+		return targetObjects;
 	}
 }

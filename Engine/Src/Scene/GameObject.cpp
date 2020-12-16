@@ -24,7 +24,7 @@ namespace Dive
 	{
 		m_components.clear();
 
-		CORE_TRACE("Destroy GameObject.");
+		CORE_TRACE("Destroy GameObject - {:s}", m_name);
 	}
 
 	void GameObject::Clone()

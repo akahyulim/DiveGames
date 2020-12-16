@@ -1,11 +1,12 @@
 #pragma once
 #include "DivePch.h"
 #include "Core/Object.h"
+#include "Scene/GameObject.h"
+
 
 namespace Dive
 {
 	class Context;
-	class GameObject;
 
 	enum class eComponentType
 	{
@@ -31,8 +32,10 @@ namespace Dive
 
 		virtual void OnUpdate() {}
 
-		GameObject* GetOwner() const { return m_owner; }
-		eComponentType GetType() const { return m_type; }
+		GameObject* GetOwner()		const { return m_owner; }
+		eComponentType GetType()	const { return m_type; }
+		unsigned int GetID()		const { return m_owner->GetID(); }
+		std::string GetName()		const { return m_owner->GetName(); }
 
 	protected:
 

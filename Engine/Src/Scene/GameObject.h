@@ -83,7 +83,7 @@ namespace Dive
 		for (auto& component : m_components)
 		{
 			if (component->GetTypeHash() == typeid(T).hash_code())
-				return static_cast<T*>(component);
+				return static_cast<T*>(component.get());
 		}
 
 		return nullptr;
