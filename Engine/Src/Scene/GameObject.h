@@ -25,10 +25,14 @@ namespace Dive
 
 		// T의 base가 Component인지 확인이 필요하다.
 		// 그런데 Component가 다른 Base를 가진다면 좀 애매해진다.
-		template<class T> T* AddComponent();
-		template<class T> void RemoveComponent();
-		template<class T> T* GetComponent();
-		template<class T> bool HasComponent();
+		template<class T> 
+		T* AddComponent();
+		template<class T> 
+		void RemoveComponent();
+		template<class T> 
+		T* GetComponent();
+		template<class T> 
+		bool HasComponent();
 		const std::vector<std::shared_ptr<Component>>& GetAllComponents() const { return m_components; }
 
 		// get & set
@@ -50,7 +54,8 @@ namespace Dive
 		std::vector<std::shared_ptr<Component>> m_components;
 	};
 
-	template<class T> T* GameObject::AddComponent()
+	template<class T>
+	T* GameObject::AddComponent()
 	{
 		// 동일한 타입이 이미 존재한다면 생성치말고 찾아서 리턴해야 한다.
 
@@ -61,7 +66,8 @@ namespace Dive
 		return component.get();
 	}
 	
-	template<class T> void GameObject::RemoveComponent()
+	template<class T>
+	void GameObject::RemoveComponent()
 	{
 		auto it = m_components.begin();
 		for (it; it != m_components.end();)
@@ -78,7 +84,8 @@ namespace Dive
 		}
 	}
 	
-	template<class T> T* GameObject::GetComponent()
+	template<class T>
+	T* GameObject::GetComponent()
 	{
 		for (auto& component : m_components)
 		{
@@ -89,7 +96,8 @@ namespace Dive
 		return nullptr;
 	}
 	
-	template<class T> bool GameObject::HasComponent()
+	template<class T>
+	bool GameObject::HasComponent()
 	{
 		for (auto& component : m_components)
 		{

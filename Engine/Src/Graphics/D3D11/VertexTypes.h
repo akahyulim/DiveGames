@@ -34,8 +34,8 @@ namespace Dive
 			this->color[3] = color.w;
 		}
 
-		float position[3] = { 0.0f, };
-		float color[4] = { 0.0f, };
+		float position[3]	= { 0.0f, };
+		float color[4]		= { 0.0f, };
 	};
 
 	struct Vertex_PosTex
@@ -51,17 +51,17 @@ namespace Dive
 			this->uv[1] = uv.y;
 		}
 
-		float position[3] = { 0.0f, };
-		float uv[2] = { 0.0f, };
+		float position[3]	= { 0.0f, };
+		float uv[2]			= { 0.0f, };
 	};
 
 	struct Vertex_2dPosTexCol
 	{
 		Vertex_2dPosTexCol() = default;
 
-		float position[2] = { 0.0f, };
-		float uv[2] = { 0.0f, };
-		unsigned int color = 0;
+		float position[2]	= { 0.0f, };
+		float uv[2]			= { 0.0f, };
+		unsigned int color	= 0;
 	};
 
 	struct Vertex_PosTexNorTan
@@ -85,10 +85,10 @@ namespace Dive
 			this->tangent[2] = tangent.z;
 		}
 
-		float position[3] = { 0.0f, };
-		float uv[2] = { 0.0f, };
-		float normal[3] = { 0.0f, };
-		float tangent[3] = { 0.0f, };
+		float position[3]	= { 0.0f, };
+		float uv[2]			= { 0.0f, };
+		float normal[3]		= { 0.0f, };
+		float tangent[3]	= { 0.0f, };
 	};
 
 	struct Vertex_Skinned
@@ -117,18 +117,18 @@ namespace Dive
 			this->weight[2] = weight.z;
 			this->weight[3] = weight.w;
 
-			this->index[0] = static_cast<uint32_t>(index.x);
-			this->index[1] = static_cast<uint32_t>(index.y);
-			this->index[2] = static_cast<uint32_t>(index.z);
-			this->index[3] = static_cast<uint32_t>(index.w);
+			this->index[0] = static_cast<unsigned int>(index.x);
+			this->index[1] = static_cast<unsigned int>(index.y);
+			this->index[2] = static_cast<unsigned int>(index.z);
+			this->index[3] = static_cast<unsigned int>(index.w);
 		}
 
-		float position[3] = { 0.0f, };
-		float uv[2] = { 0.0f, };
-		float normal[3] = { 0.0f, };
-		float tangent[3] = { 0.0f, };
-		float weight[4] = { 0.0f, };
-		uint32_t index[4] = { 0, };		// bone index
+		float position[3]		= { 0.0f, };
+		float uv[2]				= { 0.0f, };
+		float normal[3]			= { 0.0f, };
+		float tangent[3]		= { 0.0f, };
+		float weight[4]			= { 0.0f, };
+		unsigned int index[4]	= { 0, };		// bone index
 	};
 
 	// 타입들을 enum으로 묶는다. 이는 템플릿 타입으로 전달하기 위해서이다.

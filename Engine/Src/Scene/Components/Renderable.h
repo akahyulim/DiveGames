@@ -5,17 +5,26 @@ namespace Dive
 {
 	class Context;
 	class GameObject;
+	class Model;
+	class Material;
 
-	// 기존에는 Component를 상속한 Behavior을 상속했다.
-	// Behavior은 enable 여부를 판단하는 Component 상속 클래스이다.
 	class Renderable : public Component
 	{
 	public:
 		explicit Renderable(Context* context, GameObject* owner);
 		~Renderable();
 
+		const std::shared_ptr<Model>& GetModel() const { return m_model; }
+		const std::shared_ptr<Material>& GetMaterial() const { return m_material; }
+
+		bool IsEnabled() const { return m_bEnabled; }
+		void SetEnable(bool enable) { m_bEnabled = enable; }
+
 	private:
 	private:
-		// Rendering에 필요한 Resouce들을 정리부터 하자.
+		bool m_bEnabled;
+
+		std::shared_ptr<Model> m_model;
+		std::shared_ptr<Material> m_material;
 	};
 }

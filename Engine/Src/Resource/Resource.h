@@ -12,11 +12,7 @@ namespace Dive
 		Texture,
 		Texture2D,
 		TextureCube,
-	};
-
-	enum class eLoadState
-	{
-		Idle,
+		Model,
 	};
 
 	class Resource : public Object
@@ -32,12 +28,10 @@ namespace Dive
 
 		const std::string& GetName()	const { return m_name; }
 		eResourceType GetType()			const { return m_type; }
-		eLoadState GetLoadState()		const { return m_loadState; }
 
 	protected:
 		std::string m_name;
-		std::string m_Path;
+		std::string m_path;
 		eResourceType m_type	= eResourceType::UnKnown;
-		eLoadState m_loadState	= eLoadState::Idle;
 	};
 }

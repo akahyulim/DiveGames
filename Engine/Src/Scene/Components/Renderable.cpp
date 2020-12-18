@@ -1,6 +1,8 @@
 #include "DivePch.h"
 #include "Renderable.h"
 #include "Scene/GameObject.h"
+#include "Graphics/Model.h"
+#include "Graphics/Material.h"
 
 
 namespace Dive

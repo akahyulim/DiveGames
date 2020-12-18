@@ -57,7 +57,6 @@ namespace Dive
 		ID3D11Buffer* m_buffer = nullptr;
 
 		bool m_bDynamic = false;
-		
 		unsigned int m_stride		= 0;
 		unsigned int m_vertexCount	= 0;
 	};
