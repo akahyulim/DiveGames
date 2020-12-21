@@ -15,8 +15,7 @@ namespace Dive
 		Unknown
 	};
 
-	// 일단 이것부터 완성한 후
-	// 삼각형 출력을 향해 가자.
+
 	class Shader : public Object
 	{
 		DIVE_OBJECT(Shader, Object);

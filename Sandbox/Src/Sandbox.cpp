@@ -15,6 +15,10 @@ void Sandbox::Setup()
 {
 	m_scene = new Scene(const_cast<Context*>(m_engine->GetContext()), "Test Scene");
 	m_scene->CreateGameObject()->SetName("Knave");
+
+	// 일단 삼각형 GameObject를 구성토록 하자.
+	// 이후 Graphics 혹은 Renderer가 Shader를 생성하고
+	// pipeline에 GameObject의 리소스들을 연결한 후 렌더링해야 한다.
 }
 
 void Sandbox::Start()
@@ -24,10 +28,6 @@ void Sandbox::Start()
 	graphics->GetWindow()->SetTitle(L"Sandbox");
 	graphics->GetWindow()->Show(true);
 	APP_TRACE("Sandbox Start~");
-
-	Shader shader(const_cast<Context*>(m_engine->GetContext()));
-	shader.CreateShader(eVertexType::PositionColor, L"../Assets/Shaders/old/Color.hlsl");
-
 }
 
 void Sandbox::Stop()
