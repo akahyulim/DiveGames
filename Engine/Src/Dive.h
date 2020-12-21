@@ -23,6 +23,7 @@
 
 
 //= Graphics ==============================================
+#include "Graphics//D3D11/Shader.h"
 #include "Graphics/D3D11/VertexTypes.h"
 #include "Graphics/D3D11/VertexTypes.h"
 #include "Graphics/D3D11/IndexBuffer.h"

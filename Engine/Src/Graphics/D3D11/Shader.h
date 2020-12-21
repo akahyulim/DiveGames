@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/Object.h"
 #include "VertexTypes.h"
-#include "InputLayout.h"
 
 
 namespace Dive
@@ -13,6 +12,7 @@ namespace Dive
 		Vertex,
 		Pixel,
 		VertexPixel,
+		Unknown
 	};
 
 	// 일단 이것부터 완성한 후
@@ -25,26 +25,39 @@ namespace Dive
 		Shader(Context* context);
 		~Shader();
 
-		// compile 후 shader와 input layout 생성
-		// input layout 생성을 위해선 vertex type 필요
+		bool CreateShader(eVertexType vertexType, std::wstring filepath);
+		bool CreateVertexShader(eVertexType vertexType, std::wstring filepath);
+		bool CreatePixelShader(std::wstring filepath);
 		
 		ID3D11VertexShader* GetVertexShader()	const { return m_vertexShader; }
 		ID3D11PixelShader* GetPixelShader()		const { return m_pixelShader; }
-		ID3D11InputLayout* GetInputLayout()		const { return m_inputLayout ? m_inputLayout->GetBuffer() : nullptr; }
+		ID3D11InputLayout* GetInputLayout()		const { return m_inputLayout; }
 
-		eShaderType GetType()					const { return m_type; }
+		eShaderType GetShaderType()				const { return m_shaderType; }
+		eVertexType GetVertexType()				const { return m_vertexType; }
 
 	private:
+		bool compileAndCreateShader(std::wstring filepath);
+		bool createVertexShader(ID3D10Blob* blob);
+		bool createPixelShader(ID3D10Blob* blob);
 
+		bool createInputLayout(ID3D10Blob* blob);
+		void createPositionDesc();
+		void createColorDesc();
+		void createTextureDesc();
+		void createNormalDesc();
+		void createTangentDesc();
 
 	private:
 		ID3D11VertexShader* m_vertexShader;
 		ID3D11PixelShader* m_pixelShader;
-		std::shared_ptr<InputLayout> m_inputLayout;
+		ID3D11InputLayout* m_inputLayout;
 		
-		eShaderType m_type;
+		eShaderType m_shaderType;
+		eVertexType m_vertexType;
+		std::vector<D3D11_INPUT_ELEMENT_DESC> m_inputDescs;
 
 		std::string m_name;
-		std::string m_filepath;
+		std::wstring m_filepath;
 	};
 }

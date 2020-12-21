@@ -25,6 +25,9 @@ void Sandbox::Start()
 	graphics->GetWindow()->Show(true);
 	APP_TRACE("Sandbox Start~");
 
+	Shader shader(const_cast<Context*>(m_engine->GetContext()));
+	shader.CreateShader(eVertexType::PositionColor, L"../Assets/Shaders/old/Color.hlsl");
+
 }
 
 void Sandbox::Stop()

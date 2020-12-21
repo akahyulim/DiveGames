@@ -91,9 +91,6 @@
     <ClCompile Include="Src\Graphics\Mesh.cpp">
       <Filter>Src\Graphic</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\D3D11\InputLayout.cpp">
-      <Filter>Src\Graphic\D3D11</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Graphics\D3D11\Shader.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClCompile>
@@ -221,9 +218,6 @@
     </ClInclude>
     <ClInclude Include="Src\Graphics\Mesh.h">
       <Filter>Src\Graphic</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Graphics\D3D11\InputLayout.h">
-      <Filter>Src\Graphic\D3D11</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\D3D11\Shader.h">
       <Filter>Src\Graphic\D3D11</Filter>

@@ -1,0 +1,39 @@
+#include "Common.hlsl"
+
+Texture2D texAlbedo;
+
+float3 eyePos;
+float3 lightColor;
+float3 lightDir;
+float3 lightPos;
+//float specPow;
+//float specInt;
+//float2 tiling;
+//float2 offset;
+
+
+float4 DirectionalLightPS(Pixel_PosTexNorTanWorld input) : SV_TARGET
+{
+	// Ambient
+	float3 ambient = lightColor * float3(0.15f, 0.15f, 0.15f);
+
+	// Phong - Diffuse
+	float3 toLight = -normalize(lightDir);
+	float amount = dot(input.normal, toLight);
+	amount = saturate(amount);
+	float3 diffuse = lightColor * amount;
+
+	// Blinn - Specular
+	float3 toEye = normalize(eyePos - input.worldPos);
+	float3 halfWay = normalize(toEye + toLight);
+	float NDotH = saturate(dot(halfWay, input.normal));
+	float3 specular = lightColor * pow(NDotH, 20.0f);
+
+	float3 finalColor = ambient + diffuse + specular;
+
+	// albedo
+	//float2 texCoord = float2(input.uv.x * tiling.x + offset.x, input.uv.y * tiling.y + offset.y);
+	float4 albedo = texAlbedo.Sample(samplerLinear, input.uv);
+
+	return float4(finalColor*albedo.xyz, albedo.w);
+}

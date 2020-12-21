@@ -1,10 +1,9 @@
 #pragma once
+#include "Context.h"
 
 
 namespace Dive
 {
-	class Context;
-
 	class Object
 	{
 	public:

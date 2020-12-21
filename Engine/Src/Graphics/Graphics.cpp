@@ -1,6 +1,7 @@
 #include "DivePch.h"
 #include "Graphics.h"
 #include "Window.h"
+#include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
 #include "D3D11/DepthStencilState.h"
