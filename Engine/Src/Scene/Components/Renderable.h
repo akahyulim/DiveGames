@@ -20,11 +20,24 @@ namespace Dive
 		bool IsEnabled() const { return m_bEnabled; }
 		void SetEnable(bool enable) { m_bEnabled = enable; }
 
+		unsigned int GetVertexBufferOffset() const { return m_vertexBufferOffset; }
+		unsigned int GetVertexCount() const { return m_vertexCount; }
+		unsigned int GetIndexBufferOffset() const { return m_indexBufferOffset; }
+		unsigned int GetIndexCount() const { return m_indexCount; }
+
 	private:
 	private:
 		bool m_bEnabled;
 
 		std::shared_ptr<Model> m_model;
 		std::shared_ptr<Material> m_material;
+
+		// Vertex & Index Buffer 설정에 전달되는 Offset을 가진다.
+		// 하지만 어떻게 계산하는지 모르겠다.
+		// 개수도 이 곳에서 확인한다.
+		unsigned int m_vertexBufferOffset;
+		unsigned int m_vertexCount;
+		unsigned int m_indexBufferOffset;
+		unsigned int m_indexCount;
 	};
 }

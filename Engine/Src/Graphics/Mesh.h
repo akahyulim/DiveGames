@@ -1,10 +1,9 @@
 #pragma once
+#include "D3D11/VertexTypes.h"
 
 
 namespace Dive
 {
-	struct Vertex_PosTexNorTan;
-
 	class Mesh
 	{
 	public:

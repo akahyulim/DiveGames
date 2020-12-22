@@ -19,6 +19,22 @@ namespace Dive
 
 		bool IsInitialized() const { return m_bInitialized; }
 
+
+		//= d3d11 pipeline???
+		// IASetInputLayout
+		// IASetVerteBuffer
+		// IASetIndexBuffer
+		// IASetPrimitiveTopology
+		// VSSetShader
+		// VSSetConstantBuffers
+		// PSSetShader
+		// PSSetConstantBuffers
+		// PSSetSamplers
+		// RSSetState
+		// OMSetRenderTargets
+		// OMSetBlendState
+		// OMSetDepthStencilState
+
 	private:
 
 	private:

@@ -11,6 +11,7 @@ namespace Dive
 		: Component(context, owner)
 	{
 		m_type = eComponentType::Renderable;
+		m_model = std::make_shared<Model>(m_context);
 	}
 
 	Renderable::~Renderable()

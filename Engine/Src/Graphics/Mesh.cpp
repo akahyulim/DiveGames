@@ -1,6 +1,5 @@
 #include "DivePch.h"
 #include "Mesh.h"
-#include "D3D11/VertexTypes.h"
 
 
 namespace Dive

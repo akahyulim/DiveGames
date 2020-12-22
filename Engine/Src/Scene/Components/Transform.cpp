@@ -144,7 +144,7 @@ namespace Dive
 		if (!m_parent)
 			return this;
 
-		m_parent->GetRoot();
+		return m_parent->GetRoot();
 	}
 	
 	Transform * Transform::GetChildByName(const std::string & name)

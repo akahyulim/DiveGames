@@ -13,12 +13,7 @@ Sandbox::~Sandbox()
 
 void Sandbox::Setup()
 {
-	m_scene = new Scene(const_cast<Context*>(m_engine->GetContext()), "Test Scene");
-	m_scene->CreateGameObject()->SetName("Knave");
-
-	// 일단 삼각형 GameObject를 구성토록 하자.
-	// 이후 Graphics 혹은 Renderer가 Shader를 생성하고
-	// pipeline에 GameObject의 리소스들을 연결한 후 렌더링해야 한다.
+	// 엔진 초기화 전에 호출된다.
 }
 
 void Sandbox::Start()
@@ -28,8 +23,31 @@ void Sandbox::Start()
 	graphics->GetWindow()->SetTitle(L"Sandbox");
 	graphics->GetWindow()->Show(true);
 	APP_TRACE("Sandbox Start~");
+
+
+	m_scene = new Scene(const_cast<Context*>(m_engine->GetContext()), "Test Scene");
+	if(!createTriangle())
+		APP_ERROR("Fail to create geometry buffers.");
 }
 
 void Sandbox::Stop()
 {
+}
+
+bool Sandbox::createTriangle()
+{
+	auto triangle = m_scene->CreateGameObject();
+	triangle->SetName("Triangle");
+	auto renderable = triangle->AddComponent<Renderable>();
+	auto model = renderable->GetModel();
+
+	std::vector<Vertex_PosTexNorTan> vertices;
+	vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.5f), DirectX::XMFLOAT3(0.0f, 0.0f, -0.5f), DirectX::XMFLOAT3(0.0f, 0.5f, 0.0f));
+	vertices.emplace_back(DirectX::XMFLOAT3(0.0f, 0.5f, 0.0f), DirectX::XMFLOAT2(0.5f, 0.0f), DirectX::XMFLOAT3(0.0f, 0.0f, -0.5f), DirectX::XMFLOAT3(0.0f, 0.5f, 0.0f));
+	vertices.emplace_back(DirectX::XMFLOAT3(0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(0.5f, 0.5f), DirectX::XMFLOAT3(0.0f, 0.0f, -0.5f), DirectX::XMFLOAT3(0.0f, 0.5f, 0.0f));
+
+	std::vector<unsigned int> indices;
+	indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
+
+	return model->SetAndCreateGeometry(vertices, indices);
 }

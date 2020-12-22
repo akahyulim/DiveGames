@@ -3,6 +3,7 @@
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Components/Component.h"
+#include "Components/Transform.h"
 
 namespace Dive
 {
@@ -16,6 +17,9 @@ namespace Dive
 			m_name = std::move(name);
 
 		// id도 함께 생성하는게 가장 잘 어울린다.
+
+		// transform은 기본적으로 추가한다.
+		AddComponent<Transform>();
 
 		CORE_TRACE("Create GameObject - {:s}.", m_name);
 	}

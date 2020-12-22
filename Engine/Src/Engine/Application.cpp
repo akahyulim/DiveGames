@@ -18,6 +18,7 @@ namespace Dive
 		APP_TRACE("Setup Application & Initialize Engine!");
 	
 		// app setup 후
+		// 위치가 좀 에바 같기도 한데, 아래에 Start가 따로 있기도 하고... 애매하네.
 		Setup();
 		// engine intialize: 생성자에서 파싱한 데이터 전달 필요
 		if (!m_engine->Initialize())

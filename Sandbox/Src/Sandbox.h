@@ -14,6 +14,9 @@ public:
 	void Stop() override;
 
 private:
+	bool createTriangle();
+
+private:
 	Dive::Scene* m_scene;
 };
 

@@ -22,8 +22,5 @@ namespace Dive
 
 	void Input::OnUpdate(const E_UPDATE* evnt)
 	{
-		CORE_TRACE("Get E_UPDATE Event ===================================");
-		CORE_TRACE("App Elapsed Time: {:f} sec", evnt->GetElapsedTimeSec());
-		CORE_TRACE("Frame Delta Time: {:f} sec", evnt->GetDeltaTimeSec());
 	}
 }

@@ -5,7 +5,9 @@
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
 #include "D3D11/DepthStencilState.h"
-#include "D3D11/VertexBuffer.h"
+#include "D3D11/BlendState.h"
+#include "D3D11/RasterizerState.h"
+#include "D3D11/Shader.h"
 
 
 namespace Dive
@@ -78,22 +80,6 @@ namespace Dive
 		return createDisplay(width, height, mode);
 	}
 
-	bool Graphics::SetVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer)
-	{
-		// 굳이 여기에 weak_ptr로 저장할 필요가 있을까?
-		// 구버전의 경우 여러번 렌더링 하기위해 기존 버퍼를 남겨두는 용도로 사용했다.
-		// 그런데 urho3d는 좀 다른 방식이다. 더 살펴봐야겠다.
-		if (!vertexBuffer)
-			return false;
-
-		m_vertexBuffer = vertexBuffer;
-
-		// pipeline에 등록
-		//m_immediateContext->IASetVertexBuffers()
-
-		return true;
-	}
-
 	bool Graphics::createDisplay(int width, int height, DisplayMode displayMode)
 	{
 		// 윈도우 생성
@@ -114,6 +100,14 @@ namespace Dive
 
 		CORE_TRACE("Window Size: {0:d} x {1:d}", m_window->GetWidth(), m_window->GetHeight());
 		CORE_TRACE("Client Rect Size: {0:d} x {1:d}", m_width, m_height);
+
+		// create default gpu resources
+		if (!createDepthStencilStates())
+			return false;
+		if (!createBlendStates())
+			return false;
+		if (!createRasterizerStates())
+			return false;
 
 		return true;
 	}
@@ -226,12 +220,12 @@ namespace Dive
 		desc.BufferDesc.Format					= DXGI_FORMAT_R8G8B8A8_UNORM;	// 매개변수 대상
 		if (m_displayMode.vSync)
 		{
-			desc.BufferDesc.RefreshRate.Denominator = 1;							// 매개변수 대상
+			desc.BufferDesc.RefreshRate.Denominator = 1;						// 매개변수 대상
 			desc.BufferDesc.RefreshRate.Numerator = 60;							// 매개변수 대상
 		}
 		else
 		{
-			desc.BufferDesc.RefreshRate.Denominator = 1;							// 매개변수 대상
+			desc.BufferDesc.RefreshRate.Denominator = 1;						// 매개변수 대상
 			desc.BufferDesc.RefreshRate.Numerator = 0;							// 매개변수 대상
 		}
 		desc.BufferDesc.ScanlineOrdering		= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -294,14 +288,49 @@ namespace Dive
 		return true;
 	}
 
-	bool Graphics::depthStencilStates()
+	bool Graphics::createDepthStencilStates()
 	{
-		m_depthStencilStateEnabled = std::make_shared<DepthStencilState>(m_context, true, D3D11_COMPARISON_LESS);
-		m_depthStencilStateDisabled = std::make_shared<DepthStencilState>(m_context, false, D3D11_COMPARISON_LESS);
+		m_depthStencilStateEnabled	= std::make_shared<DepthStencilState>(m_context, TRUE, D3D11_COMPARISON_LESS);
+		m_depthStencilStateDisabled = std::make_shared<DepthStencilState>(m_context, FALSE, D3D11_COMPARISON_LESS);
 
 		if (!m_depthStencilStateEnabled || !m_depthStencilStateDisabled)
 		{
-			CORE_ERROR("");
+			CORE_ERROR("Fail to create depthstencil states.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Graphics::createBlendStates()
+	{
+		m_blendStateEnable		= std::make_shared<BlendState>(m_context, TRUE);
+		m_blendStateDisable		= std::make_shared<BlendState>(m_context, FALSE);
+		m_blendStateColorAdd	= std::make_shared<BlendState>(m_context, TRUE, D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD);
+
+		if (!m_blendStateEnable || !m_blendStateDisable || !m_blendStateColorAdd)
+		{
+			CORE_ERROR("Fail to create beldn states.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Graphics::createRasterizerStates()
+	{
+		m_rasterizeStateCullBackSolid		= std::make_shared<RasterizerState>(m_context, D3D11_CULL_BACK, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
+		m_rasterizeStateCullFrontSolid		= std::make_shared<RasterizerState>(m_context, D3D11_CULL_FRONT, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
+		m_rasterizeStateCullNoneSolid		= std::make_shared<RasterizerState>(m_context, D3D11_CULL_NONE, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
+
+		m_rasterizeStateCullBackWireFrame	= std::make_shared<RasterizerState>(m_context, D3D11_CULL_BACK, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
+		m_rasterizeStateCullFrontWireFrame	= std::make_shared<RasterizerState>(m_context, D3D11_CULL_FRONT, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
+		m_rasterizeStateCullNoneWireFrame	= std::make_shared<RasterizerState>(m_context, D3D11_CULL_NONE, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
+
+		if (!m_rasterizeStateCullBackSolid || !m_rasterizeStateCullFrontSolid || !m_rasterizeStateCullNoneSolid
+			|| !m_rasterizeStateCullBackWireFrame || !m_rasterizeStateCullFrontWireFrame || !m_rasterizeStateCullNoneWireFrame)
+		{
+			CORE_ERROR("Fail to create rasterizer states.");
 			return false;
 		}
 

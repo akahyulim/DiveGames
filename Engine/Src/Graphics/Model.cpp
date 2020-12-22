@@ -3,9 +3,6 @@
 #include "Mesh.h"
 #include "Core/Context.h"
 #include "Core/Log.h"
-#include "D3D11/VertexTypes.h"
-#include "D3D11/VertexBuffer.h"
-#include "D3D11/IndexBuffer.h"
 
 
 namespace Dive
@@ -18,6 +15,14 @@ namespace Dive
 
 	Model::~Model()
 	{
+		Clear();
+	}
+
+	void Model::Clear()
+	{
+		m_indexBuffer.reset();
+		m_vertexBuffer.reset();
+		m_mesh->Clear();
 	}
 
 	void Model::SetGeometry(std::vector<Vertex_PosTexNorTan>& vertices, std::vector<unsigned int>& indices)
@@ -30,6 +35,13 @@ namespace Dive
 
 		m_mesh->SetVertices(vertices);
 		m_mesh->SetIndices(indices);
+	}
+
+	bool Model::SetAndCreateGeometry(std::vector<Vertex_PosTexNorTan>& vertices, std::vector<unsigned int>& indices)
+	{
+		SetGeometry(vertices, indices);
+
+		return createGeometryBuffers();
 	}
 
 	bool Model::createGeometryBuffers()
