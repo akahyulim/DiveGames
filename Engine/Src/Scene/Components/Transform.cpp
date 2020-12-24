@@ -3,6 +3,7 @@
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Scene/GameObject.h"
+#include "Scene/Scene.h"
 
 
 namespace Dive
@@ -47,126 +48,6 @@ namespace Dive
 
 		DirectX::XMStoreFloat3(&m_localPosition, position);
 		updateTransform();
-	}
-
-	void Transform::SetParent(Transform * parent)
-	{
-		// 빈 객체를 전달받으면 독립
-		if (!m_parent)
-		{
-			BecomeOrphan();
-			return;
-		}
-
-		// 자신을 부모를 삼으려는 경우
-		if (GetID() == parent->GetID())
-			return;
-
-		// 동일한 부모를 전달받은 경우
-		if (m_parent->GetID() == parent->GetID())
-			return;
-
-		// 자식 혹은 자손을 전달받은 경우
-		if (IsDescendant(parent))
-			return;
-
-		// 기존 부모에게서 제거
-		if (m_parent)
-		{
-			auto it = m_parent->GetChildren().begin();
-			for (it; it != m_parent->GetChildren().end();)
-			{
-				if ((*it)->GetID() == GetID())
-				{
-					it = m_parent->m_children.erase(it);
-				}
-				else
-					it++;
-			}
-		}
-
-		// 새로운 부모에게 추가
-		parent->AddChild(this);
-		m_parent = parent;
-
-		updateTransform();
-	}
-	
-	void Transform::BecomeOrphan()
-	{
-		if (!m_parent)
-			return;
-
-		// 기존 부모에게서 제거
-		auto it = m_parent->GetChildren().begin();
-		for (it; it != m_parent->GetChildren().end();)
-		{
-			if ((*it)->GetID() == GetID())
-			{
-				it = m_parent->m_children.erase(it);
-			}
-			else
-				it++;
-		}
-
-		m_parent = nullptr;
-
-		updateTransform();
-	}
-
-	bool Transform::IsDescendant(const Transform * transform) const
-	{
-		if (!transform || transform->IsRoot())
-			return false;
-
-		for (const auto& child : m_children)
-		{
-			if (child->GetID() == transform->GetID())
-				return true;
-
-			if (child->IsDescendant(transform))
-				return true;
-		}
-
-		return false;
-	}
-	
-	void Transform::AddChild(Transform * child)
-	{
-		if (!child || GetID() == child->GetID())
-			return;
-
-		child->SetParent(this);
-	}
-	
-	Transform * Transform::GetRoot()
-	{
-		if (!m_parent)
-			return this;
-
-		return m_parent->GetRoot();
-	}
-	
-	Transform * Transform::GetChildByName(const std::string & name)
-	{
-		if (m_children.empty() || name.empty())
-			return nullptr;
-
-		for (const auto& child : m_children)
-		{
-			if (child->GetName() == name)
-				return child;
-		}
-
-		return nullptr;
-	}
-	
-	Transform * Transform::GetChildByIndex(unsigned int index)
-	{
-		if (m_children.empty() || index > m_children.size())
-			return nullptr;
-
-		return m_children[index];
 	}
 
 	void Transform::updateTransform()

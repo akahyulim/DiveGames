@@ -6,8 +6,7 @@ namespace Dive
 	class Context;
 	class Component;
 
-	// hash_number가 필요하다.
-	class GameObject : public Object
+	class GameObject : public Object, public std::enable_shared_from_this<GameObject>
 	{
 		DIVE_OBJECT(GameObject, Object);
 
@@ -35,6 +34,9 @@ namespace Dive
 		bool HasComponent();
 		const std::vector<std::shared_ptr<Component>>& GetAllComponents() const { return m_components; }
 
+		void MarkForDestruction() { m_bPendingDestruction = true; }
+		bool IsPendingDestruction() const { return m_bPendingDestruction; }
+
 		// get & set
 		std::string GetName() const { return m_name; }
 		void SetName(std::string name) { m_name = std::move(name); }
@@ -42,14 +44,16 @@ namespace Dive
 		bool IsActive() const { return m_bActive; }
 		void SetActive(bool active) { m_bActive = active; }
 
-		unsigned int GetID() const { return m_ID; }
+		std::shared_ptr<GameObject> GetSharedPtr() { return shared_from_this(); }
 
 	private:
+		GameObject(const GameObject&)				= delete;
+		GameObject& operator=(const GameObject&)	= delete;
 
 	private:
 		std::string m_name;
 		bool m_bActive;
-		unsigned int m_ID;
+		bool m_bPendingDestruction;
 
 		std::vector<std::shared_ptr<Component>> m_components;
 	};

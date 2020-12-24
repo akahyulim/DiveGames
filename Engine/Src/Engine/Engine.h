@@ -33,7 +33,7 @@ namespace Dive
 		bool IsInitialized()	const { return m_bInitialized; }
 		bool IsExiting()		const { return m_bExiting; }
 		
-		const Context* GetContext() const { return m_context; }
+		Context* GetContext() const { return m_context; }
 
 		// 결국 이것 때문에 SystemManager가 this pointer를 가지게 된다.
 		const WindowData& GetWindowData()			const { return m_windowData; }
@@ -45,6 +45,10 @@ namespace Dive
 
 			return m_context->GetSubsystem<T>();
 		}
+
+	private:
+		Engine(const Engine&)				= delete;
+		Engine& operator=(const Engine&)	= delete;
 
 	private:
 		WindowData m_windowData;

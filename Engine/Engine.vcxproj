@@ -147,10 +147,10 @@
     <ClInclude Include="Src\Scene\Components\Transform.h" />
     <ClInclude Include="Src\Scene\GameObject.h" />
     <ClInclude Include="Src\Scene\Scene.h" />
+    <ClInclude Include="Src\Scene\SceneEvents.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Core\Context.cpp" />
-    <ClCompile Include="Src\Core\Object.cpp" />
     <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\BlendState.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\RasterizerState.cpp" />
@@ -180,6 +180,7 @@
     <ClCompile Include="Src\Scene\Components\Component.cpp" />
     <ClCompile Include="Src\Scene\Components\Renderable.cpp" />
     <ClCompile Include="Src\Scene\Components\Transform.cpp" />
+    <ClCompile Include="Src\Scene\Components\Transform_Hierarchy.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />
   </ItemGroup>

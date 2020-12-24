@@ -8,7 +8,6 @@ Sandbox::Sandbox()
 
 Sandbox::~Sandbox()
 {
-	SAFE_DELETE(m_scene);
 }
 
 void Sandbox::Setup()
@@ -25,7 +24,8 @@ void Sandbox::Start()
 	APP_TRACE("Sandbox Start~");
 
 
-	m_scene = new Scene(const_cast<Context*>(m_engine->GetContext()), "Test Scene");
+	m_scene = m_engine->GetSubsystem<Scene>();
+	m_scene->SetName("Test Scene");
 	if(!createTriangle())
 		APP_ERROR("Fail to create geometry buffers.");
 }

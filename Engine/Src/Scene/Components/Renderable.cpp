@@ -12,6 +12,7 @@ namespace Dive
 	{
 		m_type = eComponentType::Renderable;
 		m_model = std::make_shared<Model>(m_context);
+		m_primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	}
 
 	Renderable::~Renderable()

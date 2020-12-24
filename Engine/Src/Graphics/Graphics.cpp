@@ -43,7 +43,7 @@ namespace Dive
 		// render target clear
 		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
 		m_immediateContext->OMSetRenderTargets(1, &m_renderTargetView, nullptr);
-		m_immediateContext->ClearRenderTargetView(m_renderTargetView, (float*)&clear_color);
+		m_immediateContext->ClearRenderTargetView(m_renderTargetView, (FLOAT*)(&clear_color));
 
 		return true;
 	}

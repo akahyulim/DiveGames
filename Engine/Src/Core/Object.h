@@ -1,19 +1,27 @@
 #pragma once
+#include "DivePch.h"
 #include "Context.h"
 
 
 namespace Dive
 {
+	static unsigned int g_ID = 0;
+
 	class Object
 	{
 	public:
-		Object(Context* context);
+		Object(Context* context)
+		{
+			m_context = context;
+			m_ID = generateID();
+		}
 		virtual ~Object() = default;
 
 		virtual size_t GetTypeHash()			const = 0;
 		virtual std::string GetTypeName()		const = 0;
 		virtual size_t GetBaseTypeHash()		const = 0;
 		virtual std::string GetBaseTypeName()	const = 0;
+		unsigned int GetID()					const { return m_ID; }
 
 		template<class T> std::shared_ptr<T> GetSubsystem()
 		{
@@ -24,7 +32,11 @@ namespace Dive
 		}
 
 	protected:
+		unsigned int generateID() { return ++g_ID; }
+
+	protected:
 		Context* m_context;
+		unsigned int m_ID;
 	};
 }
 

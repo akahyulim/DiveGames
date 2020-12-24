@@ -6,9 +6,11 @@ namespace Dive
 {
 	class Context;
 	class GameObject;
+	class E_UPDATE;
 
-	// subsystem이어야 하는가...
-	// 둘 이상의 Scene이 필요할 수 있는데...
+	// 두 개의 scene이 swap될 수 있으나
+	// 기본적으로 file을 통해 관리된다.
+	// 추후 unity의 scene swap을 분석해보자.
 	class Scene : public Object
 	{
 		DIVE_OBJECT(Scene, Object);
@@ -17,10 +19,11 @@ namespace Dive
 		Scene(Context* context, std::string name = "");
 		~Scene();
 
+		void OnUpdate(const E_UPDATE* evnt);
+
 		void Unload();
 
-		std::shared_ptr<GameObject>& CreateGameObject();
-		void AddGameObject(const std::shared_ptr<GameObject>& gameObject);
+		std::shared_ptr<GameObject> CreateGameObject();
 		void RemoveGameObject(const std::shared_ptr<GameObject>& gameObject);
 
 		const std::shared_ptr<GameObject>& GetGameObjectByName(const std::string& name);
@@ -36,9 +39,16 @@ namespace Dive
 		bool IsDirty()					const { return m_bDirty; }
 
 	private:
+		Scene(const Scene&)				= delete;
+		Scene& operator=(const Scene&)	= delete;
+
+		void removeGameObject(const std::shared_ptr<GameObject> gameObject);
+
 	private:
 		std::string m_name;
-		bool m_bDirty;
+		// resolve라는 걸로 대채되었다. 매번 갱신여부를 기록하는 것이 아니라
+		// 한 번 묶은 후 다루는 것 같다.
+		bool m_bDirty;	
 
 		std::vector<std::shared_ptr<GameObject>> m_gameObjects;
 	};

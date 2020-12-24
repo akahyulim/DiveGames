@@ -8,7 +8,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Renderer.h"
 #include "Input/Input.h"
-
+#include "Scene/Scene.h"
 
 namespace Dive
 {
@@ -16,11 +16,12 @@ namespace Dive
 		: m_bInitialized(false),
 		m_bExiting(false)
 	{
+		Log::Initialize();
+	
 		m_context = new Context;
 		m_context->RegisterSubsystem<Time>();
 		m_context->RegisterSubsystem<Input>();
-
-		Log::Initialize();
+		m_context->RegisterSubsystem<Scene>();
 	}
 
 	Engine::~Engine()
@@ -47,6 +48,9 @@ namespace Dive
 		// 원래는 setting을 가져와서 비교하며 전달한다.
 		if (!graphics->SetMode(0, 0, false, false, true))
 			return false;
+
+		auto renderer = m_context->GetSubsystem<Renderer>();
+		renderer->Initialize();
 
 		m_bInitialized = true;
 		CORE_TRACE("Initialized Engine.");

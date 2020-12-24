@@ -34,7 +34,6 @@ namespace Dive
 
 		GameObject* GetOwner()		const { return m_owner; }
 		eComponentType GetType()	const { return m_type; }
-		unsigned int GetID()		const { return m_owner->GetID(); }
 		std::string GetName()		const { return m_owner->GetName(); }
 
 	protected:

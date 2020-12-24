@@ -9,14 +9,13 @@ namespace Dive
 {
 	GameObject::GameObject(Context * context, std::string name)
 		: Object(context),
-		m_bActive(true)
+		m_bActive(true),
+		m_bPendingDestruction(false)
 	{
 		if (name.empty())
 			m_name = "GameObject";
 		else
 			m_name = std::move(name);
-
-		// id도 함께 생성하는게 가장 잘 어울린다.
 
 		// transform은 기본적으로 추가한다.
 		AddComponent<Transform>();
@@ -34,7 +33,8 @@ namespace Dive
 	void GameObject::Clone()
 	{
 		// 깊은 복사 수행
-		// 그런데 World에 등록한다.
+		// component는 물론
+		// 계층구조 까지 염두해야 하기에 복잡하다.
 	}
 	
 	void GameObject::Start()

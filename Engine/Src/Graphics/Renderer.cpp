@@ -4,6 +4,8 @@
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
+#include "Scene/GameObject.h"
+#include "Scene/SceneEvents.h"
 
 
 namespace Dive
@@ -33,6 +35,46 @@ namespace Dive
 
 	void Renderer::Render()
 	{
-		//CORE_TRACE("Rendering...");
+		// 기본 설정 후 Pass를 순서대로 호출한다.
+		testRender();
+	}
+
+	void Renderer::OnAcquireRenderable(const E_UPDATE_SCENE* evnt)
+	{
+		if (!evnt || evnt->GetGameObjects().empty())
+			return;
+
+		// 타입을 나눈 후 저장한다.
+	}
+	
+	void Renderer::testRender()
+	{
+		if (m_graphics.expired())
+			return;
+
+		auto immediateContext = m_graphics.lock()->GetRHIContext();
+		auto renderableObjects = m_gameObjects[eRenderableObjectType::Opaque];
+		if (renderableObjects.empty())
+			return;
+
+		// VSSetShader
+		// VSSetConstantBuffers
+		// PSSetShader
+		// PSSetConstantBuffers
+		// PSSetSamplers
+		// RSSetState
+		// OMSetRenderTargets
+		// OMSetBlendState
+		// OMSetDepthStencilState
+		
+		for (const auto& gameObject : renderableObjects)
+		{
+			// IASetInputLayout
+			// IASetVerteBuffer
+			// IASetIndexBuffer
+			// IASetPrimitiveTopology
+			//immediateContext->IASetPrimitiveTopology()
+			
+		}
 	}
 }

@@ -25,6 +25,9 @@ namespace Dive
 		unsigned int GetIndexBufferOffset() const { return m_indexBufferOffset; }
 		unsigned int GetIndexCount() const { return m_indexCount; }
 
+		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { m_primitiveTopology; }
+		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) { m_primitiveTopology = primitiveTopology; }
+
 	private:
 	private:
 		bool m_bEnabled;
@@ -39,5 +42,7 @@ namespace Dive
 		unsigned int m_vertexCount;
 		unsigned int m_indexBufferOffset;
 		unsigned int m_indexCount;
+
+		D3D11_PRIMITIVE_TOPOLOGY m_primitiveTopology;
 	};
 }

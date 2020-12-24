@@ -17,7 +17,7 @@ private:
 	bool createTriangle();
 
 private:
-	Dive::Scene* m_scene;
+	std::shared_ptr<Scene> m_scene;
 };
 
 
