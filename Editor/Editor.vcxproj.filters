@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Src\Editor.cpp">
-      <Filter>Src</Filter>
-    </ClCompile>
     <ClCompile Include="Src\ImGUI\imgui.cpp">
       <Filter>Src\ImGUI</Filter>
     </ClCompile>
@@ -22,20 +19,17 @@
     <ClCompile Include="Src\ImGUI\imgui_widgets.cpp">
       <Filter>Src\ImGUI</Filter>
     </ClCompile>
-    <ClCompile Include="Src\main.cpp">
+    <ClCompile Include="Src\Editor.cpp">
       <Filter>Src</Filter>
     </ClCompile>
     <ClCompile Include="Src\Widgets\MenuBar.cpp">
       <Filter>Src\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Widgets\Scene.cpp">
-      <Filter>Src\Widgets</Filter>
+    <ClCompile Include="Src\main.cpp">
+      <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Editor.h">
-      <Filter>Src</Filter>
-    </ClInclude>
     <ClInclude Include="Src\ImGUI\imconfig.h">
       <Filter>Src\ImGUI</Filter>
     </ClInclude>
@@ -60,16 +54,13 @@
     <ClInclude Include="Src\ImGUI\imstb_truetype.h">
       <Filter>Src\ImGUI</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Window.h">
+    <ClInclude Include="Src\Editor.h">
       <Filter>Src</Filter>
     </ClInclude>
     <ClInclude Include="Src\Widgets\MenuBar.h">
       <Filter>Src\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="Src\Widgets\Widget.h">
-      <Filter>Src\Widgets</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Widgets\Scene.h">
       <Filter>Src\Widgets</Filter>
     </ClInclude>
   </ItemGroup>

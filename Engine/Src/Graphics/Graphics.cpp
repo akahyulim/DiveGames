@@ -12,12 +12,17 @@
 
 namespace Dive
 {
+	Graphics* g_graphics = nullptr;
+
 	Graphics::Graphics(Context* context)
 		: Object(context)
 
 	{
 		m_window = std::make_shared<Window>();
 		assert(m_window);
+
+		// 좀 애매허다.
+		g_graphics = this;
 	}
 
 	Graphics::~Graphics()
@@ -30,6 +35,18 @@ namespace Dive
 		m_window.reset();
 
 		CORE_TRACE("Call Graphics's Destructor ======================");
+	}
+
+	// 이 곳에서 input을 처리한다?
+	LRESULT Graphics::MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		// imgui의 처리가 필요하다.
+
+		switch (msg)
+		{
+		default:
+			return DefWindowProc(hWnd, msg, wParam, lParam);
+		}
 	}
 
 	bool Graphics::BeginFrame()
@@ -78,6 +95,14 @@ namespace Dive
 		mode.screenMode = fullScreen ? eScreenMode::FullScreen : (borderless ? eScreenMode::Borderless : eScreenMode::Windowed);
 	
 		return createDisplay(width, height, mode);
+	}
+
+	bool Graphics::SetWindowSubclassing(LONG newProc)
+	{
+		if (!m_window)
+			return false;
+		
+		return m_window->ChangeWndProc(newProc);
 	}
 
 	bool Graphics::createDisplay(int width, int height, DisplayMode displayMode)

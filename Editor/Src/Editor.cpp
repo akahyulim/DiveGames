@@ -1,110 +1,109 @@
 #include "Editor.h"
-#include "Dive.h"
 #include "ImGUI/imgui.h"
-#include "ImGUI/imgui_internal.h"
-#include "ImGUI/imgui_impl_win32.h"
-#include "ImGUI/imgui_impl_dx11.h"
+#include "ImGui/imgui_internal.h"
+#include "ImGui/imgui_impl_win32.h"
+#include "ImGui/imgui_impl_dx11.h"
 #include "Widgets/MenuBar.h"
-#include "Widgets/Scene.h"
 
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-Editor::Editor(HINSTANCE hInstance, HWND hWnd, int width, int height, bool windowed)
+Editor::Editor()
+	: m_bInitialized(false),
+	m_bExiting(false)
 {
-	// Engine
-	{
-		m_engine = std::make_unique<Dive::Engine>(hInstance, hWnd, width, height, windowed);
-		if (!m_engine->IsInitialized())
-		{
-			return;
-		}
-		m_systemManager = m_engine->GetSystemManager();
-	}
+	Log::Initialize();
 
-	// ImGUI
-	{
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-
-		ImGuiIO& io = ImGui::GetIO();
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-		ImGui::StyleColorsDark();
-
-		auto renderer = m_engine->GetSystemManager()->GetSystem<Dive::Renderer>();
-		ImGui_ImplWin32_Init(hWnd);
-		ImGui_ImplDX11_Init(renderer->GetRenderDevice()->GetD3dDevice(), renderer->GetRenderDevice()->GetImmediateContext());
-	}
-
-	// Widgets
-	{
-		m_widgets.emplace_back(std::make_shared<MenuBar>(this));
-		m_widgets.emplace_back(std::make_shared<Scene>(this));
-	}
-
-	m_bInitialized = true;
+	m_context = new Context;
+	m_context->RegisterSubsystem<Time>();
+	m_context->RegisterSubsystem<Input>();
+	m_context->RegisterSubsystem<Scene>();
 }
 
 Editor::~Editor()
 {
-	m_widgets.clear();
+	SAFE_DELETE(m_context);
+}
 
-	if (ImGui::GetCurrentContext())
-	{
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
-	}
+LRESULT Editor::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+
+	auto graphics = m_context->GetSubsystem<Graphics>();
+	if (graphics)
+		return CallWindowProc(graphics->GetWindow()->GetBaseWndProc(), hWnd, msg, wParam, lParam);
+	else
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+}
+
+bool Editor::Initialize()
+{
+	if (m_bInitialized)
+		return true;
+
+	m_context->RegisterSubsystem<Graphics>();
+	m_context->RegisterSubsystem<Renderer>();
+
+	//= Graphics & Renderer
+	auto graphics = m_context->GetSubsystem<Graphics>();
+	// 원래는 setting을 가져와서 비교하며 전달한다.
+	if (!graphics->SetMode(0, 0, false, false, true))
+		return false;
+
+	auto renderer = m_context->GetSubsystem<Renderer>();
+	renderer->Initialize();
+
+
+	graphics->GetWindow()->SetTitle(L"Sandbox");
+	graphics->GetWindow()->Show(true);
+
+
+	m_bInitialized = true;
+
+	return true;
+}
+
+void Editor::DoExit()
+{
+	// graphic close
+
+	m_bExiting = true;
+}
+
+void Editor::RunFrame()
+{
+	assert(m_bInitialized);
+
+	if (!m_context->GetSubsystem<Graphics>()->IsInitialized())
+		m_bExiting = true;
+
+	if (m_bExiting)
+		return;
+
+	Update();
+
+	Render();
 }
 
 void Editor::Update()
 {
-	if (!m_bInitialized)
-		return;
-
-	m_engine->Update();
-
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-	
-	// draw widget
-	for (auto& widget : m_widgets)
-	{
-		widget->Begin();
-		widget->Tick();
-		widget->End();
-	}
-
-	ImGui::Render();
-
-	// 위치가 좀 달라졌다?
-	{
-		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
-
-		auto renderer = m_engine->GetSystemManager()->GetSystem<Dive::Renderer>();
-		auto renderTarget = renderer->GetRenderDevice()->GetRenderTargetView();
-		renderer->GetRenderDevice()->GetImmediateContext()->OMSetRenderTargets(1, &renderTarget, nullptr);
-		renderer->GetRenderDevice()->GetImmediateContext()->ClearRenderTargetView(renderTarget, (float*)&clear_color);
-	}
-
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-	// 호출 과정이 에반데...
-	m_engine->GetSystemManager()->GetSystem<Dive::Renderer>()->GetRenderDevice()->Present();
+	auto time = m_context->GetSubsystem<Time>();
+	time->Update();
 }
 
-void Editor::OnResize(int width, int height)
+void Editor::Render()
 {
-	if (!m_engine->IsInitialized())
+	// Begin Frame
+	auto graphics = m_context->GetSubsystem<Graphics>();
+	if (!graphics->BeginFrame())
+	{
+		DoExit();
 		return;
+	}
 
-	APP_TRACE("Change Winodw Size: {0:d}, {1:d}", width, height);
+	auto renderer = m_context->GetSubsystem<Renderer>();
+	renderer->Render();
+	// UI Render
 
-	// 차라리 아래 주석처럼 직접 전달하는 편이 나을지도...
-	Dive::WindowResizeEvent evnt(width, height);
-	Dive::EventSystem::GetInstance().Fire(&evnt);
-	//m_engine->GetSystemManager()->GetSystem<Dive::Renderer>()->OnResize(width, height);
-
-	// 이건 적용되는듯
-	ImGui_ImplDX11_InvalidateDeviceObjects();
-	ImGui_ImplDX11_CreateDeviceObjects();
+	// EndFrame
+	graphics->EndFrame();
 }

@@ -1,5 +1,4 @@
-#include "Dive.h"
-#include "Window.h"
+#include <Windows.h>
 #include "Editor.h"
 
 
@@ -9,26 +8,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	AllocConsole();
 #endif
 
-	Window::Create(hInstance, L"Dive Editor");
-	Window::Show();
+	Editor* editor = new Editor;
+	if (!editor->Initialize())
+		return 0;
 
-	Editor editor(hInstance, Window::g_hWnd, Window::GetWidth(), Window::GetHeight(), true);
-	if (!editor.IsInitialized())
-	{
-		APP_CRITICAL("");
-		return 1;
-	}
+	while (!editor->IsExiting())
+		editor->RunFrame();
 
-	Window::g_OnResize = [&editor](int width, int height) {editor.OnResize(width, height); };
-
-	APP_TRACE("프로그램을 실행합니다.");
-	while(Window::Run())
-	{
-		editor.Update();
-	}
-
-	Window::Destroy();
-	APP_TRACE("프로그램이 종료되었습니다.");
+	delete editor;
 
 #ifdef _DEBUG
 	system("pause");

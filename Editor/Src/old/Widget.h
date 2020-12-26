@@ -10,7 +10,7 @@ class Widget
 public:
 	Widget(Editor* editor) : m_editor(editor) 
 	{
-		//m_systemManager = m_editor->GetSystemManager();
+		m_systemManager = m_editor->GetSystemManager();
 	}
 	virtual ~Widget() = default;
 
@@ -86,7 +86,7 @@ public:
 protected:
 	Editor* m_editor						= nullptr;
 	//Dive::SystemManager* m_systemManager	= nullptr;
-	//td::shared_ptr<Dive::SystemManager> m_systemManager;
+	std::shared_ptr<Dive::SystemManager> m_systemManager;
 
 	ImGuiWindow* m_window	= nullptr;
 	std::string m_title		= "no name";

@@ -1,13 +1,20 @@
 #include "DivePch.h"
 #include "Window.h"
-
+#include "Graphics/Graphics.h"
 
 namespace Dive
 {
+	extern Graphics* g_graphics;
+
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (msg)
 		{
+		case WM_DESTROY:
+		{
+			PostQuitMessage(0);
+			return 0;
+		}
 		case WM_CLOSE:
 		{
 			PostQuitMessage(0);
@@ -15,7 +22,7 @@ namespace Dive
 		}
 
 		default:
-			return DefWindowProc(hWnd, msg, wParam, lParam);
+			return g_graphics->MessageHandler(hWnd, msg, wParam, lParam);
 		}
 	}
 
@@ -23,6 +30,7 @@ namespace Dive
 		: m_style(0)
 	{
 		m_title = L"no name";
+		m_baseWndProc = WndProc;
 	}
 
 	bool Dive::Window::Create(int width, int height, bool fullScreen, bool windowed)
@@ -36,7 +44,7 @@ namespace Dive
 		wndClass.cbWndExtra		= 0;
 		wndClass.style			= CS_HREDRAW | CS_VREDRAW | CS_OWNDC; //0;
 		wndClass.hInstance		= m_hInstance;
-		wndClass.lpfnWndProc	= WndProc;
+		wndClass.lpfnWndProc	= m_baseWndProc;
 		wndClass.hbrBackground	= (HBRUSH)(COLOR_WINDOW + 1);
 		wndClass.hCursor		= LoadCursor(m_hInstance, IDC_ARROW);
 		wndClass.hIcon			= LoadIcon(m_hInstance, IDI_APPLICATION);
@@ -130,6 +138,12 @@ namespace Dive
 		ShowWindow(m_hWnd, show ? SW_SHOW : SW_HIDE);
 		UpdateWindow(m_hWnd);
 		SetFocus(m_hWnd);
+	}
+
+	bool Window::ChangeWndProc(LONG newWndProc)
+	{
+		m_baseWndProc = (WNDPROC)SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, newWndProc);
+		return false;
 	}
 
 	int Window::GetClientRectWidth()
