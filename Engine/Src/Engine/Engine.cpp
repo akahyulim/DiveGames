@@ -10,6 +10,7 @@
 #include "Input/Input.h"
 #include "Scene/Scene.h"
 
+
 namespace Dive
 {
 	Engine::Engine()
@@ -99,7 +100,7 @@ namespace Dive
 		}
 
 		GetSubsystem<Renderer>()->Render();
-		// UI Render: 이 곳에 imGUI를 넣을 수 있지 않을까?
+		// UI Render
 			
 		// EndFrame
 		graphics->EndFrame();

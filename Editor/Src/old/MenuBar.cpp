@@ -5,8 +5,6 @@ MenuBar::MenuBar(Editor* editor)
 	: Widget(editor)
 {
 	m_bWindow = false;
-	m_scene = m_editor->GetContext()->GetSubsystem<Scene>().get();
-	assert(m_scene);
 //	m_pSelectedObj = nullptr;
 
 	/*
@@ -32,6 +30,17 @@ MenuBar::MenuBar(Editor* editor)
 
 void MenuBar::Tick(float deltaTime)
 {
+	OPENFILENAME ofn;
+	memset(&ofn, 0, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = nullptr;
+
+	// 이건 scene와 project를 구분해야 한다.
+	ofn.lpstrFilter = L"All Files(*.*)\0*.scene\0";
+
+	ofn.lpstrFile = nullptr;
+	ofn.nMaxFile = MAX_PATH;
+
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -44,7 +53,6 @@ void MenuBar::Tick(float deltaTime)
 				}
 
 				// 새로운 scene 생성
-				APP_TRACE("clicked File menu");
 			}
 
 			if (ImGui::MenuItem("Open Scene"))
@@ -52,6 +60,11 @@ void MenuBar::Tick(float deltaTime)
 				//if (m_pWorld->IsDirty())
 				{
 					// 저장, 저장안함, 취소
+				}
+
+				if (GetOpenFileName(&ofn) != 0)
+				{
+					// 이후 로드 실행
 				}
 			}
 
@@ -65,6 +78,10 @@ void MenuBar::Tick(float deltaTime)
 
 			if (ImGui::MenuItem("Save As..."))
 			{
+				if (GetSaveFileName(&ofn) != 0)
+				{
+					// 이후 지정된 경로에 지정된 이름으로 저장
+				}
 			}
 
 			ImGui::Separator();
@@ -75,10 +92,24 @@ void MenuBar::Tick(float deltaTime)
 
 			if (ImGui::MenuItem("Open Project"))
 			{
+				// 프로젝트 단위도 검사해야 하나?
+				//if (m_pWorld->IsDirty())
+				{
+					// 저장, 저장안함, 취소
+				}
+
+				if (GetOpenFileName(&ofn) != 0)
+				{
+					// 이후 로드 실행
+				}
 			}
 
 			if (ImGui::MenuItem("Save Project"))
 			{
+				if (GetSaveFileName(&ofn) != 0)
+				{
+					// 이후 로드 실행
+				}
 			}
 
 			// settings???
@@ -105,7 +136,6 @@ void MenuBar::Tick(float deltaTime)
 			if (ImGui::MenuItem("Create Empty"))
 			{
 				//m_pWorld->CreateGameObject();
-				m_scene->CreateGameObject();
 			}
 
 			if (ImGui::BeginMenu("3D Object"))

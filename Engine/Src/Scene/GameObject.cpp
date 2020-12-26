@@ -39,7 +39,7 @@ namespace Dive
 	
 	void GameObject::Start()
 	{
-		CORE_TRACE("Start GameObject.");
+		//CORE_TRACE("Start GameObject.");
 
 		for (auto& component : m_components)
 			component->OnStart();
@@ -47,7 +47,7 @@ namespace Dive
 	
 	void GameObject::Stop()
 	{
-		CORE_TRACE("Stop GameObject.");
+		//CORE_TRACE("Stop GameObject.");
 
 		for (auto& component : m_components)
 			component->OnStop();
@@ -58,7 +58,7 @@ namespace Dive
 		if (!m_bActive)
 			return;
 
-		CORE_TRACE("Update GameObject.");
+		//CORE_TRACE("Update GameObject.");
 
 		for (auto& component : m_components)
 			component->OnUpdate();

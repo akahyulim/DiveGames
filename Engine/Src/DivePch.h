@@ -33,6 +33,8 @@
 #include <guiddef.h>
 #include <iomanip>
 #include <any>
+#include <Windows.h>
+#include <WinUser.h>
 #include <winerror.h>
 #include <variant>
 #include <typeindex>

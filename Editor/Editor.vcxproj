@@ -98,8 +98,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Widgets\Scene.h" />
-    <ClInclude Include="Src\Widgets\MenuBar.h" />
     <ClInclude Include="Src\Editor.h" />
     <ClInclude Include="Src\ImGUI\imconfig.h" />
     <ClInclude Include="Src\ImGUI\imgui.h" />
@@ -109,20 +107,21 @@
     <ClInclude Include="Src\ImGUI\imstb_rectpack.h" />
     <ClInclude Include="Src\ImGUI\imstb_textedit.h" />
     <ClInclude Include="Src\ImGUI\imstb_truetype.h" />
+    <ClInclude Include="Src\Widgets\Hierarchy.h" />
+    <ClInclude Include="Src\Widgets\MenuBar.h" />
     <ClInclude Include="Src\Widgets\Widget.h" />
-    <ClInclude Include="Src\Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Widgets\Scene.cpp" />
-    <ClCompile Include="Src\Widgets\MenuBar.cpp" />
     <ClCompile Include="Src\Editor.cpp" />
-    <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\ImGUI\imgui.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_demo.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_draw.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_impl_dx11.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_impl_win32.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="Src\main.cpp" />
+    <ClCompile Include="Src\Widgets\Hierarchy.cpp" />
+    <ClCompile Include="Src\Widgets\MenuBar.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">

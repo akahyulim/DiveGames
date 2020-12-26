@@ -28,7 +28,7 @@ namespace Dive
 		Unload();
 
 		DIVE_UNSUBSCRIBE_FROM_EVENT(Scene, E_UPDATE, this);
-		CORE_TRACE("Destroy Scene - {:s}", m_name);
+		CORE_TRACE("Destroy Scene - {:s} ===========================", m_name);
 	}
 
 	void Scene::OnUpdate(const E_UPDATE* evnt)

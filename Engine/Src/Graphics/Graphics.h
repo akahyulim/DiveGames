@@ -61,8 +61,10 @@ namespace Dive
 		DIVE_OBJECT(Graphics, Object);
 
 	public:
-		Graphics(Context* context);
+		explicit Graphics(Context* context);
 		~Graphics();
+
+		LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 		bool BeginFrame();
 		void EndFrame();
@@ -73,6 +75,7 @@ namespace Dive
 
 		// settings를 얻어와야 한다.
 		bool SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync);
+		bool SetWindowSubclassing(LONG_PTR newProc);
 
 		std::shared_ptr<Window> GetWindow() const { return m_window; }
 
@@ -83,6 +86,9 @@ namespace Dive
 		ID3D11DeviceContext* GetRHIContext() const { return m_immediateContext; }
 		
 	private:
+		Graphics(const Graphics&)				= delete;
+		Graphics& operator=(const Graphics&)	= delete;
+
 		bool createDisplay(int width, int height, DisplayMode displayMode);
 		void adjustDisplayMode(int& width, int& height, DisplayMode& displayMode);
 		

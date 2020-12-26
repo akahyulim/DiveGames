@@ -12,12 +12,17 @@
 
 namespace Dive
 {
+	Graphics* g_graphics = nullptr;
+
 	Graphics::Graphics(Context* context)
 		: Object(context)
 
 	{
 		m_window = std::make_shared<Window>();
 		assert(m_window);
+
+		// 좀 애매허다.
+		g_graphics = this;
 	}
 
 	Graphics::~Graphics()
@@ -26,10 +31,25 @@ namespace Dive
 		SAFE_RELEASE(m_device);
 		SAFE_RELEASE(m_swapChain);
 
-		m_window->Destroy();
-		m_window.reset();
-
 		CORE_TRACE("Call Graphics's Destructor ======================");
+	}
+
+	// 이 곳에서 input을 처리한다?
+	LRESULT Graphics::MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		// imgui의 처리가 필요하다.
+
+		switch (msg)
+		{
+		case WM_KEYDOWN:
+			return 0;
+
+		case WM_KEYUP:
+			return 0;
+
+		default:
+			return DefWindowProc(hWnd, msg, wParam, lParam);
+		}
 	}
 
 	bool Graphics::BeginFrame()
@@ -38,7 +58,10 @@ namespace Dive
 			return false;
 
 		if (!m_window->Run())
+		{
+			m_window->Destroy();
 			return false;
+		}
 
 		// render target clear
 		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
@@ -65,7 +88,7 @@ namespace Dive
 
 	bool Graphics::IsInitialized()
 	{
-		return ( m_window != nullptr && m_device != nullptr);
+		return (m_window != nullptr && m_device != nullptr);
 	}
 
 	bool Graphics::SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync)
@@ -78,6 +101,14 @@ namespace Dive
 		mode.screenMode = fullScreen ? eScreenMode::FullScreen : (borderless ? eScreenMode::Borderless : eScreenMode::Windowed);
 	
 		return createDisplay(width, height, mode);
+	}
+
+	bool Graphics::SetWindowSubclassing(LONG_PTR newProc)
+	{
+		if (!m_window)
+			return false;
+		
+		return m_window->ChangeWndProc(newProc);
 	}
 
 	bool Graphics::createDisplay(int width, int height, DisplayMode displayMode)
