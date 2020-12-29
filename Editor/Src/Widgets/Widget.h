@@ -8,10 +8,7 @@
 class Widget
 {
 public:
-	Widget(Editor* editor) : m_editor(editor) 
-	{
-		//m_systemManager = m_editor->GetSystemManager();
-	}
+	Widget(Editor* editor) : m_editor(editor) {}
 	virtual ~Widget() = default;
 
 	bool Begin()
@@ -49,7 +46,7 @@ public:
 		}
 
 		ImGui::Begin(m_title.c_str(), &m_bVisible, m_wndFlags);
-		m_bWindowBegun = true;
+		m_bBegunWindow = true;
 
 		return true;
 	}
@@ -58,7 +55,7 @@ public:
 
 	bool End()
 	{
-		if (!m_bWindowBegun)
+		if (!m_bBegunWindow)
 			return false;
 
 		m_window = ImGui::GetCurrentWindow();
@@ -76,17 +73,19 @@ public:
 		m_varCount++;
 	}
 
-	bool IsWindow()					{ return m_bWindow; }
-	bool& IsVisible()				{ return m_bVisible; }
+	bool IsWindow()					const { return m_bWindow; }
+	const bool& IsVisible()			const { return m_bVisible; }
 	void SetVisible(bool visible)	{ m_bVisible = visible; }
-	float GetHeight()				{ return m_height; }
+	float GetHeight()				const { return m_height; }
 	ImGuiWindow* GetWindow()		{ return m_window; }
-	const std::string& GetTitle()	{ return m_title; }
+	const std::string& GetTitle()	const { return m_title; }
+
+private:
+	Widget(const Widget&)				= delete;
+	Widget& operator=(const Widget&)	= delete;
 
 protected:
-	Editor* m_editor						= nullptr;
-	//Dive::SystemManager* m_systemManager	= nullptr;
-	//td::shared_ptr<Dive::SystemManager> m_systemManager;
+	Editor* m_editor		= nullptr;
 
 	ImGuiWindow* m_window	= nullptr;
 	std::string m_title		= "no name";
@@ -102,6 +101,6 @@ protected:
 	DirectX::XMFLOAT2 m_padding{ -1.0f, -1.0f };
 
 private:
-	bool m_bWindowBegun		= false;
+	bool m_bBegunWindow		= false;
 	unsigned int m_varCount = 0;
 };

@@ -15,7 +15,7 @@ namespace Dive
 		m_bDirty(false)
 	{
 		if (name.empty())
-			m_name = "Scene";
+			m_name = "No Name";
 		else
 			m_name = std::move(name);
 

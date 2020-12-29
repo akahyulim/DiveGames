@@ -13,21 +13,21 @@ namespace Dive
 		m_bPendingDestruction(false)
 	{
 		if (name.empty())
-			m_name = "GameObject";
+			m_name = "Empty";
 		else
 			m_name = std::move(name);
 
 		// transform은 기본적으로 추가한다.
 		AddComponent<Transform>();
 
-		CORE_TRACE("Create GameObject - {:s}.", m_name);
+		CORE_TRACE("Create GameObject - {:s}, {:d}.", m_name, m_ID);
 	}
 
 	GameObject::~GameObject()
 	{
 		m_components.clear();
 
-		CORE_TRACE("Destroy GameObject - {:s}", m_name);
+		CORE_TRACE("Destroy GameObject - {:s}, {:d}", m_name, m_ID);
 	}
 
 	void GameObject::Clone()

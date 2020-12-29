@@ -4,6 +4,8 @@
 #include "ImGui/imgui_impl_win32.h"
 #include "ImGui/imgui_impl_dx11.h"
 #include "Widgets/MenuBar.h"
+#include "Widgets/Hierarchy.h"
+
 
 Editor* s_editor = nullptr;
 
@@ -75,6 +77,7 @@ bool Editor::Initialize()
 	// Widgets
 	{
 		m_widgets.emplace_back(std::make_shared<MenuBar>(this));
+		m_widgets.emplace_back(std::make_shared<Hierarchy>(this));
 	}
 
 	m_bInitialized = true;
