@@ -5,6 +5,8 @@ MenuBar::MenuBar(Editor* editor)
 	: Widget(editor)
 {
 	m_bWindow = false;
+	m_scene = m_editor->GetContext()->GetSubsystem<Scene>().get();
+	assert(m_scene);
 //	m_pSelectedObj = nullptr;
 
 	/*
@@ -103,6 +105,7 @@ void MenuBar::Tick(float deltaTime)
 			if (ImGui::MenuItem("Create Empty"))
 			{
 				//m_pWorld->CreateGameObject();
+				m_scene->CreateGameObject();
 			}
 
 			if (ImGui::BeginMenu("3D Object"))

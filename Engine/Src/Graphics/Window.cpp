@@ -140,10 +140,10 @@ namespace Dive
 		SetFocus(m_hWnd);
 	}
 
-	bool Window::ChangeWndProc(LONG newWndProc)
+	bool Window::ChangeWndProc(LONG_PTR newWndProc)
 	{
 		m_baseWndProc = (WNDPROC)SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, newWndProc);
-		return false;
+		return m_baseWndProc == WndProc;
 	}
 
 	int Window::GetClientRectWidth()

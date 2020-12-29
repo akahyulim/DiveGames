@@ -75,7 +75,7 @@ namespace Dive
 
 		// settings를 얻어와야 한다.
 		bool SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync);
-		bool SetWindowSubclassing(LONG newProc);
+		bool SetWindowSubclassing(LONG_PTR newProc);
 
 		std::shared_ptr<Window> GetWindow() const { return m_window; }
 

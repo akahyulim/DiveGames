@@ -15,7 +15,7 @@ namespace Dive
 
 		void Show(bool show);
 
-		bool ChangeWndProc(LONG newWndProc);
+		bool ChangeWndProc(LONG_PTR newWndProc);
 
 		HWND GetHandle() const { return m_hWnd; }
 
@@ -24,7 +24,7 @@ namespace Dive
 		int GetClientRectWidth();
 		int GetClientRectHeight();
 
-		WNDPROC& GetBaseWndProc() { return m_baseWndProc; }
+		const WNDPROC& GetBaseWndProc() const { return m_baseWndProc; }
 
 		// set icon
 		// set title

@@ -31,9 +31,6 @@ namespace Dive
 		SAFE_RELEASE(m_device);
 		SAFE_RELEASE(m_swapChain);
 
-		m_window->Destroy();
-		m_window.reset();
-
 		CORE_TRACE("Call Graphics's Destructor ======================");
 	}
 
@@ -44,6 +41,12 @@ namespace Dive
 
 		switch (msg)
 		{
+		case WM_KEYDOWN:
+			return 0;
+
+		case WM_KEYUP:
+			return 0;
+
 		default:
 			return DefWindowProc(hWnd, msg, wParam, lParam);
 		}
@@ -55,7 +58,10 @@ namespace Dive
 			return false;
 
 		if (!m_window->Run())
+		{
+			m_window->Destroy();
 			return false;
+		}
 
 		// render target clear
 		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
@@ -82,7 +88,7 @@ namespace Dive
 
 	bool Graphics::IsInitialized()
 	{
-		return ( m_window != nullptr && m_device != nullptr);
+		return (m_window != nullptr && m_device != nullptr);
 	}
 
 	bool Graphics::SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync)
@@ -97,7 +103,7 @@ namespace Dive
 		return createDisplay(width, height, mode);
 	}
 
-	bool Graphics::SetWindowSubclassing(LONG newProc)
+	bool Graphics::SetWindowSubclassing(LONG_PTR newProc)
 	{
 		if (!m_window)
 			return false;

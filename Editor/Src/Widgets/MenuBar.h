@@ -18,6 +18,7 @@ private:
 private:
 //	Dive::World* m_pWorld;
 //	Dive::GameObject* m_pSelectedObj;
+	Scene* m_scene;
 
 	// µÑ ´Ù dialog
 	bool m_bShowProjectOpen		= false;

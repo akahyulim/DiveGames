@@ -19,8 +19,6 @@ public:
 	Editor();
 	~Editor();
 
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 	bool Initialize();
 	void DoExit();
 
@@ -32,6 +30,8 @@ public:
 	// 사실 애네 둘은 private이어야 한다.
 	void Update();
 	void Render();
+
+	Context* GetContext() const { return m_context; }
 
 private:
 private:
