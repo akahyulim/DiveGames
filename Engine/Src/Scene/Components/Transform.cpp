@@ -22,6 +22,28 @@ namespace Dive
 		CORE_TRACE("Destroy Transform.");
 	}
 
+	void Transform::Serialize(void * stream)
+	{
+		// local position
+		// local rotation
+		// local scale
+		// look at
+		// parent가 존재한다면 id 없다면 0(-1)이 더 어울릴듯
+	}
+
+	void Transform::Deserialize(void * stream)
+	{
+		// local position
+		// local rotation
+		// local scale
+		// look at
+		// parent id
+		// id가 있다면 scene로부터 game object를 가져온 후
+		// 해당 부모로부터 자신을 자식으로 추가
+
+		updateTransform();
+	}
+
 	DirectX::XMVECTOR Transform::GetPosition()
 	{
 		return DirectX::XMVectorSet(m_matrix._41, m_matrix._42, m_matrix._43, 1.0f);

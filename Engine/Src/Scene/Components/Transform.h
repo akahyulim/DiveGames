@@ -16,6 +16,8 @@ namespace Dive
 		~Transform();
 
 		// serialization
+		void Serialize(void* stream);
+		void Deserialize(void* stream);
 
 		// const &∑Œ ∏Æ≈œ???
 		//= position

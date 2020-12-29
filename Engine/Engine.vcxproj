@@ -107,6 +107,7 @@
   <ItemGroup>
     <ClInclude Include="Src\Core\CoreEvents.h" />
     <ClInclude Include="Src\Core\Context.h" />
+    <ClInclude Include="Src\Core\FileStream.h" />
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\EventSystem.h" />
     <ClInclude Include="Src\Engine\Application.h" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Core\Context.cpp" />
+    <ClCompile Include="Src\Core\FileStream.cpp" />
     <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\BlendState.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\RasterizerState.cpp" />

@@ -94,6 +94,9 @@
     <ClCompile Include="Src\Scene\Components\Transform_Hierarchy.cpp">
       <Filter>Src\Scene\Components</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Core\FileStream.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
@@ -224,6 +227,9 @@
     </ClInclude>
     <ClInclude Include="Src\Scene\SceneEvents.h">
       <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\FileStream.h">
+      <Filter>Src\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

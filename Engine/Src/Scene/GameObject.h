@@ -5,6 +5,7 @@ namespace Dive
 {
 	class Context;
 	class Component;
+	class Transform;
 
 	class GameObject : public Object, public std::enable_shared_from_this<GameObject>
 	{
@@ -14,7 +15,8 @@ namespace Dive
 		explicit GameObject(Context* context, std::string name = "");
 		~GameObject();
 
-		// serialization
+		void Serialize(void* stream);
+		void Deserialize(void* stream, Transform* parent = nullptr);
 
 		void Clone();
 

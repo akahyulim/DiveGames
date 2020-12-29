@@ -21,7 +21,9 @@ namespace Dive
 		virtual std::string GetTypeName()		const = 0;
 		virtual size_t GetBaseTypeHash()		const = 0;
 		virtual std::string GetBaseTypeName()	const = 0;
+		
 		unsigned int GetID()					const { return m_ID; }
+		void SetID(unsigned int id)				{ m_ID = id; }
 
 		template<class T> std::shared_ptr<T> GetSubsystem()
 		{

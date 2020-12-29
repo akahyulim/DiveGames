@@ -19,6 +19,9 @@ namespace Dive
 		Scene(Context* context, std::string name = "");
 		~Scene();
 
+		bool SaveToFile(const std::string& filepath);
+		bool LoadFromFile(const std::string& filepath);
+
 		void OnUpdate(const E_UPDATE* evnt);
 
 		void Unload();

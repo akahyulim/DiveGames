@@ -30,6 +30,70 @@ namespace Dive
 		CORE_TRACE("Destroy GameObject - {:s}, {:d}", m_name, m_ID);
 	}
 
+	void GameObject::Serialize(void * stream)
+	{
+		// basic data
+		{
+			// is active
+			// hierarchy visibility => editor camera를 숨기는 것과 같은 기능?
+			// id
+			// name
+		}
+
+		// components
+		{
+			// component 개수
+			// component type id
+			// compoennt id
+
+			// component serialize
+		}
+
+		// children
+		{
+			// children 획득
+
+			// children count
+
+			// children id
+
+			// 모든 children의 ower를 통해 serialize
+		}
+	}
+
+	void GameObject::Deserialize(void * stream, Transform * parent)
+	{
+		// basic data
+		{
+			// is active
+			// hierarchy visibility => editor camera를 숨기는 것과 같은 기능?
+			// id
+			// name
+		}
+
+		// components
+		{
+			// component 개수
+			// component type id
+			// compoennt id
+			// 들을 통해 component 생성 => 생성 함수 추가 구현 필요
+
+			// component deserialize
+
+			// 전달받은 parent를 set parent
+		}
+
+		// children
+		{
+			// children count
+			// scene을 통해 child를 count만큼 생성하며 id 전달
+
+			// children에서 child들의 deserialize
+
+			// transform의 acquireChildren => 부모를 통해 계층관계 형성
+		}
+	}
+
 	void GameObject::Clone()
 	{
 		// 깊은 복사 수행

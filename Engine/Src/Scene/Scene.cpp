@@ -6,6 +6,7 @@
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/CoreEvents.h"
+#include "Core/FileSystemHelper.h"
 
 
 namespace Dive
@@ -29,6 +30,60 @@ namespace Dive
 
 		DIVE_UNSUBSCRIBE_FROM_EVENT(Scene, E_UPDATE, this);
 		CORE_TRACE("Destroy Scene - {:s} ===========================", m_name);
+	}
+
+	bool Scene::SaveToFile(const std::string & filepath)
+	{
+		// 확장자가 붙어있지 않으면 추가
+		// 이름만 뽑아서 저장
+
+		// 파일 오픈
+
+		auto rootGameObjects = GetRootGameObjects();
+		// root game object count
+		unsigned int rootCount = static_cast<unsigned int>(rootGameObjects.size());
+
+		for (const auto& gameObject : rootGameObjects)
+		{
+			// root game object id
+			unsigned int id = gameObject->GetID();
+
+			// file을 전달하여 개별 root game object의 serialize 호출
+			gameObject->Serialize(nullptr);
+		}
+
+		return true;
+	}
+
+	bool Scene::LoadFromFile(const std::string & filepath)
+	{
+		// 파일 존재 여부
+		// 올바른 확장자인지 확인
+
+		// 파일 오픈
+
+		// 기존 세팅 클리어
+
+		// 이름만 뽑아서 저장
+
+		// root game object count 획득
+		unsigned int count;
+		for (unsigned int i = 0; i != count; i++)
+		{
+			std::shared_ptr<GameObject> gameObject = CreateGameObject();
+			// id를 읽은 후 저장
+			unsigned int id;
+			gameObject->SetID(id);
+		}
+		
+		// 생성된 game object들에게 file을 전달하여 deserialize 호출
+		// 계층 구조때문에 다시한번 루프
+		for (auto& gameObject : m_gameObjects)
+		{
+			gameObject->Deserialize(nullptr, nullptr);
+		}
+
+		return true;
 	}
 
 	void Scene::OnUpdate(const E_UPDATE* evnt)
