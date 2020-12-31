@@ -1,17 +1,19 @@
 #pragma once
 #include "DivePch.h"
 #include "Core/Object.h"
-#include "Scene/GameObject.h"
 
 
 namespace Dive
 {
 	class Context;
+	class FileStream;
+	class GameObject;
 
-	enum class eComponentType
+	enum class eComponentType : unsigned int
 	{
 		Transform,
 		Renderable,
+	//	Unknown
 	};
 
 	class Component : public Object
@@ -23,6 +25,8 @@ namespace Dive
 		virtual ~Component() = default;
 
 		// serialization
+		virtual void Serialize(FileStream& stream) {}
+		virtual void Deserialize(FileStream& stream) {}
 
 		virtual void OnAwake() {}
 		virtual void OnStart() {}
@@ -34,7 +38,7 @@ namespace Dive
 
 		GameObject* GetOwner()		const { return m_owner; }
 		eComponentType GetType()	const { return m_type; }
-		std::string GetName()		const { return m_owner->GetName(); }
+		std::string GetName()		const;// { return m_owner->GetName(); }
 
 	protected:
 

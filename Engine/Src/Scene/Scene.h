@@ -8,25 +8,24 @@ namespace Dive
 	class GameObject;
 	class E_UPDATE;
 
-	// 두 개의 scene이 swap될 수 있으나
-	// 기본적으로 file을 통해 관리된다.
-	// 추후 unity의 scene swap을 분석해보자.
+	// 추후 Scene Swap에 대해 생각해봐야 한다.
 	class Scene : public Object
 	{
 		DIVE_OBJECT(Scene, Object);
 
 	public:
-		Scene(Context* context, std::string name = "");
+		explicit Scene(Context* context, std::string name = "");
 		~Scene();
+
+		void New() { clear(); }
 
 		bool SaveToFile(const std::string& filepath);
 		bool LoadFromFile(const std::string& filepath);
 
+		// sub system interface를 만들것인가...
 		void OnUpdate(const E_UPDATE* evnt);
 
-		void Unload();
-
-		std::shared_ptr<GameObject> CreateGameObject();
+		std::shared_ptr<GameObject> CreateGameObject(bool active = true);
 		void RemoveGameObject(const std::shared_ptr<GameObject>& gameObject);
 
 		const std::shared_ptr<GameObject>& GetGameObjectByName(const std::string& name);
@@ -45,14 +44,16 @@ namespace Dive
 		Scene(const Scene&)				= delete;
 		Scene& operator=(const Scene&)	= delete;
 
+		void clear();
 		void removeGameObject(const std::shared_ptr<GameObject> gameObject);
 
 	private:
 		std::string m_name;
-		// resolve라는 걸로 대채되었다. 매번 갱신여부를 기록하는 것이 아니라
-		// 한 번 묶은 후 다루는 것 같다.
+
 		bool m_bDirty;	
+		bool m_bClear;
 
 		std::vector<std::shared_ptr<GameObject>> m_gameObjects;
+		std::vector<std::shared_ptr<GameObject>> m_loadedGameObjects;
 	};
 }

@@ -1,6 +1,7 @@
 #include "DivePch.h"
 #include "Transform.h"
 #include "Core/Context.h"
+#include "Core/FileStream.h"
 #include "Core/Log.h"
 #include "Scene/GameObject.h"
 #include "Scene/Scene.h"
@@ -22,24 +23,33 @@ namespace Dive
 		CORE_TRACE("Destroy Transform.");
 	}
 
-	void Transform::Serialize(void * stream)
+	void Transform::Serialize(FileStream & stream)
 	{
 		// local position
 		// local rotation
 		// local scale
 		// look at
 		// parent가 존재한다면 id 없다면 0(-1)이 더 어울릴듯
+		stream.Write(m_parent ? m_parent->GetID() : 0);
 	}
 
-	void Transform::Deserialize(void * stream)
+	void Transform::Deserialize(FileStream & stream)
 	{
 		// local position
 		// local rotation
 		// local scale
 		// look at
 		// parent id
-		// id가 있다면 scene로부터 game object를 가져온 후
-		// 해당 부모로부터 자신을 자식으로 추가
+		unsigned int parentID = 0;
+		stream.Read(&parentID);
+
+		if (parentID != 0)
+		{
+			if (const auto& parent = GetSubsystem<Scene>()->GetGameObjectByID(parentID))
+			{
+				parent->GetComponent<Transform>()->AddChild(this);
+			}
+		}
 
 		updateTransform();
 	}

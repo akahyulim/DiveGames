@@ -1,8 +1,10 @@
 #include "DivePch.h"
 #include "GameObject.h"
+#include "Scene.h"
 #include "Core/Context.h"
+#include "Core/FileStream.h"
 #include "Core/Log.h"
-#include "Components/Component.h"
+#include "Components/Renderable.h"
 #include "Components/Transform.h"
 
 namespace Dive
@@ -12,13 +14,9 @@ namespace Dive
 		m_bActive(true),
 		m_bPendingDestruction(false)
 	{
-		if (name.empty())
-			m_name = "Empty";
-		else
-			m_name = std::move(name);
+		m_name = name.empty() ? "Game Object" : std::move(name);
 
-		// transform은 기본적으로 추가한다.
-		AddComponent<Transform>();
+		m_transform = AddComponent<Transform>();
 
 		CORE_TRACE("Create GameObject - {:s}, {:d}.", m_name, m_ID);
 	}
@@ -30,67 +28,107 @@ namespace Dive
 		CORE_TRACE("Destroy GameObject - {:s}, {:d}", m_name, m_ID);
 	}
 
-	void GameObject::Serialize(void * stream)
+	void GameObject::Serialize(FileStream& stream)
 	{
 		// basic data
 		{
-			// is active
-			// hierarchy visibility => editor camera를 숨기는 것과 같은 기능?
-			// id
-			// name
+			stream.Write(m_bActive);
+			stream.Write(m_ID);
+			stream.Write(m_name);
 		}
 
 		// components
 		{
-			// component 개수
-			// component type id
-			// compoennt id
+			stream.Write(GetComponentsCount());
 
-			// component serialize
+			for (const auto& component : m_components)
+			{
+				stream.Write(static_cast<unsigned int>(component->GetType()));
+				stream.Write(component->GetID());
+			}
+
+			for (const auto& component : m_components)
+			{
+				component->Serialize(stream);
+			}
 		}
 
 		// children
 		{
-			// children 획득
+			auto children = m_transform->GetChildren();
 
-			// children count
+			stream.Write(static_cast<unsigned int>(children.size()));
 
-			// children id
+			for (const auto& child : children)
+			{
+				stream.Write(child->GetID());
+			}
 
-			// 모든 children의 ower를 통해 serialize
+			for (const auto& child : children)
+			{
+				auto owner = child->GetOwner();
+				if (!owner)
+				{
+					CORE_ERROR("");
+					break;
+				}
+
+				owner->Serialize(stream);
+			}
 		}
 	}
 
-	void GameObject::Deserialize(void * stream, Transform * parent)
+	void GameObject::Deserialize(FileStream & stream, Transform * parent)
 	{
 		// basic data
 		{
-			// is active
-			// hierarchy visibility => editor camera를 숨기는 것과 같은 기능?
-			// id
-			// name
+			stream.Read(&m_bActive);
+			stream.Read(&m_ID);
+			stream.Read(&m_name);
 		}
 
 		// components
 		{
-			// component 개수
-			// component type id
-			// compoennt id
-			// 들을 통해 component 생성 => 생성 함수 추가 구현 필요
+			auto componentCount = stream.ReadAs<unsigned int>();
+			for (unsigned int i = 0; i != componentCount; i++)
+			{
+				unsigned int type = 0;
+				stream.Read(&type);
+				
+				unsigned int id = 0;
+				stream.Read(&id);
 
-			// component deserialize
+				AddComponent(static_cast<eComponentType>(type), id);
+			}
 
-			// 전달받은 parent를 set parent
+			for (const auto& component : m_components)
+			{
+				component->Deserialize(stream);
+			}
+
+			m_transform->SetParent(parent);
 		}
 
 		// children
 		{
-			// children count
-			// scene을 통해 child를 count만큼 생성하며 id 전달
+			auto childrenCount = stream.ReadAs<unsigned int>();
+			
+			auto scene = GetSubsystem<Scene>();
+			std::vector<std::weak_ptr<GameObject>> children;
+			for (unsigned int i = 0; i != childrenCount; i++)
+			{
+				auto child = scene->CreateGameObject();
+				child->SetID(stream.ReadAs<unsigned int>());
 
-			// children에서 child들의 deserialize
+				children.emplace_back(child);
+			}
 
-			// transform의 acquireChildren => 부모를 통해 계층관계 형성
+			for (const auto& child : children)
+			{
+				child.lock()->Deserialize(stream, m_transform);
+			}
+
+			m_transform->AcquireChildern();
 		}
 	}
 
@@ -103,16 +141,12 @@ namespace Dive
 	
 	void GameObject::Start()
 	{
-		//CORE_TRACE("Start GameObject.");
-
 		for (auto& component : m_components)
 			component->OnStart();
 	}
 	
 	void GameObject::Stop()
 	{
-		//CORE_TRACE("Stop GameObject.");
-
 		for (auto& component : m_components)
 			component->OnStop();
 	}
@@ -122,9 +156,30 @@ namespace Dive
 		if (!m_bActive)
 			return;
 
-		//CORE_TRACE("Update GameObject.");
-
 		for (auto& component : m_components)
 			component->OnUpdate();
+	}
+
+	Component * GameObject::AddComponent(eComponentType type, unsigned int id)
+	{
+		switch (type)
+		{
+		case eComponentType::Renderable:
+		{
+			auto component = AddComponent<Renderable>();
+			component->SetID(id);
+			return static_cast<Component*>(component);
+		}
+
+		case eComponentType::Transform:
+		{
+			auto component = AddComponent<Transform>();
+			component->SetID(id);
+			return static_cast<Component*>(component);
+		}
+
+		default:
+			return nullptr;
+		}
 	}
 }

@@ -7,13 +7,15 @@
 #include "Core/Log.h"
 #include "Core/CoreEvents.h"
 #include "Core/FileSystemHelper.h"
+#include "Core/FileStream.h"
 
 
 namespace Dive
 {
 	Scene::Scene(Context * context, std::string name)
 		: Object(context),
-		m_bDirty(false)
+		m_bDirty(false),
+		m_bClear(false)
 	{
 		if (name.empty())
 			m_name = "No Name";
@@ -26,8 +28,6 @@ namespace Dive
 
 	Scene::~Scene()
 	{
-		Unload();
-
 		DIVE_UNSUBSCRIBE_FROM_EVENT(Scene, E_UPDATE, this);
 		CORE_TRACE("Destroy Scene - {:s} ===========================", m_name);
 	}
@@ -37,20 +37,28 @@ namespace Dive
 		// 확장자가 붙어있지 않으면 추가
 		// 이름만 뽑아서 저장
 
-		// 파일 오픈
+		FileStream stream(filepath, eFileStreamMode::Write);
+		if (!stream.IsOpen())
+		{
+			CORE_ERROR("");
+			return false;
+		}
 
 		auto rootGameObjects = GetRootGameObjects();
-		// root game object count
-		unsigned int rootCount = static_cast<unsigned int>(rootGameObjects.size());
+		auto rootCount = static_cast<unsigned int>(rootGameObjects.size());
+		stream.Write(rootCount);
 
 		for (const auto& gameObject : rootGameObjects)
 		{
-			// root game object id
-			unsigned int id = gameObject->GetID();
-
-			// file을 전달하여 개별 root game object의 serialize 호출
-			gameObject->Serialize(nullptr);
+			stream.Write(gameObject->GetID());
 		}
+
+		for (const auto& gameObject : rootGameObjects)
+		{
+			gameObject->Serialize(stream);
+		}
+
+		stream.Close();
 
 		return true;
 	}
@@ -60,28 +68,32 @@ namespace Dive
 		// 파일 존재 여부
 		// 올바른 확장자인지 확인
 
-		// 파일 오픈
+		FileStream stream(filepath, eFileStreamMode::Read);
+		if (!stream.IsOpen())
+		{
+			CORE_ERROR("");
+			return false;
+		}
 
-		// 기존 세팅 클리어
+		clear();
 
 		// 이름만 뽑아서 저장
 
-		// root game object count 획득
-		unsigned int count;
-		for (unsigned int i = 0; i != count; i++)
+		unsigned int rootCount = stream.ReadAs<unsigned int>();
+		for (unsigned int i = 0; i != rootCount; i++)
 		{
 			std::shared_ptr<GameObject> gameObject = CreateGameObject();
-			// id를 읽은 후 저장
-			unsigned int id;
-			gameObject->SetID(id);
+			gameObject->SetID(stream.ReadAs<unsigned int>());
 		}
 		
-		// 생성된 game object들에게 file을 전달하여 deserialize 호출
-		// 계층 구조때문에 다시한번 루프
 		for (auto& gameObject : m_gameObjects)
 		{
-			gameObject->Deserialize(nullptr, nullptr);
+			gameObject->Deserialize(stream, nullptr);
 		}
+
+		stream.Close();
+
+		m_bDirty = true;
 
 		return true;
 	}
@@ -136,28 +148,26 @@ namespace Dive
 			DIVE_FIRE_EVENT(&evnt);
 			m_bDirty = false;
 		}
+
+		if (m_bClear)
+		{
+			m_loadedGameObjects.clear();
+			m_loadedGameObjects.shrink_to_fit();
+
+			m_bClear = false;
+		}
 	}
 
-	void Scene::Unload()
+	std::shared_ptr<GameObject> Scene::CreateGameObject(bool active)
 	{
-		m_gameObjects.clear();
-		m_gameObjects.shrink_to_fit();
-
-		m_bDirty = true;
-	}
-
-	std::shared_ptr<GameObject> Scene::CreateGameObject()
-	{
-		m_bDirty = true;
-		return m_gameObjects.emplace_back(std::make_shared<GameObject>(m_context));
+		auto gameObject = m_gameObjects.emplace_back(std::make_shared<GameObject>(m_context));
+		gameObject->SetActive(active);
+		return gameObject;
 	}
 
 	void Scene::RemoveGameObject(const std::shared_ptr<GameObject>& gameObject)
 	{
-		if (!gameObject)
-			return;
-
-		if (!ExistsGameObject(gameObject))
+		if (!gameObject || !ExistsGameObject(gameObject))
 			return;
 
 		gameObject->MarkForDestruction();
@@ -210,6 +220,15 @@ namespace Dive
 		}
 
 		return targetObjects;
+	}
+
+	void Scene::clear()
+	{
+		m_loadedGameObjects.clear();
+		m_loadedGameObjects.swap(m_gameObjects);
+
+		m_bDirty = true;
+		m_bClear = true;	
 	}
 
 	void Scene::removeGameObject(const std::shared_ptr<GameObject> gameObject)

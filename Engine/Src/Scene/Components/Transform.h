@@ -5,6 +5,7 @@ namespace Dive
 {
 	class Context;
 	class GameObject;
+	class FileStream;
 
 	// 일단 계층 구조와 위치 설정만 구현
 	class Transform : public Component
@@ -16,8 +17,8 @@ namespace Dive
 		~Transform();
 
 		// serialization
-		void Serialize(void* stream);
-		void Deserialize(void* stream);
+		void Serialize(FileStream& stream) override;
+		void Deserialize(FileStream& stream) override;
 
 		// const &로 리턴???
 		//= position

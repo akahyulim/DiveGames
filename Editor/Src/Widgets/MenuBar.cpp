@@ -38,29 +38,22 @@ void MenuBar::Tick(float deltaTime)
 		{
 			if (ImGui::MenuItem("New Scene"))
 			{
-				//if (m_pWorld->IsDirty())
-				{
-					// 저장, 저장안함, 취소
-				}
-
-				// 새로운 scene 생성
-				APP_TRACE("clicked File menu");
+				// 일단 Scene을 Clear하자.
+				m_scene->New();
 			}
 
 			if (ImGui::MenuItem("Open Scene"))
 			{
-				//if (m_pWorld->IsDirty())
-				{
-					// 저장, 저장안함, 취소
-				}
+				// 하드 코딩으로 특정 이름의 파일을 열자.
+				m_scene->LoadFromFile("../Assets/Scenes/LastDay.scene");
 			}
 
 			ImGui::Separator();
 
 			if (ImGui::MenuItem("Save"))
 			{
-				// 기존 세이브가 없다면 지정된 경로에 scene이름으로 저장
-				// 이후부턴 해당 scene 이름으로 새로 저장
+				// 하등 코딩으로 특정 이름의 파일로 저장하자.
+				m_scene->SaveToFile("../Assets/Scenes/LastDay.scene");
 			}
 
 			if (ImGui::MenuItem("Save As..."))

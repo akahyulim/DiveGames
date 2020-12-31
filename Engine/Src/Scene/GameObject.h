@@ -1,11 +1,13 @@
 #pragma once
 #include "Core/Object.h"
+#include "Components/Component.h"
 
 namespace Dive
 {
 	class Context;
 	class Component;
 	class Transform;
+	class FileStream;
 
 	class GameObject : public Object, public std::enable_shared_from_this<GameObject>
 	{
@@ -15,8 +17,9 @@ namespace Dive
 		explicit GameObject(Context* context, std::string name = "");
 		~GameObject();
 
-		void Serialize(void* stream);
-		void Deserialize(void* stream, Transform* parent = nullptr);
+		// 포인터보단 참조 전달이 낫지 않을까?
+		void Serialize(FileStream& stream);
+		void Deserialize(FileStream& stream, Transform* parent = nullptr);
 
 		void Clone();
 
@@ -24,16 +27,11 @@ namespace Dive
 		void Stop();
 		void Update();
 
-		// T의 base가 Component인지 확인이 필요하다.
-		// 그런데 Component가 다른 Base를 가진다면 좀 애매해진다.
-		template<class T> 
-		T* AddComponent();
-		template<class T> 
-		void RemoveComponent();
-		template<class T> 
-		T* GetComponent();
-		template<class T> 
-		bool HasComponent();
+		template<class T> T* AddComponent();
+		Component* AddComponent(eComponentType type, unsigned int id = 0);
+		template<class T> void RemoveComponent();
+		template<class T> T* GetComponent();
+		template<class T> bool HasComponent();
 		const std::vector<std::shared_ptr<Component>>& GetAllComponents() const { return m_components; }
 
 		void MarkForDestruction() { m_bPendingDestruction = true; }
@@ -46,7 +44,11 @@ namespace Dive
 		bool IsActive() const { return m_bActive; }
 		void SetActive(bool active) { m_bActive = active; }
 
+		unsigned int GetComponentsCount() const { return static_cast<unsigned int>(m_components.size()); }
+
 		std::shared_ptr<GameObject> GetSharedPtr() { return shared_from_this(); }
+
+		Transform* GetTransform() const { return m_transform; }
 
 	private:
 		GameObject(const GameObject&)				= delete;
@@ -58,12 +60,14 @@ namespace Dive
 		bool m_bPendingDestruction;
 
 		std::vector<std::shared_ptr<Component>> m_components;
+		Transform* m_transform;
 	};
 
 	template<class T>
 	T* GameObject::AddComponent()
 	{
-		// 동일한 타입이 이미 존재한다면 생성치말고 찾아서 리턴해야 한다.
+		if (auto component = GetComponent<T>())
+			return component;
 
 		auto component = std::make_shared<T>(m_context, this);
 		m_components.emplace_back(std::static_pointer_cast<Component>(component));
