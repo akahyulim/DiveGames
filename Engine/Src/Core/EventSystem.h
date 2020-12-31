@@ -7,6 +7,7 @@
 #define DIVE_SUBSCRIBE_TO_EVENT(receiver, memberFunction)				Dive::EventDispatcher::GetInstance().SubscribeToEvent(receiver, memberFunction)
 #define DIVE_UNSUBSCRIBE_FROM_EVENT(receiverType, eventType, receiver)	Dive::EventDispatcher::GetInstance().UnsubscribeFromEvent<receiverType, eventType>(receiver)
 
+// 디버그 모드로 종료시 list의 메모리 오류가 발생한다.
 namespace Dive
 {
 	class IEvent

@@ -34,7 +34,7 @@ namespace Dive
 
 		std::vector<std::shared_ptr<GameObject>> GetRootGameObjects();
 		const std::vector<std::shared_ptr<GameObject>>& GetAllGameObjects() const { return m_gameObjects; }
-		size_t GetGameObjectsCount()										const { return m_gameObjects.size(); }
+		unsigned int GetGameObjectsCount()									const { return static_cast<unsigned int>(m_gameObjects.size()); }
  		
 		std::string GetName()			const { return m_name; }
 		void SetName(std::string name) { m_name = std::move(name); }

@@ -86,6 +86,9 @@ namespace Dive
 			gameObject->SetID(stream.ReadAs<unsigned int>());
 		}
 		
+		// 계층구조까지는 적용되는데
+		// 두 번째 루트가 말썽이다.
+		// 데이터가 꼬여 버린거다.
 		for (auto& gameObject : m_gameObjects)
 		{
 			gameObject->Deserialize(stream, nullptr);

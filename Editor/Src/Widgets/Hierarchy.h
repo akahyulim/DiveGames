@@ -1,11 +1,10 @@
 #pragma once
 #include "Widget.h"
+#include "../DragAndDrop.h"
 
 using namespace Dive;
 
-// DragAndDrop을 구현하지 못했다.
-// 이는 ImGui를 랩핑하여 추가해야 한다.
-// 일단 테스트의 편의를 위해 Serialization부터 간다.
+
 class Hierarchy : public Widget
 {
 public:
@@ -29,4 +28,6 @@ private:
 	// 최신 버전에서는 아에 전역 변수로 선언했다.
 	GameObject* m_clicked = nullptr;
 	GameObject* m_hovered = nullptr;
+
+	DragDropPayload m_payload;
 };

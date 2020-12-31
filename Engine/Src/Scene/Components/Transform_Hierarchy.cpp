@@ -9,7 +9,7 @@ namespace Dive
 	void Transform::SetParent(Transform * parent)
 	{
 		// 빈 객체를 전달받으면 독립
-		if (!m_parent)
+		if (!parent)
 		{
 			BecomeOrphan();
 			return;
@@ -52,7 +52,8 @@ namespace Dive
 		if (oldParent)
 			oldParent->AcquireChildern();
 
-		m_parent->AcquireChildern();
+		if(m_parent)
+			m_parent->AcquireChildern();
 
 		updateTransform();
 	}

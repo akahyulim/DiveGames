@@ -69,6 +69,9 @@
     <ClInclude Include="Src\Widgets\Hierarchy.h">
       <Filter>Src\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="Src\DragAndDrop.h">
+      <Filter>Src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">

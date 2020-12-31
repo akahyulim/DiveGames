@@ -29,7 +29,6 @@ namespace Dive
 		// local rotation
 		// local scale
 		// look at
-		// parent가 존재한다면 id 없다면 0(-1)이 더 어울릴듯
 		stream.Write(m_parent ? m_parent->GetID() : 0);
 	}
 
@@ -39,7 +38,6 @@ namespace Dive
 		// local rotation
 		// local scale
 		// look at
-		// parent id
 		unsigned int parentID = 0;
 		stream.Read(&parentID);
 
