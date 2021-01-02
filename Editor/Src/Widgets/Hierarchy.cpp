@@ -1,4 +1,9 @@
 #include "Hierarchy.h"
+#include "../ImGui/imgui_stdlib.h"
+
+
+// 왜 전역으로 했을까?
+static bool g_popupGameObjectRename = false;
 
 
 Hierarchy::Hierarchy(Editor * editor)
@@ -52,6 +57,8 @@ void Hierarchy::showTree()
 	}
 
 	handleClicking();
+	popupGameObjectPropertyMenu();
+	popupGameObjectRename();
 }
 
 void Hierarchy::addGameObject(GameObject * gameObject)
@@ -115,6 +122,20 @@ void Hierarchy::handleClicking()
 		else
 			setSelected(nullptr);
 	}
+
+	if (clickedRight)
+	{
+		if (m_hovered)
+		{
+			setSelected(m_hovered);
+			ImGui::OpenPopup("##PropertyMenu");
+		}
+		else
+		{
+			setSelected(nullptr);
+			ImGui::OpenPopup("##HierarchyGameObjectMenu");
+		}
+	}
 }
 
 void Hierarchy::handleDragAndDrop(GameObject * gameObject)
@@ -140,5 +161,105 @@ void Hierarchy::handleDragAndDrop(GameObject * gameObject)
 				droppedObj->GetTransform()->SetParent(gameObject->GetTransform());
 			}
 		}
+	}
+}
+
+void Hierarchy::popupGameObjectPropertyMenu()
+{
+	if (!ImGui::BeginPopup("##PropertyMenu"))
+		return;
+
+	if (ImGui::MenuItem("Root"))
+	{
+		//m_selected->GetTransform()()->SetParent(nullptr);
+	}
+
+	if (ImGui::MenuItem(u8"자식 떼어내기"))
+	{
+		//m_selected->GetTransform()()->DetachChildren();
+	}
+
+	ImGui::Separator();
+
+	/*
+	if (ImGui::MenuItem(u8"복사", "Ctrl + C"))
+	{
+		m_pCopiedObj = m_selected;
+	}
+
+	if (m_pCopiedObj)
+	{
+		if (ImGui::MenuItem(u8"붙여넣기", "Ctrl + V"))
+		{
+			m_pCopiedObj->Clone();
+		}
+	}
+	*/
+	if (ImGui::MenuItem(u8"제거", "Del"))
+	{
+		//if (m_pCopiedObj && m_pCopiedObj->GetInstanceID() == m_selected->GetInstanceID())
+		//	m_pCopiedObj = nullptr;
+
+		//m_pScene->RemoveGameObject(m_selected);
+		//setSelected(nullptr);
+	}
+
+	if (ImGui::MenuItem(u8"Rename", "F2"))
+	{
+		g_popupGameObjectRename = true;
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::BeginMenu("Component"))
+	{
+		if (ImGui::MenuItem("Renderable"))
+		{
+
+		}
+
+		if (ImGui::MenuItem("Collision"))
+		{
+
+		}
+
+		ImGui::EndMenu();
+	}
+
+	ImGui::EndPopup();
+}
+
+void Hierarchy::popupGameObjectRename()
+{
+	if (g_popupGameObjectRename)
+	{
+		ImGui::OpenPopup("##RenameEntity");
+		g_popupGameObjectRename = false;
+	}
+
+	if (ImGui::BeginPopup("##RenameEntity"))
+	{
+		auto selectedentity = m_selected;//EditorHelper::Get().g_selected_entity.lock();
+		if (!selectedentity)
+		{
+			ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+			return;
+		}
+
+		auto name = selectedentity->GetName();
+
+		ImGui::Text("Name:");
+		ImGui::InputText("##edit", &name);
+		selectedentity->SetName(std::string(name));
+
+		if (ImGui::Button("Ok"))
+		{
+			ImGui::CloseCurrentPopup();
+			ImGui::EndPopup();
+			return;
+		}
+
+		ImGui::EndPopup();
 	}
 }

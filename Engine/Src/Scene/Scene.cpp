@@ -79,19 +79,17 @@ namespace Dive
 
 		// 이름만 뽑아서 저장
 
-		unsigned int rootCount = stream.ReadAs<unsigned int>();
+		auto rootCount = stream.ReadAs<unsigned int>();
 		for (unsigned int i = 0; i != rootCount; i++)
 		{
-			std::shared_ptr<GameObject> gameObject = CreateGameObject();
+			auto gameObject = CreateGameObject();
 			gameObject->SetID(stream.ReadAs<unsigned int>());
 		}
 		
-		// 계층구조까지는 적용되는데
-		// 두 번째 루트가 말썽이다.
-		// 데이터가 꼬여 버린거다.
-		for (auto& gameObject : m_gameObjects)
+		// root만 실행해야 합니다.
+		for (unsigned int i = 0; i != rootCount; i++)
 		{
-			gameObject->Deserialize(stream, nullptr);
+			m_gameObjects[i]->Deserialize(stream, nullptr);
 		}
 
 		stream.Close();
@@ -211,18 +209,18 @@ namespace Dive
 
 	std::vector<std::shared_ptr<GameObject>> Scene::GetRootGameObjects()
 	{
-		std::vector<std::shared_ptr<GameObject>> targetObjects;
+		std::vector<std::shared_ptr<GameObject>> rootGameObjects;
 		for (const auto& gameObject : m_gameObjects)
 		{
 			auto transform = gameObject->GetComponent<Transform>();
 			if (transform)
 			{
 				if (transform->IsRoot())
-					targetObjects.emplace_back(gameObject);
+					rootGameObjects.emplace_back(gameObject);
 			}
 		}
 
-		return targetObjects;
+		return rootGameObjects;
 	}
 
 	void Scene::clear()

@@ -31,6 +31,9 @@
     <ClCompile Include="Src\Widgets\Hierarchy.cpp">
       <Filter>Src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="Src\ImGUI\imgui_stdlib.cpp">
+      <Filter>Src\ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\ImGUI\imconfig.h">
@@ -71,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="Src\DragAndDrop.h">
       <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\ImGUI\imgui_stdlib.h">
+      <Filter>Src\ImGUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

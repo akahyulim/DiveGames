@@ -105,6 +105,7 @@
     <ClInclude Include="Src\ImGUI\imgui_impl_dx11.h" />
     <ClInclude Include="Src\ImGUI\imgui_impl_win32.h" />
     <ClInclude Include="Src\ImGUI\imgui_internal.h" />
+    <ClInclude Include="Src\ImGUI\imgui_stdlib.h" />
     <ClInclude Include="Src\ImGUI\imstb_rectpack.h" />
     <ClInclude Include="Src\ImGUI\imstb_textedit.h" />
     <ClInclude Include="Src\ImGUI\imstb_truetype.h" />
@@ -119,6 +120,7 @@
     <ClCompile Include="Src\ImGUI\imgui_draw.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_impl_dx11.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_impl_win32.cpp" />
+    <ClCompile Include="Src\ImGUI\imgui_stdlib.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Widgets\Hierarchy.cpp" />

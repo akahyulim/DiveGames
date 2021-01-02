@@ -20,6 +20,9 @@ private:
 	void handleClicking();
 	void handleDragAndDrop(GameObject* gameObject);
 
+	void popupGameObjectPropertyMenu();
+	void popupGameObjectRename();
+
 private:
 	Scene* m_scene = nullptr;
 

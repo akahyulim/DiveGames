@@ -97,8 +97,8 @@ void MenuBar::Tick(float deltaTime)
 		{
 			if (ImGui::MenuItem("Create Empty"))
 			{
-				//m_pWorld->CreateGameObject();
-				m_scene->CreateGameObject();
+				auto addedGameObject = m_scene->CreateGameObject();
+				addedGameObject->SetName("Empty");
 			}
 
 			if (ImGui::BeginMenu("3D Object"))

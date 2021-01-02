@@ -56,24 +56,16 @@ namespace Dive
 		// children
 		{
 			auto children = m_transform->GetChildren();
-
 			stream.Write(static_cast<unsigned int>(children.size()));
 
 			for (const auto& child : children)
 			{
-				stream.Write(child->GetID());
+				stream.Write(child->GetOwner()->GetID());
 			}
 
 			for (const auto& child : children)
 			{
-				auto owner = child->GetOwner();
-				if (!owner)
-				{
-					CORE_ERROR("");
-					break;
-				}
-
-				owner->Serialize(stream);
+				child->GetOwner()->Serialize(stream);
 			}
 		}
 	}
@@ -90,12 +82,11 @@ namespace Dive
 		// components
 		{
 			auto componentCount = stream.ReadAs<unsigned int>();
+			unsigned int type = 0;
+			unsigned int id = 0;
 			for (unsigned int i = 0; i != componentCount; i++)
 			{
-				unsigned int type = 0;
 				stream.Read(&type);
-				
-				unsigned int id = 0;
 				stream.Read(&id);
 
 				AddComponent(static_cast<eComponentType>(type), id);

@@ -27,7 +27,7 @@ namespace Dive
 		}
 
 		// 자손을 전달받은 경우
-		if (parent->IsAncestor(this))
+		if(IsDescendant(parent))
 		{
 			if (HasParent())
 			{
@@ -39,7 +39,10 @@ namespace Dive
 			//
 			else
 			{
-				for (const auto& child : m_children)
+				// 변경된 값이 적용되지 않게
+				// 복사해야 한다.
+				auto temp = m_children;
+				for (const auto& child : temp)
 				{
 					child->BecomeOrphan();
 				}
@@ -51,7 +54,7 @@ namespace Dive
 
 		if (oldParent)
 			oldParent->AcquireChildern();
-
+		 
 		if(m_parent)
 			m_parent->AcquireChildern();
 
@@ -68,8 +71,7 @@ namespace Dive
 
 		updateTransform();
 
-		// 굳이 이럴 필요가 있나?
-		// 오버헤드 같은데...
+		// 이러면 기존 children이 변경되어 버린다.
 		oldParent->AcquireChildern();
 	}
 
@@ -154,6 +156,7 @@ namespace Dive
 		return m_children[index];
 	}
 
+	// 굳이 전체 루프까지 돌리며 자식을 재구성할 필요가 있을까?
 	void Transform::AcquireChildern()
 	{
 		m_children.clear();
