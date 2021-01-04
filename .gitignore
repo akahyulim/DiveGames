@@ -5,7 +5,7 @@
 Assets/Fonts/
 Assets/Models/
 Assets/Textures/
-Assets/Scenes/
+#Assets/Scenes/
 
 ### Windows ###
 # Windows thumbnail cache files
