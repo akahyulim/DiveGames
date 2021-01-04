@@ -6,42 +6,35 @@
 
 namespace Dive
 {
-	void Transform::SetParent(Transform * parent)
+	void Transform::SetParent(Transform * newParent)
 	{
-		// 빈 객체를 전달받으면 독립
-		if (!parent)
+		if (!newParent)
 		{
 			BecomeOrphan();
 			return;
 		}
 
-		// 자신을 부모를 삼으려는 경우
-		if (GetID() == parent->GetID())
+		if (this->GetID() == newParent->GetID())
 			return;
 
-		// 동일한 부모를 전달받은 경우
 		if (HasParent())
 		{
-			if (m_parent->GetID() == parent->GetID())
+			if (m_parent->GetID() == newParent->GetID())
 				return;
 		}
 
-		// 자손을 전달받은 경우
-		if(IsDescendant(parent))
+		if(IsDescendant(newParent))
 		{
+			auto temp = m_children;
 			if (HasParent())
 			{
-				for (const auto& child : m_children)
+				for (const auto& child : temp)
 				{
 					child->SetParent(m_parent);
 				}
 			}
-			//
 			else
 			{
-				// 변경된 값이 적용되지 않게
-				// 복사해야 한다.
-				auto temp = m_children;
 				for (const auto& child : temp)
 				{
 					child->BecomeOrphan();
@@ -50,13 +43,13 @@ namespace Dive
 		}
 
 		auto oldParent = m_parent;
-		m_parent = parent;
+		m_parent = newParent;
 
 		if (oldParent)
-			oldParent->AcquireChildern();
+			oldParent->AcqurieChildren();
 		 
 		if(m_parent)
-			m_parent->AcquireChildern();
+			m_parent->AcqurieChildren();
 
 		updateTransform();
 	}
@@ -71,13 +64,12 @@ namespace Dive
 
 		updateTransform();
 
-		// 이러면 기존 children이 변경되어 버린다.
-		oldParent->AcquireChildern();
+		oldParent->AcqurieChildren();
 	}
 
 	bool Transform::IsAncestor(const Transform * target) const
 	{
-		if (!target || !HasParent() || !target->HasChildren())
+		if (!HasParent() || !target || !target->HasChildren())
 			return false;
 
 		for (const auto& child : target->GetChildren())
@@ -118,6 +110,22 @@ namespace Dive
 		return false;
 	}
 
+	void Transform::GetDescendants(std::vector<Transform*>* descendants)
+	{
+		if (!descendants)
+			return;
+
+		for (auto child : m_children)
+		{
+			descendants->emplace_back(child);
+
+			if (child->HasChildren())
+			{
+				child->GetDescendants(descendants);
+			}
+		}
+	}
+
 	void Transform::AddChild(Transform * child)
 	{
 		if (!child || GetID() == child->GetID())
@@ -156,8 +164,7 @@ namespace Dive
 		return m_children[index];
 	}
 
-	// 굳이 전체 루프까지 돌리며 자식을 재구성할 필요가 있을까?
-	void Transform::AcquireChildern()
+	void Transform::AcqurieChildren()
 	{
 		m_children.clear();
 		m_children.shrink_to_fit();
@@ -172,7 +179,7 @@ namespace Dive
 			if (transform->GetParent()->GetID() == this->GetID())
 			{
 				m_children.emplace_back(transform);
-				transform->AcquireChildern();
+				transform->AcqurieChildren();
 			}
 		}
 	}

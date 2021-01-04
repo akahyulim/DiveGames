@@ -36,9 +36,11 @@ namespace Dive
 
 		virtual void OnUpdate() {}
 
+		virtual void Copy(Component* other) {}
+
 		GameObject* GetOwner()		const { return m_owner; }
 		eComponentType GetType()	const { return m_type; }
-		std::string GetName()		const;// { return m_owner->GetName(); }
+		std::string GetName()		const;
 
 	protected:
 

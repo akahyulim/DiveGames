@@ -20,6 +20,8 @@ namespace Dive
 		void Serialize(FileStream& stream) override;
 		void Deserialize(FileStream& stream) override;
 
+		void Copy(Component* other) override;
+
 		// const &∑Œ ∏Æ≈œ???
 		//= position
 		DirectX::XMVECTOR GetPosition();
@@ -37,10 +39,11 @@ namespace Dive
 		//= hierarchy
 		bool IsRoot()										const { return !HasParent(); }
 		bool HasParent()									const { return m_parent; }
-		void SetParent(Transform* parent);
+		void SetParent(Transform* newParent);
 		void BecomeOrphan();
 		bool IsAncestor(const Transform* target)			const;
 		bool IsDescendant(const Transform* target)			const;
+		void GetDescendants(std::vector<Transform*>* descendants);
 		bool HasChildren()									const { return !m_children.empty() ? true : false; }
 		size_t GetChildrenCount()							const { return m_children.size(); }
 		void AddChild(Transform* child);
@@ -49,7 +52,7 @@ namespace Dive
 		Transform* GetChildByName(const std::string& name)	const;
 		Transform* GetChildByIndex(unsigned int index)		const;
 		const std::vector<Transform*>& GetChildren()		const { return m_children; }
-		void AcquireChildern();
+		void AcqurieChildren();
 
 
 	private:

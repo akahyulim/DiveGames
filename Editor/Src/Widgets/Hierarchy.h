@@ -27,10 +27,10 @@ private:
 	Scene* m_scene = nullptr;
 
 	GameObject* m_selected = nullptr;
-
-	// 최신 버전에서는 아에 전역 변수로 선언했다.
 	GameObject* m_clicked = nullptr;
 	GameObject* m_hovered = nullptr;
+	GameObject* m_copied = nullptr;
 
 	DragDropPayload m_payload;
+	bool m_bPopupRename;
 };

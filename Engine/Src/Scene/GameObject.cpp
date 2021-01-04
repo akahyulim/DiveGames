@@ -119,15 +119,31 @@ namespace Dive
 				child.lock()->Deserialize(stream, m_transform);
 			}
 
-			m_transform->AcquireChildern();
+			m_transform->AcqurieChildren();
 		}
 	}
 
-	void GameObject::Clone()
+	GameObject* GameObject::Clone()
 	{
-		// 깊은 복사 수행
-		// component는 물론
-		// 계층구조 까지 염두해야 하기에 복잡하다.
+		auto scene = GetSubsystem<Scene>();
+
+		auto clone = scene->CreateGameObject();
+		clone->SetName(m_name);
+		clone->SetActive(m_bActive);
+	
+		for (auto component : m_components)
+		{
+			auto cloneComponent = clone->AddComponent(component->GetType());
+			cloneComponent->Copy(component.get());
+		}
+	
+		for (auto child : m_transform->GetChildren())
+		{
+			auto cloneChild = child->GetOwner()->Clone();
+			cloneChild->SetParentByGameObject(clone.get());
+		}
+
+		return clone.get();
 	}
 	
 	void GameObject::Start()
@@ -158,19 +174,44 @@ namespace Dive
 		case eComponentType::Renderable:
 		{
 			auto component = AddComponent<Renderable>();
-			component->SetID(id);
+			if(id != 0 ) component->SetID(id);
 			return static_cast<Component*>(component);
 		}
 
 		case eComponentType::Transform:
 		{
 			auto component = AddComponent<Transform>();
-			component->SetID(id);
+			if (id != 0) component->SetID(id);
 			return static_cast<Component*>(component);
 		}
 
 		default:
 			return nullptr;
 		}
+	}
+
+	GameObject * GameObject::GetParentGameObject()
+	{
+		auto parentTransform = m_transform->GetParent();
+		if(!parentTransform)
+			return nullptr;
+
+		return parentTransform->GetOwner();
+	}
+
+	void GameObject::SetParentByGameObject(GameObject * newParent)
+	{
+		if (!newParent)
+			return;
+
+		SetParentByTrasnsform(newParent->GetTransform());
+	}
+
+	void GameObject::SetParentByTrasnsform(Transform * newParent)
+	{
+		if (!newParent)
+			return;
+
+		m_transform->SetParent(newParent);
 	}
 }

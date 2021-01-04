@@ -17,11 +17,10 @@ namespace Dive
 		explicit GameObject(Context* context, std::string name = "");
 		~GameObject();
 
-		// 포인터보단 참조 전달이 낫지 않을까?
 		void Serialize(FileStream& stream);
 		void Deserialize(FileStream& stream, Transform* parent = nullptr);
 
-		void Clone();
+		GameObject* Clone();
 
 		void Start();
 		void Stop();
@@ -40,15 +39,15 @@ namespace Dive
 		// get & set
 		std::string GetName() const { return m_name; }
 		void SetName(std::string name) { m_name = std::move(name); }
-
 		bool IsActive() const { return m_bActive; }
 		void SetActive(bool active) { m_bActive = active; }
-
 		unsigned int GetComponentsCount() const { return static_cast<unsigned int>(m_components.size()); }
-
 		std::shared_ptr<GameObject> GetSharedPtr() { return shared_from_this(); }
-
 		Transform* GetTransform() const { return m_transform; }
+
+		GameObject* GetParentGameObject();
+		void SetParentByGameObject(GameObject* newParent);
+		void SetParentByTrasnsform(Transform* newParent);
 
 	private:
 		GameObject(const GameObject&)				= delete;

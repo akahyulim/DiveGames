@@ -2,12 +2,10 @@
 #include "../ImGui/imgui_stdlib.h"
 
 
-// 왜 전역으로 했을까?
-static bool g_popupGameObjectRename = false;
-
 
 Hierarchy::Hierarchy(Editor * editor)
-	: Widget(editor)
+	: Widget(editor),
+	m_bPopupRename(false)
 {
 	m_title = std::move("Hierarchy");
 	m_scene = m_editor->GetContext()->GetSubsystem<Scene>().get();
@@ -171,59 +169,38 @@ void Hierarchy::popupGameObjectPropertyMenu()
 
 	if (ImGui::MenuItem("Root"))
 	{
-		//m_selected->GetTransform()()->SetParent(nullptr);
-	}
-
-	if (ImGui::MenuItem(u8"자식 떼어내기"))
-	{
-		//m_selected->GetTransform()()->DetachChildren();
+		m_selected->GetTransform()->SetParent(nullptr);
 	}
 
 	ImGui::Separator();
 
-	/*
-	if (ImGui::MenuItem(u8"복사", "Ctrl + C"))
+	if (ImGui::MenuItem(u8"Copy", "Ctrl + C"))
 	{
-		m_pCopiedObj = m_selected;
+		m_copied = m_selected;
 	}
 
-	if (m_pCopiedObj)
+	if (m_copied)
 	{
-		if (ImGui::MenuItem(u8"붙여넣기", "Ctrl + V"))
+		if (ImGui::MenuItem(u8"Paste", "Ctrl + V"))
 		{
-			m_pCopiedObj->Clone();
+			m_copied->Clone();
 		}
 	}
-	*/
-	if (ImGui::MenuItem(u8"제거", "Del"))
-	{
-		//if (m_pCopiedObj && m_pCopiedObj->GetInstanceID() == m_selected->GetInstanceID())
-		//	m_pCopiedObj = nullptr;
+	
+	ImGui::Separator();
 
-		//m_pScene->RemoveGameObject(m_selected);
-		//setSelected(nullptr);
+	if (ImGui::MenuItem(u8"Remove", "Del"))
+	{
+		if (m_copied && m_copied->GetID() == m_selected->GetID())
+			m_copied = nullptr;
+
+		m_scene->RemoveGameObject(m_selected);
+		setSelected(nullptr);
 	}
 
 	if (ImGui::MenuItem(u8"Rename", "F2"))
 	{
-		g_popupGameObjectRename = true;
-	}
-
-	ImGui::Separator();
-
-	if (ImGui::BeginMenu("Component"))
-	{
-		if (ImGui::MenuItem("Renderable"))
-		{
-
-		}
-
-		if (ImGui::MenuItem("Collision"))
-		{
-
-		}
-
-		ImGui::EndMenu();
+		m_bPopupRename = true;
 	}
 
 	ImGui::EndPopup();
@@ -231,15 +208,15 @@ void Hierarchy::popupGameObjectPropertyMenu()
 
 void Hierarchy::popupGameObjectRename()
 {
-	if (g_popupGameObjectRename)
+	if (m_bPopupRename)
 	{
 		ImGui::OpenPopup("##RenameEntity");
-		g_popupGameObjectRename = false;
+		m_bPopupRename = false;
 	}
 
 	if (ImGui::BeginPopup("##RenameEntity"))
 	{
-		auto selectedentity = m_selected;//EditorHelper::Get().g_selected_entity.lock();
+		auto selectedentity = m_selected;
 		if (!selectedentity)
 		{
 			ImGui::CloseCurrentPopup();

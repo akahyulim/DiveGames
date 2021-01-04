@@ -26,16 +26,17 @@ namespace Dive
 		void OnUpdate(const E_UPDATE* evnt);
 
 		std::shared_ptr<GameObject> CreateGameObject(bool active = true);
-		void RemoveGameObject(const std::shared_ptr<GameObject>& gameObject);
+		void RemoveGameObject(const std::shared_ptr<GameObject>& target);
+		void RemoveGameObject(GameObject* target);
 
 		const std::shared_ptr<GameObject>& GetGameObjectByName(const std::string& name);
 		const std::shared_ptr<GameObject>& GetGameObjectByID(unsigned int id);
-		bool ExistsGameObject(const std::shared_ptr<GameObject>& gameObject);
+		bool ExistsGameObject(const std::shared_ptr<GameObject>& target);
+		bool ExistsGameObject(GameObject* target);
 
 		std::vector<std::shared_ptr<GameObject>> GetRootGameObjects();
 		const std::vector<std::shared_ptr<GameObject>>& GetAllGameObjects() const { return m_gameObjects; }
 		unsigned int GetGameObjectsCount()									const { return static_cast<unsigned int>(m_gameObjects.size()); }
- 		
 		std::string GetName()			const { return m_name; }
 		void SetName(std::string name) { m_name = std::move(name); }
 		bool IsDirty()					const { return m_bDirty; }
@@ -45,7 +46,7 @@ namespace Dive
 		Scene& operator=(const Scene&)	= delete;
 
 		void clear();
-		void removeGameObject(const std::shared_ptr<GameObject> gameObject);
+		void removeGameObject(const std::shared_ptr<GameObject> target);
 
 	private:
 		std::string m_name;

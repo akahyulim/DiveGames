@@ -15,12 +15,12 @@ namespace Dive
 	{
 		m_type = eComponentType::Transform;
 
-		CORE_TRACE("Create Transform.");
+		CORE_TRACE("Create Transform : ID - {:d}", m_ID);
 	}
 
 	Transform::~Transform()
 	{
-		CORE_TRACE("Destroy Transform.");
+		CORE_TRACE("Destroy Transform : ID - {:d}", m_ID);
 	}
 
 	void Transform::Serialize(FileStream & stream)
@@ -50,6 +50,17 @@ namespace Dive
 		}
 
 		updateTransform();
+	}
+
+	void Transform::Copy(Component * other)
+	{
+		if (!other)
+			return;
+
+		// local position
+		// local rotation
+		// local scale
+		// look at
 	}
 
 	DirectX::XMVECTOR Transform::GetPosition()

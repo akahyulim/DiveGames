@@ -166,12 +166,21 @@ namespace Dive
 		return gameObject;
 	}
 
-	void Scene::RemoveGameObject(const std::shared_ptr<GameObject>& gameObject)
+	void Scene::RemoveGameObject(const std::shared_ptr<GameObject>& target)
 	{
-		if (!gameObject || !ExistsGameObject(gameObject))
+		if (!target || !ExistsGameObject(target))
 			return;
 
-		gameObject->MarkForDestruction();
+		target->MarkForDestruction();
+		m_bDirty = true;
+	}
+
+	void Scene::RemoveGameObject(GameObject * target)
+	{
+		if (!target || !ExistsGameObject(target))
+			return;
+
+		target->MarkForDestruction();
 		m_bDirty = true;
 	}
 
@@ -199,12 +208,20 @@ namespace Dive
 		return empty;
 	}
 
-	bool Scene::ExistsGameObject(const std::shared_ptr<GameObject>& gameObject)
+	bool Scene::ExistsGameObject(const std::shared_ptr<GameObject>& target)
 	{
-		if (!gameObject)
+		if (!target)
 			return false;
 
-		return GetGameObjectByID(gameObject->GetID()) != nullptr;
+		return GetGameObjectByID(target->GetID()) != nullptr;
+	}
+
+	bool Scene::ExistsGameObject(GameObject * target)
+	{
+		if (!target)
+			return false;
+		
+		return GetGameObjectByID(target->GetID()) != nullptr;
 	}
 
 	std::vector<std::shared_ptr<GameObject>> Scene::GetRootGameObjects()
@@ -232,10 +249,11 @@ namespace Dive
 		m_bClear = true;	
 	}
 
-	void Scene::removeGameObject(const std::shared_ptr<GameObject> gameObject)
+	// 타겟의 자손들까지 모두 제거합니다.
+	void Scene::removeGameObject(const std::shared_ptr<GameObject> target)
 	{
 		// 자손들부터 제거
-		auto children = gameObject->GetComponent<Transform>()->GetChildren();
+		auto children = target->GetComponent<Transform>()->GetChildren();
 		for (const auto& child : children)
 		{
 			removeGameObject(child->GetOwner()->GetSharedPtr());
@@ -245,7 +263,7 @@ namespace Dive
 		auto it = m_gameObjects.begin();
 		for (it; it != m_gameObjects.end();)
 		{
-			if ((*it)->GetID() == gameObject->GetID())
+			if ((*it)->GetID() == target->GetID())
 			{
 				(*it).reset();
 				it = m_gameObjects.erase(it);
@@ -256,11 +274,11 @@ namespace Dive
 		}
 
 		// 부모로부터 제거
-		auto parent = gameObject->GetComponent<Transform>()->GetParent();
+		auto parent = target->GetComponent<Transform>()->GetParent();
 		if (parent)
 		{
 			// 부모의 계층 관계 업데이트
-			parent->AcquireChildern();
+			parent->AcqurieChildren();
 		}
 	}
 }
