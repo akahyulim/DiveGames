@@ -15,6 +15,9 @@ namespace Dive
 	{
 		m_type = eComponentType::Transform;
 
+		m_localPosition = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+		m_localScale	= DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+
 		CORE_TRACE("Create Transform : ID - {:d}", m_ID);
 	}
 
@@ -25,18 +28,18 @@ namespace Dive
 
 	void Transform::Serialize(FileStream & stream)
 	{
-		// local position
+		stream.Write(m_localPosition);
 		// local rotation
-		// local scale
+		stream.Write(m_localScale);
 		// look at
 		stream.Write(m_parent ? m_parent->GetID() : 0);
 	}
 
 	void Transform::Deserialize(FileStream & stream)
 	{
-		// local position
+		stream.Read(&m_localPosition);
 		// local rotation
-		// local scale
+		stream.Read(&m_localScale);
 		// look at
 		unsigned int parentID = 0;
 		stream.Read(&parentID);
@@ -57,9 +60,13 @@ namespace Dive
 		if (!other)
 			return;
 
-		// local position
+		auto org = dynamic_cast<Transform*>(other);
+		if (!org)
+			return;
+
+		m_localPosition = org->m_localPosition;
 		// local rotation
-		// local scale
+		m_localScale = org->m_localScale;
 		// look at
 	}
 

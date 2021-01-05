@@ -80,8 +80,10 @@ namespace Dive
 		{
 			if (width <= 0 || height <= 0)
 			{
-				width = 1024;
-				height = 768;
+				//width = 1024;
+				//height = 768;
+				width = GetSystemMetrics(SM_CXSCREEN);
+				height = GetSystemMetrics(SM_CYSCREEN);
 			}
 
 			m_positionX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;

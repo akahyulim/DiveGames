@@ -9,6 +9,7 @@ namespace Dive
 	class DepthStencilState;
 	class BlendState;
 	class RasterizerState;
+	class Sampler;
 	class Shader;
 
 	// 전체 창 화면 같은건 해상도와 이 모드의 조합으로 만든다.
@@ -55,6 +56,35 @@ namespace Dive
 
 	};
 
+	// 전부 지원하지 않는 값을 추가해야 한다.
+	enum class eRasterizerState
+	{
+		CullBackSolid,
+		CullFrontSolid,
+		CullNoneSolid,
+		CullBackWireFrame,
+		CullFrontWireFrame,
+		CullNoneWireFrame,
+	};
+
+	enum class eBlendState
+	{
+		Enabled,
+		Disabled,
+		ColorAdded,
+	};
+
+	enum class eSamplerType
+	{
+		Linear,
+		CompareDepth,
+		PointClamp,
+		BilinearClamp,
+		BilinearWrap,
+		TrilinearClamp,
+		AnisotropicWrap,
+	};
+
 	// Window, D3D11 RHI 그리고 GPU Resource를 관리합니다.
 	class Graphics : public Object
 	{
@@ -84,6 +114,13 @@ namespace Dive
 
 		ID3D11Device* GetRHIDevice() const { return m_device; }
 		ID3D11DeviceContext* GetRHIContext() const { return m_immediateContext; }
+
+		// get
+		Shader* GetShader(eRenderShaderType type);
+		RasterizerState* GetRasterizerState(eRasterizerState state);
+		BlendState* GetBlendState(eBlendState state);
+		DepthStencilState* GetDepthStencilState(bool enabled);
+		Sampler* GetSampler(eSamplerType type);
 		
 	private:
 		Graphics(const Graphics&)				= delete;
@@ -97,6 +134,7 @@ namespace Dive
 		bool createDepthStencilStates();
 		bool createBlendStates();
 		bool createRasterizerStates();
+		bool createSampels();
 		bool createShaders();
 
 	private:
@@ -114,7 +152,6 @@ namespace Dive
 		ID3D11RenderTargetView* m_renderTargetView = nullptr;
 
 		//= GPU Resources
-		// 다른 곳에 전달하지 않는다면 unique_ptr로 변경
 		std::shared_ptr<DepthStencilState> m_depthStencilStateEnabled;
 		std::shared_ptr<DepthStencilState> m_depthStencilStateDisabled;
 
@@ -128,6 +165,14 @@ namespace Dive
 		std::shared_ptr<RasterizerState> m_rasterizeStateCullBackWireFrame;
 		std::shared_ptr<RasterizerState> m_rasterizeStateCullFrontWireFrame;
 		std::shared_ptr<RasterizerState> m_rasterizeStateCullNoneWireFrame;
+
+		std::shared_ptr<Sampler> m_samplerLinear;			// test용
+		std::shared_ptr<Sampler> m_samplerCompareDepth;
+		std::shared_ptr<Sampler> m_samplerPointClamp;
+		std::shared_ptr<Sampler> m_samplerBilinearClamp;
+		std::shared_ptr<Sampler> m_samplerBilinearWrap;
+		std::shared_ptr<Sampler> m_samplerTrilinearClamp;
+		std::shared_ptr<Sampler> m_samplerAnisotropicWrap;
 
 		std::unordered_map<eRenderShaderType, std::shared_ptr<Shader>> m_shaders;
 	};

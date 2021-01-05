@@ -110,6 +110,7 @@
     <ClInclude Include="Src\ImGUI\imstb_textedit.h" />
     <ClInclude Include="Src\ImGUI\imstb_truetype.h" />
     <ClInclude Include="Src\Widgets\Hierarchy.h" />
+    <ClInclude Include="Src\Widgets\Inspector.h" />
     <ClInclude Include="Src\Widgets\MenuBar.h" />
     <ClInclude Include="Src\Widgets\Widget.h" />
   </ItemGroup>
@@ -124,6 +125,7 @@
     <ClCompile Include="Src\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Widgets\Hierarchy.cpp" />
+    <ClCompile Include="Src\Widgets\Inspector.cpp" />
     <ClCompile Include="Src\Widgets\MenuBar.cpp" />
   </ItemGroup>
   <ItemGroup>

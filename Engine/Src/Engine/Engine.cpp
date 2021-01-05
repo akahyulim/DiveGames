@@ -47,7 +47,7 @@ namespace Dive
 		//= Graphics & Renderer
 		auto graphics = m_context->GetSubsystem<Graphics>();
 		// 원래는 setting을 가져와서 비교하며 전달한다.
-		if (!graphics->SetMode(0, 0, false, false, true))
+		if (!graphics->SetMode(1024, 768, false, false, true))
 			return false;
 
 		auto renderer = m_context->GetSubsystem<Renderer>();

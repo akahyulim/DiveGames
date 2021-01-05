@@ -7,6 +7,7 @@
 #include "D3D11/DepthStencilState.h"
 #include "D3D11/BlendState.h"
 #include "D3D11/RasterizerState.h"
+#include "D3D11/Sampler.h"
 #include "D3D11/Shader.h"
 
 
@@ -91,6 +92,8 @@ namespace Dive
 		return (m_window != nullptr && m_device != nullptr);
 	}
 
+	// 이 상태에서 최대크기 화면을 만들 수 없다.
+	// 사이즈를 입력받아 적용하려면 번거롭다.
 	bool Graphics::SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync)
 	{
 		DisplayMode mode;
@@ -109,6 +112,54 @@ namespace Dive
 			return false;
 		
 		return m_window->ChangeWndProc(newProc);
+	}
+
+	RasterizerState * Graphics::GetRasterizerState(eRasterizerState state)
+	{
+		switch (state)
+		{
+		case eRasterizerState::CullBackSolid:		return m_rasterizeStateCullBackSolid.get();
+		case eRasterizerState::CullFrontSolid:		return m_rasterizeStateCullFrontSolid.get();
+		case eRasterizerState::CullNoneSolid:		return m_rasterizeStateCullNoneSolid.get();
+		case eRasterizerState::CullBackWireFrame:	return m_rasterizeStateCullBackWireFrame.get();
+		case eRasterizerState::CullFrontWireFrame:	return m_rasterizeStateCullFrontWireFrame.get();
+		case eRasterizerState::CullNoneWireFrame:	return m_rasterizeStateCullNoneWireFrame.get();
+
+		default: return nullptr;
+		}
+	}
+
+	BlendState * Graphics::GetBlendState(eBlendState state)
+	{
+		switch (state)
+		{
+		case eBlendState::Enabled:		return m_blendStateEnable.get();
+		case eBlendState::Disabled:		return m_blendStateDisable.get(); 
+		case eBlendState::ColorAdded:	return m_blendStateColorAdd.get();
+
+		default: return nullptr;
+		}
+	}
+
+	DepthStencilState * Graphics::GetDepthStencilState(bool enabled)
+	{
+		return enabled ? m_depthStencilStateEnabled.get() : m_depthStencilStateDisabled.get();
+	}
+
+	Sampler * Graphics::GetSampler(eSamplerType type)
+	{
+		switch (type)
+		{
+		case eSamplerType::Linear:			return m_samplerLinear.get();
+		case eSamplerType::CompareDepth:	return m_samplerCompareDepth.get();
+		case eSamplerType::PointClamp:		return m_samplerPointClamp.get();
+		case eSamplerType::BilinearClamp:	return m_samplerBilinearClamp.get();
+		case eSamplerType::BilinearWrap:	return m_samplerBilinearWrap.get();
+		case eSamplerType::TrilinearClamp:	return m_samplerTrilinearClamp.get();
+		case eSamplerType::AnisotropicWrap: return m_samplerAnisotropicWrap.get();
+	
+		default: return nullptr;
+		}
 	}
 
 	bool Graphics::createDisplay(int width, int height, DisplayMode displayMode)
@@ -138,6 +189,8 @@ namespace Dive
 		if (!createBlendStates())
 			return false;
 		if (!createRasterizerStates())
+			return false;
+		if (!createSampels())
 			return false;
 
 		return true;
@@ -219,9 +272,6 @@ namespace Dive
 	{
 		if (!m_window)
 			return false;
-
-		m_width = m_window->GetClientRectWidth();
-		m_height = m_window->GetClientRectHeight();
 
 		UINT deviceFlags = 0;
 #ifdef _DEBUG
@@ -366,5 +416,31 @@ namespace Dive
 		}
 
 		return true;
+	}
+
+	bool Graphics::createSampels()
+	{
+		m_samplerLinear				= std::make_shared<Sampler>(m_context, D3D11_FILTER_MIN_MAG_MIP_LINEAR);
+
+		m_samplerCompareDepth		= std::make_shared<Sampler>(m_context, D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_GREATER_EQUAL);
+		m_samplerPointClamp			= std::make_shared<Sampler>(m_context, D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_ALWAYS);
+		m_samplerBilinearClamp		= std::make_shared<Sampler>(m_context, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP);
+		m_samplerBilinearWrap		= std::make_shared<Sampler>(m_context, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP);
+		m_samplerTrilinearClamp		= std::make_shared<Sampler>(m_context, D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP);
+		m_samplerAnisotropicWrap	= std::make_shared<Sampler>(m_context, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, 16);
+
+		if (!m_samplerLinear || !m_samplerCompareDepth || !m_samplerPointClamp | !m_samplerBilinearClamp
+			|| !m_samplerBilinearWrap || !m_samplerTrilinearClamp || !m_samplerAnisotropicWrap)
+		{
+			CORE_ERROR("fail to create samplers.");
+			return false;
+		}
+
+		return true;
+	}
+	
+	bool Graphics::createShaders()
+	{
+		return false;
 	}
 }

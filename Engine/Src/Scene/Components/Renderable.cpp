@@ -11,11 +11,13 @@ namespace Dive
 		: Component(context, owner)
 	{
 		m_type = eComponentType::Renderable;
-		m_model = std::make_shared<Model>(m_context);
+		// 직접 생성이 아니다. 잘못했다.
+		m_model = new Model(m_context);//std::make_shared<Model>(m_context);
 		m_primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 	}
 
 	Renderable::~Renderable()
 	{
+		
 	}
 }

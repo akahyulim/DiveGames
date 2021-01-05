@@ -37,6 +37,7 @@
 #include "Graphics/D3D11/DepthStencilState.h"
 #include "Graphics/D3D11/RasterizerState.h"
 #include "Graphics/D3D11/BlendState.h"
+#include "Graphics/D3D11/Sampler.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/Model.h"
 #include "Graphics/Renderer.h"

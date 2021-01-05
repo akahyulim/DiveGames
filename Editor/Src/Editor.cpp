@@ -5,9 +5,11 @@
 #include "ImGui/imgui_impl_dx11.h"
 #include "Widgets/MenuBar.h"
 #include "Widgets/Hierarchy.h"
+#include "Widgets/Inspector.h"
 
 
 Editor* s_editor = nullptr;
+Inspector* g_inspector = nullptr;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -78,6 +80,7 @@ bool Editor::Initialize()
 	{
 		m_widgets.emplace_back(std::make_shared<MenuBar>(this));
 		m_widgets.emplace_back(std::make_shared<Hierarchy>(this));
+		g_inspector = dynamic_cast<Inspector*>(m_widgets.emplace_back(std::make_shared<Inspector>(this)).get());
 	}
 
 	m_bInitialized = true;

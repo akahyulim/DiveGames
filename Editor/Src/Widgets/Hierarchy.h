@@ -5,6 +5,7 @@
 using namespace Dive;
 
 
+// Scene에 구성된 GameObject들을 계층 구조 형태로 관리합니다.
 class Hierarchy : public Widget
 {
 public:

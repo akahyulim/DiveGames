@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Object.h"
+#include "Graphics.h"
 
 namespace Dive
 {
@@ -31,30 +32,38 @@ namespace Dive
 
 		void OnAcquireRenderable(const E_UPDATE_SCENE* evnt);
 
+	private:
 		//= d3d11 pipeline???
 		// IASetInputLayout
 		// IASetVerteBuffer
 		// IASetIndexBuffer
-		// IASetPrimitiveTopology
+		void setPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology);
 		// VSSetShader
 		// VSSetConstantBuffers
 		// PSSetShader
 		// PSSetConstantBuffers
-		// PSSetSamplers
-		// RSSetState
+		void setSampler(eSamplerType type);
+		void setRasterizerState(eRasterizerState state);
 		// OMSetRenderTargets
-		// OMSetBlendState
-		// OMSetDepthStencilState
+		void setBlendState(eBlendState state);
+		void setDepthStencilState(bool enabled);
 
-	private:
 		void testRender();
 
 	private:
 		std::weak_ptr<Graphics> m_graphics;
+		ID3D11DeviceContext* m_deviceContext;
 
 		bool m_bInitialized;
 
 		std::unordered_map<eRenderableObjectType, std::vector<GameObject*>> m_gameObjects;
+
+		// 전부 초기값 때문에 문제가 생길 수 있다.
+		// none같은 걸 전부 추가해야 한다.
+		eSamplerType m_samplerType;				// sampler는 여러개를 전달 할 수 있는 것 같다...
+		eRasterizerState m_rasterizerState;
+		eBlendState m_blendState;
+		bool m_bDepthStencilEnabled;
 	};
 }
 

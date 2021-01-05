@@ -129,6 +129,7 @@
     <ClInclude Include="Src\Graphics\D3D11\IndexBuffer.h" />
     <ClInclude Include="Src\Graphics\D3D11\RenderDeviceEnums.h" />
     <ClInclude Include="Src\Graphics\D3D11\RenderDeviceTypes.h" />
+    <ClInclude Include="Src\Graphics\D3D11\Sampler.h" />
     <ClInclude Include="Src\Graphics\D3D11\Shader.h" />
     <ClInclude Include="Src\Graphics\D3D11\Texture.h" />
     <ClInclude Include="Src\Graphics\D3D11\Texture2D.h" />
@@ -169,6 +170,7 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\D3D11\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\IndexBuffer.cpp" />
+    <ClCompile Include="Src\Graphics\D3D11\Sampler.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\Shader.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\Texture.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\Texture2D.cpp" />

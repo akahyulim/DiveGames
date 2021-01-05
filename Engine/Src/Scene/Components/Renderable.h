@@ -14,7 +14,8 @@ namespace Dive
 		explicit Renderable(Context* context, GameObject* owner);
 		~Renderable();
 
-		const std::shared_ptr<Model>& GetModel() const { return m_model; }
+		//const std::shared_ptr<Model>& GetModel() const { return m_model; }
+		Model* GetModel() const { return m_model; }
 		const std::shared_ptr<Material>& GetMaterial() const { return m_material; }
 
 		bool IsEnabled() const { return m_bEnabled; }
@@ -25,14 +26,18 @@ namespace Dive
 		unsigned int GetIndexBufferOffset() const { return m_indexBufferOffset; }
 		unsigned int GetIndexCount() const { return m_indexCount; }
 
-		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { m_primitiveTopology; }
+		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { return m_primitiveTopology; }
 		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) { m_primitiveTopology = primitiveTopology; }
 
 	private:
+		Renderable(const Renderable&)				= delete;
+		Renderable& operator=(const Renderable&)	= delete;
+
 	private:
 		bool m_bEnabled;
 
-		std::shared_ptr<Model> m_model;
+		//std::shared_ptr<Model> m_model;
+		Model* m_model;
 		std::shared_ptr<Material> m_material;
 
 		// Vertex & Index Buffer 설정에 전달되는 Offset을 가진다.

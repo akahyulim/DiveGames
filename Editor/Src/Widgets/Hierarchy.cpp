@@ -1,7 +1,8 @@
 #include "Hierarchy.h"
 #include "../ImGui/imgui_stdlib.h"
+#include "Inspector.h"
 
-
+extern Inspector* g_inspector;
 
 Hierarchy::Hierarchy(Editor * editor)
 	: Widget(editor),
@@ -102,6 +103,8 @@ void Hierarchy::setSelected(GameObject * gameObject)
 
 	m_selected = gameObject;
 	// widget Inspector
+	g_inspector->SetSelected(m_selected);
+
 	// widget menu에도 전달
 }
 

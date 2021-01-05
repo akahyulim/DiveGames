@@ -63,6 +63,7 @@ namespace Dive
 
 	private:
 		DirectX::XMFLOAT3 m_localPosition;
+		DirectX::XMFLOAT3 m_localScale;
 
 		DirectX::XMFLOAT4X4 m_matrix;
 		DirectX::XMFLOAT4X4 m_localMatrix;
