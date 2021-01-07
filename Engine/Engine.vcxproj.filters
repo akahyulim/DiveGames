@@ -82,9 +82,6 @@
     <ClCompile Include="Src\Scene\Scene.cpp">
       <Filter>Src\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\Model.cpp">
-      <Filter>Src\Graphic</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Graphics\Mesh.cpp">
       <Filter>Src\Graphic</Filter>
     </ClCompile>
@@ -99,6 +96,12 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\D3D11\Sampler.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\MeshFilter.cpp">
+      <Filter>Src\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Material.cpp">
+      <Filter>Src\Graphic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -216,9 +219,6 @@
     <ClInclude Include="Src\Scene\Scene.h">
       <Filter>Src\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\Model.h">
-      <Filter>Src\Graphic</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Graphics\Material.h">
       <Filter>Src\Graphic</Filter>
     </ClInclude>
@@ -236,6 +236,9 @@
     </ClInclude>
     <ClInclude Include="Src\Graphics\D3D11\Sampler.h">
       <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\MeshFilter.h">
+      <Filter>Src\Graphic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -5,7 +5,7 @@ namespace Dive
 {
 	class Context;
 	class GameObject;
-	class Model;
+	class MeshFilter;
 	class Material;
 
 	class Renderable : public Component
@@ -14,9 +14,11 @@ namespace Dive
 		explicit Renderable(Context* context, GameObject* owner);
 		~Renderable();
 
-		//const std::shared_ptr<Model>& GetModel() const { return m_model; }
-		Model* GetModel() const { return m_model; }
-		const std::shared_ptr<Material>& GetMaterial() const { return m_material; }
+		MeshFilter* GetMeshFilter() const { return m_meshFilter; }
+		void SetMeshFilter(MeshFilter* meshFilter) { m_meshFilter = meshFilter; }
+
+		Material* GetMaterial() const { return m_material; }
+		void SetMaterial(Material* material) { m_material = material; }
 
 		bool IsEnabled() const { return m_bEnabled; }
 		void SetEnable(bool enable) { m_bEnabled = enable; }
@@ -36,9 +38,8 @@ namespace Dive
 	private:
 		bool m_bEnabled;
 
-		//std::shared_ptr<Model> m_model;
-		Model* m_model;
-		std::shared_ptr<Material> m_material;
+		MeshFilter* m_meshFilter;
+		Material* m_material;
 
 		// Vertex & Index Buffer 설정에 전달되는 Offset을 가진다.
 		// 하지만 어떻게 계산하는지 모르겠다.

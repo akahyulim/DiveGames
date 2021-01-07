@@ -12,6 +12,8 @@ namespace Dive
 	enum class eComponentType : unsigned int
 	{
 		Transform,
+		MeshFilter,
+		MeshRenderer,
 		Renderable,
 	//	Unknown
 	};

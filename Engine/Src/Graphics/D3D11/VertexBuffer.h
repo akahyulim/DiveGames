@@ -46,8 +46,7 @@ namespace Dive
 		void* Map();
 		bool Unmap();
 
-		// offset은 renderable이 가진다?
-		const ID3D11Buffer* GetBuffer()		const { return m_buffer; }
+		ID3D11Buffer* GetBuffer()			const { return m_buffer; }
 		unsigned int GetStride()			const { return m_stride; }
 		unsigned int GetVertexCount()		const { return m_vertexCount; }
 

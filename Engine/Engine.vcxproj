@@ -139,7 +139,7 @@
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\Material.h" />
     <ClInclude Include="Src\Graphics\Mesh.h" />
-    <ClInclude Include="Src\Graphics\Model.h" />
+    <ClInclude Include="Src\Graphics\MeshFilter.h" />
     <ClInclude Include="Src\Graphics\Renderer.h" />
     <ClInclude Include="Src\Graphics\Window.h" />
     <ClInclude Include="Src\Input\Input.h" />
@@ -176,8 +176,9 @@
     <ClCompile Include="Src\Graphics\D3D11\Texture2D.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\VertexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
+    <ClCompile Include="Src\Graphics\Material.cpp" />
     <ClCompile Include="Src\Graphics\Mesh.cpp" />
-    <ClCompile Include="Src\Graphics\Model.cpp" />
+    <ClCompile Include="Src\Graphics\MeshFilter.cpp" />
     <ClCompile Include="Src\Graphics\Renderer.cpp" />
     <ClCompile Include="Src\Graphics\Window.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />

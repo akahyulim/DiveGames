@@ -15,12 +15,12 @@ namespace Dive
 		// vertices
 		void SetVertices(const std::vector<Vertex_PosTexNorTan>& vertices) { m_vertices = vertices; }
 		std::vector<Vertex_PosTexNorTan>& GetVertices() { return m_vertices; }
-		unsigned int GetVerticesCount() const { static_cast<unsigned int>(m_vertices.size()); }
+		unsigned int GetVerticesCount() const { return static_cast<unsigned int>(m_vertices.size()); }
 
 		// indices
 		void SetIndices(const std::vector<unsigned int>& indices) { m_indices = indices; }
 		std::vector<unsigned int>& GetIndices() { return m_indices; }
-		unsigned int GetIndicesCount() const { static_cast<unsigned int>(m_indices.size()); }
+		unsigned int GetIndicesCount() const { return static_cast<unsigned int>(m_indices.size()); }
 
 		unsigned int GetMemorySize();
 

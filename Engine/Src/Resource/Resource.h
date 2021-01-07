@@ -12,7 +12,8 @@ namespace Dive
 		Texture,
 		Texture2D,
 		TextureCube,
-		Model,
+		Material,
+		MeshFilter,
 	};
 
 	class Resource : public Object

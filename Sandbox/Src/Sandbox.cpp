@@ -34,13 +34,16 @@ void Sandbox::Stop()
 {
 }
 
+// 유니티 식으로 하려면 해당 GameObject의 Script에서 직접 구성해야 한다.
 bool Sandbox::createTriangle()
 {
+	// game object 및 Renderable Component 생성
 	auto triangle = m_scene->CreateGameObject();
 	triangle->SetName("Triangle");
 	auto renderable = triangle->AddComponent<Renderable>();
-	auto model = renderable->GetModel();
 
+	
+	// 삼각형 Geometry 구성
 	std::vector<Vertex_PosTexNorTan> vertices;
 	vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(0.0f, 0.5f), DirectX::XMFLOAT3(0.0f, 0.0f, -0.5f), DirectX::XMFLOAT3(0.0f, 0.5f, 0.0f));
 	vertices.emplace_back(DirectX::XMFLOAT3(0.0f, 0.5f, 0.0f), DirectX::XMFLOAT2(0.5f, 0.0f), DirectX::XMFLOAT3(0.0f, 0.0f, -0.5f), DirectX::XMFLOAT3(0.0f, 0.5f, 0.0f));
@@ -49,5 +52,18 @@ bool Sandbox::createTriangle()
 	std::vector<unsigned int> indices;
 	indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
 
-	return model->SetAndCreateGeometry(vertices, indices);
+	// Mesh에 저장
+	auto mesh = new Mesh();
+	mesh->SetVertices(vertices);
+	mesh->SetIndices(indices);
+
+	// Mesh를 MeshFilter에 저장
+	auto meshFilter = new MeshFilter(m_engine->GetContext());
+	if (!meshFilter->SetMesh("Triangle", mesh))
+		return false;
+
+	// Renderable에 MeshFilter 전달
+	renderable->SetMeshFilter(meshFilter);
+
+	return true;
 }

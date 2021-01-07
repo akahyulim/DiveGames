@@ -18,12 +18,12 @@ namespace Dive
 		m_localPosition = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 		m_localScale	= DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 
-		CORE_TRACE("Create Transform : ID - {:d}", m_ID);
+		CORE_TRACE("Create {:s}'s Transform Component.", m_owner->GetName());
 	}
 
 	Transform::~Transform()
 	{
-		CORE_TRACE("Destroy Transform : ID - {:d}", m_ID);
+		CORE_TRACE("Destroy {:s}'s Transform Component.", m_owner->GetName());
 	}
 
 	void Transform::Serialize(FileStream & stream)

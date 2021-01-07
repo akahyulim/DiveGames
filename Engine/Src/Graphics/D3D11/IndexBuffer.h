@@ -20,6 +20,7 @@ namespace Dive
 		bool Unmap();
 
 		ID3D11Buffer* GetBuffer() const { return m_buffer; }
+		DXGI_FORMAT GetFormat() const { return DXGI_FORMAT_R32_UINT; }
 
 	private:
 		ID3D11Buffer* m_buffer = nullptr;

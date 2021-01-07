@@ -39,7 +39,7 @@
 #include "Graphics/D3D11/BlendState.h"
 #include "Graphics/D3D11/Sampler.h"
 #include "Graphics/Mesh.h"
-#include "Graphics/Model.h"
+#include "Graphics/MeshFilter.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Window.h"
