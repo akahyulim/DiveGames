@@ -11,6 +11,7 @@ namespace Dive
 	class RasterizerState;
 	class Sampler;
 	class Shader;
+	class ConstantBuffer;
 
 	// 전체 창 화면 같은건 해상도와 이 모드의 조합으로 만든다.
 	enum class eScreenMode
@@ -117,10 +118,14 @@ namespace Dive
 
 		// get
 		Shader* GetShader(eRenderShaderType type);
+		Shader* GetBaseShader() const { return m_baseShader; }
+		ConstantBuffer* GetConstantBuffer() const { return m_constantBuffer; }
 		RasterizerState* GetRasterizerState(eRasterizerState state);
 		BlendState* GetBlendState(eBlendState state);
 		DepthStencilState* GetDepthStencilState(bool enabled);
 		Sampler* GetSampler(eSamplerType type);
+
+		ID3D11RenderTargetView* GetRenderTargetView() const { return m_renderTargetView; }
 		
 	private:
 		Graphics(const Graphics&)				= delete;
@@ -136,6 +141,9 @@ namespace Dive
 		bool createRasterizerStates();
 		bool createSampels();
 		bool createShaders();
+		bool createBaseShader();
+
+		bool createConstantBuffer();
 
 	private:
 		std::shared_ptr<Window> m_window;
@@ -152,6 +160,7 @@ namespace Dive
 		ID3D11RenderTargetView* m_renderTargetView = nullptr;
 
 		//= GPU Resources
+		// 스파르탄에서는 5개까지 구분해놓았다.
 		std::shared_ptr<DepthStencilState> m_depthStencilStateEnabled;
 		std::shared_ptr<DepthStencilState> m_depthStencilStateDisabled;
 
@@ -175,5 +184,14 @@ namespace Dive
 		std::shared_ptr<Sampler> m_samplerAnisotropicWrap;
 
 		std::unordered_map<eRenderShaderType, std::shared_ptr<Shader>> m_shaders;
+		Shader* m_baseShader;
+
+		struct MatrixBuffer
+		{
+			DirectX::XMFLOAT4X4 world;
+			DirectX::XMFLOAT4X4 view;
+			DirectX::XMFLOAT4X4 proj;
+		};
+		ConstantBuffer* m_constantBuffer;
 	};
 }

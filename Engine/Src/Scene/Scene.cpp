@@ -161,6 +161,9 @@ namespace Dive
 
 	std::shared_ptr<GameObject> Scene::CreateGameObject(bool active)
 	{
+		// 이게 원래는 없다.
+		m_bDirty = true;
+
 		auto gameObject = m_gameObjects.emplace_back(std::make_shared<GameObject>(m_context));
 		gameObject->SetActive(active);
 		return gameObject;

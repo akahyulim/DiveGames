@@ -23,7 +23,7 @@ namespace Dive
 			if (!graphics || !graphics->IsInitialized())
 			{
 				CORE_ERROR("");
-				return;
+				return false;
 			}
 
 			SAFE_RELEASE(m_buffer);

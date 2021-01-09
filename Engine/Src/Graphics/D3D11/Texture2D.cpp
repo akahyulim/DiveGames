@@ -43,6 +43,7 @@ namespace Dive
 		}
 	}
 
+	// 우선 Texture를 생성한 후 이를 이용해 RenderTargetView, DepthStencilView, ShaderResourceView를 생성한다.
 	bool Texture2D::createTextureResource()
 	{
 		if (!m_graphics || !m_graphics->IsInitialized())
@@ -118,6 +119,9 @@ namespace Dive
 		}
 
 		// DepthStencilView
+		// DXGI_FORMAT_D32_FLOAT 포멧 정황상 Stencil은 제외된 듯 하다.
+		// 최신 스파르탄에서는 다시 24, 8로 나눈 것 같다.
+		// 그리고 일반이랑 readOnly두 개를 사용한다.
 		if (m_bindFlags & D3D11_BIND_SHADER_RESOURCE)
 		{
 			D3D11_DEPTH_STENCIL_VIEW_DESC desc;

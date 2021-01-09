@@ -5,6 +5,8 @@
 #include "D3D11/RasterizerState.h"
 #include "D3D11/BlendState.h"
 #include "D3D11/DepthStencilState.h"
+#include "D3D11/Shader.h"
+#include "D3D11/ConstantBuffer.h"
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
@@ -20,10 +22,12 @@ namespace Dive
 		m_bInitialized(false),
 		m_meshFilter(nullptr)
 	{
+		DIVE_SUBSCRIBE_TO_EVENT(this, &Renderer::OnAcquireRenderable);
 	}
 
 	Renderer::~Renderer()
 	{
+		DIVE_UNSUBSCRIBE_FROM_EVENT(Renderer, E_UPDATE_SCENE, this);
 		CORE_TRACE("Call Renderer's Desctructor =====================");
 	}
 
@@ -42,7 +46,6 @@ namespace Dive
 
 	void Renderer::Render()
 	{
-		// 기본 설정 후 Pass를 순서대로 호출한다.
 		testRender();
 	}
 
@@ -51,7 +54,12 @@ namespace Dive
 		if (!evnt || evnt->GetGameObjects().empty())
 			return;
 
-		// 타입을 나눈 후 저장한다.
+		// 일단 그냥 저장
+		auto gameObjects = evnt->GetGameObjects();
+		for (auto gameObject : gameObjects)
+		{
+			m_gameObjects[eRenderableObjectType::Opaque].emplace_back(gameObject.get());
+		}
 	}
 
 	// 버퍼가 다수라면?
@@ -61,8 +69,8 @@ namespace Dive
 		if (!renderable || !renderable->GetMeshFilter())
 			return;
 		
-		if(m_meshFilter->GetID() == renderable->GetMeshFilter()->GetID())
-			return;
+		//if(m_meshFilter->GetID() == renderable->GetMeshFilter()->GetID())
+		//	return;
 
 		m_meshFilter = renderable->GetMeshFilter();
 
@@ -95,29 +103,54 @@ namespace Dive
 		m_deviceContext->IASetPrimitiveTopology(primitiveTopology);
 	}
 
+	// 일단 shader와 input layout을 모두 전달한다.
+	// constantbuffer까지...
+	void Renderer::setShader()
+	{
+		auto shader = m_graphics.lock()->GetBaseShader();
+
+		m_deviceContext->IASetInputLayout(shader->GetInputLayout());
+		m_deviceContext->VSSetShader(shader->GetVertexShader(), nullptr, 0);
+		m_deviceContext->PSSetShader(shader->GetPixelShader(), nullptr, 0);
+
+		auto matrixBuffer = m_graphics.lock()->GetConstantBuffer()->GetBuffer();
+		m_deviceContext->VSSetConstantBuffers(0, 1, &matrixBuffer);
+	}
+
 	// 여러개를 전달할 수 있다. 좀 더 살펴본 후 수정하자.
 	void Renderer::setSampler(eSamplerType type)
 	{
-		if (m_samplerType == type)
-			return;
+		//if (m_samplerType == type)
+		//	return;
 
 		auto sampler = m_graphics.lock()->GetSampler(type)->GetState();
 
 		m_deviceContext->PSSetSamplers(0, 1, &sampler);
 
-		m_samplerType = type;
+		//m_samplerType = type;
 	}
 
 	void Renderer::setRasterizerState(eRasterizerState state)
 	{
-		if (m_rasterizerState == state)
-			return;
+		//if (m_rasterizerState == state)
+		//	return;
 
 		auto rasterizerState = m_graphics.lock()->GetRasterizerState(state);
 		
 		m_deviceContext->RSSetState(rasterizerState->GetState());
 		
-		m_rasterizerState = state;
+		//m_rasterizerState = state;
+	}
+
+	// 일단 backbuffer rendertarget을 사용한다. depth stencil은 적용하지 않는다.
+	// clear도 우선 적용한다.
+	void Renderer::setRenderTarget()
+	{
+		auto renderTargetView = m_graphics.lock()->GetRenderTargetView();
+		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+		m_deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
+		m_deviceContext->OMSetRenderTargets(1, &renderTargetView, nullptr);
 	}
 
 	void Renderer::setBlendState(eBlendState state, unsigned int sampleMask)
@@ -132,6 +165,7 @@ namespace Dive
 		m_blendState = state;
 	}
 
+	// m_bDepthStencilEnabled를 초기화하지 않아 사용 불가
 	void Renderer::setDepthStencilState(bool enabled)
 	{
 		if (m_bDepthStencilEnabled == enabled)
@@ -149,13 +183,14 @@ namespace Dive
 	{
 		auto meshFilter = renderable->GetMeshFilter();
 		auto indexCount = meshFilter->GetIndexCount();
-		// offset과는 다른 것 같은데...
 		auto indexOffset = renderable->GetIndexBufferOffset();
 		auto vertexOffset = renderable->GetVertexBufferOffset();
 
 		m_deviceContext->DrawIndexed(indexCount, indexOffset, vertexOffset);
 	}
 
+	// 일단 commandLine을 설정 한 후 Draw하자.
+	// 이후 좀 더 세분화하여 overhead를 줄여나가자.
 	void Renderer::testRender()
 	{
 		if (m_graphics.expired())
@@ -166,16 +201,31 @@ namespace Dive
 		if (renderableObjects.empty())
 			return;
 
-		// IASetInputLayout
-		// VSSetShader
-		// VSSetConstantBuffers
-		// PSSetShader
+		// 일단 BeginFrame()을 적용
+		setRenderTarget();
+
+		// viewport, constant buffer
+		{
+			D3D11_VIEWPORT viewport;
+			viewport.Width = (float)m_graphics.lock()->GetWidth();
+			viewport.Height = (float)m_graphics.lock()->GetHeight();
+			viewport.MinDepth = 0.0f;
+			viewport.MaxDepth = 1.0f;
+			viewport.TopLeftX = 0.0f;
+			viewport.TopLeftY = 0.0f;
+
+			// Create the viewport.
+			immediateContext->RSSetViewports(1, &viewport);
+
+		}
+
+		setShader();
+		// VSSetConstantBuffers => world, view, proj
 		// PSSetConstantBuffers
-		setSampler(eSamplerType::Linear);
+		//setSampler(eSamplerType::Linear);
 		setRasterizerState(eRasterizerState::CullBackSolid);
-		// OMSetRenderTargets
-		setBlendState(eBlendState::Enabled, 0xFFFFFFFF);
-		setDepthStencilState(true);
+		//setBlendState(eBlendState::Disabled, 0xFFFFFFFF);
+		//setDepthStencilState(false);
 		
 		// 엄밀하게 따지자면 Shader도 Renderable의 Material에 포함되었을 것이다...
 		for (const auto& gameObject : renderableObjects)

@@ -4,6 +4,8 @@
 
 namespace Dive
 {
+	// 적어도 VertexTypes에 정의된 타입 전부를 지원하도록 할 순 없을까?
+	// Mesh 자체를 template class로 만들어야 하나?
 	class Mesh
 	{
 	public:

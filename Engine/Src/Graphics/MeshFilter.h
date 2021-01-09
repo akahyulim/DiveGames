@@ -10,9 +10,6 @@ namespace Dive
 	class Context;
 	class Mesh;
 
-
-	// 일단 단일 메시만 생각하자.
-	// 스파르탄도 GameObject로 계층 구조를 형성했다.
 	class MeshFilter : public Resource
 	{
 		DIVE_OBJECT(MeshFilter, Resource);
@@ -30,10 +27,13 @@ namespace Dive
 		VertexBuffer* GetVertexBuffer()	const { return m_vertexBuffer; }
 		IndexBuffer* GetIndexBuffer()	const { return m_indexBuffer; }
 
-		unsigned int GetVertexCount() const { return m_vertexCount; }
-		unsigned int GetIndexCount() const { return m_indexCount; }
+		unsigned int GetVertexCount()	const { return m_vertexCount; }
+		unsigned int GetIndexCount()	const { return m_indexCount; }
 
 	private:
+		MeshFilter(const MeshFilter&)				= delete;
+		MeshFilter& operator=(const MeshFilter&)	= delete;
+
 		bool createBuffer();
 
 	private:
