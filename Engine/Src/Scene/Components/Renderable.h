@@ -10,6 +10,8 @@ namespace Dive
 
 	class Renderable : public Component
 	{
+		DIVE_OBJECT(Renderable, Component);
+
 	public:
 		explicit Renderable(Context* context, GameObject* owner);
 		~Renderable();

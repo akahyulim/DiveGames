@@ -9,6 +9,7 @@
 #include "D3D11/RasterizerState.h"
 #include "D3D11/Sampler.h"
 #include "D3D11/Shader.h"
+#include "D3D11/ConstantBuffer.h"
 
 
 namespace Dive
@@ -191,6 +192,12 @@ namespace Dive
 		if (!createRasterizerStates())
 			return false;
 		if (!createSampels())
+			return false;
+
+		if(!createBaseShader())
+			return false;
+
+		if (!createConstantBuffer())
 			return false;
 
 		return true;
@@ -442,5 +449,55 @@ namespace Dive
 	bool Graphics::createShaders()
 	{
 		return false;
+	}
+
+	bool Graphics::createBaseShader()
+	{
+		m_baseShader = new Shader(m_context);
+		if (!m_baseShader->CreateShader(eVertexType::PositionUvNormalTangent, L"../Assets/Shaders/baseShader.hlsl"))
+			return false;
+
+		return true;
+	}
+
+	// 원래는 생성한 후 update로 갱신시켜야 한다.
+	bool Graphics::createConstantBuffer()
+	{
+		m_constantBuffer = new ConstantBuffer(m_context);
+		if (!m_constantBuffer->Create<MatrixBuffer>())
+			return false;
+
+		// view
+		DirectX::XMMATRIX view;
+//		{
+			DirectX::XMFLOAT3 pos, lookAt, up;
+			pos.x = 0.0f; pos.y = 0.0f; pos.z = -5.0f;
+			lookAt.x = 0.0f; lookAt.y = 0.0f; lookAt.z = 0.0f;
+			up.x = 0.0f, up.y = 1.0f; up.z = 0.0f;
+			DirectX::XMVECTOR vecPos, vecLookAt, vecUp;
+			vecPos = DirectX::XMLoadFloat3(&pos);
+			vecLookAt = DirectX::XMLoadFloat3(&lookAt);
+			vecUp = DirectX::XMLoadFloat3(&up);
+			view = DirectX::XMMatrixLookAtLH(vecPos, vecLookAt, vecUp);
+//		}
+
+		// proj
+		DirectX::XMMATRIX proj;
+//		{
+			float fieldOfView = 3.141592654f / 4.0f;
+			float screenAspect = (float)m_width / (float)m_height;
+			proj = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
+//		}
+
+		auto ptr = static_cast<MatrixBuffer*>(m_constantBuffer->Map());
+		DirectX::XMStoreFloat4x4(&(ptr->world), DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity()));
+		//DirectX::XMStoreFloat4x4(&(ptr->view), DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity()));
+		DirectX::XMStoreFloat4x4(&(ptr->view), DirectX::XMMatrixTranspose(view));
+		DirectX::XMStoreFloat4x4(&(ptr->proj), DirectX::XMMatrixTranspose(proj));
+
+		if (!m_constantBuffer->Unmap())
+			return false;
+
+		return true;
 	}
 }

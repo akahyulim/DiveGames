@@ -33,7 +33,10 @@ namespace Dive
 	bool MeshFilter::CreateMesh(std::string name, const std::vector<Vertex_PosTexNorTan>& vertices, const std::vector<unsigned int>& indices)
 	{
 		if (vertices.empty() || indices.empty())
+		{
+			CORE_ERROR("");
 			return false;
+		}
 
 		if (m_mesh)
 			Clear();
@@ -50,7 +53,10 @@ namespace Dive
 	bool MeshFilter::SetMesh(std::string name, Mesh * mesh)
 	{
 		if (!mesh)
+		{
+			CORE_ERROR("");
 			return false;
+		}
 
 		if (m_mesh)
 			Clear();
@@ -75,7 +81,7 @@ namespace Dive
 			m_vertexBuffer = new VertexBuffer(m_context);
 			if (!m_vertexBuffer->Create(m_mesh->GetVertices()))
 			{
-				CORE_ERROR("");
+				CORE_ERROR("Failed to create vertex buffer.");
 				return false;
 			}
 		}
@@ -84,7 +90,7 @@ namespace Dive
 			m_indexBuffer = new IndexBuffer(m_context);
 			if (!m_indexBuffer->Create(m_mesh->GetIndices()))
 			{
-				CORE_ERROR("");
+				CORE_ERROR("Failed to create index buffer.");
 				return false;
 			}
 		}

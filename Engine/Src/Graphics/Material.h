@@ -16,6 +16,7 @@ namespace Dive
 
 	// 리소스이긴한데 개별 설정도 되는거 아닌가?
 	// 좀 더 생각해보자면 Default를 복사해온 후 Custermizing 하는 느낌?
+	// 실제로 unity에서도 값을 변경하면 복사되어 다른 material로 취급된다고 한다.
 	class Material : public Resource
 	{
 	public:

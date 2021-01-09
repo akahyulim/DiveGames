@@ -3,7 +3,7 @@
 #include "Scene.h"
 #include "Core/Context.h"
 #include "Core/FileStream.h"
-#include "Core/Log.h"
+//#include "Core/Log.h"
 #include "Components/Renderable.h"
 #include "Components/Transform.h"
 

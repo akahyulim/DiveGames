@@ -43,9 +43,10 @@ namespace Dive
 		// VSSetConstantBuffers
 		// PSSetShader
 		// PSSetConstantBuffers
+		void setShader();
 		void setSampler(eSamplerType type);
 		void setRasterizerState(eRasterizerState state);
-		// OMSetRenderTargets
+		void setRenderTarget();
 		void setBlendState(eBlendState state, unsigned int sampleMask);
 		void setDepthStencilState(bool enabled);
 
