@@ -1,27 +1,29 @@
 #pragma once
 #include "Texture.h"
 
-// 1. createTextureResource()안에서 다시 함수를 호출하는건 에바다.
-// 2. 생성 인자에 대한 이해도를 높인 후 다듬을 필요가 있다.
-
 
 namespace Dive
 {
 	class Context;
 
-	// 스파르탄은 Texture에 viewport가 멤버변수로 존재하며,
-	// 모든 생성함수에서 크기에 맞춰 초기화한다.
+	// 일단 Array, Mipmap은 전부 제외
 	class Texture2D : public Texture
 	{
 	public:
-		// sharder resource?
-		Texture2D(Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, const std::vector<std::vector<std::byte>>& data);
+		Texture2D(Context* context, std::string name);
+		~Texture2D();
 
-		
-		// format을 기준으로 RenderTargetView & ShaderResourceView 혹은 DepthStencilView & ShaderResourceView로 생성한다.	
-		Texture2D(Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned int arraySize, unsigned int flags, std::string name = " ");
+		// 이렇게 하면 Base인 Texture로 사용이 불가능하다.
+		// 그런데 굳이 2D와 Cube를 Texture Interface로 묶어 사용할 필요가 있나 싶다.
+		// load image file = shaderResourceView
+		bool CreateRenderTarget(unsigned int width, unsigned int height, DXGI_FORMAT format);
+		bool CreateDepthStencil(unsigned int width, unsigned int height, bool useStencil);
+
+		ID3D11Resource* GetResource() { return static_cast<ID3D11Resource*>(m_resource); }
 
 	private:
-		bool createTextureResource() override;
+
+	private:
+		ID3D11Texture2D* m_resource;
 	};
 }

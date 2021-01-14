@@ -7,167 +7,170 @@
 
 namespace Dive
 {
-	Texture2D::Texture2D(Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, const std::vector<std::vector<std::byte>>& data)
+	Texture2D::Texture2D(Context * context, std::string name)
 		: Texture(context)
 	{
-		m_type		= eResourceType::Texture2D;
-		m_width		= width;
-		m_height	= height;
-		m_format	= format;
-		m_data		= data;
-		m_bindFlags = D3D11_BIND_SHADER_RESOURCE;
-
-		if (!createTextureResource())
-		{
-			CORE_ERROR("");
-			return;
-		}
+		m_name = std::move(name);
 	}
 
-	Texture2D::Texture2D(Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned int arraySize, unsigned int flags, std::string name)
-		: Texture(context)
+	Texture2D::~Texture2D()
 	{
-		m_type		= eResourceType::Texture2D;
-		m_name		= name;
-		m_width		= width;
-		m_height	= height;
-		m_format	= format;
-		m_arraySize = arraySize;
-		m_bindFlags = (format == DXGI_FORMAT_D32_FLOAT) ?
-					D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE : D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-
-		if (!createTextureResource())
-		{
-			CORE_ERROR("");
-			return;
-		}
+		SAFE_RELEASE(m_depthStencilView);
+		SAFE_RELEASE(m_renderTargetView);
+		SAFE_RELEASE(m_shaderResourceView);
+		SAFE_RELEASE(m_resource);
 	}
-
-	// 우선 Texture를 생성한 후 이를 이용해 RenderTargetView, DepthStencilView, ShaderResourceView를 생성한다.
-	bool Texture2D::createTextureResource()
+	
+	bool Texture2D::CreateRenderTarget(unsigned int width, unsigned int height, DXGI_FORMAT format)
 	{
-		if (!m_graphics || !m_graphics->IsInitialized())
+		if (width <= 0 || height <= 0)
 		{
 			CORE_ERROR("");
 			return false;
 		}
 
-		auto device = m_graphics->GetRHIDevice();
-		// 이걸 제거해야 하는지, 남겨둬야 하는지 모르겠다.
-		ID3D11Texture2D* texture = nullptr;
+		// base datas
+		{
+			m_width = width;
+			m_height = height;
+			m_format = format;
 
-		// Texture
+			setViewport(m_width, m_height);
+		}
+
+		// texture 생성
 		{
 			D3D11_TEXTURE2D_DESC desc;
 			ZeroMemory(&desc, sizeof(desc));
-			desc.Format				= m_format;
-			desc.Width				= m_width;
-			desc.Height				= m_height;
-			desc.MipLevels			= m_data.empty() ? 1 : static_cast<UINT>(m_data.size());
-			desc.ArraySize			= m_arraySize;
-			desc.SampleDesc.Count	= 1;
+			desc.Width = m_width;
+			desc.Height = m_height;
+			desc.Format = m_format;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.SampleDesc.Count = 1;
 			desc.SampleDesc.Quality = 0;
-			desc.BindFlags			= m_bindFlags;
-			desc.Usage				= (m_bindFlags & D3D11_BIND_RENDER_TARGET) || (m_bindFlags & D3D11_BIND_DEPTH_STENCIL) ?
-									D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
-			desc.MiscFlags			= 0;
-			desc.CPUAccessFlags		= 0;
+			desc.MiscFlags = 0;
+			desc.CPUAccessFlags = 0;
 
-			std::vector<D3D11_SUBRESOURCE_DATA> subResourceDatas;
-			auto mipWidth	= m_width;
-			auto mipHeight = m_height;
-			for (unsigned int i = 0; i != m_data.size(); ++i)
-			{
-				if (m_data[i].empty())
-				{
-					CORE_ERROR("", i);
-					return false;
-				}
-
-				auto& subResourceData				= subResourceDatas.emplace_back(D3D11_SUBRESOURCE_DATA{});
-				subResourceData.pSysMem				= m_data[i].data();
-				subResourceData.SysMemPitch			= mipWidth * m_channelCount * (m_bpc / 8);				// 가로 * 채널 수 / 채널의 바이트 크기
-				subResourceData.SysMemSlicePitch	= 0;
-
-				mipWidth	= max(mipWidth / 2, 1);
-				mipHeight	= max(mipHeight / 2, 1);
-			}
-
-			if (FAILED(device->CreateTexture2D(&desc, subResourceDatas.data(), &texture)))
+			if (FAILED(m_renderDevice->CreateTexture2D(&desc, nullptr, &m_resource)))
 			{
 				CORE_ERROR("");
 				return false;
 			}
 		}
 
-		// RendTargetView
-		if(m_bindFlags & D3D11_BIND_RENDER_TARGET)
+		// renderTargetView 생성
 		{
 			D3D11_RENDER_TARGET_VIEW_DESC desc;
-			ZeroMemory(&desc, sizeof(desc));
-			desc.Format							= m_format;
-			desc.ViewDimension					= (m_arraySize == 1) ? D3D11_RTV_DIMENSION_TEXTURE2D : D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-			desc.Texture2DArray.ArraySize		= m_arraySize;
-			desc.Texture2DArray.FirstArraySlice = 0;
-			desc.Texture2DArray.MipSlice		= 0;
+			desc.Format = m_format;
+			desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipSlice = 0;		// 사용할 mipLevel 같다.
 
-			if (FAILED(device->CreateRenderTargetView(static_cast<ID3D11Resource*>(texture), &desc, &m_renderTargetView)))
+			if (FAILED(m_renderDevice->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_renderTargetView)))
 			{
 				CORE_ERROR("");
+				SAFE_RELEASE(m_resource);
 				return false;
 			}
 		}
 
-		// DepthStencilView
-		// DXGI_FORMAT_D32_FLOAT 포멧 정황상 Stencil은 제외된 듯 하다.
-		// 최신 스파르탄에서는 다시 24, 8로 나눈 것 같다.
-		// 그리고 일반이랑 readOnly두 개를 사용한다.
-		if (m_bindFlags & D3D11_BIND_SHADER_RESOURCE)
-		{
-			D3D11_DEPTH_STENCIL_VIEW_DESC desc;
-			ZeroMemory(&desc, sizeof(desc));
-			desc.Format							= m_format;
-			desc.ViewDimension					= (m_arraySize == 1) ? D3D11_DSV_DIMENSION_TEXTURE2D : D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
-			desc.Texture2DArray.ArraySize		= m_arraySize;
-			desc.Texture2DArray.FirstArraySlice = 0;
-			desc.Texture2DArray.MipSlice		= 0;
-
-			for (unsigned int i = 0; i != m_arraySize; i++)
-			{
-				desc.Texture2DArray.FirstArraySlice = i;
-
-				ID3D11DepthStencilView* view = nullptr;
-				if (FAILED(device->CreateDepthStencilView(static_cast<ID3D11Resource*>(texture), &desc, &view)))
-				{
-					CORE_ERROR("");
-					return false;
-				}
-				m_DepthStencilViews.push_back(view);
-			}
-		}
-
-		// ShaderResourceView
-		if (m_bindFlags & D3D11_BIND_DEPTH_STENCIL)
+		// shaderResourceView 생성
 		{
 			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-			ZeroMemory(&desc, sizeof(desc));
-			desc.Format							= m_format;
-			desc.ViewDimension					= (m_arraySize == 1) ? D3D11_SRV_DIMENSION_TEXTURE2D : D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
-			desc.Texture2DArray.ArraySize		= m_arraySize;
-			desc.Texture2DArray.FirstArraySlice = 0;
-			desc.Texture2DArray.MipLevels		= m_data.empty() ? 1 : static_cast<UINT>(m_data.size());
-			desc.Texture2DArray.MostDetailedMip = 0;
+			desc.Format = m_format;
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipLevels = -1;
+			desc.Texture2D.MostDetailedMip = 0;
 
-			if (FAILED(device->CreateShaderResourceView(static_cast<ID3D11Resource*>(texture), &desc, &m_ShaderResourceView)))
+			if (FAILED(m_renderDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_shaderResourceView)))
+			{
+				CORE_ERROR("");
+				SAFE_RELEASE(m_renderTargetView);
+				SAFE_RELEASE(m_resource);
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	// stencil 사용 유무에 따라 Format이 DXGI_FORMAT_D32_FLOAT_S8X24_UINT, DXGI_FORMAT_D32_FLOAT 로 나뉜다.
+	// 이때 Texture와 ShaderResourceView의 Format도 다르게 설정해야 한다.
+	bool Texture2D::CreateDepthStencil(unsigned int width, unsigned int height, bool useStencil)
+	{
+		if (width <= 0 || height <= 0)
+		{
+			CORE_ERROR("");
+			return false;
+		}
+
+		// base datas
+		{
+			m_width = width;
+			m_height = height;
+			m_format = useStencil ? DXGI_FORMAT_D32_FLOAT_S8X24_UINT : DXGI_FORMAT_D32_FLOAT;
+
+			setViewport(m_width, m_height);
+		}
+
+		// texture 생성
+		{
+			D3D11_TEXTURE2D_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));
+			desc.Width = m_width;
+			desc.Height = m_height;
+			desc.Format = m_format == DXGI_FORMAT_D32_FLOAT_S8X24_UINT ? DXGI_FORMAT_R32G8X24_TYPELESS : DXGI_FORMAT_R32_TYPELESS;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;	// 이것만 다르다.
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
+			desc.MiscFlags = 0;
+			desc.CPUAccessFlags = 0;
+
+			if (FAILED(m_renderDevice->CreateTexture2D(&desc, nullptr, &m_resource)))
 			{
 				CORE_ERROR("");
 				return false;
 			}
 		}
 
-		// 일단 릴리즈
-		SAFE_RELEASE(texture);
-		
+		// DepthStencilView 생성
+		{
+			D3D11_DEPTH_STENCIL_VIEW_DESC desc;
+			desc.Format = m_format;
+			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipSlice = 0;
+			desc.Flags = 0;	// depth, stencil 둘 다 읽고 쓰기 가능
+
+			if (FAILED(m_renderDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_depthStencilView)))
+			{
+				CORE_ERROR("");
+				SAFE_RELEASE(m_resource);
+				return false;
+			}
+		}
+
+		// shaderResourceView 생성
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+			desc.Format = m_format == DXGI_FORMAT_D32_FLOAT_S8X24_UINT ? DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS : DXGI_FORMAT_R32_FLOAT;
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipLevels = -1;
+			desc.Texture2D.MostDetailedMip = 0;
+
+			if (FAILED(m_renderDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_shaderResourceView)))
+			{
+				CORE_ERROR("");
+				SAFE_RELEASE(m_depthStencilView);
+				SAFE_RELEASE(m_resource);
+				return false;
+			}
+		}
+
 		return true;
 	}
 }

@@ -12,6 +12,7 @@ namespace Dive
 	class Sampler;
 	class Shader;
 	class ConstantBuffer;
+	class Texture2D;
 
 	// 전체 창 화면 같은건 해상도와 이 모드의 조합으로 만든다.
 	enum class eScreenMode
@@ -126,6 +127,10 @@ namespace Dive
 		Sampler* GetSampler(eSamplerType type);
 
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_renderTargetView; }
+
+		// test -> 나중엔 map의 key로 접근
+		Texture2D* GetRenderTarget() const { return m_renderTarget; }
+		Texture2D* GetDepthStencil() const { return m_depthStencil; }
 		
 	private:
 		Graphics(const Graphics&)				= delete;
@@ -141,8 +146,8 @@ namespace Dive
 		bool createRasterizerStates();
 		bool createSampels();
 		bool createShaders();
+		bool createTextures();
 		bool createBaseShader();
-
 		bool createConstantBuffer();
 
 	private:
@@ -160,7 +165,7 @@ namespace Dive
 		ID3D11RenderTargetView* m_renderTargetView = nullptr;
 
 		//= GPU Resources
-		// 스파르탄에서는 5개까지 구분해놓았다.
+		// 스파르탄에서는 5개까지 구분해놓았다. => 좀 더 자세히 구분했다.
 		std::shared_ptr<DepthStencilState> m_depthStencilStateEnabled;
 		std::shared_ptr<DepthStencilState> m_depthStencilStateDisabled;
 
@@ -182,6 +187,10 @@ namespace Dive
 		std::shared_ptr<Sampler> m_samplerBilinearWrap;
 		std::shared_ptr<Sampler> m_samplerTrilinearClamp;
 		std::shared_ptr<Sampler> m_samplerAnisotropicWrap;
+
+		// textures -> 나중엔 enum을 key로 한 unordered_map으로 관리
+		Texture2D* m_renderTarget;
+		Texture2D* m_depthStencil;
 
 		std::unordered_map<eRenderShaderType, std::shared_ptr<Shader>> m_shaders;
 		Shader* m_baseShader;

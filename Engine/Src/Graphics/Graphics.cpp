@@ -9,6 +9,7 @@
 #include "D3D11/RasterizerState.h"
 #include "D3D11/Sampler.h"
 #include "D3D11/Shader.h"
+#include "D3D11//Texture2D.h"
 #include "D3D11/ConstantBuffer.h"
 
 
@@ -67,8 +68,9 @@ namespace Dive
 
 		// render target clear
 		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
-		m_immediateContext->OMSetRenderTargets(1, &m_renderTargetView, nullptr);
+		m_immediateContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencil->GetDepthStencilView());
 		m_immediateContext->ClearRenderTargetView(m_renderTargetView, (FLOAT*)(&clear_color));
+		m_immediateContext->ClearDepthStencilView(m_depthStencil->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		return true;
 	}
@@ -195,6 +197,9 @@ namespace Dive
 			return false;
 
 		if(!createBaseShader())
+			return false;
+
+		if (!createTextures())
 			return false;
 
 		if (!createConstantBuffer())
@@ -449,6 +454,22 @@ namespace Dive
 	bool Graphics::createShaders()
 	{
 		return false;
+	}
+
+	bool Graphics::createTextures()
+	{
+		m_renderTarget = new Texture2D(m_context, "RenderTarget");
+		m_renderTarget->CreateRenderTarget(m_width, m_height, DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+		m_depthStencil = new Texture2D(m_context, "DepthStencil");
+		m_depthStencil->CreateDepthStencil(m_width, m_height, true);
+
+		if (!m_renderTarget || !m_depthStencil)
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	bool Graphics::createBaseShader()

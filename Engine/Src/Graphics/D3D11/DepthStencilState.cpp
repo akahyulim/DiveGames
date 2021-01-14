@@ -8,6 +8,7 @@
 
 namespace Dive
 {
+	// 좀 더 세분화가 필요할 것 같다.
 	DepthStencilState::DepthStencilState(Context* context, BOOL enable, D3D11_COMPARISON_FUNC cmpFunc)
 		: Object(context)
 	{

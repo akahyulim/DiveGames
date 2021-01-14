@@ -7,6 +7,7 @@
 #include "D3D11/DepthStencilState.h"
 #include "D3D11/Shader.h"
 #include "D3D11/ConstantBuffer.h"
+#include "D3D11/Texture2D.h"
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
@@ -142,12 +143,12 @@ namespace Dive
 		//m_rasterizerState = state;
 	}
 
-	// 일단 backbuffer rendertarget을 사용한다. depth stencil은 적용하지 않는다.
-	// clear도 우선 적용한다.
+	// 현재 직접 만든 RenderTargetView가 화면에 나타나지 않는다.
+	// 이는 Backbuffer를 기반으로 하지 않아서일 수 있다.
 	void Renderer::setRenderTarget()
 	{
-		auto renderTargetView = m_graphics.lock()->GetRenderTargetView();
-		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		auto renderTargetView = m_graphics.lock()->GetRenderTarget()->GetRenderTargetView();//m_graphics.lock()->GetRenderTargetView();
+		float clearColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
 
 		m_deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
 		m_deviceContext->OMSetRenderTargets(1, &renderTargetView, nullptr);
@@ -201,8 +202,7 @@ namespace Dive
 		if (renderableObjects.empty())
 			return;
 
-		// 일단 BeginFrame()을 적용
-		setRenderTarget();
+		//setRenderTarget();
 
 		// viewport, constant buffer
 		{
@@ -225,7 +225,7 @@ namespace Dive
 		//setSampler(eSamplerType::Linear);
 		setRasterizerState(eRasterizerState::CullBackSolid);
 		//setBlendState(eBlendState::Disabled, 0xFFFFFFFF);
-		//setDepthStencilState(false);
+		setDepthStencilState(true);
 		
 		// 엄밀하게 따지자면 Shader도 Renderable의 Material에 포함되었을 것이다...
 		for (const auto& gameObject : renderableObjects)
