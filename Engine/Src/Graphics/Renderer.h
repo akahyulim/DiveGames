@@ -35,24 +35,7 @@ namespace Dive
 		void OnAcquireRenderable(const E_UPDATE_SCENE* evnt);
 
 	private:
-		//= d3d11 pipeline???
-		// IASetInputLayout
-		void setBuffers(Renderable* renderable);
-		void setPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology);
-		// VSSetShader
-		// VSSetConstantBuffers
-		// PSSetShader
-		// PSSetConstantBuffers
-		void setShader();
-		void setSampler(eSamplerType type);
-		void setRasterizerState(eRasterizerState state);
-		void setRenderTarget();
-		void setBlendState(eBlendState state, unsigned int sampleMask);
-		void setDepthStencilState(bool enabled);
-
-		void drawIndexed(Renderable* renderable);
-
-		void testRender();
+		void legacyShader();
 
 	private:
 		std::weak_ptr<Graphics> m_graphics;

@@ -66,6 +66,7 @@ namespace Dive
 			return false;
 		}
 
+		// 이건 Renderer로 이동
 		// render target clear
 		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
 		m_immediateContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencil->GetDepthStencilView());

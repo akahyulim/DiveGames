@@ -113,6 +113,8 @@
     <ClInclude Include="Src\Engine\Application.h" />
     <ClInclude Include="Src\Core\Main.h" />
     <ClInclude Include="Src\Graphics\D3D11\BlendState.h" />
+    <ClInclude Include="Src\Graphics\D3D11\Command.h" />
+    <ClInclude Include="Src\Graphics\D3D11\PipelineState.h" />
     <ClInclude Include="Src\Graphics\D3D11\RasterizerState.h" />
     <ClInclude Include="Src\Graphics\D3D11\DepthStencilState.h" />
     <ClInclude Include="Src\Core\IniHelper.h" />
@@ -156,6 +158,7 @@
     <ClCompile Include="Src\Core\FileStream.cpp" />
     <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\BlendState.cpp" />
+    <ClCompile Include="Src\Graphics\D3D11\Command.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\RasterizerState.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\DepthStencilState.cpp" />
     <ClCompile Include="Src\Core\IniHelper.cpp" />
