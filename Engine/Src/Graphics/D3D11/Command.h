@@ -13,11 +13,15 @@ namespace Dive
 	// 이걸 누가 가져야 할까?
 	class Command : public Object
 	{
+		DIVE_OBJECT(Command, Object);
+
 	public:
 		Command(Context* context);
 		~Command();
 
 		bool SetPipelineState(const PipelineState& state);
+
+		void ClearRenderTarget();
 
 		// buffers
 		void SetVertexBuffer(VertexBuffer* buffer, unsigned int offset = 0);

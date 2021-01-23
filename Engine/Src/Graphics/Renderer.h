@@ -10,6 +10,7 @@ namespace Dive
 	class MeshFilter;
 	class Renderable;
 	class E_UPDATE_SCENE;
+	class Command;
 
 	enum class eRenderableObjectType
 	{
@@ -52,6 +53,11 @@ namespace Dive
 		eRasterizerState m_rasterizerState;
 		eBlendState m_blendState;
 		bool m_bDepthStencilEnabled;
+
+		GameObject* m_selectedCamera = nullptr;
+
+		// 일단 여기에...
+		Command* m_command;
 	};
 }
 

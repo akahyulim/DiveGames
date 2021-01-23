@@ -68,10 +68,10 @@ namespace Dive
 
 		// 이건 Renderer로 이동
 		// render target clear
-		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
-		m_immediateContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencil->GetDepthStencilView());
-		m_immediateContext->ClearRenderTargetView(m_renderTargetView, (FLOAT*)(&clear_color));
-		m_immediateContext->ClearDepthStencilView(m_depthStencil->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		//float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
+		//m_immediateContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencil->GetDepthStencilView());
+		//m_immediateContext->ClearRenderTargetView(m_renderTargetView, (FLOAT*)(&clear_color));
+		//m_immediateContext->ClearDepthStencilView(m_depthStencil->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		return true;
 	}
@@ -376,7 +376,7 @@ namespace Dive
 			CORE_ERROR("");
 			return false;
 		}
-
+		
 		CORE_TRACE("Created d3d11 rhi.");
 
 		return true;

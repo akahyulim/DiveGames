@@ -6,6 +6,7 @@
 //#include "Core/Log.h"
 #include "Components/Renderable.h"
 #include "Components/Transform.h"
+#include "Components/Camera.h"
 
 
 namespace Dive
@@ -176,12 +177,20 @@ namespace Dive
 		{
 			auto component = AddComponent<Renderable>();
 			if(id != 0 ) component->SetID(id);
+			// 아래의 부분은 중복된다. 그런데 component가 지역변수로 밖으로 빼낼 수 없다...
 			return static_cast<Component*>(component);
 		}
 
 		case eComponentType::Transform:
 		{
 			auto component = AddComponent<Transform>();
+			if (id != 0) component->SetID(id);
+			return static_cast<Component*>(component);
+		}
+
+		case eComponentType::Camera:
+		{
+			auto component = AddComponent<Camera>();
 			if (id != 0) component->SetID(id);
 			return static_cast<Component*>(component);
 		}

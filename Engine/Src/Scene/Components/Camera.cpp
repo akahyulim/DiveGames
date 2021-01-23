@@ -2,7 +2,7 @@
 #include "Camera.h"
 #include "Transform.h"
 #include "../GameObject.h"
-#include "Core/FileStream.h"
+//#include "Core/FileStream.h"
 #include "Core/Log.h"
 
 

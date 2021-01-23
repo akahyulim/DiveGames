@@ -37,6 +37,11 @@ void Sandbox::Stop()
 // 유니티 식으로 하려면 해당 GameObject의 Script에서 직접 구성해야 한다.
 bool Sandbox::createTriangle()
 {
+	// camera 추가
+	auto camera = m_scene->CreateGameObject();
+	camera->SetName("Camera");
+	camera->AddComponent<Camera>();
+
 	// game object 및 Renderable Component 생성
 	auto triangle = m_scene->CreateGameObject();
 	triangle->SetName("Triangle");

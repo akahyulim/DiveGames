@@ -55,3 +55,4 @@
 #include "Scene/Components/Component.h"
 #include "Scene/Components/Transform.h"
 #include "Scene/Components/Renderable.h"
+#include "Scene/Components/Camera.h"

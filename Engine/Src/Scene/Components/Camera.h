@@ -24,8 +24,9 @@ namespace Dive
 		~Camera();
 
 		// serialize
-		void Serialize(FileStream& stream) override;
-		void Deserialize(FileStream& stream) override;
+		// 왜인지 모르겠지만 에러가 난다...
+		//void Serialize(FileStream& stream) override;
+		//void Deserialize(FileStream& stream) override;
 
 		void OnUpdate() override;
 
@@ -33,6 +34,7 @@ namespace Dive
 		eProjectionType GetProjectionType() const { return m_projectionType; }
 		void SetProjectionType(eProjectionType type) { m_projectionType = type; }
 
+		// XMFLOAT4는 에바다.
 		DirectX::XMFLOAT4 GetBackgroundColor() const { return m_backgroundColor; }
 		void SetBackgroundColor(DirectX::XMFLOAT4 color) { m_backgroundColor = std::move(color); }
 
