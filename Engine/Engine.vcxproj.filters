@@ -106,6 +106,9 @@
     <ClCompile Include="Src\Graphics\D3D11\Command.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Scene\Components\Camera.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
@@ -249,6 +252,12 @@
     <ClInclude Include="Src\Graphics\D3D11\Command.h">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Scene\Components\Camera.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Geometry\Math.h">
+      <Filter>Src\Geometry</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">
@@ -277,6 +286,9 @@
     </Filter>
     <Filter Include="Src\Scene\Components">
       <UniqueIdentifier>{0d485a41-c5db-4c19-ab69-f451cd017176}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Geometry">
+      <UniqueIdentifier>{05b0431e-58dd-4770-94a5-c245d4d91cda}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

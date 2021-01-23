@@ -15,6 +15,7 @@ namespace Dive
 		MeshFilter,
 		MeshRenderer,
 		Renderable,
+		Camera,
 	//	Unknown
 	};
 

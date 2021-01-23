@@ -7,7 +7,7 @@ namespace Dive
 	class GameObject;
 	class FileStream;
 
-	// 일단 계층 구조와 위치 설정만 구현
+
 	class Transform : public Component
 	{
 		DIVE_OBJECT(Transform, Component);
@@ -22,7 +22,6 @@ namespace Dive
 
 		void Copy(Component* other) override;
 
-		// const &로 리턴???
 		//= position
 		DirectX::XMVECTOR GetPosition();
 		DirectX::XMVECTOR GetLocalPosition();
@@ -31,9 +30,42 @@ namespace Dive
 		void SetPosition(float x, float y, float z)			{ SetPosition(DirectX::XMVectorSet(x, y, z, 1.0f)); }
 		void SetLocalPosition(float x, float y, float z)	{ SetLocalPosition(DirectX::XMVectorSet(x, y, z, 1.0f)); }
 
+		//= rotation
+		DirectX::XMVECTOR GetRotation();
+		DirectX::XMVECTOR GetRotationDegrees();
+		DirectX::XMVECTOR GetRotationRadians();
+		DirectX::XMVECTOR GetLocalRotation();
+		DirectX::XMVECTOR GetLocalRotationDegrees();
+		DirectX::XMVECTOR GetLocalRotationRadians();
+		void SetRotation(const DirectX::XMVECTOR& quaternion);
+		void SetLocalRotation(const DirectX::XMVECTOR& quaternion);
+		void SetRotationDegrees(const DirectX::XMVECTOR& degrees);
+		void SetLocalRotationDegrees(const DirectX::XMVECTOR& degrees);
+		void SetRotationRadians(const DirectX::XMVECTOR& radians);
+		void SetLocalRotationRadians(const DirectX::XMVECTOR& radians);
+
+		//= Scale
+		DirectX::XMVECTOR GetScale();
+		DirectX::XMVECTOR GetLocalScale();
+		void SetScale(const DirectX::XMVECTOR& scale);
+		void SetLocalScale(const DirectX::XMVECTOR& scale);
+		void SetScale(float x, float y, float z)			{ SetScale(DirectX::XMVectorSet(x, y, z, 1.0f)); }
+		void SetLocalScale(float x, float y, float z)		{ SetLocalScale(DirectX::XMVectorSet(x, y, z, 1.0f)); }
+
+		//= Move
+		void Translate(const DirectX::XMVECTOR& delta);
+		void Rotate(const DirectX::XMVECTOR& delta);
+
 		//= etc
 		DirectX::XMMATRIX GetMatrix()		const { return DirectX::XMLoadFloat4x4(&m_matrix); }
 		DirectX::XMMATRIX GetLocalMatrix()	const { return DirectX::XMLoadFloat4x4(&m_localMatrix); }
+
+		DirectX::XMVECTOR GetUp();
+		DirectX::XMVECTOR GetDown();
+		DirectX::XMVECTOR GetLeft();
+		DirectX::XMVECTOR GetRight();
+		DirectX::XMVECTOR GetBackward();
+		DirectX::XMVECTOR GetForward();
 
 
 		//= hierarchy
@@ -63,6 +95,7 @@ namespace Dive
 
 	private:
 		DirectX::XMFLOAT3 m_localPosition;
+		DirectX::XMFLOAT4 m_localRotation;
 		DirectX::XMFLOAT3 m_localScale;
 
 		DirectX::XMFLOAT4X4 m_matrix;

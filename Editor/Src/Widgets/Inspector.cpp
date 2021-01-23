@@ -57,9 +57,15 @@ void Inspector::showTransform()
 	// 이렇게 접는다. 뭐... 특별한 건 없는데 굳이 프레임 함수까지 만들어야 할까?
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		DirectX::XMFLOAT3 pos, scl;
-		//XMFLOAT3 rot;
+		// 보여주는 좌표계는 뭘로 해야 하는가?
+		// 이걸 기준으로 변환이 일어나기에 신중해야 한다.
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMFLOAT3 rot;
+		DirectX::XMFLOAT3 scl;
+		
 		DirectX::XMStoreFloat3(&pos, transform->GetLocalPosition());
+		DirectX::XMStoreFloat3(&rot, transform->GetLocalRotationDegrees());
+		DirectX::XMStoreFloat3(&scl, transform->GetLocalScale());
 		//XMStoreFloat3(&rot, pTransform->GetLocalRotation());	// 이거 때문에 안먹힌다.
 		//DirectX::XMStoreFloat3(&scl, transform->GetLocalScale());
 
@@ -88,25 +94,23 @@ void Inspector::showTransform()
 		ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("PosZ", "##", &pos.z);
 
 		// Rotation
-		//ImGui::Text("Rot");
-		//ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("RotX", "##", &rot.x);
-		//ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("RotY", "##", &rot.y);
-		//ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("RotZ", "##", &rot.z);
+		ImGui::Text("Rot");
+		ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("RotX", "##", &rot.x);
+		ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("RotY", "##", &rot.y);
+		ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("RotZ", "##", &rot.z);
 
 		// Scale
-		//ImGui::Text("Scl");
-		//ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("SclX", "##", &scl.x);
-		//ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("SclY", "##", &scl.y);
-		//ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("SclZ", "##", &scl.z);
+		ImGui::Text("Scl");
+		ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("SclX", "##", &scl.x);
+		ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("SclY", "##", &scl.y);
+		ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("SclZ", "##", &scl.z);
 
 		// 실행 중이 아닐 때 변경 가능
 		{
 			// 계층 구조일 경우 부모의 좌표계에서 설정되는 것이 맞다.
-			transform->SetLocalPosition(XMLoadFloat3(&pos));
-			//pTransform->SetLocalScale(XMLoadFloat3(&scl));
-			//transform->SetLocalRotation(XMLoadFloat3(&rot));
-			//pTransform->SetPosition(XMLoadFloat3(&pos));
-			//pTransform->SetScale(XMLoadFloat3(&scl));
+			transform->SetLocalPosition(DirectX::XMLoadFloat3(&pos));
+			transform->SetLocalRotationDegrees(DirectX::XMLoadFloat3(&rot));
+			transform->SetLocalScale(DirectX::XMLoadFloat3(&scl));
 		}
 	}
 

@@ -112,6 +112,7 @@
     <ClInclude Include="Src\Core\EventSystem.h" />
     <ClInclude Include="Src\Engine\Application.h" />
     <ClInclude Include="Src\Core\Main.h" />
+    <ClInclude Include="Src\Geometry\Math.h" />
     <ClInclude Include="Src\Graphics\D3D11\BlendState.h" />
     <ClInclude Include="Src\Graphics\D3D11\Command.h" />
     <ClInclude Include="Src\Graphics\D3D11\PipelineState.h" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Src\Graphics\Window.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
+    <ClInclude Include="Src\Scene\Components\Camera.h" />
     <ClInclude Include="Src\Scene\Components\Component.h" />
     <ClInclude Include="Src\Scene\Components\Renderable.h" />
     <ClInclude Include="Src\Scene\Components\Transform.h" />
@@ -185,6 +187,7 @@
     <ClCompile Include="Src\Graphics\Renderer.cpp" />
     <ClCompile Include="Src\Graphics\Window.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
+    <ClCompile Include="Src\Scene\Components\Camera.cpp" />
     <ClCompile Include="Src\Scene\Components\Component.cpp" />
     <ClCompile Include="Src\Scene\Components\Renderable.cpp" />
     <ClCompile Include="Src\Scene\Components\Transform.cpp" />
