@@ -1,6 +1,7 @@
 #include "DivePch.h"
 #include "Graphics.h"
 #include "Window.h"
+#include "DeviceAndSwapChain.h"
 #include "Core/Context.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
@@ -18,7 +19,8 @@ namespace Dive
 	Graphics* g_graphics = nullptr;
 
 	Graphics::Graphics(Context* context)
-		: Object(context)
+		: Object(context),
+		m_deviceAndSwapChain(nullptr)
 
 	{
 		m_window = std::make_shared<Window>();
@@ -30,9 +32,7 @@ namespace Dive
 
 	Graphics::~Graphics()
 	{
-		SAFE_RELEASE(m_immediateContext);
-		SAFE_RELEASE(m_device);
-		SAFE_RELEASE(m_swapChain);
+		SAFE_DELETE(m_deviceAndSwapChain);
 
 		CORE_TRACE("Call Graphics's Destructor ======================");
 	}
@@ -40,24 +40,17 @@ namespace Dive
 	// 이 곳에서 input을 처리한다?
 	LRESULT Graphics::MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		// imgui의 처리가 필요하다.
-
-		switch (msg)
+		if ((msg == WM_SIZE) || (msg == WM_DISPLAYCHANGE))
 		{
-		case WM_KEYDOWN:
-			return 0;
-
-		case WM_KEYUP:
-			return 0;
-
-		default:
-			return DefWindowProc(hWnd, msg, wParam, lParam);
+			ResizeResolution();
 		}
+		
+		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
 	bool Graphics::BeginFrame()
 	{
-		if (!IsInitialized() || !m_window)
+		if (!IsInitialized())
 			return false;
 
 		if (!m_window->Run())
@@ -66,36 +59,58 @@ namespace Dive
 			return false;
 		}
 
-		// 이건 Renderer로 이동
+		// 스파르탄은 이 부분 역시 CommandList에서 처리한다.
+		// 즉, Begin, EndFrame 같은 함수가 없다.
 		// render target clear
-		//float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
-		//m_immediateContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencil->GetDepthStencilView());
-		//m_immediateContext->ClearRenderTargetView(m_renderTargetView, (FLOAT*)(&clear_color));
-		//m_immediateContext->ClearDepthStencilView(m_depthStencil->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		auto immediateContext = m_deviceAndSwapChain->GetImmediateContext();
+		auto renderTargetView = m_deviceAndSwapChain->GetRenderTargetView();
+		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
+		immediateContext->OMSetRenderTargets(1, &renderTargetView, nullptr);// m_depthStencil->GetDepthStencilView());
+		immediateContext->ClearRenderTargetView(renderTargetView, (FLOAT*)(&clear_color));
+		//immediateContext->ClearDepthStencilView(m_depthStencil->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		return true;
 	}
 
 	void Graphics::EndFrame()
 	{
-		if (!m_swapChain)
-		{
-			CORE_ERROR("");
+		if (!IsInitialized())
 			return;
-		}
 
-		if (FAILED(m_swapChain->Present(m_displayMode.vSync ? 1 : 0, 0)))
-		{
-			CORE_ERROR("");
-			return;
-		}
+		m_deviceAndSwapChain->Present();
 	}
 
-	bool Graphics::IsInitialized()
+	bool Graphics::IsInitialized() const
 	{
-		return (m_window != nullptr && m_device != nullptr);
+		// 좀 애매하다.
+		return (m_window != nullptr && m_deviceAndSwapChain != nullptr);
 	}
 
+	DirectX::XMUINT2 Graphics::GetResolution() const
+	{
+		if(!IsInitialized())
+			return DirectX::XMUINT2(0 , 0);
+
+		return m_deviceAndSwapChain->GetSwapChainSize();
+	}
+
+	void Graphics::SetResolution(DirectX::XMUINT2 size, bool force)
+	{
+		if (!IsInitialized())
+			return;
+
+		m_deviceAndSwapChain->ResizeTarget(size, force);
+	}
+
+	void Graphics::ResizeResolution(DirectX::XMUINT2 size)
+	{
+		if (!IsInitialized())
+			return;
+
+		m_deviceAndSwapChain->ResizeBuffer(size);
+	}
+
+	// 생성함수로 보기에는 이름이 애매하다.
 	// 이 상태에서 최대크기 화면을 만들 수 없다.
 	// 사이즈를 입력받아 적용하려면 번거롭다.
 	bool Graphics::SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync)
@@ -116,6 +131,35 @@ namespace Dive
 			return false;
 		
 		return m_window->ChangeWndProc(newProc);
+	}
+
+	void Graphics::ResizeTextures(unsigned int width, unsigned int height)
+	{
+		// 일단 지원하는 크기인지 확인한다.
+
+	//	if (m_width == width && m_height == height)
+		if(m_textureSize.x == width && m_textureSize.y == height)
+			return;
+
+		// 크기를 저장한다.
+		m_textureSize = DirectX::XMUINT2(width, height);
+
+		// 텍스쳐를 새롭게 생성한다.
+		createTextures();
+
+		CORE_INFO("Change resolution {0:d} x {1:d}", m_textureSize.x, m_textureSize.y);
+
+		return;
+	}
+
+	ID3D11Device * Graphics::GetRHIDevice() const
+	{
+		return IsInitialized() ? m_deviceAndSwapChain->GetDevice() : nullptr;
+	}
+
+	ID3D11DeviceContext * Graphics::GetRHIContext() const
+	{
+		return IsInitialized() ? m_deviceAndSwapChain->GetImmediateContext() : nullptr;
 	}
 
 	RasterizerState * Graphics::GetRasterizerState(eRasterizerState state)
@@ -170,22 +214,29 @@ namespace Dive
 	{
 		// 윈도우 생성
 		if (!m_window->Create(
-			width, 
-			height, 
-			displayMode.screenMode == eScreenMode::FullScreen, 
-			displayMode.screenMode == eScreenMode::Windowed))
+			width,
+			height,
+			displayMode.screenMode == eScreenMode::FullScreen,
+			displayMode.screenMode == eScreenMode::Windowed
+		))
+		{
 			return false;
+		}
 
-		m_width = m_window->GetClientRectWidth();
-		m_height = m_window->GetClientRectHeight();
+		// 일단 크기를 동일하게 한다.
+		auto clientWidth = m_window->GetClientRectWidth();
+		auto clientHeight = m_window->GetClientRectHeight();
+		m_textureSize.x = clientWidth;
+		m_textureSize.y = clientHeight;
 		m_displayMode = displayMode;
 
-		// d3d11 생성
-		if (!createRHI())
+		m_deviceAndSwapChain = new DeviceAndSwapChain(m_context, m_window.get()->GetHandle(), clientWidth, clientHeight,
+			displayMode.screenMode == eScreenMode::Windowed ? TRUE : FALSE);
+		if (!m_deviceAndSwapChain->IsInitialized())
 			return false;
 
 		CORE_TRACE("Window Size: {0:d} x {1:d}", m_window->GetWidth(), m_window->GetHeight());
-		CORE_TRACE("Client Rect Size: {0:d} x {1:d}", m_width, m_height);
+		CORE_TRACE("Client Rect Size: {0:d} x {1:d}", m_textureSize.x, m_textureSize.y);
 
 		// create default gpu resources
 		if (!createDepthStencilStates())
@@ -281,107 +332,6 @@ namespace Dive
 		*/
 	}
 
-	bool Graphics::createRHI()
-	{
-		if (!m_window)
-			return false;
-
-		UINT deviceFlags = 0;
-#ifdef _DEBUG
-		deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
-		std::vector<D3D_FEATURE_LEVEL> featureLevels
-		{
-			D3D_FEATURE_LEVEL_11_1,
-			D3D_FEATURE_LEVEL_11_0,
-			D3D_FEATURE_LEVEL_10_1,
-			D3D_FEATURE_LEVEL_10_1,
-			D3D_FEATURE_LEVEL_9_3,
-			D3D_FEATURE_LEVEL_9_2,
-			D3D_FEATURE_LEVEL_9_1,
-		};
-
-		D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_HARDWARE;
-
-		DXGI_SWAP_CHAIN_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.OutputWindow						= m_window->GetHandle();
-		desc.BufferDesc.Width					= m_width;
-		desc.BufferDesc.Height					= m_height;
-		desc.Windowed							= (m_displayMode.screenMode == eScreenMode::FullScreen) ? FALSE : TRUE;
-		desc.BufferCount						= 1;							// 매개변수 대상
-		desc.BufferDesc.Format					= DXGI_FORMAT_R8G8B8A8_UNORM;	// 매개변수 대상
-		if (m_displayMode.vSync)
-		{
-			desc.BufferDesc.RefreshRate.Denominator = 1;						// 매개변수 대상
-			desc.BufferDesc.RefreshRate.Numerator = 60;							// 매개변수 대상
-		}
-		else
-		{
-			desc.BufferDesc.RefreshRate.Denominator = 1;						// 매개변수 대상
-			desc.BufferDesc.RefreshRate.Numerator = 0;							// 매개변수 대상
-		}
-		desc.BufferDesc.ScanlineOrdering		= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		desc.BufferDesc.Scaling					= DXGI_MODE_SCALING_UNSPECIFIED;
-		desc.BufferUsage						= DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		desc.SampleDesc.Count					= 1;
-		desc.SampleDesc.Quality					= 0;
-		desc.SwapEffect							= DXGI_SWAP_EFFECT_DISCARD;
-		desc.Flags								= 0;
-
-		auto createDevice = [this, deviceFlags, featureLevels, driverType, desc]()
-		{
-			return D3D11CreateDeviceAndSwapChain(
-				nullptr,									// 역시 임시
-				driverType,
-				nullptr,
-				deviceFlags,
-				featureLevels.data(),
-				static_cast<UINT>(featureLevels.size()),
-				D3D11_SDK_VERSION,
-				&desc,
-				&m_swapChain,
-				&m_device,
-				nullptr,
-				&m_immediateContext);
-		};
-
-		auto result = createDevice();
-		if (result == DXGI_ERROR_SDK_COMPONENT_MISSING)
-		{
-			CORE_WARN("");
-			deviceFlags &= ~D3D11_CREATE_DEVICE_DEBUG;
-			result = createDevice();
-		}
-
-		if (FAILED(result))
-		{
-			CORE_ERROR("");
-			return false;
-		}
-
-		// render target view 생성
-		ID3D11Texture2D* backBuffer = nullptr;
-		if (FAILED(m_swapChain->GetBuffer(0, IID_PPV_ARGS(&backBuffer))))
-		{
-			CORE_ERROR("");
-			return false;
-		}
-
-		result = m_device->CreateRenderTargetView(backBuffer, nullptr, &m_renderTargetView);
-		backBuffer->Release();
-		if (FAILED(result))
-		{
-			CORE_ERROR("");
-			return false;
-		}
-		
-		CORE_TRACE("Created d3d11 rhi.");
-
-		return true;
-	}
-
 	bool Graphics::createDepthStencilStates()
 	{
 		m_depthStencilStateEnabled	= std::make_shared<DepthStencilState>(m_context, TRUE, D3D11_COMPARISON_LESS);
@@ -457,15 +407,18 @@ namespace Dive
 		return false;
 	}
 
+	// 사용하는 모든 Texture를 지정된 크기로 생성한다.
+	// 이는 ResizeTextures()을 통해 새로운 크기로 갱신될 수 있다.
 	bool Graphics::createTextures()
 	{
-		m_renderTarget = new Texture2D(m_context, "RenderTarget");
-		m_renderTarget->CreateRenderTarget(m_width, m_height, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		// 갱신하려면 지운 후 새로 만들거나 스마트 포인터를 써야 한다.
+		m_editorView = new Texture2D(m_context, "EditorView");
+		m_editorView->CreateRenderTarget(m_textureSize.x, m_textureSize.y, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
 		m_depthStencil = new Texture2D(m_context, "DepthStencil");
-		m_depthStencil->CreateDepthStencil(m_width, m_height, true);
+		m_depthStencil->CreateDepthStencil(m_textureSize.x, m_textureSize.y, true);
 
-		if (!m_renderTarget || !m_depthStencil)
+		if (!m_editorView || !m_depthStencil)
 		{
 			return false;
 		}
@@ -507,7 +460,7 @@ namespace Dive
 		DirectX::XMMATRIX proj;
 //		{
 			float fieldOfView = 3.141592654f / 4.0f;
-			float screenAspect = (float)m_width / (float)m_height;
+			float screenAspect = (float)m_textureSize.x / (float)m_textureSize.y;
 			proj = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
 //		}
 

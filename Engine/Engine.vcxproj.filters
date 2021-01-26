@@ -112,6 +112,9 @@
     <ClCompile Include="Src\Geometry\Frustum.cpp">
       <Filter>Src\Geometry</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Graphics\DeviceAndSwapChain.cpp">
+      <Filter>Src\Graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
@@ -263,6 +266,9 @@
     </ClInclude>
     <ClInclude Include="Src\Geometry\Frustum.h">
       <Filter>Src\Geometry</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\DeviceAndSwapChain.h">
+      <Filter>Src\Graphic</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -197,6 +197,8 @@ void MenuBar::Tick(float deltaTime)
 			if (ImGui::MenuItem("Camera"))
 			{
 				//m_pWorld->CreateCameraObject();
+				auto camera = m_scene->CreateGameObject();
+				camera->AddComponent<Camera>();
 			}
 
 			ImGui::EndMenu();

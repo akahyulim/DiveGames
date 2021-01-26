@@ -51,64 +51,10 @@ namespace Dive
 		m_bInitialized = true;
 	}
 
-	// 1. 직접 만든 Texture의 RendrTargetView는 왜 적용이 안되는가?
-	// => 나의 경우 직접 만든 Texture를 사용하는 곳이 없어, Clear되지 않은 SwapChain RenderTargetView가 보여진 것이다.
-	// 2. RenderTargetView들은 전부 Backbuffer에 들어가 swap chain 되는가?
-	// => Backbuffer RenderTarget만 SwapChain되는 것 같다. 
-	// => 그렇다면 Spartan이 이상해지는데?
-	// => Spartan이 Clear한 Texture는 Editor에서 Viewport에 출력되는 것이다. 즉, Backbuffer RenderTargetView가 아니다.
-	// => 그렇다면 적어도 Spartan에서 Backbuffer를 이용해 만든 RenderTargetView를 찾을 수 있어야 해.
-	// => SwapChain에서 만든다. 확인했다. 즉, SwapChain RenderTargetView는 무조건 필요하다.
 	void Renderer::Render()
 	{
-		// 전처리 존재
-		{
-			// 카메라가 존재하지 않으면 RenderTarget만 Clear
-			if (!m_selectedCamera)
-			{
-				// 우선 RenderTarget을 설정해놓아야 한다.(Set하라는게 아니다.)
-				// command로 설정해야 한다. render target, color를 전달한다. 사실 중간 데이터가 더 있다.
-				// 직접 만든 텍스쳐의 렌더 타겟뷰가 작동하지 않는다.
-				auto view = m_graphics.lock()->GetRenderTargetView();
-				//m_deviceContext->OMSetRenderTargets(1, &view, nullptr);
-				float clearColor[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
-				m_deviceContext->ClearRenderTargetView(view, clearColor);
-
-				return;
-			}
-
-			// Renderable이 존재하지 않으면 Camera Color로 RenderTarget Clear
-			if(m_gameObjects[eRenderableObjectType::Light].empty() && m_gameObjects[eRenderableObjectType::Opaque].empty()
-				&& m_gameObjects[eRenderableObjectType::Transparent].empty())
-			{
-				// 역시 command로 설정한다. 색상만 camera 것으로 전달한다.
-				// 이 부분은 추후 수정이 필요하다. 스카이 박스가 설정될 수 있기 때문이다.
-
-				// 왜 직접 만든 텍스쳐는 안될까?
-				auto view = m_graphics.lock()->GetRenderTarget()->GetRenderTargetView();//m_graphics.lock()->GetRenderTargetView();
-				if (!view)
-				{
-					CORE_ERROR("NOT FOUND RENDER TARGET VIEW");
-					return;
-				}
-				// 충격... 렌더 타겟을 설정하지 않앗는데 색상이 적용되었다....
-				// Shader로 전달하는 것이지, backbuffer에 설정하는 것이 아니다!
-				// 그렇다면 어떤 화면을 그릴지 어떻게 선택된 거지? 생성된 모든 RenderTargetView를? 아닐건데...
-				//m_deviceContext->OMSetRenderTargets(1, &view, nullptr);
-				// 카메라 색상 가져오기가 너무 귀찮다.
-				DirectX::XMFLOAT4 color = m_selectedCamera->GetComponent<Camera>()->GetBackgroundColor();
-				float clearColor[4] = { color.x, color.y, color.z, color.w };
-				m_deviceContext->ClearRenderTargetView(view, clearColor);
-				return;
-			}
-
-			// constant buffer - frame?
-			{
-
-			}
-		}
-
-		legacyShader();
+		//legacyShader();
+		renderEditor();
 
 		// frame count ++
 	}
@@ -152,6 +98,46 @@ namespace Dive
 		}
 
 		// Light Render
+		{
+
+		}
+	}
+
+	// RenderTargetView = ImGUI + renderEditor(view window)
+	// Editor 전용으로 gizmo가 추가 될 수 있다. 일반적으론 DebugRender라 칭하는 것 같다. 예) grid
+	void Renderer::renderEditor()
+	{
+		// 카메라가 존재하지 않으면 RenderTarget만 Clear
+		if (!m_selectedCamera)
+		{
+			auto view = m_graphics.lock()->GetEditorTexture()->GetRenderTargetView();
+			float clearColor[4] = { 0.5f, 0.5f, 0.0f, 1.0f };
+			m_deviceContext->ClearRenderTargetView(view, clearColor);
+
+			return;
+		}
+
+		// Renderable이 존재하지 않으면 Camera Color로 RenderTarget Clear
+		if (m_gameObjects[eRenderableObjectType::Light].empty() && m_gameObjects[eRenderableObjectType::Opaque].empty()
+			&& m_gameObjects[eRenderableObjectType::Transparent].empty())
+		{
+			// 역시 command로 설정한다. 색상만 camera 것으로 전달한다.
+			// 이 부분은 추후 수정이 필요하다. 스카이 박스가 설정될 수 있기 때문이다.
+
+			// 왜 직접 만든 텍스쳐는 안될까?
+			auto view = m_graphics.lock()->GetEditorTexture()->GetRenderTargetView();
+			if (!view)
+			{
+				CORE_ERROR("NOT FOUND RENDER TARGET VIEW");
+				return;
+			}
+			DirectX::XMFLOAT4 color = m_selectedCamera->GetComponent<Camera>()->GetBackgroundColor();
+			float clearColor[4] = { color.x, color.y, color.z, color.w };
+			m_deviceContext->ClearRenderTargetView(view, clearColor);
+			return;
+		}
+
+		// constant buffer - frame?
 		{
 
 		}

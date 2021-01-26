@@ -6,6 +6,7 @@
 #include "Widgets/MenuBar.h"
 #include "Widgets/Hierarchy.h"
 #include "Widgets/Inspector.h"
+#include "Widgets/EditView.h"
 
 
 Editor* s_editor = nullptr;
@@ -19,9 +20,13 @@ LRESULT EditorWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	auto graphics = s_editor->GetContext()->GetSubsystem<Graphics>();
 	if (graphics)
+	{
 		return CallWindowProc(graphics->GetWindow()->GetBaseWndProc(), hWnd, msg, wParam, lParam);
+	}
 	else
+	{
 		return DefWindowProc(hWnd, msg, wParam, lParam);
+	}
 }
 
 Editor::Editor()
@@ -81,6 +86,7 @@ bool Editor::Initialize()
 		m_widgets.emplace_back(std::make_shared<MenuBar>(this));
 		m_widgets.emplace_back(std::make_shared<Hierarchy>(this));
 		g_inspector = dynamic_cast<Inspector*>(m_widgets.emplace_back(std::make_shared<Inspector>(this)).get());
+		m_widgets.emplace_back(std::make_shared<EditView>(this));
 	}
 
 	m_bInitialized = true;

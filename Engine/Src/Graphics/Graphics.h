@@ -6,6 +6,7 @@ namespace Dive
 {
 	class Context;
 	class Window;
+	class DeviceAndSwapChain;
 	class DepthStencilState;
 	class BlendState;
 	class RasterizerState;
@@ -14,6 +15,8 @@ namespace Dive
 	class ConstantBuffer;
 	class Texture2D;
 
+	// 너무 많다. 다른 곳으로 옮길까...?
+	// => 스파르탄도 RenderEnums라고 만들어 옮겼다.
 	// 전체 창 화면 같은건 해상도와 이 모드의 조합으로 만든다.
 	enum class eScreenMode
 	{
@@ -101,21 +104,26 @@ namespace Dive
 		bool BeginFrame();
 		void EndFrame();
 
-		// Draw???
+		bool IsInitialized() const;
 
-		bool IsInitialized();
+		// SwapChain
+		DirectX::XMUINT2 GetResolution() const;
+		void SetResolution(DirectX::XMUINT2 size, bool force);
+		void ResizeResolution(DirectX::XMUINT2 size = DirectX::XMUINT2(0, 0));
 
 		// settings를 얻어와야 한다.
 		bool SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync);
 		bool SetWindowSubclassing(LONG_PTR newProc);
 
+		DirectX::XMUINT2 GetTextureSize() const { return m_textureSize; }
+		void ResizeTextures(unsigned int width, unsigned int height);
+
+
 		std::shared_ptr<Window> GetWindow() const { return m_window; }
 
-		int GetWidth() const { return m_width; }
-		int GetHeight() const { return m_height; }
 
-		ID3D11Device* GetRHIDevice() const { return m_device; }
-		ID3D11DeviceContext* GetRHIContext() const { return m_immediateContext; }
+		ID3D11Device* GetRHIDevice() const;
+		ID3D11DeviceContext* GetRHIContext() const;
 
 		// get
 		Shader* GetShader(eRenderShaderType type);
@@ -126,10 +134,8 @@ namespace Dive
 		DepthStencilState* GetDepthStencilState(bool enabled);
 		Sampler* GetSampler(eSamplerType type);
 
-		ID3D11RenderTargetView* GetRenderTargetView() const { return m_renderTargetView; }
-
 		// test -> 나중엔 map의 key로 접근
-		Texture2D* GetRenderTarget() const { return m_renderTarget; }
+		Texture2D* GetEditorTexture() const { return m_editorView; }
 		Texture2D* GetDepthStencil() const { return m_depthStencil; }
 		
 	private:
@@ -139,8 +145,6 @@ namespace Dive
 		bool createDisplay(int width, int height, DisplayMode displayMode);
 		void adjustDisplayMode(int& width, int& height, DisplayMode& displayMode);
 		
-		bool createRHI();
-
 		bool createDepthStencilStates();
 		bool createBlendStates();
 		bool createRasterizerStates();
@@ -152,17 +156,14 @@ namespace Dive
 
 	private:
 		std::shared_ptr<Window> m_window;
+		DeviceAndSwapChain* m_deviceAndSwapChain;
 
-		int m_width;
-		int m_height;
 		DisplayMode m_displayMode;
 		VgaInfo m_vgaInfo;
 		std::vector<AdapterInfo> m_adapterInfos;
 
-		ID3D11Device* m_device = nullptr;
-		ID3D11DeviceContext* m_immediateContext = nullptr;
-		IDXGISwapChain* m_swapChain = nullptr;
-		ID3D11RenderTargetView* m_renderTargetView = nullptr;
+		// texture size
+		DirectX::XMUINT2 m_textureSize;
 
 		//= GPU Resources
 		// 스파르탄에서는 5개까지 구분해놓았다. => 좀 더 자세히 구분했다.
@@ -189,7 +190,7 @@ namespace Dive
 		std::shared_ptr<Sampler> m_samplerAnisotropicWrap;
 
 		// textures -> 나중엔 enum을 key로 한 unordered_map으로 관리
-		Texture2D* m_renderTarget;
+		Texture2D* m_editorView;
 		Texture2D* m_depthStencil;
 
 		std::unordered_map<eRenderShaderType, std::shared_ptr<Shader>> m_shaders;

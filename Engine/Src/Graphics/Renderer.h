@@ -37,6 +37,7 @@ namespace Dive
 
 	private:
 		void legacyShader();
+		void renderEditor();
 
 	private:
 		std::weak_ptr<Graphics> m_graphics;
