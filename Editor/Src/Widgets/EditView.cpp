@@ -34,19 +34,18 @@ void EditView::drawTexture(float deltaTime)
 	width -= (width % 2 != 0) ? 1 : 0;
 	height -= (height % 2 != 0) ? 1 : 0;
 
-	//m_pTexView = m_pRenderer->GetRenderTextures(Dive::eRenderTargetType::GBuffer_Albedo);
-	//m_pTexView = m_pRenderer->GetRenderTextures(Dive::eRenderTargetType::Light_Diffuse);
-	//m_pTexView = m_pRenderer->GetRenderTextures(Dive::eRenderTargetType::Composition);
-	m_texture = m_graphics->GetEditorTexture();
+	m_texture = m_graphics->GetRenderTexture(eRenderTextureType::EditorView);
 
 	if (m_texture)
 	{
-		//if (m_texture->GetWidth() != width || m_texture->GetHeight() != height)
+		if (m_texture->GetWidth() != width || m_texture->GetHeight() != height)
 		{
 			//if (m_tickCount >= 0.250f)
 			{
 				//m_pRenderer->ResizeRenderTextures(width, height);
+				m_graphics->ResizeTextures(DirectX::XMUINT2(width, height));
 				// Resize 과정에서 Texture를 재생성하므로 포인터를 다시 받아줘야 한다.
+				m_texture = m_graphics->GetRenderTexture(eRenderTextureType::EditorView);
 				//m_pTexView = m_pRenderer->GetRenderTextures(Dive::eRenderTargetType::Composition);
 				//m_tickCount = 0.0f;
 			}

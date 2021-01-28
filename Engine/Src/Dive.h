@@ -44,6 +44,7 @@
 #include "Graphics/D3D11/Sampler.h"
 #include "Graphics/D3D11/Texture.h"
 #include "Graphics/D3D11/Texture2D.h"
+#include "Graphics/GraphicsEnums.h"
 #include "Graphics/DeviceAndSwapChain.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/MeshFilter.h"

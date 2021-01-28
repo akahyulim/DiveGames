@@ -131,49 +131,22 @@ namespace Dive
 			return false;
 		}
 
-		// 결국 이 부분이 문제였다.
-		// RenderTargetView들을 무조건 해제해야 하는 것 같다.
-//		bool used = false;
-//		ID3D11RenderTargetView* currentRenderTargetView = nullptr;
-//		ID3D11DepthStencilView* currentDepthStencilView = nullptr;
-//		m_immediateContext->OMGetRenderTargets(1, &currentRenderTargetView, &currentDepthStencilView);
-//		if (m_renderTargetView == currentRenderTargetView)
-		{
-			m_immediateContext->OMSetRenderTargets(0, nullptr, nullptr);
-//			used = true;
-		}
-
-		// 꼭 미리 릴리즈 시켜야 한다.
+		m_immediateContext->OMSetRenderTargets(0, nullptr, nullptr);
 		SAFE_RELEASE(m_renderTargetView);
 
 		if(FAILED(m_swapChain->ResizeBuffers(0, size.x, size.y, DXGI_FORMAT_UNKNOWN, 0)))
 		{
-//			if (used)
-			{
-//				m_immediateContext->OMSetRenderTargets(1, &m_renderTargetView, currentDepthStencilView);
-			}
-
 			CORE_ERROR("fail to resize buffers.");
 			return false;
 		}
 
-		// depth stencil view도 새로 생성해야할 수 있다.
 		if (!createRenderTargetView())
 		{
 			return false;
 		}
 
-//		if (used)
-		{
-//			m_immediateContext->OMSetRenderTargets(1, &m_renderTargetView, currentDepthStencilView);
-		}
-
 		DXGI_SWAP_CHAIN_DESC desc;
 		m_swapChain->GetDesc(&desc);
-
-		CORE_TRACE("Change Resolution Width: {0:d} -> {1:d}", m_size.x, desc.BufferDesc.Width);
-		CORE_TRACE("Change Resolution Height: {0:d} -> {1:d}", m_size.y, desc.BufferDesc.Height);
-
 		m_size = DirectX::XMUINT2(desc.BufferDesc.Width, desc.BufferDesc.Height);
 
 		return true;

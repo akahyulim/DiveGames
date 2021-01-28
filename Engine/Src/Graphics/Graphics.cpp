@@ -32,8 +32,6 @@ namespace Dive
 
 	Graphics::~Graphics()
 	{
-		SAFE_DELETE(m_deviceAndSwapChain);
-
 		CORE_TRACE("Call Graphics's Destructor ======================");
 	}
 
@@ -83,7 +81,7 @@ namespace Dive
 	bool Graphics::IsInitialized() const
 	{
 		// 좀 애매하다.
-		return (m_window != nullptr && m_deviceAndSwapChain != nullptr);
+		return (m_window && m_deviceAndSwapChain && m_deviceAndSwapChain->IsInitialized());
 	}
 
 	DirectX::XMUINT2 Graphics::GetResolution() const
@@ -115,7 +113,7 @@ namespace Dive
 	// 사이즈를 입력받아 적용하려면 번거롭다.
 	bool Graphics::SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync)
 	{
-		DisplayMode mode;
+		DISPLAY_MODE mode;
 		mode.fullScreen = fullScreen;
 		mode.borderless = borderless;
 		mode.vSync = vSync;
@@ -133,18 +131,15 @@ namespace Dive
 		return m_window->ChangeWndProc(newProc);
 	}
 
-	void Graphics::ResizeTextures(unsigned int width, unsigned int height)
+	void Graphics::ResizeTextures(const DirectX::XMUINT2& size)
 	{
 		// 일단 지원하는 크기인지 확인한다.
 
-	//	if (m_width == width && m_height == height)
-		if(m_textureSize.x == width && m_textureSize.y == height)
+		if(m_textureSize.x == size.x && m_textureSize.y == size.y)
 			return;
 
-		// 크기를 저장한다.
-		m_textureSize = DirectX::XMUINT2(width, height);
+		m_textureSize = size;
 
-		// 텍스쳐를 새롭게 생성한다.
 		createTextures();
 
 		CORE_INFO("Change resolution {0:d} x {1:d}", m_textureSize.x, m_textureSize.y);
@@ -210,7 +205,7 @@ namespace Dive
 		}
 	}
 
-	bool Graphics::createDisplay(int width, int height, DisplayMode displayMode)
+	bool Graphics::createDisplay(int width, int height, DISPLAY_MODE displayMode)
 	{
 		// 윈도우 생성
 		if (!m_window->Create(
@@ -230,7 +225,7 @@ namespace Dive
 		m_textureSize.y = clientHeight;
 		m_displayMode = displayMode;
 
-		m_deviceAndSwapChain = new DeviceAndSwapChain(m_context, m_window.get()->GetHandle(), clientWidth, clientHeight,
+		m_deviceAndSwapChain = std::make_shared<DeviceAndSwapChain>(m_context, m_window.get()->GetHandle(), clientWidth, clientHeight,
 			displayMode.screenMode == eScreenMode::Windowed ? TRUE : FALSE);
 		if (!m_deviceAndSwapChain->IsInitialized())
 			return false;
@@ -261,7 +256,7 @@ namespace Dive
 	}
 
 	// 용도를 좀 더 명확히 해야 한다.
-	void Graphics::adjustDisplayMode(int & width, int & height, DisplayMode & screenMode)
+	void Graphics::adjustDisplayMode(int & width, int & height, DISPLAY_MODE & screenMode)
 	{
 		/*
 		HRESULT hResult;
@@ -330,149 +325,5 @@ namespace Dive
 		SAFE_RELEASE(adapter);
 		SAFE_RELEASE(factory);
 		*/
-	}
-
-	bool Graphics::createDepthStencilStates()
-	{
-		m_depthStencilStateEnabled	= std::make_shared<DepthStencilState>(m_context, TRUE, D3D11_COMPARISON_LESS);
-		m_depthStencilStateDisabled = std::make_shared<DepthStencilState>(m_context, FALSE, D3D11_COMPARISON_LESS);
-
-		if (!m_depthStencilStateEnabled || !m_depthStencilStateDisabled)
-		{
-			CORE_ERROR("Fail to create depthstencil states.");
-			return false;
-		}
-
-		return true;
-	}
-
-	bool Graphics::createBlendStates()
-	{
-		m_blendStateEnable		= std::make_shared<BlendState>(m_context, TRUE);
-		m_blendStateDisable		= std::make_shared<BlendState>(m_context, FALSE);
-		m_blendStateColorAdd	= std::make_shared<BlendState>(m_context, TRUE, D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD);
-
-		if (!m_blendStateEnable || !m_blendStateDisable || !m_blendStateColorAdd)
-		{
-			CORE_ERROR("Fail to create beldn states.");
-			return false;
-		}
-
-		return true;
-	}
-
-	bool Graphics::createRasterizerStates()
-	{
-		m_rasterizeStateCullBackSolid		= std::make_shared<RasterizerState>(m_context, D3D11_CULL_BACK, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
-		m_rasterizeStateCullFrontSolid		= std::make_shared<RasterizerState>(m_context, D3D11_CULL_FRONT, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
-		m_rasterizeStateCullNoneSolid		= std::make_shared<RasterizerState>(m_context, D3D11_CULL_NONE, D3D11_FILL_SOLID, TRUE, FALSE, FALSE, FALSE);
-
-		m_rasterizeStateCullBackWireFrame	= std::make_shared<RasterizerState>(m_context, D3D11_CULL_BACK, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
-		m_rasterizeStateCullFrontWireFrame	= std::make_shared<RasterizerState>(m_context, D3D11_CULL_FRONT, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
-		m_rasterizeStateCullNoneWireFrame	= std::make_shared<RasterizerState>(m_context, D3D11_CULL_NONE, D3D11_FILL_WIREFRAME, TRUE, FALSE, FALSE, TRUE);
-
-		if (!m_rasterizeStateCullBackSolid || !m_rasterizeStateCullFrontSolid || !m_rasterizeStateCullNoneSolid
-			|| !m_rasterizeStateCullBackWireFrame || !m_rasterizeStateCullFrontWireFrame || !m_rasterizeStateCullNoneWireFrame)
-		{
-			CORE_ERROR("Fail to create rasterizer states.");
-			return false;
-		}
-
-		return true;
-	}
-
-	bool Graphics::createSampels()
-	{
-		m_samplerLinear				= std::make_shared<Sampler>(m_context, D3D11_FILTER_MIN_MAG_MIP_LINEAR);
-
-		m_samplerCompareDepth		= std::make_shared<Sampler>(m_context, D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_GREATER_EQUAL);
-		m_samplerPointClamp			= std::make_shared<Sampler>(m_context, D3D11_FILTER_MIN_MAG_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_COMPARISON_ALWAYS);
-		m_samplerBilinearClamp		= std::make_shared<Sampler>(m_context, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_CLAMP);
-		m_samplerBilinearWrap		= std::make_shared<Sampler>(m_context, D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT, D3D11_TEXTURE_ADDRESS_WRAP);
-		m_samplerTrilinearClamp		= std::make_shared<Sampler>(m_context, D3D11_FILTER_MIN_MAG_MIP_LINEAR, D3D11_TEXTURE_ADDRESS_CLAMP);
-		m_samplerAnisotropicWrap	= std::make_shared<Sampler>(m_context, D3D11_FILTER_ANISOTROPIC, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_COMPARISON_ALWAYS, 16);
-
-		if (!m_samplerLinear || !m_samplerCompareDepth || !m_samplerPointClamp | !m_samplerBilinearClamp
-			|| !m_samplerBilinearWrap || !m_samplerTrilinearClamp || !m_samplerAnisotropicWrap)
-		{
-			CORE_ERROR("fail to create samplers.");
-			return false;
-		}
-
-		return true;
-	}
-	
-	bool Graphics::createShaders()
-	{
-		return false;
-	}
-
-	// 사용하는 모든 Texture를 지정된 크기로 생성한다.
-	// 이는 ResizeTextures()을 통해 새로운 크기로 갱신될 수 있다.
-	bool Graphics::createTextures()
-	{
-		// 갱신하려면 지운 후 새로 만들거나 스마트 포인터를 써야 한다.
-		m_editorView = new Texture2D(m_context, "EditorView");
-		m_editorView->CreateRenderTarget(m_textureSize.x, m_textureSize.y, DXGI_FORMAT_R32G32B32A32_FLOAT);
-
-		m_depthStencil = new Texture2D(m_context, "DepthStencil");
-		m_depthStencil->CreateDepthStencil(m_textureSize.x, m_textureSize.y, true);
-
-		if (!m_editorView || !m_depthStencil)
-		{
-			return false;
-		}
-
-		return true;
-	}
-
-	bool Graphics::createBaseShader()
-	{
-		m_baseShader = new Shader(m_context);
-		if (!m_baseShader->CreateShader(eVertexType::PositionUvNormalTangent, L"../Assets/Shaders/baseShader.hlsl"))
-			return false;
-
-		return true;
-	}
-
-	// 원래는 생성한 후 update로 갱신시켜야 한다.
-	bool Graphics::createConstantBuffer()
-	{
-		m_constantBuffer = new ConstantBuffer(m_context);
-		if (!m_constantBuffer->Create<MatrixBuffer>())
-			return false;
-
-		// view
-		DirectX::XMMATRIX view;
-//		{
-			DirectX::XMFLOAT3 pos, lookAt, up;
-			pos.x = 0.0f; pos.y = 0.0f; pos.z = -5.0f;
-			lookAt.x = 0.0f; lookAt.y = 0.0f; lookAt.z = 0.0f;
-			up.x = 0.0f, up.y = 1.0f; up.z = 0.0f;
-			DirectX::XMVECTOR vecPos, vecLookAt, vecUp;
-			vecPos = DirectX::XMLoadFloat3(&pos);
-			vecLookAt = DirectX::XMLoadFloat3(&lookAt);
-			vecUp = DirectX::XMLoadFloat3(&up);
-			view = DirectX::XMMatrixLookAtLH(vecPos, vecLookAt, vecUp);
-//		}
-
-		// proj
-		DirectX::XMMATRIX proj;
-//		{
-			float fieldOfView = 3.141592654f / 4.0f;
-			float screenAspect = (float)m_textureSize.x / (float)m_textureSize.y;
-			proj = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
-//		}
-
-		auto ptr = static_cast<MatrixBuffer*>(m_constantBuffer->Map());
-		DirectX::XMStoreFloat4x4(&(ptr->world), DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity()));
-		//DirectX::XMStoreFloat4x4(&(ptr->view), DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity()));
-		DirectX::XMStoreFloat4x4(&(ptr->view), DirectX::XMMatrixTranspose(view));
-		DirectX::XMStoreFloat4x4(&(ptr->proj), DirectX::XMMatrixTranspose(proj));
-
-		if (!m_constantBuffer->Unmap())
-			return false;
-
-		return true;
 	}
 }

@@ -29,6 +29,9 @@ namespace Dive
 		//ID3D11DepthStencilView* GetDepthStencilView(unsigned int index = 0)		{ return m_depthStencilViews.size() > index ? m_depthStencilViews[index] : nullptr; }
 		const D3D11_VIEWPORT& GetViewport()	const { return m_viewport; }
 
+		unsigned int GetWidth() const { return m_width; }
+		unsigned int GetHeight() const { return m_height; }
+
 	protected:
 		virtual bool createTextureAndView() { return false; }
 		void setViewport(unsigned int width, unsigned int height);

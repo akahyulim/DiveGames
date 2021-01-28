@@ -115,6 +115,9 @@
     <ClCompile Include="Src\Graphics\DeviceAndSwapChain.cpp">
       <Filter>Src\Graphic</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Graphics\Graphics_Resources.cpp">
+      <Filter>Src\Graphic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
@@ -268,6 +271,9 @@
       <Filter>Src\Geometry</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\DeviceAndSwapChain.h">
+      <Filter>Src\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\GraphicsEnums.h">
       <Filter>Src\Graphic</Filter>
     </ClInclude>
   </ItemGroup>

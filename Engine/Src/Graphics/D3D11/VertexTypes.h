@@ -1,9 +1,13 @@
 #pragma once
 #include "DivePch.h"
 
-
 namespace Dive
 {
+	// 구조체이므로 전부 대문자로 바꾸자.
+	// 이름은 VERTEX_P, VERTEX_PC, VERTEX_PUNT와 같이 간략화하자?
+	// 혹은 VERTEX_POS_COL, VERTEX_POS_UV_NOR_TAN 처럼 확인이 가능하게? 
+	// VERTEX_POSITION_UV_NORMAL_TANGENT는 너무 길지?
+	// VERTEX_POSITION_UV_NORMAL_TANGENT_WEIGHT_INDEX까지도 갈텐데...
 	struct Vertex_Undefined {};
 
 	struct Vertex_Pos

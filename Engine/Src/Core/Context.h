@@ -32,6 +32,7 @@ namespace Dive
 			}
 		}
 
+		// 코드 일관성을 유지하려면 .get()을 리턴해야 한다.
 		template<class T> std::shared_ptr<T> GetSubsystem()
 		{
 			for (auto& subsystem : m_subsystems)

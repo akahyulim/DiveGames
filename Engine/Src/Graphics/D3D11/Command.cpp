@@ -7,6 +7,7 @@
 #include "DepthStencilState.h"
 #include "RasterizerState.h"
 #include "Shader.h"
+#include "Texture2D.h"
 #include "Graphics/Graphics.h"
 #include "Core/Context.h"
 #include "Core/Log.h"
@@ -113,17 +114,76 @@ namespace Dive
 				unsigned int stencilRef = 0;
 				immediateContext->OMGetDepthStencilState(&oldDepthStencilState, &stencilRef);
 
-				if(currentDepthStencilState != oldDepthStencilState)
+				if (currentDepthStencilState != oldDepthStencilState)
+				{
 					immediateContext->OMSetDepthStencilState(currentDepthStencilState, 1);
+				}
 			}
 
 			// RenderTargets
 			{
-				// 좀 복잡하다.
+				// state로부터 depthstencilview를 얻어온다.
+				ID3D11DepthStencilView* depthStencilView = nullptr;
+				{
+					if (state.depthStencilTexture)
+					{
+						depthStencilView = state.depthStencilTexture->GetDepthStencilView();
+					}
+				}
+
+				// 최대 8개의 View를 저장할 수 있는 배열 혹은 Vector를 생성한다.
+				// 이후 SwapChain의 RenderTargetView 혹은 Texture2D View를 순서대로 저장한다.
+				std::vector<ID3D11RenderTargetView*> renderTargetViews;
+				renderTargetViews.reserve(8);
+				{
+					// State에 RenderTargetView가 존재하면 배열에 하나만 넣고,
+					// 없다면 Texture2D View를 순서대로 넣는거다.
+					if (state.swapChainRenderTargetView)
+					{
+						renderTargetViews.push_back(state.swapChainRenderTargetView);
+					}
+					else
+					{
+						for (auto rtv : state.renderTargets)
+						{
+							renderTargetViews.push_back(rtv->GetRenderTargetView());
+						}
+					}
+				}
+
+				// 위의 과정에서 구성한 RenderTargetView와 DepthStenciView를 OMSetRenderTargets()에 전달한다.
+				{
+					immediateContext->OMSetRenderTargets(
+						static_cast<UINT>(renderTargetViews.size()),
+						renderTargetViews.data(),
+						depthStencilView);
+				}
 			}
 		}
 
 		return true;
+	}
+
+	// 그러고보니 이건 데이터가 아닌데 함수화? 데이터인가?
+	void Command::ClearRenderTarget(Texture2D * texture, DirectX::XMFLOAT4 color)
+	{
+		if (!texture || !texture->GetRenderTargetView())
+		{
+			CORE_ERROR("");
+			return;
+		}
+
+		// 에바?
+		auto immediateContext = m_context->GetSubsystem<Graphics>()->GetRHIContext();
+		if (!immediateContext)
+		{
+			CORE_ERROR("");
+			return;
+		}
+
+		// 등록이 아니라 클리어이므로 이전것과 비교가 필요없다.
+		float clearColor[4]{ color.x, color.y, color.z, color.w };
+		immediateContext->ClearRenderTargetView(texture->GetRenderTargetView(), clearColor);
 	}
 	
 	void Command::SetVertexBuffer(VertexBuffer * buffer, unsigned int offset)

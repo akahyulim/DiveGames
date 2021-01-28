@@ -142,6 +142,7 @@
     <ClInclude Include="Src\Graphics\D3D11\VertexTypes.h" />
     <ClInclude Include="Src\Graphics\DeviceAndSwapChain.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
+    <ClInclude Include="Src\Graphics\GraphicsEnums.h" />
     <ClInclude Include="Src\Graphics\Material.h" />
     <ClInclude Include="Src\Graphics\Mesh.h" />
     <ClInclude Include="Src\Graphics\MeshFilter.h" />
@@ -185,6 +186,7 @@
     <ClCompile Include="Src\Graphics\D3D11\VertexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\DeviceAndSwapChain.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
+    <ClCompile Include="Src\Graphics\Graphics_Resources.cpp" />
     <ClCompile Include="Src\Graphics\Material.cpp" />
     <ClCompile Include="Src\Graphics\Mesh.cpp" />
     <ClCompile Include="Src\Graphics\MeshFilter.cpp" />

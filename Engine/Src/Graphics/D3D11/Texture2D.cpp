@@ -7,26 +7,15 @@
 
 namespace Dive
 {
-	Texture2D::Texture2D(Context * context, std::string name)
+	Texture2D::Texture2D(Context * context, unsigned int width, unsigned int height, DXGI_FORMAT format, std::string name)
 		: Texture(context)
 	{
 		m_name = std::move(name);
-	}
 
-	Texture2D::~Texture2D()
-	{
-		SAFE_RELEASE(m_depthStencilView);
-		SAFE_RELEASE(m_renderTargetView);
-		SAFE_RELEASE(m_shaderResourceView);
-		SAFE_RELEASE(m_resource);
-	}
-	
-	bool Texture2D::CreateRenderTarget(unsigned int width, unsigned int height, DXGI_FORMAT format)
-	{
 		if (width <= 0 || height <= 0)
 		{
 			CORE_ERROR("");
-			return false;
+			return;
 		}
 
 		// base datas
@@ -57,7 +46,7 @@ namespace Dive
 			if (FAILED(m_renderDevice->CreateTexture2D(&desc, nullptr, &m_resource)))
 			{
 				CORE_ERROR("");
-				return false;
+				return;
 			}
 		}
 
@@ -72,7 +61,7 @@ namespace Dive
 			{
 				CORE_ERROR("");
 				SAFE_RELEASE(m_resource);
-				return false;
+				return;
 			}
 		}
 
@@ -89,21 +78,20 @@ namespace Dive
 				CORE_ERROR("");
 				SAFE_RELEASE(m_renderTargetView);
 				SAFE_RELEASE(m_resource);
-				return false;
+				return;
 			}
 		}
-
-		return true;
 	}
 
-	// stencil 사용 유무에 따라 Format이 DXGI_FORMAT_D32_FLOAT_S8X24_UINT, DXGI_FORMAT_D32_FLOAT 로 나뉜다.
-	// 이때 Texture와 ShaderResourceView의 Format도 다르게 설정해야 한다.
-	bool Texture2D::CreateDepthStencil(unsigned int width, unsigned int height, bool useStencil)
+	Texture2D::Texture2D(Context * context, unsigned int width, unsigned int height, bool useStencil, std::string name)
+		: Texture(context)
 	{
+		m_name = std::move(name);
+
 		if (width <= 0 || height <= 0)
 		{
 			CORE_ERROR("");
-			return false;
+			return;
 		}
 
 		// base datas
@@ -134,7 +122,7 @@ namespace Dive
 			if (FAILED(m_renderDevice->CreateTexture2D(&desc, nullptr, &m_resource)))
 			{
 				CORE_ERROR("");
-				return false;
+				return;
 			}
 		}
 
@@ -150,7 +138,7 @@ namespace Dive
 			{
 				CORE_ERROR("");
 				SAFE_RELEASE(m_resource);
-				return false;
+				return;
 			}
 		}
 
@@ -167,10 +155,16 @@ namespace Dive
 				CORE_ERROR("");
 				SAFE_RELEASE(m_depthStencilView);
 				SAFE_RELEASE(m_resource);
-				return false;
+				return;
 			}
 		}
+	}
 
-		return true;
+	Texture2D::~Texture2D()
+	{
+		SAFE_RELEASE(m_depthStencilView);
+		SAFE_RELEASE(m_renderTargetView);
+		SAFE_RELEASE(m_shaderResourceView);
+		SAFE_RELEASE(m_resource);
 	}
 }

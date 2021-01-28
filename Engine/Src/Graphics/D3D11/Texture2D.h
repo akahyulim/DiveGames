@@ -7,17 +7,15 @@ namespace Dive
 	class Context;
 
 	// 일단 Array, Mipmap은 전부 제외
+	// 모든 생성자가 Resource와 RenderTargetView 생성 함수를 가진다.
+	// 추후 private 함수로 나누자.
 	class Texture2D : public Texture
 	{
 	public:
-		Texture2D(Context* context, std::string name);
-		~Texture2D();
-
-		// 이렇게 하면 Base인 Texture로 사용이 불가능하다.
-		// 그런데 굳이 2D와 Cube를 Texture Interface로 묶어 사용할 필요가 있나 싶다.
 		// load image file = shaderResourceView
-		bool CreateRenderTarget(unsigned int width, unsigned int height, DXGI_FORMAT format);
-		bool CreateDepthStencil(unsigned int width, unsigned int height, bool useStencil);
+		Texture2D(Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, std::string name = "");
+		Texture2D(Context* context, unsigned int width, unsigned int height, bool useStencil = true, std::string name = "");
+		~Texture2D();
 
 		ID3D11Resource* GetResource() { return static_cast<ID3D11Resource*>(m_resource); }
 

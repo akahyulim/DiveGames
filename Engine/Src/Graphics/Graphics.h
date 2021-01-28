@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Object.h"
+#include "GraphicsEnums.h"
 
 
 namespace Dive
@@ -15,17 +16,7 @@ namespace Dive
 	class ConstantBuffer;
 	class Texture2D;
 
-	// 너무 많다. 다른 곳으로 옮길까...?
-	// => 스파르탄도 RenderEnums라고 만들어 옮겼다.
-	// 전체 창 화면 같은건 해상도와 이 모드의 조합으로 만든다.
-	enum class eScreenMode
-	{
-		FullScreen,
-		Borderless,
-		Windowed,
-	};
-
-	struct DisplayMode
+	struct DISPLAY_MODE
 	{
 		eScreenMode screenMode;
 		bool fullScreen;
@@ -34,15 +25,15 @@ namespace Dive
 		// refresh rate
 	};
 
-	struct VgaInfo
+	struct VGA_INFO
 	{
 		std::wstring name;
 		int videoMemory;
 	};
 
-	struct AdapterInfo
+	struct ADAPTER_INFO
 	{
-		AdapterInfo(unsigned int width, unsigned int height, unsigned int numerator, unsigned int denominator)
+		ADAPTER_INFO(unsigned int width, unsigned int height, unsigned int numerator, unsigned int denominator)
 		{
 			this->width = width;
 			this->hegiht = height;
@@ -56,40 +47,6 @@ namespace Dive
 		unsigned int denominator;
 	};
 
-	enum class eRenderShaderType
-	{
-
-	};
-
-	// 전부 지원하지 않는 값을 추가해야 한다.
-	enum class eRasterizerState
-	{
-		CullBackSolid,
-		CullFrontSolid,
-		CullNoneSolid,
-		CullBackWireFrame,
-		CullFrontWireFrame,
-		CullNoneWireFrame,
-	};
-
-	enum class eBlendState
-	{
-		Enabled,
-		Disabled,
-		ColorAdded,
-	};
-
-	enum class eSamplerType
-	{
-		Linear,
-		CompareDepth,
-		PointClamp,
-		BilinearClamp,
-		BilinearWrap,
-		TrilinearClamp,
-		AnisotropicWrap,
-	};
-
 	// Window, D3D11 RHI 그리고 GPU Resource를 관리합니다.
 	class Graphics : public Object
 	{
@@ -99,6 +56,9 @@ namespace Dive
 		explicit Graphics(Context* context);
 		~Graphics();
 
+		// settings를 얻어와야 한다.
+		bool SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync);
+		bool SetWindowSubclassing(LONG_PTR newProc);
 		LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 		bool BeginFrame();
@@ -111,17 +71,12 @@ namespace Dive
 		void SetResolution(DirectX::XMUINT2 size, bool force);
 		void ResizeResolution(DirectX::XMUINT2 size = DirectX::XMUINT2(0, 0));
 
-		// settings를 얻어와야 한다.
-		bool SetMode(int width, int height, bool fullScreen, bool borderless, bool vSync);
-		bool SetWindowSubclassing(LONG_PTR newProc);
-
+		// RenderTargets
+		Texture2D* GetRenderTexture(eRenderTextureType type) { return m_renderTextures[type].get(); }
 		DirectX::XMUINT2 GetTextureSize() const { return m_textureSize; }
-		void ResizeTextures(unsigned int width, unsigned int height);
-
+		void ResizeTextures(const DirectX::XMUINT2& size);
 
 		std::shared_ptr<Window> GetWindow() const { return m_window; }
-
-
 		ID3D11Device* GetRHIDevice() const;
 		ID3D11DeviceContext* GetRHIContext() const;
 
@@ -134,16 +89,12 @@ namespace Dive
 		DepthStencilState* GetDepthStencilState(bool enabled);
 		Sampler* GetSampler(eSamplerType type);
 
-		// test -> 나중엔 map의 key로 접근
-		Texture2D* GetEditorTexture() const { return m_editorView; }
-		Texture2D* GetDepthStencil() const { return m_depthStencil; }
-		
 	private:
 		Graphics(const Graphics&)				= delete;
 		Graphics& operator=(const Graphics&)	= delete;
 
-		bool createDisplay(int width, int height, DisplayMode displayMode);
-		void adjustDisplayMode(int& width, int& height, DisplayMode& displayMode);
+		bool createDisplay(int width, int height, DISPLAY_MODE displayMode);
+		void adjustDisplayMode(int& width, int& height, DISPLAY_MODE& displayMode);
 		
 		bool createDepthStencilStates();
 		bool createBlendStates();
@@ -156,11 +107,11 @@ namespace Dive
 
 	private:
 		std::shared_ptr<Window> m_window;
-		DeviceAndSwapChain* m_deviceAndSwapChain;
+		std::shared_ptr<DeviceAndSwapChain> m_deviceAndSwapChain;
 
-		DisplayMode m_displayMode;
-		VgaInfo m_vgaInfo;
-		std::vector<AdapterInfo> m_adapterInfos;
+		DISPLAY_MODE m_displayMode;
+		VGA_INFO m_vgaInfo;
+		std::vector<ADAPTER_INFO> m_adapterInfos;
 
 		// texture size
 		DirectX::XMUINT2 m_textureSize;
@@ -189,9 +140,7 @@ namespace Dive
 		std::shared_ptr<Sampler> m_samplerTrilinearClamp;
 		std::shared_ptr<Sampler> m_samplerAnisotropicWrap;
 
-		// textures -> 나중엔 enum을 key로 한 unordered_map으로 관리
-		Texture2D* m_editorView;
-		Texture2D* m_depthStencil;
+		std::unordered_map<eRenderTextureType, std::shared_ptr<Texture2D>> m_renderTextures;
 
 		std::unordered_map<eRenderShaderType, std::shared_ptr<Shader>> m_shaders;
 		Shader* m_baseShader;

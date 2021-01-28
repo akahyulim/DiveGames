@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Object.h"
 #include "Graphics.h"
+#include "GraphicsEnums.h"
 
 namespace Dive
 {
@@ -11,14 +12,6 @@ namespace Dive
 	class Renderable;
 	class E_UPDATE_SCENE;
 	class Command;
-
-	enum class eRenderableObjectType
-	{
-		Opaque,
-		Transparent,
-		Light,
-		Camera,
-	};
 
 	class Renderer : public Object
 	{
@@ -39,8 +32,11 @@ namespace Dive
 		void legacyShader();
 		void renderEditor();
 
+		// passes
+		void base();
+
 	private:
-		std::weak_ptr<Graphics> m_graphics;
+		Graphics* m_graphics;
 		ID3D11DeviceContext* m_deviceContext;
 
 		bool m_bInitialized;
