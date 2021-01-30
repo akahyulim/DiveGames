@@ -77,8 +77,8 @@ namespace Dive
 			
 			if (gameObject->HasComponent<Renderable>())
 			{
-				// Material에 저장된 Rendering Mode로 구분
-				// 기본적으로 opaque, transparent 추후 cutout, fade 추가?
+				// rendering mode를 통한 구분보다는
+				// material로 구분한 후 rendering mode별로 그리는게 맞는 것 같다.
 			}
 
 			// light component 여부로 light 구분
@@ -184,5 +184,45 @@ namespace Dive
 
 		// 대상 object vector를 위의 함수로 draw
 		// 문제는 VertexType별 구분없이 RenderableType으로만 접근한다면 오버헤드가 발생할 수 있다.
+	}
+
+	void Renderer::pass_PosCol()
+	{
+		if (!m_selectedCamera)
+		{
+			m_command->ClearRenderTarget(m_graphics->GetRenderTexture(
+				eRenderTextureType::EditorView),
+				DirectX::XMFLOAT4(0.5f, 0.5f, 0.0f, 1.0f));
+
+			return;
+		}
+
+		if (m_gameObjects[eRenderableObjectType::Opaque].empty())
+		{
+			m_command->ClearRenderTarget(
+				m_graphics->GetRenderTexture(eRenderTextureType::EditorView),
+				m_selectedCamera->GetComponent<Camera>()->GetBackgroundColor());
+
+			return;
+		}
+
+		// constant buffer - frame?
+		{
+
+		}
+
+		// command
+		{
+			PipelineState state;
+			// shader 별로 만드는게 맞는데.. 좀 더 크게보면 material 별로...
+			// Material이 리소스 이므로 Material 기준이 맞는 것 같다.
+			// 그렇다면 Material의 구분 조건을 명확히 해야 한다.
+			state.depthStencilState		= m_graphics->GetDepthStencilState(true);
+			state.primitiveTopology		= D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			state.depthStencilTexture	= m_graphics->GetRenderTexture(eRenderTextureType::DepthStencil);
+			state.renderTargets.push_back(m_graphics->GetRenderTexture(eRenderTextureType::EditorView));
+
+			m_command->SetPipelineState(state);
+		}
 	}
 }

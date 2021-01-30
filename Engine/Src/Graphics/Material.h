@@ -10,13 +10,17 @@ namespace Dive
 	enum class eRenderingMode
 	{
 		Opaque,
-		Cutout,
 		Transparent,
 	};
 
-	// 리소스이긴한데 개별 설정도 되는거 아닌가?
-	// 좀 더 생각해보자면 Default를 복사해온 후 Custermizing 하는 느낌?
-	// 실제로 unity에서도 값을 변경하면 복사되어 다른 material로 취급된다고 한다.
+	// update
+	// material은 shader에 종속적이다.
+	// 각각의 텍스쳐들은 해당 shader가 사용하는 shader resource view인 거다.
+	// 즉, 해당 shader에 constant buffer로 texture와 값을 전달해주는 거다.
+	// 그래서 유니티의 standard shader material이 아래와 같은 형태인 것이다.
+	// 그렇다면 결국 shader별로 material을 만들어야 한다는 이야기인가?
+	// shader와 material, vertex type은 서로 매칭되므로, rendering mode만 염두하여 그리면 될려나...
+	// renderable에 material을 추가하는 형태이므로, vertex type을 확인한 후 해당 material의 지원 여부를 결정할 수 있다.
 	class Material : public Resource
 	{
 	public:

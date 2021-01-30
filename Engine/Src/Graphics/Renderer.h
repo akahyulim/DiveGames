@@ -35,6 +35,7 @@ namespace Dive
 		// passes
 		void base();
 		void testTemplate();
+		void pass_PosCol();
 
 	private:
 		Graphics* m_graphics;

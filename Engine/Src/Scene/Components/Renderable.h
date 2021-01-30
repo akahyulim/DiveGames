@@ -17,29 +17,22 @@ namespace Dive
 		explicit Renderable(Context* context, GameObject* owner);
 		~Renderable();
 
-		MeshFilter* GetMeshFilter() const { return m_meshFilter; }
-		void SetMeshFilter(MeshFilter* meshFilter) { m_meshFilter = meshFilter; }
+		MeshFilter* GetMeshFilter() const			{ return m_meshFilter; }
+		void SetMeshFilter(MeshFilter* meshFilter)	{ m_meshFilter = meshFilter; }
 
-		Material* GetMaterial() const { return m_material; }
-		void SetMaterial(Material* material) { m_material = material; }
+		Material* GetMaterial() const				{ return m_material; }
+		void SetMaterial(Material* material)		{ m_material = material; }
 
-		bool IsEnabled() const { return m_bEnabled; }
-		void SetEnable(bool enable) { m_bEnabled = enable; }
+		bool IsEnabled() const						{ return m_bEnabled; }
+		void SetEnable(bool enable)					{ m_bEnabled = enable; }
 
-		unsigned int GetVertexBufferOffset() const { return m_vertexBufferOffset; }
-		unsigned int GetVertexCount() const { return m_meshFilter ? m_meshFilter->GetVertexCount() : 0; }
-		unsigned int GetIndexBufferOffset() const { return m_indexBufferOffset; }
-		unsigned int GetIndexCount() const { return m_meshFilter ? m_meshFilter->GetIndexCount() : 0; }
+		unsigned int GetVertexBufferOffset() const	{ return m_vertexBufferOffset; }
+		unsigned int GetVertexCount() const			{ return m_meshFilter ? m_meshFilter->GetVertexCount() : 0; }
+		unsigned int GetIndexBufferOffset() const	{ return m_indexBufferOffset; }
+		unsigned int GetIndexCount() const			{ return m_meshFilter ? m_meshFilter->GetIndexCount() : 0; }
 
-		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { return m_primitiveTopology; }
-		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) { m_primitiveTopology = primitiveTopology; }
-
-		// ==================================================================================================================
-		MeshFilter* GetTMeshFilter() const { return m_tmeshFilter; }
-		void SetTMeshFilter(MeshFilter* meshFilter) { m_tmeshFilter = meshFilter; }
-
-		unsigned int GetTVertexCount() const { return m_tmeshFilter ? m_tmeshFilter->GetVertexCount() : 0; }
-		unsigned int GetTIndexCount() const { return m_tmeshFilter ? m_tmeshFilter->GetIndexCount() : 0; }
+		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const					{ return m_primitiveTopology; }
+		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology)	{ m_primitiveTopology = primitiveTopology; }
 
 
 	private:
@@ -49,7 +42,6 @@ namespace Dive
 	private:
 		bool m_bEnabled;
 
-		MeshFilter* m_tmeshFilter;
 		MeshFilter* m_meshFilter;
 		Material* m_material;
 

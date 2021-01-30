@@ -27,6 +27,7 @@ namespace Dive
 		template<typename VertexType, typename IndexType = unsigned int>
 		bool SetMesh(const Mesh<VertexType, typename IndexType>& mesh, std::string name = "");
 		// 전달은 할 수 있지만 타입을 유추할 수 없다.
+		// 사용하는 곳이 없다면 메모리 관리 측면에서 보았을 때 버퍼 생성 후 지우는게 나을 수 있다.
 		void* GetMesh() const { return m_mesh; }
 
 		VertexBuffer* GetVertexBuffer()	const { return m_vertexBuffer.get(); }
