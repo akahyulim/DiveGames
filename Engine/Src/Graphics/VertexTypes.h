@@ -153,5 +153,6 @@ namespace Dive
 	template<> inline eVertexType VertexTypeToEnum<Vertex_PosCol>()			{ return eVertexType::PositionColor; }
 	template<> inline eVertexType VertexTypeToEnum<Vertex_PosTex>()			{ return eVertexType::PositionUv; }
 	template<> inline eVertexType VertexTypeToEnum<Vertex_PosTexNorTan>()	{ return eVertexType::PositionUvNormalTangent; }
-	template<> inline eVertexType VertexTypeToEnum<Vertex_2dPosTexCol>()	{ return eVertexType::PositionUvColor2D; }
+//	template<> inline eVertexType VertexTypeToEnum<Vertex_2dPosTexCol>()	{ return eVertexType::PositionUvColor2D; }
+
 }

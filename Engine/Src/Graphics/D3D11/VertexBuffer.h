@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Object.h"
+#include "../VertexTypes.h"
 
 namespace Dive
 {
@@ -19,6 +20,7 @@ namespace Dive
 			m_bDynamic		= false;
 			m_stride		= static_cast<unsigned int>(sizeof(T));
 			m_vertexCount	= static_cast<unsigned int>(vertices.size());
+			m_vertexType	= VertexTypeToEnum<T>();
 
 			return createBuffer(static_cast<const void*>(vertices.data()));
 		}
@@ -29,6 +31,7 @@ namespace Dive
 			m_bDynamic		= false;
 			m_stride		= static_cast<unsigned int>(sizeof(T));
 			m_vertexCount	= vertexCount;
+			m_vertexType	= VertexTypeToEnum<T>();
 
 			return createBuffer(static_cast<const void*>(vertices));
 		}
@@ -39,6 +42,7 @@ namespace Dive
 			m_bDynamic		= true;
 			m_stride		= static_cast<unsigned int>(sizeof(T));
 			m_vertexCount	= vertexCount;
+			m_vertexType	= VertexTypeToEnum<T>();
 
 			return createBuffer(nullptr);
 		}
@@ -49,16 +53,18 @@ namespace Dive
 		ID3D11Buffer* GetBuffer()			const { return m_buffer; }
 		unsigned int GetStride()			const { return m_stride; }
 		unsigned int GetVertexCount()		const { return m_vertexCount; }
+		eVertexType GetVertexType()			const { return m_vertexType; }
 
 	private:
 		bool createBuffer(const void* vertices);
 
 	private:
-		ID3D11Buffer* m_buffer = nullptr;
+		ID3D11Buffer* m_buffer;
 
-		bool m_bDynamic = false;
-		unsigned int m_stride		= 0;
-		unsigned int m_vertexCount	= 0;
+		bool m_bDynamic;
+		unsigned int m_stride;
+		unsigned int m_vertexCount;
+		eVertexType m_vertexType;
 	};
 }
 

@@ -9,7 +9,12 @@
 namespace Dive
 {
 	VertexBuffer::VertexBuffer(Context* context)
-		: Object(context)
+		: Object(context),
+		m_buffer(nullptr),
+		m_bDynamic(false),
+		m_stride(0),
+		m_vertexCount(0),
+		m_vertexType(eVertexType::Unknown)
 	{
 	}
 

@@ -19,10 +19,10 @@ namespace Dive
 
 	enum class eRenderableObjectType
 	{
+		Camera,
+		Light,
 		Opaque,
 		Transparent,
-		Light,
-		Camera,
 	};
 
 	enum class eRenderTextureType
@@ -58,5 +58,13 @@ namespace Dive
 		BilinearWrap,
 		TrilinearClamp,
 		AnisotropicWrap,
+	};
+
+	// Light로 옮기기
+	enum class eLightType
+	{
+		Directional,
+		Point,
+		Spot,
 	};
 }

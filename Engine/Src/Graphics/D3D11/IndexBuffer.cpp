@@ -1,15 +1,15 @@
 #include "DivePch.h"
 #include "IndexBuffer.h"
-#include "Graphics/Graphics.h"
-#include "Core/Context.h"
-#include "Core/DiveDefs.h"
-#include "Core/Log.h"
 
 
 namespace Dive
 {
-	IndexBuffer::IndexBuffer(Context* context)
-		: Object(context)
+	IndexBuffer::IndexBuffer(Context * context)
+		: Object(context),
+		m_buffer(nullptr),
+		m_bDynamic(false),
+		m_stride(0),
+		m_count(0)
 	{
 	}
 
@@ -18,43 +18,14 @@ namespace Dive
 		SAFE_RELEASE(m_buffer);
 	}
 
-	bool IndexBuffer::Create(const std::vector<unsigned int>& indices)
+	DXGI_FORMAT IndexBuffer::GetFormat() const
 	{
-		auto graphics = GetSubsystem<Graphics>();
-		if (!graphics || !graphics->IsInitialized() || indices.empty())
-		{
-			CORE_ERROR("");
-			return false;
-		}
-
-		SAFE_RELEASE(m_buffer);
-
-		unsigned int size = static_cast<unsigned int>(indices.size());
-
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.BindFlags				= D3D11_BIND_INDEX_BUFFER;
-		desc.ByteWidth				= static_cast<unsigned int>(sizeof(unsigned int)) * size;
-		desc.CPUAccessFlags			= 0;
-		desc.MiscFlags				= 0;
-		desc.StructureByteStride	= 0;
-		desc.Usage					= D3D11_USAGE_IMMUTABLE;
-
-		D3D11_SUBRESOURCE_DATA data;
-		data.pSysMem			= indices.data();
-		data.SysMemPitch		= 0;
-		data.SysMemSlicePitch	= 0;
-
-		if (FAILED(graphics->GetRHIDevice()->CreateBuffer(&desc, &data, &m_buffer)))
-		{
-			CORE_ERROR("");
-			return false;
-		}
-
-		return true;
+		if (m_stride == sizeof(unsigned short))		return DXGI_FORMAT_R16_UINT;
+		else if (m_stride == sizeof(unsigned int))	return DXGI_FORMAT_R32_UINT;
+		else										return DXGI_FORMAT_UNKNOWN;
 	}
 
-	bool IndexBuffer::CreateDynamic(unsigned int size)
+	bool IndexBuffer::createBuffer(const void * indices)
 	{
 		auto graphics = GetSubsystem<Graphics>();
 		if (!graphics || !graphics->IsInitialized())
@@ -63,16 +34,23 @@ namespace Dive
 			return false;
 		}
 
+		SAFE_RELEASE(m_buffer);
+
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.BindFlags				= D3D11_BIND_INDEX_BUFFER;
-		desc.ByteWidth				= static_cast<unsigned int>(sizeof(unsigned int)) * size;
-		desc.CPUAccessFlags			= D3D11_CPU_ACCESS_WRITE;
+		desc.ByteWidth				= m_stride * m_count;
 		desc.MiscFlags				= 0;
 		desc.StructureByteStride	= 0;
-		desc.Usage					= D3D11_USAGE_DYNAMIC;
+		desc.Usage					= m_bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_IMMUTABLE;
+		desc.CPUAccessFlags			= m_bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
+		desc.BindFlags				= D3D11_BIND_INDEX_BUFFER;
 
-		if (FAILED(graphics->GetRHIDevice()->CreateBuffer(&desc, nullptr, &m_buffer)))
+		D3D11_SUBRESOURCE_DATA data;
+		data.pSysMem			= indices;
+		data.SysMemPitch		= 0;
+		data.SysMemSlicePitch	= 0;
+
+		if (FAILED(graphics->GetRHIDevice()->CreateBuffer(&desc, m_bDynamic ? nullptr : &data, &m_buffer)))
 		{
 			CORE_ERROR("");
 			return false;

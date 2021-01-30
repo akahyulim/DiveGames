@@ -34,6 +34,7 @@ namespace Dive
 
 		// passes
 		void base();
+		void testTemplate();
 
 	private:
 		Graphics* m_graphics;

@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Object.h"
-#include "VertexTypes.h"
+#include "../VertexTypes.h"
 
 
 namespace Dive

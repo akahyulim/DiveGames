@@ -34,6 +34,14 @@ namespace Dive
 		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { return m_primitiveTopology; }
 		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) { m_primitiveTopology = primitiveTopology; }
 
+		// ==================================================================================================================
+		MeshFilter* GetTMeshFilter() const { return m_tmeshFilter; }
+		void SetTMeshFilter(MeshFilter* meshFilter) { m_tmeshFilter = meshFilter; }
+
+		unsigned int GetTVertexCount() const { return m_tmeshFilter ? m_tmeshFilter->GetVertexCount() : 0; }
+		unsigned int GetTIndexCount() const { return m_tmeshFilter ? m_tmeshFilter->GetIndexCount() : 0; }
+
+
 	private:
 		Renderable(const Renderable&)				= delete;
 		Renderable& operator=(const Renderable&)	= delete;
@@ -41,6 +49,7 @@ namespace Dive
 	private:
 		bool m_bEnabled;
 
+		MeshFilter* m_tmeshFilter;
 		MeshFilter* m_meshFilter;
 		Material* m_material;
 

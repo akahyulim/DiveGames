@@ -1,5 +1,9 @@
 #pragma once
 #include "Core/Object.h"
+#include "Core/Context.h"
+#include "Core/DiveDefs.h"
+#include "Core/Log.h"
+#include "Graphics/Graphics.h"
 
 namespace Dive
 {
@@ -8,22 +12,51 @@ namespace Dive
 	class IndexBuffer : public Object
 	{
 		DIVE_OBJECT(IndexBuffer, Object);
-		
+
 	public:
 		IndexBuffer(Context* context);
 		~IndexBuffer();
 
-		bool Create(const std::vector<unsigned int>& indices);
+		template<typename T = unsigned int>
+		bool Create(const std::vector<T>& indices);
+		template<typename T = unsigned int>
 		bool CreateDynamic(unsigned int size);
 
 		void* Map();
 		bool Unmap();
 
 		ID3D11Buffer* GetBuffer() const { return m_buffer; }
-		DXGI_FORMAT GetFormat() const { return DXGI_FORMAT_R32_UINT; }
+		DXGI_FORMAT GetFormat() const;
 
 	private:
-		ID3D11Buffer* m_buffer = nullptr;
+		bool createBuffer(const void* indices);
+
+	private:
+		ID3D11Buffer* m_buffer;
+		
+		bool m_bDynamic;
+		unsigned int m_stride;
+		unsigned int m_count;
 	};
+
+	template<typename T>
+	inline bool IndexBuffer::Create(const std::vector<T>& indices)
+	{
+		m_bDynamic	= false;
+		m_stride	= sizeof(T);
+		m_count		= static_cast<unsigned int>(indices.size());
+
+		return createBuffer(indices.data());
+	}
+
+	template<typename T>
+	inline bool IndexBuffer::CreateDynamic(unsigned int size)
+	{
+		m_bDynamic	= true;
+		m_stride	= sizeof(T);
+		m_count		= size;
+
+		return createBuffer(nullptr);
+	}
 }
 

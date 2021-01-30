@@ -32,8 +32,6 @@
 
 //= Graphics ==============================================
 #include "Graphics//D3D11/Shader.h"
-#include "Graphics/D3D11/VertexTypes.h"
-#include "Graphics/D3D11/VertexTypes.h"
 #include "Graphics/D3D11/IndexBuffer.h"
 #include "Graphics/D3D11/ConstantBuffer.h"
 #include "Graphics/D3D11/RenderDeviceEnums.h"
@@ -46,6 +44,7 @@
 #include "Graphics/D3D11/Texture2D.h"
 #include "Graphics/GraphicsEnums.h"
 #include "Graphics/DeviceAndSwapChain.h"
+#include "Graphics/VertexTypes.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/MeshFilter.h"
 #include "Graphics/Renderer.h"

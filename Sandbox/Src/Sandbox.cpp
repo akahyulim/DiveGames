@@ -58,17 +58,27 @@ bool Sandbox::createTriangle()
 	indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
 
 	// Mesh에 저장
-	auto mesh = new Mesh();
+//	auto mesh = new Mesh();
+//	mesh->SetVertices(vertices);
+//	mesh->SetIndices(indices);
+
+	// Mesh를 MeshFilter에 저장
+//	auto meshFilter = new MeshFilter(m_engine->GetContext());
+//	if (!meshFilter->SetMesh("Triangle", mesh))
+//		return false;
+
+	auto mesh = std::make_unique<Mesh<Vertex_PosTexNorTan>>();
 	mesh->SetVertices(vertices);
 	mesh->SetIndices(indices);
 
-	// Mesh를 MeshFilter에 저장
 	auto meshFilter = new MeshFilter(m_engine->GetContext());
-	if (!meshFilter->SetMesh("Triangle", mesh))
+	if (!meshFilter->SetMesh<Vertex_PosTexNorTan>(*mesh.get()))
 		return false;
+	//if (!meshFilter->CreateMesh<Vertex_PosTexNorTan>(vertices, indices, "Triangle"))
+	//	return false;
 
 	// Renderable에 MeshFilter 전달
-	renderable->SetMeshFilter(meshFilter);
+	renderable->SetTMeshFilter(meshFilter);
 
 	return true;
 }

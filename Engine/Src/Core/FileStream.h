@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics/D3D11/VertexTypes.h"
+#include "Graphics/VertexTypes.h"
 
 
 namespace Dive

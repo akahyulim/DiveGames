@@ -66,8 +66,6 @@ namespace Dive
 			return;
 
 		// light, camera, object(opaque, transparent), etc로 구분
-		// object는 다시 rigid, skinned 이런 식으로 나눌 수 있지 않을까?
-		// 물론 이 경우 vertex type은 두 개로 줄여놓아야 한다.
 		auto gameObjects = evnt->GetGameObjects();
 		for (auto gameObject : gameObjects)
 		{
@@ -79,10 +77,11 @@ namespace Dive
 			
 			if (gameObject->HasComponent<Renderable>())
 			{
-				// opaqu, transparent를 구분하여 저장해야 한다.
-				// 추후 vertex type별로도 구분해야 한다.
-				//m_gameObjects[eRenderableObjectType::Opaque].emplace_back(gameObject.get());
+				// Material에 저장된 Rendering Mode로 구분
+				// 기본적으로 opaque, transparent 추후 cutout, fade 추가?
 			}
+
+			// light component 여부로 light 구분
 		}
 	}
 
@@ -92,6 +91,7 @@ namespace Dive
 	{
 		// 잊어버리기 전에...
 		// 펄어비스는 DepthBuffer를 ShaderResourceView로 만들지 않은 것 같다.
+		// => 다른 RenderTargetView들의 설명을 제외한 것일 수 있다.
 
 		// Scene Render
 		{
@@ -122,7 +122,6 @@ namespace Dive
 		if (m_gameObjects[eRenderableObjectType::Light].empty() && m_gameObjects[eRenderableObjectType::Opaque].empty()
 			&& m_gameObjects[eRenderableObjectType::Transparent].empty())
 		{
-			// 역시 command로 설정한다. 색상만 camera 것으로 전달한다.
 			// 이 부분은 추후 수정이 필요하다. 스카이 박스가 설정될 수 있기 때문이다.
 
 			m_command->ClearRenderTarget(m_graphics->GetRenderTexture(eRenderTextureType::EditorView),
@@ -137,17 +136,25 @@ namespace Dive
 		}
 
 		// 이하내용은 Shader별로 각종 Command의 조합으로 그린다.
+
+		base();
 	}
 
 	void Renderer::base()
 	{
+		// input layout에 일치하는 오브젝트가 없다면 리턴해야 한다.
+		// 이건 결국 Shader에 저장된 InputLayout과 Object의 묶음으로 비교해야 한다.
+		// 덧붙여서 Transparent까지 생각한다면 VertexTypeCount * 2개의 조합이 나와버린다.
+		// 물론 이때 State는 Shader를 제외한다면 전부 동일할 수 있다.
+
 		// state 설정
 		{
 			// graphics로부터 resource들을 가져와 state를 구성한 후
 			// command에 전달하여 gpu로 전달한다.
 			PipelineState state;
-			state.depthStencilState = m_graphics->GetDepthStencilState(true);
-			state.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			state.depthStencilState		= m_graphics->GetDepthStencilState(true);
+			state.primitiveTopology		= D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			state.depthStencilTexture	= m_graphics->GetRenderTexture(eRenderTextureType::DepthStencil);
 			state.renderTargets.push_back(m_graphics->GetRenderTexture(eRenderTextureType::EditorView));
 
 			m_command->SetPipelineState(state);
@@ -161,5 +168,21 @@ namespace Dive
 		{
 			// type별로 구분된 buffer들을 command를 통해 gpu로 전달한다.
 		}
+	}
+
+	void Renderer::testTemplate()
+	{
+		// pass에서 그려져야 할 object를 우선 확인한다. 없다면 리턴
+		// 예를 들면 opaque와 transparent 둘 다 비어있다면 리턴
+		// 바로 리턴하면 안되는 것일 수 있다. 예를 들면 RenderTargetView 같은건 아래에서 Clear해주어야 한다.
+
+		// pass 의도에 맞게 기본적인 state를 설정
+		
+		// 남은 state와 data를 구성하는 람다 함수 생성
+		// 매개변수로 material과 renderable을 전달하여 shader와 vertex type을 매칭?
+		// 이 경우 material의 매개변수가 동일해야 한다.
+
+		// 대상 object vector를 위의 함수로 draw
+		// 문제는 VertexType별 구분없이 RenderableType으로만 접근한다면 오버헤드가 발생할 수 있다.
 	}
 }

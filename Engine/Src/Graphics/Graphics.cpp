@@ -63,9 +63,8 @@ namespace Dive
 		auto immediateContext = m_deviceAndSwapChain->GetImmediateContext();
 		auto renderTargetView = m_deviceAndSwapChain->GetRenderTargetView();
 		float clear_color[4]{ 0.1f, 0.1f, 0.1f, 1.0f };
-		immediateContext->OMSetRenderTargets(1, &renderTargetView, nullptr);// m_depthStencil->GetDepthStencilView());
+		immediateContext->OMSetRenderTargets(1, &renderTargetView, nullptr);
 		immediateContext->ClearRenderTargetView(renderTargetView, (FLOAT*)(&clear_color));
-		//immediateContext->ClearDepthStencilView(m_depthStencil->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		return true;
 	}
