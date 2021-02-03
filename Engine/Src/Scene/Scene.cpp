@@ -17,10 +17,7 @@ namespace Dive
 		m_bDirty(false),
 		m_bClear(false)
 	{
-		if (name.empty())
-			m_name = "No Name";
-		else
-			m_name = std::move(name);
+		m_name = name.empty() ? "No Name" : std::move(name);
 
 		DIVE_SUBSCRIBE_TO_EVENT(this, &Scene::OnUpdate);
 		CORE_TRACE("Create Scene - {:s}", m_name);

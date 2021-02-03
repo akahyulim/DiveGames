@@ -47,6 +47,8 @@
 #include "Graphics/VertexTypes.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/MeshFilter.h"
+#include "Graphics/Material.h"
+#include "Graphics/Legacy.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Window.h"

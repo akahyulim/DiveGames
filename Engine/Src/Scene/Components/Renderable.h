@@ -9,6 +9,8 @@ namespace Dive
 	class GameObject;
 	class Material;
 
+	// Rigid, Skinned, etc로 나눠질 수 있다.
+	// 이건 유니티를 직접 봐야 알 거 같다.
 	class Renderable : public Component
 	{
 		DIVE_OBJECT(Renderable, Component);
@@ -21,7 +23,7 @@ namespace Dive
 		void SetMeshFilter(MeshFilter* meshFilter)	{ m_meshFilter = meshFilter; }
 
 		Material* GetMaterial() const				{ return m_material; }
-		void SetMaterial(Material* material)		{ m_material = material; }
+		void SetMaterial(Material* material);
 
 		bool IsEnabled() const						{ return m_bEnabled; }
 		void SetEnable(bool enable)					{ m_bEnabled = enable; }
@@ -42,6 +44,8 @@ namespace Dive
 	private:
 		bool m_bEnabled;
 
+		// 둘 다 리소스인데... enum으로 관리하는게 낫지 않을려나?
+		// MeshFilter는 enum으로 관리하기 어렵겠다...
 		MeshFilter* m_meshFilter;
 		Material* m_material;
 

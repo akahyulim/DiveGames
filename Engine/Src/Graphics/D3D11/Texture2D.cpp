@@ -10,7 +10,8 @@ namespace Dive
 	Texture2D::Texture2D(Context * context, unsigned int width, unsigned int height, DXGI_FORMAT format, std::string name)
 		: Texture(context)
 	{
-		m_name = std::move(name);
+		m_resourceName = std::move(name);
+		m_resourceType = eResourceType::Texture2D;
 
 		if (width <= 0 || height <= 0)
 		{
@@ -86,7 +87,8 @@ namespace Dive
 	Texture2D::Texture2D(Context * context, unsigned int width, unsigned int height, bool useStencil, std::string name)
 		: Texture(context)
 	{
-		m_name = std::move(name);
+		m_resourceName = std::move(name);
+		m_resourceType = eResourceType::Texture2D;
 
 		if (width <= 0 || height <= 0)
 		{

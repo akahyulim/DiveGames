@@ -21,18 +21,22 @@ namespace Dive
 		DIVE_OBJECT(Resource, Object);
 
 	public:
-		Resource(Context* context, eResourceType type) : Object(context), m_type(type) {}
+		Resource(Context* context)
+			: Object(context),
+			m_resourceType(eResourceType::UnKnown)
+		{}
 		virtual ~Resource() = default;
 
 		virtual bool SaveToFile(const std::string& path)	{ return true; }
 		virtual bool LoadFromFile(const std::string& path)	{ return true; }
 
-		const std::string& GetName()	const { return m_name; }
-		eResourceType GetType()			const { return m_type; }
+		const std::string& GetResourceName()	const { return m_resourceName; }
+		const std::string& GetResourcePath()	const { return m_resourcePath; }
+		eResourceType GetResourceType()			const { return m_resourceType; }
 
 	protected:
-		std::string m_name;
-		std::string m_path;
-		eResourceType m_type	= eResourceType::UnKnown;
+		std::string m_resourceName;
+		std::string m_resourcePath;
+		eResourceType m_resourceType;
 	};
 }

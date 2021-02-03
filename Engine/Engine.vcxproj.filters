@@ -97,9 +97,6 @@
     <ClCompile Include="Src\Graphics\MeshFilter.cpp">
       <Filter>Src\Graphic</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\Material.cpp">
-      <Filter>Src\Graphic</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Graphics\D3D11\Command.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClCompile>
@@ -114,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\Graphics_Resources.cpp">
       <Filter>Src\Graphic</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Legacy.cpp">
+      <Filter>Src\Graphic\Materials</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -228,9 +228,6 @@
     <ClInclude Include="Src\Scene\Scene.h">
       <Filter>Src\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\Material.h">
-      <Filter>Src\Graphic</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Graphics\Mesh.h">
       <Filter>Src\Graphic</Filter>
     </ClInclude>
@@ -273,6 +270,12 @@
     <ClInclude Include="Src\Graphics\VertexTypes.h">
       <Filter>Src\Graphic</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Graphics\Material.h">
+      <Filter>Src\Graphic\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\Legacy.h">
+      <Filter>Src\Graphic\Materials</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Src">
@@ -304,6 +307,9 @@
     </Filter>
     <Filter Include="Src\Geometry">
       <UniqueIdentifier>{05b0431e-58dd-4770-94a5-c245d4d91cda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Graphic\Materials">
+      <UniqueIdentifier>{64c60f68-b6b6-4d98-a331-fda3033599c7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

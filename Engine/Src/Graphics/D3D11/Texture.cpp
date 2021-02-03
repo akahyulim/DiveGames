@@ -9,8 +9,9 @@
 namespace Dive
 {
 	Texture::Texture(Context* context)
-		: Resource(context, eResourceType::Texture)
+		: Resource(context)
 	{
+		m_resourceType = eResourceType::Texture;
 		m_renderDevice = GetSubsystem<Graphics>()->GetRHIDevice();
 	}
 

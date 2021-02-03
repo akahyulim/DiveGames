@@ -198,6 +198,9 @@ namespace Dive
 
 	bool Shader::createInputLayout(ID3D10Blob* blob)
 	{
+		// 유니티처럼 선택적으로 사용하려면
+		// 모든 요소를 등록해야 한다.
+		// 물론 이때 VertexBuffer 역시 모든 요소를 쓰레기 값이라도 가지고 있어야 한다.
 		switch (m_vertexType)
 		{
 		case eVertexType::Position:
@@ -240,7 +243,6 @@ namespace Dive
 		{
 			CORE_ERROR("");
 			SAFE_RELEASE(blob);
-			CORE_ERROR("");
 			return false;
 		}
 

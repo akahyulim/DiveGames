@@ -48,9 +48,13 @@ bool Sandbox::createTriangle()
 	{
 		auto triangle = m_scene->CreateGameObject();
 		triangle->SetName("Triangle");
+
+		// 사용 Mesh에 따라 구체화된 객체를 생성시켜야 한다.
+		// Rigid, Skinned, Line, Particle 등으로 나뉜다.
 		auto renderable = triangle->AddComponent<Renderable>();
 
-		// 삼각형 Geometry 구성
+		// 삼각형 Geometry 구성 => VertexType을 바꿔야 한다.
+		// 아니면 MeshFilter를 Renderable에 추가할 때 타입을 변경한 후 빈 곳의 값을 계산하여 넣어야 한다.
 		std::vector<Vertex_PosCol> vertices;
 		vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
 		vertices.emplace_back(DirectX::XMFLOAT3(0.0f, 0.5f, 0.0f), DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
@@ -68,6 +72,9 @@ bool Sandbox::createTriangle()
 			return false;
 
 		renderable->SetMeshFilter(meshFilter);
+
+		// 일단 하드코딩으로 추가하자.
+		renderable->SetMaterial((Material*)new Legacy(m_engine->GetContext()));
 	}
 
 	return true;

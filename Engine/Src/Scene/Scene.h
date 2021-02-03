@@ -8,6 +8,9 @@ namespace Dive
 	class GameObject;
 	class E_UPDATE;
 
+	// Componnet -> Behavior -> Skybox이며 오직 Material만 가진다.
+	// 이걸 유니티처럼 Scene에서 관리토록 하려면 Scene이 GameObject여야 한다...
+
 	// 추후 Scene Swap에 대해 생각해봐야 한다.
 	class Scene : public Object
 	{

@@ -2,6 +2,7 @@
 #include "Core/Object.h"
 #include "Core/Log.h"
 #include "Core/DiveDefs.h"
+#include "../Graphics.h"
 
 namespace Dive
 {

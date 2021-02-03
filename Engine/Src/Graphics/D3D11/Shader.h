@@ -24,6 +24,7 @@ namespace Dive
 		Shader(Context* context);
 		~Shader();
 
+		// VertexType을 직접전달하는 것이 아니라 Vertex Buffer를 이용해 유추할 순 없을까?
 		bool CreateShader(eVertexType vertexType, std::wstring filepath);
 		bool CreateVertexShader(eVertexType vertexType, std::wstring filepath);
 		bool CreatePixelShader(std::wstring filepath);

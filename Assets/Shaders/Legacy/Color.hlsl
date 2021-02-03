@@ -2,10 +2,9 @@
 
 Pixel_PosCol mainVS(Vertex_PosCol input)
 {
-	Piexl_PosCol output = (Pixel_PosCol)0;
-
-	output.position = mul(input.position, g_wvp);
-	output.color	= input.color;
+	Pixel_PosCol output = (Pixel_PosCol)0;
+	output.position		= mul(input.position, g_wvp);
+	output.color		= input.color;
 
 	return output;
 }

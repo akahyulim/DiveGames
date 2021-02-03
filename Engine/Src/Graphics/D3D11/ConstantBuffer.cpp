@@ -1,7 +1,5 @@
 #include "DivePch.h"
 #include "ConstantBuffer.h"
-#include "Graphics/Graphics.h"
-#include "Core/Context.h"
 
 
 namespace Dive

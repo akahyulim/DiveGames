@@ -12,6 +12,19 @@
 // Mesh 정보 저장 및 Buffer 생성
 namespace Dive
 {	
+	// 이렇게 만들어도 Type과 구조체가 필요하다.
+	// 유니티에서는 Component다...
+	class Dive_MeshFilter
+	{
+	public:
+		bool SetMesh(Dive_Mesh* mesh);
+
+	private:
+		std::unique_ptr<Dive_Mesh> m_mesh;
+		std::shared_ptr<VertexBuffer> m_vertexBuffer;
+		std::shared_ptr<IndexBuffer> m_indexBuffer;
+	};
+
 	class MeshFilter : public Resource
 	{
 		DIVE_OBJECT(MeshFilter, Resource);
@@ -81,7 +94,7 @@ namespace Dive
 		m_mesh			= (void*)new Mesh<VertexType, IndexType>(mesh);
 		m_vertexCount	= mesh.GetVertexCount();
 		m_indexCount	= mesh.GetIndexCount();
-		m_name			= std::move(name);
+		m_resourceName	= std::move(name);
 		
 		return createBuffer<VertexType, IndexType>();
 	}

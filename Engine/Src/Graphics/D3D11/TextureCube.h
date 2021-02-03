@@ -8,7 +8,7 @@ namespace Dive
 	{
 	public:
 	private:
-		bool createTextureResource() override;
+//		bool createTextureResource() override;
 
 	private:
 	};

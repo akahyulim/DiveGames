@@ -1,8 +1,10 @@
 #pragma once
 #include "DivePch.h"
 
-// 구조체도 있는데 Enums라는 이름이다.
-// 구조체를 따로 빼낼까...
+
+// 모든 enum이 define을 가질 필요는 없다.
+// base class가 존재한다면 undefined
+// 없다면 생성시 선택토록 하면 된다.
 namespace Dive
 {
 	enum class eScreenMode
@@ -12,17 +14,21 @@ namespace Dive
 		Windowed,
 	};
 
-	enum class eRenderShaderType
+	// Debug, UI 등도 추가될 수 있다.
+	enum class eShaderPassType
 	{
-
+		Legacy,
+		Light,
+		Undefined
 	};
 
-	enum class eRenderableObjectType
+	enum class eRenderShaderType
 	{
-		Camera,
-		Light,
-		Opaque,
-		Transparent,
+		Vertex_Color,
+
+		Light_Directional,
+		Light_Point,
+		Light_Sopt,
 	};
 
 	enum class eRenderTextureType
@@ -31,7 +37,6 @@ namespace Dive
 		DepthStencil,
 	};
 
-	// 전부 지원하지 않는 값을 추가해야 한다.
 	enum class eRasterizerState
 	{
 		CullBackSolid,
@@ -60,7 +65,6 @@ namespace Dive
 		AnisotropicWrap,
 	};
 
-	// Light로 옮기기
 	enum class eLightType
 	{
 		Directional,

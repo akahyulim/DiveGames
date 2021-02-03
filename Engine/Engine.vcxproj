@@ -139,6 +139,7 @@
     <ClInclude Include="Src\Graphics\D3D11\Texture2D.h" />
     <ClInclude Include="Src\Graphics\D3D11\TextureCube.h" />
     <ClInclude Include="Src\Graphics\D3D11\VertexBuffer.h" />
+    <ClInclude Include="Src\Graphics\Legacy.h" />
     <ClInclude Include="Src\Graphics\VertexTypes.h" />
     <ClInclude Include="Src\Graphics\DeviceAndSwapChain.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
@@ -187,7 +188,7 @@
     <ClCompile Include="Src\Graphics\DeviceAndSwapChain.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Graphics\Graphics_Resources.cpp" />
-    <ClCompile Include="Src\Graphics\Material.cpp" />
+    <ClCompile Include="Src\Graphics\Legacy.cpp" />
     <ClCompile Include="Src\Graphics\MeshFilter.cpp" />
     <ClCompile Include="Src\Graphics\Renderer.cpp" />
     <ClCompile Include="Src\Graphics\Window.cpp" />
