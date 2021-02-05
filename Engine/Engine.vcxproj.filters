@@ -76,9 +76,6 @@
     <ClCompile Include="Src\Scene\Components\Transform.cpp">
       <Filter>Src\Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Scene\Components\Renderable.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Scene\Scene.cpp">
       <Filter>Src\Scene</Filter>
     </ClCompile>
@@ -93,9 +90,6 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\D3D11\Sampler.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Graphics\MeshFilter.cpp">
-      <Filter>Src\Graphic</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\D3D11\Command.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
@@ -114,6 +108,15 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\Legacy.cpp">
       <Filter>Src\Graphic\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\RenderableMesh.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\SkinnedRenderableMesh.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Geometry\Mesh.cpp">
+      <Filter>Src\Geometry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -222,14 +225,8 @@
     <ClInclude Include="Src\Scene\Components\Transform.h">
       <Filter>Src\Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Scene\Components\Renderable.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Scene\Scene.h">
       <Filter>Src\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Graphics\Mesh.h">
-      <Filter>Src\Graphic</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\D3D11\Shader.h">
       <Filter>Src\Graphic\D3D11</Filter>
@@ -242,9 +239,6 @@
     </ClInclude>
     <ClInclude Include="Src\Graphics\D3D11\Sampler.h">
       <Filter>Src\Graphic\D3D11</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Graphics\MeshFilter.h">
-      <Filter>Src\Graphic</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\D3D11\PipelineState.h">
       <Filter>Src\Graphic\D3D11</Filter>
@@ -275,6 +269,15 @@
     </ClInclude>
     <ClInclude Include="Src\Graphics\Legacy.h">
       <Filter>Src\Graphic\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\RenderableMesh.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\SkinnedRenderableMesh.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Geometry\Mesh.h">
+      <Filter>Src\Geometry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

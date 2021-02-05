@@ -24,6 +24,7 @@
 
 //= Geometry ==============================================
 //#include "Geometry/Math.h"
+#include "Geometry/Mesh.h"
 
 
 //= Input =================================================
@@ -45,8 +46,6 @@
 #include "Graphics/GraphicsEnums.h"
 #include "Graphics/DeviceAndSwapChain.h"
 #include "Graphics/VertexTypes.h"
-#include "Graphics/Mesh.h"
-#include "Graphics/MeshFilter.h"
 #include "Graphics/Material.h"
 #include "Graphics/Legacy.h"
 #include "Graphics/Renderer.h"
@@ -59,5 +58,6 @@
 #include "Scene/GameObject.h"
 #include "Scene/Components/Component.h"
 #include "Scene/Components/Transform.h"
-#include "Scene/Components/Renderable.h"
 #include "Scene/Components/Camera.h"
+#include "Scene/Components/RenderableMesh.h"
+#include "Scene/Components/SkinnedRenderableMesh.h"

@@ -14,6 +14,7 @@ namespace Dive
 		TextureCube,
 		Material,
 		MeshFilter,
+		Mesh,
 	};
 
 	class Resource : public Object

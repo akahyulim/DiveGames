@@ -25,6 +25,12 @@ namespace Dive
 
 	void * VertexBuffer::Map()
 	{
+		if (!m_bDynamic)
+		{
+			CORE_ERROR("");
+			return nullptr;
+		}
+			
 		auto graphics = GetSubsystem<Graphics>();
 		if (!graphics || !graphics->IsInitialized() || !m_buffer)
 		{

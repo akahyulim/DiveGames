@@ -14,7 +14,7 @@ namespace Dive
 		: Component(context, owner),
 		m_parent(nullptr)
 	{
-		m_type = eComponentType::Transform;
+		m_componentType = eComponentType::Transform;
 
 		m_localPosition = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 		m_localRotation = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);

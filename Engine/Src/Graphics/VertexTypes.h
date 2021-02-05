@@ -10,6 +10,8 @@ namespace Dive
 	// VERTEX_POSITION_UV_NORMAL_TANGENT_WEIGHT_INDEX까지도 갈텐데...
 	struct Vertex_Undefined {};
 
+	// 기본사양 두 개는 Vertex_Rigid, Vertex,Skinned로 단순화하자.
+
 	struct Vertex_Pos
 	{
 		Vertex_Pos() = default;

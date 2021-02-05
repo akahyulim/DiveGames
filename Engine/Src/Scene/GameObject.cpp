@@ -3,10 +3,10 @@
 #include "Scene.h"
 #include "Core/Context.h"
 #include "Core/FileStream.h"
-//#include "Core/Log.h"
-#include "Components/Renderable.h"
 #include "Components/Transform.h"
 #include "Components/Camera.h"
+#include "Components/RenderableMesh.h"
+#include "Components/SkinnedRenderableMesh.h"
 
 
 namespace Dive
@@ -45,7 +45,7 @@ namespace Dive
 
 			for (const auto& component : m_components)
 			{
-				stream.Write(static_cast<unsigned int>(component->GetType()));
+				stream.Write(static_cast<unsigned int>(component->GetComponentType()));
 				stream.Write(component->GetID());
 			}
 
@@ -135,7 +135,7 @@ namespace Dive
 	
 		for (auto component : m_components)
 		{
-			auto cloneComponent = clone->AddComponent(component->GetType());
+			auto cloneComponent = clone->AddComponent(component->GetComponentType());
 			cloneComponent->Copy(component.get());
 		}
 	
@@ -171,33 +171,21 @@ namespace Dive
 
 	Component * GameObject::AddComponent(eComponentType type, unsigned int id)
 	{
+		Component* com = nullptr;
+
 		switch (type)
 		{
-		case eComponentType::Renderable:
-		{
-			auto component = AddComponent<Renderable>();
-			if(id != 0 ) component->SetID(id);
-			// 아래의 부분은 중복된다. 그런데 component가 지역변수로 밖으로 빼낼 수 없다...
-			return static_cast<Component*>(component);
+		case eComponentType::Transform:				com = static_cast<Component*>(AddComponent<Transform>());				break;
+		case eComponentType::Camera:				com = static_cast<Component*>(AddComponent<Camera>());					break;
+		case eComponentType::RenderableMesh:		com = static_cast<Component*>(AddComponent<RenderableMesh>());			break;
+		case eComponentType::SkinnedRenderableMesh:	com = static_cast<Component*>(AddComponent<SkinnedRenderableMesh>());	break;
+
+		default:	return nullptr;
 		}
 
-		case eComponentType::Transform:
-		{
-			auto component = AddComponent<Transform>();
-			if (id != 0) component->SetID(id);
-			return static_cast<Component*>(component);
-		}
+		if (id != 0)	com->SetID(id);
 
-		case eComponentType::Camera:
-		{
-			auto component = AddComponent<Camera>();
-			if (id != 0) component->SetID(id);
-			return static_cast<Component*>(component);
-		}
-
-		default:
-			return nullptr;
-		}
+		return com;
 	}
 
 	GameObject * GameObject::GetParentGameObject()

@@ -11,7 +11,7 @@ namespace Dive
 	Camera::Camera(Context * context, GameObject * owner)
 		: Component(context, owner)
 	{
-		m_type = eComponentType::Camera;
+		m_componentType = eComponentType::Camera;
 		m_projectionType = eProjectionType::Perspective;
 
 		DirectX::XMStoreFloat4x4(&m_view, DirectX::XMMatrixIdentity());

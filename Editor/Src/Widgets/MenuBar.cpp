@@ -107,7 +107,7 @@ void MenuBar::Tick(float deltaTime)
 				{
 					/*
 					auto pObject = m_pWorld->CreateGameObject();
-					auto pRenderable = pObject->AddComponent<Dive::Renderable>();
+					auto pRenderable = pObject->AddComponent<Dive::MeshRenderer>();
 					pRenderable->SetDefaultGeometry(Dive::eGeometryType::Default_Triangle);
 					pRenderable->SetDefaultMaterial();
 					pObject->SetName("Triangle");
@@ -118,7 +118,7 @@ void MenuBar::Tick(float deltaTime)
 				{
 					/*
 					auto pObject = m_pWorld->CreateGameObject();
-					auto pRenderable = pObject->AddComponent<Dive::Renderable>();
+					auto pRenderable = pObject->AddComponent<Dive::MeshRenderer>();
 					pRenderable->SetDefaultGeometry(Dive::eGeometryType::Default_Quad);
 					pRenderable->SetDefaultMaterial();
 					pObject->SetName("Quad");
@@ -131,7 +131,7 @@ void MenuBar::Tick(float deltaTime)
 				{
 					/*
 					auto pObject = m_pWorld->CreateGameObject();
-					auto pRenderable = pObject->AddComponent<Dive::Renderable>();
+					auto pRenderable = pObject->AddComponent<Dive::MeshRenderer>();
 					pRenderable->SetDefaultGeometry(Dive::eGeometryType::Default_Cube);
 					pRenderable->SetDefaultMaterial();
 					pObject->SetName("Cube");
@@ -142,7 +142,7 @@ void MenuBar::Tick(float deltaTime)
 				{
 					/*
 					auto pObject = m_pWorld->CreateGameObject();
-					auto pRenderable = pObject->AddComponent<Dive::Renderable>();
+					auto pRenderable = pObject->AddComponent<Dive::MeshRenderer>();
 					pRenderable->SetDefaultGeometry(Dive::eGeometryType::Default_Plane);
 					pRenderable->SetDefaultMaterial();
 					pObject->SetName("Plane");
@@ -153,7 +153,7 @@ void MenuBar::Tick(float deltaTime)
 				{
 					/*
 					auto pObject = m_pWorld->CreateGameObject();
-					auto pRenderable = pObject->AddComponent<Dive::Renderable>();
+					auto pRenderable = pObject->AddComponent<Dive::MeshRenderer>();
 					pRenderable->SetDefaultGeometry(Dive::eGeometryType::Default_Sphere);
 					pRenderable->SetDefaultMaterial();
 					pObject->SetName("Sphere");
@@ -221,7 +221,7 @@ void MenuBar::Tick(float deltaTime)
 				}
 			}
 
-			if (ImGui::MenuItem("Renderable"))
+			if (ImGui::MenuItem("MeshRenderer"))
 			{
 			}
 

@@ -12,11 +12,10 @@ namespace Dive
 	enum class eComponentType : unsigned int
 	{
 		Transform,
-		MeshFilter,
-		MeshRenderer,
-		Renderable,
 		Camera,
-	//	Unknown
+		RenderableMesh,
+		SkinnedRenderableMesh,
+		Unknown
 	};
 
 	class Component : public Object
@@ -41,14 +40,14 @@ namespace Dive
 
 		virtual void Copy(Component* other) {}
 
-		GameObject* GetOwner()		const { return m_owner; }
-		eComponentType GetType()	const { return m_type; }
-		std::string GetName()		const;
+		GameObject* GetOwner() const				{ return m_owner; }
+		eComponentType GetComponentType() const		{ return m_componentType; }
+		std::string GetName() const;
 
 	protected:
 
 	protected:
 		GameObject* m_owner;
-		eComponentType m_type;
+		eComponentType m_componentType;
 	};
 }

@@ -99,12 +99,6 @@ namespace Dive
 
 	};
 
-	// 뭔지 모르겠다.
-	enum class eBufferType : uint8_t
-	{
-
-	};
-
 	// 역시 뭔지 모르겠지만 일단 추가
 	enum class eUpdateType : uint8_t
 	{

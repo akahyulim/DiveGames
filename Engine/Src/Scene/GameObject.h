@@ -67,7 +67,9 @@ namespace Dive
 	T* GameObject::AddComponent()
 	{
 		if (auto component = GetComponent<T>())
+		{
 			return component;
+		}
 
 		auto component = std::make_shared<T>(m_context, this);
 		m_components.emplace_back(std::static_pointer_cast<Component>(component));

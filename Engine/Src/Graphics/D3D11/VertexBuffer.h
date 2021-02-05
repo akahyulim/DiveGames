@@ -2,6 +2,7 @@
 #include "Core/Object.h"
 #include "../VertexTypes.h"
 
+
 namespace Dive
 {
 	class Context;

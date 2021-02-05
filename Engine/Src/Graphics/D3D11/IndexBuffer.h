@@ -25,7 +25,8 @@ namespace Dive
 		void* Map();
 		bool Unmap();
 
-		ID3D11Buffer* GetBuffer() const { return m_buffer; }
+		unsigned int GetCount() const	{ return m_count; }
+		ID3D11Buffer* GetBuffer() const	{ return m_buffer; }
 		DXGI_FORMAT GetFormat() const;
 
 	private:

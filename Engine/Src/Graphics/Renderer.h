@@ -9,7 +9,7 @@ namespace Dive
 	class Graphics;
 	class GameObject;
 	class MeshFilter;
-	class Renderable;
+	class MeshRenderer;
 	class E_UPDATE_SCENE;
 	class Command;
 
@@ -39,6 +39,7 @@ namespace Dive
 
 	private:
 		// pass
+		void pass_Color();
 
 	private:
 		Graphics* m_graphics;
