@@ -101,8 +101,11 @@ namespace Dive
 				m_gameObjects[eRenderableObjectType::Camera].push_back(gameObject.get());
 			}
 			
-			// 이렇게하면 일단 Renderable에 따라 두 번 나눠야 하고
-			// 하나의 GameObject가 두 곳 이상에 저장될 수 있다...
+			// Renderable이 Rigid, Skinned 두 개라 분류 과정 역시 두 번 진행해야 한다. => 이건 가능
+			// Material이 둘 이상일 경우 하나의 GameObject가 중복으로 분류될 수 있다. => Material별 Mesh로 분류? 그런데 Material != Shader이다.
+			// Shader가 다르다면 매 번 설정을 달리 해야 한다.
+			// => 결국 Shader와 Rendering Mode 둘 다 염두해서 나누어야 한다.
+			// 일단 1순위는 Rendering Mode일 듯 하다.
 			if (gameObject->HasComponent<RenderableMesh>())
 			{
 				for (const auto& material : gameObject->GetComponent<RenderableMesh>()->GetAllMaterial())
@@ -126,36 +129,30 @@ namespace Dive
 		m_selectedCamera = m_gameObjects[eRenderableObjectType::Camera][0];
 	}
 
-	// 실제로는 technique이다. 내부에서 다시 pass로 갈라져야 한다.
-	void Renderer::pass_Color()
+	// 일단 RenderingMode로만 나누고 Shader는 그냥 Material에서 참조하여 계속 변하도록 해볼까?
+	// 추후 프로파일링을 통해 분석을 해보도록 하고 말야...
+	// 그런데 이러한 구현은 Command와 State의 효용성이 거의 없는데...
+	// 일단 Opaque만 적용
+	void Renderer::pass_GBuffer()
 	{
-		if (m_gameObjects[eRenderableObjectType::Opaque].empty())
-			return;
+		// GBuffer PreRender
+		// GBuffer RenderTargetView, DepthStencilView Clear
+		// GBuffer RenderTargetView, DepthStencilState Set
+		// => GBuffer Class를 만든 후 Graphics에서 관리토록 하면 된다.
 
-		// PipelineState
-		{
-			PipelineState state;
-			// MeshRenderer, Material을 참조
-			// 그 외의 설정(DepthStencil, Blending, Rasterizer 등)은 이전에 등록해야 한다.
-			// shader를 전달할 수 없다. shader 별로 나누던지, 아래의 루프에서 material로부터 shader를 참조해야 한다.
-			// 아니면 이 곳에서 shader를 등록한 후, 아래의 루프에서 동일한 Shader를 사용하지 않는 경우 continue로 넘겨야 한다.
+		// Renderable Render
+		// Shader, InputLayout, ConstantBuffer 관리 => ConstantBuffer는 Transform과 Material이 구분되어야 한다.
+		// Renderable Draw(Buffer, PrimitiveTopology) => 이건 Mesh 단위로 처리하는 게 나을 것 같은데...
 
-			m_command->SetPipelineState(state);
-		}
+		// GBuffer PostRender
+		// GBuffer RenderTargetView의 내용을 파일화할 것인가
+	}
+	
+	void Renderer::pass_Lighting()
+	{
+		// BackBuffer RenderTargetView를 Set
+		// GBuffer 계산용 Constant Buffer 전달?
 
-		for(const auto& gameObject : m_gameObjects[eRenderableObjectType::Opaque])
-		{
-			// 기본적으로 Renderable에 저장된 객체들을 사용한다.
-			// 그렇다면 command에 Renderable을 넘기는게 낫지 않을까?
-			auto renderable = gameObject->GetComponent<RenderableMesh>();
-			auto mesh = renderable->GetMesh();
-
-			// material shader resource view
-			// material constant buffer
-			// world position constant buffer? => 예전에는 Transform에 viewProj를 넘겨 직접 계산한 결과를 buffer에 넣었다.
-			m_command->SetVertexBuffer(mesh->GetVertexBuffer());
-			m_command->SetIndexBuffer(mesh->GetIndexBuffer());
-			m_command->DrawIndexed(mesh->GetIndexBuffer()->GetCount());
-		}
+		// Light Draw
 	}
 }

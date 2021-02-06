@@ -14,6 +14,8 @@ namespace Dive
 		IndexBuffer
 	};
 
+	// 결국 Command에서 Data는 얘인데...
+	// draw 함수를 이 곳에 만드는 건 어떨까?
 	class Mesh : public Resource
 	{
 	public:

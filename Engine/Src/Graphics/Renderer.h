@@ -38,8 +38,8 @@ namespace Dive
 		void OnAcquireRenderable(const E_UPDATE_SCENE* evnt);
 
 	private:
-		// pass
-		void pass_Color();
+		void pass_GBuffer();
+		void pass_Lighting();
 
 	private:
 		Graphics* m_graphics;

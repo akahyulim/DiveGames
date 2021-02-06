@@ -14,7 +14,10 @@ namespace Dive
 	public:
 		// load image file = shaderResourceView
 		Texture2D(Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, std::string name = "");
+
+		// 이건 각각 포멧이 다르고, stencil 사용 여부도 염두해야 한다... 그리고 readOnly도...
 		Texture2D(Context* context, unsigned int width, unsigned int height, bool useStencil = true, std::string name = "");
+
 		~Texture2D();
 
 		ID3D11Resource* GetResource() { return static_cast<ID3D11Resource*>(m_resource); }
