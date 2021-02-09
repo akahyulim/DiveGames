@@ -6,28 +6,29 @@ namespace Dive
 {
 	class Context;
 
-	// 일단 Array, Mipmap은 전부 제외
-	// 모든 생성자가 Resource와 RenderTargetView 생성 함수를 가진다.
-	// 추후 private 함수로 나누자.
 	class Texture2D : public Texture
 	{
 	public:
 		// load image file = shaderResourceView
-		Texture2D(Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, std::string name = "");
+		Texture2D(Context* context, unsigned int width, unsigned int height, DXGI_FORMAT format, bool readOnly = false, std::string name = "")
+			: Texture(context)
+		{
+			m_resourceName	= std::move(name);
+			m_resourceType	= eResourceType::Texture2D;
 
-		// 이건 각각 포멧이 다르고, stencil 사용 여부도 염두해야 한다... 그리고 readOnly도...
-		Texture2D(Context* context, unsigned int width, unsigned int height, bool useStencil = true, std::string name = "");
+			m_width			= width;
+			m_height		= height;
+			m_format		= format;
+			m_channelCount	= GetChannelCount(format);
+			m_bindFlags		= D3D11_BIND_SHADER_RESOURCE;
+			m_bindFlags		|= IsDepthFormat(format) ? D3D11_BIND_DEPTH_STENCIL : D3D11_BIND_RENDER_TARGET;
+			
+			createTextureViews(readOnly);
+		}
 
-		~Texture2D();
-
-		ID3D11Resource* GetResource() { return static_cast<ID3D11Resource*>(m_resource); }
+		~Texture2D() = default;
 
 	private:
-		// texture & shader resource view
-		// render target view
-		// depth stecnil view
-
-	private:
-		ID3D11Texture2D* m_resource;
+		bool createTextureViews(bool readOnly);
 	};
 }

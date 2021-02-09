@@ -7,200 +7,109 @@
 
 namespace Dive
 {
-	Texture2D::Texture2D(Context * context, unsigned int width, unsigned int height, DXGI_FORMAT format, std::string name)
-		: Texture(context)
+	bool Texture2D::createTextureViews(bool readOnly)
 	{
-		m_resourceName = std::move(name);
-		m_resourceType = eResourceType::Texture2D;
+		DXGI_FORMAT formatSRV	= m_format;
+		DXGI_FORMAT formatRTV	= m_format;
+		DXGI_FORMAT formatDSV	= m_format;
 
-		if (width <= 0 || height <= 0)
+		if (m_format == DXGI_FORMAT_D24_UNORM_S8_UINT)
 		{
-			CORE_ERROR("");
-			return;
+			formatRTV = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		}
+		else if (m_format == DXGI_FORMAT_D32_FLOAT_S8X24_UINT)
+		{
+			formatRTV = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+		}
+		else if (m_format == DXGI_FORMAT_D32_FLOAT)
+		{
+			formatRTV = DXGI_FORMAT_R32_FLOAT;
 		}
 
-		// base datas
-		{
-			m_width		= width;
-			m_height	= height;
-			m_format	= format;
+		ID3D11Texture2D* resource = nullptr;
 
-			setViewport(m_width, m_height);
-		}
-
-		// format에 따라 BindFlags를 구분할 수 있다.
-		// 그런데 depthstencil format을 두세개로 제한해야 한다.
-		bool depthStencil = true;
-		DXGI_FORMAT shaderResourceViewFormat;
-		DXGI_FORMAT depthStencilViewFormat;
+		// texture2d
 		{
-			if (m_format == DXGI_FORMAT_R24G8_TYPELESS)
-			{
-				shaderResourceViewFormat	= DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-				depthStencilViewFormat		= DXGI_FORMAT_D24_UNORM_S8_UINT;
-			}
-			else
-			{
-				depthStencil = false;
-			}
-		}
+			// 역시 mipmap과 array에 대한 정확한 이해가 필요하다.
 
-		// texture 생성
-		{
 			D3D11_TEXTURE2D_DESC desc;
 			ZeroMemory(&desc, sizeof(desc));
 			desc.Width				= m_width;
 			desc.Height				= m_height;
 			desc.Format				= m_format;
 			desc.Usage				= D3D11_USAGE_DEFAULT;
-			desc.BindFlags			= D3D11_BIND_SHADER_RESOURCE;
-			desc.BindFlags			|= depthStencil ? D3D11_BIND_DEPTH_STENCIL : D3D11_BIND_RENDER_TARGET;
-			desc.MipLevels			= 1;
-			desc.ArraySize			= 1;
+			desc.BindFlags			= m_bindFlags;
+			desc.MipLevels			= m_mipLevels;
+			desc.ArraySize			= m_arraySize;
 			desc.SampleDesc.Count	= 1;
 			desc.SampleDesc.Quality = 0;
 			desc.MiscFlags			= 0;
 			desc.CPUAccessFlags		= 0;
 
-			if (FAILED(m_renderDevice->CreateTexture2D(&desc, nullptr, &m_resource)))
+			// miplevel만큼 data가 있다면 subreosurce를 만들어야 한다.
+			std::vector<D3D11_SUBRESOURCE_DATA> subResources;
+			{
+
+			}
+
+			if (FAILED(m_renderDevice->CreateTexture2D(&desc, subResources.empty() ? nullptr : subResources.data(), &resource)))
 			{
 				CORE_ERROR("");
-				return;
+				return false;
 			}
 		}
 
-		// shaderResourceView 생성
+		// shader resource view
 		{
 			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-			desc.Format = depthStencil ? shaderResourceViewFormat : m_format;
-			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipLevels = -1;
-			desc.Texture2D.MostDetailedMip = 0;
-
-			if (FAILED(m_renderDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_shaderResourceView)))
-			{
-				CORE_ERROR("");
-				SAFE_RELEASE(m_renderTargetView);
-				SAFE_RELEASE(m_resource);
-				return;
-			}
-		}
-
-		if (depthStencil)
-		{
-			D3D11_DEPTH_STENCIL_VIEW_DESC desc;
-			desc.Format				= depthStencilViewFormat;
-			desc.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipSlice = 0;
-			desc.Flags				= 0;	// depth, stencil 둘 다 읽고 쓰기 가능	=> 이게 둘로 나눠져야 한다.
-
-			if (FAILED(m_renderDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_depthStencilView)))
-			{
-				CORE_ERROR("");
-				SAFE_RELEASE(m_resource);
-				return;
-			}
-		}
-		// renderTargetView 생성
-		else 
-		{
-			D3D11_RENDER_TARGET_VIEW_DESC desc;
-			desc.Format				= m_format;
-			desc.ViewDimension		= D3D11_RTV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipSlice = 0;		// 사용할 mipLevel 같다.
-
-			if (FAILED(m_renderDevice->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_renderTargetView)))
-			{
-				CORE_ERROR("");
-				SAFE_RELEASE(m_resource);
-				return;
-			}
-		}
-	}
-
-	Texture2D::Texture2D(Context * context, unsigned int width, unsigned int height, bool useStencil, std::string name)
-		: Texture(context)
-	{
-		m_resourceName = std::move(name);
-		m_resourceType = eResourceType::Texture2D;
-
-		if (width <= 0 || height <= 0)
-		{
-			CORE_ERROR("");
-			return;
-		}
-
-		// base datas
-		{
-			m_width		= width;
-			m_height	= height;
-			m_format	= useStencil ? DXGI_FORMAT_D32_FLOAT_S8X24_UINT : DXGI_FORMAT_D32_FLOAT;
-
-			setViewport(m_width, m_height);
-		}
-
-		// texture 생성
-		{
-			D3D11_TEXTURE2D_DESC desc;
-			ZeroMemory(&desc, sizeof(desc));
-			desc.Width				= m_width;
-			desc.Height				= m_height;
-			desc.Format				= m_format == DXGI_FORMAT_D32_FLOAT_S8X24_UINT ? DXGI_FORMAT_R32G8X24_TYPELESS : DXGI_FORMAT_R32_TYPELESS;
-			desc.Usage				= D3D11_USAGE_DEFAULT;
-			desc.BindFlags			= D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;	// 이것만 다르다.
-			desc.MipLevels			= 1;
-			desc.ArraySize			= 1;
-			desc.SampleDesc.Count	= 1;
-			desc.SampleDesc.Quality = 0;
-			desc.MiscFlags			= 0;
-			desc.CPUAccessFlags		= 0;
-
-			if (FAILED(m_renderDevice->CreateTexture2D(&desc, nullptr, &m_resource)))
-			{
-				CORE_ERROR("");
-				return;
-			}
-		}
-
-		// DepthStencilView 생성
-		{
-			D3D11_DEPTH_STENCIL_VIEW_DESC desc;
-			desc.Format				= m_format;
-			desc.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipSlice = 0;
-			desc.Flags				= 0;	// depth, stencil 둘 다 읽고 쓰기 가능	=> 이게 둘로 나눠져야 한다.
-
-			if (FAILED(m_renderDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_depthStencilView)))
-			{
-				CORE_ERROR("");
-				SAFE_RELEASE(m_resource);
-				return;
-			}
-		}
-
-		// shaderResourceView 생성
-		{
-			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-			desc.Format						= m_format == DXGI_FORMAT_D32_FLOAT_S8X24_UINT ? DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS : DXGI_FORMAT_R32_FLOAT;
+			desc.Format						= formatSRV;
 			desc.ViewDimension				= D3D11_SRV_DIMENSION_TEXTURE2D;
 			desc.Texture2D.MipLevels		= -1;
 			desc.Texture2D.MostDetailedMip	= 0;
+			// 이것도 array size의 영향을 받는다.
 
-			if (FAILED(m_renderDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_shaderResourceView)))
+			if (FAILED(m_renderDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(resource), &desc, &m_shaderResourceView)))
 			{
 				CORE_ERROR("");
-				SAFE_RELEASE(m_depthStencilView);
-				SAFE_RELEASE(m_resource);
-				return;
+				return false;
 			}
 		}
-	}
 
-	Texture2D::~Texture2D()
-	{
-		SAFE_RELEASE(m_depthStencilView);
-		SAFE_RELEASE(m_renderTargetView);
-		SAFE_RELEASE(m_shaderResourceView);
-		SAFE_RELEASE(m_resource);
+		if (IsDepthFormat(m_format))
+		{
+			// depth stencil view
+			D3D11_DEPTH_STENCIL_VIEW_DESC desc;
+			desc.Format				= formatDSV;
+			desc.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipSlice = 0;
+			desc.Flags				= readOnly ? D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL : 0;
+			// array size가 있다면 texture2d array가 되어야 한다.
+
+			if (FAILED(m_renderDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(resource), &desc, &m_depthStencilView)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+		}
+		else
+		{
+			// render target view
+			D3D11_RENDER_TARGET_VIEW_DESC desc;
+			desc.Format				= formatRTV;
+			desc.ViewDimension		= D3D11_RTV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipSlice = 0;
+			// array size가 있다면 texture2d array가 되어야 한다.
+
+			if (FAILED(m_renderDevice->CreateRenderTargetView(static_cast<ID3D11Resource*>(resource), &desc, &m_renderTargetView)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+		}
+
+		SAFE_RELEASE(resource);
+
+		return true;
 	}
 }

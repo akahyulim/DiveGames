@@ -109,6 +109,7 @@
     <ClInclude Include="Src\ImGUI\imstb_rectpack.h" />
     <ClInclude Include="Src\ImGUI\imstb_textedit.h" />
     <ClInclude Include="Src\ImGUI\imstb_truetype.h" />
+    <ClInclude Include="Src\Importer\ImageImporter.h" />
     <ClInclude Include="Src\Widgets\EditView.h" />
     <ClInclude Include="Src\Widgets\Hierarchy.h" />
     <ClInclude Include="Src\Widgets\Inspector.h" />
@@ -124,6 +125,7 @@
     <ClCompile Include="Src\ImGUI\imgui_impl_win32.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_stdlib.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="Src\Importer\ImageImporter.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Widgets\EditView.cpp" />
     <ClCompile Include="Src\Widgets\Hierarchy.cpp" />

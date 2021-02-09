@@ -88,10 +88,7 @@ namespace Dive
 
 	bool Graphics::createTextures()
 	{
-		// 이렇게 하면 기존 메모리는 자동으로 제거해주는게 맞나?
-		m_renderTextures[eRenderTextureType::EditorView] = std::make_shared<Texture2D>(m_context, m_textureSize.x, m_textureSize.y, DXGI_FORMAT_R32G32B32A32_FLOAT, "EditorView");
-		m_renderTextures[eRenderTextureType::DepthStencil] = std::make_shared<Texture2D>(m_context, m_textureSize.x, m_textureSize.y, true, "DepthStencil");
-
+		
 		return true;
 	}
 

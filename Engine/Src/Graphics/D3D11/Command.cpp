@@ -169,7 +169,7 @@ namespace Dive
 	{
 		if (!texture || !texture->GetRenderTargetView())
 		{
-			CORE_ERROR("");
+			CORE_ERROR("texture ¾ø¾î");
 			return;
 		}
 
