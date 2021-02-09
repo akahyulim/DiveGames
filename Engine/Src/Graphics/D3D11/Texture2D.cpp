@@ -28,6 +28,23 @@ namespace Dive
 			setViewport(m_width, m_height);
 		}
 
+		// format에 따라 BindFlags를 구분할 수 있다.
+		// 그런데 depthstencil format을 두세개로 제한해야 한다.
+		bool depthStencil = true;
+		DXGI_FORMAT shaderResourceViewFormat;
+		DXGI_FORMAT depthStencilViewFormat;
+		{
+			if (m_format == DXGI_FORMAT_R24G8_TYPELESS)
+			{
+				shaderResourceViewFormat	= DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+				depthStencilViewFormat		= DXGI_FORMAT_D24_UNORM_S8_UINT;
+			}
+			else
+			{
+				depthStencil = false;
+			}
+		}
+
 		// texture 생성
 		{
 			D3D11_TEXTURE2D_DESC desc;
@@ -36,7 +53,8 @@ namespace Dive
 			desc.Height				= m_height;
 			desc.Format				= m_format;
 			desc.Usage				= D3D11_USAGE_DEFAULT;
-			desc.BindFlags			= D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+			desc.BindFlags			= D3D11_BIND_SHADER_RESOURCE;
+			desc.BindFlags			|= depthStencil ? D3D11_BIND_DEPTH_STENCIL : D3D11_BIND_RENDER_TARGET;
 			desc.MipLevels			= 1;
 			desc.ArraySize			= 1;
 			desc.SampleDesc.Count	= 1;
@@ -51,7 +69,40 @@ namespace Dive
 			}
 		}
 
+		// shaderResourceView 생성
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+			desc.Format = depthStencil ? shaderResourceViewFormat : m_format;
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipLevels = -1;
+			desc.Texture2D.MostDetailedMip = 0;
+
+			if (FAILED(m_renderDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_shaderResourceView)))
+			{
+				CORE_ERROR("");
+				SAFE_RELEASE(m_renderTargetView);
+				SAFE_RELEASE(m_resource);
+				return;
+			}
+		}
+
+		if (depthStencil)
+		{
+			D3D11_DEPTH_STENCIL_VIEW_DESC desc;
+			desc.Format				= depthStencilViewFormat;
+			desc.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipSlice = 0;
+			desc.Flags				= 0;	// depth, stencil 둘 다 읽고 쓰기 가능	=> 이게 둘로 나눠져야 한다.
+
+			if (FAILED(m_renderDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_depthStencilView)))
+			{
+				CORE_ERROR("");
+				SAFE_RELEASE(m_resource);
+				return;
+			}
+		}
 		// renderTargetView 생성
+		else 
 		{
 			D3D11_RENDER_TARGET_VIEW_DESC desc;
 			desc.Format				= m_format;
@@ -61,23 +112,6 @@ namespace Dive
 			if (FAILED(m_renderDevice->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_renderTargetView)))
 			{
 				CORE_ERROR("");
-				SAFE_RELEASE(m_resource);
-				return;
-			}
-		}
-
-		// shaderResourceView 생성
-		{
-			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-			desc.Format						= m_format;
-			desc.ViewDimension				= D3D11_SRV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipLevels		= -1;
-			desc.Texture2D.MostDetailedMip	= 0;
-
-			if (FAILED(m_renderDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_resource), &desc, &m_shaderResourceView)))
-			{
-				CORE_ERROR("");
-				SAFE_RELEASE(m_renderTargetView);
 				SAFE_RELEASE(m_resource);
 				return;
 			}

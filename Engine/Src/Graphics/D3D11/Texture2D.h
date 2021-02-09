@@ -23,6 +23,9 @@ namespace Dive
 		ID3D11Resource* GetResource() { return static_cast<ID3D11Resource*>(m_resource); }
 
 	private:
+		// texture & shader resource view
+		// render target view
+		// depth stecnil view
 
 	private:
 		ID3D11Texture2D* m_resource;

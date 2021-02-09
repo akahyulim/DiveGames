@@ -44,7 +44,7 @@ namespace Dive
 		m_normal				= new Texture2D(m_context, width, height, DXGI_FORMAT_R11G11B10_FLOAT, "Normal");
 		m_specPower				= new Texture2D(m_context, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, "SpecPower");
 
-		// gbuffer 까지...
+		// cbuffer 까지...
 
 		m_width		= width;
 		m_height	= height;
