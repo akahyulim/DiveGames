@@ -19,6 +19,7 @@ namespace Dive
 		m_bpp(0),
 		m_bpc(0),
 		m_channelCount(0),
+		m_bitsPerChannel(8),
 		m_bindFlags(0),
 		m_mipLevels(1),
 		m_arraySize(1),
@@ -33,6 +34,24 @@ namespace Dive
 		SAFE_RELEASE(m_depthStencilView);
 		SAFE_RELEASE(m_renderTargetView);
 		SAFE_RELEASE(m_shaderResourceView);
+	}
+
+	bool Texture::SaveToFile(const std::string & path)
+	{
+		// 가지고 있는 데이터들을 파일로 저장한다.
+
+		return false;
+	}
+
+	bool Texture::LoadFromFile(const std::string & path)
+	{
+		// 파일이 존재하는지 확인
+		// 파일 포멧 확인
+		// 파일의 데이터를 전부 저장
+
+		// GPU Resource 생성
+
+		return false;
 	}
 
 	unsigned int Texture::GetChannelCount(DXGI_FORMAT format)

@@ -7,6 +7,7 @@ namespace Dive
 	class Graphics;
 
 	// 일단 ID3D11UnorderedAccessView는 제외
+	// 아무리봐도 class를 나눌 필요까진 없다.
 	class Texture : public Resource
 	{
 	public:
@@ -14,8 +15,8 @@ namespace Dive
 		virtual ~Texture();
 
 		// load, save
-
-		// get, set texture datas
+		bool SaveToFile(const std::string& path) override;
+		bool LoadFromFile(const std::string& path) override;
 
 		// get
 		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_shaderResourceView; }
@@ -23,8 +24,10 @@ namespace Dive
 		ID3D11DepthStencilView* GetDepthStencilView() const		{ return m_depthStencilView; }
 		const D3D11_VIEWPORT& GetViewport()	const				{ return m_viewport; }
 
+		// get, set texture datas
 		unsigned int GetWidth() const	{ return m_width; }
 		unsigned int GetHeight() const	{ return m_height; }
+		// 이외의 값들이 필요한가?
 
 
 		unsigned int GetChannelCount(DXGI_FORMAT format);
@@ -35,7 +38,7 @@ namespace Dive
 		}
 
 	protected:
-		virtual bool createTextureAndView() { return false; }
+		//virtual bool createTextureAndView() { return false; }
 		void setViewport(unsigned int width, unsigned int height);
 
 	protected:
@@ -53,10 +56,14 @@ namespace Dive
 		unsigned int m_bpp;				// byte per pixel
 		unsigned int m_bpc;				// byte per channel
 		unsigned int m_channelCount;
+		unsigned int m_bitsPerChannel;
 		unsigned int m_bindFlags;
 		unsigned int m_mipLevels;
 		unsigned int m_arraySize;
 		DXGI_FORMAT m_format;
+
+		// bpp, bpc, channelCount, bitsPerChannel 등은 거의 필요가 없는 것 같은데...
+		// pitch 계산을 좀 더 효율적으로 하는 방법은 없을까?
 
 		std::vector<std::vector<std::byte>> m_data;
 	};

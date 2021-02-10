@@ -121,6 +121,9 @@
     <ClCompile Include="Src\Graphics\D3D11\GBuffer.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Graphics\D3D11\Dive_Texture.cpp">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
@@ -283,6 +286,9 @@
       <Filter>Src\Geometry</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\D3D11\GBuffer.h">
+      <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\D3D11\Dive_Texture.h">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClInclude>
   </ItemGroup>
