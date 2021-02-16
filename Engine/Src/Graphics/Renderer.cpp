@@ -12,7 +12,7 @@
 #include "D3D11/DepthStencilState.h"
 #include "D3D11/Shader.h"
 #include "D3D11/ConstantBuffer.h"
-#include "D3D11/Texture2D.h"
+#include "D3D11/Dive_Texture.h"
 #include "D3D11/PipelineState.h"
 #include "D3D11/Command.h"
 #include "D3D11/VertexBuffer.h"
@@ -60,8 +60,9 @@ namespace Dive
 	{
 		if (!m_selectedCamera)
 		{
-			m_command->ClearRenderTarget(m_graphics->GetRenderTexture(eRenderTextureType::EditorView),
-				DirectX::XMFLOAT4(0.5f, 0.5f, 0.0f, 1.0f));
+			// 현재 텍스쳐가 없다.
+			//m_command->ClearRenderTarget(m_graphics->GetRenderTexture(eRenderTextureType::EditorView),
+			//	DirectX::XMFLOAT4(0.5f, 0.5f, 0.0f, 1.0f));
 
 			return;
 		}
@@ -71,8 +72,9 @@ namespace Dive
 		{
 			// 스카이 박스를 적용할 수 있다. 이건 Scene의 Skybox와는 별개이다.
 
-			m_command->ClearRenderTarget(m_graphics->GetRenderTexture(eRenderTextureType::EditorView),
-				m_selectedCamera->GetComponent<Camera>()->GetBackgroundColor());
+			// 역시 현재 텍스쳐가 없다.
+			//m_command->ClearRenderTarget(m_graphics->GetRenderTexture(eRenderTextureType::EditorView),
+			//	m_selectedCamera->GetComponent<Camera>()->GetBackgroundColor());
 
 			return;
 		}

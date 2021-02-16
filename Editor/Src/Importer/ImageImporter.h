@@ -16,7 +16,7 @@ class ImageImporter
 {
 public:
 
-	bool Load(const std::string& filepath, Texture* texture, bool generateMipmaps = true);
+	bool Load(const std::string& filepath, Dive_Texture* texture, bool generateMipmaps = true);
 
 private:
 private:

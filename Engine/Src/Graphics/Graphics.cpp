@@ -10,7 +10,7 @@
 #include "D3D11/RasterizerState.h"
 #include "D3D11/Sampler.h"
 #include "D3D11/Shader.h"
-#include "D3D11//Texture2D.h"
+#include "D3D11/Dive_Texture.h"
 #include "D3D11/ConstantBuffer.h"
 
 

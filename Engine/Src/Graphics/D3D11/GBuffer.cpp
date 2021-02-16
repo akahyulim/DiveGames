@@ -1,6 +1,6 @@
 #include "DivePch.h"
 #include "GBuffer.h"
-#include "Texture2D.h"
+#include "Dive_Texture.h"
 #include "ConstantBuffer.h"
 #include "Core/DiveDefs.h"
 #include "Core/Log.h"
@@ -14,6 +14,7 @@ namespace Dive
 		m_colorSpecIntensity(nullptr),
 		m_normal(nullptr),
 		m_specPower(nullptr),
+		m_dpethStencilReadOnly(nullptr),
 		m_width(0),
 		m_height(0)
 	{
@@ -40,9 +41,17 @@ namespace Dive
 
 		Clear();
 
-		m_colorSpecIntensity	= new Texture2D(m_context, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, "ColorSpecularIntensity");
-		m_normal				= new Texture2D(m_context, width, height, DXGI_FORMAT_R11G11B10_FLOAT, "Normal");
-		m_specPower				= new Texture2D(m_context, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, "SpecPower");
+		m_colorSpecIntensity = new Dive_Texture(m_context);
+		m_colorSpecIntensity->CreateRenderTexture(width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+		m_normal = new Dive_Texture(m_context);
+		m_normal->CreateRenderTexture(width, height, DXGI_FORMAT_R11G11B10_FLOAT);
+
+		m_specPower = new Dive_Texture(m_context);
+		m_specPower->CreateRenderTexture(width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
+
+		m_dpethStencilReadOnly = new Dive_Texture(m_context);
+		m_dpethStencilReadOnly->CreateDepthStencilTexture(width, height, DXGI_FORMAT_R24G8_TYPELESS, true);
 
 		// cbuffer ±îÁö...
 
@@ -54,6 +63,7 @@ namespace Dive
 	
 	void GBuffer::Clear()
 	{
+		SAFE_DELETE(m_dpethStencilReadOnly);
 		SAFE_DELETE(m_specPower);
 		SAFE_DELETE(m_normal);
 		SAFE_DELETE(m_colorSpecIntensity);

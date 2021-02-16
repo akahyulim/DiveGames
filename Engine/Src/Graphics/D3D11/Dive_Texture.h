@@ -13,23 +13,37 @@ namespace Dive
 		bool SaveToFile(const std::string& filepath) override;
 		bool LoadFromFile(const std::string& filepath) override;
 
-		bool CreateRenderTexture(unsigned int width, unsigned int height, DXGI_FORMAT format, std::string name = "");
-		bool CreateDepthStencilTexture(unsigned int width, unsigned int height, DXGI_FORMAT format, bool readOnly = false, std::string name = "");
-		bool CreateCubeTexture(unsigned int width, unsigned int height, DXGI_FORMAT format, std::string name = "");
-		// LoadFile의 mipmap을 생성하려면 랩핑 함수를 만들어야 한다.
-		// 그런데 mipmap을 만든다는 것 자체가 외부 파일 로딩할 때 아닌가?
-		// 일단 ImageImporter로 넘기자.
-		// => 흐음.. 좀 더 생각해봐야 할듯
-		// 예를 들면 수면, 거울 등의 텍스쳐를 만들 때 RenderTargetView로 그리고 mipmap으로 적용하지 않으려나...
-		// 그렇다면 위의 것들 전부가 적용 여부를 받아야 하는데...
+		bool CreateRenderTexture(unsigned int width, unsigned height, DXGI_FORMAT format, bool generateMipmaps = false);
+		bool CreateDepthStencilTexture(unsigned int width, unsigned height, DXGI_FORMAT format, bool readOnly = false);
+		bool CreateCubeTexture(unsigned int width, unsigned height, DXGI_FORMAT format);
+
+		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_shaderResourceView; }
+		ID3D11DepthStencilView* GetDepthStencilView() const		{ return m_depthStencilView; }
+		ID3D11RenderTargetView* GetRenderTargetView() const		{ return m_renderTargetView; }
+
+		unsigned int GetWidth() const { return m_width; }
+		unsigned int GetHeight() const { return m_height; }
+		D3D11_VIEWPORT GetViewport() const { return m_viewport; }
+
+		void PrintTextureInfo();
 
 	private:
+		bool createTexture2D(bool generateMipmaps = false);
+		bool createShaderResourceView();
+		bool createRenderTargetView();
+		bool createDepthStencilView(bool readOnly = false);
+
+		DXGI_FORMAT getShaderResourceViewFormat();
+		DXGI_FORMAT getDepthStencilViewFormat();
+
+		void setViewport();
 
 	private:
 		ID3D11Device* m_device;
 		ID3D11ShaderResourceView* m_shaderResourceView;
 		ID3D11DepthStencilView* m_depthStencilView;
 		ID3D11RenderTargetView* m_renderTargetView;
+		ID3D11Texture2D* m_texture;
 
 		unsigned int m_width;
 		unsigned int m_height;
@@ -39,5 +53,11 @@ namespace Dive
 
 		DXGI_FORMAT m_format;
 
+		std::vector<std::vector<std::byte>> m_data;
+
+		D3D11_VIEWPORT m_viewport;
+
+		std::array<ID3D11DepthStencilView*, 6> m_depthStencilViews;
+		std::array<ID3D11RenderTargetView*, 6> m_renderTargetViews;
 	};
 }

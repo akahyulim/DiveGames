@@ -14,7 +14,7 @@ namespace Dive
 	class Sampler;
 	class Shader;
 	class ConstantBuffer;
-	class Texture2D;
+	class Dive_Texture;
 
 	struct DISPLAY_MODE
 	{
@@ -72,7 +72,7 @@ namespace Dive
 		void ResizeResolution(DirectX::XMUINT2 size = DirectX::XMUINT2(0, 0));
 
 		// RenderTargets
-		Texture2D* GetRenderTexture(eRenderTextureType type) { return m_renderTextures[type].get(); }
+		Dive_Texture* GetRenderTexture(eRenderTextureType type) { return m_renderTextures[type].get(); }
 		DirectX::XMUINT2 GetTextureSize() const { return m_textureSize; }
 		void ResizeTextures(const DirectX::XMUINT2& size);
 
@@ -140,7 +140,7 @@ namespace Dive
 		std::shared_ptr<Sampler> m_samplerTrilinearClamp;
 		std::shared_ptr<Sampler> m_samplerAnisotropicWrap;
 
-		std::unordered_map<eRenderTextureType, std::shared_ptr<Texture2D>> m_renderTextures;
+		std::unordered_map<eRenderTextureType, std::shared_ptr<Dive_Texture>> m_renderTextures;
 
 		std::unordered_map<eRenderShaderType, std::shared_ptr<Shader>> m_shaders;
 		Shader* m_baseShader;

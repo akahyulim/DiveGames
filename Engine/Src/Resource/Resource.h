@@ -6,6 +6,7 @@ namespace Dive
 {
 	class Context;
 
+	// RenderTargetTexture, DepthStencilTexture, CubeTexture·Î º¯°æ?
 	enum class eResourceType
 	{
 		UnKnown,

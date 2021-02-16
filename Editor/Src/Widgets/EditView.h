@@ -16,5 +16,5 @@ private:
 
 private:
 	Graphics* m_graphics;
-	Texture2D* m_texture;
+	Dive_Texture* m_texture;
 };

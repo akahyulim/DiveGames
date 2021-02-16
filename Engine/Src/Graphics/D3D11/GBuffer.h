@@ -4,7 +4,7 @@
 namespace Dive
 {
 	class ConstantBuffer;
-	class Texture2D;
+	class Dive_Texture;
 	class DepthStencilState;
 
 	class GBuffer : public Object
@@ -26,6 +26,8 @@ namespace Dive
 		// color sepc intensity rendertargetview
 		// depth stencil view 2개
 		// 각각의 shader resource view
+
+
 		unsigned int GetWidth() const	{ return m_width; }
 		unsigned int GetHeight() const	{ return m_height; }
 
@@ -34,9 +36,10 @@ namespace Dive
 		ConstantBuffer* m_constantBuffer;
 		
 		// texture2d
-		Texture2D* m_colorSpecIntensity;
-		Texture2D* m_normal;
-		Texture2D* m_specPower;
+		Dive_Texture* m_colorSpecIntensity;
+		Dive_Texture* m_normal;
+		Dive_Texture* m_specPower;
+		Dive_Texture* m_dpethStencilReadOnly;
 		// depth stencil 2개다. => 일단 하나만...
 
 		// depth stencil을 모두 사용한다. 
