@@ -9,7 +9,7 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
 	class ConstantBuffer;
-	class Texture2D;
+	class Dive_Texture;
 
 	// 이걸 누가 가져야 할까?
 	class Command : public Object
@@ -23,7 +23,9 @@ namespace Dive
 		bool SetPipelineState(const PipelineState& state);
 
 		// 스파르탄은 unordered access view와 depth stencil view도 이 하나의 함수로 초기화했다.
-		void ClearRenderTarget(Texture2D* texture, DirectX::XMFLOAT4 color);
+		void ClearRenderTarget(Dive_Texture* texture, DirectX::XMFLOAT4 color);
+		// 흐음... 기본 RenderTarget은 이게 맞다.
+		void ClearRenderTarget(ID3D11RenderTargetView* rtv, DirectX::XMFLOAT4 color);
 
 		// buffers
 		void SetVertexBuffer(VertexBuffer* buffer, unsigned int offset = 0);

@@ -8,7 +8,10 @@
 namespace Dive
 {
 	Dive_Texture::Dive_Texture(Context * context)
-		: Resource(context)
+		: Resource(context),
+		m_shaderResourceView(nullptr),
+		m_renderTargetView(nullptr),
+		m_depthStencilView(nullptr)
 	{
 		m_bindFlags = 0;
 
@@ -30,15 +33,40 @@ namespace Dive
 		return false;
 	}
 	
+	// 오직 Engine Format만 다룬다.
+	// 따라서 Mipmap 생성은 직접하지 않는다.
 	bool Dive_Texture::LoadFromFile(const std::string & filepath)
 	{
-		// 오직 Engine Format만 다룬다.
-		// 따라서 Mipmap 생성은 직접하지 않는다.
+		// 엔진 포멧 확인
+		{
 
-		// 여기서도 Texture2D, ShaderResourceView, RenderTargetView를 생성한다.
-		// 따라서 데이터를 전달받아 생성하는 함수도 생각해야 한다.
+		}
 
-		return false;
+		// file을 읽어 data 저장
+		{
+
+		}
+
+		// data의 종류에 따라 Texture2D, ShaderResourceView, RenderTargetView 또는 Cube Texture 생성
+		// data(eResourceType??)를 참조하여 CreateRenderTexture 혹은 CreateCubeTexture를 호출하는 것이 가장 이상적
+		// 하지만  현재 구현상황에서는 직접 Texture와 View를 생성해야 한다.
+
+		// Texture2D
+		{
+			// mipmap data를 직접 가지고 있을 수 있다.
+			// CreateRenderTexture가 아니라 직접 멤버 변수를 세팅한 후 View 생성 함수를 호출해야 한다.
+
+			if (!createTexture2D())				return false;
+			if (!createShaderResourceView())	return false;
+			if (!createRenderTargetView())		return false;	// depthStencilView도 파일에 저장한 걸 읽을 수 있을 것 같은데...
+		}
+		// Cube Texture
+		{
+			// array data를 가진다.
+			// mipmap data도 가질 수 있다.
+		}
+
+		return true;
 	}
 	
 	bool Dive_Texture::CreateRenderTexture(unsigned int width, unsigned height, DXGI_FORMAT format, bool generateMipmaps)
@@ -52,21 +80,22 @@ namespace Dive
 
 		setViewport();
 
-		if (!createTexture2D(generateMipmaps))
+		if (!createTexture2D(generateMipmaps))	return false;
+		if (!createShaderResourceView())		return false;
+		if (!createRenderTargetView())			return false;
+		
+
+		if (generateMipmaps)
 		{
-			return false;
+			auto deviceContext = GetSubsystem<Graphics>()->GetRHIContext();
+			deviceContext->GenerateMips(m_shaderResourceView);
+			
+			D3D11_TEXTURE2D_DESC desc;
+			m_texture->GetDesc(&desc);
+			m_mipLevels = desc.MipLevels;
 		}
 
-		if (!createShaderResourceView())
-		{
-			return false;
-		}
-
-		if (!createRenderTargetView())
-		{
-			return false;
-		}
-
+		m_data.clear();
 		SAFE_RELEASE(m_texture);
 
 		return true;
@@ -82,24 +111,13 @@ namespace Dive
 		m_arraySize = 1;
 		m_mipLevels = 1;
 		m_format	= format;
-		m_bindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;	// depth 일수도 있다..
+		m_bindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
 
 		setViewport();
 
-		if (!createTexture2D())
-		{
-			return false;
-		}
-
-		if (!createShaderResourceView())
-		{
-			return false;
-		}
-
-		if (!createDepthStencilView(readOnly))
-		{
-			return false;
-		}
+		if (!createTexture2D())					return false;
+		if (!createShaderResourceView())		return false;
+		if (!createDepthStencilView(readOnly))	return false;
 
 		SAFE_RELEASE(m_texture);
 
@@ -108,12 +126,12 @@ namespace Dive
 
 	bool Dive_Texture::CreateCubeTexture(unsigned int width, unsigned height, DXGI_FORMAT format)
 	{
-		m_width = width;
-		m_height = height;
+		m_width		= width;
+		m_height	= height;
 		m_arraySize = 6;
 		m_mipLevels = 1;
-		m_format = format;
-		m_bindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+		m_format	= format;
+		m_bindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;	// depth stencil 일수도 있다. 근데 어따 쓰는지는 모르겠다.
 
 		setViewport();
 
@@ -133,13 +151,14 @@ namespace Dive
 			D3D11_TEXTURE2D_DESC desc;
 			static_cast<ID3D11Texture2D*>(resource)->GetDesc(&desc);
 
-			CORE_TRACE("{0:d} x {1:d}, {2:d}", desc.Width, desc.Height, desc.MipLevels);
+			CORE_TRACE("{0:d} x {1:d}, {2:d} : {3:d}", desc.Width, desc.Height, desc.MipLevels, m_mipLevels);
 
 			// mipmap별로 접근할 순 없나? 크기 확인도 할 겸...
 		}
 	}
 
 	// load to file에서 mipmap 개수는 정해져 있으므로, 오버 라이드 해야 한다.
+	// 일단 Texture Array는 지원하지 않는다.
 	bool Dive_Texture::createTexture2D(bool generateMipmaps)
 	{
 		D3D11_TEXTURE2D_DESC desc;
@@ -147,20 +166,34 @@ namespace Dive
 		desc.Width				= m_width;
 		desc.Height				= m_height;
 		desc.Format				= m_format;
-		desc.Usage				= D3D11_USAGE_DEFAULT;	// 나중에 고쳐야 한다.
+		desc.Usage				= m_data.empty() ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
 		desc.BindFlags			= m_bindFlags;
-		desc.MipLevels			= m_mipLevels;		// 만들어지던 말던 최대 개수로 저장된다. 이를 다시 멤버 변수로 저장할 필요도 있다.
+		desc.MipLevels			= m_mipLevels;
 		desc.ArraySize			= m_arraySize;
 		desc.SampleDesc.Count	= 1;
 		desc.SampleDesc.Quality = 0;
-		desc.MiscFlags			= generateMipmaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+		desc.MiscFlags			= (m_mipLevels == 0 && generateMipmaps) ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 		desc.CPUAccessFlags		= 0;
 
-		if (FAILED(m_device->CreateTexture2D(&desc, nullptr, &m_texture)))
+		std::vector<D3D11_SUBRESOURCE_DATA> datas;
+		if (m_mipLevels > 1)
+		{
+			for (unsigned int i = 0; i < m_mipLevels; i++)
+			{
+				D3D11_SUBRESOURCE_DATA& data	= datas.emplace_back(D3D11_SUBRESOURCE_DATA{});
+				data.pSysMem					= i < m_data.size() ? m_data[i].data() : nullptr;
+				data.SysMemPitch;	// data load시 pitch만 계산하면 되지 않을까?
+				data.SysMemSlicePitch			= 0;
+			}
+		}
+
+		if (FAILED(m_device->CreateTexture2D(&desc, datas.empty()? nullptr : datas.data(), &m_texture)))
 		{
 			CORE_ERROR("");
 			return false;
 		}
+
+		// 생성 후에는 m_data도 필요없다.
 
 		return true;
 	}
@@ -177,14 +210,6 @@ namespace Dive
 		{
 			CORE_ERROR("");
 			return false;
-		}
-
-		// 음... 이걸 언제 갱신하지?
-		if (m_mipLevels == 0)
-		{
-			auto deviceContext = GetSubsystem<Graphics>()->GetRHIContext();
-			// 실제로 만들어졌는지 확인할 수가 없다.
-			deviceContext->GenerateMips(m_shaderResourceView);
 		}
 
 		return true;

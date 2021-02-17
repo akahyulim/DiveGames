@@ -1,6 +1,8 @@
 #pragma once
 #include "Widget.h"
 
+namespace Dive { class EditorRenderer; }
+
 using namespace Dive;
 
 class EditView : public Widget
@@ -16,5 +18,7 @@ private:
 
 private:
 	Graphics* m_graphics;
+	EditorRenderer* m_renderer;
+	
 	Dive_Texture* m_texture;
 };

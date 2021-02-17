@@ -1,4 +1,5 @@
 #include "Editor.h"
+#include "EditorRenderer.h"
 #include "ImGUI/imgui.h"
 #include "ImGui/imgui_internal.h"
 #include "ImGui/imgui_impl_win32.h"
@@ -54,7 +55,7 @@ bool Editor::Initialize()
 		return true;
 
 	m_context->RegisterSubsystem<Graphics>();
-	m_context->RegisterSubsystem<Renderer>();
+	m_context->RegisterSubsystem<EditorRenderer>();
 
 	//= Graphics & Renderer
 	auto graphics = m_context->GetSubsystem<Graphics>();
@@ -65,7 +66,7 @@ bool Editor::Initialize()
 	graphics->GetWindow()->Show(true);
 	graphics->SetWindowSubclassing((LONG_PTR)&EditorWndProc);
 
-	auto renderer = m_context->GetSubsystem<Renderer>();
+	auto renderer = m_context->GetSubsystem<EditorRenderer>();
 	renderer->Initialize();
 
 	// ImGUI
@@ -131,7 +132,7 @@ void Editor::Render()
 		return;
 	}
 
-	auto renderer = m_context->GetSubsystem<Renderer>();
+	auto renderer = m_context->GetSubsystem<EditorRenderer>();
 	renderer->Render();
 	// UI Render
 

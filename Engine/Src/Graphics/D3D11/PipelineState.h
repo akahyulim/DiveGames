@@ -7,7 +7,7 @@ namespace Dive
 	class DepthStencilState;
 	class BlendState;
 	class RasterizerState;
-	class Texture2D;
+	class Dive_Texture;
 	// sampler는 왜인지 모르겠지만 Data같다.
 
 	// 두 번 이상 사용된다면 미리 생성해 놓는것도 나쁘지 않을 것 같다.
@@ -28,8 +28,8 @@ namespace Dive
 		D3D11_VIEWPORT viewport;
 		
 		ID3D11RenderTargetView* swapChainRenderTargetView = nullptr;
-		Texture2D* depthStencilTexture = nullptr;			// 따로 구분했다.
-		std::vector<Texture2D*> renderTargets;				// 최대 8장이다.
+		Dive_Texture* depthStencilTexture = nullptr;			// 따로 구분했다.
+		std::vector<Dive_Texture*> renderTargets;				// 최대 8장이다.
 
 	};
 }

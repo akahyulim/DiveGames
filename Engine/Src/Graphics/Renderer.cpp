@@ -17,6 +17,7 @@
 #include "D3D11/Command.h"
 #include "D3D11/VertexBuffer.h"
 #include "D3D11/IndexBuffer.h"
+#include "D3D11/GBuffer.h"
 #include "Scene/GameObject.h"
 #include "Scene/SceneEvents.h"
 #include "Scene/Components/Camera.h"
@@ -56,25 +57,19 @@ namespace Dive
 		m_bInitialized = true;
 	}
 
+
+	// 역시 삼각형부터 그리고 텍스쳐를 붙이면서 확장시켜 나가는 게 맞는 것 같다.
 	void Renderer::Render()
 	{
-		if (!m_selectedCamera)
-		{
-			// 현재 텍스쳐가 없다.
-			//m_command->ClearRenderTarget(m_graphics->GetRenderTexture(eRenderTextureType::EditorView),
-			//	DirectX::XMFLOAT4(0.5f, 0.5f, 0.0f, 1.0f));
+		if (!m_selectedCamera)	return;
 
-			return;
-		}
-
-		// 이 부분은 일단 아래의 분류 함수에 종속적이다.
+		// 빛이 없으면 안보인다는 설정?
 		if (m_gameObjects[eRenderableObjectType::Light].empty())
 		{
 			// 스카이 박스를 적용할 수 있다. 이건 Scene의 Skybox와는 별개이다.
 
-			// 역시 현재 텍스쳐가 없다.
-			//m_command->ClearRenderTarget(m_graphics->GetRenderTexture(eRenderTextureType::EditorView),
-			//	m_selectedCamera->GetComponent<Camera>()->GetBackgroundColor());
+			m_command->ClearRenderTarget(m_graphics->GetRenderTargetView(),
+				m_selectedCamera->GetComponent<Camera>()->GetBackgroundColor());
 
 			return;
 		}

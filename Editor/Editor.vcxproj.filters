@@ -43,6 +43,9 @@
     <ClCompile Include="Src\Importer\ImageImporter.cpp">
       <Filter>Src\Importer</Filter>
     </ClCompile>
+    <ClCompile Include="Src\EditorRenderer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\ImGUI\imconfig.h">
@@ -95,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="Src\Importer\ImageImporter.h">
       <Filter>Src\Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\EditorRenderer.h">
+      <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

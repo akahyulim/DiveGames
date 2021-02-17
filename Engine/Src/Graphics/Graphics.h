@@ -15,6 +15,7 @@ namespace Dive
 	class Shader;
 	class ConstantBuffer;
 	class Dive_Texture;
+	class GBuffer;
 
 	struct DISPLAY_MODE
 	{
@@ -70,6 +71,7 @@ namespace Dive
 		DirectX::XMUINT2 GetResolution() const;
 		void SetResolution(DirectX::XMUINT2 size, bool force);
 		void ResizeResolution(DirectX::XMUINT2 size = DirectX::XMUINT2(0, 0));
+		ID3D11RenderTargetView* GetRenderTargetView(); 	// 이름 변경 필요?
 
 		// RenderTargets
 		Dive_Texture* GetRenderTexture(eRenderTextureType type) { return m_renderTextures[type].get(); }
@@ -88,6 +90,8 @@ namespace Dive
 		BlendState* GetBlendState(eBlendState state);
 		DepthStencilState* GetDepthStencilState(bool enabled);
 		Sampler* GetSampler(eSamplerType type);
+
+		GBuffer* GetGBuffer() const { return m_gbuffer.get(); }
 
 	private:
 		Graphics(const Graphics&)				= delete;
@@ -139,6 +143,8 @@ namespace Dive
 		std::shared_ptr<Sampler> m_samplerBilinearWrap;
 		std::shared_ptr<Sampler> m_samplerTrilinearClamp;
 		std::shared_ptr<Sampler> m_samplerAnisotropicWrap;
+
+		std::shared_ptr<GBuffer> m_gbuffer;
 
 		std::unordered_map<eRenderTextureType, std::shared_ptr<Dive_Texture>> m_renderTextures;
 

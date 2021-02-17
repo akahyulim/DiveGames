@@ -12,6 +12,7 @@
 #include "D3D11/Shader.h"
 #include "D3D11/Dive_Texture.h"
 #include "D3D11/ConstantBuffer.h"
+#include "D3D11/GBuffer.h"
 
 
 namespace Dive
@@ -105,6 +106,11 @@ namespace Dive
 			return;
 
 		m_deviceAndSwapChain->ResizeBuffer(size);
+	}
+
+	ID3D11RenderTargetView * Graphics::GetRenderTargetView()
+	{
+		return m_deviceAndSwapChain->GetRenderTargetView();
 	}
 
 	// 생성함수로 보기에는 이름이 애매하다.
@@ -249,6 +255,10 @@ namespace Dive
 			return false;
 
 		if (!createConstantBuffer())
+			return false;
+
+		m_gbuffer = std::make_shared<GBuffer>(m_context);
+		if (!m_gbuffer->Initialize(m_textureSize.x, m_textureSize.y))
 			return false;
 
 		return true;

@@ -44,6 +44,7 @@
 //#include "Graphics/D3D11/Texture.h"
 //#include "Graphics/D3D11/Texture2D.h"
 #include "Graphics/D3D11/Dive_Texture.h"
+#include "Graphics/D3D11/Command.h"
 #include "Graphics/GraphicsEnums.h"
 #include "Graphics/DeviceAndSwapChain.h"
 #include "Graphics/VertexTypes.h"

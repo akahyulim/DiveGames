@@ -1,9 +1,10 @@
 #include "EditView.h"
-
+#include "../EditorRenderer.h"
 
 EditView::EditView(Editor * editor)
 	: Widget(editor),
 	m_graphics(nullptr),
+	m_renderer(nullptr),
 	m_texture(nullptr)
 {
 	m_title = "Edit View";
@@ -12,6 +13,7 @@ EditView::EditView(Editor * editor)
 	m_padding = DirectX::XMFLOAT2(4.0f, 4.0f);
 
 	m_graphics = m_editor->GetContext()->GetSubsystem<Graphics>().get();
+	m_renderer = m_editor->GetContext()->GetSubsystem<EditorRenderer>().get();
 }
 
 EditView::~EditView()
@@ -34,7 +36,8 @@ void EditView::drawTexture(float deltaTime)
 	width -= (width % 2 != 0) ? 1 : 0;
 	height -= (height % 2 != 0) ? 1 : 0;
 
-	m_texture = m_graphics->GetRenderTexture(eRenderTextureType::EditorView);
+	//m_texture = m_graphics->GetRenderTexture(eRenderTextureType::EditorView);
+	m_texture = m_renderer->GetRenderTarget();
 
 	if (m_texture)
 	{
@@ -42,11 +45,11 @@ void EditView::drawTexture(float deltaTime)
 		{
 			//if (m_tickCount >= 0.250f)
 			{
-				//m_pRenderer->ResizeRenderTextures(width, height);
-				m_graphics->ResizeTextures(DirectX::XMUINT2(width, height));
+				//m_graphics->ResizeTextures(DirectX::XMUINT2(width, height));
+				m_renderer->ResizeRenderTarget(width, height);
 				// Resize 과정에서 Texture를 재생성하므로 포인터를 다시 받아줘야 한다.
-				m_texture = m_graphics->GetRenderTexture(eRenderTextureType::EditorView);
-				//m_pTexView = m_pRenderer->GetRenderTextures(Dive::eRenderTargetType::Composition);
+				//m_texture = m_graphics->GetRenderTexture(eRenderTextureType::EditorView);
+				m_texture = m_renderer->GetRenderTarget();
 				//m_tickCount = 0.0f;
 			}
 			//m_tickCount += deltaTime;

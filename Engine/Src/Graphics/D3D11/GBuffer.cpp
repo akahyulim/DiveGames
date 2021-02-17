@@ -39,7 +39,7 @@ namespace Dive
 			return true;
 		}
 
-		Clear();
+		//Clear();
 
 		m_colorSpecIntensity = new Dive_Texture(m_context);
 		m_colorSpecIntensity->CreateRenderTexture(width, height, DXGI_FORMAT_R8G8B8A8_UNORM);

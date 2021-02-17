@@ -67,8 +67,8 @@ bool Sandbox::createTriangle()
 	// test texture
 	{
 		Dive_Texture tex(m_engine->GetContext());
-		tex.CreateRenderTexture(800, 600, DXGI_FORMAT_R32G32B32A32_FLOAT);
-		//tex.CreateDepthStencilTexture(800, 600, DXGI_FORMAT_R24G8_TYPELESS);
+		//tex.CreateRenderTexture(800, 600, DXGI_FORMAT_R32G32B32A32_FLOAT);
+		tex.CreateDepthStencilTexture(800, 600, DXGI_FORMAT_R24G8_TYPELESS);
 		tex.PrintTextureInfo();
 	}
 

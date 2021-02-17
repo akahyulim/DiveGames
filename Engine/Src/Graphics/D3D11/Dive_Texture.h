@@ -25,6 +25,11 @@ namespace Dive
 		unsigned int GetHeight() const { return m_height; }
 		D3D11_VIEWPORT GetViewport() const { return m_viewport; }
 
+		// Engine Format만 지원한다면
+		// 외부 Format에서 data를 받아오는 함수가 필요하다.
+		// 그런데 이렇게 하면 Import가 load한 후 다시 save하고 load해야 사용할 수 있다...
+		// 스파르탄 역시 함수를 통해 data를 받았다.
+
 		void PrintTextureInfo();
 
 	private:
@@ -40,16 +45,20 @@ namespace Dive
 
 	private:
 		ID3D11Device* m_device;
+		ID3D11Texture2D* m_texture;
 		ID3D11ShaderResourceView* m_shaderResourceView;
+
+		// 얘네들을 어떻게 해야 할까...
 		ID3D11DepthStencilView* m_depthStencilView;
 		ID3D11RenderTargetView* m_renderTargetView;
-		ID3D11Texture2D* m_texture;
+		
 
 		unsigned int m_width;
 		unsigned int m_height;
 		unsigned int m_arraySize;
 		unsigned int m_mipLevels;
 		unsigned int m_bindFlags;
+		//unsigned int m_pitch;
 
 		DXGI_FORMAT m_format;
 

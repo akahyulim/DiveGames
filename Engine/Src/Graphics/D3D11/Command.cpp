@@ -7,7 +7,7 @@
 #include "DepthStencilState.h"
 #include "RasterizerState.h"
 #include "Shader.h"
-#include "Texture2D.h"
+#include "Dive_Texture.h"
 #include "Graphics/Graphics.h"
 #include "Core/Context.h"
 #include "Core/Log.h"
@@ -165,7 +165,7 @@ namespace Dive
 	}
 
 	// 그러고보니 이건 데이터가 아닌데 함수화? 데이터인가?
-	void Command::ClearRenderTarget(Texture2D * texture, DirectX::XMFLOAT4 color)
+	void Command::ClearRenderTarget(Dive_Texture * texture, DirectX::XMFLOAT4 color)
 	{
 		if (!texture || !texture->GetRenderTargetView())
 		{
@@ -184,6 +184,27 @@ namespace Dive
 		// 등록이 아니라 클리어이므로 이전것과 비교가 필요없다.
 		float clearColor[4]{ color.x, color.y, color.z, color.w };
 		immediateContext->ClearRenderTargetView(texture->GetRenderTargetView(), clearColor);
+	}
+
+	void Command::ClearRenderTarget(ID3D11RenderTargetView * rtv, DirectX::XMFLOAT4 color)
+	{
+		if (!rtv)
+		{
+			CORE_ERROR("texture 없어");
+			return;
+		}
+
+		// 에바?
+		auto immediateContext = m_context->GetSubsystem<Graphics>()->GetRHIContext();
+		if (!immediateContext)
+		{
+			CORE_ERROR("");
+			return;
+		}
+
+		// 등록이 아니라 클리어이므로 이전것과 비교가 필요없다.
+		float clearColor[4]{ color.x, color.y, color.z, color.w };
+		immediateContext->ClearRenderTargetView(rtv, clearColor);
 	}
 	
 	void Command::SetVertexBuffer(VertexBuffer * buffer, unsigned int offset)

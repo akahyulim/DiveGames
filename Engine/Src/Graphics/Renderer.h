@@ -30,18 +30,18 @@ namespace Dive
 		Renderer(Context* context);
 		~Renderer();
 
-		void Initialize();
-		void Render();
+		virtual void Initialize();
+		virtual void Render();
 
 		bool IsInitialized() const { return m_bInitialized; }
 
 		void OnAcquireRenderable(const E_UPDATE_SCENE* evnt);
 
-	private:
+	protected:
 		void pass_GBuffer();
 		void pass_Lighting();
 
-	private:
+	protected:
 		Graphics* m_graphics;
 		ID3D11DeviceContext* m_deviceContext;
 
