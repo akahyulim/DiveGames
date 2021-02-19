@@ -10,9 +10,7 @@ namespace Dive
 	class Dive_Texture;
 	// sampler는 왜인지 모르겠지만 Data같다.
 
-	// 두 번 이상 사용된다면 미리 생성해 놓는것도 나쁘지 않을 것 같다.
-	// 그럴땐 Object를 상속하는 Class로 만들어 고유 hash를 가지게 하여 이전 State와의 비교를 통해 Command에 중복 등록을 회피할 수 있다.
-	// 멤버 객체들의 사용 여부를 확인하는 invalid()가 필요할 수 있다. 이때 역시 class가 어울린다.
+	// Spratan 기준으로 Buffer(Vertex, Index)와 Model Texture를 제외하곤 전부  State이다.
 	struct PipelineState
 	{
 		PipelineState()		= default;
@@ -29,7 +27,7 @@ namespace Dive
 		
 		ID3D11RenderTargetView* swapChainRenderTargetView = nullptr;
 		Dive_Texture* depthStencilTexture = nullptr;			// 따로 구분했다.
-		std::vector<Dive_Texture*> renderTargets;				// 최대 8장이다.
+		std::vector<Dive_Texture*> renderTargets;				// 최대 8장이다. 이게 결국 GBuffer다.
 
 	};
 }

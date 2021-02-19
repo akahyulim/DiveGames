@@ -16,7 +16,6 @@ namespace Dive
 	public:
 		Material(Context* context)
 			: Resource(context),
-			m_shaderPass(eShaderPassType::Undefined),
 			m_constantBuffer(nullptr),
 			m_bDirty(true)
 		{
@@ -24,11 +23,7 @@ namespace Dive
 		}
 		~Material() = default;
 
-		eShaderPassType GetShaderPass() const		{ return m_shaderPass; }
-		void SetShaderPass(eShaderPassType type)	{ m_shaderPass = type; }
-
 	protected:
-		eShaderPassType m_shaderPass;
 		ConstantBuffer* m_constantBuffer;
 
 		bool m_bDirty;

@@ -14,7 +14,6 @@ namespace Dive
 		m_tiling(DirectX::XMFLOAT2(0.0f, 0.0f)),
 		m_offset(DirectX::XMFLOAT2(0.0f, 0.0f))
 	{
-		m_shaderPass	= eShaderPassType::Legacy;
 		m_renderingMode = eRenderingMode::Opaque;
 	}
 

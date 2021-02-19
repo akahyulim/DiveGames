@@ -142,6 +142,7 @@
     <ClInclude Include="Src\Graphics\D3D11\Texture2D.h" />
     <ClInclude Include="Src\Graphics\D3D11\TextureCube.h" />
     <ClInclude Include="Src\Graphics\D3D11\VertexBuffer.h" />
+    <ClInclude Include="Src\Graphics\Graphics_ConstantBuffers.h" />
     <ClInclude Include="Src\Graphics\Legacy.h" />
     <ClInclude Include="Src\Graphics\VertexTypes.h" />
     <ClInclude Include="Src\Graphics\DeviceAndSwapChain.h" />
@@ -152,6 +153,7 @@
     <ClInclude Include="Src\Graphics\Window.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
+    <ClInclude Include="Src\Resource\ResourceManager.h" />
     <ClInclude Include="Src\Scene\Components\Camera.h" />
     <ClInclude Include="Src\Scene\Components\Component.h" />
     <ClInclude Include="Src\Scene\Components\RenderableMesh.h" />
@@ -197,6 +199,7 @@
     <ClCompile Include="Src\Graphics\Renderer.cpp" />
     <ClCompile Include="Src\Graphics\Window.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
+    <ClCompile Include="Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="Src\Scene\Components\Camera.cpp" />
     <ClCompile Include="Src\Scene\Components\Component.cpp" />
     <ClCompile Include="Src\Scene\Components\RenderableMesh.cpp" />

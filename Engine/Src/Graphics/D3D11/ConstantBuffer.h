@@ -14,9 +14,14 @@ namespace Dive
 		DIVE_OBJECT(ConstantBuffer, Object);
 
 	public:
+		// dynamic 여부와 이름을 받는다.
+		// dx11에는 필요없다고 한다.
 		ConstantBuffer(Context* context);
 		~ConstantBuffer();
 
+		// offset count를 전달 받는다. 스왑체인버퍼 개수이다...
+		// 이 offset count와 m_strid(sizeof(T))가 size가 된다. 즉, 버퍼 크기를 계산하는 용도 외에는 쓸모 없다.
+		// 아래 구현 사항에는 변동이 없다.
 		template<typename T>
 		bool Create()
 		{
@@ -54,6 +59,8 @@ namespace Dive
 
 	private:
 		ID3D11Buffer* m_buffer = nullptr;
+
+		// offset index와 offse dynamic index라는걸 가진다.
 	};
 }
 

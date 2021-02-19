@@ -14,7 +14,6 @@ namespace Dive
 		Texture2D,
 		TextureCube,
 		Material,
-		MeshFilter,
 		Mesh,
 	};
 
@@ -35,6 +34,8 @@ namespace Dive
 		const std::string& GetResourceName()	const { return m_resourceName; }
 		const std::string& GetResourcePath()	const { return m_resourcePath; }
 		eResourceType GetResourceType()			const { return m_resourceType; }
+
+		void SetResourceName(const std::string& name) { m_resourceName = name; }
 
 	protected:
 		std::string m_resourceName;

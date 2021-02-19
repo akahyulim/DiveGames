@@ -124,6 +124,9 @@
     <ClCompile Include="Src\Graphics\D3D11\Dive_Texture.cpp">
       <Filter>Src\Graphic\D3D11</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Resource\ResourceManager.cpp">
+      <Filter>Src\Resource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
@@ -290,6 +293,12 @@
     </ClInclude>
     <ClInclude Include="Src\Graphics\D3D11\Dive_Texture.h">
       <Filter>Src\Graphic\D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\Graphics_ConstantBuffers.h">
+      <Filter>Src\Graphic</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Resource\ResourceManager.h">
+      <Filter>Src\Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

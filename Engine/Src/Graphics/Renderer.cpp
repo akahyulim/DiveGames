@@ -1,5 +1,6 @@
 #include "DivePch.h"
 #include "Renderer.h"
+#include "Graphics_ConstantBuffers.h"
 #include "GraphicsEnums.h"
 #include "Material.h"
 #include "Legacy.h"
@@ -20,6 +21,7 @@
 #include "D3D11/GBuffer.h"
 #include "Scene/GameObject.h"
 #include "Scene/SceneEvents.h"
+#include "Scene/Components/Transform.h"
 #include "Scene/Components/Camera.h"
 #include "Scene/Components/RenderableMesh.h"
 #include "Scene/Components/SkinnedRenderableMesh.h"
@@ -58,28 +60,22 @@ namespace Dive
 	}
 
 
-	// 역시 삼각형부터 그리고 텍스쳐를 붙이면서 확장시켜 나가는 게 맞는 것 같다.
 	void Renderer::Render()
 	{
 		if (!m_selectedCamera)	return;
 
-		// 빛이 없으면 안보인다는 설정?
-		if (m_gameObjects[eRenderableObjectType::Light].empty())
+		// Camera Color은 Skybox가 없는 경우?
 		{
-			// 스카이 박스를 적용할 수 있다. 이건 Scene의 Skybox와는 별개이다.
-
-			m_command->ClearRenderTarget(m_graphics->GetRenderTargetView(),
+			m_command->ClearRenderTarget(
+				m_graphics->GetRenderTargetView(),
 				m_selectedCamera->GetComponent<Camera>()->GetBackgroundColor());
-
-			return;
 		}
 
-		// constant buffer - 매 프레임 갱신
+		// Legacy Shading
 		{
-
+			pass_GBuffer();
+			pass_Lighting();
 		}
-
-		// 이하내용은 Shader별로 각종 Command의 조합으로 그린다.
 
 		// frame count ++
 	}
@@ -98,16 +94,16 @@ namespace Dive
 				m_gameObjects[eRenderableObjectType::Camera].push_back(gameObject.get());
 			}
 			
-			// Renderable이 Rigid, Skinned 두 개라 분류 과정 역시 두 번 진행해야 한다. => 이건 가능
-			// Material이 둘 이상일 경우 하나의 GameObject가 중복으로 분류될 수 있다. => Material별 Mesh로 분류? 그런데 Material != Shader이다.
-			// Shader가 다르다면 매 번 설정을 달리 해야 한다.
-			// => 결국 Shader와 Rendering Mode 둘 다 염두해서 나누어야 한다.
-			// 일단 1순위는 Rendering Mode일 듯 하다.
+			// Mesh 종류에 상관없이 RenderingMode로 구분해도 된다.
+			// 하지만 아래의 구현은 각각 구분토록 되어있다. 한 번에 하는 방법을 만들어야 한다.
+			// GameObject가 계층구조로 이루어져 있을 경우도 그냥 적용될 거 같긴한데...
+			/*
 			if (gameObject->HasComponent<RenderableMesh>())
 			{
+				// 이러면 안된다. Matrial은 하나씩 가지고 GameObject의 계층구조로 관리해야 한다.
 				for (const auto& material : gameObject->GetComponent<RenderableMesh>()->GetAllMaterial())
 				{
-					if (material->GetShaderPass() == eShaderPassType::Legacy)
+					//if (material->GetShaderPass() == eShaderPassType::Legacy)
 					{
 						switch (dynamic_cast<Legacy*>(material)->GetRenderingMode())
 						{
@@ -118,7 +114,7 @@ namespace Dive
 					}
 				}
 			}
-
+			*/
 			// light component 여부로 light 구분
 		}
 
@@ -126,25 +122,54 @@ namespace Dive
 		m_selectedCamera = m_gameObjects[eRenderableObjectType::Camera][0];
 	}
 
-	// 일단 RenderingMode로만 나누고 Shader는 그냥 Material에서 참조하여 계속 변하도록 해볼까?
-	// 추후 프로파일링을 통해 분석을 해보도록 하고 말야...
-	// 그런데 이러한 구현은 Command와 State의 효용성이 거의 없는데...
-	// 일단 Opaque만 적용
 	void Renderer::pass_GBuffer()
 	{
-		// GBuffer PreRender
-		// GBuffer RenderTargetView, DepthStencilView Clear
-		// GBuffer RenderTargetView, DepthStencilState Set
-		// => GBuffer Class를 만든 후 Graphics에서 관리토록 하면 된다.
+		// 이렇게 구현할 경우 초반에 가져와야할 객체가 많아진다.
+		// 예를 들자면 ContantBuffer, Smaplers. DepthStencilStates, RasterizerStates 등도 가져와야 한다.
+		// 아에 멤버 변수로 두는 방법도 있지만 Graphics에 너무 의존적이다.
+		auto gbuffer = m_graphics->GetGBuffer();
+		if (!gbuffer)	return;
+
+		// Pipeline State
+		{
+			PipelineState state;
+			// GBuffer PreRender
+			// 초기화
+			// render target으로 설정
+
+			// Shader를 공통으로 적용시키는게 맞겠지만
+			// 일반 Mesh와 SkinnedMesh는 Shader가 다르다.
+			// 그렇다면 이 과정을 두 번 구분하거나 이름 없는 함수로 구현하는게 맞을까?
+
+			// CBuffer는 일단 나도 간단하게(world, worldViewProj) 구성하여 이 곳에서 전달하자.
+			// 그런데 구조체 자체는 미리 선언되어 있고 생성 시켜야 한다.
+		}
 
 		// Renderable Render
-		// Shader, InputLayout, ConstantBuffer 관리 => ConstantBuffer는 Transform과 Material이 구분되어야 한다.
-		// Renderable Draw(Buffer, PrimitiveTopology) => 이건 Mesh 단위로 처리하는 게 나을 것 같은데...
+		for(auto gameObject : m_gameObjects[eRenderableObjectType::Opaque])
+		{
+			// 동일한 opaque라도 material의 Shader로 일치여부로 루프에서 제외(continue) 시킬 수 있다.
+			// 하지만 material이 둘 이상이라면 어떻게 해야 할까? => 이건 GameObject의 계층구조 문제이다.
 
-		// GBuffer PostRender
-		// GBuffer RenderTargetView의 내용을 파일화할 것인가
+			// constant buffer
+			{
+				auto cbObject = static_cast<CB_OBJECT*>(m_graphics->GetObjectContantBuffer()->Map());
+				if(!cbObject)
+				{
+					CORE_ERROR("");
+					return;
+				}
+				DirectX::XMStoreFloat4x4(&cbObject->world, gameObject->GetTransform()->GetMatrix());
+				DirectX::XMStoreFloat4x4(&cbObject->worldViewProjection, m_selectedCamera->GetComponent<Camera>()->GetViewProjectionMatrix());
+				m_graphics->GetObjectContantBuffer()->Unmap();
+			}
+
+			// 대상은 Material의 Texture와 Mesh의 Buffer
+			// 마지막에는 Draw
+		}
 	}
 	
+	// 매개변수의 유무로 RenderTarget을 달리 할 수 있을 것 같다.
 	void Renderer::pass_Lighting()
 	{
 		// BackBuffer RenderTargetView를 Set

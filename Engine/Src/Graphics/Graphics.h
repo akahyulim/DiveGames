@@ -74,24 +74,25 @@ namespace Dive
 		ID3D11RenderTargetView* GetRenderTargetView(); 	// 이름 변경 필요?
 
 		// RenderTargets
-		Dive_Texture* GetRenderTexture(eRenderTextureType type) { return m_renderTextures[type].get(); }
-		DirectX::XMUINT2 GetTextureSize() const { return m_textureSize; }
-		void ResizeTextures(const DirectX::XMUINT2& size);
+		//Dive_Texture* GetRenderTexture(eRenderTextureType type) { return m_renderTextures[type].get(); }
+		//DirectX::XMUINT2 GetTextureSize() const { return m_textureSize; }
+		//void ResizeTextures(const DirectX::XMUINT2& size);
 
 		std::shared_ptr<Window> GetWindow() const { return m_window; }
 		ID3D11Device* GetRHIDevice() const;
 		ID3D11DeviceContext* GetRHIContext() const;
 
 		// get
-		Shader* GetShader(eRenderShaderType type);
-		Shader* GetBaseShader() const { return m_baseShader; }
-		ConstantBuffer* GetConstantBuffer() const { return m_constantBuffer; }
+		Shader* GetShader(eRenderShaderType type) { return m_shaders[type].get(); }
 		RasterizerState* GetRasterizerState(eRasterizerState state);
 		BlendState* GetBlendState(eBlendState state);
 		DepthStencilState* GetDepthStencilState(bool enabled);
 		Sampler* GetSampler(eSamplerType type);
 
 		GBuffer* GetGBuffer() const { return m_gbuffer.get(); }
+
+		// constant buffers
+		ConstantBuffer* GetObjectContantBuffer() { return m_cbObject.get(); }
 
 	private:
 		Graphics(const Graphics&)				= delete;
@@ -106,8 +107,7 @@ namespace Dive
 		bool createSampels();
 		bool createShaders();
 		bool createTextures();
-		bool createBaseShader();
-		bool createConstantBuffer();
+		bool createConstantBuffers();
 
 	private:
 		std::shared_ptr<Window> m_window;
@@ -144,19 +144,11 @@ namespace Dive
 		std::shared_ptr<Sampler> m_samplerTrilinearClamp;
 		std::shared_ptr<Sampler> m_samplerAnisotropicWrap;
 
-		std::shared_ptr<GBuffer> m_gbuffer;
-
-		std::unordered_map<eRenderTextureType, std::shared_ptr<Dive_Texture>> m_renderTextures;
-
 		std::unordered_map<eRenderShaderType, std::shared_ptr<Shader>> m_shaders;
-		Shader* m_baseShader;
 
-		struct MatrixBuffer
-		{
-			DirectX::XMFLOAT4X4 world;
-			DirectX::XMFLOAT4X4 view;
-			DirectX::XMFLOAT4X4 proj;
-		};
-		ConstantBuffer* m_constantBuffer;
+		std::shared_ptr<ConstantBuffer> m_cbObject;
+
+		// 이렇게 관리할거면 다른 리소스들도 모으는게 더 깔끔하지 않을까?
+		std::shared_ptr<GBuffer> m_gbuffer;
 	};
 }

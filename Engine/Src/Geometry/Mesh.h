@@ -16,6 +16,7 @@ namespace Dive
 
 	// 결국 Command에서 Data는 얘인데...
 	// draw 함수를 이 곳에 만드는 건 어떨까?
+	// => 인터페이스 통일성을 유지하는 편이 나을 것 같다.
 	class Mesh : public Resource
 	{
 	public:
@@ -30,6 +31,14 @@ namespace Dive
 		// get & set
 		VertexBuffer* GetVertexBuffer() const	{ return m_vertexBuffer; }
 		IndexBuffer* GetIndexBuffer() const		{ return m_indexBuffer; }
+
+		eVertexType GetVertexType() const 
+		{
+			if (m_vertexBuffer)
+				return m_vertexBuffer->GetVertexType();
+
+			return eVertexType::Unknown;
+		}
 
 	private:
 		Mesh(const Mesh&)				= delete;

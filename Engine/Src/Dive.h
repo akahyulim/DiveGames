@@ -41,8 +41,6 @@
 #include "Graphics/D3D11/RasterizerState.h"
 #include "Graphics/D3D11/BlendState.h"
 #include "Graphics/D3D11/Sampler.h"
-//#include "Graphics/D3D11/Texture.h"
-//#include "Graphics/D3D11/Texture2D.h"
 #include "Graphics/D3D11/Dive_Texture.h"
 #include "Graphics/D3D11/Command.h"
 #include "Graphics/GraphicsEnums.h"
@@ -53,6 +51,11 @@
 #include "Graphics/Renderer.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Window.h"
+
+
+//= Resource ==============================================
+#include "Resource/Resource.h"
+#include "Resource/ResourceManager.h"
 
 
 //= Scene =================================================

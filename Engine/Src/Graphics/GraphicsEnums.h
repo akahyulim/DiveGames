@@ -14,14 +14,6 @@ namespace Dive
 		Windowed,
 	};
 
-	// Debug, UI 등도 추가될 수 있다.
-	enum class eShaderPassType
-	{
-		Legacy,
-		Light,
-		Undefined
-	};
-
 	enum class eRenderShaderType
 	{
 		Vertex_Color,

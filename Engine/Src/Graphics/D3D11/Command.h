@@ -23,6 +23,7 @@ namespace Dive
 		bool SetPipelineState(const PipelineState& state);
 
 		// 스파르탄은 unordered access view와 depth stencil view도 이 하나의 함수로 초기화했다.
+		// 직접 받지 않았다. State를 전달받은 후 초기화했다.
 		void ClearRenderTarget(Dive_Texture* texture, DirectX::XMFLOAT4 color);
 		// 흐음... 기본 RenderTarget은 이게 맞다.
 		void ClearRenderTarget(ID3D11RenderTargetView* rtv, DirectX::XMFLOAT4 color);

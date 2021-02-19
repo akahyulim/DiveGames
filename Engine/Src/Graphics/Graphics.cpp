@@ -136,6 +136,7 @@ namespace Dive
 		return m_window->ChangeWndProc(newProc);
 	}
 
+	/*
 	void Graphics::ResizeTextures(const DirectX::XMUINT2& size)
 	{
 		// 일단 지원하는 크기인지 확인한다.
@@ -151,6 +152,7 @@ namespace Dive
 
 		return;
 	}
+	*/
 
 	ID3D11Device * Graphics::GetRHIDevice() const
 	{
@@ -248,13 +250,10 @@ namespace Dive
 		if (!createSampels())
 			return false;
 
-		if(!createBaseShader())
-			return false;
-
 		if (!createTextures())
 			return false;
 
-		if (!createConstantBuffer())
+		if (!createConstantBuffers())
 			return false;
 
 		m_gbuffer = std::make_shared<GBuffer>(m_context);

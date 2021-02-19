@@ -19,13 +19,16 @@ namespace Dive
 
 		// mesh
 		Mesh* GetMesh() const		{ return m_mesh; }
+		// 아래와 같은 이유로 구분되어야 할 것 같다.
 		virtual bool SetMesh(Mesh* mesh);
 
 		// materials
-		unsigned int GetMaterialCount() const { return static_cast<unsigned int>(m_materials.size()); }
-		Material* GetMaterial(size_t index) const;
-		const std::vector<Material*>& GetAllMaterial() const { return m_materials; }
-		bool AddMaterial(Material* material);
+		Material* GetMaterial() { return m_material; }
+		// get은 파일로부터 생성하거나, 생성된 것을 가져와야 한다.
+		void SetMaterial(const std::string& filepath);
+		// 생성된 것이라 함은 테스트에서 구현한 것과 같이 코드 상에서 직접 만든 것이다.
+		// 따라서 이를 Cache에 넣으면서 파일화하는 작업이 필요하다.
+
 
 		// light & shadow
 
@@ -33,6 +36,6 @@ namespace Dive
 
 	protected:
 		Mesh* m_mesh;
-		std::vector<Material*> m_materials;
+		Material* m_material;
 	};
 }

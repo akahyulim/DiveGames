@@ -8,6 +8,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Renderer.h"
 #include "Input/Input.h"
+#include "Resource/ResourceManager.h"
 #include "Scene/Scene.h"
 
 
@@ -22,6 +23,7 @@ namespace Dive
 		m_context = new Context;
 		m_context->RegisterSubsystem<Time>();
 		m_context->RegisterSubsystem<Input>();
+		m_context->RegisterSubsystem<ResourceManager>();
 		m_context->RegisterSubsystem<Scene>();
 	}
 

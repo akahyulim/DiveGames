@@ -1,5 +1,6 @@
 #include "DivePch.h"
 #include "Graphics.h"
+#include "Graphics_ConstantBuffers.h"
 #include "Core/Log.h"
 #include "D3D11/DepthStencilState.h"
 #include "D3D11/BlendState.h"
@@ -83,61 +84,23 @@ namespace Dive
 
 	bool Graphics::createShaders()
 	{
-		return false;
+
+
+		return true;
 	}
 
 	bool Graphics::createTextures()
 	{
+		// 각종 RenderTarget과 DepthStencil View를 생성하는 함수 였으나
+		// 현재 GBuffer를 따로 만들었다.
 		
 		return true;
 	}
 
-	bool Graphics::createBaseShader()
+	bool Graphics::createConstantBuffers()
 	{
-		m_baseShader = new Shader(m_context);
-		if (!m_baseShader->CreateShader(eVertexType::PositionUvNormalTangent, L"../Assets/Shaders/baseShader.hlsl"))
-			return false;
-
-		return true;
-	}
-
-	// 원래는 생성한 후 update로 갱신시켜야 한다.
-	bool Graphics::createConstantBuffer()
-	{
-		m_constantBuffer = new ConstantBuffer(m_context);
-		if (!m_constantBuffer->Create<MatrixBuffer>())
-			return false;
-
-		// view
-		DirectX::XMMATRIX view;
-		//		{
-		DirectX::XMFLOAT3 pos, lookAt, up;
-		pos.x = 0.0f; pos.y = 0.0f; pos.z = -5.0f;
-		lookAt.x = 0.0f; lookAt.y = 0.0f; lookAt.z = 0.0f;
-		up.x = 0.0f, up.y = 1.0f; up.z = 0.0f;
-		DirectX::XMVECTOR vecPos, vecLookAt, vecUp;
-		vecPos = DirectX::XMLoadFloat3(&pos);
-		vecLookAt = DirectX::XMLoadFloat3(&lookAt);
-		vecUp = DirectX::XMLoadFloat3(&up);
-		view = DirectX::XMMatrixLookAtLH(vecPos, vecLookAt, vecUp);
-		//		}
-
-				// proj
-		DirectX::XMMATRIX proj;
-		//		{
-		float fieldOfView = 3.141592654f / 4.0f;
-		float screenAspect = (float)m_textureSize.x / (float)m_textureSize.y;
-		proj = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
-		//		}
-
-		auto ptr = static_cast<MatrixBuffer*>(m_constantBuffer->Map());
-		DirectX::XMStoreFloat4x4(&(ptr->world), DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity()));
-		//DirectX::XMStoreFloat4x4(&(ptr->view), DirectX::XMMatrixTranspose(DirectX::XMMatrixIdentity()));
-		DirectX::XMStoreFloat4x4(&(ptr->view), DirectX::XMMatrixTranspose(view));
-		DirectX::XMStoreFloat4x4(&(ptr->proj), DirectX::XMMatrixTranspose(proj));
-
-		if (!m_constantBuffer->Unmap())
-			return false;
+		m_cbObject = std::make_shared<ConstantBuffer>(m_context);
+		m_cbObject->Create<CB_OBJECT>();
 
 		return true;
 	}

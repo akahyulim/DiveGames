@@ -38,6 +38,10 @@ namespace Dive
 		DirectX::XMFLOAT4 GetBackgroundColor() const { return m_backgroundColor; }
 		void SetBackgroundColor(DirectX::XMFLOAT4 color) { m_backgroundColor = std::move(color); }
 
+		DirectX::XMMATRIX GetViewMatrix() const { return DirectX::XMLoadFloat4x4(&m_view); }
+		DirectX::XMMATRIX GetProjectionMatrix() const { return DirectX::XMLoadFloat4x4(&m_projection); }
+		DirectX::XMMATRIX GetViewProjectionMatrix() const { return GetViewMatrix() * GetProjectionMatrix(); }
+
 	private:
 		void computeViewMatrix();
 		void computeProjectionMatrix();

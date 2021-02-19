@@ -21,41 +21,22 @@ namespace Dive
 	
 	bool RenderableMesh::SetMesh(Mesh * mesh)
 	{
-		// 지원하는 type인지 확인해야 한다.
+		if (!mesh || mesh->GetVertexType() != eVertexType::PositionUvNormalTangent)
+		{
+			CORE_ERROR("존재하지 않거나 지원하지 않는 Mesh를 전달받았습니다..");
+			return false;
+		}
 
 		if (m_mesh && mesh)
 		{
 			if (m_mesh->GetID() == mesh->GetID())
 			{
-				CORE_ERROR("");
+				CORE_TRACE("동일한 ID({:d})의 Mesh를 전달받았습니다.", m_mesh->GetID());
 				return true;
 			}
 		}
 
 		m_mesh = mesh;
-
-		return true;
-	}
-
-	Material * RenderableMesh::GetMaterial(size_t index) const
-	{
-		if(m_materials.empty() || index >= m_materials.size())
-			return nullptr;
-
-		return m_materials[index];
-	}
-
-	bool RenderableMesh::AddMaterial(Material * material)
-	{
-		if(!material)	return false;
-
-		for (const auto& mat : m_materials)
-		{
-			if (mat->GetID() == material->GetID())
-				return false;
-		}
-
-		m_materials.emplace_back(material);
 
 		return true;
 	}
