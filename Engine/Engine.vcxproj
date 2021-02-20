@@ -112,6 +112,7 @@
     <ClInclude Include="Src\Core\EventSystem.h" />
     <ClInclude Include="Src\Engine\Application.h" />
     <ClInclude Include="Src\Core\Main.h" />
+    <ClInclude Include="Src\Geometry\Dive_Mesh.h" />
     <ClInclude Include="Src\Geometry\Frustum.h" />
     <ClInclude Include="Src\Geometry\Math.h" />
     <ClInclude Include="Src\Geometry\Mesh.h" />
@@ -167,6 +168,7 @@
     <ClCompile Include="Src\Core\Context.cpp" />
     <ClCompile Include="Src\Core\FileStream.cpp" />
     <ClCompile Include="Src\Engine\Application.cpp" />
+    <ClCompile Include="Src\Geometry\Dive_Mesh.cpp" />
     <ClCompile Include="Src\Geometry\Frustum.cpp" />
     <ClCompile Include="Src\Geometry\Mesh.cpp" />
     <ClCompile Include="Src\Graphics\D3D11\BlendState.cpp" />

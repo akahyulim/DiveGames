@@ -16,7 +16,7 @@ namespace Dive
 {
 	namespace File
 	{
-		bool ExistsA(const std::string& name)
+		bool IsExistFile(const std::string& name)
 		{
 			try
 			{
@@ -24,7 +24,7 @@ namespace Dive
 			}
 			catch (std::filesystem::filesystem_error& e)
 			{
-				CORE_ERROR("File::ExistsA>> {:s}", e.what());
+				CORE_ERROR("File::IsExistFile>> {:s}", e.what());
 				return false;
 			}
 		}
@@ -73,18 +73,73 @@ namespace Dive
 				return false;
 			}
 		}
-	}
-
-	namespace Dir
-	{
 		std::string GetCurrentA()
 		{
 			return std::filesystem::current_path().generic_string() + "/";
 		}
 
+		std::string GetFileNameWithExtension(const std::string & filepath)
+		{
+			return std::filesystem::path(filepath).filename().generic_string();
+		}
+
+		std::string GetFileName(const std::string & filepath)
+		{
+			auto filename	= GetFileNameWithExtension(filepath);
+			auto index		= filename.find_last_of('.');
+
+			if (index != std::string::npos)
+				return filename.substr(0, index);
+
+			return "";
+		}
+
+		std::string GetFileExtension(const std::string & filepath)
+		{
+			std::string extension;
+
+			try
+			{
+				extension = std::filesystem::path(filepath).extension().generic_string();
+			}
+			catch(std::system_error& e)
+			{
+				CORE_ERROR("{:s}", e.what());
+			}
+
+			return extension;
+		}
+
 		std::wstring GetCurrentW()
 		{
 			return std::filesystem::current_path().generic_wstring() + L"/";
+		}
+
+		bool IsEngineMeshFile(const std::string & filepath)
+		{
+			return GetFileExtension(filepath) == EXTENSION_MESH;
+		}
+
+		bool IsEngineMaterialFile(const std::string & filepath)
+		{
+			return GetFileExtension(filepath) == EXTENSION_MATERIAL;
+		}
+		
+		bool IsEngineTextureFile(const std::string & filepath)
+		{
+			return GetFileExtension(filepath) == EXTENSION_TEXTURE;
+		}
+		
+		bool IsEngineSceneFile(const std::string & filepath)
+		{
+			return GetFileExtension(filepath) == EXTENSION_SCENE;
+		}
+		
+		bool IsEngineFile(const std::string & filepath)
+		{
+			return	IsEngineMaterialFile(filepath)	||
+					IsEngineTextureFile(filepath)	||
+					IsEngineSceneFile(filepath);
 		}
 	}
 }

@@ -14,16 +14,16 @@ namespace Dive
 		IndexBuffer
 	};
 
-	// 결국 Command에서 Data는 얘인데...
-	// draw 함수를 이 곳에 만드는 건 어떨까?
-	// => 인터페이스 통일성을 유지하는 편이 나을 것 같다.
+	// save, load를 하려면 vertices, indices가  필요하다.
+	// 그리고 vertex type이 구분되어야 한다...
 	class Mesh : public Resource
 	{
 	public:
 		Mesh(Context* context);
 		virtual ~Mesh();
 
-		// save & load
+		bool SaveToFile(const std::string& filepath) override;
+		bool LoadFromFile(const std::string& filepath) override;
 
 		template<typename T>
 		bool CreateBuffer(eBufferType type, const std::vector<T>& data);
@@ -54,7 +54,7 @@ namespace Dive
 	{
 		if (data.empty())
 		{
-			CORE_ERROR("");
+			CORE_ERROR("Data가 존재하지 않습니다.");
 			return false;
 		}
 

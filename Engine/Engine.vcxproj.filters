@@ -127,6 +127,9 @@
     <ClCompile Include="Src\Resource\ResourceManager.cpp">
       <Filter>Src\Resource</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Geometry\Dive_Mesh.cpp">
+      <Filter>Src\Geometry</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\FileSystemHelper.h">
@@ -299,6 +302,9 @@
     </ClInclude>
     <ClInclude Include="Src\Resource\ResourceManager.h">
       <Filter>Src\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Geometry\Dive_Mesh.h">
+      <Filter>Src\Geometry</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

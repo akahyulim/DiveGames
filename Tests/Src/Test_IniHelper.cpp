@@ -5,7 +5,7 @@ using namespace Dive;
 
 TEST(IniHelper, SetGetInt)
 {
-	auto file = Dir::GetCurrentA() + "test_data.ini";
+	auto file = File::GetCurrentA() + "test_data.ini";
 	Dive::IniHelper helper(file.c_str());
 	
 	auto section = helper["Display"];
@@ -28,7 +28,7 @@ TEST(IniHelper, SetGetInt)
 
 TEST(IniHelper, SetGetBool)
 {
-	auto file = Dir::GetCurrentA() + "test_data.ini";
+	auto file = File::GetCurrentA() + "test_data.ini";
 	Dive::IniHelper helper(file.c_str());
 
 	helper["Display"]["bVSync"] = false;
@@ -42,7 +42,7 @@ TEST(IniHelper, SetGetBool)
 
 TEST(IniHelper, SetGetDouble)
 {
-	auto file = Dir::GetCurrentA() + "test_data.ini";
+	auto file = File::GetCurrentA() + "test_data.ini";
 	Dive::IniHelper helper(file.c_str());
 
 	auto section = helper["Display"];
@@ -65,7 +65,7 @@ TEST(IniHelper, SetGetDouble)
 
 TEST(IniHelper, SetGetString)
 {
-	auto file = Dir::GetCurrentA() + "test_data.ini";
+	auto file = File::GetCurrentA() + "test_data.ini";
 	Dive::IniHelper helper(file.c_str());
 
 	auto section = helper["Display"];
@@ -77,7 +77,7 @@ TEST(IniHelper, SetGetString)
 
 TEST(IniHelper, SetGetKorean)
 {
-	auto file = Dir::GetCurrentA() + "test_data.ini";
+	auto file = File::GetCurrentA() + "test_data.ini";
 	Dive::IniHelper helper(file.c_str());
 
 	auto section = helper["SCORE"];
@@ -94,7 +94,7 @@ TEST(IniHelper, SetGetKorean)
 //================================================================================//
 TEST(IniHelper, GetReadData)
 {
-	auto file = Dir::GetCurrentA() + "test_data.ini";
+	auto file = File::GetCurrentA() + "test_data.ini";
 	Dive::IniHelper helper(file.c_str());
 
 	int width = helper["Display"]["nWidth"] << 1980;
@@ -121,7 +121,7 @@ TEST(IniHelper, GetReadData)
 //================================================================================//
 TEST(IniHelper, SetInitailzeData)
 {
-	auto file = Dir::GetCurrentA() + "test_data.ini";
+	auto file = File::GetCurrentA() + "test_data.ini";
 	EXPECT_TRUE(File::DeleteA(file.c_str()));
 	
 	Dive::IniHelper helper(file.c_str());

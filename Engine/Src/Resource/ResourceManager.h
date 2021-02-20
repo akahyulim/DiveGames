@@ -36,13 +36,17 @@ namespace Dive
 	template<class T>
 	inline std::shared_ptr<T> ResourceManager::Load(const std::string & filepath)
 	{
-		if (!File::ExistsA(filepath))
+		if (!File::IsExistFile(filepath))
 		{
 			CORE_ERROR("잘못된 경로의 파일을 전달받았습니다. - {:s}", filepath);
 			return std::shared_ptr<T>();
 		}
 
-		// 지원 확장자인지도 확인
+		if (!File::IsEngineFile(filepath))
+		{
+			CORE_ERROR("Dive Engine에서 지원하는 형식의 파일이 아닙니다. - {:s}", filepath);
+			return std::shared_ptr<T>();
+		}
 
 		auto resource = std::make_shared<T>(m_context);
 		//resource->LoadFromFile(filepath);
