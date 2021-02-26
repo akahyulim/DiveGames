@@ -65,7 +65,7 @@ bool Sandbox::createTriangle()
 		renderableMesh->SetMesh(triangleMesh.get());
 	}
 
-	// test
+	// test - resource
 	{
 		auto rscMng = m_engine->GetSubsystem<ResourceManager>();
 		//rscMng->Load<Dive_Texture>("C://Dev//Ref//Unity_UI//LightK.png");
@@ -91,6 +91,11 @@ bool Sandbox::createTriangle()
 			APP_TRACE("존재하지 않는 객체입니다.");
 
 		APP_TRACE("Resource Count: {:d}", rscMng->GetResourceCount(eResourceType::Mesh));
+	}
+
+	// test - calcurate normal
+	{
+		
 	}
 
 	return true;

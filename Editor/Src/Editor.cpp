@@ -9,6 +9,8 @@
 #include "Widgets/Inspector.h"
 #include "Widgets/EditView.h"
 
+// test 
+#include "Importer/ModelImporter.h"
 
 Editor* s_editor = nullptr;
 Inspector* g_inspector = nullptr;
@@ -91,6 +93,13 @@ bool Editor::Initialize()
 	}
 
 	m_bInitialized = true;
+
+	// 테스트 하기에 적절한 위치가 아니다.
+	ModelImporter importer(m_context->GetSubsystem<Scene>().get());
+	//importer.LoadFromFile("C://Dev/Libs/assimp-master/test/models/FBX/box.fbx");
+	importer.LoadFromFile("../Assets/Models/wolf/wolf.ase");
+	//importer.LoadFromFile("../Assets/Models/woman/woman.ase");
+	//importer.LoadFromFile("../Assets/Models/mong/mong.ase");
 
 	return true;
 }

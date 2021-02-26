@@ -101,7 +101,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>External\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -116,6 +116,7 @@
     <ClInclude Include="Src\Geometry\Frustum.h" />
     <ClInclude Include="Src\Geometry\Math.h" />
     <ClInclude Include="Src\Geometry\Mesh.h" />
+    <ClInclude Include="Src\Geometry\PresetGeometry.h" />
     <ClInclude Include="Src\Graphics\D3D11\BlendState.h" />
     <ClInclude Include="Src\Graphics\D3D11\Command.h" />
     <ClInclude Include="Src\Graphics\D3D11\Dive_Texture.h" />

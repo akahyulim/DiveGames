@@ -1,42 +1,59 @@
 #pragma once
 #include "Resource/Resource.h"
 
-// 생각을 계속 해봤는데...
-// 유니티는 결국 모든 요소에 디폴트 값을 넣거나 직접 계산했을 것 같다.
-// 물론 mesh renderer와 skinned mesh renderer는 구분 해놓고 말이다.
 namespace Dive
 {
 	class VertexBuffer;
 	class IndexBuffer;
 
-	// Window Style처럼 만들고 싶다.
-	enum class eVertexFormat
+	struct DIVE_VERTEX
 	{
-		POSITION,
-		COLOR,
-		TEX_COORD,
-		NORMAL,
+		// 생성자 정도는 만들어 두는게 낫다.
+
+		float positions[3];
+		float colors[4];
+		float texCoords[2];
+		float normals[3];
+		float tangnts[3];
+		float boneWeights[4];
+		unsigned int boneIndices[4];
 	};
 
+	// 아에 mesh부터 rigid와 skinned로 구분하는건 어떨까?
+	// 아니면 적어도 둘 중 하나라는 표식은 달고 있어야 한다.
 	class Dive_Mesh
 	{
 	public:
+		Dive_Mesh();
+		~Dive_Mesh();
 
-		// 각 요소 정보를 취합해 타입을 확정한 후 vertices를 구성
-		void GenerateVertices();
+		void Clear();
 
-	public:
-		std::vector<DirectX::XMFLOAT3> positions;
-		std::vector<DirectX::XMFLOAT4> colors;
-		std::vector<DirectX::XMFLOAT2> texCoords;
-		std::vector<DirectX::XMFLOAT3> normals;
+		void AppendVertice(const std::vector<DIVE_VERTEX>& vertices, unsigned int* offset);
+		void AppendIndices(const std::vector<unsigned int>& indices, unsigned int* offset);
+
+		std::vector<DIVE_VERTEX>& GetVertices() { return m_vertices; }
+		void SetVertices(const std::vector<DIVE_VERTEX>& vertices) { m_vertices = vertices; }
+
+		std::vector<unsigned int>& GetIndices() { return m_indices; }
+		void SetIndices(const std::vector<unsigned int>& indices) { m_indices = indices; }
+
+		unsigned int GetVertexCount() const;
+		unsigned int GetIndexCount() const;
+		unsigned int GetTriangleCount() const;
 
 	private:
-		// 타입별 vertices?
-		std::vector<unsigned int> indices;
+		std::vector<DIVE_VERTEX> m_vertices;
+		std::vector<unsigned int> m_indices;
+
 	};
 
-	// mesh data는 굳이 가지고 있을 필요가 없기때문에 분리하는 게 맞다.
+	// 여전히 prefab과 헷갈린다. 다른 resource들과는 달리 game object를 직접 생성하기 때문이다.
+	// 그런데 프리셋 모델 혹은 하드 코딩된 mesh를 사용할거라면 prefab과 구분되어야 한다.
+	// 이는 load from file에서 확인할 수 있지 않을까?
+
+	// 일단 하나로 만들었지만 추후 rigid와 skinned로 나눠져야 할 수 있다.
+	// 현재 언듯 보기엔 버퍼 생성 부분은 override하는 derrived로 만들면 될 것 같다.
 	class Dive_MeshFilter : public Resource
 	{
 		DIVE_OBJECT(Dive_MeshFilter, Resource);
@@ -45,27 +62,21 @@ namespace Dive
 		Dive_MeshFilter(Context* context);
 		~Dive_MeshFilter();
 
-		// save to file은 vertices, indices가 필요하다.
-		// 그런데 app 상에서는 호출하는 경우가 없다???
-		// 굳이 따지자면 code 상에서 만든 mesh를 파일화하는 경우인데...
-		// 이건 다른 리소스들도 생각해볼 문제다.
-		// import한 리소스를 엔진 포멧으로 만드는 건 생각해볼만 한데...
+		bool LoadFromFile(const std::string& filepath) override;
+		bool SaveToFile(const std::string& filepath) override;
 
-		// load from file은 엔진 포멧을 읽어서 버퍼를 생성
+		void AppendGeometry(const std::vector<DIVE_VERTEX>& vertices, const std::vector<unsigned int>& indices,
+			unsigned int* vertexOffset = nullptr, unsigned int* indexOffset = nullptr);
 
-		void SetMesh(const Dive_Mesh& mesh);
-
-		bool CreateBuffers();
+		const VertexBuffer* GetVertexBuffer() const { return m_vertexBuffer.get(); }
+		const IndexBuffer* GetIndexBuffer() const { return m_indexBuffer.get(); }
 
 	private:
-		void indentifyMeshType();
+		bool createBuffers();
 
 	private:
-		// mesh가 아니라 vertices, indices를 가져야 한다.
-		// 이것들을 dive_mesh에서 관리토록 하면 좋을지도...
-		Dive_Mesh m_mesh;
-
-		VertexBuffer* m_vertexBuffer;
-		IndexBuffer* m_indexBuffer;
+		std::shared_ptr<Dive_Mesh> m_mesh;
+		std::shared_ptr<VertexBuffer> m_vertexBuffer;
+		std::shared_ptr<IndexBuffer> m_indexBuffer;
 	};
 }

@@ -40,11 +40,14 @@
     <ClCompile Include="Src\Widgets\EditView.cpp">
       <Filter>Src\Widgets</Filter>
     </ClCompile>
+    <ClCompile Include="Src\EditorRenderer.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
     <ClCompile Include="Src\Importer\ImageImporter.cpp">
       <Filter>Src\Importer</Filter>
     </ClCompile>
-    <ClCompile Include="Src\EditorRenderer.cpp">
-      <Filter>Src</Filter>
+    <ClCompile Include="Src\Importer\ModelImporter.cpp">
+      <Filter>Src\Importer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -96,11 +99,14 @@
     <ClInclude Include="Src\Widgets\EditView.h">
       <Filter>Src\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="Src\EditorRenderer.h">
+      <Filter>Src</Filter>
+    </ClInclude>
     <ClInclude Include="Src\Importer\ImageImporter.h">
       <Filter>Src\Importer</Filter>
     </ClInclude>
-    <ClInclude Include="Src\EditorRenderer.h">
-      <Filter>Src</Filter>
+    <ClInclude Include="Src\Importer\ModelImporter.h">
+      <Filter>Src\Importer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -114,7 +120,7 @@
       <UniqueIdentifier>{abf000c1-fa97-4f48-9475-66023d43a18f}</UniqueIdentifier>
     </Filter>
     <Filter Include="Src\Importer">
-      <UniqueIdentifier>{302afd78-07d0-4592-b953-3aec188f1abd}</UniqueIdentifier>
+      <UniqueIdentifier>{07a6024e-9875-4911-87cb-34a609c69ee3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -84,7 +84,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Engine\Src;..\Engine\External;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>External;..\Engine\Src;..\Engine\External;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -95,6 +95,8 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>External\libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc141-mtd.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -111,6 +113,7 @@
     <ClInclude Include="Src\ImGUI\imstb_textedit.h" />
     <ClInclude Include="Src\ImGUI\imstb_truetype.h" />
     <ClInclude Include="Src\Importer\ImageImporter.h" />
+    <ClInclude Include="Src\Importer\ModelImporter.h" />
     <ClInclude Include="Src\Widgets\EditView.h" />
     <ClInclude Include="Src\Widgets\Hierarchy.h" />
     <ClInclude Include="Src\Widgets\Inspector.h" />
@@ -128,6 +131,7 @@
     <ClCompile Include="Src\ImGUI\imgui_stdlib.cpp" />
     <ClCompile Include="Src\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="Src\Importer\ImageImporter.cpp" />
+    <ClCompile Include="Src\Importer\ModelImporter.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Widgets\EditView.cpp" />
     <ClCompile Include="Src\Widgets\Hierarchy.cpp" />
