@@ -28,7 +28,7 @@
 #include <thread>
 #include <condition_variable>
 #include <mutex>
-#include <typeinfo.h>
+#include <typeinfo>
 #include <functional>
 #include <sstream>
 #include <guiddef.h>

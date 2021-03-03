@@ -6,6 +6,10 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
 
+	// dx11에서는 skinning을 compute shader에서 수행한다.
+	// 문제는 compute shader 방법을 모른다는 것과
+	// animation을 어떻게 shader에 전달하느냐 하는 것이다. 여전히 constant buffer일까?
+
 	struct DIVE_VERTEX
 	{
 		// 생성자 정도는 만들어 두는게 낫다.
@@ -15,7 +19,7 @@ namespace Dive
 		float texCoords[2];
 		float normals[3];
 		float tangnts[3];
-		float boneWeights[4];
+		float boneWeights[4];			// 굳이 4개를 가질 필요가 없다. 1.0 - 3개면 나머지 값이 나오기 때문이다.
 		unsigned int boneIndices[4];
 	};
 

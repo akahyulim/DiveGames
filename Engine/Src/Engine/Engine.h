@@ -14,6 +14,8 @@ namespace Dive
 		bool windowed;
 	};
 
+	// 이름을 Runtime으로 바꾸는 편이 나을 것 같다.
+	// Editor는 이를 상속받는다. 따라서 protected로 멤버 변수를 관리하자.
 	class Engine
 	{
 	public:
