@@ -155,11 +155,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CommonInclude.h" />
     <ClInclude Include="DiveEngine.h" />
+    <ClInclude Include="GraphicsDevice.h" />
+    <ClInclude Include="Object.h" />
+    <ClInclude Include="Renderer.h" />
+    <ClInclude Include="RenderPath.h" />
+    <ClInclude Include="RenderPath3D.h" />
     <ClInclude Include="Runtime.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="GraphicsDevice.cpp" />
+    <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="RenderPath3D.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="Timer.cpp" />
   </ItemGroup>

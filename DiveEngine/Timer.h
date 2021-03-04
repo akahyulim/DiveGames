@@ -2,11 +2,11 @@
 
 namespace Dive
 {
-	class Dive_Timer
+	class Timer
 	{
 	public:
-		Dive_Timer();
-		~Dive_Timer() = default;
+		Timer();
+		~Timer() = default;
 
 		static void Start();
 

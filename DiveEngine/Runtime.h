@@ -1,10 +1,11 @@
 #pragma once
 #include "Timer.h"
-
 #include <Windows.h>
 
 namespace Dive
 {
+	class RenderPath;
+
 	class Runtime
 	{
 	public:
@@ -15,11 +16,16 @@ namespace Dive
 		virtual void Update(float deltaTime);
 		virtual void FixedUpdate();
 		virtual void Render();
+		// compose
+
+		void SetActivePath(RenderPath* path);
+		RenderPath* GetActivePath() { return m_activePath; }
 
 		void SetWindow(HWND windowHandle, bool fullScreen);
 
 	protected:
-		Dive_Timer m_timer;
+		Timer m_timer;
+		RenderPath* m_activePath = nullptr;
 
 		float m_deltaTime = 0.0f;
 
