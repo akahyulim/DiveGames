@@ -7,6 +7,7 @@
 #include "Object.h"
 #include "Runtime.h"
 #include "Timer.h"
+#include "ThreadPool.h"
 #include "Scene.h"
 #include "Renderer.h"
 #include "RenderPath.h"

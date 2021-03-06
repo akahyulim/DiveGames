@@ -1,4 +1,5 @@
 #include "Runtime.h"
+#include "ThreadPool.h"
 #include "RenderPath.h"
 #include "GraphicsDevice.h"
 #include "Renderer.h"
@@ -16,10 +17,11 @@ namespace Dive
 		}
 		m_bInitialized = true;
 
-		// 일단 Singleton으로 간다.
-		// sub system 생성 & 초기화
-		// job system으로 호출할 것인가...
-		Renderer::GetInstance().Initialize();
+		ThreadPool::GetInstance().Initialize();
+
+		// 실행은 되는데 애매하다. function이 member function을 어떻게 받은거지???
+		// bind도 봐야 한다.
+		ThreadPool::GetInstance().AddTask([] {Renderer::GetInstance().Initialize(); });
 	}
 
 	void Runtime::Run()

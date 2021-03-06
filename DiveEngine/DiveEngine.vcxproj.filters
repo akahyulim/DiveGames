@@ -31,6 +31,9 @@
     <ClInclude Include="GraphicsDevice.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="ThreadPool.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Runtime.cpp">
@@ -46,6 +49,9 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadPool.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
   </ItemGroup>
