@@ -8,18 +8,25 @@ namespace Dive
 	class Renderer
 	{
 	public:
+		~Renderer();
+
 		static Renderer& GetInstance()
 		{
-			static Renderer renderer;
-			return renderer;
+			static Renderer instance;
+			return instance;
 		}
 
 		void Initialize();
+
+		// update(constant buffer), draw 등이 구현되어 있다.
+		// 이로 미루어보아 scene의 data를 사용함을 알 수 있다.
+		// 여기에서 구현된 요소들을 RenderPath에서 구성하여 그리는 형태이다.
 
 		GraphicsDevice* GetDevice() { return m_device.get(); }
 		void SetDevice(std::shared_ptr<GraphicsDevice> device);
 
 	private:
+		Renderer() = default;
 
 	private:
 		std::shared_ptr<GraphicsDevice> m_device;

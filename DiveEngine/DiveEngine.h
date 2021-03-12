@@ -4,6 +4,7 @@
 
 #include "CommonInclude.h"
 
+#include "Log.h"
 #include "Object.h"
 #include "Runtime.h"
 #include "Timer.h"

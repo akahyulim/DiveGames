@@ -1,5 +1,5 @@
 #pragma once
-
+#include "GraphicsDevice.h"
 
 namespace Dive
 {
@@ -18,7 +18,7 @@ namespace Dive
 		virtual void Update(float deltaTime) {}
 		virtual void PostUpdate() {}
 		virtual void Render() const {}
-		// compose
+		virtual void Compose(CommandList cmd) const {}
 
 		// get & set mask
 

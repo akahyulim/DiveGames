@@ -1,66 +1,108 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="DiveEngine.h">
-      <Filter>Engine</Filter>
+    <ClInclude Include="Log.h">
+      <Filter>Engine\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Runtime.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderPath.h">
-      <Filter>Engine</Filter>
+    <ClInclude Include="Profiler.h">
+      <Filter>Engine\Tools</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderPath3D.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="CommonInclude.h">
-      <Filter>Engine</Filter>
+      <Filter>Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsDevice.h">
-      <Filter>Engine</Filter>
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonInclude.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="DiveEngine.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPath.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderPath3D.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Runtime.h">
+      <Filter>Engine\Core</Filter>
     </ClInclude>
     <ClInclude Include="ThreadPool.h">
-      <Filter>Engine</Filter>
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Engine\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Engine\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Engine\Scene\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Runtime.cpp">
-      <Filter>Engine</Filter>
+    <ClCompile Include="Log.cpp">
+      <Filter>Engine\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderPath3D.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="GraphicsDevice.cpp">
-      <Filter>Engine</Filter>
+    <ClCompile Include="Profiler.cpp">
+      <Filter>Engine\Tools</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>Engine</Filter>
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPath3D.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Runtime.cpp">
+      <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
-      <Filter>Engine</Filter>
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Engine\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="spdlog">
-      <UniqueIdentifier>{feff4b9a-8951-44bd-8011-6883a26dbaaa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Engine">
       <UniqueIdentifier>{c7d05b3b-5ca0-4b66-8f7c-5dbfba591b66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Tools">
+      <UniqueIdentifier>{77d99d9b-f82f-4acb-bd38-680e775d8fdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Graphics">
+      <UniqueIdentifier>{1326af25-081c-4cf4-b939-d927b9d45a14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Scene">
+      <UniqueIdentifier>{c1aa4b85-851d-45df-abea-6fec5b35b458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Core">
+      <UniqueIdentifier>{935efe1f-4709-4022-9b1b-d67f83dc83a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Scene\Components">
+      <UniqueIdentifier>{7bc942ed-9c43-48b4-ad1c-95c51f40ebc0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

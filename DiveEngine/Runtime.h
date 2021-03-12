@@ -1,5 +1,6 @@
 #pragma once
 #include "Timer.h"
+#include "GraphicsDevice.h"
 #include <Windows.h>
 
 namespace Dive
@@ -9,6 +10,9 @@ namespace Dive
 	class Runtime
 	{
 	public:
+		Runtime();
+		virtual ~Runtime() = default;
+
 		virtual void Initialize();
 
 		void Run();
@@ -16,7 +20,7 @@ namespace Dive
 		virtual void Update(float deltaTime);
 		virtual void FixedUpdate();
 		virtual void Render();
-		// compose
+		virtual void Compose(CommandList cmd);
 
 		void SetActivePath(RenderPath* path);
 		RenderPath* GetActivePath() { return m_activePath; }

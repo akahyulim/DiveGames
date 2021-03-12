@@ -1,7 +1,7 @@
 #include "Runtime.h"
+#include "Log.h"
 #include "ThreadPool.h"
 #include "RenderPath.h"
-#include "GraphicsDevice.h"
 #include "Renderer.h"
 #include <memory>
 
@@ -9,6 +9,11 @@ using namespace std;
 
 namespace Dive
 {
+	Runtime::Runtime()
+	{
+		Log::Initialize();
+	}
+
 	void Runtime::Initialize()
 	{
 		if (m_bInitialized)
@@ -16,12 +21,12 @@ namespace Dive
 			return;
 		}
 		m_bInitialized = true;
+		
+		CORE_TRACE("Dive Engine 초기화를 시작합니다...");
 
 		ThreadPool::GetInstance().Initialize();
 
-		// 실행은 되는데 애매하다. function이 member function을 어떻게 받은거지???
-		// bind도 봐야 한다.
-		ThreadPool::GetInstance().AddTask([] {Renderer::GetInstance().Initialize(); });
+		ThreadPool::GetInstance().AddTask([] { Renderer::GetInstance().Initialize(); });
 	}
 
 	void Runtime::Run()
@@ -43,6 +48,13 @@ namespace Dive
 		{
 			// 입력 버퍼만 수행
 		}
+
+		// Present 실행
+		auto device = Renderer::GetInstance().GetDevice();
+		auto cmd = device->BeginCommandList();
+		device->PresentBegin(cmd);
+		Compose(cmd);
+		device->PresentEnd();
 	}
 	
 	void Runtime::Update(float deltaTime)
@@ -81,6 +93,14 @@ namespace Dive
 		}
 	}
 
+	void Runtime::Compose(CommandList cmd)
+	{
+		if (m_activePath)
+		{
+			m_activePath->Compose(cmd);
+		}
+	}
+
 	void Runtime::SetActivePath(RenderPath* path)
 	{
 		// 뭔가 있다.
@@ -100,7 +120,19 @@ namespace Dive
 	
 	void Runtime::SetWindow(HWND windowHandle, bool fullScreen)
 	{
-		auto renderer = Renderer::GetInstance();
+		auto& renderer = Renderer::GetInstance();
 		renderer.SetDevice(make_shared<GraphicsDevice>(windowHandle, fullScreen));
+
+		auto device = renderer.GetDevice();
+		CORE_TRACE("Resolution: {0:d} x {1:d}", device->GetResolutionWidth(), device->GetResolutionHeight());
+
+		RECT rt;
+		GetClientRect(windowHandle, &rt);
+		auto width = static_cast<unsigned int>(rt.right - rt.left);
+		auto height = static_cast<unsigned int>(rt.bottom - rt.top);
+		CORE_TRACE("Changed ClientRect: {0:d} x {1:d}", width, height);
+
+		device->SetResolution(800, 600);
+		CORE_TRACE("Changed Resolution: {0:d} x {1:d}", device->GetResolutionWidth(), device->GetResolutionHeight());
 	}
 }

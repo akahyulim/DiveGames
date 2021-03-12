@@ -1,4 +1,5 @@
 #pragma once
+#include "Log.h"
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -39,14 +40,13 @@ namespace Dive
 		{
 			if (m_workers.empty())
 			{
-
+				CORE_WARN("Worker Thread가 존재하지 않습니다. Main Thread에서 실행합니다.");
 				function();
 				return;
 			}
 
 			std::unique_lock<std::mutex> lock(m_mutex);
-			// bind를 왜 사용했을까?
-			m_tasks.push(std::make_shared<Task>(std::bind(std::forward<Function>(function))));
+			m_tasks.push(std::make_shared<Task>(std::forward<Function>(function)));
 			lock.unlock();
 
 			m_wakeCondition.notify_one();

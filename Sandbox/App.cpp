@@ -5,5 +5,8 @@ using namespace Dive;
 
 namespace Sandbox
 {
-
+	void App::Initialize()
+	{
+		Runtime::Initialize();
+	}
 }

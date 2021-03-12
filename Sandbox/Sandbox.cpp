@@ -112,6 +112,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    int height       = 0;
 
    // ini 파일 로드
+   width = 800;
+   height = 600;
 
    HWND hWnd = NULL;
 
@@ -151,6 +153,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    g_app.SetWindow(hWnd, bFullScreen);
 
+   // 해상도를 맞추려면 크기를 변경해야 한다.
+
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
@@ -171,6 +175,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
     switch (message)
     {
+    case WM_SIZE:
+        // lparam을 이벤트로 보낸다?
+        // 그게 아니라면 전역 변수를 통해 sandbox에서 device를 얻어 resolution을 호출해야 한다.
+        // 위키드는 renderer에서 이벤트를 받아 처리하는데 해당 구독 람다 함수를 어떻게 어디서 호출하는지 모르겠다.
+        break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);

@@ -31,7 +31,7 @@ namespace Dive
 			m_workers.emplace_back([this]() {this->threadLoop(); });
 		}
 
-		// log trace
+		CORE_TRACE("{:d}개의 Worker Thread가 생성되었습니다.", m_workerCount);
 	}
 
 	void ThreadPool::threadLoop()
@@ -49,7 +49,7 @@ namespace Dive
 			task = m_tasks.front();
 			m_tasks.pop();
 
-			m_mutex.unlock();
+			lock.unlock();
 
 			task->Execute();
 		}

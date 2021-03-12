@@ -2,6 +2,7 @@
 #include "Object.h"
 #include <vector>
 #include <string>
+#include <memory>
 
 namespace Dive
 {
@@ -10,15 +11,16 @@ namespace Dive
 	class Scene : public Object
 	{
 	public:
-		Scene() = default;
+		Scene();
 		~Scene();
 
 		void Update(float deltaTime);
 		void Clear();
 
 		GameObject* CreateGameObject();
-		GameObject* GetGameObject(const std::string& name);
-		void RemoveGameObject(const std::string& name);
+		GameObject* GetGameObjectByName(const std::string& name);
+		void RemoveGameObjectByName(const std::string& name);
+		void RemoveGameObject(GameObject* target);
 
 		static Scene& GetGlobalScene()
 		{
@@ -26,11 +28,12 @@ namespace Dive
 			return scene;
 		}
 
+		
 	private:
 		Scene(const Scene&)				= delete;
 		Scene& operator=(const Scene&)	= delete;
 
 	private:
-		std::vector<GameObject*> m_gameObjects;
+		std::vector<std::shared_ptr<GameObject>> m_gameObjects;
 	};
 }

@@ -12,7 +12,7 @@ namespace Dive
 		void PreUpdate() override;
 		void Update(float deltaTime) override;
 		void Render() const override;
-		// compose
+		void Compose(CommandList cmd) const override;
 		//============================================
 
 	private:
@@ -20,6 +20,5 @@ namespace Dive
 		Scene* m_scene = &Scene::GetGlobalScene();
 
 		// gpu resource를 가진다?
-		// device를 통해 진접 생성해놨다...
 	};
 }

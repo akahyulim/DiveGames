@@ -1,3 +1,4 @@
+#include "..\..\..\DiveEngine\Scene.h"
 #include "DivePch.h"
 #include "Scene.h"
 #include "SceneEvents.h"
@@ -21,6 +22,10 @@ namespace Dive
 
 		DIVE_SUBSCRIBE_TO_EVENT(this, &Scene::OnUpdate);
 		CORE_TRACE("Create Scene - {:s}", m_name);
+	}
+
+	Scene::Scene()
+	{
 	}
 
 	Scene::~Scene()
