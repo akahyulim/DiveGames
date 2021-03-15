@@ -1,38 +1,48 @@
 #include "Timer.h"
-#include <chrono>
 
 using namespace std;
 
-chrono::high_resolution_clock::time_point startTime;
 
 namespace Dive
 {
 	Timer::Timer()
 	{
-		Start();
-		Record();
+		Reset();
 	}
 
-	void Timer::Start()
+	void Timer::Reset()
 	{
-		startTime = chrono::high_resolution_clock::now();
+		m_startTime = chrono::high_resolution_clock::now();
 	}
 
-	double Timer::GetTotalTime()
+	double Timer::GetElapsedTime(bool reset)
 	{
-		auto now = chrono::high_resolution_clock::now();
-		chrono::duration<double, std::milli> elapsed = now - startTime;
+		auto currentTime = chrono::high_resolution_clock::now();
+		chrono::duration<double, std::milli> elapsedTime = currentTime - m_startTime;
 
-		return elapsed.count();
-	}
-	
-	double Timer::GetElapsedTime()
-	{
-		return GetTotalTime() - m_lastTime;
+		if (reset)
+		{
+			m_startTime = currentTime;
+		}
+
+		return elapsedTime.count();
 	}
 
-	void Timer::Record()
+	void TimeManager::Initialize()
 	{
-		m_lastTime = GetTotalTime();
+		m_startTime = chrono::high_resolution_clock::now();
+	}
+
+	void TimeManager::Update()
+	{
+		auto currentTime = chrono::high_resolution_clock::now();
+		chrono::duration<double, std::milli> elapsedTime = currentTime - m_startTime;
+
+		m_realTimeSinceStartup += elapsedTime.count();
+		m_deltaTime = elapsedTime.count();
+
+		m_startTime = currentTime;
+
+		++m_frameCount;
 	}
 }

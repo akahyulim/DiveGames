@@ -1,11 +1,13 @@
 #pragma once
-#include "Timer.h"
 #include "GraphicsDevice.h"
 #include <Windows.h>
 
 namespace Dive
 {
 	class RenderPath;
+
+	// 유니티의 경우 Fixed Timestep은 Timer가
+	// Target FrameRate는 Application이 가진다.
 
 	class Runtime
 	{
@@ -28,12 +30,11 @@ namespace Dive
 		void SetWindow(HWND windowHandle, bool fullScreen);
 
 	protected:
-		Timer m_timer;
 		RenderPath* m_activePath = nullptr;
 
 		float m_deltaTime = 0.0f;
 
 		bool m_bInitialized = false;
-		bool m_bWindowActive = false;
+		bool m_bWindowActive = true;
 	};
 }
