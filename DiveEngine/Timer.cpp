@@ -39,7 +39,7 @@ namespace Dive
 		chrono::duration<double, std::milli> elapsedTime = currentTime - m_startTime;
 
 		m_realTimeSinceStartup += elapsedTime.count();
-		m_deltaTime = elapsedTime.count();
+		m_deltaTime = elapsedTime.count() * m_timeScale;
 
 		m_startTime = currentTime;
 

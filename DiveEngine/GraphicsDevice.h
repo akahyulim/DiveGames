@@ -42,6 +42,8 @@ namespace Dive
 		bool GetVSyncEnabled() const { return m_bVSync; }
 		void SetVSuncEnabled(bool use) { m_bVSync = use; }
 
+		bool IsInitialized() const;
+
 		// resource bind 함수
 		// 역시 직접 묶을게 아니라면 deferredContext를 넘겨야 한다.
 		// 따라서 스레드에 민감하다.

@@ -8,8 +8,6 @@ namespace Dive
 	class Renderer
 	{
 	public:
-		~Renderer();
-
 		static Renderer& GetInstance()
 		{
 			static Renderer instance;
@@ -25,10 +23,15 @@ namespace Dive
 		GraphicsDevice* GetDevice() { return m_device.get(); }
 		void SetDevice(std::shared_ptr<GraphicsDevice> device);
 
+		// 阿辆 府家胶 积己
+
 	private:
 		Renderer() = default;
+		~Renderer();
 
 	private:
 		std::shared_ptr<GraphicsDevice> m_device;
+
+		// 积己 府家胶 包府
 	};
 }

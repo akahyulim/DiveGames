@@ -27,10 +27,12 @@ namespace Dive
 
 		ThreadPool::GetInstance().Initialize();
 
-		// 현재 ThreadPool 결과가 이상하다.
+		// 또 잘 되는 것 같다...
+		ThreadPool::GetInstance().AddTask([] { TimeManager::GetInstance().Initialize(); });
+		ThreadPool::GetInstance().AddTask([] { Renderer::GetInstance().Initialize(); });
 
-		TimeManager::GetInstance().Initialize();
-		Renderer::GetInstance().Initialize();
+	//	TimeManager::GetInstance().Initialize();
+	//	Renderer::GetInstance().Initialize();
 	}
 
 	void Runtime::Run()
@@ -47,26 +49,46 @@ namespace Dive
 		}
 
 		TimeManager::GetInstance().Update();
-		CORE_TRACE("FrameCount: {0:n}, ElapsedTime: {1:n}", TimeManager::GetInstance().GetFrameCount(), TimeManager::GetInstance().GetRealTimeSinceStartUpSec());
 
-		//m_deltaTime = static_cast<float>(max(0.0, m_timer.GetElapsedTime() / 1000.0f));
-		//m_timer.Record();
+		auto delta = TimeManager::GetInstance().GetDeltaTimeSec();
+
+		static float fixedFrameAccumulator = 0.0f;
+		static float deltaFrameAccumulator = 0.0f;
 
 		if (m_bWindowActive)
 		{
-			// 일단 타이머가 초단위로 값을 가진다... 0.2sec
-			// 따라서 elapsed time을 누적한 후 값을 비교하여 실행 여부를 판단해야 한다.
-			// 그게 아니라면 TimeManager가 이 함수를 호출하는게 된다. 물론 이벤트라면 가능할 거 같긴한데...
-			// 처음에 생각했던 것 처럼 Runtime에서 FixedTime을 관리하는 것도 생각해볼 수 있다.
-			// 하지만 그 경우에도 결국엔 FixedTime을 FixedUpdate()에 전달해주는 것이 자연스럽다.
-			// 이를 Update()와 연관시켜보면 결국 매개변수는 없애고 필요할 때 TimeManager 객체를 통해 
-			// FixedTime과 ElapsedTime을 획득하는 것이 가장 깔끔하다. 유니티에서도 그렇게 구현되어 있다.
-			FixedUpdate();
-			
-			Update(m_deltaTime);
-			// 입력 버퍼
-			Render();
-			
+			fixedFrameAccumulator += delta;
+			deltaFrameAccumulator += delta;
+
+			if (fixedFrameAccumulator >= TimeManager::GetInstance().GetFixedFrameRate())
+			{
+				CORE_TRACE("FixedUpdate Frame: {:n}", TimeManager::GetInstance().GetFrameCount());
+
+				FixedUpdate();
+				fixedFrameAccumulator = 0.0f;
+			}
+
+			if (m_bFrameLock)
+			{
+				if (deltaFrameAccumulator >= static_cast<float>(1.0f / m_targetFPS))
+				{
+					Update(deltaFrameAccumulator);
+					// 입력 버퍼
+					Render();
+
+					deltaFrameAccumulator = 0.0f;
+				}
+			}
+			else
+			{
+				CORE_TRACE("Unlock Update Frame: {:n}", TimeManager::GetInstance().GetFrameCount());
+
+				Update(delta);
+				// 입력 버퍼
+				Render();
+
+				deltaFrameAccumulator = 0.0f;
+			}
 		}
 		else
 		{

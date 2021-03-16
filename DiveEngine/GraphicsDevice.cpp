@@ -149,6 +149,11 @@ namespace Dive
 		}
 	}
 	
+	bool GraphicsDevice::IsInitialized() const
+	{
+		return (m_device != nullptr && m_immediateContext != nullptr && m_swapChain != nullptr);
+	}
+
 	void GraphicsDevice::BindViewports(unsigned int count, const D3D11_VIEWPORT* viewports, CommandList cmd)
 	{
 		assert(count < 6);
