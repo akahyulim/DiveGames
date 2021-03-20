@@ -7,7 +7,7 @@ namespace Dive
 	{
 	public:
 		RenderPath() = default;
-		virtual ~RenderPath();
+		virtual ~RenderPath() {}
 
 		virtual void Load() {}
 		virtual void Start() {}
@@ -18,7 +18,7 @@ namespace Dive
 		virtual void Update(float deltaTime) {}
 		virtual void PostUpdate() {}
 		virtual void Render() const {}
-		virtual void Compose(CommandList cmd) const {}
+		virtual void Compose() const {}
 
 		// get & set mask
 

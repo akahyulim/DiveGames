@@ -25,14 +25,10 @@ namespace Dive
 		
 		CORE_TRACE("Dive Engine 초기화를 시작합니다...");
 
-		ThreadPool::GetInstance().Initialize();
-
-		// 또 잘 되는 것 같다...
-		ThreadPool::GetInstance().AddTask([] { TimeManager::GetInstance().Initialize(); });
-		ThreadPool::GetInstance().AddTask([] { Renderer::GetInstance().Initialize(); });
-
-	//	TimeManager::GetInstance().Initialize();
-	//	Renderer::GetInstance().Initialize();
+		// 일단 싱글 쓰레드로 간다.
+		// 이후 laoding은 asyn로 하고, parallel은 최후로 미룬다.
+		TimeManager::GetInstance().Initialize();
+		Renderer::GetInstance().Initialize();
 	}
 
 	void Runtime::Run()
@@ -95,11 +91,12 @@ namespace Dive
 			// 입력 버퍼만 수행
 		}
 
-		// Present 실행
+		// device의 직접 호출은 에바다.
+		// 그리고 위치도 Render()로 옮겨야 한다.
+		// 문제는 Compose()이다.
 		auto device = Renderer::GetInstance().GetDevice();
-		auto cmd = device->BeginCommandList();
-		device->PresentBegin(cmd);
-		Compose(cmd);
+		device->PresentBegin();
+		Compose();
 		device->PresentEnd();
 	}
 	
@@ -139,11 +136,11 @@ namespace Dive
 		}
 	}
 
-	void Runtime::Compose(CommandList cmd)
+	void Runtime::Compose()
 	{
 		if (m_activePath)
 		{
-			m_activePath->Compose(cmd);
+			m_activePath->Compose();
 		}
 	}
 

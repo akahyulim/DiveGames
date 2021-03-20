@@ -80,52 +80,19 @@ namespace Dive
 		}
 	}
 
-	CommandList GraphicsDevice::BeginCommandList()
-	{
-		auto cmd = m_commandCount.fetch_add(1);
-		assert(cmd < COMMANDLIST_COUNT);
-
-		if (!m_deferredContexts[cmd])
-		{
-			HRESULT hr = m_device->CreateDeferredContext(0, &m_deferredContexts[cmd]);
-			assert(SUCCEEDED(hr));
-		}
-
-		// 왜인지 모르겠지만... 멤버 변수가 아니다..
-		D3D11_VIEWPORT viewport;
-		viewport.TopLeftX = 0.0f;
-		viewport.TopLeftY = 0.0f;
-		viewport.Width = static_cast<FLOAT>(m_resolutionWidth);
-		viewport.Height = static_cast<FLOAT>(m_resolutionHeight);
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-		m_deferredContexts[cmd]->RSSetViewports(1, &viewport);
-
-		// 시저 렉??
-		
-
-		// CommandList별 리소스들을 초기화한다.
-		m_prevPrimitiveTopologies[cmd] = {};
-		m_prevVertexShaders[cmd] = {};
-		m_prevPixelShaders[cmd] = {};
-
-
-		return cmd;
-	}
-
-	void GraphicsDevice::PresentBegin(CommandList cmd)
+	// BeginScene 혹은 아에 Renderer의 Render 초반으로 옮기자.
+	void GraphicsDevice::PresentBegin()
 	{
 		auto renderTargetView = m_renderTargetView.Get();
-		m_deferredContexts[cmd]->OMSetRenderTargets(1, &renderTargetView, 0);
+		m_immediateContext->OMSetRenderTargets(1, &renderTargetView, 0);
 		
 		float clearColors[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
-		m_deferredContexts[cmd]->ClearRenderTargetView(renderTargetView, clearColors);
+		m_immediateContext->ClearRenderTargetView(renderTargetView, clearColors);
 	}
 	
+	// 이건 어찌됐든 Renderer에서?
 	void GraphicsDevice::PresentEnd()
 	{
-		submitCommandLists();
-
 		m_swapChain->Present(m_bVSync, 0);
 	}
 
@@ -154,7 +121,7 @@ namespace Dive
 		return (m_device != nullptr && m_immediateContext != nullptr && m_swapChain != nullptr);
 	}
 
-	void GraphicsDevice::BindViewports(unsigned int count, const D3D11_VIEWPORT* viewports, CommandList cmd)
+	void GraphicsDevice::BindViewports(unsigned int count, const D3D11_VIEWPORT* viewports)
 	{
 		assert(count < 6);
 
@@ -169,7 +136,7 @@ namespace Dive
 			vps[i].MaxDepth = viewports[i].MaxDepth;
 		}
 
-		m_deferredContexts[cmd]->RSSetViewports(count, vps);
+		m_immediateContext->RSSetViewports(count, vps);
 	}
 
 	void GraphicsDevice::createBackbufferResources()
@@ -185,20 +152,5 @@ namespace Dive
 			CORE_ERROR("RenderTargetView 생성에 실패하였습니다.");
 			PostQuitMessage(0);
 		}
-	}
-
-	void GraphicsDevice::submitCommandLists()
-	{
-		auto cmdLast = m_commandCount.load();
-		m_commandCount.store(0);
-
-		for (CommandList cmd = 0; cmd < cmdLast; cmd++)
-		{
-			HRESULT hr = m_deferredContexts[cmd]->FinishCommandList(false, &m_commandLists[cmd]);
-			assert(SUCCEEDED(hr));
-			m_immediateContext->ExecuteCommandList(m_commandLists[cmd].Get(), false);
-			m_commandLists[cmd].Reset();
-		}
-		m_immediateContext->ClearState();
 	}
 }

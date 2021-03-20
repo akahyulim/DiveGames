@@ -1,10 +1,20 @@
 #pragma once
 #include "GraphicsDevice.h"
+#include "GraphicsEnums.h"
 #include <memory>
 
 namespace Dive
 {
-	// state, shader, layout, cb, gb 등을 생성 및 관리하는 듯 하다.
+	// visibility
+	// Draw 대상을 관리하는 클래스이다.
+	// RenderPath3D에서 관리하고 scene, camera등을 받은 후
+	// Renderer::UpdateVisibility()를 통해 매 프레임 JobSystem으로 대상을 추려낸다.
+	// 이렇게 관리되는 대상들은 나중에 Draw에 전달된다.
+
+	// PipelineState
+	// States, Shaders, InputLayout을 설정한 객체
+	// 이를 Graphics에 넘겨 한 번에 bind한다.
+
 	class Renderer
 	{
 	public:
@@ -16,22 +26,28 @@ namespace Dive
 
 		void Initialize();
 
-		// update(constant buffer), draw 등이 구현되어 있다.
-		// 이로 미루어보아 scene의 data를 사용함을 알 수 있다.
-		// 여기에서 구현된 요소들을 RenderPath에서 구성하여 그리는 형태이다.
+		// update와 draw가 있다.
 
 		GraphicsDevice* GetDevice() { return m_device.get(); }
 		void SetDevice(std::shared_ptr<GraphicsDevice> device);
-
-		// 각종 리소스 생성
 
 	private:
 		Renderer() = default;
 		~Renderer();
 
+		// 각종 GPU Resource 생성
+		void createSamplers();
+		void createDepthStencilStates();
+		void createConstantBuffers();
+		void createTextures();
+		void createShaders();
+		void createPipelineStates();
+
 	private:
+		// 흐음... 이쪽에서 이름을 바꿔야 하나...
 		std::shared_ptr<GraphicsDevice> m_device;
 
-		// 생성 리소스 관리
+		// GPU Resource 관리
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState[DSSTATE_COUNT];
 	};
 }

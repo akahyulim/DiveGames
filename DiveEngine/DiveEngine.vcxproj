@@ -160,11 +160,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="CommonInclude.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="DiveEngine.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GraphicsDevice.h" />
+    <ClInclude Include="GraphicsEnums.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Profiler.h" />

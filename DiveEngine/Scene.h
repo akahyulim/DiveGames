@@ -28,12 +28,9 @@ namespace Dive
 			return scene;
 		}
 
-		
-	private:
-		Scene(const Scene&)				= delete;
-		Scene& operator=(const Scene&)	= delete;
 
 	private:
 		std::vector<std::shared_ptr<GameObject>> m_gameObjects;
+		// camera??
 	};
 }

@@ -22,7 +22,7 @@ namespace Dive
 		virtual void Update(float deltaTime);
 		virtual void FixedUpdate();
 		virtual void Render();
-		virtual void Compose(CommandList cmd);
+		virtual void Compose();
 
 		void SetActivePath(RenderPath* path);
 		RenderPath* GetActivePath() { return m_activePath; }
