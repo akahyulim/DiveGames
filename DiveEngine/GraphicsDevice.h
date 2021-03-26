@@ -23,6 +23,8 @@ namespace Dive
 		void PresentBegin();
 		void PresentEnd();
 
+		bool CreateSamplerState(D3D11_SAMPLER_DESC* desc, ID3D11SamplerState* state);
+
 		void SetResolution(unsigned int width, unsigned int height);
 
 		unsigned int GetResolutionWidth() const { return m_resolutionWidth; }
@@ -40,7 +42,8 @@ namespace Dive
 		// 이것두 괜히 랩핑 형태가 될 수 있다.
 		void BindViewports(unsigned int count, const D3D11_VIEWPORT* viewports);
 
-		// 이름이 좀 에바다. 
+		// 이름이 좀 에바다.
+		// 그런데 아무리봐도 직접 전달하는건 에바다.
 		ID3D11Device* GetDevice() { return m_device.Get(); }
 		ID3D11DeviceContext* GetImmediateContext() { return m_immediateContext.Get(); }
 

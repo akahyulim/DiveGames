@@ -10,5 +10,6 @@ namespace Dive
 		Component(size_t typeHash) : Object(typeHash) {}
 		virtual ~Component() {}
 
+		virtual void Update(float deltaTime) {}
 	};
 }

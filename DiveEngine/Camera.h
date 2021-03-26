@@ -10,6 +10,8 @@ namespace Dive
 		Camera();
 		~Camera();
 
+		void Update(float deltaTime) override;
+
 	private:
 	};
 }

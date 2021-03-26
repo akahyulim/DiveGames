@@ -13,6 +13,8 @@ namespace Dive
 		GameObject();
 		~GameObject() = default;
 
+		void Update(float deltaTime);
+
 		template<typename T>
 		T* AddComponent();
 

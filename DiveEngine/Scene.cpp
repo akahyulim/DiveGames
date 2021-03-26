@@ -11,6 +11,26 @@ namespace Dive
 	{
 	}
 
+	Scene::~Scene()
+	{
+	}
+
+	void Scene::Update(float deltaTime)
+	{
+		CORE_TRACE("Scene::Update() - deltaTime * timeScale이다.");
+		CORE_TRACE("Scene::Update() - 대상은 모든 GameObjects다.");
+
+		for (auto& gameObject : m_gameObjects)
+		{
+			gameObject->Update(deltaTime);
+		}
+	}
+
+	void Scene::Clear()
+	{
+		m_gameObjects.clear();
+	}
+
 	GameObject* Scene::CreateGameObject()
 	{
 		auto newGameObject = m_gameObjects.emplace_back(make_shared<GameObject>());

@@ -4,6 +4,8 @@
 
 namespace Dive
 {
+	// 얘는 Load와 Start가 없다.
+	// 아마도 Renderer와 Scene에서 생성한 Resource를 사용하기 때문인 것 같다.
 	class RenderPath3D : public RenderPath
 	{
 	public:

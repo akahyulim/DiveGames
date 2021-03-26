@@ -12,5 +12,6 @@
 #include "Scene.h"
 #include "Renderer.h"
 #include "RenderPath.h"
+#include "RenderPath3D.h"
 
 #pragma comment(lib, "DiveEngine.lib")

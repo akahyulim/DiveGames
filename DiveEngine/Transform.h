@@ -9,6 +9,8 @@ namespace Dive
 		Transform();
 		~Transform();
 
+		void Update(float deltaTime) override;
+
 	private:
 	private:
 	};

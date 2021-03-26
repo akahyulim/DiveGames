@@ -5,11 +5,19 @@
 
 namespace Dive
 {
-	// visibility
-	// Draw 대상을 관리하는 클래스이다.
-	// RenderPath3D에서 관리하고 scene, camera등을 받은 후
-	// Renderer::UpdateVisibility()를 통해 매 프레임 JobSystem으로 대상을 추려낸다.
-	// 이렇게 관리되는 대상들은 나중에 Draw에 전달된다.
+	enum class eVisibilityType
+	{
+		Invalid = 0,
+		Objects,
+		Lights,
+	};
+
+	class Visibility
+	{
+	public:
+	private:
+		// frustum도 있다.
+	};
 
 	// PipelineState
 	// States, Shaders, InputLayout을 설정한 객체
@@ -27,6 +35,7 @@ namespace Dive
 		void Initialize();
 
 		// update와 draw가 있다.
+		// update는 visibility, PerFrameData,  RenderData, CameraCB 등이 있다.
 
 		GraphicsDevice* GetDevice() { return m_device.get(); }
 		void SetDevice(std::shared_ptr<GraphicsDevice> device);

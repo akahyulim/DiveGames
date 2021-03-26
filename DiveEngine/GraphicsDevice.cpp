@@ -96,6 +96,20 @@ namespace Dive
 		m_swapChain->Present(m_bVSync, 0);
 	}
 
+	// 너무 랩핑함수다.
+	bool GraphicsDevice::CreateSamplerState(D3D11_SAMPLER_DESC* desc, ID3D11SamplerState* state)
+	{
+		assert(desc != nullptr);
+
+		if (FAILED(m_device->CreateSamplerState(desc, &state)))
+		{
+			CORE_ERROR("");
+			return false;
+		}
+
+		return true;
+	}
+
 	// 윈도우의 크기가 변경되었을 때 호출되어야 한다.
 	void GraphicsDevice::SetResolution(unsigned int width, unsigned int height)
 	{

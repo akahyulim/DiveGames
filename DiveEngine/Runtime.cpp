@@ -122,6 +122,11 @@ namespace Dive
 
 		if (m_activePath)
 		{
+			// 대상이 좀 애매하다.
+			// 사실상 호출 함수는 3d가 상속한 2d의 FixedUpdate()이다.
+			// 유니티에서는 rigid body update에 쓰인다고 한다.
+			// 아마도 애니메이션의 속도를 일관성있게 만들기 위함인듯 하다.
+			// 그런데 이 대상은 Scene에 존재할텐데...
 			m_activePath->FixedUpdate();
 		}
 	}
@@ -153,7 +158,7 @@ namespace Dive
 				m_activePath->Stop();
 			}
 
-			if (path)
+			if (path != nullptr)
 			{
 				path->Start();
 			}
