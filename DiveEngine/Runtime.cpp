@@ -51,6 +51,7 @@ namespace Dive
 		static float fixedFrameAccumulator = 0.0f;
 		static float deltaFrameAccumulator = 0.0f;
 
+	
 		if (m_bWindowActive)
 		{
 			fixedFrameAccumulator += delta;
@@ -90,14 +91,6 @@ namespace Dive
 		{
 			// 입력 버퍼만 수행
 		}
-
-		// device의 직접 호출은 에바다.
-		// 그리고 위치도 Render()로 옮겨야 한다.
-		// 문제는 Compose()이다.
-		auto device = Renderer::GetInstance().GetDevice();
-		device->PresentBegin();
-		Compose();
-		device->PresentEnd();
 	}
 	
 	void Runtime::Update(float deltaTime)
@@ -133,12 +126,18 @@ namespace Dive
 	
 	void Runtime::Render()
 	{
+		auto graphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
+		graphicsDevice->PresentBegin();
+
 		// lua
 
 		if (m_activePath)
 		{
 			m_activePath->Render();
 		}
+
+		Compose();
+		graphicsDevice->PresentEnd();
 	}
 
 	void Runtime::Compose()
@@ -169,18 +168,9 @@ namespace Dive
 	void Runtime::SetWindow(HWND windowHandle, bool fullScreen)
 	{
 		auto& renderer = Renderer::GetInstance();
-		renderer.SetDevice(make_shared<GraphicsDevice>(windowHandle, fullScreen));
+		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(windowHandle, fullScreen));
 
-		auto device = renderer.GetDevice();
-		CORE_TRACE("Resolution: {0:d} x {1:d}", device->GetResolutionWidth(), device->GetResolutionHeight());
-
-		RECT rt;
-		GetClientRect(windowHandle, &rt);
-		auto width = static_cast<unsigned int>(rt.right - rt.left);
-		auto height = static_cast<unsigned int>(rt.bottom - rt.top);
-		CORE_TRACE("Changed ClientRect: {0:d} x {1:d}", width, height);
-
-		device->SetResolution(800, 600);
-		CORE_TRACE("Changed Resolution: {0:d} x {1:d}", device->GetResolutionWidth(), device->GetResolutionHeight());
+		auto graphicsDevice = renderer.GetGraphicsDevice();
+		CORE_TRACE("Resolution: {0:d} x {1:d}", graphicsDevice->GetResolutionWidth(), graphicsDevice->GetResolutionHeight());
 	}
 }

@@ -55,20 +55,17 @@
     <ClInclude Include="GraphicsDevice.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="SamplerState.h">
-      <Filter>Engine\Graphics\Resources</Filter>
+    <ClInclude Include="Mesh.h">
+      <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="VertexBuffer.h">
-      <Filter>Engine\Graphics\Resources</Filter>
+    <ClInclude Include="VertexTypes.h">
+      <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="IndexBuffer.h">
-      <Filter>Engine\Graphics\Resources</Filter>
+    <ClInclude Include="GraphicsInclude.h">
+      <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>Engine\Graphics\Resources</Filter>
-    </ClInclude>
-    <ClInclude Include="Buffer.h">
-      <Filter>Engine\Graphics\Resources</Filter>
+    <ClInclude Include="PipelineState.h">
+      <Filter>Engine\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -105,17 +102,14 @@
     <ClCompile Include="GraphicsDevice.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="VertexBuffer.cpp">
-      <Filter>Engine\Graphics\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="IndexBuffer.cpp">
-      <Filter>Engine\Graphics\Resources</Filter>
-    </ClCompile>
-    <ClCompile Include="Buffer.cpp">
-      <Filter>Engine\Graphics\Resources</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Engine\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Renderer_Resources.cpp">
+      <Filter>Engine\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -136,9 +130,6 @@
     </Filter>
     <Filter Include="Engine\Scene\Components">
       <UniqueIdentifier>{7bc942ed-9c43-48b4-ad1c-95c51f40ebc0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Graphics\Resources">
-      <UniqueIdentifier>{da7a23d9-d213-43f6-b97e-479a7b864911}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

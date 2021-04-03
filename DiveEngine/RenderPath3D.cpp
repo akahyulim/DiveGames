@@ -39,9 +39,12 @@ namespace Dive
 	// 순서대로 그린다.
 	void RenderPath3D::Render() const
 	{
-		auto device = Renderer::GetInstance().GetDevice();
+		auto pImmediateContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
+		assert(pImmediateContext != nullptr);
 
-		CORE_TRACE("RenderPath3D::Render() - Rendering...");
+		Renderer::GetInstance().UpdateCB();
+		Renderer::GetInstance().DrawScene();
+
 	}
 
 	void RenderPath3D::Compose() const

@@ -9,9 +9,18 @@
 #include "Runtime.h"
 #include "Timer.h"
 #include "ThreadPool.h"
-#include "Scene.h"
-#include "Renderer.h"
 #include "RenderPath.h"
 #include "RenderPath3D.h"
+
+//= Graphics ======================
+#include "GraphicsDevice.h"
+#include "Renderer.h"
+#include "VertexTypes.h"
+#include "Mesh.h"
+
+//= Scene =========================
+#include "Scene.h"
+//#include "GameObject.h"
+//#include "Component.h"
 
 #pragma comment(lib, "DiveEngine.lib")

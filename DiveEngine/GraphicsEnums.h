@@ -1,17 +1,52 @@
 #pragma once
 
-enum class eDepthStencilStates : uint32_t
+namespace Dive
 {
-	Default = 0,
-	Shaodw,
-	WriteOnly,
-	Count
-};
+	enum class eBufferType
+	{
+		Vertex,
+		Index,
+		Constant,
+		Invalid
+	};
 
-enum DSSTATE
-{
-	DSSTATE_DEFAULT,
-	DSSTATE_SHADOW,
-	DSSTATE_WRITE_ONLY,
-	DSSTATE_COUNT
-};
+	enum class eShaderStage
+	{
+		Vs,
+		Ps,
+		Invalid
+	};
+
+	enum SHADERTYPES
+	{
+		// vertex
+		VSTYPE_COLOR,
+
+		// index
+		PSTYPE_COLOR,
+
+		SHADERTYPE_COUNT
+	};
+
+	// shader 이름과 달라도 되나...
+	enum ILTYPES
+	{
+		ILTYPE_POS,
+		ILTYPE_POS_COL,
+		ILTYPE_POS_TEX,
+
+		ILTYPE_COUNT
+	};
+
+	enum DSSTYPES
+	{
+		DSSTYPE_DEFAULT,
+		DSSTYPE_COUNT
+	};
+
+	enum RSSTYPES
+	{
+		RSSTYPE_CULLBACK_SOLID,
+		RSSTYPE_COUNT
+	};
+}

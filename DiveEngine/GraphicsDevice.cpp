@@ -58,10 +58,10 @@ namespace Dive
 				static_cast<UINT>(featureLevels.size()),
 				D3D11_SDK_VERSION,
 				&desc,
-				&m_swapChain,
-				&m_device,
+				&m_pSwapChain,
+				&m_pDevice,
 				nullptr,
-				&m_immediateContext);
+				&m_pImmediateContext);
 		};
 
 		auto result = createDeviceAndSwapChain();
@@ -73,6 +73,7 @@ namespace Dive
 		}
 
 		createBackbufferResources();
+		createDepthStencilView();
 		
 		if (FAILED(result))
 		{
@@ -81,33 +82,20 @@ namespace Dive
 	}
 
 	// BeginScene 혹은 아에 Renderer의 Render 초반으로 옮기자.
+	// => 잘 모르겠다....
 	void GraphicsDevice::PresentBegin()
 	{
-		auto renderTargetView = m_renderTargetView.Get();
-		m_immediateContext->OMSetRenderTargets(1, &renderTargetView, 0);
+		m_pImmediateContext->OMSetRenderTargets(1, m_pRTV.GetAddressOf(), m_pDSV.Get());
 		
-		float clearColors[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
-		m_immediateContext->ClearRenderTargetView(renderTargetView, clearColors);
+		float clearColors[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+		m_pImmediateContext->ClearRenderTargetView(m_pRTV.Get(), clearColors);
+		m_pImmediateContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 	
 	// 이건 어찌됐든 Renderer에서?
 	void GraphicsDevice::PresentEnd()
 	{
-		m_swapChain->Present(m_bVSync, 0);
-	}
-
-	// 너무 랩핑함수다.
-	bool GraphicsDevice::CreateSamplerState(D3D11_SAMPLER_DESC* desc, ID3D11SamplerState* state)
-	{
-		assert(desc != nullptr);
-
-		if (FAILED(m_device->CreateSamplerState(desc, &state)))
-		{
-			CORE_ERROR("");
-			return false;
-		}
-
-		return true;
+		m_pSwapChain->Present(m_bVSync ? 1 : 0, 0);
 	}
 
 	// 윈도우의 크기가 변경되었을 때 호출되어야 한다.
@@ -117,10 +105,10 @@ namespace Dive
 		{
 			// render target 연결을 끊지 않았는데 문제가 없다...
 
-			m_backBuffer.Reset();
-			m_renderTargetView.Reset();
+			m_pBackBuffer.Reset();
+			m_pRTV.Reset();
 
-			HRESULT hr = m_swapChain->ResizeBuffers(m_backBufferCount, width, height, m_format, 0);
+			HRESULT hr = m_pSwapChain->ResizeBuffers(m_backBufferCount, width, height, m_format, 0);
 			assert(SUCCEEDED(hr));
 
 			m_resolutionWidth = width;
@@ -132,39 +120,57 @@ namespace Dive
 	
 	bool GraphicsDevice::IsInitialized() const
 	{
-		return (m_device != nullptr && m_immediateContext != nullptr && m_swapChain != nullptr);
-	}
-
-	void GraphicsDevice::BindViewports(unsigned int count, const D3D11_VIEWPORT* viewports)
-	{
-		assert(count < 6);
-
-		D3D11_VIEWPORT vps[6];
-		for (unsigned int i = 0; i < count; i++)
-		{
-			vps[i].TopLeftX = viewports[i].TopLeftX;
-			vps[i].TopLeftY = viewports[i].TopLeftY;
-			vps[i].Width	= viewports[i].Width;
-			vps[i].Height	= viewports[i].Height;
-			vps[i].MinDepth = viewports[i].MinDepth;
-			vps[i].MaxDepth = viewports[i].MaxDepth;
-		}
-
-		m_immediateContext->RSSetViewports(count, vps);
+		return (m_pDevice != nullptr && m_pImmediateContext != nullptr && m_pSwapChain != nullptr);
 	}
 
 	void GraphicsDevice::createBackbufferResources()
 	{
-		if (FAILED(m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &m_backBuffer)))
+		if (FAILED(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &m_pBackBuffer)))
 		{
 			CORE_ERROR("BackBuffer 생성에 실패하였습니다.");
 			PostQuitMessage(0);
 		}
 
-		if (FAILED(m_device->CreateRenderTargetView(m_backBuffer.Get(), nullptr, &m_renderTargetView)))
+		if (FAILED(m_pDevice->CreateRenderTargetView(m_pBackBuffer.Get(), nullptr, &m_pRTV)))
 		{
 			CORE_ERROR("RenderTargetView 생성에 실패하였습니다.");
 			PostQuitMessage(0);
+		}
+	}
+
+	void GraphicsDevice::createDepthStencilView()
+	{
+		D3D11_TEXTURE2D_DESC texDesc;
+		ZeroMemory(&texDesc, sizeof(texDesc));
+
+		// Set up the description of the depth buffer.
+		texDesc.Width = GetResolutionWidth();
+		texDesc.Height = GetResolutionHeight();
+		texDesc.MipLevels = 1;
+		texDesc.ArraySize = 1;
+		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		texDesc.SampleDesc.Count = 1;
+		texDesc.SampleDesc.Quality = 0;
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		texDesc.CPUAccessFlags = 0;
+		texDesc.MiscFlags = 0;
+
+		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, m_pDSBuffer.GetAddressOf())))
+		{
+			CORE_ERROR("DepthStencil TextureBuffer 생성 실패");
+			return;
+		}
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc;
+		ZeroMemory(&viewDesc, sizeof(viewDesc));
+		viewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		viewDesc.Texture2D.MipSlice = 0;
+
+		if (FAILED(m_pDevice->CreateDepthStencilView(m_pDSBuffer.Get(), &viewDesc, m_pDSV.GetAddressOf())))
+		{
+			CORE_ERROR("DepthStencilView 생성 실패");
 		}
 	}
 }

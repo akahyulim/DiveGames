@@ -18,10 +18,11 @@ struct PixelInput
 	float4 color : COLOR;
 };
 
-PixelInput VertexMain(VertexInput input)
+PixelInput mainVS(VertexInput input)
 {
 	PixelInput output;
 
+	input.position.w = 1.0f;
 	output.position = mul(input.position, world);
 	output.position = mul(output.position, view);
 	output.position = mul(output.position, proj);
@@ -31,7 +32,7 @@ PixelInput VertexMain(VertexInput input)
 	return output;
 }
 
-float4 PixelMain(PixelInput input) : SV_TARGET
+float4 mainPS(PixelInput input) : SV_TARGET
 {
 	return input.color;
 }

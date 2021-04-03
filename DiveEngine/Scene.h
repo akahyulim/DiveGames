@@ -1,5 +1,6 @@
 #pragma once
 #include "Object.h"
+#include "Mesh.h"		// 추후 지워야할 대상?
 #include <vector>
 #include <string>
 #include <memory>
@@ -28,9 +29,16 @@ namespace Dive
 			return scene;
 		}
 
+		void SetMesh(Mesh* mesh) { m_pMesh = mesh; }
+		Mesh* GetMesh() { return m_pMesh; }
+
 
 	private:
 		std::vector<std::shared_ptr<GameObject>> m_gameObjects;
 		// camera??
+
+
+		// test용
+		Mesh* m_pMesh;
 	};
 }

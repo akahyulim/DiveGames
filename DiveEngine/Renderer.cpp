@@ -1,4 +1,6 @@
 #include "Renderer.h"
+#include "Scene.h"
+#include "Mesh.h"
 #include "Log.h"
 #include <assert.h>
 
@@ -11,80 +13,150 @@ namespace Dive
 
 	void Renderer::Initialize()
 	{
-		if (!m_device || !m_device->IsInitialized())
+		if (!m_pGraphicsDevice || !m_pGraphicsDevice->IsInitialized())
 		{
 			CORE_ERROR("Graphics Device가 생성되지 않아 초기화를 실행할 수 없습니다. 프로그램을 종료합니다.");
 			PostQuitMessage(0);
 		}
 
-		createSamplers();
-		createDepthStencilStates();
+		createStates();
 		createConstantBuffers();
 		createTextures();
 		createShaders();
-		// 모든 Resource가 생성된 후 PipelineState를 만든다.
-		// 적어도 states, shaders, inputlayouts는 만들어져 있어야 한다.
+		createPipelineStates();	// 가장 마지막이어야 한다.
 		
 		CORE_TRACE("Renderer 초기화에 성공하였습니다.");
 	}
 
-	void Renderer::SetDevice(std::shared_ptr<GraphicsDevice> device)
+	void Renderer::UpdateCB()
 	{
-		m_device = device;
+		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
+		assert(pImmediateContext != nullptr);
 
-		assert(m_device);
+		// CB Update
+		if (m_pCBMatrix == nullptr)
+			return;
 
-		// 왜 wicked는 여기에서 sampler를 생성할까?
-	}
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-	void Renderer::createSamplers()
-	{
-		// 어떻게 생성할 것인가?
-	}
-
-	void Renderer::createDepthStencilStates()
-	{
-		D3D11_DEPTH_STENCIL_DESC desc;
-		desc.DepthEnable	= true;
-		desc.DepthWriteMask	= D3D11_DEPTH_WRITE_MASK_ALL;
-		desc.DepthFunc		= D3D11_COMPARISON_GREATER;
-
-		if (FAILED(m_device->GetDevice()->CreateDepthStencilState(&desc, &m_depthStencilState[DSSTATE_DEFAULT])))
+		if (FAILED(pImmediateContext->Map(m_pCBMatrix.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
-			CORE_ERROR("");
+			CORE_ERROR("Constant Buffer Mapping에 실패하였습니다.");
+			return;
 		}
 
-		// state는 이렇게 한다 해도 buffer 생성은 다르게 한다면....?
-		// 일관성을 유지하는게 나을텐데...
+		MatrixBuffer* pBuffer = static_cast<MatrixBuffer*>(mappedResource.pData);
+		pBuffer->world = XMMatrixTranspose(XMMatrixIdentity());
+		{
+			XMFLOAT3 up, position, lookAt;
+			XMVECTOR upVector, positionVector, lookAtVector;
+			float yaw, pitch, roll;
+			XMMATRIX rotationMatrix;
+
+			up.x = 0.0f;
+			up.y = 1.0f;
+			up.z = 0.0f;
+
+			upVector = XMLoadFloat3(&up);
+
+			position.x = 0.0f;
+			position.y = 0.0f;
+			position.z = -5.0f;
+
+			// Load it into a XMVECTOR structure.
+			positionVector = XMLoadFloat3(&position);
+
+			// Setup where the camera is looking by default.
+			lookAt.x = 0.0f;
+			lookAt.y = 0.0f;
+			lookAt.z = 1.0f;
+
+			// Load it into a XMVECTOR structure.
+			lookAtVector = XMLoadFloat3(&lookAt);
+
+			// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
+			pitch = 0.0f * 0.0174532925f;
+			yaw = 0.0f * 0.0174532925f;
+			roll = 0.0f * 0.0174532925f;
+
+			// Create the rotation matrix from the yaw, pitch, and roll values.
+			rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+
+			// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
+			lookAtVector = XMVector3TransformCoord(lookAtVector, rotationMatrix);
+			upVector = XMVector3TransformCoord(upVector, rotationMatrix);
+
+			// Translate the rotated camera position to the location of the viewer.
+			lookAtVector = XMVectorAdd(positionVector, lookAtVector);
+			pBuffer->view = XMMatrixTranspose(XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
+		}
+		{
+			float fieldOfView = 3.141592654f / 4.0f;
+			float screenAspect = (float)m_pGraphicsDevice->GetResolutionWidth() / (float)m_pGraphicsDevice->GetResolutionHeight();
+			pBuffer->proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f));
+		}
+		pImmediateContext->Unmap(static_cast<ID3D11Resource*>(m_pCBMatrix.Get()), 0);
 	}
 
-	void Renderer::createConstantBuffers()
+	void Renderer::DrawScene()
 	{
+		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
+		assert(pImmediateContext != nullptr);
+
+		pImmediateContext->IASetInputLayout(m_pipelineStateColor.pIL);
+		pImmediateContext->IASetPrimitiveTopology(m_pipelineStateColor.primitiveTopology);
+		pImmediateContext->VSSetShader(m_pipelineStateColor.pVS, NULL, 0);
+		pImmediateContext->PSSetShader(m_pipelineStateColor.pPS, NULL, 0);
+		pImmediateContext->OMSetDepthStencilState(m_pipelineStateColor.pDSS, 1);
+		pImmediateContext->RSSetState(m_pipelineStateColor.pRSS);
+
+		pImmediateContext->VSSetConstantBuffers(0, 1, m_pCBMatrix.GetAddressOf());
+
+		
+		// 임시
+		// 누가 가져야 할까?
+		D3D11_VIEWPORT viewport;
+		viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
+		viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+		viewport.TopLeftX = 0.0f;
+		viewport.TopLeftY = 0.0f;
+		pImmediateContext->RSSetViewports(1, &viewport);
+
+		// 이건 임시다. Visibility 등을 통해 얻어야 한다.
+		Mesh* mesh = Scene::GetGlobalScene().GetMesh();
+
+		ID3D11Buffer* vbs[] =
+		{
+			mesh->m_pVBPosition.Get(),
+			mesh->m_pVBColor.Get()
+		};
+		
+		UINT strides[] =
+		{
+			sizeof(XMFLOAT3),
+			sizeof(XMFLOAT4)
+		};
+		
+		unsigned int offsets[] =
+		{
+			0,
+			0
+		};
+
+		pImmediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);
+		pImmediateContext->IASetIndexBuffer(mesh->m_pIB.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		pImmediateContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 	}
 
-	void Renderer::createTextures()
+	void Renderer::SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device)
 	{
-		// 텍스쳐의 경우 복잡해질 수 있다.
-		// 일단 view 생성 요건이 다르고 sub resource까지 설정해야 한다.
-		// 그리고 생성하는 texture의 개수도 꽤 많을 것 같다.
+		m_pGraphicsDevice = device;
+
+		assert(m_pGraphicsDevice);
 	}
 
-	void Renderer::createShaders()
-	{
-		// Input Layout도 함께 생성
-	}
-
-	void Renderer::createPipelineStates()
-	{
-		// 생성한 shaders, states, inputLayout, prmitive_topology로
-		// PipelineStateDesc를 구성한 후
-		// GraphicsDevice::CreateRenderPipelineState()에 전달하여
-		// PipelineState를 생성한다.
-		// 사실 state, inputLayout까지 이 곳에서 생성했다면
-		// CreateRenderPipelineState()를 Graphics에 선언 및 정의할 필요가 없다.
-		// 그리고 PipelineStateDesc와 PipelineState의 구분도 의미가 없다.
-
-		// PipelineState는 Draw 단위에서 사용할 State와 Sahder의 묶음이다.
-		// 이외의 Buffer는 따로 bind하여야 한다.
-	}
+	
 }

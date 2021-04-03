@@ -1,16 +1,8 @@
 #pragma once
+#include "GraphicsInclude.h"
+#include "GraphicsEnums.h"
 #include "CommonInclude.h"
-#include <d3d11_3.h>
-#include <DXGI1_3.h>
-#include <wrl/client.h>
 #include <Windows.h>
-#include <atomic>
-
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "d3dcompiler.lib")
-#pragma comment(lib, "dxguid.lib")
 
 namespace Dive
 {
@@ -22,8 +14,6 @@ namespace Dive
 
 		void PresentBegin();
 		void PresentEnd();
-
-		bool CreateSamplerState(D3D11_SAMPLER_DESC* desc, ID3D11SamplerState* state);
 
 		void SetResolution(unsigned int width, unsigned int height);
 
@@ -38,24 +28,22 @@ namespace Dive
 
 		bool IsInitialized() const;
 
-		// resource bind 함수
-		// 이것두 괜히 랩핑 형태가 될 수 있다.
-		void BindViewports(unsigned int count, const D3D11_VIEWPORT* viewports);
-
-		// 이름이 좀 에바다.
-		// 그런데 아무리봐도 직접 전달하는건 에바다.
-		ID3D11Device* GetDevice() { return m_device.Get(); }
-		ID3D11DeviceContext* GetImmediateContext() { return m_immediateContext.Get(); }
+		ID3D11Device* GetDevice() { return m_pDevice.Get(); }
+		ID3D11DeviceContext* GetImmediateContext() { return m_pImmediateContext.Get(); }
 
 	private:
 		void createBackbufferResources();
+		void createDepthStencilView();
 
 	private:
-		Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
-		Microsoft::WRL::ComPtr<ID3D11Device> m_device;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_immediateContext;
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_backBuffer;
+		Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwapChain;
+		Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pImmediateContext;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pRTV;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pBackBuffer;
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pDSBuffer;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDSV;
 
 		bool m_bVSync = false;
 		bool m_bFullScreen = false;

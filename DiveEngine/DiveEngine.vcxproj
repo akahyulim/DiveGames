@@ -160,46 +160,44 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Buffer.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CommonInclude.h" />
     <ClInclude Include="Component.h" />
-    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DiveEngine.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
-    <ClInclude Include="IndexBuffer.h" />
+    <ClInclude Include="GraphicsInclude.h" />
     <ClInclude Include="Log.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Object.h" />
+    <ClInclude Include="PipelineState.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderPath.h" />
     <ClInclude Include="RenderPath3D.h" />
     <ClInclude Include="Runtime.h" />
-    <ClInclude Include="SamplerState.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="VertexBuffer.h" />
+    <ClInclude Include="VertexTypes.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
-    <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Renderer_Resources.cpp" />
     <ClCompile Include="RenderPath3D.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="VertexBuffer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
