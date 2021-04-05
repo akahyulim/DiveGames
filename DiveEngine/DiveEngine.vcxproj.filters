@@ -67,6 +67,9 @@
     <ClInclude Include="PipelineState.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -109,6 +112,9 @@
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Renderer_Resources.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

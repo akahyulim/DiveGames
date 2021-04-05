@@ -49,4 +49,10 @@ namespace Dive
 		RSSTYPE_CULLBACK_SOLID,
 		RSSTYPE_COUNT
 	};
+
+	
+	enum SMPSTYPES
+	{
+
+	};
 }

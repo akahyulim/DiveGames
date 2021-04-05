@@ -69,6 +69,7 @@ namespace Dive
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_pInputLayouts[ILTYPE_COUNT];
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_pDepthStencilStates[DSSTYPE_COUNT];
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_pRasterizerStates[RSSTYPE_COUNT];
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerState;
 
 		// constant buffer บฮลอ
 		struct MatrixBuffer

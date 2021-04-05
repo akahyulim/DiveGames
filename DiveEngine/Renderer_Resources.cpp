@@ -11,9 +11,9 @@ namespace Dive
 		auto pDevice = m_pGraphicsDevice->GetDevice();
 		assert(pDevice != nullptr);
 
-		HRESULT hr;
+		HRESULT hr = E_FAIL;
 
-		// DepthStenicl State
+		// DepthStenicl States
 		{
 			D3D11_DEPTH_STENCIL_DESC desc;
 			desc.DepthEnable = true;
@@ -40,7 +40,7 @@ namespace Dive
 			assert(SUCCEEDED(hr));
 		}
 
-		// Rasterizer State
+		// Rasterizer States
 		{
 			D3D11_RASTERIZER_DESC desc;
 			desc.AntialiasedLineEnable = false;
@@ -55,6 +55,27 @@ namespace Dive
 			desc.SlopeScaledDepthBias = 0.0f;
 
 			hr = pDevice->CreateRasterizerState(&desc, m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].GetAddressOf());
+			assert(SUCCEEDED(hr));
+		}
+
+		// Sampler States
+		{
+			D3D11_SAMPLER_DESC desc;
+			desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+			desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+			desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+			desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+			desc.MipLODBias = 0.0f;
+			desc.MaxAnisotropy = 1;
+			desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+			desc.BorderColor[0] = 0;
+			desc.BorderColor[1] = 0;
+			desc.BorderColor[2] = 0;
+			desc.BorderColor[3] = 0;
+			desc.MinLOD = 0;
+			desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+			hr = pDevice->CreateSamplerState(&desc, m_pSamplerState.GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 
