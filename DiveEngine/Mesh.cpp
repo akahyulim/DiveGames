@@ -39,7 +39,7 @@ namespace Dive
 
 				if (FAILED(pDevice->CreateBuffer(&desc, &data, m_pVBPosition.GetAddressOf())))
 				{
-					CORE_ERROR("");
+					CORE_ERROR("Position Buffer 생성에 실패하였습니다.");
 					return false;
 				}
 
@@ -69,7 +69,7 @@ namespace Dive
 
 					if (FAILED(pDevice->CreateBuffer(&desc, &data, m_pVBColor.GetAddressOf())))
 					{
-						CORE_ERROR("");
+						CORE_ERROR("Color Buffer 생성에 실패하였습니다.");
 						return false;
 					}
 				}
@@ -79,7 +79,26 @@ namespace Dive
 			{
 				if (!m_uv.empty())
 				{
+					UINT stride = static_cast<UINT>(sizeof(DirectX::XMFLOAT2));
 
+					D3D11_BUFFER_DESC desc;
+					desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+					desc.Usage = D3D11_USAGE_DEFAULT;
+					desc.CPUAccessFlags = 0;
+					desc.StructureByteStride = stride;
+					desc.ByteWidth = stride * static_cast<UINT>(m_uv.size());
+					desc.MiscFlags = 0;
+
+					D3D11_SUBRESOURCE_DATA data;
+					data.pSysMem = m_uv.data();
+					data.SysMemPitch = 0;
+					data.SysMemSlicePitch = 0;
+
+					if (FAILED(pDevice->CreateBuffer(&desc, &data, m_pVBUv.GetAddressOf())))
+					{
+						CORE_ERROR("UV Buffer 생성에 실패하였습니다.");
+						return false;
+					}
 				}
 			}
 

@@ -189,13 +189,13 @@ namespace Dive
 		ID3D11Buffer* vbs[] =
 		{
 			mesh->m_pVBPosition.Get(),
-			//mesh->m_pVBColor.Get()
+			mesh->m_pVBUv.Get()
 		};
 
 		UINT strides[] =
 		{
 			sizeof(XMFLOAT3),
-			//sizeof(XMFLOAT4)
+			sizeof(XMFLOAT2)
 		};
 
 		unsigned int offsets[] =
