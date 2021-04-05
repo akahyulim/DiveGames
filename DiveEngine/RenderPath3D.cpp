@@ -43,7 +43,7 @@ namespace Dive
 		assert(pImmediateContext != nullptr);
 
 		Renderer::GetInstance().UpdateCB();
-		Renderer::GetInstance().DrawScene();
+		Renderer::GetInstance().DrawColor();
 
 	}
 

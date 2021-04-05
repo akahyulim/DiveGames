@@ -42,6 +42,10 @@ namespace Dive
 		void UpdateCB();
 		void DrawScene();
 
+		// 일단 나누자
+		void DrawColor();
+		void DrawTexturing();
+
 
 		GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice.get(); }
 		void SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device);
@@ -84,5 +88,6 @@ namespace Dive
 		// 굳이 동적생성할 필요가 없다. enum array로 만들자.
 		// 그런데 위키드는 pipelinestate가 종류별 배열로 꽤 많다.
 		PipelineState m_pipelineStateColor;
+		PipelineState m_pipelineStateTexturing;
 	};
 }

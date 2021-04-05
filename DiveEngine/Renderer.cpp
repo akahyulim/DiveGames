@@ -100,6 +100,11 @@ namespace Dive
 
 	void Renderer::DrawScene()
 	{
+		
+	}
+
+	void Renderer::DrawColor()
+	{
 		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
@@ -112,7 +117,7 @@ namespace Dive
 
 		pImmediateContext->VSSetConstantBuffers(0, 1, m_pCBMatrix.GetAddressOf());
 
-		
+
 		// 임시
 		// 누가 가져야 할까?
 		D3D11_VIEWPORT viewport;
@@ -132,13 +137,67 @@ namespace Dive
 			mesh->m_pVBPosition.Get(),
 			mesh->m_pVBColor.Get()
 		};
-		
+
 		UINT strides[] =
 		{
 			sizeof(XMFLOAT3),
 			sizeof(XMFLOAT4)
 		};
-		
+
+		unsigned int offsets[] =
+		{
+			0,
+			0
+		};
+
+		pImmediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);
+		pImmediateContext->IASetIndexBuffer(mesh->m_pIB.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		pImmediateContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+	}
+
+	void Renderer::DrawTexturing()
+	{
+		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
+		assert(pImmediateContext != nullptr);
+
+		pImmediateContext->IASetInputLayout(m_pipelineStateTexturing.pIL);
+		pImmediateContext->IASetPrimitiveTopology(m_pipelineStateTexturing.primitiveTopology);
+		pImmediateContext->VSSetShader(m_pipelineStateTexturing.pVS, NULL, 0);
+		pImmediateContext->PSSetShader(m_pipelineStateTexturing.pPS, NULL, 0);
+		pImmediateContext->PSSetSamplers(0, 1, &m_pipelineStateTexturing.pSS);	// 얘는 더블 포인터다...
+		pImmediateContext->OMSetDepthStencilState(m_pipelineStateTexturing.pDSS, 1);
+		pImmediateContext->RSSetState(m_pipelineStateTexturing.pRSS);
+
+		pImmediateContext->VSSetConstantBuffers(0, 1, m_pCBMatrix.GetAddressOf());
+
+
+		// 임시
+		// 누가 가져야 할까?
+		D3D11_VIEWPORT viewport;
+		viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
+		viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+		viewport.TopLeftX = 0.0f;
+		viewport.TopLeftY = 0.0f;
+		pImmediateContext->RSSetViewports(1, &viewport);
+
+		// 이건 임시다. Visibility 등을 통해 얻어야 한다.
+		Mesh* mesh = Scene::GetGlobalScene().GetMesh();
+
+		ID3D11Buffer* vbs[] =
+		{
+			mesh->m_pVBPosition.Get(),
+			//mesh->m_pVBColor.Get()
+		};
+
+		UINT strides[] =
+		{
+			sizeof(XMFLOAT3),
+			//sizeof(XMFLOAT4)
+		};
+
 		unsigned int offsets[] =
 		{
 			0,
@@ -156,7 +215,5 @@ namespace Dive
 		m_pGraphicsDevice = device;
 
 		assert(m_pGraphicsDevice);
-	}
-
-	
+	}	
 }

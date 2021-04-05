@@ -127,6 +127,24 @@ namespace Dive
 			}
 		}
 
+		// Texturing Shader
+		{
+			D3D11_INPUT_ELEMENT_DESC desc[] =
+			{
+				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			};
+
+			if (!createVertexShader(L"../DiveEngine/texturing.hlsl", VSTYPE_TEXTURING, ILTYPE_POS_TEX, desc, arraysize(desc)))
+			{
+				return false;
+			}
+			if (!createPixelShader(L"../DiveEngine/texturing.hlsl", PSTYPE_TEXTURING))
+			{
+				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -140,6 +158,17 @@ namespace Dive
 			m_pipelineStateColor.pRSS = m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
 			m_pipelineStateColor.pIL = m_pInputLayouts[ILTYPE_POS_COL].Get();
 			m_pipelineStateColor.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		}
+
+		// Texturing
+		{
+			m_pipelineStateTexturing.pVS = (ID3D11VertexShader*)m_pShaders[VSTYPE_TEXTURING].Get();
+			m_pipelineStateTexturing.pPS = (ID3D11PixelShader*)m_pShaders[PSTYPE_TEXTURING].Get();
+			m_pipelineStateTexturing.pDSS = m_pDepthStencilStates[DSSTYPE_DEFAULT].Get();
+			m_pipelineStateTexturing.pRSS = m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
+			m_pipelineStateTexturing.pSS = m_pSamplerState.Get();
+			m_pipelineStateTexturing.pIL = m_pInputLayouts[ILTYPE_POS_TEX].Get();
+			m_pipelineStateTexturing.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
 	}
 

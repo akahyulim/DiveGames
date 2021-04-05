@@ -21,9 +21,11 @@ namespace Dive
 	{
 		// vertex
 		VSTYPE_COLOR,
+		VSTYPE_TEXTURING,
 
-		// index
+		// pixel
 		PSTYPE_COLOR,
+		PSTYPE_TEXTURING,
 
 		SHADERTYPE_COUNT
 	};
