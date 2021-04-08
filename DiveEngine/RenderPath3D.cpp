@@ -43,8 +43,8 @@ namespace Dive
 		assert(pImmediateContext != nullptr);
 
 		Renderer::GetInstance().UpdateCB();
-		Renderer::GetInstance().DrawColor();
-
+		//Renderer::GetInstance().DrawColor();
+		Renderer::GetInstance().DrawTexturing();
 	}
 
 	void RenderPath3D::Compose() const

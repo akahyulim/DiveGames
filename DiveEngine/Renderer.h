@@ -3,6 +3,7 @@
 #include "GraphicsDevice.h"
 #include "GraphicsEnums.h"
 #include "PipelineState.h"
+#include "Texture.h"
 #include <memory>
 #include <string>
 
@@ -89,5 +90,10 @@ namespace Dive
 		// 그런데 위키드는 pipelinestate가 종류별 배열로 꽤 많다.
 		PipelineState m_pipelineStateColor;
 		PipelineState m_pipelineStateTexturing;
+
+
+		// texturing test
+		//Texture* m_pTex = nullptr;
+		std::shared_ptr<Texture> m_pTex;
 	};
 }

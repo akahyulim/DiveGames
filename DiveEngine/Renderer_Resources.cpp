@@ -104,6 +104,10 @@ namespace Dive
 
 	bool Renderer::createTextures()
 	{
+		m_pTex = std::make_shared<Texture>();
+		if (!m_pTex->LoadFromFile(L"../Assets/Textures/Choa.jpg"))
+			return false;
+
 		return true;
 	}
 

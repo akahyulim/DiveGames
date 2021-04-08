@@ -17,10 +17,14 @@
 #include "Renderer.h"
 #include "VertexTypes.h"
 #include "Mesh.h"
+#include "Texture.h"
 
 //= Scene =========================
 #include "Scene.h"
 //#include "GameObject.h"
 //#include "Component.h"
+
+//= Tool ==========================
+
 
 #pragma comment(lib, "DiveEngine.lib")

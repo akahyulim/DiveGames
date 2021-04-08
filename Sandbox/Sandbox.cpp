@@ -19,9 +19,12 @@ namespace Sandbox
 		m_triangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
 		m_triangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
 		m_triangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
-		m_triangle->m_colors.emplace_back(DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-		m_triangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-		m_triangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+		m_triangle->m_uv.emplace_back(DirectX::XMFLOAT2(0.0f, 1.0f));
+		m_triangle->m_uv.emplace_back(DirectX::XMFLOAT2(0.5f, 0.0f));
+		m_triangle->m_uv.emplace_back(DirectX::XMFLOAT2(1.0f, 1.0f));
+		//m_triangle->m_colors.emplace_back(DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+		//m_triangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+		//m_triangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
 		m_triangle->m_indices.emplace_back(0);
 		m_triangle->m_indices.emplace_back(1);
 		m_triangle->m_indices.emplace_back(2);
