@@ -35,9 +35,27 @@ PixelInput mainVS(VertexInput input)
 Texture2D shaderTex;
 SamplerState samplerType;
 
+// 샘플러를 사용하지 않고 텍셀 읽기
+float4 texLoad(Texture2D tex, float2 texCoord)
+{
+	// texture의 크기 획득
+	uint width, height;
+	tex.GetDimensions(width, height);
+	
+	// texcoord와 함께 그려질 좌표 계산 + mip level
+	float3 texCoord3 = float3(texCoord.x * width,
+		texCoord.y * height,
+		0);
+
+	// 해당 좌표의 텍셀을 로드
+	return tex.Load(texCoord3);
+}
+
 float4 mainPS(PixelInput input) : SV_TARGET
 {
 	float4 color;
 	color = shaderTex.Sample(samplerType, input.uv);
 	return color;
+
+	//return texLoad(shaderTex, input.uv);
 }

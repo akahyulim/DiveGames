@@ -6,7 +6,7 @@ using namespace std;
 
 namespace Dive
 {
-	bool Renderer::createStates()
+	bool Renderer::createDepthStencilStates()
 	{
 		auto pDevice = m_pGraphicsDevice->GetDevice();
 		assert(pDevice != nullptr);
@@ -40,7 +40,16 @@ namespace Dive
 			assert(SUCCEEDED(hr));
 		}
 
-		// Rasterizer States
+		return true;
+	}
+
+	bool Renderer::createRasterizerStates()
+	{
+		auto pDevice = m_pGraphicsDevice->GetDevice();
+		assert(pDevice != nullptr);
+
+		HRESULT hr = E_FAIL;
+
 		{
 			D3D11_RASTERIZER_DESC desc;
 			desc.AntialiasedLineEnable = false;
@@ -58,20 +67,30 @@ namespace Dive
 			assert(SUCCEEDED(hr));
 		}
 
-		// Sampler States
+		return true;
+	}
+
+	bool Renderer::createSamplerStates()
+	{
+		auto pDevice = m_pGraphicsDevice->GetDevice();
+		assert(pDevice != nullptr);
+
+		HRESULT hr = E_FAIL;
+
+		// 어떻게 구분할 것인가를 정해야 한다.
 		{
 			D3D11_SAMPLER_DESC desc;
-			desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-			desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-			desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-			desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+			desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+			desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+			desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+			desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 			desc.MipLODBias = 0.0f;
 			desc.MaxAnisotropy = 1;
 			desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-			desc.BorderColor[0] = 0;
-			desc.BorderColor[1] = 0;
-			desc.BorderColor[2] = 0;
-			desc.BorderColor[3] = 0;
+			desc.BorderColor[0] = 0.0f;
+			desc.BorderColor[1] = 0.0f;
+			desc.BorderColor[2] = 0.0f;
+			desc.BorderColor[3] = 0.0f;
 			desc.MinLOD = 0;
 			desc.MaxLOD = D3D11_FLOAT32_MAX;
 
@@ -102,11 +121,21 @@ namespace Dive
 		return true;
 	}
 
+	// 원래는 에디터에서 사용하는 디폴트 텍스쳐를 생성한다.
 	bool Renderer::createTextures()
 	{
-		m_pTex = std::make_shared<Texture>();
-		if (!m_pTex->LoadFromFile(L"../Assets/Textures/Choa.jpg"))
-			return false;
+		m_pTex = std::make_shared<Texture>(L"../Assets/Textures/Choa.jpg");
+
+		return true;
+	}
+
+	// 이름이 좀 애매하다. dsv도 생성할거다.
+	bool Renderer::createRenderTargetViews()
+	{
+		auto width = m_pGraphicsDevice->GetResolutionWidth();
+		auto height = m_pGraphicsDevice->GetResolutionHeight();
+
+		m_pRTV = std::make_shared<Texture>(width, height, DXGI_FORMAT_R8G8B8A8_UINT, "Test_RenderTargetView");
 
 		return true;
 	}

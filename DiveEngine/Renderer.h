@@ -56,10 +56,14 @@ namespace Dive
 		~Renderer();
 
 		// 각종 GPU Resource 생성
-		bool createStates();
+		bool createDepthStencilStates();
+		bool createRasterizerStates();
+		bool createSamplerStates();
 		bool createConstantBuffers();
 		bool createTextures();
+		bool createRenderTargetViews();
 		bool createShaders();
+
 		void createPipelineStates();
 
 		bool createVertexShader(const std::wstring& filepath, unsigned int shaderType, unsigned int inputLayoutType = ILTYPE_COUNT,
@@ -95,5 +99,6 @@ namespace Dive
 		// texturing test
 		//Texture* m_pTex = nullptr;
 		std::shared_ptr<Texture> m_pTex;
+		std::shared_ptr<Texture> m_pRTV;
 	};
 }

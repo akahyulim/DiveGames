@@ -55,6 +55,5 @@ namespace Dive
 	
 	enum SMPSTYPES
 	{
-
 	};
 }

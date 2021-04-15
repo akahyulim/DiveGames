@@ -19,10 +19,16 @@ namespace Dive
 			PostQuitMessage(0);
 		}
 
-		createStates();
+		// states
+		createDepthStencilStates();
+		createRasterizerStates();
+		createSamplerStates();
+
 		createConstantBuffers();
 		createTextures();
+		createRenderTargetViews();
 		createShaders();
+
 		createPipelineStates();	// 가장 마지막이어야 한다.
 		
 		CORE_TRACE("Renderer 초기화에 성공하였습니다.");
