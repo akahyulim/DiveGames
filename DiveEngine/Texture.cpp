@@ -63,10 +63,7 @@ namespace Dive
 			createRenderTargetView(pDev);
 		}
 
-		// DSV
-		{
-
-		}
+		// DSV는 다음에 구현하자. Format이 복잡하고, 책에서는 다른 식으로 구현한 것 같다.
 	}
 
 	bool Texture::createTexture2D(ID3D11Device* pDev, unsigned flags)

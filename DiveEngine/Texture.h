@@ -6,7 +6,10 @@
 
 namespace Dive
 {
-	// 일단 2D Texture 전용
+	// 1. 일단 2D Texture 전용
+	// 2. DepthStencilView는 미구현(Deferred에서 다시 해보자.)
+	// 3. 파일 관련 Helper 함수 필요
+
 	class Texture
 	{
 	public:
