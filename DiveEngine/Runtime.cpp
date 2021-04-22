@@ -4,6 +4,7 @@
 #include "ThreadPool.h"
 #include "RenderPath.h"
 #include "Renderer.h"
+#include "Input.h"
 #include <memory>
 
 using namespace std;
@@ -17,6 +18,8 @@ namespace Dive
 
 	void Runtime::Initialize()
 	{
+		assert(m_hWnd != 0);
+
 		if (m_bInitialized)
 		{
 			return;
@@ -29,6 +32,7 @@ namespace Dive
 		// 이후 laoding은 asyn로 하고, parallel은 최후로 미룬다.
 		TimeManager::GetInstance().Initialize();
 		Renderer::GetInstance().Initialize();
+		Input::GetInstance().Initialize(m_hWnd);
 	}
 
 	void Runtime::Run()
@@ -70,7 +74,7 @@ namespace Dive
 				if (deltaFrameAccumulator >= static_cast<float>(1.0f / m_targetFPS))
 				{
 					Update(deltaFrameAccumulator);
-					// 입력 버퍼
+					Input::GetInstance().Update();
 					Render();
 
 					deltaFrameAccumulator = 0.0f;
@@ -81,7 +85,7 @@ namespace Dive
 				CORE_TRACE("Unlock Update Frame: {:n}", TimeManager::GetInstance().GetFrameCount());
 
 				Update(delta);
-				// 입력 버퍼
+				Input::GetInstance().Update();
 				Render();
 
 				deltaFrameAccumulator = 0.0f;
@@ -167,10 +171,11 @@ namespace Dive
 	
 	void Runtime::SetWindow(HWND windowHandle, bool fullScreen)
 	{
+		m_hWnd = windowHandle;
+		m_bFullScreen = fullScreen;
+
+		// 이것두 그냥 Initailize에 넣어버리는 편이 나을 것 같다.
 		auto& renderer = Renderer::GetInstance();
 		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(windowHandle, fullScreen));
-
-		auto graphicsDevice = renderer.GetGraphicsDevice();
-		CORE_TRACE("Resolution: {0:d} x {1:d}", graphicsDevice->GetResolutionWidth(), graphicsDevice->GetResolutionHeight());
 	}
 }

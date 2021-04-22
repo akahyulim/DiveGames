@@ -70,6 +70,9 @@
     <ClInclude Include="Texture.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Engine\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -117,6 +120,12 @@
     <ClCompile Include="Texture.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Input.cpp">
+      <Filter>Engine\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform_Hierarchy.cpp">
+      <Filter>Engine\Scene\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -136,6 +145,9 @@
     </Filter>
     <Filter Include="Engine\Scene\Components">
       <UniqueIdentifier>{7bc942ed-9c43-48b4-ad1c-95c51f40ebc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Input">
+      <UniqueIdentifier>{7d6380e9-9fcb-4788-b719-d270596b1123}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

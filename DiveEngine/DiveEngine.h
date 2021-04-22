@@ -19,6 +19,9 @@
 #include "Mesh.h"
 #include "Texture.h"
 
+//= Input =========================
+#include "Input.h"
+
 //= Scene =========================
 #include "Scene.h"
 //#include "GameObject.h"

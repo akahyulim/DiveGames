@@ -35,7 +35,12 @@ namespace Dive
 		bool IsFrameLock() const { return m_bFrameLock; }
 		void SetFrameLock(bool enable) { m_bFrameLock = enable; }
 
+		bool IsInitialized() const { return m_bInitialized; }
+
 	protected:
+		HWND m_hWnd = 0;
+		bool m_bFullScreen = false;
+
 		RenderPath* m_activePath = nullptr;
 
 		float m_deltaTime = 0.0f;

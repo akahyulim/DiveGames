@@ -8,7 +8,9 @@ namespace Dive
 	GameObject::GameObject()
 		: Object(typeid(GameObject).hash_code())
 	{
-		AddComponent<Transform>();
+		// 하나로 만들까?
+		auto transform = AddComponent<Transform>();
+		transform->SetOwnder(this);
 	}
 
 	void GameObject::Update(float deltaTime)
