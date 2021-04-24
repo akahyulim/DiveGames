@@ -50,7 +50,6 @@ namespace Dive
         void ParseMessage(LPARAM lParam);   // 나중에 이름 바꾸기
 
 		bool GetKey(const eKeyCode key) { return m_keys[static_cast<unsigned int>(key)]; }
-		// 아래 두 함수는 해당 프레임에서 판단한다.
 		bool GetKeyDown(const eKeyCode key);
 		bool GetKeyUp(const eKeyCode key);
   
@@ -66,16 +65,14 @@ namespace Dive
 
 		bool m_bUpdated = false;
 
-		// keyboard
+		// keys
 		bool m_keys[256] = { false };
 		bool m_oldKeys[256] = { false };
 
 		// mouse
-		DirectX::XMFLOAT2 m_mousePos = DirectX::XMFLOAT2(0.0f, 0.0f);
-		DirectX::XMFLOAT2 m_mousePosDelta = DirectX::XMFLOAT2(0.0f, 0.0f);
-		float m_mouseWheelDelta = 0.0f;
-
-		// x-input pad
+		DirectX::XMFLOAT2 m_mousePos		= DirectX::XMFLOAT2(0.0f, 0.0f);
+		DirectX::XMFLOAT2 m_mousePosDelta	= DirectX::XMFLOAT2(0.0f, 0.0f);
+		float m_mouseWheelDelta				= 0.0f;
 
   };
 }
