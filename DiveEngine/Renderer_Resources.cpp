@@ -98,6 +98,26 @@ namespace Dive
 			assert(SUCCEEDED(hr));
 		}
 
+		{
+			D3D11_SAMPLER_DESC desc;
+			desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+			desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+			desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+			desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+			desc.MipLODBias = 0.0f;
+			desc.MaxAnisotropy = 1;
+			desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+			desc.BorderColor[0] = 0.0f;
+			desc.BorderColor[1] = 0.0f;
+			desc.BorderColor[2] = 0.0f;
+			desc.BorderColor[3] = 0.0f;
+			desc.MinLOD = 0;
+			desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+			hr = pDevice->CreateSamplerState(&desc, m_pSamplerStateLinear.GetAddressOf());
+			assert(SUCCEEDED(hr));
+		}
+
 		return true;
 	}
 
@@ -162,6 +182,7 @@ namespace Dive
 
 		// Texturing Shader
 		{
+			// 각 요소마다 Buffer가 다르기때문에 inputSlot은 스택을 쌓아야 한다.
 			D3D11_INPUT_ELEMENT_DESC desc[] =
 			{
 				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -177,6 +198,33 @@ namespace Dive
 				return false;
 			}
 		}
+
+		// Font Shader
+		{
+			// 위의 InputLayout들과 달리 하나의 VertexType 구조체로 만들어져 있다.
+			D3D11_INPUT_ELEMENT_DESC desc[] =
+			{
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
+			};
+
+			if (!createVertexShader(L"../DiveEngine/fonts.hlsl", VSTYPE_FONTS, ILTYPE_POS_TEX2, desc, arraysize(desc)))
+			{
+				return false;
+			}
+			if (!createPixelShader(L"../DiveEngine/fonts.hlsl", PSTYPE_FONTS))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool Renderer::createFonts()
+	{
+		m_pFont = new Font;
+		m_pFont->Initialize(L"../Assets/Fonts/fontdata.txt", L"../Assets/fonts/font.dds");
 
 		return true;
 	}
@@ -202,6 +250,17 @@ namespace Dive
 			m_pipelineStateTexturing.pSS = m_pSamplerState.Get();
 			m_pipelineStateTexturing.pIL = m_pInputLayouts[ILTYPE_POS_TEX].Get();
 			m_pipelineStateTexturing.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		}
+
+		// Font
+		{
+			m_pipelineStateFont.pVS = (ID3D11VertexShader*)m_pShaders[VSTYPE_FONTS].Get();
+			m_pipelineStateFont.pPS = (ID3D11PixelShader*)m_pShaders[PSTYPE_FONTS].Get();
+			m_pipelineStateFont.pDSS = m_pDepthStencilStates[DSSTYPE_DEFAULT].Get();
+			m_pipelineStateFont.pRSS = m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
+			m_pipelineStateFont.pSS = m_pSamplerStateLinear.Get();
+			m_pipelineStateFont.pIL = m_pInputLayouts[ILTYPE_POS_TEX2].Get();
+			m_pipelineStateFont.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
 	}
 

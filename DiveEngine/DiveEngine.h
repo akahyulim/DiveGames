@@ -28,6 +28,7 @@
 //#include "Component.h"
 
 //= Tool ==========================
+#include "FontImporter.h"
 
 
 #pragma comment(lib, "DiveEngine.lib")

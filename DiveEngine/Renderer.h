@@ -4,6 +4,7 @@
 #include "GraphicsEnums.h"
 #include "PipelineState.h"
 #include "Texture.h"
+#include "Font.h"
 #include <memory>
 #include <string>
 
@@ -46,6 +47,7 @@ namespace Dive
 		// 일단 나누자
 		void DrawColor();
 		void DrawTexturing();
+		void DrawText();
 
 
 		GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice.get(); }
@@ -63,6 +65,7 @@ namespace Dive
 		bool createTextures();
 		bool createRenderTargetViews();
 		bool createShaders();
+		bool createFonts();
 
 		void createPipelineStates();
 
@@ -79,6 +82,9 @@ namespace Dive
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_pDepthStencilStates[DSSTYPE_COUNT];
 		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_pRasterizerStates[RSSTYPE_COUNT];
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerState;
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerStateLinear;
+
+		Font* m_pFont = nullptr;
 
 		// constant buffer 부터
 		struct MatrixBuffer
@@ -86,6 +92,7 @@ namespace Dive
 			DirectX::XMMATRIX world;
 			DirectX::XMMATRIX view;
 			DirectX::XMMATRIX proj;
+			DirectX::XMMATRIX projOrthographic;
 		};
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pCBMatrix;
 
@@ -94,6 +101,7 @@ namespace Dive
 		// 그런데 위키드는 pipelinestate가 종류별 배열로 꽤 많다.
 		PipelineState m_pipelineStateColor;
 		PipelineState m_pipelineStateTexturing;
+		PipelineState m_pipelineStateFont;	// text라는 이름이 더 낫지 않을까?
 
 
 		// texturing test

@@ -3,6 +3,7 @@ cbuffer MatrixBuffer
 	float4x4 world;
 	float4x4 view;
 	float4x4 proj;
+	float4x4 projOrtho;
 };
 
 struct VertexInput

@@ -45,6 +45,7 @@ namespace Dive
 		Renderer::GetInstance().UpdateCB();
 		//Renderer::GetInstance().DrawColor();
 		Renderer::GetInstance().DrawTexturing();
+		Renderer::GetInstance().DrawText();
 	}
 
 	void RenderPath3D::Compose() const

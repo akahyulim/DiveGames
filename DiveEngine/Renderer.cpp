@@ -29,11 +29,14 @@ namespace Dive
 		createRenderTargetViews();
 		createShaders();
 
+		createFonts();
+
 		createPipelineStates();	// 가장 마지막이어야 한다.
 		
 		CORE_TRACE("Renderer 초기화에 성공하였습니다.");
 	}
 
+	// 갱신만 한다. bind는 개별 path에서 한다.
 	void Renderer::UpdateCB()
 	{
 		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
@@ -52,7 +55,11 @@ namespace Dive
 		}
 
 		MatrixBuffer* pBuffer = static_cast<MatrixBuffer*>(mappedResource.pData);
+		
+		// World Matrix
 		pBuffer->world = XMMatrixTranspose(XMMatrixIdentity());
+
+		// View Matrix
 		{
 			XMFLOAT3 up, position, lookAt;
 			XMVECTOR upVector, positionVector, lookAtVector;
@@ -96,11 +103,21 @@ namespace Dive
 			lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 			pBuffer->view = XMMatrixTranspose(XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
 		}
+
+		// Perspective Projection Matrix
 		{
 			float fieldOfView = 3.141592654f / 4.0f;
 			float screenAspect = (float)m_pGraphicsDevice->GetResolutionWidth() / (float)m_pGraphicsDevice->GetResolutionHeight();
 			pBuffer->proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f));
 		}
+
+		// Orthographic Projection Matrix
+		{
+			auto width = (float)m_pGraphicsDevice->GetResolutionWidth();
+			auto height = (float)m_pGraphicsDevice->GetResolutionHeight();
+			pBuffer->projOrthographic = XMMatrixTranspose(XMMatrixOrthographicLH(width, height, 0.1f, 1000.0f));
+		}
+
 		pImmediateContext->Unmap(static_cast<ID3D11Resource*>(m_pCBMatrix.Get()), 0);
 	}
 
@@ -109,6 +126,7 @@ namespace Dive
 		
 	}
 
+	// 이걸 적용하려면 IL가 맞아야 한다.
 	void Renderer::DrawColor()
 	{
 		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
@@ -218,6 +236,51 @@ namespace Dive
 		pImmediateContext->IASetIndexBuffer(mesh->m_pIB.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		pImmediateContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+	}
+
+	// 함수이름이 자동으로 바뀌네...
+	void Renderer::DrawText()
+	{
+		// 출력 문자 생성
+		// 화면 중심이 0, 0이다.
+		auto width = m_pGraphicsDevice->GetResolutionWidth();
+		auto height = m_pGraphicsDevice->GetResolutionHeight();
+		float drawX = (float)(((width / 2) * -1) + 0.0f);	// 계산 결과가 이상하다.
+		float drawY = (float)((height / 2) - 0.0f);
+		m_pFont->SetText("CHOA", DirectX::XMFLOAT2(0.0f, 200.0f));
+
+		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
+		assert(pImmediateContext != nullptr);
+
+		pImmediateContext->IASetInputLayout(m_pipelineStateFont.pIL);
+		pImmediateContext->IASetPrimitiveTopology(m_pipelineStateFont.primitiveTopology);
+		pImmediateContext->VSSetShader(m_pipelineStateFont.pVS, NULL, 0);
+		pImmediateContext->PSSetShader(m_pipelineStateFont.pPS, NULL, 0);
+		pImmediateContext->PSSetSamplers(0, 1, &m_pipelineStateFont.pSS);	// 얘는 더블 포인터다...
+		pImmediateContext->OMSetDepthStencilState(m_pipelineStateFont.pDSS, 1);
+		pImmediateContext->RSSetState(m_pipelineStateFont.pRSS);
+
+		pImmediateContext->VSSetConstantBuffers(0, 1, m_pCBMatrix.GetAddressOf());
+
+		D3D11_VIEWPORT viewport;
+		viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
+		viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+		viewport.TopLeftX = 0.0f;
+		viewport.TopLeftY = 0.0f;
+		pImmediateContext->RSSetViewports(1, &viewport);
+
+		auto pSRV = m_pFont->GetFontAtlas();
+		pImmediateContext->PSSetShaderResources(0, 1, &pSRV);
+
+		auto pVB = m_pFont->GetVertexBuffer();
+		unsigned int stride = m_pFont->GetStride();
+		unsigned int offset = 0;
+		pImmediateContext->IASetVertexBuffers(0, 1, &pVB, &stride, &offset);
+		pImmediateContext->IASetIndexBuffer(m_pFont->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+
+		pImmediateContext->DrawIndexed(m_pFont->GetIndexCount(), 0, 0);
 	}
 
 	void Renderer::SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device)

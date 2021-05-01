@@ -138,10 +138,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>DirectXTex_Debug.lib;</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTex_Debug.lib;freetype.lib;</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>External;External/DirectXTex;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>External/libs;</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -171,6 +171,9 @@
     <ClInclude Include="CommonInclude.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="DiveEngine.h" />
+    <ClInclude Include="Dive_Font.h" />
+    <ClInclude Include="Font.h" />
+    <ClInclude Include="FontImporter.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
@@ -194,6 +197,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Dive_Font.cpp" />
+    <ClCompile Include="Font.cpp" />
+    <ClCompile Include="FontImporter.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="Input.cpp" />
