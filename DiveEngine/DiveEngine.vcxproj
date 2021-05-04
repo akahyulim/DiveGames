@@ -189,6 +189,7 @@
     <ClInclude Include="RenderPath3D.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="TextMesh.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Timer.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="RenderPath3D.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="Timer.cpp" />

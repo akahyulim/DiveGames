@@ -13,6 +13,9 @@ namespace Dive
 	class Texture
 	{
 	public:
+		// cpu에서 그리기용(SRV)
+		Texture(unsigned int width, unsigned int height);
+
 		// SRV(파일명, mipmap 생성 여부)
 		Texture(const std::wstring& filepath, bool generateMips = true);
 

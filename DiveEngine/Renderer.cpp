@@ -229,7 +229,7 @@ namespace Dive
 		};
 
 		// 위치와 방법이 마음에 들지 않는다.
-		auto pSRV = m_pTex->GetShaderResourceView();
+		auto pSRV = m_pCpuTex->GetShaderResourceView();//m_pTex->GetShaderResourceView();
 		pImmediateContext->PSSetShaderResources(0, 1, &pSRV);
 
 		pImmediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);

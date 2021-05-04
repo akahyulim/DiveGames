@@ -108,5 +108,6 @@ namespace Dive
 		//Texture* m_pTex = nullptr;
 		std::shared_ptr<Texture> m_pTex;
 		std::shared_ptr<Texture> m_pRTV;
+		std::shared_ptr<Texture> m_pCpuTex;
 	};
 }

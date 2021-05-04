@@ -82,6 +82,9 @@
     <ClInclude Include="Dive_Font.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="TextMesh.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -142,6 +145,9 @@
       <Filter>Engine\Tools</Filter>
     </ClCompile>
     <ClCompile Include="Dive_Font.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="TextMesh.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

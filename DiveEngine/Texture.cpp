@@ -4,6 +4,49 @@
 
 namespace Dive
 {
+	// 문제없이 사용가능 하다.
+	// map / unmap 역시 함수화하는게 맞는가?
+	Texture::Texture(unsigned int width, unsigned int height)
+	{
+		auto pDev = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
+		assert(pDev != nullptr);
+
+		// 크기 확인 필요
+		m_width = width;
+		m_height = height;
+		m_format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		{
+			D3D11_TEXTURE2D_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));	// 의외로 중요하다.
+			desc.Format = m_format;
+			desc.Width = m_width;
+			desc.Height = m_height;
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			desc.Usage = D3D11_USAGE_DYNAMIC;
+			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			desc.SampleDesc.Count = 1;
+
+			auto hr = pDev->CreateTexture2D(&desc, nullptr, m_pTexture2D.GetAddressOf());
+			assert(SUCCEEDED(hr));
+		}
+
+		// 바로 생성하는 게 맞는 것 같다.
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));
+			desc.Format = m_format;
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipLevels = 1;
+			desc.Texture2D.MostDetailedMip = 0;
+
+			auto hr = pDev->CreateShaderResourceView(m_pTexture2D.Get(), &desc, m_pSRV.GetAddressOf());
+			assert(SUCCEEDED(hr));
+		}
+	}
+
 	Texture::Texture(const std::wstring& filepath, bool generateMips)
 	{
 		// 파일 존재 여부

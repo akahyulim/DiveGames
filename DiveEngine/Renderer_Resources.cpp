@@ -146,6 +146,40 @@ namespace Dive
 	{
 		m_pTex = std::make_shared<Texture>(L"../Assets/Textures/Choa.jpg");
 
+		// 생성한 후 특정 색 넣기
+		{
+			m_pCpuTex = std::make_shared<Texture>(800, 600);
+		
+			auto pImmediateContex = m_pGraphicsDevice->GetImmediateContext();
+
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+			pImmediateContex->Map(m_pCpuTex->GetTexture2D(),
+				D3D11CalcSubresource(0, 0, 1),
+				D3D11_MAP_WRITE_DISCARD,
+				0,
+				&mappedResource);
+
+			UCHAR* pTexels = (UCHAR*)mappedResource.pData;
+
+			// 색상 넣기
+			for (UINT row = 0; row < 600; ++row)
+			{
+				UINT rowStart = row * mappedResource.RowPitch;
+
+				for (UINT col = 0; col < 800; ++col)
+				{
+					UINT colStart = col * 4;
+
+					pTexels[rowStart + colStart + 0] = 255;
+					pTexels[rowStart + colStart + 1] = 128;
+					pTexels[rowStart + colStart + 2] = 64;
+					pTexels[rowStart + colStart + 3] = 32;
+				}
+			}
+
+			pImmediateContex->Unmap(m_pCpuTex->GetTexture2D(), D3D11CalcSubresource(0, 0, 1));
+		}
+
 		return true;
 	}
 
