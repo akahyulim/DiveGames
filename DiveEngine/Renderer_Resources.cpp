@@ -170,10 +170,10 @@ namespace Dive
 				{
 					UINT colStart = col * 4;
 
-					pTexels[rowStart + colStart + 0] = 255;
-					pTexels[rowStart + colStart + 1] = 128;
-					pTexels[rowStart + colStart + 2] = 64;
-					pTexels[rowStart + colStart + 3] = 32;
+					pTexels[rowStart + colStart + 0] = 100;		// R
+					pTexels[rowStart + colStart + 1] = 0; 128;		// G
+					pTexels[rowStart + colStart + 2] = 0; 64;		// B
+					pTexels[rowStart + colStart + 3] = 0; 32;
 				}
 			}
 
@@ -257,10 +257,22 @@ namespace Dive
 
 	bool Renderer::createFonts()
 	{
-		m_pFont = new Font;
-		m_pFont->Initialize(L"../Assets/Fonts/fontdata.txt", L"../Assets/fonts/font.dds");
+		auto result = false;
 
-		return true;
+		{		
+			m_pFont = new Font;
+			auto result = m_pFont->Initialize(L"../Assets/Fonts/fontdata.txt", L"../Assets/fonts/font.dds");
+			assert(result);
+		}
+
+		{
+			m_pDvFont = new Dive_Font;
+			result = m_pDvFont->LoadFromFile("../Assets/Fonts/NanumBarunGothic.ttf");
+			assert(result);
+		}
+		
+
+		return result;
 	}
 
 	void Renderer::createPipelineStates()

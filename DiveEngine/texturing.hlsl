@@ -56,7 +56,20 @@ float4 mainPS(PixelInput input) : SV_TARGET
 {
 	float4 color;
 	color = shaderTex.Sample(samplerType, input.uv);
-	return color;
 
 	//return texLoad(shaderTex, input.uv);
+
+	// 폰트 테스트!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// 폰트만 출력 성공
+/*	 float4 color = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	 color.r = shaderTex.Sample(samplerType, input.uv).r;
+	 color.g = color.r;
+	 color.b = color.r;
+	 color.a = color.r;
+
+	 // Color it
+	 // 색을 곱했다.
+	 color *= float4(1.0f, 1.0f, 0.0f, 1.0f);
+	 */
+	 return color;
 }

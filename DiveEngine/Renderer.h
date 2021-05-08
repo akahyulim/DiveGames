@@ -5,6 +5,7 @@
 #include "PipelineState.h"
 #include "Texture.h"
 #include "Font.h"
+#include "Dive_Font.h"
 #include <memory>
 #include <string>
 
@@ -84,8 +85,6 @@ namespace Dive
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerState;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerStateLinear;
 
-		Font* m_pFont = nullptr;
-
 		// constant buffer บฮลอ
 		struct MatrixBuffer
 		{
@@ -109,5 +108,9 @@ namespace Dive
 		std::shared_ptr<Texture> m_pTex;
 		std::shared_ptr<Texture> m_pRTV;
 		std::shared_ptr<Texture> m_pCpuTex;
+
+
+		Font* m_pFont = nullptr;
+		Dive_Font* m_pDvFont = nullptr;
 	};
 }

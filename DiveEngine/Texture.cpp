@@ -14,7 +14,7 @@ namespace Dive
 		// 크기 확인 필요
 		m_width = width;
 		m_height = height;
-		m_format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		m_format = DXGI_FORMAT_R8_UNORM;//DXGI_FORMAT_R8G8B8A8_UNORM;	// 사실 4채널이 필요없다.
 
 		{
 			D3D11_TEXTURE2D_DESC desc;
