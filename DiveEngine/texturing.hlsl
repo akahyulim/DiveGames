@@ -54,22 +54,23 @@ float4 texLoad(Texture2D tex, float2 texCoord)
 
 float4 mainPS(PixelInput input) : SV_TARGET
 {
-	float4 color;
-	color = shaderTex.Sample(samplerType, input.uv);
+//	float4 color;
+//	color = shaderTex.Sample(samplerType, input.uv);
 
 	//return texLoad(shaderTex, input.uv);
 
 	// 폰트 테스트!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	// 폰트만 출력 성공
-/*	 float4 color = float4(0.0f, 0.0f, 0.0f, 1.0f);
-	 color.r = shaderTex.Sample(samplerType, input.uv).r;
+
+	 float4 color = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	 color.r = shaderTex.Sample(samplerType, input.uv);
 	 color.g = color.r;
 	 color.b = color.r;
 	 color.a = color.r;
 
 	 // Color it
 	 // 색을 곱했다.
-	 color *= float4(1.0f, 1.0f, 0.0f, 1.0f);
-	 */
+	 color *= float4(0.3f, 0.3f, 0.3f, 1.0f);
+	 
 	 return color;
 }

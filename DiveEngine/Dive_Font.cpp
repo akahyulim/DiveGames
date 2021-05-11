@@ -4,45 +4,50 @@
 
 namespace Dive
 {
+	static const unsigned int GLYPH_START	= 32;//0xAC00;
+	static const unsigned int GLYPH_END		= 127;// 0xD7B0;
+	static const unsigned int ATLAS_WIDTH	= 512;
+
 	// 비 멤버, 비 프렌드 함수
 
-	//  glyph에서 가장 큰 가로, 세로 크기를 가져온다.
+	//  glyph에서 최대 큰 가로, 세로 크기를 가져온다.
 	inline void GetCharacterMaxDimension(const FT_Face& face, unsigned int& maxWidth, unsigned int& maxHeight)
 	{
-		unsigned int width = 0;
+		unsigned int width	= 0;
 		unsigned int height = 0;
 
-		for (unsigned int charCode = 32; charCode != 127; charCode++)
+		for (unsigned int charCode = GLYPH_START; charCode != GLYPH_END; charCode++)
 		{
 			if (0 != FT_Load_Char(face, charCode, 0))
 				continue;
 
-			auto pBitmap = &face->glyph->bitmap;
-			width = max(width, pBitmap->width);
-			height = max(height, pBitmap->rows);
+			auto pBitmap	= &face->glyph->bitmap;
+			width			= max(width, pBitmap->width);
+			height			= max(height, pBitmap->rows);
 		}
 
-		maxWidth = width;
-		maxHeight = height;
+		maxWidth	= width;
+		maxHeight	= height;
 	}
 
+	// Glyph들의 크기와 Atlas의 크기 계산
 	inline void GetAtlasDeimension(const FT_Face& face, unsigned int& atlasWidth, unsigned int& atlasHeight,
 		unsigned int& atlasCellWidth, unsigned int& atlasCellHeight)
 	{
-		unsigned int maxWidth = 0;
-		unsigned int maxHeight = 0;
+		unsigned int maxWidth	= 0;
+		unsigned int maxHeight	= 0;
 
 		GetCharacterMaxDimension(face, maxWidth, maxHeight);
 
 		// Atlas의 Width는 상수로 저장해놓았다. = 512
 		// Height는 계산이 필요하다.
-		const unsigned int glyphCount = 127 - 32;
-		const unsigned int glyphPerRow = 512 / maxWidth;
-		const unsigned int rowCount = static_cast<unsigned int>(ceil(static_cast<float>(glyphCount) / static_cast<float>(glyphPerRow)));
+		const unsigned int glyphCount	= GLYPH_END - GLYPH_START;
+		const unsigned int glyphPerRow	= ATLAS_WIDTH / maxWidth;
+		const unsigned int rowCount		= static_cast<unsigned int>(ceil(static_cast<float>(glyphCount) / static_cast<float>(glyphPerRow)));
 
-		atlasWidth = 512;
-		atlasHeight = maxHeight * rowCount;
-		atlasCellWidth = maxWidth;
+		atlasWidth		= ATLAS_WIDTH;
+		atlasHeight		= maxHeight * rowCount;
+		atlasCellWidth	= maxWidth;
 		atlasCellHeight = maxHeight;
 	}
 
@@ -70,12 +75,11 @@ namespace Dive
 		FT_New_Face(m_libFt, filepath.c_str(), faceIndex, &face);
 
 		// 크기는 미리 설정하는 게 맞다.
-		//FT_Set_Pixel_Sizes(face, width, height);
-		FT_Set_Char_Size(face, 14 * 64, 0, 96, 0);
+		FT_Set_Char_Size(face, 33 * 64, 0, 96, 0);
 
 		GetAtlasDeimension(face, m_atlasWidth, m_atlasHeight, m_atlasCellWidth, m_atlasCellHeight);
 
-		m_pAtlas = new Texture(m_atlasWidth, m_atlasHeight);
+		m_pAtlas = new Texture(m_atlasWidth, m_atlasHeight);	
 
 		auto pImmediateContex = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 
@@ -89,17 +93,17 @@ namespace Dive
 		//UCHAR* pTexels = (UCHAR*)mappedResource.pData;
 		BYTE* pTexels = (BYTE*)mappedResource.pData;
 
-		DirectX::XMFLOAT2 pen = DirectX::XMFLOAT2(0.0f, 0.0f);
-		for (unsigned int charCode = 32; charCode < 127; charCode++)
+		DirectX::XMUINT2 pen = DirectX::XMUINT2(0, 0);
+		for (unsigned int charCode = GLYPH_START; charCode != GLYPH_END; charCode++)
 		{
-			printChar(pTexels, mappedResource.RowPitch, face, pen, charCode);
+			printChar(pTexels, face, pen, charCode);
 
-			pen.x += static_cast<float>(m_atlasCellWidth);
+			pen.x += m_atlasCellWidth;
 
-			if (pen.x + static_cast<float>(m_atlasCellWidth) > static_cast<float>(m_atlasWidth))
+			if (pen.x + m_atlasCellWidth > m_atlasWidth)
 			{
-				pen.x = 0.0f;
-				pen.y += static_cast<float>(m_atlasCellHeight);
+				pen.x = 0;
+				pen.y += m_atlasCellHeight;
 			}
 
 		}
@@ -125,39 +129,38 @@ namespace Dive
 		}
 	}
 
-	void Dive_Font::printChar(BYTE* pTexels, unsigned int rowPitch, FT_Face& face, DirectX::XMFLOAT2& pen, FT_ULong ch)
+	void Dive_Font::printChar(BYTE* pTexels, FT_Face& face, DirectX::XMUINT2& pen, FT_ULong ch)
 	{
+		// RowPitch는 결국 AtlasWidth와 같다.
+
 		unsigned index = FT_Get_Char_Index(face, ch);
 		FT_Load_Glyph(face, index, FT_LOAD_RENDER | FT_LOAD_NO_BITMAP);
 
+		// 함수로 보기 좋게 묶기
 		//m_glyphs[ch].offsetX = face->glyph->metrics.horiBearingX >> 6;
 		//m_glyphs[ch].offsetY = face->glyph->metrics.horiBearingY >> 6;
 		//m_glyphs[ch].horizontalAdvence = face->glyph->metrics.horiAdvance >> 6;
 		m_glyphs[ch].width		= face->glyph->metrics.width >> 6;
 		m_glyphs[ch].height		= face->glyph->metrics.height >> 6;
-		m_glyphs[ch].uvLeft		= pen.x / static_cast<float>(m_atlasWidth);
-		m_glyphs[ch].uvRight	= (pen.x + static_cast<float>(m_glyphs[ch].width)) / static_cast<float>(m_atlasWidth);
-		m_glyphs[ch].uvTop		= pen.y / static_cast<float>(m_atlasHeight);
-		m_glyphs[ch].uvBottom	= (pen.y + static_cast<float>(m_glyphs[ch].height)) / static_cast<float>(m_atlasHeight);
-		
+		m_glyphs[ch].uvLeft		= static_cast<float>(pen.x / m_atlasWidth);
+		m_glyphs[ch].uvRight	= static_cast<float>((pen.x + m_glyphs[ch].width) / m_atlasWidth);
+		m_glyphs[ch].uvTop		= static_cast<float>(pen.y / m_atlasHeight);
+		m_glyphs[ch].uvBottom	= static_cast<float>((pen.y + m_glyphs[ch].height) / m_atlasHeight);
 
-		// 이 크기는 왜 설정한 값과 다를까?
 		unsigned int width = face->glyph->bitmap.width;
 		unsigned int height = face->glyph->bitmap.rows;
 
-		for (UINT row = 0; row < height; ++row)
+		for (UINT row = 0; row < height; row++)
 		{
-			UINT rowStart = row * rowPitch;
-
-			for (UINT col = 0; col < width; ++col)
+			for (UINT col = 0; col < width; col++)
 			{
-				UINT colStart = col;
+				BYTE value = face->glyph->bitmap.buffer[col + row * width];
 
-				// Bitmap 기준으로 색상을 찾는다.
-				BYTE value = face->glyph->bitmap.buffer[row * width + col];
+				// 이게 먹히네...
+				UINT atlas_x = pen.x + col;
+				UINT atlas_y = pen.y + row;
 
-				// 그리고 그 색상을 Texture에 저장한다.
-				//pTexels[rowStart + colStart + 0] = value;
+				pTexels[atlas_x + atlas_y * m_atlasWidth] = value;
 			}
 		}
 	}
