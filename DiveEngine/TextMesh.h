@@ -2,42 +2,58 @@
 #include "Renderer.h"
 #include "Dive_Font.h"
 #include <string>
+#include <vector>
 
 namespace Dive
 {
 	// 추후 Mesh를 상속토록???
+	// 결국 GameObject에 속한 Component가 되는건가?
 	class TextMesh
 	{
+		struct VertexType
+		{
+			VertexType(float x, float y, float z, float u, float v)
+			{
+				position = DirectX::XMFLOAT3(x, y, z);
+				tex = DirectX::XMFLOAT2(u, v);
+			}
+
+			DirectX::XMFLOAT3 position;
+			DirectX::XMFLOAT2 tex;
+		};
+
 	public:
 		TextMesh();
 		~TextMesh();
 
 		bool SetFont(const Dive_Font* pFont);
 
-		bool SetText(const std::string& text);
+		bool SetText(const std::wstring& text, const DirectX::XMFLOAT2& position);
 
-		// 만약 크기 변경 함수를 호출한다면
-		// Font에서 다시 텍스쳐를 만들어야 한다.
-		// 그리고 이 경우 기존 출력까지도 변경된 크기를 적용받아야 한다.
-		// 일반적으로 이러한 논리는 당연하다.
-		void SetFontSize(unsigned int size);
-
-		ID3D11Buffer* GetVertexBuffer();
-		ID3D11Buffer* GetIndexBuffer();
+		ID3D11Buffer* GetVertexBuffer() { return m_pVertexBuffer.Get(); }
+		ID3D11Buffer* GetIndexBuffer() { return m_pIndexBuffer.Get();; }
 		// 랩핑함수 호출일 수 밖에 없다.
 		ID3D11ShaderResourceView* GetAtlas();
 
-	private:
+		unsigned int GetStride() const { return sizeof(VertexType); }
+		unsigned int GetIndexCount() const { return static_cast<unsigned int>(m_indices.size()); }
 
 	private:
-		ID3D11Buffer* m_pVertexBuffer = nullptr;
-		ID3D11Buffer* m_pIdexBuffer = nullptr;
+		bool updateBuffers(std::vector<VertexType>& vertices, std::vector<unsigned int>& indices);
+
+	private:
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pVertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pIndexBuffer;
+
+		std::vector<VertexType> m_vertices;
+		std::vector<unsigned int> m_indices;
 
 		// Font는 결국 Resource가 되어야 한다.
 		Dive_Font* m_pFont = nullptr;
 
 		// state를 직접 만들어야 하나? 생성된 걸 가져야 하나?
 
-		unsigned int m_fontSize;
+		unsigned int m_fontSize = 0;
+		std::wstring m_oldText = L"";
 	};
 }

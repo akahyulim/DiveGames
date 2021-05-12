@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Mesh.h"
 #include "Log.h"
+#include "TextMesh.h"
 #include <assert.h>
 
 namespace Dive
@@ -229,9 +230,9 @@ namespace Dive
 		};
 
 		// 위치와 방법이 마음에 들지 않는다.
-		//auto pSRV = m_pTex->GetShaderResourceView();
+		auto pSRV = m_pTex->GetShaderResourceView();
 		//auto pSRV = m_pCpuTex->GetShaderResourceView();
-		auto pSRV = m_pDvFont->GetAtlas()->GetShaderResourceView();
+		//auto pSRV = m_pDvFont->GetAtlas()->GetShaderResourceView();
 		pImmediateContext->PSSetShaderResources(0, 1, &pSRV);
 
 		pImmediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);
@@ -249,7 +250,7 @@ namespace Dive
 		auto height = m_pGraphicsDevice->GetResolutionHeight();
 		float drawX = (float)(((width / 2) * -1) + 0.0f);	// 계산 결과가 이상하다.
 		float drawY = (float)((height / 2) - 0.0f);
-		m_pFont->SetText("CHOA", DirectX::XMFLOAT2(0.0f, 200.0f));
+		//m_pFont->SetText("CHOA", DirectX::XMFLOAT2(0.0f, 200.0f));
 
 		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
@@ -273,16 +274,21 @@ namespace Dive
 		viewport.TopLeftY = 0.0f;
 		pImmediateContext->RSSetViewports(1, &viewport);
 
-		auto pSRV = m_pFont->GetFontAtlas();
+		//auto pSRV = m_pFont->GetFontAtlas();
+		auto pSRV = m_pTextMesh->GetAtlas();
 		pImmediateContext->PSSetShaderResources(0, 1, &pSRV);
 
-		auto pVB = m_pFont->GetVertexBuffer();
-		unsigned int stride = m_pFont->GetStride();
+		//auto pVB = m_pFont->GetVertexBuffer();
+		auto pVB = m_pTextMesh->GetVertexBuffer();
+		//unsigned int stride = m_pFont->GetStride();
+		unsigned int stride = m_pTextMesh->GetStride();
 		unsigned int offset = 0;
 		pImmediateContext->IASetVertexBuffers(0, 1, &pVB, &stride, &offset);
-		pImmediateContext->IASetIndexBuffer(m_pFont->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+		//pImmediateContext->IASetIndexBuffer(m_pFont->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+		pImmediateContext->IASetIndexBuffer(m_pTextMesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
-		pImmediateContext->DrawIndexed(m_pFont->GetIndexCount(), 0, 0);
+		//pImmediateContext->DrawIndexed(m_pFont->GetIndexCount(), 0, 0);
+		pImmediateContext->DrawIndexed(m_pTextMesh->GetIndexCount(), 0, 0);
 	}
 
 	void Renderer::SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device)

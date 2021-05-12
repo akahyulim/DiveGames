@@ -4,9 +4,11 @@
 
 namespace Dive
 {
-	static const unsigned int GLYPH_START	= 32;//0xAC00;
-	static const unsigned int GLYPH_END		= 127;// 0xD7B0;
-	static const unsigned int ATLAS_WIDTH	= 512;
+	// 전부 11,184개다. 반면 ks1001은 2350개다.
+	// 그런데 ks1001은 유니코드와 다르다.
+	static const unsigned int GLYPH_START = 0xAC00; //32;
+	static const unsigned int GLYPH_END = 0xD7B0; // 127;
+	static const unsigned int ATLAS_WIDTH	= 1024;
 
 	// 비 멤버, 비 프렌드 함수
 
@@ -75,7 +77,7 @@ namespace Dive
 		FT_New_Face(m_libFt, filepath.c_str(), faceIndex, &face);
 
 		// 크기는 미리 설정하는 게 맞다.
-		FT_Set_Char_Size(face, 33 * 64, 0, 96, 0);
+		FT_Set_Char_Size(face, 14 * 64, 0, 96, 0);
 
 		GetAtlasDeimension(face, m_atlasWidth, m_atlasHeight, m_atlasCellWidth, m_atlasCellHeight);
 
@@ -93,7 +95,24 @@ namespace Dive
 		//UCHAR* pTexels = (UCHAR*)mappedResource.pData;
 		BYTE* pTexels = (BYTE*)mappedResource.pData;
 
+		// 이건 다시 Float2로 바꿔야 한다.
 		DirectX::XMUINT2 pen = DirectX::XMUINT2(0, 0);
+		// 알파벳 + 특수 문자: 이걸 적용하려면 크기부터 먼저 적용해야 한다.
+		/*
+		for (unsigned int charCode = 32; charCode != 127; charCode++)
+		{
+			printChar(pTexels, face, pen, charCode);
+
+			pen.x += m_atlasCellWidth;
+
+			if (pen.x + m_atlasCellWidth > m_atlasWidth)
+			{
+				pen.x = 0;
+				pen.y += m_atlasCellHeight;
+			}
+		}
+		*/
+		// local 문자
 		for (unsigned int charCode = GLYPH_START; charCode != GLYPH_END; charCode++)
 		{
 			printChar(pTexels, face, pen, charCode);
@@ -105,9 +124,8 @@ namespace Dive
 				pen.x = 0;
 				pen.y += m_atlasCellHeight;
 			}
-
 		}
-
+		
 		pImmediateContex->Unmap(m_pAtlas->GetTexture2D(), D3D11CalcSubresource(0, 0, 1));
 
 		FT_Done_Face(face);
@@ -129,6 +147,12 @@ namespace Dive
 		}
 	}
 
+	Dive_Glyph Dive_Font::GetGlyph(unsigned int key)
+	{
+		assert(!m_glyphs.empty()); 
+		return m_glyphs[key];
+	}
+
 	void Dive_Font::printChar(BYTE* pTexels, FT_Face& face, DirectX::XMUINT2& pen, FT_ULong ch)
 	{
 		// RowPitch는 결국 AtlasWidth와 같다.
@@ -142,10 +166,10 @@ namespace Dive
 		//m_glyphs[ch].horizontalAdvence = face->glyph->metrics.horiAdvance >> 6;
 		m_glyphs[ch].width		= face->glyph->metrics.width >> 6;
 		m_glyphs[ch].height		= face->glyph->metrics.height >> 6;
-		m_glyphs[ch].uvLeft		= static_cast<float>(pen.x / m_atlasWidth);
-		m_glyphs[ch].uvRight	= static_cast<float>((pen.x + m_glyphs[ch].width) / m_atlasWidth);
-		m_glyphs[ch].uvTop		= static_cast<float>(pen.y / m_atlasHeight);
-		m_glyphs[ch].uvBottom	= static_cast<float>((pen.y + m_glyphs[ch].height) / m_atlasHeight);
+		m_glyphs[ch].uvLeft		= (float)pen.x / (float)m_atlasWidth;
+		m_glyphs[ch].uvRight	= ((float)pen.x + (float)m_glyphs[ch].width) / (float)m_atlasWidth;
+		m_glyphs[ch].uvTop		= (float)pen.y / (float)m_atlasHeight;
+		m_glyphs[ch].uvBottom	= ((float)pen.y + (float)m_glyphs[ch].height) / (float)m_atlasHeight;
 
 		unsigned int width = face->glyph->bitmap.width;
 		unsigned int height = face->glyph->bitmap.rows;

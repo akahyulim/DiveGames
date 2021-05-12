@@ -6,11 +6,14 @@
 #include "Texture.h"
 #include "Font.h"
 #include "Dive_Font.h"
+//#include "TextMesh.h"
 #include <memory>
 #include <string>
 
 namespace Dive
 {
+	class TextMesh;
+
 	enum class eVisibilityType
 	{
 		Invalid = 0,
@@ -112,5 +115,6 @@ namespace Dive
 
 		Font* m_pFont = nullptr;
 		Dive_Font* m_pDvFont = nullptr;
+		TextMesh* m_pTextMesh = nullptr;
 	};
 }

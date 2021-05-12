@@ -26,25 +26,104 @@ namespace Dive
 	}
 
 	// 결국 ascii와 unicode로 나뉘어야 한다.
-	bool TextMesh::SetText(const std::string& text)
+	bool TextMesh::SetText(const std::wstring& text, const DirectX::XMFLOAT2& position)
 	{
-		// 이게 좀 복잡하다.
-		// 일단 문장 자체는 저장해야 한다. 그래야 이전 입력을 다시 그리지 않을 수 있다.
-		// 그런데 이후 Font의 Face나 Size가 변경되면
-		// 이들을 다시 텍스쳐에 세겨야 한다.
-		// 그리고 이에 맞춰 버퍼도 다시 생성해줘야 한다.
-		// 따라서 이 곳에서 버퍼를 생성하는게 맞는지 생각해볼 필요가 있다.
+		if (m_oldText == text)
+			return false;
+
+		m_vertices.shrink_to_fit();
+		m_oldText = text;
+
+		DirectX::XMFLOAT2 pen = position;
+
+		for (unsigned int i = 0; i != text.size(); i++)
+		{
+			auto index = text[i];
+			auto letter = m_pFont->GetGlyph(index);
+
+			// 공백인데 값이 다를 수 있다.
+			if (index == ' ')
+			{
+				// 추후 간격을 따로 변수화해야 한다.
+				pen.x += 10.0f;
+			}
+			else
+			{
+				m_vertices.emplace_back(pen.x,					pen.y,					0.0f, letter.uvLeft,	letter.uvTop);
+				m_vertices.emplace_back(pen.x + letter.width,	pen.y - letter.height,	0.0f, letter.uvRight,	letter.uvBottom);
+				m_vertices.emplace_back(pen.x,					pen.y - letter.height,	0.0f, letter.uvLeft,	letter.uvBottom);
+
+				m_vertices.emplace_back(pen.x,					pen.y,					0.0f, letter.uvLeft,	letter.uvTop);
+				m_vertices.emplace_back(pen.x + letter.width,	pen.y,					0.0f, letter.uvRight,	letter.uvTop);
+				m_vertices.emplace_back(pen.x + letter.width,	pen.y - letter.height,	0.0f, letter.uvRight,	letter.uvBottom);
+
+				pen.x += letter.width + 1.0f;	// 1.0f는 뭐냐??? 출력 문자 사이 간격 같다.
+			}
+		}
+
+		for (int i = 0; i != (int)m_vertices.size(); i++)
+		{
+			m_indices.emplace_back(i);
+		}
+
+		auto result = updateBuffers(m_vertices, m_indices);
+		assert(result);
 
 		return true;
 	}
 
-	void TextMesh::SetFontSize(unsigned int size)
+	ID3D11ShaderResourceView* TextMesh::GetAtlas()
 	{
-		if (m_fontSize == size)
-			return;
+		assert(m_pFont);
 
-		// Font를 다시 구성해야 한다.
+		return m_pFont->GetAtlas()->GetShaderResourceView();
+	}
 
-		m_fontSize = size;
+	bool TextMesh::updateBuffers(std::vector<VertexType>& vertices, std::vector<unsigned int>& indices)
+	{
+		auto pDev = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
+		assert(pDev != nullptr);
+
+		HRESULT hResult = E_FAIL;
+
+		// create vertex buffer
+		{
+			D3D11_BUFFER_DESC desc;
+			desc.ByteWidth = (unsigned int)(sizeof(VertexType) * vertices.size());
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			desc.CPUAccessFlags = 0;
+			desc.MiscFlags = 0;
+			desc.StructureByteStride = sizeof(VertexType);
+
+			D3D11_SUBRESOURCE_DATA data;
+			data.pSysMem = vertices.data();
+			data.SysMemPitch = 0;
+			data.SysMemSlicePitch = 0;
+
+			hResult = pDev->CreateBuffer(&desc, &data, m_pVertexBuffer.GetAddressOf());
+			assert(SUCCEEDED(hResult));
+		}
+
+		// create index buffer
+		{
+			D3D11_BUFFER_DESC desc;
+			desc.ByteWidth = (unsigned int)(sizeof(unsigned int) * indices.size());
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			desc.CPUAccessFlags = 0;
+			desc.MiscFlags = 0;
+			desc.StructureByteStride = 0;
+
+			D3D11_SUBRESOURCE_DATA data;
+			data.pSysMem = indices.data();
+			data.SysMemPitch = 0;
+			data.SysMemSlicePitch = 0;
+
+			hResult = pDev->CreateBuffer(&desc, &data, m_pIndexBuffer.GetAddressOf());
+			assert(SUCCEEDED(hResult));
+		}
+
+		return true;
 	}
 }

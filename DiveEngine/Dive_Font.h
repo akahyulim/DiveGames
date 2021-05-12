@@ -6,8 +6,11 @@
 #include <unordered_map>
 
 // 문제점
-// 1. 영문자(소문자)의 경우 상하 위치가 맞지 않는 경우가 있다.
+// 1. 문자의 경우 상하 위치가 안맞는다.
 // 2. 한글의 문자수가 너무 많아 전부 ATLAS로 만들면 크기가 너무 크다.
+// 실제로 Font Size를 조절하지 않으면 생성이 불가능하다. + 영문자와 특수기호도 생각해야 한다.
+// 3. 자음 혹은 모음만으로 출력이 불가능하다. 그렇다면 현재 적용한 유니코드는 완성형이라는 건가?
+// 채팅 프로그램을 만들려면 조합형으로 할텐데...
 
 namespace Dive
 {
@@ -37,6 +40,8 @@ namespace Dive
 		void SetFontSize(unsigned int size);
 
 		Texture* GetAtlas() { return m_pAtlas; }
+
+		Dive_Glyph GetGlyph(unsigned int key);
 
 	private:
 		void printChar(BYTE* pTexels, FT_Face& face, DirectX::XMUINT2& pen, FT_ULong ch);

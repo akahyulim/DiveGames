@@ -1,5 +1,6 @@
 #include "Renderer.h"
 #include "Log.h"
+#include "TextMesh.h"
 #include <d3dcompiler.h>
 
 using namespace std;
@@ -269,6 +270,14 @@ namespace Dive
 			m_pDvFont = new Dive_Font;
 			result = m_pDvFont->LoadFromFile("../Assets/Fonts/NanumBarunGothic.ttf");
 			assert(result);
+		}
+
+		{
+			m_pTextMesh = new TextMesh;
+			result = m_pTextMesh->SetFont(m_pDvFont);
+			assert(result);
+			m_pTextMesh->SetText(L"가나다라마바사아자차카파하",//L"You Konw, I Know, We Both Know, 이 침묵은 깨져야만 해. 너도, 나도, 다 알면서도, 쉽게 할 수 없는 일...",
+				DirectX::XMFLOAT2(-200.0f, 200.0f));
 		}
 		
 
