@@ -41,6 +41,8 @@ namespace Dive
 			auto index = text[i];
 			auto letter = m_pFont->GetGlyph(index);
 
+			// 탭, 줄바꿈, 스페이스바 등을 전부 구분해야 한다.
+			// 그리고 latain과 local 역시 구분이 필요할 수 있다.
 			// 공백인데 값이 다를 수 있다.
 			if (index == ' ')
 			{
@@ -49,13 +51,13 @@ namespace Dive
 			}
 			else
 			{
-				m_vertices.emplace_back(pen.x,					pen.y,					0.0f, letter.uvLeft,	letter.uvTop);
-				m_vertices.emplace_back(pen.x + letter.width,	pen.y - letter.height,	0.0f, letter.uvRight,	letter.uvBottom);
-				m_vertices.emplace_back(pen.x,					pen.y - letter.height,	0.0f, letter.uvLeft,	letter.uvBottom);
+				m_vertices.emplace_back(pen.x + letter.offsetX,					pen.y + letter.offsetY,					0.0f, letter.uvLeft,	letter.uvTop);
+				m_vertices.emplace_back(pen.x + letter.offsetX + letter.width,	pen.y + letter.offsetY - letter.height,	0.0f, letter.uvRight,	letter.uvBottom);
+				m_vertices.emplace_back(pen.x + letter.offsetX,					pen.y + letter.offsetY - letter.height,	0.0f, letter.uvLeft,	letter.uvBottom);
 
-				m_vertices.emplace_back(pen.x,					pen.y,					0.0f, letter.uvLeft,	letter.uvTop);
-				m_vertices.emplace_back(pen.x + letter.width,	pen.y,					0.0f, letter.uvRight,	letter.uvTop);
-				m_vertices.emplace_back(pen.x + letter.width,	pen.y - letter.height,	0.0f, letter.uvRight,	letter.uvBottom);
+				m_vertices.emplace_back(pen.x + letter.offsetX,					pen.y + letter.offsetY,					0.0f, letter.uvLeft,	letter.uvTop);
+				m_vertices.emplace_back(pen.x + letter.offsetX + letter.width,	pen.y + letter.offsetY,					0.0f, letter.uvRight,	letter.uvTop);
+				m_vertices.emplace_back(pen.x + letter.offsetX + letter.width,	pen.y + letter.offsetY - letter.height,	0.0f, letter.uvRight,	letter.uvBottom);
 
 				pen.x += letter.width + 1.0f;	// 1.0f는 뭐냐??? 출력 문자 사이 간격 같다.
 			}
@@ -89,17 +91,17 @@ namespace Dive
 		// create vertex buffer
 		{
 			D3D11_BUFFER_DESC desc;
-			desc.ByteWidth = (unsigned int)(sizeof(VertexType) * vertices.size());
-			desc.Usage = D3D11_USAGE_DEFAULT;
-			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			desc.CPUAccessFlags = 0;
-			desc.MiscFlags = 0;
-			desc.StructureByteStride = sizeof(VertexType);
+			desc.ByteWidth				= sizeof(VertexType) * static_cast<unsigned int>(vertices.size());
+			desc.Usage					= D3D11_USAGE_DEFAULT;
+			desc.BindFlags				= D3D11_BIND_VERTEX_BUFFER;
+			desc.CPUAccessFlags			= 0;
+			desc.MiscFlags				= 0;
+			desc.StructureByteStride	= sizeof(VertexType);
 
 			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = vertices.data();
-			data.SysMemPitch = 0;
-			data.SysMemSlicePitch = 0;
+			data.pSysMem				= vertices.data();
+			data.SysMemPitch			= 0;
+			data.SysMemSlicePitch		= 0;
 
 			hResult = pDev->CreateBuffer(&desc, &data, m_pVertexBuffer.GetAddressOf());
 			assert(SUCCEEDED(hResult));
@@ -108,17 +110,17 @@ namespace Dive
 		// create index buffer
 		{
 			D3D11_BUFFER_DESC desc;
-			desc.ByteWidth = (unsigned int)(sizeof(unsigned int) * indices.size());
-			desc.Usage = D3D11_USAGE_DEFAULT;
-			desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-			desc.CPUAccessFlags = 0;
-			desc.MiscFlags = 0;
-			desc.StructureByteStride = 0;
+			desc.ByteWidth				= sizeof(unsigned int) * static_cast<unsigned int>(indices.size());
+			desc.Usage					= D3D11_USAGE_DEFAULT;
+			desc.BindFlags				= D3D11_BIND_INDEX_BUFFER;
+			desc.CPUAccessFlags			= 0;
+			desc.MiscFlags				= 0;
+			desc.StructureByteStride	= 0;
 
 			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = indices.data();
-			data.SysMemPitch = 0;
-			data.SysMemSlicePitch = 0;
+			data.pSysMem				= indices.data();
+			data.SysMemPitch			= 0;
+			data.SysMemSlicePitch		= 0;
 
 			hResult = pDev->CreateBuffer(&desc, &data, m_pIndexBuffer.GetAddressOf());
 			assert(SUCCEEDED(hResult));

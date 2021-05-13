@@ -244,14 +244,6 @@ namespace Dive
 	// 함수이름이 자동으로 바뀌네...
 	void Renderer::DrawText()
 	{
-		// 출력 문자 생성
-		// 화면 중심이 0, 0이다.
-		auto width = m_pGraphicsDevice->GetResolutionWidth();
-		auto height = m_pGraphicsDevice->GetResolutionHeight();
-		float drawX = (float)(((width / 2) * -1) + 0.0f);	// 계산 결과가 이상하다.
-		float drawY = (float)((height / 2) - 0.0f);
-		//m_pFont->SetText("CHOA", DirectX::XMFLOAT2(0.0f, 200.0f));
-
 		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
@@ -274,20 +266,15 @@ namespace Dive
 		viewport.TopLeftY = 0.0f;
 		pImmediateContext->RSSetViewports(1, &viewport);
 
-		//auto pSRV = m_pFont->GetFontAtlas();
 		auto pSRV = m_pTextMesh->GetAtlas();
 		pImmediateContext->PSSetShaderResources(0, 1, &pSRV);
 
-		//auto pVB = m_pFont->GetVertexBuffer();
 		auto pVB = m_pTextMesh->GetVertexBuffer();
-		//unsigned int stride = m_pFont->GetStride();
 		unsigned int stride = m_pTextMesh->GetStride();
 		unsigned int offset = 0;
 		pImmediateContext->IASetVertexBuffers(0, 1, &pVB, &stride, &offset);
-		//pImmediateContext->IASetIndexBuffer(m_pFont->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		pImmediateContext->IASetIndexBuffer(m_pTextMesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
-		//pImmediateContext->DrawIndexed(m_pFont->GetIndexCount(), 0, 0);
 		pImmediateContext->DrawIndexed(m_pTextMesh->GetIndexCount(), 0, 0);
 	}
 

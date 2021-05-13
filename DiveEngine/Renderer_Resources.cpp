@@ -260,12 +260,6 @@ namespace Dive
 	{
 		auto result = false;
 
-		{		
-			m_pFont = new Font;
-			auto result = m_pFont->Initialize(L"../Assets/Fonts/fontdata.txt", L"../Assets/fonts/font.dds");
-			assert(result);
-		}
-
 		{
 			m_pDvFont = new Dive_Font;
 			result = m_pDvFont->LoadFromFile("../Assets/Fonts/NanumBarunGothic.ttf");
@@ -276,7 +270,7 @@ namespace Dive
 			m_pTextMesh = new TextMesh;
 			result = m_pTextMesh->SetFont(m_pDvFont);
 			assert(result);
-			m_pTextMesh->SetText(L"가나다라마바사아자차카파하",//L"You Konw, I Know, We Both Know, 이 침묵은 깨져야만 해. 너도, 나도, 다 알면서도, 쉽게 할 수 없는 일...",
+			m_pTextMesh->SetText(L"We're just walking down the street.",
 				DirectX::XMFLOAT2(-200.0f, 200.0f));
 		}
 		
