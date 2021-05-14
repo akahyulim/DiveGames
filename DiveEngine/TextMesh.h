@@ -1,14 +1,16 @@
 #pragma once
+#include "Component.h"
 #include "Renderer.h"
-#include "Dive_Font.h"
+#include "Font.h"
 #include <string>
 #include <vector>
 
 namespace Dive
 {
-	// 추후 Mesh를 상속토록???
-	// 결국 GameObject에 속한 Component가 되는건가?
-	class TextMesh
+	// 이건 3d 상의 text이다. gui용은 따로 만들어야 한다...
+
+	// 추후 Mesh Base를 만들수도 있다.
+	class TextMesh : public Component
 	{
 		struct VertexType
 		{
@@ -26,17 +28,30 @@ namespace Dive
 		TextMesh();
 		~TextMesh();
 
-		bool SetFont(const Dive_Font* pFont);
+		bool SetFont(const Font* pFont);
+		bool SetFont(const std::string& name);
 
+		// positiond은 transform에서 관리한다.
+		// 하지만 z축은 생각을 좀 해봐야 한다.
 		bool SetText(const std::wstring& text, const DirectX::XMFLOAT2& position);
+
+		ID3D11ShaderResourceView* GetAtlas();
 
 		ID3D11Buffer* GetVertexBuffer() { return m_pVertexBuffer.Get(); }
 		ID3D11Buffer* GetIndexBuffer() { return m_pIndexBuffer.Get();; }
-		// 랩핑함수 호출일 수 밖에 없다.
-		ID3D11ShaderResourceView* GetAtlas();
-
+		
 		unsigned int GetStride() const { return sizeof(VertexType); }
 		unsigned int GetIndexCount() const { return static_cast<unsigned int>(m_indices.size()); }
+
+		void SetLineSpacing(unsigned int size) { m_lineSpacing = size; }
+		unsigned int GetLineSpacing() const { return m_lineSpacing; }
+
+		void SetTabSize(unsigned int size) { m_tabSize = size; }
+		unsigned int GetTabSize() const { return m_tabSize; }
+
+		void SetFontSize(unsigned int size);
+		unsigned int GetFontSize() const { return m_fontSize; }
+
 
 	private:
 		bool updateBuffers(std::vector<VertexType>& vertices, std::vector<unsigned int>& indices);
@@ -48,12 +63,13 @@ namespace Dive
 		std::vector<VertexType> m_vertices;
 		std::vector<unsigned int> m_indices;
 
-		// Font는 결국 Resource가 되어야 한다.
-		Dive_Font* m_pFont = nullptr;
+		std::wstring m_text;
 
-		// state를 직접 만들어야 하나? 생성된 걸 가져야 하나?
+		// 타입이 바뀔 수 있다.
+		unsigned int m_lineSpacing;
+		unsigned int m_tabSize;
+		unsigned int m_fontSize;
 
-		unsigned int m_fontSize = 0;
-		std::wstring m_oldText = L"";
+		Font* m_pFont;
 	};
 }

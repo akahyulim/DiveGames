@@ -1,8 +1,9 @@
-﻿// DiveStudio.cpp : 애플리케이션에 대한 진입점을 정의합니다.
+﻿
+// DiveStudio.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
-
 #include "framework.h"
 #include "EntryPoint.h"
+#include "DiveStudio.h"
 
 #define MAX_LOADSTRING 100
 
@@ -10,6 +11,7 @@
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
+Studio::Studio g_app;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -45,10 +47,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // 기본 메시지 루프입니다:
     while (GetMessage(&msg, nullptr, 0, 0))
     {
-        if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
-            DispatchMessage(&msg);
+            DispatchMessageW(&msg);
+        }
+        else
+        {
+            g_app.Run();
         }
     }
 
@@ -76,7 +82,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_DIVESTUDIO));
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszMenuName   = MAKEINTRESOURCEW(IDC_DIVESTUDIO);
+    wcex.lpszMenuName   = NULL; // 메뉴바 제거
     wcex.lpszClassName  = szWindowClass;
     wcex.hIconSm        = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
@@ -97,13 +103,39 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+   // 이 부분은 현재 복붙이다. 추후 정리해야 한다. //////////////////////////////////////
+  // HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+   //   CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+   /////////////////////////////////////////////////////////////////////////////////////
+   int posX = CW_USEDEFAULT;
+   int posY = 0;
+   int width = CW_USEDEFAULT;
+   int height = 0;
+
+   // ini 파일 로드
+   width = 1600;
+   height = 900;
+
+   HWND hWnd = NULL;
+
+   hWnd = CreateWindowEx(
+           WS_EX_APPWINDOW,
+           szWindowClass,
+           szTitle,
+           WS_OVERLAPPEDWINDOW,
+           posX, posY,
+           width, height,
+           NULL,
+           NULL,
+           hInstance,
+           NULL);
 
    if (!hWnd)
    {
       return FALSE;
    }
+
+   g_app.SetWindow(hWnd, false);
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);

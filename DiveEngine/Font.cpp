@@ -1,4 +1,4 @@
-#include "Dive_Font.h"
+#include "Font.h"
 #include "GraphicsInclude.h"
 #include "Renderer.h"
 
@@ -53,19 +53,19 @@ namespace Dive
 		atlasCellHeight = maxHeight;
 	}
 
-	Dive_Font::Dive_Font()
+	Font::Font()
 	{
 		m_fontSize = 20;
 		FT_Init_FreeType(&m_libFt);
 	}
 
-	Dive_Font::~Dive_Font()
+	Font::~Font()
 	{
 		FT_Done_FreeType(m_libFt);
 	}
 
 	// 크기는 디폴트, 아니라면 미리 SetFontSize???
-	bool Dive_Font::LoadFromFile(const std::string& filepath, FT_Long faceIndex)
+	bool Font::LoadFromFile(const std::string& filepath, FT_Long faceIndex)
 	{
 		// 현재 파일 설정과 같다면 재생성하지 않는다? 크기가 다르다면?
 
@@ -109,7 +109,7 @@ namespace Dive
 		return true;
 	}
 
-	void Dive_Font::SetFontSize(unsigned int size)
+	void Font::SetFontSize(unsigned int size)
 	{
 		// 너무 자유분방하게 생각하고 있다.
 		// Atlas가 생성되어 있어야 크기도 변경할 수 있다고 여기는 편이 낫다.
@@ -123,13 +123,13 @@ namespace Dive
 		}
 	}
 
-	Dive_Glyph Dive_Font::GetGlyph(unsigned int key)
+	Glyph Font::GetGlyph(unsigned int key)
 	{
 		assert(!m_glyphs.empty()); 
 		return m_glyphs[key];
 	}
 
-	void Dive_Font::printChar(BYTE* pTexels, FT_Face& face, DirectX::XMUINT2& pen, FT_ULong ch)
+	void Font::printChar(BYTE* pTexels, FT_Face& face, DirectX::XMUINT2& pen, FT_ULong ch)
 	{
 		// RowPitch는 결국 AtlasWidth와 같다.
 

@@ -4,7 +4,7 @@
 #include "GraphicsEnums.h"
 #include "PipelineState.h"
 #include "Texture.h"
-#include "Dive_Font.h"
+#include "Font.h"
 #include <memory>
 #include <string>
 
@@ -110,7 +110,7 @@ namespace Dive
 		std::shared_ptr<Texture> m_pRTV;
 		std::shared_ptr<Texture> m_pCpuTex;
 
-		Dive_Font* m_pDvFont = nullptr;
-		TextMesh* m_pTextMesh = nullptr;
+		Font* m_pDvFont = nullptr;
+		//TextMesh* m_pTextMesh = nullptr;
 	};
 }

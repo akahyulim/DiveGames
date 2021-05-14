@@ -7,11 +7,12 @@
 
 // 문제점
 // 1. 영문자와 한글을 구분할 것인가?
+// => 그냥 해당 폰트 파일에 적재된 모든 문자를 만들면 안되나?
 // 2. Outline을 적용할 것인가?
 
 namespace Dive
 {
-	struct Dive_Glyph
+	struct Glyph
 	{
 		unsigned int offsetX = 0;
 		unsigned int offsetY = 0;
@@ -26,11 +27,11 @@ namespace Dive
 	};
 
 	// 일단 임포터 없이 만들자.
-	class Dive_Font
+	class Font
 	{
 	public:
-		Dive_Font();
-		~Dive_Font();
+		Font();
+		~Font();
 
 		// 일단 유니코드만 지원
 		bool LoadFromFile(const std::string& filepath, FT_Long faceIndex = 0);
@@ -39,7 +40,7 @@ namespace Dive
 		unsigned int GetFontSize() const { return m_fontSize; }
 
 		Texture* GetAtlas() { return m_pAtlas; }
-		Dive_Glyph GetGlyph(unsigned int key);
+		Glyph GetGlyph(unsigned int key);
 
 	private:
 		void printChar(BYTE* pTexels, FT_Face& face, DirectX::XMUINT2& pen, FT_ULong ch);
@@ -55,7 +56,7 @@ namespace Dive
 		unsigned int m_atlasCellWidth = 0;
 		unsigned int m_atlasCellHeight = 0;
 
-		std::unordered_map<unsigned int, Dive_Glyph> m_glyphs;
+		std::unordered_map<unsigned int, Glyph> m_glyphs;
 
 		unsigned int m_fontSize;
 	};

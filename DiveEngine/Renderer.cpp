@@ -244,6 +244,8 @@ namespace Dive
 	// 함수이름이 자동으로 바뀌네...
 	void Renderer::DrawText()
 	{
+		// GameObject에서 TextMesh만 뽑아서 호출하도록 바꿔야 한다.
+
 		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
@@ -266,16 +268,16 @@ namespace Dive
 		viewport.TopLeftY = 0.0f;
 		pImmediateContext->RSSetViewports(1, &viewport);
 
-		auto pSRV = m_pTextMesh->GetAtlas();
-		pImmediateContext->PSSetShaderResources(0, 1, &pSRV);
+		//auto pSRV = m_pTextMesh->GetAtlas();
+		//pImmediateContext->PSSetShaderResources(0, 1, &pSRV);
 
-		auto pVB = m_pTextMesh->GetVertexBuffer();
-		unsigned int stride = m_pTextMesh->GetStride();
-		unsigned int offset = 0;
-		pImmediateContext->IASetVertexBuffers(0, 1, &pVB, &stride, &offset);
-		pImmediateContext->IASetIndexBuffer(m_pTextMesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+		//auto pVB = m_pTextMesh->GetVertexBuffer();
+		///unsigned int stride = m_pTextMesh->GetStride();
+		//unsigned int offset = 0;
+		//pImmediateContext->IASetVertexBuffers(0, 1, &pVB, &stride, &offset);
+		//pImmediateContext->IASetIndexBuffer(m_pTextMesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
-		pImmediateContext->DrawIndexed(m_pTextMesh->GetIndexCount(), 0, 0);
+		//pImmediateContext->DrawIndexed(m_pTextMesh->GetIndexCount(), 0, 0);
 	}
 
 	void Renderer::SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device)

@@ -1,5 +1,5 @@
 #pragma once
-#include "Dive_Font.h"
+#include "Font.h"
 #include "External/ft2build.h"
 #include FT_FREETYPE_H
 
@@ -11,7 +11,7 @@ namespace Dive
 		FontImporter();
 		~FontImporter();
 
-		bool ImporterFile(Dive_Font* pFont, const std::string& filepath);
+		bool ImporterFile(Font* pFont, const std::string& filepath);
 
 	private:
 	private:

@@ -3,42 +3,55 @@
 namespace Dive
 {
 	TextMesh::TextMesh()
+		: Component(typeid(TextMesh).hash_code())
 	{
-		// 멤버 변수 초기화
+		m_lineSpacing	= 1;
+		m_tabSize		= 4;
+		m_fontSize		= 9;
 
-		// Resource Manager 등으로부터 Default Font를 얻어온다.
-		// Font자체는 Renderer 등에서 Face별로 생성된다.
-		// 그리고 해당 Font로부터 Size 등으로 저장한다.
+		m_pFont = nullptr;
 	}
 
 	TextMesh::~TextMesh()
 	{
 	}
 	
-	bool TextMesh::SetFont(const Dive_Font* pFont)
+	bool TextMesh::SetFont(const Font* pFont)
 	{
 		assert(pFont != nullptr);
 
 		if (m_pFont != pFont)
-			m_pFont = const_cast<Dive_Font*>(pFont);
+			m_pFont = const_cast<Font*>(pFont);
 
 		return true;
+	}
+
+	bool TextMesh::SetFont(const std::string& name)
+	{
+		// 폰트 리소스에 해당 이름이 있는지 확인한다.
+		// 없다면 리소스 폴더에서 생성한다.
+		// 없다면 기본 시스템 폴더에서 생성한다.
+		// 없다면 false
+
+		return false;
 	}
 
 	// 결국 ascii와 unicode로 나뉘어야 한다.
 	bool TextMesh::SetText(const std::wstring& text, const DirectX::XMFLOAT2& position)
 	{
-		if (m_oldText == text)
+		if (m_text == text)
 			return false;
 
 		m_vertices.shrink_to_fit();
-		m_oldText = text;
+		m_text = text;
 
+		// Transform으로부터 가져오거나
+		// 0, 0으로 설정한 후 Transform값을 이용해 변환해야 한다.
 		DirectX::XMFLOAT2 pen = position;
 
-		for (unsigned int i = 0; i != text.size(); i++)
+		for (unsigned int i = 0; i != m_text.size(); i++)
 		{
-			auto index = text[i];
+			auto index = m_text[i];
 			auto letter = m_pFont->GetGlyph(index);
 
 			// 탭, 줄바꿈, 스페이스바 등을 전부 구분해야 한다.
@@ -79,6 +92,12 @@ namespace Dive
 		assert(m_pFont);
 
 		return m_pFont->GetAtlas()->GetShaderResourceView();
+	}
+
+	void TextMesh::SetFontSize(unsigned int size)
+	{
+		// 사실 size별로 Atlas를 생성하는 것도 에바다.
+		// 뭐 다른 방법이 없을까?
 	}
 
 	bool TextMesh::updateBuffers(std::vector<VertexType>& vertices, std::vector<unsigned int>& indices)

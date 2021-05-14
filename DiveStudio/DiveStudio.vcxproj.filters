@@ -8,6 +8,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Studio">
+      <UniqueIdentifier>{f4c1922c-a761-46ed-8bd0-f1c0145075d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Studio\Widgets">
+      <UniqueIdentifier>{5f19ecd5-3bfb-46b9-b3f1-822a0591561b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Studio\ImGUI">
+      <UniqueIdentifier>{fd4453e4-8259-4de3-93a5-559f512858b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EntryPoint.h">
@@ -22,7 +31,39 @@
     <ClInclude Include="targetver.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="DiveStudio.h" />
+    <ClInclude Include="DiveStudio.h">
+      <Filter>Studio</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imconfig.h">
+      <Filter>Studio\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imgui.h">
+      <Filter>Studio\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imgui_impl_dx11.h">
+      <Filter>Studio\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imgui_impl_win32.h">
+      <Filter>Studio\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imgui_internal.h">
+      <Filter>Studio\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imgui_stdlib.h">
+      <Filter>Studio\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imstb_rectpack.h">
+      <Filter>Studio\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imstb_textedit.h">
+      <Filter>Studio\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI\imstb_truetype.h">
+      <Filter>Studio\ImGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Widget.h">
+      <Filter>Studio\Widgets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DiveStudio.rc">
@@ -41,6 +82,29 @@
     <ClCompile Include="EntryPoint.cpp">
       <Filter>Base</Filter>
     </ClCompile>
-    <ClCompile Include="DiveStudio.cpp" />
+    <ClCompile Include="DiveStudio.cpp">
+      <Filter>Studio</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui.cpp">
+      <Filter>Studio\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_demo.cpp">
+      <Filter>Studio\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_draw.cpp">
+      <Filter>Studio\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_impl_dx11.cpp">
+      <Filter>Studio\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_impl_win32.cpp">
+      <Filter>Studio\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_stdlib.cpp">
+      <Filter>Studio\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI\imgui_widgets.cpp">
+      <Filter>Studio\ImGUI</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

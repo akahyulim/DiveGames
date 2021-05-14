@@ -261,11 +261,13 @@ namespace Dive
 		auto result = false;
 
 		{
-			m_pDvFont = new Dive_Font;
+			m_pDvFont = new Font;
 			result = m_pDvFont->LoadFromFile("../Assets/Fonts/NanumBarunGothic.ttf");
 			assert(result);
 		}
 
+		// TextMesh를 Component로 만든 후 제거할 코드
+		/*
 		{
 			m_pTextMesh = new TextMesh;
 			result = m_pTextMesh->SetFont(m_pDvFont);
@@ -273,7 +275,7 @@ namespace Dive
 			m_pTextMesh->SetText(L"We're just walking down the street.",
 				DirectX::XMFLOAT2(-200.0f, 200.0f));
 		}
-		
+		*/
 
 		return result;
 	}
