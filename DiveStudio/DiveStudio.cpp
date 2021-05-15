@@ -21,6 +21,8 @@ namespace Studio
 		// 현재 Renderer 생성과정에서 오류가 발생한다.
 		Dive::Runtime::Initialize();
 
+		SetActivePath(&m_renderPath);
+
 		// ImGUI
 		{
 			auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();

@@ -114,12 +114,13 @@ namespace Dive
 		assert(pDev != nullptr);
 
 		D3D11_TEXTURE2D_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
 		desc.Format				= m_format;
 		desc.Width				= m_width;
 		desc.Height				= m_height;
 		desc.BindFlags			= flags;
 		desc.ArraySize			= 1;
-		desc.Usage				= D3D11_USAGE_DEFAULT;
+		desc.Usage				= D3D11_USAGE_DEFAULT;	
 		desc.MipLevels			= 1;
 		desc.CPUAccessFlags		= 0;	// 이것도 애매하네
 		desc.SampleDesc.Count	= 1;

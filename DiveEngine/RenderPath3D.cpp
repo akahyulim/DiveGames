@@ -44,7 +44,7 @@ namespace Dive
 
 		Renderer::GetInstance().UpdateCB();
 		//Renderer::GetInstance().DrawColor();
-		Renderer::GetInstance().DrawTexturing();
+		//Renderer::GetInstance().DrawTexturing();
 		
 		// TextMesh와 GameObject 구성 후 다시 테스트
 		//Renderer::GetInstance().DrawText();

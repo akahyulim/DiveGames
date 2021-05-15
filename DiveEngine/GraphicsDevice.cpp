@@ -87,7 +87,7 @@ namespace Dive
 	{
 		m_pImmediateContext->OMSetRenderTargets(1, m_pRTV.GetAddressOf(), m_pDSV.Get());
 		
-		float clearColors[4] = {0.0f, 0.0f, 0.0f, 1.0f};//{ 0.5f, 0.5f, 0.5f, 1.0f };
+		float clearColors[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
 		m_pImmediateContext->ClearRenderTargetView(m_pRTV.Get(), clearColors);
 		m_pImmediateContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}

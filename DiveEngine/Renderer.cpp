@@ -26,8 +26,8 @@ namespace Dive
 		createSamplerStates();
 
 		createConstantBuffers();
-		createTextures();
-		createRenderTargetViews();
+		//createTextures();				// 현재는 Sandbox 테스트용, Spartan은 Editor에서 사용하는 Texture 생성용
+		//createRenderTargetViews();	// 역시 현재는 사용하는 곳이 없다.
 		createShaders();
 
 		createFonts();

@@ -24,7 +24,6 @@ namespace Dive
 		{
 			return;
 		}
-		m_bInitialized = true;
 		
 		CORE_TRACE("Dive Engine 초기화를 시작합니다...");
 
@@ -33,6 +32,8 @@ namespace Dive
 		TimeManager::GetInstance().Initialize();
 		Renderer::GetInstance().Initialize();
 		Input::GetInstance().Initialize(m_hWnd);
+
+		m_bInitialized = true;
 	}
 
 	void Runtime::Run()
