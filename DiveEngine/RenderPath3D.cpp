@@ -36,14 +36,14 @@ namespace Dive
 		CORE_TRACE("RenderPath3D::Update() - Update Camera Component");
 	}
 	
-	// 순서대로 그린다.
+	// Renderer와 어떻게 나누느냐...
 	void RenderPath3D::Render() const
 	{
 		auto pImmediateContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
 		Renderer::GetInstance().UpdateCB();
-		//Renderer::GetInstance().DrawColor();
+		Renderer::GetInstance().DrawColor();
 		//Renderer::GetInstance().DrawTexturing();
 		
 		// TextMesh와 GameObject 구성 후 다시 테스트

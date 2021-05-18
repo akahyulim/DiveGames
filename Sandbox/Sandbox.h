@@ -11,6 +11,9 @@ namespace Sandbox
 		void Initialize() override;
 
 	private:
+		void triangle_coloring();
+		void triangle_texturing();
+
 	private:
 		Dive::RenderPath3D m_renderPath;
 

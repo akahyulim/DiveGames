@@ -145,6 +145,7 @@ namespace Dive
 
 		// 임시
 		// 누가 가져야 할까?
+		// Wicked는 RenderPath3D::Render()에서 생성됐다.
 		D3D11_VIEWPORT viewport;
 		viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
 		viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
