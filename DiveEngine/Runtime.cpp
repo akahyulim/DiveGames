@@ -153,7 +153,7 @@ namespace Dive
 		}
 	}
 
-	void Runtime::SetActivePath(RenderPath* path)
+	void Runtime::ActivatePath(RenderPath* path)
 	{
 		// π∫∞° ¿÷¥Ÿ.
 		{

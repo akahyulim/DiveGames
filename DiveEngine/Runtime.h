@@ -24,7 +24,7 @@ namespace Dive
 		virtual void Render();
 		virtual void Compose();
 
-		void SetActivePath(RenderPath* path);
+		void ActivatePath(RenderPath* path);
 		RenderPath* GetActivePath() { return m_activePath; }
 
 		void SetWindow(HWND windowHandle, bool fullScreen);

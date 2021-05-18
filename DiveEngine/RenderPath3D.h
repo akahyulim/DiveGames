@@ -4,8 +4,8 @@
 
 namespace Dive
 {
-	// 얘는 Load와 Start가 없다.
-	// 아마도 Renderer와 Scene에서 생성한 Resource를 사용하기 때문인 것 같다.
+	// 엔진의 Default Rendering 경로이다.
+	// Wicked는 여기에서 기능이 추가된? RenderPath3D_PathTracing까지 있다.
 	class RenderPath3D : public RenderPath
 	{
 	public:
