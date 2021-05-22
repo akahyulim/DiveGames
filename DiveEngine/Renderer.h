@@ -8,6 +8,10 @@
 #include <memory>
 #include <string>
 
+// Collectio of Graphics Technique implementaions.
+// Fucntion to draw a scene, shadows, post processes.
+// Manager of GraphicsDevice Instance
+// Provides other helper functions
 namespace Dive
 {
 	class TextMesh;

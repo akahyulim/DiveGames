@@ -31,6 +31,14 @@ namespace Dive
 		m_gameObjects.clear();
 	}
 
+	void Scene::LoadFromFile(const std::string& filepath)
+	{
+	}
+
+	void Scene::SaveToFile(const std::string& filepath)
+	{
+	}
+
 	GameObject* Scene::CreateGameObject()
 	{
 		auto newGameObject = m_gameObjects.emplace_back(make_shared<GameObject>());

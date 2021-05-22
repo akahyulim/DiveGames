@@ -2,10 +2,10 @@
 #include "RenderPath.h"
 #include "Scene.h"
 
+// Basic class for 3d rendering paths.
+// The post proecess chain is also implemented here.
 namespace Dive
 {
-	// 엔진의 Default Rendering 경로이다.
-	// Wicked는 여기에서 기능이 추가된? RenderPath3D_PathTracing까지 있다.
 	class RenderPath3D : public RenderPath
 	{
 	public:

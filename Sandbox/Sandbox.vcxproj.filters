@@ -20,9 +20,6 @@
     <ClInclude Include="Resource.h">
       <Filter>Base</Filter>
     </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>Base</Filter>
-    </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>Base</Filter>
     </ClInclude>
@@ -43,9 +40,6 @@
   <ItemGroup>
     <ClCompile Include="Sandbox.cpp" />
     <ClCompile Include="EntryPoint.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
       <Filter>Base</Filter>
     </ClCompile>
   </ItemGroup>

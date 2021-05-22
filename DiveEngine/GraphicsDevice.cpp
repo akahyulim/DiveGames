@@ -37,6 +37,8 @@ namespace Dive
 		desc.Windowed						= fullScreen ? FALSE : TRUE;
 		desc.BufferCount					= m_backBufferCount;
 		desc.BufferDesc.Format				= m_format;
+		desc.BufferDesc.RefreshRate.Numerator =  60;
+		desc.BufferDesc.RefreshRate.Denominator = 1;
 		//desc.BufferDesc.RefreshRate.Numerator = vSync ? refreshRateNumerator : 0;
 		//desc.BufferDesc.RefreshRate.Denominator = vSync ? refreshRateDenominator : 1;
 		desc.BufferDesc.ScanlineOrdering	= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -45,7 +47,7 @@ namespace Dive
 		desc.SampleDesc.Count				= 1;
 		desc.SampleDesc.Quality				= 0;
 		desc.SwapEffect						= DXGI_SWAP_EFFECT_DISCARD;
-		desc.Flags							= deviceFlags;
+		desc.Flags = 0;// deviceFlags;
 
 		auto createDeviceAndSwapChain = [this, deviceFlags, featureLevels, driverType, desc]()
 		{
@@ -81,13 +83,17 @@ namespace Dive
 		}
 	}
 
-	// BeginScene 혹은 아에 Renderer의 Render 초반으로 옮기자.
-	// => 잘 모르겠다....
+	//==========================================================================================//
+	// DepthStencilView를 적용하면 ResizeResolution()이 먹히지 않는다.							//
+	// 아마도 DetphStencilView도 다시 생성해야하나 보다.										//
+	// => 이 문제는 현재 ResizeResolution()에서 임시로 해결했다.								//
+	//==========================================================================================//
 	void GraphicsDevice::PresentBegin()
 	{
+		//m_pImmediateContext->OMSetRenderTargets(1, m_pRTV.GetAddressOf(), nullptr);
 		m_pImmediateContext->OMSetRenderTargets(1, m_pRTV.GetAddressOf(), m_pDSV.Get());
 		
-		float clearColors[4] = { 0.5f, 0.5f, 0.5f, 1.0f };
+		float clearColors[4] = { 0.25f, 0.25f, 0.25f, 1.0f };
 		m_pImmediateContext->ClearRenderTargetView(m_pRTV.Get(), clearColors);
 		m_pImmediateContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
@@ -98,12 +104,21 @@ namespace Dive
 		m_pSwapChain->Present(m_bVSync ? 1 : 0, 0);
 	}
 
-	// 윈도우의 크기가 변경되었을 때 호출되어야 한다.
-	void GraphicsDevice::SetResolution(unsigned int width, unsigned int height)
+	//==========================================================================================//
+	// WM_SIZE가 호출한다.																		//
+	// 문제1) RenderTargetView의 연결을 끊어야 하지만 일단 그냥 적용했다.						//
+	// => 결국 Resolution과 관계된 Texture 및 View들은 전부 다시 생성해야 한다.					//
+	// => 따라서 이 함수는 직접 호출이 아닌 Renderer에서 호출되어야 한다.						//
+	// 문제2) 상하와 좌우의 크기 변경 대응이 다른 문제가 있다.									//
+	// 상식적으로 생각하면 좌우 크기 변경이 맞고, 상하 크기 변경이 이상하다.					//
+	// 즉, 높이가 변경될 경우 내부 해상도?가 다 바뀐다.											//
+	// => 참고예제를 보니 똑같은 현상이 있다. 문제가 아니라는건가?								//
+	//==========================================================================================//
+	void GraphicsDevice::ResizeResolution(unsigned int width, unsigned int height)
 	{
 		if ((width != m_resolutionWidth) || (height != m_resolutionHeight) && (width > 0) && (height > 0))
 		{
-			// render target 연결을 끊지 않았는데 문제가 없다...
+			//m_pImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
 
 			m_pBackBuffer.Reset();
 			m_pRTV.Reset();
@@ -115,6 +130,40 @@ namespace Dive
 			m_resolutionHeight = height;
 
 			createBackbufferResources();
+
+			CORE_TRACE("Resize Resolution : {0:d} x {1:d}", m_resolutionWidth, m_resolutionHeight);
+
+			//===========================================================================================
+			// DepthStencilBuffer를 임시로 여기에서 제거한 후 호출
+			m_pDSBuffer.Reset();
+			m_pDSV.Reset();
+
+			createDepthStencilView();
+			//============================================================================================
+		}
+	}
+
+	//==========================================================================================//
+	// App 내부에서 해상도를 변경할 때 사용한다.												//
+	// ResizeResolution과 이름의 통일성이 없다.													//
+	// ResizeResolution과 같은 문제점을 가진다.													//
+	//==========================================================================================//
+	void GraphicsDevice::ResizeTarget(unsigned int width, unsigned int height)
+	{
+		if ((width != m_resolutionWidth) || (height != m_resolutionHeight) && (width > 0) && (height > 0))
+		{
+			DXGI_MODE_DESC desc;
+			desc.Width						= width;
+			desc.Height						= height;
+			desc.Format						= m_format;
+			desc.RefreshRate.Numerator		= 60;
+			desc.RefreshRate.Denominator	= 1;
+			desc.ScanlineOrdering			= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+			desc.Scaling					= DXGI_MODE_SCALING_UNSPECIFIED;
+
+			CORE_TRACE("Resize Target : {0:d} x {1:d}", width, height);
+
+			m_pSwapChain->ResizeTarget(&desc);
 		}
 	}
 	
@@ -123,6 +172,12 @@ namespace Dive
 		return (m_pDevice != nullptr && m_pImmediateContext != nullptr && m_pSwapChain != nullptr);
 	}
 
+	//==========================================================================================//
+	// 이름에 create가 포함되어 있다면 두 가지 경우로 나뉘어야 한다.							//
+	// 1. 이미 생성되어 있다면 pass																//
+	// 2. 이미 생성되어 있다면 연결을 끊고 다시 생성											//
+	// 이 부분을 좀 더 생각해봐야 한다.															//
+	//==========================================================================================//
 	void GraphicsDevice::createBackbufferResources()
 	{
 		if (FAILED(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &m_pBackBuffer)))
@@ -138,12 +193,15 @@ namespace Dive
 		}
 	}
 
+	//==========================================================================================//
+	// OMSetRenderTargetViews()에 적용하려면													//
+	// ResizeResolution()때 다시 생성해야 할 것 같다.											//
+	// 현재 ResizeResolution()에서 Reset후 다시 이 함수 호출토록 수정했다.						//
+	//==========================================================================================//
 	void GraphicsDevice::createDepthStencilView()
 	{
 		D3D11_TEXTURE2D_DESC texDesc;
 		ZeroMemory(&texDesc, sizeof(texDesc));
-
-		// Set up the description of the depth buffer.
 		texDesc.Width = GetResolutionWidth();
 		texDesc.Height = GetResolutionHeight();
 		texDesc.MipLevels = 1;

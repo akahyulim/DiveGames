@@ -1,4 +1,5 @@
 #pragma once
+#include "DiveEngine.h"
 
 namespace Sandbox
 {

@@ -1,6 +1,7 @@
 #pragma once
 #include "GraphicsDevice.h"
 
+// override this(fucntion) to perform custom gameplay or rendering logic
 namespace Dive
 {
 	class RenderPath

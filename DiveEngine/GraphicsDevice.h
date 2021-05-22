@@ -15,7 +15,8 @@ namespace Dive
 		void PresentBegin();
 		void PresentEnd();
 
-		void SetResolution(unsigned int width, unsigned int height);
+		void ResizeResolution(unsigned int width, unsigned int height);
+		void ResizeTarget(unsigned int width, unsigned int height);
 
 		unsigned int GetResolutionWidth() const { return m_resolutionWidth; }
 		unsigned int GetResolutionHeight() const { return m_resolutionHeight; }

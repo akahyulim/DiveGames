@@ -142,7 +142,6 @@ namespace Dive
 
 		pImmediateContext->VSSetConstantBuffers(0, 1, m_pCBMatrix.GetAddressOf());
 
-
 		// 임시
 		// 누가 가져야 할까?
 		// Wicked는 RenderPath3D::Render()에서 생성됐다.
