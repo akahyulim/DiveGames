@@ -29,6 +29,7 @@
 
 //= Tool ==========================
 #include "FontImporter.h"
+#include "IniHelper.h"
 
 
 #pragma comment(lib, "DiveEngine.lib")

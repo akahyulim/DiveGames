@@ -17,6 +17,9 @@
     <Filter Include="External\ImGui">
       <UniqueIdentifier>{58dbc075-befa-49d6-9159-c44e1981ff73}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Widget">
+      <UniqueIdentifier>{67e9040f-93a3-4811-8a39-5eb6aad52c62}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -52,6 +55,18 @@
     <ClInclude Include="External\ImGui\imstb_truetype.h">
       <Filter>External\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="External\ImGui\imgui_impl_dx11.h">
+      <Filter>External\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGui\imgui_impl_win32.h">
+      <Filter>External\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Widget.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="WidgetMenu.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Editor.rc">
@@ -84,6 +99,18 @@
     </ClCompile>
     <ClCompile Include="External\ImGui\imgui_widgets.cpp">
       <Filter>External\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\imgui_impl_dx11.cpp">
+      <Filter>External\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\imgui_impl_win32.cpp">
+      <Filter>External\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor_WndProc.cpp">
+      <Filter>Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="WidgetMenu.cpp">
+      <Filter>Widget</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

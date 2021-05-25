@@ -170,7 +170,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             unsigned int width = lParam & 0xFFFF;
             unsigned int height = (lParam >> 16) & 0xFFFF;
             APP_TRACE("Call Resize Resolution : {0:d} x {1:d}", width, height);
-            pGraphicsDevice->ResizeResolution(width, height);
+            pGraphicsDevice->ResizeBuffers(width, height);
         }
         }
         break;

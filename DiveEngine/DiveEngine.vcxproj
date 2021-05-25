@@ -177,6 +177,7 @@
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
     <ClInclude Include="GraphicsInclude.h" />
+    <ClInclude Include="IniHelper.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="Mesh.h" />
@@ -201,6 +202,7 @@
     <ClCompile Include="FontImporter.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
+    <ClCompile Include="IniHelper.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Mesh.cpp" />

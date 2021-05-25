@@ -149,6 +149,8 @@
     <ClInclude Include="EntryPoint.h" />
     <ClInclude Include="External\ImGui\imconfig.h" />
     <ClInclude Include="External\ImGui\imgui.h" />
+    <ClInclude Include="External\ImGui\imgui_impl_dx11.h" />
+    <ClInclude Include="External\ImGui\imgui_impl_win32.h" />
     <ClInclude Include="External\ImGui\imgui_internal.h" />
     <ClInclude Include="External\ImGui\imstb_rectpack.h" />
     <ClInclude Include="External\ImGui\imstb_textedit.h" />
@@ -156,14 +158,20 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Widget.h" />
+    <ClInclude Include="WidgetMenu.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Editor.cpp" />
+    <ClCompile Include="Editor_WndProc.cpp" />
     <ClCompile Include="EntryPoint.cpp" />
     <ClCompile Include="External\ImGui\imgui.cpp" />
     <ClCompile Include="External\ImGui\imgui_demo.cpp" />
     <ClCompile Include="External\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="External\ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="External\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="External\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="WidgetMenu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Editor.rc" />

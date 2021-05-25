@@ -105,16 +105,10 @@ namespace Dive
 	}
 
 	//==========================================================================================//
-	// WM_SIZE가 호출한다.																		//
-	// 문제1) RenderTargetView의 연결을 끊어야 하지만 일단 그냥 적용했다.						//
-	// => 결국 Resolution과 관계된 Texture 및 View들은 전부 다시 생성해야 한다.					//
-	// => 따라서 이 함수는 직접 호출이 아닌 Renderer에서 호출되어야 한다.						//
-	// 문제2) 상하와 좌우의 크기 변경 대응이 다른 문제가 있다.									//
-	// 상식적으로 생각하면 좌우 크기 변경이 맞고, 상하 크기 변경이 이상하다.					//
-	// 즉, 높이가 변경될 경우 내부 해상도?가 다 바뀐다.											//
-	// => 참고예제를 보니 똑같은 현상이 있다. 문제가 아니라는건가?								//
+	// 누가 호출할 것인지 아직 정하지 못했다.													//
+	// RenderTarget 해제를 하지 않았다.															//
 	//==========================================================================================//
-	void GraphicsDevice::ResizeResolution(unsigned int width, unsigned int height)
+	void GraphicsDevice::ResizeBuffers(unsigned int width, unsigned int height)
 	{
 		if ((width != m_resolutionWidth) || (height != m_resolutionHeight) && (width > 0) && (height > 0))
 		{
@@ -146,7 +140,6 @@ namespace Dive
 	//==========================================================================================//
 	// App 내부에서 해상도를 변경할 때 사용한다.												//
 	// ResizeResolution과 이름의 통일성이 없다.													//
-	// ResizeResolution과 같은 문제점을 가진다.													//
 	//==========================================================================================//
 	void GraphicsDevice::ResizeTarget(unsigned int width, unsigned int height)
 	{

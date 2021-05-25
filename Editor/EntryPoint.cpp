@@ -5,6 +5,8 @@
 #include "EntryPoint.h"
 #include "Editor.h"
 
+extern LRESULT Editor::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 #define MAX_LOADSTRING 100
 
 // 전역 변수:
@@ -76,7 +78,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.cbSize = sizeof(WNDCLASSEX);
 
     wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = WndProc;
+    wcex.lpfnWndProc    = Editor::WndProc;
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
     wcex.hInstance      = hInstance;
@@ -104,6 +106,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
+   // ini 파일 제어가 가장 간단하다.
+   // title
+   // full screen or size
+   // 일단 full이면 size는 무시된다.
+   // full이 아니면 size를 적용받는다.
+   // 위치는 항상 중앙으로 직접 계산
+
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
@@ -130,8 +139,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
+//  현재 이 부분은 필요가 없어졌다.
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    if (Editor::WndProc(hWnd, message, wParam, lParam))
+        return true;
+
     switch (message)
     {
     case WM_COMMAND:
