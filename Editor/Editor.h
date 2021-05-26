@@ -12,7 +12,7 @@ namespace Editor
 		Editor();
 		~Editor();
 
-		void Initialize() override;
+		bool Initialize() override;
 
 		void Render() override;
 

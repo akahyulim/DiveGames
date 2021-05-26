@@ -106,14 +106,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-   // ini 파일 제어가 가장 간단하다.
-   // title
-   // full screen or size
-   // 일단 full이면 size는 무시된다.
-   // full이 아니면 size를 적용받는다.
-   // 위치는 항상 중앙으로 직접 계산
-
-
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 
@@ -124,7 +116,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    g_editor.SetWindow(hWnd, false);
 
-   ShowWindow(hWnd, nCmdShow);
+   ShowWindow(hWnd, SW_HIDE);
    UpdateWindow(hWnd);
 
    return TRUE;

@@ -9,7 +9,7 @@ namespace Sandbox
 		Sandbox() = default;
 		~Sandbox() = default;
 
-		void Initialize() override;
+		bool Initialize() override;
 
 	private:
 		void triangle_coloring();

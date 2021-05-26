@@ -15,7 +15,7 @@ namespace Dive
 		Runtime();
 		virtual ~Runtime() = default;
 
-		virtual void Initialize();
+		virtual bool Initialize();
 
 		void Run();
 

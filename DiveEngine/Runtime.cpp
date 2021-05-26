@@ -16,31 +16,37 @@ namespace Dive
 		Log::Initialize();
 	}
 
-	void Runtime::Initialize()
+	bool Runtime::Initialize()
 	{
 		assert(m_hWnd != 0);
 
 		if (m_bInitialized)
 		{
-			return;
+			return false;
 		}
 		
 		CORE_TRACE("Dive Engine 초기화를 시작합니다...");
 
+		// 원래 SetWindow에서 호출하던 부분 =============================================
+		auto& renderer = Renderer::GetInstance();
+		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(m_hWnd, m_bFullScreen));
+		//===============================================================================
+
 		// 일단 싱글 쓰레드로 간다.
 		// 이후 laoding은 asyn로 하고, parallel은 최후로 미룬다.
+		// 전부 bool 타입으로 바꾸자
 		TimeManager::GetInstance().Initialize();
 		Renderer::GetInstance().Initialize();
 		Input::GetInstance().Initialize(m_hWnd);
 
-		m_bInitialized = true;
+		return true;
 	}
 
 	void Runtime::Run()
 	{
 		if (!m_bInitialized)
 		{
-			Initialize();
+			m_bInitialized = Initialize();
 			
 			if (!m_bInitialized)
 			{
@@ -174,9 +180,5 @@ namespace Dive
 	{
 		m_hWnd = windowHandle;
 		m_bFullScreen = fullScreen;
-
-		// 이것두 그냥 Initailize에 넣어버리는 편이 나을 것 같다.
-		auto& renderer = Renderer::GetInstance();
-		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(windowHandle, fullScreen));
 	}
 }

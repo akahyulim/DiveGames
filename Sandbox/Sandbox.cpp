@@ -2,9 +2,12 @@
 
 namespace Sandbox
 {
-	void Sandbox::Initialize()
+	bool Sandbox::Initialize()
 	{
-		Runtime::Initialize();
+		if (!Runtime::Initialize())
+		{
+			return false;
+		}
 
 		ActivatePath(&m_renderPath);
 
@@ -12,6 +15,8 @@ namespace Sandbox
 		//triangle_texturing();
 
 		APP_TRACE("Complete Sandbox Initialization");
+		
+		return true;
 	}
 
 	void Sandbox::triangle_coloring()
