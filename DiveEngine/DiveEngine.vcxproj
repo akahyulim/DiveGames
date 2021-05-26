@@ -171,8 +171,11 @@
     <ClInclude Include="CommonInclude.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="DiveEngine.h" />
+    <ClInclude Include="FileStream.h" />
+    <ClInclude Include="FileSystemHelper.h" />
     <ClInclude Include="Font.h" />
     <ClInclude Include="FontImporter.h" />
+    <ClInclude Include="FormatHelper.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
@@ -189,6 +192,7 @@
     <ClInclude Include="RenderPath3D.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TextMesh.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="ThreadPool.h" />
@@ -198,8 +202,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="FileStream.cpp" />
+    <ClCompile Include="FileSystemHelper.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontImporter.cpp" />
+    <ClCompile Include="FormatHelper.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="IniHelper.cpp" />
@@ -212,6 +219,7 @@
     <ClCompile Include="RenderPath3D.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="ThreadPool.cpp" />

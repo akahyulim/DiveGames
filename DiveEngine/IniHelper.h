@@ -1,6 +1,8 @@
 #pragma once
+#include <windows.h>
 #include <string>
 #include <memory>
+
 
 namespace Dive
 {
@@ -63,7 +65,7 @@ namespace Dive
 		char defaultStr[MAX_VALUE_SIZE];
 		sprintf_s(defaultStr, MAX_VALUE_SIZE, formatSpec, defaultValue);
 		std::unique_ptr<char> pBuffer(new char[MAX_VALUE_SIZE]);
-		//GetPrivateProfileStringA(m_sectionName.c_str(), m_keyName.c_str(), defaultStr, pBuffer.get(), MAX_VALUE_SIZE, m_fileName.c_str());
+		GetPrivateProfileStringA(m_sectionName.c_str(), m_keyName.c_str(), defaultStr, pBuffer.get(), MAX_VALUE_SIZE, m_fileName.c_str());
 		
 		return std::string(pBuffer.get());
 	}
@@ -73,7 +75,7 @@ namespace Dive
 	{
 		char valueStr[MAX_VALUE_SIZE];
 		sprintf_s(valueStr, MAX_VALUE_SIZE, formatSpec, value);
-		//WritePrivateProfileStringA(m_sectionName.c_str(), m_keyName.c_str(), valueStr, m_fileName.c_str());
+		WritePrivateProfileStringA(m_sectionName.c_str(), m_keyName.c_str(), valueStr, m_fileName.c_str());
 	}
 
 	class Section

@@ -113,6 +113,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    // full이 아니면 size를 적용받는다.
    // 위치는 항상 중앙으로 직접 계산
 
+
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
 

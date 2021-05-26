@@ -120,7 +120,7 @@ namespace Dive
 	}
 
 	IniHelper::IniHelper(const std::string fileName)
-		: m_fileName(std::move(fileName))
+		: m_fileName(fileName)
 	{
 	}
 

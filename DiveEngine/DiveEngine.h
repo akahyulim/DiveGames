@@ -30,6 +30,10 @@
 //= Tool ==========================
 #include "FontImporter.h"
 #include "IniHelper.h"
+#include "FileStream.h"
+#include "StringHelper.h"
+#include "FileSystemHelper.h"
+#include "FormatHelper.h"
 
 
 #pragma comment(lib, "DiveEngine.lib")
