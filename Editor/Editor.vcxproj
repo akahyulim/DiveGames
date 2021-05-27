@@ -163,7 +163,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Editor.cpp" />
-    <ClCompile Include="Editor_WndProc.cpp" />
     <ClCompile Include="EntryPoint.cpp" />
     <ClCompile Include="External\ImGui\imgui.cpp" />
     <ClCompile Include="External\ImGui\imgui_demo.cpp" />

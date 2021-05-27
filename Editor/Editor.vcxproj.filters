@@ -106,9 +106,6 @@
     <ClCompile Include="External\ImGui\imgui_impl_win32.cpp">
       <Filter>External\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Editor_WndProc.cpp">
-      <Filter>Editor</Filter>
-    </ClCompile>
     <ClCompile Include="WidgetMenu.cpp">
       <Filter>Widget</Filter>
     </ClCompile>

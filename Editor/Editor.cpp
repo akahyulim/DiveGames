@@ -121,4 +121,13 @@ namespace Editor
 		Compose();
 		graphicsDevice->PresentEnd();
 	}
+
+	void Editor::ResizeWindow(unsigned int width, unsigned int height)
+	{
+		auto filePath = Dive::FileSystemHelper::GetWorkingDirectory() + "editor.ini";
+		Dive::IniHelper ini(filePath);
+		ini["Window"]["Width"]		= width;
+		ini["Window"]["Height"]		= height;
+		ini["Window"]["bMaximize"]	= IsZoomed(m_hWnd) ? true : false;
+	}
 }

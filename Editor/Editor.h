@@ -16,6 +16,8 @@ namespace Editor
 
 		void Render() override;
 
+		void ResizeWindow(unsigned int width, unsigned int height);
+
 	private:
 	private:
 		std::vector<std::shared_ptr<Widget>> m_widgets;

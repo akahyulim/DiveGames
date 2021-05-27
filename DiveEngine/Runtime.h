@@ -6,7 +6,6 @@ namespace Dive
 {
 	class RenderPath;
 
-	// m_bWindowActive는 윈도우 상태에서 얻어와야 한다.
 	// m_bLockFrame은 VSync와도 연관있다.
 
 	class Runtime
@@ -34,6 +33,8 @@ namespace Dive
 
 		bool IsFrameLock() const { return m_bFrameLock; }
 		void SetFrameLock(bool enable) { m_bFrameLock = enable; }
+
+		void ActiveWindow(bool active) { m_bWindowActive = active; }
 
 		bool IsInitialized() const { return m_bInitialized; }
 

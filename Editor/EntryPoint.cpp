@@ -4,8 +4,9 @@
 #include "framework.h"
 #include "EntryPoint.h"
 #include "Editor.h"
+#include "External/ImGui/imgui_impl_win32.h"
 
-extern LRESULT Editor::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #define MAX_LOADSTRING 100
 
@@ -36,6 +37,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDC_EDITOR, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
+#ifdef _DEBUG
+    AllocConsole();
+#endif
+
     // 애플리케이션 초기화를 수행합니다:
     if (!InitInstance (hInstance, nCmdShow))
     {
@@ -61,6 +66,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
+#ifdef _DEBUG
+    system("pause");
+    FreeConsole();
+#endif
+
     return (int) msg.wParam;
 }
 
@@ -78,7 +88,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
     wcex.cbSize = sizeof(WNDCLASSEX);
 
     wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = Editor::WndProc;
+    wcex.lpfnWndProc    = WndProc;
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
     wcex.hInstance      = hInstance;
@@ -132,14 +142,41 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - 종료 메시지를 게시하고 반환합니다.
 //
 //
-//  현재 이 부분은 필요가 없어졌다.
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    if (Editor::WndProc(hWnd, message, wParam, lParam))
+    if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
         return true;
 
     switch (message)
     {
+    case WM_SIZE:
+        {
+            // 메시지로 날리면 초기화 확인 같은건 안해도 될거다.
+            if (!g_editor.IsInitialized())   return 0;
+            unsigned int width = lParam & 0xFFFF;
+            unsigned int height = (lParam >> 16) & 0xFFFF;
+            auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
+            if (pGraphicsDevice->IsInitialized())
+                pGraphicsDevice->ResizeBuffers(width, height);
+
+            // ini를 갱신해야 한다.
+            g_editor.ResizeWindow(width, height);
+        }
+        break;
+    case WM_DPICHANGED:
+        {
+        }
+        break;
+    case WM_INPUT:
+        {
+        }
+        break;
+    case WM_KILLFOCUS:
+        g_editor.ActiveWindow(false);
+        break;
+    case WM_SETFOCUS:
+        g_editor.ActiveWindow(true);
+        break;
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);

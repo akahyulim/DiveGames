@@ -28,6 +28,9 @@ namespace Dive
 		CORE_TRACE("Dive Engine 초기화를 시작합니다...");
 
 		// 원래 SetWindow에서 호출하던 부분 =============================================
+		// Backbuffer의 크기 설정을 늦추기 위해 이 곳으로 옮겼다.
+		// 하지만 Wicked의 경우 Renderer::Initialize() 과정의 마지막에 WM_SIZE 이벤트를 받도록 하여
+		// ReiszeBuffers()를 호출토록 하였다. 
 		auto& renderer = Renderer::GetInstance();
 		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(m_hWnd, m_bFullScreen));
 		//===============================================================================
