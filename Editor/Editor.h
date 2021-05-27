@@ -22,6 +22,4 @@ namespace Editor
 	private:
 		std::vector<std::shared_ptr<Widget>> m_widgets;
 	};
-
-	LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 }

@@ -1,6 +1,7 @@
 #include "WidgetMenu.h"
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
+#include <Windows.h>
 
 namespace Editor
 {
@@ -50,6 +51,9 @@ namespace Editor
 
 				if (ImGui::MenuItem("Exit"))
 				{
+					// 저장 여부를 확인해야 한다.
+
+					PostQuitMessage(0);
 				}
 
 				ImGui::EndMenu();

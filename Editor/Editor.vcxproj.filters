@@ -37,6 +37,12 @@
     <ClInclude Include="Editor.h">
       <Filter>Editor</Filter>
     </ClInclude>
+    <ClInclude Include="Widget.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="WidgetMenu.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
     <ClInclude Include="External\ImGui\imconfig.h">
       <Filter>External\ImGui</Filter>
     </ClInclude>
@@ -44,6 +50,12 @@
       <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="External\ImGui\imgui_internal.h">
+      <Filter>External\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGui\imgui_impl_dx11.h">
+      <Filter>External\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="External\ImGui\imgui_impl_win32.h">
       <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="External\ImGui\imstb_rectpack.h">
@@ -54,18 +66,6 @@
     </ClInclude>
     <ClInclude Include="External\ImGui\imstb_truetype.h">
       <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imgui_impl_dx11.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imgui_impl_win32.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Widget.h">
-      <Filter>Widget</Filter>
-    </ClInclude>
-    <ClInclude Include="WidgetMenu.h">
-      <Filter>Widget</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +88,9 @@
     <ClCompile Include="Editor.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
+    <ClCompile Include="WidgetMenu.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
     <ClCompile Include="External\ImGui\imgui.cpp">
       <Filter>External\ImGui</Filter>
     </ClCompile>
@@ -95,6 +98,9 @@
       <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="External\ImGui\imgui_draw.cpp">
+      <Filter>External\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="External\ImGui\imgui_tables.cpp">
       <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="External\ImGui\imgui_widgets.cpp">
@@ -105,9 +111,6 @@
     </ClCompile>
     <ClCompile Include="External\ImGui\imgui_impl_win32.cpp">
       <Filter>External\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="WidgetMenu.cpp">
-      <Filter>Widget</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

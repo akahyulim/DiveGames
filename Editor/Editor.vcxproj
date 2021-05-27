@@ -120,6 +120,7 @@
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>../DiveEngine;../DiveEngine/External;</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -169,6 +170,7 @@
     <ClCompile Include="External\ImGui\imgui_draw.cpp" />
     <ClCompile Include="External\ImGui\imgui_impl_dx11.cpp" />
     <ClCompile Include="External\ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="External\ImGui\imgui_tables.cpp" />
     <ClCompile Include="External\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="WidgetMenu.cpp" />
   </ItemGroup>
