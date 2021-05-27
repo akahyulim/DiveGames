@@ -37,10 +37,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDC_EDITOR, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance);
 
-#ifdef _DEBUG
-    AllocConsole();
-#endif
-
     // 애플리케이션 초기화를 수행합니다:
     if (!InitInstance (hInstance, nCmdShow))
     {
@@ -65,11 +61,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             g_editor.Run();
         }
     }
-
-#ifdef _DEBUG
-    system("pause");
-    FreeConsole();
-#endif
 
     return (int) msg.wParam;
 }

@@ -20,15 +20,10 @@ namespace Dive
 		spdlog::register_logger(s_coreLogger);
 		s_coreLogger->set_level(spdlog::level::trace);
 		s_coreLogger->flush_on(spdlog::level::trace);
-#ifdef _DEBUG
-		
-#endif
 
 		s_appLogger = std::make_shared<spdlog::logger>("APP", begin(logSinks), end(logSinks));
 		spdlog::register_logger(s_appLogger);
 		s_appLogger->set_level(spdlog::level::trace);
 		s_appLogger->flush_on(spdlog::level::trace);
-#ifdef _DEBUG
-#endif
 	}
 }
