@@ -146,6 +146,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Assets.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="Console.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EntryPoint.h" />
     <ClInclude Include="External\ImGui\imconfig.h" />
@@ -158,11 +161,16 @@
     <ClInclude Include="External\ImGui\imstb_truetype.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="Viewport.h" />
+    <ClInclude Include="World.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Widget.h" />
-    <ClInclude Include="WidgetMenu.h" />
+    <ClInclude Include="MenuBar.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Assets.cpp" />
+    <ClCompile Include="Component.cpp" />
+    <ClCompile Include="Console.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EntryPoint.cpp" />
     <ClCompile Include="External\ImGui\imgui.cpp" />
@@ -172,7 +180,10 @@
     <ClCompile Include="External\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="External\ImGui\imgui_tables.cpp" />
     <ClCompile Include="External\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="WidgetMenu.cpp" />
+    <ClCompile Include="MenuBar.cpp" />
+    <ClCompile Include="Viewport.cpp" />
+    <ClCompile Include="World.cpp" />
+    <ClCompile Include="Widget.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Editor.rc" />

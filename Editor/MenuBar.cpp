@@ -1,21 +1,29 @@
-#include "WidgetMenu.h"
+#include "MenuBar.h"
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
 #include <Windows.h>
 
 namespace Editor
 {
-	void WidgetMenu::Tick()
+	MenuBar::MenuBar(Editor* pEditor)
+		: Widget(pEditor)
 	{
+		m_title = "MenuBar";
+		m_bWindow = false;
+	}
+
+	void MenuBar::TickAlways()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(GetPadding(), GetPadding()));
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("New Scene"))
+				if (ImGui::MenuItem("New World"))
 				{
 				}
 
-				if (ImGui::MenuItem("Open Scene"))
+				if (ImGui::MenuItem("Open World"))
 				{
 				}
 
@@ -154,7 +162,7 @@ namespace Editor
 			if (ImGui::BeginMenu("Window"))
 			{
 				/*
-				ImGui::MenuItem("Scene", NULL, &g_pWidgetScene->IsVisible());
+				ImGui::MenuItem("World", NULL, &g_pWidgetScene->IsVisible());
 				ImGui::MenuItem("Game", NULL, &g_pWidgetGame->IsVisible());
 				ImGui::MenuItem("Hierarchy", NULL, &g_pWidgetHierarchy->IsVisible());
 				ImGui::MenuItem("Components", NULL, &g_pWidgetInspector->IsVisible());
@@ -184,5 +192,6 @@ namespace Editor
 
 			ImGui::EndMainMenuBar();
 		}
+		ImGui::PopStyleVar();
 	}
 }

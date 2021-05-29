@@ -40,9 +40,6 @@
     <ClInclude Include="Widget.h">
       <Filter>Widget</Filter>
     </ClInclude>
-    <ClInclude Include="WidgetMenu.h">
-      <Filter>Widget</Filter>
-    </ClInclude>
     <ClInclude Include="External\ImGui\imconfig.h">
       <Filter>External\ImGui</Filter>
     </ClInclude>
@@ -67,6 +64,24 @@
     <ClInclude Include="External\ImGui\imstb_truetype.h">
       <Filter>External\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="MenuBar.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="Viewport.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets.h">
+      <Filter>Widget</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Editor.rc">
@@ -88,9 +103,6 @@
     <ClCompile Include="Editor.cpp">
       <Filter>Editor</Filter>
     </ClCompile>
-    <ClCompile Include="WidgetMenu.cpp">
-      <Filter>Widget</Filter>
-    </ClCompile>
     <ClCompile Include="External\ImGui\imgui.cpp">
       <Filter>External\ImGui</Filter>
     </ClCompile>
@@ -111,6 +123,27 @@
     </ClCompile>
     <ClCompile Include="External\ImGui\imgui_impl_win32.cpp">
       <Filter>External\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="MenuBar.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="Viewport.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Widget</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets.cpp">
+      <Filter>Widget</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

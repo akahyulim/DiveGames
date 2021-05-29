@@ -1,15 +1,50 @@
 #pragma once
+#include "DiveEngine.h"
+#include "External/ImGui/imgui.h"
+#include "External/ImGui/imgui_internal.h"
 
 namespace Editor
 {
+	class Editor;
+
+	// 윈도우 바깥으로 나가면 제어가 안된다.
 	class Widget
 	{
 	public:
-		Widget() {}
-		virtual ~Widget() {}
+		Widget(Editor* pEditor);
+		virtual ~Widget() = default;
 
-		void Begin() {}
-		void End() {}
-		virtual void Tick() {}
+		void Tick();
+
+		virtual void TickAlways() {}
+		virtual void TickVisible() {}
+		virtual void OnShow() {}
+		virtual void OnHide() {}
+		virtual void OnPushStyleVar() {}
+
+		bool IsVisible() const { return m_bVisible; }
+		void SetVisible(bool visible) { m_bVisible = visible; }
+		float GetHeight() const { return m_height; }
+		std::string GetTitle() const { return m_title; }
+		ImGuiWindow* GetWindow() const { return m_window; }
+
+	protected:
+		bool m_bWindow = true;
+		bool m_bVisible = true;
+		int m_flags = ImGuiWindowFlags_NoCollapse;
+		float m_height = 0.0f;
+		float m_alpha = -1.0f;
+		ImVec2 m_position = ImVec2(-1.0f, -1.0f);
+		ImVec2 m_size = ImVec2(-1.0f, -1.0f);
+		ImVec2 m_sizeMax = ImVec2(FLT_MAX, FLT_MAX);
+		ImVec2 m_padding = ImVec2(-1.0f, -1.0f);
+		std::string m_title = "Title";
+		ImGuiWindow* m_window = nullptr;
+
+		Editor* m_pEditor = nullptr;
+
+	private:
+		unsigned char m_varPushes = 0;
+
 	};
 }

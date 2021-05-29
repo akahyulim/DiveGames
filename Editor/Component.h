@@ -3,11 +3,10 @@
 
 namespace Editor
 {
-	class WidgetMenu : public Widget
+	class Component : public Widget
 	{
 	public:
-		void Tick() override;
-
+		Component(Editor* pEditor);
 	private:
 	private:
 	};
