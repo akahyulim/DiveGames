@@ -8,6 +8,7 @@ namespace Editor
 	class Editor;
 
 	// 윈도우 바깥으로 나가면 제어가 안된다.
+	// => Spartan은 해당 버그가 없다.
 	class Widget
 	{
 	public:
@@ -16,7 +17,9 @@ namespace Editor
 
 		void Tick();
 
+		// menubar, toolbar, progressbar만 구현한다.
 		virtual void TickAlways() {}
+		// 일반적인 윈도우의 설정이다.
 		virtual void TickVisible() {}
 		virtual void OnShow() {}
 		virtual void OnHide() {}
@@ -45,6 +48,5 @@ namespace Editor
 
 	private:
 		unsigned char m_varPushes = 0;
-
 	};
 }

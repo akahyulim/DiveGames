@@ -148,7 +148,6 @@
   <ItemGroup>
     <ClInclude Include="Assets.h" />
     <ClInclude Include="Component.h" />
-    <ClInclude Include="Console.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EntryPoint.h" />
     <ClInclude Include="External\ImGui\imconfig.h" />
@@ -170,7 +169,6 @@
   <ItemGroup>
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="Component.cpp" />
-    <ClCompile Include="Console.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EntryPoint.cpp" />
     <ClCompile Include="External\ImGui\imgui.cpp" />

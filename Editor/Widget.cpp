@@ -12,15 +12,14 @@ namespace Editor
 
 	void Widget::Tick()
 	{
-		// 이건 이름처럼 항상 그려지는 부분이고
+		// 이건 Menubar처럼 항상 그려지는 부분이다.
+		// 이외에도 Progressbar, Toolbar 등이 구현 대상이다.
 		TickAlways();
 
 		if (!m_bWindow)	
 			return;
 
-		// 아래의 부분은 특정 상황??? 에서만 보여지는 것 같다.
-		// MenuBar로는 재현이 불가능하다.
-		bool begun = false;
+		bool bBegun = false;
 		{
 			if (!m_bVisible)
 				return;
@@ -33,6 +32,7 @@ namespace Editor
 			{
 				ImGui::SetNextWindowSize(m_size, ImGuiCond_FirstUseEver);
 			}
+			// 여기에서 크기를 제한시켜줘야하는데...
 			if ((m_size.x != -1.0f && m_size.y != -1.0f) || (m_sizeMax.x != FLT_MAX && m_sizeMax.y != FLT_MAX))
 			{
 				ImGui::SetNextWindowSizeConstraints(m_size, m_sizeMax);
@@ -48,20 +48,19 @@ namespace Editor
 				m_varPushes++;
 			}
 
+			// Style을 추가한 내용을 푸쉬하는 부분이다.
 			OnPushStyleVar();
 
-			// 순서상 구체 위젯이 먼저 그려진 후 호출된다.
-			// 따라서 결국 다른 윈도우를 만들어 그리는 형태가 되었다...
 			if (ImGui::Begin(m_title.c_str(), &m_bVisible, m_flags))
 			{
 				m_window = ImGui::GetCurrentWindow();
 				m_height = ImGui::GetWindowHeight();
 
-				begun = true;
+				bBegun = true;
 			}
 			else if (m_window && m_window->Hidden)
 			{
-				begun = true;
+				bBegun = true;
 			}
 
 			if (m_window && m_window->Appearing)
@@ -74,8 +73,9 @@ namespace Editor
 			}
 		}
 
-		if (begun)
+		if (bBegun)
 		{
+			// 이게 실제로 보여지는 부분이다.
 			TickVisible();
 
 			{

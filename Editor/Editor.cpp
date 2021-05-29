@@ -6,7 +6,6 @@
 #include "MenuBar.h"
 #include "World.h"
 #include "Viewport.h"
-#include "Console.h"
 #include "Assets.h"
 #include "Component.h"
 
@@ -20,9 +19,12 @@ namespace Editor
 
 	Editor::~Editor()
 	{
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
+		if (ImGui::GetCurrentContext())
+		{
+			ImGui_ImplDX11_Shutdown();
+			ImGui_ImplWin32_Shutdown();
+			ImGui::DestroyContext();
+		}
 	}
 
 	bool Editor::Initialize()
@@ -34,6 +36,7 @@ namespace Editor
 
 		initialize_ImGui();
 
+		// 윈도우 보이기
 		ShowWindow(m_hWnd, m_bMaximize ? SW_MAXIMIZE : SW_SHOWDEFAULT);
 		UpdateWindow(m_hWnd);
 
@@ -53,8 +56,7 @@ namespace Editor
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
-
-			begin_ImGui();
+			beginDockSpace();
 
 			// 이 곳에서 Widget을 그릴 것이다.
 			for (auto pWidget : m_widgets)
@@ -62,12 +64,11 @@ namespace Editor
 				pWidget->Tick();
 			}
 
-			end_ImGui();
+			endDockSpace();
 
 			ImGui::Render();
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-			// Update and Render additional Platform Windows
 			ImGuiIO& io = ImGui::GetIO();
 			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
@@ -92,9 +93,16 @@ namespace Editor
 	void Editor::ResizeWindow(unsigned int width, unsigned int height)
 	{
 		Dive::IniHelper ini(m_iniFilePath);
-		ini["Window"]["Width"] = width;
-		ini["Window"]["Height"] = height;
-		ini["Window"]["bMaximize"] = IsZoomed(m_hWnd) ? true : false;
+		if (IsZoomed(m_hWnd))
+		{
+			ini["Window"]["bMaximize"] = true;
+		}
+		else
+		{
+			ini["Window"]["bMaximize"] = false;
+			ini["Window"]["Width"] = width;
+			ini["Window"]["Height"] = height;
+		}
 	}
 
 	void Editor::initialized_ini()
@@ -120,41 +128,32 @@ namespace Editor
 
 	void Editor::initialize_ImGui()
 	{
-		// Setup Dear ImGui context
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
+
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-		//io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-		//io.ConfigViewportsNoAutoMerge = true;
-		//io.ConfigViewportsNoTaskBarIcon = true;
-		//io.ConfigViewportsNoDefaultParent = true;
-		//io.ConfigDockingAlwaysTabBar = true;
-		//io.ConfigDockingTransparentPayload = true;
-		//io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;     // FIXME-DPI: Experimental. THIS CURRENTLY DOESN'T WORK AS EXPECTED. DON'T USE IN USER APP!
-		//io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports; // FIXME-DPI: Experimental.
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+		io.ConfigWindowsResizeFromEdges = true;
+		io.ConfigViewportsNoTaskBarIcon = true;
+		//io.Fonts->AddFontFromFileTTF("../Assets/Fonts/NanumGothic.ttf", 14);
 
-		// Setup Dear ImGui style
+		applyStyle();
+		/*
 		ImGui::StyleColorsDark();
-		//ImGui::StyleColorsClassic();
-
-		// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
 		ImGuiStyle& style = ImGui::GetStyle();
 		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
 			style.WindowRounding = 0.0f;
 			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 		}
-
+		*/
 		ImGui_ImplWin32_Init(m_hWnd);
 
 		auto pDevice = Dive::Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
 		auto pImmediateContext = Dive::Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 		ImGui_ImplDX11_Init(pDevice, pImmediateContext);
-
-		io.Fonts->AddFontFromFileTTF("../Assets/Fonts/NanumGothic.ttf", 14);
 
 		// Widget 생성
 		m_widgets.emplace_back(std::make_shared<MenuBar>(this));
@@ -162,12 +161,10 @@ namespace Editor
 		m_widgets.emplace_back(std::make_shared<Viewport>(this));
 		m_widgets.emplace_back(std::make_shared<Component>(this));
 		m_widgets.emplace_back(std::make_shared<Assets>(this));
-		//m_widgets.emplace_back(std::make_shared<Console>(this));
 	}
 
-	void Editor::begin_ImGui()
+	void Editor::beginDockSpace()
 	{
-		// 전체 화면을 커버할 위젯을 만드는 것 같다.
 		const auto window_flags =
 			ImGuiWindowFlags_MenuBar |				
 			ImGuiWindowFlags_NoDocking |
@@ -178,13 +175,12 @@ namespace Editor
 			ImGuiWindowFlags_NoBringToFrontOnFocus |
 			ImGuiWindowFlags_NoNavFocus;
 
-		float offset_y = 8.0f;// _editor::widget_menu_bar ? (_editor::widget_menu_bar->GetHeight() + _editor::widget_menu_bar->GetPadding()) : 0;
+		float offset_y = 8.0f;
 		const ImGuiViewport* viewport = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + offset_y));
 		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - offset_y));
 		ImGui::SetNextWindowViewport(viewport->ID);
 
-		// Set window style
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -193,31 +189,23 @@ namespace Editor
 		const char* dockSpaceName = "DiveEditor";
 
 		bool open = true;
-		m_editor_begun = ImGui::Begin(dockSpaceName, &open, window_flags);
+		m_bDockSpace = ImGui::Begin(dockSpaceName, &open, window_flags);
 		ImGui::PopStyleVar(3);
 
-		// 크기를 설정해야 한다.
-		// 미리 docking 해놓았던데 그건 패스해도 될 것 같다.
-		// Begin dock space
-		if (m_editor_begun)
+		if (m_bDockSpace)
 		{
-			// Dock space
 			const auto window_id = ImGui::GetID(dockSpaceName);
 			if (!ImGui::DockBuilderGetNode(window_id))
 			{
-				// Reset current docking state
 				ImGui::DockBuilderRemoveNode(window_id);
 				ImGui::DockBuilderAddNode(window_id, ImGuiDockNodeFlags_None);
 				ImGui::DockBuilderSetNodeSize(window_id, ImGui::GetMainViewport()->Size);
 
-				// DockBuilderSplitNode(ImGuiID node_id, ImGuiDir split_dir, float size_ratio_for_node_at_dir, ImGuiID* out_id_dir, ImGuiID* out_id_other);
 				ImGuiID dock_main_id = window_id;
 				ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.3f, nullptr, &dock_main_id);
 				const ImGuiID dock_right_right_id = ImGui::DockBuilderSplitNode(dock_right_id, ImGuiDir_Right, 0.5f, nullptr, &dock_right_id);
 				ImGuiID dock_down_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.3f, nullptr, &dock_main_id);
 
-				// Dock windows
-				// 이름과 연관이 있는 것 같다???
 				ImGui::DockBuilderDockWindow("Viewport", dock_main_id);
 				ImGui::DockBuilderDockWindow("World", dock_right_id);
 				ImGui::DockBuilderDockWindow("Component", dock_right_right_id);
@@ -230,9 +218,104 @@ namespace Editor
 		}
 	}
 	
-	void Editor::end_ImGui()
+	void Editor::endDockSpace()
 	{
-		if(m_editor_begun)
+		if(m_bDockSpace)
 			ImGui::End();
+	}
+
+	void Editor::applyStyle() const
+	{
+		// Color settings    
+		const auto color_text = ImVec4(0.810f, 0.810f, 0.810f, 1.000f);
+		const auto color_text_disabled = ImVec4(color_text.x, color_text.y, color_text.z, 0.5f);
+		const auto color_interactive = ImVec4(0.338f, 0.338f, 0.338f, 1.000f);
+		const auto color_interactive_hovered = ImVec4(0.450f, 0.450f, 0.450f, 1.000f);
+		const auto color_interactive_clicked = ImVec4(0.586f, 0.586f, 0.586f, 1.000f);
+		const auto color_background = ImVec4(50.0f / 255.0f, 50.0f / 255.0f, 50.0f / 255.0f, 1.0f);
+		const auto color_background_content = ImVec4(35.0f / 255.0f, 35.0f / 255.0f, 35.0f / 255.0f, 1.0f);
+		const auto color_shadow = ImVec4(0.0f, 0.0f, 0.0f, 0.5f);
+
+		// Use default dark style as a base
+		ImGui::StyleColorsDark();
+
+		// Colors
+		ImVec4* colors = ImGui::GetStyle().Colors;
+		colors[ImGuiCol_Text] = color_text;
+		colors[ImGuiCol_TextDisabled] = color_text_disabled;
+		colors[ImGuiCol_WindowBg] = color_background;             // Background of normal windows
+		colors[ImGuiCol_ChildBg] = color_background;             // Background of child windows
+		colors[ImGuiCol_PopupBg] = color_background;             // Background of popups, menus, tooltips windows
+		colors[ImGuiCol_Border] = color_interactive;
+		colors[ImGuiCol_BorderShadow] = color_shadow;
+		colors[ImGuiCol_FrameBg] = color_background_content;     // Background of checkbox, radio button, plot, slider, text input
+		colors[ImGuiCol_FrameBgHovered] = color_interactive;
+		colors[ImGuiCol_FrameBgActive] = color_interactive_clicked;
+		colors[ImGuiCol_TitleBg] = color_background_content;
+		colors[ImGuiCol_TitleBgActive] = color_interactive;
+		colors[ImGuiCol_TitleBgCollapsed] = color_background;
+		colors[ImGuiCol_MenuBarBg] = color_background_content;
+		colors[ImGuiCol_ScrollbarBg] = color_background_content;
+		colors[ImGuiCol_ScrollbarGrab] = color_interactive;
+		colors[ImGuiCol_ScrollbarGrabHovered] = color_interactive_hovered;
+		colors[ImGuiCol_ScrollbarGrabActive] = color_interactive_clicked;
+		colors[ImGuiCol_CheckMark] = color_text;
+		colors[ImGuiCol_SliderGrab] = color_interactive;
+		colors[ImGuiCol_SliderGrabActive] = color_interactive_clicked;
+		colors[ImGuiCol_Button] = color_interactive;
+		colors[ImGuiCol_ButtonHovered] = color_interactive_hovered;
+		colors[ImGuiCol_ButtonActive] = color_interactive_clicked;
+		colors[ImGuiCol_Header] = color_interactive;            // Header* colors are used for CollapsingHeader, TreeNode, Selectable, MenuItem
+		colors[ImGuiCol_HeaderHovered] = color_interactive_hovered;
+		colors[ImGuiCol_HeaderActive] = color_interactive_clicked;
+		colors[ImGuiCol_Separator] = color_interactive;
+		colors[ImGuiCol_SeparatorHovered] = color_interactive_hovered;
+		colors[ImGuiCol_SeparatorActive] = color_interactive_clicked;
+		colors[ImGuiCol_ResizeGrip] = color_interactive;
+		colors[ImGuiCol_ResizeGripHovered] = color_interactive_hovered;
+		colors[ImGuiCol_ResizeGripActive] = color_interactive_clicked;
+		colors[ImGuiCol_Tab] = color_interactive;
+		colors[ImGuiCol_TabHovered] = color_interactive_hovered;
+		colors[ImGuiCol_TabActive] = color_interactive_clicked;
+		colors[ImGuiCol_TabUnfocused] = color_interactive;
+		colors[ImGuiCol_TabUnfocusedActive] = color_interactive;            // Might be called active, but it's active only because it's it's the only tab available, the user didn't really activate it
+		colors[ImGuiCol_DockingPreview] = color_interactive_clicked;    // Preview overlay color when about to docking something
+		colors[ImGuiCol_DockingEmptyBg] = color_interactive;            // Background color for empty node (e.g. CentralNode with no window docked into it)
+		colors[ImGuiCol_PlotLines] = color_interactive;
+		colors[ImGuiCol_PlotLinesHovered] = color_interactive_hovered;
+		colors[ImGuiCol_PlotHistogram] = color_interactive;
+		colors[ImGuiCol_PlotHistogramHovered] = color_interactive_hovered;
+		colors[ImGuiCol_TextSelectedBg] = color_background;
+		colors[ImGuiCol_DragDropTarget] = color_interactive_hovered;    // Color when hovering over target
+		colors[ImGuiCol_NavHighlight] = color_background;             // Gamepad/keyboard: current highlighted item
+		colors[ImGuiCol_NavWindowingHighlight] = color_background;             // Highlight window when using CTRL+TAB
+		colors[ImGuiCol_NavWindowingDimBg] = color_background;             // Darken/colorize entire screen behind the CTRL+TAB window list, when active
+		colors[ImGuiCol_ModalWindowDimBg] = color_background;             // Darken/colorize entire screen behind a modal window, when one is active
+
+		// Spatial settings
+		const auto font_size = 24.0f;
+		const auto font_scale = 0.7f;
+		const auto roundness = 2.0f;
+
+		// Spatial
+		ImGuiStyle& style = ImGui::GetStyle();
+		style.WindowBorderSize = 1.0f;
+		style.FrameBorderSize = 0.0f;
+		style.ScrollbarSize = 20.0f;
+		style.FramePadding = ImVec2(5, 5);
+		style.ItemSpacing = ImVec2(6, 5);
+		style.WindowMenuButtonPosition = ImGuiDir_Right;
+		style.WindowRounding = roundness;
+		style.FrameRounding = roundness;
+		style.PopupRounding = roundness;
+		style.GrabRounding = roundness;
+		style.ScrollbarRounding = roundness;
+		style.Alpha = 1.0f;
+
+		// Font
+		auto& io = ImGui::GetIO();
+		//const string dir_fonts = m_context->GetSubsystem<ResourceCache>()->GetResourceDirectory(ResourceDirectory::Fonts) + "/";
+		io.Fonts->AddFontFromFileTTF("../Assets/Fonts/NanumGothic.ttf", font_size);
+		io.FontGlobalScale = font_scale;
 	}
 }
