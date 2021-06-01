@@ -7,8 +7,6 @@ namespace Editor
 {
 	class Editor;
 
-	// 윈도우 바깥으로 나가면 제어가 안된다.
-	// => Spartan은 해당 버그가 없다.
 	class Widget
 	{
 	public:

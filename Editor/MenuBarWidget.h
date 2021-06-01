@@ -3,10 +3,10 @@
 
 namespace Editor
 {
-	class MenuBar : public Widget
+	class MenuBarWidget : public Widget
 	{
 	public:
-		MenuBar(Editor* pEditor);
+		MenuBarWidget(Editor* pEditor);
 
 		void TickAlways() override;
 		float GetPadding() { return 8.0f; }

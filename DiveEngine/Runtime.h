@@ -1,6 +1,7 @@
 #pragma once
 #include "GraphicsDevice.h"
 #include <Windows.h>
+#include <string>
 
 namespace Dive
 {
@@ -38,6 +39,8 @@ namespace Dive
 
 		bool IsInitialized() const { return m_bInitialized; }
 
+		std::string GetIniFilePath() const { return m_iniFilePath; }
+
 	protected:
 		HWND m_hWnd = 0;
 		bool m_bFullScreen = false;
@@ -50,5 +53,7 @@ namespace Dive
 
 		bool m_bInitialized = false;
 		bool m_bWindowActive = true;
+
+		std::string m_iniFilePath;
 	};
 }

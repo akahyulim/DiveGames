@@ -3,11 +3,11 @@
 #include "External/ImGui/imgui_internal.h"
 #include "External/ImGui/imgui_impl_win32.h"
 #include "External/ImGui/imgui_impl_dx11.h"
-#include "MenuBar.h"
-#include "World.h"
-#include "Viewport.h"
-#include "Assets.h"
-#include "Component.h"
+#include "MenuBarWidget.h"
+#include "HierarchyWidget.h"
+#include "SceneWidget.h"
+#include "AssetsWidget.h"
+#include "InspectorWidget.h"
 
 namespace Editor
 {
@@ -29,16 +29,11 @@ namespace Editor
 
 	bool Editor::Initialize()
 	{
-		initialized_ini();
-
 		if (!Dive::Runtime::Initialize())
 			return false;
 
+		// ImGui 초기화 및 Widget 생성
 		initialize_ImGui();
-
-		// 윈도우 보이기
-		ShowWindow(m_hWnd, m_bMaximize ? SW_MAXIMIZE : SW_SHOWDEFAULT);
-		UpdateWindow(m_hWnd);
 
 		APP_TRACE("Editor의 초기화에 성공하였습니다.");
 
@@ -69,18 +64,17 @@ namespace Editor
 			ImGui::Render();
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-			ImGuiIO& io = ImGui::GetIO();
-			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
 				ImGui::UpdatePlatformWindows();
 				ImGui::RenderPlatformWindowsDefault();
 			}
-		}
+		}	
 
 		// 이건 엔진에서 그리는 부분
 		// 에디터에서는 RenderPath3D를 수정해야 한다.
 		// Debug용 Render가 추가되고,
-		// World이 다른 RenderTarget에 그려져야 하기 때문이다.
+		// HierarchyWidget이 다른 RenderTarget에 그려져야 하기 때문이다.
 		if (m_activePath)
 		{
 			m_activePath->Render();
@@ -105,27 +99,6 @@ namespace Editor
 		}
 	}
 
-	void Editor::initialized_ini()
-	{
-		Dive::IniHelper ini(m_iniFilePath);
-		m_bMaximize = ini["Window"]["bMaximize"] << false;
-		int width = ini["Window"]["Width"] << 800;
-		int height = ini["Window"]["Height"] << 600;
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
-
-		if (!Dive::FileSystemHelper::FileExists(m_iniFilePath))
-		{
-			ini["Window"]["Width"] = width;
-			ini["Window"]["Height"] = height;
-			ini["Window"]["bMaximize"] = m_bMaximize;
-		}
-
-		RECT rcClient = { 0, 0, width, height };
-		AdjustWindowRect(&rcClient, WS_OVERLAPPEDWINDOW, FALSE);
-		SetWindowPos(m_hWnd, nullptr, posX, posY, (rcClient.right - rcClient.left), (rcClient.bottom - rcClient.top), 0);
-	}
-
 	void Editor::initialize_ImGui()
 	{
 		IMGUI_CHECKVERSION();
@@ -137,18 +110,9 @@ namespace Editor
 		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 		io.ConfigWindowsResizeFromEdges = true;
 		io.ConfigViewportsNoTaskBarIcon = true;
-		//io.Fonts->AddFontFromFileTTF("../Assets/Fonts/NanumGothic.ttf", 14);
 
 		applyStyle();
-		/*
-		ImGui::StyleColorsDark();
-		ImGuiStyle& style = ImGui::GetStyle();
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			style.WindowRounding = 0.0f;
-			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-		}
-		*/
+
 		ImGui_ImplWin32_Init(m_hWnd);
 
 		auto pDevice = Dive::Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
@@ -156,11 +120,11 @@ namespace Editor
 		ImGui_ImplDX11_Init(pDevice, pImmediateContext);
 
 		// Widget 생성
-		m_widgets.emplace_back(std::make_shared<MenuBar>(this));
-		m_widgets.emplace_back(std::make_shared<World>(this));
-		m_widgets.emplace_back(std::make_shared<Viewport>(this));
-		m_widgets.emplace_back(std::make_shared<Component>(this));
-		m_widgets.emplace_back(std::make_shared<Assets>(this));
+		m_widgets.emplace_back(std::make_shared<MenuBarWidget>(this));
+		m_widgets.emplace_back(std::make_shared<HierarchyWidget>(this));
+		m_widgets.emplace_back(std::make_shared<SceneWidget>(this));
+		m_widgets.emplace_back(std::make_shared<InspectorWidget>(this));
+		m_widgets.emplace_back(std::make_shared<AssetsWidget>(this));
 	}
 
 	void Editor::beginDockSpace()
@@ -202,13 +166,13 @@ namespace Editor
 				ImGui::DockBuilderSetNodeSize(window_id, ImGui::GetMainViewport()->Size);
 
 				ImGuiID dock_main_id = window_id;
-				ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.3f, nullptr, &dock_main_id);
-				const ImGuiID dock_right_right_id = ImGui::DockBuilderSplitNode(dock_right_id, ImGuiDir_Right, 0.5f, nullptr, &dock_right_id);
+				ImGuiID dock_left_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.2f, nullptr, &dock_main_id);
+				const ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.2f, nullptr, &dock_main_id);
 				ImGuiID dock_down_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.3f, nullptr, &dock_main_id);
 
-				ImGui::DockBuilderDockWindow("Viewport", dock_main_id);
-				ImGui::DockBuilderDockWindow("World", dock_right_id);
-				ImGui::DockBuilderDockWindow("Component", dock_right_right_id);
+				ImGui::DockBuilderDockWindow("Scene", dock_main_id);
+				ImGui::DockBuilderDockWindow("Hierarchy", dock_left_id);
+				ImGui::DockBuilderDockWindow("Inspector", dock_right_id);
 				ImGui::DockBuilderDockWindow("Assets", dock_down_id);
 
 				ImGui::DockBuilderFinish(dock_main_id);

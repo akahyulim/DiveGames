@@ -1,18 +1,18 @@
-#include "MenuBar.h"
+#include "MenuBarWidget.h"
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
 #include <Windows.h>
 
 namespace Editor
 {
-	MenuBar::MenuBar(Editor* pEditor)
+	MenuBarWidget::MenuBarWidget(Editor* pEditor)
 		: Widget(pEditor)
 	{
 		m_title = "MenuBar";
 		m_bWindow = false;
 	}
 
-	void MenuBar::TickAlways()
+	void MenuBarWidget::TickAlways()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(GetPadding(), GetPadding()));
 		if (ImGui::BeginMainMenuBar())
@@ -167,7 +167,7 @@ namespace Editor
 				ImGui::MenuItem("Hierarchy", NULL, &g_pWidgetHierarchy->IsVisible());
 				ImGui::MenuItem("Components", NULL, &g_pWidgetInspector->IsVisible());
 				ImGui::MenuItem("Log", NULL, &g_pWidgetConsole->IsVisible());
-				ImGui::MenuItem("Assets", NULL, &g_pWidgetAssets->IsVisible());
+				ImGui::MenuItem("AssetsWidget", NULL, &g_pWidgetAssets->IsVisible());
 
 				ImGui::Separator();
 

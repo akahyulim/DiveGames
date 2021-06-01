@@ -78,7 +78,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
+    wcex.style = 0;//CS_CLASSDC;//CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc    = WndProc;
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
@@ -107,8 +107,22 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
+   Dive::IniHelper ini(g_editor.GetIniFilePath());
+   bool bMaximize   = ini["Window"]["bMaximize"] << false;
+   int width        = ini["Window"]["Width"] << 800;
+   int height       = ini["Window"]["Height"] << 600;
+   int posX         = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+   int posY         = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
+
+   if (!Dive::FileSystemHelper::FileExists(g_editor.GetIniFilePath()))
+   {
+       ini["Window"]["Width"] = width;
+       ini["Window"]["Height"] = height;
+       ini["Window"]["bMaximize"] = bMaximize;
+   }
+
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+      posX, posY, width, height, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -117,7 +131,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    g_editor.SetWindow(hWnd, false);
 
-   ShowWindow(hWnd, SW_HIDE);
+   ShowWindow(hWnd, bMaximize ? SW_MAXIMIZE : SW_SHOWDEFAULT);
    UpdateWindow(hWnd);
 
    return TRUE;
@@ -162,11 +176,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
         }
         break;
+    // 아래의 포커스 부분 때문에 위젯이 영역 밖으로 나가면 제어가 불가능해진다.
+    // 추후 필요가 없다고 생각되면 해당 구문을 삭제하자.
     case WM_KILLFOCUS:
-        g_editor.ActiveWindow(false);
+       // g_editor.ActiveWindow(false);
         break;
     case WM_SETFOCUS:
-        g_editor.ActiveWindow(true);
+       // g_editor.ActiveWindow(true);
         break;
     case WM_COMMAND:
         {
