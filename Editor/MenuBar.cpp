@@ -1,11 +1,11 @@
-#include "Widget_MenuBar.h"
+#include "MenuBar.h"
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
 #include <Windows.h>
 
 namespace Editor
 {
-	Widget_MenuBar::Widget_MenuBar(Editor* pEditor)
+	MenuBar::MenuBar(Editor* pEditor)
 		: Widget(pEditor)
 	{
 		m_title = "MenuBar";
@@ -13,7 +13,7 @@ namespace Editor
 		m_pScene = &Dive::Scene::GetGlobalScene();
 	}
 
-	void Widget_MenuBar::TickAlways()
+	void MenuBar::TickAlways()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(GetPadding(), GetPadding()));
 		if (ImGui::BeginMainMenuBar())

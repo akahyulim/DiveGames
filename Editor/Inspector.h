@@ -3,10 +3,10 @@
 
 namespace Editor
 {
-	class Widget_Inspector : public Widget
+	class Inspector : public Widget
 	{
 	public:
-		Widget_Inspector(Editor* pEditor);
+		Inspector(Editor* pEditor);
 	private:
 	private:
 	};

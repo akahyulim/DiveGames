@@ -3,10 +3,12 @@
 
 namespace Editor
 {
-	class Widget_Hierarchy : public Widget
+	class Hierarchy : public Widget
 	{
 	public:
-		Widget_Hierarchy(Editor* pEditor);
+		Hierarchy(Editor* pEditor);
+
+		void TickVisible() override;
 
 	private:
 	private:

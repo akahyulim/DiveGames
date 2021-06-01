@@ -3,10 +3,10 @@
 
 namespace Editor
 {
-	class Widget_Scene : public Widget
+	class Scene : public Widget
 	{
 	public:
-		Widget_Scene(Editor* pEditor);
+		Scene(Editor* pEditor);
 
 		void TickVisible() override;
 

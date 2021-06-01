@@ -67,19 +67,19 @@
     <ClInclude Include="External\ImGui\imstb_truetype.h">
       <Filter>External\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Widget_Hierarchy.h">
+    <ClInclude Include="Assets.h">
       <Filter>UI\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="Widget_Scene.h">
+    <ClInclude Include="MenuBar.h">
       <Filter>UI\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="Widget_MenuBar.h">
+    <ClInclude Include="Inspector.h">
       <Filter>UI\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="Widget_Inspector.h">
+    <ClInclude Include="Hierarchy.h">
       <Filter>UI\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="Widget_Assets.h">
+    <ClInclude Include="Scene.h">
       <Filter>UI\Widgets</Filter>
     </ClInclude>
   </ItemGroup>
@@ -127,19 +127,19 @@
     <ClCompile Include="Widget.cpp">
       <Filter>UI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Widget_Hierarchy.cpp">
+    <ClCompile Include="Assets.cpp">
       <Filter>UI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Widget_Scene.cpp">
+    <ClCompile Include="MenuBar.cpp">
       <Filter>UI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Widget_MenuBar.cpp">
+    <ClCompile Include="Inspector.cpp">
       <Filter>UI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Widget_Inspector.cpp">
+    <ClCompile Include="Hierarchy.cpp">
       <Filter>UI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Widget_Assets.cpp">
+    <ClCompile Include="Scene.cpp">
       <Filter>UI\Widgets</Filter>
     </ClCompile>
   </ItemGroup>

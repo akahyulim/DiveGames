@@ -3,11 +3,11 @@
 #include "External/ImGui/imgui_internal.h"
 #include "External/ImGui/imgui_impl_win32.h"
 #include "External/ImGui/imgui_impl_dx11.h"
-#include "Widget_MenuBar.h"
-#include "Widget_Hierarchy.h"
-#include "Widget_Scene.h"
-#include "Widget_Assets.h"
-#include "Widget_Inspector.h"
+#include "MenuBar.h"
+#include "Hierarchy.h"
+#include "Scene.h"
+#include "Assets.h"
+#include "Inspector.h"
 
 namespace Editor
 {
@@ -74,7 +74,7 @@ namespace Editor
 		// 이건 엔진에서 그리는 부분
 		// 에디터에서는 RenderPath3D를 수정해야 한다.
 		// Debug용 Render가 추가되고,
-		// Widget_Hierarchy이 다른 RenderTarget에 그려져야 하기 때문이다.
+		// Hierarchy이 다른 RenderTarget에 그려져야 하기 때문이다.
 		if (m_activePath)
 		{
 			m_activePath->Render();
@@ -120,11 +120,11 @@ namespace Editor
 		ImGui_ImplDX11_Init(pDevice, pImmediateContext);
 
 		// Widget 생성
-		m_widgets.emplace_back(std::make_shared<Widget_MenuBar>(this));
-		m_widgets.emplace_back(std::make_shared<Widget_Hierarchy>(this));
-		m_widgets.emplace_back(std::make_shared<Widget_Scene>(this));
-		m_widgets.emplace_back(std::make_shared<Widget_Inspector>(this));
-		m_widgets.emplace_back(std::make_shared<Widget_Assets>(this));
+		m_widgets.emplace_back(std::make_shared<MenuBar>(this));
+		m_widgets.emplace_back(std::make_shared<Hierarchy>(this));
+		m_widgets.emplace_back(std::make_shared<Scene>(this));
+		m_widgets.emplace_back(std::make_shared<Inspector>(this));
+		m_widgets.emplace_back(std::make_shared<Assets>(this));
 	}
 
 	void Editor::beginDockSpace()
