@@ -1,18 +1,19 @@
-#include "MenuBarWidget.h"
+#include "Widget_MenuBar.h"
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
 #include <Windows.h>
 
 namespace Editor
 {
-	MenuBarWidget::MenuBarWidget(Editor* pEditor)
+	Widget_MenuBar::Widget_MenuBar(Editor* pEditor)
 		: Widget(pEditor)
 	{
 		m_title = "MenuBar";
 		m_bWindow = false;
+		m_pScene = &Dive::Scene::GetGlobalScene();
 	}
 
-	void MenuBarWidget::TickAlways()
+	void Widget_MenuBar::TickAlways()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(GetPadding(), GetPadding()));
 		if (ImGui::BeginMainMenuBar())
@@ -73,6 +74,7 @@ namespace Editor
 			{
 				if (ImGui::MenuItem("Create Empty"))
 				{
+					m_pScene->CreateGameObject();
 				}
 
 				if (ImGui::BeginMenu("3D Object"))

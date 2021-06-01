@@ -1,9 +1,9 @@
-#include "SceneWidget.h"
+#include "Widget_Scene.h"
 
 // Renderer로부터 Image를 가져와 출력한다.
 namespace Editor
 {
-    SceneWidget::SceneWidget(Editor* pEditor)
+    Widget_Scene::Widget_Scene(Editor* pEditor)
         : Widget(pEditor)
     {
         m_title = "Scene";
@@ -12,7 +12,7 @@ namespace Editor
         m_padding = ImVec2(4.0f, 4.0f);
     }
 
-    void SceneWidget::TickVisible()
+    void Widget_Scene::TickVisible()
     {
     }
 }
