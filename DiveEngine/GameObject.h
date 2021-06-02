@@ -32,7 +32,8 @@ namespace Dive
 
 	private:
 	private:
-		std::string m_name = "no name";
+		// 유니티는 'Object 1'로 시작한다.
+		std::string m_name = "Object";
 		bool m_bActive = true;
 
 		std::vector<std::shared_ptr<Component>> m_components;

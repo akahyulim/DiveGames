@@ -82,6 +82,9 @@
     <ClInclude Include="Scene.h">
       <Filter>UI\Widgets</Filter>
     </ClInclude>
+    <ClInclude Include="DragDrop.h">
+      <Filter>UI</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Editor.rc">

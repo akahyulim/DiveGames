@@ -188,6 +188,10 @@ namespace Editor
 			ImGui::End();
 	}
 
+	//============================================================================================//
+	// 1. 폰트 파일 존재 유무 확인이 필요하다.
+	// 2. 모르는 변수가 많고 이름도 내 스타일이 아니다.
+	//============================================================================================//
 	void Editor::applyStyle() const
 	{
 		// Color settings    
@@ -275,7 +279,7 @@ namespace Editor
 		style.GrabRounding = roundness;
 		style.ScrollbarRounding = roundness;
 		style.Alpha = 1.0f;
-
+		
 		// Font
 		auto& io = ImGui::GetIO();
 		//const string dir_fonts = m_context->GetSubsystem<ResourceCache>()->GetResourceDirectory(ResourceDirectory::Fonts) + "/";

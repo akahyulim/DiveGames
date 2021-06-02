@@ -24,8 +24,9 @@
 
 //= Scene =========================
 #include "Scene.h"
-//#include "GameObject.h"
-//#include "Component.h"
+#include "GameObject.h"
+#include "Component.h"
+#include "Transform.h"
 
 //= Tool ==========================
 #include "FontImporter.h"

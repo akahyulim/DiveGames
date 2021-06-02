@@ -27,8 +27,13 @@ namespace Dive
 
 		GameObject* CreateGameObject();
 		GameObject* GetGameObjectByName(const std::string& name);
+		GameObject* GetGameObjectByID(unsigned int id);
 		void RemoveGameObjectByName(const std::string& name);
 		void RemoveGameObject(GameObject* target);
+
+		std::vector<GameObject*> GetRootGameObjects();
+
+		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(m_gameObjects.size()); }
 
 		static Scene& GetGlobalScene()
 		{
@@ -51,7 +56,7 @@ namespace Dive
 		// 그런데 이건 어디까지나 Editor의 경우이다.
 		// App의 경우엔 리소스를 어떻게 처리하지?
 		std::string m_pathDir = "../Assets/Scenes/";
-		std::string m_name;
+		std::string m_name = "Untitled";
 		std::vector<std::shared_ptr<GameObject>> m_gameObjects;
 		// camera??
 

@@ -1,8 +1,7 @@
 #include "Scene.h"
 #include "GameObject.h"
 #include "Log.h"
-
-using namespace std;
+#include "Transform.h"
 
 namespace Dive
 {
@@ -41,7 +40,7 @@ namespace Dive
 
 	GameObject* Scene::CreateGameObject()
 	{
-		auto newGameObject = m_gameObjects.emplace_back(make_shared<GameObject>());
+		auto newGameObject = m_gameObjects.emplace_back(std::make_shared<GameObject>());
 		// ¹º°¡ È£Ãâ?
 
 		return newGameObject.get();
@@ -52,6 +51,17 @@ namespace Dive
 		for (auto& target : m_gameObjects)
 		{
 			if (target->GetName() == name)
+				return target.get();
+		}
+
+		return nullptr;
+	}
+
+	GameObject* Scene::GetGameObjectByID(unsigned int id)
+	{
+		for (auto& target : m_gameObjects)
+		{
+			if (target->GetID() == id)
 				return target.get();
 		}
 
@@ -90,5 +100,23 @@ namespace Dive
 			else
 				it++;
 		}
+	}
+
+	std::vector<GameObject*> Scene::GetRootGameObjects()
+	{
+		std::vector<GameObject*> rootGameObjects;
+		for (auto pGameObject : m_gameObjects)
+		{
+			auto pTransform = pGameObject->GetComponent<Transform>();
+			if (pTransform)
+			{
+				if (!pTransform->HasParent())
+				{
+					rootGameObjects.emplace_back(pGameObject.get());
+				}
+			}
+		}
+
+		return rootGameObjects;
 	}
 }

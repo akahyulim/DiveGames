@@ -13,6 +13,9 @@ namespace Dive
 
 	void Transform::SetParent(Transform* pParent)
 	{
+		// nullptr은 좀 문제가 있다.
+		// 독립시킬려고 할 수 있다.
+		// 실제로 현재 이 함수 말고는 독립을 시킬 수 없다.
 		if (pParent == nullptr || this->GetID() == pParent->GetID())
 			return;
 
