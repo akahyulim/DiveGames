@@ -23,7 +23,7 @@ namespace Dive
 		if(this->GetID() == pParent->GetID())
 			return;
 
-		if (!m_pParent)
+		if (m_pParent)
 		{
 			for (auto it = m_pParent->m_children.begin(); it != m_pParent->m_children.end();)
 			{
