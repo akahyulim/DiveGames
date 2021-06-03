@@ -1,5 +1,6 @@
 #include "Hierarchy.h"
 #include "Inspector.h"
+#include "External/ImGui/imgui_stdlib.h"
 
 // 기본 구현 
 // 게임 오브젝트 추가시 디폴트 이름에 id를 넣었으면 한다.
@@ -7,8 +8,8 @@
 // 계층구조 테스트를 확실하게 해야 한다.
 
 // 컨트롤 확장
-// GameObject의 이름을 변경할 수 있어야 한다.
 // 계층구조를 제어할 수 있어야 한다.
+// GameObject를 추가할 수 있어야 한다.
 
 // 인스펙터로 확장
 // inspector의 포인터가 필요하다.
@@ -74,7 +75,7 @@ namespace Editor
         handleClicking();
 
         popupPropertyMenu();
-        popupRename();
+        popupGameObjectRename();
     }
 
     void Hierarchy::treeAddGameObject(Dive::GameObject* pGameObject)
@@ -187,24 +188,15 @@ namespace Editor
         if (!ImGui::BeginPopup("##PropertyMenu"))
             return;
 
-        // 이건 왜 안먹히지....?
-        // => 독립하도록 구현하지 않았다.
-        if (ImGui::MenuItem("Root"))
+        //if (ImGui::MenuItem(u8"Copy", "Ctrl + C"))
         {
-            m_pSelected->GetComponent<Dive::Transform>()->SetParent(nullptr);
-        }
-
-        ImGui::Separator();
-
-        if (ImGui::MenuItem(u8"Copy", "Ctrl + C"))
-        {
-            m_pCopied = m_pSelected;
+        //    m_pCopied = m_pSelected;
         }
 
         // 구현하지 않았다.
-        if (m_pCopied)
+        //if (m_pCopied)
         {
-            if (ImGui::MenuItem(u8"Paste", "Ctrl + V"))
+        //    if (ImGui::MenuItem(u8"Paste", "Ctrl + V"))
             {
                 //m_copied->Clone();
             }
@@ -212,14 +204,9 @@ namespace Editor
 
         ImGui::Separator();
 
-        // bug
-        // 자식일 경우 뻗는다.
-        // 부모를 제거하면 자식들이 사라진다. 제거되는게 아니다.
+        // 일단 잘 돌아간다. 자식들까지 전부 제거한다.
         if (ImGui::MenuItem(u8"Remove", "Del"))
         {
-            if (m_pCopied && m_pCopied->GetID() == m_pSelected->GetID())
-                m_pCopied = nullptr;
-
             m_pScene->RemoveGameObject(m_pSelected);
             setSelected(nullptr);
         }
@@ -229,34 +216,37 @@ namespace Editor
             m_bPopupRename = true;
         }
 
+        ImGui::Separator();
+
+        // GameObject 생성 함수들을 처리한다.
+        // 일단 유니티의 인터페이스를 확인한 후 구현하자.
+
         ImGui::EndPopup();
     }
 
-    void Hierarchy::popupRename()
+    void Hierarchy::popupGameObjectRename()
     {
         if (m_bPopupRename)
         {
-            ImGui::OpenPopup("##RenameEntity");
+            ImGui::OpenPopup("##RenameGameObject");
             m_bPopupRename = false;
         }
 
-        if (ImGui::BeginPopup("##RenameEntity"))
+        if (ImGui::BeginPopup("##RenameGameObject"))
         {
-            auto selectedentity = m_pSelected;
-            if (!selectedentity)
+            auto pSelected = m_pSelected;
+            if (!pSelected)
             {
                 ImGui::CloseCurrentPopup();
                 ImGui::EndPopup();
                 return;
             }
 
-            auto name = selectedentity->GetName();
+            auto name = pSelected->GetName();
 
             ImGui::Text("Name:");
-            // 복붙했는데도 매개변수가 다르다. 
-            // 버전업된 모양이다. 하위호환을 신경쓰지 않은거네...
-            //ImGui::InputText("##edit", &name);
-            selectedentity->SetName(std::string(name));
+            ImGui::InputText("##edit", &name);
+            pSelected->SetName(std::string(name));
 
             if (ImGui::Button("Ok"))
             {

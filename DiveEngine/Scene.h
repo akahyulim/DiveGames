@@ -10,6 +10,9 @@ namespace Dive
 {
 	class GameObject;
 
+	// 추후 인터페이스를 개선하는 작업이 필요할 것 같다.
+	// 너무 중구난방식으로 구현해놓았다.
+	// 그런데 유니티에는 참고할만한 클래스가 없다...
 	class Scene : public Object
 	{
 	public:
@@ -28,9 +31,9 @@ namespace Dive
 		GameObject* CreateGameObject();
 		GameObject* GetGameObjectByName(const std::string& name);
 		GameObject* GetGameObjectByID(unsigned int id);
-		void RemoveGameObjectByName(const std::string& name);
 		void RemoveGameObject(GameObject* target);
 
+		std::vector<std::shared_ptr<GameObject>> GetAllGameObjects() { return m_gameObjects; }
 		std::vector<GameObject*> GetRootGameObjects();
 
 		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(m_gameObjects.size()); }
@@ -47,6 +50,9 @@ namespace Dive
 		// test용
 		void SetMesh(Mesh* mesh) { m_pMesh = mesh; }
 		Mesh* GetMesh() { return m_pMesh; }
+
+	private:
+		void gameObjectRemove(GameObject* pGameObject);
 
 
 	private:

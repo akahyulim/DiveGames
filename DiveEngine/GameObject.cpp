@@ -1,16 +1,14 @@
 #include "GameObject.h"
-#include "Transform.h"
-
-using namespace std;
 
 namespace Dive
 {
 	GameObject::GameObject()
-		: Object(typeid(GameObject).hash_code())
+		: Object(typeid(GameObject).hash_code()),
+		m_pTransform(nullptr)
 	{
 		// 하나로 만들까?
-		auto transform = AddComponent<Transform>();
-		transform->SetOwnder(this);
+		m_pTransform = AddComponent<Transform>();
+		m_pTransform->SetOwnder(this);
 	}
 
 	void GameObject::Update(float deltaTime)

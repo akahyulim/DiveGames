@@ -73,7 +73,7 @@ namespace Dive
 
 			if (fixedFrameAccumulator >= TimeManager::GetInstance().GetFixedFrameRate())
 			{
-				CORE_TRACE("FixedUpdate Frame: {:n}", TimeManager::GetInstance().GetFrameCount());
+				//CORE_TRACE("FixedUpdate Frame: {:n}", TimeManager::GetInstance().GetFrameCount());
 
 				FixedUpdate();
 				fixedFrameAccumulator = 0.0f;
@@ -92,7 +92,7 @@ namespace Dive
 			}
 			else
 			{
-				CORE_TRACE("Unlock Update Frame: {:n}", TimeManager::GetInstance().GetFrameCount());
+				//CORE_TRACE("Unlock Update Frame: {:n}", TimeManager::GetInstance().GetFrameCount());
 
 				Update(delta);
 				Input::GetInstance().Update();

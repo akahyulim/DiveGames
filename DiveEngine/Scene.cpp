@@ -67,39 +67,15 @@ namespace Dive
 
 		return nullptr;
 	}
-	
-	void Scene::RemoveGameObjectByName(const std::string& name)
-	{
-		auto it = m_gameObjects.begin();
-		for (it; it != m_gameObjects.end();)
-		{
-			if ((*it)->GetName() == name)
-			{
-				// 제거 함수?
-				(*it).reset();
-				it = m_gameObjects.erase(it);
-				return;
-			}
-			else
-				it++;
-		}
-	}
 
 	void Scene::RemoveGameObject(GameObject* target)
 	{
-		auto it = m_gameObjects.begin();
-		for (it; it != m_gameObjects.end();)
-		{
-			if ((*it)->GetID() == target->GetID())
-			{
-				// 제거 함수?
-				(*it).reset();
-				it = m_gameObjects.erase(it);
-				return;
-			}
-			else
-				it++;
-		}
+		assert(target != nullptr);
+
+		// 스파르탄은 바로 지우지 않는다. 일단 제거 대상으로 설정해놓는다.
+		// 그리고 다음 Frame에서 제거한다.
+
+		gameObjectRemove(target);
 	}
 
 	std::vector<GameObject*> Scene::GetRootGameObjects()
@@ -118,5 +94,34 @@ namespace Dive
 		}
 
 		return rootGameObjects;
+	}
+
+	void Scene::gameObjectRemove(GameObject* pGameObject)
+	{
+		// 자식들부터 먼저 제거
+		auto pChildren = pGameObject->GetTransform()->GetChildren();
+		for (auto pChild : pChildren)
+		{
+			gameObjectRemove(pChild->GetOwner());
+		}
+
+		auto pParent = pGameObject->GetTransform()->GetParent();
+
+		// 부모에게서 제외되는 구문이 없다.
+		for (auto it = m_gameObjects.begin(); it != m_gameObjects.end();)
+		{
+			auto pTarget = *it;
+			if (pTarget->GetID() == pGameObject->GetID())
+			{
+				it = m_gameObjects.erase(it);
+				break;
+			}
+			++it;
+		}
+
+		if (pParent)
+		{
+			pParent->AcquireChidren();
+		}
 	}
 }

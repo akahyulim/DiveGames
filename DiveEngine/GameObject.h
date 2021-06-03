@@ -1,6 +1,7 @@
 #pragma once
 #include "Object.h"
 #include "Component.h"
+#include "Transform.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -24,7 +25,9 @@ namespace Dive
 		template<typename T>
 		T* GetComponent();
 
-		std::string GetName() const { return m_name; }
+		Transform* GetTransform() { return m_pTransform; }
+
+		const std::string& GetName() const { return m_name; }
 		void SetName(const std::string name) { m_name = name; }
 
 		bool GetActive() const { return m_bActive; }
@@ -37,6 +40,9 @@ namespace Dive
 		bool m_bActive = true;
 
 		std::vector<std::shared_ptr<Component>> m_components;
+
+		Transform* m_pTransform;
+
 	};
 
 	template<typename T>

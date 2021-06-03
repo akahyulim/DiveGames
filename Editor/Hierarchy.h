@@ -20,7 +20,7 @@ namespace Editor
 		void handleDragDrop(Dive::GameObject* pGameObject);
 
 		void popupPropertyMenu();
-		void popupRename();
+		void popupGameObjectRename();
 
 	private:
 		Dive::Scene* m_pScene;
