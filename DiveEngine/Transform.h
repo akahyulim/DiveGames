@@ -6,6 +6,8 @@
 
 namespace Dive
 {
+	class FileStream;
+
 	class Transform : public Component
 	{
 	public:
@@ -14,10 +16,12 @@ namespace Dive
 
 		// 오버라이드 함수
 		void Update(float deltaTime) override;
+		void Serialize(FileStream* pStream) override;
+		void Deserialize(FileStream* pStream) override;
 
 		// 변환 함수
 
-		// 계층구조 함수
+		// 계층구조 함수 ===================================================================================
 		// 시조를 리턴한다.
 		Transform* GetRoot();
 		// 부모 존재 여부를 리턴한다.
@@ -39,7 +43,7 @@ namespace Dive
 		bool IsChildOf(const Transform* pParent) const;
 		// 모든 자식을 떼어낸다. 자식들을 제거하지 않고 부모를 없애고 싶을 때 사용한다.
 		void DetachChildren();
-		// 자식들로부터 부모 자식 관계를 재구성한다. 재귀적으로 호출한다.
+		// 자식들로부터 부모 자식 관계를 재귀적으로 재구성한다.
 		void AcquireChidren();
 
 	private:

@@ -8,16 +8,22 @@
 
 namespace Dive
 {
+	class FileStream;
+
 	class GameObject : public Object
 	{
 	public:
 		GameObject();
 		~GameObject() = default;
 
+		void Serialize(FileStream* pStream);
+		void Deserialize(FileStream* pStream, Transform* pParent = nullptr);
+
 		void Update(float deltaTime);
 
 		template<typename T>
 		T* AddComponent();
+		Component* AddComponent(unsigned int typeHash, unsigned int id = 0);
 
 		template<typename T>
 		void RemoveComponent();
@@ -32,6 +38,8 @@ namespace Dive
 
 		bool GetActive() const { return m_bActive; }
 		void SetActive(bool active) { m_bActive = active; }
+
+		unsigned int GetComponentCount() const { return static_cast<unsigned int>(m_components.size()); }
 
 	private:
 	private:

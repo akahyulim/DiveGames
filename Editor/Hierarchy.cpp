@@ -115,7 +115,8 @@ namespace Editor
 
     void Hierarchy::setSelected(Dive::GameObject* pGameObject)
     {
-        if (!pGameObject)    return;
+        // 없을 때 리턴하면 안된다.
+        //if (!pGameObject)    return;
 
         m_pSelected = pGameObject;
 
@@ -140,18 +141,7 @@ namespace Editor
         }
 
         if (clickedRight)
-        {
-            if (m_pHovered)
-            {
-                setSelected(m_pHovered);
-                ImGui::OpenPopup("##PropertyMenu");
-            }
-            else
-            {
-                setSelected(nullptr);
-                ImGui::OpenPopup("##HierarchyGameObjectMenu");
-            }
-        }
+            ImGui::OpenPopup("##PropertyMenu");
     }
 
     void Hierarchy::handleDragDrop(Dive::GameObject* pGameObject)
@@ -188,15 +178,14 @@ namespace Editor
         if (!ImGui::BeginPopup("##PropertyMenu"))
             return;
 
-        //if (ImGui::MenuItem(u8"Copy", "Ctrl + C"))
+        if (ImGui::MenuItem("Copy", 0, false, m_pSelected != nullptr))
         {
-        //    m_pCopied = m_pSelected;
+            m_pCopied = m_pSelected;
         }
 
-        // 구현하지 않았다.
-        //if (m_pCopied)
+        if (m_pCopied)
         {
-        //    if (ImGui::MenuItem(u8"Paste", "Ctrl + V"))
+            if (ImGui::MenuItem("Paste", 0, false, m_pCopied != nullptr))
             {
                 //m_copied->Clone();
             }
@@ -204,23 +193,58 @@ namespace Editor
 
         ImGui::Separator();
 
-        // 일단 잘 돌아간다. 자식들까지 전부 제거한다.
-        if (ImGui::MenuItem(u8"Remove", "Del"))
+        // 게임 오브젝트가 선택되어 있을 때 활성화
+        if (ImGui::MenuItem("Rename", 0, false, m_pSelected != nullptr))
+        {
+            m_bPopupRename = true;
+        }
+
+        if (ImGui::MenuItem("Duplicate"))
+        {
+            // Copy와의 차이점을 알아야 한다.
+        }
+
+        if (ImGui::MenuItem("Remove", 0, false, m_pSelected != nullptr))
         {
             m_pScene->RemoveGameObject(m_pSelected);
             setSelected(nullptr);
         }
 
-        if (ImGui::MenuItem(u8"Rename", "F2"))
-        {
-            m_bPopupRename = true;
-        }
-
         ImGui::Separator();
 
-        // GameObject 생성 함수들을 처리한다.
-        // 일단 유니티의 인터페이스를 확인한 후 구현하자.
+        if (ImGui::MenuItem("Create Empty"))
+        {
+            Dive::Scene::GetGlobalScene().CreateGameObject();
+        }
 
+        if (ImGui::BeginMenu("3D Object"))
+        {
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("2D Object"))
+        {
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Effects"))
+        {
+            ImGui::EndMenu();
+        }
+
+        if (ImGui::BeginMenu("Light"))
+        {
+            ImGui::EndMenu();
+        }
+
+        // audio
+        // vidio
+        // ui
+
+        if (ImGui::MenuItem("Camera"))
+        {
+        }
+        
         ImGui::EndPopup();
     }
 

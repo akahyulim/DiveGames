@@ -1,4 +1,5 @@
 #pragma once
+#include "Log.h"
 #include <atomic>
 #include <typeinfo>
 
@@ -18,7 +19,16 @@ namespace Dive
 		virtual ~Object() {}
 
 		unsigned int GetID() const { return m_id; }
-		// serialize 과정에 id를 저장할 거라면 SetID도 필요하다.
+		void SetID(unsigned int id) 
+		{ 
+			if (INVALID_ID == id)
+			{
+				CORE_ERROR("");
+				return;
+			}
+
+			m_id = id;
+		}
 
 		size_t GetTypeHash() const { return m_typeHash; }
 

@@ -26,14 +26,16 @@ namespace Editor
 
 				if (ImGui::MenuItem("Open World"))
 				{
+					std::string filepath = "../Assets/Scenes/default.scene";
+					Dive::Scene::GetGlobalScene().LoadFromFile(filepath);
 				}
 
 				ImGui::Separator();
 
 				if (ImGui::MenuItem("Save"))
 				{
-					// 기존 세이브가 없다면 지정된 경로에 scene이름으로 저장
-					// 이후부턴 해당 scene 이름으로 새로 저장
+					std::string filepath = "../Assets/Scenes/default.scene";
+					Dive::Scene::GetGlobalScene().SaveToFile(filepath);
 				}
 
 				if (ImGui::MenuItem("Save As..."))

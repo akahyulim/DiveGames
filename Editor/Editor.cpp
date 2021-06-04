@@ -25,6 +25,8 @@ namespace Editor
 			ImGui_ImplWin32_Shutdown();
 			ImGui::DestroyContext();
 		}
+
+		APP_TRACE("Editor를 종료합니다.");
 	}
 
 	bool Editor::Initialize()

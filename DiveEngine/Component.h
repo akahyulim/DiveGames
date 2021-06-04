@@ -4,6 +4,7 @@
 namespace Dive
 {
 	class GameObject;
+	class FileStream;
 
 	// base다.
 	class Component : public Object
@@ -13,6 +14,8 @@ namespace Dive
 		virtual ~Component() {}
 
 		virtual void Update(float deltaTime) {}
+		virtual void Serialize(FileStream* pStream) {}
+		virtual void Deserialize(FileStream* pStream) {}
 
 		GameObject* GetOwner() const { return m_pOwner; }
 		// owner를 바꾸려 시도할 수 있다.

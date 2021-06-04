@@ -2,6 +2,8 @@
 #include "GameObject.h"
 #include "Log.h"
 #include "Transform.h"
+#include "FileSystemHelper.h"
+#include "FileStream.h"
 
 namespace Dive
 {
@@ -16,9 +18,6 @@ namespace Dive
 
 	void Scene::Update(float deltaTime)
 	{
-		CORE_TRACE("Scene::Update() - deltaTime * timeScale이다.");
-		CORE_TRACE("Scene::Update() - 대상은 모든 GameObjects다.");
-
 		for (auto& gameObject : m_gameObjects)
 		{
 			gameObject->Update(deltaTime);
@@ -30,12 +29,75 @@ namespace Dive
 		m_gameObjects.clear();
 	}
 
-	void Scene::LoadFromFile(const std::string& filepath)
+	bool Scene::SaveToFile(const std::string& filepath)
 	{
+		// 경로를 받는다.
+		// 없으면 기본 경로를 사용한다.
+		// 이름 + .scene 확장자로 관리한다.
+		// 즉, 이름이 있어야 한다.
+		// 다른 이름으로 저장할 수 있어야 한다.
+		// 따라서 Scene의 이름과 파일의 이름이 다를 수 있다.
+
+
+		FileStream stream(filepath, eFileStreamMode::Write);
+		if (!stream.IsOpen())
+		{
+			CORE_ERROR("");
+			return false;
+		}
+
+		auto rootGameObjects = GetRootGameObjects();
+		auto rootCount = static_cast<unsigned int>(rootGameObjects.size());
+		stream.Write(rootCount);
+
+		for (const auto& pGameObject : rootGameObjects)
+		{
+			stream.Write(pGameObject->GetID());
+		}
+		for (const auto& pGameObject : rootGameObjects)
+		{
+			pGameObject->Serialize(&stream);
+		}
+
+		stream.Close();
+
+		return true;
 	}
 
-	void Scene::SaveToFile(const std::string& filepath)
+	bool Scene::LoadFromFile(const std::string& filepath)
 	{
+		// 이쪽은 이름과 확장자까지 포함된 경로를 받는다.
+
+		if (!FileSystemHelper::FileExists(filepath))
+		{
+			CORE_ERROR("");
+			return false;
+		}
+
+		
+		FileStream stream(filepath, eFileStreamMode::Read);
+		if (!stream.IsOpen())
+			return false;
+
+		// id 때문에라도 반드시 초기화가 필요하다.
+		Clear();
+
+		auto rootCount = stream.ReadAs<unsigned int>();
+		for (unsigned int i = 0; i != rootCount; i++)
+		{
+			auto pGameObject = CreateGameObject();
+			pGameObject->SetID(stream.ReadAs<unsigned int>());
+		}
+		for (unsigned int i = 0; i != rootCount; i++)
+		{
+			m_gameObjects[i]->Deserialize(&stream, nullptr);
+		}
+
+		stream.Close();
+
+		// 갱신 여부를 알려야 한다.
+
+		return true;
 	}
 
 	GameObject* Scene::CreateGameObject()

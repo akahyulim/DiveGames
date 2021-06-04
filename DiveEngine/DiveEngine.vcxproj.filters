@@ -147,9 +147,6 @@
     <ClCompile Include="Input.cpp">
       <Filter>Engine\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Transform_Hierarchy.cpp">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="FontImporter.cpp">
       <Filter>Engine\Tools</Filter>
     </ClCompile>

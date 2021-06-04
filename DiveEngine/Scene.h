@@ -23,10 +23,8 @@ namespace Dive
 
 		void Clear();
 
-		// 경로가 필요하다. 아마도 Asset이 맞겠지.
-		// 파일 helper도 필요하다.
-		void LoadFromFile(const std::string& filepath);
-		void SaveToFile(const std::string& filepath);
+		bool SaveToFile(const std::string& filepath);
+		bool LoadFromFile(const std::string& filepath);
 
 		GameObject* CreateGameObject();
 		GameObject* GetGameObjectByName(const std::string& name);
