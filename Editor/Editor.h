@@ -24,10 +24,16 @@ namespace Editor
 		void endDockSpace();
 		void applyStyle() const;
 
+		void projectDialog();
+
 	private:
 		std::vector<std::shared_ptr<Widget>> m_widgets;
 
 		bool m_bMaximize;
 		bool m_bDockSpace;
+
+		bool m_bShowProjectDialog;
+
+		std::string m_projectName;
 	};
 }

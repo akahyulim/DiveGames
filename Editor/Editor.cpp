@@ -15,6 +15,9 @@ namespace Editor
 	{
 		m_iniFilePath = Dive::FileSystemHelper::GetWorkingDirectory() + "editor.ini";
 		m_bMaximize = false;
+
+		// test
+		m_bShowProjectDialog = true;
 	}
 
 	Editor::~Editor()
@@ -53,15 +56,22 @@ namespace Editor
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 
-			beginDockSpace();
-
-			// 이 곳에서 Widget을 그릴 것이다.
-			for (auto pWidget : m_widgets)
+			if (m_bShowProjectDialog)
 			{
-				pWidget->Tick();
+				projectDialog();
 			}
+			else
+			{
+				beginDockSpace();
 
-			endDockSpace();
+				// 이 곳에서 Widget을 그릴 것이다.
+				for (auto pWidget : m_widgets)
+				{
+					pWidget->Tick();
+				}
+
+				endDockSpace();
+			}
 
 			ImGui::Render();
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -287,5 +297,26 @@ namespace Editor
 		//const string dir_fonts = m_context->GetSubsystem<ResourceCache>()->GetResourceDirectory(ResourceDirectory::Fonts) + "/";
 		io.Fonts->AddFontFromFileTTF("../Assets/Fonts/NanumGothic.ttf", font_size);
 		io.FontGlobalScale = font_scale;
+	}
+
+	void Editor::projectDialog()
+	{
+		// 동일한 윈도우 핸들을 사용하므로 Hide해버리면 이 창 역시 뜨지 않는다.
+		// 그렇다고 윈도우를 따로 만든다는 것도 에바다. imGui를 따로 초기화해서 사용해야 하기 때문이다.
+		// 그냥 지금 구현 방법도 그리 나쁜 선택은 아닌 것 같은데...
+
+		// 프로젝트도 클래스를 만들어야 하나....?
+		// 일단 폴더 이름으로 프로젝트를 구분할 순 있을 것 같다.
+		// 하지만 해당 프로젝트를 선택했을 때 실행해야할 장면은?
+		// 이외에도 관련 정보가 필요하다. 그렇다면 객체화하는 게 맞다.
+		// => 유니티의 경우 패키지라는 묶음이 있지만 이게 프로젝트 파일은 아니다. 에셋의 묶음이다.
+		// 그러고보니 vs도 프로젝트 파일이 따로 있는데...
+
+		ImGui::Begin("Select Project");
+		ImGui::Text("Hello from another window!");
+		if (ImGui::Button("Close Me"))
+			m_bShowProjectDialog = false;
+
+		ImGui::End();
 	}
 }

@@ -22,28 +22,44 @@ namespace Editor
 			{
 				if (ImGui::MenuItem("New World"))
 				{
+					// 현재 Scene의 변경사항 확인 후 저장 여부를 묻는다.
+					// 그런데 Scene의 변경 여부라는게 GameObject, Component 전부를 뜻한다...
+					{
+						Dive::Scene::GetGlobalScene().Clear();
+					}
 				}
 
 				if (ImGui::MenuItem("Open World"))
 				{
-					std::string filepath = "../Assets/Scenes/default.scene";
-					Dive::Scene::GetGlobalScene().LoadFromFile(filepath);
+					// 우선 현재 Scene의 변경 사항 확인 후 저장 여부를 묻는다.
+					// 특정 폴더를 열어 scene 포멧 파일만 보여준다.
+					// 선택하면 해당 파일을 로드한다.
+					{
+						std::string filepath = "../Assets/Scenes/default.scene";
+						Dive::Scene::GetGlobalScene().LoadFromFile(filepath);
+					}
 				}
 
 				ImGui::Separator();
 
 				if (ImGui::MenuItem("Save"))
 				{
-					std::string filepath = "../Assets/Scenes/default.scene";
-					Dive::Scene::GetGlobalScene().SaveToFile(filepath);
+					// 동일한 이름의 파일이 있는지 확인한다.
+					// 만약 있다면 덮어씌울 것인지 물어야 한다.
+					{
+						std::string filepath = "../Assets/Scenes/default.scene";
+						Dive::Scene::GetGlobalScene().SaveToFile(filepath);
+					}
 				}
 
 				if (ImGui::MenuItem("Save As..."))
 				{
+					// Scene 폴더를 연 후 이름을 입력 받아 저장한다.
 				}
 
 				ImGui::Separator();
 
+				// 프로젝트는 게임 전체를 의미한다.
 				if (ImGui::MenuItem("New Project"))
 				{
 				}
@@ -62,7 +78,8 @@ namespace Editor
 
 				if (ImGui::MenuItem("Exit"))
 				{
-					// 저장 여부를 확인해야 한다.
+					// 갱신 여부를 확인한 후 저장 여부를 묻는다.
+					// 그런데 갱신 여부가 프로젝트인가, 씬인가...
 
 					PostQuitMessage(0);
 				}
