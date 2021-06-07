@@ -16,6 +16,15 @@ namespace Dive
 {
 	class TextMesh;
 
+	enum class eRenderTargets
+	{
+		Gbuffer_Albedo,
+		Gbuffer_Normal,
+		GBuffer_Material,
+		GBuffer_Depth,
+		Frame_Ldr,	// 사실 뭔지 모른다.
+	};
+
 	enum class eVisibilityType
 	{
 		Invalid = 0,
@@ -45,6 +54,13 @@ namespace Dive
 
 		void Initialize();
 
+		const D3D11_VIEWPORT& GetViewport() const { return m_viewport; }
+		void SetViewport(float width, float height, float offsetX = 0.0f, float offsetY = 0.0f);
+
+		// RenderTarget용 크기이다.
+		const DirectX::XMINT2& GetResolution() const { m_resolution; }
+		void SetResolution(unsigned int width, unsigned int height);
+
 		// update와 draw가 있다.
 		// update는 visibility, PerFrameData,  RenderData, CameraCB 등이 있다.
 		void UpdateCB();
@@ -58,9 +74,10 @@ namespace Dive
 
 		GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice.get(); }
 		void SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device);
+		Texture* GetFrameTexture() { return m_renderTargets[eRenderTargets::Frame_Ldr]; }
 
 	private:
-		Renderer() = default;
+		Renderer();
 		~Renderer();
 
 		// 각종 GPU Resource 생성
@@ -68,8 +85,8 @@ namespace Dive
 		bool createRasterizerStates();
 		bool createSamplerStates();
 		bool createConstantBuffers();
-		bool createTextures();
-		bool createRenderTargetViews();
+		bool createTextures();	// 의미가 달라졌다.
+		bool createRenderTargets();
 		bool createShaders();
 		bool createFonts();
 
@@ -81,6 +98,10 @@ namespace Dive
 
 	private:
 		std::shared_ptr<GraphicsDevice> m_pGraphicsDevice;
+
+		// RenderTarget용 크기다. 타입이 애매하다.
+		DirectX::XMINT2 m_resolution;
+		D3D11_VIEWPORT m_viewport;
 
 		// GPU Resource 관리
 		Microsoft::WRL::ComPtr<ID3D11DeviceChild> m_pShaders[SHADERTYPE_COUNT];
@@ -106,6 +127,9 @@ namespace Dive
 		PipelineState m_pipelineStateColor;
 		PipelineState m_pipelineStateTexturing;
 		PipelineState m_pipelineStateFont;	// text라는 이름이 더 낫지 않을까?
+
+		std::unordered_map<eRenderTargets, Texture*> m_renderTargets;
+
 
 
 		// texturing test

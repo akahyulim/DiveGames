@@ -25,7 +25,7 @@ namespace Dive
 		virtual void Compose();
 
 		void ActivatePath(RenderPath* path);
-		RenderPath* GetActivePath() { return m_activePath; }
+		RenderPath* GetActivePath() { return m_pActivePath; }
 
 		void SetWindow(HWND windowHandle, bool fullScreen);
 
@@ -45,7 +45,7 @@ namespace Dive
 		HWND m_hWnd = 0;
 		bool m_bFullScreen = false;
 
-		RenderPath* m_activePath = nullptr;
+		RenderPath* m_pActivePath = nullptr;
 
 		float m_deltaTime = 0.0f;
 		float m_targetFPS = 60.0f;

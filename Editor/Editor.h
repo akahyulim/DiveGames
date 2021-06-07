@@ -1,6 +1,7 @@
 #pragma once
 #include "DiveEngine.h"
 #include "Widget.h"
+#include "RenderPathEditor.h"
 #include <vector>
 #include <memory>
 
@@ -24,7 +25,6 @@ namespace Editor
 		void endDockSpace();
 		void applyStyle() const;
 
-		void projectDialog();
 
 	private:
 		std::vector<std::shared_ptr<Widget>> m_widgets;
@@ -34,6 +34,6 @@ namespace Editor
 
 		bool m_bShowProjectDialog;
 
-		std::string m_projectName;
+		RenderPathEditor m_renderPathEditor;
 	};
 }

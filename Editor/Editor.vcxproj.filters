@@ -88,6 +88,9 @@
     <ClInclude Include="External\ImGui\imgui_stdlib.h">
       <Filter>External\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="RenderPathEditor.h">
+      <Filter>Editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Editor.rc">
@@ -150,6 +153,9 @@
     </ClCompile>
     <ClCompile Include="External\ImGui\imgui_stdlib.cpp">
       <Filter>External\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPathEditor.cpp">
+      <Filter>Editor</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

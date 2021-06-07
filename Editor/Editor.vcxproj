@@ -161,6 +161,7 @@
     <ClInclude Include="External\ImGui\imstb_textedit.h" />
     <ClInclude Include="External\ImGui\imstb_truetype.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="RenderPathEditor.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Hierarchy.h" />
@@ -182,6 +183,7 @@
     <ClCompile Include="External\ImGui\imgui_tables.cpp" />
     <ClCompile Include="External\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="MenuBar.cpp" />
+    <ClCompile Include="RenderPathEditor.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Hierarchy.cpp" />
     <ClCompile Include="Widget.cpp" />

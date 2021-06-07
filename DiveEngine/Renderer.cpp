@@ -7,6 +7,18 @@
 
 namespace Dive
 {
+	Renderer::Renderer()
+	{
+		m_resolution = DirectX::XMINT2(0, 0);
+		// 이렇게 초기화하면 Sandbox에서 문제가 생긴다.
+		m_viewport.Width = static_cast<float>(m_resolution.x);
+		m_viewport.Height = static_cast<float>(m_resolution.y);
+		m_viewport.MinDepth = 0.0f;
+		m_viewport.MaxDepth = 1.0f;
+		m_viewport.TopLeftX = 0.0f;
+		m_viewport.TopLeftY = 0.0f;
+	}
+
 	Renderer::~Renderer()
 	{
 		// 리소스 제거
@@ -27,7 +39,7 @@ namespace Dive
 
 		createConstantBuffers();
 		//createTextures();				// 현재는 Sandbox 테스트용, Spartan은 Editor에서 사용하는 Texture 생성용
-		//createRenderTargetViews();	// 역시 현재는 사용하는 곳이 없다.
+		createRenderTargets();		// 여러 RenderTexture들을 만든다.
 		createShaders();
 
 		createFonts();
@@ -35,6 +47,35 @@ namespace Dive
 		createPipelineStates();	// 가장 마지막이어야 한다.
 		
 		CORE_TRACE("Renderer 초기화에 성공하였습니다.");
+	}
+
+	void Renderer::SetViewport(float width, float height, float offsetX, float offsetY)
+	{
+		if (m_viewport.Width != width || m_viewport.Height != height)
+		{
+			// 뭔가를 하는데...
+
+			m_viewport.Width = width;
+			m_viewport.Height = height;
+
+			// 애초에 offset이 뭐냐...
+		}
+	}
+
+	// 다시 한 번 말하지만 RenderTarget용 크기설정이다.
+	void Renderer::SetResolution(unsigned int width, unsigned int height)
+	{
+		if (m_resolution.x == width && m_resolution.y == height)
+			return;
+
+		// 이외에도 크기가 맞는지 확인이 필요하다.
+
+		m_resolution.x = width;
+		m_resolution.y = height;
+
+		createRenderTargets();
+
+		CORE_TRACE("해상도 변경: {0:d}x{1:d}", width, height);
 	}
 
 	// 갱신만 한다. bind는 개별 path에서 한다.
@@ -130,6 +171,11 @@ namespace Dive
 	// 이걸 적용하려면 IL가 맞아야 한다.
 	void Renderer::DrawColor()
 	{
+		// 이건 임시다. Visibility 등을 통해 얻어야 한다.
+		Mesh* mesh = Scene::GetGlobalScene().GetMesh();
+		if (!mesh)
+			return;
+
 		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
@@ -141,21 +187,7 @@ namespace Dive
 		pImmediateContext->RSSetState(m_pipelineStateColor.pRSS);
 
 		pImmediateContext->VSSetConstantBuffers(0, 1, m_pCBMatrix.GetAddressOf());
-
-		// 임시
-		// 누가 가져야 할까?
-		// Wicked는 RenderPath3D::Render()에서 생성됐다.
-		D3D11_VIEWPORT viewport;
-		viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
-		viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-		viewport.TopLeftX = 0.0f;
-		viewport.TopLeftY = 0.0f;
-		pImmediateContext->RSSetViewports(1, &viewport);
-
-		// 이건 임시다. Visibility 등을 통해 얻어야 한다.
-		Mesh* mesh = Scene::GetGlobalScene().GetMesh();
+		pImmediateContext->RSSetViewports(1, &m_viewport);
 
 		ID3D11Buffer* vbs[] =
 		{

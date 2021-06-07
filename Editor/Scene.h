@@ -12,5 +12,7 @@ namespace Editor
 
 	private:
 	private:
+		Dive::Scene* m_pScene;
+		Dive::Renderer* m_pRenderer;
 	};
 }

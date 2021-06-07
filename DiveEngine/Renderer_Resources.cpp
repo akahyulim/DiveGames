@@ -142,55 +142,75 @@ namespace Dive
 		return true;
 	}
 
-	// 원래는 에디터에서 사용하는 디폴트 텍스쳐를 생성한다.
+	// 기존 사용처와 성격이 달라졌다.
+	// 스파르탄에선 에디터용 SRV 생성에 사용되었다.
 	bool Renderer::createTextures()
 	{
-		m_pTex = std::make_shared<Texture>(L"../Assets/Textures/Choa.jpg");
-
-		// 생성한 후 특정 색 넣기
+		// 삭제 대상 : 테스트용 구문
 		{
-			m_pCpuTex = std::make_shared<Texture>(800, 600);
-		
-			auto pImmediateContex = m_pGraphicsDevice->GetImmediateContext();
+			m_pTex = std::make_shared<Texture>(L"../Assets/Textures/Choa.jpg");
 
-			D3D11_MAPPED_SUBRESOURCE mappedResource;
-			pImmediateContex->Map(m_pCpuTex->GetTexture2D(),
-				D3D11CalcSubresource(0, 0, 1),
-				D3D11_MAP_WRITE_DISCARD,
-				0,
-				&mappedResource);
-
-			UCHAR* pTexels = (UCHAR*)mappedResource.pData;
-
-			// 색상 넣기
-			for (UINT row = 0; row < 600; ++row)
+			// 생성한 후 특정 색 넣기
 			{
-				UINT rowStart = row * mappedResource.RowPitch;
+				m_pCpuTex = std::make_shared<Texture>(800, 600);
 
-				for (UINT col = 0; col < 800; ++col)
+				auto pImmediateContex = m_pGraphicsDevice->GetImmediateContext();
+
+				D3D11_MAPPED_SUBRESOURCE mappedResource;
+				pImmediateContex->Map(m_pCpuTex->GetTexture2D(),
+					D3D11CalcSubresource(0, 0, 1),
+					D3D11_MAP_WRITE_DISCARD,
+					0,
+					&mappedResource);
+
+				UCHAR* pTexels = (UCHAR*)mappedResource.pData;
+
+				// 색상 넣기
+				for (UINT row = 0; row < 600; ++row)
 				{
-					UINT colStart = col * 4;
+					UINT rowStart = row * mappedResource.RowPitch;
 
-					pTexels[rowStart + colStart + 0] = 100;		// R
-					pTexels[rowStart + colStart + 1] = 0; 128;		// G
-					pTexels[rowStart + colStart + 2] = 0; 64;		// B
-					pTexels[rowStart + colStart + 3] = 0; 32;
+					for (UINT col = 0; col < 800; ++col)
+					{
+						UINT colStart = col * 4;
+
+						pTexels[rowStart + colStart + 0] = 100;		// R
+						pTexels[rowStart + colStart + 1] = 0; 128;		// G
+						pTexels[rowStart + colStart + 2] = 0; 64;		// B
+						pTexels[rowStart + colStart + 3] = 0; 32;
+					}
 				}
-			}
 
-			pImmediateContex->Unmap(m_pCpuTex->GetTexture2D(), D3D11CalcSubresource(0, 0, 1));
+				pImmediateContex->Unmap(m_pCpuTex->GetTexture2D(), D3D11CalcSubresource(0, 0, 1));
+			}
 		}
 
 		return true;
 	}
 
-	// 이름이 좀 애매하다. dsv도 생성할거다.
-	bool Renderer::createRenderTargetViews()
+	// 스파르탄에선 CreateRenderTextures다.
+	bool Renderer::createRenderTargets()
 	{
-		auto width = m_pGraphicsDevice->GetResolutionWidth();
-		auto height = m_pGraphicsDevice->GetResolutionHeight();
+		// BackBuffer와 어떻게 구분하느냐...
+		auto width = m_resolution.x;
+		auto height = m_resolution.y;
 
-		m_pRTV = std::make_shared<Texture>(width, height, DXGI_FORMAT_R8G8B8A8_UINT, "Test_RenderTargetView");
+		// 다시 크기 확인을 한다.
+		if ((width / 4) == 0 || (height / 4) == 0)
+		{
+			CORE_WARN("{0:d}x{1:d}는 지원하지 않는 해상도입니다.", width, height);
+			return false;
+		}
+
+		// 얘는 테스트용이다.
+		{
+			m_pRTV = std::make_shared<Texture>(width, height, DXGI_FORMAT_R8G8B8A8_UINT, "Test_RenderTargetView");
+		}
+
+		// renderTargets들을 만든다. 타입때문에 지웠다가 다시 만들어야 한다. 나중에 수정이 필요할듯?
+		if (m_renderTargets[eRenderTargets::Frame_Ldr])
+			delete m_renderTargets[eRenderTargets::Frame_Ldr];
+		m_renderTargets[eRenderTargets::Frame_Ldr] = new Texture(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 		return true;
 	}

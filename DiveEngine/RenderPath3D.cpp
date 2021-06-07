@@ -21,7 +21,7 @@ namespace Dive
 		// scene update
 		{
 			auto timeScale = TimeManager::GetInstance().GetTimeScale();
-			m_scene->Update(deltaTime * timeScale);
+			m_pScene->Update(deltaTime * timeScale);
 		}
 
 		// visibility 생성 및 초기화 그리고 설정
