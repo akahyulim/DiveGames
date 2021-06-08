@@ -97,6 +97,15 @@
     <ClInclude Include="StringHelper.h">
       <Filter>Engine\Tools</Filter>
     </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Engine\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="dvMesh.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -171,6 +180,9 @@
     <ClCompile Include="StringHelper.cpp">
       <Filter>Engine\Tools</Filter>
     </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -193,6 +205,9 @@
     </Filter>
     <Filter Include="Engine\Input">
       <UniqueIdentifier>{7d6380e9-9fcb-4788-b719-d270596b1123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Resource">
+      <UniqueIdentifier>{a52c840e-1afd-4594-981d-8351db2f048e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

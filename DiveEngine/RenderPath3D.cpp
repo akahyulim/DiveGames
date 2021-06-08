@@ -42,6 +42,12 @@ namespace Dive
 		auto pImmediateContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
+		// Eidtor에선 Backbuffer와 RenderTarget의 크기가 다르므로
+		// Sandbox에선 이렇게 Backbuffer 크기로 설정을 해 주어야 한다.
+		float width = (float)Renderer::GetInstance().GetGraphicsDevice()->GetResolutionWidth();
+		float height = (float)Renderer::GetInstance().GetGraphicsDevice()->GetResolutionHeight();
+		Renderer::GetInstance().SetViewport(width, height);
+		
 		Renderer::GetInstance().UpdateCB();
 		Renderer::GetInstance().DrawColor();
 		//Renderer::GetInstance().DrawTexturing();

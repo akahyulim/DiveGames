@@ -13,6 +13,8 @@ namespace Dive
 		// 이렇게 초기화하면 Sandbox에서 문제가 생긴다.
 		m_viewport.Width = static_cast<float>(m_resolution.x);
 		m_viewport.Height = static_cast<float>(m_resolution.y);
+		//m_viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
+		//m_viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
 		m_viewport.MinDepth = 0.0f;
 		m_viewport.MaxDepth = 1.0f;
 		m_viewport.TopLeftX = 0.0f;
