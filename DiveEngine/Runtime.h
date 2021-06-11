@@ -5,6 +5,7 @@
 
 namespace Dive
 {
+	class AssetManager;
 	class RenderPath;
 
 	// m_bLockFrame은 VSync와도 연관있다.
@@ -13,7 +14,7 @@ namespace Dive
 	{
 	public:
 		Runtime();
-		virtual ~Runtime() = default;
+		virtual ~Runtime();
 
 		virtual bool Initialize();
 
@@ -41,6 +42,8 @@ namespace Dive
 
 		std::string GetIniFilePath() const { return m_iniFilePath; }
 
+		AssetManager* GetAssetManager() { return m_pAssetManager; }
+
 	protected:
 		HWND m_hWnd = 0;
 		bool m_bFullScreen = false;
@@ -55,5 +58,7 @@ namespace Dive
 		bool m_bWindowActive = true;
 
 		std::string m_iniFilePath;
+
+		AssetManager* m_pAssetManager;
 	};
 }

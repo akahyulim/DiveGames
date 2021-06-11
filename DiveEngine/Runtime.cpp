@@ -5,6 +5,7 @@
 #include "RenderPath.h"
 #include "Renderer.h"
 #include "Input.h"
+#include "AssetManager.h"
 #include <memory>
 
 using namespace std;
@@ -13,7 +14,19 @@ namespace Dive
 {
 	Runtime::Runtime()
 	{
+		m_pAssetManager = nullptr;
+
 		Log::Initialize();
+
+		CORE_TRACE("Runtime::Runtime()");
+	}
+
+	Runtime::~Runtime()
+	{
+		delete m_pAssetManager;
+		m_pAssetManager = nullptr;
+
+		CORE_TRACE("Runtime::~Runtime()");
 	}
 
 	bool Runtime::Initialize()
@@ -24,8 +37,6 @@ namespace Dive
 		{
 			return false;
 		}
-		
-		CORE_TRACE("Dive Engine 초기화를 시작합니다...");
 
 		// 원래 SetWindow에서 호출하던 부분 =============================================
 		// Backbuffer의 크기 설정을 늦추기 위해 이 곳으로 옮겼다.
@@ -41,6 +52,8 @@ namespace Dive
 		TimeManager::GetInstance().Initialize();
 		Renderer::GetInstance().Initialize();
 		Input::GetInstance().Initialize(m_hWnd);
+
+		CORE_TRACE("Runtime::Initialize()");
 
 		return true;
 	}
@@ -177,11 +190,15 @@ namespace Dive
 			}
 			m_pActivePath = path;
 		}
+
+		CORE_TRACE("Runtime::ActivatePath()");
 	}
 	
 	void Runtime::SetWindow(HWND windowHandle, bool fullScreen)
 	{
 		m_hWnd = windowHandle;
 		m_bFullScreen = fullScreen;
+
+		CORE_TRACE("Runtime::SetWindow()");
 	}
 }

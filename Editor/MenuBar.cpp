@@ -26,6 +26,7 @@ namespace Editor
 					// 그런데 Scene의 변경 여부라는게 GameObject, Component 전부를 뜻한다...
 					{
 						Dive::Scene::GetGlobalScene().Clear();
+
 					}
 				}
 
@@ -49,6 +50,8 @@ namespace Editor
 					{
 						std::string filepath = "../Assets/Scenes/default.scene";
 						Dive::Scene::GetGlobalScene().SaveToFile(filepath);
+
+						APP_TRACE("현재 Scene과 Asset을 파일로 저장하였습니다.");
 					}
 				}
 

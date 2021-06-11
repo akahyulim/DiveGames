@@ -15,6 +15,8 @@ namespace Editor
 	{
 		m_iniFilePath = Dive::FileSystemHelper::GetWorkingDirectory() + "editor.ini";
 		m_bMaximize = false;
+
+		APP_TRACE("Editor::Editor()");
 	}
 
 	Editor::~Editor()
@@ -26,7 +28,7 @@ namespace Editor
 			ImGui::DestroyContext();
 		}
 
-		APP_TRACE("Editor를 종료합니다.");
+		APP_TRACE("Editor::~Editor()");
 	}
 
 	bool Editor::Initialize()
@@ -40,7 +42,7 @@ namespace Editor
 		// RenderPath 적용
 		ActivatePath(&m_renderPathEditor);
 
-		APP_TRACE("Editor의 초기화에 성공하였습니다.");
+		APP_TRACE("Editor::Initialize()");
 
 		return true;
 	}
