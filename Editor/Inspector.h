@@ -7,6 +7,8 @@ namespace Editor
 	{
 	public:
 		Inspector(Editor* pEditor);
+
+		void TickVisible() override;
 	private:
 	private:
 	};
