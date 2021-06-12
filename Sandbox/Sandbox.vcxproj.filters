@@ -5,23 +5,28 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Base">
+    <Filter Include="Window">
       <UniqueIdentifier>{ba68088b-8afd-4766-870c-bf77474f2c9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{25eac9c4-a266-4d5d-ad84-4502dabea3e4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Sandbox.h" />
     <ClInclude Include="EntryPoint.h">
-      <Filter>Base</Filter>
+      <Filter>Window</Filter>
     </ClInclude>
     <ClInclude Include="framework.h">
-      <Filter>Base</Filter>
+      <Filter>Window</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>Base</Filter>
+      <Filter>Window</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>Base</Filter>
+      <Filter>Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Sandbox.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -38,9 +43,11 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Sandbox.cpp" />
     <ClCompile Include="EntryPoint.cpp">
-      <Filter>Base</Filter>
+      <Filter>Window</Filter>
+    </ClCompile>
+    <ClCompile Include="Sandbox.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

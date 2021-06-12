@@ -22,19 +22,21 @@ namespace Editor
 			{
 				if (ImGui::MenuItem("New World"))
 				{
-					// 현재 Scene의 변경사항 확인 후 저장 여부를 묻는다.
-					// 그런데 Scene의 변경 여부라는게 GameObject, Component 전부를 뜻한다...
-					{
-						Dive::Scene::GetGlobalScene().Clear();
+					if (Dive::Scene::GetGlobalScene().IsDirty())
+						ImGui::OpenPopup("SaveDirty");
 
-					}
+					Dive::Scene::GetGlobalScene().Clear();
 				}
 
 				if (ImGui::MenuItem("Open World"))
 				{
-					// 우선 현재 Scene의 변경 사항 확인 후 저장 여부를 묻는다.
-					// 특정 폴더를 열어 scene 포멧 파일만 보여준다.
-					// 선택하면 해당 파일을 로드한다.
+					if (Dive::Scene::GetGlobalScene().IsDirty())
+					{
+						// 팝업
+						// 기존 Scene에 변경 사항이 존재합니다. 저장하시겠습니까?
+					}
+
+					// 디렉토리 탐색기를 연다.
 					{
 						std::string filepath = "../Assets/Scenes/default.scene";
 						Dive::Scene::GetGlobalScene().LoadFromFile(filepath);
@@ -58,11 +60,14 @@ namespace Editor
 				if (ImGui::MenuItem("Save As..."))
 				{
 					// Scene 폴더를 연 후 이름을 입력 받아 저장한다.
+					// Scene의 이름을 변경한 후
+					// 저장할 폴더 경로를 SaveToFile에 넣으면 된다.
 				}
 
 				ImGui::Separator();
 
 				// 프로젝트는 게임 전체를 의미한다.
+				// 일단 뒤로 미루자.
 				if (ImGui::MenuItem("New Project"))
 				{
 				}
@@ -81,8 +86,12 @@ namespace Editor
 
 				if (ImGui::MenuItem("Exit"))
 				{
-					// 갱신 여부를 확인한 후 저장 여부를 묻는다.
-					// 그런데 갱신 여부가 프로젝트인가, 씬인가...
+					// 일단은 Scene의 변경사항 여부만 확인한다.
+					if (Dive::Scene::GetGlobalScene().IsDirty())
+					{
+
+					}
+					// 하지만 추후 Project의 변경사항까지 확인해야 한다.
 
 					PostQuitMessage(0);
 				}
@@ -217,5 +226,17 @@ namespace Editor
 			ImGui::EndMainMenuBar();
 		}
 		ImGui::PopStyleVar();
+
+		// flag 때문에 자꾸 전체 윈도우 크기가 바뀐다.
+		// 현재 창이 뜨지도 않는다.
+		if (ImGui::BeginPopupModal("SaveDirty", NULL, 0))//ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			// 팝업
+			// 기존 Scene에 변경 사항이 존재합니다. 저장하시겠습니까?
+			// 저장, 저장 안함, 취소
+			ImGui::Text("Save?");
+
+			ImGui::EndPopup();
+		}
 	}
 }

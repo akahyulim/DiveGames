@@ -10,10 +10,13 @@ namespace Dive
 	Scene::Scene()
 		: Object(typeid(Scene).hash_code())
 	{
+		m_name = "Untitled";
+		m_bDirty = false;
 	}
 
 	Scene::~Scene()
 	{
+		Clear();
 	}
 
 	void Scene::Update(float deltaTime)
@@ -26,7 +29,12 @@ namespace Dive
 
 	void Scene::Clear()
 	{
-		m_gameObjects.clear();
+		if (!m_gameObjects.empty())
+		{
+			m_gameObjects.clear();
+		}
+
+		m_bDirty = true;
 	}
 
 	bool Scene::SaveToFile(const std::string& filepath)
@@ -61,6 +69,8 @@ namespace Dive
 
 		stream.Close();
 
+		m_bDirty = false;
+
 		return true;
 	}
 
@@ -70,11 +80,9 @@ namespace Dive
 
 		if (!FileSystemHelper::FileExists(filepath))
 		{
-			CORE_ERROR("");
 			return false;
 		}
 
-		
 		FileStream stream(filepath, eFileStreamMode::Read);
 		if (!stream.IsOpen())
 			return false;
@@ -104,6 +112,8 @@ namespace Dive
 	{
 		auto newGameObject = m_gameObjects.emplace_back(std::make_shared<GameObject>());
 		// 뭔가 호출?
+
+		m_bDirty = true;
 
 		return newGameObject.get();
 	}
@@ -136,6 +146,8 @@ namespace Dive
 
 		// 스파르탄은 바로 지우지 않는다. 일단 제거 대상으로 설정해놓는다.
 		// 그리고 다음 Frame에서 제거한다.
+
+		m_bDirty = true;
 
 		gameObjectRemove(target);
 	}
@@ -185,5 +197,7 @@ namespace Dive
 		{
 			pParent->AcquireChidren();
 		}
+
+		m_bDirty = true;
 	}
 }

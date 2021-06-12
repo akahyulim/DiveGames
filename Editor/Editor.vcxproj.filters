@@ -5,9 +5,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Base">
-      <UniqueIdentifier>{6129e17f-6c0e-4f72-99d4-1e86baa9c64b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Editor">
       <UniqueIdentifier>{c49de30f-27f1-4b2b-b7f1-3a76018371e2}</UniqueIdentifier>
     </Filter>
@@ -17,31 +14,34 @@
     <Filter Include="External\ImGui">
       <UniqueIdentifier>{58dbc075-befa-49d6-9159-c44e1981ff73}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI">
+    <Filter Include="Editor\Window">
+      <UniqueIdentifier>{6129e17f-6c0e-4f72-99d4-1e86baa9c64b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor\UI">
       <UniqueIdentifier>{29ffc6bf-a814-41a4-8981-50b9ecd77de7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="UI\Widgets">
+    <Filter Include="Editor\UI\Widgets">
       <UniqueIdentifier>{67e9040f-93a3-4811-8a39-5eb6aad52c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor\Core">
+      <UniqueIdentifier>{0c323b41-1df6-4e20-be13-257655aad3f6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
-      <Filter>Base</Filter>
+      <Filter>Editor\Window</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>Base</Filter>
+      <Filter>Editor\Window</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>Base</Filter>
+      <Filter>Editor\Window</Filter>
     </ClInclude>
     <ClInclude Include="EntryPoint.h">
-      <Filter>Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor.h">
-      <Filter>Editor</Filter>
+      <Filter>Editor\Window</Filter>
     </ClInclude>
     <ClInclude Include="Widget.h">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="External\ImGui\imconfig.h">
       <Filter>External\ImGui</Filter>
@@ -68,28 +68,31 @@
       <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Assets.h">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="MenuBar.h">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="Inspector.h">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="Hierarchy.h">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="DragDrop.h">
-      <Filter>UI</Filter>
+      <Filter>Editor\UI</Filter>
     </ClInclude>
     <ClInclude Include="External\ImGui\imgui_stdlib.h">
       <Filter>External\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="Editor.h">
+      <Filter>Editor\Core</Filter>
+    </ClInclude>
     <ClInclude Include="RenderPathEditor.h">
-      <Filter>Editor</Filter>
+      <Filter>Editor\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -107,10 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EntryPoint.cpp">
-      <Filter>Base</Filter>
-    </ClCompile>
-    <ClCompile Include="Editor.cpp">
-      <Filter>Editor</Filter>
+      <Filter>Editor\Window</Filter>
     </ClCompile>
     <ClCompile Include="External\ImGui\imgui.cpp">
       <Filter>External\ImGui</Filter>
@@ -134,28 +134,31 @@
       <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Widget.cpp">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="Assets.cpp">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="MenuBar.cpp">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="Inspector.cpp">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="Hierarchy.cpp">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
-      <Filter>UI\Widgets</Filter>
+      <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="External\ImGui\imgui_stdlib.cpp">
       <Filter>External\ImGui</Filter>
     </ClCompile>
+    <ClCompile Include="Editor.cpp">
+      <Filter>Editor\Core</Filter>
+    </ClCompile>
     <ClCompile Include="RenderPathEditor.cpp">
-      <Filter>Editor</Filter>
+      <Filter>Editor\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

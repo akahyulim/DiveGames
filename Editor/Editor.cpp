@@ -93,6 +93,7 @@ namespace Editor
 
 	void Editor::ResizeWindow(unsigned int width, unsigned int height)
 	{
+		// 이 부분때문인지 파일에 저장된 상태가 영....
 		Dive::IniHelper ini(m_iniFilePath);
 		if (IsZoomed(m_hWnd))
 		{

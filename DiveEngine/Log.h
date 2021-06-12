@@ -1,11 +1,9 @@
 #pragma once
-#include <spdlog/spdlog.h>
+#include "External/spdlog/spdlog.h"
 
 // 전방 선언
 namespace spdlog { class logger; }
 
-// 현재 사용이 되지만 App에서도 spdlog 폴더를 include해야 한다. 에바다.
-// 헤더 파일들을 프로젝트에 포함시키면 <>가 안먹힌다.
 namespace Dive
 {
 	class Log
