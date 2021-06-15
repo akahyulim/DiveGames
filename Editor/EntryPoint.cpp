@@ -5,6 +5,7 @@
 #include "EntryPoint.h"
 #include "Editor.h"
 #include "External/ImGui/imgui_impl_win32.h"
+#include <iostream>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -14,7 +15,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
-Editor::Editor g_editor;
+Editor::Editor* g_pEditor = nullptr;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -31,6 +32,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: 여기에 코드를 입력합니다.
+#ifdef _DEBUG
+    AllocConsole();
+#endif
+    g_pEditor = new Editor::Editor;
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -58,9 +63,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            g_editor.Run();
+            g_pEditor->Run();
         }
     }
+
+    if (g_pEditor)
+    {
+        APP_TRACE("DiveEditor를 종료합니다.");
+        delete g_pEditor;
+        g_pEditor = nullptr;
+    }
+
+#ifdef _DEBUG
+    system("pause");
+    FreeConsole();
+#endif
 
     return (int) msg.wParam;
 }
@@ -78,7 +95,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
     wcex.cbSize = sizeof(WNDCLASSEX);
 
-    wcex.style = 0;//CS_CLASSDC;//CS_HREDRAW | CS_VREDRAW;
+    wcex.style          = 0;
     wcex.lpfnWndProc    = WndProc;
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
@@ -107,14 +124,14 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-   Dive::IniHelper ini(g_editor.GetIniFilePath());
+   Dive::IniHelper ini(g_pEditor->GetIniFilePath());
    bool bMaximize   = ini["Window"]["bMaximize"] << false;
    int width        = ini["Window"]["Width"] << 800;
    int height       = ini["Window"]["Height"] << 600;
    int posX         = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
    int posY         = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 
-   if (!Dive::FileSystemHelper::FileExists(g_editor.GetIniFilePath()))
+   if (!Dive::FileSystemHelper::FileExists(g_pEditor->GetIniFilePath()))
    {
        ini["Window"]["Width"] = width;
        ini["Window"]["Height"] = height;
@@ -129,7 +146,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-   g_editor.SetWindow(hWnd, false);
+   g_pEditor->SetWindow(hWnd, false);
 
    ShowWindow(hWnd, bMaximize ? SW_MAXIMIZE : SW_SHOWDEFAULT);
    UpdateWindow(hWnd);
@@ -157,7 +174,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         {
             // 메시지로 날리면 초기화 확인 같은건 안해도 될거다.
-            if (!g_editor.IsInitialized())   return 0;
+            if (!g_pEditor->IsInitialized())   return 0;
             unsigned int width = lParam & 0xFFFF;
             unsigned int height = (lParam >> 16) & 0xFFFF;
             auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
@@ -165,7 +182,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 pGraphicsDevice->ResizeBuffers(width, height);
 
             // ini를 갱신해야 한다.
-            g_editor.ResizeWindow(width, height);
+            g_pEditor->ResizeWindow(width, height);
         }
         break;
     case WM_DPICHANGED:

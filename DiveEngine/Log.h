@@ -1,8 +1,6 @@
 #pragma once
 #include "External/spdlog/spdlog.h"
-
-// 전방 선언
-namespace spdlog { class logger; }
+#include "External/spdlog/fmt/ostr.h"
 
 namespace Dive
 {

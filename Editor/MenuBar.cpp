@@ -1,4 +1,5 @@
 #include "MenuBar.h"
+#include "Editor.h"
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
 #include <Windows.h>
@@ -120,7 +121,7 @@ namespace Editor
 					}
 					// 하지만 추후 Project의 변경사항까지 확인해야 한다.
 
-					PostQuitMessage(0);
+					DestroyWindow(m_pEditor->GetWindowHandle());
 				}
 
 				ImGui::EndMenu();

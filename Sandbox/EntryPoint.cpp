@@ -11,7 +11,7 @@
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
-Sandbox::Sandbox g_app;
+Sandbox::Sandbox* g_pApp = nullptr;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -28,6 +28,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: 여기에 코드를 입력합니다.
+#ifdef _DEBUG
+    AllocConsole();
+#endif
+
+    g_pApp = new Sandbox::Sandbox;
+    assert(g_pApp);
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -55,9 +61,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            g_app.Run();
+            g_pApp->Run();
         }
     }
+
+    if (g_pApp)
+    {
+        delete g_pApp;
+        g_pApp = nullptr;
+    }
+
+#ifdef _DEBUG
+    system("pause");
+    FreeConsole();
+#endif
 
     return (int) msg.wParam;
 }
@@ -134,7 +151,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-   g_app.SetWindow(hWnd, bFullScreen);
+   g_pApp->SetWindow(hWnd, bFullScreen);
 
    // 해상도를 맞추려면 크기를 변경해야 한다.
 
@@ -163,7 +180,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         // 일단은 직접 보내보자.
         {        
-        if (!g_app.IsInitialized()) return 0;
+        if (!g_pApp->IsInitialized()) return 0;
         auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
         if (pGraphicsDevice->IsInitialized())
         {
@@ -193,7 +210,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_INPUT:
         {
-            if (g_app.IsInitialized())
+            if (g_pApp->IsInitialized())
             {
                 Dive::Input::GetInstance().ParseMessage(lParam);
             }

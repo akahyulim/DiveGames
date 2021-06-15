@@ -28,6 +28,7 @@ namespace Dive
 		void ActivatePath(RenderPath* path);
 		RenderPath* GetActivePath() { return m_pActivePath; }
 
+		HWND GetWindowHandle() { return m_hWnd; }
 		void SetWindow(HWND windowHandle, bool fullScreen);
 
 		float GetTargetFrame() const { return m_targetFPS; }
