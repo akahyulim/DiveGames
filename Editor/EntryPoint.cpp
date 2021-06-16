@@ -35,7 +35,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #ifdef _DEBUG
     AllocConsole();
 #endif
-    g_pEditor = new Editor::Editor;
+    
+    Editor::Editor diveEditor;
+    g_pEditor = &diveEditor;
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -63,16 +65,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            g_pEditor->Run();
+            diveEditor.Run();
         }
     }
 
-    if (g_pEditor)
-    {
-        APP_TRACE("DiveEditor를 종료합니다.");
-        delete g_pEditor;
-        g_pEditor = nullptr;
-    }
+    APP_TRACE("DiveEditor를 종료합니다.");
+    g_pEditor = nullptr;
 
 #ifdef _DEBUG
     system("pause");
@@ -182,6 +180,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 pGraphicsDevice->ResizeBuffers(width, height);
 
             // ini를 갱신해야 한다.
+            // 에디터가 아닌 Runtime에 구현해야한다.
             g_pEditor->ResizeWindow(width, height);
         }
         break;

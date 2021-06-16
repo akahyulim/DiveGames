@@ -15,18 +15,15 @@ namespace Dive
 	Runtime::Runtime()
 	{
 		m_pAssetManager = nullptr;
-
-		Log::Initialize();
-
-		CORE_TRACE("Runtime::Runtime()");
 	}
 
 	Runtime::~Runtime()
 	{
-		delete m_pAssetManager;
-		m_pAssetManager = nullptr;
-
-		CORE_TRACE("Runtime::~Runtime()");
+		if (m_pAssetManager)
+		{
+			delete m_pAssetManager;
+			m_pAssetManager = nullptr;
+		}
 	}
 
 	bool Runtime::Initialize()
@@ -37,6 +34,10 @@ namespace Dive
 		{
 			return false;
 		}
+
+		// 여기가 맞다.
+		Log::Initialize();
+
 
 		// 원래 SetWindow에서 호출하던 부분 =============================================
 		// Backbuffer의 크기 설정을 늦추기 위해 이 곳으로 옮겼다.
@@ -199,6 +200,7 @@ namespace Dive
 		m_hWnd = windowHandle;
 		m_bFullScreen = fullScreen;
 
-		CORE_TRACE("Runtime::SetWindow()");
+		// 로그 객체가 생성되지 않았다.
+		//CORE_TRACE("Runtime::SetWindow()");
 	}
 }

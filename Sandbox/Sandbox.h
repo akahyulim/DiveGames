@@ -6,8 +6,8 @@ namespace Sandbox
 	class Sandbox : public Dive::Runtime
 	{
 	public:
-		Sandbox() = default;
-		~Sandbox() = default;
+		Sandbox();
+		~Sandbox();
 
 		bool Initialize() override;
 
@@ -19,6 +19,6 @@ namespace Sandbox
 		Dive::RenderPath3D m_renderPath;
 
 		// 위치가 좀 에바다.
-		Dive::Mesh* m_triangle;
+		Dive::Mesh* m_pTriangle;
 	};
 }

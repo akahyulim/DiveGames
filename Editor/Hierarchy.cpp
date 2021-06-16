@@ -212,6 +212,10 @@ namespace Editor
 
         ImGui::Separator();
 
+        // 선택된 대상의 위에서 클릭할 땐
+        // Component를 추가토록 하는게 맞다.
+        // 일단 유니티 인테페이스를 확인하자.
+
         if (ImGui::MenuItem("Create Empty"))
         {
             Dive::Scene::GetGlobalScene().CreateGameObject();

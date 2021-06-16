@@ -9,14 +9,15 @@
 #include "Assets.h"
 #include "Inspector.h"
 
+
+// ini 관련은 다시 Engine 쪽으로 옮겨야 한다.
+// Settings가 맞는 것 같다.
 namespace Editor
 {
 	Editor::Editor()
 	{
 		m_iniFilePath = Dive::FileSystemHelper::GetWorkingDirectory() + "editor.ini";
 		m_bMaximize = false;
-
-		APP_TRACE("Editor::Editor()");
 	}
 
 	Editor::~Editor()
@@ -27,8 +28,6 @@ namespace Editor
 			ImGui_ImplWin32_Shutdown();
 			ImGui::DestroyContext();
 		}
-
-		APP_TRACE("Editor::~Editor()");
 	}
 
 	bool Editor::Initialize()

@@ -32,6 +32,7 @@ namespace Dive
 		if (!m_gameObjects.empty())
 		{
 			m_gameObjects.clear();
+			m_gameObjects.shrink_to_fit();
 		}
 
 		m_bDirty = true;
@@ -110,12 +111,12 @@ namespace Dive
 
 	GameObject* Scene::CreateGameObject()
 	{
-		auto newGameObject = m_gameObjects.emplace_back(std::make_shared<GameObject>());
+		auto pAddedObject = m_gameObjects.emplace_back(std::make_shared<GameObject>());
 		// ¹º°¡ È£Ãâ?
 
 		m_bDirty = true;
 
-		return newGameObject.get();
+		return pAddedObject.get();
 	}
 
 	GameObject* Scene::GetGameObjectByName(const std::string& name)
@@ -131,10 +132,10 @@ namespace Dive
 
 	GameObject* Scene::GetGameObjectByID(unsigned int id)
 	{
-		for (auto& target : m_gameObjects)
+		for (auto& pTarget : m_gameObjects)
 		{
-			if (target->GetID() == id)
-				return target.get();
+			if (pTarget->GetID() == id)
+				return pTarget.get();
 		}
 
 		return nullptr;

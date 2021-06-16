@@ -13,6 +13,7 @@ WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
 Sandbox::Sandbox* g_pApp = nullptr;
 
+
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -32,8 +33,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     AllocConsole();
 #endif
 
-    g_pApp = new Sandbox::Sandbox;
-    assert(g_pApp);
+    Sandbox::Sandbox app;
+    g_pApp = &app;
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -61,15 +62,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            g_pApp->Run();
+            app.Run();
         }
     }
 
-    if (g_pApp)
-    {
-        delete g_pApp;
-        g_pApp = nullptr;
-    }
+    g_pApp = nullptr;
 
 #ifdef _DEBUG
     system("pause");
