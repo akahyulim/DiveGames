@@ -382,6 +382,9 @@
     <ClInclude Include="External\spdlog\sinks\wincolor_sink-inl.h">
       <Filter>External\spdlog\sinks</Filter>
     </ClInclude>
+    <ClInclude Include="Settings.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -464,6 +467,9 @@
     </ClCompile>
     <ClCompile Include="AssetManager.cpp">
       <Filter>Engine\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Settings.cpp">
+      <Filter>Engine\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

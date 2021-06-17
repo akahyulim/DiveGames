@@ -1,0 +1,69 @@
+#include "Settings.h"
+#include "IniHelper.h"
+#include "FileSystemHelper.h"
+#include "Log.h"
+
+namespace Dive
+{
+	void Settings::Initialize(const std::string& title)
+	{
+		m_filename = FileSystemHelper::GetWorkingDirectory() + title + ".ini";
+
+		Load();
+	}
+
+	void Settings::Default()
+	{
+		IniHelper ini(m_filename);
+		ini["Window"]["Width"] = 800;
+		ini["Window"]["Height"] = 600;
+		ini["Window"]["bMaximize"] = false;
+		ini["Window"]["bFullScreen"] = false;
+		ini["Window"]["bWindowed"] = false;
+
+		Load();
+	}
+
+	void Settings::Save()
+	{
+		IniHelper ini(m_filename);
+		ini["Window"]["Width"] = m_width;
+		ini["Window"]["Height"] = m_height;
+		ini["Window"]["bMaximize"] = m_bMaximize;
+		ini["Window"]["bFullScreen"] = m_bFullScreen;
+		ini["Window"]["bWindowed"] = m_bWindowed;
+	}
+
+	void Settings::Load()
+	{
+		if (!FileSystemHelper::FileExists(m_filename))
+			Default();
+
+		IniHelper ini(m_filename);
+		m_width = ini["Window"]["Width"];
+		m_height = ini["Window"]["Height"];
+		m_bMaximize = ini["Window"]["bMaximize"];
+		m_bFullScreen = ini["Window"]["bFullScreen"];
+		m_bWindowed = ini["Window"]["bWindowed"];
+	}
+
+	void Settings::SetWidth(unsigned int width)
+	{
+		if ((width <= 0) || (m_width == width))
+		{
+			CORE_ERROR("Settings::SetWidth >> 유효하지 않은 크기({:d})로 변경을 시도하였습니다.", width);
+		}
+
+		m_width = width;
+	}
+
+	void Settings::SetHeight(unsigned int height)
+	{
+		if ((height <= 0) || (m_height == height))
+		{
+			CORE_ERROR("Settings::SetWidth >> 유효하지 않은 크기({:d})로 변경을 시도하였습니다.", height);
+		}
+
+		m_width = height;
+	}
+}

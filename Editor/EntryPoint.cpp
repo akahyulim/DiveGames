@@ -122,6 +122,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
+   // 역시 위치가 에바다.
+   // 현재 Editor가 생성자에서 FilePath를 초기화 하였지만
+   // Settings를 사용한다면 Editor가 초기화를 끝낸 후에나 불러 올 수 있다.
+   // 가장 깔끔한 방법은 역시나 초반엔 윈도우를 숨기고,
+   // Editor나 Runtime에서 크기를 확정한 후 Show하는 거다. 
    Dive::IniHelper ini(g_pEditor->GetIniFilePath());
    bool bMaximize   = ini["Window"]["bMaximize"] << false;
    int width        = ini["Window"]["Width"] << 800;
@@ -172,6 +177,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         {
             // 메시지로 날리면 초기화 확인 같은건 안해도 될거다.
+            // 그리고 아래 에디터에서 호출하는 함수도
+            // Runtime에서 이벤트로 받을 수 있다.
+
             if (!g_pEditor->IsInitialized())   return 0;
             unsigned int width = lParam & 0xFFFF;
             unsigned int height = (lParam >> 16) & 0xFFFF;

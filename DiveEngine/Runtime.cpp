@@ -1,5 +1,6 @@
 #include "Runtime.h"
 #include "Log.h"
+#include "Settings.h"
 #include "Timer.h"
 #include "ThreadPool.h"
 #include "RenderPath.h"
@@ -15,6 +16,7 @@ namespace Dive
 	Runtime::Runtime()
 	{
 		m_pAssetManager = nullptr;
+		m_title = "diveEngine";
 	}
 
 	Runtime::~Runtime()
@@ -50,6 +52,7 @@ namespace Dive
 		// 일단 싱글 쓰레드로 간다.
 		// 이후 laoding은 asyn로 하고, parallel은 최후로 미룬다.
 		// 전부 bool 타입으로 바꾸자
+		Settings::GetInstance().Initialize(m_title);
 		TimeManager::GetInstance().Initialize();
 		Renderer::GetInstance().Initialize();
 		Input::GetInstance().Initialize(m_hWnd);

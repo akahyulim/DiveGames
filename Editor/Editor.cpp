@@ -18,6 +18,8 @@ namespace Editor
 	{
 		m_iniFilePath = Dive::FileSystemHelper::GetWorkingDirectory() + "editor.ini";
 		m_bMaximize = false;
+
+		m_title = "diveEditor";
 	}
 
 	Editor::~Editor()
@@ -34,6 +36,8 @@ namespace Editor
 	{
 		if (!Dive::Runtime::Initialize())
 			return false;
+
+		// 윈도우 크기를 변경한 후 Show?
 
 		// ImGui 초기화 및 Widget 생성
 		initialize_ImGui();
@@ -90,6 +94,7 @@ namespace Editor
 		graphicsDevice->PresentEnd();
 	}
 
+	// 이제 이 부분을 Runtime으로 옮겨야 한다.
 	void Editor::ResizeWindow(unsigned int width, unsigned int height)
 	{
 		// 이 부분때문인지 파일에 저장된 상태가 영....

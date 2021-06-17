@@ -287,6 +287,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TextMesh.h" />
     <ClInclude Include="Texture.h" />
@@ -317,6 +318,7 @@
     <ClCompile Include="RenderPath3D.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Settings.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="Texture.cpp" />

@@ -46,6 +46,8 @@ namespace Dive
 		AssetManager* GetAssetManager() { return m_pAssetManager; }
 
 	protected:
+		std::string m_title;
+
 		HWND m_hWnd = 0;
 		bool m_bFullScreen = false;
 
