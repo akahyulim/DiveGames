@@ -179,13 +179,14 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // 메시지로 날리면 초기화 확인 같은건 안해도 될거다.
             // 그리고 아래 에디터에서 호출하는 함수도
             // Runtime에서 이벤트로 받을 수 있다.
+            EVENT_FIRE_DATA(Dive::eEventType::ChangedResolution, wParam);
 
-            if (!g_pEditor->IsInitialized())   return 0;
+          //  if (!g_pEditor->IsInitialized())   return 0;
             unsigned int width = lParam & 0xFFFF;
             unsigned int height = (lParam >> 16) & 0xFFFF;
-            auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
-            if (pGraphicsDevice->IsInitialized())
-                pGraphicsDevice->ResizeBuffers(width, height);
+          //  auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
+          //  if (pGraphicsDevice->IsInitialized())
+          //      pGraphicsDevice->ResizeBuffers(width, height);
 
             // ini를 갱신해야 한다.
             // 에디터가 아닌 Runtime에 구현해야한다.

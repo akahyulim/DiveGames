@@ -18,6 +18,7 @@ namespace Editor
 		void Render() override;
 
 		void ResizeWindow(unsigned int width, unsigned int height);
+		void OnResize(unsigned int data);
 
 	private:
 		void initialize_ImGui();

@@ -173,6 +173,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="DiveEngine.h" />
     <ClInclude Include="dvMesh.h" />
+    <ClInclude Include="Event.h" />
     <ClInclude Include="External\spdlog\async.h" />
     <ClInclude Include="External\spdlog\async_logger-inl.h" />
     <ClInclude Include="External\spdlog\async_logger.h" />

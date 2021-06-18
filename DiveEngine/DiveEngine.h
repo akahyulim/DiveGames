@@ -7,6 +7,7 @@
 #include "Log.h"
 #include "Object.h"
 #include "Runtime.h"
+#include "Event.h"
 #include "Timer.h"
 #include "ThreadPool.h"
 #include "RenderPath.h"

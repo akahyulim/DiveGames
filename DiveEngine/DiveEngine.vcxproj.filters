@@ -385,6 +385,9 @@
     <ClInclude Include="Settings.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">

@@ -8,7 +8,7 @@
 #include "Scene.h"
 #include "Assets.h"
 #include "Inspector.h"
-
+#include <iostream>
 
 // ini 관련은 다시 Engine 쪽으로 옮겨야 한다.
 // Settings가 맞는 것 같다.
@@ -44,6 +44,9 @@ namespace Editor
 
 		// RenderPath 적용
 		ActivatePath(&m_renderPathEditor);
+
+		// 생성자에서 구독하면 안된다. 시스템들이 생성되지 않은 상태이다.
+		EVENT_SUBSCRIBE(Dive::eEventType::ChangedResolution, EVENT_HANDLE_DATA(OnResize));
 
 		APP_TRACE("Editor::Initialize()");
 
@@ -109,6 +112,21 @@ namespace Editor
 			ini["Window"]["Width"] = width;
 			ini["Window"]["Height"] = height;
 		}
+	}
+
+	// 일단 이벤트가 돌아간다. 좀 더 다듬자.
+	void Editor::OnResize(unsigned int data)
+	{
+		// 흐음... 이게 문제가 아니네...
+		if (!IsInitialized())   return;
+
+		unsigned int width = data & 0xFFFF;
+		unsigned int height = (data >> 16) & 0xFFFF;
+		auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
+		if (pGraphicsDevice->IsInitialized())
+			pGraphicsDevice->ResizeBuffers(width, height);
+
+		APP_INFO("Editor::OnResize()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	}
 
 	void Editor::initialize_ImGui()
