@@ -17,9 +17,6 @@ namespace Editor
 
 		void Render() override;
 
-		void ResizeWindow(unsigned int width, unsigned int height);
-		void OnResize(unsigned int data);
-
 	private:
 		void initialize_ImGui();
 		void beginDockSpace();
@@ -30,7 +27,6 @@ namespace Editor
 	private:
 		std::vector<std::shared_ptr<Widget>> m_widgets;
 
-		bool m_bMaximize;
 		bool m_bDockSpace;
 
 		bool m_bShowProjectDialog;

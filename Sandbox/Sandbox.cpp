@@ -5,6 +5,8 @@ namespace Sandbox
 	Sandbox::Sandbox()
 	{
 		m_pTriangle = nullptr;
+
+		m_title = "SandBox";
 	}
 
 	Sandbox::~Sandbox()

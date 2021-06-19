@@ -16,10 +16,7 @@ namespace Editor
 {
 	Editor::Editor()
 	{
-		m_iniFilePath = Dive::FileSystemHelper::GetWorkingDirectory() + "editor.ini";
-		m_bMaximize = false;
-
-		m_title = "diveEditor";
+		m_title = "DiveEditor";
 	}
 
 	Editor::~Editor()
@@ -32,21 +29,17 @@ namespace Editor
 		}
 	}
 
+	// 아무리봐도 상속은 에바같은데...
 	bool Editor::Initialize()
 	{
 		if (!Dive::Runtime::Initialize())
 			return false;
-
-		// 윈도우 크기를 변경한 후 Show?
 
 		// ImGui 초기화 및 Widget 생성
 		initialize_ImGui();
 
 		// RenderPath 적용
 		ActivatePath(&m_renderPathEditor);
-
-		// 생성자에서 구독하면 안된다. 시스템들이 생성되지 않은 상태이다.
-		EVENT_SUBSCRIBE(Dive::eEventType::ChangedResolution, EVENT_HANDLE_DATA(OnResize));
 
 		APP_TRACE("Editor::Initialize()");
 
@@ -95,38 +88,6 @@ namespace Editor
 
 		Compose();
 		graphicsDevice->PresentEnd();
-	}
-
-	// 이제 이 부분을 Runtime으로 옮겨야 한다.
-	void Editor::ResizeWindow(unsigned int width, unsigned int height)
-	{
-		// 이 부분때문인지 파일에 저장된 상태가 영....
-		Dive::IniHelper ini(m_iniFilePath);
-		if (IsZoomed(m_hWnd))
-		{
-			ini["Window"]["bMaximize"] = true;
-		}
-		else
-		{
-			ini["Window"]["bMaximize"] = false;
-			ini["Window"]["Width"] = width;
-			ini["Window"]["Height"] = height;
-		}
-	}
-
-	// 일단 이벤트가 돌아간다. 좀 더 다듬자.
-	void Editor::OnResize(unsigned int data)
-	{
-		// 흐음... 이게 문제가 아니네...
-		if (!IsInitialized())   return;
-
-		unsigned int width = data & 0xFFFF;
-		unsigned int height = (data >> 16) & 0xFFFF;
-		auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
-		if (pGraphicsDevice->IsInitialized())
-			pGraphicsDevice->ResizeBuffers(width, height);
-
-		APP_INFO("Editor::OnResize()!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	}
 
 	void Editor::initialize_ImGui()

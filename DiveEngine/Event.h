@@ -4,11 +4,15 @@
 #include <list>
 #include <vector>
 
+// 매개변수를 여러개 받을 수 있도록 할 수 없을까?
+// 그렇다면 Fire에서 전달도 여러개 해야겠지?
+// 구독 해제가 필요한가?
+// 이벤트는 어떻게 구성해야 할까?
+
 #define EVENT_HANDLE(callable)					[this](unsigned int data) {callable();}
 #define EVENT_HANDLE_STATIC(callable)			[](unsigned int data) {callable();}
 #define EVENT_HANDLE_DATA(callable)				[this](unsigned int data) {callable(data);}
 #define EVENT_HANDLE_DATA_STATIC(callable)		[](unsigned int data) {callable(data);}
-
 #define EVENT_SUBSCRIBE(eventID, callable)		Dive::EventManager::GetInstance().Subscribe(eventID, callable)
 #define EVENT_FIRE(eventID)						Dive::EventManager::GetInstance().FireEvent(eventID)
 #define EVENT_FIRE_DATA(eventID, eventData)		Dive::EventManager::GetInstance().FireEvent(eventID, eventData)
@@ -29,7 +33,6 @@ namespace Dive
 			return instance;
 		}
 		
-		// 이렇게하면 멤버 함수를 받지 못한다.
 		void Subscribe(const eEventType id, std::function<void(unsigned int)> callback)
 		{
 			m_subscribers[id].push_back(callback);

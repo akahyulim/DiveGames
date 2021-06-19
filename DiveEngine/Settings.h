@@ -26,6 +26,10 @@ namespace Dive
 		unsigned int GetHeight() const { return m_height; }
 		void SetHeight(unsigned int height);
 
+		bool IsFullScreen() const { return m_bFullScreen; }
+
+		bool IsBorderlessWindow() const { return m_bBorderless; }
+
 	private:
 
 	private:
@@ -36,6 +40,6 @@ namespace Dive
 		unsigned int m_height;
 		bool m_bMaximize;
 		bool m_bFullScreen;
-		bool m_bWindowed;
+		bool m_bBorderless;
 	};
 }

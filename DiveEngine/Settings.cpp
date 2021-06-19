@@ -10,6 +10,13 @@ namespace Dive
 		m_filename = FileSystemHelper::GetWorkingDirectory() + title + ".ini";
 
 		Load();
+
+		CORE_INFO("Application Setting Informations...");
+		CORE_INFO("Application Title : {:s}", title);
+		CORE_INFO("Window Resolution : {0:d}x{1:d}", m_width, m_height);
+		CORE_INFO("Window Maximize : {:b}", m_bMaximize);
+		CORE_INFO("Window FullScreen : {:b}", m_bFullScreen);
+		CORE_INFO("Window Borderless : {:b}", m_bBorderless);
 	}
 
 	void Settings::Default()
@@ -19,7 +26,7 @@ namespace Dive
 		ini["Window"]["Height"] = 600;
 		ini["Window"]["bMaximize"] = false;
 		ini["Window"]["bFullScreen"] = false;
-		ini["Window"]["bWindowed"] = false;
+		ini["Window"]["bBorderless"] = false;
 
 		Load();
 	}
@@ -31,7 +38,7 @@ namespace Dive
 		ini["Window"]["Height"] = m_height;
 		ini["Window"]["bMaximize"] = m_bMaximize;
 		ini["Window"]["bFullScreen"] = m_bFullScreen;
-		ini["Window"]["bWindowed"] = m_bWindowed;
+		ini["Window"]["bBorderless"] = m_bBorderless;
 	}
 
 	void Settings::Load()
@@ -44,7 +51,7 @@ namespace Dive
 		m_height = ini["Window"]["Height"];
 		m_bMaximize = ini["Window"]["bMaximize"];
 		m_bFullScreen = ini["Window"]["bFullScreen"];
-		m_bWindowed = ini["Window"]["bWindowed"];
+		m_bBorderless = ini["Window"]["bBorderless"];
 	}
 
 	void Settings::SetWidth(unsigned int width)

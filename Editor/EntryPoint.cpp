@@ -122,24 +122,10 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-   // 역시 위치가 에바다.
-   // 현재 Editor가 생성자에서 FilePath를 초기화 하였지만
-   // Settings를 사용한다면 Editor가 초기화를 끝낸 후에나 불러 올 수 있다.
-   // 가장 깔끔한 방법은 역시나 초반엔 윈도우를 숨기고,
-   // Editor나 Runtime에서 크기를 확정한 후 Show하는 거다. 
-   Dive::IniHelper ini(g_pEditor->GetIniFilePath());
-   bool bMaximize   = ini["Window"]["bMaximize"] << false;
-   int width        = ini["Window"]["Width"] << 800;
-   int height       = ini["Window"]["Height"] << 600;
-   int posX         = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
-   int posY         = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
-
-   if (!Dive::FileSystemHelper::FileExists(g_pEditor->GetIniFilePath()))
-   {
-       ini["Window"]["Width"] = width;
-       ini["Window"]["Height"] = height;
-       ini["Window"]["bMaximize"] = bMaximize;
-   }
+   int width    =  800;
+   int height   = 600;
+   int posX     = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+   int posY     = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       posX, posY, width, height, nullptr, nullptr, hInstance, nullptr);
@@ -151,9 +137,8 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    g_pEditor->SetWindow(hWnd, false);
 
-   ShowWindow(hWnd, bMaximize ? SW_MAXIMIZE : SW_SHOWDEFAULT);
-   UpdateWindow(hWnd);
-
+   ShowWindow(hWnd, SW_HIDE);
+  
    return TRUE;
 }
 
@@ -175,23 +160,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_SIZE:
-        {
-            // 메시지로 날리면 초기화 확인 같은건 안해도 될거다.
-            // 그리고 아래 에디터에서 호출하는 함수도
-            // Runtime에서 이벤트로 받을 수 있다.
-            EVENT_FIRE_DATA(Dive::eEventType::ChangedResolution, wParam);
-
-          //  if (!g_pEditor->IsInitialized())   return 0;
-            unsigned int width = lParam & 0xFFFF;
-            unsigned int height = (lParam >> 16) & 0xFFFF;
-          //  auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
-          //  if (pGraphicsDevice->IsInitialized())
-          //      pGraphicsDevice->ResizeBuffers(width, height);
-
-            // ini를 갱신해야 한다.
-            // 에디터가 아닌 Runtime에 구현해야한다.
-            g_pEditor->ResizeWindow(width, height);
-        }
+           EVENT_FIRE_DATA(Dive::eEventType::ChangedResolution, static_cast<unsigned int>(lParam));
         break;
     case WM_DPICHANGED:
         {

@@ -152,8 +152,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    // 해상도를 맞추려면 크기를 변경해야 한다.
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
+//   ShowWindow(hWnd, nCmdShow);
+ //  UpdateWindow(hWnd);
+   ShowWindow(hWnd, SW_HIDE);
 
    return TRUE;
 }
@@ -175,18 +176,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_SIZE:
-        // 일단은 직접 보내보자.
-        {        
-        if (!g_pApp->IsInitialized()) return 0;
-        auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
-        if (pGraphicsDevice->IsInitialized())
-        {
-            unsigned int width = lParam & 0xFFFF;
-            unsigned int height = (lParam >> 16) & 0xFFFF;
-            APP_TRACE("Call Resize Resolution : {0:d} x {1:d}", width, height);
-            pGraphicsDevice->ResizeBuffers(width, height);
-        }
-        }
+        EVENT_FIRE_DATA(Dive::eEventType::ChangedResolution, lParam);
         break;
     case WM_COMMAND:
         {

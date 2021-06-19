@@ -45,6 +45,12 @@ namespace Dive
 
 		AssetManager* GetAssetManager() { return m_pAssetManager; }
 
+
+
+		void OnResizeResolution(unsigned int data);
+
+	protected:
+
 	protected:
 		std::string m_title;
 
