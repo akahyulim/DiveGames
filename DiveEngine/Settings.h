@@ -3,6 +3,13 @@
 
 namespace Dive
 {
+	enum class eWindowModes : unsigned short
+	{
+		Windowed,
+		Borderless,
+		FullScreen,
+	};
+
 	// 그냥 다 때려박고 싱글톤으로 만들자.
 	class Settings
 	{
@@ -26,11 +33,18 @@ namespace Dive
 		unsigned int GetHeight() const { return m_height; }
 		void SetHeight(unsigned int height);
 
+		bool IsMaximize() const { return m_bMaximize; }
+		void SetMaximize(bool maximize) { m_bMaximize = maximize; }
+
 		bool IsFullScreen() const { return m_bFullScreen; }
+		void SetFullScreen(bool fullScreen) { m_bFullScreen = fullScreen; }
 
 		bool IsBorderlessWindow() const { return m_bBorderless; }
+		void SetBorderlessWindow(bool borderless) { m_bBorderless = borderless; }
 
-	private:
+		eWindowModes GetWindowMode();
+		void SetWindowMode(eWindowModes mode);
+
 
 	private:
 		std::string m_filename;
@@ -41,5 +55,6 @@ namespace Dive
 		bool m_bMaximize;
 		bool m_bFullScreen;
 		bool m_bBorderless;
+		eWindowModes m_windowMode;
 	};
 }

@@ -1,6 +1,5 @@
 #include "Runtime.h"
 #include "Log.h"
-#include "Settings.h"
 #include "Timer.h"
 #include "ThreadPool.h"
 #include "RenderPath.h"
@@ -43,68 +42,16 @@ namespace Dive
 		Log::Initialize();
 		Settings::GetInstance().Initialize(m_title);
 
-		// 결국 이건 옵션 등에서 변경할 때 재활용할 수 있게 만들어야 한다.
-		// 즉, 이전 값과의 비교가 필요할 수 있다.
+		// 윈도우 모드, 크기가 매개변수 대상이다.
 		{
-			unsigned int width = Settings::GetInstance().GetWidth();
-			unsigned int height = Settings::GetInstance().GetHeight();
-			unsigned int posX = 0;
-			unsigned int posY = 0;
-			bool bFullScreen = Settings::GetInstance().IsFullScreen();
-			if (bFullScreen)
-			{
-				// 현재 전체 창모드가 되어버린다.
-				width = GetSystemMetrics(SM_CXSCREEN);
-				height = GetSystemMetrics(SM_CYSCREEN);
-
-				DEVMODE dmScreenSettings;
-				memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
-				dmScreenSettings.dmSize = sizeof(dmScreenSettings);
-				dmScreenSettings.dmPelsWidth = (unsigned long)width;
-				dmScreenSettings.dmPelsHeight = (unsigned long)height;
-				dmScreenSettings.dmBitsPerPel = 32;
-				dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
-
-				ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
-			}
-			else
-			{
-				bool bBorderless = Settings::GetInstance().IsBorderlessWindow();
-				auto style = GetWindowLong(m_hWnd, GWL_STYLE);
-				if (bBorderless)
-				{
-					if (style != WS_POPUP)
-					{
-						SetWindowLong(m_hWnd, GWL_STYLE, WS_POPUP);
-					}
-				}
-				else
-				{
-					// maximize는 여기서만 적용된다.
-					if (style != WS_OVERLAPPEDWINDOW)
-					{
-
-						SetWindowLong(m_hWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW);
-
-						RECT rt = { 0, 0, (LONG)width, (LONG)height };
-						AdjustWindowRect(&rt, WS_OVERLAPPEDWINDOW, 0);
-
-						width = rt.right - rt.left;
-						height = rt.bottom - rt.top;
-					}
-				}
-
-				posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
-				posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
-			}
-
-			// 마지막으로 윈도우 크기를 변경한 후 Show
-			// 기존 크기와 같은지 확인해야 한다. => 이건 일단 미루자.
-			SetWindowPos(m_hWnd, NULL, posX, posY, width, height, 0);
-
-			ShowWindow(m_hWnd, SW_SHOWDEFAULT);
-			UpdateWindow(m_hWnd);
-
+			auto& settings = Settings::GetInstance();
+			eWindowModes mode = settings.GetWindowMode();
+			bool maximize = settings.IsMaximize();
+			unsigned int width = settings.GetWidth();
+			unsigned int height = settings.GetHeight();
+			
+			// override하려면 매개변수를 전달하는 게 맞다.
+			ModifyWindow(mode, width, height, maximize);
 		}
 
 		// 원래 SetWindow에서 호출하던 부분 =============================================
@@ -275,32 +222,82 @@ namespace Dive
 		//CORE_TRACE("Runtime::SetWindow()");
 	}
 
+	// 그냥 App용으로 만들고 Editor는 override시키자.
+	void Runtime::ModifyWindow(eWindowModes mode, unsigned int width, unsigned height, bool maximize)
+	{
+		unsigned int posX = 0;
+		unsigned int posY = 0;
+
+		if (mode == eWindowModes::FullScreen)
+		{
+			// 현재 전체 창모드가 되어버린다.
+			width = GetSystemMetrics(SM_CXSCREEN);
+			height = GetSystemMetrics(SM_CYSCREEN);
+
+			DEVMODE dmScreenSettings;
+			memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
+			dmScreenSettings.dmSize = sizeof(dmScreenSettings);
+			dmScreenSettings.dmPelsWidth = static_cast<DWORD>(width);
+			dmScreenSettings.dmPelsHeight = static_cast<DWORD>(height);
+			dmScreenSettings.dmBitsPerPel = 32;
+			dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+
+			ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
+		}
+		else
+		{
+			LONG style = 0;
+
+			if (mode == eWindowModes::Windowed)
+			{
+				style = WS_CAPTION | WS_THICKFRAME | WS_SYSMENU | WS_MINIMIZEBOX;
+
+				RECT rt = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+				AdjustWindowRect(&rt, style, 0);
+
+				width = rt.right - rt.left;
+				height = rt.bottom - rt.top;
+			}
+			else
+			{
+				style = WS_POPUP;
+			}
+
+			SetWindowLong(m_hWnd, GWL_STYLE, style);
+
+			posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+			posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
+		}
+
+		SetWindowPos(m_hWnd, NULL, posX, posY, width, height, 0);
+
+		ShowWindow(m_hWnd, SW_SHOWDEFAULT);
+		UpdateWindow(m_hWnd);
+	}
+
 	// 전체크기... 즉 Resolution이 변경되는 거다.
 	void Runtime::OnResizeResolution(unsigned int data)
 	{
 		unsigned int width = data & 0xFFFF;
 		unsigned int height = (data >> 16) & 0xFFFF;
 
-		APP_INFO("Editor::OnResizeResolution() : {0:d}x{1:d}", width, height);
+		CORE_INFO("Editor::OnResizeResolution() : {0:d}x{1:d}", width, height);
 
-		auto pGraphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
+		auto pGraphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
 		if (pGraphicsDevice->IsInitialized())
 			pGraphicsDevice->ResizeBuffers(width, height);
 
-		// 일단 이 부분은 Setting로 갱싱되어야 한다.
-		// 그리고 매번 저장하는 것 보단
-		// 꼭 저장해야할 시점에 확인이 필요하므로 함수화하는 게 맞다.
-		// 그런데 각각의 요소가 여러 시스템에 퍼져있다는게 문제다.
-		IniHelper ini(m_iniFilePath);
+		// 이번엔 크기 저장이 좀 이상하다.
+		auto& settings = Settings::GetInstance();
 		if (IsZoomed(m_hWnd))
 		{
-			ini["Window"]["bMaximize"] = true;
+			settings.SetMaximize(true);
 		}
 		else
 		{
-			ini["Window"]["bMaximize"] = false;
-			ini["Window"]["Width"] = width;
-			ini["Window"]["Height"] = height;
+			settings.SetMaximize(false);
+			settings.SetWidth(width);
+			settings.SetHeight(height);
 		}
 	}
 }

@@ -17,6 +17,8 @@ namespace Editor
 
 		void Render() override;
 
+		void ModifyWindow(Dive::eWindowModes mode, unsigned int width, unsigned int height, bool maximize) override;
+
 	private:
 		void initialize_ImGui();
 		void beginDockSpace();

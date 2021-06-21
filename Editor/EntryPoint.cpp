@@ -122,7 +122,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
 
-   int width    =  800;
+   int width    = 800;
    int height   = 600;
    int posX     = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
    int posY     = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
@@ -160,7 +160,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_SIZE:
-           EVENT_FIRE_DATA(Dive::eEventType::ChangedResolution, static_cast<unsigned int>(lParam));
+        EVENT_FIRE_DATA(Dive::eEventType::ChangedResolution, static_cast<unsigned int>(lParam));
         break;
     case WM_DPICHANGED:
         {
@@ -204,6 +204,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }
         break;
     case WM_DESTROY:
+        Dive::Settings().GetInstance().Save();
         PostQuitMessage(0);
         break;
     default:

@@ -58,7 +58,7 @@ namespace Dive
 		void SetViewport(float width, float height, float offsetX = 0.0f, float offsetY = 0.0f);
 
 		// RenderTarget용 크기이다.
-		const DirectX::XMINT2& GetResolution() const { m_resolution; }
+		const DirectX::XMINT2& GetResolution() const { return m_resolution; }
 		void SetResolution(unsigned int width, unsigned int height);
 
 		// update와 draw가 있다.

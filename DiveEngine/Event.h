@@ -22,6 +22,7 @@ namespace Dive
 	enum class eEventType
 	{
 		ChangedResolution,
+		QuitApplication,
 	};
 
 	class EventManager

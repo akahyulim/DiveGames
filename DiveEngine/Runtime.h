@@ -1,5 +1,6 @@
 #pragma once
 #include "GraphicsDevice.h"
+#include "Settings.h"
 #include <Windows.h>
 #include <string>
 
@@ -45,7 +46,7 @@ namespace Dive
 
 		AssetManager* GetAssetManager() { return m_pAssetManager; }
 
-
+		virtual void ModifyWindow(eWindowModes mode, unsigned int width, unsigned height, bool maximize);
 
 		void OnResizeResolution(unsigned int data);
 

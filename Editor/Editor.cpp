@@ -29,7 +29,6 @@ namespace Editor
 		}
 	}
 
-	// 아무리봐도 상속은 에바같은데...
 	bool Editor::Initialize()
 	{
 		if (!Dive::Runtime::Initialize())
@@ -88,6 +87,31 @@ namespace Editor
 
 		Compose();
 		graphicsDevice->PresentEnd();
+	}
+
+	// 에디터는 무조건 윈도우 모드다.
+	void Editor::ModifyWindow(Dive::eWindowModes mode, unsigned int width, unsigned int height, bool maximize)
+	{
+		unsigned int posX = 0;
+		unsigned int posY = 0;
+
+		LONG style = WS_OVERLAPPEDWINDOW;
+
+		RECT rt = { 0, 0, static_cast<LONG>(width), static_cast<LONG>(height) };
+		AdjustWindowRect(&rt, style, 0);
+
+		width = rt.right - rt.left;
+		height = rt.bottom - rt.top;
+			
+		SetWindowLong(m_hWnd, GWL_STYLE, style);
+
+		posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+		posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
+		
+		SetWindowPos(m_hWnd, NULL, posX, posY, width, height, 0);
+
+		ShowWindow(m_hWnd, maximize ? SW_MAXIMIZE : SW_SHOWDEFAULT);
+		UpdateWindow(m_hWnd);
 	}
 
 	void Editor::initialize_ImGui()
