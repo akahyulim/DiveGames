@@ -388,6 +388,9 @@
     <ClInclude Include="Event.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Engine\Scene\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -473,6 +476,9 @@
     </ClCompile>
     <ClCompile Include="Settings.cpp">
       <Filter>Engine\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

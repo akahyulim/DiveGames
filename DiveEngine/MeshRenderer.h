@@ -4,24 +4,24 @@
 
 namespace Dive
 {
-	// 그릴 때 사용하는 데이터를 전달한다.
-	// 즉, Buffer, Offset, Count 등을 가져야 한다.
-	// Renderable이라는 이름도 크게 나쁘진 않다.
+	// 일단 이건 base로 한다.
+	// 추후 2D, Static, Skinned로 나뉠 수 있다.
+	// 프리팹은 좀 더 나중에 생각하자.
 	class MeshRenderer : public Component
 	{
 	public:
 	private:
 	private:
-		// 이렇게 한다는건 Spartan 모델을 따르겠다는 거다.
-		// 그리고 static, skinned에 따라 구분되어야 한다.
-		dvMesh* m_pMesh;
-		unsigned int m_vertexOffset;
-		unsigned int m_vertexCount;
-		unsigned int m_indexOffset;
-		unsigned int m_indexCount;
-		
+		// Mesh : 리소스다.
 		// Material: 텍스쳐, 색 등
 		// Lighting
 		
+		// vertex buffer
+		// index buffer
+
+		// 부위가 나뉠 수 있다.
+		// 나뉜다면 해당 부위별 GameObejct(Transform)과 vertices, indices의 offset 및 count를 관리해야 한다.
+		// 그래야 그릴 때 나눌 수 있다.
+		// 그런데 유니티엔 MeshRenderer도 Transform이 당연히 있다. 이건 의미가 없는건가?
 	};
 }

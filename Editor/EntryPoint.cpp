@@ -160,6 +160,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
     case WM_SIZE:
+        // MINIZE 문제가 발생한다.
         EVENT_FIRE_DATA(Dive::eEventType::ChangedResolution, static_cast<unsigned int>(lParam));
         break;
     case WM_DPICHANGED:

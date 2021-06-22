@@ -10,8 +10,7 @@
 #include "Inspector.h"
 #include <iostream>
 
-// ini 관련은 다시 Engine 쪽으로 옮겨야 한다.
-// Settings가 맞는 것 같다.
+
 namespace Editor
 {
 	Editor::Editor()
@@ -89,7 +88,6 @@ namespace Editor
 		graphicsDevice->PresentEnd();
 	}
 
-	// 에디터는 무조건 윈도우 모드다.
 	void Editor::ModifyWindow(Dive::eWindowModes mode, unsigned int width, unsigned int height, bool maximize)
 	{
 		unsigned int posX = 0;

@@ -6,7 +6,7 @@
 
 namespace Dive
 {
-	struct dvMesh;
+	class dvMesh;
 
 	// 모델은 오브젝트의 부위 메시가 아니다.
 	// 하나의 전체 오브젝트(혹은 rigid, skinned로 구분되는 것)임을 염두해야 한다. 

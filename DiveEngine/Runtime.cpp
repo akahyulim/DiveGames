@@ -29,6 +29,13 @@ namespace Dive
 		}
 	}
 
+	//==========================================================================================//
+	// 1. 태생적으로 순서에 민감할 수 밖에 없다.												//
+	// 2. 추후 Graphics Device Setting와 같이 추가 설정 객체가 필요할 수 있다.					//
+	// 3. Multi-Thread를 적용하지 않았다.														//
+	// 4. Renderer와 Graphics의 생성 과정을 수정해야 한다.										//
+	// 참고한 인터페이스는 멀티 플랫폼 지원을 염두해 둔 것이다.									//
+	//==========================================================================================//
 	bool Runtime::Initialize()
 	{
 		assert(m_hWnd != 0);
@@ -38,34 +45,27 @@ namespace Dive
 			return false;
 		}
 
-		// 순서에 유념해야 한다.
 		Log::Initialize();
 		Settings::GetInstance().Initialize(m_title);
 
-		// 윈도우 모드, 크기가 매개변수 대상이다.
 		{
 			auto& settings = Settings::GetInstance();
 			eWindowModes mode = settings.GetWindowMode();
+			if (mode == eWindowModes::FullScreen)
+				m_bFullScreen = true;
+			else
+				m_bFullScreen = false;
 			bool maximize = settings.IsMaximize();
 			unsigned int width = settings.GetWidth();
 			unsigned int height = settings.GetHeight();
 			
-			// override하려면 매개변수를 전달하는 게 맞다.
 			ModifyWindow(mode, width, height, maximize);
 		}
 
-		// 원래 SetWindow에서 호출하던 부분 =============================================
-		// Backbuffer의 크기 설정을 늦추기 위해 이 곳으로 옮겼다.
-		// 하지만 Wicked의 경우 Renderer::Initialize() 과정의 마지막에 WM_SIZE 이벤트를 받도록 하여
-		// ReiszeBuffers()를 호출토록 하였다. 
+		// 이 부분을 아래 Renderer::GetInstance().Initialize()에 통합하자.
 		auto& renderer = Renderer::GetInstance();
-		// 그런데 이렇게 Set을 할 필요가 있나? 이건 멀티플랫폼의 잔재 같은데...
 		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(m_hWnd, m_bFullScreen));
-		//===============================================================================
 
-		// 일단 싱글 쓰레드로 간다.
-		// 이후 laoding은 asyn로 하고, parallel은 최후로 미룬다.
-		// 전부 bool 타입으로 바꾸자
 		TimeManager::GetInstance().Initialize();
 		Renderer::GetInstance().Initialize();
 		Input::GetInstance().Initialize(m_hWnd);
@@ -105,8 +105,6 @@ namespace Dive
 
 			if (fixedFrameAccumulator >= TimeManager::GetInstance().GetFixedFrameRate())
 			{
-				//CORE_TRACE("FixedUpdate Frame: {:n}", TimeManager::GetInstance().GetFrameCount());
-
 				FixedUpdate();
 				fixedFrameAccumulator = 0.0f;
 			}
@@ -124,8 +122,6 @@ namespace Dive
 			}
 			else
 			{
-				//CORE_TRACE("Unlock Update Frame: {:n}", TimeManager::GetInstance().GetFrameCount());
-
 				Update(delta);
 				Input::GetInstance().Update();
 				Render();
@@ -217,12 +213,12 @@ namespace Dive
 	{
 		m_hWnd = windowHandle;
 		m_bFullScreen = fullScreen;
-
-		// 로그 객체가 생성되지 않았다.
-		//CORE_TRACE("Runtime::SetWindow()");
 	}
 
-	// 그냥 App용으로 만들고 Editor는 override시키자.
+	//==================================================================================================//
+	// 1. Virtual로 구현했다. Editor는 오직 Windowed만 필요하기 때문이다.								//
+	// 2. FullScreen의 Size는 크기가 아니라 해상도다. 이는 추후 좀 더 생각해보자.						//
+	//==================================================================================================//										
 	void Runtime::ModifyWindow(eWindowModes mode, unsigned int width, unsigned height, bool maximize)
 	{
 		unsigned int posX = 0;
@@ -230,7 +226,6 @@ namespace Dive
 
 		if (mode == eWindowModes::FullScreen)
 		{
-			// 현재 전체 창모드가 되어버린다.
 			width = GetSystemMetrics(SM_CXSCREEN);
 			height = GetSystemMetrics(SM_CYSCREEN);
 
@@ -275,7 +270,10 @@ namespace Dive
 		UpdateWindow(m_hWnd);
 	}
 
-	// 전체크기... 즉 Resolution이 변경되는 거다.
+	//==============================================================================//
+	// 1. Minimize시 크기가 0, 0으로 전달된다.										//
+	// 이때 Backbuffer와 RenderTarget의 크기를 0, 0으로 변경해야하나?				//
+	//==============================================================================//
 	void Runtime::OnResizeResolution(unsigned int data)
 	{
 		unsigned int width = data & 0xFFFF;
@@ -287,7 +285,6 @@ namespace Dive
 		if (pGraphicsDevice->IsInitialized())
 			pGraphicsDevice->ResizeBuffers(width, height);
 
-		// 이번엔 크기 저장이 좀 이상하다.
 		auto& settings = Settings::GetInstance();
 		if (IsZoomed(m_hWnd))
 		{

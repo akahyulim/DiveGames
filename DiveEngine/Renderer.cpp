@@ -314,6 +314,19 @@ namespace Dive
 		//pImmediateContext->DrawIndexed(m_pTextMesh->GetIndexCount(), 0, 0);
 	}
 
+	// 스파르탄은 이벤트 callback 함수다.
+	// 그런데 현재 내 이벤트 시스템에선 Variant를 매개변수로 받을 수 없다.
+	void Renderer::ObjectClassify()
+	{
+		// 모든 GameObject를 순회하면서 Component 여부로 나누어 저장한다.
+		// Opaque와 Transparent의 구분은 Material을 이용한다.
+
+		// Opaque와 Transparent는 근거리순으로 비교하여 재정렬한다.
+
+		// 근데 업데이트 주기는 어떻게 되는걸까?
+		// 그리고 Frustum Culling을 여기에서 적용하는건 무리인가?
+	}
+
 	void Renderer::SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device)
 	{
 		m_pGraphicsDevice = device;

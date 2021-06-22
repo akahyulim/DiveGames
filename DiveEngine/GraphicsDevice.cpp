@@ -107,10 +107,11 @@ namespace Dive
 	//==========================================================================================//
 	// 누가 호출할 것인지 아직 정하지 못했다.													//
 	// RenderTarget 해제를 하지 않았다.															//
+	// WM_SIZE에서 Minimize시 0, 0을 전달한다.													//
 	//==========================================================================================//
 	void GraphicsDevice::ResizeBuffers(unsigned int width, unsigned int height)
 	{
-		if ((width != m_resolutionWidth) || (height != m_resolutionHeight) && (width > 0) && (height > 0))
+		if ((width != m_resolutionWidth) || (height != m_resolutionHeight))// && (width > 0) && (height > 0))
 		{
 			//m_pImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
 

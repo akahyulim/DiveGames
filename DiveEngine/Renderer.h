@@ -14,6 +14,7 @@
 // Provides other helper functions
 namespace Dive
 {
+	class GameObject;
 	class TextMesh;
 
 	enum class eRenderTargets
@@ -25,18 +26,13 @@ namespace Dive
 		Frame_Ldr,	// 사실 뭔지 모른다.
 	};
 
-	enum class eVisibilityType
+	// 그려질 대상들
+	enum class eObjectType
 	{
-		Invalid = 0,
-		Objects,
-		Lights,
-	};
-
-	class Visibility
-	{
-	public:
-	private:
-		// frustum도 있다.
+		Opaque,
+		Transparent,
+		Light,
+		Camera,
 	};
 
 	// PipelineState
@@ -71,6 +67,7 @@ namespace Dive
 		void DrawTexturing();
 		void DrawText();
 
+		void ObjectClassify();
 
 		GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice.get(); }
 		void SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device);
@@ -130,7 +127,7 @@ namespace Dive
 
 		std::unordered_map<eRenderTargets, Texture*> m_renderTargets;
 
-
+		std::unordered_map<eObjectType, std::vector<GameObject*>> m_gameObjects;
 
 		// texturing test
 		//Texture* m_pTex = nullptr;

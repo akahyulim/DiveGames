@@ -196,6 +196,7 @@ namespace Dive
 		auto height = m_resolution.y;
 
 		// 다시 크기 확인을 한다.
+		// 크기가 맞지 않다고 생성을 안해버리는게 맞나?
 		if ((width / 4) == 0 || (height / 4) == 0)
 		{
 			CORE_WARN("{0:d}x{1:d}는 지원하지 않는 해상도입니다.", width, height);
