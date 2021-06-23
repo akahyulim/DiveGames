@@ -3,7 +3,7 @@
 #include "External/ft2build.h"
 #include FT_FREETYPE_H
 
-namespace Dive
+namespace dive
 {
 	class FontImporter
 	{

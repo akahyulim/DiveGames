@@ -12,7 +12,7 @@
 // Fucntion to draw a scene, shadows, post processes.
 // Manager of GraphicsDevice Instance
 // Provides other helper functions
-namespace Dive
+namespace dive
 {
 	class GameObject;
 	class TextMesh;

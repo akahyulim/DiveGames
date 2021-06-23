@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Dive
+namespace dive
 {
 	enum class eBufferType
 	{

@@ -1,7 +1,7 @@
 #include "GraphicsDevice.h"
 #include "Log.h"
 
-namespace Dive
+namespace dive
 {
 	// debugLayer에 맞춰 디버그 데이터 출력도 염두해 둘려면
 	// 해당 매개변수를 저장하는게 낫다.

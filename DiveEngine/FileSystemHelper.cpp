@@ -10,7 +10,7 @@
 //===============================
 
 
-namespace Dive
+namespace dive
 {
 	namespace FileSystemHelper
 	{

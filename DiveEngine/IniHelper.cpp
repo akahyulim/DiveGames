@@ -1,40 +1,40 @@
 #include "IniHelper.h"
 
-namespace Dive
+namespace dive
 {
 	Key::Key(const std::string& fileName, const std::string& sectionName, const std::string& keyName)
-		: m_fileName(fileName), m_sectionName(sectionName), m_keyName(keyName)
+		: mFileName(fileName), mSectionName(sectionName), mKeyName(keyName)
 	{
-		m_defaultStrValue = "";
+		mDefaultStringValue = "";
 	}
 
 	Key::operator int()
 	{
-		auto value = getKeyValue(m_defaultIntValue, "%d");
+		auto value = getKeyValue(mDefaultIntValue, "%d");
 		return std::stoi(value.c_str());
 	}
 
 	Key::operator unsigned int()
 	{
-		auto value = getKeyValue(m_defaultIntValue, "%d");
+		auto value = getKeyValue(mDefaultIntValue, "%d");
 		return std::stoi(value.c_str());
 	}
 
 	Key::operator bool()
 	{
-		auto value = getKeyValue(m_bDefaultBoolValue, "%d");
+		auto value = getKeyValue(mbDefaultBoolValue, "%d");
 		return std::stoi(value.c_str()) == 0 ? false : true;
 	}
 
 	Key::operator double()
 	{
-		auto value = getKeyValue(m_defaultDoubleValue, "%.4f");
+		auto value = getKeyValue(mDefaultDoubleValue, "%.4f");
 		return std::stod(value.c_str());
 	}
 
 	Key::operator std::string()
 	{
-		auto value = getKeyValue(m_defaultStrValue.c_str(), "%s");
+		auto value = getKeyValue(mDefaultStringValue.c_str(), "%s");
 		return value;
 	}
 
@@ -76,56 +76,56 @@ namespace Dive
 
 	Key& Key::operator<<(int value)
 	{
-		m_defaultIntValue = value;
+		mDefaultIntValue = value;
 		return *this;
 	}
 
 	Key& Key::operator<<(unsigned int value)
 	{
-		m_defaultIntValue = value;
+		mDefaultIntValue = value;
 		return *this;
 	}
 
 	Key& Key::operator<<(bool value)
 	{
-		m_bDefaultBoolValue = value;
+		mbDefaultBoolValue = value;
 		return *this;
 	}
 
 	Key& Key::operator<<(double value)
 	{
-		m_defaultDoubleValue = value;
+		mDefaultDoubleValue = value;
 		return *this;
 	}
 
 	Key& Key::operator<<(const char* value)
 	{
-		m_defaultStrValue = value;
+		mDefaultStringValue = value;
 		return *this;
 	}
 
 	Key& Key::operator<<(std::string value)
 	{
-		m_defaultStrValue = std::move(value);
+		mDefaultStringValue = std::move(value);
 		return *this;
 	}
 
 	Section::Section(const std::string& fileName, const std::string& sectionName)
-		: m_fileName(fileName), m_sectionName(sectionName)
+		: mFileName(fileName), mSectionName(sectionName)
 	{}
 
 	Key Section::operator[](const std::string& keyName)
 	{
-		return Key(m_fileName, m_sectionName, keyName);
+		return Key(mFileName, mSectionName, keyName);
 	}
 
 	IniHelper::IniHelper(const std::string fileName)
-		: m_fileName(fileName)
+		: mFileName(fileName)
 	{
 	}
 
 	Section IniHelper::operator[](const std::string& sectionName)
 	{
-		return Section(m_fileName, sectionName);
+		return Section(mFileName, sectionName);
 	}
 }

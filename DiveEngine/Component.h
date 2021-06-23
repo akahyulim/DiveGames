@@ -1,7 +1,7 @@
 #pragma once
 #include "Object.h"
 
-namespace Dive
+namespace dive
 {
 	class GameObject;
 	class FileStream;

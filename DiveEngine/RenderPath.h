@@ -2,7 +2,7 @@
 #include "GraphicsDevice.h"
 
 // override this(fucntion) to perform custom gameplay or rendering logic
-namespace Dive
+namespace dive
 {
 	class RenderPath
 	{

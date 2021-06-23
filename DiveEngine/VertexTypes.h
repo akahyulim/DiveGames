@@ -1,7 +1,7 @@
 #pragma once
 #include "CommonInclude.h"
 
-namespace Dive
+namespace dive
 {
 	struct Vertex_Pos
 	{

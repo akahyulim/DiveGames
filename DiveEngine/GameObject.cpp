@@ -3,7 +3,7 @@
 #include "Scene.h"
 #include "Log.h"
 
-namespace Dive
+namespace dive
 {
 	GameObject::GameObject()
 		: Object(typeid(GameObject).hash_code()),

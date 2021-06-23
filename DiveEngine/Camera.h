@@ -2,7 +2,7 @@
 #include "Component.h"
 
 
-namespace Dive
+namespace dive
 {
 	class Camera : public Component
 	{

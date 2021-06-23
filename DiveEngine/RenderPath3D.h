@@ -4,7 +4,7 @@
 
 // Basic class for 3d rendering paths.
 // The post proecess chain is also implemented here.
-namespace Dive
+namespace dive
 {
 	class RenderPath3D : public RenderPath
 	{

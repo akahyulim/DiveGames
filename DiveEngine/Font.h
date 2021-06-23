@@ -10,7 +10,7 @@
 // => 그냥 해당 폰트 파일에 적재된 모든 문자를 만들면 안되나?
 // 2. Outline을 적용할 것인가?
 
-namespace Dive
+namespace dive
 {
 	struct Glyph
 	{

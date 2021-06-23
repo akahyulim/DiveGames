@@ -4,7 +4,7 @@
 #include "CommonInclude.h"
 #include <Windows.h>
 
-namespace Dive
+namespace dive
 {
 	class GraphicsDevice
 	{

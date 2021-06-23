@@ -5,7 +5,7 @@
 #include "TextMesh.h"
 #include <assert.h>
 
-namespace Dive
+namespace dive
 {
 	Renderer::Renderer()
 	{

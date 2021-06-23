@@ -1,6 +1,6 @@
 #include "TextMesh.h"
 
-namespace Dive
+namespace dive
 {
 	TextMesh::TextMesh()
 		: Component(typeid(TextMesh).hash_code())

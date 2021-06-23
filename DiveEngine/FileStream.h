@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace Dive
+namespace dive
 {
 	enum class eFileStreamMode
 	{
@@ -19,7 +19,7 @@ namespace Dive
 		FileStream(const std::string& filepath, eFileStreamMode mode);
 		~FileStream();
 
-		bool IsOpen() const { return m_bOpened; }
+		bool IsOpen() const { return mbFileOpened; }
 		void Close();
 
 		// ÀÐ±â
@@ -37,7 +37,7 @@ namespace Dive
 			>::type>
 		void Read(T* value)
 		{
-			m_in.read(reinterpret_cast<char*>(value), sizeof(T));
+			m_InputStream.read(reinterpret_cast<char*>(value), sizeof(T));
 		}
 
 		template<class T, class = typename std::enable_if <
@@ -82,7 +82,7 @@ namespace Dive
 		>::type>
 		void Write(T value)
 		{
-			m_out.write(reinterpret_cast<char*>(&value), sizeof(T));
+			mOutputStream.write(reinterpret_cast<char*>(&value), sizeof(T));
 		}
 
 		void Write(const std::string& value);
@@ -93,9 +93,9 @@ namespace Dive
 	//	void Write(const std::vector<Vertex_PosTexNorTan>& vec);
 
 	private:
-		std::ofstream m_out;
-		std::ifstream m_in;
-		eFileStreamMode m_mode;
-		bool m_bOpened;
+		std::ofstream mOutputStream;
+		std::ifstream m_InputStream;
+		eFileStreamMode mStreamMode;
+		bool mbFileOpened;
 	};
 }

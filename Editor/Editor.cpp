@@ -30,7 +30,7 @@ namespace Editor
 
 	bool Editor::Initialize()
 	{
-		if (!Dive::Runtime::Initialize())
+		if (!dive::Runtime::Initialize())
 			return false;
 
 		// ImGui 초기화 및 Widget 생성
@@ -46,7 +46,7 @@ namespace Editor
 
 	void Editor::Render()
 	{
-		auto graphicsDevice = Dive::Renderer::GetInstance().GetGraphicsDevice();
+		auto graphicsDevice = dive::Renderer::GetInstance().GetGraphicsDevice();
 		graphicsDevice->PresentBegin();
 
 		// ImGui에서 그리는 부분
@@ -88,7 +88,7 @@ namespace Editor
 		graphicsDevice->PresentEnd();
 	}
 
-	void Editor::ModifyWindow(Dive::eWindowModes mode, unsigned int width, unsigned int height, bool maximize)
+	void Editor::ModifyWindow(dive::eWindowModes mode, unsigned int width, unsigned int height, bool maximize)
 	{
 		unsigned int posX = 0;
 		unsigned int posY = 0;
@@ -128,8 +128,8 @@ namespace Editor
 
 		ImGui_ImplWin32_Init(m_hWnd);
 
-		auto pDevice = Dive::Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
-		auto pImmediateContext = Dive::Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
+		auto pDevice = dive::Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
+		auto pImmediateContext = dive::Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 		ImGui_ImplDX11_Init(pDevice, pImmediateContext);
 
 		// Widget 생성

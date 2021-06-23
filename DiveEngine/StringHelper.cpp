@@ -8,7 +8,7 @@
 #include "StringHelper.h"
 //===============================
 
-namespace Dive
+namespace dive
 {
 	namespace StringHelper
 	{

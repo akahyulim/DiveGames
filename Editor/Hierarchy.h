@@ -13,22 +13,22 @@ namespace Editor
 
 	private:
 		void treeShow();
-		void treeAddGameObject(Dive::GameObject* pGameObject);
+		void treeAddGameObject(dive::GameObject* pGameObject);
 
-		void setSelected(Dive::GameObject* pGameObject);
+		void setSelected(dive::GameObject* pGameObject);
 		void handleClicking();
-		void handleDragDrop(Dive::GameObject* pGameObject);
+		void handleDragDrop(dive::GameObject* pGameObject);
 
 		void popupPropertyMenu();
 		void popupGameObjectRename();
 
 	private:
-		Dive::Scene* m_pScene;
+		dive::Scene* m_pScene;
 
-		Dive::GameObject* m_pSelected;
-		Dive::GameObject* m_pClicked;
-		Dive::GameObject* m_pHovered;
-		Dive::GameObject* m_pCopied;
+		dive::GameObject* m_pSelected;
+		dive::GameObject* m_pClicked;
+		dive::GameObject* m_pHovered;
+		dive::GameObject* m_pCopied;
 
 		DragDropPayload m_payload;
 		bool m_bPopupRename;

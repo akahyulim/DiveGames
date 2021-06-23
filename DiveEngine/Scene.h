@@ -5,7 +5,7 @@
 #include <string>
 #include <memory>
 
-namespace Dive
+namespace dive
 {
 	class GameObject;
 

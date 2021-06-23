@@ -4,7 +4,7 @@ namespace Editor
 {
 	RenderPathEditor::RenderPathEditor()
 	{
-		m_pScene = &Dive::Scene::GetGlobalScene();
+		m_pScene = &dive::Scene::GetGlobalScene();
 	}
 
 	RenderPathEditor::~RenderPathEditor()
@@ -20,7 +20,7 @@ namespace Editor
 	{
 		// 업데이트 필요 여부에 따라 선택
 		{
-			auto timeScale = Dive::TimeManager::GetInstance().GetTimeScale();
+			auto timeScale = dive::TimeManager::GetInstance().GetTimeScale();
 			m_pScene->Update(deltaTime * timeScale);
 		}
 	}
@@ -32,10 +32,10 @@ namespace Editor
 	//================================================================================================
 	void RenderPathEditor::Render() const
 	{
-		auto pRenderer = &Dive::Renderer::GetInstance();
+		auto pRenderer = &dive::Renderer::GetInstance();
 		assert(pRenderer);
 
-		auto pImmediateContext = Dive::Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
+		auto pImmediateContext = dive::Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 		assert(pImmediateContext);
 
 		// ClearColor는 어디에서 가져와야 할까?
@@ -46,8 +46,8 @@ namespace Editor
 		float clearColors[4] = { 0.5f, 0.5f, 0.75f, 1.0f };
 		pImmediateContext->ClearRenderTargetView(pRtv, clearColors);
 
-		Dive::Renderer::GetInstance().UpdateCB();
-		Dive::Renderer::GetInstance().DrawColor();
+		dive::Renderer::GetInstance().UpdateCB();
+		dive::Renderer::GetInstance().DrawColor();
 	}
 	
 	void RenderPathEditor::Compose() const

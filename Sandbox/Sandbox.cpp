@@ -37,7 +37,7 @@ namespace Sandbox
 
 	void Sandbox::triangle_coloring()
 	{
-		m_pTriangle = new Dive::Mesh;
+		m_pTriangle = new dive::Mesh;
 		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
 		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
 		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
@@ -50,7 +50,7 @@ namespace Sandbox
 
 		m_pTriangle->CreateRenderDate();
 
-		Dive::Scene::GetGlobalScene().SetMesh(m_pTriangle);
+		dive::Scene::GetGlobalScene().SetMesh(m_pTriangle);
 
 		// 현재는 Scene이 Mesh 단일 객체를 멤버 변수로 관리하고 있다.
 		// 결국엔 GameObject로 다루어야 한다.
@@ -59,7 +59,7 @@ namespace Sandbox
 
 	void Sandbox::triangle_texturing()
 	{
-		m_pTriangle = new Dive::Mesh;
+		m_pTriangle = new dive::Mesh;
 		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
 		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
 		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
@@ -72,7 +72,7 @@ namespace Sandbox
 
 		m_pTriangle->CreateRenderDate();
 
-		Dive::Scene::GetGlobalScene().SetMesh(m_pTriangle);
+		dive::Scene::GetGlobalScene().SetMesh(m_pTriangle);
 
 		// 텍스쳐도 여기에서 생성한 후 등록해야 한다.
 	}

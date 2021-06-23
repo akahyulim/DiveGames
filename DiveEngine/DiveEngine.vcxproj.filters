@@ -4,9 +4,6 @@
     <ClInclude Include="Log.h">
       <Filter>Engine\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Profiler.h">
-      <Filter>Engine\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
@@ -394,9 +391,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
-      <Filter>Engine\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="Profiler.cpp">
       <Filter>Engine\Tools</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">

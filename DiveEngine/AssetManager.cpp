@@ -1,7 +1,7 @@
 #include "AssetManager.h"
 #include "Log.h"
 
-namespace Dive
+namespace dive
 {
 	AssetManager::AssetManager()
 	{

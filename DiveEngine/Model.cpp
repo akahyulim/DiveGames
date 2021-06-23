@@ -3,7 +3,7 @@
 #include "Renderer.h"
 #include "Log.h"
 
-namespace Dive
+namespace dive
 {
 	Model::Model()
 	{

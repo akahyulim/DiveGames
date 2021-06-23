@@ -2,7 +2,7 @@
 #include "Renderer.h"
 #include "Log.h"
 
-namespace Dive
+namespace dive
 {
 	// 문제없이 사용가능 하다.
 	// map / unmap 역시 함수화하는게 맞는가?

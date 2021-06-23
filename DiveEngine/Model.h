@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace Dive
+namespace dive
 {
 	class dvMesh;
 

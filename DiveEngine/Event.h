@@ -13,11 +13,11 @@
 #define EVENT_HANDLE_STATIC(callable)			[](unsigned int data) {callable();}
 #define EVENT_HANDLE_DATA(callable)				[this](unsigned int data) {callable(data);}
 #define EVENT_HANDLE_DATA_STATIC(callable)		[](unsigned int data) {callable(data);}
-#define EVENT_SUBSCRIBE(eventID, callable)		Dive::EventManager::GetInstance().Subscribe(eventID, callable)
-#define EVENT_FIRE(eventID)						Dive::EventManager::GetInstance().FireEvent(eventID)
-#define EVENT_FIRE_DATA(eventID, eventData)		Dive::EventManager::GetInstance().FireEvent(eventID, eventData)
+#define EVENT_SUBSCRIBE(eventID, callable)		dive::EventManager::GetInstance().Subscribe(eventID, callable)
+#define EVENT_FIRE(eventID)						dive::EventManager::GetInstance().FireEvent(eventID)
+#define EVENT_FIRE_DATA(eventID, eventData)		dive::EventManager::GetInstance().FireEvent(eventID, eventData)
 
-namespace Dive
+namespace dive
 {
 	enum class eEventType
 	{

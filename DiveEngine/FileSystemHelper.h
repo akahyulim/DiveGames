@@ -13,7 +13,7 @@
 #include <vector>
 #include <filesystem>
 
-namespace Dive
+namespace dive
 {
 	namespace FileSystemHelper
 	{

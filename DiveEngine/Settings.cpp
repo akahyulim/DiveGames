@@ -3,7 +3,7 @@
 #include "FileSystemHelper.h"
 #include "Log.h"
 
-namespace Dive
+namespace dive
 {
 	void Settings::Initialize(const std::string& title)
 	{

@@ -11,7 +11,7 @@ namespace Editor
 	{
 		m_title = "MenuBar";
 		m_bWindow = false;
-		m_pScene = &Dive::Scene::GetGlobalScene();
+		m_pScene = &dive::Scene::GetGlobalScene();
 	}
 
 	void MenuBar::TickAlways()
@@ -25,7 +25,7 @@ namespace Editor
 				{
 					// 검색해보니 Menu에선 modal popup이 안된다는 이슈가 있다.
 					// 해결책을 찾아보자.
-					if (Dive::Scene::GetGlobalScene().IsDirty())
+					if (dive::Scene::GetGlobalScene().IsDirty())
 						ImGui::OpenPopup("Delete?");
 					
 					// Always center this window when appearing
@@ -53,12 +53,12 @@ namespace Editor
 						ImGui::EndPopup();
 					}
 
-					Dive::Scene::GetGlobalScene().Clear();
+					dive::Scene::GetGlobalScene().Clear();
 				}
 
 				if (ImGui::MenuItem("Open World"))
 				{
-					if (Dive::Scene::GetGlobalScene().IsDirty())
+					if (dive::Scene::GetGlobalScene().IsDirty())
 					{
 						// 팝업
 						// 기존 Scene에 변경 사항이 존재합니다. 저장하시겠습니까?
@@ -67,7 +67,7 @@ namespace Editor
 					// 디렉토리 탐색기를 연다.
 					{
 						std::string filepath = "../Assets/Scenes/default.scene";
-						Dive::Scene::GetGlobalScene().LoadFromFile(filepath);
+						dive::Scene::GetGlobalScene().LoadFromFile(filepath);
 					}
 				}
 
@@ -79,7 +79,7 @@ namespace Editor
 					// 만약 있다면 덮어씌울 것인지 물어야 한다.
 					{
 						std::string filepath = "../Assets/Scenes/default.scene";
-						Dive::Scene::GetGlobalScene().SaveToFile(filepath);
+						dive::Scene::GetGlobalScene().SaveToFile(filepath);
 
 						APP_TRACE("현재 Scene과 Asset을 파일로 저장하였습니다.");
 					}
@@ -115,7 +115,7 @@ namespace Editor
 				if (ImGui::MenuItem("Exit"))
 				{
 					// 일단은 Scene의 변경사항 여부만 확인한다.
-					if (Dive::Scene::GetGlobalScene().IsDirty())
+					if (dive::Scene::GetGlobalScene().IsDirty())
 					{
 
 					}

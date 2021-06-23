@@ -23,7 +23,7 @@ namespace Editor
     {
         m_title = "Hierarchy";
         m_flags |= ImGuiWindowFlags_HorizontalScrollbar;
-        m_pScene = &Dive::Scene::GetGlobalScene();
+        m_pScene = &dive::Scene::GetGlobalScene();
 
         m_pSelected = nullptr;
         m_pClicked = nullptr;
@@ -59,7 +59,7 @@ namespace Editor
                 auto id = std::get<unsigned int>(payload->data);
                 if (auto dropped = m_pScene->GetGameObjectByID(id))
                 {
-                    dropped->GetComponent<Dive::Transform>()->SetParent(nullptr);
+                    dropped->GetComponent<dive::Transform>()->SetParent(nullptr);
                 }
             }
 
@@ -78,14 +78,14 @@ namespace Editor
         popupGameObjectRename();
     }
 
-    void Hierarchy::treeAddGameObject(Dive::GameObject* pGameObject)
+    void Hierarchy::treeAddGameObject(dive::GameObject* pGameObject)
     {
         if (!pGameObject) return;
 
         ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
 
         // 자식 존재 여부
-        auto children = pGameObject->GetComponent<Dive::Transform>()->GetChildren();
+        auto children = pGameObject->GetComponent<dive::Transform>()->GetChildren();
         children.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
        
         if (m_pSelected)
@@ -113,7 +113,7 @@ namespace Editor
         }
     }
 
-    void Hierarchy::setSelected(Dive::GameObject* pGameObject)
+    void Hierarchy::setSelected(dive::GameObject* pGameObject)
     {
         // 없을 때 리턴하면 안된다.
         //if (!pGameObject)    return;
@@ -144,7 +144,7 @@ namespace Editor
             ImGui::OpenPopup("##PropertyMenu");
     }
 
-    void Hierarchy::handleDragDrop(Dive::GameObject* pGameObject)
+    void Hierarchy::handleDragDrop(dive::GameObject* pGameObject)
     {
         auto dragDrop = DragDrop::GetInstance();
 
@@ -166,8 +166,8 @@ namespace Editor
             {
                 if (droppedObj->GetID() != pGameObject->GetID())
                 {
-                    droppedObj->GetComponent<Dive::Transform>()->SetParent(
-                        pGameObject->GetComponent<Dive::Transform>());
+                    droppedObj->GetComponent<dive::Transform>()->SetParent(
+                        pGameObject->GetComponent<dive::Transform>());
                 }
             }
         }
@@ -218,7 +218,7 @@ namespace Editor
 
         if (ImGui::MenuItem("Create Empty"))
         {
-            Dive::Scene::GetGlobalScene().CreateGameObject();
+            dive::Scene::GetGlobalScene().CreateGameObject();
         }
 
         if (ImGui::BeginMenu("3D Object"))

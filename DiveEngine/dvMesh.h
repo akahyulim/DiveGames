@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-namespace Dive
+namespace dive
 {	
 	class GameObject;
 

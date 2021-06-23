@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace Dive
+namespace dive
 {
 	enum class eWindowModes : unsigned short
 	{

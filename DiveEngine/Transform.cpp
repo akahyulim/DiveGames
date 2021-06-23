@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include "FileStream.h"
 
-namespace Dive
+namespace dive
 {
 	Transform::Transform()
 		: Component(typeid(Transform).hash_code())

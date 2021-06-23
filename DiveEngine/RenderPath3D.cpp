@@ -5,7 +5,7 @@
 //#include "ThreadPool.h"
 #include "Log.h"
 
-namespace Dive
+namespace dive
 {
 	void RenderPath3D::PreUpdate()
 	{

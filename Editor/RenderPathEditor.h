@@ -3,7 +3,7 @@
 
 namespace Editor
 {
-	class RenderPathEditor : public Dive::RenderPath
+	class RenderPathEditor : public dive::RenderPath
 	{
 	public:
 		RenderPathEditor();
@@ -18,6 +18,6 @@ namespace Editor
 
 	private:
 	private:
-		Dive::Scene* m_pScene;
+		dive::Scene* m_pScene;
 	};
 }

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-namespace Dive
+namespace dive
 {
 	bool Renderer::createDepthStencilStates()
 	{

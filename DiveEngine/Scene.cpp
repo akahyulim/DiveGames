@@ -5,7 +5,7 @@
 #include "FileSystemHelper.h"
 #include "FileStream.h"
 
-namespace Dive
+namespace dive
 {
 	Scene::Scene()
 		: Object(typeid(Scene).hash_code())

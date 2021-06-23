@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace Dive
+namespace dive
 {
 	// 이건 3d 상의 text이다. gui용은 따로 만들어야 한다...
 

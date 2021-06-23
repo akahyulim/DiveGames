@@ -3,7 +3,7 @@
 using namespace std;
 
 
-namespace Dive
+namespace dive
 {
 	Timer::Timer()
 	{

@@ -12,7 +12,7 @@
 
 using namespace std;
 
-namespace Dive
+namespace dive
 {
 	Runtime::Runtime()
 	{

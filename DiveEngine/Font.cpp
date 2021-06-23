@@ -2,7 +2,7 @@
 #include "GraphicsInclude.h"
 #include "Renderer.h"
 
-namespace Dive
+namespace dive
 {
 	static const unsigned int GLYPH_BASIC_LATIN_START = 0x0000;
 	static const unsigned int GLYPH_BASIC_LATIN_END = 0x007F;

@@ -3,7 +3,7 @@
 #include <atomic>
 #include <typeinfo>
 
-namespace Dive
+namespace dive
 {
 	static const unsigned int INVALID_ID = 0;
 

@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include <string>
 
-namespace Dive
+namespace dive
 {
 	class AssetManager;
 	class RenderPath;

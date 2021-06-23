@@ -4,7 +4,7 @@
 #include <vector>
 #include <memory>
 
-namespace Dive
+namespace dive
 {
 	class Mesh
 	{

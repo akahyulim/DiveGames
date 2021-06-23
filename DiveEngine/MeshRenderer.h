@@ -2,7 +2,7 @@
 #include "Component.h"
 #include "dvMesh.h"
 
-namespace Dive
+namespace dive
 {
 	// 일단 이건 base로 한다.
 	// 추후 2D, Static, Skinned로 나뉠 수 있다.

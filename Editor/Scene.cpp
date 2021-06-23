@@ -12,8 +12,8 @@ namespace Editor
         m_flags |= ImGuiWindowFlags_NoScrollbar;
         m_padding = ImVec2(4.0f, 4.0f);
         
-        m_pScene = &Dive::Scene::GetGlobalScene();
-        m_pRenderer = &Dive::Renderer::GetInstance();
+        m_pScene = &dive::Scene::GetGlobalScene();
+        m_pRenderer = &dive::Renderer::GetInstance();
     }
 
     void Scene::TickVisible()

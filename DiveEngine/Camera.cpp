@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 
-namespace Dive
+namespace dive
 {
 	Camera::Camera()
 		: Component(typeid(Camera).hash_code())

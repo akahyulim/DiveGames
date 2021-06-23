@@ -3,7 +3,7 @@
 
 namespace Sandbox
 {
-	class Sandbox : public Dive::Runtime
+	class Sandbox : public dive::Runtime
 	{
 	public:
 		Sandbox();
@@ -16,9 +16,9 @@ namespace Sandbox
 		void triangle_texturing();
 
 	private:
-		Dive::RenderPath3D m_renderPath;
+		dive::RenderPath3D m_renderPath;
 
 		// 위치가 좀 에바다.
-		Dive::Mesh* m_pTriangle;
+		dive::Mesh* m_pTriangle;
 	};
 }
