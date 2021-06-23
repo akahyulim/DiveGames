@@ -1,7 +1,7 @@
 #pragma once
 #include "DiveEngine.h"
 
-namespace Sandbox
+namespace sandbox
 {
 	class Sandbox : public dive::Runtime
 	{
@@ -16,9 +16,9 @@ namespace Sandbox
 		void triangle_texturing();
 
 	private:
-		dive::RenderPath3D m_renderPath;
+		dive::RenderPath3D mRenderPath;
 
 		// 위치가 좀 에바다.
-		dive::Mesh* m_pTriangle;
+		dive::Mesh* mpTriangle;
 	};
 }

@@ -1,20 +1,20 @@
 #include "Sandbox.h"
 
-namespace Sandbox
+namespace sandbox
 {
 	Sandbox::Sandbox()
 	{
-		m_pTriangle = nullptr;
+		mpTriangle = nullptr;
 
 		m_title = "SandBox";
 	}
 
 	Sandbox::~Sandbox()
 	{
-		if (m_pTriangle)
+		if (mpTriangle)
 		{
-			delete m_pTriangle;
-			m_pTriangle = nullptr;
+			delete mpTriangle;
+			mpTriangle = nullptr;
 		}
 	}
 
@@ -25,7 +25,7 @@ namespace Sandbox
 			return false;
 		}
 
-		ActivatePath(&m_renderPath);
+		ActivatePath(&mRenderPath);
 
 		triangle_coloring();
 		//triangle_texturing();
@@ -37,20 +37,20 @@ namespace Sandbox
 
 	void Sandbox::triangle_coloring()
 	{
-		m_pTriangle = new dive::Mesh;
-		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
-		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
-		m_pTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-		m_pTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-		m_pTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-		m_pTriangle->m_indices.emplace_back(0);
-		m_pTriangle->m_indices.emplace_back(1);
-		m_pTriangle->m_indices.emplace_back(2);
+		mpTriangle = new dive::Mesh;
+		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
+		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
+		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
+		mpTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+		mpTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+		mpTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+		mpTriangle->m_indices.emplace_back(0);
+		mpTriangle->m_indices.emplace_back(1);
+		mpTriangle->m_indices.emplace_back(2);
 
-		m_pTriangle->CreateRenderDate();
+		mpTriangle->CreateRenderDate();
 
-		dive::Scene::GetGlobalScene().SetMesh(m_pTriangle);
+		dive::Scene::GetGlobalScene().SetMesh(mpTriangle);
 
 		// 현재는 Scene이 Mesh 단일 객체를 멤버 변수로 관리하고 있다.
 		// 결국엔 GameObject로 다루어야 한다.
@@ -59,20 +59,20 @@ namespace Sandbox
 
 	void Sandbox::triangle_texturing()
 	{
-		m_pTriangle = new dive::Mesh;
-		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
-		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
-		m_pTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
-		m_pTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(0.0f, 1.0f));
-		m_pTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(0.5f, 0.0f));
-		m_pTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(1.0f, 1.0f));
-		m_pTriangle->m_indices.emplace_back(0);
-		m_pTriangle->m_indices.emplace_back(1);
-		m_pTriangle->m_indices.emplace_back(2);
+		mpTriangle = new dive::Mesh;
+		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
+		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
+		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
+		mpTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(0.0f, 1.0f));
+		mpTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(0.5f, 0.0f));
+		mpTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(1.0f, 1.0f));
+		mpTriangle->m_indices.emplace_back(0);
+		mpTriangle->m_indices.emplace_back(1);
+		mpTriangle->m_indices.emplace_back(2);
 
-		m_pTriangle->CreateRenderDate();
+		mpTriangle->CreateRenderDate();
 
-		dive::Scene::GetGlobalScene().SetMesh(m_pTriangle);
+		dive::Scene::GetGlobalScene().SetMesh(mpTriangle);
 
 		// 텍스쳐도 여기에서 생성한 후 등록해야 한다.
 	}
