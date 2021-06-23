@@ -16,16 +16,16 @@ namespace dive
 {
 	Runtime::Runtime()
 	{
-		m_pAssetManager = nullptr;
-		m_title = "diveEngine";
+		mAssetManager = nullptr;
+		mAppTitle = "diveEngine";
 	}
 
 	Runtime::~Runtime()
 	{
-		if (m_pAssetManager)
+		if (mAssetManager)
 		{
-			delete m_pAssetManager;
-			m_pAssetManager = nullptr;
+			delete mAssetManager;
+			mAssetManager = nullptr;
 		}
 	}
 
@@ -38,23 +38,23 @@ namespace dive
 	//==========================================================================================//
 	bool Runtime::Initialize()
 	{
-		assert(m_hWnd != 0);
+		assert(mWindowHandle != 0);
 
-		if (m_bInitialized)
+		if (mbInitialized)
 		{
 			return false;
 		}
 
 		Log::Initialize();
-		Settings::GetInstance().Initialize(m_title);
+		Settings::GetInstance().Initialize(mAppTitle);
 
 		{
 			auto& settings = Settings::GetInstance();
 			eWindowModes mode = settings.GetWindowMode();
 			if (mode == eWindowModes::FullScreen)
-				m_bFullScreen = true;
+				mbFullScreen = true;
 			else
-				m_bFullScreen = false;
+				mbFullScreen = false;
 			bool maximize = settings.IsMaximize();
 			unsigned int width = settings.GetWidth();
 			unsigned int height = settings.GetHeight();
@@ -64,11 +64,11 @@ namespace dive
 
 		// 이 부분을 아래 Renderer::GetInstance().Initialize()에 통합하자.
 		auto& renderer = Renderer::GetInstance();
-		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(m_hWnd, m_bFullScreen));
+		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(mWindowHandle, mbFullScreen));
 
 		TimeManager::GetInstance().Initialize();
 		Renderer::GetInstance().Initialize();
-		Input::GetInstance().Initialize(m_hWnd);
+		Input::GetInstance().Initialize(mWindowHandle);
 
 		EVENT_SUBSCRIBE(eEventType::ChangedResolution, EVENT_HANDLE_DATA(OnResizeResolution));
 
@@ -79,11 +79,11 @@ namespace dive
 
 	void Runtime::Run()
 	{
-		if (!m_bInitialized)
+		if (!mbInitialized)
 		{
-			m_bInitialized = Initialize();
+			mbInitialized = Initialize();
 			
-			if (!m_bInitialized)
+			if (!mbInitialized)
 			{
 				CORE_ERROR("Rumtime 초기화에 실패하였습니다. 프로그램을 종료합니다.");
 				PostQuitMessage(0);
@@ -98,7 +98,7 @@ namespace dive
 		static float deltaFrameAccumulator = 0.0f;
 
 	
-		if (m_bWindowActive)
+		if (mbActiveWindow)
 		{
 			fixedFrameAccumulator += delta;
 			deltaFrameAccumulator += delta;
@@ -109,9 +109,9 @@ namespace dive
 				fixedFrameAccumulator = 0.0f;
 			}
 
-			if (m_bFrameLock)
+			if (mbFrameLock)
 			{
-				if (deltaFrameAccumulator >= static_cast<float>(1.0f / m_targetFPS))
+				if (deltaFrameAccumulator >= static_cast<float>(1.0f / mTargetFPS))
 				{
 					Update(deltaFrameAccumulator);
 					Input::GetInstance().Update();
@@ -137,17 +137,17 @@ namespace dive
 	
 	void Runtime::Update(float deltaTime)
 	{
-		if (m_pActivePath)
+		if (mActivePath)
 		{
-			m_pActivePath->PreUpdate();
+			mActivePath->PreUpdate();
 		}
 
 		// lua
 
-		if (m_pActivePath)
+		if (mActivePath)
 		{
-			m_pActivePath->Update(deltaTime);
-			m_pActivePath->PostUpdate();
+			mActivePath->Update(deltaTime);
+			mActivePath->PostUpdate();
 		}
 	}
 	
@@ -155,14 +155,14 @@ namespace dive
 	{
 		// lua
 
-		if (m_pActivePath)
+		if (mActivePath)
 		{
 			// 대상이 좀 애매하다.
 			// 사실상 호출 함수는 3d가 상속한 2d의 FixedUpdate()이다.
 			// 유니티에서는 rigid body update에 쓰인다고 한다.
 			// 아마도 애니메이션의 속도를 일관성있게 만들기 위함인듯 하다.
 			// 그런데 이 대상은 Scene에 존재할텐데...
-			m_pActivePath->FixedUpdate();
+			mActivePath->FixedUpdate();
 		}
 	}
 	
@@ -173,9 +173,9 @@ namespace dive
 
 		// lua
 
-		if (m_pActivePath)
+		if (mActivePath)
 		{
-			m_pActivePath->Render();
+			mActivePath->Render();
 		}
 
 		Compose();
@@ -184,9 +184,9 @@ namespace dive
 
 	void Runtime::Compose()
 	{
-		if (m_pActivePath)
+		if (mActivePath)
 		{
-			m_pActivePath->Compose();
+			mActivePath->Compose();
 		}
 	}
 
@@ -194,16 +194,16 @@ namespace dive
 	{
 		// 뭔가 있다.
 		{
-			if (m_pActivePath)
+			if (mActivePath)
 			{
-				m_pActivePath->Stop();
+				mActivePath->Stop();
 			}
 
 			if (path != nullptr)
 			{
 				path->Start();
 			}
-			m_pActivePath = path;
+			mActivePath = path;
 		}
 
 		CORE_TRACE("Runtime::ActivatePath()");
@@ -211,15 +211,15 @@ namespace dive
 	
 	void Runtime::SetWindow(HWND windowHandle, bool fullScreen)
 	{
-		m_hWnd = windowHandle;
-		m_bFullScreen = fullScreen;
+		mWindowHandle = windowHandle;
+		mbFullScreen = fullScreen;
 	}
 
 	//==================================================================================================//
 	// 1. Virtual로 구현했다. Editor는 오직 Windowed만 필요하기 때문이다.								//
 	// 2. FullScreen의 Size는 크기가 아니라 해상도다. 이는 추후 좀 더 생각해보자.						//
 	//==================================================================================================//										
-	void Runtime::ModifyWindow(eWindowModes mode, unsigned int width, unsigned height, bool maximize)
+	void Runtime::ModifyWindow(eWindowModes mode, unsigned int width, unsigned int height, bool maximize)
 	{
 		unsigned int posX = 0;
 		unsigned int posY = 0;
@@ -258,16 +258,16 @@ namespace dive
 				style = WS_POPUP;
 			}
 
-			SetWindowLong(m_hWnd, GWL_STYLE, style);
+			SetWindowLong(mWindowHandle, GWL_STYLE, style);
 
 			posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
 			posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 		}
 
-		SetWindowPos(m_hWnd, NULL, posX, posY, width, height, 0);
+		SetWindowPos(mWindowHandle, NULL, posX, posY, width, height, 0);
 
-		ShowWindow(m_hWnd, SW_SHOWDEFAULT);
-		UpdateWindow(m_hWnd);
+		ShowWindow(mWindowHandle, SW_SHOWDEFAULT);
+		UpdateWindow(mWindowHandle);
 	}
 
 	//==============================================================================//
@@ -286,7 +286,7 @@ namespace dive
 			pGraphicsDevice->ResizeBuffers(width, height);
 
 		auto& settings = Settings::GetInstance();
-		if (IsZoomed(m_hWnd))
+		if (IsZoomed(mWindowHandle))
 		{
 			settings.SetMaximize(true);
 		}

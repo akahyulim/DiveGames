@@ -19,25 +19,25 @@ namespace dive
 	{
 	}
 
-	void Transform::Serialize(FileStream* pStream)
+	void Transform::Serialize(FileStream* fileStream)
 	{
 		// local pos, rot ,scl
 		// lookAt
-		pStream->Write(m_pParent ? m_pParent->GetOwner()->GetID() : 0);
+		fileStream->Write(mParent ? mParent->GetOwner()->GetID() : 0);
 	}
 
-	void Transform::Deserialize(FileStream* pStream)
+	void Transform::Deserialize(FileStream* fileStream)
 	{
 		// local pos, rot ,scl
 		// lookAt
 		unsigned int parentId = 0;
-		pStream->Read(&parentId);
+		fileStream->Read(&parentId);
 
 		if (parentId != 0)
 		{
-			if (auto pParent = Scene::GetGlobalScene().GetGameObjectByID(parentId))
+			if (auto parentTransform = Scene::GetGlobalScene().GetGameObjectByID(parentId))
 			{
-				SetParent(pParent->GetTransform());
+				SetParent(parentTransform->GetTransform());
 			}
 		}
 
@@ -47,47 +47,47 @@ namespace dive
 	// 계층 구조 =================================================
 	Transform* Transform::GetRoot()
 	{
-		if (!m_pParent)
+		if (!mParent)
 			return this;
 		else
-			return m_pParent->GetRoot();
+			return mParent->GetRoot();
 	}
 
-	void Transform::SetParent(Transform* pParent)
+	void Transform::SetParent(Transform* parentTransform)
 	{
-		if (!pParent)
+		if (!parentTransform)
 		{
 			BecomeOrphan();
 			return;
 		}
 
-		if (this->GetID() == pParent->GetID())
+		if (this->GetID() == parentTransform->GetID())
 			return;
 
-		if (m_pParent)
+		if (mParent)
 		{
-			for (auto it = m_pParent->m_children.begin(); it != m_pParent->m_children.end();)
+			for (auto it = mParent->mChildren.begin(); it != mParent->mChildren.end();)
 			{
 				if ((*it)->GetID() == this->GetID())
 				{
-					it = m_pParent->m_children.erase(it);
+					it = mParent->mChildren.erase(it);
 				}
 				else
 					++it;
 			}
 		}
 
-		pParent->m_children.emplace_back(this);
-		m_pParent = pParent;
+		parentTransform->mChildren.emplace_back(this);
+		mParent = parentTransform;
 	}
 
 	void Transform::BecomeOrphan()
 	{
-		if (!m_pParent)
+		if (!mParent)
 			return;
 
-		auto pOldParent = m_pParent;
-		m_pParent = nullptr;
+		auto pOldParent = mParent;
+		mParent = nullptr;
 
 		// UpdateTransform();
 
@@ -96,9 +96,9 @@ namespace dive
 
 	Transform* Transform::Find(const std::string& name) const
 	{
-		if (!m_children.empty())
+		if (!mChildren.empty())
 		{
-			for (auto& child : m_children)
+			for (auto& child : mChildren)
 			{
 				if (child->GetOwner() && child->GetOwner()->GetName() == name)
 				{
@@ -112,45 +112,45 @@ namespace dive
 
 	Transform* Transform::GetChild(unsigned int index) const
 	{
-		if (m_children.empty() || m_children.size() - 1 < index)
+		if (mChildren.empty() || mChildren.size() - 1 < index)
 			return nullptr;
 
-		return m_children[index];
+		return mChildren[index];
 	}
 
-	bool Transform::IsChildOf(const Transform* pParent) const
+	bool Transform::IsChildOf(const Transform* parentTransform) const
 	{
-		if (!pParent)
+		if (!parentTransform)
 			return false;
 
-		// pParent이 자신이라도 ture를 리턴한다.
-		if (pParent->GetID() == GetID())
+		// parentTransform이 자신이라도 ture를 리턴한다.
+		if (parentTransform->GetID() == GetID())
 			return true;
 
-		if (m_pParent->GetID() == pParent->GetID())
+		if (mParent->GetID() == parentTransform->GetID())
 			return true;
 
-		return m_pParent->IsChildOf(pParent);
+		return mParent->IsChildOf(parentTransform);
 	}
 
 	void Transform::DetachChildren()
 	{
-		if (m_children.empty())
+		if (mChildren.empty())
 			return;
 
-		for (auto pChild : m_children)
+		for (auto pChild : mChildren)
 		{
-			pChild->m_pParent = nullptr;
+			pChild->mParent = nullptr;
 		}
 
-		m_children.clear();
-		m_children.shrink_to_fit();
+		mChildren.clear();
+		mChildren.shrink_to_fit();
 	}
 
 	void Transform::AcquireChidren()
 	{
-		m_children.clear();
-		m_children.shrink_to_fit();
+		mChildren.clear();
+		mChildren.shrink_to_fit();
 
 		auto allGameObjects = Scene::GetGlobalScene().GetAllGameObjects();
 
@@ -160,7 +160,7 @@ namespace dive
 			{
 				if (gameObject->GetTransform()->GetParent()->GetID() == GetID())
 				{
-					m_children.emplace_back(gameObject->GetTransform());
+					mChildren.emplace_back(gameObject->GetTransform());
 					gameObject->GetTransform()->AcquireChidren();
 				}
 			}

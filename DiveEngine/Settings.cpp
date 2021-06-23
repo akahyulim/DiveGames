@@ -7,124 +7,124 @@ namespace dive
 {
 	void Settings::Initialize(const std::string& title)
 	{
-		m_filename = FileSystemHelper::GetWorkingDirectory() + title + ".ini";
+		mFileName = FileSystemHelper::GetWorkingDirectory() + title + ".ini";
 
 		Load();
 
 		CORE_INFO("Application Setting Informations...");
 		CORE_INFO("Application Title: {:s}", title);
-		CORE_INFO("Window Size: {0:d}x{1:d}", m_width, m_height);
-		CORE_INFO("Window Maximize: {:b}", m_bMaximize);
-		CORE_INFO("Window FullScreen: {:b}", m_bFullScreen);
-		CORE_INFO("Window Borderless: {:b}", m_bBorderless);
+		CORE_INFO("Window Size: {0:d}x{1:d}", mWidth, mHeight);
+		CORE_INFO("Window Maximize: {:b}", mbMaximize);
+		CORE_INFO("Window FullScreen: {:b}", mbFullScreen);
+		CORE_INFO("Window Borderless: {:b}", mbBorderless);
 		CORE_INFO("Window Mode: {:s}", GetWindowMode() == eWindowModes::Windowed ? "Windowed" : (GetWindowMode() == eWindowModes::Borderless ? "Borderless" : "FullScreen"));
 	}
 
 	void Settings::Default()
 	{
-		IniHelper ini(m_filename);
+		IniHelper ini(mFileName);
 
 		// Window
-		ini["Window"]["Width"]			= m_width		= 800;
-		ini["Window"]["Height"]			= m_height		= 600;
-		ini["Window"]["bMaximize"]		= m_bMaximize	= false;
-		ini["Window"]["bFullScreen"]	= m_bFullScreen = false;
-		ini["Window"]["bBorderless"]	= m_bBorderless = false;
+		ini["Window"]["Width"]			= mWidth		= 800;
+		ini["Window"]["Height"]			= mHeight		= 600;
+		ini["Window"]["bMaximize"]		= mbMaximize	= false;
+		ini["Window"]["bFullScreen"]	= mbFullScreen = false;
+		ini["Window"]["bBorderless"]	= mbBorderless = false;
 	}
 
 	void Settings::Save()
 	{
-		if (!FileSystemHelper::FileExists(m_filename))
+		if (!FileSystemHelper::FileExists(mFileName))
 			Default();
 
-		IniHelper ini(m_filename);
+		IniHelper ini(mFileName);
 
 		// Window
-		ini["Window"]["Width"] = m_width;
-		ini["Window"]["Height"] = m_height;
-		ini["Window"]["bMaximize"] = m_bMaximize;
-		ini["Window"]["bFullScreen"] = m_bFullScreen;
-		ini["Window"]["bBorderless"] = m_bBorderless;
+		ini["Window"]["Width"] = mWidth;
+		ini["Window"]["Height"] = mHeight;
+		ini["Window"]["bMaximize"] = mbMaximize;
+		ini["Window"]["bFullScreen"] = mbFullScreen;
+		ini["Window"]["bBorderless"] = mbBorderless;
 
 		CORE_TRACE("ini파일을 저장합니다.");
 	}
 
 	void Settings::Load()
 	{
-		if (!FileSystemHelper::FileExists(m_filename))
+		if (!FileSystemHelper::FileExists(mFileName))
 			Default();
 
-		IniHelper ini(m_filename);
+		IniHelper ini(mFileName);
 
 		// Window
-		m_width = ini["Window"]["Width"];
-		m_height = ini["Window"]["Height"];
-		m_bMaximize = ini["Window"]["bMaximize"];
-		m_bFullScreen = ini["Window"]["bFullScreen"];
-		m_bBorderless = ini["Window"]["bBorderless"];
+		mWidth = ini["Window"]["Width"];
+		mHeight = ini["Window"]["Height"];
+		mbMaximize = ini["Window"]["bMaximize"];
+		mbFullScreen = ini["Window"]["bFullScreen"];
+		mbBorderless = ini["Window"]["bBorderless"];
 	}
 
 	void Settings::SetWidth(unsigned int width)
 	{
-		if ((width <= 0) || (m_width == width))
+		if ((width <= 0) || (mWidth == width))
 		{
 			CORE_ERROR("Settings::SetWidth >> 유효하지 않은 크기({:d})로 변경을 시도하였습니다.", width);
 			return;
 		}
 
-		m_width = width;
+		mWidth = width;
 	}
 
 	void Settings::SetHeight(unsigned int height)
 	{
-		if ((height <= 0) || (m_height == height))
+		if ((height <= 0) || (mHeight == height))
 		{
 			CORE_ERROR("Settings::SetHeight >> 유효하지 않은 크기({:d})로 변경을 시도하였습니다.", height);
 			return;
 		}
 
-		m_height = height;
+		mHeight = height;
 	}
 	eWindowModes Settings::GetWindowMode()
 	{
-		if (m_bFullScreen)
+		if (mbFullScreen)
 		{
-			m_windowMode = eWindowModes::FullScreen;
+			mWindowMode = eWindowModes::FullScreen;
 		}
-		else if (m_bBorderless)
+		else if (mbBorderless)
 		{
-			m_windowMode = eWindowModes::Borderless;
+			mWindowMode = eWindowModes::Borderless;
 		}
 		else
 		{
-			m_windowMode = eWindowModes::Windowed;
+			mWindowMode = eWindowModes::Windowed;
 		}
 
-		return m_windowMode;
+		return mWindowMode;
 	}
 
 	void Settings::SetWindowMode(eWindowModes mode)
 	{
-		m_windowMode = mode;
+		mWindowMode = mode;
 
-		switch (m_windowMode)
+		switch (mWindowMode)
 		{
 		case eWindowModes::Windowed:
 		{
-			m_bBorderless = false;
-			m_bFullScreen = false;
+			mbBorderless = false;
+			mbFullScreen = false;
 		}
 		break;
 		case eWindowModes::Borderless:
 		{
-			m_bBorderless = true;
-			m_bFullScreen = false;
+			mbBorderless = true;
+			mbFullScreen = false;
 		}
 		break;
 		case eWindowModes::FullScreen:
 		{
-			m_bBorderless = true;
-			m_bFullScreen = true;
+			mbBorderless = true;
+			mbFullScreen = true;
 		}
 		break;
 		default:

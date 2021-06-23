@@ -9,7 +9,7 @@ namespace dive
 {
 	bool Renderer::createDepthStencilStates()
 	{
-		auto pDevice = m_pGraphicsDevice->GetDevice();
+		auto pDevice = mGraphicsDevice->GetDevice();
 		assert(pDevice != nullptr);
 
 		HRESULT hr = E_FAIL;
@@ -37,7 +37,7 @@ namespace dive
 			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			hr = pDevice->CreateDepthStencilState(&desc, m_pDepthStencilStates[DSSTYPE_DEFAULT].GetAddressOf());
+			hr = pDevice->CreateDepthStencilState(&desc, mDepthStencilStates[DSSTYPE_DEFAULT].GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 
@@ -46,7 +46,7 @@ namespace dive
 
 	bool Renderer::createRasterizerStates()
 	{
-		auto pDevice = m_pGraphicsDevice->GetDevice();
+		auto pDevice = mGraphicsDevice->GetDevice();
 		assert(pDevice != nullptr);
 
 		HRESULT hr = E_FAIL;
@@ -64,7 +64,7 @@ namespace dive
 			desc.ScissorEnable = false;
 			desc.SlopeScaledDepthBias = 0.0f;
 
-			hr = pDevice->CreateRasterizerState(&desc, m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].GetAddressOf());
+			hr = pDevice->CreateRasterizerState(&desc, mRasterizerStates[RSSTYPE_CULLBACK_SOLID].GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 
@@ -73,7 +73,7 @@ namespace dive
 
 	bool Renderer::createSamplerStates()
 	{
-		auto pDevice = m_pGraphicsDevice->GetDevice();
+		auto pDevice = mGraphicsDevice->GetDevice();
 		assert(pDevice != nullptr);
 
 		HRESULT hr = E_FAIL;
@@ -95,7 +95,7 @@ namespace dive
 			desc.MinLOD = 0;
 			desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-			hr = pDevice->CreateSamplerState(&desc, m_pSamplerState.GetAddressOf());
+			hr = pDevice->CreateSamplerState(&desc, mSamplerState.GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 
@@ -115,7 +115,7 @@ namespace dive
 			desc.MinLOD = 0;
 			desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-			hr = pDevice->CreateSamplerState(&desc, m_pSamplerStateLinear.GetAddressOf());
+			hr = pDevice->CreateSamplerState(&desc, mSamplerStateLinear.GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 
@@ -124,7 +124,7 @@ namespace dive
 
 	bool Renderer::createConstantBuffers()
 	{
-		auto pDevice = m_pGraphicsDevice->GetDevice();
+		auto pDevice = mGraphicsDevice->GetDevice();
 		assert(pDevice != nullptr);
 
 		// world, view, projection matrix
@@ -136,7 +136,7 @@ namespace dive
 		desc.MiscFlags = 0;
 		desc.StructureByteStride = 0;
 
-		auto hr = pDevice->CreateBuffer(&desc, nullptr, m_pCBMatrix.GetAddressOf());
+		auto hr = pDevice->CreateBuffer(&desc, nullptr, mConstantBufferMatrix.GetAddressOf());
 		assert(SUCCEEDED(hr));
 	
 		return true;
@@ -148,16 +148,16 @@ namespace dive
 	{
 		// 삭제 대상 : 테스트용 구문
 		{
-			m_pTex = std::make_shared<Texture>(L"../Assets/Textures/Choa.jpg");
+			mTexture = std::make_shared<Texture>(L"../Assets/Textures/Choa.jpg");
 
 			// 생성한 후 특정 색 넣기
 			{
-				m_pCpuTex = std::make_shared<Texture>(800, 600);
+				mCpuTexture = std::make_shared<Texture>(800, 600);
 
-				auto pImmediateContex = m_pGraphicsDevice->GetImmediateContext();
+				auto pImmediateContex = mGraphicsDevice->GetImmediateContext();
 
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				pImmediateContex->Map(m_pCpuTex->GetTexture2D(),
+				pImmediateContex->Map(mCpuTexture->GetTexture2D(),
 					D3D11CalcSubresource(0, 0, 1),
 					D3D11_MAP_WRITE_DISCARD,
 					0,
@@ -181,7 +181,7 @@ namespace dive
 					}
 				}
 
-				pImmediateContex->Unmap(m_pCpuTex->GetTexture2D(), D3D11CalcSubresource(0, 0, 1));
+				pImmediateContex->Unmap(mCpuTexture->GetTexture2D(), D3D11CalcSubresource(0, 0, 1));
 			}
 		}
 
@@ -192,8 +192,8 @@ namespace dive
 	bool Renderer::createRenderTargets()
 	{
 		// BackBuffer와 어떻게 구분하느냐...
-		auto width = m_resolution.x;
-		auto height = m_resolution.y;
+		auto width = mRenderTargetSize.x;
+		auto height = mRenderTargetSize.y;
 
 		// 다시 크기 확인을 한다.
 		// 크기가 맞지 않다고 생성을 안해버리는게 맞나?
@@ -205,13 +205,13 @@ namespace dive
 
 		// 얘는 테스트용이다.
 		{
-//			m_pRTV = std::make_shared<Texture>(width, height, DXGI_FORMAT_R8G8B8A8_UINT, "Test_RenderTargetView");
+//			mRenderTargetView = std::make_shared<Texture>(width, height, DXGI_FORMAT_R8G8B8A8_UINT, "Test_RenderTargetView");
 		}
 
 		// renderTargets들을 만든다. 타입때문에 지웠다가 다시 만들어야 한다. 나중에 수정이 필요할듯?
-		if (m_renderTargets[eRenderTargets::Frame_Ldr])
-			delete m_renderTargets[eRenderTargets::Frame_Ldr];
-		m_renderTargets[eRenderTargets::Frame_Ldr] = new Texture(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT);
+		if (mRenderTargets[eRenderTargets::Frame_Ldr])
+			delete mRenderTargets[eRenderTargets::Frame_Ldr];
+		mRenderTargets[eRenderTargets::Frame_Ldr] = new Texture(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 		return true;
 	}
@@ -282,8 +282,8 @@ namespace dive
 		auto result = false;
 
 		{
-			m_pDvFont = new Font;
-			result = m_pDvFont->LoadFromFile("../Assets/Fonts/NanumBarunGothic.ttf");
+			mDvFont = new Font;
+			result = mDvFont->LoadFromFile("../Assets/Fonts/NanumBarunGothic.ttf");
 			assert(result);
 		}
 
@@ -291,7 +291,7 @@ namespace dive
 		/*
 		{
 			m_pTextMesh = new TextMesh;
-			result = m_pTextMesh->SetFont(m_pDvFont);
+			result = m_pTextMesh->SetFont(mDvFont);
 			assert(result);
 			m_pTextMesh->SetText(L"We're just walking down the street.",
 				DirectX::XMFLOAT2(-200.0f, 200.0f));
@@ -305,41 +305,41 @@ namespace dive
 	{
 		// Color
 		{
-			m_pipelineStateColor.pVS = (ID3D11VertexShader*)m_pShaders[VSTYPE_COLOR].Get();
-			m_pipelineStateColor.pPS = (ID3D11PixelShader*)m_pShaders[PSTYPE_COLOR].Get();
-			m_pipelineStateColor.pDSS = m_pDepthStencilStates[DSSTYPE_DEFAULT].Get();
-			m_pipelineStateColor.pRSS = m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
-			m_pipelineStateColor.pIL = m_pInputLayouts[ILTYPE_POS_COL].Get();
-			m_pipelineStateColor.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			mPipelineStateColor.pVS = (ID3D11VertexShader*)mShaders[VSTYPE_COLOR].Get();
+			mPipelineStateColor.pPS = (ID3D11PixelShader*)mShaders[PSTYPE_COLOR].Get();
+			mPipelineStateColor.pDSS = mDepthStencilStates[DSSTYPE_DEFAULT].Get();
+			mPipelineStateColor.pRSS = mRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
+			mPipelineStateColor.pIL = mInputLayouts[ILTYPE_POS_COL].Get();
+			mPipelineStateColor.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
 
 		// Texturing
 		{
-			m_pipelineStateTexturing.pVS = (ID3D11VertexShader*)m_pShaders[VSTYPE_TEXTURING].Get();
-			m_pipelineStateTexturing.pPS = (ID3D11PixelShader*)m_pShaders[PSTYPE_TEXTURING].Get();
-			m_pipelineStateTexturing.pDSS = m_pDepthStencilStates[DSSTYPE_DEFAULT].Get();
-			m_pipelineStateTexturing.pRSS = m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
-			m_pipelineStateTexturing.pSS = m_pSamplerState.Get();
-			m_pipelineStateTexturing.pIL = m_pInputLayouts[ILTYPE_POS_TEX].Get();
-			m_pipelineStateTexturing.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			mPipelineStateTexturing.pVS = (ID3D11VertexShader*)mShaders[VSTYPE_TEXTURING].Get();
+			mPipelineStateTexturing.pPS = (ID3D11PixelShader*)mShaders[PSTYPE_TEXTURING].Get();
+			mPipelineStateTexturing.pDSS = mDepthStencilStates[DSSTYPE_DEFAULT].Get();
+			mPipelineStateTexturing.pRSS = mRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
+			mPipelineStateTexturing.pSS = mSamplerState.Get();
+			mPipelineStateTexturing.pIL = mInputLayouts[ILTYPE_POS_TEX].Get();
+			mPipelineStateTexturing.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
 
 		// Font
 		{
-			m_pipelineStateFont.pVS = (ID3D11VertexShader*)m_pShaders[VSTYPE_FONTS].Get();
-			m_pipelineStateFont.pPS = (ID3D11PixelShader*)m_pShaders[PSTYPE_FONTS].Get();
-			m_pipelineStateFont.pDSS = m_pDepthStencilStates[DSSTYPE_DEFAULT].Get();
-			m_pipelineStateFont.pRSS = m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
-			m_pipelineStateFont.pSS = m_pSamplerStateLinear.Get();
-			m_pipelineStateFont.pIL = m_pInputLayouts[ILTYPE_POS_TEX2].Get();
-			m_pipelineStateFont.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			mPipelineStateFont.pVS = (ID3D11VertexShader*)mShaders[VSTYPE_FONTS].Get();
+			mPipelineStateFont.pPS = (ID3D11PixelShader*)mShaders[PSTYPE_FONTS].Get();
+			mPipelineStateFont.pDSS = mDepthStencilStates[DSSTYPE_DEFAULT].Get();
+			mPipelineStateFont.pRSS = mRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
+			mPipelineStateFont.pSS = mSamplerStateLinear.Get();
+			mPipelineStateFont.pIL = mInputLayouts[ILTYPE_POS_TEX2].Get();
+			mPipelineStateFont.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
 	}
 
 	bool Renderer::createVertexShader(const std::wstring& filepath, unsigned int shaderType, unsigned int inputLayoutType,
 		D3D11_INPUT_ELEMENT_DESC* pDescs, UINT numElements)
 	{
-		auto pDevice = m_pGraphicsDevice->GetDevice();
+		auto pDevice = mGraphicsDevice->GetDevice();
 		assert(pDevice != nullptr);
 
 		ID3D10Blob* pShaderBuffer = nullptr;
@@ -362,7 +362,7 @@ namespace dive
 		}
 		
 		if (FAILED(pDevice->CreateVertexShader(pShaderBuffer->GetBufferPointer(), pShaderBuffer->GetBufferSize(), nullptr,
-			(ID3D11VertexShader**)m_pShaders[shaderType].GetAddressOf())))
+			(ID3D11VertexShader**)mShaders[shaderType].GetAddressOf())))
 		{
 			CORE_ERROR("Vertex Shader 생성에 실패하였습니다.");
 			return false;
@@ -371,7 +371,7 @@ namespace dive
 		if ((pDescs != nullptr) && (inputLayoutType != ILTYPE_COUNT))
 		{
 			if (FAILED(pDevice->CreateInputLayout(pDescs, numElements, pShaderBuffer->GetBufferPointer(), pShaderBuffer->GetBufferSize(),
-				m_pInputLayouts[inputLayoutType].GetAddressOf())))
+				mInputLayouts[inputLayoutType].GetAddressOf())))
 			{
 				CORE_ERROR("Input Layout 생성에 실패하였습니다.");
 				return false;
@@ -384,7 +384,7 @@ namespace dive
 
 	bool Renderer::createPixelShader(const std::wstring& filepath, unsigned int shaderType)
 	{
-		auto pDevice = m_pGraphicsDevice->GetDevice();
+		auto pDevice = mGraphicsDevice->GetDevice();
 		assert(pDevice != nullptr);
 
 		ID3D10Blob* pShaderBuffer = nullptr;
@@ -407,7 +407,7 @@ namespace dive
 		}
 
 		if (FAILED(pDevice->CreatePixelShader(pShaderBuffer->GetBufferPointer(), pShaderBuffer->GetBufferSize(), nullptr,
-			(ID3D11PixelShader**)m_pShaders[shaderType].GetAddressOf())))
+			(ID3D11PixelShader**)mShaders[shaderType].GetAddressOf())))
 		{
 			CORE_ERROR("Pixel Shader 생성에 실패하였습니다.");
 		}

@@ -24,8 +24,8 @@ namespace dive
 		}
 		else if (mStreamMode == eFileStreamMode::Read)
 		{
-			m_InputStream.open(filepath, iosFlags);
-			if (m_InputStream.fail())
+			mInputStream.open(filepath, iosFlags);
+			if (mInputStream.fail())
 			{
 				CORE_ERROR("");
 				return;
@@ -49,8 +49,8 @@ namespace dive
 		}
 		else if (mStreamMode == eFileStreamMode::Read)
 		{
-			m_InputStream.clear();
-			m_InputStream.close();
+			mInputStream.clear();
+			mInputStream.close();
 		}
 	}
 
@@ -70,7 +70,7 @@ namespace dive
 
 		value->resize(length);
 
-		m_InputStream.read(const_cast<char*>(value->c_str()), length);
+		mInputStream.read(const_cast<char*>(value->c_str()), length);
 	}
 
 	void FileStream::Read(std::vector<std::string>* vec)
@@ -106,7 +106,7 @@ namespace dive
 
 		vec->resize(length);
 
-		m_InputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(unsigned char) * length);
+		mInputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(unsigned char) * length);
 	}
 
 	void FileStream::Read(std::vector<std::byte>* vec)
@@ -121,7 +121,7 @@ namespace dive
 
 		vec->resize(length);
 
-		m_InputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(std::byte) * length);
+		mInputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(std::byte) * length);
 	}
 
 	void FileStream::Read(std::vector<unsigned int>* vec)
@@ -136,7 +136,7 @@ namespace dive
 
 		vec->resize(length);
 
-		m_InputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(unsigned int) * length);
+		mInputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(unsigned int) * length);
 	}
 	/*
 	void FileStream::Read(std::vector<Vertex_PosTexNorTan>* vec)
@@ -151,7 +151,7 @@ namespace dive
 
 		vec->resize(length);
 
-		m_InputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(Vertex_PosTexNorTan) * length);
+		mInputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(Vertex_PosTexNorTan) * length);
 	}
 	*/
 	void FileStream::Write(const std::string & value)

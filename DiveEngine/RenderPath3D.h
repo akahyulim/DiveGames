@@ -19,7 +19,7 @@ namespace dive
 
 	private:
 	private:
-		Scene* m_pScene = &Scene::GetGlobalScene();
+		Scene* mScene = &Scene::GetGlobalScene();
 
 		// visibility를 가진다.
 

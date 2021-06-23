@@ -16,8 +16,8 @@ namespace dive
 		GameObject();
 		~GameObject() = default;
 
-		void Serialize(FileStream* pStream);
-		void Deserialize(FileStream* pStream, Transform* pParent = nullptr);
+		void Serialize(FileStream* fileStream);
+		void Deserialize(FileStream* fileStream, Transform* parentTransform = nullptr);
 
 		void Update(float deltaTime);
 
@@ -31,25 +31,25 @@ namespace dive
 		template<typename T>
 		T* GetComponent();
 
-		Transform* GetTransform() { return m_pTransform; }
+		Transform* GetTransform() { return mTransform; }
 
-		const std::string& GetName() const { return m_name; }
-		void SetName(const std::string name) { m_name = name; }
+		const std::string& GetName() const { return mName; }
+		void SetName(const std::string name) { mName = name; }
 
-		bool GetActive() const { return m_bActive; }
-		void SetActive(bool active) { m_bActive = active; }
+		bool GetActive() const { return mbActive; }
+		void SetActive(bool active) { mbActive = active; }
 
-		unsigned int GetComponentCount() const { return static_cast<unsigned int>(m_components.size()); }
+		unsigned int GetComponentCount() const { return static_cast<unsigned int>(mComponents.size()); }
 
 	private:
 	private:
 		// 유니티는 'Object 1'로 시작한다.
-		std::string m_name = "Object";
-		bool m_bActive = true;
+		std::string mName = "Object";
+		bool mbActive = true;
 
-		std::vector<std::shared_ptr<Component>> m_components;
+		std::vector<std::shared_ptr<Component>> mComponents;
 
-		Transform* m_pTransform;
+		Transform* mTransform;
 
 	};
 
@@ -63,7 +63,7 @@ namespace dive
 
 		// 생성자를 선언해야 한다.
 		auto component = std::make_shared<T>();
-		m_components.push_back(std::static_pointer_cast<Component>(component));
+		mComponents.push_back(std::static_pointer_cast<Component>(component));
 		// awake가 있다면 호출
 
 		return component.get();
@@ -72,14 +72,14 @@ namespace dive
 	template<typename T>
 	void GameObject::RemoveComponent()
 	{
-		auto& it = m_components.begin();
-		for (it; it != m_components.end();)
+		auto& it = mComponents.begin();
+		for (it; it != mComponents.end();)
 		{
 			if ((*it)->GetTypeHash() == typeid(T).hash_code())
 			{
 				// 제거 함수 호출?
 				(*it).reset();
-				it = m_components.erase(it);
+				it = mComponents.erase(it);
 				return;
 			}
 			else
@@ -90,7 +90,7 @@ namespace dive
 	template<typename T>
 	T* GameObject::GetComponent()
 	{
-		for (auto& component : m_components)
+		for (auto& component : mComponents)
 		{
 			if (component->GetTypeHash() == typeid(T).hash_code())
 			{

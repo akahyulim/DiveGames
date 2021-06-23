@@ -7,16 +7,16 @@ namespace dive
 {
 	GameObject::GameObject()
 		: Object(typeid(GameObject).hash_code()),
-		m_pTransform(nullptr)
+		mTransform(nullptr)
 	{
 		// 하나로 만들까?
-		m_pTransform = AddComponent<Transform>();
-		m_pTransform->SetOwnder(this);
+		mTransform = AddComponent<Transform>();
+		mTransform->SetOwnder(this);
 	}
 
-	void GameObject::Serialize(FileStream* pStream)
+	void GameObject::Serialize(FileStream* fileStream)
 	{ 
-		if (!pStream)
+		if (!fileStream)
 		{
 			CORE_ERROR("");
 			return;
@@ -24,44 +24,44 @@ namespace dive
 
 		// basic
 		{
-			pStream->Write(m_bActive);
-			pStream->Write(GetID());
-			pStream->Write(m_name);
+			fileStream->Write(mbActive);
+			fileStream->Write(GetID());
+			fileStream->Write(mName);
 		}
 
 		// component
 		{
-			pStream->Write(GetComponentCount());
-			for (const auto pComponent : m_components)
+			fileStream->Write(GetComponentCount());
+			for (const auto pComponent : mComponents)
 			{
-				pStream->Write(static_cast<unsigned int>(pComponent->GetTypeHash()));
-				pStream->Write(pComponent->GetID());
+				fileStream->Write(static_cast<unsigned int>(pComponent->GetTypeHash()));
+				fileStream->Write(pComponent->GetID());
 			}
-			for (const auto pComponent : m_components)
+			for (const auto pComponent : mComponents)
 			{
-				pComponent->Serialize(pStream);
+				pComponent->Serialize(fileStream);
 			}
 		}
 
 		// children
 		{
-			auto children = m_pTransform->GetChildren();
-			pStream->Write(static_cast<unsigned int>(children.size()));
+			auto children = mTransform->GetChildren();
+			fileStream->Write(static_cast<unsigned int>(children.size()));
 
 			for (const auto pChild : children)
 			{
-				pStream->Write(pChild->GetOwner()->GetID());
+				fileStream->Write(pChild->GetOwner()->GetID());
 			}
 			for (const auto pChild : children)
 			{
-				pChild->GetOwner()->Serialize(pStream);
+				pChild->GetOwner()->Serialize(fileStream);
 			}
 		}
 	}
 
-	void GameObject::Deserialize(FileStream* pStream, Transform* pParent)
+	void GameObject::Deserialize(FileStream* fileStream, Transform* parentTransform)
 	{
-		if (!pStream)
+		if (!fileStream)
 		{
 			CORE_ERROR("");
 			return;
@@ -69,56 +69,56 @@ namespace dive
 
 		// basic
 		{
-			pStream->Read(&m_bActive);
+			fileStream->Read(&mbActive);
 			unsigned int id;
-			pStream->Read(&id);
+			fileStream->Read(&id);
 			SetID(id);
-			pStream->Read(&m_name);
+			fileStream->Read(&mName);
 		}
 
 		// component
 		{
-			auto componentCount = pStream->ReadAs<unsigned int>();
+			auto componentCount = fileStream->ReadAs<unsigned int>();
 			unsigned int type = 0;
 			unsigned int id = 0;
 			for (unsigned int i = 0; i != componentCount; i++)
 			{
-				pStream->Read(&type);
-				pStream->Read(&id);
+				fileStream->Read(&type);
+				fileStream->Read(&id);
 
 				AddComponent(type, id);
 			}
-			for (const auto pComponent : m_components)
+			for (const auto pComponent : mComponents)
 			{
-				pComponent->Deserialize(pStream);
+				pComponent->Deserialize(fileStream);
 			}
 
-			m_pTransform->SetParent(pParent);
+			mTransform->SetParent(parentTransform);
 		}
 
 		// children
 		{
-			auto childrenCount = pStream->ReadAs<unsigned int>();
+			auto childrenCount = fileStream->ReadAs<unsigned int>();
 			std::vector<GameObject*> children;
 			for (unsigned int i = 0; i != childrenCount; i++)
 			{
 				auto pChild = Scene::GetGlobalScene().CreateGameObject();
-				pChild->SetID(pStream->ReadAs<unsigned int>());
+				pChild->SetID(fileStream->ReadAs<unsigned int>());
 
 				children.emplace_back(pChild);
 			}
 			for (const auto pChild : children)
 			{
-				pChild->Deserialize(pStream, m_pTransform);
+				pChild->Deserialize(fileStream, mTransform);
 			}
 
-			m_pTransform->AcquireChidren();
+			mTransform->AcquireChidren();
 		}
 	}
 
 	void GameObject::Update(float deltaTime)
 	{
-		for (auto& component : m_components)
+		for (auto& component : mComponents)
 		{
 			component->Update(deltaTime);
 		}
@@ -130,8 +130,8 @@ namespace dive
 		// Transform은 이미 생성되어 있으므로 id만 바꾼다.
 		if (typeid(Transform).hash_code() == typeHash)
 		{
-			m_pTransform->SetID(id);
-			return m_pTransform;
+			mTransform->SetID(id);
+			return mTransform;
 		}
 
 		return nullptr;

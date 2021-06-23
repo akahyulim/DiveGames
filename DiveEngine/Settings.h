@@ -27,34 +27,34 @@ namespace dive
 		void Save();
 		void Load();
 
-		unsigned int GetWidth() const { return m_width; }
+		unsigned int GetWidth() const { return mWidth; }
 		void SetWidth(unsigned int width);
 
-		unsigned int GetHeight() const { return m_height; }
+		unsigned int GetHeight() const { return mHeight; }
 		void SetHeight(unsigned int height);
 
-		bool IsMaximize() const { return m_bMaximize; }
-		void SetMaximize(bool maximize) { m_bMaximize = maximize; }
+		bool IsMaximize() const { return mbMaximize; }
+		void SetMaximize(bool maximize) { mbMaximize = maximize; }
 
-		bool IsFullScreen() const { return m_bFullScreen; }
-		void SetFullScreen(bool fullScreen) { m_bFullScreen = fullScreen; }
+		bool IsFullScreen() const { return mbFullScreen; }
+		void SetFullScreen(bool fullScreen) { mbFullScreen = fullScreen; }
 
-		bool IsBorderlessWindow() const { return m_bBorderless; }
-		void SetBorderlessWindow(bool borderless) { m_bBorderless = borderless; }
+		bool IsBorderlessWindow() const { return mbBorderless; }
+		void SetBorderlessWindow(bool borderless) { mbBorderless = borderless; }
 
 		eWindowModes GetWindowMode();
 		void SetWindowMode(eWindowModes mode);
 
 
 	private:
-		std::string m_filename;
+		std::string mFileName;
 
 		// window
-		unsigned int m_width;
-		unsigned int m_height;
-		bool m_bMaximize;
-		bool m_bFullScreen;
-		bool m_bBorderless;
-		eWindowModes m_windowMode;
+		unsigned int mWidth;
+		unsigned int mHeight;
+		bool mbMaximize;
+		bool mbFullScreen;
+		bool mbBorderless;
+		eWindowModes mWindowMode;
 	};
 }

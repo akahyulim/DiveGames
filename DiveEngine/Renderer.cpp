@@ -9,16 +9,16 @@ namespace dive
 {
 	Renderer::Renderer()
 	{
-		m_resolution = DirectX::XMINT2(0, 0);
+		mRenderTargetSize = DirectX::XMINT2(0, 0);
 		// 이렇게 초기화하면 Sandbox에서 문제가 생긴다.
-		m_viewport.Width = static_cast<float>(m_resolution.x);
-		m_viewport.Height = static_cast<float>(m_resolution.y);
-		//m_viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
-		//m_viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
-		m_viewport.MinDepth = 0.0f;
-		m_viewport.MaxDepth = 1.0f;
-		m_viewport.TopLeftX = 0.0f;
-		m_viewport.TopLeftY = 0.0f;
+		mViewPort.Width = static_cast<float>(mRenderTargetSize.x);
+		mViewPort.Height = static_cast<float>(mRenderTargetSize.y);
+		//mViewPort.Width = (float)mGraphicsDevice->GetResolutionWidth();
+		//mViewPort.Height = (float)mGraphicsDevice->GetResolutionHeight();
+		mViewPort.MinDepth = 0.0f;
+		mViewPort.MaxDepth = 1.0f;
+		mViewPort.TopLeftX = 0.0f;
+		mViewPort.TopLeftY = 0.0f;
 	}
 
 	Renderer::~Renderer()
@@ -28,7 +28,7 @@ namespace dive
 
 	void Renderer::Initialize()
 	{
-		if (!m_pGraphicsDevice || !m_pGraphicsDevice->IsInitialized())
+		if (!mGraphicsDevice || !mGraphicsDevice->IsInitialized())
 		{
 			CORE_ERROR("Graphics Device가 생성되지 않아 초기화를 실행할 수 없습니다. 프로그램을 종료합니다.");
 			PostQuitMessage(0);
@@ -53,12 +53,12 @@ namespace dive
 
 	void Renderer::SetViewport(float width, float height, float offsetX, float offsetY)
 	{
-		if (m_viewport.Width != width || m_viewport.Height != height)
+		if (mViewPort.Width != width || mViewPort.Height != height)
 		{
 			// 뭔가를 하는데...
 
-			m_viewport.Width = width;
-			m_viewport.Height = height;
+			mViewPort.Width = width;
+			mViewPort.Height = height;
 
 			// 애초에 offset이 뭐냐...
 		}
@@ -67,13 +67,13 @@ namespace dive
 	// 다시 한 번 말하지만 RenderTarget용 크기설정이다.
 	void Renderer::SetResolution(unsigned int width, unsigned int height)
 	{
-		if (m_resolution.x == width && m_resolution.y == height)
+		if (mRenderTargetSize.x == width && mRenderTargetSize.y == height)
 			return;
 
 		// 이외에도 크기가 맞는지 확인이 필요하다.
 
-		m_resolution.x = width;
-		m_resolution.y = height;
+		mRenderTargetSize.x = width;
+		mRenderTargetSize.y = height;
 
 		createRenderTargets();
 
@@ -83,16 +83,16 @@ namespace dive
 	// 갱신만 한다. bind는 개별 path에서 한다.
 	void Renderer::UpdateCB()
 	{
-		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
+		auto pImmediateContext = mGraphicsDevice->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
 		// CB Update
-		if (m_pCBMatrix == nullptr)
+		if (mConstantBufferMatrix == nullptr)
 			return;
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-		if (FAILED(pImmediateContext->Map(m_pCBMatrix.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		if (FAILED(pImmediateContext->Map(mConstantBufferMatrix.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
 			CORE_ERROR("Constant Buffer Mapping에 실패하였습니다.");
 			return;
@@ -151,18 +151,18 @@ namespace dive
 		// Perspective Projection Matrix
 		{
 			float fieldOfView = 3.141592654f / 4.0f;
-			float screenAspect = (float)m_pGraphicsDevice->GetResolutionWidth() / (float)m_pGraphicsDevice->GetResolutionHeight();
+			float screenAspect = (float)mGraphicsDevice->GetResolutionWidth() / (float)mGraphicsDevice->GetResolutionHeight();
 			pBuffer->proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f));
 		}
 
 		// Orthographic Projection Matrix
 		{
-			auto width = (float)m_pGraphicsDevice->GetResolutionWidth();
-			auto height = (float)m_pGraphicsDevice->GetResolutionHeight();
+			auto width = (float)mGraphicsDevice->GetResolutionWidth();
+			auto height = (float)mGraphicsDevice->GetResolutionHeight();
 			pBuffer->projOrthographic = XMMatrixTranspose(XMMatrixOrthographicLH(width, height, 0.1f, 1000.0f));
 		}
 
-		pImmediateContext->Unmap(static_cast<ID3D11Resource*>(m_pCBMatrix.Get()), 0);
+		pImmediateContext->Unmap(static_cast<ID3D11Resource*>(mConstantBufferMatrix.Get()), 0);
 	}
 
 	void Renderer::DrawScene()
@@ -178,18 +178,18 @@ namespace dive
 		if (!mesh)
 			return;
 
-		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
+		auto pImmediateContext = mGraphicsDevice->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
-		pImmediateContext->IASetInputLayout(m_pipelineStateColor.pIL);
-		pImmediateContext->IASetPrimitiveTopology(m_pipelineStateColor.primitiveTopology);
-		pImmediateContext->VSSetShader(m_pipelineStateColor.pVS, NULL, 0);
-		pImmediateContext->PSSetShader(m_pipelineStateColor.pPS, NULL, 0);
-		pImmediateContext->OMSetDepthStencilState(m_pipelineStateColor.pDSS, 1);
-		pImmediateContext->RSSetState(m_pipelineStateColor.pRSS);
+		pImmediateContext->IASetInputLayout(mPipelineStateColor.pIL);
+		pImmediateContext->IASetPrimitiveTopology(mPipelineStateColor.primitiveTopology);
+		pImmediateContext->VSSetShader(mPipelineStateColor.pVS, NULL, 0);
+		pImmediateContext->PSSetShader(mPipelineStateColor.pPS, NULL, 0);
+		pImmediateContext->OMSetDepthStencilState(mPipelineStateColor.pDSS, 1);
+		pImmediateContext->RSSetState(mPipelineStateColor.pRSS);
 
-		pImmediateContext->VSSetConstantBuffers(0, 1, m_pCBMatrix.GetAddressOf());
-		pImmediateContext->RSSetViewports(1, &m_viewport);
+		pImmediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
+		pImmediateContext->RSSetViewports(1, &mViewPort);
 
 		ID3D11Buffer* vbs[] =
 		{
@@ -217,25 +217,25 @@ namespace dive
 
 	void Renderer::DrawTexturing()
 	{
-		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
+		auto pImmediateContext = mGraphicsDevice->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
-		pImmediateContext->IASetInputLayout(m_pipelineStateTexturing.pIL);
-		pImmediateContext->IASetPrimitiveTopology(m_pipelineStateTexturing.primitiveTopology);
-		pImmediateContext->VSSetShader(m_pipelineStateTexturing.pVS, NULL, 0);
-		pImmediateContext->PSSetShader(m_pipelineStateTexturing.pPS, NULL, 0);
-		pImmediateContext->PSSetSamplers(0, 1, &m_pipelineStateTexturing.pSS);	// 얘는 더블 포인터다...
-		pImmediateContext->OMSetDepthStencilState(m_pipelineStateTexturing.pDSS, 1);
-		pImmediateContext->RSSetState(m_pipelineStateTexturing.pRSS);
+		pImmediateContext->IASetInputLayout(mPipelineStateTexturing.pIL);
+		pImmediateContext->IASetPrimitiveTopology(mPipelineStateTexturing.primitiveTopology);
+		pImmediateContext->VSSetShader(mPipelineStateTexturing.pVS, NULL, 0);
+		pImmediateContext->PSSetShader(mPipelineStateTexturing.pPS, NULL, 0);
+		pImmediateContext->PSSetSamplers(0, 1, &mPipelineStateTexturing.pSS);	// 얘는 더블 포인터다...
+		pImmediateContext->OMSetDepthStencilState(mPipelineStateTexturing.pDSS, 1);
+		pImmediateContext->RSSetState(mPipelineStateTexturing.pRSS);
 
-		pImmediateContext->VSSetConstantBuffers(0, 1, m_pCBMatrix.GetAddressOf());
+		pImmediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
 
 
 		// 임시
 		// 누가 가져야 할까?
 		D3D11_VIEWPORT viewport;
-		viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
-		viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
+		viewport.Width = (float)mGraphicsDevice->GetResolutionWidth();
+		viewport.Height = (float)mGraphicsDevice->GetResolutionHeight();
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 		viewport.TopLeftX = 0.0f;
@@ -264,9 +264,9 @@ namespace dive
 		};
 
 		// 위치와 방법이 마음에 들지 않는다.
-		auto pSRV = m_pTex->GetShaderResourceView();
-		//auto pSRV = m_pCpuTex->GetShaderResourceView();
-		//auto pSRV = m_pDvFont->GetAtlas()->GetShaderResourceView();
+		auto pSRV = mTexture->GetShaderResourceView();
+		//auto pSRV = mCpuTexture->GetShaderResourceView();
+		//auto pSRV = mDvFont->GetAtlas()->GetShaderResourceView();
 		pImmediateContext->PSSetShaderResources(0, 1, &pSRV);
 
 		pImmediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);
@@ -280,22 +280,22 @@ namespace dive
 	{
 		// GameObject에서 TextMesh만 뽑아서 호출하도록 바꿔야 한다.
 
-		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
+		auto pImmediateContext = mGraphicsDevice->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
-		pImmediateContext->IASetInputLayout(m_pipelineStateFont.pIL);
-		pImmediateContext->IASetPrimitiveTopology(m_pipelineStateFont.primitiveTopology);
-		pImmediateContext->VSSetShader(m_pipelineStateFont.pVS, NULL, 0);
-		pImmediateContext->PSSetShader(m_pipelineStateFont.pPS, NULL, 0);
-		pImmediateContext->PSSetSamplers(0, 1, &m_pipelineStateFont.pSS);	// 얘는 더블 포인터다...
-		pImmediateContext->OMSetDepthStencilState(m_pipelineStateFont.pDSS, 1);
-		pImmediateContext->RSSetState(m_pipelineStateFont.pRSS);
+		pImmediateContext->IASetInputLayout(mPipelineStateFont.pIL);
+		pImmediateContext->IASetPrimitiveTopology(mPipelineStateFont.primitiveTopology);
+		pImmediateContext->VSSetShader(mPipelineStateFont.pVS, NULL, 0);
+		pImmediateContext->PSSetShader(mPipelineStateFont.pPS, NULL, 0);
+		pImmediateContext->PSSetSamplers(0, 1, &mPipelineStateFont.pSS);	// 얘는 더블 포인터다...
+		pImmediateContext->OMSetDepthStencilState(mPipelineStateFont.pDSS, 1);
+		pImmediateContext->RSSetState(mPipelineStateFont.pRSS);
 
-		pImmediateContext->VSSetConstantBuffers(0, 1, m_pCBMatrix.GetAddressOf());
+		pImmediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
 
 		D3D11_VIEWPORT viewport;
-		viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
-		viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
+		viewport.Width = (float)mGraphicsDevice->GetResolutionWidth();
+		viewport.Height = (float)mGraphicsDevice->GetResolutionHeight();
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 		viewport.TopLeftX = 0.0f;
@@ -329,8 +329,8 @@ namespace dive
 
 	void Renderer::SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device)
 	{
-		m_pGraphicsDevice = device;
+		mGraphicsDevice = device;
 
-		assert(m_pGraphicsDevice);
+		assert(mGraphicsDevice);
 	}	
 }

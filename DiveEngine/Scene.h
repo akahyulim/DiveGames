@@ -27,10 +27,10 @@ namespace dive
 		GameObject* GetGameObjectByID(unsigned int id);
 		void RemoveGameObject(GameObject* target);
 
-		std::vector<std::shared_ptr<GameObject>> GetAllGameObjects() { return m_gameObjects; }
+		std::vector<std::shared_ptr<GameObject>> GetAllGameObjects() { return mGameObjects; }
 		std::vector<GameObject*> GetRootGameObjects();
 
-		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(m_gameObjects.size()); }
+		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(mGameObjects.size()); }
 
 		static Scene& GetGlobalScene()
 		{
@@ -38,28 +38,28 @@ namespace dive
 			return scene;
 		}
 
-		std::string GetName() { return m_name; }
-		void SetName(const std::string& name) { m_name = name; }
+		std::string GetName() { return mName; }
+		void SetName(const std::string& name) { mName = name; }
 
-		bool IsDirty() { return m_bDirty; }
+		bool IsDirty() { return mbDirty; }
 
 		// test¿ë
-		void SetMesh(Mesh* mesh) { m_pMesh = mesh; }
-		Mesh* GetMesh() { return m_pMesh; }
+		void SetMesh(Mesh* mesh) { mMesh = mesh; }
+		Mesh* GetMesh() { return mMesh; }
 
 	private:
-		void gameObjectRemove(GameObject* pGameObject);
+		void gameObjectRemove(GameObject* gameObject);
 
 
 	private:
-		std::string m_name;
-		std::vector<std::shared_ptr<GameObject>> m_gameObjects;
+		std::string mName;
+		std::vector<std::shared_ptr<GameObject>> mGameObjects;
 		// camera??
 
-		bool m_bDirty;
+		bool mbDirty;
 
 
 		// test¿ë
-		Mesh* m_pMesh = nullptr;
+		Mesh* mMesh = nullptr;
 	};
 }

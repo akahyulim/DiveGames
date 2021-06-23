@@ -11,10 +11,10 @@ namespace dive
 		FontImporter();
 		~FontImporter();
 
-		bool ImporterFile(Font* pFont, const std::string& filepath);
+		bool ImporterFile(Font* font, const std::string& filepath);
 
 	private:
 	private:
-		FT_LibraryRec_* m_library = nullptr;
+		FT_LibraryRec_* mLibrary = nullptr;
 	};
 }

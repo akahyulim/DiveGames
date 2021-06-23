@@ -12,17 +12,17 @@ namespace dive
 
 	void Timer::Reset()
 	{
-		m_startTime = chrono::high_resolution_clock::now();
+		mStartTime = chrono::high_resolution_clock::now();
 	}
 
 	double Timer::GetElapsedTime(bool reset)
 	{
 		auto currentTime = chrono::high_resolution_clock::now();
-		chrono::duration<double, std::milli> elapsedTime = currentTime - m_startTime;
+		chrono::duration<double, std::milli> elapsedTime = currentTime - mStartTime;
 
 		if (reset)
 		{
-			m_startTime = currentTime;
+			mStartTime = currentTime;
 		}
 
 		return elapsedTime.count();
@@ -30,19 +30,19 @@ namespace dive
 
 	void TimeManager::Initialize()
 	{
-		m_startTime = chrono::high_resolution_clock::now();
+		mStartTime = chrono::high_resolution_clock::now();
 	}
 
 	void TimeManager::Update()
 	{
 		auto currentTime = chrono::high_resolution_clock::now();
-		chrono::duration<double, std::milli> elapsedTime = currentTime - m_startTime;
+		chrono::duration<double, std::milli> elapsedTime = currentTime - mStartTime;
 
-		m_realTimeSinceStartup += elapsedTime.count();
-		m_deltaTime = elapsedTime.count() * m_timeScale;
+		mRealTimeSinceStartup += elapsedTime.count();
+		mDeltaTime = elapsedTime.count() * mTimeScale;
 
-		m_startTime = currentTime;
+		mStartTime = currentTime;
 
-		++m_frameCount;
+		++mFrameCount;
 	}
 }

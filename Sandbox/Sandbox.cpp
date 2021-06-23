@@ -6,7 +6,7 @@ namespace sandbox
 	{
 		mTriangle = nullptr;
 
-		m_title = "SandBox";
+		mAppTitle = "SandBox";
 	}
 
 	Sandbox::~Sandbox()

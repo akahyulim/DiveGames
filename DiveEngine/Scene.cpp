@@ -10,8 +10,8 @@ namespace dive
 	Scene::Scene()
 		: Object(typeid(Scene).hash_code())
 	{
-		m_name = "Untitled";
-		m_bDirty = false;
+		mName = "Untitled";
+		mbDirty = false;
 	}
 
 	Scene::~Scene()
@@ -21,7 +21,7 @@ namespace dive
 
 	void Scene::Update(float deltaTime)
 	{
-		for (auto& gameObject : m_gameObjects)
+		for (auto& gameObject : mGameObjects)
 		{
 			gameObject->Update(deltaTime);
 		}
@@ -29,13 +29,13 @@ namespace dive
 
 	void Scene::Clear()
 	{
-		if (!m_gameObjects.empty())
+		if (!mGameObjects.empty())
 		{
-			m_gameObjects.clear();
-			m_gameObjects.shrink_to_fit();
+			mGameObjects.clear();
+			mGameObjects.shrink_to_fit();
 		}
 
-		m_bDirty = true;
+		mbDirty = true;
 	}
 
 	bool Scene::SaveToFile(const std::string& filepath)
@@ -59,18 +59,18 @@ namespace dive
 		auto rootCount = static_cast<unsigned int>(rootGameObjects.size());
 		stream.Write(rootCount);
 
-		for (const auto& pGameObject : rootGameObjects)
+		for (const auto& gameObject : rootGameObjects)
 		{
-			stream.Write(pGameObject->GetID());
+			stream.Write(gameObject->GetID());
 		}
-		for (const auto& pGameObject : rootGameObjects)
+		for (const auto& gameObject : rootGameObjects)
 		{
-			pGameObject->Serialize(&stream);
+			gameObject->Serialize(&stream);
 		}
 
 		stream.Close();
 
-		m_bDirty = false;
+		mbDirty = false;
 
 		return true;
 	}
@@ -94,12 +94,12 @@ namespace dive
 		auto rootCount = stream.ReadAs<unsigned int>();
 		for (unsigned int i = 0; i != rootCount; i++)
 		{
-			auto pGameObject = CreateGameObject();
-			pGameObject->SetID(stream.ReadAs<unsigned int>());
+			auto gameObject = CreateGameObject();
+			gameObject->SetID(stream.ReadAs<unsigned int>());
 		}
 		for (unsigned int i = 0; i != rootCount; i++)
 		{
-			m_gameObjects[i]->Deserialize(&stream, nullptr);
+			mGameObjects[i]->Deserialize(&stream, nullptr);
 		}
 
 		stream.Close();
@@ -111,17 +111,17 @@ namespace dive
 
 	GameObject* Scene::CreateGameObject()
 	{
-		auto pAddedObject = m_gameObjects.emplace_back(std::make_shared<GameObject>());
+		auto pAddedObject = mGameObjects.emplace_back(std::make_shared<GameObject>());
 		// 뭔가 호출?
 
-		m_bDirty = true;
+		mbDirty = true;
 
 		return pAddedObject.get();
 	}
 
 	GameObject* Scene::GetGameObjectByName(const std::string& name)
 	{
-		for (auto& target : m_gameObjects)
+		for (auto& target : mGameObjects)
 		{
 			if (target->GetName() == name)
 				return target.get();
@@ -132,7 +132,7 @@ namespace dive
 
 	GameObject* Scene::GetGameObjectByID(unsigned int id)
 	{
-		for (auto& pTarget : m_gameObjects)
+		for (auto& pTarget : mGameObjects)
 		{
 			if (pTarget->GetID() == id)
 				return pTarget.get();
@@ -148,7 +148,7 @@ namespace dive
 		// 스파르탄은 바로 지우지 않는다. 일단 제거 대상으로 설정해놓는다.
 		// 그리고 다음 Frame에서 제거한다.
 
-		m_bDirty = true;
+		mbDirty = true;
 
 		gameObjectRemove(target);
 	}
@@ -156,14 +156,14 @@ namespace dive
 	std::vector<GameObject*> Scene::GetRootGameObjects()
 	{
 		std::vector<GameObject*> rootGameObjects;
-		for (auto pGameObject : m_gameObjects)
+		for (auto gameObject : mGameObjects)
 		{
-			auto pTransform = pGameObject->GetComponent<Transform>();
+			auto pTransform = gameObject->GetComponent<Transform>();
 			if (pTransform)
 			{
 				if (!pTransform->HasParent())
 				{
-					rootGameObjects.emplace_back(pGameObject.get());
+					rootGameObjects.emplace_back(gameObject.get());
 				}
 			}
 		}
@@ -171,34 +171,34 @@ namespace dive
 		return rootGameObjects;
 	}
 
-	void Scene::gameObjectRemove(GameObject* pGameObject)
+	void Scene::gameObjectRemove(GameObject* gameObject)
 	{
 		// 자식들부터 먼저 제거
-		auto pChildren = pGameObject->GetTransform()->GetChildren();
+		auto pChildren = gameObject->GetTransform()->GetChildren();
 		for (auto pChild : pChildren)
 		{
 			gameObjectRemove(pChild->GetOwner());
 		}
 
-		auto pParent = pGameObject->GetTransform()->GetParent();
+		auto parentTransform = gameObject->GetTransform()->GetParent();
 
 		// 부모에게서 제외되는 구문이 없다.
-		for (auto it = m_gameObjects.begin(); it != m_gameObjects.end();)
+		for (auto it = mGameObjects.begin(); it != mGameObjects.end();)
 		{
 			auto pTarget = *it;
-			if (pTarget->GetID() == pGameObject->GetID())
+			if (pTarget->GetID() == gameObject->GetID())
 			{
-				it = m_gameObjects.erase(it);
+				it = mGameObjects.erase(it);
 				break;
 			}
 			++it;
 		}
 
-		if (pParent)
+		if (parentTransform)
 		{
-			pParent->AcquireChidren();
+			parentTransform->AcquireChidren();
 		}
 
-		m_bDirty = true;
+		mbDirty = true;
 	}
 }

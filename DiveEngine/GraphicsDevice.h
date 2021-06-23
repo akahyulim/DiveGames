@@ -18,39 +18,39 @@ namespace dive
 		void ResizeBuffers(unsigned int width, unsigned int height);
 		void ResizeTarget(unsigned int width, unsigned int height);
 
-		unsigned int GetResolutionWidth() const { return m_resolutionWidth; }
-		unsigned int GetResolutionHeight() const { return m_resolutionHeight; }
+		unsigned int GetResolutionWidth() const { return mResolutionWidth; }
+		unsigned int GetResolutionHeight() const { return mResolutionHeight; }
 
-		DXGI_FORMAT GetBackbufferFormat() const { return m_format; }
-		unsigned int GetBackbufferCount() const { return m_backBufferCount; }
+		DXGI_FORMAT GetBackbufferFormat() const { return mFormat; }
+		unsigned int GetBackbufferCount() const { return mBackBufferCount; }
 
-		bool GetVSyncEnabled() const { return m_bVSync; }
-		void SetVSuncEnabled(bool use) { m_bVSync = use; }
+		bool GetVSyncEnabled() const { return mbVSync; }
+		void SetVSuncEnabled(bool use) { mbVSync = use; }
 
 		bool IsInitialized() const;
 
-		ID3D11Device* GetDevice() { return m_pDevice.Get(); }
-		ID3D11DeviceContext* GetImmediateContext() { return m_pImmediateContext.Get(); }
+		ID3D11Device* GetDevice() { return mDevice.Get(); }
+		ID3D11DeviceContext* GetImmediateContext() { return mImmediateContext.Get(); }
 
 	private:
 		void createBackbufferResources();
 		void createDepthStencilView();
 
 	private:
-		Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwapChain;
-		Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pImmediateContext;
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pRTV;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pBackBuffer;
+		Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
+		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mImmediateContext;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mRenderTargetView;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> mBackBuffer;
 
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pDSBuffer;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDSV;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> mDepthStencilBuffer;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mDepthStencilView;
 
-		bool m_bVSync = false;
-		bool m_bFullScreen = false;
-		unsigned int m_resolutionWidth = 0;
-		unsigned int m_resolutionHeight = 0;
-		DXGI_FORMAT m_format = DXGI_FORMAT_R8G8B8A8_UNORM;
-		unsigned int m_backBufferCount = 2;
+		bool mbVSync = false;
+		bool mbFullScreen = false;
+		unsigned int mResolutionWidth = 0;
+		unsigned int mResolutionHeight = 0;
+		DXGI_FORMAT mFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+		unsigned int mBackBufferCount = 2;
 	};
 }

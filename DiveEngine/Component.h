@@ -14,14 +14,14 @@ namespace dive
 		virtual ~Component() {}
 
 		virtual void Update(float deltaTime) {}
-		virtual void Serialize(FileStream* pStream) {}
-		virtual void Deserialize(FileStream* pStream) {}
+		virtual void Serialize(FileStream* fileStream) {}
+		virtual void Deserialize(FileStream* fileStream) {}
 
-		GameObject* GetOwner() const { return m_pOwner; }
+		GameObject* GetOwner() const { return mOwner; }
 		// owner를 바꾸려 시도할 수 있다.
-		void SetOwnder(GameObject* pOwner) { m_pOwner = pOwner; }
+		void SetOwnder(GameObject* owner) { mOwner = owner; }
 
 	private:
-		GameObject* m_pOwner = nullptr;
+		GameObject* mOwner = nullptr;
 	};
 }

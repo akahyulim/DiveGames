@@ -37,7 +37,7 @@ namespace dive
 			>::type>
 		void Read(T* value)
 		{
-			m_InputStream.read(reinterpret_cast<char*>(value), sizeof(T));
+			mInputStream.read(reinterpret_cast<char*>(value), sizeof(T));
 		}
 
 		template<class T, class = typename std::enable_if <
@@ -94,7 +94,7 @@ namespace dive
 
 	private:
 		std::ofstream mOutputStream;
-		std::ifstream m_InputStream;
+		std::ifstream mInputStream;
 		eFileStreamMode mStreamMode;
 		bool mbFileOpened;
 	};
