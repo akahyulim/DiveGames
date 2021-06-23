@@ -4,14 +4,14 @@
 #include "External/ImGui/imgui_internal.h"
 #include <Windows.h>
 
-namespace Editor
+namespace editor
 {
 	MenuBar::MenuBar(Editor* pEditor)
 		: Widget(pEditor)
 	{
-		m_title = "MenuBar";
-		m_bWindow = false;
-		m_pScene = &dive::Scene::GetGlobalScene();
+		mTitle = "MenuBar";
+		mbWindow = false;
+		mpScene = &dive::Scene::GetGlobalScene();
 	}
 
 	void MenuBar::TickAlways()
@@ -121,7 +121,7 @@ namespace Editor
 					}
 					// 하지만 추후 Project의 변경사항까지 확인해야 한다.
 
-					DestroyWindow(m_pEditor->GetWindowHandle());
+					DestroyWindow(mpEditor->GetWindowHandle());
 				}
 
 				ImGui::EndMenu();
@@ -133,7 +133,7 @@ namespace Editor
 			{
 				if (ImGui::MenuItem("Create Empty"))
 				{
-					m_pScene->CreateGameObject();
+					mpScene->CreateGameObject();
 				}
 
 				if (ImGui::BeginMenu("3D Object"))

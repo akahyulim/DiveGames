@@ -1,10 +1,10 @@
 #include "RenderPathEditor.h"
 
-namespace Editor
+namespace editor
 {
 	RenderPathEditor::RenderPathEditor()
 	{
-		m_pScene = &dive::Scene::GetGlobalScene();
+		mpSpace = &dive::Scene::GetGlobalScene();
 	}
 
 	RenderPathEditor::~RenderPathEditor()
@@ -21,7 +21,7 @@ namespace Editor
 		// 업데이트 필요 여부에 따라 선택
 		{
 			auto timeScale = dive::TimeManager::GetInstance().GetTimeScale();
-			m_pScene->Update(deltaTime * timeScale);
+			mpSpace->Update(deltaTime * timeScale);
 		}
 	}
 	

@@ -1,7 +1,7 @@
 #pragma once
 #include "DiveEngine.h"
 
-namespace Editor
+namespace editor
 {
 	class RenderPathEditor : public dive::RenderPath
 	{
@@ -18,6 +18,6 @@ namespace Editor
 
 	private:
 	private:
-		dive::Scene* m_pScene;
+		dive::Scene* mpSpace;
 	};
 }

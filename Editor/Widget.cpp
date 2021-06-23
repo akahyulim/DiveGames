@@ -1,13 +1,13 @@
 #include "Widget.h"
 #include "Editor.h"
 
-namespace Editor
+namespace editor
 {
 	Widget::Widget(Editor* pEditor)
 	{
 		assert(pEditor);
 
-		m_pEditor = pEditor;
+		mpEditor = pEditor;
 	}
 
 	void Widget::Tick()
@@ -16,58 +16,58 @@ namespace Editor
 		// 이외에도 Progressbar, Toolbar 등이 구현 대상이다.
 		TickAlways();
 
-		if (!m_bWindow)	
+		if (!mbWindow)	
 			return;
 
 		bool bBegun = false;
 		{
-			if (!m_bVisible)
+			if (!mbVisible)
 				return;
 
-			if (m_position.x != -1.0f && m_position.y != -1.0f)
+			if (mPosition.x != -1.0f && mPosition.y != -1.0f)
 			{
-				ImGui::SetNextWindowPos(m_position);
+				ImGui::SetNextWindowPos(mPosition);
 			}
-			if (m_size.x != -1.0f && m_size.y != -1.0f)
+			if (mSize.x != -1.0f && mSize.y != -1.0f)
 			{
-				ImGui::SetNextWindowSize(m_size, ImGuiCond_FirstUseEver);
+				ImGui::SetNextWindowSize(mSize, ImGuiCond_FirstUseEver);
 			}
 			// 여기에서 크기를 제한시켜줘야하는데...
-			if ((m_size.x != -1.0f && m_size.y != -1.0f) || (m_sizeMax.x != FLT_MAX && m_sizeMax.y != FLT_MAX))
+			if ((mSize.x != -1.0f && mSize.y != -1.0f) || (mMaxSize.x != FLT_MAX && mMaxSize.y != FLT_MAX))
 			{
-				ImGui::SetNextWindowSizeConstraints(m_size, m_sizeMax);
+				ImGui::SetNextWindowSizeConstraints(mSize, mMaxSize);
 			}
-			if (m_alpha != -1.0f)
+			if (mAlpha != -1.0f)
 			{
-				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, m_alpha);
-				m_varPushes++;
+				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, mAlpha);
+				mVarPushes++;
 			}
-			if (m_padding.x != -1.0f && m_padding.y != -1.0f)
+			if (mPadding.x != -1.0f && mPadding.y != -1.0f)
 			{
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_padding);
-				m_varPushes++;
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, mPadding);
+				mVarPushes++;
 			}
 
 			// Style을 추가한 내용을 푸쉬하는 부분이다.
 			OnPushStyleVar();
 
-			if (ImGui::Begin(m_title.c_str(), &m_bVisible, m_flags))
+			if (ImGui::Begin(mTitle.c_str(), &mbVisible, mFlags))
 			{
-				m_window = ImGui::GetCurrentWindow();
-				m_height = ImGui::GetWindowHeight();
+				mWindow = ImGui::GetCurrentWindow();
+				mHeight = ImGui::GetWindowHeight();
 
 				bBegun = true;
 			}
-			else if (m_window && m_window->Hidden)
+			else if (mWindow && mWindow->Hidden)
 			{
 				bBegun = true;
 			}
 
-			if (m_window && m_window->Appearing)
+			if (mWindow && mWindow->Appearing)
 			{
 				OnShow();
 			}
-			else if (!m_bVisible)
+			else if (!mbVisible)
 			{
 				OnHide();
 			}
@@ -81,8 +81,8 @@ namespace Editor
 			{
 				ImGui::End();
 
-				ImGui::PopStyleVar(m_varPushes);
-				m_varPushes = 0;
+				ImGui::PopStyleVar(mVarPushes);
+				mVarPushes = 0;
 			}
 		}
 	}

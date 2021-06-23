@@ -1,7 +1,7 @@
 #pragma once
 #include "Widget.h"
 
-namespace Editor
+namespace editor
 {
 	class MenuBar : public Widget
 	{
@@ -13,6 +13,6 @@ namespace Editor
 
 	private:
 	private:
-		dive::Scene* m_pScene;
+		dive::Scene* mpScene;
 	};
 }

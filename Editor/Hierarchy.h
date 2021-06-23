@@ -2,7 +2,7 @@
 #include "Widget.h"
 #include "DragDrop.h"
 
-namespace Editor
+namespace editor
 {
 	class Hierarchy : public Widget
 	{
@@ -23,14 +23,14 @@ namespace Editor
 		void popupGameObjectRename();
 
 	private:
-		dive::Scene* m_pScene;
+		dive::Scene* mpScene;
 
-		dive::GameObject* m_pSelected;
-		dive::GameObject* m_pClicked;
-		dive::GameObject* m_pHovered;
-		dive::GameObject* m_pCopied;
+		dive::GameObject* mpSelected;
+		dive::GameObject* mpClicked;
+		dive::GameObject* mpHovered;
+		dive::GameObject* mpCopied;
 
-		DragDropPayload m_payload;
-		bool m_bPopupRename;
+		DragDropPayload mPayload;
+		bool mbPopupRename;
 	};
 }

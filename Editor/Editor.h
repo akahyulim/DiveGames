@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-namespace Editor
+namespace editor
 {
 	class Editor : public dive::Runtime
 	{
@@ -27,12 +27,12 @@ namespace Editor
 
 
 	private:
-		std::vector<std::shared_ptr<Widget>> m_widgets;
+		std::vector<std::shared_ptr<Widget>> mWidgets;
 
-		bool m_bDockSpace;
+		bool mbDockSpace;
 
-		bool m_bShowProjectDialog;
+		bool mbShowProjectDialog;
 
-		RenderPathEditor m_renderPathEditor;
+		RenderPathEditor mRenderPathEditor;
 	};
 }

@@ -1,10 +1,10 @@
 #include "Assets.h"
 
-namespace Editor
+namespace editor
 {
 	Assets::Assets(Editor* pEditor)
 		: Widget(pEditor)
 	{
-		m_title = "Assets";
+		mTitle = "Assets";
 	}
 }

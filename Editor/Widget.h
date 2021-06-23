@@ -3,7 +3,7 @@
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
 
-namespace Editor
+namespace editor
 {
 	class Editor;
 
@@ -23,28 +23,28 @@ namespace Editor
 		virtual void OnHide() {}
 		virtual void OnPushStyleVar() {}
 
-		bool IsVisible() const { return m_bVisible; }
-		void SetVisible(bool visible) { m_bVisible = visible; }
-		float GetHeight() const { return m_height; }
-		std::string GetTitle() const { return m_title; }
-		ImGuiWindow* GetWindow() const { return m_window; }
+		bool IsVisible() const { return mbVisible; }
+		void SetVisible(bool visible) { mbVisible = visible; }
+		float GetHeight() const { return mHeight; }
+		std::string GetTitle() const { return mTitle; }
+		ImGuiWindow* GetWindow() const { return mWindow; }
 
 	protected:
-		bool m_bWindow = true;
-		bool m_bVisible = true;
-		int m_flags = ImGuiWindowFlags_NoCollapse;
-		float m_height = 0.0f;
-		float m_alpha = -1.0f;
-		ImVec2 m_position = ImVec2(-1.0f, -1.0f);
-		ImVec2 m_size = ImVec2(-1.0f, -1.0f);
-		ImVec2 m_sizeMax = ImVec2(FLT_MAX, FLT_MAX);
-		ImVec2 m_padding = ImVec2(-1.0f, -1.0f);
-		std::string m_title = "Title";
-		ImGuiWindow* m_window = nullptr;
+		bool mbWindow = true;
+		bool mbVisible = true;
+		int mFlags = ImGuiWindowFlags_NoCollapse;
+		float mHeight = 0.0f;
+		float mAlpha = -1.0f;
+		ImVec2 mPosition = ImVec2(-1.0f, -1.0f);
+		ImVec2 mSize = ImVec2(-1.0f, -1.0f);
+		ImVec2 mMaxSize = ImVec2(FLT_MAX, FLT_MAX);
+		ImVec2 mPadding = ImVec2(-1.0f, -1.0f);
+		std::string mTitle = "Title";
+		ImGuiWindow* mWindow = nullptr;
 
-		Editor* m_pEditor = nullptr;
+		Editor* mpEditor = nullptr;
 
 	private:
-		unsigned char m_varPushes = 0;
+		unsigned char mVarPushes = 0;
 	};
 }

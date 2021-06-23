@@ -11,7 +11,7 @@
 #include <iostream>
 
 
-namespace Editor
+namespace editor
 {
 	Editor::Editor()
 	{
@@ -37,7 +37,7 @@ namespace Editor
 		initialize_ImGui();
 
 		// RenderPath 적용
-		ActivatePath(&m_renderPathEditor);
+		ActivatePath(&mRenderPathEditor);
 
 		APP_TRACE("Editor::Initialize()");
 
@@ -58,7 +58,7 @@ namespace Editor
 			beginDockSpace();
 
 			// 이 곳에서 Widget을 그릴 것이다.
-			for (auto pWidget : m_widgets)
+			for (auto pWidget : mWidgets)
 			{
 				pWidget->Tick();
 			}
@@ -133,11 +133,11 @@ namespace Editor
 		ImGui_ImplDX11_Init(pDevice, pImmediateContext);
 
 		// Widget 생성
-		m_widgets.emplace_back(std::make_shared<MenuBar>(this));
-		m_widgets.emplace_back(std::make_shared<Hierarchy>(this));
-		m_widgets.emplace_back(std::make_shared<Scene>(this));
-		m_widgets.emplace_back(std::make_shared<Inspector>(this));
-		m_widgets.emplace_back(std::make_shared<Assets>(this));
+		mWidgets.emplace_back(std::make_shared<MenuBar>(this));
+		mWidgets.emplace_back(std::make_shared<Hierarchy>(this));
+		mWidgets.emplace_back(std::make_shared<Scene>(this));
+		mWidgets.emplace_back(std::make_shared<Inspector>(this));
+		mWidgets.emplace_back(std::make_shared<Assets>(this));
 	}
 
 	void Editor::beginDockSpace()
@@ -166,10 +166,10 @@ namespace Editor
 		const char* dockSpaceName = "DiveEditor";
 
 		bool open = true;
-		m_bDockSpace = ImGui::Begin(dockSpaceName, &open, window_flags);
+		mbDockSpace = ImGui::Begin(dockSpaceName, &open, window_flags);
 		ImGui::PopStyleVar(3);
 
-		if (m_bDockSpace)
+		if (mbDockSpace)
 		{
 			const auto window_id = ImGui::GetID(dockSpaceName);
 			if (!ImGui::DockBuilderGetNode(window_id))
@@ -197,7 +197,7 @@ namespace Editor
 	
 	void Editor::endDockSpace()
 	{
-		if(m_bDockSpace)
+		if(mbDockSpace)
 			ImGui::End();
 	}
 
