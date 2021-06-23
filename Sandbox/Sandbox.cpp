@@ -4,17 +4,17 @@ namespace sandbox
 {
 	Sandbox::Sandbox()
 	{
-		mpTriangle = nullptr;
+		mTriangle = nullptr;
 
 		m_title = "SandBox";
 	}
 
 	Sandbox::~Sandbox()
 	{
-		if (mpTriangle)
+		if (mTriangle)
 		{
-			delete mpTriangle;
-			mpTriangle = nullptr;
+			delete mTriangle;
+			mTriangle = nullptr;
 		}
 	}
 
@@ -37,20 +37,20 @@ namespace sandbox
 
 	void Sandbox::triangle_coloring()
 	{
-		mpTriangle = new dive::Mesh;
-		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
-		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
-		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
-		mpTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
-		mpTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
-		mpTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
-		mpTriangle->m_indices.emplace_back(0);
-		mpTriangle->m_indices.emplace_back(1);
-		mpTriangle->m_indices.emplace_back(2);
+		mTriangle = new dive::Mesh;
+		mTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
+		mTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
+		mTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
+		mTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f));
+		mTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f));
+		mTriangle->m_colors.emplace_back(DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f));
+		mTriangle->m_indices.emplace_back(0);
+		mTriangle->m_indices.emplace_back(1);
+		mTriangle->m_indices.emplace_back(2);
 
-		mpTriangle->CreateRenderDate();
+		mTriangle->CreateRenderDate();
 
-		dive::Scene::GetGlobalScene().SetMesh(mpTriangle);
+		dive::Scene::GetGlobalScene().SetMesh(mTriangle);
 
 		// 현재는 Scene이 Mesh 단일 객체를 멤버 변수로 관리하고 있다.
 		// 결국엔 GameObject로 다루어야 한다.
@@ -59,20 +59,20 @@ namespace sandbox
 
 	void Sandbox::triangle_texturing()
 	{
-		mpTriangle = new dive::Mesh;
-		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
-		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
-		mpTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
-		mpTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(0.0f, 1.0f));
-		mpTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(0.5f, 0.0f));
-		mpTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(1.0f, 1.0f));
-		mpTriangle->m_indices.emplace_back(0);
-		mpTriangle->m_indices.emplace_back(1);
-		mpTriangle->m_indices.emplace_back(2);
+		mTriangle = new dive::Mesh;
+		mTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f));
+		mTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
+		mTriangle->m_positions.emplace_back(DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f));
+		mTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(0.0f, 1.0f));
+		mTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(0.5f, 0.0f));
+		mTriangle->m_uv.emplace_back(DirectX::XMFLOAT2(1.0f, 1.0f));
+		mTriangle->m_indices.emplace_back(0);
+		mTriangle->m_indices.emplace_back(1);
+		mTriangle->m_indices.emplace_back(2);
 
-		mpTriangle->CreateRenderDate();
+		mTriangle->CreateRenderDate();
 
-		dive::Scene::GetGlobalScene().SetMesh(mpTriangle);
+		dive::Scene::GetGlobalScene().SetMesh(mTriangle);
 
 		// 텍스쳐도 여기에서 생성한 후 등록해야 한다.
 	}

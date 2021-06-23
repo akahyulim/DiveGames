@@ -11,7 +11,7 @@
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
-sandbox::Sandbox* gpApp = nullptr;
+sandbox::Sandbox* gApp = nullptr;
 
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
@@ -34,7 +34,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #endif
 
     sandbox::Sandbox app;
-    gpApp = &app;
+    gApp = &app;
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -66,7 +66,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
-    gpApp = nullptr;
+    gApp = nullptr;
 
 #ifdef _DEBUG
     system("pause");
@@ -148,7 +148,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-   gpApp->SetWindow(hWnd, bFullScreen);
+   gApp->SetWindow(hWnd, bFullScreen);
 
    // 해상도를 맞추려면 크기를 변경해야 한다.
 
@@ -199,7 +199,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_INPUT:
         {
-            if (gpApp->IsInitialized())
+            if (gApp->IsInitialized())
             {
                 dive::Input::GetInstance().ParseMessage(lParam);
             }

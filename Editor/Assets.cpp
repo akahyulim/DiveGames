@@ -2,8 +2,8 @@
 
 namespace editor
 {
-	Assets::Assets(Editor* pEditor)
-		: Widget(pEditor)
+	Assets::Assets(Editor* editor)
+		: Widget(editor)
 	{
 		mTitle = "Assets";
 	}

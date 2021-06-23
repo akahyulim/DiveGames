@@ -3,8 +3,8 @@
 // Renderer로부터 Image를 가져와 출력한다.
 namespace editor
 {
-    Scene::Scene(Editor* pEditor)
-        : Widget(pEditor)
+    Scene::Scene(Editor* editor)
+        : Widget(editor)
     {
         mTitle = "Scene";
         // 크기 설정에 의미가 있나 싶다.
@@ -12,28 +12,28 @@ namespace editor
         mFlags |= ImGuiWindowFlags_NoScrollbar;
         mPadding = ImVec2(4.0f, 4.0f);
         
-        mpScene = &dive::Scene::GetGlobalScene();
-        mpRenderer = &dive::Renderer::GetInstance();
+        mScene = &dive::Scene::GetGlobalScene();
+        mRenderer = &dive::Renderer::GetInstance();
     }
 
     void Scene::TickVisible()
     {
-        if (!mpRenderer)
+        if (!mRenderer)
             return;
 
         float width = static_cast<float>(ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x);
         float height = static_cast<float>(ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y);
     
         // Viewport도 설정해줘야 한다.
-        mpRenderer->SetViewport(width, height);
+        mRenderer->SetViewport(width, height);
 
         // 변경 여부를 판단해야 한다. 아니면 매번 변경한다. 근데 별 상관 없을수도...
         {
-            mpRenderer->SetResolution(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
+            mRenderer->SetResolution(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
         }
     
         ImGui::Image(
-            mpRenderer->GetFrameTexture()->GetShaderResourceView(),
+            mRenderer->GetFrameTexture()->GetShaderResourceView(),
             //nullptr,
             ImVec2(static_cast<float>(width), static_cast<float>(height)),
             ImVec2(0, 0),

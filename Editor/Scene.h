@@ -6,13 +6,13 @@ namespace editor
 	class Scene : public Widget
 	{
 	public:
-		Scene(Editor* pEditor);
+		Scene(Editor* editor);
 
 		void TickVisible() override;
 
 	private:
 	private:
-		dive::Scene* mpScene;
-		dive::Renderer* mpRenderer;
+		dive::Scene* mScene;
+		dive::Renderer* mRenderer;
 	};
 }

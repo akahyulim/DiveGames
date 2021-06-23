@@ -3,8 +3,8 @@
 // 현재 선택된 GameObject의 Inspector들을 보여준다.
 namespace editor
 {
-	Inspector::Inspector(Editor* pEditor)
-		: Widget(pEditor)
+	Inspector::Inspector(Editor* editor)
+		: Widget(editor)
 	{
 		mTitle = "Inspector";
 	}

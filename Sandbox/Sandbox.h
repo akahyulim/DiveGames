@@ -19,6 +19,6 @@ namespace sandbox
 		dive::RenderPath3D mRenderPath;
 
 		// 위치가 좀 에바다.
-		dive::Mesh* mpTriangle;
+		dive::Mesh* mTriangle;
 	};
 }

@@ -6,13 +6,13 @@ namespace editor
 	class MenuBar : public Widget
 	{
 	public:
-		MenuBar(Editor* pEditor);
+		MenuBar(Editor* editor);
 
 		void TickAlways() override;
 		float GetPadding() { return 8.0f; }
 
 	private:
 	private:
-		dive::Scene* mpScene;
+		dive::Scene* mScene;
 	};
 }

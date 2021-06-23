@@ -10,7 +10,7 @@ namespace editor
 	class Widget
 	{
 	public:
-		Widget(Editor* pEditor);
+		Widget(Editor* editor);
 		virtual ~Widget() = default;
 
 		void Tick();
@@ -42,7 +42,7 @@ namespace editor
 		std::string mTitle = "Title";
 		ImGuiWindow* mWindow = nullptr;
 
-		Editor* mpEditor = nullptr;
+		Editor* mEditor = nullptr;
 
 	private:
 		unsigned char mVarPushes = 0;

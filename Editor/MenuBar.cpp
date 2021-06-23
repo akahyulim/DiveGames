@@ -6,12 +6,12 @@
 
 namespace editor
 {
-	MenuBar::MenuBar(Editor* pEditor)
-		: Widget(pEditor)
+	MenuBar::MenuBar(Editor* editor)
+		: Widget(editor)
 	{
 		mTitle = "MenuBar";
 		mbWindow = false;
-		mpScene = &dive::Scene::GetGlobalScene();
+		mScene = &dive::Scene::GetGlobalScene();
 	}
 
 	void MenuBar::TickAlways()
@@ -121,7 +121,7 @@ namespace editor
 					}
 					// 하지만 추후 Project의 변경사항까지 확인해야 한다.
 
-					DestroyWindow(mpEditor->GetWindowHandle());
+					DestroyWindow(mEditor->GetWindowHandle());
 				}
 
 				ImGui::EndMenu();
@@ -133,7 +133,7 @@ namespace editor
 			{
 				if (ImGui::MenuItem("Create Empty"))
 				{
-					mpScene->CreateGameObject();
+					mScene->CreateGameObject();
 				}
 
 				if (ImGui::BeginMenu("3D Object"))

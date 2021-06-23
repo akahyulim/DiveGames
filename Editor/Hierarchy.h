@@ -7,28 +7,28 @@ namespace editor
 	class Hierarchy : public Widget
 	{
 	public:
-		Hierarchy(Editor* pEditor);
+		Hierarchy(Editor* editor);
 
 		void TickVisible() override;
 
 	private:
 		void treeShow();
-		void treeAddGameObject(dive::GameObject* pGameObject);
+		void treeAddGameObject(dive::GameObject* gameObject);
 
-		void setSelected(dive::GameObject* pGameObject);
+		void setSelected(dive::GameObject* gameObject);
 		void handleClicking();
-		void handleDragDrop(dive::GameObject* pGameObject);
+		void handleDragDrop(dive::GameObject* gameObject);
 
 		void popupPropertyMenu();
 		void popupGameObjectRename();
 
 	private:
-		dive::Scene* mpScene;
+		dive::Scene* mScene;
 
-		dive::GameObject* mpSelected;
-		dive::GameObject* mpClicked;
-		dive::GameObject* mpHovered;
-		dive::GameObject* mpCopied;
+		dive::GameObject* mSelected;
+		dive::GameObject* mClicked;
+		dive::GameObject* mHovered;
+		dive::GameObject* mCopied;
 
 		DragDropPayload mPayload;
 		bool mbPopupRename;

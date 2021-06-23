@@ -6,7 +6,7 @@ namespace editor
 	class Assets : public Widget
 	{
 	public:
-		Assets(Editor* pEditor);
+		Assets(Editor* editor);
 	private:
 	private:
 	};

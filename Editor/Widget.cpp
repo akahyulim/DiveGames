@@ -3,11 +3,11 @@
 
 namespace editor
 {
-	Widget::Widget(Editor* pEditor)
+	Widget::Widget(Editor* editor)
 	{
-		assert(pEditor);
+		assert(editor);
 
-		mpEditor = pEditor;
+		mEditor = editor;
 	}
 
 	void Widget::Tick()

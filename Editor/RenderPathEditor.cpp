@@ -4,7 +4,7 @@ namespace editor
 {
 	RenderPathEditor::RenderPathEditor()
 	{
-		mpSpace = &dive::Scene::GetGlobalScene();
+		mScene = &dive::Scene::GetGlobalScene();
 	}
 
 	RenderPathEditor::~RenderPathEditor()
@@ -21,7 +21,7 @@ namespace editor
 		// 업데이트 필요 여부에 따라 선택
 		{
 			auto timeScale = dive::TimeManager::GetInstance().GetTimeScale();
-			mpSpace->Update(deltaTime * timeScale);
+			mScene->Update(deltaTime * timeScale);
 		}
 	}
 	
