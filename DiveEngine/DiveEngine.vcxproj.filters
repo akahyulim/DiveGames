@@ -97,9 +97,6 @@
     <ClInclude Include="Resource.h">
       <Filter>Engine\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Engine\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="dvMesh.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
@@ -388,6 +385,9 @@
     <ClInclude Include="Light.h">
       <Filter>Engine\Scene\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Engine\Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -459,9 +459,6 @@
     <ClCompile Include="StringHelper.cpp">
       <Filter>Engine\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="Model.cpp">
-      <Filter>Engine\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="MeshRenderer.cpp">
       <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
@@ -473,6 +470,9 @@
     </ClCompile>
     <ClCompile Include="Light.cpp">
       <Filter>Engine\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="dvMesh.cpp">
+      <Filter>Engine\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -520,6 +520,9 @@
     </Filter>
     <Filter Include="External\spdlog\fmt\bundled">
       <UniqueIdentifier>{561cef61-527b-4925-89c6-a7bcdf59ace5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Utility">
+      <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

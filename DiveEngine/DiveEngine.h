@@ -18,6 +18,7 @@
 #include "Renderer.h"
 #include "VertexTypes.h"
 #include "Mesh.h"
+#include "dvMesh.h"
 #include "Texture.h"
 
 //= Input =========================
@@ -28,6 +29,10 @@
 #include "GameObject.h"
 #include "Component.h"
 #include "Transform.h"
+#include "MeshRenderer.h"
+
+//= Utility =======================
+#include "Geometry.h"
 
 //= Tool ==========================
 #include "FontImporter.h"

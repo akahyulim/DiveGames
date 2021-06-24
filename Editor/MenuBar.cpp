@@ -150,6 +150,17 @@ namespace editor
 
 					if (ImGui::MenuItem("Cube"))
 					{
+						// 일단 테스트
+						dive::dvMesh mesh;
+						mesh.SetName("Cube");
+						dive::utility::geometry::CreateCube(mesh.GetVertices(), mesh.GetIndices());
+
+						auto gameObject = mScene->CreateGameObject();
+						auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
+
+						meshRenderer->SetMesh(mesh);
+
+						gameObject->SetName("Cube");
 					}
 
 					if (ImGui::MenuItem("Plane"))

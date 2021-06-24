@@ -4,10 +4,11 @@
 
 namespace dive
 {
-	// 1. unity는 package라는 포멧 파일로 asset을 관리한다.
-	// asset 타입별 구분이 존재하겠지만 솔직히 잘 모르겠다.
-	// 그냥 여러 포멧의 파일들을 압축하는 것 같기도 하다.
-	// 2. import하면 해당 package의 모든 asset들이 prefab으로 생성되는 것 같다.
+	// 특정 경로의 프로젝트 이름으로 폴더가 생성된다.
+	// => 경로 변경이 가능하게 하려면 결국 ini 파일 등에 저장해야 한다.
+	// Assets의 Art에 Textures, Sprites, Models, Materials 등으로 나누어진다.
+	// Assets의 Scenes에 Scene, Prefabs에 prefab이 저장된다.
+	// Editor는 실행 후 Project를 Load하면 관련 Asset들을 모두 메모리에 올린다.
 	class AssetManager
 	{
 	public:

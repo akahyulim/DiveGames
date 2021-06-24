@@ -2,6 +2,7 @@
 #include "Object.h"
 #include "Component.h"
 #include "Transform.h"
+#include "MeshRenderer.h"
 #include <string>
 #include <vector>
 #include <memory>

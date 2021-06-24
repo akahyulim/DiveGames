@@ -270,6 +270,7 @@
     <ClInclude Include="FontImporter.h" />
     <ClInclude Include="FormatHelper.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
     <ClInclude Include="GraphicsInclude.h" />
@@ -279,7 +280,6 @@
     <ClInclude Include="Log.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshRenderer.h" />
-    <ClInclude Include="Model.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="Renderer.h" />
@@ -300,6 +300,7 @@
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="dvMesh.cpp" />
     <ClCompile Include="FileStream.cpp" />
     <ClCompile Include="FileSystemHelper.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -313,7 +314,6 @@
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
-    <ClCompile Include="Model.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Renderer_Resources.cpp" />
     <ClCompile Include="RenderPath3D.cpp" />
