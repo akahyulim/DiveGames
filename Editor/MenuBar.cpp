@@ -151,7 +151,8 @@ namespace editor
 					if (ImGui::MenuItem("Cube"))
 					{
 						// 일단 테스트
-						dive::dvMesh mesh;
+						// mesh를 잘못 생성했다.
+						static dive::dvMesh mesh;
 						mesh.SetName("Cube");
 						dive::utility::geometry::CreateCube(mesh.GetVertices(), mesh.GetIndices());
 

@@ -14,6 +14,9 @@ namespace dive
 
 	// 일단 static mesh만 구현하고, 추후 분리하는 방법을 고민해보자.
 	// skinned mesh의 경우에도 결국엔 단일 mesh로 구성함을 잊지 말자.
+	// Mesh를 어떻게 관리할 것인지도 생각해야 한다.
+	// 현재 Editor와 Sandbox 둘 다 static으로 생성하였다.
+	// MeshRenderer에서 생성하는 것이 가장 나을 것 같다.
 	class dvMesh
 	{
 	public:

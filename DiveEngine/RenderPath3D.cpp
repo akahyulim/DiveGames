@@ -49,9 +49,10 @@ namespace dive
 		Renderer::GetInstance().SetViewport(width, height);
 		
 		Renderer::GetInstance().UpdateCB();
-		Renderer::GetInstance().DrawColor();
+		//Renderer::GetInstance().DrawColor();
 		//Renderer::GetInstance().DrawTexturing();
-		
+		Renderer::GetInstance().DrawLegacy();
+
 		// TextMesh와 GameObject 구성 후 다시 테스트
 		//Renderer::GetInstance().DrawText();
 	}

@@ -65,6 +65,7 @@ namespace dive
 		// 일단 나누자
 		void DrawColor();
 		void DrawTexturing();
+		void DrawLegacy();
 		void DrawText();
 
 		void ObjectClassify();
@@ -90,7 +91,7 @@ namespace dive
 		void createPipelineStates();
 
 		bool createVertexShader(const std::wstring& filepath, unsigned int shaderType, unsigned int inputLayoutType = ILTYPE_COUNT,
-			D3D11_INPUT_ELEMENT_DESC* pDescs = nullptr, UINT numElements = 0);
+			D3D11_INPUT_ELEMENT_DESC* descs = nullptr, UINT numElements = 0);
 		bool createPixelShader(const std::wstring& filepath, unsigned int shaderType);
 
 	private:
@@ -124,6 +125,7 @@ namespace dive
 		PipelineState mPipelineStateColor;
 		PipelineState mPipelineStateTexturing;
 		PipelineState mPipelineStateFont;	// text라는 이름이 더 낫지 않을까?
+		PipelineState mPipelineStateLegacy;
 
 		std::unordered_map<eRenderTargets, Texture*> mRenderTargets;
 

@@ -14,15 +14,13 @@ namespace dive
 		// 추후 바꿔야할 거다.
 		void SetMesh(const dvMesh& mesh);
 
-
-		// 아니면 아에 이 곳에서 Draw()를 구성하는 것도 한 방법이다.
-		// 물론 그렇다면 SkinnedMesh일 때 좀 더 생각할 구석이 많아진다.
-		// 스파르탄 형식은 안되기 때문이다?
-		// 일단 이걸 그릴려면 IL과 이에 맞는 Shader를 또 만들어야 한다.
+		// 아에 이 곳에 Draw 함수를 만들수도 있다.
+		// 하지만 IL과 Shader를 구분 선택할 수 있어야 한다.
 		ID3D11Buffer* GetVertexBuffer() { return mVertexBuffer; }
-		ID3D11Buffer* GetIdexBuffer() { return mIndexBuffer; }
+		ID3D11Buffer* GetIndexBuffer() { return mIndexBuffer; }
 
-		unsigned int GetVertexStride() { return mStride; }
+		unsigned int GetVertexStride() { return static_cast<unsigned int>(sizeof(VertexType_PosTexNorTan)); }
+		unsigned int GetIndexCount() { return mMesh->GetIndexCount(); }
 
 	private:
 		void calcu();

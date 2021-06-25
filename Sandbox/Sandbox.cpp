@@ -27,8 +27,18 @@ namespace sandbox
 
 		ActivatePath(&mRenderPath);
 
-		triangle_coloring();
+		//triangle_coloring();
 		//triangle_texturing();
+		{
+			auto gameObject = dive::Scene::GetGlobalScene().CreateGameObject();
+			auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
+
+			static dive::dvMesh mesh;
+			mesh.SetName("Cube");
+			dive::utility::geometry::CreateCube(mesh.GetVertices(), mesh.GetIndices());
+
+			meshRenderer->SetMesh(mesh);
+		}
 
 		APP_TRACE("Sandbox::Initialize()");
 		

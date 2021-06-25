@@ -1,6 +1,8 @@
 #include "Renderer.h"
 #include "Scene.h"
 #include "Mesh.h"
+#include "MeshRenderer.h"
+#include "GameObject.h"
 #include "Log.h"
 #include "TextMesh.h"
 #include <assert.h>
@@ -83,8 +85,8 @@ namespace dive
 	// 갱신만 한다. bind는 개별 path에서 한다.
 	void Renderer::UpdateCB()
 	{
-		auto pImmediateContext = mGraphicsDevice->GetImmediateContext();
-		assert(pImmediateContext != nullptr);
+		auto immediateContext = mGraphicsDevice->GetImmediateContext();
+		assert(immediateContext != nullptr);
 
 		// CB Update
 		if (mConstantBufferMatrix == nullptr)
@@ -92,7 +94,7 @@ namespace dive
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-		if (FAILED(pImmediateContext->Map(mConstantBufferMatrix.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		if (FAILED(immediateContext->Map(mConstantBufferMatrix.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
 			CORE_ERROR("Constant Buffer Mapping에 실패하였습니다.");
 			return;
@@ -162,7 +164,7 @@ namespace dive
 			pBuffer->projOrthographic = XMMatrixTranspose(XMMatrixOrthographicLH(width, height, 0.1f, 1000.0f));
 		}
 
-		pImmediateContext->Unmap(static_cast<ID3D11Resource*>(mConstantBufferMatrix.Get()), 0);
+		immediateContext->Unmap(static_cast<ID3D11Resource*>(mConstantBufferMatrix.Get()), 0);
 	}
 
 	void Renderer::DrawScene()
@@ -178,18 +180,18 @@ namespace dive
 		if (!mesh)
 			return;
 
-		auto pImmediateContext = mGraphicsDevice->GetImmediateContext();
-		assert(pImmediateContext != nullptr);
+		auto immediateContext = mGraphicsDevice->GetImmediateContext();
+		assert(immediateContext != nullptr);
 
-		pImmediateContext->IASetInputLayout(mPipelineStateColor.pIL);
-		pImmediateContext->IASetPrimitiveTopology(mPipelineStateColor.primitiveTopology);
-		pImmediateContext->VSSetShader(mPipelineStateColor.pVS, NULL, 0);
-		pImmediateContext->PSSetShader(mPipelineStateColor.pPS, NULL, 0);
-		pImmediateContext->OMSetDepthStencilState(mPipelineStateColor.pDSS, 1);
-		pImmediateContext->RSSetState(mPipelineStateColor.pRSS);
+		immediateContext->IASetInputLayout(mPipelineStateColor.pIL);
+		immediateContext->IASetPrimitiveTopology(mPipelineStateColor.primitiveTopology);
+		immediateContext->VSSetShader(mPipelineStateColor.pVS, NULL, 0);
+		immediateContext->PSSetShader(mPipelineStateColor.pPS, NULL, 0);
+		immediateContext->OMSetDepthStencilState(mPipelineStateColor.pDSS, 1);
+		immediateContext->RSSetState(mPipelineStateColor.pRSS);
 
-		pImmediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
-		pImmediateContext->RSSetViewports(1, &mViewPort);
+		immediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
+		immediateContext->RSSetViewports(1, &mViewPort);
 
 		ID3D11Buffer* vbs[] =
 		{
@@ -209,26 +211,26 @@ namespace dive
 			0
 		};
 
-		pImmediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);
-		pImmediateContext->IASetIndexBuffer(mesh->m_pIB.Get(), DXGI_FORMAT_R32_UINT, 0);
+		immediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);
+		immediateContext->IASetIndexBuffer(mesh->m_pIB.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		pImmediateContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+		immediateContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 	}
 
 	void Renderer::DrawTexturing()
 	{
-		auto pImmediateContext = mGraphicsDevice->GetImmediateContext();
-		assert(pImmediateContext != nullptr);
+		auto immediateContext = mGraphicsDevice->GetImmediateContext();
+		assert(immediateContext != nullptr);
 
-		pImmediateContext->IASetInputLayout(mPipelineStateTexturing.pIL);
-		pImmediateContext->IASetPrimitiveTopology(mPipelineStateTexturing.primitiveTopology);
-		pImmediateContext->VSSetShader(mPipelineStateTexturing.pVS, NULL, 0);
-		pImmediateContext->PSSetShader(mPipelineStateTexturing.pPS, NULL, 0);
-		pImmediateContext->PSSetSamplers(0, 1, &mPipelineStateTexturing.pSS);	// 얘는 더블 포인터다...
-		pImmediateContext->OMSetDepthStencilState(mPipelineStateTexturing.pDSS, 1);
-		pImmediateContext->RSSetState(mPipelineStateTexturing.pRSS);
+		immediateContext->IASetInputLayout(mPipelineStateTexturing.pIL);
+		immediateContext->IASetPrimitiveTopology(mPipelineStateTexturing.primitiveTopology);
+		immediateContext->VSSetShader(mPipelineStateTexturing.pVS, NULL, 0);
+		immediateContext->PSSetShader(mPipelineStateTexturing.pPS, NULL, 0);
+		immediateContext->PSSetSamplers(0, 1, &mPipelineStateTexturing.pSS);	// 얘는 더블 포인터다...
+		immediateContext->OMSetDepthStencilState(mPipelineStateTexturing.pDSS, 1);
+		immediateContext->RSSetState(mPipelineStateTexturing.pRSS);
 
-		pImmediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
+		immediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
 
 
 		// 임시
@@ -240,7 +242,7 @@ namespace dive
 		viewport.MaxDepth = 1.0f;
 		viewport.TopLeftX = 0.0f;
 		viewport.TopLeftY = 0.0f;
-		pImmediateContext->RSSetViewports(1, &viewport);
+		immediateContext->RSSetViewports(1, &viewport);
 
 		// 이건 임시다. Visibility 등을 통해 얻어야 한다.
 		Mesh* mesh = Scene::GetGlobalScene().GetMesh();
@@ -267,31 +269,28 @@ namespace dive
 		auto pSRV = mTexture->GetShaderResourceView();
 		//auto pSRV = mCpuTexture->GetShaderResourceView();
 		//auto pSRV = mDvFont->GetAtlas()->GetShaderResourceView();
-		pImmediateContext->PSSetShaderResources(0, 1, &pSRV);
+		immediateContext->PSSetShaderResources(0, 1, &pSRV);
 
-		pImmediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);
-		pImmediateContext->IASetIndexBuffer(mesh->m_pIB.Get(), DXGI_FORMAT_R32_UINT, 0);
+		immediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);
+		immediateContext->IASetIndexBuffer(mesh->m_pIB.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		pImmediateContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+		immediateContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
 	}
 
-	// 함수이름이 자동으로 바뀌네...
-	void Renderer::DrawText()
+	void Renderer::DrawLegacy()
 	{
-		// GameObject에서 TextMesh만 뽑아서 호출하도록 바꿔야 한다.
+		auto immediateContext = mGraphicsDevice->GetImmediateContext();
+		assert(immediateContext != nullptr);
 
-		auto pImmediateContext = mGraphicsDevice->GetImmediateContext();
-		assert(pImmediateContext != nullptr);
+		immediateContext->IASetInputLayout(mPipelineStateLegacy.pIL);
+		immediateContext->IASetPrimitiveTopology(mPipelineStateLegacy.primitiveTopology);
+		immediateContext->VSSetShader(mPipelineStateLegacy.pVS, NULL, 0);
+		immediateContext->PSSetShader(mPipelineStateLegacy.pPS, NULL, 0);
+		immediateContext->PSSetSamplers(0, 1, &mPipelineStateLegacy.pSS);
+		immediateContext->OMSetDepthStencilState(mPipelineStateLegacy.pDSS, 1);
+		immediateContext->RSSetState(mPipelineStateLegacy.pRSS);
 
-		pImmediateContext->IASetInputLayout(mPipelineStateFont.pIL);
-		pImmediateContext->IASetPrimitiveTopology(mPipelineStateFont.primitiveTopology);
-		pImmediateContext->VSSetShader(mPipelineStateFont.pVS, NULL, 0);
-		pImmediateContext->PSSetShader(mPipelineStateFont.pPS, NULL, 0);
-		pImmediateContext->PSSetSamplers(0, 1, &mPipelineStateFont.pSS);	// 얘는 더블 포인터다...
-		pImmediateContext->OMSetDepthStencilState(mPipelineStateFont.pDSS, 1);
-		pImmediateContext->RSSetState(mPipelineStateFont.pRSS);
-
-		pImmediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
+		immediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
 
 		D3D11_VIEWPORT viewport;
 		viewport.Width = (float)mGraphicsDevice->GetResolutionWidth();
@@ -300,18 +299,69 @@ namespace dive
 		viewport.MaxDepth = 1.0f;
 		viewport.TopLeftX = 0.0f;
 		viewport.TopLeftY = 0.0f;
-		pImmediateContext->RSSetViewports(1, &viewport);
+		immediateContext->RSSetViewports(1, &viewport);
+
+		// 현재 벡터를 복사해서 받고 있다. 참조가 훨씬 나을듯... 
+		auto gameObjects = Scene::GetGlobalScene().GetAllGameObjects();
+		MeshRenderer* meshRenderer = nullptr;
+		for (const auto& gameObject : gameObjects)
+		{
+			meshRenderer = gameObject->GetComponent<MeshRenderer>();
+			if (meshRenderer)
+			{
+				ID3D11Buffer* vertexBuffer = meshRenderer->GetVertexBuffer();
+				assert(vertexBuffer != nullptr);
+				unsigned int stride = meshRenderer->GetVertexStride();
+				unsigned int offset = 0;
+				immediateContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+				ID3D11Buffer* indexBuffer = meshRenderer->GetIndexBuffer();
+				assert(indexBuffer != nullptr);
+				immediateContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+				immediateContext->DrawIndexed(meshRenderer->GetIndexCount(), 0, 0);
+
+				CORE_TRACE("Legacy Object - {0:d}, {1:d}", stride, meshRenderer->GetIndexCount());
+			}
+		}
+	}
+
+	// 함수이름이 자동으로 바뀌네...
+	void Renderer::DrawText()
+	{
+		// GameObject에서 TextMesh만 뽑아서 호출하도록 바꿔야 한다.
+
+		auto immediateContext = mGraphicsDevice->GetImmediateContext();
+		assert(immediateContext != nullptr);
+
+		immediateContext->IASetInputLayout(mPipelineStateFont.pIL);
+		immediateContext->IASetPrimitiveTopology(mPipelineStateFont.primitiveTopology);
+		immediateContext->VSSetShader(mPipelineStateFont.pVS, NULL, 0);
+		immediateContext->PSSetShader(mPipelineStateFont.pPS, NULL, 0);
+		immediateContext->PSSetSamplers(0, 1, &mPipelineStateFont.pSS);	// 얘는 더블 포인터다...
+		immediateContext->OMSetDepthStencilState(mPipelineStateFont.pDSS, 1);
+		immediateContext->RSSetState(mPipelineStateFont.pRSS);
+
+		immediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
+
+		D3D11_VIEWPORT viewport;
+		viewport.Width = (float)mGraphicsDevice->GetResolutionWidth();
+		viewport.Height = (float)mGraphicsDevice->GetResolutionHeight();
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+		viewport.TopLeftX = 0.0f;
+		viewport.TopLeftY = 0.0f;
+		immediateContext->RSSetViewports(1, &viewport);
 
 		//auto pSRV = m_pTextMesh->GetAtlas();
-		//pImmediateContext->PSSetShaderResources(0, 1, &pSRV);
+		//immediateContext->PSSetShaderResources(0, 1, &pSRV);
 
 		//auto pVB = m_pTextMesh->GetVertexBuffer();
 		///unsigned int stride = m_pTextMesh->GetStride();
 		//unsigned int offset = 0;
-		//pImmediateContext->IASetVertexBuffers(0, 1, &pVB, &stride, &offset);
-		//pImmediateContext->IASetIndexBuffer(m_pTextMesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+		//immediateContext->IASetVertexBuffers(0, 1, &pVB, &stride, &offset);
+		//immediateContext->IASetIndexBuffer(m_pTextMesh->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 
-		//pImmediateContext->DrawIndexed(m_pTextMesh->GetIndexCount(), 0, 0);
+		//immediateContext->DrawIndexed(m_pTextMesh->GetIndexCount(), 0, 0);
 	}
 
 	// 스파르탄은 이벤트 callback 함수다.

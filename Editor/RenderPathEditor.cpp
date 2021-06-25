@@ -47,7 +47,8 @@ namespace editor
 		pImmediateContext->ClearRenderTargetView(pRtv, clearColors);
 
 		dive::Renderer::GetInstance().UpdateCB();
-		dive::Renderer::GetInstance().DrawColor();
+		//dive::Renderer::GetInstance().DrawColor();
+		dive::Renderer::GetInstance().DrawLegacy();
 	}
 	
 	void RenderPathEditor::Compose() const
