@@ -352,7 +352,8 @@ namespace dive
 			mPipelineStateLegacy.pRSS = mRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
 			mPipelineStateLegacy.pSS = mSamplerState.Get();
 			mPipelineStateLegacy.pIL = mInputLayouts[ILTYPE_POS_TEX_NOR_TAN].Get();
-			mPipelineStateLegacy.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;//D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			mPipelineStateLegacy.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+													 D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
 
 		// Font

@@ -144,6 +144,18 @@ namespace editor
 
 					if (ImGui::MenuItem("Quad"))
 					{
+						// 일단 테스트
+						// mesh를 잘못 생성했다.
+						auto quad = new dive::dvMesh;
+						quad->SetName("Quad");
+						dive::utility::geometry::CreateQuad(quad->GetVertices(), quad->GetIndices());
+
+						auto gameObject = mScene->CreateGameObject();
+						auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
+
+						meshRenderer->SetMesh(*quad);
+
+						gameObject->SetName("Quad");
 					}
 
 					ImGui::Separator();
@@ -152,14 +164,14 @@ namespace editor
 					{
 						// 일단 테스트
 						// mesh를 잘못 생성했다.
-						static dive::dvMesh mesh;
-						mesh.SetName("Cube");
-						dive::utility::geometry::CreateCube(mesh.GetVertices(), mesh.GetIndices());
+						auto cube = new dive::dvMesh;
+						cube->SetName("Cube");
+						dive::utility::geometry::CreateCube(cube->GetVertices(), cube->GetIndices());
 
 						auto gameObject = mScene->CreateGameObject();
 						auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
 
-						meshRenderer->SetMesh(mesh);
+						meshRenderer->SetMesh(*cube);
 
 						gameObject->SetName("Cube");
 					}
