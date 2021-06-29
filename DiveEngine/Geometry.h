@@ -3,6 +3,10 @@
 #include "VertexTypes.h"
 #include <vector>
 
+//========================================================//
+// 일단 Triangle List로 보면 형태가 맞다.                 //
+// 하지만 Line List로 보면 인덱스가 좀 이상하다.          //
+//========================================================//
 namespace dive::utility::geometry
 {
     static void CreateQuad(std::vector<VertexType_PosTexNorTan>& vertices, std::vector<unsigned int>& indices)
@@ -16,7 +20,6 @@ namespace dive::utility::geometry
         indices.emplace_back(3);    indices.emplace_back(2);    indices.emplace_back(0);
     }
 
-	// 여전히 안맞는 부분이 있다.
 	static void CreateCube(std::vector<VertexType_PosTexNorTan>& vertices, std::vector<unsigned int>& indices)
 	{
         // front

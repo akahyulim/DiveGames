@@ -1,10 +1,12 @@
 #include "Renderer.h"
 #include "Scene.h"
-#include "Mesh.h"
 #include "MeshRenderer.h"
+#include "Camera.h"
+#include "Light.h"
 #include "GameObject.h"
 #include "Log.h"
 #include "TextMesh.h"
+#include "Event.h"
 #include <assert.h>
 
 namespace dive
@@ -21,6 +23,8 @@ namespace dive
 		mViewPort.MaxDepth = 1.0f;
 		mViewPort.TopLeftX = 0.0f;
 		mViewPort.TopLeftY = 0.0f;
+
+		EVENT_SUBSCRIBE(eEventType::SceneResolve, EVENT_HANDLE(ObjectClassify));
 	}
 
 	Renderer::~Renderer()
@@ -103,8 +107,10 @@ namespace dive
 		MatrixBuffer* pBuffer = static_cast<MatrixBuffer*>(mappedResource.pData);
 		
 		// World Matrix
+		// 이건 개별 GameObject의 Transform으로부터 가져온다.
 		pBuffer->world = XMMatrixTranspose(XMMatrixIdentity());
 
+		// View와 Projection은 Camera로부터 가져온다.
 		// View Matrix
 		{
 			XMFLOAT3 up, position, lookAt;
@@ -172,113 +178,11 @@ namespace dive
 		
 	}
 
-	// 이걸 적용하려면 IL가 맞아야 한다.
-	void Renderer::DrawColor()
-	{
-		// 이건 임시다. Visibility 등을 통해 얻어야 한다.
-		Mesh* mesh = Scene::GetGlobalScene().GetMesh();
-		if (!mesh)
-			return;
-
-		auto immediateContext = mGraphicsDevice->GetImmediateContext();
-		assert(immediateContext != nullptr);
-
-		immediateContext->IASetInputLayout(mPipelineStateColor.pIL);
-		immediateContext->IASetPrimitiveTopology(mPipelineStateColor.primitiveTopology);
-		immediateContext->VSSetShader(mPipelineStateColor.pVS, NULL, 0);
-		immediateContext->PSSetShader(mPipelineStateColor.pPS, NULL, 0);
-		immediateContext->OMSetDepthStencilState(mPipelineStateColor.pDSS, 1);
-		immediateContext->RSSetState(mPipelineStateColor.pRSS);
-
-		immediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
-		immediateContext->RSSetViewports(1, &mViewPort);
-
-		ID3D11Buffer* vbs[] =
-		{
-			mesh->m_pVBPosition.Get(),
-			mesh->m_pVBColor.Get()
-		};
-
-		UINT strides[] =
-		{
-			sizeof(XMFLOAT3),
-			sizeof(XMFLOAT4)
-		};
-
-		unsigned int offsets[] =
-		{
-			0,
-			0
-		};
-
-		immediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);
-		immediateContext->IASetIndexBuffer(mesh->m_pIB.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		immediateContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
-	}
-
-	void Renderer::DrawTexturing()
-	{
-		auto immediateContext = mGraphicsDevice->GetImmediateContext();
-		assert(immediateContext != nullptr);
-
-		immediateContext->IASetInputLayout(mPipelineStateTexturing.pIL);
-		immediateContext->IASetPrimitiveTopology(mPipelineStateTexturing.primitiveTopology);
-		immediateContext->VSSetShader(mPipelineStateTexturing.pVS, NULL, 0);
-		immediateContext->PSSetShader(mPipelineStateTexturing.pPS, NULL, 0);
-		immediateContext->PSSetSamplers(0, 1, &mPipelineStateTexturing.pSS);	// 얘는 더블 포인터다...
-		immediateContext->OMSetDepthStencilState(mPipelineStateTexturing.pDSS, 1);
-		immediateContext->RSSetState(mPipelineStateTexturing.pRSS);
-
-		immediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
-
-
-		// 임시
-		// 누가 가져야 할까?
-		D3D11_VIEWPORT viewport;
-		viewport.Width = (float)mGraphicsDevice->GetResolutionWidth();
-		viewport.Height = (float)mGraphicsDevice->GetResolutionHeight();
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-		viewport.TopLeftX = 0.0f;
-		viewport.TopLeftY = 0.0f;
-		immediateContext->RSSetViewports(1, &viewport);
-
-		// 이건 임시다. Visibility 등을 통해 얻어야 한다.
-		Mesh* mesh = Scene::GetGlobalScene().GetMesh();
-
-		ID3D11Buffer* vbs[] =
-		{
-			mesh->m_pVBPosition.Get(),
-			mesh->m_pVBUv.Get()
-		};
-
-		UINT strides[] =
-		{
-			sizeof(XMFLOAT3),
-			sizeof(XMFLOAT2)
-		};
-
-		unsigned int offsets[] =
-		{
-			0,
-			0
-		};
-
-		// 위치와 방법이 마음에 들지 않는다.
-		auto pSRV = mTexture->GetShaderResourceView();
-		//auto pSRV = mCpuTexture->GetShaderResourceView();
-		//auto pSRV = mDvFont->GetAtlas()->GetShaderResourceView();
-		immediateContext->PSSetShaderResources(0, 1, &pSRV);
-
-		immediateContext->IASetVertexBuffers(0, arraysize(vbs), vbs, strides, offsets);
-		immediateContext->IASetIndexBuffer(mesh->m_pIB.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		immediateContext->DrawIndexed(mesh->GetIndexCount(), 0, 0);
-	}
-
 	void Renderer::DrawLegacy()
 	{
+		if (mGameObjects[eObjectType::Opaque].empty())
+			return;
+
 		auto immediateContext = mGraphicsDevice->GetImmediateContext();
 		assert(immediateContext != nullptr);
 
@@ -289,39 +193,26 @@ namespace dive
 		immediateContext->PSSetSamplers(0, 1, &mPipelineStateLegacy.pSS);
 		immediateContext->OMSetDepthStencilState(mPipelineStateLegacy.pDSS, 1);
 		immediateContext->RSSetState(mPipelineStateLegacy.pRSS);
+		immediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());		// 이건 GameObject마다 가려내야 한다.
+		immediateContext->RSSetViewports(1, &mViewPort);
 
-		immediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
-
-		D3D11_VIEWPORT viewport;
-		viewport.Width = (float)mGraphicsDevice->GetResolutionWidth();
-		viewport.Height = (float)mGraphicsDevice->GetResolutionHeight();
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-		viewport.TopLeftX = 0.0f;
-		viewport.TopLeftY = 0.0f;
-		immediateContext->RSSetViewports(1, &viewport);
-
-		// 현재 벡터를 복사해서 받고 있다. 참조가 훨씬 나을듯... 
-		auto gameObjects = Scene::GetGlobalScene().GetAllGameObjects();
 		MeshRenderer* meshRenderer = nullptr;
-		for (const auto& gameObject : gameObjects)
+		for (const auto& gameObject : mGameObjects[eObjectType::Opaque])
 		{
 			meshRenderer = gameObject->GetComponent<MeshRenderer>();
-			if (meshRenderer)
-			{
-				ID3D11Buffer* vertexBuffer = meshRenderer->GetVertexBuffer();
-				assert(vertexBuffer != nullptr);
-				unsigned int stride = meshRenderer->GetVertexStride();
-				unsigned int offset = 0;
-				immediateContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-				ID3D11Buffer* indexBuffer = meshRenderer->GetIndexBuffer();
-				assert(indexBuffer != nullptr);
-				immediateContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+			
+			ID3D11Buffer* vertexBuffer = meshRenderer->GetVertexBuffer();
+			assert(vertexBuffer != nullptr);
+			unsigned int stride = meshRenderer->GetVertexStride();
+			unsigned int offset = 0;
+			immediateContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+			ID3D11Buffer* indexBuffer = meshRenderer->GetIndexBuffer();
+			assert(indexBuffer != nullptr);
+			immediateContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-				immediateContext->DrawIndexed(meshRenderer->GetIndexCount(), 0, 0);
+			immediateContext->DrawIndexed(meshRenderer->GetIndexCount(), 0, 0);
 
-				CORE_TRACE("Legacy Object - {0:d}, {1:d}", stride, meshRenderer->GetIndexCount());
-			}
+			CORE_TRACE("Legacy Object - {0:d}, {1:d}", stride, meshRenderer->GetIndexCount());
 		}
 	}
 
@@ -364,12 +255,41 @@ namespace dive
 		//immediateContext->DrawIndexed(m_pTextMesh->GetIndexCount(), 0, 0);
 	}
 
-	// 스파르탄은 이벤트 callback 함수다.
-	// 그런데 현재 내 이벤트 시스템에선 Variant를 매개변수로 받을 수 없다.
+	// =========================================================================//
+	// Scene에서 GameObjects가 갱신될 때 마다 호출된다.							//
+	// 갱신의 시점은 Scene과 GameObject에서 이벤트를 발생시키는 것인데			//
+	// 아직 분석이 덜 되었다.													//
+	//==========================================================================//
 	void Renderer::ObjectClassify()
 	{
-		// 모든 GameObject를 순회하면서 Component 여부로 나누어 저장한다.
-		// Opaque와 Transparent의 구분은 Material을 이용한다.
+		mGameObjects.clear();
+		// 카메라도 초기화?
+
+		auto& gameObjects = Scene::GetGlobalScene().GetAllGameObjects();
+		for (const auto& gameObject : gameObjects)
+		{
+			if (!gameObject->GetActive())
+				continue;
+
+			auto meshRenderer = gameObject->GetComponent<MeshRenderer>();
+			auto camera = gameObject->GetComponent<Camera>();
+			auto light = gameObject->GetComponent<Light>();
+
+			if (meshRenderer)
+			{
+				// Opaque와 Transparent의 구분은 Material을 이용한다.
+				mGameObjects[eObjectType::Opaque].push_back(gameObject.get());
+			}
+			else if (camera)
+			{
+				mGameObjects[eObjectType::Camera].push_back(gameObject.get());
+				// 카메라 선택... 메인 카메라인가?
+			}
+			else if (light)
+			{
+				mGameObjects[eObjectType::Light].push_back(gameObject.get());
+			}
+		}
 
 		// Opaque와 Transparent는 근거리순으로 비교하여 재정렬한다.
 

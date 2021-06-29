@@ -1,6 +1,5 @@
 #pragma once
 #include "Object.h"
-#include "Mesh.h"		// 추후 지워야할 대상
 #include <vector>
 #include <string>
 #include <memory>
@@ -27,7 +26,7 @@ namespace dive
 		GameObject* GetGameObjectByID(unsigned int id);
 		void RemoveGameObject(GameObject* target);
 
-		std::vector<std::shared_ptr<GameObject>> GetAllGameObjects() { return mGameObjects; }
+		const std::vector<std::shared_ptr<GameObject>>& GetAllGameObjects() const { return mGameObjects; }
 		std::vector<GameObject*> GetRootGameObjects();
 
 		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(mGameObjects.size()); }
@@ -43,10 +42,6 @@ namespace dive
 
 		bool IsDirty() { return mbDirty; }
 
-		// test용
-		void SetMesh(Mesh* mesh) { mMesh = mesh; }
-		Mesh* GetMesh() { return mMesh; }
-
 	private:
 		void gameObjectRemove(GameObject* gameObject);
 
@@ -57,9 +52,5 @@ namespace dive
 		// camera??
 
 		bool mbDirty;
-
-
-		// test용
-		Mesh* mMesh = nullptr;
 	};
 }

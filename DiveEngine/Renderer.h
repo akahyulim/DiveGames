@@ -63,8 +63,6 @@ namespace dive
 		void DrawScene();
 
 		// 일단 나누자
-		void DrawColor();
-		void DrawTexturing();
 		void DrawLegacy();
 		void DrawText();
 
@@ -138,6 +136,5 @@ namespace dive
 		std::shared_ptr<Texture> mCpuTexture;
 
 		Font* mDvFont = nullptr;
-		//TextMesh* m_pTextMesh = nullptr;
 	};
 }

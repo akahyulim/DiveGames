@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "Transform.h"
 #include "MeshRenderer.h"
+#include "Event.h"
 #include <string>
 #include <vector>
 #include <memory>
@@ -67,6 +68,8 @@ namespace dive
 		mComponents.push_back(std::static_pointer_cast<Component>(component));
 		// awake가 있다면 호출
 
+		EVENT_FIRE(eEventType::SceneResolve);
+
 		return component.get();
 	}
 
@@ -86,6 +89,9 @@ namespace dive
 			else
 				it++;
 		}
+
+		// 이건 추후 확인 필요
+		EVENT_FIRE(eEventType::SceneResolve);
 	}
 
 	template<typename T>

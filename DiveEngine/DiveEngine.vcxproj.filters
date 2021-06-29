@@ -52,9 +52,6 @@
     <ClInclude Include="GraphicsDevice.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Engine\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="VertexTypes.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
@@ -96,9 +93,6 @@
     </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>Engine\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="dvMesh.h">
-      <Filter>Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="MeshRenderer.h">
       <Filter>Engine\Scene\Components</Filter>
@@ -388,6 +382,9 @@
     <ClInclude Include="Geometry.h">
       <Filter>Engine\Utility</Filter>
     </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -422,9 +419,6 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Engine\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Renderer_Resources.cpp">
       <Filter>Engine\Graphics</Filter>
@@ -471,8 +465,11 @@
     <ClCompile Include="Light.cpp">
       <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="dvMesh.cpp">
+    <ClCompile Include="Mesh.cpp">
       <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform_Hierarchy.cpp">
+      <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

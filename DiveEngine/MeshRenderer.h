@@ -1,9 +1,18 @@
 #pragma once
 #include "Component.h"
-#include "dvMesh.h"
+#include "Mesh.h"
 
 namespace dive
 {
+	enum class eDefaultMeshType
+	{
+		Triangle,
+		Quad,
+		Cube,
+		Sphere,
+		Capsule,
+	};
+
 	// static mesh다.
 	class MeshRenderer : public Component
 	{
@@ -11,8 +20,12 @@ namespace dive
 		MeshRenderer();
 		~MeshRenderer();
 
-		// 추후 바꿔야할 거다.
-		void SetMesh(const dvMesh& mesh);
+		// Virtual
+		void Serialize(FileStream* fileStream) override;
+		void Deserialize(FileStream* fileStream) override;
+
+		void CreateDefaultMesh(eDefaultMeshType type);
+
 
 		// 아에 이 곳에 Draw 함수를 만들수도 있다.
 		// 하지만 IL과 Shader를 구분 선택할 수 있어야 한다.
@@ -27,7 +40,7 @@ namespace dive
 		bool createBuffers();
 
 	private:
-		dvMesh* mMesh = nullptr;
+		Mesh* mMesh = nullptr;
 		// Material: 텍스쳐, 색 등
 		// Lighting
 		

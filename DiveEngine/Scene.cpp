@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "FileSystemHelper.h"
 #include "FileStream.h"
+#include "Event.h"
 
 namespace dive
 {
@@ -24,6 +25,14 @@ namespace dive
 		for (auto& gameObject : mGameObjects)
 		{
 			gameObject->Update(deltaTime);
+		}
+
+		if (mbDirty)
+		{
+			// 삭제 대기 오브젝트를 제거한다.
+			// 이벤트를 날린다.
+			EVENT_FIRE(eEventType::SceneResolve);
+			mbDirty = false;
 		}
 	}
 
@@ -70,8 +79,6 @@ namespace dive
 
 		stream.Close();
 
-		mbDirty = false;
-
 		return true;
 	}
 
@@ -104,7 +111,7 @@ namespace dive
 
 		stream.Close();
 
-		// 갱신 여부를 알려야 한다.
+		mbDirty = true;
 
 		return true;
 	}
@@ -113,9 +120,6 @@ namespace dive
 	{
 		auto pAddedObject = mGameObjects.emplace_back(std::make_shared<GameObject>());
 		// 뭔가 호출?
-
-		mbDirty = true;
-
 		return pAddedObject.get();
 	}
 
@@ -141,6 +145,10 @@ namespace dive
 		return nullptr;
 	}
 
+	//==========================================//
+	// 이벤트를 발생시키면서 꼬여버린 것 같다.	//
+	// Update에서 처리하도록 스파르탄을 따르자.	//
+	//==========================================//
 	void Scene::RemoveGameObject(GameObject* target)
 	{
 		assert(target != nullptr);

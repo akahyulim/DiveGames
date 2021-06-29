@@ -172,7 +172,7 @@
     <ClInclude Include="CommonInclude.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="DiveEngine.h" />
-    <ClInclude Include="dvMesh.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="External\spdlog\async.h" />
     <ClInclude Include="External\spdlog\async_logger-inl.h" />
@@ -278,7 +278,6 @@
     <ClInclude Include="Input.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Log.h" />
-    <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PipelineState.h" />
@@ -300,7 +299,7 @@
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="dvMesh.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="FileStream.cpp" />
     <ClCompile Include="FileSystemHelper.cpp" />
     <ClCompile Include="Font.cpp" />
@@ -312,7 +311,6 @@
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Log.cpp" />
-    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Renderer_Resources.cpp" />
@@ -326,6 +324,7 @@
     <ClCompile Include="ThreadPool.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="Transform_Hierarchy.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

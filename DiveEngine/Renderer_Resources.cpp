@@ -218,43 +218,6 @@ namespace dive
 
 	bool Renderer::createShaders()
 	{
-		// Color Shader
-		{
-			D3D11_INPUT_ELEMENT_DESC desc[] =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-			};
-
-			if (!createVertexShader(L"../DiveEngine/color.hlsl", VSTYPE_COLOR, ILTYPE_POS_COL, desc, arraysize(desc)))
-			{
-				return false;
-			}
-			if (!createPixelShader(L"../DiveEngine/color.hlsl", PSTYPE_COLOR))
-			{
-				return false;
-			}
-		}
-
-		// Texturing Shader
-		{
-			// 각 요소마다 Buffer가 다르기때문에 inputSlot은 스택을 쌓아야 한다.
-			D3D11_INPUT_ELEMENT_DESC desc[] =
-			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-			};
-
-			if (!createVertexShader(L"../DiveEngine/texturing.hlsl", VSTYPE_TEXTURING, ILTYPE_POS_TEX, desc, arraysize(desc)))
-			{
-				return false;
-			}
-			if (!createPixelShader(L"../DiveEngine/texturing.hlsl", PSTYPE_TEXTURING))
-			{
-				return false;
-			}
-		}
-
 		// Legacy Shader
 		{
 			D3D11_INPUT_ELEMENT_DESC desc[] =
@@ -323,27 +286,6 @@ namespace dive
 
 	void Renderer::createPipelineStates()
 	{
-		// Color
-		{
-			mPipelineStateColor.pVS = (ID3D11VertexShader*)mShaders[VSTYPE_COLOR].Get();
-			mPipelineStateColor.pPS = (ID3D11PixelShader*)mShaders[PSTYPE_COLOR].Get();
-			mPipelineStateColor.pDSS = mDepthStencilStates[DSSTYPE_DEFAULT].Get();
-			mPipelineStateColor.pRSS = mRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
-			mPipelineStateColor.pIL = mInputLayouts[ILTYPE_POS_COL].Get();
-			mPipelineStateColor.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		}
-
-		// Texturing
-		{
-			mPipelineStateTexturing.pVS = (ID3D11VertexShader*)mShaders[VSTYPE_TEXTURING].Get();
-			mPipelineStateTexturing.pPS = (ID3D11PixelShader*)mShaders[PSTYPE_TEXTURING].Get();
-			mPipelineStateTexturing.pDSS = mDepthStencilStates[DSSTYPE_DEFAULT].Get();
-			mPipelineStateTexturing.pRSS = mRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
-			mPipelineStateTexturing.pSS = mSamplerState.Get();
-			mPipelineStateTexturing.pIL = mInputLayouts[ILTYPE_POS_TEX].Get();
-			mPipelineStateTexturing.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		}
-
 		// Legacy
 		{
 			mPipelineStateLegacy.pVS = (ID3D11VertexShader*)mShaders[VSTYPE_LEGACY].Get();
@@ -352,8 +294,7 @@ namespace dive
 			mPipelineStateLegacy.pRSS = mRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
 			mPipelineStateLegacy.pSS = mSamplerState.Get();
 			mPipelineStateLegacy.pIL = mInputLayouts[ILTYPE_POS_TEX_NOR_TAN].Get();
-			mPipelineStateLegacy.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-													 D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			mPipelineStateLegacy.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
 
 		// Font

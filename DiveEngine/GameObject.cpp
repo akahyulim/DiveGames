@@ -114,6 +114,8 @@ namespace dive
 
 			mTransform->AcquireChidren();
 		}
+
+		EVENT_FIRE(eEventType::SceneResolve);
 	}
 
 	void GameObject::Update(float deltaTime)

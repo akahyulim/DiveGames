@@ -21,6 +21,7 @@ namespace dive
 {
 	enum class eEventType
 	{
+		SceneResolve,
 		ChangedResolution,
 		QuitApplication,
 	};
