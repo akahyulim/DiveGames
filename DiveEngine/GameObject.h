@@ -16,7 +16,7 @@ namespace dive
 	{
 	public:
 		GameObject();
-		~GameObject() = default;
+		~GameObject();
 
 		void Serialize(FileStream* fileStream);
 		void Deserialize(FileStream* fileStream, Transform* parentTransform = nullptr);
@@ -38,10 +38,14 @@ namespace dive
 		const std::string& GetName() const { return mName; }
 		void SetName(const std::string name) { mName = name; }
 
-		bool GetActive() const { return mbActive; }
+		bool IsActive() const { return mbActive; }
 		void SetActive(bool active) { mbActive = active; }
 
 		unsigned int GetComponentCount() const { return static_cast<unsigned int>(mComponents.size()); }
+
+		// 이름을 바꾸자
+		void MarkForDestruction() { mbDestructionPending = true; }
+		bool IsPendingDestruction() const { return mbDestructionPending; }
 
 	private:
 	private:
@@ -49,9 +53,12 @@ namespace dive
 		std::string mName = "Object";
 		bool mbActive = true;
 
-		std::vector<std::shared_ptr<Component>> mComponents;
+		std::vector<Component*> mComponents;
 
 		Transform* mTransform;
+
+		// 이름을 바꾸자
+		bool mbDestructionPending = false;
 
 	};
 
@@ -63,14 +70,14 @@ namespace dive
 			return component;
 		}
 
-		// 생성자를 선언해야 한다.
-		auto component = std::make_shared<T>();
-		mComponents.push_back(std::static_pointer_cast<Component>(component));
+		auto newComponent = dynamic_cast<T*>(mComponents.emplace_back(static_cast<Component*>(new T)));
+		assert(newComponent);
+
 		// awake가 있다면 호출
 
 		EVENT_FIRE(eEventType::SceneResolve);
 
-		return component.get();
+		return newComponent;
 	}
 
 	template<typename T>
@@ -97,11 +104,11 @@ namespace dive
 	template<typename T>
 	T* GameObject::GetComponent()
 	{
-		for (auto& component : mComponents)
+		for (auto component : mComponents)
 		{
 			if (component->GetTypeHash() == typeid(T).hash_code())
 			{
-				return static_cast<T*>(component.get());
+				return dynamic_cast<T*>(component);
 			}
 		}
 

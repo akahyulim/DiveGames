@@ -12,6 +12,10 @@ namespace dive
 			return mParent->GetRoot();
 	}
 
+	// =============================================//
+	// 상위 노드의 부모를 하위 노드로 변경할 경우	//
+	// 모두 사라지는 버그가 있다.					//
+	//==============================================//
 	void Transform::SetParent(Transform* parentTransform)
 	{
 		if (!parentTransform)

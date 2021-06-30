@@ -268,7 +268,7 @@ namespace dive
 		auto& gameObjects = Scene::GetGlobalScene().GetAllGameObjects();
 		for (const auto& gameObject : gameObjects)
 		{
-			if (!gameObject->GetActive())
+			if (!gameObject->IsActive())
 				continue;
 
 			auto meshRenderer = gameObject->GetComponent<MeshRenderer>();
@@ -278,16 +278,16 @@ namespace dive
 			if (meshRenderer)
 			{
 				// Opaque와 Transparent의 구분은 Material을 이용한다.
-				mGameObjects[eObjectType::Opaque].push_back(gameObject.get());
+				mGameObjects[eObjectType::Opaque].push_back(gameObject);
 			}
 			else if (camera)
 			{
-				mGameObjects[eObjectType::Camera].push_back(gameObject.get());
+				mGameObjects[eObjectType::Camera].push_back(gameObject);
 				// 카메라 선택... 메인 카메라인가?
 			}
 			else if (light)
 			{
-				mGameObjects[eObjectType::Light].push_back(gameObject.get());
+				mGameObjects[eObjectType::Light].push_back(gameObject);
 			}
 		}
 

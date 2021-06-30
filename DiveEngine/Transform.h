@@ -20,6 +20,28 @@ namespace dive
 		void Deserialize(FileStream* fileStream) override;
 
 		// 변환 함수
+		void UpdateTransform();
+
+		DirectX::XMFLOAT3 GetPosition();
+		DirectX::XMFLOAT3 GetLocalPosition() const { return mLocalPosition; }
+		void SetPosition(const DirectX::XMFLOAT3& position);
+		void SetPosition(float x, float y, float z);
+		void SetLocalPosition(const DirectX::XMFLOAT3& position);
+		void SetLocalPosition(float x, float y, float z);
+
+		DirectX::XMFLOAT4 GetRotation();
+		DirectX::XMFLOAT4 GetLocalRotation() const { return mLocalRotation; }
+		void SetRotation(const DirectX::XMFLOAT3& rotation);
+		void SetLocalRotation(const DirectX::XMFLOAT3& rotation);
+
+		DirectX::XMFLOAT3 GetScale();
+		DirectX::XMFLOAT3 GetLocalScale() const { return mLocalScale; }
+		void SetScale(const DirectX::XMFLOAT3& scale);
+		void SetLocalScale(const DirectX::XMFLOAT3& scale);
+
+		void SetLookAt(const DirectX::XMFLOAT3& lookAt) { mLookAt = lookAt; }
+		const DirectX::XMMATRIX& GetMatrix() const { return mMatrix; }
+		const DirectX::XMMATRIX& GetLocalMatrix() const { return mLocalMatrix; }
 
 		// 계층구조 함수 ===================================================================================
 		// 시조를 리턴한다.
@@ -50,6 +72,14 @@ namespace dive
 
 	private:
 		// transform
+		DirectX::XMFLOAT3 mLocalPosition;
+		DirectX::XMFLOAT4 mLocalRotation;
+		DirectX::XMFLOAT3 mLocalScale;
+
+		DirectX::XMMATRIX mMatrix;
+		DirectX::XMMATRIX mLocalMatrix;
+
+		DirectX::XMFLOAT3 mLookAt;
 
 		// heirarchy
 		Transform* mParent = nullptr;

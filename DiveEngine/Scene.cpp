@@ -29,8 +29,18 @@ namespace dive
 
 		if (mbDirty)
 		{
-			// 삭제 대기 오브젝트를 제거한다.
-			// 이벤트를 날린다.
+			// 얕은 복사이지만 리소스를 차지한다.
+			auto copy = mGameObjects;
+
+			// 더 중요한 문제는 이게 왜 먹히는지 이해가 안된다.
+			for (auto gameObject : copy)
+			{
+				if(gameObject->IsPendingDestruction())
+				{
+					eraseGameObject(gameObject);
+				}
+			}
+
 			EVENT_FIRE(eEventType::SceneResolve);
 			mbDirty = false;
 		}
@@ -38,8 +48,17 @@ namespace dive
 
 	void Scene::Clear()
 	{
+		// 애매허네...
+		// 스파르탄은 스레드 안정성을 위해서
+		// swap 처리를 하였다.
 		if (!mGameObjects.empty())
 		{
+			for (auto gameObject : mGameObjects)
+			{
+				delete gameObject;
+				gameObject = nullptr;
+			}
+
 			mGameObjects.clear();
 			mGameObjects.shrink_to_fit();
 		}
@@ -116,19 +135,23 @@ namespace dive
 		return true;
 	}
 
-	GameObject* Scene::CreateGameObject()
+	//==================================//
+	// 추가적인 처리가 필요할 수 있다.	//
+	//==================================//
+	GameObject* Scene::CreateGameObject(bool active)
 	{
-		auto pAddedObject = mGameObjects.emplace_back(std::make_shared<GameObject>());
-		// 뭔가 호출?
-		return pAddedObject.get();
+		auto newGameObject = mGameObjects.emplace_back(new GameObject);
+		newGameObject->SetActive(active);
+
+		return newGameObject;
 	}
 
 	GameObject* Scene::GetGameObjectByName(const std::string& name)
 	{
-		for (auto& target : mGameObjects)
+		for (auto gameObject : mGameObjects)
 		{
-			if (target->GetName() == name)
-				return target.get();
+			if (gameObject->GetName() == name)
+				return gameObject;
 		}
 
 		return nullptr;
@@ -136,29 +159,23 @@ namespace dive
 
 	GameObject* Scene::GetGameObjectByID(unsigned int id)
 	{
-		for (auto& pTarget : mGameObjects)
+		for (auto gameObject : mGameObjects)
 		{
-			if (pTarget->GetID() == id)
-				return pTarget.get();
+			if (gameObject->GetID() == id)
+				return gameObject;
 		}
 
 		return nullptr;
 	}
 
-	//==========================================//
-	// 이벤트를 발생시키면서 꼬여버린 것 같다.	//
-	// Update에서 처리하도록 스파르탄을 따르자.	//
-	//==========================================//
-	void Scene::RemoveGameObject(GameObject* target)
+	void Scene::RemoveGameObject(GameObject* gameObject)
 	{
-		assert(target != nullptr);
+		if (!gameObject)
+			return;
 
-		// 스파르탄은 바로 지우지 않는다. 일단 제거 대상으로 설정해놓는다.
-		// 그리고 다음 Frame에서 제거한다.
+		gameObject->MarkForDestruction();
 
 		mbDirty = true;
-
-		gameObjectRemove(target);
 	}
 
 	std::vector<GameObject*> Scene::GetRootGameObjects()
@@ -171,7 +188,7 @@ namespace dive
 			{
 				if (!pTransform->HasParent())
 				{
-					rootGameObjects.emplace_back(gameObject.get());
+					rootGameObjects.emplace_back(gameObject);
 				}
 			}
 		}
@@ -179,22 +196,25 @@ namespace dive
 		return rootGameObjects;
 	}
 
-	void Scene::gameObjectRemove(GameObject* gameObject)
+	//==============================================//
+	// 전달받은 대상의 자식들까지 모두 제거합니다.	//
+	//==============================================//
+	void Scene::eraseGameObject(GameObject* gameObject)
 	{
-		// 자식들부터 먼저 제거
-		auto pChildren = gameObject->GetTransform()->GetChildren();
-		for (auto pChild : pChildren)
+		if (!gameObject)
+			return;
+
+		auto children = gameObject->GetTransform()->GetChildren();
+		for (auto child : children)
 		{
-			gameObjectRemove(pChild->GetOwner());
+			RemoveGameObject(child->GetOwner());
 		}
 
-		auto parentTransform = gameObject->GetTransform()->GetParent();
+		auto parent = gameObject->GetTransform()->GetParent();
 
-		// 부모에게서 제외되는 구문이 없다.
 		for (auto it = mGameObjects.begin(); it != mGameObjects.end();)
 		{
-			auto pTarget = *it;
-			if (pTarget->GetID() == gameObject->GetID())
+			if ((*it)->GetID() == gameObject->GetID())
 			{
 				it = mGameObjects.erase(it);
 				break;
@@ -202,11 +222,9 @@ namespace dive
 			++it;
 		}
 
-		if (parentTransform)
+		if (parent)
 		{
-			parentTransform->AcquireChidren();
+			parent->AcquireChidren();
 		}
-
-		mbDirty = true;
 	}
 }

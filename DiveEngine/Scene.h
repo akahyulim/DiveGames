@@ -21,12 +21,12 @@ namespace dive
 		bool SaveToFile(const std::string& filepath);
 		bool LoadFromFile(const std::string& filepath);
 
-		GameObject* CreateGameObject();
+		GameObject* CreateGameObject(bool active = true);
 		GameObject* GetGameObjectByName(const std::string& name);
 		GameObject* GetGameObjectByID(unsigned int id);
-		void RemoveGameObject(GameObject* target);
+		void RemoveGameObject(GameObject* gameObject);
 
-		const std::vector<std::shared_ptr<GameObject>>& GetAllGameObjects() const { return mGameObjects; }
+		const std::vector<GameObject*>& GetAllGameObjects() const { return mGameObjects; }
 		std::vector<GameObject*> GetRootGameObjects();
 
 		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(mGameObjects.size()); }
@@ -43,12 +43,11 @@ namespace dive
 		bool IsDirty() { return mbDirty; }
 
 	private:
-		void gameObjectRemove(GameObject* gameObject);
-
+		void eraseGameObject(GameObject* gameObject);
 
 	private:
 		std::string mName;
-		std::vector<std::shared_ptr<GameObject>> mGameObjects;
+		std::vector<GameObject*> mGameObjects;
 		// camera??
 
 		bool mbDirty;

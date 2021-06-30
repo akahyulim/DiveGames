@@ -14,6 +14,21 @@ namespace dive
 		mTransform->SetOwnder(this);
 	}
 
+	GameObject::~GameObject()
+	{
+		// 이게 계층구조 때문에 좀 예민할 수 있다.
+		if (!mComponents.empty())
+		{
+			for (auto component : mComponents)
+			{
+				delete component;
+				component = nullptr;
+			}
+
+			mComponents.clear();
+		}
+	}
+
 	void GameObject::Serialize(FileStream* fileStream)
 	{ 
 		if (!fileStream)
