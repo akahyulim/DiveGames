@@ -3,6 +3,8 @@
 #include "GraphicsDevice.h"
 #include "GraphicsEnums.h"
 #include "PipelineState.h"
+#include "ConstantBuffer.h"
+#include "ConstantBuffers.h"	// 이름 변경 대상
 #include "Texture.h"
 #include "Font.h"
 #include <memory>
@@ -39,6 +41,10 @@ namespace dive
 	// States, Shaders, InputLayout을 설정한 객체
 	// 이를 Graphics에 넘겨 한 번에 bind한다.
 
+
+	// 현재 이 곳엔 Update가 없다.
+	// RenderPath에서 취사 선택하기 때문이다.
+	// 이는 wicked engine을 참고 한 것이다.
 	class Renderer
 	{
 	public:
@@ -107,7 +113,16 @@ namespace dive
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> mSamplerState;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> mSamplerStateLinear;
 
+		// Constant Buffer
+		BufferFrame mBufferFrameCPU;
+		ConstantBuffer* mBufferFrameGPU;
+
+		BufferObject mBufferObjectCPU;
+		ConstantBuffer* mBufferObjectGPU;
+
 		// constant buffer 부터
+		// => 이건 이제 제거 대상이다.
+		// 일단 만들어놓은 ConstantBuffer를 적용해보자.
 		struct MatrixBuffer
 		{
 			DirectX::XMMATRIX world;
@@ -115,7 +130,8 @@ namespace dive
 			DirectX::XMMATRIX proj;
 			DirectX::XMMATRIX projOrthographic;
 		};
-		Microsoft::WRL::ComPtr<ID3D11Buffer> mConstantBufferMatrix;
+		//Microsoft::WRL::ComPtr<ID3D11Buffer> mConstantBufferMatrix;
+		ConstantBuffer* mBufferFrame;
 
 		// pipeline states
 		// 굳이 동적생성할 필요가 없다. enum array로 만들자.

@@ -124,6 +124,7 @@ namespace dive
 
 	bool Renderer::createConstantBuffers()
 	{
+		/*
 		auto device = mGraphicsDevice->GetDevice();
 		assert(device != nullptr);
 
@@ -138,7 +139,28 @@ namespace dive
 
 		auto hr = device->CreateBuffer(&desc, nullptr, mConstantBufferMatrix.GetAddressOf());
 		assert(SUCCEEDED(hr));
-	
+	*/
+		mBufferFrame = new ConstantBuffer(mGraphicsDevice.get(), "BufferFrame");
+		if (!mBufferFrame->Create< MatrixBuffer>())
+		{
+			CORE_ERROR("BufferFrame 생성에 실패하였습니다.");
+			return false;
+		}
+
+		mBufferFrameGPU = new ConstantBuffer(mGraphicsDevice.get(), "BufferFrameGPU");
+		if (!mBufferFrameGPU->Create< BufferFrame >())
+		{
+			CORE_ERROR("BufferFrameGPU 생성에 실패하였습니다.");
+			return false;
+		}
+
+		mBufferObjectGPU = new ConstantBuffer(mGraphicsDevice.get(), "BufferObjectGPU");
+		if (!mBufferObjectGPU->Create< BufferObject >())
+		{
+			CORE_ERROR("BufferObjectGPU 생성에 실패하였습니다.");
+			return false;
+		}
+
 		return true;
 	}
 

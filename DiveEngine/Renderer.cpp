@@ -86,16 +86,26 @@ namespace dive
 		CORE_TRACE("해상도 변경: {0:d}x{1:d}", width, height);
 	}
 
-	// 갱신만 한다. bind는 개별 path에서 한다.
+	//======================================================================================//
+	// 갱신만 한다. bind는 개별 path에서 한다.												//
+	// 현재 wciked와 spartan의 구현이 꼬였다.												//
+	// spartan의 경우 일단 구조체가 존재하고 매 pass마다 해당 구조체에 값을 넣은 후			//
+	// 버퍼 업데이트를 호출하여 갱신하는 것 같다.											//
+	// 이때 구조체는 Renderer의 힙에 생성된 변수이고										//
+	// 따라서 버퍼 업데이트 함수에서 직접 멤버 변수로 접근한다.								//
+	// 사실 상수 버퍼는 종류가 여러개라 Tick에서 초기화하는 것도 있고(camera)				//
+	// pass에서 설정하는 것도 있는 것 같다.													//
+	//======================================================================================//
 	void Renderer::UpdateCB()
 	{
 		auto immediateContext = mGraphicsDevice->GetImmediateContext();
 		assert(immediateContext != nullptr);
 
 		// CB Update
-		if (mConstantBufferMatrix == nullptr)
+		if (mBufferFrame == nullptr)
 			return;
 
+		/*
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 
 		if (FAILED(immediateContext->Map(mConstantBufferMatrix.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
@@ -105,7 +115,10 @@ namespace dive
 		}
 
 		MatrixBuffer* pBuffer = static_cast<MatrixBuffer*>(mappedResource.pData);
-		
+		*/
+
+		MatrixBuffer* pBuffer = static_cast<MatrixBuffer*>(mBufferFrame->Map());
+
 		// World Matrix
 		// 이건 개별 GameObject의 Transform으로부터 가져온다.
 		pBuffer->world = XMMatrixTranspose(XMMatrixIdentity());
@@ -161,6 +174,8 @@ namespace dive
 			float fieldOfView = 3.141592654f / 4.0f;
 			float screenAspect = (float)mGraphicsDevice->GetResolutionWidth() / (float)mGraphicsDevice->GetResolutionHeight();
 			pBuffer->proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f));
+
+			// mBufferFrame로 테스트를 하려 했으나 역시 XMMATRIX다...
 		}
 
 		// Orthographic Projection Matrix
@@ -170,7 +185,8 @@ namespace dive
 			pBuffer->projOrthographic = XMMatrixTranspose(XMMatrixOrthographicLH(width, height, 0.1f, 1000.0f));
 		}
 
-		immediateContext->Unmap(static_cast<ID3D11Resource*>(mConstantBufferMatrix.Get()), 0);
+		//immediateContext->Unmap(static_cast<ID3D11Resource*>(mConstantBufferMatrix.Get()), 0);
+		mBufferFrame->Unmap();
 	}
 
 	void Renderer::DrawScene()
@@ -193,12 +209,20 @@ namespace dive
 		immediateContext->PSSetSamplers(0, 1, &mPipelineStateLegacy.pSS);
 		immediateContext->OMSetDepthStencilState(mPipelineStateLegacy.pDSS, 1);
 		immediateContext->RSSetState(mPipelineStateLegacy.pRSS);
-		immediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());		// 이건 GameObject마다 가려내야 한다.
+		ID3D11Buffer* buffer = mBufferFrame->GetBuffer();
+		immediateContext->VSSetConstantBuffers(0, 1, &buffer);//mConstantBufferMatrix.GetAddressOf());		// 이건 GameObject마다 가려내야 한다.
 		immediateContext->RSSetViewports(1, &mViewPort);
+
 
 		MeshRenderer* meshRenderer = nullptr;
 		for (const auto& gameObject : mGameObjects[eObjectType::Opaque])
 		{
+			if (Transform* tranform = gameObject->GetTransform())
+			{
+				mBufferObjectCPU.world = tranform->GetMatrix();
+				mBufferObjectCPU.wvp;	// mBufferFramCPU.viewProj와 곱해야 하는데... 곱해야 한다... 즉, XMMATRIX여야 한다...
+			}
+
 			meshRenderer = gameObject->GetComponent<MeshRenderer>();
 			
 			ID3D11Buffer* vertexBuffer = meshRenderer->GetVertexBuffer();
@@ -232,7 +256,8 @@ namespace dive
 		immediateContext->OMSetDepthStencilState(mPipelineStateFont.pDSS, 1);
 		immediateContext->RSSetState(mPipelineStateFont.pRSS);
 
-		immediateContext->VSSetConstantBuffers(0, 1, mConstantBufferMatrix.GetAddressOf());
+		ID3D11Buffer* buffer = mBufferFrame->GetBuffer();
+		immediateContext->VSSetConstantBuffers(0, 1, &buffer);
 
 		D3D11_VIEWPORT viewport;
 		viewport.Width = (float)mGraphicsDevice->GetResolutionWidth();

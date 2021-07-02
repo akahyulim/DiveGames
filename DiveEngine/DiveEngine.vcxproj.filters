@@ -385,6 +385,9 @@
     <ClInclude Include="Mesh.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -470,6 +473,12 @@
     </ClCompile>
     <ClCompile Include="Transform_Hierarchy.cpp">
       <Filter>Engine\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffers.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>Engine\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

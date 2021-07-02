@@ -22,8 +22,10 @@ namespace dive
 		// 변환 함수
 		void UpdateTransform();
 
-		DirectX::XMFLOAT3 GetPosition();
+		DirectX::XMFLOAT3 GetPosition() const;
+		void GetPosition(float& outX, float& outY, float& outZ);
 		DirectX::XMFLOAT3 GetLocalPosition() const { return mLocalPosition; }
+		void GetLocalPosition(float& outX, float& outY, float& outZ);
 		void SetPosition(const DirectX::XMFLOAT3& position);
 		void SetPosition(float x, float y, float z);
 		void SetLocalPosition(const DirectX::XMFLOAT3& position);
@@ -40,8 +42,8 @@ namespace dive
 		void SetLocalScale(const DirectX::XMFLOAT3& scale);
 
 		void SetLookAt(const DirectX::XMFLOAT3& lookAt) { mLookAt = lookAt; }
-		const DirectX::XMMATRIX& GetMatrix() const { return mMatrix; }
-		const DirectX::XMMATRIX& GetLocalMatrix() const { return mLocalMatrix; }
+		const DirectX::XMFLOAT4X4& GetMatrix() const { return mMatrix; }
+		const DirectX::XMFLOAT4X4& GetLocalMatrix() const { return mLocalMatrix; }
 
 		// 계층구조 함수 ===================================================================================
 		// 시조를 리턴한다.
@@ -69,6 +71,13 @@ namespace dive
 		void AcquireChidren();
 
 	private:
+		DirectX::XMVECTOR getPosition() const;
+		DirectX::XMVECTOR getLocalPosition() const;
+		void setPosition(const DirectX::XMVECTOR& position);
+		void setLocalPosition(const DirectX::XMVECTOR& position);
+
+		DirectX::XMMATRIX getMatrix() const;
+		DirectX::XMMATRIX getLocalMatrix() const;
 
 	private:
 		// transform
@@ -76,8 +85,8 @@ namespace dive
 		DirectX::XMFLOAT4 mLocalRotation;
 		DirectX::XMFLOAT3 mLocalScale;
 
-		DirectX::XMMATRIX mMatrix;
-		DirectX::XMMATRIX mLocalMatrix;
+		DirectX::XMFLOAT4X4 mMatrix;
+		DirectX::XMFLOAT4X4 mLocalMatrix;
 
 		DirectX::XMFLOAT3 mLookAt;
 

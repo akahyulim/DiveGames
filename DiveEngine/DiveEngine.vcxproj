@@ -171,6 +171,7 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CommonInclude.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DiveEngine.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Event.h" />
@@ -299,6 +300,7 @@
   <ItemGroup>
     <ClCompile Include="AssetManager.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="ConstantBuffer.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="FileStream.cpp" />
     <ClCompile Include="FileSystemHelper.cpp" />
@@ -313,6 +315,7 @@
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="ConstantBuffers.h" />
     <ClCompile Include="Renderer_Resources.cpp" />
     <ClCompile Include="RenderPath3D.cpp" />
     <ClCompile Include="Runtime.cpp" />

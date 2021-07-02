@@ -51,71 +51,99 @@ namespace dive
 
 	void Transform::UpdateTransform()
 	{
-		auto matrixLocalPos = DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&GetLocalPosition()));
-		
+		DirectX::XMMATRIX matLocalPos = DirectX::XMMatrixTranslationFromVector(getLocalPosition());
+		DirectX::XMMATRIX matLocalRot = DirectX::XMMatrixIdentity();
+		DirectX::XMMATRIX matLocalScl = DirectX::XMMatrixIdentity();
+
+		auto localMatrix = matLocalScl * matLocalRot * matLocalPos;
+		DirectX::XMStoreFloat4x4(&mLocalMatrix, localMatrix);
+
+		if (HasParent())
+		{
+			DirectX::XMStoreFloat4x4(&mMatrix, (localMatrix * mParent->getMatrix()));
+		}
+		else
+		{
+			mMatrix = mLocalMatrix;
+		}
+
+		for (auto child : mChildren)
+		{
+			child->UpdateTransform();
+		}
 	}
 
-	DirectX::XMFLOAT3 Transform::GetPosition()
+	DirectX::XMFLOAT3 Transform::GetPosition() const
 	{
-		return DirectX::XMFLOAT3();
+		return DirectX::XMFLOAT3(mMatrix._41, mMatrix._42, mMatrix._43);
+	}
+
+	void Transform::GetPosition(float& outX, float& outY, float& outZ)
+	{
+		outX = mMatrix._41;
+		outY = mMatrix._42;
+		outZ = mMatrix._43;
+	}
+
+	void Transform::GetLocalPosition(float& outX, float& outY, float& outZ)
+	{
+		outX = mLocalPosition.x;
+		outY = mLocalPosition.y;
+		outZ = mLocalPosition.z;
 	}
 
 	void Transform::SetPosition(const DirectX::XMFLOAT3& position)
 	{
-		if (DirectX::XMVector3Equal(DirectX::XMLoadFloat3(&GetPosition()), DirectX::XMLoadFloat3(&position)))
-			return;
-
-		// 루트면은 그냥 전달 받은 값 저장
-		// 부모가 있다면 변환 행렬 역행렬을 곱한 값을 저장
+		setPosition(DirectX::XMLoadFloat3(&position));
 	}
 
-	void Transform::SetPosition(float x, float y, float z)
-	{
-		SetPosition(DirectX::XMFLOAT3(x, y, z));
-	}
-	
 	void Transform::SetLocalPosition(const DirectX::XMFLOAT3& position)
-	{
-		if (DirectX::XMVector3Equal(DirectX::XMLoadFloat3(&GetLocalPosition()), DirectX::XMLoadFloat3(&position)))
-			return;
-
-		mLocalPosition = position;
-
-		UpdateTransform();
+	{;
+		setLocalPosition(DirectX::XMLoadFloat3(&position));
 	}
 
 	void Transform::SetLocalPosition(float x, float y, float z)
+	{;
+		setLocalPosition(DirectX::XMVectorSet(x, y, z, 1.0f));
+	}
+	
+	DirectX::XMVECTOR Transform::getPosition() const
 	{
-		SetLocalPosition(DirectX::XMFLOAT3(x, y, z));
+		DirectX::XMFLOAT3 pos = GetPosition();
+		return DirectX::XMLoadFloat3(&pos);
+	}
+	
+	DirectX::XMVECTOR Transform::getLocalPosition() const
+	{
+		return DirectX::XMLoadFloat3(&mLocalPosition);
 	}
 
-	DirectX::XMFLOAT4 Transform::GetRotation()
+	void Transform::setPosition(const DirectX::XMVECTOR& position)
 	{
+		if (DirectX::XMVector3Equal(position, getPosition()))
+			return;
 
+		setLocalPosition( HasParent() ?
+			DirectX::XMVector3Transform(position, DirectX::XMMatrixInverse(nullptr, mParent->getMatrix()))
+			: position);
 	}
 
-	void Transform::SetRotation(const DirectX::XMFLOAT3& rotation)
+	void Transform::setLocalPosition(const DirectX::XMVECTOR& position)
 	{
+		if (DirectX::XMVector3Equal(position, getLocalPosition()))
+			return;
 
+		DirectX::XMStoreFloat3(&mLocalPosition, position);
+		UpdateTransform();
 	}
 
-	void Transform::SetLocalRotation(const DirectX::XMFLOAT3& rotation)
+	DirectX::XMMATRIX Transform::getMatrix() const
 	{
-
+		return DirectX::XMLoadFloat4x4(&mMatrix);
 	}
 
-	DirectX::XMFLOAT3 Transform::GetScale()
+	DirectX::XMMATRIX Transform::getLocalMatrix() const
 	{
-
-	}
-
-	void Transform::SetScale(const DirectX::XMFLOAT3& scale)
-	{
-
-	}
-
-	void Transform::SetLocalScale(const DirectX::XMFLOAT3& scale)
-	{
-
+		return DirectX::XMLoadFloat4x4(&mLocalMatrix);
 	}
 }
