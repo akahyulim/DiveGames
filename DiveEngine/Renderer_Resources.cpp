@@ -231,8 +231,13 @@ namespace dive
 		}
 
 		// renderTargets들을 만든다. 타입때문에 지웠다가 다시 만들어야 한다. 나중에 수정이 필요할듯?
+		// 에디터 실행시 hlsl의 cb를 수정할 때 마다 이 곳에서 뻗는다....
+		// 렌더 타겟 설정을 안해서일 수 있다.
 		if (mRenderTargets[eRenderTargets::Frame_Ldr])
+		{
 			delete mRenderTargets[eRenderTargets::Frame_Ldr];
+			mRenderTargets[eRenderTargets::Frame_Ldr] = nullptr;
+		}
 		mRenderTargets[eRenderTargets::Frame_Ldr] = new Texture(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 		return true;

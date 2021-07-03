@@ -105,18 +105,6 @@ namespace dive
 		if (mBufferFrame == nullptr)
 			return;
 
-		/*
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-		if (FAILED(immediateContext->Map(mConstantBufferMatrix.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
-		{
-			CORE_ERROR("Constant Buffer Mapping에 실패하였습니다.");
-			return;
-		}
-
-		MatrixBuffer* pBuffer = static_cast<MatrixBuffer*>(mappedResource.pData);
-		*/
-
 		MatrixBuffer* pBuffer = static_cast<MatrixBuffer*>(mBufferFrame->Map());
 
 		// World Matrix
@@ -166,23 +154,31 @@ namespace dive
 
 			// Translate the rotated camera position to the location of the viewer.
 			lookAtVector = XMVectorAdd(positionVector, lookAtVector);
-			pBuffer->view = XMMatrixTranspose(XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
+
+			auto viewMatrix = XMMatrixTranspose(XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
+			pBuffer->view = viewMatrix;
+			mBufferFrameCPU.SetViewMatrix(viewMatrix);
 		}
 
 		// Perspective Projection Matrix
 		{
 			float fieldOfView = 3.141592654f / 4.0f;
 			float screenAspect = (float)mGraphicsDevice->GetResolutionWidth() / (float)mGraphicsDevice->GetResolutionHeight();
-			pBuffer->proj = XMMatrixTranspose(XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f));
-
-			// mBufferFrame로 테스트를 하려 했으나 역시 XMMATRIX다...
+			
+			auto projMatrix = XMMatrixTranspose(XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f));
+			pBuffer->proj = projMatrix;
+			mBufferFrameCPU.SetPerspectiveProjectionMatrix(projMatrix);
+			auto view_proj = mBufferFrameCPU.GetViewMatrix() * mBufferFrameCPU.GetPerspectiveProjectionMatrix();
+			mBufferFrameCPU.SetViewProjectionMatrix(view_proj);
 		}
 
 		// Orthographic Projection Matrix
 		{
 			auto width = (float)mGraphicsDevice->GetResolutionWidth();
 			auto height = (float)mGraphicsDevice->GetResolutionHeight();
-			pBuffer->projOrthographic = XMMatrixTranspose(XMMatrixOrthographicLH(width, height, 0.1f, 1000.0f));
+			auto orthoProjMatrix = XMMatrixTranspose(XMMatrixOrthographicLH(width, height, 0.1f, 1000.0f));
+			pBuffer->projOrthographic = orthoProjMatrix;
+			mBufferFrameCPU.SetOrthoProjectionMatrix(orthoProjMatrix);
 		}
 
 		//immediateContext->Unmap(static_cast<ID3D11Resource*>(mConstantBufferMatrix.Get()), 0);
@@ -209,18 +205,33 @@ namespace dive
 		immediateContext->PSSetSamplers(0, 1, &mPipelineStateLegacy.pSS);
 		immediateContext->OMSetDepthStencilState(mPipelineStateLegacy.pDSS, 1);
 		immediateContext->RSSetState(mPipelineStateLegacy.pRSS);
-		ID3D11Buffer* buffer = mBufferFrame->GetBuffer();
-		immediateContext->VSSetConstantBuffers(0, 1, &buffer);//mConstantBufferMatrix.GetAddressOf());		// 이건 GameObject마다 가려내야 한다.
+		//ID3D11Buffer* buffer = mBufferFrame->GetBuffer();
+		//immediateContext->VSSetConstantBuffers(0, 1, &buffer);//mConstantBufferMatrix.GetAddressOf());
 		immediateContext->RSSetViewports(1, &mViewPort);
 
 
 		MeshRenderer* meshRenderer = nullptr;
 		for (const auto& gameObject : mGameObjects[eObjectType::Opaque])
 		{
-			if (Transform* tranform = gameObject->GetTransform())
+			if (Transform* transform = gameObject->GetTransform())
 			{
-				mBufferObjectCPU.world = tranform->GetMatrix();
-				mBufferObjectCPU.wvp;	// mBufferFramCPU.viewProj와 곱해야 하는데... 곱해야 한다... 즉, XMMATRIX여야 한다...
+				mBufferObjectCPU.SetWorldMatrix(transform->GetMatrix());
+				mBufferObjectCPU.SetWorldViewProjectionMatrix(mBufferObjectCPU.GetWorldMatrix() * mBufferFrameCPU.GetViewProjectionMatrix());
+
+				// 일단 그냥 테스트
+				// 스파르탄은 함수를 사용해 CPU 데이터를 GPU에 map / unmap 했다. 
+				BufferObject* pData = static_cast<BufferObject*>(mBufferObjectGPU->Map());
+				pData->world = mBufferObjectCPU.world;
+				pData->wvp = mBufferObjectCPU.wvp;
+				assert(mBufferObjectGPU->Unmap());
+
+				// wvp 계산이 잘못된 것 이었다.
+				// 아닌데... 결과는 맞는데...
+				ID3D11Buffer* buffer = mBufferObjectGPU->GetBuffer();
+				immediateContext->VSSetConstantBuffers(0, 1, &buffer);
+
+				//auto position = transform->GetPositionFloat3();
+				//CORE_TRACE("Position: {0:f}, {1:f}, {2:f}", position.x, position.y, position.z);
 			}
 
 			meshRenderer = gameObject->GetComponent<MeshRenderer>();
@@ -236,7 +247,7 @@ namespace dive
 
 			immediateContext->DrawIndexed(meshRenderer->GetIndexCount(), 0, 0);
 
-			CORE_TRACE("Legacy Object - {0:d}, {1:d}", stride, meshRenderer->GetIndexCount());
+			//CORE_TRACE("Legacy Object - {0:d}, {1:d}", stride, meshRenderer->GetIndexCount());
 		}
 	}
 

@@ -1,11 +1,18 @@
-
+/*
 cbuffer MatrixBuffer
 {
 	matrix world;
 	matrix view;
 	matrix proj;
 };
-
+*/
+cbuffer BufferFrameGPU
+{
+	// float4x4와 matrix는 차이가 없나?
+	float4x4 world;
+	float4x4 wvp;
+};
+/**/
 struct VertexInput
 {
 	float4 position : POSITION0;
@@ -27,9 +34,7 @@ PixelInput mainVS(VertexInput input)
 	PixelInput output;
 
 	input.position.w = 1.0f;
-	output.position = mul(input.position, world);
-	output.position = mul(output.position, view);
-	output.position = mul(output.position, proj);
+	output.position = mul(input.position, wvp);
 
 	output.uv = input.uv;
 	output.normal = mul(input.normal, (float3x3)world).xyz;
@@ -38,8 +43,8 @@ PixelInput mainVS(VertexInput input)
 	return output;
 }
 
-// 일단 에디터에서는 RenderTarget이 달라야 한다.
-// 하지만 현재 Sandbox에서도 보이지 않는다.
+// 에디터의 경우 RenderTarget이 달라야하지 않나?
+// 현재 그냥 보인다.
 float4 mainPS(PixelInput input) : SV_TARGET
 {
 	return float4(1.0f, 1.0f, 0.0f, 1.0f);
