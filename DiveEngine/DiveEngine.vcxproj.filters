@@ -10,9 +10,6 @@
     <ClInclude Include="Scene.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
-    <ClInclude Include="CommonInclude.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="DiveEngine.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>

@@ -1,7 +1,6 @@
 #pragma once
 #include "GraphicsInclude.h"
 #include "GraphicsEnums.h"
-#include "CommonInclude.h"
 #include <Windows.h>
 
 namespace dive
