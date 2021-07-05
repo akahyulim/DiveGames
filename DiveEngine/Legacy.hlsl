@@ -1,18 +1,10 @@
-/*
-cbuffer MatrixBuffer
-{
-	matrix world;
-	matrix view;
-	matrix proj;
-};
-*/
 cbuffer BufferFrameGPU
 {
 	// float4x4와 matrix는 차이가 없나?
-	float4x4 world;
-	float4x4 wvp;
+	matrix world;
+	matrix wvp;
 };
-/**/
+
 struct VertexInput
 {
 	float4 position : POSITION0;

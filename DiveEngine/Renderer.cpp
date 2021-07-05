@@ -89,19 +89,16 @@ namespace dive
 	//======================================================================================//
 	// 갱신만 한다. bind는 개별 path에서 한다.												//
 	// 현재 wciked와 spartan의 구현이 꼬였다.												//
-	// spartan의 경우 일단 구조체가 존재하고 매 pass마다 해당 구조체에 값을 넣은 후			//
-	// 버퍼 업데이트를 호출하여 갱신하는 것 같다.											//
-	// 이때 구조체는 Renderer의 힙에 생성된 변수이고										//
-	// 따라서 버퍼 업데이트 함수에서 직접 멤버 변수로 접근한다.								//
-	// 사실 상수 버퍼는 종류가 여러개라 Tick에서 초기화하는 것도 있고(camera)				//
-	// pass에서 설정하는 것도 있는 것 같다.													//
+	// Main Camera를 통해 View, Projection을 이용한 행렬을 계산해							//
+	// 매 프레임 갱신하는 Constant Buffer의 데이터를 저장(CPU)한다.							//
+	// 현재 구버전 Constant Buffer에 하드 코딩된 View, Projection이 사용되어				//
+	// 복잡하다.																			//
 	//======================================================================================//
 	void Renderer::UpdateCB()
 	{
 		auto immediateContext = mGraphicsDevice->GetImmediateContext();
 		assert(immediateContext != nullptr);
 
-		// CB Update
 		if (mBufferFrame == nullptr)
 			return;
 
@@ -155,8 +152,8 @@ namespace dive
 			// Translate the rotated camera position to the location of the viewer.
 			lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 
-			auto viewMatrix = XMMatrixTranspose(XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
-			pBuffer->view = viewMatrix;
+			auto viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+			pBuffer->view = XMMatrixTranspose(viewMatrix);
 			mBufferFrameCPU.SetViewMatrix(viewMatrix);
 		}
 
@@ -165,8 +162,8 @@ namespace dive
 			float fieldOfView = 3.141592654f / 4.0f;
 			float screenAspect = (float)mGraphicsDevice->GetResolutionWidth() / (float)mGraphicsDevice->GetResolutionHeight();
 			
-			auto projMatrix = XMMatrixTranspose(XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f));
-			pBuffer->proj = projMatrix;
+			auto projMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
+			pBuffer->proj = XMMatrixTranspose(projMatrix);
 			mBufferFrameCPU.SetPerspectiveProjectionMatrix(projMatrix);
 			auto view_proj = mBufferFrameCPU.GetViewMatrix() * mBufferFrameCPU.GetPerspectiveProjectionMatrix();
 			mBufferFrameCPU.SetViewProjectionMatrix(view_proj);
@@ -205,8 +202,6 @@ namespace dive
 		immediateContext->PSSetSamplers(0, 1, &mPipelineStateLegacy.pSS);
 		immediateContext->OMSetDepthStencilState(mPipelineStateLegacy.pDSS, 1);
 		immediateContext->RSSetState(mPipelineStateLegacy.pRSS);
-		//ID3D11Buffer* buffer = mBufferFrame->GetBuffer();
-		//immediateContext->VSSetConstantBuffers(0, 1, &buffer);//mConstantBufferMatrix.GetAddressOf());
 		immediateContext->RSSetViewports(1, &mViewPort);
 
 
@@ -216,22 +211,24 @@ namespace dive
 			if (Transform* transform = gameObject->GetTransform())
 			{
 				mBufferObjectCPU.SetWorldMatrix(transform->GetMatrix());
-				mBufferObjectCPU.SetWorldViewProjectionMatrix(mBufferObjectCPU.GetWorldMatrix() * mBufferFrameCPU.GetViewProjectionMatrix());
+				mBufferObjectCPU.SetWorldViewProjectionMatrix(XMMatrixTranspose(mBufferObjectCPU.GetWorldMatrix() * mBufferFrameCPU.GetViewProjectionMatrix()));
 
-				// 일단 그냥 테스트
-				// 스파르탄은 함수를 사용해 CPU 데이터를 GPU에 map / unmap 했다. 
+				//==========================================================================//
+				// Constant Buffer Test														//
+				// 1. 스파르탄은 함수를 사용해 CPU 데이터를 GPU에 map / unmap 했다.			//
+				// 2. DirectX의 행렬과 HLSL의 행렬 방향이 다르기때문에 전치해 주어야 한다.	//
+				// 현재 XMFLOAT4X4로 저장했기에 좀 더 복잡해졌다.							//
+				//==========================================================================//
+				DirectX::XMMATRIX world = XMMatrixTranspose(mBufferObjectCPU.GetWorldMatrix());
+				DirectX::XMMATRIX wvp = XMMatrixTranspose(mBufferObjectCPU.GetWorldViewProjectionMatrix());
+
 				BufferObject* pData = static_cast<BufferObject*>(mBufferObjectGPU->Map());
-				pData->world = mBufferObjectCPU.world;
-				pData->wvp = mBufferObjectCPU.wvp;
+				DirectX::XMStoreFloat4x4(&pData->world, world);
+				DirectX::XMStoreFloat4x4(&pData->wvp, wvp);
 				assert(mBufferObjectGPU->Unmap());
 
-				// wvp 계산이 잘못된 것 이었다.
-				// 아닌데... 결과는 맞는데...
 				ID3D11Buffer* buffer = mBufferObjectGPU->GetBuffer();
 				immediateContext->VSSetConstantBuffers(0, 1, &buffer);
-
-				//auto position = transform->GetPositionFloat3();
-				//CORE_TRACE("Position: {0:f}, {1:f}, {2:f}", position.x, position.y, position.z);
 			}
 
 			meshRenderer = gameObject->GetComponent<MeshRenderer>();
