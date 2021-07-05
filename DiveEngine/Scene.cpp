@@ -178,7 +178,7 @@ namespace dive
 		mbDirty = true;
 	}
 
-	std::vector<GameObject*> Scene::GetRootGameObjects()
+	std::vector<GameObject*> Scene::GetRootGameObjects() const
 	{
 		std::vector<GameObject*> rootGameObjects;
 		for (auto gameObject : mGameObjects)
@@ -216,6 +216,8 @@ namespace dive
 		{
 			if ((*it)->GetID() == gameObject->GetID())
 			{
+				delete (*it);
+				(*it) = nullptr;
 				it = mGameObjects.erase(it);
 				break;
 			}

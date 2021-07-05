@@ -27,6 +27,8 @@ namespace dive
 
 			mComponents.clear();
 		}
+
+		APP_TRACE("Destroy GameObject: {:s}", mName);
 	}
 
 	void GameObject::Serialize(FileStream* fileStream)

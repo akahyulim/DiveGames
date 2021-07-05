@@ -27,7 +27,7 @@ namespace dive
 		void RemoveGameObject(GameObject* gameObject);
 
 		const std::vector<GameObject*>& GetAllGameObjects() const { return mGameObjects; }
-		std::vector<GameObject*> GetRootGameObjects();
+		std::vector<GameObject*> GetRootGameObjects() const;
 
 		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(mGameObjects.size()); }
 
@@ -37,7 +37,7 @@ namespace dive
 			return scene;
 		}
 
-		std::string GetName() { return mName; }
+		std::string GetName() const { return mName; }
 		void SetName(const std::string& name) { mName = name; }
 
 		bool IsDirty() { return mbDirty; }
