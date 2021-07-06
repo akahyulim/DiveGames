@@ -6,12 +6,13 @@
 
 namespace dive
 {
+	class GameObject;
 	class FileStream;
 
 	class Transform : public Component
 	{
 	public:
-		Transform();
+		Transform(GameObject* owner);
 		~Transform();
 
 		// 오버라이드 함수

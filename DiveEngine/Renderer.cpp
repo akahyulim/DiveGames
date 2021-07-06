@@ -211,7 +211,7 @@ namespace dive
 			if (Transform* transform = gameObject->GetTransform())
 			{
 				mBufferObjectCPU.SetWorldMatrix(transform->GetMatrix());
-				mBufferObjectCPU.SetWorldViewProjectionMatrix(XMMatrixTranspose(mBufferObjectCPU.GetWorldMatrix() * mBufferFrameCPU.GetViewProjectionMatrix()));
+				mBufferObjectCPU.SetWorldViewProjectionMatrix(mBufferObjectCPU.GetWorldMatrix() * mBufferFrameCPU.GetViewProjectionMatrix());
 
 				//==========================================================================//
 				// Constant Buffer Test														//

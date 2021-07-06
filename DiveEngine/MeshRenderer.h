@@ -4,6 +4,8 @@
 
 namespace dive
 {
+	class GameObject;
+
 	enum class eDefaultMeshType
 	{
 		Triangle,
@@ -17,7 +19,7 @@ namespace dive
 	class MeshRenderer : public Component
 	{
 	public:
-		MeshRenderer();
+		MeshRenderer(GameObject* owner);
 		~MeshRenderer();
 
 		// Virtual

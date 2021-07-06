@@ -3,6 +3,7 @@
 #include "Component.h"
 #include "Transform.h"
 #include "MeshRenderer.h"
+#include "Camera.h"
 #include "Event.h"
 #include <string>
 #include <vector>
@@ -70,7 +71,7 @@ namespace dive
 			return component;
 		}
 
-		auto newComponent = dynamic_cast<T*>(mComponents.emplace_back(static_cast<Component*>(new T)));
+		auto newComponent = dynamic_cast<T*>(mComponents.emplace_back(static_cast<Component*>(new T(this))));
 		assert(newComponent);
 
 		// awake가 있다면 호출

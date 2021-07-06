@@ -5,8 +5,8 @@
 
 namespace dive
 {
-	Transform::Transform()
-		: Component(typeid(Transform).hash_code())
+	Transform::Transform(GameObject* owner)
+		: Component(typeid(Transform).hash_code(), owner, this)
 	{
 		mLocalPosition = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 

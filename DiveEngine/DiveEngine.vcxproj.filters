@@ -477,6 +477,9 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Engine\Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Engine\Scene\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">

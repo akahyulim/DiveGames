@@ -7,6 +7,8 @@
 
 namespace dive
 {
+	class GameObject;
+
 	// 이건 3d 상의 text이다. gui용은 따로 만들어야 한다...
 
 	// 추후 Mesh Base를 만들수도 있다.
@@ -25,7 +27,7 @@ namespace dive
 		};
 
 	public:
-		TextMesh();
+		TextMesh(GameObject* owner);
 		~TextMesh();
 
 		bool SetFont(const Font* pFont);

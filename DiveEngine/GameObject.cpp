@@ -11,7 +11,6 @@ namespace dive
 	{
 		// 하나로 만들까?
 		mTransform = AddComponent<Transform>();
-		mTransform->SetOwnder(this);
 	}
 
 	GameObject::~GameObject()
