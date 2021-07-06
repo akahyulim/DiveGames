@@ -28,8 +28,8 @@ namespace dive
 
 		bool IsInitialized() const;
 
-		ID3D11Device* GetDevice() { return mDevice.Get(); }
-		ID3D11DeviceContext* GetImmediateContext() { return mImmediateContext.Get(); }
+		ID3D11Device* GetDevice() { return mDevice; }
+		ID3D11DeviceContext* GetImmediateContext() { return mImmediateContext; }
 
 	private:
 		void createBackbufferResources();
@@ -37,8 +37,8 @@ namespace dive
 
 	private:
 		Microsoft::WRL::ComPtr<IDXGISwapChain> mSwapChain;
-		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mImmediateContext;
+		ID3D11Device* mDevice = nullptr;
+		ID3D11DeviceContext* mImmediateContext = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mRenderTargetView;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> mBackBuffer;
 

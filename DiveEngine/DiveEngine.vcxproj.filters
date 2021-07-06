@@ -28,9 +28,6 @@
     <ClInclude Include="ThreadPool.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="GameObject.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
@@ -64,29 +61,11 @@
     <ClInclude Include="Input.h">
       <Filter>Engine\Input</Filter>
     </ClInclude>
-    <ClInclude Include="FontImporter.h">
-      <Filter>Engine\Tools</Filter>
-    </ClInclude>
     <ClInclude Include="TextMesh.h">
       <Filter>Engine\Scene\Components</Filter>
     </ClInclude>
     <ClInclude Include="Font.h">
       <Filter>Engine\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="IniHelper.h">
-      <Filter>Engine\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="FileStream.h">
-      <Filter>Engine\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystemHelper.h">
-      <Filter>Engine\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="FormatHelper.h">
-      <Filter>Engine\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="StringHelper.h">
-      <Filter>Engine\Tools</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>Engine\Resource</Filter>
@@ -367,9 +346,6 @@
     <ClInclude Include="External\spdlog\sinks\wincolor_sink-inl.h">
       <Filter>External\spdlog\sinks</Filter>
     </ClInclude>
-    <ClInclude Include="Settings.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Event.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
@@ -377,13 +353,37 @@
       <Filter>Engine\Scene\Components</Filter>
     </ClInclude>
     <ClInclude Include="Geometry.h">
-      <Filter>Engine\Utility</Filter>
+      <Filter>Engine\Helpers</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="ConstantBuffer.h">
       <Filter>Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="FileStream.h">
+      <Filter>Engine\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystemHelper.h">
+      <Filter>Engine\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="FontImporter.h">
+      <Filter>Engine\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="FormatHelper.h">
+      <Filter>Engine\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="IniHelper.h">
+      <Filter>Engine\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="StringHelper.h">
+      <Filter>Engine\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Settings.h">
+      <Filter>Engine\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Engine\Helpers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -400,9 +400,6 @@
       <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="ThreadPool.cpp">
-      <Filter>Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Timer.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="Scene.cpp">
@@ -429,38 +426,17 @@
     <ClCompile Include="Input.cpp">
       <Filter>Engine\Input</Filter>
     </ClCompile>
-    <ClCompile Include="FontImporter.cpp">
-      <Filter>Engine\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="TextMesh.cpp">
       <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Font.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="IniHelper.cpp">
-      <Filter>Engine\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="FileStream.cpp">
-      <Filter>Engine\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystemHelper.cpp">
-      <Filter>Engine\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="FormatHelper.cpp">
-      <Filter>Engine\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="StringHelper.cpp">
-      <Filter>Engine\Tools</Filter>
-    </ClCompile>
     <ClCompile Include="MeshRenderer.cpp">
       <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="AssetManager.cpp">
       <Filter>Engine\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Settings.cpp">
-      <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="Light.cpp">
       <Filter>Engine\Scene\Components</Filter>
@@ -476,6 +452,30 @@
     </ClCompile>
     <ClCompile Include="ConstantBuffer.cpp">
       <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="FileStream.cpp">
+      <Filter>Engine\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystemHelper.cpp">
+      <Filter>Engine\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="FontImporter.cpp">
+      <Filter>Engine\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="FormatHelper.cpp">
+      <Filter>Engine\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="IniHelper.cpp">
+      <Filter>Engine\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="StringHelper.cpp">
+      <Filter>Engine\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Settings.cpp">
+      <Filter>Engine\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Engine\Helpers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -524,7 +524,7 @@
     <Filter Include="External\spdlog\fmt\bundled">
       <UniqueIdentifier>{561cef61-527b-4925-89c6-a7bcdf59ace5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Utility">
+    <Filter Include="Engine\Helpers">
       <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
     </Filter>
   </ItemGroup>

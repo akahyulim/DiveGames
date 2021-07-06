@@ -49,30 +49,31 @@ namespace dive
 		void Update();
         void ParseMessage(LPARAM lParam);   // 나중에 이름 바꾸기
 
-		bool GetKey(const eKeyCode key) { return m_keys[static_cast<unsigned int>(key)]; }
+		bool GetKey(const eKeyCode key) { return mKeys[static_cast<unsigned int>(key)]; }
 		bool GetKeyDown(const eKeyCode key);
 		bool GetKeyUp(const eKeyCode key);
   
-		const DirectX::XMFLOAT2& GetMousePosition() const { return m_mousePos; }
+		DirectX::XMFLOAT2 GetMousePosition() const { return mMousePos; }
 		void SetMousePosition(const DirectX::XMFLOAT2& position);
-		const DirectX::XMFLOAT2& GetMousePosDelta() const { return m_mousePosDelta; }
-		float GetMouseWheelDelta() const { return m_mouseWheelDelta; }
+		
+		DirectX::XMFLOAT2 GetMousePosDelta() const { return mMousePosDelta; }
+		float GetMouseWheelDelta() const { return mMouseWheelDelta; }
 
 	private:
 
 	private:
-		HWND m_hWnd = 0;
+		HWND mWindowHandle = 0;
 
-		bool m_bUpdated = false;
+		bool mbUpdated = false;
 
 		// keys
-		bool m_keys[256] = { false };
-		bool m_oldKeys[256] = { false };
+		bool mKeys[256]		= { false };
+		bool mOldKeys[256]	= { false };
 
 		// mouse
-		DirectX::XMFLOAT2 m_mousePos		= DirectX::XMFLOAT2(0.0f, 0.0f);
-		DirectX::XMFLOAT2 m_mousePosDelta	= DirectX::XMFLOAT2(0.0f, 0.0f);
-		float m_mouseWheelDelta				= 0.0f;
+		DirectX::XMFLOAT2 mMousePos			= DirectX::XMFLOAT2(0.0f, 0.0f);
+		DirectX::XMFLOAT2 mMousePosDelta	= DirectX::XMFLOAT2(0.0f, 0.0f);
+		float mMouseWheelDelta				= 0.0f;
 
   };
 }

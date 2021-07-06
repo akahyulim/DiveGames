@@ -11,6 +11,8 @@ namespace dive
 	};
 
 	// 그냥 다 때려박고 싱글톤으로 만들자.
+	// 해상도, BackBuffer 크기, 윈도우 크기, 그리고 RenderTarget의 크기는 다 다를 수 있다.
+	// 물론 Settings는 해상도와 BackBuffer 크기 그리고 윈도우 크기만 다루면 된다.
 	class Settings
 	{
 	public:
