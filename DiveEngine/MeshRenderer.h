@@ -35,6 +35,9 @@ namespace dive
 		unsigned int GetVertexStride() { return static_cast<unsigned int>(sizeof(VertexType_PosTexNorTan)); }
 		unsigned int GetIndexCount() { return mMesh->GetIndexCount(); }
 
+		// test
+		void Render(ID3D11DeviceContext* deviceContext);
+
 	private:
 		void calcu();
 		bool createBuffers();

@@ -232,7 +232,12 @@ namespace dive
 			}
 
 			meshRenderer = gameObject->GetComponent<MeshRenderer>();
-			
+			if (!meshRenderer)
+				continue;
+
+			meshRenderer->Render(immediateContext);
+
+			/*
 			ID3D11Buffer* vertexBuffer = meshRenderer->GetVertexBuffer();
 			assert(vertexBuffer != nullptr);
 			unsigned int stride = meshRenderer->GetVertexStride();
@@ -243,7 +248,7 @@ namespace dive
 			immediateContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 			immediateContext->DrawIndexed(meshRenderer->GetIndexCount(), 0, 0);
-
+			*/
 			//CORE_TRACE("Legacy Object - {0:d}, {1:d}", stride, meshRenderer->GetIndexCount());
 		}
 	}

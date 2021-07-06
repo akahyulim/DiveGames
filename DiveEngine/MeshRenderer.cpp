@@ -94,6 +94,23 @@ namespace dive
 		}
 	}
 
+	void MeshRenderer::Render(ID3D11DeviceContext* deviceContext)
+	{
+		if (!deviceContext)
+			return;
+
+		// ref에선 constant buffer와 input layout, shader를 외부에서 먼저 bind 시켰다.
+		// 그렇다면 이 곳에선 Material과 기타 데이터를 bind해야 하는데
+		// 일단은 buffer만 bind한 후 draw 하자.
+		// 문제는 추후 Model을 어떻게 그려야하느냐 이다.
+
+		unsigned int offset = 0;
+		deviceContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &mStride, &offset);
+		deviceContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+		deviceContext->DrawIndexed(GetIndexCount(), 0, 0);
+	}
+
 	void MeshRenderer::calcu()
 	{
 		// 빈 데이터를 계산한 후 추가한다.
@@ -108,7 +125,10 @@ namespace dive
 
 		// vertex buffer
 		{
+			// 일단 그냥 막 코딩
+			// VertexStride만 VertexBuffer Bind에 사용되기 때문이다.
 			stride = static_cast<unsigned int>(sizeof(VertexType_PosTexNorTan));
+			mStride = stride;
 
 			D3D11_BUFFER_DESC desc;
 			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
