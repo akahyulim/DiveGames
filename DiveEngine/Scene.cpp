@@ -11,7 +11,7 @@ namespace dive
 	Scene::Scene()
 		: Object(typeid(Scene).hash_code())
 	{
-		mName = "Untitled";
+		SetName("Untitled");
 		mbDirty = false;
 	}
 
@@ -48,9 +48,6 @@ namespace dive
 
 	void Scene::Clear()
 	{
-		// 애매허네...
-		// 스파르탄은 스레드 안정성을 위해서
-		// swap 처리를 하였다.
 		if (!mGameObjects.empty())
 		{
 			for (auto gameObject : mGameObjects)
@@ -89,7 +86,7 @@ namespace dive
 
 		for (const auto& gameObject : rootGameObjects)
 		{
-			stream.Write(gameObject->GetID());
+			stream.Write(gameObject->GetInstanceID());
 		}
 		for (const auto& gameObject : rootGameObjects)
 		{
@@ -121,7 +118,7 @@ namespace dive
 		for (unsigned int i = 0; i != rootCount; i++)
 		{
 			auto gameObject = CreateGameObject();
-			gameObject->SetID(stream.ReadAs<unsigned int>());
+			gameObject->SetInstanceID(stream.ReadAs<unsigned int>());
 		}
 		for (unsigned int i = 0; i != rootCount; i++)
 		{
@@ -161,7 +158,7 @@ namespace dive
 	{
 		for (auto gameObject : mGameObjects)
 		{
-			if (gameObject->GetID() == id)
+			if (gameObject->GetInstanceID() == id)
 				return gameObject;
 		}
 
@@ -207,14 +204,14 @@ namespace dive
 		auto children = gameObject->GetTransform()->GetChildren();
 		for (auto child : children)
 		{
-			RemoveGameObject(child->GetOwner());
+			RemoveGameObject(child->GetGameObject());
 		}
 
 		auto parent = gameObject->GetTransform()->GetParent();
 
 		for (auto it = mGameObjects.begin(); it != mGameObjects.end();)
 		{
-			if ((*it)->GetID() == gameObject->GetID())
+			if ((*it)->GetInstanceID() == gameObject->GetInstanceID())
 			{
 				delete (*it);
 				(*it) = nullptr;

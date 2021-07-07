@@ -12,7 +12,7 @@ namespace dive
 	class Transform : public Component
 	{
 	public:
-		Transform(GameObject* owner);
+		Transform(GameObject* gameObject);
 		~Transform();
 
 		// 오버라이드 함수
@@ -61,13 +61,13 @@ namespace dive
 		Transform* GetRoot();
 		bool HasParent() const { return (mParent != nullptr); }
 		Transform* GetParent() const { return mParent; }
-		void SetParent(Transform* parentTransform);
+		void SetParent(Transform* parent);
 		void BecomeOrphan();
 		unsigned int GetChildCount() const { return static_cast<unsigned int>(mChildren.size()); }
 		Transform* Find(const std::string& name) const;
 		Transform* GetChild(unsigned int index) const;
 		std::vector<Transform*> GetChildren() { return mChildren; }
-		bool IsChildOf(const Transform* parentTransform) const;
+		bool IsChildOf(const Transform* parent) const;
 		void DetachChildren();
 		void AcquireChidren();
 

@@ -27,7 +27,7 @@ namespace dive
 		};
 
 	public:
-		TextMesh(GameObject* owner);
+		TextMesh(GameObject* gameObject);
 		~TextMesh();
 
 		bool SetFont(const Font* pFont);

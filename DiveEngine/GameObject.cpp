@@ -9,13 +9,12 @@ namespace dive
 		: Object(typeid(GameObject).hash_code()),
 		mTransform(nullptr)
 	{
-		// 하나로 만들까?
+		SetName("Object");
 		mTransform = AddComponent<Transform>();
 	}
 
 	GameObject::~GameObject()
 	{
-		// 이게 계층구조 때문에 좀 예민할 수 있다.
 		if (!mComponents.empty())
 		{
 			for (auto component : mComponents)
@@ -27,7 +26,7 @@ namespace dive
 			mComponents.clear();
 		}
 
-		APP_TRACE("Destroy GameObject: {:s}", mName);
+		APP_TRACE("Destroy GameObject: {:s}", GetName());
 	}
 
 	void GameObject::Serialize(FileStream* fileStream)
@@ -41,8 +40,8 @@ namespace dive
 		// basic
 		{
 			fileStream->Write(mbActive);
-			fileStream->Write(GetID());
-			fileStream->Write(mName);
+			fileStream->Write(GetInstanceID());
+			fileStream->Write(GetName());
 		}
 
 		// component
@@ -51,7 +50,7 @@ namespace dive
 			for (const auto pComponent : mComponents)
 			{
 				fileStream->Write(static_cast<unsigned int>(pComponent->GetTypeHash()));
-				fileStream->Write(pComponent->GetID());
+				fileStream->Write(pComponent->GetInstanceID());
 			}
 			for (const auto pComponent : mComponents)
 			{
@@ -66,11 +65,11 @@ namespace dive
 
 			for (const auto pChild : children)
 			{
-				fileStream->Write(pChild->GetOwner()->GetID());
+				fileStream->Write(pChild->GetGameObject()->GetInstanceID());
 			}
 			for (const auto pChild : children)
 			{
-				pChild->GetOwner()->Serialize(fileStream);
+				pChild->GetGameObject()->Serialize(fileStream);
 			}
 		}
 	}
@@ -88,8 +87,10 @@ namespace dive
 			fileStream->Read(&mbActive);
 			unsigned int id;
 			fileStream->Read(&id);
-			SetID(id);
-			fileStream->Read(&mName);
+			SetInstanceID(id);
+			std::string name;
+			fileStream->Read(&name);
+			SetName(name);
 		}
 
 		// component
@@ -119,7 +120,7 @@ namespace dive
 			for (unsigned int i = 0; i != childrenCount; i++)
 			{
 				auto pChild = Scene::GetGlobalScene().CreateGameObject();
-				pChild->SetID(fileStream->ReadAs<unsigned int>());
+				pChild->SetInstanceID(fileStream->ReadAs<unsigned int>());
 
 				children.emplace_back(pChild);
 			}
@@ -148,7 +149,7 @@ namespace dive
 		// Transform은 이미 생성되어 있으므로 id만 바꾼다.
 		if (typeid(Transform).hash_code() == typeHash)
 		{
-			mTransform->SetID(id);
+			mTransform->SetInstanceID(id);
 			return mTransform;
 		}
 

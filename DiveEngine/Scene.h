@@ -37,16 +37,12 @@ namespace dive
 			return scene;
 		}
 
-		std::string GetName() const { return mName; }
-		void SetName(const std::string& name) { mName = name; }
-
 		bool IsDirty() { return mbDirty; }
 
 	private:
 		void eraseGameObject(GameObject* gameObject);
 
 	private:
-		std::string mName;
 		std::vector<GameObject*> mGameObjects;
 		// camera??
 

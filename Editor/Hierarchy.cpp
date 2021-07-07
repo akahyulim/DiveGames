@@ -37,7 +37,7 @@ namespace editor
 
         if (ImGui::IsMouseReleased(0) && mClicked)
         {
-            if (mHovered && mHovered->GetID() == mClicked->GetID())
+            if (mHovered && mHovered->GetInstanceID() == mClicked->GetInstanceID())
             {
                 setSelected(mClicked);
             }
@@ -90,10 +90,10 @@ namespace editor
        
         if (mSelected)
         {
-            nodeFlags |= (mSelected->GetID() == gameObject->GetID()) ? ImGuiTreeNodeFlags_Selected : 0;
+            nodeFlags |= (mSelected->GetInstanceID() == gameObject->GetInstanceID()) ? ImGuiTreeNodeFlags_Selected : 0;
         }
 
-        bool bNodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)gameObject->GetID(), nodeFlags, gameObject->GetName().c_str());
+        bool bNodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)gameObject->GetInstanceID(), nodeFlags, gameObject->GetName().c_str());
 
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
         {
@@ -106,7 +106,7 @@ namespace editor
         {
             for (auto pChild : children)
             {
-                treeAddGameObject(pChild->GetOwner());
+                treeAddGameObject(pChild->GetGameObject());
             }
 
             ImGui::TreePop();
@@ -152,7 +152,7 @@ namespace editor
         if (dragDrop.DragBegin())
         {
             // 멤버 변수일 필요가...?
-            mPayload.data = gameObject->GetID();
+            mPayload.data = gameObject->GetInstanceID();
             mPayload.type = eDragPayloadType::GameObject;
             dragDrop.DragPayload(mPayload);
             dragDrop.DragEnd();
@@ -164,7 +164,7 @@ namespace editor
             auto id = std::get<unsigned int>(payload->data);
             if (auto droppedObj = mScene->GetGameObjectByID(id))
             {
-                if (droppedObj->GetID() != gameObject->GetID())
+                if (droppedObj->GetInstanceID() != gameObject->GetInstanceID())
                 {
                     droppedObj->GetComponent<dive::Transform>()->SetParent(
                         gameObject->GetComponent<dive::Transform>());

@@ -18,7 +18,7 @@ namespace dive
 	class Camera : public Component
 	{
 	public:
-		Camera(GameObject* owner);
+		Camera(GameObject* gameObject);
 		~Camera();
 
 		void Update(float deltaTime) override;

@@ -19,7 +19,7 @@ namespace dive
 	class MeshRenderer : public Component
 	{
 	public:
-		MeshRenderer(GameObject* owner);
+		MeshRenderer(GameObject* gameObject);
 		~MeshRenderer();
 
 		// Virtual

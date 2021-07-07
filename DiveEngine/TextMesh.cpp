@@ -2,8 +2,8 @@
 
 namespace dive
 {
-	TextMesh::TextMesh(GameObject* owner)
-		: Component(typeid(TextMesh).hash_code(), owner)
+	TextMesh::TextMesh(GameObject* gameObject)
+		: Component(typeid(TextMesh).hash_code(), gameObject)
 	{
 		m_lineSpacing	= 1;
 		m_tabSize		= 4;

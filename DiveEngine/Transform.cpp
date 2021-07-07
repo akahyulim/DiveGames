@@ -5,8 +5,8 @@
 
 namespace dive
 {
-	Transform::Transform(GameObject* owner)
-		: Component(typeid(Transform).hash_code(), owner, this)
+	Transform::Transform(GameObject* gameObject)
+		: Component(typeid(Transform).hash_code(), gameObject, this)
 	{
 		mLocalPosition = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 
@@ -28,7 +28,7 @@ namespace dive
 	{
 		// local pos, rot ,scl
 		// lookAt
-		fileStream->Write(mParent ? mParent->GetOwner()->GetID() : 0);
+		fileStream->Write(mParent ? mParent->GetGameObject()->GetInstanceID() : 0);
 	}
 
 	void Transform::Deserialize(FileStream* fileStream)
@@ -110,7 +110,6 @@ namespace dive
 		SetLocalPositionByVector(HasParent() ?
 			DirectX::XMVector3Transform(position, DirectX::XMMatrixInverse(nullptr, mParent->GetMatrix()))
 			: position);
-
 	}
 
 	void Transform::SetPositionByFloat3(const DirectX::XMFLOAT3& position)

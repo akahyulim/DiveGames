@@ -7,7 +7,6 @@
 #include "Event.h"
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace dive
 {
@@ -36,9 +35,6 @@ namespace dive
 
 		Transform* GetTransform() { return mTransform; }
 
-		const std::string& GetName() const { return mName; }
-		void SetName(const std::string name) { mName = name; }
-
 		bool IsActive() const { return mbActive; }
 		void SetActive(bool active) { mbActive = active; }
 
@@ -50,8 +46,6 @@ namespace dive
 
 	private:
 	private:
-		// 유니티는 'Object 1'로 시작한다.
-		std::string mName = "Object";
 		bool mbActive = true;
 
 		std::vector<Component*> mComponents;
@@ -89,7 +83,8 @@ namespace dive
 		{
 			if ((*it)->GetTypeHash() == typeid(T).hash_code())
 			{
-				// 제거 함수 호출?
+				delete (*it);
+				(*it) = nullptr;
 				(*it).reset();
 				it = mComponents.erase(it);
 				return;
