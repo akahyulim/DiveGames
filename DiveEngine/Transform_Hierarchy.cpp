@@ -10,10 +10,10 @@ namespace dive
 	//==================================================//
 	Transform* Transform::GetRoot()
 	{
-		if (!mParent)
+		if (!m_Parent)
 			return this;
 		else
-			return mParent->GetRoot();
+			return m_Parent->GetRoot();
 	}
 
 	// =============================================//
@@ -31,30 +31,30 @@ namespace dive
 		if (this->GetInstanceID() == parent->GetInstanceID())
 			return;
 
-		if (mParent)
+		if (m_Parent)
 		{
-			for (auto it = mParent->mChildren.begin(); it != mParent->mChildren.end();)
+			for (auto it = m_Parent->m_Children.begin(); it != m_Parent->m_Children.end();)
 			{
 				if ((*it)->GetInstanceID() == this->GetInstanceID())
 				{
-					it = mParent->mChildren.erase(it);
+					it = m_Parent->m_Children.erase(it);
 				}
 				else
 					++it;
 			}
 		}
 
-		parent->mChildren.emplace_back(this);
-		mParent = parent;
+		parent->m_Children.emplace_back(this);
+		m_Parent = parent;
 	}
 
 	void Transform::BecomeOrphan()
 	{
-		if (!mParent)
+		if (!m_Parent)
 			return;
 
-		auto oldParent = mParent;
-		mParent = nullptr;
+		auto oldParent = m_Parent;
+		m_Parent = nullptr;
 
 		UpdateTransform();
 
@@ -68,13 +68,13 @@ namespace dive
 	//==================================//
 	// GameObject의 이름을 사용합니다.	//
 	//==================================//
-	Transform* Transform::Find(const std::string& name) const
+	Transform* Transform::GetChildByName(const std::string& name) const
 	{
-		if (!mChildren.empty())
+		if (!m_Children.empty())
 		{
-			for (auto child : mChildren)
+			for (auto child : m_Children)
 			{
-				assert(child->GetGameObject());
+				assert(child->GetGameObject() && "Do not find GameObject");
 
 				if (child->GetGameObject()->GetName() == name)
 				{
@@ -86,65 +86,63 @@ namespace dive
 		return nullptr;
 	}
 
-	Transform* Transform::GetChild(unsigned int index) const
-	{
-		if (mChildren.empty() || mChildren.size() - 1 < index)
-			return nullptr;
-
-		return mChildren[index];
-	}
-
+	// parent가 자신이라도 ture를 리턴한다.
 	bool Transform::IsChildOf(const Transform* parent) const
 	{
+		assert(parent && "Invalid Parameter");
+
 		if (!parent)
 			return false;
 
-		// parent가 자신이라도 ture를 리턴한다.
 		if (parent->GetInstanceID() == GetInstanceID())
 			return true;
 
-		if (mParent->GetInstanceID() == parent->GetInstanceID())
+		if (m_Parent->GetInstanceID() == parent->GetInstanceID())
 			return true;
 
-		return mParent->IsChildOf(parent);
+		return m_Parent->IsChildOf(parent);
 	}
 
 	void Transform::DetachChildren()
 	{
-		if (mChildren.empty())
+		if (m_Children.empty())
 			return;
 
-		for (auto pChild : mChildren)
+		for (auto pChild : m_Children)
 		{
-			pChild->mParent = nullptr;
+			pChild->m_Parent = nullptr;
 		}
 
-		mChildren.clear();
-		mChildren.shrink_to_fit();
+		m_Children.clear();
+		m_Children.shrink_to_fit();
 
 		UpdateTransform();
 	}
 
-	// 현재 머리가 안돌아 가는데
-	// 계층구조를 변경하는 함수라면
-	// UpdateTransform이 필요하다.
 	void Transform::AcquireChidren()
 	{
-		mChildren.clear();
-		mChildren.shrink_to_fit();
+		m_Children.clear();
+		m_Children.shrink_to_fit();
 
+		// 나중에 Scene이 Global이 아닐 수 있다.
+		// 그렇다면 Scene을 전달받아야 한다.
+		// 아니면 GameObject 측에서 자신이 속한 Scene을 저장하도록 할 수도 있다.
 		auto& allGameObjects = Scene::GetGlobalScene().GetAllGameObjects();
 
+		// 결국 Children을 모두 Clear한 후
+		// 다시 GetParent()를 이용해 계층구조를 재구축하겠다는 의미이다.
 		for (auto gameObject : allGameObjects)
 		{
 			if (gameObject->GetTransform()->HasParent())
 			{
 				if (gameObject->GetTransform()->GetParent()->GetInstanceID() == GetInstanceID())
 				{
-					mChildren.emplace_back(gameObject->GetTransform());
+					m_Children.emplace_back(gameObject->GetTransform());
 					gameObject->GetTransform()->AcquireChidren();
 				}
 			}
 		}
+
+		// Transform도 Update 시켜야 한다.
 	}
 }

@@ -12,7 +12,7 @@ namespace dive
 		: Object(typeid(Scene).hash_code())
 	{
 		SetName("Untitled");
-		mbDirty = false;
+		m_bDirty = false;
 	}
 
 	Scene::~Scene()
@@ -22,17 +22,21 @@ namespace dive
 
 	void Scene::Update(float deltaTime)
 	{
-		for (auto& gameObject : mGameObjects)
+		// 순서가 애매하네...
+		// Dirty Check가 먼저 아닌가?
+		for (auto& gameObject : m_GameObjects)
 		{
 			gameObject->Update(deltaTime);
 		}
 
-		if (mbDirty)
+		if (m_bDirty)
 		{
 			// 얕은 복사이지만 리소스를 차지한다.
-			auto copy = mGameObjects;
+			auto copy = m_GameObjects;
 
 			// 더 중요한 문제는 이게 왜 먹히는지 이해가 안된다.
+			// 얕은 복사라서 gameObject는 동일하기 때문인 것 같다.
+			// 그런데 swap도 하지 않는다면 굳이 copy로 처리할 필요가 있나?
 			for (auto gameObject : copy)
 			{
 				if(gameObject->IsPendingDestruction())
@@ -42,25 +46,25 @@ namespace dive
 			}
 
 			EVENT_FIRE(eEventType::SceneResolve);
-			mbDirty = false;
+			m_bDirty = false;
 		}
 	}
 
 	void Scene::Clear()
 	{
-		if (!mGameObjects.empty())
+		if (!m_GameObjects.empty())
 		{
-			for (auto gameObject : mGameObjects)
+			for (auto gameObject : m_GameObjects)
 			{
 				delete gameObject;
 				gameObject = nullptr;
 			}
 
-			mGameObjects.clear();
-			mGameObjects.shrink_to_fit();
+			m_GameObjects.clear();
+			m_GameObjects.shrink_to_fit();
 		}
 
-		mbDirty = true;
+		m_bDirty = true;
 	}
 
 	bool Scene::SaveToFile(const std::string& filepath)
@@ -122,12 +126,12 @@ namespace dive
 		}
 		for (unsigned int i = 0; i != rootCount; i++)
 		{
-			mGameObjects[i]->Deserialize(&stream, nullptr);
+			m_GameObjects[i]->Deserialize(&stream, nullptr);
 		}
 
 		stream.Close();
 
-		mbDirty = true;
+		m_bDirty = true;
 
 		return true;
 	}
@@ -137,7 +141,7 @@ namespace dive
 	//==================================//
 	GameObject* Scene::CreateGameObject(bool active)
 	{
-		auto newGameObject = mGameObjects.emplace_back(new GameObject);
+		auto newGameObject = m_GameObjects.emplace_back(new GameObject);
 		newGameObject->SetActive(active);
 
 		return newGameObject;
@@ -145,7 +149,7 @@ namespace dive
 
 	GameObject* Scene::GetGameObjectByName(const std::string& name)
 	{
-		for (auto gameObject : mGameObjects)
+		for (auto gameObject : m_GameObjects)
 		{
 			if (gameObject->GetName() == name)
 				return gameObject;
@@ -156,9 +160,9 @@ namespace dive
 
 	GameObject* Scene::GetGameObjectByID(unsigned int id)
 	{
-		for (auto gameObject : mGameObjects)
+		for (auto gameObject : m_GameObjects)
 		{
-			if (gameObject->GetInstanceID() == id)
+			if (gameObject->GetInstanceID() == GetInstanceID())
 				return gameObject;
 		}
 
@@ -167,18 +171,20 @@ namespace dive
 
 	void Scene::RemoveGameObject(GameObject* gameObject)
 	{
+		assert(gameObject, "INVALID PARAMETER");
+
 		if (!gameObject)
 			return;
 
 		gameObject->MarkForDestruction();
 
-		mbDirty = true;
+		m_bDirty = true;
 	}
 
 	std::vector<GameObject*> Scene::GetRootGameObjects() const
 	{
 		std::vector<GameObject*> rootGameObjects;
-		for (auto gameObject : mGameObjects)
+		for (auto gameObject : m_GameObjects)
 		{
 			auto pTransform = gameObject->GetComponent<Transform>();
 			if (pTransform)
@@ -198,29 +204,39 @@ namespace dive
 	//==============================================//
 	void Scene::eraseGameObject(GameObject* gameObject)
 	{
-		if (!gameObject)
-			return;
+		assert(gameObject, "INVALID PARAMETER");
 
+		if (!gameObject)
+		{
+			CORE_WARN("Scene::eraseGameObject>> 잘못된 인자를 전달받았습니다.");
+			return;
+		}
+
+		// 제거될 대상의 자식들 역시 제거 대상으로 설정한다.
 		auto children = gameObject->GetTransform()->GetChildren();
 		for (auto child : children)
 		{
 			RemoveGameObject(child->GetGameObject());
 		}
 
+		// 지워질 대상의 부모를 우선 저장한다.
 		auto parent = gameObject->GetTransform()->GetParent();
 
-		for (auto it = mGameObjects.begin(); it != mGameObjects.end();)
+		// 현재 GameObject를 컨테이너에서 제거한다.
+		// 그렇다면 위에서 제거 대상으로 추가 설정한 자식들은 언제 제거할까?
+		for (auto it = m_GameObjects.begin(); it != m_GameObjects.end();)
 		{
 			if ((*it)->GetInstanceID() == gameObject->GetInstanceID())
 			{
 				delete (*it);
 				(*it) = nullptr;
-				it = mGameObjects.erase(it);
+				it = m_GameObjects.erase(it);
 				break;
 			}
 			++it;
 		}
 
+		// 제거된 대상의 부모가 자식을 다시 설정토록 한다.
 		if (parent)
 		{
 			parent->AcquireChidren();

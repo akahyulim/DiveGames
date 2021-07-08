@@ -7,23 +7,23 @@ namespace dive
 {
 	GameObject::GameObject()
 		: Object(typeid(GameObject).hash_code()),
-		mTransform(nullptr)
+		m_Transform(nullptr)
 	{
 		SetName("Object");
-		mTransform = AddComponent<Transform>();
+		m_Transform = AddComponent<Transform>();
 	}
 
 	GameObject::~GameObject()
 	{
-		if (!mComponents.empty())
+		if (!m_Components.empty())
 		{
-			for (auto component : mComponents)
+			for (auto component : m_Components)
 			{
 				delete component;
 				component = nullptr;
 			}
 
-			mComponents.clear();
+			m_Components.clear();
 		}
 
 		APP_TRACE("Destroy GameObject: {:s}", GetName());
@@ -39,7 +39,7 @@ namespace dive
 
 		// basic
 		{
-			fileStream->Write(mbActive);
+			fileStream->Write(m_bActive);
 			fileStream->Write(GetInstanceID());
 			fileStream->Write(GetName());
 		}
@@ -47,12 +47,12 @@ namespace dive
 		// component
 		{
 			fileStream->Write(GetComponentCount());
-			for (const auto pComponent : mComponents)
+			for (const auto pComponent : m_Components)
 			{
 				fileStream->Write(static_cast<unsigned int>(pComponent->GetTypeHash()));
 				fileStream->Write(pComponent->GetInstanceID());
 			}
-			for (const auto pComponent : mComponents)
+			for (const auto pComponent : m_Components)
 			{
 				pComponent->Serialize(fileStream);
 			}
@@ -60,7 +60,7 @@ namespace dive
 
 		// children
 		{
-			auto children = mTransform->GetChildren();
+			auto children = m_Transform->GetChildren();
 			fileStream->Write(static_cast<unsigned int>(children.size()));
 
 			for (const auto pChild : children)
@@ -84,7 +84,7 @@ namespace dive
 
 		// basic
 		{
-			fileStream->Read(&mbActive);
+			fileStream->Read(&m_bActive);
 			unsigned int id;
 			fileStream->Read(&id);
 			SetInstanceID(id);
@@ -105,12 +105,12 @@ namespace dive
 
 				AddComponent(type, id);
 			}
-			for (const auto pComponent : mComponents)
+			for (const auto pComponent : m_Components)
 			{
 				pComponent->Deserialize(fileStream);
 			}
 
-			mTransform->SetParent(parentTransform);
+			m_Transform->SetParent(parentTransform);
 		}
 
 		// children
@@ -126,10 +126,10 @@ namespace dive
 			}
 			for (const auto pChild : children)
 			{
-				pChild->Deserialize(fileStream, mTransform);
+				pChild->Deserialize(fileStream, m_Transform);
 			}
 
-			mTransform->AcquireChidren();
+			m_Transform->AcquireChidren();
 		}
 
 		EVENT_FIRE(eEventType::SceneResolve);
@@ -137,7 +137,7 @@ namespace dive
 
 	void GameObject::Update(float deltaTime)
 	{
-		for (auto& component : mComponents)
+		for (auto& component : m_Components)
 		{
 			component->Update(deltaTime);
 		}
@@ -149,8 +149,8 @@ namespace dive
 		// Transform은 이미 생성되어 있으므로 id만 바꾼다.
 		if (typeid(Transform).hash_code() == typeHash)
 		{
-			mTransform->SetInstanceID(id);
-			return mTransform;
+			m_Transform->SetInstanceID(id);
+			return m_Transform;
 		}
 
 		return nullptr;

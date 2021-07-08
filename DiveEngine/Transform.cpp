@@ -8,12 +8,12 @@ namespace dive
 	Transform::Transform(GameObject* gameObject)
 		: Component(typeid(Transform).hash_code(), gameObject, this)
 	{
-		mLocalPosition = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+		m_LocalPosition = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 
-		DirectX::XMStoreFloat4x4(&mMatrix, DirectX::XMMatrixIdentity());
-		DirectX::XMStoreFloat4x4(&mLocalMatrix, DirectX::XMMatrixIdentity());
+		DirectX::XMStoreFloat4x4(&m_Matrix, DirectX::XMMatrixIdentity());
+		DirectX::XMStoreFloat4x4(&m_LocalMatrix, DirectX::XMMatrixIdentity());
 
-		mLookAt = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f); // 이건 추후 바꿔야 한다.
+		m_LookAt = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f); // 이건 추후 바꿔야 한다.
 	}
 
 	Transform::~Transform()
@@ -28,7 +28,7 @@ namespace dive
 	{
 		// local pos, rot ,scl
 		// lookAt
-		fileStream->Write(mParent ? mParent->GetGameObject()->GetInstanceID() : 0);
+		fileStream->Write(m_Parent ? m_Parent->GetGameObject()->GetInstanceID() : 0);
 	}
 
 	void Transform::Deserialize(FileStream* fileStream)
@@ -56,18 +56,18 @@ namespace dive
 		DirectX::XMMATRIX matLocalScl = DirectX::XMMatrixIdentity();
 
 		auto localMatrix = matLocalScl * matLocalRot * matLocalPos;
-		DirectX::XMStoreFloat4x4(&mLocalMatrix, localMatrix);
+		DirectX::XMStoreFloat4x4(&m_LocalMatrix, localMatrix);
 
 		if (HasParent())
 		{
-			DirectX::XMStoreFloat4x4(&mMatrix, (localMatrix * mParent->GetMatrix()));
+			DirectX::XMStoreFloat4x4(&m_Matrix, (localMatrix * m_Parent->GetMatrix()));
 		}
 		else
 		{
-			mMatrix = mLocalMatrix;
+			m_Matrix = m_LocalMatrix;
 		}
 
-		for (auto child : mChildren)
+		for (auto child : m_Children)
 		{
 			child->UpdateTransform();
 		}
@@ -75,31 +75,31 @@ namespace dive
 
 	DirectX::XMVECTOR Transform::GetPositionVector() const
 	{
-		return DirectX::XMVectorSet(mMatrix._41, mMatrix._42, mMatrix._43, 1.0f);
+		return DirectX::XMVectorSet(m_Matrix._41, m_Matrix._42, m_Matrix._43, 1.0f);
 	}
 
 	DirectX::XMFLOAT3 Transform::GetPositionFloat3() const
 	{
-		return DirectX::XMFLOAT3(mMatrix._41, mMatrix._42, mMatrix._43);
+		return DirectX::XMFLOAT3(m_Matrix._41, m_Matrix._42, m_Matrix._43);
 	}
 
 	void Transform::GetPosition(float& outX, float& outY, float& outZ) const
 	{
-		outX = mMatrix._41;
-		outY = mMatrix._42;
-		outZ = mMatrix._43;
+		outX = m_Matrix._41;
+		outY = m_Matrix._42;
+		outZ = m_Matrix._43;
 	}
 
 	DirectX::XMVECTOR Transform::GetLocalPositionVector() const
 	{
-		return DirectX::XMLoadFloat3(&mLocalPosition);
+		return DirectX::XMLoadFloat3(&m_LocalPosition);
 	}
 
 	void Transform::GetLocalPosition(float& outX, float& outY, float& outZ) const
 	{
-		outX = mLocalPosition.x;
-		outY = mLocalPosition.y;
-		outZ = mLocalPosition.z;
+		outX = m_LocalPosition.x;
+		outY = m_LocalPosition.y;
+		outZ = m_LocalPosition.z;
 	}
 
 	void Transform::SetPositionByVector(const DirectX::FXMVECTOR& position)
@@ -108,7 +108,7 @@ namespace dive
 			return;
 
 		SetLocalPositionByVector(HasParent() ?
-			DirectX::XMVector3Transform(position, DirectX::XMMatrixInverse(nullptr, mParent->GetMatrix()))
+			DirectX::XMVector3Transform(position, DirectX::XMMatrixInverse(nullptr, m_Parent->GetMatrix()))
 			: position);
 	}
 
@@ -127,7 +127,7 @@ namespace dive
 		if (DirectX::XMVector3Equal(position, GetLocalPositionVector()))
 			return;
 
-		DirectX::XMStoreFloat3(&mLocalPosition, position);
+		DirectX::XMStoreFloat3(&m_LocalPosition, position);
 
 		UpdateTransform();
 	}
@@ -144,6 +144,6 @@ namespace dive
 
 	void Transform::SetLookAt(float x, float y, float z)
 	{
-		mLookAt = DirectX::XMFLOAT3(x, y, z);
+		m_LookAt = DirectX::XMFLOAT3(x, y, z);
 	}
 }

@@ -33,27 +33,27 @@ namespace dive
 		template<typename T>
 		T* GetComponent();
 
-		Transform* GetTransform() { return mTransform; }
+		Transform* GetTransform() { return m_Transform; }
 
-		bool IsActive() const { return mbActive; }
-		void SetActive(bool active) { mbActive = active; }
+		bool IsActive() const { return m_bActive; }
+		void SetActive(bool active) { m_bActive = active; }
 
-		unsigned int GetComponentCount() const { return static_cast<unsigned int>(mComponents.size()); }
+		unsigned int GetComponentCount() const { return static_cast<unsigned int>(m_Components.size()); }
 
 		// 이름을 바꾸자
-		void MarkForDestruction() { mbDestructionPending = true; }
-		bool IsPendingDestruction() const { return mbDestructionPending; }
+		void MarkForDestruction() { m_bDestructionPending = true; }
+		bool IsPendingDestruction() const { return m_bDestructionPending; }
 
 	private:
 	private:
-		bool mbActive = true;
+		bool m_bActive = true;
 
-		std::vector<Component*> mComponents;
+		std::vector<Component*> m_Components;
 
-		Transform* mTransform;
+		Transform* m_Transform;
 
 		// 이름을 바꾸자
-		bool mbDestructionPending = false;
+		bool m_bDestructionPending = false;
 
 	};
 
@@ -65,7 +65,7 @@ namespace dive
 			return component;
 		}
 
-		auto newComponent = dynamic_cast<T*>(mComponents.emplace_back(static_cast<Component*>(new T(this))));
+		auto newComponent = dynamic_cast<T*>(m_Components.emplace_back(static_cast<Component*>(new T(this))));
 		assert(newComponent);
 
 		// awake가 있다면 호출
@@ -78,15 +78,15 @@ namespace dive
 	template<typename T>
 	void GameObject::RemoveComponent()
 	{
-		auto& it = mComponents.begin();
-		for (it; it != mComponents.end();)
+		auto& it = m_Components.begin();
+		for (it; it != m_Components.end();)
 		{
 			if ((*it)->GetTypeHash() == typeid(T).hash_code())
 			{
 				delete (*it);
 				(*it) = nullptr;
 				(*it).reset();
-				it = mComponents.erase(it);
+				it = m_Components.erase(it);
 				return;
 			}
 			else
@@ -100,7 +100,7 @@ namespace dive
 	template<typename T>
 	T* GameObject::GetComponent()
 	{
-		for (auto component : mComponents)
+		for (auto component : m_Components)
 		{
 			if (component->GetTypeHash() == typeid(T).hash_code())
 			{
