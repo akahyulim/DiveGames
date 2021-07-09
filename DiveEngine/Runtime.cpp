@@ -5,6 +5,7 @@
 #include "RenderPath.h"
 #include "Renderer.h"
 #include "Input.h"
+#include "SceneManager.h"
 #include "AssetManager.h"
 #include "Event.h"
 #include "IniHelper.h"
@@ -16,17 +17,11 @@ namespace dive
 {
 	Runtime::Runtime()
 	{
-		mAssetManager = nullptr;
-		mAppTitle = "diveEngine";
+		m_AppTitle = "diveEngine";
 	}
 
 	Runtime::~Runtime()
 	{
-		if (mAssetManager)
-		{
-			delete mAssetManager;
-			mAssetManager = nullptr;
-		}
 	}
 
 	//==========================================================================================//
@@ -38,23 +33,23 @@ namespace dive
 	//==========================================================================================//
 	bool Runtime::Initialize()
 	{
-		assert(mWindowHandle != 0);
+		assert(m_hWnd != 0);
 
-		if (mbInitialized)
+		if (m_bInitialized)
 		{
 			return false;
 		}
 
 		Log::Initialize();
-		Settings::GetInstance().Initialize(mAppTitle);
+		Settings::GetInstance().Initialize(m_AppTitle);
 
 		{
 			auto& settings = Settings::GetInstance();
 			eWindowModes mode = settings.GetWindowMode();
 			if (mode == eWindowModes::FullScreen)
-				mbFullScreen = true;
+				m_bFullScreen = true;
 			else
-				mbFullScreen = false;
+				m_bFullScreen = false;
 			bool maximize = settings.IsMaximize();
 			unsigned int width = settings.GetWidth();
 			unsigned int height = settings.GetHeight();
@@ -64,11 +59,11 @@ namespace dive
 
 		// 이 부분을 아래 Renderer::GetInstance().Initialize()에 통합하자.
 		auto& renderer = Renderer::GetInstance();
-		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(mWindowHandle, mbFullScreen));
+		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(m_hWnd, m_bFullScreen));
 
 		TimeManager::GetInstance().Initialize();
 		Renderer::GetInstance().Initialize();
-		Input::GetInstance().Initialize(mWindowHandle);
+		Input::GetInstance().Initialize(m_hWnd);
 
 		EVENT_SUBSCRIBE(eEventType::ChangedResolution, EVENT_HANDLE_DATA(OnResizeResolution));
 
@@ -79,11 +74,11 @@ namespace dive
 
 	void Runtime::Run()
 	{
-		if (!mbInitialized)
+		if (!m_bInitialized)
 		{
-			mbInitialized = Initialize();
+			m_bInitialized = Initialize();
 			
-			if (!mbInitialized)
+			if (!m_bInitialized)
 			{
 				CORE_ERROR("Rumtime 초기화에 실패하였습니다. 프로그램을 종료합니다.");
 				PostQuitMessage(0);
@@ -98,7 +93,7 @@ namespace dive
 		static float deltaFrameAccumulator = 0.0f;
 
 	
-		if (mbActiveWindow)
+		if (m_bActiveWindow)
 		{
 			fixedFrameAccumulator += delta;
 			deltaFrameAccumulator += delta;
@@ -109,9 +104,9 @@ namespace dive
 				fixedFrameAccumulator = 0.0f;
 			}
 
-			if (mbFrameLock)
+			if (m_bFrameLock)
 			{
-				if (deltaFrameAccumulator >= static_cast<float>(1.0f / mTargetFPS))
+				if (deltaFrameAccumulator >= static_cast<float>(1.0f / m_TargetFPS))
 				{
 					Update(deltaFrameAccumulator);
 					Input::GetInstance().Update();
@@ -137,17 +132,17 @@ namespace dive
 	
 	void Runtime::Update(float deltaTime)
 	{
-		if (mActivePath)
+		if (m_ActivePath)
 		{
-			mActivePath->PreUpdate();
+			m_ActivePath->PreUpdate();
 		}
 
 		// lua
 
-		if (mActivePath)
+		if (m_ActivePath)
 		{
-			mActivePath->Update(deltaTime);
-			mActivePath->PostUpdate();
+			m_ActivePath->Update(deltaTime);
+			m_ActivePath->PostUpdate();
 		}
 	}
 	
@@ -155,14 +150,14 @@ namespace dive
 	{
 		// lua
 
-		if (mActivePath)
+		if (m_ActivePath)
 		{
 			// 대상이 좀 애매하다.
 			// 사실상 호출 함수는 3d가 상속한 2d의 FixedUpdate()이다.
 			// 유니티에서는 rigid body update에 쓰인다고 한다.
 			// 아마도 애니메이션의 속도를 일관성있게 만들기 위함인듯 하다.
 			// 그런데 이 대상은 Scene에 존재할텐데...
-			mActivePath->FixedUpdate();
+			m_ActivePath->FixedUpdate();
 		}
 	}
 	
@@ -173,9 +168,9 @@ namespace dive
 
 		// lua
 
-		if (mActivePath)
+		if (m_ActivePath)
 		{
-			mActivePath->Render();
+			m_ActivePath->Render();
 		}
 
 		Compose();
@@ -184,9 +179,9 @@ namespace dive
 
 	void Runtime::Compose()
 	{
-		if (mActivePath)
+		if (m_ActivePath)
 		{
-			mActivePath->Compose();
+			m_ActivePath->Compose();
 		}
 	}
 
@@ -194,16 +189,16 @@ namespace dive
 	{
 		// 뭔가 있다.
 		{
-			if (mActivePath)
+			if (m_ActivePath)
 			{
-				mActivePath->Stop();
+				m_ActivePath->Stop();
 			}
 
 			if (path != nullptr)
 			{
 				path->Start();
 			}
-			mActivePath = path;
+			m_ActivePath = path;
 		}
 
 		CORE_TRACE("Runtime::ActivatePath()");
@@ -211,8 +206,8 @@ namespace dive
 	
 	void Runtime::SetWindow(HWND windowHandle, bool fullScreen)
 	{
-		mWindowHandle = windowHandle;
-		mbFullScreen = fullScreen;
+		m_hWnd = windowHandle;
+		m_bFullScreen = fullScreen;
 	}
 
 	//==================================================================================================//
@@ -258,16 +253,16 @@ namespace dive
 				style = WS_POPUP;
 			}
 
-			SetWindowLong(mWindowHandle, GWL_STYLE, style);
+			SetWindowLong(m_hWnd, GWL_STYLE, style);
 
 			posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
 			posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 		}
 
-		SetWindowPos(mWindowHandle, NULL, posX, posY, width, height, 0);
+		SetWindowPos(m_hWnd, NULL, posX, posY, width, height, 0);
 
-		ShowWindow(mWindowHandle, SW_SHOWDEFAULT);
-		UpdateWindow(mWindowHandle);
+		ShowWindow(m_hWnd, SW_SHOWDEFAULT);
+		UpdateWindow(m_hWnd);
 	}
 
 	//==============================================================================//
@@ -286,7 +281,7 @@ namespace dive
 			pGraphicsDevice->ResizeBuffers(width, height);
 
 		auto& settings = Settings::GetInstance();
-		if (IsZoomed(mWindowHandle))
+		if (IsZoomed(m_hWnd))
 		{
 			settings.SetMaximize(true);
 		}

@@ -20,6 +20,7 @@
 #include "Input.h"
 
 //= Scene =========================
+#include "SceneManager.h"
 #include "Scene.h"
 #include "GameObject.h"
 #include "Component.h"

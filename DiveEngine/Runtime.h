@@ -6,6 +6,7 @@
 
 namespace dive
 {
+	class SceneManager;
 	class AssetManager;
 	class RenderPath;
 
@@ -27,48 +28,47 @@ namespace dive
 		virtual void Compose();
 
 		void ActivatePath(RenderPath* path);
-		RenderPath* GetActivePath() { return mActivePath; }
+		RenderPath* GetActivePath() { return m_ActivePath; }
 
-		HWND GetWindowHandle() { return mWindowHandle; }
+		HWND GetWindowHandle() { return m_hWnd; }
 		void SetWindow(HWND windowHandle, bool fullScreen);
 
-		float GetTargetFrame() const { return mTargetFPS; }
-		void SetTargetFrame(float fps) { mTargetFPS = fps; }
+		float GetTargetFrame() const { return m_TargetFPS; }
+		void SetTargetFrame(float fps) { m_TargetFPS = fps; }
 
-		bool IsFrameLock() const { return mbFrameLock; }
-		void SetFrameLock(bool enable) { mbFrameLock = enable; }
+		bool IsFrameLock() const { return m_bFrameLock; }
+		void SetFrameLock(bool enable) { m_bFrameLock = enable; }
 
-		void ActiveWindow(bool active) { mbActiveWindow = active; }
+		void ActiveWindow(bool active) { m_bActiveWindow = active; }
 
-		bool IsInitialized() const { return mbInitialized; }
+		bool IsInitialized() const { return m_bInitialized; }
 
-		std::string GetIniFilePath() const { return mIniFilePath; }
+		std::string GetIniFilePath() const { return m_IniFilePath; }
 
-		AssetManager* GetAssetManager() { return mAssetManager; }
 
 		virtual void ModifyWindow(eWindowModes mode, unsigned int width, unsigned int height, bool maximize);
 
 		void OnResizeResolution(unsigned int data);
 
-	protected:
+		// get systems
 
 	protected:
-		std::string mAppTitle;
 
-		HWND mWindowHandle = 0;
-		bool mbFullScreen = false;
+	protected:
+		std::string m_AppTitle;
 
-		RenderPath* mActivePath = nullptr;
+		HWND m_hWnd = 0;
+		bool m_bFullScreen = false;
 
-		float mDeltaTime = 0.0f;
-		float mTargetFPS = 60.0f;
-		bool mbFrameLock = false;
+		RenderPath* m_ActivePath = nullptr;
 
-		bool mbInitialized = false;
-		bool mbActiveWindow = true;
+		float m_DeltaTime = 0.0f;
+		float m_TargetFPS = 60.0f;
+		bool m_bFrameLock = false;
 
-		std::string mIniFilePath;
+		bool m_bInitialized = false;
+		bool m_bActiveWindow = true;
 
-		AssetManager* mAssetManager;
+		std::string m_IniFilePath;
 	};
 }

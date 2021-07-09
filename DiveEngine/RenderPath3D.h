@@ -1,5 +1,6 @@
 #pragma once
 #include "RenderPath.h"
+#include "SceneManager.h"
 #include "Scene.h"
 
 // Basic class for 3d rendering paths.
@@ -19,7 +20,7 @@ namespace dive
 
 	private:
 	private:
-		Scene* mScene = &Scene::GetGlobalScene();
+		Scene* m_Scene = SceneManager::GetInstance().GetActiveScene();
 
 		// visibility를 가진다.
 

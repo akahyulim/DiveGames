@@ -4,7 +4,7 @@ namespace sandbox
 {
 	Sandbox::Sandbox()
 	{
-		mAppTitle = "SandBox";
+		m_AppTitle = "SandBox";
 	}
 
 	Sandbox::~Sandbox()

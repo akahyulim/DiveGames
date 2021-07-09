@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "SceneManager.h"
 #include "Scene.h"
 #include "MeshRenderer.h"
 #include "Camera.h"
@@ -303,7 +304,7 @@ namespace dive
 		mGameObjects.clear();
 		// 카메라도 초기화?
 
-		auto& gameObjects = Scene::GetGlobalScene().GetAllGameObjects();
+		auto& gameObjects = SceneManager::GetInstance().GetActiveScene()->GetAllGameObjects();
 		for (const auto& gameObject : gameObjects)
 		{
 			if (!gameObject->IsActive())

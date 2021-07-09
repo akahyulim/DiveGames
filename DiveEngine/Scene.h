@@ -12,6 +12,7 @@ namespace dive
 	{
 	public:
 		Scene();
+		Scene(const std::string& sceneName);
 		~Scene();
 
 		void Update(float deltaTime);
@@ -45,6 +46,8 @@ namespace dive
 		// GetRootGameObjects
 		// IsValid
 
+		bool IsLoaded() const { return m_bLoaded; }
+
 	private:
 		void eraseGameObject(GameObject* gameObject);
 
@@ -55,7 +58,7 @@ namespace dive
 		bool m_bDirty;
 
 		// 유니티의 멤버 변수
-		// bLoaded
+		bool m_bLoaded = false;
 		// unsigned int rootCount
 		// std::string Path
 		// buildIndex: 빌드 세팅에서의 인덱스...

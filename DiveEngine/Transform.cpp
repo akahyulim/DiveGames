@@ -1,4 +1,5 @@
 #include "Transform.h"
+#include "SceneManager.h"
 #include "Scene.h"
 #include "GameObject.h"
 #include "FileStream.h"
@@ -40,7 +41,7 @@ namespace dive
 
 		if (parentId != 0)
 		{
-			if (auto parentTransform = Scene::GetGlobalScene().GetGameObjectByID(parentId))
+			if (auto parentTransform = SceneManager::GetInstance().GetActiveScene()->GetGameObjectByID(parentId))
 			{
 				SetParent(parentTransform->GetTransform());
 			}

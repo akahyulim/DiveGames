@@ -13,6 +13,6 @@ namespace editor
 
 	private:
 	private:
-		dive::Scene* mScene;
+		dive::Scene* m_Scene;
 	};
 }

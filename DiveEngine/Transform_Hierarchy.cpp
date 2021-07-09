@@ -1,4 +1,5 @@
 #include "Transform.h"
+#include "SceneManager.h"
 #include "Scene.h"
 #include "GameObject.h"
 
@@ -127,7 +128,7 @@ namespace dive
 		// 나중에 Scene이 Global이 아닐 수 있다.
 		// 그렇다면 Scene을 전달받아야 한다.
 		// 아니면 GameObject 측에서 자신이 속한 Scene을 저장하도록 할 수도 있다.
-		auto& allGameObjects = Scene::GetGlobalScene().GetAllGameObjects();
+		auto& allGameObjects = SceneManager::GetInstance().GetActiveScene()->GetAllGameObjects();
 
 		// 결국 Children을 모두 Clear한 후
 		// 다시 GetParent()를 이용해 계층구조를 재구축하겠다는 의미이다.

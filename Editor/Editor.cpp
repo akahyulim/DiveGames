@@ -15,7 +15,7 @@ namespace editor
 {
 	Editor::Editor()
 	{
-		mAppTitle = "DiveEditor";
+		m_AppTitle = "DiveEditor";
 	}
 
 	Editor::~Editor()
@@ -79,9 +79,9 @@ namespace editor
 		// 에디터에서는 RenderPath3D를 수정해야 한다.
 		// Debug용 Render가 추가되고,
 		// Hierarchy이 다른 RenderTarget에 그려져야 하기 때문이다.
-		if (mActivePath)
+		if (m_ActivePath)
 		{
-			mActivePath->Render();
+			m_ActivePath->Render();
 		}
 
 		Compose();
@@ -101,15 +101,15 @@ namespace editor
 		width = rt.right - rt.left;
 		height = rt.bottom - rt.top;
 			
-		SetWindowLong(mWindowHandle, GWL_STYLE, style);
+		SetWindowLong(m_hWnd, GWL_STYLE, style);
 
 		posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
 		posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 		
-		SetWindowPos(mWindowHandle, NULL, posX, posY, width, height, 0);
+		SetWindowPos(m_hWnd, NULL, posX, posY, width, height, 0);
 
-		ShowWindow(mWindowHandle, maximize ? SW_MAXIMIZE : SW_SHOWDEFAULT);
-		UpdateWindow(mWindowHandle);
+		ShowWindow(m_hWnd, maximize ? SW_MAXIMIZE : SW_SHOWDEFAULT);
+		UpdateWindow(m_hWnd);
 	}
 
 	void Editor::initialize_ImGui()
@@ -126,7 +126,7 @@ namespace editor
 
 		applyStyle();
 
-		ImGui_ImplWin32_Init(mWindowHandle);
+		ImGui_ImplWin32_Init(m_hWnd);
 
 		auto pDevice = dive::Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
 		auto pImmediateContext = dive::Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();

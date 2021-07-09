@@ -15,13 +15,16 @@ namespace dive
 	// 그리기전 준비를 한다.
 	void RenderPath3D::Update(float deltaTime)
 	{
+		if (!m_Scene)
+			return;
+
 		// 2d update
 		CORE_TRACE("RenderPath3D::Update() - RenderPath2D::Update()");
 
 		// scene update
 		{
 			auto timeScale = TimeManager::GetInstance().GetTimeScale();
-			mScene->Update(deltaTime * timeScale);
+			m_Scene->Update(deltaTime * timeScale);
 		}
 
 		// visibility 생성 및 초기화 그리고 설정

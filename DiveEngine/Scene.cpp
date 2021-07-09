@@ -15,6 +15,16 @@ namespace dive
 		m_bDirty = false;
 	}
 
+	Scene::Scene(const std::string& sceneName)
+		: Object(typeid(Scene).hash_code())
+	{
+		SetName(sceneName);
+
+		m_bDirty = false;
+		// 좀 애매허다.
+		m_bLoaded = true;
+	}
+
 	Scene::~Scene()
 	{
 		Clear();
@@ -104,6 +114,8 @@ namespace dive
 
 	bool Scene::LoadFromFile(const std::string& filepath)
 	{
+		m_bLoaded = false;
+
 		// 이쪽은 이름과 확장자까지 포함된 경로를 받는다.
 
 		if (!FileSystemHelper::FileExists(filepath))
@@ -132,6 +144,7 @@ namespace dive
 		stream.Close();
 
 		m_bDirty = true;
+		m_bLoaded = true;
 
 		return true;
 	}
@@ -141,7 +154,7 @@ namespace dive
 	//==================================//
 	GameObject* Scene::CreateGameObject(bool active)
 	{
-		auto newGameObject = m_GameObjects.emplace_back(new GameObject);
+		auto newGameObject = m_GameObjects.emplace_back(new GameObject(this));
 		newGameObject->SetActive(active);
 
 		return newGameObject;
@@ -171,7 +184,7 @@ namespace dive
 
 	void Scene::RemoveGameObject(GameObject* gameObject)
 	{
-		assert(gameObject, "INVALID PARAMETER");
+		assert(gameObject && "INVALID PARAMETER");
 
 		if (!gameObject)
 			return;
@@ -204,7 +217,7 @@ namespace dive
 	//==============================================//
 	void Scene::eraseGameObject(GameObject* gameObject)
 	{
-		assert(gameObject, "INVALID PARAMETER");
+		assert(gameObject && "INVALID PARAMETER");
 
 		if (!gameObject)
 		{

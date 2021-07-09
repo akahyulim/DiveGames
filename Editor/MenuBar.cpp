@@ -11,7 +11,7 @@ namespace editor
 	{
 		mTitle = "MenuBar";
 		mbWindow = false;
-		mScene = &dive::Scene::GetGlobalScene();
+		m_Scene = &dive::Scene::GetGlobalScene();
 	}
 
 	void MenuBar::TickAlways()
@@ -133,7 +133,7 @@ namespace editor
 			{
 				if (ImGui::MenuItem("Create Empty"))
 				{
-					mScene->CreateGameObject();
+					m_Scene->CreateGameObject();
 				}
 
 				if (ImGui::BeginMenu("3D Object"))
@@ -144,7 +144,7 @@ namespace editor
 
 					if (ImGui::MenuItem("Quad"))
 					{
-						auto gameObject = mScene->CreateGameObject();
+						auto gameObject = m_Scene->CreateGameObject();
 						auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
 						meshRenderer->CreateDefaultMesh(dive::eDefaultMeshType::Quad);
 						gameObject->SetName("Quad");
@@ -154,7 +154,7 @@ namespace editor
 
 					if (ImGui::MenuItem("Cube"))
 					{
-						auto gameObject = mScene->CreateGameObject();
+						auto gameObject = m_Scene->CreateGameObject();
 						auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
 						meshRenderer->CreateDefaultMesh(dive::eDefaultMeshType::Cube);
 						gameObject->SetName("Cube");

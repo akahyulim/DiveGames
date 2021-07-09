@@ -5,11 +5,12 @@
 
 namespace dive
 {
-	GameObject::GameObject()
+	GameObject::GameObject(Scene* scene)
 		: Object(typeid(GameObject).hash_code()),
-		m_Transform(nullptr)
+		m_Transform(nullptr),
+		m_Scene(scene)
 	{
-		SetName("Object");
+		SetName("GameObject");
 		m_Transform = AddComponent<Transform>();
 	}
 
@@ -119,7 +120,7 @@ namespace dive
 			std::vector<GameObject*> children;
 			for (unsigned int i = 0; i != childrenCount; i++)
 			{
-				auto pChild = Scene::GetGlobalScene().CreateGameObject();
+				auto pChild = GetScene()->CreateGameObject(true);
 				pChild->SetInstanceID(fileStream->ReadAs<unsigned int>());
 
 				children.emplace_back(pChild);

@@ -10,12 +10,13 @@
 
 namespace dive
 {
+	class Scene;
 	class FileStream;
 
 	class GameObject : public Object
 	{
 	public:
-		GameObject();
+		GameObject(Scene* scene);
 		~GameObject();
 
 		void Serialize(FileStream* fileStream);
@@ -40,20 +41,27 @@ namespace dive
 
 		unsigned int GetComponentCount() const { return static_cast<unsigned int>(m_Components.size()); }
 
+		Scene* GetScene() { return m_Scene; }
+
 		// 이름을 바꾸자
 		void MarkForDestruction() { m_bDestructionPending = true; }
 		bool IsPendingDestruction() const { return m_bDestructionPending; }
 
 	private:
 	private:
+		Scene* m_Scene = nullptr;
 		bool m_bActive = true;
 
 		std::vector<Component*> m_Components;
 
-		Transform* m_Transform;
+		Transform* m_Transform = nullptr;
 
 		// 이름을 바꾸자
 		bool m_bDestructionPending = false;
+
+		// unity
+		// std::string m_Tag;
+		// unsigned int m_Layer;
 
 	};
 
