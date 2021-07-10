@@ -11,8 +11,13 @@ namespace editor
 		void TickAlways() override;
 		float GetPadding() { return 8.0f; }
 
+		void OnSetActiveScene();
+
 	private:
+		void popupSetSceneName();
+
 	private:
 		dive::Scene* m_Scene;
+		bool m_bPopupSceneName;
 	};
 }

@@ -304,6 +304,7 @@ namespace dive
 		mGameObjects.clear();
 		// 카메라도 초기화?
 
+		// 결국 여기까지 왔다.
 		auto& gameObjects = SceneManager::GetInstance().GetActiveScene()->GetAllGameObjects();
 		for (const auto& gameObject : gameObjects)
 		{

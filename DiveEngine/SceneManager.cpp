@@ -2,6 +2,7 @@
 #include "Runtime.h"
 #include "Scene.h"
 #include "FileSystemHelper.h"
+#include "Event.h"
 #include "Log.h"
 
 namespace dive
@@ -12,6 +13,10 @@ namespace dive
 
 	SceneManager::~SceneManager()
 	{
+		m_ActiveScene = nullptr;
+
+		// 여기에서 문제점은 LoadedScene이 여러개일 필요가 있냐는 거다.
+		// swap용이 필요하다해도 3개 이상일 필요는 없잖아?
 		if (!m_LoadedScene.empty())
 		{
 			for (auto scene : m_LoadedScene)
@@ -23,6 +28,7 @@ namespace dive
 		}
 	}
 	
+	// 이건 어떻게 SetActiveScene으로 하지?
 	Scene* SceneManager::CreateScene(const std::string& sceneName)
 	{
 		if (!m_LoadedScene.empty())
@@ -31,7 +37,7 @@ namespace dive
 			{
 				if (scene->GetName() == sceneName)
 				{
-					CORE_WARN("SceneManager::CreateScene >> 이미 존재하는 Scene Name을 전달받아 생성이 취소되었습니다.");
+					CORE_WARN("SceneManager::CreateScene >> 이미 존재하는 Scene Name({:s})을 전달받아 생성이 취소되었습니다.", sceneName);
 					return nullptr;
 				}
 			}
@@ -39,20 +45,22 @@ namespace dive
 
 		auto newScene = m_LoadedScene.emplace_back(new Scene(sceneName));
 
-		if (!m_ActiveScene)
-			SetActiveScene(newScene);
-
 		return newScene;
 	}
 
+	//==========================================//
+	// Load되지 않은 Scene은 사용할 수 없다.	//
+	// 여러모로 생각할 게 많다.					//
+	//==========================================//
 	bool SceneManager::SetActiveScene(Scene* scene)
 	{
 		assert(scene && "INVALID_PARAMETER");
 		
 		if (scene->IsLoaded())
 		{
-			// swap 과정이 필요한가?
 			m_ActiveScene = scene;
+
+			EVENT_FIRE(eEventType::SceneActivate);
 
 			return true;
 		}
@@ -71,8 +79,7 @@ namespace dive
 		return nullptr;
 	}
 
-	// 유니티 예제를 보면 Scene1과 Scene2 그리고 ProgressScene 총 세개가 존재한다.
-	// 문제는 Scene을 제거해야 하느냐이다.
+	// 동기 방식 Scene 전환
 	Scene* SceneManager::LoadScene(const std::string& scenePath)
 	{
 		if (FileSystemHelper::FileExists(scenePath))
@@ -81,6 +88,10 @@ namespace dive
 			auto newScene = CreateScene(sceneName);
 			if (!newScene)
 				return nullptr;
+
+			m_ActiveScene = newScene;
+
+			EVENT_FIRE(eEventType::SceneActivate);
 
 			if (!newScene->LoadFromFile(scenePath))
 				return nullptr;

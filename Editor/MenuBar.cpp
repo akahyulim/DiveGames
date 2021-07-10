@@ -11,7 +11,10 @@ namespace editor
 	{
 		mTitle = "MenuBar";
 		mbWindow = false;
-		m_Scene = &dive::Scene::GetGlobalScene();
+		m_Scene = nullptr;
+		m_bPopupSceneName = false;
+
+		EVENT_SUBSCRIBE(dive::eEventType::SceneActivate, EVENT_HANDLE(OnSetActiveScene));
 	}
 
 	void MenuBar::TickAlways()
@@ -21,42 +24,21 @@ namespace editor
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("New World"))
+				if (ImGui::MenuItem("New Scene"))
 				{
-					// 검색해보니 Menu에선 modal popup이 안된다는 이슈가 있다.
-					// 해결책을 찾아보자.
-					if (dive::Scene::GetGlobalScene().IsDirty())
-						ImGui::OpenPopup("Delete?");
-					
-					// Always center this window when appearing
-					ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-					ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-
-					// 아래에서 클리어 하기 전에 떠야하므로 위치는 맞다.
-					if (ImGui::BeginPopupModal("Delete?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+					if (m_Scene)
 					{
-						ImGui::Text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
-						ImGui::Separator();
-
-						//static int unused_i = 0;
-						//ImGui::Combo("Combo", &unused_i, "Delete\0Delete harder\0");
-
-						static bool dont_ask_me_next_time = false;
-						ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-						ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
-						ImGui::PopStyleVar();
-
-						if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-						ImGui::SetItemDefaultFocus();
-						ImGui::SameLine();
-						if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-						ImGui::EndPopup();
+						if (m_Scene->IsDirty())
+						{
+							// 팝업창을 띄워 Dirty면 변경점을 저장할 것인지 묻는다.
+						}
 					}
 
-					dive::Scene::GetGlobalScene().Clear();
+					// 팝업을 띄워야 하는데 방법이 있나 보다.
+					m_bPopupSceneName = true;
 				}
 
-				if (ImGui::MenuItem("Open World"))
+				if (ImGui::MenuItem("Open Scene"))
 				{
 					if (dive::Scene::GetGlobalScene().IsDirty())
 					{
@@ -67,7 +49,7 @@ namespace editor
 					// 디렉토리 탐색기를 연다.
 					{
 						std::string filepath = "../Assets/Scenes/default.scene";
-						dive::Scene::GetGlobalScene().LoadFromFile(filepath);
+						dive::SceneManager::GetInstance().LoadScene(filepath);
 					}
 				}
 
@@ -271,6 +253,66 @@ namespace editor
 			// 기존 Scene에 변경 사항이 존재합니다. 저장하시겠습니까?
 			// 저장, 저장 안함, 취소
 			ImGui::Text("Save?");
+
+			ImGui::EndPopup();
+		}
+
+		//= Popups ============================
+		popupSetSceneName();
+	}
+
+	void MenuBar::OnSetActiveScene()
+	{
+		m_Scene = dive::SceneManager::GetInstance().GetActiveScene();
+		assert(m_Scene);
+	}
+
+	// 화면 정중앙에 뜨도록 하고 싶다.
+	// 버튼이 우측 정렬되도록 하고 싶다.
+	void MenuBar::popupSetSceneName()
+	{
+		static char sceneName[32] = { 0, };
+	
+		if (m_bPopupSceneName)
+		{
+			ImGui::OpenPopup("##SetSceneName");
+			m_bPopupSceneName = false;
+			ZeroMemory(sceneName, sizeof(sceneName));
+		}
+
+		if (ImGui::BeginPopup("##SetSceneName"))
+		{
+			ImGui::Text("Input New Scene Name");
+			ImGui::InputText("##edit", &sceneName[0], IM_ARRAYSIZE(sceneName));
+
+			if (ImGui::Button("Cancel"))
+			{
+				ImGui::CloseCurrentPopup();
+				ImGui::EndPopup();
+				return;
+			}
+
+			ImGui::SameLine(0.0f, 5.0f);
+
+			if (ImGui::Button("Ok"))
+			{
+				auto newScene = dive::SceneManager::GetInstance().CreateScene(sceneName);
+				if(!newScene)
+				{
+					// 새 창을 띄워야 하나...
+					// 여기에서 modaless를 띄우면 되지 않을까?
+					// 그리고 그 창에서 다시 m_bPopupSceneName = true로 하고 말이지...
+				}
+				else
+				{
+					// 이걸 직접 하는게 아직 좀 그렇다.
+					dive::SceneManager::GetInstance().SetActiveScene(newScene);
+				}
+
+				ImGui::CloseCurrentPopup();
+				ImGui::EndPopup();
+				return;
+			}
 
 			ImGui::EndPopup();
 		}

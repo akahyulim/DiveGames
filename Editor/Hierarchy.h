@@ -22,15 +22,18 @@ namespace editor
 		void popupPropertyMenu();
 		void popupGameObjectRename();
 
+		// m_Scene과 함께 Widget에 넣는 편이 나을 것 같다.
+		void OnSetActiveScene();
+
 	private:
-		dive::Scene* mScene;
+		dive::Scene* m_Scene;
 
-		dive::GameObject* mSelected;
-		dive::GameObject* mClicked;
-		dive::GameObject* mHovered;
-		dive::GameObject* mCopied;
+		dive::GameObject* m_Selected;
+		dive::GameObject* m_Clicked;
+		dive::GameObject* m_Hovered;
+		dive::GameObject* m_Copied;
 
-		DragDropPayload mPayload;
-		bool mbPopupRename;
+		DragDropPayload m_Payload;
+		bool m_bPopupRename;
 	};
 }

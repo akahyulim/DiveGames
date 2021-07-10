@@ -22,9 +22,8 @@ namespace editor
         if (!m_Renderer)
             return;
 
-        //m_Scene = dive::SceneManager::GetInstance().GetActiveScene();
-        //if (!m_Scene)
-         //   return;
+        if(dive::SceneManager::GetInstance().GetActiveScene())
+            m_Scene = dive::SceneManager::GetInstance().GetActiveScene();
 
         float width = static_cast<float>(ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x);
         float height = static_cast<float>(ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y);

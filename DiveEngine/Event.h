@@ -21,6 +21,11 @@ namespace dive
 {
 	enum class eEventType
 	{
+		SceneActivate,
+		SceneSave,
+		SceneSaved,
+		SceneLoad,
+		SceneLoaded,
 		SceneResolve,
 		ChangedResolution,
 		QuitApplication,
@@ -52,6 +57,11 @@ namespace dive
 				}
 			}
 		}
+
+	private:
+		EventManager() = default;
+		EventManager(const EventManager&) = delete;
+		EventManager operator=(const EventManager&) = delete;
 		
 	private:
 		std::unordered_map<eEventType, std::list<std::function<void(unsigned int)>>> m_subscribers;
