@@ -12,7 +12,7 @@ namespace editor
 		mTitle = "MenuBar";
 		mbWindow = false;
 		m_Scene = nullptr;
-		m_bPopupSceneName = false;
+		m_bModalNewScene = false;
 
 		EVENT_SUBSCRIBE(dive::eEventType::SceneActivate, EVENT_HANDLE(OnSetActiveScene));
 	}
@@ -20,6 +20,7 @@ namespace editor
 	void MenuBar::TickAlways()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(GetPadding(), GetPadding()));
+
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("File"))
@@ -35,7 +36,8 @@ namespace editor
 					}
 
 					// 팝업을 띄워야 하는데 방법이 있나 보다.
-					m_bPopupSceneName = true;
+					m_bModalNewScene = true;
+					//ImGui::OpenPopup("popup");
 				}
 
 				if (ImGui::MenuItem("Open Scene"))
@@ -245,20 +247,9 @@ namespace editor
 		}
 		ImGui::PopStyleVar();
 
-		// flag 때문에 자꾸 전체 윈도우 크기가 바뀐다.
-		// 현재 창이 뜨지도 않는다.
-		if (ImGui::BeginPopupModal("SaveDirty", NULL, 0))//ImGuiWindowFlags_AlwaysAutoResize))
-		{
-			// 팝업
-			// 기존 Scene에 변경 사항이 존재합니다. 저장하시겠습니까?
-			// 저장, 저장 안함, 취소
-			ImGui::Text("Save?");
-
-			ImGui::EndPopup();
-		}
-
 		//= Popups ============================
-		popupSetSceneName();
+		modalNewScene();
+
 	}
 
 	void MenuBar::OnSetActiveScene()
@@ -267,25 +258,36 @@ namespace editor
 		assert(m_Scene);
 	}
 
-	// 화면 정중앙에 뜨도록 하고 싶다.
 	// 버튼이 우측 정렬되도록 하고 싶다.
-	void MenuBar::popupSetSceneName()
+	void MenuBar::modalNewScene()
 	{
-		static char sceneName[32] = { 0, };
+		static char sceneName[16] = { 0, };
 	
-		if (m_bPopupSceneName)
+		if (m_bModalNewScene)
 		{
-			ImGui::OpenPopup("##SetSceneName");
-			m_bPopupSceneName = false;
+			ImGui::OpenPopup("New Scene");
+			m_bModalNewScene = false;
 			ZeroMemory(sceneName, sizeof(sceneName));
 		}
 
-		if (ImGui::BeginPopup("##SetSceneName"))
+		// 이렇게 하니 움직이지 않는다.
+		auto& io = ImGui::GetIO();
+		//ImGui::SetNextWindowPos(ImVec2(io.DisplaySize.x * 0.5f, io.DisplaySize.y * 0.5f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
+
+		if (ImGui::BeginPopupModal("New Scene", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 		{
+			ImGui::NewLine();
 			ImGui::Text("Input New Scene Name");
+			ImGui::NewLine();
+
 			ImGui::InputText("##edit", &sceneName[0], IM_ARRAYSIZE(sceneName));
 
-			if (ImGui::Button("Cancel"))
+			ImGui::NewLine();
+
+			// 이렇게 쓰는게 아닌가?
+			ImGui::PushItemWidth(-100);
+
+			if (ImGui::Button("Cancel", ImVec2(100, 30)))
 			{
 				ImGui::CloseCurrentPopup();
 				ImGui::EndPopup();
@@ -294,14 +296,30 @@ namespace editor
 
 			ImGui::SameLine(0.0f, 5.0f);
 
-			if (ImGui::Button("Ok"))
+			if (ImGui::Button("Ok", ImVec2(100, 30)))
 			{
+				// 빈 문자열은 안된다.
+
 				auto newScene = dive::SceneManager::GetInstance().CreateScene(sceneName);
 				if(!newScene)
 				{
-					// 새 창을 띄워야 하나...
-					// 여기에서 modaless를 띄우면 되지 않을까?
-					// 그리고 그 창에서 다시 m_bPopupSceneName = true로 하고 말이지...
+					// 이것두 m_b로 만들어야 할 것 같다.
+					ImGui::OpenPopup("SameNameExists");
+
+					if (ImGui::BeginPopupModal("SameNameExists", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+					{
+						ImGui::NewLine();
+						ImGui::Text("Input New Scene Name");
+						ImGui::NewLine();
+
+						if (ImGui::Button("Ok"))
+							m_bModalNewScene = true;
+
+						ImGui::NewLine();
+
+						ImGui::EndPopup();
+					}
+
 				}
 				else
 				{
@@ -314,6 +332,8 @@ namespace editor
 				return;
 			}
 
+			ImGui::NewLine();
+		
 			ImGui::EndPopup();
 		}
 	}

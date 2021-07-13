@@ -14,10 +14,10 @@ namespace editor
 		void OnSetActiveScene();
 
 	private:
-		void popupSetSceneName();
+		void modalNewScene();
 
 	private:
 		dive::Scene* m_Scene;
-		bool m_bPopupSceneName;
+		bool m_bModalNewScene;
 	};
 }

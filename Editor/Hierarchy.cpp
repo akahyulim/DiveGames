@@ -223,7 +223,10 @@ namespace editor
 
         if (ImGui::MenuItem("Create Empty"))
         {
-            dive::Scene::GetGlobalScene().CreateGameObject();
+            if (m_Scene)
+            {
+                m_Scene->CreateGameObject();
+            }
         }
 
         if (ImGui::BeginMenu("3D Object"))

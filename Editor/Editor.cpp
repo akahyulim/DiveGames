@@ -201,12 +201,14 @@ namespace editor
 			ImGui::End();
 	}
 
-	//============================================================================================//
-	// 1. 폰트 파일 존재 유무 확인이 필요하다.
-	// 2. 모르는 변수가 많고 이름도 내 스타일이 아니다.
-	//============================================================================================//
+	//==========================================================================================//
+	// 1. 폰트 파일 존재 유무 확인이 필요하다.													//
+	// 2. 모르는 변수가 많고 이름도 내 스타일이 아니다.											//
+	// 3. Modal Popup 사용시 Transparency가 되지 않아 전부 주석처리 했다.						//
+	//==========================================================================================//
 	void Editor::applyStyle() const
 	{
+		/*
 		// Color settings    
 		const auto color_text = ImVec4(0.810f, 0.810f, 0.810f, 1.000f);
 		const auto color_text_disabled = ImVec4(color_text.x, color_text.y, color_text.z, 0.5f);
@@ -292,7 +294,10 @@ namespace editor
 		style.GrabRounding = roundness;
 		style.ScrollbarRounding = roundness;
 		style.Alpha = 1.0f;
-		
+		*/
+		const auto font_size = 24.0f;
+		const auto font_scale = 0.7f;
+
 		// Font
 		auto& io = ImGui::GetIO();
 		//const string dir_fonts = m_context->GetSubsystem<ResourceCache>()->GetResourceDirectory(ResourceDirectory::Fonts) + "/";
