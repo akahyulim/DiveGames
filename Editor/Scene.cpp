@@ -6,11 +6,11 @@ namespace editor
     Scene::Scene(Editor* editor)
         : Widget(editor)
     {
-        mTitle = "Scene";
+        m_Title = "Scene";
         // 크기 설정에 의미가 있나 싶다.
-        mSize = ImVec2(400, 250);
-        mFlags |= ImGuiWindowFlags_NoScrollbar;
-        mPadding = ImVec2(4.0f, 4.0f);
+        m_Size = ImVec2(400, 250);
+        m_Flags |= ImGuiWindowFlags_NoScrollbar;
+        m_Padding = ImVec2(4.0f, 4.0f);
         
         m_Scene = &dive::Scene::GetGlobalScene();
         m_Renderer = &dive::Renderer::GetInstance();

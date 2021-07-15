@@ -12,28 +12,25 @@ namespace editor
 		void TickVisible() override;
 
 	private:
-		void treeShow();
-		void treeAddGameObject(dive::GameObject* gameObject);
+		void showMainTree();
+		void showAddedTree(dive::GameObject* gameObject);
 
-		void setSelected(dive::GameObject* gameObject);
+		void setSelectedGameObject(dive::GameObject* gameObject);
 		void handleClicking();
 		void handleDragDrop(dive::GameObject* gameObject);
 
 		void popupPropertyMenu();
 		void popupGameObjectRename();
 
-		// m_Scene과 함께 Widget에 넣는 편이 나을 것 같다.
-		void OnSetActiveScene();
-
 	private:
-		dive::Scene* m_Scene;
-
-		dive::GameObject* m_Selected;
-		dive::GameObject* m_Clicked;
-		dive::GameObject* m_Hovered;
-		dive::GameObject* m_Copied;
+		// 스파르탄의 경우 이들을 정적 글로벌 변수 선언한 후
+		// Inspector의 정적 멤버 함수를 통해 전달했다.
+		dive::GameObject* m_SelectedGameObject = nullptr;
+		dive::GameObject* m_ClickedGameObject = nullptr;
+		dive::GameObject* m_HoveredGameObject = nullptr;
+		dive::GameObject* m_CopiedGameObject = nullptr;
 
 		DragDropPayload m_Payload;
-		bool m_bPopupRename;
+		bool m_bPopupRename = false;
 	};
 }

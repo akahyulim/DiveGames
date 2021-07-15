@@ -175,7 +175,7 @@ namespace dive
 	{
 		for (auto gameObject : m_GameObjects)
 		{
-			if (gameObject->GetInstanceID() == GetInstanceID())
+			if (gameObject->GetInstanceID() == id)
 				return gameObject;
 		}
 

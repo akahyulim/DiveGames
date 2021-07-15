@@ -64,5 +64,8 @@ namespace editor
 			}
 			return nullptr;
 		}
+
+	private:
+		DragDrop() = default;
 	};
 }

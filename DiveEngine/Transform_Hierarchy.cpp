@@ -17,58 +17,43 @@ namespace dive
 			return m_Parent->GetRoot();
 	}
 
-	// =============================================//
-	// 상위 노드의 부모를 하위 노드로 변경할 경우	//
-	// 모두 사라지는 버그가 있다.					//
-	//==============================================//
+	// 현재 부모를 자식으로 삼을 경우 버그가 발생한다.
 	void Transform::SetParent(Transform* parent)
 	{
-		if (!parent)
+		if (parent)
 		{
-			BecomeOrphan();
-			return;
+			if (parent->GetInstanceID() == GetInstanceID())
+				return;
 		}
 
-		if (this->GetInstanceID() == parent->GetInstanceID())
-			return;
-
-		if (m_Parent)
+		// 여러가지 상황이 발생할 수 있다.
+		// 예를 들면 자식이 부모가 되거나
+		// 자식이 더 상위로 올라가는 것 처럼 말이다.
+		if (HasParent())
 		{
-			for (auto it = m_Parent->m_Children.begin(); it != m_Parent->m_Children.end();)
+			auto sibling = GetParent()->m_Children;
+			auto it = sibling.begin();
+			for (it; it != sibling.end();)
 			{
-				if ((*it)->GetInstanceID() == this->GetInstanceID())
+				if ((*it)->GetInstanceID() == GetInstanceID())
 				{
-					it = m_Parent->m_Children.erase(it);
+					it = sibling.erase(it);
 				}
 				else
-					++it;
+					it++;
 			}
 		}
 
-		parent->m_Children.emplace_back(this);
+		if(parent)
+			parent->m_Children.emplace_back(this);
 		m_Parent = parent;
-	}
+	
 
-	void Transform::BecomeOrphan()
-	{
-		if (!m_Parent)
-			return;
-
-		auto oldParent = m_Parent;
-		m_Parent = nullptr;
-
+		// 흐음... 둘의 관계를 생각해봐야 한다.
 		UpdateTransform();
-
-		// 이 재귀함수는 무거워 보이는데
-		// 굳이 이렇게 할 필요가 있나?
-		// 그냥 부모의 children에서 자신만 지우면 되는데..
-		// 그러고보니 removeChild같은게 없네.
-		oldParent->AcquireChidren();
+		m_bChanged = true;
 	}
 
-	//==================================//
-	// GameObject의 이름을 사용합니다.	//
-	//==================================//
 	Transform* Transform::GetChildByName(const std::string& name) const
 	{
 		if (!m_Children.empty())
@@ -91,15 +76,23 @@ namespace dive
 	bool Transform::IsChildOf(const Transform* parent) const
 	{
 		assert(parent && "Invalid Parameter");
-
 		if (!parent)
+		{
+			CORE_ERROR("");
 			return false;
+		}
 
 		if (parent->GetInstanceID() == GetInstanceID())
 			return true;
 
-		if (m_Parent->GetInstanceID() == parent->GetInstanceID())
-			return true;
+		for (auto child : parent->GetChildren())
+		{
+			if (child->GetInstanceID() == GetInstanceID())
+				return true;
+		}
+
+		if (!HasParent())
+			return false;
 
 		return m_Parent->IsChildOf(parent);
 	}
@@ -117,9 +110,14 @@ namespace dive
 		m_Children.clear();
 		m_Children.shrink_to_fit();
 
+		// 이 둘을 별개로 관리해야 하나...?
 		UpdateTransform();
+		m_bChanged = true;
 	}
 
+	// 이걸 사용했다는 건
+	// 결국 부모의 m_Children으로 자식을 관리하는게 아니라
+	// 자식의 m_Parent로 m_Children을 재구성한다는 것이다.
 	void Transform::AcquireChidren()
 	{
 		m_Children.clear();

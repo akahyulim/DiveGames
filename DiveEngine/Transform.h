@@ -58,21 +58,27 @@ namespace dive
 		const DirectX::XMFLOAT4X4& GetLocalMatrixFloat4x4() const { return m_LocalMatrix; }
 
 		// Hierarchy
+		std::vector<Transform*> GetChildren() const { return m_Children; }
+		void AcquireChidren();
+
+		// unity hierarchy
 		Transform* GetRoot();
 		bool HasParent() const { return (m_Parent != nullptr); }
 		Transform* GetParent() const { return m_Parent; }
 		void SetParent(Transform* parent);
-		void BecomeOrphan();
 		unsigned int GetChildCount() const { return static_cast<unsigned int>(m_Children.size()); }
 		Transform* GetChildByName(const std::string& name) const;
-		std::vector<Transform*> GetChildren() { return m_Children; }
 		bool IsChildOf(const Transform* parent) const;
 		void DetachChildren();
-		void AcquireChidren();
+
+		// unity
+		bool HasChanged() const { return m_bChanged; }
 
 	private:
 
 	private:
+		bool m_bChanged = false;
+
 		// transform
 		DirectX::XMFLOAT3 m_LocalPosition;
 		DirectX::XMFLOAT4 m_LocalRotation;

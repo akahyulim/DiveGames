@@ -5,6 +5,6 @@ namespace editor
 	Assets::Assets(Editor* editor)
 		: Widget(editor)
 	{
-		mTitle = "Assets";
+		m_Title = "Assets";
 	}
 }

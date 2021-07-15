@@ -3,38 +3,42 @@
 // 현재 선택된 GameObject의 Inspector들을 보여준다.
 namespace editor
 {
+	dive::GameObject* Inspector::m_InspectedTarget = nullptr;
+
 	Inspector::Inspector(Editor* editor)
 		: Widget(editor)
 	{
-		mTitle = "Inspector";
+		m_Title = "Inspector";
 	}
+
 	void Inspector::TickVisible()
 	{
-        if (ImGui::Button("Delete.."))
-            ImGui::OpenPopup("Delete?");
+		if (m_InspectedTarget)
+		{
+			// 다른 정보를 먼저 출력해야 한다.
+			ImGui::Text("%s", m_InspectedTarget->GetName().c_str());
 
-        // Always center this window when appearing
-        ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-        ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+			showTransform(m_InspectedTarget->GetTransform());
+			// 이하 다른 Components
 
-        if (ImGui::BeginPopupModal("Delete?", NULL, ImGuiWindowFlags_AlwaysAutoResize))
-        {
-            ImGui::Text("All those beautiful files will be deleted.\nThis operation cannot be undone!\n\n");
-            ImGui::Separator();
+			showAddComponentButton();
+		}
+		// else if로 material
+	}
 
-            //static int unused_i = 0;
-            //ImGui::Combo("Combo", &unused_i, "Delete\0Delete harder\0");
+	void Inspector::SetInspectGameObject(dive::GameObject* target)
+	{
+		m_InspectedTarget = target;
 
-            static bool dont_ask_me_next_time = false;
-            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-            ImGui::Checkbox("Don't ask me next time", &dont_ask_me_next_time);
-            ImGui::PopStyleVar();
-
-            if (ImGui::Button("OK", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-            ImGui::SetItemDefaultFocus();
-            ImGui::SameLine();
-            if (ImGui::Button("Cancel", ImVec2(120, 0))) { ImGui::CloseCurrentPopup(); }
-            ImGui::EndPopup();
-        }
+		// hint인가 뭔가 설정
+	}
+	
+	void Inspector::showTransform(dive::Transform* transform)
+	{
+		assert(transform);
+	}
+	
+	void Inspector::showAddComponentButton()
+	{
 	}
 }

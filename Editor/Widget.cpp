@@ -7,7 +7,9 @@ namespace editor
 	{
 		assert(editor);
 
-		mEditor = editor;
+		m_Editor = editor;
+
+		EVENT_SUBSCRIBE(dive::eEventType::SceneActivate, EVENT_HANDLE(OnSetActiveScene));
 	}
 
 	void Widget::Tick()
@@ -16,58 +18,58 @@ namespace editor
 		// 이외에도 Progressbar, Toolbar 등이 구현 대상이다.
 		TickAlways();
 
-		if (!mbWindow)	
+		if (!m_bWindow)	
 			return;
 
 		bool bBegun = false;
 		{
-			if (!mbVisible)
+			if (!m_bVisible)
 				return;
 
-			if (mPosition.x != -1.0f && mPosition.y != -1.0f)
+			if (m_Position.x != -1.0f && m_Position.y != -1.0f)
 			{
-				ImGui::SetNextWindowPos(mPosition);
+				ImGui::SetNextWindowPos(m_Position);
 			}
-			if (mSize.x != -1.0f && mSize.y != -1.0f)
+			if (m_Size.x != -1.0f && m_Size.y != -1.0f)
 			{
-				ImGui::SetNextWindowSize(mSize, ImGuiCond_FirstUseEver);
+				ImGui::SetNextWindowSize(m_Size, ImGuiCond_FirstUseEver);
 			}
 			// 여기에서 크기를 제한시켜줘야하는데...
-			if ((mSize.x != -1.0f && mSize.y != -1.0f) || (mMaxSize.x != FLT_MAX && mMaxSize.y != FLT_MAX))
+			if ((m_Size.x != -1.0f && m_Size.y != -1.0f) || (m_MaxSize.x != FLT_MAX && m_MaxSize.y != FLT_MAX))
 			{
-				ImGui::SetNextWindowSizeConstraints(mSize, mMaxSize);
+				ImGui::SetNextWindowSizeConstraints(m_Size, m_MaxSize);
 			}
-			if (mAlpha != -1.0f)
+			if (m_Alpha != -1.0f)
 			{
-				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, mAlpha);
+				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, m_Alpha);
 				mVarPushes++;
 			}
-			if (mPadding.x != -1.0f && mPadding.y != -1.0f)
+			if (m_Padding.x != -1.0f && m_Padding.y != -1.0f)
 			{
-				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, mPadding);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Padding);
 				mVarPushes++;
 			}
 
 			// Style을 추가한 내용을 푸쉬하는 부분이다.
 			OnPushStyleVar();
 
-			if (ImGui::Begin(mTitle.c_str(), &mbVisible, mFlags))
+			if (ImGui::Begin(m_Title.c_str(), &m_bVisible, m_Flags))
 			{
-				mWindow = ImGui::GetCurrentWindow();
-				mHeight = ImGui::GetWindowHeight();
+				m_Window = ImGui::GetCurrentWindow();
+				m_Height = ImGui::GetWindowHeight();
 
 				bBegun = true;
 			}
-			else if (mWindow && mWindow->Hidden)
+			else if (m_Window && m_Window->Hidden)
 			{
 				bBegun = true;
 			}
 
-			if (mWindow && mWindow->Appearing)
+			if (m_Window && m_Window->Appearing)
 			{
 				OnShow();
 			}
-			else if (!mbVisible)
+			else if (!m_bVisible)
 			{
 				OnHide();
 			}
@@ -85,5 +87,10 @@ namespace editor
 				mVarPushes = 0;
 			}
 		}
+	}
+
+	void Widget::OnSetActiveScene()
+	{
+		m_Scene = dive::SceneManager::GetInstance().GetActiveScene();
 	}
 }

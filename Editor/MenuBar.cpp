@@ -9,12 +9,9 @@ namespace editor
 	MenuBar::MenuBar(Editor* editor)
 		: Widget(editor)
 	{
-		mTitle = "MenuBar";
-		mbWindow = false;
-		m_Scene = nullptr;
+		m_Title = "MenuBar";
+		m_bWindow = false;
 		m_bModalNewScene = false;
-
-		EVENT_SUBSCRIBE(dive::eEventType::SceneActivate, EVENT_HANDLE(OnSetActiveScene));
 	}
 
 	void MenuBar::TickAlways()
@@ -105,7 +102,7 @@ namespace editor
 					}
 					// 하지만 추후 Project의 변경사항까지 확인해야 한다.
 
-					DestroyWindow(mEditor->GetWindowHandle());
+					DestroyWindow(m_Editor->GetWindowHandle());
 				}
 
 				ImGui::EndMenu();
@@ -250,12 +247,6 @@ namespace editor
 		//= Popups ============================
 		modalNewScene();
 
-	}
-
-	void MenuBar::OnSetActiveScene()
-	{
-		m_Scene = dive::SceneManager::GetInstance().GetActiveScene();
-		assert(m_Scene);
 	}
 
 	// 버튼이 우측 정렬되도록 하고 싶다.

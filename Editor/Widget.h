@@ -23,26 +23,29 @@ namespace editor
 		virtual void OnHide() {}
 		virtual void OnPushStyleVar() {}
 
-		bool IsVisible() const { return mbVisible; }
-		void SetVisible(bool visible) { mbVisible = visible; }
-		float GetHeight() const { return mHeight; }
-		std::string GetTitle() const { return mTitle; }
-		ImGuiWindow* GetWindow() const { return mWindow; }
+		void OnSetActiveScene();
+
+		bool IsVisible() const { return m_bVisible; }
+		void SetVisible(bool visible) { m_bVisible = visible; }
+		float GetHeight() const { return m_Height; }
+		std::string GetTitle() const { return m_Title; }
+		ImGuiWindow* GetWindow() const { return m_Window; }
 
 	protected:
-		bool mbWindow = true;
-		bool mbVisible = true;
-		int mFlags = ImGuiWindowFlags_NoCollapse;
-		float mHeight = 0.0f;
-		float mAlpha = -1.0f;
-		ImVec2 mPosition = ImVec2(-1.0f, -1.0f);
-		ImVec2 mSize = ImVec2(-1.0f, -1.0f);
-		ImVec2 mMaxSize = ImVec2(FLT_MAX, FLT_MAX);
-		ImVec2 mPadding = ImVec2(-1.0f, -1.0f);
-		std::string mTitle = "Title";
-		ImGuiWindow* mWindow = nullptr;
+		bool m_bWindow = true;
+		bool m_bVisible = true;
+		int m_Flags = ImGuiWindowFlags_NoCollapse;
+		float m_Height = 0.0f;
+		float m_Alpha = -1.0f;
+		ImVec2 m_Position = ImVec2(-1.0f, -1.0f);
+		ImVec2 m_Size = ImVec2(-1.0f, -1.0f);
+		ImVec2 m_MaxSize = ImVec2(FLT_MAX, FLT_MAX);
+		ImVec2 m_Padding = ImVec2(-1.0f, -1.0f);
+		std::string m_Title = "Title";
+		ImGuiWindow* m_Window = nullptr;
 
-		Editor* mEditor = nullptr;
+		Editor* m_Editor = nullptr;
+		dive::Scene* m_Scene = nullptr;
 
 	private:
 		unsigned char mVarPushes = 0;
