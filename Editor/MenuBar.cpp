@@ -39,10 +39,14 @@ namespace editor
 
 				if (ImGui::MenuItem("Open Scene"))
 				{
-					if (dive::Scene::GetGlobalScene().IsDirty())
+					//if (dive::Scene::GetGlobalScene().IsDirty())
+					if (m_Scene)
 					{
+						if(m_Scene->IsDirty())
+						{
 						// 팝업
 						// 기존 Scene에 변경 사항이 존재합니다. 저장하시겠습니까?
+						}
 					}
 
 					// 디렉토리 탐색기를 연다.
@@ -60,7 +64,8 @@ namespace editor
 					// 만약 있다면 덮어씌울 것인지 물어야 한다.
 					{
 						std::string filepath = "../Assets/Scenes/default.scene";
-						dive::Scene::GetGlobalScene().SaveToFile(filepath);
+						//dive::Scene::GetGlobalScene().SaveToFile(filepath);
+						m_Scene->SaveToFile(filepath);
 
 						APP_TRACE("현재 Scene과 Asset을 파일로 저장하였습니다.");
 					}
@@ -96,7 +101,8 @@ namespace editor
 				if (ImGui::MenuItem("Exit"))
 				{
 					// 일단은 Scene의 변경사항 여부만 확인한다.
-					if (dive::Scene::GetGlobalScene().IsDirty())
+					//if (dive::Scene::GetGlobalScene().IsDirty())
+					if(m_Scene->IsDirty())
 					{
 
 					}

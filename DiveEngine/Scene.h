@@ -32,14 +32,6 @@ namespace dive
 
 		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(m_GameObjects.size()); }
 
-		// 이제 이건 지워져야 한다.
-		// 그런데 사용되는 곳이 꽤 될 거다.
-		static Scene& GetGlobalScene()
-		{
-			static Scene scene;
-			return scene;
-		}
-
 		bool IsDirty() { return m_bDirty; }
 		
 		// 유니티의 함수

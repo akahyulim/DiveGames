@@ -18,6 +18,5 @@ namespace editor
 
 	private:
 	private:
-		dive::Scene* mScene;
 	};
 }

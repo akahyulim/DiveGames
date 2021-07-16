@@ -184,8 +184,6 @@ namespace dive
 
 	void Scene::RemoveGameObject(GameObject* gameObject)
 	{
-		assert(gameObject && "INVALID PARAMETER");
-
 		if (!gameObject)
 			return;
 

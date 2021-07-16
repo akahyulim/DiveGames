@@ -20,7 +20,6 @@ namespace dive
 
 	private:
 	private:
-		Scene* m_Scene = SceneManager::GetInstance().GetActiveScene();
 
 		// visibility를 가진다.
 

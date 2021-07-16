@@ -12,18 +12,22 @@ namespace editor
         m_Flags |= ImGuiWindowFlags_NoScrollbar;
         m_Padding = ImVec2(4.0f, 4.0f);
         
-        m_Scene = &dive::Scene::GetGlobalScene();
+        //m_Scene = &dive::Scene::GetGlobalScene();
         m_Renderer = &dive::Renderer::GetInstance();
     }
 
     void Scene::TickVisible()
     {
+        if (!m_Scene)
+            return;
+
         // 그냥 리턴하면 안된다.
+        // => 왜?
         if (!m_Renderer)
             return;
 
-        if(dive::SceneManager::GetInstance().GetActiveScene())
-            m_Scene = dive::SceneManager::GetInstance().GetActiveScene();
+        //if(dive::SceneManager::GetInstance().GetActiveScene())
+        //   m_Scene = dive::SceneManager::GetInstance().GetActiveScene();
 
         float width = static_cast<float>(ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x);
         float height = static_cast<float>(ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y);

@@ -4,7 +4,9 @@ namespace editor
 {
 	RenderPathEditor::RenderPathEditor()
 	{
-		mScene = &dive::Scene::GetGlobalScene();
+		//m_Scene = &dive::Scene::GetGlobalScene();
+		// 갱신되는걸 염두하려면 이 역시 이벤트가 맞지 않을까?
+		//m_Scene = dive::SceneManager::GetInstance().GetActiveScene();
 	}
 
 	RenderPathEditor::~RenderPathEditor()
@@ -18,10 +20,13 @@ namespace editor
 	
 	void RenderPathEditor::Update(float deltaTime)
 	{
+		if (!m_Scene)
+			return;
+
 		// 업데이트 필요 여부에 따라 선택
 		{
 			auto timeScale = dive::TimeManager::GetInstance().GetTimeScale();
-			mScene->Update(deltaTime * timeScale);
+			m_Scene->Update(deltaTime * timeScale);
 		}
 	}
 	
@@ -32,6 +37,11 @@ namespace editor
 	//================================================================================================
 	void RenderPathEditor::Render() const
 	{
+		// 사실 Scene이 없어도 배경색은 그냥 그릴 수 있다.
+		// 다만 Scene이 없다는 사실을 알리고 싶어 이 부분을 추가하는 게 나을 것 같다.
+		if (!m_Scene)
+			return;
+
 		auto pRenderer = &dive::Renderer::GetInstance();
 		assert(pRenderer);
 

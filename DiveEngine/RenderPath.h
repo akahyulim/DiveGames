@@ -1,5 +1,8 @@
 #pragma once
 #include "GraphicsDevice.h"
+#include "Scene.h"
+#include "SceneManager.h"
+#include "Event.h"
 
 // override this(fucntion) to perform custom gameplay or rendering logic
 namespace dive
@@ -7,7 +10,10 @@ namespace dive
 	class RenderPath
 	{
 	public:
-		RenderPath() = default;
+		RenderPath()
+		{
+			EVENT_SUBSCRIBE(eEventType::SceneActivate, EVENT_HANDLE(OnSetActiveScene));
+		}
 		virtual ~RenderPath() {}
 
 		// LoadingRenderPath에서 호출된다.
@@ -28,7 +34,16 @@ namespace dive
 
 		// get & set mask
 
+		void OnSetActiveScene()
+		{
+			m_Scene = SceneManager::GetInstance().GetActiveScene();
+		}
+
+	protected:
+		Scene* m_Scene;
+
 	private:
 		// mask
+
 	};
 }
