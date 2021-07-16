@@ -75,6 +75,9 @@ namespace dive
 		}
 	}
 
+
+	// 계층구조 형성 과정에서 이상징후가 포착되었다.
+	// SetParent를 두 번 호출하는 것 같다.
 	void GameObject::Deserialize(FileStream* fileStream, Transform* parentTransform)
 	{
 		if (!fileStream)
@@ -130,7 +133,7 @@ namespace dive
 				pChild->Deserialize(fileStream, m_Transform);
 			}
 
-			m_Transform->AcquireChidren();
+			//m_Transform->AcquireChidren();
 		}
 
 		EVENT_FIRE(eEventType::SceneResolve);

@@ -43,7 +43,8 @@ namespace dive
 		{
 			if (auto parentTransform = SceneManager::GetInstance().GetActiveScene()->GetGameObjectByID(parentId))
 			{
-				SetParent(parentTransform->GetTransform());
+				// 일단 이걸 주석처리하자. GameObject에서도 계층구조를 형성하기 때문이다.
+			//	SetParent(parentTransform->GetTransform());
 			}
 		}
 

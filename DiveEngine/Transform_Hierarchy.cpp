@@ -17,7 +17,13 @@ namespace dive
 			return m_Parent->GetRoot();
 	}
 
-	// 현재 부모를 자식으로 삼을 경우 버그가 발생한다.
+	// 문제점 정리
+	// 0. 파일 로드시 계층구조 과정에서 SetParent가 두 번 호출되는 로그가 찍혔다.
+	// => Transform::Deserialize()에서 계층구조를 형성했다.
+	// 1. 기존 부모에게서 제거되지 않고 있다.
+	// => 참조 문제였다...
+	// 2. 여전히 제거 과정에 문제가 발생한다.
+	// 3. 현재 부모를 자식으로 삼을 경우 버그가 발생한다.
 	void Transform::SetParent(Transform* parent)
 	{
 		if (parent)
@@ -26,26 +32,30 @@ namespace dive
 				return;
 		}
 
-		// 여러가지 상황이 발생할 수 있다.
-		// 예를 들면 자식이 부모가 되거나
-		// 자식이 더 상위로 올라가는 것 처럼 말이다.
+		// 기존 부모에게서 제거
 		if (HasParent())
 		{
-			auto sibling = GetParent()->m_Children;
-			auto it = sibling.begin();
-			for (it; it != sibling.end();)
+			// 복사가 아니라 참조로 사용해야 한다.
+			auto& sibling = GetParent()->m_Children;
+			for (auto it = sibling.begin(); it != sibling.end();)
 			{
 				if ((*it)->GetInstanceID() == GetInstanceID())
 				{
-					it = sibling.erase(it);
+					CORE_TRACE("{0:s}가 {1:s}(을)를 독립시켰습니다.", GetParent()->GetGameObject()->GetName(), GetGameObject()->GetName());
+
+					sibling.erase(it);
+					break;
 				}
 				else
-					it++;
+					++it;
 			}
 		}
 
-		if(parent)
+		if (parent)
+		{
 			parent->m_Children.emplace_back(this);
+			CORE_TRACE("{0:s}가 {1:s}의 새로운 부모가 되었습니다.", parent->GetGameObject()->GetName(), GetGameObject()->GetName());
+		}
 		m_Parent = parent;
 	
 
@@ -123,9 +133,7 @@ namespace dive
 		m_Children.clear();
 		m_Children.shrink_to_fit();
 
-		// 나중에 Scene이 Global이 아닐 수 있다.
-		// 그렇다면 Scene을 전달받아야 한다.
-		// 아니면 GameObject 측에서 자신이 속한 Scene을 저장하도록 할 수도 있다.
+		// 이것두 그냥 이벤트로???
 		auto& allGameObjects = SceneManager::GetInstance().GetActiveScene()->GetAllGameObjects();
 
 		// 결국 Children을 모두 Clear한 후
@@ -143,5 +151,7 @@ namespace dive
 		}
 
 		// Transform도 Update 시켜야 한다.
+		UpdateTransform();
+		m_bChanged = true;
 	}
 }

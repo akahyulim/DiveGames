@@ -130,6 +130,7 @@ namespace dive
 		// id 때문에라도 반드시 초기화가 필요하다.
 		Clear();
 
+		// 루트 게임오브젝트만 생성한 후 역직렬화 시작
 		auto rootCount = stream.ReadAs<unsigned int>();
 		for (unsigned int i = 0; i != rootCount; i++)
 		{
@@ -182,6 +183,7 @@ namespace dive
 		return nullptr;
 	}
 
+	// 전달받은 대상의 자식들까지 모두 제거 대상
 	void Scene::RemoveGameObject(GameObject* gameObject)
 	{
 		if (!gameObject)
@@ -189,6 +191,15 @@ namespace dive
 
 		gameObject->MarkForDestruction();
 
+		auto transform = gameObject->GetTransform();
+		assert(transform);
+
+		auto children = transform->GetChildren();
+		for (auto child : children)
+		{
+			RemoveGameObject(child->GetGameObject());
+		}
+		
 		m_bDirty = true;
 	}
 
@@ -210,47 +221,28 @@ namespace dive
 		return rootGameObjects;
 	}
 
-	//==============================================//
-	// 전달받은 대상의 자식들까지 모두 제거합니다.	//
-	//==============================================//
+	// 아직 문제가 발생한다.
+	// 그런데 제거 과정 버그라기 보단
+	// 트리 구성 과정에서 발생하는 것 같다.
 	void Scene::eraseGameObject(GameObject* gameObject)
 	{
-		assert(gameObject && "INVALID PARAMETER");
-
 		if (!gameObject)
-		{
-			CORE_WARN("Scene::eraseGameObject>> 잘못된 인자를 전달받았습니다.");
 			return;
-		}
 
-		// 제거될 대상의 자식들 역시 제거 대상으로 설정한다.
-		auto children = gameObject->GetTransform()->GetChildren();
-		for (auto child : children)
-		{
-			RemoveGameObject(child->GetGameObject());
-		}
+		gameObject->GetTransform()->SetParent(nullptr);
 
-		// 지워질 대상의 부모를 우선 저장한다.
-		auto parent = gameObject->GetTransform()->GetParent();
-
-		// 현재 GameObject를 컨테이너에서 제거한다.
-		// 그렇다면 위에서 제거 대상으로 추가 설정한 자식들은 언제 제거할까?
 		for (auto it = m_GameObjects.begin(); it != m_GameObjects.end();)
 		{
 			if ((*it)->GetInstanceID() == gameObject->GetInstanceID())
 			{
 				delete (*it);
 				(*it) = nullptr;
-				it = m_GameObjects.erase(it);
+
+				m_GameObjects.erase(it);
 				break;
 			}
-			++it;
-		}
-
-		// 제거된 대상의 부모가 자식을 다시 설정토록 한다.
-		if (parent)
-		{
-			parent->AcquireChidren();
+			else
+				++it;
 		}
 	}
 }
