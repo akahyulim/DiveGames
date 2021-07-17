@@ -1,4 +1,5 @@
 #include "MeshRenderer.h"
+#include "GameObject.h"
 #include "Renderer.h"
 #include "GraphicsDevice.h"
 #include "Log.h"
@@ -23,6 +24,7 @@ namespace dive
 		}
 	}
 
+	// 당연히 저장부터 되어야 겠지.
 	void MeshRenderer::Serialize(FileStream* fileStream)
 	{
 		// 값을 저장하기 보단
@@ -33,6 +35,7 @@ namespace dive
 		// 추후 Material과 기타 설정값들도 추가해야 한다.
 	}
 
+	// 이 부분이 없어서 출력이 안되고 있다.
 	void MeshRenderer::Deserialize(FileStream* fileStream)
 	{
 		// 저장된 타입 혹은 파일 경로를 읽어 들인 후
@@ -97,6 +100,10 @@ namespace dive
 	void MeshRenderer::Render(ID3D11DeviceContext* deviceContext)
 	{
 		if (!deviceContext)
+			return;
+
+		// 여기가 맞나 모르겠다.
+		if (!GetGameObject()->IsActive())
 			return;
 
 		// ref에선 constant buffer와 input layout, shader를 외부에서 먼저 bind 시켰다.

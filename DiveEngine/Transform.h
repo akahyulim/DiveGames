@@ -57,11 +57,11 @@ namespace dive
 		DirectX::XMMATRIX GetLocalMatrix() const { return DirectX::XMLoadFloat4x4(&m_LocalMatrix); }
 		const DirectX::XMFLOAT4X4& GetLocalMatrixFloat4x4() const { return m_LocalMatrix; }
 
+		// unity
+		bool HasChanged() const { return m_bChanged; }
+
 		// Hierarchy
 		std::vector<Transform*> GetChildren() const { return m_Children; }
-		void AcquireChidren();
-
-		// unity hierarchy
 		Transform* GetRoot();
 		bool HasParent() const { return (m_Parent != nullptr); }
 		Transform* GetParent() const { return m_Parent; }
@@ -71,8 +71,6 @@ namespace dive
 		bool IsChildOf(const Transform* parent) const;
 		void DetachChildren();
 
-		// unity
-		bool HasChanged() const { return m_bChanged; }
 
 	private:
 

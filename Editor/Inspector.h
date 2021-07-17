@@ -10,11 +10,15 @@ namespace editor
 
 		void TickVisible() override;
 
+		// material과 같이 Resource를 출력하기도 한다.
+		// 유니티의 경우 texture와 mesh까지도 보여준다.
 		static void SetInspectGameObject(dive::GameObject* target);
-		// material용도 있어야 하나?
 
 	private:
+		void showGameObject();
 		void showTransform(dive::Transform* transform);
+		void showCamera(dive::Camera* camera);
+		void showMeshRenderer(dive::MeshRenderer* meshRenderer);
 		// 이하 다른 Components
 
 		void showAddComponentButton();

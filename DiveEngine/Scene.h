@@ -32,7 +32,7 @@ namespace dive
 
 		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(m_GameObjects.size()); }
 
-		bool IsDirty() { return m_bDirty; }
+		bool IsDirty() { return m_bChanged; }
 		
 		// 유니티의 함수
 		// GetRootGameObjects
@@ -47,7 +47,7 @@ namespace dive
 		std::vector<GameObject*> m_GameObjects;
 		// camera??
 
-		bool m_bDirty;
+		bool m_bChanged;
 
 		// 유니티의 멤버 변수
 		bool m_bLoaded = false;

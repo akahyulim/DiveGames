@@ -12,7 +12,7 @@ namespace dive
 		: Object(typeid(Scene).hash_code())
 	{
 		SetName("Untitled");
-		m_bDirty = false;
+		m_bChanged = false;
 	}
 
 	Scene::Scene(const std::string& sceneName)
@@ -20,7 +20,7 @@ namespace dive
 	{
 		SetName(sceneName);
 
-		m_bDirty = false;
+		m_bChanged = false;
 		// 좀 애매허다.
 		m_bLoaded = true;
 	}
@@ -39,7 +39,7 @@ namespace dive
 			gameObject->Update(deltaTime);
 		}
 
-		if (m_bDirty)
+		if (m_bChanged)
 		{
 			// 얕은 복사이지만 리소스를 차지한다.
 			auto copy = m_GameObjects;
@@ -56,7 +56,7 @@ namespace dive
 			}
 
 			EVENT_FIRE(eEventType::SceneResolve);
-			m_bDirty = false;
+			m_bChanged = false;
 		}
 	}
 
@@ -74,7 +74,7 @@ namespace dive
 			m_GameObjects.shrink_to_fit();
 		}
 
-		m_bDirty = true;
+		m_bChanged = true;
 	}
 
 	bool Scene::SaveToFile(const std::string& filepath)
@@ -144,7 +144,7 @@ namespace dive
 
 		stream.Close();
 
-		m_bDirty = true;
+		m_bChanged = true;
 		m_bLoaded = true;
 
 		return true;
@@ -200,7 +200,7 @@ namespace dive
 			RemoveGameObject(child->GetGameObject());
 		}
 		
-		m_bDirty = true;
+		m_bChanged = true;
 	}
 
 	std::vector<GameObject*> Scene::GetRootGameObjects() const
@@ -221,15 +221,13 @@ namespace dive
 		return rootGameObjects;
 	}
 
-	// 아직 문제가 발생한다.
-	// 그런데 제거 과정 버그라기 보단
-	// 트리 구성 과정에서 발생하는 것 같다.
 	void Scene::eraseGameObject(GameObject* gameObject)
 	{
 		if (!gameObject)
 			return;
 
 		gameObject->GetTransform()->SetParent(nullptr);
+		gameObject->GetTransform()->DetachChildren();
 
 		for (auto it = m_GameObjects.begin(); it != m_GameObjects.end();)
 		{

@@ -132,8 +132,6 @@ namespace dive
 			{
 				pChild->Deserialize(fileStream, m_Transform);
 			}
-
-			//m_Transform->AcquireChidren();
 		}
 
 		EVENT_FIRE(eEventType::SceneResolve);
@@ -148,6 +146,7 @@ namespace dive
 	}
 
 	// 아직 부실하다.
+	// 현재 Transform만 생성이 가능하다. switch문으로 구현해야 할까?
 	Component* GameObject::AddComponent(unsigned int typeHash, unsigned int id)
 	{
 		// Transform은 이미 생성되어 있으므로 id만 바꾼다.
