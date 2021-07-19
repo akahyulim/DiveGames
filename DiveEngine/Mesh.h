@@ -22,21 +22,22 @@ namespace dive
 
 		void Clear();
 
-		std::string GetName() const { return mName; }
-		void SetName(const std::string& name) { mName = name; }
+		// object를 상속시키는 편이 나을 것 같다.
+		std::string GetName() const { return m_Name; }
+		void SetName(const std::string& name) { m_Name = name; }
 
-		unsigned int GetVertexCount() const { return static_cast<unsigned int>(mVertices.size()); }
-		std::vector<VertexType_PosTexNorTan>& GetVertices() { return mVertices; }
-		void SetVertices(const std::vector<VertexType_PosTexNorTan>& vertices) { mVertices = vertices; }
+		unsigned int GetVertexCount() const { return static_cast<unsigned int>(m_Vertices.size()); }
+		std::vector<VertexType_PosTexNorTan>& GetVertices() { return m_Vertices; }
+		void SetVertices(const std::vector<VertexType_PosTexNorTan>& vertices) { m_Vertices = vertices; }
 
-		unsigned int GetIndexCount() const { return static_cast<unsigned int>(mIndices.size()); }
-		std::vector<unsigned int>& GetIndices() { return mIndices; }
-		void SetIndices(const std::vector<unsigned int>& indices) { mIndices = indices; }
+		unsigned int GetIndexCount() const { return static_cast<unsigned int>(m_Indices.size()); }
+		std::vector<unsigned int>& GetIndices() { return m_Indices; }
+		void SetIndices(const std::vector<unsigned int>& indices) { m_Indices = indices; }
 
 	private:
-		std::string mName = "";
+		std::string m_Name = "";
 
-		std::vector<VertexType_PosTexNorTan> mVertices;
-		std::vector<unsigned int> mIndices;
+		std::vector<VertexType_PosTexNorTan> m_Vertices;
+		std::vector<unsigned int> m_Indices;
 	};
 }

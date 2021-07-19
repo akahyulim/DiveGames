@@ -51,7 +51,7 @@ namespace editor
 
 					// 디렉토리 탐색기를 연다.
 					{
-						std::string filepath = "../Assets/Scenes/default.scene";
+						std::string filepath = "../Assets/Scenes/MeshTestScene.scene";//"../Assets/Scenes/default.scene";
 						dive::SceneManager::GetInstance().LoadScene(filepath);
 					}
 				}
@@ -63,7 +63,7 @@ namespace editor
 					// 동일한 이름의 파일이 있는지 확인한다.
 					// 만약 있다면 덮어씌울 것인지 물어야 한다.
 					{
-						std::string filepath = "../Assets/Scenes/default.scene";
+						std::string filepath = "../Assets/Scenes/" + m_Scene->GetName() + ".scene";
 						//dive::Scene::GetGlobalScene().SaveToFile(filepath);
 						m_Scene->SaveToFile(filepath);
 

@@ -145,17 +145,36 @@ namespace dive
 		}
 	}
 
-	// 아직 부실하다.
-	// 현재 Transform만 생성이 가능하다. switch문으로 구현해야 할까?
+	//======================================================================//
+	// 파일에 unsigned int로 저장했기에 typid.hash_code도 형변환 해야 한다.	//
+	// id 부분도 현재 마음에 들지 않는다.									//
+	//======================================================================//
 	Component* GameObject::AddComponent(unsigned int typeHash, unsigned int id)
 	{
-		// Transform은 이미 생성되어 있으므로 id만 바꾼다.
-		if (typeid(Transform).hash_code() == typeHash)
+		Component* newComponent = nullptr;
+
+		if ((unsigned int)typeid(Transform).hash_code() == typeHash)
 		{
-			m_Transform->SetInstanceID(id);
-			return m_Transform;
+			newComponent = static_cast<Component*>(m_Transform);
+		}
+		else if ((unsigned int)typeid(Camera).hash_code() == typeHash)
+		{
+			newComponent = m_Components.emplace_back(static_cast<Component*>(new Camera(this)));
+		}
+		else if ((unsigned int)typeid(MeshRenderer).hash_code() == typeHash)
+		{
+			newComponent = m_Components.emplace_back(static_cast<Component*>(new MeshRenderer(this)));
 		}
 
-		return nullptr;
+		// 현재 구현하지 않은 부분이 있어서 일단 주석처리
+		//assert(newComponent);
+
+		// 0 말고 다른 건 없을까?
+		if (id != 0)
+		{
+			if(newComponent)
+				newComponent->SetInstanceID(id);
+		}
+		return newComponent;
 	}
 }

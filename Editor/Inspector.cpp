@@ -1,4 +1,6 @@
 #include "Inspector.h"
+#include "External/ImGui/imgui_stdlib.h"
+
 
 // 현재 선택된 GameObject의 Inspector들을 보여준다.
 namespace editor
@@ -193,6 +195,11 @@ namespace editor
 
 		if (ImGui::CollapsingHeader("MeshRenderer", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 		{
+			auto meshName = meshRenderer->GetMesh()->GetName();
+
+			ImGui::Text("Mesh");	ImGui::SameLine();	ImGui::InputText(nullptr, &meshName);	
+			// 사실 이름을 바꾸려는 시도는 에바다.
+			// meshRenderer->GetMesh()->SetName(meshName);
 		}
 
 		ImGui::Separator();

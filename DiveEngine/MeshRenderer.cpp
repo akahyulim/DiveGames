@@ -4,6 +4,7 @@
 #include "GraphicsDevice.h"
 #include "Log.h"
 #include "Geometry.h"
+#include "FileStream.h"
 
 namespace dive
 {
@@ -12,58 +13,79 @@ namespace dive
 	{
 		// 이걸 다른 곳에 전달할 필요가 없다면
 		// unique_ptr에 딱 어울린다.
-		mMesh = new Mesh;
+		m_Mesh = new Mesh;
 	}
 
 	MeshRenderer::~MeshRenderer()
 	{
-		if (mMesh)
+		if (m_Mesh)
 		{
-			delete mMesh;
-			mMesh = nullptr;
+			delete m_Mesh;
+			m_Mesh = nullptr;
 		}
 	}
 
-	// 당연히 저장부터 되어야 겠지.
+	// 일단 구현한 것만 넣자.
 	void MeshRenderer::Serialize(FileStream* fileStream)
 	{
-		// 값을 저장하기 보단
-		// 어떤 Mesh를 만들었느냐를 저장해야 한다.
-		// 즉, Default일 경우 어떤 타입이었냐
-		// 파일일 경우 경로를 저장해야 한다.
+		if (!fileStream)
+		{
+			CORE_ERROR("");
+			return;
+		}
 
-		// 추후 Material과 기타 설정값들도 추가해야 한다.
+		// basic
+		{
+			fileStream->Write((int)m_MeshType);
+		}
 	}
 
-	// 이 부분이 없어서 출력이 안되고 있다.
 	void MeshRenderer::Deserialize(FileStream* fileStream)
 	{
-		// 저장된 타입 혹은 파일 경로를 읽어 들인 후
-		// Mesh를 구성하고 버퍼를 생성해야 한다.
+		if (!fileStream)
+		{
+			CORE_ERROR("");
+			return;
+		}
+
+		{
+			fileStream->Read((int*)&m_MeshType);
+		}
+
+		if (m_MeshType != eDefaultMeshType::None)
+		{
+			CreateDefaultMesh(m_MeshType);
+		}
 	}
 
 	// 모델 로드일 땐 다른 구현이 필요하다.
 	// 아마도 LoadFromFile이 되겠지?
+	// 이렇게 하면 결국 Model은 중복생성된다.
+	// 게다가 버퍼까지 MeshRenderer마다 개별로 생성된다.
+	// 그런데 프리팹을 만들거라면 좀 더 생각해봐야 한다.
+	// 유니티의 경우 이와같은 기본 Geometry는 프리팹으로 생성하지 않는다.
 	void MeshRenderer::CreateDefaultMesh(eDefaultMeshType type)
 	{
+		m_MeshType = type;
+
 		// 함수로 만들까 싶다.
-		if (!mMesh->GetVertices().empty() || !mMesh->GetIndices().empty())
+		if (!m_Mesh->GetVertices().empty() || !m_Mesh->GetIndices().empty())
 		{
-			mMesh->Clear();
+			m_Mesh->Clear();
 		}
-		if (mVertexBuffer)
+		if (m_VertexBuffer)
 		{
-			mVertexBuffer->Release();
-			mVertexBuffer = nullptr;
+			m_VertexBuffer->Release();
+			m_VertexBuffer = nullptr;
 		}
-		if (mIndexBuffer)
+		if (m_IndexBuffer)
 		{
-			mIndexBuffer->Release();
-			mIndexBuffer = nullptr;
+			m_IndexBuffer->Release();
+			m_IndexBuffer = nullptr;
 		}
 
-		auto& vertices = mMesh->GetVertices();
-		auto& indices = mMesh->GetIndices();
+		auto& vertices = m_Mesh->GetVertices();
+		auto& indices = m_Mesh->GetIndices();
 
 		switch (type)
 		{
@@ -74,13 +96,13 @@ namespace dive
 		case eDefaultMeshType::Quad:
 		{
 			utility::geometry::CreateQuad(vertices, indices);
-			mMesh->SetName("Quad");
+			m_Mesh->SetName("Quad");
 			break;
 		}
 		case eDefaultMeshType::Cube:
 		{
 			utility::geometry::CreateCube(vertices, indices);
-			mMesh->SetName("Cube");
+			m_Mesh->SetName("Cube");
 			break;
 		}
 		default:
@@ -92,8 +114,8 @@ namespace dive
 
 		if (!createBuffers())
 		{
-			delete mMesh;
-			mMesh = nullptr;
+			delete m_Mesh;
+			m_Mesh = nullptr;
 		}
 	}
 
@@ -112,8 +134,8 @@ namespace dive
 		// 문제는 추후 Model을 어떻게 그려야하느냐 이다.
 
 		unsigned int offset = 0;
-		deviceContext->IASetVertexBuffers(0, 1, &mVertexBuffer, &mStride, &offset);
-		deviceContext->IASetIndexBuffer(mIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		deviceContext->IASetVertexBuffers(0, 1, &m_VertexBuffer, &m_Stride, &offset);
+		deviceContext->IASetIndexBuffer(m_IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 		deviceContext->DrawIndexed(GetIndexCount(), 0, 0);
 	}
@@ -135,22 +157,22 @@ namespace dive
 			// 일단 그냥 막 코딩
 			// VertexStride만 VertexBuffer Bind에 사용되기 때문이다.
 			stride = static_cast<unsigned int>(sizeof(VertexType_PosTexNorTan));
-			mStride = stride;
+			m_Stride = stride;
 
 			D3D11_BUFFER_DESC desc;
 			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 			desc.Usage = D3D11_USAGE_DEFAULT;
 			desc.CPUAccessFlags = 0;
 			desc.StructureByteStride = 0;
-			desc.ByteWidth = stride * mMesh->GetVertexCount();
+			desc.ByteWidth = stride * m_Mesh->GetVertexCount();
 			desc.MiscFlags = 0;
 
 			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = mMesh->GetVertices().data();
+			data.pSysMem = m_Mesh->GetVertices().data();
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
-			if (FAILED(device->CreateBuffer(&desc, &data, &mVertexBuffer)))
+			if (FAILED(device->CreateBuffer(&desc, &data, &m_VertexBuffer)))
 			{
 				return false;
 			}
@@ -165,15 +187,15 @@ namespace dive
 			desc.Usage = D3D11_USAGE_DEFAULT;
 			desc.CPUAccessFlags = 0;
 			desc.StructureByteStride = 0;
-			desc.ByteWidth = stride * mMesh->GetIndexCount();
+			desc.ByteWidth = stride * m_Mesh->GetIndexCount();
 			desc.MiscFlags = 0;
 
 			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = mMesh->GetIndices().data();
+			data.pSysMem = m_Mesh->GetIndices().data();
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
-			if (FAILED(device->CreateBuffer(&desc, &data, &mIndexBuffer)))
+			if (FAILED(device->CreateBuffer(&desc, &data, &m_IndexBuffer)))
 			{
 				return false;
 			}

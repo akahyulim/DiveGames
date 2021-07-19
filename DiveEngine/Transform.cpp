@@ -27,14 +27,16 @@ namespace dive
 
 	void Transform::Serialize(FileStream* fileStream)
 	{
-		// local pos, rot ,scl
+		// local rot ,scl
+		fileStream->Write(m_LocalPosition);
 		// lookAt
 		fileStream->Write(m_Parent ? m_Parent->GetGameObject()->GetInstanceID() : 0);
 	}
 
 	void Transform::Deserialize(FileStream* fileStream)
 	{
-		// local pos, rot ,scl
+		// local rot ,scl
+		fileStream->Read(&m_LocalPosition);
 		// lookAt
 		unsigned int parentId = 0;
 		fileStream->Read(&parentId);

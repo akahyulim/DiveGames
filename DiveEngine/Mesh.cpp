@@ -4,10 +4,10 @@ namespace dive
 {
 	void Mesh::Clear()
 	{
-		mVertices.clear();
-		mVertices.shrink_to_fit();
+		m_Vertices.clear();
+		m_Vertices.shrink_to_fit();
 
-		mIndices.clear();
-		mIndices.shrink_to_fit();
+		m_Indices.clear();
+		m_Indices.shrink_to_fit();
 	}
 }
