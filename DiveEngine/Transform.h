@@ -38,16 +38,32 @@ namespace dive
 		void SetLocalPosition(float x, float y, float z);
 
 		// Rotation
-		DirectX::XMFLOAT4 GetRotation();
-		DirectX::XMFLOAT4 GetLocalRotation() const { return m_LocalRotation; }
-		void SetRotation(const DirectX::XMFLOAT3& rotation);
-		void SetLocalRotation(const DirectX::XMFLOAT3& rotation);
+		DirectX::XMVECTOR GetRotationVector() const;
+		DirectX::XMFLOAT4 GetRotationFloat4() const;
+		void GetRotation(float& outX, float& outY, float& outZ) const;
+		DirectX::XMVECTOR GetLocalRotationVector() const;
+		DirectX::XMFLOAT4 GetLocalRotationFloat4() const { return m_LocalRotation; }
+		void GetLocalRotation(float& outX, float& outY, float& outZ) const;
+		void SetRotationByVector(const DirectX::FXMVECTOR& rotation);
+		void SetRotationByFloat4(const DirectX::XMFLOAT4& rotation);
+		void SetRotation(float x, float y, float z);
+		void SetLocalRotationByVector(const DirectX::FXMVECTOR& rotation);
+		void SetLocalRotationByFloat4(const DirectX::XMFLOAT4& rotation);
+		void SetLocalRotation(float x, float y, float z);
 
 		// Scale
-		DirectX::XMFLOAT3 GetScale();
-		DirectX::XMFLOAT3 GetLocalScale() const { return m_LocalScale; }
-		void SetScale(const DirectX::XMFLOAT3& scale);
-		void SetLocalScale(const DirectX::XMFLOAT3& scale);
+		DirectX::XMVECTOR GetScaleVector() const;
+		DirectX::XMFLOAT3 GetScaleFloat3() const;
+		void GetScale(float& outX, float& outY, float& outZ);
+		DirectX::XMVECTOR GetLocalScaleVector() const;
+		DirectX::XMFLOAT3 GetLocalScaleFloat3() const { return m_LocalScale; }
+		void GetLocalScale(float& outX, float& outY, float& outZ);
+		void SetScaleVector(const DirectX::XMVECTOR& scale);
+		void SetScaleFloat3(const DirectX::XMFLOAT3& scale);
+		void SetScale(float x, float y, float z);
+		void SetLocalScaleVector(const DirectX::XMVECTOR& scale);
+		void SetLocalScaleFloat3(const DirectX::XMFLOAT3& scale);
+		void SetLocalScale(float x, float y, float z);
 
 		void SetLookAtByFloat3(const DirectX::XMFLOAT3& lookAt) { m_LookAt = lookAt; }
 		void SetLookAt(float x, float y, float z);

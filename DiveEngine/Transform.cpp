@@ -137,6 +137,56 @@ namespace dive
 		SetLocalPositionByVector(DirectX::XMVectorSet(x, y, z, 1.0f));
 	}
 
+	DirectX::XMVECTOR Transform::GetScaleVector() const
+	{
+		return DirectX::XMVECTOR();
+	}
+	
+	DirectX::XMFLOAT3 Transform::GetScaleFloat3() const
+	{
+		return DirectX::XMFLOAT3();
+	}
+	
+	void Transform::GetScale(float& outX, float& outY, float& outZ)
+	{
+	}
+	
+	DirectX::XMVECTOR Transform::GetLocalScaleVector() const
+	{
+		return DirectX::XMLoadFloat3(&m_LocalScale);
+	}
+
+	void Transform::GetLocalScale(float& outX, float& outY, float& outZ)
+	{
+		outX = m_LocalScale.x;
+		outY = m_LocalScale.y;
+		outZ = m_LocalScale.z;
+	}
+	
+	void Transform::SetScaleVector(const DirectX::XMVECTOR& scale)
+	{
+	}
+	
+	void Transform::SetScaleFloat3(const DirectX::XMFLOAT3& scale)
+	{
+	}
+	
+	void Transform::SetScale(float x, float y, float z)
+	{
+	}
+	
+	void Transform::SetLocalScaleVector(const DirectX::XMVECTOR& scale)
+	{
+	}
+	
+	void Transform::SetLocalScaleFloat3(const DirectX::XMFLOAT3& scale)
+	{
+	}
+	
+	void Transform::SetLocalScale(float x, float y, float z)
+	{
+	}
+
 	void Transform::SetLookAt(float x, float y, float z)
 	{
 		m_LookAt = DirectX::XMFLOAT3(x, y, z);
