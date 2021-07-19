@@ -39,6 +39,9 @@ namespace dive
 		unsigned int GetVertexStride() { return static_cast<unsigned int>(sizeof(VertexType_PosTexNorTan)); }
 		unsigned int GetIndexCount() { return m_Mesh->GetIndexCount(); }
 
+		bool IsReceiveShadows() const { return m_bReceiveShadows; }
+		void SetReceiveShadows(bool receive) { m_bReceiveShadows = receive; }
+
 		// 이걸 통째로 넘겨줘야 하나...? 그럼 unique_ptr로 못만듬
 		Mesh* GetMesh() { return m_Mesh; }
 
@@ -63,6 +66,8 @@ namespace dive
 		// 일단 offset은 0으로...
 
 		eDefaultMeshType m_MeshType = eDefaultMeshType::None;
+
+		bool m_bReceiveShadows = false;
 
 		// 부위가 나뉠 수 있다.
 		// 나뉜다면 해당 부위별 GameObejct(Transform)과 vertices, indices의 offset 및 count를 관리해야 한다.

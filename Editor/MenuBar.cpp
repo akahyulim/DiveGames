@@ -185,6 +185,9 @@ namespace editor
 
 				if (ImGui::MenuItem("Camera"))
 				{
+					auto gameObject = m_Scene->CreateGameObject();
+					gameObject->SetName("Camera");
+					gameObject->AddComponent<dive::Camera>();
 				}
 
 				ImGui::EndMenu();

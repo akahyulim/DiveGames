@@ -129,15 +129,14 @@ namespace editor
 		// 이게 좀 이상하다. 되다 안되다 한다.
 		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			/*
 			// 가져오기
-			bool bEnabled = camera->Enabled();
+			bool bEnabled = false;// camera->Enabled();
 			bool bOcclusionCulling = false;
 			bool bHdr = false;
 
 			// 보여주기 
 			// enabled
-			ImGui::Text("Enable"); ImGui::SameLine(Property::g_column); ImGui::Checkbox("##Nothing", &bEnabled);
+			ImGui::Text("Enable"); ImGui::SameLine(); ImGui::Checkbox("##Nothing", &bEnabled);
 
 			// Clear Flags
 			ImGui::Text("Clear Flags");
@@ -173,16 +172,15 @@ namespace editor
 			ImGui::Text("Target Texture");
 
 			// Occlusion Culling
-			ImGui::Text("Occlusion Culling"); ImGui::SameLine(Property::g_column); ImGui::Checkbox("##Shap", &bOcclusionCulling);
+			ImGui::Text("Occlusion Culling"); ImGui::SameLine(); ImGui::Checkbox("##Shap", &bOcclusionCulling);
 
 			// HDR
-			ImGui::Text("HDR"); ImGui::SameLine(Property::g_column); ImGui::Checkbox("##Nothing", &bHdr);
+			ImGui::Text("HDR"); ImGui::SameLine(); ImGui::Checkbox("##Nothing", &bHdr);
 
 			// target display???
 
 			// 설정하기
-			pCamera->SetEnable(bEnabled);
-			*/
+			//pCamera->SetEnable(bEnabled);
 		}
 
 		ImGui::Separator();
@@ -197,9 +195,22 @@ namespace editor
 		{
 			auto meshName = meshRenderer->GetMesh()->GetName();
 
-			ImGui::Text("Mesh");	ImGui::SameLine();	ImGui::InputText(nullptr, &meshName);	
-			// 사실 이름을 바꾸려는 시도는 에바다.
-			// meshRenderer->GetMesh()->SetName(meshName);
+			ImGui::Text("Mesh");	ImGui::SameLine();	ImGui::InputText("##Edit", &meshName);	
+			ImGui::Text("Cast Shadows"); //on / off ? ?
+			bool bReceiveShadows = meshRenderer->IsReceiveShadows();
+			ImGui::Text("Receive Shaodws");	ImGui::SameLine(); ImGui::Checkbox("##Receive Shadows", &bReceiveShadows);
+			// Materials
+			if (ImGui::TreeNode("Materials"))
+			{
+				ImGui::TreePop();
+				ImGui::Separator();
+			}
+			// Use Light Probes - radio button
+			// Replection Probes 
+			// Anchor Override
+
+			// 설정은 몰아서?
+			meshRenderer->SetReceiveShadows(bReceiveShadows);
 		}
 
 		ImGui::Separator();
