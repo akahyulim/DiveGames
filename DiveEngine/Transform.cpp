@@ -11,6 +11,7 @@ namespace dive
 		: Component(typeid(Transform).hash_code(), pGameObject, this)
 	{
 		m_LocalPosition = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+		m_LocalRotation = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 		m_LocalScale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 
 		DirectX::XMStoreFloat4x4(&m_Matrix, DirectX::XMMatrixIdentity());
@@ -23,6 +24,7 @@ namespace dive
 	// 이게 호출이 안되네...								//
 	// GameObject 혹은 Scene 제거가 제대로 안된다는 소리다.	//
 	// 그리고보니 SceneManager때문인 것 같다.				//
+	// SceneManager에서 Clear 등을 만들면 될 것 같다.		//
 	//======================================================//
 	Transform::~Transform()
 	{
@@ -54,14 +56,15 @@ namespace dive
 		unsigned int parentId = 0;
 		pFileStream->Read(&parentId);
 
-		// update transform
+		// update pTransform
 	}
 
+	// 변환 행렬은 구현을 완료하였다.
 	void Transform::UpdateTransform()
 	{
-		DirectX::XMMATRIX matLocalPos = DirectX::XMMatrixTranslationFromVector(GetLocalPositionVector());
-		DirectX::XMMATRIX matLocalRot = DirectX::XMMatrixIdentity();
-		DirectX::XMMATRIX matLocalScl = DirectX::XMMatrixScalingFromVector(GetLocalScaleVector());
+		DirectX::XMMATRIX matLocalPos = DirectX::XMMatrixTranslationFromVector(getLocalPositionByVector());
+		DirectX::XMMATRIX matLocalRot = DirectX::XMMatrixIdentity();//DirectX::XMMatrixRotationQuaternion(GetLocalRotationVector());
+		DirectX::XMMATRIX matLocalScl = DirectX::XMMatrixScalingFromVector(getLocalScaleByVector());
 
 		auto localMatrix = matLocalScl * matLocalRot * matLocalPos;
 		DirectX::XMStoreFloat4x4(&m_LocalMatrix, localMatrix);
@@ -81,105 +84,26 @@ namespace dive
 		}
 	}
 
-	DirectX::XMVECTOR Transform::GetPositionVector() const
+	DirectX::XMFLOAT3 Transform::GetPosition() const
 	{
-		return DirectX::XMVectorSet(m_Matrix._41, m_Matrix._42, m_Matrix._43, 1.0f);
+		return DirectX::XMFLOAT3(m_Matrix._41, m_Matrix._42, m_Matrix._43);
 	}
 
-	DirectX::XMFLOAT3 Transform::GetPositionFloat3() const
+	void Transform::SetPosition(const DirectX::XMFLOAT3& position)
 	{
-		//return DirectX::XMFLOAT3(m_Matrix._41, m_Matrix._42, m_Matrix._43);
-		if (HasParent())
-		{
-			auto position = DirectX::XMVector3Transform(GetLocalPositionVector(), m_pParent->GetMatrix());
-			DirectX::XMFLOAT3 result;
-			DirectX::XMStoreFloat3(&result, position);
-			return result;
-		}
-		else
-		{
-			return m_LocalPosition;
-		}
+		setPositionByVector(DirectX::XMLoadFloat3(&position));
 	}
 
-	void Transform::GetPosition(float& outX, float& outY, float& outZ) const
+	void Transform::SetLocalPosition(const DirectX::XMFLOAT3& position)
 	{
-		outX = m_Matrix._41;
-		outY = m_Matrix._42;
-		outZ = m_Matrix._43;
-	}
-
-	DirectX::XMVECTOR Transform::GetLocalPositionVector() const
-	{
-		return DirectX::XMLoadFloat3(&m_LocalPosition);
-	}
-
-	void Transform::GetLocalPosition(float& outX, float& outY, float& outZ) const
-	{
-		outX = m_LocalPosition.x;
-		outY = m_LocalPosition.y;
-		outZ = m_LocalPosition.z;
-	}
-
-	void Transform::SetPositionByVector(const DirectX::FXMVECTOR& position)
-	{
-		if (DirectX::XMVector3Equal(position, GetPositionVector()))
-			return;
-
-		SetLocalPositionByVector(HasParent() ?
-			DirectX::XMVector3Transform(position, DirectX::XMMatrixInverse(nullptr, m_pParent->GetMatrix()))
-			: position);
-	}
-
-	void Transform::SetPositionByFloat3(const DirectX::XMFLOAT3& position)
-	{
-		SetPositionByVector(DirectX::XMLoadFloat3(&position));
-	}
-
-	void Transform::SetPosition(float x, float y, float z)
-	{
-		SetPositionByVector(DirectX::XMVectorSet(x, y, z, 1.0f));
-	}
-
-	// scale처럼 바꿀건지 선택해야 한다.
-	void Transform::SetLocalPositionByVector(const DirectX::FXMVECTOR& position)
-	{
-		if (DirectX::XMVector3Equal(position, GetLocalPositionVector()))
-			return;
-
-		DirectX::XMStoreFloat3(&m_LocalPosition, position);
-
-		UpdateTransform();
-	}
-
-	void Transform::SetLocalPositionByFloat3(const DirectX::XMFLOAT3& position)
-	{;
-		SetLocalPositionByVector(DirectX::XMLoadFloat3(&position));
-	}
-
-	void Transform::SetLocalPosition(float x, float y, float z)
-	{;
-		SetLocalPositionByVector(DirectX::XMVectorSet(x, y, z, 1.0f));
-	}
-
-	// 일단 World Scale 계산은 틀린 것 같다.
-	DirectX::XMVECTOR Transform::GetScaleVector() const
-	{
-		if (HasParent())
-		{
-			auto scale = DirectX::XMVector3Transform(GetLocalScaleVector(), m_pParent->GetMatrix());
-			return scale;
-		}
-
-		return DirectX::XMLoadFloat3(&m_LocalScale);
+		setLocalPositionByVector(DirectX::XMLoadFloat3(&position));
 	}
 	
-	// 일단 여기에서 해보자
-	DirectX::XMFLOAT3 Transform::GetScaleFloat3() const
+	DirectX::XMFLOAT3 Transform::GetScale() const
 	{
 		if (HasParent())
 		{
-			auto scale = DirectX::XMVector3Transform(GetLocalScaleVector(), m_pParent->GetMatrix());
+			auto scale = DirectX::XMVector3Transform(getLocalScaleByVector(), m_pParent->GetMatrix());
 			DirectX::XMFLOAT3 result;
 			DirectX::XMStoreFloat3(&result, scale);
 
@@ -189,62 +113,13 @@ namespace dive
 		return m_LocalScale;
 	}
 	
-	void Transform::GetScale(float& outX, float& outY, float& outZ)
+	void Transform::SetScale(const DirectX::XMFLOAT3& scale)
 	{
-		auto scale = GetScaleFloat3();
-		outX = scale.x;
-		outY = scale.y;
-		outZ = scale.z;
-	}
-	
-	// 로컬은 그냥 가져와도 되나?
-	DirectX::XMVECTOR Transform::GetLocalScaleVector() const
-	{
-		return DirectX::XMLoadFloat3(&m_LocalScale);
+		setScaleByVector(DirectX::XMLoadFloat3(&scale));
 	}
 
-	void Transform::GetLocalScale(float& outX, float& outY, float& outZ)
-	{
-		outX = m_LocalScale.x;
-		outY = m_LocalScale.y;
-		outZ = m_LocalScale.z;
-	}
-	
-	void Transform::SetScaleByVector(const DirectX::FXMVECTOR& scale)
-	{
-		// 비교는 나중에
-
-		if (HasParent())
-		{
-			// 부모가 있을 때
-			// 일단 여기에서 역 곱하기
-			SetLocalScaleByVector(DirectX::XMVector3Transform(scale, DirectX::XMMatrixInverse(nullptr, m_pParent->GetMatrix())));
-		}
-		else
-		{
-			// 부모가 없을 때
-			SetLocalScaleByVector(scale);
-		}
-	}
-	
-	void Transform::SetScaleByFloat3(const DirectX::XMFLOAT3& scale)
-	{
-		SetScaleByVector(DirectX::XMLoadFloat3(&scale));
-	}
-	
-	void Transform::SetScale(float x, float y, float z)
-	{
-	}
-	
-	void Transform::SetLocalScaleByVector(const DirectX::FXMVECTOR& scale)
-	{
-		DirectX::XMFLOAT3 destination;
-		DirectX::XMStoreFloat3(&destination, scale);
-
-		SetLocalScaleByFloat3(destination);
-	}
-	
-	void Transform::SetLocalScaleByFloat3(const DirectX::XMFLOAT3& scale)
+	// 이건 다시 setLocalScaleByVector로 바꾸자
+	void Transform::SetLocalScale(const DirectX::XMFLOAT3& scale)
 	{
 		// 흐음... 0.0이어도 안되는데
 
@@ -255,14 +130,83 @@ namespace dive
 
 		UpdateTransform();
 	}
-	
-	void Transform::SetLocalScale(float x, float y, float z)
-	{
-		SetLocalScaleByFloat3(DirectX::XMFLOAT3(x, y, z ));
-	}
 
 	void Transform::SetLookAt(float x, float y, float z)
 	{
 		m_LookAt = DirectX::XMFLOAT3(x, y, z);
+	}
+
+	DirectX::XMVECTOR Transform::getPositionByVector() const
+	{
+		return DirectX::XMVectorSet(m_Matrix._41, m_Matrix._42, m_Matrix._43, 1.0f);
+	}
+
+	void Transform::setPositionByVector(const DirectX::FXMVECTOR& position)
+	{
+		if (DirectX::XMVector3Equal(position, getPositionByVector()))
+			return;
+
+		setLocalPositionByVector(HasParent() ?
+			DirectX::XMVector3Transform(position, DirectX::XMMatrixInverse(nullptr, m_pParent->GetMatrix()))
+			: position);
+	}
+
+	DirectX::XMVECTOR Transform::getLocalPositionByVector() const
+	{
+		return DirectX::XMLoadFloat3(&m_LocalPosition);
+	}
+
+	// scale처럼 바꿀건지 선택해야 한다.
+	void Transform::setLocalPositionByVector(const DirectX::FXMVECTOR& position)
+	{
+		if (DirectX::XMVector3Equal(position, getLocalPositionByVector()))
+			return;
+
+		DirectX::XMStoreFloat3(&m_LocalPosition, position);
+
+		UpdateTransform();
+	}
+
+	// 일단 World Scale 계산은 틀린 것 같다.
+	DirectX::XMVECTOR Transform::getScaleByVector() const
+	{
+		if (HasParent())
+		{
+			auto scale = DirectX::XMVector3Transform(getLocalScaleByVector(), m_pParent->GetMatrix());
+			return scale;
+		}
+
+		return DirectX::XMLoadFloat3(&m_LocalScale);
+	}
+
+	void Transform::setScaleByVector(const DirectX::FXMVECTOR& scale)
+	{
+		// 비교는 나중에
+
+		if (HasParent())
+		{
+			// 부모가 있을 때
+			// 일단 여기에서 역 곱하기
+			setLocalScaleByVector(DirectX::XMVector3Transform(scale, DirectX::XMMatrixInverse(nullptr, m_pParent->GetMatrix())));
+		}
+		else
+		{
+			// 부모가 없을 때
+			setLocalScaleByVector(scale);
+		}
+	}
+
+	// 로컬은 그냥 가져와도 되나?
+	DirectX::XMVECTOR Transform::getLocalScaleByVector() const
+	{
+		return DirectX::XMLoadFloat3(&m_LocalScale);
+	}
+
+	void Transform::setLocalScaleByVector(const DirectX::FXMVECTOR& scale)
+	{
+		DirectX::XMFLOAT3 destination;
+		DirectX::XMStoreFloat3(&destination, scale);
+
+		SetLocalScale(destination);
 	}
 }

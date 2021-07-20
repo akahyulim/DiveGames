@@ -5,23 +5,23 @@
 // 현재 선택된 GameObject의 Inspector들을 보여준다.
 namespace editor
 {
-	dive::GameObject* Inspector::m_InspectedTarget = nullptr;
+	dive::GameObject* Inspector::m_pInspectedTarget = nullptr;
 
-	Inspector::Inspector(Editor* editor)
-		: Widget(editor)
+	Inspector::Inspector(Editor* pEditor)
+		: Widget(pEditor)
 	{
 		m_Title = "Inspector";
 	}
 
 	void Inspector::TickVisible()
 	{
-		if (m_InspectedTarget)
+		if (m_pInspectedTarget)
 		{
 			showGameObject();
 
-			showTransform(m_InspectedTarget->GetTransform());
-			showCamera(m_InspectedTarget->GetComponent<dive::Camera>());
-			showMeshRenderer(m_InspectedTarget->GetComponent<dive::MeshRenderer>());
+			showTransform(m_pInspectedTarget->GetTransform());
+			showCamera(m_pInspectedTarget->GetComponent<dive::Camera>());
+			showMeshRenderer(m_pInspectedTarget->GetComponent<dive::MeshRenderer>());
 			// 이하 다른 Components
 
 			showAddComponentButton();
@@ -29,9 +29,9 @@ namespace editor
 		// else if로 material
 	}
 
-	void Inspector::SetInspectGameObject(dive::GameObject* target)
+	void Inspector::SetInspectGameObject(dive::GameObject* pTarget)
 	{
-		m_InspectedTarget = target;
+		m_pInspectedTarget = pTarget;
 
 		// hint인가 뭔가 설정
 	}
@@ -41,25 +41,25 @@ namespace editor
 		if (ImGui::CollapsingHeader("GameObject", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// 가져오기
-			bool bActive = m_InspectedTarget->IsActive();
+			bool bActive = m_pInspectedTarget->IsActive();
 
 			// 보여주기
 			ImGui::Checkbox("##", &bActive); ImGui::SameLine();
-			ImGui::Text(m_InspectedTarget->GetName().c_str());
+			ImGui::Text(m_pInspectedTarget->GetName().c_str());
 
 			ImGui::Text("Tag");	ImGui::SameLine();	ImGui::Text("Layer");
 
 			// 설정하기
-			m_InspectedTarget->SetActive(bActive);
+			m_pInspectedTarget->SetActive(bActive);
 		}
 
 		ImGui::Separator();
 	}
 
-	void Inspector::showTransform(dive::Transform* transform)
+	void Inspector::showTransform(dive::Transform* pTransform)
 	{
 		// assert가 맞나?
-		if (!transform)
+		if (!pTransform)
 			return;
 
 		// 이렇게 접는다. 뭐... 특별한 건 없는데 굳이 프레임 함수까지 만들어야 할까?
@@ -68,21 +68,21 @@ namespace editor
 			DirectX::XMFLOAT3 pos, scl;
 			DirectX::XMFLOAT3 rot;
 			// 이걸 로컬로 보여주는게 맞나?
-			pos = transform->GetLocalPositionFloat3();
+			pos = pTransform->GetLocalPosition();
 			rot = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);	// 얘는 degree로 출력 및 조정되어야 한다.
-			scl = transform->GetLocalScaleFloat3();
+			scl = pTransform->GetLocalScale();
 
 			// ImGui::InputFloat을 랩핑한 함수다.
-			auto showFloat = [](const char* id, const char* label, float* value)
+			auto showFloat = [](const char* pID, const char* pLabel, float* pValue)
 			{
 				float step = 0.0f;
 				float step_fast = 0.0f;
-				const char* decimals = "%.4f";
+				const char* pDecimals = "%.4f";
 				auto inputTextFlags = ImGuiInputTextFlags_CharsDecimal;
 
 				ImGui::PushItemWidth(75.0f);
-				ImGui::PushID(id);
-				ImGui::InputFloat(label, value, step, step_fast, decimals, inputTextFlags);
+				ImGui::PushID(pID);
+				ImGui::InputFloat(pLabel, pValue, step, step_fast, pDecimals, inputTextFlags);
 				ImGui::PopID();
 				ImGui::PopItemWidth();
 			};
@@ -109,8 +109,8 @@ namespace editor
 			// 실행 중이 아닐 때 변경 가능
 			{
 				// 계층 구조일 경우 부모의 좌표계에서 설정되는 것이 맞다.
-				transform->SetLocalPositionByFloat3(pos);
-				transform->SetLocalScaleByFloat3(scl);
+				pTransform->SetLocalPosition(pos);
+				pTransform->SetLocalScale(scl);
 				
 				//pTransform->SetLocalScale(XMLoadFloat3(&scl));
 			//	pTransform->SetLocalRotation(XMLoadFloat3(&rot));
@@ -124,16 +124,16 @@ namespace editor
 	}
 
 	// 아직 구현하지 않은 것이 많다.
-	void Inspector::showCamera(dive::Camera* camera)
+	void Inspector::showCamera(dive::Camera* pCamera)
 	{
-		if (!camera)
+		if (!pCamera)
 			return;
 
 		// 이게 좀 이상하다. 되다 안되다 한다.
 		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// 가져오기
-			bool bEnabled = false;// camera->Enabled();
+			bool bEnabled = false;// pCamera->Enabled();
 			bool bOcclusionCulling = false;
 			bool bHdr = false;
 
@@ -180,7 +180,7 @@ namespace editor
 			// HDR
 			ImGui::Text("HDR"); ImGui::SameLine(); ImGui::Checkbox("##Nothing", &bHdr);
 
-			// target display???
+			// pTarget display???
 
 			// 설정하기
 			//pCamera->SetEnable(bEnabled);
@@ -189,18 +189,18 @@ namespace editor
 		ImGui::Separator();
 	}
 
-	void Inspector::showMeshRenderer(dive::MeshRenderer* meshRenderer)
+	void Inspector::showMeshRenderer(dive::MeshRenderer* pMeshRenderer)
 	{
-		if (!meshRenderer)
+		if (!pMeshRenderer)
 			return;
 
 		if (ImGui::CollapsingHeader("MeshRenderer", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			auto meshName = meshRenderer->GetMesh()->GetName();
+			auto meshName = pMeshRenderer->GetMesh()->GetName();
 
 			ImGui::Text("Mesh");	ImGui::SameLine();	ImGui::InputText("##Edit", &meshName);	
 			ImGui::Text("Cast Shadows"); //on / off ? ?
-			bool bReceiveShadows = meshRenderer->IsReceiveShadows();
+			bool bReceiveShadows = pMeshRenderer->IsReceiveShadows();
 			ImGui::Text("Receive Shaodws");	ImGui::SameLine(); ImGui::Checkbox("##Receive Shadows", &bReceiveShadows);
 			// Materials
 			if (ImGui::TreeNode("Materials"))
@@ -213,7 +213,7 @@ namespace editor
 			// Anchor Override
 
 			// 설정은 몰아서?
-			meshRenderer->SetReceiveShadows(bReceiveShadows);
+			pMeshRenderer->SetReceiveShadows(bReceiveShadows);
 		}
 
 		ImGui::Separator();
