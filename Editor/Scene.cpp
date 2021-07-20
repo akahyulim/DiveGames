@@ -16,6 +16,10 @@ namespace editor
         m_Renderer = &dive::Renderer::GetInstance();
     }
 
+    //===================================================//
+    // 새로운 Scene를 생성하면                           //
+    // 최초에는 기존 Scene 화면 출력이 유지되고 있다.    //
+    //===================================================//
     void Scene::TickVisible()
     {
         if (!m_Scene)

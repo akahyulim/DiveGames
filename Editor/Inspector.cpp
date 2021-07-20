@@ -67,9 +67,10 @@ namespace editor
 		{
 			DirectX::XMFLOAT3 pos, scl;
 			DirectX::XMFLOAT3 rot;
+			// 이걸 로컬로 보여주는게 맞나?
 			pos = transform->GetLocalPositionFloat3();
 			rot = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);	// 얘는 degree로 출력 및 조정되어야 한다.
-			scl = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+			scl = transform->GetLocalScaleFloat3();
 
 			// ImGui::InputFloat을 랩핑한 함수다.
 			auto showFloat = [](const char* id, const char* label, float* value)
@@ -109,6 +110,8 @@ namespace editor
 			{
 				// 계층 구조일 경우 부모의 좌표계에서 설정되는 것이 맞다.
 				transform->SetLocalPositionByFloat3(pos);
+				transform->SetLocalScaleByFloat3(scl);
+				
 				//pTransform->SetLocalScale(XMLoadFloat3(&scl));
 			//	pTransform->SetLocalRotation(XMLoadFloat3(&rot));
 				//pTransform->SetPosition(XMLoadFloat3(&pos));

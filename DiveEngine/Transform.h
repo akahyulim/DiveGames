@@ -12,13 +12,13 @@ namespace dive
 	class Transform : public Component
 	{
 	public:
-		Transform(GameObject* gameObject);
+		Transform(GameObject* pGameObject);
 		~Transform();
 
 		// 오버라이드 함수
 		void Update(float deltaTime) override;
-		void Serialize(FileStream* fileStream) override;
-		void Deserialize(FileStream* fileStream) override;
+		void Serialize(FileStream* pFileStream) override;
+		void Deserialize(FileStream* pFileStream) override;
 
 		// 변환 함수
 		void UpdateTransform();
@@ -58,11 +58,11 @@ namespace dive
 		DirectX::XMVECTOR GetLocalScaleVector() const;
 		DirectX::XMFLOAT3 GetLocalScaleFloat3() const { return m_LocalScale; }
 		void GetLocalScale(float& outX, float& outY, float& outZ);
-		void SetScaleVector(const DirectX::XMVECTOR& scale);
-		void SetScaleFloat3(const DirectX::XMFLOAT3& scale);
+		void SetScaleByVector(const DirectX::FXMVECTOR& scale);
+		void SetScaleByFloat3(const DirectX::XMFLOAT3& scale);
 		void SetScale(float x, float y, float z);
-		void SetLocalScaleVector(const DirectX::XMVECTOR& scale);
-		void SetLocalScaleFloat3(const DirectX::XMFLOAT3& scale);
+		void SetLocalScaleByVector(const DirectX::FXMVECTOR& scale);
+		void SetLocalScaleByFloat3(const DirectX::XMFLOAT3& scale);
 		void SetLocalScale(float x, float y, float z);
 
 		void SetLookAtByFloat3(const DirectX::XMFLOAT3& lookAt) { m_LookAt = lookAt; }
@@ -79,12 +79,12 @@ namespace dive
 		// Hierarchy
 		std::vector<Transform*> GetChildren() const { return m_Children; }
 		Transform* GetRoot();
-		bool HasParent() const { return (m_Parent != nullptr); }
-		Transform* GetParent() const { return m_Parent; }
-		void SetParent(Transform* parent);
+		bool HasParent() const { return (m_pParent != nullptr); }
+		Transform* GetParent() const { return m_pParent; }
+		void SetParent(Transform* pParent);
 		unsigned int GetChildCount() const { return static_cast<unsigned int>(m_Children.size()); }
 		Transform* GetChildByName(const std::string& name) const;
-		bool IsChildOf(const Transform* parent) const;
+		bool IsChildOf(const Transform* pParent) const;
 		void DetachChildren();
 
 
@@ -104,7 +104,7 @@ namespace dive
 		DirectX::XMFLOAT3 m_LookAt;
 
 		// heirarchy
-		Transform* m_Parent = nullptr;
+		Transform* m_pParent = nullptr;
 		std::vector<Transform*> m_Children;
 	};
 }

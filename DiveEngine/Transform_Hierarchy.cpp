@@ -11,26 +11,26 @@ namespace dive
 	//==================================================//
 	Transform* Transform::GetRoot()
 	{
-		if (!m_Parent)
+		if (!m_pParent)
 			return this;
 		else
-			return m_Parent->GetRoot();
+			return m_pParent->GetRoot();
 	}
 
 	// 모든 문제 해결
-	void Transform::SetParent(Transform* parent)
+	void Transform::SetParent(Transform* pParent)
 	{
-		if (parent)
+		if (pParent)
 		{
-			if (parent->GetInstanceID() == GetInstanceID())
+			if (pParent->GetInstanceID() == GetInstanceID())
 				return;
 		}
 
 		if (HasParent())
 		{
-			if (parent)
+			if (pParent)
 			{
-				if (parent->GetInstanceID() == GetParent()->GetInstanceID())
+				if (pParent->GetInstanceID() == GetParent()->GetInstanceID())
 					return;
 			}
 
@@ -49,12 +49,12 @@ namespace dive
 			}
 		}
 
-		if (parent)
+		if (pParent)
 		{
-			parent->m_Children.emplace_back(this);
-			CORE_TRACE("{0:s}가 {1:s}의 새로운 부모가 되었습니다.", parent->GetGameObject()->GetName(), GetGameObject()->GetName());
+			pParent->m_Children.emplace_back(this);
+			CORE_TRACE("{0:s}가 {1:s}의 새로운 부모가 되었습니다.", pParent->GetGameObject()->GetName(), GetGameObject()->GetName());
 		}
-		m_Parent = parent;
+		m_pParent = pParent;
 	
 
 		// 흐음... 둘의 관계를 생각해봐야 한다.
@@ -81,24 +81,24 @@ namespace dive
 	}
 
 	// parent가 자신이라도 ture를 리턴한다.
-	bool Transform::IsChildOf(const Transform* parent) const
+	bool Transform::IsChildOf(const Transform* pParent) const
 	{
-		if (!parent)
+		if (!pParent)
 			return false;
 		
-		if (parent->GetInstanceID() == GetInstanceID())
+		if (pParent->GetInstanceID() == GetInstanceID())
 			return true;
 
 		if (!HasParent())
 			return false;
 
-		for (auto child : parent->GetChildren())
+		for (auto child : pParent->GetChildren())
 		{
 			if (child->GetInstanceID() == GetInstanceID())
 				return true;
 		}
 
-		return m_Parent->IsChildOf(parent);
+		return m_pParent->IsChildOf(pParent);
 	}
 
 	void Transform::DetachChildren()
@@ -108,7 +108,7 @@ namespace dive
 
 		for (auto pChild : m_Children)
 		{
-			pChild->m_Parent = nullptr;
+			pChild->m_pParent = nullptr;
 		}
 
 		m_Children.clear();
