@@ -10,7 +10,7 @@ namespace editor
 	class Widget
 	{
 	public:
-		Widget(Editor* editor);
+		Widget(Editor* pEditor);
 		virtual ~Widget() = default;
 
 		void Tick();
@@ -29,7 +29,7 @@ namespace editor
 		void SetVisible(bool visible) { m_bVisible = visible; }
 		float GetHeight() const { return m_Height; }
 		std::string GetTitle() const { return m_Title; }
-		ImGuiWindow* GetWindow() const { return m_Window; }
+		ImGuiWindow* GetWindow() const { return m_pWindow; }
 
 	protected:
 		bool m_bWindow = true;
@@ -42,12 +42,12 @@ namespace editor
 		ImVec2 m_MaxSize = ImVec2(FLT_MAX, FLT_MAX);
 		ImVec2 m_Padding = ImVec2(-1.0f, -1.0f);
 		std::string m_Title = "Title";
-		ImGuiWindow* m_Window = nullptr;
+		ImGuiWindow* m_pWindow = nullptr;
 
-		Editor* m_Editor = nullptr;
-		dive::Scene* m_Scene = nullptr;
+		Editor* m_pEditor = nullptr;
+		dive::Scene* m_pScene = nullptr;
 
 	private:
-		unsigned char mVarPushes = 0;
+		unsigned char m_VarPushs = 0;
 	};
 }

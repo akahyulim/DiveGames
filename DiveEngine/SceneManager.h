@@ -26,8 +26,8 @@ namespace dive
 		// UnloadSceneAsync
 		// MergeScenes
 		// MovegGmeobjectToScene
-		Scene* GetActiveScene() { return m_ActiveScene; }
-		bool SetActiveScene(Scene* scene);
+		Scene* GetActiveScene() { return m_pActiveScene; }
+		bool SetActiveScene(Scene* pScene);
 
 		Scene* GetSceneByName(const std::string& sceneName);
 
@@ -43,6 +43,6 @@ namespace dive
 		// scene count in build settings
 
 		// 직접 관리하는게 나으려나...? 아니면 m_LoadedScene에서 Scene에게 일종의 bool 값을 주어야 한다...
-		Scene* m_ActiveScene = nullptr;
+		Scene* m_pActiveScene = nullptr;
 	};
 }

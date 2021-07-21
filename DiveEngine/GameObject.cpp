@@ -5,13 +5,13 @@
 
 namespace dive
 {
-	GameObject::GameObject(Scene* scene)
+	GameObject::GameObject(Scene* pScene)
 		: Object(typeid(GameObject).hash_code()),
-		m_Transform(nullptr),
-		m_Scene(scene)
+		m_pTransform(nullptr),
+		m_pScene(pScene)
 	{
 		SetName("GameObject");
-		m_Transform = AddComponent<Transform>();
+		m_pTransform = AddComponent<Transform>();
 	}
 
 	GameObject::~GameObject()
@@ -30,9 +30,9 @@ namespace dive
 		APP_TRACE("Destroy GameObject: {:s}", GetName());
 	}
 
-	void GameObject::Serialize(FileStream* fileStream)
+	void GameObject::Serialize(FileStream* pFileStream)
 	{ 
-		if (!fileStream)
+		if (!pFileStream)
 		{
 			CORE_ERROR("");
 			return;
@@ -40,37 +40,37 @@ namespace dive
 
 		// basic
 		{
-			fileStream->Write(m_bActive);
-			fileStream->Write(GetInstanceID());
-			fileStream->Write(GetName());
+			pFileStream->Write(m_bActive);
+			pFileStream->Write(GetInstanceID());
+			pFileStream->Write(GetName());
 		}
 
 		// component
 		{
-			fileStream->Write(GetComponentCount());
+			pFileStream->Write(GetComponentCount());
 			for (const auto pComponent : m_Components)
 			{
-				fileStream->Write(static_cast<unsigned int>(pComponent->GetTypeHash()));
-				fileStream->Write(pComponent->GetInstanceID());
+				pFileStream->Write(static_cast<unsigned int>(pComponent->GetTypeHash()));
+				pFileStream->Write(pComponent->GetInstanceID());
 			}
 			for (const auto pComponent : m_Components)
 			{
-				pComponent->Serialize(fileStream);
+				pComponent->Serialize(pFileStream);
 			}
 		}
 
 		// children
 		{
-			auto children = m_Transform->GetChildren();
-			fileStream->Write(static_cast<unsigned int>(children.size()));
+			auto children = m_pTransform->GetChildren();
+			pFileStream->Write(static_cast<unsigned int>(children.size()));
 
 			for (const auto pChild : children)
 			{
-				fileStream->Write(pChild->GetGameObject()->GetInstanceID());
+				pFileStream->Write(pChild->GetGameObject()->GetInstanceID());
 			}
 			for (const auto pChild : children)
 			{
-				pChild->GetGameObject()->Serialize(fileStream);
+				pChild->GetGameObject()->Serialize(pFileStream);
 			}
 		}
 	}
@@ -78,9 +78,9 @@ namespace dive
 
 	// 계층구조 형성 과정에서 이상징후가 포착되었다.
 	// SetParent를 두 번 호출하는 것 같다.
-	void GameObject::Deserialize(FileStream* fileStream, Transform* parentTransform)
+	void GameObject::Deserialize(FileStream* pFileStream, Transform* pParentTransform)
 	{
-		if (!fileStream)
+		if (!pFileStream)
 		{
 			CORE_ERROR("");
 			return;
@@ -88,49 +88,49 @@ namespace dive
 
 		// basic
 		{
-			fileStream->Read(&m_bActive);
+			pFileStream->Read(&m_bActive);
 			unsigned int id;
-			fileStream->Read(&id);
+			pFileStream->Read(&id);
 			SetInstanceID(id);
 			std::string name;
-			fileStream->Read(&name);
+			pFileStream->Read(&name);
 			SetName(name);
 		}
 
 		// component
 		{
-			auto componentCount = fileStream->ReadAs<unsigned int>();
+			auto componentCount = pFileStream->ReadAs<unsigned int>();
 			unsigned int type = 0;
 			unsigned int id = 0;
 			for (unsigned int i = 0; i != componentCount; i++)
 			{
-				fileStream->Read(&type);
-				fileStream->Read(&id);
+				pFileStream->Read(&type);
+				pFileStream->Read(&id);
 
 				AddComponent(type, id);
 			}
 			for (const auto pComponent : m_Components)
 			{
-				pComponent->Deserialize(fileStream);
+				pComponent->Deserialize(pFileStream);
 			}
 
-			m_Transform->SetParent(parentTransform);
+			m_pTransform->SetParent(pParentTransform);
 		}
 
 		// children
 		{
-			auto childrenCount = fileStream->ReadAs<unsigned int>();
+			auto childrenCount = pFileStream->ReadAs<unsigned int>();
 			std::vector<GameObject*> children;
 			for (unsigned int i = 0; i != childrenCount; i++)
 			{
 				auto pChild = GetScene()->CreateGameObject(true);
-				pChild->SetInstanceID(fileStream->ReadAs<unsigned int>());
+				pChild->SetInstanceID(pFileStream->ReadAs<unsigned int>());
 
 				children.emplace_back(pChild);
 			}
 			for (const auto pChild : children)
 			{
-				pChild->Deserialize(fileStream, m_Transform);
+				pChild->Deserialize(pFileStream, m_pTransform);
 			}
 		}
 
@@ -155,7 +155,7 @@ namespace dive
 
 		if ((unsigned int)typeid(Transform).hash_code() == typeHash)
 		{
-			newComponent = static_cast<Component*>(m_Transform);
+			newComponent = static_cast<Component*>(m_pTransform);
 		}
 		else if ((unsigned int)typeid(Camera).hash_code() == typeHash)
 		{

@@ -3,10 +3,10 @@
 
 namespace dive
 {
-	Component::Component(size_t  typeHash, GameObject* gameObject, Transform* transform)
+	Component::Component(size_t  typeHash, GameObject* pGameObject, Transform* pTransform)
 		: Object(typeHash)
 	{
-		mGameObject = gameObject;
-		mTransform = transform ? transform : gameObject->GetTransform();
+		m_pGameObject = pGameObject;
+		m_pTransform = pTransform ? pTransform : pGameObject->GetTransform();
 	}
 }

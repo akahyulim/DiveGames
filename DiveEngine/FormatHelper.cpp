@@ -6,12 +6,12 @@
 
 namespace dive
 {
-	std::vector<std::string> FormatHelper::mSupportedImageFormats;
-	std::vector<std::string> FormatHelper::mSupportedShaderFormats;
+	std::vector<std::string> FormatHelper::m_SupportedImageFormats;
+	std::vector<std::string> FormatHelper::m_SupportedShaderFormats;
 
 	void FormatHelper::Initialize()
 	{
-		mSupportedImageFormats =
+		m_SupportedImageFormats =
 		{
 			".jpg",
 			".png",
@@ -47,7 +47,7 @@ namespace dive
 			".xpm"
 		};
 
-		mSupportedShaderFormats = 
+		m_SupportedShaderFormats = 
 		{	
 			".hlsl"
 		};
@@ -57,7 +57,7 @@ namespace dive
 	{
 		std::string fileExtension = FileSystemHelper::GetExtension(filepath);
 
-		for (const auto& format : mSupportedImageFormats)
+		for (const auto& format : m_SupportedImageFormats)
 		{
 			if ((fileExtension == format) || fileExtension == StringHelper::ToUppercase(format))
 				return true;
@@ -70,7 +70,7 @@ namespace dive
 	{
 		std::string fileExtension = FileSystemHelper::GetExtension(path);
 
-		for (const auto& format : mSupportedShaderFormats)
+		for (const auto& format : m_SupportedShaderFormats)
 		{
 			if ((fileExtension == format) || (fileExtension == StringHelper::ToUppercase(format)))
 				return true;

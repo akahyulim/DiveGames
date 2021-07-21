@@ -36,11 +36,11 @@ namespace dive
 
 		void OnSetActiveScene()
 		{
-			m_Scene = SceneManager::GetInstance().GetActiveScene();
+			m_pScene = SceneManager::GetInstance().GetActiveScene();
 		}
 
 	protected:
-		Scene* m_Scene;
+		Scene* m_pScene;
 
 	private:
 		// mask

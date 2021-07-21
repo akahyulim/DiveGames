@@ -24,7 +24,7 @@ namespace dive
 		Key& operator=(unsigned int value);
 		Key& operator=(bool value);
 		Key& operator=(double value);
-		Key& operator=(const char* value);
+		Key& operator=(const char* pValue);
 		Key& operator=(std::string value);
 
 		//======================================================================//
@@ -35,47 +35,47 @@ namespace dive
 		Key& operator<<(unsigned int value);
 		Key& operator<<(bool value);
 		Key& operator<<(double value);
-		Key& operator<<(const char* value);
+		Key& operator<<(const char* pValue);
 		Key& operator<<(std::string value);
 
 	private:
 		template<typename T>
-		std::string getKeyValue(const T& defaultValue, const char* formatSpec);
+		std::string getKeyValue(const T& defaultValue, const char* pFormatSpec);
 		template<typename T>
-		void setKeyValue(T value, const char* formatSpec);
+		void setKeyValue(T value, const char* pFormatSpec);
 
 	private:
-		std::string mFileName;
-		std::string mSectionName;
-		std::string mKeyName;
+		std::string m_FileName;
+		std::string m_SectionName;
+		std::string m_KeyName;
 
-		std::string mDefaultStringValue;
+		std::string m_DefaultStringValue;
 		union
 		{
-			int mDefaultIntValue;
-			unsigned int mDefaultUintValue;
-			bool mbDefaultBoolValue;
-			double mDefaultDoubleValue;
+			int m_DefaultIntValue;
+			unsigned int m_DefaultUintValue;
+			bool m_bDefaultBoolValue;
+			double m_DefaultDoubleValue;
 		};
 	};
 
 	template<typename T>
-	std::string Key::getKeyValue(const T& defaultValue, const char* formatSpec)
+	std::string Key::getKeyValue(const T& defaultValue, const char* pFormatSpec)
 	{
 		char defaultStr[MAX_VALUE_SIZE];
-		sprintf_s(defaultStr, MAX_VALUE_SIZE, formatSpec, defaultValue);
+		sprintf_s(defaultStr, MAX_VALUE_SIZE, pFormatSpec, defaultValue);
 		std::unique_ptr<char> pBuffer(new char[MAX_VALUE_SIZE]);
-		GetPrivateProfileStringA(mSectionName.c_str(), mKeyName.c_str(), defaultStr, pBuffer.get(), MAX_VALUE_SIZE, mFileName.c_str());
+		GetPrivateProfileStringA(m_SectionName.c_str(), m_KeyName.c_str(), defaultStr, pBuffer.get(), MAX_VALUE_SIZE, m_FileName.c_str());
 		
 		return std::string(pBuffer.get());
 	}
 
 	template<typename T>
-	void Key::setKeyValue(T value, const char* formatSpec)
+	void Key::setKeyValue(T value, const char* pFormatSpec)
 	{
 		char valueStr[MAX_VALUE_SIZE];
-		sprintf_s(valueStr, MAX_VALUE_SIZE, formatSpec, value);
-		WritePrivateProfileStringA(mSectionName.c_str(), mKeyName.c_str(), valueStr, mFileName.c_str());
+		sprintf_s(valueStr, MAX_VALUE_SIZE, pFormatSpec, value);
+		WritePrivateProfileStringA(m_SectionName.c_str(), m_KeyName.c_str(), valueStr, m_FileName.c_str());
 	}
 
 	class Section
@@ -87,8 +87,8 @@ namespace dive
 		Key operator[](const std::string& keyName);
 
 	private:
-		std::string mFileName;
-		std::string mSectionName;
+		std::string m_FileName;
+		std::string m_SectionName;
 	};
 
 	class IniHelper
@@ -100,7 +100,7 @@ namespace dive
 		Section operator[](const std::string& sectionName);
 
 	private:
-		std::string mFileName;
+		std::string m_FileName;
 	};
 }
 

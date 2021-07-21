@@ -8,27 +8,27 @@
 
 namespace dive
 {
-	MeshRenderer::MeshRenderer(GameObject* gameObject)
-		: Component(typeid(MeshRenderer).hash_code(), gameObject)
+	MeshRenderer::MeshRenderer(GameObject* pGameObject)
+		: Component(typeid(MeshRenderer).hash_code(), pGameObject)
 	{
 		// 이걸 다른 곳에 전달할 필요가 없다면
 		// unique_ptr에 딱 어울린다.
-		m_Mesh = new Mesh;
+		m_pMesh = new Mesh;
 	}
 
 	MeshRenderer::~MeshRenderer()
 	{
-		if (m_Mesh)
+		if (m_pMesh)
 		{
-			delete m_Mesh;
-			m_Mesh = nullptr;
+			delete m_pMesh;
+			m_pMesh = nullptr;
 		}
 	}
 
 	// 일단 구현한 것만 넣자.
-	void MeshRenderer::Serialize(FileStream* fileStream)
+	void MeshRenderer::Serialize(FileStream* pFileStream)
 	{
-		if (!fileStream)
+		if (!pFileStream)
 		{
 			CORE_ERROR("");
 			return;
@@ -36,20 +36,20 @@ namespace dive
 
 		// basic
 		{
-			fileStream->Write((int)m_MeshType);
+			pFileStream->Write((int)m_MeshType);
 		}
 	}
 
-	void MeshRenderer::Deserialize(FileStream* fileStream)
+	void MeshRenderer::Deserialize(FileStream* pFileStream)
 	{
-		if (!fileStream)
+		if (!pFileStream)
 		{
 			CORE_ERROR("");
 			return;
 		}
 
 		{
-			fileStream->Read((int*)&m_MeshType);
+			pFileStream->Read((int*)&m_MeshType);
 		}
 
 		if (m_MeshType != eDefaultMeshType::None)
@@ -69,23 +69,23 @@ namespace dive
 		m_MeshType = type;
 
 		// 함수로 만들까 싶다.
-		if (!m_Mesh->GetVertices().empty() || !m_Mesh->GetIndices().empty())
+		if (!m_pMesh->GetVertices().empty() || !m_pMesh->GetIndices().empty())
 		{
-			m_Mesh->Clear();
+			m_pMesh->Clear();
 		}
-		if (m_VertexBuffer)
+		if (m_pVertexBuffer)
 		{
-			m_VertexBuffer->Release();
-			m_VertexBuffer = nullptr;
+			m_pVertexBuffer->Release();
+			m_pVertexBuffer = nullptr;
 		}
-		if (m_IndexBuffer)
+		if (m_pIndexBuffer)
 		{
-			m_IndexBuffer->Release();
-			m_IndexBuffer = nullptr;
+			m_pIndexBuffer->Release();
+			m_pIndexBuffer = nullptr;
 		}
 
-		auto& vertices = m_Mesh->GetVertices();
-		auto& indices = m_Mesh->GetIndices();
+		auto& vertices = m_pMesh->GetVertices();
+		auto& indices = m_pMesh->GetIndices();
 
 		switch (type)
 		{
@@ -96,13 +96,13 @@ namespace dive
 		case eDefaultMeshType::Quad:
 		{
 			utility::geometry::CreateQuad(vertices, indices);
-			m_Mesh->SetName("Quad");
+			m_pMesh->SetName("Quad");
 			break;
 		}
 		case eDefaultMeshType::Cube:
 		{
 			utility::geometry::CreateCube(vertices, indices);
-			m_Mesh->SetName("Cube");
+			m_pMesh->SetName("Cube");
 			break;
 		}
 		default:
@@ -114,8 +114,8 @@ namespace dive
 
 		if (!createBuffers())
 		{
-			delete m_Mesh;
-			m_Mesh = nullptr;
+			delete m_pMesh;
+			m_pMesh = nullptr;
 		}
 	}
 
@@ -134,8 +134,8 @@ namespace dive
 		// 문제는 추후 Model을 어떻게 그려야하느냐 이다.
 
 		unsigned int offset = 0;
-		deviceContext->IASetVertexBuffers(0, 1, &m_VertexBuffer, &m_Stride, &offset);
-		deviceContext->IASetIndexBuffer(m_IndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		deviceContext->IASetVertexBuffers(0, 1, &m_pVertexBuffer, &m_Stride, &offset);
+		deviceContext->IASetIndexBuffer(m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
 		deviceContext->DrawIndexed(GetIndexCount(), 0, 0);
 	}
@@ -164,15 +164,15 @@ namespace dive
 			desc.Usage = D3D11_USAGE_DEFAULT;
 			desc.CPUAccessFlags = 0;
 			desc.StructureByteStride = 0;
-			desc.ByteWidth = stride * m_Mesh->GetVertexCount();
+			desc.ByteWidth = stride * m_pMesh->GetVertexCount();
 			desc.MiscFlags = 0;
 
 			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = m_Mesh->GetVertices().data();
+			data.pSysMem = m_pMesh->GetVertices().data();
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
-			if (FAILED(device->CreateBuffer(&desc, &data, &m_VertexBuffer)))
+			if (FAILED(device->CreateBuffer(&desc, &data, &m_pVertexBuffer)))
 			{
 				return false;
 			}
@@ -187,15 +187,15 @@ namespace dive
 			desc.Usage = D3D11_USAGE_DEFAULT;
 			desc.CPUAccessFlags = 0;
 			desc.StructureByteStride = 0;
-			desc.ByteWidth = stride * m_Mesh->GetIndexCount();
+			desc.ByteWidth = stride * m_pMesh->GetIndexCount();
 			desc.MiscFlags = 0;
 
 			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = m_Mesh->GetIndices().data();
+			data.pSysMem = m_pMesh->GetIndices().data();
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
-			if (FAILED(device->CreateBuffer(&desc, &data, &m_IndexBuffer)))
+			if (FAILED(device->CreateBuffer(&desc, &data, &m_pIndexBuffer)))
 			{
 				return false;
 			}

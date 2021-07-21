@@ -19,7 +19,7 @@ namespace dive
 		FileStream(const std::string& filepath, eFileStreamMode mode);
 		~FileStream();
 
-		bool IsOpen() const { return mbFileOpened; }
+		bool IsOpen() const { return m_bFileOpened; }
 		void Close();
 
 		// 읽기
@@ -37,7 +37,7 @@ namespace dive
 			>::type>
 		void Read(T* value)
 		{
-			mInputStream.read(reinterpret_cast<char*>(value), sizeof(T));
+			m_InputStream.read(reinterpret_cast<char*>(value), sizeof(T));
 		}
 
 		template<class T, class = typename std::enable_if <
@@ -59,12 +59,12 @@ namespace dive
 			return value;
 		}
 
-		void Read(std::string* value);
-		void Read(std::vector<std::string>* vec);
-		void Read(std::vector<unsigned char>* vec);
-		void Read(std::vector<std::byte>* vec);
-		void Read(std::vector<unsigned int>* vec);
-	//	void Read(std::vector<Vertex_PosTexNorTan>* vec);
+		void Read(std::string* pValue);
+		void Read(std::vector<std::string>* pVec);
+		void Read(std::vector<unsigned char>* pVec);
+		void Read(std::vector<std::byte>* pVec);
+		void Read(std::vector<unsigned int>* pVec);
+	//	void Read(std::vector<Vertex_PosTexNorTan>* pVec);
 
 
 		// 쓰기
@@ -82,7 +82,7 @@ namespace dive
 		>::type>
 		void Write(T value)
 		{
-			mOutputStream.write(reinterpret_cast<char*>(&value), sizeof(T));
+			m_OutputStream.write(reinterpret_cast<char*>(&value), sizeof(T));
 		}
 
 		void Write(const std::string& value);
@@ -93,9 +93,9 @@ namespace dive
 	//	void Write(const std::vector<Vertex_PosTexNorTan>& vec);
 
 	private:
-		std::ofstream mOutputStream;
-		std::ifstream mInputStream;
-		eFileStreamMode mStreamMode;
-		bool mbFileOpened;
+		std::ofstream m_OutputStream;
+		std::ifstream m_InputStream;
+		eFileStreamMode m_StreamMode;
+		bool m_bFileOpened;
 	};
 }

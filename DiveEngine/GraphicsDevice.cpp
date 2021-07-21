@@ -7,12 +7,12 @@ namespace dive
 	// 해당 매개변수를 저장하는게 낫다.
 	GraphicsDevice::GraphicsDevice(HWND hWnd, bool fullScreen, bool debugLayer)
 	{
-		mbFullScreen = fullScreen;
+		m_bFullScreen = fullScreen;
 
 		RECT rt;
 		GetClientRect(hWnd, &rt);
-		mResolutionWidth = static_cast<unsigned int>(rt.right - rt.left);
-		mResolutionHeight = static_cast<unsigned int>(rt.bottom - rt.top);
+		m_ResolutionWidth = static_cast<unsigned int>(rt.right - rt.left);
+		m_ResolutionHeight = static_cast<unsigned int>(rt.bottom - rt.top);
 
 		UINT deviceFlags = debugLayer ? D3D11_CREATE_DEVICE_DEBUG : 0;
 
@@ -32,11 +32,11 @@ namespace dive
 		DXGI_SWAP_CHAIN_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.OutputWindow					= hWnd;
-		desc.BufferDesc.Width				= mResolutionWidth;
-		desc.BufferDesc.Height				= mResolutionHeight;
+		desc.BufferDesc.Width				= m_ResolutionWidth;
+		desc.BufferDesc.Height				= m_ResolutionHeight;
 		desc.Windowed						= fullScreen ? FALSE : TRUE;
-		desc.BufferCount					= mBackBufferCount;
-		desc.BufferDesc.Format				= mFormat;
+		desc.BufferCount					= m_BackBufferCount;
+		desc.BufferDesc.Format				= m_Format;
 		desc.BufferDesc.RefreshRate.Numerator =  60;
 		desc.BufferDesc.RefreshRate.Denominator = 1;
 		//desc.BufferDesc.RefreshRate.Numerator = vSync ? refreshRateNumerator : 0;
@@ -60,10 +60,10 @@ namespace dive
 				static_cast<UINT>(featureLevels.size()),
 				D3D11_SDK_VERSION,
 				&desc,
-				&mSwapChain,
-				&mDevice,
+				&m_pSwapChain,
+				&m_pDevice,
 				nullptr,
-				&mImmediateContext);
+				&m_pImmediateContext);
 		};
 
 		auto result = createDeviceAndSwapChain();
@@ -90,18 +90,18 @@ namespace dive
 	//==========================================================================================//
 	void GraphicsDevice::PresentBegin()
 	{
-		//mImmediateContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), nullptr);
-		mImmediateContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
+		//m_pImmediateContext->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), nullptr);
+		m_pImmediateContext->OMSetRenderTargets(1, m_pRenderTargetView.GetAddressOf(), m_pDepthStencilView.Get());
 		
 		float clearColors[4] = { 0.25f, 0.25f, 0.25f, 1.0f };
-		mImmediateContext->ClearRenderTargetView(mRenderTargetView.Get(), clearColors);
-		mImmediateContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView.Get(), clearColors);
+		m_pImmediateContext->ClearDepthStencilView(m_pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 	
 	// 이건 어찌됐든 Renderer에서?
 	void GraphicsDevice::PresentEnd()
 	{
-		mSwapChain->Present(mbVSync ? 1 : 0, 0);
+		m_pSwapChain->Present(m_bVSync ? 1 : 0, 0);
 	}
 
 	//==========================================================================================//
@@ -111,27 +111,27 @@ namespace dive
 	//==========================================================================================//
 	void GraphicsDevice::ResizeBuffers(unsigned int width, unsigned int height)
 	{
-		if ((width != mResolutionWidth) || (height != mResolutionHeight))// && (width > 0) && (height > 0))
+		if ((width != m_ResolutionWidth) || (height != m_ResolutionHeight))// && (width > 0) && (height > 0))
 		{
-			//mImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
+			//m_pImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
 
-			mBackBuffer.Reset();
-			mRenderTargetView.Reset();
+			m_pBackBuffer.Reset();
+			m_pRenderTargetView.Reset();
 
-			HRESULT hr = mSwapChain->ResizeBuffers(mBackBufferCount, width, height, mFormat, 0);
+			HRESULT hr = m_pSwapChain->ResizeBuffers(m_BackBufferCount, width, height, m_Format, 0);
 			assert(SUCCEEDED(hr));
 
-			mResolutionWidth = width;
-			mResolutionHeight = height;
+			m_ResolutionWidth = width;
+			m_ResolutionHeight = height;
 
 			createBackbufferResources();
 
-			CORE_TRACE("Resize Resolution : {0:d} x {1:d}", mResolutionWidth, mResolutionHeight);
+			CORE_TRACE("Resize Resolution : {0:d} x {1:d}", m_ResolutionWidth, m_ResolutionHeight);
 
 			//===========================================================================================
 			// DepthStencilBuffer를 임시로 여기에서 제거한 후 호출
-			mDepthStencilBuffer.Reset();
-			mDepthStencilView.Reset();
+			m_pDepthStencilBuffer.Reset();
+			m_pDepthStencilView.Reset();
 
 			createDepthStencilView();
 			//============================================================================================
@@ -144,12 +144,12 @@ namespace dive
 	//==========================================================================================//
 	void GraphicsDevice::ResizeTarget(unsigned int width, unsigned int height)
 	{
-		if ((width != mResolutionWidth) || (height != mResolutionHeight) && (width > 0) && (height > 0))
+		if ((width != m_ResolutionWidth) || (height != m_ResolutionHeight) && (width > 0) && (height > 0))
 		{
 			DXGI_MODE_DESC desc;
 			desc.Width						= width;
 			desc.Height						= height;
-			desc.Format						= mFormat;
+			desc.Format						= m_Format;
 			desc.RefreshRate.Numerator		= 60;
 			desc.RefreshRate.Denominator	= 1;
 			desc.ScanlineOrdering			= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -157,13 +157,13 @@ namespace dive
 
 			CORE_TRACE("Resize Target : {0:d} x {1:d}", width, height);
 
-			mSwapChain->ResizeTarget(&desc);
+			m_pSwapChain->ResizeTarget(&desc);
 		}
 	}
 	
 	bool GraphicsDevice::IsInitialized() const
 	{
-		return (mDevice != nullptr && mImmediateContext != nullptr && mSwapChain != nullptr);
+		return (m_pDevice != nullptr && m_pImmediateContext != nullptr && m_pSwapChain != nullptr);
 	}
 
 	//==========================================================================================//
@@ -174,13 +174,13 @@ namespace dive
 	//==========================================================================================//
 	void GraphicsDevice::createBackbufferResources()
 	{
-		if (FAILED(mSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &mBackBuffer)))
+		if (FAILED(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &m_pBackBuffer)))
 		{
 			CORE_ERROR("BackBuffer 생성에 실패하였습니다.");
 			PostQuitMessage(0);
 		}
 
-		if (FAILED(mDevice->CreateRenderTargetView(mBackBuffer.Get(), nullptr, &mRenderTargetView)))
+		if (FAILED(m_pDevice->CreateRenderTargetView(m_pBackBuffer.Get(), nullptr, &m_pRenderTargetView)))
 		{
 			CORE_ERROR("RenderTargetView 생성에 실패하였습니다.");
 			PostQuitMessage(0);
@@ -208,7 +208,7 @@ namespace dive
 		texDesc.CPUAccessFlags = 0;
 		texDesc.MiscFlags = 0;
 
-		if (FAILED(mDevice->CreateTexture2D(&texDesc, nullptr, mDepthStencilBuffer.GetAddressOf())))
+		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, m_pDepthStencilBuffer.GetAddressOf())))
 		{
 			CORE_ERROR("DepthStencil TextureBuffer 생성 실패");
 			return;
@@ -220,7 +220,7 @@ namespace dive
 		viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		viewDesc.Texture2D.MipSlice = 0;
 
-		if (FAILED(mDevice->CreateDepthStencilView(mDepthStencilBuffer.Get(), &viewDesc, mDepthStencilView.GetAddressOf())))
+		if (FAILED(m_pDevice->CreateDepthStencilView(m_pDepthStencilBuffer.Get(), &viewDesc, m_pDepthStencilView.GetAddressOf())))
 		{
 			CORE_ERROR("DepthStencilView 생성 실패");
 		}

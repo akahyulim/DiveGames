@@ -3,11 +3,11 @@
 
 namespace editor
 {
-	Widget::Widget(Editor* editor)
+	Widget::Widget(Editor* pEditor)
 	{
-		assert(editor);
+		assert(pEditor);
 
-		m_Editor = editor;
+		m_pEditor = pEditor;
 
 		EVENT_SUBSCRIBE(dive::eEventType::SceneActivate, EVENT_HANDLE(OnSetActiveScene));
 	}
@@ -42,12 +42,12 @@ namespace editor
 			if (m_Alpha != -1.0f)
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, m_Alpha);
-				mVarPushes++;
+				m_VarPushs++;
 			}
 			if (m_Padding.x != -1.0f && m_Padding.y != -1.0f)
 			{
 				ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, m_Padding);
-				mVarPushes++;
+				m_VarPushs++;
 			}
 
 			// Style을 추가한 내용을 푸쉬하는 부분이다.
@@ -55,17 +55,17 @@ namespace editor
 
 			if (ImGui::Begin(m_Title.c_str(), &m_bVisible, m_Flags))
 			{
-				m_Window = ImGui::GetCurrentWindow();
+				m_pWindow = ImGui::GetCurrentWindow();
 				m_Height = ImGui::GetWindowHeight();
 
 				bBegun = true;
 			}
-			else if (m_Window && m_Window->Hidden)
+			else if (m_pWindow && m_pWindow->Hidden)
 			{
 				bBegun = true;
 			}
 
-			if (m_Window && m_Window->Appearing)
+			if (m_pWindow && m_pWindow->Appearing)
 			{
 				OnShow();
 			}
@@ -83,14 +83,14 @@ namespace editor
 			{
 				ImGui::End();
 
-				ImGui::PopStyleVar(mVarPushes);
-				mVarPushes = 0;
+				ImGui::PopStyleVar(m_VarPushs);
+				m_VarPushs = 0;
 			}
 		}
 	}
 
 	void Widget::OnSetActiveScene()
 	{
-		m_Scene = dive::SceneManager::GetInstance().GetActiveScene();
+		m_pScene = dive::SceneManager::GetInstance().GetActiveScene();
 	}
 }

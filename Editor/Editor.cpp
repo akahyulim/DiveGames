@@ -37,7 +37,7 @@ namespace editor
 		initialize_ImGui();
 
 		// RenderPath 적용
-		ActivatePath(&mRenderPathEditor);
+		ActivatePath(&m_RenderPathEditor);
 
 		APP_TRACE("Editor::Initialize()");
 
@@ -58,7 +58,7 @@ namespace editor
 			beginDockSpace();
 
 			// 이 곳에서 Widget을 그릴 것이다.
-			for (auto pWidget : mWidgets)
+			for (auto pWidget : m_Widgets)
 			{
 				pWidget->Tick();
 			}
@@ -79,9 +79,9 @@ namespace editor
 		// 에디터에서는 RenderPath3D를 수정해야 한다.
 		// Debug용 Render가 추가되고,
 		// Hierarchy이 다른 RenderTarget에 그려져야 하기 때문이다.
-		if (m_ActivePath)
+		if (m_pActivePath)
 		{
-			m_ActivePath->Render();
+			m_pActivePath->Render();
 		}
 
 		Compose();
@@ -133,11 +133,11 @@ namespace editor
 		ImGui_ImplDX11_Init(pDevice, pImmediateContext);
 
 		// Widget 생성
-		mWidgets.emplace_back(std::make_shared<MenuBar>(this));
-		mWidgets.emplace_back(std::make_shared<Hierarchy>(this));
-		mWidgets.emplace_back(std::make_shared<Scene>(this));
-		mWidgets.emplace_back(std::make_shared<Inspector>(this));
-		mWidgets.emplace_back(std::make_shared<Assets>(this));
+		m_Widgets.emplace_back(std::make_shared<MenuBar>(this));
+		m_Widgets.emplace_back(std::make_shared<Hierarchy>(this));
+		m_Widgets.emplace_back(std::make_shared<Scene>(this));
+		m_Widgets.emplace_back(std::make_shared<Inspector>(this));
+		m_Widgets.emplace_back(std::make_shared<Assets>(this));
 	}
 
 	void Editor::beginDockSpace()
@@ -153,10 +153,10 @@ namespace editor
 			ImGuiWindowFlags_NoNavFocus;
 
 		float offset_y = 8.0f;
-		const ImGuiViewport* viewport = ImGui::GetMainViewport();
-		ImGui::SetNextWindowPos(ImVec2(viewport->Pos.x, viewport->Pos.y + offset_y));
-		ImGui::SetNextWindowSize(ImVec2(viewport->Size.x, viewport->Size.y - offset_y));
-		ImGui::SetNextWindowViewport(viewport->ID);
+		const ImGuiViewport* pViewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(ImVec2(pViewport->Pos.x, pViewport->Pos.y + offset_y));
+		ImGui::SetNextWindowSize(ImVec2(pViewport->Size.x, pViewport->Size.y - offset_y));
+		ImGui::SetNextWindowViewport(pViewport->ID);
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -166,10 +166,10 @@ namespace editor
 		const char* dockSpaceName = "DiveEditor";
 
 		bool open = true;
-		mbDockSpace = ImGui::Begin(dockSpaceName, &open, window_flags);
+		m_bDockSpace = ImGui::Begin(dockSpaceName, &open, window_flags);
 		ImGui::PopStyleVar(3);
 
-		if (mbDockSpace)
+		if (m_bDockSpace)
 		{
 			const auto window_id = ImGui::GetID(dockSpaceName);
 			if (!ImGui::DockBuilderGetNode(window_id))
@@ -197,7 +197,7 @@ namespace editor
 	
 	void Editor::endDockSpace()
 	{
-		if(mbDockSpace)
+		if(m_bDockSpace)
 			ImGui::End();
 	}
 

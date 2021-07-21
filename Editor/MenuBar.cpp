@@ -6,8 +6,8 @@
 
 namespace editor
 {
-	MenuBar::MenuBar(Editor* editor)
-		: Widget(editor)
+	MenuBar::MenuBar(Editor* pEditor)
+		: Widget(pEditor)
 	{
 		m_Title = "MenuBar";
 		m_bWindow = false;
@@ -24,9 +24,9 @@ namespace editor
 			{
 				if (ImGui::MenuItem("New Scene"))
 				{
-					if (m_Scene)
+					if (m_pScene)
 					{
-						if (m_Scene->IsDirty())
+						if (m_pScene->IsDirty())
 						{
 							// 팝업창을 띄워 Dirty면 변경점을 저장할 것인지 묻는다.
 						}
@@ -40,9 +40,9 @@ namespace editor
 				if (ImGui::MenuItem("Open Scene"))
 				{
 					//if (dive::Scene::GetGlobalScene().IsDirty())
-					if (m_Scene)
+					if (m_pScene)
 					{
-						if(m_Scene->IsDirty())
+						if(m_pScene->IsDirty())
 						{
 						// 팝업
 						// 기존 Scene에 변경 사항이 존재합니다. 저장하시겠습니까?
@@ -63,9 +63,9 @@ namespace editor
 					// 동일한 이름의 파일이 있는지 확인한다.
 					// 만약 있다면 덮어씌울 것인지 물어야 한다.
 					{
-						std::string filepath = "../Assets/Scenes/" + m_Scene->GetName() + ".scene";
+						std::string filepath = "../Assets/Scenes/" + m_pScene->GetName() + ".scene";
 						//dive::Scene::GetGlobalScene().SaveToFile(filepath);
-						m_Scene->SaveToFile(filepath);
+						m_pScene->SaveToFile(filepath);
 
 						APP_TRACE("현재 Scene과 Asset을 파일로 저장하였습니다.");
 					}
@@ -102,13 +102,13 @@ namespace editor
 				{
 					// 일단은 Scene의 변경사항 여부만 확인한다.
 					//if (dive::Scene::GetGlobalScene().IsDirty())
-					if(m_Scene->IsDirty())
+					if(m_pScene->IsDirty())
 					{
 
 					}
 					// 하지만 추후 Project의 변경사항까지 확인해야 한다.
 
-					DestroyWindow(m_Editor->GetWindowHandle());
+					DestroyWindow(m_pEditor->GetWindowHandle());
 				}
 
 				ImGui::EndMenu();
@@ -120,7 +120,7 @@ namespace editor
 			{
 				if (ImGui::MenuItem("Create Empty"))
 				{
-					m_Scene->CreateGameObject();
+					m_pScene->CreateGameObject();
 				}
 
 				if (ImGui::BeginMenu("3D Object"))
@@ -131,20 +131,20 @@ namespace editor
 
 					if (ImGui::MenuItem("Quad"))
 					{
-						auto gameObject = m_Scene->CreateGameObject();
-						auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
+						auto pGameObject = m_pScene->CreateGameObject();
+						auto meshRenderer = pGameObject->AddComponent<dive::MeshRenderer>();
 						meshRenderer->CreateDefaultMesh(dive::eDefaultMeshType::Quad);
-						gameObject->SetName("Quad");
+						pGameObject->SetName("Quad");
 					}
 
 					ImGui::Separator();
 
 					if (ImGui::MenuItem("Cube"))
 					{
-						auto gameObject = m_Scene->CreateGameObject();
-						auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
+						auto pGameObject = m_pScene->CreateGameObject();
+						auto meshRenderer = pGameObject->AddComponent<dive::MeshRenderer>();
 						meshRenderer->CreateDefaultMesh(dive::eDefaultMeshType::Cube);
-						gameObject->SetName("Cube");
+						pGameObject->SetName("Cube");
 					}
 
 					if (ImGui::MenuItem("Plane"))
@@ -185,9 +185,9 @@ namespace editor
 
 				if (ImGui::MenuItem("Camera"))
 				{
-					auto gameObject = m_Scene->CreateGameObject();
-					gameObject->SetName("Camera");
-					gameObject->AddComponent<dive::Camera>();
+					auto pGameObject = m_pScene->CreateGameObject();
+					pGameObject->SetName("Camera");
+					pGameObject->AddComponent<dive::Camera>();
 				}
 
 				ImGui::EndMenu();

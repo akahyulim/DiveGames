@@ -27,12 +27,12 @@ namespace editor
 
 
 	private:
-		std::vector<std::shared_ptr<Widget>> mWidgets;
+		std::vector<std::shared_ptr<Widget>> m_Widgets;
 
-		bool mbDockSpace;
+		bool m_bDockSpace;
 
-		bool mbShowProjectDialog;
+		bool m_bShowProjectDialog;
 
-		RenderPathEditor mRenderPathEditor;
+		RenderPathEditor m_RenderPathEditor;
 	};
 }

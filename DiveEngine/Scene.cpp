@@ -184,14 +184,14 @@ namespace dive
 	}
 
 	// 전달받은 대상의 자식들까지 모두 제거 대상
-	void Scene::RemoveGameObject(GameObject* gameObject)
+	void Scene::RemoveGameObject(GameObject* pGameObjct)
 	{
-		if (!gameObject)
+		if (!pGameObjct)
 			return;
 
-		gameObject->MarkForDestruction();
+		pGameObjct->MarkForDestruction();
 
-		auto transform = gameObject->GetTransform();
+		auto transform = pGameObjct->GetTransform();
 		assert(transform);
 
 		auto children = transform->GetChildren();
@@ -221,17 +221,17 @@ namespace dive
 		return rootGameObjects;
 	}
 
-	void Scene::eraseGameObject(GameObject* gameObject)
+	void Scene::eraseGameObject(GameObject* pGameObjct)
 	{
-		if (!gameObject)
+		if (!pGameObjct)
 			return;
 
-		gameObject->GetTransform()->SetParent(nullptr);
-		gameObject->GetTransform()->DetachChildren();
+		pGameObjct->GetTransform()->SetParent(nullptr);
+		pGameObjct->GetTransform()->DetachChildren();
 
 		for (auto it = m_GameObjects.begin(); it != m_GameObjects.end();)
 		{
-			if ((*it)->GetInstanceID() == gameObject->GetInstanceID())
+			if ((*it)->GetInstanceID() == pGameObjct->GetInstanceID())
 			{
 				delete (*it);
 				(*it) = nullptr;

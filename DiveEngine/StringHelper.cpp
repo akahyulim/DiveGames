@@ -12,40 +12,40 @@ namespace dive
 {
 	namespace StringHelper
 	{
-		std::string ToUppercase(const char * lowerStr)
+		std::string ToUppercase(const char * pLowerStr)
 		{
-			const int size = static_cast<int>(strlen(lowerStr));
+			const int size = static_cast<int>(strlen(pLowerStr));
 
-			std::string upperStr;
-			upperStr.reserve(size);
+			std::string pUpperStr;
+			pUpperStr.reserve(size);
 
 			for (int i = 0; i != size; i++)
 			{
-				if (lowerStr[i] >= 'a' && lowerStr[i] <= 'z')
-					upperStr.push_back(lowerStr[i] - ('a' - 'A'));
+				if (pLowerStr[i] >= 'a' && pLowerStr[i] <= 'z')
+					pUpperStr.push_back(pLowerStr[i] - ('a' - 'A'));
 				else
-					upperStr.push_back(lowerStr[i]);
+					pUpperStr.push_back(pLowerStr[i]);
 			}
 
-			return upperStr;
+			return pUpperStr;
 		}
 
-		std::string ToLowercase(const char * upperStr)
+		std::string ToLowercase(const char * pUpperStr)
 		{
-			const int size = static_cast<int>(strlen(upperStr));
+			const int size = static_cast<int>(strlen(pUpperStr));
 
-			std::string lowerStr;
-			lowerStr.reserve(size);
+			std::string pLowerStr;
+			pLowerStr.reserve(size);
 
 			for (int i = 0; i != size; i++)
 			{
-				if (upperStr[i] >= 'A' && upperStr[i] <= 'Z')
-					lowerStr.push_back(upperStr[i] + ('a' - 'A'));
+				if (pUpperStr[i] >= 'A' && pUpperStr[i] <= 'Z')
+					pLowerStr.push_back(pUpperStr[i] + ('a' - 'A'));
 				else
-					lowerStr.push_back(upperStr[i]);
+					pLowerStr.push_back(pUpperStr[i]);
 			}
 
-			return lowerStr;
+			return pLowerStr;
 		}
 
 		std::string ToUppercase(const std::string & lowerStr)
@@ -76,24 +76,24 @@ namespace dive
 		// 주의: 최초 토큰에서 문자열 끝까지 리턴합니다.
 		// ex) "Our love is great" "love" => "love is great"
 		// ---------------------------------------------------------------------------------------------------------
-		std::string GetStringAfterToken(const char * str, const char * token)
+		std::string GetStringAfterToken(const char * pStr, const char * pToken)
 		{
-			const int tokenSize = static_cast<int>(strlen(token));
+			const int tokenSize = static_cast<int>(strlen(pToken));
 			char cmpStr[256] = { 0, };
 			std::string afterStr;
 
-			while (*str != '\0')
+			while (*pStr != '\0')
 			{
-				if (*str == *token)
+				if (*pStr == *pToken)
 				{
 					memset(cmpStr, 0, sizeof(cmpStr));
-					memcpy(cmpStr, str, tokenSize);
+					memcpy(cmpStr, pStr, tokenSize);
 
-					if (0 == strcmp(cmpStr, token))
-						afterStr = str;
+					if (0 == strcmp(cmpStr, pToken))
+						afterStr = pStr;
 				}
 
-				str++;
+				pStr++;
 			}
 
 			return afterStr;
@@ -103,10 +103,10 @@ namespace dive
 		// 주의: FirstToken, SecondToken 둘 다 처음 검색된 동일 토큰을 기준으로 작동합니다.
 		// ex) "Next Song: Plastic Love. Next Song: Plastic Love. " "Song: " " Next" => "Plastic Love."
 		// ---------------------------------------------------------------------------------------------------------
-		std::string GetStringBetweenTokens(const char * str, const char * firstToken, const char * secondToken)
+		std::string GetStringBetweenTokens(const char * pStr, const char * pFirstToken, const char * pSecondToken)
 		{
-			const int firstTokenSize = static_cast<int>(strlen(firstToken));
-			const int secondTokenSize = static_cast<int>(strlen(secondToken));
+			const int firstTokenSize = static_cast<int>(strlen(pFirstToken));
+			const int secondTokenSize = static_cast<int>(strlen(pSecondToken));
 
 			char cmpStr[256] = { 0, };
 
@@ -114,32 +114,32 @@ namespace dive
 
 			std::string betweenStr;
 
-			while (*str != '\0')
+			while (*pStr != '\0')
 			{
-				if (*str == *firstToken)
+				if (*pStr == *pFirstToken)
 				{
 					if (!isFoundFirstToken)
 					{
 						memset(cmpStr, 0, sizeof(cmpStr));
-						memcpy(cmpStr, str, firstTokenSize);
+						memcpy(cmpStr, pStr, firstTokenSize);
 
-						if (0 == strcmp(cmpStr, firstToken))
+						if (0 == strcmp(cmpStr, pFirstToken))
 						{
 							isFoundFirstToken = true;
-							str += firstTokenSize;
+							pStr += firstTokenSize;
 						}
 					}
 				}
 
 				// 첫 번째 토큰 후 바로 위치할 수 있다.
-				if (*str == *secondToken)
+				if (*pStr == *pSecondToken)
 				{
 					if (isFoundFirstToken)
 					{
 						memset(cmpStr, 0, sizeof(cmpStr));
-						memcpy(cmpStr, str, secondTokenSize);
+						memcpy(cmpStr, pStr, secondTokenSize);
 
-						if (0 == strcmp(cmpStr, secondToken))
+						if (0 == strcmp(cmpStr, pSecondToken))
 						{
 							if (betweenStr.empty())
 							{
@@ -152,39 +152,39 @@ namespace dive
 				}
 
 				if (isFoundFirstToken)
-					betweenStr += *str;
+					betweenStr += *pStr;
 
-				str++;
+				pStr++;
 			}
 
 			return betweenStr;
 		}
 
-		std::string ReplaceToken(const char * str, const char * token, const char * newToken)
+		std::string ReplaceToken(const char * pStr, const char * pToken, const char * pNewToken)
 		{
-			const int tokenSize = static_cast<int>(strlen(token));
+			const int tokenSize = static_cast<int>(strlen(pToken));
 			char cmpStr[256] = { 0, };
 			std::string fixedStr;
 
-			while (*str != '\0')
+			while (*pStr != '\0')
 			{
-				if (*str == *token)
+				if (*pStr == *pToken)
 				{
 					memset(cmpStr, 0, sizeof(cmpStr));
-					memcpy(cmpStr, str, tokenSize);
+					memcpy(cmpStr, pStr, tokenSize);
 
-					if (0 == strcmp(cmpStr, token))
+					if (0 == strcmp(cmpStr, pToken))
 					{
-						fixedStr += newToken;
-						str += tokenSize - 1;
+						fixedStr += pNewToken;
+						pStr += tokenSize - 1;
 					}
 					else
-						fixedStr += *str;
+						fixedStr += *pStr;
 				}
 				else
-					fixedStr += *str;
+					fixedStr += *pStr;
 
-				str++;
+				pStr++;
 			}
 
 			return fixedStr;

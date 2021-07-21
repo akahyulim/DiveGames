@@ -3,8 +3,8 @@
 
 namespace dive
 {
-	Camera::Camera(GameObject* gameObject)
-		: Component(typeid(Camera).hash_code(), gameObject)
+	Camera::Camera(GameObject* pGameObject)
+		: Component(typeid(Camera).hash_code(), pGameObject)
 	{
 	}
 	

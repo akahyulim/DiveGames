@@ -13,7 +13,7 @@ namespace dive
 
 	SceneManager::~SceneManager()
 	{
-		m_ActiveScene = nullptr;
+		m_pActiveScene = nullptr;
 
 		// 여기에서 문제점은 LoadedScene이 여러개일 필요가 있냐는 거다.
 		// swap용이 필요하다해도 3개 이상일 필요는 없잖아?
@@ -52,13 +52,13 @@ namespace dive
 	// Load되지 않은 Scene은 사용할 수 없다.	//
 	// 여러모로 생각할 게 많다.					//
 	//==========================================//
-	bool SceneManager::SetActiveScene(Scene* scene)
+	bool SceneManager::SetActiveScene(Scene* pScene)
 	{
-		assert(scene && "INVALID_PARAMETER");
+		assert(pScene && "INVALID_PARAMETER");
 		
-		if (scene->IsLoaded())
+		if (pScene->IsLoaded())
 		{
-			m_ActiveScene = scene;
+			m_pActiveScene = pScene;
 
 			EVENT_FIRE(eEventType::SceneActivate);
 
@@ -89,7 +89,7 @@ namespace dive
 			if (!newScene)
 				return nullptr;
 
-			m_ActiveScene = newScene;
+			m_pActiveScene = newScene;
 
 			EVENT_FIRE(eEventType::SceneActivate);
 

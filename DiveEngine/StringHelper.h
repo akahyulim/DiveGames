@@ -20,14 +20,14 @@ namespace dive
 	namespace StringHelper
 	{
 		// MBCS
-		std::string ToUppercase(const char* lowerStr);
-		std::string ToLowercase(const char* upperStr);
+		std::string ToUppercase(const char* pLowerStr);
+		std::string ToLowercase(const char* pUpperStr);
 		std::string ToUppercase(const std::string& lowerStr);
 		std::string ToLowercase(const std::string& upperStr);
 
-		std::string GetStringAfterToken(const char* str, const char* token);
-		std::string GetStringBetweenTokens(const char* str, const char* firstToken, const char* secondToken);
-		std::string ReplaceToken(const char* str, const char* token, const char* newToken);
+		std::string GetStringAfterToken(const char* pStr, const char* pToken);
+		std::string GetStringBetweenTokens(const char* pStr, const char* pFirstToken, const char* pSecondToken);
+		std::string ReplaceToken(const char* pStr, const char* pToken, const char* pNewToken);
 
 		// UNICODE
 		std::wstring MbcsToWbcs(const std::string str, unsigned int mbcsEncoding = CP_ACP);

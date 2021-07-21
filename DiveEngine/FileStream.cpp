@@ -5,34 +5,34 @@
 namespace dive
 {
 	FileStream::FileStream(const std::string & filepath, eFileStreamMode mode)
-		: mbFileOpened(false),
-		mStreamMode(mode)
+		: m_bFileOpened(false),
+		m_StreamMode(mode)
 	{
 		int iosFlags = std::ios::binary;
-		iosFlags |= mStreamMode == eFileStreamMode::Read ? std::ios::in : 0;
-		iosFlags |= mStreamMode == eFileStreamMode::Write ? std::ios::out : 0;
-		iosFlags |= mStreamMode == eFileStreamMode::Append ? std::ios::app : 0;
+		iosFlags |= m_StreamMode == eFileStreamMode::Read ? std::ios::in : 0;
+		iosFlags |= m_StreamMode == eFileStreamMode::Write ? std::ios::out : 0;
+		iosFlags |= m_StreamMode == eFileStreamMode::Append ? std::ios::app : 0;
 
-		if (mStreamMode == eFileStreamMode::Write || mStreamMode == eFileStreamMode::Append)
+		if (m_StreamMode == eFileStreamMode::Write || m_StreamMode == eFileStreamMode::Append)
 		{
-			mOutputStream.open(filepath, iosFlags);
-			if (mOutputStream.fail())
+			m_OutputStream.open(filepath, iosFlags);
+			if (m_OutputStream.fail())
 			{
 				CORE_ERROR("");
 				return;
 			}
 		}
-		else if (mStreamMode == eFileStreamMode::Read)
+		else if (m_StreamMode == eFileStreamMode::Read)
 		{
-			mInputStream.open(filepath, iosFlags);
-			if (mInputStream.fail())
+			m_InputStream.open(filepath, iosFlags);
+			if (m_InputStream.fail())
 			{
 				CORE_ERROR("");
 				return;
 			}
 		}
 
-		mbFileOpened = true;
+		m_bFileOpened = true;
 	}
 
 	FileStream::~FileStream()
@@ -42,116 +42,116 @@ namespace dive
 
 	void FileStream::Close()
 	{
-		if (mStreamMode == eFileStreamMode::Write || mStreamMode == eFileStreamMode::Append)
+		if (m_StreamMode == eFileStreamMode::Write || m_StreamMode == eFileStreamMode::Append)
 		{
-			mOutputStream.flush();
-			mOutputStream.close();
+			m_OutputStream.flush();
+			m_OutputStream.close();
 		}
-		else if (mStreamMode == eFileStreamMode::Read)
+		else if (m_StreamMode == eFileStreamMode::Read)
 		{
-			mInputStream.clear();
-			mInputStream.close();
+			m_InputStream.clear();
+			m_InputStream.close();
 		}
 	}
 
 	// 1. capacity가 0으로 초기화되지 않고 있다.
 	// 2. value->c_str()로 읽어오기 때문에 크기를 할당해야 한다.
 	// 즉, resize가 필수이다.
-	void FileStream::Read(std::string * value)
+	void FileStream::Read(std::string * pValue)
 	{
-		if (!value)
+		if (!pValue)
 			return;
 		
-		value->clear();
-		value->shrink_to_fit();
+		pValue->clear();
+		pValue->shrink_to_fit();
 
 		unsigned int length = 0;
 		Read(&length);
 
-		value->resize(length);
+		pValue->resize(length);
 
-		mInputStream.read(const_cast<char*>(value->c_str()), length);
+		m_InputStream.read(const_cast<char*>(pValue->c_str()), length);
 	}
 
-	void FileStream::Read(std::vector<std::string>* vec)
+	void FileStream::Read(std::vector<std::string>* pVec)
 	{
-		if (!vec)
+		if (!pVec)
 			return;
 
-		vec->clear();
-		vec->shrink_to_fit();
+		pVec->clear();
+		pVec->shrink_to_fit();
 
 		unsigned int length = 0;
 		Read(&length);
 
-		vec->resize(length);
+		pVec->resize(length);
 
 		std::string str;
 		for (unsigned int i = 0; i != length; i++)
 		{
 			Read(&str);
-			vec->emplace_back(str);
+			pVec->emplace_back(str);
 		}
 	}
 
-	void FileStream::Read(std::vector<unsigned char>* vec)
+	void FileStream::Read(std::vector<unsigned char>* pVec)
 	{
-		if (!vec)
+		if (!pVec)
 			return;
 
-		vec->clear();
-		vec->shrink_to_fit();
+		pVec->clear();
+		pVec->shrink_to_fit();
 
 		auto length = ReadAs<unsigned int>();
 
-		vec->resize(length);
+		pVec->resize(length);
 
-		mInputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(unsigned char) * length);
+		m_InputStream.read(reinterpret_cast<char*>(pVec->data()), sizeof(unsigned char) * length);
 	}
 
-	void FileStream::Read(std::vector<std::byte>* vec)
+	void FileStream::Read(std::vector<std::byte>* pVec)
 	{
-		if (!vec)
+		if (!pVec)
 			return;
 
-		vec->clear();
-		vec->shrink_to_fit();
+		pVec->clear();
+		pVec->shrink_to_fit();
 
 		auto length = ReadAs<unsigned int>();
 
-		vec->resize(length);
+		pVec->resize(length);
 
-		mInputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(std::byte) * length);
+		m_InputStream.read(reinterpret_cast<char*>(pVec->data()), sizeof(std::byte) * length);
 	}
 
-	void FileStream::Read(std::vector<unsigned int>* vec)
+	void FileStream::Read(std::vector<unsigned int>* pVec)
 	{
-		if (!vec)
+		if (!pVec)
 			return;
 
-		vec->clear();
-		vec->shrink_to_fit();
+		pVec->clear();
+		pVec->shrink_to_fit();
 
 		auto length = ReadAs<unsigned int>();
 
-		vec->resize(length);
+		pVec->resize(length);
 
-		mInputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(unsigned int) * length);
+		m_InputStream.read(reinterpret_cast<char*>(pVec->data()), sizeof(unsigned int) * length);
 	}
 	/*
-	void FileStream::Read(std::vector<Vertex_PosTexNorTan>* vec)
+	void FileStream::Read(std::vector<Vertex_PosTexNorTan>* pVec)
 	{
-		if (!vec)
+		if (!pVec)
 			return;
 
-		vec->clear();
-		vec->shrink_to_fit();
+		pVec->clear();
+		pVec->shrink_to_fit();
 
 		auto length = ReadAs<unsigned int>();
 
-		vec->resize(length);
+		pVec->resize(length);
 
-		mInputStream.read(reinterpret_cast<char*>(vec->data()), sizeof(Vertex_PosTexNorTan) * length);
+		m_InputStream.read(reinterpret_cast<char*>(pVec->data()), sizeof(Vertex_PosTexNorTan) * length);
 	}
 	*/
 	void FileStream::Write(const std::string & value)
@@ -159,7 +159,7 @@ namespace dive
 		auto length = static_cast<unsigned int>(value.length());
 		Write(length);
 
-		mOutputStream.write(value.c_str(), length);
+		m_OutputStream.write(value.c_str(), length);
 	}
 
 	void FileStream::Write(const std::vector<std::string>& vec)
@@ -178,7 +178,7 @@ namespace dive
 		auto size = static_cast<unsigned int>(vec.size());
 		Write(size);
 
-		mOutputStream.write(reinterpret_cast<const char*>(&vec[0]), sizeof(unsigned char) * size);
+		m_OutputStream.write(reinterpret_cast<const char*>(&vec[0]), sizeof(unsigned char) * size);
 	}
 
 	void FileStream::Write(const std::vector<std::byte>& vec)
@@ -186,7 +186,7 @@ namespace dive
 		auto size = static_cast<unsigned int>(vec.size());
 		Write(size);
 
-		mOutputStream.write(reinterpret_cast<const char*>(&vec[0]), sizeof(std::byte) * size);
+		m_OutputStream.write(reinterpret_cast<const char*>(&vec[0]), sizeof(std::byte) * size);
 	}
 
 	void FileStream::Write(const std::vector<unsigned int>& vec)
@@ -194,7 +194,7 @@ namespace dive
 		auto size = static_cast<unsigned int>(vec.size());
 		Write(size);
 
-		mOutputStream.write(reinterpret_cast<const char*>(&vec[0]), sizeof(unsigned int) * size);
+		m_OutputStream.write(reinterpret_cast<const char*>(&vec[0]), sizeof(unsigned int) * size);
 	}
 
 	/*
@@ -203,7 +203,7 @@ namespace dive
 		auto size = static_cast<unsigned int>(vec.size());
 		Write(size);
 
-		mOutputStream.write(reinterpret_cast<const char*>(&vec[0]), sizeof(Vertex_PosTexNorTan) * size);
+		m_OutputStream.write(reinterpret_cast<const char*>(&vec[0]), sizeof(Vertex_PosTexNorTan) * size);
 	}
 	*/
 }

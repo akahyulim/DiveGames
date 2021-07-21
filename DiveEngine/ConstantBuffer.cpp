@@ -5,16 +5,16 @@
 
 namespace dive
 {
-	ConstantBuffer::ConstantBuffer(GraphicsDevice* graphicsDevice, const std::string& name)
+	ConstantBuffer::ConstantBuffer(GraphicsDevice* pGraphicsDevice, const std::string& name)
 		: Object(typeid(ConstantBuffer).hash_code()),
-		mGraphicsDevice(graphicsDevice),
-		mBuffer(nullptr),
-		mName(name),
-		mOffsetCount(0),
-		mStride(0),
-		mSizeGPU(0)
+		m_pGraphicsDevice(pGraphicsDevice),
+		m_pBuffer(nullptr),
+		m_Name(name),
+		m_OffsetCount(0),
+		m_Stride(0),
+		m_SizeGPU(0)
 	{
-		assert(graphicsDevice->IsInitialized());
+		assert(pGraphicsDevice->IsInitialized());
 	}
 
 	ConstantBuffer::~ConstantBuffer()
@@ -24,14 +24,14 @@ namespace dive
 
 	void* ConstantBuffer::Map()
 	{
-		if (mBuffer == nullptr)
+		if (m_pBuffer == nullptr)
 		{
 			CORE_ERROR("");
 			return nullptr;
 		}
 
 		D3D11_MAPPED_SUBRESOURCE mappedSubresource;
-		if (FAILED(mGraphicsDevice->GetImmediateContext()->Map(mBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource)))
+		if (FAILED(m_pGraphicsDevice->GetImmediateContext()->Map(m_pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedSubresource)))
 		{
 			CORE_ERROR("");
 			return nullptr;
@@ -42,13 +42,13 @@ namespace dive
 	
 	bool ConstantBuffer::Unmap()
 	{
-		if (mBuffer == nullptr)
+		if (m_pBuffer == nullptr)
 		{
 			CORE_ERROR("");
 			return false;
 		}
 
-		mGraphicsDevice->GetImmediateContext()->Unmap(mBuffer, 0);
+		m_pGraphicsDevice->GetImmediateContext()->Unmap(m_pBuffer, 0);
 		return true;
 	}
 	
@@ -61,11 +61,11 @@ namespace dive
 		desc.Usage					= D3D11_USAGE_DYNAMIC;
 		desc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
 		desc.CPUAccessFlags			= D3D11_CPU_ACCESS_WRITE;
-		desc.ByteWidth				= static_cast<UINT>(mStride);
+		desc.ByteWidth				= static_cast<UINT>(m_Stride);
 		desc.MiscFlags				= 0;
 		desc.StructureByteStride	= 0;
 
-		if (FAILED(mGraphicsDevice->GetDevice()->CreateBuffer(&desc, nullptr, &mBuffer)))
+		if (FAILED(m_pGraphicsDevice->GetDevice()->CreateBuffer(&desc, nullptr, &m_pBuffer)))
 		{
 			CORE_ERROR("");
 			return false;
@@ -76,10 +76,10 @@ namespace dive
 	
 	void ConstantBuffer::destroy()
 	{
-		if (mBuffer)
+		if (m_pBuffer)
 		{
-			mBuffer->Release();
-			mBuffer = nullptr;
+			m_pBuffer->Release();
+			m_pBuffer = nullptr;
 		}
 	}
 }

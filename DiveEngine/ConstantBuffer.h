@@ -10,15 +10,15 @@ namespace dive
 	class ConstantBuffer : public Object
 	{
 	public:
-		ConstantBuffer(GraphicsDevice* graphicsDevice, const std::string& name);
+		ConstantBuffer(GraphicsDevice* pGraphicsDevice, const std::string& name);
 		~ConstantBuffer();
 
 		template<typename T>
 		bool Create(unsigned int offsetCount = 1)
 		{
-			mOffsetCount = offsetCount;
-			mStride = static_cast<uint32_t>(sizeof(T));
-			mSizeGPU = static_cast<uint64_t>(mStride * mOffsetCount);
+			m_OffsetCount = offsetCount;
+			m_Stride = static_cast<uint32_t>(sizeof(T));
+			m_SizeGPU = static_cast<uint64_t>(m_Stride * m_OffsetCount);
 
 			return create();
 		}
@@ -26,21 +26,21 @@ namespace dive
 		void* Map();
 		bool Unmap();
 
-		ID3D11Buffer* GetBuffer() const { return mBuffer; }
+		ID3D11Buffer* GetBuffer() const { return m_pBuffer; }
 
 	private:
 		bool create();
 		void destroy();
 
 	private:
-		GraphicsDevice* mGraphicsDevice;
-		ID3D11Buffer* mBuffer;
+		GraphicsDevice* m_pGraphicsDevice;
+		ID3D11Buffer* m_pBuffer;
 
-		std::string mName;
+		std::string m_Name;
 
 		// 왠지 얘네는 필요없을 것 같다.
-		uint32_t mOffsetCount;
-		uint32_t mStride;
-		uint64_t mSizeGPU;
+		uint32_t m_OffsetCount;
+		uint32_t m_Stride;
+		uint64_t m_SizeGPU;
 	};
 }

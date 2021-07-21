@@ -8,20 +8,20 @@ namespace dive
 	// map / unmap 역시 함수화하는게 맞는가?
 	Texture::Texture(unsigned int width, unsigned int height)
 	{
-		auto device = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
-		assert(device != nullptr);
+		auto pDevice = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
+		assert(pDevice != nullptr);
 
 		// 크기 확인 필요
-		mWidth = width;
-		mHeight = height;
-		mFormat = DXGI_FORMAT_R8_UNORM;//DXGI_FORMAT_R8G8B8A8_UNORM;	// 사실 4채널이 필요없다.
+		m_Width = width;
+		m_Height = height;
+		m_Format = DXGI_FORMAT_R8_UNORM;//DXGI_FORMAT_R8G8B8A8_UNORM;	// 사실 4채널이 필요없다.
 
 		{
 			D3D11_TEXTURE2D_DESC desc;
 			ZeroMemory(&desc, sizeof(desc));	// 의외로 중요하다.
-			desc.Format = mFormat;
-			desc.Width = mWidth;
-			desc.Height = mHeight;
+			desc.Format = m_Format;
+			desc.Width = m_Width;
+			desc.Height = m_Height;
 			desc.MipLevels = 1;
 			desc.ArraySize = 1;
 			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
@@ -29,7 +29,7 @@ namespace dive
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 			desc.SampleDesc.Count = 1;
 
-			auto hr = device->CreateTexture2D(&desc, nullptr, mTexture2D.GetAddressOf());
+			auto hr = pDevice->CreateTexture2D(&desc, nullptr, m_pTexture2D.GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 
@@ -37,12 +37,12 @@ namespace dive
 		{
 			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
 			ZeroMemory(&desc, sizeof(desc));
-			desc.Format = mFormat;
+			desc.Format = m_Format;
 			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 			desc.Texture2D.MipLevels = 1;
 			desc.Texture2D.MostDetailedMip = 0;
 
-			auto hr = device->CreateShaderResourceView(mTexture2D.Get(), &desc, mShaderResourceView.GetAddressOf());
+			auto hr = pDevice->CreateShaderResourceView(m_pTexture2D.Get(), &desc, m_pShaderResourceView.GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 	}
@@ -69,14 +69,14 @@ namespace dive
 			hr = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), TEX_FILTER_DEFAULT, 0, mipChain);
 			assert(SUCCEEDED(hr));
 
-			hr = DirectX::CreateShaderResourceView(pDevice, mipChain.GetImages(), mipChain.GetImageCount(), mipChain.GetMetadata(), mShaderResourceView.GetAddressOf());
+			hr = DirectX::CreateShaderResourceView(pDevice, mipChain.GetImages(), mipChain.GetImageCount(), mipChain.GetMetadata(), m_pShaderResourceView.GetAddressOf());
 			assert(SUCCEEDED(hr));
 
 			setMetaData(mipChain.GetMetadata());
 		}
 		else
 		{
-			hr = DirectX::CreateShaderResourceView(pDevice, image.GetImages(), image.GetImageCount(), image.GetMetadata(), mShaderResourceView.GetAddressOf());
+			hr = DirectX::CreateShaderResourceView(pDevice, image.GetImages(), image.GetImageCount(), image.GetMetadata(), m_pShaderResourceView.GetAddressOf());
 			assert(SUCCEEDED(hr));
 
 			setMetaData(image.GetMetadata());
@@ -90,34 +90,34 @@ namespace dive
 		assert(width > 0);
 		assert(height > 0);
 
-		mWidth		= width;
-		mHeight	= height;
-		mFormat	= format;	// DepthStencilView는 문제가 발생할 수 있다.
-		mName		= name;
+		m_Width		= width;
+		m_Height	= height;
+		m_Format	= format;	// DepthStencilView는 문제가 발생할 수 있다.
+		m_Name		= name;
 
-		auto device = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
-		assert(device != nullptr);
+		auto pDevice = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
+		assert(pDevice != nullptr);
 
 		// format에 맞춰 RTV, DSV 생성
 		// RTV
 		{
-			createTexture2D(device, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
-			createShaderResourceView(device);
-			createRenderTargetView(device);
+			createTexture2D(pDevice, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
+			createShaderResourceView(pDevice);
+			createRenderTargetView(pDevice);
 		}
 
 		// DSV는 다음에 구현하자. Format이 복잡하고, 책에서는 다른 식으로 구현한 것 같다.
 	}
 
-	bool Texture::createTexture2D(ID3D11Device* device, unsigned flags)
+	bool Texture::createTexture2D(ID3D11Device* pDevice, unsigned flags)
 	{
-		assert(device != nullptr);
+		assert(pDevice != nullptr);
 
 		D3D11_TEXTURE2D_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.Format				= mFormat;
-		desc.Width				= mWidth;
-		desc.Height				= mHeight;
+		desc.Format				= m_Format;
+		desc.Width				= m_Width;
+		desc.Height				= m_Height;
 		desc.BindFlags			= flags;
 		desc.ArraySize			= 1;
 		desc.Usage				= D3D11_USAGE_DEFAULT;	
@@ -127,41 +127,41 @@ namespace dive
 		desc.SampleDesc.Quality = 0;
 		desc.MiscFlags			= 0;	// 이것도 인자로 받아야 할듯?
 
-		auto hr = device->CreateTexture2D(&desc, nullptr, mTexture2D.GetAddressOf());
+		auto hr = pDevice->CreateTexture2D(&desc, nullptr, m_pTexture2D.GetAddressOf());
 		assert(SUCCEEDED(hr));
 
 		return true;
 	}
 
-	bool Texture::createShaderResourceView(ID3D11Device* device)
+	bool Texture::createShaderResourceView(ID3D11Device* pDevice)
 	{
-		assert(device != nullptr);
-		assert(mTexture2D != nullptr);
+		assert(pDevice != nullptr);
+		assert(m_pTexture2D != nullptr);
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.Format						= mFormat;
+		desc.Format						= m_Format;
 		desc.ViewDimension				= D3D11_SRV_DIMENSION_TEXTURE2D;
 		desc.Texture2D.MipLevels		= 1;
 		desc.Texture2D.MostDetailedMip	= 0;
 
-		auto hr = device->CreateShaderResourceView(mTexture2D.Get(), &desc, mShaderResourceView.GetAddressOf());
+		auto hr = pDevice->CreateShaderResourceView(m_pTexture2D.Get(), &desc, m_pShaderResourceView.GetAddressOf());
 		assert(SUCCEEDED(hr));
 
 		return true;
 	}
 
-	bool Texture::createRenderTargetView(ID3D11Device* device)
+	bool Texture::createRenderTargetView(ID3D11Device* pDevice)
 	{
-		assert(device != nullptr);
+		assert(pDevice != nullptr);
 
 		D3D11_RENDER_TARGET_VIEW_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.Format				= mFormat;
+		desc.Format				= m_Format;
 		desc.ViewDimension		= D3D11_RTV_DIMENSION_TEXTURE2D;
 		desc.Texture2D.MipSlice = 0;
 
-		auto hr = device->CreateRenderTargetView(mTexture2D.Get(), &desc, mRenderTargetView.GetAddressOf());
+		auto hr = pDevice->CreateRenderTargetView(m_pTexture2D.Get(), &desc, m_pRenderTargetView.GetAddressOf());
 		assert(SUCCEEDED(hr));
 
 		return true;
@@ -169,10 +169,10 @@ namespace dive
 
 	void Texture::setMetaData(const DirectX::TexMetadata& data)
 	{
-		mFormat	= data.format;
-		mWidth		= static_cast<unsigned int>(data.width);
-		mHeight	= static_cast<unsigned int>(data.height);
-		mMipLevels = static_cast<unsigned int>(data.mipLevels);
-		mArraySize = static_cast<unsigned int>(data.arraySize);
+		m_Format	= data.format;
+		m_Width		= static_cast<unsigned int>(data.width);
+		m_Height	= static_cast<unsigned int>(data.height);
+		m_MipLevels = static_cast<unsigned int>(data.mipLevels);
+		m_ArraySize = static_cast<unsigned int>(data.arraySize);
 	}
 }

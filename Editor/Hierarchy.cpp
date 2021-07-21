@@ -19,8 +19,8 @@
 
 namespace editor
 {
-    Hierarchy::Hierarchy(Editor* editor)
-        : Widget(editor)
+    Hierarchy::Hierarchy(Editor* pEditor)
+        : Widget(pEditor)
     {
         m_Title = "Hierarchy";
         m_Flags |= ImGuiWindowFlags_HorizontalScrollbar;
@@ -29,19 +29,19 @@ namespace editor
     // DragDrop으로 Transform을 어떻게 다룰 것인지 고심해야 한다.
     void Hierarchy::TickVisible()
     {
-        if (!m_Scene)
+        if (!m_pScene)
             return;
 
         showMainTree();
 
-        if (ImGui::IsMouseReleased(0) && m_ClickedGameObject)
+        if (ImGui::IsMouseReleased(0) && m_pClickedGameObject)
         {
-            if (m_HoveredGameObject && m_HoveredGameObject->GetInstanceID() == m_ClickedGameObject->GetInstanceID())
+            if (m_pHoveredGameObject && m_pHoveredGameObject->GetInstanceID() == m_pClickedGameObject->GetInstanceID())
             {
-                setSelectedGameObject(m_ClickedGameObject);
+                setSelectedGameObject(m_pClickedGameObject);
             }
 
-            m_ClickedGameObject = nullptr;
+            m_pClickedGameObject = nullptr;
         }
     }
 
@@ -51,12 +51,12 @@ namespace editor
     //=================================================//
     void Hierarchy::showMainTree()
     {
-        assert(m_Scene);
+        assert(m_pScene);
 
-        m_HoveredGameObject = nullptr;
+        m_pHoveredGameObject = nullptr;
 
         char sceneInfo[32] = { 0, };
-        sprintf_s(sceneInfo, "%s - %d", m_Scene->GetName().c_str(), m_Scene->GetGameObjectCount());
+        sprintf_s(sceneInfo, "%s - %d", m_pScene->GetName().c_str(), m_pScene->GetGameObjectCount());
 
         // 이건 전체 트리다.
         if (ImGui::TreeNodeEx(sceneInfo, ImGuiTreeNodeFlags_DefaultOpen))
@@ -67,13 +67,13 @@ namespace editor
             if (auto payload = DragDrop::GetInstance().GetPayload(eDragPayloadType::GameObject))
             {
                 auto id = std::get<unsigned int>(payload->data);
-                if (auto dropped = m_Scene->GetGameObjectByID(id))
+                if (auto dropped = m_pScene->GetGameObjectByID(id))
                 {
                     dropped->GetComponent<dive::Transform>()->SetParent(nullptr);
                 }
             }
 
-            auto rootGameObjects = m_Scene->GetRootGameObjects();
+            auto rootGameObjects = m_pScene->GetRootGameObjects();
             for (auto gameObject : rootGameObjects)
             {
                 showAddedTree(gameObject);
@@ -99,9 +99,9 @@ namespace editor
         auto children = gameObject->GetComponent<dive::Transform>()->GetChildren();
         children.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
        
-        if (m_SelectedGameObject)
+        if (m_pSelectedGameObject)
         {
-            nodeFlags |= (m_SelectedGameObject->GetInstanceID() == gameObject->GetInstanceID()) ? ImGuiTreeNodeFlags_Selected : 0;
+            nodeFlags |= (m_pSelectedGameObject->GetInstanceID() == gameObject->GetInstanceID()) ? ImGuiTreeNodeFlags_Selected : 0;
         }
 
         // 이걸 굳이 if로 만들지 않은 이유는 무었일까?
@@ -110,7 +110,7 @@ namespace editor
 
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
         {
-            m_HoveredGameObject = gameObject;
+            m_pHoveredGameObject = gameObject;
         }
 
         // 드래그드랍 상태일 때 부모 대상이 되는 거다.
@@ -130,10 +130,10 @@ namespace editor
 
     void Hierarchy::setSelectedGameObject(dive::GameObject* gameObject)
     {
-        if (m_SelectedGameObject != gameObject)
+        if (m_pSelectedGameObject != gameObject)
         {
-            m_SelectedGameObject = gameObject;
-            Inspector::SetInspectGameObject(m_SelectedGameObject);
+            m_pSelectedGameObject = gameObject;
+            Inspector::SetInspectGameObject(m_pSelectedGameObject);
         }
     }
 
@@ -147,8 +147,8 @@ namespace editor
 
         if (clickedLeft)
         {
-            if (m_HoveredGameObject)
-                m_ClickedGameObject = m_HoveredGameObject;
+            if (m_pHoveredGameObject)
+                m_pClickedGameObject = m_pHoveredGameObject;
             else
                 setSelectedGameObject(nullptr);
         }
@@ -182,7 +182,7 @@ namespace editor
         if (auto payload = dragDrop.GetPayload(eDragPayloadType::GameObject))
         {
             auto id = std::get<unsigned int>(payload->data);
-            if (auto droppedObj = m_Scene->GetGameObjectByID(id))
+            if (auto droppedObj = m_pScene->GetGameObjectByID(id))
             {
                 APP_TRACE("Payload Data id: {:d}", id);
 
@@ -209,14 +209,14 @@ namespace editor
         if (!ImGui::BeginPopup("##PropertyMenu"))
             return;
 
-        if (ImGui::MenuItem("Copy", 0, false, m_SelectedGameObject != nullptr))
+        if (ImGui::MenuItem("Copy", 0, false, m_pSelectedGameObject != nullptr))
         {
-            m_CopiedGameObject = m_SelectedGameObject;
+            m_pCopiedGameObject = m_pSelectedGameObject;
         }
 
-        if (m_CopiedGameObject)
+        if (m_pCopiedGameObject)
         {
-            if (ImGui::MenuItem("Paste", 0, false, m_CopiedGameObject != nullptr))
+            if (ImGui::MenuItem("Paste", 0, false, m_pCopiedGameObject != nullptr))
             {
                 //m_copied->Clone();
             }
@@ -225,7 +225,7 @@ namespace editor
         ImGui::Separator();
 
         // 게임 오브젝트가 선택되어 있을 때 활성화
-        if (ImGui::MenuItem("Rename", 0, false, m_SelectedGameObject != nullptr))
+        if (ImGui::MenuItem("Rename", 0, false, m_pSelectedGameObject != nullptr))
         {
             m_bPopupRename = true;
         }
@@ -235,9 +235,9 @@ namespace editor
             // Copy와의 차이점을 알아야 한다.
         }
 
-        if (ImGui::MenuItem("Remove", 0, false, m_SelectedGameObject != nullptr))
+        if (ImGui::MenuItem("Remove", 0, false, m_pSelectedGameObject != nullptr))
         {
-            m_Scene->RemoveGameObject(m_SelectedGameObject);
+            m_pScene->RemoveGameObject(m_pSelectedGameObject);
             setSelectedGameObject(nullptr);
         }
 
@@ -249,9 +249,9 @@ namespace editor
 
         if (ImGui::MenuItem("Create Empty"))
         {
-            if (m_Scene)
+            if (m_pScene)
             {
-                m_Scene->CreateGameObject();
+                m_pScene->CreateGameObject();
             }
         }
 
@@ -296,7 +296,7 @@ namespace editor
 
         if (ImGui::BeginPopup("##RenameGameObject"))
         {
-            auto pSelected = m_SelectedGameObject;
+            auto pSelected = m_pSelectedGameObject;
             if (!pSelected)
             {
                 ImGui::CloseCurrentPopup();

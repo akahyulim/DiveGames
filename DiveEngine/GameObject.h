@@ -19,8 +19,8 @@ namespace dive
 		GameObject(Scene* scene);
 		~GameObject();
 
-		void Serialize(FileStream* fileStream);
-		void Deserialize(FileStream* fileStream, Transform* parentTransform = nullptr);
+		void Serialize(FileStream* pFileStream);
+		void Deserialize(FileStream* pFileStream, Transform* pParentTransform = nullptr);
 
 		void Update(float deltaTime);
 
@@ -34,14 +34,14 @@ namespace dive
 		template<typename T>
 		T* GetComponent();
 
-		Transform* GetTransform() { return m_Transform; }
+		Transform* GetTransform() { return m_pTransform; }
 
 		bool IsActive() const { return m_bActive; }
 		void SetActive(bool active) { m_bActive = active; }
 
 		unsigned int GetComponentCount() const { return static_cast<unsigned int>(m_Components.size()); }
 
-		Scene* GetScene() { return m_Scene; }
+		Scene* GetScene() { return m_pScene; }
 
 		// 이름을 바꾸자
 		void MarkForDestruction() { m_bDestructionPending = true; }
@@ -49,12 +49,12 @@ namespace dive
 
 	private:
 	private:
-		Scene* m_Scene = nullptr;
+		Scene* m_pScene = nullptr;
 		bool m_bActive = true;
 
 		std::vector<Component*> m_Components;
 
-		Transform* m_Transform = nullptr;
+		Transform* m_pTransform = nullptr;
 
 		// 이름을 바꾸자
 		bool m_bDestructionPending = false;

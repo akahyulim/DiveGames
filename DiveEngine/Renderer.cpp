@@ -14,16 +14,16 @@ namespace dive
 {
 	Renderer::Renderer()
 	{
-		mRenderTargetSize = DirectX::XMINT2(0, 0);
+		m_RenderTargetSize = DirectX::XMINT2(0, 0);
 		// 이렇게 초기화하면 Sandbox에서 문제가 생긴다.
-		mViewPort.Width = static_cast<float>(mRenderTargetSize.x);
-		mViewPort.Height = static_cast<float>(mRenderTargetSize.y);
-		//mViewPort.Width = (float)mGraphicsDevice->GetResolutionWidth();
-		//mViewPort.Height = (float)mGraphicsDevice->GetResolutionHeight();
-		mViewPort.MinDepth = 0.0f;
-		mViewPort.MaxDepth = 1.0f;
-		mViewPort.TopLeftX = 0.0f;
-		mViewPort.TopLeftY = 0.0f;
+		m_ViewPort.Width = static_cast<float>(m_RenderTargetSize.x);
+		m_ViewPort.Height = static_cast<float>(m_RenderTargetSize.y);
+		//m_ViewPort.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
+		//m_ViewPort.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
+		m_ViewPort.MinDepth = 0.0f;
+		m_ViewPort.MaxDepth = 1.0f;
+		m_ViewPort.TopLeftX = 0.0f;
+		m_ViewPort.TopLeftY = 0.0f;
 
 		EVENT_SUBSCRIBE(eEventType::SceneResolve, EVENT_HANDLE(ObjectClassify));
 	}
@@ -35,7 +35,7 @@ namespace dive
 
 	void Renderer::Initialize()
 	{
-		if (!mGraphicsDevice || !mGraphicsDevice->IsInitialized())
+		if (!m_pGraphicsDevice || !m_pGraphicsDevice->IsInitialized())
 		{
 			CORE_ERROR("Graphics Device가 생성되지 않아 초기화를 실행할 수 없습니다. 프로그램을 종료합니다.");
 			PostQuitMessage(0);
@@ -60,12 +60,12 @@ namespace dive
 
 	void Renderer::SetViewport(float width, float height, float offsetX, float offsetY)
 	{
-		if (mViewPort.Width != width || mViewPort.Height != height)
+		if (m_ViewPort.Width != width || m_ViewPort.Height != height)
 		{
 			// 뭔가를 하는데...
 
-			mViewPort.Width = width;
-			mViewPort.Height = height;
+			m_ViewPort.Width = width;
+			m_ViewPort.Height = height;
 
 			// 애초에 offset이 뭐냐...
 		}
@@ -74,13 +74,13 @@ namespace dive
 	// 다시 한 번 말하지만 RenderTarget용 크기설정이다.
 	void Renderer::SetResolution(unsigned int width, unsigned int height)
 	{
-		if (mRenderTargetSize.x == width && mRenderTargetSize.y == height)
+		if (m_RenderTargetSize.x == width && m_RenderTargetSize.y == height)
 			return;
 
 		// 이외에도 크기가 맞는지 확인이 필요하다.
 
-		mRenderTargetSize.x = width;
-		mRenderTargetSize.y = height;
+		m_RenderTargetSize.x = width;
+		m_RenderTargetSize.y = height;
 
 		createRenderTargets();
 
@@ -97,13 +97,13 @@ namespace dive
 	//======================================================================================//
 	void Renderer::UpdateCB()
 	{
-		auto immediateContext = mGraphicsDevice->GetImmediateContext();
+		auto immediateContext = m_pGraphicsDevice->GetImmediateContext();
 		assert(immediateContext != nullptr);
 
-		if (mBufferFrame == nullptr)
+		if (m_pBufferFrame == nullptr)
 			return;
 
-		MatrixBuffer* pBuffer = static_cast<MatrixBuffer*>(mBufferFrame->Map());
+		MatrixBuffer* pBuffer = static_cast<MatrixBuffer*>(m_pBufferFrame->Map());
 
 		// World Matrix
 		// 이건 개별 GameObject의 Transform으로부터 가져온다.
@@ -155,32 +155,32 @@ namespace dive
 
 			auto viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
 			pBuffer->view = XMMatrixTranspose(viewMatrix);
-			mBufferFrameCPU.SetViewMatrix(viewMatrix);
+			m_BufferFrameCPU.SetViewMatrix(viewMatrix);
 		}
 
 		// Perspective Projection Matrix
 		{
 			float fieldOfView = 3.141592654f / 4.0f;
-			float screenAspect = (float)mGraphicsDevice->GetResolutionWidth() / (float)mGraphicsDevice->GetResolutionHeight();
+			float screenAspect = (float)m_pGraphicsDevice->GetResolutionWidth() / (float)m_pGraphicsDevice->GetResolutionHeight();
 			
 			auto projMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
 			pBuffer->proj = XMMatrixTranspose(projMatrix);
-			mBufferFrameCPU.SetPerspectiveProjectionMatrix(projMatrix);
-			auto view_proj = mBufferFrameCPU.GetViewMatrix() * mBufferFrameCPU.GetPerspectiveProjectionMatrix();
-			mBufferFrameCPU.SetViewProjectionMatrix(view_proj);
+			m_BufferFrameCPU.SetPerspectiveProjectionMatrix(projMatrix);
+			auto view_proj = m_BufferFrameCPU.GetViewMatrix() * m_BufferFrameCPU.GetPerspectiveProjectionMatrix();
+			m_BufferFrameCPU.SetViewProjectionMatrix(view_proj);
 		}
 
 		// Orthographic Projection Matrix
 		{
-			auto width = (float)mGraphicsDevice->GetResolutionWidth();
-			auto height = (float)mGraphicsDevice->GetResolutionHeight();
+			auto width = (float)m_pGraphicsDevice->GetResolutionWidth();
+			auto height = (float)m_pGraphicsDevice->GetResolutionHeight();
 			auto orthoProjMatrix = XMMatrixTranspose(XMMatrixOrthographicLH(width, height, 0.1f, 1000.0f));
 			pBuffer->projOrthographic = orthoProjMatrix;
-			mBufferFrameCPU.SetOrthoProjectionMatrix(orthoProjMatrix);
+			m_BufferFrameCPU.SetOrthoProjectionMatrix(orthoProjMatrix);
 		}
 
 		//immediateContext->Unmap(static_cast<ID3D11Resource*>(mConstantBufferMatrix.Get()), 0);
-		mBufferFrame->Unmap();
+		m_pBufferFrame->Unmap();
 	}
 
 	void Renderer::DrawScene()
@@ -190,29 +190,29 @@ namespace dive
 
 	void Renderer::DrawLegacy()
 	{
-		if (mGameObjects[eObjectType::Opaque].empty())
+		if (m_GameObjects[eObjectType::Opaque].empty())
 			return;
 
-		auto immediateContext = mGraphicsDevice->GetImmediateContext();
+		auto immediateContext = m_pGraphicsDevice->GetImmediateContext();
 		assert(immediateContext != nullptr);
 
-		immediateContext->IASetInputLayout(mPipelineStateLegacy.pIL);
-		immediateContext->IASetPrimitiveTopology(mPipelineStateLegacy.primitiveTopology);
-		immediateContext->VSSetShader(mPipelineStateLegacy.pVS, NULL, 0);
-		immediateContext->PSSetShader(mPipelineStateLegacy.pPS, NULL, 0);
-		immediateContext->PSSetSamplers(0, 1, &mPipelineStateLegacy.pSS);
-		immediateContext->OMSetDepthStencilState(mPipelineStateLegacy.pDSS, 1);
-		immediateContext->RSSetState(mPipelineStateLegacy.pRSS);
-		immediateContext->RSSetViewports(1, &mViewPort);
+		immediateContext->IASetInputLayout(m_PipelineStateLegacy.pIL);
+		immediateContext->IASetPrimitiveTopology(m_PipelineStateLegacy.primitiveTopology);
+		immediateContext->VSSetShader(m_PipelineStateLegacy.pVS, NULL, 0);
+		immediateContext->PSSetShader(m_PipelineStateLegacy.pPS, NULL, 0);
+		immediateContext->PSSetSamplers(0, 1, &m_PipelineStateLegacy.pSS);
+		immediateContext->OMSetDepthStencilState(m_PipelineStateLegacy.pDSS, 1);
+		immediateContext->RSSetState(m_PipelineStateLegacy.pRSS);
+		immediateContext->RSSetViewports(1, &m_ViewPort);
 
 
 		MeshRenderer* meshRenderer = nullptr;
-		for (const auto& gameObject : mGameObjects[eObjectType::Opaque])
+		for (const auto& gameObject : m_GameObjects[eObjectType::Opaque])
 		{
 			if (Transform* transform = gameObject->GetTransform())
 			{
-				mBufferObjectCPU.SetWorldMatrix(transform->GetMatrix());
-				mBufferObjectCPU.SetWorldViewProjectionMatrix(mBufferObjectCPU.GetWorldMatrix() * mBufferFrameCPU.GetViewProjectionMatrix());
+				m_BufferObjectCPU.SetWorldMatrix(transform->GetMatrix());
+				m_BufferObjectCPU.SetWorldViewProjectionMatrix(m_BufferObjectCPU.GetWorldMatrix() * m_BufferFrameCPU.GetViewProjectionMatrix());
 
 				//==========================================================================//
 				// Constant Buffer Test														//
@@ -220,15 +220,15 @@ namespace dive
 				// 2. DirectX의 행렬과 HLSL의 행렬 방향이 다르기때문에 전치해 주어야 한다.	//
 				// 현재 XMFLOAT4X4로 저장했기에 좀 더 복잡해졌다.							//
 				//==========================================================================//
-				DirectX::XMMATRIX world = XMMatrixTranspose(mBufferObjectCPU.GetWorldMatrix());
-				DirectX::XMMATRIX wvp = XMMatrixTranspose(mBufferObjectCPU.GetWorldViewProjectionMatrix());
+				DirectX::XMMATRIX world = XMMatrixTranspose(m_BufferObjectCPU.GetWorldMatrix());
+				DirectX::XMMATRIX wvp = XMMatrixTranspose(m_BufferObjectCPU.GetWorldViewProjectionMatrix());
 
-				BufferObject* pData = static_cast<BufferObject*>(mBufferObjectGPU->Map());
+				BufferObject* pData = static_cast<BufferObject*>(m_pBufferObjectGPU->Map());
 				DirectX::XMStoreFloat4x4(&pData->world, world);
 				DirectX::XMStoreFloat4x4(&pData->wvp, wvp);
-				assert(mBufferObjectGPU->Unmap());
+				assert(m_pBufferObjectGPU->Unmap());
 
-				ID3D11Buffer* buffer = mBufferObjectGPU->GetBuffer();
+				ID3D11Buffer* buffer = m_pBufferObjectGPU->GetBuffer();
 				immediateContext->VSSetConstantBuffers(0, 1, &buffer);
 			}
 
@@ -259,23 +259,23 @@ namespace dive
 	{
 		// GameObject에서 TextMesh만 뽑아서 호출하도록 바꿔야 한다.
 
-		auto immediateContext = mGraphicsDevice->GetImmediateContext();
+		auto immediateContext = m_pGraphicsDevice->GetImmediateContext();
 		assert(immediateContext != nullptr);
 
-		immediateContext->IASetInputLayout(mPipelineStateFont.pIL);
-		immediateContext->IASetPrimitiveTopology(mPipelineStateFont.primitiveTopology);
-		immediateContext->VSSetShader(mPipelineStateFont.pVS, NULL, 0);
-		immediateContext->PSSetShader(mPipelineStateFont.pPS, NULL, 0);
-		immediateContext->PSSetSamplers(0, 1, &mPipelineStateFont.pSS);	// 얘는 더블 포인터다...
-		immediateContext->OMSetDepthStencilState(mPipelineStateFont.pDSS, 1);
-		immediateContext->RSSetState(mPipelineStateFont.pRSS);
+		immediateContext->IASetInputLayout(m_PipelineStateFont.pIL);
+		immediateContext->IASetPrimitiveTopology(m_PipelineStateFont.primitiveTopology);
+		immediateContext->VSSetShader(m_PipelineStateFont.pVS, NULL, 0);
+		immediateContext->PSSetShader(m_PipelineStateFont.pPS, NULL, 0);
+		immediateContext->PSSetSamplers(0, 1, &m_PipelineStateFont.pSS);	// 얘는 더블 포인터다...
+		immediateContext->OMSetDepthStencilState(m_PipelineStateFont.pDSS, 1);
+		immediateContext->RSSetState(m_PipelineStateFont.pRSS);
 
-		ID3D11Buffer* buffer = mBufferFrame->GetBuffer();
+		ID3D11Buffer* buffer = m_pBufferFrame->GetBuffer();
 		immediateContext->VSSetConstantBuffers(0, 1, &buffer);
 
 		D3D11_VIEWPORT viewport;
-		viewport.Width = (float)mGraphicsDevice->GetResolutionWidth();
-		viewport.Height = (float)mGraphicsDevice->GetResolutionHeight();
+		viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
+		viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 		viewport.TopLeftX = 0.0f;
@@ -301,7 +301,7 @@ namespace dive
 	//==========================================================================//
 	void Renderer::ObjectClassify()
 	{
-		mGameObjects.clear();
+		m_GameObjects.clear();
 		// 카메라도 초기화?
 
 		// 결국 여기까지 왔다.
@@ -318,16 +318,16 @@ namespace dive
 			if (meshRenderer)
 			{
 				// Opaque와 Transparent의 구분은 Material을 이용한다.
-				mGameObjects[eObjectType::Opaque].push_back(gameObject);
+				m_GameObjects[eObjectType::Opaque].push_back(gameObject);
 			}
 			else if (camera)
 			{
-				mGameObjects[eObjectType::Camera].push_back(gameObject);
+				m_GameObjects[eObjectType::Camera].push_back(gameObject);
 				// 카메라 선택... 메인 카메라인가?
 			}
 			else if (light)
 			{
-				mGameObjects[eObjectType::Light].push_back(gameObject);
+				m_GameObjects[eObjectType::Light].push_back(gameObject);
 			}
 		}
 
@@ -337,10 +337,10 @@ namespace dive
 		// 그리고 Frustum Culling을 여기에서 적용하는건 무리인가?
 	}
 
-	void Renderer::SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device)
+	void Renderer::SetGraphicsDevice(std::shared_ptr<GraphicsDevice> pDevice)
 	{
-		mGraphicsDevice = device;
+		m_pGraphicsDevice = pDevice;
 
-		assert(mGraphicsDevice);
+		assert(m_pGraphicsDevice);
 	}	
 }

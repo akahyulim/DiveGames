@@ -9,8 +9,8 @@ namespace dive
 {
 	bool Renderer::createDepthStencilStates()
 	{
-		auto device = mGraphicsDevice->GetDevice();
-		assert(device != nullptr);
+		auto pDevice = m_pGraphicsDevice->GetDevice();
+		assert(pDevice != nullptr);
 
 		HRESULT hr = E_FAIL;
 
@@ -37,7 +37,7 @@ namespace dive
 			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			hr = device->CreateDepthStencilState(&desc, mDepthStencilStates[DSSTYPE_DEFAULT].GetAddressOf());
+			hr = pDevice->CreateDepthStencilState(&desc, m_pDepthStencilStates[DSSTYPE_DEFAULT].GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 
@@ -46,8 +46,8 @@ namespace dive
 
 	bool Renderer::createRasterizerStates()
 	{
-		auto device = mGraphicsDevice->GetDevice();
-		assert(device != nullptr);
+		auto pDevice = m_pGraphicsDevice->GetDevice();
+		assert(pDevice != nullptr);
 
 		HRESULT hr = E_FAIL;
 
@@ -64,7 +64,7 @@ namespace dive
 			desc.ScissorEnable = false;
 			desc.SlopeScaledDepthBias = 0.0f;
 
-			hr = device->CreateRasterizerState(&desc, mRasterizerStates[RSSTYPE_CULLBACK_SOLID].GetAddressOf());
+			hr = pDevice->CreateRasterizerState(&desc, m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 
@@ -73,8 +73,8 @@ namespace dive
 
 	bool Renderer::createSamplerStates()
 	{
-		auto device = mGraphicsDevice->GetDevice();
-		assert(device != nullptr);
+		auto pDevice = m_pGraphicsDevice->GetDevice();
+		assert(pDevice != nullptr);
 
 		HRESULT hr = E_FAIL;
 
@@ -95,7 +95,7 @@ namespace dive
 			desc.MinLOD = 0;
 			desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-			hr = device->CreateSamplerState(&desc, mSamplerState.GetAddressOf());
+			hr = pDevice->CreateSamplerState(&desc, m_pSamplerState.GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 
@@ -115,7 +115,7 @@ namespace dive
 			desc.MinLOD = 0;
 			desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-			hr = device->CreateSamplerState(&desc, mSamplerStateLinear.GetAddressOf());
+			hr = pDevice->CreateSamplerState(&desc, m_pSamplerStateLinear.GetAddressOf());
 			assert(SUCCEEDED(hr));
 		}
 
@@ -125,8 +125,8 @@ namespace dive
 	bool Renderer::createConstantBuffers()
 	{
 		/*
-		auto device = mGraphicsDevice->GetDevice();
-		assert(device != nullptr);
+		auto pDevice = m_pGraphicsDevice->GetDevice();
+		assert(pDevice != nullptr);
 
 		// world, view, projection matrix
 		D3D11_BUFFER_DESC desc;
@@ -137,25 +137,25 @@ namespace dive
 		desc.MiscFlags = 0;
 		desc.StructureByteStride = 0;
 
-		auto hr = device->CreateBuffer(&desc, nullptr, mConstantBufferMatrix.GetAddressOf());
+		auto hr = pDevice->CreateBuffer(&desc, nullptr, mConstantBufferMatrix.GetAddressOf());
 		assert(SUCCEEDED(hr));
 	*/
-		mBufferFrame = new ConstantBuffer(mGraphicsDevice.get(), "BufferFrame");
-		if (!mBufferFrame->Create< MatrixBuffer>())
+		m_pBufferFrame = new ConstantBuffer(m_pGraphicsDevice.get(), "BufferFrame");
+		if (!m_pBufferFrame->Create< MatrixBuffer>())
 		{
 			CORE_ERROR("BufferFrame 생성에 실패하였습니다.");
 			return false;
 		}
 
-		mBufferFrameGPU = new ConstantBuffer(mGraphicsDevice.get(), "BufferFrameGPU");
-		if (!mBufferFrameGPU->Create< BufferFrame >())
+		m_pBufferFrameGPU = new ConstantBuffer(m_pGraphicsDevice.get(), "BufferFrameGPU");
+		if (!m_pBufferFrameGPU->Create< BufferFrame >())
 		{
 			CORE_ERROR("BufferFrameGPU 생성에 실패하였습니다.");
 			return false;
 		}
 
-		mBufferObjectGPU = new ConstantBuffer(mGraphicsDevice.get(), "BufferObjectGPU");
-		if (!mBufferObjectGPU->Create< BufferObject >())
+		m_pBufferObjectGPU = new ConstantBuffer(m_pGraphicsDevice.get(), "BufferObjectGPU");
+		if (!m_pBufferObjectGPU->Create< BufferObject >())
 		{
 			CORE_ERROR("BufferObjectGPU 생성에 실패하였습니다.");
 			return false;
@@ -170,16 +170,16 @@ namespace dive
 	{
 		// 삭제 대상 : 테스트용 구문
 		{
-			mTexture = std::make_shared<Texture>(L"../Assets/Textures/Choa.jpg");
+			m_pTexture = std::make_shared<Texture>(L"../Assets/Textures/Choa.jpg");
 
 			// 생성한 후 특정 색 넣기
 			{
-				mCpuTexture = std::make_shared<Texture>(800, 600);
+				m_pCpuTexture = std::make_shared<Texture>(800, 600);
 
-				auto immediateContext = mGraphicsDevice->GetImmediateContext();
+				auto immediateContext = m_pGraphicsDevice->GetImmediateContext();
 
 				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				immediateContext->Map(mCpuTexture->GetTexture2D(),
+				immediateContext->Map(m_pCpuTexture->GetTexture2D(),
 					D3D11CalcSubresource(0, 0, 1),
 					D3D11_MAP_WRITE_DISCARD,
 					0,
@@ -203,7 +203,7 @@ namespace dive
 					}
 				}
 
-				immediateContext->Unmap(mCpuTexture->GetTexture2D(), D3D11CalcSubresource(0, 0, 1));
+				immediateContext->Unmap(m_pCpuTexture->GetTexture2D(), D3D11CalcSubresource(0, 0, 1));
 			}
 		}
 
@@ -214,8 +214,8 @@ namespace dive
 	bool Renderer::createRenderTargets()
 	{
 		// BackBuffer와 어떻게 구분하느냐...
-		auto width = mRenderTargetSize.x;
-		auto height = mRenderTargetSize.y;
+		auto width = m_RenderTargetSize.x;
+		auto height = m_RenderTargetSize.y;
 
 		// 다시 크기 확인을 한다.
 		// 크기가 맞지 않다고 생성을 안해버리는게 맞나?
@@ -227,18 +227,18 @@ namespace dive
 
 		// 얘는 테스트용이다.
 		{
-//			mRenderTargetView = std::make_shared<Texture>(width, height, DXGI_FORMAT_R8G8B8A8_UINT, "Test_RenderTargetView");
+//			m_pRenderTargetView = std::make_shared<Texture>(width, height, DXGI_FORMAT_R8G8B8A8_UINT, "Test_RenderTargetView");
 		}
 
 		// renderTargets들을 만든다. 타입때문에 지웠다가 다시 만들어야 한다. 나중에 수정이 필요할듯?
 		// 에디터 실행시 hlsl의 cb를 수정할 때 마다 이 곳에서 뻗는다....
 		// 렌더 타겟 설정을 안해서일 수 있다.
-		if (mRenderTargets[eRenderTargets::Frame_Ldr])
+		if (m_RenderTargets[eRenderTargets::Frame_Ldr])
 		{
-			delete mRenderTargets[eRenderTargets::Frame_Ldr];
-			mRenderTargets[eRenderTargets::Frame_Ldr] = nullptr;
+			delete m_RenderTargets[eRenderTargets::Frame_Ldr];
+			m_RenderTargets[eRenderTargets::Frame_Ldr] = nullptr;
 		}
-		mRenderTargets[eRenderTargets::Frame_Ldr] = new Texture(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT);
+		m_RenderTargets[eRenderTargets::Frame_Ldr] = new Texture(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT);
 
 		return true;
 	}
@@ -292,8 +292,8 @@ namespace dive
 		auto result = false;
 
 		{
-			mDvFont = new Font;
-			result = mDvFont->LoadFromFile("../Assets/Fonts/NanumBarunGothic.ttf");
+			m_pDvFont = new Font;
+			result = m_pDvFont->LoadFromFile("../Assets/Fonts/NanumBarunGothic.ttf");
 			assert(result);
 		}
 
@@ -301,7 +301,7 @@ namespace dive
 		/*
 		{
 			m_pTextMesh = new TextMesh;
-			result = m_pTextMesh->SetFont(mDvFont);
+			result = m_pTextMesh->SetFont(m_pDvFont);
 			assert(result);
 			m_pTextMesh->SetText(L"We're just walking down the street.",
 				DirectX::XMFLOAT2(-200.0f, 200.0f));
@@ -315,24 +315,24 @@ namespace dive
 	{
 		// Legacy
 		{
-			mPipelineStateLegacy.pVS = (ID3D11VertexShader*)mShaders[VSTYPE_LEGACY].Get();
-			mPipelineStateLegacy.pPS = (ID3D11PixelShader*)mShaders[PSTYPE_LEGACY].Get();
-			mPipelineStateLegacy.pDSS = mDepthStencilStates[DSSTYPE_DEFAULT].Get();
-			mPipelineStateLegacy.pRSS = mRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
-			mPipelineStateLegacy.pSS = mSamplerState.Get();
-			mPipelineStateLegacy.pIL = mInputLayouts[ILTYPE_POS_TEX_NOR_TAN].Get();
-			mPipelineStateLegacy.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			m_PipelineStateLegacy.pVS = (ID3D11VertexShader*)m_pShaders[VSTYPE_LEGACY].Get();
+			m_PipelineStateLegacy.pPS = (ID3D11PixelShader*)m_pShaders[PSTYPE_LEGACY].Get();
+			m_PipelineStateLegacy.pDSS = m_pDepthStencilStates[DSSTYPE_DEFAULT].Get();
+			m_PipelineStateLegacy.pRSS = m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
+			m_PipelineStateLegacy.pSS = m_pSamplerState.Get();
+			m_PipelineStateLegacy.pIL = m_pInputLayouts[ILTYPE_POS_TEX_NOR_TAN].Get();
+			m_PipelineStateLegacy.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
 
 		// Font
 		{
-			mPipelineStateFont.pVS = (ID3D11VertexShader*)mShaders[VSTYPE_FONTS].Get();
-			mPipelineStateFont.pPS = (ID3D11PixelShader*)mShaders[PSTYPE_FONTS].Get();
-			mPipelineStateFont.pDSS = mDepthStencilStates[DSSTYPE_DEFAULT].Get();
-			mPipelineStateFont.pRSS = mRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
-			mPipelineStateFont.pSS = mSamplerStateLinear.Get();
-			mPipelineStateFont.pIL = mInputLayouts[ILTYPE_POS_TEX2].Get();
-			mPipelineStateFont.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			m_PipelineStateFont.pVS = (ID3D11VertexShader*)m_pShaders[VSTYPE_FONTS].Get();
+			m_PipelineStateFont.pPS = (ID3D11PixelShader*)m_pShaders[PSTYPE_FONTS].Get();
+			m_PipelineStateFont.pDSS = m_pDepthStencilStates[DSSTYPE_DEFAULT].Get();
+			m_PipelineStateFont.pRSS = m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
+			m_PipelineStateFont.pSS = m_pSamplerStateLinear.Get();
+			m_PipelineStateFont.pIL = m_pInputLayouts[ILTYPE_POS_TEX2].Get();
+			m_PipelineStateFont.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
 	}
 
@@ -340,8 +340,8 @@ namespace dive
 	bool Renderer::createVertexShader(const std::wstring& filepath, unsigned int shaderType, unsigned int inputLayoutType,
 		D3D11_INPUT_ELEMENT_DESC* descs, UINT numElements)
 	{
-		auto device = mGraphicsDevice->GetDevice();
-		assert(device != nullptr);
+		auto pDevice = m_pGraphicsDevice->GetDevice();
+		assert(pDevice != nullptr);
 
 		ID3D10Blob* shaderBuffer = nullptr;
 		ID3D10Blob* shaderError = nullptr;
@@ -362,8 +362,8 @@ namespace dive
 			return false;
 		}
 		
-		if (FAILED(device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr,
-			(ID3D11VertexShader**)mShaders[shaderType].GetAddressOf())))
+		if (FAILED(pDevice->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr,
+			(ID3D11VertexShader**)m_pShaders[shaderType].GetAddressOf())))
 		{
 			CORE_ERROR("Vertex Shader 생성에 실패하였습니다.");
 			return false;
@@ -371,8 +371,8 @@ namespace dive
 		
 		if ((descs != nullptr) && (inputLayoutType != ILTYPE_COUNT))
 		{
-			if (FAILED(device->CreateInputLayout(descs, numElements, shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(),
-				mInputLayouts[inputLayoutType].GetAddressOf())))
+			if (FAILED(pDevice->CreateInputLayout(descs, numElements, shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(),
+				m_pInputLayouts[inputLayoutType].GetAddressOf())))
 			{
 				CORE_ERROR("Input Layout 생성에 실패하였습니다.");
 				return false;
@@ -385,8 +385,8 @@ namespace dive
 
 	bool Renderer::createPixelShader(const std::wstring& filepath, unsigned int shaderType)
 	{
-		auto device = mGraphicsDevice->GetDevice();
-		assert(device != nullptr);
+		auto pDevice = m_pGraphicsDevice->GetDevice();
+		assert(pDevice != nullptr);
 
 		ID3D10Blob* shaderBuffer = nullptr;
 		ID3D10Blob* shaderError = nullptr;
@@ -407,8 +407,8 @@ namespace dive
 			return false;
 		}
 
-		if (FAILED(device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr,
-			(ID3D11PixelShader**)mShaders[shaderType].GetAddressOf())))
+		if (FAILED(pDevice->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr,
+			(ID3D11PixelShader**)m_pShaders[shaderType].GetAddressOf())))
 		{
 			CORE_ERROR("Pixel Shader 생성에 실패하였습니다.");
 		}

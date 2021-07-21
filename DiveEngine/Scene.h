@@ -25,7 +25,7 @@ namespace dive
 		GameObject* CreateGameObject(bool active = true);
 		GameObject* GetGameObjectByName(const std::string& name);
 		GameObject* GetGameObjectByID(unsigned int id);
-		void RemoveGameObject(GameObject* gameObject);
+		void RemoveGameObject(GameObject* pGameObjct);
 
 		const std::vector<GameObject*>& GetAllGameObjects() const { return m_GameObjects; }
 		std::vector<GameObject*> GetRootGameObjects() const;
@@ -41,7 +41,7 @@ namespace dive
 		bool IsLoaded() const { return m_bLoaded; }
 
 	private:
-		void eraseGameObject(GameObject* gameObject);
+		void eraseGameObject(GameObject* pGameObjct);
 
 	private:
 		std::vector<GameObject*> m_GameObjects;

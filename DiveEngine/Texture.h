@@ -23,54 +23,54 @@ namespace dive
 		Texture(unsigned int width, unsigned int height, DXGI_FORMAT format, std::string name = "");
 
 
-		ID3D11Texture2D* GetTexture2D() { return mTexture2D.Get(); }
-		ID3D11RenderTargetView* GetRenderTargetView() { return mRenderTargetView.Get(); }
-		ID3D11ShaderResourceView* GetShaderResourceView() { return mShaderResourceView.Get(); }
+		ID3D11Texture2D* GetTexture2D() { return m_pTexture2D.Get(); }
+		ID3D11RenderTargetView* GetRenderTargetView() { return m_pRenderTargetView.Get(); }
+		ID3D11ShaderResourceView* GetShaderResourceView() { return m_pShaderResourceView.Get(); }
 
 		// get & set
-		unsigned int GetWidth() const { return mWidth; }
-		unsigned int GetHeight() const { return mHeight; }
-		unsigned int GetMipLevls() const { return mMipLevels; }
-		unsigned int GetArraySize() const { return mArraySize; }
-		DXGI_FORMAT GetFormat() const { return mFormat; }
-		std::string GetName() const { return mName; }
+		unsigned int GetWidth() const { return m_Width; }
+		unsigned int GetHeight() const { return m_Height; }
+		unsigned int GetMipLevls() const { return m_MipLevels; }
+		unsigned int GetArraySize() const { return m_ArraySize; }
+		DXGI_FORMAT GetFormat() const { return m_Format; }
+		std::string GetName() const { return m_Name; }
 
-		void SetWidth(unsigned int width) { mWidth = width; }
-		void SetHeight(unsigned int height) { mHeight = height; }
-		void SetFormat(DXGI_FORMAT format) { mFormat = format; }
+		void SetWidth(unsigned int width) { m_Width = width; }
+		void SetHeight(unsigned int height) { m_Height = height; }
+		void SetFormat(DXGI_FORMAT format) { m_Format = format; }
 
-		void SetChannelCount(unsigned int count) { mChannelCount = count; }
-		void SetBitsPerChannel(unsigned int value) { mBitsPerChannel = value; }
-		void SetPitch(unsigned int pitch) { mPitch = pitch; }
-		void SetData(std::vector<std::byte>& data) { mData = data; }
+		void SetChannelCount(unsigned int count) { m_ChannelCount = count; }
+		void SetBitsPerChannel(unsigned int value) { m_BitsPerChannel = value; }
+		void SetPitch(unsigned int pitch) { m_Pitch = pitch; }
+		void SetData(std::vector<std::byte>& data) { m_Data = data; }
 
 
 	private:
-		bool createTexture2D(ID3D11Device* device, unsigned flags);
-		bool createShaderResourceView(ID3D11Device* device);
-		bool createRenderTargetView(ID3D11Device* device);
-		bool createDepthStencilView(ID3D11Device* device);
+		bool createTexture2D(ID3D11Device* pDevice, unsigned flags);
+		bool createShaderResourceView(ID3D11Device* pDevice);
+		bool createRenderTargetView(ID3D11Device* pDevice);
+		bool createDepthStencilView(ID3D11Device* pDevice);
 
 		void setMetaData(const DirectX::TexMetadata& data);
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> mTexture2D;
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mRenderTargetView;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mShaderResourceView;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mDepthStencilView;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pTexture2D;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pRenderTargetView;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pShaderResourceView;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDepthStencilView;
 
-		std::string mName;
+		std::string m_Name;
 
 		// 최소한의 데이터 필요
 		// 필요없는 건 지우자.
-		unsigned int mWidth = 0;
-		unsigned int mHeight = 0;
-		unsigned int mMipLevels = 0;
-		unsigned int mArraySize = 0;
-		unsigned int mChannelCount = 0;
-		unsigned int mBitsPerChannel = 0;
-		unsigned int mPitch = 0;
-		DXGI_FORMAT mFormat = DXGI_FORMAT_UNKNOWN;
-		std::vector<std::byte> mData;
+		unsigned int m_Width = 0;
+		unsigned int m_Height = 0;
+		unsigned int m_MipLevels = 0;
+		unsigned int m_ArraySize = 0;
+		unsigned int m_ChannelCount = 0;
+		unsigned int m_BitsPerChannel = 0;
+		unsigned int m_Pitch = 0;
+		DXGI_FORMAT m_Format = DXGI_FORMAT_UNKNOWN;
+		std::vector<std::byte> m_Data;
 	};
 }

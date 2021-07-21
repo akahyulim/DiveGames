@@ -14,9 +14,9 @@ namespace dive
 		// 라이브러리 릴리즈
 	}
 	
-	bool FontImporter::ImporterFile(Font* font, const std::string& filepath)
+	bool FontImporter::ImporterFile(Font* pFont, const std::string& filepath)
 	{
-		assert(font != nullptr);
+		assert(pFont != nullptr);
 		// 파일 존재 여부
 
 

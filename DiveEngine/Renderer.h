@@ -56,11 +56,11 @@ namespace dive
 
 		void Initialize();
 
-		const D3D11_VIEWPORT& GetViewport() const { return mViewPort; }
+		const D3D11_VIEWPORT& GetViewport() const { return m_ViewPort; }
 		void SetViewport(float width, float height, float offsetX = 0.0f, float offsetY = 0.0f);
 
 		// RenderTarget용 크기이다.
-		const DirectX::XMINT2& GetResolution() const { return mRenderTargetSize; }
+		const DirectX::XMINT2& GetResolution() const { return m_RenderTargetSize; }
 		void SetResolution(unsigned int width, unsigned int height);
 
 		// update와 draw가 있다.
@@ -74,9 +74,9 @@ namespace dive
 
 		void ObjectClassify();
 
-		GraphicsDevice* GetGraphicsDevice() { return mGraphicsDevice.get(); }
-		void SetGraphicsDevice(std::shared_ptr<GraphicsDevice> device);
-		Texture* GetFrameTexture() { return mRenderTargets[eRenderTargets::Frame_Ldr]; }
+		GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice.get(); }
+		void SetGraphicsDevice(std::shared_ptr<GraphicsDevice> pDevice);
+		Texture* GetFrameTexture() { return m_RenderTargets[eRenderTargets::Frame_Ldr]; }
 
 	private:
 		Renderer();
@@ -99,26 +99,26 @@ namespace dive
 		bool createPixelShader(const std::wstring& filepath, unsigned int shaderType);
 
 	private:
-		std::shared_ptr<GraphicsDevice> mGraphicsDevice;
+		std::shared_ptr<GraphicsDevice> m_pGraphicsDevice;
 
 		// RenderTarget용 크기다. 타입이 애매하다.
-		DirectX::XMINT2 mRenderTargetSize;
-		D3D11_VIEWPORT mViewPort;
+		DirectX::XMINT2 m_RenderTargetSize;
+		D3D11_VIEWPORT m_ViewPort;
 
 		// GPU Resource 관리
-		Microsoft::WRL::ComPtr<ID3D11DeviceChild> mShaders[SHADERTYPE_COUNT];
-		Microsoft::WRL::ComPtr<ID3D11InputLayout> mInputLayouts[ILTYPE_COUNT];
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> mDepthStencilStates[DSSTYPE_COUNT];
-		Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRasterizerStates[RSSTYPE_COUNT];
-		Microsoft::WRL::ComPtr<ID3D11SamplerState> mSamplerState;
-		Microsoft::WRL::ComPtr<ID3D11SamplerState> mSamplerStateLinear;
+		Microsoft::WRL::ComPtr<ID3D11DeviceChild> m_pShaders[SHADERTYPE_COUNT];
+		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_pInputLayouts[ILTYPE_COUNT];
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_pDepthStencilStates[DSSTYPE_COUNT];
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_pRasterizerStates[RSSTYPE_COUNT];
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerState;
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerStateLinear;
 
 		// Constant Buffer
-		BufferFrame mBufferFrameCPU;
-		ConstantBuffer* mBufferFrameGPU;
+		BufferFrame m_BufferFrameCPU;
+		ConstantBuffer* m_pBufferFrameGPU;
 
-		BufferObject mBufferObjectCPU;
-		ConstantBuffer* mBufferObjectGPU;
+		BufferObject m_BufferObjectCPU;
+		ConstantBuffer* m_pBufferObjectGPU;
 
 		// constant buffer 부터
 		// => 이건 이제 제거 대상이다.
@@ -131,26 +131,26 @@ namespace dive
 			DirectX::XMMATRIX projOrthographic;
 		};
 		//Microsoft::WRL::ComPtr<ID3D11Buffer> mConstantBufferMatrix;
-		ConstantBuffer* mBufferFrame;
+		ConstantBuffer* m_pBufferFrame;
 
 		// pipeline states
 		// 굳이 동적생성할 필요가 없다. enum array로 만들자.
 		// 그런데 위키드는 pipelinestate가 종류별 배열로 꽤 많다.
-		PipelineState mPipelineStateColor;
-		PipelineState mPipelineStateTexturing;
-		PipelineState mPipelineStateFont;	// text라는 이름이 더 낫지 않을까?
-		PipelineState mPipelineStateLegacy;
+		PipelineState m_PipelineStateColor;
+		PipelineState m_PipelineStateTexturing;
+		PipelineState m_PipelineStateFont;	// text라는 이름이 더 낫지 않을까?
+		PipelineState m_PipelineStateLegacy;
 
-		std::unordered_map<eRenderTargets, Texture*> mRenderTargets;
+		std::unordered_map<eRenderTargets, Texture*> m_RenderTargets;
 
-		std::unordered_map<eObjectType, std::vector<GameObject*>> mGameObjects;
+		std::unordered_map<eObjectType, std::vector<GameObject*>> m_GameObjects;
 
 		// texturing test
-		//Texture* mTexture = nullptr;
-		std::shared_ptr<Texture> mTexture;
-		std::shared_ptr<Texture> mRenderTargetView;
-		std::shared_ptr<Texture> mCpuTexture;
+		//Texture* m_pTexture = nullptr;
+		std::shared_ptr<Texture> m_pTexture;
+		std::shared_ptr<Texture> m_pRenderTargetView;
+		std::shared_ptr<Texture> m_pCpuTexture;
 
-		Font* mDvFont = nullptr;
+		Font* m_pDvFont = nullptr;
 	};
 }

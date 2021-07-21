@@ -132,17 +132,17 @@ namespace dive
 	
 	void Runtime::Update(float deltaTime)
 	{
-		if (m_ActivePath)
+		if (m_pActivePath)
 		{
-			m_ActivePath->PreUpdate();
+			m_pActivePath->PreUpdate();
 		}
 
 		// lua
 
-		if (m_ActivePath)
+		if (m_pActivePath)
 		{
-			m_ActivePath->Update(deltaTime);
-			m_ActivePath->PostUpdate();
+			m_pActivePath->Update(deltaTime);
+			m_pActivePath->PostUpdate();
 		}
 	}
 	
@@ -150,14 +150,14 @@ namespace dive
 	{
 		// lua
 
-		if (m_ActivePath)
+		if (m_pActivePath)
 		{
 			// 대상이 좀 애매하다.
 			// 사실상 호출 함수는 3d가 상속한 2d의 FixedUpdate()이다.
 			// 유니티에서는 rigid body update에 쓰인다고 한다.
 			// 아마도 애니메이션의 속도를 일관성있게 만들기 위함인듯 하다.
 			// 그런데 이 대상은 Scene에 존재할텐데...
-			m_ActivePath->FixedUpdate();
+			m_pActivePath->FixedUpdate();
 		}
 	}
 	
@@ -168,9 +168,9 @@ namespace dive
 
 		// lua
 
-		if (m_ActivePath)
+		if (m_pActivePath)
 		{
-			m_ActivePath->Render();
+			m_pActivePath->Render();
 		}
 
 		Compose();
@@ -179,26 +179,26 @@ namespace dive
 
 	void Runtime::Compose()
 	{
-		if (m_ActivePath)
+		if (m_pActivePath)
 		{
-			m_ActivePath->Compose();
+			m_pActivePath->Compose();
 		}
 	}
 
-	void Runtime::ActivatePath(RenderPath* path)
+	void Runtime::ActivatePath(RenderPath* pPath)
 	{
 		// 뭔가 있다.
 		{
-			if (m_ActivePath)
+			if (m_pActivePath)
 			{
-				m_ActivePath->Stop();
+				m_pActivePath->Stop();
 			}
 
-			if (path != nullptr)
+			if (pPath != nullptr)
 			{
-				path->Start();
+				pPath->Start();
 			}
-			m_ActivePath = path;
+			m_pActivePath = pPath;
 		}
 
 		CORE_TRACE("Runtime::ActivatePath()");
