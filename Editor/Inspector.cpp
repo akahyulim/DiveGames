@@ -65,12 +65,17 @@ namespace editor
 		// 이렇게 접는다. 뭐... 특별한 건 없는데 굳이 프레임 함수까지 만들어야 할까?
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			DirectX::XMFLOAT3 pos, scl;
+			float posX, posY, posZ;
+			float degreeX, degreeY, degreeZ;
+			float sclX, sclY, sclZ;
+
+			pTransform->GetLocalPosition(posX, posY, posZ);
+			pTransform->GetLocalRotation(degreeX, degreeY, degreeZ);
+			pTransform->GetLocalScale(sclX, sclY, sclZ);
+			// old ==================================
+
 			DirectX::XMFLOAT3 rot;
-			// 이걸 로컬로 보여주는게 맞나?
-			pos = pTransform->GetLocalPosition();
 			rot = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);	// 얘는 degree로 출력 및 조정되어야 한다.
-			scl = pTransform->GetLocalScale();
 
 			// ImGui::InputFloat을 랩핑한 함수다.
 			auto showFloat = [](const char* pID, const char* pLabel, float* pValue)
@@ -90,32 +95,28 @@ namespace editor
 			// 좀 더 깔끔히 다듬고 싶다.
 			// Position
 			ImGui::Text("Pos");
-			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("PosX", "##", &pos.x);
-			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("PosY", "##", &pos.y);
-			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("PosZ", "##", &pos.z);
+			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("PosX", "##", &posX);
+			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("PosY", "##", &posY);
+			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("PosZ", "##", &posZ);
 
 			// Rotation
 			ImGui::Text("Rot");
-			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("RotX", "##", &rot.x);
-			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("RotY", "##", &rot.y);
-			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("RotZ", "##", &rot.z);
+			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("RotX", "##", &degreeX);
+			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("RotY", "##", &degreeY);
+			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("RotZ", "##", &degreeZ);
 
 			// Scale
 			ImGui::Text("Scl");
-			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("SclX", "##", &scl.x);
-			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("SclY", "##", &scl.y);
-			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("SclZ", "##", &scl.z);
+			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("SclX", "##", &sclX);
+			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("SclY", "##", &sclY);
+			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("SclZ", "##", &sclZ);
 
 			// 실행 중이 아닐 때 변경 가능
 			{
 				// 계층 구조일 경우 부모의 좌표계에서 설정되는 것이 맞다.
-				pTransform->SetLocalPosition(pos);
-				pTransform->SetLocalScale(scl);
-				
-				//pTransform->SetLocalScale(XMLoadFloat3(&scl));
-			//	pTransform->SetLocalRotation(XMLoadFloat3(&rot));
-				//pTransform->SetPosition(XMLoadFloat3(&pos));
-				//pTransform->SetScale(XMLoadFloat3(&scl));
+				pTransform->SetLocalPosition(posX, posY, posZ);
+				pTransform->SetLocalRotation(degreeX, degreeY, degreeZ);
+				pTransform->SetLocalScale(sclX, sclY, sclZ);
 			}
 		}
 

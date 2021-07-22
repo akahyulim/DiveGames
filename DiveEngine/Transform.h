@@ -30,34 +30,47 @@ namespace dive
 		void UpdateTransform();
 
 		// Position
-		DirectX::XMFLOAT3 GetPosition() const;
-		void SetPosition(const DirectX::XMFLOAT3& position);
-		DirectX::XMFLOAT3 GetLocalPosition() const { return m_LocalPosition; }
-		void SetLocalPosition(const DirectX::XMFLOAT3& position);
-		
+		DirectX::XMVECTOR GetPosition() const;
+		void GetPosition(float& outX, float& outY, float& outZ) const;
+		void SetPosition(const DirectX::FXMVECTOR& position);
+		void SetPosition(float x, float y, float z);
+		DirectX::XMVECTOR GetLocalPosition() const ;
+		void GetLocalPosition(float& outX, float& outY, float& outZ) const;
+		void SetLocalPosition(const DirectX::FXMVECTOR& position);
+		void SetLocalPosition(float x, float y, float z);
+	
 		// Rotation
-		DirectX::XMFLOAT4 GetRotation() const;
-		void SetRotation(const DirectX::XMFLOAT4& rotation);
-		DirectX::XMFLOAT4 GetLocalRotation() const { return m_LocalRotation; }
-		void SetLocalRotation(const DirectX::XMFLOAT4& rotation);
-		// eular angle을 받는 것들도 필요하....나?
-		// 유니티의 경우 Quaternion에 Eular 함수가 있어서 변환시켜 준다...
-		void SetRotation(float xAngle, float yAngle, float zAngle);
-
+		DirectX::XMVECTOR GetRotation() const;
+		void GetRotation(float& degreeX, float& degreeY, float& degreeZ) const;
+		void SetRotation(const DirectX::FXMVECTOR& quaternion);
+		void SetRotation(float degreeX, float degreeY, float degreeZ);
+		DirectX::XMVECTOR GetLocalRotation() const;
+		void GetLocalRotation(float& degreeX, float& degreeY, float& degreeZ) const;
+		void SetLocalRotation(const DirectX::FXMVECTOR& quaternion);
+		void SetLocalRotation(float degreeX, float degreeY, float degreeZ);
+		
 		// Scale
-		DirectX::XMFLOAT3 GetScale() const;
-		void SetScale(const DirectX::XMFLOAT3& scale);
-		DirectX::XMFLOAT3 GetLocalScale() const { return m_LocalScale; }
-		void SetLocalScale(const DirectX::XMFLOAT3& scale);
+		DirectX::XMVECTOR GetScale() const;
+		void GetScale(float& outX, float& outY, float& outZ) const;
+		void SetScale(const DirectX::FXMVECTOR& scale);
+		void SetScale(float x, float y, float z);
+		DirectX::XMVECTOR GetLocalScale() const;
+		void GetLocalScale(float& outX, float& outY, float& outZ) const;
+		void SetLocalScale(const DirectX::FXMVECTOR& scale);
+		void SetLocalScale(float x, float y, float z);
 
-		void Translate(const DirectX::XMFLOAT3& translation, eSpace relativeTo = eSpace::Self);
+		// Move
+		void Translate(const DirectX::FXMVECTOR& translation, eSpace relativeTo = eSpace::Self);
 		void Translate(float x, float y, float z, eSpace relativeTo = eSpace::Self);
+		void Rotate(const DirectX::FXMVECTOR& enulerAngles, eSpace relativeTo = eSpace::Self);
+		void Rotate(float degreeX, float degreeY, float degreeZ, eSpace relativeTo = eSpace::Self);
+		// void RotateAround
 
-		void Rotate(const DirectX::XMFLOAT3& enulerAngles);
-		void Rotate(float xAngle, float yAngle, float zAngle);
+		void LookAt(const Transform& target);
+		void LookAt(const DirectX::FXMVECTOR& worldPosition);
+		void LookAt(float posX, float posY, float posZ);
 
-		void SetLookAtByFloat3(const DirectX::XMFLOAT3& lookAt) { m_LookAt = lookAt; }
-		void SetLookAt(float x, float y, float z);
+		// forward, up ,right
 
 		DirectX::XMMATRIX GetMatrix() const { return DirectX::XMLoadFloat4x4(&m_Matrix); }
 		const DirectX::XMFLOAT4X4& GetMatrixFloat4x4() const { return m_Matrix; }
@@ -78,39 +91,18 @@ namespace dive
 		bool IsChildOf(const Transform* pParent) const;
 		void DetachChildren();
 
-
 	private:
-		// 흐음... 얘네를 다시 public으로 올려야 할 거 같다.
-		// deltaTime을 곱할때는 VECTOR가 더 편하기 때문이다.
-		DirectX::XMVECTOR getPosition() const;
-		void setPosition(const DirectX::FXMVECTOR& position);
-		DirectX::XMVECTOR getLocalPosition() const;
-		void setLocalPosition(const DirectX::FXMVECTOR& position);
-
-		DirectX::XMVECTOR getRotation() const;
-		void setRotation(const DirectX::FXMVECTOR& rotation);
-		DirectX::XMVECTOR getLocalRotation() const;
-		void setLocalRotation(const DirectX::FXMVECTOR& rotation);
-
-		DirectX::XMVECTOR getScale() const;
-		void setScale(const DirectX::FXMVECTOR& scale);
-		DirectX::XMVECTOR getLocalScale() const;
-		void setLocalScale(const DirectX::FXMVECTOR& scale);
-
-		void translate(const DirectX::FXMVECTOR& translation, eSpace relativeTo);
 		
 	private:
 		bool m_bChanged = false;
 
-		// pTransform
+		// Transform
 		DirectX::XMFLOAT3 m_LocalPosition;
 		DirectX::XMFLOAT4 m_LocalRotation;
 		DirectX::XMFLOAT3 m_LocalScale;
 
 		DirectX::XMFLOAT4X4 m_Matrix;
 		DirectX::XMFLOAT4X4 m_LocalMatrix;
-
-		DirectX::XMFLOAT3 m_LookAt;
 
 		// heirarchy
 		Transform* m_pParent = nullptr;
