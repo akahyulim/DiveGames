@@ -72,11 +72,7 @@ namespace editor
 			pTransform->GetLocalPosition(posX, posY, posZ);
 			pTransform->GetLocalRotation(degreeX, degreeY, degreeZ);
 			pTransform->GetLocalScale(sclX, sclY, sclZ);
-			// old ==================================
-
-			DirectX::XMFLOAT3 rot;
-			rot = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);	// 얘는 degree로 출력 및 조정되어야 한다.
-
+			
 			// ImGui::InputFloat을 랩핑한 함수다.
 			auto showFloat = [](const char* pID, const char* pLabel, float* pValue)
 			{

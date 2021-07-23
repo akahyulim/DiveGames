@@ -4,9 +4,42 @@
 #include "GameObject.h"
 #include "FileStream.h"
 #include "Log.h"
+//#define _USE_MATH_DEFINES
+#include <cmath>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 namespace dive
 {
+	// 되긴 하는데... 버그가 있다.
+	// 그리고 위치가 애매하다.
+	// 그냥 math를 직접 만들까 싶다...
+	void QuaternionToEulerAngles(DirectX::XMFLOAT4 q, float& degreeX, float& degreeY, float& degreeZ)
+	{
+		float roll, pitch, yaw;
+
+		float sinr_cosp = 2.0f * (q.w * q.x + q.y * q.z);
+		float cosr_cosp = 1.0f - 2 * (q.x * q.x + q.y * q.y);
+		roll = std::atan2(sinr_cosp, cosr_cosp);
+
+		// pitch (y-axis rotation)
+		float sinp = 2 * (q.w * q.y - q.z * q.x);
+		if (std::abs(sinp) >= 1)
+			pitch = std::copysign(M_PI / 2, sinp); // use 90 degrees if out of range
+		else
+			pitch = std::asin(sinp);
+
+		// yaw (z-axis rotation)
+		float siny_cosp = 2 * (q.w * q.z + q.x * q.y);
+		float cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z);
+		yaw = std::atan2(siny_cosp, cosy_cosp);
+
+		degreeX = DirectX::XMConvertToDegrees(roll);
+		degreeY = DirectX::XMConvertToDegrees(pitch);
+		degreeZ = DirectX::XMConvertToDegrees(yaw);
+	}
+
 	Transform::Transform(GameObject* pGameObject)
 		: Component(typeid(Transform).hash_code(), pGameObject, this)
 	{
@@ -27,38 +60,33 @@ namespace dive
 	Transform::~Transform()
 	{
 		CORE_TRACE("Transform 소멸자 호출");
-		//CORE_TRACE("name : {0:s}, parent name : {1:s}", GetGameObject()->GetName(), HasParent() ? GetParent()->GetGameObject()->GetName() : "nope");
-			//world pos({1:f}, {2:f}, {3:f}), local pos({4:f}, {5:f}, {6:f})",
 	}
 
 	void Transform::Update(float deltaTime)
 	{
 		//test
-		//Translate(DirectX::XMVectorSet(0.0f, 0.1f, 0.0f, 1.0f) * deltaTime, eSpace::World);
+		Translate(DirectX::XMVectorSet(0.0f, 0.1f, 0.0f, 1.0f) * deltaTime);
 	}
 
 	void Transform::Serialize(FileStream* pFileStream)
 	{
-		// local rot
 		pFileStream->Write(m_LocalPosition);
+		pFileStream->Write(m_LocalRotation);
 		pFileStream->Write(m_LocalScale);
-		// lookAt
 		pFileStream->Write(m_pParent ? m_pParent->GetGameObject()->GetInstanceID() : 0);
 	}
 
 	void Transform::Deserialize(FileStream* pFileStream)
 	{
-		// local rot
 		pFileStream->Read(&m_LocalPosition);
+		pFileStream->Read(&m_LocalRotation);
 		pFileStream->Read(&m_LocalScale);
-		// lookAt
 		unsigned int parentId = 0;
 		pFileStream->Read(&parentId);
 
-		// update pTransform
+		UpdateTransform();
 	}
 
-	// 변환 행렬은 구현을 완료하였다.
 	void Transform::UpdateTransform()
 	{
 		DirectX::XMMATRIX matLocalPos = DirectX::XMMatrixTranslationFromVector(GetLocalPosition());
@@ -100,7 +128,6 @@ namespace dive
 		if (DirectX::XMVector3Equal(position, GetPosition()))
 			return;
 
-		// GetMatrix면 부모의 Scale 변환까지 적용되는 건데...
 		SetLocalPosition(
 			HasParent() ?
 			DirectX::XMVector3Transform(position, DirectX::XMMatrixInverse(nullptr, GetParent()->GetMatrix())) :
@@ -142,14 +169,14 @@ namespace dive
 
 	DirectX::XMVECTOR Transform::GetRotation() const
 	{
-		// 이것두 행렬에서 계산해야 한다.
+		// 행렬에서 계산해야 한다.
 
 		return DirectX::XMQuaternionIdentity();
 	}
 	
 	void Transform::GetRotation(float& degreeX, float& degreeY, float& degreeZ) const
 	{
-		// 최대 난관!!!
+		// GetRotation의 결과를 사용해야 한다.
 
 		degreeX = 0.0f;
 		degreeY = 0.0f;
@@ -163,7 +190,7 @@ namespace dive
 
 		SetLocalRotation(
 			HasParent() ?
-			quaternion * DirectX::XMQuaternionInverse(GetParent()->GetRotation()) :
+			DirectX::XMQuaternionMultiply(quaternion, DirectX::XMQuaternionInverse(GetParent()->GetRotation())) :
 			quaternion
 		);
 	}
@@ -174,6 +201,7 @@ namespace dive
 		float radianY = DirectX::XMConvertToRadians(degreeY);
 		float radianZ = DirectX::XMConvertToRadians(degreeZ);
 
+		// 사실 이 부분도 이해가 필요하다. 그냥 함수만 가져다 쓴다고 해결되는 문제가 아니다.
 		SetRotation(DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ));
 	}
 	
@@ -184,11 +212,7 @@ namespace dive
 	
 	void Transform::GetLocalRotation(float& degreeX, float& degreeY, float& degreeZ) const
 	{
-		// 이걸 어떻게 계산하냐...
-
-		degreeX = 0.0f;
-		degreeY = 0.0f;
-		degreeZ = 0.0f;
+		QuaternionToEulerAngles(m_LocalRotation, degreeX, degreeY, degreeZ);
 	}
 	
 	void Transform::SetLocalRotation(const DirectX::FXMVECTOR& quaternion)
@@ -262,7 +286,7 @@ namespace dive
 
 		DirectX::XMStoreFloat3(&m_LocalScale, scale);
 
-		// 0.0f라면 다른 값으로 변경해줘야 한다.
+		// 요소 중 하나라도 0.0f 면 안되기 때문이 확인 후 변경해 주어야 한다.
 
 		UpdateTransform();
 	}
@@ -272,20 +296,20 @@ namespace dive
 		SetLocalScale(DirectX::XMVectorSet(x, y, z, 1.0f));
 	}
 
+	// 테스트 하기가 애매하다.
 	void Transform::Translate(const DirectX::FXMVECTOR& translation, eSpace relativeTo)
 	{
 		switch (relativeTo)
 		{
 		case eSpace::World:
 		{
+			// 이게 셀프라 생각했는데 테스트 해보니 월드 좌표로 움직인다.
 			SetPosition(GetPosition() + translation);
 			return;
 		}
 		case eSpace::Self:
 		{
-			// 회전행렬을 곱해야 한다.
-			//=> 이게 아닐 수도 있을 것 같다.
-			// 좀 더 생각해보자.
+			// 아마도 translation에 월드 회전을 곱해야 할 거 같다.
 			return;
 		}
 		default:
@@ -298,8 +322,25 @@ namespace dive
 		Translate(DirectX::XMVectorSet(x, y, z, 1.0f), relativeTo);
 	}
 
-	void Transform::Rotate(const DirectX::FXMVECTOR& enulerAngles, eSpace relativeTo)
+	// 원래 오일러 앵글을 Vector3로 받는 함수다.
+	// 그런데 XMVECTOR의 경우 애매해서 그냥 Quaternion으로 두었다.
+	// 이는 Rotation도 마찬가지다. 원래는 오일러 앵글의 각도를 Vec3로 받는게 자연스러운 구현일 것이다.
+	// 그런데 이 Rotate의 경우 XMFLOAT3로 받으면 deltaTime을 곱할 수가 없다.
+	void Transform::Rotate(const DirectX::FXMVECTOR& quaternion, eSpace relativeTo)
 	{
+		switch (relativeTo)
+		{
+		case eSpace::World:
+		{
+			return;
+		}
+		case eSpace::Self:
+		{
+			return;
+		}
+		default:
+			return;
+		}
 	}
 
 	void Transform::Rotate(float degreeX, float degreeY, float degreeZ, eSpace relativeTo)
@@ -313,6 +354,7 @@ namespace dive
 
 	// 대상을 바라보는 방향이 전방벡터가 되도록 회전시킨다.
 	// 유니티에서는 두 번째 매개변수로 WorldUp vector를 전달 받았다.
+	// 이것도 역시나 Vector3가 자연스러울 것이다.
 	void Transform::LookAt(const DirectX::FXMVECTOR& worldPosition)
 	{
 

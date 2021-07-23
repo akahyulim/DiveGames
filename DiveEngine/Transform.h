@@ -62,7 +62,7 @@ namespace dive
 		// Move
 		void Translate(const DirectX::FXMVECTOR& translation, eSpace relativeTo = eSpace::Self);
 		void Translate(float x, float y, float z, eSpace relativeTo = eSpace::Self);
-		void Rotate(const DirectX::FXMVECTOR& enulerAngles, eSpace relativeTo = eSpace::Self);
+		void Rotate(const DirectX::FXMVECTOR& quaternion, eSpace relativeTo = eSpace::Self);
 		void Rotate(float degreeX, float degreeY, float degreeZ, eSpace relativeTo = eSpace::Self);
 		// void RotateAround
 
