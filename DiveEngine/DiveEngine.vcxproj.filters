@@ -400,7 +400,7 @@
     <ClInclude Include="Quaternion.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Matrix.h">
+    <ClInclude Include="Matrix4x4.h">
       <Filter>Engine\Math</Filter>
     </ClInclude>
   </ItemGroup>
@@ -510,7 +510,7 @@
     <ClCompile Include="Quaternion.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Matrix.cpp">
+    <ClCompile Include="Matrix4x4.cpp">
       <Filter>Engine\Math</Filter>
     </ClCompile>
   </ItemGroup>

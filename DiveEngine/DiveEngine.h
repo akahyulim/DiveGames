@@ -9,6 +9,12 @@
 #include "RenderPath.h"
 #include "RenderPath3D.h"
 
+//= Math ==========================
+#include "Vector2.h"
+#include "Vector3.h"
+#include "Quaternion.h"
+#include "Matrix4x4.h"
+
 //= Graphics ======================
 #include "GraphicsDevice.h"
 #include "Renderer.h"

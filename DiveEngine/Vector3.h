@@ -29,6 +29,7 @@ namespace dive
 
 		~Vector3() = default;
 
+		// operator overloading
 		void operator+=(const Vector3& rhs)
 		{
 			this->x += rhs.x;
@@ -108,7 +109,6 @@ namespace dive
 			this->z /= rhs.z;
 		}
 
-		// 이건 좀 에반가...?
 		void operator/=(const float value)
 		{
 			x /= value;
@@ -139,17 +139,30 @@ namespace dive
 		Vector3 operator-() const { return Vector3(-x, -y, -z); }
 
 		float Length() const { return std::sqrt(x * x + y * y + z * z); }
-		float SqrLenth() const { return x * x + y * y + z * z; }
+		float SqrLength() const { return x * x + y * y + z * z; }
 
 		void Normalize()
 		{
-			// 값을 정규화한다.
+			const auto sqrLength = SqrLength();
+			
+			if (sqrLength != 1.0f && sqrLength > 0.0f)
+			{
+				x /= Length();
+				y /= Length();
+				z /= Length();
+			}
 		}
 
 		Vector3 Normalized() const
 		{
-			// 정규화한 값을 리턴한다.
-			return Vector3();
+			const auto sqrLength = SqrLength();
+
+			if (sqrLength != 1.0f && sqrLength > 0.0f)
+			{
+				return (*this) / Length();
+			}
+			else
+				return *this;
 		}
 
 		static Vector3 Normalize(const Vector3& v)
