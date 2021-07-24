@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector3.h"
+#include "Quaternion.h"
 
 namespace dive
 {
@@ -66,16 +67,14 @@ namespace dive
 			*this = (*this) * rhs;
 		}
 
-		// 계산 과정이 예상과 다르다. 
-		// 동차항 변환? 때문인 것 같다. 좀 더 알아본 후 구현하자.
 		Vector3 operator*(const Vector3& rhs) const
 		{
 			float x = (rhs.x * this->m00) + (rhs.x * this->m10) + (rhs.x * this->m20) + this->m30;
 			float y = (rhs.y * this->m01) + (rhs.y * this->m11) + (rhs.y * this->m21) + this->m31;
 			float z = (rhs.z * this->m02) + (rhs.z * this->m12) + (rhs.z * this->m22) + this->m32;
-			//float w = (rhs.x * this->m00) + (rhs.x * this->m10) + (rhs.x * this->m20) + this->m30;
+			float w = 1 / ((rhs.x * this->m03) + (rhs.x * this->m13) + (rhs.x * this->m23) + this->m33);
 	
-			return Vector3();
+			return Vector3(x * w, y * w, z * w);
 		}
 
 		bool operator==(const Matrix4x4& rhs)
@@ -102,15 +101,40 @@ namespace dive
 			m30 = 0.0f, m31 = 0.0f, m32 = 0.0f, m33 = 1.0f;
 		}
 
-		// Inverse : 역행렬 리턴
-		// IsIdentity : 단위 행렬 확인
-		// Transpose : 전치 행렬 반환
+		bool IsIdentity()
+		{
+			return (*this) == Identity;
+		}
+
+		Matrix4x4 Transpose() const
+		{
+			return Matrix4x4(
+				m00, m10, m20, m30,
+				m01, m11, m21, m31,
+				m02, m12, m22, m32,
+				m03, m13, m23, m33
+			);
+		}
+
+		Matrix4x4 Inverse() const
+		{
+			// 자신의 값을 이용한 역행렬을 계산 후 리턴
+			return Matrix4x4();
+		}
 
 		// 스파르탄의 경우 scale, quaternion도 얻을 수 있다.
 
 		// static fucntion
-		// Ortho : left, right, bottom, top, near, far을 전달하면 직교 투영 행렬 생성 리턴
-		// Perspective : fov, aspect, near, far을 전달하면 투영 행렬 생성 리턴
+		static Matrix4x4 Ortho(float left, float right, float bottom, float top, float near, float far)
+		{
+			return Matrix4x4();
+		}
+
+		static Matrix4x4 Perspective(float fov, float aspect, float near, float far)
+		{
+			return Matrix4x4();
+		}
+
 		static Matrix4x4 Scale(const Vector3& v)
 		{
 			return Matrix4x4(
@@ -121,7 +145,23 @@ namespace dive
 			);
 		}
 
-		// TRS: Vector3 pos, Quaternion q, Vectror3 s를 전달하면 변환 행렬 생성 리턴
+		static Matrix4x4 Rotation(const Quaternion& q)
+		{
+			// 쿼터니언을 회전 행렬로 변환한다.
+			return Matrix4x4();
+		}
+
+		static Matrix4x4 TRS(const Vector3& pos, const Quaternion& q, const Vector3& s)
+		{
+			const auto rotation = Rotation(q);
+
+			return Matrix4x4(
+				s.x * rotation.m00, s.x * rotation.m01, s.x * rotation.m02, 0.0f,
+				s.y * rotation.m10, s.y * rotation.m11, s.y * rotation.m12, 0.0f,
+				s.z * rotation.m20, s.z * rotation.m21, s.z * rotation.m22, 0.0f,
+				pos.x,				pos.y,				pos.z,				1.0f
+			);
+		}
 
 	public:
 		// 1. 변수의 선언 순서대로 메모리 접근이 가능한 것 같다.

@@ -25,7 +25,11 @@ namespace dive
 		~Quaternion() = default;
 		
 		// operator overloading
-		// 곱하기 자체는 꽤 복잡하다.
+		Quaternion operator*(const Quaternion& rhs) const
+		{
+			// 겁나 복잡함...
+			return Quaternion();
+		}
 
 		Quaternion operator*(float value) const
 		{
@@ -52,12 +56,14 @@ namespace dive
 
 		}
 
-		
+		// static
 
 	public:
 		float x;
 		float y;
 		float z;
 		float w;
+
+		static const Quaternion Identity;
 	};
 }

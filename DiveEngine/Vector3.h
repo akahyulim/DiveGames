@@ -141,18 +141,6 @@ namespace dive
 		float Length() const { return std::sqrt(x * x + y * y + z * z); }
 		float SqrLength() const { return x * x + y * y + z * z; }
 
-		void Normalize()
-		{
-			const auto sqrLength = SqrLength();
-			
-			if (sqrLength != 1.0f && sqrLength > 0.0f)
-			{
-				x /= Length();
-				y /= Length();
-				z /= Length();
-			}
-		}
-
 		Vector3 Normalized() const
 		{
 			const auto sqrLength = SqrLength();
@@ -163,11 +151,6 @@ namespace dive
 			}
 			else
 				return *this;
-		}
-
-		static Vector3 Normalize(const Vector3& v)
-		{
-			return v.Normalized();
 		}
 		
 		static float Dot(const Vector3& lhs, const Vector3& rhs)
