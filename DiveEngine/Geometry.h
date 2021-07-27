@@ -1,5 +1,6 @@
 #pragma once
-#include "GraphicsInclude.h"
+#include "Vector2.h"
+#include "Vector3.h"
 #include "VertexTypes.h"
 #include <vector>
 
@@ -11,10 +12,10 @@ namespace dive::utility::geometry
 {
     static void CreateQuad(std::vector<VertexType_PosTexNorTan>& vertices, std::vector<unsigned int>& indices)
     {
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, 0.5f, 0.0f), DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT3(0, 1, 0), DirectX::XMFLOAT3(1, 0, 0));   // 0 top-left
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, 0.5f, 0.0f), DirectX::XMFLOAT2(1, 0), DirectX::XMFLOAT3(0, 1, 0), DirectX::XMFLOAT3(1, 0, 0));    // 1 top-right
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(0, 1), DirectX::XMFLOAT3(0, 1, 0), DirectX::XMFLOAT3(1, 0, 0));  // 2 bottom-left
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, -0.5f, 0.0f), DirectX::XMFLOAT2(1, 1), DirectX::XMFLOAT3(0, 1, 0), DirectX::XMFLOAT3(1, 0, 0));   // 3 bottom-right
+        vertices.emplace_back(Vector3(-0.5f, 0.5f, 0.0f), Vector2(0, 0), Vector3(0, 1, 0), Vector3(1, 0, 0));   // 0 top-left
+        vertices.emplace_back(Vector3(0.5f, 0.5f, 0.0f), Vector2(1, 0), Vector3(0, 1, 0), Vector3(1, 0, 0));    // 1 top-right
+        vertices.emplace_back(Vector3(-0.5f, -0.5f, 0.0f), Vector2(0, 1), Vector3(0, 1, 0), Vector3(1, 0, 0));  // 2 bottom-left
+        vertices.emplace_back(Vector3(0.5f, -0.5f, 0.0f), Vector2(1, 1), Vector3(0, 1, 0), Vector3(1, 0, 0));   // 3 bottom-right
 
         indices.emplace_back(0);    indices.emplace_back(1);    indices.emplace_back(3);
         indices.emplace_back(3);    indices.emplace_back(2);    indices.emplace_back(0);
@@ -23,40 +24,40 @@ namespace dive::utility::geometry
 	static void CreateCube(std::vector<VertexType_PosTexNorTan>& vertices, std::vector<unsigned int>& indices)
 	{
         // front
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT2(0, 1), DirectX::XMFLOAT3(0, 0, -1), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, 0.5f, -0.5f), DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT3(0, 0, -1), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, -0.5f, -0.5f), DirectX::XMFLOAT2(1, 1), DirectX::XMFLOAT3(0, 0, -1), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, 0.5f, -0.5f), DirectX::XMFLOAT2(1, 0), DirectX::XMFLOAT3(0, 0, -1), DirectX::XMFLOAT3(0, 1, 0));
+        vertices.emplace_back(Vector3(-0.5f, -0.5f, -0.5f), Vector2(0, 1), Vector3(0, 0, -1), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(-0.5f, 0.5f, -0.5f), Vector2(0, 0), Vector3(0, 0, -1), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(0.5f, -0.5f, -0.5f), Vector2(1, 1), Vector3(0, 0, -1), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(0.5f, 0.5f, -0.5f), Vector2(1, 0), Vector3(0, 0, -1), Vector3(0, 1, 0));
 
         // bottom
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f), DirectX::XMFLOAT2(0, 1), DirectX::XMFLOAT3(0, -1, 0), DirectX::XMFLOAT3(1, 0, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT3(0, -1, 0), DirectX::XMFLOAT3(1, 0, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f), DirectX::XMFLOAT2(1, 1), DirectX::XMFLOAT3(0, -1, 0), DirectX::XMFLOAT3(1, 0, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, -0.5f, -0.5f), DirectX::XMFLOAT2(1, 0), DirectX::XMFLOAT3(0, -1, 0), DirectX::XMFLOAT3(1, 0, 0));
+        vertices.emplace_back(Vector3(-0.5f, -0.5f, 0.5f), Vector2(0, 1), Vector3(0, -1, 0), Vector3(1, 0, 0));
+        vertices.emplace_back(Vector3(-0.5f, -0.5f, -0.5f), Vector2(0, 0), Vector3(0, -1, 0), Vector3(1, 0, 0));
+        vertices.emplace_back(Vector3(0.5f, -0.5f, 0.5f), Vector2(1, 1), Vector3(0, -1, 0), Vector3(1, 0, 0));
+        vertices.emplace_back(Vector3(0.5f, -0.5f, -0.5f), Vector2(1, 0), Vector3(0, -1, 0), Vector3(1, 0, 0));
 
         // back
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f), DirectX::XMFLOAT2(1, 1), DirectX::XMFLOAT3(0, 0, 1), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, 0.5f, 0.5f), DirectX::XMFLOAT2(1, 0), DirectX::XMFLOAT3(0, 0, 1), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f), DirectX::XMFLOAT2(0, 1), DirectX::XMFLOAT3(0, 0, 1), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f), DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT3(0, 0, 1), DirectX::XMFLOAT3(0, 1, 0));
+        vertices.emplace_back(Vector3(-0.5f, -0.5f, 0.5f), Vector2(1, 1), Vector3(0, 0, 1), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(-0.5f, 0.5f, 0.5f), Vector2(1, 0), Vector3(0, 0, 1), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(0.5f, -0.5f, 0.5f), Vector2(0, 1), Vector3(0, 0, 1), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(0.5f, 0.5f, 0.5f), Vector2(0, 0), Vector3(0, 0, 1), Vector3(0, 1, 0));
 
         // top
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, 0.5f, 0.5f), DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT3(0, 1, 0), DirectX::XMFLOAT3(1, 0, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, 0.5f, -0.5f), DirectX::XMFLOAT2(0, 1), DirectX::XMFLOAT3(0, 1, 0), DirectX::XMFLOAT3(1, 0, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f), DirectX::XMFLOAT2(1, 0), DirectX::XMFLOAT3(0, 1, 0), DirectX::XMFLOAT3(1, 0, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, 0.5f, -0.5f), DirectX::XMFLOAT2(1, 1), DirectX::XMFLOAT3(0, 1, 0), DirectX::XMFLOAT3(1, 0, 0));
+        vertices.emplace_back(Vector3(-0.5f, 0.5f, 0.5f), Vector2(0, 0), Vector3(0, 1, 0), Vector3(1, 0, 0));
+        vertices.emplace_back(Vector3(-0.5f, 0.5f, -0.5f), Vector2(0, 1), Vector3(0, 1, 0), Vector3(1, 0, 0));
+        vertices.emplace_back(Vector3(0.5f, 0.5f, 0.5f), Vector2(1, 0), Vector3(0, 1, 0), Vector3(1, 0, 0));
+        vertices.emplace_back(Vector3(0.5f, 0.5f, -0.5f), Vector2(1, 1), Vector3(0, 1, 0), Vector3(1, 0, 0));
 
         // left
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, -0.5f, 0.5f), DirectX::XMFLOAT2(0, 1), DirectX::XMFLOAT3(-1, 0, 0), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, 0.5f, 0.5f), DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT3(-1, 0, 0), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, -0.5f, -0.5f), DirectX::XMFLOAT2(1, 1), DirectX::XMFLOAT3(-1, 0, 0), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(-0.5f, 0.5f, -0.5f), DirectX::XMFLOAT2(1, 0), DirectX::XMFLOAT3(-1, 0, 0), DirectX::XMFLOAT3(0, 1, 0));
+        vertices.emplace_back(Vector3(-0.5f, -0.5f, 0.5f), Vector2(0, 1), Vector3(-1, 0, 0), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(-0.5f, 0.5f, 0.5f), Vector2(0, 0), Vector3(-1, 0, 0), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(-0.5f, -0.5f, -0.5f), Vector2(1, 1), Vector3(-1, 0, 0), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(-0.5f, 0.5f, -0.5f), Vector2(1, 0), Vector3(-1, 0, 0), Vector3(0, 1, 0));
 
         // right
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f), DirectX::XMFLOAT2(1, 1), DirectX::XMFLOAT3(1, 0, 0), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f), DirectX::XMFLOAT2(1, 0), DirectX::XMFLOAT3(1, 0, 0), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, -0.5f, -0.5f), DirectX::XMFLOAT2(0, 1), DirectX::XMFLOAT3(1, 0, 0), DirectX::XMFLOAT3(0, 1, 0));
-        vertices.emplace_back(DirectX::XMFLOAT3(0.5f, 0.5f, -0.5f), DirectX::XMFLOAT2(0, 0), DirectX::XMFLOAT3(1, 0, 0), DirectX::XMFLOAT3(0, 1, 0));
+        vertices.emplace_back(Vector3(0.5f, -0.5f, 0.5f), Vector2(1, 1), Vector3(1, 0, 0), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(0.5f, 0.5f, 0.5f), Vector2(1, 0), Vector3(1, 0, 0), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(0.5f, -0.5f, -0.5f), Vector2(0, 1), Vector3(1, 0, 0), Vector3(0, 1, 0));
+        vertices.emplace_back(Vector3(0.5f, 0.5f, -0.5f), Vector2(0, 0), Vector3(1, 0, 0), Vector3(0, 1, 0));
 
         // front
         indices.emplace_back(0); indices.emplace_back(1); indices.emplace_back(2);

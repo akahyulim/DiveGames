@@ -1,4 +1,5 @@
 #pragma once
+#include "DiveCore.h"
 #include <cmath>
 
 namespace dive
@@ -25,6 +26,19 @@ namespace dive
 		}
 
 		~Vector2() = default;
+
+		// operartor overloading
+		float operator[](size_t idx) const
+		{
+			DV_ASSERT(idx <= 2);
+			return (&x)[idx];
+		}
+
+		float operator[](size_t idx)
+		{
+			DV_ASSERT(idx <= 2);
+			return (&x)[idx];
+		}
 
 		void operator+=(const Vector2& rhs)
 		{
@@ -100,6 +114,8 @@ namespace dive
 
 		void operator/=(const float value)
 		{
+			DV_ASSERT(value != 0.0f);
+
 			x /= value;
 			y /= value;
 		}
@@ -111,6 +127,8 @@ namespace dive
 
 		Vector2 operator/(const float value) const
 		{
+			DV_ASSERT(value != 0.0f);
+
 			return Vector2(x / value, y / value);
 		}
 
@@ -129,13 +147,16 @@ namespace dive
 		float Length() const { return std::sqrt(x * x + y * y); }
 		float SqrLenth() const { return x * x + y * y; }
 
+		static Vector2 Lerp(const Vector2& a, const Vector2& b, float t)
+		{
+			return a + (b - a) * t;
+		}
 
 		// Nomalize
 		// Nomalized
 
 	public:
-		float x;
-		float y;
+		float x, y;
 
 		static const Vector2 Zero;
 		static const Vector2 One;

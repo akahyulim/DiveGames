@@ -1,5 +1,6 @@
 #pragma once
-#include "GraphicsInclude.h"
+#include "Vector2.h"
+#include "Vector3.h"
 
 namespace dive
 {
@@ -7,10 +8,10 @@ namespace dive
 	{
 		VertexType_PosTexNorTan() = default;
 		VertexType_PosTexNorTan(
-			const DirectX::XMFLOAT3& pos,
-			const DirectX::XMFLOAT2& tex,
-			const DirectX::XMFLOAT3& nor = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
-			const DirectX::XMFLOAT3& tan = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f))
+			const Vector3& pos,
+			const Vector2& tex,
+			const Vector3& nor = Vector3::Zero,
+			const Vector3& tan = Vector3::Zero)
 		{
 			this->position[0] = pos.x;
 			this->position[1] = pos.y;
@@ -28,6 +29,7 @@ namespace dive
 			this->tangent[2] = tan.z;
 		}
 
+		// 스파르탄 역시 배열로 관리한다.
 		float position[3] = { 0.0f, };
 		float texCoord[2] = { 0.0f, };
 		float normal[3] = { 0.0f, };

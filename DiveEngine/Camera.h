@@ -1,5 +1,8 @@
 #pragma once
 #include "Component.h"
+#include "Vector3.h"
+#include "Vector4.h"
+#include "Matrix4x4.h"
 #include <DirectXMath.h>
 
 namespace dive
@@ -31,9 +34,9 @@ namespace dive
 		float GetFarPlane() const { return m_FarPlane; }
 		void SetFarPlane(float farPlane) { m_FarPlane = farPlane; }
 		
-		DirectX::XMFLOAT4 GetClearClor() const { return m_ClearColor; }
-		void SetClearColor(const DirectX::XMFLOAT4& color) { m_ClearColor = color; }
-		void SetClearColor(float r, float g, float b, float a) { m_ClearColor = DirectX::XMFLOAT4(r, g, b, a); }
+		Vector4 GetClearClor() const { return m_ClearColor; }
+		void SetClearColor(const Vector4& color) { m_ClearColor = color; }
+		void SetClearColor(float r, float g, float b, float a) { m_ClearColor = Vector4(r, g, b, a); }
 
 	private:
 		DirectX::XMMATRIX computeViewMatrix() const;
@@ -44,9 +47,9 @@ namespace dive
 		float m_NearPlane;
 		float m_FarPlane;
 
-		DirectX::XMFLOAT3 m_Position;
-		DirectX::XMFLOAT4 m_ClearColor;
-		DirectX::XMFLOAT4X4 m_View;
-		DirectX::XMFLOAT4X4 m_Projection;
+		Vector3 m_Position;
+		Vector4 m_ClearColor;
+		Matrix4x4 m_View;
+		Matrix4x4 m_Projection;
 	};
 }

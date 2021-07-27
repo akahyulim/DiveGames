@@ -1,5 +1,8 @@
 #pragma once
 #include "Component.h"
+#include "Vector3.h"
+#include "Quaternion.h"
+#include "Matrix4x4.h"
 #include <DirectXMath.h>
 #include <string>
 #include <vector>
@@ -30,6 +33,12 @@ namespace dive
 		void UpdateTransform();
 
 		// Position
+		Vector3 dvGetPosition() const;
+		void dvSetPosition(const Vector3& p);
+		Vector3 dvGetLocalPosition() const { return m_dvLocalPosition; }
+		void dvSetLocalPosition(const Vector3& p);
+
+
 		DirectX::XMVECTOR GetPosition() const;
 		void GetPosition(float& outX, float& outY, float& outZ) const;
 		void SetPosition(const DirectX::FXMVECTOR& position);
@@ -40,6 +49,11 @@ namespace dive
 		void SetLocalPosition(float x, float y, float z);
 	
 		// Rotation
+		Quaternion dvGetRotation() const;
+		void dvSetRotation(const Quaternion& q);
+		Quaternion dvGetLocalRotation() const { return m_dvLocalRotation; }
+		void dvSetLocalRotation(const Quaternion& q);
+
 		DirectX::XMVECTOR GetRotation() const;
 		void GetRotation(float& degreeX, float& degreeY, float& degreeZ) const;
 		void SetRotation(const DirectX::FXMVECTOR& quaternion);
@@ -50,6 +64,11 @@ namespace dive
 		void SetLocalRotation(float degreeX, float degreeY, float degreeZ);
 		
 		// Scale
+		Vector3 dvGetScale() const;
+		void dvSetScale(const Vector3& s);
+		Vector3 dvGetLocalScale() const { return m_dvLocalScale; }
+		void dvSetLocalScale(const Vector3& s);
+
 		DirectX::XMVECTOR GetScale() const;
 		void GetScale(float& outX, float& outY, float& outZ) const;
 		void SetScale(const DirectX::FXMVECTOR& scale);
@@ -92,11 +111,19 @@ namespace dive
 		void DetachChildren();
 
 	private:
+		void transformUpdate();
 		
 	private:
 		bool m_bChanged = false;
 
 		// Transform
+		Vector3 m_dvLocalPosition;
+		Quaternion m_dvLocalRotation;
+		Vector3 m_dvLocalScale;
+
+		Matrix4x4 m_dvMatrix;
+		Matrix4x4 m_dvLocalMatrix;
+
 		DirectX::XMFLOAT3 m_LocalPosition;
 		DirectX::XMFLOAT4 m_LocalRotation;
 		DirectX::XMFLOAT3 m_LocalScale;

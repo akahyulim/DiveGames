@@ -1,4 +1,5 @@
 #pragma once
+#include "DiveCore.h"
 #include <cmath>
 
 namespace dive
@@ -30,6 +31,18 @@ namespace dive
 		~Vector3() = default;
 
 		// operator overloading
+		float operator[](size_t idx) const
+		{
+			DV_ASSERT(idx <= 3);
+			return (&x)[idx];
+		}
+
+		float& operator[](size_t idx)
+		{
+			DV_ASSERT(idx <= 3);
+			return (&x)[idx];
+		}
+
 		void operator+=(const Vector3& rhs)
 		{
 			this->x += rhs.x;
@@ -111,6 +124,8 @@ namespace dive
 
 		void operator/=(const float value)
 		{
+			DV_ASSERT(value != 0.0f);
+
 			x /= value;
 			y /= value;
 			z /= value;
@@ -123,6 +138,8 @@ namespace dive
 
 		Vector3 operator/(const float value) const
 		{
+			DV_ASSERT(value != 0.0f);
+
 			return Vector3(x / value, y / value, z / value);
 		}
 
@@ -181,8 +198,7 @@ namespace dive
 
 		static Vector3 Lerp(const Vector3& a, const Vector3& b, float t)
 		{
-			// ¼±Çü º¸°£.. ±î¸Ô¾ú³×. Á¨Àå!!!!
-			return Vector3();
+			return a * (b - a) * t;
 		}
 
 		static Vector3 Max(const Vector3& lhs, const Vector3& rhs)
@@ -201,9 +217,7 @@ namespace dive
 		}
 
 	public:
-		float x;
-		float y;
-		float z;
+		float x, y, z;
 
 		static const Vector3 Zero;
 		static const Vector3 One;

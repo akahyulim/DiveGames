@@ -111,6 +111,34 @@ namespace dive
 		}
 	}
 
+	Vector3 Transform::dvGetPosition() const
+	{
+		// 아... 행렬에서 가져올 수 밖에 없나...
+		// position의 경우엔 가장 깔끔하긴 하다.
+		// 그런데 유니티에선 관련 함수가 없다.
+
+		return Vector3::Zero;
+	}
+
+	void Transform::dvSetPosition(const Vector3& p)
+	{
+		if (dvGetPosition() == p)
+			return;
+
+		// SetLocal...
+	}
+
+	void Transform::dvSetLocalPosition(const Vector3& p)
+	{
+		if (m_dvLocalPosition == p)
+			return;
+
+		m_dvLocalPosition = p;
+
+		transformUpdate();
+	}
+
+	//= 여기서 부터 ============================================================================
 	DirectX::XMVECTOR Transform::GetPosition() const
 	{
 		return DirectX::XMVectorSet(m_Matrix._41, m_Matrix._42, m_Matrix._43, 1.0f);
@@ -166,7 +194,33 @@ namespace dive
 	{
 		SetLocalPosition(DirectX::XMVectorSet(x, y, z, 1.0f));
 	}
+	//= 여기 까지 ===================================================================================
+	
+	Quaternion Transform::dvGetRotation() const
+	{
+		// 이것두 역시 행렬로 부터 구해야 하나...
+		return Quaternion();
+	}
 
+	void Transform::dvSetRotation(const Quaternion& q)
+	{
+		if (dvGetRotation() == q)
+			return;
+
+		// 회전 사원수 역을 곱한다. 아직 미구현
+	}
+
+	void Transform::dvSetLocalRotation(const Quaternion& q)
+	{
+		if (m_dvLocalRotation == q)
+			return;
+
+		m_dvLocalRotation = q;
+
+		transformUpdate();
+	}
+
+	//= 여기서 부터 ========================================================================================================
 	DirectX::XMVECTOR Transform::GetRotation() const
 	{
 		// 행렬에서 계산해야 한다.
@@ -233,7 +287,37 @@ namespace dive
 
 		SetLocalRotation(DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ));
 	}
+	// 여기까지 ============================================================================================================
+
+	Vector3 Transform::dvGetScale() const
+	{
+		// 이것두 행렬에서 가져와야 한다.
+		// 그런데 유니티는 어떻게 했을까...
+
+		return Vector3();
+	}
+
+	void Transform::dvSetScale(const Vector3& s)
+	{
+		if (dvGetScale() == s)
+			return;
+
+		dvSetLocalScale(
+			HasParent() ?
+			s / GetParent()->dvGetScale() : s);
+	}
+
+	void Transform::dvSetLocalScale(const Vector3& s)
+	{
+		if (m_dvLocalScale == s)
+			return;
+
+		m_dvLocalScale = s;
+
+		transformUpdate();
+	}
 	
+	//= 여기에서 부터 =========================================================================================
 	DirectX::XMVECTOR Transform::GetScale() const
 	{
 		// 변환행렬에서 가져와야 하는데...
@@ -295,6 +379,7 @@ namespace dive
 	{
 		SetLocalScale(DirectX::XMVectorSet(x, y, z, 1.0f));
 	}
+	//= 여기까지 ===============================================================================================================
 
 	// 테스트 하기가 애매하다.
 	void Transform::Translate(const DirectX::FXMVECTOR& translation, eSpace relativeTo)
@@ -363,5 +448,9 @@ namespace dive
 	void Transform::LookAt(float posX, float posY, float posZ)
 	{
 		LookAt(DirectX::XMVectorSet(posX, posY, posZ, 1.0f));
+	}
+
+	void Transform::transformUpdate()
+	{
 	}
 }
