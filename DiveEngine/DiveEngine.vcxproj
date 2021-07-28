@@ -173,7 +173,7 @@
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="DiveCore.h" />
     <ClInclude Include="DiveEngine.h" />
-    <ClInclude Include="Matrix4x4.h" />
+    <ClInclude Include="dvMath.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="External\spdlog\async.h" />
@@ -283,7 +283,6 @@
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PipelineState.h" />
-    <ClInclude Include="Quaternion.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderPath.h" />
     <ClInclude Include="RenderPath3D.h" />
@@ -298,9 +297,6 @@
     <ClInclude Include="ThreadPool.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />
-    <ClInclude Include="Vector2.h" />
-    <ClInclude Include="Vector3.h" />
-    <ClInclude Include="Vector4.h" />
     <ClInclude Include="VertexTypes.h" />
   </ItemGroup>
   <ItemGroup>
@@ -308,7 +304,6 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="Matrix4x4.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="FileStream.cpp" />
     <ClCompile Include="FileSystemHelper.cpp" />
@@ -322,7 +317,6 @@
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
-    <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ConstantBuffers.h" />
     <ClCompile Include="Renderer_Resources.cpp" />
@@ -338,8 +332,6 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="Transform_Hierarchy.cpp" />
-    <ClCompile Include="Vector2.cpp" />
-    <ClCompile Include="Vector3.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

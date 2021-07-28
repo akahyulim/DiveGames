@@ -1,8 +1,8 @@
 #pragma once
+#include "GraphicsInclude.h"
 #include <Windows.h>
 #include <DirectXMath.h>
 #include <array>
-#include "Vector2.h"
 
 namespace dive
 {
@@ -54,10 +54,10 @@ namespace dive
 		bool GetKeyDown(const eKeyCode key);
 		bool GetKeyUp(const eKeyCode key);
   
-		Vector2 GetMousePosition() const { return m_MousePos; }
-		void SetMousePosition(const Vector2& position);
+		DirectX::XMFLOAT2 GetMousePosition() const { return m_MousePos; }
+		void SetMousePosition(const DirectX::XMFLOAT2& position);
 
-		Vector2 GetMousePositionDelta() const { return m_MousePosDelta; }
+		DirectX::XMFLOAT2 GetMousePositionDelta() const { return m_MousePosDelta; }
 		float GetMouseWheelDelta() const { return m_MouseWheelDelta; }
 
 	private:
@@ -68,12 +68,12 @@ namespace dive
 		bool m_bUpdated = false;
 
 		// keys
-		bool m_Keys[256]		= { false };
+		bool m_Keys[256] = { false };
 		bool m_OldKeys[256]	= { false };
 
 		// mouse
-		Vector2 m_MousePos = Vector2::Zero;
-		Vector2 m_MousePosDelta = Vector2::Zero;
+		DirectX::XMFLOAT2 m_MousePos = DirectX::XMFLOAT2(0.0f, 0.0f);
+		DirectX::XMFLOAT2 m_MousePosDelta = DirectX::XMFLOAT2(0.0f, 0.0f);
 		float m_MouseWheelDelta				= 0.0f;
 
   };

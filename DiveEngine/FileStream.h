@@ -1,9 +1,5 @@
 #pragma once
 #include "GraphicsInclude.h"
-// Transform 구현 후 적용
-#include "Vector2.h"
-#include "Vector3.h"
-#include "Vector4.h"
 #include <fstream>
 #include <string>
 #include <vector>

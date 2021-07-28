@@ -1,6 +1,5 @@
 #pragma once
-#include "Vector2.h"
-#include "Vector3.h"
+#include "GraphicsInclude.h"
 
 namespace dive
 {
@@ -8,10 +7,10 @@ namespace dive
 	{
 		VertexType_PosTexNorTan() = default;
 		VertexType_PosTexNorTan(
-			const Vector3& pos,
-			const Vector2& tex,
-			const Vector3& nor = Vector3::Zero,
-			const Vector3& tan = Vector3::Zero)
+			const DirectX::XMFLOAT3& pos,
+			const DirectX::XMFLOAT2& tex,
+			const DirectX::XMFLOAT3& nor = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f),
+			const DirectX::XMFLOAT3& tan = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f))
 		{
 			this->position[0] = pos.x;
 			this->position[1] = pos.y;

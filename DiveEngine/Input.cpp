@@ -55,7 +55,7 @@ namespace dive
                 if (::GetCursorPos(&pt))
                 {
                     ::ScreenToClient(m_hWnd, &pt);
-                    m_MousePos = Vector2(static_cast<float>(pt.x), static_cast<float>(pt.y));
+                    m_MousePos = DirectX::XMFLOAT2(static_cast<float>(pt.x), static_cast<float>(pt.y));
                 }
             }
 
@@ -75,7 +75,7 @@ namespace dive
         {
             // 이걸 왜 초기화할까?
             // 아 프레임 단위로 안하면 결국 값은 계산 커지니깐?
-            m_MousePosDelta = Vector2::Zero;
+            m_MousePosDelta = DirectX::XMFLOAT2(0.0f, 0.0f);
         }
 
         unsigned int cbSize = 0;
@@ -128,7 +128,7 @@ namespace dive
         return (m_OldKeys[static_cast<unsigned int>(key)] && !m_Keys[static_cast<unsigned int>(key)]);
     }
 
-    void Input::SetMousePosition(const Vector2& position)
+    void Input::SetMousePosition(const DirectX::XMFLOAT2& position)
     {
         if (m_hWnd == ::GetActiveWindow())
         {
