@@ -26,10 +26,19 @@ namespace dive
 		CORE_TRACE("Transform 소멸자 호출");
 	}
 
+	//=====================================================================//
+	// 추후 updateTransform을 없애고 IsChanged()를 적용할지 결정해야 한다. //
+	//=====================================================================//
 	void Transform::Update(float deltaTime)
 	{
-		//test
-		TranslateVector(DirectX::XMVectorSet(0.0f, 0.1f, 0.0f, 1.0f) * deltaTime);
+		// 미리 언질을 해놓자.
+		// Editor에서는 기본적으로 Update를 꺼놓아야 한다.
+		// 그리고 테스트 실행시 Update를 수행한다.
+		// 그런데 IsChanged()로 Transform을 Update한다면 즉각적으로 Editor에 반영되지 않는다.
+
+		// 이 test는 확인이 너무 힘들다.
+		//TranslateVector(DirectX::XMVectorSet(0.0f, 0.1f, 0.0f, 0.0f) * deltaTime);// , eSpace::World);
+		//RotateEulerAnglesVector(DirectX::XMVectorSet(0.0f, 45.0f, 0.0f, 0.0f) * deltaTime, eSpace::World);
 	}
 
 	void Transform::Serialize(FileStream* pFileStream)
@@ -128,6 +137,7 @@ namespace dive
 		SetLocalPositionVector(DirectX::XMVectorSet(x, y, z, 1.0f));
 	}
 
+	// Qaternion을 XMVECTOR 타입으로 리턴합니다.
 	DirectX::XMVECTOR Transform::GetRotationVector() const
 	{
 		DirectX::XMVECTOR scale, rot, trans;
@@ -136,6 +146,7 @@ namespace dive
 		return rot;
 	}
 
+	// Qaternion을 XMFLOAT4 타입으로 리턴합니다.
 	DirectX::XMFLOAT4 Transform::GetRotation() const
 	{
 		DirectX::XMFLOAT4 rot;
@@ -143,14 +154,20 @@ namespace dive
 
 		return rot;
 	}
+
+	// 오일러각을 XMFLOAT3 타입으로 리턴합니다.
+	DirectX::XMFLOAT3 Transform::GetRotationEulerAngles() const
+	{
+		return QuaternionToEulerAngles(GetRotation());
+	}
 	
 	void Transform::GetRotationEulerAngles(float& degreeX, float& degreeY, float& degreeZ) const
 	{
-		// GetRotation의 결과를 사용해야 한다.
+		auto eularAngles = QuaternionToEulerAngles(GetRotation());
 
-		degreeX = 0.0f;
-		degreeY = 0.0f;
-		degreeZ = 0.0f;
+		degreeX = eularAngles.x;
+		degreeY = eularAngles.y;
+		degreeZ = eularAngles.z;
 	}
 	
 	void Transform::SetRotationVector(const DirectX::XMVECTOR& quaternion)
@@ -169,7 +186,6 @@ namespace dive
 
 	void Transform::SetRotationEulerAngles(const DirectX::XMFLOAT3& eularAngles)
 	{
-		// 일단 아래 복붙
 		float radianX = DirectX::XMConvertToRadians(eularAngles.x);
 		float radianY = DirectX::XMConvertToRadians(eularAngles.y);
 		float radianZ = DirectX::XMConvertToRadians(eularAngles.z);
@@ -183,7 +199,6 @@ namespace dive
 		float radianY = DirectX::XMConvertToRadians(degreeY);
 		float radianZ = DirectX::XMConvertToRadians(degreeZ);
 
-		// 사실 이 부분도 이해가 필요하다. 그냥 함수만 가져다 쓴다고 해결되는 문제가 아니다.
 		SetRotationVector(DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ));
 	}
 	
@@ -223,7 +238,6 @@ namespace dive
 
 	void Transform::SetLocalRotationEulerAngles(const DirectX::XMFLOAT3& eularAngles)
 	{
-		// 일단 아래 복붙
 		float radianX = DirectX::XMConvertToRadians(eularAngles.x);
 		float radianY = DirectX::XMConvertToRadians(eularAngles.y);
 		float radianZ = DirectX::XMConvertToRadians(eularAngles.z);
@@ -295,15 +309,15 @@ namespace dive
 		outY = m_LocalScale.y;
 		outZ = m_LocalScale.z;
 	}
-	
+
+	// 자식의 경우 자신의 회전된 축을 기준으로 Scale되어야 하는 거 아닐까?
+	// 테스트 결과 부모의 축에 따라 Scale 된다.
 	void Transform::SetLocalScaleVector(const DirectX::XMVECTOR& scale)
 	{
 		if (DirectX::XMVector3Equal(scale, GetLocalScaleVector()))
 			return;
 
 		DirectX::XMStoreFloat3(&m_LocalScale, scale);
-
-		// 요소 중 하나라도 0.0f 면 안되기 때문이 확인 후 변경해 주어야 한다.
 
 		updateTransform();
 	}
@@ -318,21 +332,41 @@ namespace dive
 		SetLocalScaleVector(DirectX::XMVectorSet(x, y, z, 1.0f));
 	}
 
-	// 테스트 하기가 애매하다.
-	// 현재 내부에서 updateTransform()을 호출하고 있다.
 	void Transform::TranslateVector(const DirectX::XMVECTOR& translation, eSpace relativeTo)
 	{
 		switch (relativeTo)
 		{
 		case eSpace::World:
 		{
-			// 이게 셀프라 생각했는데 테스트 해보니 월드 좌표로 움직인다.
-			SetPositionVector(GetPositionVector() + translation);
+			// 부모든 로컬이든 다 무시하고 월드 좌표계로 이동
+			SetLocalPositionVector(GetLocalPositionVector() + translation);
 			return;
 		}
 		case eSpace::Self:
 		{
-			// 아마도 translation에 월드 회전을 곱해야 할 거 같다.
+			if (HasParent())
+			{
+				// 부모가 존재할 경우 부모의 역행렬을 곱해 부모 좌표계로 이동
+				// 아 머리가 안돌아간다.
+				// 그냥 월드 변환을 곱하면 안되나...
+				auto delta = DirectX::XMVector3Transform(translation, DirectX::XMMatrixInverse(nullptr, GetParent()->GetMatrix()));
+				SetLocalPositionVector(GetLocalPositionVector() + delta);
+
+				CORE_TRACE("delta = {0:f}, {1:f}, {2:f}", DirectX::XMVectorGetX(delta), DirectX::XMVectorGetY(delta), DirectX::XMVectorGetZ(delta));
+			}
+			else
+			{
+				/*
+				// 부모가 존재하지 않을 경우 자신의 로컬 좌표계를 곱해 로컬 좌표계로 이동
+				auto delta = DirectX::XMVector3Transform(translation, GetLocalMatrix());
+				SetLocalPositionVector(GetLocalPositionVector() + delta);
+
+				// delta가 누적되어 우주를 뚫어 버린다...
+				// 갱신된 위치에서 다시 변환이 일어나기 때문 아닐까?
+				CORE_TRACE("delta = {0:f}, {1:f}, {2:f}", DirectX::XMVectorGetX(delta), DirectX::XMVectorGetY(delta), DirectX::XMVectorGetZ(delta));
+				*/
+			}
+
 			return;
 		}
 		default:
@@ -350,20 +384,19 @@ namespace dive
 		TranslateVector(DirectX::XMVectorSet(x, y, z, 1.0f), relativeTo);
 	}
 
-	// 원래 오일러 앵글을 DirectX::XMFLOAT3로 받는 함수다.
-	// 그런데 XMVECTOR의 경우 애매해서 그냥 Quaternion으로 두었다.
-	// 이는 Rotation도 마찬가지다. 원래는 오일러 앵글의 각도를 Vec3로 받는게 자연스러운 구현일 것이다.
-	// 그런데 이 Rotate의 경우 XMFLOAT3로 받으면 deltaTime을 곱할 수가 없다.
 	void Transform::RotateVector(const DirectX::XMVECTOR& quaternion, eSpace relativeTo)
 	{
 		switch (relativeTo)
 		{
 		case eSpace::World:
 		{
+			// 그냥 곱하면 되는 걸까?
+			SetRotationVector(GetRotationVector() * quaternion);
 			return;
 		}
 		case eSpace::Self:
 		{
+			SetLocalRotationVector(GetLocalRotationVector() * quaternion);
 			return;
 		}
 		default:
@@ -376,17 +409,95 @@ namespace dive
 		RotateVector(DirectX::XMLoadFloat4(&quaternion), relativeTo);
 	}
 
+	void Transform::RotateEulerAnglesVector(const DirectX::XMVECTOR& eularAngles, eSpace relativeTo)
+	{
+		// 에바지만 일단 이렇게...
+		float radianX = DirectX::XMConvertToRadians(DirectX::XMVectorGetX(eularAngles));
+		float radianY = DirectX::XMConvertToRadians(DirectX::XMVectorGetY(eularAngles));
+		float radianZ = DirectX::XMConvertToRadians(DirectX::XMVectorGetZ(eularAngles));
+
+		// 매개변수 순서를 다시 확인해야 한다.
+		DirectX::XMVECTOR pitch = DirectX::XMQuaternionRotationRollPitchYaw(radianX, 0.0f, 0.0f);
+		DirectX::XMVECTOR yaw = DirectX::XMQuaternionRotationRollPitchYaw(0.0f, radianY, 0.0f);
+		DirectX::XMVECTOR roll = DirectX::XMQuaternionRotationRollPitchYaw(0.0f, 0.0f, radianZ);
+
+		switch (relativeTo)
+		{
+		case eSpace::World:
+		{
+			DirectX::XMVECTOR rot = GetRotationVector();
+			rot = DirectX::XMQuaternionMultiply(pitch, rot);
+			rot = DirectX::XMQuaternionMultiply(rot, yaw);
+			rot = DirectX::XMQuaternionMultiply(roll, rot);
+			rot = DirectX::XMQuaternionNormalize(rot);
+
+			SetRotationVector(rot);
+
+			return;
+		}
+		case eSpace::Self:
+		{
+			DirectX::XMVECTOR rot = GetLocalRotationVector();
+			rot = DirectX::XMQuaternionMultiply(pitch, rot);
+			rot = DirectX::XMQuaternionMultiply(rot, yaw);
+			rot = DirectX::XMQuaternionMultiply(roll, rot);
+			rot = DirectX::XMQuaternionNormalize(rot);
+
+			SetLocalRotationVector(rot);
+
+			return;
+		}
+		default:
+			return;
+		}
+	}
+
 	void Transform::RotateEulerAngles(const DirectX::XMFLOAT3& eularAngles, eSpace relativeTo)
 	{
-		// 이것과 아래것은 일단 구현이 동일할 것이다.
-		// 그런데 Wicked에선 각도를 이용해 회전 쿼터니언을 구한 다음 위와 같이 전달하는게 아니다.
-		// 각 축 별로 회전 사원수를 만든 후
-		// 곱하는 순서도 특정 법칙을 따랐다.
-		// 그리고 마지막으로 회전 사원수를 정규화했다.
+		float radianX = DirectX::XMConvertToRadians(eularAngles.x);
+		float radianY = DirectX::XMConvertToRadians(eularAngles.y);
+		float radianZ = DirectX::XMConvertToRadians(eularAngles.z);
+
+		// 매개변수 순서를 다시 확인해야 한다.
+		DirectX::XMVECTOR pitch = DirectX::XMQuaternionRotationRollPitchYaw(radianX, 0.0f, 0.0f);
+		DirectX::XMVECTOR yaw = DirectX::XMQuaternionRotationRollPitchYaw(0.0f, radianY, 0.0f);
+		DirectX::XMVECTOR roll = DirectX::XMQuaternionRotationRollPitchYaw(0.0f, 0.0f, radianZ);
+
+		switch (relativeTo)
+		{
+		case eSpace::World:
+		{
+			DirectX::XMVECTOR rot = GetRotationVector();
+			rot = DirectX::XMQuaternionMultiply(pitch, rot);
+			rot = DirectX::XMQuaternionMultiply(rot, yaw);
+			rot = DirectX::XMQuaternionMultiply(roll, rot);
+			rot = DirectX::XMQuaternionIdentity();
+
+			SetRotationVector(rot);
+
+			return;
+		}
+		case eSpace::Self:
+		{
+			DirectX::XMVECTOR rot = GetLocalRotationVector();
+			rot = DirectX::XMQuaternionMultiply(pitch, rot);
+			rot = DirectX::XMQuaternionMultiply(rot, yaw);
+			rot = DirectX::XMQuaternionMultiply(roll, rot);
+			rot = DirectX::XMQuaternionIdentity();
+
+			SetLocalRotationVector(rot);
+
+			return;
+		}
+		default:
+			return;
+		}
+
 	}
 
 	void Transform::RotateEulerAngles(float degreeX, float degreeY, float degreeZ, eSpace relativeTo)
 	{
+		RotateEulerAngles(DirectX::XMFLOAT3(degreeX, degreeY, degreeZ), relativeTo);
 	}
 
 	void Transform::LookAt(const Transform& target)

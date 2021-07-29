@@ -75,11 +75,13 @@ namespace dive
 		void SetLocalScale(float x, float y, float z);
 
 		// Move
+		// Camera를 움직이려면 구현해야 한다.
 		void TranslateVector(const DirectX::XMVECTOR& translation, eSpace relativeTo = eSpace::Self);
 		void Translate(const DirectX::XMFLOAT3& translation, eSpace relativeTo = eSpace::Self);
 		void Translate(float x, float y, float z, eSpace relativeTo = eSpace::Self);
 		void RotateVector(const DirectX::XMVECTOR& quaternion, eSpace relativeTo = eSpace::Self);
 		void Rotate(const DirectX::XMFLOAT4& quaternion, eSpace relativeTo = eSpace::Self);
+		void RotateEulerAnglesVector(const DirectX::XMVECTOR& eularAngles, eSpace relativeTo = eSpace::Self);
 		void RotateEulerAngles(const DirectX::XMFLOAT3& eularAngles, eSpace relativeTo = eSpace::Self);
 		void RotateEulerAngles(float degreeX, float degreeY, float degreeZ, eSpace relativeTo = eSpace::Self);
 		// void RotateAround
@@ -96,6 +98,7 @@ namespace dive
 		const DirectX::XMFLOAT4X4& GetLocalMatrixFloat4x4() const { return m_LocalMatrix; }
 
 		// unity
+		// 이건 Update용인데 현재는 필요없다.
 		bool HasChanged() const { return m_bChanged; }
 
 		// Hierarchy

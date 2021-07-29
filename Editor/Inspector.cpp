@@ -65,10 +65,6 @@ namespace editor
 		// 이렇게 접는다. 뭐... 특별한 건 없는데 굳이 프레임 함수까지 만들어야 할까?
 		if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			float posX, posY, posZ;
-			float degreeX, degreeY, degreeZ;
-			float sclX, sclY, sclZ;
-
 			DirectX::XMFLOAT3 pos;
 			DirectX::XMFLOAT3 rot;
 			DirectX::XMFLOAT3 scl;
