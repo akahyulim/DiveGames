@@ -50,7 +50,7 @@ namespace dive
 	private:
 	private:
 		Scene* m_pScene = nullptr;
-		bool m_bActive = true;
+		bool m_bActive = true;	// root false면 자식들도 안보여야 하지 않을까?
 
 		std::vector<Component*> m_Components;
 

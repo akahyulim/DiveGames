@@ -74,11 +74,15 @@ namespace dive
 		void SetLocalScale(const DirectX::XMFLOAT3& scale);
 		void SetLocalScale(float x, float y, float z);
 
-		// Move
-		// Camera를 움직이려면 구현해야 한다.
+		// Translate
 		void TranslateVector(const DirectX::XMVECTOR& translation, eSpace relativeTo = eSpace::Self);
 		void Translate(const DirectX::XMFLOAT3& translation, eSpace relativeTo = eSpace::Self);
 		void Translate(float x, float y, float z, eSpace relativeTo = eSpace::Self);
+		void TranslateVector(const DirectX::XMVECTOR& translation, const Transform* pRelativeTo);
+		void Translate(const DirectX::XMFLOAT3& translation, const Transform* pRelativeTo);
+		void Translate(float x, float y, float z, const Transform* pRelativeTo);
+			
+		// Rotate
 		void RotateVector(const DirectX::XMVECTOR& quaternion, eSpace relativeTo = eSpace::Self);
 		void Rotate(const DirectX::XMFLOAT4& quaternion, eSpace relativeTo = eSpace::Self);
 		void RotateEulerAnglesVector(const DirectX::XMVECTOR& eularAngles, eSpace relativeTo = eSpace::Self);

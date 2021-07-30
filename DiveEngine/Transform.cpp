@@ -36,9 +36,7 @@ namespace dive
 		// 그리고 테스트 실행시 Update를 수행한다.
 		// 그런데 IsChanged()로 Transform을 Update한다면 즉각적으로 Editor에 반영되지 않는다.
 
-		// 이 test는 확인이 너무 힘들다.
-		//TranslateVector(DirectX::XMVectorSet(0.0f, 0.1f, 0.0f, 0.0f) * deltaTime);// , eSpace::World);
-		//RotateEulerAnglesVector(DirectX::XMVectorSet(0.0f, 45.0f, 0.0f, 0.0f) * deltaTime, eSpace::World);
+		// 이 곳에서 Translate, Rotate를 test하면 각자 적용되기 때문에 결과 예측이 너무 복잡해진다.
 	}
 
 	void Transform::Serialize(FileStream* pFileStream)
@@ -332,41 +330,23 @@ namespace dive
 		SetLocalScaleVector(DirectX::XMVectorSet(x, y, z, 1.0f));
 	}
 
+	//==============================================================================//
+	// 이 구현이 맞느 것 같다.														//
+	// 현재 모든 Transform 객체들이 Update를 통해 이동하므로 이상하게 보이는 거다.	//
+	//==============================================================================//
 	void Transform::TranslateVector(const DirectX::XMVECTOR& translation, eSpace relativeTo)
 	{
 		switch (relativeTo)
 		{
 		case eSpace::World:
 		{
-			// 부모든 로컬이든 다 무시하고 월드 좌표계로 이동
 			SetLocalPositionVector(GetLocalPositionVector() + translation);
 			return;
 		}
 		case eSpace::Self:
 		{
-			if (HasParent())
-			{
-				// 부모가 존재할 경우 부모의 역행렬을 곱해 부모 좌표계로 이동
-				// 아 머리가 안돌아간다.
-				// 그냥 월드 변환을 곱하면 안되나...
-				auto delta = DirectX::XMVector3Transform(translation, DirectX::XMMatrixInverse(nullptr, GetParent()->GetMatrix()));
-				SetLocalPositionVector(GetLocalPositionVector() + delta);
-
-				CORE_TRACE("delta = {0:f}, {1:f}, {2:f}", DirectX::XMVectorGetX(delta), DirectX::XMVectorGetY(delta), DirectX::XMVectorGetZ(delta));
-			}
-			else
-			{
-				/*
-				// 부모가 존재하지 않을 경우 자신의 로컬 좌표계를 곱해 로컬 좌표계로 이동
-				auto delta = DirectX::XMVector3Transform(translation, GetLocalMatrix());
-				SetLocalPositionVector(GetLocalPositionVector() + delta);
-
-				// delta가 누적되어 우주를 뚫어 버린다...
-				// 갱신된 위치에서 다시 변환이 일어나기 때문 아닐까?
-				CORE_TRACE("delta = {0:f}, {1:f}, {2:f}", DirectX::XMVectorGetX(delta), DirectX::XMVectorGetY(delta), DirectX::XMVectorGetZ(delta));
-				*/
-			}
-
+			auto delta = DirectX::XMVector3Transform(translation, GetMatrix());
+			SetPositionVector(delta);
 			return;
 		}
 		default:
@@ -384,6 +364,36 @@ namespace dive
 		TranslateVector(DirectX::XMVectorSet(x, y, z, 1.0f), relativeTo);
 	}
 
+	//==============================================//
+	// 이건 일단 나중에 구현하자. 테스트가 힘들다.	//
+	//==============================================//
+	void Transform::TranslateVector(const DirectX::XMVECTOR& translation, const Transform* pRelativeTo)
+	{
+		if (pRelativeTo == nullptr)
+		{
+			SetLocalPositionVector(GetLocalPositionVector() + translation);
+			return;
+		}
+		else
+		{
+			// pRelativeTo의 좌표계에 맞춰 translation 한다는 의미일텐데...
+			// 결국엔 이 객체의 위치를 이동시켜야 하잖아.
+			// 또 막구현하면 위치값이 우주로 갈 거 같은데...
+			auto delta = DirectX::XMVector3Transform(translation, pRelativeTo->GetMatrix());
+			
+		}
+	}
+
+	void Transform::Translate(const DirectX::XMFLOAT3& translation, const Transform* pRelativeTo)
+	{
+		TranslateVector(DirectX::XMLoadFloat3(&translation), pRelativeTo);
+	}
+
+	void Transform::Translate(float x, float y, float z, const Transform* pRelativeTo)
+	{
+		TranslateVector(DirectX::XMVectorSet(x, y, z, 1.0f), pRelativeTo);
+	}
+
 	void Transform::RotateVector(const DirectX::XMVECTOR& quaternion, eSpace relativeTo)
 	{
 		switch (relativeTo)
@@ -391,12 +401,15 @@ namespace dive
 		case eSpace::World:
 		{
 			// 그냥 곱하면 되는 걸까?
-			SetRotationVector(GetRotationVector() * quaternion);
+			auto delta = DirectX::XMQuaternionNormalize(GetLocalRotationVector() * quaternion);
+			SetLocalRotationVector(delta);
 			return;
 		}
 		case eSpace::Self:
 		{
-			SetLocalRotationVector(GetLocalRotationVector() * quaternion);
+			// 스파르탄은
+			// '로컬 회전 * 월드회전 역 사원수 * 델타 * 월드회전 사원수'로 계산했다.
+			//SetLocalRotationVector(GetLocalRotationVector() * quaternion);
 			return;
 		}
 		default:
