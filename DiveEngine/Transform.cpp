@@ -394,6 +394,7 @@ namespace dive
 		TranslateVector(DirectX::XMVectorSet(x, y, z, 1.0f), pRelativeTo);
 	}
 
+	// 테스트 하지 못했다.
 	void Transform::RotateVector(const DirectX::XMVECTOR& quaternion, eSpace relativeTo)
 	{
 		switch (relativeTo)
@@ -422,6 +423,9 @@ namespace dive
 		RotateVector(DirectX::XMLoadFloat4(&quaternion), relativeTo);
 	}
 
+	// 위의 Rotate와는 달리 독립적으로 구현했다.
+	// 일단 World는 돌아가는 것 같은데 구현이 애매하다.
+	// Self는 테스트하지 못했다.
 	void Transform::RotateEulerAnglesVector(const DirectX::XMVECTOR& eularAngles, eSpace relativeTo)
 	{
 		// 에바지만 일단 이렇게...
@@ -529,6 +533,53 @@ namespace dive
 	void Transform::LookAt(float posX, float posY, float posZ)
 	{
 		LookAt(DirectX::XMVectorSet(posX, posY, posZ, 1.0f));
+	}
+
+	DirectX::XMVECTOR Transform::ForwardVector() const
+	{
+		// 방법이 두 가지다.
+		// 일단 쿼터니언을 이용해 float3를 회전시키는 방법
+		// 다른 하나는 쿼터니언으로 회전 행렬을 만든 다음에 회전 시키는 방법
+		// 일단 이 곳에선 행렬로 구현해보자.
+		return DirectX::XMVector3Transform(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), DirectX::XMMatrixRotationQuaternion(GetLocalRotationVector()));
+	}
+
+	DirectX::XMFLOAT3 Transform::Forward() const
+	{
+		DirectX::XMFLOAT3 forward;
+		DirectX::XMStoreFloat3(&forward, ForwardVector());
+
+		return forward;
+	}
+
+	DirectX::XMVECTOR Transform::UpVector() const
+	{
+		// 일단 이것도 행렬로 구현했다.
+		return DirectX::XMVector3Transform(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), DirectX::XMMatrixRotationQuaternion(GetLocalRotationVector()));
+
+		// 사원수 계산을 찾아본 후 다시 구현하자.
+		// 결국 사원수 정리를 한 번은 해야 한다.
+	}
+
+	DirectX::XMFLOAT3 Transform::Up() const
+	{
+		DirectX::XMFLOAT3 up;
+		DirectX::XMStoreFloat3(&up, UpVector());
+
+		return up;
+	}
+
+	DirectX::XMVECTOR Transform::RightVector() const
+	{
+		return DirectX::XMVector3Transform(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), DirectX::XMMatrixRotationQuaternion(GetLocalRotationVector()));
+	}
+
+	DirectX::XMFLOAT3 Transform::Right() const
+	{
+		DirectX::XMFLOAT3 right;
+		DirectX::XMStoreFloat3(&right, RightVector());
+
+		return right;
 	}
 
 	void Transform::updateTransform()

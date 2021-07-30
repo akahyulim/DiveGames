@@ -95,6 +95,12 @@ namespace dive
 		void LookAt(float posX, float posY, float posZ);
 
 		// forward, up ,right
+		DirectX::XMVECTOR ForwardVector() const;
+		DirectX::XMFLOAT3 Forward() const;
+		DirectX::XMVECTOR UpVector() const;
+		DirectX::XMFLOAT3 Up() const;
+		DirectX::XMVECTOR RightVector() const;
+		DirectX::XMFLOAT3 Right() const;
 
 		DirectX::XMMATRIX GetMatrix() const { return DirectX::XMLoadFloat4x4(&m_Matrix); }
 		const DirectX::XMFLOAT4X4& GetMatrixFloat4x4() const { return m_Matrix; }
