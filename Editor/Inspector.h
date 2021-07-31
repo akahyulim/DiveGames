@@ -19,6 +19,7 @@ namespace editor
 		void showTransform(dive::Transform* pTransform);
 		void showCamera(dive::Camera* pCamera);
 		void showMeshRenderer(dive::MeshRenderer* pMeshRenderer);
+		void showLight(dive::Light* pLight);
 		// 이하 다른 Components
 
 		void showAddComponentButton();

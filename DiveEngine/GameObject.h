@@ -4,6 +4,7 @@
 #include "Transform.h"
 #include "MeshRenderer.h"
 #include "Camera.h"
+#include "Light.h"
 #include "Event.h"
 #include <string>
 #include <vector>

@@ -20,8 +20,11 @@ namespace editor
 			showGameObject();
 
 			showTransform(m_pInspectedTarget->GetTransform());
+			// Camera, MeshRenderer, Light는 Enalbe Checkbox가 따로 존재해야 한다.
+			// 그렇다면 GameObject와는 별도로 변수를 가진다는 이야기인데...
 			showCamera(m_pInspectedTarget->GetComponent<dive::Camera>());
 			showMeshRenderer(m_pInspectedTarget->GetComponent<dive::MeshRenderer>());
+			showLight(m_pInspectedTarget->GetComponent<dive::Light>());
 			// 이하 다른 Components
 
 			showAddComponentButton();
@@ -73,39 +76,37 @@ namespace editor
 			rot = pTransform->GetLocalRotationEulerAngles();
 			scl = pTransform->GetLocalScale();
 			
-			// ImGui::InputFloat을 랩핑한 함수다.
-			auto showFloat = [](const char* pID, const char* pLabel, float* pValue)
-			{
-				float step = 0.0f;
-				float step_fast = 0.0f;
-				const char* pDecimals = "%.4f";
-				auto inputTextFlags = ImGuiInputTextFlags_CharsDecimal;
-
-				ImGui::PushItemWidth(75.0f);
-				ImGui::PushID(pID);
-				ImGui::InputFloat(pLabel, pValue, step, step_fast, pDecimals, inputTextFlags);
-				ImGui::PopID();
-				ImGui::PopItemWidth();
-			};
+			ImGui::PushItemWidth(75.0f);
 
 			// 좀 더 깔끔히 다듬고 싶다.
 			// Position
 			ImGui::Text("Pos");
-			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("PosX", "##", &pos.x);
-			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("PosY", "##", &pos.y);
-			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("PosZ", "##", &pos.z);
+			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 
+			ImGui::DragScalar("##posX", ImGuiDataType_Float, &pos.x, 0.01f, nullptr, nullptr, "%.4f");
+			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 
+			ImGui::DragScalar("##posY", ImGuiDataType_Float, &pos.y, 0.01f, nullptr, nullptr, "%.4f");
+			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();
+			ImGui::DragScalar("##posZ", ImGuiDataType_Float, &pos.z, 0.01f, nullptr, nullptr, "%.4f");
 
 			// Rotation
 			ImGui::Text("Rot");
-			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("RotX", "##", &rot.x);
-			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("RotY", "##", &rot.y);
-			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("RotZ", "##", &rot.z);
+			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();
+			ImGui::DragScalar("##rotX", ImGuiDataType_Float, &rot.x, 1.0f, nullptr, nullptr, "%.4f");
+			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();
+			ImGui::DragScalar("##rotY", ImGuiDataType_Float, &rot.y, 1.0f, nullptr, nullptr, "%.4f");
+			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();
+			ImGui::DragScalar("##rotZ", ImGuiDataType_Float, &rot.z, 1.0f, nullptr, nullptr, "%.4f");
 
 			// Scale
 			ImGui::Text("Scl");
-			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();	 showFloat("SclX", "##", &scl.x);
-			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();	 showFloat("SclY", "##", &scl.y);
-			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();	 showFloat("SclZ", "##", &scl.z);
+			ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();
+			ImGui::DragScalar("##sclX", ImGuiDataType_Float, &scl.x, 0.01f, nullptr, nullptr, "%.4f");
+			ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();
+			ImGui::DragScalar("##sclY", ImGuiDataType_Float, &scl.y, 0.01f, nullptr, nullptr, "%.4f");
+			ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();
+			ImGui::DragScalar("##sclZ", ImGuiDataType_Float, &scl.z, 0.01f, nullptr, nullptr, "%.4f");
+
+			ImGui::PopItemWidth();
 
 			// 실행 중이 아닐 때 변경 가능
 			{
@@ -211,6 +212,79 @@ namespace editor
 
 			// 설정은 몰아서?
 			pMeshRenderer->SetReceiveShadows(bReceiveShadows);
+		}
+
+		ImGui::Separator();
+	}
+
+	void Inspector::showLight(dive::Light* pLight)
+	{
+		if (!pLight)
+			return;
+
+		if (ImGui::CollapsingHeader("Light", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			// 적용 유무 라디오 박스가 먼저다.
+
+			{
+				int type = static_cast<int>(pLight->GetType());
+
+				ImGui::Text("Type"); 
+
+				ImGui::SameLine();
+				
+				// 중앙 정렬 같은건 없나...?
+				ImGui::Combo("##combo", &type, "Directional\0Spot\0Point");
+
+				pLight->SetType(static_cast<dive::eLightType>(type));
+			}
+
+			// Range
+			{
+				const float f32_zero = 0.f, f32_one = 10.f;
+
+				float range = pLight->GetRange();
+
+				ImGui::Text("Range");
+
+				ImGui::SameLine();
+
+				// Transform의 좌표도 이게 나을 것 같기도...
+				// 그런데 min, max가 없어도 되나?
+				// label은 다 달라야 하는 것 같다.
+				ImGui::DragScalar("##drag float", ImGuiDataType_Float, &range, 0.05f, &f32_zero, nullptr, "%.2f");
+
+				pLight->SetRange(range);
+			}
+
+			// Color
+			{
+				DirectX::XMFLOAT4 color = pLight->GetColor();
+				float col[4] = { color.x, color.y, color.z, color.w };
+
+				ImGui::Text("Color");
+
+				ImGui::SameLine();
+
+				ImGui::ColorEdit4("##color", col);
+
+				color = DirectX::XMFLOAT4(col[0], col[1], col[2], col[3]);
+				pLight->SetColor(color);
+			}
+		
+			// Intensity
+			{
+				float intensity = pLight->GetIntensity();
+
+				ImGui::Text("Intensity");
+
+				ImGui::SameLine();
+
+				// 실제로는 min, max를 얻어와서 적용해야 한다.
+				ImGui::SliderFloat("##Intensity", &intensity, 0.0f, 10.0f);
+
+				pLight->SetIntensity(intensity);
+			}
 		}
 
 		ImGui::Separator();

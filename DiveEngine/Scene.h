@@ -8,6 +8,9 @@ namespace dive
 {
 	class GameObject;
 
+	// GameObjects를 임의로 정렬할 수 있어야 한다.
+	// 그렇지 않으면 Editor의 Hierarchy에서 생성 순서대로 Tree에 출력된다.
+	// 아니면 적어도 Editor의 Hierarchy에서는 임의 변경이 가능해야 한다.
 	class Scene : public Object
 	{
 	public:

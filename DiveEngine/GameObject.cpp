@@ -165,6 +165,10 @@ namespace dive
 		{
 			newComponent = m_Components.emplace_back(static_cast<Component*>(new MeshRenderer(this)));
 		}
+		else if ((unsigned int)typeid(Light).hash_code() == typeHash)
+		{
+			newComponent = m_Components.emplace_back(static_cast<Component*>(new Light(this)));
+		}
 
 		// 현재 구현하지 않은 부분이 있어서 일단 주석처리
 		//assert(newComponent);

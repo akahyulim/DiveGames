@@ -1,4 +1,5 @@
 #include "Transform.h"
+#include "DiveCore.h"
 #include "SceneManager.h"
 #include "Scene.h"
 #include "GameObject.h"
@@ -41,6 +42,8 @@ namespace dive
 
 	void Transform::Serialize(FileStream* pFileStream)
 	{
+		DV_ASSERT(pFileStream);
+
 		pFileStream->Write(m_LocalPosition);
 		pFileStream->Write(m_LocalRotation);
 		pFileStream->Write(m_LocalScale);
@@ -49,6 +52,8 @@ namespace dive
 
 	void Transform::Deserialize(FileStream* pFileStream)
 	{
+		DV_ASSERT(pFileStream);
+
 		pFileStream->Read(&m_LocalPosition);
 		pFileStream->Read(&m_LocalRotation);
 		pFileStream->Read(&m_LocalScale);

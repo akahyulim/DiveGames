@@ -30,6 +30,7 @@
 #include "Transform.h"
 #include "MeshRenderer.h"
 #include "Camera.h"
+#include "Light.h"
 
 //= Helper ========================
 #include "dvMath.h"

@@ -14,6 +14,7 @@ namespace editor
 		m_bModalNewScene = false;
 	}
 
+	// Scene이 없을 때 GameObject를 생성할 수 없는데 그냥 시도한다.
 	void MenuBar::TickAlways()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(GetPadding(), GetPadding()));
@@ -170,6 +171,10 @@ namespace editor
 				{
 					if (ImGui::MenuItem("Directional"))
 					{
+						auto pGameObject = m_pScene->CreateGameObject();
+						auto pLight = pGameObject->AddComponent<dive::Light>();
+						pLight->SetType(dive::eLightType::Directional);
+						pGameObject->SetName("Directional Light");
 					}
 
 					if (ImGui::MenuItem("Spot"))
@@ -186,8 +191,8 @@ namespace editor
 				if (ImGui::MenuItem("Camera"))
 				{
 					auto pGameObject = m_pScene->CreateGameObject();
-					pGameObject->SetName("Camera");
 					pGameObject->AddComponent<dive::Camera>();
+					pGameObject->SetName("Camera");
 				}
 
 				ImGui::EndMenu();
