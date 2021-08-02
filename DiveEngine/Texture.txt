@@ -1,0 +1,23 @@
+Texture의 구성
+- ID3D11Texture2D 
+- ID3D11RenderTargetView
+- ID3D11DepthStencilView
+- ID3D11ShaderResrouceView
+
+사용처
+- Model Resource: Import
+- GBuffer: Deferred Shading
+- Inspector: Data를 가공할 수 있지 않을까?
+
+Import
+- 대중적인 포멧을 import하여 Resource로 만들 수 있어야 한다.
+- 파일명과 기타 설정(mipmap 생성 여부)을 전달하면 리소스가 만들어져야 한다.
+
+직접 생성
+- 특정 크기, 포멧, View 종류 설정에 맞춰 생성이 필요할 수 있다.(예를 들면 GBuffer용)
+=> 생성 매개변수가 복잡해질 수 밖에 없다.
+- Cube Map 생성도 염두해 두어야 한다.
+
+기타
+- 예전에 텍스쳐 배열을 팠던거 같은데... 기록해 두었던가?
+- Texture를 만든다면 View Set 과정에 귀찮음이 발생할 수 있다.

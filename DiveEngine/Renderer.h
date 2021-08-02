@@ -5,6 +5,7 @@
 #include "PipelineState.h"
 #include "ConstantBuffer.h"
 #include "ConstantBuffers.h"	// 이름 변경 대상
+#include "GBuffer.h"
 #include "Texture.h"
 #include "Font.h"
 #include <memory>
@@ -144,6 +145,8 @@ namespace dive
 		std::unordered_map<eRenderTargets, Texture*> m_RenderTargets;
 
 		std::unordered_map<eObjectType, std::vector<GameObject*>> m_GameObjects;
+
+		GBuffer m_GBuffer;	// 책에서 동적 생성을 하지 않았다.
 
 		// texturing test
 		//Texture* m_pTexture = nullptr;

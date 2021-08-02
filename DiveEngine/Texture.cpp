@@ -1,9 +1,26 @@
 #include "Texture.h"
+#include "DiveCore.h"
+#include "FileSystemHelper.h"
 #include "Renderer.h"
 #include "Log.h"
 
+
+// 1. 일단 LoadFromFile부터 다듬자.
+// - DirectXTex가 wstring을 사용한다. 따라서 관련 함수를 따로 만들던가 string <-> wstring 변환 함수를 만들어야 한다.
+// - 이후 GBuffer용 리소스 생성을 생성자 인터페이스를 만들어보자.
+// 2. 리소스 포인터를 어떻게 관리할 지 좀 더 생각해보자.
+// - Microsoft::WRL::ComPtr이 unique ptr도 아닌 것 같고 사용 방법도 shared ptr과 비슷하니 raw pointer가 나을 것 같다.
+// 3. Device 객체는 생성자를 통해 전달받아 멤버 변수로 관리하는 편이 나을 것 같다.
+// - 좀 더 생각해보던가.. 이 객체를 누가 생성하느냐에 따라 달려있다. 물론 Renderer가 생성하겠지...
 namespace dive
 {
+	Texture::Texture(ID3D11Device* pDevice)
+		: m_pDevice(nullptr) 
+	{
+		DV_ASSERT(pDevice != nullptr);
+		m_pDevice = pDevice;
+	}
+
 	// 문제없이 사용가능 하다.
 	// map / unmap 역시 함수화하는게 맞는가?
 	Texture::Texture(unsigned int width, unsigned int height)
@@ -107,6 +124,67 @@ namespace dive
 		}
 
 		// DSV는 다음에 구현하자. Format이 복잡하고, 책에서는 다른 식으로 구현한 것 같다.
+	}
+
+	// 이거 굳이 왜 wstring으로 했지...?
+	// DirectXTex가 wstring을 사용하기 때문이다.
+	// 포멧 변환 함수가 필요하다.
+	bool Texture::LoadFromFile(const std::wstring& filepath, bool generateMips)
+	{
+		// 파일 존재 여부
+		//if (!FileSystemHelper::FileExists(filepath))
+		{
+		//	CORE_ERROR("");
+		//	return false;
+		}
+
+		// clear??? 
+
+		DirectX::ScratchImage image;
+
+		// 포멧 확인 후 로드 함수 호출
+		if (FAILED(DirectX::LoadFromWICFile(filepath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, image)))
+		{
+			CORE_ERROR("");
+			return false;
+		}
+		
+		// 그냥 생성자를 통해 전달받아 멤버 변수로 관리할까.... 싶다.
+		auto pDevice = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
+		DV_ASSERT(pDevice != nullptr);
+
+		if (generateMips)
+		{
+			DirectX::ScratchImage mipChain;
+
+			if (FAILED(DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), TEX_FILTER_DEFAULT, 0, mipChain)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+			
+
+			if (FAILED(DirectX::CreateShaderResourceView(pDevice, mipChain.GetImages(), mipChain.GetImageCount(), mipChain.GetMetadata(), m_pShaderResourceView.GetAddressOf())))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+			setMetaData(mipChain.GetMetadata());
+		}
+		else
+		{
+			if (FAILED(DirectX::CreateShaderResourceView(pDevice, image.GetImages(), image.GetImageCount(), image.GetMetadata(), m_pShaderResourceView.GetAddressOf())))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+			setMetaData(image.GetMetadata());
+		}
+
+		// 이름 저장...(wstring에서 string 변환 필요)
+		return true;
 	}
 
 	bool Texture::createTexture2D(ID3D11Device* pDevice, unsigned flags)

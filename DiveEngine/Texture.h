@@ -13,15 +13,19 @@ namespace dive
 	class Texture
 	{
 	public:
+		Texture(ID3D11Device* pDevice);
+
 		// cpu에서 그리기용(SRV)
 		Texture(unsigned int width, unsigned int height);
 
-		// SRV(파일명, mipmap 생성 여부)
+		// SRV(파일명, mipmap 생성 여부) => 기본 생성자로 변경하기
+		// 그리고 LoadFromFile()로 대체
 		Texture(const std::wstring& filepath, bool generateMips = true);
 
 		// RTV or DSV(size, view type, format type?)
 		Texture(unsigned int width, unsigned int height, DXGI_FORMAT format, std::string name = "");
 
+		bool LoadFromFile(const std::wstring& filepath, bool generateMips = false);
 
 		ID3D11Texture2D* GetTexture2D() { return m_pTexture2D.Get(); }
 		ID3D11RenderTargetView* GetRenderTargetView() { return m_pRenderTargetView.Get(); }
@@ -54,12 +58,14 @@ namespace dive
 		void setMetaData(const DirectX::TexMetadata& data);
 
 	private:
+		ID3D11Device* m_pDevice = nullptr;
+
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pTexture2D;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pRenderTargetView;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pShaderResourceView;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDepthStencilView;
-
-		std::string m_Name;
+		
+		std::string m_Name = "";
 
 		// 최소한의 데이터 필요
 		// 필요없는 건 지우자.

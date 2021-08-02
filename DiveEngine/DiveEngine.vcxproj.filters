@@ -394,6 +394,12 @@
     <ClInclude Include="dvMath.h">
       <Filter>Engine\Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="GBuffer.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="dvTexture.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -492,6 +498,12 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="GBuffer.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="dvTexture.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -542,5 +554,10 @@
     <Filter Include="Engine\Helpers">
       <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Texture.txt">
+      <Filter>Engine\Graphics</Filter>
+    </Text>
   </ItemGroup>
 </Project>

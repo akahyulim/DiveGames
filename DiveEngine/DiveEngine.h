@@ -15,6 +15,7 @@
 #include "GraphicsInclude.h"
 #include "GraphicsDevice.h"
 #include "Renderer.h"
+#include "GBuffer.h"
 #include "VertexTypes.h"
 #include "Mesh.h"
 #include "Texture.h"
