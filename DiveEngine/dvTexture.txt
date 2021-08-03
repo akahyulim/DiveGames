@@ -1,0 +1,35 @@
+Texture의 구성
+- ID3D11Texture2D 
+- ID3D11RenderTargetView
+- ID3D11DepthStencilView
+- ID3D11ShaderResrouceView
+
+역시 용도를 확실히 정리해 두어야 할 것 같다.
+- LoadFromFile
+	- 대중적인 포멧의 파일로 부터 데이터를 파싱해 ShaderResourceView를 생성 + Mimap 생성
+- GBuffer용 Texture 생성
+	- 기본적인 데이터들은 RTV에 쓴 후 SRV로 읽어 들인다.
+	- Depth, Stencil 데이터들은 DSV에 쓴 후 SRV로 읽어 들인다.
+- Cube Map
+	- 총 6장의 RTV, SRV를 만든다.
+	
+
+유니티
+- Texture
+	- 기본클래스다. Texture2D, RenderTarget이 상속한다.
+	- Width, Height를 가진다.
+	- wrapMode를 가진다.
+	- filterMode를 가진다.
+	- ansioLevel을 가진다.
+	- mipMapBias를 가진다.(MipLevel이 아니다.)
+- Textur2D
+	- 텍스처를 생성하거나, 기존 텍스처 에셋을 수정하는데 사용한다.
+	- format을 가진다.
+	- mipmapCount를 가진다.
+	- 빈 텍스쳐, 특정 색상 텍스쳐를 생성할 수 있다.
+	- 생성된 텍스쳐의 특정 픽셀 데이터를 가져오거나 변경할 수 있다.
+	- 생성된 텍스쳐의 크기를 변경할 수 있다.
+- RenderTarget
+: 무조건 DSV를 만드는 것인지, Cubemap은 어떻게 만드는 것인지 생각해보자.
+	- 텍스쳐 위에 렌더링 결과물을 그리는데 사용한다.
+	- IsCubemap으로 cubemap 사용 설정이 가능하다.

@@ -1,8 +1,10 @@
 #include "GBuffer.h"
 #include "DiveCore.h"
 
-// 일단 Texture의 LoadFromFile 구현 후 진행토록 하자.
-// 아마도 Texture를 통해 리소스들을 관리하는 편이 더 나을 것 같다.
+// 그러고보니 SRV를 Shader에 전달하는 과정을 확인하지 못했다.
+// RTV는 OMSetRenderTargets()로 세팅했다.
+// => 예제를 살펴보니 Light에서 ID3D11ShaderResourceView* 배열로 묶은 후 PSSetShaderResources()로 전달함을 확인했다.
+// 즉, 이 클래스는 RTV, DSV, SRV를 데이터 타입에 맞춰 생성하고 + @로 ConstantBuffer까지 만들었다.
 namespace dive
 {
 	// Resize시에도 호출된다.

@@ -174,7 +174,9 @@
     <ClInclude Include="DiveCore.h" />
     <ClInclude Include="DiveEngine.h" />
     <ClInclude Include="dvMath.h" />
+    <ClInclude Include="dvRenderTexture.h" />
     <ClInclude Include="dvTexture.h" />
+    <ClInclude Include="dvTexture2D.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Event.h" />
@@ -306,7 +308,8 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="dvTexture.cpp" />
+    <ClCompile Include="dvRenderTexture.cpp" />
+    <ClCompile Include="dvTexture2D.cpp" />
     <ClCompile Include="GBuffer.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="FileStream.cpp" />
@@ -338,7 +341,7 @@
     <ClCompile Include="Transform_Hierarchy.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Texture.txt" />
+    <Text Include="dvTexture.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

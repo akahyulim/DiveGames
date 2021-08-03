@@ -19,6 +19,9 @@
 #include "VertexTypes.h"
 #include "Mesh.h"
 #include "Texture.h"
+#include "dvTexture.h"
+#include "dvTexture2D.h"
+#include "dvRenderTexture.h"
 
 //= Input =========================
 #include "Input.h"

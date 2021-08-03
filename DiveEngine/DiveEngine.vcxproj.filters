@@ -400,6 +400,12 @@
     <ClInclude Include="dvTexture.h">
       <Filter>Engine\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="dvTexture2D.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="dvRenderTexture.h">
+      <Filter>Engine\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -501,7 +507,10 @@
     <ClCompile Include="GBuffer.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="dvTexture.cpp">
+    <ClCompile Include="dvTexture2D.cpp">
+      <Filter>Engine\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="dvRenderTexture.cpp">
       <Filter>Engine\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -556,7 +565,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Texture.txt">
+    <Text Include="dvTexture.txt">
       <Filter>Engine\Graphics</Filter>
     </Text>
   </ItemGroup>
