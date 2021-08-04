@@ -168,44 +168,7 @@ namespace dive
 	// 스파르탄에선 에디터용 SRV 생성에 사용되었다.
 	bool Renderer::createTextures()
 	{
-		// 삭제 대상 : 테스트용 구문
-		{
-			m_pTexture = std::make_shared<Texture>(L"../Assets/Textures/Choa.jpg");
-
-			// 생성한 후 특정 색 넣기
-			{
-				m_pCpuTexture = std::make_shared<Texture>(800, 600);
-
-				auto immediateContext = m_pGraphicsDevice->GetImmediateContext();
-
-				D3D11_MAPPED_SUBRESOURCE mappedResource;
-				immediateContext->Map(m_pCpuTexture->GetTexture2D(),
-					D3D11CalcSubresource(0, 0, 1),
-					D3D11_MAP_WRITE_DISCARD,
-					0,
-					&mappedResource);
-
-				UCHAR* pTexels = (UCHAR*)mappedResource.pData;
-
-				// 색상 넣기
-				for (UINT row = 0; row < 600; ++row)
-				{
-					UINT rowStart = row * mappedResource.RowPitch;
-
-					for (UINT col = 0; col < 800; ++col)
-					{
-						UINT colStart = col * 4;
-
-						pTexels[rowStart + colStart + 0] = 100;		// R
-						pTexels[rowStart + colStart + 1] = 0; 128;		// G
-						pTexels[rowStart + colStart + 2] = 0; 64;		// B
-						pTexels[rowStart + colStart + 3] = 0; 32;
-					}
-				}
-
-				immediateContext->Unmap(m_pCpuTexture->GetTexture2D(), D3D11CalcSubresource(0, 0, 1));
-			}
-		}
+		// 테스트용 코드를 모두 삭제
 
 		return true;
 	}
@@ -223,11 +186,6 @@ namespace dive
 		{
 			CORE_WARN("{0:d}x{1:d}는 지원하지 않는 해상도입니다.", width, height);
 			return false;
-		}
-
-		// 얘는 테스트용이다.
-		{
-//			m_pRenderTargetView = std::make_shared<Texture>(width, height, DXGI_FORMAT_R8G8B8A8_UINT, "Test_RenderTargetView");
 		}
 
 		// renderTargets들을 만든다. 타입때문에 지웠다가 다시 만들어야 한다. 나중에 수정이 필요할듯?

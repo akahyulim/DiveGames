@@ -6,8 +6,8 @@ namespace dive
 	class GBuffer
 	{
 	public:
-		GBuffer() = default;
-		~GBuffer() = default;
+		GBuffer(ID3D11Device* pDevice);
+		~GBuffer();
 
 		bool Initialize(unsigned int width, unsigned int height);
 		void Clear();
@@ -16,12 +16,24 @@ namespace dive
 		void PostRender(ID3D11DeviceContext* pImmediateContext);
 		void PrepareForUnpack(ID3D11DeviceContext* pImmediateContext);
 
+		// 왜 이 Texture만 전달할까?
 		ID3D11Texture2D* GetColorTexture() { return m_pTexColorSpecIntensity; }
 
-		// 다른 get들... 꼭 필요한가? 기억이 안난다.
+		// 왜 다른 RTV는 전달함수가 없을까?
+		ID3D11DepthStencilView* GetDSV() { return m_pDepthStencilView; }
+		ID3D11DepthStencilView* GetReadOnlyDSV() { return m_pReadOnlyDepthStencilView; }
+
+		ID3D11ShaderResourceView* GetDepthStencilSRV() { return m_pDepthStencilSRV; }
+		ID3D11ShaderResourceView* GetColorInensitySRV() { return m_pColorSpecIntensitySRV; }
+		ID3D11ShaderResourceView* GetNormalSRV() { return m_pNormalSRV; }
+		ID3D11ShaderResourceView* GetSpecPowerSRV() { return m_pSpecPowerSRV; }
+
 
 	private:
 	private:
+		ID3D11Device* m_pDevice = nullptr;
+		// 크기도 저장하는 편이 낫지 않을까?
+
 		// ??? buffer?
 
 		// RenderTarget Texture
@@ -41,7 +53,7 @@ namespace dive
 		ID3D11ShaderResourceView* m_pDepthStencilSRV = nullptr;
 		ID3D11ShaderResourceView* m_pColorSpecIntensitySRV = nullptr;
 		ID3D11ShaderResourceView* m_pNormalSRV = nullptr;
-		ID3D11ShaderResourceView** m_pSpecPowerSRV = nullptr;
+		ID3D11ShaderResourceView* m_pSpecPowerSRV = nullptr;
 
 		ID3D11DepthStencilState* m_pDepthStencilState = nullptr;
 	};

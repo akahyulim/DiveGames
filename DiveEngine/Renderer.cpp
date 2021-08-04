@@ -41,6 +41,11 @@ namespace dive
 			PostQuitMessage(0);
 		}
 
+		// 형태가 좀... 일관성이 없다.
+		m_pGBuffer = new GBuffer(m_pGraphicsDevice->GetDevice());
+		// 크기가 이러면 안된다. 일반적으로 맞지만 Editor의 Scene과는 다르다.
+		m_pGBuffer->Initialize(m_pGraphicsDevice->GetResolutionHeight(), m_pGraphicsDevice->GetResolutionHeight());
+
 		// states
 		createDepthStencilStates();
 		createRasterizerStates();

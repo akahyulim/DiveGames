@@ -1,23 +1,205 @@
 #include "GBuffer.h"
 #include "DiveCore.h"
+#include "Log.h"
 
-// 그러고보니 SRV를 Shader에 전달하는 과정을 확인하지 못했다.
-// RTV는 OMSetRenderTargets()로 세팅했다.
-// => 예제를 살펴보니 Light에서 ID3D11ShaderResourceView* 배열로 묶은 후 PSSetShaderResources()로 전달함을 확인했다.
-// 즉, 이 클래스는 RTV, DSV, SRV를 데이터 타입에 맞춰 생성하고 + @로 ConstantBuffer까지 만들었다.
+// 유니티의 RenderTarget은 GBuffer의 Texture로 사용하기 힘들다.
+// 그리고 스파르탄처럼 Texture를 만드는 것도 에바 같다.
+// 그래서 일단 책을 따르기로 했다.
 namespace dive
 {
+	GBuffer::GBuffer(ID3D11Device* pDevice)
+	{
+		DV_ASSERT(pDevice != nullptr);
+		m_pDevice = pDevice;
+	}
+
+	GBuffer::~GBuffer()
+	{
+		Clear();
+	}
+	
 	// Resize시에도 호출된다.
 	bool GBuffer::Initialize(unsigned int width, unsigned int height)
 	{
 		Clear();
 
-		// 직접 생성하므로 꽤 길다...
+		// 크기 확인 필요?
 
+		// Texture formats
+		static const DXGI_FORMAT depthStencilTextureFormat = DXGI_FORMAT_R24G8_TYPELESS;
+		static const DXGI_FORMAT colorSpecpIntesityTextureForamt = DXGI_FORMAT_R8G8B8A8_UNORM;
+		static const DXGI_FORMAT normalTextureFormat = DXGI_FORMAT_R11G11B10_FLOAT;
+		static const DXGI_FORMAT specPowerTextureFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		// Constant Buffer까지 생성한다.
+		// Rener Target View formats
+		static const DXGI_FORMAT depthStencilViewFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		static const DXGI_FORMAT colorSpecpIntesityRenderTargetViewForamt = DXGI_FORMAT_R8G8B8A8_UNORM;
+		static const DXGI_FORMAT normalRenderTargetViewFormat = DXGI_FORMAT_R11G11B10_FLOAT;
+		static const DXGI_FORMAT specPowerRenderTargetViewFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+		
+		// Shader Resource View formats
+		static const DXGI_FORMAT depthStencilShaderResourceViewFormat = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		static const DXGI_FORMAT colorSpecpIntesityShaderResourceViewForamt = DXGI_FORMAT_R8G8B8A8_UNORM;
+		static const DXGI_FORMAT normalShaderResourceViewFormat = DXGI_FORMAT_R11G11B10_FLOAT;
+		static const DXGI_FORMAT specPowerShaderResourceViewFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		return false;
+		// create textures
+		{
+			D3D11_TEXTURE2D_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));
+			desc.Width = width;
+			desc.Height = height;
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+			desc.CPUAccessFlags = 0;
+			desc.MiscFlags = 0;
+
+			desc.Format = depthStencilTextureFormat;
+			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexDepthStencil)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+			
+			desc.Format  = colorSpecpIntesityTextureForamt;
+			desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexColorSpecIntensity)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+			desc.Format = normalTextureFormat;
+			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexNormal)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+			desc.Format = specPowerTextureFormat;
+			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexSpecPower)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+		}
+
+		// create DSV
+		{
+			D3D11_DEPTH_STENCIL_VIEW_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));
+			desc.Format = depthStencilViewFormat;
+			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			desc.Flags = 0;
+
+			if (FAILED(m_pDevice->CreateDepthStencilView(m_pTexDepthStencil, &desc, &m_pDepthStencilView)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+			desc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
+			if (FAILED(m_pDevice->CreateDepthStencilView(m_pTexDepthStencil, &desc, &m_pReadOnlyDepthStencilView)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+		}
+
+		// create RTV
+		{
+			D3D11_RENDER_TARGET_VIEW_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));
+			desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+
+			desc.Format = colorSpecpIntesityRenderTargetViewForamt;
+			if (FAILED(m_pDevice->CreateRenderTargetView(m_pTexColorSpecIntensity, &desc, &m_pColorSpecIntensityRTV)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+			desc.Format = normalRenderTargetViewFormat;
+			if (FAILED(m_pDevice->CreateRenderTargetView(m_pTexNormal, &desc, &m_pNormalRTV)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+			desc.Format = specPowerRenderTargetViewFormat;
+			if (FAILED(m_pDevice->CreateRenderTargetView(m_pTexSpecPower, &desc, &m_pSpecPowerRTV)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+		}
+
+		// create SRV
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipLevels = 1;
+
+			desc.Format = depthStencilShaderResourceViewFormat;
+			if (FAILED(m_pDevice->CreateShaderResourceView(m_pTexDepthStencil, &desc, &m_pDepthStencilSRV)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+			desc.Format = colorSpecpIntesityShaderResourceViewForamt;
+			if (FAILED(m_pDevice->CreateShaderResourceView(m_pTexColorSpecIntensity, &desc, &m_pColorSpecIntensitySRV)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+			desc.Format = normalShaderResourceViewFormat;
+			if (FAILED(m_pDevice->CreateShaderResourceView(m_pTexNormal, &desc, &m_pNormalSRV)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+
+			desc.Format = specPowerShaderResourceViewFormat;
+			if (FAILED(m_pDevice->CreateShaderResourceView(m_pTexSpecPower, &desc, &m_pSpecPowerSRV)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+		}
+
+		// depth stencil state
+		{
+			D3D11_DEPTH_STENCIL_DESC desc;
+			desc.DepthEnable = TRUE;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			desc.DepthFunc = D3D11_COMPARISON_LESS;
+			desc.StencilEnable = TRUE;
+			desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+			desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+			const D3D11_DEPTH_STENCILOP_DESC stencilMarkOp = { D3D11_STENCIL_OP_REPLACE, D3D11_STENCIL_OP_REPLACE, D3D11_STENCIL_OP_REPLACE, D3D11_COMPARISON_ALWAYS };
+			desc.FrontFace = stencilMarkOp;
+			desc.BackFace = stencilMarkOp;
+
+			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_pDepthStencilState)))
+			{
+				CORE_ERROR("");
+				return false;
+			}
+		}
+
+		// constant buffer
+		{
+
+		}
+
+		return true;
 	}
 	
 	void GBuffer::Clear()

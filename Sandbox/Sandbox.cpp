@@ -31,11 +31,6 @@ namespace sandbox
 			gameObject->SetName("Cube");
 		}
 
-		// texture load
-		{
-			auto pTex = new dive::dvTexture2D(dive::Renderer::GetInstance().GetGraphicsDevice()->GetDevice(), "../Assets/Textures/choa.jpg", true);
-		}
-
 		APP_TRACE("Sandbox::Initialize()");
 		
 		return true;

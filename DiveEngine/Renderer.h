@@ -142,18 +142,18 @@ namespace dive
 		PipelineState m_PipelineStateFont;	// text라는 이름이 더 낫지 않을까?
 		PipelineState m_PipelineStateLegacy;
 
+		// RenderTargets 모음이다. 스파르탄의 영향을 받아 GBuffer용으로 구현했다.
+		// 현재 Editor에서 Scene을 보여주는 텍스쳐로 활용 중이다.
+		// 구현 과정에 의하면 GBuffer와 RenderTarget은 구분되어야 한다.
 		std::unordered_map<eRenderTargets, Texture*> m_RenderTargets;
 
 		std::unordered_map<eObjectType, std::vector<GameObject*>> m_GameObjects;
 
-		GBuffer m_GBuffer;	// 책에서 동적 생성을 하지 않았다.
+		// 책에서 동적 생성을 하지 않았다.
+		// 하지만 생성자에 Device 전달이 필요하다.
+		GBuffer* m_pGBuffer;	
 
-		// texturing test
-		//Texture* m_pTexture = nullptr;
-		std::shared_ptr<Texture> m_pTexture;
-		std::shared_ptr<Texture> m_pRenderTargetView;
-		std::shared_ptr<Texture> m_pCpuTexture;
-
+		// 이건 고쳐야 된다.
 		Font* m_pDvFont = nullptr;
 	};
 }
