@@ -1,0 +1,13 @@
+크기에 대한 생각
+
+결국 GraphicsDevice가 Backbuffer의 크기를
+GBuffer가 자신의 크기를 각자 관리토록 하였다.
+
+하지만 아직도 GBuffer의 Initialize 및 Resize를 어디에서 어떻게 수행할 지
+Eidtor의 Scene에서 출력할 RenderTexture는 누가 관리하고 어떻게 구현할 지 결정하지 못했다.
+
+RenderTexture의 문제
+- RenderTarget으로 쓰려면 결국 Shader가 달라야 한다. 아마 최종 출력 Shader가 될 것이다.
+- 마지막 Shader Pass에서 RenderTarget을 전달해야 한다.
+	- 일단 생성을 App(Eidtor)에서 할 지, Renderer에서 일괄 생성할 지 결정하지 못했다.
+=> Deferred Shading에 대한 이해부터 완벽하지 않다.

@@ -19,11 +19,14 @@ namespace dive
 	}
 	
 	// Resize시에도 호출된다.
+	// 역시 Editor가 문제다. Backbuffer 크기에만 맞출 수 없다.
 	bool GBuffer::Initialize(unsigned int width, unsigned int height)
 	{
 		Clear();
 
 		// 크기 확인 필요?
+		m_Width = width;
+		m_Height = height;
 
 		// Texture formats
 		static const DXGI_FORMAT depthStencilTextureFormat = DXGI_FORMAT_R24G8_TYPELESS;
@@ -221,6 +224,14 @@ namespace dive
 		DV_RELEASE(m_pSpecPowerRTV);
 
 		DV_RELEASE(m_pDepthStencilState);
+	}
+
+	void GBuffer::Resize(unsigned int width, unsigned int height)
+	{
+		if (width == m_Width && height == m_Height)
+			return;
+
+		Initialize(width, height);
 	}
 	
 	void GBuffer::PreRender(ID3D11DeviceContext* pImmediateContext)

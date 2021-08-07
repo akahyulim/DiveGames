@@ -30,12 +30,16 @@ namespace editor
         if (!m_pRenerer)
             return;
 
-        //if(dive::SceneManager::GetInstance().GetActiveScene())
-        //   m_pScene = dive::SceneManager::GetInstance().GetActiveScene();
-
+        
         float width = static_cast<float>(ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x);
         float height = static_cast<float>(ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y);
     
+        //================================================================================================================//
+        // 여기나 생성자에서 크기를 계산한 후 GBuffer와 RenderTexture를 생성 혹은 Resize하는 함수를 호출하는 건 어떨까?   //
+        // 그런데 RenderTexture를 RenderTarget으로 설정하려면 결국 해당 부분이 수정된 Shader를 사용하고,                  //
+        // RenderTexture를 Shader에 전달하는 구문도 해당 Pass에 끼워 넣어야 하는데..?                                     //
+        //================================================================================================================//
+
         // Viewport도 설정해줘야 한다.
         m_pRenerer->SetViewport(width, height);
 

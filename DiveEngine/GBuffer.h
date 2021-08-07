@@ -12,9 +12,14 @@ namespace dive
 		bool Initialize(unsigned int width, unsigned int height);
 		void Clear();
 
+		void Resize(unsigned int width, unsigned int height);
+
 		void PreRender(ID3D11DeviceContext* pImmediateContext);
 		void PostRender(ID3D11DeviceContext* pImmediateContext);
 		void PrepareForUnpack(ID3D11DeviceContext* pImmediateContext);
+
+		unsigned int GetWidth() const { return m_Width; }
+		unsigned int GetHeight() const { return m_Height; }
 
 		// 왜 이 Texture만 전달할까?
 		ID3D11Texture2D* GetColorTexture() { return m_pTexColorSpecIntensity; }
@@ -32,7 +37,9 @@ namespace dive
 	private:
 	private:
 		ID3D11Device* m_pDevice = nullptr;
-		// 크기도 저장하는 편이 낫지 않을까?
+
+		unsigned int m_Width = 400;
+		unsigned int m_Height = 300;
 
 		// ??? buffer?
 

@@ -568,5 +568,6 @@
     <Text Include="dvTexture.txt">
       <Filter>Engine\Graphics</Filter>
     </Text>
+    <Text Include="Issue.txt" />
   </ItemGroup>
 </Project>

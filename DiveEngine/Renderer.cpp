@@ -44,6 +44,10 @@ namespace dive
 		// 형태가 좀... 일관성이 없다.
 		m_pGBuffer = new GBuffer(m_pGraphicsDevice->GetDevice());
 		// 크기가 이러면 안된다. 일반적으로 맞지만 Editor의 Scene과는 다르다.
+		// 가장 만만한 곳은 RenderPath3D이다. 그런데 RenderPath에 대한 분석이 안되어있다.
+		// 외부에서 직접 아래 함수를 호출토록 해야 하는 걸까...?
+		// 아니면 일단은 여기에서 초기화 개념으로 생성해놓고
+		// Editor의 Scene에서 다시 생성하는걸루다가...
 		m_pGBuffer->Initialize(m_pGraphicsDevice->GetResolutionHeight(), m_pGraphicsDevice->GetResolutionHeight());
 
 		// states
@@ -90,6 +94,19 @@ namespace dive
 		createRenderTargets();
 
 		CORE_TRACE("해상도 변경: {0:d}x{1:d}", width, height);
+	}
+
+	void Renderer::GetGBufferSize(unsigned int& outWidth, unsigned int& outHeight)
+	{
+		if (m_pGBuffer)
+		{
+			outWidth = 0, outHeight = 0;
+		}
+		else
+		{
+			outWidth = m_pGBuffer->GetWidth();
+			outHeight = m_pGBuffer->GetHeight();
+		}
 	}
 
 	//======================================================================================//

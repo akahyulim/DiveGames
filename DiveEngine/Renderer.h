@@ -61,8 +61,13 @@ namespace dive
 		void SetViewport(float width, float height, float offsetX = 0.0f, float offsetY = 0.0f);
 
 		// RenderTarget용 크기이다.
+		// 현재 GBuffer로 통합했으니 이름을 바꾸는 편이 낫다.
+		// 그런데 추후 구현할 RenderTexture 역시 같은 크기로 만들어질 가능성이 있다.
+		// 아니라면 아에 GBuffer 객체 자체에서 크기를 관리하는 편이 낫다.
 		const DirectX::XMINT2& GetResolution() const { return m_RenderTargetSize; }
 		void SetResolution(unsigned int width, unsigned int height);
+
+		void GetGBufferSize(unsigned int& outWidth, unsigned int& outHeight);
 
 		// update와 draw가 있다.
 		// update는 visibility, PerFrameData,  RenderData, CameraCB 등이 있다.
@@ -104,6 +109,7 @@ namespace dive
 
 		// RenderTarget용 크기다. 타입이 애매하다.
 		DirectX::XMINT2 m_RenderTargetSize;
+
 		D3D11_VIEWPORT m_ViewPort;
 
 		// GPU Resource 관리
