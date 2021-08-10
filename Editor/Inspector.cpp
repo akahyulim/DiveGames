@@ -130,35 +130,62 @@ namespace editor
 		// 이게 좀 이상하다. 되다 안되다 한다.
 		if (ImGui::CollapsingHeader("Camera", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			// 가져오기
-			bool bEnabled = false;// pCamera->Enabled();
-			bool bOcclusionCulling = false;
-			bool bHdr = false;
-
-			// 보여주기 
-			// enabled
-			ImGui::Text("Enable"); ImGui::SameLine(); ImGui::Checkbox("##Nothing", &bEnabled);
-
 			// Clear Flags
-			ImGui::Text("Clear Flags");
+			{
+				ImGui::Text("Clear Flags");
+			}
 
 			// Backgound Color
-			ImGui::Text("Background Color");
+			{
+				DirectX::XMFLOAT4 color = pCamera->GetBackgroundColor();
+				float col[4] = { color.x, color.y, color.z, color.w };
+
+				ImGui::Text("Background");
+
+				ImGui::SameLine();
+
+				ImGui::ColorEdit4("##background", col);
+
+				color = DirectX::XMFLOAT4(col[0], col[1], col[2], col[3]);
+				pCamera->SetBackgroundColor(color);
+			}
 
 			// Culling Mask
-			ImGui::Text("Culling Mask");
+			{
+				ImGui::Text("Culling Mask");
+			}
 
 			// Projection
-			ImGui::Text("Projection");
+			{
+				ImGui::Text("Projection");
+			}
 
 			// Field Of View
-			ImGui::Text("Field Of View");
+			{
+				float fov = pCamera->GetFieldOfView();
+
+				ImGui::Text("Field Of View");
+
+				ImGui::SameLine();
+
+				// 실제로는 min, max를 얻어와서 적용해야 한다.
+				ImGui::SliderFloat("##fov", &fov, 0.0f, 180.0f);
+
+				pCamera->SetFieldOfView(fov);
+			}
 
 			// Clipping Planes
-			ImGui::Text("Clipping Planes");
-			ImGui::SameLine();	ImGui::Text("Near");
-			ImGui::Text("Far");
+			// 한계값이 있다면 위의 SliderFloat이 어울린다.
+			{
+				ImGui::Text("Clipping Planes");	ImGui::SameLine();
+				float nearPlane = pCamera->GetNearPlane();
+				ImGui::Text("Near"); ImGui::SameLine();	ImGui::DragScalar("##nearPlane", ImGuiDataType_Float, &nearPlane, 0.01f, nullptr, nullptr, "%.4f");
+				float farPlane = pCamera->GetFarPlane();
+				ImGui::Text("Far");	ImGui::SameLine();	ImGui::DragScalar("##farPlane", ImGuiDataType_Float, &farPlane, 0.01f, nullptr, nullptr, "%.4f");
 
+				pCamera->SetNearPlane(nearPlane);
+				pCamera->SetFarPlane(farPlane);
+			}
 			// Viewport
 			ImGui::Text("Viewport");
 			ImGui::Text("X");	ImGui::SameLine();	ImGui::Text("Y");
@@ -173,10 +200,10 @@ namespace editor
 			ImGui::Text("Target Texture");
 
 			// Occlusion Culling
-			ImGui::Text("Occlusion Culling"); ImGui::SameLine(); ImGui::Checkbox("##Shap", &bOcclusionCulling);
+			//ImGui::Text("Occlusion Culling"); ImGui::SameLine(); ImGui::Checkbox("##Shap", &bOcclusionCulling);
 
 			// HDR
-			ImGui::Text("HDR"); ImGui::SameLine(); ImGui::Checkbox("##Nothing", &bHdr);
+			//ImGui::Text("HDR"); ImGui::SameLine(); ImGui::Checkbox("##Nothing", &bHdr);
 
 			// pTarget display???
 

@@ -11,3 +11,4 @@ RenderTexture의 문제
 - 마지막 Shader Pass에서 RenderTarget을 전달해야 한다.
 	- 일단 생성을 App(Eidtor)에서 할 지, Renderer에서 일괄 생성할 지 결정하지 못했다.
 => Deferred Shading에 대한 이해부터 완벽하지 않다.
+=> Directional Light부터 보면 될 것 같다.
