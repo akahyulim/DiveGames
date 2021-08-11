@@ -57,7 +57,7 @@ namespace dive
 
 		void Initialize();
 
-		const D3D11_VIEWPORT& GetViewport() const { return m_ViewPort; }
+		const D3D11_VIEWPORT& GetViewport() const { return m_Viewport; }
 		void SetViewport(float width, float height, float offsetX = 0.0f, float offsetY = 0.0f);
 
 		// RenderTarget용 크기이다.
@@ -110,7 +110,7 @@ namespace dive
 		// RenderTarget용 크기다. 타입이 애매하다.
 		DirectX::XMINT2 m_RenderTargetSize;
 
-		D3D11_VIEWPORT m_ViewPort;
+		D3D11_VIEWPORT m_Viewport;
 
 		// GPU Resource 관리
 		Microsoft::WRL::ComPtr<ID3D11DeviceChild> m_pShaders[SHADERTYPE_COUNT];

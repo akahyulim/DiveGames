@@ -16,14 +16,14 @@ namespace dive
 	{
 		m_RenderTargetSize = DirectX::XMINT2(0, 0);
 		// 이렇게 초기화하면 Sandbox에서 문제가 생긴다.
-		m_ViewPort.Width = static_cast<float>(m_RenderTargetSize.x);
-		m_ViewPort.Height = static_cast<float>(m_RenderTargetSize.y);
-		//m_ViewPort.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
-		//m_ViewPort.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
-		m_ViewPort.MinDepth = 0.0f;
-		m_ViewPort.MaxDepth = 1.0f;
-		m_ViewPort.TopLeftX = 0.0f;
-		m_ViewPort.TopLeftY = 0.0f;
+		m_Viewport.Width = static_cast<float>(m_RenderTargetSize.x);
+		m_Viewport.Height = static_cast<float>(m_RenderTargetSize.y);
+		//m_Viewport.Width = (float)m_pGraphicsDevice->GetResolutionWidth();
+		//m_Viewport.Height = (float)m_pGraphicsDevice->GetResolutionHeight();
+		m_Viewport.MinDepth = 0.0f;
+		m_Viewport.MaxDepth = 1.0f;
+		m_Viewport.TopLeftX = 0.0f;
+		m_Viewport.TopLeftY = 0.0f;
 
 		EVENT_SUBSCRIBE(eEventType::SceneResolve, EVENT_HANDLE(ObjectClassify));
 	}
@@ -69,12 +69,12 @@ namespace dive
 
 	void Renderer::SetViewport(float width, float height, float offsetX, float offsetY)
 	{
-		if (m_ViewPort.Width != width || m_ViewPort.Height != height)
+		if (m_Viewport.Width != width || m_Viewport.Height != height)
 		{
 			// 뭔가를 하는데...
 
-			m_ViewPort.Width = width;
-			m_ViewPort.Height = height;
+			m_Viewport.Width = width;
+			m_Viewport.Height = height;
 
 			// 애초에 offset이 뭐냐...
 		}
@@ -98,7 +98,7 @@ namespace dive
 
 	void Renderer::GetGBufferSize(unsigned int& outWidth, unsigned int& outHeight)
 	{
-		if (m_pGBuffer)
+		if (!m_pGBuffer)
 		{
 			outWidth = 0, outHeight = 0;
 		}
@@ -132,6 +132,9 @@ namespace dive
 		pBuffer->world = XMMatrixTranspose(XMMatrixIdentity());
 
 		// View와 Projection은 Camera로부터 가져온다.
+		// => 카메라가 여러개일 수 있다.
+		// => Scene 혹은 Camera의 static으로부터 활성화된 카메라를 모두 얻어와야 한다.
+		// => 그렇게 되면 pass를 나누던가 하연튼 복잡해진다...
 		// View Matrix
 		{
 			XMFLOAT3 up, position, lookAt;
@@ -225,7 +228,7 @@ namespace dive
 		immediateContext->PSSetSamplers(0, 1, &m_PipelineStateLegacy.pSS);
 		immediateContext->OMSetDepthStencilState(m_PipelineStateLegacy.pDSS, 1);
 		immediateContext->RSSetState(m_PipelineStateLegacy.pRSS);
-		immediateContext->RSSetViewports(1, &m_ViewPort);
+		immediateContext->RSSetViewports(1, &m_Viewport);
 
 
 		MeshRenderer* meshRenderer = nullptr;

@@ -12,3 +12,29 @@ RenderTexture의 문제
 	- 일단 생성을 App(Eidtor)에서 할 지, Renderer에서 일괄 생성할 지 결정하지 못했다.
 => Deferred Shading에 대한 이해부터 완벽하지 않다.
 => Directional Light부터 보면 될 것 같다.
+
+Camera
+- Camera GameObject 자체는 여러개가 존재할 수 있다.
+- 이들 중 단 하나만 Activate 되어야 한다???
+	- 화면 전환시에만 사용하는 방법 같다.
+- Scene은 이를 알아야 한다.
+	- Camera들도 이를 알아야 한다?
+	- 유니티의 경우 Camera의 static variables를 통해 모든 Camera를 리턴한다...
+		- 이건 결국 static container가 존재한다는 의미인데... c++에선 본 적이 없다.
+- RenderTexture를 이용하여 한 번에 두 대 이상 카메라를 사용할 수 있다.
+=> 이건 render pass까지 생각을 해봐야 한다? 
+- Viewport Rect은 무엇인가?
+	- Camera가 Screen에 그릴 영역을 의미한다.
+	- 어찌보면 RenderTexture의 크기와 시작 지점이라 할 수 있다.
+	=> RenderTexture와 관련이 없다. TargetTexture 설정없이 구현한 카메라별 분할 예제를 확인했다.
+	=> 아무리봐도 RenderTarget으로 구현해야 할 거 같은데... 3dapi도 멀티 카메라에서 RenderTarget을 사용했다.
+	=> 이건 결국 Viewport가 맞았다. 다만 값들이 0.0 ~ 1.0 사이로 정규화되어 있을 뿐이다.
+- 현재 Camera별로 그린다는 생각으로 가고 있는데... 그러면 Draw Call이 Camera 대수만큼 배로 늘어나는거 아닌가?
+
+
+Behavior
+- 유니티에는 Component를 상속하는 Behavior이라는 클래스가 있다.
+	- 다른 Component와 달리 활성화 유무를 지정할 수 있다. 
+	- 카메라 등이 이를 상속한다.
+- Inspector에서 활성화 유무를 설정하는 Component들이 존재하는 이유다.
+=> Tag 설정도 아직 안했고... 결국 Object부터 Component까지 유니티 인터페이스를 좀 더 견고하게 받아야 들어야 할 거 같다.

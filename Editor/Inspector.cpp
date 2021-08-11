@@ -157,7 +157,15 @@ namespace editor
 
 			// Projection
 			{
+				int projectionType = static_cast<int>(pCamera->GetProjectionType());
+
 				ImGui::Text("Projection");
+				ImGui::SameLine();
+
+				// 중앙 정렬 같은건 없나...?
+				ImGui::Combo("##proejctionTypeCombe", &projectionType, "Perspective\0Orthographic");
+
+				pCamera->SetProjectionType(static_cast<dive::eProjectionType>(projectionType));
 			}
 
 			// Field Of View
@@ -179,9 +187,9 @@ namespace editor
 			{
 				ImGui::Text("Clipping Planes");	ImGui::SameLine();
 				float nearPlane = pCamera->GetNearPlane();
-				ImGui::Text("Near"); ImGui::SameLine();	ImGui::DragScalar("##nearPlane", ImGuiDataType_Float, &nearPlane, 0.01f, nullptr, nullptr, "%.4f");
+				ImGui::Text("Near"); ImGui::SameLine();	ImGui::DragScalar("##nearPlane", ImGuiDataType_Float, &nearPlane, 0.1f, nullptr, nullptr, "%.2f");
 				float farPlane = pCamera->GetFarPlane();
-				ImGui::Text("Far");	ImGui::SameLine();	ImGui::DragScalar("##farPlane", ImGuiDataType_Float, &farPlane, 0.01f, nullptr, nullptr, "%.4f");
+				ImGui::Text("Far");	ImGui::SameLine();	ImGui::DragScalar("##farPlane", ImGuiDataType_Float, &farPlane, 0.1f, nullptr, nullptr, "%.2f");
 
 				pCamera->SetNearPlane(nearPlane);
 				pCamera->SetFarPlane(farPlane);
@@ -197,8 +205,15 @@ namespace editor
 			// rendering path???
 
 			// Target Texture
-			ImGui::Text("Target Texture");
+			{
+				auto pTargetTexture = pCamera->GetTargetTexture();
 
+				ImGui::Text("Target Texture"); //ImGui::SameLine();
+				// 그냥 Text가 아니라 박스로 둘러쌓여야 하는데...
+				// InputText 같다?
+
+				// 옆의 단추를 누르면 리소를 찾겠지?
+			}
 			// Occlusion Culling
 			//ImGui::Text("Occlusion Culling"); ImGui::SameLine(); ImGui::Checkbox("##Shap", &bOcclusionCulling);
 
@@ -252,6 +267,7 @@ namespace editor
 		if (ImGui::CollapsingHeader("Light", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// 적용 유무 라디오 박스가 먼저다.
+			// -> 이게 바로 Behavior이다.
 
 			{
 				int type = static_cast<int>(pLight->GetType());
