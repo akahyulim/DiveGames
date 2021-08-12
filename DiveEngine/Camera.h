@@ -13,6 +13,25 @@ namespace dive
 		Orthographic,
 	};
 
+	struct ScreenRect
+	{
+		ScreenRect()
+		{
+			x = y = width = height = 0.0f;
+		}
+
+		ScreenRect(float x, float y, float width, float height)
+		{
+			this->x = x;
+			this->y = y;
+			this->width = width;
+			this->height = height;
+		}
+
+		float x, y;
+		float width, height;
+	};
+
 	// 주 역할은 입력을 받아 Transform을 변한시키고
 	// 이를 이용하여 View, Projection Matrix를 계산한다.
 	// 이외에도 컬링, 픽킹 등의 기능을 수행한다.
@@ -34,7 +53,7 @@ namespace dive
 		float GetFieldOfView() const { return m_FieldOfView; }
 		void SetFieldOfView(float angle);
 
-		float GetAspect() const { return m_ViewWidth / m_ViewHeight; };
+		float GetAspect() const { return static_cast<float>(m_ScreenWidth / m_ScreenHeight); };
 
 		float GetNearPlane() const { return m_NearPlane; }
 		void SetNearPlane(float nearPlane);
@@ -46,31 +65,29 @@ namespace dive
 		void SetBackgroundColor(float r, float g, float b, float a) { SetBackgroundColor(DirectX::XMFLOAT4(r, g, b, a)); }
 
 		DirectX::XMFLOAT4X4 GetView() const { return m_View; }
+		DirectX::XMMATRIX GetViewMatrix() const { return DirectX::XMLoadFloat4x4(&m_View); }
 		DirectX::XMFLOAT4X4 GetProjection() const { return m_Projection; }
+		DirectX::XMMATRIX GetProjectionMatrix() const { return DirectX::XMLoadFloat4x4(&m_Projection); }
 		DirectX::XMFLOAT4X4 GetViewProjection() const;
+		DirectX::XMMATRIX GetViewProjectionMatrix() const { return GetViewMatrix() * GetProjectionMatrix(); }
 
 		dvRenderTexture* GetTargetTexture() { return m_pTargetTexture; }
 		void SetTargetTexture(dvRenderTexture* pTexture) { m_pTargetTexture = pTexture; }
 
 		// Viewport
 		D3D11_VIEWPORT GetViewport() const { return m_Viewport; }
-		//void SetViewport(float width, float height, float x = 0.0f, float y = 0.0f);
+		D3D11_VIEWPORT* GetViewportPtr() { return &m_Viewport; }
+		unsigned int GetScreenWidth() const { return m_ScreenWidth; }
+		unsigned int SetScreenHeight() const { return m_ScreenHeight; }
+		void SetScreenSize(unsigned int width, unsigned int height);
+		ScreenRect GetScreenRect() const { return m_ScreenRect; }
+		void SetScreenRect(float x, float y, float width, float height);
+
+		// 이건 Orthographic 전용 같다. ScreenSize와는 다르다.
 		float GetViewWidth() const { return m_ViewWidth; }
 		void SetViewWidth(float width);
 		float GetViewHeight() const { return m_ViewHeight; }
 		void SetViewHeight(float height);
-		// 이걸 어떻게 계산할까나...
-		// 굳이 이 곳에서 직접 계산할 필요가 있나?
-		// Viewport만 설정한 후 Inspector에서 계산해도 될 것 같은데...
-		// 그럼 위의 Get, SetView Width, Height 함수도 필요없어지고...
-		float GetNormalizedRectX();
-		void SetNormalizedRectX(float x);
-		float GetNormalizedRectY();
-		void SetNormalizedRectY(float y);
-		float GetNormalizedRectWidth();
-		void SetNormalizedRectWidth(float width);
-		float GetNormalizedRectHeight();
-		void SetNormalizedRectHeight(float height);
 
 		// static
 		static std::vector<Camera*> GetAllCameras() { return s_Cameras; }
@@ -103,6 +120,9 @@ namespace dive
 		// rect : 카메라의 렌더링 결과물이 나타날 화면에서의 위치 0 ~ 1
 		// 이게 결국 Viewport다.
 		D3D11_VIEWPORT m_Viewport;
+		ScreenRect m_ScreenRect;
+		unsigned int m_ScreenWidth;
+		unsigned int m_ScreenHeight;
 
 		// pixel width, height : pixel 단위의 넒이, 높이
 

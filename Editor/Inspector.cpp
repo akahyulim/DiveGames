@@ -194,11 +194,26 @@ namespace editor
 				pCamera->SetNearPlane(nearPlane);
 				pCamera->SetFarPlane(farPlane);
 			}
-			// Viewport
-			ImGui::Text("Viewport");
-			ImGui::Text("X");	ImGui::SameLine();	ImGui::Text("Y");
-			ImGui::Text("W");	ImGui::SameLine();	ImGui::Text("H");
 
+			// Viewport
+			{
+				ImGui::Text("Viewport Rect");
+
+				auto screenRect = pCamera->GetScreenRect();
+				float x = screenRect.x;
+				float y = screenRect.y;
+				float width = screenRect.width;
+				float height = screenRect.height;
+
+				ImGui::Text("X");	ImGui::SameLine();	ImGui::SliderFloat("##x", &x, 0.0f, 1.0f);	//ImGui::SameLine();
+				ImGui::Text("Y");	ImGui::SameLine();	ImGui::SliderFloat("##y", &y, 0.0f, 1.0f);
+				ImGui::Text("W");	ImGui::SameLine();	ImGui::SliderFloat("##width", &width, 0.0f, 1.0f);	//ImGui::SameLine();
+				ImGui::Text("H");	ImGui::SameLine();	ImGui::SliderFloat("##height", &height, 0.0f, 1.0f);
+
+				pCamera->SetScreenRect(x, y, width, height);
+			}
+
+			
 			// Detph	
 			ImGui::Text("Depth");
 

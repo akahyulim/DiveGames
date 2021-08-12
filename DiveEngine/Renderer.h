@@ -161,5 +161,7 @@ namespace dive
 
 		// 이건 고쳐야 된다.
 		Font* m_pDvFont = nullptr;
+
+		GameObject* m_pCamera = nullptr;
 	};
 }

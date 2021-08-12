@@ -44,6 +44,11 @@ namespace dive
 		m_Viewport.MinDepth = 0.0f;
 		m_Viewport.MaxDepth = 1.0f;
 
+		m_ScreenRect.x = 0.0f;
+		m_ScreenRect.y = 0.0f;
+		m_ScreenRect.width= 1.0f;
+		m_ScreenRect.height = 1.0f;
+
 		s_Cameras.emplace_back(this);
 	}
 	
@@ -57,6 +62,11 @@ namespace dive
 
 		if (!m_bUpdated)
 			return;
+
+		m_Viewport.TopLeftX = m_ScreenRect.x * static_cast<float>(m_ScreenWidth);
+		m_Viewport.TopLeftY = m_ScreenRect.y * static_cast<float>(m_ScreenHeight);
+		m_Viewport.Width = m_ScreenRect.width * static_cast<float>(m_ScreenWidth);
+		m_Viewport.Height = m_ScreenRect.height * static_cast<float>(m_ScreenHeight);
 
 		DirectX::XMStoreFloat4x4(&m_View, computeViewMatrix());
 		DirectX::XMStoreFloat4x4(&m_Projection, computeProjectionMatrix());
@@ -114,6 +124,46 @@ namespace dive
 		m_FieldOfView = angle;
 		m_bUpdated = true;
 	}
+
+	void Camera::SetScreenSize(unsigned int width, unsigned int height)
+	{
+		if (m_ScreenWidth == width && m_ScreenHeight == height)
+			return;
+
+		if (width <= 0 || height <= 0)
+		{
+			return;
+		}
+
+		m_ScreenWidth = width;
+		m_ScreenHeight = height;
+
+		m_bUpdated = true;
+	}
+
+	void Camera::SetScreenRect(float x, float y, float width, float height)
+	{
+		if (m_ScreenRect.x == x && m_ScreenRect.y == y && m_ScreenRect.width == width && m_ScreenRect.height == height)
+			return;
+
+		if (x < 0.0f || x > 1.0f || y < 0.0f || y > 1.0f || width < 0.0f || width > 1.0f || height < 0.0f || height > 1.0f)
+		{
+			return;
+		}
+
+		if (x >= width || y >= height)
+		{
+			return;
+		}
+
+		m_ScreenRect.x = x;
+		m_ScreenRect.y = y;
+		m_ScreenRect.width = width;
+		m_ScreenRect.height = height;
+
+		m_bUpdated = true;
+	}
+
 
 	// 이건 Viewport의 Width와 같은 걸까?
 	void Camera::SetViewWidth(float width)

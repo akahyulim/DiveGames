@@ -8,6 +8,7 @@
 #include "Log.h"
 #include "TextMesh.h"
 #include "Event.h"
+#include "Camera.h"
 #include <assert.h>
 
 namespace dive
@@ -69,7 +70,13 @@ namespace dive
 
 	void Renderer::SetViewport(float width, float height, float offsetX, float offsetY)
 	{
-		if (m_Viewport.Width != width || m_Viewport.Height != height)
+		if (m_pCamera)
+		{
+			auto pCamera = m_pCamera->GetComponent<Camera>();
+			pCamera->SetScreenSize(width, height);
+		}
+		//if (m_Viewport.Width != width || m_Viewport.Height != height)
+		else
 		{
 			// 뭔가를 하는데...
 
@@ -135,73 +142,93 @@ namespace dive
 		// => 카메라가 여러개일 수 있다.
 		// => Scene 혹은 Camera의 static으로부터 활성화된 카메라를 모두 얻어와야 한다.
 		// => 그렇게 되면 pass를 나누던가 하연튼 복잡해진다...
-		// View Matrix
+		if (m_pCamera)
 		{
-			XMFLOAT3 up, position, lookAt;
-			XMVECTOR upVector, positionVector, lookAtVector;
-			float yaw, pitch, roll;
-			XMMATRIX rotationMatrix;
+			auto pCamera = m_pCamera->GetComponent<Camera>();
 
-			up.x = 0.0f;
-			up.y = 1.0f;
-			up.z = 0.0f;
-
-			upVector = XMLoadFloat3(&up);
-
-			position.x = 0.0f;
-			position.y = 0.0f;
-			position.z = -5.0f;
-
-			// Load it into a XMVECTOR structure.
-			positionVector = XMLoadFloat3(&position);
-
-			// Setup where the camera is looking by default.
-			lookAt.x = 0.0f;
-			lookAt.y = 0.0f;
-			lookAt.z = 1.0f;
-
-			// Load it into a XMVECTOR structure.
-			lookAtVector = XMLoadFloat3(&lookAt);
-
-			// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
-			pitch = 0.0f * 0.0174532925f;
-			yaw = 0.0f * 0.0174532925f;
-			roll = 0.0f * 0.0174532925f;
-
-			// Create the rotation matrix from the yaw, pitch, and roll values.
-			rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-
-			// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
-			lookAtVector = XMVector3TransformCoord(lookAtVector, rotationMatrix);
-			upVector = XMVector3TransformCoord(upVector, rotationMatrix);
-
-			// Translate the rotated camera position to the location of the viewer.
-			lookAtVector = XMVectorAdd(positionVector, lookAtVector);
-
-			auto viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+			// view
+			auto viewMatrix = pCamera->GetViewMatrix();
 			pBuffer->view = XMMatrixTranspose(viewMatrix);
-			m_BufferFrameCPU.SetViewMatrix(viewMatrix);
-		}
 
-		// Perspective Projection Matrix
-		{
-			float fieldOfView = 3.141592654f / 4.0f;
-			float screenAspect = (float)m_pGraphicsDevice->GetResolutionWidth() / (float)m_pGraphicsDevice->GetResolutionHeight();
-			
-			auto projMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
+			// projection
+			auto projMatrix = pCamera->GetProjectionMatrix();
 			pBuffer->proj = XMMatrixTranspose(projMatrix);
-			m_BufferFrameCPU.SetPerspectiveProjectionMatrix(projMatrix);
-			auto view_proj = m_BufferFrameCPU.GetViewMatrix() * m_BufferFrameCPU.GetPerspectiveProjectionMatrix();
-			m_BufferFrameCPU.SetViewProjectionMatrix(view_proj);
-		}
 
-		// Orthographic Projection Matrix
+			// constant buffer
+			m_BufferFrameCPU.SetViewMatrix(viewMatrix);
+			m_BufferFrameCPU.SetPerspectiveProjectionMatrix(projMatrix);
+			m_BufferFrameCPU.SetViewProjectionMatrix(pCamera->GetViewProjectionMatrix());
+		}
+		else
 		{
-			auto width = (float)m_pGraphicsDevice->GetResolutionWidth();
-			auto height = (float)m_pGraphicsDevice->GetResolutionHeight();
-			auto orthoProjMatrix = XMMatrixTranspose(XMMatrixOrthographicLH(width, height, 0.1f, 1000.0f));
-			pBuffer->projOrthographic = orthoProjMatrix;
-			m_BufferFrameCPU.SetOrthoProjectionMatrix(orthoProjMatrix);
+			// View Matrix
+			{
+				XMFLOAT3 up, position, lookAt;
+				XMVECTOR upVector, positionVector, lookAtVector;
+				float yaw, pitch, roll;
+				XMMATRIX rotationMatrix;
+
+				up.x = 0.0f;
+				up.y = 1.0f;
+				up.z = 0.0f;
+
+				upVector = XMLoadFloat3(&up);
+
+				position.x = 0.0f;
+				position.y = 0.0f;
+				position.z = -5.0f;
+
+				// Load it into a XMVECTOR structure.
+				positionVector = XMLoadFloat3(&position);
+
+				// Setup where the camera is looking by default.
+				lookAt.x = 0.0f;
+				lookAt.y = 0.0f;
+				lookAt.z = 1.0f;
+
+				// Load it into a XMVECTOR structure.
+				lookAtVector = XMLoadFloat3(&lookAt);
+
+				// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
+				pitch = 0.0f * 0.0174532925f;
+				yaw = 0.0f * 0.0174532925f;
+				roll = 0.0f * 0.0174532925f;
+
+				// Create the rotation matrix from the yaw, pitch, and roll values.
+				rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+
+				// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
+				lookAtVector = XMVector3TransformCoord(lookAtVector, rotationMatrix);
+				upVector = XMVector3TransformCoord(upVector, rotationMatrix);
+
+				// Translate the rotated camera position to the location of the viewer.
+				lookAtVector = XMVectorAdd(positionVector, lookAtVector);
+
+				auto viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+				pBuffer->view = XMMatrixTranspose(viewMatrix);
+				m_BufferFrameCPU.SetViewMatrix(viewMatrix);
+			}
+
+			// Perspective Projection Matrix
+			{
+				float fieldOfView = 3.141592654f / 4.0f;
+				float screenAspect = (float)m_pGraphicsDevice->GetResolutionWidth() / (float)m_pGraphicsDevice->GetResolutionHeight();
+
+				auto projMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
+				pBuffer->proj = XMMatrixTranspose(projMatrix);
+				m_BufferFrameCPU.SetPerspectiveProjectionMatrix(projMatrix);
+				auto view_proj = m_BufferFrameCPU.GetViewMatrix() * m_BufferFrameCPU.GetPerspectiveProjectionMatrix();
+				m_BufferFrameCPU.SetViewProjectionMatrix(view_proj);
+			}
+
+			// Orthographic Projection Matrix
+			{
+				auto width = (float)m_pGraphicsDevice->GetResolutionWidth();
+				auto height = (float)m_pGraphicsDevice->GetResolutionHeight();
+				auto orthoProjMatrix = XMMatrixTranspose(XMMatrixOrthographicLH(width, height, 0.1f, 1000.0f));
+				pBuffer->projOrthographic = orthoProjMatrix;
+				m_BufferFrameCPU.SetOrthoProjectionMatrix(orthoProjMatrix);
+			}
 		}
 
 		//immediateContext->Unmap(static_cast<ID3D11Resource*>(mConstantBufferMatrix.Get()), 0);
@@ -228,8 +255,15 @@ namespace dive
 		immediateContext->PSSetSamplers(0, 1, &m_PipelineStateLegacy.pSS);
 		immediateContext->OMSetDepthStencilState(m_PipelineStateLegacy.pDSS, 1);
 		immediateContext->RSSetState(m_PipelineStateLegacy.pRSS);
-		immediateContext->RSSetViewports(1, &m_Viewport);
-
+		
+		//m_pCamera->GetComponent<Camera>()->SetScreenSize(m_Viewport.Width, m_Viewport.Height);
+		if (m_pCamera)
+		{
+			//auto viewport = m_pCamera->GetComponent<Camera>()->GetViewport();
+			immediateContext->RSSetViewports(1, m_pCamera->GetComponent<Camera>()->GetViewportPtr());
+		}
+		else
+			immediateContext->RSSetViewports(1, &m_Viewport);
 
 		MeshRenderer* meshRenderer = nullptr;
 		for (const auto& gameObject : m_GameObjects[eObjectType::Opaque])
@@ -248,6 +282,7 @@ namespace dive
 				DirectX::XMMATRIX world = XMMatrixTranspose(m_BufferObjectCPU.GetWorldMatrix());
 				DirectX::XMMATRIX wvp = XMMatrixTranspose(m_BufferObjectCPU.GetWorldViewProjectionMatrix());
 
+				// UpdateCB에서 전달하지 못한 World 관련 행렬을 이 곳에서 Set한다.
 				BufferObject* pData = static_cast<BufferObject*>(m_pBufferObjectGPU->Map());
 				DirectX::XMStoreFloat4x4(&pData->world, world);
 				DirectX::XMStoreFloat4x4(&pData->wvp, wvp);
@@ -349,6 +384,7 @@ namespace dive
 			{
 				m_GameObjects[eObjectType::Camera].push_back(gameObject);
 				// 카메라 선택... 메인 카메라인가?
+				m_pCamera = gameObject;
 			}
 			else if (light)
 			{
