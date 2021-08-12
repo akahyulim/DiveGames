@@ -68,6 +68,10 @@ namespace dive
 		CORE_TRACE("Renderer 초기화에 성공하였습니다.");
 	}
 
+	//==============================================================================================//
+	// 카메라가 없을 순 없다.																		//
+	// 따라서 사용자는 Renderer가 아닌 Scene -> Camera 순의 접근으로 설정하는 것이 맞는 것 같다.	//
+	//==============================================================================================//
 	void Renderer::SetViewport(float width, float height, float offsetX, float offsetY)
 	{
 		if (m_pCamera)
@@ -136,6 +140,7 @@ namespace dive
 
 		// World Matrix
 		// 이건 개별 GameObject의 Transform으로부터 가져온다.
+		// 필요없는 것 같다. 예전 구현의 레거시다.
 		pBuffer->world = XMMatrixTranspose(XMMatrixIdentity());
 
 		// View와 Projection은 Camera로부터 가져온다.
@@ -154,10 +159,17 @@ namespace dive
 			auto projMatrix = pCamera->GetProjectionMatrix();
 			pBuffer->proj = XMMatrixTranspose(projMatrix);
 
+			// 빈 값이라도 넣어야 하나??? 아니면 Projection은 하나만 전달토록 해야 하나...
+			// 그것도 아니면 억지로라도 계산해서 두 개 다 넣어야 하나...
+			// orthographic
+			auto orthoProjMatrix = XMMatrixTranspose(DirectX::XMMatrixIdentity());
+			pBuffer->projOrthographic = orthoProjMatrix;
+
 			// constant buffer
 			m_BufferFrameCPU.SetViewMatrix(viewMatrix);
 			m_BufferFrameCPU.SetPerspectiveProjectionMatrix(projMatrix);
-			m_BufferFrameCPU.SetViewProjectionMatrix(pCamera->GetViewProjectionMatrix());
+			m_BufferFrameCPU.SetViewProjectionMatrix(viewMatrix * projMatrix);//pCamera->GetViewProjectionMatrix());
+			m_BufferFrameCPU.SetOrthoProjectionMatrix(orthoProjMatrix);
 		}
 		else
 		{
@@ -282,7 +294,7 @@ namespace dive
 				DirectX::XMMATRIX world = XMMatrixTranspose(m_BufferObjectCPU.GetWorldMatrix());
 				DirectX::XMMATRIX wvp = XMMatrixTranspose(m_BufferObjectCPU.GetWorldViewProjectionMatrix());
 
-				// UpdateCB에서 전달하지 못한 World 관련 행렬을 이 곳에서 Set한다.
+				// 이건 오브젝트 버퍼다. UpdateCB랑은 상관없다.
 				BufferObject* pData = static_cast<BufferObject*>(m_pBufferObjectGPU->Map());
 				DirectX::XMStoreFloat4x4(&pData->world, world);
 				DirectX::XMStoreFloat4x4(&pData->wvp, wvp);

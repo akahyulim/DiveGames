@@ -94,7 +94,7 @@ namespace dive
 		static unsigned int GetAllCamerasCount() { return static_cast<unsigned int>(s_Cameras.size()); }
 
 	private:
-		DirectX::XMMATRIX computeViewMatrix() const;
+		DirectX::XMMATRIX computeViewMatrix();
 		DirectX::XMMATRIX computeProjectionMatrix() const;
 
 	private:
@@ -123,6 +123,8 @@ namespace dive
 		ScreenRect m_ScreenRect;
 		unsigned int m_ScreenWidth;
 		unsigned int m_ScreenHeight;
+
+		DirectX::XMFLOAT3 m_Position;
 
 		// pixel width, height : pixel 단위의 넒이, 높이
 

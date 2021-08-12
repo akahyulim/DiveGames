@@ -58,7 +58,7 @@ namespace dive
 	
 
 		// 흐음... 둘의 관계를 생각해봐야 한다.
-		updateTransform();
+		//updateTransform();
 		m_bChanged = true;
 	}
 
@@ -115,7 +115,7 @@ namespace dive
 		m_Children.shrink_to_fit();
 
 		// 이 둘을 별개로 관리해야 하나...?
-		updateTransform();
+		//updateTransform();
 		m_bChanged = true;
 	}
 }

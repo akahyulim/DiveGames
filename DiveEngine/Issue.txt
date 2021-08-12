@@ -30,6 +30,7 @@ Camera
 	=> 아무리봐도 RenderTarget으로 구현해야 할 거 같은데... 3dapi도 멀티 카메라에서 RenderTarget을 사용했다.
 	=> 이건 결국 Viewport가 맞았다. 다만 값들이 0.0 ~ 1.0 사이로 정규화되어 있을 뿐이다.
 - 현재 Camera별로 그린다는 생각으로 가고 있는데... 그러면 Draw Call이 Camera 대수만큼 배로 늘어나는거 아닌가?
+- Editor는 기본적으로 카메라를 가진다. 하지만 이는 게임의 카메라가 아니다!!!
 
 
 Behavior

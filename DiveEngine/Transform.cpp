@@ -32,12 +32,33 @@ namespace dive
 	//=====================================================================//
 	void Transform::Update(float deltaTime)
 	{
-		// 미리 언질을 해놓자.
-		// Editor에서는 기본적으로 Update를 꺼놓아야 한다.
-		// 그리고 테스트 실행시 Update를 수행한다.
-		// 그런데 IsChanged()로 Transform을 Update한다면 즉각적으로 Editor에 반영되지 않는다.
+		if (!HasChanged())
+			return;
 
-		// 이 곳에서 Translate, Rotate를 test하면 각자 적용되기 때문에 결과 예측이 너무 복잡해진다.
+		DirectX::XMMATRIX matLocalPos = DirectX::XMMatrixTranslationFromVector(GetLocalPositionVector());
+		DirectX::XMMATRIX matLocalRot = DirectX::XMMatrixRotationQuaternion(GetLocalRotationVector());
+		DirectX::XMMATRIX matLocalScl = DirectX::XMMatrixScalingFromVector(GetLocalScaleVector());
+
+		auto localMatrix = matLocalScl * matLocalRot * matLocalPos;
+		DirectX::XMStoreFloat4x4(&m_LocalMatrix, localMatrix);
+
+		if (HasParent())
+		{
+			DirectX::XMStoreFloat4x4(&m_Matrix, (localMatrix * m_pParent->GetMatrix()));
+		}
+		else
+		{
+			m_Matrix = m_LocalMatrix;
+		}
+
+		for (auto child : m_Children)
+		{
+			// 직접 호출은 에바인가?
+			child->m_bChanged = true;
+			child->m_bChanged = true;
+		}
+
+		m_bChanged = false;
 	}
 
 	void Transform::Serialize(FileStream* pFileStream)
@@ -60,7 +81,7 @@ namespace dive
 		unsigned int parentId = 0;
 		pFileStream->Read(&parentId);
 
-		updateTransform();
+		m_bChanged = true;
 	}
 
 	void Transform::Clear()
@@ -69,7 +90,7 @@ namespace dive
 		m_LocalRotation = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 		m_LocalScale	= DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 
-		updateTransform();
+		m_bChanged = true;
 	}
 
 	DirectX::XMVECTOR Transform::GetPositionVector() const
@@ -127,7 +148,7 @@ namespace dive
 
 		DirectX::XMStoreFloat3(&m_LocalPosition, position);
 
-		updateTransform();
+		m_bChanged = true;
 	}
 
 	void Transform::SetLocalPosition(const DirectX::XMFLOAT3& position)
@@ -231,7 +252,7 @@ namespace dive
 
 		DirectX::XMStoreFloat4(&m_LocalRotation, quaternion);
 
-		updateTransform();
+		m_bChanged = true;
 	}
 
 	void Transform::SetLocalRotation(const DirectX::XMFLOAT4& quaternion)
@@ -322,7 +343,7 @@ namespace dive
 
 		DirectX::XMStoreFloat3(&m_LocalScale, scale);
 
-		updateTransform();
+		m_bChanged = true;
 	}
 	
 	void Transform::SetLocalScale(const DirectX::XMFLOAT3& scale)
@@ -611,7 +632,7 @@ namespace dive
 
 		for (auto child : m_Children)
 		{
-			child->updateTransform();
+			child->m_bChanged = true;
 		}
 	}
 }

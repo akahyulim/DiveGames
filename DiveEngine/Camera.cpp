@@ -49,6 +49,8 @@ namespace dive
 		m_ScreenRect.width= 1.0f;
 		m_ScreenRect.height = 1.0f;
 
+		m_Position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+		
 		s_Cameras.emplace_back(this);
 	}
 	
@@ -56,12 +58,15 @@ namespace dive
 	{
 	}
 
+	//======================================================================//
+	// 현재 오버헤드를 작정하고 매 프레임 업데이트 중이다.					//
+	// 이를 해소하려면 GameObject 내부 단위의 이벤트 시스템이 필요하다.		//
+	// 그것도 아니라면 스파르탄처럼 위치, 회전값을 매 프레임 비교해야 한다.	//
+	//======================================================================//
 	void Camera::Update(float deltaTime)
 	{
-		// viewport와 position, rotation으로도 updated를 확인한다...
-
-		if (!m_bUpdated)
-			return;
+		//if (!m_bUpdated)
+		//	return;
 
 		m_Viewport.TopLeftX = m_ScreenRect.x * static_cast<float>(m_ScreenWidth);
 		m_Viewport.TopLeftY = m_ScreenRect.y * static_cast<float>(m_ScreenHeight);
@@ -224,7 +229,7 @@ namespace dive
 		return viewProj;
 	}
 
-	DirectX::XMMATRIX Camera::computeViewMatrix() const
+	DirectX::XMMATRIX Camera::computeViewMatrix()
 	{
 		auto transform = GetGameObject()->GetTransform();
 		
@@ -233,6 +238,8 @@ namespace dive
 		auto lookAt = transform->ForwardVector();
 		lookAt += pos;
 
+		m_Position = transform->GetPosition();
+
 		return DirectX::XMMatrixLookAtLH(pos, lookAt, up);
 	}
 
@@ -240,7 +247,7 @@ namespace dive
 	{
 		if (m_ProjectionType == eProjectionType::Perspective)
 		{
-			return DirectX::XMMatrixPerspectiveFovLH(m_FieldOfView, GetAspect(), m_NearPlane, m_FarPlane);
+			return DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(m_FieldOfView), GetAspect(), m_NearPlane, m_FarPlane);
 		}
 		else if (m_ProjectionType == eProjectionType::Orthographic)
 		{

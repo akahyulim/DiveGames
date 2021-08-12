@@ -53,6 +53,7 @@ namespace editor
 			ImGui::Text("Tag");	ImGui::SameLine();	ImGui::Text("Layer");
 
 			// 설정하기
+			// 현재 계층구조일 경우 하위 계층에 적용이 안되는 것 같다.
 			m_pInspectedTarget->SetActive(bActive);
 		}
 
