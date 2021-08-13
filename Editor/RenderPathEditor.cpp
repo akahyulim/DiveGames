@@ -23,18 +23,35 @@ namespace editor
 		if (!m_pScene)
 			return;
 
-		// 업데이트 필요 여부에 따라 선택
+		// 2d update
+		CORE_TRACE("RenderPath3D::Update() - RenderPath2D::Update()");
+
+		// scene update
 		{
 			auto timeScale = dive::TimeManager::GetInstance().GetTimeScale();
 			m_pScene->Update(deltaTime * timeScale);
 		}
+
+		// visibility 생성 및 초기화 그리고 설정
+		// 그런데 매번 할 필요가 없다. 이벤트로 처리하는게 낫다.
+		CORE_TRACE("RenderPath3D::Update() - Visibility 구성");
+
+		// renderer::updatePerFrameData: 매 프레임 업데이트 되는 데이터???
+		// 여기에서 데이터를 얻어온 후 다른 곳에서 buffer를 만들어 전달하는 것 같다.
+		dive::Renderer::GetInstance().UpdateCB();
+		CORE_TRACE("RenderPath3D::Update() - Update Per Frame Data(Constant Buffer)");
+
+		// camera update
+		// 이것도 현재 구현과는 어울리지 않는 것 같다.
+		CORE_TRACE("RenderPath3D::Update() - Update Camera Component");
 	}
 	
-	//================================================================================================
-	// 일단 Renderer에 구성한 Pass의 조합으로 최종 결과물을 그리는 함수다.
-	// Editor의 경우 Backbuffer의 RenderTargetView는 ImGui용으로 사용해야 하므로,
-	// Scene Widget에 그릴 텍스쳐는 Pass_Ldr이라는 RenderTargetView를 RenderTarget으로 삼고 있다.
-	//================================================================================================
+	/*
+	* Renderer에 구성한 Pass로 구성한다. 
+	* Deferred Shading 기준으로 크게 두 개의 Pass로 구성된다.
+	* 첫 번째. GBuffer에 그린다.
+	* 두 번째. GBuffer를 참조해 Lighting을 RenderTarget 혹은 Backbuffer에 그린다.
+	*/
 	void RenderPathEditor::Render() const
 	{
 		// 사실 Scene이 없어도 배경색은 그냥 그릴 수 있다.
@@ -42,23 +59,51 @@ namespace editor
 		if (!m_pScene)
 			return;
 
+		// 문제는 객체들을 얼마나 가져와서 사용할 거냐이다.
+		// Renderer에 구현된 Pass만으로는 부족할 수 있기 때문이다.
+		// 하지만 너무 난잡하게 가져와서 사용하면 구현이 복잡해 질 수 있다.
+		// Tick과 Render를 구분해야 한다. 그렇지 않으면 헬이 된다.
+
 		auto pRenderer = &dive::Renderer::GetInstance();
 		assert(pRenderer);
 
 		auto pImmediateContext = dive::Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 		assert(pImmediateContext);
 
-		// ClearColor는 어디에서 가져와야 할까?
-		// 아에 GraphicsDevice에 RenderTarget만 전달하면 되는 함수를 만드는게 나을까?
-		// 스파르탄의 경우 Pass 내부에 포함되어 있다. 그런데 이는 Runtime과 Editor의 결합도가 높은 스파르탄의 특징때문인듯 하다.
+		// 이 부분 때문에 Editor용 RenderPath가 필요했다.
+		// Editor는 Scene을 RenderTarget에 그려야 하기 때문이다.
+		// 나는 이 RenderTarget을 이 RenderPath에서 직접 생성하여 사용하고 싶다.
+		// => 생성은 Renderer에 생성함수를 만들어서 적용한다 해도
+		// => Resize가 문제다...
 		auto pRtv = pRenderer->GetFrameTexture()->GetRenderTargetView();
 		pImmediateContext->OMSetRenderTargets(1, &pRtv, nullptr);
-		float clearColors[4] = { 0.5f, 0.5f, 0.75f, 1.0f };
-		pImmediateContext->ClearRenderTargetView(pRtv, clearColors);
 
-		dive::Renderer::GetInstance().UpdateCB();
-		//dive::Renderer::GetInstance().DrawColor();
-		dive::Renderer::GetInstance().DrawLegacy();
+		// 새로운 Scene을 만들어도 이전 카메라를 놓지 못하네...
+		// 그런데 다중 Camera를 지원하려면 Camera별 Pass가 진행되어야 한다.
+		// 따라서 이러한 ClearColor 구현은 의미가 없다???
+		auto pCamera = pRenderer->GetCamera();
+		float clearColors[4];
+		if (!pCamera)
+		{
+			clearColors[0] = 0.0f;
+			clearColors[1] = 0.0f;
+			clearColors[2] = 0.0f;
+			clearColors[3] = 1.0f;
+		}
+		else
+		{
+			auto color = pCamera->GetComponent<dive::Camera>()->GetBackgroundColor();
+			clearColors[0] = color.x;
+			clearColors[1] = color.y;
+			clearColors[2] = color.z;
+			clearColors[3] = color.w;
+		}
+		pImmediateContext->ClearRenderTargetView(pRtv, clearColors);
+		
+
+		// pass 
+		//dive::Renderer::GetInstance().DrawLegacy();
+		dive::Renderer::GetInstance().PassMultiCamTest(pRtv);
 	}
 	
 	void RenderPathEditor::Compose() const

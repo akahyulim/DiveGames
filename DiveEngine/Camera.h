@@ -13,6 +13,14 @@ namespace dive
 		Orthographic,
 	};
 
+	enum class eCameraClearFlags
+	{
+		Skybox,
+		SolidColor,
+		Depth,
+		Nothing
+	};
+
 	struct ScreenRect
 	{
 		ScreenRect()
@@ -89,6 +97,9 @@ namespace dive
 		float GetViewHeight() const { return m_ViewHeight; }
 		void SetViewHeight(float height);
 
+		eCameraClearFlags GetClearFlags() const { return m_ClearFlags; }
+		void SetClearFlags(eCameraClearFlags flag) { m_ClearFlags = flag; }
+
 		// static
 		static std::vector<Camera*> GetAllCameras() { return s_Cameras; }
 		static unsigned int GetAllCamerasCount() { return static_cast<unsigned int>(s_Cameras.size()); }
@@ -129,5 +140,14 @@ namespace dive
 		// pixel width, height : pixel 단위의 넒이, 높이
 
 		// 불투명 오브젝트 정렬 모드?
+
+		// CameraClearFlags
+		// enum이고 Skybox, SolidColor, Depth, Nothing 으로 구성된다.
+		// 선택된 대상으로 배경을 채운다.
+		eCameraClearFlags m_ClearFlags;
+
+		// Culling Mask
+		// GameObject의 LayerMask와 어찌저찌 해서 그릴 대상을 추릴 수 있다.
+		// Tag와 Layer는 따로 존재하며, 여기에 등록하면 GameObject에서 할당할 수 있다.
 	};
 }

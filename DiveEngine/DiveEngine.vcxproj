@@ -326,6 +326,7 @@
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ConstantBuffers.h" />
+    <ClCompile Include="Renderer_Pass.cpp" />
     <ClCompile Include="Renderer_Resources.cpp" />
     <ClCompile Include="RenderPath3D.cpp" />
     <ClCompile Include="Runtime.cpp" />

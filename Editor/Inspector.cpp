@@ -178,7 +178,7 @@ namespace editor
 				ImGui::SameLine();
 
 				// 실제로는 min, max를 얻어와서 적용해야 한다.
-				ImGui::SliderFloat("##fov", &fov, 0.0f, 180.0f);
+				ImGui::SliderFloat("##fov", &fov, 0.0f, 180.0f, "%.1f");
 
 				pCamera->SetFieldOfView(fov);
 			}
@@ -206,10 +206,10 @@ namespace editor
 				float width = screenRect.width;
 				float height = screenRect.height;
 
-				ImGui::Text("X");	ImGui::SameLine();	ImGui::SliderFloat("##x", &x, 0.0f, 1.0f);	//ImGui::SameLine();
-				ImGui::Text("Y");	ImGui::SameLine();	ImGui::SliderFloat("##y", &y, 0.0f, 1.0f);
-				ImGui::Text("W");	ImGui::SameLine();	ImGui::SliderFloat("##width", &width, 0.0f, 1.0f);	//ImGui::SameLine();
-				ImGui::Text("H");	ImGui::SameLine();	ImGui::SliderFloat("##height", &height, 0.0f, 1.0f);
+				ImGui::Text("X");	ImGui::SameLine();	ImGui::SliderFloat("##x", &x, 0.0f, 1.0f, "%.2f");	//ImGui::SameLine();
+				ImGui::Text("Y");	ImGui::SameLine();	ImGui::SliderFloat("##y", &y, 0.0f, 1.0f, "%.2f");
+				ImGui::Text("W");	ImGui::SameLine();	ImGui::SliderFloat("##width", &width, 0.0f, 1.0f, "%.2f");	//ImGui::SameLine();
+				ImGui::Text("H");	ImGui::SameLine();	ImGui::SliderFloat("##height", &height, 0.0f, 1.0f, "%.2f");
 
 				pCamera->SetScreenRect(x, y, width, height);
 			}

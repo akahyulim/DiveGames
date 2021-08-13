@@ -50,6 +50,8 @@ namespace dive
 		m_ScreenRect.height = 1.0f;
 
 		m_Position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+		m_ClearFlags = eCameraClearFlags::SolidColor;
 		
 		s_Cameras.emplace_back(this);
 	}
@@ -118,9 +120,10 @@ namespace dive
 	}
 
 	// 0 ~ 180도 사이. 기본은 60
+	// 그런데 0도는 또 안되는 것 같다.
 	void Camera::SetFieldOfView(float angle)
 	{
-		if (angle < 0.0f || angle > 180.0f)
+		if (angle <= 0.0f || angle > 180.0f)
 			return;
 
 		if (m_FieldOfView == angle)
@@ -251,7 +254,8 @@ namespace dive
 		}
 		else if (m_ProjectionType == eProjectionType::Orthographic)
 		{
-			return DirectX::XMMatrixOrthographicLH(m_ViewWidth, m_ViewHeight, m_NearPlane, m_FarPlane);
+			// 일단 임시로 ScreenWidth, Height를 넣었다.
+			return DirectX::XMMatrixOrthographicLH((float)m_ScreenWidth, (float)m_ScreenHeight, m_NearPlane, m_FarPlane);
 		}
 
 		CORE_ERROR("");

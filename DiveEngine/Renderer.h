@@ -72,11 +72,14 @@ namespace dive
 		// update와 draw가 있다.
 		// update는 visibility, PerFrameData,  RenderData, CameraCB 등이 있다.
 		void UpdateCB();
+
+		//= 얘네들은 아래 Pass들이 흡수해야 한다. =============
 		void DrawScene();
 
 		// 일단 나누자
 		void DrawLegacy();
 		void DrawText();
+		//=====================================================
 
 		void ObjectClassify();
 
@@ -84,11 +87,21 @@ namespace dive
 		void SetGraphicsDevice(std::shared_ptr<GraphicsDevice> pDevice);
 		Texture* GetFrameTexture() { return m_RenderTargets[eRenderTargets::Frame_Ldr]; }
 
+		// Render Passes
+		// RenderPath에서 호출할 거기 때문에 public이어야 한다.
+		void PassGBuffer();
+		void PassLighting();
+		void PassMultiCamTest(ID3D11RenderTargetView* pRTV);
+
+
+		// 임시
+		GameObject* GetCamera() { return m_pCamera; }
+
 	private:
 		Renderer();
 		~Renderer();
 
-		// 각종 GPU Resource 생성
+		// Render Resources
 		bool createDepthStencilStates();
 		bool createRasterizerStates();
 		bool createSamplerStates();
@@ -103,6 +116,7 @@ namespace dive
 		bool createVertexShader(const std::wstring& filepath, unsigned int shaderType, unsigned int inputLayoutType = ILTYPE_COUNT,
 			D3D11_INPUT_ELEMENT_DESC* descs = nullptr, UINT numElements = 0);
 		bool createPixelShader(const std::wstring& filepath, unsigned int shaderType);
+
 
 	private:
 		std::shared_ptr<GraphicsDevice> m_pGraphicsDevice;
