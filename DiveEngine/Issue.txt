@@ -5,10 +5,17 @@
 	=> 결국 아래의 '크기에 대한 생각'과 연결된다.
 
 크기에 대한 생각
-결국 GraphicsDevice가 Backbuffer의 크기를
-GBuffer가 자신의 크기를 각자 관리토록 하였다.
-하지만 아직도 GBuffer의 Initialize 및 Resize를 어디에서 어떻게 수행할 지
-Eidtor의 Scene에서 출력할 RenderTexture는 누가 관리하고 어떻게 구현할 지 결정하지 못했다.
+- Backbuffer의 크기는 결국 App의 Client Size다.
+	- WM_SIZE에 반응하는 건 Backbuffer Size가 맞다.
+	- 결국 이 값이 App의 Resolution이다.
+- GBuffer의 크기는 Backbuffer와 다를 수 있다.
+	- Editor가 그렇다. 이럴땐 GBuffer에 Resize 함수를 두던가 Initialize를 새로 하는게 맞는 것 같다.
+- 개별 RenderTexture의 크기는 생성시 결정하는 게 맞는 것 같다.
+- Camera가 RenderTarget의 크기를 알아내는 방법
+	- Camera의 ViewMatrix, Viewport 계산에 사용된다.
+	- 1. RenderTexture가 있다면 크기를 얻어 온다.
+	- 2. 없다면 GBuffer 객체를 통해 크기를 얻어 온다.
+	- 3. 그것도 없다면 Resolution을 얻어온다.
 
 RenderTexture의 문제
 - RenderTarget으로 쓰려면 결국 Shader가 달라야 한다. 아마 최종 출력 Shader가 될 것이다.
