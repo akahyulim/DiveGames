@@ -98,6 +98,11 @@ namespace editor
 			clearColors[2] = color.z;
 			clearColors[3] = color.w;
 		}
+
+		// 여기에서 Camera의 ClearFlags의 SolidColor, Depth, Nothing이 적용된다. Cubemap은 아직 모르겠다.
+		// 이때 필요한 것이 바로 RenderTargetView와 DepthStencilView이다.
+		// 이걸 아에 Camera가 가지도록 하는건 에바일까?
+		// MeshRenderer도 자신이 Draw하는데...
 		pImmediateContext->ClearRenderTargetView(pRtv, clearColors);
 		
 

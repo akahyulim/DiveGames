@@ -1,3 +1,9 @@
+- Begin / EndScene의 구현에 대해 생각을 정리 중이다.(Renderer_Pass.cpp)
+- Camera는 자신이 그릴 Screen의 크기를 스스로 찾아야 한다.
+	- 현재 이 때문에 Sandbox 실행이 되지 않는다.
+	- RenderTarget(Texture), GBuffer, Backbuffer 순으로 찾아야 할 것이다. 
+	=> 결국 아래의 '크기에 대한 생각'과 연결된다.
+
 크기에 대한 생각
 결국 GraphicsDevice가 Backbuffer의 크기를
 GBuffer가 자신의 크기를 각자 관리토록 하였다.

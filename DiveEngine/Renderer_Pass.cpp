@@ -6,11 +6,33 @@
 
 namespace dive
 {
+	// Begin이라기보다는 Clear라는 이름이 더 어울릴 것 같다.
+	void Renderer::BeginScene()
+	{
+		// RenderTargetView, DepthStencilView를 Clear 한다.
+		// 대상은 Backbuffer(GraphicsDevice), GBuffer 둘 중 하나다.
+		// 아니면 둘 다 해도 될 것 같다.
+		// 현재 둘 다 개별 객체 Clear함수가 존재한다. 이를 호출하던지 아니면 View를 얻어와 Clear해야 한다.
+		// 그런데 Clear color과 적용 여부가 Camera에 있다.
+		// => 현재 BackBuffer를 Clear하는 PresentBegin이 Runtime::Render에서 호출된다.
+		// => 이게 맞는 것 같기도 하고...
+		// => 즉, Backbuffer는 따로 Clear하는게 나을 것 같다는 소리다.
+
+		// Camera의 RenderTarget Clear는 개별 수행해야 할 것 같다.
+
+		// 일단 메인 카메라의 존재 여부를 확인한다.
+		// => 사실 Main Camera의 구분은 또 어떻게 해야할 지 생각해야 한다.
+		// 없다면 특정 색상으로 Clear 후 리턴한다.
+		// 메인 카메라가 있다면 Clear함수를 호출한다. 
+	}
+
 	// RenderTarget을 얻어와야 할 수 있다.
 	void Renderer::PassGBuffer()
 	{
 		// 다중 카메라를 사용할 거라면
 		// 이 곳에서 루프를 돌려야 한다.
+
+		// 다중 카메라라면 MainCamera가 아니고 RenerTarget을 가질 경우 다시 ClearFlag를 수행해야 한다.
 	}
 
 	void Renderer::PassLighting()

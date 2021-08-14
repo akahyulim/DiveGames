@@ -5,13 +5,11 @@
 #include "FileStream.h"
 #include "dvRenderTexture.h"
 
-// View Width, View Height가 뭔지 모르겠다.
-// => Orthographic에서 사용하며 해상도 같다.
-// => 만약 다른 곳에선 사용하지 않는다면 굳이 멤버 변수로 관리할 필요가 없다. 그냥 값을 가져오면 된다.
-// Viewport Rect도 어떻게 작동하는지 모르겠다.
-// => TargetTexture 부분을 보면 기본적으로 스크린에 그린다고 한다.
-// => 예제에서도 TargetTexture 설정 없이 한 화면에 카메라별 렌더링을 수행하고 있다.
-// ViewMatrix 계산이 제대로 된건지 모르겠다.(Forward, Up을 Transform으로부터 가져왔는데, 계산을 행렬로 했다.)
+/*
+* ClearFlags에 맞춰 RenderTargetView, DepthStencilView를 Clear 여부를 적용한다.
+* 계산한 Viewport를 리턴한다.
+* ConstantBuffer용 값들을 리턴한다.
+*/
 namespace dive
 {
 	std::vector<Camera*> Camera::s_Cameras;
@@ -35,6 +33,8 @@ namespace dive
 
 		// 외부에서 생성된 텍스쳐를 가져오는 것 같다.
 		// 좀 더 알아봐야겠지?
+		// 이걸 굳이 가져오는 이유는 직접 Clear하기 위함이 아닐까?
+		// 아 물론 직관적으로 그려질 대상을 보여주는 것도 이유가 될 수 있다.
 		m_pTargetTexture = nullptr;
 
 		m_Viewport.TopLeftX = 0.0f;
@@ -108,6 +108,41 @@ namespace dive
 		pFileStream->Read(&m_NearPlane);
 		pFileStream->Read(&m_FarPlane);
 		pFileStream->Read(&m_BackgroundColor);
+	}
+
+	// ClearCamera 혹은 BeginScene이 적당할 거 같다.
+	// 아니면 Renderer::BegineScene()에서 Camera::ClearScene() 정도가 좋으려나...?
+	void Camera::ClearRenderTarget()
+	{
+		// BackBuffer 혹은 GBuffer의 RenderTarget들을 Clear할 수 있어야 한다.
+		// 개별 RenderTarget을 가진다면 이때 DepthStencilView도 함께 생성되었겠지?
+		// 직접 Clear하려면 immediateContext가 필요하다.
+
+		switch (m_ClearFlags)
+		{
+		case eCameraClearFlags::Skybox:
+		{
+			// 이건 아직 잘 모르겠다.
+			break;
+		}
+		case eCameraClearFlags::SolidColor:
+		{
+			// 이건 아마 RenderTargetView, DepthStencilView 둘을 Clear할 거다.
+			break;
+		}
+		case eCameraClearFlags::Depth:
+		{
+			// 이건 아마 DepthStencilView만 Clear할 거다.
+			break;
+		}
+		case eCameraClearFlags::Nothing:
+		{
+			// 이건 RenderTargetView, DepthStencilView 둘 다 Clear하지 않는거다.
+			break;
+		}
+		default:
+			return;
+		}
 	}
 
 	void Camera::SetProjectionType(eProjectionType type)

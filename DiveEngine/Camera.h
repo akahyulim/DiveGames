@@ -54,6 +54,8 @@ namespace dive
 		void Serialize(FileStream* pFileStream) override;
 		void Deserialize(FileStream* pFileStream) override;
 
+		void ClearRenderTarget();
+
 		// functions
 		eProjectionType GetProjectionType() const { return m_ProjectionType; }
 		void SetProjectionType(eProjectionType type);

@@ -89,6 +89,7 @@ namespace dive
 
 		// Render Passes
 		// RenderPath에서 호출할 거기 때문에 public이어야 한다.
+		void BeginScene();
 		void PassGBuffer();
 		void PassLighting();
 		void PassMultiCamTest(ID3D11RenderTargetView* pRTV);

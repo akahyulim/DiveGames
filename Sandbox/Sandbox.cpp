@@ -31,6 +31,16 @@ namespace sandbox
 			gameObject->SetName("Cube");
 		}
 
+		// 이제 카메라가 없으면 안된다?
+		{
+			auto pGameObject = activeScene->CreateGameObject();
+			pGameObject->SetName("Cam");
+			pGameObject->GetTransform()->SetPosition(0.0f, 0.0f, -5.0f);
+			auto pCam = pGameObject->AddComponent<dive::Camera>();
+			// 카메라에 ScreenSize를 설정해 주어야 한다.
+			// 직접 찾도록 하는게 나을 것 같은데...
+		}
+
 		APP_TRACE("Sandbox::Initialize()");
 		
 		return true;

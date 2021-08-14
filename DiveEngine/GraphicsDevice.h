@@ -39,6 +39,8 @@ namespace dive
 		Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwapChain;
 		ID3D11Device* m_pDevice = nullptr;
 		ID3D11DeviceContext* m_pImmediateContext = nullptr;
+		// 책에 의하면 GBuffer를 사용했을 때 Backbuffer의 RenderTargetView를 아에 생성조차 하지 않았다.
+		// => 잘못 알았다. DXUT라는 곳에 꼭꼭 숨겨져 있었다.
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pRenderTargetView;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pBackBuffer;
 
