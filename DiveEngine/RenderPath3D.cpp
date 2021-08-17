@@ -2,9 +2,14 @@
 #include "Renderer.h"
 #include "GraphicsDevice.h"
 #include "Timer.h"
-//#include "ThreadPool.h"
 #include "Log.h"
 
+/*
+* 너무 복잡하다.
+* 차라리 Renderer를 상속하여 Pass를 추가한 후
+* Update를 Override하는 편이 더 직관적일 것 같다.
+* Editor의 DebugDraw 처럼 추가 Pass가 필요한 경우처럼 말이다.
+*/
 namespace dive
 {
 	void RenderPath3D::PreUpdate()

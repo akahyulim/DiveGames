@@ -9,6 +9,7 @@
 #include "TextMesh.h"
 #include "Event.h"
 #include "Camera.h"
+#include "DiveCore.h"
 #include <assert.h>
 
 namespace dive
@@ -31,11 +32,16 @@ namespace dive
 
 	Renderer::~Renderer()
 	{
+		DV_DELETE(m_pGraphicsDevice);
+
 		// 리소스 제거
 	}
 
-	void Renderer::Initialize()
+	void Renderer::Initialize(HWND hWnd, bool fullScreen)
 	{
+		// 일단 구현
+		m_pGraphicsDevice = new GraphicsDevice(hWnd, fullScreen);
+
 		if (!m_pGraphicsDevice || !m_pGraphicsDevice->IsInitialized())
 		{
 			CORE_ERROR("Graphics Device가 생성되지 않아 초기화를 실행할 수 없습니다. 프로그램을 종료합니다.");
@@ -66,6 +72,13 @@ namespace dive
 		createPipelineStates();	// 가장 마지막이어야 한다.
 		
 		CORE_TRACE("Renderer 초기화에 성공하였습니다.");
+	}
+
+	void Renderer::Update(float deltaTime)
+	{
+		// update
+
+		// render
 	}
 
 	//==============================================================================//
@@ -413,8 +426,8 @@ namespace dive
 
 	void Renderer::SetGraphicsDevice(std::shared_ptr<GraphicsDevice> pDevice)
 	{
-		m_pGraphicsDevice = pDevice;
+		//m_pGraphicsDevice = pDevice;
 
-		assert(m_pGraphicsDevice);
+		//assert(m_pGraphicsDevice);
 	}	
 }

@@ -140,21 +140,21 @@ namespace dive
 		auto hr = pDevice->CreateBuffer(&desc, nullptr, mConstantBufferMatrix.GetAddressOf());
 		assert(SUCCEEDED(hr));
 	*/
-		m_pBufferFrame = new ConstantBuffer(m_pGraphicsDevice.get(), "BufferFrame");
+		m_pBufferFrame = new ConstantBuffer(m_pGraphicsDevice, "BufferFrame");
 		if (!m_pBufferFrame->Create< MatrixBuffer>())
 		{
 			CORE_ERROR("BufferFrame 생성에 실패하였습니다.");
 			return false;
 		}
 
-		m_pBufferFrameGPU = new ConstantBuffer(m_pGraphicsDevice.get(), "BufferFrameGPU");
+		m_pBufferFrameGPU = new ConstantBuffer(m_pGraphicsDevice, "BufferFrameGPU");
 		if (!m_pBufferFrameGPU->Create< BufferFrame >())
 		{
 			CORE_ERROR("BufferFrameGPU 생성에 실패하였습니다.");
 			return false;
 		}
 
-		m_pBufferObjectGPU = new ConstantBuffer(m_pGraphicsDevice.get(), "BufferObjectGPU");
+		m_pBufferObjectGPU = new ConstantBuffer(m_pGraphicsDevice, "BufferObjectGPU");
 		if (!m_pBufferObjectGPU->Create< BufferObject >())
 		{
 			CORE_ERROR("BufferObjectGPU 생성에 실패하였습니다.");

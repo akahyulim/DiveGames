@@ -43,9 +43,6 @@ namespace dive
 	// 이를 Graphics에 넘겨 한 번에 bind한다.
 
 
-	// 현재 이 곳엔 Update가 없다.
-	// RenderPath에서 취사 선택하기 때문이다.
-	// 이는 wicked engine을 참고 한 것이다.
 	class Renderer
 	{
 	public:
@@ -55,15 +52,14 @@ namespace dive
 			return instance;
 		}
 
-		void Initialize();
+		void Initialize(HWND hWnd, bool fullScreen);
+
+		virtual void Update(float deltaTime);
 
 		const D3D11_VIEWPORT& GetViewport() const { return m_Viewport; }
 		void SetViewport(float width, float height, float offsetX = 0.0f, float offsetY = 0.0f);
 
-		// RenderTarget용 크기이다.
-		// 현재 GBuffer로 통합했으니 이름을 바꾸는 편이 낫다.
-		// 그런데 추후 구현할 RenderTexture 역시 같은 크기로 만들어질 가능성이 있다.
-		// 아니라면 아에 GBuffer 객체 자체에서 크기를 관리하는 편이 낫다.
+		// 현재 Editor의 Scene에서 RenderTexture의 크기를 변경할 때 사용 중이다.
 		const DirectX::XMINT2& GetResolution() const { return m_RenderTargetSize; }
 		void SetResolution(unsigned int width, unsigned int height);
 
@@ -74,6 +70,8 @@ namespace dive
 		void UpdateCB();
 
 		//= 얘네들은 아래 Pass들이 흡수해야 한다. =============
+		// 그런데 생각해보니 스파르탄도 Draw와 Pass가 따로 구현된 것 같은데...?
+		// 찾아보니 스파르탄의 DrawXXX는 전부 Debug용 그리기다.
 		void DrawScene();
 
 		// 일단 나누자
@@ -83,12 +81,15 @@ namespace dive
 
 		void ObjectClassify();
 
-		GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice.get(); }
+		GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice; }
 		void SetGraphicsDevice(std::shared_ptr<GraphicsDevice> pDevice);
 		Texture* GetFrameTexture() { return m_RenderTargets[eRenderTargets::Frame_Ldr]; }
 
 		// Render Passes
 		// RenderPath에서 호출할 거기 때문에 public이어야 한다.
+		// Backbuffer, GBuffer의 RenderTargetView 설정은 이들 구현에 포함되어야 한다.
+		// 아직도 Pass와 Path의 구분이 명확하지 않다.
+		// 이 곳에서 Pass를 나누고 다시 Path에서 취사선택하는게 가능한가?
 		void BeginScene();
 		void PassGBuffer();
 		void PassLighting();
@@ -120,7 +121,8 @@ namespace dive
 
 
 	private:
-		std::shared_ptr<GraphicsDevice> m_pGraphicsDevice;
+		//std::shared_ptr<GraphicsDevice> m_pGraphicsDevice;
+		GraphicsDevice* m_pGraphicsDevice = nullptr;
 
 		// RenderTarget용 크기다. 타입이 애매하다.
 		DirectX::XMINT2 m_RenderTargetSize;

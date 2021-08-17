@@ -58,11 +58,11 @@ namespace dive
 		}
 
 		// 이 부분을 아래 Renderer::GetInstance().Initialize()에 통합하자.
-		auto& renderer = Renderer::GetInstance();
-		renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(m_hWnd, m_bFullScreen));
+		//auto& renderer = Renderer::GetInstance();
+		//renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(m_hWnd, m_bFullScreen));
 
 		TimeManager::GetInstance().Initialize();
-		Renderer::GetInstance().Initialize();
+		Renderer::GetInstance().Initialize(m_hWnd, m_bFullScreen);
 		Input::GetInstance().Initialize(m_hWnd);
 
 		EVENT_SUBSCRIBE(eEventType::ChangedResolution, EVENT_HANDLE_DATA(OnResizeResolution));
@@ -271,15 +271,19 @@ namespace dive
 	//==============================================================================//
 	void Runtime::OnResizeResolution(unsigned int data)
 	{
+		// 이건 클라이언트 영역 크기인가?
 		unsigned int width = data & 0xFFFF;
 		unsigned int height = (data >> 16) & 0xFFFF;
 
 		CORE_INFO("Editor::OnResizeResolution() : {0:d}x{1:d}", width, height);
 
+		// 이러지 말고 직접 이벤트를 받도록 하는 편이 낫지 않을까?
+		// GraphicsDevice에 직접 접근하는게 꺼림직하다.
 		auto pGraphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
 		if (pGraphicsDevice->IsInitialized())
 			pGraphicsDevice->ResizeBuffers(width, height);
 
+		// 이벤트를 직접 받는다면 이 부분은 어떻게 할 것인가?
 		auto& settings = Settings::GetInstance();
 		if (IsZoomed(m_hWnd))
 		{
