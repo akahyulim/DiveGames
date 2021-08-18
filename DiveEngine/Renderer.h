@@ -54,8 +54,6 @@ namespace dive
 
 		void Initialize(HWND hWnd, bool fullScreen);
 
-		virtual void Update(float deltaTime);
-
 		const D3D11_VIEWPORT& GetViewport() const { return m_Viewport; }
 		void SetViewport(float width, float height, float offsetX = 0.0f, float offsetY = 0.0f);
 

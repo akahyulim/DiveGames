@@ -1,0 +1,16 @@
+GraphicsDevice
+- SwapChain, Device, DeviceContext를 생성 및 관리한다.
+- 각종 Resource의 생성 함수를 지원한다.
+	- 이때 shared_ptr로 생성하여 가비지 컬렉션을 적용한다.
+- 각종 Resource의 Bind 함수를 지원한다.
+- 각종 Draw 함수를 지원한다.
+
+Renderer
+- 기본적인 Resource 배열들을 관리한다.
+	- Shader, Texture, Sampler, States, GPUBuffer, InputLayout
+		- GPUBuffer는 Constant Buffer 같다. Shader Resource는 뭐지...
+		- Texture의 용도가 뭔지 아직 모르겠다.
+
+RenderPath
+- 각종 Texture를 가진다.
+	- GBuffer로 사용할 개별 Texture들인 것 같다.

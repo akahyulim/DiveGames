@@ -279,9 +279,7 @@ namespace dive
 
 		// 이러지 말고 직접 이벤트를 받도록 하는 편이 낫지 않을까?
 		// GraphicsDevice에 직접 접근하는게 꺼림직하다.
-		auto pGraphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
-		if (pGraphicsDevice->IsInitialized())
-			pGraphicsDevice->ResizeBuffers(width, height);
+		Renderer::GetInstance().GetGraphicsDevice()->SetResolution(width, height);
 
 		// 이벤트를 직접 받는다면 이 부분은 어떻게 할 것인가?
 		auto& settings = Settings::GetInstance();

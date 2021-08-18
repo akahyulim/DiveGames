@@ -1,11 +1,7 @@
-RenderPath 제거하기
-- Render의 Pass 조합으로 RenderPath를 구성한다는 생각은 너무 이상적이다.
-	- 지원한느 모든 Pass를 구현한 후 RenderPath::Render에서 순서대로 조합하여 사용한다? 과연 가능한가?
-- System들의 Update를 Runtime에서 직접 배치해 주어야 한다.
-- Renderer::Update는 virtual로 타입으로 하고, 추가 Pass가 필요할 때 구체 클래스에서 구현한 후 Update를 직접 구성할 수 있다.
-	- 예를 들면 Editor에서 EditorRenderer : public dive::Renderer를 만든 후 Pass_DebugDraw()를 구현한 후 Update에서 Pass들을 재구성할 수 있다.
-	- System Interface를 뽑아내면 좋을 것 같지만... 현실적으론 어렵겠지?
-		- 사실 System들을 Singleton으로 접근하는 것도 마음에 들지 않는다.
+RenderPath 살리기
+- App(Editor라 할 지라도)에서 Renderer를 상속하는 객체를 만드는건 에바다.
+- 렌더링에 관련된 모든 내용은 Engine에서 처리해 주는 것이 맞다.
+	- Model Importer 같은 경우엔 Editor에서 구현하고, Engine Format으로 변화해주는게 맞다.
 
 GraphicsDevice
 - SwapChain, Device, DeviceContext를 생성 및 관리한다.

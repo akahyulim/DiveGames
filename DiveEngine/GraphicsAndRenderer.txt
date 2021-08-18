@@ -1,0 +1,53 @@
+
+사용 객체
+- IDXGISwapChain
+- ID3D11Device, ID3D11DeviceContext
+
+사용 Resources
+- ID3D11Texture2D
+- ID3D11RenderTargetView
+- ID3D11ShaderResoureView
+- ID3D11DepthStencilView
+
+사용 State
+- ID3D11DepthStecilState
+- ID3D11RasterizerState
+- ID3D11SamplerState
+
+ Shader Resources
+ - ID3D11InputLayout
+ - ID3D11VertexShader
+ - ID3D11PixelShader
+ 
+ Buffer
+ - ID3D11Buffer
+	- ConstantBuffer
+	- VertexBuffer
+	- IndexBuffer
+
+ 하는 일
+ - Create & Release Resources
+	- WickedEngine의 경우 Resource는 SmartPointer 타입이라 자동으로 Release 된다.
+	- 그리고 desc는 지역변수라 또 자동으로 제거된다.
+	=> 하지만 이를 내 엔진에 적용할 순 없다.
+ - Bind 
+ - Draw
+
+ 아주 기본적인 리소스
+ : WickedEngine은 이들을 wiRenderer에서 관리한다. 이는 Spartan과 비슷하다.
+ - Backbuffer
+	- RenderTargetView
+	- DepthStencilView
+=> WickedEngine의 경우 GraphicsDevice에서 RenderTargetView를 관리한다. 하지만 DepthStencilView는 없다.
+- DepthStencilStates
+- RasterizerStates
+- SamplerStates
+- GBuffer
+	- RenderTargetViews
+	- ShaderResourceViews
+	- DepthsStencilViews
+=> Wicked의 경우 RenderPath3D에서 개별 Texture들로 구현한 것 같다.
+- VertexShader
+	- InputLayout
+- PixelShader
+

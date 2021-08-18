@@ -572,5 +572,11 @@
       <Filter>Engine\Graphics</Filter>
     </Text>
     <Text Include="Issue.txt" />
+    <Text Include="GraphicsAndRenderer.txt">
+      <Filter>Engine\Graphics</Filter>
+    </Text>
+    <Text Include="WickedEngine%27sGraphicsSystems.txt">
+      <Filter>Engine\Graphics</Filter>
+    </Text>
   </ItemGroup>
 </Project>

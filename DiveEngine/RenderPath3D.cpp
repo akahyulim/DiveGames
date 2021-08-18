@@ -5,13 +5,17 @@
 #include "Log.h"
 
 /*
-* 너무 복잡하다.
-* 차라리 Renderer를 상속하여 Pass를 추가한 후
-* Update를 Override하는 편이 더 직관적일 것 같다.
-* Editor의 DebugDraw 처럼 추가 Pass가 필요한 경우처럼 말이다.
+* 다시 잘 살려보자.
 */
 namespace dive
 {
+	/*
+	* ResizeBuffer
+	* 사실상 추가 Texture들을 포함한 추가 리소들을 생성하는 함수다.
+	* 크기는 GraphicsDevice의 Resolution을 기반으로 한다.
+	* 갱신 주기는 RenderPath2D의 Load, Update 등이며, WM_SIZE 이벤트도 수신하는 것 같다.
+	*/
+
 	void RenderPath3D::PreUpdate()
 	{
 		CORE_TRACE("RenderPath3D::PreUpdate() - Previous Camera 저장");

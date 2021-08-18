@@ -17,8 +17,8 @@ namespace dive
 
 		RECT rt;
 		GetClientRect(hWnd, &rt);
-		m_Width = static_cast<unsigned int>(rt.right - rt.left);
-		m_Height = static_cast<unsigned int>(rt.bottom - rt.top);
+		m_ResolutionWidth = static_cast<unsigned int>(rt.right - rt.left);
+		m_ResolutionHeight = static_cast<unsigned int>(rt.bottom - rt.top);
 
 		UINT deviceFlags = debugLayer ? D3D11_CREATE_DEVICE_DEBUG : 0;
 
@@ -38,8 +38,8 @@ namespace dive
 		DXGI_SWAP_CHAIN_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.OutputWindow						= hWnd;
-		desc.BufferDesc.Width					= m_Width;
-		desc.BufferDesc.Height					= m_Height;
+		desc.BufferDesc.Width					= m_ResolutionWidth;
+		desc.BufferDesc.Height					= m_ResolutionHeight;
 		desc.Windowed							= fullScreen ? FALSE : TRUE;
 		desc.BufferCount						= m_BackBufferCount;
 		desc.BufferDesc.Format					= m_Format;
@@ -90,8 +90,6 @@ namespace dive
 
 	GraphicsDevice::~GraphicsDevice()
 	{
-		DV_RELEASE(m_pDepthStencilView);
-		DV_RELEASE(m_pDepthStencilBuffer);
 		DV_RELEASE(m_pRenderTargetView);
 		DV_RELEASE(m_pImmediateContext);
 		DV_RELEASE(m_pDevice);
@@ -99,70 +97,30 @@ namespace dive
 	}
 
 	/*
-	* DepthStencilView가 꼭 필요한지 의문이다.
-	* 바로 아래 PresentEnd()와 함께 사용한다.
-	* 현재 Runtime::Render()에서 호출된다.
-	* => Render의 시작과 끝에서 BackBuffer를 RenderTarget으로 둘 이유가 없다.
-	* => 물론 Editor의 경우엔 다르다.
-	* 아무리봐도 이건 Renderer에서 구현되어야 할 것 같다.
-	* 그리고 DepthStencilView의 생성 및 관리도 GraphicsDevice에는 어울리지 않는 것 같다.
-	* 따지고보면 BackBuffer RTV도 그냥 Renderer에서 생성 및 관리하는 편이 나을 것 같기도...
+	* WickedEngine을 참조하여
+	* 일단 DepthStencilView 관련 구문을 모두 제거하였다.
 	*/
 	void GraphicsDevice::PresentBegin()
 	{
-		m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, m_pDepthStencilView);
+		m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, 0);
 		
 		float clearColors[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, clearColors);
-		m_pImmediateContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 	
 	void GraphicsDevice::PresentEnd()
 	{
-		m_pSwapChain->Present(m_bVSync ? 1 : 0, 0);
+		m_pSwapChain->Present(static_cast<UINT>(m_bVSync), 0);
 	}
 
 	/*
-	* 현재 Editor의 Runtime에서 이벤트를 처리하면서 이 함수를 호출하고 있다.
+	* App 내부에서 해상도를 변경할 때 호출한다.
+	* 그런데 WickedEngine에는 이러한 구현이 없다. (ResizeTarget()을 호출하는 코드 자체가 없다.)
+	* 만약 그냥 둔다면 이름이라도 좀 바꾸고 싶다.
 	*/
-	void GraphicsDevice::ResizeBuffers(unsigned int width, unsigned int height)
-	{
-		if (width < 0 || height < 0)
-		{
-			CORE_ERROR("Receive wrong size.");
-			return;
-		}
-
-		if (width == m_Width && height == m_Height)
-			return;
-
-		m_pImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
-
-		DV_RELEASE(m_pRenderTargetView);
-		DV_RELEASE(m_pDepthStencilBuffer);
-		DV_RELEASE(m_pDepthStencilView);
-
-		if (!SUCCEEDED(m_pSwapChain->ResizeBuffers(m_BackBufferCount, width, height, m_Format, 0)))
-		{
-			CORE_ERROR("Fail to Reisze Bakbuffer.");
-			return;
-		}
-
-		m_Width = width;
-		m_Height = height;
-
-		createBackbufferResources();
-
-		CORE_TRACE("Resize Resolution : {0:d} x {1:d}", m_Width, m_Height);
-	}
-
-	//==========================================================================================//
-	// App 내부에서 해상도를 변경할 때 사용한다.												//
-	// ResizeResolution과 이름의 통일성이 없다.													//
-	//==========================================================================================//
 	void GraphicsDevice::ResizeTarget(unsigned int width, unsigned int height)
 	{
-		if ((width != m_Width) || (height != m_Height) && (width > 0) && (height > 0))
+		if ((width != m_ResolutionWidth) || (height != m_ResolutionHeight) && (width > 0) && (height > 0))
 		{
 			DXGI_MODE_DESC desc;
 			desc.Width						= width;
@@ -178,6 +136,29 @@ namespace dive
 			m_pSwapChain->ResizeTarget(&desc);
 		}
 	}
+
+	/*
+	* 현재 Editor의 Runtime에서 이벤트를 처리하면서 이 함수를 호출하고 있다.
+	*/
+	void GraphicsDevice::SetResolution(unsigned int width, unsigned int height)
+	{
+		if ((width != m_ResolutionWidth || height != m_ResolutionHeight) && (width > 0 || height > 0))
+		{
+			m_ResolutionWidth = width;
+			m_ResolutionHeight = height;
+
+			DV_RELEASE(m_pBackBuffer);
+			DV_RELEASE(m_pRenderTargetView);
+
+			if (FAILED(m_pSwapChain->ResizeBuffers(m_BackBufferCount, width, height, m_Format, 0)))
+			{
+				CORE_ERROR("");
+				return;
+			}
+
+			createBackbufferResources();
+		}
+	}
 	
 	bool GraphicsDevice::IsInitialized() const
 	{
@@ -190,51 +171,16 @@ namespace dive
 	*/
 	void GraphicsDevice::createBackbufferResources()
 	{
-		ID3D11Texture2D* pBackBuffer = nullptr;
-		
-		if (FAILED(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer)))
+		if (FAILED(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&m_pBackBuffer)))
 		{
 			CORE_ERROR("BackBuffer 생성에 실패하였습니다.");
 			PostQuitMessage(0);
 		}
 
-		if (FAILED(m_pDevice->CreateRenderTargetView(pBackBuffer, NULL, &m_pRenderTargetView)))
+		if (FAILED(m_pDevice->CreateRenderTargetView(m_pBackBuffer, nullptr, &m_pRenderTargetView)))
 		{
 			CORE_ERROR("RenderTargetView 생성에 실패하였습니다.");
 			PostQuitMessage(0);
-		}
-
-		DV_RELEASE(pBackBuffer);
-
-		D3D11_TEXTURE2D_DESC texDesc;
-		ZeroMemory(&texDesc, sizeof(texDesc));
-		texDesc.Width = m_Width;
-		texDesc.Height = m_Height;
-		texDesc.MipLevels = 1;
-		texDesc.ArraySize = 1;
-		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		texDesc.SampleDesc.Count = 1;
-		texDesc.SampleDesc.Quality = 0;
-		texDesc.Usage = D3D11_USAGE_DEFAULT;
-		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		texDesc.CPUAccessFlags = 0;
-		texDesc.MiscFlags = 0;
-
-		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pDepthStencilBuffer)))
-		{
-			CORE_ERROR("DepthStencil TextureBuffer 생성 실패");
-			return;
-		}
-
-		D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc;
-		ZeroMemory(&viewDesc, sizeof(viewDesc));
-		viewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		viewDesc.Texture2D.MipSlice = 0;
-
-		if (FAILED(m_pDevice->CreateDepthStencilView(m_pDepthStencilBuffer, &viewDesc, &m_pDepthStencilView)))
-		{
-			CORE_ERROR("DepthStencilView 생성 실패");
 		}
 	}
 }

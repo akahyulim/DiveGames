@@ -74,13 +74,6 @@ namespace dive
 		CORE_TRACE("Renderer 초기화에 성공하였습니다.");
 	}
 
-	void Renderer::Update(float deltaTime)
-	{
-		// update
-
-		// render
-	}
-
 	//==============================================================================//
 	// 이건 에바다. 현재 이 구현 때문에 Sandbox가 실행되지 않는다.					//
 	// Camera는 자신이 그려질 RenderTarget의 크기를 스스로 찾아서 갱신해야 한다.	//
