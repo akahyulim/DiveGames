@@ -416,11 +416,4 @@ namespace dive
 		// 근데 업데이트 주기는 어떻게 되는걸까?
 		// 그리고 Frustum Culling을 여기에서 적용하는건 무리인가?
 	}
-
-	void Renderer::SetGraphicsDevice(std::shared_ptr<GraphicsDevice> pDevice)
-	{
-		//m_pGraphicsDevice = pDevice;
-
-		//assert(m_pGraphicsDevice);
-	}	
 }

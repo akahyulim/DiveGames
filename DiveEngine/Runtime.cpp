@@ -128,6 +128,13 @@ namespace dive
 		{
 			// 입력 버퍼만 수행
 		}
+
+		auto graphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
+		graphicsDevice->PresentBegin();
+
+		Compose();
+
+		graphicsDevice->PresentEnd();
 	}
 	
 	void Runtime::Update(float deltaTime)
@@ -163,18 +170,12 @@ namespace dive
 	
 	void Runtime::Render()
 	{
-		auto graphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
-		graphicsDevice->PresentBegin();
-
 		// lua
 
 		if (m_pActivePath)
 		{
 			m_pActivePath->Render();
 		}
-
-		Compose();
-		graphicsDevice->PresentEnd();
 	}
 
 	void Runtime::Compose()

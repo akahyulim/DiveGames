@@ -11,6 +11,7 @@ namespace dive
 	{
 	public:
 		RenderPath()
+			: m_pScene(nullptr)
 		{
 			EVENT_SUBSCRIBE(eEventType::SceneActivate, EVENT_HANDLE(OnSetActiveScene));
 		}
@@ -28,8 +29,6 @@ namespace dive
 		virtual void Update(float deltaTime) {}
 		virtual void PostUpdate() {}
 		virtual void Render() const {}
-
-		// 아직 뭔지 잘 모르겠다.
 		virtual void Compose() const {}
 
 		// get & set mask

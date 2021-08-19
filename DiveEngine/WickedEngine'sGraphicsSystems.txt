@@ -1,16 +1,32 @@
 GraphicsDevice
 - SwapChain, Device, DeviceContext를 생성 및 관리한다.
+- Device 설정을 관리한다.
+	- Resolution, VSync, Format etc
 - 각종 Resource의 생성 함수를 지원한다.
 	- 이때 shared_ptr로 생성하여 가비지 컬렉션을 적용한다.
+	- Buffer의 Map / Unmap도 지원한다.
 - 각종 Resource의 Bind 함수를 지원한다.
 - 각종 Draw 함수를 지원한다.
+	- 랩핑 함수라고 보면 된다.
 
 Renderer
+- GraphicsDevice와 Scene 그리고 각종 GameObject들을 활용하여 Pass를 구성한다.
 - 기본적인 Resource 배열들을 관리한다.
 	- Shader, Texture, Sampler, States, GPUBuffer, InputLayout
 		- GPUBuffer는 Constant Buffer 같다. Shader Resource는 뭐지...
 		- Texture의 용도가 뭔지 아직 모르겠다.
+- Visibility를 Update한다.
+	- Scene의 Object들을 Camera로 Culling한다.
+	- Flag에 맞춰 저장한다.
+	- 이 과정을 수행만 할 뿐, 관리는 RenderPath가 한다.
+- 각종 Draw 및 후처리 Pass가 구현되어 있다.
+	- Draw는 GraphicsDevice를 이용해 리소스를 Bind한 후 Draw를 call한다.
 
 RenderPath
+- Renderer의 각종 DrawPass를 조합하여 출력 화면을 만든다.
+	- MultiThread Rendering 때문에 분석이 어렵다.
 - 각종 Texture를 가진다.
 	- GBuffer로 사용할 개별 Texture들인 것 같다.
+- Visibility 객체들을 관리한다.
+	- 좀 더 정확하게 보자면 관리는 자신이 하지만 정리는 Renderer에 넘긴다.
+	- 그리고 Render에서 Renderer의 Draw에 전달한다.

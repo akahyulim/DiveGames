@@ -15,7 +15,7 @@ namespace editor
 
 		bool Initialize() override;
 
-		void Render() override;
+		void Compose() override;
 
 		void ModifyWindow(dive::eWindowModes mode, unsigned int width, unsigned int height, bool maximize) override;
 

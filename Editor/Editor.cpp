@@ -44,48 +44,39 @@ namespace editor
 		return true;
 	}
 
-	void Editor::Render()
+	/*
+	* ImGUI를 그려내기 위한 위치는 이 곳이 유일했다.
+	* 현재 Path의 Compose를 비활성화 하였는데
+	* 추후 어떻게 구현할 지 생각을 해야 한다.
+	*/
+	void Editor::Compose()
 	{
-		auto graphicsDevice = dive::Renderer::GetInstance().GetGraphicsDevice();
-		graphicsDevice->PresentBegin();
-
-		// ImGui에서 그리는 부분
+//		if (m_pActivePath)
 		{
-			ImGui_ImplDX11_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
-
-			beginDockSpace();
-
-			// 이 곳에서 Widget을 그릴 것이다.
-			for (auto pWidget : m_Widgets)
-			{
-				pWidget->Tick();
-			}
-
-			endDockSpace();
-
-			ImGui::Render();
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-			if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-			{
-				ImGui::UpdatePlatformWindows();
-				ImGui::RenderPlatformWindowsDefault();
-			}
-		}	
-
-		// 이건 엔진에서 그리는 부분
-		// 에디터에서는 RenderPath3D를 수정해야 한다.
-		// Debug용 Render가 추가되고,
-		// Hierarchy이 다른 RenderTarget에 그려져야 하기 때문이다.
-		if (m_pActivePath)
-		{
-			m_pActivePath->Render();
+//			m_pActivePath->Compose();
 		}
 
-		Compose();
-		graphicsDevice->PresentEnd();
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+
+		beginDockSpace();
+
+		for (auto pWidget : m_Widgets)
+		{
+			pWidget->Tick();
+		}
+
+		endDockSpace();
+
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
 	}
 
 	void Editor::ModifyWindow(dive::eWindowModes mode, unsigned int width, unsigned int height, bool maximize)

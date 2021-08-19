@@ -80,7 +80,8 @@ namespace dive
 		void ObjectClassify();
 
 		GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice; }
-		void SetGraphicsDevice(std::shared_ptr<GraphicsDevice> pDevice);
+
+		// 이건 Editor용 임시다.
 		Texture* GetFrameTexture() { return m_RenderTargets[eRenderTargets::Frame_Ldr]; }
 
 		// Render Passes
@@ -119,7 +120,6 @@ namespace dive
 
 
 	private:
-		//std::shared_ptr<GraphicsDevice> m_pGraphicsDevice;
 		GraphicsDevice* m_pGraphicsDevice = nullptr;
 
 		// RenderTarget용 크기다. 타입이 애매하다.
