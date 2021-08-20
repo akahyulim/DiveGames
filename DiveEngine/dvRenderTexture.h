@@ -3,6 +3,12 @@
 
 namespace dive
 {
+	/*
+	* 렌더 텍스처를 사용하려면 먼저 새 렌더 텍스처를 생성하고 카메라 하나를 지정해서 렌더링합니다. 
+	* 그러면 일반 텍스처와 마찬가지로 머티리얼 에서 렌더 텍스처를 사용할 수 있습니다.
+	* 위의 유니티 설명에 따르면 카메라에 종속되는 렌더 타겟이라는 의미다.
+	* Deferred Shading에 사용할 RenderTargetView와는 성격이 다른 것 같다.
+	*/
 	class dvRenderTexture : public dvTexture
 	{
 	public:

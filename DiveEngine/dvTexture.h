@@ -5,6 +5,7 @@
 
 namespace dive
 {
+	// Graphics Device를 캡슐화하려는 현재의 구상이랑 충돌한다.
 	// 일단 Object 상속으로 가자. Resource의 필요성을 모르겠다.
 	class dvTexture : public Object
 	{

@@ -94,6 +94,9 @@
     <ClInclude Include="RenderPathEditor.h">
       <Filter>Editor\Core</Filter>
     </ClInclude>
+    <ClInclude Include="RenderPath_Deferred.h">
+      <Filter>Editor\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Editor.rc">
@@ -158,6 +161,9 @@
       <Filter>Editor\Core</Filter>
     </ClCompile>
     <ClCompile Include="RenderPathEditor.cpp">
+      <Filter>Editor\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPath_Deferred.cpp">
       <Filter>Editor\Core</Filter>
     </ClCompile>
   </ItemGroup>

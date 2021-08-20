@@ -1,14 +1,13 @@
 #pragma once
 #include "DiveEngine.h"
 
-// 그러고보니 namespace가 좀 에바같다.
-namespace editor
+namespace dive
 {
-	class RenderPathEditor : public dive::RenderPath
+	class RenderPath_Deferred : public RenderPath
 	{
 	public:
-		RenderPathEditor();
-		~RenderPathEditor();
+		RenderPath_Deferred();
+		~RenderPath_Deferred();
 
 		//= OVERRIDE ================================
 		void PreUpdate() override;
@@ -17,7 +16,11 @@ namespace editor
 		void Compose() const override;
 		//============================================
 
+		void ResizeBuffers(unsigned int width = 0, unsigned int height = 0);
+
 	private:
+
 	private:
+		// Textures
 	};
 }

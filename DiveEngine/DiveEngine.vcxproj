@@ -178,6 +178,7 @@
     <ClInclude Include="dvTexture.h" />
     <ClInclude Include="dvTexture2D.h" />
     <ClInclude Include="GBuffer.h" />
+    <ClInclude Include="Graphics.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="External\spdlog\async.h" />

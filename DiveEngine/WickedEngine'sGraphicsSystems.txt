@@ -30,3 +30,17 @@ RenderPath
 - Visibility 객체들을 관리한다.
 	- 좀 더 정확하게 보자면 관리는 자신이 하지만 정리는 Renderer에 넘긴다.
 	- 그리고 Render에서 Renderer의 Draw에 전달한다.
+- Render
+	- RenderPassBegin() / RenderPassEnd()로 묶는다.
+		- RenderTarget의 설정 및 클리어 구문이다.
+	- Viewport를 형성 한 후 Bind한다.
+		- Viewport의 크기 설정은 RenderTarget을 통해 지정된다.
+	- 그려질 대상을 관련 Draw 함수에 전달하여 그려낸다.
+
+RenderPass
+- RenderTarget or DepthsStencil View들이다.
+- RenderPath에서 각종 ResourceBuffer들과 함께 생성된다.
+	- 앞서 생성된 Texture(RenderTargetView, DepthStencilView)들의 조합을 RenderPass라는 객체에 저장하는 형태이다.
+- RenderPath::Render()에서 Pass별로 RenderPassBegin()에 전달된다.
+	- 그러면 GraphicsDevice에서 Texture 포인터를 얻은 후 타입에 맞게 Clear 후 RenderTarget으로 Set한다.
+	- RenderPassEnd()는 OMSetRenderTargets()에 nullptr을 전달하여 초기화하는 것이다.
