@@ -178,7 +178,6 @@
     <ClInclude Include="dvTexture.h" />
     <ClInclude Include="dvTexture2D.h" />
     <ClInclude Include="GBuffer.h" />
-    <ClInclude Include="Graphics.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="External\spdlog\async.h" />
@@ -344,9 +343,10 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="dvTexture.txt" />
-    <Text Include="GraphicsAndRenderer.txt" />
+    <Text Include="Graphics.txt" />
     <Text Include="Issue.txt" />
     <Text Include="WickedEngine%27sGraphicsSystems.txt" />
+    <Text Include="지금까지 정리의 흐름.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

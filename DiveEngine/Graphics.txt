@@ -1,0 +1,39 @@
+
+Graphics
+- GraphicsDevice와 이들로부터 생성되는 Resource들로 구성
+- GraphicsDevice: IDXGISwapChain, ID3D11Device, ID3D11DeviceContext
+	- Resource 생성
+	- Binde
+	- Draw
+- Resources
+	- Texture: Texture1D, Texture2D, Texture3D, ID3D11RenderTargetView, ID3D11ShaderResourceView, ID3D11DepthStenciView
+	- States: DepthStencilState, RasterizedState, SamplerState
+	- Sahder
+		- ID3D11InputLayout
+	- Constant Buffer
+
+ref
+- WickedEngine
+	- GraphicsDevice
+		- SwapChain, Device, Context 생성 및 사용
+		- Resource를 직접 생성
+		- Resource Bind 함수 지원
+		- Resource Draw 함수 지원
+		=> SwapChain, Device, Context를 외부에 노출하지 않는다.
+	- Resources
+		- Create: Desc 설정 후 GraphicsDevice의 생성 함수에 전달하는 방식
+			- 이때 GraphicsDevice는 거의 전역 변수 형태로 획득
+		- Bind: 특정 객체(찾지 못함)에 등록된 Resource들을 특정 시점에 pso_validate()를 통해 Bind
+- Spartan, etc
+	- GraphicsDevice
+		- SwapChain, Device, Context 생성 및 관리
+	- Resources
+		- Create: 생성자 혹은 생성함수의 인자로 기본적인 Desc를 전달
+			- Device도 함께 전달하거나, 내부에서 획득하여 생성
+		- Bind: 특정 객체(CommandList)에 Resource를 등록한 후 특정 시점에 특정 함수를 통해 Bind
+
+- 비고
+	- 어찌 되었던간에 두 엔진 디자인 모두 GraphicDevice는 전역 변수 스타일로 획득한다.
+	- Resource의 생성은 Sparatan 형식이 더 직관적이고 단순해 보인다.
+		- 다만 이 경우 desc의 많은 부분을 특정 값으로 초기화하여야 한다.
+	

@@ -5,7 +5,7 @@
       <Filter>Engine\Tools</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Engine\Scene</Filter>
@@ -41,22 +41,13 @@
       <Filter>Engine\Scene\Components</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsEnums.h">
-      <Filter>Engine\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsDevice.h">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="VertexTypes.h">
-      <Filter>Engine\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsInclude.h">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="PipelineState.h">
-      <Filter>Engine\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Input.h">
       <Filter>Engine\Input</Filter>
@@ -65,7 +56,7 @@
       <Filter>Engine\Scene\Components</Filter>
     </ClInclude>
     <ClInclude Include="Font.h">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
       <Filter>Engine\Resource</Filter>
@@ -356,10 +347,7 @@
       <Filter>Engine\Helpers</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
-      <Filter>Engine\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="FileStream.h">
       <Filter>Engine\Helpers</Filter>
@@ -395,19 +383,28 @@
       <Filter>Engine\Helpers</Filter>
     </ClInclude>
     <ClInclude Include="GBuffer.h">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="dvTexture.h">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="dvTexture2D.h">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="dvRenderTexture.h">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics.h">
-      <Filter>Engine\Graphics</Filter>
+    <ClInclude Include="GraphicsDevice.h">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsInclude.h">
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -415,7 +412,7 @@
       <Filter>Engine\Tools</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="RenderPath3D.cpp">
       <Filter>Engine\Core</Filter>
@@ -435,17 +432,11 @@
     <ClCompile Include="Transform.cpp">
       <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsDevice.cpp">
-      <Filter>Engine\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Renderer_Resources.cpp">
-      <Filter>Engine\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>Engine\Input</Filter>
@@ -454,7 +445,7 @@
       <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Font.cpp">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="MeshRenderer.cpp">
       <Filter>Engine\Scene\Components</Filter>
@@ -466,16 +457,10 @@
       <Filter>Engine\Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Transform_Hierarchy.cpp">
       <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="ConstantBuffers.h">
-      <Filter>Engine\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="ConstantBuffer.cpp">
-      <Filter>Engine\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="FileStream.cpp">
       <Filter>Engine\Helpers</Filter>
@@ -508,16 +493,28 @@
       <Filter>Engine\Scene</Filter>
     </ClCompile>
     <ClCompile Include="GBuffer.cpp">
-      <Filter>Engine\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="dvTexture2D.cpp">
-      <Filter>Engine\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="dvRenderTexture.cpp">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Renderer_Pass.cpp">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffers.h">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="dvTexture2D.cpp">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="dvRenderTexture.cpp">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsDevice.cpp">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -526,9 +523,6 @@
     </Filter>
     <Filter Include="Engine\Tools">
       <UniqueIdentifier>{77d99d9b-f82f-4acb-bd38-680e775d8fdd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Graphics">
-      <UniqueIdentifier>{1326af25-081c-4cf4-b939-d927b9d45a14}</UniqueIdentifier>
     </Filter>
     <Filter Include="Engine\Scene">
       <UniqueIdentifier>{c1aa4b85-851d-45df-abea-6fec5b35b458}</UniqueIdentifier>
@@ -569,17 +563,24 @@
     <Filter Include="Engine\Helpers">
       <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Engine\Renderer">
+      <UniqueIdentifier>{1326af25-081c-4cf4-b939-d927b9d45a14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Renderer\Graphics">
+      <UniqueIdentifier>{00151ce7-f9c3-495a-8838-348f943d933a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="dvTexture.txt">
-      <Filter>Engine\Graphics</Filter>
-    </Text>
     <Text Include="Issue.txt" />
-    <Text Include="GraphicsAndRenderer.txt">
-      <Filter>Engine\Graphics</Filter>
-    </Text>
     <Text Include="WickedEngine%27sGraphicsSystems.txt">
-      <Filter>Engine\Graphics</Filter>
+      <Filter>Engine\Renderer</Filter>
     </Text>
+    <Text Include="dvTexture.txt">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </Text>
+    <Text Include="Graphics.txt">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </Text>
+    <Text Include="지금까지 정리의 흐름.txt" />
   </ItemGroup>
 </Project>
