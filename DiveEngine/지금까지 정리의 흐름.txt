@@ -1,17 +1,18 @@
 
 Wicked의 GraphicsDevice, Renderer 그리고 RenderPath
 - GraphicsDevice는 Device 및 Resource(Buffer) 생성 및 Bind, Draw를 처리
-- Renderer는
-=> 아직 Renderer에 대한 이해가 부족하다.
-- RenderPath는 해당 App에서 필요로 하는 화면을 구성
+- Renderer는 Graphics Technique, Daw 구현 및 GraphicsDevice Manager
+- RenderPath는 그리려는 화면을 추가 리소스와 Renderer를 통해 구성 및 Render
 
 Graphics의 구성
-- Graphics, Renderer Resource의 구분이 필요하다.
+- Graphics와 Renderer의 Resource 구분이 필요하다.
+	- Buffer는 Graphics, 이들을 활용한 객체는 Renderer Resource이다.
 - Resource 생성 및 Bind는 개별 Device(ID3D11Device, ID3D11DeviceContext)를 전달하는 방법으로 정하자.
 - GraphicsDevice의 전달은 두 방법으로 나누어 진다.
-	- System들은 Renderer를 통해 GraphicsDevice 객체의 포인터를 받을 수 있다.
+	- System들은 Runtime(engine)을 통해 Renderer::GraphicsDevice 객체의 포인터를 받을 수 있다.
 	- 이하 class들은 생성자를 통해 명시적으로 ID3D11Device를 전달받아야 한다.
-		- ID3D11Context의 경우 Bind를 구현하는 방식에 따라 결정될 것 같다.
+		- 아니면 상위 System에 접근하는 방식을 취할수 도 있다.
+		- ID3D11DeviceContext의 경우 Bind를 구현하는 방식에 따라 결정될 것 같다.
 - Backbuffer Data(Resolution, Format)등은 GraphicsDevice가 직접 관리하는 편이 나을 것 같다.
 	- ResizeBuffer() 역시 직접 관리하는 편이 직관적이다. 하지만 외부에서 접근이 어려울 수 있다.
 

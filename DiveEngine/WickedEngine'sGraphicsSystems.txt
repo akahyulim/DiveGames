@@ -10,7 +10,9 @@ GraphicsDevice
 	- 랩핑 함수라고 보면 된다.
 
 Renderer
-- GraphicsDevice와 Scene 그리고 각종 GameObject들을 활용하여 Pass를 구성한다.
+: This is a collection of graphics technique implentations and functions to draw a scene, shadows, post processes and other things.
+It is also the manager of the GraphicsDevice instance, and provides other helper functions to load shaders from files on disk.
+- GraphicsDevice와 Scene 그리고 각종 GameObject들을 활용하여 Draw(Pass)를 구성한다.
 - 기본적인 Resource 배열들을 관리한다.
 	- Shader, Texture, Sampler, States, GPUBuffer, InputLayout
 		- GPUBuffer는 Constant Buffer 같다. Shader Resource는 뭐지...
@@ -19,8 +21,18 @@ Renderer
 	- Scene의 Object들을 Camera로 Culling한다.
 	- Flag에 맞춰 저장한다.
 	- 이 과정을 수행만 할 뿐, 관리는 RenderPath가 한다.
-- 각종 Draw 및 후처리 Pass가 구현되어 있다.
-	- Draw는 GraphicsDevice를 이용해 리소스를 Bind한 후 Draw를 call한다.
+- Update Data
+	- UpdatePerFrameData: RenderPath에서 Scene Update 후에 호출되며 CullFrustum등을 수행한다???
+	- UpdateRenderData: RenderPath에서 Render 초기에 호출되며...???
+	=> 이 두 함수는 RenderPath 구체 클래스에서 구성한 동일한 Constant Buffer를 사용하고 있다.
+- DrawXXX
+	- 특정 화면을 Draw한다.
+	- DrawScene
+		- Viewport는 외부에서 Bind되어야 한다.
+		- Camera에서 보이는 대상을 추려 그려낸다. 즉, 컬링이 적용되고 카메라와의 거리에 맞춰 정렬된다.
+		=> 컬링 및 정렬이 이미 이루어진 상태의 Visibility를 전달받는 것 같다.
+		- 내부에서 Visibility 별로 따로 그려지는 것 같다. 그리고 좀 더 복잡하게 흘러간다...
+
 
 RenderPath
 - Renderer의 각종 DrawPass를 조합하여 출력 화면을 만든다.

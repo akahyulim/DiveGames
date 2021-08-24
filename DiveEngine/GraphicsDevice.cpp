@@ -4,13 +4,6 @@
 
 namespace dive
 {
-	/*
-	* 이걸 굳이 동적생성 할 필요가 있나?
-	* Renderer에서 꼭 필요로 하는 객체인데?
-	* 실행 도중 제거할 필요가 없는 객체인데?
-	* 그렇다면 생성자는 놔두고 초기화를 위해 Initialize 함수를 만드는 편이 낫겠지?
-	* 잉? 스택은 크기가 작다고 한다.
-	*/
 	GraphicsDevice::GraphicsDevice(HWND hWnd, bool fullScreen, bool debugLayer)
 	{
 		m_bFullScreen = fullScreen;

@@ -295,6 +295,8 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Settings.h" />
+    <ClInclude Include="Src\Renderer\Graphics\dvGraphicsDevice.h" />
+    <ClInclude Include="Src\Renderer\dvRenderer.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TextMesh.h" />
     <ClInclude Include="Texture.h" />
@@ -333,6 +335,8 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="Src\Renderer\dvRenderer.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\dvGraphicsDevice.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="Texture.cpp" />
