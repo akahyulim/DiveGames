@@ -1,0 +1,60 @@
+#pragma once
+#include <d3d11_3.h>
+#include <DXGI1_3.h>
+
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "d3dcompiler.lib")
+#pragma comment(lib, "dxguid.lib")
+
+namespace dive
+{
+	class GraphicsDevice
+	{
+	public:
+		GraphicsDevice(HWND hWnd, bool fullScreen, bool debugLayer = false);
+		~GraphicsDevice();
+
+		void PresentBegin();
+		void PresentEnd();
+
+		void ResizeTarget(UINT width, UINT height);
+		void SetResolution(UINT width, UINT height);
+
+		UINT GetResolutionWidth() const { return m_ResolutionWidth; }
+		UINT GetResolutionHeight() const { return m_ResolutionHeight; }
+		
+		DXGI_FORMAT GetFormat() const { return m_Format; }
+		UINT GetBackbufferCount() const { return m_BackbufferCount; }
+
+		bool GetVSyncEnabled() const { return m_bVSync; }
+		void SetVSuncEnabled(bool use) { m_bVSync = use; }
+
+		bool IsInitialized() const;
+
+		ID3D11Device* GetDevice() { return m_pDevice; }
+		ID3D11DeviceContext* GetImmediateContext() { return m_pImmediateContext; }
+
+		ID3D11Resource* GetBackbuffer() { return m_pBackbuffer; }
+		ID3D11RenderTargetView* GetBackbufferRTV() { return m_pBackbufferRTV; }
+
+	private:
+		void createBackbufferResource();
+
+	private:
+		IDXGISwapChain* m_pSwapChain = nullptr;
+		ID3D11Device* m_pDevice = nullptr;
+		ID3D11DeviceContext* m_pImmediateContext = nullptr;
+
+		ID3D11Resource* m_pBackbuffer = nullptr;
+		ID3D11RenderTargetView* m_pBackbufferRTV = nullptr;
+
+		UINT m_ResolutionWidth = 0;
+		UINT m_ResolutionHeight = 0;
+		bool m_bVSync = false;
+		bool m_bFullScreen = false;
+		DXGI_FORMAT m_Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		UINT m_BackbufferCount = 2;
+	};
+}

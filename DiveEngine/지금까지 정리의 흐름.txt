@@ -17,6 +17,15 @@ Graphics의 구성
 	- ResizeBuffer() 역시 직접 관리하는 편이 직관적이다. 하지만 외부에서 접근이 어려울 수 있다.
 
 진행 방향
-- 일단 Renderer에 대한 명확한 이해가 필요하다.
-- 기존 Graphics Resource 구현을 점검하고, Texture 등 미완성 Class들의 구현 방향을 확정 및 진행해야 한다.
-- Renderer와 RenderPath의 조합으로 Editor에 Deferred Shading을 적용해야 한다.
+- Deferred Shading의 기본 Lighting 구현을 통해 GraphicsDevice, Renderer, RenderPath의 이해가 필요하다.
+- GraphicsDevice
+	- Reosurce의 랩퍼 클래스 구현은 하지 않기로 했다.
+	- Desc를 전달받으면 생성하는 함수가 필요하다.
+	- Bind 함수 역시 필요하다.
+		- 이 과정은 PipelineState 등을 통해 이루어질 것이다.
+- Renderer
+	- 일단 GraphicsDevice를 통해 기본적으로 필요한 Resource들을 생성한다.
+	- DrawScene()을 구성할 Pass를 나누어야 한다.
+- RenderPath
+	- 현재 Editor의 RenderPath에서 구조를 확립해 놓았다.
+		- 물론 좀 더 다듬을 필요는 있다.

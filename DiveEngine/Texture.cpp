@@ -1,7 +1,7 @@
 #include "Texture.h"
 #include "DiveCore.h"
 #include "FileSystemHelper.h"
-#include "Renderer.h"
+#include "Src/Renderer/Renderer.h"
 #include "Log.h"
 
 

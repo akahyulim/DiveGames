@@ -1,6 +1,6 @@
 #pragma once
 #include "Component.h"
-#include "Renderer.h"
+#include "Src/Renderer/Renderer.h"
 #include "Font.h"
 #include <string>
 #include <vector>

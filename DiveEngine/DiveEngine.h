@@ -11,10 +11,10 @@
 #include "RenderPath.h"
 #include "RenderPath3D.h"
 
-//= Graphics ======================
+//= Renderer ======================
+#include "Src/Renderer/Graphics/GraphicsDevice.h"
 #include "GraphicsInclude.h"
-#include "GraphicsDevice.h"
-#include "Renderer.h"
+#include "Src/Renderer/Renderer.h"
 #include "GBuffer.h"
 #include "VertexTypes.h"
 #include "Mesh.h"

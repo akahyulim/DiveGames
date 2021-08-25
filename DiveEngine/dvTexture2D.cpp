@@ -72,7 +72,7 @@ namespace dive
 		{
 			DirectX::ScratchImage mipChain;
 
-			if (FAILED(DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), TEX_FILTER_DEFAULT, 0, mipChain)))
+			if (FAILED(DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_DEFAULT, 0, mipChain)))
 			{
 				CORE_ERROR("");
 				return;

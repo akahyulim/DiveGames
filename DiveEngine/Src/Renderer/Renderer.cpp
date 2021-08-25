@@ -1,16 +1,15 @@
 #include "Renderer.h"
-#include "SceneManager.h"
-#include "Scene.h"
-#include "MeshRenderer.h"
-#include "Camera.h"
-#include "Light.h"
-#include "GameObject.h"
-#include "Log.h"
-#include "TextMesh.h"
-#include "Event.h"
-#include "Camera.h"
-#include "DiveCore.h"
-#include <assert.h>
+#include "../SceneManager.h"
+#include "../Scene.h"
+#include "../MeshRenderer.h"
+#include "../Camera.h"
+#include "../Light.h"
+#include "../GameObject.h"
+#include "../Log.h"
+#include "../TextMesh.h"
+#include "../Event.h"
+#include "../Camera.h"
+#include "../DiveCore.h"
 
 namespace dive
 {
@@ -252,11 +251,6 @@ namespace dive
 
 		//immediateContext->Unmap(static_cast<ID3D11Resource*>(mConstantBufferMatrix.Get()), 0);
 		m_pBufferFrame->Unmap();
-	}
-
-	void Renderer::DrawScene()
-	{
-		
 	}
 
 	void Renderer::DrawLegacy()

@@ -1,13 +1,13 @@
 #pragma once
-#include "GraphicsInclude.h"
-#include "GraphicsDevice.h"
-#include "GraphicsEnums.h"
-#include "PipelineState.h"
-#include "ConstantBuffer.h"
-#include "ConstantBuffers.h"	// 이름 변경 대상
-#include "GBuffer.h"
-#include "Texture.h"
-#include "Font.h"
+#include "Graphics/GraphicsDevice.h"
+#include "../GraphicsInclude.h"
+#include "../GraphicsEnums.h"
+#include "../PipelineState.h"
+#include "../ConstantBuffer.h"
+#include "../ConstantBuffers.h"	// 이름 변경 대상
+#include "../GBuffer.h"
+#include "../Texture.h"
+#include "../Font.h"
 #include <memory>
 #include <string>
 
@@ -92,7 +92,6 @@ namespace dive
 		void BeginScene();
 		void PassGBuffer();
 		void PassLighting();
-		void PassMultiCamTest(ID3D11RenderTargetView* pRTV);
 
 
 		// 임시

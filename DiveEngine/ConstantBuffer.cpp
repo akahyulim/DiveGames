@@ -1,7 +1,7 @@
 #include "ConstantBuffer.h"
 #include "Log.h"
-#include "GraphicsDevice.h"
-#include "Renderer.h"
+#include "Src/Renderer/Graphics/GraphicsDevice.h"
+#include "Src/Renderer/Renderer.h"
 
 namespace dive
 {

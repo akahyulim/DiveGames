@@ -1,0 +1,25 @@
+
+종류
+- Texture
+	- Texture2D
+	- TextureCube
+	- DepthStencilBuffer
+	=> Base Class로 접근하는 편이 일반적이다. 다만 Unity의 Interface도 잊지 말자.
+- Buffer
+	- VertexBuffer
+	- IndexBuffer
+	- ConstantBuffer
+- ID3D11DeviceChild
+	- Vertex Shader
+		- InputLayout
+	- Pixel Shader
+- State
+	- DepthStencilState
+	- SamplerState
+	- RasterizerState
+
+생각
+- 개별 랩퍼 객체를 만들 필요는 없을 것 같다.
+- PipelineState 같은 건 필요할 것 같다.
+- Buffer, Texture의 생성 및 이용 방법을 좀 더 생각해 보아야 할 것 같다.
+	- Texture는 rsc, rtv, dsv, srv로 나뉘기 때문이다.

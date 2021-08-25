@@ -277,7 +277,6 @@
     <ClInclude Include="FormatHelper.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Geometry.h" />
-    <ClInclude Include="GraphicsDevice.h" />
     <ClInclude Include="GraphicsEnums.h" />
     <ClInclude Include="GraphicsInclude.h" />
     <ClInclude Include="IniHelper.h" />
@@ -287,7 +286,6 @@
     <ClInclude Include="MeshRenderer.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PipelineState.h" />
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderPath.h" />
     <ClInclude Include="RenderPath3D.h" />
     <ClInclude Include="Resource.h" />
@@ -295,8 +293,9 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Settings.h" />
-    <ClInclude Include="Src\Renderer\Graphics\dvGraphicsDevice.h" />
-    <ClInclude Include="Src\Renderer\dvRenderer.h" />
+    <ClInclude Include="Src\Renderer\Graphics\DepthStencilState.h" />
+    <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
+    <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TextMesh.h" />
     <ClInclude Include="Texture.h" />
@@ -320,23 +319,21 @@
     <ClCompile Include="FontImporter.cpp" />
     <ClCompile Include="FormatHelper.cpp" />
     <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="GraphicsDevice.cpp" />
     <ClCompile Include="IniHelper.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
-    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ConstantBuffers.h" />
-    <ClCompile Include="Renderer_Pass.cpp" />
-    <ClCompile Include="Renderer_Resources.cpp" />
     <ClCompile Include="RenderPath3D.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Settings.cpp" />
-    <ClCompile Include="Src\Renderer\dvRenderer.cpp" />
-    <ClCompile Include="Src\Renderer\Graphics\dvGraphicsDevice.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
+    <ClCompile Include="Src\Renderer\Renderer.cpp" />
+    <ClCompile Include="Src\Renderer\Renderer_Pass.cpp" />
+    <ClCompile Include="Src\Renderer\Renderer_Resources.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -349,6 +346,7 @@
     <Text Include="dvTexture.txt" />
     <Text Include="Graphics.txt" />
     <Text Include="Issue.txt" />
+    <Text Include="Src\Renderer\Graphics\GraphicsResources.txt" />
     <Text Include="WickedEngine%27sGraphicsSystems.txt" />
     <Text Include="지금까지 정리의 흐름.txt" />
   </ItemGroup>

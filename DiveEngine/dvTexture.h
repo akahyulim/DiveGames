@@ -1,6 +1,6 @@
 #pragma once
 #include "Object.h"
-#include "GraphicsDevice.h"
+#include "Src/Renderer/Graphics/GraphicsDevice.h"
 #include "DiveCore.h"
 
 namespace dive

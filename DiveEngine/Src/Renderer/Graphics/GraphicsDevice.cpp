@@ -1,7 +1,11 @@
 #include "GraphicsDevice.h"
-#include "Log.h"
-#include "DiveCore.h"
+#include "../Log.h"
+#include "../DiveCore.h"
 
+
+// 1. 생성자에 대해 좀 더 생각해본 후 정리해야 한다.
+// 2. 현재 Frame Rate를 관리하지 않고 있다.
+// Frame Rate 변경시에도 ResizeTarget()을 사용하는 것일까?
 namespace dive
 {
 	GraphicsDevice::GraphicsDevice(HWND hWnd, bool fullScreen, bool debugLayer)
@@ -10,8 +14,8 @@ namespace dive
 
 		RECT rt;
 		GetClientRect(hWnd, &rt);
-		m_ResolutionWidth = static_cast<unsigned int>(rt.right - rt.left);
-		m_ResolutionHeight = static_cast<unsigned int>(rt.bottom - rt.top);
+		m_ResolutionWidth = static_cast<UINT>(rt.right - rt.left);
+		m_ResolutionHeight = static_cast<UINT>(rt.bottom - rt.top);
 
 		UINT deviceFlags = debugLayer ? D3D11_CREATE_DEVICE_DEBUG : 0;
 
@@ -34,7 +38,7 @@ namespace dive
 		desc.BufferDesc.Width					= m_ResolutionWidth;
 		desc.BufferDesc.Height					= m_ResolutionHeight;
 		desc.Windowed							= fullScreen ? FALSE : TRUE;
-		desc.BufferCount						= m_BackBufferCount;
+		desc.BufferCount						= m_BackbufferCount;
 		desc.BufferDesc.Format					= m_Format;
 		desc.BufferDesc.RefreshRate.Numerator	=  60;
 		desc.BufferDesc.RefreshRate.Denominator = 1;
@@ -73,7 +77,7 @@ namespace dive
 			result = createDeviceAndSwapChain();
 		}
 
-		createBackbufferResources();
+		createBackbufferResource();
 		
 		if (FAILED(result))
 		{
@@ -83,22 +87,20 @@ namespace dive
 
 	GraphicsDevice::~GraphicsDevice()
 	{
-		DV_RELEASE(m_pRenderTargetView);
+		DV_RELEASE(m_pBackbufferRTV);
+		DV_RELEASE(m_pBackbuffer);
+
 		DV_RELEASE(m_pImmediateContext);
 		DV_RELEASE(m_pDevice);
 		DV_RELEASE(m_pSwapChain);
 	}
 
-	/*
-	* WickedEngine을 참조하여
-	* 일단 DepthStencilView 관련 구문을 모두 제거하였다.
-	*/
 	void GraphicsDevice::PresentBegin()
 	{
-		m_pImmediateContext->OMSetRenderTargets(1, &m_pRenderTargetView, 0);
+		m_pImmediateContext->OMSetRenderTargets(1, &m_pBackbufferRTV, 0);
 		
 		float clearColors[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		m_pImmediateContext->ClearRenderTargetView(m_pRenderTargetView, clearColors);
+		m_pImmediateContext->ClearRenderTargetView(m_pBackbufferRTV, clearColors);
 	}
 	
 	void GraphicsDevice::PresentEnd()
@@ -106,12 +108,9 @@ namespace dive
 		m_pSwapChain->Present(static_cast<UINT>(m_bVSync), 0);
 	}
 
-	/*
-	* App 내부에서 해상도를 변경할 때 호출한다.
-	* 그런데 WickedEngine에는 이러한 구현이 없다. (ResizeTarget()을 호출하는 코드 자체가 없다.)
-	* 만약 그냥 둔다면 이름이라도 좀 바꾸고 싶다.
-	*/
-	void GraphicsDevice::ResizeTarget(unsigned int width, unsigned int height)
+	// 윈도우 크기 혹은 해상도를 변경할 때 사용한다.
+	// ResizeResolution으로 이름을 바꾸자.
+	void GraphicsDevice::ResizeTarget(UINT width, UINT height)
 	{
 		if ((width != m_ResolutionWidth) || (height != m_ResolutionHeight) && (width > 0) && (height > 0))
 		{
@@ -130,26 +129,27 @@ namespace dive
 		}
 	}
 
-	/*
-	* 현재 Editor의 Runtime에서 이벤트를 처리하면서 이 함수를 호출하고 있다.
-	*/
-	void GraphicsDevice::SetResolution(unsigned int width, unsigned int height)
+	// WM_SIZE에 대응하여 Backbuffer 크기를 변경한다.
+	// 이 함수를 이용하여 윈도우, 해상도 변경은 불가능하다.
+	// ResizeBackbuffer로 이름을 바꾸자.
+	// 현재 Editor의 Runtime에서 이벤트를 처리하면서 이 함수를 호출하고 있다.
+	void GraphicsDevice::SetResolution(UINT width, UINT height)
 	{
 		if ((width != m_ResolutionWidth || height != m_ResolutionHeight) && (width > 0 || height > 0))
 		{
 			m_ResolutionWidth = width;
 			m_ResolutionHeight = height;
 
-			DV_RELEASE(m_pBackBuffer);
-			DV_RELEASE(m_pRenderTargetView);
+			DV_RELEASE(m_pBackbuffer);
+			DV_RELEASE(m_pBackbufferRTV);
 
-			if (FAILED(m_pSwapChain->ResizeBuffers(m_BackBufferCount, width, height, m_Format, 0)))
+			if (FAILED(m_pSwapChain->ResizeBuffers(m_BackbufferCount, width, height, m_Format, 0)))
 			{
 				CORE_ERROR("");
 				return;
 			}
 
-			createBackbufferResources();
+			createBackbufferResource();
 		}
 	}
 	
@@ -158,22 +158,23 @@ namespace dive
 		return (m_pDevice != nullptr && m_pImmediateContext != nullptr && m_pSwapChain != nullptr);
 	}
 
-	/*
-	* 일단 View 생성을 한 군데에 몰아 넣었다.
-	* 이제 문제는 이걸 여기에서 관리하느냐, Renderer에서 관리하느냐가 문제이다.
-	*/
-	void GraphicsDevice::createBackbufferResources()
+	void GraphicsDevice::createBackbufferResource()
 	{
-		if (FAILED(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&m_pBackBuffer)))
+		DV_RELEASE(m_pBackbuffer);
+		DV_RELEASE(m_pBackbufferRTV);
+
+		DV_ASSERT(m_pSwapChain != nullptr);
+
+		if (FAILED(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&m_pBackbuffer)))
 		{
 			CORE_ERROR("BackBuffer 생성에 실패하였습니다.");
-			PostQuitMessage(0);
 		}
 
-		if (FAILED(m_pDevice->CreateRenderTargetView(m_pBackBuffer, nullptr, &m_pRenderTargetView)))
+		DV_ASSERT(m_pDevice != nullptr);
+
+		if (FAILED(m_pDevice->CreateRenderTargetView(m_pBackbuffer, nullptr, &m_pBackbufferRTV)))
 		{
 			CORE_ERROR("RenderTargetView 생성에 실패하였습니다.");
-			PostQuitMessage(0);
 		}
 	}
 }

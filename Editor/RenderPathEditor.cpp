@@ -43,9 +43,16 @@ namespace editor
 		}
 	}
 	
-	/*
-	* Wicked는 RenderPass라는 것을 만들어 사용하는데... 뭔지 모르겠다.
-	*/
+	// WickedEngine의 사용법 정리
+	// 1. GBuffer는 RenderPath가 관리한다.
+	//	- 직접 생성 및 크기를 갱신한다.
+	//	- 생성 후 RenderPass를 통해 GBuffer처럼 RenderTarget을 묶는다.
+	// 2. Pass의 시작은 항상 RenderPassBegin. 끝은 RenderPassEnd
+	//	- RenderPass를 전달하여 OMSet 및 Clear를 수행한다.
+	//	- OMSet을 nullptr로 떼어준다.
+	// 3. Viewport는 RenderPass를 구성하는 RenderTargetView의 크기로 설정
+	// 4. DrawXXX() 함수에 Visibility 등을 전달하여 Draw
+	//	- DrawXXX() 내부에서 또 여러가지 처리를 한 후 Draw
 	void RenderPathEditor::Render() const
 	{
 		if (!m_pScene)
@@ -57,39 +64,46 @@ namespace editor
 		auto pImmediateContext = dive::Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 		assert(pImmediateContext);
 
-		/*
-		* 첫 번째 Pass
-		* 현재까지 분석한 바에 따르면 
-		* ConstantBuffer Update, Viewport & RenderTarget Bind 후
-		* Draw Call에 Visibility를 전달하는 모양세다.
-		* 이때 RenderPass라는 것을 사용하기도 하는데 아직 뭔지 모르겠다.
-		*/
 		{
 			// 이 RenderTarget Texture는 RenderPath에서 만들고 관리하는게 맞다.
 			auto pRTV = pRenderer->GetFrameTexture()->GetRenderTargetView();
-			pImmediateContext->OMSetRenderTargets(1, &pRTV, nullptr);
 
-			auto pCamera = pRenderer->GetCamera();
-			float clearColors[4];
-			if (!pCamera)
+			// RenerPassBegin
 			{
-				clearColors[0] = 0.0f;
-				clearColors[1] = 0.0f;
-				clearColors[2] = 0.0f;
-				clearColors[3] = 1.0f;
+				pImmediateContext->OMSetRenderTargets(1, &pRTV, nullptr);
+
+				// 사실 GBuffer라면 특정 색으로 초기화해야 할 거다.
+				auto pCamera = pRenderer->GetCamera();
+				float clearColors[4];
+				if (!pCamera)
+				{
+					clearColors[0] = 0.0f;
+					clearColors[1] = 0.0f;
+					clearColors[2] = 0.0f;
+					clearColors[3] = 1.0f;
+				}
+				else
+				{
+					auto color = pCamera->GetComponent<dive::Camera>()->GetBackgroundColor();
+					clearColors[0] = color.x;
+					clearColors[1] = color.y;
+					clearColors[2] = color.z;
+					clearColors[3] = color.w;
+				}
+
+				pImmediateContext->ClearRenderTargetView(pRTV, clearColors);
 			}
-			else
+
+			// Wicked는 먼저 RenderTarget으로부터 크기를 가져와
+			// Viewport를 Bind한다.
+			// 하지만 현재 구현은 Camera를 통해 Viewport를 계산하고 있다.
+
+			pRenderer->DrawScene();
+
+			// RenderPassEnd
 			{
-				auto color = pCamera->GetComponent<dive::Camera>()->GetBackgroundColor();
-				clearColors[0] = color.x;
-				clearColors[1] = color.y;
-				clearColors[2] = color.z;
-				clearColors[3] = color.w;
+				pImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
 			}
-
-			pImmediateContext->ClearRenderTargetView(pRTV, clearColors);
-
-			pRenderer->PassMultiCamTest(pRTV);
 		}
 	}
 	

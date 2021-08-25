@@ -4,9 +4,6 @@
     <ClInclude Include="Log.h">
       <Filter>Engine\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Renderer.h">
-      <Filter>Engine\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Engine\Scene</Filter>
     </ClInclude>
@@ -397,28 +394,25 @@
     <ClInclude Include="dvRenderTexture.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsDevice.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="GraphicsInclude.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\dvGraphicsDevice.h">
+    <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Renderer\dvRenderer.h">
+    <ClInclude Include="Src\Renderer\Renderer.h">
       <Filter>Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\DepthStencilState.h">
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
       <Filter>Engine\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="RenderPath3D.cpp">
       <Filter>Engine\Core</Filter>
@@ -440,9 +434,6 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Renderer_Resources.cpp">
-      <Filter>Engine\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Input.cpp">
       <Filter>Engine\Input</Filter>
@@ -501,9 +492,6 @@
     <ClCompile Include="GBuffer.cpp">
       <Filter>Engine\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer_Pass.cpp">
-      <Filter>Engine\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="ConstantBuffer.cpp">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
@@ -516,16 +504,19 @@
     <ClCompile Include="dvRenderTexture.cpp">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsDevice.cpp">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Renderer\Graphics\dvGraphicsDevice.cpp">
+    <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Renderer\dvRenderer.cpp">
+    <ClCompile Include="Src\Renderer\Renderer.cpp">
+      <Filter>Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Renderer_Pass.cpp">
+      <Filter>Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Renderer_Resources.cpp">
       <Filter>Engine\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
@@ -594,5 +585,8 @@
       <Filter>Engine\Renderer\Graphics</Filter>
     </Text>
     <Text Include="지금까지 정리의 흐름.txt" />
+    <Text Include="Src\Renderer\Graphics\GraphicsResources.txt">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </Text>
   </ItemGroup>
 </Project>

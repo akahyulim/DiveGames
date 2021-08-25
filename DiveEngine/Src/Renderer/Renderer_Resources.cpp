@@ -1,6 +1,6 @@
 #include "Renderer.h"
-#include "Log.h"
-#include "TextMesh.h"
+#include "../Log.h"
+#include "../TextMesh.h"
 #include <d3dcompiler.h>
 
 using namespace std;

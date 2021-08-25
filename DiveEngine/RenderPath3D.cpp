@@ -1,6 +1,6 @@
 #include "RenderPath3D.h"
-#include "Renderer.h"
-#include "GraphicsDevice.h"
+#include "Src/Renderer/Renderer.h"
+#include "Src/Renderer/Graphics/GraphicsDevice.h"
 #include "Timer.h"
 #include "Log.h"
 
@@ -42,7 +42,8 @@ namespace dive
 		}
 	}
 	
-	// Renderer와 어떻게 나누느냐...
+	// 현재 Sandbox가 이를 사용하고 있다.
+	// 추후 수정 구현이 필요하다.
 	void RenderPath3D::Render() const
 	{
 		if (!m_pScene)	return;
@@ -50,14 +51,23 @@ namespace dive
 		auto pImmediateContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 		assert(pImmediateContext != nullptr);
 
-		// Eidtor에선 Backbuffer와 RenderTarget의 크기가 다르므로
-		// Sandbox에선 이렇게 Backbuffer 크기로 설정을 해 주어야 한다.
+		// RenderPassBegin
+		{
+			// 생성 및 패키징된 RenderTarget들을 OMSet & Clear
+		}
+
+		// 이게 아니라 RenderTargetView로부터 크기를 가져와야 한다.
 		float width = (float)Renderer::GetInstance().GetGraphicsDevice()->GetResolutionWidth();
 		float height = (float)Renderer::GetInstance().GetGraphicsDevice()->GetResolutionHeight();
 		Renderer::GetInstance().SetViewport(width, height);
 		
 		Renderer::GetInstance().UpdateCB();
 		Renderer::GetInstance().DrawLegacy();
+
+		// RenderPassEnd
+		{
+			// OMSet을 nullptr로 초기화
+		}
 	}
 
 	void RenderPath3D::Compose() const
