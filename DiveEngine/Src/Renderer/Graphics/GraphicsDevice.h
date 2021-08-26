@@ -1,6 +1,7 @@
 #pragma once
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
+#include <wrl/client.h>
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -14,7 +15,7 @@ namespace dive
 	{
 	public:
 		GraphicsDevice(HWND hWnd, bool fullScreen, bool debugLayer = false);
-		~GraphicsDevice();
+		~GraphicsDevice() = default;
 
 		void PresentBegin();
 		void PresentEnd();
@@ -33,22 +34,22 @@ namespace dive
 
 		bool IsInitialized() const;
 
-		ID3D11Device* GetDevice() { return m_pDevice; }
-		ID3D11DeviceContext* GetImmediateContext() { return m_pImmediateContext; }
+		ID3D11Device* GetDevice() { return m_pDevice.Get(); }
+		ID3D11DeviceContext* GetImmediateContext() { return m_pImmediateContext.Get(); }
 
-		ID3D11Resource* GetBackbuffer() { return m_pBackbuffer; }
-		ID3D11RenderTargetView* GetBackbufferRTV() { return m_pBackbufferRTV; }
+		ID3D11Resource* GetBackbuffer() { return m_pBackbuffer.Get(); }
+		ID3D11RenderTargetView* GetBackbufferRTV() { return m_pBackbufferRTV.Get(); }
 
 	private:
 		void createBackbufferResource();
 
 	private:
-		IDXGISwapChain* m_pSwapChain = nullptr;
-		ID3D11Device* m_pDevice = nullptr;
-		ID3D11DeviceContext* m_pImmediateContext = nullptr;
+		Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwapChain;
+		Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pImmediateContext;
 
-		ID3D11Resource* m_pBackbuffer = nullptr;
-		ID3D11RenderTargetView* m_pBackbufferRTV = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11Resource> m_pBackbuffer;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pBackbufferRTV;
 
 		UINT m_ResolutionWidth = 0;
 		UINT m_ResolutionHeight = 0;

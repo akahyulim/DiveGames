@@ -1,3 +1,7 @@
+현재 문제점
+	- DepthStencilBuffer, View를 포함할 것인가...?
+	- Cubemap은 어떻게 할 것인가?
+
 Texture의 구성
 - ID3D11Texture2D 
 - ID3D11RenderTargetView
@@ -33,3 +37,12 @@ Texture의 구성
 : 무조건 DSV를 만드는 것인지, Cubemap은 어떻게 만드는 것인지 생각해보자.
 	- 텍스쳐 위에 렌더링 결과물을 그리는데 사용한다.
 	- IsCubemap으로 cubemap 사용 설정이 가능하다.
+	- Rendering 된 값은 결국 사용해야 한다. 즉, ShaderResourceView도 가질 것이다.
+
+RasterTek
+- TextureClass
+	- File을 읽어 ID3D11ShaderResourceView 생성
+	- ShaderResourceView 리턴 함수 
+- RenderTargetTextureClass
+	- 전달받은 크기로 ID3D11Texture2D, ID3D11ShaderResourceView, ID3D11RenderTargetView 생성
+	- 즉, TextureClass에 ID3D11RenderTargetView 생성 및 RenderTarget의 Bind와 Clear 함수 추가

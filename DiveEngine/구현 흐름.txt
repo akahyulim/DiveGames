@@ -1,0 +1,14 @@
+
+목표 - Deferred Shading으로 Legacy Lighting을 구현하면서 GraphicsDevice, Renderer, RenderPath 기능 구분하기
+
+[Light 없는 GBuffer Rendering]
+GraphicsDevice
+	- 결국 Device와 Context 생성 및 관리를 주요 기능으로 축소된 형태다.
+	- 물론 Backbuffer를 직접 관리(RTV 전달 및 Buffer Size 대응)하는 기능이 있다.
+Renderer
+	- 기본적인 State 관리
+		=> 형태 및 생성, Bind 방법을 확정해야 한다.
+		=> 아무리 생각해도 Device와 Context를 획득하는게 일반적인 방식 같다.
+RenderPath
+	- GBuffer에 대응하는 Texture 관리
+		=> Texture부터 만들어야 한다.

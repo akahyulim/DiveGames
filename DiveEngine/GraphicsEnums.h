@@ -38,21 +38,25 @@ namespace dive
 
 		ILTYPE_COUNT
 	};
+	// 위의 enum들도 전부 enum class로 바꾸자.
 
-	enum DSSTYPES
+	enum class eDepthStencilState
 	{
-		DSSTYPE_DEFAULT,
-		DSSTYPE_COUNT
+		Default,
+		Count,
 	};
 
-	enum RSSTYPES
+	enum class eRasterizerState
 	{
-		RSSTYPE_CULLBACK_SOLID,
-		RSSTYPE_COUNT
+		Cullback_Solid,
+		Count
 	};
 
-	
-	enum SMPSTYPES
+	// 임시... 추후 다시 나누어야 한다.
+	enum class eSamplerState
 	{
+		Default,
+		Linear,
+		Count
 	};
 }

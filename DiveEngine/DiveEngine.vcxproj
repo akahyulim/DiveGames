@@ -293,7 +293,6 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Settings.h" />
-    <ClInclude Include="Src\Renderer\Graphics\DepthStencilState.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="StringHelper.h" />
@@ -346,8 +345,10 @@
     <Text Include="dvTexture.txt" />
     <Text Include="Graphics.txt" />
     <Text Include="Issue.txt" />
+    <Text Include="PipelineState.txt" />
     <Text Include="Src\Renderer\Graphics\GraphicsResources.txt" />
     <Text Include="WickedEngine%27sGraphicsSystems.txt" />
+    <Text Include="구현 흐름.txt" />
     <Text Include="지금까지 정리의 흐름.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

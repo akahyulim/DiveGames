@@ -25,6 +25,8 @@ namespace dive
 
 			auto pCameraCom = pCamera->GetComponent<Camera>();
 
+			// PipelineState를 만들어 놓고 또 이렇게 Bind하는게 맞나 싶다.
+			// 그런데 다시보니 개별 추가 데이터가 필요하긴 하다.
 			immediateContext->IASetInputLayout(m_PipelineStateLegacy.pIL);
 			immediateContext->IASetPrimitiveTopology(m_PipelineStateLegacy.primitiveTopology);
 			immediateContext->VSSetShader(m_PipelineStateLegacy.pVS, NULL, 0);
@@ -35,6 +37,7 @@ namespace dive
 
 			// Viewport 역시 일단 순서대로 적용한다.
 			// 그런데... num을 설정하면 어떻게 되는거지?
+			//=> 테스트용임을 감안하자. Wicked는 Viewport를 RenderPath에서 이 함수 호출전에 Bind하였다. 물론 구현이 다를순 있다.
 			immediateContext->RSSetViewports(1, pCameraCom->GetViewportPtr());
 
 			MeshRenderer* meshRenderer = nullptr;

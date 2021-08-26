@@ -2,6 +2,8 @@
 #include "../Log.h"
 #include "../DiveCore.h"
 
+using namespace Microsoft::WRL;
+
 
 // 1. 생성자에 대해 좀 더 생각해본 후 정리해야 한다.
 // 2. 현재 Frame Rate를 관리하지 않고 있다.
@@ -63,10 +65,10 @@ namespace dive
 				static_cast<UINT>(featureLevels.size()),
 				D3D11_SDK_VERSION,
 				&desc,
-				&m_pSwapChain,
-				&m_pDevice,
+				m_pSwapChain.GetAddressOf(),
+				m_pDevice.GetAddressOf(),
 				nullptr,
-				&m_pImmediateContext);
+				m_pImmediateContext.GetAddressOf());
 		};
 
 		auto result = createDeviceAndSwapChain();
@@ -85,22 +87,12 @@ namespace dive
 		}
 	}
 
-	GraphicsDevice::~GraphicsDevice()
-	{
-		DV_RELEASE(m_pBackbufferRTV);
-		DV_RELEASE(m_pBackbuffer);
-
-		DV_RELEASE(m_pImmediateContext);
-		DV_RELEASE(m_pDevice);
-		DV_RELEASE(m_pSwapChain);
-	}
-
 	void GraphicsDevice::PresentBegin()
 	{
-		m_pImmediateContext->OMSetRenderTargets(1, &m_pBackbufferRTV, 0);
+		m_pImmediateContext->OMSetRenderTargets(1, m_pBackbufferRTV.GetAddressOf(), 0);
 		
 		float clearColors[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		m_pImmediateContext->ClearRenderTargetView(m_pBackbufferRTV, clearColors);
+		m_pImmediateContext->ClearRenderTargetView(m_pBackbufferRTV.Get(), clearColors);
 	}
 	
 	void GraphicsDevice::PresentEnd()
@@ -140,12 +132,12 @@ namespace dive
 			m_ResolutionWidth = width;
 			m_ResolutionHeight = height;
 
-			DV_RELEASE(m_pBackbuffer);
-			DV_RELEASE(m_pBackbufferRTV);
+			m_pBackbuffer.Reset();
+			m_pBackbufferRTV.Reset();
 
 			if (FAILED(m_pSwapChain->ResizeBuffers(m_BackbufferCount, width, height, m_Format, 0)))
 			{
-				CORE_ERROR("");
+				CORE_ERROR("GraphicsDevice::SetResolution>> SwapChain의 ReiszeBuffers에 실패하였습니다.");
 				return;
 			}
 
@@ -160,21 +152,21 @@ namespace dive
 
 	void GraphicsDevice::createBackbufferResource()
 	{
-		DV_RELEASE(m_pBackbuffer);
-		DV_RELEASE(m_pBackbufferRTV);
+		m_pBackbuffer.Reset();
+		m_pBackbufferRTV.Reset();
 
 		DV_ASSERT(m_pSwapChain != nullptr);
 
-		if (FAILED(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&m_pBackbuffer)))
+		if (FAILED(m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)m_pBackbuffer.GetAddressOf())))
 		{
-			CORE_ERROR("BackBuffer 생성에 실패하였습니다.");
+			CORE_ERROR("GraphicsDevice::createBackbufferResource>> BackBuffer 생성에 실패하였습니다.");
 		}
 
 		DV_ASSERT(m_pDevice != nullptr);
 
-		if (FAILED(m_pDevice->CreateRenderTargetView(m_pBackbuffer, nullptr, &m_pBackbufferRTV)))
+		if (FAILED(m_pDevice->CreateRenderTargetView(m_pBackbuffer.Get(), nullptr, m_pBackbufferRTV.GetAddressOf())))
 		{
-			CORE_ERROR("RenderTargetView 생성에 실패하였습니다.");
+			CORE_ERROR("GraphicsDevice::createBackbufferResource>> RenderTargetView 생성에 실패하였습니다.");
 		}
 	}
 }

@@ -93,6 +93,9 @@ namespace dive
 		void PassGBuffer();
 		void PassLighting();
 
+		ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilState state) { return m_pDepthStencilStates[static_cast<int>(state)].Get(); }
+		ID3D11RasterizerState* GetRasterizerState(eRasterizerState state) { return m_pRasterizerStates[static_cast<int>(state)].Get(); }
+		ID3D11SamplerState* GetSamplerState(eSamplerState state) { return m_pSamplerStates[static_cast<int>(state)].Get(); }
 
 		// 임시
 		GameObject* GetCamera() { return m_pCamera; }
@@ -102,11 +105,11 @@ namespace dive
 		~Renderer();
 
 		// Render Resources
-		bool createDepthStencilStates();
-		bool createRasterizerStates();
-		bool createSamplerStates();
+		void createDepthStencilStates();
+		void createRasterizerStates();
+		void createSamplerStates();
+
 		bool createConstantBuffers();
-		bool createTextures();	// 의미가 달라졌다.
 		bool createRenderTargets();
 		bool createShaders();
 		bool createFonts();
@@ -129,10 +132,10 @@ namespace dive
 		// GPU Resource 관리
 		Microsoft::WRL::ComPtr<ID3D11DeviceChild> m_pShaders[SHADERTYPE_COUNT];
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_pInputLayouts[ILTYPE_COUNT];
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_pDepthStencilStates[DSSTYPE_COUNT];
-		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_pRasterizerStates[RSSTYPE_COUNT];
-		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerState;
-		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerStateLinear;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_pDepthStencilStates[static_cast<int>(eDepthStencilState::Count)];
+		Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_pRasterizerStates[static_cast<int>(eRasterizerState::Count)];
+		Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerStates[static_cast<int>(eSamplerState::Count)];
+		//Microsoft::WRL::ComPtr<ID3D11SamplerState> m_pSamplerStateLinear;
 
 		// Constant Buffer
 		BufferFrame m_BufferFrameCPU;

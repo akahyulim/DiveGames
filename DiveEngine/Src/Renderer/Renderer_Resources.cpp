@@ -1,4 +1,5 @@
 #include "Renderer.h"
+#include "../DiveCore.h"
 #include "../Log.h"
 #include "../TextMesh.h"
 #include <d3dcompiler.h>
@@ -7,50 +8,48 @@ using namespace std;
 
 namespace dive
 {
-	bool Renderer::createDepthStencilStates()
+	void Renderer::createDepthStencilStates()
 	{
 		auto pDevice = m_pGraphicsDevice->GetDevice();
-		assert(pDevice != nullptr);
+		DV_ASSERT(pDevice != nullptr);
 
 		HRESULT hr = E_FAIL;
 
-		// DepthStenicl States
 		{
 			D3D11_DEPTH_STENCIL_DESC desc;
-			desc.DepthEnable = true;
+			desc.DepthEnable = TRUE;
 			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 			desc.DepthFunc = D3D11_COMPARISON_LESS;
 
-			desc.StencilEnable = true;
+			desc.StencilEnable = TRUE;
 			desc.StencilReadMask = 0xFF;
 			desc.StencilWriteMask = 0xFF;
 
-			// Stencil operations if pixel is front-facing.
+			// OP붙은 것들이 GBuffer와 다르다.
 			desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 			desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
 			desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			// Stencil operations if pixel is back-facing.
 			desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 			desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
 			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			hr = pDevice->CreateDepthStencilState(&desc, m_pDepthStencilStates[DSSTYPE_DEFAULT].GetAddressOf());
-			assert(SUCCEEDED(hr));
+			// 얻어서 할 것인가, 직접 넘길 것인가...
+			hr = pDevice->CreateDepthStencilState(&desc, m_pDepthStencilStates[static_cast<int>(eDepthStencilState::Default)].GetAddressOf());
+			DV_ASSERT(SUCCEEDED(hr));
 		}
-
-		return true;
 	}
 
-	bool Renderer::createRasterizerStates()
+	void Renderer::createRasterizerStates()
 	{
 		auto pDevice = m_pGraphicsDevice->GetDevice();
-		assert(pDevice != nullptr);
+		DV_ASSERT(pDevice != nullptr);
 
 		HRESULT hr = E_FAIL;
 
+		// CullBack Solid
 		{
 			D3D11_RASTERIZER_DESC desc;
 			desc.AntialiasedLineEnable = false;
@@ -64,17 +63,15 @@ namespace dive
 			desc.ScissorEnable = false;
 			desc.SlopeScaledDepthBias = 0.0f;
 
-			hr = pDevice->CreateRasterizerState(&desc, m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].GetAddressOf());
-			assert(SUCCEEDED(hr));
+			hr = pDevice->CreateRasterizerState(&desc, m_pRasterizerStates[static_cast<int>(eRasterizerState::Cullback_Solid)].GetAddressOf());
+			DV_ASSERT(SUCCEEDED(hr));
 		}
-
-		return true;
 	}
 
-	bool Renderer::createSamplerStates()
+	void Renderer::createSamplerStates()
 	{
 		auto pDevice = m_pGraphicsDevice->GetDevice();
-		assert(pDevice != nullptr);
+		DV_ASSERT(pDevice != nullptr);
 
 		HRESULT hr = E_FAIL;
 
@@ -95,8 +92,8 @@ namespace dive
 			desc.MinLOD = 0;
 			desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-			hr = pDevice->CreateSamplerState(&desc, m_pSamplerState.GetAddressOf());
-			assert(SUCCEEDED(hr));
+			hr = pDevice->CreateSamplerState(&desc, m_pSamplerStates[static_cast<int>(eSamplerState::Default)].GetAddressOf());
+			DV_ASSERT(SUCCEEDED(hr));
 		}
 
 		{
@@ -115,18 +112,16 @@ namespace dive
 			desc.MinLOD = 0;
 			desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-			hr = pDevice->CreateSamplerState(&desc, m_pSamplerStateLinear.GetAddressOf());
-			assert(SUCCEEDED(hr));
+			hr = pDevice->CreateSamplerState(&desc, m_pSamplerStates[static_cast<int>(eSamplerState::Linear)].GetAddressOf());
+			DV_ASSERT(SUCCEEDED(hr));
 		}
-
-		return true;
 	}
 
 	bool Renderer::createConstantBuffers()
 	{
 		/*
 		auto pDevice = m_pGraphicsDevice->GetDevice();
-		assert(pDevice != nullptr);
+		DV_ASSERT(pDevice != nullptr);
 
 		// world, view, projection matrix
 		D3D11_BUFFER_DESC desc;
@@ -138,7 +133,7 @@ namespace dive
 		desc.StructureByteStride = 0;
 
 		auto hr = pDevice->CreateBuffer(&desc, nullptr, mConstantBufferMatrix.GetAddressOf());
-		assert(SUCCEEDED(hr));
+		DV_ASSERT(SUCCEEDED(hr));
 	*/
 		m_pBufferFrame = new ConstantBuffer(m_pGraphicsDevice, "BufferFrame");
 		if (!m_pBufferFrame->Create< MatrixBuffer>())
@@ -160,15 +155,6 @@ namespace dive
 			CORE_ERROR("BufferObjectGPU 생성에 실패하였습니다.");
 			return false;
 		}
-
-		return true;
-	}
-
-	// 기존 사용처와 성격이 달라졌다.
-	// 스파르탄에선 에디터용 SRV 생성에 사용되었다.
-	bool Renderer::createTextures()
-	{
-		// 테스트용 코드를 모두 삭제
 
 		return true;
 	}
@@ -252,7 +238,7 @@ namespace dive
 		{
 			m_pDvFont = new Font;
 			result = m_pDvFont->LoadFromFile("../Assets/Fonts/NanumBarunGothic.ttf");
-			assert(result);
+			DV_ASSERT(result);
 		}
 
 		// TextMesh를 Component로 만든 후 제거할 코드
@@ -260,7 +246,7 @@ namespace dive
 		{
 			m_pTextMesh = new TextMesh;
 			result = m_pTextMesh->SetFont(m_pDvFont);
-			assert(result);
+			DV_ASSERT(result);
 			m_pTextMesh->SetText(L"We're just walking down the street.",
 				DirectX::XMFLOAT2(-200.0f, 200.0f));
 		}
@@ -275,9 +261,9 @@ namespace dive
 		{
 			m_PipelineStateLegacy.pVS = (ID3D11VertexShader*)m_pShaders[VSTYPE_LEGACY].Get();
 			m_PipelineStateLegacy.pPS = (ID3D11PixelShader*)m_pShaders[PSTYPE_LEGACY].Get();
-			m_PipelineStateLegacy.pDSS = m_pDepthStencilStates[DSSTYPE_DEFAULT].Get();
-			m_PipelineStateLegacy.pRSS = m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
-			m_PipelineStateLegacy.pSS = m_pSamplerState.Get();
+			m_PipelineStateLegacy.pDSS = GetDepthStencilState(eDepthStencilState::Default);
+			m_PipelineStateLegacy.pRSS = GetRasterizerState(eRasterizerState::Cullback_Solid);
+			m_PipelineStateLegacy.pSS = GetSamplerState(eSamplerState::Default);
 			m_PipelineStateLegacy.pIL = m_pInputLayouts[ILTYPE_POS_TEX_NOR_TAN].Get();
 			m_PipelineStateLegacy.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
@@ -286,9 +272,9 @@ namespace dive
 		{
 			m_PipelineStateFont.pVS = (ID3D11VertexShader*)m_pShaders[VSTYPE_FONTS].Get();
 			m_PipelineStateFont.pPS = (ID3D11PixelShader*)m_pShaders[PSTYPE_FONTS].Get();
-			m_PipelineStateFont.pDSS = m_pDepthStencilStates[DSSTYPE_DEFAULT].Get();
-			m_PipelineStateFont.pRSS = m_pRasterizerStates[RSSTYPE_CULLBACK_SOLID].Get();
-			m_PipelineStateFont.pSS = m_pSamplerStateLinear.Get();
+			m_PipelineStateFont.pDSS = GetDepthStencilState(eDepthStencilState::Default);
+			m_PipelineStateFont.pRSS = GetRasterizerState(eRasterizerState::Cullback_Solid);
+			m_PipelineStateFont.pSS = GetSamplerState(eSamplerState::Linear);
 			m_PipelineStateFont.pIL = m_pInputLayouts[ILTYPE_POS_TEX2].Get();
 			m_PipelineStateFont.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
@@ -299,7 +285,7 @@ namespace dive
 		D3D11_INPUT_ELEMENT_DESC* descs, UINT numElements)
 	{
 		auto pDevice = m_pGraphicsDevice->GetDevice();
-		assert(pDevice != nullptr);
+		DV_ASSERT(pDevice != nullptr);
 
 		ID3D10Blob* shaderBuffer = nullptr;
 		ID3D10Blob* shaderError = nullptr;
@@ -344,7 +330,7 @@ namespace dive
 	bool Renderer::createPixelShader(const std::wstring& filepath, unsigned int shaderType)
 	{
 		auto pDevice = m_pGraphicsDevice->GetDevice();
-		assert(pDevice != nullptr);
+		DV_ASSERT(pDevice != nullptr);
 
 		ID3D10Blob* shaderBuffer = nullptr;
 		ID3D10Blob* shaderError = nullptr;
