@@ -589,5 +589,8 @@
     <Text Include="PipelineState.txt">
       <Filter>Engine\Renderer</Filter>
     </Text>
+    <Text Include="RenderPass.txt">
+      <Filter>Engine\Renderer</Filter>
+    </Text>
   </ItemGroup>
 </Project>

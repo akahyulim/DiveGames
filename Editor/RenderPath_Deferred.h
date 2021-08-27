@@ -21,6 +21,6 @@ namespace dive
 	private:
 
 	private:
-		// Textures
+		// GBuffer Textures
 	};
 }

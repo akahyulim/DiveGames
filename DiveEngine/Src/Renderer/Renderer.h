@@ -67,16 +67,6 @@ namespace dive
 		// update는 visibility, PerFrameData,  RenderData, CameraCB 등이 있다.
 		void UpdateCB();
 
-		//= 얘네들은 아래 Pass들이 흡수해야 한다. =============
-		// 그런데 생각해보니 스파르탄도 Draw와 Pass가 따로 구현된 것 같은데...?
-		// 찾아보니 스파르탄의 DrawXXX는 전부 Debug용 그리기다.
-		void DrawScene();
-
-		// 일단 나누자
-		void DrawLegacy();
-		void DrawText();
-		//=====================================================
-
 		void ObjectClassify();
 
 		GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice; }
@@ -85,13 +75,8 @@ namespace dive
 		Texture* GetFrameTexture() { return m_RenderTargets[eRenderTargets::Frame_Ldr]; }
 
 		// Render Passes
-		// RenderPath에서 호출할 거기 때문에 public이어야 한다.
-		// Backbuffer, GBuffer의 RenderTargetView 설정은 이들 구현에 포함되어야 한다.
-		// 아직도 Pass와 Path의 구분이 명확하지 않다.
-		// 이 곳에서 Pass를 나누고 다시 Path에서 취사선택하는게 가능한가?
-		void BeginScene();
-		void PassGBuffer();
-		void PassLighting();
+		void DrawScene();
+		void DrawLight();
 
 		ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilState state) { return m_pDepthStencilStates[static_cast<int>(state)].Get(); }
 		ID3D11RasterizerState* GetRasterizerState(eRasterizerState state) { return m_pRasterizerStates[static_cast<int>(state)].Get(); }

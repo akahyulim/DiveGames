@@ -5,6 +5,9 @@
 
 namespace dive
 {
+	// shader resource view 용이다.
+	// 특정 색상으로 만들 수 있다.
+	// 파일로 부터 데이터를 로드하여 만들 수 있다.
 	class dvTexture2D : public dvTexture
 	{
 	public:

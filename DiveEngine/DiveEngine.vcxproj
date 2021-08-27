@@ -346,6 +346,7 @@
     <Text Include="Graphics.txt" />
     <Text Include="Issue.txt" />
     <Text Include="PipelineState.txt" />
+    <Text Include="RenderPass.txt" />
     <Text Include="Src\Renderer\Graphics\GraphicsResources.txt" />
     <Text Include="WickedEngine%27sGraphicsSystems.txt" />
     <Text Include="구현 흐름.txt" />

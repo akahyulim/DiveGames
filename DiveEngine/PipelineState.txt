@@ -13,11 +13,13 @@
 
 사용
 - Spratan
-	- PassXXX에서 Renderer의 Resource를 택일하여 지역변수로 구성
-	- CommandList라는 곳의 BeginRenderPass(에서 전달받은 PipelineState의 요소를 이전 값과 비교한 후 Bind
+	- Renderer::PassXXX()에서 Resource를 택일하여 지역변수로 구성
+	- CommandList::BeginRenderPass() PipelineState를 전달하여 Bind
+		- 내부에서 이전 Bind 객체와 비교 진행
 		- EndPass()도 존재하지만 Draw Time을 확인하는듯
 - Wicked
 	- Renderer에 전역 변수 배열로 관리
+		- Object의 경우 상당히 많은 조합으로 구성
 	- Renderer::LoadShader()에서 리소스들을 생성한 후 desc를 조합하여 GraphicsDevice::CreatePipelineState()에 전달
 		- GraphicsDevice::CreatePipelineState()는 사실 desc를 참조하여 States를 만들고 함께 전달받은 PipelineState 변수에 저장하기만 한다.
 	- Renderer의 Draw류 함수에서 그려질 대상의 PipelineState를 GraphicsDevice::BeginPipelineState()에 전달한다.

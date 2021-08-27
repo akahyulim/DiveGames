@@ -1,6 +1,7 @@
 현재 문제점
-	- DepthStencilBuffer, View를 포함할 것인가...?
-	- Cubemap은 어떻게 할 것인가?
+	- 유니티처럼 구현하면 사용자는 딱 구분해서 사용해야 하는데...
+	- 그리고 Format에 따른 구분 역시 좀 더 신경써야 한다.
+	- 여전히 Cubemap에 대해선 넘기는 중...
 
 Texture의 구성
 - ID3D11Texture2D 
