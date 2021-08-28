@@ -1,7 +1,7 @@
 #include "dvTexture2D.h"
-#include "FileSystemHelper.h"
-#include "StringHelper.h"
-#include "Log.h"
+#include "../FileSystemHelper.h"
+#include "../StringHelper.h"
+#include "../Log.h"
 
 namespace dive
 {
@@ -27,7 +27,7 @@ namespace dive
 			desc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
 			desc.SampleDesc.Count	= 1;
 
-			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
+			if (FAILED(pDevice->CreateTexture2D(&desc, nullptr, m_pBuffer.GetAddressOf())))
 			{
 				CORE_ERROR("");
 				return;
@@ -42,7 +42,7 @@ namespace dive
 			desc.Texture2D.MipLevels		= 1;
 			desc.Texture2D.MostDetailedMip	= 0;
 
-			if (FAILED(m_pDevice->CreateShaderResourceView(m_pTexture, &desc, &m_pSRV)))
+			if (FAILED(pDevice->CreateShaderResourceView(m_pBuffer.Get(), &desc, m_pShaderResourceView.GetAddressOf())))
 			{
 				CORE_ERROR("");
 				return;
@@ -50,6 +50,7 @@ namespace dive
 		}
 	}
 
+	// 여기에선 ID3D11Texture2D를 구하지 않았다.
 	dvTexture2D::dvTexture2D(ID3D11Device* pDevice, const std::string& filepath, bool hasMipMap)
 		: dvTexture(typeid(dvTexture2D).hash_code(), pDevice)
 	{
@@ -79,7 +80,7 @@ namespace dive
 			}
 
 
-			if (FAILED(DirectX::CreateShaderResourceView(m_pDevice, mipChain.GetImages(), mipChain.GetImageCount(), mipChain.GetMetadata(), &m_pSRV)))
+			if (FAILED(DirectX::CreateShaderResourceView(pDevice, mipChain.GetImages(), mipChain.GetImageCount(), mipChain.GetMetadata(), m_pShaderResourceView.GetAddressOf())))
 			{
 				CORE_ERROR("");
 				return;
@@ -89,7 +90,7 @@ namespace dive
 		}
 		else
 		{
-			if (FAILED(DirectX::CreateShaderResourceView(m_pDevice, image.GetImages(), image.GetImageCount(), image.GetMetadata(), &m_pSRV)))
+			if (FAILED(DirectX::CreateShaderResourceView(pDevice, image.GetImages(), image.GetImageCount(), image.GetMetadata(), m_pShaderResourceView.GetAddressOf())))
 			{
 				CORE_ERROR("");
 				return;
@@ -99,12 +100,6 @@ namespace dive
 		}
 
 		SetName(FileSystemHelper::GetFilenameWithoutExtension(filepath));
-	}
-
-	dvTexture2D::~dvTexture2D()
-	{
-		DV_RELEASE(m_pTexture);
-		DV_RELEASE(m_pSRV);
 	}
 
 	void dvTexture2D::setMetadata(const DirectX::TexMetadata& data)

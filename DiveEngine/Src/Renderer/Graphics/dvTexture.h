@@ -1,7 +1,15 @@
 #pragma once
-#include "Object.h"
-#include "Src/Renderer/Graphics/GraphicsDevice.h"
-#include "DiveCore.h"
+#include "../Object.h"
+#include "../DiveCore.h"
+#include <d3d11_3.h>
+#include <DXGI1_3.h>
+#include <wrl/client.h>
+
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "d3dcompiler.lib")
+#pragma comment(lib, "dxguid.lib")
 
 namespace dive
 {
@@ -13,7 +21,6 @@ namespace dive
 			: Object(typeHash)
 		{
 			DV_ASSERT(pDevice != nullptr);
-			m_pDevice = pDevice;
 		}
 		virtual ~dvTexture() = default;
 
@@ -22,14 +29,11 @@ namespace dive
 		unsigned int GetHeight() const { return m_Height; }
 
 	protected:
-		ID3D11Device* m_pDevice = nullptr;
 
 		unsigned int m_Width	= 0;
 		unsigned int m_Height	= 0;
 		
 		// ansioLevel
-		D3D11_FILTER m_FilterMode					= D3D11_FILTER_COMPARISON_ANISOTROPIC;// filterMode
-		D3D11_TEXTURE_ADDRESS_MODE m_AddressMode	= D3D11_TEXTURE_ADDRESS_WRAP;// wrapMode
 		// mipMapBias
 	};
 }

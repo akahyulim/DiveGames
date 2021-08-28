@@ -13,15 +13,15 @@
 
 //= Renderer ======================
 #include "Src/Renderer/Graphics/GraphicsDevice.h"
+#include "Src/Renderer/Graphics/dvTexture.h"
+#include "Src/Renderer/Graphics/dvTexture2D.h"
+#include "Src/Renderer/Graphics/dvRenderTexture.h"
 #include "GraphicsInclude.h"
 #include "Src/Renderer/Renderer.h"
 #include "GBuffer.h"
 #include "VertexTypes.h"
 #include "Mesh.h"
 #include "Texture.h"
-#include "dvTexture.h"
-#include "dvTexture2D.h"
-#include "dvRenderTexture.h"
 
 //= Input =========================
 #include "Input.h"

@@ -174,9 +174,6 @@
     <ClInclude Include="DiveCore.h" />
     <ClInclude Include="DiveEngine.h" />
     <ClInclude Include="dvMath.h" />
-    <ClInclude Include="dvRenderTexture.h" />
-    <ClInclude Include="dvTexture.h" />
-    <ClInclude Include="dvTexture2D.h" />
     <ClInclude Include="GBuffer.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Event.h" />
@@ -293,6 +290,9 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Settings.h" />
+    <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h" />
+    <ClInclude Include="Src\Renderer\Graphics\dvTexture.h" />
+    <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="StringHelper.h" />
@@ -308,8 +308,6 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="dvRenderTexture.cpp" />
-    <ClCompile Include="dvTexture2D.cpp" />
     <ClCompile Include="GBuffer.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="FileStream.cpp" />
@@ -329,6 +327,8 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\Renderer_Pass.cpp" />
@@ -342,11 +342,11 @@
     <ClCompile Include="Transform_Hierarchy.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="dvTexture.txt" />
     <Text Include="Graphics.txt" />
     <Text Include="Issue.txt" />
     <Text Include="PipelineState.txt" />
     <Text Include="RenderPass.txt" />
+    <Text Include="Src\Renderer\Graphics\dvTexture.txt" />
     <Text Include="Src\Renderer\Graphics\GraphicsResources.txt" />
     <Text Include="WickedEngine%27sGraphicsSystems.txt" />
     <Text Include="구현 흐름.txt" />

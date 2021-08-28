@@ -385,15 +385,6 @@
     <ClInclude Include="ConstantBuffer.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="dvTexture.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="dvTexture2D.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="dvRenderTexture.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Texture.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
@@ -405,6 +396,15 @@
     </ClInclude>
     <ClInclude Include="Src\Renderer\Renderer.h">
       <Filter>Engine\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\dvTexture.h">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h">
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -495,12 +495,6 @@
     <ClCompile Include="ConstantBuffers.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="dvTexture2D.cpp">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="dvRenderTexture.cpp">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
@@ -515,6 +509,12 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Renderer_Resources.cpp">
       <Filter>Engine\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp">
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -575,9 +575,6 @@
     <Text Include="WickedEngine%27sGraphicsSystems.txt">
       <Filter>Engine\Renderer</Filter>
     </Text>
-    <Text Include="dvTexture.txt">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </Text>
     <Text Include="Graphics.txt">
       <Filter>Engine\Renderer\Graphics</Filter>
     </Text>
@@ -591,6 +588,9 @@
     </Text>
     <Text Include="RenderPass.txt">
       <Filter>Engine\Renderer</Filter>
+    </Text>
+    <Text Include="Src\Renderer\Graphics\dvTexture.txt">
+      <Filter>Engine\Renderer\Graphics</Filter>
     </Text>
   </ItemGroup>
 </Project>
