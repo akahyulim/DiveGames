@@ -3,7 +3,7 @@
 #include "Transform.h"
 #include "DiveCore.h"
 #include "FileStream.h"
-#include "Src/Renderer/Graphics/dvRenderTexture.h"
+#include "Src/Renderer/Graphics/dvCubemap.h"
 
 /*
 * ClearFlags에 맞춰 RenderTargetView, DepthStencilView를 Clear 여부를 적용한다.

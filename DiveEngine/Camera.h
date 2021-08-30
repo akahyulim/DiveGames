@@ -5,7 +5,7 @@
 namespace dive
 {
 	class GameObject;
-	class dvRenderTexture;
+	class dvCubemap;
 
 	enum class eProjectionType
 	{
@@ -81,8 +81,8 @@ namespace dive
 		DirectX::XMFLOAT4X4 GetViewProjection() const;
 		DirectX::XMMATRIX GetViewProjectionMatrix() const { return GetViewMatrix() * GetProjectionMatrix(); }
 
-		dvRenderTexture* GetTargetTexture() { return m_pTargetTexture; }
-		void SetTargetTexture(dvRenderTexture* pTexture) { m_pTargetTexture = pTexture; }
+		dvCubemap* GetTargetTexture() { return m_pTargetTexture; }
+		void SetTargetTexture(dvCubemap* pTexture) { m_pTargetTexture = pTexture; }
 
 		// Viewport
 		D3D11_VIEWPORT GetViewport() const { return m_Viewport; }
@@ -125,7 +125,7 @@ namespace dive
 		DirectX::XMFLOAT4X4 m_View;
 		DirectX::XMFLOAT4X4 m_Projection;
 
-		dvRenderTexture* m_pTargetTexture;
+		dvCubemap* m_pTargetTexture;
 
 		static std::vector<Camera*> s_Cameras;
 

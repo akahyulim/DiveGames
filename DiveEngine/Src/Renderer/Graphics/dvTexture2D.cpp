@@ -5,108 +5,79 @@
 
 namespace dive
 {
-	// 유니티에서는 밉맵도 생성했다는데 몇개를 만들어야 할 지 모르겠다.
-	// 용도는 색상을 직접 채워넣는 것이다.
-	dvTexture2D::dvTexture2D(ID3D11Device* pDevice, unsigned int width, unsigned int height)
-		: dvTexture(typeid(dvTexture2D).hash_code(), pDevice)
+	// create texture2d
+	bool CreateTextureResource(ID3D11Device* pDevice, ID3D11Texture2D** ppResource, unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned int arraySize, unsigned int mipCount,
+		unsigned int bindFlags)
 	{
-		m_Width = width;
-		m_Height = height;
-		m_Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		DV_ASSERT(pDevice);
 
+		D3D11_TEXTURE2D_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Width = width;
+		desc.Height = height;
+		desc.ArraySize = arraySize; 
+		desc.BindFlags = bindFlags;
+		desc.Format = format;
+		desc.MipLevels = mipCount;
+		desc.Usage;
+
+		// sub resource 
+
+		if (FAILED(pDevice->CreateTexture2D(&desc, nullptr, ppResource)))
 		{
-			D3D11_TEXTURE2D_DESC desc;
-			ZeroMemory(&desc, sizeof(desc));
-			desc.Format				= m_Format;
-			desc.Width				= m_Width;
-			desc.Height				= m_Height;
-			desc.MipLevels			= 1;
-			desc.ArraySize			= 1;
-			desc.BindFlags			= D3D11_BIND_SHADER_RESOURCE;
-			desc.Usage				= D3D11_USAGE_DYNAMIC;
-			desc.CPUAccessFlags		= D3D11_CPU_ACCESS_WRITE;
-			desc.SampleDesc.Count	= 1;
-
-			if (FAILED(pDevice->CreateTexture2D(&desc, nullptr, m_pBuffer.GetAddressOf())))
-			{
-				CORE_ERROR("");
-				return;
-			}
+			return false;
 		}
-
-		{
-			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-			ZeroMemory(&desc, sizeof(desc));
-			desc.Format						= m_Format;
-			desc.ViewDimension				= D3D11_SRV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipLevels		= 1;
-			desc.Texture2D.MostDetailedMip	= 0;
-
-			if (FAILED(pDevice->CreateShaderResourceView(m_pBuffer.Get(), &desc, m_pShaderResourceView.GetAddressOf())))
-			{
-				CORE_ERROR("");
-				return;
-			}
-		}
+		return true;
 	}
 
-	// 여기에선 ID3D11Texture2D를 구하지 않았다.
-	dvTexture2D::dvTexture2D(ID3D11Device* pDevice, const std::string& filepath, bool hasMipMap)
-		: dvTexture(typeid(dvTexture2D).hash_code(), pDevice)
+	bool CraeteShaderResourceView(ID3D11Device* pDevice, ID3D11ShaderResourceView** ppShaderResourceView, DXGI_FORMAT format)
 	{
-		if (!FileSystemHelper::FileExists(filepath))
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+
+		return true;
+	}
+
+	bool CraeteRenderTargetView(ID3D11Device* pDevice, ID3D11RenderTargetView** ppRenderTargetView, DXGI_FORMAT format)
+	{
+		D3D11_RENDER_TARGET_VIEW_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Format = format;
+		// array size가 필요하다...
+
+		return true;
+	}
+
+	bool CraeteDepthStencilView(ID3D11Device* pDevice, ID3D11DepthStencilView** ppDepthStencilView, DXGI_FORMAT format)
+	{
+		D3D11_DEPTH_STENCIL_VIEW_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+
+		return true;
+	}
+
+	// 단일 텍스쳐
+	// 텍스쳐 배열
+	// 그리고 mipmap 및
+	// sub rsource 사용시
+	// 생성법을 완벽히 숙지해야 한다.
+	void dvTexture2D::createResourceAndViews(ID3D11Device* pDevice)
+	{
+		// Resource
+		if (!CreateTextureResource(pDevice, m_pResource.GetAddressOf(), m_Width, m_Height, m_Format, m_ArraySize, m_MipCount, m_BindFlags))
 		{
-			CORE_ERROR("");
 			return;
 		}
 
-		auto file = StringHelper::Utf8ToUtf16(filepath);
-		DirectX::ScratchImage image;
+		// SRV
 
-		if (FAILED(DirectX::LoadFromWICFile(file.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, image)))
+		if (m_BindFlags & D3D11_BIND_RENDER_TARGET)
 		{
-			CORE_ERROR("");
-			return;
+			// RTV
 		}
-
-		if (hasMipMap)
+		else if (m_BindFlags & D3D11_BIND_DEPTH_STENCIL)
 		{
-			DirectX::ScratchImage mipChain;
-
-			if (FAILED(DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(), image.GetMetadata(), DirectX::TEX_FILTER_DEFAULT, 0, mipChain)))
-			{
-				CORE_ERROR("");
-				return;
-			}
-
-
-			if (FAILED(DirectX::CreateShaderResourceView(pDevice, mipChain.GetImages(), mipChain.GetImageCount(), mipChain.GetMetadata(), m_pShaderResourceView.GetAddressOf())))
-			{
-				CORE_ERROR("");
-				return;
-			}
-
-			setMetadata(mipChain.GetMetadata());
+			// DSV
 		}
-		else
-		{
-			if (FAILED(DirectX::CreateShaderResourceView(pDevice, image.GetImages(), image.GetImageCount(), image.GetMetadata(), m_pShaderResourceView.GetAddressOf())))
-			{
-				CORE_ERROR("");
-				return;
-			}
-
-			setMetadata(image.GetMetadata());
-		}
-
-		SetName(FileSystemHelper::GetFilenameWithoutExtension(filepath));
-	}
-
-	void dvTexture2D::setMetadata(const DirectX::TexMetadata& data)
-	{
-		m_Width			= static_cast<unsigned int>(data.width);
-		m_Height		= static_cast<unsigned int>(data.height);
-		m_Format		= data.format;
-		m_MipmapCount	= static_cast<unsigned int>(data.mipLevels);
 	}
 }
