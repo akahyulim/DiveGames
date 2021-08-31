@@ -17,10 +17,9 @@ namespace dive
 	class dvTexture : public Object
 	{
 	public:
-		dvTexture(size_t typeHash, ID3D11Device* pDevice)
+		dvTexture(size_t typeHash)
 			: Object(typeHash)
 		{
-			DV_ASSERT(pDevice != nullptr);
 		}
 		virtual ~dvTexture() = default;
 
@@ -30,9 +29,10 @@ namespace dive
 
 	protected:
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pResource;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pResourceView;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pShaderResourceView;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pRenderTargetView;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDepthStencilView;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDepthStencilViewReadOnly;
 
 		unsigned int m_Width	= 0;
 		unsigned int m_Height	= 0;

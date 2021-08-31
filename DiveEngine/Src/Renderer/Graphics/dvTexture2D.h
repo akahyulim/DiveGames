@@ -1,35 +1,34 @@
 #pragma once
 #include "dvTexture.h"
-#include "DirectXTex/DirectXTex.h"
 #include <string>
+#include <DirectXMath.h>
 
 namespace dive
 {
 	class dvTexture2D : public dvTexture
 	{
 	public:
-		// render target or depth stencil view
-		// 스파르탄은 이때 밉맵 생성을 지원하지 않았다.
-		dvTexture2D(ID3D11Device* pDevice, unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned int bindFlags, unsigned int arraySize = 1)
-			: dvTexture(typeid(dvTexture2D).hash_code(), pDevice)
-		{
-			// 각종 설정 초기화
-			m_Width = width;
-			m_Height = height;
-			m_Format = format;
-			m_ArraySize = arraySize;
-			m_MipCount = 1;
-			m_BindFlags = D3D11_BIND_SHADER_RESOURCE | bindFlags;
-			
-			createResourceAndViews(pDevice);
-		}
-		
+		// 결국 어떤 텍스쳐를 생성하고, 거기엔 어떤 정보가 필요한지가 중요하다.
 
-		// shader reosurce view
-		// load or 특정 색상으로 초기화
+		dvTexture2D(const std::string& name = "")
+			: dvTexture(typeid(dvTexture2D).hash_code())  
+		{
+			SetName(name);
+		}
+
+		bool CreateColorRenderTexture(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned int mipCount = 1);
+
+		bool CreateDepthRenderTexture(unsigned int width, unsigned int height, DXGI_FORMAT format, bool readOnly = false, unsigned int mipCount = 1);
+
+		bool LoadFromFile(const std::string& filepath, bool createMips = false);
+		bool SaveToFile(const std::string& filepath);
+
+		void Clear();
+
+
+		// static 함수로 특정 색상의 텍스쳐를 생성 = 유니티에 있었던 것 같다.
 
 	private:
-		void createResourceAndViews(ID3D11Device* pDevice);
 
 	private:
 	};
