@@ -43,11 +43,22 @@ Texture의 구성
 	- 빈 텍스쳐, 특정 색상 텍스쳐를 생성할 수 있다.
 	- 생성된 텍스쳐의 특정 픽셀 데이터를 가져오거나 변경할 수 있다.
 	- 생성된 텍스쳐의 크기를 변경할 수 있다.
-- RenderTarget
+	- LoadImage()로 byte 배열에서 Image를 Load할 수 있다.
+	=> Cubemap이 없다.
+- RenderTexture
 : 무조건 DSV를 만드는 것인지, Cubemap은 어떻게 만드는 것인지 생각해보자.
 	- 텍스쳐 위에 렌더링 결과물을 그리는데 사용한다.
 	- IsCubemap으로 cubemap 사용 설정이 가능하다.
 	- Rendering 된 값은 결국 사용해야 한다. 즉, ShaderResourceView도 가질 것이다.
+	=> 검색을 해보니 Texture2D::LoadImage()로 RenderTexture를 읽어낸다... 
+	=> 예제가 두 개나 있어 확실한 것 같은데... 이러면 cubemap이 에바잖아...
+	=> 굳이 이를 따를 필요가 있나 싶다..
+- Load
+	- 1. Resources라는 객체를 통해 파일을 특정 리소스 타입으로 리턴받는다.
+	예) Resources.Load<Texture2D>("Textures/" + name);
+	- 2. File.IO를 통해 byte array로 읽은 후 Load한다.
+	예) byte[] tex = System.IO.File.ReadAllBytes(path);
+		texture.Load(tex);
 
 RasterTek
 - TextureClass

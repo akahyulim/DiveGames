@@ -8,186 +8,82 @@ using namespace DirectX;
 
 namespace dive
 {
-	// create texture2d
-	bool CreateTextureResource(ID3D11Device* pDevice, ID3D11Texture2D** ppResource, unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned int arraySize, unsigned int mipCount,
-		unsigned int bindFlags)
+	// ResourceManager::Load<Texture2D>("filepath")에서
+	// 파일 파싱 데이터를 기반(size, format)으로 Texture 생성 후
+	// Texture2D::LoadData()로 raw data를 받고
+	// 마지막으로 Apply를 해서 srv를 생성한다.
+	// => 잘못 정리했다.
+	// SetPixel()에만 Apply()가 필요하고
+	// LoadData()에는 필요 없다고 한다.
+	void dvTexture2D::Apply()
 	{
-		DV_ASSERT(pDevice);
-
-		D3D11_TEXTURE2D_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Width = width;
-		desc.Height = height;
-		desc.ArraySize = arraySize; 
-		desc.BindFlags = bindFlags;
-		desc.Format = format;
-		desc.MipLevels = mipCount;
-		desc.SampleDesc.Count = 1;	// ?
-		desc.SampleDesc.Quality = 0;
-		desc.Usage;
-		desc.CPUAccessFlags;
-
-		// sub resource 
-		// 이걸 일단 받아와야지 존재하는지 아닌지 알 수 있다...
-		vector<D3D11_SUBRESOURCE_DATA> datas;
-		// 단일 혹은 mipmap일 수 있다. 물론 array일수도...
-
-		if (FAILED(pDevice->CreateTexture2D(&desc, datas.data(), ppResource)))
+		// update subresource
+		if(!m_data.empty())
 		{
-			return false;
-		}
-		return true;
-	}
-
-	bool CreateShaderResourceView(ID3D11Device* pDevice, ID3D11Resource* pResource, ID3D11ShaderResourceView** ppShaderResourceView, DXGI_FORMAT format)
-	{
-		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Format = format;
-		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		desc.Texture2D.MipLevels;
-		desc.Texture2D.MostDetailedMip;
-
-		if (FAILED(pDevice->CreateShaderResourceView(pResource, &desc, ppShaderResourceView)))
-		{
-			CORE_ERROR("");
-			return false;
+			// 계산법을 알아야 한다. channel때문에 4인것 같고, unsigned char는 byte인 것 같은데...
+			unsigned int rowPitch = (m_Width * 4) * sizeof(unsigned char);
+			m_pDeviceContext->UpdateSubresource(m_pResource.Get(), 0, nullptr, m_data.data(), rowPitch, 0);
 		}
 
-		return true;
-	}
-
-	bool CreateRenderTargetView(ID3D11Device* pDevice, ID3D11Resource* pResource, ID3D11RenderTargetView** ppRenderTargetView, DXGI_FORMAT format)
-	{
-		D3D11_RENDER_TARGET_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Format = format;
-		desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-		desc.Texture2D.MipSlice;
-		
-		if (FAILED(pDevice->CreateRenderTargetView(pResource, &desc, ppRenderTargetView)))
+		// create shader resource view
 		{
-			CORE_ERROR("");
-			return false;
-		}
+			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));
+			desc.Format = m_Format;
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MostDetailedMip = 0;
+			desc.Texture2D.MipLevels = -1;
 
-		return true;
-	}
-
-	bool CreateDepthStencilView(ID3D11Device* pDevice, ID3D11Resource* pResource, ID3D11DepthStencilView** ppDepthStencilView, DXGI_FORMAT format, unsigned int flags)
-	{
-		D3D11_DEPTH_STENCIL_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Format = format;
-		desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		desc.Texture2D;
-		desc.Flags = flags;
-
-		if (FAILED(pDevice->CreateDepthStencilView(pResource, &desc, ppDepthStencilView)))
-		{
-			CORE_ERROR("");
-			return false;
-		}
-
-		return true;
-	}
-
-	// Resource의 Format으로부터
-	// SRV, RTV, DSV의 Format을 정할 수 있어야 한다.
-	DXGI_FORMAT GetDepthFormatSRV(DXGI_FORMAT format)
-	{
-		if (format == DXGI_FORMAT_R24G8_TYPELESS)
-			return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-		else if (format == DXGI_FORMAT_D32_FLOAT_S8X24_UINT)
-			return DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
-		else if (format == DXGI_FORMAT_D32_FLOAT)
-			return DXGI_FORMAT_R32_FLOAT;
-
-		return format;
-	}
-
-	DXGI_FORMAT GetDepthFormatDSV(DXGI_FORMAT format)
-	{
-		if (format == DXGI_FORMAT_R24G8_TYPELESS)
-			return DXGI_FORMAT_D24_UNORM_S8_UINT;
-		else if (format == DXGI_FORMAT_D32_FLOAT_S8X24_UINT)
-			return DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
-		else if (format == DXGI_FORMAT_D32_FLOAT)
-			return DXGI_FORMAT_D32_FLOAT;
-
-		return format;
-	}
-
-	bool dvTexture2D::CreateColorRenderTexture(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned int mipCount)
-	{
-		Clear();
-
-		m_Width = width;
-		m_Height = height;
-		m_Format = format;
-		m_MipCount = mipCount;
-		m_BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-
-		// temp : 어떻게 얻어야 할 지 좀 더 생각해보자.
-		ID3D11Device* pDevice = nullptr;
-
-		// Resource
-		if (!CreateTextureResource(pDevice, m_pResource.GetAddressOf(), m_Width, m_Height, m_Format, m_ArraySize, m_MipCount, m_BindFlags))
-			return false;
-
-		// SRV
-		if (!CreateShaderResourceView(pDevice, m_pResource.Get(), m_pShaderResourceView.GetAddressOf(), m_Format))
-			return false;
-
-		// RTV
-		if (!CreateRenderTargetView(pDevice, m_pResource.Get(), m_pRenderTargetView.GetAddressOf(), m_Format))
-			return false;
-
-		return true;
-	}
-
-	bool dvTexture2D::CreateDepthRenderTexture(unsigned int width, unsigned int height, DXGI_FORMAT format, bool readOnly, unsigned int mipCount)
-	{
-		Clear();
-
-		m_Width = width;
-		m_Height = height;
-		m_Format = format;
-		m_MipCount = mipCount;
-		m_BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
-
-		// temp : 어떻게 얻어야 할 지 좀 더 생각해보자.
-		ID3D11Device* pDevice = nullptr;
-
-		// Resource
-		if (!CreateTextureResource(pDevice, m_pResource.GetAddressOf(), m_Width, m_Height, m_Format, m_ArraySize, m_MipCount, m_BindFlags))
-			return false;
-
-		// SRV
-		if (!CreateShaderResourceView(pDevice, m_pResource.Get(), m_pShaderResourceView.GetAddressOf(), GetDepthFormatSRV(m_Format)))
-			return false;
-
-		// DSV
-		{
-			if (!CreateDepthStencilView(pDevice, m_pResource.Get(), m_pDepthStencilView.GetAddressOf(), GetDepthFormatDSV(m_Format), 0))
-				return false;
-
-			if (readOnly)
+			if (FAILED(m_pDevice->CreateShaderResourceView(m_pResource.Get(), &desc, m_pShaderResourceView.GetAddressOf())))
 			{
-				if (!CreateDepthStencilView(pDevice, m_pResource.Get(), m_pDepthStencilViewReadOnly.GetAddressOf(), GetDepthFormatDSV(m_Format), D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL))
-					return false;
+				CORE_ERROR("");
+				return;
 			}
 		}
 
+		// generate mipmaps
+		if(m_bMipmaps)
+		{
+			m_pDeviceContext->GenerateMips(m_pShaderResourceView.Get());
+		}
+	}
+
+	// 내부에서 Apply()를 호출하던가 아니면 Apply()구현을 없애고 이 곳에 넣어야 한다. 
+	bool dvTexture2D::LoadData(const std::vector<std::byte>& data)
+	{
+		if (data.empty())
+			return false;
+
+		// 이외에 false가 될 이유는...?
+
+		// Apply()를 사용하려면 복사부터 해야 한다.
+		// 그런데 굳이...? 
+
 		return true;
 	}
 
-	void dvTexture2D::Clear()
+	bool dvTexture2D::createResource()
 	{
-		m_pResource.Reset();
-		m_pShaderResourceView.Reset();
-		m_pRenderTargetView.Reset();
-		m_pDepthStencilView.Reset();
-		m_pDepthStencilViewReadOnly.Reset();
+		D3D11_TEXTURE2D_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Width = m_Width;
+		desc.Height = m_Height;
+		desc.Format = m_Format;
+		desc.ArraySize = m_ArraySize;
+		desc.MipLevels = m_bMipmaps ? 0 : 1;
+		desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		desc.SampleDesc.Count = 1;
+		desc.SampleDesc.Quality = 0;
+		desc.CPUAccessFlags = 0;
+		desc.MiscFlags = m_bMipmaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+
+		if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, m_pResource.GetAddressOf())))
+		{
+			CORE_ERROR("");
+			return false;
+		}
+
+		return false;
 	}
 }

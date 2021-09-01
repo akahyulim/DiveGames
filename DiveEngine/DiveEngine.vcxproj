@@ -291,6 +291,7 @@
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvCubemap.h" />
+    <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvTexture.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
@@ -328,6 +329,7 @@
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\dvCubemap.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />

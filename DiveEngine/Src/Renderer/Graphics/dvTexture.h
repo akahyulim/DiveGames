@@ -28,16 +28,14 @@ namespace dive
 		unsigned int GetHeight() const { return m_Height; }
 
 	protected:
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pResource;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_pShaderResourceView;
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pRenderTargetView;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDepthStencilView;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDepthStencilViewReadOnly;
+		ID3D11Device* m_pDevice = nullptr;
+		ID3D11DeviceContext* m_pDeviceContext = nullptr;
 
 		unsigned int m_Width	= 0;
 		unsigned int m_Height	= 0;
 		DXGI_FORMAT m_Format = DXGI_FORMAT_UNKNOWN;
 		unsigned int m_ArraySize = 0;
+		bool m_bMipmaps = false;
 		unsigned int m_MipCount = 0;
 		unsigned int m_BindFlags = 0;
 		
