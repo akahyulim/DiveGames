@@ -28,18 +28,11 @@ namespace dive
 		unsigned int GetHeight() const { return m_Height; }
 
 	protected:
-		ID3D11Device* m_pDevice = nullptr;
-		ID3D11DeviceContext* m_pDeviceContext = nullptr;
-
-		unsigned int m_Width	= 0;
-		unsigned int m_Height	= 0;
-		DXGI_FORMAT m_Format = DXGI_FORMAT_UNKNOWN;
-		unsigned int m_ArraySize = 0;
-		bool m_bMipmaps = false;
-		unsigned int m_MipCount = 0;
-		unsigned int m_BindFlags = 0;
-		
 		// ansioLevel
 		// mipMapBias
+		// filter mode
+		// wrap mode
+		unsigned int m_Width = 0;
+		unsigned int m_Height = 0;
 	};
 }

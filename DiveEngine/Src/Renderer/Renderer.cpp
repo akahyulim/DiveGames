@@ -11,6 +11,8 @@
 #include "../Camera.h"
 #include "../DiveCore.h"
 
+#include "Graphics/dvTexture2D.h"
+
 namespace dive
 {
 	Renderer::Renderer()
@@ -68,6 +70,10 @@ namespace dive
 		createFonts();
 
 		createPipelineStates();	// 가장 마지막이어야 한다.
+
+		// 그냥 테스트
+		dvTexture2D dvTex(600, 400, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+		dvTex.Apply();
 		
 		CORE_TRACE("Renderer 초기화에 성공하였습니다.");
 	}

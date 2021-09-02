@@ -8,6 +8,22 @@ using namespace DirectX;
 
 namespace dive
 {
+	unsigned int GetChannelCount(DXGI_FORMAT format)
+	{
+		unsigned int channelCount = 0;
+
+		switch (format)
+		{
+		case DXGI_FORMAT_R8G8B8A8_UNORM:
+			channelCount = 4;
+			break;
+		default:
+			break;
+		}
+
+		return channelCount;
+	}
+
 	// ResourceManager::Load<Texture2D>("filepath")에서
 	// 파일 파싱 데이터를 기반(size, format)으로 Texture 생성 후
 	// Texture2D::LoadData()로 raw data를 받고
@@ -21,7 +37,10 @@ namespace dive
 		if(!m_data.empty())
 		{
 			// 계산법을 알아야 한다. channel때문에 4인것 같고, unsigned char는 byte인 것 같은데...
-			unsigned int rowPitch = (m_Width * 4) * sizeof(unsigned char);
+			// 즉, format으로부터 channel count를 계산할 수 있어야 한다.
+			unsigned int rowPitch = (m_Width * GetChannelCount(m_Format)) * sizeof(unsigned char);
+
+			// mipmap별 get / set을 하려면 map을 통해 타겟을 설정해야 한다.
 			m_pDeviceContext->UpdateSubresource(m_pResource.Get(), 0, nullptr, m_data.data(), rowPitch, 0);
 		}
 
@@ -29,10 +48,10 @@ namespace dive
 		{
 			D3D11_SHADER_RESOURCE_VIEW_DESC desc;
 			ZeroMemory(&desc, sizeof(desc));
-			desc.Format = m_Format;
-			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MostDetailedMip = 0;
-			desc.Texture2D.MipLevels = -1;
+			desc.Format						= m_Format;
+			desc.ViewDimension				= D3D11_SRV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MostDetailedMip	= 0;
+			desc.Texture2D.MipLevels		= -1;
 
 			if (FAILED(m_pDevice->CreateShaderResourceView(m_pResource.Get(), &desc, m_pShaderResourceView.GetAddressOf())))
 			{
@@ -45,10 +64,17 @@ namespace dive
 		if(m_bMipmaps)
 		{
 			m_pDeviceContext->GenerateMips(m_pShaderResourceView.Get());
+
+			D3D11_TEXTURE2D_DESC desc;
+			m_pResource->GetDesc(&desc);
+			m_MipmapCount = desc.MipLevels;
 		}
 	}
 
-	// 내부에서 Apply()를 호출하던가 아니면 Apply()구현을 없애고 이 곳에 넣어야 한다. 
+	// 내부에서 Apply()를 호출하던가 아니면 Apply()구현을 없애고 이 곳에 넣어야 한다.
+	// 단순히 Data만 전달해선 안된다.
+	// 크기와 포멧을 비롯해 기타 정보를 다른 함수를 통해 전달해야 한다.
+	// 물론 크기와 포멧 그리고 mipmap 여부까지 동일하다면 그냥 써도 된다. 
 	bool dvTexture2D::LoadData(const std::vector<std::byte>& data)
 	{
 		if (data.empty())
@@ -62,28 +88,35 @@ namespace dive
 		return true;
 	}
 
+	// 1. GenerateMips()에서 D3D11_BIND_RENDER_TARGET를 필요로 한다.
+	// 2. CPU에서 Read하려면 usage를 STAGING으로 설정해야 한다. => 파이프라인 스테이지 입력으로 사용하지 못한다는 글이 있다.
+	// => LoadData를 하려면 적어도 DYNAMIC에 CPU_ACCESS_WRITE까진 해줘야 한다.
+	// => 문제는 유니티처럼 GetPixel()을 구현할 것이냐이다.
+	// 3. 애초에 문제는 mipmap생성과 dynamic & cpu_access_write 조합이 안먹히는 것이다.
+	// => BIND_RENDER_TARGET이 문제인 것 같다.
+	// => UpdateSubresource()가 해결책이 될 수 있다.
 	bool dvTexture2D::createResource()
 	{
 		D3D11_TEXTURE2D_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.Width = m_Width;
-		desc.Height = m_Height;
-		desc.Format = m_Format;
-		desc.ArraySize = m_ArraySize;
+		desc.Width				= m_Width;
+		desc.Height				= m_Height;
+		desc.Format				= m_Format;
+		desc.ArraySize			= 1;
 		desc.MipLevels = m_bMipmaps ? 0 : 1;
-		desc.Usage = D3D11_USAGE_DEFAULT;
-		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		desc.SampleDesc.Count = 1;
+		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;// m_bMipmaps ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : D3D11_BIND_SHADER_RESOURCE;
+		desc.SampleDesc.Count	= 1;
 		desc.SampleDesc.Quality = 0;
-		desc.CPUAccessFlags = 0;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;	// read까지 하려면 uasge가 staging이어야 한다.
 		desc.MiscFlags = m_bMipmaps ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
-
+		
 		if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, m_pResource.GetAddressOf())))
 		{
 			CORE_ERROR("");
 			return false;
 		}
 
-		return false;
+		return true;
 	}
 }

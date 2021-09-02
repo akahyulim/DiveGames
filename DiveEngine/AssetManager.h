@@ -4,6 +4,8 @@
 
 namespace dive
 {
+	// => 유니티에선 Resources라는 이름인 것 같다.
+
 	// 특정 경로의 프로젝트 이름으로 폴더가 생성된다.
 	// => 경로 변경이 가능하게 하려면 결국 ini 파일 등에 저장해야 한다.
 	// Assets의 Art에 Textures, Sprites, Models, Materials 등으로 나누어진다.
