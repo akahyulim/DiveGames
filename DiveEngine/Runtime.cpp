@@ -6,7 +6,7 @@
 #include "Src/Renderer/Renderer.h"
 #include "Input.h"
 #include "SceneManager.h"
-#include "AssetManager.h"
+#include "ResourceManager.h"
 #include "Event.h"
 #include "IniHelper.h"
 #include <memory>

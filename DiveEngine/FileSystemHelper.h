@@ -15,6 +15,7 @@
 
 namespace dive
 {
+	// 유니티의 경우 System.IO.File.Create, Delete, Exsist 등으로 구성되어 있다.
 	namespace FileSystemHelper
 	{
 		//= DIRECTORIES ===================================================

@@ -7,12 +7,12 @@ namespace dive
 	class Resource : public Object
 	{
 	public:
-		// 생성자부터 좀 에반데...
 		Resource(size_t typeHash) : Object(typeHash) {}
 		virtual ~Resource() = default;
 
-		virtual bool SaveToFile(const std::string& filepath) { return true; }
+		// 순수 가상 함수이면 안되나?
 		virtual bool LoadFromFile(const std::string& filepath) { return true; }
+		virtual bool SaveToFile(const std::string& filepath) { return true; }
 
 
 		// get resource type

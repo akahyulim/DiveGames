@@ -24,6 +24,29 @@ namespace dive
 		return channelCount;
 	}
 
+	bool dvTexture2D::LoadFromFile(const std::string& filepath)
+	{
+		// 포멧 확인
+
+		// 생각해보니 좀 에바다. 결국 생성자를 통해 만든 후 데이터를 집어 넣는 거잖아...
+		// 일단 과정이나 정리하자.
+		// 이름, format, size
+		// mipmap 생성 여부? => 유니티에선 on / off 밖에 없다고 한다. 직접 만든건 충돌한다고?
+		// 그리고 data
+
+		// 그냥 DirectXTex로 다 될려나...? 그렇다면 자체 포멧도 필요없다...
+		// 그럼 너무 날먹인데...? 
+
+		// 이후 texture와 srv를 생성하면 끝
+
+		return true;
+	}
+
+	bool dvTexture2D::SaveToFile(const std::string& filepath)
+	{
+		return true;
+	}
+
 	// ResourceManager::Load<Texture2D>("filepath")에서
 	// 파일 파싱 데이터를 기반(size, format)으로 Texture 생성 후
 	// Texture2D::LoadData()로 raw data를 받고

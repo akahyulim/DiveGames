@@ -7,7 +7,7 @@
 namespace dive
 {
 	class SceneManager;
-	class AssetManager;
+	class ResourceManager;
 	class RenderPath;
 
 	// m_bLockFrame은 VSync와도 연관있다.

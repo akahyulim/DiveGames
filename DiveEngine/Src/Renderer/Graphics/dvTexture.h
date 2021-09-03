@@ -1,5 +1,5 @@
 #pragma once
-#include "../Object.h"
+#include "../Resource.h"
 #include "../DiveCore.h"
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
@@ -13,12 +13,11 @@
 
 namespace dive
 {
-	// 일단 Object 상속으로 가자. Resource의 필요성을 모르겠다.
-	class dvTexture : public Object
+	class dvTexture : public Resource
 	{
 	public:
 		dvTexture(size_t typeHash)
-			: Object(typeHash)
+			: Resource(typeHash)
 		{
 		}
 		virtual ~dvTexture() = default;

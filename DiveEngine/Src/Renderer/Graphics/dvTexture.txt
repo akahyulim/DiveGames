@@ -1,32 +1,29 @@
-현재 문제점
-	- 유니티처럼 구현하면 사용자는 딱 구분해서 사용해야 하는데...
-	- 그리고 Format에 따른 구분 역시 좀 더 신경써야 한다.
-	- 여전히 Cubemap에 대해선 넘기는 중...
+결국 어떻게, 어디에 사용하느냐가 중요하다.
+- 어떻게 만들 것인가?
+	- Load
+		- ResourceManager에서 파일 경로를 받아 생성 후 dvTexture로 리턴
+		- Material 용도는 대부분 이렇게 생성
+		- 문제는 Texture2D, RenderTexture의 Interface로 구성할 것이냐
+	- 직접 생성
+		- Texture2D
+			- 크기, 포멧, 밉맵 생성여부를 전달하여 생성
+			- 처음부터 색상이 초기화된 텍스처를 생성
+			- 생성된 텍스쳐에 Data를 전달
+			=> 애초에 White, Black이 아닌 빈 SRV를 만들 필요가 있나?
+		- RenderTexture
+- 어디에 사용하는가?
+	- Texture2D
+		- Materials
+	- RenderTexture
+		- GBuffer
+		- Camera's RenderTarget
+		- Cubemap
 
 Texture의 구성
 - ID3D11Texture2D 
 - ID3D11RenderTargetView
 - ID3D11DepthStencilView
-- ID3D11ShaderResrouceView
-
-역시 용도를 확실히 정리해 두어야 할 것 같다.
-- Material
-: 대부분 Import(Load)하여 생성한다.
-	- Shader Resource View로 활용한다.
-	- Diffuse: 손맵이다. Albedo랑은 다르다.
-	- Normal & Height Map
-		- 둘 다 Bump Map이지만 표현방법이 달라 색도 다르다.
-		- Format은 다 동일해도 되나?
-		- Import할 때 Normal 혹은 Height Map임을 설정해야 한다.
-- RenderTarget
-	- SRV는 물론 RTV + DSV로 활용한다.
-	- 역시 용도별 Format이 다를 수 밖에 없다.
-	- GBuffer
-	- Camera's RenderTarget
-	- Cubemap
-		- Import도 가능해야 한다.
-
-	
+- ID3D11ShaderResrouceView	
 
 유니티
 - Texture

@@ -61,9 +61,6 @@
     <ClInclude Include="MeshRenderer.h">
       <Filter>Engine\Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="AssetManager.h">
-      <Filter>Engine\Resource</Filter>
-    </ClInclude>
     <ClInclude Include="External\spdlog\async.h">
       <Filter>External\spdlog</Filter>
     </ClInclude>
@@ -409,6 +406,9 @@
     <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Engine\Resource</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -446,9 +446,6 @@
     </ClCompile>
     <ClCompile Include="MeshRenderer.cpp">
       <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetManager.cpp">
-      <Filter>Engine\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Light.cpp">
       <Filter>Engine\Scene\Components</Filter>
@@ -521,6 +518,9 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp">
       <Filter>Engine\Renderer\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Engine\Resource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
