@@ -2,7 +2,7 @@
 #include "Widget.h"
 #include "DragDrop.h"
 
-namespace editor
+namespace Editor
 {
 	class Hierarchy : public Widget
 	{

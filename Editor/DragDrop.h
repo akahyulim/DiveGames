@@ -2,7 +2,7 @@
 #include "External/ImGui/imgui.h"
 #include <variant>
 
-namespace editor
+namespace Editor
 {
 	enum class eDragPayloadType
 	{

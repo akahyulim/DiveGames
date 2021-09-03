@@ -11,6 +11,10 @@
 #include "RenderPath.h"
 #include "RenderPath3D.h"
 
+//= Resource ======================
+#include "Resource.h"
+#include "ResourceManager.h"
+
 //= Renderer ======================
 #include "Src/Renderer/Graphics/GraphicsDevice.h"
 #include "Src/Renderer/Graphics/dvTexture.h"

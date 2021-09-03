@@ -3,7 +3,7 @@
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
 
-namespace editor
+namespace Editor
 {
 	class Editor;
 

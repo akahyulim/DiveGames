@@ -1,7 +1,7 @@
 #include "Scene.h"
 
 // Renderer로부터 Image를 가져와 출력한다.
-namespace editor
+namespace Editor
 {
     Scene::Scene(Editor* pEditor)
         : Widget(pEditor)

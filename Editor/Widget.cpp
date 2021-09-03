@@ -1,7 +1,7 @@
 #include "Widget.h"
 #include "Editor.h"
 
-namespace editor
+namespace Editor
 {
 	Widget::Widget(Editor* pEditor)
 	{

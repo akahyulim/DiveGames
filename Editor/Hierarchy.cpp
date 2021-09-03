@@ -17,7 +17,7 @@
 // 예전에는 전역 변수로 접근했다.
 
 
-namespace editor
+namespace Editor
 {
     Hierarchy::Hierarchy(Editor* pEditor)
         : Widget(pEditor)

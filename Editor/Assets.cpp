@@ -1,6 +1,6 @@
 #include "Assets.h"
 
-namespace editor
+namespace Editor
 {
 	Assets::Assets(Editor* pEditor)
 		: Widget(pEditor)

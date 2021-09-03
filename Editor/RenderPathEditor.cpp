@@ -1,6 +1,6 @@
 #include "RenderPathEditor.h"
 
-namespace editor
+namespace Editor
 {
 	RenderPathEditor::RenderPathEditor()
 	{

@@ -2,7 +2,7 @@
 #include "DiveEngine.h"
 
 // 그러고보니 namespace가 좀 에바같다.
-namespace editor
+namespace Editor
 {
 	class RenderPathEditor : public dive::RenderPath
 	{

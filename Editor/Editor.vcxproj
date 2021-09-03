@@ -149,6 +149,7 @@
     <ClInclude Include="Assets.h" />
     <ClInclude Include="DragDrop.h" />
     <ClInclude Include="External\ImGui\imgui_stdlib.h" />
+    <ClInclude Include="Importer\ImageImporter.h" />
     <ClInclude Include="Inspector.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EntryPoint.h" />
@@ -173,6 +174,7 @@
   <ItemGroup>
     <ClCompile Include="Assets.cpp" />
     <ClCompile Include="External\ImGui\imgui_stdlib.cpp" />
+    <ClCompile Include="Importer\ImageImporter.cpp" />
     <ClCompile Include="Inspector.cpp" />
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EntryPoint.cpp" />

@@ -4,7 +4,7 @@
 #include "External/ImGui/imgui_internal.h"
 #include <Windows.h>
 
-namespace editor
+namespace Editor
 {
 	MenuBar::MenuBar(Editor* pEditor)
 		: Widget(pEditor)

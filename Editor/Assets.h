@@ -1,7 +1,7 @@
 #pragma once
 #include "Widget.h"
 
-namespace editor
+namespace Editor
 {
 	class Assets : public Widget
 	{
