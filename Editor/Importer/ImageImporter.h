@@ -1,5 +1,6 @@
 #pragma once
 #include "DiveEngine.h"
+#include "FreeImage/FreeImage.h"
 
 namespace Editor
 {

@@ -10,6 +10,7 @@
 #include "Inspector.h"
 #include <iostream>
 
+#include "Importer/ImageImporter.h"
 
 namespace Editor
 {
@@ -40,6 +41,10 @@ namespace Editor
 		ActivatePath(&m_RenderPathEditor);
 
 		APP_TRACE("Editor::Initialize()");
+
+		// test
+		Importer::ImageImporter imgImport;
+		imgImport.Load("../Assets/Textures/choa.jpg", nullptr);
 
 		return true;
 	}

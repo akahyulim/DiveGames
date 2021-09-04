@@ -598,5 +598,8 @@
     <Text Include="Src\Renderer\Graphics\dvTexture.txt">
       <Filter>Engine\Renderer\Graphics</Filter>
     </Text>
+    <Text Include="LoadFromFile.txt">
+      <Filter>Engine\Renderer\Graphics</Filter>
+    </Text>
   </ItemGroup>
 </Project>

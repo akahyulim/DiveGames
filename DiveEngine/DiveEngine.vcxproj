@@ -346,6 +346,7 @@
   <ItemGroup>
     <Text Include="Graphics.txt" />
     <Text Include="Issue.txt" />
+    <Text Include="LoadFromFile.txt" />
     <Text Include="PipelineState.txt" />
     <Text Include="RenderPass.txt" />
     <Text Include="Src\Renderer\Graphics\dvTexture.txt" />

@@ -1,0 +1,29 @@
+
+Texture를 생성하는 File은 두 개로 나뉜다.
+	- 외부 Format File
+		- Importer를 통해 데이터를 읽어들인 후 Texture를 만들어야 한다.
+	- Engine Format File
+		- SaveToFile()로 생성한다.
+
+
+Texture Import
+	- size, format, data 그리고 기타(channel count, bytes per pixel, 투명화 유무)
+	- 이미 생성된 Texture를 재구성할 수 밖에 없다.
+		- ResourceManager의 관리대상이다. 따라서 외부에서 생성한 후 Importer에 넘길 수 밖에 없다.
+			- 정 안되면 Importer내부에서 생성한 후 ResourceManager에 등록하는 방법도 있다.
+				- 이렇게 한다면 생성자를 통해 만들 수 있다.
+		- 기존 Resource들을 초기화한 후 데이터들을 다시 전달 받아야 한다. 그리고 다시 Resource들을 생성해야 한다.
+			- 데이터들을 전달 받는건 멤버 함수로 충분하다.
+			- Load() 같은 함수로 이미지 데이터를 전달 받은 후 Resource 초기화 후 재생성을 시도해 볼 수 있다.
+
+ResourceManager
+	- Create<Texture>();
+Importer
+	- Load(path, pTexture, generateMips);
+		- Imager File Parsing
+	Texture
+		- SetWidth(), SetHeight(), SetFormat()
+		- Load(Parsing Image Data);
+			- 기존 Resource Relase 후 다시 생성
+		=> 과정이 너무 구리다. 역시 직접 생성 후 ResourceManager에 등록하는 편이 나으려나...?
+		=> 실제로 Spratan의 ResourceCache에도 Cache라는 함수가 존재한다.
