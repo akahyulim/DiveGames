@@ -162,7 +162,6 @@ namespace dive
 				CORE_ERROR("");
 				return false;
 			}
-			
 
 			if (FAILED(DirectX::CreateShaderResourceView(pDevice, mipChain.GetImages(), mipChain.GetImageCount(), mipChain.GetMetadata(), m_pShaderResourceView.GetAddressOf())))
 			{

@@ -42,10 +42,6 @@ namespace Editor
 
 		APP_TRACE("Editor::Initialize()");
 
-		// test
-		Importer::ImageImporter imgImport;
-		imgImport.Load("../Assets/Textures/choa.jpg", nullptr);
-
 		return true;
 	}
 
