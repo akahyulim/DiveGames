@@ -601,5 +601,8 @@
     <Text Include="LoadFromFile.txt">
       <Filter>Engine\Renderer\Graphics</Filter>
     </Text>
+    <Text Include="ResourceManager.txt">
+      <Filter>Engine\Resource</Filter>
+    </Text>
   </ItemGroup>
 </Project>

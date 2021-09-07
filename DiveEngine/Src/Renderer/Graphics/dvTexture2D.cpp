@@ -2,6 +2,7 @@
 #include "../FileSystemHelper.h"
 #include "../StringHelper.h"
 #include "../Log.h"
+#include "../External/DirectXTex/DirectXTex.h"
 
 using namespace std;
 using namespace DirectX;
@@ -32,30 +33,32 @@ namespace dive
 		return channelCount;
 	}
 
-	bool dvTexture2D::SaveToFile(const std::string& filepath)
+	bool dvTexture2D::LoadFromFile(const std::string& filepath, bool generateMips)
 	{
-		// 파일을 직접 생성하나?
-		// 여튼간에 파일 유무 확인이 필요하다.
+		if (!FileSystemHelper::FileExists(filepath))
+			return false;
 
-		// data가 있어야 한다.
+		m_pResource.Reset();
+		m_pShaderResourceView.Reset();
 
-		return true;
-	}
+		DirectX::ScratchImage image;
+		if (FAILED(DirectX::LoadFromWICFile(StringHelper::Utf8ToUtf16(filepath).c_str(), DirectX::WIC_FLAGS_NONE, nullptr, image)))
+		{
+			CORE_ERROR("");
+			return false;
+		}
 
-	bool dvTexture2D::LoadFromFile(const std::string& filepath)
-	{
-		// 포멧 확인
+		const auto& data = image.GetMetadata();
+		m_Width = static_cast<unsigned int>(data.width);
+		m_Height = static_cast<unsigned int>(data.height);
+		m_Format = data.format;
+		m_bMipmaps = generateMips;
 
-		// 생각해보니 좀 에바다. 결국 생성자를 통해 만든 후 데이터를 집어 넣는 거잖아...
-		// 일단 과정이나 정리하자.
-		// 이름, format, size
-		// mipmap 생성 여부? => 유니티에선 on / off 밖에 없다고 한다. 직접 만든건 충돌한다고?
-		// 그리고 data
+		if (!createResource())
+			return false;
 
-		// 그냥 DirectXTex로 다 될려나...? 그렇다면 자체 포멧도 필요없다...
-		// 그럼 너무 날먹인데...? 
-
-		// 이후 texture와 srv를 생성하면 끝
+		if (!LoadData(image.GetPixels()))
+			return false;
 
 		return true;
 	}

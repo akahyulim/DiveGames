@@ -349,6 +349,7 @@
     <Text Include="LoadFromFile.txt" />
     <Text Include="PipelineState.txt" />
     <Text Include="RenderPass.txt" />
+    <Text Include="ResourceManager.txt" />
     <Text Include="Src\Renderer\Graphics\dvTexture.txt" />
     <Text Include="Src\Renderer\Graphics\GraphicsResources.txt" />
     <Text Include="WickedEngine%27sGraphicsSystems.txt" />

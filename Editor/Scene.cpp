@@ -1,5 +1,4 @@
 #include "Scene.h"
-#include "Importer/ImageImporter.h"
 
 // Renderer로부터 Image를 가져와 출력한다.
 namespace Editor
@@ -16,10 +15,9 @@ namespace Editor
         //m_pScene = &dive::Scene::GetGlobalScene();
         m_pRenerer = &dive::Renderer::GetInstance();
 
-        // test
-        Importer::ImageImporter imp;
-        //m_pChoA = imp.Load("../Assets/Textures/Choa.jpg", false);
-        //m_pChoA = imp.LoadFile(L"../Assets/Textures/stars.jpg");
+        // test 
+        m_pChoA = new dive::dvTexture2D();
+        m_pChoA->LoadFromFile("../Assets/Textures/Choa.jpg", true);
     }
 
     //===================================================//

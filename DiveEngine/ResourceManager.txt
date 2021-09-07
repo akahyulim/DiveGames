@@ -1,0 +1,39 @@
+
+Spartan's ResourceManager
+- vector<shared_ptr<IResource>>로 m_resources를 관리한다.
+	- 즉, Resource 구체 Type을 구분하여 관리하진 않는다.
+- Directory를 관리한다.
+	- 전체, 타입별로 관리한다.
+- Engine Format File로부터 생성된 Resource 객체만 관리한다.
+	- Load(filepath)로부터 생성한 후 Cache()를 통해 저장한다.
+- ResourceFile
+	- SaveResourcesToFiles: m_resources의 타입과 경로를 _resources.dat라는 파일로 저장한다.
+	- LoadResourcesFromFiles: _resources.dat를 읽어 m_resources를 구성한다.
+	- 둘 다 사용하는 코드를 찾지 못했다.
+		- Scene 관리에 사용할 수 있을 것 같다.
+	- Reosurce File의 Path는 해당 IResource에서 관리한다.
+- 나머지 함수들로는 IsCached(), Get(), Remove() 등이 있다.
+
+
+생각해볼 사항
+- Engine Format이 강제된다.
+	- Wicked는 .wiscene만 존재하는 것 같다.
+	- 유니티는 자체 포멧이 눈에 띄지 않는다.
+- Load(filepath)가 Resource의 virtual fucntion으로 한정된다.
+	- Texture를 예로 들자면 Mipmap 생성을 따로 전달할 수 없게 된다. 따라서 파일에 Mip Data가 포함되어야 한다.
+		- 결국 Mipmap이란게 실행 메모리 상에만 존재하느냐, 아에 파일화하여 저장하느냐의 차이로 이해할 수 있을 것 같다.
+			- Mipmap 생성에 시간이 걸린다면 Eidtor에서 파일화한 후 Load에서 Subresource로 생성하는 편이 나을 것 같긴 하다. => 이게 Spartan의 구현이다.
+- 리소스와 실행 파일의 관계에 대한 이해가 모호하다.
+	- Editor용으로 사용하는 것인가?
+	- 릴리즈 수행시 실행 파일에 리소스가 포함되는가?
+		- 여태까지 경험에서는 그렇지 않았다. 하지만 다른 프로그램들은 리소스를 직접 찾을 수 없었다.
+
+
+Texture Import Scenario
+- Texture Folder에 다양한 format의 image file들이 있다.
+	- 최초 실행시 basic settings로 import한다. 이때 engine format으로 save도 한다.
+	- 개별 texture import settings를 이용하여 변경이 가능하다.
+		- revert or apply로 새로운 settings을 적용한 import 여부를 결정한다.
+- Texture Folder에 image file을 추가한다.
+	- 변경 사항을 인식하여 추가된 file을 import한다.
+- engine format이 우선순위가 높아야 한다? 그런데 유니티에선 engine format이 보이지 않는다.

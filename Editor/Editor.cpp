@@ -10,8 +10,6 @@
 #include "Inspector.h"
 #include <iostream>
 
-#include "Importer/ImageImporter.h"
-
 namespace Editor
 {
 	Editor::Editor()

@@ -11,6 +11,13 @@ namespace dive
 	public:
 		// map / unmap도 생각해야 하나?
 
+		dvTexture2D()
+			: dvTexture(typeid(dvTexture2D).hash_code())
+		{
+			m_pDevice = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
+			m_pDeviceContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
+		}
+
 		dvTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool generateMips = false)
 			: dvTexture(typeid(dvTexture2D).hash_code())
 		{
@@ -26,15 +33,7 @@ namespace dive
 			createResource();
 		}
 
-		// override
-		bool SaveToFile(const std::string& filepath) override;
-		bool LoadFromFile(const std::string& filepath) override;
-
-		// 유니티에서도 생성자와 매우 비슷하다고 언급한다. 존재하는 텍스쳐 객체를 다루는 점만 다르단다.
-		// 그런데 생각해보니 크기를 변경할 수 없다. 따로 알고리즘이나 함수가 필요할 것 같다.
-		// 아니 애초에 Mipmap이 존재하면 필요도 없는 행위다.
-		// 임포터를 활용한 갱신으로 사용하기엔 이름이 가지는 의미가 너무 명확해 맞지 않다.
-		bool Resize(unsigned int width, unsigned int height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool mipMap = false);
+		bool LoadFromFile(const std::string& filepath, bool generateMips = false);
 
 		void Apply();
 		bool LoadData(const std::vector<std::byte>& data);
