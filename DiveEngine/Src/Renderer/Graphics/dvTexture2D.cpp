@@ -33,7 +33,7 @@ namespace dive
 		return channelCount;
 	}
 
-	bool dvTexture2D::LoadFromFile(const std::string& filepath, bool generateMips)
+	bool dvTexture2D::LoadFromFile(const std::string& filepath)
 	{
 		if (!FileSystemHelper::FileExists(filepath))
 			return false;
@@ -52,7 +52,6 @@ namespace dive
 		m_Width = static_cast<unsigned int>(data.width);
 		m_Height = static_cast<unsigned int>(data.height);
 		m_Format = data.format;
-		m_bMipmaps = generateMips;
 
 		if (!createResource())
 			return false;

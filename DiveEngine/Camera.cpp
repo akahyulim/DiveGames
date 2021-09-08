@@ -17,6 +17,8 @@ namespace dive
 	Camera::Camera(GameObject* pGameObject)
 		: Component(typeid(Camera).hash_code(), pGameObject)
 	{
+		m_Type = eComponentType::Camera;
+
 		m_ProjectionType = eProjectionType::Perspective;
 
 		m_FieldOfView = 60.0f;

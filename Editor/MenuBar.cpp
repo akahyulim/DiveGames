@@ -173,7 +173,7 @@ namespace Editor
 					{
 						auto pGameObject = m_pScene->CreateGameObject();
 						auto pLight = pGameObject->AddComponent<dive::Light>();
-						pLight->SetType(dive::eLightType::Directional);
+						pLight->SetLightType(dive::eLightType::Directional);
 						pGameObject->SetName("Directional Light");
 					}
 

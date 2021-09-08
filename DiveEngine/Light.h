@@ -30,8 +30,10 @@ namespace dive
 		// 사실상 함수가 거의 없다.
 		// 대부분 Get / Set이다.
 
-		eLightType GetType() const { return m_Type; }
-		void SetType(eLightType type) { m_Type = type; }
+		// Component의 Type과 이름이 겹친다.
+		// 그런데... 일관성을 위해서 여긴 그대로 두는게 나을 것 같은데...
+		eLightType GetLightType() const { return m_LightType; }
+		void SetLightType(eLightType type) { m_LightType = type; }
 
 		DirectX::XMFLOAT4 GetColor() const { return m_Color; }
 		void SetColor(const DirectX::XMFLOAT4& color) { m_Color = color; }
@@ -45,7 +47,7 @@ namespace dive
 	private:
 
 	private:
-		eLightType m_Type;
+		eLightType m_LightType;
 		DirectX::XMFLOAT4 m_Color;
 		float m_Intensity;
 		float m_Range;

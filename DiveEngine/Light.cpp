@@ -9,7 +9,9 @@ namespace dive
 	Light::Light(GameObject* pGameObject)
 		: Component(typeid(Light).hash_code(), pGameObject)
 	{
-		m_Type		= eLightType::Directional;
+		m_Type = eComponentType::Light;
+
+		m_LightType	 = eLightType::Directional;
 		m_Color		= DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		m_Intensity = 1.0f;
 		m_Range		= 1.0f;
@@ -27,7 +29,7 @@ namespace dive
 	{
 		DV_ASSERT(pFileStream);
 
-		pFileStream->Write(static_cast<int>(m_Type));
+		pFileStream->Write(static_cast<int>(m_LightType));
 		pFileStream->Write(m_Color);
 		pFileStream->Write(m_Intensity);
 		pFileStream->Write(m_Range);
@@ -39,7 +41,7 @@ namespace dive
 
 		int type = 0;
 		pFileStream->Read(&type);
-		m_Type = static_cast<eLightType>(type);
+		m_LightType = static_cast<eLightType>(type);
 		pFileStream->Read(&m_Color);
 		pFileStream->Read(&m_Intensity);
 		pFileStream->Read(&m_Range);

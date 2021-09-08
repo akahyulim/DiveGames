@@ -11,6 +11,8 @@ namespace dive
 	MeshRenderer::MeshRenderer(GameObject* pGameObject)
 		: Component(typeid(MeshRenderer).hash_code(), pGameObject)
 	{
+		m_Type = eComponentType::MeshRenderer;
+
 		// 이걸 다른 곳에 전달할 필요가 없다면
 		// unique_ptr에 딱 어울린다.
 		m_pMesh = new Mesh;

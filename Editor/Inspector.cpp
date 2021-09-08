@@ -295,7 +295,7 @@ namespace Editor
 				// 중앙 정렬 같은건 없나...?
 				ImGui::Combo("##combo", &type, "Directional\0Spot\0Point");
 
-				pLight->SetType(static_cast<dive::eLightType>(type));
+				pLight->SetLightType(static_cast<dive::eLightType>(type));
 			}
 
 			// Range

@@ -50,6 +50,7 @@ namespace dive
 			pFileStream->Write(GetComponentCount());
 			for (const auto pComponent : m_Components)
 			{
+				// eComponentType을 저장토록 수정해야 한다.
 				pFileStream->Write(static_cast<unsigned int>(pComponent->GetTypeHash()));
 				pFileStream->Write(pComponent->GetInstanceID());
 			}
@@ -145,10 +146,8 @@ namespace dive
 		}
 	}
 
-	//======================================================================//
-	// 파일에 unsigned int로 저장했기에 typid.hash_code도 형변환 해야 한다.	//
-	// id 부분도 현재 마음에 들지 않는다.									//
-	//======================================================================//
+	// typeHash를 eComponentType으로 변경해야 한다.
+	// 현재 직렬화 과정에도 typeHash가 저장되고 있다.
 	Component* GameObject::AddComponent(unsigned int typeHash, unsigned int id)
 	{
 		Component* newComponent = nullptr;

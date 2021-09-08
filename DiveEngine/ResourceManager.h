@@ -12,15 +12,28 @@ namespace dive
 	class ResourceManager
 	{
 	public:
-		ResourceManager();
-		~ResourceManager();
+		static ResourceManager& GetInstance()
+		{
+			static ResourceManager instance;
+			return instance;
+		}
+
+
+		template<class T>
+		T* Cache(const T* pResource)
+		{
+			if (pResource == nullptr)
+				return nullptr;
+
+			// 이미 cache 되었다면 그냥 리턴
+
+			return dynamic_cast<T*>(m_Resources.emplace_back(pResource));
+		}
 
 		template<class T>
 		T* Load(const std::string& filepath)
 		{
 			// 파일 존재 여부
-
-			// 엔진 포멧 여부
 
 			// 스파르탄은 객체 생성 후
 			// Resource::LoadFromFile()에 path를 전달했다.
@@ -29,7 +42,19 @@ namespace dive
 			// Texture::Load()로는 Engine Format읠 모든 Data를 넘길 수 없다.
 		}
 
+		bool IsCached(const std::string& name, eResourceType type);
+
+		template<class T>
+		T* GetByName(const std::string& name)
+		{
+
+		}
+
+		
+
 	private:
+		ResourceManager();
+		~ResourceManager();
 
 	private:
 		std::vector<Resource*> m_Resources;	// shared_ptr로...?

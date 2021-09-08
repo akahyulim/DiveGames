@@ -17,7 +17,8 @@ namespace Editor
 
         // test 
         m_pChoA = new dive::dvTexture2D();
-        m_pChoA->LoadFromFile("../Assets/Textures/Choa.jpg", true);
+        m_pChoA->LoadFromFile("../Assets/Textures/Choa.jpg");
+        // ReosurceManager에 Cache한 후 사용토록 발전시키기
     }
 
     //===================================================//

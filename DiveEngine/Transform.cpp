@@ -13,6 +13,9 @@ namespace dive
 	Transform::Transform(GameObject* pGameObject)
 		: Component(typeid(Transform).hash_code(), pGameObject, this)
 	{
+		// 스파르탄은 AddComponent에서 SetType()을 통해 Entity가 직접 설정해주고 있다. 에바같은데... 
+		m_Type = eComponentType::Transform;
+
 		Clear();
 	}
 
