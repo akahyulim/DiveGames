@@ -16,9 +16,12 @@ namespace Editor
         m_pRenerer = &dive::Renderer::GetInstance();
 
         // test 
-        m_pChoA = new dive::dvTexture2D();
-        m_pChoA->LoadFromFile("../Assets/Textures/Choa.jpg");
-        // ReosurceManager에 Cache한 후 사용토록 발전시키기
+        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/choa.jpg");
+        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/dmc5.jpg");
+        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/iu.jpg");
+        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/winter.jpg");
+        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/bluePrint.jpg");
+        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/stars.jpg");
     }
 
     //===================================================//
@@ -52,9 +55,11 @@ namespace Editor
         {
             m_pRenerer->SetResolution(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
         }
+
+        auto selectedTex = dive::ResourceManager::GetInstance().GetByName<dive::dvTexture2D>("bluePrint");
     
         ImGui::Image(
-            m_pChoA ? m_pChoA->GetShaderResourceView() : 
+            selectedTex ? selectedTex->GetShaderResourceView() :
             m_pRenerer->GetFrameTexture()->GetShaderResourceView(),
             //nullptr,
             ImVec2(static_cast<float>(width), static_cast<float>(height)),

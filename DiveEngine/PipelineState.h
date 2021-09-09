@@ -9,7 +9,7 @@ namespace dive
 	// 그런데 굳이 id가 필요한가 싶다.
 	struct PipelineState : public Object
 	{
-		PipelineState() : Object(0) {}
+		PipelineState() {}
 
 		ID3D11VertexShader* pVS = nullptr;
 		ID3D11PixelShader* pPS = nullptr;

@@ -14,8 +14,5 @@ namespace Editor
 	private:
 		dive::Scene* m_pScene;
 		dive::Renderer* m_pRenerer;
-
-		// test 
-		dive::dvTexture2D* m_pChoA = nullptr;
 	};
 }

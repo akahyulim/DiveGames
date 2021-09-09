@@ -1,5 +1,5 @@
 #pragma once
-#include "Object.h"
+#include "../Object.h"
 #include <string>
 
 namespace dive
@@ -15,7 +15,7 @@ namespace dive
 	class Resource : public Object
 	{
 	public:
-		Resource(size_t typeHash) : Object(typeHash) {}
+		Resource();
 		virtual ~Resource() = default;
 
 		// 순수 가상 함수이면 안되나?
@@ -23,8 +23,10 @@ namespace dive
 		//virtual bool SaveToFile(const std::string& filepath) { return true; }
 
 
-		eResourceType GetResourceType() const { return m_Type; }
+		eResourceType GetType() const { return m_Type; }
 
+		template<class T>
+		static constexpr eResourceType TypeToEnum();
 
 	protected:
 		eResourceType m_Type = eResourceType::Unknown;

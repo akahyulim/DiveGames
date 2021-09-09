@@ -1,5 +1,5 @@
 #pragma once
-#include "../Resource.h"
+#include "../../Resource/Resource.h"
 #include "../DiveCore.h"
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
@@ -16,8 +16,7 @@ namespace dive
 	class dvTexture : public Resource
 	{
 	public:
-		dvTexture(size_t typeHash)
-			: Resource(typeHash)
+		dvTexture()
 		{
 		}
 		virtual ~dvTexture() = default;

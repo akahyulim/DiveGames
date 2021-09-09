@@ -12,8 +12,8 @@
 #include "RenderPath3D.h"
 
 //= Resource ======================
-#include "Resource.h"
-#include "ResourceManager.h"
+#include "Src/Resource/Resource.h"
+#include "Src/Resource/ResourceManager.h"
 
 //= Renderer ======================
 #include "Src/Renderer/Graphics/GraphicsDevice.h"

@@ -7,7 +7,7 @@
 namespace dive
 {
 	Light::Light(GameObject* pGameObject)
-		: Component(typeid(Light).hash_code(), pGameObject)
+		: Component(pGameObject)
 	{
 		m_Type = eComponentType::Light;
 

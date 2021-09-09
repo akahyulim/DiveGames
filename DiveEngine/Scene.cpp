@@ -9,14 +9,12 @@
 namespace dive
 {
 	Scene::Scene()
-		: Object(typeid(Scene).hash_code())
 	{
 		SetName("Untitled");
 		m_bChanged = false;
 	}
 
 	Scene::Scene(const std::string& sceneName)
-		: Object(typeid(Scene).hash_code())
 	{
 		SetName(sceneName);
 

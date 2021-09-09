@@ -84,16 +84,12 @@ namespace dive
 		return newComponent;
 	}
 
-	// GetTypeHash()말고 비교할 수 없을까?
-	// Object가 TypeHash를 가지는건 에바같다.
-	// 일단 Component Type을 추가하긴 했다.
 	template<typename T>
 	void GameObject::RemoveComponent()
 	{
 		auto& it = m_Components.begin();
 		for (it; it != m_Components.end();)
 		{
-			//if ((*it)->GetTypeHash() == typeid(T).hash_code())
 			if((*it)->GetType() == Component::TypeToEnum<T>())
 			{
 				delete (*it);
@@ -115,7 +111,6 @@ namespace dive
 	{
 		for (auto component : m_Components)
 		{
-			//if (component->GetTypeHash() == typeid(T).hash_code())
 			if (component->GetType() == Component::TypeToEnum<T>())
 			{
 				return dynamic_cast<T*>(component);

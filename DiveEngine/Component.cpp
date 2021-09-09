@@ -1,10 +1,13 @@
 #include "Component.h"
 #include "GameObject.h"
+#include "Transform.h"
+#include "Camera.h"
+#include "MeshRenderer.h"
+#include "Light.h"
 
 namespace dive
 {
-	Component::Component(size_t  typeHash, GameObject* pGameObject, Transform* pTransform)
-		: Object(typeHash)
+	Component::Component(GameObject* pGameObject, Transform* pTransform)
 	{
 		m_pGameObject = pGameObject;
 		m_pTransform = pTransform ? pTransform : pGameObject->GetTransform();

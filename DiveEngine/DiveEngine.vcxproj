@@ -167,7 +167,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />
     <ClInclude Include="ConstantBuffer.h" />
@@ -285,7 +284,6 @@
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="RenderPath.h" />
     <ClInclude Include="RenderPath3D.h" />
-    <ClInclude Include="Resource.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
@@ -296,6 +294,8 @@
     <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
+    <ClInclude Include="Src\Resource\Resource.h" />
+    <ClInclude Include="Src\Resource\ResourceManager.h" />
     <ClInclude Include="StringHelper.h" />
     <ClInclude Include="TextMesh.h" />
     <ClInclude Include="Texture.h" />
@@ -305,7 +305,6 @@
     <ClInclude Include="VertexTypes.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
@@ -335,6 +334,8 @@
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\Renderer_Pass.cpp" />
     <ClCompile Include="Src\Renderer\Renderer_Resources.cpp" />
+    <ClCompile Include="Src\Resource\Resource.cpp" />
+    <ClCompile Include="Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="StringHelper.cpp" />
     <ClCompile Include="TextMesh.cpp" />
     <ClCompile Include="Texture.cpp" />
@@ -349,9 +350,9 @@
     <Text Include="LoadFromFile.txt" />
     <Text Include="PipelineState.txt" />
     <Text Include="RenderPass.txt" />
-    <Text Include="ResourceManager.txt" />
     <Text Include="Src\Renderer\Graphics\dvTexture.txt" />
     <Text Include="Src\Renderer\Graphics\GraphicsResources.txt" />
+    <Text Include="Src\Resource\ResourceManager.txt" />
     <Text Include="WickedEngine%27sGraphicsSystems.txt" />
     <Text Include="구현 흐름.txt" />
     <Text Include="지금까지 정리의 흐름.txt" />

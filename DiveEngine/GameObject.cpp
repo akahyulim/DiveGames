@@ -6,8 +6,7 @@
 namespace dive
 {
 	GameObject::GameObject(Scene* pScene)
-		: Object(typeid(GameObject).hash_code()),
-		m_pTransform(nullptr),
+		: m_pTransform(nullptr),
 		m_pScene(pScene)
 	{
 		SetName("GameObject");
@@ -51,7 +50,7 @@ namespace dive
 			for (const auto pComponent : m_Components)
 			{
 				// eComponentType을 저장토록 수정해야 한다.
-				pFileStream->Write(static_cast<unsigned int>(pComponent->GetTypeHash()));
+				pFileStream->Write(static_cast<unsigned int>(pComponent->GetType()));
 				pFileStream->Write(pComponent->GetInstanceID());
 			}
 			for (const auto pComponent : m_Components)
@@ -146,31 +145,26 @@ namespace dive
 		}
 	}
 
-	// typeHash를 eComponentType으로 변경해야 한다.
-	// 현재 직렬화 과정에도 typeHash가 저장되고 있다.
 	Component* GameObject::AddComponent(unsigned int typeHash, unsigned int id)
 	{
 		Component* newComponent = nullptr;
 
-		if ((unsigned int)typeid(Transform).hash_code() == typeHash)
+		if (eComponentType::Transform == static_cast<eComponentType>(typeHash))
 		{
 			newComponent = static_cast<Component*>(m_pTransform);
 		}
-		else if ((unsigned int)typeid(Camera).hash_code() == typeHash)
+		else if (eComponentType::Camera == static_cast<eComponentType>(typeHash))
 		{
 			newComponent = m_Components.emplace_back(static_cast<Component*>(new Camera(this)));
 		}
-		else if ((unsigned int)typeid(MeshRenderer).hash_code() == typeHash)
+		else if (eComponentType::MeshRenderer == static_cast<eComponentType>(typeHash))
 		{
 			newComponent = m_Components.emplace_back(static_cast<Component*>(new MeshRenderer(this)));
 		}
-		else if ((unsigned int)typeid(Light).hash_code() == typeHash)
+		else if (eComponentType::Light == static_cast<eComponentType>(typeHash))
 		{
 			newComponent = m_Components.emplace_back(static_cast<Component*>(new Light(this)));
 		}
-
-		// 현재 구현하지 않은 부분이 있어서 일단 주석처리
-		//assert(newComponent);
 
 		// 0 말고 다른 건 없을까?
 		if (id != 0)

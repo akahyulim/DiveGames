@@ -12,7 +12,6 @@ namespace dive
 		// map / unmap도 생각해야 하나?
 
 		dvTexture2D(bool generateMips = true)
-			: dvTexture(typeid(dvTexture2D).hash_code())
 		{
 			m_pDevice = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
 			m_pDeviceContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
@@ -21,7 +20,6 @@ namespace dive
 		}
 
 		dvTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool generateMips = false)
-			: dvTexture(typeid(dvTexture2D).hash_code())
 		{
 			m_pDevice = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
 			m_pDeviceContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
@@ -34,6 +32,8 @@ namespace dive
 
 			createResource();
 		}
+
+		~dvTexture2D();
 
 		bool LoadFromFile(const std::string& filepath) override;
 

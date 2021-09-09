@@ -11,11 +11,8 @@ namespace dive
 	class Object
 	{
 	public:
-		Object(size_t typeHash)
-			: m_TypeHash(typeHash)
+		Object()
 		{
-			static std::atomic<unsigned int> next{ INVALID_ID + 1 };
-			m_InstanceID = next.fetch_add(1);
 		}
 		virtual ~Object() {}
 
@@ -31,8 +28,6 @@ namespace dive
 			m_InstanceID = id;
 		}
 
-		size_t GetTypeHash() const { return m_TypeHash; }
-
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
 
@@ -42,7 +37,6 @@ namespace dive
 
 	private:
 		unsigned int m_InstanceID	= INVALID_ID;
-		size_t m_TypeHash			= INVALID_ID;
 		std::string m_Name			= "";
 	};
 }

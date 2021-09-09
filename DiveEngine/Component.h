@@ -20,7 +20,7 @@ namespace dive
 	class Component : public Object
 	{
 	public:
-		Component(size_t typeHash, GameObject* pGameObject, Transform* pTransform = nullptr);
+		Component(GameObject* pGameObject, Transform* pTransform = nullptr);
 		virtual ~Component() {}
 
 		virtual void Update(float deltaTime) {}

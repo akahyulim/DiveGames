@@ -15,7 +15,7 @@ namespace dive
 	std::vector<Camera*> Camera::s_Cameras;
 
 	Camera::Camera(GameObject* pGameObject)
-		: Component(typeid(Camera).hash_code(), pGameObject)
+		: Component(pGameObject)
 	{
 		m_Type = eComponentType::Camera;
 

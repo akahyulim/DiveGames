@@ -33,6 +33,12 @@ namespace dive
 		return channelCount;
 	}
 
+	dvTexture2D::~dvTexture2D()
+	{
+		CORE_TRACE("dvTexture2D Destroy");
+	}
+
+	// 이름을 여기에서 저장하는게 맞는 걸까?
 	bool dvTexture2D::LoadFromFile(const std::string& filepath)
 	{
 		if (!FileSystemHelper::FileExists(filepath))

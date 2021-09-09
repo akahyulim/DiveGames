@@ -6,8 +6,7 @@
 namespace dive
 {
 	ConstantBuffer::ConstantBuffer(GraphicsDevice* pGraphicsDevice, const std::string& name)
-		: Object(typeid(ConstantBuffer).hash_code()),
-		m_pGraphicsDevice(pGraphicsDevice),
+		: m_pGraphicsDevice(pGraphicsDevice),
 		m_pBuffer(nullptr),
 		m_Name(name),
 		m_OffsetCount(0),

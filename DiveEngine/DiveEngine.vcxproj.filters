@@ -55,9 +55,6 @@
     <ClInclude Include="Font.h">
       <Filter>Engine\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Engine\Resource</Filter>
-    </ClInclude>
     <ClInclude Include="MeshRenderer.h">
       <Filter>Engine\Scene\Components</Filter>
     </ClInclude>
@@ -406,7 +403,10 @@
     <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceManager.h">
+    <ClInclude Include="Src\Resource\Resource.h">
+      <Filter>Engine\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Resource\ResourceManager.h">
       <Filter>Engine\Resource</Filter>
     </ClInclude>
   </ItemGroup>
@@ -519,7 +519,10 @@
     <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
+    <ClCompile Include="Src\Resource\Resource.cpp">
+      <Filter>Engine\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Resource\ResourceManager.cpp">
       <Filter>Engine\Resource</Filter>
     </ClCompile>
   </ItemGroup>
@@ -601,7 +604,7 @@
     <Text Include="LoadFromFile.txt">
       <Filter>Engine\Renderer\Graphics</Filter>
     </Text>
-    <Text Include="ResourceManager.txt">
+    <Text Include="Src\Resource\ResourceManager.txt">
       <Filter>Engine\Resource</Filter>
     </Text>
   </ItemGroup>

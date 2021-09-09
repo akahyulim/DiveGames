@@ -9,7 +9,7 @@
 namespace dive
 {
 	MeshRenderer::MeshRenderer(GameObject* pGameObject)
-		: Component(typeid(MeshRenderer).hash_code(), pGameObject)
+		: Component(pGameObject)
 	{
 		m_Type = eComponentType::MeshRenderer;
 
