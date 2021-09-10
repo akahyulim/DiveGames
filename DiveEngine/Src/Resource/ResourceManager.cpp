@@ -25,14 +25,11 @@ namespace dive
 		return GetByName(name, type) != nullptr ? true : false;
 	}
 	
-	// 타입까지 확인해야 하는게 맞지만
-	// 현재 비교가 되지 않고 있다.
 	Resource* ResourceManager::GetByName(const std::string& name, eResourceType type)
 	{
 		for (auto pResource : m_Resources)
 		{
-			//if (pResource->GetName() == name && pResource->GetType() == type)//static_cast<eResourceType>(type))
-			if(pResource->GetName() == name)
+			if (pResource->GetName() == name && pResource->GetType() == type)
 				return pResource;
 		}
 

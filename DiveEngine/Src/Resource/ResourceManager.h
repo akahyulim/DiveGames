@@ -85,6 +85,11 @@ namespace dive
 		}
 
 		bool IsCached(const std::string& name, eResourceType type);
+		template<class T>
+		bool IsCached(const std::string& name)
+		{
+			return IsCached(name, Resource::TypeToEnum<T>());
+		}
 		
 		Resource* GetByName(const std::string& name, eResourceType type);
 		template<class T>
@@ -99,10 +104,8 @@ namespace dive
 		~ResourceManager();
 
 	private:
-		std::vector<Resource*> m_Resources;	// shared_ptr로...?
+		std::vector<Resource*> m_Resources;
 
 		// asset타입별로 direcoty가 다르다.
-
-		// importer들
 	};
 }

@@ -13,6 +13,8 @@ namespace dive
 
 		dvTexture2D(bool generateMips = true)
 		{
+			m_Type = eResourceType::Texture2D;
+
 			m_pDevice = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
 			m_pDeviceContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 
@@ -21,6 +23,8 @@ namespace dive
 
 		dvTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool generateMips = false)
 		{
+			m_Type = eResourceType::Texture2D;
+
 			m_pDevice = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
 			m_pDeviceContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 

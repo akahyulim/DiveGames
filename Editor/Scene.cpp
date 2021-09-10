@@ -56,10 +56,12 @@ namespace Editor
             m_pRenerer->SetResolution(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
         }
 
-        auto selectedTex = dive::ResourceManager::GetInstance().GetByName<dive::dvTexture2D>("bluePrint");
-    
+        static dive::dvTexture2D* pSelectedTex = nullptr;
+        if(!pSelectedTex)
+            pSelectedTex = dive::ResourceManager::GetInstance().GetByName<dive::dvTexture2D>("bluePrint");
+
         ImGui::Image(
-            selectedTex ? selectedTex->GetShaderResourceView() :
+            pSelectedTex ? pSelectedTex->GetShaderResourceView() :
             m_pRenerer->GetFrameTexture()->GetShaderResourceView(),
             //nullptr,
             ImVec2(static_cast<float>(width), static_cast<float>(height)),
