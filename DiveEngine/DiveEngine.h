@@ -19,7 +19,7 @@
 #include "Src/Renderer/Graphics/GraphicsDevice.h"
 #include "Src/Renderer/Graphics/dvTexture.h"
 #include "Src/Renderer/Graphics/dvTexture2D.h"
-#include "Src/Renderer/Graphics/dvCubemap.h"
+#include "Src/Renderer/Graphics/dvRenderTexture.h"
 #include "GraphicsInclude.h"
 #include "Src/Renderer/Renderer.h"
 #include "GBuffer.h"
