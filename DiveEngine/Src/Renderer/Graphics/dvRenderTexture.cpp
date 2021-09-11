@@ -2,5 +2,5 @@
 
 namespace dive
 {
-
+	dvRenderTexture* dvRenderTexture::m_pActive = nullptr;
 }

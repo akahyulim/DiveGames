@@ -1,5 +1,8 @@
 #include "RenderPath_Deferred.h"
 
+// Editor의 Camera를 이 곳에서 관리토록 할 수 없을까?
+// 그리고 App의 Main Camera에는 RenderTexture를 붙여 구석에서 보이게 하면 될 것 같은데...
+// 물론 App 실행시에는 RenderTexture를 적용하지 말아야지.
 namespace dive
 {
 	void RenderPath_Deferred::Render() const
