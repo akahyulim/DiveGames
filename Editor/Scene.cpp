@@ -13,7 +13,7 @@ namespace Editor
         m_Padding = ImVec2(4.0f, 4.0f);
         
         //m_pScene = &dive::Scene::GetGlobalScene();
-        m_pRenerer = &dive::Renderer::GetInstance();
+        m_pRenderer = &dive::Renderer::GetInstance();
 
         // test 
         dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/choa.jpg");
@@ -35,7 +35,7 @@ namespace Editor
 
         // 그냥 리턴하면 안된다.
         // => 왜?
-        if (!m_pRenerer)
+        if (!m_pRenderer)
             return;
 
         
@@ -49,11 +49,11 @@ namespace Editor
         //================================================================================================================//
 
         // Viewport도 설정해줘야 한다.
-        m_pRenerer->SetViewport(width, height);
+        m_pRenderer->SetViewport(width, height);
 
         // 변경 여부를 판단해야 한다. 아니면 매번 변경한다. 근데 별 상관 없을수도...
         {
-            m_pRenerer->SetResolution(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
+            m_pRenderer->SetResolution(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
         }
 
         static dive::dvTexture2D* pSelectedTex = nullptr;
@@ -61,8 +61,9 @@ namespace Editor
             pSelectedTex = dive::ResourceManager::GetInstance().GetByName<dive::dvTexture2D>("bluePrint");
 
         ImGui::Image(
-            pSelectedTex ? pSelectedTex->GetShaderResourceView() :
-            m_pRenerer->GetFrameTexture()->GetShaderResourceView(),
+            //pSelectedTex ? pSelectedTex->GetShaderResourceView() :
+           m_pRenderer->GetRenderTarget()->GetColorShaderResourceView(),
+            //m_pRenderer->GetFrameTexture()->GetShaderResourceView(),
             //nullptr,
             ImVec2(static_cast<float>(width), static_cast<float>(height)),
             ImVec2(0, 0),

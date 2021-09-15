@@ -2,9 +2,8 @@
 #include "DiveCore.h"
 #include "Log.h"
 
-// 유니티의 RenderTarget은 GBuffer의 Texture로 사용하기 힘들다.
-// 그리고 스파르탄처럼 Texture를 만드는 것도 에바 같다.
-// 그래서 일단 책을 따르기로 했다.
+// 유니티 역시 GBuffer가 따로 존재하는 것 같다.
+// 총 4장 + DepthStencil Buffer로 구성된다.
 namespace dive
 {
 	GBuffer::GBuffer(ID3D11Device* pDevice)

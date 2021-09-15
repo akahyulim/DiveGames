@@ -2,6 +2,7 @@
 #include "../DiveCore.h"
 #include "../Log.h"
 #include "../TextMesh.h"
+#include "Graphics/dvRenderTexture.h"
 #include <d3dcompiler.h>
 
 using namespace std;
@@ -183,6 +184,16 @@ namespace dive
 			m_RenderTargets[eRenderTargets::Frame_Ldr] = nullptr;
 		}
 		m_RenderTargets[eRenderTargets::Frame_Ldr] = new Texture(width, height, DXGI_FORMAT_R16G16B16A16_FLOAT);
+
+		// 이건 결국 Resize() 같은건데...
+		// 현재 Relese를 구현했으니 수정이 가능할 것 같다.
+		if (m_pRenderTarget)
+		{
+			delete m_pRenderTarget;
+			m_pRenderTarget = nullptr;
+		}
+		m_pRenderTarget = new dvRenderTexture(width, height, 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
+		m_pRenderTarget->Create();
 
 		return true;
 	}

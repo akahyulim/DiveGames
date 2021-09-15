@@ -8,6 +8,7 @@
 #include "../GBuffer.h"
 #include "../Texture.h"
 #include "../Font.h"
+//#include "Graphics/dvRenderTexture.h"
 #include <memory>
 #include <string>
 
@@ -19,6 +20,7 @@ namespace dive
 {
 	class GameObject;
 	class TextMesh;
+	class dvRenderTexture;
 
 	enum class eRenderTargets
 	{
@@ -73,6 +75,7 @@ namespace dive
 
 		// 이건 Editor용 임시다.
 		Texture* GetFrameTexture() { return m_RenderTargets[eRenderTargets::Frame_Ldr]; }
+		dvRenderTexture* GetRenderTarget() { return m_pRenderTarget; }
 
 		// Render Passes
 		void DrawScene();
@@ -154,6 +157,8 @@ namespace dive
 		// 현재 Editor에서 Scene을 보여주는 텍스쳐로 활용 중이다.
 		// 구현 과정에 의하면 GBuffer와 RenderTarget은 구분되어야 한다.
 		std::unordered_map<eRenderTargets, Texture*> m_RenderTargets;
+		// render target으로 gbuffer test
+		dvRenderTexture* m_pRenderTarget = nullptr;
 
 		std::unordered_map<eObjectType, std::vector<GameObject*>> m_GameObjects;
 

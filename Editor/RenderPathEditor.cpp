@@ -66,11 +66,17 @@ namespace Editor
 
 		{
 			// 이 RenderTarget Texture는 RenderPath에서 만들고 관리하는게 맞다.
-			auto pRTV = pRenderer->GetFrameTexture()->GetRenderTargetView();
+			// 왜... 맞다고 한거지...? 결과를 그리는 텍스쳐로 염두한 것일까?
+			auto pRTV = pRenderer->GetRenderTarget()->GetColorRenderTargetView();//GetFrameTexture()->GetRenderTargetView();
 
 			// RenerPassBegin
 			{
-				pImmediateContext->OMSetRenderTargets(1, &pRTV, nullptr);
+				//pImmediateContext->OMSetRenderTargets(1, &pRTV, nullptr);
+				// 이걸 굳이 Current Camera의 Update() 등에서 수행하지 않은 이유는
+				// 모든 RenderTexture가 굳이 Camera를 가질 필요는 없다는 의미?
+				// 그렇다면 아래 ClearRenderTargetView()도 RenderTexture가 처리할 수 있어야 하는데? 
+				// 찾아보니 이게 존재하는 이유조차 의문이 든다.
+				dive::dvRenderTexture::SetActive(pRenderer->GetRenderTarget());
 
 				// 사실 GBuffer라면 특정 색으로 초기화해야 할 거다.
 				auto pCamera = pRenderer->GetCamera();
@@ -91,6 +97,7 @@ namespace Editor
 					clearColors[3] = color.w;
 				}
 
+				// 이건 아마도 Camera의 Update() 등에서 수행할 것 같다.
 				pImmediateContext->ClearRenderTargetView(pRTV, clearColors);
 			}
 
