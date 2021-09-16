@@ -1,21 +1,17 @@
 #pragma once
 #include "Graphics/GraphicsDevice.h"
+#include "Graphics/GBuffer.h"
 #include "../GraphicsInclude.h"
 #include "../GraphicsEnums.h"
 #include "../PipelineState.h"
 #include "../ConstantBuffer.h"
 #include "../ConstantBuffers.h"	// 이름 변경 대상
-#include "../GBuffer.h"
 #include "../Texture.h"
 #include "../Font.h"
-//#include "Graphics/dvRenderTexture.h"
 #include <memory>
 #include <string>
 
-// Collectio of Graphics Technique implementaions.
-// Fucntion to draw a scene, shadows, post processes.
-// Manager of GraphicsDevice Instance
-// Provides other helper functions
+
 namespace dive
 {
 	class GameObject;
@@ -62,8 +58,6 @@ namespace dive
 		// 현재 Editor의 Scene에서 RenderTexture의 크기를 변경할 때 사용 중이다.
 		const DirectX::XMINT2& GetResolution() const { return m_RenderTargetSize; }
 		void SetResolution(unsigned int width, unsigned int height);
-
-		void GetGBufferSize(unsigned int& outWidth, unsigned int& outHeight);
 
 		// update와 draw가 있다.
 		// update는 visibility, PerFrameData,  RenderData, CameraCB 등이 있다.
@@ -153,18 +147,15 @@ namespace dive
 		PipelineState m_PipelineStateFont;	// text라는 이름이 더 낫지 않을까?
 		PipelineState m_PipelineStateLegacy;
 
-		// RenderTargets 모음이다. 스파르탄의 영향을 받아 GBuffer용으로 구현했다.
-		// 현재 Editor에서 Scene을 보여주는 텍스쳐로 활용 중이다.
-		// 구현 과정에 의하면 GBuffer와 RenderTarget은 구분되어야 한다.
+		// 이건 스파르탄의 GBuffer이다. 지워야 한다.
 		std::unordered_map<eRenderTargets, Texture*> m_RenderTargets;
-		// render target으로 gbuffer test
+		// 이건 RenderTexture로 GBuffer를 테스트 한 것이다.
+		// 이렇게 카메라 없이 단독으로 사용해선 안될 것 같다.
 		dvRenderTexture* m_pRenderTarget = nullptr;
 
 		std::unordered_map<eObjectType, std::vector<GameObject*>> m_GameObjects;
 
-		// 책에서 동적 생성을 하지 않았다.
-		// 하지만 생성자에 Device 전달이 필요하다.
-		GBuffer* m_pGBuffer;	
+		GBuffer m_GBuffer;
 
 		// 이건 고쳐야 된다.
 		Font* m_pDvFont = nullptr;

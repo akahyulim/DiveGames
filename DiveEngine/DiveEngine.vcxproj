@@ -173,7 +173,6 @@
     <ClInclude Include="DiveCore.h" />
     <ClInclude Include="DiveEngine.h" />
     <ClInclude Include="dvMath.h" />
-    <ClInclude Include="GBuffer.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="External\spdlog\async.h" />
@@ -291,6 +290,7 @@
     <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvTexture.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h" />
+    <ClInclude Include="Src\Renderer\Graphics\GBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
@@ -307,7 +307,6 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="GBuffer.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="FileStream.cpp" />
     <ClCompile Include="FileSystemHelper.cpp" />
@@ -328,6 +327,7 @@
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\GBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\Renderer_Pass.cpp" />

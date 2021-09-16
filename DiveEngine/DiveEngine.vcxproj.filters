@@ -373,9 +373,6 @@
     <ClInclude Include="dvMath.h">
       <Filter>Engine\Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="GBuffer.h">
-      <Filter>Engine\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="ConstantBuffer.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
@@ -405,6 +402,9 @@
     </ClInclude>
     <ClInclude Include="Src\Resource\ResourceManager.h">
       <Filter>Engine\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\GBuffer.h">
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -483,9 +483,6 @@
     <ClCompile Include="SceneManager.cpp">
       <Filter>Engine\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="GBuffer.cpp">
-      <Filter>Engine\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="ConstantBuffer.cpp">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
@@ -518,6 +515,9 @@
     </ClCompile>
     <ClCompile Include="Src\Resource\ResourceManager.cpp">
       <Filter>Engine\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\GBuffer.cpp">
+      <Filter>Engine\Renderer\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
