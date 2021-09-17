@@ -5,9 +5,10 @@
 // 물론 App 실행시에는 RenderTexture를 적용하지 말아야지.
 namespace dive
 {
+	// 아직도 Render Path와 Pass를 구분하지 못하겠다...
 	void RenderPath_Deferred::Render() const
 	{
-		// depth
+		// deferred shading
 		{
 			// render pass begin(render targets clear and set)
 			// set viewport and bind 
@@ -15,11 +16,13 @@ namespace dive
 			// render pass end(render targets set null)
 		}
 
-		// Lighting
+		// Lighting shading
 		{
 			// 위의 pass에서 그려진 texture의 shader resource view를 활용하여
 			// render target에 Light가 적용된 최종 출력 화면을 그려낸다.
 		}
+
+		// Post processing
 	}
 
 	void RenderPath_Deferred::Compose() const

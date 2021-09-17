@@ -3,8 +3,10 @@
 #include "../DiveCore.h"
 #include "../Log.h"
 
-// 유니티 역시 GBuffer가 따로 존재하는 것 같다.
-// 총 4장 + DepthStencil Buffer로 구성된다.
+// 1. Editor의 경우 View의 크기가 Resolution과 다르다. 즉, 따로 설정해야 한다.
+//	- 굳이 GBuffer의 크기를 변경할 필요가 있을까? View 크기에 맞는 RenderTarget을 만든 후 결과를 그리면 되지 않나?
+//		- 그렇다면 샘플링이 따로 필요한가?
+// 2. Editor의 View, 그리고 후처리에 사용될 RenderTarget이 필요하다.
 namespace dive
 {
 	GBuffer::GBuffer()
@@ -16,10 +18,6 @@ namespace dive
 		Clear();
 	}
 	
-	// 역시 크기가 문제다.. Backbuffer랑 다를 수 있다.
-	// 그런데 그 상황은 에디터라는 특별한 구현에서 발생한다.
-	// 이를 위해 Resolution을 두 개로 나누어 관리한다는게 맞는 걸까?
-	// 아에 GBuffer를 사용자에게 제공하는게 낫지 않을까?
 	bool GBuffer::Initialize(ID3D11Device* pDevice, unsigned int width, unsigned int height)
 	{
 		DV_ASSERT(pDevice != nullptr);

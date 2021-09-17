@@ -589,9 +589,6 @@
     <Text Include="PipelineState.txt">
       <Filter>Engine\Renderer</Filter>
     </Text>
-    <Text Include="RenderPass.txt">
-      <Filter>Engine\Renderer</Filter>
-    </Text>
     <Text Include="Src\Renderer\Graphics\dvTexture.txt">
       <Filter>Engine\Renderer\Graphics</Filter>
     </Text>
@@ -600,6 +597,12 @@
     </Text>
     <Text Include="Src\Resource\ResourceManager.txt">
       <Filter>Engine\Resource</Filter>
+    </Text>
+    <Text Include="RenderPathAndPass.txt">
+      <Filter>Engine\Renderer</Filter>
+    </Text>
+    <Text Include="Src\Renderer\Graphics\Texture와 Map.txt">
+      <Filter>Engine\Renderer\Graphics</Filter>
     </Text>
   </ItemGroup>
 </Project>
