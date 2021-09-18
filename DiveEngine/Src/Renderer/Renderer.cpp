@@ -65,9 +65,6 @@ namespace dive
 		// 그냥 테스트
 		dvTexture2D dvTex(600, 400, DXGI_FORMAT_R8G8B8A8_UNORM, true);
 		dvTex.Apply();
-
-		// 역시 임시로 초기화
-		m_GBuffer.Initialize(m_pGraphicsDevice->GetDevice(), m_pGraphicsDevice->GetResolutionWidth(), m_pGraphicsDevice->GetResolutionHeight());
 		
 		CORE_TRACE("Renderer 초기화에 성공하였습니다.");
 	}
@@ -108,8 +105,6 @@ namespace dive
 		m_RenderTargetSize.y = height;
 
 		createRenderTargets();
-
-		m_GBuffer.Initialize(m_pGraphicsDevice->GetDevice(), width, height);
 
 		CORE_TRACE("해상도 변경: {0:d}x{1:d}", width, height);
 	}

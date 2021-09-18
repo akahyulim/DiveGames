@@ -3,6 +3,7 @@
 #include "../DiveCore.h"
 #include "../Log.h"
 
+// 역시 이건 에바다.
 // 1. Editor의 경우 View의 크기가 Resolution과 다르다. 즉, 따로 설정해야 한다.
 //	- 굳이 GBuffer의 크기를 변경할 필요가 있을까? View 크기에 맞는 RenderTarget을 만든 후 결과를 그리면 되지 않나?
 //		- 그렇다면 샘플링이 따로 필요한가?

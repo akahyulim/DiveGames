@@ -1,6 +1,5 @@
 #pragma once
 #include "Graphics/GraphicsDevice.h"
-#include "Graphics/GBuffer.h"
 #include "../GraphicsInclude.h"
 #include "../GraphicsEnums.h"
 #include "../PipelineState.h"
@@ -39,6 +38,15 @@ namespace dive
 	// PipelineState
 	// States, Shaders, InputLayout을 설정한 객체
 	// 이를 Graphics에 넘겨 한 번에 bind한다.
+
+	// 딴데로 옮길까...
+	enum eGBuffer
+	{
+		RT0,
+		RT1, 
+		RT2,
+		Count
+	};
 
 
 	class Renderer
@@ -153,9 +161,11 @@ namespace dive
 		// 이렇게 카메라 없이 단독으로 사용해선 안될 것 같다.
 		dvRenderTexture* m_pRenderTarget = nullptr;
 
-		std::unordered_map<eObjectType, std::vector<GameObject*>> m_GameObjects;
+		// Wicked는 이렇게 구분했다.
+		dvRenderTexture* m_pGBuffer[eGBuffer::Count];
+		// Depth는 따로 인듯... 일단 제외
 
-		GBuffer m_GBuffer;
+		std::unordered_map<eObjectType, std::vector<GameObject*>> m_GameObjects;
 
 		// 이건 고쳐야 된다.
 		Font* m_pDvFont = nullptr;
