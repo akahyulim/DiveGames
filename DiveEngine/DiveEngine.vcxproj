@@ -282,7 +282,7 @@
     <ClInclude Include="Object.h" />
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="RenderPath.h" />
-    <ClInclude Include="RenderPath3D.h" />
+    <ClInclude Include="RenderPath3D_Legacy.h" />
     <ClInclude Include="Runtime.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
@@ -320,7 +320,7 @@
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="MeshRenderer.cpp" />
     <ClCompile Include="ConstantBuffers.h" />
-    <ClCompile Include="RenderPath3D.cpp" />
+    <ClCompile Include="RenderPath3D_Legacy.cpp" />
     <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />

@@ -16,9 +16,6 @@
     <ClInclude Include="RenderPath.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
-    <ClInclude Include="RenderPath3D.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Runtime.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
@@ -406,13 +403,13 @@
     <ClInclude Include="Src\Renderer\Graphics\GBuffer.h">
       <Filter>Engine\Renderer\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="RenderPath3D_Legacy.h">
+      <Filter>Engine\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
       <Filter>Engine\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderPath3D.cpp">
-      <Filter>Engine\Core</Filter>
     </ClCompile>
     <ClCompile Include="Runtime.cpp">
       <Filter>Engine\Core</Filter>
@@ -518,6 +515,9 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\GBuffer.cpp">
       <Filter>Engine\Renderer\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderPath3D_Legacy.cpp">
+      <Filter>Engine\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

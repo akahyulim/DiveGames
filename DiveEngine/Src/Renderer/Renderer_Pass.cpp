@@ -18,6 +18,7 @@ namespace dive
 		// 현재 DepthStencilView가 존재하지 않는다.
 
 		// 일단 Legacy를 두 개 이상의 Camera로 그려보자.
+		// => 이건 좀 특별한 케이스다. 원래는 Camera에 RenderTexture가 존재하므로 따로 그려야 한다.
 		for (auto& pCamera : m_GameObjects[eObjectType::Camera])
 		{
 			if (m_GameObjects[eObjectType::Opaque].empty())

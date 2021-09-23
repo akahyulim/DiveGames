@@ -9,7 +9,7 @@
 #include "Event.h"
 #include "ThreadPool.h"
 #include "RenderPath.h"
-#include "RenderPath3D.h"
+#include "RenderPath3D_Legacy.h"
 
 //= Resource ======================
 #include "Src/Resource/Resource.h"

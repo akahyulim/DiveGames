@@ -196,23 +196,6 @@ namespace dive
 		m_pRenderTarget = new dvRenderTexture(width, height, 0, DXGI_FORMAT_R16G16B16A16_FLOAT);
 		m_pRenderTarget->Create();
 
-		// dvRenderTexture로 GBuffer 생성
-		{
-			//DV_DELETE_ARRAY(m_pGBuffer);	// 이게 왜 안되냐?
-			DV_DELETE(m_pGBuffer[eGBuffer::RT0]);
-			DV_DELETE(m_pGBuffer[eGBuffer::RT1]);
-			DV_DELETE(m_pGBuffer[eGBuffer::RT2]);
-
-			m_pGBuffer[eGBuffer::RT0] = new dvRenderTexture(width, height, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
-			if (m_pGBuffer[eGBuffer::RT0])	m_pGBuffer[eGBuffer::RT0]->Create();
-
-			m_pGBuffer[eGBuffer::RT1] = new dvRenderTexture(width, height, 0, DXGI_FORMAT_R11G11B10_FLOAT);
-			if (m_pGBuffer[eGBuffer::RT1])	m_pGBuffer[eGBuffer::RT1]->Create();
-
-			m_pGBuffer[eGBuffer::RT2] = new dvRenderTexture(width, height, 0, DXGI_FORMAT_R8G8B8A8_UNORM);
-			if (m_pGBuffer[eGBuffer::RT2])	m_pGBuffer[eGBuffer::RT2]->Create();
-		}
-
 		return true;
 	}
 
@@ -284,6 +267,7 @@ namespace dive
 		return result;
 	}
 
+	// Wicked는 DrawXXX() 내부에서 직접 Bind한다.
 	void Renderer::createPipelineStates()
 	{
 		// Legacy

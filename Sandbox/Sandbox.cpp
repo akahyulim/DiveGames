@@ -18,11 +18,15 @@ namespace sandbox
 			return false;
 		}
 
+		ActivatePath(&m_RenderPath);
+
+		/*
+
 		// 일단 Scene을 직접 생성한 후 Active로 설정한다.
 		auto activeScene = dive::SceneManager::GetInstance().CreateScene("Sandbox");
 		dive::SceneManager::GetInstance().SetActiveScene(activeScene);
 
-		ActivatePath(&mRenderPath);
+		
 
 		{
 			auto gameObject = activeScene->CreateGameObject();
@@ -40,6 +44,8 @@ namespace sandbox
 			// 카메라에 ScreenSize를 설정해 주어야 한다.
 			// 직접 찾도록 하는게 나을 것 같은데...
 		}
+
+		*/
 
 		APP_TRACE("Sandbox::Initialize()");
 		

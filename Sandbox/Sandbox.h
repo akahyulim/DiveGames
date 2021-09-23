@@ -14,6 +14,6 @@ namespace sandbox
 	private:
 
 	private:
-		dive::RenderPath3D mRenderPath;
+		dive::RenderPath3D_Legacy m_RenderPath;
 	};
 }

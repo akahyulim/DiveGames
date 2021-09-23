@@ -3,11 +3,12 @@
 
 namespace dive
 {
-	class RenderPath_Deferred : public RenderPath
+	// RenderPath_Legacy를 상속받는게 맞을 것 같다.
+	class RenderPath3D_Editor : public RenderPath3D_Legacy
 	{
 	public:
-		RenderPath_Deferred();
-		~RenderPath_Deferred();
+		RenderPath3D_Editor();
+		~RenderPath3D_Editor();
 
 		//= OVERRIDE ================================
 		void PreUpdate() override;
@@ -16,11 +17,10 @@ namespace dive
 		void Compose() const override;
 		//============================================
 
-		void ResizeBuffers(unsigned int width = 0, unsigned int height = 0);
-
 	private:
 
 	private:
-		// GBuffer Textures
+		// Editor의 View에 붙일 dvRenderTexture가 필요하다.
+
 	};
 }
