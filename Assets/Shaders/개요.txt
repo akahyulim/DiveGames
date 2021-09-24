@@ -1,0 +1,10 @@
+
+- 일단 'Assets/Shaders'에 저장한다.
+- 당연하게도 Legacy부터 구현한다.
+	- 일단 해당 폴더에서 구현을 시작하고, 추후 필요하다면 공통 파일을 밖으로 빼낸다.
+
+Legacy 구성
+- Common.hlsl
+- GBufferVis
+- DeferredShading.hlsl
+- DirLight.hlsl

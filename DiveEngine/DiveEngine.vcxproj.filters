@@ -572,6 +572,9 @@
     <Filter Include="Engine\Renderer\Graphics">
       <UniqueIdentifier>{00151ce7-f9c3-495a-8838-348f943d933a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{926b5899-c18b-4d81-b5da-261b2d925309}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Issue.txt" />
@@ -604,5 +607,19 @@
     <Text Include="Src\Renderer\Graphics\Texture와 Map.txt">
       <Filter>Engine\Renderer\Graphics</Filter>
     </Text>
+    <Text Include="..\Assets\Shaders\개요.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Assets\Shaders\Legacy\Common.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Assets\Shaders\Legacy\DeferredShading.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\Assets\Shaders\Legacy\GBufferVis.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

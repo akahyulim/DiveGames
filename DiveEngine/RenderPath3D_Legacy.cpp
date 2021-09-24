@@ -2,11 +2,23 @@
 #include "Src/Renderer/Renderer.h"
 #include "Src/Renderer/Graphics/GraphicsDevice.h"
 #include "Timer.h"
+#include "Event.h"
 #include "Log.h"
 
 namespace dive
 {
-	// 주기를 아직 모르겠다.
+	// 생성자에서 처리하기 조금 애매하다.
+	RenderPath3D_Legacy::RenderPath3D_Legacy()
+	{
+		ResizeBuffers();
+		EVENT_SUBSCRIBE(eEventType::ChangedResolution, EVENT_HANDLE(ResizeBuffers));
+	}
+	
+	RenderPath3D_Legacy::~RenderPath3D_Legacy()
+	{
+	}
+
+	// Wicked에선 Resolution Change 이벤트에 반응하는듯 하다.
 	void RenderPath3D_Legacy::ResizeBuffers()
 	{
 		auto pGraphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
@@ -50,8 +62,6 @@ namespace dive
 	{
 		if (!m_pScene)	return;
 
-		CORE_TRACE("RenderPath3D_Legacy::PreUpdate() - Previous Camera 저장");
-
 		// GameObject PreUpdate를 수행할 수 있다.
 	}
 
@@ -77,38 +87,29 @@ namespace dive
 	// 그리고 Sandbox에서 확인하면 구현해야 한다.
 	void RenderPath3D_Legacy::Render() const
 	{
+		if (!m_pScene)
+			return;
+
 		// 이걸 매 프레임마다 가져 오는 것도 오버헤드일텐데...
 		auto pGraphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
 		DV_ASSERT(pGraphicsDevice);
 
 		auto pImmediateContext = pGraphicsDevice->GetImmediateContext();
 		DV_ASSERT(pImmediateContext);
-
-
-		if (!m_pScene)
-		{
-			// back buffer라도 그려줘야지
-			// 근데 역시 흰 바탕이라 차이가 없다.
-			pGraphicsDevice->PresentBegin();
-			pGraphicsDevice->PresentEnd();
-
-			// 그리고 이 리턴이 마음에 들지 않는데...
-			return;
-		}
-
 		
 		// GBuffer Pass
 		// : Opaque Object를 각각의 GBuffer에 그린다.
 		{
 			//Pass Begin
 			{
-				ID3D11RenderTargetView* pRTV[3] =
-				{ m_pGBuffer[eGBuffer::RT0]->GetColorRenderTargetView(), m_pGBuffer[eGBuffer::RT1]->GetColorRenderTargetView(), m_pGBuffer[eGBuffer::RT2]->GetColorRenderTargetView() };
+				ID3D11RenderTargetView* pRTV[3] = { 
+					m_pGBuffer[eGBuffer::RT0]->GetColorRenderTargetView(), 
+					m_pGBuffer[eGBuffer::RT1]->GetColorRenderTargetView(), 
+					m_pGBuffer[eGBuffer::RT2]->GetColorRenderTargetView() };
 				float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 				pImmediateContext->ClearRenderTargetView(pRTV[0], clearColor);
 				pImmediateContext->ClearRenderTargetView(pRTV[1], clearColor);
 				pImmediateContext->ClearRenderTargetView(pRTV[2], clearColor);
-
 				pImmediateContext->ClearDepthStencilView(m_pDepthStencilBuffer->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 				pImmediateContext->OMSetRenderTargets(3, pRTV, m_pDepthStencilBuffer->GetDepthStencilView());
@@ -141,19 +142,21 @@ namespace dive
 
 				// draw
 				{
+					// 기본적으로 결과는 back buffer에 float4로 넘겨질거다.
+					// 따라서 다르게 전달하고 싶다면 추가 rtv가 필요하다.
 				}
 			}
 
 			// End Pass
 			{
 				ID3D11RenderTargetView* pRTV[3] = { nullptr, nullptr, nullptr };
-				pGraphicsDevice->GetImmediateContext()->OMSetRenderTargets(3, pRTV, nullptr);
+				pImmediateContext->OMSetRenderTargets(3, pRTV, nullptr);
 			}
 		}
 
 		// Lighting Pass
 		{
-
+			// GBuffer를 SRV로 활용
 		}
 
 		// Post Processing Passes

@@ -91,7 +91,7 @@ namespace dive
 	{
 		m_pImmediateContext->OMSetRenderTargets(1, m_pBackbufferRTV.GetAddressOf(), 0);
 		
-		float clearColors[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		float clearColors[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
 		m_pImmediateContext->ClearRenderTargetView(m_pBackbufferRTV.Get(), clearColors);
 	}
 	

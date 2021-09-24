@@ -18,9 +18,10 @@ namespace sandbox
 			return false;
 		}
 
-		ActivatePath(&m_RenderPath);
-
-		/*
+		// 시스템 초기화 후 생성해야 한다.
+		// 그게 아니라면 별도의 초기화 함수가 필요하다.
+		m_pRenderPath = new dive::RenderPath3D_Legacy;
+		ActivatePath(m_pRenderPath);
 
 		// 일단 Scene을 직접 생성한 후 Active로 설정한다.
 		auto activeScene = dive::SceneManager::GetInstance().CreateScene("Sandbox");
@@ -29,23 +30,21 @@ namespace sandbox
 		
 
 		{
-			auto gameObject = activeScene->CreateGameObject();
-			auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
-			meshRenderer->CreateDefaultMesh(dive::eDefaultMeshType::Cube);
-			gameObject->SetName("Cube");
+		//	auto gameObject = activeScene->CreateGameObject();
+		//	auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
+		//	meshRenderer->CreateDefaultMesh(dive::eDefaultMeshType::Cube);
+		//	gameObject->SetName("Cube");
 		}
 
 		// 이제 카메라가 없으면 안된다?
 		{
-			auto pGameObject = activeScene->CreateGameObject();
-			pGameObject->SetName("Cam");
-			pGameObject->GetTransform()->SetPosition(0.0f, 0.0f, -5.0f);
-			auto pCam = pGameObject->AddComponent<dive::Camera>();
+		//	auto pGameObject = activeScene->CreateGameObject();
+		//	pGameObject->SetName("Cam");
+		//	pGameObject->GetTransform()->SetPosition(0.0f, 0.0f, -5.0f);
+		//	auto pCam = pGameObject->AddComponent<dive::Camera>();
 			// 카메라에 ScreenSize를 설정해 주어야 한다.
 			// 직접 찾도록 하는게 나을 것 같은데...
 		}
-
-		*/
 
 		APP_TRACE("Sandbox::Initialize()");
 		

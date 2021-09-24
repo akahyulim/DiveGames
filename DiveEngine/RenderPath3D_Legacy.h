@@ -20,6 +20,8 @@ namespace dive
 	class RenderPath3D_Legacy : public RenderPath
 	{
 	public:
+		RenderPath3D_Legacy();
+		~RenderPath3D_Legacy();
 
 		void ResizeBuffers();
 
