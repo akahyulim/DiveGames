@@ -2,21 +2,40 @@
 
 namespace dive
 {
-	enum class eBufferType
+	// 새로 만든 것
+	enum DEPTH_STENCIL_STATE_TYPES
 	{
-		Vertex,
-		Index,
-		Constant,
-		Invalid
+		DEPTH_STENCIL_STATE_DEFAULT,
+		DEPTH_STENCIL_STATE_TYPE_COUNT
 	};
 
-	enum class eShaderStage
+	enum RASTERIZER_STATE_TYPES
 	{
-		Vs,
-		Ps,
-		Invalid
+		RASTERIZER_STATE_CULLBACK_SOLID,
+		RASTERIZER_STATE_TYPE_COUNT
 	};
 
+	enum SHADER_TYPES
+	{
+		// Vertex Shaders
+		VERTEX_SHADER_GBUFFER,
+
+		// Pixel Shaders
+		PIXEL_SHADER_GBUFFER,
+
+		SHADER_TYPE_COUNT
+	};
+
+	enum INPUT_LAYOUT_TYPES
+	{
+		INPUT_LYAOUT_POS,
+
+		INPUT_LAYOUT_TYPE_COUNT,
+	};
+
+	// 새로 만든 것 END
+
+	// 배열 인덱스로 활용하기 위해 enum으로 만들었다.
 	enum SHADERTYPES
 	{
 		// vertex
@@ -38,7 +57,21 @@ namespace dive
 
 		ILTYPE_COUNT
 	};
-	// 위의 enum들도 전부 enum class로 바꾸자.
+
+	enum class eBufferType
+	{
+		Vertex,
+		Index,
+		Constant,
+		Invalid
+	};
+
+	enum class eShaderStage
+	{
+		Vs,
+		Ps,
+		Invalid
+	};
 
 	enum class eDepthStencilState
 	{

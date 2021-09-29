@@ -87,12 +87,12 @@ namespace dive
 		}
 	}
 
-	void GraphicsDevice::PresentBegin()
+	void GraphicsDevice::PresentBegin(float* pClearColor)
 	{
 		m_pImmediateContext->OMSetRenderTargets(1, m_pBackbufferRTV.GetAddressOf(), 0);
 		
-		float clearColors[4] = { 0.0f, 0.0f, 1.0f, 1.0f };
-		m_pImmediateContext->ClearRenderTargetView(m_pBackbufferRTV.Get(), clearColors);
+		float clearColors[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		m_pImmediateContext->ClearRenderTargetView(m_pBackbufferRTV.Get(), pClearColor ? pClearColor : clearColors);
 	}
 	
 	void GraphicsDevice::PresentEnd()

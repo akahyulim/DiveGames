@@ -4,8 +4,10 @@
 #include "Scene.h"
 #include "Src/Renderer/Graphics/dvRenderTexture.h"
 
-// Basic class for 3d rendering paths.
-// The post proecess chain is also implemented here.
+/*
+*	이름 그대로 RenderPath 구현
+*	Core에는 어울리지 않는다. 사용자에 의해 수정 가능한 Level임을 알리고 싶다.
+*/
 namespace dive
 {
 	// 결국엔 데이터를 가르쳐 주는 편이 나을 것 같긴 하다...

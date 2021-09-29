@@ -406,6 +406,9 @@
     <ClInclude Include="RenderPath3D_Legacy.h">
       <Filter>Engine\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\dvRenderer.h">
+      <Filter>Engine\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Log.cpp">
@@ -519,6 +522,9 @@
     <ClCompile Include="RenderPath3D_Legacy.cpp">
       <Filter>Engine\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Renderer\dvRenderer.cpp">
+      <Filter>Engine\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Engine">
@@ -609,6 +615,12 @@
     </Text>
     <Text Include="..\Assets\Shaders\개요.txt">
       <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="Src\Renderer\Pass Process.txt">
+      <Filter>Engine\Renderer</Filter>
+    </Text>
+    <Text Include="Src\Renderer\CommandList.txt">
+      <Filter>Engine\Renderer</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>

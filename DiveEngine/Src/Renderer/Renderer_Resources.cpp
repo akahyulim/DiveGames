@@ -267,7 +267,9 @@ namespace dive
 		return result;
 	}
 
-	// Wicked는 DrawXXX() 내부에서 직접 Bind한다.
+	// Wicked는 미리 생성 후 DrawXXX() 내부에서 직접 Bind한다.
+	// Spartan은 PassXXX() 내부에서 생성 후 BeginRenderPass()를 통해 Bind한다.
+	// 이는 하나의 Pass안에서도 PixelShader가 다를 수 있기 때문이다.
 	void Renderer::createPipelineStates()
 	{
 		// Legacy

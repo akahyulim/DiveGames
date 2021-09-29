@@ -9,6 +9,10 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
 
+/*
+*	SwapChain 및 D3D11 Device 관리
+*	Resource 생성 및 Bind 구현은 좀 더 생각해 봐야 할 것 같다.
+*/
 namespace dive
 {
 	class GraphicsDevice
@@ -17,7 +21,7 @@ namespace dive
 		GraphicsDevice(HWND hWnd, bool fullScreen, bool debugLayer = false);
 		~GraphicsDevice() = default;
 
-		void PresentBegin();
+		void PresentBegin(float* pClearColor = nullptr);
 		void PresentEnd();
 
 		void ResizeTarget(UINT width, UINT height);

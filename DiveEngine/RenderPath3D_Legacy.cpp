@@ -91,76 +91,30 @@ namespace dive
 			return;
 
 		// 이걸 매 프레임마다 가져 오는 것도 오버헤드일텐데...
+		// 생성시 매개변수로 받아 저장하고, 매 프레임 존재 유무를 확인하는 편이 나으려나...?
 		auto pGraphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
 		DV_ASSERT(pGraphicsDevice);
 
 		auto pImmediateContext = pGraphicsDevice->GetImmediateContext();
 		DV_ASSERT(pImmediateContext);
 		
-		// GBuffer Pass
-		// : Opaque Object를 각각의 GBuffer에 그린다.
+		// Pass - GBuffer
 		{
-			//Pass Begin
-			{
-				ID3D11RenderTargetView* pRTV[3] = { 
-					m_pGBuffer[eGBuffer::RT0]->GetColorRenderTargetView(), 
-					m_pGBuffer[eGBuffer::RT1]->GetColorRenderTargetView(), 
-					m_pGBuffer[eGBuffer::RT2]->GetColorRenderTargetView() };
-				float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-				pImmediateContext->ClearRenderTargetView(pRTV[0], clearColor);
-				pImmediateContext->ClearRenderTargetView(pRTV[1], clearColor);
-				pImmediateContext->ClearRenderTargetView(pRTV[2], clearColor);
-				pImmediateContext->ClearDepthStencilView(m_pDepthStencilBuffer->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			// Wicked에서 RenderPass는 RenerTargets이며 ResizeBuffers()에서 Texture들 생성 후 구성된다.
+			// 이후 이 곳에서 GraphicesDevice의 Begin() / End()를 통해 RenderTarget으로 설정된다.
+			// 이를 통해 복잡한 코드를 해결한 듯 하다.
+			// 여기에서 다시 GraphicsDevice를 사용 하느냐, ImmediateContext를 직접 사용하느냐로 구현이 갈린다.
+			// 즉, GraphicsDevice의 역할에 대해 정리를 마쳐야 한다.
 
-				pImmediateContext->OMSetRenderTargets(3, pRTV, m_pDepthStencilBuffer->GetDepthStencilView());
-			}
-			
-			// Bind
-			// : Renderer 내부에서 구현하면 간단하지만, 이 곳에서 구현하면 Get으로 얻어온 후 다시 Bind해야 한다...
-			{
-				// gbuffer constant buffer
-				// viewport
-				// depth stencil state
-				// rasterizer state
-				// sampler state
-				// primitive topology
-				// vertex shader
-				// input layout
-				// pixel shader
-			}
-
+			// Pass Begin: Set & Clear RenderTargets, DepthStencilView
+			// Bind Viewport
 			// Draw
-			// : opaque object만 대상이다.
-			{
-				// bind
-				{
-					// object constant buffer
-					// vertex buffer
-					// index buffer
-					// material resource
-				}
-
-				// draw
-				{
-					// 기본적으로 결과는 back buffer에 float4로 넘겨질거다.
-					// 따라서 다르게 전달하고 싶다면 추가 rtv가 필요하다.
-				}
-			}
-
-			// End Pass
-			{
-				ID3D11RenderTargetView* pRTV[3] = { nullptr, nullptr, nullptr };
-				pImmediateContext->OMSetRenderTargets(3, pRTV, nullptr);
-			}
+			// Pass End: Disconect RenderTargets
 		}
 
-		// Lighting Pass
+		// Pass - Light
 		{
-			// GBuffer를 SRV로 활용
-		}
 
-		// Post Processing Passes
-		{
 		}
 	}
 

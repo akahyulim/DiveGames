@@ -287,6 +287,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Settings.h" />
+    <ClInclude Include="Src\Renderer\dvRenderer.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvTexture.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h" />
@@ -325,6 +326,7 @@
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Settings.cpp" />
+    <ClCompile Include="Src\Renderer\dvRenderer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GBuffer.cpp" />
@@ -349,9 +351,11 @@
     <Text Include="LoadFromFile.txt" />
     <Text Include="PipelineState.txt" />
     <Text Include="RenderPathAndPass.txt" />
+    <Text Include="Src\Renderer\CommandList.txt" />
     <Text Include="Src\Renderer\Graphics\dvTexture.txt" />
     <Text Include="Src\Renderer\Graphics\GraphicsResources.txt" />
     <Text Include="Src\Renderer\Graphics\Texture와 Map.txt" />
+    <Text Include="Src\Renderer\Pass Process.txt" />
     <Text Include="Src\Resource\ResourceManager.txt" />
     <Text Include="WickedEngine%27sGraphicsSystems.txt" />
     <Text Include="구현 흐름.txt" />

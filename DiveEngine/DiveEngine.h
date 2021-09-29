@@ -20,8 +20,10 @@
 #include "Src/Renderer/Graphics/dvTexture.h"
 #include "Src/Renderer/Graphics/dvTexture2D.h"
 #include "Src/Renderer/Graphics/dvRenderTexture.h"
-#include "GraphicsInclude.h"
 #include "Src/Renderer/Renderer.h"
+#include "Src/Renderer/dvRenderer.h"	// 갱신 버전
+#include "GraphicsInclude.h"
+#include "GraphicsEnums.h"
 #include "VertexTypes.h"
 #include "Mesh.h"
 #include "Texture.h"
