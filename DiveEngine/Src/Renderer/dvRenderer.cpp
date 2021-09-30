@@ -18,6 +18,7 @@ namespace dive
 			createSamplerStates();
 			createDepthStencilStates();
 			createRasterizerStates();
+			createBlendStates();
 		}
 
 		// Resources
@@ -34,12 +35,11 @@ namespace dive
 		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
 		DV_ASSERT(pImmediateContext);
 
-		// 기본적인 resource bind
+		// PipelineState
 		{
-			// 이전 set과 비교하는 편이 나을 것 같다. => 일단은 그냥 구성하는 편이 나으려나..?
-			// spartan은 이 곳에서 PipelineState의 기본 설정을 구성하고 아래 Render Mesh에서 완성한 후 CommandList::BeginRenderPass()에 전달하여 bind한다.
-			// 이때 BeginRenderPass()는 이전 리소스들과 비교를 수행하기도 한다.
-			// 여기에서 CommandList는 GraphicsDevice에서 Bind(), Draw()를 전담하는 객체로, 모든 Pass()의 기본 매개변수이다. 
+			// PipelineState를 만들어서 Bind하느냐, 그냥 직접 Bind하느냐로 갈린다.
+			// 멀티 쓰레드 렌더링 여부와 상관관계를 알아야 한다.
+			// 단순히 편의성때문이라면 PipelineState를 만드는 편이 낫다.
 			pImmediateContext->OMSetDepthStencilState(m_pDepthStencilStates[DEPTH_STENCIL_STATE_DEFAULT].Get(), 0);
 			pImmediateContext->RSSetState(m_pRasterizerStates[RASTERIZER_STATE_CULLBACK_SOLID].Get());
 			// sampler
@@ -68,12 +68,13 @@ namespace dive
 		auto pDevice = m_pGraphicsDevice->GetDevice();
 		DV_ASSERT(pDevice);
 
-		HRESULT result;
 		D3D11_DEPTH_STENCIL_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+
+		HRESULT result;
 
 		// default
 		{
-			ZeroMemory(&desc, sizeof(desc));
 			desc.DepthEnable		= TRUE;
 			desc.DepthWriteMask		= D3D11_DEPTH_WRITE_MASK_ALL;
 			desc.DepthFunc			= D3D11_COMPARISON_LESS;
@@ -105,12 +106,13 @@ namespace dive
 		auto pDevice = m_pGraphicsDevice->GetDevice();
 		DV_ASSERT(pDevice);
 
-		HRESULT result;
 		D3D11_RASTERIZER_DESC desc;
-		
+		ZeroMemory(&desc, sizeof(desc));
+
+		HRESULT result;
+
 		// cullback_solid
 		{
-			ZeroMemory(&desc, sizeof(desc));
 			desc.AntialiasedLineEnable	= false;
 			desc.CullMode				= D3D11_CULL_BACK;
 			desc.DepthBias				= 0;
@@ -123,6 +125,25 @@ namespace dive
 			desc.SlopeScaledDepthBias	= 0.0f;
 
 			result = pDevice->CreateRasterizerState(&desc, m_pRasterizerStates[RASTERIZER_STATE_CULLBACK_SOLID].GetAddressOf());
+			DV_ASSERT(SUCCEEDED(result));
+		}
+
+		return true;
+	}
+
+	bool dvRenderer::createBlendStates()
+	{
+		auto pDevice = m_pGraphicsDevice->GetDevice();
+		DV_ASSERT(pDevice);
+
+		D3D11_BLEND_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		
+		HRESULT result;
+
+		// opaque
+		{
+			result = pDevice->CreateBlendState(&desc, m_pBlendStates[BLEND_STATE_OPAQUE].GetAddressOf());
 			DV_ASSERT(SUCCEEDED(result));
 		}
 

@@ -15,6 +15,13 @@ namespace dive
 		RASTERIZER_STATE_TYPE_COUNT
 	};
 
+	enum BLEND_STATE_TYPES
+	{
+		BLEND_STATE_OPAQUE,
+		BLEND_STATE_TRANSPARENT,
+		BLEND_STATE_TYPE_COUNT
+	};
+
 	enum SHADER_TYPES
 	{
 		// Vertex Shaders
