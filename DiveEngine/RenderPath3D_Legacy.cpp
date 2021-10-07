@@ -97,7 +97,7 @@ namespace dive
 
 		auto pImmediateContext = pGraphicsDevice->GetImmediateContext();
 		DV_ASSERT(pImmediateContext);
-		
+
 		// Pass - GBuffer
 		{
 			// Wicked에서 RenderPass는 RenerTargets이며 ResizeBuffers()에서 Texture들 생성 후 구성된다.
@@ -107,19 +107,53 @@ namespace dive
 			// 즉, GraphicsDevice의 역할에 대해 정리를 마쳐야 한다.
 
 			// Pass Begin: Set & Clear RenderTargets, DepthStencilView
+			{
+				ID3D11RenderTargetView* pGBuffer[] = {
+					m_pGBuffer[eGBuffer::RT0]->GetColorRenderTargetView(),
+					m_pGBuffer[eGBuffer::RT1]->GetColorRenderTargetView(),
+					m_pGBuffer[eGBuffer::RT2]->GetColorRenderTargetView() };
+
+				// RTV, DSV 초기화
+				pImmediateContext->OMSetRenderTargets(3, pGBuffer, m_pDepthStencilBuffer->GetDepthStencilView());
+			}
+
 			// Bind Viewport
+			// 이건 일단 Draw에 넣자.
+		
 			// Draw
+			{
+
+			}
+
 			// Pass End: Disconect RenderTargets
+			{
+				// 좀 생소해도 이게 맞는 것 같다.
+				ID3D11RenderTargetView* pGBuffer[] = { nullptr, nullptr, nullptr };
+				pImmediateContext->OMSetRenderTargets(3, pGBuffer, nullptr);
+			}
 		}
 
 		// Pass - Light
 		{
-
 		}
 	}
 
+	// Backbuffer를 RenderTarget으로 하는 Begine / End에 둘러 쌓여 있다.
 	void RenderPath3D_Legacy::Compose() const
 	{
-		// 기본적으로는 Backbuffer에 그린다.
+		// 테스트
+		auto pGraphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
+		DV_ASSERT(pGraphicsDevice);
+
+		// Camera의 크기를 갱신해주는 과정이다.
+		// 이를 통해 Viewport 또한 계산되므로 꼭 필요하다.
+		// 다만 그 위치가 애매하다.
+		// Wicked의 경우 현재와 같이 RenderTarget 설정 후 설정하는데
+		// 다중 카메라를 지원토록 하려면 Pass 함수 안에서 하는게 맞다.
+		unsigned int width = pGraphicsDevice->GetResolutionWidth();
+		unsigned int height = pGraphicsDevice->GetResolutionHeight();
+		Renderer::GetInstance().SetViewport(width, height);
+
+		Renderer::GetInstance().DrawScene();
 	}
 }

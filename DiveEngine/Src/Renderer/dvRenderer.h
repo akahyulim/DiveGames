@@ -17,13 +17,13 @@ namespace dive
 
 		// Passes
 		void DrawScene();
+		void DrawLights();
 
 		// Get & Set
 		GraphicsDevice* GetGraphicsDevice() { return m_pGraphicsDevice.get(); }
 
 		ID3D11DepthStencilState* GetDepthStencilState(DEPTH_STENCIL_STATE_TYPES type) { return m_pDepthStencilStates[type].Get(); }
 		ID3D11RasterizerState* GetRasterizerState(RASTERIZER_STATE_TYPES type) { return m_pRasterizerStates[type].Get(); }
-		
 
 	private:
 		bool createSamplerStates();

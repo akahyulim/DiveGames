@@ -27,23 +27,24 @@ namespace sandbox
 		auto activeScene = dive::SceneManager::GetInstance().CreateScene("Sandbox");
 		dive::SceneManager::GetInstance().SetActiveScene(activeScene);
 
-		
-
+	
+		// Main Camera
 		{
-		//	auto gameObject = activeScene->CreateGameObject();
-		//	auto meshRenderer = gameObject->AddComponent<dive::MeshRenderer>();
-		//	meshRenderer->CreateDefaultMesh(dive::eDefaultMeshType::Cube);
-		//	gameObject->SetName("Cube");
+			auto pGameObject = activeScene->CreateGameObject();
+			pGameObject->SetName("MainCamera");
+			pGameObject->GetTransform()->SetPosition(0.0f, 0.0f, -5.0f);
+			auto pCam = pGameObject->AddComponent<dive::Camera>();
+
+			// 크기 설정 위치가 에바다. 게다가 크기를 임의로 하드코딩 했다.
+			pCam->SetScreenSize(800, 600);
 		}
 
-		// 이제 카메라가 없으면 안된다?
+		// Objects
 		{
-		//	auto pGameObject = activeScene->CreateGameObject();
-		//	pGameObject->SetName("Cam");
-		//	pGameObject->GetTransform()->SetPosition(0.0f, 0.0f, -5.0f);
-		//	auto pCam = pGameObject->AddComponent<dive::Camera>();
-			// 카메라에 ScreenSize를 설정해 주어야 한다.
-			// 직접 찾도록 하는게 나을 것 같은데...
+			auto pGameObject = activeScene->CreateGameObject();
+			auto pMeshRenderer = pGameObject->AddComponent<dive::MeshRenderer>();
+			pMeshRenderer->CreateDefaultMesh(dive::eDefaultMeshType::Cube);
+			pGameObject->SetName("Cube");
 		}
 
 		APP_TRACE("Sandbox::Initialize()");

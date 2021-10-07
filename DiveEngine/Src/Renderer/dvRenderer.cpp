@@ -55,6 +55,11 @@ namespace dive
 		// render mesh: visibility에서 가공된 결과물이다.
 	}
 
+	void dvRenderer::DrawLights()
+	{
+		// GBuffer를 ShaderResourceView로 활용하여 빛이 적용된 Scene을 그린다.
+	}
+
 	bool dvRenderer::createSamplerStates()
 	{
 		auto pDevice = m_pGraphicsDevice->GetDevice();

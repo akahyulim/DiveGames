@@ -4,11 +4,13 @@
 #include "../GameObject.h"
 #include "../Camera.h"
 
+// 일단 dvRenderer 구현은 나중으로 미루고
+// 이 곳에서 Deferred Shader로 Lighting 까지 구현해보자.
 namespace dive
 {
-	// 현재 테스트 용으로 한 곳에 몰아 넣었다.
-	// 추후 세분화시킨 후 나누어야 한다.
-	// 멀티 카메라를 테스트하던 구현이다.
+	// Multi-Thread Render reference를 참고하자면
+	// 이 곳에선 Static과 Dynamic Params만 설정하고
+	// RenderScene() 같은 곳에서 Bind를 시킬 수 있다.
 	void Renderer::DrawScene()
 	{
 		auto immediateContext = m_pGraphicsDevice->GetImmediateContext();
@@ -17,8 +19,9 @@ namespace dive
 		// CameraClearFlags Test를 위해 Depth Only를 구현해보고 싶은데
 		// 현재 DepthStencilView가 존재하지 않는다.
 
-		// 일단 Legacy를 두 개 이상의 Camera로 그려보자.
-		// => 이건 좀 특별한 케이스다. 원래는 Camera에 RenderTexture가 존재하므로 따로 그려야 한다.
+		// 유니티의 다중 카메라 예제를 따라해본 구현이다.
+		// 이를 그대로 적용하려면 적어도 MainCamera 정도로 제한이 필요하다.
+		// 그리고 Viewport 설정에 필요한 작업도 내부에서 해 주어야 한다.
 		for (auto& pCamera : m_GameObjects[eObjectType::Camera])
 		{
 			if (m_GameObjects[eObjectType::Opaque].empty())
@@ -38,7 +41,9 @@ namespace dive
 
 			// Viewport 역시 일단 순서대로 적용한다.
 			// 그런데... num을 설정하면 어떻게 되는거지?
-			//=> 테스트용임을 감안하자. Wicked는 Viewport를 RenderPath에서 이 함수 호출전에 Bind하였다. 물론 구현이 다를순 있다.
+			// 만약 num을 MainCamera 개수만큼, Viewport 포인터를 배열로 전달할 수 있다면
+			// 카메라 개수만큼 루프를 돌리지 않아도 될 것이다.
+			// 다만 이 경우 변환 행렬을 따로 전달할 수 있어야 한다.
 			immediateContext->RSSetViewports(1, pCameraCom->GetViewportPtr());
 
 			MeshRenderer* meshRenderer = nullptr;
@@ -74,6 +79,7 @@ namespace dive
 					continue;
 
 				// 이건 다시 Draw로 바꿔야 할 것 같다.
+				// 그러면 AssetData Bind가 추가돼 더 복잡해질 것이다.
 				meshRenderer->Render(immediateContext);
 			}
 		}
