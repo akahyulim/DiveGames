@@ -11,6 +11,9 @@ namespace dive
 	// Multi-Thread Render reference를 참고하자면
 	// 이 곳에선 Static과 Dynamic Params만 설정하고
 	// RenderScene() 같은 곳에서 Bind를 시킬 수 있다.
+	// 그럴려면 Pass별 Params를 설정해 놓은 객체 혹은 변수가 필요하다.
+	// static의 경우 RenderPath에서 RTV, DSV 등을 설정할 수 있을 것 같긴한데
+	// Dynamic의 경우엔 뭘로 해야 할까?
 	void Renderer::DrawScene()
 	{
 		auto immediateContext = m_pGraphicsDevice->GetImmediateContext();
@@ -45,6 +48,76 @@ namespace dive
 			// 카메라 개수만큼 루프를 돌리지 않아도 될 것이다.
 			// 다만 이 경우 변환 행렬을 따로 전달할 수 있어야 한다.
 			immediateContext->RSSetViewports(1, pCameraCom->GetViewportPtr());
+
+			MeshRenderer* meshRenderer = nullptr;
+			for (const auto& gameObject : m_GameObjects[eObjectType::Opaque])
+			{
+				if (Transform* transform = gameObject->GetTransform())
+				{
+					// view proj 역시 camera로부터 직접 가져왔다.
+					m_BufferObjectCPU.SetWorldMatrix(transform->GetMatrix());
+					m_BufferObjectCPU.SetWorldViewProjectionMatrix(m_BufferObjectCPU.GetWorldMatrix() * pCameraCom->GetViewProjectionMatrix());
+
+					//==========================================================================//
+					// Constant Buffer Test														//
+					// 1. 스파르탄은 함수를 사용해 CPU 데이터를 GPU에 map / unmap 했다.			//
+					// 2. DirectX의 행렬과 HLSL의 행렬 방향이 다르기때문에 전치해 주어야 한다.	//
+					// 현재 XMFLOAT4X4로 저장했기에 좀 더 복잡해졌다.							//
+					//==========================================================================//
+					DirectX::XMMATRIX world = XMMatrixTranspose(m_BufferObjectCPU.GetWorldMatrix());
+					DirectX::XMMATRIX wvp = XMMatrixTranspose(m_BufferObjectCPU.GetWorldViewProjectionMatrix());
+
+					// 이건 오브젝트 버퍼다. UpdateCB랑은 상관없다.
+					BufferObject* pData = static_cast<BufferObject*>(m_pBufferObjectGPU->Map());
+					DirectX::XMStoreFloat4x4(&pData->world, world);
+					DirectX::XMStoreFloat4x4(&pData->wvp, wvp);
+					assert(m_pBufferObjectGPU->Unmap());
+
+					ID3D11Buffer* buffer = m_pBufferObjectGPU->GetBuffer();
+					immediateContext->VSSetConstantBuffers(0, 1, &buffer);
+				}
+
+				meshRenderer = gameObject->GetComponent<MeshRenderer>();
+				if (!meshRenderer)
+					continue;
+
+				// 이건 다시 Draw로 바꿔야 할 것 같다.
+				// 그러면 AssetData Bind가 추가돼 더 복잡해질 것이다.
+				meshRenderer->Render(immediateContext);
+			}
+		}
+	}
+
+	// 나중에 DrawScene을 지우고 이름을 바꾸자.
+	void Renderer::DrawGBuffer()
+	{
+		auto immediateContext = m_pGraphicsDevice->GetImmediateContext();
+		DV_ASSERT(immediateContext != nullptr);
+
+		// 이렇게까지 해도 Visibility가 이상하다.
+		// 여기부터 해결하자.
+		if (m_GameObjects.empty())
+			return;
+
+		// 현재 GameObject가 제대로 설정되어 있지 않다.
+		for (auto& pCamera : m_GameObjects[eObjectType::Camera])
+		{
+			if (m_GameObjects[eObjectType::Opaque].empty())
+				return;
+
+			auto pCameraCom = pCamera->GetComponent<Camera>();
+
+	
+			// 몇개는 GET 함수가 있다...
+			// 그런데 더블 포인터 타입때문에 직접 가져오는게 편하다.
+			immediateContext->VSSetShader((ID3D11VertexShader*)m_pShaders[SHADERTYPES::VSTYPE_DEFERRED_SHADING].Get(), NULL, 0);
+			immediateContext->PSSetShader((ID3D11PixelShader*)m_pShaders[SHADERTYPES::PSTYPE_DEFERRED_SHADING].Get(), NULL, 0);
+			immediateContext->IASetInputLayout(m_pInputLayouts[ILTYPES::ILTYPE_POS_NOR_TEX].Get());
+			// 시작 슬롯, 개수, 포인터로 묶에서 보낼 수 있다.
+			immediateContext->PSSetSamplers(0, 1, m_pSamplerStates[(size_t)eSamplerState::Default].GetAddressOf());
+			immediateContext->OMSetDepthStencilState(m_pDepthStencilStates[(size_t)eDepthStencilState::Default].Get(), 1);
+			immediateContext->RSSetState(m_pRasterizerStates[(size_t)eRasterizerState::Cullback_Solid].Get());
+			immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 			MeshRenderer* meshRenderer = nullptr;
 			for (const auto& gameObject : m_GameObjects[eObjectType::Opaque])

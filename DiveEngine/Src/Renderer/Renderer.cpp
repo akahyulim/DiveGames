@@ -266,6 +266,8 @@ namespace dive
 			{
 				m_GameObjects[eObjectType::Camera].push_back(gameObject);
 				// 카메라 선택... 메인 카메라인가?
+				// 즉, 이렇게 하면 안된다. 카메라는 여러개일 수 있고
+				// 개념상으로 메인 카메라 역시 2개 이상일 수 있다.
 				m_pCamera = gameObject;
 			}
 			else if (light)

@@ -72,6 +72,7 @@ namespace dive
 
 		// Render Passes
 		void DrawScene();
+		void DrawGBuffer();
 		void DrawLight();
 
 		ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilState state) { return m_pDepthStencilStates[static_cast<int>(state)].Get(); }

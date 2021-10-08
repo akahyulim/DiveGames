@@ -49,9 +49,15 @@ namespace dive
 		VSTYPE_FONTS,
 		VSTYPE_LEGACY,
 
+		VSTYPE_GBUFFER_VIS,
+		VSTYPE_DEFERRED_SHADING,
+
 		// pixel
 		PSTYPE_FONTS,
 		PSTYPE_LEGACY,
+
+		PSTYPE_GBUFFER_VIS,
+		PSTYPE_DEFERRED_SHADING,
 
 		SHADERTYPE_COUNT
 	};
@@ -61,6 +67,8 @@ namespace dive
 	{
 		ILTYPE_POS_TEX2,	// 이건 폰트용으로 VertexType이 하나로 만들어졌다.
 		ILTYPE_POS_TEX_NOR_TAN,
+
+		ILTYPE_POS_NOR_TEX,
 
 		ILTYPE_COUNT
 	};

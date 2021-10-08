@@ -199,25 +199,61 @@ namespace dive
 		return true;
 	}
 
+	// Shader의 생성 자체는 한 곳에 모으는 것이 맞다. Thread를 이용하여 로드하면 더 좋다.
+	// 다만 Pass별로 자신이 사용할 Shader를 관리토록 하면 어떨가 싶다.
+	// 물론 이는 책의 예제를 참고한 것일 뿐... 참고 엔진에서는 Pass에서 직접 가져와 bind한다.
 	bool Renderer::createShaders()
 	{
 		// Legacy Shader
 		{
-			D3D11_INPUT_ELEMENT_DESC desc[] =
+			// test용 그냥 그리기
 			{
-				{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-				{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-			};
+				D3D11_INPUT_ELEMENT_DESC desc[] =
+				{
+					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				};
 
-			if (!createVertexShader(L"../DiveEngine/legacy.hlsl", VSTYPE_LEGACY, ILTYPE_POS_TEX_NOR_TAN, desc, arraysize(desc)))
-			{
-				return false;
+				if (!createVertexShader(L"../DiveEngine/legacy.hlsl", VSTYPE_LEGACY, ILTYPE_POS_TEX_NOR_TAN, desc, arraysize(desc)))
+				{
+					return false;
+				}
+				if (!createPixelShader(L"../DiveEngine/legacy.hlsl", PSTYPE_LEGACY))
+				{
+					return false;
+				}
 			}
-			if (!createPixelShader(L"../DiveEngine/legacy.hlsl", PSTYPE_LEGACY))
+
+			// Deferred Shading
 			{
-				return false;
+				D3D11_INPUT_ELEMENT_DESC desc[] =
+				{
+					// 일단 Tangent 제거 및 순서 변환
+					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				};
+
+				if (!createVertexShader(L"../Assets/Shaders/Legacy/DeferredShading.hlsl", VSTYPE_LEGACY, ILTYPE_POS_NOR_TEX, desc, arraysize(desc)))
+				{
+					return false;
+				}
+				if (!createPixelShader(L"../Assets/Shaders/Legacy/DeferredShading.hlsl", PSTYPE_LEGACY))
+				{
+					return false;
+				}
+			}
+
+			// Light
+			{
+
+			}
+
+			// GBufferVis??
+			{
+
 			}
 		}
 

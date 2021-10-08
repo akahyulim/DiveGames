@@ -19,12 +19,16 @@ namespace dive
 	}
 
 	// Wicked에선 Resolution Change 이벤트에 반응하는듯 하다.
+	// 즉, 매 프레임 새로 그리는건 아니다.
 	void RenderPath3D_Legacy::ResizeBuffers()
 	{
 		auto pGraphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
 		DV_ASSERT(pGraphicsDevice);
 
 		// resolution
+		// 이러면 안될 것 같은데... 일반적으로는 맞다.
+		// 하지만 Editor에서는 크기를 다르게 설정해야 한다.
+		// 그렇다면 이벤트를 통해 크기를 전달받으면 어떨까?
 		unsigned int width = pGraphicsDevice->GetResolutionWidth();
 		unsigned int height = pGraphicsDevice->GetResolutionHeight();
 
@@ -100,12 +104,6 @@ namespace dive
 
 		// Pass - GBuffer
 		{
-			// Wicked에서 RenderPass는 RenerTargets이며 ResizeBuffers()에서 Texture들 생성 후 구성된다.
-			// 이후 이 곳에서 GraphicesDevice의 Begin() / End()를 통해 RenderTarget으로 설정된다.
-			// 이를 통해 복잡한 코드를 해결한 듯 하다.
-			// 여기에서 다시 GraphicsDevice를 사용 하느냐, ImmediateContext를 직접 사용하느냐로 구현이 갈린다.
-			// 즉, GraphicsDevice의 역할에 대해 정리를 마쳐야 한다.
-
 			// Pass Begin: Set & Clear RenderTargets, DepthStencilView
 			{
 				ID3D11RenderTargetView* pGBuffer[] = {
@@ -113,16 +111,35 @@ namespace dive
 					m_pGBuffer[eGBuffer::RT1]->GetColorRenderTargetView(),
 					m_pGBuffer[eGBuffer::RT2]->GetColorRenderTargetView() };
 
-				// RTV, DSV 초기화
+				float width = static_cast<float>(m_pGBuffer[eGBuffer::RT0]->GetWidth());
+				float height = static_cast<float>(m_pGBuffer[eGBuffer::RT0]->GetHeight());
+
+				// 이게 맞는 것 같다. RT마다 크기가 달라질 수 있기 때문이다.
+				// 다만 책의 예제에서는 딱 한 번 Backbuffer의 크기로 설정했다. 그냥 단순하게 만든 것 같기도 하고...
+				D3D11_VIEWPORT vp;
+				vp.Width = width;
+				vp.Height = height;
+				vp.TopLeftX = 0.0f;
+				vp.TopLeftY = 0.0f;
+				vp.MinDepth = 0.0f;
+				vp.MaxDepth = 1.0f;
+				pImmediateContext->RSSetViewports(1, &vp);
+
+				// 역시나 카메라가 걸린다.
+				Renderer::GetInstance().SetViewport(width, height);
+
+				float clearColor[] = {0.0f, 0.0f, 0.0f, 1.0f};
+				pImmediateContext->ClearRenderTargetView(pGBuffer[0], clearColor);
+				pImmediateContext->ClearRenderTargetView(pGBuffer[1], clearColor);
+				pImmediateContext->ClearRenderTargetView(pGBuffer[2], clearColor);
+				pImmediateContext->ClearDepthStencilView(m_pDepthStencilBuffer->GetDepthStencilView(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
 				pImmediateContext->OMSetRenderTargets(3, pGBuffer, m_pDepthStencilBuffer->GetDepthStencilView());
 			}
 
-			// Bind Viewport
-			// 이건 일단 Draw에 넣자.
-		
 			// Draw
 			{
-
+				Renderer::GetInstance().DrawGBuffer();
 			}
 
 			// Pass End: Disconect RenderTargets
@@ -144,14 +161,21 @@ namespace dive
 		// 테스트
 		auto pGraphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
 		DV_ASSERT(pGraphicsDevice);
+		auto width = (float)pGraphicsDevice->GetResolutionWidth();
+		auto height = (float)pGraphicsDevice->GetResolutionHeight();
 
-		// Camera의 크기를 갱신해주는 과정이다.
-		// 이를 통해 Viewport 또한 계산되므로 꼭 필요하다.
-		// 다만 그 위치가 애매하다.
-		// Wicked의 경우 현재와 같이 RenderTarget 설정 후 설정하는데
-		// 다중 카메라를 지원토록 하려면 Pass 함수 안에서 하는게 맞다.
-		unsigned int width = pGraphicsDevice->GetResolutionWidth();
-		unsigned int height = pGraphicsDevice->GetResolutionHeight();
+		D3D11_VIEWPORT vp;
+		vp.Width = width;
+		vp.Height = height;
+		vp.TopLeftX = 0.0f;
+		vp.TopLeftY = 0.0f;
+		vp.MinDepth = 0.0f;
+		vp.MaxDepth = 1.0f;
+
+		pGraphicsDevice->GetImmediateContext()->RSSetViewports(1, &vp);
+
+		// 카메라에도 크기를 전달해야 하는 것 같다.
+		// 애초에 이 함수가 viewport까지 설정하는 의도였던 것 같다.
 		Renderer::GetInstance().SetViewport(width, height);
 
 		Renderer::GetInstance().DrawScene();
