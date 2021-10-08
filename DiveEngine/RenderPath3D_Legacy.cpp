@@ -139,7 +139,7 @@ namespace dive
 
 			// Draw
 			{
-				Renderer::GetInstance().DrawGBuffer();
+		//		Renderer::GetInstance().DrawGBuffer();
 			}
 
 			// Pass End: Disconect RenderTargets

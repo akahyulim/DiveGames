@@ -94,12 +94,14 @@ namespace dive
 		auto immediateContext = m_pGraphicsDevice->GetImmediateContext();
 		DV_ASSERT(immediateContext != nullptr);
 
-		// 이렇게까지 해도 Visibility가 이상하다.
-		// 여기부터 해결하자.
-		if (m_GameObjects.empty())
-			return;
-
 		// 현재 GameObject가 제대로 설정되어 있지 않다.
+		// Scene::Update를 호출하는 구문이 없기 때문인 것 같다.
+		// 그럼 Compose는 왜 제대로 된거지?
+		// => 아니다. 어디선가 Scene::Update를 호출하고 있다.
+		// => RenderPath의 Update에서 활성화된 Scene을 Update한다.
+		// 그렇다면 왜...?
+		// 다시보니 위의 DrawScene()도 먹통이 되었다...
+
 		for (auto& pCamera : m_GameObjects[eObjectType::Camera])
 		{
 			if (m_GameObjects[eObjectType::Opaque].empty())
