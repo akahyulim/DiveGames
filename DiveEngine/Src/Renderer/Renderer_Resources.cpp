@@ -230,17 +230,17 @@ namespace dive
 			{
 				D3D11_INPUT_ELEMENT_DESC desc[] =
 				{
-					// 일단 Tangent 제거 및 순서 변환
 					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+					{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 				};
 
-				if (!createVertexShader(L"../Assets/Shaders/Legacy/DeferredShading.hlsl", VSTYPE_LEGACY, ILTYPE_POS_NOR_TEX, desc, arraysize(desc)))
+				if (!createVertexShader(L"../Assets/Shaders/Legacy/DeferredShading.hlsl", VSTYPE_DEFERRED_SHADING, ILTYPE_POS_TEX_NOR_TAN, desc, arraysize(desc)))
 				{
 					return false;
 				}
-				if (!createPixelShader(L"../Assets/Shaders/Legacy/DeferredShading.hlsl", PSTYPE_LEGACY))
+				if (!createPixelShader(L"../Assets/Shaders/Legacy/DeferredShading.hlsl", PSTYPE_DEFERRED_SHADING))
 				{
 					return false;
 				}
@@ -341,7 +341,14 @@ namespace dive
 		ID3D10Blob* shaderBuffer = nullptr;
 		ID3D10Blob* shaderError = nullptr;
 
-		if (FAILED(D3DCompileFromFile(filepath.c_str(), NULL, NULL, "mainVS", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &shaderError)))
+		DWORD compileFlags = 0;
+#if _DEBUG
+		compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_PREFER_FLOW_CONTROL;
+#else
+		compileFlags |= D3DCOMPILE_ENABLE_STRICTNESS | D3DCIMPILE_OPTIMIZATION_LEVEL3;
+#endif
+
+		if (FAILED(D3DCompileFromFile(filepath.c_str(), NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "mainVS", "vs_5_0", compileFlags, 0, &shaderBuffer, &shaderError)))
 		{
 			if (shaderError != nullptr)
 			{
@@ -364,6 +371,8 @@ namespace dive
 			return false;
 		}
 		
+		// 이미 생성 되어 있는 경우 nullptr이 가능해야 한다.
+		// 물론 이런 경우가 발생하지 않을 수도 있다.
 		if ((descs != nullptr) && (inputLayoutType != ILTYPE_COUNT))
 		{
 			if (FAILED(pDevice->CreateInputLayout(descs, numElements, shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(),
@@ -386,7 +395,14 @@ namespace dive
 		ID3D10Blob* shaderBuffer = nullptr;
 		ID3D10Blob* shaderError = nullptr;
 
-		if (FAILED(D3DCompileFromFile(filepath.c_str(), NULL, NULL, "mainPS", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &shaderBuffer, &shaderError)))
+		DWORD compileFlags = 0;
+#if _DEBUG
+		compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_PREFER_FLOW_CONTROL;
+#else
+		compileFlags |= D3DCOMPILE_ENABLE_STRICTNESS | D3DCIMPILE_OPTIMIZATION_LEVEL3;
+#endif
+
+		if (FAILED(D3DCompileFromFile(filepath.c_str(), NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "mainPS", "ps_5_0", compileFlags, 0, &shaderBuffer, &shaderError)))
 		{
 			if (shaderError != nullptr)
 			{

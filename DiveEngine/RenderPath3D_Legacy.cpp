@@ -139,7 +139,7 @@ namespace dive
 
 			// Draw
 			{
-		//		Renderer::GetInstance().DrawGBuffer();
+				Renderer::GetInstance().DrawGBuffer();
 			}
 
 			// Pass End: Disconect RenderTargets
@@ -178,6 +178,7 @@ namespace dive
 		// 애초에 이 함수가 viewport까지 설정하는 의도였던 것 같다.
 		Renderer::GetInstance().SetViewport(width, height);
 
+		// 현재 Renderable이 화면에서 보이지 않는다.
 		Renderer::GetInstance().DrawScene();
 	}
 }

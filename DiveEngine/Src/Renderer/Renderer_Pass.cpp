@@ -38,7 +38,8 @@ namespace dive
 			immediateContext->IASetPrimitiveTopology(m_PipelineStateLegacy.primitiveTopology);
 			immediateContext->VSSetShader(m_PipelineStateLegacy.pVS, NULL, 0);
 			immediateContext->PSSetShader(m_PipelineStateLegacy.pPS, NULL, 0);
-			immediateContext->PSSetSamplers(0, 1, &m_PipelineStateLegacy.pSS);
+			//immediateContext->PSSetSamplers(0, 1, &m_PipelineStateLegacy.pSS);
+			immediateContext->PSSetSamplers(0, 1, m_pSamplerStates[(size_t)eSamplerState::Linear].GetAddressOf());
 			immediateContext->OMSetDepthStencilState(m_PipelineStateLegacy.pDSS, 1);
 			immediateContext->RSSetState(m_PipelineStateLegacy.pRSS);
 
@@ -47,7 +48,7 @@ namespace dive
 			// 만약 num을 MainCamera 개수만큼, Viewport 포인터를 배열로 전달할 수 있다면
 			// 카메라 개수만큼 루프를 돌리지 않아도 될 것이다.
 			// 다만 이 경우 변환 행렬을 따로 전달할 수 있어야 한다.
-			immediateContext->RSSetViewports(1, pCameraCom->GetViewportPtr());
+			//immediateContext->RSSetViewports(1, pCameraCom->GetViewportPtr());
 
 			MeshRenderer* meshRenderer = nullptr;
 			for (const auto& gameObject : m_GameObjects[eObjectType::Opaque])
@@ -94,14 +95,8 @@ namespace dive
 		auto immediateContext = m_pGraphicsDevice->GetImmediateContext();
 		DV_ASSERT(immediateContext != nullptr);
 
-		// 현재 GameObject가 제대로 설정되어 있지 않다.
-		// Scene::Update를 호출하는 구문이 없기 때문인 것 같다.
-		// 그럼 Compose는 왜 제대로 된거지?
-		// => 아니다. 어디선가 Scene::Update를 호출하고 있다.
-		// => RenderPath의 Update에서 활성화된 Scene을 Update한다.
-		// 그렇다면 왜...?
-		// 다시보니 위의 DrawScene()도 먹통이 되었다...
-
+		// m_GameObjects가 갱신되지 않는 경우가 발생했었다.
+		// 고쳐진 이유를 모르겠다.
 		for (auto& pCamera : m_GameObjects[eObjectType::Camera])
 		{
 			if (m_GameObjects[eObjectType::Opaque].empty())
@@ -114,9 +109,9 @@ namespace dive
 			// 그런데 더블 포인터 타입때문에 직접 가져오는게 편하다.
 			immediateContext->VSSetShader((ID3D11VertexShader*)m_pShaders[SHADERTYPES::VSTYPE_DEFERRED_SHADING].Get(), NULL, 0);
 			immediateContext->PSSetShader((ID3D11PixelShader*)m_pShaders[SHADERTYPES::PSTYPE_DEFERRED_SHADING].Get(), NULL, 0);
-			immediateContext->IASetInputLayout(m_pInputLayouts[ILTYPES::ILTYPE_POS_NOR_TEX].Get());
+			immediateContext->IASetInputLayout(m_pInputLayouts[ILTYPES::ILTYPE_POS_TEX_NOR_TAN].Get());
 			// 시작 슬롯, 개수, 포인터로 묶에서 보낼 수 있다.
-			immediateContext->PSSetSamplers(0, 1, m_pSamplerStates[(size_t)eSamplerState::Default].GetAddressOf());
+			immediateContext->PSSetSamplers(0, 1, m_pSamplerStates[(size_t)eSamplerState::Linear].GetAddressOf());
 			immediateContext->OMSetDepthStencilState(m_pDepthStencilStates[(size_t)eDepthStencilState::Default].Get(), 1);
 			immediateContext->RSSetState(m_pRasterizerStates[(size_t)eRasterizerState::Cullback_Solid].Get());
 			immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -139,7 +134,10 @@ namespace dive
 					DirectX::XMMATRIX world = XMMatrixTranspose(m_BufferObjectCPU.GetWorldMatrix());
 					DirectX::XMMATRIX wvp = XMMatrixTranspose(m_BufferObjectCPU.GetWorldViewProjectionMatrix());
 
-					// 이건 오브젝트 버퍼다. UpdateCB랑은 상관없다.
+					// 현재 바로 위 DrawScene()과 동일한 코드이지만
+					// 이 cb는 DeferredShading에서 사용되어야 하는 cb이다.
+					// 그 곳에선 cb의 구성이 wvp, world로 되어 있으므로, 순서상 문제가 발생할 수 있다.
+					// 물론 shader쪽 구성을 바꾸는 것이 훨씬 간단하겠지만, 그 곳은 또 offset 때문에 문제가 발생할 수 있다.
 					BufferObject* pData = static_cast<BufferObject*>(m_pBufferObjectGPU->Map());
 					DirectX::XMStoreFloat4x4(&pData->world, world);
 					DirectX::XMStoreFloat4x4(&pData->wvp, wvp);
