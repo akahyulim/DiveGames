@@ -1,8 +1,8 @@
 #include "Renderer.h"
-#include "../DiveCore.h"
-#include "../Log.h"
-#include "../GameObject.h"
-#include "../Camera.h"
+#include "../Core/DiveCore.h"
+#include "../Helper/Log.h"
+#include "../Scene/GameObject.h"
+#include "../Scene/Component/Camera.h"
 
 // 일단 dvRenderer 구현은 나중으로 미루고
 // 이 곳에서 Deferred Shader로 Lighting 까지 구현해보자.
@@ -22,9 +22,8 @@ namespace dive
 		// CameraClearFlags Test를 위해 Depth Only를 구현해보고 싶은데
 		// 현재 DepthStencilView가 존재하지 않는다.
 
-		// 유니티의 다중 카메라 예제를 따라해본 구현이다.
-		// 이를 그대로 적용하려면 적어도 MainCamera 정도로 제한이 필요하다.
-		// 그리고 Viewport 설정에 필요한 작업도 내부에서 해 주어야 한다.
+		// 사실 MainCamera는 하나인게 맞다.
+		// 나머지 Camera들은 RTV용이다.
 		for (auto& pCamera : m_GameObjects[eObjectType::Camera])
 		{
 			if (m_GameObjects[eObjectType::Opaque].empty())
@@ -32,24 +31,19 @@ namespace dive
 
 			auto pCameraCom = pCamera->GetComponent<Camera>();
 
-			// PipelineState를 만들어 놓고 또 이렇게 Bind하는게 맞나 싶다.
-			// 그런데 다시보니 개별 추가 데이터가 필요하긴 하다.
+			// PipelineState가 필요한지 의문이다.
+			immediateContext->RSSetViewports(1, pCameraCom->GetViewportPtr());
 			immediateContext->IASetInputLayout(m_PipelineStateLegacy.pIL);
 			immediateContext->IASetPrimitiveTopology(m_PipelineStateLegacy.primitiveTopology);
 			immediateContext->VSSetShader(m_PipelineStateLegacy.pVS, NULL, 0);
 			immediateContext->PSSetShader(m_PipelineStateLegacy.pPS, NULL, 0);
-			//immediateContext->PSSetSamplers(0, 1, &m_PipelineStateLegacy.pSS);
-			immediateContext->PSSetSamplers(0, 1, m_pSamplerStates[(size_t)eSamplerState::Linear].GetAddressOf());
+			immediateContext->PSSetSamplers(0, 1, &m_PipelineStateLegacy.pSS);
+			//immediateContext->PSSetSamplers(0, 1, m_pSamplerStates[(size_t)eSamplerState::Linear].GetAddressOf());
 			immediateContext->OMSetDepthStencilState(m_PipelineStateLegacy.pDSS, 1);
 			immediateContext->RSSetState(m_PipelineStateLegacy.pRSS);
 
-			// Viewport 역시 일단 순서대로 적용한다.
-			// 그런데... num을 설정하면 어떻게 되는거지?
-			// 만약 num을 MainCamera 개수만큼, Viewport 포인터를 배열로 전달할 수 있다면
-			// 카메라 개수만큼 루프를 돌리지 않아도 될 것이다.
-			// 다만 이 경우 변환 행렬을 따로 전달할 수 있어야 한다.
-			//immediateContext->RSSetViewports(1, pCameraCom->GetViewportPtr());
-
+			// 결국 그려지는 GameObject의 Component들에서 Data를 Bind한 후 최종적으로 Draw를 호출한다.
+			// 대상은 ConstantBuffer(변환 행렬, Material Data), Texture(Material, SRV), Buffer(Vertex, Index) 등이다.
 			MeshRenderer* meshRenderer = nullptr;
 			for (const auto& gameObject : m_GameObjects[eObjectType::Opaque])
 			{
@@ -74,6 +68,7 @@ namespace dive
 					DirectX::XMStoreFloat4x4(&pData->wvp, wvp);
 					assert(m_pBufferObjectGPU->Unmap());
 
+					// 사실 이 역시 Transform에서 Constant Buffer를 만들어 놓고 직접 Bind하는 방법이 있긴 하다.
 					ID3D11Buffer* buffer = m_pBufferObjectGPU->GetBuffer();
 					immediateContext->VSSetConstantBuffers(0, 1, &buffer);
 				}
@@ -82,8 +77,11 @@ namespace dive
 				if (!meshRenderer)
 					continue;
 
-				// 이건 다시 Draw로 바꿔야 할 것 같다.
-				// 그러면 AssetData Bind가 추가돼 더 복잡해질 것이다.
+				// 책의 예제에서는 Mesh::Draw()가 존재하는 반면
+				// 엔진 구현 예제들은 하나같이 직접 데이터를 가져온 후 bind한다.
+				// 이는 아무 Mesh들도 종류에 따라 Draw 방법을 다르게 했기 때문인 것 같다.
+				// 따라서 MeshRenderer를 잘 구분해 놓는다면 굳이 직접 데이터를 리턴받지 않아도 될 것 같다.
+				// 문제는 MeshRenderer 내부에서 Mesh를 어떻게 계층화시키느냐 이다.
 				meshRenderer->Render(immediateContext);
 			}
 		}
@@ -115,6 +113,8 @@ namespace dive
 			immediateContext->OMSetDepthStencilState(m_pDepthStencilStates[(size_t)eDepthStencilState::Default].Get(), 1);
 			immediateContext->RSSetState(m_pRasterizerStates[(size_t)eRasterizerState::Cullback_Solid].Get());
 			immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+			// DeferredShading.hlsl을 적용하려면 Specular에 대한 ConstantBuffer도 만들어서 전달해야 한다.
 
 			MeshRenderer* meshRenderer = nullptr;
 			for (const auto& gameObject : m_GameObjects[eObjectType::Opaque])
@@ -151,8 +151,6 @@ namespace dive
 				if (!meshRenderer)
 					continue;
 
-				// 이건 다시 Draw로 바꿔야 할 것 같다.
-				// 그러면 AssetData Bind가 추가돼 더 복잡해질 것이다.
 				meshRenderer->Render(immediateContext);
 			}
 		}
@@ -161,5 +159,32 @@ namespace dive
 	void Renderer::DrawLight()
 	{
 
+	}
+
+	void Renderer::DrawCompose()
+	{
+		auto pImmediateContext = m_pGraphicsDevice->GetImmediateContext();
+		DV_ASSERT(pImmediateContext != nullptr);
+
+		pImmediateContext->PSSetSamplers(0, 1, m_pSamplerStates[(size_t)eSamplerState::Linear].GetAddressOf());
+
+		pImmediateContext->IASetInputLayout(NULL);
+		pImmediateContext->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+		pImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+		// Set the shaders
+		pImmediateContext->VSSetShader((ID3D11VertexShader*)m_pShaders[SHADERTYPES::VSTYPE_COMPOSE].Get(), NULL, 0);
+		pImmediateContext->GSSetShader(NULL, NULL, 0);
+		pImmediateContext->PSSetShader((ID3D11PixelShader*)m_pShaders[SHADERTYPES::PSTYPE_COMPOSE].Get(), NULL, 0);
+
+		// 여기서도 Draw Call 발생
+		pImmediateContext->Draw(4, 0);
+
+		// Cleanup
+		ID3D11ShaderResourceView* arrRV[1] = { NULL };
+		pImmediateContext->PSSetShaderResources(4, 1, arrRV);
+		pImmediateContext->VSSetShader(NULL, NULL, 0);
+		pImmediateContext->PSSetShader(NULL, NULL, 0);
+		pImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 }

@@ -1,0 +1,9 @@
+
+Deferred Shading으로 Light 부터 구현한 후 Post Procssing에 도전할 것이다.
+
+Multi Thread Rerdering에 대해 알아보았다.
+	- 당장 적용하기에는 무리가 있다.
+	- ThreadPool이 필요하긴 하다.
+
+하나의 큰 줄기로 구현한 후 부분을 나누는 방식으로 구현해야 한다.
+	- 일단 현재 모듈화한 부분들을 최대한 정리한 후 다시 줄기를 만들어 가자.

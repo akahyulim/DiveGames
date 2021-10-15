@@ -1,6 +1,6 @@
 #pragma once
 #include "../../Resource/Resource.h"
-#include "../DiveCore.h"
+#include "../../Core/DiveCore.h"
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
 #include <wrl/client.h>

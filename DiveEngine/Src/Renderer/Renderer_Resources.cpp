@@ -1,7 +1,7 @@
 #include "Renderer.h"
-#include "../DiveCore.h"
-#include "../Log.h"
-#include "../TextMesh.h"
+#include "../Core/DiveCore.h"
+#include "../Helper/Log.h"
+#include "../Scene/Component/TextMesh.h"
 #include "Graphics/dvRenderTexture.h"
 #include <d3dcompiler.h>
 
@@ -251,9 +251,25 @@ namespace dive
 
 			}
 
-			// GBufferVis??
+			// Compose
 			{
+				// 사실 필요없다.
+				D3D11_INPUT_ELEMENT_DESC desc[] =
+				{
+					{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+					{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+				};
 
+				if (!createVertexShader(L"../Assets/Shaders/Legacy/Compose.hlsl", VSTYPE_COMPOSE, ILTYPE_POS_TEX_NOR_TAN, desc, arraysize(desc)))
+				{
+					return false;
+				}
+				if (!createPixelShader(L"../Assets/Shaders/Legacy/Compose.hlsl", PSTYPE_COMPOSE))
+				{
+					return false;
+				}
 			}
 		}
 
@@ -378,7 +394,7 @@ namespace dive
 			if (FAILED(pDevice->CreateInputLayout(descs, numElements, shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(),
 				m_pInputLayouts[inputLayoutType].GetAddressOf())))
 			{
-				CORE_ERROR("Input Layout 생성에 실패하였습니다.");
+				CORE_ERROR("../Input Layout 생성에 실패하였습니다.");
 				return false;
 			}
 		}

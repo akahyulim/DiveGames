@@ -80,6 +80,8 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\bin\debug\</OutDir>
     <IntDir>..\bin\int\x64\Debug\DiveEngine\</IntDir>
+    <PublicIncludeDirectories>
+    </PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -128,7 +130,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>External;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Src;External</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -167,14 +169,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="ConstantBuffer.h" />
-    <ClInclude Include="DiveCore.h" />
-    <ClInclude Include="DiveEngine.h" />
-    <ClInclude Include="dvMath.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Event.h" />
     <ClInclude Include="External\spdlog\async.h" />
     <ClInclude Include="External\spdlog\async_logger-inl.h" />
     <ClInclude Include="External\spdlog\async_logger.h" />
@@ -265,101 +259,107 @@
     <ClInclude Include="External\spdlog\stopwatch.h" />
     <ClInclude Include="External\spdlog\tweakme.h" />
     <ClInclude Include="External\spdlog\version.h" />
-    <ClInclude Include="FileStream.h" />
-    <ClInclude Include="FileSystemHelper.h" />
-    <ClInclude Include="Font.h" />
-    <ClInclude Include="FontImporter.h" />
-    <ClInclude Include="FormatHelper.h" />
-    <ClInclude Include="GameObject.h" />
-    <ClInclude Include="Geometry.h" />
-    <ClInclude Include="GraphicsEnums.h" />
-    <ClInclude Include="GraphicsInclude.h" />
-    <ClInclude Include="IniHelper.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="Log.h" />
-    <ClInclude Include="MeshRenderer.h" />
-    <ClInclude Include="Object.h" />
-    <ClInclude Include="PipelineState.h" />
-    <ClInclude Include="RenderPath.h" />
-    <ClInclude Include="RenderPath3D_Legacy.h" />
-    <ClInclude Include="Runtime.h" />
-    <ClInclude Include="Scene.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="Settings.h" />
-    <ClInclude Include="Src\Renderer\dvRenderer.h" />
+    <ClInclude Include="Src\Core\DiveCore.h" />
+    <ClInclude Include="Src\Core\DiveEngine.h" />
+    <ClInclude Include="Src\Core\Event.h" />
+    <ClInclude Include="Src\Core\Object.h" />
+    <ClInclude Include="Src\Core\RenderPath.h" />
+    <ClInclude Include="Src\Core\RenderPath3D_Legacy.h" />
+    <ClInclude Include="Src\Core\Runtime.h" />
+    <ClInclude Include="Src\Core\ThreadPool.h" />
+    <ClInclude Include="Src\Helper\dvMath.h" />
+    <ClInclude Include="Src\Helper\FileStream.h" />
+    <ClInclude Include="Src\Helper\FileSystemHelper.h" />
+    <ClInclude Include="Src\Helper\FontImporter.h" />
+    <ClInclude Include="Src\Helper\FormatHelper.h" />
+    <ClInclude Include="Src\Helper\Geometry.h" />
+    <ClInclude Include="Src\Helper\IniHelper.h" />
+    <ClInclude Include="Src\Helper\Log.h" />
+    <ClInclude Include="Src\Helper\Settings.h" />
+    <ClInclude Include="Src\Helper\StringHelper.h" />
+    <ClInclude Include="Src\Helper\Timer.h" />
+    <ClInclude Include="Src\Input\Input.h" />
+    <ClInclude Include="Src\Renderer\Font.h" />
+    <ClInclude Include="Src\Renderer\GraphicsEnums.h" />
+    <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Src\Renderer\Graphics\ConstantBuffers.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvTexture.h" />
     <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h" />
     <ClInclude Include="Src\Renderer\Graphics\GBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
+    <ClInclude Include="Src\Renderer\Graphics\GraphicsInclude.h" />
+    <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
+    <ClInclude Include="Src\Renderer\Mesh.h" />
+    <ClInclude Include="Src\Renderer\PipelineState.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
+    <ClInclude Include="Src\Renderer\VertexTypes.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceManager.h" />
-    <ClInclude Include="StringHelper.h" />
-    <ClInclude Include="TextMesh.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="ThreadPool.h" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="Transform.h" />
-    <ClInclude Include="VertexTypes.h" />
+    <ClInclude Include="Src\Scene\Component\Camera.h" />
+    <ClInclude Include="Src\Scene\Component\Component.h" />
+    <ClInclude Include="Src\Scene\Component\Light.h" />
+    <ClInclude Include="Src\Scene\Component\MeshRenderer.h" />
+    <ClInclude Include="Src\Scene\Component\TextMesh.h" />
+    <ClInclude Include="Src\Scene\Component\Transform.h" />
+    <ClInclude Include="Src\Scene\GameObject.h" />
+    <ClInclude Include="Src\Scene\Scene.h" />
+    <ClInclude Include="Src\Scene\SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="ConstantBuffer.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="FileStream.cpp" />
-    <ClCompile Include="FileSystemHelper.cpp" />
-    <ClCompile Include="Font.cpp" />
-    <ClCompile Include="FontImporter.cpp" />
-    <ClCompile Include="FormatHelper.cpp" />
-    <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="IniHelper.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="Light.cpp" />
-    <ClCompile Include="Log.cpp" />
-    <ClCompile Include="MeshRenderer.cpp" />
-    <ClCompile Include="ConstantBuffers.h" />
-    <ClCompile Include="RenderPath3D_Legacy.cpp" />
-    <ClCompile Include="Runtime.cpp" />
-    <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="Settings.cpp" />
-    <ClCompile Include="Src\Renderer\dvRenderer.cpp" />
+    <ClCompile Include="Src\Core\RenderPath3D_Legacy.cpp" />
+    <ClCompile Include="Src\Core\Runtime.cpp" />
+    <ClCompile Include="Src\Core\ThreadPool.cpp" />
+    <ClCompile Include="Src\Helper\FileStream.cpp" />
+    <ClCompile Include="Src\Helper\FileSystemHelper.cpp" />
+    <ClCompile Include="Src\Helper\FontImporter.cpp" />
+    <ClCompile Include="Src\Helper\FormatHelper.cpp" />
+    <ClCompile Include="Src\Helper\IniHelper.cpp" />
+    <ClCompile Include="Src\Helper\Log.cpp" />
+    <ClCompile Include="Src\Helper\Settings.cpp" />
+    <ClCompile Include="Src\Helper\StringHelper.cpp" />
+    <ClCompile Include="Src\Helper\Timer.cpp" />
+    <ClCompile Include="Src\Input\Input.cpp" />
+    <ClCompile Include="Src\Renderer\Font.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
+    <ClCompile Include="Src\Renderer\Mesh.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\Renderer_Pass.cpp" />
     <ClCompile Include="Src\Renderer\Renderer_Resources.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceManager.cpp" />
-    <ClCompile Include="StringHelper.cpp" />
-    <ClCompile Include="TextMesh.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="ThreadPool.cpp" />
-    <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="Transform.cpp" />
-    <ClCompile Include="Transform_Hierarchy.cpp" />
+    <ClCompile Include="Src\Scene\Component\Camera.cpp" />
+    <ClCompile Include="Src\Scene\Component\Component.cpp" />
+    <ClCompile Include="Src\Scene\Component\Light.cpp" />
+    <ClCompile Include="Src\Scene\Component\MeshRenderer.cpp" />
+    <ClCompile Include="Src\Scene\Component\TextMesh.cpp" />
+    <ClCompile Include="Src\Scene\Component\Transform.cpp" />
+    <ClCompile Include="Src\Scene\Component\Transform_Hierarchy.cpp" />
+    <ClCompile Include="Src\Scene\GameObject.cpp" />
+    <ClCompile Include="Src\Scene\Scene.cpp" />
+    <ClCompile Include="Src\Scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\Assets\Shaders\개요.txt" />
-    <Text Include="Graphics.txt" />
-    <Text Include="Issue.txt" />
-    <Text Include="LoadFromFile.txt" />
-    <Text Include="PipelineState.txt" />
-    <Text Include="RenderPathAndPass.txt" />
-    <Text Include="Src\Renderer\CommandList.txt" />
-    <Text Include="Src\Renderer\Graphics\dvTexture.txt" />
-    <Text Include="Src\Renderer\Graphics\GraphicsResources.txt" />
-    <Text Include="Src\Renderer\Graphics\Texture와 Map.txt" />
-    <Text Include="Src\Renderer\Pass Process.txt" />
-    <Text Include="Src\Resource\ResourceManager.txt" />
-    <Text Include="WickedEngine%27sGraphicsSystems.txt" />
-    <Text Include="구현 흐름.txt" />
-    <Text Include="지금까지 정리의 흐름.txt" />
+    <Text Include="Doc\dvTexture.txt" />
+    <Text Include="Doc\Graphics.txt" />
+    <Text Include="Doc\GraphicsResources.txt" />
+    <Text Include="Doc\include path.txt" />
+    <Text Include="Doc\Issue.txt" />
+    <Text Include="Doc\LoadFromFile.txt" />
+    <Text Include="Doc\Pass Process.txt" />
+    <Text Include="Doc\PipelineState.txt" />
+    <Text Include="Doc\RenderPathAndPass.txt" />
+    <Text Include="Doc\ResourceManager.txt" />
+    <Text Include="Doc\Texture와 Map.txt" />
+    <Text Include="Doc\WickedEngine%27sGraphicsSystems.txt" />
+    <Text Include="Doc\구현 흐름.txt" />
+    <Text Include="Doc\1. 지금까지 정리의 흐름.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Assets\Shaders\Legacy\Common.hlsl">
@@ -368,7 +368,7 @@
     <None Include="..\Assets\Shaders\Legacy\DeferredShading.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="..\Assets\Shaders\Legacy\GBufferVis.hlsl">
+    <None Include="..\Assets\Shaders\Legacy\Compose.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

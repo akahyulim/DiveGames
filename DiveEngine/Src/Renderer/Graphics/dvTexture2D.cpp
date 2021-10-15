@@ -1,8 +1,8 @@
 #include "dvTexture2D.h"
-#include "../FileSystemHelper.h"
-#include "../StringHelper.h"
-#include "../Log.h"
-#include "../External/DirectXTex/DirectXTex.h"
+#include "../../Helper/FileSystemHelper.h"
+#include "../../Helper/StringHelper.h"
+#include "../../Helper/Log.h"
+#include "DirectXTex/DirectXTex.h"
 
 using namespace std;
 using namespace DirectX;

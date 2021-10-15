@@ -1,15 +1,15 @@
 #include "Renderer.h"
-#include "../SceneManager.h"
-#include "../Scene.h"
-#include "../MeshRenderer.h"
-#include "../Camera.h"
-#include "../Light.h"
-#include "../GameObject.h"
-#include "../Log.h"
-#include "../TextMesh.h"
-#include "../Event.h"
-#include "../Camera.h"
-#include "../DiveCore.h"
+#include "../Scene/SceneManager.h"
+#include "../Scene/Scene.h"
+#include "../Scene/Component/MeshRenderer.h"
+#include "../Scene/Component/Camera.h"
+#include "../Scene/Component/Light.h"
+#include "../Scene/GameObject.h"
+#include "../Helper/Log.h"
+#include "../Scene/Component/TextMesh.h"
+#include "../Core/Event.h"
+#include "../Scene/Component/Camera.h"
+#include "../Core/DiveCore.h"
 
 #include "Graphics/dvTexture2D.h"
 
@@ -66,7 +66,7 @@ namespace dive
 		dvTexture2D dvTex(600, 400, DXGI_FORMAT_R8G8B8A8_UNORM, true);
 		dvTex.Apply();
 		
-		CORE_TRACE("Renderer 초기화에 성공하였습니다.");
+		CORE_TRACE("../Renderer 초기화에 성공하였습니다.");
 	}
 
 	//==============================================================================//

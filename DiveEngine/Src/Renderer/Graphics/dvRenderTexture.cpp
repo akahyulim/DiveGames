@@ -1,5 +1,5 @@
 #include "dvRenderTexture.h"
-#include "../DiveCore.h"
+#include "../../Core/DiveCore.h"
 
 namespace dive
 {

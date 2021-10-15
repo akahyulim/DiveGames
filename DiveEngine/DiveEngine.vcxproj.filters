@@ -1,60 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="Log.h">
-      <Filter>Engine\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="Scene.h">
-      <Filter>Engine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="DiveEngine.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderPath.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Runtime.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ThreadPool.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="GameObject.h">
-      <Filter>Engine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsEnums.h">
-      <Filter>Engine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexTypes.h">
-      <Filter>Engine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="PipelineState.h">
-      <Filter>Engine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Input.h">
-      <Filter>Engine\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="TextMesh.h">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Font.h">
-      <Filter>Engine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshRenderer.h">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="External\spdlog\async.h">
       <Filter>External\spdlog</Filter>
     </ClInclude>
@@ -325,229 +271,256 @@
     <ClInclude Include="External\spdlog\sinks\wincolor_sink-inl.h">
       <Filter>External\spdlog\sinks</Filter>
     </ClInclude>
-    <ClInclude Include="Event.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.h">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry.h">
-      <Filter>Engine\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Engine\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="FileStream.h">
-      <Filter>Engine\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystemHelper.h">
-      <Filter>Engine\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="FontImporter.h">
-      <Filter>Engine\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="FormatHelper.h">
-      <Filter>Engine\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="IniHelper.h">
-      <Filter>Engine\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="StringHelper.h">
-      <Filter>Engine\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Settings.h">
-      <Filter>Engine\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Engine\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneManager.h">
-      <Filter>Engine\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="DiveCore.h">
-      <Filter>Engine\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="dvMath.h">
-      <Filter>Engine\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsInclude.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
+      <Filter>Src\Renderer\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Src\Renderer\Renderer.h">
-      <Filter>Engine\Renderer</Filter>
+      <Filter>Src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Src\Renderer\Graphics\dvTexture.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
+      <Filter>Src\Renderer\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
+      <Filter>Src\Renderer\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
+      <Filter>Src\Renderer\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Src\Resource\Resource.h">
-      <Filter>Engine\Resource</Filter>
+      <Filter>Src\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Src\Resource\ResourceManager.h">
-      <Filter>Engine\Resource</Filter>
+      <Filter>Src\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Src\Renderer\Graphics\GBuffer.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
+      <Filter>Src\Renderer\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="RenderPath3D_Legacy.h">
-      <Filter>Engine\Core</Filter>
+    <ClInclude Include="Src\Input\Input.h">
+      <Filter>Src\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Renderer\dvRenderer.h">
-      <Filter>Engine\Renderer</Filter>
+    <ClInclude Include="Src\Scene\GameObject.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Scene.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\SceneManager.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\Camera.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\Component.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\Light.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\MeshRenderer.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\TextMesh.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\Transform.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\GraphicsEnums.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Mesh.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\VertexTypes.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\GraphicsInclude.h">
+      <Filter>Src\Renderer\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\Texture.h">
+      <Filter>Src\Renderer\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\dvMath.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\FileStream.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\FileSystemHelper.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\FontImporter.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\FormatHelper.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\Geometry.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\IniHelper.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\Log.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\Settings.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\StringHelper.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\Timer.h">
+      <Filter>Src\Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DiveCore.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DiveEngine.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Event.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Object.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\RenderPath.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\RenderPath3D_Legacy.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Runtime.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\ThreadPool.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h">
+      <Filter>Src\Renderer\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\ConstantBuffers.h">
+      <Filter>Src\Renderer\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Font.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\PipelineState.h">
+      <Filter>Src\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Log.cpp">
-      <Filter>Engine\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="Runtime.cpp">
-      <Filter>Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="ThreadPool.cpp">
-      <Filter>Engine\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Scene.cpp">
-      <Filter>Engine\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="GameObject.cpp">
-      <Filter>Engine\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Input.cpp">
-      <Filter>Engine\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="TextMesh.cpp">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Font.cpp">
-      <Filter>Engine\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshRenderer.cpp">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Engine\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Transform_Hierarchy.cpp">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="FileStream.cpp">
-      <Filter>Engine\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystemHelper.cpp">
-      <Filter>Engine\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="FontImporter.cpp">
-      <Filter>Engine\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="FormatHelper.cpp">
-      <Filter>Engine\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="IniHelper.cpp">
-      <Filter>Engine\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="StringHelper.cpp">
-      <Filter>Engine\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Settings.cpp">
-      <Filter>Engine\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Engine\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Engine\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
-      <Filter>Engine\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="ConstantBuffer.cpp">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="ConstantBuffers.h">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp">
-      <Filter>Engine\Renderer\Graphics</Filter>
+      <Filter>Src\Renderer\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Renderer.cpp">
-      <Filter>Engine\Renderer</Filter>
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Renderer_Pass.cpp">
-      <Filter>Engine\Renderer</Filter>
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Renderer_Resources.cpp">
-      <Filter>Engine\Renderer</Filter>
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp">
-      <Filter>Engine\Renderer\Graphics</Filter>
+      <Filter>Src\Renderer\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp">
-      <Filter>Engine\Renderer\Graphics</Filter>
+      <Filter>Src\Renderer\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Resource\Resource.cpp">
-      <Filter>Engine\Resource</Filter>
+      <Filter>Src\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Src\Resource\ResourceManager.cpp">
-      <Filter>Engine\Resource</Filter>
+      <Filter>Src\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\GBuffer.cpp">
-      <Filter>Engine\Renderer\Graphics</Filter>
+      <Filter>Src\Renderer\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="RenderPath3D_Legacy.cpp">
-      <Filter>Engine\Core</Filter>
+    <ClCompile Include="Src\Input\Input.cpp">
+      <Filter>Src\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Renderer\dvRenderer.cpp">
-      <Filter>Engine\Renderer</Filter>
+    <ClCompile Include="Src\Scene\GameObject.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Scene.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\SceneManager.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Camera.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Component.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Light.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\MeshRenderer.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\TextMesh.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Transform.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Transform_Hierarchy.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Mesh.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\Texture.cpp">
+      <Filter>Src\Renderer\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Helper\FileStream.cpp">
+      <Filter>Src\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Helper\FileSystemHelper.cpp">
+      <Filter>Src\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Helper\FontImporter.cpp">
+      <Filter>Src\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Helper\FormatHelper.cpp">
+      <Filter>Src\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Helper\IniHelper.cpp">
+      <Filter>Src\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Helper\Log.cpp">
+      <Filter>Src\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Helper\Settings.cpp">
+      <Filter>Src\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Helper\StringHelper.cpp">
+      <Filter>Src\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Helper\Timer.cpp">
+      <Filter>Src\Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\RenderPath3D_Legacy.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\Runtime.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\ThreadPool.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp">
+      <Filter>Src\Renderer\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Font.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Engine">
-      <UniqueIdentifier>{c7d05b3b-5ca0-4b66-8f7c-5dbfba591b66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Tools">
-      <UniqueIdentifier>{77d99d9b-f82f-4acb-bd38-680e775d8fdd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Scene">
-      <UniqueIdentifier>{c1aa4b85-851d-45df-abea-6fec5b35b458}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Core">
-      <UniqueIdentifier>{935efe1f-4709-4022-9b1b-d67f83dc83a0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Scene\Components">
-      <UniqueIdentifier>{7bc942ed-9c43-48b4-ad1c-95c51f40ebc0}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Input">
-      <UniqueIdentifier>{7d6380e9-9fcb-4788-b719-d270596b1123}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Resource">
-      <UniqueIdentifier>{a52c840e-1afd-4594-981d-8351db2f048e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="External">
       <UniqueIdentifier>{b8cdb25b-3036-44e0-baa2-bd91ede243cb}</UniqueIdentifier>
     </Filter>
@@ -569,58 +542,85 @@
     <Filter Include="External\spdlog\fmt\bundled">
       <UniqueIdentifier>{561cef61-527b-4925-89c6-a7bcdf59ace5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine\Helpers">
-      <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Renderer">
-      <UniqueIdentifier>{1326af25-081c-4cf4-b939-d927b9d45a14}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Engine\Renderer\Graphics">
-      <UniqueIdentifier>{00151ce7-f9c3-495a-8838-348f943d933a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Shaders">
       <UniqueIdentifier>{926b5899-c18b-4d81-b5da-261b2d925309}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src">
+      <UniqueIdentifier>{c7d05b3b-5ca0-4b66-8f7c-5dbfba591b66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Scene">
+      <UniqueIdentifier>{c1aa4b85-851d-45df-abea-6fec5b35b458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Scene\Components">
+      <UniqueIdentifier>{7bc942ed-9c43-48b4-ad1c-95c51f40ebc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Core">
+      <UniqueIdentifier>{935efe1f-4709-4022-9b1b-d67f83dc83a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Input">
+      <UniqueIdentifier>{7d6380e9-9fcb-4788-b719-d270596b1123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Resource">
+      <UniqueIdentifier>{a52c840e-1afd-4594-981d-8351db2f048e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Helpers">
+      <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Renderer">
+      <UniqueIdentifier>{1326af25-081c-4cf4-b939-d927b9d45a14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Renderer\Graphics">
+      <UniqueIdentifier>{00151ce7-f9c3-495a-8838-348f943d933a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Doc">
+      <UniqueIdentifier>{7e215838-d5d9-4ab7-a317-e071ac36ddd1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Issue.txt" />
-    <Text Include="WickedEngine%27sGraphicsSystems.txt">
-      <Filter>Engine\Renderer</Filter>
-    </Text>
-    <Text Include="Graphics.txt">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </Text>
-    <Text Include="지금까지 정리의 흐름.txt" />
-    <Text Include="Src\Renderer\Graphics\GraphicsResources.txt">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </Text>
-    <Text Include="구현 흐름.txt" />
-    <Text Include="PipelineState.txt">
-      <Filter>Engine\Renderer</Filter>
-    </Text>
-    <Text Include="Src\Renderer\Graphics\dvTexture.txt">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </Text>
-    <Text Include="LoadFromFile.txt">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </Text>
-    <Text Include="Src\Resource\ResourceManager.txt">
-      <Filter>Engine\Resource</Filter>
-    </Text>
-    <Text Include="RenderPathAndPass.txt">
-      <Filter>Engine\Renderer</Filter>
-    </Text>
-    <Text Include="Src\Renderer\Graphics\Texture와 Map.txt">
-      <Filter>Engine\Renderer\Graphics</Filter>
-    </Text>
     <Text Include="..\Assets\Shaders\개요.txt">
       <Filter>Shaders</Filter>
     </Text>
-    <Text Include="Src\Renderer\Pass Process.txt">
-      <Filter>Engine\Renderer</Filter>
+    <Text Include="Doc\dvTexture.txt">
+      <Filter>Doc</Filter>
     </Text>
-    <Text Include="Src\Renderer\CommandList.txt">
-      <Filter>Engine\Renderer</Filter>
+    <Text Include="Doc\Graphics.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\GraphicsResources.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\Issue.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\LoadFromFile.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\Pass Process.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\PipelineState.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\RenderPathAndPass.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\ResourceManager.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\Texture와 Map.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\WickedEngine%27sGraphicsSystems.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\구현 흐름.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\include path.txt">
+      <Filter>Doc</Filter>
+    </Text>
+    <Text Include="Doc\1. 지금까지 정리의 흐름.txt">
+      <Filter>Doc</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
@@ -630,7 +630,7 @@
     <None Include="..\Assets\Shaders\Legacy\DeferredShading.hlsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\Assets\Shaders\Legacy\GBufferVis.hlsl">
+    <None Include="..\Assets\Shaders\Legacy\Compose.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

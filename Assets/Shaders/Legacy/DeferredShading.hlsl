@@ -44,9 +44,9 @@ VS_OUTPUT mainVS(VS_INPUT input)
 	input.Position.w = 1.0f;
 	output.Position = mul(input.Position, WorldViewProjection);
 
-	output.UV = input.UV;
-	output.Normal = mul(input.Normal, (float3x3)World);
-	output.Tangent = mul(input.Tangent, (float3x3)World);
+	output.UV		= input.UV;
+	output.Normal	= mul(input.Normal, (float3x3)World);
+	output.Tangent	= mul(input.Tangent, (float3x3)World);
 
 	return output;
 }

@@ -1,7 +1,7 @@
 #pragma once
 #include "Resource.h"
-#include "../DiveCore.h"
-#include "../FileSystemHelper.h"
+#include "../Core/DiveCore.h"
+#include "../Helper/FileSystemHelper.h"
 #include <vector>
 #include <algorithm>
 

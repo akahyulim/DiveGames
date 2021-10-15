@@ -1,7 +1,7 @@
 #include "GBuffer.h"
 #include "../Renderer.h"
-#include "../DiveCore.h"
-#include "../Log.h"
+#include "../../Core/DiveCore.h"
+#include "../../Helper/Log.h"
 
 // 역시 이건 에바다.
 // 1. Editor의 경우 View의 크기가 Resolution과 다르다. 즉, 따로 설정해야 한다.

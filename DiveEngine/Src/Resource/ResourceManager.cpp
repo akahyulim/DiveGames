@@ -1,5 +1,5 @@
 #include "ResourceManager.h"
-#include "../Log.h"
+#include "../Helper/Log.h"
 
 namespace dive
 {

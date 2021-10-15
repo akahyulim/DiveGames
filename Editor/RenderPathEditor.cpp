@@ -105,6 +105,9 @@ namespace Editor
 			// Viewport를 Bind한다.
 			// 하지만 현재 구현은 Camera를 통해 Viewport를 계산하고 있다.
 
+			// 1015: 현재 오브젝트가 그려지지 않고 있다.
+			// 이는 테스트 과정에서 생겨난 의도된? 현상이다.
+			// 이게 문제가 아닌거 같은데...
 			pRenderer->DrawScene();
 
 			// RenderPassEnd

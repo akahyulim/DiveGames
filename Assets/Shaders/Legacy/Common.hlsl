@@ -2,6 +2,7 @@
 
 // GBuffer Texture
 // 순서에 영향을 받나...? 이건 srv 같다.
+// 어떻게 Common으로 bind했는지 모르겠다.
 Texture2D<float> DepthTexture : register(t0);
 Texture2D<float4> ColorSpecIntTexture : register(t1);
 Texture2D<float3> NormalTexture : register(t2);

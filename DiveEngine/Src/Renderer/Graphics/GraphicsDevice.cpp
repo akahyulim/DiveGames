@@ -1,6 +1,6 @@
 #include "GraphicsDevice.h"
-#include "../Log.h"
-#include "../DiveCore.h"
+#include "../../Helper/Log.h"
+#include "../../Core/DiveCore.h"
 
 using namespace Microsoft::WRL;
 

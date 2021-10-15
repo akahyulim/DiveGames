@@ -1,12 +1,12 @@
 #pragma once
 #include "Graphics/GraphicsDevice.h"
-#include "../GraphicsInclude.h"
-#include "../GraphicsEnums.h"
-#include "../PipelineState.h"
-#include "../ConstantBuffer.h"
-#include "../ConstantBuffers.h"	// 이름 변경 대상
-#include "../Texture.h"
-#include "../Font.h"
+#include "Graphics/GraphicsInclude.h"
+#include "GraphicsEnums.h"
+#include "PipelineState.h"
+#include "Graphics/ConstantBuffer.h"
+#include "Graphics/ConstantBuffers.h"	// 이름 변경 대상
+#include "Graphics/Texture.h"
+#include "Font.h"
 #include <memory>
 #include <string>
 
@@ -74,6 +74,7 @@ namespace dive
 		void DrawScene();
 		void DrawGBuffer();
 		void DrawLight();
+		void DrawCompose();
 
 		ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilState state) { return m_pDepthStencilStates[static_cast<int>(state)].Get(); }
 		ID3D11RasterizerState* GetRasterizerState(eRasterizerState state) { return m_pRasterizerStates[static_cast<int>(state)].Get(); }
