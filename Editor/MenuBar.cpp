@@ -4,7 +4,9 @@
 #include "External/ImGui/imgui_internal.h"
 #include <Windows.h>
 
-namespace Editor
+using namespace DiveEngine;
+
+namespace DiveEditor
 {
 	MenuBar::MenuBar(Editor* pEditor)
 		: Widget(pEditor)
@@ -40,7 +42,7 @@ namespace Editor
 
 				if (ImGui::MenuItem("Open Scene"))
 				{
-					//if (dive::Scene::GetGlobalScene().IsDirty())
+					//if (Scene::GetGlobalScene().IsDirty())
 					if (m_pScene)
 					{
 						if(m_pScene->IsDirty())
@@ -53,7 +55,7 @@ namespace Editor
 					// 디렉토리 탐색기를 연다.
 					{
 						std::string filepath = "../Assets/Scenes/MeshTestScene.scene";//"../Assets/Scenes/default.scene";
-						dive::SceneManager::GetInstance().LoadScene(filepath);
+						SceneManager::GetInstance().LoadScene(filepath);
 					}
 				}
 
@@ -65,7 +67,7 @@ namespace Editor
 					// 만약 있다면 덮어씌울 것인지 물어야 한다.
 					{
 						std::string filepath = "../Assets/Scenes/" + m_pScene->GetName() + ".scene";
-						//dive::Scene::GetGlobalScene().SaveToFile(filepath);
+						//Scene::GetGlobalScene().SaveToFile(filepath);
 						m_pScene->SaveToFile(filepath);
 
 						APP_TRACE("현재 Scene과 Asset을 파일로 저장하였습니다.");
@@ -102,7 +104,7 @@ namespace Editor
 				if (ImGui::MenuItem("Exit"))
 				{
 					// 일단은 Scene의 변경사항 여부만 확인한다.
-					//if (dive::Scene::GetGlobalScene().IsDirty())
+					//if (Scene::GetGlobalScene().IsDirty())
 					if(m_pScene->IsDirty())
 					{
 
@@ -133,8 +135,8 @@ namespace Editor
 					if (ImGui::MenuItem("Quad"))
 					{
 						auto pGameObject = m_pScene->CreateGameObject();
-						auto meshRenderer = pGameObject->AddComponent<dive::MeshRenderer>();
-						meshRenderer->CreateDefaultMesh(dive::eDefaultMeshType::Quad);
+						auto meshRenderer = pGameObject->AddComponent<MeshRenderer>();
+						meshRenderer->CreateDefaultMesh(eDefaultMeshType::Quad);
 						pGameObject->SetName("Quad");
 					}
 
@@ -143,8 +145,8 @@ namespace Editor
 					if (ImGui::MenuItem("Cube"))
 					{
 						auto pGameObject = m_pScene->CreateGameObject();
-						auto meshRenderer = pGameObject->AddComponent<dive::MeshRenderer>();
-						meshRenderer->CreateDefaultMesh(dive::eDefaultMeshType::Cube);
+						auto meshRenderer = pGameObject->AddComponent<MeshRenderer>();
+						meshRenderer->CreateDefaultMesh(eDefaultMeshType::Cube);
 						pGameObject->SetName("Cube");
 					}
 
@@ -172,8 +174,8 @@ namespace Editor
 					if (ImGui::MenuItem("Directional"))
 					{
 						auto pGameObject = m_pScene->CreateGameObject();
-						auto pLight = pGameObject->AddComponent<dive::Light>();
-						pLight->SetLightType(dive::eLightType::Directional);
+						auto pLight = pGameObject->AddComponent<Light>();
+						pLight->SetLightType(eLightType::Directional);
 						pGameObject->SetName("Directional Light");
 					}
 
@@ -191,7 +193,7 @@ namespace Editor
 				if (ImGui::MenuItem("Camera"))
 				{
 					auto pGameObject = m_pScene->CreateGameObject();
-					pGameObject->AddComponent<dive::Camera>();
+					pGameObject->AddComponent<Camera>();
 					pGameObject->SetName("Camera");
 				}
 
@@ -305,7 +307,7 @@ namespace Editor
 			{
 				// 빈 문자열은 안된다.
 
-				auto newScene = dive::SceneManager::GetInstance().CreateScene(sceneName);
+				auto newScene = SceneManager::GetInstance().CreateScene(sceneName);
 				if(!newScene)
 				{
 					// 이것두 m_b로 만들어야 할 것 같다.
@@ -329,7 +331,7 @@ namespace Editor
 				else
 				{
 					// 이걸 직접 하는게 아직 좀 그렇다.
-					dive::SceneManager::GetInstance().SetActiveScene(newScene);
+					SceneManager::GetInstance().SetActiveScene(newScene);
 				}
 
 				ImGui::CloseCurrentPopup();

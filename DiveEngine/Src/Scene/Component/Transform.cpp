@@ -7,7 +7,7 @@
 #include "../../Helper/dvMath.h"
 #include "../../Helper/Log.h"
 
-namespace dive
+namespace DiveEngine
 {
 	
 	Transform::Transform(GameObject* pGameObject)
@@ -17,6 +17,12 @@ namespace dive
 		m_Type = eComponentType::Transform;
 
 		Clear();
+
+		REGISTER_ATTRIBUTE_VALUE_VALUE(m_LocalPosition, DirectX::XMFLOAT3);
+		REGISTER_ATTRIBUTE_VALUE_VALUE(m_LocalRotation, DirectX::XMFLOAT4);
+		REGISTER_ATTRIBUTE_VALUE_VALUE(m_LocalScale, DirectX::XMFLOAT3);
+		REGISTER_ATTRIBUTE_VALUE_VALUE(m_Matrix, DirectX::XMFLOAT4X4);
+		REGISTER_ATTRIBUTE_VALUE_VALUE(m_LocalMatrix, DirectX::XMFLOAT4X4);
 	}
 
 	//======================================================//

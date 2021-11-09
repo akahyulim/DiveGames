@@ -178,7 +178,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SIZE:
         // minimize에서도 호출된다.
         // 그리고 이때 backbuffer 생성에 실패한다.
-        EVENT_FIRE_DATA(dive::eEventType::ChangedResolution, static_cast<unsigned int>(lParam));
+        EVENT_FIRE_DATA(DiveEngine::eEventType::ChangedResolution, static_cast<unsigned int>(lParam));
         break;
     case WM_COMMAND:
         {
@@ -201,13 +201,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             if (g_pApp->IsInitialized())
             {
-                dive::Input::GetInstance().ParseMessage(lParam);
+                DiveEngine::Input::GetInstance().ParseMessage(lParam);
             }
         }
         break;
     case WM_KEYDOWN:
         {
-        auto pGraphicsDevice = dive::Renderer::GetInstance().GetGraphicsDevice();
+        auto pGraphicsDevice = DiveEngine::Renderer::GetInstance().GetGraphicsDevice();
         if (pGraphicsDevice->IsInitialized())
         {
             switch (wParam)

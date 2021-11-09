@@ -3,7 +3,7 @@
 #include "../../Core/Object.h"
 #include <string>
 
-namespace dive
+namespace DiveEngine
 {
 	class GraphicsDevice;
 

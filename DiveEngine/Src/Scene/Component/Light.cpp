@@ -4,7 +4,7 @@
 #include "../../Helper/FileStream.h"
 
 
-namespace dive
+namespace DiveEngine
 {
 	Light::Light(GameObject* pGameObject)
 		: Component(pGameObject)

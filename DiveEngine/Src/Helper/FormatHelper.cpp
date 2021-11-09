@@ -4,7 +4,7 @@
 #include "StringHelper.h"
 #include "FileSystemHelper.h"
 
-namespace dive
+namespace DiveEngine
 {
 	std::vector<std::string> FormatHelper::m_SupportedImageFormats;
 	std::vector<std::string> FormatHelper::m_SupportedShaderFormats;

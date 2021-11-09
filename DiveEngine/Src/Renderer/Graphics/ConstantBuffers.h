@@ -2,7 +2,7 @@
 #include <DirectXMath.h>
 
 // 이름을 바꿔야 할 것 같다.
-namespace dive
+namespace DiveEngine
 {
 	struct BufferFrame
 	{

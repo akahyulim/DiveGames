@@ -7,7 +7,7 @@
 
 using namespace std;
 
-namespace dive
+namespace DiveEngine
 {
 	void Renderer::createDepthStencilStates()
 	{
@@ -226,6 +226,7 @@ namespace dive
 				}
 			}
 
+			/*
 			// Deferred Shading
 			{
 				D3D11_INPUT_ELEMENT_DESC desc[] =
@@ -271,6 +272,7 @@ namespace dive
 					return false;
 				}
 			}
+			*/
 		}
 
 		// Font Shader

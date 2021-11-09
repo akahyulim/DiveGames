@@ -2,7 +2,7 @@
 #include <string>
 #include <vector>
 
-namespace dive
+namespace DiveEngine
 {
 	class Runtime;
 	class Scene;

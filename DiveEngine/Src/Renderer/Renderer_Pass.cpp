@@ -6,7 +6,7 @@
 
 // 일단 dvRenderer 구현은 나중으로 미루고
 // 이 곳에서 Deferred Shader로 Lighting 까지 구현해보자.
-namespace dive
+namespace DiveEngine
 {
 	// Multi-Thread Render reference를 참고하자면
 	// 이 곳에선 Static과 Dynamic Params만 설정하고

@@ -1,7 +1,7 @@
 #pragma once
 #include "Widget.h"
 
-namespace Editor
+namespace DiveEditor
 {
 	class MenuBar : public Widget
 	{

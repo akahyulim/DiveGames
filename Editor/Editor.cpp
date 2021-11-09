@@ -10,7 +10,9 @@
 #include "Inspector.h"
 #include <iostream>
 
-namespace Editor
+using namespace DiveEngine;
+
+namespace DiveEditor
 {
 	Editor::Editor()
 	{
@@ -29,8 +31,11 @@ namespace Editor
 
 	bool Editor::Initialize()
 	{
-		if (!dive::Runtime::Initialize())
+		if (!Runtime::Initialize())
 			return false;
+
+		// Asset 폴더의 모든 Resource들을 Load한다.
+		ResourceManager::GetInstance().LoadResourcesFromAssetFolder();
 
 		// ImGui 초기화 및 Widget 생성
 		initialize_ImGui();
@@ -50,9 +55,9 @@ namespace Editor
 	*/
 	void Editor::Compose()
 	{
-//		if (m_pActivePath)
+		if (m_pActivePath)
 		{
-//			m_pActivePath->Compose();
+			m_pActivePath->Compose();
 		}
 
 		ImGui_ImplDX11_NewFrame();
@@ -78,7 +83,7 @@ namespace Editor
 		}
 	}
 
-	void Editor::ModifyWindow(dive::eWindowModes mode, unsigned int width, unsigned int height, bool maximize)
+	void Editor::ModifyWindow(eWindowModes mode, unsigned int width, unsigned int height, bool maximize)
 	{
 		unsigned int posX = 0;
 		unsigned int posY = 0;
@@ -118,8 +123,8 @@ namespace Editor
 
 		ImGui_ImplWin32_Init(m_hWnd);
 
-		auto pDevice = dive::Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
-		auto pImmediateContext = dive::Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
+		auto pDevice = Renderer::GetInstance().GetGraphicsDevice()->GetDevice();
+		auto pImmediateContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 		ImGui_ImplDX11_Init(pDevice, pImmediateContext);
 
 		// Widget 생성

@@ -5,9 +5,9 @@
 #include <vector>
 #include <memory>
 
-namespace Editor
+namespace DiveEditor
 {
-	class Editor : public dive::Runtime
+	class Editor : public DiveEngine::Runtime
 	{
 	public:
 		Editor();
@@ -17,7 +17,7 @@ namespace Editor
 
 		void Compose() override;
 
-		void ModifyWindow(dive::eWindowModes mode, unsigned int width, unsigned int height, bool maximize) override;
+		void ModifyWindow(DiveEngine::eWindowModes mode, unsigned int width, unsigned int height, bool maximize) override;
 
 	private:
 		void initialize_ImGui();

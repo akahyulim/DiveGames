@@ -4,7 +4,7 @@
 #include FT_FREETYPE_H
 #include <string>
 
-namespace dive
+namespace DiveEngine
 {
 	class FontImporter
 	{

@@ -1,6 +1,6 @@
 #include "TextMesh.h"
 
-namespace dive
+namespace DiveEngine
 {
 	TextMesh::TextMesh(GameObject* gameObject)
 		: Component(gameObject)

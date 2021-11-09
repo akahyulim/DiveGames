@@ -3,7 +3,7 @@
 #include "../Core/Object.h"
 #include <assert.h>
 
-namespace dive
+namespace DiveEngine
 {
 	// 나중에 다른 곳에 모아 놓자.
 	// 그런데 굳이 id가 필요한가 싶다.

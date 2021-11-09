@@ -11,7 +11,7 @@
 #include <string>
 
 
-namespace dive
+namespace DiveEngine
 {
 	class GameObject;
 	class TextMesh;

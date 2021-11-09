@@ -8,7 +8,7 @@ using namespace Microsoft::WRL;
 // 1. 생성자에 대해 좀 더 생각해본 후 정리해야 한다.
 // 2. 현재 Frame Rate를 관리하지 않고 있다.
 // Frame Rate 변경시에도 ResizeTarget()을 사용하는 것일까?
-namespace dive
+namespace DiveEngine
 {
 	GraphicsDevice::GraphicsDevice(HWND hWnd, bool fullScreen, bool debugLayer)
 	{

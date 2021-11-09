@@ -1,6 +1,7 @@
 #include "RenderPathEditor.h"
+using namespace DiveEngine;
 
-namespace Editor
+namespace DiveEditor
 {
 	RenderPathEditor::RenderPathEditor()
 	{
@@ -25,7 +26,7 @@ namespace Editor
 
 		// Scene Update
 		{
-			auto timeScale = dive::TimeManager::GetInstance().GetTimeScale();
+			auto timeScale = TimeManager::GetInstance().GetTimeScale();
 			m_pScene->Update(deltaTime * timeScale);
 		}
 
@@ -39,7 +40,7 @@ namespace Editor
 
 		// Frame Data Update
 		{
-			dive::Renderer::GetInstance().UpdateCB();
+			Renderer::GetInstance().UpdateCB();
 		}
 	}
 	
@@ -58,10 +59,10 @@ namespace Editor
 		if (!m_pScene)
 			return;
 
-		auto pRenderer = &dive::Renderer::GetInstance();
+		auto pRenderer = &Renderer::GetInstance();
 		assert(pRenderer);
 
-		auto pImmediateContext = dive::Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
+		auto pImmediateContext = Renderer::GetInstance().GetGraphicsDevice()->GetImmediateContext();
 		assert(pImmediateContext);
 
 		{
@@ -76,7 +77,7 @@ namespace Editor
 				// 모든 RenderTexture가 굳이 Camera를 가질 필요는 없다는 의미?
 				// 그렇다면 아래 ClearRenderTargetView()도 RenderTexture가 처리할 수 있어야 하는데? 
 				// 찾아보니 이게 존재하는 이유조차 의문이 든다.
-				dive::dvRenderTexture::SetActive(pRenderer->GetRenderTarget());
+				dvRenderTexture::SetActive(pRenderer->GetRenderTarget());
 
 				// 사실 GBuffer라면 특정 색으로 초기화해야 할 거다.
 				auto pCamera = pRenderer->GetCamera();
@@ -90,7 +91,7 @@ namespace Editor
 				}
 				else
 				{
-					auto color = pCamera->GetComponent<dive::Camera>()->GetBackgroundColor();
+					auto color = pCamera->GetComponent<Camera>()->GetBackgroundColor();
 					clearColors[0] = color.x;
 					clearColors[1] = color.y;
 					clearColors[2] = color.z;
@@ -104,10 +105,29 @@ namespace Editor
 			// Wicked는 먼저 RenderTarget으로부터 크기를 가져와
 			// Viewport를 Bind한다.
 			// 하지만 현재 구현은 Camera를 통해 Viewport를 계산하고 있다.
+			{
+				auto width = pRenderer->GetRenderTarget()->GetWidth();
+				auto height = pRenderer->GetRenderTarget()->GetHeight();
 
-			// 1015: 현재 오브젝트가 그려지지 않고 있다.
-			// 이는 테스트 과정에서 생겨난 의도된? 현상이다.
-			// 이게 문제가 아닌거 같은데...
+				D3D11_VIEWPORT vp;
+				vp.Width = width;
+				vp.Height = height;
+				vp.TopLeftX = 0.0f;
+				vp.TopLeftY = 0.0f;
+				vp.MinDepth = 0.0f;
+				vp.MaxDepth = 1.0f;
+				pImmediateContext->RSSetViewports(1, &vp);
+
+				// 역시나 카메라가 걸린다.
+				Renderer::GetInstance().SetViewport(width, height);
+			}
+
+			//======================================================//
+			// 현재 오브젝트가 그려지지 않고 있다.					//
+			// 이는 Deferred와 Compose shader를 추가하면서			//
+			// Input layout이 꼬여 버렸기 때문이다.					//
+			// 위 두 개의 shader 생성을 막으면 제대로 출력된다.		//
+			//======================================================//
 			pRenderer->DrawScene();
 
 			// RenderPassEnd

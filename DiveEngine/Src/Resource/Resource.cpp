@@ -1,7 +1,8 @@
 #include "Resource.h"
 #include "../Renderer/Graphics/dvTexture2D.h"
+#include "../Renderer/Material.h"
 
-namespace dive
+namespace DiveEngine
 {
 	Resource::Resource()
 	{
@@ -13,4 +14,6 @@ namespace dive
 #define INSTANTIATE_TO_RESOURCE_TYPE(T, enumT) template<> eResourceType Resource::TypeToEnum<T>() { return enumT; }
 
 	INSTANTIATE_TO_RESOURCE_TYPE(dvTexture2D, eResourceType::Texture2D)
+	INSTANTIATE_TO_RESOURCE_TYPE(Material, eResourceType::Material)
+
 }

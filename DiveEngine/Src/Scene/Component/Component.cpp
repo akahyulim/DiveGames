@@ -5,7 +5,7 @@
 #include "MeshRenderer.h"
 #include "Light.h"
 
-namespace dive
+namespace DiveEngine
 {
 	Component::Component(GameObject* pGameObject, Transform* pTransform)
 	{

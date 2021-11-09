@@ -2,7 +2,7 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 
-namespace dive
+namespace DiveEngine
 {
 	class Log
 	{
@@ -19,15 +19,15 @@ namespace dive
 }
 
 // Engine Logger Macro
-#define CORE_TRACE(...)			dive::Log::GetCoreLogger()->trace(__VA_ARGS__)
-#define CORE_INFO(...)			dive::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define CORE_WARN(...)			dive::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define CORE_ERROR(...)			dive::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define CORE_CRITICAL(...)		dive::Log::GetCoreLogger()->critical(__VA_ARGS__)
+#define CORE_TRACE(...)			DiveEngine::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define CORE_INFO(...)			DiveEngine::Log::GetCoreLogger()->info(__VA_ARGS__)
+#define CORE_WARN(...)			DiveEngine::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define CORE_ERROR(...)			DiveEngine::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define CORE_CRITICAL(...)		DiveEngine::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
 // Application Logger Macro
-#define APP_TRACE(...)			dive::Log::GetAppLogger()->trace(__VA_ARGS__)
-#define APP_INFO(...)			dive::Log::GetAppLogger()->info(__VA_ARGS__)
-#define APP_WARN(...)			dive::Log::GetAppLogger()->warn(__VA_ARGS__)
-#define APP_ERROR(...)			dive::Log::GetAppLogger()->error(__VA_ARGS__)
-#define APP_CRITICAL(...)		dive::Log::GetAppLogger()->critical(__VA_ARGS__)
+#define APP_TRACE(...)			DiveEngine::Log::GetAppLogger()->trace(__VA_ARGS__)
+#define APP_INFO(...)			DiveEngine::Log::GetAppLogger()->info(__VA_ARGS__)
+#define APP_WARN(...)			DiveEngine::Log::GetAppLogger()->warn(__VA_ARGS__)
+#define APP_ERROR(...)			DiveEngine::Log::GetAppLogger()->error(__VA_ARGS__)
+#define APP_CRITICAL(...)		DiveEngine::Log::GetAppLogger()->critical(__VA_ARGS__)

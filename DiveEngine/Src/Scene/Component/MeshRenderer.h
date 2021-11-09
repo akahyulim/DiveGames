@@ -2,9 +2,10 @@
 #include "Component.h"
 #include "../../Renderer/Mesh.h"
 
-namespace dive
+namespace DiveEngine
 {
 	class GameObject;
+	class Material;
 
 	enum class eDefaultMeshType
 	{
@@ -46,19 +47,17 @@ namespace dive
 		Mesh* GetMesh() { return m_pMesh; }
 
 		// test
-		void Render(ID3D11DeviceContext* deviceContext);
+		void Render(ID3D11DeviceContext* pDeviceContext);
 
 	private:
-		void calcu();
 		bool createBuffers();
 
 	private:
 		Mesh* m_pMesh = nullptr;
-		// Material: 텍스쳐, 색 등
+		Material* m_pMaterial = nullptr;
 		// Lighting
 		
-		// 만약 이 곳에서 Draw를 구현한다면
-		// 아래 버퍼는 unique_ptr이 어울린다.
+		// 아무리 생각해도 얘가 Buffer를 가지는 건 아니다.
 		ID3D11Buffer* m_pVertexBuffer = nullptr;
 		ID3D11Buffer* m_pIndexBuffer = nullptr;
 

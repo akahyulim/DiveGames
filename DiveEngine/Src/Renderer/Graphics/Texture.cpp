@@ -12,7 +12,7 @@
 // - Microsoft::WRL::ComPtr이 unique ptr도 아닌 것 같고 사용 방법도 shared ptr과 비슷하니 raw pointer가 나을 것 같다.
 // 3. Device 객체는 생성자를 통해 전달받아 멤버 변수로 관리하는 편이 나을 것 같다.
 // - 좀 더 생각해보던가.. 이 객체를 누가 생성하느냐에 따라 달려있다. 물론 Renderer가 생성하겠지...
-namespace dive
+namespace DiveEngine
 {
 	Texture::Texture(ID3D11Device* pDevice)
 		: m_pDevice(nullptr) 

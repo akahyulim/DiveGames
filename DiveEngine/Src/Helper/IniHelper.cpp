@@ -1,6 +1,6 @@
 #include "IniHelper.h"
 
-namespace dive
+namespace DiveEngine
 {
 	Key::Key(const std::string& fileName, const std::string& sectionName, const std::string& keyName)
 		: m_FileName(fileName), m_SectionName(sectionName), m_KeyName(keyName)

@@ -2,7 +2,7 @@
 #include "spdlog/sinks/stdout_color_sinks.h"
 #include "spdlog/sinks/basic_file_sink.h"
 
-namespace dive
+namespace DiveEngine
 {
 	std::shared_ptr<spdlog::logger> Log::sCoreLogger;
 	std::shared_ptr<spdlog::logger> Log::sAppLogger;

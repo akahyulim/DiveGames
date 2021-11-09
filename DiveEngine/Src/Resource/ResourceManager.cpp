@@ -1,7 +1,7 @@
 #include "ResourceManager.h"
 #include "../Helper/Log.h"
 
-namespace dive
+namespace DiveEngine
 {
 	ResourceManager::ResourceManager()
 	{
@@ -34,5 +34,22 @@ namespace dive
 		}
 
 		return nullptr;
+	}
+
+	// Asset 폴더의 모든 Resource를 로드한다.
+	void ResourceManager::LoadResourcesFromAssetFolder()
+	{
+	}
+	
+	// 현재 Scene에서 사용한 Resource들의 파일 경로를 저장한다.
+	// WorldSave Event에서 호출된다.
+	void ResourceManager::SaveResourcesToFile(const std::string& filepath)
+	{
+	}
+	
+	// Scene에 사용되는 Resource들의 파일 경로를 읽어 로드한다.
+	// WorldLoad Event에서 호출되는데... 애매하다.
+	void ResourceManager::LoadResourcesFromFile(const std::string& filepath)
+	{
 	}
 }

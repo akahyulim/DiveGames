@@ -4,7 +4,7 @@
 #include <DirectXMath.h>
 #include <array>
 
-namespace dive
+namespace DiveEngine
 {
 	// 키와 버튼을 모두 맵핑
 	enum class eKeyCode

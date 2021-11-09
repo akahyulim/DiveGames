@@ -1,7 +1,7 @@
 #include "Input.h"
 #include "../Helper/Log.h"
 
-namespace dive
+namespace DiveEngine
 {
     void Input::Initialize(HWND hWnd)
     {

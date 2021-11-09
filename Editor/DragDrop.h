@@ -2,7 +2,7 @@
 #include "External/ImGui/imgui.h"
 #include <variant>
 
-namespace Editor
+namespace DiveEditor
 {
 	enum class eDragPayloadType
 	{

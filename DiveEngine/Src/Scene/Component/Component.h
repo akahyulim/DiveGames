@@ -1,7 +1,10 @@
 #pragma once
 #include "../../Core/Object.h"
+#include <functional>
+#include <any>
+#include <vector>
 
-namespace dive
+namespace DiveEngine
 {
 	class GameObject;
 	class FileStream;
@@ -14,6 +17,12 @@ namespace dive
 		Camera,
 		Light,
 		MeshRenderer,
+	};
+
+	struct Attribute
+	{
+		std::function<std::any()> getter;
+		std::function<void(std::any)> setter;
 	};
 
 	// base´Ù.
@@ -38,10 +47,43 @@ namespace dive
 		template<class T>
 		static constexpr eComponentType TypeToEnum();
 
+		const std::vector<Attribute>& GetAttributes() const { return m_Attributes; }
+		void SetAttributes(const std::vector<Attribute>& attributes)
+		{
+			for (size_t i = 0; i != attributes.size(); i++)
+			{
+				m_Attributes[i].setter(attributes[i].getter());
+			}
+		}
+
+	protected:
+		#define REGISTER_ATTRIBUTE_GET_SET(getter, setter, type) RegisterAttribute(     \
+        [this]()                        { return getter(); },                           \
+        [this](const std::any& valueIn) { setter(std::any_cast<type>(valueIn)); });     \
+
+		#define REGISTER_ATTRIBUTE_VALUE_SET(value, setter, type) RegisterAttribute(    \
+        [this]()                        { return value; },                              \
+        [this](const std::any& valueIn) { setter(std::any_cast<type>(valueIn)); });     \
+
+		#define REGISTER_ATTRIBUTE_VALUE_VALUE(value, type) RegisterAttribute(          \
+        [this]()                        { return value; },                              \
+        [this](const std::any& valueIn) { value = std::any_cast<type>(valueIn); });     \
+
+		// Registers an attribute
+		void RegisterAttribute(std::function<std::any()>&& getter, std::function<void(std::any)>&& setter)
+		{
+			Attribute attribute;
+			attribute.getter = std::move(getter);
+			attribute.setter = std::move(setter);
+			m_Attributes.emplace_back(attribute);
+		}
+
 	protected:
 		GameObject* m_pGameObject = nullptr;
 		Transform* m_pTransform = nullptr;
 
 		eComponentType m_Type = eComponentType::Unknown;
+
+		std::vector<Attribute> m_Attributes;
 	};
 }

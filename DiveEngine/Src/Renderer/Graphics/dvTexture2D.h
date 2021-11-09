@@ -4,7 +4,7 @@
 #include <string>
 #include <DirectXMath.h>
 
-namespace dive
+namespace DiveEngine
 {
 	class dvTexture2D : public dvTexture
 	{

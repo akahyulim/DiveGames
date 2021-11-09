@@ -4,7 +4,7 @@
 #include <memory>
 
 
-namespace dive
+namespace DiveEngine
 {
 	constexpr size_t MAX_VALUE_SIZE = 256;
 

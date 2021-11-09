@@ -13,7 +13,7 @@
 *	SwapChain 및 D3D11 Device 관리
 *	Resource 생성 및 Bind 구현은 좀 더 생각해 봐야 할 것 같다.
 */
-namespace dive
+namespace DiveEngine
 {
 	class GraphicsDevice
 	{

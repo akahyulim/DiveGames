@@ -1,7 +1,9 @@
 #include "Scene.h"
 
+using namespace DiveEngine;
+
 // Renderer로부터 Image를 가져와 출력한다.
-namespace Editor
+namespace DiveEditor
 {
     Scene::Scene(Editor* pEditor)
         : Widget(pEditor)
@@ -12,16 +14,16 @@ namespace Editor
         m_Flags |= ImGuiWindowFlags_NoScrollbar;
         m_Padding = ImVec2(4.0f, 4.0f);
         
-        //m_pScene = &dive::Scene::GetGlobalScene();
-        m_pRenderer = &dive::Renderer::GetInstance();
+        //m_pScene = &Scene::GetGlobalScene();
+        m_pRenderer = &Renderer::GetInstance();
 
         // test 
-        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/choa.jpg");
-        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/dmc5.jpg");
-        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/iu.jpg");
-        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/winter.jpg");
-        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/bluePrint.jpg");
-        dive::ResourceManager::GetInstance().Load<dive::dvTexture2D>("../Assets/Textures/stars.jpg");
+        ResourceManager::GetInstance().Load<dvTexture2D>("../Assets/Textures/choa.jpg");
+        ResourceManager::GetInstance().Load<dvTexture2D>("../Assets/Textures/dmc5.jpg");
+        ResourceManager::GetInstance().Load<dvTexture2D>("../Assets/Textures/iu.jpg");
+        ResourceManager::GetInstance().Load<dvTexture2D>("../Assets/Textures/winter.jpg");
+        ResourceManager::GetInstance().Load<dvTexture2D>("../Assets/Textures/bluePrint.jpg");
+        ResourceManager::GetInstance().Load<dvTexture2D>("../Assets/Textures/stars.jpg");
     }
 
     //===================================================//
@@ -73,9 +75,9 @@ namespace Editor
         // 사실 어떤 Path에서 이게 적용되는지도 모르겠다.
         m_pRenderer->SetViewport(width, height);
 
-        static dive::dvTexture2D* pSelectedTex = nullptr;
+        static dvTexture2D* pSelectedTex = nullptr;
         if(!pSelectedTex)
-            pSelectedTex = dive::ResourceManager::GetInstance().GetByName<dive::dvTexture2D>("bluePrint");
+            pSelectedTex = ResourceManager::GetInstance().GetByName<dvTexture2D>("bluePrint");
 
         ImGui::Image(
             //pSelectedTex ? pSelectedTex->GetShaderResourceView() :

@@ -1,6 +1,8 @@
 #include "Assets.h"
 
-namespace Editor
+using namespace DiveEngine;
+
+namespace DiveEditor
 {
 	Assets::Assets(Editor* pEditor)
 		: Widget(pEditor)

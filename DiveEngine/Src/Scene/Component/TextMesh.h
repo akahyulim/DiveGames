@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace dive
+namespace DiveEngine
 {
 	class GameObject;
 

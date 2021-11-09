@@ -1,7 +1,9 @@
 #include "Widget.h"
 #include "Editor.h"
 
-namespace Editor
+using namespace DiveEngine;
+
+namespace DiveEditor
 {
 	Widget::Widget(Editor* pEditor)
 	{
@@ -9,7 +11,7 @@ namespace Editor
 
 		m_pEditor = pEditor;
 
-		EVENT_SUBSCRIBE(dive::eEventType::SceneActivate, EVENT_HANDLE(OnSetActiveScene));
+		EVENT_SUBSCRIBE(eEventType::SceneActivate, EVENT_HANDLE(OnSetActiveScene));
 	}
 
 	void Widget::Tick()
@@ -91,6 +93,6 @@ namespace Editor
 
 	void Widget::OnSetActiveScene()
 	{
-		m_pScene = dive::SceneManager::GetInstance().GetActiveScene();
+		m_pScene = SceneManager::GetInstance().GetActiveScene();
 	}
 }

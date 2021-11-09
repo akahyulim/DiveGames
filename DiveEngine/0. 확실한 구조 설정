@@ -1,0 +1,23 @@
+
+- Library
+	- LIB냐 DLL이냐
+	=> 개발 편의성을 위해 lib가 맞다. 
+	- header를 따로 관리하는 것이 맞냐?
+	=> 사용자는 header를 include할 수 있어야 한다. 하지만 최종 실행파일에선 전부 포함된다.
+
+- File
+	- File들을 System별로 구분할 것인가?
+		- Unreal Engine 역시 폴더로 구분해 놓았다.
+	- header들을 하나의 header로 묶을 것인가?
+	=> 해당 Project의 std lib와 core lib 정도는 묶어두는 편이 낫다. 일종의 pch처럼 말이다.
+	=> 다만 static lib일 경우 이를 사용하는 측에선 개별 header를 include해야 한다.
+
+- namespace
+	- Engine은 DiveEngine, Editor는 DiveEditor, Sandbox는 기존대로...
+		- DiveEditor와 Sandbox는 using namespace DiveEngine
+		=> cpp에서 using namespace하는 편이 낫다.
+	- 하위 namepsace를 가지게 할 것인가?
+		- Unity의 경우 추가 system들을 구분한 것 같다.
+			- UnityEngine + @로 구현된 것 같다.
+			- SceneManagement를 왜 따로 빼놓았는지 모르겠다.
+	

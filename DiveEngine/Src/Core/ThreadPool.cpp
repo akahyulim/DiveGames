@@ -2,7 +2,7 @@
 
 using namespace std;
 
-namespace dive
+namespace DiveEngine
 {
 	ThreadPool::~ThreadPool()
 	{

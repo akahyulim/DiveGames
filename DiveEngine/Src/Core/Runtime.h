@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include <string>
 
-namespace dive
+namespace DiveEngine
 {
 	class SceneManager;
 	class ResourceManager;

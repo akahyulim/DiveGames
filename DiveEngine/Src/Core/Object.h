@@ -4,7 +4,7 @@
 #include <atomic>
 #include <typeinfo>
 
-namespace dive
+namespace DiveEngine
 {
 	static const unsigned int INVALID_ID = 0;
 

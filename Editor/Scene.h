@@ -1,7 +1,7 @@
 #pragma once
 #include "Widget.h"
 
-namespace Editor
+namespace DiveEditor
 {
 	class Scene : public Widget
 	{
@@ -12,7 +12,7 @@ namespace Editor
 
 	private:
 	private:
-		dive::Scene* m_pScene;
-		dive::Renderer* m_pRenderer;
+		DiveEngine::Scene* m_pScene;
+		DiveEngine::Renderer* m_pRenderer;
 	};
 }

@@ -7,7 +7,7 @@
 #include "../Helper/FileStream.h"
 
 
-namespace dive
+namespace DiveEngine
 {
 	Scene::Scene()
 	{

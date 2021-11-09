@@ -409,6 +409,15 @@
     <ClInclude Include="Src\Renderer\PipelineState.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\Material.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\dxMesh.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Resource\Importer\ModelImporter.h">
+      <Filter>Src\Resource\Importer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp">
@@ -519,6 +528,12 @@
     <ClCompile Include="Src\Renderer\Font.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Renderer\Material.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp">
+      <Filter>Src\Resource\Importer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -575,11 +590,11 @@
     <Filter Include="Doc">
       <UniqueIdentifier>{7e215838-d5d9-4ab7-a317-e071ac36ddd1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Resource\Importer">
+      <UniqueIdentifier>{c8aa3c5b-fc11-4def-b9eb-fe7482bcab62}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\Assets\Shaders\개요.txt">
-      <Filter>Shaders</Filter>
-    </Text>
     <Text Include="Doc\dvTexture.txt">
       <Filter>Doc</Filter>
     </Text>
@@ -632,6 +647,9 @@
     </None>
     <None Include="..\Assets\Shaders\Legacy\Compose.hlsl">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="0. 확실한 구조 설정">
+      <Filter>Doc</Filter>
     </None>
   </ItemGroup>
 </Project>

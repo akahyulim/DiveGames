@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 
-namespace dive
+namespace DiveEngine
 {
 	class Scene;
 	class FileStream;
@@ -24,6 +24,8 @@ namespace dive
 		void Deserialize(FileStream* pFileStream, Transform* pParentTransform = nullptr);
 
 		void Update(float deltaTime);
+
+		GameObject* Duplicate();
 
 		template<typename T>
 		T* AddComponent();

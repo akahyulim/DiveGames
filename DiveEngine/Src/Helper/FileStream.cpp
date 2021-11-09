@@ -2,7 +2,7 @@
 #include "Log.h"
 
 
-namespace dive
+namespace DiveEngine
 {
 	FileStream::FileStream(const std::string & filepath, eFileStreamMode mode)
 		: m_bFileOpened(false),

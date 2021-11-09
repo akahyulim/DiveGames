@@ -1,7 +1,7 @@
 #pragma once
 #include "Widget.h"
 
-namespace Editor
+namespace DiveEditor
 {
 	class Inspector : public Widget
 	{
@@ -12,19 +12,19 @@ namespace Editor
 
 		// material과 같이 Resource를 출력하기도 한다.
 		// 유니티의 경우 texture와 mesh까지도 보여준다.
-		static void SetInspectGameObject(dive::GameObject* pTarget);
+		static void SetInspectGameObject(DiveEngine::GameObject* pTarget);
 
 	private:
 		void showGameObject();
-		void showTransform(dive::Transform* pTransform);
-		void showCamera(dive::Camera* pCamera);
-		void showMeshRenderer(dive::MeshRenderer* pMeshRenderer);
-		void showLight(dive::Light* pLight);
+		void showTransform(DiveEngine::Transform* pTransform);
+		void showCamera(DiveEngine::Camera* pCamera);
+		void showMeshRenderer(DiveEngine::MeshRenderer* pMeshRenderer);
+		void showLight(DiveEngine::Light* pLight);
 		// 이하 다른 Components
 
 		void showAddComponentButton();
 
 	private:
-		static dive::GameObject* m_pInspectedTarget;
+		static DiveEngine::GameObject* m_pInspectedTarget;
 	};
 }

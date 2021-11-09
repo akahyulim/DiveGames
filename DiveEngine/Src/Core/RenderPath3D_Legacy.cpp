@@ -6,7 +6,7 @@
 #include "../Helper/Log.h"
 
 
-namespace dive
+namespace DiveEngine
 {
 	// 생성자에서 처리하기 조금 애매하다.
 	RenderPath3D_Legacy::RenderPath3D_Legacy()
@@ -229,6 +229,7 @@ namespace dive
 		auto pGraphicsDevice = Renderer::GetInstance().GetGraphicsDevice();
 		DV_ASSERT(pGraphicsDevice);
 
+		/*
 		// Render의 결과물 SRV를 가져와 Backbuffer의 RTV에 그린다.
 		// Editor의 경우 이 부분을 구현하지 않으면 의도한 것과 같이 View가 나뉘게 된다.
 		{
@@ -242,5 +243,9 @@ namespace dive
 			// 일단 의도한대로 SRV를 RTV에 그렸다.
 			Renderer::GetInstance().DrawCompose();
 		}
+		*/
+
+		// 일단 현재 그냥 그리기가 안된다 IL 때문일 수 있다.
+		Renderer::GetInstance().DrawGBuffer();// .DrawScene();
 	}
 }

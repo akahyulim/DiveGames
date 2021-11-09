@@ -15,7 +15,7 @@
 #include <vector>
 //===============================
 
-namespace dive
+namespace DiveEngine
 {
 	namespace StringHelper
 	{

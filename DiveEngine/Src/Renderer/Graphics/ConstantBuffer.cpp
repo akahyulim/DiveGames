@@ -3,7 +3,7 @@
 #include "GraphicsDevice.h"
 #include "../Renderer.h"
 
-namespace dive
+namespace DiveEngine
 {
 	ConstantBuffer::ConstantBuffer(GraphicsDevice* pGraphicsDevice, const std::string& name)
 		: m_pGraphicsDevice(pGraphicsDevice),

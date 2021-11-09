@@ -2,12 +2,13 @@
 #include "../Core/Object.h"
 #include <string>
 
-namespace dive
+namespace DiveEngine
 {
 	enum class eResourceType
 	{
 		Unknown,
 		Texture2D,
+		Material
 	};
 
 	// eResourceType을 가지는게 맞는 것 같다.
@@ -18,10 +19,9 @@ namespace dive
 		Resource();
 		virtual ~Resource() = default;
 
-		// 순수 가상 함수이면 안되나?
+		virtual bool SaveToFile(const std::string& filepath) { return true; }
 		virtual bool LoadFromFile(const std::string& filepath) { return true; }
-		//virtual bool SaveToFile(const std::string& filepath) { return true; }
-
+		
 
 		eResourceType GetType() const { return m_Type; }
 

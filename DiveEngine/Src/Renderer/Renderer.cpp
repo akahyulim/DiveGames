@@ -13,7 +13,7 @@
 
 #include "Graphics/dvTexture2D.h"
 
-namespace dive
+namespace DiveEngine
 {
 	Renderer::Renderer()
 	{

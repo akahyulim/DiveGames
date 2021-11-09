@@ -5,7 +5,7 @@
 #include "../Helper/FileSystemHelper.h"
 #include "../Helper/Log.h"
 
-namespace dive
+namespace DiveEngine
 {
 	SceneManager::SceneManager()
 	{

@@ -8,7 +8,7 @@
 //	- 굳이 GBuffer의 크기를 변경할 필요가 있을까? View 크기에 맞는 RenderTarget을 만든 후 결과를 그리면 되지 않나?
 //		- 그렇다면 샘플링이 따로 필요한가?
 // 2. Editor의 View, 그리고 후처리에 사용될 RenderTarget이 필요하다.
-namespace dive
+namespace DiveEngine
 {
 	GBuffer::GBuffer()
 	{

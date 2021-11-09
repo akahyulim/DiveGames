@@ -3,7 +3,7 @@
 
 namespace sandbox
 {
-	class Sandbox : public dive::Runtime
+	class Sandbox : public DiveEngine::Runtime
 	{
 	public:
 		Sandbox();
@@ -14,6 +14,6 @@ namespace sandbox
 	private:
 
 	private:
-		dive::RenderPath3D_Legacy* m_pRenderPath;
+		DiveEngine::RenderPath3D_Legacy* m_pRenderPath;
 	};
 }

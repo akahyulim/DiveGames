@@ -4,7 +4,7 @@
 namespace dive
 {
 	// RenderPath_Legacy를 상속받는게 맞을 것 같다.
-	class RenderPath3D_Editor : public RenderPath3D_Legacy
+	class RenderPath3D_Editor : public DiveEngine::RenderPath3D_Legacy
 	{
 	public:
 		RenderPath3D_Editor();

@@ -2,7 +2,7 @@
 #include "dvTexture.h"
 #include "../Renderer.h"
 
-namespace dive
+namespace DiveEngine
 {
 	// GBuffer용으로 테스트를 성공했다.
 	// 카메라가 비추는 걸 텍스쳐에 따로 그린다.(카메라가 2개 이상인 이유)

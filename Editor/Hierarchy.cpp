@@ -3,6 +3,8 @@
 #include "External/ImGui/imgui_stdlib.h"
 #include "Inspector.h"
 
+using namespace DiveEngine;
+
 // 기본 구현 
 // 게임 오브젝트 추가시 디폴트 이름에 id를 넣었으면 한다.
 // 파일화를 해야 한다.
@@ -17,7 +19,7 @@
 // 예전에는 전역 변수로 접근했다.
 
 
-namespace Editor
+namespace DiveEditor
 {
     Hierarchy::Hierarchy(Editor* pEditor)
         : Widget(pEditor)
@@ -69,7 +71,7 @@ namespace Editor
                 auto id = std::get<unsigned int>(payload->data);
                 if (auto dropped = m_pScene->GetGameObjectByID(id))
                 {
-                    dropped->GetComponent<dive::Transform>()->SetParent(nullptr);
+                    dropped->GetComponent<Transform>()->SetParent(nullptr);
                 }
             }
 
@@ -89,14 +91,14 @@ namespace Editor
     }
 
     // 내부 트리를 만든다.
-    void Hierarchy::showAddedTree(dive::GameObject* gameObject)
+    void Hierarchy::showAddedTree(GameObject* gameObject)
     {
         if (!gameObject) return;
 
         ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
 
         // 자식 존재 여부
-        auto children = gameObject->GetComponent<dive::Transform>()->GetChildren();
+        auto children = gameObject->GetComponent<Transform>()->GetChildren();
         children.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
        
         if (m_pSelectedGameObject)
@@ -128,7 +130,7 @@ namespace Editor
         }
     }
 
-    void Hierarchy::setSelectedGameObject(dive::GameObject* gameObject)
+    void Hierarchy::setSelectedGameObject(GameObject* gameObject)
     {
         if (m_pSelectedGameObject != gameObject)
         {
@@ -161,7 +163,7 @@ namespace Editor
     // 전달인자는 상황에 따라 다르게 사용된다.
     // 드래그일 땐 대상의 정보를 저장하고,
     // 드랍일 땐 저장된 대상의 부모로 설정한다.
-    void Hierarchy::handleDragDrop(dive::GameObject* gameObject)
+    void Hierarchy::handleDragDrop(GameObject* gameObject)
     {
         auto dragDrop = DragDrop::GetInstance();
 
@@ -191,8 +193,8 @@ namespace Editor
 
                 if (droppedObj->GetInstanceID() != gameObject->GetInstanceID())
                 {
-                    droppedObj->GetComponent<dive::Transform>()->SetParent(
-                        gameObject->GetComponent<dive::Transform>());
+                    droppedObj->GetComponent<Transform>()->SetParent(
+                        gameObject->GetComponent<Transform>());
 
                     APP_TRACE("Drop Target Name: {:s}, ID: {:d}", gameObject->GetName(), gameObject->GetInstanceID());
                 }
@@ -218,7 +220,11 @@ namespace Editor
         {
             if (ImGui::MenuItem("Paste", 0, false, m_pCopiedGameObject != nullptr))
             {
-                //m_copied->Clone();
+                m_pCopiedGameObject->Duplicate();
+
+                // 새로 생성된 GameObject들이 계속 하이라이트 상태다...
+                // 아무래도 copy 본체의 selected 상태까지 가져온 듯 한데...
+                // => 이게 문제가 아니다. 추가되는 모든 오브젝트가 동일한 결과다!!!!
             }
         }
 

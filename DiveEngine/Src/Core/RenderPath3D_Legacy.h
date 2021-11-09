@@ -9,7 +9,7 @@
 *	이름 그대로 RenderPath 구현
 *	Core에는 어울리지 않는다. 사용자에 의해 수정 가능한 Level임을 알리고 싶다.
 */
-namespace dive
+namespace DiveEngine
 {
 	// 결국엔 데이터를 가르쳐 주는 편이 나을 것 같긴 하다...
 	enum eGBuffer

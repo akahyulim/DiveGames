@@ -3,7 +3,7 @@
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
 
-namespace Editor
+namespace DiveEditor
 {
 	class Editor;
 
@@ -45,7 +45,7 @@ namespace Editor
 		ImGuiWindow* m_pWindow = nullptr;
 
 		Editor* m_pEditor = nullptr;
-		dive::Scene* m_pScene = nullptr;
+		DiveEngine::Scene* m_pScene = nullptr;
 
 	private:
 		unsigned char m_VarPushs = 0;

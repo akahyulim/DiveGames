@@ -1,7 +1,7 @@
 #pragma once
 #include "Graphics/GraphicsInclude.h"
 
-namespace dive
+namespace DiveEngine
 {
 	struct VertexType_PosTexNorTan
 	{

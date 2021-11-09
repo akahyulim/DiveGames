@@ -279,6 +279,7 @@
     <ClInclude Include="Src\Helper\StringHelper.h" />
     <ClInclude Include="Src\Helper\Timer.h" />
     <ClInclude Include="Src\Input\Input.h" />
+    <ClInclude Include="Src\Renderer\dxMesh.h" />
     <ClInclude Include="Src\Renderer\Font.h" />
     <ClInclude Include="Src\Renderer\GraphicsEnums.h" />
     <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h" />
@@ -290,10 +291,12 @@
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsInclude.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
+    <ClInclude Include="Src\Renderer\Material.h" />
     <ClInclude Include="Src\Renderer\Mesh.h" />
     <ClInclude Include="Src\Renderer\PipelineState.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\VertexTypes.h" />
+    <ClInclude Include="Src\Resource\Importer\ModelImporter.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceManager.h" />
     <ClInclude Include="Src\Scene\Component\Camera.h" />
@@ -327,10 +330,12 @@
     <ClCompile Include="Src\Renderer\Graphics\GBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
+    <ClCompile Include="Src\Renderer\Material.cpp" />
     <ClCompile Include="Src\Renderer\Mesh.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\Renderer_Pass.cpp" />
     <ClCompile Include="Src\Renderer\Renderer_Resources.cpp" />
+    <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="Src\Scene\Component\Camera.cpp" />
@@ -345,7 +350,6 @@
     <ClCompile Include="Src\Scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\Assets\Shaders\개요.txt" />
     <Text Include="Doc\dvTexture.txt" />
     <Text Include="Doc\Graphics.txt" />
     <Text Include="Doc\GraphicsResources.txt" />
@@ -371,6 +375,7 @@
     <None Include="..\Assets\Shaders\Legacy\Compose.hlsl">
       <FileType>Document</FileType>
     </None>
+    <None Include="0. 확실한 구조 설정" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

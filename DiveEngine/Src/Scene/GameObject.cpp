@@ -3,7 +3,10 @@
 #include "../Helper/Log.h"
 #include "../Helper/FileStream.h"
 
-namespace dive
+// 모든 Object가 ID를 가질 필요가 있는가?
+// Hazle의 경우 Entity만 UUID를 Component로 가진다.
+
+namespace DiveEngine
 {
 	GameObject::GameObject(Scene* pScene)
 		: m_pTransform(nullptr),
@@ -143,6 +146,39 @@ namespace dive
 		{
 			component->Update(deltaTime);
 		}
+	}
+
+	// 1. 일단 추가되면 인스펙터에는 보이는데 화면엔 안보인다.
+	// 그러다가 다른 걸 추가하거나 수정하면 보인다.
+	// 정확하게 말하자면 가장 마지막에 추가한 오브젝트가 안보인다.
+	// 2. 계층구조가 만들어지지 않고 있다.
+	GameObject* GameObject::Duplicate()
+	{
+		auto pClone = m_pScene->CreateGameObject();
+		pClone->SetName(this->GetName());
+		pClone->SetActive(this->IsActive());
+
+		for (auto pOrgComponent : m_Components)
+		{
+			auto pCloneComponent = pClone->AddComponent(static_cast<unsigned int>(pOrgComponent->GetType()));
+			// 일단 이건 먹힌다.
+			pCloneComponent->SetAttributes(pOrgComponent->GetAttributes());
+		}
+
+		// 스파르탄 코드를 보면 순서가 잘못된 것 같다.
+		for (auto pOrgChild : m_pTransform->GetChildren())
+		{
+			auto pCloneChild = pOrgChild->GetGameObject()->Duplicate();
+			CORE_TRACE("Create Clone Child : {:s}", pCloneChild->GetName());
+			// 이 과정에서 InstanceID가 동일하다며 리턴한다...
+			// 맞다. ID가 중복된다...
+			// 일단 SetParent()에서 ID 중복 확인만 주석처리하면 계층구조가 형성된다...
+			// 그러고보니 현재 Object에서도 ID를 설정하지 않고 있다...
+			pCloneChild->GetTransform()->SetParent(pClone->GetTransform());
+			CORE_TRACE("Set Hierarchy Parent = {0:s},  Child = {1:s}", pCloneChild->GetTransform()->GetParent()->GetGameObject()->GetName(), pCloneChild->GetName());
+		}
+		
+		return pClone;
 	}
 
 	Component* GameObject::AddComponent(unsigned int typeHash, unsigned int id)

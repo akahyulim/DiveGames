@@ -1,11 +1,12 @@
 #include "Inspector.h"
 #include "External/ImGui/imgui_stdlib.h"
 
+using namespace DiveEngine;
 
 // 현재 선택된 GameObject의 Inspector들을 보여준다.
-namespace Editor
+namespace DiveEditor
 {
-	dive::GameObject* Inspector::m_pInspectedTarget = nullptr;
+	GameObject* Inspector::m_pInspectedTarget = nullptr;
 
 	Inspector::Inspector(Editor* pEditor)
 		: Widget(pEditor)
@@ -22,9 +23,9 @@ namespace Editor
 			showTransform(m_pInspectedTarget->GetTransform());
 			// Camera, MeshRenderer, Light는 Enalbe Checkbox가 따로 존재해야 한다.
 			// 그렇다면 GameObject와는 별도로 변수를 가진다는 이야기인데...
-			showCamera(m_pInspectedTarget->GetComponent<dive::Camera>());
-			showMeshRenderer(m_pInspectedTarget->GetComponent<dive::MeshRenderer>());
-			showLight(m_pInspectedTarget->GetComponent<dive::Light>());
+			showCamera(m_pInspectedTarget->GetComponent<Camera>());
+			showMeshRenderer(m_pInspectedTarget->GetComponent<MeshRenderer>());
+			showLight(m_pInspectedTarget->GetComponent<Light>());
 			// 이하 다른 Components
 
 			showAddComponentButton();
@@ -32,7 +33,7 @@ namespace Editor
 		// else if로 material
 	}
 
-	void Inspector::SetInspectGameObject(dive::GameObject* pTarget)
+	void Inspector::SetInspectGameObject(GameObject* pTarget)
 	{
 		m_pInspectedTarget = pTarget;
 
@@ -60,7 +61,7 @@ namespace Editor
 		ImGui::Separator();
 	}
 
-	void Inspector::showTransform(dive::Transform* pTransform)
+	void Inspector::showTransform(Transform* pTransform)
 	{
 		// assert가 맞나?
 		if (!pTransform)
@@ -123,7 +124,7 @@ namespace Editor
 	}
 
 	// 아직 구현하지 않은 것이 많다.
-	void Inspector::showCamera(dive::Camera* pCamera)
+	void Inspector::showCamera(Camera* pCamera)
 	{
 		if (!pCamera)
 			return;
@@ -166,7 +167,7 @@ namespace Editor
 				// 중앙 정렬 같은건 없나...?
 				ImGui::Combo("##proejctionTypeCombe", &projectionType, "Perspective\0Orthographic");
 
-				pCamera->SetProjectionType(static_cast<dive::eProjectionType>(projectionType));
+				pCamera->SetProjectionType(static_cast<eProjectionType>(projectionType));
 			}
 
 			// Field Of View
@@ -245,7 +246,7 @@ namespace Editor
 		ImGui::Separator();
 	}
 
-	void Inspector::showMeshRenderer(dive::MeshRenderer* pMeshRenderer)
+	void Inspector::showMeshRenderer(MeshRenderer* pMeshRenderer)
 	{
 		if (!pMeshRenderer)
 			return;
@@ -275,7 +276,7 @@ namespace Editor
 		ImGui::Separator();
 	}
 
-	void Inspector::showLight(dive::Light* pLight)
+	void Inspector::showLight(Light* pLight)
 	{
 		if (!pLight)
 			return;
@@ -295,7 +296,7 @@ namespace Editor
 				// 중앙 정렬 같은건 없나...?
 				ImGui::Combo("##combo", &type, "Directional\0Spot\0Point");
 
-				pLight->SetLightType(static_cast<dive::eLightType>(type));
+				pLight->SetLightType(static_cast<eLightType>(type));
 			}
 
 			// Range

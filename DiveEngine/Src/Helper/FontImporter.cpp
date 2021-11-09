@@ -2,7 +2,7 @@
 #include "Log.h"
 #include <vector>
 
-namespace dive
+namespace DiveEngine
 {
 	FontImporter::FontImporter()
 	{
