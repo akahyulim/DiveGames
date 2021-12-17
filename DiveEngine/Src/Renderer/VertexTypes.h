@@ -3,6 +3,27 @@
 
 namespace DiveEngine
 {
+	struct Vertex_StaticMesh
+	{
+		Vertex_StaticMesh(
+			const DirectX::XMFLOAT3& pos,
+			const DirectX::XMFLOAT2& uv,
+			const DirectX::XMFLOAT3& nor,
+			const DirectX::XMFLOAT3& tan
+		)
+		{
+			this->position = pos;
+			this->uv = uv;
+			this->normal = nor;
+			this->tangent = tan;
+		}
+
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT2 uv;
+		DirectX::XMFLOAT3 normal;
+		DirectX::XMFLOAT3 tangent;
+	};
+
 	struct VertexType_PosTexNorTan
 	{
 		VertexType_PosTexNorTan() = default;

@@ -1,5 +1,6 @@
 #include "MenuBar.h"
 #include "Editor.h"
+#include "Geometry.h"
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
 #include <Windows.h>
@@ -128,43 +129,128 @@ namespace DiveEditor
 
 				if (ImGui::BeginMenu("3D Object"))
 				{
-					if (ImGui::MenuItem("Triangle"))
-					{
-					}
-
-					if (ImGui::MenuItem("Quad"))
-					{
-						auto pGameObject = m_pScene->CreateGameObject();
-						auto meshRenderer = pGameObject->AddComponent<MeshRenderer>();
-						meshRenderer->CreateDefaultMesh(eDefaultMeshType::Quad);
-						pGameObject->SetName("Quad");
-					}
-
-					ImGui::Separator();
-
 					if (ImGui::MenuItem("Cube"))
 					{
-						auto pGameObject = m_pScene->CreateGameObject();
-						auto meshRenderer = pGameObject->AddComponent<MeshRenderer>();
-						meshRenderer->CreateDefaultMesh(eDefaultMeshType::Cube);
-						pGameObject->SetName("Cube");
-					}
+						static StaticMesh* pMesh = nullptr;
 
-					if (ImGui::MenuItem("Plane"))
-					{
+						if (!pMesh)
+						{
+							std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+							std::vector<uint32_t> indices;
+							Utility::CreateCube(vertices, indices);
+
+							pMesh = new DiveEngine::StaticMesh();
+							pMesh->SetVertices(vertices);
+							pMesh->SetIndices(indices);
+							pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
+							pMesh->SetName("Cube");
+						}
+
+						auto pGameObject = m_pScene->CreateGameObject();
+						auto pMeshRenderer = pGameObject->AddComponent<StaticMeshRenderer>();
+						pMeshRenderer->SetMesh(pMesh);
+						pGameObject->SetName(pMesh->GetName());
 					}
 
 					if (ImGui::MenuItem("Sphere"))
 					{
+						static StaticMesh* pMesh = nullptr;
+
+						if (!pMesh)
+						{
+							std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+							std::vector<uint32_t> indices;
+							Utility::CreateSphere(vertices, indices);
+
+							pMesh = new DiveEngine::StaticMesh();
+							pMesh->SetVertices(vertices);
+							pMesh->SetIndices(indices);
+							pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
+							pMesh->SetName("Sphere");
+						}
+
+						auto pGameObject = m_pScene->CreateGameObject();
+						auto pMeshRenderer = pGameObject->AddComponent<StaticMeshRenderer>();
+						pMeshRenderer->SetMesh(pMesh);
+						pGameObject->SetName(pMesh->GetName());
 					}
+
+					/*
+					if (ImGui::MenuItem("Capsule"))
+					{
+					}
+					*/
 
 					if (ImGui::MenuItem("Cylinder"))
 					{
+						static StaticMesh* pMesh = nullptr;
+
+						if (!pMesh)
+						{
+							std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+							std::vector<uint32_t> indices;
+							Utility::CreateCylinder(vertices, indices);
+
+							pMesh = new DiveEngine::StaticMesh();
+							pMesh->SetVertices(vertices);
+							pMesh->SetIndices(indices);
+							pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
+							pMesh->SetName("Cylinder");
+						}
+
+						auto pGameObject = m_pScene->CreateGameObject();
+						auto pMeshRenderer = pGameObject->AddComponent<StaticMeshRenderer>();
+						pMeshRenderer->SetMesh(pMesh);
+						pGameObject->SetName(pMesh->GetName());
 					}
 
-					if (ImGui::MenuItem("Cone"))
+					if (ImGui::MenuItem("Plane"))
 					{
+						static StaticMesh* pMesh = nullptr;
+
+						if (!pMesh)
+						{
+							std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+							std::vector<uint32_t> indices;
+							Utility::CreatePlane(vertices, indices);
+
+							pMesh = new DiveEngine::StaticMesh();
+							pMesh->SetVertices(vertices);
+							pMesh->SetIndices(indices);
+							pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
+							pMesh->SetName("Plane");
+						}
+
+						auto pGameObject = m_pScene->CreateGameObject();
+						auto pMeshRenderer = pGameObject->AddComponent<StaticMeshRenderer>();
+						pMeshRenderer->SetMesh(pMesh);
+						pGameObject->SetName(pMesh->GetName());
 					}
+
+					if (ImGui::MenuItem("Quad"))
+					{
+						static StaticMesh* pMesh = nullptr;
+
+						if (!pMesh)
+						{
+							std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+							std::vector<uint32_t> indices;
+							Utility::CreateQuad(vertices, indices);
+
+							pMesh = new DiveEngine::StaticMesh();
+							pMesh->SetVertices(vertices);
+							pMesh->SetIndices(indices);
+							pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
+							pMesh->SetName("Quad");
+						}
+
+						auto pGameObject = m_pScene->CreateGameObject();
+						auto pMeshRenderer = pGameObject->AddComponent<StaticMeshRenderer>();
+						pMeshRenderer->SetMesh(pMesh);
+						pGameObject->SetName(pMesh->GetName());
+					}
+
+					ImGui::Separator();
 
 					ImGui::EndMenu();
 				}

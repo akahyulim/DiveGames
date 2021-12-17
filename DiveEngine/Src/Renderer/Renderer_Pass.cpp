@@ -3,6 +3,7 @@
 #include "../Helper/Log.h"
 #include "../Scene/GameObject.h"
 #include "../Scene/Component/Camera.h"
+#include "../Scene/Component/dvMeshRenderer.h"
 
 // 일단 dvRenderer 구현은 나중으로 미루고
 // 이 곳에서 Deferred Shader로 Lighting 까지 구현해보자.
@@ -32,14 +33,14 @@ namespace DiveEngine
 			auto pCameraCom = pCamera->GetComponent<Camera>();
 
 			// PipelineState가 필요한지 의문이다.
-			immediateContext->RSSetViewports(1, pCameraCom->GetViewportPtr());
+			//immediateContext->RSSetViewports(1, pCameraCom->GetViewportPtr());
 			immediateContext->IASetInputLayout(m_PipelineStateLegacy.pIL);
-			immediateContext->IASetPrimitiveTopology(m_PipelineStateLegacy.primitiveTopology);
+			immediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);//m_PipelineStateLegacy.primitiveTopology);
 			immediateContext->VSSetShader(m_PipelineStateLegacy.pVS, NULL, 0);
 			immediateContext->PSSetShader(m_PipelineStateLegacy.pPS, NULL, 0);
-			immediateContext->PSSetSamplers(0, 1, &m_PipelineStateLegacy.pSS);
+			//immediateContext->PSSetSamplers(0, 1, &m_PipelineStateLegacy.pSS);
 			//immediateContext->PSSetSamplers(0, 1, m_pSamplerStates[(size_t)eSamplerState::Linear].GetAddressOf());
-			immediateContext->OMSetDepthStencilState(m_PipelineStateLegacy.pDSS, 1);
+			//immediateContext->OMSetDepthStencilState(m_PipelineStateLegacy.pDSS, 1);
 			immediateContext->RSSetState(m_PipelineStateLegacy.pRSS);
 
 			// 결국 그려지는 GameObject의 Component들에서 Data를 Bind한 후 최종적으로 Draw를 호출한다.
@@ -74,15 +75,18 @@ namespace DiveEngine
 				}
 
 				meshRenderer = gameObject->GetComponent<MeshRenderer>();
-				if (!meshRenderer)
-					continue;
+				if (meshRenderer)
+				{
+					meshRenderer->Render(immediateContext);
+				}
 
-				// 책의 예제에서는 Mesh::Draw()가 존재하는 반면
-				// 엔진 구현 예제들은 하나같이 직접 데이터를 가져온 후 bind한다.
-				// 이는 아무 Mesh들도 종류에 따라 Draw 방법을 다르게 했기 때문인 것 같다.
-				// 따라서 MeshRenderer를 잘 구분해 놓는다면 굳이 직접 데이터를 리턴받지 않아도 될 것 같다.
-				// 문제는 MeshRenderer 내부에서 Mesh를 어떻게 계층화시키느냐 이다.
-				meshRenderer->Render(immediateContext);
+				// base인 MeshRenderer로 받아서 Draw를 호출할 순 없을까?
+				// Shader는 어차피 Material에서 획득할테니 말이다.
+				dvMeshRenderer* pDmr = gameObject->GetComponent<StaticMeshRenderer>();
+				if (pDmr)
+				{
+					pDmr->Draw(immediateContext);
+				}
 			}
 		}
 	}

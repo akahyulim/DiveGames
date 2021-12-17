@@ -2,6 +2,7 @@
 #include "Component/Component.h"
 #include "Component/Transform.h"
 #include "Component/MeshRenderer.h"
+#include "Component/StaticMeshRenderer.h"
 #include "Component/Camera.h"
 #include "Component/Light.h"
 #include "../Core/Object.h"
@@ -13,6 +14,15 @@ namespace DiveEngine
 {
 	class Scene;
 	class FileStream;
+
+	enum class ePrimitiveType
+	{
+		Plane,
+		Cube,
+		Sphere,
+		Capsule,
+		Cylinder
+	};
 
 	class GameObject : public Object
 	{
@@ -33,7 +43,7 @@ namespace DiveEngine
 
 		template<typename T>
 		void RemoveComponent();
-
+			
 		template<typename T>
 		T* GetComponent();
 
@@ -49,6 +59,8 @@ namespace DiveEngine
 		// 이름을 바꾸자
 		void MarkForDestruction() { m_bDestructionPending = true; }
 		bool IsPendingDestruction() const { return m_bDestructionPending; }
+
+		static GameObject* CreatePrimitive(ePrimitiveType type, Scene* pScene);
 
 	private:
 	private:

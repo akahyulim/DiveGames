@@ -17,6 +17,8 @@ namespace DiveEngine
 		Camera,
 		Light,
 		MeshRenderer,
+		dvMeshRenderer,
+		StaticMeshRenderer,
 	};
 
 	struct Attribute

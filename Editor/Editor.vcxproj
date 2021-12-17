@@ -149,6 +149,7 @@
     <ClInclude Include="Assets.h" />
     <ClInclude Include="DragDrop.h" />
     <ClInclude Include="External\ImGui\imgui_stdlib.h" />
+    <ClInclude Include="Geometry.h" />
     <ClInclude Include="Inspector.h" />
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EntryPoint.h" />

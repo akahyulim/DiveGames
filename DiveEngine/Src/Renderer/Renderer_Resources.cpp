@@ -396,7 +396,7 @@ namespace DiveEngine
 			if (FAILED(pDevice->CreateInputLayout(descs, numElements, shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(),
 				m_pInputLayouts[inputLayoutType].GetAddressOf())))
 			{
-				CORE_ERROR("../Input Layout 생성에 실패하였습니다.");
+				CORE_ERROR("Input Layout 생성에 실패하였습니다.");
 				return false;
 			}
 		}

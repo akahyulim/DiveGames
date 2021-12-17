@@ -412,11 +412,23 @@
     <ClInclude Include="Src\Renderer\Material.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Renderer\dxMesh.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Resource\Importer\ModelImporter.h">
       <Filter>Src\Resource\Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\dvMesh.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\dvMeshRenderer.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\StaticMesh.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\SkinnedMesh.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\StaticMeshRenderer.h">
+      <Filter>Src\Scene\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -533,6 +545,18 @@
     </ClCompile>
     <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp">
       <Filter>Src\Resource\Importer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\dvMesh.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\dvMeshRenderer.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\StaticMesh.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\StaticMeshRenderer.cpp">
+      <Filter>Src\Scene\Components</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -31,6 +31,8 @@
 #include "../Renderer/GraphicsEnums.h"
 #include "../Renderer/VertexTypes.h"
 #include "../Renderer/Mesh.h"
+#include "../Renderer/dvMesh.h"
+#include "../Renderer/StaticMesh.h"
 
 //= Input =========================
 #include "../Input/Input.h"
@@ -42,6 +44,8 @@
 #include "../Scene/Component/Component.h"
 #include "../Scene/Component/Transform.h"
 #include "../Scene/Component/MeshRenderer.h"
+#include "../Scene/Component/dvMeshRenderer.h"
+#include "../Scene/Component/StaticMeshRenderer.h"
 #include "../Scene/Component/Camera.h"
 #include "../Scene/Component/Light.h"
 

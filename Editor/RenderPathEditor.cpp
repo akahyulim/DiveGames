@@ -129,7 +129,7 @@ namespace DiveEditor
 			// 위 두 개의 shader 생성을 막으면 제대로 출력된다.		//
 			//======================================================//
 			pRenderer->DrawScene();
-
+			
 			// RenderPassEnd
 			{
 				pImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);

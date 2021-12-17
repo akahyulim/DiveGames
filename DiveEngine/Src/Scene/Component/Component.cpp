@@ -3,6 +3,8 @@
 #include "Transform.h"
 #include "Camera.h"
 #include "MeshRenderer.h"
+#include "dvMeshRenderer.h"
+#include "StaticMeshRenderer.h"
 #include "Light.h"
 
 namespace DiveEngine
@@ -25,5 +27,7 @@ namespace DiveEngine
 	REGISTER_COMPONENT(Transform, eComponentType::Transform)
 	REGISTER_COMPONENT(Camera, eComponentType::Camera)
 	REGISTER_COMPONENT(MeshRenderer, eComponentType::MeshRenderer)
+	REGISTER_COMPONENT(dvMeshRenderer, eComponentType::dvMeshRenderer)
+	REGISTER_COMPONENT(StaticMeshRenderer, eComponentType::StaticMeshRenderer)
 	REGISTER_COMPONENT(Light, eComponentType::Light)
 }

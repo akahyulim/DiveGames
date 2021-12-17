@@ -96,13 +96,9 @@ namespace DiveEngine
 
 		switch (type)
 		{
-		case eDefaultMeshType::Triangle:
-		{
-			break;
-		}
 		case eDefaultMeshType::Quad:
 		{
-			utility::geometry::CreateQuad(vertices, indices);
+			utility::geometry::CreatePlane(vertices, indices);
 			m_pMesh->SetName("Quad");
 			break;
 		}

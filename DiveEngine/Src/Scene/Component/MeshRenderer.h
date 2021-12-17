@@ -14,6 +14,7 @@ namespace DiveEngine
 		Cube,
 		Sphere,
 		Capsule,
+		Plane,
 		None
 	};
 

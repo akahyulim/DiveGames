@@ -2,6 +2,7 @@
 #include "../Scene/SceneManager.h"
 #include "../Scene/Scene.h"
 #include "../Scene/Component/MeshRenderer.h"
+#include "../Scene/Component/dvMeshRenderer.h"
 #include "../Scene/Component/Camera.h"
 #include "../Scene/Component/Light.h"
 #include "../Scene/GameObject.h"
@@ -254,10 +255,16 @@ namespace DiveEngine
 				continue;
 
 			auto meshRenderer = gameObject->GetComponent<MeshRenderer>();
+			auto pStaticMeshRenderer = gameObject->GetComponent<StaticMeshRenderer>();
 			auto camera = gameObject->GetComponent<Camera>();
 			auto light = gameObject->GetComponent<Light>();
 
 			if (meshRenderer)
+			{
+				// Opaque와 Transparent의 구분은 Material을 이용한다.
+				m_GameObjects[eObjectType::Opaque].push_back(gameObject);
+			}
+			else if (pStaticMeshRenderer)
 			{
 				// Opaque와 Transparent의 구분은 Material을 이용한다.
 				m_GameObjects[eObjectType::Opaque].push_back(gameObject);

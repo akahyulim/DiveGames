@@ -8,6 +8,9 @@ namespace DiveEngine
 	{
 		Unknown,
 		Texture2D,
+		Mesh,
+		Static_Mesh,
+		Skinned_Mesh,
 		Material
 	};
 
@@ -19,6 +22,7 @@ namespace DiveEngine
 		Resource();
 		virtual ~Resource() = default;
 
+		// 이렇게 하면 개별 파일화하겠다는 거다.
 		virtual bool SaveToFile(const std::string& filepath) { return true; }
 		virtual bool LoadFromFile(const std::string& filepath) { return true; }
 		

@@ -157,6 +157,9 @@ namespace DiveEngine
 		auto newGameObject = m_GameObjects.emplace_back(new GameObject(this));
 		newGameObject->SetActive(active);
 
+		// 이게 원래는 없었다. 이유가 있을텐데...
+		m_bChanged = true;
+
 		return newGameObject;
 	}
 
