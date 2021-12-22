@@ -6,18 +6,20 @@
 
 namespace DiveEngine
 {
-	static const unsigned int INVALID_ID = 0;
+	static const uint32_t INVALID_ID = 0;
 
 	class Object
 	{
 	public:
 		Object()
 		{
+			static std::atomic<uint32_t> next(INVALID_ID + 1);
+			m_instanceID = next.fetch_add(1);
 		}
 		virtual ~Object() {}
 
-		unsigned int GetInstanceID() const { return m_InstanceID; }
-		void SetInstanceID(unsigned int id) 
+		uint32_t GetInstanceID() const { return m_instanceID; }
+		void SetInstanceID(uint32_t id) 
 		{ 
 			if (INVALID_ID == id)
 			{
@@ -25,18 +27,18 @@ namespace DiveEngine
 				return;
 			}
 
-			m_InstanceID = id;
+			m_instanceID = id;
 		}
 
-		std::string GetName() const { return m_Name; }
-		void SetName(const std::string& name) { m_Name = name; }
+		std::string GetName() const { return m_name; }
+		void SetName(const std::string& name) { m_name = name; }
 
 	private:
 		Object(const Object&)				= delete;
 		Object& operator=(const Object&)	= delete;
 
 	private:
-		unsigned int m_InstanceID	= INVALID_ID;
-		std::string m_Name			= "";
+		uint32_t m_instanceID	= INVALID_ID;
+		std::string m_name		= "";
 	};
 }
