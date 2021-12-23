@@ -8,7 +8,7 @@ namespace DiveEditor
 	namespace Utility
 	{
 		// Cube
-		void CreateCube(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
+		inline void CreateCube(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
 		{
 			// vertices
 			{
@@ -78,7 +78,7 @@ namespace DiveEditor
 		}
 
 		// Sphere: UV Sphere
-		void CreateSphere(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices, float radius = 0.5f, int slices = 20, int stacks = 20)
+		inline void CreateSphere(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices, float radius = 0.5f, int slices = 20, int stacks = 20)
 		{
 			// vertices
 			{
@@ -157,7 +157,7 @@ namespace DiveEditor
 		// Capsule
 
 		// Cylinder
-		void CreateCylinder(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices, float radiusTop = 0.5f, float radiusBottom = 0.5f, float height = 1.0f, int slices = 15, int stacks = 15)
+		inline void CreateCylinder(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices, float radiusTop = 0.5f, float radiusBottom = 0.5f, float height = 1.0f, int slices = 15, int stacks = 15)
 		{
 			const float stackHeight = height / stacks;
 			const float radiusStep = (radiusTop - radiusBottom) / stacks;
@@ -265,7 +265,7 @@ namespace DiveEditor
 		}
 
 		// Plane
-		void CreatePlane(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
+		inline void CreatePlane(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
 		{
 			// vertices
 			{
@@ -295,7 +295,7 @@ namespace DiveEditor
 		}
 
 		// Quad
-		void CreateQuad(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
+		inline void CreateQuad(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
 		{
 			// vertices
 			{

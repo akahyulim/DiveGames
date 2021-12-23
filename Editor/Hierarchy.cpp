@@ -1,14 +1,9 @@
 #include "Hierarchy.h"
 #include "Inspector.h"
+#include "Geometry.h"
 #include "External/ImGui/imgui_stdlib.h"
-#include "Inspector.h"
 
 using namespace DiveEngine;
-
-// 기본 구현 
-// 게임 오브젝트 추가시 디폴트 이름에 id를 넣었으면 한다.
-// 파일화를 해야 한다.
-// 계층구조 테스트를 확실하게 해야 한다.
 
 // 컨트롤 확장
 // 계층구조를 제어할 수 있어야 한다.
@@ -36,14 +31,14 @@ namespace DiveEditor
 
         showMainTree();
 
-        if (ImGui::IsMouseReleased(0) && m_pClickedGameObject)
+        if (ImGui::IsMouseReleased(0) && m_pClickedObject)
         {
-            if (m_pHoveredGameObject && m_pHoveredGameObject->GetInstanceID() == m_pClickedGameObject->GetInstanceID())
+            if (m_pHoveredObject && m_pHoveredObject->GetInstanceID() == m_pClickedObject->GetInstanceID())
             {
-                setSelectedGameObject(m_pClickedGameObject);
+                setSelectedGameObject(m_pClickedObject);
             }
 
-            m_pClickedGameObject = nullptr;
+            m_pClickedObject = nullptr;
         }
     }
 
@@ -55,7 +50,7 @@ namespace DiveEditor
     {
         assert(m_pScene);
 
-        m_pHoveredGameObject = nullptr;
+        m_pHoveredObject = nullptr;
 
         char sceneInfo[32] = { 0, };
         sprintf_s(sceneInfo, "%s - %d", m_pScene->GetName().c_str(), m_pScene->GetGameObjectCount());
@@ -76,9 +71,9 @@ namespace DiveEditor
             }
 
             auto rootGameObjects = m_pScene->GetRootGameObjects();
-            for (auto gameObject : rootGameObjects)
+            for (auto pObject : rootGameObjects)
             {
-                showAddedTree(gameObject);
+                showAddedTree(pObject);
             }
 
             ImGui::TreePop();
@@ -91,33 +86,33 @@ namespace DiveEditor
     }
 
     // 내부 트리를 만든다.
-    void Hierarchy::showAddedTree(GameObject* gameObject)
+    void Hierarchy::showAddedTree(GameObject* pObject)
     {
-        if (!gameObject) return;
+        if (!pObject) return;
 
         ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
 
         // 자식 존재 여부
-        auto children = gameObject->GetComponent<Transform>()->GetChildren();
+        auto children = pObject->GetComponent<Transform>()->GetChildren();
         children.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
        
-        if (m_pSelectedGameObject)
+        if (m_pSelectedObject)
         {
-            nodeFlags |= (m_pSelectedGameObject->GetInstanceID() == gameObject->GetInstanceID()) ? ImGuiTreeNodeFlags_Selected : 0;
+            nodeFlags |= (m_pSelectedObject->GetInstanceID() == pObject->GetInstanceID()) ? ImGuiTreeNodeFlags_Selected : 0;
         }
 
         // 이걸 굳이 if로 만들지 않은 이유는 무었일까?
         // 아래의 두 부분 때문인 것 같은데...
-        bool bNodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)gameObject->GetInstanceID(), nodeFlags, gameObject->GetName().c_str());
+        bool bNodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)pObject->GetInstanceID(), nodeFlags, pObject->GetName().c_str());
 
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
         {
-            m_pHoveredGameObject = gameObject;
+            m_pHoveredObject = pObject;
         }
 
         // 드래그드랍 상태일 때 부모 대상이 되는 거다.
         // 결국 현재 이 부분에서도 버그가 발생되고 있다.
-        handleDragDrop(gameObject);
+        handleDragDrop(pObject);
 
         if (bNodeOpen)
         {
@@ -130,12 +125,12 @@ namespace DiveEditor
         }
     }
 
-    void Hierarchy::setSelectedGameObject(GameObject* gameObject)
+    void Hierarchy::setSelectedGameObject(GameObject* pObject)
     {
-        if (m_pSelectedGameObject != gameObject)
+        if (m_pSelectedObject != pObject)
         {
-            m_pSelectedGameObject = gameObject;
-            Inspector::SetInspectGameObject(m_pSelectedGameObject);
+            m_pSelectedObject = pObject;
+            Inspector::SetInspectGameObject(m_pSelectedObject);
         }
     }
 
@@ -149,8 +144,8 @@ namespace DiveEditor
 
         if (clickedLeft)
         {
-            if (m_pHoveredGameObject)
-                m_pClickedGameObject = m_pHoveredGameObject;
+            if (m_pHoveredObject)
+                m_pClickedObject = m_pHoveredObject;
             else
                 setSelectedGameObject(nullptr);
         }
@@ -163,21 +158,21 @@ namespace DiveEditor
     // 전달인자는 상황에 따라 다르게 사용된다.
     // 드래그일 땐 대상의 정보를 저장하고,
     // 드랍일 땐 저장된 대상의 부모로 설정한다.
-    void Hierarchy::handleDragDrop(GameObject* gameObject)
+    void Hierarchy::handleDragDrop(GameObject* pObject)
     {
         auto dragDrop = DragDrop::GetInstance();
 
         // 드래그일 경우 현재 오브젝트의 정보를 payload에 저장한다.
         if (dragDrop.DragBegin())
         {
-            // 아.. m_Payload를 멤버 변수로 만들 필요가 없구나.
+            // 아.. m_payload를 멤버 변수로 만들 필요가 없구나.
             // 아닌가... 어딘가에 저장되어야 있어야 하나?
-            m_Payload.data = gameObject->GetInstanceID();
-            m_Payload.type = eDragPayloadType::GameObject;
-            dragDrop.DragPayload(m_Payload);
+            m_payload.data = pObject->GetInstanceID();
+            m_payload.type = eDragPayloadType::GameObject;
+            dragDrop.DragPayload(m_payload);
             dragDrop.DragEnd();
 
-            APP_TRACE("Drag Target Name: {:s}, ID: {:d}", gameObject->GetName(), gameObject->GetInstanceID());
+            APP_TRACE("Drag Target Name: {:s}, ID: {:d}", pObject->GetName(), pObject->GetInstanceID());
         }
 
         // 드랍일 경우 적재 오브젝트를 확인하고, 현재 오브젝트와 다를 경우 현재 오브젝트를 부모로 설정한다.
@@ -191,12 +186,12 @@ namespace DiveEditor
                 // 현재 이 놈이 안맞는다...
                 APP_TRACE("Drop Payload Name: {:s}, ID: {:d}", droppedObj->GetName(), droppedObj->GetInstanceID());
 
-                if (droppedObj->GetInstanceID() != gameObject->GetInstanceID())
+                if (droppedObj->GetInstanceID() != pObject->GetInstanceID())
                 {
                     droppedObj->GetComponent<Transform>()->SetParent(
-                        gameObject->GetComponent<Transform>());
+                        pObject->GetComponent<Transform>());
 
-                    APP_TRACE("Drop Target Name: {:s}, ID: {:d}", gameObject->GetName(), gameObject->GetInstanceID());
+                    APP_TRACE("Drop Target Name: {:s}, ID: {:d}", pObject->GetName(), pObject->GetInstanceID());
                 }
             }
         }
@@ -211,27 +206,23 @@ namespace DiveEditor
         if (!ImGui::BeginPopup("##PropertyMenu"))
             return;
 
-        if (ImGui::MenuItem("Copy", 0, false, m_pSelectedGameObject != nullptr))
+        if (ImGui::MenuItem("Copy", 0, false, m_pSelectedObject != nullptr))
         {
-            m_pCopiedGameObject = m_pSelectedGameObject;
+            m_pCopiedObject = m_pSelectedObject;
         }
 
-        if (m_pCopiedGameObject)
+        if (m_pCopiedObject)
         {
-            if (ImGui::MenuItem("Paste", 0, false, m_pCopiedGameObject != nullptr))
+            if (ImGui::MenuItem("Paste", 0, false, m_pCopiedObject != nullptr))
             {
-                m_pCopiedGameObject->Duplicate();
-
-                // 새로 생성된 GameObject들이 계속 하이라이트 상태다...
-                // 아무래도 copy 본체의 selected 상태까지 가져온 듯 한데...
-                // => 이게 문제가 아니다. 추가되는 모든 오브젝트가 동일한 결과다!!!!
+                m_pCopiedObject->Duplicate();
             }
         }
 
         ImGui::Separator();
 
         // 게임 오브젝트가 선택되어 있을 때 활성화
-        if (ImGui::MenuItem("Rename", 0, false, m_pSelectedGameObject != nullptr))
+        if (ImGui::MenuItem("Rename", 0, false, m_pSelectedObject != nullptr))
         {
             m_bPopupRename = true;
         }
@@ -241,9 +232,9 @@ namespace DiveEditor
             // Copy와의 차이점을 알아야 한다.
         }
 
-        if (ImGui::MenuItem("Remove", 0, false, m_pSelectedGameObject != nullptr))
+        if (ImGui::MenuItem("Remove", 0, false, m_pSelectedObject != nullptr))
         {
-            m_pScene->RemoveGameObject(m_pSelectedGameObject);
+            m_pScene->RemoveGameObject(m_pSelectedObject);
             setSelectedGameObject(nullptr);
         }
 
@@ -263,6 +254,127 @@ namespace DiveEditor
 
         if (ImGui::BeginMenu("3D Object"))
         {
+          
+            if (ImGui::MenuItem("Cube"))
+            {
+                static StaticMesh* pMesh = nullptr;
+
+                if (!pMesh)
+                {
+                    std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+                    std::vector<uint32_t> indices;
+                    Utility::CreateCube(vertices, indices);
+
+                    pMesh = new DiveEngine::StaticMesh();
+                    pMesh->SetVertices(vertices);
+                    pMesh->SetIndices(indices);
+                    pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
+                    pMesh->SetName("Cube");
+                }
+
+                auto pGameObject = m_pScene->CreateGameObject();
+                auto pMeshRenderer = pGameObject->AddComponent<StaticMeshRenderer>();
+                pMeshRenderer->SetMesh(pMesh);
+                pGameObject->SetName(pMesh->GetName());
+                
+            }
+          
+            if (ImGui::MenuItem("Sphere"))
+            {
+                static StaticMesh* pMesh = nullptr;
+
+                if (!pMesh)
+                {
+                    std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+                    std::vector<uint32_t> indices;
+                    Utility::CreateSphere(vertices, indices);
+
+                    pMesh = new DiveEngine::StaticMesh();
+                    pMesh->SetVertices(vertices);
+                    pMesh->SetIndices(indices);
+                    pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
+                    pMesh->SetName("Sphere");
+                }
+
+                auto pGameObject = m_pScene->CreateGameObject();
+                auto pMeshRenderer = pGameObject->AddComponent<StaticMeshRenderer>();
+                pMeshRenderer->SetMesh(pMesh);
+                pGameObject->SetName(pMesh->GetName());
+            }
+
+            if (ImGui::MenuItem("Capsule"))
+            {
+            }
+            
+            if (ImGui::MenuItem("Cylinder"))
+            {
+                static StaticMesh* pMesh = nullptr;
+
+                if (!pMesh)
+                {
+                    std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+                    std::vector<uint32_t> indices;
+                    Utility::CreateCylinder(vertices, indices);
+
+                    pMesh = new DiveEngine::StaticMesh();
+                    pMesh->SetVertices(vertices);
+                    pMesh->SetIndices(indices);
+                    pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
+                    pMesh->SetName("Cylinder");
+                }
+
+                auto pGameObject = m_pScene->CreateGameObject();
+                auto pMeshRenderer = pGameObject->AddComponent<StaticMeshRenderer>();
+                pMeshRenderer->SetMesh(pMesh);
+                pGameObject->SetName(pMesh->GetName());
+            }
+
+            if (ImGui::MenuItem("Plane"))
+            {
+                static StaticMesh* pMesh = nullptr;
+
+                if (!pMesh)
+                {
+                    std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+                    std::vector<uint32_t> indices;
+                    Utility::CreatePlane(vertices, indices);
+
+                    pMesh = new DiveEngine::StaticMesh();
+                    pMesh->SetVertices(vertices);
+                    pMesh->SetIndices(indices);
+                    pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
+                    pMesh->SetName("Plane");
+                }
+
+                auto pGameObject = m_pScene->CreateGameObject();
+                auto pMeshRenderer = pGameObject->AddComponent<StaticMeshRenderer>();
+                pMeshRenderer->SetMesh(pMesh);
+                pGameObject->SetName(pMesh->GetName());
+            }
+
+            if (ImGui::MenuItem("Quad"))
+            {
+                static StaticMesh* pMesh = nullptr;
+
+                if (!pMesh)
+                {
+                    std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+                    std::vector<uint32_t> indices;
+                    Utility::CreateQuad(vertices, indices);
+
+                    pMesh = new DiveEngine::StaticMesh();
+                    pMesh->SetVertices(vertices);
+                    pMesh->SetIndices(indices);
+                    pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
+                    pMesh->SetName("Quad");
+                }
+
+                auto pGameObject = m_pScene->CreateGameObject();
+                auto pMeshRenderer = pGameObject->AddComponent<StaticMeshRenderer>();
+                pMeshRenderer->SetMesh(pMesh);
+                pGameObject->SetName(pMesh->GetName());
+            }
+
             ImGui::EndMenu();
         }
 
@@ -302,7 +414,7 @@ namespace DiveEditor
 
         if (ImGui::BeginPopup("##RenameGameObject"))
         {
-            auto pSelected = m_pSelectedGameObject;
+            auto pSelected = m_pSelectedObject;
             if (!pSelected)
             {
                 ImGui::CloseCurrentPopup();
