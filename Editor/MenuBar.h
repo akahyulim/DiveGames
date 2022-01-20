@@ -17,6 +17,6 @@ namespace DiveEditor
 
 	private:
 		bool m_bModalNewProject;
-		bool m_bModalNewScene;
+		bool m_bModalNewScene;;
 	};
 }

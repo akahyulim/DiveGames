@@ -3,13 +3,35 @@
 #include "Geometry.h"
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
+#include "External/ImGui/imgui_stdlib.h"
 #include <Windows.h>
 #include <Commdlg.h>
+#include <ShlObj.h>
+#include <atlstr.h>
 
 using namespace DiveEngine;
 
 namespace DiveEditor
 {
+
+	int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
+	{
+		switch (uMsg)
+		{
+		case BFFM_INITIALIZED:
+		{
+			::SendMessage(hWnd, BFFM_SETSELECTION, TRUE, lpData);
+			break;
+		}
+
+		default:
+			break;
+		}
+
+		return 0;
+	}
+
+
 	MenuBar::MenuBar(Editor* pEditor)
 		: Widget(pEditor)
 	{
@@ -33,17 +55,6 @@ namespace DiveEditor
 				{
 					if (ImGui::MenuItem("Project"))
 					{
-						// 현재 저장되지 않은 프로젝트가 로드 중일 때
-						// 1. 새로운 프로젝트 생성창 팝업
-						// 2. 생성창에서 만들기 버튼을 클릭했을 경우
-						// 저장되지 않은 사항이 있다는 메시지와 함께 저장, 저장안함, 취소 세 개의 버튼으로 구성된 창 팝업
-						// 현재 프로젝트가 저장된 상태라면 바로 새로운 프로젝트가 생성
-
-						// 생성창
-						// 경로 설정
-						// 프로젝트 이름 입력
-						// 취소, 만들기 버튼
-
 						m_bModalNewProject = true;
 					}
 
@@ -517,46 +528,49 @@ namespace DiveEditor
 		//= Popups ============================
 		modalNewProject();
 		modalNewScene();
-
 	}
 
-	// 크기를 미리 만들어 놓고 싶다.
+	/*
+	*	dir 제어에 string, wstring 구분이 필요하다. 
+	*	project load 상태를 어떻게 확인할 것인가 생각해야 한다.
+	*/
 	void MenuBar::modalNewProject()
 	{
-		static char projectName[32] = { 0, };
-		static char projectLoc[128] = { 0, };
+		static std::string inputName;
+		static std::string inputDir;
+		static std::string curPath;
 
 		if (m_bModalNewProject)
 		{
-			ImGui::OpenPopup("##Create New Project");
-			m_bModalNewProject = false;
-			ZeroMemory(projectName, sizeof(projectName));
+			ImGui::OpenPopup("##new_project");
 
-			// 일단 현재 실행 폴더로...
-			auto curDir = DiveEngine::FileSystemHelper::GetWorkingDirectory();
-			strcpy_s(projectLoc, curDir.c_str());
+			m_bModalNewProject = false;
+		
+			inputName = "NewApplication";
+			// '/'를 '\'로 바꾸고, 마지막엔 해당 토큰이 없었으면 좋겠다.
+			inputDir = DiveEngine::FileSystemHelper::GetWorkingDirectory();
 		}
 
 		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-		//ImGui::SetNextWindowSize(ImVec2(500, 300));
 
-		if (ImGui::BeginPopupModal("##Create New Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::BeginPopupModal("##new_project", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar))
 		{
 			// title
 			{
-				// 좀 크게 만들고 싶다.
+				// 텍스트를 좀 크게 만들고 싶다.
+				// 그런데 쉽지 않다.
 				ImGui::Text("Create New Proejct");
-				ImGui::NewLine();
-				ImGui::NewLine();
+				ImGui::Dummy(ImVec2(0.0f, 30.0f));
 			}
 
 			// project naming
 			{
 				ImGui::Text("Project Name");
-				ImGui::NewLine();	// 이건 좀 줄이고 싶다.
+				ImGui::Dummy(ImVec2(0.0f, 5.0f));
 				ImGui::PushItemWidth(400);
-				ImGui::InputText("##name", projectName, IM_ARRAYSIZE(projectName));
+				// 포커스를 주고 싶다.
+				ImGui::InputText("##input_name", &inputName, ImGuiInputTextFlags_AutoSelectAll);
 				ImGui::PopItemWidth();
 				ImGui::NewLine();
 			}
@@ -564,27 +578,49 @@ namespace DiveEditor
 			// set location
 			{
 				ImGui::Text("Location");
-				ImGui::NewLine();	// 이것도 좀 줄이고 싶다.
+				ImGui::Dummy(ImVec2(0.0f, 5.0f));
 				ImGui::PushItemWidth(400);
-				// 일단 디폴트 폴더가 존재해야 한다. 아래의 Button은 이를 기준으로 검색한다.
-				ImGui::InputText("##loc", projectLoc, IM_ARRAYSIZE(projectLoc));
+				ImGui::InputText("##input_dir", &inputDir, ImGuiInputTextFlags_ReadOnly);
 				ImGui::PopItemWidth();
 				ImGui::SameLine(0.0f, 5.0f);
-				if(ImGui::Button("...")) 
+				if (ImGui::Button("..."))
 				{
-					// 디렉토리 창을 열어 선택한 경로를 복사해온다.
-					// 이건 파일 열기 대화상자랑 좀 다르다.
+					BROWSEINFO bi;
+					ZeroMemory(&bi, sizeof(BROWSEINFO));
+
+					// A, W 문제인듯 하다.
+					bi.hwndOwner = NULL;// m_pEditor->GetWindowHandle();
+					bi.pidlRoot		= NULL;
+					bi.lpszTitle	= L"프로젝트 생성 폴더 선택";
+					bi.ulFlags = BIF_EDITBOX | BIF_NEWDIALOGSTYLE | BIF_BROWSEINCLUDEURLS;
+					bi.lpfn			= BrowseCallbackProc;
+					// 헐이다. /는 안먹힌다. \\로 해야 한다.
+					// 이건 경로를 구분하는 c++과 winapi의 차이인듯 하다.
+					std::wstring path = //DiveEngine::StringHelper::Utf8ToUtf16(inputDir.c_str());
+						std::filesystem::current_path().generic_wstring();
+					bi.lParam = //(LPARAM)L"C:\\";
+								//(LPARAM)(path.c_str());
+								//(LPARAM)L"C:\\Dev\\Projects\\DiveGames\\Editor";
+								(LPARAM)(path.c_str());
+
+					LPITEMIDLIST pSelected = ::SHBrowseForFolder(&bi);
+					if (pSelected != NULL)
+					{
+						WCHAR temp[MAX_PATH] = { 0 };
+						if (::SHGetPathFromIDList(pSelected, temp))
+						{
+							//inputDir = temp;
+						}
+					}
 				}
 			}
 
-			ImGui::NewLine();
-			ImGui::NewLine();
-			ImGui::NewLine();
-			ImGui::NewLine();
+			ImGui::Dummy(ImVec2(0.0f, 100.0f));
 
 			// Buttons
-			{	
-				// 둘 다 우측 정렬하고 싶다. 그럴려면 적어도 크기는 고정되어야 하나...?
+			{
+				// 두 버튼을 우측 정렬 하고 싶다.
+
 				if (ImGui::Button("Cancel", ImVec2(120, 0)))
 				{
 					ImGui::CloseCurrentPopup();
@@ -593,18 +629,71 @@ namespace DiveEditor
 				ImGui::SameLine(0.0f, 5.0f);
 
 				// 이름 혹은 경로가 비어있다면 아에 비활성화된다.
+				static bool enabled = true;
+				if (inputName.empty())
+					enabled = false;
+				else
+					enabled = true;
+
+				if (!enabled)
+				{
+					ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+					ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+				}
+
+
 				if (ImGui::Button("Create", ImVec2(120, 0)))
 				{
-					// 이름 확인
-					// 동일한 이름은 안된다.
-					// 동일한 이름이 존재한다며 경고창을 띄운다. 확인 버튼만 있다.
+					// C:\\일 때 문제가 될 수 있다. 
+					// => 아니네...
+					curPath = inputDir + "\\" + inputName;
 
-					// 저장이 필요한지 확인 필요
-					// 저장이 필요하다면 다른 팝업을 또 띄워야 한다.
-					// 저장 대상이 Scene으로 한정되니... 하나를 만들면 돌려 쓸 수 있을 것 같다.
-					// 다만 modal에서 다시 modal이 되나....?
+					if (0 == _access_s(curPath.c_str(), 0))
+					{
+						ImGui::OpenPopup("##warn_box");
+					}
+					else
+					{
+						// 1. 현재 열린 프로젝트 혹은 파일이 있다면 + 변경 사항이 있다면
+						// 다시 modal로 경고창을 띄워야 한다.
+						// => 이건 뭘로 판별해야 하지...?
 
-					ImGui::CloseCurrentPopup();
+						// 2. Project를 생성하는 함수를 호출한다.
+						// 내부적으로 폴더를 생성하고 Project file까지 만들 것이다.
+						// 이 곳에서 직접 생성하는 것 보다 함수를 만들고 호출하는 편이 나을 것 같다.
+						// 그런데 다른 곳에선 안쓰일 것 같다...
+						// Project class를 만든 후 serialization 할 것인가?
+						// 간단한 파일화만 할 것인가?
+						APP_TRACE("create project: {:s}", curPath);
+
+						ImGui::CloseCurrentPopup();
+					}
+				}
+
+				// 모달팝업 부분이 Button 처리 내부에 들어가면 안그려진다.
+				{
+					ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+					ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+					// 이걸 추가하니 타이틀바에 종료 버튼이 생기는 듯?
+					bool unused_open = true;
+					if (ImGui::BeginPopupModal("##warn_box", &unused_open, ImGuiWindowFlags_AlwaysAutoResize))
+					{
+						ImGui::Text("already exist.\nPlease, input other directory or project name.");
+
+						ImGui::Dummy(ImVec2(0.0f, 50.0f));
+
+						if (ImGui::Button("OK", ImVec2(120.0, 0)))
+							ImGui::CloseCurrentPopup();
+
+						ImGui::EndPopup();
+					}
+				}
+
+				if (!enabled)
+				{
+					ImGui::PopItemFlag();
+					ImGui::PopStyleVar();
 				}
 			}
 
