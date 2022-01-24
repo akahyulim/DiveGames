@@ -1,6 +1,7 @@
+#include "divepch.h"
 #include "Mesh.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	void Mesh::Clear()
 	{

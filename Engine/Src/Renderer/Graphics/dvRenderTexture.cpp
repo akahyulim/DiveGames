@@ -1,7 +1,8 @@
+#include "divepch.h"
 #include "dvRenderTexture.h"
 #include "../../Core/DiveCore.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	dvRenderTexture* dvRenderTexture::m_pActive = nullptr;
 

@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "Transform.h"
 #include "../../Core/DiveCore.h"
 #include "../SceneManager.h"
@@ -7,7 +8,7 @@
 #include "../../Helper/dvMath.h"
 #include "../../Helper/Log.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	
 	Transform::Transform(GameObject* pGameObject)

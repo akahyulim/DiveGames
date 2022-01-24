@@ -5,10 +5,11 @@
 */
 
 //= INCLUDES ====================
+#include "divepch.h"
 #include "StringHelper.h"
 //===============================
 
-namespace DiveEngine
+namespace Dive
 {
 	namespace StringHelper
 	{

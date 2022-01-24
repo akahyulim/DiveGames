@@ -1,7 +1,8 @@
+#include "divepch.h"
 #include "Input.h"
 #include "../Helper/Log.h"
 
-namespace DiveEngine
+namespace Dive
 {
     void Input::Initialize(HWND hWnd)
     {

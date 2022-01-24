@@ -1,11 +1,11 @@
-#include "Widget.h"
+#include "Panel.h"
 #include "Editor.h"
 
-using namespace DiveEngine;
 
-namespace DiveEditor
+
+namespace Dive
 {
-	Widget::Widget(Editor* pEditor)
+	Panel::Panel(Editor* pEditor)
 	{
 		assert(pEditor);
 
@@ -14,7 +14,7 @@ namespace DiveEditor
 		EVENT_SUBSCRIBE(eEventType::SceneActivate, EVENT_HANDLE(OnSetActiveScene));
 	}
 
-	void Widget::Tick()
+	void Panel::Tick()
 	{
 		// 이건 Menubar처럼 항상 그려지는 부분이다.
 		// 이외에도 Progressbar, Toolbar 등이 구현 대상이다.
@@ -91,7 +91,7 @@ namespace DiveEditor
 		}
 	}
 
-	void Widget::OnSetActiveScene()
+	void Panel::OnSetActiveScene()
 	{
 		m_pScene = SceneManager::GetInstance().GetActiveScene();
 	}

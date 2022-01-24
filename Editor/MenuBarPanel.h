@@ -1,12 +1,12 @@
 #pragma once
-#include "Widget.h"
+#include "Panel.h"
 
-namespace DiveEditor
+namespace Dive
 {
-	class MenuBar : public Widget
+	class MenuBarPanel : public Panel
 	{
 	public:
-		MenuBar(Editor* pEditor);
+		MenuBarPanel(Editor* pEditor);
 
 		void TickAlways() override;
 		float GetPadding() { return 8.0f; }

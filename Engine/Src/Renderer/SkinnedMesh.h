@@ -1,7 +1,7 @@
 #pragma once
 #include "dvMesh.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	class SkinnedMesh : public dvMesh
 	{

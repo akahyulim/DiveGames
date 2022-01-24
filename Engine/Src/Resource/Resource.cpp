@@ -1,9 +1,10 @@
+#include "divepch.h"
 #include "Resource.h"
 #include "../Renderer/Graphics/dvTexture2D.h"
 #include "../Renderer/Material.h"
 #include "Renderer/dvMesh.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	Resource::Resource()
 	{

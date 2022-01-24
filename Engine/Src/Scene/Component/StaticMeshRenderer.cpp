@@ -1,8 +1,9 @@
+#include "divepch.h"
 #include "StaticMeshRenderer.h"
 #include "../Src/Renderer/dvMesh.h"
 #include "../Src/Renderer/StaticMesh.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	StaticMeshRenderer::StaticMeshRenderer(GameObject* pOwner)
 		: dvMeshRenderer(pOwner)

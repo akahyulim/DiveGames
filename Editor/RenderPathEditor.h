@@ -1,10 +1,10 @@
 #pragma once
-#include "Src/Core/DiveEngine.h"
+#include "Src/DiveEngine.h"
 
 // 그러고보니 namespace가 좀 에바같다.
-namespace DiveEditor
+namespace Dive
 {
-	class RenderPathEditor : public DiveEngine::RenderPath
+	class RenderPathEditor : public Dive::RenderPath
 	{
 	public:
 		RenderPathEditor();

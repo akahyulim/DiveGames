@@ -1,13 +1,13 @@
 #pragma once
-#include "Src/Core/DiveEngine.h"
-#include "Widget.h"
+#include "Src/DiveEngine.h"
+#include "Panel.h"
 #include "RenderPathEditor.h"
 #include <vector>
 #include <memory>
 
-namespace DiveEditor
+namespace Dive
 {
-	class Editor : public DiveEngine::Runtime
+	class Editor : public Dive::Runtime
 	{
 	public:
 		Editor();
@@ -17,7 +17,7 @@ namespace DiveEditor
 
 		void Compose() override;
 
-		void ModifyWindow(DiveEngine::eWindowModes mode, unsigned int width, unsigned int height, bool maximize) override;
+		void ModifyWindow(Dive::eWindowModes mode, unsigned int width, unsigned int height, bool maximize) override;
 
 	private:
 		void initialize_ImGui();
@@ -27,7 +27,7 @@ namespace DiveEditor
 
 
 	private:
-		std::vector<std::shared_ptr<Widget>> m_Widgets;
+		std::vector<std::shared_ptr<Panel>> m_Panels;
 
 		bool m_bDockSpace;
 

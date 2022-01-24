@@ -7,10 +7,8 @@
 #include "Component/Light.h"
 #include "../Core/Object.h"
 #include "../Core/Event.h"
-#include <string>
-#include <vector>
 
-namespace DiveEngine
+namespace Dive
 {
 	class Scene;
 	class FileStream;

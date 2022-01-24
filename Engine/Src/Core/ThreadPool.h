@@ -8,7 +8,7 @@
 #include <functional>
 #include <memory>
 
-namespace DiveEngine
+namespace Dive
 {
 	class Task
 	{

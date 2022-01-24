@@ -1,10 +1,11 @@
 /*
 */
+#include "divepch.h"
 #include "FormatHelper.h"
 #include "StringHelper.h"
 #include "FileSystemHelper.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	std::vector<std::string> FormatHelper::m_SupportedImageFormats;
 	std::vector<std::string> FormatHelper::m_SupportedShaderFormats;

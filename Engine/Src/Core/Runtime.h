@@ -1,10 +1,9 @@
 #pragma once
 #include "../Renderer/Graphics/GraphicsDevice.h"
 #include "../Helper/Settings.h"
-#include <Windows.h>
-#include <string>
 
-namespace DiveEngine
+
+namespace Dive
 {
 	class SceneManager;
 	class ResourceManager;

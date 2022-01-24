@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace DiveEngine
+namespace Dive
 {
 	enum class eFileStreamMode
 	{

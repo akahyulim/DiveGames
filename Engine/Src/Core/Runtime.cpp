@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "Runtime.h"
 #include "ThreadPool.h"
 #include "RenderPath.h"
@@ -9,11 +10,11 @@
 #include "../Helper/IniHelper.h"
 #include "../Helper/Timer.h"
 #include "../Helper/Log.h"
-#include <memory>
+
 
 using namespace std;
 
-namespace DiveEngine
+namespace Dive
 {
 	Runtime::Runtime()
 	{

@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-namespace DiveEngine
+namespace Dive
 {	
 	enum eMeshType
 	{

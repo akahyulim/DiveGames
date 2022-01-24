@@ -6,12 +6,11 @@
 #include "Graphics/ConstantBuffer.h"
 #include "Graphics/ConstantBuffers.h"	// 이름 변경 대상
 #include "Graphics/Texture.h"
-#include "Font.h"
 #include <memory>
 #include <string>
 
 
-namespace DiveEngine
+namespace Dive
 {
 	class GameObject;
 	class TextMesh;
@@ -158,9 +157,6 @@ namespace DiveEngine
 		dvRenderTexture* m_pRenderTarget = nullptr;
 
 		std::unordered_map<eObjectType, std::vector<GameObject*>> m_GameObjects;
-
-		// 이건 고쳐야 된다.
-		Font* m_pDvFont = nullptr;
 
 		GameObject* m_pCamera = nullptr;
 	};

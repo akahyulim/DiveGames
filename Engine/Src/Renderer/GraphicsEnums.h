@@ -1,6 +1,6 @@
 #pragma once
 
-namespace DiveEngine
+namespace Dive
 {
 	// 새로 만든 것
 	enum DEPTH_STENCIL_STATE_TYPES

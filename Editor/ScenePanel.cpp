@@ -1,12 +1,12 @@
-#include "Scene.h"
+#include "ScenePanel.h"
 
-using namespace DiveEngine;
+
 
 // Renderer로부터 Image를 가져와 출력한다.
-namespace DiveEditor
+namespace Dive
 {
-    Scene::Scene(Editor* pEditor)
-        : Widget(pEditor)
+    ScenePanel::ScenePanel(Editor* pEditor)
+        : Panel(pEditor)
     {
         m_Title = "Scene";
         // 크기 설정에 의미가 있나 싶다.
@@ -14,7 +14,7 @@ namespace DiveEditor
         m_Flags |= ImGuiWindowFlags_NoScrollbar;
         m_Padding = ImVec2(4.0f, 4.0f);
         
-        //m_pScene = &Scene::GetGlobalScene();
+        //m_pScene = &ScenePanel::GetGlobalScene();
         m_pRenderer = &Renderer::GetInstance();
 
         // test 
@@ -30,7 +30,7 @@ namespace DiveEditor
     // 새로운 Scene를 생성하면                           //
     // 최초에는 기존 Scene 화면 출력이 유지되고 있다.    //
     //===================================================//
-    void Scene::TickVisible()
+    void ScenePanel::TickVisible()
     {
         if (!m_pScene)
             return;
@@ -48,7 +48,7 @@ namespace DiveEditor
             
             //if (m_Size.x != width || m_Size.y != height)
             {
-                APP_TRACE("Scene Widget Size = {0:d} x {1:d} : {2:d} x {3:d}", (int)m_Size.x, (int)m_Size.y, (int)width, (int)height);
+                APP_TRACE("Scene Panel Size = {0:d} x {1:d} : {2:d} x {3:d}", (int)m_Size.x, (int)m_Size.y, (int)width, (int)height);
 
                 m_Size = ImVec2(width, height);
             }

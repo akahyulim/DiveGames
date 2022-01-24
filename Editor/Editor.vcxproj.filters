@@ -43,7 +43,7 @@
     <ClInclude Include="EntryPoint.h">
       <Filter>Editor\Window</Filter>
     </ClInclude>
-    <ClInclude Include="Widget.h">
+    <ClInclude Include="Panel.h">
       <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="External\ImGui\imconfig.h">
@@ -70,19 +70,19 @@
     <ClInclude Include="External\ImGui\imstb_truetype.h">
       <Filter>External\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Assets.h">
+    <ClInclude Include="AssetPanel.h">
       <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="MenuBar.h">
+    <ClInclude Include="MenuBarPanel.h">
       <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="Inspector.h">
+    <ClInclude Include="InspectorPanel.h">
       <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="Hierarchy.h">
+    <ClInclude Include="HierarchyPanel.h">
       <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h">
+    <ClInclude Include="ScenePanel.h">
       <Filter>Editor\UI\Widgets</Filter>
     </ClInclude>
     <ClInclude Include="DragDrop.h">
@@ -142,22 +142,22 @@
     <ClCompile Include="External\ImGui\imgui_impl_win32.cpp">
       <Filter>External\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Widget.cpp">
+    <ClCompile Include="Panel.cpp">
       <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Assets.cpp">
+    <ClCompile Include="AssetPanel.cpp">
       <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="MenuBar.cpp">
+    <ClCompile Include="MenuBarPanel.cpp">
       <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Inspector.cpp">
+    <ClCompile Include="InspectorPanel.cpp">
       <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Hierarchy.cpp">
+    <ClCompile Include="HierarchyPanel.cpp">
       <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
+    <ClCompile Include="ScenePanel.cpp">
       <Filter>Editor\UI\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="External\ImGui\imgui_stdlib.cpp">

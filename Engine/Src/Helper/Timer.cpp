@@ -1,9 +1,10 @@
+#include "divepch.h"
 #include "Timer.h"
 
 using namespace std;
 
 
-namespace DiveEngine
+namespace Dive
 {
 	Timer::Timer()
 	{

@@ -2,7 +2,7 @@
 #include "Component.h"
 #include "../Src/Renderer/Graphics/GraphicsDevice.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	class GameObject;
 	class dvMesh;

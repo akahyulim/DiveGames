@@ -1,8 +1,6 @@
 #pragma once
-#include <string>
-#include <vector>
 
-namespace DiveEngine
+namespace Dive
 {
 	class Runtime;
 	class Scene;

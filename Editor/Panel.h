@@ -1,17 +1,17 @@
 #pragma once
-#include "Src/Core/DiveEngine.h"
+#include "Src/DiveEngine.h"
 #include "External/ImGui/imgui.h"
 #include "External/ImGui/imgui_internal.h"
 
-namespace DiveEditor
+namespace Dive
 {
 	class Editor;
 
-	class Widget
+	class Panel
 	{
 	public:
-		Widget(Editor* pEditor);
-		virtual ~Widget() = default;
+		Panel(Editor* pEditor);
+		virtual ~Panel() = default;
 
 		void Tick();
 
@@ -45,7 +45,7 @@ namespace DiveEditor
 		ImGuiWindow* m_pWindow = nullptr;
 
 		Editor* m_pEditor = nullptr;
-		DiveEngine::Scene* m_pScene = nullptr;
+		Dive::Scene* m_pScene = nullptr;
 
 	private:
 		unsigned char m_VarPushs = 0;

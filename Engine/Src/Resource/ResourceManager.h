@@ -5,7 +5,7 @@
 #include <vector>
 #include <algorithm>
 
-namespace DiveEngine
+namespace Dive
 {
 	// 특정 경로의 프로젝트 이름으로 폴더가 생성된다.
 	// => 경로 변경이 가능하게 하려면 결국 ini 파일 등에 저장해야 한다.

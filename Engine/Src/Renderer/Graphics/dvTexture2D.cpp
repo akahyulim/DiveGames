@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "dvTexture2D.h"
 #include "../../Helper/FileSystemHelper.h"
 #include "../../Helper/StringHelper.h"
@@ -15,7 +16,7 @@ using namespace DirectX;
 *	Load() 역시 기본적으로 LoadFromFile()과 동일하다.
 *		- 그런데 이를 분명 Save()하고 싶어질테다.
 */
-namespace DiveEngine
+namespace Dive
 {
 	unsigned int GetChannelCount(DXGI_FORMAT format)
 	{

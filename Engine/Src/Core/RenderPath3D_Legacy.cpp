@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "RenderPath3D_Legacy.h"
 #include "Event.h"
 #include "../Renderer/Graphics/GraphicsDevice.h"
@@ -6,7 +7,7 @@
 #include "../Helper/Log.h"
 
 
-namespace DiveEngine
+namespace Dive
 {
 	// 생성자에서 처리하기 조금 애매하다.
 	RenderPath3D_Legacy::RenderPath3D_Legacy()

@@ -1,7 +1,8 @@
+#include "divepch.h"
 #include "ResourceManager.h"
 #include "../Helper/Log.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	ResourceManager::ResourceManager()
 	{

@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "Renderer.h"
 #include "../Scene/SceneManager.h"
 #include "../Scene/Scene.h"
@@ -7,14 +8,13 @@
 #include "../Scene/Component/Light.h"
 #include "../Scene/GameObject.h"
 #include "../Helper/Log.h"
-#include "../Scene/Component/TextMesh.h"
 #include "../Core/Event.h"
 #include "../Scene/Component/Camera.h"
 #include "../Core/DiveCore.h"
 
 #include "Graphics/dvTexture2D.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	Renderer::Renderer()
 	{

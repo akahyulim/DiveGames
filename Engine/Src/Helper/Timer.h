@@ -1,7 +1,7 @@
 #pragma once
 #include <chrono>
 
-namespace DiveEngine
+namespace Dive
 {
 	class Timer
 	{

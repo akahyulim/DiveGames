@@ -5,12 +5,13 @@
 */
 
 //= INCLUDES ====================
+#include "divepch.h"
 #include "FileSystemHelper.h"
 #include  "Log.h"
 //===============================
 
 
-namespace DiveEngine
+namespace Dive
 {
 	namespace FileSystemHelper
 	{

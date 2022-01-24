@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "Component.h"
 #include "../GameObject.h"
 #include "Transform.h"
@@ -7,7 +8,7 @@
 #include "StaticMeshRenderer.h"
 #include "Light.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	Component::Component(GameObject* pGameObject, Transform* pTransform)
 	{

@@ -2,7 +2,7 @@
 #include "Component.h"
 #include "../../Renderer/Graphics/GraphicsInclude.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	class GameObject;
 	class FileStream;

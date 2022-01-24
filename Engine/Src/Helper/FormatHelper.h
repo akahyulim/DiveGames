@@ -6,11 +6,6 @@
 */
 #pragma once
 
-// temp includes
-#include <vector>
-#include <string>
-
-
 // DIVE ENGINE EXTENSION
 static const char* DEE_SCENE		= ".scene";
 static const char* DEE_MATERIAL		= ".mat";
@@ -18,7 +13,7 @@ static const char* DEE_TEXTURE		= ".texture";
 static const char* DEE_MESH			= ".mesh";
 static const char* DEE_MODEL		= ".model";
 
-namespace DiveEngine
+namespace Dive
 {
 	// 임포터를 에디터에 넣을꺼면
 	// 엔진 확장자 확인만 하는 함수들을 helper로 묶는 편이 나을 것 같다.

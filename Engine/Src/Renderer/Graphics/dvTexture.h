@@ -11,7 +11,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
 
-namespace DiveEngine
+namespace Dive
 {
 	class dvTexture : public Resource
 	{

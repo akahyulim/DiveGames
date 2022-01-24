@@ -2,7 +2,7 @@
 #include "dvMesh.h"
 #include "VertexTypes.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	class StaticMesh : public dvMesh
 	{

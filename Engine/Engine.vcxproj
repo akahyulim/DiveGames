@@ -129,9 +129,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Src;External</AdditionalIncludeDirectories>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>divepch.h</PrecompiledHeaderFile>
+      <AdditionalIncludeDirectories>Src;External;</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
@@ -170,98 +170,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="External\spdlog\async.h" />
-    <ClInclude Include="External\spdlog\async_logger-inl.h" />
-    <ClInclude Include="External\spdlog\async_logger.h" />
-    <ClInclude Include="External\spdlog\cfg\argv.h" />
-    <ClInclude Include="External\spdlog\cfg\env.h" />
-    <ClInclude Include="External\spdlog\cfg\helpers-inl.h" />
-    <ClInclude Include="External\spdlog\cfg\helpers.h" />
-    <ClInclude Include="External\spdlog\cfg\log_levels.h" />
-    <ClInclude Include="External\spdlog\common-inl.h" />
-    <ClInclude Include="External\spdlog\common.h" />
-    <ClInclude Include="External\spdlog\details\backtracer-inl.h" />
-    <ClInclude Include="External\spdlog\details\backtracer.h" />
-    <ClInclude Include="External\spdlog\details\circular_q.h" />
-    <ClInclude Include="External\spdlog\details\console_globals.h" />
-    <ClInclude Include="External\spdlog\details\file_helper-inl.h" />
-    <ClInclude Include="External\spdlog\details\file_helper.h" />
-    <ClInclude Include="External\spdlog\details\fmt_helper.h" />
-    <ClInclude Include="External\spdlog\details\log_msg-inl.h" />
-    <ClInclude Include="External\spdlog\details\log_msg.h" />
-    <ClInclude Include="External\spdlog\details\log_msg_buffer-inl.h" />
-    <ClInclude Include="External\spdlog\details\log_msg_buffer.h" />
-    <ClInclude Include="External\spdlog\details\mpmc_blocking_q.h" />
-    <ClInclude Include="External\spdlog\details\null_mutex.h" />
-    <ClInclude Include="External\spdlog\details\os-inl.h" />
-    <ClInclude Include="External\spdlog\details\os.h" />
-    <ClInclude Include="External\spdlog\details\periodic_worker-inl.h" />
-    <ClInclude Include="External\spdlog\details\periodic_worker.h" />
-    <ClInclude Include="External\spdlog\details\registry-inl.h" />
-    <ClInclude Include="External\spdlog\details\registry.h" />
-    <ClInclude Include="External\spdlog\details\synchronous_factory.h" />
-    <ClInclude Include="External\spdlog\details\tcp_client-windows.h" />
-    <ClInclude Include="External\spdlog\details\tcp_client.h" />
-    <ClInclude Include="External\spdlog\details\thread_pool-inl.h" />
-    <ClInclude Include="External\spdlog\details\thread_pool.h" />
-    <ClInclude Include="External\spdlog\details\windows_include.h" />
-    <ClInclude Include="External\spdlog\fmt\bin_to_hex.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\chrono.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\color.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\compile.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\core.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\format-inl.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\format.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\locale.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\os.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\ostream.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\posix.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\printf.h" />
-    <ClInclude Include="External\spdlog\fmt\bundled\ranges.h" />
-    <ClInclude Include="External\spdlog\fmt\chrono.h" />
-    <ClInclude Include="External\spdlog\fmt\fmt.h" />
-    <ClInclude Include="External\spdlog\fmt\ostr.h" />
-    <ClInclude Include="External\spdlog\formatter.h" />
-    <ClInclude Include="External\spdlog\fwd.h" />
-    <ClInclude Include="External\spdlog\logger-inl.h" />
-    <ClInclude Include="External\spdlog\logger.h" />
-    <ClInclude Include="External\spdlog\pattern_formatter-inl.h" />
-    <ClInclude Include="External\spdlog\pattern_formatter.h" />
-    <ClInclude Include="External\spdlog\sinks\android_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\ansicolor_sink-inl.h" />
-    <ClInclude Include="External\spdlog\sinks\ansicolor_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\base_sink-inl.h" />
-    <ClInclude Include="External\spdlog\sinks\base_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\basic_file_sink-inl.h" />
-    <ClInclude Include="External\spdlog\sinks\basic_file_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\daily_file_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\dist_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\dup_filter_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\msvc_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\null_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\ostream_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\ringbuffer_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\rotating_file_sink-inl.h" />
-    <ClInclude Include="External\spdlog\sinks\rotating_file_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\sink-inl.h" />
-    <ClInclude Include="External\spdlog\sinks\sink.h" />
-    <ClInclude Include="External\spdlog\sinks\stdout_color_sinks-inl.h" />
-    <ClInclude Include="External\spdlog\sinks\stdout_color_sinks.h" />
-    <ClInclude Include="External\spdlog\sinks\stdout_sinks-inl.h" />
-    <ClInclude Include="External\spdlog\sinks\stdout_sinks.h" />
-    <ClInclude Include="External\spdlog\sinks\syslog_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\systemd_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\tcp_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\wincolor_sink-inl.h" />
-    <ClInclude Include="External\spdlog\sinks\wincolor_sink.h" />
-    <ClInclude Include="External\spdlog\sinks\win_eventlog_sink.h" />
-    <ClInclude Include="External\spdlog\spdlog-inl.h" />
-    <ClInclude Include="External\spdlog\spdlog.h" />
-    <ClInclude Include="External\spdlog\stopwatch.h" />
-    <ClInclude Include="External\spdlog\tweakme.h" />
-    <ClInclude Include="External\spdlog\version.h" />
+    <ClInclude Include="Src\divepch.h" />
     <ClInclude Include="Src\Core\DiveCore.h" />
-    <ClInclude Include="Src\Core\DiveEngine.h" />
+    <ClInclude Include="Src\DiveEngine.h" />
     <ClInclude Include="Src\Core\Event.h" />
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\RenderPath.h" />
@@ -271,7 +182,6 @@
     <ClInclude Include="Src\Helper\dvMath.h" />
     <ClInclude Include="Src\Helper\FileStream.h" />
     <ClInclude Include="Src\Helper\FileSystemHelper.h" />
-    <ClInclude Include="Src\Helper\FontImporter.h" />
     <ClInclude Include="Src\Helper\FormatHelper.h" />
     <ClInclude Include="Src\Helper\Geometry.h" />
     <ClInclude Include="Src\Helper\IniHelper.h" />
@@ -281,7 +191,6 @@
     <ClInclude Include="Src\Helper\Timer.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Renderer\dvMesh.h" />
-    <ClInclude Include="Src\Renderer\Font.h" />
     <ClInclude Include="Src\Renderer\GraphicsEnums.h" />
     <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\ConstantBuffers.h" />
@@ -299,7 +208,6 @@
     <ClInclude Include="Src\Renderer\SkinnedMesh.h" />
     <ClInclude Include="Src\Renderer\StaticMesh.h" />
     <ClInclude Include="Src\Renderer\VertexTypes.h" />
-    <ClInclude Include="Src\Resource\Importer\ModelImporter.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceManager.h" />
     <ClInclude Include="Src\Scene\Component\Camera.h" />
@@ -308,19 +216,20 @@
     <ClInclude Include="Src\Scene\Component\Light.h" />
     <ClInclude Include="Src\Scene\Component\MeshRenderer.h" />
     <ClInclude Include="Src\Scene\Component\StaticMeshRenderer.h" />
-    <ClInclude Include="Src\Scene\Component\TextMesh.h" />
     <ClInclude Include="Src\Scene\Component\Transform.h" />
     <ClInclude Include="Src\Scene\GameObject.h" />
     <ClInclude Include="Src\Scene\Scene.h" />
     <ClInclude Include="Src\Scene\SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\divepch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Src\Core\RenderPath3D_Legacy.cpp" />
     <ClCompile Include="Src\Core\Runtime.cpp" />
     <ClCompile Include="Src\Core\ThreadPool.cpp" />
     <ClCompile Include="Src\Helper\FileStream.cpp" />
     <ClCompile Include="Src\Helper\FileSystemHelper.cpp" />
-    <ClCompile Include="Src\Helper\FontImporter.cpp" />
     <ClCompile Include="Src\Helper\FormatHelper.cpp" />
     <ClCompile Include="Src\Helper\IniHelper.cpp" />
     <ClCompile Include="Src\Helper\Log.cpp" />
@@ -329,7 +238,6 @@
     <ClCompile Include="Src\Helper\Timer.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\Renderer\dvMesh.cpp" />
-    <ClCompile Include="Src\Renderer\Font.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp" />
@@ -342,7 +250,6 @@
     <ClCompile Include="Src\Renderer\Renderer_Pass.cpp" />
     <ClCompile Include="Src\Renderer\Renderer_Resources.cpp" />
     <ClCompile Include="Src\Renderer\StaticMesh.cpp" />
-    <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="Src\Scene\Component\Camera.cpp" />
@@ -351,7 +258,6 @@
     <ClCompile Include="Src\Scene\Component\Light.cpp" />
     <ClCompile Include="Src\Scene\Component\MeshRenderer.cpp" />
     <ClCompile Include="Src\Scene\Component\StaticMeshRenderer.cpp" />
-    <ClCompile Include="Src\Scene\Component\TextMesh.cpp" />
     <ClCompile Include="Src\Scene\Component\Transform.cpp" />
     <ClCompile Include="Src\Scene\Component\Transform_Hierarchy.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />

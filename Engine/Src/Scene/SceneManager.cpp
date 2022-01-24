@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "SceneManager.h"
 #include "Scene.h"
 #include "../Core/Runtime.h"
@@ -5,7 +6,7 @@
 #include "../Helper/FileSystemHelper.h"
 #include "../Helper/Log.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	SceneManager::SceneManager()
 	{

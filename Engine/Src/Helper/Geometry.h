@@ -7,7 +7,7 @@
 // 일단 Triangle List로 보면 형태가 맞다.                 //
 // 하지만 Line List로 보면 인덱스가 좀 이상하다.          //
 //========================================================//
-namespace DiveEngine::utility::geometry
+namespace Dive::utility::geometry
 {
     static void CreatePlane(std::vector<VertexType_PosTexNorTan>& vertices, std::vector<unsigned int>& indices)
     {

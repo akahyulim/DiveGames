@@ -1,9 +1,10 @@
+#include "divepch.h"
 #include "ConstantBuffer.h"
 #include "../../Helper/Log.h"
 #include "GraphicsDevice.h"
 #include "../Renderer.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	ConstantBuffer::ConstantBuffer(GraphicsDevice* pGraphicsDevice, const std::string& name)
 		: m_pGraphicsDevice(pGraphicsDevice),

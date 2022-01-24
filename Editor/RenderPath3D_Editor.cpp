@@ -1,5 +1,5 @@
 #include "RenderPath3D_Editor.h"
-using namespace DiveEngine;
+
 
 namespace dive
 {

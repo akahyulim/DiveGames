@@ -2,7 +2,7 @@
 #include "Component.h"
 #include "../../Renderer/Mesh.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	class GameObject;
 	class Material;

@@ -1,7 +1,7 @@
 #pragma once
 #include "dvMeshRenderer.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	// 이건 아직 구분 사항을 좀 더 찾아봐야 한다.
 	class StaticMeshRenderer : public dvMeshRenderer

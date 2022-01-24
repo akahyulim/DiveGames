@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "Scene.h"
 #include "GameObject.h"
 #include "Component/Transform.h"
@@ -7,7 +8,7 @@
 #include "../Helper/FileStream.h"
 
 
-namespace DiveEngine
+namespace Dive
 {
 	Scene::Scene()
 	{

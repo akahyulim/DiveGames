@@ -1,10 +1,11 @@
+#include "divepch.h"
 #include "Light.h"
 #include "../GameObject.h"
 #include "../../Core/DiveCore.h"
 #include "../../Helper/FileStream.h"
 
 
-namespace DiveEngine
+namespace Dive
 {
 	Light::Light(GameObject* pGameObject)
 		: Component(pGameObject)

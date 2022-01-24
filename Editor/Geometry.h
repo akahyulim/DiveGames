@@ -3,50 +3,50 @@
 
 using namespace DirectX;
 
-namespace DiveEditor
+namespace Dive
 {
 	namespace Utility
 	{
 		// Cube
-		inline void CreateCube(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
+		inline void CreateCube(std::vector<Dive::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
 		{
 			// vertices
 			{
 				// front
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, -0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, -0.5f),	XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, -0.5f),	XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, -0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, -0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, -0.5f),	XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, -0.5f),	XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, -0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
 
 				// back
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, 0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, 0.5f),		XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, 0.5f),	XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, 0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, 0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, 0.5f),		XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, 0.5f),	XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, 0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
 				
 				// top
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, -0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, 0.5f),	XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, 0.5f),		XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, -0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, -0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, 0.5f),	XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, 0.5f),		XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, -0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
 
 				// bottom
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, 0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, -0.5f),	XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, -0.5f),	XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, 0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, 0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, -0.5f),	XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, -0.5f),	XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, 0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
 
 				// left
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, 0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, 0.5f),	XMFLOAT2(0.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, -0.5f),	XMFLOAT2(1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, -0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, 0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, 0.5f),	XMFLOAT2(0.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, -0.5f),	XMFLOAT2(1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, -0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
 
 				// right
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, -0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, -0.5f),	XMFLOAT2(0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, 0.5f),		XMFLOAT2(1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, 0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, -0.5f),	XMFLOAT2(0.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, -0.5f),	XMFLOAT2(0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, 0.5f),		XMFLOAT2(1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, 0.5f),	XMFLOAT2(1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
 			}
 
 			// indices
@@ -78,7 +78,7 @@ namespace DiveEditor
 		}
 
 		// Sphere: UV Sphere
-		inline void CreateSphere(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices, float radius = 0.5f, int slices = 20, int stacks = 20)
+		inline void CreateSphere(std::vector<Dive::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices, float radius = 0.5f, int slices = 20, int stacks = 20)
 		{
 			// vertices
 			{
@@ -157,7 +157,7 @@ namespace DiveEditor
 		// Capsule
 
 		// Cylinder
-		inline void CreateCylinder(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices, float radiusTop = 0.5f, float radiusBottom = 0.5f, float height = 1.0f, int slices = 15, int stacks = 15)
+		inline void CreateCylinder(std::vector<Dive::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices, float radiusTop = 0.5f, float radiusBottom = 0.5f, float height = 1.0f, int slices = 15, int stacks = 15)
 		{
 			const float stackHeight = height / stacks;
 			const float radiusStep = (radiusTop - radiusBottom) / stacks;
@@ -265,7 +265,7 @@ namespace DiveEditor
 		}
 
 		// Plane
-		inline void CreatePlane(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
+		inline void CreatePlane(std::vector<Dive::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
 		{
 			// vertices
 			{
@@ -275,10 +275,10 @@ namespace DiveEditor
 					vertices.shrink_to_fit();
 				}
 
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.0f, -0.5f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.0f, 0.5f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.0f, 0.5f),  XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.0f, -0.5f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.0f, -0.5f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.0f, 0.5f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.0f, 0.5f),  XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.0f, -0.5f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)));
 			}
 
 			// indices
@@ -295,7 +295,7 @@ namespace DiveEditor
 		}
 
 		// Quad
-		inline void CreateQuad(std::vector<DiveEngine::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
+		inline void CreateQuad(std::vector<Dive::Vertex_StaticMesh>& vertices, std::vector<uint32_t>& indices)
 		{
 			// vertices
 			{
@@ -305,10 +305,10 @@ namespace DiveEditor
 					vertices.shrink_to_fit();
 				}
 
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
-				vertices.emplace_back(DiveEngine::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, -0.5f, 0.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(-0.5f, 0.5f, 0.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, 0.5f, 0.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
+				vertices.emplace_back(Dive::Vertex_StaticMesh(XMFLOAT3(0.5f, -0.5f, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)));
 			}
 
 			// indices

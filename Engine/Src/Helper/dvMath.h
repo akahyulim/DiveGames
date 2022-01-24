@@ -5,7 +5,7 @@
 #define saturate(x) std::min(std::max(x,0.0f),1.0f)
 
 // 믿을 수 없지만 Math라는 파일 이름과 inline 설정을 포함하지 않은 것이 문제였다.
-namespace DiveEngine
+namespace Dive
 {
 	inline DirectX::XMFLOAT3 QuaternionToEulerAngles(const DirectX::XMFLOAT4& quaternion)
 	{

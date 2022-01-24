@@ -1,8 +1,9 @@
+#include "divepch.h"
 #include "FileStream.h"
 #include "Log.h"
 
 
-namespace DiveEngine
+namespace Dive
 {
 	FileStream::FileStream(const std::string & filepath, eFileStreamMode mode)
 		: m_bFileOpened(false),

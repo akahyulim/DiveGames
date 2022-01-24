@@ -5,7 +5,7 @@
 #include "../Scene/Scene.h"
 
 // override this(fucntion) to perform custom gameplay or rendering logic
-namespace DiveEngine
+namespace Dive
 {
 	class RenderPath
 	{

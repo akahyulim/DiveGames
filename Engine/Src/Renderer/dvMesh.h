@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_map>
 
-namespace DiveEngine
+namespace Dive
 {
 	class GameObject;
 	class Transform;

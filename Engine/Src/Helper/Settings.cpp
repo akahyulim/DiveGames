@@ -1,9 +1,10 @@
+#include "divepch.h"
 #include "Settings.h"
 #include "IniHelper.h"
 #include "FileSystemHelper.h"
 #include "Log.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	void Settings::Initialize(const std::string& title)
 	{

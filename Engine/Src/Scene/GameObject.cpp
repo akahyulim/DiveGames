@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "GameObject.h"
 #include "Scene.h"
 #include "../Core/DiveCore.h"
@@ -7,7 +8,7 @@
 // 모든 Object가 ID를 가질 필요가 있는가?
 // Hazle의 경우 Entity만 UUID를 Component로 가진다.
 
-namespace DiveEngine
+namespace Dive
 {
 	// 유니티는 이름만 전달 받는다.
 	GameObject::GameObject(Scene* pScene)

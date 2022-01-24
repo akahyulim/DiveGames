@@ -1,7 +1,8 @@
+#include "divepch.h"
 #include "StaticMesh.h"
 #include "../Src/Core/DiveCore.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	StaticMesh::StaticMesh()
 	{

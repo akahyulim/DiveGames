@@ -1,19 +1,10 @@
 #pragma once
-#include <d3d11_3.h>
-#include <DXGI1_3.h>
-#include <wrl/client.h>
-
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "dxgi.lib")
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "d3dcompiler.lib")
-#pragma comment(lib, "dxguid.lib")
 
 /*
 *	SwapChain 및 D3D11 Device 관리
 *	Resource 생성 및 Bind 구현은 좀 더 생각해 봐야 할 것 같다.
 */
-namespace DiveEngine
+namespace Dive
 {
 	class GraphicsDevice
 	{

@@ -3,16 +3,16 @@
 #include "External/ImGui/imgui_internal.h"
 #include "External/ImGui/imgui_impl_win32.h"
 #include "External/ImGui/imgui_impl_dx11.h"
-#include "MenuBar.h"
-#include "Hierarchy.h"
-#include "Scene.h"
-#include "Assets.h"
-#include "Inspector.h"
+#include "MenuBarPanel.h"
+#include "HierarchyPanel.h"
+#include "ScenePanel.h"
+#include "AssetPanel.h"
+#include "InspectorPanel.h"
 #include <iostream>
 
-using namespace DiveEngine;
 
-namespace DiveEditor
+
+namespace Dive
 {
 	Editor::Editor()
 	{
@@ -66,9 +66,9 @@ namespace DiveEditor
 
 		beginDockSpace();
 
-		for (auto pWidget : m_Widgets)
+		for (auto pPanel : m_Panels)
 		{
-			pWidget->Tick();
+			pPanel->Tick();
 		}
 
 		endDockSpace();
@@ -128,11 +128,11 @@ namespace DiveEditor
 		ImGui_ImplDX11_Init(pDevice, pImmediateContext);
 
 		// Widget »ý¼º
-		m_Widgets.emplace_back(std::make_shared<MenuBar>(this));
-		m_Widgets.emplace_back(std::make_shared<Hierarchy>(this));
-		m_Widgets.emplace_back(std::make_shared<Scene>(this));
-		m_Widgets.emplace_back(std::make_shared<Inspector>(this));
-		m_Widgets.emplace_back(std::make_shared<Assets>(this));
+		m_Panels.emplace_back(std::make_shared<MenuBarPanel>(this));
+		m_Panels.emplace_back(std::make_shared<HierarchyPanel>(this));
+		m_Panels.emplace_back(std::make_shared<ScenePanel>(this));
+		m_Panels.emplace_back(std::make_shared<InspectorPanel>(this));
+		m_Panels.emplace_back(std::make_shared<AssetPanel>(this));
 	}
 
 	void Editor::beginDockSpace()

@@ -1,4 +1,4 @@
-#include "MenuBar.h"
+#include "MenuBarPanel.h"
 #include "Editor.h"
 #include "Geometry.h"
 #include "External/ImGui/imgui.h"
@@ -9,9 +9,7 @@
 #include <ShlObj.h>
 #include <atlstr.h>
 
-using namespace DiveEngine;
-
-namespace DiveEditor
+namespace Dive
 {
 
 	int CALLBACK BrowseCallbackProc(HWND hWnd, UINT uMsg, LPARAM lParam, LPARAM lpData)
@@ -32,8 +30,8 @@ namespace DiveEditor
 	}
 
 
-	MenuBar::MenuBar(Editor* pEditor)
-		: Widget(pEditor)
+	MenuBarPanel::MenuBarPanel(Editor* pEditor)
+		: Panel(pEditor)
 	{
 		m_Title				= "MenuBar";
 		m_bWindow			= false;
@@ -43,7 +41,7 @@ namespace DiveEditor
 	}
 
 	// Scene이 없을 때 GameObject를 생성할 수 없는데 그냥 시도한다.
-	void MenuBar::TickAlways()
+	void MenuBarPanel::TickAlways()
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(GetPadding(), GetPadding()));
 
@@ -78,7 +76,7 @@ namespace DiveEditor
 						// 1 순위는 저장된 시작 폴더
 						// 2 순위는 Editor의 실행 폴더
 						// 일단은 Editor의 실행 폴더를 열도록 한다.
-						auto dir = DiveEngine::FileSystemHelper::GetWorkingDirectory();
+						auto dir = Dive::FileSystemHelper::GetWorkingDirectory();
 
 						char targetFile[MAX_PATH] = "";
 
@@ -111,7 +109,7 @@ namespace DiveEditor
 						// 여긴 우선 순위가 다르다.
 						// 1 순위는 현재 프로젝트 폴더의 Assets\Scenes => 즉, 프로젝트 실행시 저장이 필요하다.
 						// 2 순위는 역시나 Editor의 위치 폴더
-						auto dir = DiveEngine::FileSystemHelper::GetWorkingDirectory();
+						auto dir = Dive::FileSystemHelper::GetWorkingDirectory();
 
 						char targetFile[MAX_PATH] = "";
 
@@ -165,7 +163,7 @@ namespace DiveEditor
 				{
 					// OPENFILENAME, GetSaveFileName 
 
-					auto dir = DiveEngine::FileSystemHelper::GetWorkingDirectory();
+					auto dir = Dive::FileSystemHelper::GetWorkingDirectory();
 
 					// 현재 Scene 이름으로 설정해야 한다.
 					char targetFile[MAX_PATH] = "";
@@ -314,11 +312,11 @@ namespace DiveEditor
 
 						if (!pMesh)
 						{
-							std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+							std::vector<Dive::Vertex_StaticMesh> vertices;
 							std::vector<uint32_t> indices;
 							Utility::CreateCube(vertices, indices);
 
-							pMesh = new DiveEngine::StaticMesh();
+							pMesh = new Dive::StaticMesh();
 							pMesh->SetVertices(vertices);
 							pMesh->SetIndices(indices);
 							pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
@@ -337,11 +335,11 @@ namespace DiveEditor
 
 						if (!pMesh)
 						{
-							std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+							std::vector<Dive::Vertex_StaticMesh> vertices;
 							std::vector<uint32_t> indices;
 							Utility::CreateSphere(vertices, indices);
 
-							pMesh = new DiveEngine::StaticMesh();
+							pMesh = new Dive::StaticMesh();
 							pMesh->SetVertices(vertices);
 							pMesh->SetIndices(indices);
 							pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
@@ -366,11 +364,11 @@ namespace DiveEditor
 
 						if (!pMesh)
 						{
-							std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+							std::vector<Dive::Vertex_StaticMesh> vertices;
 							std::vector<uint32_t> indices;
 							Utility::CreateCylinder(vertices, indices);
 
-							pMesh = new DiveEngine::StaticMesh();
+							pMesh = new Dive::StaticMesh();
 							pMesh->SetVertices(vertices);
 							pMesh->SetIndices(indices);
 							pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
@@ -389,11 +387,11 @@ namespace DiveEditor
 
 						if (!pMesh)
 						{
-							std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+							std::vector<Dive::Vertex_StaticMesh> vertices;
 							std::vector<uint32_t> indices;
 							Utility::CreatePlane(vertices, indices);
 
-							pMesh = new DiveEngine::StaticMesh();
+							pMesh = new Dive::StaticMesh();
 							pMesh->SetVertices(vertices);
 							pMesh->SetIndices(indices);
 							pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
@@ -412,11 +410,11 @@ namespace DiveEditor
 
 						if (!pMesh)
 						{
-							std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+							std::vector<Dive::Vertex_StaticMesh> vertices;
 							std::vector<uint32_t> indices;
 							Utility::CreateQuad(vertices, indices);
 
-							pMesh = new DiveEngine::StaticMesh();
+							pMesh = new Dive::StaticMesh();
 							pMesh->SetVertices(vertices);
 							pMesh->SetIndices(indices);
 							pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
@@ -493,16 +491,16 @@ namespace DiveEditor
 			if (ImGui::BeginMenu("Window"))
 			{
 				/*
-				ImGui::MenuItem("World", NULL, &g_pWidgetScene->IsVisible());
-				ImGui::MenuItem("Game", NULL, &g_pWidgetGame->IsVisible());
-				ImGui::MenuItem("Hierarchy", NULL, &g_pWidgetHierarchy->IsVisible());
-				ImGui::MenuItem("Components", NULL, &g_pWidgetInspector->IsVisible());
-				ImGui::MenuItem("Log", NULL, &g_pWidgetConsole->IsVisible());
-				ImGui::MenuItem("AssetsWidget", NULL, &g_pWidgetAssets->IsVisible());
+				ImGui::MenuItem("World", NULL, &g_pPanelScene->IsVisible());
+				ImGui::MenuItem("Game", NULL, &g_pPanelGame->IsVisible());
+				ImGui::MenuItem("Hierarchy", NULL, &g_pPanelHierarchy->IsVisible());
+				ImGui::MenuItem("Components", NULL, &g_pPanelInspector->IsVisible());
+				ImGui::MenuItem("Log", NULL, &g_pPanelConsole->IsVisible());
+				ImGui::MenuItem("AssetsPanel", NULL, &g_pPanelAssets->IsVisible());
 
 				ImGui::Separator();
 
-				ImGui::MenuItem("Image Importer");// , NULL, &g_pWidgetImageImporter->IsVisible());
+				ImGui::MenuItem("Image Importer");// , NULL, &g_pPanelImageImporter->IsVisible());
 				ImGui::MenuItem("Model Importer");
 
 				ImGui::Separator();
@@ -534,7 +532,7 @@ namespace DiveEditor
 	*	dir 제어에 string, wstring 구분이 필요하다. 
 	*	project load 상태를 어떻게 확인할 것인가 생각해야 한다.
 	*/
-	void MenuBar::modalNewProject()
+	void MenuBarPanel::modalNewProject()
 	{
 		static std::string inputName;
 		static std::string inputDir;
@@ -548,7 +546,7 @@ namespace DiveEditor
 		
 			inputName = "NewApplication";
 			// '/'를 '\'로 바꾸고, 마지막엔 해당 토큰이 없었으면 좋겠다.
-			inputDir = DiveEngine::FileSystemHelper::GetWorkingDirectory();
+			inputDir = Dive::FileSystemHelper::GetWorkingDirectory();
 		}
 
 		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
@@ -596,7 +594,7 @@ namespace DiveEditor
 					bi.lpfn			= BrowseCallbackProc;
 					// 헐이다. /는 안먹힌다. \\로 해야 한다.
 					// 이건 경로를 구분하는 c++과 winapi의 차이인듯 하다.
-					std::wstring path = //DiveEngine::StringHelper::Utf8ToUtf16(inputDir.c_str());
+					std::wstring path = //Dive::StringHelper::Utf8ToUtf16(inputDir.c_str());
 						std::filesystem::current_path().generic_wstring();
 					bi.lParam = //(LPARAM)L"C:\\";
 								//(LPARAM)(path.c_str());
@@ -702,7 +700,7 @@ namespace DiveEditor
 	}
 
 	// 버튼이 우측 정렬되도록 하고 싶다.
-	void MenuBar::modalNewScene()
+	void MenuBarPanel::modalNewScene()
 	{
 		static char sceneName[16] = { 0, };
 	

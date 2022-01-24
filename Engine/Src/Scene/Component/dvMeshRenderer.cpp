@@ -1,10 +1,11 @@
+#include "divepch.h"
 #include "dvMeshRenderer.h"
 #include "Transform.h"
 #include "../GameObject.h"
 #include "Renderer/dvMesh.h"
 #include "Renderer/Renderer.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	dvMeshRenderer::dvMeshRenderer(GameObject* pGameObject)
 		: Component(pGameObject),

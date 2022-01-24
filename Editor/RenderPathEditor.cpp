@@ -1,7 +1,7 @@
 #include "RenderPathEditor.h"
-using namespace DiveEngine;
 
-namespace DiveEditor
+
+namespace Dive
 {
 	RenderPathEditor::RenderPathEditor()
 	{

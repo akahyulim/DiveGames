@@ -1,7 +1,7 @@
 #pragma once
 #include "Graphics/GraphicsInclude.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	struct Vertex_StaticMesh
 	{

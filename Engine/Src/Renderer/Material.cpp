@@ -1,7 +1,8 @@
+#include "divepch.h"
 #include "Material.h"
 #include "Graphics/dvTexture2D.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	Material::Material()
 	{

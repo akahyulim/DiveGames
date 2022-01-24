@@ -1,9 +1,10 @@
+#include "divepch.h"
 #include "Transform.h"
 #include "../SceneManager.h"
 #include "../Scene.h"
 #include "../GameObject.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	//==================================================//
 	// 절대 nullptr을 반환하지 않습니다.				//

@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "MeshRenderer.h"
 #include "../GameObject.h"
 #include "../../Renderer/Renderer.h"
@@ -7,7 +8,7 @@
 #include "../../Helper/FileStream.h"
 #include "../../Renderer/Material.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	MeshRenderer::MeshRenderer(GameObject* pGameObject)
 		: Component(pGameObject)

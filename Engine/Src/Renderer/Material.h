@@ -2,7 +2,7 @@
 #include "../Resource/Resource.h"
 #include <string>
 
-namespace DiveEngine
+namespace Dive
 {
 	class dvTexture2D;
 

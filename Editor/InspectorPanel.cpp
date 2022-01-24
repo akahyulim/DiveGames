@@ -1,20 +1,18 @@
-#include "Inspector.h"
+#include "InspectorPanel.h"
 #include "External/ImGui/imgui_stdlib.h"
 
-using namespace DiveEngine;
-
-// 현재 선택된 GameObject의 Inspector들을 보여준다.
-namespace DiveEditor
+// 현재 선택된 GameObject의 InspectorPanel들을 보여준다.
+namespace Dive
 {
-	GameObject* Inspector::m_pInspectedTarget = nullptr;
+	GameObject* InspectorPanel::m_pInspectedTarget = nullptr;
 
-	Inspector::Inspector(Editor* pEditor)
-		: Widget(pEditor)
+	InspectorPanel::InspectorPanel(Editor* pEditor)
+		: Panel(pEditor)
 	{
 		m_Title = "Inspector";
 	}
 
-	void Inspector::TickVisible()
+	void InspectorPanel::TickVisible()
 	{
 		if (m_pInspectedTarget)
 		{
@@ -33,14 +31,14 @@ namespace DiveEditor
 		// else if로 material
 	}
 
-	void Inspector::SetInspectGameObject(GameObject* pTarget)
+	void InspectorPanel::SetInspectGameObject(GameObject* pTarget)
 	{
 		m_pInspectedTarget = pTarget;
 
 		// hint인가 뭔가 설정
 	}
 	
-	void Inspector::showGameObject()
+	void InspectorPanel::showGameObject()
 	{
 		if (ImGui::CollapsingHeader("GameObject", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 		{
@@ -61,7 +59,7 @@ namespace DiveEditor
 		ImGui::Separator();
 	}
 
-	void Inspector::showTransform(Transform* pTransform)
+	void InspectorPanel::showTransform(Transform* pTransform)
 	{
 		// assert가 맞나?
 		if (!pTransform)
@@ -124,7 +122,7 @@ namespace DiveEditor
 	}
 
 	// 아직 구현하지 않은 것이 많다.
-	void Inspector::showCamera(Camera* pCamera)
+	void InspectorPanel::showCamera(Camera* pCamera)
 	{
 		if (!pCamera)
 			return;
@@ -246,7 +244,7 @@ namespace DiveEditor
 		ImGui::Separator();
 	}
 
-	void Inspector::showMeshRenderer(MeshRenderer* pMeshRenderer)
+	void InspectorPanel::showMeshRenderer(MeshRenderer* pMeshRenderer)
 	{
 		if (!pMeshRenderer)
 			return;
@@ -276,7 +274,7 @@ namespace DiveEditor
 		ImGui::Separator();
 	}
 
-	void Inspector::showLight(Light* pLight)
+	void InspectorPanel::showLight(Light* pLight)
 	{
 		if (!pLight)
 			return;
@@ -350,7 +348,7 @@ namespace DiveEditor
 		ImGui::Separator();
 	}
 	
-	void Inspector::showAddComponentButton()
+	void InspectorPanel::showAddComponentButton()
 	{
 		ImGui::SetCursorPosX(ImGui::GetWindowWidth() * 0.5f - 150);
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 10);

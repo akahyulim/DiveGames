@@ -2,7 +2,7 @@
 #include "../../Renderer/Graphics/GraphicsInclude.h"
 #include "Component.h"
 
-namespace DiveEngine
+namespace Dive
 {
 	class GameObject;
 	class dvRenderTexture;

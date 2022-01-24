@@ -1,10 +1,8 @@
 #pragma once
 #include "../Core/Object.h"
-#include <vector>
-#include <string>
-#include <memory>
 
-namespace DiveEngine
+
+namespace Dive
 {
 	class GameObject;
 

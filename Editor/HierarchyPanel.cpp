@@ -1,9 +1,7 @@
-#include "Hierarchy.h"
-#include "Inspector.h"
+#include "HierarchyPanel.h"
+#include "InspectorPanel.h"
 #include "Geometry.h"
 #include "External/ImGui/imgui_stdlib.h"
-
-using namespace DiveEngine;
 
 // 컨트롤 확장
 // 계층구조를 제어할 수 있어야 한다.
@@ -14,17 +12,17 @@ using namespace DiveEngine;
 // 예전에는 전역 변수로 접근했다.
 
 
-namespace DiveEditor
+namespace Dive
 {
-    Hierarchy::Hierarchy(Editor* pEditor)
-        : Widget(pEditor)
+    HierarchyPanel::HierarchyPanel(Editor* pEditor)
+        : Panel(pEditor)
     {
         m_Title = "Hierarchy";
         m_Flags |= ImGuiWindowFlags_HorizontalScrollbar;
     }
 
     // DragDrop으로 Transform을 어떻게 다룰 것인지 고심해야 한다.
-    void Hierarchy::TickVisible()
+    void HierarchyPanel::TickVisible()
     {
         if (!m_pScene)
             return;
@@ -46,7 +44,7 @@ namespace DiveEditor
     // Root의 순서 변경이 안된다.                      //
     // 아마 자식들 중 형제들 역시 마찬가지일 것이다.   //
     //=================================================//
-    void Hierarchy::showMainTree()
+    void HierarchyPanel::showMainTree()
     {
         assert(m_pScene);
 
@@ -86,7 +84,7 @@ namespace DiveEditor
     }
 
     // 내부 트리를 만든다.
-    void Hierarchy::showAddedTree(GameObject* pObject)
+    void HierarchyPanel::showAddedTree(GameObject* pObject)
     {
         if (!pObject) return;
 
@@ -125,16 +123,16 @@ namespace DiveEditor
         }
     }
 
-    void Hierarchy::setSelectedGameObject(GameObject* pObject)
+    void HierarchyPanel::setSelectedGameObject(GameObject* pObject)
     {
         if (m_pSelectedObject != pObject)
         {
             m_pSelectedObject = pObject;
-            Inspector::SetInspectGameObject(m_pSelectedObject);
+            InspectorPanel::SetInspectGameObject(m_pSelectedObject);
         }
     }
 
-    void Hierarchy::handleClicking()
+    void HierarchyPanel::handleClicking()
     {
         if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
             return;
@@ -158,7 +156,7 @@ namespace DiveEditor
     // 전달인자는 상황에 따라 다르게 사용된다.
     // 드래그일 땐 대상의 정보를 저장하고,
     // 드랍일 땐 저장된 대상의 부모로 설정한다.
-    void Hierarchy::handleDragDrop(GameObject* pObject)
+    void HierarchyPanel::handleDragDrop(GameObject* pObject)
     {
         auto dragDrop = DragDrop::GetInstance();
 
@@ -201,7 +199,7 @@ namespace DiveEditor
     // 몇몇 GameObject 구성 과정은 MenuBar와 동일하다.          //
     // 따라서 따로 함수화시킨 후 이를 사용하는 편이 직관적이다. //
     //==========================================================//
-    void Hierarchy::popupPropertyMenu()
+    void HierarchyPanel::popupPropertyMenu()
     {
         if (!ImGui::BeginPopup("##PropertyMenu"))
             return;
@@ -261,11 +259,11 @@ namespace DiveEditor
 
                 if (!pMesh)
                 {
-                    std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+                    std::vector<Dive::Vertex_StaticMesh> vertices;
                     std::vector<uint32_t> indices;
                     Utility::CreateCube(vertices, indices);
 
-                    pMesh = new DiveEngine::StaticMesh();
+                    pMesh = new Dive::StaticMesh();
                     pMesh->SetVertices(vertices);
                     pMesh->SetIndices(indices);
                     pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
@@ -285,11 +283,11 @@ namespace DiveEditor
 
                 if (!pMesh)
                 {
-                    std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+                    std::vector<Dive::Vertex_StaticMesh> vertices;
                     std::vector<uint32_t> indices;
                     Utility::CreateSphere(vertices, indices);
 
-                    pMesh = new DiveEngine::StaticMesh();
+                    pMesh = new Dive::StaticMesh();
                     pMesh->SetVertices(vertices);
                     pMesh->SetIndices(indices);
                     pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
@@ -312,11 +310,11 @@ namespace DiveEditor
 
                 if (!pMesh)
                 {
-                    std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+                    std::vector<Dive::Vertex_StaticMesh> vertices;
                     std::vector<uint32_t> indices;
                     Utility::CreateCylinder(vertices, indices);
 
-                    pMesh = new DiveEngine::StaticMesh();
+                    pMesh = new Dive::StaticMesh();
                     pMesh->SetVertices(vertices);
                     pMesh->SetIndices(indices);
                     pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
@@ -335,11 +333,11 @@ namespace DiveEditor
 
                 if (!pMesh)
                 {
-                    std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+                    std::vector<Dive::Vertex_StaticMesh> vertices;
                     std::vector<uint32_t> indices;
                     Utility::CreatePlane(vertices, indices);
 
-                    pMesh = new DiveEngine::StaticMesh();
+                    pMesh = new Dive::StaticMesh();
                     pMesh->SetVertices(vertices);
                     pMesh->SetIndices(indices);
                     pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
@@ -358,11 +356,11 @@ namespace DiveEditor
 
                 if (!pMesh)
                 {
-                    std::vector<DiveEngine::Vertex_StaticMesh> vertices;
+                    std::vector<Dive::Vertex_StaticMesh> vertices;
                     std::vector<uint32_t> indices;
                     Utility::CreateQuad(vertices, indices);
 
-                    pMesh = new DiveEngine::StaticMesh();
+                    pMesh = new Dive::StaticMesh();
                     pMesh->SetVertices(vertices);
                     pMesh->SetIndices(indices);
                     pMesh->CreateBuffers(Renderer::GetInstance().GetGraphicsDevice()->GetDevice());
@@ -404,7 +402,7 @@ namespace DiveEditor
         ImGui::EndPopup();
     }
 
-    void Hierarchy::popupGameObjectRename()
+    void HierarchyPanel::popupGameObjectRename()
     {
         if (m_bPopupRename)
         {

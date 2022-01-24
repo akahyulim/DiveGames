@@ -1,8 +1,9 @@
+#include "divepch.h"
 #include "ThreadPool.h"
 
 using namespace std;
 
-namespace DiveEngine
+namespace Dive
 {
 	ThreadPool::~ThreadPool()
 	{

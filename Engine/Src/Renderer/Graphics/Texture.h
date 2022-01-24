@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-namespace DiveEngine
+namespace Dive
 {
 	// 1. 일단 2D Texture 전용
 	// 2. DepthStencilView는 미구현(Deferred에서 다시 해보자.)

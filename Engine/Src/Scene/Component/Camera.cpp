@@ -1,3 +1,4 @@
+#include "divepch.h"
 #include "Camera.h"
 #include "../GameObject.h"
 #include "Transform.h"
@@ -10,7 +11,7 @@
 * 계산한 Viewport를 리턴한다.
 * ConstantBuffer용 값들을 리턴한다.
 */
-namespace DiveEngine
+namespace Dive
 {
 	std::vector<Camera*> Camera::s_Cameras;
 

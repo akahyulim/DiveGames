@@ -1,10 +1,6 @@
 #pragma once
-#include <windows.h>
-#include <string>
-#include <memory>
 
-
-namespace DiveEngine
+namespace Dive
 {
 	constexpr size_t MAX_VALUE_SIZE = 256;
 
