@@ -59,7 +59,7 @@ namespace DiveEngine
 		createRenderTargets();		// 여러 RenderTexture들을 만든다.
 		createShaders();
 
-		createFonts();
+		//createFonts();
 
 		createPipelineStates();	// 가장 마지막이어야 한다.
 

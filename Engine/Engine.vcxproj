@@ -22,8 +22,9 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{03f1fc52-be54-4d26-b7f6-0a4edb4e8983}</ProjectGuid>
-    <RootNamespace>DiveEngine</RootNamespace>
+    <RootNamespace>Engine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>Engine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -79,7 +80,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>..\bin\debug\</OutDir>
-    <IntDir>..\bin\int\x64\Debug\DiveEngine\</IntDir>
+    <IntDir>..\bin\int\x64\Debug\Engine\</IntDir>
     <PublicIncludeDirectories>
     </PublicIncludeDirectories>
   </PropertyGroup>

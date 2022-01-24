@@ -63,4 +63,4 @@
 #include "../Helper/FormatHelper.h"
 
 
-#pragma comment(lib, "DiveEngine.lib")
+#pragma comment(lib, "Engine.lib")
