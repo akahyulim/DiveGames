@@ -1,7 +1,7 @@
 #include "divepch.h"
 #include "GraphicsDevice.h"
-#include "../../Helper/Log.h"
-#include "../../Core/DiveCore.h"
+#include "Base/Log.h"
+#include "Base/DiveCore.h"
 
 using namespace Microsoft::WRL;
 

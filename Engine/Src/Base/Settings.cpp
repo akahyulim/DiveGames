@@ -1,14 +1,14 @@
 #include "divepch.h"
 #include "Settings.h"
 #include "IniHelper.h"
-#include "FileSystemHelper.h"
 #include "Log.h"
+#include "Utils/FileSystem.h"
 
 namespace Dive
 {
 	void Settings::Initialize(const std::string& title)
 	{
-		m_FileName = FileSystemHelper::GetWorkingDirectory() + title + ".ini";
+		m_FileName = Util::FileSystem::GetWorkingDirectory() + title + ".ini";
 
 		Load();
 
@@ -35,7 +35,7 @@ namespace Dive
 
 	void Settings::Save()
 	{
-		if (!FileSystemHelper::FileExists(m_FileName))
+		if (!Util::FileSystem::FileExists(m_FileName))
 			Default();
 
 		IniHelper ini(m_FileName);
@@ -52,7 +52,7 @@ namespace Dive
 
 	void Settings::Load()
 	{
-		if (!FileSystemHelper::FileExists(m_FileName))
+		if (!Util::FileSystem::FileExists(m_FileName))
 			Default();
 
 		IniHelper ini(m_FileName);

@@ -3,9 +3,9 @@
 #include "../GameObject.h"
 #include "../../Renderer/Renderer.h"
 #include "../../Renderer/Graphics/GraphicsDevice.h"
-#include "../../Helper/Log.h"
-#include "../../Helper/Geometry.h"
-#include "../../Helper/FileStream.h"
+#include "Base/Log.h"
+#include "Utils/Geometry.h"
+#include "Base/FileStream.h"
 #include "../../Renderer/Material.h"
 
 namespace Dive
@@ -99,13 +99,13 @@ namespace Dive
 		{
 		case eDefaultMeshType::Quad:
 		{
-			utility::geometry::CreatePlane(vertices, indices);
+			Geometry::CreatePlane(vertices, indices);
 			m_pMesh->SetName("Quad");
 			break;
 		}
 		case eDefaultMeshType::Cube:
 		{
-			utility::geometry::CreateCube(vertices, indices);
+			Geometry::CreateCube(vertices, indices);
 			m_pMesh->SetName("Cube");
 			break;
 		}

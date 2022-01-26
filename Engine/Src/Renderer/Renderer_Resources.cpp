@@ -1,7 +1,7 @@
 #include "divepch.h"
 #include "Renderer.h"
-#include "../Core/DiveCore.h"
-#include "../Helper/Log.h"
+#include "Base/DiveCore.h"
+#include "Base/Log.h"
 #include "Graphics/dvRenderTexture.h"
 #include <d3dcompiler.h>
 

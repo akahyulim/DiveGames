@@ -1,13 +1,15 @@
 #pragma once
-#include "../Renderer/Graphics/GraphicsInclude.h"
-#include "../Renderer/VertexTypes.h"
+#include "Renderer/Graphics/GraphicsInclude.h"
+#include "Renderer/VertexTypes.h"
 #include <vector>
 
+// Editor에 구현할 것을 사용할 것이다.
+// 추후 꼭 지우자!
 //========================================================//
 // 일단 Triangle List로 보면 형태가 맞다.                 //
 // 하지만 Line List로 보면 인덱스가 좀 이상하다.          //
 //========================================================//
-namespace Dive::utility::geometry
+namespace Dive::Geometry
 {
     static void CreatePlane(std::vector<VertexType_PosTexNorTan>& vertices, std::vector<unsigned int>& indices)
     {

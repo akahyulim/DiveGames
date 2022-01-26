@@ -2,8 +2,8 @@
 #include "Camera.h"
 #include "../GameObject.h"
 #include "Transform.h"
-#include "../../Core/DiveCore.h"
-#include "../../Helper/FileStream.h"
+#include "Base/DiveCore.h"
+#include "Base/FileStream.h"
 #include "../../Renderer/Graphics/dvRenderTexture.h"
 
 /*

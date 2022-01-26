@@ -1,10 +1,10 @@
 #include "divepch.h"
 #include "SceneManager.h"
 #include "Scene.h"
-#include "../Core/Runtime.h"
-#include "../Core/Event.h"
-#include "../Helper/FileSystemHelper.h"
-#include "../Helper/Log.h"
+#include "Base/Runtime.h"
+#include "Base/Event.h"
+#include "Utils/FileSystem.h"
+#include "Base/Log.h"
 
 namespace Dive
 {
@@ -83,9 +83,9 @@ namespace Dive
 	// 동기 방식 Scene 전환
 	Scene* SceneManager::LoadScene(const std::string& scenePath)
 	{
-		if (FileSystemHelper::FileExists(scenePath))
+		if (Util::FileSystem::FileExists(scenePath))
 		{
-			auto sceneName = FileSystemHelper::GetFilenameWithoutExtension(scenePath);
+			auto sceneName = Util::FileSystem::GetFilenameWithoutExtension(scenePath);
 			auto newScene = CreateScene(sceneName);
 			if (!newScene)
 				return nullptr;

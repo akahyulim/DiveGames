@@ -1,5 +1,5 @@
 #pragma once
-#include "../Core/Object.h"
+#include "Base/Object.h"
 #include <string>
 
 namespace Dive

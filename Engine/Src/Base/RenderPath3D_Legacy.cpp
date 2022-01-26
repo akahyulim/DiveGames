@@ -1,10 +1,10 @@
 #include "divepch.h"
 #include "RenderPath3D_Legacy.h"
 #include "Event.h"
-#include "../Renderer/Graphics/GraphicsDevice.h"
-#include "../Renderer/Renderer.h"
-#include "../Helper/Timer.h"
-#include "../Helper/Log.h"
+#include "Timer.h"
+#include "Log.h"
+#include "Renderer/Graphics/GraphicsDevice.h"
+#include "Renderer/Renderer.h"
 
 
 namespace Dive

@@ -1,9 +1,9 @@
 #pragma once
 #include "RenderPath.h"
-#include "../Renderer/Graphics/dvTexture2D.h"
-#include "../Renderer/Graphics/dvRenderTexture.h"
-#include "../Scene/SceneManager.h"
-#include "../Scene/Scene.h"
+#include "Renderer/Graphics/dvTexture2D.h"
+#include "Renderer/Graphics/dvRenderTexture.h"
+#include "Scene/SceneManager.h"
+#include "Scene/Scene.h"
 
 /*
 *	이름 그대로 RenderPath 구현

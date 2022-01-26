@@ -7,9 +7,9 @@
 #include "../Resource/ResourceManager.h"
 #include "../Scene/SceneManager.h"
 #include "../Input/Input.h"
-#include "../Helper/IniHelper.h"
-#include "../Helper/Timer.h"
-#include "../Helper/Log.h"
+#include "IniHelper.h"
+#include "Timer.h"
+#include "Log.h"
 
 
 using namespace std;

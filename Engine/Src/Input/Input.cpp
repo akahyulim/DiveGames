@@ -1,6 +1,6 @@
 #include "divepch.h"
 #include "Input.h"
-#include "../Helper/Log.h"
+#include "Base/Log.h"
 
 namespace Dive
 {

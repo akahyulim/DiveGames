@@ -1,6 +1,6 @@
 #include "divepch.h"
 #include "dvMesh.h"
-#include "Core/DiveCore.h"
+#include "Base/DiveCore.h"
 
 namespace Dive
 {

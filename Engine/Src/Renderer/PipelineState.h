@@ -1,6 +1,6 @@
 #pragma once
 #include "Graphics/GraphicsInclude.h"
-#include "../Core/Object.h"
+#include "Base/Object.h"
 #include <assert.h>
 
 namespace Dive

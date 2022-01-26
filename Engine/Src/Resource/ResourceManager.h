@@ -1,7 +1,7 @@
 #pragma once
 #include "Resource.h"
-#include "../Core/DiveCore.h"
-#include "../Helper/FileSystemHelper.h"
+#include "Base/DiveCore.h"
+#include "Utils/FileSystem.h"
 #include <vector>
 #include <algorithm>
 
@@ -39,11 +39,11 @@ namespace Dive
 		T* Load(const std::string& filepath)
 		{
 			// 파일 존재 여부
-			if (!FileSystemHelper::FileExists(filepath))
+			if (!Util::FileSystem::FileExists(filepath))
 				return nullptr;
 
 			// 이름만 뽑아내기
-			const std::string name = FileSystemHelper::GetFilenameWithoutExtension(filepath);
+			const std::string name = Util::FileSystem::GetFilenameWithoutExtension(filepath);
 
 			if (IsCached(name, Resource::TypeToEnum<T>()))
 				return GetByName<T>(name);

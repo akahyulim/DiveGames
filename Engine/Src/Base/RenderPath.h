@@ -1,8 +1,8 @@
 #pragma once
 #include "Event.h"
-#include "../Renderer/Graphics/GraphicsDevice.h"
-#include "../Scene/SceneManager.h"
-#include "../Scene/Scene.h"
+#include "Renderer/Graphics/GraphicsDevice.h"
+#include "Scene/SceneManager.h"
+#include "Scene/Scene.h"
 
 // override this(fucntion) to perform custom gameplay or rendering logic
 namespace Dive

@@ -7,10 +7,10 @@
 #include "../Scene/Component/Camera.h"
 #include "../Scene/Component/Light.h"
 #include "../Scene/GameObject.h"
-#include "../Helper/Log.h"
-#include "../Core/Event.h"
+#include "Base/Log.h"
+#include "Base/Event.h"
 #include "../Scene/Component/Camera.h"
-#include "../Core/DiveCore.h"
+#include "Base/DiveCore.h"
 
 #include "Graphics/dvTexture2D.h"
 

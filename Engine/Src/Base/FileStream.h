@@ -1,5 +1,5 @@
 #pragma once
-#include "../Renderer/Graphics/GraphicsInclude.h"
+#include "Renderer/Graphics/GraphicsInclude.h"
 #include <fstream>
 #include <string>
 #include <vector>

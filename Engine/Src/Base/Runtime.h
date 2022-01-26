@@ -1,6 +1,6 @@
 #pragma once
 #include "../Renderer/Graphics/GraphicsDevice.h"
-#include "../Helper/Settings.h"
+#include "Settings.h"
 
 
 namespace Dive

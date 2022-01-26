@@ -1,8 +1,8 @@
 #include "divepch.h"
 #include "Light.h"
 #include "../GameObject.h"
-#include "../../Core/DiveCore.h"
-#include "../../Helper/FileStream.h"
+#include "Base/DiveCore.h"
+#include "Base/FileStream.h"
 
 
 namespace Dive

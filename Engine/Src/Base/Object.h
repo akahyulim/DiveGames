@@ -1,5 +1,5 @@
 #pragma once
-#include "../Helper/Log.h"
+#include "Log.h"
 #include <string>
 #include <atomic>
 #include <typeinfo>

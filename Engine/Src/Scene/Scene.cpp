@@ -2,10 +2,10 @@
 #include "Scene.h"
 #include "GameObject.h"
 #include "Component/Transform.h"
-#include "../Core/Event.h"
-#include "../Helper/Log.h"
-#include "../Helper/FileSystemHelper.h"
-#include "../Helper/FileStream.h"
+#include "Base/Event.h"
+#include "Base/Log.h"
+#include "Utils/FileSystem.h"
+#include "Base/FileStream.h"
 
 
 namespace Dive
@@ -118,7 +118,7 @@ namespace Dive
 
 		// 이쪽은 이름과 확장자까지 포함된 경로를 받는다.
 
-		if (!FileSystemHelper::FileExists(filepath))
+		if (!Util::FileSystem::FileExists(filepath))
 		{
 			return false;
 		}

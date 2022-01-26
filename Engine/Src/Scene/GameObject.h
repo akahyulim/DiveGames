@@ -5,8 +5,8 @@
 #include "Component/StaticMeshRenderer.h"
 #include "Component/Camera.h"
 #include "Component/Light.h"
-#include "../Core/Object.h"
-#include "../Core/Event.h"
+#include "Base/Object.h"
+#include "Base/Event.h"
 
 namespace Dive
 {

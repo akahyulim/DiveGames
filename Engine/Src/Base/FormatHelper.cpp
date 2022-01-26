@@ -2,8 +2,8 @@
 */
 #include "divepch.h"
 #include "FormatHelper.h"
-#include "StringHelper.h"
-#include "FileSystemHelper.h"
+#include "Utils/String.h"
+#include "Utils/FileSystem.h"
 
 namespace Dive
 {
@@ -56,11 +56,11 @@ namespace Dive
 	
 	bool FormatHelper::IsSupportedImageFile(const std::string & filepath)
 	{
-		std::string fileExtension = FileSystemHelper::GetExtension(filepath);
+		std::string fileExtension = Util::FileSystem::GetExtension(filepath);
 
 		for (const auto& format : m_SupportedImageFormats)
 		{
-			if ((fileExtension == format) || fileExtension == StringHelper::ToUppercase(format))
+			if ((fileExtension == format) || fileExtension == Util::String::ToUppercase(format))
 				return true;
 		}
 
@@ -69,11 +69,11 @@ namespace Dive
 
 	bool FormatHelper::IsSupportedShaderFile(const std::string & path)
 	{
-		std::string fileExtension = FileSystemHelper::GetExtension(path);
+		std::string fileExtension = Util::FileSystem::GetExtension(path);
 
 		for (const auto& format : m_SupportedShaderFormats)
 		{
-			if ((fileExtension == format) || (fileExtension == StringHelper::ToUppercase(format)))
+			if ((fileExtension == format) || (fileExtension == Util::String::ToUppercase(format)))
 				return true;
 		}
 
@@ -82,26 +82,26 @@ namespace Dive
 	
 	bool FormatHelper::IsEngineSceneFile(const std::string & path)
 	{
-		return FileSystemHelper::GetExtension(path) == DEE_SCENE;
+		return Util::FileSystem::GetExtension(path) == DEE_SCENE;
 	}
 	
 	bool FormatHelper::IsEngineMaterialFile(const std::string & path)
 	{
-		return FileSystemHelper::GetExtension(path) == DEE_MATERIAL;
+		return Util::FileSystem::GetExtension(path) == DEE_MATERIAL;
 	}
 	
 	bool FormatHelper::IsEngineTextureFile(const std::string & path)
 	{
-		return FileSystemHelper::GetExtension(path) == DEE_TEXTURE;
+		return Util::FileSystem::GetExtension(path) == DEE_TEXTURE;
 	}
 	
 	bool FormatHelper::IsEngineMeshFile(const std::string & path)
 	{
-		return FileSystemHelper::GetExtension(path) == DEE_MESH;
+		return Util::FileSystem::GetExtension(path) == DEE_MESH;
 	}
 
 	bool FormatHelper::IsEngineModelFile(const std::string & path)
 	{
-		return FileSystemHelper::GetExtension(path) == DEE_MODEL;
+		return Util::FileSystem::GetExtension(path) == DEE_MODEL;
 	}
 }

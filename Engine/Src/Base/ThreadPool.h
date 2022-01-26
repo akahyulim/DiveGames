@@ -1,5 +1,5 @@
 #pragma once
-#include "../Helper/Log.h"
+#include "Log.h"
 #include <thread>
 #include <mutex>
 #include <condition_variable>

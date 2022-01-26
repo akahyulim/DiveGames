@@ -1,6 +1,6 @@
 #include "divepch.h"
 #include "ConstantBuffer.h"
-#include "../../Helper/Log.h"
+#include "Base/Log.h"
 #include "GraphicsDevice.h"
 #include "../Renderer.h"
 

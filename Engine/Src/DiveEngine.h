@@ -8,15 +8,19 @@
 
 #include "divepch.h"
 
-//= Core ==========================
-#include "Core/DiveCore.h"
-#include "Core/Object.h"
-#include "Core/Event.h"
-#include "Core/ThreadPool.h"
-// 아래 세 개의 항목은 따로 분리하는 게 나을 것 같다.
-#include "Core/Runtime.h"
-#include "Core/RenderPath.h"
-#include "Core/RenderPath3D_Legacy.h"
+//= Base ==========================
+#include "Base/DiveCore.h"
+#include "Base/Object.h"
+#include "Base/Event.h"
+#include "Base/ThreadPool.h"
+#include "Base/Runtime.h"
+#include "Base/RenderPath.h"
+#include "Base/RenderPath3D_Legacy.h"
+#include "Base/Timer.h"
+#include "Base/Log.h"
+#include "Base/IniHelper.h"
+#include "Base/FileStream.h"
+#include "Base/FormatHelper.h"
 
 //= Resource ======================
 #include "Resource/Resource.h"
@@ -51,17 +55,8 @@
 #include "Scene/Component/Camera.h"
 #include "Scene/Component/Light.h"
 
-//= Helper ========================
-// 나중에 더 나눌 예정이다.
-#include "Helper/dvMath.h"
-#include "Helper/Geometry.h"
-#include "Helper/Timer.h"
-#include "Helper/Log.h"
-#include "Helper/IniHelper.h"
-#include "Helper/FileStream.h"
-#include "Helper/StringHelper.h"
-#include "Helper/FileSystemHelper.h"
-#include "Helper/FormatHelper.h"
-
-
-//#pragma comment(lib, "Engine.lib")
+//= Utils ========================
+#include "Utils/Math.h"
+#include "Utils/Geometry.h"
+#include "Utils/String.h"
+#include "Utils/FileSystem.h"

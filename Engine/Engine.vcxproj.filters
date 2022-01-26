@@ -67,60 +67,6 @@
     <ClInclude Include="Src\Renderer\Graphics\Texture.h">
       <Filter>Src\Renderer\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Helper\dvMath.h">
-      <Filter>Src\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Helper\FileStream.h">
-      <Filter>Src\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Helper\FileSystemHelper.h">
-      <Filter>Src\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Helper\FormatHelper.h">
-      <Filter>Src\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Helper\Geometry.h">
-      <Filter>Src\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Helper\IniHelper.h">
-      <Filter>Src\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Helper\Log.h">
-      <Filter>Src\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Helper\Settings.h">
-      <Filter>Src\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Helper\StringHelper.h">
-      <Filter>Src\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Helper\Timer.h">
-      <Filter>Src\Helpers</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\DiveCore.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\DiveEngine.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Event.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Object.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\RenderPath.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\RenderPath3D_Legacy.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\Runtime.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Core\ThreadPool.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h">
       <Filter>Src\Renderer\Graphics</Filter>
     </ClInclude>
@@ -150,6 +96,60 @@
     </ClInclude>
     <ClInclude Include="Src\divepch.h">
       <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Utils\Geometry.h">
+      <Filter>Src\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\DiveCore.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\Event.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\Object.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\RenderPath.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\RenderPath3D_Legacy.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\Runtime.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\ThreadPool.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\FileStream.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\FormatHelper.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\IniHelper.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\Log.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\Settings.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\Timer.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\DiveEngine.h">
+      <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Utils\Math.h">
+      <Filter>Src\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Utils\FileSystem.h">
+      <Filter>Src\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Utils\String.h">
+      <Filter>Src\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -216,39 +216,6 @@
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp">
       <Filter>Src\Renderer\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Helper\FileStream.cpp">
-      <Filter>Src\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Helper\FileSystemHelper.cpp">
-      <Filter>Src\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Helper\FormatHelper.cpp">
-      <Filter>Src\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Helper\IniHelper.cpp">
-      <Filter>Src\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Helper\Log.cpp">
-      <Filter>Src\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Helper\Settings.cpp">
-      <Filter>Src\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Helper\StringHelper.cpp">
-      <Filter>Src\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Helper\Timer.cpp">
-      <Filter>Src\Helpers</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\RenderPath3D_Legacy.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\Runtime.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\ThreadPool.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp">
       <Filter>Src\Renderer\Graphics</Filter>
     </ClCompile>
@@ -270,6 +237,39 @@
     <ClCompile Include="Src\divepch.cpp">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Base\RenderPath3D_Legacy.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\Runtime.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\ThreadPool.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\FileStream.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\FormatHelper.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\IniHelper.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\Log.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\Settings.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\Timer.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Utils\FileSystem.cpp">
+      <Filter>Src\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Utils\String.cpp">
+      <Filter>Src\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -287,17 +287,11 @@
     <Filter Include="Src\Scene\Components">
       <UniqueIdentifier>{7bc942ed-9c43-48b4-ad1c-95c51f40ebc0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Core">
-      <UniqueIdentifier>{935efe1f-4709-4022-9b1b-d67f83dc83a0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Input">
       <UniqueIdentifier>{7d6380e9-9fcb-4788-b719-d270596b1123}</UniqueIdentifier>
     </Filter>
     <Filter Include="Src\Resource">
       <UniqueIdentifier>{a52c840e-1afd-4594-981d-8351db2f048e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Src\Helpers">
-      <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
     </Filter>
     <Filter Include="Src\Renderer">
       <UniqueIdentifier>{1326af25-081c-4cf4-b939-d927b9d45a14}</UniqueIdentifier>
@@ -307,6 +301,12 @@
     </Filter>
     <Filter Include="Doc">
       <UniqueIdentifier>{7e215838-d5d9-4ab7-a317-e071ac36ddd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Utils">
+      <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Base">
+      <UniqueIdentifier>{935efe1f-4709-4022-9b1b-d67f83dc83a0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

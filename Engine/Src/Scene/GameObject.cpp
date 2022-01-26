@@ -1,9 +1,9 @@
 #include "divepch.h"
 #include "GameObject.h"
 #include "Scene.h"
-#include "../Core/DiveCore.h"
-#include "../Helper/Log.h"
-#include "../Helper/FileStream.h"
+#include "Base/DiveCore.h"
+#include "Base/Log.h"
+#include "Base/FileStream.h"
 
 // 모든 Object가 ID를 가질 필요가 있는가?
 // Hazle의 경우 Entity만 UUID를 Component로 가진다.

@@ -1,12 +1,12 @@
 #include "divepch.h"
 #include "Transform.h"
-#include "../../Core/DiveCore.h"
 #include "../SceneManager.h"
 #include "../Scene.h"
 #include "../GameObject.h"
-#include "../../Helper/FileStream.h"
-#include "../../Helper/dvMath.h"
-#include "../../Helper/Log.h"
+#include "Base/DiveCore.h"
+#include "Base/FileStream.h"
+#include "Base/Log.h"
+#include "Utils/Math.h"
 
 namespace Dive
 {
@@ -192,12 +192,12 @@ namespace Dive
 	// 오일러각을 XMFLOAT3 타입으로 리턴합니다.
 	DirectX::XMFLOAT3 Transform::GetRotationEulerAngles() const
 	{
-		return QuaternionToEulerAngles(GetRotation());
+		return Math::QuaternionToEulerAngles(GetRotation());
 	}
 	
 	void Transform::GetRotationEulerAngles(float& degreeX, float& degreeY, float& degreeZ) const
 	{
-		auto eularAngles = QuaternionToEulerAngles(GetRotation());
+		auto eularAngles = Math::QuaternionToEulerAngles(GetRotation());
 
 		degreeX = eularAngles.x;
 		degreeY = eularAngles.y;
@@ -243,12 +243,12 @@ namespace Dive
 	
 	DirectX::XMFLOAT3 Transform::GetLocalRotationEulerAngles() const
 	{
-		return QuaternionToEulerAngles(m_LocalRotation);
+		return Math::QuaternionToEulerAngles(m_LocalRotation);
 	}
 
 	void Transform::GetLocalRotationEulerAngles(float& degreeX, float& degreeY, float& degreeZ) const
 	{
-		auto eulerAngles = QuaternionToEulerAngles(m_LocalRotation);
+		auto eulerAngles = Math::QuaternionToEulerAngles(m_LocalRotation);
 
 		degreeX = eulerAngles.x;
 		degreeY = eulerAngles.y;
