@@ -2,8 +2,6 @@
 */
 #include "divepch.h"
 #include "FormatHelper.h"
-#include "Utils/String.h"
-#include "Utils/FileSystem.h"
 
 namespace Dive
 {
@@ -56,11 +54,12 @@ namespace Dive
 	
 	bool FormatHelper::IsSupportedImageFile(const std::string & filepath)
 	{
-		std::string fileExtension = Util::FileSystem::GetExtension(filepath);
-
+		// 일단 전부 소문자로 가정...
+		std::string fileExtension = std::filesystem::path(filepath).extension().string();
+		
 		for (const auto& format : m_SupportedImageFormats)
 		{
-			if ((fileExtension == format) || fileExtension == Util::String::ToUppercase(format))
+			if (fileExtension == format)
 				return true;
 		}
 
@@ -69,11 +68,12 @@ namespace Dive
 
 	bool FormatHelper::IsSupportedShaderFile(const std::string & path)
 	{
-		std::string fileExtension = Util::FileSystem::GetExtension(path);
+		// 여기도 소문자로 가정
+		std::string fileExtension = std::filesystem::path(path).extension().string();
 
 		for (const auto& format : m_SupportedShaderFormats)
 		{
-			if ((fileExtension == format) || (fileExtension == Util::String::ToUppercase(format)))
+			if (fileExtension == format)
 				return true;
 		}
 
@@ -82,26 +82,26 @@ namespace Dive
 	
 	bool FormatHelper::IsEngineSceneFile(const std::string & path)
 	{
-		return Util::FileSystem::GetExtension(path) == DEE_SCENE;
+		return std::filesystem::path(path).extension().string() == DEE_SCENE;
 	}
 	
 	bool FormatHelper::IsEngineMaterialFile(const std::string & path)
 	{
-		return Util::FileSystem::GetExtension(path) == DEE_MATERIAL;
+		return std::filesystem::path(path).extension().string() == DEE_MATERIAL;
 	}
 	
 	bool FormatHelper::IsEngineTextureFile(const std::string & path)
 	{
-		return Util::FileSystem::GetExtension(path) == DEE_TEXTURE;
+		return std::filesystem::path(path).extension().string() == DEE_TEXTURE;
 	}
 	
 	bool FormatHelper::IsEngineMeshFile(const std::string & path)
 	{
-		return Util::FileSystem::GetExtension(path) == DEE_MESH;
+		return std::filesystem::path(path).extension().string() == DEE_MESH;
 	}
 
 	bool FormatHelper::IsEngineModelFile(const std::string & path)
 	{
-		return Util::FileSystem::GetExtension(path) == DEE_MODEL;
+		return std::filesystem::path(path).extension().string() == DEE_MODEL;
 	}
 }

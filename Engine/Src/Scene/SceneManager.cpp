@@ -3,7 +3,6 @@
 #include "Scene.h"
 #include "Base/Runtime.h"
 #include "Base/Event.h"
-#include "Utils/FileSystem.h"
 #include "Base/Log.h"
 
 namespace Dive
@@ -83,23 +82,22 @@ namespace Dive
 	// 동기 방식 Scene 전환
 	Scene* SceneManager::LoadScene(const std::string& scenePath)
 	{
-		if (Util::FileSystem::FileExists(scenePath))
-		{
-			auto sceneName = Util::FileSystem::GetFilenameWithoutExtension(scenePath);
-			auto newScene = CreateScene(sceneName);
-			if (!newScene)
-				return nullptr;
+		// 매개변수를 const std::filesystem::path로 받으면 여러모로 편하다.
+		if (!std::filesystem::exists(scenePath))
+			return nullptr;
+		
+		auto sceneName = std::filesystem::path(scenePath).stem().string();
+		auto newScene = CreateScene(sceneName);
+		if (!newScene)
+			return nullptr;
 
-			m_pActiveScene = newScene;
+		m_pActiveScene = newScene;
 
-			EVENT_FIRE(eEventType::SceneActivate);
+		EVENT_FIRE(eEventType::SceneActivate);
 
-			if (!newScene->LoadFromFile(scenePath))
-				return nullptr;
+		if (!newScene->LoadFromFile(scenePath))
+			return nullptr;
 
-			return newScene;
-		}
-	
-		return nullptr;
+		return newScene;
 	}
 }

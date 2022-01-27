@@ -97,9 +97,6 @@
     <ClInclude Include="Src\divepch.h">
       <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Utils\Geometry.h">
-      <Filter>Src\Utils</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Base\DiveCore.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
@@ -142,14 +139,8 @@
     <ClInclude Include="Src\DiveEngine.h">
       <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Utils\Math.h">
-      <Filter>Src\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Utils\FileSystem.h">
-      <Filter>Src\Utils</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Utils\String.h">
-      <Filter>Src\Utils</Filter>
+    <ClInclude Include="Src\Math\Math.h">
+      <Filter>Src\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -264,12 +255,6 @@
     <ClCompile Include="Src\Base\Timer.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Utils\FileSystem.cpp">
-      <Filter>Src\Utils</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Utils\String.cpp">
-      <Filter>Src\Utils</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -302,11 +287,11 @@
     <Filter Include="Doc">
       <UniqueIdentifier>{7e215838-d5d9-4ab7-a317-e071ac36ddd1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Utils">
-      <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Base">
       <UniqueIdentifier>{935efe1f-4709-4022-9b1b-d67f83dc83a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Math">
+      <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

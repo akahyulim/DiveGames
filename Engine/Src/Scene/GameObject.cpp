@@ -213,43 +213,4 @@ namespace Dive
 		}
 		return newComponent;
 	}
-
-	// 일단 Scene을 매개변수로 받도록 한다.
-	GameObject* GameObject::CreatePrimitive(ePrimitiveType type, Scene* pScene)
-	{
-		DV_ASSERT(pScene);
-
-		auto pNewGameObject = pScene->CreateGameObject();
-		auto pMeshRenderer = pNewGameObject->AddComponent<MeshRenderer>();
-
-		// 이 곳에서 직접 Mesh를 생성하거나
-		// 생성된 Mesh를 
-		// MeshRenderer에 전달하는 것이 자연스럽다.
-		// 결국 Mesh와 Resource를 어떻게 구현하느냐가 중요하다.
-		// 그리고 이 과정에서 계층구조를 함께 생각해야만 한다.
-		// 또한 이 구조는 ModelImport 과정에도 영향을 미친다.
-
-		switch (type)
-		{
-		case ePrimitiveType::Plane:
-			// Mesh의 Veritces와 Indecies를 CreatePlane에 전달하여 data를 얻은 후 Buffer를 만든다.
-			// 이후 MeshRenderer에 Mesh를 전달한다.
-			break;
-		case ePrimitiveType::Cube:
-			break;
-		case ePrimitiveType::Sphere:
-			break;
-		case ePrimitiveType::Capsule:
-			break;
-		case ePrimitiveType::Cylinder:
-			break;
-
-
-		default:
-			pScene->RemoveGameObject(pNewGameObject);
-			return nullptr;
-		}
-
-		return nullptr;
-	}
 }

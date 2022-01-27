@@ -58,8 +58,6 @@ namespace Dive
 		void MarkForDestruction() { m_bDestructionPending = true; }
 		bool IsPendingDestruction() const { return m_bDestructionPending; }
 
-		static GameObject* CreatePrimitive(ePrimitiveType type, Scene* pScene);
-
 	private:
 	private:
 		Scene* m_pScene = nullptr;

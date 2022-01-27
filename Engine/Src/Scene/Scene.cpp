@@ -4,7 +4,6 @@
 #include "Component/Transform.h"
 #include "Base/Event.h"
 #include "Base/Log.h"
-#include "Utils/FileSystem.h"
 #include "Base/FileStream.h"
 
 
@@ -118,7 +117,7 @@ namespace Dive
 
 		// 이쪽은 이름과 확장자까지 포함된 경로를 받는다.
 
-		if (!Util::FileSystem::FileExists(filepath))
+		if (!std::filesystem::exists(filepath))
 		{
 			return false;
 		}

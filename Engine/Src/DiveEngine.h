@@ -55,8 +55,5 @@
 #include "Scene/Component/Camera.h"
 #include "Scene/Component/Light.h"
 
-//= Utils ========================
-#include "Utils/Math.h"
-#include "Utils/Geometry.h"
-#include "Utils/String.h"
-#include "Utils/FileSystem.h"
+//= Math ==========================
+#include "Math/Math.h"

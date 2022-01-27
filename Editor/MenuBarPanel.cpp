@@ -77,7 +77,7 @@ namespace Dive
 						// 1 순위는 저장된 시작 폴더
 						// 2 순위는 Editor의 실행 폴더
 						// 일단은 Editor의 실행 폴더를 열도록 한다.
-						auto dir = Util::FileSystem::GetWorkingDirectory();
+						auto dir = std::filesystem::current_path().string() + '/';
 
 						char targetFile[MAX_PATH] = "";
 
@@ -110,7 +110,7 @@ namespace Dive
 						// 여긴 우선 순위가 다르다.
 						// 1 순위는 현재 프로젝트 폴더의 Assets\Scenes => 즉, 프로젝트 실행시 저장이 필요하다.
 						// 2 순위는 역시나 Editor의 위치 폴더
-						auto dir = Util::FileSystem::GetWorkingDirectory();
+						auto dir = std::filesystem::current_path().string() + '/';
 
 						char targetFile[MAX_PATH] = "";
 
@@ -164,7 +164,7 @@ namespace Dive
 				{
 					// OPENFILENAME, GetSaveFileName 
 
-					auto dir = Util::FileSystem::GetWorkingDirectory();
+					auto dir = std::filesystem::current_path().string() + '/';
 
 					// 현재 Scene 이름으로 설정해야 한다.
 					char targetFile[MAX_PATH] = "";
@@ -547,7 +547,7 @@ namespace Dive
 		
 			inputName = "NewApplication";
 			// '/'를 '\'로 바꾸고, 마지막엔 해당 토큰이 없었으면 좋겠다.
-			inputDir = Util::FileSystem::GetWorkingDirectory();
+			inputDir = std::filesystem::current_path().string() + '/';
 		}
 
 		ImVec2 center = ImGui::GetMainViewport()->GetCenter();

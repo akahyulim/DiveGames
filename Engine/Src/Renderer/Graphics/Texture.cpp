@@ -1,7 +1,6 @@
 #include "divepch.h"
 #include "Texture.h"
 #include "Base/DiveCore.h"
-#include "Utils/FileSystem.h"
 #include "../Renderer.h"
 #include "Base/Log.h"
 
@@ -133,7 +132,7 @@ namespace Dive
 	bool Texture::LoadFromFile(const std::wstring& filepath, bool generateMips)
 	{
 		// 파일 존재 여부
-		//if (!Util::FileSystem::FileExists(filepath))
+		//if (!std::filesystem::exists(filepath))
 		{
 		//	CORE_ERROR("");
 		//	return false;

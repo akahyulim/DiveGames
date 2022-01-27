@@ -1,7 +1,5 @@
 #include "divepch.h"
 #include "dvTexture2D.h"
-#include "Utils/FileSystem.h"
-#include "Utils/String.h"
 #include "Base/Log.h"
 #include "DirectXTex/DirectXTex.h"
 
@@ -42,14 +40,18 @@ namespace Dive
 	// 이름을 여기에서 저장하는게 맞는 걸까?
 	bool dvTexture2D::LoadFromFile(const std::string& filepath)
 	{
-		if (!Util::FileSystem::FileExists(filepath))
+		// 이 부분도 변경 사항
+		if (!std::filesystem::exists(filepath))
 			return false;
+
+		// string -> wstring
+		std::wstring file(filepath.begin(), filepath.end());
 
 		m_pResource.Reset();
 		m_pShaderResourceView.Reset();
 
 		DirectX::ScratchImage image;
-		if (FAILED(DirectX::LoadFromWICFile(Util::String::Utf8ToUtf16(filepath).c_str(), DirectX::WIC_FLAGS_NONE, nullptr, image)))
+		if (FAILED(DirectX::LoadFromWICFile(file.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, image)))
 		{
 			CORE_ERROR("");
 			return false;

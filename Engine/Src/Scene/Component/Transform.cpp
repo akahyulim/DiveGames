@@ -6,7 +6,7 @@
 #include "Base/DiveCore.h"
 #include "Base/FileStream.h"
 #include "Base/Log.h"
-#include "Utils/Math.h"
+#include "Math/Math.h"
 
 namespace Dive
 {

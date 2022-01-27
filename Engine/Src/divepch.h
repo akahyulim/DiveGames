@@ -11,6 +11,7 @@
 #include <list>
 #include <unordered_map>
 #include <algorithm>
+#include <filesystem>
 
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
