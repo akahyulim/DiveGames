@@ -115,9 +115,6 @@
     <ClInclude Include="Src\Base\Runtime.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Base\ThreadPool.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Base\FileStream.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
@@ -232,9 +229,6 @@
       <Filter>Src\Base</Filter>
     </ClCompile>
     <ClCompile Include="Src\Base\Runtime.cpp">
-      <Filter>Src\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Base\ThreadPool.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
     <ClCompile Include="Src\Base\FileStream.cpp">

@@ -1,5 +1,5 @@
 #pragma once
-#include "../Renderer/Graphics/GraphicsDevice.h"
+#include "Renderer/Graphics/GraphicsDevice.h"
 #include "Settings.h"
 
 

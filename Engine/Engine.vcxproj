@@ -178,7 +178,6 @@
     <ClInclude Include="Src\Base\RenderPath.h" />
     <ClInclude Include="Src\Base\RenderPath3D_Legacy.h" />
     <ClInclude Include="Src\Base\Runtime.h" />
-    <ClInclude Include="Src\Base\ThreadPool.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Base\FileStream.h" />
     <ClInclude Include="Src\Base\FormatHelper.h" />
@@ -224,7 +223,6 @@
     </ClCompile>
     <ClCompile Include="Src\Base\RenderPath3D_Legacy.cpp" />
     <ClCompile Include="Src\Base\Runtime.cpp" />
-    <ClCompile Include="Src\Base\ThreadPool.cpp" />
     <ClCompile Include="Src\Base\FileStream.cpp" />
     <ClCompile Include="Src\Base\FormatHelper.cpp" />
     <ClCompile Include="Src\Base\IniHelper.cpp" />

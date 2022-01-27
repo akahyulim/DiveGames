@@ -9,9 +9,9 @@ namespace Dive
 		FullScreen,
 	};
 
-	// 그냥 다 때려박고 싱글톤으로 만들자.
-	// 해상도, BackBuffer 크기, 윈도우 크기, 그리고 RenderTarget의 크기는 다 다를 수 있다.
-	// 물론 Settings는 해상도와 BackBuffer 크기 그리고 윈도우 크기만 다루면 된다.
+	// 생각을 좀 해보니 클래스보단 구조체가 어울릴 것 같다.
+	// 파일화는 Runtime에서 직접 해도 된다.
+	// 그렇다면 WindowData와 GraphicsData 둘로 나누어서 관리할까나?
 	class Settings
 	{
 	public:
@@ -23,16 +23,14 @@ namespace Dive
 
 		void Initialize(const std::string& title);
 
-		void Default();
-
 		void Save();
 		void Load();
 
-		unsigned int GetWidth() const { return m_Width; }
-		void SetWidth(unsigned int width);
+		uint32_t GetWidth() const { return m_Width; }
+		void SetWidth(uint32_t width);
 
-		unsigned int GetHeight() const { return m_Height; }
-		void SetHeight(unsigned int height);
+		uint32_t GetHeight() const { return m_Height; }
+		void SetHeight(uint32_t height);
 
 		bool IsMaximize() const { return m_bMaximize; }
 		void SetMaximize(bool maximize) { m_bMaximize = maximize; }
@@ -46,16 +44,15 @@ namespace Dive
 		eWindowModes GetWindowMode();
 		void SetWindowMode(eWindowModes mode);
 
-
 	private:
 		std::string m_FileName;
 
-		// window
-		unsigned int m_Width;
-		unsigned int m_Height;
-		bool m_bMaximize;
-		bool m_bFullScreen;
-		bool m_bBorderless;
-		eWindowModes m_WindowMode;
+		// Window
+		uint32_t m_Width			= 800;
+		uint32_t m_Height			= 600;
+		bool m_bMaximize			= false;
+		bool m_bFullScreen			= false;
+		bool m_bBorderless			= false;
+		eWindowModes m_WindowMode	= eWindowModes::Windowed;
 	};
 }

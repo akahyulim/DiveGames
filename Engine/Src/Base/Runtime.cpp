@@ -1,15 +1,14 @@
 #include "divepch.h"
 #include "Runtime.h"
-#include "ThreadPool.h"
 #include "RenderPath.h"
 #include "Event.h"
-#include "../Renderer/Renderer.h"
-#include "../Resource/ResourceManager.h"
-#include "../Scene/SceneManager.h"
-#include "../Input/Input.h"
 #include "IniHelper.h"
 #include "Timer.h"
 #include "Log.h"
+#include "Renderer/Renderer.h"
+#include "Resource/ResourceManager.h"
+#include "Scene/SceneManager.h"
+#include "Input/Input.h"
 
 
 using namespace std;
