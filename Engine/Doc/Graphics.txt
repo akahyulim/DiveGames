@@ -1,4 +1,0 @@
-
-- 생성자의 매개변수를 어떻게 할 것인가?
-- Frame Rate 전달 및 적용 방법은?
-- Backbuffer Count 전달 및 적용 방법은?
