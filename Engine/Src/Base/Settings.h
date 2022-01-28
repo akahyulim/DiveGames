@@ -9,9 +9,8 @@ namespace Dive
 		FullScreen,
 	};
 
-	// 생각을 좀 해보니 클래스보단 구조체가 어울릴 것 같다.
-	// 파일화는 Runtime에서 직접 해도 된다.
-	// 그렇다면 WindowData와 GraphicsData 둘로 나누어서 관리할까나?
+	// 일단 setting 자체는 app에 이관한다.
+	// 하지만 현재 core부터 수정할 계획이라 이 부분은 일단 사용토록 하자.
 	class Settings
 	{
 	public:

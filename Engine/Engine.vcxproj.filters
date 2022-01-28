@@ -118,9 +118,6 @@
     <ClInclude Include="Src\Base\FileStream.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Base\FormatHelper.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Base\IniHelper.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
@@ -232,9 +229,6 @@
       <Filter>Src\Base</Filter>
     </ClCompile>
     <ClCompile Include="Src\Base\FileStream.cpp">
-      <Filter>Src\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Base\FormatHelper.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
     <ClCompile Include="Src\Base\IniHelper.cpp">
