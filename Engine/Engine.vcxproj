@@ -183,7 +183,7 @@
     <ClInclude Include="Src\Base\IniHelper.h" />
     <ClInclude Include="Src\Base\Log.h" />
     <ClInclude Include="Src\Base\Settings.h" />
-    <ClInclude Include="Src\Base\Timer.h" />
+    <ClInclude Include="Src\Base\Time.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Renderer\dvMesh.h" />
     <ClInclude Include="Src\Renderer\GraphicsEnums.h" />
@@ -226,7 +226,7 @@
     <ClCompile Include="Src\Base\IniHelper.cpp" />
     <ClCompile Include="Src\Base\Log.cpp" />
     <ClCompile Include="Src\Base\Settings.cpp" />
-    <ClCompile Include="Src\Base\Timer.cpp" />
+    <ClCompile Include="Src\Base\Time.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\Renderer\dvMesh.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp" />

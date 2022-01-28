@@ -78,7 +78,7 @@ namespace Dive
 		pFileStream->Write(m_LocalPosition);
 		pFileStream->Write(m_LocalRotation);
 		pFileStream->Write(m_LocalScale);
-		pFileStream->Write(m_pParent ? m_pParent->GetGameObject()->GetInstanceID() : 0);
+		pFileStream->Write(m_pParent ? m_pParent->GetGameObject()->GetID() : 0);
 	}
 
 	void Transform::Deserialize(FileStream* pFileStream)

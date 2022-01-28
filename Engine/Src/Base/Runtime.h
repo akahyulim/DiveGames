@@ -2,20 +2,18 @@
 #include "Renderer/Graphics/GraphicsDevice.h"
 #include "Settings.h"
 
-
 namespace Dive
 {
 	class SceneManager;
 	class ResourceManager;
 	class RenderPath;
 
-	// m_bLockFrame은 VSync와도 연관있다.
-
+	// Hazle의 경우 singleton이다.
 	class Runtime
 	{
 	public:
-		Runtime();
-		virtual ~Runtime();
+		Runtime()			= default;
+		virtual ~Runtime()	= default;
 
 		virtual bool Initialize();
 
@@ -32,8 +30,8 @@ namespace Dive
 		HWND GetWindowHandle() { return m_hWnd; }
 		void SetWindow(HWND windowHandle, bool fullScreen);
 
-		float GetTargetFrame() const { return m_TargetFPS; }
-		void SetTargetFrame(float fps) { m_TargetFPS = fps; }
+		float GetTargetFrameRate() const { return m_TargetFrameRate; }
+		void SetTargetFrameRate(float fps) { m_TargetFrameRate = fps; }
 
 		bool IsFrameLock() const { return m_bFrameLock; }
 		void SetFrameLock(bool enable) { m_bFrameLock = enable; }
@@ -49,8 +47,6 @@ namespace Dive
 
 		void OnResizeResolution(unsigned int data);
 
-		// get systems
-
 	protected:
 
 	protected:
@@ -61,8 +57,8 @@ namespace Dive
 
 		RenderPath* m_pActivePath = nullptr;
 
-		float m_DeltaTime = 0.0f;
-		float m_TargetFPS = 60.0f;
+		// 이 두 값은 Runtime이 관리하는 게 맞는 듯?
+		float m_TargetFrameRate = 60.0f;
 		bool m_bFrameLock = false;
 
 		bool m_bInitialized = false;

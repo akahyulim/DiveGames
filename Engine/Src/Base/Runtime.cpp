@@ -1,39 +1,22 @@
 #include "divepch.h"
 #include "Runtime.h"
+#include "DiveCore.h"
 #include "RenderPath.h"
 #include "Event.h"
 #include "IniHelper.h"
-#include "Timer.h"
+#include "Time.h"
 #include "Log.h"
 #include "Renderer/Renderer.h"
 #include "Resource/ResourceManager.h"
 #include "Scene/SceneManager.h"
 #include "Input/Input.h"
 
-
-using namespace std;
-
 namespace Dive
 {
-	Runtime::Runtime()
-	{
-		m_AppTitle = "diveEngine";
-	}
-
-	Runtime::~Runtime()
-	{
-	}
-
-	//==========================================================================================//
-	// 1. 태생적으로 순서에 민감할 수 밖에 없다.												//
-	// 2. 추후 Graphics Device Setting와 같이 추가 설정 객체가 필요할 수 있다.					//
-	// 3. Multi-Thread를 적용하지 않았다.														//
-	// 4. Renderer와 Graphics의 생성 과정을 수정해야 한다.										//
-	// 참고한 인터페이스는 멀티 플랫폼 지원을 염두해 둔 것이다.									//
-	//==========================================================================================//
+	// 그냥 여기에서 윈도우 데이터를 받는 편이 나을 것 같은데...
 	bool Runtime::Initialize()
 	{
-		assert(m_hWnd != 0);
+		DV_ASSERT(m_hWnd);
 
 		if (m_bInitialized)
 		{
@@ -41,8 +24,9 @@ namespace Dive
 		}
 
 		Log::Initialize();
-		Settings::GetInstance().Initialize(m_AppTitle);
+		Time::Initialize();
 
+		Settings::GetInstance().Initialize(m_AppTitle);
 		{
 			auto& settings = Settings::GetInstance();
 			eWindowModes mode = settings.GetWindowMode();
@@ -57,23 +41,17 @@ namespace Dive
 			ModifyWindow(mode, width, height, maximize);
 		}
 
-		// 이 부분을 아래 Renderer::GetInstance().Initialize()에 통합하자.
-		//auto& renderer = Renderer::GetInstance();
-		//renderer.SetGraphicsDevice(make_shared<GraphicsDevice>(m_hWnd, m_bFullScreen));
-
-		TimeManager::GetInstance().Initialize();
 		Renderer::GetInstance().Initialize(m_hWnd, m_bFullScreen);
 		Input::GetInstance().Initialize(m_hWnd);
 
 		EVENT_SUBSCRIBE(eEventType::ChangedResolution, EVENT_HANDLE_DATA(OnResizeResolution));
-
-		CORE_TRACE("Runtime::Initialize()");
 
 		return true;
 	}
 
 	void Runtime::Run()
 	{
+		// 윈도우 핸들을 받기위해 초기화를 이 곳에 둔 것 같은데 이상하다.
 		if (!m_bInitialized)
 		{
 			m_bInitialized = Initialize();
@@ -85,9 +63,9 @@ namespace Dive
 			}
 		}
 
-		TimeManager::GetInstance().Update();
+		Time::Update();
 
-		auto delta = TimeManager::GetInstance().GetDeltaTimeSec();
+		auto delta = Time::GetDeltaTimeSec();
 
 		static float fixedFrameAccumulator = 0.0f;
 		static float deltaFrameAccumulator = 0.0f;
@@ -98,7 +76,7 @@ namespace Dive
 			fixedFrameAccumulator += delta;
 			deltaFrameAccumulator += delta;
 
-			if (fixedFrameAccumulator >= TimeManager::GetInstance().GetFixedFrameRate())
+			if (fixedFrameAccumulator >= Time::GetFixedFrameRate())
 			{
 				FixedUpdate();
 				fixedFrameAccumulator = 0.0f;
@@ -106,7 +84,7 @@ namespace Dive
 
 			if (m_bFrameLock)
 			{
-				if (deltaFrameAccumulator >= static_cast<float>(1.0f / m_TargetFPS))
+				if (deltaFrameAccumulator >= static_cast<float>(1.0f / m_TargetFrameRate))
 				{
 					Update(deltaFrameAccumulator);
 					Input::GetInstance().Update();
@@ -201,8 +179,6 @@ namespace Dive
 			}
 			m_pActivePath = pPath;
 		}
-
-		CORE_TRACE("Runtime::ActivatePath()");
 	}
 	
 	void Runtime::SetWindow(HWND windowHandle, bool fullScreen)
@@ -211,10 +187,6 @@ namespace Dive
 		m_bFullScreen = fullScreen;
 	}
 
-	//==================================================================================================//
-	// 1. Virtual로 구현했다. Editor는 오직 Windowed만 필요하기 때문이다.								//
-	// 2. FullScreen의 Size는 크기가 아니라 해상도다. 이는 추후 좀 더 생각해보자.						//
-	//==================================================================================================//										
 	void Runtime::ModifyWindow(eWindowModes mode, unsigned int width, unsigned int height, bool maximize)
 	{
 		unsigned int posX = 0;

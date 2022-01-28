@@ -1,7 +1,7 @@
 #include "divepch.h"
 #include "RenderPath3D_Legacy.h"
 #include "Event.h"
-#include "Timer.h"
+#include "Time.h"
 #include "Log.h"
 #include "Renderer/Graphics/GraphicsDevice.h"
 #include "Renderer/Renderer.h"
@@ -97,7 +97,7 @@ namespace Dive
 
 		// scene update
 		{
-			auto timeScale = TimeManager::GetInstance().GetTimeScale();
+			auto timeScale = Time::GetTimeScale();
 			m_pScene->Update(deltaTime * timeScale);
 		}
 

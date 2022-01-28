@@ -23,7 +23,7 @@ namespace Dive
 	{
 		if (pParent)
 		{
-			if (pParent->GetInstanceID() == GetInstanceID())
+			if (pParent->GetID() == GetID())
 				return;
 		}
 
@@ -31,14 +31,14 @@ namespace Dive
 		{
 			if (pParent)
 			{
-				if (pParent->GetInstanceID() == GetParent()->GetInstanceID())
+				if (pParent->GetID() == GetParent()->GetID())
 					return;
 			}
 
 			auto& sibling = GetParent()->m_Children;
 			for (auto it = sibling.begin(); it != sibling.end();)
 			{
-				if ((*it)->GetInstanceID() == GetInstanceID())
+				if ((*it)->GetID() == GetID())
 				{
 					CORE_TRACE("{0:s}가 {1:s}(을)를 독립시켰습니다.", GetParent()->GetGameObject()->GetName(), GetGameObject()->GetName());
 
@@ -87,7 +87,7 @@ namespace Dive
 		if (!pParent)
 			return false;
 		
-		if (pParent->GetInstanceID() == GetInstanceID())
+		if (pParent->GetID() == GetID())
 			return true;
 
 		if (!HasParent())
@@ -95,7 +95,7 @@ namespace Dive
 
 		for (auto child : pParent->GetChildren())
 		{
-			if (child->GetInstanceID() == GetInstanceID())
+			if (child->GetID() == GetID())
 				return true;
 		}
 

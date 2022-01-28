@@ -31,7 +31,7 @@ namespace Dive
 
         if (ImGui::IsMouseReleased(0) && m_pClickedObject)
         {
-            if (m_pHoveredObject && m_pHoveredObject->GetInstanceID() == m_pClickedObject->GetInstanceID())
+            if (m_pHoveredObject && m_pHoveredObject->GetID() == m_pClickedObject->GetID())
             {
                 setSelectedGameObject(m_pClickedObject);
             }
@@ -96,12 +96,12 @@ namespace Dive
        
         if (m_pSelectedObject)
         {
-            nodeFlags |= (m_pSelectedObject->GetInstanceID() == pObject->GetInstanceID()) ? ImGuiTreeNodeFlags_Selected : 0;
+            nodeFlags |= (m_pSelectedObject->GetID() == pObject->GetID()) ? ImGuiTreeNodeFlags_Selected : 0;
         }
 
         // 이걸 굳이 if로 만들지 않은 이유는 무었일까?
         // 아래의 두 부분 때문인 것 같은데...
-        bool bNodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)pObject->GetInstanceID(), nodeFlags, pObject->GetName().c_str());
+        bool bNodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)pObject->GetID(), nodeFlags, pObject->GetName().c_str());
 
         if (ImGui::IsItemHovered(ImGuiHoveredFlags_RectOnly))
         {
@@ -165,12 +165,12 @@ namespace Dive
         {
             // 아.. m_payload를 멤버 변수로 만들 필요가 없구나.
             // 아닌가... 어딘가에 저장되어야 있어야 하나?
-            m_payload.data = pObject->GetInstanceID();
+            m_payload.data = pObject->GetID();
             m_payload.type = eDragPayloadType::GameObject;
             dragDrop.DragPayload(m_payload);
             dragDrop.DragEnd();
 
-            APP_TRACE("Drag Target Name: {:s}, ID: {:d}", pObject->GetName(), pObject->GetInstanceID());
+            APP_TRACE("Drag Target Name: {:s}, ID: {:d}", pObject->GetName(), pObject->GetID());
         }
 
         // 드랍일 경우 적재 오브젝트를 확인하고, 현재 오브젝트와 다를 경우 현재 오브젝트를 부모로 설정한다.
@@ -182,14 +182,14 @@ namespace Dive
                 APP_TRACE("Payload Data id: {:d}", id);
 
                 // 현재 이 놈이 안맞는다...
-                APP_TRACE("Drop Payload Name: {:s}, ID: {:d}", droppedObj->GetName(), droppedObj->GetInstanceID());
+                APP_TRACE("Drop Payload Name: {:s}, ID: {:d}", droppedObj->GetName(), droppedObj->GetID());
 
-                if (droppedObj->GetInstanceID() != pObject->GetInstanceID())
+                if (droppedObj->GetID() != pObject->GetID())
                 {
                     droppedObj->GetComponent<Transform>()->SetParent(
                         pObject->GetComponent<Transform>());
 
-                    APP_TRACE("Drop Target Name: {:s}, ID: {:d}", pObject->GetName(), pObject->GetInstanceID());
+                    APP_TRACE("Drop Target Name: {:s}, ID: {:d}", pObject->GetName(), pObject->GetID());
                 }
             }
         }

@@ -127,14 +127,14 @@
     <ClInclude Include="Src\Base\Settings.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Base\Timer.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
     <ClInclude Include="Src\DiveEngine.h">
       <Filter>Src</Filter>
     </ClInclude>
     <ClInclude Include="Src\Math\Math.h">
       <Filter>Src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\Time.h">
+      <Filter>Src\Base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -240,7 +240,7 @@
     <ClCompile Include="Src\Base\Settings.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Base\Timer.cpp">
+    <ClCompile Include="Src\Base\Time.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
   </ItemGroup>

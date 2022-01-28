@@ -4,7 +4,6 @@
 #include <atomic>
 #include <typeinfo>
 
-
 namespace Dive
 {
 	static const uint32_t INVALID_ID = 0;
@@ -15,31 +14,31 @@ namespace Dive
 		Object()
 		{
 			static std::atomic<uint32_t> next(INVALID_ID + 1);
-			m_instanceID = next.fetch_add(1);
+			m_ID = next.fetch_add(1);
 		}
 		virtual ~Object() {}
 
-		uint32_t GetInstanceID() const { return m_instanceID; }
-		void SetInstanceID(uint32_t id) 
+		uint32_t GetID() const { return m_ID; }
+		void SetID(uint32_t id) 
 		{ 
 			if (INVALID_ID == id)
 			{
-				CORE_ERROR("");
+				CORE_WARN("잘못된 ID로 설정을 시도하였습니다.");
 				return;
 			}
 
-			m_instanceID = id;
+			m_ID = id;
 		}
 
-		std::string GetName() const { return m_name; }
-		void SetName(const std::string& name) { m_name = name; }
+		std::string GetName() const { return m_Name; }
+		void SetName(const std::string& name) { m_Name = name; }
 
 	private:
 		Object(const Object&)				= delete;
 		Object& operator=(const Object&)	= delete;
 
 	private:
-		uint32_t m_instanceID	= INVALID_ID;
-		std::string m_name		= "";
+		uint32_t m_ID		= INVALID_ID;
+		std::string m_Name	= "";
 	};
 }

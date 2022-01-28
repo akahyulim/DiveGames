@@ -20,14 +20,14 @@
     <Filter Include="Editor\UI">
       <UniqueIdentifier>{29ffc6bf-a814-41a4-8981-50b9ecd77de7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Editor\Core">
-      <UniqueIdentifier>{0c323b41-1df6-4e20-be13-257655aad3f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Editor\Utility">
-      <UniqueIdentifier>{f1635951-6845-4a6f-b02d-21c56b590e90}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Editor\UI\Panels">
       <UniqueIdentifier>{67e9040f-93a3-4811-8a39-5eb6aad52c62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor\Base">
+      <UniqueIdentifier>{0c323b41-1df6-4e20-be13-257655aad3f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Editor\Utils">
+      <UniqueIdentifier>{f1635951-6845-4a6f-b02d-21c56b590e90}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -92,16 +92,16 @@
       <Filter>External\ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Editor.h">
-      <Filter>Editor\Core</Filter>
+      <Filter>Editor\Base</Filter>
     </ClInclude>
     <ClInclude Include="RenderPathEditor.h">
-      <Filter>Editor\Core</Filter>
+      <Filter>Editor\Base</Filter>
     </ClInclude>
     <ClInclude Include="RenderPath3D_Editor.h">
-      <Filter>Editor\Core</Filter>
+      <Filter>Editor\Base</Filter>
     </ClInclude>
     <ClInclude Include="Geometry.h">
-      <Filter>Editor\Utility</Filter>
+      <Filter>Editor\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -164,13 +164,13 @@
       <Filter>External\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="Editor.cpp">
-      <Filter>Editor\Core</Filter>
+      <Filter>Editor\Base</Filter>
     </ClCompile>
     <ClCompile Include="RenderPathEditor.cpp">
-      <Filter>Editor\Core</Filter>
+      <Filter>Editor\Base</Filter>
     </ClCompile>
     <ClCompile Include="RenderPath3D_Editor.cpp">
-      <Filter>Editor\Core</Filter>
+      <Filter>Editor\Base</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

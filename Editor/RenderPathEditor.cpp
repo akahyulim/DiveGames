@@ -26,7 +26,7 @@ namespace Dive
 
 		// Scene Update
 		{
-			auto timeScale = TimeManager::GetInstance().GetTimeScale();
+			auto timeScale = Time::GetTimeScale();
 			m_pScene->Update(deltaTime * timeScale);
 		}
 

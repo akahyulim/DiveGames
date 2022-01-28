@@ -99,7 +99,7 @@ namespace Dive
 
 		for (const auto& gameObject : rootGameObjects)
 		{
-			stream.Write(gameObject->GetInstanceID());
+			stream.Write(gameObject->GetID());
 		}
 		for (const auto& gameObject : rootGameObjects)
 		{
@@ -134,7 +134,7 @@ namespace Dive
 		for (unsigned int i = 0; i != rootCount; i++)
 		{
 			auto gameObject = CreateGameObject();
-			gameObject->SetInstanceID(stream.ReadAs<unsigned int>());
+			gameObject->SetID(stream.ReadAs<unsigned int>());
 		}
 		for (unsigned int i = 0; i != rootCount; i++)
 		{
@@ -178,7 +178,7 @@ namespace Dive
 	{
 		for (auto gameObject : m_GameObjects)
 		{
-			if (gameObject->GetInstanceID() == id)
+			if (gameObject->GetID() == id)
 				return gameObject;
 		}
 
@@ -233,7 +233,7 @@ namespace Dive
 
 		for (auto it = m_GameObjects.begin(); it != m_GameObjects.end();)
 		{
-			if ((*it)->GetInstanceID() == pGameObjct->GetInstanceID())
+			if ((*it)->GetID() == pGameObjct->GetID())
 			{
 				delete (*it);
 				(*it) = nullptr;

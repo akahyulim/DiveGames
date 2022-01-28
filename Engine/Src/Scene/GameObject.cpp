@@ -46,7 +46,7 @@ namespace Dive
 		// basic
 		{
 			pFileStream->Write(m_bActive);
-			pFileStream->Write(GetInstanceID());
+			pFileStream->Write(GetID());
 			pFileStream->Write(GetName());
 		}
 
@@ -57,7 +57,7 @@ namespace Dive
 			{
 				// eComponentType을 저장토록 수정해야 한다.
 				pFileStream->Write(static_cast<unsigned int>(pComponent->GetType()));
-				pFileStream->Write(pComponent->GetInstanceID());
+				pFileStream->Write(pComponent->GetID());
 			}
 			for (const auto pComponent : m_Components)
 			{
@@ -72,7 +72,7 @@ namespace Dive
 
 			for (const auto pChild : children)
 			{
-				pFileStream->Write(pChild->GetGameObject()->GetInstanceID());
+				pFileStream->Write(pChild->GetGameObject()->GetID());
 			}
 			for (const auto pChild : children)
 			{
@@ -97,7 +97,7 @@ namespace Dive
 			pFileStream->Read(&m_bActive);
 			unsigned int id;
 			pFileStream->Read(&id);
-			SetInstanceID(id);
+			SetID(id);
 			std::string name;
 			pFileStream->Read(&name);
 			SetName(name);
@@ -130,7 +130,7 @@ namespace Dive
 			for (unsigned int i = 0; i != childrenCount; i++)
 			{
 				auto pChild = GetScene()->CreateGameObject(true);
-				pChild->SetInstanceID(pFileStream->ReadAs<unsigned int>());
+				pChild->SetID(pFileStream->ReadAs<unsigned int>());
 
 				children.emplace_back(pChild);
 			}
@@ -209,7 +209,7 @@ namespace Dive
 		if (id != 0)
 		{
 			if(newComponent)
-				newComponent->SetInstanceID(id);
+				newComponent->SetID(id);
 		}
 		return newComponent;
 	}

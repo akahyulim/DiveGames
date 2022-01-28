@@ -74,7 +74,7 @@ namespace Dive
 			auto it = m_Resources.begin();
 			for (it; it != m_Resources.end();)
 			{
-				if ((*it)->GetInstanceID() == pResource->GetInstanceID())
+				if ((*it)->GetID() == pResource->GetID())
 				{
 					DV_DELETE(*it);
 					it = m_Resources.erase(it);
