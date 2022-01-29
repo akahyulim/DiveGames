@@ -15,8 +15,8 @@
 namespace Dive
 {
 	Editor::Editor()
+		: Runtime("DiveEditor")
 	{
-		m_AppTitle = "DiveEditor";
 	}
 
 	Editor::~Editor()

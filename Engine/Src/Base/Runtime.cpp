@@ -13,6 +13,23 @@
 
 namespace Dive
 {
+	Runtime* Runtime::s_pInstance = nullptr;
+
+	Runtime::Runtime(const std::string& name)
+		: m_AppName(name)
+	{
+		DV_ASSERT(!s_pInstance);
+		s_pInstance = this;
+
+		Log::Initialize();
+		Time::Initialize();
+	}
+
+	Runtime::~Runtime()
+	{
+		// static class 중 몇 가지는 직접 Shutdown() 호출
+	}
+
 	// 그냥 여기에서 윈도우 데이터를 받는 편이 나을 것 같은데...
 	bool Runtime::Initialize()
 	{
@@ -23,10 +40,7 @@ namespace Dive
 			return false;
 		}
 
-		Log::Initialize();
-		Time::Initialize();
-
-		Settings::GetInstance().Initialize(m_AppTitle);
+		Settings::GetInstance().Initialize(m_AppName);
 		{
 			auto& settings = Settings::GetInstance();
 			eWindowModes mode = settings.GetWindowMode();
@@ -181,12 +195,15 @@ namespace Dive
 		}
 	}
 	
+	// 이것도 추후 필요 없을 것 같다.
 	void Runtime::SetWindow(HWND windowHandle, bool fullScreen)
 	{
 		m_hWnd = windowHandle;
 		m_bFullScreen = fullScreen;
 	}
 
+	// 이건 굳이 필요 없을 것 같다.
+	// App에서 Window를 제어하는 것이 더 직관적이다.
 	void Runtime::ModifyWindow(eWindowModes mode, unsigned int width, unsigned int height, bool maximize)
 	{
 		unsigned int posX = 0;

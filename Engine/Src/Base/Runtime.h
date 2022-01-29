@@ -8,12 +8,11 @@ namespace Dive
 	class ResourceManager;
 	class RenderPath;
 
-	// Hazle의 경우 singleton이다.
 	class Runtime
 	{
 	public:
-		Runtime()			= default;
-		virtual ~Runtime()	= default;
+		Runtime(const std::string& name = "Dive App");
+		virtual ~Runtime();
 
 		virtual bool Initialize();
 
@@ -26,6 +25,8 @@ namespace Dive
 
 		void ActivatePath(RenderPath* pPath);
 		RenderPath* GetActivePath() { return m_pActivePath; }
+
+		static Runtime& Get() { return *s_pInstance; }
 
 		HWND GetWindowHandle() { return m_hWnd; }
 		void SetWindow(HWND windowHandle, bool fullScreen);
@@ -50,7 +51,9 @@ namespace Dive
 	protected:
 
 	protected:
-		std::string m_AppTitle;
+		static Runtime* s_pInstance;
+
+		std::string m_AppName;
 
 		HWND m_hWnd = 0;
 		bool m_bFullScreen = false;

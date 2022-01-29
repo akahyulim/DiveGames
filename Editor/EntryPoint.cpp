@@ -15,7 +15,6 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 HINSTANCE hInst;                                // 현재 인스턴스입니다.
 WCHAR szTitle[MAX_LOADSTRING];                  // 제목 표시줄 텍스트입니다.
 WCHAR szWindowClass[MAX_LOADSTRING];            // 기본 창 클래스 이름입니다.
-Dive::Editor* g_pEditor = nullptr;
 
 // 이 코드 모듈에 포함된 함수의 선언을 전달합니다:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -36,8 +35,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     AllocConsole();
 #endif
     
-    Dive::Editor diveEditor;
-    g_pEditor = &diveEditor;
+    auto pDiveEditor = new Dive::Editor();
 
     // 전역 문자열을 초기화합니다.
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -65,12 +63,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         else
         {
-            diveEditor.Run();
+            pDiveEditor->Run();
         }
     }
 
-    APP_TRACE("DiveEditor를 종료합니다.");
-    g_pEditor = nullptr;
+    delete pDiveEditor;
 
 #ifdef _DEBUG
     system("pause");
@@ -135,7 +132,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-   g_pEditor->SetWindow(hWnd, false);
+   Dive::Runtime::Get().SetWindow(hWnd, false);
 
    ShowWindow(hWnd, SW_HIDE);
   
