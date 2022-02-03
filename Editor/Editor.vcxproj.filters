@@ -1,176 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="리소스 파일">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Src">
+      <UniqueIdentifier>{6c4475a9-78d7-4cc3-8c81-152141842b2d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Editor">
-      <UniqueIdentifier>{c49de30f-27f1-4b2b-b7f1-3a76018371e2}</UniqueIdentifier>
+    <Filter Include="Src\Base">
+      <UniqueIdentifier>{cf59ce6a-6abc-49a9-98e8-4fc8056cc824}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External">
-      <UniqueIdentifier>{ba3b0f29-0b34-4781-ab3a-4c0c95b8e842}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\ImGui">
-      <UniqueIdentifier>{58dbc075-befa-49d6-9159-c44e1981ff73}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Editor\Window">
-      <UniqueIdentifier>{6129e17f-6c0e-4f72-99d4-1e86baa9c64b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Editor\UI">
-      <UniqueIdentifier>{29ffc6bf-a814-41a4-8981-50b9ecd77de7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Editor\UI\Panels">
-      <UniqueIdentifier>{67e9040f-93a3-4811-8a39-5eb6aad52c62}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Editor\Base">
-      <UniqueIdentifier>{0c323b41-1df6-4e20-be13-257655aad3f6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Editor\Utils">
-      <UniqueIdentifier>{f1635951-6845-4a6f-b02d-21c56b590e90}</UniqueIdentifier>
+    <Filter Include="Src\Panels">
+      <UniqueIdentifier>{46de50d0-2e8e-47d8-8af1-924b7bc98c37}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h">
-      <Filter>Editor\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>Editor\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>Editor\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="EntryPoint.h">
-      <Filter>Editor\Window</Filter>
-    </ClInclude>
-    <ClInclude Include="Panel.h">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imconfig.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imgui.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imgui_internal.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imgui_impl_dx11.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imgui_impl_win32.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imstb_rectpack.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imstb_textedit.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imstb_truetype.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="AssetPanel.h">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="MenuBarPanel.h">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="InspectorPanel.h">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="HierarchyPanel.h">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="ScenePanel.h">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="DragDrop.h">
-      <Filter>Editor\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="External\ImGui\imgui_stdlib.h">
-      <Filter>External\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor.h">
-      <Filter>Editor\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderPathEditor.h">
-      <Filter>Editor\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="RenderPath3D_Editor.h">
-      <Filter>Editor\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Geometry.h">
-      <Filter>Editor\Utils</Filter>
-    </ClInclude>
+    <ClCompile Include="Src\Base\Editor.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\Window.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\main.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="Editor.rc">
-      <Filter>리소스 파일</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="small.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
-    <Image Include="Editor.ico">
-      <Filter>리소스 파일</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="EntryPoint.cpp">
-      <Filter>Editor\Window</Filter>
-    </ClCompile>
-    <ClCompile Include="External\ImGui\imgui.cpp">
-      <Filter>External\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="External\ImGui\imgui_demo.cpp">
-      <Filter>External\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="External\ImGui\imgui_draw.cpp">
-      <Filter>External\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="External\ImGui\imgui_tables.cpp">
-      <Filter>External\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="External\ImGui\imgui_widgets.cpp">
-      <Filter>External\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="External\ImGui\imgui_impl_dx11.cpp">
-      <Filter>External\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="External\ImGui\imgui_impl_win32.cpp">
-      <Filter>External\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="Panel.cpp">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetPanel.cpp">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="MenuBarPanel.cpp">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="InspectorPanel.cpp">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="HierarchyPanel.cpp">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="ScenePanel.cpp">
-      <Filter>Editor\UI\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="External\ImGui\imgui_stdlib.cpp">
-      <Filter>External\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="Editor.cpp">
-      <Filter>Editor\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderPathEditor.cpp">
-      <Filter>Editor\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="RenderPath3D_Editor.cpp">
-      <Filter>Editor\Base</Filter>
-    </ClCompile>
+    <ClInclude Include="Src\Base\Editor.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\Window.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

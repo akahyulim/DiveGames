@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{e7a1c56e-0b4f-400c-8be2-0a62764af59a}</ProjectGuid>
+    <ProjectGuid>{7845b01c-f5c4-49ba-9365-e202cccbecc2}</ProjectGuid>
     <RootNamespace>Editor</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -88,11 +88,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -102,11 +102,11 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -116,17 +116,15 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>../Engine;../Engine/External;External;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../Engine/Src;../Engine/External;Base;External;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>../Engine/External;External/Libs;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -135,73 +133,29 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AssetPanel.h" />
-    <ClInclude Include="DragDrop.h" />
-    <ClInclude Include="External\ImGui\imgui_stdlib.h" />
-    <ClInclude Include="Geometry.h" />
-    <ClInclude Include="InspectorPanel.h" />
-    <ClInclude Include="Editor.h" />
-    <ClInclude Include="EntryPoint.h" />
-    <ClInclude Include="External\ImGui\imconfig.h" />
-    <ClInclude Include="External\ImGui\imgui.h" />
-    <ClInclude Include="External\ImGui\imgui_impl_dx11.h" />
-    <ClInclude Include="External\ImGui\imgui_impl_win32.h" />
-    <ClInclude Include="External\ImGui\imgui_internal.h" />
-    <ClInclude Include="External\ImGui\imstb_rectpack.h" />
-    <ClInclude Include="External\ImGui\imstb_textedit.h" />
-    <ClInclude Include="External\ImGui\imstb_truetype.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="RenderPathEditor.h" />
-    <ClInclude Include="RenderPath3D_Editor.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="ScenePanel.h" />
-    <ClInclude Include="HierarchyPanel.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="Panel.h" />
-    <ClInclude Include="MenuBarPanel.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="AssetPanel.cpp" />
-    <ClCompile Include="External\ImGui\imgui_stdlib.cpp" />
-    <ClCompile Include="InspectorPanel.cpp" />
-    <ClCompile Include="Editor.cpp" />
-    <ClCompile Include="EntryPoint.cpp" />
-    <ClCompile Include="External\ImGui\imgui.cpp" />
-    <ClCompile Include="External\ImGui\imgui_demo.cpp" />
-    <ClCompile Include="External\ImGui\imgui_draw.cpp" />
-    <ClCompile Include="External\ImGui\imgui_impl_dx11.cpp" />
-    <ClCompile Include="External\ImGui\imgui_impl_win32.cpp" />
-    <ClCompile Include="External\ImGui\imgui_tables.cpp" />
-    <ClCompile Include="External\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="MenuBarPanel.cpp" />
-    <ClCompile Include="RenderPathEditor.cpp" />
-    <ClCompile Include="RenderPath3D_Editor.cpp" />
-    <ClCompile Include="ScenePanel.cpp" />
-    <ClCompile Include="HierarchyPanel.cpp" />
-    <ClCompile Include="Panel.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Editor.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Editor.ico" />
-    <Image Include="small.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
       <Project>{03f1fc52-be54-4d26-b7f6-0a4edb4e8983}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Src\Base\Editor.cpp" />
+    <ClCompile Include="Src\Base\Window.cpp" />
+    <ClCompile Include="Src\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Src\Base\Editor.h" />
+    <ClInclude Include="Src\Base\Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
