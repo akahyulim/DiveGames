@@ -21,7 +21,7 @@ namespace Dive
 		DV_ASSERT(!s_pInstance);
 		s_pInstance = this;
 
-		Log::Initialize();
+		//Log::Initialize();
 		Time::Initialize();
 	}
 

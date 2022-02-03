@@ -7,6 +7,9 @@ Assets/Models/
 Assets/Textures/
 #Assets/Scenes/
 
+# imgui
+[Ee]ditor/imgui.ini
+
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db

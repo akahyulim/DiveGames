@@ -15,6 +15,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// create engine system & runtime
 	Dive::Log::Initialize();
+	auto pEditor = new Dive::Editor("DiveEditor");
 
 	// tick
 	while (window.Run())
@@ -22,6 +23,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	// close
+	delete pEditor;
+	pEditor = nullptr;
 	window.Destroy();
 
 #ifdef _DEBUG
