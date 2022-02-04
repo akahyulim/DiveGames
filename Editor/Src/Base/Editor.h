@@ -6,11 +6,11 @@ namespace Dive
 	class Editor : public Runtime
 	{
 	public:
-		Editor(const std::string& name);
+		Editor(HINSTANCE hInstance);
 		~Editor();
 
 	private:
-	private:
 
+	private:
 	};
 }

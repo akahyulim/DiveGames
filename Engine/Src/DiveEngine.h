@@ -17,6 +17,7 @@
 #include "Base/RenderPath3D_Legacy.h"
 #include "Base/Time.h"
 #include "Base/Log.h"
+#include "Base/AppWindow.h"
 #include "Base/IniHelper.h"		// 현재 Settings만 사용 중. 즉, 제거 대상
 #include "Base/FileStream.h"
 

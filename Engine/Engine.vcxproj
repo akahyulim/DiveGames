@@ -170,6 +170,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Src\Base\AppWindow.h" />
     <ClInclude Include="Src\divepch.h" />
     <ClInclude Include="Src\Base\DiveCore.h" />
     <ClInclude Include="Src\DiveEngine.h" />
@@ -217,6 +218,7 @@
     <ClInclude Include="Src\Scene\SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Base\AppWindow.cpp" />
     <ClCompile Include="Src\divepch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -256,22 +258,6 @@
     <ClCompile Include="Src\Scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="Doc\dvTexture.txt" />
-    <Text Include="Doc\Graphics.txt" />
-    <Text Include="Doc\GraphicsResources.txt" />
-    <Text Include="Doc\include path.txt" />
-    <Text Include="Doc\Issue.txt" />
-    <Text Include="Doc\LoadFromFile.txt" />
-    <Text Include="Doc\Pass Process.txt" />
-    <Text Include="Doc\PipelineState.txt" />
-    <Text Include="Doc\RenderPathAndPass.txt" />
-    <Text Include="Doc\ResourceManager.txt" />
-    <Text Include="Doc\Texture와 Map.txt" />
-    <Text Include="Doc\WickedEngine%27sGraphicsSystems.txt" />
-    <Text Include="Doc\구현 흐름.txt" />
-    <Text Include="Doc\1. 지금까지 정리의 흐름.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\Assets\Shaders\Legacy\Common.hlsl">
       <FileType>Document</FileType>
     </None>
@@ -281,7 +267,6 @@
     <None Include="..\Assets\Shaders\Legacy\Compose.hlsl">
       <FileType>Document</FileType>
     </None>
-    <None Include="0. 확실한 구조 설정" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

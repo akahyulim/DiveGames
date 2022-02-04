@@ -26,7 +26,5 @@ namespace Dive
 		spdlog::register_logger(sAppLogger);
 		sAppLogger->set_level(spdlog::level::trace);
 		sAppLogger->flush_on(spdlog::level::trace);
-
-		CORE_INFO("Log System 초기화를 수행하였습니다.");
 	}
 }

@@ -136,6 +136,9 @@
     <ClInclude Include="Src\Base\Time.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Base\AppWindow.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp">
@@ -243,6 +246,9 @@
     <ClCompile Include="Src\Base\Time.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Base\AppWindow.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -272,59 +278,12 @@
     <Filter Include="Src\Renderer\Graphics">
       <UniqueIdentifier>{00151ce7-f9c3-495a-8838-348f943d933a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Doc">
-      <UniqueIdentifier>{7e215838-d5d9-4ab7-a317-e071ac36ddd1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Base">
       <UniqueIdentifier>{935efe1f-4709-4022-9b1b-d67f83dc83a0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Src\Math">
       <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="Doc\dvTexture.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\Graphics.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\GraphicsResources.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\Issue.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\LoadFromFile.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\Pass Process.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\PipelineState.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\RenderPathAndPass.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\ResourceManager.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\Texture와 Map.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\WickedEngine%27sGraphicsSystems.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\구현 흐름.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\include path.txt">
-      <Filter>Doc</Filter>
-    </Text>
-    <Text Include="Doc\1. 지금까지 정리의 흐름.txt">
-      <Filter>Doc</Filter>
-    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Assets\Shaders\Legacy\Common.hlsl">
@@ -335,9 +294,6 @@
     </None>
     <None Include="..\Assets\Shaders\Legacy\Compose.hlsl">
       <Filter>Shaders</Filter>
-    </None>
-    <None Include="0. 확실한 구조 설정">
-      <Filter>Doc</Filter>
     </None>
   </ItemGroup>
 </Project>

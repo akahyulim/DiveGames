@@ -1,4 +1,3 @@
-#include "Base/Window.h"
 #include "Base/Editor.h"
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -10,22 +9,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AllocConsole();
 #endif
 
-	// create window
-	Dive::Window window(hInstance, Dive::WindowData(L"DiveEditor"));
+	// create editor
+	Dive::Editor* pEditor = new Dive::Editor(hInstance);
+	DV_ASSERT(pEditor);
 
-	// create engine system & runtime
-	Dive::Log::Initialize();
-	auto pEditor = new Dive::Editor("DiveEditor");
+	// run editor
+	pEditor->Run();
 
-	// tick
-	while (window.Run())
-	{
-	}
-
-	// close
-	delete pEditor;
-	pEditor = nullptr;
-	window.Destroy();
+	// delete editor
+	DV_DELETE(pEditor);
 
 #ifdef _DEBUG
 	system("pause");
