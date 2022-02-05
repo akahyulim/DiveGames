@@ -6,11 +6,13 @@ namespace Dive
 	class Editor : public Runtime
 	{
 	public:
-		Editor(HINSTANCE hInstance);
+		Editor() = default;
 		~Editor();
 
 	private:
 
 	private:
 	};
+
+	Runtime* CreateApplication(HINSTANCE hInstance);
 }

@@ -9,18 +9,20 @@ namespace Dive
 	class Runtime
 	{
 	public:
-		Runtime(HINSTANCE hInstance, const std::string& title = "DiveGames");
+		Runtime();
 		virtual ~Runtime();
+
+		virtual void Initialize();
 		
 		void Run();
 
-		AppWindow& GetAppWindow() { return *m_pAppWindow; }
+		AppWindow* GetAppWindow() { return m_pAppWindow; }
 
 	protected:
 
 	protected:
 		static Runtime* s_pInstance;
 
-		std::unique_ptr<AppWindow> m_pAppWindow;
+		AppWindow* m_pAppWindow = nullptr;
 	};
 }

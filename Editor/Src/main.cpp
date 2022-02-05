@@ -9,8 +9,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AllocConsole();
 #endif
 
-	// create editor
-	Dive::Editor* pEditor = new Dive::Editor(hInstance);
+	// create & intialize editor
+	auto pEditor = Dive::CreateApplication(hInstance);
 	DV_ASSERT(pEditor);
 
 	// run editor

@@ -9,7 +9,7 @@ namespace Dive
 {
 	Runtime* Runtime::s_pInstance = nullptr;
 
-	Runtime::Runtime(HINSTANCE hInstance, const std::string& title)
+	Runtime::Runtime()
 	{
 		DV_ASSERT(!s_pInstance);
 		s_pInstance = this;
@@ -17,19 +17,21 @@ namespace Dive
 		Log::Initialize();
 		Time::Initialize();
 
-		m_pAppWindow = std::make_unique<AppWindow>(hInstance, title);
-
+		m_pAppWindow = new AppWindow;
 	}
 
 	Runtime::~Runtime()
 	{
-		m_pAppWindow->Destroy();
+		DV_DELETE(m_pAppWindow);
+	}
+
+	void Runtime::Initialize()
+	{
+		m_pAppWindow->Create();
 	}
 
 	void Runtime::Run()
 	{
-		Time::Update();
-
 		if (m_pAppWindow)
 		{
 			while (m_pAppWindow->Run())

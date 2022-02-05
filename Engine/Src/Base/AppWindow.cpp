@@ -1,6 +1,7 @@
 #include "divepch.h"
 #include "AppWindow.h"
 #include "DiveCore.h"
+#include "Log.h"
 
 namespace Dive
 {
@@ -11,36 +12,40 @@ namespace Dive
 		case WM_CLOSE:
 		{
 			PostQuitMessage(0);
-			return 0;
+			break;
 		}
 		case WM_DESTROY:
 		{
 			PostQuitMessage(0);
-			return 0;
+			break;
 		}
-		default:
-			return DefWindowProcW(hWnd, msg, wParam, lParam);
 		}
+
+		return DefWindowProcW(hWnd, msg, wParam, lParam);
+	}
+	
+	AppWindow::~AppWindow()
+	{
+		Destroy();
 	}
 
-	AppWindow::AppWindow(HINSTANCE hInstance, const std::string& title)
+	void AppWindow::Create()
 	{
-		// load ini
-		unsigned int width = 800;
-		unsigned int height = 600;
+		if (m_hInstance == 0)
+			m_hInstance = GetModuleHandle(NULL);
 
 		std::wstring windowName;
-		windowName.assign(title.begin(), title.end());
+		windowName.assign(m_Title.begin(), m_Title.end());
 
 		WNDCLASSEX wcex;
 
 		wcex.cbSize = sizeof(WNDCLASSEX);
 
-		wcex.style			= 0;
+		wcex.style = 0;
 		wcex.lpfnWndProc	= WndProc;
 		wcex.cbClsExtra		= 0;
 		wcex.cbWndExtra		= 0;
-		wcex.hInstance		= hInstance;
+		wcex.hInstance		= m_hInstance;
 		wcex.hIcon			= LoadIcon(nullptr, IDI_APPLICATION);
 		wcex.hCursor		= LoadCursor(nullptr, IDC_ARROW);
 		wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW + 1);
@@ -50,29 +55,31 @@ namespace Dive
 
 		DV_ASSERT(RegisterClassEx(&wcex));
 
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - (int)width) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - (int)height) / 2;
+		int posX = (GetSystemMetrics(SM_CXSCREEN) - (int)m_Width) / 2;
+		int posY = (GetSystemMetrics(SM_CYSCREEN) - (int)m_Height) / 2;
 
 		auto hWnd = CreateWindowW(windowName.c_str(), windowName.c_str(), WS_OVERLAPPEDWINDOW,
-			posX, posY, width, height, nullptr, nullptr, hInstance, nullptr);
+			posX, posY, m_Width, m_Height, nullptr, nullptr, m_hInstance, nullptr);
 
 		DV_ASSERT(hWnd != NULL);
-
-		m_hInstance		= hInstance;
-		m_hWnd			= hWnd;
-		m_Title			= title;
-		m_Width			= width;
-		m_Height		= height;
 
 		ShowWindow(hWnd, SW_SHOW);
 		SetForegroundWindow(hWnd);
 		SetFocus(hWnd);
 	}
 
-	AppWindow::~AppWindow()
+	void AppWindow::Destroy()
 	{
+		DestroyWindow(m_hWnd);
+		m_hWnd = nullptr;
+
+		std::wstring windowName;
+		windowName.assign(m_Title.begin(), m_Title.end());
+
+		UnregisterClassW(windowName.c_str(), m_hInstance);
+		m_hInstance = nullptr;
 	}
-	
+
 	bool AppWindow::Run()
 	{
 		MSG msg;
@@ -88,17 +95,5 @@ namespace Dive
 		}
 
 		return true;
-	}
-
-	void AppWindow::Destroy()
-	{
-		DestroyWindow(m_hWnd);
-		m_hWnd = nullptr;
-
-		std::wstring windowName;
-		windowName.assign(m_Title.begin(), m_Title.end());
-
-		UnregisterClassW(windowName.c_str(), m_hInstance);
-		m_hInstance = nullptr;
 	}
 }
