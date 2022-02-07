@@ -12,12 +12,11 @@
 #include "Base/DiveCore.h"
 #include "Base/Object.h"
 #include "Base/Event.h"
-#include "Base/Runtime.h"
+#include "Base/Engine.h"
 #include "Base/RenderPath.h"
 #include "Base/RenderPath3D_Legacy.h"
 #include "Base/Time.h"
 #include "Base/Log.h"
-#include "Base/IniHelper.h"		// 현재 Settings만 사용 중. 즉, 제거 대상
 #include "Base/FileStream.h"
 
 //= Resource ======================

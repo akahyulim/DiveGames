@@ -112,19 +112,10 @@
     <ClInclude Include="Src\Base\RenderPath3D_Legacy.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Base\Runtime.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Base\FileStream.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Base\IniHelper.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Base\Log.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Base\Settings.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
     <ClInclude Include="Src\DiveEngine.h">
@@ -134,6 +125,9 @@
       <Filter>Src\Math</Filter>
     </ClInclude>
     <ClInclude Include="Src\Base\Time.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\Engine.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
   </ItemGroup>
@@ -225,22 +219,16 @@
     <ClCompile Include="Src\Base\RenderPath3D_Legacy.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Base\Runtime.cpp">
-      <Filter>Src\Base</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Base\FileStream.cpp">
-      <Filter>Src\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Base\IniHelper.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
     <ClCompile Include="Src\Base\Log.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Base\Settings.cpp">
+    <ClCompile Include="Src\Base\Time.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Base\Time.cpp">
+    <ClCompile Include="Src\Base\Engine.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
   </ItemGroup>

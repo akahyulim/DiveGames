@@ -177,12 +177,10 @@
     <ClInclude Include="Src\Base\Object.h" />
     <ClInclude Include="Src\Base\RenderPath.h" />
     <ClInclude Include="Src\Base\RenderPath3D_Legacy.h" />
-    <ClInclude Include="Src\Base\Runtime.h" />
+    <ClInclude Include="Src\Base\Engine.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Base\FileStream.h" />
-    <ClInclude Include="Src\Base\IniHelper.h" />
     <ClInclude Include="Src\Base\Log.h" />
-    <ClInclude Include="Src\Base\Settings.h" />
     <ClInclude Include="Src\Base\Time.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Renderer\dvMesh.h" />
@@ -221,11 +219,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Src\Base\RenderPath3D_Legacy.cpp" />
-    <ClCompile Include="Src\Base\Runtime.cpp" />
+    <ClCompile Include="Src\Base\Engine.cpp" />
     <ClCompile Include="Src\Base\FileStream.cpp" />
-    <ClCompile Include="Src\Base\IniHelper.cpp" />
     <ClCompile Include="Src\Base\Log.cpp" />
-    <ClCompile Include="Src\Base\Settings.cpp" />
     <ClCompile Include="Src\Base\Time.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\Renderer\dvMesh.cpp" />

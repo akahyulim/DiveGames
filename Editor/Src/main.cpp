@@ -12,7 +12,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	// create
 	Dive::Editor editor;
-	Dive::AppWindow window(hInstance, "DiveEditor");
+	Dive::AppWindow window(hInstance, editor.GetData());
+	Dive::g_pOnMessage = [&editor](Dive::WindowData& data) { editor.OnWindowMessage(data); };
+	window.Show();
 
 	// run
 	while (window.Run())

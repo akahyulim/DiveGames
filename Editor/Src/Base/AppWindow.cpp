@@ -1,31 +1,68 @@
 #include "AppWindow.h"
+#include "Editor.h"
 #include "DiveEngine.h"
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	Dive::WindowData data;
+	data.hWnd = hWnd;
+	data.msg = msg;
+	data.wParam = wParam;
+	data.lParam = lParam;
+
+	switch (msg)
+	{
+	case WM_DISPLAYCHANGE:
+	{
+		data.Width = static_cast<unsigned int>(lParam & 0xffff);
+		data.Height = static_cast<unsigned int>((lParam >> 16) & 0xffff);
+		break;
+	}
+	case WM_SIZE:
+	{
+		data.Width = static_cast<unsigned int>(lParam & 0xffff);
+		data.Height = static_cast<unsigned int>((lParam >> 16) & 0xffff);
+		break;
+	}
+	case WM_SYSCOMMAND:
+	{
+		data.Minimize = wParam == SC_MINIMIZE;
+		data.Maximize = wParam == SC_MAXIMIZE;
+		break;
+	}
+	case WM_CLOSE:
+	{
+		PostQuitMessage(0);
+		break;
+	}
+	case WM_DESTROY:
+	{
+		PostQuitMessage(0);
+		break;
+	}
+	}
+
+	// 헐... 생성된건데..
+	// 왜 if가 지나치냐...?
+	if (Dive::g_pOnMessage)
+	{
+		Dive::g_pOnMessage(data);
+	}
+
+	return DefWindowProcW(hWnd, msg, wParam, lParam);
+}
 
 namespace Dive
 {
-	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		switch (msg)
-		{
-		case WM_CLOSE:
-		{
-			PostQuitMessage(0);
-			break;
-		}
-		case WM_DESTROY:
-		{
-			PostQuitMessage(0);
-			break;
-		}
-		}
-
-		return DefWindowProcW(hWnd, msg, wParam, lParam);
-	}
-	
-	AppWindow::AppWindow(HINSTANCE hInstance, const std::string& title)
+	AppWindow::AppWindow(HINSTANCE hInstance, const EditorData& data)
 	{
 		if (m_hInstance == 0)
 			m_hInstance = GetModuleHandle(NULL);
+
+		m_Title		= data.Title;
+		m_Width		= data.Width;
+		m_Height	= data.Height;
+		m_bMaximize = data.Maximize;
 
 		std::wstring windowName;
 		windowName.assign(m_Title.begin(), m_Title.end());
@@ -58,15 +95,6 @@ namespace Dive
 
 		m_hInstance = hInstance;
 		m_hWnd = hWnd;
-
-		ShowWindow(hWnd, SW_SHOW);
-		SetForegroundWindow(hWnd);
-		SetFocus(hWnd);
-	}
-
-	AppWindow::~AppWindow()
-	{
-		Destroy();
 	}
 
 	void AppWindow::Create()
@@ -102,10 +130,6 @@ namespace Dive
 			posX, posY, m_Width, m_Height, nullptr, nullptr, m_hInstance, nullptr);
 
 		DV_ASSERT(hWnd != NULL);
-
-		ShowWindow(hWnd, SW_SHOW);
-		SetForegroundWindow(hWnd);
-		SetFocus(hWnd);
 	}
 
 	void AppWindow::Destroy()
@@ -118,6 +142,15 @@ namespace Dive
 
 		UnregisterClassW(windowName.c_str(), m_hInstance);
 		m_hInstance = nullptr;
+	}
+
+	void AppWindow::Show()
+	{
+		DV_ASSERT(m_hWnd);
+
+		ShowWindow(m_hWnd, SW_SHOW);
+		SetForegroundWindow(m_hWnd);
+		SetFocus(m_hWnd);
 	}
 
 	bool AppWindow::Run()

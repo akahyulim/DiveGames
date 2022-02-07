@@ -125,7 +125,7 @@ namespace Dive
 	// WM_SIZE에 대응하여 Backbuffer 크기를 변경한다.
 	// 이 함수를 이용하여 윈도우, 해상도 변경은 불가능하다.
 	// ResizeBackbuffer로 이름을 바꾸자.
-	// 현재 Editor의 Runtime에서 이벤트를 처리하면서 이 함수를 호출하고 있다.
+	// 현재 Editor의 Engine에서 이벤트를 처리하면서 이 함수를 호출하고 있다.
 	void GraphicsDevice::SetResolution(UINT width, UINT height)
 	{
 		if ((width != m_ResolutionWidth || height != m_ResolutionHeight) && (width > 0 || height > 0))

@@ -2,7 +2,7 @@
 
 namespace Dive
 {
-	class Runtime;
+	class Engine;
 	class Scene;
 
 	class SceneManager

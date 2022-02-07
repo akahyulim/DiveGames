@@ -1,17 +1,25 @@
 #pragma once
 #include <Windows.h>
 #include <string>
+#include <functional>
 
 namespace Dive
 {
+	struct EditorData;
+	struct WindowData;
+
+	static std::function<void(WindowData& data)> g_pOnMessage;
+
 	class AppWindow
 	{
 	public:
-		AppWindow(HINSTANCE hInstance, const std::string& title = "DiveGames");
-		~AppWindow();
+		AppWindow(HINSTANCE hInstance, const EditorData& data);
+		~AppWindow() = default;
 
 		void Create();
 		void Destroy();
+
+		void Show();
 
 		bool Run();
 
@@ -38,5 +46,7 @@ namespace Dive
 		
 		unsigned int m_Width	= 800;
 		unsigned int m_Height	= 600;
+
+		bool m_bMaximize		= false;
 	};
 }
