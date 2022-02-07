@@ -14,15 +14,11 @@ namespace Dive
 
 		virtual void Initialize();
 		
-		void Run();
-
-		AppWindow* GetAppWindow() { return m_pAppWindow; }
+		void Tick();
 
 	protected:
 
 	protected:
 		static Runtime* s_pInstance;
-
-		AppWindow* m_pAppWindow = nullptr;
 	};
 }

@@ -170,7 +170,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Base\AppWindow.h" />
     <ClInclude Include="Src\divepch.h" />
     <ClInclude Include="Src\Base\DiveCore.h" />
     <ClInclude Include="Src\DiveEngine.h" />
@@ -218,7 +217,6 @@
     <ClInclude Include="Src\Scene\SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Base\AppWindow.cpp" />
     <ClCompile Include="Src\divepch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>

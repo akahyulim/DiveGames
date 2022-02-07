@@ -1,11 +1,13 @@
 #pragma once
+#include <Windows.h>
+#include <string>
 
 namespace Dive
 {
 	class AppWindow
 	{
 	public:
-		AppWindow() = default;
+		AppWindow(HINSTANCE hInstance, const std::string& title = "DiveGames");
 		~AppWindow();
 
 		void Create();

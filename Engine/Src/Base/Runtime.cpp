@@ -3,7 +3,6 @@
 #include "DiveCore.h"
 #include "Time.h"
 #include "Log.h"
-#include "AppWindow.h"
 
 namespace Dive
 {
@@ -16,28 +15,17 @@ namespace Dive
 
 		Log::Initialize();
 		Time::Initialize();
-
-		m_pAppWindow = new AppWindow;
 	}
 
 	Runtime::~Runtime()
 	{
-		DV_DELETE(m_pAppWindow);
 	}
 
 	void Runtime::Initialize()
 	{
-		m_pAppWindow->Create();
 	}
 
-	void Runtime::Run()
+	void Runtime::Tick()
 	{
-		if (m_pAppWindow)
-		{
-			while (m_pAppWindow->Run())
-			{
-
-			}
-		}
 	}
 }

@@ -45,6 +45,9 @@
     <ClCompile Include="External\imgui-docking\imgui_widgets.cpp">
       <Filter>External\imgui-docking</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Base\AppWindow.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Base\Editor.h">
@@ -73,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="External\imgui-docking\imstb_truetype.h">
       <Filter>External\imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\AppWindow.h">
+      <Filter>Src\Base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

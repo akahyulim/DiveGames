@@ -1,18 +1,18 @@
 #pragma once
-#include "DiveEngine.h"
 
 namespace Dive
 {
-	class Editor : public Runtime
+	class Editor
 	{
 	public:
-		Editor() = default;
+		Editor();
 		~Editor();
 
+		void Tick();
+
 	private:
 
 	private:
+
 	};
-
-	Runtime* CreateApplication(HINSTANCE hInstance);
 }
