@@ -131,14 +131,16 @@ namespace Dive
 		{
 		case WM_SIZE:
 		{
+			m_Data.Width = static_cast<unsigned int>(lParam & 0xffff);
+			m_Data.Height = static_cast<unsigned int>((lParam >> 16) & 0xffff);
+
+			WindowResizeEvent event(m_Data.Width, m_Data.Height);
+			m_Data.EventCallback(event);
+
 			break;
 		}
 		case WM_CLOSE:
 		{
-
-			Event evnt;
-			m_Data.EventCallback(evnt);
-
 			PostQuitMessage(0);
 			break;
 		}

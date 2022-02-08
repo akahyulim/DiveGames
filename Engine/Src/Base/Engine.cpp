@@ -2,7 +2,6 @@
 #include "Engine.h"
 #include "Base.h"
 #include "Time.h"
-#include "Events/Event.h"
 
 namespace Dive
 {
@@ -35,5 +34,14 @@ namespace Dive
 
 	void Engine::OnEvent(Event& event)
 	{
+		EventDispatcher dispatcher(event);
+		dispatcher.Dispatch<WindowResizeEvent>(DV_BIND_EVENT_FN(Engine::OnWinodwResize));
+	}
+
+	bool Engine::OnWinodwResize(WindowResizeEvent& event)
+	{
+		CORE_TRACE("call wnd resize event: {0:d} x {1:d}", event.GetWidth(), event.GetHeight());
+
+		return true;
 	}
 }

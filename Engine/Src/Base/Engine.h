@@ -1,8 +1,9 @@
 #pragma once
+#include "Events/Event.h"
+#include "Events/AppEvent.h"
 
 namespace Dive
 {
-	class Event;
 
 	class Engine
 	{
@@ -16,6 +17,7 @@ namespace Dive
 		virtual void Tick();
 
 		void OnEvent(Event& event);
+		bool OnWinodwResize(WindowResizeEvent& event);
 
 	private:
 

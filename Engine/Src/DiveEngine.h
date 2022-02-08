@@ -17,6 +17,7 @@
 
 //= Events ========================
 #include "Events/Event.h"
+#include "Events/AppEvent.h"
 
 //= Resource ======================
 

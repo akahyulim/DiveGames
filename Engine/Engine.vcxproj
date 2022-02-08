@@ -177,6 +177,7 @@
     <ClInclude Include="Src\Base\Engine.h" />
     <ClInclude Include="Src\Base\Log.h" />
     <ClInclude Include="Src\Base\Time.h" />
+    <ClInclude Include="Src\Events\AppEvent.h" />
     <ClInclude Include="Src\Events\Event.h" />
   </ItemGroup>
   <ItemGroup>
