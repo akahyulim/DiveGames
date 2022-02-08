@@ -9,48 +9,21 @@
 #include "divepch.h"
 
 //= Base ==========================
-#include "Base/DiveCore.h"
+#include "Base/Base.h"
 #include "Base/Object.h"
-#include "Base/Event.h"
 #include "Base/Engine.h"
-#include "Base/RenderPath.h"
-#include "Base/RenderPath3D_Legacy.h"
 #include "Base/Time.h"
 #include "Base/Log.h"
-#include "Base/FileStream.h"
+
+//= Events ========================
+#include "Events/Event.h"
 
 //= Resource ======================
-#include "Resource/Resource.h"
-#include "Resource/ResourceManager.h"
 
 //= Renderer ======================
-#include "Renderer/Graphics/GraphicsInclude.h"
-#include "Renderer/Graphics/GraphicsDevice.h"
-#include "Renderer/Graphics/dvTexture.h"
-#include "Renderer/Graphics/dvTexture2D.h"
-#include "Renderer/Graphics/dvRenderTexture.h"
-#include "Renderer/Graphics/Texture.h"			// 삭제 대상
-#include "Renderer/Renderer.h"
-#include "Renderer/GraphicsEnums.h"
-#include "Renderer/VertexTypes.h"
-#include "Renderer/Mesh.h"
-#include "Renderer/dvMesh.h"
-#include "Renderer/StaticMesh.h"
 
 //= Input =========================
-#include "Input/Input.h"
 
 //= Scene =========================
-#include "Scene/SceneManager.h"
-#include "Scene/Scene.h"
-#include "Scene/GameObject.h"
-#include "Scene/Component/Component.h"
-#include "Scene/Component/Transform.h"
-#include "Scene/Component/MeshRenderer.h"
-#include "Scene/Component/dvMeshRenderer.h"
-#include "Scene/Component/StaticMeshRenderer.h"
-#include "Scene/Component/Camera.h"
-#include "Scene/Component/Light.h"
 
 //= Math ==========================
-#include "Math/Math.h"

@@ -1,118 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Renderer.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\dvTexture.h">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Resource\Resource.h">
-      <Filter>Src\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Resource\ResourceManager.h">
-      <Filter>Src\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\GBuffer.h">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Input\Input.h">
-      <Filter>Src\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\GameObject.h">
-      <Filter>Src\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\Scene.h">
-      <Filter>Src\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\SceneManager.h">
-      <Filter>Src\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\Component\Camera.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\Component\Component.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\Component\Light.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\Component\MeshRenderer.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\Component\Transform.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\GraphicsEnums.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Mesh.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\VertexTypes.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\GraphicsInclude.h">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\Texture.h">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\ConstantBuffers.h">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\PipelineState.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Material.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\dvMesh.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\Component\dvMeshRenderer.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\StaticMesh.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\SkinnedMesh.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\Component\StaticMeshRenderer.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Src\divepch.h">
       <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Base\DiveCore.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Base\Event.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Base\Object.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Base\RenderPath.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Base\RenderPath3D_Legacy.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Base\FileStream.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
     <ClInclude Include="Src\Base\Log.h">
@@ -121,106 +13,22 @@
     <ClInclude Include="Src\DiveEngine.h">
       <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Math\Math.h">
-      <Filter>Src\Math</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Base\Time.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
     <ClInclude Include="Src\Base\Engine.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Events\Event.h">
+      <Filter>Src\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\Base.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Renderer.cpp">
-      <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Renderer_Pass.cpp">
-      <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Renderer_Resources.cpp">
-      <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Resource\Resource.cpp">
-      <Filter>Src\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Resource\ResourceManager.cpp">
-      <Filter>Src\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Graphics\GBuffer.cpp">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Input\Input.cpp">
-      <Filter>Src\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\GameObject.cpp">
-      <Filter>Src\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Scene.cpp">
-      <Filter>Src\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\SceneManager.cpp">
-      <Filter>Src\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Component\Camera.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Component\Component.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Component\Light.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Component\MeshRenderer.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Component\Transform.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Component\Transform_Hierarchy.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Mesh.cpp">
-      <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Graphics\Texture.cpp">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp">
-      <Filter>Src\Renderer\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Material.cpp">
-      <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\dvMesh.cpp">
-      <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Component\dvMeshRenderer.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\StaticMesh.cpp">
-      <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Component\StaticMeshRenderer.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Src\divepch.cpp">
       <Filter>Src</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Base\RenderPath3D_Legacy.cpp">
-      <Filter>Src\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Base\FileStream.cpp">
-      <Filter>Src\Base</Filter>
     </ClCompile>
     <ClCompile Include="Src\Base\Log.cpp">
       <Filter>Src\Base</Filter>
@@ -245,9 +53,6 @@
     <Filter Include="Src\Scene">
       <UniqueIdentifier>{c1aa4b85-851d-45df-abea-6fec5b35b458}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Scene\Components">
-      <UniqueIdentifier>{7bc942ed-9c43-48b4-ad1c-95c51f40ebc0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Input">
       <UniqueIdentifier>{7d6380e9-9fcb-4788-b719-d270596b1123}</UniqueIdentifier>
     </Filter>
@@ -257,14 +62,14 @@
     <Filter Include="Src\Renderer">
       <UniqueIdentifier>{1326af25-081c-4cf4-b939-d927b9d45a14}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Renderer\Graphics">
-      <UniqueIdentifier>{00151ce7-f9c3-495a-8838-348f943d933a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Base">
       <UniqueIdentifier>{935efe1f-4709-4022-9b1b-d67f83dc83a0}</UniqueIdentifier>
     </Filter>
     <Filter Include="Src\Math">
       <UniqueIdentifier>{fa9d06cb-f09c-43a6-ad08-3a49ed240a34}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Events">
+      <UniqueIdentifier>{c8625268-a56a-4de6-a0c2-80adac89a45c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

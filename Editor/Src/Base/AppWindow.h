@@ -5,48 +5,45 @@
 
 namespace Dive
 {
-	struct EditorData;
-	struct WindowData;
-
-	static std::function<void(WindowData& data)> g_pOnMessage;
+	struct WindowProps;
+	class Event;
 
 	class AppWindow
 	{
+		using EventCallbackFn = std::function<void(Event&)>;
+
 	public:
-		AppWindow(HINSTANCE hInstance, const EditorData& data);
+		AppWindow(HINSTANCE hInstance, const WindowProps& props);
 		~AppWindow() = default;
 
-		void Create();
 		void Destroy();
 
 		void Show();
 
 		bool Run();
 
-		HINSTANCE GetInstance() const { return m_hInstance; }
-		void SetInstance(HINSTANCE hInstance) { m_hInstance = hInstance; }
+		void SetEventCallback(const EventCallbackFn& callback) { m_Data.EventCallback = callback; }
 
-		HWND GetHandle() const { return m_hWnd; }
-
-		std::string GetTitle() const { return m_Title; }
-		void SetTitle(const std::string& title) { m_Title = title; }
-
-		unsigned int GetWidth() const { return m_Width; }
-		void SetWidth(unsigned int width) { m_Width = width; }
-
-		unsigned int GetHeight() const { return m_Height; }
-		void SetHeight(unsigned int height) { m_Height = height; }
-
+		LRESULT CALLBACK AppWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	private:
-		HINSTANCE m_hInstance	= 0;
-		HWND m_hWnd				= 0;
-		
-		std::string m_Title		= "Dive";
-		
-		unsigned int m_Width	= 800;
-		unsigned int m_Height	= 600;
+		struct WindowData
+		{
+			HINSTANCE hInstance;
+			HWND hWnd;
 
-		bool m_bMaximize		= false;
+			UINT Msg;
+			WPARAM wParam;
+			LPARAM lParam;
+
+			std::string Title;
+
+			unsigned int Width;
+			unsigned int Height;
+
+			EventCallbackFn EventCallback;
+		};
+
+		WindowData m_Data;
 	};
 }

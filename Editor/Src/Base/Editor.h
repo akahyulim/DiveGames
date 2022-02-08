@@ -1,13 +1,11 @@
 #pragma once
-#include <string>
+#include "DiveEngine.h"
 
 namespace Dive
 {
-	class Engine;
-	struct WindowData;
+	class AppWindow;
 
-	// 사실상 WindowData와 겹친다...?
-	struct EditorData
+	struct WindowProps
 	{
 		std::string Title	= "DiveEditor";
 		unsigned int Width	= 1280;
@@ -15,27 +13,26 @@ namespace Dive
 		bool Maximize		= false;
 	};
 
-	class Editor
+	class Editor : public Engine
 	{
 	public:
-		Editor();
+		Editor(HINSTANCE hInstance);
 		~Editor();
 
-		void Tick();
+		void Initialize() override;
+		void Destroy() override;
 
-		void OnWindowMessage(WindowData& data);
+		void Tick() override;
 
-		const EditorData& GetData() const { return m_Data; }
+		const WindowProps& GetWindowProps() const { return m_WindowProps; }
 
 	private:
+		void initializeImGui();
+		void destroyImGui();
 
 	private:
-		// editor
-		EditorData m_Data;
-		bool m_bInitialized = false;
+		AppWindow* m_pAppWnd = nullptr;
 
-		// engine
-		Engine* m_pEngine = nullptr;
-
+		WindowProps m_WindowProps;
 	};
 }

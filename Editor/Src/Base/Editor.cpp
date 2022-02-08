@@ -1,47 +1,60 @@
 #include "Editor.h"
-#include "DiveEngine.h"
+#include "AppWindow.h"
 #include "imgui-docking/imgui.h"
 #include "imgui-docking/imgui_impl_win32.h"
 #include "imgui-docking/imgui_impl_dx11.h"
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
 namespace Dive
 {
-    Editor::Editor()
+    Editor::Editor(HINSTANCE hInstance)
     {
-        // load ini 
+        // load ini
+
+        m_pAppWnd = new AppWindow(hInstance, m_WindowProps);
+        DV_ASSERT(m_pAppWnd);
+
+        m_pAppWnd->SetEventCallback(DV_BIND_EVENT_FN(Engine::OnEvent));
     }
 
     Editor::~Editor()
     {
-        DV_DELETE(m_pEngine);
+    }
+
+    void Editor::Initialize()
+    {
+        Engine::Initialize();
+
+        initializeImGui();
+
+        m_pAppWnd->Show();
+    }
+
+    void Editor::Destroy()
+    {
+        destroyImGui();
+
+        Engine::Destroy();
+
+        m_pAppWnd->Destroy();
+        DV_DELETE(m_pAppWnd);
     }
 
     void Editor::Tick()
     {
+        if (!m_pAppWnd)
+            return;
+
+        while (m_pAppWnd->Run())
+        {
+            Engine::Tick();
+        }
     }
 
-    void Editor::OnWindowMessage(WindowData& data)
+    void Editor::initializeImGui()
     {
-        if (!m_bInitialized)
-        {
-            m_pEngine = new Engine;
-            DV_ASSERT(m_pEngine);
+    }
 
-            // sub system 가져오기?
-
-            // imgui 초기화
-
-            m_bInitialized = true;
-        }
-        else
-        {
-            ImGui_ImplWin32_WndProcHandler(data.hWnd, data.msg, data.wParam, data.lParam);
-
-            // engine의 backbuffer resize
-
-            m_pEngine->SetWindowData(data);
-        }
+    void Editor::destroyImGui()
+    {
     }
 }

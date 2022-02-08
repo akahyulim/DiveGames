@@ -16,3 +16,5 @@
 #ifndef DV_RELEASE
 #define DV_RELEASE(p) { if(p) (p)->Release(); (p) = nullptr; }
 #endif
+
+#include "Log.h"

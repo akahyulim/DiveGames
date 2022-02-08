@@ -1,119 +1,61 @@
 #include "AppWindow.h"
 #include "Editor.h"
 #include "DiveEngine.h"
+#include "imgui-docking/imgui_impl_win32.h"
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	Dive::WindowData data;
-	data.hWnd = hWnd;
-	data.msg = msg;
-	data.wParam = wParam;
-	data.lParam = lParam;
-
-	switch (msg)
-	{
-	case WM_DISPLAYCHANGE:
-	{
-		data.Width = static_cast<unsigned int>(lParam & 0xffff);
-		data.Height = static_cast<unsigned int>((lParam >> 16) & 0xffff);
-		break;
-	}
-	case WM_SIZE:
-	{
-		data.Width = static_cast<unsigned int>(lParam & 0xffff);
-		data.Height = static_cast<unsigned int>((lParam >> 16) & 0xffff);
-		break;
-	}
-	case WM_SYSCOMMAND:
-	{
-		data.Minimize = wParam == SC_MINIMIZE;
-		data.Maximize = wParam == SC_MAXIMIZE;
-		break;
-	}
-	case WM_CLOSE:
-	{
-		PostQuitMessage(0);
-		break;
-	}
-	case WM_DESTROY:
-	{
-		PostQuitMessage(0);
-		break;
-	}
-	}
-
-	// 헐... 생성된건데..
-	// 왜 if가 지나치냐...?
-	if (Dive::g_pOnMessage)
-	{
-		Dive::g_pOnMessage(data);
-	}
-
-	return DefWindowProcW(hWnd, msg, wParam, lParam);
-}
+// 이게 좀 애매하다.
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Dive
 {
-	AppWindow::AppWindow(HINSTANCE hInstance, const EditorData& data)
+	static Dive::AppWindow* s_pAppWnd = nullptr;
+
+	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		if (m_hInstance == 0)
-			m_hInstance = GetModuleHandle(NULL);
+		if (s_pAppWnd)
+		{
+			return s_pAppWnd->AppWndProc(hWnd, msg, wParam, lParam);
+		}
+		else
+		{
+			switch (msg)
+			{
+			case WM_CLOSE:
+			{
+				PostQuitMessage(0);
+				break;
+			}
+			case WM_DESTROY:
+			{
+				PostQuitMessage(0);
+				break;
+			}
+			}
 
-		m_Title		= data.Title;
-		m_Width		= data.Width;
-		m_Height	= data.Height;
-		m_bMaximize = data.Maximize;
-
-		std::wstring windowName;
-		windowName.assign(m_Title.begin(), m_Title.end());
-
-		WNDCLASSEX wcex;
-
-		wcex.cbSize = sizeof(WNDCLASSEX);
-
-		wcex.style = 0;
-		wcex.lpfnWndProc = WndProc;
-		wcex.cbClsExtra = 0;
-		wcex.cbWndExtra = 0;
-		wcex.hInstance = m_hInstance;
-		wcex.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-		wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-		wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-		wcex.lpszMenuName = nullptr;
-		wcex.lpszClassName = windowName.c_str();
-		wcex.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
-
-		DV_ASSERT(RegisterClassEx(&wcex));
-
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - (int)m_Width) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - (int)m_Height) / 2;
-
-		auto hWnd = CreateWindowW(windowName.c_str(), windowName.c_str(), WS_OVERLAPPEDWINDOW,
-			posX, posY, m_Width, m_Height, nullptr, nullptr, m_hInstance, nullptr);
-
-		DV_ASSERT(hWnd != NULL);
-
-		m_hInstance = hInstance;
-		m_hWnd = hWnd;
+			return DefWindowProcW(hWnd, msg, wParam, lParam);
+		}
 	}
 
-	void AppWindow::Create()
-	{
-		if (m_hInstance == 0)
-			m_hInstance = GetModuleHandle(NULL);
+	AppWindow::AppWindow(HINSTANCE hInstance, const WindowProps& props)
+	{	
+		DV_ASSERT(s_pAppWnd == nullptr);
+		s_pAppWnd = this;
 
+		if (hInstance == 0)
+			hInstance = GetModuleHandle(NULL);
+	
 		std::wstring windowName;
-		windowName.assign(m_Title.begin(), m_Title.end());
+		windowName.assign(props.Title.begin(), props.Title.end());
 
 		WNDCLASSEX wcex;
 
 		wcex.cbSize = sizeof(WNDCLASSEX);
 
-		wcex.style = 0;
+		wcex.style			= 0;
 		wcex.lpfnWndProc	= WndProc;
 		wcex.cbClsExtra		= 0;
 		wcex.cbWndExtra		= 0;
-		wcex.hInstance		= m_hInstance;
+		wcex.hInstance		= hInstance;
 		wcex.hIcon			= LoadIcon(nullptr, IDI_APPLICATION);
 		wcex.hCursor		= LoadCursor(nullptr, IDC_ARROW);
 		wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW + 1);
@@ -123,34 +65,40 @@ namespace Dive
 
 		DV_ASSERT(RegisterClassEx(&wcex));
 
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - (int)m_Width) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - (int)m_Height) / 2;
+		int posX = (GetSystemMetrics(SM_CXSCREEN) - (int)props.Width) / 2;
+		int posY = (GetSystemMetrics(SM_CYSCREEN) - (int)props.Height) / 2;
 
 		auto hWnd = CreateWindowW(windowName.c_str(), windowName.c_str(), WS_OVERLAPPEDWINDOW,
-			posX, posY, m_Width, m_Height, nullptr, nullptr, m_hInstance, nullptr);
+			posX, posY, props.Width, props.Height, nullptr, nullptr, hInstance, nullptr);
 
 		DV_ASSERT(hWnd != NULL);
+
+		m_Data.hInstance	= hInstance;
+		m_Data.hWnd			= hWnd;
+		m_Data.Title		= props.Title;
+		m_Data.Width		= props.Width;
+		m_Data.Height		= props.Height;
 	}
 
 	void AppWindow::Destroy()
 	{
-		DestroyWindow(m_hWnd);
-		m_hWnd = nullptr;
+		DestroyWindow(m_Data.hWnd);
+		m_Data.hWnd = nullptr;
 
 		std::wstring windowName;
-		windowName.assign(m_Title.begin(), m_Title.end());
+		windowName.assign(m_Data.Title.begin(), m_Data.Title.end());
 
-		UnregisterClassW(windowName.c_str(), m_hInstance);
-		m_hInstance = nullptr;
+		UnregisterClassW(windowName.c_str(), m_Data.hInstance);
+		m_Data.hInstance = nullptr;
 	}
 
 	void AppWindow::Show()
 	{
-		DV_ASSERT(m_hWnd);
+		DV_ASSERT(m_Data.hWnd);
 
-		ShowWindow(m_hWnd, SW_SHOW);
-		SetForegroundWindow(m_hWnd);
-		SetFocus(m_hWnd);
+		ShowWindow(m_Data.hWnd, SW_SHOW);
+		SetForegroundWindow(m_Data.hWnd);
+		SetFocus(m_Data.hWnd);
 	}
 
 	bool AppWindow::Run()
@@ -168,5 +116,39 @@ namespace Dive
 		}
 
 		return true;
+	}
+
+	LRESULT AppWindow::AppWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		// 애매해...
+		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+
+		m_Data.Msg		= msg;
+		m_Data.wParam	= wParam;
+		m_Data.lParam	= lParam;
+
+		switch (msg)
+		{
+		case WM_SIZE:
+		{
+			break;
+		}
+		case WM_CLOSE:
+		{
+
+			Event evnt;
+			m_Data.EventCallback(evnt);
+
+			PostQuitMessage(0);
+			break;
+		}
+		case WM_DESTROY:
+		{
+			PostQuitMessage(0);
+			break;
+		}
+		}
+
+		return DefWindowProcW(hWnd, msg, wParam, lParam);
 	}
 }

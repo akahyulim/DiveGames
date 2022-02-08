@@ -1,5 +1,5 @@
 #pragma once
-#include "Log.h"
+#include "Base.h"
 #include <string>
 #include <atomic>
 #include <typeinfo>

@@ -171,85 +171,21 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Src\divepch.h" />
-    <ClInclude Include="Src\Base\DiveCore.h" />
+    <ClInclude Include="Src\Base\Base.h" />
     <ClInclude Include="Src\DiveEngine.h" />
-    <ClInclude Include="Src\Base\Event.h" />
     <ClInclude Include="Src\Base\Object.h" />
-    <ClInclude Include="Src\Base\RenderPath.h" />
-    <ClInclude Include="Src\Base\RenderPath3D_Legacy.h" />
     <ClInclude Include="Src\Base\Engine.h" />
-    <ClInclude Include="Src\Math\Math.h" />
-    <ClInclude Include="Src\Base\FileStream.h" />
     <ClInclude Include="Src\Base\Log.h" />
     <ClInclude Include="Src\Base\Time.h" />
-    <ClInclude Include="Src\Input\Input.h" />
-    <ClInclude Include="Src\Renderer\dvMesh.h" />
-    <ClInclude Include="Src\Renderer\GraphicsEnums.h" />
-    <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h" />
-    <ClInclude Include="Src\Renderer\Graphics\ConstantBuffers.h" />
-    <ClInclude Include="Src\Renderer\Graphics\dvRenderTexture.h" />
-    <ClInclude Include="Src\Renderer\Graphics\dvTexture.h" />
-    <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h" />
-    <ClInclude Include="Src\Renderer\Graphics\GBuffer.h" />
-    <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
-    <ClInclude Include="Src\Renderer\Graphics\GraphicsInclude.h" />
-    <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
-    <ClInclude Include="Src\Renderer\Material.h" />
-    <ClInclude Include="Src\Renderer\Mesh.h" />
-    <ClInclude Include="Src\Renderer\PipelineState.h" />
-    <ClInclude Include="Src\Renderer\Renderer.h" />
-    <ClInclude Include="Src\Renderer\SkinnedMesh.h" />
-    <ClInclude Include="Src\Renderer\StaticMesh.h" />
-    <ClInclude Include="Src\Renderer\VertexTypes.h" />
-    <ClInclude Include="Src\Resource\Resource.h" />
-    <ClInclude Include="Src\Resource\ResourceManager.h" />
-    <ClInclude Include="Src\Scene\Component\Camera.h" />
-    <ClInclude Include="Src\Scene\Component\Component.h" />
-    <ClInclude Include="Src\Scene\Component\dvMeshRenderer.h" />
-    <ClInclude Include="Src\Scene\Component\Light.h" />
-    <ClInclude Include="Src\Scene\Component\MeshRenderer.h" />
-    <ClInclude Include="Src\Scene\Component\StaticMeshRenderer.h" />
-    <ClInclude Include="Src\Scene\Component\Transform.h" />
-    <ClInclude Include="Src\Scene\GameObject.h" />
-    <ClInclude Include="Src\Scene\Scene.h" />
-    <ClInclude Include="Src\Scene\SceneManager.h" />
+    <ClInclude Include="Src\Events\Event.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Src\Base\RenderPath3D_Legacy.cpp" />
     <ClCompile Include="Src\Base\Engine.cpp" />
-    <ClCompile Include="Src\Base\FileStream.cpp" />
     <ClCompile Include="Src\Base\Log.cpp" />
     <ClCompile Include="Src\Base\Time.cpp" />
-    <ClCompile Include="Src\Input\Input.cpp" />
-    <ClCompile Include="Src\Renderer\dvMesh.cpp" />
-    <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp" />
-    <ClCompile Include="Src\Renderer\Graphics\dvRenderTexture.cpp" />
-    <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp" />
-    <ClCompile Include="Src\Renderer\Graphics\GBuffer.cpp" />
-    <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
-    <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
-    <ClCompile Include="Src\Renderer\Material.cpp" />
-    <ClCompile Include="Src\Renderer\Mesh.cpp" />
-    <ClCompile Include="Src\Renderer\Renderer.cpp" />
-    <ClCompile Include="Src\Renderer\Renderer_Pass.cpp" />
-    <ClCompile Include="Src\Renderer\Renderer_Resources.cpp" />
-    <ClCompile Include="Src\Renderer\StaticMesh.cpp" />
-    <ClCompile Include="Src\Resource\Resource.cpp" />
-    <ClCompile Include="Src\Resource\ResourceManager.cpp" />
-    <ClCompile Include="Src\Scene\Component\Camera.cpp" />
-    <ClCompile Include="Src\Scene\Component\Component.cpp" />
-    <ClCompile Include="Src\Scene\Component\dvMeshRenderer.cpp" />
-    <ClCompile Include="Src\Scene\Component\Light.cpp" />
-    <ClCompile Include="Src\Scene\Component\MeshRenderer.cpp" />
-    <ClCompile Include="Src\Scene\Component\StaticMeshRenderer.cpp" />
-    <ClCompile Include="Src\Scene\Component\Transform.cpp" />
-    <ClCompile Include="Src\Scene\Component\Transform_Hierarchy.cpp" />
-    <ClCompile Include="Src\Scene\GameObject.cpp" />
-    <ClCompile Include="Src\Scene\Scene.cpp" />
-    <ClCompile Include="Src\Scene\SceneManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Assets\Shaders\Legacy\Common.hlsl">
