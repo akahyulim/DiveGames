@@ -12,9 +12,9 @@ namespace Dive
 		virtual ~Engine();
 		
 		virtual void Initialize();
-		virtual void Destroy();
 
-		virtual void Tick();
+		void Update();
+		void Render();
 
 		void OnEvent(Event& event);
 		bool OnWinodwResize(WindowResizeEvent& event);

@@ -24,6 +24,8 @@ namespace Dive
 
 		void SetEventCallback(const EventCallbackFn& callback) { m_Data.EventCallback = callback; }
 
+		HWND GetWinodwHandle() { return m_Data.hWnd; }
+
 		LRESULT CALLBACK AppWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	private:

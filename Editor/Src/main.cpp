@@ -14,10 +14,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	editor.Initialize();
 
 	// run
-	editor.Tick();
+	editor.Run();
 
-	// destroy
-	editor.Destroy();
 
 #ifdef _DEBUG
 	system("pause");

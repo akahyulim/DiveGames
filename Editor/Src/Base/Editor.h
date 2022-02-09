@@ -20,19 +20,31 @@ namespace Dive
 		~Editor();
 
 		void Initialize() override;
-		void Destroy() override;
 
-		void Tick() override;
+		void Run();
 
 		const WindowProps& GetWindowProps() const { return m_WindowProps; }
 
 	private:
-		void initializeImGui();
-		void destroyImGui();
+		// d3d11 device
+		void createDeviceD3D();
+		void cleanupDeviceD3D();
+		void createRenderTarget();
+		void cleanupRenderTarget();
+
+		// imGui
+		void beginFrame();
+		void endFrame();
 
 	private:
+		// window
 		AppWindow* m_pAppWnd = nullptr;
-
 		WindowProps m_WindowProps;
+
+		// d3d11 device
+		ID3D11Device* m_pD3dDevice = nullptr;
+		ID3D11DeviceContext* m_pD3dDeviceContext = nullptr;
+		IDXGISwapChain* m_pSwapChain = nullptr;
+		ID3D11RenderTargetView* m_pMainRenderTargetView = nullptr;
 	};
 }

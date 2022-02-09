@@ -24,11 +24,11 @@ namespace Dive
 		Log::Initialize();
 	}
 
-	void Engine::Destroy()
+	void Engine::Update()
 	{
 	}
 
-	void Engine::Tick()
+	void Engine::Render()
 	{
 	}
 
