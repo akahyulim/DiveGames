@@ -32,28 +32,17 @@ namespace Dive
 
     void Editor::Initialize()
     {
-        Engine::Initialize();
-
         // intialize imGui
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO(); (void)io;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
-        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
-        //io.ConfigViewportsNoAutoMerge = true;
-        //io.ConfigViewportsNoTaskBarIcon = true;
-        //io.ConfigViewportsNoDefaultParent = true;
-        //io.ConfigDockingAlwaysTabBar = true;
-        //io.ConfigDockingTransparentPayload = true;
-        //io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleFonts;     // FIXME-DPI: Experimental. THIS CURRENTLY DOESN'T WORK AS EXPECTED. DON'T USE IN USER APP!
-        //io.ConfigFlags |= ImGuiConfigFlags_DpiEnableScaleViewports; // FIXME-DPI: Experimental.
-
+        
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
-        //ImGui::StyleColorsClassic();
-
+        
         // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
         ImGuiStyle& style = ImGui::GetStyle();
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -66,6 +55,9 @@ namespace Dive
         ImGui_ImplWin32_Init(m_pAppWnd->GetWinodwHandle());
         ImGui_ImplDX11_Init(m_pD3dDevice, m_pD3dDeviceContext);
 
+        // initialize engine
+        Engine::Initialize();
+
         m_pAppWnd->Show();
     }
 
@@ -77,11 +69,11 @@ namespace Dive
         while (m_pAppWnd->Run())
         {
             Update();
-
-            beginFrame();
-
             Render();
 
+            // 생각해보니 굳이 이걸 나눌 필요가 없다...
+            beginFrame();
+            renderPanels();
             endFrame();
         }
     }
@@ -109,7 +101,6 @@ namespace Dive
         sd.SwapEffect                           = DXGI_SWAP_EFFECT_DISCARD;
 
         UINT createDeviceFlags = 0;
-        //createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
         D3D_FEATURE_LEVEL featureLevel;
         const D3D_FEATURE_LEVEL featureLevelArray[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
         auto hResult = D3D11CreateDeviceAndSwapChain(
@@ -134,10 +125,10 @@ namespace Dive
     void Editor::cleanupDeviceD3D()
     {
         cleanupRenderTarget();
-
-        if (m_pSwapChain) { m_pSwapChain->Release(); m_pSwapChain = NULL; }
-        if (m_pD3dDeviceContext) { m_pD3dDeviceContext->Release(); m_pD3dDeviceContext = NULL; }
-        if (m_pD3dDevice) { m_pD3dDevice->Release(); m_pD3dDevice = NULL; }
+    
+        DV_RELEASE(m_pSwapChain);
+        DV_RELEASE(m_pD3dDeviceContext);
+        DV_RELEASE(m_pD3dDevice);
     }
 
     void Editor::createRenderTarget()
@@ -150,7 +141,128 @@ namespace Dive
 
     void Editor::cleanupRenderTarget()
     {
-        if (m_pMainRenderTargetView) { m_pMainRenderTargetView->Release(); m_pMainRenderTargetView = NULL; }
+        DV_RELEASE(m_pMainRenderTargetView);
+    }
+
+    // 일단 어느정도 만들어본 후 분리하자
+    void Editor::renderPanels()
+    {
+        // menubar
+        {
+            if (ImGui::BeginMainMenuBar())
+            {
+                if (ImGui::BeginMenu("File"))
+                {
+                    if (ImGui::BeginMenu("New"))
+                    {
+                        if(ImGui::MenuItem("Project"))
+                        {
+
+                        }
+
+                        if (ImGui::MenuItem("Scene"))
+                        {
+
+                        }
+
+                        ImGui::EndMenu();
+                    }
+                    if (ImGui::BeginMenu("Open"))
+                    {
+                        if (ImGui::MenuItem("Project"))
+                        {
+
+                        }
+
+                        if (ImGui::MenuItem("Scene"))
+                        {
+
+                        }
+                        ImGui::EndMenu();
+                    }
+
+                    ImGui::Separator();
+
+                    if (ImGui::MenuItem("Close"))
+                    {
+                    }
+                    if (ImGui::MenuItem("Close Project"))
+                    {
+
+                    }
+
+                    ImGui::Separator();
+
+                    if (ImGui::MenuItem("Save"))
+                    {
+
+                    }
+                    if (ImGui::MenuItem("Save As..."))
+                    {
+
+                    }
+                    if (ImGui::MenuItem("Save All"))
+                    {
+
+                    }
+
+                    ImGui::Separator();
+
+                    if (ImGui::MenuItem("Exit"))
+                    {
+                        ::DestroyWindow(m_pAppWnd->GetWinodwHandle());
+                    }
+
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("GameObject"))
+                {
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Component"))
+                {
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Window"))
+                {
+                    ImGui::EndMenu();
+                }
+                if (ImGui::BeginMenu("Help"))
+                {
+                    ImGui::EndMenu();
+                }
+
+                ImGui::EndMainMenuBar();
+            }
+        } // menubar
+
+        // scene
+        {
+            ImGui::Begin("Scene");
+
+            ImGui::End();
+        } // scene
+
+        // hierarchy
+        {
+            ImGui::Begin("Hierarchy");
+
+            ImGui::End();
+        } // hierarchy
+
+        // inspector
+        {
+            ImGui::Begin("Inspector");
+
+            ImGui::End();
+        } // inspector
+
+        // asset
+        {
+            ImGui::Begin("Asset");
+
+            ImGui::End();
+        } // asset
     }
 
     void Editor::beginFrame()
@@ -162,11 +274,8 @@ namespace Dive
     
     void Editor::endFrame()
     {
-        const float clear_color_with_alpha[4] = { 1.0f, 1.0f, 0.0f, 1.0f };
-            //{ clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w };
-
-        // Update and Render additional Platform Windows
         ImGuiIO& io = ImGui::GetIO();
+        const float clear_color_with_alpha[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 
         // rendering
         ImGui::Render();
@@ -180,7 +289,6 @@ namespace Dive
             ImGui::RenderPlatformWindowsDefault();
         }
 
-        m_pSwapChain->Present(1, 0); // Present with vsync
-        //m_pSwapChain->Present(0, 0); // Present without vsync
+        m_pSwapChain->Present(1, 0);
     }
 }

@@ -80,5 +80,23 @@
     <ClInclude Include="Src\Base\AppWindow.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Panels\Panel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\ScenePanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\InspectorPanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\HierarchyPanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\AssetPanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\MenuBarPanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

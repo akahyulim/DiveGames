@@ -121,7 +121,11 @@ namespace Dive
 	LRESULT AppWindow::AppWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		// 애매해...
-		ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+		// 그리고 ImGui 예제는 여기에서 true를 리턴한다...
+		// 리턴해버리면 아래부분이 실행될 수 없는게 당연한데...
+		// 아... LRESULT의 0은 SUCCEEDED지만 if의 0은 flase다?
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+			return true;
 
 		m_Data.Msg		= msg;
 		m_Data.wParam	= wParam;
@@ -129,6 +133,7 @@ namespace Dive
 
 		switch (msg)
 		{
+			// 이 곳에서 Editor의 Swapbuffer를 리사이즈한 후 RenderTarget을 다시 생성해줘야 한다...
 		case WM_SIZE:
 		{
 			m_Data.Width = static_cast<unsigned int>(lParam & 0xffff);

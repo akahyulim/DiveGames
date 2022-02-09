@@ -1,5 +1,6 @@
 #pragma once
 #include "DiveEngine.h"
+#include "Panels/MenubarPanel.h"
 
 namespace Dive
 {
@@ -33,6 +34,7 @@ namespace Dive
 		void cleanupRenderTarget();
 
 		// imGui
+		void renderPanels();
 		void beginFrame();
 		void endFrame();
 
@@ -42,9 +44,11 @@ namespace Dive
 		WindowProps m_WindowProps;
 
 		// d3d11 device
-		ID3D11Device* m_pD3dDevice = nullptr;
-		ID3D11DeviceContext* m_pD3dDeviceContext = nullptr;
-		IDXGISwapChain* m_pSwapChain = nullptr;
+		ID3D11Device* m_pD3dDevice						= nullptr;
+		ID3D11DeviceContext* m_pD3dDeviceContext		= nullptr;
+		IDXGISwapChain* m_pSwapChain					= nullptr;
 		ID3D11RenderTargetView* m_pMainRenderTargetView = nullptr;
+
+		// panels
 	};
 }
