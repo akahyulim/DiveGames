@@ -9,13 +9,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AllocConsole();
 #endif
 
-	// create & initialize
 	Dive::Editor editor(hInstance);
-	editor.Initialize();
 
-	// run
 	editor.Run();
-
 
 #ifdef _DEBUG
 	system("pause");
