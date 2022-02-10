@@ -2,6 +2,7 @@
 #include "imgui-docking/imgui.h"
 #include "imgui-docking/imgui_impl_win32.h"
 #include "imgui-docking/imgui_impl_dx11.h"
+#include "Panels/MenuBarPanel.h"
 
 static Dive::Editor* s_pEditor = nullptr;
 
@@ -71,33 +72,12 @@ namespace Dive
 
 	Editor::~Editor()
 	{
-		// destroy engine
-
-		// destroy ImGui
-		{
-			ImGui_ImplDX11_Shutdown();
-			ImGui_ImplWin32_Shutdown();
-			ImGui::DestroyContext();
-		}
-
-		// destroy d3d11 device
-		{
-			cleanupDeviceD3D();
-		}
-
-		// destroy window
-		{
-			std::wstring windowName;
-			windowName.assign(m_Title.begin(), m_Title.end());
-			::DestroyWindow(m_hWnd);
-			::UnregisterClass(windowName.c_str(), m_hInstance);
-		}
+		
 	}
 
 	void Editor::Run()
 	{
-		bool done = false;
-		while (!done)
+		while (!m_bDone)
 		{
 			MSG msg;
 			ZeroMemory(&msg, sizeof(MSG));
@@ -108,10 +88,12 @@ namespace Dive
 				::DispatchMessageW(&msg);
 				
 				if (msg.message == WM_QUIT)
-					done = true;
+				{
+					Close();
+				}
 			}
 
-			if (done)
+			if (m_bDone)
 				break;
 
 			// 이 아래쪽에서 Update
@@ -141,6 +123,34 @@ namespace Dive
 
 				m_pSwapChain->Present(1, 0); // Present with vsync
 			}
+		}
+	}
+
+	void Editor::Destroy()
+	{
+		// delete panels
+		DV_DELETE(m_pMenuBarPanel);
+
+		// destroy engine
+
+		// destroy ImGui
+		{
+			ImGui_ImplDX11_Shutdown();
+			ImGui_ImplWin32_Shutdown();
+			ImGui::DestroyContext();
+		}
+
+		// destroy d3d11 device
+		{
+			cleanupDeviceD3D();
+		}
+
+		// destroy window
+		{
+			std::wstring windowName;
+			windowName.assign(m_Title.begin(), m_Title.end());
+			::DestroyWindow(m_hWnd);
+			::UnregisterClass(windowName.c_str(), m_hInstance);
 		}
 	}
 
@@ -263,6 +273,9 @@ namespace Dive
 		// custom style & resource
 		setDarkThemeColors();
 		loadResources();
+
+		// create panels
+		m_pMenuBarPanel = new MenuBarPanel(this);
 	}
 
 	void Editor::setDarkThemeColors()
@@ -361,39 +374,8 @@ namespace Dive
 
 		style.WindowMinSize.x = minWinSizeX;
 		
-		if (ImGui::BeginMainMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::BeginMenu("New"))
-				{
-					ImGui::EndMenu();
-				}
-				if (ImGui::BeginMenu("Open"))
-				{
-					ImGui::EndMenu();
-				}
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("GameObject"))
-			{
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("Component"))
-			{
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("Window"))
-			{
-				ImGui::EndMenu();
-			}
-			if (ImGui::BeginMenu("Help"))
-			{
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMainMenuBar();
-		}
+		// Render Panels
+		m_pMenuBarPanel->RenderPanel();
 
 		ImGui::Begin("Scene");
 		ImGui::End();

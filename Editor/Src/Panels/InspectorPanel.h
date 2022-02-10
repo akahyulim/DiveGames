@@ -1,9 +1,9 @@
 #pragma once
-#include "Panel.h"
+
 
 namespace Dive
 {
-	class InspectorPanel : public Panel
+	class InspectorPanel 
 	{
 	public:
 

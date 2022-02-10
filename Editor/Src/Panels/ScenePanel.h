@@ -1,9 +1,9 @@
 #pragma once
-#include "Panel.h"
+
 
 namespace Dive
 {
-	class ScenePanel : public Panel
+	class ScenePanel 
 	{
 	public:
 

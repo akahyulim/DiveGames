@@ -13,6 +13,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	editor.Run();
 
+	editor.Destroy();
+
 #ifdef _DEBUG
 	system("pause");
 	FreeConsole();

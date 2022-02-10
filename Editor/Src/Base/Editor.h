@@ -5,6 +5,10 @@
 
 namespace Dive
 {
+	// panels
+	class MenuBarPanel;
+
+
 	struct WindowProps
 	{
 		std::string Title = "Dive";
@@ -20,6 +24,8 @@ namespace Dive
 		~Editor();
 
 		void Run();
+		void Close() { m_bDone = true; }
+		void Destroy();
 
 		void CreateRenderTarget();
 		void CleanupRenderTarget();
@@ -43,16 +49,21 @@ namespace Dive
 
 	private:
 		// window
-		HINSTANCE m_hInstance = 0;
-		HWND m_hWnd = 0;
+		HINSTANCE m_hInstance	= 0;
+		HWND m_hWnd				= 0;
 		std::string m_Title;
-		unsigned int m_Width = 0;
-		unsigned int m_Height = 0;
+		unsigned int m_Width	= 0;
+		unsigned int m_Height	= 0;
 
 		// d3d11 device
-		IDXGISwapChain* m_pSwapChain = nullptr;
-		ID3D11Device* m_pD3dDevice = nullptr;
-		ID3D11DeviceContext* m_pD3dDeviceContext = nullptr;
+		IDXGISwapChain* m_pSwapChain				= nullptr;
+		ID3D11Device* m_pD3dDevice					= nullptr;
+		ID3D11DeviceContext* m_pD3dDeviceContext	= nullptr;
 		ID3D11RenderTargetView* m_pRenderTargetView = nullptr;
+
+		// panels
+		MenuBarPanel* m_pMenuBarPanel = nullptr;
+
+		bool m_bDone = false;
 	};
 }
