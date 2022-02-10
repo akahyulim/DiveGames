@@ -36,6 +36,8 @@ namespace Dive
 		void cleanupDeviceD3D();
 
 		void intializeImGui();
+		void setDarkThemeColors();
+		void loadResources();
 
 		void drawPanels();
 
