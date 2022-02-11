@@ -9,11 +9,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	AllocConsole();
 #endif
 
-	Dive::Editor editor(hInstance);
+	Editor editor(hInstance);
 
 	editor.Run();
 
-	editor.Destroy();
+	editor.Shutdown();
 
 #ifdef _DEBUG
 	system("pause");

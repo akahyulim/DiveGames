@@ -1,13 +1,9 @@
 #pragma once
 
-
-namespace Dive
+class ScenePanel
 {
-	class ScenePanel 
-	{
-	public:
+public:
 
-	private:
-	private:
-	};
-}
+private:
+private:
+};

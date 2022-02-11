@@ -23,7 +23,7 @@ namespace Dive
 		{ 
 			if (INVALID_ID == id)
 			{
-				CORE_WARN("잘못된 ID로 설정을 시도하였습니다.");
+				//CORE_WARN("잘못된 ID로 설정을 시도하였습니다.");
 				return;
 			}
 

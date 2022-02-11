@@ -1,27 +1,23 @@
 #pragma once
-#include "Events/Event.h"
-#include "Events/AppEvent.h"
+#include "Time.h"
 
 namespace Dive
 {
+	class Renderer;
 
 	class Engine
 	{
 	public:
-		Engine();
-		virtual ~Engine();
-		
-		virtual void Initialize();
+		Engine()	= default;
+		~Engine()	= default;
 
-		void Update();
-		void Render();
+		void Initialize();
+		void Shutdown();
 
-		void OnEvent(Event& event);
-		bool OnWinodwResize(WindowResizeEvent& event);
 
 	private:
-
+	
 	private:
-		static Engine* s_pInstance;
+		Time m_Time;
 	};
 }

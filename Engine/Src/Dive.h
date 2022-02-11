@@ -1,0 +1,22 @@
+#pragma once
+#include "Base/Time.h"
+
+namespace Dive
+{
+	// 전방 선언
+	class Engine;
+	
+	Engine* CreateEngine();
+	void DestroyEngine(Engine* pEngine = nullptr);
+	Engine* GetCurrentEngine();
+	void SetCurrentEngine(Engine* pEngine);
+
+
+	// WINDOW DATA를 받아 Renderer를 초기화하는 함수가 필요하다.
+
+	void Update();
+	void Render();
+
+	// get
+
+}

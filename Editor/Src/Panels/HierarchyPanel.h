@@ -1,13 +1,9 @@
 #pragma once
 
-
-namespace Dive
+class HierarchyPanel
 {
-	class HierarchyPanel 
-	{
-	public:
+public:
 
-	private:
-	private:
-	};
-}
+private:
+private:
+};

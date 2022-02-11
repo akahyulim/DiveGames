@@ -1,13 +1,9 @@
 #pragma once
 
-
-namespace Dive
+class InspectorPanel
 {
-	class InspectorPanel 
-	{
-	public:
+public:
 
-	private:
-	private:
-	};
-}
+private:
+private:
+};

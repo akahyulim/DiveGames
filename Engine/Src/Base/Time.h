@@ -5,32 +5,35 @@ namespace Dive
 	class Time
 	{
 	public:
-		static void Initialize();
-
-		static void Update();
-
-		static double GetDeltaTimeMS() { return m_DeltaTime; }
-		static float GetDeltaTimeSec() { return static_cast<float>(m_DeltaTime / 1000.0f); }
- 
-		static double GetRealTimeSinceStartUpMS() { return m_RealTimeSinceStartup; }
-		static unsigned int GetRealTimeSinceStartUpSec() { return static_cast<unsigned int>(m_RealTimeSinceStartup / 1000); }
-
-		static float GetFixedFrameRate() { return m_FixedFrameRate; }
-		static void SetFixedFrameRate(float rate) { m_FixedFrameRate = rate; }
-		
-		static float GetTimeScale() { return m_TimeScale; }
-		static void SetTimeScale(float scale) { m_TimeScale = scale; }
-
-	private:
 		Time() = default;
 		~Time() = default;
 
-	private:
-		static std::chrono::high_resolution_clock::time_point m_StartTime;
+		void Initialize();
 
-		static double m_RealTimeSinceStartup;
-		static double m_DeltaTime;
-		static float m_FixedFrameRate;
-		static float m_TimeScale;
+		void Update();
+
+		double GetDeltaTimeMS() { return m_DeltaTime; }
+		float GetDeltaTimeSec() { return static_cast<float>(m_DeltaTime / 1000.0f); }
+ 
+		double GetRealTimeSinceStartUpMS() { return m_RealTimeSinceStartup; }
+		unsigned int GetRealTimeSinceStartUpSec() { return static_cast<unsigned int>(m_RealTimeSinceStartup / 1000); }
+
+		float GetFixedFrameRate() { return m_FixedFrameRate; }
+		void SetFixedFrameRate(float rate) { m_FixedFrameRate = rate; }
+		
+		float GetTimeScale() { return m_TimeScale; }
+		void SetTimeScale(float scale) { m_TimeScale = scale; }
+
+	private:
+		Time(const Time&) = delete;
+		Time& operator=(const Time&) = delete;
+
+	private:
+		std::chrono::high_resolution_clock::time_point m_StartTime;
+
+		double m_RealTimeSinceStartup	= 0;
+		double m_DeltaTime				= 0;
+		float m_FixedFrameRate			= 0.0f;
+		float m_TimeScale				= 0.0f;
 	};
 }

@@ -1,13 +1,9 @@
 #pragma once
 
-
-namespace Dive
+class AssetPanel
 {
-	class AssetPanel 
-	{
-	public:
+public:
 
-	private:
-	private:
-	};
-}
+private:
+private:
+};

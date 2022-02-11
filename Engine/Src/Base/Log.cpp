@@ -5,11 +5,16 @@
 
 namespace Dive
 {
-	std::shared_ptr<spdlog::logger> Log::sCoreLogger;
-	std::shared_ptr<spdlog::logger> Log::sAppLogger;
+	bool Log::m_bInitialized = false;
+
+	std::shared_ptr<spdlog::logger> Log::m_pCoreLogger;
+	std::shared_ptr<spdlog::logger> Log::m_pAppLogger;
 
 	void Log::Initialize()
 	{
+		if (m_bInitialized)
+			return;
+
 		std::vector<spdlog::sink_ptr> logSinks;
 		logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
 		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Dive.log", true));
@@ -17,14 +22,16 @@ namespace Dive
 		logSinks[0]->set_pattern("%^[%T] %n: %v%$");
 		logSinks[1]->set_pattern("[%T] [%l] %n: %v");
 
-		sCoreLogger = std::make_shared<spdlog::logger>("CORE", std::begin(logSinks), std::end(logSinks));
-		spdlog::register_logger(sCoreLogger);
-		sCoreLogger->set_level(spdlog::level::trace);
-		sCoreLogger->flush_on(spdlog::level::trace);
+		m_pCoreLogger = std::make_shared<spdlog::logger>("CORE", std::begin(logSinks), std::end(logSinks));
+		spdlog::register_logger(m_pCoreLogger);
+		m_pCoreLogger->set_level(spdlog::level::trace);
+		m_pCoreLogger->flush_on(spdlog::level::trace);
 
-		sAppLogger = std::make_shared<spdlog::logger>("APP", std::begin(logSinks), std::end(logSinks));
-		spdlog::register_logger(sAppLogger);
-		sAppLogger->set_level(spdlog::level::trace);
-		sAppLogger->flush_on(spdlog::level::trace);
+		m_pAppLogger = std::make_shared<spdlog::logger>("APP", std::begin(logSinks), std::end(logSinks));
+		spdlog::register_logger(m_pAppLogger);
+		m_pAppLogger->set_level(spdlog::level::trace);
+		m_pAppLogger->flush_on(spdlog::level::trace);
+
+		m_bInitialized = true;
 	}
 }

@@ -1,47 +1,18 @@
 #include "divepch.h"
 #include "Engine.h"
-#include "Base.h"
-#include "Time.h"
+#include "Log.h"
 
 namespace Dive
 {
-	Engine* Engine::s_pInstance = nullptr;
-
-	Engine::Engine()
-	{
-		DV_ASSERT(!s_pInstance);
-		s_pInstance = this;
-	}
-
-	Engine::~Engine()
-	{
-		// sub system 종료
-	}
-
 	void Engine::Initialize()
 	{
-		// sub system 초기화
 		Log::Initialize();
+		m_Time.Initialize();
+
+		// renderer는 일단 생성 후 따로 윈도우 데이터를 받아 초기화하는걸로...?
 	}
 
-	void Engine::Update()
+	void Engine::Shutdown()
 	{
-	}
-
-	void Engine::Render()
-	{
-	}
-
-	void Engine::OnEvent(Event& event)
-	{
-		EventDispatcher dispatcher(event);
-		dispatcher.Dispatch<WindowResizeEvent>(DV_BIND_EVENT_FN(Engine::OnWinodwResize));
-	}
-
-	bool Engine::OnWinodwResize(WindowResizeEvent& event)
-	{
-		CORE_TRACE("call wnd resize event: {0:d} x {1:d}", event.GetWidth(), event.GetHeight());
-
-		return true;
 	}
 }

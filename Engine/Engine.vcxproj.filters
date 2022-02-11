@@ -28,6 +28,9 @@
     <ClInclude Include="Src\Events\AppEvent.h">
       <Filter>Src\Events</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Dive.h">
+      <Filter>Src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -41,6 +44,9 @@
     </ClCompile>
     <ClCompile Include="Src\Base\Engine.cpp">
       <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Dive.cpp">
+      <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

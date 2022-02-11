@@ -24,9 +24,6 @@
     <ClCompile Include="Src\main.cpp">
       <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="External\imgui-docking\imgui.cpp">
-      <Filter>External\imgui-docking</Filter>
-    </ClCompile>
     <ClCompile Include="External\imgui-docking\imgui_demo.cpp">
       <Filter>External\imgui-docking</Filter>
     </ClCompile>
@@ -48,15 +45,15 @@
     <ClCompile Include="Src\Panels\MenuBarPanel.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="External\imgui-docking\imgui.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Base\Editor.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
     <ClInclude Include="External\imgui-docking\imconfig.h">
-      <Filter>External\imgui-docking</Filter>
-    </ClInclude>
-    <ClInclude Include="External\imgui-docking\imgui.h">
       <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="External\imgui-docking\imgui_impl_dx11.h">
@@ -91,6 +88,9 @@
     </ClInclude>
     <ClInclude Include="Src\Panels\MenuBarPanel.h">
       <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="External\imgui-docking\imgui.h">
+      <Filter>External\imgui-docking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
