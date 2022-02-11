@@ -12,13 +12,13 @@ namespace Dive
 
 		static std::shared_ptr<spdlog::logger>& GetCoreLogger() 
 		{
-			DV_ASSERT(m_bInitialized);
+			DV_ASSERT(m_bInitialized && "Log Instance is not initialized yet.");
 			return m_pCoreLogger; 
 		}
 
 		static std::shared_ptr<spdlog::logger>& GetAppLogger() 
 		{ 
-			DV_ASSERT(m_bInitialized);
+			DV_ASSERT(m_bInitialized && "Log Instance is not initialized yet.");
 			return m_pAppLogger; 
 		}
 
@@ -31,15 +31,15 @@ namespace Dive
 }
 
 // Engine Logger Macro
-#define DIVE_CORE_TRACE(...)		Dive::Log::GetCoreLogger()->trace(__VA_ARGS__)
-#define DIVE_CORE_INFO(...)			Dive::Log::GetCoreLogger()->info(__VA_ARGS__)
-#define DIVE_CORE_WARN(...)			Dive::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define DIVE_CORE_ERROR(...)		Dive::Log::GetCoreLogger()->error(__VA_ARGS__)
-#define DIVE_CORE_CRITICAL(...)		Dive::Log::GetCoreLogger()->critical(__VA_ARGS__)
+#define DV_CORE_TRACE(...)		Dive::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define DV_CORE_INFO(...)			Dive::Log::GetCoreLogger()->info(__VA_ARGS__)
+#define DV_CORE_WARN(...)			Dive::Log::GetCoreLogger()->warn(__VA_ARGS__)
+#define DV_CORE_ERROR(...)		Dive::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define DV_CORE_CRITICAL(...)		Dive::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
 // Application Logger Macro
-#define DIVE_APP_TRACE(...)			Dive::Log::GetAppLogger()->trace(__VA_ARGS__)
-#define DIVE_APP_INFO(...)			Dive::Log::GetAppLogger()->info(__VA_ARGS__)
-#define DIVE_APP_WARN(...)			Dive::Log::GetAppLogger()->warn(__VA_ARGS__)
-#define DIVE_APP_ERROR(...)			Dive::Log::GetAppLogger()->error(__VA_ARGS__)
-#define DIVE_APP_CRITICAL(...)		Dive::Log::GetAppLogger()->critical(__VA_ARGS__)
+#define DV_APP_TRACE(...)			Dive::Log::GetAppLogger()->trace(__VA_ARGS__)
+#define DV_APP_INFO(...)			Dive::Log::GetAppLogger()->info(__VA_ARGS__)
+#define DV_APP_WARN(...)			Dive::Log::GetAppLogger()->warn(__VA_ARGS__)
+#define DV_APP_ERROR(...)			Dive::Log::GetAppLogger()->error(__VA_ARGS__)
+#define DV_APP_CRITICAL(...)		Dive::Log::GetAppLogger()->critical(__VA_ARGS__)

@@ -16,6 +16,8 @@ namespace Dive
 
 		pEngine->Initialize();
 
+		DV_CORE_TRACE("Engine was created");
+		
 		return pEngine;
 	}
 
@@ -29,7 +31,9 @@ namespace Dive
 		if (g_pEngine == pEngine)
 			SetCurrentEngine(nullptr);
 
-		DIVE_DELETE(pEngine);
+		DV_DELETE(pEngine);
+
+		DV_CORE_TRACE("Engine was destroyed");
 	}
 
 	Engine* GetCurrentEngine()

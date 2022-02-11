@@ -131,7 +131,7 @@ void Editor::Run()
 void Editor::Shutdown()
 {
 	// delete panels
-	DIVE_DELETE(m_pMenuBarPanel);
+	DV_DELETE(m_pMenuBarPanel);
 
 	// destroy engine
 	Dive::DestroyEngine();
@@ -167,7 +167,7 @@ void Editor::CreateRenderTarget()
 
 void Editor::CleanupRenderTarget()
 {
-	DIVE_RELEASE(m_pRenderTargetView);
+	DV_RELEASE(m_pRenderTargetView);
 }
 
 void Editor::createWindow(HINSTANCE hInstance, const WindowProps& props)
@@ -243,9 +243,9 @@ void Editor::cleanupDeviceD3D()
 {
 	CleanupRenderTarget();
 
-	DIVE_RELEASE(m_pSwapChain);
-	DIVE_RELEASE(m_pD3dDevice);
-	DIVE_RELEASE(m_pD3dDeviceContext);
+	DV_RELEASE(m_pSwapChain);
+	DV_RELEASE(m_pD3dDevice);
+	DV_RELEASE(m_pD3dDeviceContext);
 }
 
 void Editor::intializeImGui()
