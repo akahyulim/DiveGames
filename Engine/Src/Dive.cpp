@@ -7,17 +7,14 @@ namespace Dive
 {
 	Engine* g_pEngine = nullptr;
 
-
-	Engine* CreateEngine()
+	Engine* CreateEngine(const WindowData* pData)
 	{
 		Engine* pEngine = new Engine;
 		DV_ASSERT(pEngine);
 		SetCurrentEngine(pEngine);
 
-		pEngine->Initialize();
+		pEngine->Initialize(pData);
 
-		DV_CORE_TRACE("Engine was created");
-		
 		return pEngine;
 	}
 
@@ -32,8 +29,6 @@ namespace Dive
 			SetCurrentEngine(nullptr);
 
 		DV_DELETE(pEngine);
-
-		DV_CORE_TRACE("Engine was destroyed");
 	}
 
 	Engine* GetCurrentEngine()
@@ -52,6 +47,12 @@ namespace Dive
 
 	void Render()
 	{
+	}
+
+	Renderer& GetRenderer()
+	{
+		DV_ASSERT(g_pEngine != nullptr && "Engine 객체가 존재하지 않습니다.");
+		return g_pEngine->GetRenderer();
 	}
 
 }

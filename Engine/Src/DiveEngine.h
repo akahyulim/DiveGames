@@ -22,6 +22,8 @@
 //= Resource ======================
 
 //= Renderer ======================
+#include "Renderer/Graphics/GraphicsDevice.h"
+#include "Renderer/Renderer.h"
 
 //= Input =========================
 

@@ -48,6 +48,9 @@
     <ClCompile Include="External\imgui-docking\imgui.cpp">
       <Filter>External\imgui-docking</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Panels\ScenePanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Base\Editor.h">

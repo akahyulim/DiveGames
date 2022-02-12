@@ -31,6 +31,12 @@
     <ClInclude Include="Src\Dive.h">
       <Filter>Src</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Renderer.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -47,6 +53,12 @@
     </ClCompile>
     <ClCompile Include="Src\Dive.cpp">
       <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Renderer.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -79,6 +91,9 @@
     </Filter>
     <Filter Include="Src\Events">
       <UniqueIdentifier>{c8625268-a56a-4de6-a0c2-80adac89a45c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Renderer\GraphicsDevice">
+      <UniqueIdentifier>{14e29e43-eba7-4d82-b934-67fe14fb73ea}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -159,6 +159,7 @@
     <ClCompile Include="Src\Base\Editor.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Panels\MenuBarPanel.cpp" />
+    <ClCompile Include="Src\Panels\ScenePanel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h" />

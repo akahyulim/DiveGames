@@ -1,12 +1,13 @@
 #pragma once
 #include "Base/Time.h"
+#include "Base/Engine.h"
+#include "Renderer/Renderer.h"
 
 namespace Dive
 {
 	// 전방 선언
-	class Engine;
 	
-	Engine* CreateEngine();
+	Engine* CreateEngine(const WindowData* pData);
 	void DestroyEngine(Engine* pEngine = nullptr);
 	Engine* GetCurrentEngine();
 	void SetCurrentEngine(Engine* pEngine);
@@ -18,5 +19,6 @@ namespace Dive
 	void Render();
 
 	// get
+	Renderer& GetRenderer();
 
 }

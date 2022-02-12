@@ -3,6 +3,7 @@
 #include "imgui-docking/imgui_impl_win32.h"
 #include "imgui-docking/imgui_impl_dx11.h"
 #include "Panels/MenuBarPanel.h"
+#include "Panels/ScenePanel.h"
 
 static Editor* s_pEditor = nullptr;
 
@@ -43,14 +44,14 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 Editor::Editor(HINSTANCE hInstance, const std::string& title)
 {
 	// load ini
-	WindowProps props;
-	props.Title = title;
-	props.Width = 800;
-	props.Height = 600;
-	props.bMaximize = false;
+	m_Title = title;
+	m_Width = 1280;
+	m_Height = 720;
+	m_bVSync = false;
+	m_bFullScreen = false;
 
 	// create window
-	createWindow(hInstance, props);
+	createWindow(hInstance);
 
 	// create d3d11 device
 	createDeviceD3D();
@@ -59,7 +60,14 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	intializeImGui();
 
 	// create engine
-	Dive::CreateEngine();
+	Dive::WindowData data;
+	data.hWnd = m_hWnd;
+	// 처음부터 ScenePanel의 크기를 주는게 낫지 않을까?
+	data.Width = m_Width;
+	data.Height = m_Height;
+	data.bVSync = m_bVSync;
+	data.bFullScreen = m_bFullScreen;
+	Dive::CreateEngine(&data);
 
 	DV_ASSERT(s_pEditor == nullptr);
 	s_pEditor = this;
@@ -123,7 +131,7 @@ void Editor::Run()
 				ImGui::RenderPlatformWindowsDefault();
 			}
 
-			m_pSwapChain->Present(1, 0); // Present with vsync
+			m_pSwapChain->Present(m_bVSync ? 1 : 0, 0);
 		}
 	}
 }
@@ -131,6 +139,7 @@ void Editor::Run()
 void Editor::Shutdown()
 {
 	// delete panels
+	DV_DELETE(m_pScenePanel);
 	DV_DELETE(m_pMenuBarPanel);
 
 	// destroy engine
@@ -170,13 +179,13 @@ void Editor::CleanupRenderTarget()
 	DV_RELEASE(m_pRenderTargetView);
 }
 
-void Editor::createWindow(HINSTANCE hInstance, const WindowProps& props)
+void Editor::createWindow(HINSTANCE hInstance)
 {
 	if (hInstance == 0)
 		hInstance = GetModuleHandle(NULL);
 
 	std::wstring windowName;
-	windowName.assign(props.Title.begin(), props.Title.end());
+	windowName.assign(m_Title.begin(), m_Title.end());
 
 	WNDCLASSEX wcex;
 	wcex.cbSize = sizeof(WNDCLASSEX);
@@ -193,19 +202,16 @@ void Editor::createWindow(HINSTANCE hInstance, const WindowProps& props)
 	wcex.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
 	DV_ASSERT(RegisterClassEx(&wcex));
 
-	int posX = (GetSystemMetrics(SM_CXSCREEN) - (int)props.Width) / 2;
-	int posY = (GetSystemMetrics(SM_CYSCREEN) - (int)props.Height) / 2;
+	int posX = (GetSystemMetrics(SM_CXSCREEN) - (int)m_Width) / 2;
+	int posY = (GetSystemMetrics(SM_CYSCREEN) - (int)m_Height) / 2;
 
 	auto hWnd = CreateWindowW(windowName.c_str(), windowName.c_str(), WS_OVERLAPPEDWINDOW,
-		posX, posY, props.Width, props.Height, nullptr, nullptr, hInstance, nullptr);
+		posX, posY, m_Width, m_Height, nullptr, nullptr, hInstance, nullptr);
 
 	DV_ASSERT(hWnd != NULL);
 
 	m_hInstance = hInstance;
 	m_hWnd = hWnd;
-	m_Title = props.Title;
-	m_Width = props.Width;
-	m_Height = props.Height;
 }
 	
 void Editor::createDeviceD3D()
@@ -278,7 +284,9 @@ void Editor::intializeImGui()
 	loadResources();
 
 	// create panels
+	// 아무래도 interface를 만드는 편이 낫겠다.
 	m_pMenuBarPanel = new MenuBarPanel(this);
+	m_pScenePanel = new ScenePanel(this);
 }
 
 void Editor::setDarkThemeColors()
@@ -379,9 +387,8 @@ void Editor::drawPanels()
 		
 	// Render Panels
 	m_pMenuBarPanel->RenderPanel();
-
-	ImGui::Begin("Scene");
-	ImGui::End();
+	m_pScenePanel->RenderPanel();
+	
 	ImGui::Begin("Hierarchy");
 	ImGui::End();
 	ImGui::Begin("Inspector");

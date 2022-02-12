@@ -1,9 +1,17 @@
 #pragma once
 #include "Time.h"
+#include "Renderer/Renderer.h"
 
 namespace Dive
 {
-	class Renderer;
+	struct WindowData
+	{
+		HWND hWnd = 0;
+		unsigned int Width = 0;
+		unsigned int Height = 0;
+		bool bVSync = false;
+		bool bFullScreen = false;
+	};
 
 	class Engine
 	{
@@ -11,13 +19,16 @@ namespace Dive
 		Engine()	= default;
 		~Engine()	= default;
 
-		void Initialize();
+		void Initialize(const WindowData* pData);
 		void Shutdown();
 
+		Renderer& GetRenderer() { return m_Renderer; }
 
 	private:
 	
 	private:
 		Time m_Time;
+
+		Renderer m_Renderer;
 	};
 }

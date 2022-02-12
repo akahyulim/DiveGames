@@ -5,15 +5,7 @@
 
 // panels
 class MenuBarPanel;
-
-
-struct WindowProps
-{
-	std::string Title = "Dive";
-	unsigned int Width	= 1280;
-	unsigned int Height = 780;
-	bool bMaximize		= false;
-};
+class ScenePanel;
 
 class Editor
 {
@@ -34,7 +26,7 @@ public:
 	ID3D11RenderTargetView* GetRnederTargetView() { return m_pRenderTargetView; }
 
 private:
-	void createWindow(HINSTANCE hInstance, const WindowProps& props);
+	void createWindow(HINSTANCE hInstance);
 
 	void createDeviceD3D();
 	void cleanupDeviceD3D();
@@ -52,6 +44,9 @@ private:
 	std::string m_Title;
 	unsigned int m_Width	= 0;
 	unsigned int m_Height	= 0;
+	bool m_bVSync			= false;
+	bool m_bFullScreen		= false;
+
 
 	// d3d11 device
 	IDXGISwapChain* m_pSwapChain				= nullptr;
@@ -61,6 +56,7 @@ private:
 
 	// panels
 	MenuBarPanel* m_pMenuBarPanel = nullptr;
+	ScenePanel* m_pScenePanel = nullptr;
 
 	bool m_bDone = false;
 };

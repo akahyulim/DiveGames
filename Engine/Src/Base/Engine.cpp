@@ -4,15 +4,17 @@
 
 namespace Dive
 {
-	void Engine::Initialize()
+	void Engine::Initialize(const WindowData* pData)
 	{
 		Log::Initialize();
 		m_Time.Initialize();
 
-		// renderer는 일단 생성 후 따로 윈도우 데이터를 받아 초기화하는걸로...?
+		m_Renderer.Initialize(pData);
+
 	}
 
 	void Engine::Shutdown()
 	{
+		m_Renderer.Shutdow();
 	}
 }

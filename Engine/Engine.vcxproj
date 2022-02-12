@@ -180,6 +180,8 @@
     <ClInclude Include="Src\Base\Time.h" />
     <ClInclude Include="Src\Events\AppEvent.h" />
     <ClInclude Include="Src\Events\Event.h" />
+    <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
+    <ClInclude Include="Src\Renderer\Renderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Dive.cpp" />
@@ -189,6 +191,8 @@
     <ClCompile Include="Src\Base\Engine.cpp" />
     <ClCompile Include="Src\Base\Log.cpp" />
     <ClCompile Include="Src\Base\Time.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
+    <ClCompile Include="Src\Renderer\Renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Assets\Shaders\Legacy\Common.hlsl">
