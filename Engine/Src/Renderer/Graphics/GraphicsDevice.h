@@ -16,6 +16,16 @@ namespace Dive
 		ID3D11Device* GetDevice() { return m_pDevice; }
 		ID3D11DeviceContext* GetImmediateContext() { return m_pImmediateContext; }
 
+		IDXGISwapChain* GetSwapChain() { return m_pSwapChain; }
+		ID3D11RenderTargetView* GetMainRenderTargetView() { return m_pMainRenderTargetView; }
+
+		unsigned int GetWidth() const { return m_Width; }
+		unsigned int GetHeight() const { return m_Height; }
+		
+		bool IsVSync() const { return m_bVSync; }
+
+		bool IsFullScreen() const { return m_bFullScreen; }
+
 	private:
 		void createBackbufferResource();
 	

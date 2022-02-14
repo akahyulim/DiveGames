@@ -11,9 +11,18 @@ namespace Dive
 		void Initialize(const WindowData* pData);
 		void Shutdow();
 
+		void Tick();
+		void BeginScene();
+		void EndScene();
+
+		void SetViewport(float width, float height);
+		void SetResolution(unsigned int width, unsigned int height);
+
 	private:
 	
 	private:
 		GraphicsDevice m_GraphicsDevice;
+
+		// resources
 	};
 }

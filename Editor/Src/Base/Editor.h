@@ -26,15 +26,16 @@ public:
 	ID3D11RenderTargetView* GetRnederTargetView() { return m_pRenderTargetView; }
 
 private:
+	// editor's window & d3ddevice
 	void createWindow(HINSTANCE hInstance);
-
 	void createDeviceD3D();
 	void cleanupDeviceD3D();
 
+	// imgui
 	void intializeImGui();
 	void setDarkThemeColors();
 	void loadResources();
-
+	void createPanels();
 	void drawPanels();
 
 private:

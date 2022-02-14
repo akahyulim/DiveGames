@@ -69,6 +69,9 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	data.bFullScreen = m_bFullScreen;
 	Dive::CreateEngine(&data);
 
+	// create panels: imgui 초기화 및 engine 생성 후 
+	createPanels();
+
 	DV_ASSERT(s_pEditor == nullptr);
 	s_pEditor = this;
 
@@ -288,10 +291,6 @@ void Editor::intializeImGui()
 	// custom style & resource
 	setDarkThemeColors();
 	loadResources();
-
-	// create panels
-	m_Panels.emplace_back(new MenuBarPanel(this));
-	m_Panels.emplace_back(new ScenePanel(this));
 }
 
 void Editor::setDarkThemeColors()
@@ -336,6 +335,12 @@ void Editor::loadResources()
 	float fontSize = 16.0f;
 	auto io = ImGui::GetIO();
 	io.FontDefault = io.Fonts->AddFontFromFileTTF("Assets/Fonts/Nanum/NanumBarunGothic.ttf", fontSize);
+}
+
+void Editor::createPanels()
+{
+	m_Panels.emplace_back(new MenuBarPanel(this));
+	m_Panels.emplace_back(new ScenePanel(this));
 }
 
 void Editor::drawPanels()

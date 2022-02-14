@@ -10,4 +10,6 @@ public:
 	void renderWindow() override;
 
 private:
+	Dive::Renderer* m_pRenderer = nullptr;
+	
 };

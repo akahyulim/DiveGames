@@ -22,6 +22,9 @@ namespace Dive
 		void Initialize(const WindowData* pData);
 		void Shutdown();
 
+		void Update();
+		void Render();
+
 		Renderer& GetRenderer() { return m_Renderer; }
 
 	private:
