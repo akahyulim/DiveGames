@@ -1,22 +1,20 @@
 #include "MenuBarPanel.h"
-#include "imgui-docking/imgui.h"
-#include "Base/Editor.h"
-#include "DiveEngine.h"
-#include <Windows.h>
 
 MenuBarPanel::MenuBarPanel(Editor* pEditor)
-	: m_pEditor(pEditor)
+	: Panel(pEditor, "MenuBar")
 {
-	DV_ASSERT(m_pEditor);
+	m_bWindow = false;
 }
 
-void MenuBarPanel::RenderPanel()
+// 메뉴바는 항상 그려져야 한다.
+void MenuBarPanel::renderAlways()
 {
 	ImGui::BeginMainMenuBar();
 
 	menuFile();
 	menuGameObject();
 	menuComponent();
+	menuWindow();
 	menuHelp();
 
 	ImGui::EndMainMenuBar();
@@ -103,6 +101,16 @@ void MenuBarPanel::menuComponent()
 {
 	if (ImGui::BeginMenu("Component"))
 	{
+		ImGui::EndMenu();
+	}
+}
+
+void MenuBarPanel::menuWindow()
+{
+	if (ImGui::BeginMenu("Window"))
+	{
+		// 해당 Panel의 객체를 가져와야 한다.
+
 		ImGui::EndMenu();
 	}
 }

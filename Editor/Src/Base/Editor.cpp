@@ -139,8 +139,14 @@ void Editor::Run()
 void Editor::Shutdown()
 {
 	// delete panels
-	DV_DELETE(m_pScenePanel);
-	DV_DELETE(m_pMenuBarPanel);
+	if (m_Panels.empty())
+	{
+		for (auto pPanel : m_Panels)
+		{
+			DV_DELETE(pPanel);
+		}
+		m_Panels.clear();
+	}
 
 	// destroy engine
 	Dive::DestroyEngine();
@@ -284,9 +290,8 @@ void Editor::intializeImGui()
 	loadResources();
 
 	// create panels
-	// 아무래도 interface를 만드는 편이 낫겠다.
-	m_pMenuBarPanel = new MenuBarPanel(this);
-	m_pScenePanel = new ScenePanel(this);
+	m_Panels.emplace_back(new MenuBarPanel(this));
+	m_Panels.emplace_back(new ScenePanel(this));
 }
 
 void Editor::setDarkThemeColors()
@@ -386,8 +391,11 @@ void Editor::drawPanels()
 	style.WindowMinSize.x = minWinSizeX;
 		
 	// Render Panels
-	m_pMenuBarPanel->RenderPanel();
-	m_pScenePanel->RenderPanel();
+	if (!m_Panels.empty())
+	{
+		for (auto pPanel : m_Panels)
+			pPanel->Tick();
+	}
 	
 	ImGui::Begin("Hierarchy");
 	ImGui::End();

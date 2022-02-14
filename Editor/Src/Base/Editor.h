@@ -2,10 +2,10 @@
 #include "DiveEngine.h"
 #include <Windows.h>
 #include <string>
+#include <vector>
 
 // panels
-class MenuBarPanel;
-class ScenePanel;
+class Panel;
 
 class Editor
 {
@@ -55,8 +55,7 @@ private:
 	ID3D11RenderTargetView* m_pRenderTargetView = nullptr;
 
 	// panels
-	MenuBarPanel* m_pMenuBarPanel = nullptr;
-	ScenePanel* m_pScenePanel = nullptr;
+	std::vector<Panel*> m_Panels;
 
 	bool m_bDone = false;
 };

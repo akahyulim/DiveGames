@@ -1,17 +1,13 @@
 #pragma once
+#include "Panel.h"
 
-class Editor;
-
-class ScenePanel
+class ScenePanel : public Panel
 {
 public:
 	ScenePanel(Editor* pEditor);
 	~ScenePanel() = default;
 
-	void RenderPanel();
+	void renderWindow() override;
 
 private:
-
-private:
-	Editor* m_pEditor = nullptr;
 };
