@@ -21,6 +21,8 @@ namespace Dive
 
 		ID3D11RenderTargetView* GetMainRenderTargetView();
 
+		GraphicsDevice* GetGraphicsDevice() { return &m_GraphicsDevice; }
+
 	private:
 	
 	private:

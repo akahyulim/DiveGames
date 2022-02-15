@@ -15,7 +15,7 @@
 
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
-#include <wrl/client.h>
+#include <DirectXTex/DirectXTex.h>
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")

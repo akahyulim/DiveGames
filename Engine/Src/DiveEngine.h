@@ -23,6 +23,7 @@
 
 //= Renderer ======================
 #include "Renderer/Graphics/GraphicsDevice.h"
+#include "Renderer/Graphics/Texture.h"
 #include "Renderer/Renderer.h"
 
 //= Input =========================
