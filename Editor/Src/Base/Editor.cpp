@@ -108,8 +108,7 @@ void Editor::Run()
 
 		// 이 아래쪽에서 Update
 		{
-			Dive::Update();
-			Dive::Render();
+			Dive::Run();
 
 			// Begin
 			ImGui_ImplDX11_NewFrame();

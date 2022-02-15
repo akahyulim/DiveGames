@@ -18,13 +18,9 @@ namespace Dive
 		m_Renderer.Shutdow();
 	}
 
-	void Engine::Update()
+	void Engine::Run()
 	{
-		m_Time.Update();
-	}
-
-	void Engine::Render()
-	{
+		m_Time.Tick();
 		m_Renderer.Tick();
 	}
 }

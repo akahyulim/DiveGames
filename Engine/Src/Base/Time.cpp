@@ -8,7 +8,7 @@ namespace Dive
 		m_StartTime = std::chrono::high_resolution_clock::now();
 	}
 
-	void Time::Update()
+	void Time::Tick()
 	{
 		auto currentTime = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double, std::milli> elapsedTime = currentTime - m_StartTime;

@@ -17,9 +17,15 @@ namespace Dive
 
 	void Renderer::Tick()
 	{
-		BeginScene();
+		// update
+		{}
 
-		EndScene();
+		// render
+		{
+			BeginScene();
+
+			EndScene();
+		}
 	}
 	
 	void Renderer::BeginScene()
@@ -29,7 +35,8 @@ namespace Dive
 		if (!pImmediateContext || !pMainRenderTargetView)
 			return;
 
-		float clearColors[4] = {0.3f, 0.3f, 0.3f, 1.0f};
+		// active camera로부터 가져와야 한다.
+		float clearColors[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 
 		pImmediateContext->ClearRenderTargetView(pMainRenderTargetView, clearColors);
 	}
@@ -41,5 +48,17 @@ namespace Dive
 			return;
 
 		pSwapChain->Present(m_GraphicsDevice.IsVSync() ? 1 : 0, 0);
+	}
+
+	void Renderer::SetResolution(unsigned int width, unsigned int height)
+	{
+		// 다른 RenderTarget들도 변경 대상이다.
+
+		m_GraphicsDevice.ResizeBackBuffer(width, height);
+	}
+
+	ID3D11RenderTargetView* Renderer::GetMainRenderTargetView()
+	{
+		return m_GraphicsDevice.GetMainRenderTargetView();
 	}
 }

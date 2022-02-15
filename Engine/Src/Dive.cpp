@@ -41,19 +41,9 @@ namespace Dive
 		g_pEngine = pEngine;
 	}
 
-	void Update()
+	void Run()
 	{
-		DV_ASSERT(g_pEngine);
-		g_pEngine->Update();
-	}
-
-	// 현재 Editor와 Engine이 번갈아가면서 그리기 때문에
-	// 화면이 깜빡거린다.
-	// 일단은 Update, Render부터 설정을 잡은 후 Renderer의 path로 내려가야할 것 같다.
-	void Render()
-	{
-		DV_ASSERT(g_pEngine);
-		//g_pEngine->Render();
+		DV_ASSERT(g_pEngine != nullptr && "Engine 객체가 존재하지 않습니다.");
 	}
 
 	Renderer& GetRenderer()

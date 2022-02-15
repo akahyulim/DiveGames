@@ -21,10 +21,11 @@ void ScenePanel::renderWindow()
 	// Editor용 Camera도 함께 설정??
 
 	// 크기가 변경되었다면 renderer의 해상도를 변경한다.
+	m_pRenderer->SetResolution(width, height);
 
 	// image를 가져와 그린다.
 	ImGui::Image(
-		nullptr,
+		nullptr,	// shader resource view다...
 		ImVec2(static_cast<float>(width), static_cast<float>(height)),
 		ImVec2(0, 0),
 		ImVec2(1, 1),

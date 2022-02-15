@@ -10,7 +10,7 @@ namespace Dive
 
 		void Initialize();
 
-		void Update();
+		void Tick();
 
 		double GetDeltaTimeMS() { return m_DeltaTime; }
 		float GetDeltaTimeSec() { return static_cast<float>(m_DeltaTime / 1000.0f); }
