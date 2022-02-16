@@ -76,7 +76,7 @@ namespace Dive
 
 		DV_ASSERT(result == S_OK);
 
-		createMainRenderTargetView();
+		CreateMainRenderTargetView();
 	}
 
 	void GraphicsDevice::Shutdown()
@@ -87,16 +87,27 @@ namespace Dive
 		DV_RELEASE(m_pSwapChain);
 	}
 
+	void GraphicsDevice::CreateMainRenderTargetView()
+	{
+		ID3D11Texture2D* pBackBuffer;
+		m_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
+		m_pDevice->CreateRenderTargetView(pBackBuffer, NULL, &m_pMainRenderTargetView);
+		DV_RELEASE(pBackBuffer);
+	}
+
+	void GraphicsDevice::CleanupMainRenderTargetView()
+	{
+		DV_RELEASE(m_pMainRenderTargetView);
+	}
+
 	void GraphicsDevice::ResizeBackBuffer(unsigned int width, unsigned int height)
 	{
 		DV_ASSERT(m_pSwapChain != nullptr);
 		DV_ASSERT(m_pImmediateContext != nullptr);
 
-		if (width == m_Width && height == m_Height)
-			return;
-
 		m_pImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
-		DV_RELEASE(m_pMainRenderTargetView);
+
+		CleanupMainRenderTargetView();
 
 		if (FAILED(m_pSwapChain->ResizeBuffers(m_BackbufferCount, width, height, m_Format, 0)))
 		{
@@ -104,49 +115,9 @@ namespace Dive
 			return;
 		}
 
-		createMainRenderTargetView();
+		CreateMainRenderTargetView();
 
 		m_Width = width;
 		m_Height = height;
-	}
-
-	// 일단 기억을 위해 남겨둔다.
-	// 1. 결국 SetRenderTargetView와 분리된 형태이다.
-	// 2. 결국 단순 랩핑 함수이다.
-	void GraphicsDevice::ClearRenderTargetView(ID3D11RenderTargetView* pRenderTargetView, const float* pColors)
-	{
-		DV_ASSERT(m_pImmediateContext != nullptr);
-		DV_ASSERT(pRenderTargetView != nullptr);
-
-		float defaultColors[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-
-		m_pImmediateContext->ClearRenderTargetView(
-			pRenderTargetView,
-			(pColors != nullptr) ? pColors : defaultColors);
-	}
-
-	void GraphicsDevice::Present()
-	{
-		DV_ASSERT(m_pSwapChain != nullptr);
-
-		m_pSwapChain->Present(m_bVSync ? 0 : 1, 0);
-	}
-
-	void GraphicsDevice::createMainRenderTargetView()
-	{
-		DV_ASSERT(m_pSwapChain != nullptr);
-		DV_ASSERT(m_pDevice != nullptr);
-
-		DV_RELEASE(m_pMainRenderTargetView);
-
-		ID3D11Texture2D* pBackbuffer = nullptr;
-		m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackbuffer);
-
-		if (FAILED(m_pDevice->CreateRenderTargetView(pBackbuffer, NULL, &m_pMainRenderTargetView)))
-		{
-			DV_CORE_WARN("MainRenderTargetView 생성에 실패하였습니다.");
-		}
-
-		DV_RELEASE(pBackbuffer);
 	}
 }

@@ -5,6 +5,7 @@
 #include "Panels/MenuBarPanel.h"
 #include "Panels/ScenePanel.h"
 
+// 현재 사용하는 곳이 없다.
 static Editor* s_pEditor = nullptr;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -18,13 +19,14 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_SIZE:
 	{
-		if (s_pEditor)
+		auto pGraphicsDevice = Dive::GetRenderer().GetGraphicsDevice();
+		if (pGraphicsDevice) 
 		{
-			if (s_pEditor->GetD3dDevice() != nullptr && wParam != SIZE_MINIMIZED)
+			if (wParam != SIZE_MINIMIZED)
 			{
-				s_pEditor->CleanupRenderTarget();
-				s_pEditor->GetSwapChain()->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
-				s_pEditor->CreateRenderTarget();
+				pGraphicsDevice->CleanupMainRenderTargetView();
+				pGraphicsDevice->GetSwapChain()->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
+				pGraphicsDevice->CreateMainRenderTargetView();
 			}
 
 			// 여기에서 Engine에 변경된 크기를 전달할 수 있다.
@@ -53,24 +55,17 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	// create window
 	createWindow(hInstance);
 
-	// create d3d11 device
-	createDeviceD3D();
-
-	// intialize ImGui
-	intializeImGui();
-
 	// create engine
 	Dive::WindowData data;
 	data.hWnd = m_hWnd;
-	// 처음부터 ScenePanel의 크기를 주는게 낫지 않을까?
 	data.Width = m_Width;
 	data.Height = m_Height;
 	data.bVSync = m_bVSync;
 	data.bFullScreen = m_bFullScreen;
 	Dive::CreateEngine(&data);
 
-	// create panels: imgui 초기화 및 engine 생성 후 
-	createPanels();
+	// intialize ImGui
+	intializeImGui();
 
 	DV_ASSERT(s_pEditor == nullptr);
 	s_pEditor = this;
@@ -111,29 +106,38 @@ void Editor::Run()
 			Dive::Run();
 
 			// Begin
-			ImGui_ImplDX11_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
+			{
+				ImGui_ImplDX11_NewFrame();
+				ImGui_ImplWin32_NewFrame();
+				ImGui::NewFrame();
+			}
 
 			drawPanels();
 
 			// End
-			const float clear_color_with_alpha[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
-			ImGuiIO& io = ImGui::GetIO();
-
-			ImGui::Render();
-			m_pD3dDeviceContext->OMSetRenderTargets(1, &m_pRenderTargetView, NULL);
-			m_pD3dDeviceContext->ClearRenderTargetView(m_pRenderTargetView, clear_color_with_alpha);
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-			// Update and Render additional Platform Windows
-			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
-				ImGui::UpdatePlatformWindows();
-				ImGui::RenderPlatformWindowsDefault();
-			}
+				auto pGraphicsDevice = Dive::GetRenderer().GetGraphicsDevice();
+				auto pImmediateContext = pGraphicsDevice->GetImmediateContext();
+				auto pSwapChain = pGraphicsDevice->GetSwapChain();
+				auto pMainRenderTargetView = pGraphicsDevice->GetMainRenderTargetView();
 
-			m_pSwapChain->Present(m_bVSync ? 1 : 0, 0);
+				const float clear_color_with_alpha[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
+				ImGuiIO& io = ImGui::GetIO();
+
+				ImGui::Render();
+				pImmediateContext->OMSetRenderTargets(1, &pMainRenderTargetView, NULL);
+				pImmediateContext->ClearRenderTargetView(pMainRenderTargetView, clear_color_with_alpha);
+				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+				// Update and Render additional Platform Windows
+				if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+				{
+					ImGui::UpdatePlatformWindows();
+					ImGui::RenderPlatformWindowsDefault();
+				}
+
+				pSwapChain->Present(m_bVSync ? 1 : 0, 0);
+			}
 		}
 	}
 }
@@ -150,9 +154,6 @@ void Editor::Shutdown()
 		m_Panels.clear();
 	}
 
-	// destroy engine
-	Dive::DestroyEngine();
-
 	// destroy ImGui
 	{
 		ImGui_ImplDX11_Shutdown();
@@ -160,10 +161,8 @@ void Editor::Shutdown()
 		ImGui::DestroyContext();
 	}
 
-	// destroy d3d11 device
-	{
-		cleanupDeviceD3D();
-	}
+	// destroy engine
+	Dive::DestroyEngine();
 
 	// destroy window
 	{
@@ -172,19 +171,6 @@ void Editor::Shutdown()
 		::DestroyWindow(m_hWnd);
 		::UnregisterClass(windowName.c_str(), m_hInstance);
 	}
-}
-
-void Editor::CreateRenderTarget()
-{
-	ID3D11Texture2D* pBackBuffer;
-	m_pSwapChain->GetBuffer(0, IID_PPV_ARGS(&pBackBuffer));
-	m_pD3dDevice->CreateRenderTargetView(pBackBuffer, NULL, &m_pRenderTargetView);
-	pBackBuffer->Release();
-}
-
-void Editor::CleanupRenderTarget()
-{
-	DV_RELEASE(m_pRenderTargetView);
 }
 
 void Editor::createWindow(HINSTANCE hInstance)
@@ -221,46 +207,6 @@ void Editor::createWindow(HINSTANCE hInstance)
 	m_hInstance = hInstance;
 	m_hWnd = hWnd;
 }
-	
-void Editor::createDeviceD3D()
-{
-	DV_ASSERT(m_hWnd);
-
-	// Setup swap chain
-	DXGI_SWAP_CHAIN_DESC sd;
-	ZeroMemory(&sd, sizeof(sd));
-	sd.BufferCount = 2;
-	sd.BufferDesc.Width = 0;
-	sd.BufferDesc.Height = 0;
-	sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	sd.BufferDesc.RefreshRate.Numerator = 60;
-	sd.BufferDesc.RefreshRate.Denominator = 1;
-	sd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.OutputWindow = m_hWnd;
-	sd.SampleDesc.Count = 1;
-	sd.SampleDesc.Quality = 0;
-	sd.Windowed = TRUE;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-	UINT createDeviceFlags = 0;
-	//createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-	D3D_FEATURE_LEVEL featureLevel;
-	const D3D_FEATURE_LEVEL featureLevelArray[2] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
-	auto hResult = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, createDeviceFlags, featureLevelArray, 2, D3D11_SDK_VERSION, &sd, &m_pSwapChain, &m_pD3dDevice, &featureLevel, &m_pD3dDeviceContext);
-	DV_ASSERT(hResult == S_OK);
-
-	CreateRenderTarget();
-}
-
-void Editor::cleanupDeviceD3D()
-{
-	CleanupRenderTarget();
-
-	DV_RELEASE(m_pSwapChain);
-	DV_RELEASE(m_pD3dDevice);
-	DV_RELEASE(m_pD3dDeviceContext);
-}
 
 void Editor::intializeImGui()
 {
@@ -285,11 +231,17 @@ void Editor::intializeImGui()
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(m_hWnd);
-	ImGui_ImplDX11_Init(m_pD3dDevice, m_pD3dDeviceContext);
+	ImGui_ImplDX11_Init(
+		Dive::GetRenderer().GetGraphicsDevice()->GetDevice(), 
+		Dive::GetRenderer().GetGraphicsDevice()->GetImmediateContext());
 
 	// custom style & resource
 	setDarkThemeColors();
 	loadResources();
+
+	// create panels
+	m_Panels.emplace_back(new MenuBarPanel(this));
+	m_Panels.emplace_back(new ScenePanel(this));
 }
 
 void Editor::setDarkThemeColors()
@@ -336,12 +288,7 @@ void Editor::loadResources()
 	io.FontDefault = io.Fonts->AddFontFromFileTTF("Assets/Fonts/Nanum/NanumBarunGothic.ttf", fontSize);
 }
 
-void Editor::createPanels()
-{
-	m_Panels.emplace_back(new MenuBarPanel(this));
-	m_Panels.emplace_back(new ScenePanel(this));
-}
-
+// 현재 Docking + Panel Object + Panel hard cording이 합쳐져 좀 길다.
 void Editor::drawPanels()
 {
 	// Note: Switch this to true to enable dockspace

@@ -10,7 +10,4 @@ public:
 	void renderWindow() override;
 
 private:
-	Dive::Renderer* m_pRenderer = nullptr;
-	//Dive::Texture2D* m_pSample = nullptr;
-	ID3D11ShaderResourceView* m_pSample = nullptr;
 };

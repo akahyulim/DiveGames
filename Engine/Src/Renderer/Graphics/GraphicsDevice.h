@@ -13,14 +13,15 @@ namespace Dive
 		void Initialize(const WindowData* pData);
 		void Shutdown();
 
+		void CreateMainRenderTargetView();
+		void CleanupMainRenderTargetView();
+
 		void ResizeBackBuffer(unsigned int width, unsigned int height);
 
 		// 객체들을 직접 리턴하는게 맞나 싶긴한데
 		// 결국 만들어 지는건 단순 랩핑 함수들이다...
 		// 그런데 Hazel은 RendererAPI라고 따로 뽑아놨다.
 		// 물론 멀티 플랫폼을 위한 인터페이스일 수 있다.
-		void ClearRenderTargetView(ID3D11RenderTargetView* pRenderTargetView, const float* pColors = nullptr);
-		void Present();
 
 		ID3D11Device* GetDevice() { return m_pDevice; }
 		ID3D11DeviceContext* GetImmediateContext() { return m_pImmediateContext; }
@@ -36,7 +37,6 @@ namespace Dive
 		bool IsFullScreen() const { return m_bFullScreen; }
 
 	private:
-		void createMainRenderTargetView();
 	
 	private:
 		ID3D11Device* m_pDevice								= nullptr;
