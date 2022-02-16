@@ -31,9 +31,6 @@ namespace Dive
 		static Texture2D* Create(unsigned int width, unsigned int height);
 		static Texture2D* Create(const std::string& path);
 
-	public:
-		void createResource(const BYTE* pData);
-
 	private:
 		std::string m_Path;
 		bool m_bLoaded = false;

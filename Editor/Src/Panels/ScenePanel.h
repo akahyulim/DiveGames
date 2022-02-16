@@ -5,9 +5,10 @@ class ScenePanel : public Panel
 {
 public:
 	ScenePanel(Editor* pEditor);
-	~ScenePanel() = default;
+	~ScenePanel();
 
 	void renderWindow() override;
 
 private:
+	Dive::Texture2D* m_pSampleTex = nullptr;
 };

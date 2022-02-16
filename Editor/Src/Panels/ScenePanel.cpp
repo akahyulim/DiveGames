@@ -3,6 +3,12 @@
 ScenePanel::ScenePanel(Editor* pEditor)
 	: Panel(pEditor, "Scene")
 {
+	m_pSampleTex = Dive::Texture2D::Create("Assets/Textures/DokeV.jpeg");
+}
+
+ScenePanel::~ScenePanel()
+{
+	DV_DELETE(m_pSampleTex);
 }
 
 // Scene이 있다면
@@ -22,7 +28,7 @@ void ScenePanel::renderWindow()
 
 	// image를 가져와 그린다.
 	ImGui::Image(
-		nullptr,//m_pSample,	// shader resource view다...
+		m_pSampleTex ? m_pSampleTex->GetShaderResourceView() : nullptr,
 		ImVec2(width, height),
 		ImVec2(0, 0),
 		ImVec2(1, 1),
