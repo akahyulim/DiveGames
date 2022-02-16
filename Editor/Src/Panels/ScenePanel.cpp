@@ -22,13 +22,13 @@ void ScenePanel::renderWindow()
 	// renderer의 viewport를 설정한다.
 	// Editor용 Camera도 함께 설정??
 
-	// 크기가 변경되었다면 renderer의 해상도를 변경한다.
-	// 현재 MainRenderTarget을 변경하려 한다.
-	//m_pRenderer->SetResolution(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
+	// 이전 ContentRegion과의 비교가 필요하다.
+	Dive::GetRenderer().SetTextures(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
+	auto pTexture = Dive::GetRenderer().GetSampleTexture();
 
-	// image를 가져와 그린다.
+	// 매번 그리는 게 맞다.
 	ImGui::Image(
-		m_pSampleTex ? m_pSampleTex->GetShaderResourceView() : nullptr,
+		pTexture ? pTexture->GetShaderResourceView() : (m_pSampleTex ? m_pSampleTex->GetShaderResourceView() : nullptr),
 		ImVec2(width, height),
 		ImVec2(0, 0),
 		ImVec2(1, 1),

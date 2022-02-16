@@ -5,31 +5,12 @@
 
 namespace Dive
 {
-	unsigned int GetChannelCount(DXGI_FORMAT format)
+	Texture2D::~Texture2D()
 	{
-		unsigned int channelCount = 0;
-
-		switch (format)
-		{
-		case DXGI_FORMAT_R8G8B8A8_UNORM:
-			channelCount = 4;
-			break;
-		default:
-			break;
-		}
-
-		return channelCount;
+		Shutdown();
 	}
 
-	// 이건 RenderTargetView + ShaderResourceView 겠지?
-	Texture2D::Texture2D(unsigned int width, unsigned int height)
-		: m_Width(width), m_Height(height)
-	{
-	}
-	
-	// 현재 RenderTargetView는 생성하지 않는다.
-	Texture2D::Texture2D(const std::string& path)
-		: m_Path(path)
+	bool Texture2D::LoadForeignFile(const std::string& path)
 	{
 		DirectX::ScratchImage img;
 
@@ -55,20 +36,131 @@ namespace Dive
 			hResult = DirectX::LoadFromWICFile(tempPath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
 		}
 
-		if(FAILED(hResult))
+		if (FAILED(hResult))
 		{
 			DV_CORE_WARN("{:s} 로드에 실패하였습니다.", m_Path);
-			return;
+			return false;
 		}
 
 		auto pDevice = Dive::GetRenderer().GetGraphicsDevice()->GetDevice();
 		DV_ASSERT(pDevice);
 
-		DirectX::CreateShaderResourceView(pDevice, img.GetImages(), img.GetImageCount(), img.GetMetadata(), &m_pShaderResourceView);
+		if (FAILED(DirectX::CreateShaderResourceView(pDevice, img.GetImages(), img.GetImageCount(), img.GetMetadata(), &m_pShaderResourceView)))
+		{
+			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
+			return false;
+		}
+
+		const auto& metaData = img.GetMetadata();
+		m_Format	= metaData.format;
+		m_Width		= static_cast<unsigned int>(metaData.width);
+		m_Height	= static_cast<unsigned int>(metaData.height);
+
+		return true;
 	}
 
-	Texture2D::~Texture2D()
+	bool Texture2D::CreateTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned bindFlags)
 	{
+		auto pDevice = Dive::GetRenderer().GetGraphicsDevice()->GetDevice();
+		DV_ASSERT(pDevice);
+
+		m_Width		= width;
+		m_Height	= height;
+		m_Format	= format;
+
+		D3D11_TEXTURE2D_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Width				= m_Width;
+		desc.Height				= m_Height;
+		desc.MipLevels			= 1;
+		desc.ArraySize			= 1;
+		desc.Format				= m_Format;
+		desc.SampleDesc.Count	= 1;
+		desc.SampleDesc.Quality = 0;
+		desc.Usage				= D3D11_USAGE_DEFAULT;
+		desc.BindFlags			= bindFlags;
+		desc.CPUAccessFlags		= 0;
+		desc.MiscFlags			= 0;
+
+		if (FAILED(pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture2D)))
+		{
+			DV_CORE_WARN("Resource Buffer 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Texture2D::CreateShaderResourceView(DXGI_FORMAT format)
+	{
+		auto pDevice = Dive::GetRenderer().GetGraphicsDevice()->GetDevice();
+		DV_ASSERT(pDevice);
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Format						= format;
+		desc.ViewDimension				= D3D11_SRV_DIMENSION_TEXTURE2D;
+		desc.Texture2D.MostDetailedMip	= 0;
+		desc.Texture2D.MipLevels		= -1;
+
+		DV_ASSERT(m_pTexture2D);
+		if (FAILED(pDevice->CreateShaderResourceView(m_pTexture2D, &desc, &m_pShaderResourceView)))
+		{
+			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Texture2D::CreateRenderTargetView(DXGI_FORMAT format)
+	{
+		auto pDevice = Dive::GetRenderer().GetGraphicsDevice()->GetDevice();
+		DV_ASSERT(pDevice);
+
+		D3D11_RENDER_TARGET_VIEW_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Format				= format;
+		desc.ViewDimension		= D3D11_RTV_DIMENSION_TEXTURE2D;
+		desc.Texture2D.MipSlice = 0;
+
+		DV_ASSERT(m_pTexture2D);
+		if (FAILED(pDevice->CreateRenderTargetView(m_pTexture2D, &desc, &m_pRenderTargetView)))
+		{
+			DV_CORE_WARN("RenderTargetView 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Texture2D::CreateDepthStencilView(DXGI_FORMAT format)
+	{
+		auto pDevice = Dive::GetRenderer().GetGraphicsDevice()->GetDevice();
+		DV_ASSERT(pDevice);
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Format				= format;
+		desc.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2D;
+		desc.Texture2D.MipSlice = 0;
+
+		DV_ASSERT(m_pTexture2D);
+		if (FAILED(pDevice->CreateDepthStencilView(m_pTexture2D, &desc, &m_pDepthStencilView)))
+		{
+			DV_CORE_WARN("DepthStencilView 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
+	}
+
+	void Texture2D::Shutdown()
+	{
+		DV_RELEASE(m_pDepthStencilView);
+		DV_RELEASE(m_pRenderTargetView);
+		DV_RELEASE(m_pShaderResourceView);
+		DV_RELEASE(m_pTexture2D);
 	}
 	
 	bool Texture2D::operator==(const Texture& other)
@@ -76,13 +168,102 @@ namespace Dive
 		return false;
 	}
 
-	Texture2D* Texture2D::Create(unsigned int width, unsigned int height)
+	Texture2D* Texture2D::Create(unsigned int width, unsigned int height, DXGI_FORMAT format, bool srv, const std::string& name)
 	{
-		return new Texture2D(width, height);
+		auto pTex = new Texture2D();
+		DV_ASSERT(pTex);
+
+		unsigned int bindFlags = D3D11_BIND_RENDER_TARGET;
+		if (srv)
+			bindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
+		if (!pTex->CreateTexture2D(width, height, format, bindFlags))
+		{
+			DV_DELETE(pTex);
+			return nullptr;
+		}
+
+		if (!pTex->CreateRenderTargetView(format))
+		{
+			DV_DELETE(pTex);
+			return nullptr;
+		}
+
+		if (srv)
+		{
+			if (!pTex->CreateShaderResourceView(format))
+			{
+				DV_DELETE(pTex);
+				return nullptr;
+			}
+		}
+
+		pTex->SetName(name);
+
+		return pTex;
 	}
 
-	Texture2D* Texture2D::Create(const std::string& path)
+	Texture2D* Texture2D::Create(unsigned int width, unsigned int height, DXGI_FORMAT texture2D, DXGI_FORMAT dsv, DXGI_FORMAT srv, const std::string& name)
 	{
-		return new Texture2D(path);
+		auto pTex = new Texture2D();
+		DV_ASSERT(pTex);
+
+		unsigned int bindFlags = D3D11_BIND_DEPTH_STENCIL;
+		if (srv != DXGI_FORMAT_UNKNOWN)
+			bindFlags |= D3D11_BIND_SHADER_RESOURCE;
+
+		if (!pTex->CreateTexture2D(width, height, texture2D, bindFlags))
+		{
+			DV_DELETE(pTex);
+			return nullptr;
+		}
+
+		if (!pTex->CreateDepthStencilView(dsv))
+		{
+			DV_DELETE(pTex);
+			return nullptr;
+		}
+
+		if (srv != DXGI_FORMAT_UNKNOWN)
+		{
+			if (!pTex->CreateShaderResourceView(srv))
+			{
+				DV_DELETE(pTex);
+				return nullptr;
+			}
+		}
+
+		pTex->SetName(name);
+
+		return pTex;
+	}
+
+	Texture2D* Texture2D::Create(const std::string& path, const std::string& name)
+	{
+		auto pTex = new Texture2D();
+		DV_ASSERT(pTex);
+
+		// path에서 확장자를 읽어 Engine, foreign 생성 함수를 구분하여 호출한다.
+		if (!pTex->LoadForeignFile(path))
+		{
+			DV_DELETE(pTex);
+			return nullptr;
+		}
+
+		// 이름을 전달받지 않았을 경우
+		// 파일 경로를 통해 '이름.확장자'로 저장
+		if (name.empty())
+		{
+			auto lastIndex = path.find_last_of("\\/");
+			auto filename = path.substr(lastIndex + 1, path.length());
+
+			pTex->SetName(filename);
+		}
+		else
+		{
+			pTex->SetName(name);
+		}
+
+		return pTex;
 	}
 }

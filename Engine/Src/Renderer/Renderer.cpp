@@ -1,17 +1,29 @@
 #include "divepch.h"
 #include "Renderer.h"
 #include "Graphics/GraphicsDevice.h"
+#include "Base/Base.h"
 #include "Base/Engine.h"
 
 namespace Dive
 {
 	void Renderer::Initialize(const WindowData* pData)
 	{
+		DV_ASSERT(pData && "WnidowData가 존재하지 않습니다.");
+
 		m_GraphicsDevice.Initialize(pData);
+
+		auto width = pData->Width;
+		auto height = pData->Height;
+
+		SetTextures(width, height);
 	}
 
 	void Renderer::Shutdow()
 	{
+		// 함수로 만들어야 하나...?
+		DV_DELETE(m_pDepthStencilTex);
+		DV_DELETE(m_pSampleTex);
+
 		m_GraphicsDevice.Shutdown();
 	}
 
@@ -28,17 +40,21 @@ namespace Dive
 		}
 	}
 	
+	// RenderTarget은 단계별로 변경된다.
+	// 따라서 이 구문은 사용이 불가능하다.
 	void Renderer::BeginScene()
 	{
 		auto pImmediateContext = m_GraphicsDevice.GetImmediateContext();
-		auto pMainRenderTargetView = m_GraphicsDevice.GetMainRenderTargetView();
-		if (!pImmediateContext || !pMainRenderTargetView)
+		auto pRenderTargetView = m_pSampleTex ? m_pSampleTex->GetRenderTargetView() : nullptr;
+		auto pDepthStencilView = m_pDepthStencilTex ? m_pDepthStencilTex->GetDepthStencilView() : nullptr;
+		if (!pImmediateContext || !pRenderTargetView)
 			return;
 
 		// active camera로부터 가져와야 한다.
-		float clearColors[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+		float clearColors[4] = {0.5f, 0.5f, 1.0f, 1.0f};
 
-		pImmediateContext->ClearRenderTargetView(pMainRenderTargetView, clearColors);
+		pImmediateContext->ClearRenderTargetView(pRenderTargetView, clearColors);
+		pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView);
 	}
 	
 	void Renderer::EndScene()
@@ -52,9 +68,24 @@ namespace Dive
 
 	void Renderer::SetResolution(unsigned int width, unsigned int height)
 	{
-		// 다른 RenderTarget들도 변경 대상이다.
-
 		m_GraphicsDevice.ResizeBackBuffer(width, height);
+	}
+
+	void Renderer::SetTextures(unsigned int width, unsigned int height)
+	{
+		if (m_TextureWidth == width && m_TextureHeight == height)
+			return;
+
+		m_TextureWidth = width;
+		m_TextureHeight = height;
+
+		// Render Target Textures
+		DV_DELETE(m_pSampleTex);
+		m_pSampleTex = Texture2D::Create(width, height, DXGI_FORMAT_R32G32B32A32_FLOAT, true);
+
+		// Depth Stencil Buffers
+		DV_DELETE(m_pDepthStencilTex);
+		m_pDepthStencilTex = Texture2D::Create(width, height, DXGI_FORMAT_D24_UNORM_S8_UINT, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	}
 
 	ID3D11RenderTargetView* Renderer::GetMainRenderTargetView()

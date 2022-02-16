@@ -44,6 +44,7 @@ namespace Dive
 	void Run()
 	{
 		DV_ASSERT(g_pEngine != nullptr && "Engine 객체가 존재하지 않습니다.");
+		g_pEngine->Run();
 	}
 
 	Renderer& GetRenderer()
