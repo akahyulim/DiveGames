@@ -10,7 +10,6 @@
 
 //= Base ==========================
 #include "Base/Base.h"
-#include "Base/Object.h"
 #include "Base/Engine.h"
 #include "Base/Time.h"
 #include "Base/Log.h"
@@ -29,5 +28,10 @@
 //= Input =========================
 
 //= Scene =========================
+#include "Scene/Scene.h"
+#include "Scene/GameObject.h"
+#include "Scene/Component/Component.h"
+#include "Scene/Component/Transform.h"
+#include "Scene/Component/Camera.h"
 
 //= Math ==========================

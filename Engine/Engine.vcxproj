@@ -174,7 +174,6 @@
     <ClInclude Include="Src\divepch.h" />
     <ClInclude Include="Src\Base\Base.h" />
     <ClInclude Include="Src\DiveEngine.h" />
-    <ClInclude Include="Src\Base\Object.h" />
     <ClInclude Include="Src\Base\Engine.h" />
     <ClInclude Include="Src\Base\Log.h" />
     <ClInclude Include="Src\Base\Time.h" />
@@ -183,6 +182,11 @@
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
+    <ClInclude Include="Src\Scene\Component\Camera.h" />
+    <ClInclude Include="Src\Scene\Component\Component.h" />
+    <ClInclude Include="Src\Scene\Component\Transform.h" />
+    <ClInclude Include="Src\Scene\GameObject.h" />
+    <ClInclude Include="Src\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Dive.cpp" />
@@ -195,6 +199,10 @@
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
+    <ClCompile Include="Src\Scene\Component\Camera.cpp" />
+    <ClCompile Include="Src\Scene\Component\Transform.cpp" />
+    <ClCompile Include="Src\Scene\GameObject.cpp" />
+    <ClCompile Include="Src\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Assets\Shaders\Legacy\Common.hlsl">

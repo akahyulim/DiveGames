@@ -4,9 +4,6 @@
     <ClInclude Include="Src\divepch.h">
       <Filter>Src</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Base\Object.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Base\Log.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
@@ -40,6 +37,21 @@
     <ClInclude Include="Src\Renderer\Graphics\Texture.h">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Scene\Scene.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\GameObject.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\Component.h">
+      <Filter>Src\Scene\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\Transform.h">
+      <Filter>Src\Scene\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\Camera.h">
+      <Filter>Src\Scene\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -65,6 +77,18 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\GameObject.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Scene.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Transform.cpp">
+      <Filter>Src\Scene\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Camera.cpp">
+      <Filter>Src\Scene\Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +124,9 @@
     </Filter>
     <Filter Include="Src\Renderer\GraphicsDevice">
       <UniqueIdentifier>{14e29e43-eba7-4d82-b934-67fe14fb73ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Scene\Component">
+      <UniqueIdentifier>{9d00574e-8829-4d1b-bf2e-35026b52a632}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
