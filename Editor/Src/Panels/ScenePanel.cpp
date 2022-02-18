@@ -4,8 +4,6 @@ ScenePanel::ScenePanel(Editor* pEditor)
 	: Panel(pEditor, "Scene")
 {
 	m_pSampleTex = Dive::Texture2D::Create("Assets/Textures/DokeV.jpeg");
-
-	// 일단 이 곳에서 Scene을 하드코딩 한 후 직렬화/역직렬화를 구현하자.
 }
 
 ScenePanel::~ScenePanel()
@@ -17,6 +15,9 @@ ScenePanel::~ScenePanel()
 // Enigne의 Backbuffer에서 rtv를 얻어와 그린다.
 void ScenePanel::renderWindow()
 {
+	if (!m_pActiveScene)
+		return;
+
 	// 크기를 계산한다. => 잘 모르겠다.
 	auto width = static_cast<float>(ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x);
 	auto height = static_cast<float>(ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y);

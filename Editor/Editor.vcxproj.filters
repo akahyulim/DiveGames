@@ -54,6 +54,15 @@
     <ClCompile Include="Src\Panels\Panel.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Panels\AssetPanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Panels\HierarchyPanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Panels\InspectorPanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Base\Editor.h">

@@ -4,6 +4,9 @@
 #include "imgui-docking/imgui_impl_dx11.h"
 #include "Panels/MenuBarPanel.h"
 #include "Panels/ScenePanel.h"
+#include "panels/HierarchyPanel.h"
+#include "Panels/InspectorPanel.h"
+#include "Panels/AssetPanel.h"
 
 // 현재 사용하는 곳이 없다.
 static Editor* s_pEditor = nullptr;
@@ -49,7 +52,7 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	m_Title = title;
 	m_Width = 1280;
 	m_Height = 720;
-	m_bVSync = false;
+	m_bVSync = true;
 	m_bFullScreen = false;
 
 	// create window
@@ -145,14 +148,11 @@ void Editor::Run()
 void Editor::Shutdown()
 {
 	// delete panels
-	if (m_Panels.empty())
-	{
-		for (auto pPanel : m_Panels)
-		{
-			DV_DELETE(pPanel);
-		}
-		m_Panels.clear();
-	}
+	DV_DELETE(m_pMenuBar);
+	DV_DELETE(m_pScene);
+	DV_DELETE(m_pHierarchy);
+	DV_DELETE(m_pInspector);
+	DV_DELETE(m_pAsset);
 
 	// destroy ImGui
 	{
@@ -240,8 +240,11 @@ void Editor::intializeImGui()
 	loadResources();
 
 	// create panels
-	m_Panels.emplace_back(new MenuBarPanel(this));
-	m_Panels.emplace_back(new ScenePanel(this));
+	m_pMenuBar = new MenuBarPanel(this);
+	m_pScene = new ScenePanel(this);
+	m_pHierarchy = new HierarchyPanel(this);
+	m_pInspector = new InspectorPanel(this);
+	m_pAsset = new AssetPanel(this);
 }
 
 void Editor::setDarkThemeColors()
@@ -342,18 +345,11 @@ void Editor::drawPanels()
 	style.WindowMinSize.x = minWinSizeX;
 		
 	// Render Panels
-	if (!m_Panels.empty())
-	{
-		for (auto pPanel : m_Panels)
-			pPanel->Tick();
-	}
-	
-	ImGui::Begin("Hierarchy");
-	ImGui::End();
-	ImGui::Begin("Inspector");
-	ImGui::End();
-	ImGui::Begin("Asset");
-	ImGui::End();
+	m_pMenuBar->Tick();
+	m_pScene->Tick();
+	m_pHierarchy->Tick();
+	m_pInspector->Tick();
+	m_pAsset->Tick();
 
 	ImGui::End();
 }

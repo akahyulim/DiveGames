@@ -6,6 +6,11 @@
 
 // panels
 class Panel;
+class MenuBarPanel;
+class ScenePanel;
+class HierarchyPanel;
+class InspectorPanel;
+class AssetPanel;
 
 class Editor
 {
@@ -16,6 +21,13 @@ public:
 	void Run();
 	void Close() { m_bDone = true; }
 	void Shutdown();
+
+	// 꼭! 좀 더 직관적인 방법을 찾자!
+	MenuBarPanel* GetMenuBar() { return m_pMenuBar; }
+	ScenePanel* GetScene() { return m_pScene; }
+	HierarchyPanel* GetHierarchy() { return m_pHierarchy; }
+	InspectorPanel* GetInspector() { return m_pInspector; }
+	AssetPanel* GetAsset() { return m_pAsset; }
 
 private:
 	// editor's window
@@ -38,7 +50,12 @@ private:
 	bool m_bFullScreen		= false;
 
 	// panels
-	std::vector<Panel*> m_Panels;
+	//std::vector<Panel*> m_Panels;
+	MenuBarPanel* m_pMenuBar		= nullptr;
+	ScenePanel* m_pScene			= nullptr;
+	HierarchyPanel* m_pHierarchy	= nullptr;
+	InspectorPanel* m_pInspector	= nullptr;
+	AssetPanel* m_pAsset			= nullptr;
 
 	bool m_bDone = false;
 };

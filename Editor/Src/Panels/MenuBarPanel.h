@@ -7,7 +7,7 @@ class MenuBarPanel : public Panel
 {
 public:
 	MenuBarPanel(Editor* pEditor);
-	~MenuBarPanel() = default;
+	~MenuBarPanel();
 
 	void renderAlways() override;
 
@@ -17,4 +17,5 @@ private:
 	void menuComponent();
 	void menuWindow();
 	void menuHelp();
+
 };

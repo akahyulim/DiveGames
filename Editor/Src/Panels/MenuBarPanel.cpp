@@ -1,9 +1,18 @@
 #include "MenuBarPanel.h"
+#include "ScenePanel.h"
+#include "HierarchyPanel.h"
+#include "InspectorPanel.h"
+#include "AssetPanel.h"
 
 MenuBarPanel::MenuBarPanel(Editor* pEditor)
 	: Panel(pEditor, "MenuBar")
 {
 	m_bWindow = false;
+}
+
+MenuBarPanel::~MenuBarPanel()
+{
+	DV_DELETE(m_pActiveScene);
 }
 
 // 메뉴바는 항상 그려져야 한다.
@@ -45,7 +54,20 @@ void MenuBarPanel::menuFile()
 			}
 			if (ImGui::MenuItem("Scene"))
 			{
+				if (m_pActiveScene)
+					DV_DELETE(m_pActiveScene);
 
+				m_pActiveScene = new Dive::Scene("Sample_World");
+				m_pActiveScene->CreateGameObject("Choa");
+				m_pActiveScene->CreateGameObject("IU");
+				m_pActiveScene->CreateGameObject("Knave");
+
+				// 전달까지 직접하는게 맞다.
+				// 하지만 방법이 너무 막무가내다....
+				// ActiveScene을 static 포인터로 하면 어떨까...?
+				m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
+				m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
+				m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
 			}
 			ImGui::EndMenu();
 		}
@@ -54,7 +76,12 @@ void MenuBarPanel::menuFile()
 
 		if (ImGui::MenuItem("Close"))
 		{
+			if (m_pActiveScene)
+				DV_DELETE(m_pActiveScene);
 
+			m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
+			m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
+			m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
 		}
 		if (ImGui::MenuItem("Close Project"))
 		{
