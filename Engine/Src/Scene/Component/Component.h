@@ -14,6 +14,8 @@ namespace Dive
 		}
 		virtual ~Component() {}
 
+		GameObject* GetGameObject() { return m_pGameObject; }
+
 	protected:
 	protected:
 		GameObject* m_pGameObject = nullptr;
