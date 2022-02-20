@@ -61,6 +61,7 @@ void MenuBarPanel::menuFile()
 				m_pActiveScene->CreateGameObject("Choa");
 				m_pActiveScene->CreateGameObject("IU");
 				m_pActiveScene->CreateGameObject("Knave");
+				m_pActiveScene->CreateGameObject(13254521934309852950, "Complex");
 
 				// 전달까지 직접하는게 맞다.
 				// 하지만 방법이 너무 막무가내다....

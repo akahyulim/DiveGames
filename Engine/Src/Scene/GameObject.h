@@ -1,14 +1,16 @@
 #pragma once
+#include "Base/Object.h"
 #include "Component/Transform.h"
 
 namespace Dive
 {
 	class Scene;
 
-	class GameObject
+	class GameObject : public Object
 	{
 	public:
-		GameObject(Scene* pScene);
+		GameObject(Scene* pScene, const std::string& name = std::string());
+		GameObject(Scene* pScene, unsigned long long id, const std::string& name = std::string());
 		~GameObject() = default;
 
 		template<class T>
@@ -40,13 +42,8 @@ namespace Dive
 			return nullptr;
 		}
 
-		std::string GetName() const { return m_Name; }
-		void SetName(const std::string& name) { m_Name = name; }
-
 	private:
 	private:
-		std::string m_Name = "GameObject";
-
 		Scene* m_pScene			= nullptr;
 	};
 }

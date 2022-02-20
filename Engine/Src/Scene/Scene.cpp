@@ -37,20 +37,33 @@ namespace Dive
 
 	GameObject* Scene::CreateGameObject(const std::string& name)
 	{
-		auto pNewGameObject = m_GameObjects.emplace_back(new GameObject(this));
+		auto pNewGameObject = m_GameObjects.emplace_back(new GameObject(this, name));
 		DV_ASSERT(pNewGameObject != nullptr);
-		pNewGameObject->SetName(name);
+		pNewGameObject->AddComponent<Transform>();
+
+		return pNewGameObject;
+	}
+
+	GameObject* Scene::CreateGameObject(unsigned long long id, const std::string& name)
+	{
+		auto pNewGameObject = m_GameObjects.emplace_back(new GameObject(this, id, name));
+		DV_ASSERT(pNewGameObject != nullptr);
 		pNewGameObject->AddComponent<Transform>();
 
 		return pNewGameObject;
 	}
 
 	// 계층 구조를 형성했을 경우 자식까지 모두 제거한다.
+	void Scene::RemoveGameObject(unsigned long long id)
+	{
+		// 바로 제거하면 안될듯?
+	}
+
 	void Scene::RemoveGameObject(GameObject* pTarget)
 	{
 		if (!pTarget)
 			return;
 
-		// 바로 지우면 안될 것 같다.
+		RemoveGameObject(pTarget->GetInstanceID());
 	}
 }

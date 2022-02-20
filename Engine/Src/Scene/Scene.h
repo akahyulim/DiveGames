@@ -17,8 +17,10 @@ namespace Dive
 		void Clear();
 
 		GameObject* CreateGameObject(const std::string& name = std::string());
+		GameObject* CreateGameObject(unsigned long long id, const std::string& name = std::string());
+		void RemoveGameObject(unsigned long long id);
 		void RemoveGameObject(GameObject* pTarget);
-
+		
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
 
