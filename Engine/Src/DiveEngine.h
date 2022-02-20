@@ -11,6 +11,7 @@
 //= Base ==========================
 #include "Base/Base.h"
 #include "Base/Engine.h"
+#include "Base/Object.h"
 #include "Base/Time.h"
 #include "Base/Log.h"
 
