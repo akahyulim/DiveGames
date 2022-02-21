@@ -38,4 +38,6 @@ protected:
 	Editor* m_pEditor	= nullptr;
 
 	Dive::Scene* m_pActiveScene = nullptr;
+
+	static Dive::GameObject* m_pSelectedObject;
 };

@@ -65,4 +65,21 @@ namespace Dive
 
 		RemoveGameObject(pTarget->GetInstanceID());
 	}
+
+	std::vector<GameObject*> Scene::GetRoots()
+	{
+		std::vector<GameObject*> roots;
+
+		for (auto& pGameObject : m_GameObjects)
+		{
+			auto pTransform = pGameObject->GetComponent<Transform>();
+			if (!pTransform)
+				continue;
+
+			if (!pTransform->HasParent())
+				roots.emplace_back(pGameObject);
+		}
+
+		return roots;
+	}
 }

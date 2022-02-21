@@ -23,8 +23,8 @@ namespace Dive
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
 
+		std::vector<GameObject*> GetRoots();
 		std::vector<GameObject*>& GetGameObjects() { return m_GameObjects; }
-
 		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(m_GameObjects.size()); }
 
 	private:

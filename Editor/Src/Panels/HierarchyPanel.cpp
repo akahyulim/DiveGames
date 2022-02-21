@@ -19,7 +19,11 @@ void HierarchyPanel::renderWindow()
 
     if (ImGui::TreeNodeEx(sceneInfo, ImGuiTreeNodeFlags_DefaultOpen))
     {
-        // 계층구조 때문에 좀 복잡하다.
+        //auto rootGameObjects = m_pActiveScene->Get();
+        //for (auto pObject : rootGameObjects)
+        {
+        //   showAddedTree(pObject);
+        }
 
         ImGui::TreePop();
     }

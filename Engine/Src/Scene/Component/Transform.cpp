@@ -6,6 +6,8 @@ namespace Dive
 	Transform::Transform(GameObject* pGameObject)
 		: Component(pGameObject)
 	{
+		m_Type = eComponentType::Transform;
+
 		Clear();
 	}
 

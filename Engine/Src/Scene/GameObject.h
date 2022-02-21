@@ -1,6 +1,7 @@
 #pragma once
 #include "Base/Object.h"
 #include "Component/Transform.h"
+#include "Component/Camera.h"
 
 namespace Dive
 {
@@ -16,34 +17,63 @@ namespace Dive
 		template<class T>
 		T* AddComponent()
 		{
-			// T가 Component를 상속한 것인지 확인이 필요하다.
-
 			if (HasComponent<T>())
 				return GetComponent<T>();
 
-			return new T(this);
+			auto pNewComponent = m_Components.emplace_back(static_cast<Component*>(new T(this)));
+			DV_ASSERT(pNewComponent);
+
+			return dynamic_cast<T*>(pNewComponent);
 		}
 		
 		template<class T>
 		void RemoveComponent()
 		{
-
+			auto it = m_Components.begin();
+			for (it; it != m_Components.end();)
+			{
+				if (it->GetType() == Component::TypeToEnum<T>())
+				{
+					DV_DELETE(*it);
+					m_Components.erase(it);
+					return;
+				}
+				else
+				{
+					it++;
+				}
+			}
 		}
 
 		template<class T>
 		bool HasComponent()
 		{
+			for (auto pComponent : m_Components)
+			{
+				if (pComponent->GetType() == Component::TypeToEnum<T>())
+					return true;
+			}
+
 			return false;
 		}
 
 		template<class T>
 		T* GetComponent()
 		{
+			for (auto pComponent : m_Components)
+			{
+				if (pComponent->GetType() == Component::TypeToEnum<T>())
+				{
+					return dynamic_cast<T*>(pComponent);
+				}
+			}
+
 			return nullptr;
 		}
 
 	private:
 	private:
 		Scene* m_pScene			= nullptr;
+		std::vector<Component*> m_Components;
 	};
 }

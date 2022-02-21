@@ -1,5 +1,7 @@
 #include "Panel.h"
 
+Dive::GameObject* Panel::m_pSelectedObject = nullptr;
+
 Panel::Panel(Editor* pEditor, const std::string& title)
 	: m_pEditor(pEditor), m_Title(title)
 {

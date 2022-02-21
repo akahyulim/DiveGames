@@ -121,6 +121,29 @@ void MenuBarPanel::menuGameObject()
 {
 	if (ImGui::BeginMenu("GameObject"))
 	{
+		if (ImGui::MenuItem("Create Empty"))
+		{
+			if (m_pActiveScene)
+			{
+				m_pActiveScene->CreateGameObject("GameObject");
+			}
+		}
+
+		if (ImGui::BeginMenu("3D Object"))
+		{
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Light"))
+		{
+			ImGui::EndMenu();
+		}
+
+		if (ImGui::BeginMenu("Camera"))
+		{
+			ImGui::EndMenu();
+		}
+
 		ImGui::EndMenu();
 	}
 }
