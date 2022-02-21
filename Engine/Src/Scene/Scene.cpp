@@ -52,10 +52,25 @@ namespace Dive
 		return pNewGameObject;
 	}
 
-	// 계층 구조를 형성했을 경우 자식까지 모두 제거한다.
+	// 일단 계층구조라도 자신만 제거한다.
 	void Scene::RemoveGameObject(unsigned long long id)
 	{
-		// 바로 제거하면 안될듯?
+		// 런타임에선 문제가 될 수 있다?
+		auto it = m_GameObjects.begin();
+		for (it; it != m_GameObjects.end();)
+		{
+			if ((*it)->GetInstanceID() == id)
+			{
+				// 부모가 존재할 때 문제가 된다.
+				DV_DELETE((*it));
+				m_GameObjects.erase(it);
+				break;
+			}
+			else
+			{
+				it++;
+			}
+		}
 	}
 
 	void Scene::RemoveGameObject(GameObject* pTarget)

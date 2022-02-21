@@ -10,5 +10,8 @@ public:
 	void renderWindow() override;
 
 private:
+	void drawNode(Dive::GameObject* pObject);
+
 private:
+	Dive::GameObject* m_pSelectedObject = nullptr;
 };

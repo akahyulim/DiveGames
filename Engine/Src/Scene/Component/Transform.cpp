@@ -158,34 +158,31 @@ namespace Dive
 		{
 			if (pParent->GetInstanceID() == GetInstanceID())
 				return;
-		}
 
-		if (HasParent())
-		{
-			if (pParent->GetInstanceID() == GetParent()->GetInstanceID())
-				return;
-
-			auto& sibling = GetParent()->m_Children;
-			for (auto it = sibling.begin(); it != sibling.end();)
+			if (HasParent())
 			{
-				if ((*it)->GetInstanceID() == GetInstanceID())
+				if (pParent->GetInstanceID() == GetParent()->GetInstanceID())
+					return;
+
+				auto& sibling = GetParent()->m_Children;
+				for (auto it = sibling.begin(); it != sibling.end();)
 				{
-					sibling.erase(it);
-					break;
-				}
-				else
-				{
-					it++;
+					if ((*it)->GetInstanceID() == GetInstanceID())
+					{
+						sibling.erase(it);
+						break;
+					}
+					else
+					{
+						it++;
+					}
 				}
 			}
-		}
 
-		if (pParent)
-		{
 			pParent->m_Children.emplace_back(this);
 		}
 
-		SetParent(pParent);
+		m_pParent = pParent;
 	}
 
 	Transform* Transform::GetRoot()
@@ -243,7 +240,7 @@ namespace Dive
 
 		for (auto pChild : m_Children)
 		{
-			pChild->SetParent(nullptr);
+			pChild->m_pParent = nullptr;
 		}
 
 		m_Children.clear();

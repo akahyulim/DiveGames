@@ -58,10 +58,11 @@ void MenuBarPanel::menuFile()
 					DV_DELETE(m_pActiveScene);
 
 				m_pActiveScene = new Dive::Scene("Sample_World");
-				m_pActiveScene->CreateGameObject("Choa");
+				m_pActiveScene->CreateGameObject("ChoA");
 				m_pActiveScene->CreateGameObject("IU");
-				m_pActiveScene->CreateGameObject("Knave");
-				m_pActiveScene->CreateGameObject(13254521934309852950, "Complex");
+				auto pParent = m_pActiveScene->CreateGameObject("Knave");
+				auto pChild = m_pActiveScene->CreateGameObject(13254521934309852950, "Complex");
+				pChild->GetComponent<Dive::Transform>()->SetParent(pParent->GetComponent<Dive::Transform>());
 
 				// 전달까지 직접하는게 맞다.
 				// 하지만 방법이 너무 막무가내다....
