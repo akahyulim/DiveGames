@@ -1,6 +1,5 @@
 #include "divepch.h"
 #include "Scene.h"
-#include "GameObject.h"
 #include "Base/Base.h"
 #include "Component/Transform.h"
 

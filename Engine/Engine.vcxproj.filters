@@ -96,6 +96,9 @@
     <ClCompile Include="Src\Base\Object.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Component.cpp">
+      <Filter>Src\Scene\Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">

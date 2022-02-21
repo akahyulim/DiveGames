@@ -1,6 +1,5 @@
 #include "divepch.h"
 #include "Transform.h"
-#include "Scene/GameObject.h"
 
 namespace Dive
 {
@@ -153,9 +152,40 @@ namespace Dive
 
 	void Transform::SetParent(Transform* pParent)
 	{
+		if (pParent)
+		{
+			if (pParent->GetInstanceID() == GetInstanceID())
+				return;
+		}
+
+		if (HasParent())
+		{
+			if (pParent->GetInstanceID() == GetParent()->GetInstanceID())
+				return;
+
+			auto& sibling = GetParent()->m_Children;
+			for (auto it = sibling.begin(); it != sibling.end();)
+			{
+				if ((*it)->GetInstanceID() == GetInstanceID())
+				{
+					sibling.erase(it);
+					break;
+				}
+				else
+				{
+					it++;
+				}
+			}
+		}
+
+		if (pParent)
+		{
+			pParent->m_Children.emplace_back(this);
+		}
+
+		SetParent(pParent);
 	}
 
-	// nullptr을 반환하지 않습니다.
 	Transform* Transform::GetRoot()
 	{
 		if (m_pParent == nullptr)
@@ -179,26 +209,31 @@ namespace Dive
 		if ((m_Children.empty()) || (index > static_cast<int>(m_Children.size())))
 			return nullptr;
 
-		// 유니티에서 가져온 인터페이스다.
-		// 그런데 유니티엔 Gets/SetSiblingIndex()라는게 있다.
-		// vector index와는 동일한 의미인 듯 한데
-		// 이를 Set, Get하는 방법을 찾아야 한다. (Set은 에바다...)
 		return m_Children[index];
 	}
 
+	// 전달받은 Parent가 자신과 같아도 true
 	bool Transform::IsChildOf(const Transform* pParent)
 	{
 		if (pParent == nullptr)
 			return false;
 
-		// GameObject의 ID로 비교해야 한다.
-		// 유니티의 경우 Component도 Object를 상속하므로 고유 InstanceID를 가진다.
-		// 실제로 GameObject로 비교하는 것 보다 직접 비교하는 편이 낫다.
+		if (!HasParent())
+			return false;
 
-		return false;
+		if (this->GetInstanceID() == pParent->GetInstanceID())
+			return true;
+
+		for (auto pChild : m_Children)
+		{
+			if (this->GetInstanceID() == pChild->GetInstanceID())
+				return true;
+		}
+
+		return m_pParent->IsChildOf(pParent);
 	}
 
-	// 자신의 자식을 모두 독립시킵니다.
+	// 자신의 자식을 모두 독립
 	void Transform::DetachChildren()
 	{
 		if (m_Children.empty())
@@ -206,7 +241,7 @@ namespace Dive
 
 		for (auto pChild : m_Children)
 		{
-			pChild->m_pParent = nullptr;
+			pChild->SetParent(nullptr);
 		}
 
 		m_Children.clear();

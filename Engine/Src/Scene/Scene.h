@@ -1,9 +1,8 @@
 #pragma once
+#include "GameObject.h"
 
 namespace Dive
 {
-	class GameObject;
-
 	class Scene
 	{
 	public:

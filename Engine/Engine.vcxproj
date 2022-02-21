@@ -202,6 +202,7 @@
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Scene\Component\Camera.cpp" />
+    <ClCompile Include="Src\Scene\Component\Component.cpp" />
     <ClCompile Include="Src\Scene\Component\Transform.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />

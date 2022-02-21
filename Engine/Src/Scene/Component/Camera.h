@@ -3,8 +3,6 @@
 
 namespace Dive
 {
-	class GameObject;
-
 	class Camera : public Component
 	{
 	public:
