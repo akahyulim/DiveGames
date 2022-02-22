@@ -12,8 +12,36 @@ namespace Dive
 			m_Name = "Untitled";
 	}
 
+	Scene::~Scene()
+	{
+		Clear();
+	}
+
 	void Scene::UpdateRuntime(float elapsedTime)
 	{
+		if (m_bDirty)
+		{
+			if (m_GameObjects.empty())
+				return;
+
+			auto it = m_GameObjects.begin();
+			for (it; it != m_GameObjects.end();)
+			{
+				if ((*it)->IsRemoveTarget())
+				{
+					DV_DELETE(*it);
+					it = m_GameObjects.erase(it);
+				}
+				else
+					it++;
+			}
+
+			m_bDirty = false;
+		}
+
+		// 현재 GameObject와 Component에는 Update가 없다.
+		// 유니티처럼 한다면 아래의 update script에서 처리하는 모양이 나올 듯?
+
 		// update script
 
 		// set camera
@@ -52,23 +80,37 @@ namespace Dive
 		return pNewGameObject;
 	}
 
-	// 일단 계층구조라도 자신만 제거한다.
+	// 자식까지 모두 제거
 	void Scene::RemoveGameObject(unsigned long long id)
 	{
-		// 런타임에선 문제가 될 수 있다?
-		auto it = m_GameObjects.begin();
-		for (it; it != m_GameObjects.end();)
+		if (m_GameObjects.empty())
+			return;
+
+		if (!m_bDirty)
+			m_bDirty = true;
+
+		for (auto pGameObject : m_GameObjects)
 		{
-			if ((*it)->GetInstanceID() == id)
+			if (pGameObject->GetInstanceID() == id)
 			{
-				// 부모가 존재할 때 문제가 된다.
-				DV_DELETE((*it));
-				m_GameObjects.erase(it);
-				break;
-			}
-			else
-			{
-				it++;
+				auto pTransform = pGameObject->GetComponent<Transform>();
+				if (pTransform)
+				{
+					if (pTransform->HasChildren())
+					{
+						for (auto pChild : pTransform->GetChildren())
+						{
+							RemoveGameObject(pChild->GetGameObject()->GetInstanceID());
+						}
+					}
+
+					if (pTransform->HasParent())
+					{
+						pTransform->SetParent(nullptr);
+					}
+				}
+
+				pGameObject->MarkRemoveTarget();
 			}
 		}
 	}

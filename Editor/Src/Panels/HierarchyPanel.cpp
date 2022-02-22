@@ -14,25 +14,30 @@ void HierarchyPanel::renderWindow()
 	if (!m_pActiveScene)
 		return;
 
-	if (ImGui::BeginDragDropTarget())
+	if (ImGui::TreeNodeEx(m_pActiveScene->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
+		if (ImGui::BeginDragDropTarget())
 		{
-			auto pInstanceID = static_cast<unsigned long long*>(pPayload->Data);
-			auto pDroppedObject = m_pActiveScene->GetGameObject(*pInstanceID);
-			pDroppedObject->GetComponent<Dive::Transform>()->SetParent(nullptr);
+			if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
+			{
+				auto pInstanceID = static_cast<unsigned long long*>(pPayload->Data);
+				auto pDroppedObject = m_pActiveScene->GetGameObject(*pInstanceID);
+				pDroppedObject->GetComponent<Dive::Transform>()->SetParent(nullptr);
+			}
+
+			ImGui::EndDragDropTarget();
 		}
 
-		ImGui::EndDragDropTarget();
-	}
-
-	auto pRoots = m_pActiveScene->GetRoots();
-	if (!pRoots.empty())
-	{
-		for (auto pRoot : pRoots)
+		auto pRoots = m_pActiveScene->GetRoots();
+		if (!pRoots.empty())
 		{
-			drawNode(pRoot);
+			for (auto pRoot : pRoots)
+			{
+				drawNode(pRoot);
+			}
 		}
+
+		ImGui::TreePop();
 	}
 }
 
@@ -80,14 +85,40 @@ void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 		ImGui::EndDragDropTarget();
 	}
 
-	bool entityDeleted = false;
+	bool bCopy = false;
+	bool bRename = false;
+	bool bDelete = false;
 	if (ImGui::BeginPopupContextItem())
 	{
-		if (ImGui::MenuItem("Delete Entity"))
-			entityDeleted = true;
+		if (ImGui::MenuItem("Copy"))
+			bCopy = true;
+
+		if (ImGui::MenuItem("Rename"))
+			bRename = true;
+
+		if (ImGui::MenuItem("Delete"))
+			bDelete = true;
 
 		ImGui::EndPopup();
 	}
+
+	if (bCopy)
+	{
+
+	}
+
+	if (bRename)
+	{
+
+	}
+
+	if (bDelete)
+	{
+		m_pActiveScene->RemoveGameObject(pObject);
+		if (m_pSelectedObject && (m_pSelectedObject->GetInstanceID() == pObject->GetInstanceID()))
+			m_pSelectedObject = nullptr;
+	}
+
 
 	if (bNodeOpen)
 	{
@@ -97,13 +128,5 @@ void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 		}
 
 		ImGui::TreePop();
-	}
-
-	if (entityDeleted)
-	{
-		// 아직 미구현
-		m_pActiveScene->RemoveGameObject(pObject);
-		if (m_pSelectedObject && (m_pSelectedObject->GetInstanceID() == pObject->GetInstanceID()))
-			m_pSelectedObject = nullptr;
 	}
 }

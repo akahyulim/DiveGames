@@ -12,7 +12,7 @@ namespace Dive
 	public:
 		GameObject(Scene* pScene, const std::string& name = std::string());
 		GameObject(Scene* pScene, unsigned long long id, const std::string& name = std::string());
-		~GameObject() = default;
+		~GameObject();
 
 		template<class T>
 		T* AddComponent()
@@ -71,9 +71,14 @@ namespace Dive
 			return nullptr;
 		}
 
+		bool IsRemoveTarget() const { return m_bRemoveTarget; }
+		void MarkRemoveTarget() { m_bRemoveTarget = true; }
+
 	private:
 	private:
 		Scene* m_pScene			= nullptr;
 		std::vector<Component*> m_Components;
+
+		bool m_bRemoveTarget = false;
 	};
 }

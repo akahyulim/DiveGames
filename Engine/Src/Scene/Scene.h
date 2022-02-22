@@ -7,10 +7,11 @@ namespace Dive
 	{
 	public:
 		Scene(const std::string& name = std::string());
-		~Scene() = default;
+		~Scene();
 
-		// event로 처리?
+		// App의 Run에서 직접 호출한다.
 		void UpdateRuntime(float elapsedTime);
+		// Editor's Camera를 전달한다.
 		//void UpdateEditor(float elpasedTime);
 
 		void Clear();
@@ -32,5 +33,6 @@ namespace Dive
 	private:
 		std::string m_Name;
 		std::vector<GameObject*> m_GameObjects;
+		bool m_bDirty = false;
 	};
 }

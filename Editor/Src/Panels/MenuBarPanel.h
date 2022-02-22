@@ -9,6 +9,9 @@ public:
 	MenuBarPanel(Editor* pEditor);
 	~MenuBarPanel();
 
+	// 위치가 조금 애매하다.
+	Dive::Scene* GetActiveScene() { return m_pActiveScene; }
+
 	void renderAlways() override;
 
 private:

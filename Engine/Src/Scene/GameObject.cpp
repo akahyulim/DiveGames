@@ -20,4 +20,18 @@ namespace Dive
 
 		DV_CORE_TRACE("Copied GameObject InstanceID: {:d}", GetInstanceID());
 	}
+
+	GameObject::~GameObject()
+	{
+		DV_CORE_TRACE("Destroy {0:s}: {1:d}", m_Name, m_InstanceID);
+
+		if (m_Components.empty())
+			return;
+
+		for(auto pComponent : m_Components)
+		{
+			DV_DELETE(pComponent);
+		}
+		m_Components.clear();
+	}
 }

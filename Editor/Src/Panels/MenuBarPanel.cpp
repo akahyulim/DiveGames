@@ -79,7 +79,9 @@ void MenuBarPanel::menuFile()
 		if (ImGui::MenuItem("Close"))
 		{
 			if (m_pActiveScene)
+			{
 				DV_DELETE(m_pActiveScene);
+			}
 
 			m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
 			m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
@@ -110,6 +112,16 @@ void MenuBarPanel::menuFile()
 		if (ImGui::MenuItem("Exit"))
 		{
 			// Scene 저장 확인
+
+			// Scene을 제거할 때 마다 사용하는 곳 모두에게 직접 전달하고 있다.
+			// 너무 비효율적이다.
+			if (m_pActiveScene)
+			{
+				DV_DELETE(m_pActiveScene);
+			}
+			m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
+			m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
+			m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
 
 			m_pEditor->Close();
 		}

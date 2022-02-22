@@ -106,7 +106,14 @@ void Editor::Run()
 
 		// 이 아래쪽에서 Update
 		{
+			// 업데이트 구분을 좀 더 명확하게 짜야할듯?
 			Dive::Run();
+
+			// Scene을 따로 업데이트하는 건 맞는데
+			// 호출하는 과정이 애매하다.
+			auto pActiveScene = m_pMenuBar->GetActiveScene();
+			if(pActiveScene)
+				pActiveScene->UpdateRuntime(0.0f);
 
 			// Begin
 			{

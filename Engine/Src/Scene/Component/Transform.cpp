@@ -212,6 +212,11 @@ namespace Dive
 		return m_pParent->GetRoot();
 	}
 
+	bool Transform::HasChildren() const
+	{
+		return !m_Children.empty();
+	}
+
 	std::vector<Transform*> Transform::GetChildren() const
 	{
 		return m_Children;

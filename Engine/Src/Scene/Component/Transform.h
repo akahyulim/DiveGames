@@ -77,6 +77,7 @@ namespace Dive
 		Transform* GetParent() const { return m_pParent; }
 		void SetParent(Transform* pParent);
 		Transform* GetRoot();
+		bool HasChildren() const;
 		std::vector<Transform*> GetChildren() const;
 		unsigned int GetChildCount();
 		Transform* GetChild(int index);
