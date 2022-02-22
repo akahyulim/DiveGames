@@ -14,8 +14,19 @@ void HierarchyPanel::renderWindow()
 	if (!m_pActiveScene)
 		return;
 
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
+		{
+			auto pInstanceID = static_cast<unsigned long long*>(pPayload->Data);
+			auto pDroppedObject = m_pActiveScene->GetGameObject(*pInstanceID);
+			pDroppedObject->GetComponent<Dive::Transform>()->SetParent(nullptr);
+		}
+
+		ImGui::EndDragDropTarget();
+	}
+
 	auto pRoots = m_pActiveScene->GetRoots();
-	
 	if (!pRoots.empty())
 	{
 		for (auto pRoot : pRoots)
@@ -31,11 +42,8 @@ void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 		return;
 
 	ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
-
-	// 자식 존재 여부
 	auto children = pObject->GetComponent<Dive::Transform>()->GetChildren();
 	children.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
-
 	if (m_pSelectedObject)
 	{
 		nodeFlags |= (m_pSelectedObject->GetInstanceID() == pObject->GetInstanceID()) ? ImGuiTreeNodeFlags_Selected : 0;
@@ -46,6 +54,30 @@ void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 	if (ImGui::IsItemClicked())
 	{
 		m_pSelectedObject = pObject;
+	}
+
+	if (ImGui::BeginDragDropSource())
+	{
+		unsigned long long id = pObject->GetInstanceID();
+		ImGui::SetDragDropPayload("HIERARCHY_NODE", &id, sizeof(unsigned long long));
+		ImGui::EndDragDropSource();
+	}
+
+	if (ImGui::BeginDragDropTarget())
+	{
+		if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
+		{
+			auto pId = static_cast<unsigned long long*>(pPayload->Data);
+			auto pDroppedObject = m_pActiveScene->GetGameObject(*pId);
+
+			if (pDroppedObject->GetInstanceID() != pObject->GetInstanceID())
+			{
+				pDroppedObject->GetComponent<Dive::Transform>()->SetParent(
+					pObject->GetComponent<Dive::Transform>());
+			}
+		}
+
+		ImGui::EndDragDropTarget();
 	}
 
 	bool entityDeleted = false;

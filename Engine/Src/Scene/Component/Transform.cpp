@@ -181,6 +181,25 @@ namespace Dive
 
 			pParent->m_Children.emplace_back(this);
 		}
+		else
+		{
+			if (HasParent())
+			{
+				auto& sibling = GetParent()->m_Children;
+				for (auto it = sibling.begin(); it != sibling.end();)
+				{
+					if ((*it)->GetInstanceID() == GetInstanceID())
+					{
+						sibling.erase(it);
+						break;
+					}
+					else
+					{
+						it++;
+					}
+				}
+			}
+		}
 
 		m_pParent = pParent;
 	}

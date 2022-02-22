@@ -81,6 +81,17 @@ namespace Dive
 		RemoveGameObject(pTarget->GetInstanceID());
 	}
 
+	GameObject* Scene::GetGameObject(unsigned long long id)
+	{
+		for (auto pGameObject : m_GameObjects)
+		{
+			if (pGameObject->GetInstanceID() == id)
+				return pGameObject;
+		}
+
+		return nullptr;
+	}
+
 	std::vector<GameObject*> Scene::GetRoots()
 	{
 		std::vector<GameObject*> roots;
