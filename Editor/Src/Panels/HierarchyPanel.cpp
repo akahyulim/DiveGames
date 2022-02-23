@@ -12,7 +12,10 @@ HierarchyPanel::~HierarchyPanel()
 void HierarchyPanel::renderWindow()
 {
 	if (!m_pActiveScene)
+	{
+		m_pSelectedObject = nullptr;
 		return;
+	}
 
 	if (ImGui::TreeNodeEx(m_pActiveScene->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 	{

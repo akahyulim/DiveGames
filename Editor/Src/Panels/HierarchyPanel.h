@@ -9,6 +9,8 @@ public:
 
 	void renderWindow() override;
 
+	Dive::GameObject* GetSeletecedObject() { return m_pSelectedObject; }
+
 private:
 	void drawNode(Dive::GameObject* pObject);
 

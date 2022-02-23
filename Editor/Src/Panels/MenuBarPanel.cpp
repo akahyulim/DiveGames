@@ -83,9 +83,9 @@ void MenuBarPanel::menuFile()
 				DV_DELETE(m_pActiveScene);
 			}
 
-			m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
-			m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
-			m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
+			m_pEditor->GetScene()->SetActiveScene(nullptr);
+			m_pEditor->GetHierarchy()->SetActiveScene(nullptr);
+			m_pEditor->GetInspector()->SetActiveScene(nullptr);
 		}
 		if (ImGui::MenuItem("Close Project"))
 		{
@@ -119,9 +119,9 @@ void MenuBarPanel::menuFile()
 			{
 				DV_DELETE(m_pActiveScene);
 			}
-			m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
-			m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
-			m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
+			m_pEditor->GetScene()->SetActiveScene(nullptr);
+			m_pEditor->GetHierarchy()->SetActiveScene(nullptr);
+			m_pEditor->GetInspector()->SetActiveScene(nullptr);
 
 			m_pEditor->Close();
 		}

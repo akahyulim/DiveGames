@@ -10,5 +10,7 @@ public:
 	void renderWindow() override;
 
 private:
+	void drawTransform(Dive::GameObject* pSelectedObject);
+	
 private:
 };

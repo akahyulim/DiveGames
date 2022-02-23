@@ -290,12 +290,13 @@ void Editor::setDarkThemeColors()
 void Editor::loadResources()
 {
 	// 아이콘 텍스쳐
-	// 폰트 여러개를 등록한 후 사용할 수 있는지 확인 필요 => 배열로 접근할 수 있는듯
-	// 만약 개수가 적다면 setDarkThemeColors()의 이름을 적절히 변환시킨 후 포함
 
-	float fontSize = 16.0f;
+	// 폰트를 배열로 관리할 수 있는 것 같은데
+	// 예상했던 것처럼 돌아가지 않는다...
+	float fontSize = 18.0f;
 	auto io = ImGui::GetIO();
 	io.FontDefault = io.Fonts->AddFontFromFileTTF("Assets/Fonts/Nanum/NanumBarunGothic.ttf", fontSize);
+	io.Fonts->AddFontFromFileTTF("Assets/Fonts/Nanum/NanumBarunGothicBold.ttf", fontSize);
 }
 
 // 현재 Docking + Panel Object + Panel hard cording이 합쳐져 좀 길다.

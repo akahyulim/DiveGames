@@ -1,155 +1,104 @@
 #include "divepch.h"
 #include "Transform.h"
 
+#include "Scene/GameObject.h" // test
+
 namespace Dive
 {
 	Transform::Transform(GameObject* pGameObject)
 		: Component(pGameObject)
 	{
 		m_Type = eComponentType::Transform;
-
-		Clear();
 	}
 
 	void Transform::Clear()
 	{
 		m_LocalPosition = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-		m_LocalRotation = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		m_LocalRotation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 		m_LocalScale	= DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-	}
-
-	DirectX::XMFLOAT3 Transform::GetLocalPosition() const
-	{
-		return m_LocalPosition;
-	}
-
-	DirectX::XMVECTOR Transform::GetLocalPositionVector() const
-	{
-		return DirectX::XMLoadFloat3(&m_LocalPosition);
-	}
-
-	void Transform::GetLocalPosition(float& outX, float& outY, float& outZ) const
-	{
-		outX = m_LocalPosition.x;
-		outY = m_LocalPosition.y;
-		outZ = m_LocalPosition.z;
-	}
-
-	void Transform::SetLocalPosition(const DirectX::XMFLOAT3& position)
-	{
-		SetLocalPosition(DirectX::XMLoadFloat3(&position));
-	}
-
-	void Transform::SetLocalPosition(const DirectX::XMVECTOR& position)
-	{
-		if (DirectX::XMVector3Equal(position, GetLocalPositionVector()))
-			return;
-
-		DirectX::XMStoreFloat3(&m_LocalPosition, position);
-	}
-
-	void Transform::SetLocalPosition(float x, float y, float z)
-	{
-		SetLocalPosition(DirectX::XMVectorSet(x, y, z, 1.0f));
 	}
 
 	DirectX::XMFLOAT3 Transform::GetPosition()
 	{
-		auto matrix = GetMatrix4X4();
+		if (!HasParent())
+			return m_LocalPosition;
 
-		return DirectX::XMFLOAT3(
-			matrix._41,
-			matrix._42,
-			matrix._43
-		);
+		auto vecLocalPos = DirectX::XMLoadFloat3(&m_LocalPosition);
+		auto parentMat = GetParent()->GetMatrix();
+		auto matParentMat = DirectX::XMLoadFloat4x4(&parentMat);
+
+		vecLocalPos = XMVector3Transform(vecLocalPos, matParentMat);
+
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMStoreFloat3(&pos, vecLocalPos);
+
+		return pos;
 	}
 
-	DirectX::XMVECTOR Transform::GetPositionVector()
+	void Transform::SetPosition(DirectX::XMFLOAT3 pos)
 	{
-		auto matrix = GetMatrix4X4();
+		if (!HasParent())
+			m_LocalPosition = pos;
 
-		return DirectX::XMVectorSet(
-			matrix._41,
-			matrix._42,
-			matrix._43,
-			1.0f
-		);
+		auto vecPos = DirectX::XMLoadFloat3(&pos);
+		auto parentMat = GetParent()->GetMatrix();
+		auto matParentMat = DirectX::XMLoadFloat4x4(&parentMat);
+
+		auto vecLocalPos = DirectX::XMVector3Transform(vecPos, DirectX::XMMatrixInverse(nullptr, matParentMat));
+
+		DirectX::XMStoreFloat3(&m_LocalPosition, vecLocalPos);
 	}
 
-	void Transform::GetPosition(float& outX, float& outY, float& outZ)
+	DirectX::XMFLOAT3 Transform::GetRotation()
 	{
-		auto matrix = GetMatrix4X4();
-
-		outX = matrix._41;
-		outZ = matrix._42;
-		outY = matrix._43;
-	}
-
-	void Transform::SetPosition(const DirectX::XMFLOAT3& position)
-	{
-		SetPosition(DirectX::XMLoadFloat3(&position));
-	}
-
-	void Transform::SetPosition(const DirectX::XMVECTOR& position)
-	{
-		SetLocalPosition(
-			HasParent() ?
-			DirectX::XMVector3Transform(position, DirectX::XMMatrixInverse(nullptr, GetParent()->GetMatrix())) :
-			position
-		);
-	}
-
-	void Transform::SetPosition(float x, float y, float z)
-	{
-		SetPosition(DirectX::XMVectorSet(x, y, z, 1.0f));
-	}
-
-	DirectX::XMVECTOR Transform::GetLocalRotationVector() const
-	{
-		return DirectX::XMVECTOR();
-	}
-
-	DirectX::XMVECTOR Transform::GetLocalScaleVector() const
-	{
-		return DirectX::XMVECTOR();
-	}
-
-	DirectX::XMFLOAT4X4 Transform::GetLocalMatrix4X4()
-	{
-		DirectX::XMMATRIX matLocalPos = DirectX::XMMatrixTranslationFromVector(GetLocalPositionVector());
-		DirectX::XMMATRIX matLocalRot = DirectX::XMMatrixRotationQuaternion(GetLocalRotationVector());
-		DirectX::XMMATRIX matLocalScl = DirectX::XMMatrixScalingFromVector(GetLocalScaleVector());
-
-		auto localMatrix = matLocalScl * matLocalRot * matLocalPos;
-		DirectX::XMStoreFloat4x4(&m_LocalMatrix, localMatrix);
+		if (!HasParent())
+			return m_LocalRotation;
 		
-		return m_LocalMatrix;
+		// 오일러각으로 출력해야 한다.
+
+		return DirectX::XMFLOAT3();
 	}
 
-	DirectX::XMMATRIX Transform::GetLocalMatrix()
+	void Transform::SetRotation(DirectX::XMFLOAT3 rot)
 	{
-		auto matrix = GetLocalMatrix4X4();
-		return DirectX::XMLoadFloat4x4(&matrix);
+		// 오일러각을 받아 회전시켜야 한다.
 	}
 
-	DirectX::XMFLOAT4X4 Transform::GetMatrix4X4()
+	DirectX::XMFLOAT4X4 Transform::GetLocalMatrix()
 	{
-		if(HasParent())
-		{
-			DirectX::XMStoreFloat4x4(&m_Matrix, (GetLocalMatrix() * m_pParent->GetMatrix()));
-		}
-		else
-		{
-			m_Matrix = GetLocalMatrix4X4();
-		}
+		auto vecLocalPos = DirectX::XMLoadFloat3(&m_LocalPosition);
+		float radianX = DirectX::XMConvertToRadians(m_LocalRotation.x);
+		float radianY = DirectX::XMConvertToRadians(m_LocalRotation.y);
+		float radianZ = DirectX::XMConvertToRadians(m_LocalRotation.z);
+		auto vecLocalRot = DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ);
+		auto vecLocalScl = DirectX::XMLoadFloat3(&m_LocalScale);
 
-		return m_Matrix;
+		auto matLocalPos = DirectX::XMMatrixTranslationFromVector(vecLocalPos);
+		auto matLocalRot = DirectX::XMMatrixRotationQuaternion(vecLocalRot);
+		auto matLocalScl = DirectX::XMMatrixScalingFromVector(vecLocalScl);
+
+		auto matLocalMat = matLocalScl * matLocalRot * matLocalPos;
+
+		DirectX::XMFLOAT4X4 localMat;
+		DirectX::XMStoreFloat4x4(&localMat, matLocalMat);
+
+		return localMat;
 	}
 
-	DirectX::XMMATRIX Transform::GetMatrix()
+	DirectX::XMFLOAT4X4 Transform::GetMatrix()
 	{
-		auto matrix = GetMatrix4X4();
-		return DirectX::XMLoadFloat4x4(&matrix);
+		if (!HasParent())
+			return GetLocalMatrix();
+
+		auto localMat = this->GetLocalMatrix();
+		auto matLocalMat = DirectX::XMLoadFloat4x4(&localMat);
+		auto parentMat = this->GetParent()->GetMatrix();
+		auto matParentMat = DirectX::XMLoadFloat4x4(&parentMat);
+
+		DirectX::XMFLOAT4X4 mat;
+		DirectX::XMStoreFloat4x4(&mat, (matLocalMat * matParentMat));
+
+		return mat;
 	}
 
 	void Transform::SetParent(Transform* pParent)
@@ -202,6 +151,10 @@ namespace Dive
 		}
 
 		m_pParent = pParent;
+
+		// test
+		auto wp = this->GetPosition();
+		DV_CORE_TRACE("{0:s}'s world position ({1:f}, {2:f}, {3:f})", this->GetGameObject()->GetName(), wp.x, wp.y, wp.z);
 	}
 
 	Transform* Transform::GetRoot()
