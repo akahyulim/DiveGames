@@ -40,15 +40,17 @@ namespace Dive
 		// matrix
 		DirectX::XMFLOAT4X4 GetMatrix();
 		DirectX::XMFLOAT4X4 GetLocalMatrix();
+		DirectX::XMFLOAT4X4 GetRotationMatrix();
+		DirectX::XMFLOAT4X4 GetLocalRotationMatrix();
 
 		// Translate
-		void Translate(const DirectX::XMFLOAT3& translation, eSpace relativeTo = eSpace::Self);
+		void Translate(DirectX::XMFLOAT3 translation, eSpace relativeTo = eSpace::Self);
 		void Translate(float x, float y, float z, eSpace relativeTo = eSpace::Self);
 
 		// Rotate
-		void Rotate(const DirectX::XMFLOAT3& eulerAngles, eSpace relativeTo = eSpace::Self);
+		void Rotate(DirectX::XMFLOAT3 eulerAngles, eSpace relativeTo = eSpace::Self);
 		void Rotate(float xAngle, float yAngle, float zAngle, eSpace relativeTo = eSpace::Self);
-		void Rotate(const DirectX::XMFLOAT3& axis, float angle, eSpace relativeTo = eSpace::Self);
+		void Rotate(DirectX::XMFLOAT3 axis, float angle, eSpace relativeTo = eSpace::Self);
 
 		// Direction
 		DirectX::XMFLOAT3 GetForward();
@@ -56,6 +58,7 @@ namespace Dive
 		DirectX::XMFLOAT3 GetRight();
 
 		// LookAt
+		void LookAt(Transform target, DirectX::XMFLOAT3 worldUp = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
 
 		// Hierarchy
 		bool HasParent() const { return (m_pParent != nullptr); }

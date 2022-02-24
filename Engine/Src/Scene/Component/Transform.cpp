@@ -1,8 +1,6 @@
 #include "divepch.h"
 #include "Transform.h"
 
-#include "Scene/GameObject.h" // test
-
 namespace Dive
 {
 	Transform::Transform(GameObject* pGameObject)
@@ -65,12 +63,14 @@ namespace Dive
 		return m_Rotation;
 	}
 
+	// -360 ~ 360 사이로 제한하고 싶다.
 	void Transform::SetRotation(DirectX::XMFLOAT3 rot)
 	{
 		m_Rotation = rot;
 	}
 
 	// 이것도 유니티 구현 확인이 필요하다.
+	// 역시 오일러 각을 제한하고 싶다.
 	DirectX::XMFLOAT3 Transform::GetLocalRotation()
 	{
 		if (!HasParent())
@@ -100,6 +100,8 @@ namespace Dive
 		auto vecLocalRot = DirectX::XMLoadFloat3(&rot);
 		auto vecRot = DirectX::XMVectorAdd(vecParentRot, vecLocalRot);
 
+		// SetRotation()에서 각도를 제한하는 구현을 추가한다면
+		// 이 부분도 SetRotation()에 전달토록 바꾸는 게 낫다.
 		DirectX::XMStoreFloat3(&m_Rotation, vecRot);
 	}
 
@@ -108,6 +110,7 @@ namespace Dive
 		return m_Scale;
 	}
 
+	// 이것 역시 0.0f 이상으로 제한하고 싶다.
 	void Transform::SetScale(DirectX::XMFLOAT3 scl)
 	{
 		m_Scale = scl;
@@ -169,7 +172,157 @@ namespace Dive
 
 	DirectX::XMFLOAT4X4 Transform::GetLocalMatrix()
 	{
-		return DirectX::XMFLOAT4X4();
+		if (!HasParent())
+			return GetMatrix();
+
+		auto mat = GetMatrix();
+		auto matMat = DirectX::XMLoadFloat4x4(&mat);
+		auto parentMat = GetParent()->GetMatrix();
+		auto matInverseParentMat = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&parentMat));
+		auto matLocalMat = matMat * matInverseParentMat;
+
+		DirectX::XMFLOAT4X4 localMat;
+		DirectX::XMStoreFloat4x4(&localMat, matLocalMat);
+
+		return localMat;
+	}
+
+	DirectX::XMFLOAT4X4 Transform::GetRotationMatrix()
+	{
+		float radianX = DirectX::XMConvertToRadians(m_Rotation.x);
+		float radianY = DirectX::XMConvertToRadians(m_Rotation.y);
+		float radianZ = DirectX::XMConvertToRadians(m_Rotation.z);
+		auto vecRot = DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ);
+		auto matRotMat = DirectX::XMMatrixRotationQuaternion(vecRot);
+
+		DirectX::XMFLOAT4X4 rotMat;
+		DirectX::XMStoreFloat4x4(&rotMat, matRotMat);
+
+		return rotMat;
+	}
+
+	// 확신이 없다.
+	DirectX::XMFLOAT4X4 Transform::GetLocalRotationMatrix()
+	{
+		if (!HasParent())
+			return GetRotationMatrix();
+
+		auto parentRotMat = GetParent()->GetRotationMatrix();
+		auto matParentRotMat = DirectX::XMLoadFloat4x4(&parentRotMat);
+		auto rotMat = GetRotationMatrix();
+		auto matRotMat = DirectX::XMLoadFloat4x4(&rotMat);
+
+		auto matLocalRotMat = matRotMat * matParentRotMat;
+
+		DirectX::XMFLOAT4X4 localRotMat;
+		DirectX::XMStoreFloat4x4(&localRotMat, matLocalRotMat);
+
+		return localRotMat;
+	}
+
+	// 일단 회전 행렬만 곱한 후 위치에서 더했다.
+	// 추후 확인이 필요하다.
+	void Transform::Translate(DirectX::XMFLOAT3 translation, eSpace relativeTo)
+	{
+		auto vecTranslation = DirectX::XMLoadFloat3(&translation);
+
+		auto mat = relativeTo == eSpace::World ? GetRotationMatrix() : GetLocalRotationMatrix();
+		auto vecMat = DirectX::XMLoadFloat4x4(&mat);
+		vecTranslation = DirectX::XMVector3Transform(vecTranslation, vecMat);
+
+		auto vecPosition = DirectX::XMLoadFloat3(&m_Position);
+		vecPosition = DirectX::XMVectorAdd(vecPosition, vecTranslation);
+
+		DirectX::XMStoreFloat3(&m_Position, vecPosition);
+	}
+
+	void Transform::Translate(float x, float y, float z, eSpace relativeTo)
+	{
+		Translate(DirectX::XMFLOAT3(x, y, z), relativeTo);
+	}
+
+	// 일단 구현했지만 눈으로 확인이 필요하다.
+	void Transform::Rotate(DirectX::XMFLOAT3 eulerAngles, eSpace relativeTo)
+	{
+		float radianX = DirectX::XMConvertToRadians(eulerAngles.x);
+		float radianY = DirectX::XMConvertToRadians(eulerAngles.y);
+		float radianZ = DirectX::XMConvertToRadians(eulerAngles.z);
+		auto vecRot = DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ);
+		auto matRotMat = DirectX::XMMatrixRotationQuaternion(vecRot);
+
+		auto mat = relativeTo == eSpace::World ? GetRotationMatrix() : GetLocalRotationMatrix();
+		auto matMat = DirectX::XMLoadFloat4x4(&mat);
+
+		matRotMat = matRotMat * matMat;
+
+		// 문제는 이 결과를 다시 오일러 각으로 뽑아낸 후 m_Rotation에 저장해야 한다는 것이다.
+	}
+
+	void Transform::Rotate(float xAngle, float yAngle, float zAngle, eSpace relativeTo)
+	{
+		Rotate(DirectX::XMFLOAT3(xAngle, yAngle, zAngle), relativeTo);
+	}
+
+	void Transform::Rotate(DirectX::XMFLOAT3 axis, float angle, eSpace relativeTo)
+	{
+		// axis 축을 angle만큼 회전시킨 후 다시 m_Rotation을 회전하는 것 같다.
+	}
+
+	// 위치 행렬 * 회전 행렬에 축 벡터를 곱하면 될 것 같다.
+	DirectX::XMFLOAT3 Transform::GetForward()
+	{
+		auto vecPos = DirectX::XMLoadFloat3(&m_Position);
+		auto matPosMat = DirectX::XMMatrixTranslationFromVector(vecPos);
+
+		auto rotMat = GetRotationMatrix();
+		auto matRotMat = DirectX::XMLoadFloat4x4(&rotMat);
+
+		auto mat = matRotMat * matPosMat;
+
+		DirectX::XMFLOAT3 forward(0.0f, 0.0f, 1.0f);
+		auto vecForward = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&forward), mat);
+		DirectX::XMStoreFloat3(&forward, vecForward);
+
+		return forward;
+	}
+
+	DirectX::XMFLOAT3 Transform::GetUp()
+	{
+		auto vecPos = DirectX::XMLoadFloat3(&m_Position);
+		auto matPosMat = DirectX::XMMatrixTranslationFromVector(vecPos);
+
+		auto rotMat = GetRotationMatrix();
+		auto matRotMat = DirectX::XMLoadFloat4x4(&rotMat);
+
+		auto mat = matRotMat * matPosMat;
+
+		DirectX::XMFLOAT3 up(0.0f, 1.0f, 0.0f);
+		auto vecUp = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&up), mat);
+		DirectX::XMStoreFloat3(&up, vecUp);
+
+		return up;
+	}
+
+	DirectX::XMFLOAT3 Transform::GetRight()
+	{
+		auto vecPos = DirectX::XMLoadFloat3(&m_Position);
+		auto matPosMat = DirectX::XMMatrixTranslationFromVector(vecPos);
+
+		auto rotMat = GetRotationMatrix();
+		auto matRotMat = DirectX::XMLoadFloat4x4(&rotMat);
+
+		auto mat = matRotMat * matPosMat;
+
+		DirectX::XMFLOAT3 right(1.0f, 0.0f, 0.0f);
+		auto vecRight = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&right), mat);
+		DirectX::XMStoreFloat3(&right, vecRight);
+
+		return right;
+	}
+
+	void Transform::LookAt(Transform target, DirectX::XMFLOAT3 worldUp)
+	{
+		// 회전시켜서 target의 현재위치를 전방 벡터로 한다.
 	}
 
 	void Transform::SetParent(Transform* pParent)
@@ -222,10 +375,6 @@ namespace Dive
 		}
 
 		m_pParent = pParent;
-
-		// test
-		auto wp = this->GetPosition();
-		DV_CORE_TRACE("{0:s}'s world position ({1:f}, {2:f}, {3:f})", this->GetGameObject()->GetName(), wp.x, wp.y, wp.z);
 	}
 
 	Transform* Transform::GetRoot()
