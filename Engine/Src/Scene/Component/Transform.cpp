@@ -110,13 +110,14 @@ namespace Dive
 		return m_Scale;
 	}
 
-	// 이것 역시 0.0f 이상으로 제한하고 싶다.
 	void Transform::SetScale(DirectX::XMFLOAT3 scl)
 	{
+		if ((scl.x <= 0.0f) || (scl.y <= 0.0f) || (scl.z <= 0.0f))
+			return;
+
 		m_Scale = scl;
 	}
 
-	// 빼기가 맞는지, 나누기인지 확인 필요
 	DirectX::XMFLOAT3 Transform::GetLocalScale()
 	{
 		if (!HasParent())
@@ -125,7 +126,7 @@ namespace Dive
 		auto parentScl = GetParent()->GetScale();
 		auto vecParentScl = DirectX::XMLoadFloat3(&parentScl);
 		auto vecScl = DirectX::XMLoadFloat3(&m_Scale);
-		auto vecLocalScl = DirectX::XMVectorSubtract(vecScl, vecParentScl);
+		auto vecLocalScl = DirectX::XMVectorDivide(vecScl, vecParentScl);
 
 		DirectX::XMFLOAT3 localScl;
 		DirectX::XMStoreFloat3(&localScl, vecLocalScl);
@@ -135,6 +136,9 @@ namespace Dive
 
 	void Transform::SetLocalScale(DirectX::XMFLOAT3 scl)
 	{
+		if ((scl.x <= 0.0f) || (scl.y <= 0.0f) || (scl.z <= 0.0f))
+			return;
+
 		if (!HasParent())
 		{
 			m_Scale = scl;
@@ -144,7 +148,7 @@ namespace Dive
 		auto parentScl = GetParent()->GetScale();
 		auto vecParentScl = DirectX::XMLoadFloat3(&parentScl);
 		auto vecLocalScl = DirectX::XMLoadFloat3(&scl);
-		auto vecScl = DirectX::XMVectorAdd(vecParentScl, vecLocalScl);
+		auto vecScl = DirectX::XMVectorMultiply(vecParentScl, vecLocalScl);
 
 		DirectX::XMStoreFloat3(&m_Scale, vecScl);
 	}
