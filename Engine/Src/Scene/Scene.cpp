@@ -17,7 +17,7 @@ namespace Dive
 		Clear();
 	}
 
-	void Scene::UpdateRuntime(float elapsedTime)
+	void Scene::Update(float elapsedTime)
 	{
 		if (m_bDirty)
 		{

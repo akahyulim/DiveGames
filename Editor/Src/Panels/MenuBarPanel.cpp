@@ -3,6 +3,7 @@
 #include "HierarchyPanel.h"
 #include "InspectorPanel.h"
 #include "AssetPanel.h"
+#include "Base/EditorScene.h"
 
 MenuBarPanel::MenuBarPanel(Editor* pEditor)
 	: Panel(pEditor, "MenuBar")
@@ -57,7 +58,7 @@ void MenuBarPanel::menuFile()
 				if (m_pActiveScene)
 					DV_DELETE(m_pActiveScene);
 
-				m_pActiveScene = new Dive::Scene("Sample_World");
+				m_pActiveScene = new EditorScene("Sample_World");
 				m_pActiveScene->CreateGameObject("ChoA");
 				m_pActiveScene->CreateGameObject("IU");
 				auto pParent = m_pActiveScene->CreateGameObject("Knave");

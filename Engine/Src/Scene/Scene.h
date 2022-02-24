@@ -7,10 +7,10 @@ namespace Dive
 	{
 	public:
 		Scene(const std::string& name = std::string());
-		~Scene();
+		virtual ~Scene();
 
 		// App의 Run에서 직접 호출한다.
-		void UpdateRuntime(float elapsedTime);
+		void Update(float elapsedTime);
 		// Editor's Camera를 전달한다.
 		//void UpdateEditor(float elpasedTime);
 

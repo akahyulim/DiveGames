@@ -1,4 +1,5 @@
 #include "Editor.h"
+#include "EditorScene.h"
 #include "imgui-docking/imgui.h"
 #include "imgui-docking/imgui_impl_win32.h"
 #include "imgui-docking/imgui_impl_dx11.h"
@@ -107,13 +108,33 @@ void Editor::Run()
 		// 이 아래쪽에서 Update
 		{
 			// 업데이트 구분을 좀 더 명확하게 짜야할듯?
+			// 이게 좀 쌩뚱맞다... 역시 Editor가 상속해야 하나....
 			Dive::Run();
 
-			// Scene을 따로 업데이트하는 건 맞는데
-			// 호출하는 과정이 애매하다.
-			auto pActiveScene = m_pMenuBar->GetActiveScene();
-			if(pActiveScene)
-				pActiveScene->UpdateRuntime(0.0f);
+			switch (m_SceneMode)
+			{
+			case eSceneMode::Editor:
+			{
+				auto pActiveScene = m_pMenuBar->GetActiveScene();
+				if (pActiveScene)
+					pActiveScene->UpdateEditor(1.0f, &m_EditorCamera);
+
+				break;
+			}
+
+			// 현재 Renderer::Tick()에서 Begin/End를 호출하여 그려진다.
+			// 실제로는 Scene::Update() 내부에서 Renderer를 호출하여 행해야 하는 일이다.
+			// 즉, Renderer는 Tick() 대상이 아닌데, Dive::Run()에서 수행되고 있는 것이다.
+			case eSceneMode::Play:
+			{				
+				auto pActiveScene = m_pMenuBar->GetActiveScene();
+			
+				//if (pActiveScene)
+				//	pActiveScene->Update(0.0f);
+				
+				break;
+			}
+			}
 
 			// Begin
 			{

@@ -63,6 +63,12 @@
     <ClCompile Include="Src\Panels\InspectorPanel.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Base\EditorScene.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\EditorCamera.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Base\Editor.h">
@@ -109,6 +115,12 @@
     </ClInclude>
     <ClInclude Include="Src\Panels\Panel.h">
       <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\EditorScene.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\EditorCamera.h">
+      <Filter>Src\Base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

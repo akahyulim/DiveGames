@@ -1,4 +1,5 @@
 #include "HierarchyPanel.h"
+#include "Base/EditorScene.h"
 
 HierarchyPanel::HierarchyPanel(Editor* pEditor)
 	: Panel(pEditor, "Hierarchy")

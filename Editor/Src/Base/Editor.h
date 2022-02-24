@@ -1,5 +1,6 @@
 #pragma once
 #include "DiveEngine.h"
+#include "EditorCamera.h"
 #include <Windows.h>
 #include <string>
 #include <vector>
@@ -58,4 +59,13 @@ private:
 	AssetPanel* m_pAsset			= nullptr;
 
 	bool m_bDone = false;
+
+	enum class eSceneMode
+	{
+		Editor = 0,
+		Play
+	};
+
+	eSceneMode m_SceneMode = eSceneMode::Editor;
+	EditorCamera m_EditorCamera;
 };
