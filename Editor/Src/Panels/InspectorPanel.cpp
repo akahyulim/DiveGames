@@ -1,13 +1,10 @@
 #include "InspectorPanel.h"
 #include "HierarchyPanel.h"
 
-// 원래는 값을 참조로 받았다.
-// 즉, c#처럼 값들을 public으로 만들고 제어한다는 소리다.
 static void DrawVec3Control(const std::string& label, DirectX::XMFLOAT3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
 {
 	ImGuiIO& io = ImGui::GetIO();
-	// 현재 폰트 선택이 안된다.
-	auto pBoldFont = io.Fonts->Fonts[0];
+	auto pBoldFont = io.Fonts->Fonts[1];
 
 	ImGui::PushID(label.c_str());
 
@@ -115,64 +112,23 @@ void InspectorPanel::drawTransform(Dive::GameObject* pSelectedObject)
 	if (!pTransform)
 		return;
 
-	
 	if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		DrawVec3Control("Position", pTransform->m_LocalPosition);
-		DrawVec3Control("Rotation", pTransform->m_LocalRotation);
-		DrawVec3Control("Scale", pTransform->m_LocalScale);
+		// position
+		auto position = pTransform->GetLocalPosition();
+		DrawVec3Control("Position", position);
+		pTransform->SetLocalPosition(position);
 
-		/*
-		DirectX::XMFLOAT3 pos;
-		DirectX::XMFLOAT3 rot;
-		DirectX::XMFLOAT3 scl;
+		// rotation
+		auto rotation = pTransform->GetLocalRotation();
+		DrawVec3Control("Rotation", rotation);
+		pTransform->SetLocalRotation(rotation);
 
-		pos = pTransform->GetLocalPosition();
-		//rot = pTransform->GetLocalRotationEulerAngles();
-		//scl = pTransform->GetLocalScale();
-		rot = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-		scl = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-
-		ImGui::PushItemWidth(75.0f);
-
-		// 좀 더 깔끔히 다듬고 싶다.
-		// Position
-		ImGui::Text("Pos");
-		ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();
-		ImGui::DragScalar("##posX", ImGuiDataType_Float, &pos.x, 0.01f, nullptr, nullptr, "%.2f");
-		ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();
-		ImGui::DragScalar("##posY", ImGuiDataType_Float, &pos.y, 0.01f, nullptr, nullptr, "%.2f");
-		ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();
-		ImGui::DragScalar("##posZ", ImGuiDataType_Float, &pos.z, 0.01f, nullptr, nullptr, "%.2f");
-
-		// Rotation
-		ImGui::Text("Rot");
-		ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();
-		ImGui::DragScalar("##rotX", ImGuiDataType_Float, &rot.x, 1.0f, nullptr, nullptr, "%.2f");
-		ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();
-		ImGui::DragScalar("##rotY", ImGuiDataType_Float, &rot.y, 1.0f, nullptr, nullptr, "%.2f");
-		ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();
-		ImGui::DragScalar("##rotZ", ImGuiDataType_Float, &rot.z, 1.0f, nullptr, nullptr, "%.2f");
-
-		// Scale
-		ImGui::Text("Scl");
-		ImGui::SameLine();	ImGui::Text("X");	ImGui::SameLine();
-		ImGui::DragScalar("##sclX", ImGuiDataType_Float, &scl.x, 0.01f, nullptr, nullptr, "%.2f");
-		ImGui::SameLine();	ImGui::Text("Y");	ImGui::SameLine();
-		ImGui::DragScalar("##sclY", ImGuiDataType_Float, &scl.y, 0.01f, nullptr, nullptr, "%.2f");
-		ImGui::SameLine();	ImGui::Text("Z");	ImGui::SameLine();
-		ImGui::DragScalar("##sclZ", ImGuiDataType_Float, &scl.z, 0.01f, nullptr, nullptr, "%.2f");
-
-		ImGui::PopItemWidth();
-
-		// 실행 중이 아닐 때 변경 가능??
-		{
-			// 계층 구조일 경우 부모의 좌표계에서 설정되는 것이 맞다.
-			pTransform->SetLocalPosition(pos);
-			//pTransform->SetLocalRotationEulerAngles(rot);
-			//pTransform->SetLocalScale(scl);
-		}
-		*/
+		// scale
+		auto scale = pTransform->GetLocalScale();
+		DrawVec3Control("Scale", scale);
+		pTransform->SetLocalScale(scale);
 	}
+
 	ImGui::Separator();
 }
