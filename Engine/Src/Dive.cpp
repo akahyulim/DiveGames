@@ -41,6 +41,16 @@ namespace Dive
 		g_pEngine = pEngine;
 	}
 
+	void BeginScene()
+	{
+		GetRenderer().BeginScene();
+	}
+
+	void EndScene()
+	{
+		GetRenderer().EndScene();
+	}
+
 	void Run()
 	{
 		DV_ASSERT(g_pEngine != nullptr && "Engine 객체가 존재하지 않습니다.");

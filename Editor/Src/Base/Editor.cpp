@@ -74,6 +74,8 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	DV_ASSERT(s_pEditor == nullptr);
 	s_pEditor = this;
 
+	// Editor Camera 복사 생성 필요
+
 	ShowWindow(m_hWnd, SW_SHOW);
 	SetForegroundWindow(m_hWnd);
 	SetFocus(m_hWnd);
@@ -115,6 +117,10 @@ void Editor::Run()
 			{
 			case eSceneMode::Editor:
 			{
+				m_EditorCamera.Update(1.0f);
+
+				// Hazel은 ActiveScene이 Editor의 멤버 변수이다.
+				// 하지만 이는 Menuber가 Editor에 만들어져 있기 때문에 가능하다.
 				auto pActiveScene = m_pMenuBar->GetActiveScene();
 				if (pActiveScene)
 					pActiveScene->UpdateEditor(1.0f, &m_EditorCamera);

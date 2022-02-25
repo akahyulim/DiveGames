@@ -15,11 +15,9 @@ namespace Dive
 	class Component
 	{
 	public:
-		Component(GameObject* pGameObject) : m_pGameObject(pGameObject)
-		{
-			DV_ASSERT(pGameObject != nullptr);
-		}
-		virtual ~Component() {}
+		Component() = default;
+		Component(GameObject* pGameObject) : m_pGameObject(pGameObject) {}
+		virtual ~Component() = default;
 
 		GameObject* GetGameObject() { return m_pGameObject; }
 

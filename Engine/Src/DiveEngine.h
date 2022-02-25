@@ -34,5 +34,6 @@
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Camera.h"
+#include "Scene/Component/SceneCamera.h"
 
 //= Math ==========================

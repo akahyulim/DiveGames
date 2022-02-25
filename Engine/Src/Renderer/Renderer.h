@@ -12,8 +12,6 @@ namespace Dive
 		void Initialize(const WindowData* pData);
 		void Shutdow();
 
-		void Tick();
-
 		void BeginScene();
 		void EndScene();
 

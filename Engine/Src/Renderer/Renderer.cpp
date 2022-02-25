@@ -26,22 +26,10 @@ namespace Dive
 
 		m_GraphicsDevice.Shutdown();
 	}
-
-	void Renderer::Tick()
-	{
-		// update
-		{}
-
-		// render
-		{
-			BeginScene();
-
-			EndScene();
-		}
-	}
 	
-	// RenderTarget은 단계별로 변경된다.
-	// 따라서 이 구문은 사용이 불가능하다.
+	// Camera를 받아 Data(viewport)를 저장
+	// clear, set은 다른 곳에서?
+	// Hazle은 오버로딩 되어있다.
 	void Renderer::BeginScene()
 	{
 		auto pImmediateContext = m_GraphicsDevice.GetImmediateContext();

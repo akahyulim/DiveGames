@@ -7,6 +7,14 @@ EditorScene::EditorScene(const std::string name)
 
 void EditorScene::UpdateEditor(float elapsedTime, EditorCamera* pCamera)
 {
-	// temp
+	// begin: camera 전달
+	Dive::BeginScene();
+
+	// temp: 그런데 GameObject dirty check를 이 곳에서 하고 있다.
 	Dive::Scene::Update(elapsedTime);
+
+	// 이 곳은 그려질 대상들을 뽑은 후 draw함수에 전달한다.
+
+	// end
+	Dive::EndScene();
 }

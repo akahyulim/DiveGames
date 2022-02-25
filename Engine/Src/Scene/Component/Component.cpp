@@ -6,7 +6,9 @@ namespace Dive
 {
 	unsigned long long Component::GetInstanceID() const
 	{
-		DV_ASSERT(m_pGameObject != nullptr);
+		if (!m_pGameObject)
+			return 0;
+
 		return m_pGameObject->GetInstanceID();
 	}
 

@@ -21,6 +21,5 @@ namespace Dive
 	void Engine::Run()
 	{
 		m_Time.Tick();
-		m_Renderer.Tick();
 	}
 }

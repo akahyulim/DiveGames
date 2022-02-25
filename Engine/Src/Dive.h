@@ -12,6 +12,9 @@ namespace Dive
 	Engine* GetCurrentEngine();
 	void SetCurrentEngine(Engine* pEngine);
 
+	void BeginScene();
+	void EndScene();
+
 
 	// WINDOW DATA를 받아 Renderer를 초기화하는 함수가 필요하다.
 
