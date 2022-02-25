@@ -33,6 +33,8 @@
 #include "Scene/GameObject.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
+#include "Scene/Component/Renderer.h"
+#include "Scene/Component/SpriteRenderer.h"
 #include "Scene/Component/Camera.h"
 #include "Scene/Component/SceneCamera.h"
 

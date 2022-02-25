@@ -5,6 +5,8 @@ EditorScene::EditorScene(const std::string name)
 {
 }
 
+// 이 곳에서 그리는 이유는 Hazel이 ECS라 그럴 수 있다.
+// 따라서 어쩌면 GameObject의 Update를 통해 Renderer Component에서 Draw 되어야 할 수 있다.
 void EditorScene::UpdateEditor(float elapsedTime, EditorCamera* pCamera)
 {
 	// begin: camera 전달
