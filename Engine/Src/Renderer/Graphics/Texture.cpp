@@ -42,7 +42,7 @@ namespace Dive
 			return false;
 		}
 
-		auto pDevice = Dive::GetRenderer().GetGraphicsDevice()->GetDevice();
+		auto pDevice = Renderer::GetGraphicsDevice()->GetDevice();
 		DV_ASSERT(pDevice);
 
 		if (FAILED(DirectX::CreateShaderResourceView(pDevice, img.GetImages(), img.GetImageCount(), img.GetMetadata(), &m_pShaderResourceView)))
@@ -61,7 +61,7 @@ namespace Dive
 
 	bool Texture2D::CreateTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned bindFlags)
 	{
-		auto pDevice = Dive::GetRenderer().GetGraphicsDevice()->GetDevice();
+		auto pDevice = Renderer::GetGraphicsDevice()->GetDevice();
 		DV_ASSERT(pDevice);
 
 		m_Width		= width;
@@ -93,7 +93,7 @@ namespace Dive
 
 	bool Texture2D::CreateShaderResourceView(DXGI_FORMAT format)
 	{
-		auto pDevice = Dive::GetRenderer().GetGraphicsDevice()->GetDevice();
+		auto pDevice = Renderer::GetGraphicsDevice()->GetDevice();
 		DV_ASSERT(pDevice);
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
@@ -115,7 +115,7 @@ namespace Dive
 
 	bool Texture2D::CreateRenderTargetView(DXGI_FORMAT format)
 	{
-		auto pDevice = Dive::GetRenderer().GetGraphicsDevice()->GetDevice();
+		auto pDevice = Renderer::GetGraphicsDevice()->GetDevice();
 		DV_ASSERT(pDevice);
 
 		D3D11_RENDER_TARGET_VIEW_DESC desc;
@@ -136,7 +136,7 @@ namespace Dive
 
 	bool Texture2D::CreateDepthStencilView(DXGI_FORMAT format)
 	{
-		auto pDevice = Dive::GetRenderer().GetGraphicsDevice()->GetDevice();
+		auto pDevice = Renderer::GetGraphicsDevice()->GetDevice();
 		DV_ASSERT(pDevice);
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC desc;

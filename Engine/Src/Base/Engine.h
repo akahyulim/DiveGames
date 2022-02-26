@@ -24,13 +24,9 @@ namespace Dive
 
 		void Run();
 
-		Renderer& GetRenderer() { return m_Renderer; }
-
 	private:
 	
 	private:
 		Time m_Time;
-
-		Renderer m_Renderer;
 	};
 }

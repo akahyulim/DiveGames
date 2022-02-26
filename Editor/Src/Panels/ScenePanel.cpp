@@ -26,8 +26,8 @@ void ScenePanel::renderWindow()
 	// Editor용 Camera도 함께 설정??
 
 	// 이전 ContentRegion과의 비교가 필요하다.
-	Dive::GetRenderer().SetTextures(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
-	auto pTexture = Dive::GetRenderer().GetSampleTexture();
+	Dive::Renderer::SetTextures(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
+	auto pTexture = Dive::Renderer::GetSampleTexture();
 
 	// 매번 그리는 게 맞다.
 	ImGui::Image(

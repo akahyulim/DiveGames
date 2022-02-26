@@ -9,13 +9,12 @@ namespace Dive
 		Log::Initialize();
 		m_Time.Initialize();
 
-		m_Renderer.Initialize(pData);
-
+		Renderer::Initialize(pData);
 	}
 
 	void Engine::Shutdown()
 	{
-		m_Renderer.Shutdow();
+		Renderer::Shutdown();
 	}
 
 	void Engine::Run()

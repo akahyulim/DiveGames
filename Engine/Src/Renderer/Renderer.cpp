@@ -6,6 +6,17 @@
 
 namespace Dive
 {
+	// static varialbes
+	GraphicsDevice Renderer::m_GraphicsDevice;
+
+	unsigned int Renderer::m_TextureWidth = 0;
+	unsigned int Renderer::m_TextureHeight = 0;
+
+	Texture2D* Renderer::m_pSampleTex = nullptr;
+	Texture2D* Renderer::m_pDepthStencilTex = nullptr;
+
+	ID3D11DepthStencilState* Renderer::m_pDepthStencilState = nullptr;
+
 	void Renderer::Initialize(const WindowData* pData)
 	{
 		DV_ASSERT(pData && "WnidowData가 존재하지 않습니다.");
@@ -18,7 +29,7 @@ namespace Dive
 		SetTextures(width, height);
 	}
 
-	void Renderer::Shutdow()
+	void Renderer::Shutdown()
 	{
 		// 함수로 만들어야 하나...?
 		DV_DELETE(m_pDepthStencilTex);
