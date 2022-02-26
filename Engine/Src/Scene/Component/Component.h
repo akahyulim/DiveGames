@@ -10,6 +10,7 @@ namespace Dive
 		Unknown,
 		Transform,
 		Camera,
+		SpriteRenderer,
 	};
 
 	class Component

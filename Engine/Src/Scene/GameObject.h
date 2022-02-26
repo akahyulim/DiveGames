@@ -2,6 +2,7 @@
 #include "Base/Object.h"
 #include "Component/Transform.h"
 #include "Component/Camera.h"
+#include "Component/SpriteRenderer.h"
 
 namespace Dive
 {

@@ -119,16 +119,11 @@ void Editor::Run()
 			{
 				m_EditorCamera.Update(1.0f);
 
-				// 임시
-				Dive::Renderer::BeginScene();
-
 				// Hazel은 ActiveScene이 Editor의 멤버 변수이다.
 				// 하지만 이는 Menuber가 Editor에 만들어져 있기 때문에 가능하다.
 				auto pActiveScene = m_pMenuBar->GetActiveScene();
 				if (pActiveScene)
 					pActiveScene->UpdateEditor(1.0f, &m_EditorCamera);
-
-				Dive::Renderer::EndScene();
 
 				break;
 			}

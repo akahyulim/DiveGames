@@ -14,13 +14,13 @@ void EditorScene::UpdateEditor(float elapsedTime, EditorCamera* pCamera)
 	// 왜냐하면 Scene 자체가 Engine 객체이기 때문이다.
 
 	// begin: camera 전달
-	//Dive::BeginScene();
+	Dive::Renderer::BeginScene();
 
 	// temp: 그런데 GameObject dirty check를 이 곳에서 하고 있다.
-	//Dive::Scene::Update(elapsedTime);
+	Dive::Scene::Update(elapsedTime);
 
 	// 이 곳은 그려질 대상들을 뽑은 후 draw함수에 전달한다.
 
 	// end
-	//Dive::EndScene();
+	Dive::Renderer::EndScene();
 }

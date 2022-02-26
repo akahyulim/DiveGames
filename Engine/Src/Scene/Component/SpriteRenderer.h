@@ -10,7 +10,7 @@ namespace Dive
 	class SpriteRenderer : public RendererComponent
 	{
 	public:
-		SpriteRenderer(GameObject* pGameObject) : RendererComponent(pGameObject) {}
+		SpriteRenderer(GameObject* pGameObject);
 		~SpriteRenderer();
 
 		void Shutdown();
@@ -26,8 +26,11 @@ namespace Dive
 		int GetVertexCount() const { return m_VertexCount; }
 		int GetIdexCount() const { return m_IndexCount; }
 
+		unsigned int GetSizeWidth() const { return m_Width; }
+		unsigned int GetSizeHeight() const { return m_Height; }
+		
 	private:
-		void createBuffer();
+		bool createBuffer();
 
 	private:
 		DirectX::XMFLOAT4 m_Color{1.0f, 1.0f, 1.0f, 1.0f};
@@ -36,17 +39,15 @@ namespace Dive
 		int m_Width = 0;
 		int m_Height = 0;
 
-		ID3D11Buffer* m_pVertexBuffer = nullptr;
-		ID3D11Buffer* m_pIndexBuffer = nullptr;
-		int m_VertexCount = 6;
-		int m_IndexCount = 6;
-
 		struct VertexType
 		{
 			DirectX::XMFLOAT3 position;
 			DirectX::XMFLOAT2 texCoord;
 		};
 
-
+		ID3D11Buffer* m_pVertexBuffer = nullptr;
+		ID3D11Buffer* m_pIndexBuffer = nullptr;
+		int m_VertexCount = 6;
+		int m_IndexCount = 6;
 	};
 }

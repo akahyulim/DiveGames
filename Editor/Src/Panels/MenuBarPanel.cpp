@@ -9,10 +9,16 @@ MenuBarPanel::MenuBarPanel(Editor* pEditor)
 	: Panel(pEditor, "MenuBar")
 {
 	m_bWindow = false;
+
+	m_pChoA = Dive::Texture2D::Create("Assets/Textures/ChoA.jpg", "ChoA");
+	m_pIU = Dive::Texture2D::Create("Assets/Textures/IU.jpg", "IU");
 }
 
 MenuBarPanel::~MenuBarPanel()
 {
+	DV_DELETE(m_pChoA);
+	DV_DELETE(m_pIU);
+
 	DV_DELETE(m_pActiveScene);
 }
 
@@ -59,8 +65,12 @@ void MenuBarPanel::menuFile()
 					DV_DELETE(m_pActiveScene);
 
 				m_pActiveScene = new EditorScene("Sample_World");
-				m_pActiveScene->CreateGameObject("ChoA");
-				m_pActiveScene->CreateGameObject("IU");
+				auto pChoA = m_pActiveScene->CreateGameObject("ChoA");
+				auto pChoASprite = pChoA->AddComponent<Dive::SpriteRenderer>();
+				pChoASprite->SetTexture(m_pChoA);
+				auto pIU = m_pActiveScene->CreateGameObject("IU");
+				auto pIUSprite = pIU->AddComponent<Dive::SpriteRenderer>();
+				pIUSprite->SetTexture(m_pChoA);
 				auto pParent = m_pActiveScene->CreateGameObject("Knave");
 				auto pChild = m_pActiveScene->CreateGameObject(13254521934309852950, "Complex");
 				pChild->GetComponent<Dive::Transform>()->SetParent(pParent->GetComponent<Dive::Transform>());

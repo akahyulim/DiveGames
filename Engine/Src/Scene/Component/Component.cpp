@@ -19,7 +19,7 @@ namespace Dive
 
 	REGISTER_COMPONENT(Transform, eComponentType::Transform)
 	REGISTER_COMPONENT(Camera, eComponentType::Camera)
-//	REGISTER_COMPONENT(MeshRenderer, eComponentType::MeshRenderer)
+	REGISTER_COMPONENT(SpriteRenderer, eComponentType::SpriteRenderer)
 //	REGISTER_COMPONENT(dvMeshRenderer, eComponentType::dvMeshRenderer)
 //	REGISTER_COMPONENT(StaticMeshRenderer, eComponentType::StaticMeshRenderer)
 //	REGISTER_COMPONENT(Light, eComponentType::Light)

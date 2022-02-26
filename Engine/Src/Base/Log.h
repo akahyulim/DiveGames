@@ -31,10 +31,10 @@ namespace Dive
 }
 
 // Engine Logger Macro
-#define DV_CORE_TRACE(...)		Dive::Log::GetCoreLogger()->trace(__VA_ARGS__)
+#define DV_CORE_TRACE(...)			Dive::Log::GetCoreLogger()->trace(__VA_ARGS__)
 #define DV_CORE_INFO(...)			Dive::Log::GetCoreLogger()->info(__VA_ARGS__)
 #define DV_CORE_WARN(...)			Dive::Log::GetCoreLogger()->warn(__VA_ARGS__)
-#define DV_CORE_ERROR(...)		Dive::Log::GetCoreLogger()->error(__VA_ARGS__)
+#define DV_CORE_ERROR(...)			Dive::Log::GetCoreLogger()->error(__VA_ARGS__)
 #define DV_CORE_CRITICAL(...)		Dive::Log::GetCoreLogger()->critical(__VA_ARGS__)
 
 // Application Logger Macro

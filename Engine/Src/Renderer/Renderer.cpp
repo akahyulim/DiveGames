@@ -65,6 +65,21 @@ namespace Dive
 		pSwapChain->Present(m_GraphicsDevice.IsVSync() ? 1 : 0, 0);
 	}
 
+	// 이걸 굳이 랩핑할 필요가 있나...
+	// 그렇게 따지면 위의 Begin/End Scene도 의미가 퇴색하는데?
+	bool Renderer::CreateBuffer(const D3D11_BUFFER_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pData, ID3D11Buffer* pBuffer)
+	{
+		auto pDevice = m_GraphicsDevice.GetDevice();
+		DV_ASSERT(pDevice);
+
+		if (FAILED(pDevice->CreateBuffer(pDesc, pData, &pBuffer)))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
 	void Renderer::SetResolution(unsigned int width, unsigned int height)
 	{
 		m_GraphicsDevice.ResizeBackBuffer(width, height);

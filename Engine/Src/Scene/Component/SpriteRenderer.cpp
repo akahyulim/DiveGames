@@ -1,8 +1,15 @@
 #include "divepch.h"
 #include "SpriteRenderer.h"
+#include "Renderer/Renderer.h"
 
 namespace Dive
 {
+	SpriteRenderer::SpriteRenderer(GameObject* pGameObject)
+		: RendererComponent(pGameObject)
+	{
+		m_Type = eComponentType::SpriteRenderer;
+	}
+
 	SpriteRenderer::~SpriteRenderer()
 	{
 		Shutdown();
@@ -13,13 +20,10 @@ namespace Dive
 		DV_RELEASE(m_pIndexBuffer);
 		DV_RELEASE(m_pVertexBuffer);
 
-		DV_DELETE(m_pTexture);
+		m_pTexture = nullptr;
 
 		m_Width = 0;
 		m_Height = 0;
-
-		m_VertexCount = 0;
-		m_IndexCount = 0;
 	}
 
 	void SpriteRenderer::SetTexture(Texture2D* pTexture)
@@ -29,10 +33,12 @@ namespace Dive
 
 		Shutdown();
 
-		m_Width = pTexture->GetWidth();
-		m_Height = pTexture->GetHeight();
+		m_pTexture	= pTexture;
+		m_Width		= static_cast<int>(pTexture->GetWidth());
+		m_Height	= static_cast<int>(pTexture->GetHeight());
 
-		createBuffer();
+		if (createBuffer())
+			Shutdown();
 	}
 
 	ID3D11ShaderResourceView* SpriteRenderer::GetShaderResourceView()
@@ -43,21 +49,40 @@ namespace Dive
 		return m_pTexture->GetShaderResourceView();
 	}
 
-	void SpriteRenderer::createBuffer()
+	bool SpriteRenderer::createBuffer()
 	{
-		// 1. GraphicsDevice를 어떻게 획득할 것인가?
-		// => Dive API는 외부에서 사용하는 게 맞는 것 같다.
-		// 2. 버퍼를 직접 생성하는 것이 맞는가?
-		// => Begin / End 처럼 Renderer에서 처리하고 싶은데...
-
 		// vertex buffer
 		{
 			auto pVertices = new VertexType[m_VertexCount];
 			DV_ASSERT(pVertices);
-			memcpy(pVertices, 0, sizeof(VertexType) * m_VertexCount);
+
+			float left = static_cast<float>((m_Width / 2) * -1);
+			float right = left + static_cast<float>(m_Width);
+			float top = static_cast<float>((m_Height / 2));
+			float bottom = top - static_cast<float>(m_Height);
+
+			// top left
+			pVertices[0].position = DirectX::XMFLOAT3(left, top, 0.0f);
+			pVertices[0].texCoord = DirectX::XMFLOAT2(0.0f, 0.0f);
+			// bottom right
+			pVertices[1].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
+			pVertices[1].texCoord = DirectX::XMFLOAT2(1.0f, 1.0f);
+			// bottom left
+			pVertices[2].position = DirectX::XMFLOAT3(left, bottom, 0.0f);
+			pVertices[2].texCoord = DirectX::XMFLOAT2(0.0f, 1.0f);
+			
+			// top left
+			pVertices[3].position = DirectX::XMFLOAT3(left, top, 0.0f);
+			pVertices[3].texCoord = DirectX::XMFLOAT2(0.0f, 0.0f);
+			// top right
+			pVertices[4].position = DirectX::XMFLOAT3(right, top, 0.0f);
+			pVertices[4].texCoord = DirectX::XMFLOAT2(1.0f, 0.0f);
+			// bottom right
+			pVertices[5].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
+			pVertices[5].texCoord = DirectX::XMFLOAT2(1.0f, 1.0f);
 
 			D3D11_BUFFER_DESC desc;
-			desc.Usage = D3D11_USAGE_DYNAMIC;
+			desc.Usage = D3D11_USAGE_DEFAULT;
 			desc.ByteWidth = sizeof(VertexType) * m_VertexCount;
 			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
@@ -69,14 +94,48 @@ namespace Dive
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
-			
+			if (!Renderer::CreateBuffer(&desc, &data, m_pVertexBuffer))
+			{
+				DV_DELETE_ARRAY(pVertices);
+				return false;
+			}
+
+			DV_DELETE_ARRAY(pVertices);
 		}
 
 		// index buffer
 		{
+			auto pIndices = new unsigned long[m_IndexCount];
+			DV_ASSERT(pIndices);
+
+			for (int i = 0; i < m_IndexCount; i++)
+			{
+				pIndices[i] = i;
+			}
+
 			D3D11_BUFFER_DESC desc;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.ByteWidth = sizeof(unsigned long) * m_IndexCount;
+			desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			desc.CPUAccessFlags = 0;
+			desc.MiscFlags = 0;
+			desc.StructureByteStride = 0;
 
 			D3D11_SUBRESOURCE_DATA data;
+			data.pSysMem = pIndices;
+			data.SysMemPitch = 0;
+			data.SysMemSlicePitch = 0;
+
+			if (!Renderer::CreateBuffer(&desc, &data, m_pIndexBuffer))
+			{
+				DV_RELEASE(m_pVertexBuffer);
+				DV_DELETE_ARRAY(pIndices);
+				return false;
+			}
+
+			DV_DELETE_ARRAY(pIndices);
 		}
+
+		return true;
 	}
 }

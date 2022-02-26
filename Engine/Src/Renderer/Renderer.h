@@ -15,6 +15,8 @@ namespace Dive
 		static void BeginScene();
 		static void EndScene();
 
+		static bool CreateBuffer(const D3D11_BUFFER_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pData, ID3D11Buffer* pBuffer);
+
 		//static void SetViewport(float width, float height);
 
 		// 일반적으로는 Backbuffer의 RenderTarget과 ResourceView들의 크기가 같겠지만
