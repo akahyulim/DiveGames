@@ -94,8 +94,8 @@ namespace Dive
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
-			auto* pGraphicsDevice = Renderer::GetGraphicsDevice();
-			if (!pGraphicsDevice->CreateBuffer(&desc, &data, m_pVertexBuffer))
+			auto graphicsDevice = Renderer::GetGraphicsDevice();
+			if (!graphicsDevice.CreateBuffer(&desc, &data, &m_pVertexBuffer))
 			{
 				DV_DELETE_ARRAY(pVertices);
 				return false;
@@ -127,8 +127,8 @@ namespace Dive
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
-			auto pGraphicsDevice = Renderer::GetGraphicsDevice();
-			if (!pGraphicsDevice->CreateBuffer(&desc, &data, m_pIndexBuffer))
+			auto graphicsDevice = Renderer::GetGraphicsDevice();
+			if (!graphicsDevice.CreateBuffer(&desc, &data, &m_pIndexBuffer))
 			{
 				DV_RELEASE(m_pVertexBuffer);
 				DV_DELETE_ARRAY(pIndices);

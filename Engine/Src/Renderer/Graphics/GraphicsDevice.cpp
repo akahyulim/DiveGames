@@ -121,17 +121,23 @@ namespace Dive
 		m_Height = height;
 	}
 
-	bool GraphicsDevice::CreateBuffer(const D3D11_BUFFER_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pData, ID3D11Buffer* pBuffer)
+	bool GraphicsDevice::CreateBuffer(const D3D11_BUFFER_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pData, ID3D11Buffer** ppBuffer)
 	{
 		if (!m_pDevice)
 			return false;
 
 		if (!pDesc || !pData)
+		{
+			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
 			return false;
+		}
 
-		if (FAILED(m_pDevice->CreateBuffer(pDesc, pData, &pBuffer)))
+		if (FAILED(m_pDevice->CreateBuffer(pDesc, pData, ppBuffer)))
+		{
+			DV_CORE_WARN("Buffer 생성에 실패하였습니다.");
 			return false;
-	
+		}
+
 		return true;
 	}
 
@@ -141,11 +147,17 @@ namespace Dive
 			return false;
 
 		if (!pDesc)
+		{
+			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
 			return false;
-
+		}
+		
 		if (FAILED(m_pDevice->CreateTexture2D(pDesc, pData, ppTexture2D)))
+		{
+			DV_CORE_WARN("Texture2D 생성에 실패하였습니다.");
 			return false;
-	
+		}
+
 		return true;
 	}
 	
@@ -155,10 +167,16 @@ namespace Dive
 			return false;
 
 		if (!pResource || !pDesc)
+		{
+			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
 			return false;
+		}
 
 		if (FAILED(m_pDevice->CreateShaderResourceView(pResource, pDesc, ppShaderResourceView)))
+		{
+			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
 			return false;
+		}
 
 		return true;
 	}
@@ -169,10 +187,16 @@ namespace Dive
 			return false;
 
 		if (!pResource || !pDesc)
+		{
+			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
 			return false;
+		}
 
 		if (FAILED(m_pDevice->CreateRenderTargetView(pResource, pDesc, ppRenderTargetView)))
+		{
+			DV_CORE_WARN("RenderTargetView 생성에 실패하였습니다.");
 			return false;
+		}
 
 		return true;
 	}
@@ -183,10 +207,175 @@ namespace Dive
 			return false;
 
 		if (!pResource || !pDesc)
+		{
+			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
 			return false;
+		}
 
 		if (FAILED(m_pDevice->CreateDepthStencilView(pResource, pDesc, ppDepthStencilView)))
+		{
+			DV_CORE_WARN("DepthStencilView 생성에 실패하였습니다.");
 			return false;
+		}
+
+		return true;
+	}
+	bool GraphicsDevice::CreateDepthStencilState(const D3D11_DEPTH_STENCIL_DESC* pDesc, ID3D11DepthStencilState** ppDepthStencilState)
+	{
+		if (!m_pDevice)
+			return false;
+
+		if (!pDesc)
+		{
+			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
+			return false;
+		}
+
+		if (FAILED(m_pDevice->CreateDepthStencilState(pDesc, ppDepthStencilState)))
+		{
+			DV_CORE_WARN("DepthStencilState 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool GraphicsDevice::CreateSamplerState(const D3D11_SAMPLER_DESC* pDesc, ID3D11SamplerState** ppSamplerState)
+	{
+		if (!m_pDevice)
+			return false;
+
+		if (!pDesc)
+		{
+			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
+			return false;
+		}
+
+		if (FAILED(m_pDevice->CreateSamplerState(pDesc, ppSamplerState)))
+		{
+			DV_CORE_WARN("SamplerState 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool GraphicsDevice::CreateRasterizerState(const D3D11_RASTERIZER_DESC* pDesc, ID3D11RasterizerState** ppRasterizerState)
+	{
+		if (!m_pDevice)
+			return false;
+
+		if (!pDesc)
+		{
+			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
+			return false;
+		}
+
+		if (FAILED(m_pDevice->CreateRasterizerState(pDesc, ppRasterizerState)))
+		{
+			DV_CORE_WARN("RasterizerState 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool GraphicsDevice::CreateVertexShader(const std::string& path, const D3D11_INPUT_ELEMENT_DESC* pDesc, unsigned int numElements, ID3D11VertexShader** ppVertexShader, ID3D11InputLayout** ppInputLayout)
+	{
+		if (!m_pDevice)
+			return false;
+
+		if (!pDesc)
+		{
+			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
+			return false;
+		}
+
+		ID3D10Blob* pShaderBuffer = nullptr;
+		ID3D10Blob* pShaderError = nullptr;
+
+		DWORD compileFlags = 0;
+#if _DEBUG
+		compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_PREFER_FLOW_CONTROL;
+#else
+		compileFlags |= D3DCOMPILE_ENABLE_STRICTNESS | D3DCIMPILE_OPTIMIZATION_LEVEL3;
+#endif
+
+		std::wstring filePath(path.begin(), path.end());
+		if (FAILED(D3DCompileFromFile(filePath.c_str(), NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "mainVS", "vs_5_0", compileFlags, 0, &pShaderBuffer, &pShaderError)))
+		{
+			if (pShaderError != nullptr)
+			{
+				DV_CORE_ERROR("{:s}", (char*)pShaderError->GetBufferPointer());
+				DV_RELEASE(pShaderError);
+			}
+			else
+			{
+				DV_CORE_WARN("{:s} 파일이 존재하지 않아 컴파일에 실패하였습니다.", path);
+			}
+
+			DV_RELEASE(pShaderBuffer);
+
+			return false;
+		}
+
+		if (FAILED(m_pDevice->CreateVertexShader(pShaderBuffer->GetBufferPointer(), pShaderBuffer->GetBufferSize(), nullptr, ppVertexShader)))
+		{
+			DV_CORE_WARN("VertexShader 생성에 실패하였습니다.");
+			return false;
+		}
+		
+		if (FAILED(m_pDevice->CreateInputLayout(pDesc, numElements, pShaderBuffer->GetBufferPointer(), pShaderBuffer->GetBufferSize(), ppInputLayout)))
+		{
+			DV_CORE_WARN("InputLayout 생성에 실패하였습니다.");
+			return false;
+		}
+
+		DV_RELEASE(pShaderBuffer);
+
+		return true;
+	}
+	
+	bool GraphicsDevice::CreatePixelShader(const std::string& path, ID3D11PixelShader** ppPixelShader)
+	{
+		if (!m_pDevice)
+			return false;
+
+		ID3D10Blob* pShaderBuffer = nullptr;
+		ID3D10Blob* pShaderError = nullptr;
+
+		DWORD compileFlags = 0;
+#if _DEBUG
+		compileFlags |= D3DCOMPILE_DEBUG | D3DCOMPILE_PREFER_FLOW_CONTROL;
+#else
+		compileFlags |= D3DCOMPILE_ENABLE_STRICTNESS | D3DCIMPILE_OPTIMIZATION_LEVEL3;
+#endif
+
+		std::wstring filePath(path.begin(), path.end());
+		if (FAILED(D3DCompileFromFile(filePath.c_str(), NULL, D3D_COMPILE_STANDARD_FILE_INCLUDE, "mainPS", "ps_5_0", compileFlags, 0, &pShaderBuffer, &pShaderError)))
+		{
+			if (pShaderError != nullptr)
+			{
+				DV_CORE_WARN("{:s}", (char*)pShaderError->GetBufferPointer());
+				DV_RELEASE(pShaderError);
+			}
+			else
+			{
+				DV_CORE_WARN("{:s} 파일이 존재하지 않아 컴파일에 실패하였습니다.", path);
+			}
+
+			DV_RELEASE(pShaderBuffer);
+
+			return false;
+		}
+
+		if (FAILED(m_pDevice->CreatePixelShader(pShaderBuffer->GetBufferPointer(), pShaderBuffer->GetBufferSize(), nullptr, ppPixelShader)))
+		{
+			DV_CORE_WARN("PixelShader 생성에 실패하였습니다.");
+			return false;
+		}
+
+		DV_RELEASE(pShaderBuffer);
 
 		return true;
 	}

@@ -23,18 +23,15 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_SIZE:
 	{
-		auto pGraphicsDevice = Dive::Renderer::GetGraphicsDevice();
-		if (pGraphicsDevice) 
+		auto graphicsDevice = Dive::Renderer::GetGraphicsDevice();
+		if (wParam != SIZE_MINIMIZED)
 		{
-			if (wParam != SIZE_MINIMIZED)
-			{
-				pGraphicsDevice->CleanupMainRenderTargetView();
-				pGraphicsDevice->GetSwapChain()->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
-				pGraphicsDevice->CreateMainRenderTargetView();
-			}
-
-			// 여기에서 Engine에 변경된 크기를 전달할 수 있다.
+			graphicsDevice.CleanupMainRenderTargetView();
+			graphicsDevice.GetSwapChain()->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
+			graphicsDevice.CreateMainRenderTargetView();
 		}
+
+		// 여기에서 Engine에 변경된 크기를 전달할 수 있다.
 		return 0;
 	}
 	case WM_DESTROY:
@@ -153,10 +150,10 @@ void Editor::Run()
 
 			// End
 			{
-				auto pGraphicsDevice = Dive::Renderer::GetGraphicsDevice();
-				auto pImmediateContext = pGraphicsDevice->GetImmediateContext();
-				auto pSwapChain = pGraphicsDevice->GetSwapChain();
-				auto pMainRenderTargetView = pGraphicsDevice->GetMainRenderTargetView();
+				auto graphicsDevice = Dive::Renderer::GetGraphicsDevice();
+				auto pImmediateContext = graphicsDevice.GetImmediateContext();
+				auto pSwapChain = graphicsDevice.GetSwapChain();
+				auto pMainRenderTargetView = graphicsDevice.GetMainRenderTargetView();
 
 				const float clear_color_with_alpha[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
 				ImGuiIO& io = ImGui::GetIO();
@@ -266,8 +263,8 @@ void Editor::intializeImGui()
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(m_hWnd);
 	ImGui_ImplDX11_Init(
-		Dive::Renderer::GetGraphicsDevice()->GetDevice(), 
-		Dive::Renderer::GetGraphicsDevice()->GetImmediateContext());
+		Dive::Renderer::GetGraphicsDevice().GetDevice(), 
+		Dive::Renderer::GetGraphicsDevice().GetImmediateContext());
 
 	// custom style & resource
 	setDarkThemeColors();

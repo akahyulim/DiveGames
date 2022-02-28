@@ -20,7 +20,7 @@ namespace Dive
 
 		HRESULT hResult = 0;
 
-		// 애매해...
+		// 위치가 애매해... Engine이 가장 유력하다.
 		hResult = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
 
 		if (_wcsicmp(ext, L".dds") == 0)
@@ -42,7 +42,7 @@ namespace Dive
 			return false;
 		}
 
-		auto pDevice = Renderer::GetGraphicsDevice()->GetDevice();
+		auto pDevice = Renderer::GetGraphicsDevice().GetDevice();
 		DV_ASSERT(pDevice);
 
 		if (FAILED(DirectX::CreateShaderResourceView(pDevice, img.GetImages(), img.GetImageCount(), img.GetMetadata(), &m_pShaderResourceView)))
@@ -79,8 +79,8 @@ namespace Dive
 		desc.CPUAccessFlags		= 0;
 		desc.MiscFlags			= 0;
 
-		auto pGraphicsDevice = Renderer::GetGraphicsDevice();
-		if (FAILED(pGraphicsDevice->CreateTexture2D(&desc, nullptr, &m_pTexture2D)))
+		auto graphicsDevice = Renderer::GetGraphicsDevice();
+		if (!graphicsDevice.CreateTexture2D(&desc, nullptr, &m_pTexture2D))
 		{
 			DV_CORE_WARN("Resource Buffer 생성에 실패하였습니다.");
 			Shutdown();
@@ -100,8 +100,8 @@ namespace Dive
 		desc.Texture2D.MipLevels		= -1;
 
 		DV_ASSERT(m_pTexture2D);
-		auto pGraphicsDevice = Renderer::GetGraphicsDevice();
-		if (!pGraphicsDevice->CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &desc, &m_pShaderResourceView))
+		auto graphicsDevice = Renderer::GetGraphicsDevice();
+		if (!graphicsDevice.CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &desc, &m_pShaderResourceView))
 		{
 			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
 			Shutdown();
@@ -120,8 +120,8 @@ namespace Dive
 		desc.Texture2D.MipSlice = 0;
 
 		DV_ASSERT(m_pTexture2D);
-		auto pGraphicsDevice = Renderer::GetGraphicsDevice();
-		if (!pGraphicsDevice->CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &desc, &m_pRenderTargetView))
+		auto graphicsDevice = Renderer::GetGraphicsDevice();
+		if (!graphicsDevice.CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &desc, &m_pRenderTargetView))
 		{
 			DV_CORE_WARN("RenderTargetView 생성에 실패하였습니다.");
 			Shutdown();
@@ -140,8 +140,8 @@ namespace Dive
 		desc.Texture2D.MipSlice = 0;
 
 		DV_ASSERT(m_pTexture2D);
-		auto pGraphicsDevice = Renderer::GetGraphicsDevice();
-		if (!pGraphicsDevice->CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &desc, &m_pDepthStencilView))
+		auto graphicsDevice = Renderer::GetGraphicsDevice();
+		if (!graphicsDevice.CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &desc, &m_pDepthStencilView))
 		{
 			DV_CORE_WARN("DepthStencilView 생성에 실패하였습니다.");
 			Shutdown();

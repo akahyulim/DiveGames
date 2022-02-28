@@ -18,6 +18,7 @@
 #include <DXGI1_3.h>
 #include <DirectXMath.h>
 #include <DirectXTex/DirectXTex.h>
+#include <d3dcompiler.h>
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
