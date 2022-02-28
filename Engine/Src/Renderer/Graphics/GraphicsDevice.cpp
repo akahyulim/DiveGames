@@ -120,4 +120,74 @@ namespace Dive
 		m_Width = width;
 		m_Height = height;
 	}
+
+	bool GraphicsDevice::CreateBuffer(const D3D11_BUFFER_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pData, ID3D11Buffer* pBuffer)
+	{
+		if (!m_pDevice)
+			return false;
+
+		if (!pDesc || !pData)
+			return false;
+
+		if (FAILED(m_pDevice->CreateBuffer(pDesc, pData, &pBuffer)))
+			return false;
+	
+		return true;
+	}
+
+	bool GraphicsDevice::CreateTexture2D(const D3D11_TEXTURE2D_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pData, ID3D11Texture2D** ppTexture2D)
+	{
+		if (!m_pDevice)
+			return false;
+
+		if (!pDesc)
+			return false;
+
+		if (FAILED(m_pDevice->CreateTexture2D(pDesc, pData, ppTexture2D)))
+			return false;
+	
+		return true;
+	}
+	
+	bool GraphicsDevice::CreateShaderResourceView(ID3D11Resource* pResource, const D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc, ID3D11ShaderResourceView** ppShaderResourceView)
+	{
+		if (!m_pDevice)
+			return false;
+
+		if (!pResource || !pDesc)
+			return false;
+
+		if (FAILED(m_pDevice->CreateShaderResourceView(pResource, pDesc, ppShaderResourceView)))
+			return false;
+
+		return true;
+	}
+	
+	bool GraphicsDevice::CreateRenderTargetView(ID3D11Resource* pResource, const D3D11_RENDER_TARGET_VIEW_DESC* pDesc, ID3D11RenderTargetView** ppRenderTargetView)
+	{
+		if (!m_pDevice)
+			return false;
+
+		if (!pResource || !pDesc)
+			return false;
+
+		if (FAILED(m_pDevice->CreateRenderTargetView(pResource, pDesc, ppRenderTargetView)))
+			return false;
+
+		return true;
+	}
+	
+	bool GraphicsDevice::CreateDepthStencilView(ID3D11Resource* pResource, const D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc, ID3D11DepthStencilView** ppDepthStencilView)
+	{
+		if (!m_pDevice)
+			return false;
+
+		if (!pResource || !pDesc)
+			return false;
+
+		if (FAILED(m_pDevice->CreateDepthStencilView(pResource, pDesc, ppDepthStencilView)))
+			return false;
+
+		return true;
+	}
 }

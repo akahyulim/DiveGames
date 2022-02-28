@@ -61,9 +61,6 @@ namespace Dive
 
 	bool Texture2D::CreateTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned bindFlags)
 	{
-		auto pDevice = Renderer::GetGraphicsDevice()->GetDevice();
-		DV_ASSERT(pDevice);
-
 		m_Width		= width;
 		m_Height	= height;
 		m_Format	= format;
@@ -82,9 +79,11 @@ namespace Dive
 		desc.CPUAccessFlags		= 0;
 		desc.MiscFlags			= 0;
 
-		if (FAILED(pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture2D)))
+		auto pGraphicsDevice = Renderer::GetGraphicsDevice();
+		if (FAILED(pGraphicsDevice->CreateTexture2D(&desc, nullptr, &m_pTexture2D)))
 		{
 			DV_CORE_WARN("Resource Buffer 생성에 실패하였습니다.");
+			Shutdown();
 			return false;
 		}
 
@@ -93,9 +92,6 @@ namespace Dive
 
 	bool Texture2D::CreateShaderResourceView(DXGI_FORMAT format)
 	{
-		auto pDevice = Renderer::GetGraphicsDevice()->GetDevice();
-		DV_ASSERT(pDevice);
-
 		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.Format						= format;
@@ -104,9 +100,11 @@ namespace Dive
 		desc.Texture2D.MipLevels		= -1;
 
 		DV_ASSERT(m_pTexture2D);
-		if (FAILED(pDevice->CreateShaderResourceView(m_pTexture2D, &desc, &m_pShaderResourceView)))
+		auto pGraphicsDevice = Renderer::GetGraphicsDevice();
+		if (!pGraphicsDevice->CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &desc, &m_pShaderResourceView))
 		{
 			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
+			Shutdown();
 			return false;
 		}
 
@@ -115,9 +113,6 @@ namespace Dive
 
 	bool Texture2D::CreateRenderTargetView(DXGI_FORMAT format)
 	{
-		auto pDevice = Renderer::GetGraphicsDevice()->GetDevice();
-		DV_ASSERT(pDevice);
-
 		D3D11_RENDER_TARGET_VIEW_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.Format				= format;
@@ -125,9 +120,11 @@ namespace Dive
 		desc.Texture2D.MipSlice = 0;
 
 		DV_ASSERT(m_pTexture2D);
-		if (FAILED(pDevice->CreateRenderTargetView(m_pTexture2D, &desc, &m_pRenderTargetView)))
+		auto pGraphicsDevice = Renderer::GetGraphicsDevice();
+		if (!pGraphicsDevice->CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &desc, &m_pRenderTargetView))
 		{
 			DV_CORE_WARN("RenderTargetView 생성에 실패하였습니다.");
+			Shutdown();
 			return false;
 		}
 
@@ -136,9 +133,6 @@ namespace Dive
 
 	bool Texture2D::CreateDepthStencilView(DXGI_FORMAT format)
 	{
-		auto pDevice = Renderer::GetGraphicsDevice()->GetDevice();
-		DV_ASSERT(pDevice);
-
 		D3D11_DEPTH_STENCIL_VIEW_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.Format				= format;
@@ -146,9 +140,11 @@ namespace Dive
 		desc.Texture2D.MipSlice = 0;
 
 		DV_ASSERT(m_pTexture2D);
-		if (FAILED(pDevice->CreateDepthStencilView(m_pTexture2D, &desc, &m_pDepthStencilView)))
+		auto pGraphicsDevice = Renderer::GetGraphicsDevice();
+		if (!pGraphicsDevice->CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &desc, &m_pDepthStencilView))
 		{
 			DV_CORE_WARN("DepthStencilView 생성에 실패하였습니다.");
+			Shutdown();
 			return false;
 		}
 

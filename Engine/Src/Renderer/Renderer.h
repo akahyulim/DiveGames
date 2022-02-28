@@ -6,16 +6,17 @@ namespace Dive
 {
 	struct WindowData;
 
+	// 여긴 GraphicsDeivce의 초기화 및 관리만 하고
+	// 나머지는 Base Resource 생성 및 관리로 제한해야 할 것 같다.
 	class Renderer
 	{
 	public:
 		static void Initialize(const WindowData* pData);
 		static void Shutdown();
 
+		// 이 역시 Graphics에서 처리하는 것이 맞는 듯...
 		static void BeginScene();
 		static void EndScene();
-
-		static bool CreateBuffer(const D3D11_BUFFER_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pData, ID3D11Buffer* pBuffer);
 
 		//static void SetViewport(float width, float height);
 
