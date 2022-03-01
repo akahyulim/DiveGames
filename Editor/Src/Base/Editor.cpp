@@ -23,7 +23,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_SIZE:
 	{
-		auto graphicsDevice = Dive::Renderer::GetGraphicsDevice();
+		auto& graphicsDevice = Dive::Renderer::GetGraphicsDevice();
 		if (wParam != SIZE_MINIMIZED)
 		{
 			graphicsDevice.CleanupMainRenderTargetView();
@@ -148,9 +148,9 @@ void Editor::Run()
 
 			drawPanels();
 
-			// End
+			// End: 내부에서 다시 Begin / End가 들어가있다.
 			{
-				auto graphicsDevice = Dive::Renderer::GetGraphicsDevice();
+				auto& graphicsDevice = Dive::Renderer::GetGraphicsDevice();
 				auto pImmediateContext = graphicsDevice.GetImmediateContext();
 				auto pSwapChain = graphicsDevice.GetSwapChain();
 				auto pMainRenderTargetView = graphicsDevice.GetMainRenderTargetView();
@@ -159,6 +159,7 @@ void Editor::Run()
 				ImGuiIO& io = ImGui::GetIO();
 
 				ImGui::Render();
+
 				pImmediateContext->OMSetRenderTargets(1, &pMainRenderTargetView, NULL);
 				pImmediateContext->ClearRenderTargetView(pMainRenderTargetView, clear_color_with_alpha);
 				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

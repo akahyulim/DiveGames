@@ -42,11 +42,13 @@ namespace Dive
 		struct VertexType
 		{
 			DirectX::XMFLOAT3 position;
-			DirectX::XMFLOAT2 texCoord;
+			DirectX::XMFLOAT2 texCoords;
 		};
 
 		ID3D11Buffer* m_pVertexBuffer = nullptr;
 		ID3D11Buffer* m_pIndexBuffer = nullptr;
+
+		// 얘네는 그냥 static const가 나을듯...
 		int m_VertexCount = 6;
 		int m_IndexCount = 6;
 	};

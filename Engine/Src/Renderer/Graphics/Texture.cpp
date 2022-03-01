@@ -79,7 +79,7 @@ namespace Dive
 		desc.CPUAccessFlags		= 0;
 		desc.MiscFlags			= 0;
 
-		auto graphicsDevice = Renderer::GetGraphicsDevice();
+		auto& graphicsDevice = Renderer::GetGraphicsDevice();
 		if (!graphicsDevice.CreateTexture2D(&desc, nullptr, &m_pTexture2D))
 		{
 			DV_CORE_WARN("Resource Buffer 생성에 실패하였습니다.");
@@ -100,7 +100,7 @@ namespace Dive
 		desc.Texture2D.MipLevels		= -1;
 
 		DV_ASSERT(m_pTexture2D);
-		auto graphicsDevice = Renderer::GetGraphicsDevice();
+		auto& graphicsDevice = Renderer::GetGraphicsDevice();
 		if (!graphicsDevice.CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &desc, &m_pShaderResourceView))
 		{
 			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
@@ -120,7 +120,7 @@ namespace Dive
 		desc.Texture2D.MipSlice = 0;
 
 		DV_ASSERT(m_pTexture2D);
-		auto graphicsDevice = Renderer::GetGraphicsDevice();
+		auto& graphicsDevice = Renderer::GetGraphicsDevice();
 		if (!graphicsDevice.CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &desc, &m_pRenderTargetView))
 		{
 			DV_CORE_WARN("RenderTargetView 생성에 실패하였습니다.");
@@ -140,7 +140,7 @@ namespace Dive
 		desc.Texture2D.MipSlice = 0;
 
 		DV_ASSERT(m_pTexture2D);
-		auto graphicsDevice = Renderer::GetGraphicsDevice();
+		auto& graphicsDevice = Renderer::GetGraphicsDevice();
 		if (!graphicsDevice.CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &desc, &m_pDepthStencilView))
 		{
 			DV_CORE_WARN("DepthStencilView 생성에 실패하였습니다.");

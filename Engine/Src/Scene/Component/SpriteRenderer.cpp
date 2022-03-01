@@ -53,6 +53,7 @@ namespace Dive
 	{
 		// vertex buffer
 		{
+			// 굳이 동적생성할 필요도 없을 것 같다.
 			auto pVertices = new VertexType[m_VertexCount];
 			DV_ASSERT(pVertices);
 
@@ -63,29 +64,29 @@ namespace Dive
 
 			// top left
 			pVertices[0].position = DirectX::XMFLOAT3(left, top, 0.0f);
-			pVertices[0].texCoord = DirectX::XMFLOAT2(0.0f, 0.0f);
+			pVertices[0].texCoords = DirectX::XMFLOAT2(0.0f, 0.0f);
 			// bottom right
 			pVertices[1].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
-			pVertices[1].texCoord = DirectX::XMFLOAT2(1.0f, 1.0f);
+			pVertices[1].texCoords = DirectX::XMFLOAT2(1.0f, 1.0f);
 			// bottom left
 			pVertices[2].position = DirectX::XMFLOAT3(left, bottom, 0.0f);
-			pVertices[2].texCoord = DirectX::XMFLOAT2(0.0f, 1.0f);
+			pVertices[2].texCoords = DirectX::XMFLOAT2(0.0f, 1.0f);
 			
 			// top left
 			pVertices[3].position = DirectX::XMFLOAT3(left, top, 0.0f);
-			pVertices[3].texCoord = DirectX::XMFLOAT2(0.0f, 0.0f);
+			pVertices[3].texCoords = DirectX::XMFLOAT2(0.0f, 0.0f);
 			// top right
 			pVertices[4].position = DirectX::XMFLOAT3(right, top, 0.0f);
-			pVertices[4].texCoord = DirectX::XMFLOAT2(1.0f, 0.0f);
+			pVertices[4].texCoords = DirectX::XMFLOAT2(1.0f, 0.0f);
 			// bottom right
 			pVertices[5].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
-			pVertices[5].texCoord = DirectX::XMFLOAT2(1.0f, 1.0f);
+			pVertices[5].texCoords = DirectX::XMFLOAT2(1.0f, 1.0f);
 
 			D3D11_BUFFER_DESC desc;
-			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.Usage = D3D11_USAGE_DEFAULT; ;// D3D11_USAGE_DYNAMIC;
 			desc.ByteWidth = sizeof(VertexType) * m_VertexCount;
 			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			desc.CPUAccessFlags = 0;// D3D11_CPU_ACCESS_WRITE;
 			desc.MiscFlags = 0;
 			desc.StructureByteStride = 0;
 
@@ -94,7 +95,7 @@ namespace Dive
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
-			auto graphicsDevice = Renderer::GetGraphicsDevice();
+			auto& graphicsDevice = Renderer::GetGraphicsDevice();
 			if (!graphicsDevice.CreateBuffer(&desc, &data, &m_pVertexBuffer))
 			{
 				DV_DELETE_ARRAY(pVertices);
@@ -127,7 +128,7 @@ namespace Dive
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
-			auto graphicsDevice = Renderer::GetGraphicsDevice();
+			auto& graphicsDevice = Renderer::GetGraphicsDevice();
 			if (!graphicsDevice.CreateBuffer(&desc, &data, &m_pIndexBuffer))
 			{
 				DV_RELEASE(m_pVertexBuffer);
