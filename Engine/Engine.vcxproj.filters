@@ -155,6 +155,9 @@
     <Filter Include="Src\Scene\Component">
       <UniqueIdentifier>{9d00574e-8829-4d1b-bf2e-35026b52a632}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Shaders">
+      <UniqueIdentifier>{a64343df-a418-4d52-a2c1-b8874d780d9d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Assets\Shaders\Legacy\Common.hlsl">
@@ -165,6 +168,9 @@
     </None>
     <None Include="..\Assets\Shaders\Legacy\Compose.hlsl">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="Src\Shaders\sprite.hlsl">
+      <Filter>Src\Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

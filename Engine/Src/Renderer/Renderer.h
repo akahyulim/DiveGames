@@ -6,6 +6,9 @@ namespace Dive
 {
 	struct WindowData;
 
+	class Transform;
+	class SpriteRenderer;
+
 	// 여긴 GraphicsDeivce의 초기화 및 관리만 하고
 	// 나머지는 Base Resource 생성 및 관리로 제한해야 할 것 같다.
 	class Renderer
@@ -17,6 +20,8 @@ namespace Dive
 		// 결국 랩핑함수다. Graphics에서 처리하는 것이 맞는 듯...
 		static void BeginScene();
 		static void EndScene();
+
+		static void DrawSprite(Transform* pTransform, SpriteRenderer* pRenderer);
 
 		//static void SetViewport(float width, float height);
 
@@ -33,6 +38,7 @@ namespace Dive
 
 		// test ============================================================
 		static Texture2D* GetSampleTexture() { return m_pSampleTex; }
+		static Texture2D* GetDepthStencilTexture() { return m_pDepthStencilTex; }
 
 	private:
 		static void createRenderTargets();
@@ -40,6 +46,7 @@ namespace Dive
 		static void createDepthStencilStates();
 		static void createRasterizerStates();
 		static void createShaders();
+		static void createMatrixBuffer();
 	
 	private:
 		static GraphicsDevice m_GraphicsDevice;
@@ -50,16 +57,31 @@ namespace Dive
 		// render targets
 
 		// samplers
+		static ID3D11SamplerState* m_pLinearSampler;
 
 		// depth stencil states
 
 		// rasterizer states
 
 		// shaders
+		static ID3D11InputLayout* m_pSpriteInputLayout;
+		static ID3D11VertexShader* m_pSpriteVertexShader;
+		static ID3D11PixelShader* m_pSpritePixelShader;
+
+		// constant buffer
+		static ID3D11Buffer* m_pMatrixBuffer;
+
+		struct MatrixBufferType
+		{
+			DirectX::XMMATRIX world;
+			DirectX::XMMATRIX view;
+			DirectX::XMMATRIX proj;
+		};
 
 		// test resources =================
 		static Texture2D* m_pSampleTex;
 		static Texture2D* m_pDepthStencilTex;
 		static ID3D11DepthStencilState* m_pDepthStencilState;
+		static ID3D11RasterizerState* m_pRasterizerState;
 	};
 }

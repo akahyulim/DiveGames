@@ -126,7 +126,7 @@ namespace Dive
 		if (!m_pDevice)
 			return false;
 
-		if (!pDesc || !pData)
+		if (!pDesc)
 		{
 			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
 			return false;
@@ -291,6 +291,12 @@ namespace Dive
 			return false;
 		}
 
+		if (!std::filesystem::exists(path))
+		{
+			DV_CORE_WARN("{:s} 파일이 존재하지 않습니다.", path);
+			return false;
+		}
+
 		ID3D10Blob* pShaderBuffer = nullptr;
 		ID3D10Blob* pShaderError = nullptr;
 
@@ -309,11 +315,6 @@ namespace Dive
 				DV_CORE_ERROR("{:s}", (char*)pShaderError->GetBufferPointer());
 				DV_RELEASE(pShaderError);
 			}
-			else
-			{
-				DV_CORE_WARN("{:s} 파일이 존재하지 않아 컴파일에 실패하였습니다.", path);
-			}
-
 			DV_RELEASE(pShaderBuffer);
 
 			return false;
@@ -341,6 +342,12 @@ namespace Dive
 		if (!m_pDevice)
 			return false;
 
+		if (!std::filesystem::exists(path))
+		{
+			DV_CORE_WARN("{:s} 파일이 존재하지 않습니다.", path);
+			return false;
+		}
+
 		ID3D10Blob* pShaderBuffer = nullptr;
 		ID3D10Blob* pShaderError = nullptr;
 
@@ -359,11 +366,6 @@ namespace Dive
 				DV_CORE_WARN("{:s}", (char*)pShaderError->GetBufferPointer());
 				DV_RELEASE(pShaderError);
 			}
-			else
-			{
-				DV_CORE_WARN("{:s} 파일이 존재하지 않아 컴파일에 실패하였습니다.", path);
-			}
-
 			DV_RELEASE(pShaderBuffer);
 
 			return false;
@@ -376,6 +378,23 @@ namespace Dive
 		}
 
 		DV_RELEASE(pShaderBuffer);
+
+		return true;
+	}
+
+	bool GraphicsDevice::CreateShader(const std::string& path, const D3D11_INPUT_ELEMENT_DESC* pDesc, unsigned int numElements, ID3D11VertexShader** ppVertexShader, ID3D11InputLayout** ppInputLayout, ID3D11PixelShader** ppPixelShader)
+	{
+		if (!CreateVertexShader(path, pDesc, numElements, ppVertexShader, ppInputLayout))
+		{
+			return false;
+		}
+		else
+		{
+			if (!CreatePixelShader(path, ppPixelShader))
+			{
+				return false;
+			}
+		}
 
 		return true;
 	}

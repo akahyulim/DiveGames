@@ -37,7 +37,7 @@ namespace Dive
 		m_Width		= static_cast<int>(pTexture->GetWidth());
 		m_Height	= static_cast<int>(pTexture->GetHeight());
 
-		if (createBuffer())
+		if (!createBuffer())
 			Shutdown();
 	}
 
@@ -49,13 +49,60 @@ namespace Dive
 		return m_pTexture->GetShaderResourceView();
 	}
 
+	// 일단 직접 MAP / UNMAP
+	void SpriteRenderer::SetColor(DirectX::XMFLOAT4 color)
+	{
+		if (m_Color.x == color.x && m_Color.y == color.y && m_Color.z == color.z && m_Color.w == color.w)
+			return;
+		m_Color = color;
+
+		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+
+		pImmediateContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		VertexType* pVertex = static_cast<VertexType*>(mappedResource.pData);
+
+		float left = static_cast<float>((m_Width / 2) * -1);
+		float right = left + static_cast<float>(m_Width);
+		float top = static_cast<float>((m_Height / 2));
+		float bottom = top - static_cast<float>(m_Height);
+
+		// top left
+		pVertex[0].position = DirectX::XMFLOAT3(left, top, 0.0f);
+		pVertex[0].color = m_Color;
+		pVertex[0].texCoord = DirectX::XMFLOAT2(0.0f, 0.0f);
+		// bottom right
+		pVertex[1].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
+		pVertex[1].color = m_Color;
+		pVertex[1].texCoord = DirectX::XMFLOAT2(1.0f, 1.0f);
+		// bottom left
+		pVertex[2].position = DirectX::XMFLOAT3(left, bottom, 0.0f);
+		pVertex[2].color = m_Color;
+		pVertex[2].texCoord = DirectX::XMFLOAT2(0.0f, 1.0f);
+
+		// top left
+		pVertex[3].position = DirectX::XMFLOAT3(left, top, 0.0f);
+		pVertex[3].color = m_Color;
+		pVertex[3].texCoord = DirectX::XMFLOAT2(0.0f, 0.0f);
+		// top right
+		pVertex[4].position = DirectX::XMFLOAT3(right, top, 0.0f);
+		pVertex[4].color = m_Color;
+		pVertex[4].texCoord = DirectX::XMFLOAT2(1.0f, 0.0f);
+		// bottom right
+		pVertex[5].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
+		pVertex[5].color = m_Color;
+		pVertex[5].texCoord = DirectX::XMFLOAT2(1.0f, 1.0f);
+
+		pImmediateContext->Unmap(m_pVertexBuffer, 0);
+	}
+
 	bool SpriteRenderer::createBuffer()
 	{
 		// vertex buffer
 		{
-			// 굳이 동적생성할 필요도 없을 것 같다.
-			auto pVertices = new VertexType[m_VertexCount];
-			DV_ASSERT(pVertices);
+			std::vector<VertexType> vertices;
+			vertices.resize(m_VertexCount);
 
 			float left = static_cast<float>((m_Width / 2) * -1);
 			float right = left + static_cast<float>(m_Width);
@@ -63,56 +110,60 @@ namespace Dive
 			float bottom = top - static_cast<float>(m_Height);
 
 			// top left
-			pVertices[0].position = DirectX::XMFLOAT3(left, top, 0.0f);
-			pVertices[0].texCoords = DirectX::XMFLOAT2(0.0f, 0.0f);
+			vertices[0].position = DirectX::XMFLOAT3(left, top, 0.0f);
+			vertices[0].color = m_Color;
+			vertices[0].texCoord = DirectX::XMFLOAT2(0.0f, 0.0f);
 			// bottom right
-			pVertices[1].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
-			pVertices[1].texCoords = DirectX::XMFLOAT2(1.0f, 1.0f);
+			vertices[1].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
+			vertices[1].color = m_Color;
+			vertices[1].texCoord = DirectX::XMFLOAT2(1.0f, 1.0f);
 			// bottom left
-			pVertices[2].position = DirectX::XMFLOAT3(left, bottom, 0.0f);
-			pVertices[2].texCoords = DirectX::XMFLOAT2(0.0f, 1.0f);
-			
+			vertices[2].position = DirectX::XMFLOAT3(left, bottom, 0.0f);
+			vertices[2].color = m_Color;
+			vertices[2].texCoord = DirectX::XMFLOAT2(0.0f, 1.0f);
+
 			// top left
-			pVertices[3].position = DirectX::XMFLOAT3(left, top, 0.0f);
-			pVertices[3].texCoords = DirectX::XMFLOAT2(0.0f, 0.0f);
+			vertices[3].position = DirectX::XMFLOAT3(left, top, 0.0f);
+			vertices[3].color = m_Color;
+			vertices[3].texCoord = DirectX::XMFLOAT2(0.0f, 0.0f);
 			// top right
-			pVertices[4].position = DirectX::XMFLOAT3(right, top, 0.0f);
-			pVertices[4].texCoords = DirectX::XMFLOAT2(1.0f, 0.0f);
+			vertices[4].position = DirectX::XMFLOAT3(right, top, 0.0f);
+			vertices[4].color = m_Color;
+			vertices[4].texCoord = DirectX::XMFLOAT2(1.0f, 0.0f);
 			// bottom right
-			pVertices[5].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
-			pVertices[5].texCoords = DirectX::XMFLOAT2(1.0f, 1.0f);
+			vertices[5].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
+			vertices[5].color = m_Color;
+			vertices[5].texCoord = DirectX::XMFLOAT2(1.0f, 1.0f);
 
 			D3D11_BUFFER_DESC desc;
-			desc.Usage = D3D11_USAGE_DEFAULT; ;// D3D11_USAGE_DYNAMIC;
+			desc.Usage = D3D11_USAGE_DYNAMIC;
 			desc.ByteWidth = sizeof(VertexType) * m_VertexCount;
 			desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			desc.CPUAccessFlags = 0;// D3D11_CPU_ACCESS_WRITE;
+			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 			desc.MiscFlags = 0;
 			desc.StructureByteStride = 0;
 
 			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = pVertices;
+			data.pSysMem = vertices.data();
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
 			auto& graphicsDevice = Renderer::GetGraphicsDevice();
 			if (!graphicsDevice.CreateBuffer(&desc, &data, &m_pVertexBuffer))
 			{
-				DV_DELETE_ARRAY(pVertices);
+				vertices.clear();
 				return false;
 			}
 
-			DV_DELETE_ARRAY(pVertices);
+			vertices.clear();
 		}
 
 		// index buffer
 		{
-			auto pIndices = new unsigned long[m_IndexCount];
-			DV_ASSERT(pIndices);
-
-			for (int i = 0; i < m_IndexCount; i++)
+			std::vector<unsigned int> indices;
+			for (int i = 0; i != m_IndexCount; i++)
 			{
-				pIndices[i] = i;
+				indices.emplace_back(i);
 			}
 
 			D3D11_BUFFER_DESC desc;
@@ -124,7 +175,7 @@ namespace Dive
 			desc.StructureByteStride = 0;
 
 			D3D11_SUBRESOURCE_DATA data;
-			data.pSysMem = pIndices;
+			data.pSysMem = indices.data();
 			data.SysMemPitch = 0;
 			data.SysMemSlicePitch = 0;
 
@@ -132,11 +183,11 @@ namespace Dive
 			if (!graphicsDevice.CreateBuffer(&desc, &data, &m_pIndexBuffer))
 			{
 				DV_RELEASE(m_pVertexBuffer);
-				DV_DELETE_ARRAY(pIndices);
+				indices.clear();
 				return false;
 			}
 
-			DV_DELETE_ARRAY(pIndices);
+			indices.clear();
 		}
 
 		return true;

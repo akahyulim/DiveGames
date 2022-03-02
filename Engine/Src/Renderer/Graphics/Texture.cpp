@@ -56,6 +56,8 @@ namespace Dive
 		m_Width		= static_cast<unsigned int>(metaData.width);
 		m_Height	= static_cast<unsigned int>(metaData.height);
 
+		m_Path = path;
+
 		return true;
 	}
 

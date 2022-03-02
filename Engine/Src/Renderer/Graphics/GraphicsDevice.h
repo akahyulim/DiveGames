@@ -29,6 +29,11 @@ namespace Dive
 		bool CreateRasterizerState(const D3D11_RASTERIZER_DESC* pDesc, ID3D11RasterizerState** ppRasterizerState);
 		bool CreateVertexShader(const std::string& path, const D3D11_INPUT_ELEMENT_DESC* pDesc, unsigned int numElements, ID3D11VertexShader** ppVertexShader, ID3D11InputLayout** ppInputLayout);
 		bool CreatePixelShader(const std::string& path, ID3D11PixelShader** ppPixelShader);
+		bool CreateShader(const std::string& path, const D3D11_INPUT_ELEMENT_DESC* pDesc, unsigned int numElements, ID3D11VertexShader** ppVertexShader, ID3D11InputLayout** ppInputLayout, ID3D11PixelShader** ppPixelShader);
+
+		// map / unmap
+
+		// begin / end
 
 		ID3D11Device* GetDevice() { return m_pDevice; }
 		ID3D11DeviceContext* GetImmediateContext() { return m_pImmediateContext; }

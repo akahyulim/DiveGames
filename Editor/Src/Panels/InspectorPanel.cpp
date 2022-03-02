@@ -126,7 +126,7 @@ void InspectorPanel::drawTransform(Dive::GameObject* pSelectedObject)
 
 		// scale
 		auto scale = pTransform->GetLocalScale();
-		DrawVec3Control("Scale", scale);
+		DrawVec3Control("Scale", scale, 1.0f);
 		pTransform->SetLocalScale(scale);
 	}
 

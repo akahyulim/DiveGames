@@ -24,10 +24,16 @@ namespace Dive
 		ID3D11Buffer* GetIndexBuffer() { return m_pIndexBuffer; }
 
 		int GetVertexCount() const { return m_VertexCount; }
-		int GetIdexCount() const { return m_IndexCount; }
+		int GetIndexCount() const { return m_IndexCount; }
+
+		unsigned int GetVertexStride() const { return sizeof(VertexType); }
+		DXGI_FORMAT GetIndexForamt() const { return DXGI_FORMAT_R32_UINT; }
 
 		unsigned int GetSizeWidth() const { return m_Width; }
 		unsigned int GetSizeHeight() const { return m_Height; }
+
+		DirectX::XMFLOAT4 GetColor() const { return m_Color; }
+		void SetColor(DirectX::XMFLOAT4 color);
 		
 	private:
 		bool createBuffer();
@@ -42,7 +48,8 @@ namespace Dive
 		struct VertexType
 		{
 			DirectX::XMFLOAT3 position;
-			DirectX::XMFLOAT2 texCoords;
+			DirectX::XMFLOAT4 color;
+			DirectX::XMFLOAT2 texCoord;
 		};
 
 		ID3D11Buffer* m_pVertexBuffer = nullptr;
