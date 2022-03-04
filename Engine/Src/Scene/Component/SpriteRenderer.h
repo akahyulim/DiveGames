@@ -35,12 +35,22 @@ namespace Dive
 		DirectX::XMFLOAT4 GetColor() const { return m_Color; }
 		void SetColor(DirectX::XMFLOAT4 color);
 		
+		bool IsFlipX() const { return m_bFlipX; }
+		void SetFlipX(bool x);
+		bool IsFlipY() const { return m_bFlipY; }
+		void SetFlipY(bool y);
+
 	private:
 		bool createBuffer();
+		void flipSprite();
 
 	private:
 		DirectX::XMFLOAT4 m_Color{1.0f, 1.0f, 1.0f, 1.0f};
 		Texture2D* m_pTexture = nullptr;
+		bool m_bFlipX = false;
+		bool m_bFlipY = false;
+
+		// Material
 
 		int m_Width = 0;
 		int m_Height = 0;

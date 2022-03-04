@@ -88,6 +88,9 @@ namespace Dive
 		if (!pTransform || !pRenderer)
 			return;
 
+		if (!pRenderer->IsEnabled())
+			return;
+
 		auto pImmediateContext = m_GraphicsDevice.GetImmediateContext();
 
 		auto pShaderResourceView = pRenderer->GetShaderResourceView();

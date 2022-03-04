@@ -398,4 +398,23 @@ namespace Dive
 
 		return true;
 	}
+
+	bool GraphicsDevice::Map(ID3D11Resource* pResource, unsigned int subresource, D3D11_MAP mapType, unsigned int mapFlags, D3D11_MAPPED_SUBRESOURCE* pMappedSubresource)
+	{
+		if (!m_pImmediateContext)
+			return false;
+
+		if (FAILED(m_pImmediateContext->Map(pResource, subresource, mapType, mapFlags, pMappedSubresource)))
+			return false;
+
+		return true;
+	}
+
+	void GraphicsDevice::Unmap(ID3D11Resource* pResource, unsigned int subresource)
+	{
+		if (!m_pImmediateContext)
+			return;
+
+		m_pImmediateContext->Unmap(pResource, subresource);
+	}
 }

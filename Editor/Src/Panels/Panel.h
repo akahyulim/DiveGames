@@ -4,6 +4,7 @@
 #include "DiveEngine.h"
 #include "imgui-docking/imgui.h"
 #include "imgui-docking/imgui_internal.h"
+#include "imgui-docking/imgui_stdlib.h"
 
 class EditorScene;
 

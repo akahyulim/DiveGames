@@ -49,18 +49,16 @@ namespace Dive
 		return m_pTexture->GetShaderResourceView();
 	}
 
-	// 일단 직접 MAP / UNMAP
 	void SpriteRenderer::SetColor(DirectX::XMFLOAT4 color)
 	{
 		if (m_Color.x == color.x && m_Color.y == color.y && m_Color.z == color.z && m_Color.w == color.w)
 			return;
 		m_Color = color;
 
-		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
+		auto& graphicsDevice = Renderer::GetGraphicsDevice();
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-		pImmediateContext->Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		graphicsDevice.Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 		VertexType* pVertex = static_cast<VertexType*>(mappedResource.pData);
 
 		float left = static_cast<float>((m_Width / 2) * -1);
@@ -94,7 +92,25 @@ namespace Dive
 		pVertex[5].color = m_Color;
 		pVertex[5].texCoord = DirectX::XMFLOAT2(1.0f, 1.0f);
 
-		pImmediateContext->Unmap(m_pVertexBuffer, 0);
+		graphicsDevice.Unmap(m_pVertexBuffer, 0);
+	}
+
+	void SpriteRenderer::SetFlipX(bool x)
+	{
+		if (m_bFlipX == x)
+			return;
+		m_bFlipX = x;
+
+		flipSprite();
+	}
+
+	void SpriteRenderer::SetFlipY(bool y)
+	{
+		if (m_bFlipY == y)
+			return;
+		m_bFlipY = y;
+
+		flipSprite();
 	}
 
 	bool SpriteRenderer::createBuffer()
@@ -191,5 +207,47 @@ namespace Dive
 		}
 
 		return true;
+	}
+
+	void SpriteRenderer::flipSprite()
+	{
+		auto& graphicsDevice = Renderer::GetGraphicsDevice();
+
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		graphicsDevice.Map(m_pVertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		VertexType* pVertex = static_cast<VertexType*>(mappedResource.pData);
+
+		float left = static_cast<float>((m_Width / 2) * -1);
+		float right = left + static_cast<float>(m_Width);
+		float top = static_cast<float>((m_Height / 2));
+		float bottom = top - static_cast<float>(m_Height);
+
+		// top left
+		pVertex[0].position = DirectX::XMFLOAT3(left, top, 0.0f);
+		pVertex[0].color = m_Color;
+		pVertex[0].texCoord = DirectX::XMFLOAT2(m_bFlipX ? 1.0f : 0.0f, m_bFlipY ? 1.0f : 0.0f);
+		// bottom right
+		pVertex[1].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
+		pVertex[1].color = m_Color;
+		pVertex[1].texCoord = DirectX::XMFLOAT2(m_bFlipX ? 0.0f : 1.0f, m_bFlipY ? 0.0f : 1.0f);
+		// bottom left
+		pVertex[2].position = DirectX::XMFLOAT3(left, bottom, 0.0f);
+		pVertex[2].color = m_Color;
+		pVertex[2].texCoord = DirectX::XMFLOAT2(m_bFlipX ? 1.0f : 0.0f, m_bFlipY ? 0.0f : 1.0f);
+
+		// top left
+		pVertex[3].position = DirectX::XMFLOAT3(left, top, 0.0f);
+		pVertex[3].color = m_Color;
+		pVertex[3].texCoord = DirectX::XMFLOAT2(m_bFlipX ? 1.0f : 0.0f, m_bFlipY ? 1.0f : 0.0f);
+		// top right
+		pVertex[4].position = DirectX::XMFLOAT3(right, top, 0.0f);
+		pVertex[4].color = m_Color;
+		pVertex[4].texCoord = DirectX::XMFLOAT2(m_bFlipX ? 0.0f : 1.0f, m_bFlipY ? 1.0f : 0.0f);
+		// bottom right
+		pVertex[5].position = DirectX::XMFLOAT3(right, bottom, 0.0f);
+		pVertex[5].color = m_Color;
+		pVertex[5].texCoord = DirectX::XMFLOAT2(m_bFlipX ? 0.0f: 1.0f, m_bFlipY ? 0.0f : 1.0f);
+
+		graphicsDevice.Unmap(m_pVertexBuffer, 0);
 	}
 }

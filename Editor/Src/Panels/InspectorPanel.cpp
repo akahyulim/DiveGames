@@ -93,6 +93,7 @@ void InspectorPanel::renderWindow()
 
 	// draw components
 	drawTransform(pSelectedObject);
+	drawSpriteRenderer(pSelectedObject);
 
 	// add components
 	if (ImGui::Button("Add Component"))
@@ -128,6 +129,57 @@ void InspectorPanel::drawTransform(Dive::GameObject* pSelectedObject)
 		auto scale = pTransform->GetLocalScale();
 		DrawVec3Control("Scale", scale, 1.0f);
 		pTransform->SetLocalScale(scale);
+	}
+
+	ImGui::Separator();
+}
+
+void InspectorPanel::drawSpriteRenderer(Dive::GameObject* pSelectedObject)
+{
+	auto pSpriteRenderer = pSelectedObject->GetComponent<Dive::SpriteRenderer>();
+	if (!pSpriteRenderer)
+		return;
+
+	auto pTexture = pSpriteRenderer->GetTexture();
+
+	if (ImGui::CollapsingHeader("Sprite Renderer", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		// enabled
+		bool enabled = pSpriteRenderer->IsEnabled();
+		ImGui::Checkbox("Enabled", &enabled);
+		pSpriteRenderer->SetEnable(enabled);
+
+		// Sprite
+		auto name = pTexture->GetName();
+		ImGui::Text("Sprite");
+		ImGui::SameLine();
+		ImGui::InputText("##SpriteName", &name);
+		pTexture->SetName(name);
+		ImGui::SameLine();
+		if (ImGui::Button("*"))
+		{
+			// Asset/Textures 폴더를 연다.
+		}
+
+		// Color
+		DirectX::XMFLOAT4 color = pSpriteRenderer->GetColor();
+		float col[4] = { color.x, color.y, color.z, color.w };
+		ImGui::Text("Color");
+		ImGui::SameLine();
+		ImGui::ColorEdit4("##background", col);
+		color = DirectX::XMFLOAT4(col[0], col[1], col[2], col[3]);
+		pSpriteRenderer->SetColor(color);
+
+		// Flip
+		bool flipX = pSpriteRenderer->IsFlipX();
+		bool flipY = pSpriteRenderer->IsFlipY();
+		ImGui::Text("Flip");
+		ImGui::SameLine();
+		ImGui::Checkbox("X", &flipX);
+		ImGui::SameLine();
+		ImGui::Checkbox("Y", &flipY);
+		pSpriteRenderer->SetFlipX(flipX);
+		pSpriteRenderer->SetFlipY(flipY);
 	}
 
 	ImGui::Separator();

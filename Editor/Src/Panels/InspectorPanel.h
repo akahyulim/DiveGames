@@ -11,6 +11,7 @@ public:
 
 private:
 	void drawTransform(Dive::GameObject* pSelectedObject);
+	void drawSpriteRenderer(Dive::GameObject* pSelectedObject);
 	
 private:
 };

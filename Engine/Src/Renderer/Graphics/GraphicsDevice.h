@@ -32,8 +32,11 @@ namespace Dive
 		bool CreateShader(const std::string& path, const D3D11_INPUT_ELEMENT_DESC* pDesc, unsigned int numElements, ID3D11VertexShader** ppVertexShader, ID3D11InputLayout** ppInputLayout, ID3D11PixelShader** ppPixelShader);
 
 		// map / unmap
+		bool Map(ID3D11Resource* pResource, unsigned int subresource, D3D11_MAP mapType, unsigned int mapFlags, D3D11_MAPPED_SUBRESOURCE* pMappedSubresource);
+		void Unmap(ID3D11Resource* pResource, unsigned int subresource);
 
 		// begin / end
+
 
 		ID3D11Device* GetDevice() { return m_pDevice; }
 		ID3D11DeviceContext* GetImmediateContext() { return m_pImmediateContext; }

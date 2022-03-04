@@ -58,6 +58,11 @@ namespace Dive
 
 		m_Path = path;
 
+		// 이런건 help 함수가 나을지도...
+		auto lastSlashIndex = path.find_last_of("\\/");
+		auto extensionIndex = path.find_last_of(".");
+		m_Name = path.substr(lastSlashIndex + 1, extensionIndex - 1 - lastSlashIndex);
+
 		return true;
 	}
 
@@ -161,6 +166,7 @@ namespace Dive
 		DV_RELEASE(m_pTexture2D);
 	}
 	
+	// 이걸 없애면 컴파일 오류가 발생한다..
 	bool Texture2D::operator==(const Texture& other)
 	{
 		return false;
@@ -248,16 +254,7 @@ namespace Dive
 			return nullptr;
 		}
 
-		// 이름을 전달받지 않았을 경우
-		// 파일 경로를 통해 '이름.확장자'로 저장
-		if (name.empty())
-		{
-			auto lastIndex = path.find_last_of("\\/");
-			auto filename = path.substr(lastIndex + 1, path.length());
-
-			pTex->SetName(filename);
-		}
-		else
+		if (!name.empty())
 		{
 			pTex->SetName(name);
 		}
