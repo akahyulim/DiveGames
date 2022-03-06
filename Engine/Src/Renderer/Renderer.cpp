@@ -109,7 +109,7 @@ namespace Dive
 			MatrixBufferType* pPtr = static_cast<MatrixBufferType*>(mappedResource.pData);
 
 			// world
-			auto world = pTransform->GetMatrix();
+			auto world = pTransform->GetLocalToWorld();
 			auto matWorld = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&world));
 			pPtr->world = matWorld;
 

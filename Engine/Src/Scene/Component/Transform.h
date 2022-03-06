@@ -38,10 +38,10 @@ namespace Dive
 		void SetLocalScale(DirectX::XMFLOAT3 scl);
 
 		// matrix
-		DirectX::XMFLOAT4X4 GetMatrix();
-		DirectX::XMFLOAT4X4 GetLocalMatrix();
+		DirectX::XMFLOAT4X4 GetLocalToWorld() const { return m_LocalToWorld; }
+		DirectX::XMFLOAT4X4 GetPositionMatrix();
 		DirectX::XMFLOAT4X4 GetRotationMatrix();
-		DirectX::XMFLOAT4X4 GetLocalRotationMatrix();
+		DirectX::XMFLOAT4X4 GetScaleMatrix();
 
 		// Translate
 		void Translate(DirectX::XMFLOAT3 translation, eSpace relativeTo = eSpace::Self);
@@ -73,9 +73,23 @@ namespace Dive
 		void DetachChildren();
 
 	private:
+		void update();
+
+		DirectX::XMVECTOR getPositionVector() const;
+		DirectX::XMVECTOR getRotationQuaternion() const;
+		DirectX::XMVECTOR getScaleVector() const;
+
+		DirectX::XMMATRIX getLocalToWorldMatrix() const;
+		DirectX::XMMATRIX getPositionMatrixMatrix() const;
+		DirectX::XMMATRIX getRotationMatrixMatrix() const;
+		DirectX::XMMATRIX getScaleMatrixMatrix() const;
+		
+	private:
 		DirectX::XMFLOAT3 m_Position = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 		DirectX::XMFLOAT3 m_Rotation = DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
 		DirectX::XMFLOAT3 m_Scale = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+
+		DirectX::XMFLOAT4X4 m_LocalToWorld;
 
 		Transform* m_pParent = nullptr;
 		std::vector<Transform*> m_Children;

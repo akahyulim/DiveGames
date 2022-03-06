@@ -24,6 +24,8 @@ namespace Dive
 	void Transform::SetPosition(DirectX::XMFLOAT3 pos)
 	{
 		m_Position = pos;
+
+		update();
 	}
 
 	DirectX::XMFLOAT3 Transform::GetLocalPosition()
@@ -42,11 +44,13 @@ namespace Dive
 		return localPos;
 	}
 
+	// 잠온다. 일단 여기서부터...
 	void Transform::SetLocalPosition(DirectX::XMFLOAT3 pos)
 	{
 		if (!HasParent())
 		{
 			m_Position = pos;
+			update();
 			return;
 		}
 
@@ -56,6 +60,8 @@ namespace Dive
 		auto vecPos = DirectX::XMVectorAdd(vecParentPos, vecLocalPos);
 
 		DirectX::XMStoreFloat3(&m_Position, vecPos);
+
+		update();
 	}
 
 	DirectX::XMFLOAT3 Transform::GetRotation() const
@@ -153,42 +159,9 @@ namespace Dive
 		DirectX::XMStoreFloat3(&m_Scale, vecScl);
 	}
 
-	DirectX::XMFLOAT4X4 Transform::GetMatrix()
+	DirectX::XMFLOAT4X4 Transform::GetPositionMatrix()
 	{
-		auto vecPos = DirectX::XMLoadFloat3(&m_Position);
-		float radianX = DirectX::XMConvertToRadians(m_Rotation.x);
-		float radianY = DirectX::XMConvertToRadians(m_Rotation.y);
-		float radianZ = DirectX::XMConvertToRadians(m_Rotation.z);
-		auto vecRot = DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ);
-		auto vecScl = DirectX::XMLoadFloat3(&m_Scale);
-
-		auto matPos = DirectX::XMMatrixTranslationFromVector(vecPos);
-		auto matRot = DirectX::XMMatrixRotationQuaternion(vecRot);
-		auto matScl = DirectX::XMMatrixScalingFromVector(vecScl);
-
-		auto matMat = matScl * matRot * matPos;
-
-		DirectX::XMFLOAT4X4 mat;
-		DirectX::XMStoreFloat4x4(&mat, matMat);
-
-		return mat;
-	}
-
-	DirectX::XMFLOAT4X4 Transform::GetLocalMatrix()
-	{
-		if (!HasParent())
-			return GetMatrix();
-
-		auto mat = GetMatrix();
-		auto matMat = DirectX::XMLoadFloat4x4(&mat);
-		auto parentMat = GetParent()->GetMatrix();
-		auto matInverseParentMat = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&parentMat));
-		auto matLocalMat = matMat * matInverseParentMat;
-
-		DirectX::XMFLOAT4X4 localMat;
-		DirectX::XMStoreFloat4x4(&localMat, matLocalMat);
-
-		return localMat;
+		return DirectX::XMFLOAT4X4();
 	}
 
 	DirectX::XMFLOAT4X4 Transform::GetRotationMatrix()
@@ -205,23 +178,9 @@ namespace Dive
 		return rotMat;
 	}
 
-	// 확신이 없다.
-	DirectX::XMFLOAT4X4 Transform::GetLocalRotationMatrix()
+	DirectX::XMFLOAT4X4 Transform::GetScaleMatrix()
 	{
-		if (!HasParent())
-			return GetRotationMatrix();
-
-		auto parentRotMat = GetParent()->GetRotationMatrix();
-		auto matParentRotMat = DirectX::XMLoadFloat4x4(&parentRotMat);
-		auto rotMat = GetRotationMatrix();
-		auto matRotMat = DirectX::XMLoadFloat4x4(&rotMat);
-
-		auto matLocalRotMat = matRotMat * matParentRotMat;
-
-		DirectX::XMFLOAT4X4 localRotMat;
-		DirectX::XMStoreFloat4x4(&localRotMat, matLocalRotMat);
-
-		return localRotMat;
+		return DirectX::XMFLOAT4X4();
 	}
 
 	// 일단 회전 행렬만 곱한 후 위치에서 더했다.
@@ -230,9 +189,9 @@ namespace Dive
 	{
 		auto vecTranslation = DirectX::XMLoadFloat3(&translation);
 
-		auto mat = relativeTo == eSpace::World ? GetRotationMatrix() : GetLocalRotationMatrix();
-		auto vecMat = DirectX::XMLoadFloat4x4(&mat);
-		vecTranslation = DirectX::XMVector3Transform(vecTranslation, vecMat);
+		//auto mat = relativeTo == eSpace::World ? GetRotationMatrix() : GetLocalRotationMatrix();
+		//auto vecMat = DirectX::XMLoadFloat4x4(&mat);
+		//vecTranslation = DirectX::XMVector3Transform(vecTranslation, vecMat);
 
 		auto vecPosition = DirectX::XMLoadFloat3(&m_Position);
 		vecPosition = DirectX::XMVectorAdd(vecPosition, vecTranslation);
@@ -254,10 +213,10 @@ namespace Dive
 		auto vecRot = DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ);
 		auto matRotMat = DirectX::XMMatrixRotationQuaternion(vecRot);
 
-		auto mat = relativeTo == eSpace::World ? GetRotationMatrix() : GetLocalRotationMatrix();
-		auto matMat = DirectX::XMLoadFloat4x4(&mat);
+		//auto mat = relativeTo == eSpace::World ? GetRotationMatrix() : GetLocalRotationMatrix();
+		//auto matMat = DirectX::XMLoadFloat4x4(&mat);
 
-		matRotMat = matRotMat * matMat;
+		//matRotMat = matRotMat * matMat;
 
 		// 문제는 이 결과를 다시 오일러 각으로 뽑아낸 후 m_Rotation에 저장해야 한다는 것이다.
 	}
@@ -446,5 +405,68 @@ namespace Dive
 
 		m_Children.clear();
 		m_Children.shrink_to_fit();
+	}
+
+	void Transform::update()
+	{
+		auto matPositionMatrix = getPositionMatrixMatrix();
+		auto matRotationMatrix = getRotationMatrixMatrix();
+		auto matScaleMatrix = getScaleMatrixMatrix();
+
+		auto matrix = matScaleMatrix * matRotationMatrix * matPositionMatrix;
+
+		if (HasParent())
+		{
+			matrix *= GetParent()->getLocalToWorldMatrix();
+		}
+		
+		DirectX::XMStoreFloat4x4(&m_LocalToWorld, matrix);
+		
+		if (HasChildren())
+		{
+			for (auto pChild : m_Children)
+			{
+				pChild->update();
+			}
+		}
+	}
+
+	DirectX::XMVECTOR Transform::getPositionVector() const
+	{
+		return DirectX::XMLoadFloat3(&m_Position);
+	}
+
+	DirectX::XMVECTOR Transform::getRotationQuaternion() const
+	{
+		float radianX = DirectX::XMConvertToRadians(m_Rotation.x);
+		float radianY = DirectX::XMConvertToRadians(m_Rotation.y);
+		float radianZ = DirectX::XMConvertToRadians(m_Rotation.z);
+
+		return DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ);
+	}
+
+	DirectX::XMVECTOR Transform::getScaleVector() const
+	{
+		return DirectX::XMLoadFloat3(&m_Scale);
+	}
+
+	DirectX::XMMATRIX Transform::getLocalToWorldMatrix() const
+	{
+		return DirectX::XMLoadFloat4x4(&m_LocalToWorld);
+	}
+
+	DirectX::XMMATRIX Transform::getPositionMatrixMatrix() const
+	{
+		return DirectX::XMMatrixTranslationFromVector(getPositionVector());
+	}
+
+	DirectX::XMMATRIX Transform::getRotationMatrixMatrix() const
+	{
+		return DirectX::XMMatrixRotationQuaternion(getRotationQuaternion());
+	}
+
+	DirectX::XMMATRIX Transform::getScaleMatrixMatrix() const
+	{
+		return DirectX::XMMatrixScalingFromVector(getScaleVector());
 	}
 }
