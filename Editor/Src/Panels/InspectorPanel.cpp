@@ -121,7 +121,7 @@ void InspectorPanel::drawTransform(Dive::GameObject* pSelectedObject)
 		pTransform->SetLocalPosition(position);
 
 		// rotation
-		auto rotation = pTransform->GetLocalRotation();
+		auto rotation = pTransform->GetLocalRotationDegrees();
 		DrawVec3Control("Rotation", rotation);
 		pTransform->SetLocalRotation(rotation);
 

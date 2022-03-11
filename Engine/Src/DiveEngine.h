@@ -39,3 +39,4 @@
 #include "Scene/Component/SceneCamera.h"
 
 //= Math ==========================
+#include "Math/Math.h"

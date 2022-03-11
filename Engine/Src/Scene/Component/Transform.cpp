@@ -1,5 +1,6 @@
 #include "divepch.h"
 #include "Transform.h"
+#include "Math/Math.h"
 
 namespace Dive
 {
@@ -7,196 +8,204 @@ namespace Dive
 		: Component(pGameObject)
 	{
 		m_Type = eComponentType::Transform;
+
+		Clear();
 	}
 
 	void Transform::Clear()
 	{
-		m_Position	= DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-		m_Rotation	= DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-		m_Scale		= DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+		m_LocalTranslation	= DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+		m_LocalRotation		= DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		m_LocalScale		= DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+
+		DirectX::XMStoreFloat4x4(&m_Matrix, DirectX::XMMatrixIdentity());
 	}
 
 	DirectX::XMFLOAT3 Transform::GetPosition() const
 	{
-		return m_Position;
+		return *((DirectX::XMFLOAT3*)&m_Matrix._41);
 	}
 
-	void Transform::SetPosition(DirectX::XMFLOAT3 pos)
+	DirectX::XMVECTOR Transform::GetPositionVector() const
 	{
-		m_Position = pos;
-
-		update();
+		return DirectX::XMLoadFloat3((DirectX::XMFLOAT3*)&m_Matrix._41);
 	}
 
-	DirectX::XMFLOAT3 Transform::GetLocalPosition()
+	void Transform::SetPosition(const DirectX::XMFLOAT3& trans)
 	{
-		if (!HasParent())
-			return m_Position;
-
-		auto parentPos = GetParent()->GetPosition();
-		auto vecParentPos = DirectX::XMLoadFloat3(&parentPos);
-		auto vecPos = DirectX::XMLoadFloat3(&m_Position);
-		auto vecLocalPos = DirectX::XMVectorSubtract(vecPos, vecParentPos);
-
-		DirectX::XMFLOAT3 localPos;
-		DirectX::XMStoreFloat3(&localPos, vecLocalPos);
-
-		return localPos;
-	}
-
-	// 잠온다. 일단 여기서부터...
-	void Transform::SetLocalPosition(DirectX::XMFLOAT3 pos)
-	{
-		if (!HasParent())
-		{
-			m_Position = pos;
-			update();
+		auto currentPosition = GetPosition();
+		if ((currentPosition.x == trans.x) && (currentPosition.y == trans.y) && (currentPosition.z == trans.z))
 			return;
+
+		auto newPosition = trans;
+
+		if (HasParent())
+		{
+			auto vecPosition = DirectX::XMVector3Transform(
+				DirectX::XMLoadFloat3(&newPosition), DirectX::XMMatrixInverse(nullptr, GetParent()->GetMatrix())
+			);
+
+			DirectX::XMStoreFloat3(&newPosition, vecPosition);
 		}
 
-		auto parentPos = GetParent()->GetPosition();
-		auto vecParentPos = DirectX::XMLoadFloat3(&parentPos);
-		auto vecLocalPos = DirectX::XMLoadFloat3(&pos);
-		auto vecPos = DirectX::XMVectorAdd(vecParentPos, vecLocalPos);
-
-		DirectX::XMStoreFloat3(&m_Position, vecPos);
-
-		update();
+		SetLocalPosition(newPosition);
 	}
 
-	DirectX::XMFLOAT3 Transform::GetRotation() const
+	DirectX::XMFLOAT4 Transform::GetRotation() const
 	{
-		return m_Rotation;
+		DirectX::XMFLOAT4 rotQuat;
+		DirectX::XMStoreFloat4(&rotQuat, GetRotationVector());
+
+		return rotQuat;
 	}
 
-	// -360 ~ 360 사이로 제한하고 싶다.
-	void Transform::SetRotation(DirectX::XMFLOAT3 rot)
+	DirectX::XMVECTOR Transform::GetRotationVector() const
 	{
-		m_Rotation = rot;
+		DirectX::XMVECTOR trans, rotQuat, scale;
+		DirectX::XMMatrixDecompose(&scale, &rotQuat, &trans, DirectX::XMLoadFloat4x4(&m_Matrix));
+
+		return rotQuat;
 	}
 
-	// 이것도 유니티 구현 확인이 필요하다.
-	// 역시 오일러 각을 제한하고 싶다.
-	DirectX::XMFLOAT3 Transform::GetLocalRotation()
+	DirectX::XMFLOAT3 Transform::GetRotationDegrees() const
 	{
-		if (!HasParent())
-			return m_Rotation;
-
-		auto parentRot = GetParent()->GetRotation();
-		auto vecParentRot = DirectX::XMLoadFloat3(&parentRot);
-		auto vecRot = DirectX::XMLoadFloat3(&m_Rotation);
-		auto vecLocalRot = DirectX::XMVectorSubtract(vecRot, vecParentRot);
-
-		DirectX::XMFLOAT3 localRot;
-		DirectX::XMStoreFloat3(&localRot, vecLocalRot);
-
-		return localRot;
+		return Math::QuaternionToEularDegrees(GetRotation());
 	}
 
-	void Transform::SetLocalRotation(DirectX::XMFLOAT3 rot)
+	void Transform::SetRotation(const DirectX::XMFLOAT4& rotQuat)
 	{
-		if (!HasParent())
-		{
-			m_Rotation = rot;
+		auto curRotQuat = GetRotationVector();
+		auto rotQuatVector = DirectX::XMLoadFloat4(&rotQuat);
+		if (DirectX::XMQuaternionEqual(curRotQuat, rotQuatVector))
 			return;
+
+		if (HasParent())
+		{
+			auto parentRotQuat = GetParent()->GetRotationVector();
+			rotQuatVector = DirectX::XMQuaternionMultiply(rotQuatVector, DirectX::XMQuaternionInverse(parentRotQuat));
 		}
 
-		auto parentRot = GetParent()->GetRotation();
-		auto vecParentRot = DirectX::XMLoadFloat3(&parentRot);
-		auto vecLocalRot = DirectX::XMLoadFloat3(&rot);
-		auto vecRot = DirectX::XMVectorAdd(vecParentRot, vecLocalRot);
+		DirectX::XMFLOAT4 newRotQuat;
+		DirectX::XMStoreFloat4(&newRotQuat, rotQuatVector);
 
-		// SetRotation()에서 각도를 제한하는 구현을 추가한다면
-		// 이 부분도 SetRotation()에 전달토록 바꾸는 게 낫다.
-		DirectX::XMStoreFloat3(&m_Rotation, vecRot);
+		SetLocalRotation(newRotQuat);
+	}
+
+	void Transform::SetRotation(const DirectX::XMFLOAT3& degrees)
+	{
+		auto radianX = DirectX::XMConvertToRadians(degrees.x);
+		auto radianY = DirectX::XMConvertToRadians(degrees.y);
+		auto radianZ = DirectX::XMConvertToRadians(degrees.z);
+		
+		auto rotQuatVector = DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ);
+
+		auto curRotQuat = GetRotationVector();
+		if (DirectX::XMQuaternionEqual(curRotQuat, rotQuatVector))
+			return;
+
+		if (HasParent())
+		{
+			auto parentRotQuat = GetParent()->GetRotationVector();
+			rotQuatVector = DirectX::XMQuaternionMultiply(rotQuatVector, DirectX::XMQuaternionInverse(parentRotQuat));
+		}
+
+		DirectX::XMFLOAT4 newRotQuat;
+		DirectX::XMStoreFloat4(&newRotQuat, rotQuatVector);
+
+		SetLocalRotation(newRotQuat);
+	}
+
+	DirectX::XMFLOAT3 Transform::GetLocalRotationDegrees() const
+	{
+		return Math::QuaternionToEularDegrees(m_LocalRotation);
+	}
+
+	void Transform::SetLocalRotation(const DirectX::XMFLOAT3& degrees)
+	{
+		auto radianX = DirectX::XMConvertToRadians(degrees.x);
+		auto radianY = DirectX::XMConvertToRadians(degrees.y);
+		auto radianZ = DirectX::XMConvertToRadians(degrees.z);
+
+		DirectX::XMStoreFloat4(&m_LocalRotation, DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ));
 	}
 
 	DirectX::XMFLOAT3 Transform::GetScale() const
 	{
-		return m_Scale;
+		DirectX::XMFLOAT3 scale;
+		DirectX::XMStoreFloat3(&scale, GetScaleVector());
+
+		return scale;
 	}
 
-	void Transform::SetScale(DirectX::XMFLOAT3 scl)
+	DirectX::XMVECTOR Transform::GetScaleVector() const
 	{
-		if ((scl.x <= 0.0f) || (scl.y <= 0.0f) || (scl.z <= 0.0f))
+		DirectX::XMVECTOR trans, rotQuat, scale;
+		DirectX::XMMatrixDecompose(&scale, &rotQuat, &trans, DirectX::XMLoadFloat4x4(&m_Matrix));
+
+		return scale;
+	}
+
+	void Transform::SetScale(const DirectX::XMFLOAT3& scale)
+	{
+		auto currentScale = GetScale();
+		if ((currentScale.x == scale.x) && (currentScale.y == scale.y) && (currentScale.z == scale.z))
 			return;
 
-		m_Scale = scl;
-	}
+		auto newScale = scale;
 
-	DirectX::XMFLOAT3 Transform::GetLocalScale()
-	{
-		if (!HasParent())
-			return m_Scale;
-
-		auto parentScl = GetParent()->GetScale();
-		auto vecParentScl = DirectX::XMLoadFloat3(&parentScl);
-		auto vecScl = DirectX::XMLoadFloat3(&m_Scale);
-		auto vecLocalScl = DirectX::XMVectorDivide(vecScl, vecParentScl);
-
-		DirectX::XMFLOAT3 localScl;
-		DirectX::XMStoreFloat3(&localScl, vecLocalScl);
-
-		return localScl;
-	}
-
-	void Transform::SetLocalScale(DirectX::XMFLOAT3 scl)
-	{
-		if ((scl.x <= 0.0f) || (scl.y <= 0.0f) || (scl.z <= 0.0f))
-			return;
-
-		if (!HasParent())
+		if (HasParent())
 		{
-			m_Scale = scl;
-			return;
+			auto parentScale = GetParent()->GetScale();
+			newScale.x /= parentScale.x;
+			newScale.y /= parentScale.y;
+			newScale.z /= parentScale.z;
 		}
 
-		auto parentScl = GetParent()->GetScale();
-		auto vecParentScl = DirectX::XMLoadFloat3(&parentScl);
-		auto vecLocalScl = DirectX::XMLoadFloat3(&scl);
-		auto vecScl = DirectX::XMVectorMultiply(vecParentScl, vecLocalScl);
-
-		DirectX::XMStoreFloat3(&m_Scale, vecScl);
+		SetLocalScale(newScale);
 	}
 
-	DirectX::XMFLOAT4X4 Transform::GetPositionMatrix()
+	DirectX::XMMATRIX Transform::GetMatrix()
 	{
-		return DirectX::XMFLOAT4X4();
+		auto matrix = GetLocalMatrix();
+
+		if (HasParent())
+		{
+			matrix *= GetParent()->GetMatrix();
+		}
+
+		DirectX::XMStoreFloat4x4(&m_Matrix, matrix);
+		
+		return matrix;
 	}
 
-	DirectX::XMFLOAT4X4 Transform::GetRotationMatrix()
+	DirectX::XMMATRIX Transform::GetLocalMatrix() const
 	{
-		float radianX = DirectX::XMConvertToRadians(m_Rotation.x);
-		float radianY = DirectX::XMConvertToRadians(m_Rotation.y);
-		float radianZ = DirectX::XMConvertToRadians(m_Rotation.z);
-		auto vecRot = DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ);
-		auto matRotMat = DirectX::XMMatrixRotationQuaternion(vecRot);
+		auto vecLocalScale = DirectX::XMLoadFloat3(&m_LocalScale);
+		auto vecLocalRotation = DirectX::XMLoadFloat4(&m_LocalRotation);
+		auto vecLocalTranslation = DirectX::XMLoadFloat3(&m_LocalTranslation);
 
-		DirectX::XMFLOAT4X4 rotMat;
-		DirectX::XMStoreFloat4x4(&rotMat, matRotMat);
-
-		return rotMat;
+		return DirectX::XMMatrixScalingFromVector(vecLocalScale) * DirectX::XMMatrixRotationQuaternion(vecLocalRotation)
+			* DirectX::XMMatrixTranslationFromVector(vecLocalTranslation);
 	}
 
-	DirectX::XMFLOAT4X4 Transform::GetScaleMatrix()
+	void Transform::Translate(const DirectX::XMFLOAT3& translation, eSpace relativeTo)
 	{
-		return DirectX::XMFLOAT4X4();
-	}
+		auto trans = translation;
 
-	// 일단 회전 행렬만 곱한 후 위치에서 더했다.
-	// 추후 확인이 필요하다.
-	void Transform::Translate(DirectX::XMFLOAT3 translation, eSpace relativeTo)
-	{
-		auto vecTranslation = DirectX::XMLoadFloat3(&translation);
+		if (relativeTo == eSpace::Self)
+		{
+			if (HasParent())
+			{
+				auto transVector = DirectX::XMVector3Transform(
+					DirectX::XMLoadFloat3(&trans), DirectX::XMMatrixInverse(nullptr, GetParent()->GetMatrix()));
 
-		//auto mat = relativeTo == eSpace::World ? GetRotationMatrix() : GetLocalRotationMatrix();
-		//auto vecMat = DirectX::XMLoadFloat4x4(&mat);
-		//vecTranslation = DirectX::XMVector3Transform(vecTranslation, vecMat);
+				DirectX::XMStoreFloat3(&trans, transVector);
+			}
+		}
 
-		auto vecPosition = DirectX::XMLoadFloat3(&m_Position);
-		vecPosition = DirectX::XMVectorAdd(vecPosition, vecTranslation);
-
-		DirectX::XMStoreFloat3(&m_Position, vecPosition);
+		m_LocalTranslation.x += trans.x;
+		m_LocalTranslation.y += trans.y;
+		m_LocalTranslation.z += trans.z;
 	}
 
 	void Transform::Translate(float x, float y, float z, eSpace relativeTo)
@@ -204,83 +213,61 @@ namespace Dive
 		Translate(DirectX::XMFLOAT3(x, y, z), relativeTo);
 	}
 
-	// 일단 구현했지만 눈으로 확인이 필요하다.
-	void Transform::Rotate(DirectX::XMFLOAT3 eulerAngles, eSpace relativeTo)
+	void Transform::Rotate(const DirectX::XMFLOAT3& degrees, eSpace relativeTo)
 	{
-		float radianX = DirectX::XMConvertToRadians(eulerAngles.x);
-		float radianY = DirectX::XMConvertToRadians(eulerAngles.y);
-		float radianZ = DirectX::XMConvertToRadians(eulerAngles.z);
-		auto vecRot = DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ);
-		auto matRotMat = DirectX::XMMatrixRotationQuaternion(vecRot);
+		auto radianX = DirectX::XMConvertToRadians(degrees.x);
+		auto radianY = DirectX::XMConvertToRadians(degrees.y);
+		auto radianZ = DirectX::XMConvertToRadians(degrees.z);
 
-		//auto mat = relativeTo == eSpace::World ? GetRotationMatrix() : GetLocalRotationMatrix();
-		//auto matMat = DirectX::XMLoadFloat4x4(&mat);
+		Rotate(DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ), relativeTo);
+	}
 
-		//matRotMat = matRotMat * matMat;
+	// 아직 잘 모르겠다.
+	void Transform::Rotate(const DirectX::XMVECTOR& rotQuat, eSpace relativeTo)
+	{
+		auto rotQuatVector = rotQuat;
 
-		// 문제는 이 결과를 다시 오일러 각으로 뽑아낸 후 m_Rotation에 저장해야 한다는 것이다.
+		if (relativeTo == eSpace::Self)
+		{
+			if (HasParent())
+			{
+				auto parentRotQuatVector = GetParent()->GetRotationVector();
+
+				// rotQuatVector = 부모 회전 사원수 역 * rotQuatVector * 부모 회전 사원수?
+			}
+		}
+
+		// 로컬 * rotQuatVector
 	}
 
 	void Transform::Rotate(float xAngle, float yAngle, float zAngle, eSpace relativeTo)
 	{
-		Rotate(DirectX::XMFLOAT3(xAngle, yAngle, zAngle), relativeTo);
+		auto radianX = DirectX::XMConvertToRadians(xAngle);
+		auto radianY = DirectX::XMConvertToRadians(yAngle);
+		auto radianZ = DirectX::XMConvertToRadians(zAngle);
+
+		Rotate(DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ), relativeTo);
 	}
 
 	void Transform::Rotate(DirectX::XMFLOAT3 axis, float angle, eSpace relativeTo)
 	{
-		// axis 축을 angle만큼 회전시킨 후 다시 m_Rotation을 회전하는 것 같다.
+		// axis 축을 angle만큼 회전시킨 후 다시 m_LocalRotation을 회전하는 것 같다.
 	}
 
 	// 위치 행렬 * 회전 행렬에 축 벡터를 곱하면 될 것 같다.
 	DirectX::XMFLOAT3 Transform::GetForward()
 	{
-		auto vecPos = DirectX::XMLoadFloat3(&m_Position);
-		auto matPosMat = DirectX::XMMatrixTranslationFromVector(vecPos);
-
-		auto rotMat = GetRotationMatrix();
-		auto matRotMat = DirectX::XMLoadFloat4x4(&rotMat);
-
-		auto mat = matRotMat * matPosMat;
-
-		DirectX::XMFLOAT3 forward(0.0f, 0.0f, 1.0f);
-		auto vecForward = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&forward), mat);
-		DirectX::XMStoreFloat3(&forward, vecForward);
-
-		return forward;
+		return DirectX::XMFLOAT3();
 	}
 
 	DirectX::XMFLOAT3 Transform::GetUp()
 	{
-		auto vecPos = DirectX::XMLoadFloat3(&m_Position);
-		auto matPosMat = DirectX::XMMatrixTranslationFromVector(vecPos);
-
-		auto rotMat = GetRotationMatrix();
-		auto matRotMat = DirectX::XMLoadFloat4x4(&rotMat);
-
-		auto mat = matRotMat * matPosMat;
-
-		DirectX::XMFLOAT3 up(0.0f, 1.0f, 0.0f);
-		auto vecUp = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&up), mat);
-		DirectX::XMStoreFloat3(&up, vecUp);
-
-		return up;
+		return DirectX::XMFLOAT3();
 	}
 
 	DirectX::XMFLOAT3 Transform::GetRight()
 	{
-		auto vecPos = DirectX::XMLoadFloat3(&m_Position);
-		auto matPosMat = DirectX::XMMatrixTranslationFromVector(vecPos);
-
-		auto rotMat = GetRotationMatrix();
-		auto matRotMat = DirectX::XMLoadFloat4x4(&rotMat);
-
-		auto mat = matRotMat * matPosMat;
-
-		DirectX::XMFLOAT3 right(1.0f, 0.0f, 0.0f);
-		auto vecRight = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&right), mat);
-		DirectX::XMStoreFloat3(&right, vecRight);
-
-		return right;
+		return DirectX::XMFLOAT3();
 	}
 
 	void Transform::LookAt(Transform target, DirectX::XMFLOAT3 worldUp)
@@ -288,6 +275,11 @@ namespace Dive
 		// 회전시켜서 target의 현재위치를 전방 벡터로 한다.
 	}
 
+	// 유니티의 경우 부모에게서 독립하면
+	// 월드 좌표계가 로컬 좌표계가 된다...?
+	// 그리고 현재 루트가 부모에게 들어갈 때
+	// 부모의 변환이 그대로 적용되어 버린다. 
+	// 구현상으로는 당연한데...
 	void Transform::SetParent(Transform* pParent)
 	{
 		if (pParent)
@@ -321,6 +313,13 @@ namespace Dive
 		{
 			if (HasParent())
 			{
+				// test
+				{
+					m_LocalTranslation = GetPosition();
+					m_LocalRotation = GetRotation();
+					m_LocalScale = GetScale();
+				}
+
 				auto& sibling = GetParent()->m_Children;
 				for (auto it = sibling.begin(); it != sibling.end();)
 				{
@@ -400,73 +399,10 @@ namespace Dive
 
 		for (auto pChild : m_Children)
 		{
-			pChild->m_pParent = nullptr;
+			pChild->SetParent(nullptr);
 		}
 
 		m_Children.clear();
 		m_Children.shrink_to_fit();
-	}
-
-	void Transform::update()
-	{
-		auto matPositionMatrix = getPositionMatrixMatrix();
-		auto matRotationMatrix = getRotationMatrixMatrix();
-		auto matScaleMatrix = getScaleMatrixMatrix();
-
-		auto matrix = matScaleMatrix * matRotationMatrix * matPositionMatrix;
-
-		if (HasParent())
-		{
-			matrix *= GetParent()->getLocalToWorldMatrix();
-		}
-		
-		DirectX::XMStoreFloat4x4(&m_LocalToWorld, matrix);
-		
-		if (HasChildren())
-		{
-			for (auto pChild : m_Children)
-			{
-				pChild->update();
-			}
-		}
-	}
-
-	DirectX::XMVECTOR Transform::getPositionVector() const
-	{
-		return DirectX::XMLoadFloat3(&m_Position);
-	}
-
-	DirectX::XMVECTOR Transform::getRotationQuaternion() const
-	{
-		float radianX = DirectX::XMConvertToRadians(m_Rotation.x);
-		float radianY = DirectX::XMConvertToRadians(m_Rotation.y);
-		float radianZ = DirectX::XMConvertToRadians(m_Rotation.z);
-
-		return DirectX::XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ);
-	}
-
-	DirectX::XMVECTOR Transform::getScaleVector() const
-	{
-		return DirectX::XMLoadFloat3(&m_Scale);
-	}
-
-	DirectX::XMMATRIX Transform::getLocalToWorldMatrix() const
-	{
-		return DirectX::XMLoadFloat4x4(&m_LocalToWorld);
-	}
-
-	DirectX::XMMATRIX Transform::getPositionMatrixMatrix() const
-	{
-		return DirectX::XMMatrixTranslationFromVector(getPositionVector());
-	}
-
-	DirectX::XMMATRIX Transform::getRotationMatrixMatrix() const
-	{
-		return DirectX::XMMatrixRotationQuaternion(getRotationQuaternion());
-	}
-
-	DirectX::XMMATRIX Transform::getScaleMatrixMatrix() const
-	{
-		return DirectX::XMMatrixScalingFromVector(getScaleVector());
 	}
 }

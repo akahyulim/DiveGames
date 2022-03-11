@@ -109,8 +109,9 @@ namespace Dive
 			MatrixBufferType* pPtr = static_cast<MatrixBufferType*>(mappedResource.pData);
 
 			// world
-			auto world = pTransform->GetLocalToWorld();
-			auto matWorld = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&world));
+			// 이건 계층구조로 인해 누적된 행렬이다.
+			// 계층구조로 구성된 오브젝트들을 어떻게 다뤄야할 지 결정해야 한다.
+			auto matWorld = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
 			pPtr->world = matWorld;
 
 			// view
