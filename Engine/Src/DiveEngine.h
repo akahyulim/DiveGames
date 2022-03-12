@@ -27,6 +27,7 @@
 #include "Renderer/Renderer.h"
 
 //= Input =========================
+#include "Input/input.h"
 
 //= Scene =========================
 #include "Scene/Scene.h"

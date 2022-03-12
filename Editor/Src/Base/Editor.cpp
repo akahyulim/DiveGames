@@ -9,36 +9,41 @@
 #include "Panels/InspectorPanel.h"
 #include "Panels/AssetPanel.h"
 
-// 현재 사용하는 곳이 없다.
 static Editor* s_pEditor = nullptr;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-		return true;
+	if (s_pEditor)
+	{
+		Dive::WindowData data;
+		data.hWnd	= hWnd;
+		data.msg	= msg;
+		data.wParam = wParam;
+		data.lParam = lParam;
+		data.Width	= s_pEditor->GetWidth();
+		data.Height = s_pEditor->GetHeight();
 
-	switch (msg)
-	{
-	case WM_SIZE:
-	{
-		auto& graphicsDevice = Dive::Renderer::GetGraphicsDevice();
-		if (wParam != SIZE_MINIMIZED)
+		if (msg == WM_DISPLAYCHANGE || msg == WM_SIZE)
 		{
-			graphicsDevice.CleanupMainRenderTargetView();
-			graphicsDevice.GetSwapChain()->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
-			graphicsDevice.CreateMainRenderTargetView();
+			data.Width	= static_cast<unsigned int>(lParam & 0xffff);
+			data.Height = static_cast<unsigned int>((lParam >> 16) & 0xffff);
 		}
 
-		// 여기에서 Engine에 변경된 크기를 전달할 수 있다.
-		return 0;
-	}
-	case WM_DESTROY:
-	{
-		::PostQuitMessage(0);
-		return 0;
-	}
+		if (msg == WM_SYSCOMMAND)
+		{
+			data.bMinimize = wParam == SC_MINIMIZE;
+			data.bMaximize = wParam == SC_MAXIMIZE;
+		}
+
+		if (msg == WM_CLOSE)
+		{
+			::PostQuitMessage(0);
+			return 0;
+		}
+
+		s_pEditor->OnWindowMessage(data);
 	}
 
 	return ::DefWindowProc(hWnd, msg, wParam, lParam);
@@ -58,9 +63,9 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 
 	// create engine
 	Dive::WindowData data;
-	data.hWnd = m_hWnd;
-	data.Width = m_Width;
-	data.Height = m_Height;
+	data.hWnd	= m_hWnd;
+	data.Width	= GetWidth();
+	data.Height = GetHeight();
 	data.bVSync = m_bVSync;
 	data.bFullScreen = m_bFullScreen;
 	Dive::CreateEngine(&data);
@@ -80,7 +85,17 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 
 Editor::~Editor()
 {
+}
+
+void Editor::OnWindowMessage(const Dive::WindowData& data)
+{
+	auto pDiveEngine = Dive::GetCurrentEngine();
+	if (!pDiveEngine)
+		return;
 		
+	ImGui_ImplWin32_WndProcHandler(data.hWnd, data.msg, data.wParam, data.lParam);
+	
+	pDiveEngine->SetWindowData(data);
 }
 
 void Editor::Run()
@@ -203,6 +218,28 @@ void Editor::Shutdown()
 		::DestroyWindow(m_hWnd);
 		::UnregisterClass(windowName.c_str(), m_hInstance);
 	}
+}
+
+unsigned int Editor::GetWidth() const
+{
+	if(m_hWnd == 0)
+		return m_Width;
+
+	RECT rt;
+	::GetClientRect(m_hWnd, &rt);
+
+	return static_cast<unsigned int>(rt.right - rt.left);
+}
+
+unsigned int Editor::GetHeight() const
+{
+	if (m_hWnd == 0)
+		return m_Height;
+
+	RECT rt;
+	::GetClientRect(m_hWnd, &rt);
+
+	return static_cast<unsigned int>(rt.bottom - rt.top);
 }
 
 void Editor::createWindow(HINSTANCE hInstance)

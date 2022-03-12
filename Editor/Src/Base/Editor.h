@@ -19,9 +19,14 @@ public:
 	Editor(HINSTANCE hInstance, const std::string& title = "DiveEditor");
 	~Editor();
 
+	void OnWindowMessage(const Dive::WindowData& data);
+
 	void Run();
 	void Close() { m_bDone = true; }
 	void Shutdown();
+
+	unsigned int GetWidth() const;
+	unsigned int GetHeight() const;
 
 	// 꼭! 좀 더 직관적인 방법을 찾자!
 	MenuBarPanel* GetMenuBar() { return m_pMenuBar; }

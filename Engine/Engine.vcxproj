@@ -180,6 +180,7 @@
     <ClInclude Include="Src\Base\Time.h" />
     <ClInclude Include="Src\Events\AppEvent.h" />
     <ClInclude Include="Src\Events\Event.h" />
+    <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
@@ -203,6 +204,7 @@
     <ClCompile Include="Src\Base\Engine.cpp" />
     <ClCompile Include="Src\Base\Log.cpp" />
     <ClCompile Include="Src\Base\Time.cpp" />
+    <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
