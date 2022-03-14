@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <sstream>
-#include "Event.h"
+#include "EventSystem.h"
 
 namespace Dive
 {

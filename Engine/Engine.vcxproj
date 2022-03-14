@@ -179,7 +179,7 @@
     <ClInclude Include="Src\Base\Log.h" />
     <ClInclude Include="Src\Base\Time.h" />
     <ClInclude Include="Src\Events\AppEvent.h" />
-    <ClInclude Include="Src\Events\Event.h" />
+    <ClInclude Include="Src\Events\EventSystem.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
