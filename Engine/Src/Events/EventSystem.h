@@ -2,38 +2,31 @@
 #include <memory>
 #include <unordered_map>
 
-#define DV_BIND_EVENT_FN(fn) [this](auto&&... args) -> decltype(auto) { return this->fn(std::forward<decltype(args)>(args)...); }
+#define EVENT_HANDLER(function)				[this](const Event& e) {function(e);}
+#define EVENT_HANDLER_STATIC(function)		[](const Event& e) { function(e);}
+
+#define SUBSCRIBE_EVENT(type, function)		Dive::EventDispatcher::GetInstance().Subscribe(type, function);
+#define UNSUBSCRIBE_EVENT(type, function)	Dive::EventDispatcher::GetInstance().Unsubscribe(type, function);
+
+#define FIRE_EVENT(e)						Dive::EventDispatcher::GetInstance().Fire(e);
 
 namespace Dive
 {
-	enum class eEventType
-	{
-		None = 0,
-		WindowResize,
-		AppUpdate, AppRender,
-	};
-
-#define EVENT_CLASS_TYPE(type) static eEventType GetStaticType() { return eEventType::type; } \
-								virtual eEventType GetEventType() const override { return GetStaticType(); } \
-								virtual const char* GetName() const override { return #type; }
-
 	// event interface
 	class Event
 	{
 	public:
 		virtual ~Event() = default;
 
-		virtual eEventType GetEventType() const = 0;
-		virtual const char* GetName() const = 0;
-		virtual std::string ToString() const { return GetName(); }
+		using EventType = const char*;
+
+		virtual EventType GetType() const = 0;
 	};
-
-#define EVENT_HANDLE(function) [this](Event& e) {function(e);}
-
-	using Subscriber = std::function<void(Event&)>;
 
 	class EventDispatcher
 	{
+		using Subscriber = std::function<void(const Event&)>;
+
 	public:
 		static EventDispatcher& GetInstance()
 		{
@@ -46,16 +39,14 @@ namespace Dive
 			m_Subscribers.clear();
 		}
 
-		template<typename T>
-		void Subscribe(Subscriber&& function)
+		void Subscribe(const Event::EventType& type, Subscriber&& function)
 		{
-			m_Subscribers[T::GetStaticType()].push_back(std::forward<Subscriber>(function));
+			m_Subscribers[type].push_back(std::forward<Subscriber>(function));
 		}
 
-		template<typename T>
-		void Unsubscribe(Subscriber&& function)
+		void Unsubscribe(const Event::EventType& type, Subscriber&& function)
 		{
-			auto& subscribers = m_Subscribers[T::GetStaticType()];
+			auto& subscribers = m_Subscribers[type];
 			const size_t functionAddress = *(reinterpret_cast<long*>(reinterpret_cast<char*>(&function)));
 
 			for (auto it = subscribers.begin(); it != subscribers.end(); it++)
@@ -69,18 +60,18 @@ namespace Dive
 			}
 		}
 
-		void Fire(Event& e)
+		void Fire(const Event& e)
 		{
-			if (m_Subscribers.find(e.GetEventType()) == m_Subscribers.end())
+			if (m_Subscribers.find(e.GetType()) == m_Subscribers.end())
 				return;
 
-			for (const auto& subscriber : m_Subscribers[e.GetEventType()])
+			for (const auto& subscriber : m_Subscribers[e.GetType()])
 			{
 				subscriber(e);
 			}
 		}
 
 	private:
-		std::unordered_map<eEventType, std::vector<Subscriber>> m_Subscribers;
+		std::unordered_map<Event::EventType, std::vector<Subscriber>> m_Subscribers;
 	};
 }

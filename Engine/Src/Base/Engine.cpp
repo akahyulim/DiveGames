@@ -26,10 +26,13 @@ namespace Dive
 	{
 		m_WindowData = data;
 
-		// 임시 처리 : 일단 Event를 사용하지 말자.
 		if (data.msg == WM_SIZE && data.wParam != SIZE_MINIMIZED)
 		{
-			Renderer::SetResolution(data.Width, data.Height);
+			WindowResizeEvent e(data.Width, data.Height);
+			FIRE_EVENT(e);
 		}
+
+		// 이곳에서 msg를 확인한 후 input을 호출할 수 있지만
+		// 입력처리는 지점별로 달라질 수 있다...
 	}
 }

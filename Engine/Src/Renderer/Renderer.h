@@ -2,6 +2,9 @@
 #include "Graphics/GraphicsDevice.h"
 #include "Graphics/Texture.h"
 
+#include "Events/EventSystem.h"
+#include "Events/AppEvent.h"
+
 namespace Dive
 {
 	struct WindowData;
@@ -25,11 +28,10 @@ namespace Dive
 
 		//static void SetViewport(float width, float height);
 
-		// 일반적으로는 Backbuffer의 RenderTarget과 ResourceView들의 크기가 같겠지만
-		// ImGui를 활용한 Editor 때문에 크기가 달라질 수 있다.
-		static void SetResolution(unsigned int width, unsigned int height);
 		// 이름을 바꾸고 싶다. 생성은 createTextures가 하기 때문이다.
 		static void SetTextures(unsigned int width, unsigned int height);
+
+		static void OnWindowResize(const Event& e);
 
 		static GraphicsDevice& GetGraphicsDevice() { return m_GraphicsDevice; }
 

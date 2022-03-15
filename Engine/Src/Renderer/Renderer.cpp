@@ -45,11 +45,14 @@ namespace Dive
 		createRasterizerStates();
 		createShaders();
 		createMatrixBuffer();	// 일단 임시다.
+
+		SUBSCRIBE_EVENT(WindowResizeEvent::s_Type, EVENT_HANDLER_STATIC(OnWindowResize));
 	}
 
 	void Renderer::Shutdown()
 	{
-		// 함수로 만들어야 하나...?
+		UNSUBSCRIBE_EVENT(WindowResizeEvent::s_Type, EVENT_HANDLER_STATIC(OnWindowResize));
+
 		DV_DELETE(m_pDepthStencilTex);
 		DV_DELETE(m_pSampleTex);
 
@@ -201,11 +204,6 @@ namespace Dive
 		pImmediateContext->DrawIndexed(indexCount, 0, 0);
 	}
 
-	void Renderer::SetResolution(unsigned int width, unsigned int height)
-	{
-		m_GraphicsDevice.ResizeBackBuffer(width, height);
-	}
-
 	// 이 곳에선 크기 확인 및 저장 후 createRenderTargets()를 호출하는 편이 나을 것 같다.
 	void Renderer::SetTextures(unsigned int width, unsigned int height)
 	{
@@ -216,6 +214,13 @@ namespace Dive
 		m_TextureHeight = height;
 
 		createRenderTargets();
+	}
+
+	void Renderer::OnWindowResize(const Event& e)
+	{
+		const WindowResizeEvent& windowResizeEvent = dynamic_cast<const WindowResizeEvent&>(e);
+
+		m_GraphicsDevice.ResizeBackBuffer(windowResizeEvent.GetWidth(), windowResizeEvent.GetHeight());
 	}
 
 	void Renderer::createRenderTargets()
