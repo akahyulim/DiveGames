@@ -19,9 +19,6 @@
     <ClInclude Include="Src\Base\Base.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Events\AppEvent.h">
-      <Filter>Src\Events</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Dive.h">
       <Filter>Src</Filter>
     </ClInclude>
@@ -71,6 +68,9 @@
       <Filter>Src\Input</Filter>
     </ClInclude>
     <ClInclude Include="Src\Events\EventSystem.h">
+      <Filter>Src\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Events\WindowEvent.h">
       <Filter>Src\Events</Filter>
     </ClInclude>
   </ItemGroup>

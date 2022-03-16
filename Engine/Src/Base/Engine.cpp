@@ -1,6 +1,10 @@
 #include "divepch.h"
 #include "Engine.h"
 #include "Log.h"
+#include "Renderer/Renderer.h"
+#include "Input/Input.h"
+#include "Events/EventSystem.h"
+#include "Events/WindowEvent.h"
 
 namespace Dive
 {
@@ -10,6 +14,7 @@ namespace Dive
 		m_Time.Initialize();
 
 		Renderer::Initialize(pData);
+		Input::Initialize(pData->hWnd);
 	}
 
 	void Engine::Shutdown()
@@ -20,19 +25,27 @@ namespace Dive
 	void Engine::Run()
 	{
 		m_Time.Tick();
+		Input::Update(0.0f);
+
+		if (Input::KeyDown(VK_RBUTTON))
+		{
+			auto pos = Input::GetMousePosition();
+			DV_CORE_INFO("MousePos: {0:f}, {1:f}", pos.x, pos.y);
+		}
+
+		if (Input::KeyDown(VK_UP))
+		{
+			Input::SetMousePosition(0.0f, 0.0f);
+			auto pos = Input::GetMousePosition();
+			DV_CORE_INFO("MousePos: {0:f}, {1:f}", pos.x, pos.y);
+		}
 	}
 
 	void Engine::SetWindowData(const WindowData& data)
 	{
 		m_WindowData = data;
 
-		if (data.msg == WM_SIZE && data.wParam != SIZE_MINIMIZED)
-		{
-			WindowResizeEvent e(data.Width, data.Height);
-			FIRE_EVENT(e);
-		}
-
-		// 이곳에서 msg를 확인한 후 input을 호출할 수 있지만
-		// 입력처리는 지점별로 달라질 수 있다...
+		WindowDataEvent e(data);
+		FIRE_EVENT(e);
 	}
 }

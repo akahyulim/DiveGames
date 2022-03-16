@@ -1,6 +1,5 @@
 #pragma once
 #include "Time.h"
-#include "Renderer/Renderer.h"
 
 namespace Dive
 {

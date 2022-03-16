@@ -1,26 +1,36 @@
 #include "divepch.h"
 #include "Input.h"
+#include "Events/WindowEvent.h"
+#include "Base/Log.h"
 
-// 일단 static으로 event를 등록할 수 있나 확인해야 한다.
-// 그리고 WndProc으로부터 event를 어떻게 전달할지 구현해야 한다.
-// 스파르탄의 경우 msg별로 event를 만든 것이 아니고
-// 매 프레임 WindowData라는 구조체를 채운 후 이벤트로 보낸다.
-// 문제는 현재 이벤트를 사용하고 있지 않다는 것이다.
 namespace Dive
 {
-	unsigned int Input::m_MouseStartIndex = static_cast<unsigned int>(eKeyCode::Click_Left);
-	unsigned int Input::m_GamePadStartIndex = static_cast<unsigned int>(eKeyCode::DPad_Up);
+	HWND Input::m_WindowHandle = NULL;
 
-	// mouse
+	std::array<bool, 256> Input::m_Keys;
+	std::array<bool, 256> Input::m_OldKeys;
+
 	DirectX::XMFLOAT2 Input::m_MousePosition = DirectX::XMFLOAT2(0.0f, 0.0f);
 	DirectX::XMFLOAT2 Input::m_MouseDelta = DirectX::XMFLOAT2(0.0f, 0.0f);
 	float Input::m_MouseWheelDelta = 0.0f;
 
-	// gamepad
 	bool Input::m_bGamePadConnected = false;
 
-	void Input::Initialize()
+	bool Input::m_bNewFrame = false;
+	bool Input::m_bDeviceChange = false;
+
+	void Input::Initialize(HWND hWnd)
 	{
+		m_WindowHandle = hWnd;
+
+		RAWINPUTDEVICE rid;
+		rid.usUsagePage = 0x01;
+		rid.usUsage = 0x02;
+		rid.dwFlags = RIDEV_INPUTSINK;
+		rid.hwndTarget = m_WindowHandle;
+		RegisterRawInputDevices(&rid, 1, sizeof(RAWINPUTDEVICE));
+
+		SUBSCRIBE_EVENT(WindowDataEvent::s_Type, EVENT_HANDLER_STATIC(OnWindowData));
 	}
 
 	void Input::Update(float elapsedTime)
@@ -28,39 +38,101 @@ namespace Dive
 		// 패드는 여기서 처리한다.
 	}
 
-	// WndProc -> editor -> engine 순으로 호출된다.
-	// 구분하는 메시지는 WM_INPUT과 WM_DEVICECHANGE 두 개뿐이다.
-	void Input::OnInputMsg()
+	void Input::OnWindowData(const Event& e)
 	{
-		// 입력 여부는 WinAPI로 직접 확인한다.
-		
-		// keyboard
+		if (m_bNewFrame)
 		{
-			m_Keys[0] = (::GetKeyState(VK_F1) & 0x8000) != 0;
+			m_OldKeys = m_Keys;
+			m_MouseDelta = DirectX::XMFLOAT2(0.0f, 0.0f);
+			m_bDeviceChange = false;
+		}
+
+		const auto& windowDataEvent = dynamic_cast<const WindowDataEvent&>(e);
+		const auto& windowData = windowDataEvent.GetWindowData();
+
+		for (int i = 0; i != 255; i++)
+		{
+			m_Keys[i] = (::GetKeyState(i) & 0x8000) != 0;
 		}
 
 		// mouse
 		{
-			m_Keys[m_MouseStartIndex]		= (::GetKeyState(VK_LBUTTON) & 0x8000) != 0;
-			m_Keys[m_MouseStartIndex + 1]	= (::GetKeyState(VK_MBUTTON) & 0x8000) != 0;
-			m_Keys[m_MouseStartIndex + 2]	= (::GetKeyState(VK_RBUTTON) & 0x8000) != 0;
+			// current cursor position
+			if (m_WindowHandle == ::GetActiveWindow())
+			{
+				POINT mousePos;
+				if (::GetCursorPos(&mousePos))
+				{
+					::ScreenToClient(m_WindowHandle, &mousePos);
+					m_MousePosition.x = static_cast<float>(mousePos.x);
+					m_MousePosition.y = static_cast<float>(mousePos.y);
+				}
+			}
 
-			// delta 계산을 위해선 WindowData가 필요하다...
+			// mouse delta
+			if (windowData.msg == WM_INPUT)
+			{
+				UINT dwSize = 48;
+				static BYTE lpb[48];
+
+				GetRawInputData((HRAWINPUT)windowData.lParam, RID_INPUT, lpb, &dwSize, sizeof(RAWINPUTHEADER));
+				RAWINPUT* pRaw = (RAWINPUT*)lpb;
+
+				if (pRaw->header.dwType == RIM_TYPEMOUSE)
+				{
+					m_MouseDelta.x = static_cast<float>(pRaw->data.mouse.lLastX);
+					m_MouseDelta.y = static_cast<float>(pRaw->data.mouse.lLastY);
+				}
+			}
+
+			// wheel delta
+			{
+				m_MouseWheelDelta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(windowData.wParam)) / static_cast<float>(WHEEL_DELTA);
+			}
 		}
+
+		if (windowData.msg == WM_DEVICECHANGE)
+		{
+			m_bDeviceChange = true;
+		}
+
+		m_bNewFrame = false;
 	}
 	
-	bool Input::GetKey(eKeyCode key)
+	bool Input::GetKey(int key)
 	{
-		return m_Keys[static_cast<unsigned int>(key)];
+		return m_Keys[key];
 	}
 	
-	bool Input::KeyDown(eKeyCode key)
+	bool Input::KeyDown(int key)
 	{
-		return GetKey(key) && !m_OldKeys[static_cast<unsigned int>(key)];
+		return GetKey(key) && !m_OldKeys[key];
 	}
 	
-	bool Input::KeyUp(eKeyCode key)
+	bool Input::KeyUp(int key)
 	{
-		return !GetKey(key) && m_OldKeys[static_cast<unsigned int>(key)];
+		return !GetKey(key) && m_OldKeys[key];
+	}
+
+	bool Input::KeyPress(int key)
+	{
+		return GetKey(key) && m_OldKeys[key];
+	}
+
+	void Input::SetMousePosition(const DirectX::XMFLOAT2& pos)
+	{
+		SetMousePosition(pos.x, pos.y);
+	}
+	
+	void Input::SetMousePosition(float x, float y)
+	{
+		if (m_WindowHandle == GetActiveWindow())
+		{
+			POINT pt = POINT{ static_cast<LONG>(x), static_cast<LONG>(y) };
+			if (::ClientToScreen(m_WindowHandle, &pt))
+			{
+				::SetCursorPos(pt.x, pt.y);
+			}
+		}
 	}
 }

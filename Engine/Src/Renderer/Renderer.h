@@ -3,7 +3,7 @@
 #include "Graphics/Texture.h"
 
 #include "Events/EventSystem.h"
-#include "Events/AppEvent.h"
+#include "Events/WindowEvent.h"
 
 namespace Dive
 {
@@ -28,10 +28,11 @@ namespace Dive
 
 		//static void SetViewport(float width, float height);
 
+		static void SetResolution(unsigned int width, unsigned int height);
 		// 이름을 바꾸고 싶다. 생성은 createTextures가 하기 때문이다.
 		static void SetTextures(unsigned int width, unsigned int height);
 
-		static void OnWindowResize(const Event& e);
+		static void OnWindowData(const Event& e);
 
 		static GraphicsDevice& GetGraphicsDevice() { return m_GraphicsDevice; }
 
