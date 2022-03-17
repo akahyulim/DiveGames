@@ -3,6 +3,7 @@
 #include "Graphics/GraphicsDevice.h"
 #include "Base/Base.h"
 #include "Base/Engine.h"
+#include "Scene/GameObject.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/SpriteRenderer.h"
 
@@ -86,6 +87,9 @@ namespace Dive
 		pSwapChain->Present(m_GraphicsDevice.IsVSync() ? 1 : 0, 0);
 	}
 
+	// 여긴 buffers(cbuffer, vertex, index), resource(texture)들만 bind한 후
+	// draw하도록 수정이 필요하다. 즉, 너무 복잡하다.
+	// viewport, shader 그리고 각종 state 들은 상위에서 bind하는 것이 맞다.
 	void Renderer::DrawSprite(Transform* pTransform, SpriteRenderer* pRenderer)
 	{
 		if (!pTransform || !pRenderer)
@@ -104,6 +108,7 @@ namespace Dive
 		pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// wvp constant buffer
+		// view와 proj는 카메라를 통해 전달 받아야 한다.
 		{
 			D3D11_MAPPED_SUBRESOURCE mappedResource;
 			
@@ -158,8 +163,7 @@ namespace Dive
 			view = DirectX::XMMatrixTranspose(view);
 			pPtr->view = view;
 
-			// proj
-			// Setup the viewport for rendering.
+			// 뷰포트는 카메라를 통하는게 맞는 것 같다.
 			D3D11_VIEWPORT viewport;
 			viewport.Width = (float)m_pSampleTex->GetWidth();
 			viewport.Height = (float)m_pSampleTex->GetHeight();
@@ -167,9 +171,9 @@ namespace Dive
 			viewport.MaxDepth = 1.0f;
 			viewport.TopLeftX = 0.0f;
 			viewport.TopLeftY = 0.0f;
-
-			// Create the viewport.
 			pImmediateContext->RSSetViewports(1, &viewport);
+
+			// proj
 			// Setup the projection matrix.
 			float fieldOfView = 3.141592654f / 4.0f;
 			float screenAspect = (float)m_pSampleTex->GetWidth() / (float)m_pSampleTex->GetHeight();
@@ -201,6 +205,82 @@ namespace Dive
 		pImmediateContext->VSSetShader(m_pSpriteVertexShader, nullptr, 0);
 		pImmediateContext->PSSetShader(m_pSpritePixelShader, nullptr, 0);
 		
+		pImmediateContext->DrawIndexed(indexCount, 0, 0);
+	}
+
+	void Renderer::DrawSprite(DirectX::XMMATRIX matView, DirectX::XMMATRIX matProj, GameObject* pObj)
+	{
+		if (!pObj)
+			return;
+
+		auto pTransform = pObj->GetComponent<Transform>();
+		auto pRenderer = pObj->GetComponent<SpriteRenderer>();
+
+		if (!pTransform || !pRenderer)
+			return;
+
+		if (!pRenderer->IsEnabled())
+			return;
+
+		auto pImmediateContext = m_GraphicsDevice.GetImmediateContext();
+
+		auto pShaderResourceView = pRenderer->GetShaderResourceView();
+		pImmediateContext->PSSetShaderResources(0, 1, &pShaderResourceView);
+		pImmediateContext->PSSetSamplers(0, 1, &m_pLinearSampler);
+		pImmediateContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
+		pImmediateContext->RSSetState(m_pRasterizerState);
+		pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		// 뷰포트는 카메라를 통하는게 맞는 것 같다.
+		D3D11_VIEWPORT viewport;
+		viewport.Width = (float)m_pSampleTex->GetWidth();
+		viewport.Height = (float)m_pSampleTex->GetHeight();
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+		viewport.TopLeftX = 0.0f;
+		viewport.TopLeftY = 0.0f;
+		pImmediateContext->RSSetViewports(1, &viewport);
+
+
+		// wvp constant buffer
+		// view와 proj는 카메라를 통해 전달 받아야 한다.
+		{
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+
+			// map
+			pImmediateContext->Map(m_pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+			MatrixBufferType* pPtr = static_cast<MatrixBufferType*>(mappedResource.pData);
+
+			// world
+			// 이건 계층구조로 인해 누적된 행렬이다.
+			// 계층구조로 구성된 오브젝트들을 어떻게 다뤄야할 지 결정해야 한다.
+			auto matWorld = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
+			pPtr->world = matWorld;
+			pPtr->view = DirectX::XMMatrixTranspose(matView);
+			pPtr->proj = DirectX::XMMatrixTranspose(matProj);
+
+			// unmap
+			pImmediateContext->Unmap(m_pMatrixBuffer, 0);
+
+			pImmediateContext->VSSetConstantBuffers(0, 1, &m_pMatrixBuffer);
+		}
+
+		auto pVertexBuffer = pRenderer->GetVertexBuffer();
+		DV_ASSERT(pVertexBuffer);
+		unsigned int stride = pRenderer->GetVertexStride();
+		unsigned int offset = 0;
+		pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
+
+		auto pIndexBuffer = pRenderer->GetIndexBuffer();
+		DV_ASSERT(pIndexBuffer);
+		auto indexCount = pRenderer->GetIndexCount();
+		auto indexFormat = pRenderer->GetIndexForamt();
+		pImmediateContext->IASetIndexBuffer(pIndexBuffer, indexFormat, 0);
+
+		pImmediateContext->IASetInputLayout(m_pSpriteInputLayout);
+		pImmediateContext->VSSetShader(m_pSpriteVertexShader, nullptr, 0);
+		pImmediateContext->PSSetShader(m_pSpritePixelShader, nullptr, 0);
+
 		pImmediateContext->DrawIndexed(indexCount, 0, 0);
 	}
 

@@ -9,6 +9,7 @@ namespace Dive
 {
 	struct WindowData;
 
+	class GameObject;
 	class Transform;
 	class SpriteRenderer;
 
@@ -25,6 +26,7 @@ namespace Dive
 		static void EndScene();
 
 		static void DrawSprite(Transform* pTransform, SpriteRenderer* pRenderer);
+		static void DrawSprite(DirectX::XMMATRIX matView, DirectX::XMMATRIX matProj, GameObject* pObj);
 
 		//static void SetViewport(float width, float height);
 

@@ -1,20 +1,14 @@
 #include "EditorScene.h"
+#include "SceneViewCamera.h"
 
 EditorScene::EditorScene(const std::string name)
 	: Dive::Scene(name)
 {
 }
 
-// 이 곳에서 그리는 이유는 Hazel이 ECS라 그럴 수 있다.
-// 따라서 어쩌면 GameObject의 Update를 통해 Renderer Component에서 Draw 되어야 할 수 있다.
-void EditorScene::UpdateEditor(float elapsedTime, EditorCamera* pCamera)
+void EditorScene::UpdateEditor(float elapsedTime, SceneViewCamera* pCamera)
 {
-	// begin / end scene은
-	// 전역화된 Renderer를 직접 가져와 호출하자.
-	// 왜냐하면 Scene 자체가 Engine 객체이기 때문이다.
-
-	// begin: camera 전달
-	//Dive::Renderer::BeginScene();
+	// begin scene
 	{
 		auto pImmediateContext = Dive::Renderer::GetGraphicsDevice().GetImmediateContext();
 		auto pRenderTargetView = Dive::Renderer::GetSampleTexture()->GetRenderTargetView();
@@ -36,15 +30,26 @@ void EditorScene::UpdateEditor(float elapsedTime, EditorCamera* pCamera)
 	// 해당 코드를 함수화해서 이 곳에서 호출하는 것을 고려할 수 있다.
 	Dive::Scene::Update(elapsedTime);
 
-	// Scene에서 Renderer들을 미리 나누어 놓는 편이 더 나을 것 같다.
-	for (auto pGameObject : GetGameObjects())
+	// pass 0
 	{
-		if (pGameObject->HasComponent<Dive::SpriteRenderer>())
+		// shader, state 등은 미리 bind 해놓는 편이 나을 듯 하다.
+		// 코드가 너무 길어진다면 spartan처럼 pass를 미리 만들어 놓은 후 호출토록 하는 것도 생각해볼 수 있다.
+		// 물론 이때 pass를 누가 가지느냐를 생각해 보아야 한다.
+		// 스파르탄처럼 Renderer에 구현하려면 결국 GameObjects를 전달해야 한다.
+		// 그게 싫다면 Scene에서 구현한 후 여기에선 호출만 하면 된다.
+
+		// Scene에서 Renderer들을 미리 나누어 놓는 편이 더 나을 것 같다.
+		for (auto pGameObject : GetGameObjects())
 		{
-			Dive::Renderer::DrawSprite(pGameObject->GetComponent<Dive::Transform>(), pGameObject->GetComponent<Dive::SpriteRenderer>());
+			if (pGameObject->HasComponent<Dive::SpriteRenderer>())
+			{
+				// 역시 카메라 객체를 전달하는 편이 더 깔끔하다...
+				// 아니면 View, Proj를 다른 cb에 map하는 것이 나을 수도 있다.
+				Dive::Renderer::DrawSprite(pCamera->GetViewMatrix(), pCamera->GetProjectionMatrix(), pGameObject);
+			}
 		}
 	}
 
-	// end
+	// end scene
 	Dive::Renderer::EndScene();
 }

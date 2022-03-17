@@ -36,6 +36,8 @@ namespace Dive
 	void Input::Update(float elapsedTime)
 	{
 		// 패드는 여기서 처리한다.
+
+		m_bNewFrame = true;
 	}
 
 	void Input::OnWindowData(const Event& e)

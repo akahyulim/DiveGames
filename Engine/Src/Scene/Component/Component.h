@@ -16,7 +16,6 @@ namespace Dive
 	class Component
 	{
 	public:
-		Component() = default;
 		Component(GameObject* pGameObject) : m_pGameObject(pGameObject) {}
 		virtual ~Component() = default;
 

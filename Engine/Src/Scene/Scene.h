@@ -10,9 +10,8 @@ namespace Dive
 		virtual ~Scene();
 
 		// App의 Run에서 직접 호출한다.
+		// Event를 받게 할 수 있다.
 		void Update(float elapsedTime);
-		// Editor's Camera를 전달한다.
-		//void UpdateEditor(float elpasedTime);
 
 		void Clear();
 

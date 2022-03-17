@@ -6,7 +6,6 @@ namespace Dive
 	class Camera : public Component
 	{
 	public:
-		Camera() = default;
 		Camera(GameObject* pGameObject);
 		Camera(GameObject* pGameObject, const DirectX::XMFLOAT4X4& mat);
 		virtual ~Camera() = default;

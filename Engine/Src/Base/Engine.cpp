@@ -26,19 +26,6 @@ namespace Dive
 	{
 		m_Time.Tick();
 		Input::Update(0.0f);
-
-		if (Input::KeyDown(VK_RBUTTON))
-		{
-			auto pos = Input::GetMousePosition();
-			DV_CORE_INFO("MousePos: {0:f}, {1:f}", pos.x, pos.y);
-		}
-
-		if (Input::KeyDown(VK_UP))
-		{
-			Input::SetMousePosition(0.0f, 0.0f);
-			auto pos = Input::GetMousePosition();
-			DV_CORE_INFO("MousePos: {0:f}, {1:f}", pos.x, pos.y);
-		}
 	}
 
 	void Engine::SetWindowData(const WindowData& data)

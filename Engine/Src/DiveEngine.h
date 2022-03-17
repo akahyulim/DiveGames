@@ -37,7 +37,6 @@
 #include "Scene/Component/Renderer.h"
 #include "Scene/Component/SpriteRenderer.h"
 #include "Scene/Component/Camera.h"
-#include "Scene/Component/SceneCamera.h"
 
 //= Math ==========================
 #include "Math/Math.h"

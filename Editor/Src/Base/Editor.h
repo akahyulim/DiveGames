@@ -1,6 +1,6 @@
 #pragma once
 #include "DiveEngine.h"
-#include "EditorCamera.h"
+#include "SceneViewCamera.h"
 #include <Windows.h>
 #include <string>
 #include <vector>
@@ -72,5 +72,6 @@ private:
 	};
 
 	eSceneMode m_SceneMode = eSceneMode::Editor;
-	EditorCamera m_EditorCamera;
+
+	SceneViewCamera m_SceneViewCamera;
 };

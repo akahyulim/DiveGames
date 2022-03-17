@@ -2,8 +2,8 @@
 #include <memory>
 #include <unordered_map>
 
-#define EVENT_HANDLER(function)				[this](const Event& e) {function(e);}
-#define EVENT_HANDLER_STATIC(function)		[](const Event& e) { function(e);}
+#define EVENT_HANDLER(function)				[this](const Dive::Event& e) {function(e);}
+#define EVENT_HANDLER_STATIC(function)		[](const Dive::Event& e) { function(e);}
 
 #define SUBSCRIBE_EVENT(type, function)		Dive::EventDispatcher::GetInstance().Subscribe(type, function);
 #define UNSUBSCRIBE_EVENT(type, function)	Dive::EventDispatcher::GetInstance().Unsubscribe(type, function);

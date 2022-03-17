@@ -125,17 +125,21 @@ void Editor::Run()
 			// 이게 좀 쌩뚱맞다... 역시 Editor가 상속해야 하나....
 			Dive::Run();
 
+			// Hazel은 이 곳에서 ScenePanel의 크기를 이용해
+			// ScenePanel에 그려질 이미지의 크기를 리사이즈하고,
+			// 각종 객체에 Viewport의 크기를 전달한다.
+
 			switch (m_SceneMode)
 			{
 			case eSceneMode::Editor:
 			{
-				m_EditorCamera.Update(1.0f);
+				m_SceneViewCamera.Update(0.0f);
 
 				// Hazel은 ActiveScene이 Editor의 멤버 변수이다.
 				// 하지만 이는 Menuber가 Editor에 만들어져 있기 때문에 가능하다.
 				auto pActiveScene = m_pMenuBar->GetActiveScene();
 				if (pActiveScene)
-					pActiveScene->UpdateEditor(1.0f, &m_EditorCamera);
+					pActiveScene->UpdateEditor(1.0f, &m_SceneViewCamera);
 
 				break;
 			}
