@@ -1,7 +1,6 @@
 #include "divepch.h"
 #include "Renderer.h"
 #include "Graphics/GraphicsDevice.h"
-#include "Base/Base.h"
 #include "Base/Engine.h"
 #include "Scene/GameObject.h"
 #include "Scene/Component/Transform.h"
@@ -17,9 +16,8 @@ namespace Dive
 
 	ID3D11SamplerState* Renderer::m_pLinearSampler = nullptr;
 
-	ID3D11InputLayout* Renderer::m_pSpriteInputLayout = nullptr;
-	ID3D11VertexShader* Renderer::m_pSpriteVertexShader = nullptr;
-	ID3D11PixelShader* Renderer::m_pSpritePixelShader = nullptr;
+	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerStateType::Count)> Renderer::m_RasterizerStates;
+	std::array<Shader, static_cast<size_t>(eShaderType::Count)> Renderer::m_Shaders;
 
 	ID3D11Buffer* Renderer::m_pMatrixBuffer = nullptr;
 
@@ -28,7 +26,6 @@ namespace Dive
 	Texture2D* Renderer::m_pDepthStencilTex = nullptr;
 
 	ID3D11DepthStencilState* Renderer::m_pDepthStencilState = nullptr;
-	ID3D11RasterizerState* Renderer::m_pRasterizerState = nullptr;
 
 	void Renderer::Initialize(const WindowData* pData)
 	{
@@ -53,6 +50,14 @@ namespace Dive
 	void Renderer::Shutdown()
 	{
 		UNSUBSCRIBE_EVENT(WindowDataEvent::s_Type, EVENT_HANDLER_STATIC(OnWindowData));
+
+		if (!m_RasterizerStates.empty())
+		{
+			for (auto pRasterizerState : m_RasterizerStates)
+			{
+				DV_RELEASE(pRasterizerState);
+			}
+		}
 
 		DV_DELETE(m_pDepthStencilTex);
 		DV_DELETE(m_pSampleTex);
@@ -104,7 +109,7 @@ namespace Dive
 		pImmediateContext->PSSetShaderResources(0, 1, &pShaderResourceView);
 		pImmediateContext->PSSetSamplers(0, 1, &m_pLinearSampler);
 		pImmediateContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
-		pImmediateContext->RSSetState(m_pRasterizerState);
+		pImmediateContext->RSSetState(m_RasterizerStates[static_cast<size_t>(eRasterizerStateType::CullBackSolid)]);
 		pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// wvp constant buffer
@@ -201,9 +206,9 @@ namespace Dive
 		auto indexFormat = pRenderer->GetIndexForamt();
 		pImmediateContext->IASetIndexBuffer(pIndexBuffer, indexFormat, 0);
 
-		pImmediateContext->IASetInputLayout(m_pSpriteInputLayout);
-		pImmediateContext->VSSetShader(m_pSpriteVertexShader, nullptr, 0);
-		pImmediateContext->PSSetShader(m_pSpritePixelShader, nullptr, 0);
+		pImmediateContext->IASetInputLayout(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pInputLayout);
+		pImmediateContext->VSSetShader(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pVertexShader, nullptr, 0);
+		pImmediateContext->PSSetShader(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pPixelShader, nullptr, 0);
 		
 		pImmediateContext->DrawIndexed(indexCount, 0, 0);
 	}
@@ -228,7 +233,7 @@ namespace Dive
 		pImmediateContext->PSSetShaderResources(0, 1, &pShaderResourceView);
 		pImmediateContext->PSSetSamplers(0, 1, &m_pLinearSampler);
 		pImmediateContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
-		pImmediateContext->RSSetState(m_pRasterizerState);
+		pImmediateContext->RSSetState(m_RasterizerStates[static_cast<size_t>(eRasterizerStateType::CullBackSolid)]);
 		pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// 뷰포트는 카메라를 통하는게 맞는 것 같다.
@@ -277,9 +282,9 @@ namespace Dive
 		auto indexFormat = pRenderer->GetIndexForamt();
 		pImmediateContext->IASetIndexBuffer(pIndexBuffer, indexFormat, 0);
 
-		pImmediateContext->IASetInputLayout(m_pSpriteInputLayout);
-		pImmediateContext->VSSetShader(m_pSpriteVertexShader, nullptr, 0);
-		pImmediateContext->PSSetShader(m_pSpritePixelShader, nullptr, 0);
+		pImmediateContext->IASetInputLayout(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pInputLayout);//m_pSpriteInputLayout);
+		pImmediateContext->VSSetShader(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pVertexShader, nullptr, 0);
+		pImmediateContext->PSSetShader(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pPixelShader, nullptr, 0);
 
 		pImmediateContext->DrawIndexed(indexCount, 0, 0);
 	}
@@ -310,6 +315,22 @@ namespace Dive
 		{
 			SetResolution(data.Width, data.Height);
 		}
+	}
+
+	ID3D11RasterizerState* Renderer::GetRasterizerState(eRasterizerStateType type)
+	{
+		if(type >= eRasterizerStateType::Count)
+			return nullptr;
+
+		return m_RasterizerStates[static_cast<size_t>(type)];
+	}
+
+	Shader* Renderer::GetShader(eShaderType type)
+	{
+		if (type >= eShaderType::Count)
+			return nullptr;
+
+		return &m_Shaders[static_cast<size_t>(type)];
 	}
 
 	void Renderer::createRenderTargets()
@@ -395,8 +416,7 @@ namespace Dive
 			desc.MultisampleEnable = false;
 			desc.ScissorEnable = false;
 			desc.SlopeScaledDepthBias = 0.0f;
-
-			m_GraphicsDevice.CreateRasterizerState(&desc, &m_pRasterizerState);
+			m_GraphicsDevice.CreateRasterizerState(&desc, &m_RasterizerStates[static_cast<size_t>(eRasterizerStateType::CullBackSolid)]);
 		}
 	}
 	
@@ -413,9 +433,13 @@ namespace Dive
 				{"TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	28, D3D11_INPUT_PER_VERTEX_DATA, 0}
 			};
 
-			// 현재 실행 경로는 Editor다.
 			unsigned int numElements = ARRAYSIZE(desc);// sizeof(desc) / sizeof(desc[0]);
-			m_GraphicsDevice.CreateShader("../Engine/Src/Shaders/sprite.hlsl", desc, numElements, &m_pSpriteVertexShader, &m_pSpriteInputLayout, &m_pSpritePixelShader);
+			// 현재 실행 경로는 Editor다.
+			// 함수의 인자를 바꾸면 더 간단해진다.
+			m_GraphicsDevice.CreateShader("../Engine/Src/Shaders/sprite.hlsl", desc, numElements,
+				&m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pVertexShader,
+				&m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pInputLayout,
+				&m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pPixelShader);
 		}
 	}
 

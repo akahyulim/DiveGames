@@ -1,7 +1,7 @@
 #pragma once
+#include "Base/Base.h"
 #include "Graphics/GraphicsDevice.h"
 #include "Graphics/Texture.h"
-
 #include "Events/EventSystem.h"
 #include "Events/WindowEvent.h"
 
@@ -12,6 +12,33 @@ namespace Dive
 	class GameObject;
 	class Transform;
 	class SpriteRenderer;
+
+	enum class eRasterizerStateType : size_t
+	{
+		CullBackSolid = 0,
+		CullBackWire,
+		Count
+	};
+
+	enum class eShaderType : size_t
+	{
+		Sprite = 0,
+		Count
+	};
+
+	struct Shader
+	{
+		~Shader()
+		{
+			DV_RELEASE(pVertexShader);
+			DV_RELEASE(pInputLayout);
+			DV_RELEASE(pPixelShader);
+		}
+
+		ID3D11VertexShader* pVertexShader	= nullptr;
+		ID3D11InputLayout* pInputLayout		= nullptr; 
+		ID3D11PixelShader* pPixelShader		= nullptr;
+	};
 
 	// 여긴 GraphicsDeivce의 초기화 및 관리만 하고
 	// 나머지는 Base Resource 생성 및 관리로 제한해야 할 것 같다.
@@ -41,6 +68,9 @@ namespace Dive
 		static unsigned int GetTextureWidth() { return m_TextureWidth; }
 		static unsigned int GetTextureHeight() { return m_TextureHeight; }
 
+		static ID3D11RasterizerState* GetRasterizerState(eRasterizerStateType type);
+		static Shader* GetShader(eShaderType type);
+
 		// test ============================================================
 		static Texture2D* GetSampleTexture() { return m_pSampleTex; }
 		static Texture2D* GetDepthStencilTexture() { return m_pDepthStencilTex; }
@@ -67,11 +97,10 @@ namespace Dive
 		// depth stencil states
 
 		// rasterizer states
+		static std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerStateType::Count)> m_RasterizerStates;
 
 		// shaders
-		static ID3D11InputLayout* m_pSpriteInputLayout;
-		static ID3D11VertexShader* m_pSpriteVertexShader;
-		static ID3D11PixelShader* m_pSpritePixelShader;
+		static std::array<Shader, static_cast<size_t>(eShaderType::Count)> m_Shaders;
 
 		// constant buffer
 		static ID3D11Buffer* m_pMatrixBuffer;
@@ -87,6 +116,5 @@ namespace Dive
 		static Texture2D* m_pSampleTex;
 		static Texture2D* m_pDepthStencilTex;
 		static ID3D11DepthStencilState* m_pDepthStencilState;
-		static ID3D11RasterizerState* m_pRasterizerState;
 	};
 }

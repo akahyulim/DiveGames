@@ -70,6 +70,15 @@
     <ClInclude Include="Src\Events\WindowEvent.h">
       <Filter>Src\Events</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\RenderPath.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\PipelineState.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\CommandList.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -122,6 +131,15 @@
     </ClCompile>
     <ClCompile Include="Src\Input\Input.cpp">
       <Filter>Src\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\CommandList.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\RenderPath.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\PipelineState.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

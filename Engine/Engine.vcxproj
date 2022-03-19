@@ -182,9 +182,12 @@
     <ClInclude Include="Src\Events\EventSystem.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Math\Math.h" />
+    <ClInclude Include="Src\Renderer\CommandList.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
+    <ClInclude Include="Src\Renderer\PipelineState.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
+    <ClInclude Include="Src\Renderer\RenderPath.h" />
     <ClInclude Include="Src\Scene\Component\Camera.h" />
     <ClInclude Include="Src\Scene\Component\Component.h" />
     <ClInclude Include="Src\Scene\Component\MeshRenderer.h" />
@@ -205,9 +208,12 @@
     <ClCompile Include="Src\Base\Time.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
+    <ClCompile Include="Src\Renderer\CommandList.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
+    <ClCompile Include="Src\Renderer\PipelineState.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
+    <ClCompile Include="Src\Renderer\RenderPath.cpp" />
     <ClCompile Include="Src\Scene\Component\Camera.cpp" />
     <ClCompile Include="Src\Scene\Component\Component.cpp" />
     <ClCompile Include="Src\Scene\Component\SpriteRenderer.cpp" />

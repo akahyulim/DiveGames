@@ -25,6 +25,9 @@
 #include "Renderer/Graphics/GraphicsDevice.h"
 #include "Renderer/Graphics/Texture.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/PipelineState.h"
+#include "Renderer/CommandList.h"
+#include "Renderer/RenderPath.h"
 
 //= Input =========================
 #include "Input/input.h"
