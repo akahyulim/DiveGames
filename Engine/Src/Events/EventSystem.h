@@ -2,6 +2,7 @@
 #include <memory>
 #include <unordered_map>
 
+// event handle macro
 #define EVENT_HANDLER(function)				[this](const Dive::Event& e) {function(e);}
 #define EVENT_HANDLER_STATIC(function)		[](const Dive::Event& e) { function(e);}
 
@@ -9,6 +10,16 @@
 #define UNSUBSCRIBE_EVENT(type, function)	Dive::EventDispatcher::GetInstance().Unsubscribe(type, function);
 
 #define FIRE_EVENT(e)						Dive::EventDispatcher::GetInstance().Fire(e);
+
+enum class eEventType
+{
+	WindowData, WindowResize,
+};
+
+// event type macro
+#define EVENT_CLASS_TYPE(type)	static eEventType GetStaticType() { return eEventType::type; }	\
+								virtual eEventType GetType() const override { return GetStaticType(); } \
+								virtual const char* GetName() const override { return #type; }
 
 namespace Dive
 {
@@ -18,9 +29,9 @@ namespace Dive
 	public:
 		virtual ~Event() = default;
 
-		using EventType = const char*;
-
-		virtual EventType GetType() const = 0;
+		virtual eEventType GetType() const = 0;
+		virtual const char* GetName() const = 0;
+		virtual std::string ToString() const { return GetName(); }
 	};
 
 	class EventDispatcher
@@ -39,12 +50,12 @@ namespace Dive
 			m_Subscribers.clear();
 		}
 
-		void Subscribe(const Event::EventType& type, Subscriber&& function)
+		void Subscribe(eEventType type, Subscriber&& function)
 		{
 			m_Subscribers[type].push_back(std::forward<Subscriber>(function));
 		}
 
-		void Unsubscribe(const Event::EventType& type, Subscriber&& function)
+		void Unsubscribe(eEventType type, Subscriber&& function)
 		{
 			auto& subscribers = m_Subscribers[type];
 			const size_t functionAddress = *(reinterpret_cast<long*>(reinterpret_cast<char*>(&function)));
@@ -72,6 +83,6 @@ namespace Dive
 		}
 
 	private:
-		std::unordered_map<Event::EventType, std::vector<Subscriber>> m_Subscribers;
+		std::unordered_map<eEventType, std::vector<Subscriber>> m_Subscribers;
 	};
 }

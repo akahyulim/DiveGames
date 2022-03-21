@@ -8,20 +8,17 @@ namespace Dive
 	{
 	public:
 
-		// state
-		// bind pipeliestate	
 		bool SetPipelineState(PipelineState& ps);
 
-		// asset data
 		// sampler
-		// vertex buffer
+		// viewport
+		void SetVertexBuffer(ID3D11Buffer* pVertexBuffer, const UINT strides, const UINT offsets);
 		// index buffer
 		// constant buffer
 		// texture: shader resource view
 
 		// draw
 
-	public:
 	private:
 		PipelineState* m_pPipelineState;
 	};

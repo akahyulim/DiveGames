@@ -10,6 +10,8 @@ namespace Dive
 	class RendererComponent : public Component
 	{
 	public:
+		COMPONENT_CLASS_TYPE(Unknown)
+
 		RendererComponent(GameObject* pGameObject) : Component(pGameObject) {}
 		virtual ~RendererComponent() = default;
 

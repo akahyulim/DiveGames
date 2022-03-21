@@ -30,7 +30,7 @@ namespace Dive
 		rid.hwndTarget = m_WindowHandle;
 		RegisterRawInputDevices(&rid, 1, sizeof(RAWINPUTDEVICE));
 
-		SUBSCRIBE_EVENT(WindowDataEvent::s_Type, EVENT_HANDLER_STATIC(OnWindowData));
+		SUBSCRIBE_EVENT(eEventType::WindowData, EVENT_HANDLER_STATIC(OnWindowData));
 	}
 
 	void Input::Update(float elapsedTime)

@@ -7,7 +7,6 @@ namespace Dive
 	SpriteRenderer::SpriteRenderer(GameObject* pGameObject)
 		: RendererComponent(pGameObject)
 	{
-		m_Type = eComponentType::SpriteRenderer;
 	}
 
 	SpriteRenderer::~SpriteRenderer()

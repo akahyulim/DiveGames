@@ -13,6 +13,11 @@ namespace Dive
 		SpriteRenderer,
 	};
 
+// 여기에 base type을 추가하면 될 거 같은데...
+#define COMPONENT_CLASS_TYPE(type)	static eComponentType GetStaticType() { return eComponentType::type; } \
+									virtual eComponentType GetType() const override { return GetStaticType(); } \
+									virtual const char* GetName() const override { return #type; }
+
 	class Component
 	{
 	public:
@@ -21,16 +26,14 @@ namespace Dive
 
 		GameObject* GetGameObject() { return m_pGameObject; }
 
-		eComponentType GetType() const { return m_Type; }
-
-		template<class T>
-		static constexpr eComponentType TypeToEnum();
-
+		virtual eComponentType GetType() const = 0;
+		virtual const char* GetName() const = 0;
+		virtual std::string GetStr() const { return GetName(); }
+ 
 		// 자신이 소속된 GameObject의 IsntanceID를 리턴
 		unsigned long long GetInstanceID() const;
 
 	protected:
 		GameObject* m_pGameObject	= nullptr;
-		eComponentType m_Type		= eComponentType::Unknown;
 	};
 }

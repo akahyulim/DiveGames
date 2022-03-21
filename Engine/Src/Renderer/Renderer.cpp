@@ -14,8 +14,8 @@ namespace Dive
 	unsigned int Renderer::m_TextureWidth = 0;
 	unsigned int Renderer::m_TextureHeight = 0;
 
-	ID3D11SamplerState* Renderer::m_pLinearSampler = nullptr;
-
+	std::array<ID3D11SamplerState*, static_cast<size_t>(eSamplerStateType::Count)> Renderer::m_SamplerStates;
+	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilStateType::Count)> Renderer::m_DepthStencilStates;
 	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerStateType::Count)> Renderer::m_RasterizerStates;
 	std::array<Shader, static_cast<size_t>(eShaderType::Count)> Renderer::m_Shaders;
 
@@ -24,8 +24,6 @@ namespace Dive
 	// 이하 테스트
 	Texture2D* Renderer::m_pSampleTex = nullptr;
 	Texture2D* Renderer::m_pDepthStencilTex = nullptr;
-
-	ID3D11DepthStencilState* Renderer::m_pDepthStencilState = nullptr;
 
 	void Renderer::Initialize(const WindowData* pData)
 	{
@@ -44,21 +42,29 @@ namespace Dive
 		createShaders();
 		createMatrixBuffer();	// 일단 임시다.
 
-		SUBSCRIBE_EVENT(WindowDataEvent::s_Type, EVENT_HANDLER_STATIC(OnWindowData));
+		SUBSCRIBE_EVENT(eEventType::WindowData, EVENT_HANDLER_STATIC(OnWindowData));
 	}
 
 	void Renderer::Shutdown()
 	{
-		UNSUBSCRIBE_EVENT(WindowDataEvent::s_Type, EVENT_HANDLER_STATIC(OnWindowData));
+		UNSUBSCRIBE_EVENT(eEventType::WindowData, EVENT_HANDLER_STATIC(OnWindowData));
 
-		if (!m_RasterizerStates.empty())
+
+		for (auto pSamplerState : m_SamplerStates)
 		{
-			for (auto pRasterizerState : m_RasterizerStates)
-			{
-				DV_RELEASE(pRasterizerState);
-			}
+			DV_RELEASE(pSamplerState);
 		}
 
+		for (auto pDepthStencilState : m_DepthStencilStates)
+		{
+			DV_RELEASE(pDepthStencilState);
+		}
+
+		for (auto pRasterizerState : m_RasterizerStates)
+		{
+			DV_RELEASE(pRasterizerState);
+		}
+	
 		DV_DELETE(m_pDepthStencilTex);
 		DV_DELETE(m_pSampleTex);
 
@@ -107,8 +113,8 @@ namespace Dive
 
 		auto pShaderResourceView = pRenderer->GetShaderResourceView();
 		pImmediateContext->PSSetShaderResources(0, 1, &pShaderResourceView);
-		pImmediateContext->PSSetSamplers(0, 1, &m_pLinearSampler);
-		pImmediateContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
+		pImmediateContext->PSSetSamplers(0, 1, &m_SamplerStates[static_cast<size_t>(eSamplerStateType::Linear)]);
+		pImmediateContext->OMSetDepthStencilState(m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthOnStencilOn)], 1);
 		pImmediateContext->RSSetState(m_RasterizerStates[static_cast<size_t>(eRasterizerStateType::CullBackSolid)]);
 		pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -231,8 +237,8 @@ namespace Dive
 
 		auto pShaderResourceView = pRenderer->GetShaderResourceView();
 		pImmediateContext->PSSetShaderResources(0, 1, &pShaderResourceView);
-		pImmediateContext->PSSetSamplers(0, 1, &m_pLinearSampler);
-		pImmediateContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
+		pImmediateContext->PSSetSamplers(0, 1, &m_SamplerStates[static_cast<size_t>(eSamplerStateType::Linear)]);
+		pImmediateContext->OMSetDepthStencilState(m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthOnStencilOn)], 1);
 		pImmediateContext->RSSetState(m_RasterizerStates[static_cast<size_t>(eRasterizerStateType::CullBackSolid)]);
 		pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -317,6 +323,22 @@ namespace Dive
 		}
 	}
 
+	ID3D11SamplerState* Renderer::GetSamplerState(eSamplerStateType type)
+	{
+		if(type >= eSamplerStateType::Count)
+			return nullptr;
+
+		return m_SamplerStates[static_cast<size_t>(type)];
+	}
+
+	ID3D11DepthStencilState* Renderer::GetDepthStencilState(eDepthStencilStateType type)
+	{
+		if(type >= eDepthStencilStateType::Count)
+			return nullptr;
+
+		return m_DepthStencilStates[static_cast<size_t>(type)];
+	}
+
 	ID3D11RasterizerState* Renderer::GetRasterizerState(eRasterizerStateType type)
 	{
 		if(type >= eRasterizerStateType::Count)
@@ -366,7 +388,7 @@ namespace Dive
 			desc.MinLOD = 0;
 			desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-			m_GraphicsDevice.CreateSamplerState(&desc, &m_pLinearSampler);
+			m_GraphicsDevice.CreateSamplerState(&desc, &m_SamplerStates[static_cast<size_t>(eSamplerStateType::Linear)]);
 		}
 	}
 
@@ -398,7 +420,7 @@ namespace Dive
 			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_pDepthStencilState);
+			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthOnStencilOn)]);
 		}
 	}
 	

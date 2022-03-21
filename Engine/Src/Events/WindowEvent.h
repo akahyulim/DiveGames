@@ -13,12 +13,7 @@ namespace Dive
 
 		const WindowData& GetWindowData() const { return m_WindowData; }
 
-		static constexpr EventType s_Type = "WindowDataEvent";
-
-		virtual EventType GetType() const
-		{
-			return s_Type;
-		}
+		EVENT_CLASS_TYPE(WindowData)
 
 	private:
 		WindowData m_WindowData;
@@ -31,15 +26,10 @@ namespace Dive
 			: m_Width(width), m_Height(height)
 		{}
 
-		static constexpr EventType s_Type = "WindowResizeEvent";
-
-		virtual EventType GetType() const
-		{
-			return s_Type;
-		}
-
 		unsigned int GetWidth() const { return m_Width; }
 		unsigned int GetHeight() const { return m_Height; }
+
+		EVENT_CLASS_TYPE(WindowResize)
 
 	private:
 		unsigned int m_Width;

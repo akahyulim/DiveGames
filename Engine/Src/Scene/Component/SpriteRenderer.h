@@ -10,6 +10,8 @@ namespace Dive
 	class SpriteRenderer : public RendererComponent
 	{
 	public:
+		COMPONENT_CLASS_TYPE(SpriteRenderer)
+
 		SpriteRenderer(GameObject* pGameObject);
 		~SpriteRenderer();
 

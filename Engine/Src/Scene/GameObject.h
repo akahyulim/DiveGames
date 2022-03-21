@@ -1,5 +1,6 @@
 #pragma once
 #include "Base/Object.h"
+#include "Component/Component.h"
 #include "Component/Transform.h"
 #include "Component/Camera.h"
 #include "Component/SpriteRenderer.h"
@@ -21,10 +22,10 @@ namespace Dive
 			if (HasComponent<T>())
 				return GetComponent<T>();
 
-			auto pNewComponent = m_Components.emplace_back(static_cast<Component*>(new T(this)));
-			DV_ASSERT(pNewComponent);
-
-			return dynamic_cast<T*>(pNewComponent);
+			T* pNewComponent = new T(this);
+			m_Components.emplace_back(static_cast<Component*>(pNewComponent));
+		
+			return pNewComponent;
 		}
 		
 		template<class T>
@@ -33,7 +34,7 @@ namespace Dive
 			auto it = m_Components.begin();
 			for (it; it != m_Components.end();)
 			{
-				if (it->GetType() == Component::TypeToEnum<T>())
+				if (it->GetType() == T::GetStaticType())
 				{
 					DV_DELETE(*it);
 					m_Components.erase(it);
@@ -51,19 +52,20 @@ namespace Dive
 		{
 			for (auto pComponent : m_Components)
 			{
-				if (pComponent->GetType() == Component::TypeToEnum<T>())
+				if (pComponent->GetType() == T::GetStaticType())
 					return true;
 			}
 
 			return false;
 		}
 
+		// 상속 구현일 경우 부모 타입으로부터 얻을 수 있도록 하고 싶다...
 		template<class T>
 		T* GetComponent()
 		{
 			for (auto pComponent : m_Components)
 			{
-				if (pComponent->GetType() == Component::TypeToEnum<T>())
+				if (pComponent->GetType() == T::GetStaticType())
 				{
 					return dynamic_cast<T*>(pComponent);
 				}
@@ -71,6 +73,9 @@ namespace Dive
 
 			return nullptr;
 		}
+
+		bool IsActive() const { return m_bActive; }
+		void SetActive(bool active) { m_bActive = active; }
 
 		bool IsRemoveTarget() const { return m_bRemoveTarget; }
 		void MarkRemoveTarget() { m_bRemoveTarget = true; }
@@ -80,6 +85,7 @@ namespace Dive
 		Scene* m_pScene			= nullptr;
 		std::vector<Component*> m_Components;
 
-		bool m_bRemoveTarget = false;
+		bool m_bActive			= true;
+		bool m_bRemoveTarget	= false;
 	};
 }

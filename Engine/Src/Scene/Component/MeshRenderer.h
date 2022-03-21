@@ -6,6 +6,7 @@ namespace Dive
 	class MeshRenderer : public RendererComponent
 	{
 	public:
+		COMPONENT_CLASS_TYPE(MeshRenderer)
 	private:
 	private:
 	};

@@ -14,6 +14,8 @@ namespace Dive
 	class Transform : public Component
 	{
 	public:
+		COMPONENT_CLASS_TYPE(Transform)
+
 		Transform(GameObject* pGameObject);
 		~Transform() = default;
 

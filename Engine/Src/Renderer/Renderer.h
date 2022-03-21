@@ -20,6 +20,20 @@ namespace Dive
 		Count
 	};
 
+	enum class eDepthStencilStateType : size_t
+	{
+		//DepthOffStencilOff = 0,
+		DepthOnStencilOn = 0,
+		Count
+	};
+
+	enum class eSamplerStateType : size_t
+	{
+		Linear = 0,
+		Count
+	};
+
+
 	enum class eShaderType : size_t
 	{
 		Sprite = 0,
@@ -68,6 +82,8 @@ namespace Dive
 		static unsigned int GetTextureWidth() { return m_TextureWidth; }
 		static unsigned int GetTextureHeight() { return m_TextureHeight; }
 
+		static ID3D11SamplerState* GetSamplerState(eSamplerStateType type);
+		static ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilStateType type);
 		static ID3D11RasterizerState* GetRasterizerState(eRasterizerStateType type);
 		static Shader* GetShader(eShaderType type);
 
@@ -92,9 +108,10 @@ namespace Dive
 		// render targets
 
 		// samplers
-		static ID3D11SamplerState* m_pLinearSampler;
+		static std::array<ID3D11SamplerState*, static_cast<size_t>(eSamplerStateType::Count)> m_SamplerStates;
 
 		// depth stencil states
+		static std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilStateType::Count)> m_DepthStencilStates;
 
 		// rasterizer states
 		static std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerStateType::Count)> m_RasterizerStates;
@@ -115,6 +132,5 @@ namespace Dive
 		// test resources =================
 		static Texture2D* m_pSampleTex;
 		static Texture2D* m_pDepthStencilTex;
-		static ID3D11DepthStencilState* m_pDepthStencilState;
 	};
 }
