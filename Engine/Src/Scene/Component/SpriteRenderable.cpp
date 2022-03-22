@@ -1,20 +1,20 @@
 #include "divepch.h"
-#include "SpriteRenderer.h"
+#include "SpriteRenderable.h"
 #include "Renderer/Renderer.h"
 
 namespace Dive
 {
-	SpriteRenderer::SpriteRenderer(GameObject* pGameObject)
-		: RendererComponent(pGameObject)
+	SpriteRenderable::SpriteRenderable(GameObject* pGameObject)
+		: Renderable(pGameObject)
 	{
 	}
 
-	SpriteRenderer::~SpriteRenderer()
+	SpriteRenderable::~SpriteRenderable()
 	{
 		Shutdown();
 	}
 	
-	void SpriteRenderer::Shutdown()
+	void SpriteRenderable::Shutdown()
 	{
 		DV_RELEASE(m_pIndexBuffer);
 		DV_RELEASE(m_pVertexBuffer);
@@ -25,7 +25,7 @@ namespace Dive
 		m_Height = 0;
 	}
 
-	void SpriteRenderer::SetTexture(Texture2D* pTexture)
+	void SpriteRenderable::SetTexture(Texture2D* pTexture)
 	{
 		if (!pTexture)
 			return;
@@ -40,7 +40,7 @@ namespace Dive
 			Shutdown();
 	}
 
-	ID3D11ShaderResourceView* SpriteRenderer::GetShaderResourceView()
+	ID3D11ShaderResourceView* SpriteRenderable::GetShaderResourceView()
 	{
 		if(!m_pTexture)
 			return nullptr;
@@ -48,7 +48,7 @@ namespace Dive
 		return m_pTexture->GetShaderResourceView();
 	}
 
-	void SpriteRenderer::SetColor(DirectX::XMFLOAT4 color)
+	void SpriteRenderable::SetColor(DirectX::XMFLOAT4 color)
 	{
 		if (m_Color.x == color.x && m_Color.y == color.y && m_Color.z == color.z && m_Color.w == color.w)
 			return;
@@ -94,7 +94,7 @@ namespace Dive
 		graphicsDevice.Unmap(m_pVertexBuffer, 0);
 	}
 
-	void SpriteRenderer::SetFlipX(bool x)
+	void SpriteRenderable::SetFlipX(bool x)
 	{
 		if (m_bFlipX == x)
 			return;
@@ -103,7 +103,7 @@ namespace Dive
 		flipSprite();
 	}
 
-	void SpriteRenderer::SetFlipY(bool y)
+	void SpriteRenderable::SetFlipY(bool y)
 	{
 		if (m_bFlipY == y)
 			return;
@@ -112,7 +112,7 @@ namespace Dive
 		flipSprite();
 	}
 
-	bool SpriteRenderer::createBuffer()
+	bool SpriteRenderable::createBuffer()
 	{
 		// vertex buffer
 		{
@@ -208,7 +208,7 @@ namespace Dive
 		return true;
 	}
 
-	void SpriteRenderer::flipSprite()
+	void SpriteRenderable::flipSprite()
 	{
 		auto& graphicsDevice = Renderer::GetGraphicsDevice();
 

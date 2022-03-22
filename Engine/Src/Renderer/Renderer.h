@@ -3,7 +3,7 @@
 #include "Graphics/GraphicsDevice.h"
 #include "Graphics/Texture.h"
 #include "Events/EventSystem.h"
-#include "Events/WindowEvent.h"
+#include "Events/EngineEvents.h"
 
 namespace Dive
 {
@@ -11,7 +11,7 @@ namespace Dive
 
 	class GameObject;
 	class Transform;
-	class SpriteRenderer;
+	class SpriteRenderable;
 
 	enum class eRasterizerStateType : size_t
 	{
@@ -66,7 +66,7 @@ namespace Dive
 		static void BeginScene();
 		static void EndScene();
 
-		static void DrawSprite(Transform* pTransform, SpriteRenderer* pRenderer);
+		static void DrawSprite(Transform* pTransform, SpriteRenderable* pRenderer);
 		static void DrawSprite(DirectX::XMMATRIX matView, DirectX::XMMATRIX matProj, GameObject* pObj);
 
 		//static void SetViewport(float width, float height);

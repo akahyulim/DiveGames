@@ -136,13 +136,13 @@ void InspectorPanel::drawTransform(Dive::GameObject* pSelectedObject)
 
 void InspectorPanel::drawSpriteRenderer(Dive::GameObject* pSelectedObject)
 {
-	auto pSpriteRenderer = pSelectedObject->GetComponent<Dive::SpriteRenderer>();
+	auto pSpriteRenderer = pSelectedObject->GetComponent<Dive::SpriteRenderable>();
 	if (!pSpriteRenderer)
 		return;
 
 	auto pTexture = pSpriteRenderer->GetTexture();
 
-	if (ImGui::CollapsingHeader("Sprite Renderer", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
+	if (ImGui::CollapsingHeader("Sprite Renderable", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		// enabled
 		bool enabled = pSpriteRenderer->IsEnabled();

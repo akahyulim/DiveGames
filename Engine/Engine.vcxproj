@@ -178,7 +178,7 @@
     <ClInclude Include="Src\Base\Engine.h" />
     <ClInclude Include="Src\Base\Log.h" />
     <ClInclude Include="Src\Base\Time.h" />
-    <ClInclude Include="Src\Events\WindowEvent.h" />
+    <ClInclude Include="Src\Events\EngineEvents.h" />
     <ClInclude Include="Src\Events\EventSystem.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Math\Math.h" />
@@ -190,9 +190,9 @@
     <ClInclude Include="Src\Renderer\RenderPath.h" />
     <ClInclude Include="Src\Scene\Component\Camera.h" />
     <ClInclude Include="Src\Scene\Component\Component.h" />
-    <ClInclude Include="Src\Scene\Component\MeshRenderer.h" />
-    <ClInclude Include="Src\Scene\Component\Renderer.h" />
-    <ClInclude Include="Src\Scene\Component\SpriteRenderer.h" />
+    <ClInclude Include="Src\Scene\Component\MeshRenderable.h" />
+    <ClInclude Include="Src\Scene\Component\Renderable.h" />
+    <ClInclude Include="Src\Scene\Component\SpriteRenderable.h" />
     <ClInclude Include="Src\Scene\Component\Transform.h" />
     <ClInclude Include="Src\Scene\GameObject.h" />
     <ClInclude Include="Src\Scene\Scene.h" />
@@ -216,7 +216,7 @@
     <ClCompile Include="Src\Renderer\RenderPath.cpp" />
     <ClCompile Include="Src\Scene\Component\Camera.cpp" />
     <ClCompile Include="Src\Scene\Component\Component.cpp" />
-    <ClCompile Include="Src\Scene\Component\SpriteRenderer.cpp" />
+    <ClCompile Include="Src\Scene\Component\SpriteRenderable.cpp" />
     <ClCompile Include="Src\Scene\Component\Transform.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />

@@ -1,5 +1,5 @@
 #pragma once
-#include "Renderer.h"
+#include "Renderable.h"
 #include "Renderer/Graphics/Texture.h"
 
 namespace Dive
@@ -7,13 +7,13 @@ namespace Dive
 	class GameObject;
 	class Texture2D;
 
-	class SpriteRenderer : public RendererComponent
+	class SpriteRenderable : public Renderable
 	{
 	public:
-		COMPONENT_CLASS_TYPE(SpriteRenderer)
+		COMPONENT_CLASS_TYPE(SpriteRenderable)
 
-		SpriteRenderer(GameObject* pGameObject);
-		~SpriteRenderer();
+		SpriteRenderable(GameObject* pGameObject);
+		~SpriteRenderable();
 
 		void Shutdown();
 

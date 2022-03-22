@@ -1,6 +1,8 @@
 #include "EditorScene.h"
 #include "SceneViewCamera.h"
 
+// 이건 제거 대상이다.
+// Update / Render는 RenderPath로 옮겨진다.
 EditorScene::EditorScene(const std::string name)
 	: Dive::Scene(name)
 {
@@ -41,7 +43,7 @@ void EditorScene::UpdateEditor(float elapsedTime, SceneViewCamera* pCamera)
 		// Scene에서 Renderer들을 미리 나누어 놓는 편이 더 나을 것 같다.
 		for (auto pGameObject : GetGameObjects())
 		{
-			if (pGameObject->HasComponent<Dive::SpriteRenderer>())
+			if (pGameObject->HasComponent<Dive::SpriteRenderable>())
 			{
 				// 역시 카메라 객체를 전달하는 편이 더 깔끔하다...
 				// 아니면 View, Proj를 다른 cb에 map하는 것이 나을 수도 있다.

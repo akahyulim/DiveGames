@@ -10,10 +10,9 @@ namespace Dive
 		Unknown,
 		Transform,
 		Camera,
-		SpriteRenderer,
+		SpriteRenderable, MeshRenderable,
 	};
 
-// 여기에 base type을 추가하면 될 거 같은데...
 #define COMPONENT_CLASS_TYPE(type)	static eComponentType GetStaticType() { return eComponentType::type; } \
 									virtual eComponentType GetType() const override { return GetStaticType(); } \
 									virtual const char* GetName() const override { return #type; }

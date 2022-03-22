@@ -17,7 +17,7 @@
 
 //= Events ========================
 #include "Events/EventSystem.h"
-#include "Events/WindowEvent.h"
+#include "Events/EngineEvents.h"
 
 //= Resource ======================
 
@@ -37,8 +37,8 @@
 #include "Scene/GameObject.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
-#include "Scene/Component/Renderer.h"
-#include "Scene/Component/SpriteRenderer.h"
+#include "Scene/Component/Renderable.h"
+#include "Scene/Component/SpriteRenderable.h"
 #include "Scene/Component/Camera.h"
 
 //= Math ==========================

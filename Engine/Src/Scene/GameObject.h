@@ -3,7 +3,8 @@
 #include "Component/Component.h"
 #include "Component/Transform.h"
 #include "Component/Camera.h"
-#include "Component/SpriteRenderer.h"
+#include "Component/SpriteRenderable.h"
+#include "Events/EngineEvents.h"
 
 namespace Dive
 {
@@ -25,6 +26,8 @@ namespace Dive
 			T* pNewComponent = new T(this);
 			m_Components.emplace_back(static_cast<Component*>(pNewComponent));
 		
+			FIRE_EVENT(GameObjectModifyEvent());
+
 			return pNewComponent;
 		}
 		
@@ -38,6 +41,9 @@ namespace Dive
 				{
 					DV_DELETE(*it);
 					m_Components.erase(it);
+
+					FIRE_EVENT(GameObjectModifyEvent());
+					
 					return;
 				}
 				else

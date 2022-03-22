@@ -4,16 +4,26 @@
 #include "CommandList.h"
 #include "Renderer.h"
 #include "Scene/GameObject.h"
-#include "Scene/Component/Renderer.h"
-#include "Scene/Component/SpriteRenderer.h"
+#include "Scene/Component/Renderable.h"
+#include "Scene/Component/SpriteRenderable.h"
+#include "Events/EngineEvents.h"
 
 namespace Dive
 {
+	RenderPath::RenderPath()
+	{
+		SUBSCRIBE_EVENT(eEventType::SceneResolve, EVENT_HANDLER(OnAcquireRenderableObjects));
+	}
+
+	RenderPath::~RenderPath()
+	{
+		UNSUBSCRIBE_EVENT(eEventType::SceneResolve, EVENT_HANDLER(OnAcquireRenderableObjects));
+	}
+
 	void RenderPath::Update(float delta)
 	{
 	}
 	
-	// active scene이 있어야 한다.
 	void RenderPath::Render()
 	{
 		// 이전 state 비교용
@@ -22,31 +32,32 @@ namespace Dive
 		passDefault(&cl);
 	}
 
-	// 스파르탄의 경우 WorldResolve라는 이벤트를 통해 호출된다.
-	void RenderPath::OnAcuireRenderObjects(std::vector<GameObject*>& gameObjects)
+	void RenderPath::OnAcquireRenderableObjects(const Event& e)
 	{
-		m_RenderObjects.clear();
+		m_RenderableObjects.clear();
 
-		for (auto pGameObject : gameObjects)
+		const SceneResolveEvent& sceneResolveEvent = dynamic_cast<const SceneResolveEvent&>(e);
+		auto pGameObjects = sceneResolveEvent.GetGameObjects();
+
+		for (auto pGameObject : *pGameObjects)
 		{
-			// isActive도 추가?
-			if (!pGameObject)
+			if (!pGameObject || !pGameObject->IsActive())
 				continue;
 
-			// 이러면 안된다. 구체 타입으로 저장되어 있을 거다.
-			// 아니면, RenderComponent를 상속하는 모든 Component를 개별로 찾으면 되긴 할 듯...
-			auto pRendererComponent = pGameObject->GetComponent<SpriteRenderer>();
+			// 이렇게 하면 Pass에서 Component를 통해 Buffer 등을 얻을 수 없다...
+			// 역시 Base인 Renderable로 받고 Interface를 사용토록 하는 것이 깔끔하다...
+			auto pSpriteRenderer = pGameObject->GetComponent<SpriteRenderable>();
 
-			if (pRendererComponent)
+			if (pSpriteRenderer)
 			{
 				// material로 opaque / transparent 구분
 				bool bTransparent = false;
 
-				m_RenderObjects[bTransparent ? eRenderObjectType::Transparent : eRenderObjectType::Opaque].emplace_back(pGameObject);
+				m_RenderableObjects[bTransparent ? eRenderableType::Transparent : eRenderableType::Opaque].emplace_back(pGameObject);
 			}
 		}
 
-		// opaque, transparent의 경우 각각 vector 재정렬 함수 호출
+		// opaque, transparent의 경우 각각 vector 정렬 함수 호출
 	}
 
 	void RenderPath::passDefault(CommandList* pCl)
@@ -60,8 +71,8 @@ namespace Dive
 		ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
 		pCl->SetPipelineState(ps);
 
-		// 스파르탄은 이 함수의 인자로 전달받는다...
-		for(auto pOpaqueObject : m_RenderObjects[eRenderObjectType::Opaque])
+		// 스파르탄은 RenderObject Type을 전달받는다.
+		for(auto pOpaqueObject : m_RenderableObjects[eRenderableType::Opaque])
 		{
 			// vertex buffer
 			// index buffer

@@ -1,11 +1,12 @@
 #pragma once
+#include "Events/EventSystem.h"
 
 namespace Dive
 {
 	class GameObject;
 	class CommandList;
 
-	enum class eRenderObjectType
+	enum class eRenderableType
 	{
 		Opaque,
 		Transparent,
@@ -15,17 +16,18 @@ namespace Dive
 	class RenderPath
 	{
 	public:
-		virtual ~RenderPath() = default;
+		RenderPath();
+		virtual ~RenderPath();
 
 		virtual void Update(float delta);
 		virtual void Render();
 
-		void OnAcuireRenderObjects(std::vector<GameObject*>& gameObjects);
+		void OnAcquireRenderableObjects(const Event& e);
 
 	private:
 		void passDefault(CommandList* pCl);
 
 	private:
-		std::unordered_map<eRenderObjectType, std::vector<GameObject*>> m_RenderObjects;
+		std::unordered_map<eRenderableType, std::vector<GameObject*>> m_RenderableObjects;
 	};
 }

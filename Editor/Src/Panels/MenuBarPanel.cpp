@@ -66,11 +66,11 @@ void MenuBarPanel::menuFile()
 
 				m_pActiveScene = new EditorScene("Sample_World");
 				auto pChoA = m_pActiveScene->CreateGameObject("ChoA");
-				auto pChoASprite = pChoA->AddComponent<Dive::SpriteRenderer>();
+				auto pChoASprite = pChoA->AddComponent<Dive::SpriteRenderable>();
 				pChoA->GetComponent<Dive::Transform>()->SetPosition(DirectX::XMFLOAT3(300.0, 0.0f, 800.0f));
 				pChoASprite->SetTexture(m_pChoA);
 				auto pIU = m_pActiveScene->CreateGameObject("IU");
-				auto pIUSprite = pIU->AddComponent<Dive::SpriteRenderer>();
+				auto pIUSprite = pIU->AddComponent<Dive::SpriteRenderable>();
 				pIU->GetComponent<Dive::Transform>()->SetPosition(DirectX::XMFLOAT3(-200.0, 0.0f, 900.0f));
 				pIUSprite->SetTexture(m_pIU);
 				auto pParent = m_pActiveScene->CreateGameObject("Knave");

@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Base/Base.h"
 #include "Component/Transform.h"
+#include "Events/EngineEvents.h"
 
 namespace Dive
 {
@@ -10,6 +11,8 @@ namespace Dive
 	{
 		if (m_Name.empty())
 			m_Name = "Untitled";
+
+		SUBSCRIBE_EVENT(eEventType::GameObjectModify, [this](const Event& e) { m_bDirty = true; });
 	}
 
 	Scene::~Scene()
@@ -21,20 +24,20 @@ namespace Dive
 	{
 		if (m_bDirty)
 		{
-			if (m_GameObjects.empty())
-				return;
-
 			auto it = m_GameObjects.begin();
 			for (it; it != m_GameObjects.end();)
 			{
 				if ((*it)->IsRemoveTarget())
 				{
+					// 이렇게 하나만 제거하면 안될 것 같다.
 					DV_DELETE(*it);
 					it = m_GameObjects.erase(it);
 				}
 				else
 					it++;
 			}
+
+			FIRE_EVENT(SceneResolveEvent(&m_GameObjects));
 
 			m_bDirty = false;
 		}

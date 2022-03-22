@@ -49,15 +49,6 @@
     <ClInclude Include="Src\Base\Object.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Scene\Component\Renderer.h">
-      <Filter>Src\Scene\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\Component\SpriteRenderer.h">
-      <Filter>Src\Scene\Component</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\Component\MeshRenderer.h">
-      <Filter>Src\Scene\Component</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Math\Math.h">
       <Filter>Src\Math</Filter>
     </ClInclude>
@@ -65,9 +56,6 @@
       <Filter>Src\Input</Filter>
     </ClInclude>
     <ClInclude Include="Src\Events\EventSystem.h">
-      <Filter>Src\Events</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Events\WindowEvent.h">
       <Filter>Src\Events</Filter>
     </ClInclude>
     <ClInclude Include="Src\Renderer\RenderPath.h">
@@ -78,6 +66,18 @@
     </ClInclude>
     <ClInclude Include="Src\Renderer\CommandList.h">
       <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Events\EngineEvents.h">
+      <Filter>Src\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\Renderable.h">
+      <Filter>Src\Scene\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\MeshRenderable.h">
+      <Filter>Src\Scene\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\SpriteRenderable.h">
+      <Filter>Src\Scene\Component</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -123,9 +123,6 @@
     <ClCompile Include="Src\Scene\Component\Component.cpp">
       <Filter>Src\Scene\Component</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Scene\Component\SpriteRenderer.cpp">
-      <Filter>Src\Scene\Component</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Math\Math.cpp">
       <Filter>Src\Math</Filter>
     </ClCompile>
@@ -140,6 +137,9 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\PipelineState.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\SpriteRenderable.cpp">
+      <Filter>Src\Scene\Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

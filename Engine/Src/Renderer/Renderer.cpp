@@ -4,7 +4,7 @@
 #include "Base/Engine.h"
 #include "Scene/GameObject.h"
 #include "Scene/Component/Transform.h"
-#include "Scene/Component/SpriteRenderer.h"
+#include "Scene/Component/SpriteRenderable.h"
 
 namespace Dive
 {
@@ -101,7 +101,7 @@ namespace Dive
 	// 여긴 buffers(cbuffer, vertex, index), resource(texture)들만 bind한 후
 	// draw하도록 수정이 필요하다. 즉, 너무 복잡하다.
 	// viewport, shader 그리고 각종 state 들은 상위에서 bind하는 것이 맞다.
-	void Renderer::DrawSprite(Transform* pTransform, SpriteRenderer* pRenderer)
+	void Renderer::DrawSprite(Transform* pTransform, SpriteRenderable* pRenderer)
 	{
 		if (!pTransform || !pRenderer)
 			return;
@@ -225,7 +225,7 @@ namespace Dive
 			return;
 
 		auto pTransform = pObj->GetComponent<Transform>();
-		auto pRenderer = pObj->GetComponent<SpriteRenderer>();
+		auto pRenderer = pObj->GetComponent<SpriteRenderable>();
 
 		if (!pTransform || !pRenderer)
 			return;
