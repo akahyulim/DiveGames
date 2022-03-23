@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "Graphics/GraphicsDevice.h"
 #include "Base/Engine.h"
+#include "Scene/Scene.h"
 #include "Scene/GameObject.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/SpriteRenderable.h"
@@ -98,203 +99,6 @@ namespace Dive
 		pSwapChain->Present(m_GraphicsDevice.IsVSync() ? 1 : 0, 0);
 	}
 
-	// 여긴 buffers(cbuffer, vertex, index), resource(texture)들만 bind한 후
-	// draw하도록 수정이 필요하다. 즉, 너무 복잡하다.
-	// viewport, shader 그리고 각종 state 들은 상위에서 bind하는 것이 맞다.
-	void Renderer::DrawSprite(Transform* pTransform, SpriteRenderable* pRenderer)
-	{
-		if (!pTransform || !pRenderer)
-			return;
-
-		if (!pRenderer->IsEnabled())
-			return;
-
-		auto pImmediateContext = m_GraphicsDevice.GetImmediateContext();
-
-		auto pShaderResourceView = pRenderer->GetShaderResourceView();
-		pImmediateContext->PSSetShaderResources(0, 1, &pShaderResourceView);
-		pImmediateContext->PSSetSamplers(0, 1, &m_SamplerStates[static_cast<size_t>(eSamplerStateType::Linear)]);
-		pImmediateContext->OMSetDepthStencilState(m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthOnStencilOn)], 1);
-		pImmediateContext->RSSetState(m_RasterizerStates[static_cast<size_t>(eRasterizerStateType::CullBackSolid)]);
-		pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// wvp constant buffer
-		// view와 proj는 카메라를 통해 전달 받아야 한다.
-		{
-			D3D11_MAPPED_SUBRESOURCE mappedResource;
-			
-			// map
-			pImmediateContext->Map(m_pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-			MatrixBufferType* pPtr = static_cast<MatrixBufferType*>(mappedResource.pData);
-
-			// world
-			// 이건 계층구조로 인해 누적된 행렬이다.
-			// 계층구조로 구성된 오브젝트들을 어떻게 다뤄야할 지 결정해야 한다.
-			auto matWorld = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
-			pPtr->world = matWorld;
-
-			// view
-			DirectX::XMFLOAT3 up, position, lookAt;
-			DirectX::XMVECTOR upVector, positionVector, lookAtVector;
-			float yaw, pitch, roll;
-			DirectX::XMMATRIX rotationMatrix;
-
-			up.x = 0.0f;
-			up.y = 1.0f;
-			up.z = 0.0f;
-			upVector = DirectX::XMLoadFloat3(&up);
-
-			position.x = 0.0f;
-			position.y = 0.0f;
-			position.z = -10.0f;
-			positionVector = DirectX::XMLoadFloat3(&position);
-
-			lookAt.x = 0.0f;
-			lookAt.y = 0.0f;
-			lookAt.z = 1.0f;
-			lookAtVector = DirectX::XMLoadFloat3(&lookAt);
-
-			// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
-			pitch = 0.0f * 0.0174532925f;
-			yaw = 0.0f * 0.0174532925f;
-			roll = 0.0f * 0.0174532925f;
-
-			// Create the rotation matrix from the yaw, pitch, and roll values.
-			rotationMatrix = DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-
-			// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
-			lookAtVector = DirectX::XMVector3TransformCoord(lookAtVector, rotationMatrix);
-			upVector = DirectX::XMVector3TransformCoord(upVector, rotationMatrix);
-
-			// Translate the rotated camera position to the location of the viewer.
-			lookAtVector = DirectX::XMVectorAdd(positionVector, lookAtVector);
-
-			// Finally create the view matrix from the three updated vectors.
-			auto view = DirectX::XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
-			view = DirectX::XMMatrixTranspose(view);
-			pPtr->view = view;
-
-			// 뷰포트는 카메라를 통하는게 맞는 것 같다.
-			D3D11_VIEWPORT viewport;
-			viewport.Width = (float)m_pSampleTex->GetWidth();
-			viewport.Height = (float)m_pSampleTex->GetHeight();
-			viewport.MinDepth = 0.0f;
-			viewport.MaxDepth = 1.0f;
-			viewport.TopLeftX = 0.0f;
-			viewport.TopLeftY = 0.0f;
-			pImmediateContext->RSSetViewports(1, &viewport);
-
-			// proj
-			// Setup the projection matrix.
-			float fieldOfView = 3.141592654f / 4.0f;
-			float screenAspect = (float)m_pSampleTex->GetWidth() / (float)m_pSampleTex->GetHeight();
-
-			// Create the projection matrix for 3D rendering.
-			auto proj = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
-			proj = DirectX::XMMatrixTranspose(proj);
-			pPtr->proj = proj;
-
-			// unmap
-			pImmediateContext->Unmap(m_pMatrixBuffer, 0);
-
-			pImmediateContext->VSSetConstantBuffers(0, 1, &m_pMatrixBuffer);
-		}
-
-		auto pVertexBuffer = pRenderer->GetVertexBuffer();
-		DV_ASSERT(pVertexBuffer);
-		unsigned int stride = pRenderer->GetVertexStride();
-		unsigned int offset = 0;
-		pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
-
-		auto pIndexBuffer = pRenderer->GetIndexBuffer();
-		DV_ASSERT(pIndexBuffer);
-		auto indexCount = pRenderer->GetIndexCount();
-		auto indexFormat = pRenderer->GetIndexForamt();
-		pImmediateContext->IASetIndexBuffer(pIndexBuffer, indexFormat, 0);
-
-		pImmediateContext->IASetInputLayout(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pInputLayout);
-		pImmediateContext->VSSetShader(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pVertexShader, nullptr, 0);
-		pImmediateContext->PSSetShader(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pPixelShader, nullptr, 0);
-		
-		pImmediateContext->DrawIndexed(indexCount, 0, 0);
-	}
-
-	void Renderer::DrawSprite(DirectX::XMMATRIX matView, DirectX::XMMATRIX matProj, GameObject* pObj)
-	{
-		if (!pObj)
-			return;
-
-		auto pTransform = pObj->GetComponent<Transform>();
-		auto pRenderer = pObj->GetComponent<SpriteRenderable>();
-
-		if (!pTransform || !pRenderer)
-			return;
-
-		if (!pRenderer->IsEnabled())
-			return;
-
-		auto pImmediateContext = m_GraphicsDevice.GetImmediateContext();
-
-		auto pShaderResourceView = pRenderer->GetShaderResourceView();
-		pImmediateContext->PSSetShaderResources(0, 1, &pShaderResourceView);
-		pImmediateContext->PSSetSamplers(0, 1, &m_SamplerStates[static_cast<size_t>(eSamplerStateType::Linear)]);
-		pImmediateContext->OMSetDepthStencilState(m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthOnStencilOn)], 1);
-		pImmediateContext->RSSetState(m_RasterizerStates[static_cast<size_t>(eRasterizerStateType::CullBackSolid)]);
-		pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		// 뷰포트는 카메라를 통하는게 맞는 것 같다.
-		D3D11_VIEWPORT viewport;
-		viewport.Width = (float)m_pSampleTex->GetWidth();
-		viewport.Height = (float)m_pSampleTex->GetHeight();
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-		viewport.TopLeftX = 0.0f;
-		viewport.TopLeftY = 0.0f;
-		pImmediateContext->RSSetViewports(1, &viewport);
-
-
-		// wvp constant buffer
-		// view와 proj는 카메라를 통해 전달 받아야 한다.
-		{
-			D3D11_MAPPED_SUBRESOURCE mappedResource;
-
-			// map
-			pImmediateContext->Map(m_pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-			MatrixBufferType* pPtr = static_cast<MatrixBufferType*>(mappedResource.pData);
-
-			// world
-			// 이건 계층구조로 인해 누적된 행렬이다.
-			// 계층구조로 구성된 오브젝트들을 어떻게 다뤄야할 지 결정해야 한다.
-			auto matWorld = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
-			pPtr->world = matWorld;
-			pPtr->view = DirectX::XMMatrixTranspose(matView);
-			pPtr->proj = DirectX::XMMatrixTranspose(matProj);
-
-			// unmap
-			pImmediateContext->Unmap(m_pMatrixBuffer, 0);
-
-			pImmediateContext->VSSetConstantBuffers(0, 1, &m_pMatrixBuffer);
-		}
-
-		auto pVertexBuffer = pRenderer->GetVertexBuffer();
-		DV_ASSERT(pVertexBuffer);
-		unsigned int stride = pRenderer->GetVertexStride();
-		unsigned int offset = 0;
-		pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
-
-		auto pIndexBuffer = pRenderer->GetIndexBuffer();
-		DV_ASSERT(pIndexBuffer);
-		auto indexCount = pRenderer->GetIndexCount();
-		auto indexFormat = pRenderer->GetIndexForamt();
-		pImmediateContext->IASetIndexBuffer(pIndexBuffer, indexFormat, 0);
-
-		pImmediateContext->IASetInputLayout(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pInputLayout);//m_pSpriteInputLayout);
-		pImmediateContext->VSSetShader(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pVertexShader, nullptr, 0);
-		pImmediateContext->PSSetShader(m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pPixelShader, nullptr, 0);
-
-		pImmediateContext->DrawIndexed(indexCount, 0, 0);
-	}
-
 	void Renderer::SetResolution(unsigned int width, unsigned int height)
 	{
 		m_GraphicsDevice.ResizeBackBuffer(width, height);
@@ -353,6 +157,26 @@ namespace Dive
 			return nullptr;
 
 		return &m_Shaders[static_cast<size_t>(type)];
+	}
+
+	void Renderer::UpdateVisibility(Visibility& vis)
+	{
+		vis.Clear();
+
+		auto pScene = vis.pScene;
+		for(auto pGameObject : pScene->GetGameObjects())
+		{
+			// 원래는 레이어, 컬링 테스트 등으로 거른 후
+			// 통과한 대상만 저장한다.
+			//if (vis.flags & Visibility::SpriteRenderables)
+			{
+				auto pSpriteRenderable = pGameObject->GetComponent<SpriteRenderable>();
+				if (!pSpriteRenderable || !pSpriteRenderable->IsEnabled())
+					continue;
+
+				vis.visibleSpriteRenderables.emplace_back(pGameObject);
+			}
+		}
 	}
 
 	void Renderer::createRenderTargets()

@@ -9,7 +9,7 @@ public:
 	EditorScene(const std::string name = std::string());
 	~EditorScene() = default;
 
-	void UpdateEditor(float elapsedTime, SceneViewCamera* pCamera);
+	//void UpdateEditor(float elapsedTime, SceneViewCamera* pCamera);
 
 private:
 

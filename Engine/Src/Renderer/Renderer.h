@@ -9,9 +9,50 @@ namespace Dive
 {
 	struct WindowData;
 
+	class Scene;
 	class GameObject;
 	class Transform;
 	class SpriteRenderable;
+
+	struct Visibility
+	{
+		void Clear()
+		{
+			visibleSpriteRenderables.clear();
+			visibleMeshRenderables.clear();
+			visibleSkinnedMeshRenderables.clear();
+			visibleLights.clear();
+			visibleTerrains.clear();
+			visibleParticles.clear();
+		}
+
+		Scene* pScene = nullptr;
+
+		// Renderable로 모으던지, 개별로 나누던지 해야한다.
+		// 일단은 나눈다고 생각하자.
+		// 근데 이게 필요한가...?
+		enum eFlags
+		{
+			Emtpy = 0,
+			SpriteRenderables = 1 << 0,
+			MeshRenderables = 1 << 1,
+			SkinnedMeshRenderables = 1 << 2,
+			Lights = 1 << 3,
+			Terrains = 1 << 4,
+			Particles = 1 << 5,
+
+			Everything = ~0u
+		};
+
+		eFlags flags;
+
+		std::vector<GameObject*> visibleSpriteRenderables;
+		std::vector<GameObject*> visibleMeshRenderables;
+		std::vector<GameObject*> visibleSkinnedMeshRenderables;
+		std::vector<GameObject*> visibleLights;
+		std::vector<GameObject*> visibleTerrains;
+		std::vector<GameObject*> visibleParticles;
+	};
 
 	enum class eRasterizerStateType : size_t
 	{
@@ -66,9 +107,6 @@ namespace Dive
 		static void BeginScene();
 		static void EndScene();
 
-		static void DrawSprite(Transform* pTransform, SpriteRenderable* pRenderer);
-		static void DrawSprite(DirectX::XMMATRIX matView, DirectX::XMMATRIX matProj, GameObject* pObj);
-
 		//static void SetViewport(float width, float height);
 
 		static void SetResolution(unsigned int width, unsigned int height);
@@ -91,6 +129,10 @@ namespace Dive
 		static Texture2D* GetSampleTexture() { return m_pSampleTex; }
 		static Texture2D* GetDepthStencilTexture() { return m_pDepthStencilTex; }
 
+		static ID3D11Buffer* GetMatrixBuffer() { return m_pMatrixBuffer; }
+
+		static void UpdateVisibility(Visibility& vis);
+
 	private:
 		static void createRenderTargets();
 		static void createSamplers();
@@ -99,6 +141,14 @@ namespace Dive
 		static void createShaders();
 		static void createMatrixBuffer();
 	
+	public:
+		struct MatrixBufferType
+		{
+			DirectX::XMMATRIX world;
+			DirectX::XMMATRIX view;
+			DirectX::XMMATRIX proj;
+		};
+
 	private:
 		static GraphicsDevice m_GraphicsDevice;
 
@@ -121,13 +171,6 @@ namespace Dive
 
 		// constant buffer
 		static ID3D11Buffer* m_pMatrixBuffer;
-
-		struct MatrixBufferType
-		{
-			DirectX::XMMATRIX world;
-			DirectX::XMMATRIX view;
-			DirectX::XMMATRIX proj;
-		};
 
 		// test resources =================
 		static Texture2D* m_pSampleTex;

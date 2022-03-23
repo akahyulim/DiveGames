@@ -3,6 +3,8 @@
 
 namespace Dive
 {
+	class RenderPath;
+
 	struct WindowData
 	{
 		HINSTANCE hInstance = 0;
@@ -28,14 +30,20 @@ namespace Dive
 		void Initialize(const WindowData* pData);
 		void Shutdown();
 
-		void Run();
+		void Update(float delta);
+		void Render();
 
 		void SetWindowData(const WindowData& data);
+
+		RenderPath* GetActiveRenderPath() { return m_pActiveRenderPath; }
+		void SetActiveRenderPath(RenderPath* pRenderPath);
 
 	private:
 	
 	private:
 		Time m_Time;
 		WindowData m_WindowData;
+
+		RenderPath* m_pActiveRenderPath = nullptr;
 	};
 }

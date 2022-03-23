@@ -68,7 +68,11 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	data.Height = GetHeight();
 	data.bVSync = m_bVSync;
 	data.bFullScreen = m_bFullScreen;
-	Dive::CreateEngine(&data);
+	auto pEngine = Dive::CreateEngine(&data);
+
+	// 위치가 애매하다.
+	pEngine->SetActiveRenderPath(static_cast<Dive::RenderPath*>(&m_EditorRenderPath));
+	m_EditorRenderPath.SetSceneViewCamera(&m_SceneViewCamera);
 
 	// intialize ImGui
 	intializeImGui();
@@ -123,12 +127,16 @@ void Editor::Run()
 		{
 			// 업데이트 구분을 좀 더 명확하게 짜야할듯?
 			// 이게 좀 쌩뚱맞다... 역시 Editor가 상속해야 하나....
-			Dive::Run();
+			//Dive::Run();
+			m_EditorRenderPath.SetActiveScene(m_pMenuBar->GetActiveScene());
+			Dive::GetCurrentEngine()->Update(0.0f);
+			Dive::GetCurrentEngine()->Render();
 
 			// Hazel은 이 곳에서 ScenePanel의 크기를 이용해
 			// ScenePanel에 그려질 이미지의 크기를 리사이즈하고,
 			// 각종 객체에 Viewport의 크기를 전달한다.
 
+			/*
 			switch (m_SceneMode)
 			{
 			case eSceneMode::Editor:
@@ -143,7 +151,7 @@ void Editor::Run()
 
 				break;
 			}
-
+			
 			// 현재 Renderer::Tick()에서 Begin/End를 호출하여 그려진다.
 			// 실제로는 Scene::Update() 내부에서 Renderer를 호출하여 행해야 하는 일이다.
 			// 즉, Renderer는 Tick() 대상이 아닌데, Dive::Run()에서 수행되고 있는 것이다.
@@ -157,7 +165,7 @@ void Editor::Run()
 				break;
 			}
 			}
-
+			*/
 			// Begin
 			{
 				ImGui_ImplDX11_NewFrame();

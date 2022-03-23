@@ -13,6 +13,7 @@ namespace Dive
 		Renderable(GameObject* pGameObject) : Component(pGameObject) {}
 		virtual ~Renderable() = default;
 
+		// Behaviour의 Enalbed랑은 다르다. 이건 보이느냐 마느냐이다.
 		bool IsEnabled() const { return m_bEnabled; }
 		void SetEnable(bool enable) { m_bEnabled = enable; }
 

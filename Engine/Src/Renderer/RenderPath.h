@@ -1,17 +1,10 @@
 #pragma once
-#include "Events/EventSystem.h"
+#include "Renderer.h"
 
 namespace Dive
 {
 	class GameObject;
 	class CommandList;
-
-	enum class eRenderableType
-	{
-		Opaque,
-		Transparent,
-		Light
-	};
 
 	class RenderPath
 	{
@@ -22,12 +15,11 @@ namespace Dive
 		virtual void Update(float delta);
 		virtual void Render();
 
-		void OnAcquireRenderableObjects(const Event& e);
+	
+	protected:
+		void passDefault(CommandList* pCl, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj);
 
-	private:
-		void passDefault(CommandList* pCl);
-
-	private:
-		std::unordered_map<eRenderableType, std::vector<GameObject*>> m_RenderableObjects;
+	protected:
+		Visibility m_MainVisibilities;
 	};
 }

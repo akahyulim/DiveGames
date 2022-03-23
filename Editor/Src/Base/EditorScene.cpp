@@ -7,7 +7,7 @@ EditorScene::EditorScene(const std::string name)
 	: Dive::Scene(name)
 {
 }
-
+/*
 void EditorScene::UpdateEditor(float elapsedTime, SceneViewCamera* pCamera)
 {
 	// begin scene
@@ -47,7 +47,7 @@ void EditorScene::UpdateEditor(float elapsedTime, SceneViewCamera* pCamera)
 			{
 				// 역시 카메라 객체를 전달하는 편이 더 깔끔하다...
 				// 아니면 View, Proj를 다른 cb에 map하는 것이 나을 수도 있다.
-				Dive::Renderer::DrawSprite(pCamera->GetViewMatrix(), pCamera->GetProjectionMatrix(), pGameObject);
+				//Dive::Renderer::DrawSprite(pCamera->GetViewMatrix(), pCamera->GetProjectionMatrix(), pGameObject);
 			}
 		}
 	}
@@ -55,3 +55,4 @@ void EditorScene::UpdateEditor(float elapsedTime, SceneViewCamera* pCamera)
 	// end scene
 	Dive::Renderer::EndScene();
 }
+*/

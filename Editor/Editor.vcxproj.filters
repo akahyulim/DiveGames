@@ -63,13 +63,16 @@
     <ClCompile Include="Src\Panels\InspectorPanel.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Base\EditorScene.cpp">
-      <Filter>Src\Base</Filter>
-    </ClCompile>
     <ClCompile Include="External\imgui-docking\imgui_stdlib.cpp">
       <Filter>External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="Src\Base\SceneViewCamera.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\EditorRenderPath.cpp">
+      <Filter>Src\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Base\EditorScene.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
   </ItemGroup>
@@ -119,13 +122,16 @@
     <ClInclude Include="Src\Panels\Panel.h">
       <Filter>Src\Panels</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Base\EditorScene.h">
-      <Filter>Src\Base</Filter>
-    </ClInclude>
     <ClInclude Include="External\imgui-docking\imgui_stdlib.h">
       <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="Src\Base\SceneViewCamera.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\EditorRenderPath.h">
+      <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Base\EditorScene.h">
       <Filter>Src\Base</Filter>
     </ClInclude>
   </ItemGroup>
