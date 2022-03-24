@@ -6,8 +6,6 @@
 #include "imgui-docking/imgui_internal.h"
 #include "imgui-docking/imgui_stdlib.h"
 
-class EditorScene;
-
 class Panel
 {
 public:
@@ -22,8 +20,8 @@ public:
 	bool IsVisible() const { return m_bVisible; }
 	void SetVisible(bool visible) { m_bVisible = visible; }
 
-	EditorScene* GetActiveScene() { return m_pActiveScene; }
-	void SetActiveScene(EditorScene* pScene) { m_pActiveScene = pScene; }
+	Dive::Scene* GetActiveScene() { return m_pActiveScene; }
+	void SetActiveScene(Dive::Scene* pScene) { m_pActiveScene = pScene; }
 
 protected:
 	// 항상 그려져야 하는 것(ex. MenuBar)
@@ -40,5 +38,5 @@ protected:
 
 	Editor* m_pEditor	= nullptr;
 
-	EditorScene* m_pActiveScene = nullptr;
+	Dive::Scene* m_pActiveScene = nullptr;
 };

@@ -159,7 +159,6 @@
     <ClCompile Include="External\imgui-docking\imgui_widgets.cpp" />
     <ClCompile Include="Src\Base\Editor.cpp" />
     <ClCompile Include="Src\Base\EditorRenderPath.cpp" />
-    <ClCompile Include="Src\Base\EditorScene.cpp" />
     <ClCompile Include="Src\Base\SceneViewCamera.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Panels\AssetPanel.cpp" />
@@ -181,7 +180,6 @@
     <ClInclude Include="External\imgui-docking\imstb_truetype.h" />
     <ClInclude Include="Src\Base\Editor.h" />
     <ClInclude Include="Src\Base\EditorRenderPath.h" />
-    <ClInclude Include="Src\Base\EditorScene.h" />
     <ClInclude Include="Src\Base\SceneViewCamera.h" />
     <ClInclude Include="Src\Panels\AssetPanel.h" />
     <ClInclude Include="Src\Panels\HierarchyPanel.h" />
