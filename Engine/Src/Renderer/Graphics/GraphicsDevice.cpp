@@ -106,9 +106,8 @@ namespace Dive
 		DV_ASSERT(m_pImmediateContext != nullptr);
 
 		m_pImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
-
 		CleanupMainRenderTargetView();
-
+		
 		if (FAILED(m_pSwapChain->ResizeBuffers(m_BackbufferCount, width, height, m_Format, 0)))
 		{
 			DV_CORE_WARN("ResizeBuffer를 실패하였습니다.");

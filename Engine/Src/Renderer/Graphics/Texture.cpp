@@ -118,6 +118,7 @@ namespace Dive
 		return true;
 	}
 
+	// Viewport도 함께 설정
 	bool Texture2D::CreateRenderTargetView(DXGI_FORMAT format)
 	{
 		D3D11_RENDER_TARGET_VIEW_DESC desc;
@@ -134,6 +135,13 @@ namespace Dive
 			Shutdown();
 			return false;
 		}
+
+		m_Viewport.TopLeftX = 0.0f;
+		m_Viewport.TopLeftY = 0.0f;
+		m_Viewport.Width	= static_cast<FLOAT>(m_Width);
+		m_Viewport.Height	= static_cast<FLOAT>(m_Height);
+		m_Viewport.MinDepth = 0.0f;
+		m_Viewport.MaxDepth = 1.0f;
 
 		return true;
 	}

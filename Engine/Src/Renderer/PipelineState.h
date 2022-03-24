@@ -15,15 +15,14 @@ namespace Dive
 
 		// Rasterizer
 		ID3D11RasterizerState* pRasterizerState = nullptr;
+		D3D11_VIEWPORT* pViewport = nullptr;
 
 		// Pixel Shader
 		ID3D11PixelShader* pPixelShader = nullptr;
 
 		// Output Merge
-		ID3D11DepthStencilView* pDepthStencilView = nullptr;
 		ID3D11DepthStencilState* pDepthStencilState = nullptr;
-		
-
-		// render targets
+		ID3D11DepthStencilView* pDepthStencilView = nullptr;		// 추후 readonly가 추가될 수 있다.
+		std::array<ID3D11RenderTargetView*, 8> renderTargetViews = { nullptr };
 	};
 }

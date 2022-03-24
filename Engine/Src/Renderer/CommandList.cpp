@@ -6,7 +6,7 @@
 
 namespace Dive
 {
-	bool CommandList::SetPipelineState(PipelineState& ps)
+	bool CommandList::BindPipelineState(PipelineState& ps)
 	{
 		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
 		if (!pImmediateContext)
@@ -62,9 +62,20 @@ namespace Dive
 			}
 		}
 
+		// Viewports
+		{
+			UINT numViewports = 1;
+			D3D11_VIEWPORT* pCurrentViewports = nullptr;
+			pImmediateContext->RSGetViewports(&numViewports, pCurrentViewports);
+
+			if (m_pPipelineState->pViewport != pCurrentViewports)
+			{
+				pImmediateContext->RSSetViewports(1, m_pPipelineState->pViewport);
+			}
+		}
+
 		// PixelShader
 		{
-
 			ID3D11PixelShader* pCurrentPixelShader = nullptr;
 			ID3D11ClassInstance* pClassInstances[256];
 			UINT numClassInstances = 256;
@@ -88,6 +99,40 @@ namespace Dive
 			}
 		}
 
+		// RenderTargetViews
+		{
+			UINT numViews = 8;
+			std::array<ID3D11RenderTargetView*, 8> currentRenderTargetViews = { nullptr };
+			ID3D11DepthStencilView* pCurrentDepthStencilView = nullptr;
+			pImmediateContext->OMGetRenderTargets(numViews, currentRenderTargetViews.data(), &pCurrentDepthStencilView);
+
+			if ((currentRenderTargetViews != m_pPipelineState->renderTargetViews) || (pCurrentDepthStencilView != m_pPipelineState->pDepthStencilView))
+			{
+				UINT renderTargetCount = 0;
+				for (auto pRenderTargetView : m_pPipelineState->renderTargetViews)
+				{
+					if (pRenderTargetView)
+					{
+						renderTargetCount++;
+					}
+				}
+
+				// 이렇게까지 해도 리사이즈가 안되는건 이해가 안된다.
+				// Scene을 로드하지 않았을 땐 문제가 발생하지 않는 걸 보니
+				// 역시 RenderTarget의 Resize와 문제가 있는 것 같다...
+				auto pRTV = m_pPipelineState->renderTargetViews[0];
+
+				pImmediateContext->OMSetRenderTargets(
+					//renderTargetCount,
+					//m_pPipelineState->renderTargetViews.data(),
+					//m_pPipelineState->pDepthStencilView
+					1,
+					&pRTV,
+					nullptr
+				);
+			}
+		}
+		
 		return true;
 	}
 

@@ -107,8 +107,6 @@ namespace Dive
 		static void BeginScene();
 		static void EndScene();
 
-		//static void SetViewport(float width, float height);
-
 		static void SetResolution(unsigned int width, unsigned int height);
 		// 이름을 바꾸고 싶다. 생성은 createTextures가 하기 때문이다.
 		static void SetTextures(unsigned int width, unsigned int height);
@@ -124,6 +122,8 @@ namespace Dive
 		static ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilStateType type);
 		static ID3D11RasterizerState* GetRasterizerState(eRasterizerStateType type);
 		static Shader* GetShader(eShaderType type);
+
+		static D3D11_VIEWPORT* GetBackbufferViewport() { return &m_Viewport; }
 
 		// test ============================================================
 		static Texture2D* GetSampleTexture() { return m_pSampleTex; }
@@ -171,6 +171,8 @@ namespace Dive
 
 		// constant buffer
 		static ID3D11Buffer* m_pMatrixBuffer;
+
+		static D3D11_VIEWPORT m_Viewport;
 
 		// test resources =================
 		static Texture2D* m_pSampleTex;

@@ -6,12 +6,13 @@ void EditorRenderPath::Update(float delta)
 	if (!m_pActiveScene || !m_pSceneViewCamera)
 		return;
 
+	// 둘 다 위치가 애매하다. 
+	// 그렇다고 Renderer에 Update를 두는 것도 이상한데...
 	m_pSceneViewCamera->Update(delta);
-	m_pActiveScene->Update(delta);	// 이건 위치가 좀 애매하다.
+	m_pActiveScene->Update(delta);
 
 	m_MainVisibilities;
 	m_MainVisibilities.pScene = m_pActiveScene;
-
 	Dive::Renderer::UpdateVisibility(m_MainVisibilities);
 }
 
@@ -21,37 +22,41 @@ void EditorRenderPath::Render()
 		return;
 
 	// begin scene
+	// : 현재 직접 bind하고 있다. 
 	{
+		// 이것도 Pass 안에 넣어야 할까?
+		// 스파르탄의 경우 초기화는 외부에서 하고
+		// pass에 필요한 것들을 인자로 전달한 후 bind하는 것 같다.
 		auto pImmediateContext = Dive::Renderer::GetGraphicsDevice().GetImmediateContext();
 		auto pRenderTargetView = Dive::Renderer::GetSampleTexture()->GetRenderTargetView();
 		auto pDepthStencilView = Dive::Renderer::GetDepthStencilTexture()->GetDepthStencilView();
 		if (!pImmediateContext || !pRenderTargetView)
 			return;
 
-		// active camera로부터 가져와야 한다.
 		float clearColors[4] = { 0.35f, 0.35f, 0.7f, 1.0f };
 
 		pImmediateContext->ClearRenderTargetView(pRenderTargetView, clearColors);
 		if (pDepthStencilView)
 			pImmediateContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-		pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView ? pDepthStencilView : nullptr);
-
-		// 좀 애매하다.
-		D3D11_VIEWPORT viewport;
-		viewport.Width = (float)Dive::Renderer::GetSampleTexture()->GetWidth();
-		viewport.Height = (float)Dive::Renderer::GetSampleTexture()->GetHeight();
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-		viewport.TopLeftX = 0.0f;
-		viewport.TopLeftY = 0.0f;
-		pImmediateContext->RSSetViewports(1, &viewport);
+		//pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView ? pDepthStencilView : nullptr);
+		//pImmediateContext->RSSetViewports(1, Dive::Renderer::GetSampleTexture()->GetViewport());
 	}
 
 	Dive::CommandList cl;
 
+	// 카메라의 역할이 이게 가장 크다.
+	// 이외에도 클리핑 기능이 있긴 한데... 그게 viewport일까? 아니면 frustum일까?
+	// 어쨌든간에 pass안에 넣는게 나아보인다.
+	// 그렇다면 결국 SceneViewCamera는 Camera를 상속해야 한다.
 	auto view = m_pSceneViewCamera->GetViewMatrix();
 	auto proj = m_pSceneViewCamera->GetProjectionMatrix();
 
 	Dive::RenderPath::passDefault(&cl, view, proj);
+
+	// BeginScene은 사실상 구현하기 애매하니,
+	// EndScene보다 Present라는 이름이 어울린다.
+	// 그런데 이 곳에서 호출하면 안된다.
+	// ImGui도 Present할 때 문제가 발생한다.
+	//Dive::Renderer().EndScene();
 }

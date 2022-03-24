@@ -122,49 +122,17 @@ void Editor::Run()
 		if (m_bDone)
 			break;
 
-		// 이 아래쪽에서 Update
 		{
-			// 업데이트 구분을 좀 더 명확하게 짜야할듯?
-			// 이게 좀 쌩뚱맞다... 역시 Editor가 상속해야 하나....
-			//Dive::Run();
+			// Scene이 변경될 수 있어 명시적 Set이 필요하다
+			// 다만 이 부분은 이벤트로도 처리가 가능하다.
 			m_EditorRenderPath.SetActiveScene(m_pMenuBar->GetActiveScene());
+			
+			// 현재 둘이 나란히 붙어 있지만 Wicked의 경우 Update가 분화되어 있고
+			// 호출 단계도 나누어진다.
 			Dive::GetCurrentEngine()->Update(0.0f);
+			// eSceneMode에 따라 구분될 수 있어야 한다.
 			Dive::GetCurrentEngine()->Render();
 
-			// Hazel은 이 곳에서 ScenePanel의 크기를 이용해
-			// ScenePanel에 그려질 이미지의 크기를 리사이즈하고,
-			// 각종 객체에 Viewport의 크기를 전달한다.
-
-			/*
-			switch (m_SceneMode)
-			{
-			case eSceneMode::Editor:
-			{
-				m_SceneViewCamera.Update(0.0f);
-
-				// Hazel은 ActiveScene이 Editor의 멤버 변수이다.
-				// 하지만 이는 Menuber가 Editor에 만들어져 있기 때문에 가능하다.
-				auto pActiveScene = m_pMenuBar->GetActiveScene();
-				if (pActiveScene)
-					pActiveScene->UpdateEditor(1.0f, &m_SceneViewCamera);
-
-				break;
-			}
-			
-			// 현재 Renderer::Tick()에서 Begin/End를 호출하여 그려진다.
-			// 실제로는 Scene::Update() 내부에서 Renderer를 호출하여 행해야 하는 일이다.
-			// 즉, Renderer는 Tick() 대상이 아닌데, Dive::Run()에서 수행되고 있는 것이다.
-			case eSceneMode::Play:
-			{				
-				auto pActiveScene = m_pMenuBar->GetActiveScene();
-			
-				//if (pActiveScene)
-				//	pActiveScene->Update(0.0f);
-				
-				break;
-			}
-			}
-			*/
 			// Begin
 			{
 				ImGui_ImplDX11_NewFrame();

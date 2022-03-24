@@ -8,7 +8,7 @@ namespace Dive
 	{
 	public:
 
-		bool SetPipelineState(PipelineState& ps);
+		bool BindPipelineState(PipelineState& ps);
 
 		// sampler
 		// viewport

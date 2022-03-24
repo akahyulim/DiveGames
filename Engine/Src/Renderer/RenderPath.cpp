@@ -18,7 +18,7 @@ namespace Dive
 	}
 
 	// 매 프레임 Visibilities를 분류하는 것은 비효율적이다.
-	// 이 곳은 말 그래돌 Udpate 구문으로 채우고
+	// 이 곳은 이름 그대로 Udpate 구문으로 채우고
 	// VisibilityUpdate는 Event 처리로 할 수도 있다.
 	void RenderPath::Update(float delta)
 	{
@@ -30,9 +30,9 @@ namespace Dive
 	
 	void RenderPath::Render()
 	{
-		// 이전 state 비교용
 		CommandList cl;
 
+		// viewport?
 		// sampler, global cbuffer
 
 		// bind까지 미리 하는 것도 생각해볼 수 있다.
@@ -57,7 +57,11 @@ namespace Dive
 			ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
 			ps.pPixelShader			= Renderer::GetShader(eShaderType::Sprite)->pPixelShader;
 			ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
-			pCl->SetPipelineState(ps);
+			ps.renderTargetViews[0] = Renderer::GetSampleTexture()->GetRenderTargetView();
+			ps.pViewport			= Renderer::GetSampleTexture()->GetViewport();
+			ps.pDepthStencilView	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
+			
+			pCl->BindPipelineState(ps);
 
 			// 카메라에 맞춰 Viewport도 bind해야 한다...
 
@@ -88,6 +92,7 @@ namespace Dive
 					pImmediateContext->VSSetConstantBuffers(0, 1, &pMatrixBuffer);
 				}
 
+				// 슬롯이 있다.
 				auto pShaderResourceView = pSpriteRenderable->GetShaderResourceView();
 				pImmediateContext->PSSetShaderResources(0, 1, &pShaderResourceView);
 

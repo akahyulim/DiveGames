@@ -22,6 +22,8 @@ namespace Dive
 
 	ID3D11Buffer* Renderer::m_pMatrixBuffer = nullptr;
 
+	D3D11_VIEWPORT Renderer::m_Viewport;
+
 	// 이하 테스트
 	Texture2D* Renderer::m_pSampleTex = nullptr;
 	Texture2D* Renderer::m_pDepthStencilTex = nullptr;
@@ -102,6 +104,13 @@ namespace Dive
 	void Renderer::SetResolution(unsigned int width, unsigned int height)
 	{
 		m_GraphicsDevice.ResizeBackBuffer(width, height);
+
+		m_Viewport.TopLeftX = 0.0f;
+		m_Viewport.TopLeftY = 0.0f;
+		m_Viewport.Width	= static_cast<FLOAT>(width);
+		m_Viewport.Height	= static_cast<FLOAT>(height);
+		m_Viewport.MinDepth = 0.0f;
+		m_Viewport.MaxDepth = 1.0f;
 	}
 
 	// 이 곳에선 크기 확인 및 저장 후 createRenderTargets()를 호출하는 편이 나을 것 같다.

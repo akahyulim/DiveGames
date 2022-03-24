@@ -37,6 +37,8 @@ namespace Dive
 		ID3D11RenderTargetView* GetRenderTargetView() { return m_pRenderTargetView; }
 		ID3D11DepthStencilView* GetDepthStencilView() { return m_pDepthStencilView; }
 
+		D3D11_VIEWPORT* GetViewport() { return &m_Viewport; }
+
 		bool operator==(const Texture& other) override;
 
 		std::string GetName() const { return m_Name; }
@@ -65,5 +67,7 @@ namespace Dive
 		ID3D11ShaderResourceView* m_pShaderResourceView = nullptr;
 		ID3D11RenderTargetView* m_pRenderTargetView		= nullptr;
 		ID3D11DepthStencilView* m_pDepthStencilView		= nullptr;
+
+		D3D11_VIEWPORT m_Viewport;
 	};
 }
