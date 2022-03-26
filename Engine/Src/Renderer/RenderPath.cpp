@@ -63,8 +63,6 @@ namespace Dive
 			
 			pCl->BindPipelineState(ps);
 
-			// 카메라에 맞춰 Viewport도 bind해야 한다...
-
 			for(auto pGameObject : m_MainVisibilities.visibleSpriteRenderables)
 			{
 				auto pTransform = pGameObject->GetComponent<Transform>();

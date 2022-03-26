@@ -32,23 +32,23 @@ namespace Dive
 
 		DXGI_SWAP_CHAIN_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.OutputWindow = m_hWnd;
-		desc.BufferDesc.Width = m_Width;
-		desc.BufferDesc.Height = m_Height;
-		desc.Windowed = m_bFullScreen ? FALSE : TRUE;
-		desc.BufferCount = m_BackbufferCount;
-		desc.BufferDesc.Format = m_Format;
-		desc.BufferDesc.RefreshRate.Numerator = 60;
+		desc.OutputWindow						= m_hWnd;
+		desc.BufferDesc.Width					= m_Width;
+		desc.BufferDesc.Height					= m_Height;
+		desc.Windowed							= m_bFullScreen ? FALSE : TRUE;
+		desc.BufferCount						= m_BackbufferCount;
+		desc.BufferDesc.Format					= m_Format;
+		desc.BufferDesc.RefreshRate.Numerator	= 60;
 		desc.BufferDesc.RefreshRate.Denominator = 1;
 		//desc.BufferDesc.RefreshRate.Numerator = m_bVSync ? refreshRateNumerator : 0;
 		//desc.BufferDesc.RefreshRate.Denominator = m_bVSync ? refreshRateDenominator : 1;
-		desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		desc.SampleDesc.Count = 1;
-		desc.SampleDesc.Quality = 0;
-		desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-		desc.Flags = deviceFlags;
+		desc.BufferDesc.ScanlineOrdering		= DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		desc.BufferDesc.Scaling					= DXGI_MODE_SCALING_UNSPECIFIED;
+		desc.BufferUsage						= DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		desc.SampleDesc.Count					= 1;
+		desc.SampleDesc.Quality					= 0;
+		desc.SwapEffect							= DXGI_SWAP_EFFECT_DISCARD;
+		desc.Flags								= deviceFlags;
 
 		auto createDeviceAndSwapChain = [this, deviceFlags, featureLevels, driverType, desc]()
 		{
@@ -105,7 +105,6 @@ namespace Dive
 		DV_ASSERT(m_pSwapChain != nullptr);
 		DV_ASSERT(m_pImmediateContext != nullptr);
 
-		m_pImmediateContext->OMSetRenderTargets(0, nullptr, nullptr);
 		CleanupMainRenderTargetView();
 		
 		if (FAILED(m_pSwapChain->ResizeBuffers(m_BackbufferCount, width, height, m_Format, 0)))

@@ -4,6 +4,11 @@ namespace Dive
 {
 	struct PipelineState
 	{
+		PipelineState() = default;
+		
+		PipelineState& operator=(const PipelineState& ref);
+		bool operator==(const PipelineState& ref);
+
 		bool IsValid();
 
 		// Input Assembly
@@ -21,6 +26,7 @@ namespace Dive
 		ID3D11PixelShader* pPixelShader = nullptr;
 
 		// Output Merge
+		ID3D11BlendState* pBlendState = nullptr;
 		ID3D11DepthStencilState* pDepthStencilState = nullptr;
 		ID3D11DepthStencilView* pDepthStencilView = nullptr;		// 추후 readonly가 추가될 수 있다.
 		std::array<ID3D11RenderTargetView*, 8> renderTargetViews = { nullptr };

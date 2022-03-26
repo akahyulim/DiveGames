@@ -1,9 +1,8 @@
 #pragma once
+#include "PipelineState.h"
 
 namespace Dive
 {
-	struct PipelineState;
-
 	class CommandList
 	{
 	public:
@@ -20,6 +19,6 @@ namespace Dive
 		// draw
 
 	private:
-		PipelineState* m_pPipelineState;
+		PipelineState m_OldStates;
 	};
 }

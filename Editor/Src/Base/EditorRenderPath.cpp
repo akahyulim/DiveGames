@@ -39,13 +39,16 @@ void EditorRenderPath::Render()
 		if (pDepthStencilView)
 			pImmediateContext->ClearDepthStencilView(pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-		//pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilView ? pDepthStencilView : nullptr);
+		UINT numViews = 8;
+		std::array<ID3D11RenderTargetView*, 8> renderTargetViews = { nullptr };
+		renderTargetViews[0] = pRenderTargetView;
+		//pImmediateContext->OMSetRenderTargets(1, renderTargetViews.data(), pDepthStencilView);
 		//pImmediateContext->RSSetViewports(1, Dive::Renderer::GetSampleTexture()->GetViewport());
 	}
 
 	Dive::CommandList cl;
 
-	// 카메라의 역할이 이게 가장 크다.
+	// 카메라의 역할은 이게 가장 크다.
 	// 이외에도 클리핑 기능이 있긴 한데... 그게 viewport일까? 아니면 frustum일까?
 	// 어쨌든간에 pass안에 넣는게 나아보인다.
 	// 그렇다면 결국 SceneViewCamera는 Camera를 상속해야 한다.

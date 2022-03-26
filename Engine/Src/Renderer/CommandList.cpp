@@ -14,102 +14,79 @@ namespace Dive
 
 		if (!ps.IsValid())
 			return false;
-		m_pPipelineState = &ps;
-
+		
 		// PrimitiveTopology
 		{
-			D3D11_PRIMITIVE_TOPOLOGY currentTopology;
-			pImmediateContext->IAGetPrimitiveTopology(&currentTopology);
-
-			if (m_pPipelineState->primitiveTopology != currentTopology)
+			if(ps.primitiveTopology != m_OldStates.primitiveTopology)
 			{
-				pImmediateContext->IASetPrimitiveTopology(m_pPipelineState->primitiveTopology);
+				pImmediateContext->IASetPrimitiveTopology(ps.primitiveTopology);
 			}
 		}
 
 		// InputLayout
 		{
-			ID3D11InputLayout* pCurrentInputLayout = nullptr;
-			pImmediateContext->IAGetInputLayout(&pCurrentInputLayout);
-
-			if (m_pPipelineState->pInputLayout != pCurrentInputLayout)
+			if (ps.pInputLayout != m_OldStates.pInputLayout)
 			{
-				pImmediateContext->IASetInputLayout(m_pPipelineState->pInputLayout);
+				pImmediateContext->IASetInputLayout(ps.pInputLayout);
 			}
 		}
 
 		// VertexShader
 		{
-			ID3D11VertexShader* pCurrentVertexShader = nullptr;
-			ID3D11ClassInstance* pClassInstances[256];
-			UINT numClassInstances = 256;
-			pImmediateContext->VSGetShader(&pCurrentVertexShader, pClassInstances, &numClassInstances);
-
-			if (m_pPipelineState->pVertexShader != pCurrentVertexShader)
+			if (ps.pVertexShader != m_OldStates.pVertexShader)
 			{
-				pImmediateContext->VSSetShader(m_pPipelineState->pVertexShader, nullptr, 0);
+				pImmediateContext->VSSetShader(ps.pVertexShader, nullptr, 0);
 			}
 		}
 
 		// RasterizerState
 		{
-			ID3D11RasterizerState* pCurrentState = nullptr;
-			pImmediateContext->RSGetState(&pCurrentState);
-
-			if (m_pPipelineState->pRasterizerState != pCurrentState)
+			if (ps.pRasterizerState != m_OldStates.pRasterizerState)
 			{
-				pImmediateContext->RSSetState(m_pPipelineState->pRasterizerState);
+				pImmediateContext->RSSetState(ps.pRasterizerState);
 			}
 		}
 
 		// Viewports
 		{
-			UINT numViewports = 1;
-			D3D11_VIEWPORT* pCurrentViewports = nullptr;
-			pImmediateContext->RSGetViewports(&numViewports, pCurrentViewports);
-
-			if (m_pPipelineState->pViewport != pCurrentViewports)
+			if (ps.pViewport != m_OldStates.pViewport)
 			{
-				pImmediateContext->RSSetViewports(1, m_pPipelineState->pViewport);
+				pImmediateContext->RSSetViewports(1, ps.pViewport);
 			}
 		}
 
 		// PixelShader
 		{
-			ID3D11PixelShader* pCurrentPixelShader = nullptr;
-			ID3D11ClassInstance* pClassInstances[256];
-			UINT numClassInstances = 256;
-			pImmediateContext->PSGetShader(&pCurrentPixelShader, pClassInstances, &numClassInstances);
-
-			if (m_pPipelineState->pPixelShader != pCurrentPixelShader)
+			if (ps.pPixelShader != m_OldStates.pPixelShader)
 			{
-				pImmediateContext->PSSetShader(m_pPipelineState->pPixelShader, nullptr, 0);
+				pImmediateContext->PSSetShader(ps.pPixelShader, nullptr, 0);
+			}
+		}
+
+		// BelndState
+		{
+			// 추가 데이터가 필요하다.
+			if (ps.pBlendState != m_OldStates.pBlendState)
+			{
+				//pImmediateContext->OMSetBlendState(ps.pBlendState, 0);
 			}
 		}
 
 		// DepthStencilState
 		{
-			UINT stencilRef = 0;
-			ID3D11DepthStencilState* pCurrentState = nullptr;
-			pImmediateContext->OMGetDepthStencilState(&pCurrentState, &stencilRef);
-
-			if (m_pPipelineState->pDepthStencilState != pCurrentState)
+			if (ps.pDepthStencilState != m_OldStates.pDepthStencilState)
 			{
-				pImmediateContext->OMSetDepthStencilState(m_pPipelineState->pDepthStencilState, 0);
+				pImmediateContext->OMSetDepthStencilState(ps.pDepthStencilState, 0);
 			}
 		}
 
 		// RenderTargetViews
 		{
-			UINT numViews = 8;
-			std::array<ID3D11RenderTargetView*, 8> currentRenderTargetViews = { nullptr };
-			ID3D11DepthStencilView* pCurrentDepthStencilView = nullptr;
-			pImmediateContext->OMGetRenderTargets(numViews, currentRenderTargetViews.data(), &pCurrentDepthStencilView);
-
-			if ((currentRenderTargetViews != m_pPipelineState->renderTargetViews) || (pCurrentDepthStencilView != m_pPipelineState->pDepthStencilView))
+			if ((ps.renderTargetViews != m_OldStates.renderTargetViews) || 
+				(ps.pDepthStencilView != m_OldStates.pDepthStencilView))
 			{
 				UINT renderTargetCount = 0;
-				for (auto pRenderTargetView : m_pPipelineState->renderTargetViews)
+				for (auto pRenderTargetView : ps.renderTargetViews)
 				{
 					if (pRenderTargetView)
 					{
@@ -117,21 +94,15 @@ namespace Dive
 					}
 				}
 
-				// 이렇게까지 해도 리사이즈가 안되는건 이해가 안된다.
-				// Scene을 로드하지 않았을 땐 문제가 발생하지 않는 걸 보니
-				// 역시 RenderTarget의 Resize와 문제가 있는 것 같다...
-				auto pRTV = m_pPipelineState->renderTargetViews[0];
-
 				pImmediateContext->OMSetRenderTargets(
-					//renderTargetCount,
-					//m_pPipelineState->renderTargetViews.data(),
-					//m_pPipelineState->pDepthStencilView
-					1,
-					&pRTV,
-					nullptr
+					renderTargetCount,
+					ps.renderTargetViews.data(),
+					ps.pDepthStencilView
 				);
 			}
 		}
+
+		m_OldStates = ps;
 		
 		return true;
 	}

@@ -135,6 +135,7 @@ namespace Dive
 
 	private:
 		static void createRenderTargets();
+		static void removeRenderTargets();
 		static void createSamplers();
 		static void createDepthStencilStates();
 		static void createRasterizerStates();

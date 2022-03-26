@@ -101,6 +101,9 @@ namespace Dive
 		pSwapChain->Present(m_GraphicsDevice.IsVSync() ? 1 : 0, 0);
 	}
 
+	// 윈도우의 크기가 외부에서 변경 되었을 경우 호출
+	// 그냥 아래의 OnWindowData로 내용을 옮기고
+	// 여기엔 직접 윈도우 크기까지 변경하는 함수로 만드는 것이 나을 것 같다.
 	void Renderer::SetResolution(unsigned int width, unsigned int height)
 	{
 		m_GraphicsDevice.ResizeBackBuffer(width, height);
@@ -200,6 +203,12 @@ namespace Dive
 		// Depth Stencil Buffers
 		DV_DELETE(m_pDepthStencilTex);
 		m_pDepthStencilTex = Texture2D::Create(width, height, DXGI_FORMAT_D24_UNORM_S8_UINT, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	}
+
+	void Renderer::removeRenderTargets()
+	{
+		DV_DELETE(m_pSampleTex);
+		DV_DELETE(m_pDepthStencilTex);
 	}
 
 	void Renderer::createSamplers()
