@@ -49,6 +49,7 @@ namespace Dive
 		// matrix
 		DirectX::XMMATRIX GetMatrix();
 		DirectX::XMMATRIX GetLocalMatrix() const;
+		void SetLocalMatrix(const DirectX::XMFLOAT4X4& matrix);
 
 		// Translate
 		void Translate(const DirectX::XMFLOAT3& translation, eSpace relativeTo = eSpace::Self);

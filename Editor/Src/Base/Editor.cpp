@@ -7,6 +7,7 @@
 #include "panels/HierarchyPanel.h"
 #include "Panels/InspectorPanel.h"
 #include "Panels/AssetPanel.h"
+#include "Importer/ModelImporter.h"
 
 static Editor* s_pEditor = nullptr;
 
@@ -80,6 +81,10 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	s_pEditor = this;
 
 	// Editor Camera 복사 생성 필요
+
+	m_pModelImporter = new ModelImporter;
+	// test
+	//m_pModelImporter->Load(nullptr, "Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");//cube.obj");
 
 	ShowWindow(m_hWnd, SW_SHOW);
 	SetForegroundWindow(m_hWnd);

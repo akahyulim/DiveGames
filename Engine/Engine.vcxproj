@@ -133,7 +133,7 @@
       <PrecompiledHeaderFile>divepch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>Src;External;</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -141,7 +141,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>DirectXTex_Debug.lib;freetype.lib;</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTex_Debug.lib;</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>External/libs;</AdditionalLibraryDirectories>
@@ -185,6 +185,9 @@
     <ClInclude Include="Src\Renderer\CommandList.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
+    <ClInclude Include="Src\Renderer\Material.h" />
+    <ClInclude Include="Src\Renderer\Mesh.h" />
+    <ClInclude Include="Src\Renderer\Model.h" />
     <ClInclude Include="Src\Renderer\PipelineState.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\RenderPath.h" />
@@ -211,29 +214,27 @@
     <ClCompile Include="Src\Renderer\CommandList.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
+    <ClCompile Include="Src\Renderer\Material.cpp" />
+    <ClCompile Include="Src\Renderer\Mesh.cpp" />
+    <ClCompile Include="Src\Renderer\Model.cpp" />
     <ClCompile Include="Src\Renderer\PipelineState.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\RenderPath.cpp" />
     <ClCompile Include="Src\Scene\Component\Camera.cpp" />
     <ClCompile Include="Src\Scene\Component\Component.cpp" />
+    <ClCompile Include="Src\Scene\Component\MeshRenderable.cpp" />
     <ClCompile Include="Src\Scene\Component\SpriteRenderable.cpp" />
     <ClCompile Include="Src\Scene\Component\Transform.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Assets\Shaders\Legacy\Common.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\Assets\Shaders\Legacy\DeferredShading.hlsl">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="..\Assets\Shaders\Legacy\Compose.hlsl">
+    <None Include="Src\Shaders\sprite.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Src\Shaders\sprite.hlsl">
+    <None Include="Src\Shaders\mesh.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

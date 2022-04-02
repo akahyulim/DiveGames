@@ -183,10 +183,14 @@ namespace Dive
 			//if (vis.flags & Visibility::SpriteRenderables)
 			{
 				auto pSpriteRenderable = pGameObject->GetComponent<SpriteRenderable>();
-				if (!pSpriteRenderable || !pSpriteRenderable->IsEnabled())
-					continue;
+				if (pSpriteRenderable && pSpriteRenderable->IsEnabled())
+					vis.visibleSpriteRenderables.emplace_back(pGameObject);
+			}
 
-				vis.visibleSpriteRenderables.emplace_back(pGameObject);
+			{
+				auto pMeshRenderable = pGameObject->GetComponent<MeshRenderable>();
+				if (pMeshRenderable && pMeshRenderable->IsEnabled())
+					vis.visibleMeshRenderables.emplace_back(pGameObject);
 			}
 		}
 	}
@@ -304,6 +308,23 @@ namespace Dive
 				&m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pVertexShader,
 				&m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pInputLayout,
 				&m_Shaders[static_cast<size_t>(eShaderType::Sprite)].pPixelShader);
+		}
+
+		// mesh
+		{
+			D3D11_INPUT_ELEMENT_DESC desc[] =
+			{
+				{"POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	0,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	20,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"TANGENT",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	32,	D3D11_INPUT_PER_VERTEX_DATA, 0}
+			};
+
+			unsigned int numElements = ARRAYSIZE(desc);
+			m_GraphicsDevice.CreateShader("../Engine/Src/Shaders/Mesh.hlsl", desc, numElements,
+				&m_Shaders[static_cast<size_t>(eShaderType::Mesh)].pVertexShader,
+				&m_Shaders[static_cast<size_t>(eShaderType::Mesh)].pInputLayout,
+				&m_Shaders[static_cast<size_t>(eShaderType::Mesh)].pPixelShader);
 		}
 	}
 

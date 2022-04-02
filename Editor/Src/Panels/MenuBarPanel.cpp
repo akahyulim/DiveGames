@@ -3,6 +3,7 @@
 #include "HierarchyPanel.h"
 #include "InspectorPanel.h"
 #include "AssetPanel.h"
+#include "Importer/ModelImporter.h"
 
 MenuBarPanel::MenuBarPanel(Editor* pEditor)
 	: Panel(pEditor, "MenuBar")
@@ -47,7 +48,15 @@ void MenuBarPanel::menuFile()
 			}
 			if (ImGui::MenuItem("Scene"))
 			{
+				if (m_pActiveScene)
+					DV_DELETE(m_pActiveScene);
 
+				m_pActiveScene = new Dive::Scene("new_world");
+
+				m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
+				m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
+				m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
+				m_pEditor->GetModelImporter()->SetScene(m_pActiveScene);
 			}
 			ImGui::EndMenu();
 		}
@@ -79,9 +88,12 @@ void MenuBarPanel::menuFile()
 				// 전달까지 직접하는게 맞다.
 				// 하지만 방법이 너무 막무가내다....
 				// ActiveScene을 static 포인터로 하면 어떨까...?
+				// => Editor용 EventSystem을 만드는 건 어떨까?
 				m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
 				m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
 				m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
+
+				m_pEditor->GetModelImporter()->SetScene(m_pActiveScene);
 			}
 			ImGui::EndMenu();
 		}
@@ -156,6 +168,63 @@ void MenuBarPanel::menuGameObject()
 
 		if (ImGui::BeginMenu("3D Object"))
 		{
+			if (ImGui::MenuItem("Cube"))
+			{
+				if (m_pActiveScene)
+				{
+					// Model 생성은 일단 임시...
+					// 실제로는 이미 생성해 놓은 Model의 복사본을 ResourceManager로부터 리턴받아야 할 듯?
+					// 따라서 Resource는 생성 및 제거를 Manager가 관리해야 한다.
+					auto pModel = new Dive::Model();
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cube.fbx");
+				}
+			}
+
+			if (ImGui::MenuItem("Sphere"))
+			{
+				if (m_pActiveScene)
+				{
+					auto pModel = new Dive::Model();
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/sphere.fbx");
+				}
+			}
+
+			if (ImGui::MenuItem("Capsule"))
+			{
+				if (m_pActiveScene)
+				{
+					auto pModel = new Dive::Model();
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/capsule.fbx");
+				}
+			}
+
+			if (ImGui::MenuItem("Cylinder"))
+			{
+				if (m_pActiveScene)
+				{
+					auto pModel = new Dive::Model();
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cylinder.fbx");
+				}
+			}
+
+			if (ImGui::MenuItem("Plane"))
+			{
+				if (m_pActiveScene)
+				{
+					//auto pModel = new Dive::Model();
+					//m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cylinder.obj");
+				}
+			}
+
+			if (ImGui::MenuItem("Quad"))
+			{
+				if (m_pActiveScene)
+				{
+					//auto pModel = new Dive::Model();
+					//m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cylinder.obj");
+				}
+			}
+
 			ImGui::EndMenu();
 		}
 

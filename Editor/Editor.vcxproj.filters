@@ -16,6 +16,9 @@
     <Filter Include="External\imgui-docking">
       <UniqueIdentifier>{5bd7c28d-334b-45b5-874b-d63f21529e47}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Importer">
+      <UniqueIdentifier>{25980306-f511-496a-80dc-1244f2849e2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Base\Editor.cpp">
@@ -72,6 +75,9 @@
     <ClCompile Include="Src\Base\EditorRenderPath.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Importer\ModelImporter.cpp">
+      <Filter>Src\Importer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Base\Editor.h">
@@ -127,6 +133,9 @@
     </ClInclude>
     <ClInclude Include="Src\Base\EditorRenderPath.h">
       <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Importer\ModelImporter.h">
+      <Filter>Src\Importer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

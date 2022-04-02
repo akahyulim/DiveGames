@@ -28,6 +28,9 @@
 #include "Renderer/PipelineState.h"
 #include "Renderer/CommandList.h"
 #include "Renderer/RenderPath.h"
+#include "Renderer/Mesh.h"
+#include "Renderer/Material.h"
+#include "Renderer/Model.h"
 
 //= Input =========================
 #include "Input/input.h"

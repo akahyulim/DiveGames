@@ -178,12 +178,22 @@ namespace Dive
 
 	DirectX::XMMATRIX Transform::GetLocalMatrix() const
 	{
-		auto vecLocalScale = DirectX::XMLoadFloat3(&m_LocalScale);
-		auto vecLocalRotation = DirectX::XMLoadFloat4(&m_LocalRotation);
-		auto vecLocalTranslation = DirectX::XMLoadFloat3(&m_LocalTranslation);
+		auto vecLocalScale			= DirectX::XMLoadFloat3(&m_LocalScale);
+		auto vecLocalRotation		= DirectX::XMLoadFloat4(&m_LocalRotation);
+		auto vecLocalTranslation	= DirectX::XMLoadFloat3(&m_LocalTranslation);
 
 		return DirectX::XMMatrixScalingFromVector(vecLocalScale) * DirectX::XMMatrixRotationQuaternion(vecLocalRotation)
 			* DirectX::XMMatrixTranslationFromVector(vecLocalTranslation);
+	}
+
+	void Transform::SetLocalMatrix(const DirectX::XMFLOAT4X4& matrix)
+	{
+		DirectX::XMVECTOR trans, rotQuat, scale;
+		DirectX::XMMatrixDecompose(&scale, &rotQuat, &trans, DirectX::XMLoadFloat4x4(&matrix));
+
+		DirectX::XMStoreFloat3(&m_LocalTranslation, trans);
+		DirectX::XMStoreFloat4(&m_LocalRotation, rotQuat);
+		DirectX::XMStoreFloat3(&m_LocalScale, scale);
 	}
 
 	void Transform::Translate(const DirectX::XMFLOAT3& translation, eSpace relativeTo)

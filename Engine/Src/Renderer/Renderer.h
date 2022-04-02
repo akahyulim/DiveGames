@@ -78,6 +78,7 @@ namespace Dive
 	enum class eShaderType : size_t
 	{
 		Sprite = 0,
+		Mesh,
 		Count
 	};
 

@@ -79,6 +79,15 @@
     <ClInclude Include="Src\Scene\Component\SpriteRenderable.h">
       <Filter>Src\Scene\Component</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\Mesh.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Material.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Model.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -141,13 +150,22 @@
     <ClCompile Include="Src\Scene\Component\SpriteRenderable.cpp">
       <Filter>Src\Scene\Component</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Renderer\Mesh.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Material.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Model.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\MeshRenderable.cpp">
+      <Filter>Src\Scene\Component</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
       <UniqueIdentifier>{b8cdb25b-3036-44e0-baa2-bd91ede243cb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{926b5899-c18b-4d81-b5da-261b2d925309}</UniqueIdentifier>
     </Filter>
     <Filter Include="Src">
       <UniqueIdentifier>{c7d05b3b-5ca0-4b66-8f7c-5dbfba591b66}</UniqueIdentifier>
@@ -184,16 +202,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Assets\Shaders\Legacy\Common.hlsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Assets\Shaders\Legacy\DeferredShading.hlsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\Assets\Shaders\Legacy\Compose.hlsl">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Src\Shaders\sprite.hlsl">
+      <Filter>Src\Shaders</Filter>
+    </None>
+    <None Include="Src\Shaders\mesh.hlsl">
       <Filter>Src\Shaders</Filter>
     </None>
   </ItemGroup>

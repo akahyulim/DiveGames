@@ -14,6 +14,8 @@ class HierarchyPanel;
 class InspectorPanel;
 class AssetPanel;
 
+class ModelImporter;
+
 class Editor
 {
 public:
@@ -35,6 +37,8 @@ public:
 	HierarchyPanel* GetHierarchy() { return m_pHierarchy; }
 	InspectorPanel* GetInspector() { return m_pInspector; }
 	AssetPanel* GetAsset() { return m_pAsset; }
+
+	ModelImporter* GetModelImporter() { return m_pModelImporter; }
 
 private:
 	// editor's window
@@ -76,4 +80,6 @@ private:
 
 	SceneViewCamera m_SceneViewCamera;
 	EditorRenderPath m_EditorRenderPath;
+
+	ModelImporter* m_pModelImporter = nullptr;
 };

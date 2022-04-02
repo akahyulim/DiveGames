@@ -4,6 +4,7 @@
 #include "Component/Transform.h"
 #include "Component/Camera.h"
 #include "Component/SpriteRenderable.h"
+#include "Component/MeshRenderable.h"
 #include "Events/EngineEvents.h"
 
 namespace Dive
