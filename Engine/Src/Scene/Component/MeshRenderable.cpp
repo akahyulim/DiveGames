@@ -1,6 +1,7 @@
 #include "divepch.h"
 #include "MeshRenderable.h"
 #include "Renderer/Mesh.h"
+#include "Renderer/Material.h"
 #include "Renderer/Model.h"
 
 namespace Dive

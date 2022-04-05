@@ -94,6 +94,7 @@ void InspectorPanel::renderWindow()
 	// draw components
 	drawTransform(pSelectedObject);
 	drawSpriteRenderer(pSelectedObject);
+	drawMeshRenderer(pSelectedObject);
 
 	// add components
 	if (ImGui::Button("Add Component"))
@@ -180,6 +181,35 @@ void InspectorPanel::drawSpriteRenderer(Dive::GameObject* pSelectedObject)
 		ImGui::Checkbox("Y", &flipY);
 		pSpriteRenderer->SetFlipX(flipX);
 		pSpriteRenderer->SetFlipY(flipY);
+	}
+
+	ImGui::Separator();
+}
+
+void InspectorPanel::drawMeshRenderer(Dive::GameObject* pSelectedObject)
+{
+	auto pMeshRenderable = pSelectedObject->GetComponent<Dive::MeshRenderable>();
+	if (!pMeshRenderable)
+		return;
+
+	auto pMaterial = pMeshRenderable->GetMaterial();
+
+	// 현재 MeshRenderable이 아닌 Material을 보여주고 있다.
+	if (ImGui::CollapsingHeader("Mesh Renderable", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		// enabled
+		bool enabled = pMeshRenderable->IsEnabled();
+		ImGui::Checkbox("Enabled", &enabled);
+		pMeshRenderable->SetEnable(enabled);
+
+		// Color
+		DirectX::XMFLOAT4 color = pMaterial->GetAlbedoColor();
+		float col[4] = { color.x, color.y, color.z, color.w };
+		ImGui::Text("Albedo Color");
+		ImGui::SameLine();
+		ImGui::ColorEdit4("##background", col);
+		color = DirectX::XMFLOAT4(col[0], col[1], col[2], col[3]);
+		pMaterial->SetAlbedoColor(color);
 	}
 
 	ImGui::Separator();

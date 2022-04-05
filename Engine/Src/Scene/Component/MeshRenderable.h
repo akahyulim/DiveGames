@@ -5,6 +5,7 @@ namespace Dive
 {
 	class GameObject;
 	class Model;
+	class Material;
 
 	// Import할 때 해당 GameObject가 관리할
 	// name, offset, count, model을 받아 저장한다.
@@ -30,6 +31,10 @@ namespace Dive
 
 		Model* GetModel() const { return m_pModel; }
 
+		Material* GetMaterial() const { return m_pMaterial; }
+		void SetMaterail(Material* pMaterial) { m_pMaterial = pMaterial; }
+		bool HasMaterial() const { return m_pMaterial != nullptr; }
+
 		COMPONENT_CLASS_TYPE(MeshRenderable)
 	private:
 
@@ -39,6 +44,8 @@ namespace Dive
 		unsigned int m_VertexCount = 0;
 		unsigned int m_IndexOffset = 0;
 		unsigned int m_IndexCount = 0;
-		Model* m_pModel = nullptr;
+		
+		Model* m_pModel			= nullptr;
+		Material* m_pMaterial	= nullptr;
 	};
 }

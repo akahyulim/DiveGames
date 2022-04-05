@@ -225,6 +225,17 @@ void MenuBarPanel::menuGameObject()
 				}
 			}
 
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Stormtrooper"))
+			{
+				if (m_pActiveScene)
+				{
+					auto pModel = new Dive::Model();
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
+				}
+			}
+
 			ImGui::EndMenu();
 		}
 

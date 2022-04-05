@@ -7,6 +7,7 @@
 #include "Scene/Component/SpriteRenderable.h"
 #include "Scene/Component/MeshRenderable.h"
 #include "Model.h"
+#include "Material.h"
 
 namespace Dive
 {
@@ -76,7 +77,7 @@ namespace Dive
 
 					// map
 					pImmediateContext->Map(pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-					Renderer::MatrixBufferType* pPtr = static_cast<Renderer::MatrixBufferType*>(mappedResource.pData);
+					Renderer::FrameBuffer* pPtr = static_cast<Renderer::FrameBuffer*>(mappedResource.pData);
 
 					// world
 					// 이건 계층구조로 인해 누적된 행렬이다.
@@ -134,13 +135,15 @@ namespace Dive
 				auto pTransform = pGameObject->GetComponent<Transform>();
 				auto pMeshRenderable = pGameObject->GetComponent<MeshRenderable>();
 
+				// 이건 추후 frame 당 한 번 update 되도록 수정이 필요하다.
+				// FrameBuffer
 				{
 					D3D11_MAPPED_SUBRESOURCE mappedResource;
 					auto pMatrixBuffer = Renderer::GetMatrixBuffer();
 
 					// map
 					pImmediateContext->Map(pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-					Renderer::MatrixBufferType* pPtr = static_cast<Renderer::MatrixBufferType*>(mappedResource.pData);
+					Renderer::FrameBuffer* pPtr = static_cast<Renderer::FrameBuffer*>(mappedResource.pData);
 
 					// world
 					// 이건 계층구조로 인해 누적된 행렬이다.
@@ -154,6 +157,37 @@ namespace Dive
 					pImmediateContext->Unmap(pMatrixBuffer, 0);
 
 					pImmediateContext->VSSetConstantBuffers(0, 1, &pMatrixBuffer);
+				}
+
+				// material test
+				{
+					auto pMaterial = pMeshRenderable->GetMaterial();
+					if (pMaterial)
+					{
+						D3D11_MAPPED_SUBRESOURCE mappedResource;
+						auto pUberBuffer = Renderer::GetUberBuffer();
+
+						// map
+						pImmediateContext->Map(pUberBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+						Renderer::UberBuffer* pPtr = static_cast<Renderer::UberBuffer*>(mappedResource.pData);
+
+						pPtr->materialColor = pMaterial->GetAlbedoColor();
+						
+						// unmap
+						pImmediateContext->Unmap(pUberBuffer, 0);
+
+						// 역시 슬롯 설정이 필요하다.
+						pImmediateContext->PSSetConstantBuffers(1, 1, &pUberBuffer);
+
+						auto srv = ((Texture2D*)pMaterial->GetMap(eMaterialMapType::Albedo))->GetShaderResourceView();
+						pImmediateContext->PSSetShaderResources(1, 1, &srv);
+					}
+
+					// ObjectBuffer
+					{
+						// world
+						// wvp는 world에 FrameBuffer의 vp를 곱한다.
+					}
 				}
 
 				// renderable로부터 model 획득

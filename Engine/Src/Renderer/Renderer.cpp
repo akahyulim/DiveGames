@@ -20,7 +20,9 @@ namespace Dive
 	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerStateType::Count)> Renderer::m_RasterizerStates;
 	std::array<Shader, static_cast<size_t>(eShaderType::Count)> Renderer::m_Shaders;
 
-	ID3D11Buffer* Renderer::m_pMatrixBuffer = nullptr;
+	ID3D11Buffer* Renderer::m_pFrameBuffer = nullptr;
+	ID3D11Buffer* Renderer::m_pUberBuffer = nullptr;
+	ID3D11Buffer* Renderer::m_pObjectBuffer = nullptr;
 
 	D3D11_VIEWPORT Renderer::m_Viewport;
 
@@ -330,16 +332,43 @@ namespace Dive
 
 	void Renderer::createMatrixBuffer()
 	{
+		// frame buffer
 		{
 			D3D11_BUFFER_DESC desc;
 			desc.Usage = D3D11_USAGE_DYNAMIC;
-			desc.ByteWidth = sizeof(MatrixBufferType);
+			desc.ByteWidth = sizeof(FrameBuffer);
 			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 			desc.MiscFlags = 0;
 			desc.StructureByteStride = 0;
 
-			m_GraphicsDevice.CreateBuffer(&desc, nullptr, &m_pMatrixBuffer);
+			m_GraphicsDevice.CreateBuffer(&desc, nullptr, &m_pFrameBuffer);
+		}
+
+		// uber buffer
+		{
+			D3D11_BUFFER_DESC desc;
+			desc.Usage = D3D11_USAGE_DYNAMIC;
+			desc.ByteWidth = sizeof(UberBuffer);
+			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			desc.MiscFlags = 0;
+			desc.StructureByteStride = 0;
+
+			m_GraphicsDevice.CreateBuffer(&desc, nullptr, &m_pUberBuffer);
+		}
+
+		// object buffer
+		{
+			D3D11_BUFFER_DESC desc;
+			desc.Usage = D3D11_USAGE_DYNAMIC;
+			desc.ByteWidth = sizeof(ObjectBuffer);
+			desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			desc.MiscFlags = 0;
+			desc.StructureByteStride = 0;
+
+			m_GraphicsDevice.CreateBuffer(&desc, nullptr, &m_pObjectBuffer);
 		}
 	}
 }

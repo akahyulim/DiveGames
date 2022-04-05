@@ -208,5 +208,17 @@
     <None Include="Src\Shaders\mesh.hlsl">
       <Filter>Src\Shaders</Filter>
     </None>
+    <None Include="Src\Shaders\common.hlsl">
+      <Filter>Src\Shaders</Filter>
+    </None>
+    <None Include="Src\Shaders\common_texture.hlsl">
+      <Filter>Src\Shaders</Filter>
+    </None>
+    <None Include="Src\Shaders\common_vertex.hlsl">
+      <Filter>Src\Shaders</Filter>
+    </None>
+    <None Include="Src\Shaders\common_buffer.hlsl">
+      <Filter>Src\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

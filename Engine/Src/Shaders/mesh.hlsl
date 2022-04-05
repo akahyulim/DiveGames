@@ -1,30 +1,16 @@
+#include "common.hlsl"
 
-cbuffer MatrixBuffer
-{
-	matrix world;
-	matrix view;
-	matrix proj;
-};
-
-struct VS_INPUT
-{
-	float4 position : POSITION;
-	float2 tex		: TEXCOORD0;
-	float3 normal	: NORMAL;
-	float3 tangent	: TANGENT;
-};
-
-struct VS_OUTPUT
+struct Pixel_Input
 {
 	float4 position : SV_POSITION;
-	float2 tex		: TEXCOORD0;
+	float2 texCoord	: TEXCOORD0;
 	float3 normal	: NORMAL;
 	float3 tangent	: TANGENT;
 };
 
-VS_OUTPUT mainVS(VS_INPUT input)
+Pixel_Input mainVS(Vertex_PosTexNorTan input)
 {
-	VS_OUTPUT output;
+	Pixel_Input output;
 
 	input.position.w = 1.0f;
 
@@ -32,7 +18,7 @@ VS_OUTPUT mainVS(VS_INPUT input)
 	output.position = mul(output.position, view);
 	output.position = mul(output.position, proj);
 
-	output.tex = input.tex;
+	output.texCoord = input.texCoord;
 
 	output.normal = mul(input.normal, (float3x3)world);
 	output.normal = normalize(output.normal);
@@ -43,7 +29,11 @@ VS_OUTPUT mainVS(VS_INPUT input)
 	return output;
 }
 
-float4 mainPS(VS_OUTPUT input) : SV_TARGET
+// 추후 common_sampler로 이동
+SamplerState linearSampler;
+
+float4 mainPS(Pixel_Input input) : SV_TARGET
 {
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+	float4 texColor = material_Albedo.Sample(linearSampler, input.texCoord);
+	return texColor * materialColor;
 }

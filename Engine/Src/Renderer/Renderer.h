@@ -126,13 +126,16 @@ namespace Dive
 
 		static D3D11_VIEWPORT* GetBackbufferViewport() { return &m_Viewport; }
 
+		static ID3D11Buffer* GetMatrixBuffer() { return m_pFrameBuffer; }
+		static ID3D11Buffer* GetUberBuffer() { return m_pUberBuffer; }
+		static ID3D11Buffer* GetObjectBuffer() { return m_pObjectBuffer; }
+
+		static void UpdateVisibility(Visibility& vis);
+
 		// test ============================================================
 		static Texture2D* GetSampleTexture() { return m_pSampleTex; }
 		static Texture2D* GetDepthStencilTexture() { return m_pDepthStencilTex; }
 
-		static ID3D11Buffer* GetMatrixBuffer() { return m_pMatrixBuffer; }
-
-		static void UpdateVisibility(Visibility& vis);
 
 	private:
 		static void createRenderTargets();
@@ -144,11 +147,24 @@ namespace Dive
 		static void createMatrixBuffer();
 	
 	public:
-		struct MatrixBufferType
+		// spartan은 총 다섯개의 버퍼를 Renderer_ConstantBuffer.h와 common_buffer.hlsl에 정의해 놓았다.
+		struct FrameBuffer
 		{
-			DirectX::XMMATRIX world;
+			DirectX::XMMATRIX world;		// 아래 ObjectBuffer로 옮겨야 한다.
 			DirectX::XMMATRIX view;
 			DirectX::XMMATRIX proj;
+		};
+
+		struct UberBuffer
+		{
+			DirectX::XMFLOAT4 materialColor;
+		};
+
+		struct ObjectBuffer
+		{
+			DirectX::XMMATRIX world;
+			DirectX::XMMATRIX wvp;
+			//DirectX::XMMATRIX wvp_old;	// 아직 용도 파악이 안됐다.
 		};
 
 	private:
@@ -172,7 +188,9 @@ namespace Dive
 		static std::array<Shader, static_cast<size_t>(eShaderType::Count)> m_Shaders;
 
 		// constant buffer
-		static ID3D11Buffer* m_pMatrixBuffer;
+		static ID3D11Buffer* m_pFrameBuffer;
+		static ID3D11Buffer* m_pUberBuffer;
+		static ID3D11Buffer* m_pObjectBuffer;
 
 		static D3D11_VIEWPORT m_Viewport;
 

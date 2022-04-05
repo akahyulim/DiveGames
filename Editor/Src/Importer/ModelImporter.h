@@ -12,6 +12,7 @@ namespace Dive
 	class Model;
 	class Scene;
 	class GameObject;
+	class MeshRenderable;
 }
 
 class ModelImporter
@@ -25,9 +26,10 @@ public:
 	void SetScene(Dive::Scene* pScene) { m_pScene = pScene; }
 
 private:
-	void parseNode(const aiNode* pNode, const aiScene* pScene, Dive::GameObject* pGameObject, Dive::GameObject* pParent);
-	void parseNodeMeshes(const aiNode* pNode, const aiScene* pScene, Dive::GameObject* pGameObject);
-	void loadMesh(const aiMesh* pMesh, Dive::GameObject* pGameObject);
+	void parseNode(const aiNode* pAiNode, const aiScene* pAiScene, Dive::GameObject* pGameObject, Dive::GameObject* pParent);
+	void parseNodeMeshes(const aiNode* pAiNode, const aiScene* pAiScene, Dive::GameObject* pGameObject);
+	Dive::MeshRenderable* loadMesh(const aiMesh* pAiMesh, Dive::GameObject* pGameObject);
+	void loadMaterial(const aiScene* pAiScene, const aiMesh* pAiMesh, Dive::MeshRenderable* pMeshRenderable);
 
 private:
 	Dive::Scene* m_pScene = nullptr;
