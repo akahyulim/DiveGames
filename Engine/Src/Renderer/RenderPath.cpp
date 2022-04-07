@@ -179,8 +179,10 @@ namespace Dive
 						// 역시 슬롯 설정이 필요하다.
 						pImmediateContext->PSSetConstantBuffers(1, 1, &pUberBuffer);
 
-						auto srv = ((Texture2D*)pMaterial->GetMap(eMaterialMapType::Albedo))->GetShaderResourceView();
-						pImmediateContext->PSSetShaderResources(1, 1, &srv);
+						// 텍스쳐 유무에 따라 available 값을 전달하는 방법을 생각해 볼 수 있다.
+						Texture2D* pAlbedoTex = dynamic_cast<Texture2D*>(pMaterial->GetMap(eMaterialMapType::Albedo));
+						auto pSrv = pAlbedoTex ? pAlbedoTex->GetShaderResourceView() : nullptr;
+						pImmediateContext->PSSetShaderResources(1, 1, &pSrv);
 					}
 
 					// ObjectBuffer

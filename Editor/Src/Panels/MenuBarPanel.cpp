@@ -236,6 +236,24 @@ void MenuBarPanel::menuGameObject()
 				}
 			}
 
+			if (ImGui::MenuItem("Pilot"))
+			{
+				if (m_pActiveScene)
+				{
+					auto pModel = new Dive::Model();
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
+				}
+			}
+
+			if (ImGui::MenuItem("Sponza"))
+			{
+				if (m_pActiveScene)
+				{
+					auto pModel = new Dive::Model();
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Sponza-master/sponza.obj");
+				}
+			}
+
 			ImGui::EndMenu();
 		}
 

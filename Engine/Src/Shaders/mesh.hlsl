@@ -34,6 +34,9 @@ SamplerState linearSampler;
 
 float4 mainPS(Pixel_Input input) : SV_TARGET
 {
-	float4 texColor = material_Albedo.Sample(linearSampler, input.texCoord);
-	return texColor * materialColor;
+	float4 albedo = materialColor;
+
+	albedo *= material_Albedo.Sample(linearSampler, input.texCoord);
+
+	return albedo;
 }

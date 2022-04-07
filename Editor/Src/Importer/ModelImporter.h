@@ -15,6 +15,14 @@ namespace Dive
 	class MeshRenderable;
 }
 
+struct ModelParams
+{
+	std::string name;
+	std::string filepath;
+	const aiScene* pAiScene = nullptr;
+	Dive::Model* pModel = nullptr;
+};
+
 class ModelImporter
 {
 public:
@@ -26,12 +34,12 @@ public:
 	void SetScene(Dive::Scene* pScene) { m_pScene = pScene; }
 
 private:
-	void parseNode(const aiNode* pAiNode, const aiScene* pAiScene, Dive::GameObject* pGameObject, Dive::GameObject* pParent);
-	void parseNodeMeshes(const aiNode* pAiNode, const aiScene* pAiScene, Dive::GameObject* pGameObject);
-	Dive::MeshRenderable* loadMesh(const aiMesh* pAiMesh, Dive::GameObject* pGameObject);
-	void loadMaterial(const aiScene* pAiScene, const aiMesh* pAiMesh, Dive::MeshRenderable* pMeshRenderable);
+	void parseNode(const aiNode* pAiNode, const ModelParams& params, Dive::GameObject* pGameObject, Dive::GameObject* pParent = nullptr);
+	void parseNodeMeshes(const aiNode* pAiNode, const ModelParams& params, Dive::GameObject* pGameObject);
+	Dive::MeshRenderable* loadMesh(const ModelParams& params, const aiMesh* pAiMesh, Dive::GameObject* pGameObject);
+	void loadMaterial(const ModelParams& params, const aiMesh* pAiMesh, Dive::MeshRenderable* pMeshRenderable);
 
 private:
 	Dive::Scene* m_pScene = nullptr;
-	Dive::Model* m_pModel = nullptr;
+	//Dive::Model* m_pModel = nullptr;
 };

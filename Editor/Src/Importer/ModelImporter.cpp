@@ -16,7 +16,10 @@ bool ModelImporter::Load(Dive::Model* pModel, const std::string& filepath)
         return false;
     }
 
-    m_pModel = pModel;
+    ModelParams params;
+    params.filepath = filepath;
+    params.name = Dive::Helper::FileSystem::GetFileNameWithoutExtension(filepath);
+    params.pModel = pModel;
 
     const auto flags =
         aiProcess_MakeLeftHanded |              // directx style.
@@ -55,17 +58,15 @@ bool ModelImporter::Load(Dive::Model* pModel, const std::string& filepath)
     // Enable progress tracking
     importer.SetPropertyBool(AI_CONFIG_GLOB_MEASURE_TIME, true);
 
-    if (const aiScene* pScene = importer.ReadFile(filepath, flags))
+    if (const aiScene* pAiScene = importer.ReadFile(filepath, flags))
     {
-        auto pRoot = m_pScene->CreateGameObject();
-        // 확장자가 붙은 파일명이다. 역시 확장자는 제거하는 게 나아 보인다.
-        std::wstring name(filepath.begin(), filepath.end());
-        name = std::filesystem::_Parse_filename(name);
-        std::string filename(name.begin(), name.end());
-        pRoot->SetName(filename);
-        m_pModel->SetRootGameObject(pRoot);
+        params.pAiScene = pAiScene;
 
-        parseNode(pScene->mRootNode, pScene, pRoot, nullptr);
+        auto pRoot = m_pScene->CreateGameObject();
+        pRoot->SetName(Dive::Helper::FileSystem::GetFileNameWithoutExtension(filepath));
+        params.pModel->SetRootGameObject(pRoot);
+
+        parseNode(pAiScene->mRootNode, params, pRoot);
 
         // parse animation
 
@@ -79,7 +80,7 @@ bool ModelImporter::Load(Dive::Model* pModel, const std::string& filepath)
 
 // node를 순회하며 mesh 파싱 호출
 // 하지만 node는 mesh만 가지는 것이 아니다.
-void ModelImporter::parseNode(const aiNode* pAiNode, const aiScene* pAiScene, Dive::GameObject* pGameObject, Dive::GameObject* pParent)
+void ModelImporter::parseNode(const aiNode* pAiNode, const ModelParams& params, Dive::GameObject* pGameObject, Dive::GameObject* pParent)
 {
     if (pParent)
     {
@@ -98,16 +99,16 @@ void ModelImporter::parseNode(const aiNode* pAiNode, const aiScene* pAiScene, Di
     };
     pGameObject->GetComponent<Dive::Transform>()->SetLocalMatrix(localMatrix);
  
-    parseNodeMeshes(pAiNode, pAiScene, pGameObject);
+    parseNodeMeshes(pAiNode, params, pGameObject);
 
     for (unsigned int i = 0; i < pAiNode->mNumChildren; i++)
     {
         auto pChild = m_pScene->CreateGameObject();
-        parseNode(pAiNode->mChildren[i], pAiScene, pChild, pGameObject);
+        parseNode(pAiNode->mChildren[i], params, pChild, pGameObject);
     }
 }
 
-void ModelImporter::parseNodeMeshes(const aiNode* pAiNode, const aiScene* pAiScene, Dive::GameObject* pGameObject)
+void ModelImporter::parseNodeMeshes(const aiNode* pAiNode, const ModelParams& params, Dive::GameObject* pGameObject)
 {
     auto nodeObject = pGameObject;
 
@@ -117,7 +118,7 @@ void ModelImporter::parseNodeMeshes(const aiNode* pAiNode, const aiScene* pAiSce
     // 2개 이상인 경우 아래에서 추가로 game object를 생성하고 있다.
     for (unsigned int i = 0; i != pAiNode->mNumMeshes; i++)
     {
-        auto pAiMesh = pAiScene->mMeshes[pAiNode->mMeshes[i]];
+        auto pAiMesh = params.pAiScene->mMeshes[pAiNode->mMeshes[i]];
 
         std::string name = pAiNode->mName.C_Str();
 
@@ -130,12 +131,12 @@ void ModelImporter::parseNodeMeshes(const aiNode* pAiNode, const aiScene* pAiSce
             // 동적으로 생성한 후 nodeObject에 대입해야 한다.
         }
 
-        auto pMeshRenderable = loadMesh(pAiMesh, nodeObject);
-        loadMaterial(pAiScene, pAiMesh, pMeshRenderable);
+        auto pMeshRenderable = loadMesh(params, pAiMesh, nodeObject);
+        loadMaterial(params, pAiMesh, pMeshRenderable);
     }
 }
 
-Dive::MeshRenderable* ModelImporter::loadMesh(const aiMesh* pAiMesh, Dive::GameObject* pGameObject)
+Dive::MeshRenderable* ModelImporter::loadMesh(const ModelParams& params, const aiMesh* pAiMesh, Dive::GameObject* pGameObject)
 {
     // vertices
     auto numVertices = pAiMesh->mNumVertices;
@@ -187,7 +188,7 @@ Dive::MeshRenderable* ModelImporter::loadMesh(const aiMesh* pAiMesh, Dive::GameO
     // Model에 geometry data를 전달한다.
     unsigned int vertexOffset = 0;
     unsigned int indexOffset = 0;
-    m_pModel->AppendGeometry(vertices, indices, &vertexOffset, &indexOffset);
+    params.pModel->AppendGeometry(vertices, indices, &vertexOffset, &indexOffset);
 
     // Renderable을 생성하고 데이터를 저장한다.
     auto pMeshRenderable = pGameObject->AddComponent<Dive::MeshRenderable>();
@@ -197,37 +198,37 @@ Dive::MeshRenderable* ModelImporter::loadMesh(const aiMesh* pAiMesh, Dive::GameO
         numVertices,
         indexOffset,
         numIndices,
-        m_pModel);
+        params.pModel);
 
     return pMeshRenderable;
 }
 
-void ModelImporter::loadMaterial(const aiScene* pAiScene, const aiMesh* pAiMesh, Dive::MeshRenderable* pMeshRenderable)
+void ModelImporter::loadMaterial(const ModelParams& params, const aiMesh* pAiMesh, Dive::MeshRenderable* pMeshRenderable)
 {
-    if (!pAiScene->HasMaterials())
+    if (!params.pAiScene->HasMaterials())
         return;
 
     // material 생성
     // 스파르탄도 그냥 동적생성한다. 임포트의 특성일 수 있다.
     auto pMaterial = new Dive::Material();
-
-    auto pAiMaterial = pAiScene->mMaterials[pAiMesh->mMaterialIndex];
+    auto pAiMaterial = params.pAiScene->mMaterials[pAiMesh->mMaterialIndex];
 
     // name
     // 이 이름을 추후 Engine format의 material file 이름으로 활용하는 듯 하다.
     aiString name;
     aiGetMaterialString(pAiMaterial, AI_MATKEY_NAME, &name);
-    DV_APP_INFO("name(filePath): {:s}", name.C_Str());
-
+    // 둘의 차이를 모르겠다.
+    DV_APP_INFO("material name: {0:s} / {1:s}", pAiMaterial->GetName().C_Str(), name.C_Str());
+    
     // color + opacity
     aiColor4D color;
     aiGetMaterialColor(pAiMaterial, AI_MATKEY_COLOR_DIFFUSE, &color);
     aiColor4D opacity;
     aiGetMaterialColor(pAiMaterial, AI_MATKEY_OPACITY, &opacity);
-    pMaterial->SetAlbedoColor(DirectX::XMFLOAT4(color.r, color.g, color.b, opacity.r));
-
-    // maps
-    const auto loadMaterialTex = [pAiMaterial, pMaterial](const Dive::eMaterialMapType diveType, const aiTextureType assimpPbrType, const aiTextureType assimpLegacyType)
+    pMaterial->SetAlbedoColor(DirectX::XMFLOAT4(color.r, color.g, color.b, 1.0f));// opacity.r));
+    
+    // textures
+    const auto loadMaterialTex = [&params, pAiMaterial, pMeshRenderable, pMaterial](const Dive::eMaterialMapType diveType, const aiTextureType assimpPbrType, const aiTextureType assimpLegacyType)
     {
         aiTextureType assimpType = pAiMaterial->GetTextureCount(assimpPbrType) > 0 ? assimpPbrType : aiTextureType_NONE;
         assimpType = pAiMaterial->GetTextureCount(assimpLegacyType) > 0 ? assimpLegacyType : assimpType;
@@ -237,30 +238,29 @@ void ModelImporter::loadMaterial(const aiScene* pAiScene, const aiMesh* pAiMesh,
         {
             if (AI_SUCCESS == pAiMaterial->GetTexture(assimpType, 0, &path))
             {
-                // 경로가 다를 수 있다. 따라서 추론하는 helper함수가 필요하다.
-                
-                // 해당 경로의 텍스쳐 생성
+                const auto& texPath = Dive::Helper::FileSystem::GetDirectory(params.filepath) + path.C_Str();
+                auto pTex = Dive::Texture2D::Create(texPath);
+                if (!pTex)
+                {
+                    // 역시 마음에 들지 않는다...
+                    pTex = Dive::Texture2D::Create("Assets/Textures/Baseplate Grid.png");
+                    DV_APP_WARN("{:s} 로드에 실패하였습니다.", texPath);
+                }
+                pMaterial->SetMap(diveType, pTex);
 
-                // 테스트용 강제 로드
-                // 결과를 보니 texCoord가 이상하다.
                 if (diveType == Dive::eMaterialMapType::Albedo)
                 {
-                    auto pTexture = Dive::Texture2D::Create("Assets/Models/dancing-stormtrooper/textures/Stormtrooper_D.png");
-                    pMaterial->SetMap(diveType, pTexture);
+                    // color를 0, 0, 0, 0으로 바꿨다. 이유는...   
                 }
 
-                // matrial에 texture 저장. 그런데 model에서 이루어진다.
-                // 정확하게 말하자면 Model의 AddTexture()에서 Material에 type에 맞춰 texture를 set한다.
-                // texture의 획득(생성) 역시 이 함수 내부에서 이루어진다.
-
-                // 스파르타은 height를 normal로 set 하고 있다.
-                // 이는 assimp 특성 때문인 듯 하다.
+                // 몇몇 모델은 normal을 hight로, hight를 normal로 다룬다고 한다.
+                // 따라서 이를 고치는 부분이 있다...
             }
         }
     };
 
     loadMaterialTex(Dive::eMaterialMapType::Albedo, aiTextureType_BASE_COLOR, aiTextureType_DIFFUSE);
     loadMaterialTex(Dive::eMaterialMapType::Normal, aiTextureType_NORMAL_CAMERA, aiTextureType_NORMALS);
-
+    
     pMeshRenderable->SetMaterail(pMaterial);
 }

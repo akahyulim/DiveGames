@@ -6,10 +6,7 @@ namespace Dive
 	class GameObject;
 	class Mesh;
 
-	// Import할 때 vertices, indices를 받아와 buffer를 직접 생성하며,
-	// root game object를 기록한다.
-	// 그리고 추후 buffer bind시 사용한다.
-	// Mesh를 하나로 고정해 놓았다.
+	// 현재 이름을 설정하지 않고 있다.
 	class Model
 	{
 	public:

@@ -180,6 +180,7 @@
     <ClInclude Include="Src\Base\Time.h" />
     <ClInclude Include="Src\Events\EngineEvents.h" />
     <ClInclude Include="Src\Events\EventSystem.h" />
+    <ClInclude Include="Src\Helper\FileSystem.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\CommandList.h" />
@@ -209,6 +210,7 @@
     <ClCompile Include="Src\Base\Engine.cpp" />
     <ClCompile Include="Src\Base\Log.cpp" />
     <ClCompile Include="Src\Base\Time.cpp" />
+    <ClCompile Include="Src\Helper\FileSystem.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\CommandList.cpp" />

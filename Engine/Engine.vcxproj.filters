@@ -88,6 +88,9 @@
     <ClInclude Include="Src\Renderer\Model.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Helper\FileSystem.h">
+      <Filter>Src\Helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -162,6 +165,9 @@
     <ClCompile Include="Src\Scene\Component\MeshRenderable.cpp">
       <Filter>Src\Scene\Component</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Helper\FileSystem.cpp">
+      <Filter>Src\Helper</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -199,6 +205,9 @@
     </Filter>
     <Filter Include="Src\Shaders">
       <UniqueIdentifier>{a64343df-a418-4d52-a2c1-b8874d780d9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Helper">
+      <UniqueIdentifier>{1a508884-ccc2-4368-af28-f45cc023c966}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
