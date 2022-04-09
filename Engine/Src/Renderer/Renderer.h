@@ -14,6 +14,23 @@ namespace Dive
 	class Transform;
 	class SpriteRenderable;
 
+	// spartan은 총 다섯개의 버퍼를 Renderer_ConstantBuffer.h와 common_buffer.hlsl에 정의해 놓았다.
+	struct FrameBuffer
+	{
+		DirectX::XMMATRIX view;
+		DirectX::XMMATRIX proj;
+	};
+
+	struct UberBuffer
+	{
+		DirectX::XMMATRIX world;
+		
+		DirectX::XMFLOAT4 materialColor;
+
+		unsigned int materialTextures;
+		unsigned int padding[3];
+	};
+
 	struct Visibility
 	{
 		void Clear()
@@ -128,7 +145,6 @@ namespace Dive
 
 		static ID3D11Buffer* GetMatrixBuffer() { return m_pFrameBuffer; }
 		static ID3D11Buffer* GetUberBuffer() { return m_pUberBuffer; }
-		static ID3D11Buffer* GetObjectBuffer() { return m_pObjectBuffer; }
 
 		static void UpdateVisibility(Visibility& vis);
 
@@ -145,27 +161,6 @@ namespace Dive
 		static void createRasterizerStates();
 		static void createShaders();
 		static void createMatrixBuffer();
-	
-	public:
-		// spartan은 총 다섯개의 버퍼를 Renderer_ConstantBuffer.h와 common_buffer.hlsl에 정의해 놓았다.
-		struct FrameBuffer
-		{
-			DirectX::XMMATRIX world;		// 아래 ObjectBuffer로 옮겨야 한다.
-			DirectX::XMMATRIX view;
-			DirectX::XMMATRIX proj;
-		};
-
-		struct UberBuffer
-		{
-			DirectX::XMFLOAT4 materialColor;
-		};
-
-		struct ObjectBuffer
-		{
-			DirectX::XMMATRIX world;
-			DirectX::XMMATRIX wvp;
-			//DirectX::XMMATRIX wvp_old;	// 아직 용도 파악이 안됐다.
-		};
 
 	private:
 		static GraphicsDevice m_GraphicsDevice;
@@ -190,7 +185,6 @@ namespace Dive
 		// constant buffer
 		static ID3D11Buffer* m_pFrameBuffer;
 		static ID3D11Buffer* m_pUberBuffer;
-		static ID3D11Buffer* m_pObjectBuffer;
 
 		static D3D11_VIEWPORT m_Viewport;
 

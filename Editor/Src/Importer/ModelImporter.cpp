@@ -225,7 +225,7 @@ void ModelImporter::loadMaterial(const ModelParams& params, const aiMesh* pAiMes
     aiGetMaterialColor(pAiMaterial, AI_MATKEY_COLOR_DIFFUSE, &color);
     aiColor4D opacity;
     aiGetMaterialColor(pAiMaterial, AI_MATKEY_OPACITY, &opacity);
-    pMaterial->SetAlbedoColor(DirectX::XMFLOAT4(color.r, color.g, color.b, 1.0f));// opacity.r));
+    pMaterial->SetAlbedoColor(DirectX::XMFLOAT4(color.r, color.g, color.b, opacity.r));
     
     // textures
     const auto loadMaterialTex = [&params, pAiMaterial, pMeshRenderable, pMaterial](const Dive::eMaterialMapType diveType, const aiTextureType assimpPbrType, const aiTextureType assimpLegacyType)
@@ -242,8 +242,6 @@ void ModelImporter::loadMaterial(const ModelParams& params, const aiMesh* pAiMes
                 auto pTex = Dive::Texture2D::Create(texPath);
                 if (!pTex)
                 {
-                    // 역시 마음에 들지 않는다...
-                    pTex = Dive::Texture2D::Create("Assets/Textures/Baseplate Grid.png");
                     DV_APP_WARN("{:s} 로드에 실패하였습니다.", texPath);
                 }
                 pMaterial->SetMap(diveType, pTex);

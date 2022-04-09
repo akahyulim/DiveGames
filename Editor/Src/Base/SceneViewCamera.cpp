@@ -13,20 +13,42 @@ void SceneViewCamera::Update(float elapsedTime)
 {
 	// 입력 처리: Scene Panel이 선택되었을 때만!
 	{
+		// 움직임만큼 전방 벡터로 이동
+		auto wheelDelta = Dive::Input::GetMouseWheelDelta();
+		if (wheelDelta != 0.0f)
 		{
-			auto wheelDelta = Dive::Input::GetMouseWheelDelta();
-			m_Position.z += wheelDelta;
+			DirectX::XMFLOAT3 focus;
+			DirectX::XMStoreFloat3(&focus, GetForwardDirection());
+
+			m_Position.x += wheelDelta * focus.x;
+			m_Position.y += wheelDelta * focus.y;
+			m_Position.z += wheelDelta * focus.z;
 		}
 
+		// 상, 하, 좌, 우 이동
 		if (Dive::Input::KeyPress(VK_MENU))//VK_MBUTTON))
 		{
-			// 상, 하, 좌, 우 = 이동
 			auto delta = Dive::Input::GetMouseDelta();
-			// 이건 잘못됐다??
-			m_Position.x += delta.x;
-			m_Position.y += delta.y;
-		}
+			
+			DirectX::XMFLOAT3 up;
+			DirectX::XMStoreFloat3(&up, GetUpDirection());
+			DirectX::XMFLOAT3 right;
+			DirectX::XMStoreFloat3(&right, DirectX::XMVector3Cross(GetUpDirection(), GetForwardDirection()));
 
+			right.x *= delta.x;
+			right.y *= delta.x;
+			right.z *= delta.x;
+
+			up.x *= delta.y;
+			up.y *= delta.y;
+			up.z *= delta.y;
+
+			m_Position.x += right.x + up.x;
+			m_Position.y += right.y + up.y;
+			m_Position.z += right.z + up.z;
+		}
+		
+		// 회전
 		if (Dive::Input::KeyPress(VK_RBUTTON))
 		{
 			auto delta = Dive::Input::GetMouseDelta();

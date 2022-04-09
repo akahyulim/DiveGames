@@ -14,16 +14,16 @@ Pixel_Input mainVS(Vertex_PosTexNorTan input)
 
 	input.position.w = 1.0f;
 
-	output.position = mul(input.position, world);
-	output.position = mul(output.position, view);
-	output.position = mul(output.position, proj);
+	output.position = mul(input.position, g_world);
+	output.position = mul(output.position, g_view);
+	output.position = mul(output.position, g_proj);
 
 	output.texCoord = input.texCoord;
 
-	output.normal = mul(input.normal, (float3x3)world);
+	output.normal = mul(input.normal, (float3x3)g_world);
 	output.normal = normalize(output.normal);
 
-	output.tangent = mul(input.tangent, (float3x3)world);
+	output.tangent = mul(input.tangent, (float3x3)g_world);
 	output.tangent = normalize(output.tangent);
 
 	return output;
@@ -34,9 +34,22 @@ SamplerState linearSampler;
 
 float4 mainPS(Pixel_Input input) : SV_TARGET
 {
-	float4 albedo = materialColor;
+	// albedo
+	float4 albedo = g_mat_color;
+	if (HasAlbedoTexture())
+	{
+		albedo *= material_Albedo.Sample(linearSampler, input.texCoord);
+		albedo.w = 1.0f;
+	}
 
-	albedo *= material_Albedo.Sample(linearSampler, input.texCoord);
+	// normal
+	float3 normal = input.normal;
+	if (HasNormalTexture())
+	{
 
-	return albedo;
+	}
+
+	float4 color = albedo;
+
+	return color;
 }

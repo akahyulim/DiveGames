@@ -39,13 +39,35 @@ namespace Dive
 		// sampler, global cbuffer
 
 		// bind까지 미리 하는 것도 생각해볼 수 있다.
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX proj;
-		passDefault(&cl, view, proj);
+		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
+
+		// 임시
+		DirectX::XMMATRIX view = DirectX::XMMatrixIdentity();
+		DirectX::XMMATRIX proj = DirectX::XMMatrixIdentity();
+
+		// FrameBuffer
+		{
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+			auto pFrameBuffer = Renderer::GetMatrixBuffer();
+
+			// map
+			pImmediateContext->Map(pFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+			FrameBuffer* pPtr = static_cast<FrameBuffer*>(mappedResource.pData);
+
+			pPtr->view = DirectX::XMMatrixTranspose(view);
+			pPtr->proj = DirectX::XMMatrixTranspose(proj);
+
+			// unmap
+			pImmediateContext->Unmap(pFrameBuffer, 0);
+
+			pImmediateContext->VSSetConstantBuffers(0, 1, &pFrameBuffer);
+		}
+
+		passDefault(&cl);
 	}
 
 	// 스파르탄은 RenderObject Type을 전달받는다.
-	void RenderPath::passDefault(CommandList* pCl, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj)
+	void RenderPath::passDefault(CommandList* pCl)
 	{
 		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
 		if (!pImmediateContext)
@@ -66,32 +88,11 @@ namespace Dive
 			
 			pCl->BindPipelineState(ps);
 
+			// 여기는 ubber buffer가 없다...
 			for(auto pGameObject : m_MainVisibilities.visibleSpriteRenderables)
 			{
 				auto pTransform = pGameObject->GetComponent<Transform>();
 				auto pSpriteRenderable = pGameObject->GetComponent<SpriteRenderable>();
-				
-				{
-					D3D11_MAPPED_SUBRESOURCE mappedResource;
-					auto pMatrixBuffer = Renderer::GetMatrixBuffer();
-
-					// map
-					pImmediateContext->Map(pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-					Renderer::FrameBuffer* pPtr = static_cast<Renderer::FrameBuffer*>(mappedResource.pData);
-
-					// world
-					// 이건 계층구조로 인해 누적된 행렬이다.
-					// 계층구조로 구성된 오브젝트들을 어떻게 다뤄야할 지 결정해야 한다.
-					auto matWorld = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
-					pPtr->world = matWorld;
-					pPtr->view = DirectX::XMMatrixTranspose(view);
-					pPtr->proj = DirectX::XMMatrixTranspose(proj);
-
-					// unmap
-					pImmediateContext->Unmap(pMatrixBuffer, 0);
-
-					pImmediateContext->VSSetConstantBuffers(0, 1, &pMatrixBuffer);
-				}
 
 				// 슬롯이 있다.
 				auto pShaderResourceView = pSpriteRenderable->GetShaderResourceView();
@@ -103,6 +104,31 @@ namespace Dive
 				unsigned int stride = pSpriteRenderable->GetVertexStride();
 				unsigned int offset = 0;
 				pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
+
+				// UberBuffer
+				{
+					D3D11_MAPPED_SUBRESOURCE mappedResource;
+					auto pUberBuffer = Renderer::GetUberBuffer();
+
+					// map
+					pImmediateContext->Map(pUberBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+					UberBuffer* pPtr = static_cast<UberBuffer*>(mappedResource.pData);
+
+					// 오직 이 값을 전달하기 위해 UberBuffer를 사용한다...
+					// 이 구현이 싫다면 world를 전달하는 다른 constant buffer를 만들어야 한다.
+					// 아니면 SpriteBuffer, MaterialBuffer 등으로 구분 구현할 수 있다.
+					// 그런데 사실 Mesh에서 Quad를 만들면 SpriteRenderable 자체가 필요없어진다...
+					// 물론 Sprite와 Quad Mesh가 다른 성격일 순 있다.
+					pPtr->world = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
+
+					// unmap
+					pImmediateContext->Unmap(pUberBuffer, 0);
+
+					// 역시 슬롯 설정이 필요하다.
+					// 그리고 WorldMatrix 때문에 VS에도 bind해야 한다.
+					pImmediateContext->VSSetConstantBuffers(1, 1, &pUberBuffer);
+					pImmediateContext->PSSetConstantBuffers(1, 1, &pUberBuffer);
+				}
 
 				auto pIndexBuffer = pSpriteRenderable->GetIndexBuffer();
 				DV_ASSERT(pIndexBuffer);
@@ -135,31 +161,7 @@ namespace Dive
 				auto pTransform = pGameObject->GetComponent<Transform>();
 				auto pMeshRenderable = pGameObject->GetComponent<MeshRenderable>();
 
-				// 이건 추후 frame 당 한 번 update 되도록 수정이 필요하다.
-				// FrameBuffer
-				{
-					D3D11_MAPPED_SUBRESOURCE mappedResource;
-					auto pMatrixBuffer = Renderer::GetMatrixBuffer();
-
-					// map
-					pImmediateContext->Map(pMatrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-					Renderer::FrameBuffer* pPtr = static_cast<Renderer::FrameBuffer*>(mappedResource.pData);
-
-					// world
-					// 이건 계층구조로 인해 누적된 행렬이다.
-					// 계층구조로 구성된 오브젝트들을 어떻게 다뤄야할 지 결정해야 한다.
-					auto matWorld = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
-					pPtr->world = matWorld;
-					pPtr->view = DirectX::XMMatrixTranspose(view);
-					pPtr->proj = DirectX::XMMatrixTranspose(proj);
-
-					// unmap
-					pImmediateContext->Unmap(pMatrixBuffer, 0);
-
-					pImmediateContext->VSSetConstantBuffers(0, 1, &pMatrixBuffer);
-				}
-
-				// material test
+				// UberBuffer
 				{
 					auto pMaterial = pMeshRenderable->GetMaterial();
 					if (pMaterial)
@@ -169,26 +171,27 @@ namespace Dive
 
 						// map
 						pImmediateContext->Map(pUberBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-						Renderer::UberBuffer* pPtr = static_cast<Renderer::UberBuffer*>(mappedResource.pData);
+						UberBuffer* pPtr = static_cast<UberBuffer*>(mappedResource.pData);
+
+						pPtr->world = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
 
 						pPtr->materialColor = pMaterial->GetAlbedoColor();
-						
+						pPtr->materialTextures = 0;
+						pPtr->materialTextures |= pMaterial->HasTexture(eMaterialMapType::Albedo) ? (1U << 0) : 0;
+						pPtr->materialTextures |= pMaterial->HasTexture(eMaterialMapType::Normal) ? (1U << 1) : 0;
+
 						// unmap
 						pImmediateContext->Unmap(pUberBuffer, 0);
 
 						// 역시 슬롯 설정이 필요하다.
+						// 그리고 WorldMatrix 때문에 VS에도 bind해야 한다.
+						pImmediateContext->VSSetConstantBuffers(1, 1, &pUberBuffer);
 						pImmediateContext->PSSetConstantBuffers(1, 1, &pUberBuffer);
 
 						// 텍스쳐 유무에 따라 available 값을 전달하는 방법을 생각해 볼 수 있다.
 						Texture2D* pAlbedoTex = dynamic_cast<Texture2D*>(pMaterial->GetMap(eMaterialMapType::Albedo));
 						auto pSrv = pAlbedoTex ? pAlbedoTex->GetShaderResourceView() : nullptr;
 						pImmediateContext->PSSetShaderResources(1, 1, &pSrv);
-					}
-
-					// ObjectBuffer
-					{
-						// world
-						// wvp는 world에 FrameBuffer의 vp를 곱한다.
 					}
 				}
 

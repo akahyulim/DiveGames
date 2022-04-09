@@ -7,8 +7,8 @@ namespace Dive
 	enum class eMaterialMapType
 	{
 		Albedo = 0,
-		Metalic,
 		Normal,
+		Metalic,
 		Occlusion,
 		Edmision,
 		DetailMask,
@@ -27,6 +27,8 @@ namespace Dive
 
 		Texture* GetMap(const eMaterialMapType type);
 		void SetMap(const eMaterialMapType type, const Texture* pTexture);
+		bool HasTexture(const eMaterialMapType type) { return m_MainMaps[type] != nullptr; }
+
 
 		const DirectX::XMFLOAT4 GetAlbedoColor() const { return m_AlbedoColor; }
 		void SetAlbedoColor(const DirectX::XMFLOAT4& color) { m_AlbedoColor = color; }
@@ -36,6 +38,8 @@ namespace Dive
 
 		const DirectX::XMFLOAT2 GetOffset() const { return m_Offset; }
 		void SetOffset(const DirectX::XMFLOAT2& offset) { m_Offset = offset; }
+
+
 
 	private:
 
@@ -49,6 +53,7 @@ namespace Dive
 		DirectX::XMFLOAT2 m_Tiling		= { 1.0f, 1.0f };
 		DirectX::XMFLOAT2 m_Offset		= { 0.0f, 0.0f };
 
+		unsigned int m_Flags = 0;
 		// Second Maps
 	};
 }

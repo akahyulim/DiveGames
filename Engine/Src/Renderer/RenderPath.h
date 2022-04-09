@@ -17,7 +17,7 @@ namespace Dive
 
 	
 	protected:
-		void passDefault(CommandList* pCl, const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj);
+		void passDefault(CommandList* pCl);
 
 	protected:
 		Visibility m_MainVisibilities;

@@ -13,9 +13,9 @@ Pixel_Input mainVS(Vertex_PosColTex input)
 	
 	input.position.w = 1.0f;
 
-	output.position = mul(input.position, world);
-	output.position = mul(output.position, view);
-	output.position = mul(output.position, proj);
+	output.position = mul(input.position, g_world);
+	output.position = mul(output.position, g_view);
+	output.position = mul(output.position, g_proj);
 
 	output.color = input.color;
 	output.texCoord = input.texCoord;

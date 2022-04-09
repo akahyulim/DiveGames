@@ -55,7 +55,28 @@ void EditorRenderPath::Render()
 	auto view = m_pSceneViewCamera->GetViewMatrix();
 	auto proj = m_pSceneViewCamera->GetProjectionMatrix();
 
-	Dive::RenderPath::passDefault(&cl, view, proj);
+	auto pImmediateContext = Dive::Renderer::GetGraphicsDevice().GetImmediateContext();
+
+	// 매 프레임 한 번만 bind하면 모든 Shader에서 사용할 수 있다.
+	// FrameBuffer
+	{
+		D3D11_MAPPED_SUBRESOURCE mappedResource;
+		auto pFrameBuffer = Dive::Renderer::GetMatrixBuffer();
+
+		// map
+		pImmediateContext->Map(pFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+		Dive::FrameBuffer* pPtr = static_cast<Dive::FrameBuffer*>(mappedResource.pData);
+
+		pPtr->view = DirectX::XMMatrixTranspose(view);
+		pPtr->proj = DirectX::XMMatrixTranspose(proj);
+
+		// unmap
+		pImmediateContext->Unmap(pFrameBuffer, 0);
+
+		pImmediateContext->VSSetConstantBuffers(0, 1, &pFrameBuffer);
+	}
+
+	Dive::RenderPath::passDefault(&cl);
 
 	// BeginScene은 사실상 구현하기 애매하니,
 	// EndScene보다 Present라는 이름이 어울린다.
