@@ -10,5 +10,4 @@ public:
 	void renderWindow() override;
 
 private:
-	Dive::Texture2D* m_pSampleTex	= nullptr;
 };

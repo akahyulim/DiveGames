@@ -29,6 +29,8 @@ void SceneViewCamera::Update(float elapsedTime)
 		if (Dive::Input::KeyPress(VK_MENU))//VK_MBUTTON))
 		{
 			auto delta = Dive::Input::GetMouseDelta();
+			delta.x *= 0.1f;
+			delta.y *= 0.1f;
 			
 			DirectX::XMFLOAT3 up;
 			DirectX::XMStoreFloat3(&up, GetUpDirection());

@@ -12,16 +12,16 @@ namespace Dive
 
 		void Tick();
 
-		double GetDeltaTimeMS() { return m_DeltaTime; }
-		float GetDeltaTimeSec() { return static_cast<float>(m_DeltaTime / 1000.0f); }
+		double GetDeltaTimeMS() const { return m_DeltaTime; }
+		float GetDeltaTimeSec() const { return static_cast<float>(m_DeltaTime / 1000.0f); }
  
-		double GetRealTimeSinceStartUpMS() { return m_RealTimeSinceStartup; }
-		unsigned int GetRealTimeSinceStartUpSec() { return static_cast<unsigned int>(m_RealTimeSinceStartup / 1000); }
+		double GetRealTimeSinceStartUpMS() const { return m_RealTimeSinceStartup; }
+		unsigned int GetRealTimeSinceStartUpSec() const { return static_cast<unsigned int>(m_RealTimeSinceStartup / 1000); }
 
-		float GetFixedFrameRate() { return m_FixedFrameRate; }
+		float GetFixedFrameRate() const { return m_FixedFrameRate; }
 		void SetFixedFrameRate(float rate) { m_FixedFrameRate = rate; }
 		
-		float GetTimeScale() { return m_TimeScale; }
+		float GetTimeScale() const { return m_TimeScale; }
 		void SetTimeScale(float scale) { m_TimeScale = scale; }
 
 	private:

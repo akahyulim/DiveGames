@@ -51,24 +51,24 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 Editor::Editor(HINSTANCE hInstance, const std::string& title)
 {
-	// load ini
-	m_Title = title;
-	m_Width = 1280;
-	m_Height = 720;
-	m_bVSync = true;
-	m_bFullScreen = false;
+	// temp: 추후 load ini
+	m_Title			= title;
+	m_Width			= 1280;
+	m_Height		= 720;
+	m_bVSync		= true;
+	m_bFullScreen	= false;
 
 	// create window
 	createWindow(hInstance);
 
 	// create engine
 	Dive::WindowData data;
-	data.hWnd	= m_hWnd;
-	data.Width	= GetWidth();
-	data.Height = GetHeight();
-	data.bVSync = m_bVSync;
-	data.bFullScreen = m_bFullScreen;
-	auto pEngine = Dive::CreateEngine(&data);
+	data.hWnd			= m_hWnd;
+	data.Width			= GetWidth();
+	data.Height			= GetHeight();
+	data.bVSync			= m_bVSync;
+	data.bFullScreen	= m_bFullScreen;
+	auto pEngine		= Dive::CreateEngine(&data);
 
 	// 위치가 애매하다.
 	pEngine->SetActiveRenderPath(static_cast<Dive::RenderPath*>(&m_EditorRenderPath));
@@ -83,8 +83,6 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	// Editor Camera 복사 생성 필요
 
 	m_pModelImporter = new ModelImporter;
-	// test
-	//m_pModelImporter->Load(nullptr, "Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");//cube.obj");
 
 	ShowWindow(m_hWnd, SW_SHOW);
 	SetForegroundWindow(m_hWnd);
@@ -93,6 +91,7 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 
 Editor::~Editor()
 {
+	//Shutdown();
 }
 
 void Editor::OnWindowMessage(const Dive::WindowData& data)
@@ -134,7 +133,7 @@ void Editor::Run()
 			
 			// 현재 둘이 나란히 붙어 있지만 Wicked의 경우 Update가 분화되어 있고
 			// 호출 단계도 나누어진다.
-			Dive::GetCurrentEngine()->Update(0.0f);
+			Dive::GetCurrentEngine()->Update();
 			// eSceneMode에 따라 구분될 수 있어야 한다.
 			Dive::GetCurrentEngine()->Render();
 
@@ -178,6 +177,9 @@ void Editor::Run()
 
 void Editor::Shutdown()
 {
+	// delete importer
+	DV_DELETE(m_pModelImporter);
+
 	// delete panels
 	DV_DELETE(m_pMenuBar);
 	DV_DELETE(m_pScene);
@@ -235,18 +237,18 @@ void Editor::createWindow(HINSTANCE hInstance)
 	windowName.assign(m_Title.begin(), m_Title.end());
 
 	WNDCLASSEX wcex;
-	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = 0;
-	wcex.lpfnWndProc = WndProc;
-	wcex.cbClsExtra = 0;
-	wcex.cbWndExtra = 0;
-	wcex.hInstance = hInstance;
-	wcex.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
-	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszMenuName = nullptr;
-	wcex.lpszClassName = windowName.c_str();
-	wcex.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
+	wcex.cbSize			= sizeof(WNDCLASSEX);
+	wcex.style			= 0;
+	wcex.lpfnWndProc	= WndProc;
+	wcex.cbClsExtra		= 0;
+	wcex.cbWndExtra		= 0;
+	wcex.hInstance		= hInstance;
+	wcex.hIcon			= LoadIcon(nullptr, IDI_APPLICATION);
+	wcex.hCursor		= LoadCursor(nullptr, IDC_ARROW);
+	wcex.hbrBackground	= (HBRUSH)(COLOR_WINDOW + 1);
+	wcex.lpszMenuName	= nullptr;
+	wcex.lpszClassName	= windowName.c_str();
+	wcex.hIconSm		= LoadIcon(nullptr, IDI_APPLICATION);
 	DV_ASSERT(RegisterClassEx(&wcex));
 
 	int posX = (GetSystemMetrics(SM_CXSCREEN) - (int)m_Width) / 2;
@@ -258,7 +260,7 @@ void Editor::createWindow(HINSTANCE hInstance)
 	DV_ASSERT(hWnd != NULL);
 
 	m_hInstance = hInstance;
-	m_hWnd = hWnd;
+	m_hWnd		= hWnd;
 }
 
 void Editor::intializeImGui()
@@ -293,11 +295,11 @@ void Editor::intializeImGui()
 	loadResources();
 
 	// create panels
-	m_pMenuBar = new MenuBarPanel(this);
-	m_pScene = new ScenePanel(this);
-	m_pHierarchy = new HierarchyPanel(this);
-	m_pInspector = new InspectorPanel(this);
-	m_pAsset = new AssetPanel(this);
+	m_pMenuBar		= new MenuBarPanel(this);
+	m_pScene		= new ScenePanel(this);
+	m_pHierarchy	= new HierarchyPanel(this);
+	m_pInspector	= new InspectorPanel(this);
+	m_pAsset		= new AssetPanel(this);
 }
 
 void Editor::setDarkThemeColors()
@@ -340,7 +342,7 @@ void Editor::loadResources()
 
 	// 폰트를 배열로 관리할 수 있는 것 같은데
 	// 예상했던 것처럼 돌아가지 않는다...
-	float fontSize = 18.0f;
+	float fontSize = 15.0f;
 	auto io = ImGui::GetIO();
 	io.Fonts->AddFontFromFileTTF("Assets/Fonts/Nanum/NanumBarunGothic.ttf", fontSize);
 	io.Fonts->AddFontFromFileTTF("Assets/Fonts/Nanum/NanumBarunGothicBold.ttf", fontSize);
@@ -392,13 +394,13 @@ void Editor::drawPanels()
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiStyle& style = ImGui::GetStyle();
 	float minWinSizeX = style.WindowMinSize.x;
-	style.WindowMinSize.x = 100.0f;
+	// dock space에서의 최소 크기...
+	style.WindowMinSize.x = 200.0f;
 	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 	{
 		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 	}
-
 	style.WindowMinSize.x = minWinSizeX;
 		
 	// Render Panels

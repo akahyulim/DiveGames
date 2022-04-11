@@ -11,6 +11,9 @@ namespace Dive
 {
 	void Engine::Initialize(const WindowData* pData)
 	{
+		auto hResult = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
+		DV_ASSERT(SUCCEEDED(hResult));
+
 		Log::Initialize();
 		m_Time.Initialize();
 
@@ -23,10 +26,13 @@ namespace Dive
 		Renderer::Shutdown();
 	}
 
-	void Engine::Update(float delta)
+	void Engine::Update()
 	{
 		m_Time.Tick();
-		Input::Update(0.0f);
+
+		auto delta = static_cast<float>(m_Time.GetDeltaTimeMS());
+
+		Input::Update(delta);
 
 		if (GetActiveRenderPath())
 		{

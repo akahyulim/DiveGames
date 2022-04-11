@@ -3,12 +3,10 @@
 ScenePanel::ScenePanel(Editor* pEditor)
 	: Panel(pEditor, "Scene")
 {
-	m_pSampleTex = Dive::Texture2D::Create("Assets/Textures/DokeV.jpeg");
 }
 
 ScenePanel::~ScenePanel()
 {
-	DV_DELETE(m_pSampleTex);
 }
 
 // Scene이 있다면
@@ -31,7 +29,7 @@ void ScenePanel::renderWindow()
 
 	// 매번 그리는 게 맞다.
 	ImGui::Image(
-		pTexture ? pTexture->GetShaderResourceView() : (m_pSampleTex ? m_pSampleTex->GetShaderResourceView() : nullptr),
+		pTexture ? pTexture->GetShaderResourceView() : nullptr,
 		ImVec2(width, height),
 		ImVec2(0, 0),
 		ImVec2(1, 1),

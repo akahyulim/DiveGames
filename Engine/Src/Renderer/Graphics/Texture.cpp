@@ -2,6 +2,7 @@
 #include "Texture.h"
 #include "Base/Base.h"
 #include "Dive.h"
+#include "Helper/FileSystem.h"
 
 namespace Dive
 {
@@ -19,10 +20,6 @@ namespace Dive
 		_wsplitpath_s(tempPath.c_str(), nullptr, 0, nullptr, 0, nullptr, 0, ext, _MAX_EXT);
 
 		HRESULT hResult = 0;
-
-		// 위치가 애매해... Engine이 가장 유력하다.
-		hResult = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
-
 		if (_wcsicmp(ext, L".dds") == 0)
 		{
 			hResult = DirectX::LoadFromDDSFile(tempPath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
@@ -55,13 +52,8 @@ namespace Dive
 		m_Format	= metaData.format;
 		m_Width		= static_cast<unsigned int>(metaData.width);
 		m_Height	= static_cast<unsigned int>(metaData.height);
-
-		m_Path = path;
-
-		// 이런건 help 함수가 나을지도...
-		auto lastSlashIndex = path.find_last_of("\\/");
-		auto extensionIndex = path.find_last_of(".");
-		m_Name = path.substr(lastSlashIndex + 1, extensionIndex - 1 - lastSlashIndex);
+		m_Path		= path;
+		m_Name		= Helper::FileSystem::GetFileNameWithoutExtension(path);
 
 		return true;
 	}

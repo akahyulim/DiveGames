@@ -44,9 +44,10 @@ namespace Dive
 	{
 		if (m_bNewFrame)
 		{
-			m_OldKeys = m_Keys;
-			m_MouseDelta = DirectX::XMFLOAT2(0.0f, 0.0f);
-			m_bDeviceChange = false;
+			m_OldKeys			= m_Keys;
+			m_MouseDelta		= DirectX::XMFLOAT2(0.0f, 0.0f);
+			m_MouseWheelDelta	= 0.0f;
+			m_bDeviceChange		= false;
 		}
 
 		const auto& windowDataEvent = dynamic_cast<const WindowDataEvent&>(e);
@@ -88,6 +89,7 @@ namespace Dive
 			}
 
 			// wheel delta
+			if(windowData.msg == WM_MOUSEWHEEL)
 			{
 				m_MouseWheelDelta = static_cast<float>(GET_WHEEL_DELTA_WPARAM(windowData.wParam)) / static_cast<float>(WHEEL_DELTA);
 			}

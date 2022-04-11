@@ -17,6 +17,7 @@ void Panel::Tick()
 		return;
 
 	// begin
+	// 이 곳에서 flags를 추가해야 스크롤바가 안 생긴다.
 	ImGui::Begin(m_Title.c_str());
 
 	m_Width = ImGui::GetWindowWidth();
