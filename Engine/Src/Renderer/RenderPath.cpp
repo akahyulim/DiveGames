@@ -201,19 +201,8 @@ namespace Dive
 				// buffer는 Model로부터 획득
 				// bind시 stride가 필요하다. offset은 그냥 0인듯
 				auto pModel = pMeshRenderable->GetModel();
-
-				// => 굳이 Model을 Renderable로부터 획득한 후 다시 이를 이용해 Buffer를 획득할 필요가 있나 싶다.
-				// Renderable의 interface를 위해 Renderable이 직접 Buffer를 리턴해도 될 것 같다.
-				auto pVertexBuffer = (ID3D11Buffer*)pModel->GetVertexBuffer();
-				DV_ASSERT(pVertexBuffer);
-				unsigned int stride = sizeof(VertexType);
-				unsigned int offset = 0;
-				pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
-
-				auto pIndexBuffer = (ID3D11Buffer*)pModel->GetIndexBuffer();
-				DV_ASSERT(pIndexBuffer);
-				auto indexFormat = DXGI_FORMAT_R32_UINT;
-				pImmediateContext->IASetIndexBuffer(pIndexBuffer, indexFormat, 0);
+				pCl->SetVertexBuffer(pModel->GetVertexBuffer());
+				pCl->SetIndexBuffer(pModel->GetIndexBuffer());
 
 				// draw시 index count, index offset, vertex offset이 필요하다.
 				// 이들은 renderable이 관리한다.

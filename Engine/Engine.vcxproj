@@ -186,7 +186,9 @@
     <ClInclude Include="Src\Renderer\CommandList.h" />
     <ClInclude Include="Src\Renderer\ConstantBuffers.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
+    <ClInclude Include="Src\Renderer\Graphics\IndexBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
+    <ClInclude Include="Src\Renderer\Graphics\VertexBuffer.h" />
     <ClInclude Include="Src\Renderer\Material.h" />
     <ClInclude Include="Src\Renderer\Mesh.h" />
     <ClInclude Include="Src\Renderer\Model.h" />
@@ -216,7 +218,9 @@
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\CommandList.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Material.cpp" />
     <ClCompile Include="Src\Renderer\Mesh.cpp" />
     <ClCompile Include="Src\Renderer\Model.cpp" />

@@ -2,6 +2,8 @@
 #include "Model.h"
 #include "Renderer.h"
 #include "Graphics/GraphicsDevice.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
 #include "Scene/GameObject.h"
 #include "Base/Base.h"
 
@@ -18,8 +20,8 @@ namespace Dive
     
     void Model::Clear()
     {
-        DV_RELEASE(m_pIndexBuffer);
-        DV_RELEASE(m_pVertexBuffer);
+        DV_DELETE(m_pIndexBuffer);
+        DV_DELETE(m_pVertexBuffer);
         m_Mesh.Clear();
 
         m_pRootGameObject = nullptr;
@@ -59,51 +61,17 @@ namespace Dive
         const auto pIndices = m_Mesh.GetIndices();
 
         // vertex buffer
+        m_pVertexBuffer = new VertexBuffer;
+        if (!m_pVertexBuffer->Create<VertexType>(pVertices))
         {
-            if (pVertices.empty())
-                return false;
-
-            D3D11_BUFFER_DESC desc;
-            desc.Usage = D3D11_USAGE_DEFAULT;
-            desc.ByteWidth = static_cast<UINT>(sizeof(VertexType)) * static_cast<UINT>(pVertices.size());
-            desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-            desc.CPUAccessFlags = 0;
-            desc.MiscFlags = 0;
-            desc.StructureByteStride = 0;
-
-            D3D11_SUBRESOURCE_DATA data;
-            data.pSysMem = pVertices.data();
-            data.SysMemPitch = 0;
-            data.SysMemSlicePitch = 0;
-
-            if (FAILED(pDevice->CreateBuffer(&desc, &data, &m_pVertexBuffer)))
-            {
-                return false;
-            }
+            return false;
         }
 
         // index buffer
+        m_pIndexBuffer = new IndexBuffer;
+        if (!m_pIndexBuffer->Create(pIndices))
         {
-            if (pIndices.empty())
-                return false;
-
-            D3D11_BUFFER_DESC desc;
-            desc.Usage = D3D11_USAGE_DEFAULT;
-            desc.ByteWidth = static_cast<UINT>(sizeof(unsigned int)) * static_cast<UINT>(pIndices.size());
-            desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-            desc.CPUAccessFlags = 0;
-            desc.MiscFlags = 0;
-            desc.StructureByteStride = 0;
-
-            D3D11_SUBRESOURCE_DATA data;
-            data.pSysMem = pIndices.data();
-            data.SysMemPitch = 0;
-            data.SysMemSlicePitch = 0;
-
-            if (FAILED(pDevice->CreateBuffer(&desc, &data, &m_pIndexBuffer)))
-            {
-                return false;
-            }
+            return false;
         }
 
         return true;

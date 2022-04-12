@@ -94,6 +94,12 @@
     <ClInclude Include="Src\Renderer\ConstantBuffers.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\VertexBuffer.h">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\IndexBuffer.h">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -170,6 +176,12 @@
     </ClCompile>
     <ClCompile Include="Src\Helper\FileSystem.cpp">
       <Filter>Src\Helper</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\VertexBuffer.cpp">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\IndexBuffer.cpp">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

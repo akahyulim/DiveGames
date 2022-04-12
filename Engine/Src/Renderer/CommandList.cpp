@@ -2,7 +2,8 @@
 #include "CommandList.h"
 #include "PipelineState.h"
 #include "Renderer.h"
-#include "CommandList.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
 
 namespace Dive
 {
@@ -107,22 +108,52 @@ namespace Dive
 		return true;
 	}
 
-	// 일단 전부 따로 받았지만
-	// Buffer와 stride는 구조체 혹은 클래스화를 생각해보자.
-	void CommandList::SetVertexBuffer(ID3D11Buffer* pVertexBuffer, const UINT strides, const UINT offsets)
+	void CommandList::SetVertexBuffer(VertexBuffer* pVertexBuffer, unsigned int offsets)
 	{
 		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
-		if (!pImmediateContext)
-			return;
+		DV_ASSERT(pImmediateContext != nullptr);
+		DV_ASSERT(pVertexBuffer != nullptr);
+		DV_ASSERT(pVertexBuffer->GetBuffer() != nullptr);
 
+		// current buffer
 		ID3D11Buffer* pCurrentBuffer = nullptr;
 		UINT currentStrides = 0;
 		UINT currentOffsets = 0;
 		pImmediateContext->IAGetVertexBuffers(0, 1, &pCurrentBuffer, &currentStrides, &currentOffsets);
 
-		if ((pVertexBuffer == pCurrentBuffer) && (offsets == currentOffsets))
+		// input buffer
+		ID3D11Buffer* pBuffer = pVertexBuffer->GetBuffer();
+		UINT strides = pVertexBuffer->GetStride();
+
+		if ((pBuffer == pCurrentBuffer) && (offsets == currentOffsets))
 			return;
 
-		pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &strides, &offsets);
+		// offset가 현재 MeshRenderer의 시작 부분이라 생각했는데, 아닌 듯 하다.
+		// 실제로 좀 더 생각해보니, 시작부분이라 해도 현재 버퍼에서 어디까지 그려야 하는지 알 수 없다.
+		// offset은 draw에 사용되네...?
+		pImmediateContext->IASetVertexBuffers(0, 1, &pBuffer, &strides, &offsets);
+	}
+
+	void CommandList::SetIndexBuffer(IndexBuffer* pIndexBuffer, unsigned int offsets)
+	{
+		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
+		DV_ASSERT(pImmediateContext != nullptr);
+		DV_ASSERT(pIndexBuffer != nullptr);
+		DV_ASSERT(pIndexBuffer->GetBuffer() != nullptr);
+
+		// current buffer
+		ID3D11Buffer* pCurrentBuffer	= nullptr;
+		DXGI_FORMAT currentFormat		= DXGI_FORMAT_UNKNOWN;
+		UINT currentOffsets				= 0;
+		pImmediateContext->IAGetIndexBuffer(&pCurrentBuffer, &currentFormat, &currentOffsets);
+
+		// input buffer
+		ID3D11Buffer* pBuffer = pIndexBuffer->GetBuffer();
+		UINT strides = pIndexBuffer->GetStride();
+
+		if ((pBuffer == pCurrentBuffer) && (offsets == currentOffsets))
+			return;
+
+		pImmediateContext->IASetIndexBuffer(pBuffer, pIndexBuffer->GetFormat(), 0);// offsets);
 	}
 }

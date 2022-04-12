@@ -5,6 +5,8 @@ namespace Dive
 {
 	class GameObject;
 	class Mesh;
+	class VertexBuffer;
+	class IndexBuffer;
 
 	// 현재 이름을 설정하지 않고 있다.
 	class Model
@@ -23,8 +25,8 @@ namespace Dive
 			unsigned int indexOffset, unsigned int indexCount, std::vector<unsigned int>* pOutIndices);
 		const Mesh* GetMesh() const { return &m_Mesh; }
 
-		const ID3D11Buffer* GetVertexBuffer() const { return m_pVertexBuffer; }
-		const ID3D11Buffer* GetIndexBuffer() const { return m_pIndexBuffer; }
+		VertexBuffer* GetVertexBuffer() { return m_pVertexBuffer; }
+		IndexBuffer* GetIndexBuffer() { return m_pIndexBuffer; }
 
 		void SetRootGameObject(GameObject* pGameObject) { m_pRootGameObject = pGameObject; }
 
@@ -40,7 +42,7 @@ namespace Dive
 		
 		Mesh m_Mesh;
 
-		ID3D11Buffer* m_pVertexBuffer = nullptr;
-		ID3D11Buffer* m_pIndexBuffer = nullptr;
+		VertexBuffer* m_pVertexBuffer = nullptr;
+		IndexBuffer* m_pIndexBuffer = nullptr;
 	};
 }

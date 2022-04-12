@@ -3,6 +3,9 @@
 
 namespace Dive
 {
+	class VertexBuffer;
+	class IndexBuffer;
+
 	class CommandList
 	{
 	public:
@@ -11,8 +14,8 @@ namespace Dive
 
 		// sampler
 		// viewport
-		void SetVertexBuffer(ID3D11Buffer* pVertexBuffer, const UINT strides, const UINT offsets);
-		// index buffer
+		void SetVertexBuffer(VertexBuffer* pVertexBuffer, unsigned int offsets = 0);
+		void SetIndexBuffer(IndexBuffer* pIndexBuffer, unsigned int offsets = 0);
 		// constant buffer
 		// texture: shader resource view
 
