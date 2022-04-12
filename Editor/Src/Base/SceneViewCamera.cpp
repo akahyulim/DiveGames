@@ -1,6 +1,5 @@
 #include "SceneViewCamera.h"
 
-// 1. position 직접 이동이 맞는 것일까?
 // 2. ScenePanel이 focus 중일 때만 입력을 처리하는 것이 맞다.
 // 3. 아직 기타 함수를 만들지 않았다.
 SceneViewCamera::SceneViewCamera()
@@ -30,7 +29,7 @@ void SceneViewCamera::Update(float elapsedTime)
 		{
 			auto delta = Dive::Input::GetMouseDelta();
 			delta.x *= 0.1f;
-			delta.y *= 0.1f;
+			delta.y *= -0.1f;
 			
 			DirectX::XMFLOAT3 up;
 			DirectX::XMStoreFloat3(&up, GetUpDirection());

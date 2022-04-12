@@ -25,9 +25,9 @@ namespace Dive
 
 		RAWINPUTDEVICE rid;
 		rid.usUsagePage = 0x01;
-		rid.usUsage = 0x02;
-		rid.dwFlags = RIDEV_INPUTSINK;
-		rid.hwndTarget = m_WindowHandle;
+		rid.usUsage		= 0x02;
+		rid.dwFlags		= RIDEV_INPUTSINK;
+		rid.hwndTarget	= m_WindowHandle;
 		RegisterRawInputDevices(&rid, 1, sizeof(RAWINPUTDEVICE));
 
 		SUBSCRIBE_EVENT(eEventType::WindowData, EVENT_HANDLER_STATIC(OnWindowData));

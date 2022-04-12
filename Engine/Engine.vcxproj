@@ -184,6 +184,7 @@
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\CommandList.h" />
+    <ClInclude Include="Src\Renderer\ConstantBuffers.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
     <ClInclude Include="Src\Renderer\Material.h" />

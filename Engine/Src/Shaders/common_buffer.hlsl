@@ -8,6 +8,7 @@ cbuffer FrameBuffer : register(b0)
 
 // pass 당 한 번 업데이트
 // 왜 이름이 우버인지 모르겠다.
+// 실제로는 MaterialBuffer 정도가 어울린다. 
 cbuffer UberBuffer : register(b1)
 {
 	matrix g_world;

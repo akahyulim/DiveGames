@@ -9,11 +9,11 @@ namespace Dive
 	{
 		DV_ASSERT(pData != nullptr);
 
-		m_hWnd = pData->hWnd;
-		m_Width = pData->Width;
-		m_Height = pData->Height;
-		m_bVSync = pData->bVSync;
-		m_bFullScreen = pData->bFullScreen;
+		m_hWnd			= pData->hWnd;
+		m_Width			= pData->Width;
+		m_Height		= pData->Height;
+		m_bVSync		= pData->bVSync;
+		m_bFullScreen	= pData->bFullScreen;
 
 		UINT deviceFlags = 0;
 

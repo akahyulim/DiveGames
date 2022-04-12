@@ -14,22 +14,8 @@ namespace Dive
 	class Transform;
 	class SpriteRenderable;
 
-	// spartan은 총 다섯개의 버퍼를 Renderer_ConstantBuffer.h와 common_buffer.hlsl에 정의해 놓았다.
-	struct FrameBuffer
-	{
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX proj;
-	};
-
-	struct UberBuffer
-	{
-		DirectX::XMMATRIX world;
-		
-		DirectX::XMFLOAT4 materialColor;
-
-		unsigned int materialTextures;
-		unsigned int padding[3];
-	};
+	struct FrameBuffer;
+	struct UberBuffer;
 
 	struct Visibility
 	{

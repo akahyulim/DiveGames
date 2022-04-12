@@ -1,4 +1,5 @@
 #include "divepch.h"
+#include "ConstantBuffers.h"
 #include "RenderPath.h"
 #include "PipelineState.h"
 #include "CommandList.h"
@@ -98,14 +99,9 @@ namespace Dive
 				auto pShaderResourceView = pSpriteRenderable->GetShaderResourceView();
 				pImmediateContext->PSSetShaderResources(0, 1, &pShaderResourceView);
 
-				// 전부 command list에서 bind하도록 수정해야 한다.
-				auto pVertexBuffer = pSpriteRenderable->GetVertexBuffer();
-				DV_ASSERT(pVertexBuffer);
-				unsigned int stride = pSpriteRenderable->GetVertexStride();
-				unsigned int offset = 0;
-				pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
-
 				// UberBuffer
+				// 현재 임시로 UberBuffer를 활용했다.
+				// 실제로는 따로 전용 혹은 공용 Buffer를 두어야 한다.
 				{
 					D3D11_MAPPED_SUBRESOURCE mappedResource;
 					auto pUberBuffer = Renderer::GetUberBuffer();
@@ -129,6 +125,12 @@ namespace Dive
 					pImmediateContext->VSSetConstantBuffers(1, 1, &pUberBuffer);
 					pImmediateContext->PSSetConstantBuffers(1, 1, &pUberBuffer);
 				}
+				// 전부 command list에서 bind하도록 수정해야 한다.
+				auto pVertexBuffer = pSpriteRenderable->GetVertexBuffer();
+				DV_ASSERT(pVertexBuffer);
+				unsigned int stride = pSpriteRenderable->GetVertexStride();
+				unsigned int offset = 0;
+				pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
 
 				auto pIndexBuffer = pSpriteRenderable->GetIndexBuffer();
 				DV_ASSERT(pIndexBuffer);
