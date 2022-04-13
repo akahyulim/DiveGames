@@ -19,6 +19,7 @@ namespace Dive
 	protected:
 		void passDefault(CommandList* pCl);
 
+
 	protected:
 		Visibility m_MainVisibilities;
 	};

@@ -26,6 +26,7 @@
 #include "Renderer/Graphics/Texture.h"
 #include "Renderer/Graphics/VertexBuffer.h"
 #include "Renderer/Graphics/IndexBuffer.h"
+#include "Renderer/Graphics/ConstantBuffer.h"
 #include "Renderer/ConstantBuffers.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/PipelineState.h"

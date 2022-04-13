@@ -1,9 +1,9 @@
 #include "divepch.h"
 #include "CommandList.h"
 #include "PipelineState.h"
-#include "Renderer.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
+#include "Graphics/ConstantBuffer.h"
 
 namespace Dive
 {
@@ -155,5 +155,46 @@ namespace Dive
 			return;
 
 		pImmediateContext->IASetIndexBuffer(pBuffer, pIndexBuffer->GetFormat(), 0);// offsets);
+	}
+
+	void CommandList::SetConstantBuffer(uint8_t type, eConstantBufferSlot slot, ConstantBuffer* pConstantBuffer)
+	{
+		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
+		DV_ASSERT(pImmediateContext != nullptr);
+		// 이것들은 매개 변수를 잘못 전달받았다고 경고로 띄우는 게...?
+		DV_ASSERT(pConstantBuffer != nullptr);
+		DV_ASSERT(pConstantBuffer->GetBuffer() != nullptr);
+
+		ID3D11Buffer* pBuffer = pConstantBuffer->GetBuffer();
+
+		if (type & Scope_Vertex)
+		{
+			ID3D11Buffer* pCurrentBuffer = nullptr;
+			pImmediateContext->VSGetConstantBuffers(static_cast<unsigned int>(slot), 1, &pCurrentBuffer);
+			if (pBuffer != pCurrentBuffer)
+			{
+				pImmediateContext->VSSetConstantBuffers(static_cast<unsigned int>(slot), 1, &pBuffer);
+			}
+		}
+
+		if (type & Scope_Pixel)
+		{
+			ID3D11Buffer* pCurrentBuffer = nullptr;
+			pImmediateContext->PSGetConstantBuffers(static_cast<unsigned int>(slot), 1, &pCurrentBuffer);
+			if (pBuffer != pCurrentBuffer)
+			{
+				pImmediateContext->PSSetConstantBuffers(static_cast<unsigned int>(slot), 1, &pBuffer);
+			}
+		}
+
+		if (type & Scope_Compute)
+		{
+			ID3D11Buffer* pCurrentBuffer = nullptr;
+			pImmediateContext->CSGetConstantBuffers(static_cast<unsigned int>(slot), 1, &pCurrentBuffer);
+			if (pBuffer != pCurrentBuffer)
+			{
+				pImmediateContext->CSSetConstantBuffers(static_cast<unsigned int>(slot), 1, &pBuffer);
+			}
+		}
 	}
 }

@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "ConstantBuffers.h"
 #include "Graphics/GraphicsDevice.h"
+#include "Graphics/ConstantBuffer.h"
 #include "Base/Engine.h"
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
@@ -21,8 +22,8 @@ namespace Dive
 	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerStateType::Count)> Renderer::m_RasterizerStates;
 	std::array<Shader, static_cast<size_t>(eShaderType::Count)> Renderer::m_Shaders;
 
-	ID3D11Buffer* Renderer::m_pFrameBuffer = nullptr;
-	ID3D11Buffer* Renderer::m_pUberBuffer = nullptr;
+	ConstantBuffer* Renderer::m_pCbFrame = nullptr;
+	ConstantBuffer* Renderer::m_pCbUber = nullptr;
 
 	D3D11_VIEWPORT Renderer::m_Viewport;
 
@@ -45,7 +46,7 @@ namespace Dive
 		createDepthStencilStates();
 		createRasterizerStates();
 		createShaders();
-		createMatrixBuffer();	// 일단 임시다.
+		createConstantBuffers();	// 일단 임시다.
 
 		SUBSCRIBE_EVENT(eEventType::WindowData, EVENT_HANDLER_STATIC(OnWindowData));
 	}
@@ -330,32 +331,12 @@ namespace Dive
 		}
 	}
 
-	void Renderer::createMatrixBuffer()
+	void Renderer::createConstantBuffers()
 	{
-		// frame buffer
-		{
-			D3D11_BUFFER_DESC desc;
-			desc.Usage					= D3D11_USAGE_DYNAMIC;
-			desc.ByteWidth				= sizeof(FrameBuffer);
-			desc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
-			desc.CPUAccessFlags			= D3D11_CPU_ACCESS_WRITE;
-			desc.MiscFlags				= 0;
-			desc.StructureByteStride	= 0;
+		m_pCbFrame = new ConstantBuffer;
+		m_pCbFrame->Create<FrameBuffer>();
 
-			m_GraphicsDevice.CreateBuffer(&desc, nullptr, &m_pFrameBuffer);
-		}
-
-		// uber buffer
-		{
-			D3D11_BUFFER_DESC desc;
-			desc.Usage					= D3D11_USAGE_DYNAMIC;
-			desc.ByteWidth				= sizeof(UberBuffer);
-			desc.BindFlags				= D3D11_BIND_CONSTANT_BUFFER;
-			desc.CPUAccessFlags			= D3D11_CPU_ACCESS_WRITE;
-			desc.MiscFlags				= 0;
-			desc.StructureByteStride	= 0;
-
-			m_GraphicsDevice.CreateBuffer(&desc, nullptr, &m_pUberBuffer);
-		}
+		m_pCbUber = new ConstantBuffer;
+		m_pCbUber->Create<UberBuffer>();
 	}
 }

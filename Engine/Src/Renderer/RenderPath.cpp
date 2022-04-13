@@ -1,8 +1,9 @@
 #include "divepch.h"
-#include "ConstantBuffers.h"
+#include "ConstantBuffers.h"	// 이름이 좀 에바다.
 #include "RenderPath.h"
 #include "PipelineState.h"
 #include "CommandList.h"
+#include "Graphics/ConstantBuffer.h"
 #include "Scene/GameObject.h"
 #include "Scene/Component/Renderable.h"
 #include "Scene/Component/SpriteRenderable.h"
@@ -48,20 +49,15 @@ namespace Dive
 
 		// FrameBuffer
 		{
-			D3D11_MAPPED_SUBRESOURCE mappedResource;
-			auto pFrameBuffer = Renderer::GetMatrixBuffer();
+			auto pCbFrame = Renderer::GetCbFrame();
 
-			// map
-			pImmediateContext->Map(pFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-			FrameBuffer* pPtr = static_cast<FrameBuffer*>(mappedResource.pData);
-
+			// map & unmap
+			auto pPtr = static_cast<FrameBuffer*>(pCbFrame->Map());
 			pPtr->view = DirectX::XMMatrixTranspose(view);
 			pPtr->proj = DirectX::XMMatrixTranspose(proj);
+			pCbFrame->Unmap();
 
-			// unmap
-			pImmediateContext->Unmap(pFrameBuffer, 0);
-
-			pImmediateContext->VSSetConstantBuffers(0, 1, &pFrameBuffer);
+			cl.SetConstantBuffer(Scope_Vertex, eConstantBufferSlot::Frame, pCbFrame);
 		}
 
 		passDefault(&cl);
@@ -103,27 +99,15 @@ namespace Dive
 				// 현재 임시로 UberBuffer를 활용했다.
 				// 실제로는 따로 전용 혹은 공용 Buffer를 두어야 한다.
 				{
-					D3D11_MAPPED_SUBRESOURCE mappedResource;
-					auto pUberBuffer = Renderer::GetUberBuffer();
+					auto pCbUber = Renderer::GetCbUber();
 
-					// map
-					pImmediateContext->Map(pUberBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-					UberBuffer* pPtr = static_cast<UberBuffer*>(mappedResource.pData);
-
-					// 오직 이 값을 전달하기 위해 UberBuffer를 사용한다...
-					// 이 구현이 싫다면 world를 전달하는 다른 constant buffer를 만들어야 한다.
-					// 아니면 SpriteBuffer, MaterialBuffer 등으로 구분 구현할 수 있다.
-					// 그런데 사실 Mesh에서 Quad를 만들면 SpriteRenderable 자체가 필요없어진다...
-					// 물론 Sprite와 Quad Mesh가 다른 성격일 순 있다.
+					// map & unmap
+					auto pPtr = static_cast<UberBuffer*>(pCbUber->Map()); 
 					pPtr->world = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
+					pCbUber->Unmap();
 
-					// unmap
-					pImmediateContext->Unmap(pUberBuffer, 0);
+					pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);
 
-					// 역시 슬롯 설정이 필요하다.
-					// 그리고 WorldMatrix 때문에 VS에도 bind해야 한다.
-					pImmediateContext->VSSetConstantBuffers(1, 1, &pUberBuffer);
-					pImmediateContext->PSSetConstantBuffers(1, 1, &pUberBuffer);
 				}
 				// 전부 command list에서 bind하도록 수정해야 한다.
 				auto pVertexBuffer = pSpriteRenderable->GetVertexBuffer();
@@ -168,27 +152,18 @@ namespace Dive
 					auto pMaterial = pMeshRenderable->GetMaterial();
 					if (pMaterial)
 					{
-						D3D11_MAPPED_SUBRESOURCE mappedResource;
-						auto pUberBuffer = Renderer::GetUberBuffer();
+						auto pCbUber = Renderer::GetCbUber();
 
-						// map
-						pImmediateContext->Map(pUberBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-						UberBuffer* pPtr = static_cast<UberBuffer*>(mappedResource.pData);
-
+						// map & unmap
+						auto pPtr = static_cast<UberBuffer*>(pCbUber->Map());
 						pPtr->world = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
-
 						pPtr->materialColor = pMaterial->GetAlbedoColor();
 						pPtr->materialTextures = 0;
 						pPtr->materialTextures |= pMaterial->HasTexture(eMaterialMapType::Albedo) ? (1U << 0) : 0;
 						pPtr->materialTextures |= pMaterial->HasTexture(eMaterialMapType::Normal) ? (1U << 1) : 0;
-
-						// unmap
-						pImmediateContext->Unmap(pUberBuffer, 0);
-
-						// 역시 슬롯 설정이 필요하다.
-						// 그리고 WorldMatrix 때문에 VS에도 bind해야 한다.
-						pImmediateContext->VSSetConstantBuffers(1, 1, &pUberBuffer);
-						pImmediateContext->PSSetConstantBuffers(1, 1, &pUberBuffer);
+						pCbUber->Unmap();
+						
+						pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);
 
 						// 텍스쳐 유무에 따라 available 값을 전달하는 방법을 생각해 볼 수 있다.
 						Texture2D* pAlbedoTex = dynamic_cast<Texture2D*>(pMaterial->GetMap(eMaterialMapType::Albedo));

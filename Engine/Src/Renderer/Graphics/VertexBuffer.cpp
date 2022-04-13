@@ -6,13 +6,19 @@
 
 namespace Dive 
 {
-	VertexBuffer::~VertexBuffer()
-	{
-		DV_RELEASE(m_pBuffer);
-	}
+    void VertexBuffer::Destroy()
+    {
+        DV_RELEASE(m_pBuffer);
+    }
 
     void* VertexBuffer::Map()
     {
+        if (!m_bDynamic)
+        {
+            DV_CORE_ERROR("Dynamic Buffer가 아닙니다. Vertex buffer Map에 실패하였습니다.");
+            return nullptr;
+        }
+
         auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
         DV_ASSERT(pImmediateContext != nullptr);
         DV_ASSERT(m_pBuffer != nullptr);
@@ -21,7 +27,7 @@ namespace Dive
 
         if (FAILED(pImmediateContext->Map(static_cast<ID3D11Resource*>(m_pBuffer), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
         {
-            DV_CORE_ERROR("Failed to map vertex buffer.");
+            DV_CORE_ERROR("Vertex buffer Map에 실패하였습니다.");
             return nullptr;
         }
 
@@ -30,6 +36,9 @@ namespace Dive
 
     void VertexBuffer::Unmap()
     {
+        if (!m_bDynamic)
+            return;
+
         auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
         DV_ASSERT(pImmediateContext != nullptr);
         DV_ASSERT(m_pBuffer != nullptr);
@@ -42,15 +51,13 @@ namespace Dive
 		auto pDevice = Renderer::GetGraphicsDevice().GetDevice();
         DV_ASSERT(pDevice != nullptr);
 
-		DV_RELEASE(m_pBuffer);
-
-        const bool bDynamic = pData == nullptr;
+        Destroy();
 
         D3D11_BUFFER_DESC desc;
-        desc.Usage                  = bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
+        desc.Usage                  = m_bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
         desc.ByteWidth              = m_Stride * m_Count;
         desc.BindFlags              = D3D11_BIND_VERTEX_BUFFER;
-        desc.CPUAccessFlags         = bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
+        desc.CPUAccessFlags         = m_bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
         desc.MiscFlags              = 0;
         desc.StructureByteStride    = 0;
 
@@ -59,9 +66,9 @@ namespace Dive
         data.SysMemPitch        = 0;
         data.SysMemSlicePitch   = 0;
 
-        if (FAILED(pDevice->CreateBuffer(&desc, bDynamic ? nullptr : &data, &m_pBuffer)))
+        if (FAILED(pDevice->CreateBuffer(&desc, m_bDynamic ? nullptr : &data, &m_pBuffer)))
         {
-            DV_CORE_ERROR("Failed to create vertex buffer.");
+            DV_CORE_ERROR("Vertex buffer 생성에 실패하였습니다.");
             return false;
         }
 

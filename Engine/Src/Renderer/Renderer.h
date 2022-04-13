@@ -14,8 +14,27 @@ namespace Dive
 	class Transform;
 	class SpriteRenderable;
 
+	class ConstantBuffer;
 	struct FrameBuffer;
 	struct UberBuffer;
+
+	// 에바?
+	enum class eConstantBufferSlot
+	{
+		Frame = 0,
+		Uber,
+		Light,
+		Material
+	};
+
+	// 동일한 이름이 아래에 있다. Scope 정도도 괜찮을 듯?
+	enum ShaderType : uint8_t
+	{
+		Scope_Unknown	= 0,
+		Scope_Vertex	= 1 << 0,
+		Scope_Pixel		= 1 << 1,
+		Scope_Compute	= 1 << 2
+	};
 
 	struct Visibility
 	{
@@ -129,8 +148,8 @@ namespace Dive
 
 		static D3D11_VIEWPORT* GetBackbufferViewport() { return &m_Viewport; }
 
-		static ID3D11Buffer* GetMatrixBuffer() { return m_pFrameBuffer; }
-		static ID3D11Buffer* GetUberBuffer() { return m_pUberBuffer; }
+		static ConstantBuffer* GetCbFrame() { return m_pCbFrame; }
+		static ConstantBuffer* GetCbUber() { return m_pCbUber; }
 
 		static void UpdateVisibility(Visibility& vis);
 
@@ -146,7 +165,7 @@ namespace Dive
 		static void createDepthStencilStates();
 		static void createRasterizerStates();
 		static void createShaders();
-		static void createMatrixBuffer();
+		static void createConstantBuffers();
 
 	private:
 		static GraphicsDevice m_GraphicsDevice;
@@ -170,7 +189,11 @@ namespace Dive
 
 		// constant buffer
 		static ID3D11Buffer* m_pFrameBuffer;
-		static ID3D11Buffer* m_pUberBuffer;
+
+		// 스파르탄은 각각 cpu, gpu로 나누며
+		// cpu는 previous를 하나 더 가진다.
+		static ConstantBuffer* m_pCbFrame;
+		static ConstantBuffer* m_pCbUber;
 
 		static D3D11_VIEWPORT m_Viewport;
 

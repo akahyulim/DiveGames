@@ -69,7 +69,7 @@ namespace Dive
 
         // index buffer
         m_pIndexBuffer = new IndexBuffer;
-        if (!m_pIndexBuffer->Create(pIndices))
+        if (!m_pIndexBuffer->Create<unsigned int>(pIndices))
         {
             return false;
         }

@@ -60,20 +60,15 @@ void EditorRenderPath::Render()
 	// 매 프레임 한 번만 bind하면 모든 Shader에서 사용할 수 있다.
 	// FrameBuffer
 	{
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		auto pFrameBuffer = Dive::Renderer::GetMatrixBuffer();
+		auto pCbFrame = Dive::Renderer::GetCbFrame();
 
-		// map
-		pImmediateContext->Map(pFrameBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-		Dive::FrameBuffer* pPtr = static_cast<Dive::FrameBuffer*>(mappedResource.pData);
-
+		// map & unmap
+		auto pPtr = static_cast<Dive::FrameBuffer*>(pCbFrame->Map());
 		pPtr->view = DirectX::XMMatrixTranspose(view);
 		pPtr->proj = DirectX::XMMatrixTranspose(proj);
+		pCbFrame->Unmap();
 
-		// unmap
-		pImmediateContext->Unmap(pFrameBuffer, 0);
-
-		pImmediateContext->VSSetConstantBuffers(0, 1, &pFrameBuffer);
+		cl.SetConstantBuffer(Dive::Scope_Vertex, Dive::eConstantBufferSlot::Frame, pCbFrame);
 	}
 
 	Dive::RenderPath::passDefault(&cl);
