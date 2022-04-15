@@ -210,7 +210,7 @@ void ModelImporter::loadMaterial(const ModelParams& params, const aiMesh* pAiMes
 
     // material 생성
     // 스파르탄도 그냥 동적생성한다. 임포트의 특성일 수 있다.
-    auto pMaterial = new Dive::Material();
+    auto pMaterial = new Dive::LegacyMaterial();
     auto pAiMaterial = params.pAiScene->mMaterials[pAiMesh->mMaterialIndex];
 
     // name

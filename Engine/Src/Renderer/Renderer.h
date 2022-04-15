@@ -17,14 +17,16 @@ namespace Dive
 	class ConstantBuffer;
 	struct FrameBuffer;
 	struct UberBuffer;
+	struct SpriteBuffer;
 
 	// 에바?
 	enum class eConstantBufferSlot
 	{
 		Frame = 0,
 		Uber,
-		Light,
-		Material
+		Sprite,
+		//Light,
+		//Material
 	};
 
 	// 동일한 이름이 아래에 있다. Scope 정도도 괜찮을 듯?
@@ -150,6 +152,7 @@ namespace Dive
 
 		static ConstantBuffer* GetCbFrame() { return m_pCbFrame; }
 		static ConstantBuffer* GetCbUber() { return m_pCbUber; }
+		static ConstantBuffer* GetCbSprite() { return m_pCbSprite; }
 
 		static void UpdateVisibility(Visibility& vis);
 
@@ -194,6 +197,7 @@ namespace Dive
 		// cpu는 previous를 하나 더 가진다.
 		static ConstantBuffer* m_pCbFrame;
 		static ConstantBuffer* m_pCbUber;
+		static ConstantBuffer* m_pCbSprite;
 
 		static D3D11_VIEWPORT m_Viewport;
 

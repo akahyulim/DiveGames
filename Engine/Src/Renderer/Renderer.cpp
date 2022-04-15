@@ -24,6 +24,7 @@ namespace Dive
 
 	ConstantBuffer* Renderer::m_pCbFrame = nullptr;
 	ConstantBuffer* Renderer::m_pCbUber = nullptr;
+	ConstantBuffer* Renderer::m_pCbSprite = nullptr;
 
 	D3D11_VIEWPORT Renderer::m_Viewport;
 
@@ -300,8 +301,7 @@ namespace Dive
 			D3D11_INPUT_ELEMENT_DESC desc[] =
 			{
 				{"POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	0,	D3D11_INPUT_PER_VERTEX_DATA, 0},
-				{"COLOR",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-				{"TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	28, D3D11_INPUT_PER_VERTEX_DATA, 0}
+				{"TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	12, D3D11_INPUT_PER_VERTEX_DATA, 0}
 			};
 
 			unsigned int numElements = ARRAYSIZE(desc);// sizeof(desc) / sizeof(desc[0]);
@@ -338,5 +338,8 @@ namespace Dive
 
 		m_pCbUber = new ConstantBuffer;
 		m_pCbUber->Create<UberBuffer>();
+
+		m_pCbSprite = new ConstantBuffer;
+		m_pCbSprite->Create<SpriteBuffer>();
 	}
 }

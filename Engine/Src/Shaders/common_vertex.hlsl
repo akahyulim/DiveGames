@@ -1,4 +1,10 @@
 
+struct Vertex_PosTex
+{
+	float4 position : POSITION0;
+	float2 texCoord : TEXCOORD0;
+};
+
 struct Vertex_PosColTex
 {
 	float4 position : POSITION0;

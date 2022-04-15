@@ -9,7 +9,7 @@
 #include "Scene/Component/SpriteRenderable.h"
 #include "Scene/Component/MeshRenderable.h"
 #include "Model.h"
-#include "Material.h"
+#include "LegacyMaterial.h"
 
 namespace Dive
 {
@@ -85,44 +85,44 @@ namespace Dive
 			
 			pCl->BindPipelineState(ps);
 
-			// 여기는 ubber buffer가 없다...
 			for(auto pGameObject : m_MainVisibilities.visibleSpriteRenderables)
 			{
 				auto pTransform = pGameObject->GetComponent<Transform>();
 				auto pSpriteRenderable = pGameObject->GetComponent<SpriteRenderable>();
 
-				// 슬롯이 있다.
-				auto pShaderResourceView = pSpriteRenderable->GetShaderResourceView();
-				pImmediateContext->PSSetShaderResources(0, 1, &pShaderResourceView);
+				// 버퍼가 없을 수 있다.
+				if (!pSpriteRenderable->GetVertexBuffer() || !pSpriteRenderable->GetIndexBuffer())
+					continue;
 
-				// UberBuffer
-				// 현재 임시로 UberBuffer를 활용했다.
-				// 실제로는 따로 전용 혹은 공용 Buffer를 두어야 한다.
+				// Sprite Buffer
 				{
-					auto pCbUber = Renderer::GetCbUber();
+					auto pCbSprite = Renderer::GetCbSprite();
 
 					// map & unmap
-					auto pPtr = static_cast<UberBuffer*>(pCbUber->Map()); 
-					pPtr->world = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
-					pCbUber->Unmap();
+					auto pPtr = static_cast<SpriteBuffer*>(pCbSprite->Map());
+					pPtr->world			= DirectX::XMMatrixTranspose(pTransform->GetMatrix());
+					pPtr->materialColor = pSpriteRenderable->GetColor();
+					pPtr->options		= 0;
+					pPtr->options		|= pSpriteRenderable->HasSprite() ? (1U << 0) : 0;
+					pPtr->options		|= pSpriteRenderable->IsFlipX() ? (1U << 1) : 0;
+					pPtr->options		|= pSpriteRenderable->IsFlipY() ? (1U << 2) : 0;
+					pCbSprite->Unmap();
 
-					pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);
+					pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Sprite, pCbSprite);
 
+					if (pSpriteRenderable->HasSprite())
+					{
+						auto pShaderResourceView = pSpriteRenderable->GetSprite()->GetShaderResourceView();
+						pImmediateContext->PSSetShaderResources(1, 1, &pShaderResourceView);
+					}
 				}
-				// 전부 command list에서 bind하도록 수정해야 한다.
-				auto pVertexBuffer = pSpriteRenderable->GetVertexBuffer();
-				DV_ASSERT(pVertexBuffer);
-				unsigned int stride = pSpriteRenderable->GetVertexStride();
-				unsigned int offset = 0;
-				pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer, &stride, &offset);
+				
+				
+				pCl->SetVertexBuffer(pSpriteRenderable->GetVertexBuffer());
+				pCl->SetIndexBuffer(pSpriteRenderable->GetIndexBuffer());
 
-				auto pIndexBuffer = pSpriteRenderable->GetIndexBuffer();
-				DV_ASSERT(pIndexBuffer);
-				auto indexCount = pSpriteRenderable->GetIndexCount();
-				auto indexFormat = pSpriteRenderable->GetIndexForamt();
-				pImmediateContext->IASetIndexBuffer(pIndexBuffer, indexFormat, 0);
-
-				pImmediateContext->DrawIndexed(indexCount, 0, 0);
+				// count는 임시
+				pImmediateContext->DrawIndexed(6, 0, 0);
 			}
 		}
 
@@ -147,6 +147,18 @@ namespace Dive
 				auto pTransform = pGameObject->GetComponent<Transform>();
 				auto pMeshRenderable = pGameObject->GetComponent<MeshRenderable>();
 
+				// renderable로부터 model 획득
+				// buffer는 Model로부터 획득
+				// bind시 stride가 필요하다. offset은 그냥 0인듯
+				auto pModel = pMeshRenderable->GetModel();
+
+				// 이것두 버퍼가 없을 수 있나...?
+				if (!pModel->GetVertexBuffer() || !pModel->GetIndexBuffer())
+					continue;
+				
+				pCl->SetVertexBuffer(pModel->GetVertexBuffer());
+				pCl->SetIndexBuffer(pModel->GetIndexBuffer());
+
 				// UberBuffer
 				{
 					auto pMaterial = pMeshRenderable->GetMaterial();
@@ -156,28 +168,21 @@ namespace Dive
 
 						// map & unmap
 						auto pPtr = static_cast<UberBuffer*>(pCbUber->Map());
-						pPtr->world = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
-						pPtr->materialColor = pMaterial->GetAlbedoColor();
-						pPtr->materialTextures = 0;
-						pPtr->materialTextures |= pMaterial->HasTexture(eMaterialMapType::Albedo) ? (1U << 0) : 0;
-						pPtr->materialTextures |= pMaterial->HasTexture(eMaterialMapType::Normal) ? (1U << 1) : 0;
+						pPtr->world				= DirectX::XMMatrixTranspose(pTransform->GetMatrix());
+						pPtr->materialColor		= pMaterial->GetAlbedoColor();
+						pPtr->materialTextures	= 0;
+						pPtr->materialTextures	|= pMaterial->HasTexture(eMaterialMapType::Albedo) ? (1U << 0) : 0;
+						pPtr->materialTextures	|= pMaterial->HasTexture(eMaterialMapType::Normal) ? (1U << 1) : 0;
 						pCbUber->Unmap();
 						
 						pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);
 
 						// 텍스쳐 유무에 따라 available 값을 전달하는 방법을 생각해 볼 수 있다.
-						Texture2D* pAlbedoTex = dynamic_cast<Texture2D*>(pMaterial->GetMap(eMaterialMapType::Albedo));
+						auto pAlbedoTex = pMaterial->GetMap(eMaterialMapType::Albedo);
 						auto pSrv = pAlbedoTex ? pAlbedoTex->GetShaderResourceView() : nullptr;
 						pImmediateContext->PSSetShaderResources(1, 1, &pSrv);
 					}
 				}
-
-				// renderable로부터 model 획득
-				// buffer는 Model로부터 획득
-				// bind시 stride가 필요하다. offset은 그냥 0인듯
-				auto pModel = pMeshRenderable->GetModel();
-				pCl->SetVertexBuffer(pModel->GetVertexBuffer());
-				pCl->SetIndexBuffer(pModel->GetIndexBuffer());
 
 				// draw시 index count, index offset, vertex offset이 필요하다.
 				// 이들은 renderable이 관리한다.

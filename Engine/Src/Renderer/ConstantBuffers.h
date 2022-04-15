@@ -18,4 +18,14 @@ namespace Dive
 		unsigned int materialTextures = 0;
 		unsigned int padding[3] = { 0 };
 	};
+
+	struct SpriteBuffer
+	{
+		DirectX::XMMATRIX world = DirectX::XMMatrixIdentity();
+
+		DirectX::XMFLOAT4 materialColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+		unsigned int options = 0;
+		unsigned int padding[3] = { 0 };
+	};
 }

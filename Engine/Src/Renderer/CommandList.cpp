@@ -140,7 +140,7 @@ namespace Dive
 		DV_ASSERT(pImmediateContext != nullptr);
 		DV_ASSERT(pIndexBuffer != nullptr);
 		DV_ASSERT(pIndexBuffer->GetBuffer() != nullptr);
-
+		
 		// current buffer
 		ID3D11Buffer* pCurrentBuffer	= nullptr;
 		DXGI_FORMAT currentFormat		= DXGI_FORMAT_UNKNOWN;

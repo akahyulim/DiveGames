@@ -34,6 +34,8 @@
 #include "Renderer/RenderPath.h"
 #include "Renderer/Mesh.h"
 #include "Renderer/Material.h"
+#include "Renderer/LegacyMaterial.h"
+#include "Renderer/SpriteMaterial.h"
 #include "Renderer/Model.h"
 
 //= Input =========================

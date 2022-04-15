@@ -5,7 +5,9 @@
 namespace Dive
 {
 	class GameObject;
-	class Texture2D;
+	class SpriteMaterial;
+	class VertexBuffer;
+	class IndexBuffer;
 
 	class SpriteRenderable : public Renderable
 	{
@@ -17,58 +19,37 @@ namespace Dive
 
 		void Shutdown();
 
-		Texture2D* GetTexture() { return m_pTexture; }
-		void SetTexture(Texture2D* pTexture);
+		VertexBuffer* GetVertexBuffer() { return m_pVertexBuffer; }
+		IndexBuffer* GetIndexBuffer() { return m_pIndexBuffer; }
 
-		ID3D11ShaderResourceView* GetShaderResourceView();
+		SpriteMaterial* GetMaterial() { return m_pMaterial; }
+		void SetMaterial(SpriteMaterial* pMaterial) { m_pMaterial = pMaterial; }
+		bool HasMaterial() const { return m_pMaterial != nullptr; }
 
-		ID3D11Buffer* GetVertexBuffer() { return m_pVertexBuffer; }
-		ID3D11Buffer* GetIndexBuffer() { return m_pIndexBuffer; }
+		Texture2D* GetSprite();
+		void SetSprite(Texture2D* pSprite);
+		bool HasSprite() const;
 
-		int GetVertexCount() const { return m_VertexCount; }
-		int GetIndexCount() const { return m_IndexCount; }
+		DirectX::XMFLOAT4 GetColor() const;
+		void SetColor(const DirectX::XMFLOAT4& color);
 
-		unsigned int GetVertexStride() const { return sizeof(VertexType); }
-		DXGI_FORMAT GetIndexForamt() const { return DXGI_FORMAT_R32_UINT; }
-
-		unsigned int GetSizeWidth() const { return m_Width; }
-		unsigned int GetSizeHeight() const { return m_Height; }
-
-		DirectX::XMFLOAT4 GetColor() const { return m_Color; }
-		void SetColor(DirectX::XMFLOAT4 color);
-		
-		bool IsFlipX() const { return m_bFlipX; }
-		void SetFlipX(bool x);
-		bool IsFlipY() const { return m_bFlipY; }
-		void SetFlipY(bool y);
+		bool IsFlipX() const;
+		void SetFlipX(bool flip);
+		bool IsFlipY() const;
+		void SetFlipY(bool flip);
 
 	private:
-		bool createBuffer();
-		void flipSprite();
+		bool createBuffer(const unsigned int width, const unsigned int height);
 
 	private:
-		DirectX::XMFLOAT4 m_Color{1.0f, 1.0f, 1.0f, 1.0f};
-		Texture2D* m_pTexture = nullptr;
-		bool m_bFlipX = false;
-		bool m_bFlipY = false;
-
-		// Material
-
-		int m_Width = 0;
-		int m_Height = 0;
-
 		struct VertexType
 		{
 			DirectX::XMFLOAT3 position;
-			DirectX::XMFLOAT4 color;
 			DirectX::XMFLOAT2 texCoord;
 		};
+		VertexBuffer* m_pVertexBuffer = nullptr;
+		IndexBuffer* m_pIndexBuffer = nullptr; 
 
-		ID3D11Buffer* m_pVertexBuffer = nullptr;
-		ID3D11Buffer* m_pIndexBuffer = nullptr;
-
-		// 얘네는 그냥 static const가 나을듯...
-		int m_VertexCount = 6;
-		int m_IndexCount = 6;
+		SpriteMaterial* m_pMaterial = nullptr;
 	};
 }

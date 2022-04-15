@@ -103,6 +103,12 @@
     <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\LegacyMaterial.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\SpriteMaterial.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -188,6 +194,12 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\LegacyMaterial.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\SpriteMaterial.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

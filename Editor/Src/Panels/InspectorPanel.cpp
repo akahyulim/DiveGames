@@ -141,8 +141,6 @@ void InspectorPanel::drawSpriteRenderer(Dive::GameObject* pSelectedObject)
 	if (!pSpriteRenderer)
 		return;
 
-	auto pTexture = pSpriteRenderer->GetTexture();
-
 	if (ImGui::CollapsingHeader("Sprite Renderable", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 	{
 		// enabled
@@ -151,11 +149,13 @@ void InspectorPanel::drawSpriteRenderer(Dive::GameObject* pSelectedObject)
 		pSpriteRenderer->SetEnable(enabled);
 
 		// Sprite
-		auto name = pTexture->GetName();
+		auto name = pSpriteRenderer->HasSprite() ? pSpriteRenderer->GetSprite()->GetName() : "";
 		ImGui::Text("Sprite");
 		ImGui::SameLine();
 		ImGui::InputText("##SpriteName", &name);
-		pTexture->SetName(name);
+		if (pSpriteRenderer->HasSprite())
+			pSpriteRenderer->GetSprite()->SetName(name);
+
 		ImGui::SameLine();
 		if (ImGui::Button("*"))
 		{
@@ -182,7 +182,7 @@ void InspectorPanel::drawSpriteRenderer(Dive::GameObject* pSelectedObject)
 		pSpriteRenderer->SetFlipX(flipX);
 		pSpriteRenderer->SetFlipY(flipY);
 	}
-
+	
 	ImGui::Separator();
 }
 
