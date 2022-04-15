@@ -19,6 +19,9 @@
     <Filter Include="Src\Importer">
       <UniqueIdentifier>{25980306-f511-496a-80dc-1244f2849e2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Utilities">
+      <UniqueIdentifier>{7e4279bf-365d-440c-8caa-ea8fdf2f6c7c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Base\Editor.cpp">
@@ -136,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="Src\Importer\ModelImporter.h">
       <Filter>Src\Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Utilities\BasicGeometry.h">
+      <Filter>Src\Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

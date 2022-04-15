@@ -20,7 +20,7 @@ namespace Dive
 		void UpdateGeometry();
 
 		void AppendGeometry(const std::vector<VertexType>& vertices, const std::vector<unsigned int>& indices,
-			unsigned int* pOutVertexOffset, unsigned int* pOutIndexOffset);
+			unsigned int* pOutVertexOffset = nullptr, unsigned int* pOutIndexOffset = nullptr);
 		void GetGeometry(unsigned int vertexOffset, unsigned int vertexCount, std::vector<VertexType>* pOutVertices,
 			unsigned int indexOffset, unsigned int indexCount, std::vector<unsigned int>* pOutIndices);
 		const Mesh* GetMesh() const { return &m_Mesh; }

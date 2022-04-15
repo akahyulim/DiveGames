@@ -191,6 +191,7 @@
     <ClInclude Include="Src\Panels\MenuBarPanel.h" />
     <ClInclude Include="Src\Panels\Panel.h" />
     <ClInclude Include="Src\Panels\ScenePanel.h" />
+    <ClInclude Include="Src\Utilities\BasicGeometry.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
