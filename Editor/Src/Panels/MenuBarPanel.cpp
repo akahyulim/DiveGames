@@ -219,10 +219,21 @@ void MenuBarPanel::menuGameObject()
 				{
 					std::vector<Dive::VertexType> vertices;
 					std::vector<unsigned int> indices;
-					Utilities::Geometry::CreatePlane(&vertices, &indices, 2, 2);
+					Utilities::Geometry::CreatePlane(&vertices, &indices);
+					// 이건 리소스지만
+					auto pModel = new Dive::Model();
+					pModel->AppendGeometry(vertices, indices);
+					pModel->UpdateGeometry();
 
-					//auto pModel = new Dive::Model();
-					//m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cylinder.obj");
+					// 이것도 리소스일 필요가 있나...?
+					// 아... 동일한 모델을 사용하는 다른 GameObject에서 사용할 수 있다.
+					auto pMaterial = new Dive::LegacyMaterial;
+
+					auto pGameObject = m_pActiveScene->CreateGameObject("Plane");
+					auto pMeshRenderable = pGameObject->AddComponent<Dive::MeshRenderable>();
+					pMeshRenderable->SetGeometry("Plane", 0, static_cast<unsigned int>(vertices.size()), 0, static_cast<unsigned int>(indices.size()), pModel);
+					pMeshRenderable->SetMaterail(pMaterial);
+					pModel->SetRootGameObject(pGameObject);
 				}
 			}
 

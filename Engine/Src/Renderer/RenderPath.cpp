@@ -130,7 +130,7 @@ namespace Dive
 		{
 			// pipeline은 il, shader가 다르다.
 			PipelineState ps;
-			ps.primitiveTopology	= D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			ps.primitiveTopology	= D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;//D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
 			ps.pInputLayout			= Renderer::GetShader(eShaderType::Mesh)->pInputLayout;
 			ps.pVertexShader		= Renderer::GetShader(eShaderType::Mesh)->pVertexShader;
 			ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
