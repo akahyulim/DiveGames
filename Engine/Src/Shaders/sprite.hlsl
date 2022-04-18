@@ -6,6 +6,11 @@ struct Pixel_Input
 	float2 texCoord	: TEXCOORD0;
 };
 
+struct Pixel_Output
+{
+	float4 albedo : SV_TARGET0;
+};
+
 Pixel_Input mainVS(Vertex_PosTex input)
 {
 	Pixel_Input output;
@@ -29,16 +34,23 @@ Pixel_Input mainVS(Vertex_PosTex input)
 	return output;
 }
 
-// 추후 common_sampler로 이동0
+// 추후 common_sampler로 이동
 SamplerState linearSampler;
 
-float4 mainPS(Pixel_Input input) : SV_TARGET
+Pixel_Output mainPS(Pixel_Input input)
 {
+	Pixel_Output output;
+
 	if (!HasSpriteTexture())
-		return float4(0.0f, 0.0f, 0.0f, 0.0f);
+	{
+		output.albedo = float4(0.0f, 0.0f, 0.0f, 0.0f);
+		return output;
+	}
 
 	float4 color = g_sprite_color;
 	color *= material_Albedo.Sample(linearSampler, input.texCoord);
 
-	return color;
+	output.albedo = color;
+
+	return output;
 }

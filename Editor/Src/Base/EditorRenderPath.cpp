@@ -28,12 +28,12 @@ void EditorRenderPath::Render()
 		// 스파르탄의 경우 초기화는 외부에서 하고
 		// pass에 필요한 것들을 인자로 전달한 후 bind하는 것 같다.
 		auto pImmediateContext = Dive::Renderer::GetGraphicsDevice().GetImmediateContext();
-		auto pRenderTargetView = Dive::Renderer::GetSampleTexture()->GetRenderTargetView();
+		auto pRenderTargetView = Dive::Renderer::GetGbufferAlbedo()->GetRenderTargetView();
 		auto pDepthStencilView = Dive::Renderer::GetDepthStencilTexture()->GetDepthStencilView();
 		if (!pImmediateContext || !pRenderTargetView)
 			return;
 
-		float clearColors[4] = { 0.35f, 0.35f, 0.7f, 1.0f };
+		float clearColors[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
 
 		pImmediateContext->ClearRenderTargetView(pRenderTargetView, clearColors);
 		if (pDepthStencilView)
@@ -43,7 +43,7 @@ void EditorRenderPath::Render()
 		std::array<ID3D11RenderTargetView*, 8> renderTargetViews = { nullptr };
 		renderTargetViews[0] = pRenderTargetView;
 		//pImmediateContext->OMSetRenderTargets(1, renderTargetViews.data(), pDepthStencilView);
-		//pImmediateContext->RSSetViewports(1, Dive::Renderer::GetSampleTexture()->GetViewport());
+		//pImmediateContext->RSSetViewports(1, Dive::Renderer::GetGbufferAlbedo()->GetViewport());
 	}
 
 	Dive::CommandList cl;

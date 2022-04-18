@@ -1,4 +1,5 @@
 #include "ScenePanel.h"
+#include "Base/SceneViewCamera.h"
 
 ScenePanel::ScenePanel(Editor* pEditor)
 	: Panel(pEditor, "Scene")
@@ -22,10 +23,11 @@ void ScenePanel::renderWindow()
 
 	// renderer의 viewport를 설정한다.
 	// Editor용 Camera도 함께 설정??
+	m_pEditor->GetSceneViewCamera()->SetViewportSize(width, height);
 
 	// 이전 ContentRegion과의 비교가 필요하다.
 	Dive::Renderer::SetTextures(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
-	auto pTexture = Dive::Renderer::GetSampleTexture();
+	auto pTexture = Dive::Renderer::GetGbufferAlbedo();
 
 	// 매번 그리는 게 맞다.
 	ImGui::Image(

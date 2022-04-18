@@ -29,7 +29,7 @@ namespace Dive
 	D3D11_VIEWPORT Renderer::m_Viewport;
 
 	// 이하 테스트
-	Texture2D* Renderer::m_pSampleTex = nullptr;
+	Texture2D* Renderer::m_pGbufferAlbedo = nullptr;
 	Texture2D* Renderer::m_pDepthStencilTex = nullptr;
 
 	void Renderer::Initialize(const WindowData* pData)
@@ -73,7 +73,7 @@ namespace Dive
 		}
 	
 		DV_DELETE(m_pDepthStencilTex);
-		DV_DELETE(m_pSampleTex);
+		DV_DELETE(m_pGbufferAlbedo);
 
 		m_GraphicsDevice.Shutdown();
 	}
@@ -84,7 +84,7 @@ namespace Dive
 	void Renderer::BeginScene()
 	{
 		auto pImmediateContext = m_GraphicsDevice.GetImmediateContext();
-		auto pRenderTargetView = m_pSampleTex ? m_pSampleTex->GetRenderTargetView() : nullptr;
+		auto pRenderTargetView = m_pGbufferAlbedo ? m_pGbufferAlbedo->GetRenderTargetView() : nullptr;
 		auto pDepthStencilView = m_pDepthStencilTex ? m_pDepthStencilTex->GetDepthStencilView() : nullptr;
 		if (!pImmediateContext || !pRenderTargetView)
 			return;
@@ -205,8 +205,8 @@ namespace Dive
 		unsigned int height = m_TextureHeight;
 		
 		// Render Target Textures
-		DV_DELETE(m_pSampleTex);
-		m_pSampleTex = Texture2D::Create(width, height, DXGI_FORMAT_R32G32B32A32_FLOAT, true);
+		DV_DELETE(m_pGbufferAlbedo);
+		m_pGbufferAlbedo = Texture2D::Create(width, height, DXGI_FORMAT_R32G32B32A32_FLOAT, true);
 
 		// Depth Stencil Buffers
 		DV_DELETE(m_pDepthStencilTex);
@@ -215,7 +215,7 @@ namespace Dive
 
 	void Renderer::removeRenderTargets()
 	{
-		DV_DELETE(m_pSampleTex);
+		DV_DELETE(m_pGbufferAlbedo);
 		DV_DELETE(m_pDepthStencilTex);
 	}
 

@@ -8,6 +8,11 @@ struct Pixel_Input
 	float3 tangent	: TANGENT;
 };
 
+struct Pixel_Output
+{
+	float4 albedo : SV_TARGET0;
+};
+
 Pixel_Input mainVS(Vertex_PosTexNorTan input)
 {
 	Pixel_Input output;
@@ -46,8 +51,10 @@ float4 CalcuDirectionalLight(float3 normal)
 	return lightColor;
 }
 
-float4 mainPS(Pixel_Input input) : SV_TARGET
+Pixel_Output mainPS(Pixel_Input input)
 {
+	Pixel_Output output;
+
 	// albedo
 	float4 albedo = g_mat_color;
 	if (HasAlbedoTexture())
@@ -60,12 +67,16 @@ float4 mainPS(Pixel_Input input) : SV_TARGET
 	float3 normal = input.normal;
 	if (HasNormalTexture())
 	{
-	//	normal *= material_Normal.Sample(linearSampler, input.texCoord);
+		// 일단 현재 sponza의 normal이 없다고 나온다.
+		// 그리고 샘플링도 이렇게 하는 게 아닐 것이다.
+		normal *= material_Normal.Sample(linearSampler, input.texCoord);
 	}
 
 	float4 color = albedo;
 
 	color *= CalcuDirectionalLight(normal);
 
-	return color;
+	output.albedo = color;
+
+	return output;
 }

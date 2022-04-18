@@ -40,6 +40,8 @@ public:
 
 	ModelImporter* GetModelImporter() { return m_pModelImporter; }
 
+	SceneViewCamera* GetSceneViewCamera() { return &m_SceneViewCamera; }
+
 private:
 	// editor's window
 	void createWindow(HINSTANCE hInstance);

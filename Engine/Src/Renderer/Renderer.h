@@ -157,7 +157,7 @@ namespace Dive
 		static void UpdateVisibility(Visibility& vis);
 
 		// test ============================================================
-		static Texture2D* GetSampleTexture() { return m_pSampleTex; }
+		static Texture2D* GetGbufferAlbedo() { return m_pGbufferAlbedo; }
 		static Texture2D* GetDepthStencilTexture() { return m_pDepthStencilTex; }
 
 
@@ -202,7 +202,7 @@ namespace Dive
 		static D3D11_VIEWPORT m_Viewport;
 
 		// test resources =================
-		static Texture2D* m_pSampleTex;
+		static Texture2D* m_pGbufferAlbedo;
 		static Texture2D* m_pDepthStencilTex;
 	};
 }

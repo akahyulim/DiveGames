@@ -5,7 +5,7 @@
 class SceneViewCamera
 {
 public:
-	SceneViewCamera();
+	SceneViewCamera(const DirectX::XMFLOAT3& pos = { 0.0f, 5.0f, -10.0f });
 	~SceneViewCamera() = default;
 
 	void Update(float elapsedTime);
@@ -20,7 +20,9 @@ public:
 	DirectX::XMVECTOR GetForwardDirection() const;
 	DirectX::XMVECTOR GetUpDirection() const;
 
-	DirectX::XMFLOAT3 GetCameraPosition() const { return m_Position; }
+	// 헤이즐의 경우 distance와 focal position을 이용해 position을 계산한다.
+	DirectX::XMFLOAT3 GetPosition() const { return m_Position; }
+	void SetPosition(const DirectX::XMFLOAT3& pos) { m_Position = pos; }
 
 	void SetViewportSize(float width, float height);
 
@@ -44,12 +46,12 @@ private:
 	DirectX::XMFLOAT4X4 m_ViewMatrix;
 	DirectX::XMFLOAT4X4 m_ProjMatrix;
 
-	float m_Pitch = 0.0f;
-	float m_Yaw = 0.0f;
+	float m_Pitch	= 0.0f;
+	float m_Yaw		= 0.0f;
 
 	float m_RotateSpeed = 0.8f;
 
 	// Viewport 크기에 맞춰 AspetRatio 계산을 위해 사용한다.
-	float m_ViewportWidth;
-	float m_ViewportHeight;
+	float m_ViewportWidth = 0.0f;
+	float m_ViewportHeight = 0.0f;
 };

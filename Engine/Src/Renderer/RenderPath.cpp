@@ -80,8 +80,8 @@ namespace Dive
 			ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
 			ps.pPixelShader			= Renderer::GetShader(eShaderType::Sprite)->pPixelShader;
 			ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
-			ps.renderTargetViews[0] = Renderer::GetSampleTexture()->GetRenderTargetView();
-			ps.pViewport			= Renderer::GetSampleTexture()->GetViewport();
+			ps.renderTargetViews[0] = Renderer::GetGbufferAlbedo()->GetRenderTargetView();
+			ps.pViewport			= Renderer::GetGbufferAlbedo()->GetViewport();
 			ps.pDepthStencilView	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
 			
 			pCl->BindPipelineState(ps);
@@ -137,8 +137,8 @@ namespace Dive
 			ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
 			ps.pPixelShader			= Renderer::GetShader(eShaderType::Mesh)->pPixelShader;
 			ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
-			ps.renderTargetViews[0] = Renderer::GetSampleTexture()->GetRenderTargetView();
-			ps.pViewport			= Renderer::GetSampleTexture()->GetViewport();
+			ps.renderTargetViews[0] = Renderer::GetGbufferAlbedo()->GetRenderTargetView();
+			ps.pViewport			= Renderer::GetGbufferAlbedo()->GetViewport();
 			ps.pDepthStencilView	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
 
 			pCl->BindPipelineState(ps);
@@ -178,10 +178,14 @@ namespace Dive
 						
 						pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);
 
-						// 텍스쳐 유무에 따라 available 값을 전달하는 방법을 생각해 볼 수 있다.
+						// 이 부분도 CommandList로 옮겨야 한다.
+						// slot은 eMaterialMapType으로 전달할 수 있을 것 같다.
 						auto pAlbedoTex = pMaterial->GetMap(eMaterialMapType::Albedo);
 						auto pSrv = pAlbedoTex ? pAlbedoTex->GetShaderResourceView() : nullptr;
 						pImmediateContext->PSSetShaderResources(1, 1, &pSrv);
+						auto pNormalTex = pMaterial->GetMap(eMaterialMapType::Normal);
+						pSrv = pNormalTex ? pNormalTex->GetShaderResourceView() : nullptr;
+						pImmediateContext->PSSetShaderResources(2, 1, &pSrv);
 					}
 				}
 

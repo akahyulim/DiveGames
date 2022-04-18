@@ -2,10 +2,12 @@
 
 // 2. ScenePanel이 focus 중일 때만 입력을 처리하는 것이 맞다.
 // 3. 아직 기타 함수를 만들지 않았다.
-SceneViewCamera::SceneViewCamera()
+SceneViewCamera::SceneViewCamera(const DirectX::XMFLOAT3& pos)
 {
 	DirectX::XMStoreFloat4x4(&m_ViewMatrix, DirectX::XMMatrixIdentity());
 	DirectX::XMStoreFloat4x4(&m_ProjMatrix, DirectX::XMMatrixIdentity());
+
+	SetPosition(pos);
 }
 
 void SceneViewCamera::Update(float elapsedTime)
@@ -66,7 +68,7 @@ void SceneViewCamera::Update(float elapsedTime)
 
 void SceneViewCamera::MouseRotate(const DirectX::XMFLOAT2& delta)
 {
-	m_Yaw += delta.x * m_RotateSpeed;
+	m_Yaw	+= delta.x * m_RotateSpeed;
 	m_Pitch += delta.y * m_RotateSpeed;
 }
 
@@ -102,10 +104,11 @@ DirectX::XMVECTOR SceneViewCamera::GetUpDirection() const
 	return DirectX::XMVector3Transform(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f), matRot);
 }
 
+// 화면 크기가 변경되었을 때 호출되어야 한다.
 void SceneViewCamera::SetViewportSize(float width, float height)
 {
-	m_ViewportWidth = width;
-	m_ViewportHeight = height;
+	m_ViewportWidth		= width;
+	m_ViewportHeight	= height;
 
 	updateProjection();
 }
@@ -120,11 +123,11 @@ void SceneViewCamera::updateView()
 	DirectX::XMStoreFloat4x4(&m_ViewMatrix, view);
 }
 
-// Viewport 크기가 변경되었을 때 호출된다...?
+// fov 계산을 아직 하지 않았다.
 void SceneViewCamera::updateProjection()
 {
 	float fieldOfView = 3.141592654f / 4.0f;
-	//float screenAspect = m_ViewportWidth / m_ViewportHeight;
+	m_AspectRatio = m_ViewportWidth / m_ViewportHeight;
 
 	auto proj = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, m_AspectRatio, m_NearPlane, m_FarPlane);
 	DirectX::XMStoreFloat4x4(&m_ProjMatrix, proj);
