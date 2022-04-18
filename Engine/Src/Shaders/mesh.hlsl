@@ -32,6 +32,20 @@ Pixel_Input mainVS(Vertex_PosTexNorTan input)
 // 추후 common_sampler로 이동
 SamplerState linearSampler;
 
+float4 CalcuDirectionalLight(float3 normal)
+{
+	float4 lightColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	float3 lightDir = float3(1.0f, -1.0f, 1.0f);
+
+	// diffuse
+	float lightIntensity = saturate(dot(normal, -lightDir));
+	lightColor = saturate(lightColor * lightIntensity);
+
+	// specular
+
+	return lightColor;
+}
+
 float4 mainPS(Pixel_Input input) : SV_TARGET
 {
 	// albedo
@@ -46,10 +60,12 @@ float4 mainPS(Pixel_Input input) : SV_TARGET
 	float3 normal = input.normal;
 	if (HasNormalTexture())
 	{
-
+	//	normal *= material_Normal.Sample(linearSampler, input.texCoord);
 	}
 
 	float4 color = albedo;
+
+	color *= CalcuDirectionalLight(normal);
 
 	return color;
 }

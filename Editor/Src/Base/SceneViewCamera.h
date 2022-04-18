@@ -20,6 +20,8 @@ public:
 	DirectX::XMVECTOR GetForwardDirection() const;
 	DirectX::XMVECTOR GetUpDirection() const;
 
+	DirectX::XMFLOAT3 GetCameraPosition() const { return m_Position; }
+
 	void SetViewportSize(float width, float height);
 
 	// 유니티 설정

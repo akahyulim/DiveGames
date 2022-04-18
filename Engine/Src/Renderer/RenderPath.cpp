@@ -55,6 +55,7 @@ namespace Dive
 			auto pPtr = static_cast<FrameBuffer*>(pCbFrame->Map());
 			pPtr->view = DirectX::XMMatrixTranspose(view);
 			pPtr->proj = DirectX::XMMatrixTranspose(proj);
+			// Camera Position을 추가해야 한다.
 			pCbFrame->Unmap();
 
 			cl.SetConstantBuffer(Scope_Vertex, eConstantBufferSlot::Frame, pCbFrame);
@@ -130,7 +131,7 @@ namespace Dive
 		{
 			// pipeline은 il, shader가 다르다.
 			PipelineState ps;
-			ps.primitiveTopology	= D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;//D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+			ps.primitiveTopology	= D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;//D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
 			ps.pInputLayout			= Renderer::GetShader(eShaderType::Mesh)->pInputLayout;
 			ps.pVertexShader		= Renderer::GetShader(eShaderType::Mesh)->pVertexShader;
 			ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);

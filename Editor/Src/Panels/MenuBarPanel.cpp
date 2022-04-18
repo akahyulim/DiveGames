@@ -178,11 +178,23 @@ void MenuBarPanel::menuGameObject()
 			{
 				if (m_pActiveScene)
 				{
-					// Model 생성은 일단 임시...
-					// 실제로는 이미 생성해 놓은 Model의 복사본을 ResourceManager로부터 리턴받아야 할 듯?
-					// 따라서 Resource는 생성 및 제거를 Manager가 관리해야 한다.
+					std::vector<Dive::VertexType> vertices;
+					std::vector<unsigned int> indices;
+					Utilities::Geometry::CreateCube(&vertices, &indices);
+					// 이건 리소스지만
 					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cube.fbx");
+					pModel->AppendGeometry(vertices, indices);
+					pModel->UpdateGeometry();
+
+					// 이것도 리소스일 필요가 있나...?
+					// 아... 동일한 모델을 사용하는 다른 GameObject에서 사용할 수 있다.
+					auto pMaterial = new Dive::LegacyMaterial;
+
+					auto pGameObject = m_pActiveScene->CreateGameObject("Cube");
+					auto pMeshRenderable = pGameObject->AddComponent<Dive::MeshRenderable>();
+					pMeshRenderable->SetGeometry("Cube", 0, static_cast<unsigned int>(vertices.size()), 0, static_cast<unsigned int>(indices.size()), pModel);
+					pMeshRenderable->SetMaterail(pMaterial);
+					pModel->SetRootGameObject(pGameObject);
 				}
 			}
 
