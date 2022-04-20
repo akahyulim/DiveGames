@@ -159,6 +159,11 @@
     <ClCompile Include="External\imgui-docking\imgui_stdlib.cpp" />
     <ClCompile Include="External\imgui-docking\imgui_tables.cpp" />
     <ClCompile Include="External\imgui-docking\imgui_widgets.cpp" />
+    <ClCompile Include="External\ImGuizmo\GraphEditor.cpp" />
+    <ClCompile Include="External\ImGuizmo\ImCurveEdit.cpp" />
+    <ClCompile Include="External\ImGuizmo\ImGradient.cpp" />
+    <ClCompile Include="External\ImGuizmo\ImGuizmo.cpp" />
+    <ClCompile Include="External\ImGuizmo\ImSequencer.cpp" />
     <ClCompile Include="Src\Base\Editor.cpp" />
     <ClCompile Include="Src\Base\EditorRenderPath.cpp" />
     <ClCompile Include="Src\Base\SceneViewCamera.cpp" />
@@ -181,6 +186,12 @@
     <ClInclude Include="External\imgui-docking\imstb_rectpack.h" />
     <ClInclude Include="External\imgui-docking\imstb_textedit.h" />
     <ClInclude Include="External\imgui-docking\imstb_truetype.h" />
+    <ClInclude Include="External\ImGuizmo\GraphEditor.h" />
+    <ClInclude Include="External\ImGuizmo\ImCurveEdit.h" />
+    <ClInclude Include="External\ImGuizmo\ImGradient.h" />
+    <ClInclude Include="External\ImGuizmo\ImGuizmo.h" />
+    <ClInclude Include="External\ImGuizmo\ImSequencer.h" />
+    <ClInclude Include="External\ImGuizmo\ImZoomSlider.h" />
     <ClInclude Include="Src\Base\Editor.h" />
     <ClInclude Include="Src\Base\EditorRenderPath.h" />
     <ClInclude Include="Src\Base\SceneViewCamera.h" />

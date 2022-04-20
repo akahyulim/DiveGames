@@ -2,6 +2,7 @@
 #include "imgui-docking/imgui.h"
 #include "imgui-docking/imgui_impl_win32.h"
 #include "imgui-docking/imgui_impl_dx11.h"
+#include "imguizmo/ImGuizmo.h"
 #include "Panels/MenuBarPanel.h"
 #include "Panels/ScenePanel.h"
 #include "panels/HierarchyPanel.h"
@@ -80,7 +81,7 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	DV_ASSERT(s_pEditor == nullptr);
 	s_pEditor = this;
 
-	// Editor Camera 복사 생성 필요
+	// Editor Camera 복사 생성 필요??
 
 	m_pModelImporter = new ModelImporter;
 
@@ -142,6 +143,7 @@ void Editor::Run()
 				ImGui_ImplDX11_NewFrame();
 				ImGui_ImplWin32_NewFrame();
 				ImGui::NewFrame();
+				ImGuizmo::BeginFrame();
 			}
 
 			drawPanels();

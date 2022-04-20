@@ -63,7 +63,7 @@ void SceneViewCamera::Update(float elapsedTime)
 
 	updateView();
 	// 원래는 proj 값을 변경할 때 호출
-	updateProjection();
+	//updateProjection();
 }
 
 void SceneViewCamera::MouseRotate(const DirectX::XMFLOAT2& delta)
@@ -129,6 +129,6 @@ void SceneViewCamera::updateProjection()
 	float fieldOfView = 3.141592654f / 4.0f;
 	m_AspectRatio = m_ViewportWidth / m_ViewportHeight;
 
-	auto proj = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, m_AspectRatio, m_NearPlane, m_FarPlane);
+	auto proj = DirectX::XMMatrixPerspectiveFovLH(m_Fov, m_AspectRatio, m_NearPlane, m_FarPlane);
 	DirectX::XMStoreFloat4x4(&m_ProjMatrix, proj);
 }
