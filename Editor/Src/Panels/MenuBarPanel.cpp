@@ -4,7 +4,6 @@
 #include "InspectorPanel.h"
 #include "AssetPanel.h"
 #include "Importer/ModelImporter.h"
-#include "Utilities/BasicGeometry.h"
 
 MenuBarPanel::MenuBarPanel(Editor* pEditor)
 	: Panel(pEditor, "MenuBar")
@@ -178,23 +177,8 @@ void MenuBarPanel::menuGameObject()
 			{
 				if (m_pActiveScene)
 				{
-					std::vector<Dive::VertexType> vertices;
-					std::vector<unsigned int> indices;
-					Utilities::Geometry::CreateCube(&vertices, &indices);
-					// 이건 리소스지만
 					auto pModel = new Dive::Model();
-					pModel->AppendGeometry(vertices, indices);
-					pModel->UpdateGeometry();
-
-					// 이것도 리소스일 필요가 있나...?
-					// 아... 동일한 모델을 사용하는 다른 GameObject에서 사용할 수 있다.
-					auto pMaterial = new Dive::LegacyMaterial;
-
-					auto pGameObject = m_pActiveScene->CreateGameObject("Cube");
-					auto pMeshRenderable = pGameObject->AddComponent<Dive::MeshRenderable>();
-					pMeshRenderable->SetGeometry("Cube", 0, static_cast<unsigned int>(vertices.size()), 0, static_cast<unsigned int>(indices.size()), pModel);
-					pMeshRenderable->SetMaterail(pMaterial);
-					pModel->SetRootGameObject(pGameObject);
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/Cube.obj");
 				}
 			}
 
@@ -203,16 +187,7 @@ void MenuBarPanel::menuGameObject()
 				if (m_pActiveScene)
 				{
 					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/sphere.fbx");
-				}
-			}
-
-			if (ImGui::MenuItem("Capsule"))
-			{
-				if (m_pActiveScene)
-				{
-					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/capsule.fbx");
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/sphere.obj");
 				}
 			}
 
@@ -221,7 +196,16 @@ void MenuBarPanel::menuGameObject()
 				if (m_pActiveScene)
 				{
 					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cylinder.fbx");
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cylinder.obj");
+				}
+			}
+
+			if (ImGui::MenuItem("Cone"))
+			{
+				if (m_pActiveScene)
+				{
+					auto pModel = new Dive::Model();
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cone.obj");
 				}
 			}
 
@@ -229,48 +213,8 @@ void MenuBarPanel::menuGameObject()
 			{
 				if (m_pActiveScene)
 				{
-					std::vector<Dive::VertexType> vertices;
-					std::vector<unsigned int> indices;
-					Utilities::Geometry::CreatePlane(&vertices, &indices);
-					// 이건 리소스지만
 					auto pModel = new Dive::Model();
-					pModel->AppendGeometry(vertices, indices);
-					pModel->UpdateGeometry();
-
-					// 이것도 리소스일 필요가 있나...?
-					// 아... 동일한 모델을 사용하는 다른 GameObject에서 사용할 수 있다.
-					auto pMaterial = new Dive::LegacyMaterial;
-
-					auto pGameObject = m_pActiveScene->CreateGameObject("Plane");
-					auto pMeshRenderable = pGameObject->AddComponent<Dive::MeshRenderable>();
-					pMeshRenderable->SetGeometry("Plane", 0, static_cast<unsigned int>(vertices.size()), 0, static_cast<unsigned int>(indices.size()), pModel);
-					pMeshRenderable->SetMaterail(pMaterial);
-					pModel->SetRootGameObject(pGameObject);
-				}
-			}
-
-			if (ImGui::MenuItem("Quad"))
-			{
-				if (m_pActiveScene)
-				{
-					std::vector<Dive::VertexType> vertices;
-					std::vector<unsigned int> indices;
-					Utilities::Geometry::CreateQuad(&vertices, &indices);
-
-					// 이건 리소스지만
-					auto pModel = new Dive::Model();
-					pModel->AppendGeometry(vertices, indices);
-					pModel->UpdateGeometry();
-
-					// 이것도 리소스일 필요가 있나...?
-					// 아... 동일한 모델을 사용하는 다른 GameObject에서 사용할 수 있다.
-					auto pMaterial = new Dive::LegacyMaterial;
-
-					auto pGameObject = m_pActiveScene->CreateGameObject("Quad");
-					auto pMeshRenderable = pGameObject->AddComponent<Dive::MeshRenderable>();
-					pMeshRenderable->SetGeometry("Quad", 0, static_cast<unsigned int>(vertices.size()), 0, static_cast<unsigned int>(indices.size()), pModel);
-					pMeshRenderable->SetMaterail(pMaterial);
-					pModel->SetRootGameObject(pGameObject);
+					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/plane.obj");
 				}
 			}
 

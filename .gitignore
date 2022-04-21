@@ -1,12 +1,6 @@
 # Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudio
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudio
 
-# Asset Floder
-Assets/Fonts/
-Assets/Models/
-Assets/Textures/
-#Assets/Scenes/
-
 # imgui
 [Ee]ditor/imgui.ini
 
@@ -109,7 +103,7 @@ StyleCopReport.xml
 *_h.h
 *.ilk
 *.meta
-*.obj
+#*.obj
 *.iobj
 *.pch
 *.pdb

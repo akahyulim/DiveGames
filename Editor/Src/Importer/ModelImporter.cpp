@@ -162,13 +162,15 @@ Dive::MeshRenderable* ModelImporter::loadMesh(const ModelParams& params, const a
         vertices[i].tangent[0] = tangent.x;
         vertices[i].tangent[1] = tangent.y;
         vertices[i].tangent[2] = tangent.z;
-
+        
         // texcoords
         // 결과가 좀 이상하다. 1.0f 이상인 값들이 들어간다.
         // 일단 해결했지만 다른 방법이 있을 것 같다.
+        // 이 값도 없는 파일들이 있다. 직접 계산도 어렵다.
         const auto& texCoord = pAiMesh->mTextureCoords[0][i];
-        vertices[i].texCoords[0] = texCoord.x > 1.0f ? texCoord.x - 1.0f: texCoord.x;
+        vertices[i].texCoords[0] = texCoord.x > 1.0f ? texCoord.x - 1.0f : texCoord.x;
         vertices[i].texCoords[1] = texCoord.y > 1.0f ? texCoord.y - 1.0f : texCoord.y;
+        
     }
 
     // indices
