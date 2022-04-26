@@ -13,6 +13,7 @@
 #include <list>
 #include <unordered_map>
 #include <algorithm>
+#include <fstream>
 #include <filesystem>
 
 #include <d3d11_3.h>

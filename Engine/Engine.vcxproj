@@ -206,6 +206,7 @@
     <ClInclude Include="Src\Scene\Component\Transform.h" />
     <ClInclude Include="Src\Scene\GameObject.h" />
     <ClInclude Include="Src\Scene\Scene.h" />
+    <ClInclude Include="Src\Scene\Serializer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Base\Object.cpp" />
@@ -240,6 +241,7 @@
     <ClCompile Include="Src\Scene\Component\Transform.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />
+    <ClCompile Include="Src\Scene\Serializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Src\Shaders\sprite.hlsl">

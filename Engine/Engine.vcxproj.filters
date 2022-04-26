@@ -109,6 +109,9 @@
     <ClInclude Include="Src\Renderer\SpriteMaterial.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Scene\Serializer.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -200,6 +203,9 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\SpriteMaterial.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Serializer.cpp">
+      <Filter>Src\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

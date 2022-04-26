@@ -48,8 +48,9 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/Renderable.h"
 #include "Scene/Component/SpriteRenderable.h"
-#include "scene/Component/MeshRenderable.h"
+#include "Scene/Component/MeshRenderable.h"
 #include "Scene/Component/Camera.h"
+#include "Scene/Serializer.h"
 
 //= Math ==========================
 #include "Math/Math.h"

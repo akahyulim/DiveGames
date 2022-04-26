@@ -72,6 +72,12 @@ void MenuBarPanel::menuFile()
 				if (m_pActiveScene)
 					DV_DELETE(m_pActiveScene);
 
+				// 원래는 대화상자로 선택
+				m_pActiveScene = new Dive::Scene;
+				Dive::Serializer serializer(m_pActiveScene);
+				serializer.Deserialize("Assets/Scene/New_World.scene");
+
+				/*
 				m_pActiveScene = new Dive::Scene("Sample_World");
 				auto pChoA = m_pActiveScene->CreateGameObject("ChoA");
 				auto pChoASprite = pChoA->AddComponent<Dive::SpriteRenderable>();
@@ -99,6 +105,7 @@ void MenuBarPanel::menuFile()
 				m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
 
 				m_pEditor->GetModelImporter()->SetScene(m_pActiveScene);
+				*/
 			}
 			ImGui::EndMenu();
 		}
@@ -125,7 +132,13 @@ void MenuBarPanel::menuFile()
 
 		if (ImGui::MenuItem("Save"))
 		{
-
+			if (m_pActiveScene)
+			{
+				Dive::Serializer serializer(m_pActiveScene);
+				// dir만 전달하자!
+				const std::string dir = "Assets/Scene";
+				serializer.Serialize(dir);
+			}
 		}
 		if (ImGui::MenuItem("Save As..."))
 		{
