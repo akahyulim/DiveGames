@@ -33,7 +33,9 @@ namespace Dive
 
 	static void SerializeGameObject(YAML::Emitter& out, GameObject* pGameObject)
 	{
-		out << YAML::Key << "GameObject" << YAML::BeginMap;
+		out << YAML::BeginMap;
+		out << YAML::Key << "GameObject";
+		out << YAML::BeginMap;
 		out << YAML::Key << "m_InstanceID" << YAML::Value << pGameObject->GetInstanceID();
 		out << YAML::Key << "m_Name" << YAML::Value << pGameObject->GetName();
 		out << YAML::Key << "m_bActive" << YAML::Value << (int)pGameObject->IsActive();
@@ -46,28 +48,39 @@ namespace Dive
 			{
 				auto pTransform = pGameObject->GetComponent<Transform>();
 
-				out << YAML::Key << "Transform" << YAML::BeginMap;
+				//out << YAML::BeginMap;
+				out << YAML::Key << "Transform";
+				out << YAML::BeginMap;
 				out << YAML::Key << "m_LocalRotation" << YAML::Value << pTransform->GetLocalRotation();
 				out << YAML::Key << "m_LocalPosition" << YAML::Value << pTransform->GetLocalPosition();
 				out << YAML::Key << "m_LocalScale" << YAML::Value << pTransform->GetLocalScale();
 				out << YAML::Key << "m_Parent" << YAML::Value << (unsigned long long)(pTransform->HasParent() ? pTransform->GetParent()->GetInstanceID() : 0);
 				out << YAML::EndMap;
+				//out << YAML::EndMap;
 			}
 
 			// SpriteRenderable
 			if (pGameObject->HasComponent<SpriteRenderable>())
 			{
-				out << YAML::Key << "SpriteRenderable" << YAML::BeginMap;
+				//out << YAML::BeginMap;
+				out << YAML::Key << "SpriteRenderable";
+				out << YAML::BeginMap;
 				out << YAML::EndMap;
+				//out << YAML::EndMap;
 			}
 
 			// MeshRenderable
 			if (pGameObject->HasComponent<MeshRenderable>())
 			{
-				out << YAML::Key << "MeshRenderable" << YAML::BeginMap;
+				//out << YAML::BeginMap;
+				out << YAML::Key << "MeshRenderable";
+				out << YAML::BeginMap;
 				out << YAML::EndMap;
+				//out << YAML::EndMap;
 			}
 		}
+
+		YAML::EndMap;
 	}
 
 	Serializer::Serializer(Scene* pScene)
@@ -90,22 +103,20 @@ namespace Dive
 		filepath = dir + '/' + m_pScene->GetName() + ".scene";
 
 		YAML::Emitter out;
-		out << YAML::BeginMap;
 
 		// scene
-		out << YAML::Key << "Scene" << YAML::BeginMap;
+		out << YAML::BeginMap;
+		out << YAML::Key << "Scene";
+		out << YAML::BeginMap;
 		out << YAML::Key << "m_Name" << YAML::Value << m_pScene->GetName();
+		out << YAML::EndMap;
 		out << YAML::EndMap;
 
 		// game object
-		//out << YAML::Key << "GameObjects" << YAML::Value << YAML::BeginSeq;
 		for (auto pGameObject : m_pScene->GetGameObjects())
 		{
-			//out << YAML::BeginMap;
 			SerializeGameObject(out, pGameObject);
-			//out << YAML::EndMap;
 		}
-		//out << YAML::EndSeq;
 
 		out << YAML::EndMap;
 
@@ -113,8 +124,6 @@ namespace Dive
 		fout << out.c_str();
 	}
 	
-	// Map과 Seq의 정확한 의미를 알아야 한다.
-	// 그리고 결국 사람이 읽고 해석한 것과 같은 처리를 할 것임을 인지하자.
 	bool Serializer::Deserialize(const std::string& filepath)
 	{
 		if (!m_pScene)
@@ -123,87 +132,33 @@ namespace Dive
 			return false;
 		}
 
-		if (!std::filesystem::exists(filepath))
+		auto nodes = YAML::LoadAllFromFile(filepath);
+		if (nodes.empty())
 		{
 			DV_CORE_WARN("{:}가 존재하지 않습니다.", filepath);
 			return false;
 		}
 
-		auto node = YAML::LoadFile(filepath);
-
-		// scene
-		auto scene = node["Scene"];
-		auto name = scene["m_Name"].as<std::string>();
-		m_pScene->SetName(name);
-
-		auto gameObjects = node["GameObject"];
-		DV_CORE_INFO("num gameObjects: {:d}", gameObjects.size());
-		if (gameObjects)
+		for (auto node : nodes)
 		{
-			for (auto gameObject : gameObjects)
+			if (node["Scene"])
 			{
-				//auto id = gameObject["m_InstanceID"].as<unsigned long long>();
-				//auto name = gameObject["m_Name"].as<std::string>();
-				//auto active = gameObject["m_bActive"].as<bool>();
+				auto scene = node["Scene"];
 
-				// 여기에선 안된다.
-				// 이유는 GameObject에 포함된 것이 아니기에
-				// 특정할 수 없기 때문인 듯 하다.
-				//auto transform = gameObject["Transform"];
-				//if (transform)
-				{
-					// xmfloat를 사용하려면 함수를 추가해야 한다.
-				//	auto parent = transform["m_Parent"].as<unsigned long long>();
-				//	DV_CORE_INFO("ParentID: {:d}", parent);
-				}
+				DV_CORE_INFO("Sene name: {:s}", scene["m_Name"].as<std::string>());
+			}
+
+			if (node["GameObject"])
+			{
+				auto gameObject = node["GameObject"];
+
+				DV_CORE_INFO("GameObject Info: {0:d}, {1:s}, {2:d}",
+					gameObject["m_InstanceID"].as<unsigned long long>(),
+					gameObject["m_Name"].as<std::string>(),
+					gameObject["m_bActive"].as<int>());
 			}
 		}
-
-		// 이것두 안된다. 위와 같은 이유인듯...?
-		auto transforms = node["Transform"];
-		if (transforms)
-		{
-			for (auto transform : transforms)
-			{
-				auto parent = transform["m_Parent"].as<unsigned long long>();
-				DV_CORE_INFO("ParentID: {:d}", parent);
-			}
-		}
-
-		/*
-		// game object
-		// 상위 노드로 묶어야 한다...
-		// 아니면 동일한 이름의 노드를 구분할 수 없다...
-		auto gameObjects = node["GameObjects"];
-		if (gameObjects)
-		{
-			DV_CORE_INFO("num gameObjects: {:d}", gameObjects.size());
-
-			for (auto gameObject : gameObjects)
-			{
-
-			//	auto id = gameObject["m_InstanceID"].as<unsigned long long>();
-			//	auto name = gameObject["m_Name"].as<std::string>();
-			//	auto active = gameObject["m_bActive"].as<bool>();
-
-			//	auto pCreatedGameObject = m_pScene->CreateGameObject(id, name);
-			//	pCreatedGameObject->SetActive(active);
-
-
-				//auto name = gameObject["m_Name"].as<std::string>();
-				//DV_CORE_INFO("name: {:s}", name);
-
-				// 이건 된다...
-				auto transform = gameObject["Transform"];
-				if (transform)
-				{
-					// xmfloat를 사용하려면 함수를 추가해야 한다.
-					auto parent = transform["m_Parent"].as<unsigned long long>();
-					DV_CORE_INFO("ParentID: {:d}", parent);
-				}
-			}
-		}
-		*/
+		
 		return true;
 	}
 }

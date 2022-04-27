@@ -1,7 +1,8 @@
 Scene:
   m_Name: new_world
+---
 GameObject:
-  m_InstanceID: 9133439883928570126
+  m_InstanceID: 1998427603303430504
   m_Name: Cube
   m_bActive: 1
 Transform:
@@ -9,14 +10,14 @@ Transform:
   m_LocalPosition: [0, 0, -0]
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
-GameObject:
-  m_InstanceID: 9349759195850797016
-  m_Name: Cube
-  m_bActive: 1
-Transform:
-  m_LocalRotation: [-0, 0, -0, 1]
-  m_LocalPosition: [0, 0, -0]
-  m_LocalScale: [1, 1, 1]
-  m_Parent: 9133439883928570126
-MeshRenderable:
-  {}
+? GameObject:
+    m_InstanceID: 6168614074837204142
+    m_Name: Cube
+    m_bActive: 1
+  Transform:
+    m_LocalRotation: [-0, 0, -0, 1]
+    m_LocalPosition: [0, 0, -0]
+    m_LocalScale: [1, 1, 1]
+    m_Parent: 1998427603303430504
+  MeshRenderable:
+    {}
