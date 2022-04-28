@@ -33,6 +33,7 @@ namespace Dive
 
 	static void SerializeGameObject(YAML::Emitter& out, GameObject* pGameObject)
 	{
+		// game object
 		out << YAML::BeginMap;
 		out << YAML::Key << "GameObject";
 		out << YAML::BeginMap;
@@ -40,15 +41,16 @@ namespace Dive
 		out << YAML::Key << "m_Name" << YAML::Value << pGameObject->GetName();
 		out << YAML::Key << "m_bActive" << YAML::Value << (int)pGameObject->IsActive();
 		out << YAML::EndMap;
-
+	
 		// components
+		out << YAML::Key << "Components" << YAML::Value << YAML::BeginSeq;
 		{
 			// Transform
 			if (pGameObject->HasComponent<Transform>())
 			{
 				auto pTransform = pGameObject->GetComponent<Transform>();
 
-				//out << YAML::BeginMap;
+				out << YAML::BeginMap;
 				out << YAML::Key << "Transform";
 				out << YAML::BeginMap;
 				out << YAML::Key << "m_LocalRotation" << YAML::Value << pTransform->GetLocalRotation();
@@ -56,31 +58,30 @@ namespace Dive
 				out << YAML::Key << "m_LocalScale" << YAML::Value << pTransform->GetLocalScale();
 				out << YAML::Key << "m_Parent" << YAML::Value << (unsigned long long)(pTransform->HasParent() ? pTransform->GetParent()->GetInstanceID() : 0);
 				out << YAML::EndMap;
-				//out << YAML::EndMap;
+				out << YAML::EndMap;
 			}
 
 			// SpriteRenderable
 			if (pGameObject->HasComponent<SpriteRenderable>())
 			{
-				//out << YAML::BeginMap;
+				out << YAML::BeginMap;
 				out << YAML::Key << "SpriteRenderable";
 				out << YAML::BeginMap;
 				out << YAML::EndMap;
-				//out << YAML::EndMap;
+				out << YAML::EndMap;
 			}
 
 			// MeshRenderable
 			if (pGameObject->HasComponent<MeshRenderable>())
 			{
-				//out << YAML::BeginMap;
+				out << YAML::BeginMap;
 				out << YAML::Key << "MeshRenderable";
 				out << YAML::BeginMap;
 				out << YAML::EndMap;
-				//out << YAML::EndMap;
+				out << YAML::EndMap;
 			}
 		}
-
-		YAML::EndMap;
+		out << YAML::EndSeq << YAML::EndMap;
 	}
 
 	Serializer::Serializer(Scene* pScene)
@@ -89,7 +90,12 @@ namespace Dive
 		DV_ASSERT(pScene != nullptr);
 	}
 
-	// 디렉토리만 받는 게 낫다.
+	// 유니티의 yaml 문서 형태처럼 GameObject, Component를 각각 구분하는 편이 나아보인다.
+	// 다만 이 경우 Compnent의 직접 생성이 가능해야 하며 개별 Object의 InstanceID를 참조하여 GameObject를 구성하며
+	// 이를 위해 Scene에서 GameObject와 Component를 따로 관리해야 한다. 즉, 복잡해진다...
+	// 그리고 ID의 제한 범위도 염두해야 한다.
+	// 하지만 유니티에선 Component를 직접 생성할 수 없다고 명시해 놓았다.
+	// 예제 코드에서 변수 생성은 c#의 특징(일종의 참조 변수)인 듯 하다.
 	void Serializer::Serialize(const std::string& dir)
 	{
 		if (!m_pScene)
@@ -156,6 +162,21 @@ namespace Dive
 					gameObject["m_InstanceID"].as<unsigned long long>(),
 					gameObject["m_Name"].as<std::string>(),
 					gameObject["m_bActive"].as<int>());
+			}
+
+			if (node["Components"])
+			{
+				auto components = node["Components"];
+
+				for (auto component : components)
+				{
+					if (component["Transform"])
+					{
+						auto transform = component["Transfrom"];
+
+						DV_CORE_INFO("Transform Info: {:d}", transform["m_Parent"].as<unsigned long long>());
+					}
+				}
 			}
 		}
 		

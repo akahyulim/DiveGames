@@ -15,6 +15,7 @@ namespace Dive
 		COMPONENT_CLASS_TYPE(SpriteRenderable)
 
 		SpriteRenderable(GameObject* pGameObject);
+		SpriteRenderable(GameObject* pGameObject, unsigned long long id);
 		~SpriteRenderable();
 
 		void Shutdown();

@@ -1,11 +1,19 @@
 #include "divepch.h"
 #include "Transform.h"
+#include "../GameObject.h"
+#include "Base/Object.h"
 #include "Math/Math.h"
 
 namespace Dive
 {
 	Transform::Transform(GameObject* pGameObject)
 		: Component(pGameObject)
+	{
+		Clear();
+	}
+
+	Transform::Transform(GameObject* pGameObject, unsigned long long id)
+		: Component(pGameObject, id)
 	{
 		Clear();
 	}

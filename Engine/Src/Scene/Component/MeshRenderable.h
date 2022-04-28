@@ -15,6 +15,7 @@ namespace Dive
 	{
 	public:
 		MeshRenderable(GameObject* pGameObject);
+		MeshRenderable(GameObject* pGameObject, unsigned long long id);
 		~MeshRenderable();
 
 		// 추후 bounding box까지

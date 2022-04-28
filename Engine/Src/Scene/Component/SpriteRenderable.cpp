@@ -14,6 +14,13 @@ namespace Dive
 		m_pMaterial = new SpriteMaterial;
 	}
 
+	SpriteRenderable::SpriteRenderable(GameObject* pGameObject, unsigned long long id)
+		: Renderable(pGameObject, id)
+	{
+		// 老窜 流立 积己茄促.
+		m_pMaterial = new SpriteMaterial;
+	}
+
 	SpriteRenderable::~SpriteRenderable()
 	{
 		Shutdown();

@@ -2,22 +2,36 @@ Scene:
   m_Name: new_world
 ---
 GameObject:
-  m_InstanceID: 1998427603303430504
-  m_Name: Cube
+  m_InstanceID: 17523048821007163498
+  m_Name: sphere
   m_bActive: 1
-Transform:
-  m_LocalRotation: [-0, 0, -0, 1]
-  m_LocalPosition: [0, 0, -0]
-  m_LocalScale: [1, 1, 1]
-  m_Parent: 0
-? GameObject:
-    m_InstanceID: 6168614074837204142
-    m_Name: Cube
-    m_bActive: 1
-  Transform:
-    m_LocalRotation: [-0, 0, -0, 1]
-    m_LocalPosition: [0, 0, -0]
-    m_LocalScale: [1, 1, 1]
-    m_Parent: 1998427603303430504
-  MeshRenderable:
-    {}
+Components:
+  - Transform:
+      m_LocalRotation: [-0, 0, -0, 1]
+      m_LocalPosition: [0, 0, -0]
+      m_LocalScale: [1, 1, 1]
+      m_Parent: 0
+---
+GameObject:
+  m_InstanceID: 13991538510985506606
+  m_Name: default
+  m_bActive: 1
+Components:
+  - Transform:
+      m_LocalRotation: [-0, 0, -0, 1]
+      m_LocalPosition: [0, 0, -0]
+      m_LocalScale: [1, 1, 1]
+      m_Parent: 17523048821007163498
+---
+GameObject:
+  m_InstanceID: 14426677969320395853
+  m_Name: pSphere2
+  m_bActive: 1
+Components:
+  - Transform:
+      m_LocalRotation: [-0, 0, -0, 1]
+      m_LocalPosition: [0, 0, -0]
+      m_LocalScale: [1, 1, 1]
+      m_Parent: 17523048821007163498
+  - MeshRenderable:
+      {}

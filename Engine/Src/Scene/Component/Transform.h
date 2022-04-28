@@ -17,6 +17,7 @@ namespace Dive
 		COMPONENT_CLASS_TYPE(Transform)
 
 		Transform(GameObject* pGameObject);
+		Transform(GameObject* pGameObject, unsigned long long id);
 		~Transform() = default;
 
 		void Clear();

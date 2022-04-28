@@ -1,5 +1,6 @@
 #pragma once
 #include "Base/Base.h"
+#include "Base/Object.h"
 
 namespace Dive
 {
@@ -21,10 +22,11 @@ namespace Dive
 									virtual eComponentType GetType() const override { return GetStaticType(); } \
 									virtual const char* GetName() const override { return #type; }
 
-	class Component
+	class Component : public Object
 	{
 	public:
-		Component(GameObject* pGameObject) : m_pGameObject(pGameObject) {}
+		Component(GameObject* pGameObject);
+		Component(GameObject* pGameObject, unsigned long long id);
 		virtual ~Component() = default;
 
 		// 일단 아무도 사용하지 않는다.
@@ -35,9 +37,6 @@ namespace Dive
 		virtual eComponentType GetType() const = 0;
 		virtual const char* GetName() const = 0;
 		virtual std::string GetStr() const { return GetName(); }
- 
-		// 자신이 소속된 GameObject의 IsntanceID를 리턴
-		unsigned long long GetInstanceID() const;
 
 	protected:
 		GameObject* m_pGameObject	= nullptr;

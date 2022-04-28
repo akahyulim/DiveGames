@@ -4,11 +4,13 @@
 
 namespace Dive
 {
-	unsigned long long Component::GetInstanceID() const
+	Component::Component(GameObject* pGameObject)
+		: m_pGameObject(pGameObject), Object(pGameObject->GetName())
 	{
-		if (!m_pGameObject)
-			return 0;
+	}
 
-		return m_pGameObject->GetInstanceID();
+	Component::Component(GameObject* pGameObject, unsigned long long id)
+		: m_pGameObject(pGameObject), Object(id, pGameObject->GetName())
+	{
 	}
 }
