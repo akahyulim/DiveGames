@@ -7,13 +7,6 @@
 
 namespace Dive
 {
-	SpriteRenderable::SpriteRenderable(GameObject* pGameObject)
-		: Renderable(pGameObject)
-	{
-		// 老窜 流立 积己茄促.
-		m_pMaterial = new SpriteMaterial;
-	}
-
 	SpriteRenderable::SpriteRenderable(GameObject* pGameObject, unsigned long long id)
 		: Renderable(pGameObject, id)
 	{

@@ -63,6 +63,7 @@ bool ModelImporter::Load(Dive::Model* pModel, const std::string& filepath)
         params.pAiScene = pAiScene;
 
         auto pRoot = m_pScene->CreateGameObject();
+        pRoot->AddComponent<Dive::Transform>();
         pRoot->SetName(Dive::Helper::FileSystem::GetFileNameWithoutExtension(filepath));
         params.pModel->SetRootGameObject(pRoot);
 
@@ -104,6 +105,7 @@ void ModelImporter::parseNode(const aiNode* pAiNode, const ModelParams& params, 
     for (unsigned int i = 0; i < pAiNode->mNumChildren; i++)
     {
         auto pChild = m_pScene->CreateGameObject();
+        pChild->AddComponent<Dive::Transform>();
         parseNode(pAiNode->mChildren[i], params, pChild, pGameObject);
     }
 }

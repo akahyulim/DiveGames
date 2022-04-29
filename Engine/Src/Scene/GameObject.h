@@ -14,37 +14,70 @@ namespace Dive
 	class GameObject : public Object
 	{
 	public:
-		GameObject(Scene* pScene, const std::string& name = std::string());
-		GameObject(Scene* pScene, unsigned long long id, const std::string& name = std::string());
+		GameObject(Scene* pScene, const std::string& name = std::string(), unsigned long long id = 0);
 		~GameObject();
 
 		template<class T>
-		T* AddComponent()
+		T* AddComponent(unsigned long long id = 0)
 		{
 			if (HasComponent<T>())
 				return GetComponent<T>();
 
-			T* pNewComponent = new T(this);
-			m_Components.emplace_back(static_cast<Component*>(pNewComponent));
+			T* pAddedComponent = new T(this, id);
+			m_Components.emplace_back(static_cast<Component*>(pAddedComponent));
 		
-			FIRE_EVENT(GameObjectModifyEvent());
+			FIRE_EVENT(GameObjectModifyEvent(static_cast<Component*>(pAddedComponent)));
 
-			return pNewComponent;
+			return pAddedComponent;
+		}
+
+		Component* AddComponent(eComponentType type, unsigned long long id = 0)
+		{
+			if (HasComponent(type))
+				return GetComponent(type);
+
+			Component* pAddedComponent = nullptr;
+
+			switch (type)
+			{
+			case eComponentType::Transform:
+				pAddedComponent = new Transform(this, id);
+				break;
+			case eComponentType::Camera:
+				//pAddedComponent = new Camera(this, id);
+				break;
+			case eComponentType::SpriteRenderable:
+				pAddedComponent = new SpriteRenderable(this, id);
+				break;
+			case eComponentType::MeshRenderable:
+				pAddedComponent = new MeshRenderable(this, id);
+				break;
+
+			default:
+				return nullptr;
+			}
+
+			m_Components.emplace_back(pAddedComponent);
+
+			FIRE_EVENT(GameObjectModifyEvent(pAddedComponent));
+
+			return pAddedComponent;
 		}
 		
 		template<class T>
 		void RemoveComponent()
 		{
+			// 굳이 이렇게 할 필요가 없을 듯 하다.
 			auto it = m_Components.begin();
 			for (it; it != m_Components.end();)
 			{
 				if (it->GetType() == T::GetStaticType())
 				{
+					FIRE_EVENT(GameObjectModifyEvent(static_cast<Component*>(*it)));
+
 					DV_DELETE(*it);
 					m_Components.erase(it);
 
-					FIRE_EVENT(GameObjectModifyEvent());
-					
 					return;
 				}
 				else
@@ -54,16 +87,21 @@ namespace Dive
 			}
 		}
 
-		template<class T>
-		bool HasComponent()
+		bool HasComponent(eComponentType type)
 		{
 			for (auto pComponent : m_Components)
 			{
-				if (pComponent->GetType() == T::GetStaticType())
+				if (pComponent->GetType() == type)
 					return true;
 			}
 
 			return false;
+		}
+
+		template<class T>
+		bool HasComponent()
+		{
+			return HasComponent(T::GetStaticType());
 		}
 
 		// 상속 구현일 경우 부모 타입으로부터 얻을 수 있도록 하고 싶다...
@@ -79,6 +117,23 @@ namespace Dive
 			}
 
 			return nullptr;
+		}
+
+		Component* GetComponent(eComponentType type)
+		{
+			for (auto pComponent : m_Components)
+			{
+				if (pComponent->GetType() == type)
+					return static_cast<Component*>(pComponent);
+			}
+
+			return nullptr;
+		}
+
+		std::vector<Component*> GetComponents()
+		{
+			// 복사 생성일 것이다.
+			return m_Components;
 		}
 
 		bool IsActive() const { return m_bActive; }

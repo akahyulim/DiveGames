@@ -77,35 +77,12 @@ void MenuBarPanel::menuFile()
 				Dive::Serializer serializer(m_pActiveScene);
 				serializer.Deserialize("Assets/Scene/New_World.scene");
 
-				/*
-				m_pActiveScene = new Dive::Scene("Sample_World");
-				auto pChoA = m_pActiveScene->CreateGameObject("ChoA");
-				auto pChoASprite = pChoA->AddComponent<Dive::SpriteRenderable>();
-				pChoA->GetComponent<Dive::Transform>()->SetPosition(DirectX::XMFLOAT3(300.0, 0.0f, 800.0f));
-				pChoASprite->SetSprite(m_pChoA);
-				
-				auto pIU = m_pActiveScene->CreateGameObject("IU");
-				auto pIUSprite = pIU->AddComponent<Dive::SpriteRenderable>();
-				pIU->GetComponent<Dive::Transform>()->SetPosition(DirectX::XMFLOAT3(-200.0, 0.0f, 900.0f));
-				pIUSprite->SetSprite(m_pIU);
-				
-				auto pParent = m_pActiveScene->CreateGameObject("Knave");
-				pParent->AddComponent<Dive::SpriteRenderable>();
-				
-				auto pChild = m_pActiveScene->CreateGameObject(13254521934309852950, "Complex");
-				pChild->AddComponent<Dive::SpriteRenderable>();
-				pChild->GetComponent<Dive::Transform>()->SetParent(pParent->GetComponent<Dive::Transform>());
-
-				// 전달까지 직접하는게 맞다.
-				// 하지만 방법이 너무 막무가내다....
-				// ActiveScene을 static 포인터로 하면 어떨까...?
-				// => Editor용 EventSystem을 만드는 건 어떨까?
+				// 번잡해...
 				m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
 				m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
 				m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
 
 				m_pEditor->GetModelImporter()->SetScene(m_pActiveScene);
-				*/
 			}
 			ImGui::EndMenu();
 		}
@@ -180,7 +157,8 @@ void MenuBarPanel::menuGameObject()
 		{
 			if (m_pActiveScene)
 			{
-				m_pActiveScene->CreateGameObject("GameObject");
+				auto pAddedGameObject = m_pActiveScene->CreateGameObject("GameObject");
+				pAddedGameObject->AddComponent<Dive::Transform>();
 			}
 		}
 

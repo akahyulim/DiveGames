@@ -12,7 +12,7 @@ namespace Dive
 		if (m_Name.empty())
 			m_Name = "Untitled";
 
-		SUBSCRIBE_EVENT(eEventType::GameObjectModify, [this](const Event& e) { m_bDirty = true; });
+		SUBSCRIBE_EVENT(eEventType::GameObjectModify, EVENT_HANDLER(OnGameObjectModify));
 	}
 
 	Scene::~Scene()
@@ -65,22 +65,9 @@ namespace Dive
 		}
 	}
 
-	GameObject* Scene::CreateGameObject(const std::string& name)
+	GameObject* Scene::CreateGameObject(const std::string& name, unsigned long long id)
 	{
-		auto pNewGameObject = m_GameObjects.emplace_back(new GameObject(this, name));
-		DV_ASSERT(pNewGameObject != nullptr);
-		pNewGameObject->AddComponent<Transform>();
-
-		return pNewGameObject;
-	}
-
-	GameObject* Scene::CreateGameObject(unsigned long long id, const std::string& name)
-	{
-		auto pNewGameObject = m_GameObjects.emplace_back(new GameObject(this, id, name));
-		DV_ASSERT(pNewGameObject != nullptr);
-		pNewGameObject->AddComponent<Transform>();
-
-		return pNewGameObject;
+		return m_GameObjects.emplace_back(new GameObject(this, name, id));
 	}
 
 	// 자식까지 모두 제거
@@ -144,13 +131,67 @@ namespace Dive
 		for (auto& pGameObject : m_GameObjects)
 		{
 			auto pTransform = pGameObject->GetComponent<Transform>();
-			if (!pTransform)
-				continue;
-
-			if (!pTransform->HasParent())
+			if( pTransform )
+			{
+				if (!pTransform->HasParent())
+				{
+					roots.emplace_back(pGameObject);
+				}
+			}
+			else
+			{
 				roots.emplace_back(pGameObject);
+			}
 		}
 
 		return roots;
 	}
+
+	std::vector<Component*> Scene::GetComponents(eComponentType type)
+	{
+		std::vector<Component*> components;
+		if (!m_Components[type].empty())
+			components = m_Components[type];
+
+		return components;
+	}
+
+	Component* Scene::GetComponent(eComponentType type, unsigned long long id)
+	{
+		auto components = GetComponents(type);
+		if (!components.empty())
+		{
+			for (auto pComponent : components)
+			{
+				if (pComponent->GetInstanceID() == id)
+					return pComponent;
+			}
+		}
+
+		return nullptr;
+	}
+
+	void Scene::OnGameObjectModify(const Event& e)
+	{
+		m_bDirty = true;
+
+		auto pComponent = dynamic_cast<const GameObjectModifyEvent&>(e).GetComponent();
+		auto type = pComponent->GetType();
+
+		if (!m_Components[type].empty())
+		{
+			auto it = m_Components[type].begin();
+			for (it; it != m_Components[type].end(); it++)
+			{
+				if ((*it)->GetInstanceID() == pComponent->GetInstanceID())
+				{
+					m_Components[type].erase(it);
+					return;
+				}
+			}
+		}
+
+		m_Components[type].push_back(const_cast<Component*>(pComponent));
+	}
+
 }

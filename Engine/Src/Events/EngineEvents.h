@@ -3,6 +3,7 @@
 #include <sstream>
 #include "EventSystem.h"
 #include "Base/Engine.h"
+#include "Scene/Component/Component.h"
 
 namespace Dive
 {
@@ -39,6 +40,11 @@ namespace Dive
 	public:
 		EVENT_CLASS_TYPE(GameObjectModify)
 
-		GameObjectModifyEvent() = default;
+		GameObjectModifyEvent(Component* pComponent) :m_pComponent(pComponent) {}
+
+		const Component* GetComponent() const { return m_pComponent; }
+
+	private:
+		Component* m_pComponent = nullptr;
 	};
 }

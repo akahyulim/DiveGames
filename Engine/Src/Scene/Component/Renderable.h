@@ -10,8 +10,7 @@ namespace Dive
 	public:
 		COMPONENT_CLASS_TYPE(Unknown)
 
-		Renderable(GameObject* pGameObject) :Component(pGameObject) {}
-		Renderable(GameObject* pGameObject, unsigned long long id) :Component(pGameObject, id) {}
+		Renderable(GameObject* pGameObject, unsigned long long id = 0) :Component(pGameObject, id) {}
 		virtual ~Renderable() = default;
 
 		// Behaviour의 Enalbed랑은 다르다. 이건 보이느냐 마느냐이다.

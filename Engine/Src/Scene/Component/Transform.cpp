@@ -6,12 +6,6 @@
 
 namespace Dive
 {
-	Transform::Transform(GameObject* pGameObject)
-		: Component(pGameObject)
-	{
-		Clear();
-	}
-
 	Transform::Transform(GameObject* pGameObject, unsigned long long id)
 		: Component(pGameObject, id)
 	{

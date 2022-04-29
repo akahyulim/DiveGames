@@ -9,13 +9,9 @@ namespace Dive
 
 	// 혹시나 같은 id가 생성될 때를 대비해 hash가 필요?
 
-	Object::Object(const std::string& name)
-		: m_InstanceID(s_UniformDistribution(s_Engine)), m_Name(name)
+	Object::Object(const std::string& name, unsigned long long id)
 	{
-	}
-
-	Object::Object(unsigned long long id, const std::string& name)
-		: m_InstanceID(id), m_Name(name)
-	{
+		m_Name			= name;
+		m_InstanceID	= id == 0 ? s_UniformDistribution(s_Engine) : id;
 	}
 }

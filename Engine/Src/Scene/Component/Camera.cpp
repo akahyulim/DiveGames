@@ -3,12 +3,6 @@
 
 namespace Dive
 {
-	Camera::Camera(GameObject* pGameObject)
-		: Component(pGameObject)
-	{
-		DirectX::XMStoreFloat4x4(&m_Projection, DirectX::XMMatrixIdentity());
-	}
-
 	Camera::Camera(GameObject* pGameObject, unsigned int long long id)
 		: Component(pGameObject, id)
 	{

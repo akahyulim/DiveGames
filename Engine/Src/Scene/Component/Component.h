@@ -8,7 +8,6 @@ namespace Dive
 
 	enum class eComponentType
 	{
-		Unknown,
 		Transform,
 		Camera,
 		SpriteRenderable, MeshRenderable, SkinnedMeshRenderable,
@@ -16,6 +15,8 @@ namespace Dive
 		Terrain,
 		Particle,	// 유니티에서는 ParicleSystem
 		Skybox,
+		Unknown,	// 이건 일단 Base에서 사용하는 곳이 있다.
+		Count
 	};
 
 #define COMPONENT_CLASS_TYPE(type)	static eComponentType GetStaticType() { return eComponentType::type; } \
@@ -25,8 +26,7 @@ namespace Dive
 	class Component : public Object
 	{
 	public:
-		Component(GameObject* pGameObject);
-		Component(GameObject* pGameObject, unsigned long long id);
+		Component(GameObject* pGameObject, unsigned long long id = 0);
 		virtual ~Component() = default;
 
 		// 일단 아무도 사용하지 않는다.

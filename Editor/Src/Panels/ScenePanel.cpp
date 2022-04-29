@@ -73,6 +73,9 @@ void ScenePanel::renderWindow()
 	auto pSelected = m_pEditor->GetHierarchy()->GetSeletecedObject();
 	if (pSelected != nullptr)
 	{
+		if (!pSelected->HasComponent<Dive::Transform>())
+			return;
+
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
 

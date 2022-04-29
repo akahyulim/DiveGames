@@ -2,36 +2,109 @@ Scene:
   m_Name: new_world
 ---
 GameObject:
-  m_InstanceID: 17523048821007163498
+  m_InstanceID: 12469022857908226459
+  m_Name: Cube
+  m_bActive: 1
+  m_Component:
+    - 0: 7696631803565088908
+---
+GameObject:
+  m_InstanceID: 3215833443992535550
+  m_Name: Cube
+  m_bActive: 1
+  m_Component:
+    - 0: 11276149428858763414
+    - 3: 11718288610792416452
+---
+GameObject:
+  m_InstanceID: 17239135907032049512
   m_Name: sphere
   m_bActive: 1
-Components:
-  - Transform:
-      m_LocalRotation: [-0, 0, -0, 1]
-      m_LocalPosition: [0, 0, -0]
-      m_LocalScale: [1, 1, 1]
-      m_Parent: 0
+  m_Component:
+    - 0: 8939799208844031653
 ---
 GameObject:
-  m_InstanceID: 13991538510985506606
+  m_InstanceID: 8666645496577766938
   m_Name: default
   m_bActive: 1
-Components:
-  - Transform:
-      m_LocalRotation: [-0, 0, -0, 1]
-      m_LocalPosition: [0, 0, -0]
-      m_LocalScale: [1, 1, 1]
-      m_Parent: 17523048821007163498
+  m_Component:
+    - 0: 192326689368700413
 ---
 GameObject:
-  m_InstanceID: 14426677969320395853
+  m_InstanceID: 15419617944820097531
   m_Name: pSphere2
   m_bActive: 1
-Components:
-  - Transform:
-      m_LocalRotation: [-0, 0, -0, 1]
-      m_LocalPosition: [0, 0, -0]
-      m_LocalScale: [1, 1, 1]
-      m_Parent: 17523048821007163498
-  - MeshRenderable:
-      {}
+  m_Component:
+    - 0: 2934858230479421446
+    - 3: 4506809481475052038
+---
+GameObject:
+  m_InstanceID: 12794427356523941018
+  m_Name: plane
+  m_bActive: 1
+  m_Component:
+    - 0: 10180719771706618211
+---
+GameObject:
+  m_InstanceID: 3035183898120309762
+  m_Name: Plane_Plane.001
+  m_bActive: 1
+  m_Component:
+    - 0: 17372342232184748966
+    - 3: 4044319349150517530
+---
+Transform:
+  m_InstanceID: 7696631803565088908
+  m_GameObject: 12469022857908226459
+  m_LocalRotation: [0, 0.382683367, 0, 0.923879564]
+  m_LocalPosition: [-3.5, 5, 0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 0
+---
+Transform:
+  m_InstanceID: 11276149428858763414
+  m_GameObject: 3215833443992535550
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 7696631803565088908
+---
+Transform:
+  m_InstanceID: 8939799208844031653
+  m_GameObject: 17239135907032049512
+  m_LocalRotation: [0, 0, 0, 1]
+  m_LocalPosition: [2.5, 6, 0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 0
+---
+Transform:
+  m_InstanceID: 192326689368700413
+  m_GameObject: 8666645496577766938
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 8939799208844031653
+---
+Transform:
+  m_InstanceID: 2934858230479421446
+  m_GameObject: 15419617944820097531
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 8939799208844031653
+---
+Transform:
+  m_InstanceID: 10180719771706618211
+  m_GameObject: 12794427356523941018
+  m_LocalRotation: [0, 0, 0, 1]
+  m_LocalPosition: [0, 0, -0]
+  m_LocalScale: [5, 5, 5]
+  m_Parent: 0
+---
+Transform:
+  m_InstanceID: 17372342232184748966
+  m_GameObject: 3035183898120309762
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 10180719771706618211
