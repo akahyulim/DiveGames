@@ -152,8 +152,10 @@ namespace Dive
 				// buffer는 Model로부터 획득
 				// bind시 stride가 필요하다. offset은 그냥 0인듯
 				auto pModel = pMeshRenderable->GetModel();
+				if (pModel == nullptr)
+					continue;
 
-				// 이것두 버퍼가 없을 수 있나...?
+				// 이것두 버퍼가 없을 수 있다.
 				if (!pModel->GetVertexBuffer() || !pModel->GetIndexBuffer())
 					continue;
 				

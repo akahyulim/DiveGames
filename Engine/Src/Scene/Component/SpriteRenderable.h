@@ -47,9 +47,9 @@ namespace Dive
 			DirectX::XMFLOAT3 position;
 			DirectX::XMFLOAT2 texCoord;
 		};
-		VertexBuffer* m_pVertexBuffer = nullptr;
-		IndexBuffer* m_pIndexBuffer = nullptr; 
+		VertexBuffer* m_pVertexBuffer	= nullptr;
+		IndexBuffer* m_pIndexBuffer		= nullptr; 
 
-		SpriteMaterial* m_pMaterial = nullptr;
+		SpriteMaterial* m_pMaterial		= nullptr;
 	};
 }

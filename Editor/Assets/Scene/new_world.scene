@@ -2,109 +2,1808 @@ Scene:
   m_Name: new_world
 ---
 GameObject:
-  m_InstanceID: 12469022857908226459
-  m_Name: Cube
+  m_InstanceID: 1066793119045751056
+  m_Name: Pilot_LP_Animated
   m_bActive: 1
   m_Component:
-    - 0: 7696631803565088908
+    - 0: 15878286127859464320
 ---
 GameObject:
-  m_InstanceID: 3215833443992535550
-  m_Name: Cube
+  m_InstanceID: 14693008041507375827
+  m_Name: Animation
   m_bActive: 1
   m_Component:
-    - 0: 11276149428858763414
-    - 3: 11718288610792416452
+    - 0: 8361156665123458615
 ---
 GameObject:
-  m_InstanceID: 17239135907032049512
-  m_Name: sphere
+  m_InstanceID: 5826879769738362620
+  m_Name: mixamorig:Hips
   m_bActive: 1
   m_Component:
-    - 0: 8939799208844031653
+    - 0: 14920507674139518137
 ---
 GameObject:
-  m_InstanceID: 8666645496577766938
-  m_Name: default
+  m_InstanceID: 3881067866971000248
+  m_Name: mixamorig:Spine
   m_bActive: 1
   m_Component:
-    - 0: 192326689368700413
+    - 0: 10002664410460353981
 ---
 GameObject:
-  m_InstanceID: 15419617944820097531
-  m_Name: pSphere2
+  m_InstanceID: 11723381136115770756
+  m_Name: mixamorig:Spine1
   m_bActive: 1
   m_Component:
-    - 0: 2934858230479421446
-    - 3: 4506809481475052038
+    - 0: 8669020306956736390
 ---
 GameObject:
-  m_InstanceID: 12794427356523941018
-  m_Name: plane
+  m_InstanceID: 4916487802312971973
+  m_Name: mixamorig:Spine2
   m_bActive: 1
   m_Component:
-    - 0: 10180719771706618211
+    - 0: 9392077590317421562
 ---
 GameObject:
-  m_InstanceID: 3035183898120309762
-  m_Name: Plane_Plane.001
+  m_InstanceID: 8308189098875151144
+  m_Name: mixamorig:Neck
   m_bActive: 1
   m_Component:
-    - 0: 17372342232184748966
-    - 3: 4044319349150517530
+    - 0: 12248988990447323678
+---
+GameObject:
+  m_InstanceID: 3522113081818653932
+  m_Name: mixamorig:Head
+  m_bActive: 1
+  m_Component:
+    - 0: 10956227153328422182
+---
+GameObject:
+  m_InstanceID: 4988247667805783175
+  m_Name: mixamorig:HeadTop_End
+  m_bActive: 1
+  m_Component:
+    - 0: 12764415302108984129
+---
+GameObject:
+  m_InstanceID: 17678455072104483040
+  m_Name: mixamorig:HeadTop_End_end
+  m_bActive: 1
+  m_Component:
+    - 0: 15712037534790100778
+---
+GameObject:
+  m_InstanceID: 9676027723782088469
+  m_Name: mixamorig:LeftShoulder
+  m_bActive: 1
+  m_Component:
+    - 0: 13409368621521654547
+---
+GameObject:
+  m_InstanceID: 10214915213501782000
+  m_Name: mixamorig:LeftArm
+  m_bActive: 1
+  m_Component:
+    - 0: 6870204603463736572
+---
+GameObject:
+  m_InstanceID: 2762180710038870372
+  m_Name: mixamorig:LeftForeArm
+  m_bActive: 1
+  m_Component:
+    - 0: 7677126825801799474
+---
+GameObject:
+  m_InstanceID: 16014275338009777792
+  m_Name: mixamorig:LeftHand
+  m_bActive: 1
+  m_Component:
+    - 0: 6359030847312579043
+---
+GameObject:
+  m_InstanceID: 5914931160895662594
+  m_Name: mixamorig:LeftHandThumb1
+  m_bActive: 1
+  m_Component:
+    - 0: 5114801181491498752
+---
+GameObject:
+  m_InstanceID: 12855282499767039438
+  m_Name: mixamorig:LeftHandThumb2
+  m_bActive: 1
+  m_Component:
+    - 0: 12244163073964109212
+---
+GameObject:
+  m_InstanceID: 4114835629272688106
+  m_Name: mixamorig:LeftHandThumb3
+  m_bActive: 1
+  m_Component:
+    - 0: 11214421063370159090
+---
+GameObject:
+  m_InstanceID: 10252950688697638300
+  m_Name: mixamorig:LeftHandThumb4
+  m_bActive: 1
+  m_Component:
+    - 0: 18259608230662082433
+---
+GameObject:
+  m_InstanceID: 7464950231590529158
+  m_Name: mixamorig:LeftHandThumb4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 6168975354149787339
+---
+GameObject:
+  m_InstanceID: 16749238882021731482
+  m_Name: mixamorig:LeftHandIndex1
+  m_bActive: 1
+  m_Component:
+    - 0: 9659105673884070274
+---
+GameObject:
+  m_InstanceID: 5842741702646815996
+  m_Name: mixamorig:LeftHandIndex2
+  m_bActive: 1
+  m_Component:
+    - 0: 14595328903318608196
+---
+GameObject:
+  m_InstanceID: 8411866741737441005
+  m_Name: mixamorig:LeftHandIndex3
+  m_bActive: 1
+  m_Component:
+    - 0: 15151713020026348701
+---
+GameObject:
+  m_InstanceID: 13462156794321011010
+  m_Name: mixamorig:LeftHandIndex4
+  m_bActive: 1
+  m_Component:
+    - 0: 2406918502059437467
+---
+GameObject:
+  m_InstanceID: 1129528014717500371
+  m_Name: mixamorig:LeftHandIndex4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 8729381983488301434
+---
+GameObject:
+  m_InstanceID: 13583426334929457706
+  m_Name: mixamorig:LeftHandRing1
+  m_bActive: 1
+  m_Component:
+    - 0: 5244377408322204333
+---
+GameObject:
+  m_InstanceID: 2205818271244523905
+  m_Name: mixamorig:LeftHandRing2
+  m_bActive: 1
+  m_Component:
+    - 0: 2024551787056468481
+---
+GameObject:
+  m_InstanceID: 16383100746463606527
+  m_Name: mixamorig:LeftHandRing3
+  m_bActive: 1
+  m_Component:
+    - 0: 1678328929710204272
+---
+GameObject:
+  m_InstanceID: 10333398092140998124
+  m_Name: mixamorig:LeftHandRing4
+  m_bActive: 1
+  m_Component:
+    - 0: 7614133712590712835
+---
+GameObject:
+  m_InstanceID: 6846674344742952996
+  m_Name: mixamorig:LeftHandRing4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 8944010411347255333
+---
+GameObject:
+  m_InstanceID: 6606384326884621083
+  m_Name: mixamorig:RightShoulder
+  m_bActive: 1
+  m_Component:
+    - 0: 12686922286851752511
+---
+GameObject:
+  m_InstanceID: 17947940272946179946
+  m_Name: mixamorig:RightArm
+  m_bActive: 1
+  m_Component:
+    - 0: 17226033371973844579
+---
+GameObject:
+  m_InstanceID: 10583884339352306352
+  m_Name: mixamorig:RightForeArm
+  m_bActive: 1
+  m_Component:
+    - 0: 8075962219614953741
+---
+GameObject:
+  m_InstanceID: 9286346765277864867
+  m_Name: mixamorig:RightHand
+  m_bActive: 1
+  m_Component:
+    - 0: 7749030322782611003
+---
+GameObject:
+  m_InstanceID: 14962092022298805668
+  m_Name: mixamorig:RightHandThumb1
+  m_bActive: 1
+  m_Component:
+    - 0: 6375744974477693505
+---
+GameObject:
+  m_InstanceID: 13835026939702462663
+  m_Name: mixamorig:RightHandThumb2
+  m_bActive: 1
+  m_Component:
+    - 0: 608658097097031676
+---
+GameObject:
+  m_InstanceID: 12869874399482939543
+  m_Name: mixamorig:RightHandThumb3
+  m_bActive: 1
+  m_Component:
+    - 0: 10303770926324241966
+---
+GameObject:
+  m_InstanceID: 2272158405209878448
+  m_Name: mixamorig:RightHandThumb4
+  m_bActive: 1
+  m_Component:
+    - 0: 9499924513397380264
+---
+GameObject:
+  m_InstanceID: 3644469322299831511
+  m_Name: mixamorig:RightHandThumb4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 3088787439163556258
+---
+GameObject:
+  m_InstanceID: 10712174391024436686
+  m_Name: mixamorig:RightHandIndex1
+  m_bActive: 1
+  m_Component:
+    - 0: 11798073199025848810
+---
+GameObject:
+  m_InstanceID: 1102848117542149903
+  m_Name: mixamorig:RightHandIndex2
+  m_bActive: 1
+  m_Component:
+    - 0: 3393155744167508516
+---
+GameObject:
+  m_InstanceID: 3273794584157325309
+  m_Name: mixamorig:RightHandIndex3
+  m_bActive: 1
+  m_Component:
+    - 0: 593962766158701914
+---
+GameObject:
+  m_InstanceID: 141857011550865135
+  m_Name: mixamorig:RightHandIndex4
+  m_bActive: 1
+  m_Component:
+    - 0: 3804621845848597254
+---
+GameObject:
+  m_InstanceID: 11636905167961508260
+  m_Name: mixamorig:RightHandIndex4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 14691813061293470397
+---
+GameObject:
+  m_InstanceID: 4319885964761802703
+  m_Name: mixamorig:RightHandRing1
+  m_bActive: 1
+  m_Component:
+    - 0: 1454089039889472920
+---
+GameObject:
+  m_InstanceID: 17590479314041361428
+  m_Name: mixamorig:RightHandRing2
+  m_bActive: 1
+  m_Component:
+    - 0: 6661542835892677602
+---
+GameObject:
+  m_InstanceID: 14016741077261447153
+  m_Name: mixamorig:RightHandRing3
+  m_bActive: 1
+  m_Component:
+    - 0: 10760713645882942728
+---
+GameObject:
+  m_InstanceID: 5143075388802024733
+  m_Name: mixamorig:RightHandRing4
+  m_bActive: 1
+  m_Component:
+    - 0: 14276753818072009167
+---
+GameObject:
+  m_InstanceID: 15985280270572002534
+  m_Name: mixamorig:RightHandRing4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 3700266583693741098
+---
+GameObject:
+  m_InstanceID: 11197677905087006833
+  m_Name: mixamorig:LeftUpLeg
+  m_bActive: 1
+  m_Component:
+    - 0: 14997368288137014214
+---
+GameObject:
+  m_InstanceID: 12720391906579052931
+  m_Name: mixamorig:LeftLeg
+  m_bActive: 1
+  m_Component:
+    - 0: 4178541674551311146
+---
+GameObject:
+  m_InstanceID: 11271693143417084043
+  m_Name: mixamorig:LeftFoot
+  m_bActive: 1
+  m_Component:
+    - 0: 518411416400290128
+---
+GameObject:
+  m_InstanceID: 10577940054770392384
+  m_Name: mixamorig:LeftToeBase
+  m_bActive: 1
+  m_Component:
+    - 0: 17650624199984971511
+---
+GameObject:
+  m_InstanceID: 3004649352316635414
+  m_Name: mixamorig:LeftToe_End
+  m_bActive: 1
+  m_Component:
+    - 0: 3656212263512082601
+---
+GameObject:
+  m_InstanceID: 11146447413073760355
+  m_Name: mixamorig:LeftToe_End_end
+  m_bActive: 1
+  m_Component:
+    - 0: 17219514975917405953
+---
+GameObject:
+  m_InstanceID: 13947263992449124733
+  m_Name: mixamorig:RightUpLeg
+  m_bActive: 1
+  m_Component:
+    - 0: 10743491651301747681
+---
+GameObject:
+  m_InstanceID: 16253799733336570268
+  m_Name: mixamorig:RightLeg
+  m_bActive: 1
+  m_Component:
+    - 0: 15427922485341284438
+---
+GameObject:
+  m_InstanceID: 16710166359861889493
+  m_Name: mixamorig:RightFoot
+  m_bActive: 1
+  m_Component:
+    - 0: 1750886464820710015
+---
+GameObject:
+  m_InstanceID: 6443265968849510187
+  m_Name: mixamorig:RightToeBase
+  m_bActive: 1
+  m_Component:
+    - 0: 9482518285023699730
+---
+GameObject:
+  m_InstanceID: 16748561078075605885
+  m_Name: mixamorig:RightToe_End
+  m_bActive: 1
+  m_Component:
+    - 0: 7514032913579662666
+---
+GameObject:
+  m_InstanceID: 980500892806308420
+  m_Name: mixamorig:RightToe_End_end
+  m_bActive: 1
+  m_Component:
+    - 0: 1501038662779072432
+---
+GameObject:
+  m_InstanceID: 10255627508002970665
+  m_Name: Armature
+  m_bActive: 1
+  m_Component:
+    - 0: 4702533742382409079
+---
+GameObject:
+  m_InstanceID: 2578398970516128272
+  m_Name: mixamorig:Hips
+  m_bActive: 1
+  m_Component:
+    - 0: 8158156088931705154
+---
+GameObject:
+  m_InstanceID: 3747298510754954182
+  m_Name: mixamorig:Spine
+  m_bActive: 1
+  m_Component:
+    - 0: 16845880428908878996
+---
+GameObject:
+  m_InstanceID: 13787386935498166141
+  m_Name: mixamorig:Spine1
+  m_bActive: 1
+  m_Component:
+    - 0: 16645195430541878508
+---
+GameObject:
+  m_InstanceID: 14106016045784365110
+  m_Name: mixamorig:Spine2
+  m_bActive: 1
+  m_Component:
+    - 0: 10080743853180222700
+---
+GameObject:
+  m_InstanceID: 9449664149046308182
+  m_Name: mixamorig:Neck
+  m_bActive: 1
+  m_Component:
+    - 0: 15821607493134050762
+---
+GameObject:
+  m_InstanceID: 13892289347756460264
+  m_Name: mixamorig:Head
+  m_bActive: 1
+  m_Component:
+    - 0: 11054600362187004598
+---
+GameObject:
+  m_InstanceID: 10847402363948173339
+  m_Name: mixamorig:HeadTop_End
+  m_bActive: 1
+  m_Component:
+    - 0: 16317300427054602847
+---
+GameObject:
+  m_InstanceID: 11732443155365143858
+  m_Name: mixamorig:HeadTop_End_end
+  m_bActive: 1
+  m_Component:
+    - 0: 10025588638274211324
+---
+GameObject:
+  m_InstanceID: 12881924125847270435
+  m_Name: mixamorig:LeftShoulder
+  m_bActive: 1
+  m_Component:
+    - 0: 13480308435096749145
+---
+GameObject:
+  m_InstanceID: 13866004187985685782
+  m_Name: mixamorig:LeftArm
+  m_bActive: 1
+  m_Component:
+    - 0: 1249223740258954993
+---
+GameObject:
+  m_InstanceID: 17934222734760187935
+  m_Name: mixamorig:LeftForeArm
+  m_bActive: 1
+  m_Component:
+    - 0: 6215011237398440698
+---
+GameObject:
+  m_InstanceID: 13760414870849519064
+  m_Name: mixamorig:LeftHand
+  m_bActive: 1
+  m_Component:
+    - 0: 1725705504761893392
+---
+GameObject:
+  m_InstanceID: 171101737419740859
+  m_Name: mixamorig:LeftHandThumb1
+  m_bActive: 1
+  m_Component:
+    - 0: 11584791021721610819
+---
+GameObject:
+  m_InstanceID: 10812611963534021916
+  m_Name: mixamorig:LeftHandThumb2
+  m_bActive: 1
+  m_Component:
+    - 0: 14461197439068836957
+---
+GameObject:
+  m_InstanceID: 15011364042136812105
+  m_Name: mixamorig:LeftHandThumb3
+  m_bActive: 1
+  m_Component:
+    - 0: 927011373315764788
+---
+GameObject:
+  m_InstanceID: 4943141031907350527
+  m_Name: mixamorig:LeftHandThumb4
+  m_bActive: 1
+  m_Component:
+    - 0: 15724513945159507448
+---
+GameObject:
+  m_InstanceID: 14933333767952568653
+  m_Name: mixamorig:LeftHandThumb4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 9199823078104569467
+---
+GameObject:
+  m_InstanceID: 17807735025892970355
+  m_Name: mixamorig:LeftHandIndex1
+  m_bActive: 1
+  m_Component:
+    - 0: 4897268445364476089
+---
+GameObject:
+  m_InstanceID: 8560957858355641158
+  m_Name: mixamorig:LeftHandIndex2
+  m_bActive: 1
+  m_Component:
+    - 0: 15999709168970994431
+---
+GameObject:
+  m_InstanceID: 13666243766921602774
+  m_Name: mixamorig:LeftHandIndex3
+  m_bActive: 1
+  m_Component:
+    - 0: 607339090250521475
+---
+GameObject:
+  m_InstanceID: 7007616687058685632
+  m_Name: mixamorig:LeftHandIndex4
+  m_bActive: 1
+  m_Component:
+    - 0: 2080351055613041903
+---
+GameObject:
+  m_InstanceID: 617343550510922642
+  m_Name: mixamorig:LeftHandIndex4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 6476707918627857089
+---
+GameObject:
+  m_InstanceID: 12471015510388498148
+  m_Name: mixamorig:LeftHandRing1
+  m_bActive: 1
+  m_Component:
+    - 0: 16535170180643866721
+---
+GameObject:
+  m_InstanceID: 11350475268640149807
+  m_Name: mixamorig:LeftHandRing2
+  m_bActive: 1
+  m_Component:
+    - 0: 7284816551467925033
+---
+GameObject:
+  m_InstanceID: 15334576955616357607
+  m_Name: mixamorig:LeftHandRing3
+  m_bActive: 1
+  m_Component:
+    - 0: 9997775362778957317
+---
+GameObject:
+  m_InstanceID: 13136723454281485512
+  m_Name: mixamorig:LeftHandRing4
+  m_bActive: 1
+  m_Component:
+    - 0: 11225155721947003172
+---
+GameObject:
+  m_InstanceID: 12984254753914544084
+  m_Name: mixamorig:LeftHandRing4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 5476262633455634722
+---
+GameObject:
+  m_InstanceID: 6403678458434277009
+  m_Name: mixamorig:RightShoulder
+  m_bActive: 1
+  m_Component:
+    - 0: 4789772573729445530
+---
+GameObject:
+  m_InstanceID: 5739737245675017615
+  m_Name: mixamorig:RightArm
+  m_bActive: 1
+  m_Component:
+    - 0: 6469007282325579135
+---
+GameObject:
+  m_InstanceID: 6924430295366463726
+  m_Name: mixamorig:RightForeArm
+  m_bActive: 1
+  m_Component:
+    - 0: 4510349090021817564
+---
+GameObject:
+  m_InstanceID: 11542481346560676839
+  m_Name: mixamorig:RightHand
+  m_bActive: 1
+  m_Component:
+    - 0: 14044996106115710147
+---
+GameObject:
+  m_InstanceID: 12485667437787982079
+  m_Name: mixamorig:RightHandThumb1
+  m_bActive: 1
+  m_Component:
+    - 0: 10167536084982144797
+---
+GameObject:
+  m_InstanceID: 12215808316759261273
+  m_Name: mixamorig:RightHandThumb2
+  m_bActive: 1
+  m_Component:
+    - 0: 7594624108747181085
+---
+GameObject:
+  m_InstanceID: 5700524169234212746
+  m_Name: mixamorig:RightHandThumb3
+  m_bActive: 1
+  m_Component:
+    - 0: 16822709166120884672
+---
+GameObject:
+  m_InstanceID: 14767524866266768408
+  m_Name: mixamorig:RightHandThumb4
+  m_bActive: 1
+  m_Component:
+    - 0: 5363947523705140106
+---
+GameObject:
+  m_InstanceID: 16978189433271808557
+  m_Name: mixamorig:RightHandThumb4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 3423899832945683007
+---
+GameObject:
+  m_InstanceID: 2102000472457673702
+  m_Name: mixamorig:RightHandIndex1
+  m_bActive: 1
+  m_Component:
+    - 0: 8741150628271598636
+---
+GameObject:
+  m_InstanceID: 18134886376670416873
+  m_Name: mixamorig:RightHandIndex2
+  m_bActive: 1
+  m_Component:
+    - 0: 14264587340683969392
+---
+GameObject:
+  m_InstanceID: 8482873082766710772
+  m_Name: mixamorig:RightHandIndex3
+  m_bActive: 1
+  m_Component:
+    - 0: 9944449876647824263
+---
+GameObject:
+  m_InstanceID: 5905973568284787159
+  m_Name: mixamorig:RightHandIndex4
+  m_bActive: 1
+  m_Component:
+    - 0: 2519529344101337094
+---
+GameObject:
+  m_InstanceID: 16740416155034558589
+  m_Name: mixamorig:RightHandIndex4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 18129715966428482621
+---
+GameObject:
+  m_InstanceID: 14145788432288379083
+  m_Name: mixamorig:RightHandRing1
+  m_bActive: 1
+  m_Component:
+    - 0: 10345420118238009186
+---
+GameObject:
+  m_InstanceID: 8046684766281010104
+  m_Name: mixamorig:RightHandRing2
+  m_bActive: 1
+  m_Component:
+    - 0: 2956162327763784972
+---
+GameObject:
+  m_InstanceID: 426441146373339948
+  m_Name: mixamorig:RightHandRing3
+  m_bActive: 1
+  m_Component:
+    - 0: 5817114001385769234
+---
+GameObject:
+  m_InstanceID: 11581541663437026450
+  m_Name: mixamorig:RightHandRing4
+  m_bActive: 1
+  m_Component:
+    - 0: 4400948464101943712
+---
+GameObject:
+  m_InstanceID: 5072606717154045366
+  m_Name: mixamorig:RightHandRing4_end
+  m_bActive: 1
+  m_Component:
+    - 0: 4617096966945072260
+---
+GameObject:
+  m_InstanceID: 7979369553822910171
+  m_Name: mixamorig:LeftUpLeg
+  m_bActive: 1
+  m_Component:
+    - 0: 10199912104282590263
+---
+GameObject:
+  m_InstanceID: 9667022201865214745
+  m_Name: mixamorig:LeftLeg
+  m_bActive: 1
+  m_Component:
+    - 0: 10428705952441362814
+---
+GameObject:
+  m_InstanceID: 73176590993674321
+  m_Name: mixamorig:LeftFoot
+  m_bActive: 1
+  m_Component:
+    - 0: 8733728573632672667
+---
+GameObject:
+  m_InstanceID: 12018403489736554495
+  m_Name: mixamorig:LeftToeBase
+  m_bActive: 1
+  m_Component:
+    - 0: 7403850253722766191
+---
+GameObject:
+  m_InstanceID: 1244745726745309967
+  m_Name: mixamorig:LeftToe_End
+  m_bActive: 1
+  m_Component:
+    - 0: 15652556407163865062
+---
+GameObject:
+  m_InstanceID: 9572495552550179436
+  m_Name: mixamorig:LeftToe_End_end
+  m_bActive: 1
+  m_Component:
+    - 0: 16218186747711350858
+---
+GameObject:
+  m_InstanceID: 14433077864205244123
+  m_Name: mixamorig:RightUpLeg
+  m_bActive: 1
+  m_Component:
+    - 0: 14784311154222346626
+---
+GameObject:
+  m_InstanceID: 11339778048473622207
+  m_Name: mixamorig:RightLeg
+  m_bActive: 1
+  m_Component:
+    - 0: 5353485539797265877
+---
+GameObject:
+  m_InstanceID: 10959738280125715557
+  m_Name: mixamorig:RightFoot
+  m_bActive: 1
+  m_Component:
+    - 0: 12351127176011047638
+---
+GameObject:
+  m_InstanceID: 10316303102513305546
+  m_Name: mixamorig:RightToeBase
+  m_bActive: 1
+  m_Component:
+    - 0: 5382673136814520102
+---
+GameObject:
+  m_InstanceID: 2720436864197128919
+  m_Name: mixamorig:RightToe_End
+  m_bActive: 1
+  m_Component:
+    - 0: 3578084130507336873
+---
+GameObject:
+  m_InstanceID: 4169223654444696625
+  m_Name: mixamorig:RightToe_End_end
+  m_bActive: 1
+  m_Component:
+    - 0: 1708176323661299052
+---
+GameObject:
+  m_InstanceID: 18034171079552656588
+  m_Name: Pilot Avatar
+  m_bActive: 1
+  m_Component:
+    - 0: 13501223878945663711
+    - 3: 1441688448148279842
 ---
 Transform:
-  m_InstanceID: 7696631803565088908
-  m_GameObject: 12469022857908226459
-  m_LocalRotation: [0, 0.382683367, 0, 0.923879564]
-  m_LocalPosition: [-3.5, 5, 0]
+  m_InstanceID: 15878286127859464320
+  m_GameObject: 1066793119045751056
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0, -0]
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
 ---
 Transform:
-  m_InstanceID: 11276149428858763414
-  m_GameObject: 3215833443992535550
+  m_InstanceID: 8361156665123458615
+  m_GameObject: 14693008041507375827
   m_LocalRotation: [-0, 0, -0, 1]
   m_LocalPosition: [0, 0, -0]
   m_LocalScale: [1, 1, 1]
-  m_Parent: 7696631803565088908
+  m_Parent: 15878286127859464320
 ---
 Transform:
-  m_InstanceID: 8939799208844031653
-  m_GameObject: 17239135907032049512
-  m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [2.5, 6, 0]
+  m_InstanceID: 14920507674139518137
+  m_GameObject: 5826879769738362620
+  m_LocalRotation: [0.0358110368, 0.438636661, -0.00326034147, 0.897944808]
+  m_LocalPosition: [-0.0873796791, 9.35019779, 0.0235245153]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 8361156665123458615
+---
+Transform:
+  m_InstanceID: 10002664410460353981
+  m_GameObject: 3881067866971000248
+  m_LocalRotation: [-0.0463272147, 0.00658016279, 0.00160047156, 0.998903394]
+  m_LocalPosition: [7.4505806e-09, 0.898899972, 0.0123999938]
+  m_LocalScale: [0.99999994, 1, 1]
+  m_Parent: 14920507674139518137
+---
+Transform:
+  m_InstanceID: 8669020306956736390
+  m_GameObject: 11723381136115770756
+  m_LocalRotation: [-0.106118947, 0.0133232335, -0.000274068676, 0.994264126]
+  m_LocalPosition: [3.7252903e-09, 1.0487994, 3.35276127e-08]
   m_LocalScale: [1, 1, 1]
-  m_Parent: 0
+  m_Parent: 10002664410460353981
 ---
 Transform:
-  m_InstanceID: 192326689368700413
-  m_GameObject: 8666645496577766938
+  m_InstanceID: 9392077590317421562
+  m_GameObject: 4916487802312971973
+  m_LocalRotation: [-0.106118955, 0.0133231115, -0.000274058024, 0.994264126]
+  m_LocalPosition: [3.7252903e-09, 1.19869959, -3.65078449e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 8669020306956736390
+---
+Transform:
+  m_InstanceID: 12248988990447323678
+  m_GameObject: 8308189098875151144
+  m_LocalRotation: [-0.0422623195, 0.147758126, -0.0495013818, 0.986879468]
+  m_LocalPosition: [-5.58793545e-08, 1.34849989, 5.96046448e-08]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 9392077590317421562
+---
+Transform:
+  m_InstanceID: 10956227153328422182
+  m_GameObject: 3522113081818653932
+  m_LocalRotation: [0.083476603, 0.295901924, 0.0626002699, 0.949502468]
+  m_LocalPosition: [-1.78813934e-07, 0.675700188, -0.158499509]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 12248988990447323678
+---
+Transform:
+  m_InstanceID: 12764415302108984129
+  m_GameObject: 4988247667805783175
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [-2.98023224e-07, 2.45880342, -0.576699615]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 10956227153328422182
+---
+Transform:
+  m_InstanceID: 15712037534790100778
+  m_GameObject: 17678455072104483040
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 2.52552605, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 12764415302108984129
+---
+Transform:
+  m_InstanceID: 13409368621521654547
+  m_GameObject: 9676027723782088469
+  m_LocalRotation: [0.609170914, 0.388454199, 0.546524048, -0.423468411]
+  m_LocalPosition: [0.641599894, 1.20730031, -0.00130003691]
+  m_LocalScale: [1, 0.99999994, 0.99999994]
+  m_Parent: 9392077590317421562
+---
+Transform:
+  m_InstanceID: 6870204603463736572
+  m_GameObject: 10214915213501782000
+  m_LocalRotation: [-0.40286237, 0.111414909, -0.0791673288, 0.904997885]
+  m_LocalPosition: [2.38418579e-07, 1.29759908, 7.37607479e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 13409368621521654547
+---
+Transform:
+  m_InstanceID: 7677126825801799474
+  m_GameObject: 2762180710038870372
+  m_LocalRotation: [-0.0375099443, -0.000424315978, 0.493091971, 0.869168162]
+  m_LocalPosition: [2.38418579e-07, 2.34689999, -5.36441803e-07]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 6870204603463736572
+---
+Transform:
+  m_InstanceID: 6359030847312579043
+  m_GameObject: 16014275338009777792
+  m_LocalRotation: [0.196842834, -0.0143790748, -0.0808163062, 0.976992726]
+  m_LocalPosition: [-3.57627869e-07, 2.70980024, 2.98023224e-08]
+  m_LocalScale: [1, 1, 0.99999994]
+  m_Parent: 7677126825801799474
+---
+Transform:
+  m_InstanceID: 5114801181491498752
+  m_GameObject: 5914931160895662594
+  m_LocalRotation: [-0.256175876, -0.123483859, 0.199837551, 0.937651634]
+  m_LocalPosition: [-0.264699996, 0.320600271, -0.17429927]
+  m_LocalScale: [0.99999994, 0.99999994, 0.99999994]
+  m_Parent: 6359030847312579043
+---
+Transform:
+  m_InstanceID: 12244163073964109212
+  m_GameObject: 12855282499767039438
+  m_LocalRotation: [0.00551577518, 0.00591725809, -0.0216533914, 0.999732852]
+  m_LocalPosition: [-0.0439006537, 0.357999504, -3.7252903e-08]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 5114801181491498752
+---
+Transform:
+  m_InstanceID: 11214421063370159090
+  m_GameObject: 4114835629272688106
+  m_LocalRotation: [-0.000168271057, -0.002144058, 0.0783402771, 0.996924341]
+  m_LocalPosition: [-4.76837158e-07, 0.333000809, 3.65078449e-07]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 12244163073964109212
+---
+Transform:
+  m_InstanceID: 18259608230662082433
+  m_GameObject: 10252950688697638300
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0.0439006649, 0.27760011, -6.24917448e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 11214421063370159090
+---
+Transform:
+  m_InstanceID: 6168975354149787339
+  m_GameObject: 7464950231590529158
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.281049699, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 18259608230662082433
+---
+Transform:
+  m_InstanceID: 9659105673884070274
+  m_GameObject: 16749238882021731482
+  m_LocalRotation: [-0.263714075, -0.0577673949, 0.156012043, 0.950146317]
+  m_LocalPosition: [-0.253499568, 0.995700598, 0.00140061975]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 6359030847312579043
+---
+Transform:
+  m_InstanceID: 14595328903318608196
+  m_GameObject: 5842741702646815996
+  m_LocalRotation: [-0.372613162, 0.00676921662, 0.0253056344, 0.927616954]
+  m_LocalPosition: [0.000400394201, 0.308999985, -5.66244125e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 9659105673884070274
+---
+Transform:
+  m_InstanceID: 15151713020026348701
+  m_GameObject: 8411866741737441005
+  m_LocalRotation: [2.9988621e-07, 5.41061891e-05, -0.00150896795, 0.999998868]
+  m_LocalPosition: [0.000199943781, 0.307200372, -3.12924385e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 14595328903318608196
+---
+Transform:
+  m_InstanceID: 2406918502059437467
+  m_GameObject: 13462156794321011010
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [-0.000600934029, 0.253500104, -2.08616257e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 15151713020026348701
+---
+Transform:
+  m_InstanceID: 8729381983488301434
+  m_GameObject: 1129528014717500371
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.2535007, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 2406918502059437467
+---
+Transform:
+  m_InstanceID: 5244377408322204333
+  m_GameObject: 13583426334929457706
+  m_LocalRotation: [-0.481996149, 0.002495558, 0.0306183863, 0.875634611]
+  m_LocalPosition: [0.126700222, 1.12470031, -0.00109928846]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 6359030847312579043
+---
+Transform:
+  m_InstanceID: 2024551787056468481
+  m_GameObject: 2205818271244523905
+  m_LocalRotation: [-0.500133812, -0.000581500237, 0.0402559265, 0.865011752]
+  m_LocalPosition: [0.00160068274, 0.284200728, -2.68220901e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 5244377408322204333
+---
+Transform:
+  m_InstanceID: 1678328929710204272
+  m_GameObject: 16383100746463606527
+  m_LocalRotation: [-2.64511891e-06, 0.000485155819, -0.0110843834, 0.999938488]
+  m_LocalPosition: [0.00140011311, 0.270099878, -2.98023224e-07]
+  m_LocalScale: [0.99999994, 0.99999994, 1]
+  m_Parent: 2024551787056468481
+---
+Transform:
+  m_InstanceID: 7614133712590712835
+  m_GameObject: 10333398092140998124
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [-0.00300008059, 0.17659989, -4.32133675e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 1678328929710204272
+---
+Transform:
+  m_InstanceID: 8944010411347255333
+  m_GameObject: 6846674344742952996
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.176624984, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 7614133712590712835
+---
+Transform:
+  m_InstanceID: 12686922286851752511
+  m_GameObject: 6606384326884621083
+  m_LocalRotation: [0.615213633, -0.395643771, -0.543528318, -0.411770761]
+  m_LocalPosition: [-0.641600013, 1.20740068, 0.00520044565]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 9392077590317421562
+---
+Transform:
+  m_InstanceID: 17226033371973844579
+  m_GameObject: 17947940272946179946
+  m_LocalRotation: [-0.442977399, -0.0894614756, 0.204142794, 0.868385553]
+  m_LocalPosition: [-2.98023224e-07, 1.29759979, -1.97440386e-07]
+  m_LocalScale: [1, 1, 0.99999994]
+  m_Parent: 12686922286851752511
+---
+Transform:
+  m_InstanceID: 8075962219614953741
+  m_GameObject: 10583884339352306352
+  m_LocalRotation: [-0.0297018085, -0.0164515637, -0.521128893, 0.852802396]
+  m_LocalPosition: [1.07288361e-06, 2.34690094, -6.55651093e-07]
+  m_LocalScale: [1, 1, 0.99999994]
+  m_Parent: 17226033371973844579
+---
+Transform:
+  m_InstanceID: 7749030322782611003
+  m_GameObject: 9286346765277864867
+  m_LocalRotation: [0.172415942, 0.0382659696, 0.0545089729, 0.982770145]
+  m_LocalPosition: [-4.76837158e-07, 2.7104013, 2.98023224e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 8075962219614953741
+---
+Transform:
+  m_InstanceID: 6375744974477693505
+  m_GameObject: 14962092022298805668
+  m_LocalRotation: [-0.337449163, 0.0538885482, -0.231158823, 0.910927892]
+  m_LocalPosition: [0.248700142, 0.304100871, -0.158300221]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 7749030322782611003
+---
+Transform:
+  m_InstanceID: 608658097097031676
+  m_GameObject: 13835026939702462663
+  m_LocalRotation: [-0.0164141301, 0.00139831647, 0.129512444, 0.991440952]
+  m_LocalPosition: [0.0293006897, 0.337600231, 8.34465027e-07]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 6375744974477693505
+---
+Transform:
+  m_InstanceID: 10303770926324241966
+  m_GameObject: 12869874399482939543
+  m_LocalRotation: [6.9287571e-06, -0.000155589965, -0.0315113254, 0.999503374]
+  m_LocalPosition: [-0.00510036945, 0.356500626, 7.74860382e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 608658097097031676
+---
+Transform:
+  m_InstanceID: 9499924513397380264
+  m_GameObject: 2272158405209878448
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [-0.0241000652, 0.311000109, 5.96046448e-08]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 10303770926324241966
+---
+Transform:
+  m_InstanceID: 3088787439163556258
+  m_GameObject: 3644469322299831511
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.311932862, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 9499924513397380264
+---
+Transform:
+  m_InstanceID: 11798073199025848810
+  m_GameObject: 10712174391024436686
+  m_LocalRotation: [-0.421210438, 0.0877623484, -0.0841385126, 0.898777008]
+  m_LocalPosition: [0.264100194, 1.02460063, -0.00149929523]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 7749030322782611003
+---
+Transform:
+  m_InstanceID: 3393155744167508516
+  m_GameObject: 1102848117542149903
+  m_LocalRotation: [-0.522426665, -0.0112381335, -0.0247443113, 0.852250993]
+  m_LocalPosition: [-0.00200033188, 0.311799854, -2.38418579e-07]
+  m_LocalScale: [0.99999994, 1, 1]
+  m_Parent: 11798073199025848810
+---
+Transform:
+  m_InstanceID: 593962766158701914
+  m_GameObject: 3273794584157325309
+  m_LocalRotation: [-8.01642273e-07, -0.0002358903, 0.0039540655, 0.999992192]
+  m_LocalPosition: [-4.76837158e-07, 0.286399841, 1.08033419e-07]
+  m_LocalScale: [0.99999994, 0.99999994, 1]
+  m_Parent: 3393155744167508516
+---
+Transform:
+  m_InstanceID: 3804621845848597254
+  m_GameObject: 141857011550865135
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0.00199973583, 0.252899885, -3.7252903e-08]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 593962766158701914
+---
+Transform:
+  m_InstanceID: 14691813061293470397
+  m_GameObject: 11636905167961508260
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.252908021, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 3804621845848597254
+---
+Transform:
+  m_InstanceID: 1454089039889472920
+  m_GameObject: 4319885964761802703
+  m_LocalRotation: [-0.449322611, 0.00976860337, -0.11560376, 0.885804474]
+  m_LocalPosition: [-0.132000089, 1.16970122, 0.00280016661]
+  m_LocalScale: [1, 1, 0.99999994]
+  m_Parent: 7749030322782611003
+---
+Transform:
+  m_InstanceID: 6661542835892677602
+  m_GameObject: 17590479314041361428
+  m_LocalRotation: [0.72429496, -0.00236142264, 0.0522600561, -0.687502921]
+  m_LocalPosition: [0.000300168991, 0.263999343, -2.38418579e-07]
+  m_LocalScale: [1, 0.99999994, 0.99999994]
+  m_Parent: 1454089039889472920
+---
+Transform:
+  m_InstanceID: 10760713645882942728
+  m_GameObject: 14016741077261447153
+  m_LocalRotation: [3.72554325e-08, 0.000186104677, 0.011113097, 0.99993825]
+  m_LocalPosition: [-0.00219964981, 0.261300921, 1.07288361e-06]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 6661542835892677602
+---
+Transform:
+  m_InstanceID: 14276753818072009167
+  m_GameObject: 5143075388802024733
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0.00189900398, 0.137600064, -7.15255737e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 10760713645882942728
+---
+Transform:
+  m_InstanceID: 3700266583693741098
+  m_GameObject: 15985280270572002534
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.137613058, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 14276753818072009167
+---
+Transform:
+  m_InstanceID: 14997368288137014214
+  m_GameObject: 11197677905087006833
+  m_LocalRotation: [-0.0859357044, -0.188354418, 0.971721828, -0.113553591]
+  m_LocalPosition: [0.798699856, -0.499900699, -0.0130000114]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 14920507674139518137
+---
+Transform:
+  m_InstanceID: 4178541674551311146
+  m_GameObject: 12720391906579052931
+  m_LocalRotation: [0.3187204, -0.0509352237, -0.0235929582, 0.946185172]
+  m_LocalPosition: [-3.27825546e-07, 4.39060116, 5.96046448e-08]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 14997368288137014214
+---
+Transform:
+  m_InstanceID: 518411416400290128
+  m_GameObject: 11271693143417084043
+  m_LocalRotation: [-0.543467641, -0.020536758, -0.109975241, 0.831941485]
+  m_LocalPosition: [-4.32133675e-07, 4.16530418, 1.78813934e-07]
+  m_LocalScale: [0.99999994, 1, 1]
+  m_Parent: 4178541674551311146
+---
+Transform:
+  m_InstanceID: 17650624199984971511
+  m_GameObject: 10577940054770392384
+  m_LocalRotation: [-0.324303448, 0.00234129862, -0.0169481281, 0.945798397]
+  m_LocalPosition: [4.29572538e-07, 1.6886102, -4.09781933e-08]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 518411416400290128
+---
+Transform:
+  m_InstanceID: 3656212263512082601
+  m_GameObject: 3004649352316635414
+  m_LocalRotation: [7.65430741e-09, 5.39130951e-06, 1.85682438e-08, 1]
+  m_LocalPosition: [-2.41212547e-07, 0.689210057, 5.58793545e-09]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 17650624199984971511
+---
+Transform:
+  m_InstanceID: 17219514975917405953
+  m_GameObject: 11146447413073760355
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.689200044, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 3656212263512082601
+---
+Transform:
+  m_InstanceID: 10743491651301747681
+  m_GameObject: 13947263992449124733
+  m_LocalRotation: [0.128918126, -0.0306992643, 0.980269849, 0.146658257]
+  m_LocalPosition: [-0.798700094, -0.499900669, -0.0584999323]
+  m_LocalScale: [0.99999994, 0.99999994, 0.999999881]
+  m_Parent: 14920507674139518137
+---
+Transform:
+  m_InstanceID: 15427922485341284438
+  m_GameObject: 16253799733336570268
+  m_LocalRotation: [0.297886342, 0.187673256, 0.016690528, 0.935822606]
+  m_LocalPosition: [4.76837158e-07, 4.39259958, -1.78813934e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 10743491651301747681
+---
+Transform:
+  m_InstanceID: 1750886464820710015
+  m_GameObject: 16710166359861889493
+  m_LocalRotation: [-0.66813302, 0.0475337096, 0.0621882454, 0.739913106]
+  m_LocalPosition: [4.02331352e-07, 4.16019869, -1.1920929e-07]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 15427922485341284438
+---
+Transform:
+  m_InstanceID: 9482518285023699730
+  m_GameObject: 6443265968849510187
+  m_LocalRotation: [-0.312031418, -0.0216981284, -0.0112241833, 0.949757636]
+  m_LocalPosition: [2.69268639e-07, 1.68927824, 1.37835741e-07]
+  m_LocalScale: [1, 0.99999994, 0.99999994]
+  m_Parent: 1750886464820710015
+---
+Transform:
+  m_InstanceID: 7514032913579662666
+  m_GameObject: 16748561078075605885
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [1.89316779e-07, 0.69548595, 5.00585884e-09]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 9482518285023699730
+---
+Transform:
+  m_InstanceID: 1501038662779072432
+  m_GameObject: 980500892806308420
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.695499957, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 7514032913579662666
+---
+Transform:
+  m_InstanceID: 4702533742382409079
+  m_GameObject: 10255627508002970665
   m_LocalRotation: [-0, 0, -0, 1]
   m_LocalPosition: [0, 0, -0]
-  m_LocalScale: [1, 1, 1]
-  m_Parent: 8939799208844031653
+  m_LocalScale: [100, 100, 100]
+  m_Parent: 15878286127859464320
 ---
 Transform:
-  m_InstanceID: 2934858230479421446
-  m_GameObject: 15419617944820097531
+  m_InstanceID: 8158156088931705154
+  m_GameObject: 2578398970516128272
+  m_LocalRotation: [0.0358110368, 0.438636661, -0.00326034147, 0.897944808]
+  m_LocalPosition: [-0.0920717567, 9.34949875, 0.0254658479]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 4702533742382409079
+---
+Transform:
+  m_InstanceID: 16845880428908878996
+  m_GameObject: 3747298510754954182
+  m_LocalRotation: [-0.0463274643, 0.00658018049, 0.00160046935, 0.998903334]
+  m_LocalPosition: [3.7252903e-08, 0.898906767, 0.0123631433]
+  m_LocalScale: [0.99999994, 1, 0.99999994]
+  m_Parent: 8158156088931705154
+---
+Transform:
+  m_InstanceID: 16645195430541878508
+  m_GameObject: 13787386935498166141
+  m_LocalRotation: [-0.10611894, 0.0133232493, -0.000274068152, 0.994264126]
+  m_LocalPosition: [-2.98023224e-08, 1.048823, 1.86264515e-08]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 16845880428908878996
+---
+Transform:
+  m_InstanceID: 10080743853180222700
+  m_GameObject: 14106016045784365110
+  m_LocalRotation: [-0.106118955, 0.0133231552, -0.000274060643, 0.994264126]
+  m_LocalPosition: [-1.49011612e-07, 1.19865704, 6.33299351e-08]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 16645195430541878508
+---
+Transform:
+  m_InstanceID: 15821607493134050762
+  m_GameObject: 9449664149046308182
+  m_LocalRotation: [-0.042262055, 0.147758231, -0.0495013297, 0.986879468]
+  m_LocalPosition: [-3.6880374e-07, 1.34848619, 3.57627869e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 10080743853180222700
+---
+Transform:
+  m_InstanceID: 11054600362187004598
+  m_GameObject: 13892289347756460264
+  m_LocalRotation: [0.0834765881, 0.295901924, 0.0626002997, 0.949502468]
+  m_LocalPosition: [-2.98023224e-07, 0.675742388, -0.158494934]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 15821607493134050762
+---
+Transform:
+  m_InstanceID: 16317300427054602847
+  m_GameObject: 10847402363948173339
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [-4.17232513e-07, 2.45877934, -0.576704085]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 11054600362187004598
+---
+Transform:
+  m_InstanceID: 10025588638274211324
+  m_GameObject: 11732443155365143858
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 2.52550507, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 16317300427054602847
+---
+Transform:
+  m_InstanceID: 13480308435096749145
+  m_GameObject: 12881924125847270435
+  m_LocalRotation: [0.608341217, 0.389765322, 0.545583546, -0.424667597]
+  m_LocalPosition: [0.641637027, 1.20730019, -0.00128749013]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 10080743853180222700
+---
+Transform:
+  m_InstanceID: 1249223740258954993
+  m_GameObject: 13866004187985685782
+  m_LocalRotation: [-0.402459711, 0.110205866, -0.0774590373, 0.905472815]
+  m_LocalPosition: [-2.38418579e-07, 1.29759121, 2.21282244e-06]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 13480308435096749145
+---
+Transform:
+  m_InstanceID: 6215011237398440698
+  m_GameObject: 17934222734760187935
+  m_LocalRotation: [-0.0246314816, -0.00821862556, 0.504475236, 0.863035619]
+  m_LocalPosition: [4.76837158e-07, 2.34686136, -3.57627869e-07]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 1249223740258954993
+---
+Transform:
+  m_InstanceID: 1725705504761893392
+  m_GameObject: 13760414870849519064
+  m_LocalRotation: [0.172308549, -0.0155682201, 0.0451705344, 0.983883619]
+  m_LocalPosition: [5.96046448e-07, 2.70980144, -3.39746475e-06]
+  m_LocalScale: [1, 0.99999994, 0.99999994]
+  m_Parent: 6215011237398440698
+---
+Transform:
+  m_InstanceID: 11584791021721610819
+  m_GameObject: 171101737419740859
+  m_LocalRotation: [-0.22662583, -0.11278104, 0.164647415, 0.95331651]
+  m_LocalPosition: [-0.26472497, 0.320591688, -0.174294263]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 1725705504761893392
+---
+Transform:
+  m_InstanceID: 14461197439068836957
+  m_GameObject: 10812611963534021916
+  m_LocalRotation: [-0.00951664615, 0.00334411417, -0.0826234967, 0.996529818]
+  m_LocalPosition: [-0.0439463556, 0.357968271, 3.05473804e-07]
+  m_LocalScale: [0.99999994, 1, 0.99999994]
+  m_Parent: 11584791021721610819
+---
+Transform:
+  m_InstanceID: 927011373315764788
+  m_GameObject: 15011364042136812105
+  m_LocalRotation: [-0.0273694675, 7.17387195e-07, -4.91922606e-07, 0.999625444]
+  m_LocalPosition: [6.79865479e-06, 0.333023787, 5.43193892e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 14461197439068836957
+---
+Transform:
+  m_InstanceID: 15724513945159507448
+  m_GameObject: 4943141031907350527
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0.0439390838, 0.277553171, 1.11758709e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 927011373315764788
+---
+Transform:
+  m_InstanceID: 9199823078104569467
+  m_GameObject: 14933333767952568653
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.281009346, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 15724513945159507448
+---
+Transform:
+  m_InstanceID: 4897268445364476089
+  m_GameObject: 17807735025892970355
+  m_LocalRotation: [-0.257975131, -0.0150802992, 0.00733265886, 0.966006041]
+  m_LocalPosition: [-0.253475249, 0.995669246, 0.00143548846]
+  m_LocalScale: [0.99999994, 1, 1]
+  m_Parent: 1725705504761893392
+---
+Transform:
+  m_InstanceID: 15999709168970994431
+  m_GameObject: 8560957858355641158
+  m_LocalRotation: [-0.388578713, 0.00710618636, 0.0254914314, 0.921035409]
+  m_LocalPosition: [0.000379443169, 0.308961332, -1.02818012e-06]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 4897268445364476089
+---
+Transform:
+  m_InstanceID: 607339090250521475
+  m_GameObject: 13666243766921602774
+  m_LocalRotation: [-0.0629428849, 1.67971148e-08, 7.65201875e-08, 0.998017132]
+  m_LocalPosition: [0.000173553824, 0.307192087, 6.20260835e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 15999709168970994431
+---
+Transform:
+  m_InstanceID: 2080351055613041903
+  m_GameObject: 7007616687058685632
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [-0.000553745776, 0.253486603, 8.21426511e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 607339090250521475
+---
+Transform:
+  m_InstanceID: 6476707918627857089
+  m_GameObject: 617343550510922642
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.2534872, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 2080351055613041903
+---
+Transform:
+  m_InstanceID: 16535170180643866721
+  m_GameObject: 12471015510388498148
+  m_LocalRotation: [-0.479687095, 0.0630404204, -0.0802871883, 0.871481597]
+  m_LocalPosition: [0.126737773, 1.12465823, -0.00111091137]
+  m_LocalScale: [1, 1, 0.99999994]
+  m_Parent: 1725705504761893392
+---
+Transform:
+  m_InstanceID: 7284816551467925033
+  m_GameObject: 11350475268640149807
+  m_LocalRotation: [-0.511049569, -0.000120975805, 0.0404881313, 0.858597159]
+  m_LocalPosition: [0.00161844492, 0.284234911, -4.47034836e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 16535170180643866721
+---
+Transform:
+  m_InstanceID: 9997775362778957317
+  m_GameObject: 15334576955616357607
+  m_LocalRotation: [-0.0819528475, -1.4577671e-07, -5.74696521e-08, 0.996636152]
+  m_LocalPosition: [0.00135585666, 0.270095855, 3.12924385e-07]
+  m_LocalScale: [1, 0.99999994, 0.99999994]
+  m_Parent: 7284816551467925033
+---
+Transform:
+  m_InstanceID: 11225155721947003172
+  m_GameObject: 13136723454281485512
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [-0.00297415257, 0.176586077, 1.93715096e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 9997775362778957317
+---
+Transform:
+  m_InstanceID: 5476262633455634722
+  m_GameObject: 12984254753914544084
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.192816183, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 11225155721947003172
+---
+Transform:
+  m_InstanceID: 4789772573729445530
+  m_GameObject: 6403678458434277009
+  m_LocalRotation: [0.614366233, -0.396971494, -0.542610765, -0.41296652]
+  m_LocalPosition: [-0.641637802, 1.207389, 0.00517097116]
+  m_LocalScale: [0.99999994, 1, 1]
+  m_Parent: 10080743853180222700
+---
+Transform:
+  m_InstanceID: 6469007282325579135
+  m_GameObject: 5739737245675017615
+  m_LocalRotation: [-0.442276299, -0.0910532549, 0.205759943, 0.868195653]
+  m_LocalPosition: [-5.36441803e-07, 1.29759145, 3.22237611e-07]
+  m_LocalScale: [0.99999994, 0.99999994, 1]
+  m_Parent: 4789772573729445530
+---
+Transform:
+  m_InstanceID: 4510349090021817564
+  m_GameObject: 6924430295366463726
+  m_LocalRotation: [-0.0175167527, -0.00816752948, -0.5391891, 0.841962934]
+  m_LocalPosition: [5.66244125e-07, 2.34686327, -8.94069672e-08]
+  m_LocalScale: [0.99999994, 0.99999994, 1]
+  m_Parent: 6469007282325579135
+---
+Transform:
+  m_InstanceID: 14044996106115710147
+  m_GameObject: 11542481346560676839
+  m_LocalRotation: [0.161415756, 0.05063935, -0.0734834298, 0.98284328]
+  m_LocalPosition: [4.76837158e-07, 2.71044588, -1.78813934e-07]
+  m_LocalScale: [1, 1, 0.99999994]
+  m_Parent: 4510349090021817564
+---
+Transform:
+  m_InstanceID: 10167536084982144797
+  m_GameObject: 12485667437787982079
+  m_LocalRotation: [-0.295507312, 0.0364492983, -0.201631323, 0.933108568]
+  m_LocalPosition: [0.24865675, 0.304139853, -0.158315361]
+  m_LocalScale: [0.99999994, 0.99999994, 0.99999994]
+  m_Parent: 14044996106115710147
+---
+Transform:
+  m_InstanceID: 7594624108747181085
+  m_GameObject: 12215808316759261273
+  m_LocalRotation: [-0.0662011206, 0.011512164, 0.179009467, 0.981550038]
+  m_LocalPosition: [0.0292519927, 0.337575674, -1.66893005e-06]
+  m_LocalScale: [1, 1, 0.99999994]
+  m_Parent: 10167536084982144797
+---
+Transform:
+  m_InstanceID: 16822709166120884672
+  m_GameObject: 5700524169234212746
+  m_LocalRotation: [0.00341167464, 2.79398364e-07, 7.45062412e-09, 0.999994218]
+  m_LocalPosition: [-0.00510621071, 0.356472909, 9.53674316e-07]
+  m_LocalScale: [1, 0.99999994, 0.99999994]
+  m_Parent: 7594624108747181085
+---
+Transform:
+  m_InstanceID: 5363947523705140106
+  m_GameObject: 14767524866266768408
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [-0.0241451263, 0.311027706, -1.1920929e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 16822709166120884672
+---
+Transform:
+  m_InstanceID: 3423899832945683007
+  m_GameObject: 16978189433271808557
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.311964452, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 5363947523705140106
+---
+Transform:
+  m_InstanceID: 8741150628271598636
+  m_GameObject: 2102000472457673702
+  m_LocalRotation: [-0.411174238, 0.0230829325, 0.0466122665, 0.910071492]
+  m_LocalPosition: [0.264090896, 1.02459884, -0.00149452686]
+  m_LocalScale: [1, 1, 0.99999994]
+  m_Parent: 14044996106115710147
+---
+Transform:
+  m_InstanceID: 14264587340683969392
+  m_GameObject: 18134886376670416873
+  m_LocalRotation: [-0.560221851, -0.01091382, -0.027089823, 0.827827573]
+  m_LocalPosition: [-0.00200986862, 0.311828911, -3.36766243e-06]
+  m_LocalScale: [1, 1, 0.99999994]
+  m_Parent: 8741150628271598636
+---
+Transform:
+  m_InstanceID: 9944449876647824263
+  m_GameObject: 8482873082766710772
+  m_LocalRotation: [-0.0595255122, -1.0635938e-07, 5.97105227e-08, 0.998226762]
+  m_LocalPosition: [-3.43322754e-05, 0.286417603, -4.47034836e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 14264587340683969392
+---
+Transform:
+  m_InstanceID: 2519529344101337094
+  m_GameObject: 5905973568284787159
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0.0020442009, 0.252891898, -6.2584877e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 9944449876647824263
+---
+Transform:
+  m_InstanceID: 18129715966428482621
+  m_GameObject: 16740416155034558589
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.25289923, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 2519529344101337094
+---
+Transform:
+  m_InstanceID: 10345420118238009186
+  m_GameObject: 14145788432288379083
+  m_LocalRotation: [-0.501361072, -0.0342392698, -0.00808352977, 0.864522696]
+  m_LocalPosition: [-0.132045507, 1.16971195, 0.00285160542]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 14044996106115710147
+---
+Transform:
+  m_InstanceID: 2956162327763784972
+  m_GameObject: 8046684766281010104
+  m_LocalRotation: [-0.684988737, 0.00175397913, -0.0488059148, 0.726914883]
+  m_LocalPosition: [0.000318050385, 0.264045745, -1.07288361e-06]
+  m_LocalScale: [0.99999994, 1, 0.99999994]
+  m_Parent: 10345420118238009186
+---
+Transform:
+  m_InstanceID: 5817114001385769234
+  m_GameObject: 426441146373339948
+  m_LocalRotation: [0.068950586, -7.09493975e-08, 4.85443294e-08, 0.997620106]
+  m_LocalPosition: [-0.00217735767, 0.261301398, 5.36441803e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 2956162327763784972
+---
+Transform:
+  m_InstanceID: 4400948464101943712
+  m_GameObject: 11581541663437026450
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0.00185823441, 0.137610614, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 5817114001385769234
+---
+Transform:
+  m_InstanceID: 4617096966945072260
+  m_GameObject: 5072606717154045366
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.178865552, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 4400948464101943712
+---
+Transform:
+  m_InstanceID: 10199912104282590263
+  m_GameObject: 7979369553822910171
+  m_LocalRotation: [-0.0862566158, -0.181333631, 0.973404288, -0.110281847]
+  m_LocalPosition: [0.888672829, -0.499898672, -0.0130189061]
+  m_LocalScale: [0.99999994, 1, 0.99999994]
+  m_Parent: 8158156088931705154
+---
+Transform:
+  m_InstanceID: 10428705952441362814
+  m_GameObject: 9667022201865214745
+  m_LocalRotation: [0.315809488, -0.047894571, -0.0133373626, 0.947519183]
+  m_LocalPosition: [-3.12924385e-07, 4.38898849, -7.4505806e-08]
+  m_LocalScale: [0.99999994, 0.99999994, 0.99999994]
+  m_Parent: 10199912104282590263
+---
+Transform:
+  m_InstanceID: 8733728573632672667
+  m_GameObject: 73176590993674321
+  m_LocalRotation: [-0.606658757, 0.0135806277, -0.0598442443, 0.79259032]
+  m_LocalPosition: [-2.68220901e-07, 4.37422562, -5.96046448e-08]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 10428705952441362814
+---
+Transform:
+  m_InstanceID: 7403850253722766191
+  m_GameObject: 12018403489736554495
+  m_LocalRotation: [-0.261301786, 0.0183539558, -0.101505525, 0.959729731]
+  m_LocalPosition: [1.86264515e-08, 1.64858484, -4.35858965e-07]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 8733728573632672667
+---
+Transform:
+  m_InstanceID: 15652556407163865062
+  m_GameObject: 1244745726745309967
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [9.25501809e-08, 0.692129672, -9.31322575e-10]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 7403850253722766191
+---
+Transform:
+  m_InstanceID: 16218186747711350858
+  m_GameObject: 9572495552550179436
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.692121923, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 15652556407163865062
+---
+Transform:
+  m_InstanceID: 14784311154222346626
+  m_GameObject: 14433077864205244123
+  m_LocalRotation: [0.128601521, -0.0239237044, 0.980950117, 0.143618375]
+  m_LocalPosition: [-0.888673127, -0.499898553, -0.0585393608]
+  m_LocalScale: [0.99999994, 0.99999994, 0.99999994]
+  m_Parent: 8158156088931705154
+---
+Transform:
+  m_InstanceID: 5353485539797265877
+  m_GameObject: 11339778048473622207
+  m_LocalRotation: [0.296846598, 0.184704989, 0.00617313012, 0.93687135]
+  m_LocalPosition: [5.96046448e-08, 4.39232254, -3.57627869e-07]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 14784311154222346626
+---
+Transform:
+  m_InstanceID: 12351127176011047638
+  m_GameObject: 10959738280125715557
+  m_LocalRotation: [0.720964253, -0.0186639931, -0.00376295904, -0.692710698]
+  m_LocalPosition: [-1.34110451e-07, 4.36876297, -1.49011612e-07]
+  m_LocalScale: [0.99999994, 1, 0.99999994]
+  m_Parent: 5353485539797265877
+---
+Transform:
+  m_InstanceID: 5382673136814520102
+  m_GameObject: 10316303102513305546
+  m_LocalRotation: [-0.247820318, -0.0347609855, 0.0724132657, 0.965470433]
+  m_LocalPosition: [6.70552254e-08, 1.64931345, -3.94880772e-07]
+  m_LocalScale: [1, 0.99999994, 1]
+  m_Parent: 12351127176011047638
+---
+Transform:
+  m_InstanceID: 3578084130507336873
+  m_GameObject: 2720436864197128919
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [9.31322575e-09, 0.698433757, 2.23517418e-08]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 5382673136814520102
+---
+Transform:
+  m_InstanceID: 1708176323661299052
+  m_GameObject: 4169223654444696625
+  m_LocalRotation: [-0, 0, -0, 1]
+  m_LocalPosition: [0, 0.698472083, -0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 3578084130507336873
+---
+Transform:
+  m_InstanceID: 13501223878945663711
+  m_GameObject: 18034171079552656588
   m_LocalRotation: [-0, 0, -0, 1]
   m_LocalPosition: [0, 0, -0]
-  m_LocalScale: [1, 1, 1]
-  m_Parent: 8939799208844031653
+  m_LocalScale: [100, 100, 100]
+  m_Parent: 15878286127859464320
 ---
-Transform:
-  m_InstanceID: 10180719771706618211
-  m_GameObject: 12794427356523941018
-  m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [0, 0, -0]
-  m_LocalScale: [5, 5, 5]
-  m_Parent: 0
----
-Transform:
-  m_InstanceID: 17372342232184748966
-  m_GameObject: 3035183898120309762
-  m_LocalRotation: [-0, 0, -0, 1]
-  m_LocalPosition: [0, 0, -0]
-  m_LocalScale: [1, 1, 1]
-  m_Parent: 10180719771706618211
+MeshRenderable:
+  m_InstanceID: 1441688448148279842
+  m_GameObject: 18034171079552656588
+  m_bEnabled: 1
+  m_AlbedoColor: [0.800000012, 0.800000012, 0.800000012, 0]

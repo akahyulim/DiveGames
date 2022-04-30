@@ -6,9 +6,14 @@
 #include "Component/Transform.h"
 #include "Component/SpriteRenderable.h"
 #include "Component/MeshRenderable.h"
+#include "Renderer/Material.h"
+#include "Renderer/SpriteMaterial.h"
+#include "Renderer/LegacyMaterial.h"
 
 #include <yaml-cpp/yaml.h>
 
+// 결국 모든 것은 Scene으로 부터 얻는다.
+// 따라서 이 부분도 Scene에 넘기는 게 어울린다.
 template<>
 struct YAML::convert<DirectX::XMFLOAT2>
 {
@@ -119,12 +124,6 @@ namespace Dive
 		DV_ASSERT(pScene != nullptr);
 	}
 
-	// 유니티의 yaml 문서 형태처럼 GameObject, Component를 각각 구분하는 편이 나아보인다.
-	// 다만 이 경우 Compnent의 직접 생성이 가능해야 하며 개별 Object의 InstanceID를 참조하여 GameObject를 구성하며
-	// 이를 위해 Scene에서 GameObject와 Component를 따로 관리해야 한다. 즉, 복잡해진다...
-	// 그리고 ID의 제한 범위도 염두해야 한다.
-	// 하지만 유니티에선 Component를 직접 생성할 수 없다고 명시해 놓았다.
-	// 예제 코드에서 변수 생성은 c#의 특징(일종의 참조 변수)인 듯 하다.
 	void Serializer::Serialize(const std::string& dir)
 	{
 		if (!m_pScene)
@@ -179,7 +178,7 @@ namespace Dive
 			out << YAML::EndMap;
 		}
 
-		// components
+		// transform component
 		if(!m_pScene->GetComponents(eComponentType::Transform).empty())
 		{
 			auto pTransforms = m_pScene->GetComponents(eComponentType::Transform);
@@ -201,6 +200,56 @@ namespace Dive
 				out << YAML::EndMap;
 			}
 		}
+
+		// sprite renderable component
+		if (!m_pScene->GetComponents(eComponentType::SpriteRenderable).empty())
+		{
+			auto pSpriteRenderables = m_pScene->GetComponents(eComponentType::SpriteRenderable);
+
+			for (auto it = pSpriteRenderables.begin(); it != pSpriteRenderables.end(); it++)
+			{
+				auto pSpriteRenderable = dynamic_cast<SpriteRenderable*>(*it);
+				auto pMaterial = pSpriteRenderable->GetMaterial();	// 이건 virtual이 아니네... 바꿔야 하나...?
+
+				out << YAML::BeginMap;
+				out << YAML::Key << "SpriteRenderable";
+				out << YAML::BeginMap;
+				out << YAML::Key << "m_InstanceID" << YAML::Value << pSpriteRenderable->GetInstanceID();
+				out << YAML::Key << "m_GameObject" << YAML::Value << pSpriteRenderable->GetGameObject()->GetInstanceID();
+				out << YAML::Key << "m_bEnabled" << YAML::Value << (int)pSpriteRenderable->IsEnabled();
+				// 이하 Material 부분은 Material에서 저장해야 한다.
+				out << YAML::Key << "m_Sprite" << YAML::Value << "None";
+				out << YAML::Key << "m_Color" << YAML::Value << pMaterial->GetColor();
+				out << YAML::Key << "m_FlipX" << YAML::Value << (int)pMaterial->IsFlipX();
+				out << YAML::Key << "m_FlipY" << YAML::Value << (int)pMaterial->IsFlipY();
+				out << YAML::EndMap;
+				out << YAML::EndMap;
+			}
+		}
+
+		// mesh renderable component
+		if (!m_pScene->GetComponents(eComponentType::MeshRenderable).empty())
+		{
+			auto pMeshRenderables = m_pScene->GetComponents(eComponentType::MeshRenderable);
+
+			for (auto it = pMeshRenderables.begin(); it != pMeshRenderables.end(); it++)
+			{
+				auto pMeshRenderable = dynamic_cast<MeshRenderable*>(*it);
+				auto pMaterial = dynamic_cast<LegacyMaterial*>(pMeshRenderable->GetMaterial());	// 현재 Renderalbe의 virtual 함수가 아니다.
+
+				out << YAML::BeginMap;
+				out << YAML::Key << "MeshRenderable";
+				out << YAML::BeginMap;
+				out << YAML::Key << "m_InstanceID" << YAML::Value << pMeshRenderable->GetInstanceID();
+				out << YAML::Key << "m_GameObject" << YAML::Value << pMeshRenderable->GetGameObject()->GetInstanceID();
+				out << YAML::Key << "m_bEnabled" << YAML::Value << (int)pMeshRenderable->IsEnabled();
+				out << YAML::Key << "m_AlbedoColor" << YAML::Value << pMaterial->GetAlbedoColor();
+				out << YAML::EndMap;
+				out << YAML::EndMap;
+			}
+		}
+
+		// 결국 material과 같은 resource는 분리하여 저장해야 한다.
 
 		std::ofstream fout(filepath);
 		fout << out.c_str();
@@ -246,9 +295,7 @@ namespace Dive
 				auto components = gameObject["m_Component"];
 				for (auto component : components)
 				{
-					int i = 0;
-					// 다른 Component는 Buffer 등이 생성되지 않아 오류가 발생한다.
-					//for (int i = 0; i < (int)eComponentType::Count; i++)
+					for (int i = 0; i < (int)eComponentType::Count; i++)
 					{
 						if (component[std::to_string(i)])
 						{
@@ -262,11 +309,11 @@ namespace Dive
 			{
 				auto transformNode = node["Transform"];
 
-				auto instanceID = transformNode["m_InstanceID"].as<unsigned long long>();
-				auto gameObjectID = transformNode["m_GameObject"].as<unsigned long long>();
-				auto pOwner = m_pScene->GetGameObject(gameObjectID);
+				auto instanceID		= transformNode["m_InstanceID"].as<unsigned long long>();
+				auto gameObjectID	= transformNode["m_GameObject"].as<unsigned long long>();
+				auto pOwner			= m_pScene->GetGameObject(gameObjectID);
 				DV_ASSERT(pOwner->GetComponent<Transform>()->GetInstanceID() == instanceID);
-				auto pTransform = pOwner->GetComponent<Transform>();
+				auto pTransform		= pOwner->GetComponent<Transform>();
 				DV_ASSERT(pTransform->GetInstanceID() == instanceID);
 
 				pTransform->SetLocalRotation(transformNode["m_LocalRotation"].as<DirectX::XMFLOAT4>());
@@ -278,6 +325,63 @@ namespace Dive
 					auto pParent = dynamic_cast<Transform*>(m_pScene->GetComponent(eComponentType::Transform, parentID));
 					pTransform->SetParent(pParent);
 				}
+			}
+
+			// 유니티는 GameObject가 구체 id : file id 순으로 저장하고
+			// Renderer는 그냥 Renderer로 저장된다.
+			// 구체 Renderer의 데이터는 Material에서 분할되는 것 같다.
+			// 여러모로 봤을 때 Scene에서 1차 가공을 한 후 yaml에서 파일화 하는 듯 보인다.
+			// 그게 아니라면 GameObject가 Component의 file id를 알 수 없다.
+			if (node["SpriteRenderable"])
+			{
+				auto meshRenderableNode = node["SpriteRenderable"];
+
+				auto instanceID		= meshRenderableNode["m_InstanceID"].as<unsigned long long>();
+				auto gameObjectID	= meshRenderableNode["m_GameObject"].as<unsigned long long>();
+				auto pOwner			= m_pScene->GetGameObject(gameObjectID);
+				DV_ASSERT(pOwner->GetComponent<SpriteRenderable>()->GetInstanceID() == instanceID);
+				auto pSpriteRenderable = pOwner->GetComponent<SpriteRenderable>();
+				DV_ASSERT(pSpriteRenderable->GetInstanceID() == instanceID);
+
+				auto bEnabled = meshRenderableNode["m_bEnabled"].as<int>();
+
+				auto pMaterial = pSpriteRenderable->GetMaterial();
+				
+				// sprite는 이름이나 ID로 저장하여야 한다.
+				// 이 곳에서는 이를 ResourceManager로 전달하여 포인터를 얻어온 다음
+				// SetSprite()로 넣는게 맞다.
+				// 그런데 찾아보니 유니티의 경우 Material과 Mesh가 파일로 관리되는 듯 하다.
+				// yaml에는 해당 데이터를 file id, guid, type으로 저장했다.
+				// 관련문서에 의하면 file id는 yaml에서의 file id인 듯 하나 material과 mesh는 예제에는 없다.
+				// file id가 결국 yaml 상에서 인덱스를 의미한다 해도, 이를 직접 구현하기는 쉽지 않다...
+				// 생각해보니 Material이 resource라면 하나만 존재하고 다른 곳에서 참조하는 형태가 맞긴 하다.
+				auto sprite = meshRenderableNode["m_Sprite"].as<std::string>();
+				auto color = meshRenderableNode["m_Color"].as<DirectX::XMFLOAT4>();
+				auto bFlipX = meshRenderableNode["m_FlipX"].as<int>();
+				auto bFlipY = meshRenderableNode["m_FlipY"].as<int>();
+
+				pSpriteRenderable->SetEnable(bEnabled);
+				pMaterial->SetColor(color);
+				pMaterial->SetFlipX(bFlipX);
+				pMaterial->SetFlipY(bFlipY);
+			}
+
+			if (node["MeshRenderable"])
+			{
+				auto meshRenderableNode = node["MeshRenderable"];
+				
+				auto instanceID		= meshRenderableNode["m_InstanceID"].as<unsigned long long>();
+				auto gameObjectID	= meshRenderableNode["m_GameObject"].as<unsigned long long>();
+				auto pOwner			= m_pScene->GetGameObject(gameObjectID);
+				DV_ASSERT(pOwner->GetComponent<MeshRenderable>()->GetInstanceID() == instanceID);
+				auto pMeshRenderable = pOwner->GetComponent<MeshRenderable>();
+				DV_ASSERT(pMeshRenderable->GetInstanceID() == instanceID);
+
+				auto bEnabled		= meshRenderableNode["m_bEnabled"].as<int>();
+				auto albedoColor	= meshRenderableNode["m_AlbedoColor"].as<DirectX::XMFLOAT4>();
+
+
+				pMeshRenderable->SetEnable(bEnabled);
 			}
 		}
 		

@@ -192,24 +192,28 @@ void InspectorPanel::drawMeshRenderer(Dive::GameObject* pSelectedObject)
 	if (!pMeshRenderable)
 		return;
 
-	auto pMaterial = pMeshRenderable->GetMaterial();
-
 	// 현재 MeshRenderable이 아닌 Material을 보여주고 있다.
 	if (ImGui::CollapsingHeader("Mesh Renderable", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 	{
+		// 현재 이게 없을 수도 있다. 그러한 경우 아래와 같이 임의 처리를 해놓았다.
+		// 그런데 추후 이게 없으면 안될 수 있다.
+		// => Default Material을 무조건 주는 것이 맞을 것 같다.
+		auto pMaterial = pMeshRenderable->GetMaterial();
+
 		// enabled
 		bool enabled = pMeshRenderable->IsEnabled();
 		ImGui::Checkbox("Enabled", &enabled);
 		pMeshRenderable->SetEnable(enabled);
 
 		// Color
-		DirectX::XMFLOAT4 color = pMaterial->GetAlbedoColor();
+		DirectX::XMFLOAT4 color = pMaterial != nullptr ? pMaterial->GetAlbedoColor() : DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		float col[4] = { color.x, color.y, color.z, color.w };
 		ImGui::Text("Albedo Color");
 		ImGui::SameLine();
 		ImGui::ColorEdit4("##background", col);
 		color = DirectX::XMFLOAT4(col[0], col[1], col[2], col[3]);
-		pMaterial->SetAlbedoColor(color);
+		if(pMaterial)
+			pMaterial->SetAlbedoColor(color);
 	}
 
 	ImGui::Separator();
