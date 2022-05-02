@@ -41,6 +41,16 @@ namespace Dive
 			return filename.substr(0, index);
 		}
 
+		std::string FileSystem::GetFileExtension(const std::string& filepath)
+		{
+			auto index = filepath.find_last_of('.');
+
+			if (index == std::string::npos)
+				return "";
+
+			return filepath.substr(index + 1, filepath.size());
+		}
+
 		// 좀 애매하다.
 		std::wstring FileSystem::StringToWString(const std::string& str)
 		{

@@ -6,10 +6,12 @@
 #include "Graphics/IndexBuffer.h"
 #include "Scene/GameObject.h"
 #include "Base/Base.h"
+#include "Helper/FileSystem.h"
 
 namespace Dive
 {
-    Model::Model()
+    Model::Model(const std::string& name, unsigned long long id)
+        : Resource(name, id)
     {
     }
 
@@ -49,6 +51,40 @@ namespace Dive
     void Model::GetGeometry(unsigned int vertexOffset, unsigned int vertexCount, std::vector<VertexType>* pOutVertices, unsigned int indexOffset, unsigned int indexCount, std::vector<unsigned int>* pOutIndices)
     {
         m_Mesh.GetGeometry(vertexOffset, vertexCount, pOutVertices, indexOffset, indexCount, pOutIndices);
+    }
+
+    bool Model::LoadFromFile(const std::string& filepath)
+    {
+        if (!std::filesystem::exists(filepath))
+        {
+            DV_CORE_ERROR("파일이 존재하지 않습니다 - {:s}", filepath);
+            return false;
+        }
+
+        // 확장자 확인
+        {
+            // file stream 필요
+
+            auto name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
+
+            if (m_Name.empty())
+                SetName(name);
+            if (m_Filepath.empty())
+                SetFilepath(filepath);
+
+            // normalize scale
+            // vertices
+            // indices
+
+            UpdateGeometry();
+        }
+
+        return true;
+    }
+
+    bool Model::SaveToFile(const std::string& filepath)
+    {
+        return false;
     }
 
     bool Model::createBuffers()

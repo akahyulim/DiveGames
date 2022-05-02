@@ -20,6 +20,8 @@
 #include "Events/EngineEvents.h"
 
 //= Resource ======================
+#include "Resource/Resource.h"
+#include "Resource/ResourceManager.h"
 
 //= Renderer ======================
 #include "Renderer/Graphics/GraphicsDevice.h"
@@ -57,3 +59,4 @@
 
 //= Helper ========================
 #include "Helper/FileSystem.h"
+#include "Helper/FileStream.h"

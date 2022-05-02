@@ -112,6 +112,15 @@
     <ClInclude Include="Src\Scene\Serializer.h">
       <Filter>Src\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Resource\Resource.h">
+      <Filter>Src\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Resource\ResourceManager.h">
+      <Filter>Src\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\FileStream.h">
+      <Filter>Src\Helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -206,6 +215,15 @@
     </ClCompile>
     <ClCompile Include="Src\Scene\Serializer.cpp">
       <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Resource\Resource.cpp">
+      <Filter>Src\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Resource\ResourceManager.cpp">
+      <Filter>Src\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Helper\FileStream.cpp">
+      <Filter>Src\Helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

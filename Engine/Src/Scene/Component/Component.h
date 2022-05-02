@@ -21,7 +21,7 @@ namespace Dive
 
 #define COMPONENT_CLASS_TYPE(type)	static eComponentType GetStaticType() { return eComponentType::type; } \
 									virtual eComponentType GetType() const override { return GetStaticType(); } \
-									virtual const char* GetName() const override { return #type; }
+									virtual const char* GetTypeStr() const override { return #type; }
 
 	class Component : public Object
 	{
@@ -35,8 +35,7 @@ namespace Dive
 		GameObject* GetGameObject() { return m_pGameObject; }
 
 		virtual eComponentType GetType() const = 0;
-		virtual const char* GetName() const = 0;
-		virtual std::string GetStr() const { return GetName(); }
+		virtual const char* GetTypeStr() const = 0;
 
 	protected:
 		GameObject* m_pGameObject	= nullptr;

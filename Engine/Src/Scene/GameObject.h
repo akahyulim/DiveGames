@@ -23,9 +23,8 @@ namespace Dive
 			if (HasComponent<T>())
 				return GetComponent<T>();
 
-			T* pAddedComponent = new T(this, id);
-			m_Components.emplace_back(static_cast<Component*>(pAddedComponent));
-		
+			T* pAddedComponent = dynamic_cast<T*>(m_Components.emplace_back(new T(this, id)));
+
 			FIRE_EVENT(GameObjectModifyEvent(static_cast<Component*>(pAddedComponent)));
 
 			return pAddedComponent;

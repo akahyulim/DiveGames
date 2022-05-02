@@ -12,6 +12,7 @@ namespace Dive
 			static std::string GetFilepathWithoutExtension(const std::string& filepath);
 			static std::string GetFileName(const std::string& filepath);
 			static std::string GetFileNameWithoutExtension(const std::string& filepath);
+			static std::string GetFileExtension(const std::string& filepath);
 
 			static std::wstring StringToWString(const std::string& str);
 		};

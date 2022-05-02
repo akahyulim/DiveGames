@@ -1,5 +1,6 @@
 #pragma once
 #include "Mesh.h"
+#include "Resource/Resource.h"
 
 namespace Dive
 {
@@ -8,11 +9,12 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
 
-	// 현재 이름을 설정하지 않고 있다.
-	class Model
+	class Model : public Resource
 	{
 	public:
-		Model();
+		RESOURCE_CLASS_TYPE(Model)
+
+		Model(const std::string& name = "", unsigned long long id = 0);
 		~Model();
 
 		void Clear();
@@ -30,14 +32,16 @@ namespace Dive
 
 		void SetRootGameObject(GameObject* pGameObject) { m_pRootGameObject = pGameObject; }
 
-		std::string GetName() const { return m_Name; }
+		bool LoadFromFile(const std::string& filepath) override;
+		bool SaveToFile(const std::string& filepath) override;
+
+
+
 
 	private:
 		bool createBuffers();
 
 	private:
-		std::string m_Name = "Unknown";
-
 		GameObject* m_pRootGameObject = nullptr;
 		
 		Mesh m_Mesh;
