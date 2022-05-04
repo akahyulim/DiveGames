@@ -20,6 +20,7 @@
 #include "Events/EngineEvents.h"
 
 //= Resource ======================
+#include "Resource/FileStream.h"
 #include "Resource/Resource.h"
 #include "Resource/ResourceManager.h"
 
@@ -59,4 +60,3 @@
 
 //= Helper ========================
 #include "Helper/FileSystem.h"
-#include "Helper/FileStream.h"

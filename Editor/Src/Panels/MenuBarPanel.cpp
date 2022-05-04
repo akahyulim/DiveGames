@@ -168,8 +168,17 @@ void MenuBarPanel::menuGameObject()
 			{
 				if (m_pActiveScene)
 				{
+					// 유니티의 경우 GameObject.CreatePrimitive(PrimitiveTypeCube)로 생성한다.
 					auto pModel = new Dive::Model();
 					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/Cube.obj");
+
+					//pModel->SaveToFile("Assets/Models/Cube.model");
+
+					/*
+					* 유니티 기준으로 Prefab을 이용할 것이다.
+					* 따라서 Model뿐만 아니라 GameObject 또한 함께 구성된 객체가 필요하다.
+					* 그런데 그걸 다시 Scene과 .dat로 어떻게 구분하여 저장할 것인지 연구가 필요하다.
+					*/
 				}
 			}
 

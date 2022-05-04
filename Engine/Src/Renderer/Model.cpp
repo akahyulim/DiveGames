@@ -7,6 +7,7 @@
 #include "Scene/GameObject.h"
 #include "Base/Base.h"
 #include "Helper/FileSystem.h"
+#include "Resource/FileStream.h"
 
 namespace Dive
 {
@@ -53,6 +54,21 @@ namespace Dive
         m_Mesh.GetGeometry(vertexOffset, vertexCount, pOutVertices, indexOffset, indexCount, pOutIndices);
     }
 
+    bool Model::SaveToFile(const std::string& filepath)
+    {
+        auto fileStream = FileStream(filepath, eFileStreamMode::Write);
+        if (!fileStream.IsOpen())
+            return false;
+
+        fileStream.Write(m_NormalizedScale);
+        fileStream.Write(m_Mesh.GetVertices());
+        fileStream.Write(m_Mesh.GetIndices());
+
+        fileStream.Close();
+
+        return true;
+    }
+
     bool Model::LoadFromFile(const std::string& filepath)
     {
         if (!std::filesystem::exists(filepath))
@@ -61,30 +77,27 @@ namespace Dive
             return false;
         }
 
-        // 확장자 확인
+        if (Helper::FileSystem::GetFileExtension(filepath) != EXTENSION_MODEL)
         {
-            // file stream 필요
-
-            auto name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
-
-            if (m_Name.empty())
-                SetName(name);
-            if (m_Filepath.empty())
-                SetFilepath(filepath);
-
-            // normalize scale
-            // vertices
-            // indices
-
-            UpdateGeometry();
+            DV_CORE_ERROR("잘못된 확장자를 가진 파일입니다.");
+            return false;
         }
 
-        return true;
-    }
+        auto fileStream = FileStream(filepath, eFileStreamMode::Read);
+        if (!fileStream.IsOpen())
+            return false;
 
-    bool Model::SaveToFile(const std::string& filepath)
-    {
-        return false;
+        fileStream.Read(&m_NormalizedScale);
+        fileStream.Read(&m_Mesh.GetVertices());
+        fileStream.Read(&m_Mesh.GetIndices());
+
+        fileStream.Close();
+
+        UpdateGeometry();
+
+        SetName(Helper::FileSystem::GetFileNameWithoutExtension(filepath));
+
+        return true;
     }
 
     bool Model::createBuffers()

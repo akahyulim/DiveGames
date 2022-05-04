@@ -118,8 +118,8 @@
     <ClInclude Include="Src\Resource\ResourceManager.h">
       <Filter>Src\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Helper\FileStream.h">
-      <Filter>Src\Helper</Filter>
+    <ClInclude Include="Src\Resource\FileStream.h">
+      <Filter>Src\Resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -222,8 +222,8 @@
     <ClCompile Include="Src\Resource\ResourceManager.cpp">
       <Filter>Src\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Helper\FileStream.cpp">
-      <Filter>Src\Helper</Filter>
+    <ClCompile Include="Src\Resource\FileStream.cpp">
+      <Filter>Src\Resource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

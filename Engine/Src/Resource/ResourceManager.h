@@ -80,7 +80,9 @@ namespace Dive
 
 		unsigned int GetResourceCount() const { return static_cast<unsigned int>(m_Resources.size()); }
 
-	private:
+		bool SaveToDataFile();
+		bool LoadFromDataFile();
+
 	private:
 		std::vector<Resource*> m_Resources;
 	};

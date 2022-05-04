@@ -180,7 +180,6 @@
     <ClInclude Include="Src\Base\Time.h" />
     <ClInclude Include="Src\Events\EngineEvents.h" />
     <ClInclude Include="Src\Events\EventSystem.h" />
-    <ClInclude Include="Src\Helper\FileStream.h" />
     <ClInclude Include="Src\Helper\FileSystem.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\Math\Math.h" />
@@ -199,6 +198,7 @@
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\RenderPath.h" />
     <ClInclude Include="Src\Renderer\SpriteMaterial.h" />
+    <ClInclude Include="Src\Resource\FileStream.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceManager.h" />
     <ClInclude Include="Src\Scene\Component\Camera.h" />
@@ -220,7 +220,6 @@
     <ClCompile Include="Src\Base\Engine.cpp" />
     <ClCompile Include="Src\Base\Log.cpp" />
     <ClCompile Include="Src\Base\Time.cpp" />
-    <ClCompile Include="Src\Helper\FileStream.cpp" />
     <ClCompile Include="Src\Helper\FileSystem.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
@@ -238,6 +237,7 @@
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\RenderPath.cpp" />
     <ClCompile Include="Src\Renderer\SpriteMaterial.cpp" />
+    <ClCompile Include="Src\Resource\FileStream.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="Src\Scene\Component\Camera.cpp" />

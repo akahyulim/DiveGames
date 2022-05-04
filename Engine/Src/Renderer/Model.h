@@ -32,11 +32,8 @@ namespace Dive
 
 		void SetRootGameObject(GameObject* pGameObject) { m_pRootGameObject = pGameObject; }
 
-		bool LoadFromFile(const std::string& filepath) override;
 		bool SaveToFile(const std::string& filepath) override;
-
-
-
+		bool LoadFromFile(const std::string& filepath) override;
 
 	private:
 		bool createBuffers();
@@ -48,5 +45,9 @@ namespace Dive
 
 		VertexBuffer* m_pVertexBuffer = nullptr;
 		IndexBuffer* m_pIndexBuffer = nullptr;
+
+		// 일단 저장만 한다. root의 transform scale에 곱하면 될 것 같은데
+		// aabb를 이용해 직접 계산하는 부분이 있어 이해가 필요하다.
+		float m_NormalizedScale = 1.0f;
 	};
 }

@@ -16,8 +16,8 @@ namespace Dive
 
 		if (m_Flags & eFileStreamMode::Write)
 		{
-			m_fOut.open(filepath, iosFlags);
-			if(m_fOut.fail())
+			m_Out.open(filepath, iosFlags);
+			if(m_Out.fail())
 			{
 				DV_CORE_ERROR("파일을 쓰기모드로 여는데 실패하였습니다 - {:s}", filepath);
 				return;
@@ -25,8 +25,8 @@ namespace Dive
 		}
 		else if (m_Flags & eFileStreamMode::Read)
 		{
-			m_fIn.open(filepath, iosFlags);
-			if (m_fIn.fail())
+			m_In.open(filepath, iosFlags);
+			if (m_In.fail())
 			{
 				DV_CORE_ERROR("파일을 읽기모드로 여는데 실패하였습니다 - {:s}", filepath);
 				return;
@@ -45,13 +45,25 @@ namespace Dive
 	{
 		if (m_Flags & eFileStreamMode::Write)
 		{
-			m_fOut.flush();
-			m_fOut.close();
+			m_Out.flush();
+			m_Out.close();
 		}
 		else if (m_Flags & eFileStreamMode::Read)
 		{
-			m_fIn.clear();
-			m_fIn.close();
+			m_In.clear();
+			m_In.close();
+		}
+	}
+
+	void FileStream::Skip(uint64_t n)
+	{
+		if (m_Flags & eFileStreamMode::Write)
+		{
+			m_Out.seekp(n, std::ios::cur);
+		}
+		else if (m_Flags & eFileStreamMode::Read)
+		{
+			m_In.ignore(n, std::ios::cur);
 		}
 	}
 	
@@ -60,7 +72,7 @@ namespace Dive
 		auto length = static_cast<uint32_t>(value.size());
 		Write(length);
 
-		m_fOut.write(const_cast<char*>(value.c_str()), length);
+		m_Out.write(value.c_str(), length);
 	}
 
 	void FileStream::Write(const std::vector<std::string>& value)
@@ -76,10 +88,10 @@ namespace Dive
 
 	void FileStream::Write(const std::vector<uint32_t>& value)
 	{
-		auto length = static_cast<uint32_t>(value.size());
-		Write(length);
+		auto size = static_cast<uint32_t>(value.size());
+		Write(size);
 
-		m_fOut.write(reinterpret_cast<const char*>(&value[0]), sizeof(uint32_t) * length);
+		m_Out.write(reinterpret_cast<const char*>(&value[0]), sizeof(uint32_t) * size);
 	}
 
 	void FileStream::Write(const std::vector<unsigned char>& value)
@@ -87,28 +99,23 @@ namespace Dive
 		auto size = static_cast<uint32_t>(value.size());
 		Write(size);
 
-		m_fOut.write(reinterpret_cast<const char*>(&value[0]), sizeof(unsigned char) * size);
+		m_Out.write(reinterpret_cast<const char*>(&value[0]), sizeof(unsigned char) * size);
 	}
 
 	void FileStream::Write(const std::vector<std::byte>& value)
 	{
-
 		auto size = static_cast<uint32_t>(value.size());
 		Write(size);
 
-		m_fOut.write(reinterpret_cast<const char*>(&value[0]), sizeof(std::byte) * size);
+		m_Out.write(reinterpret_cast<const char*>(&value[0]), sizeof(std::byte) * size);
 	}
 
-	void FileStream::Skip(uint64_t n)
+	void FileStream::Write(const std::vector<VertexType>& value)
 	{
-		if (m_Flags & eFileStreamMode::Write)
-		{
-			m_fOut.seekp(n, std::ios::cur);
-		}
-		else if (m_Flags & eFileStreamMode::Read)
-		{
-			m_fIn.ignore(n, std::ios::cur);
-		}
+		auto size = static_cast<uint32_t>(value.size());
+		Write(size);
+
+		m_Out.write(reinterpret_cast<const char*>(&value[0]), sizeof(VertexType) * size);
 	}
 
 	void FileStream::Read(std::string* pValue)
@@ -116,12 +123,12 @@ namespace Dive
 		if (pValue == nullptr)
 			return;
 
-		uint32_t length = 0;
-		Read(&length);
-
+		// 길이
+		auto length = ReadAs<uint32_t>();
 		pValue->resize(length);
 		
-		m_fIn.read(const_cast<char*>(pValue->c_str()), length);
+		// 길이만큼 읽기
+		m_In.read(const_cast<char*>(pValue->c_str()), length);
 	}
 	
 	void FileStream::Read(std::vector<std::string>* pValue)
@@ -129,12 +136,10 @@ namespace Dive
 		if (pValue == nullptr)
 			return;
 
-		pValue->clear();
-		pValue->shrink_to_fit();
+		// vector size
+		auto size = ReadAs<uint32_t>();
 
-		uint32_t size = 0;
-		Read(&size);
-
+		// 요소마다 std::string 만큼 읽기
 		std::string str;
 		for (uint32_t i = 0; i <= size; i++)
 		{
@@ -148,17 +153,10 @@ namespace Dive
 		if (pValue == nullptr)
 			return;
 
-		pValue->clear();
-		pValue->shrink_to_fit();
+		auto size = ReadAs<uint32_t>();
+		pValue->resize(size);
 
-		// 얘부터는 왜 이렇게 하냐...?!
-		auto length = ReadAs<uint32_t>();
-
-		// 공간 확보 및 초기화...? 일단 이것들부터 확실히 하자.
-		pValue->reserve(length);
-		pValue->resize(length);
-
-		m_fIn.read(reinterpret_cast<char*>(pValue->data()), sizeof(uint32_t) * length);
+		m_In.read(reinterpret_cast<char*>(pValue->data()), sizeof(uint32_t) * size);
 	}
 
 	void FileStream::Read(std::vector<unsigned char>* pValue)
@@ -166,8 +164,10 @@ namespace Dive
 		if (pValue == nullptr)
 			return;
 
-		pValue->clear();
-		pValue->shrink_to_fit();
+		auto size = ReadAs<uint32_t>();
+		pValue->resize(size);
+
+		m_In.read(reinterpret_cast<char*>(pValue->data()), sizeof(unsigned char) * size);
 	}
 	
 	void FileStream::Read(std::vector<std::byte>* pValue)
@@ -175,7 +175,20 @@ namespace Dive
 		if (pValue == nullptr)
 			return;
 
-		pValue->clear();
-		pValue->shrink_to_fit();
+		auto size = ReadAs<uint32_t>();
+		pValue->resize(size);
+
+		m_In.read(reinterpret_cast<char*>(pValue->data()), sizeof(std::byte) * size);
+	}
+
+	void FileStream::Read(std::vector<VertexType>* pValue)
+	{
+		if (pValue == nullptr)
+			return;
+
+		auto size = ReadAs<uint32_t>();
+		pValue->reserve(size);
+
+		m_In.read(reinterpret_cast<char*>(pValue->data()), sizeof(VertexType) * size);
 	}
 }

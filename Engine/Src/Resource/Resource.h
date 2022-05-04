@@ -3,6 +3,9 @@
 
 namespace Dive
 {
+	static const char* EXTENSION_MODEL		= "model";
+	static const char* EXTENSION_TEXTURE	= "texture";
+
 	enum class eResourceType
 	{
 		Unknown = 0,
@@ -21,8 +24,8 @@ namespace Dive
 		Resource(const std::string& name = "", unsigned long long id = 0);
 		virtual ~Resource() = default;
 
+		virtual bool SaveToFile(const std::string& filepath) { return true; }
 		virtual bool LoadFromFile(const std::string& filepath)	{ return true; }
-		virtual bool SaveToFile(const std::string& filepath)	{ return true; }
 
 		virtual eResourceType GetType()		const = 0;
 		virtual const char* GetTypeStr()	const = 0;
