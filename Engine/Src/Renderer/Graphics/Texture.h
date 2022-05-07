@@ -1,11 +1,15 @@
 #pragma once
+#include "Resource/Resource.h"
 
 namespace Dive
 {
 	// texture interface
-	class Texture
+	class Texture : public Resource
 	{
 	public:
+		RESOURCE_CLASS_TYPE(Texture)
+
+		Texture(const std::string& name = "", unsigned long long id = 0);
 		virtual ~Texture() = default;
 
 		virtual unsigned int GetWidth() const = 0;
@@ -18,13 +22,12 @@ namespace Dive
 	class Texture2D : public Texture
 	{
 	public:
-		Texture2D() = default;
+		RESOURCE_CLASS_TYPE(Texture2D)
+
+		Texture2D(const std::string& name = "", unsigned long long id = 0);
 		~Texture2D();
 
-		// 일단은 넘어가지만
-		// 여기도 ShaderResourceView가 추가될 수 있다.
-		bool LoadEngineFile(const std::string& path);
-		bool LoadForeignFile(const std::string& path);
+		bool LoadFromFile(const std::string& filepath);
 
 		bool CreateTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned bindFlags);
 		bool CreateShaderResourceView(DXGI_FORMAT format);
@@ -41,11 +44,6 @@ namespace Dive
 
 		bool operator==(const Texture& other) override;
 
-		std::string GetName() const { return m_Name; }
-		void SetName(const std::string& name) { m_Name = name; }
-
-		std::string GetPath() const { return m_Path; }
-
 		unsigned int GetWidth() const override { return m_Width; }
 		unsigned int GetHeight() const override { return m_Height; }
 
@@ -57,8 +55,6 @@ namespace Dive
 		static Texture2D* Create(const std::string& path, const std::string& name = "");
 
 	private:
-		std::string m_Name;
-		std::string m_Path;
 		unsigned int m_Width	= 0;
 		unsigned int m_Height	= 0;
 		DXGI_FORMAT m_Format	= DXGI_FORMAT_UNKNOWN;

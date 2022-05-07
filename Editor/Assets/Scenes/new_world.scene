@@ -1,0 +1,127 @@
+Scene:
+  m_Name: new_world
+---
+GameObject:
+  m_InstanceID: 14692826134373714708
+  m_Name: GameObject
+  m_bActive: 1
+  m_Component:
+    - 0: 2570133660680120879
+    - 2: 14079727701230173399
+---
+GameObject:
+  m_InstanceID: 8320481106998942918
+  m_Name: GameObject
+  m_bActive: 1
+  m_Component:
+    - 0: 10131366612259978724
+    - 2: 793876398941399556
+---
+GameObject:
+  m_InstanceID: 13983900203479488752
+  m_Name: GameObject
+  m_bActive: 1
+  m_Component:
+    - 0: 17396062666240798309
+    - 2: 17063910354710207356
+---
+GameObject:
+  m_InstanceID: 8909030654514492558
+  m_Name: GameObject
+  m_bActive: 1
+  m_Component:
+    - 0: 1439837346254961063
+    - 2: 15765027189733183797
+---
+GameObject:
+  m_InstanceID: 11718091012828572782
+  m_Name: GameObject
+  m_bActive: 1
+  m_Component:
+    - 0: 4840272615081149016
+    - 2: 13492969954843749613
+---
+Transform:
+  m_InstanceID: 2570133660680120879
+  m_GameObject: 14692826134373714708
+  m_LocalRotation: [0, 0, 0, 1]
+  m_LocalPosition: [600.5, 309.5, 800]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 0
+---
+Transform:
+  m_InstanceID: 10131366612259978724
+  m_GameObject: 8320481106998942918
+  m_LocalRotation: [0, 0, 0, 1]
+  m_LocalPosition: [0, 0, 900]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 0
+---
+Transform:
+  m_InstanceID: 17396062666240798309
+  m_GameObject: 13983900203479488752
+  m_LocalRotation: [0, 0, 0, 1]
+  m_LocalPosition: [492, -232, 800]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 0
+---
+Transform:
+  m_InstanceID: 1439837346254961063
+  m_GameObject: 8909030654514492558
+  m_LocalRotation: [0, 0, 0, 1]
+  m_LocalPosition: [-505, 237.5, 800]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 0
+---
+Transform:
+  m_InstanceID: 4840272615081149016
+  m_GameObject: 11718091012828572782
+  m_LocalRotation: [0, 0, 0, 1]
+  m_LocalPosition: [-423, -165.5, 750]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 0
+---
+SpriteRenderable:
+  m_InstanceID: 14079727701230173399
+  m_GameObject: 14692826134373714708
+  m_bEnabled: 1
+  m_Sprite: ChoA
+  m_Color: [0.959578216, 0.964601755, 0.396937907, 1]
+  m_FlipX: 1
+  m_FlipY: 0
+---
+SpriteRenderable:
+  m_InstanceID: 793876398941399556
+  m_GameObject: 8320481106998942918
+  m_bEnabled: 1
+  m_Sprite: DokeV
+  m_Color: [1, 1, 1, 1]
+  m_FlipX: 0
+  m_FlipY: 0
+---
+SpriteRenderable:
+  m_InstanceID: 17063910354710207356
+  m_GameObject: 13983900203479488752
+  m_bEnabled: 1
+  m_Sprite: IU
+  m_Color: [0.53755188, 0.859376669, 0.920354009, 1]
+  m_FlipX: 1
+  m_FlipY: 0
+---
+SpriteRenderable:
+  m_InstanceID: 15765027189733183797
+  m_GameObject: 8909030654514492558
+  m_bEnabled: 1
+  m_Sprite: Baseplate Grid
+  m_Color: [1, 1, 1, 1]
+  m_FlipX: 0
+  m_FlipY: 0
+---
+SpriteRenderable:
+  m_InstanceID: 13492969954843749613
+  m_GameObject: 11718091012828572782
+  m_bEnabled: 1
+  m_Sprite: dmc
+  m_Color: [1, 1, 1, 1]
+  m_FlipX: 0
+  m_FlipY: 0

@@ -8,8 +8,8 @@ namespace Dive
 
 	enum class eResourceType
 	{
-		Unknown = 0,
 		Texture,
+		Texture2D,
 		Model,
 		Count
 	};
@@ -24,7 +24,7 @@ namespace Dive
 		Resource(const std::string& name = "", unsigned long long id = 0);
 		virtual ~Resource() = default;
 
-		virtual bool SaveToFile(const std::string& filepath) { return true; }
+		//virtual bool SaveToFile(const std::string& filepath) { return true; }
 		virtual bool LoadFromFile(const std::string& filepath)	{ return true; }
 
 		virtual eResourceType GetType()		const = 0;
@@ -34,7 +34,6 @@ namespace Dive
 		void SetFilepath(const std::string& filepath) { m_Filepath = filepath; }
 		
 	protected:
-		eResourceType m_Type = eResourceType::Unknown;
 		std::string m_Filepath;
 	};
 }

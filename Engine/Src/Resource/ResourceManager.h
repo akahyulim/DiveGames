@@ -2,6 +2,7 @@
 #include "Base/Base.h"
 #include "Resource.h"
 #include "Helper/FileSystem.h"
+#include "Renderer/Graphics/Texture.h"
 
 namespace Dive
 {

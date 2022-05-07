@@ -22,8 +22,5 @@ private:
 	void menuHelp();
 
 private:
-	// test asset
-	Dive::Texture2D* m_pIU = nullptr;
-	Dive::Texture2D* m_pChoA = nullptr;
 
 };

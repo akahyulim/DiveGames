@@ -9,6 +9,7 @@
 #include "Renderer/Material.h"
 #include "Renderer/SpriteMaterial.h"
 #include "Renderer/LegacyMaterial.h"
+#include "Resource/ResourceManager.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -124,6 +125,10 @@ namespace Dive
 		DV_ASSERT(pScene != nullptr);
 	}
 
+	// 굳이 현재와 같은 형태를 가질 필요는 없다.
+	// Root GameObject에서 재귀적으로 자식을 직렬화 한다면
+	// 계층구조를 유지하면서 Scene이 Component를 관리하지 않아도 된다.
+	// => 배열 구조 구현이 어렵다.
 	void Serializer::Serialize(const std::string& dir)
 	{
 		if (!m_pScene)
@@ -218,7 +223,7 @@ namespace Dive
 				out << YAML::Key << "m_GameObject" << YAML::Value << pSpriteRenderable->GetGameObject()->GetInstanceID();
 				out << YAML::Key << "m_bEnabled" << YAML::Value << (int)pSpriteRenderable->IsEnabled();
 				// 이하 Material 부분은 Material에서 저장해야 한다.
-				out << YAML::Key << "m_Sprite" << YAML::Value << "None";
+				out << YAML::Key << "m_Sprite" << YAML::Value << pMaterial->GetSprite()->GetName();
 				out << YAML::Key << "m_Color" << YAML::Value << pMaterial->GetColor();
 				out << YAML::Key << "m_FlipX" << YAML::Value << (int)pMaterial->IsFlipX();
 				out << YAML::Key << "m_FlipY" << YAML::Value << (int)pMaterial->IsFlipY();
@@ -361,9 +366,13 @@ namespace Dive
 				auto bFlipY = meshRenderableNode["m_FlipY"].as<int>();
 
 				pSpriteRenderable->SetEnable(bEnabled);
+				// 이렇게 하면 버퍼 생성을 건너띈다.
+				//pMaterial->SetSprite(ResourceManager::GetInstance().GetResource<Texture2D>(sprite));
+				pSpriteRenderable->SetSprite(ResourceManager::GetInstance().GetResource<Texture2D>(sprite));
 				pMaterial->SetColor(color);
 				pMaterial->SetFlipX(bFlipX);
 				pMaterial->SetFlipY(bFlipY);
+
 			}
 
 			if (node["MeshRenderable"])

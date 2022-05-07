@@ -11,6 +11,16 @@ namespace Dive
 {
 	class Scene;
 
+	enum class ePrimitiveType
+	{
+		Sphere,
+		Capsule,
+		Cylinder,
+		Cube,
+		Plane,
+		Quad
+	};
+
 	class GameObject : public Object
 	{
 	public:
@@ -140,6 +150,12 @@ namespace Dive
 
 		bool IsRemoveTarget() const { return m_bRemoveTarget; }
 		void MarkRemoveTarget() { m_bRemoveTarget = true; }
+
+		Scene* GetScene() { return m_pScene; }
+		void SetScene(Scene* pScene) { m_pScene = pScene; }
+
+		static GameObject* CreatePrimitive(Scene* pScene, ePrimitiveType type);
+
 
 	private:
 	private:

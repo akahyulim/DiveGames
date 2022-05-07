@@ -3,19 +3,31 @@
 #include "Base/Base.h"
 #include "Dive.h"
 #include "Helper/FileSystem.h"
+#include "Resource/ResourceManager.h"
 
 namespace Dive
 {
+	Texture::Texture(const std::string& name, unsigned long long id)
+		: Resource(name, id)
+	{
+	}
+
+	Texture2D::Texture2D(const std::string& name, unsigned long long id)
+		: Texture(name, id)
+	{
+	}
+
 	Texture2D::~Texture2D()
 	{
 		Shutdown();
 	}
 
-	bool Texture2D::LoadForeignFile(const std::string& path)
+	// 직접 하지 말고, DirectX Texture 부분을 Importer로 뽑아보자.
+	bool Texture2D::LoadFromFile(const std::string& filepath)
 	{
 		DirectX::ScratchImage img;
 
-		std::wstring tempPath(path.begin(), path.end());
+		std::wstring tempPath(filepath.begin(), filepath.end());
 		WCHAR ext[_MAX_EXT];
 		_wsplitpath_s(tempPath.c_str(), nullptr, 0, nullptr, 0, nullptr, 0, ext, _MAX_EXT);
 
@@ -35,7 +47,7 @@ namespace Dive
 
 		if (FAILED(hResult))
 		{
-			DV_CORE_WARN("{:s} 로드에 실패하였습니다.", m_Path);
+			DV_CORE_WARN("{:s} 로드에 실패하였습니다.", filepath);
 			return false;
 		}
 
@@ -49,11 +61,12 @@ namespace Dive
 		}
 
 		const auto& metaData = img.GetMetadata();
-		m_Format	= metaData.format;
-		m_Width		= static_cast<unsigned int>(metaData.width);
-		m_Height	= static_cast<unsigned int>(metaData.height);
-		m_Path		= path;
-		m_Name		= Helper::FileSystem::GetFileNameWithoutExtension(path);
+		m_Format = metaData.format;
+		m_Width = static_cast<unsigned int>(metaData.width);
+		m_Height = static_cast<unsigned int>(metaData.height);
+		
+		SetFilepath(filepath);
+		m_Name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
 
 		return true;
 	}
@@ -174,7 +187,7 @@ namespace Dive
 
 	Texture2D* Texture2D::Create(unsigned int width, unsigned int height, DXGI_FORMAT format, bool srv, const std::string& name)
 	{
-		auto pTex = new Texture2D();
+		auto pTex = new Texture2D(name);
 		DV_ASSERT(pTex);
 
 		unsigned int bindFlags = D3D11_BIND_RENDER_TARGET;
@@ -244,21 +257,12 @@ namespace Dive
 
 	Texture2D* Texture2D::Create(const std::string& path, const std::string& name)
 	{
-		auto pTex = new Texture2D();
-		DV_ASSERT(pTex);
-
-		// path에서 확장자를 읽어 Engine, foreign 생성 함수를 구분하여 호출한다.
-		if (!pTex->LoadForeignFile(path))
-		{
-			DV_DELETE(pTex);
-			return nullptr;
-		}
-
+		auto pTexture = ResourceManager::GetInstance().Load<Texture2D>(path);
 		if (!name.empty())
 		{
-			pTex->SetName(name);
+			pTexture->SetName(name);
 		}
 
-		return pTex;
+		return pTexture;
 	}
 }

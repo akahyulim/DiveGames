@@ -149,18 +149,55 @@ void InspectorPanel::drawSpriteRenderer(Dive::GameObject* pSelectedObject)
 		pSpriteRenderer->SetEnable(enabled);
 
 		// Sprite
-		auto name = pSpriteRenderer->HasSprite() ? pSpriteRenderer->GetSprite()->GetName() : "";
-		ImGui::Text("Sprite");
-		ImGui::SameLine();
-		ImGui::InputText("##SpriteName", &name);
-		if (pSpriteRenderer->HasSprite())
-			pSpriteRenderer->GetSprite()->SetName(name);
+		//auto name = pSpriteRenderer->HasSprite() ? pSpriteRenderer->GetSprite()->GetName() : "";
+		//ImGui::Text("Sprite");
+		//ImGui::SameLine();
+		//ImGui::InputText("##SpriteName", &name);
+		//if (pSpriteRenderer->HasSprite())
+		//	pSpriteRenderer->GetSprite()->SetName(name);
 
-		ImGui::SameLine();
-		if (ImGui::Button("*"))
+		//ImGui::SameLine();
+		//if (ImGui::Button("*"))
 		{
 			// Asset/Textures 폴더를 연다.
 		}
+		const char* items[] = { "", "Baseplate Grid", "ChoA", "dmc", "DokeV", "IU" };
+		int currentItem = 0;
+		ImGui::Text("Sprite");
+		ImGui::SameLine();
+		ImGui::Combo("##Sprite", &currentItem, items, IM_ARRAYSIZE(items));
+		if(!pSpriteRenderer->HasSprite())
+		{
+			auto rscMng = Dive::ResourceManager::GetInstance();
+
+			switch (currentItem)
+			{
+			case 0:
+				pSpriteRenderer->SetSprite(nullptr);
+				break;
+			case 1:
+				Dive::Texture2D::Create("Assets/Textures/Baseplate Grid.png");
+				pSpriteRenderer->SetSprite(rscMng.GetResource<Dive::Texture2D>("Baseplate Grid"));
+				break;
+			case 2:
+				Dive::Texture2D::Create("Assets/Textures/ChoA.jpg");
+				pSpriteRenderer->SetSprite(rscMng.GetResource<Dive::Texture2D>("ChoA"));
+				break;
+			case 3:
+				Dive::Texture2D::Create("Assets/Textures/dmc.jpg");
+				pSpriteRenderer->SetSprite(rscMng.GetResource<Dive::Texture2D>("dmc"));
+				break;
+			case 4:
+				Dive::Texture2D::Create("Assets/Textures/DokeV.jpeg");
+				pSpriteRenderer->SetSprite(rscMng.GetResource<Dive::Texture2D>("DokeV"));
+				break;
+			case 5:
+				Dive::Texture2D::Create("Assets/Textures/IU.jpg");
+				pSpriteRenderer->SetSprite(rscMng.GetResource<Dive::Texture2D>("IU"));
+				break;
+			}
+		}
+
 
 		// Color
 		DirectX::XMFLOAT4 color = pSpriteRenderer->GetColor();

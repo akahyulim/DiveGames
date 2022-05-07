@@ -10,5 +10,7 @@ public:
 	void renderWindow() override;
 
 private:
+	void loadAssets();
+
 private:
 };

@@ -9,16 +9,10 @@ MenuBarPanel::MenuBarPanel(Editor* pEditor)
 	: Panel(pEditor, "MenuBar")
 {
 	m_bWindow = false;
-
-	m_pChoA = Dive::Texture2D::Create("Assets/Textures/ChoA.jpg", "ChoA");
-	m_pIU = Dive::Texture2D::Create("Assets/Textures/IU.jpg", "IU");
 }
 
 MenuBarPanel::~MenuBarPanel()
 {
-	DV_DELETE(m_pChoA);
-	DV_DELETE(m_pIU);
-
 	DV_DELETE(m_pActiveScene);
 }
 
@@ -74,8 +68,12 @@ void MenuBarPanel::menuFile()
 
 				// 원래는 대화상자로 선택
 				m_pActiveScene = new Dive::Scene;
+
+				// 역시 Scene 이름을 전달하자.
+				Dive::ResourceManager::GetInstance().LoadFromDataFile();
+
 				Dive::Serializer serializer(m_pActiveScene);
-				serializer.Deserialize("Assets/Scene/New_World.scene");
+				serializer.Deserialize("Assets/Scenes/New_World.scene");
 
 				// 번잡해...
 				m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
@@ -113,8 +111,11 @@ void MenuBarPanel::menuFile()
 			{
 				Dive::Serializer serializer(m_pActiveScene);
 				// dir만 전달하자!
-				const std::string dir = "Assets/Scene";
+				const std::string dir = "Assets/Scenes";
 				serializer.Serialize(dir);
+
+				// scene 이름을 전달하자.
+				Dive::ResourceManager::GetInstance().SaveToDataFile();
 			}
 		}
 		if (ImGui::MenuItem("Save As..."))
@@ -268,6 +269,21 @@ void MenuBarPanel::menuComponent()
 {
 	if (ImGui::BeginMenu("Component"))
 	{
+		if (ImGui::MenuItem("SpriteRenderable"))
+		{
+			if (m_pActiveScene)
+			{
+				auto pSelected = m_pEditor->GetHierarchy()->GetSeletecedObject();
+				if (pSelected)
+				{
+					if (!pSelected->HasComponent<Dive::SpriteRenderable>())
+					{
+						pSelected->AddComponent<Dive::SpriteRenderable>();
+					}
+				}
+			}
+		}
+
 		ImGui::EndMenu();
 	}
 }

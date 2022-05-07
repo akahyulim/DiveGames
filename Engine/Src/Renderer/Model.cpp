@@ -54,6 +54,7 @@ namespace Dive
         m_Mesh.GetGeometry(vertexOffset, vertexCount, pOutVertices, indexOffset, indexCount, pOutIndices);
     }
 
+    /*
     bool Model::SaveToFile(const std::string& filepath)
     {
         auto fileStream = FileStream(filepath, eFileStreamMode::Write);
@@ -68,7 +69,9 @@ namespace Dive
 
         return true;
     }
+    */
 
+    // 임포터를 엔진으로 옮기고 이 부분도 수정하자.
     bool Model::LoadFromFile(const std::string& filepath)
     {
         if (!std::filesystem::exists(filepath))
