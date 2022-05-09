@@ -127,7 +127,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;YAML_CPP_STATIC_DEFINE;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>divepch.h</PrecompiledHeaderFile>
@@ -141,7 +141,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>DirectXTex_Debug.lib;yaml-cppd.lib;</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;DirectXTex_Debug.lib;yaml-cppd.lib;</AdditionalDependencies>
     </Lib>
     <Lib>
       <AdditionalLibraryDirectories>External/libs;</AdditionalLibraryDirectories>
@@ -199,6 +199,7 @@
     <ClInclude Include="Src\Renderer\RenderPath.h" />
     <ClInclude Include="Src\Renderer\SpriteMaterial.h" />
     <ClInclude Include="Src\Resource\FileStream.h" />
+    <ClInclude Include="Src\Resource\Importer\ModelImporter.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceManager.h" />
     <ClInclude Include="Src\Scene\Component\Camera.h" />
@@ -238,6 +239,7 @@
     <ClCompile Include="Src\Renderer\RenderPath.cpp" />
     <ClCompile Include="Src\Renderer\SpriteMaterial.cpp" />
     <ClCompile Include="Src\Resource\FileStream.cpp" />
+    <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="Src\Scene\Component\Camera.cpp" />

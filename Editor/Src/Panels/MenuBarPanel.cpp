@@ -3,7 +3,6 @@
 #include "HierarchyPanel.h"
 #include "InspectorPanel.h"
 #include "AssetPanel.h"
-#include "Importer/ModelImporter.h"
 
 MenuBarPanel::MenuBarPanel(Editor* pEditor)
 	: Panel(pEditor, "MenuBar")
@@ -50,7 +49,6 @@ void MenuBarPanel::menuFile()
 				m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
 				m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
 				m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
-				m_pEditor->GetModelImporter()->SetScene(m_pActiveScene);
 			}
 			ImGui::EndMenu();
 		}
@@ -79,8 +77,6 @@ void MenuBarPanel::menuFile()
 				m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
 				m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
 				m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
-
-				m_pEditor->GetModelImporter()->SetScene(m_pActiveScene);
 			}
 			ImGui::EndMenu();
 		}
@@ -169,86 +165,33 @@ void MenuBarPanel::menuGameObject()
 			{
 				if (m_pActiveScene)
 				{
-					// 유니티의 경우 GameObject.CreatePrimitive(PrimitiveTypeCube)로 생성한다.
-					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/Cube.obj");
-
-					//pModel->SaveToFile("Assets/Models/Cube.model");
-
-					/*
-					* 유니티 기준으로 Prefab을 이용할 것이다.
-					* 따라서 Model뿐만 아니라 GameObject 또한 함께 구성된 객체가 필요하다.
-					* 그런데 그걸 다시 Scene과 .dat로 어떻게 구분하여 저장할 것인지 연구가 필요하다.
-					*/
+					// 유니티에선 스크립트 차원에서 함수가 존재한다.
+					// GameObject의 CreatePrimitive였나...
 				}
 			}
 
 			if (ImGui::MenuItem("Sphere"))
 			{
-				if (m_pActiveScene)
-				{
-					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/sphere.obj");
-				}
+				
 			}
 
 			if (ImGui::MenuItem("Cylinder"))
 			{
-				if (m_pActiveScene)
-				{
-					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cylinder.obj");
-				}
+				
 			}
 
 			if (ImGui::MenuItem("Cone"))
 			{
-				if (m_pActiveScene)
-				{
-					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/cone.obj");
-				}
+				
 			}
 
 			if (ImGui::MenuItem("Plane"))
 			{
-				if (m_pActiveScene)
-				{
-					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Base/plane.obj");
-				}
+				
 			}
 
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("Stormtrooper"))
-			{
-				if (m_pActiveScene)
-				{
-					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
-				}
-			}
-
-			if (ImGui::MenuItem("Pilot"))
-			{
-				if (m_pActiveScene)
-				{
-					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
-				}
-			}
-
-			if (ImGui::MenuItem("Sponza"))
-			{
-				if (m_pActiveScene)
-				{
-					auto pModel = new Dive::Model();
-					m_pEditor->GetModelImporter()->Load(pModel, "Assets/Models/Sponza-master/sponza.obj");
-				}
-			}
-
-			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Light"))

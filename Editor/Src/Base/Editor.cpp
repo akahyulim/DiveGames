@@ -8,7 +8,6 @@
 #include "panels/HierarchyPanel.h"
 #include "Panels/InspectorPanel.h"
 #include "Panels/AssetPanel.h"
-#include "Importer/ModelImporter.h"
 
 static Editor* s_pEditor = nullptr;
 
@@ -82,8 +81,6 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	s_pEditor = this;
 
 	// Editor Camera 복사 생성 필요??
-
-	m_pModelImporter = new ModelImporter;
 
 	ShowWindow(m_hWnd, SW_SHOW);
 	SetForegroundWindow(m_hWnd);
@@ -179,9 +176,6 @@ void Editor::Run()
 
 void Editor::Shutdown()
 {
-	// delete importer
-	DV_DELETE(m_pModelImporter);
-
 	// delete panels
 	DV_DELETE(m_pMenuBar);
 	DV_DELETE(m_pScene);

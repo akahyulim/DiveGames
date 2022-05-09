@@ -38,8 +38,6 @@ public:
 	InspectorPanel* GetInspector() { return m_pInspector; }
 	AssetPanel* GetAsset() { return m_pAsset; }
 
-	ModelImporter* GetModelImporter() { return m_pModelImporter; }
-
 	SceneViewCamera* GetSceneViewCamera() { return &m_SceneViewCamera; }
 
 private:
@@ -82,6 +80,4 @@ private:
 
 	SceneViewCamera m_SceneViewCamera;
 	EditorRenderPath m_EditorRenderPath;
-
-	ModelImporter* m_pModelImporter = nullptr;
 };

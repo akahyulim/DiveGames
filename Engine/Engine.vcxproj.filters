@@ -121,6 +121,9 @@
     <ClInclude Include="Src\Resource\FileStream.h">
       <Filter>Src\Resource</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Resource\Importer\ModelImporter.h">
+      <Filter>Src\Resource\Importer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -225,6 +228,9 @@
     <ClCompile Include="Src\Resource\FileStream.cpp">
       <Filter>Src\Resource</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp">
+      <Filter>Src\Resource\Importer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -265,6 +271,9 @@
     </Filter>
     <Filter Include="Src\Helper">
       <UniqueIdentifier>{1a508884-ccc2-4368-af28-f45cc023c966}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Resource\Importer">
+      <UniqueIdentifier>{3bdc49eb-8d93-41b9-86c6-1c154d84a343}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

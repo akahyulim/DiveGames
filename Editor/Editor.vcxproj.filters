@@ -16,9 +16,6 @@
     <Filter Include="External\imgui-docking">
       <UniqueIdentifier>{5bd7c28d-334b-45b5-874b-d63f21529e47}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Importer">
-      <UniqueIdentifier>{25980306-f511-496a-80dc-1244f2849e2d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="External\ImGuizmo">
       <UniqueIdentifier>{92b0cd16-4fad-48c2-acc6-113d950978b6}</UniqueIdentifier>
     </Filter>
@@ -77,9 +74,6 @@
     </ClCompile>
     <ClCompile Include="Src\Base\EditorRenderPath.cpp">
       <Filter>Src\Base</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Importer\ModelImporter.cpp">
-      <Filter>Src\Importer</Filter>
     </ClCompile>
     <ClCompile Include="External\ImGuizmo\GraphEditor.cpp">
       <Filter>External\ImGuizmo</Filter>
@@ -151,9 +145,6 @@
     </ClInclude>
     <ClInclude Include="Src\Base\EditorRenderPath.h">
       <Filter>Src\Base</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Importer\ModelImporter.h">
-      <Filter>Src\Importer</Filter>
     </ClInclude>
     <ClInclude Include="External\ImGuizmo\GraphEditor.h">
       <Filter>External\ImGuizmo</Filter>
