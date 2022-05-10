@@ -72,10 +72,18 @@ InspectorPanel::InspectorPanel(Editor* pEditor)
 {
 	// 최소 크기 확보가 필요하다.
 	// 사실 크기를 고정하는 것이 디자인하는데 더 편하다.
+
+	SUBSCRIBE_EVENT(eEventType::CreateScene, EVENT_HANDLER(OnActiveScene));
 }
 
 InspectorPanel::~InspectorPanel()
 {
+}
+
+void InspectorPanel::OnActiveScene(const Dive::Event& e)
+{
+	const auto& evt = dynamic_cast<const Dive::CreateSceneEvent&>(e);
+	m_pActiveScene = const_cast<Dive::Scene*>(evt.GetCreatedScene());
 }
 
 void InspectorPanel::renderWindow()

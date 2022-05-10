@@ -7,6 +7,8 @@ public:
 	InspectorPanel(Editor* pEditor);
 	~InspectorPanel();
 
+	void OnActiveScene(const Dive::Event& e);
+
 	void renderWindow() override;
 
 private:

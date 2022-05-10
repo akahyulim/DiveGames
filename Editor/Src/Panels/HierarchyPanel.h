@@ -7,6 +7,8 @@ public:
 	HierarchyPanel(Editor* pEditor);
 	~HierarchyPanel();
 
+	void OnActiveScene(const Dive::Event& e);
+
 	void renderWindow() override;
 
 	Dive::GameObject* GetSeletecedObject() { return m_pSelectedObject; }

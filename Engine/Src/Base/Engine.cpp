@@ -6,6 +6,7 @@
 #include "Events/EventSystem.h"
 #include "Events/EngineEvents.h"
 #include "Renderer/RenderPath.h"
+#include "Scene/Scene.h"
 
 namespace Dive
 {
@@ -23,6 +24,8 @@ namespace Dive
 
 	void Engine::Shutdown()
 	{
+		DV_DELETE(m_pActiveScene);
+	
 		Renderer::Shutdown();
 	}
 
@@ -63,5 +66,22 @@ namespace Dive
 		// 기존 ActiveRenderPath가 있다면 Stop 후 전달받은 RenderPath를 Start 해줘야 한다.
 
 		m_pActiveRenderPath = pRenderPath;
+	}
+
+	Scene* Engine::CreateScene(const std::string& name)
+	{
+		// 일단은 지운다.
+		if (m_pActiveScene)
+		{
+			DV_DELETE(m_pActiveScene);
+		}
+
+		m_pActiveScene = new Scene(name);
+		DV_ASSERT(m_pActiveScene != nullptr);
+
+		CreateSceneEvent e(m_pActiveScene);
+		FIRE_EVENT(e);
+
+		return m_pActiveScene;
 	}
 }

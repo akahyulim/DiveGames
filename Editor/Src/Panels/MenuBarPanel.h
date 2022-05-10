@@ -12,6 +12,8 @@ public:
 	// 위치가 조금 애매하다.
 	Dive::Scene* GetActiveScene() { return m_pActiveScene; }
 
+	void OnActiveScene(const Dive::Event& e);
+
 	void renderAlways() override;
 
 private:

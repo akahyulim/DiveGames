@@ -114,13 +114,17 @@ namespace Dive
 
 		for (uint32_t i = 0; i < count; i++)
 		{
-			const auto file = fileStream.ReadAs<std::string>();
+			const auto assetFilepath = fileStream.ReadAs<std::string>();
 			const auto type = static_cast<eResourceType>(fileStream.ReadAs<uint32_t>());
 
 			switch (type)
 			{
 			case eResourceType::Texture2D:
-				Load<Texture2D>(file);
+				Load<Texture2D>(assetFilepath);
+				break;
+
+			case eResourceType::Model:
+				Load<Model>(assetFilepath);
 				break;
 			}
 		}

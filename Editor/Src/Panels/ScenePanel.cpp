@@ -6,10 +6,17 @@
 ScenePanel::ScenePanel(Editor* pEditor)
 	: Panel(pEditor, "Scene")
 {
+	SUBSCRIBE_EVENT(eEventType::CreateScene, EVENT_HANDLER(OnActiveScene));
 }
 
 ScenePanel::~ScenePanel()
 {
+}
+
+void ScenePanel::OnActiveScene(const Dive::Event& e)
+{
+	const auto& evt = dynamic_cast<const Dive::CreateSceneEvent&>(e);
+	m_pActiveScene = const_cast<Dive::Scene*>(evt.GetCreatedScene());
 }
 
 // Scene이 있다면

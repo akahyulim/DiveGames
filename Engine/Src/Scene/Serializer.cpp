@@ -10,6 +10,7 @@
 #include "Renderer/SpriteMaterial.h"
 #include "Renderer/LegacyMaterial.h"
 #include "Resource/ResourceManager.h"
+#include "Renderer/Model.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -248,6 +249,12 @@ namespace Dive
 				out << YAML::Key << "m_InstanceID" << YAML::Value << pMeshRenderable->GetInstanceID();
 				out << YAML::Key << "m_GameObject" << YAML::Value << pMeshRenderable->GetGameObject()->GetInstanceID();
 				out << YAML::Key << "m_bEnabled" << YAML::Value << (int)pMeshRenderable->IsEnabled();
+				out << YAML::Key << "m_GeometryName" << YAML::Value << pMeshRenderable->GetGeometryName();
+				out << YAML::Key << "m_VertexOffset" << YAML::Value << pMeshRenderable->VertexOffset();
+				out << YAML::Key << "m_VertexCount" << YAML::Value << pMeshRenderable->VertexCount();
+				out << YAML::Key << "m_IndexOffset" << YAML::Value << pMeshRenderable->IndexOffset();
+				out << YAML::Key << "m_IndexCount" << YAML::Value << pMeshRenderable->IndexCount();
+				out << YAML::Key << "m_Model" << YAML::Value << pMeshRenderable->GetModel()->GetName();	// 이름은 중복될 수 있다.
 				out << YAML::Key << "m_AlbedoColor" << YAML::Value << pMaterial->GetAlbedoColor();
 				out << YAML::EndMap;
 				out << YAML::EndMap;
@@ -387,10 +394,24 @@ namespace Dive
 				DV_ASSERT(pMeshRenderable->GetInstanceID() == instanceID);
 
 				auto bEnabled		= meshRenderableNode["m_bEnabled"].as<int>();
+				auto geometryName	= meshRenderableNode["m_GeometryName"].as<std::string>();
+				auto vertexOffset	= meshRenderableNode["m_VertexOffset"].as<unsigned int>();
+				auto vertexCount	= meshRenderableNode["m_VertexCount"].as<unsigned int>();
+				auto indexOffset	= meshRenderableNode["m_IndexOffset"].as<unsigned int>();
+				auto indexCount		= meshRenderableNode["m_IndexCount"].as<unsigned int>();
+				auto model			= meshRenderableNode["m_Model"].as<std::string>();
 				auto albedoColor	= meshRenderableNode["m_AlbedoColor"].as<DirectX::XMFLOAT4>();
 
+				// 일단 직접 생성
+				// 그런데 Material 역시 Resource다...?
+				pMeshRenderable->SetMaterail(new LegacyMaterial);
+				auto pMaterial = pMeshRenderable->GetMaterial();
+				auto pModel = ResourceManager::GetInstance().GetResource<Model>(model);
 
 				pMeshRenderable->SetEnable(bEnabled);
+				if(pModel)
+					pMeshRenderable->SetGeometry(geometryName, vertexOffset, vertexCount, indexOffset, indexCount, pModel);
+				pMaterial->SetAlbedoColor(albedoColor);
 			}
 		}
 		

@@ -3,10 +3,17 @@
 HierarchyPanel::HierarchyPanel(Editor* pEditor)
 	: Panel(pEditor, "Hierarchy")
 {
+	SUBSCRIBE_EVENT(eEventType::CreateScene, EVENT_HANDLER(OnActiveScene));
 }
 
 HierarchyPanel::~HierarchyPanel()
 {
+}
+
+void HierarchyPanel::OnActiveScene(const Dive::Event& e)
+{
+	const auto& evt = dynamic_cast<const Dive::CreateSceneEvent&>(e);
+	m_pActiveScene = const_cast<Dive::Scene*>(evt.GetCreatedScene());
 }
 
 void HierarchyPanel::renderWindow()

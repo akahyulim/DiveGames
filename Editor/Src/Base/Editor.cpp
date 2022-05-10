@@ -127,7 +127,8 @@ void Editor::Run()
 		{
 			// Scene이 변경될 수 있어 명시적 Set이 필요하다
 			// 다만 이 부분은 이벤트로도 처리가 가능하다.
-			m_EditorRenderPath.SetActiveScene(m_pMenuBar->GetActiveScene());
+			// 매 프레임 받는 것 보다 생성 혹은 변경시에만 받는 것이 맞다.
+			//m_EditorRenderPath.SetActiveScene(m_pMenuBar->GetActiveScene());
 			
 			// 현재 둘이 나란히 붙어 있지만 Wicked의 경우 Update가 분화되어 있고
 			// 호출 단계도 나누어진다.

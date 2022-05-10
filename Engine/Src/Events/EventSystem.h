@@ -14,7 +14,9 @@
 enum class eEventType
 {
 	WindowData,
-	SceneResolve, GameObjectModify,
+	CreateScene, 
+	SceneResolve, 
+	GameObjectModify
 };
 
 // event type macro

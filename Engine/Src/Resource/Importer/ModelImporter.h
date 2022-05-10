@@ -24,12 +24,10 @@ namespace Dive
 	class ModelImporter
 	{
 	public:
-		ModelImporter();
+		ModelImporter(Scene* pScene);
 		~ModelImporter();
 
 		bool Load(Model* pModel, const std::string& filepath);
-
-		void SetScene(Scene* pScene) { m_pScene = pScene; }
 
 	private:
 		void parseNode(const aiNode* pAiNode, const ModelParams& params, GameObject* pGameObject, GameObject* pParent = nullptr);

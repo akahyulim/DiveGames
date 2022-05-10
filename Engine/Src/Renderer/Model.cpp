@@ -8,6 +8,11 @@
 #include "Base/Base.h"
 #include "Helper/FileSystem.h"
 #include "Resource/FileStream.h"
+#include "Resource/Importer/ModelImporter.h"
+
+// 이건 좀 에바?
+#include "Base/Engine.h"
+#include "Dive.h"
 
 namespace Dive
 {
@@ -54,24 +59,6 @@ namespace Dive
         m_Mesh.GetGeometry(vertexOffset, vertexCount, pOutVertices, indexOffset, indexCount, pOutIndices);
     }
 
-    /*
-    bool Model::SaveToFile(const std::string& filepath)
-    {
-        auto fileStream = FileStream(filepath, eFileStreamMode::Write);
-        if (!fileStream.IsOpen())
-            return false;
-
-        fileStream.Write(m_NormalizedScale);
-        fileStream.Write(m_Mesh.GetVertices());
-        fileStream.Write(m_Mesh.GetIndices());
-
-        fileStream.Close();
-
-        return true;
-    }
-    */
-
-    // 임포터를 엔진으로 옮기고 이 부분도 수정하자.
     bool Model::LoadFromFile(const std::string& filepath)
     {
         if (!std::filesystem::exists(filepath))
@@ -80,25 +67,19 @@ namespace Dive
             return false;
         }
 
-        if (Helper::FileSystem::GetFileExtension(filepath) != EXTENSION_MODEL)
-        {
-            DV_CORE_ERROR("잘못된 확장자를 가진 파일입니다.");
+        // 1. GetCurrentEngine은 사용자를 위한 API였는데... 접근 방식이 좀 에바다.
+        // 2. ResourceManager에서 .dat를 이용해 로드할 경우
+        // 새로운 GameObject 계층 구조가 생성된다.
+        // 이를 구분하려면 별도 포멧으로 Vertices, Indices 등을 저장한 후
+        // Load시 버퍼만 생성하는 수 밖에 없다.
+        // 그리고 이렇게 생성된 Model 객체를 Scene의 GameObject에 직접 연결해야 한다.
+        ModelImporter importer(GetCurrentEngine()->GetActiveScene());
+        if (!importer.Load(this, filepath))
             return false;
-        }
 
-        auto fileStream = FileStream(filepath, eFileStreamMode::Read);
-        if (!fileStream.IsOpen())
-            return false;
-
-        fileStream.Read(&m_NormalizedScale);
-        fileStream.Read(&m_Mesh.GetVertices());
-        fileStream.Read(&m_Mesh.GetIndices());
-
-        fileStream.Close();
+        SetFilepath(filepath);
 
         UpdateGeometry();
-
-        SetName(Helper::FileSystem::GetFileNameWithoutExtension(filepath));
 
         return true;
     }

@@ -3,6 +3,7 @@
 
 namespace Dive
 {
+	class Scene;
 	class RenderPath;
 
 	struct WindowData
@@ -38,6 +39,9 @@ namespace Dive
 		RenderPath* GetActiveRenderPath() { return m_pActiveRenderPath; }
 		void SetActiveRenderPath(RenderPath* pRenderPath);
 
+		Scene* CreateScene(const std::string& name = "");
+		Scene* GetActiveScene() { return m_pActiveScene; }
+
 	private:
 	
 	private:
@@ -45,5 +49,7 @@ namespace Dive
 		WindowData m_WindowData;
 
 		RenderPath* m_pActiveRenderPath = nullptr;
+
+		Scene* m_pActiveScene = nullptr;
 	};
 }

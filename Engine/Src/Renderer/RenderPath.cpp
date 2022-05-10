@@ -15,7 +15,9 @@ namespace Dive
 {
 	RenderPath::RenderPath()
 	{
-		// active scene과 camera가 필요하다.
+		// camera가 필요하다.
+
+		SUBSCRIBE_EVENT(eEventType::CreateScene, EVENT_HANDLER(OnActiveScene));
 	}
 
 	RenderPath::~RenderPath()
@@ -62,6 +64,12 @@ namespace Dive
 		}
 
 		passDefault(&cl);
+	}
+
+	void RenderPath::OnActiveScene(const Event& e)
+	{
+		const auto& evnt = dynamic_cast<const CreateSceneEvent&>(e);
+		m_pActiveScene = const_cast<Scene*>(evnt.GetCreatedScene());
 	}
 
 	// 스파르탄은 RenderObject Type을 전달받는다.

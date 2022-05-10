@@ -8,11 +8,18 @@ MenuBarPanel::MenuBarPanel(Editor* pEditor)
 	: Panel(pEditor, "MenuBar")
 {
 	m_bWindow = false;
+
+	SUBSCRIBE_EVENT(eEventType::CreateScene, EVENT_HANDLER(OnActiveScene));
 }
 
 MenuBarPanel::~MenuBarPanel()
 {
-	DV_DELETE(m_pActiveScene);
+}
+
+void MenuBarPanel::OnActiveScene(const Dive::Event& e)
+{
+	const auto& evt = dynamic_cast<const Dive::CreateSceneEvent&>(e);
+	m_pActiveScene = const_cast<Dive::Scene*>(evt.GetCreatedScene());
 }
 
 // 메뉴바는 항상 그려져야 한다.
@@ -42,13 +49,11 @@ void MenuBarPanel::menuFile()
 			if (ImGui::MenuItem("Scene"))
 			{
 				if (m_pActiveScene)
-					DV_DELETE(m_pActiveScene);
+				{
+					// 저장 여부 확인
+				}
 
-				m_pActiveScene = new Dive::Scene("new_world");
-
-				m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
-				m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
-				m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
+				Dive::GetCurrentEngine()->CreateScene("new_world");
 			}
 			ImGui::EndMenu();
 		}
@@ -62,21 +67,17 @@ void MenuBarPanel::menuFile()
 			if (ImGui::MenuItem("Scene"))
 			{
 				if (m_pActiveScene)
-					DV_DELETE(m_pActiveScene);
+				{
+					// 저장 여부 확인
+				}
 
-				// 원래는 대화상자로 선택
-				m_pActiveScene = new Dive::Scene;
+				m_pActiveScene = Dive::GetCurrentEngine()->CreateScene();
 
 				// 역시 Scene 이름을 전달하자.
 				Dive::ResourceManager::GetInstance().LoadFromDataFile();
 
 				Dive::Serializer serializer(m_pActiveScene);
 				serializer.Deserialize("Assets/Scenes/New_World.scene");
-
-				// 번잡해...
-				m_pEditor->GetScene()->SetActiveScene(m_pActiveScene);
-				m_pEditor->GetHierarchy()->SetActiveScene(m_pActiveScene);
-				m_pEditor->GetInspector()->SetActiveScene(m_pActiveScene);
 			}
 			ImGui::EndMenu();
 		}
@@ -87,12 +88,9 @@ void MenuBarPanel::menuFile()
 		{
 			if (m_pActiveScene)
 			{
-				DV_DELETE(m_pActiveScene);
+				// 저장 여부 확인
 			}
 
-			m_pEditor->GetScene()->SetActiveScene(nullptr);
-			m_pEditor->GetHierarchy()->SetActiveScene(nullptr);
-			m_pEditor->GetInspector()->SetActiveScene(nullptr);
 		}
 		if (ImGui::MenuItem("Close Project"))
 		{
@@ -127,17 +125,10 @@ void MenuBarPanel::menuFile()
 
 		if (ImGui::MenuItem("Exit"))
 		{
-			// Scene 저장 확인
-
-			// Scene을 제거할 때 마다 사용하는 곳 모두에게 직접 전달하고 있다.
-			// 너무 비효율적이다.
 			if (m_pActiveScene)
 			{
-				DV_DELETE(m_pActiveScene);
+				// 저장 여부 확인
 			}
-			m_pEditor->GetScene()->SetActiveScene(nullptr);
-			m_pEditor->GetHierarchy()->SetActiveScene(nullptr);
-			m_pEditor->GetInspector()->SetActiveScene(nullptr);
 
 			m_pEditor->Close();
 		}
@@ -167,31 +158,69 @@ void MenuBarPanel::menuGameObject()
 				{
 					// 유니티에선 스크립트 차원에서 함수가 존재한다.
 					// GameObject의 CreatePrimitive였나...
+					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cube.obj");
 				}
 			}
 
 			if (ImGui::MenuItem("Sphere"))
 			{
-				
+				if (m_pActiveScene)
+				{
+					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Sphere.obj");
+				}
 			}
 
 			if (ImGui::MenuItem("Cylinder"))
 			{
-				
+				if (m_pActiveScene)
+				{
+					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cylinder.obj");
+				}
 			}
 
 			if (ImGui::MenuItem("Cone"))
 			{
-				
+				if (m_pActiveScene)
+				{
+					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cone.obj");
+				}
 			}
 
 			if (ImGui::MenuItem("Plane"))
 			{
-				
+				if (m_pActiveScene)
+				{
+					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Plane.obj");
+				}
 			}
 
 			ImGui::Separator();
 
+			if (ImGui::MenuItem("Stormtrooper"))
+			{
+				if (m_pActiveScene)
+				{
+					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
+				}
+			}
+
+			if (ImGui::MenuItem("Pilot"))
+			{
+				if (m_pActiveScene)
+				{
+					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/pilot-avatar/source/Pilot_LP_Animation.fbx");
+				}
+			}
+
+			if (ImGui::MenuItem("Sponza"))
+			{
+				if (m_pActiveScene)
+				{
+					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Sponza-master/sponza.obj");
+				}
+			}
+
+			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Light"))

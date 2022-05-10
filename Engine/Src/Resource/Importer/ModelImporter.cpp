@@ -9,8 +9,10 @@
 
 namespace Dive
 {
-    ModelImporter::ModelImporter()
+    ModelImporter::ModelImporter(Scene* pScene)
+        : m_pScene(pScene)
     {
+        DV_ASSERT(m_pScene != nullptr);
     }
 
     ModelImporter::~ModelImporter()
