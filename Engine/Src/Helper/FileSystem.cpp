@@ -16,13 +16,12 @@ namespace Dive
 
 		std::string FileSystem::GetFilepathWithoutExtension(const std::string& filepath)
 		{
-			auto filename = GetFileName(filepath);
-			auto index = filename.find_last_of('.');
+			auto index = filepath.find_last_of('.');
 
 			if (index == std::string::npos)
 				return "";
 
-			return filename.substr(0, index);
+			return filepath.substr(0, index);
 		}
 
 		std::string FileSystem::GetFileName(const std::string& filepath)

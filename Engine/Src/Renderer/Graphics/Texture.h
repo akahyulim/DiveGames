@@ -27,6 +27,7 @@ namespace Dive
 		Texture2D(const std::string& name = "", unsigned long long id = 0);
 		~Texture2D();
 
+		bool SaveFromFile(const std::string& filepath);
 		bool LoadFromFile(const std::string& filepath);
 
 		bool CreateTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned bindFlags);

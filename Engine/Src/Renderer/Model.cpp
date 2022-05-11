@@ -25,7 +25,7 @@ namespace Dive
     {
         Clear();
     }
-    
+
     void Model::Clear()
     {
         DV_DELETE(m_pIndexBuffer);
@@ -34,7 +34,7 @@ namespace Dive
 
         m_pRootGameObject = nullptr;
     }
-    
+
     void Model::UpdateGeometry()
     {
         if ((m_Mesh.GetVertexCount() == 0) || (m_Mesh.GetIndexCount() == 0))
@@ -59,6 +59,24 @@ namespace Dive
         m_Mesh.GetGeometry(vertexOffset, vertexCount, pOutVertices, indexOffset, indexCount, pOutIndices);
     }
 
+    // 오직 엔진 포멧 경로만 받는다.
+    bool Model::SaveToFile(const std::string& filepath)
+    {
+        FileStream fout(filepath, eFileStreamMode::Write);
+        if (!fout.IsOpen())
+            return false;
+
+        // 외부 파일 경로?
+        fout.Write(m_NormalizedScale);
+        fout.Write(m_Mesh.GetVertices());
+        fout.Write(m_Mesh.GetIndices());
+
+        fout.Close();
+
+        return true;
+    }
+
+    // 일단 스파르탄의 외부, 엔진 포멧 형식으로 간다.
     bool Model::LoadFromFile(const std::string& filepath)
     {
         if (!std::filesystem::exists(filepath))
@@ -67,19 +85,42 @@ namespace Dive
             return false;
         }
 
-        // 1. GetCurrentEngine은 사용자를 위한 API였는데... 접근 방식이 좀 에바다.
-        // 2. ResourceManager에서 .dat를 이용해 로드할 경우
-        // 새로운 GameObject 계층 구조가 생성된다.
-        // 이를 구분하려면 별도 포멧으로 Vertices, Indices 등을 저장한 후
-        // Load시 버퍼만 생성하는 수 밖에 없다.
-        // 그리고 이렇게 생성된 Model 객체를 Scene의 GameObject에 직접 연결해야 한다.
-        ModelImporter importer(GetCurrentEngine()->GetActiveScene());
-        if (!importer.Load(this, filepath))
-            return false;
+        if (Helper::FileSystem::GetFileExtension(filepath) == EXTENSION_MODEL)
+        {
+            FileStream fin(filepath, eFileStreamMode::Read);
+            if (!fin.IsOpen())
+                return false;
 
-        SetFilepath(filepath);
+            fin.Read(&m_NormalizedScale);
+            fin.Read(&m_Mesh.GetVertices());
+            fin.Read(&m_Mesh.GetIndices());
 
-        UpdateGeometry();
+            fin.Close();
+
+            // file path 설정
+            // 경로 및 이름을 저장하는 용도다.
+            {
+                m_ExportedFilepath.clear();
+                m_EngineFilepath = filepath;
+                m_Name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
+            }
+
+            UpdateGeometry();
+        }
+        else
+        {
+            // 여기도 file path 설정?
+            // Engine Format path를 설정하는 용도다.
+            {
+                m_ExportedFilepath = filepath;
+                m_EngineFilepath = Helper::FileSystem::GetFilepathWithoutExtension(filepath) + ".model";
+                m_Name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
+            }
+
+            ModelImporter importer(GetCurrentEngine()->GetActiveScene());
+            if (!importer.Load(this, filepath))
+                return false;
+        }
 
         return true;
     }

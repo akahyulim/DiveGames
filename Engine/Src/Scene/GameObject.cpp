@@ -17,6 +17,7 @@ namespace Dive
 
 		for(auto pComponent : m_Components)
 		{
+			FIRE_EVENT(ModifyGameObjectEvent(static_cast<Component*>(pComponent)));
 			DV_DELETE(pComponent);
 		}
 		m_Components.clear();

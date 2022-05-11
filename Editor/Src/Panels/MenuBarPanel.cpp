@@ -89,6 +89,8 @@ void MenuBarPanel::menuFile()
 			if (m_pActiveScene)
 			{
 				// 저장 여부 확인
+
+				// Engine에서 Scene을 Close해야 한다.
 			}
 
 		}
@@ -208,7 +210,7 @@ void MenuBarPanel::menuGameObject()
 			{
 				if (m_pActiveScene)
 				{
-					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/pilot-avatar/source/Pilot_LP_Animation.fbx");
+					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
 				}
 			}
 

@@ -49,12 +49,13 @@ namespace Dive
 		std::vector<GameObject*>* m_pGameObjects;
 	};
 
-	class GameObjectModifyEvent : public Event
+	// Add / Remove Components
+	class ModifyGameObjectEvent : public Event
 	{
 	public:
-		EVENT_CLASS_TYPE(GameObjectModify)
+		EVENT_CLASS_TYPE(ModifyGameObject)
 
-		GameObjectModifyEvent(Component* pComponent) : m_pComponent(pComponent) {}
+		ModifyGameObjectEvent(Component* pComponent) : m_pComponent(pComponent) {}
 
 		const Component* GetComponent() const { return m_pComponent; }
 

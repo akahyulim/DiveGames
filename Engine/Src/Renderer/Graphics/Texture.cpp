@@ -22,6 +22,11 @@ namespace Dive
 		Shutdown();
 	}
 
+	bool Texture2D::SaveFromFile(const std::string& filepath)
+	{
+		return true;
+	}
+
 	// 직접 하지 말고, DirectX Texture 부분을 Importer로 뽑아보자.
 	bool Texture2D::LoadFromFile(const std::string& filepath)
 	{
@@ -65,8 +70,13 @@ namespace Dive
 		m_Width = static_cast<unsigned int>(metaData.width);
 		m_Height = static_cast<unsigned int>(metaData.height);
 		
-		SetFilepath(filepath);
-		m_Name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
+		//SetFilepath(filepath);
+		//m_Name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
+		{
+			m_ExportedFilepath = filepath;
+			m_EngineFilepath = filepath;
+			m_Name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
+		}
 
 		return true;
 	}

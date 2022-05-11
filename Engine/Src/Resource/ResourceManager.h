@@ -28,6 +28,8 @@ namespace Dive
 
 			auto name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
 
+			// 추가 로드를 시도해도 이미 만들어져 있는 것을 리턴한다...
+			// 따라서 복사한 후 리턴하도록 만들어야 한다.
 			if (HasResource<T>(name))
 				return GetResource<T>(name);
 

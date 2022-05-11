@@ -35,7 +35,7 @@ namespace Dive
 
 			T* pAddedComponent = dynamic_cast<T*>(m_Components.emplace_back(new T(this, id)));
 
-			FIRE_EVENT(GameObjectModifyEvent(static_cast<Component*>(pAddedComponent)));
+			FIRE_EVENT(ModifyGameObjectEvent(static_cast<Component*>(pAddedComponent)));
 
 			return pAddedComponent;
 		}
@@ -68,7 +68,7 @@ namespace Dive
 
 			m_Components.emplace_back(pAddedComponent);
 
-			FIRE_EVENT(GameObjectModifyEvent(pAddedComponent));
+			FIRE_EVENT(ModifyGameObjectEvent(pAddedComponent));
 
 			return pAddedComponent;
 		}
@@ -76,13 +76,13 @@ namespace Dive
 		template<class T>
 		void RemoveComponent()
 		{
-			// 굳이 이렇게 할 필요가 없을 듯 하다.
+			// 굳이 이렇게 할 필요가 없을 듯 하다. => 무슨 의미?
 			auto it = m_Components.begin();
 			for (it; it != m_Components.end();)
 			{
 				if (it->GetType() == T::GetStaticType())
 				{
-					FIRE_EVENT(GameObjectModifyEvent(static_cast<Component*>(*it)));
+					FIRE_EVENT(ModifyGameObjectEvent(static_cast<Component*>(*it)));
 
 					DV_DELETE(*it);
 					m_Components.erase(it);

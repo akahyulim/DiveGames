@@ -32,7 +32,7 @@ namespace Dive
 
 		void SetRootGameObject(GameObject* pGameObject) { m_pRootGameObject = pGameObject; }
 
-		//bool SaveToFile(const std::string& filepath) override;
+		bool SaveToFile(const std::string& filepath) override;
 		bool LoadFromFile(const std::string& filepath) override;
 
 	private:

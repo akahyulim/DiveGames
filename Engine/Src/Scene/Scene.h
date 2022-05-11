@@ -31,7 +31,7 @@ namespace Dive
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
 
-		void OnGameObjectModify(const Event& e);
+		void OnModifyComponents(const Event& e);
 
 	private:
 	private:

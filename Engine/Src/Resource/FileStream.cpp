@@ -187,7 +187,7 @@ namespace Dive
 			return;
 
 		auto size = ReadAs<uint32_t>();
-		pValue->reserve(size);
+		pValue->resize(size);
 
 		m_In.read(reinterpret_cast<char*>(pValue->data()), sizeof(VertexType) * size);
 	}

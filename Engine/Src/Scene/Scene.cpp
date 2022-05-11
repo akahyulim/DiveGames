@@ -12,7 +12,7 @@ namespace Dive
 		if (m_Name.empty())
 			m_Name = "Untitled";
 
-		SUBSCRIBE_EVENT(eEventType::GameObjectModify, EVENT_HANDLER(OnGameObjectModify));
+		SUBSCRIBE_EVENT(eEventType::ModifyGameObject, EVENT_HANDLER(OnModifyComponents));
 	}
 
 	Scene::~Scene()
@@ -29,7 +29,8 @@ namespace Dive
 			{
 				if ((*it)->IsRemoveTarget())
 				{
-					// 이렇게 하나만 제거하면 안될 것 같다.
+					// 아직까진 별 문제가 없으나
+					// 이렇게 하나씩 제거하면 안될 것 같다.
 					DV_DELETE(*it);
 					it = m_GameObjects.erase(it);
 				}
@@ -173,13 +174,13 @@ namespace Dive
 		return nullptr;
 	}
 
-	void Scene::OnGameObjectModify(const Event& e)
+	// 참조중인 Component container update
+	void Scene::OnModifyComponents(const Event& e)
 	{
 		m_bDirty = true;
 
-		auto pComponent = dynamic_cast<const GameObjectModifyEvent&>(e).GetComponent();
+		auto pComponent = dynamic_cast<const ModifyGameObjectEvent&>(e).GetComponent();
 		auto type = pComponent->GetType();
-
 		if (!m_Components[type].empty())
 		{
 			auto it = m_Components[type].begin();
