@@ -22,21 +22,22 @@ namespace Dive
 		VertexBuffer* GetVertexBuffer() { return m_pVertexBuffer; }
 		IndexBuffer* GetIndexBuffer() { return m_pIndexBuffer; }
 
-		SpriteMaterial* GetMaterial() { return m_pMaterial; }
-		void SetMaterial(SpriteMaterial* pMaterial) { m_pMaterial = pMaterial; }
-		bool HasMaterial() const { return m_pMaterial != nullptr; }
-
-		Texture2D* GetSprite();
+		Texture2D* GetSprite() { return m_pSprite; }
 		void SetSprite(Texture2D* pSprite);
 		bool HasSprite() const;
 
-		DirectX::XMFLOAT4 GetColor() const;
-		void SetColor(const DirectX::XMFLOAT4& color);
+		DirectX::XMFLOAT4 GetColor() const { return m_Color; }
+		void SetColor(const DirectX::XMFLOAT4& color) { m_Color = color; }
 
-		bool IsFlipX() const;
-		void SetFlipX(bool flip);
-		bool IsFlipY() const;
-		void SetFlipY(bool flip);
+		bool IsFlipX() const { return m_bFlipX; }
+		void SetFlipX(bool flip) { m_bFlipX = flip; }
+		bool IsFlipY() const { return m_bFlipY; }
+		void SetFlipY(bool flip) { m_bFlipY = flip; }
+
+		// 이건 Renderable의 virtual이어야 한다.
+		SpriteMaterial* GetMaterial() { return m_pMaterial; }
+		void SetMaterial(SpriteMaterial* pMaterial);
+		bool HasMaterial() const { return m_pMaterial != nullptr; }
 
 	private:
 		bool createBuffer(const unsigned int width, const unsigned int height);
@@ -49,6 +50,11 @@ namespace Dive
 		};
 		VertexBuffer* m_pVertexBuffer	= nullptr;
 		IndexBuffer* m_pIndexBuffer		= nullptr; 
+
+		Texture2D* m_pSprite			= nullptr;
+		DirectX::XMFLOAT4 m_Color		= DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+		bool m_bFlipX					= false;
+		bool m_bFlipY					= false;
 
 		SpriteMaterial* m_pMaterial		= nullptr;
 	};

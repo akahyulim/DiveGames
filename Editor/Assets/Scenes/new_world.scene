@@ -2086,7 +2086,7 @@ Transform:
   m_InstanceID: 8153330530080412487
   m_GameObject: 8989847016287330505
   m_LocalRotation: [0, 0.382683367, 0, 0.923879564]
-  m_LocalPosition: [0, 8.5, 0]
+  m_LocalPosition: [-3.53553438, 6, 3.53553343]
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
 ---
@@ -2102,7 +2102,7 @@ Transform:
   m_InstanceID: 7119529705187954370
   m_GameObject: 14455208743967235119
   m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [-4.5, 5.5, 0]
+  m_LocalPosition: [-12.5, 9.5, 12]
   m_LocalScale: [2, 2, 2]
   m_Parent: 0
 ---
@@ -2126,7 +2126,7 @@ Transform:
   m_InstanceID: 14848495445513360108
   m_GameObject: 13849598413551270354
   m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [6, 8.5, 0]
+  m_LocalPosition: [0, 1, 8]
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
 ---
@@ -2142,7 +2142,7 @@ Transform:
   m_InstanceID: 12693042638249805213
   m_GameObject: 11906330171519040279
   m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [6, 4.5, 0]
+  m_LocalPosition: [2.5, 1, 8]
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
 ---
@@ -4453,20 +4453,20 @@ Transform:
 SpriteRenderable:
   m_InstanceID: 18356165297986196324
   m_GameObject: 5461970726672570813
-  m_bEnabled: 1
+  m_bEnabled: true
   m_Sprite: dmc
   m_Color: [1, 1, 1, 1]
-  m_FlipX: 0
-  m_FlipY: 0
+  m_FlipX: false
+  m_FlipY: false
 ---
 SpriteRenderable:
   m_InstanceID: 2396995333634795939
   m_GameObject: 14985545461152450117
-  m_bEnabled: 1
+  m_bEnabled: true
   m_Sprite: Baseplate Grid
   m_Color: [1, 1, 1, 1]
-  m_FlipX: 0
-  m_FlipY: 0
+  m_FlipX: false
+  m_FlipY: false
 ---
 MeshRenderable:
   m_InstanceID: 2544729078981126735

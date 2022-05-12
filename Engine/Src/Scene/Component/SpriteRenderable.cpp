@@ -4,17 +4,20 @@
 #include "Renderer/SpriteMaterial.h"
 #include "Renderer/Graphics/VertexBuffer.h"
 #include "Renderer/Graphics/IndexBuffer.h"
+#include "Resource/ResourceManager.h"
 
 namespace Dive
 {
 	SpriteRenderable::SpriteRenderable(GameObject* pGameObject, unsigned long long id)
 		: Renderable(pGameObject, id)
 	{
-		// 일단 직접 생성한다.
-		// 이 부분은 잘못됐다.
-		// ModelImport 과정에서 직접 생성한 후
-		// Model을 통해 이 곳에서 Set과 함께 Cache된다.
-		m_pMaterial = new SpriteMaterial;
+		// 유니티를 기준으로
+		// Sprite와 Material은 별개다.
+		// 따라서 Sprite, Flip, Color는 전부 SpriteRenderer의,
+		// Material은 Renderer의 멤버 변수이다.
+		// 그리고 Sprite의 Material이 사용하는 Shader는
+		// Default: 알파 블렌딩된 쉐이더, 라이팅과는 연동 X
+		// Diffuse: 간이?적인 알파 블렌딩된 쉐이더, 라이팅과 연동(정면 방향 법선 벡터)
 	}
 
 	SpriteRenderable::~SpriteRenderable()
@@ -28,78 +31,21 @@ namespace Dive
 		DV_DELETE(m_pVertexBuffer);
 	}
 
-	Texture2D* SpriteRenderable::GetSprite()
-	{
-		// Material이 없을 수 있다. 따라서 아래의 구문들은 전부 수정이 필요하다.
-		DV_ASSERT(m_pMaterial != nullptr);
-
-		if(!m_pMaterial->HasSprite())
-			return nullptr;
-
-		return m_pMaterial->GetSprite();
-	}
-
 	void SpriteRenderable::SetSprite(Texture2D* pSprite)
 	{
-		DV_ASSERT(m_pMaterial != nullptr);
-
 		if (pSprite == nullptr)
 			return;
 
-		m_pMaterial->SetSprite(pSprite);
-
-		createBuffer(pSprite->GetWidth(), pSprite->GetHeight());
+		m_pSprite = pSprite;
+		
+		createBuffer(m_pSprite->GetWidth(), m_pSprite->GetHeight());
 	}
 
 	bool SpriteRenderable::HasSprite() const
 	{
-		DV_ASSERT(m_pMaterial != nullptr);
-
-		return m_pMaterial->HasSprite();
+		return m_pSprite != nullptr;
 	}
-
-	DirectX::XMFLOAT4 SpriteRenderable::GetColor() const
-	{
-		DV_ASSERT(m_pMaterial != nullptr);
-
-		return m_pMaterial->GetColor();
-	}
-
-	void SpriteRenderable::SetColor(const DirectX::XMFLOAT4& color)
-	{
-		DV_ASSERT(m_pMaterial != nullptr);
-
-		m_pMaterial->SetColor(color);
-	}
-
-	bool SpriteRenderable::IsFlipX() const
-	{
-		DV_ASSERT(m_pMaterial != nullptr);
-
-		return m_pMaterial->IsFlipX();
-	}
-
-	void SpriteRenderable::SetFlipX(bool flip)
-	{
-		DV_ASSERT(m_pMaterial != nullptr);
-
-		m_pMaterial->SetFlipX(flip);
-	}
-
-	bool SpriteRenderable::IsFlipY() const
-	{
-		DV_ASSERT(m_pMaterial != nullptr);
-
-		return m_pMaterial->IsFlipY();
-	}
-
-	void SpriteRenderable::SetFlipY(bool flip)
-	{
-		DV_ASSERT(m_pMaterial != nullptr);
-
-		m_pMaterial->SetFlipY(flip);
-	}
-
+	
 	bool SpriteRenderable::createBuffer(const unsigned int width, const unsigned int height)
 	{
 		Shutdown();
@@ -141,5 +87,8 @@ namespace Dive
 		return true;
 	}
 
-
+	void SpriteRenderable::SetMaterial(SpriteMaterial* pMaterial)
+	{
+		// 일단 제외
+	}
 }

@@ -156,12 +156,13 @@ namespace Dive
 				out << YAML::BeginMap;
 				out << YAML::Key << "m_InstanceID" << YAML::Value << pSpriteRenderable->GetInstanceID();
 				out << YAML::Key << "m_GameObject" << YAML::Value << pSpriteRenderable->GetGameObject()->GetInstanceID();
-				out << YAML::Key << "m_bEnabled" << YAML::Value << (int)pSpriteRenderable->IsEnabled();
-				// 이하 Material 부분은 Material에서 저장해야 한다.
-				out << YAML::Key << "m_Sprite" << YAML::Value << pMaterial->GetSprite()->GetName();
-				out << YAML::Key << "m_Color" << YAML::Value << pMaterial->GetColor();
-				out << YAML::Key << "m_FlipX" << YAML::Value << (int)pMaterial->IsFlipX();
-				out << YAML::Key << "m_FlipY" << YAML::Value << (int)pMaterial->IsFlipY();
+				out << YAML::Key << "m_bEnabled" << YAML::Value << pSpriteRenderable->IsEnabled();
+				// Resource 역시 InstanceID로 저장하는 편이 낫다.
+				// 다만 그렇게 하려면 생성할 때 기존 InstanceID를 전달받아야 한다.
+				out << YAML::Key << "m_Sprite" << YAML::Value << pSpriteRenderable->GetSprite()->GetName();
+				out << YAML::Key << "m_Color" << YAML::Value << pSpriteRenderable->GetColor();
+				out << YAML::Key << "m_FlipX" << YAML::Value << pSpriteRenderable->IsFlipX();
+				out << YAML::Key << "m_FlipY" << YAML::Value << pSpriteRenderable->IsFlipY();
 				out << YAML::EndMap;
 				out << YAML::EndMap;
 			}
@@ -283,30 +284,17 @@ namespace Dive
 				auto pSpriteRenderable = pOwner->GetComponent<SpriteRenderable>();
 				DV_ASSERT(pSpriteRenderable->GetInstanceID() == instanceID);
 
-				auto bEnabled = meshRenderableNode["m_bEnabled"].as<int>();
-
-				auto pMaterial = pSpriteRenderable->GetMaterial();
-
-				// sprite는 이름이나 ID로 저장하여야 한다.
-				// 이 곳에서는 이를 ResourceManager로 전달하여 포인터를 얻어온 다음
-				// SetSprite()로 넣는게 맞다.
-				// 그런데 찾아보니 유니티의 경우 Material과 Mesh가 파일로 관리되는 듯 하다.
-				// yaml에는 해당 데이터를 file id, guid, type으로 저장했다.
-				// 관련문서에 의하면 file id는 yaml에서의 file id인 듯 하나 material과 mesh는 예제에는 없다.
-				// file id가 결국 yaml 상에서 인덱스를 의미한다 해도, 이를 직접 구현하기는 쉽지 않다...
-				// 생각해보니 Material이 resource라면 하나만 존재하고 다른 곳에서 참조하는 형태가 맞긴 하다.
+				auto bEnabled = meshRenderableNode["m_bEnabled"].as<bool>();
 				auto sprite = meshRenderableNode["m_Sprite"].as<std::string>();
 				auto color = meshRenderableNode["m_Color"].as<DirectX::XMFLOAT4>();
-				auto bFlipX = meshRenderableNode["m_FlipX"].as<int>();
-				auto bFlipY = meshRenderableNode["m_FlipY"].as<int>();
+				auto bFlipX = meshRenderableNode["m_FlipX"].as<bool>();
+				auto bFlipY = meshRenderableNode["m_FlipY"].as<bool>();
 
 				pSpriteRenderable->SetEnable(bEnabled);
-				// 이렇게 하면 버퍼 생성을 건너띈다.
-				//pMaterial->SetSprite(ResourceManager::GetInstance().GetResource<Texture2D>(sprite));
 				pSpriteRenderable->SetSprite(ResourceManager::GetInstance().GetResource<Texture2D>(sprite));
-				pMaterial->SetColor(color);
-				pMaterial->SetFlipX(bFlipX);
-				pMaterial->SetFlipY(bFlipY);
+				pSpriteRenderable->SetColor(color);
+				pSpriteRenderable->SetFlipX(bFlipX);
+				pSpriteRenderable->SetFlipY(bFlipY);
 
 			}
 

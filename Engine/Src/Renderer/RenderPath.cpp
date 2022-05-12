@@ -99,8 +99,7 @@ namespace Dive
 				auto pTransform = pGameObject->GetComponent<Transform>();
 				auto pSpriteRenderable = pGameObject->GetComponent<SpriteRenderable>();
 
-				// 버퍼가 없을 수 있다.
-				if (!pSpriteRenderable->GetVertexBuffer() || !pSpriteRenderable->GetIndexBuffer())
+				if (!pSpriteRenderable->HasSprite())
 					continue;
 
 				// Sprite Buffer
@@ -119,13 +118,9 @@ namespace Dive
 
 					pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Sprite, pCbSprite);
 
-					if (pSpriteRenderable->HasSprite())
-					{
-						auto pShaderResourceView = pSpriteRenderable->GetSprite()->GetShaderResourceView();
-						pImmediateContext->PSSetShaderResources(1, 1, &pShaderResourceView);
-					}
+					auto pShaderResourceView = pSpriteRenderable->GetSprite()->GetShaderResourceView();
+					pImmediateContext->PSSetShaderResources(1, 1, &pShaderResourceView);
 				}
-				
 				
 				pCl->SetVertexBuffer(pSpriteRenderable->GetVertexBuffer());
 				pCl->SetIndexBuffer(pSpriteRenderable->GetIndexBuffer());
