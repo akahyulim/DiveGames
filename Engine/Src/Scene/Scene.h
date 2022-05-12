@@ -13,8 +13,10 @@ namespace Dive
 		// App의 Run에서 직접 호출한다.
 		// Event를 받게 할 수 있다.
 		void Update(float elapsedTime);
-
 		void Clear();
+
+		void Serialize(const std::string& filepath);
+		bool Deserialize(const std::string& filepath);
 
 		GameObject* CreateGameObject(const std::string& name = std::string(), unsigned long long id = 0);
 		void RemoveGameObject(unsigned long long id);

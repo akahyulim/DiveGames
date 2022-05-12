@@ -54,7 +54,6 @@
 #include "Scene/Component/SpriteRenderable.h"
 #include "Scene/Component/MeshRenderable.h"
 #include "Scene/Component/Camera.h"
-#include "Scene/Serializer.h"
 
 //= Math ==========================
 #include "Math/Math.h"

@@ -5,12 +5,16 @@ namespace Dive
 {
 	static const char* EXTENSION_MODEL		= "model";
 	static const char* EXTENSION_TEXTURE	= "texture";
+	static const char* EXTENSION_MATERIAL	= "dv_material";
 
 	enum class eResourceType
 	{
 		Texture,
 		Texture2D,
 		Model,
+		Material,
+		SpriteMaterial,
+		LegacyMaterial,
 		Count
 	};
 

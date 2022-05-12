@@ -109,9 +109,6 @@
     <ClInclude Include="Src\Renderer\SpriteMaterial.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Scene\Serializer.h">
-      <Filter>Src\Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Resource\Resource.h">
       <Filter>Src\Resource</Filter>
     </ClInclude>
@@ -123,6 +120,9 @@
     </ClInclude>
     <ClInclude Include="Src\Resource\Importer\ModelImporter.h">
       <Filter>Src\Resource\Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Helper\YamlHelper.h">
+      <Filter>Src\Helper</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -215,9 +215,6 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\SpriteMaterial.cpp">
       <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Serializer.cpp">
-      <Filter>Src\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Src\Resource\Resource.cpp">
       <Filter>Src\Resource</Filter>

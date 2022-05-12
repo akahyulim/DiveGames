@@ -96,6 +96,8 @@ namespace Dive
 			fileStream.Write(resourcePath);
 			fileStream.Write(type);
 
+			// Cache할 때 한 번 만들었는데... 또 만든다.
+			// 업데이트 개념으로 생각해야 하나?
 			pResource->SaveToFile(resourcePath);
 		}
 

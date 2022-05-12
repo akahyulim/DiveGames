@@ -8,8 +8,13 @@ namespace Dive
 	class SpriteMaterial : public Material
 	{
 	public:
-		SpriteMaterial();
+		RESOURCE_CLASS_TYPE(SpriteMaterial)
+
+		SpriteMaterial(const std::string& name = "", unsigned long long id = 0);
 		~SpriteMaterial();
+
+		bool SaveToFile(const std::string& filepath) override;
+		bool LoadFromFile(const std::string& filepath) override;
 
 		Texture2D* GetSprite() { return m_pSprite; }
 		void SetSprite(Texture2D* pSprite) { m_pSprite = pSprite; }

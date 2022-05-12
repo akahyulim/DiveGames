@@ -76,8 +76,7 @@ void MenuBarPanel::menuFile()
 				// 역시 Scene 이름을 전달하자.
 				Dive::ResourceManager::GetInstance().LoadFromDataFile();
 
-				Dive::Serializer serializer(m_pActiveScene);
-				serializer.Deserialize("Assets/Scenes/New_World.scene");
+				m_pActiveScene->Deserialize("Assets/Scenes/New_World.scene");
 			}
 			ImGui::EndMenu();
 		}
@@ -105,10 +104,7 @@ void MenuBarPanel::menuFile()
 		{
 			if (m_pActiveScene)
 			{
-				Dive::Serializer serializer(m_pActiveScene);
-				// dir만 전달하자!
-				const std::string dir = "Assets/Scenes";
-				serializer.Serialize(dir);
+				m_pActiveScene->Serialize("Assets/Scenes/New_World.scene");
 
 				// scene 이름을 전달하자.
 				Dive::ResourceManager::GetInstance().SaveToDataFile();

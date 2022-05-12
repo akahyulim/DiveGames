@@ -11,6 +11,9 @@ namespace Dive
 		: Renderable(pGameObject, id)
 	{
 		// 일단 직접 생성한다.
+		// 이 부분은 잘못됐다.
+		// ModelImport 과정에서 직접 생성한 후
+		// Model을 통해 이 곳에서 Set과 함께 Cache된다.
 		m_pMaterial = new SpriteMaterial;
 	}
 
@@ -27,6 +30,7 @@ namespace Dive
 
 	Texture2D* SpriteRenderable::GetSprite()
 	{
+		// Material이 없을 수 있다. 따라서 아래의 구문들은 전부 수정이 필요하다.
 		DV_ASSERT(m_pMaterial != nullptr);
 
 		if(!m_pMaterial->HasSprite())

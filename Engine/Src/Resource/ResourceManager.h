@@ -18,6 +18,23 @@ namespace Dive
 		void Clear();
 
 		template<class T>
+		T* Cache(T* pResource)
+		{
+			if (pResource == nullptr)
+				return nullptr;
+
+			auto name = pResource->GetName();
+			if (HasResource<T>(name))
+				return GetResource<T>(name);
+
+			// 이 곳에서 save to file을 한 번 한다.
+			// 이때문에 resource는 engine file path를 가져야 한다.
+			// 그런데 어찌되었던, 최신 상태 파일은 SaveToDataFile()에서 다시 만들때 생성한다.
+
+			return dynamic_cast<T*>(m_Resources.emplace_back(pResource));
+		}
+
+		template<class T>
 		T* Load(const std::string& filepath)
 		{
 			if (!std::filesystem::exists(filepath))
@@ -33,16 +50,14 @@ namespace Dive
 			if (HasResource<T>(name))
 				return GetResource<T>(name);
 
-			auto pCachedResource = new T(name);
-			if (!pCachedResource->LoadFromFile(filepath))
+			auto pCreatedResource = new T(name);
+			if (!pCreatedResource->LoadFromFile(filepath))
 			{
 				DV_CORE_ERROR("파일 로드에 실패하였습니다 - {:s}", filepath);
 				return nullptr;
 			}
 
-			m_Resources.emplace_back(pCachedResource);
-
-			return pCachedResource;
+			return Cache<T>(pCreatedResource);
 		}
 
 		bool HasResource(const std::string& name, const eResourceType type);

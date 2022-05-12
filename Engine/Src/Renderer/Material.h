@@ -1,12 +1,14 @@
 #pragma once
+#include "Resource/Resource.h"
 
 namespace Dive
 {
-	// 추후 Resource 상속을 염두해야 한다.
-	class Material
+	class Material : public Resource
 	{
 	public:
-		Material() = default;
+		RESOURCE_CLASS_TYPE(Material)
+
+		Material(const std::string& name = "", unsigned long long id = 0);
 		virtual ~Material() = default;
 	};
 }

@@ -3477,7 +3477,7 @@ Transform:
 Transform:
   m_InstanceID: 9292737013056934435
   m_GameObject: 10011029965193771728
-  m_LocalRotation: [0, 0.707106531, 0, 0.707107067]
+  m_LocalRotation: [0, 0.382683367, 0, 0.923879564]
   m_LocalPosition: [3.5, 0, 0]
   m_LocalScale: [0.00200000009, 0.00200000009, 0.00200000009]
   m_Parent: 0
@@ -4438,8 +4438,8 @@ Transform:
   m_InstanceID: 15534377969834651426
   m_GameObject: 5461970726672570813
   m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [4, 5.5, 0]
-  m_LocalScale: [0.00999999978, 0.00999999978, 0.00999999978]
+  m_LocalPosition: [15, 10, 30]
+  m_LocalScale: [0.0500000007, 0.0500000007, 0.0500000007]
   m_Parent: 0
 ---
 Transform:
