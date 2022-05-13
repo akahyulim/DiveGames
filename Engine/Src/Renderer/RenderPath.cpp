@@ -8,8 +8,8 @@
 #include "Scene/Component/Renderable.h"
 #include "Scene/Component/SpriteRenderable.h"
 #include "Scene/Component/MeshRenderable.h"
+#include "Material.h"
 #include "Model.h"
-#include "LegacyMaterial.h"
 
 namespace Dive
 {
@@ -177,8 +177,8 @@ namespace Dive
 						pPtr->world				= DirectX::XMMatrixTranspose(pTransform->GetMatrix());
 						pPtr->materialColor		= pMaterial->GetAlbedoColor();
 						pPtr->materialTextures	= 0;
-						pPtr->materialTextures	|= pMaterial->HasTexture(eMaterialMapType::Albedo) ? (1U << 0) : 0;
-						pPtr->materialTextures	|= pMaterial->HasTexture(eMaterialMapType::Normal) ? (1U << 1) : 0;
+						pPtr->materialTextures	|= pMaterial->HasMap(eMaterialMapType::Albedo) ? (1U << 0) : 0;
+						pPtr->materialTextures	|= pMaterial->HasMap(eMaterialMapType::Normal) ? (1U << 1) : 0;
 						pCbUber->Unmap();
 						
 						pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);

@@ -5,7 +5,6 @@ namespace Dive
 {
 	class GameObject;
 	class Model;
-	class LegacyMaterial;
 
 	// Import할 때 해당 GameObject가 관리할
 	// name, offset, count, model을 받아 저장한다.
@@ -14,6 +13,8 @@ namespace Dive
 	class MeshRenderable : public Renderable
 	{
 	public:
+		COMPONENT_CLASS_TYPE(MeshRenderable)
+			
 		MeshRenderable(GameObject* pGameObject, unsigned long long id = 0);
 		~MeshRenderable();
 
@@ -31,11 +32,6 @@ namespace Dive
 
 		Model* GetModel() const { return m_pModel; }
 
-		LegacyMaterial* GetMaterial() const { return m_pMaterial; }
-		void SetMaterail(LegacyMaterial* pMaterial) { m_pMaterial = pMaterial; }
-		bool HasMaterial() const { return m_pMaterial != nullptr; }
-
-		COMPONENT_CLASS_TYPE(MeshRenderable)
 	private:
 
 	private:
@@ -46,6 +42,5 @@ namespace Dive
 		unsigned int m_IndexCount	= 0;
 		
 		Model* m_pModel				= nullptr;
-		LegacyMaterial* m_pMaterial	= nullptr;
 	};
 }

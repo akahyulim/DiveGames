@@ -34,11 +34,6 @@ namespace Dive
 		bool IsFlipY() const { return m_bFlipY; }
 		void SetFlipY(bool flip) { m_bFlipY = flip; }
 
-		// 이건 Renderable의 virtual이어야 한다.
-		SpriteMaterial* GetMaterial() { return m_pMaterial; }
-		void SetMaterial(SpriteMaterial* pMaterial);
-		bool HasMaterial() const { return m_pMaterial != nullptr; }
-
 	private:
 		bool createBuffer(const unsigned int width, const unsigned int height);
 
@@ -55,7 +50,5 @@ namespace Dive
 		DirectX::XMFLOAT4 m_Color		= DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
 		bool m_bFlipX					= false;
 		bool m_bFlipY					= false;
-
-		SpriteMaterial* m_pMaterial		= nullptr;
 	};
 }

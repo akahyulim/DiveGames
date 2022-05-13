@@ -1,7 +1,6 @@
 #include "divepch.h"
 #include "SpriteRenderable.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/SpriteMaterial.h"
 #include "Renderer/Graphics/VertexBuffer.h"
 #include "Renderer/Graphics/IndexBuffer.h"
 #include "Resource/ResourceManager.h"
@@ -13,6 +12,7 @@ namespace Dive
 	{
 		// 유니티를 기준으로
 		// Sprite와 Material은 별개다.
+		// => 애초에 Sprite는 Texture도 아니다. 개별 class다.
 		// 따라서 Sprite, Flip, Color는 전부 SpriteRenderer의,
 		// Material은 Renderer의 멤버 변수이다.
 		// 그리고 Sprite의 Material이 사용하는 Shader는
@@ -85,10 +85,5 @@ namespace Dive
 		}
 
 		return true;
-	}
-
-	void SpriteRenderable::SetMaterial(SpriteMaterial* pMaterial)
-	{
-		// 일단 제외
 	}
 }

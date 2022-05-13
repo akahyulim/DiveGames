@@ -194,6 +194,7 @@ void MenuBarPanel::menuGameObject()
 
 			ImGui::Separator();
 
+			// hazel의 경우 mesh라는 entity를 만들고 mesh component에서 파일을 로드하였다.
 			if (ImGui::MenuItem("Stormtrooper"))
 			{
 				if (m_pActiveScene)

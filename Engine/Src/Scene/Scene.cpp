@@ -4,8 +4,7 @@
 #include "Component/Transform.h"
 #include "Component/SpriteRenderable.h"
 #include "Component/MeshRenderable.h"
-#include "Renderer/LegacyMaterial.h"
-#include "Renderer/SpriteMaterial.h"
+#include "Renderer/Material.h"
 #include "Renderer/Model.h"
 #include "Renderer/Graphics/Texture.h"
 #include "Resource/ResourceManager.h"
@@ -149,16 +148,15 @@ namespace Dive
 			for (auto it = pSpriteRenderables.begin(); it != pSpriteRenderables.end(); it++)
 			{
 				auto pSpriteRenderable = dynamic_cast<SpriteRenderable*>(*it);
-				auto pMaterial = pSpriteRenderable->GetMaterial();	// 이건 virtual이 아니네... 바꿔야 하나...?
-
+				
 				out << YAML::BeginMap;
 				out << YAML::Key << "SpriteRenderable";
 				out << YAML::BeginMap;
 				out << YAML::Key << "m_InstanceID" << YAML::Value << pSpriteRenderable->GetInstanceID();
 				out << YAML::Key << "m_GameObject" << YAML::Value << pSpriteRenderable->GetGameObject()->GetInstanceID();
 				out << YAML::Key << "m_bEnabled" << YAML::Value << pSpriteRenderable->IsEnabled();
-				// Resource 역시 InstanceID로 저장하는 편이 낫다.
-				// 다만 그렇게 하려면 생성할 때 기존 InstanceID를 전달받아야 한다.
+				// Sprite 역시 InstanceID로 관리하는 편이 용이하지만
+				// 현재 Texture2D는 Serialize를 지원하지 않는다.
 				out << YAML::Key << "m_Sprite" << YAML::Value << pSpriteRenderable->GetSprite()->GetName();
 				out << YAML::Key << "m_Color" << YAML::Value << pSpriteRenderable->GetColor();
 				out << YAML::Key << "m_FlipX" << YAML::Value << pSpriteRenderable->IsFlipX();
@@ -176,7 +174,7 @@ namespace Dive
 			for (auto it = pMeshRenderables.begin(); it != pMeshRenderables.end(); it++)
 			{
 				auto pMeshRenderable = dynamic_cast<MeshRenderable*>(*it);
-				auto pMaterial = dynamic_cast<LegacyMaterial*>(pMeshRenderable->GetMaterial());	// 현재 Renderalbe의 virtual 함수가 아니다.
+				auto pMaterial = dynamic_cast<Material*>(pMeshRenderable->GetMaterial());	// 현재 Renderalbe의 virtual 함수가 아니다.
 
 				out << YAML::BeginMap;
 				out << YAML::Key << "MeshRenderable";
@@ -190,13 +188,11 @@ namespace Dive
 				out << YAML::Key << "m_IndexOffset" << YAML::Value << pMeshRenderable->IndexOffset();
 				out << YAML::Key << "m_IndexCount" << YAML::Value << pMeshRenderable->IndexCount();
 				out << YAML::Key << "m_Model" << YAML::Value << pMeshRenderable->GetModel()->GetName();	// 이름은 중복될 수 있다.
-				out << YAML::Key << "m_AlbedoColor" << YAML::Value << pMaterial->GetAlbedoColor();
+				out << YAML::Key << "m_AlbedoColor" << YAML::Value << pMaterial->GetAlbedoColor();	// 이건 mtrl에서 관리해야 한다.
 				out << YAML::EndMap;
 				out << YAML::EndMap;
 			}
 		}
-
-		// 결국 material과 같은 resource는 분리하여 저장해야 한다.
 
 		std::ofstream fout(filepath);
 		fout << out.c_str();
@@ -302,25 +298,25 @@ namespace Dive
 			{
 				auto meshRenderableNode = node["MeshRenderable"];
 
-				auto instanceID = meshRenderableNode["m_InstanceID"].as<unsigned long long>();
-				auto gameObjectID = meshRenderableNode["m_GameObject"].as<unsigned long long>();
+				auto instanceID		= meshRenderableNode["m_InstanceID"].as<unsigned long long>();
+				auto gameObjectID	= meshRenderableNode["m_GameObject"].as<unsigned long long>();
 				auto pOwner = GetGameObject(gameObjectID);
 				DV_ASSERT(pOwner->GetComponent<MeshRenderable>()->GetInstanceID() == instanceID);
 				auto pMeshRenderable = pOwner->GetComponent<MeshRenderable>();
 				DV_ASSERT(pMeshRenderable->GetInstanceID() == instanceID);
 
-				auto bEnabled = meshRenderableNode["m_bEnabled"].as<int>();
-				auto geometryName = meshRenderableNode["m_GeometryName"].as<std::string>();
-				auto vertexOffset = meshRenderableNode["m_VertexOffset"].as<unsigned int>();
-				auto vertexCount = meshRenderableNode["m_VertexCount"].as<unsigned int>();
-				auto indexOffset = meshRenderableNode["m_IndexOffset"].as<unsigned int>();
-				auto indexCount = meshRenderableNode["m_IndexCount"].as<unsigned int>();
-				auto model = meshRenderableNode["m_Model"].as<std::string>();
-				auto albedoColor = meshRenderableNode["m_AlbedoColor"].as<DirectX::XMFLOAT4>();
+				auto bEnabled		= meshRenderableNode["m_bEnabled"].as<int>();
+				auto geometryName	= meshRenderableNode["m_GeometryName"].as<std::string>();
+				auto vertexOffset	= meshRenderableNode["m_VertexOffset"].as<unsigned int>();
+				auto vertexCount	= meshRenderableNode["m_VertexCount"].as<unsigned int>();
+				auto indexOffset	= meshRenderableNode["m_IndexOffset"].as<unsigned int>();
+				auto indexCount		= meshRenderableNode["m_IndexCount"].as<unsigned int>();
+				auto model			= meshRenderableNode["m_Model"].as<std::string>();
+				auto albedoColor	= meshRenderableNode["m_AlbedoColor"].as<DirectX::XMFLOAT4>();
 
 				// 일단 직접 생성
 				// 그런데 Material 역시 Resource다...?
-				pMeshRenderable->SetMaterail(new LegacyMaterial);
+				pMeshRenderable->SetMaterial(new Material);
 				auto pMaterial = pMeshRenderable->GetMaterial();
 				auto pModel = ResourceManager::GetInstance().GetResource<Model>(model);
 

@@ -1,11 +1,12 @@
 #include "divepch.h"
 #include "ModelImporter.h"
 #include "Renderer/Model.h"
-#include "Renderer/LegacyMaterial.h"
+#include "Renderer/Material.h"
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
 #include "Scene/Component/MeshRenderable.h"
 #include "Helper/FileSystem.h"
+#include "Resource/ResourceManager.h"
 
 namespace Dive
 {
@@ -217,22 +218,34 @@ namespace Dive
         return pMeshRenderable;
     }
 
+    // 현재 Mesh 단위로 Material을 탐색하고 있다.
+    // 해당 Mesh 단위로 MeshRenderable을 생성하고 mtrl을 연결하기 위한 듯 하나
+    // 동일한 이름의 mtrl이 검색되는 것으로 보아 mtrl이 중복 생성됨을 생각해볼 수 있다.
+    // 따라서 여기에선 Renderable에 연결만 하고
+    // Material의 생성은 다른 방법을 찾아야 한다.
     void ModelImporter::loadMaterial(const ModelParams& params, const aiMesh* pAiMesh, MeshRenderable* pMeshRenderable)
     {
         if (!params.pAiScene->HasMaterials())
             return;
 
         // material 생성
-        // 스파르탄도 그냥 동적생성한다. 임포트의 특성일 수 있다.
-        auto pMaterial = new LegacyMaterial();
+        auto pMaterial = new Material();
         auto pAiMaterial = params.pAiScene->mMaterials[pAiMesh->mMaterialIndex];
+        // 일단 이름을 만들고 매니져에 넣는다.
+        // 스파르탄은 Model에 Set하면 그 곳에서 함께 전달된 Renderable에서 Cache한다.
+        pMaterial->SetName(pAiMaterial->GetName().C_Str());
+        ResourceManager::GetInstance().Cache<Material>(pMaterial);
+        DV_CORE_TRACE("mtrl: {:s}", pAiMaterial->GetName().C_Str());
+        // 동일한 이름의 mtrl이 존재한다.
+        // 문제는 값 또한 같은 것인지 아직 확인이 불가능하다는 것이다.
+        // 현재 Mesh 단위로 탐색 중이니 아마도 같은 것 같다는 생각은 든다.
 
         // name
         // 이 이름을 추후 Engine format의 material file 이름으로 활용하는 듯 하다.
         aiString name;
         aiGetMaterialString(pAiMaterial, AI_MATKEY_NAME, &name);
         // 둘의 차이를 모르겠다.
-        DV_APP_INFO("material name: {0:s} / {1:s}", pAiMaterial->GetName().C_Str(), name.C_Str());
+        //DV_CORE_INFO("material name: {0:s} / {1:s}", pAiMaterial->GetName().C_Str(), name.C_Str());
 
         // color + opacity
         aiColor4D color;
@@ -256,7 +269,7 @@ namespace Dive
                     auto pTex = Texture2D::Create(texPath);
                     if (!pTex)
                     {
-                        DV_APP_WARN("{:s} 로드에 실패하였습니다.", texPath);
+                        DV_CORE_WARN("{:s} 로드에 실패하였습니다.", texPath);
                     }
                     pMaterial->SetMap(diveType, pTex);
 
@@ -274,6 +287,6 @@ namespace Dive
         loadMaterialTex(eMaterialMapType::Albedo, aiTextureType_BASE_COLOR, aiTextureType_DIFFUSE);
         loadMaterialTex(eMaterialMapType::Normal, aiTextureType_NORMAL_CAMERA, aiTextureType_NORMALS);
 
-        pMeshRenderable->SetMaterail(pMaterial);
+        pMeshRenderable->SetMaterial(pMaterial);
     }
 }
