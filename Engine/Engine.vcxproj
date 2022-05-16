@@ -203,6 +203,7 @@
     <ClInclude Include="Src\Resource\ResourceManager.h" />
     <ClInclude Include="Src\Scene\Component\Camera.h" />
     <ClInclude Include="Src\Scene\Component\Component.h" />
+    <ClInclude Include="Src\Scene\Component\Light.h" />
     <ClInclude Include="Src\Scene\Component\MeshRenderable.h" />
     <ClInclude Include="Src\Scene\Component\Renderable.h" />
     <ClInclude Include="Src\Scene\Component\SpriteRenderable.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="Src\Scene\Component\Camera.cpp" />
     <ClCompile Include="Src\Scene\Component\Component.cpp" />
+    <ClCompile Include="Src\Scene\Component\Light.cpp" />
     <ClCompile Include="Src\Scene\Component\MeshRenderable.cpp" />
     <ClCompile Include="Src\Scene\Component\Renderable.cpp" />
     <ClCompile Include="Src\Scene\Component\SpriteRenderable.cpp" />

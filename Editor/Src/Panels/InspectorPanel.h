@@ -15,6 +15,7 @@ private:
 	void drawTransform(Dive::GameObject* pSelectedObject);
 	void drawSpriteRenderer(Dive::GameObject* pSelectedObject);
 	void drawMeshRenderer(Dive::GameObject* pSelectedObject);
+	void drawLight(Dive::GameObject* pSelectedObject);
 	
 private:
 };

@@ -224,6 +224,33 @@ void MenuBarPanel::menuGameObject()
 
 		if (ImGui::BeginMenu("Light"))
 		{
+			if (ImGui::MenuItem("Directional"))
+			{
+				if (m_pActiveScene)
+				{
+					auto lightObj = m_pActiveScene->CreateGameObject("Directional_Light");
+					lightObj->AddComponent<Dive::Transform>();
+					auto lightCom = lightObj->AddComponent<Dive::Light>();
+					lightCom->SetLightType(Dive::eLightType::Directional);
+				}
+			}
+
+			if (ImGui::MenuItem("Point"))
+			{
+				if (m_pActiveScene)
+				{
+
+				}
+			}
+
+			if (ImGui::MenuItem("Spot"))
+			{
+				if (m_pActiveScene)
+				{
+
+				}
+			}
+
 			ImGui::EndMenu();
 		}
 
@@ -250,6 +277,21 @@ void MenuBarPanel::menuComponent()
 					if (!pSelected->HasComponent<Dive::SpriteRenderable>())
 					{
 						pSelected->AddComponent<Dive::SpriteRenderable>();
+					}
+				}
+			}
+		}
+
+		if (ImGui::MenuItem("Light"))
+		{
+			if (m_pActiveScene)
+			{
+				auto pSelected = m_pEditor->GetHierarchy()->GetSeletecedObject();
+				if (pSelected)
+				{
+					if (!pSelected->HasComponent<Dive::Light>())
+					{
+						pSelected->AddComponent<Dive::Light>();
 					}
 				}
 			}

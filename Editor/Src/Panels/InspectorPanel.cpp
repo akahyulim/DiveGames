@@ -103,6 +103,7 @@ void InspectorPanel::renderWindow()
 	drawTransform(pSelectedObject);
 	drawSpriteRenderer(pSelectedObject);
 	drawMeshRenderer(pSelectedObject);
+	drawLight(pSelectedObject);
 
 	// add components
 	if (ImGui::Button("Add Component"))
@@ -259,6 +260,45 @@ void InspectorPanel::drawMeshRenderer(Dive::GameObject* pSelectedObject)
 		color = DirectX::XMFLOAT4(col[0], col[1], col[2], col[3]);
 		if(pMaterial)
 			pMaterial->SetAlbedoColor(color);
+	}
+
+	ImGui::Separator();
+}
+
+void InspectorPanel::drawLight(Dive::GameObject* pSelectedObject)
+{
+	if (pSelectedObject == nullptr)
+		return;
+
+	auto pLightComponent = pSelectedObject->GetComponent<Dive::Light>();
+	if (pLightComponent == nullptr)
+		return;
+
+	if (ImGui::CollapsingHeader("Light Renderable", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
+	{
+		// enabled
+		bool enabled = pLightComponent->IsEnabled();
+		ImGui::Checkbox("Enabled", &enabled);
+		pLightComponent->SetEnable(enabled);
+
+		// type
+		const char* items[] = { "Directional", "Point", "Spot" };
+		int currentItem = static_cast<int>(pLightComponent->GetLightType());
+		ImGui::Text("Type");
+		ImGui::SameLine();
+		ImGui::Combo("##lightType", &currentItem, items, IM_ARRAYSIZE(items));
+		pLightComponent->SetLightType(static_cast<Dive::eLightType>(currentItem));
+
+		// color
+		auto color = pLightComponent->GetColor();
+		float col[3] = { color.x, color.y, color.z };
+		ImGui::Text("Color");
+		ImGui::SameLine();
+		ImGui::ColorEdit3("##lightColor", col);
+		color = DirectX::XMFLOAT3(col[0], col[1], col[2]);
+		pLightComponent->SetColor(color);
+
+		// range
 	}
 
 	ImGui::Separator();

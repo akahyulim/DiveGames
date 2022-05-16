@@ -130,76 +130,100 @@ namespace Dive
 			}
 		}
 
-		if(!m_MainVisibilities.visibleMeshRenderables.empty())
-		{
-			// pipeline은 il, shader가 다르다.
-			PipelineState ps;
-			ps.primitiveTopology	= D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;//D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
-			ps.pInputLayout			= Renderer::GetShader(eShaderType::Mesh)->pInputLayout;
-			ps.pVertexShader		= Renderer::GetShader(eShaderType::Mesh)->pVertexShader;
-			ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
-			ps.pPixelShader			= Renderer::GetShader(eShaderType::Mesh)->pPixelShader;
-			ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
-			ps.renderTargetViews[0] = Renderer::GetGbufferAlbedo()->GetRenderTargetView();
-			ps.pViewport			= Renderer::GetGbufferAlbedo()->GetViewport();
-			ps.pDepthStencilView	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
-
-			pCl->BindPipelineState(ps);
-
-			for (auto pGameObject : m_MainVisibilities.visibleMeshRenderables)
+		if(!m_MainVisibilities.visibleLights.empty())
+		{ 
+			// forward light 이므로 Light * object 만큼 draw call이 발생한다.
+			// 그리고 현재 구현이 잘못되어 두 번째 Light부터 적용이 되지 않는다.
+			for (auto pGameObject : m_MainVisibilities.visibleLights)
 			{
+				auto pLight = pGameObject->GetComponent<Light>();
+				if (pLight == nullptr || !pLight->IsEnabled())
+					continue;
+
 				auto pTransform = pGameObject->GetComponent<Transform>();
-				auto pMeshRenderable = pGameObject->GetComponent<MeshRenderable>();
 
-				// renderable로부터 model 획득
-				// buffer는 Model로부터 획득
-				// bind시 stride가 필요하다. offset은 그냥 0인듯
-				auto pModel = pMeshRenderable->GetModel();
-				if (pModel == nullptr)
-					continue;
+				// 현재 테스트에선 cb만 만들어서 등록하면 될 듯
+				// map & unmap
+				auto pCbLight = Renderer::GetCbLight();
+				auto pPtr = static_cast<LightBuffer*>(pCbLight->Map());
+				pPtr->dir = pTransform->GetForward();
+				pPtr->color = pLight->GetColor();
+				pCbLight->Unmap();
 
-				// 이것두 버퍼가 없을 수 있다.
-				if (!pModel->GetVertexBuffer() || !pModel->GetIndexBuffer())
-					continue;
-				
-				pCl->SetVertexBuffer(pModel->GetVertexBuffer());
-				pCl->SetIndexBuffer(pModel->GetIndexBuffer());
+				pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Light, pCbLight);
 
-				// UberBuffer
+				if (!m_MainVisibilities.visibleMeshRenderables.empty())
 				{
-					auto pMaterial = pMeshRenderable->GetMaterial();
-					if (pMaterial)
+					// pipeline은 il, shader가 다르다.
+					PipelineState ps;
+					ps.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;//D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+					ps.pInputLayout = Renderer::GetShader(eShaderType::Mesh)->pInputLayout;
+					ps.pVertexShader = Renderer::GetShader(eShaderType::Mesh)->pVertexShader;
+					ps.pRasterizerState = Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
+					ps.pPixelShader = Renderer::GetShader(eShaderType::Mesh)->pPixelShader;
+					ps.pDepthStencilState = Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
+					ps.renderTargetViews[0] = Renderer::GetGbufferAlbedo()->GetRenderTargetView();
+					ps.pViewport = Renderer::GetGbufferAlbedo()->GetViewport();
+					ps.pDepthStencilView = Renderer::GetDepthStencilTexture()->GetDepthStencilView();
+
+					pCl->BindPipelineState(ps);
+
+					for (auto pGameObject : m_MainVisibilities.visibleMeshRenderables)
 					{
-						auto pCbUber = Renderer::GetCbUber();
+						auto pTransform = pGameObject->GetComponent<Transform>();
+						auto pMeshRenderable = pGameObject->GetComponent<MeshRenderable>();
 
-						// map & unmap
-						auto pPtr = static_cast<UberBuffer*>(pCbUber->Map());
-						pPtr->world				= DirectX::XMMatrixTranspose(pTransform->GetMatrix());
-						pPtr->materialColor		= pMaterial->GetAlbedoColor();
-						pPtr->materialTextures	= 0;
-						pPtr->materialTextures	|= pMaterial->HasMap(eMaterialMapType::Albedo) ? (1U << 0) : 0;
-						pPtr->materialTextures	|= pMaterial->HasMap(eMaterialMapType::Normal) ? (1U << 1) : 0;
-						pCbUber->Unmap();
-						
-						pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);
+						// renderable로부터 model 획득
+						// buffer는 Model로부터 획득
+						// bind시 stride가 필요하다. offset은 그냥 0인듯
+						auto pModel = pMeshRenderable->GetModel();
+						if (pModel == nullptr)
+							continue;
 
-						// 이 부분도 CommandList로 옮겨야 한다.
-						// slot은 eMaterialMapType으로 전달할 수 있을 것 같다.
-						auto pAlbedoTex = pMaterial->GetMap(eMaterialMapType::Albedo);
-						auto pSrv = pAlbedoTex ? pAlbedoTex->GetShaderResourceView() : nullptr;
-						pImmediateContext->PSSetShaderResources(1, 1, &pSrv);
-						auto pNormalTex = pMaterial->GetMap(eMaterialMapType::Normal);
-						pSrv = pNormalTex ? pNormalTex->GetShaderResourceView() : nullptr;
-						pImmediateContext->PSSetShaderResources(2, 1, &pSrv);
+						// 이것두 버퍼가 없을 수 있다.
+						if (!pModel->GetVertexBuffer() || !pModel->GetIndexBuffer())
+							continue;
+
+						pCl->SetVertexBuffer(pModel->GetVertexBuffer());
+						pCl->SetIndexBuffer(pModel->GetIndexBuffer());
+
+						// UberBuffer
+						{
+							auto pMaterial = pMeshRenderable->GetMaterial();
+							if (pMaterial)
+							{
+								auto pCbUber = Renderer::GetCbUber();
+
+								// map & unmap
+								auto pPtr = static_cast<UberBuffer*>(pCbUber->Map());
+								pPtr->world = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
+								pPtr->materialColor = pMaterial->GetAlbedoColor();
+								pPtr->materialTextures = 0;
+								pPtr->materialTextures |= pMaterial->HasMap(eMaterialMapType::Albedo) ? (1U << 0) : 0;
+								pPtr->materialTextures |= pMaterial->HasMap(eMaterialMapType::Normal) ? (1U << 1) : 0;
+								pCbUber->Unmap();
+
+								pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);
+
+								// 이 부분도 CommandList로 옮겨야 한다.
+								// slot은 eMaterialMapType으로 전달할 수 있을 것 같다.
+								auto pAlbedoTex = pMaterial->GetMap(eMaterialMapType::Albedo);
+								auto pSrv = pAlbedoTex ? pAlbedoTex->GetShaderResourceView() : nullptr;
+								pImmediateContext->PSSetShaderResources(1, 1, &pSrv);
+								auto pNormalTex = pMaterial->GetMap(eMaterialMapType::Normal);
+								pSrv = pNormalTex ? pNormalTex->GetShaderResourceView() : nullptr;
+								pImmediateContext->PSSetShaderResources(2, 1, &pSrv);
+							}
+						}
+
+						// draw시 index count, index offset, vertex offset이 필요하다.
+						// 이들은 renderable이 관리한다.
+						auto indexCount = pMeshRenderable->IndexCount();
+						auto indexOffset = pMeshRenderable->IndexOffset();
+						auto vertexOffset = pMeshRenderable->VertexOffset();
+						pImmediateContext->DrawIndexed(indexCount, indexOffset, vertexOffset);
 					}
 				}
-
-				// draw시 index count, index offset, vertex offset이 필요하다.
-				// 이들은 renderable이 관리한다.
-				auto indexCount = pMeshRenderable->IndexCount();
-				auto indexOffset = pMeshRenderable->IndexOffset();
-				auto vertexOffset = pMeshRenderable->VertexOffset();
-				pImmediateContext->DrawIndexed(indexCount, indexOffset, vertexOffset);
 			}
 		}
 	}

@@ -3,6 +3,7 @@
 #include "Component/Component.h"
 #include "Component/Transform.h"
 #include "Component/Camera.h"
+#include "Component/Light.h"
 #include "Component/SpriteRenderable.h"
 #include "Component/MeshRenderable.h"
 #include "Events/EngineEvents.h"
@@ -60,6 +61,10 @@ namespace Dive
 				break;
 			case eComponentType::MeshRenderable:
 				pAddedComponent = new MeshRenderable(this, id);
+				break;
+
+			case eComponentType::Light:
+				pAddedComponent = new Light(this, id);
 				break;
 
 			default:

@@ -25,7 +25,7 @@ namespace Dive
 		Frame = 0,
 		Uber,
 		Sprite,
-		//Light,
+		Light,
 		//Material
 	};
 
@@ -153,6 +153,7 @@ namespace Dive
 		static ConstantBuffer* GetCbFrame() { return m_pCbFrame; }
 		static ConstantBuffer* GetCbUber() { return m_pCbUber; }
 		static ConstantBuffer* GetCbSprite() { return m_pCbSprite; }
+		static ConstantBuffer* GetCbLight() { return m_pCbLight; }
 
 		static void UpdateVisibility(Visibility& vis);
 
@@ -198,6 +199,7 @@ namespace Dive
 		static ConstantBuffer* m_pCbFrame;
 		static ConstantBuffer* m_pCbUber;
 		static ConstantBuffer* m_pCbSprite;
+		static ConstantBuffer* m_pCbLight;
 
 		static D3D11_VIEWPORT m_Viewport;
 

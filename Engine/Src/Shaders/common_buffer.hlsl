@@ -30,6 +30,12 @@ cbuffer SpriteBuffer : register(b2)
 	uint3 g_sprite_padding;
 }
 
+cbuffer LightBuffer : register(b3)
+{
+	float3 g_dir_light_dir;
+	float3 g_light_color;
+}
+
 bool HasAlbedoTexture() { return g_mat_textures & uint(1U << 0); }
 bool HasNormalTexture() { return g_mat_textures & uint(1U << 1); }
 

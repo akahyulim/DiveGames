@@ -4,6 +4,7 @@
 #include "Component/Transform.h"
 #include "Component/SpriteRenderable.h"
 #include "Component/MeshRenderable.h"
+#include "Component/Light.h"
 #include "Renderer/Material.h"
 #include "Renderer/Model.h"
 #include "Renderer/Graphics/Texture.h"
@@ -194,6 +195,28 @@ namespace Dive
 			}
 		}
 
+		// Lights
+		if (!GetComponents(eComponentType::Light).empty())
+		{
+			auto pLights = GetComponents(eComponentType::Light);
+
+			for (auto it = pLights.begin(); it != pLights.end(); it++)
+			{
+				auto pLight = dynamic_cast<Light*>(*it);
+
+				out << YAML::BeginMap;
+				out << YAML::Key << "Light";
+				out << YAML::BeginMap;
+				out << YAML::Key << "m_InstanceID" << YAML::Value << pLight->GetInstanceID();
+				out << YAML::Key << "m_GameObject" << YAML::Value << pLight->GetGameObject()->GetInstanceID();
+				out << YAML::Key << "m_bEnabled" << YAML::Value << (int)pLight->IsEnabled();
+				out << YAML::Key << "m_LightType" << YAML::Value << (int)pLight->GetLightType();
+				out << YAML::Key << "m_Color" << YAML::Value << pLight->GetColor();
+				out << YAML::EndMap;
+				out << YAML::EndMap;
+			}
+		}
+
 		std::ofstream fout(filepath);
 		fout << out.c_str();
 	}
@@ -324,6 +347,26 @@ namespace Dive
 				if (pModel)
 					pMeshRenderable->SetGeometry(geometryName, vertexOffset, vertexCount, indexOffset, indexCount, pModel);
 				pMaterial->SetAlbedoColor(albedoColor);
+			}
+
+			// light
+			if (node["Light"])
+			{
+				auto lightNode = node["Light"];
+
+				auto instanceID = lightNode["m_InstanceID"].as<unsigned long long>();
+				auto gameObjectID = lightNode["m_GameObject"].as<unsigned long long>();
+				auto pOwner = GetGameObject(gameObjectID);
+				DV_ASSERT(pOwner->GetComponent<Light>()->GetInstanceID() == instanceID);
+				auto pLight = pOwner->GetComponent<Light>();
+				DV_ASSERT(pLight->GetInstanceID() == instanceID);
+
+				auto bEnabled = lightNode["m_bEnabled"].as<int>();
+				auto type = lightNode["m_LightType"].as<int>();
+				
+				pLight->SetEnable(bEnabled);
+				pLight->SetLightType(static_cast<eLightType>(type));
+				pLight->SetColor(lightNode["m_Color"].as<DirectX::XMFLOAT3>());
 			}
 		}
 

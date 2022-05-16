@@ -28,4 +28,12 @@ namespace Dive
 		unsigned int options = 0;
 		unsigned int padding[3] = { 0 };
 	};
+
+	struct LightBuffer
+	{
+		DirectX::XMFLOAT3 dir = { 0.0f, 0.0f, 0.0f };
+		float pad;
+		DirectX::XMFLOAT3 color = { 1.0f, 1.0f, 1.0f };
+		float pad2;
+	};
 }

@@ -8,6 +8,7 @@
 #include "Scene/GameObject.h"
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/SpriteRenderable.h"
+#include "Scene/Component/Light.h"
 
 namespace Dive
 {
@@ -25,6 +26,7 @@ namespace Dive
 	ConstantBuffer* Renderer::m_pCbFrame = nullptr;
 	ConstantBuffer* Renderer::m_pCbUber = nullptr;
 	ConstantBuffer* Renderer::m_pCbSprite = nullptr;
+	ConstantBuffer* Renderer::m_pCbLight = nullptr;
 
 	D3D11_VIEWPORT Renderer::m_Viewport;
 
@@ -191,10 +193,18 @@ namespace Dive
 					vis.visibleSpriteRenderables.emplace_back(pGameObject);
 			}
 
+			// mesh renderalbes
 			{
 				auto pMeshRenderable = pGameObject->GetComponent<MeshRenderable>();
 				if (pMeshRenderable && pMeshRenderable->IsEnabled())
 					vis.visibleMeshRenderables.emplace_back(pGameObject);
+			}
+
+			// lights
+			{
+				auto pLight = pGameObject->GetComponent<Light>();
+				if (pLight && pLight->IsEnabled())
+					vis.visibleLights.emplace_back(pGameObject);
 			}
 		}
 	}
@@ -341,5 +351,8 @@ namespace Dive
 
 		m_pCbSprite = new ConstantBuffer;
 		m_pCbSprite->Create<SpriteBuffer>();
+
+		m_pCbLight = new ConstantBuffer;
+		m_pCbLight->Create<LightBuffer>();
 	}
 }

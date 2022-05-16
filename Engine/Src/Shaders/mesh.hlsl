@@ -39,14 +39,15 @@ SamplerState linearSampler;
 
 float4 CalcuDirectionalLight(float3 normal)
 {
-	float4 lightColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	float3 lightDir = float3(1.0f, -1.0f, 1.0f);
+	float4 lightColor = float4(g_light_color, 1.0f);
+	float3 lightDir = g_dir_light_dir;
 
 	// diffuse
 	float lightIntensity = saturate(dot(normal, -lightDir));
 	lightColor = saturate(lightColor * lightIntensity);
 
 	// specular
+	// 카메라 위치가 필요하다.
 
 	return lightColor;
 }
@@ -74,6 +75,8 @@ Pixel_Output mainPS(Pixel_Input input)
 
 	float4 color = albedo;
 
+	// 곱하는 것인지, 더하는 것인지... 테스트를 해봐도 모르겠다.
+	// rastertek은 곱했고, 책은 더했다...
 	color *= CalcuDirectionalLight(normal);
 
 	output.albedo = color;

@@ -68,11 +68,19 @@ GameObject:
     - 0: 8491294232979699187
     - 3: 18380195010966379570
 ---
+GameObject:
+  m_InstanceID: 4351392605559722766
+  m_Name: DirectionalLight
+  m_bActive: 1
+  m_Component:
+    - 0: 2912900825378185495
+    - 5: 13480224764948454448
+---
 Transform:
   m_InstanceID: 13782616469023307455
   m_GameObject: 17016521625386918359
   m_LocalRotation: [0, 0.382683367, 0, 0.923879564]
-  m_LocalPosition: [0, 1, 0]
+  m_LocalPosition: [0, 1, -5]
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
 ---
@@ -104,8 +112,8 @@ Transform:
   m_InstanceID: 12583672073916194093
   m_GameObject: 9334014870940779690
   m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [-4.5, 3, -7.5999999]
-  m_LocalScale: [1, 1, 1]
+  m_LocalPosition: [-8, 2.5, 0]
+  m_LocalScale: [2, 2, 2]
   m_Parent: 0
 ---
 Transform:
@@ -128,17 +136,25 @@ Transform:
   m_InstanceID: 4441013507986128588
   m_GameObject: 15615581569613569180
   m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [0, 0, -0]
-  m_LocalScale: [1, 1, 1]
+  m_LocalPosition: [6.5, 2, 0]
+  m_LocalScale: [2, 2, 2]
   m_Parent: 0
 ---
 Transform:
   m_InstanceID: 8491294232979699187
   m_GameObject: 5644510691149911156
   m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [5, 1, 0]
+  m_LocalPosition: [0, 0, 0]
   m_LocalScale: [1, 1, 1]
   m_Parent: 4441013507986128588
+---
+Transform:
+  m_InstanceID: 2912900825378185495
+  m_GameObject: 4351392605559722766
+  m_LocalRotation: [0.353552818, 0.353553444, -0.146446362, 0.853553653]
+  m_LocalPosition: [0, 5, 0]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 0
 ---
 MeshRenderable:
   m_InstanceID: 14610844427729167174
@@ -150,7 +166,7 @@ MeshRenderable:
   m_IndexOffset: 0
   m_IndexCount: 36
   m_Model: Cube
-  m_AlbedoColor: [1, 1, 1, 1]
+  m_AlbedoColor: [0, 1, 0, 1]
 ---
 MeshRenderable:
   m_InstanceID: 11452441027775174875
@@ -162,7 +178,7 @@ MeshRenderable:
   m_IndexOffset: 0
   m_IndexCount: 6
   m_Model: Plane
-  m_AlbedoColor: [1, 1, 1, 1]
+  m_AlbedoColor: [0, 0, 0, 1]
 ---
 MeshRenderable:
   m_InstanceID: 7355569934198619297
@@ -186,4 +202,11 @@ MeshRenderable:
   m_IndexOffset: 0
   m_IndexCount: 186
   m_Model: Cone
-  m_AlbedoColor: [0.0044247508, 1, 0.286357462, 1]
+  m_AlbedoColor: [0, 0, 1, 1]
+---
+Light:
+  m_InstanceID: 13480224764948454448
+  m_GameObject: 4351392605559722766
+  m_bEnabled: 1
+  m_LightType: 0
+  m_Color: [0.526548684, 0.526548684, 0.526548684]

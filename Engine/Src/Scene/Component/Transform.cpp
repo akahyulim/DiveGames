@@ -264,10 +264,19 @@ namespace Dive
 		// axis 축을 angle만큼 회전시킨 후 다시 m_LocalRotation을 회전하는 것 같다.
 	}
 
-	// 위치 행렬 * 회전 행렬에 축 벡터를 곱하면 될 것 같다.
+	// 스파르탄의 경우 로컬 회전 행렬에 각 축 행렬을 곱했다.
 	DirectX::XMFLOAT3 Transform::GetForward()
 	{
-		return DirectX::XMFLOAT3();
+		auto vecLocalRotation = DirectX::XMLoadFloat4(&m_LocalRotation);
+		auto localRotation = DirectX::XMMatrixRotationQuaternion(vecLocalRotation);
+
+		auto forwardVector = DirectX::XMVector3Transform(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f), localRotation);
+		forwardVector = DirectX::XMVector3Normalize(forwardVector);
+
+		DirectX::XMFLOAT3 forward;
+		DirectX::XMStoreFloat3(&forward, forwardVector);
+
+		return forward;
 	}
 
 	DirectX::XMFLOAT3 Transform::GetUp()
