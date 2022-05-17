@@ -151,7 +151,7 @@ Transform:
 Transform:
   m_InstanceID: 2912900825378185495
   m_GameObject: 4351392605559722766
-  m_LocalRotation: [0.353552818, 0.353553444, -0.146446362, 0.853553653]
+  m_LocalRotation: [0.382683367, 8.06254974e-09, -1.94647249e-08, 0.923879564]
   m_LocalPosition: [0, 5, 0]
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
@@ -178,7 +178,7 @@ MeshRenderable:
   m_IndexOffset: 0
   m_IndexCount: 6
   m_Model: Plane
-  m_AlbedoColor: [0, 0, 0, 1]
+  m_AlbedoColor: [1, 1, 1, 1]
 ---
 MeshRenderable:
   m_InstanceID: 7355569934198619297
@@ -209,4 +209,4 @@ Light:
   m_GameObject: 4351392605559722766
   m_bEnabled: 1
   m_LightType: 0
-  m_Color: [0.526548684, 0.526548684, 0.526548684]
+  m_Color: [1, 1, 1]

@@ -54,6 +54,7 @@ void EditorRenderPath::Render()
 	// 그렇다면 결국 SceneViewCamera는 Camera를 상속해야 한다.
 	auto view = m_pSceneViewCamera->GetViewMatrix();
 	auto proj = m_pSceneViewCamera->GetProjectionMatrix();
+	auto eyePos = m_pSceneViewCamera->GetPosition();
 
 	auto pImmediateContext = Dive::Renderer::GetGraphicsDevice().GetImmediateContext();
 
@@ -66,6 +67,7 @@ void EditorRenderPath::Render()
 		auto pPtr = static_cast<Dive::FrameBuffer*>(pCbFrame->Map());
 		pPtr->view = DirectX::XMMatrixTranspose(view);
 		pPtr->proj = DirectX::XMMatrixTranspose(proj);
+		pPtr->eyePos = eyePos;
 		pCbFrame->Unmap();
 
 		cl.SetConstantBuffer(Dive::Scope_Vertex, Dive::eConstantBufferSlot::Frame, pCbFrame);

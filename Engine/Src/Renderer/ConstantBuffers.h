@@ -7,6 +7,9 @@ namespace Dive
 	{
 		DirectX::XMMATRIX view = DirectX::XMMatrixIdentity();
 		DirectX::XMMATRIX proj = DirectX::XMMatrixIdentity();
+
+		DirectX::XMFLOAT3 eyePos = {0.0f, 0.0f, 0.0f};
+		float pad;
 	};
 
 	struct UberBuffer

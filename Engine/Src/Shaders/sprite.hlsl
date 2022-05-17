@@ -17,9 +17,9 @@ Pixel_Input mainVS(Vertex_PosTex input)
 	
 	input.position.w = 1.0f;
 
-	output.position = mul(input.position, g_sprite_world);
-	output.position = mul(output.position, g_view);
-	output.position = mul(output.position, g_proj);
+	output.position = mul(input.position, g_SpriteWorld);
+	output.position = mul(output.position, g_View);
+	output.position = mul(output.position, g_Proj);
 
 	output.texCoord = input.texCoord;
 	if (IsSpriteFlipX())
@@ -47,7 +47,7 @@ Pixel_Output mainPS(Pixel_Input input)
 		return output;
 	}
 
-	float4 color = g_sprite_color;
+	float4 color = g_SpriteColor;
 	color *= material_Albedo.Sample(linearSampler, input.texCoord);
 
 	output.albedo = color;
