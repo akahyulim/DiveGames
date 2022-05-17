@@ -26,6 +26,7 @@ namespace Dive
 		bool CreateDepthStencilView(ID3D11Resource* pResource, const D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc, ID3D11DepthStencilView** ppDepthStencilView);
 		bool CreateDepthStencilState(const D3D11_DEPTH_STENCIL_DESC* pDesc, ID3D11DepthStencilState** ppDepthStencilState);
 		bool CreateSamplerState(const D3D11_SAMPLER_DESC* pDesc, ID3D11SamplerState** ppSamplerState);
+		bool CreateBlendState(const D3D11_BLEND_DESC* pDesc, ID3D11BlendState** ppBlendState);
 		bool CreateRasterizerState(const D3D11_RASTERIZER_DESC* pDesc, ID3D11RasterizerState** ppRasterizerState);
 		bool CreateVertexShader(const std::string& path, const D3D11_INPUT_ELEMENT_DESC* pDesc, unsigned int numElements, ID3D11VertexShader** ppVertexShader, ID3D11InputLayout** ppInputLayout);
 		bool CreatePixelShader(const std::string& path, ID3D11PixelShader** ppPixelShader);

@@ -134,6 +134,7 @@ namespace Dive
 		{ 
 			// forward light 이므로 Light * object 만큼 draw call이 발생한다.
 			// 그리고 현재 구현이 잘못되어 두 번째 Light부터 적용이 되지 않는다.
+			// blend state에서 처리해야 할 것 같다. 아직 반투명 그리기도 안된다.
 			for (auto pGameObject : m_MainVisibilities.visibleLights)
 			{
 				auto pLight = pGameObject->GetComponent<Light>();
@@ -156,15 +157,20 @@ namespace Dive
 				{
 					// pipeline은 il, shader가 다르다.
 					PipelineState ps;
-					ps.primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;//D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
-					ps.pInputLayout = Renderer::GetShader(eShaderType::Mesh)->pInputLayout;
-					ps.pVertexShader = Renderer::GetShader(eShaderType::Mesh)->pVertexShader;
-					ps.pRasterizerState = Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
-					ps.pPixelShader = Renderer::GetShader(eShaderType::Mesh)->pPixelShader;
-					ps.pDepthStencilState = Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
+					ps.primitiveTopology	= D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;//D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
+					ps.pInputLayout			= Renderer::GetShader(eShaderType::Mesh)->pInputLayout;
+					ps.pVertexShader		= Renderer::GetShader(eShaderType::Mesh)->pVertexShader;
+					ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
+					ps.pPixelShader			= Renderer::GetShader(eShaderType::Mesh)->pPixelShader;
+					ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::ForwardLight);		// 임시(blend 때문)
 					ps.renderTargetViews[0] = Renderer::GetGbufferAlbedo()->GetRenderTargetView();
-					ps.pViewport = Renderer::GetGbufferAlbedo()->GetViewport();
-					ps.pDepthStencilView = Renderer::GetDepthStencilTexture()->GetDepthStencilView();
+					ps.pViewport			= Renderer::GetGbufferAlbedo()->GetViewport();
+					ps.pDepthStencilView	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
+
+					// 불투명 + 멀티 라이트를 위한 add다.
+					// 어떻게 하는지 아직 모르겠다.
+					// 책에서 bind하는 순서를 분석해야 할 듯 하다.
+					ps.pBlendState			= Renderer::GetBlendState(eBlendStateType::Addtive);
 
 					pCl->BindPipelineState(ps);
 

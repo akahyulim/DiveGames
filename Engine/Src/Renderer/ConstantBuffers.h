@@ -3,6 +3,10 @@
 
 namespace Dive
 {
+	// 크기 설정을 1바이트 기준을 하기 위한 조치 같다.
+	// 책에서 이렇게 했다.
+#pragma pack(push, 1)
+
 	struct FrameBuffer
 	{
 		DirectX::XMMATRIX view = DirectX::XMMatrixIdentity();
@@ -39,4 +43,6 @@ namespace Dive
 		DirectX::XMFLOAT3 color = { 1.0f, 1.0f, 1.0f };
 		float pad2;
 	};
+
+#pragma pack(pop)
 }

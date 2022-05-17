@@ -47,6 +47,7 @@ float3 CalcuDirectionalLight(float3 pos, float3 normal)
 	float3 lightColor = g_LightColor * saturate(NDotL);
 
 	// blinn specular
+	// 생각했던 것보다 눈에 띄지 않는다.
 	float3 toEye = normalize(eyePos - pos);
 	float3 halfWay = normalize(toEye + lightDir);
 	float NDotH = saturate(dot(normal, halfWay));
@@ -63,7 +64,8 @@ Pixel_Output mainPS(Pixel_Input input)
 	float4 albedo = g_MatColor;
 	if (HasAlbedoTexture())
 	{
-		albedo *= material_Albedo.Sample(linearSampler, input.texCoord);
+		// map이 있다면 material color는 무시하는 것이 맞겠지?
+		albedo = material_Albedo.Sample(linearSampler, input.texCoord);
 		albedo.w = 1.0f;
 	}
 

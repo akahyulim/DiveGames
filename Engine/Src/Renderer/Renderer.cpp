@@ -19,6 +19,7 @@ namespace Dive
 	unsigned int Renderer::m_TextureHeight = 0;
 
 	std::array<ID3D11SamplerState*, static_cast<size_t>(eSamplerStateType::Count)> Renderer::m_SamplerStates;
+	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendStateType::Count)> Renderer::m_BlendStates;
 	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilStateType::Count)> Renderer::m_DepthStencilStates;
 	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerStateType::Count)> Renderer::m_RasterizerStates;
 	std::array<Shader, static_cast<size_t>(eShaderType::Count)> Renderer::m_Shaders;
@@ -46,6 +47,7 @@ namespace Dive
 		// 어느 부분에서 잘못되었는지 개별 추적이 가능해야 한다.
 		SetTextures(pData->Width, pData->Height);
 		createSamplers();
+		createBlendStates();
 		createDepthStencilStates();
 		createRasterizerStates();
 		createShaders();
@@ -153,6 +155,14 @@ namespace Dive
 		return m_SamplerStates[static_cast<size_t>(type)];
 	}
 
+	ID3D11BlendState* Renderer::GetBlendState(eBlendStateType type)
+	{
+		if (type >= eBlendStateType::Count)
+			return nullptr;
+
+		return m_BlendStates[static_cast<size_t>(type)];
+	}
+
 	ID3D11DepthStencilState* Renderer::GetDepthStencilState(eDepthStencilStateType type)
 	{
 		if(type >= eDepthStencilStateType::Count)
@@ -252,6 +262,60 @@ namespace Dive
 		}
 	}
 
+	void Renderer::createBlendStates()
+	{
+		D3D11_BLEND_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+
+		// disabled
+		{
+			desc.AlphaToCoverageEnable					= false;
+			desc.IndependentBlendEnable					= false;
+			desc.RenderTarget[0].BlendEnable			= false;
+			desc.RenderTarget[0].SrcBlend				= D3D11_BLEND_SRC_ALPHA;
+			desc.RenderTarget[0].DestBlend				= D3D11_BLEND_INV_SRC_ALPHA;
+			desc.RenderTarget[0].BlendOp				= D3D11_BLEND_OP_ADD;
+			desc.RenderTarget[0].SrcBlendAlpha			= D3D11_BLEND_ONE;
+			desc.RenderTarget[0].DestBlendAlpha			= D3D11_BLEND_ONE;
+			desc.RenderTarget[0].BlendOpAlpha			= D3D11_BLEND_OP_ADD;
+			desc.RenderTarget[0].RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;
+
+			m_GraphicsDevice.CreateBlendState(&desc, &m_BlendStates[static_cast<size_t>(eBlendStateType::Disabled)]);
+		}
+
+		// alpha
+		{
+			desc.AlphaToCoverageEnable					= false;
+			desc.IndependentBlendEnable					= false;
+			desc.RenderTarget[0].BlendEnable			= true;
+			desc.RenderTarget[0].SrcBlend				= D3D11_BLEND_SRC_ALPHA;
+			desc.RenderTarget[0].DestBlend				= D3D11_BLEND_INV_SRC_ALPHA;
+			desc.RenderTarget[0].BlendOp				= D3D11_BLEND_OP_ADD;
+			desc.RenderTarget[0].SrcBlendAlpha			= D3D11_BLEND_ONE;
+			desc.RenderTarget[0].DestBlendAlpha			= D3D11_BLEND_ONE;
+			desc.RenderTarget[0].BlendOpAlpha			= D3D11_BLEND_OP_ADD;
+			desc.RenderTarget[0].RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;
+
+			m_GraphicsDevice.CreateBlendState(&desc, &m_BlendStates[static_cast<size_t>(eBlendStateType::Alpha)]);
+		}
+
+		// addtive
+		{
+			desc.AlphaToCoverageEnable					= false;
+			desc.IndependentBlendEnable					= false;
+			desc.RenderTarget[0].BlendEnable			= true;
+			desc.RenderTarget[0].SrcBlend				= D3D11_BLEND_ONE;
+			desc.RenderTarget[0].DestBlend				= D3D11_BLEND_ONE;
+			desc.RenderTarget[0].BlendOp				= D3D11_BLEND_OP_ADD;
+			desc.RenderTarget[0].SrcBlendAlpha			= D3D11_BLEND_ONE;
+			desc.RenderTarget[0].DestBlendAlpha			= D3D11_BLEND_ONE;
+			desc.RenderTarget[0].BlendOpAlpha			= D3D11_BLEND_OP_ADD;
+			desc.RenderTarget[0].RenderTargetWriteMask	= D3D11_COLOR_WRITE_ENABLE_ALL;
+
+			m_GraphicsDevice.CreateBlendState(&desc, &m_BlendStates[static_cast<size_t>(eBlendStateType::Addtive)]);
+		}
+	}
+
 	void Renderer::createDepthStencilStates()
 	{
 		// 이렇게 하면 추가 괄호 안에선 초기화된 값인가...?
@@ -260,27 +324,43 @@ namespace Dive
 
 		{
 			// Set up the description of the stencil state.
-			desc.DepthEnable = true;
-			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-			desc.DepthFunc = D3D11_COMPARISON_LESS;
+			desc.DepthEnable					= true;
+			desc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ALL;
+			desc.DepthFunc						= D3D11_COMPARISON_LESS;
 
-			desc.StencilEnable = true;
-			desc.StencilReadMask = 0xFF;
-			desc.StencilWriteMask = 0xFF;
+			desc.StencilEnable					= true;
+			desc.StencilReadMask				= 0xFF;
+			desc.StencilWriteMask				= 0xFF;
 
 			// Stencil operations if pixel is front-facing.
-			desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-			desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-			desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-			desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+			desc.FrontFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_INCR;
+			desc.FrontFace.StencilPassOp		= D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
 
 			// Stencil operations if pixel is back-facing.
-			desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-			desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+			desc.BackFace.StencilFailOp			= D3D11_STENCIL_OP_KEEP;
+			desc.BackFace.StencilDepthFailOp	= D3D11_STENCIL_OP_DECR;
+			desc.BackFace.StencilPassOp			= D3D11_STENCIL_OP_KEEP;
+			desc.BackFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
 
 			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthOnStencilOn)]);
+		}
+
+		// 임시 forward light
+		{
+			D3D11_DEPTH_STENCIL_DESC descDepth;
+			descDepth.DepthEnable = TRUE;
+			descDepth.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			descDepth.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+			descDepth.StencilEnable = FALSE;
+			descDepth.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+			descDepth.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+			const D3D11_DEPTH_STENCILOP_DESC noSkyStencilOp = { D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_COMPARISON_EQUAL };
+			descDepth.FrontFace = noSkyStencilOp;
+			descDepth.BackFace = noSkyStencilOp;
+
+			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::ForwardLight)]);
 		}
 	}
 	

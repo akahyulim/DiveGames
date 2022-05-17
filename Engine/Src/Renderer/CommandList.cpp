@@ -67,9 +67,10 @@ namespace Dive
 		// BelndState
 		{
 			// 추가 데이터가 필요하다.
+			// 두 번째 인자가 좀 애매하다.
 			if (ps.pBlendState != m_OldStates.pBlendState)
 			{
-				//pImmediateContext->OMSetBlendState(ps.pBlendState, 0);
+				pImmediateContext->OMSetBlendState(ps.pBlendState, NULL, 0xffffffff);
 			}
 		}
 

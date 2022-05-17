@@ -258,6 +258,26 @@ namespace Dive
 		return true;
 	}
 
+	bool GraphicsDevice::CreateBlendState(const D3D11_BLEND_DESC* pDesc, ID3D11BlendState** ppBlendState)
+	{
+		if (!m_pDevice)
+			return false;
+
+		if (!pDesc)
+		{
+			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
+			return false;
+		}
+
+		if (FAILED(m_pDevice->CreateBlendState(pDesc, ppBlendState)))
+		{
+			DV_CORE_WARN("RasterizerState 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
+	}
+
 	bool GraphicsDevice::CreateRasterizerState(const D3D11_RASTERIZER_DESC* pDesc, ID3D11RasterizerState** ppRasterizerState)
 	{
 		if (!m_pDevice)

@@ -89,6 +89,7 @@ namespace Dive
 	{
 		//DepthOffStencilOff = 0,
 		DepthOnStencilOn = 0,
+		ForwardLight,
 		Count
 	};
 
@@ -98,6 +99,13 @@ namespace Dive
 		Count
 	};
 
+	enum class eBlendStateType : size_t
+	{
+		Disabled = 0,
+		Alpha,
+		Addtive,
+		Count
+	};
 
 	enum class eShaderType : size_t
 	{
@@ -144,6 +152,7 @@ namespace Dive
 		static unsigned int GetTextureHeight() { return m_TextureHeight; }
 
 		static ID3D11SamplerState* GetSamplerState(eSamplerStateType type);
+		static ID3D11BlendState* GetBlendState(eBlendStateType type);
 		static ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilStateType type);
 		static ID3D11RasterizerState* GetRasterizerState(eRasterizerStateType type);
 		static Shader* GetShader(eShaderType type);
@@ -166,6 +175,7 @@ namespace Dive
 		static void createRenderTargets();
 		static void removeRenderTargets();
 		static void createSamplers();
+		static void createBlendStates();
 		static void createDepthStencilStates();
 		static void createRasterizerStates();
 		static void createShaders();
@@ -181,6 +191,9 @@ namespace Dive
 
 		// samplers
 		static std::array<ID3D11SamplerState*, static_cast<size_t>(eSamplerStateType::Count)> m_SamplerStates;
+
+		// blend states
+		static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendStateType::Count)> m_BlendStates;
 
 		// depth stencil states
 		static std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilStateType::Count)> m_DepthStencilStates;
