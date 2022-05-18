@@ -299,6 +299,11 @@ void InspectorPanel::drawLight(Dive::GameObject* pSelectedObject)
 		pLightComponent->SetColor(color);
 
 		// range
+		auto range = pLightComponent->GetRange();
+		ImGui::Text("Range");
+		ImGui::SameLine();
+		ImGui::DragFloat("##Range", &range, 1.0f, 0.0f, 1000.0f, "%.2f");
+		pLightComponent->SetRange(range);
 	}
 
 	ImGui::Separator();

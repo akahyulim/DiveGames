@@ -76,6 +76,14 @@ GameObject:
     - 0: 2912900825378185495
     - 5: 13480224764948454448
 ---
+GameObject:
+  m_InstanceID: 2041190445132961682
+  m_Name: Point_Light
+  m_bActive: 1
+  m_Component:
+    - 0: 10844647929126790046
+    - 5: 8740258599498975815
+---
 Transform:
   m_InstanceID: 13782616469023307455
   m_GameObject: 17016521625386918359
@@ -156,6 +164,14 @@ Transform:
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
 ---
+Transform:
+  m_InstanceID: 10844647929126790046
+  m_GameObject: 2041190445132961682
+  m_LocalRotation: [0, 0, 0, 1]
+  m_LocalPosition: [2.5, 3.5, -7]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 0
+---
 MeshRenderable:
   m_InstanceID: 14610844427729167174
   m_GameObject: 5363419921289634880
@@ -209,4 +225,13 @@ Light:
   m_GameObject: 4351392605559722766
   m_bEnabled: 1
   m_LightType: 0
+  m_Color: [0.765486717, 0.758712471, 0.758712471]
+  m_Range: 10
+---
+Light:
+  m_InstanceID: 8740258599498975815
+  m_GameObject: 2041190445132961682
+  m_bEnabled: 1
+  m_LightType: 1
   m_Color: [1, 1, 1]
+  m_Range: 60

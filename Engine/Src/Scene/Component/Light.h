@@ -38,10 +38,11 @@ namespace Dive
 	private:
 		eLightType m_LightType = eLightType::Directional;
 
-		DirectX::XMFLOAT3 m_Color		= DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+		DirectX::XMFLOAT3 m_Color = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
 		float m_Range = 10.0f;
 
 		// 추후 분리?
+		// 이미 Behavior을 만들어 놓긴 했다.
 		bool m_bEnabled = true;
 	};
 }

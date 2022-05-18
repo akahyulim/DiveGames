@@ -34,8 +34,11 @@ cbuffer SpriteBuffer : register(b2)
 
 cbuffer LightBuffer : register(b3)
 {
-	float3 g_DirLightDir;
-	float3 g_LightColor;
+	float3 g_LightPos		: packoffset(c0);
+	float3 g_DirLightDir	: packoffset(c1);
+	float3 g_LightColor		: packoffset(c2);
+	float g_LightRange		: packoffset(c2.w);
+	uint g_LightOptions		: packoffset(c3);
 }
 
 bool HasAlbedoTexture() { return g_MatTextures & uint(1U << 0); }
@@ -44,3 +47,8 @@ bool HasNormalTexture() { return g_MatTextures & uint(1U << 1); }
 bool HasSpriteTexture() { return g_SpriteOptions & uint(1U << 0); }
 bool IsSpriteFlipX() { return g_SpriteOptions & uint(1U << 1); }
 bool IsSpriteFlipY() { return g_SpriteOptions & uint(1U << 2); }
+
+// light options
+bool IsDirectionalLight()	{ return g_LightOptions & uint(1U << 0); }
+bool IsPointLight()			{ return g_LightOptions & uint(1U << 1); }
+bool IsSpotLight()			{ return g_LightOptions & uint(1U << 2); }

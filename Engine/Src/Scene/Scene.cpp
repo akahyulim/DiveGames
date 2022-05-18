@@ -212,6 +212,7 @@ namespace Dive
 				out << YAML::Key << "m_bEnabled" << YAML::Value << (int)pLight->IsEnabled();
 				out << YAML::Key << "m_LightType" << YAML::Value << (int)pLight->GetLightType();
 				out << YAML::Key << "m_Color" << YAML::Value << pLight->GetColor();
+				out << YAML::Key << "m_Range" << YAML::Value << pLight->GetRange();
 				out << YAML::EndMap;
 				out << YAML::EndMap;
 			}
@@ -363,10 +364,13 @@ namespace Dive
 
 				auto bEnabled = lightNode["m_bEnabled"].as<int>();
 				auto type = lightNode["m_LightType"].as<int>();
+				auto color = lightNode["m_Color"].as<DirectX::XMFLOAT3>();
+				auto range = lightNode["m_Range"].as<float>();
 				
 				pLight->SetEnable(bEnabled);
 				pLight->SetLightType(static_cast<eLightType>(type));
-				pLight->SetColor(lightNode["m_Color"].as<DirectX::XMFLOAT3>());
+				pLight->SetColor(color);
+				pLight->SetRange(range);
 			}
 		}
 

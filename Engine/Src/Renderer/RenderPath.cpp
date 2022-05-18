@@ -147,8 +147,26 @@ namespace Dive
 				// map & unmap
 				auto pCbLight = Renderer::GetCbLight();
 				auto pPtr = static_cast<LightBuffer*>(pCbLight->Map());
-				pPtr->dir = pTransform->GetForward();
+				
 				pPtr->color = pLight->GetColor();
+
+				pPtr->options = 0;
+				if (pLight->GetLightType() == eLightType::Directional)
+				{
+					pPtr->dir = pTransform->GetForward();
+					pPtr->options |= (1 << 0);
+				}
+				if (pLight->GetLightType() == eLightType::Point)
+				{
+					// local로 해야 한다. 추후 확인 필요.
+					pPtr->pos = pTransform->GetLocalPosition();
+					pPtr->range = 1.0f / pLight->GetRange();
+					pPtr->options |= (1 << 1);
+				}
+				if (pLight->GetLightType() == eLightType::Spot)
+				{
+					pPtr->options |= (1 << 2);
+				}
 				pCbLight->Unmap();
 
 				pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Light, pCbLight);
@@ -162,7 +180,7 @@ namespace Dive
 					ps.pVertexShader		= Renderer::GetShader(eShaderType::Mesh)->pVertexShader;
 					ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
 					ps.pPixelShader			= Renderer::GetShader(eShaderType::Mesh)->pPixelShader;
-					ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::ForwardLight);		// 임시(blend 때문)
+					ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
 					ps.renderTargetViews[0] = Renderer::GetGbufferAlbedo()->GetRenderTargetView();
 					ps.pViewport			= Renderer::GetGbufferAlbedo()->GetViewport();
 					ps.pDepthStencilView	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
@@ -170,7 +188,10 @@ namespace Dive
 					// 불투명 + 멀티 라이트를 위한 add다.
 					// 어떻게 하는지 아직 모르겠다.
 					// 책에서 bind하는 순서를 분석해야 할 듯 하다.
-					ps.pBlendState			= Renderer::GetBlendState(eBlendStateType::Addtive);
+					//if (pLight->GetLightType() == eLightType::Directional)
+						ps.pBlendState = Renderer::GetBlendState(eBlendStateType::Disabled);
+					//else
+					//	ps.pBlendState = Renderer::GetBlendState(eBlendStateType::Addtive);
 
 					pCl->BindPipelineState(ps);
 
