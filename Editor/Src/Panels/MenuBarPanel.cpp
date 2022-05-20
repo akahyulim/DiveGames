@@ -250,7 +250,10 @@ void MenuBarPanel::menuGameObject()
 			{
 				if (m_pActiveScene)
 				{
-
+					auto lightObj = m_pActiveScene->CreateGameObject("Spot_Light");
+					lightObj->AddComponent<Dive::Transform>();
+					auto lightCom = lightObj->AddComponent<Dive::Light>();
+					lightCom->SetLightType(Dive::eLightType::Spot);
 				}
 			}
 

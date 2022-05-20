@@ -304,6 +304,13 @@ void InspectorPanel::drawLight(Dive::GameObject* pSelectedObject)
 		ImGui::SameLine();
 		ImGui::DragFloat("##Range", &range, 1.0f, 0.0f, 1000.0f, "%.2f");
 		pLightComponent->SetRange(range);
+
+		// spot angle
+		auto spotAngle = pLightComponent->GetSpotAngle() * 2.0f;
+		ImGui::Text("Spot Angle");
+		ImGui::SameLine();
+		ImGui::DragFloat("##SpotAngle", &spotAngle, 1.0f, 1.0f, 179.0f, "%.2f");
+		pLightComponent->SetSpotAngle(spotAngle * 0.5f);
 	}
 
 	ImGui::Separator();

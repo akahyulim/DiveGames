@@ -213,6 +213,7 @@ namespace Dive
 				out << YAML::Key << "m_LightType" << YAML::Value << (int)pLight->GetLightType();
 				out << YAML::Key << "m_Color" << YAML::Value << pLight->GetColor();
 				out << YAML::Key << "m_Range" << YAML::Value << pLight->GetRange();
+				out << YAML::Key << "m_SpotAngle" << YAML::Value << pLight->GetSpotAngle();
 				out << YAML::EndMap;
 				out << YAML::EndMap;
 			}
@@ -362,15 +363,17 @@ namespace Dive
 				auto pLight = pOwner->GetComponent<Light>();
 				DV_ASSERT(pLight->GetInstanceID() == instanceID);
 
-				auto bEnabled = lightNode["m_bEnabled"].as<int>();
-				auto type = lightNode["m_LightType"].as<int>();
-				auto color = lightNode["m_Color"].as<DirectX::XMFLOAT3>();
-				auto range = lightNode["m_Range"].as<float>();
+				auto bEnabled	= lightNode["m_bEnabled"].as<int>();
+				auto type		= lightNode["m_LightType"].as<int>();
+				auto color		= lightNode["m_Color"].as<DirectX::XMFLOAT3>();
+				auto range		= lightNode["m_Range"].as<float>();
+				auto spotAngle	= lightNode["m_SpotAngle"].as<float>();
 				
 				pLight->SetEnable(bEnabled);
 				pLight->SetLightType(static_cast<eLightType>(type));
 				pLight->SetColor(color);
 				pLight->SetRange(range);
+				pLight->SetSpotAngle(spotAngle);
 			}
 		}
 

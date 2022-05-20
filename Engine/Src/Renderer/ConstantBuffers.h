@@ -39,16 +39,13 @@ namespace Dive
 	struct LightBuffer
 	{
 		DirectX::XMFLOAT3 pos = { 0.0f, 0.0f, 0.0f };
-		float pad;
+		float rangeRcp = 0.0f;
 
 		DirectX::XMFLOAT3 dir = { 0.0f, 0.0f, 0.0f };
-		float pad1;
+		float spotAngle = 0.0f;
 		
-		DirectX::XMFLOAT3 color = { 1.0f, 1.0f, 1.0f };
-		float range = 0.0f;
-
+		DirectX::XMFLOAT3 color = { 0.0f, 0.0f, 0.0f };
 		unsigned int options = 0;
-		float pad3[3] = { 0 };
 	};
 
 #pragma pack(pop)

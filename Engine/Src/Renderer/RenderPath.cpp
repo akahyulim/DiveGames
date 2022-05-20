@@ -148,19 +148,18 @@ namespace Dive
 				auto pCbLight = Renderer::GetCbLight();
 				auto pPtr = static_cast<LightBuffer*>(pCbLight->Map());
 				
-				pPtr->color = pLight->GetColor();
-
-				pPtr->options = 0;
+				pPtr->pos		= pTransform->GetLocalPosition();
+				pPtr->rangeRcp	= 1.0f / pLight->GetRange();
+				pPtr->dir		= pTransform->GetForward();
+				pPtr->spotAngle = cosf(pLight->GetSpotAngleRadian());
+				pPtr->color		= pLight->GetColor();
+				pPtr->options	= 0;
 				if (pLight->GetLightType() == eLightType::Directional)
-				{
-					pPtr->dir = pTransform->GetForward();
+				{					
 					pPtr->options |= (1 << 0);
 				}
 				if (pLight->GetLightType() == eLightType::Point)
 				{
-					// local로 해야 한다. 추후 확인 필요.
-					pPtr->pos = pTransform->GetLocalPosition();
-					pPtr->range = 1.0f / pLight->GetRange();
 					pPtr->options |= (1 << 1);
 				}
 				if (pLight->GetLightType() == eLightType::Spot)
