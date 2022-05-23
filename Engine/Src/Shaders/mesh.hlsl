@@ -118,7 +118,8 @@ float3 CalcuSpotLight(float3 pos, float3 normal, float4 mtrlColor)
 
 	// cone attenuation
 	float cosAngle = dot(lightDir, toLight);
-	float coneAttn = saturate((cosAngle - g_SpotAngle) * (1 / g_SpotAngle));
+	//float coneAttn = saturate((cosAngle - radians(cos(65.0f))) * (1 / g_SpotAngle));
+	float coneAttn = saturate(cosAngle * (1 / g_SpotAngle));
 	coneAttn *= coneAttn;
 
 	// 역시 책에서는 attn과 coneAttn을 material에 곱했다.
