@@ -9,7 +9,7 @@ struct Pixel_Input
 	float3 worldPos : TEXCOORD1;
 };
 
-struct Pixel_Output
+struct Pixel_GBuffer_Out
 {
 	float4 albedo : SV_TARGET0;
 };
@@ -126,9 +126,9 @@ float3 CalcuSpotLight(float3 pos, float3 normal, float4 mtrlColor)
 	return spotLight * (mtrlColor * attn * coneAttn).rgb;
 }
 
-Pixel_Output mainPS(Pixel_Input input)
+Pixel_GBuffer_Out mainPS(Pixel_Input input)
 {
-	Pixel_Output output;
+	Pixel_GBuffer_Out output;
 
 	// albedo
 	float4 albedo = g_MatColor;

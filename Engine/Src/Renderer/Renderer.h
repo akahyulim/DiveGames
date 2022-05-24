@@ -111,6 +111,8 @@ namespace Dive
 	{
 		Sprite = 0,
 		Mesh,
+		Deferred,
+		Light,
 		Count
 	};
 
@@ -166,9 +168,12 @@ namespace Dive
 
 		static void UpdateVisibility(Visibility& vis);
 
-		// test ============================================================
-		static Texture2D* GetGbufferAlbedo() { return m_pGbufferAlbedo; }
+		static Texture2D* GetGBufferAlbedo() { return m_pGBufferAlbedo; }
+		static Texture2D* GetGBufferNormal() { return m_pGBufferNormal; }
+		static Texture2D* GetGBufferMaterial() { return m_pGBufferMaterial; }
 		static Texture2D* GetDepthStencilTexture() { return m_pDepthStencilTex; }
+
+		static Texture2D* GetFrameOutput() { return m_pFrameOutput; }
 
 
 	private:
@@ -216,8 +221,12 @@ namespace Dive
 
 		static D3D11_VIEWPORT m_Viewport;
 
-		// test resources =================
-		static Texture2D* m_pGbufferAlbedo;
+		// GBuffers
+		static Texture2D* m_pGBufferAlbedo;
+		static Texture2D* m_pGBufferNormal;
+		static Texture2D* m_pGBufferMaterial;
 		static Texture2D* m_pDepthStencilTex;
+
+		static Texture2D* m_pFrameOutput;
 	};
 }

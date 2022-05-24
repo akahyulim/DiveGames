@@ -88,8 +88,8 @@ namespace Dive
 			ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
 			ps.pPixelShader			= Renderer::GetShader(eShaderType::Sprite)->pPixelShader;
 			ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
-			ps.renderTargetViews[0] = Renderer::GetGbufferAlbedo()->GetRenderTargetView();
-			ps.pViewport			= Renderer::GetGbufferAlbedo()->GetViewport();
+			ps.renderTargetViews[0] = Renderer::GetGBufferAlbedo()->GetRenderTargetView();
+			ps.pViewport			= Renderer::GetGBufferAlbedo()->GetViewport();
 			ps.pDepthStencilView	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
 			
 			pCl->BindPipelineState(ps);
@@ -180,8 +180,8 @@ namespace Dive
 					ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
 					ps.pPixelShader			= Renderer::GetShader(eShaderType::Mesh)->pPixelShader;
 					ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
-					ps.renderTargetViews[0] = Renderer::GetGbufferAlbedo()->GetRenderTargetView();
-					ps.pViewport			= Renderer::GetGbufferAlbedo()->GetViewport();
+					ps.renderTargetViews[0] = Renderer::GetGBufferAlbedo()->GetRenderTargetView();
+					ps.pViewport			= Renderer::GetGBufferAlbedo()->GetViewport();
 					ps.pDepthStencilView	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
 
 					// 불투명 + 멀티 라이트를 위한 add다.
@@ -252,5 +252,127 @@ namespace Dive
 				}
 			}
 		}
+	}
+
+	void RenderPath::passGBuffer(CommandList* pCl)
+	{
+		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
+		if (!pImmediateContext)
+			return;
+
+		// 일단 직접 연결
+		PipelineState ps;
+
+		// PreRender
+		auto pGBufferAlbedo			= Renderer::GetGBufferAlbedo()->GetRenderTargetView();
+		auto pGBufferNormal			= Renderer::GetGBufferNormal()->GetRenderTargetView();
+		auto pGBufferMaterial		= Renderer::GetGBufferMaterial()->GetRenderTargetView();
+		auto pGBufferDepthStencil	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
+		auto pDepthStencilState		= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
+
+		// clear
+		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		pImmediateContext->ClearRenderTargetView(pGBufferAlbedo, clearColor);
+		pImmediateContext->ClearRenderTargetView(pGBufferNormal, clearColor);
+		pImmediateContext->ClearRenderTargetView(pGBufferMaterial, clearColor);
+		pImmediateContext->ClearDepthStencilView(pGBufferDepthStencil, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+		// set
+		ID3D11RenderTargetView* rt[3] = { pGBufferAlbedo, pGBufferNormal, pGBufferMaterial };
+		pImmediateContext->OMSetRenderTargets(3, rt, pGBufferDepthStencil);
+		pImmediateContext->OMSetDepthStencilState(pDepthStencilState, 1);
+
+		// render scene
+		if (!m_MainVisibilities.visibleMeshRenderables.empty())
+		{
+			// sampler state : 일단 제외
+			// blend state : 일단 제외
+			pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			pImmediateContext->IASetInputLayout(Renderer::GetShader(eShaderType::Deferred)->pInputLayout);
+			pImmediateContext->VSSetShader(Renderer::GetShader(eShaderType::Deferred)->pVertexShader, NULL, 0);
+			pImmediateContext->PSSetShader(Renderer::GetShader(eShaderType::Deferred)->pPixelShader, NULL, 0);
+			pImmediateContext->RSSetViewports(1, Renderer::GetGBufferAlbedo()->GetViewport());
+			pImmediateContext->RSSetState(Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid));
+
+			for (auto pGameObject : m_MainVisibilities.visibleMeshRenderables)
+			{	
+				auto pTransform = pGameObject->GetComponent<Transform>();
+				auto pMeshRenderable = pGameObject->GetComponent<MeshRenderable>();
+
+				auto pModel = pMeshRenderable->GetModel();
+				if (pModel == nullptr)
+					continue;
+				if (!pModel->GetVertexBuffer() || !pModel->GetIndexBuffer())
+					continue;
+
+				// 굳이 바꿀 필요가 없다.
+				pCl->SetVertexBuffer(pModel->GetVertexBuffer());
+				pCl->SetIndexBuffer(pModel->GetIndexBuffer());
+
+				// UberBuffer
+				{
+					auto pMaterial = pMeshRenderable->GetMaterial();
+					if (pMaterial)
+					{
+						auto pCbUber = Renderer::GetCbUber();
+
+						// map & unmap
+						auto pPtr = static_cast<UberBuffer*>(pCbUber->Map());
+						pPtr->world = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
+						pPtr->materialColor = pMaterial->GetAlbedoColor();
+						pPtr->materialTextures = 0;
+						pPtr->materialTextures |= pMaterial->HasMap(eMaterialMapType::Albedo) ? (1U << 0) : 0;
+						pPtr->materialTextures |= pMaterial->HasMap(eMaterialMapType::Normal) ? (1U << 1) : 0;
+						pCbUber->Unmap();
+
+						//pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);
+						auto pBuffer = pCbUber->GetBuffer();
+						pImmediateContext->VSSetConstantBuffers(static_cast<unsigned int>(eConstantBufferSlot::Uber), 1, &pBuffer);
+						pImmediateContext->PSSetConstantBuffers(static_cast<unsigned int>(eConstantBufferSlot::Uber), 1, &pBuffer);
+
+						// 이 부분도 CommandList로 옮겨야 한다.
+						// slot은 eMaterialMapType으로 전달할 수 있을 것 같다.
+						auto pAlbedoTex = pMaterial->GetMap(eMaterialMapType::Albedo);
+						auto pSrv = pAlbedoTex ? pAlbedoTex->GetShaderResourceView() : nullptr;
+						pImmediateContext->PSSetShaderResources(1, 1, &pSrv);
+						auto pNormalTex = pMaterial->GetMap(eMaterialMapType::Normal);
+						pSrv = pNormalTex ? pNormalTex->GetShaderResourceView() : nullptr;
+						pImmediateContext->PSSetShaderResources(2, 1, &pSrv);
+					}
+				}
+
+				auto indexCount = pMeshRenderable->IndexCount();
+				auto indexOffset = pMeshRenderable->IndexOffset();
+				auto vertexOffset = pMeshRenderable->VertexOffset();
+				pImmediateContext->DrawIndexed(indexCount, indexOffset, vertexOffset);
+			}
+		}
+	}
+
+	void RenderPath::passLighting(CommandList* pCl)
+	{
+		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
+		if (!pImmediateContext)
+			return;
+
+		// GBuffer의 값을 이용해 light를 적용
+		// 즉, render target view가 달라진다.
+
+		// 일단 선형 깊이값을 출력토록 하자.
+		// 현재 깊이값은 비 선형값으로 저장된 상태다.
+		// 따라서 셰이더에서 계산한 후 출력해야 한다.
+
+		// PostRender
+		ID3D11RenderTargetView* rt[3] = { NULL, NULL, NULL };
+		auto pDepthStencilViewReadOnly = Renderer::GetDepthStencilTexture()->GetDepthStencilViewReadOnly();
+		pImmediateContext->OMSetRenderTargets(3, rt, pDepthStencilViewReadOnly);
+
+		// 괜히 두 번 한다...
+		auto pRenderTargetView = Renderer::GetFrameOutput()->GetRenderTargetView();
+		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		pImmediateContext->ClearRenderTargetView(pRenderTargetView, clearColor);
+		pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilViewReadOnly);
+
+		// draw를 어떻게 해야 하는지 모르겠다.
 	}
 }

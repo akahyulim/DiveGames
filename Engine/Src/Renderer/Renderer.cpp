@@ -31,9 +31,12 @@ namespace Dive
 
 	D3D11_VIEWPORT Renderer::m_Viewport;
 
-	// 이하 테스트
-	Texture2D* Renderer::m_pGbufferAlbedo = nullptr;
+	Texture2D* Renderer::m_pGBufferAlbedo = nullptr;
+	Texture2D* Renderer::m_pGBufferNormal = nullptr;
+	Texture2D* Renderer::m_pGBufferMaterial = nullptr;
 	Texture2D* Renderer::m_pDepthStencilTex = nullptr;
+
+	Texture2D* Renderer::m_pFrameOutput = nullptr;
 
 	void Renderer::Initialize(const WindowData* pData)
 	{
@@ -77,7 +80,7 @@ namespace Dive
 		}
 	
 		DV_DELETE(m_pDepthStencilTex);
-		DV_DELETE(m_pGbufferAlbedo);
+		DV_DELETE(m_pGBufferAlbedo);
 
 		m_GraphicsDevice.Shutdown();
 	}
@@ -88,7 +91,7 @@ namespace Dive
 	void Renderer::BeginScene()
 	{
 		auto pImmediateContext = m_GraphicsDevice.GetImmediateContext();
-		auto pRenderTargetView = m_pGbufferAlbedo ? m_pGbufferAlbedo->GetRenderTargetView() : nullptr;
+		auto pRenderTargetView = m_pGBufferAlbedo ? m_pGBufferAlbedo->GetRenderTargetView() : nullptr;
 		auto pDepthStencilView = m_pDepthStencilTex ? m_pDepthStencilTex->GetDepthStencilView() : nullptr;
 		if (!pImmediateContext || !pRenderTargetView)
 			return;
@@ -219,23 +222,38 @@ namespace Dive
 		}
 	}
 
+	// crateGBuffer이라고 바꾸는 편이 나을 것 같다.
+	// -> 스파르탄을 보니 GBuffer 이외에도 RenderTarget이 많다.
 	void Renderer::createRenderTargets()
 	{
 		unsigned int width = m_TextureWidth;
 		unsigned int height = m_TextureHeight;
 		
-		// Render Target Textures
-		DV_DELETE(m_pGbufferAlbedo);
-		m_pGbufferAlbedo = Texture2D::Create(width, height, DXGI_FORMAT_R32G32B32A32_FLOAT, true);
+		// albedo: r8g8b8a8
+		DV_DELETE(m_pGBufferAlbedo);
+		m_pGBufferAlbedo = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
 
-		// Depth Stencil Buffers
+		// normal: r8g8b8a8 or r11g11b10
+		DV_DELETE(m_pGBufferNormal);
+		m_pGBufferNormal = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+
+		// material: r8g8b8a8
+		DV_DELETE(m_pGBufferMaterial);
+		m_pGBufferMaterial = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+
+		// Depth Stencil Buffer
 		DV_DELETE(m_pDepthStencilTex);
-		m_pDepthStencilTex = Texture2D::Create(width, height, DXGI_FORMAT_D24_UNORM_S8_UINT, DXGI_FORMAT_D24_UNORM_S8_UINT);
+		m_pDepthStencilTex = Texture2D::Create(width, height, DXGI_FORMAT_R24G8_TYPELESS, DXGI_FORMAT_D24_UNORM_S8_UINT,
+			DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
+
+		// frame output
+		DV_DELETE(m_pFrameOutput);
+		m_pFrameOutput = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
 	}
 
 	void Renderer::removeRenderTargets()
 	{
-		DV_DELETE(m_pGbufferAlbedo);
+		DV_DELETE(m_pGBufferAlbedo);
 		DV_DELETE(m_pDepthStencilTex);
 	}
 
@@ -329,20 +347,24 @@ namespace Dive
 			desc.DepthFunc						= D3D11_COMPARISON_LESS;
 
 			desc.StencilEnable					= true;
-			desc.StencilReadMask				= 0xFF;
-			desc.StencilWriteMask				= 0xFF;
+			desc.StencilReadMask				= D3D11_DEFAULT_STENCIL_READ_MASK;
+			desc.StencilWriteMask				= D3D11_DEFAULT_STENCIL_WRITE_MASK;
+
+			const D3D11_DEPTH_STENCILOP_DESC stencilMarkOp = { D3D11_STENCIL_OP_REPLACE, D3D11_STENCIL_OP_REPLACE, D3D11_STENCIL_OP_REPLACE, D3D11_COMPARISON_ALWAYS };
+			desc.FrontFace = stencilMarkOp;
+			desc.BackFace = stencilMarkOp;
 
 			// Stencil operations if pixel is front-facing.
-			desc.FrontFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
-			desc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_INCR;
-			desc.FrontFace.StencilPassOp		= D3D11_STENCIL_OP_KEEP;
-			desc.FrontFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
+			//desc.FrontFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
+			//desc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_INCR;
+			//desc.FrontFace.StencilPassOp		= D3D11_STENCIL_OP_KEEP;
+			//desc.FrontFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
 
 			// Stencil operations if pixel is back-facing.
-			desc.BackFace.StencilFailOp			= D3D11_STENCIL_OP_KEEP;
-			desc.BackFace.StencilDepthFailOp	= D3D11_STENCIL_OP_DECR;
-			desc.BackFace.StencilPassOp			= D3D11_STENCIL_OP_KEEP;
-			desc.BackFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
+			//desc.BackFace.StencilFailOp			= D3D11_STENCIL_OP_KEEP;
+			//desc.BackFace.StencilDepthFailOp	= D3D11_STENCIL_OP_DECR;
+			//desc.BackFace.StencilPassOp			= D3D11_STENCIL_OP_KEEP;
+			//desc.BackFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
 
 			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthOnStencilOn)]);
 		}
@@ -418,6 +440,40 @@ namespace Dive
 				&m_Shaders[static_cast<size_t>(eShaderType::Mesh)].pVertexShader,
 				&m_Shaders[static_cast<size_t>(eShaderType::Mesh)].pInputLayout,
 				&m_Shaders[static_cast<size_t>(eShaderType::Mesh)].pPixelShader);
+		}
+
+		// Deferred
+		{
+			D3D11_INPUT_ELEMENT_DESC desc[] =
+			{
+				{"POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	0,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	20,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"TANGENT",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	32,	D3D11_INPUT_PER_VERTEX_DATA, 0}
+			};
+
+			unsigned int numElements = ARRAYSIZE(desc);
+			m_GraphicsDevice.CreateShader("../Engine/Src/Shaders/DeferredShading.hlsl", desc, numElements,
+				&m_Shaders[static_cast<size_t>(eShaderType::Deferred)].pVertexShader,
+				&m_Shaders[static_cast<size_t>(eShaderType::Deferred)].pInputLayout,
+				&m_Shaders[static_cast<size_t>(eShaderType::Deferred)].pPixelShader);
+		}
+
+		// light
+		{
+			D3D11_INPUT_ELEMENT_DESC desc[] =
+			{
+				{"POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	0,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	20,	D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{"TANGENT",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	32,	D3D11_INPUT_PER_VERTEX_DATA, 0}
+			};
+
+			unsigned int numElements = ARRAYSIZE(desc);
+			m_GraphicsDevice.CreateShader("../Engine/Src/Shaders/Lighting.hlsl", desc, numElements,
+				&m_Shaders[static_cast<size_t>(eShaderType::Light)].pVertexShader,
+				&m_Shaders[static_cast<size_t>(eShaderType::Light)].pInputLayout,
+				&m_Shaders[static_cast<size_t>(eShaderType::Light)].pPixelShader);
 		}
 	}
 

@@ -40,6 +40,7 @@ namespace Dive
 		ID3D11ShaderResourceView* GetShaderResourceView() { return m_pShaderResourceView; }
 		ID3D11RenderTargetView* GetRenderTargetView() { return m_pRenderTargetView; }
 		ID3D11DepthStencilView* GetDepthStencilView() { return m_pDepthStencilView; }
+		ID3D11DepthStencilView* GetDepthStencilViewReadOnly() { return m_pDepthStencilViewReadOnly; }
 
 		D3D11_VIEWPORT* GetViewport() { return &m_Viewport; }
 
@@ -60,10 +61,11 @@ namespace Dive
 		unsigned int m_Height	= 0;
 		DXGI_FORMAT m_Format	= DXGI_FORMAT_UNKNOWN;
 		
-		ID3D11Texture2D* m_pTexture2D					= nullptr;
-		ID3D11ShaderResourceView* m_pShaderResourceView = nullptr;
-		ID3D11RenderTargetView* m_pRenderTargetView		= nullptr;
-		ID3D11DepthStencilView* m_pDepthStencilView		= nullptr;
+		ID3D11Texture2D* m_pTexture2D						= nullptr;
+		ID3D11ShaderResourceView* m_pShaderResourceView		= nullptr;
+		ID3D11RenderTargetView* m_pRenderTargetView			= nullptr;
+		ID3D11DepthStencilView* m_pDepthStencilView			= nullptr;
+		ID3D11DepthStencilView* m_pDepthStencilViewReadOnly = nullptr;
 
 		D3D11_VIEWPORT m_Viewport;
 	};

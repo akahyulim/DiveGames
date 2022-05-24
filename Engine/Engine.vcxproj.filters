@@ -287,5 +287,11 @@
     <None Include="Src\Shaders\common_buffer.hlsl">
       <Filter>Src\Shaders</Filter>
     </None>
+    <None Include="Src\Shaders\DeferredShading.hlsl">
+      <Filter>Src\Shaders</Filter>
+    </None>
+    <None Include="Src\Shaders\Lighting.hlsl">
+      <Filter>Src\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -23,6 +23,8 @@ namespace Dive
 	
 	protected:
 		void passDefault(CommandList* pCl);
+		void passGBuffer(CommandList* pCl);
+		void passLighting(CommandList* pCl);
 
 
 	protected:

@@ -28,7 +28,7 @@ void EditorRenderPath::Render()
 		// 스파르탄의 경우 초기화는 외부에서 하고
 		// pass에 필요한 것들을 인자로 전달한 후 bind하는 것 같다.
 		auto pImmediateContext = Dive::Renderer::GetGraphicsDevice().GetImmediateContext();
-		auto pRenderTargetView = Dive::Renderer::GetGbufferAlbedo()->GetRenderTargetView();
+		auto pRenderTargetView = Dive::Renderer::GetGBufferAlbedo()->GetRenderTargetView();
 		auto pDepthStencilView = Dive::Renderer::GetDepthStencilTexture()->GetDepthStencilView();
 		if (!pImmediateContext || !pRenderTargetView)
 			return;
@@ -43,7 +43,7 @@ void EditorRenderPath::Render()
 		std::array<ID3D11RenderTargetView*, 8> renderTargetViews = { nullptr };
 		renderTargetViews[0] = pRenderTargetView;
 		//pImmediateContext->OMSetRenderTargets(1, renderTargetViews.data(), pDepthStencilView);
-		//pImmediateContext->RSSetViewports(1, Dive::Renderer::GetGbufferAlbedo()->GetViewport());
+		//pImmediateContext->RSSetViewports(1, Dive::Renderer::GetGBufferAlbedo()->GetViewport());
 	}
 
 	Dive::CommandList cl;
@@ -73,7 +73,9 @@ void EditorRenderPath::Render()
 		cl.SetConstantBuffer(Dive::Scope_Vertex, Dive::eConstantBufferSlot::Frame, pCbFrame);
 	}
 
-	Dive::RenderPath::passDefault(&cl);
+	//Dive::RenderPath::passDefault(&cl);
+	Dive::RenderPath::passGBuffer(&cl);
+	Dive::RenderPath::passLighting(&cl);
 
 	// BeginScene은 사실상 구현하기 애매하니,
 	// EndScene보다 Present라는 이름이 어울린다.

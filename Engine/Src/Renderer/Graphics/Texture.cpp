@@ -178,6 +178,14 @@ namespace Dive
 			return false;
 		}
 
+		desc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
+		if (!graphicsDevice.CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &desc, &m_pDepthStencilViewReadOnly))
+		{
+			DV_CORE_WARN("DepthStencilViewReadOnly 생성에 실패하였습니다.");
+			Shutdown();
+			return false;
+		}
+
 		return true;
 	}
 
