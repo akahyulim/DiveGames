@@ -303,12 +303,6 @@ namespace Dive
 		if (!m_pDevice)
 			return false;
 
-		if (!pDesc)
-		{
-			DV_CORE_WARN("유효하지 않은 매개변수를 전달받았습니다.");
-			return false;
-		}
-
 		if (!std::filesystem::exists(path))
 		{
 			DV_CORE_WARN("{:s} 파일이 존재하지 않습니다.", path);
@@ -344,10 +338,17 @@ namespace Dive
 			return false;
 		}
 		
-		if (FAILED(m_pDevice->CreateInputLayout(pDesc, numElements, pShaderBuffer->GetBufferPointer(), pShaderBuffer->GetBufferSize(), ppInputLayout)))
+		if (pDesc != nullptr)
 		{
-			DV_CORE_WARN("InputLayout 생성에 실패하였습니다.");
-			return false;
+			if (FAILED(m_pDevice->CreateInputLayout(pDesc, numElements, pShaderBuffer->GetBufferPointer(), pShaderBuffer->GetBufferSize(), ppInputLayout)))
+			{
+				DV_CORE_WARN("InputLayout 생성에 실패하였습니다.");
+				return false;
+			}
+		}
+		else
+		{
+			ppInputLayout = nullptr;
 		}
 
 		DV_RELEASE(pShaderBuffer);

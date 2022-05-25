@@ -4,6 +4,8 @@ cbuffer FrameBuffer : register(b0)
 {
 	matrix g_View;
 	matrix g_Proj;
+	
+	float4 g_PerspectiveValues;
 
 	float3 g_EyePos;
 }

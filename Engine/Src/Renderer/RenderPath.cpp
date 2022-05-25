@@ -57,11 +57,19 @@ namespace Dive
 			auto pPtr = static_cast<FrameBuffer*>(pCbFrame->Map());
 			pPtr->view = DirectX::XMMatrixTranspose(view);
 			pPtr->proj = DirectX::XMMatrixTranspose(proj);
+			// PerpectiveValue를 추가해야 한다.
 			// Camera Position을 추가해야 한다.
+			// => 둘 다 Editor의 Path Render에선 추가했다.
 			pCbFrame->Unmap();
 
 			cl.SetConstantBuffer(Scope_Vertex, eConstantBufferSlot::Frame, pCbFrame);
 		}
+
+		// 일단 하드 코딩
+		auto pPointSampler = Renderer::GetSamplerState(eSamplerStateType::Point);
+		auto pLinearSampler = Renderer::GetSamplerState(eSamplerStateType::Linear);
+		pImmediateContext->PSSetSamplers(0, 1, &pPointSampler);
+		pImmediateContext->PSSetSamplers(1, 1, &pLinearSampler);
 
 		passDefault(&cl);
 	}
@@ -373,6 +381,23 @@ namespace Dive
 		pImmediateContext->ClearRenderTargetView(pRenderTargetView, clearColor);
 		pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilViewReadOnly);
 
-		// draw를 어떻게 해야 하는지 모르겠다.
+
+		auto pDepthStencilShaderResourceView = Renderer::GetDepthStencilTexture()->GetShaderResourceView();
+		auto pAlbedoShaderResourceView = Renderer::GetGBufferAlbedo()->GetShaderResourceView();
+		auto pNormalShaderResourceView = Renderer::GetGBufferNormal()->GetShaderResourceView();
+		auto pMaterialShaderResourceView = Renderer::GetGBufferMaterial()->GetShaderResourceView();
+		
+		pImmediateContext->PSSetShaderResources(0, 1, &pDepthStencilShaderResourceView);
+		pImmediateContext->PSSetShaderResources(1, 1, &pAlbedoShaderResourceView);
+		pImmediateContext->PSSetShaderResources(2, 1, &pNormalShaderResourceView);
+		pImmediateContext->PSSetShaderResources(3, 1, &pMaterialShaderResourceView);
+
+		pImmediateContext->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+		pImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+		pImmediateContext->IASetInputLayout(Renderer::GetShader(eShaderType::Light)->pInputLayout);
+		pImmediateContext->VSSetShader(Renderer::GetShader(eShaderType::Light)->pVertexShader, nullptr, 0);
+		pImmediateContext->PSSetShader(Renderer::GetShader(eShaderType::Light)->pPixelShader, nullptr, 0);
+
+		pImmediateContext->Draw(4, 0);
 	}
 }

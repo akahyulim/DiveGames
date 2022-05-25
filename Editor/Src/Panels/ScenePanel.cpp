@@ -40,6 +40,7 @@ void ScenePanel::renderWindow()
 	//pTexture = Dive::Renderer::GetGBufferNormal();
 	//pTexture = Dive::Renderer::GetGBufferMaterial();
 	//pTexture = Dive::Renderer::GetDepthStencilTexture();
+	pTexture = Dive::Renderer::GetFrameOutput();
 
 	// 매번 그리는 게 맞다.
 	ImGui::Image(

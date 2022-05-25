@@ -40,8 +40,9 @@ Pixel_Input mainVS(Vertex_PosTexNorTan input)
 	return output;
 }
 
-// 추후 common_sampler로 이동
-SamplerState linearSampler;
+// 어딘가에서 set을 했을 것인데 찾질 못했다.
+// 지워야 하는데...
+//SamplerState linearSampler;
 
 float3 CalcuDirectionalLight(float3 pos, float3 normal, float4 mtrlColor)
 {
@@ -135,7 +136,7 @@ Pixel_GBuffer_Out mainPS(Pixel_Input input)
 	if (HasAlbedoTexture())
 	{
 		// map이 있다면 material color는 무시하는 것이 맞겠지?
-		albedo = material_Albedo.Sample(linearSampler, input.texCoord);
+		albedo = material_Albedo.Sample(LinearSampler, input.texCoord);
 		albedo.w = 1.0f;
 	}
 
@@ -145,7 +146,7 @@ Pixel_GBuffer_Out mainPS(Pixel_Input input)
 	{
 		// 일단 현재 sponza의 normal이 없다고 나온다.
 		// 그리고 샘플링도 이렇게 하는 게 아닐 것이다.
-	//	normal *= material_Normal.Sample(linearSampler, input.texCoord);
+	//	normal *= material_Normal.Sample(LinearSampler, input.texCoord);
 	}
 
 	float3 lightColor = 0;

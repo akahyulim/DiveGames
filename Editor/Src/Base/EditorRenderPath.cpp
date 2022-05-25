@@ -67,11 +67,29 @@ void EditorRenderPath::Render()
 		auto pPtr = static_cast<Dive::FrameBuffer*>(pCbFrame->Map());
 		pPtr->view = DirectX::XMMatrixTranspose(view);
 		pPtr->proj = DirectX::XMMatrixTranspose(proj);
+		
+		{
+			// linear depth 계산에 사용된다.
+			// 정확히 무슨 값인지 아직 모른다.
+			DirectX::XMFLOAT4X4 p;
+			DirectX::XMStoreFloat4x4(&p, proj);
+			pPtr->perspectiveValues.x = 1.0f / p._11;
+			pPtr->perspectiveValues.y = 1.0f / p._22;
+			pPtr->perspectiveValues.z = p._43;
+			pPtr->perspectiveValues.w = -p._33;
+		}
+
 		pPtr->eyePos = eyePos;
 		pCbFrame->Unmap();
 
-		cl.SetConstantBuffer(Dive::Scope_Vertex, Dive::eConstantBufferSlot::Frame, pCbFrame);
+		cl.SetConstantBuffer(Dive::Scope_Vertex | Dive::Scope_Pixel, Dive::eConstantBufferSlot::Frame, pCbFrame);
 	}
+
+	// 일단 하드 코딩
+	auto pPointSampler = Dive::Renderer::GetSamplerState(Dive::eSamplerStateType::Point);
+	auto pLinearSampler = Dive::Renderer::GetSamplerState(Dive::eSamplerStateType::Linear);
+	pImmediateContext->PSSetSamplers(0, 1, &pPointSampler);
+	pImmediateContext->PSSetSamplers(1, 1, &pLinearSampler);
 
 	//Dive::RenderPath::passDefault(&cl);
 	Dive::RenderPath::passGBuffer(&cl);

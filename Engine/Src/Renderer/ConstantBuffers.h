@@ -12,6 +12,8 @@ namespace Dive
 		DirectX::XMMATRIX view = DirectX::XMMatrixIdentity();
 		DirectX::XMMATRIX proj = DirectX::XMMatrixIdentity();
 
+		DirectX::XMFLOAT4 perspectiveValues = { 0.0f, 0.0f, 0.0f, 0.0f };
+
 		DirectX::XMFLOAT3 eyePos = {0.0f, 0.0f, 0.0f};
 		float pad;
 	};

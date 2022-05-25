@@ -95,7 +95,8 @@ namespace Dive
 
 	enum class eSamplerStateType : size_t
 	{
-		Linear = 0,
+		Point = 0,
+		Linear,
 		Count
 	};
 

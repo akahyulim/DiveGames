@@ -259,6 +259,26 @@ namespace Dive
 
 	void Renderer::createSamplers()
 	{
+		// point
+		{
+			D3D11_SAMPLER_DESC desc;
+			desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+			desc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+			desc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+			desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+			desc.MipLODBias = 0.0f;
+			desc.MaxAnisotropy = 1;
+			desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+			desc.BorderColor[0] = 0;
+			desc.BorderColor[1] = 0;
+			desc.BorderColor[2] = 0;
+			desc.BorderColor[3] = 0;
+			desc.MinLOD = 0;
+			desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+			m_GraphicsDevice.CreateSamplerState(&desc, &m_SamplerStates[static_cast<size_t>(eSamplerStateType::Point)]);
+		}
+
 		// linear
 		{
 			D3D11_SAMPLER_DESC desc;
@@ -461,16 +481,7 @@ namespace Dive
 
 		// light
 		{
-			D3D11_INPUT_ELEMENT_DESC desc[] =
-			{
-				{"POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	0,	D3D11_INPUT_PER_VERTEX_DATA, 0},
-				{"TEXCOORD",	0, DXGI_FORMAT_R32G32_FLOAT,		0,	12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-				{"NORMAL",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	20,	D3D11_INPUT_PER_VERTEX_DATA, 0},
-				{"TANGENT",		0, DXGI_FORMAT_R32G32B32_FLOAT,		0,	32,	D3D11_INPUT_PER_VERTEX_DATA, 0}
-			};
-
-			unsigned int numElements = ARRAYSIZE(desc);
-			m_GraphicsDevice.CreateShader("../Engine/Src/Shaders/Lighting.hlsl", desc, numElements,
+			m_GraphicsDevice.CreateShader("../Engine/Src/Shaders/Lighting.hlsl", nullptr, 0,
 				&m_Shaders[static_cast<size_t>(eShaderType::Light)].pVertexShader,
 				&m_Shaders[static_cast<size_t>(eShaderType::Light)].pInputLayout,
 				&m_Shaders[static_cast<size_t>(eShaderType::Light)].pPixelShader);
