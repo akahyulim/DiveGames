@@ -354,66 +354,95 @@ namespace Dive
 		}
 	}
 
+	// 일단 책에 있는 것들로만 우선 만들었다.
+	// 추가될 여지가 있다.
 	void Renderer::createDepthStencilStates()
 	{
-		// 이렇게 하면 추가 괄호 안에선 초기화된 값인가...?
 		D3D11_DEPTH_STENCIL_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 
-		// 일단 depth와 stencil의 사용여부
-		// depth의 경우 test 및 write 여부
-		// stencil의 경우 test 여부
-
-		// 스파르탄 기준 총 다섯개
-		// 1. off, off
-		// 2. rw, off
-		// 3. r, off
-		// 4, off, r
-		// 5. rw, w
-
+		// dpeth off, stencil off
 		{
-			// Set up the description of the stencil state.
+			// depth
+			desc.DepthEnable					= false;
+			desc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
+			desc.DepthFunc						= D3D11_COMPARISON_NEVER;
+
+			// stencil
+			desc.StencilEnable					= false;
+			desc.StencilWriteMask				= 0;
+			desc.StencilReadMask				= 0;
+			// face
+			desc.FrontFace.StencilFunc			= D3D11_COMPARISON_NEVER;
+			desc.FrontFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_INCR;
+			desc.FrontFace.StencilPassOp		= D3D11_STENCIL_OP_KEEP;
+			desc.BackFace						= desc.FrontFace;
+
+			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthOff_StencilOff)]);
+		}
+
+		// less / write, ds
+		{
+			// depth
 			desc.DepthEnable					= true;
 			desc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ALL;
 			desc.DepthFunc						= D3D11_COMPARISON_LESS;
 
+			// stencil
 			desc.StencilEnable					= true;
-			desc.StencilReadMask				= D3D11_DEFAULT_STENCIL_READ_MASK;
 			desc.StencilWriteMask				= D3D11_DEFAULT_STENCIL_WRITE_MASK;
+			desc.StencilReadMask				= D3D11_DEFAULT_STENCIL_READ_MASK;
+			// face
+			desc.FrontFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
+			desc.FrontFace.StencilFailOp		= D3D11_STENCIL_OP_REPLACE;
+			desc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_REPLACE;
+			desc.FrontFace.StencilPassOp		= D3D11_STENCIL_OP_REPLACE;
+			desc.BackFace						= desc.FrontFace;
 
-			const D3D11_DEPTH_STENCILOP_DESC stencilMarkOp = { D3D11_STENCIL_OP_REPLACE, D3D11_STENCIL_OP_REPLACE, D3D11_STENCIL_OP_REPLACE, D3D11_COMPARISON_ALWAYS };
-			desc.FrontFace = stencilMarkOp;
-			desc.BackFace = stencilMarkOp;
-
-			// Stencil operations if pixel is front-facing.
-			//desc.FrontFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
-			//desc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_INCR;
-			//desc.FrontFace.StencilPassOp		= D3D11_STENCIL_OP_KEEP;
-			//desc.FrontFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
-
-			// Stencil operations if pixel is back-facing.
-			//desc.BackFace.StencilFailOp			= D3D11_STENCIL_OP_KEEP;
-			//desc.BackFace.StencilDepthFailOp	= D3D11_STENCIL_OP_DECR;
-			//desc.BackFace.StencilPassOp			= D3D11_STENCIL_OP_KEEP;
-			//desc.BackFace.StencilFunc			= D3D11_COMPARISON_ALWAYS;
-
-			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthOnStencilOn)]);
+			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthWriteLess_StencilOn)]);
 		}
 
-		// 임시 forward light
+		// greater / no write, ds
 		{
-			D3D11_DEPTH_STENCIL_DESC descDepth;
-			descDepth.DepthEnable = TRUE;
-			descDepth.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-			descDepth.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-			descDepth.StencilEnable = FALSE;
-			descDepth.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
-			descDepth.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
-			const D3D11_DEPTH_STENCILOP_DESC noSkyStencilOp = { D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_COMPARISON_EQUAL };
-			descDepth.FrontFace = noSkyStencilOp;
-			descDepth.BackFace = noSkyStencilOp;
+			// depth
+			desc.DepthEnable					= true;
+			desc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
+			desc.DepthFunc						= D3D11_COMPARISON_GREATER_EQUAL;
 
-			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::ForwardLight)]);
+			// stencil
+			desc.StencilEnable					= false;
+			desc.StencilWriteMask				= D3D11_DEFAULT_STENCIL_WRITE_MASK;
+			desc.StencilReadMask				= D3D11_DEFAULT_STENCIL_READ_MASK;
+			// face
+			desc.FrontFace.StencilFunc			= D3D11_COMPARISON_EQUAL;
+			desc.FrontFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilPassOp		= D3D11_STENCIL_OP_KEEP; 
+			desc.BackFace						= desc.FrontFace;
+
+			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthNoWriteGreater_StencilOn)]);
+		}
+
+		// less / no write, ds
+		{
+			// depth
+			desc.DepthEnable					= true;
+			desc.DepthWriteMask					= D3D11_DEPTH_WRITE_MASK_ZERO;
+			desc.DepthFunc						= D3D11_COMPARISON_LESS;
+
+			// stencil
+			desc.StencilEnable = true;
+			desc.StencilWriteMask				= D3D11_DEFAULT_STENCIL_WRITE_MASK;
+			desc.StencilReadMask				= D3D11_DEFAULT_STENCIL_READ_MASK;
+			// face
+			desc.FrontFace.StencilFunc			= D3D11_COMPARISON_EQUAL;
+			desc.FrontFace.StencilFailOp		= D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilDepthFailOp	= D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilPassOp		= D3D11_STENCIL_OP_KEEP; 
+			desc.BackFace						= desc.FrontFace;
+
+			m_GraphicsDevice.CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilStateType::DepthNoWriteLess_StencilOn)]);
 		}
 	}
 	

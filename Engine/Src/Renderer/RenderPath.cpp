@@ -96,7 +96,7 @@ namespace Dive
 			ps.pVertexShader		= Renderer::GetShader(eShaderType::Sprite)->pVertexShader;
 			ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
 			ps.pPixelShader			= Renderer::GetShader(eShaderType::Sprite)->pPixelShader;
-			ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
+			ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthWriteLess_StencilOn);
 			ps.renderTargetViews[0] = Renderer::GetGBufferAlbedo()->GetRenderTargetView();
 			ps.pViewport			= Renderer::GetGBufferAlbedo()->GetViewport();
 			ps.pDepthStencilView	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
@@ -188,7 +188,7 @@ namespace Dive
 					ps.pVertexShader		= Renderer::GetShader(eShaderType::Mesh)->pVertexShader;
 					ps.pRasterizerState		= Renderer::GetRasterizerState(eRasterizerStateType::CullBackSolid);
 					ps.pPixelShader			= Renderer::GetShader(eShaderType::Mesh)->pPixelShader;
-					ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
+					ps.pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthWriteLess_StencilOn);
 					ps.renderTargetViews[0] = Renderer::GetGBufferAlbedo()->GetRenderTargetView();
 					ps.pViewport			= Renderer::GetGBufferAlbedo()->GetViewport();
 					ps.pDepthStencilView	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
@@ -277,7 +277,7 @@ namespace Dive
 		auto pGBufferNormal			= Renderer::GetGBufferNormal()->GetRenderTargetView();
 		auto pGBufferMaterial		= Renderer::GetGBufferMaterial()->GetRenderTargetView();
 		auto pGBufferDepthStencil	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
-		auto pDepthStencilState		= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthOnStencilOn);
+		auto pDepthStencilState		= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthWriteLess_StencilOn);
 
 		// clear
 		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -431,7 +431,16 @@ namespace Dive
 			pImmediateContext->VSSetShader(Renderer::GetShader(eShaderType::Light)->pVertexShader, nullptr, 0);
 			pImmediateContext->PSSetShader(Renderer::GetShader(eShaderType::Light)->pPixelShader, nullptr, 0);
 
+			ID3D11DepthStencilState* pPrevState;
+			UINT stencilRef;
+			pImmediateContext->OMGetDepthStencilState(&pPrevState, &stencilRef);
+
+			auto pDepthStencilState = Renderer::GetDepthStencilState(eDepthStencilStateType::DepthNoWriteLess_StencilOn);
+			//pImmediateContext->OMSetDepthStencilState(pDepthStencilState, 1);
+
 			pImmediateContext->Draw(4, 0);
+
+			//pImmediateContext->OMSetDepthStencilState(pPrevState, stencilRef);
 		}
 	}
 }

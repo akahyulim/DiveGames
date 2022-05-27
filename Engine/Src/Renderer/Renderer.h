@@ -87,9 +87,10 @@ namespace Dive
 
 	enum class eDepthStencilStateType : size_t
 	{
-		//DepthOffStencilOff = 0,
-		DepthOnStencilOn = 0,
-		ForwardLight,
+		DepthOff_StencilOff = 0,
+		DepthWriteLess_StencilOn,
+		DepthNoWriteGreater_StencilOn,
+		DepthNoWriteLess_StencilOn,
 		Count
 	};
 
