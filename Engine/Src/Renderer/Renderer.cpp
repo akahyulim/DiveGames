@@ -360,6 +360,17 @@ namespace Dive
 		D3D11_DEPTH_STENCIL_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 
+		// 일단 depth와 stencil의 사용여부
+		// depth의 경우 test 및 write 여부
+		// stencil의 경우 test 여부
+
+		// 스파르탄 기준 총 다섯개
+		// 1. off, off
+		// 2. rw, off
+		// 3. r, off
+		// 4, off, r
+		// 5. rw, w
+
 		{
 			// Set up the description of the stencil state.
 			desc.DepthEnable					= true;

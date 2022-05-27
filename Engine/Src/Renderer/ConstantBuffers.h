@@ -9,8 +9,9 @@ namespace Dive
 
 	struct FrameBuffer
 	{
-		DirectX::XMMATRIX view = DirectX::XMMatrixIdentity();
-		DirectX::XMMATRIX proj = DirectX::XMMatrixIdentity();
+		DirectX::XMMATRIX view		= DirectX::XMMatrixIdentity();
+		DirectX::XMMATRIX proj		= DirectX::XMMatrixIdentity();
+		DirectX::XMMATRIX viewInv	= DirectX::XMMatrixIdentity();
 
 		DirectX::XMFLOAT4 perspectiveValues = { 0.0f, 0.0f, 0.0f, 0.0f };
 

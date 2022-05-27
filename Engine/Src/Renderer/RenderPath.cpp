@@ -57,9 +57,10 @@ namespace Dive
 			auto pPtr = static_cast<FrameBuffer*>(pCbFrame->Map());
 			pPtr->view = DirectX::XMMatrixTranspose(view);
 			pPtr->proj = DirectX::XMMatrixTranspose(proj);
+			// ViewInv를 추가해야 한다.
 			// PerpectiveValue를 추가해야 한다.
 			// Camera Position을 추가해야 한다.
-			// => 둘 다 Editor의 Path Render에선 추가했다.
+			// => 전부 Editor의 Path Render에선 추가했다.
 			pCbFrame->Unmap();
 
 			cl.SetConstantBuffer(Scope_Vertex, eConstantBufferSlot::Frame, pCbFrame);
@@ -359,45 +360,78 @@ namespace Dive
 
 	void RenderPath::passLighting(CommandList* pCl)
 	{
+		if (m_MainVisibilities.visibleLights.empty())
+			return;
+
 		auto pImmediateContext = Renderer::GetGraphicsDevice().GetImmediateContext();
 		if (!pImmediateContext)
 			return;
 
-		// GBuffer의 값을 이용해 light를 적용
-		// 즉, render target view가 달라진다.
+		// 1. 아직 빛이 누적되지 않는다.
+		// 2. 스파르탄은 Light마다 RenderTarget을 달리하는 것 같다.
+		for (auto pGameObject : m_MainVisibilities.visibleLights)
+		{
+			// PostRender
+			ID3D11RenderTargetView* rt[3] = { NULL, NULL, NULL };
+			auto pDepthStencilViewReadOnly = Renderer::GetDepthStencilTexture()->GetDepthStencilViewReadOnly();
+			pImmediateContext->OMSetRenderTargets(3, rt, pDepthStencilViewReadOnly);
 
-		// 일단 선형 깊이값을 출력토록 하자.
-		// 현재 깊이값은 비 선형값으로 저장된 상태다.
-		// 따라서 셰이더에서 계산한 후 출력해야 한다.
+			// 괜히 두 번 한다...
+			auto pRenderTargetView = Renderer::GetFrameOutput()->GetRenderTargetView();
+			float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			pImmediateContext->ClearRenderTargetView(pRenderTargetView, clearColor);
+			pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilViewReadOnly);
 
-		// PostRender
-		ID3D11RenderTargetView* rt[3] = { NULL, NULL, NULL };
-		auto pDepthStencilViewReadOnly = Renderer::GetDepthStencilTexture()->GetDepthStencilViewReadOnly();
-		pImmediateContext->OMSetRenderTargets(3, rt, pDepthStencilViewReadOnly);
+			auto pDepthStencilShaderResourceView = Renderer::GetDepthStencilTexture()->GetShaderResourceView();
+			auto pAlbedoShaderResourceView = Renderer::GetGBufferAlbedo()->GetShaderResourceView();
+			auto pNormalShaderResourceView = Renderer::GetGBufferNormal()->GetShaderResourceView();
+			auto pMaterialShaderResourceView = Renderer::GetGBufferMaterial()->GetShaderResourceView();
 
-		// 괜히 두 번 한다...
-		auto pRenderTargetView = Renderer::GetFrameOutput()->GetRenderTargetView();
-		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		pImmediateContext->ClearRenderTargetView(pRenderTargetView, clearColor);
-		pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilViewReadOnly);
+			pImmediateContext->PSSetShaderResources(0, 1, &pDepthStencilShaderResourceView);
+			pImmediateContext->PSSetShaderResources(1, 1, &pAlbedoShaderResourceView);
+			pImmediateContext->PSSetShaderResources(2, 1, &pNormalShaderResourceView);
+			pImmediateContext->PSSetShaderResources(3, 1, &pMaterialShaderResourceView);
 
+			auto pLight = pGameObject->GetComponent<Light>();
+			if (pLight == nullptr || !pLight->IsEnabled())
+				continue;
 
-		auto pDepthStencilShaderResourceView = Renderer::GetDepthStencilTexture()->GetShaderResourceView();
-		auto pAlbedoShaderResourceView = Renderer::GetGBufferAlbedo()->GetShaderResourceView();
-		auto pNormalShaderResourceView = Renderer::GetGBufferNormal()->GetShaderResourceView();
-		auto pMaterialShaderResourceView = Renderer::GetGBufferMaterial()->GetShaderResourceView();
-		
-		pImmediateContext->PSSetShaderResources(0, 1, &pDepthStencilShaderResourceView);
-		pImmediateContext->PSSetShaderResources(1, 1, &pAlbedoShaderResourceView);
-		pImmediateContext->PSSetShaderResources(2, 1, &pNormalShaderResourceView);
-		pImmediateContext->PSSetShaderResources(3, 1, &pMaterialShaderResourceView);
+			auto pTransform = pGameObject->GetComponent<Transform>();
 
-		pImmediateContext->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
-		pImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-		pImmediateContext->IASetInputLayout(Renderer::GetShader(eShaderType::Light)->pInputLayout);
-		pImmediateContext->VSSetShader(Renderer::GetShader(eShaderType::Light)->pVertexShader, nullptr, 0);
-		pImmediateContext->PSSetShader(Renderer::GetShader(eShaderType::Light)->pPixelShader, nullptr, 0);
+			// 현재 테스트에선 cb만 만들어서 등록하면 될 듯
+			// map & unmap
+			auto pCbLight = Renderer::GetCbLight();
+			auto pPtr = static_cast<LightBuffer*>(pCbLight->Map());
 
-		pImmediateContext->Draw(4, 0);
+			pPtr->pos = pTransform->GetLocalPosition();
+			pPtr->rangeRcp = 1.0f / pLight->GetRange();
+			pPtr->dir = pTransform->GetForward();
+			pPtr->spotAngle = cosf(pLight->GetSpotAngleRadian());
+			pPtr->color = pLight->GetColor();
+			pPtr->options = 0;
+			if (pLight->GetLightType() == eLightType::Directional)
+			{
+				pPtr->options |= (1 << 0);
+			}
+			if (pLight->GetLightType() == eLightType::Point)
+			{
+				pPtr->options |= (1 << 1);
+			}
+			if (pLight->GetLightType() == eLightType::Spot)
+			{
+				pPtr->options |= (1 << 2);
+			}
+			pCbLight->Unmap();
+
+			pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Light, pCbLight);
+
+			pImmediateContext->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+			pImmediateContext->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+			pImmediateContext->IASetInputLayout(Renderer::GetShader(eShaderType::Light)->pInputLayout);
+			pImmediateContext->VSSetShader(Renderer::GetShader(eShaderType::Light)->pVertexShader, nullptr, 0);
+			pImmediateContext->PSSetShader(Renderer::GetShader(eShaderType::Light)->pPixelShader, nullptr, 0);
+
+			pImmediateContext->Draw(4, 0);
+		}
 	}
 }

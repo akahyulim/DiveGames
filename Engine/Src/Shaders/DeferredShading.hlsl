@@ -40,9 +40,26 @@ Pixel_GBuffer_Out mainPS(Pixel_Input input)
 {
 	Pixel_GBuffer_Out output;
 
-	output.Albedo = float4(1.0f, 0.0f, 0.0f, 1.0f);
-	output.Normal = float4(input.normal.xyz, 1.0f);
-	output.Material = float4(0.0f, 0.0f, 1.0f, 1.0f);
+	float4 albedo = g_MatColor;
+	if (HasAlbedoTexture())
+	{
+		// map이 있다면 material color는 무시하는 것이 맞겠지?
+		albedo = material_Albedo.Sample(LinearSampler, input.texCoord);
+		albedo.w = 1.0f;
+	}
+
+	// normal
+	float3 normal = input.normal;
+	if (HasNormalTexture())
+	{
+		// 일단 현재 sponza의 normal이 없다고 나온다.
+		// 그리고 샘플링도 이렇게 하는 게 아닐 것이다.
+	//	normal *= material_Normal.Sample(LinearSampler, input.texCoord);
+	}
+
+	output.Albedo	= albedo;
+	output.Normal	= float4(normal * 0.5 + 0.5, 1.0f);
+	//output.Material = float4(normal.xyz, 1.0f);
 
 	return output;
 }

@@ -67,17 +67,15 @@ void EditorRenderPath::Render()
 		auto pPtr = static_cast<Dive::FrameBuffer*>(pCbFrame->Map());
 		pPtr->view = DirectX::XMMatrixTranspose(view);
 		pPtr->proj = DirectX::XMMatrixTranspose(proj);
-		
-		{
-			// linear depth 계산에 사용된다.
-			// 정확히 무슨 값인지 아직 모른다.
-			DirectX::XMFLOAT4X4 p;
-			DirectX::XMStoreFloat4x4(&p, proj);
-			pPtr->perspectiveValues.x = 1.0f / p._11;
-			pPtr->perspectiveValues.y = 1.0f / p._22;
-			pPtr->perspectiveValues.z = p._43;
-			pPtr->perspectiveValues.w = -p._33;
-		}
+		pPtr->viewInv = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, view));
+
+		DirectX::XMFLOAT4X4 p;
+		DirectX::XMStoreFloat4x4(&p, proj);
+		pPtr->perspectiveValues.x = 1.0f / p._11;
+		pPtr->perspectiveValues.y = 1.0f / p._22;
+		pPtr->perspectiveValues.z = p._43;
+		pPtr->perspectiveValues.w = -p._33;
+	
 
 		pPtr->eyePos = eyePos;
 		pCbFrame->Unmap();

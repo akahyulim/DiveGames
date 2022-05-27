@@ -2740,7 +2740,7 @@ MeshRenderable:
 Light:
   m_InstanceID: 15070568303560226532
   m_GameObject: 1259115248727428446
-  m_bEnabled: 0
+  m_bEnabled: 1
   m_LightType: 0
   m_Color: [1, 1, 1]
   m_Range: 10
@@ -2758,7 +2758,7 @@ Light:
 Light:
   m_InstanceID: 1266520226908140982
   m_GameObject: 3431116627152915829
-  m_bEnabled: 1
+  m_bEnabled: 0
   m_LightType: 2
   m_Color: [1, 1, 1]
   m_Range: 100

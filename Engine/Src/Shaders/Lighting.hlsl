@@ -25,40 +25,46 @@ Pixel_Input mainVS(uint VertexID : SV_VERTEXID)
 	return output;
 }
 
-Texture2D<float> DepthTexture		: register(t0);
-Texture2D<float4> AlbedoTexture		: register(t1);
-Texture2D<float4> NormalTexture		: register(t2);
-Texture2D<float4> MaterialTexture	: register(t3);
-
 struct Pixel_Output
 {
 	float4 FrameOutput : SV_TARGET0;
 };
 
-// pixel shade
-// 일단 depth를 선형으로 출력한다.
+float3 CalcDirectionalLight(float3 pos, float depth, SurfaceData data)
+{
+	float3 dirLight = 0;
+
+	float3 lightDir = -g_LightDir;
+
+	// ambient
+	float ambient = 0.1f;
+	dirLight = g_LightColor * ambient;
+
+	// phong diffuse
+	float diffuse = saturate(dot(data.normal, lightDir));
+	dirLight += g_LightColor * diffuse;
+
+	// blinn specular
+	float3 toEye = normalize(g_EyePos - pos);
+	float3 halfWay = normalize(toEye + lightDir);
+	float specular = pow(saturate(dot(data.normal, halfWay)), 250.f) * 0.25f;
+	dirLight += g_LightColor * specular;
+
+	return data.albedo * dirLight;
+}
+
 Pixel_Output mainPS(Pixel_Input input)
 {
 	Pixel_Output output;
 
-	int3 location3 = int3(input.Position.xy, 0);
-
-	float depth = DepthTexture.Load(location3).x;
-	depth = ConvertZToLinearDepth(depth);
+	SurfaceData data = UnpackGBuffer(input.Position.xy);
 	
-	// 책에선 출력위해 각 요소의 값을 다시 계산했다.
-	output.FrameOutput = float4(
-		1.0 - saturate(depth / 75.0),
-		1.0 - saturate(depth / 125.0),
-		1.0 - saturate(depth / 200.0),
-		1.0);
+	float depth = data.linearDepth;
+	float3 pos = CalcWorldPos(input.cpPos, depth);
 
-	// 결국
-	// albedo는 화면의 uv에 맞게 색상을 저장하고
-	// normal은 법선 벡터를 저장하고
-	// depth는 깊이 값을 저장한 것이다.
-	// 즉, 모든 요소를 개별 텍스쳐에 기록한다고 보면 된다.
-	// 그리고 이를 이용해 light를 처리하는 것이다.
+	float3 directionalLight = CalcDirectionalLight(pos, depth, data);
+
+	output.FrameOutput = float4(directionalLight.xyz, 1.0f);
 
 	return output;
 }
