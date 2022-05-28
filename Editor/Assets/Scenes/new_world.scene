@@ -1249,6 +1249,14 @@ GameObject:
     - 0: 17293462293971892342
     - 5: 1266520226908140982
 ---
+GameObject:
+  m_InstanceID: 13339665916337882659
+  m_Name: Spot_Light
+  m_bActive: 1
+  m_Component:
+    - 0: 6712619751492711550
+    - 5: 909261881832175652
+---
 Transform:
   m_InstanceID: 8106191284142876529
   m_GameObject: 12103417057600720543
@@ -2644,7 +2652,7 @@ Transform:
 Transform:
   m_InstanceID: 4667695266656669869
   m_GameObject: 1259115248727428446
-  m_LocalRotation: [0, 0, 0, 1]
+  m_LocalRotation: [0.353552788, 0.353553414, -0.146446154, 0.853553712]
   m_LocalPosition: [0, 0, 0]
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
@@ -2653,7 +2661,7 @@ Transform:
   m_InstanceID: 9580987611416431916
   m_GameObject: 4400037384656433446
   m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [0, 4.5, -5]
+  m_LocalPosition: [0, 12, -3.79999995]
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
 ---
@@ -2661,7 +2669,15 @@ Transform:
   m_InstanceID: 17293462293971892342
   m_GameObject: 3431116627152915829
   m_LocalRotation: [0, 0, 0, 1]
-  m_LocalPosition: [0.5, 7.5, 5]
+  m_LocalPosition: [-4.5, 7.5, 2]
+  m_LocalScale: [1, 1, 1]
+  m_Parent: 0
+---
+Transform:
+  m_InstanceID: 6712619751492711550
+  m_GameObject: 13339665916337882659
+  m_LocalRotation: [0, 0, 0, 1]
+  m_LocalPosition: [7, 2.5, 5]
   m_LocalScale: [1, 1, 1]
   m_Parent: 0
 ---
@@ -2740,7 +2756,7 @@ MeshRenderable:
 Light:
   m_InstanceID: 15070568303560226532
   m_GameObject: 1259115248727428446
-  m_bEnabled: 1
+  m_bEnabled: 0
   m_LightType: 0
   m_Color: [1, 1, 1]
   m_Range: 10
@@ -2749,17 +2765,26 @@ Light:
 Light:
   m_InstanceID: 8827333967992895324
   m_GameObject: 4400037384656433446
-  m_bEnabled: 0
+  m_bEnabled: 1
   m_LightType: 1
   m_Color: [1, 1, 1]
-  m_Range: 30
+  m_Range: 135
   m_SpotAngle: 60
 ---
 Light:
   m_InstanceID: 1266520226908140982
   m_GameObject: 3431116627152915829
-  m_bEnabled: 0
+  m_bEnabled: 1
   m_LightType: 2
-  m_Color: [1, 1, 1]
-  m_Range: 100
-  m_SpotAngle: 22.5
+  m_Color: [1, 0, 0]
+  m_Range: 60
+  m_SpotAngle: 34.5
+---
+Light:
+  m_InstanceID: 909261881832175652
+  m_GameObject: 13339665916337882659
+  m_bEnabled: 1
+  m_LightType: 2
+  m_Color: [0.0530973673, 0.220690608, 1]
+  m_Range: 60
+  m_SpotAngle: 34

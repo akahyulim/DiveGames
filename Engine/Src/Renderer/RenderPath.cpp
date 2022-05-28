@@ -367,9 +367,8 @@ namespace Dive
 		if (!pImmediateContext)
 			return;
 
-		// 1. 아직 빛이 누적되지 않는다.
-		// 2. 스파르탄은 Light마다 RenderTarget을 달리하는 것 같다.
-		for (auto pGameObject : m_MainVisibilities.visibleLights)
+		// 어처구니가 없다.
+		// RenderTarget을 매 Light마다 초기화했으니 Blending이 안된거지.
 		{
 			// PostRender
 			ID3D11RenderTargetView* rt[3] = { NULL, NULL, NULL };
@@ -381,6 +380,11 @@ namespace Dive
 			float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 			pImmediateContext->ClearRenderTargetView(pRenderTargetView, clearColor);
 			pImmediateContext->OMSetRenderTargets(1, &pRenderTargetView, pDepthStencilViewReadOnly);
+		}
+
+		// 스파르탄은 Light마다 RenderTarget을 달리하는 것 같다.
+		for (auto pGameObject : m_MainVisibilities.visibleLights)
+		{
 
 			auto pDepthStencilShaderResourceView = Renderer::GetDepthStencilTexture()->GetShaderResourceView();
 			auto pAlbedoShaderResourceView = Renderer::GetGBufferAlbedo()->GetShaderResourceView();
@@ -436,11 +440,20 @@ namespace Dive
 			pImmediateContext->OMGetDepthStencilState(&pPrevState, &stencilRef);
 
 			auto pDepthStencilState = Renderer::GetDepthStencilState(eDepthStencilStateType::DepthNoWriteLess_StencilOn);
-			//pImmediateContext->OMSetDepthStencilState(pDepthStencilState, 1);
+			pImmediateContext->OMSetDepthStencilState(pDepthStencilState, 1);
+
+			auto pBlendState = Renderer::GetBlendState(eBlendStateType::Addtive);
+			float blendFactor[] = { 0, 0, 0, 0 };
+			UINT sampleMask = 0xffffffff;
+			pImmediateContext->OMSetBlendState(pBlendState, blendFactor, sampleMask);
 
 			pImmediateContext->Draw(4, 0);
 
-			//pImmediateContext->OMSetDepthStencilState(pPrevState, stencilRef);
+
+			pBlendState = Renderer::GetBlendState(eBlendStateType::Disabled);
+			pImmediateContext->OMSetBlendState(pBlendState, blendFactor, sampleMask);
+
+			pImmediateContext->OMSetDepthStencilState(pPrevState, stencilRef);
 		}
 	}
 }

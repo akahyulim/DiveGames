@@ -53,6 +53,63 @@ float3 CalcDirectionalLight(float3 pos, float depth, SurfaceData data)
 	return data.albedo * dirLight;
 }
 
+float3 CalcPointLight(float3 pos, SurfaceData data)
+{
+	float3 pointLight = 0;
+
+	float3 toLight = g_LightPos - pos;
+	float lightDist = length(toLight);
+	float3 toEye = normalize(g_EyePos - pos);
+
+	// phong diffuse
+	toLight /= lightDist;
+	float diffuse = saturate(dot(data.normal, toLight));
+	pointLight = g_LightColor * diffuse;
+
+	// blinn specular
+	float3 halfWay = normalize(toEye + toLight);
+	float specular = pow(saturate(dot(data.normal, halfWay)), 250.f) * 0.25f;
+	pointLight += g_LightColor * specular;
+
+	// point attnuation
+	float attn = 1.0f - saturate(lightDist * g_LightRangeRcp);
+	attn *= attn;
+
+	return pointLight * (data.albedo * attn);
+}
+
+float3 CalcSpotLight(float3 pos, SurfaceData data)
+{
+	float3 spotLight = 0;
+
+	float3 toLight = g_LightPos - pos;
+	float lightDist = length(toLight);
+	float3 toEye = normalize(g_EyePos - pos);
+	float3 lightDir = -g_LightDir;
+
+	// phong diffuse
+	toLight /= lightDist;
+	float diffuse = saturate(dot(toLight, data.normal));
+	spotLight = g_LightColor * diffuse;
+
+	// blinn specular
+	float3 halfWay = normalize(toEye + toLight);
+	float specular = pow(saturate(dot(data.normal, halfWay)), 250.f) * 0.25f;
+	spotLight += g_LightColor * specular;
+
+	// attenuation
+	float attn = 1.0 - saturate(lightDist * g_LightRangeRcp);
+	attn *= attn;
+
+	// cone attenuation
+	float cosAngle = dot(lightDir, toLight);
+	//float coneAttn = saturate((cosAngle - radians(cos(65.0f))) * (1 / g_SpotAngle));
+	float coneAttn = saturate(cosAngle * (1 / g_SpotAngle));
+	coneAttn *= coneAttn;
+
+	return spotLight * (data.albedo * attn * coneAttn).rgb;
+}
+
 Pixel_Output mainPS(Pixel_Input input)
 {
 	Pixel_Output output;
@@ -62,9 +119,15 @@ Pixel_Output mainPS(Pixel_Input input)
 	float depth = data.linearDepth;
 	float3 pos = CalcWorldPos(input.cpPos, depth);
 
-	float3 directionalLight = CalcDirectionalLight(pos, depth, data);
+	float3 lightColor = 0;
+	if (IsDirectionalLight())
+		lightColor = CalcDirectionalLight(pos, depth, data);
+	if (IsPointLight())
+		lightColor = CalcPointLight(pos, data);
+	if (IsSpotLight())
+		lightColor = CalcSpotLight(pos, data);
 
-	output.FrameOutput = float4(directionalLight.xyz, 1.0f);
+	output.FrameOutput = float4(lightColor.xyz, 1.0f);
 
 	return output;
 }
