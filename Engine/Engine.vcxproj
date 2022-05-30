@@ -187,6 +187,7 @@
     <ClInclude Include="Src\Renderer\CommandList.h" />
     <ClInclude Include="Src\Renderer\ConstantBuffers.h" />
     <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Src\Renderer\Graphics\dv_texture.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Graphics\IndexBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\CommandList.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\dv_texture.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />

@@ -13,6 +13,8 @@ namespace Dive
 		Texture2D,
 		Model,
 		Material,
+		Texture2dArray,		// 추후 위쪽으로 옮기기: 현재 파일로 저장된 값 때문에 임시로 지정
+		TextureCube,		// CUBE도 array가 있는데... 일단 제외
 		Count
 	};
 
