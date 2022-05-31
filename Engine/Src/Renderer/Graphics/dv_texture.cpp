@@ -3,112 +3,154 @@
 #include "Renderer/Renderer.h"
 #include "GraphicsDevice.h"
 #include "Base/Base.h"
-#include "Resource/Resource.h"		// 나중에 헤더로 옮기기
 
 namespace Dive
 {
-	static bool CreateTexture2D(
-		ID3D11Texture2D*& pTexture,
-		unsigned int width,
-		unsigned int height,
-		unsigned int channelCount,
-		unsigned int bitsPerChannel,
-		unsigned int flags,
-		DXGI_FORMAT format,
-		std::vector<TextureSliceData>& data,
-		unsigned int mipLevels = 1,
-		unsigned int arraySize = 1
-	)
+	DV_Texture::DV_Texture()
 	{
-		DV_ASSERT(width != 0);
-		DV_ASSERT(height != 0);
-		DV_ASSERT(mipLevels != 0);
-		DV_ASSERT(arraySize != 0);
+		// device만 획득
+	}
+	
+	DV_Texture::~DV_Texture()
+	{
+		// 모두 제거
+	}
 
-		const bool hasData = !data.empty() && !data[0].mips.empty() && !data[0].mips[0].bytes.empty();
-			
+	bool DV_Texture::createTexture()
+	{
+		DV_ASSERT(m_Width > 0);
+		DV_ASSERT(m_Height > 0);
+
+		const bool hasData = !m_Data.empty() && !m_Data[0].mips.empty() && !m_Data[0].mips[0].bytes.empty();
+
 		D3D11_TEXTURE2D_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-
-		desc.Width				= width;
-		desc.Height				= height;
-		desc.MipLevels			= mipLevels;
-		desc.ArraySize			= arraySize;
-		desc.Format				= format;
-		desc.SampleDesc.Count	= 1;
+		desc.Width = m_Width;
+		desc.Height = m_Height;
+		desc.MipLevels = m_MipLevels;
+		desc.ArraySize = m_ArraySize;
+		desc.Format = m_Format;
+		desc.SampleDesc.Count = 1;
 		desc.SampleDesc.Quality = 0;
-		desc.Usage				= D3D11_USAGE_DEFAULT;		// 일단 지정
-		desc.BindFlags			= flags;
-		desc.MiscFlags			= 0;
-		desc.CPUAccessFlags		= 0;
+		desc.Usage = D3D11_USAGE_DEFAULT;		// 일단 지정
+		desc.BindFlags = m_BindFlags;
+		desc.MiscFlags = m_MiscFlags;
+		desc.CPUAccessFlags = 0;
 
 		std::vector<D3D11_SUBRESOURCE_DATA> subresources;
 		if (hasData)
 		{
-			for (unsigned int arrayIndex = 0; arrayIndex < arraySize; arrayIndex++)
+			for (unsigned int arrayIndex = 0; arrayIndex < m_ArraySize; arrayIndex++)
 			{
-				for (unsigned int mipIndex = 0; mipIndex < mipLevels; mipIndex++)
+				for (unsigned int mipIndex = 0; mipIndex < m_MipLevels; mipIndex++)
 				{
 					auto& subresource = subresources.emplace_back(D3D11_SUBRESOURCE_DATA{});
-					subresource.pSysMem				= data[arrayIndex].mips[mipIndex].bytes.data();
-					subresource.SysMemPitch			= (width >> mipIndex) * channelCount * (bitsPerChannel / 8);
-					subresource.SysMemSlicePitch	= 0;
+					subresource.pSysMem = m_Data[arrayIndex].mips[mipIndex].bytes.data();
+					subresource.SysMemPitch = (m_Width >> mipIndex) * m_ChannelCount * (m_BitsPerChannel / 8);
+					subresource.SysMemSlicePitch = 0;
 				}
 			}
 		}
 
 		auto pDevice = Renderer::GetGraphicsDevice().GetDevice();
 		DV_ASSERT(pDevice != nullptr);
-		
-		if (FAILED(pDevice->CreateTexture2D(&desc, hasData ? subresources.data() : nullptr, &pTexture)))
+
+		if (FAILED(pDevice->CreateTexture2D(&desc, subresources.data(), &m_pTexture2D)))
 		{
 			DV_CORE_ERROR("Texture2D 생성에 실패하였습니다.");
 			return false;
 		}
 
+		// srv
+		if (desc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
+		{
+			if (!createShaderResourceView(0, -1, 0, -1))
+				return false;
+		}
+
+		// rtv
+		if (desc.BindFlags & D3D11_BIND_RENDER_TARGET)
+		{
+
+		}
+
+		// dsv
+		if (desc.BindFlags & D3D11_BIND_DEPTH_STENCIL)
+		{
+
+		}
+
 		return true;
 	}
 
-	static bool CreateShaderResourceView(
-		ID3D11Texture2D* pTexture, 
-		ID3D11ShaderResourceView*& pSrv, 
-		eResourceType type,
-		DXGI_FORMAT format,
-		unsigned int mipLevels	= 1,
-		unsigned int mostMip	= 0,
-		unsigned int arraySize	= 1
-	)
+	bool DV_Texture::createShaderResourceView(
+		int firstSlice,
+		unsigned int sliceCount,
+		unsigned int mipCount,
+		unsigned int firstMip
+		)
 	{
-		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
+		DV_ASSERT(m_pTexture2D != nullptr);
 
-		desc.Format = format;
-		if (type == eResourceType::Texture2D)
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+
+		switch (m_Format)
 		{
-			desc.ViewDimension					= D3D11_SRV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipLevels			= mipLevels;
-			desc.Texture2D.MostDetailedMip		= mipLevels == 1 ? 0 : mostMip;
+		case DXGI_FORMAT_R16_TYPELESS:
+			desc.Format = DXGI_FORMAT_R16_UNORM;
+			break;
+		case DXGI_FORMAT_R32_TYPELESS:
+			desc.Format = DXGI_FORMAT_R32_FLOAT;
+			break;
+		case DXGI_FORMAT_R24G8_TYPELESS:
+			desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+			break;
+		case DXGI_FORMAT_R32G8X24_TYPELESS:
+			desc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+			break;
+		default:
+			desc.Format = m_Format;
+			break;
 		}
-		else if (type == eResourceType::Texture2dArray)
+
+		if (m_ArraySize > 1)
 		{
-			desc.ViewDimension					= D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
-			desc.Texture2DArray.ArraySize		= arraySize;
-			desc.Texture2DArray.FirstArraySlice = 0;
-			desc.Texture2DArray.MipLevels		= mipLevels;
-			desc.Texture2DArray.MostDetailedMip = mipLevels == 1 ? 0 : mostMip;
+			if (m_MiscFlags & D3D11_RESOURCE_MISC_TEXTURECUBE)
+			{
+				if (m_ArraySize > 6)
+				{
+					desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBEARRAY;
+					desc.TextureCubeArray.First2DArrayFace = firstSlice;
+					desc.TextureCubeArray.MipLevels = mipCount;
+					desc.TextureCubeArray.MostDetailedMip = firstMip;
+					desc.TextureCubeArray.NumCubes = std::min(m_ArraySize, sliceCount) / 6;
+				}
+				else
+				{
+					desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+					desc.TextureCube.MipLevels = mipCount;
+					desc.TextureCube.MostDetailedMip = firstMip;
+				}
+			}
+			else
+			{
+				desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+				desc.Texture2DArray.ArraySize = sliceCount;
+				desc.Texture2DArray.FirstArraySlice = firstSlice;
+				desc.Texture2DArray.MipLevels = mipCount;
+				desc.Texture2DArray.MostDetailedMip = firstMip;
+			}
 		}
-		else if (type == eResourceType::TextureCube)
+		else
 		{
-			desc.ViewDimension					= D3D11_SRV_DIMENSION_TEXTURECUBE;
-			desc.TextureCube.MipLevels			= mipLevels;
-			desc.TextureCube.MostDetailedMip	= mipLevels == 1 ? 0 : mostMip;
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipLevels = mipCount;
+			desc.Texture2D.MostDetailedMip = firstMip;
 		}
-		// 사실 cube도 array가 있다.
 
 		auto pDevice = Renderer::GetGraphicsDevice().GetDevice();
 		DV_ASSERT(pDevice != nullptr);
 
-		if (FAILED(pDevice->CreateShaderResourceView(pTexture, &desc, &pSrv)))
+		if (FAILED(pDevice->CreateShaderResourceView(m_pTexture2D, &desc, &m_pShaderResourceView)))
 		{
 			DV_CORE_ERROR("ShaderResourceView 생성에 실패하였습니다.");
 			return false;
@@ -117,36 +159,48 @@ namespace Dive
 		return true;
 	}
 
-	static bool CreateRenderTargetView(
-		ID3D11Texture2D* pTexture,
-		ID3D11RenderTargetView* pRtv,
-		eResourceType type,
-		DXGI_FORMAT format,
-		unsigned int arraySize = 1
-	)
+	bool DV_Texture::createRenderTargetView(int firstSlice, unsigned int sliceCount, unsigned int mipCount, unsigned int firstMip)
 	{
-		D3D11_RENDER_TARGET_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
+		DV_ASSERT(m_pTexture2D != nullptr);
 
-		desc.Format = format;
-		if (type == eResourceType::Texture2D)
+		D3D11_RENDER_TARGET_VIEW_DESC desc;
+
+		switch (m_Format)
 		{
-			desc.ViewDimension						= D3D11_RTV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipSlice					= 0;
+		case DXGI_FORMAT_R16_TYPELESS:
+			desc.Format = DXGI_FORMAT_R16_UNORM;
+			break;
+		case DXGI_FORMAT_R32_TYPELESS:
+			desc.Format = DXGI_FORMAT_R32_FLOAT;
+			break;
+		case DXGI_FORMAT_R24G8_TYPELESS:
+			desc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+			break;
+		case DXGI_FORMAT_R32G8X24_TYPELESS:
+			desc.Format = DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+			break;
+		default:
+			desc.Format = m_Format;
+			break;
 		}
-		else if (type == eResourceType::Texture2dArray)
+
+		if (m_ArraySize > 1)
 		{
-			desc.ViewDimension						= D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-			desc.Texture2DArray.MipSlice			= 0;
-			desc.Texture2DArray.FirstArraySlice		= 0;			// 일단 스파르탄과 다르게 간다.
-			desc.Texture2DArray.ArraySize			= arraySize;
+			desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+			desc.Texture2DArray.ArraySize;
+			desc.Texture2DArray.FirstArraySlice;
+			desc.Texture2DArray.MipSlice;
 		}
-		// RTV는 TextureCube가 없다.
+		else
+		{
+			desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipSlice;
+		}
 
 		auto pDevice = Renderer::GetGraphicsDevice().GetDevice();
 		DV_ASSERT(pDevice != nullptr);
 
-		if (FAILED(pDevice->CreateRenderTargetView(pTexture, &desc, &pRtv)))
+		if (FAILED(pDevice->CreateRenderTargetView(m_pTexture2D, &desc, &m_pRenderTargetView)))
 		{
 			DV_CORE_ERROR("RenderTargetView 생성에 실패하였습니다.");
 			return false;
@@ -155,62 +209,53 @@ namespace Dive
 		return true;
 	}
 
-	static bool CreateDepthStencilView(
-		ID3D11Texture2D* pTexture,
-		ID3D11DepthStencilView* pDsv,
-		DXGI_FORMAT format,
-		eResourceType type,
-		unsigned int arraySize	= 1,
-		bool readOnly			= false
-	)
+	// 둘 다 사용할 지 전달 필요
+	bool DV_Texture::createDepthStencilView()
 	{
 		D3D11_DEPTH_STENCIL_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
 
-		desc.Format = format;
-		desc.Flags	= readOnly ? D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL : 0;	// 일단 스텐실도 무조건 포함
+		desc.Flags;
 
-		if (type == eResourceType::Texture2D)
+		switch (m_Format)
 		{
-			desc.ViewDimension					= D3D11_DSV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipSlice				= 0;
-
+		case DXGI_FORMAT_R16_TYPELESS:
+			desc.Format = DXGI_FORMAT_D16_UNORM;
+			break;
+		case DXGI_FORMAT_R32_TYPELESS:
+			desc.Format = DXGI_FORMAT_D32_FLOAT;
+			break;
+		case DXGI_FORMAT_R24G8_TYPELESS:
+			desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			break;
+		case DXGI_FORMAT_R32G8X24_TYPELESS:
+			desc.Format = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
+			break;
+		default:
+			desc.Format = m_Format;
+			break;
 		}
-		else if (type == eResourceType::Texture2dArray)
+
+		if (m_ArraySize > 1)
 		{
-			desc.ViewDimension					= D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
-			desc.Texture2DArray.MipSlice		= 0;
-			desc.Texture2DArray.FirstArraySlice = 0;
-			desc.Texture2DArray.ArraySize		= arraySize;	// 이것도 일단 스파르탄이랑 다르게 간다.
+			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+			desc.Texture2DArray.ArraySize;
+			desc.Texture2DArray.FirstArraySlice;
+			desc.Texture2DArray.MipSlice;
+		}
+		else
+		{
+			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipSlice;
 		}
 
 		auto pDevice = Renderer::GetGraphicsDevice().GetDevice();
 		DV_ASSERT(pDevice != nullptr);
 
-		if (FAILED(pDevice->CreateDepthStencilView(pTexture, &desc, &pDsv)))
+		if (FAILED(pDevice->CreateDepthStencilView(m_pTexture2D, &desc, &m_pDepthStencilView)))
 		{
 			DV_CORE_ERROR("DepthStencilView 생성에 실패하였습니다.");
 			return false;
 		}
-
-		return true;
-	}
-
-	bool DV_Texture::createTexture()
-	{
-		// 멤버 변수를 이용하여 resource, srv, rtv, dsv를 차례대로 만든다.
-
-		if (!CreateTexture2D(m_pTexture, m_Width, m_Height, m_ChannelCount, m_BitsPerChannel, m_Flags, m_Format,
-			m_Data, m_MipLevels, m_ArraySize))
-		{
-			return false;
-		}
-
-		// 포멧이 전부 다르다...
-		//DXGI_FORMAT formatSrv, formatRtv, formatDsv;
-
-		// 하나의 view에 배열을 생성하는 것인지, view를 배열로 관리해야 하는 것인지 아직 모른다.
-		// 일단 cube를 만드는 방법부터 알아보자.
 
 		return true;
 	}
