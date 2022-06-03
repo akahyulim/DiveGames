@@ -23,9 +23,10 @@ namespace Dive
 
 	bool Texture2D::create()
 	{
-		DV_ASSERT(m_pDevice);
-
 		Shutdown();
+
+		if (!m_pDevice || !m_Width || !m_Height)
+			return false;
 
 		D3D11_TEXTURE2D_DESC textureDesc;
 		ZeroMemory(&textureDesc, sizeof(textureDesc));
@@ -45,6 +46,7 @@ namespace Dive
 		if (FAILED(m_pDevice->CreateTexture2D(&textureDesc, nullptr, &m_pTexture2D)))
 		{
 			DV_CORE_ERROR("Texture2D 생성에 실패하였습니다.");
+			Shutdown();
 			return false;
 		}
 
@@ -61,6 +63,7 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &srvDesc, &m_pShaderResourceView)))
 			{
 				DV_CORE_ERROR("ShaderResourceView 생성에 실패하였습니다.");
+				Shutdown();
 				return false;
 			}
 		}
@@ -77,6 +80,7 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &rtvDesc, &m_pRenderTargetView)))
 			{
 				DV_CORE_ERROR("RenderTargetView 생성에 실패하였습니다");
+				Shutdown();
 				return false;
 			}
 		}
@@ -94,6 +98,7 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &dsvDesc, &m_pDepthStencilView)))
 			{
 				DV_CORE_ERROR("DepthStencilView 생성에 실패하였습니다.");
+				Shutdown();
 				return false;
 			}
 
@@ -101,9 +106,19 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &dsvDesc, &m_pDepthStencilViewReadOnly)))
 			{
 				DV_CORE_ERROR("DepthStencilViewReadOnly 생성에 실패하였습니다.");
+				Shutdown();
 				return false;
 			}
 		}
+
+		// 이건 어디에서...?
+		m_Viewport.TopLeftX = 0.0f;
+		m_Viewport.TopLeftY = 0.0f;
+		m_Viewport.Width = static_cast<FLOAT>(m_Width);
+		m_Viewport.Height = static_cast<FLOAT>(m_Height);
+		m_Viewport.MinDepth = 0.0f;
+		m_Viewport.MaxDepth = 1.0f;
+
 
 		return true;
 	}
@@ -276,10 +291,10 @@ namespace Dive
 	}
 
 	// 이걸 없애면 컴파일 오류가 발생한다..
-	bool Texture2D::operator==(const Texture& other)
-	{
-		return false;
-	}
+	//bool Texture2D::operator==(const Texture& other)
+	//{
+	//	return false;
+	//}
 
 	bool Texture2D::SetSize(int width, int height, DXGI_FORMAT format, unsigned int bindFlags)
 	{

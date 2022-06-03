@@ -17,7 +17,7 @@ namespace Dive
 
 		void Shutdown();
 
-		virtual bool operator==(const Texture& other) = 0;
+		//virtual bool operator==(const Texture& other) = 0;
 
 		ID3D11ShaderResourceView* GetShaderResourceView() { return m_pShaderResourceView; }
 		ID3D11RenderTargetView* GetRenderTargetView() { return m_pRenderTargetView; }

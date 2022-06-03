@@ -191,6 +191,7 @@
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Renderer\Graphics\IndexBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
+    <ClInclude Include="Src\Renderer\Graphics\TextureCube.h" />
     <ClInclude Include="Src\Renderer\Graphics\VertexBuffer.h" />
     <ClInclude Include="Src\Renderer\Material.h" />
     <ClInclude Include="Src\Renderer\Mesh.h" />
@@ -230,6 +231,7 @@
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\TextureCube.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Material.cpp" />
     <ClCompile Include="Src\Renderer\Mesh.cpp" />

@@ -24,7 +24,7 @@ namespace Dive
 		bool CreateRenderTargetView(DXGI_FORMAT format);
 		bool CreateDepthStencilView(DXGI_FORMAT format);
 
-		bool operator==(const Texture& other) override;
+		//bool operator==(const Texture& other) override;
 
 		bool SetSize(int width, int height, DXGI_FORMAT format, unsigned int bindFlags);
 

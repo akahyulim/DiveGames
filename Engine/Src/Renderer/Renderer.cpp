@@ -9,6 +9,7 @@
 #include "Scene/Component/Transform.h"
 #include "Scene/Component/SpriteRenderable.h"
 #include "Scene/Component/Light.h"
+#include "Graphics/TextureCube.h"	// test
 
 namespace Dive
 {
@@ -224,6 +225,8 @@ namespace Dive
 
 	// crateGBuffer이라고 바꾸는 편이 나을 것 같다.
 	// -> 스파르탄을 보니 GBuffer 이외에도 RenderTarget이 많다.
+	// 리소스의 생성과 업데이트를 분리하고 싶다.
+	// 현재 Texture2D의 경우 SetSize를 통해 재생성이 가능하기 때문이다.
 	void Renderer::createRenderTargets()
 	{
 		unsigned int width = m_TextureWidth;
@@ -231,24 +234,43 @@ namespace Dive
 		
 		// albedo: r8g8b8a8
 		DV_DELETE(m_pGBufferAlbedo);
-		m_pGBufferAlbedo = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+		//m_pGBufferAlbedo = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+		m_pGBufferAlbedo = new Texture2D;
+		m_pGBufferAlbedo->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
 
 		// normal: r8g8b8a8 or r11g11b10
 		DV_DELETE(m_pGBufferNormal);
-		m_pGBufferNormal = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+		//m_pGBufferNormal = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+		m_pGBufferNormal = new Texture2D;
+		m_pGBufferNormal->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
 
 		// material: r8g8b8a8
 		DV_DELETE(m_pGBufferMaterial);
-		m_pGBufferMaterial = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+		m_pGBufferMaterial = new Texture2D;
+		m_pGBufferMaterial->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
 
 		// Depth Stencil Buffer
 		DV_DELETE(m_pDepthStencilTex);
-		m_pDepthStencilTex = Texture2D::Create(width, height, DXGI_FORMAT_R24G8_TYPELESS, DXGI_FORMAT_D24_UNORM_S8_UINT,
-			DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
+		//m_pDepthStencilTex = Texture2D::Create(width, height, DXGI_FORMAT_R24G8_TYPELESS, DXGI_FORMAT_D24_UNORM_S8_UINT,
+		//	DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
+		m_pDepthStencilTex = new Texture2D;
+		m_pDepthStencilTex->SetSize(width, height, DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL);
 
 		// frame output
 		DV_DELETE(m_pFrameOutput);
-		m_pFrameOutput = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+		//m_pFrameOutput = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
+		m_pFrameOutput = new Texture2D;
+		m_pFrameOutput->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
+
+		// test
+		{
+			auto pTextureCube = new TextureCube;
+			pTextureCube->SetSize(10, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
+			delete pTextureCube;
+			pTextureCube = new TextureCube;
+			pTextureCube->SetSize(10, DXGI_FORMAT_R32_TYPELESS, D3D11_BIND_DEPTH_STENCIL);
+			delete pTextureCube;
+		}
 	}
 
 	void Renderer::removeRenderTargets()

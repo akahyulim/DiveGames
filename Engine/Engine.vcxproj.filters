@@ -124,6 +124,9 @@
     <ClInclude Include="Src\Renderer\Graphics\Texture2D.h">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\TextureCube.h">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -227,6 +230,9 @@
       <Filter>Src\Scene\Component</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\Texture2D.cpp">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\TextureCube.cpp">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClCompile>
   </ItemGroup>
