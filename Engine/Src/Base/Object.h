@@ -5,7 +5,9 @@ namespace Dive
 	class Object
 	{
 	public:
-		Object(const std::string& name = std::string(), unsigned long long id = 0);
+		Object();
+		Object(unsigned long long id);
+		//Object(const std::string& name = std::string(), unsigned long long id = 0);
 		virtual ~Object() = default;
 
 		unsigned long long GetInstanceID() const { return m_InstanceID; }

@@ -1,7 +1,7 @@
 #pragma once
 #include "Base/Base.h"
 #include "Graphics/GraphicsDevice.h"
-#include "Graphics/Texture.h"
+#include "Graphics/Texture2D.h"
 #include "Events/EventSystem.h"
 #include "Events/EngineEvents.h"
 

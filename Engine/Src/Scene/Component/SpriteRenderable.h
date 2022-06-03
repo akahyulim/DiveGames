@@ -1,6 +1,6 @@
 #pragma once
 #include "Renderable.h"
-#include "Renderer/Graphics/Texture.h"
+#include "Renderer/Graphics/Texture2D.h"
 
 namespace Dive
 {

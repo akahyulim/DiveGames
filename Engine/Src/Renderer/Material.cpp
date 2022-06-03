@@ -5,15 +5,25 @@
 
 namespace Dive
 {
-	Material::Material(const std::string& name, unsigned long long id)
-		: Resource(name, id)
+	Material::Material()
 	{
-		m_MainMaps[eMaterialMapType::Albedo]		= nullptr;
-		m_MainMaps[eMaterialMapType::Metalic]		= nullptr;
-		m_MainMaps[eMaterialMapType::Normal]		= nullptr;
-		m_MainMaps[eMaterialMapType::Occlusion]		= nullptr;
-		m_MainMaps[eMaterialMapType::Edmision]		= nullptr;
-		m_MainMaps[eMaterialMapType::DetailMask]	= nullptr;
+		m_MainMaps[eMaterialMapType::Albedo] = nullptr;
+		m_MainMaps[eMaterialMapType::Metalic] = nullptr;
+		m_MainMaps[eMaterialMapType::Normal] = nullptr;
+		m_MainMaps[eMaterialMapType::Occlusion] = nullptr;
+		m_MainMaps[eMaterialMapType::Edmision] = nullptr;
+		m_MainMaps[eMaterialMapType::DetailMask] = nullptr;
+	}
+
+	Material::Material(unsigned long long id)
+		: Resource(id)
+	{
+		m_MainMaps[eMaterialMapType::Albedo] = nullptr;
+		m_MainMaps[eMaterialMapType::Metalic] = nullptr;
+		m_MainMaps[eMaterialMapType::Normal] = nullptr;
+		m_MainMaps[eMaterialMapType::Occlusion] = nullptr;
+		m_MainMaps[eMaterialMapType::Edmision] = nullptr;
+		m_MainMaps[eMaterialMapType::DetailMask] = nullptr;
 	}
 
 	Material::~Material()

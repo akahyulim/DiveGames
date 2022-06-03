@@ -384,7 +384,10 @@ namespace Dive
 	{
 		// 유니티에 따르자면 Transform이 기본 추가인데...
 		// Deserialize 과정에서 ID를 저장하기 위해 직접 추가하도록 만들어 놓았다.
-		return m_GameObjects.emplace_back(new GameObject(this, name, id));
+		auto pAddedGameObject = m_GameObjects.emplace_back(new GameObject(this, id));
+		pAddedGameObject->SetName(name);
+
+		return pAddedGameObject;
 	}
 
 	// 자식까지 모두 제거

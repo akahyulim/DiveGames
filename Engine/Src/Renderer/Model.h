@@ -13,8 +13,10 @@ namespace Dive
 	{
 	public:
 		RESOURCE_CLASS_TYPE(Model)
-
-		Model(const std::string& name = "", unsigned long long id = 0);
+	public:
+		Model();
+		Model(unsigned long long id);
+		//Model(const std::string& name = "", unsigned long long id = 0);
 		~Model();
 
 		void Clear();

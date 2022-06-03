@@ -5,8 +5,18 @@
 
 namespace Dive
 {
-	GameObject::GameObject(Scene* pScene, const std::string& name, unsigned long long id)
-		: m_pScene(pScene), Object(name, id)
+	//GameObject::GameObject(Scene* pScene, const std::string& name, unsigned long long id)
+	//	: m_pScene(pScene), Object(name, id)
+	//{
+	//}
+
+	GameObject::GameObject(Scene* pScene)
+		: m_pScene(pScene)
+	{
+	}
+
+	GameObject::GameObject(Scene* pScene, unsigned long long id)
+		: m_pScene(pScene), Object(id)
 	{
 	}
 

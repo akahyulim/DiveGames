@@ -26,7 +26,8 @@ namespace Dive
 	class Component : public Object
 	{
 	public:
-		Component(GameObject* pGameObject, unsigned long long id = 0);
+		Component(GameObject* pGameObject);
+		Component(GameObject* pGameObject, unsigned long long id);
 		virtual ~Component() = default;
 
 		// 일단 아무도 사용하지 않는다.

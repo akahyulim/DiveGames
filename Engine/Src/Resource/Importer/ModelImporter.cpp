@@ -2,6 +2,7 @@
 #include "ModelImporter.h"
 #include "Renderer/Model.h"
 #include "Renderer/Material.h"
+#include "Renderer/Graphics/Texture2D.h"
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
 #include "Scene/Component/MeshRenderable.h"

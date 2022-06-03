@@ -16,8 +16,12 @@
 
 namespace Dive
 {
-    Model::Model(const std::string& name, unsigned long long id)
-        : Resource(name, id)
+    Model::Model()
+    {
+    }
+
+    Model::Model(unsigned long long id)
+        : Resource(id)
     {
     }
 

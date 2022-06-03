@@ -7,280 +7,70 @@
 
 namespace Dive
 {
-	Texture::Texture(const std::string& name, unsigned long long id)
-		: Resource(name, id)
+	Texture::Texture()
 	{
+		m_pDevice = Renderer::GetGraphicsDevice().GetDevice();
+		DV_ASSERT(m_pDevice);
 	}
 
-	Texture2D::Texture2D(const std::string& name, unsigned long long id)
-		: Texture(name, id)
+	Texture::Texture(unsigned long long id)
+		: Resource(id)
 	{
+		m_pDevice = Renderer::GetGraphicsDevice().GetDevice();
+		DV_ASSERT(m_pDevice);
 	}
 
-	Texture2D::~Texture2D()
+	//Texture::Texture(const std::string& name, unsigned long long id)
+	//	: Resource(name, id)
+	//{
+	//	m_pDevice = Renderer::GetGraphicsDevice().GetDevice();
+	//	DV_ASSERT(m_pDevice);
+	//}
+
+	void Texture::Shutdown()
 	{
-		Shutdown();
-	}
-
-	bool Texture2D::SaveFromFile(const std::string& filepath)
-	{
-		return true;
-	}
-
-	// 직접 하지 말고, DirectX Texture 부분을 Importer로 뽑아보자.
-	bool Texture2D::LoadFromFile(const std::string& filepath)
-	{
-		DirectX::ScratchImage img;
-
-		std::wstring tempPath(filepath.begin(), filepath.end());
-		WCHAR ext[_MAX_EXT];
-		_wsplitpath_s(tempPath.c_str(), nullptr, 0, nullptr, 0, nullptr, 0, ext, _MAX_EXT);
-
-		HRESULT hResult = 0;
-		if (_wcsicmp(ext, L".dds") == 0)
-		{
-			hResult = DirectX::LoadFromDDSFile(tempPath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
-		}
-		else if (_wcsicmp(ext, L".tga") == 0)
-		{
-			hResult = DirectX::LoadFromTGAFile(tempPath.c_str(), nullptr, img);
-		}
-		else
-		{
-			hResult = DirectX::LoadFromWICFile(tempPath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
-		}
-
-		if (FAILED(hResult))
-		{
-			DV_CORE_WARN("{:s} 로드에 실패하였습니다.", filepath);
-			return false;
-		}
-
-		auto pDevice = Renderer::GetGraphicsDevice().GetDevice();
-		DV_ASSERT(pDevice);
-
-		if (FAILED(DirectX::CreateShaderResourceView(pDevice, img.GetImages(), img.GetImageCount(), img.GetMetadata(), &m_pShaderResourceView)))
-		{
-			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
-			return false;
-		}
-
-		const auto& metaData = img.GetMetadata();
-		m_Format = metaData.format;
-		m_Width = static_cast<unsigned int>(metaData.width);
-		m_Height = static_cast<unsigned int>(metaData.height);
-		
-		//SetFilepath(filepath);
-		//m_Name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
-		{
-			m_ExportedFilepath = filepath;
-			m_EngineFilepath = filepath;
-			m_Name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
-		}
-
-		return true;
-	}
-
-	bool Texture2D::CreateTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned bindFlags)
-	{
-		m_Width		= width;
-		m_Height	= height;
-		m_Format	= format;
-
-		D3D11_TEXTURE2D_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Width				= m_Width;
-		desc.Height				= m_Height;
-		desc.MipLevels			= 1;
-		desc.ArraySize			= 1;
-		desc.Format				= m_Format;
-		desc.SampleDesc.Count	= 1;
-		desc.SampleDesc.Quality = 0;
-		desc.Usage				= D3D11_USAGE_DEFAULT;
-		desc.BindFlags			= bindFlags;
-		desc.CPUAccessFlags		= 0;
-		desc.MiscFlags			= 0;
-
-		auto& graphicsDevice = Renderer::GetGraphicsDevice();
-		if (!graphicsDevice.CreateTexture2D(&desc, nullptr, &m_pTexture2D))
-		{
-			DV_CORE_WARN("Resource Buffer 생성에 실패하였습니다.");
-			Shutdown();
-			return false;
-		}
-
-		return true;
-	}
-
-	bool Texture2D::CreateShaderResourceView(DXGI_FORMAT format)
-	{
-		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Format						= format;
-		desc.ViewDimension				= D3D11_SRV_DIMENSION_TEXTURE2D;
-		desc.Texture2D.MostDetailedMip	= 0;
-		desc.Texture2D.MipLevels		= -1;
-
-		DV_ASSERT(m_pTexture2D);
-		auto& graphicsDevice = Renderer::GetGraphicsDevice();
-		if (!graphicsDevice.CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &desc, &m_pShaderResourceView))
-		{
-			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
-			Shutdown();
-			return false;
-		}
-
-		return true;
-	}
-
-	// Viewport도 함께 설정
-	bool Texture2D::CreateRenderTargetView(DXGI_FORMAT format)
-	{
-		D3D11_RENDER_TARGET_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Format				= format;
-		desc.ViewDimension		= D3D11_RTV_DIMENSION_TEXTURE2D;
-		desc.Texture2D.MipSlice = 0;
-
-		DV_ASSERT(m_pTexture2D);
-		auto& graphicsDevice = Renderer::GetGraphicsDevice();
-		if (!graphicsDevice.CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &desc, &m_pRenderTargetView))
-		{
-			DV_CORE_WARN("RenderTargetView 생성에 실패하였습니다.");
-			Shutdown();
-			return false;
-		}
-
-		m_Viewport.TopLeftX = 0.0f;
-		m_Viewport.TopLeftY = 0.0f;
-		m_Viewport.Width	= static_cast<FLOAT>(m_Width);
-		m_Viewport.Height	= static_cast<FLOAT>(m_Height);
-		m_Viewport.MinDepth = 0.0f;
-		m_Viewport.MaxDepth = 1.0f;
-
-		return true;
-	}
-
-	bool Texture2D::CreateDepthStencilView(DXGI_FORMAT format)
-	{
-		D3D11_DEPTH_STENCIL_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Format				= format;
-		desc.ViewDimension		= D3D11_DSV_DIMENSION_TEXTURE2D;
-		desc.Texture2D.MipSlice = 0;
-
-		DV_ASSERT(m_pTexture2D);
-		auto& graphicsDevice = Renderer::GetGraphicsDevice();
-		if (!graphicsDevice.CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &desc, &m_pDepthStencilView))
-		{
-			DV_CORE_WARN("DepthStencilView 생성에 실패하였습니다.");
-			Shutdown();
-			return false;
-		}
-
-		desc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
-		if (!graphicsDevice.CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &desc, &m_pDepthStencilViewReadOnly))
-		{
-			DV_CORE_WARN("DepthStencilViewReadOnly 생성에 실패하였습니다.");
-			Shutdown();
-			return false;
-		}
-
-		return true;
-	}
-
-	void Texture2D::Shutdown()
-	{
-		DV_RELEASE(m_pDepthStencilView);
-		DV_RELEASE(m_pRenderTargetView);
-		DV_RELEASE(m_pShaderResourceView);
 		DV_RELEASE(m_pTexture2D);
+		DV_RELEASE(m_pShaderResourceView);
+		DV_RELEASE(m_pRenderTargetView);
+		DV_RELEASE(m_pDepthStencilView);
+		DV_RELEASE(m_pDepthStencilViewReadOnly);
+	}
+
+	unsigned int Texture::GetSRGBFormat(unsigned int format)
+	{
+		if (format == DXGI_FORMAT_R8G8B8A8_UNORM)
+			return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		else if (format == DXGI_FORMAT_BC1_UNORM)
+			return DXGI_FORMAT_BC1_UNORM_SRGB;
+		else if (format == DXGI_FORMAT_BC2_UNORM)
+			return DXGI_FORMAT_BC2_UNORM_SRGB;
+		else if (format == DXGI_FORMAT_BC3_UNORM)
+			return DXGI_FORMAT_BC3_UNORM_SRGB;
+		else
+			return format;
 	}
 	
-	// 이걸 없애면 컴파일 오류가 발생한다..
-	bool Texture2D::operator==(const Texture& other)
+	unsigned int Texture::GetSRVFormat(unsigned int format)
 	{
-		return false;
+		if (format == DXGI_FORMAT_R24G8_TYPELESS)
+			return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		else if (format == DXGI_FORMAT_R16_TYPELESS)
+			return DXGI_FORMAT_R16_UNORM;
+		else if (format == DXGI_FORMAT_R32_TYPELESS)
+			return DXGI_FORMAT_R32_FLOAT;
+		else
+			return format;
 	}
-
-	Texture2D* Texture2D::Create(unsigned int width, unsigned int height, DXGI_FORMAT format, bool srv, const std::string& name)
+	
+	unsigned int Texture::GetDSVFormat(unsigned int format)
 	{
-		auto pTex = new Texture2D(name);
-		DV_ASSERT(pTex);
-
-		unsigned int bindFlags = D3D11_BIND_RENDER_TARGET;
-		if (srv)
-			bindFlags |= D3D11_BIND_SHADER_RESOURCE;
-
-		if (!pTex->CreateTexture2D(width, height, format, bindFlags))
-		{
-			DV_DELETE(pTex);
-			return nullptr;
-		}
-
-		if (!pTex->CreateRenderTargetView(format))
-		{
-			DV_DELETE(pTex);
-			return nullptr;
-		}
-
-		if (srv)
-		{
-			if (!pTex->CreateShaderResourceView(format))
-			{
-				DV_DELETE(pTex);
-				return nullptr;
-			}
-		}
-
-		pTex->SetName(name);
-
-		return pTex;
-	}
-
-	Texture2D* Texture2D::Create(unsigned int width, unsigned int height, DXGI_FORMAT texture2D, DXGI_FORMAT dsv, DXGI_FORMAT srv, const std::string& name)
-	{
-		auto pTex = new Texture2D();
-		DV_ASSERT(pTex);
-
-		unsigned int bindFlags = D3D11_BIND_DEPTH_STENCIL;
-		if (srv != DXGI_FORMAT_UNKNOWN)
-			bindFlags |= D3D11_BIND_SHADER_RESOURCE;
-
-		if (!pTex->CreateTexture2D(width, height, texture2D, bindFlags))
-		{
-			DV_DELETE(pTex);
-			return nullptr;
-		}
-
-		if (!pTex->CreateDepthStencilView(dsv))
-		{
-			DV_DELETE(pTex);
-			return nullptr;
-		}
-
-		if (srv != DXGI_FORMAT_UNKNOWN)
-		{
-			if (!pTex->CreateShaderResourceView(srv))
-			{
-				DV_DELETE(pTex);
-				return nullptr;
-			}
-		}
-
-		pTex->SetName(name);
-
-		return pTex;
-	}
-
-	Texture2D* Texture2D::Create(const std::string& path, const std::string& name)
-	{
-		auto pTexture = ResourceManager::GetInstance().Load<Texture2D>(path);
-		if (!name.empty())
-		{
-			pTexture->SetName(name);
-		}
-
-		return pTexture;
+		if (format == DXGI_FORMAT_R24G8_TYPELESS)
+			return DXGI_FORMAT_D24_UNORM_S8_UINT;
+		else if (format == DXGI_FORMAT_R16_TYPELESS)
+			return DXGI_FORMAT_D16_UNORM;
+		else if (DXGI_FORMAT_R32_TYPELESS)
+			return DXGI_FORMAT_D32_FLOAT;
+		else
+			return format;
 	}
 }

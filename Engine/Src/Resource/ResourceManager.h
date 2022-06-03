@@ -2,7 +2,7 @@
 #include "Base/Base.h"
 #include "Resource.h"
 #include "Helper/FileSystem.h"
-#include "Renderer/Graphics/Texture.h"
+#include "Renderer/Graphics/Texture2D.h"
 #include "Renderer/Material.h"
 
 namespace Dive
@@ -51,7 +51,8 @@ namespace Dive
 			if (HasResource<T>(name))
 				return GetResource<T>(name);
 
-			auto pCreatedResource = new T(name);
+			auto pCreatedResource = new T();
+			pCreatedResource->SetName(name);
 			if (!pCreatedResource->LoadFromFile(filepath))
 			{
 				DV_CORE_ERROR("파일 로드에 실패하였습니다 - {:s}", filepath);

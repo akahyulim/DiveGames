@@ -13,8 +13,7 @@ namespace Dive
 		Texture2D,
 		Model,
 		Material,
-		Texture2dArray,		// 추후 위쪽으로 옮기기: 현재 파일로 저장된 값 때문에 임시로 지정
-		TextureCube,		// CUBE도 array가 있는데... 일단 제외
+		TextureCube,
 		Count
 	};
 
@@ -25,7 +24,9 @@ namespace Dive
 	class Resource : public Object
 	{
 	public:
-		Resource(const std::string& name = "", unsigned long long id = 0);
+		Resource();
+		Resource(unsigned long long id);
+		//Resource(const std::string& name = "", unsigned long long id = 0);
 		virtual ~Resource() = default;
 
 		virtual bool SaveToFile(const std::string& filepath) { return true; }

@@ -25,7 +25,9 @@ namespace Dive
 	class GameObject : public Object
 	{
 	public:
-		GameObject(Scene* pScene, const std::string& name = std::string(), unsigned long long id = 0);
+		GameObject(Scene* pScene);
+		GameObject(Scene* pScene, unsigned long long id);
+		//GameObject(Scene* pScene, const std::string& name = std::string(), unsigned long long id = 0);
 		~GameObject();
 
 		template<class T>
