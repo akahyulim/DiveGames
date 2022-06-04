@@ -200,6 +200,7 @@
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\RenderPath.h" />
     <ClInclude Include="Src\Resource\FileStream.h" />
+    <ClInclude Include="Src\Resource\Importer\ImageImporter.h" />
     <ClInclude Include="Src\Resource\Importer\ModelImporter.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceManager.h" />
@@ -240,6 +241,7 @@
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\RenderPath.cpp" />
     <ClCompile Include="Src\Resource\FileStream.cpp" />
+    <ClCompile Include="Src\Resource\Importer\ImageImporter.cpp" />
     <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceManager.cpp" />

@@ -127,6 +127,9 @@
     <ClInclude Include="Src\Renderer\Graphics\TextureCube.h">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Resource\Importer\ImageImporter.h">
+      <Filter>Src\Resource\Importer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -234,6 +237,9 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\TextureCube.cpp">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Resource\Importer\ImageImporter.cpp">
+      <Filter>Src\Resource\Importer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

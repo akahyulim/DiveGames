@@ -19,6 +19,7 @@ namespace Dive
 
 		//virtual bool operator==(const Texture& other) = 0;
 
+		ID3D11Texture2D* GetTexture2D() { return m_pTexture2D; }
 		ID3D11ShaderResourceView* GetShaderResourceView() { return m_pShaderResourceView; }
 		ID3D11RenderTargetView* GetRenderTargetView() { return m_pRenderTargetView; }
 		ID3D11DepthStencilView* GetDepthStencilView() { return m_pDepthStencilView; }

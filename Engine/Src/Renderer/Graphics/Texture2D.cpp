@@ -157,10 +157,15 @@ namespace Dive
 			return false;
 		}
 
-		auto pDevice = Renderer::GetGraphicsDevice().GetDevice();
-		DV_ASSERT(pDevice);
+		// texture2d가 필요할 수 있다.
+		if (FAILED(DirectX::CreateTexture(m_pDevice, img.GetImages(), img.GetImageCount(), img.GetMetadata(), (ID3D11Resource**)&m_pTexture2D)))
+		{
+			DV_CORE_ERROR("Texture2D 생성에 실패하였습니다.");
+			return false;
+		}
 
-		if (FAILED(DirectX::CreateShaderResourceView(pDevice, img.GetImages(), img.GetImageCount(), img.GetMetadata(), &m_pShaderResourceView)))
+		// texture2d를 만들었으므로 기본 함수를 호출하는 편이 낫다.
+		if (FAILED(DirectX::CreateShaderResourceView(m_pDevice, img.GetImages(), img.GetImageCount(), img.GetMetadata(), &m_pShaderResourceView)))
 		{
 			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
 			return false;

@@ -20,6 +20,7 @@
 #include "Events/EngineEvents.h"
 
 //= Resource ======================
+#include "Resource/Importer/ImageImporter.h"
 #include "Resource/Importer/ModelImporter.h"
 #include "Resource/FileStream.h"
 #include "Resource/Resource.h"

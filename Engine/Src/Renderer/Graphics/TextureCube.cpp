@@ -138,4 +138,14 @@ namespace Dive
 
 		return create();
 	}
+
+	bool TextureCube::LoadTexture(const std::string& front, const std::string& back, const std::string& up, const std::string& down, const std::string& left, const std::string& right, unsigned int bindFlags, bool generateMips)
+	{
+		// 각 텍스쳐별 data가 필요하다.
+		// 즉, 서브리소스에 데이터를 전달해 생성해야 한다.
+		// 밉맵이 필요한 경우엔 좀 더 복잡해질 수 있다.
+		// view는 srv를 기본으로 할 것이다.
+		
+		return false;
+	}
 }
