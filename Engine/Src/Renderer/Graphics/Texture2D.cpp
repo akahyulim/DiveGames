@@ -60,6 +60,8 @@ namespace Dive
 			srvDesc.Texture2D.MipLevels = 1;
 			srvDesc.Texture2D.MostDetailedMip = 0;
 
+			// 큐브맵을 생성하는 경우에도 srv는 하나만 만든다.
+			// 이는 다수의 예제에서 확인했다.
 			if (FAILED(m_pDevice->CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &srvDesc, &m_pShaderResourceView)))
 			{
 				DV_CORE_ERROR("ShaderResourceView 생성에 실패하였습니다.");
@@ -77,6 +79,8 @@ namespace Dive
 			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 			rtvDesc.Texture2D.MipSlice = 0;
 
+			// urho에 의하면 rtv는 각 면별로 존재하는 것 같다...
+			// 스파르탄 역시 rtv와 dsv는 배열로 생성한다.
 			if (FAILED(m_pDevice->CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &rtvDesc, &m_pRenderTargetView)))
 			{
 				DV_CORE_ERROR("RenderTargetView 생성에 실패하였습니다");
@@ -123,12 +127,14 @@ namespace Dive
 		return true;
 	}
 
+	/*
 	bool Texture2D::SaveFromFile(const std::string& filepath)
 	{
 		return true;
 	}
-
+	*/
 	// 직접 하지 말고, DirectX Texture 부분을 Importer로 뽑아보자.
+	/*
 	bool Texture2D::LoadFromFile(const std::string& filepath)
 	{
 		DirectX::ScratchImage img;
@@ -186,7 +192,7 @@ namespace Dive
 
 		return true;
 	}
-
+	*/
 	bool Texture2D::CreateTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned bindFlags)
 	{
 		m_Width = width;

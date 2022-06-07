@@ -16,8 +16,8 @@ namespace Dive
 
 		bool create() override;
 
-		bool SaveFromFile(const std::string& filepath);
-		bool LoadFromFile(const std::string& filepath);
+		//bool SaveFromFile(const std::string& filepath);
+		//bool LoadFromFile(const std::string& filepath);
 
 		bool CreateTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned bindFlags);
 		bool CreateShaderResourceView(DXGI_FORMAT format);

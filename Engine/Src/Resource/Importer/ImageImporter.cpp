@@ -15,15 +15,14 @@ namespace Dive
 	ImageImporter::~ImageImporter()
 	{
 	}
-	
-	// 1. Cube를 만들때처럼 texture array를 생성할 수 있을까?
-	// 2. 스파르탄처럼 img에서 필요한 데이터만 뽑아 낼 수 있을까?
+
+	// 스파르탄처럼 sliceIndex를 매개변수로 추가하는 편이 나을 것 같다.
 	bool ImageImporter::Load(const std::string& filepath, Texture* pTexture)
 	{
-		if (!m_pDevice || !pTexture)
+		if (!pTexture)
 			return false;
 
-		DirectX::ScratchImage img;
+		DirectX::ScratchImage baseImage;
 
 		std::wstring tempPath(filepath.begin(), filepath.end());
 		WCHAR ext[_MAX_EXT];
@@ -32,15 +31,15 @@ namespace Dive
 		HRESULT hResult = 0;
 		if (_wcsicmp(ext, L".dds") == 0)
 		{
-			hResult = DirectX::LoadFromDDSFile(tempPath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
+			hResult = DirectX::LoadFromDDSFile(tempPath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, baseImage);
 		}
 		else if (_wcsicmp(ext, L".tga") == 0)
 		{
-			hResult = DirectX::LoadFromTGAFile(tempPath.c_str(), nullptr, img);
+			hResult = DirectX::LoadFromTGAFile(tempPath.c_str(), nullptr, baseImage);
 		}
 		else
 		{
-			hResult = DirectX::LoadFromWICFile(tempPath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
+			hResult = DirectX::LoadFromWICFile(tempPath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, baseImage);
 		}
 
 		if (FAILED(hResult))
@@ -49,29 +48,53 @@ namespace Dive
 			return false;
 		}
 
-		if (FAILED(DirectX::CreateTexture(
-			m_pDevice,
-			img.GetImages(),
-			img.GetImageCount(),
-			img.GetMetadata(),
-			(ID3D11Resource**)pTexture->GetTexture2D()
-		)))
-		{
-			DV_CORE_ERROR("ID3D11Textur2D 생성에 실패하였습니다.");
-			return false;
-		}
+		const auto pImages = baseImage.GetImages();
+		const auto& texMetadata = baseImage.GetMetadata();
 
-		// 기본 데이터까진 Set하는 편이 나아 보인다.
+		auto width = texMetadata.width;
+		auto height = texMetadata.height;
+		auto arraySize = texMetadata.arraySize;
+		auto mipLevels = texMetadata.mipLevels;
+		auto format = texMetadata.format;
+		// cubemap일 경우 배열별로 받아야 한다...?
+		auto rowPitch = pImages->rowPitch;
+		auto slicePitch = pImages->slicePitch;
 
-		// 문제는 srv, rtv 등도 이 곳에서 생성할 것인가 이다.
+		// data를 저장을 어떻게 해야할 지 생각해봐야 한다.
+		// array를 만들거면 6개 이상일 수 있다.
+		// 그리고 mipmap도 생각해야 한다. => 밉맵을 이 곳에서 생성한다면 좀 간단해질듯?
+		auto pPixels = pImages->pixels;	// 복사해야 한다. 아니면 지워질듯...
 
-		// 스파르탄의 경우
-		// 1. bindflags만 추가한 texture 생성
-		// 2. 생성한 texture의 LoadFromFile호출
-		// 3. LoadFromFile 내부에서 Importer의 Load에 경로와 자신의 포인터를 전달하여 로드한 데이터 저장
-		// 4. 다시 Texture::LoadFromFile로 돌아와 CreateResource()를 호출하여 Resource와 View를 생성
+		// 이걸로 밉맵을 생성한다.
+		// 추가 텍스쳐를 만들어야 해서 mipChain으로 받는 듯 하다.
+		DirectX::ScratchImage mipChain;
+		DirectX::GenerateMipMaps(baseImage.GetImages(), baseImage.GetImageCount(), baseImage.GetMetadata(), DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
 
-		img.Release();
+		// 0번째가 원본과 동일하고, 1x1까지 생성하는 듯 하다.
+		auto count = mipChain.GetImageCount();
+
+		baseImage.Release();
+
+		// texture에 대입
+		pTexture->SetWidth((const uint32_t)width);
+		pTexture->SetHeight((const uint32_t)height);
+		pTexture->SetArraySize((const uint32_t)arraySize);
+		pTexture->SetMipLevels((const uint32_t)mipLevels);
+		pTexture->SetFormat((const DXGI_FORMAT)format);
+		pTexture->SetRowPitch((const uint32_t)rowPitch);
+		pTexture->SetSlicePitch((const uint32_t)slicePitch);
+		// channel count?
+		// sub resource = pixels?
+		pPixels;
+
+		// 내부에서 만드는 것은 에바다.
+		// flags와 mipmap 생성 여부 등을 추가로 설정할 수 있어야 한다.
+		// 스파르탄은 생성자에서 이 값들을 매개변수로 전달한 후 임포터에서 Load한다.
+		// 정확하게 정리하자면
+		// 1. 텍스쳐를 생성(flags, generageMips)
+		// 2. 생성한 텍스쳐의 LoadFromFile에 파일 경로를 전달(slice index 필요)
+		// 3. 내부에서 임포터로 Load(slice index에 맞게 data도 저장)
+		// 4. 밉맵 생성 여부 처리 후 Create(rtv, dsv의 경우 array 생성이 필요할 수 있음)
 
 		return true;
 	}

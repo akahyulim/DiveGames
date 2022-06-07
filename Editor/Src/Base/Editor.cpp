@@ -85,6 +85,20 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	ShowWindow(m_hWnd, SW_SHOW);
 	SetForegroundWindow(m_hWnd);
 	SetFocus(m_hWnd);
+
+	// test
+	Dive::Texture tex;
+	tex.LoadFromFile("Assets/Textures/DokeV.jpeg");
+	std::vector<std::string> paths;
+	paths.emplace_back("Assets/Enviroment/X-.tga");
+	paths.emplace_back("Assets/Enviroment/X+.tga");
+	paths.emplace_back("Assets/Enviroment/Y-.tga");
+	paths.emplace_back("Assets/Enviroment/Y+.tga");
+	paths.emplace_back("Assets/Enviroment/Z-.tga");
+	paths.emplace_back("Assets/Enviroment/Z+.tga");
+
+//	Dive::ImageImporter ipt;
+//	ipt.LoadArray(paths, &tex);
 }
 
 Editor::~Editor()

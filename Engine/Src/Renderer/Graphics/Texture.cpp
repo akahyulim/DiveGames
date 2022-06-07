@@ -4,6 +4,7 @@
 #include "Dive.h"
 #include "Helper/FileSystem.h"
 #include "Resource/ResourceManager.h"
+#include "Resource/Importer/ImageImporter.h"
 
 namespace Dive
 {
@@ -26,6 +27,25 @@ namespace Dive
 	//	m_pDevice = Renderer::GetGraphicsDevice().GetDevice();
 	//	DV_ASSERT(m_pDevice);
 	//}
+
+	// 단일 텍스처의 경우 그냥 사용해도 되지만
+	// cube나 array일 경우 다수의 경로를 전달해야 한다.
+	// 스파르탄의 경우 이때문에 좀 복잡해졌다.
+	// 차라리 각각 개별 함수를 가지는 편이 나을 것 같다.
+	bool Texture::LoadFromFile(const std::string& filepath)
+	{
+		ImageImporter ipt;
+		if (!ipt.Load(filepath, this))
+			return false;
+
+		// mipmap
+
+		// create
+		if (!create())
+			return false;
+
+		return true;
+	}
 
 	void Texture::Shutdown()
 	{
