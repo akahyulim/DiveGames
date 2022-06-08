@@ -32,15 +32,14 @@ namespace Dive
 	// cube나 array일 경우 다수의 경로를 전달해야 한다.
 	// 스파르탄의 경우 이때문에 좀 복잡해졌다.
 	// 차라리 각각 개별 함수를 가지는 편이 나을 것 같다.
+	// => 하지만 ResourceManager에서 Load가 불가능해진다.
+	// 물론 타입별로 처리하면 될 것 같긴 하다.
 	bool Texture::LoadFromFile(const std::string& filepath)
 	{
 		ImageImporter ipt;
-		if (!ipt.Load(filepath, this))
+		if (!ipt.Load(filepath, this, true))	// 밉맵 생성 임시
 			return false;
 
-		// mipmap
-
-		// create
 		if (!create())
 			return false;
 

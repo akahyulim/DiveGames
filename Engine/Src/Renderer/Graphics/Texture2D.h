@@ -11,6 +11,7 @@ namespace Dive
 	public:
 		Texture2D();
 		Texture2D(unsigned long long id);
+		Texture2D(unsigned int bindFlags);
 		//Texture2D(const std::string& name = "", unsigned long long id = 0);
 		~Texture2D();
 

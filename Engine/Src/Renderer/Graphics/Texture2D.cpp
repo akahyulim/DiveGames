@@ -4,6 +4,7 @@
 #include "GraphicsDevice.h"
 #include "Base/Base.h"
 #include "Resource/ResourceManager.h"
+#include "Resource/Importer/ImageImporter.h"
 
 namespace Dive
 {
@@ -14,6 +15,11 @@ namespace Dive
 	Texture2D::Texture2D(unsigned long long id)
 		: Texture(id)
 	{
+	}
+
+	Texture2D::Texture2D(unsigned int bindFlags)
+	{
+		m_BindFlags = bindFlags;
 	}
 
 	Texture2D::~Texture2D()
@@ -43,7 +49,23 @@ namespace Dive
 		textureDesc.MiscFlags = 0;
 		textureDesc.CPUAccessFlags = 0;
 
-		if (FAILED(m_pDevice->CreateTexture2D(&textureDesc, nullptr, &m_pTexture2D)))
+		std::vector<D3D11_SUBRESOURCE_DATA> subResources;
+		if(!m_SubResources.empty() && !m_SubResources[0].mips.empty() && !m_SubResources[0].mips[0].pixels.empty())
+		{
+			for (uint32_t arrayIndex = 0; arrayIndex < m_ArraySize; arrayIndex++)
+			{
+				for (uint32_t mipIndex = 0; mipIndex < m_MipLevels; mipIndex++)
+				{
+					D3D11_SUBRESOURCE_DATA& data = subResources.emplace_back(D3D11_SUBRESOURCE_DATA{});
+
+					data.pSysMem = m_SubResources[arrayIndex].mips[mipIndex].pixels.data();
+					data.SysMemPitch = m_SubResources[arrayIndex].mips[mipIndex].rowPitch;
+					data.SysMemSlicePitch = 0;
+				}
+			}
+		}
+
+		if (FAILED(m_pDevice->CreateTexture2D(&textureDesc, subResources.data(), &m_pTexture2D)))
 		{
 			DV_CORE_ERROR("Texture2D 생성에 실패하였습니다.");
 			Shutdown();
@@ -395,7 +417,11 @@ namespace Dive
 
 	Texture2D* Texture2D::Create(const std::string& path, const std::string& name)
 	{
-		auto pTexture = ResourceManager::GetInstance().Load<Texture2D>(path);
+		auto pTexture = new Texture2D((unsigned int)D3D11_BIND_SHADER_RESOURCE);
+		ImageImporter ipt;
+		ipt.Load(path, pTexture, true);
+
+		//auto pTexture = ResourceManager::GetInstance().Load<Texture2D>(path);
 		if (!name.empty())
 		{
 			pTexture->SetName(name);

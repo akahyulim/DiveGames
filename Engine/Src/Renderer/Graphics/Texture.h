@@ -63,6 +63,8 @@ namespace Dive
 		// slice pitch
 
 		// data
+
+		std::vector<TextureResource>& GetSubResources() { return m_SubResources; }
 	
 		unsigned int GetSRGBFormat(unsigned int format);
 		unsigned int GetSRVFormat(unsigned int format);
@@ -81,11 +83,7 @@ namespace Dive
 		uint32_t m_ArraySize = 0;
 		uint32_t m_MipLevels = 0;
 
-		// 이것들은 subresource의 mip마다 다르다.
-		// 따라서 array, mip마다 개별로 존재해야 한다.
-		//uint32_t m_RowPitch = 0;
-		//uint32_t m_SlicePitch = 0;
-		std::vector<TextureResource> m_Resources;
+		std::vector<TextureResource> m_SubResources;
 
 		ID3D11Texture2D* m_pTexture2D = nullptr;
 		ID3D11ShaderResourceView* m_pShaderResourceView = nullptr;

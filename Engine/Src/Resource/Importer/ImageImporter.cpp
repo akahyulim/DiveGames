@@ -53,45 +53,49 @@ namespace Dive
 		pTexture->SetArraySize((const uint32_t)texMetadata.arraySize);
 		pTexture->SetFormat((const DXGI_FORMAT)texMetadata.format);
 		
-		if (generateMips)
-		{
-			DirectX::ScratchImage mipChain;
-			DirectX::GenerateMipMaps(baseImage.GetImages(), baseImage.GetImageCount(), baseImage.GetMetadata(), DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
+		auto subResources = pTexture->GetSubResources();
 
-			const auto pImages = mipChain.GetImages();
-			const auto imageCount = mipChain.GetImageCount();
-			for (size_t i = 0; i < imageCount; i++)
+		for (uint32_t arrayIndex = 0; arrayIndex < pTexture->GetArraySize(); arrayIndex++)
+		{
+			subResources.emplace_back(Dive::TextureResource{});
+
+			if (generateMips)
 			{
-				auto rowPitch = pImages[i].rowPitch;
-				auto slicePitch = pImages[i].slicePitch;
-				auto data = pImages[i].pixels;
+				DirectX::ScratchImage mipChain;
+				DirectX::GenerateMipMaps(baseImage.GetImages(), baseImage.GetImageCount(), baseImage.GetMetadata(), DirectX::TEX_FILTER_DEFAULT, 0, mipChain);
 
-				Dive::TextureMip mip;
-				mip.rowPitch = (uint32_t)pImages[i].rowPitch;
-				mip.slicePitch = (uint32_t)pImages[i].slicePitch;
-				//mip.pixels;// = pImages[i].pixels;
-				size_t byteSize = rowPitch * slicePitch;
-				
-				DV_APP_INFO("{0:d} x {1:d}", mip.rowPitch, mip.slicePitch);
-				DV_APP_INFO("size: {:d} bytes", (uint32_t)byteSize);
-				//mip.pixels.resize(byteSize);
-				//auto size = sizeof(pImages[i].pixels);
-				//memcpy(&mip.pixels[0], pImages[i].pixels, byteSize);
-				
+				const auto pImages = mipChain.GetImages();
+				const auto imageCount = mipChain.GetImageCount();
+				for (size_t i = 0; i < imageCount; i++)
+				{
+					Dive::TextureMip& mip = subResources[arrayIndex].mips.emplace_back(Dive::TextureMip{});
+
+					mip.rowPitch = (uint32_t)pImages[i].rowPitch;
+					mip.slicePitch = (uint32_t)pImages[i].slicePitch;
+
+					const size_t size = pImages[i].rowPitch * pImages[i].height;
+					mip.pixels.resize(size);
+					memcpy(&mip.pixels[0], pImages[i].pixels, size);
+				}
+
+				pTexture->SetMipLevels((const uint32_t)mipChain.GetMetadata().mipLevels);
+
+				mipChain.Release();
 			}
+			else
+			{
+				Dive::TextureMip& mip = subResources[arrayIndex].mips.emplace_back(Dive::TextureMip{});
+				const auto pImages = baseImage.GetImages();
 
-			pTexture->SetMipLevels((const uint32_t)mipChain.GetMetadata().mipLevels);
+				mip.rowPitch = pImages->rowPitch;
+				mip.slicePitch = pImages->slicePitch;
+				
+				const size_t size = baseImage.GetPixelsSize();
+				mip.pixels.resize(size);
+				memcpy(&mip.pixels[0], pImages->pixels, size);
 
-			mipChain.Release();
-		}
-		else
-		{
-			const auto pImages = baseImage.GetImages();
-			auto rowPitch = pImages->rowPitch;
-			auto slicePitch = pImages->slicePitch;
-			auto data = pImages->pixels;
-
-			pTexture->SetMipLevels((const uint32_t)texMetadata.mipLevels);
+				pTexture->SetMipLevels((const uint32_t)texMetadata.mipLevels);
+			}
 		}
 
 		baseImage.Release();
