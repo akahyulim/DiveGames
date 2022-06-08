@@ -3,7 +3,20 @@
 
 namespace Dive
 {
-	// texture interface
+
+	struct TextureMip
+	{
+		uint32_t rowPitch = 0;
+		uint32_t slicePitch = 0;
+		std::vector<std::byte> pixels;
+	};
+
+	struct TextureResource
+	{
+		std::vector<TextureMip> mips;
+		uint32_t GetMipCount() const { return (uint32_t)mips.size(); }
+	};
+
 	class Texture : public Resource
 	{
 	public:
@@ -44,12 +57,13 @@ namespace Dive
 		DXGI_FORMAT GetFormat() const { return m_Format; }
 		void SetFormat(const DXGI_FORMAT format) { m_Format = format; }
 
-		uint32_t GetRowPitch() const { return m_RowPitch; }
-		void SetRowPitch(const uint32_t pitch) { m_RowPitch = pitch; }
+		// row pitch
 
-		uint32_t GetSlicePitch() const { return m_SlicePitch; }
-		void SetSlicePitch(const uint32_t pitch) { m_SlicePitch = pitch; }
 
+		// slice pitch
+
+		// data
+	
 		unsigned int GetSRGBFormat(unsigned int format);
 		unsigned int GetSRVFormat(unsigned int format);
 		unsigned int GetDSVFormat(unsigned int format);
@@ -66,8 +80,12 @@ namespace Dive
 		unsigned int m_BindFlags = 0;
 		uint32_t m_ArraySize = 0;
 		uint32_t m_MipLevels = 0;
-		uint32_t m_RowPitch = 0;
-		uint32_t m_SlicePitch = 0;
+
+		// 이것들은 subresource의 mip마다 다르다.
+		// 따라서 array, mip마다 개별로 존재해야 한다.
+		//uint32_t m_RowPitch = 0;
+		//uint32_t m_SlicePitch = 0;
+		std::vector<TextureResource> m_Resources;
 
 		ID3D11Texture2D* m_pTexture2D = nullptr;
 		ID3D11ShaderResourceView* m_pShaderResourceView = nullptr;

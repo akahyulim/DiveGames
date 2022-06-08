@@ -88,7 +88,7 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 
 	// test
 	Dive::Texture tex;
-	tex.LoadFromFile("Assets/Textures/DokeV.jpeg");
+//	tex.LoadFromFile("Assets/Textures/DokeV.jpeg");
 	std::vector<std::string> paths;
 	paths.emplace_back("Assets/Enviroment/X-.tga");
 	paths.emplace_back("Assets/Enviroment/X+.tga");
@@ -97,8 +97,9 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	paths.emplace_back("Assets/Enviroment/Z-.tga");
 	paths.emplace_back("Assets/Enviroment/Z+.tga");
 
-//	Dive::ImageImporter ipt;
+	Dive::ImageImporter ipt;
 //	ipt.LoadArray(paths, &tex);
+	ipt.Load("Assets/Textures/DokeV.jpeg", &tex, true);
 }
 
 Editor::~Editor()

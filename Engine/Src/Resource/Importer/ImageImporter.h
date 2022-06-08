@@ -10,7 +10,7 @@ namespace Dive
 		ImageImporter();
 		~ImageImporter();
 
-		bool Load(const std::string& filepath, Texture* pTexture);
+		bool Load(const std::string& filepath, Texture* pTexture, bool generateMips = false);
 		bool LoadArray(std::vector<std::string> filepaths, Texture* pTexture);
 
 	private:
