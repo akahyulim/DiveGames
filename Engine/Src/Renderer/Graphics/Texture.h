@@ -19,7 +19,6 @@ namespace Dive
 
 	class Texture : public Resource
 	{
-	public:
 		RESOURCE_CLASS_TYPE(Texture)
 
 	public:
@@ -80,7 +79,7 @@ namespace Dive
 		uint32_t m_Height = 0;
 		DXGI_FORMAT m_Format = DXGI_FORMAT_UNKNOWN;
 		unsigned int m_BindFlags = 0;
-		uint32_t m_ArraySize = 0;
+		uint32_t m_ArraySize = 0;		// texture2d array, texture cube에만 사용된다.
 		uint32_t m_MipLevels = 0;
 
 		std::vector<TextureResource> m_SubResources;

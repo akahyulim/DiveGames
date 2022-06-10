@@ -11,8 +11,8 @@ namespace Dive
 
 	class Model : public Resource
 	{
-	public:
 		RESOURCE_CLASS_TYPE(Model)
+
 	public:
 		Model();
 		Model(unsigned long long id);

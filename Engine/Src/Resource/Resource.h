@@ -17,9 +17,11 @@ namespace Dive
 		Count
 	};
 
-#define RESOURCE_CLASS_TYPE(type)	static eResourceType GetStaticType() { return eResourceType::type;} \
-									virtual eResourceType GetType() const override { return GetStaticType(); } \
-									virtual const char* GetTypeStr() const override { return #type;} 
+#define RESOURCE_CLASS_TYPE(type) \
+	public:	\
+	static eResourceType GetStaticType() { return eResourceType::type;} \
+	virtual eResourceType GetType() const override { return GetStaticType(); } \
+	virtual const char* GetTypeStr() const override { return #type;} 
  
 	class Resource : public Object
 	{

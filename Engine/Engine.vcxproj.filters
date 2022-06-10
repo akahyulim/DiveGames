@@ -130,6 +130,12 @@
     <ClInclude Include="Src\Resource\Importer\ImageImporter.h">
       <Filter>Src\Resource\Importer</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\DvTexture.h">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -240,6 +246,12 @@
     </ClCompile>
     <ClCompile Include="Src\Resource\Importer\ImageImporter.cpp">
       <Filter>Src\Resource\Importer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\DvTexture.cpp">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

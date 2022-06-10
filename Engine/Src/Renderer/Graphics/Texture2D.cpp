@@ -22,6 +22,16 @@ namespace Dive
 		m_BindFlags = bindFlags;
 	}
 
+	Texture2D::Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, uint32_t bindFlags, bool generateMips)
+	{
+		m_Width = width;
+		m_Height = height;
+		m_Format = format;
+		m_BindFlags = bindFlags;
+		m_ArraySize = 1;
+		m_MipLevels = generateMips ? 0 : 1;		// 명시적인 개수를 알 수 없다.
+	}
+
 	Texture2D::~Texture2D()
 	{
 		Shutdown();
@@ -40,13 +50,13 @@ namespace Dive
 		textureDesc.Format = m_Format;
 		textureDesc.Width = m_Width;
 		textureDesc.Height = m_Height;
-		textureDesc.ArraySize = 1;
-		textureDesc.MipLevels = 1;
+		textureDesc.ArraySize = m_ArraySize;
+		textureDesc.MipLevels = m_MipLevels;		// 0이면 최대, 1이면 멀티 샘플이라는데...
 		textureDesc.BindFlags = m_BindFlags;
 		textureDesc.Usage = D3D11_USAGE_DEFAULT;
 		textureDesc.SampleDesc.Count = 1;
 		textureDesc.SampleDesc.Quality = 0;
-		textureDesc.MiscFlags = 0;
+		textureDesc.MiscFlags = 0;					// mip map 생성이 들어갈 수 있다. 다만 d3d11으로 생성할 경우에만 적용되는 듯
 		textureDesc.CPUAccessFlags = 0;
 
 		std::vector<D3D11_SUBRESOURCE_DATA> subResources;
@@ -79,11 +89,9 @@ namespace Dive
 
 			srvDesc.Format = (DXGI_FORMAT)GetSRVFormat(textureDesc.Format);
 			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			srvDesc.Texture2D.MipLevels = 1;
+			srvDesc.Texture2D.MipLevels = -1;
 			srvDesc.Texture2D.MostDetailedMip = 0;
 
-			// 큐브맵을 생성하는 경우에도 srv는 하나만 만든다.
-			// 이는 다수의 예제에서 확인했다.
 			if (FAILED(m_pDevice->CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &srvDesc, &m_pShaderResourceView)))
 			{
 				DV_CORE_ERROR("ShaderResourceView 생성에 실패하였습니다.");

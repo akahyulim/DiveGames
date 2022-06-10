@@ -6,13 +6,13 @@ namespace Dive
 	// ¹Ó¸Ê°ú ¹è¿­Àº Á¦¿Ü
 	class Texture2D : public Texture
 	{
-	public:
 		RESOURCE_CLASS_TYPE(Texture2D)
+	
 	public:
 		Texture2D();
 		Texture2D(unsigned long long id);
 		Texture2D(unsigned int bindFlags);
-		//Texture2D(const std::string& name = "", unsigned long long id = 0);
+		Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, uint32_t bindFlags, bool generateMips = false);
 		~Texture2D();
 
 		bool create() override;

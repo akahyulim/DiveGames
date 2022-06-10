@@ -18,8 +18,8 @@ namespace Dive
 
 	class Material : public Resource
 	{
-	public:
 		RESOURCE_CLASS_TYPE(Material)
+	
 	public:
 		Material();
 		Material(unsigned long long id);

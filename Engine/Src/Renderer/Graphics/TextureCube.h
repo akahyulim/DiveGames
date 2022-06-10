@@ -5,8 +5,8 @@ namespace Dive
 {
 	class TextureCube : public Texture
 	{
-	public:
 		RESOURCE_CLASS_TYPE(TextureCube)
+	
 	public:
 		TextureCube();
 		TextureCube(unsigned long long id);
