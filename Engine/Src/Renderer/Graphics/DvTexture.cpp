@@ -34,6 +34,20 @@ namespace Dive
 			return format;
 	}
 
+	uint32_t DvTexture::CalMipMaxLevel(uint32_t width, uint32_t height)
+	{
+		uint32_t maxLevel = 1;
+
+		while (width > 1 || height > 1)
+		{
+			++maxLevel;
+			width = width > 1 ? (width >> 1u) : 1;
+			height = height > 1 ? (height >> 1u) : 1;
+		}
+
+		return maxLevel;
+	}
+
 	void DvTexture::RegenerateMips()
 	{
 		if (!m_pShaderResourceView)

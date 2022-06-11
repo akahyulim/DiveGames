@@ -19,6 +19,8 @@ namespace Dive
 	{
 		// 명시적으로 사용중인 곳을 찾아 nullptr을 전달한다.
 
+		DV_RELEASE(m_pDepthStencilView);
+		DV_RELEASE(m_pRenderTargetView);
 		DV_RELEASE(m_pShaderResourceView);
 		DV_RELEASE(m_pTexture2D);
 	}
@@ -36,6 +38,22 @@ namespace Dive
 		m_Height = height;
 		m_Format = format;
 		m_Usage = usage;
+
+		// 1. multiSample > 1 && autoResolve == false 면 1
+		// 2. SetNumLevels()에서 usage > TEXTURE_RENDERTARGET 이면 1	=> 여기까진 requestLevels
+		// 3. Create_D3D11에서	=> 여기서부턴 m_MipLevels
+		//	1. ChcekLevels에서 requestLevels == 0 또는 계산 결과보다 작으면 계산 결과 사용
+		//	2. USAGE == TEXTURE_DEPTHSTENCIL이면 1
+		//	3. TEXTURE_RENDERTARGET && mipLevels != 1 && multiSample == 1이면 generate mips 적용
+		//	4. srv생성 중 desc.Texture2D.MipLevels = usage != TEXTURE_DYNAMIC ? m_MipLevels : 1
+
+		// autoResolve는 밉맵 자동 생성 함수 사용여부를 뜻하는 듯 한데...
+		// 멤버 변수로도 저장한다.
+		// 하지만 역시 Sample에 영향을 받아 도중에 변경된다.
+		// 그런데 정작 RegenerateLevels()에선 확인을 하지 않는다.
+		// 물론 외부에서 GetAutoResolve()로 확인한 후 RegerateLevels()를 호출할 수 있다.
+
+		m_MipLevels = m_Usage > eTextureUsage::TEXTURE_RENDERTARGET ? 1 : CalMipMaxLevel(m_Width, m_Height);
 
 		return Create();
 	}
@@ -71,7 +89,6 @@ namespace Dive
 			texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
 		else if (m_Usage == eTextureUsage::TEXTURE_DEPTHSTENCIL)
 			texDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
-		// D3D11_SHADER_RESOURCE가 빠질 수 있다.
 		texDesc.MiscFlags = 0;	// 임시
 		texDesc.CPUAccessFlags = m_Usage == eTextureUsage::TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
 
@@ -141,6 +158,14 @@ namespace Dive
 				return false;
 			}
 		}
+
+		// temp
+		m_Viewport.TopLeftX = 0.0f;
+		m_Viewport.TopLeftY = 0.0f;
+		m_Viewport.Width = static_cast<FLOAT>(m_Width);
+		m_Viewport.Height = static_cast<FLOAT>(m_Height);
+		m_Viewport.MinDepth = 0.0f;
+		m_Viewport.MaxDepth = 1.0f;
 
 		return true;
 	}

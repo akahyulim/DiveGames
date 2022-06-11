@@ -37,7 +37,7 @@ void ScenePanel::renderWindow()
 	// 이전 ContentRegion과의 비교가 필요하다.
 	Dive::Renderer::SetTextures(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
 	auto pTexture = Dive::Renderer::GetGBufferAlbedo();
-	//pTexture = Dive::Renderer::GetGBufferNormal();
+	pTexture = Dive::Renderer::GetGBufferNormal();
 	//pTexture = Dive::Renderer::GetGBufferMaterial();
 	//pTexture = Dive::Renderer::GetDepthStencilTexture();
 	pTexture = Dive::Renderer::GetFrameOutput();

@@ -28,14 +28,16 @@ namespace Dive
 		uint32_t GetHeight() const { return m_Height; }
 		uint32_t GetArraySize() const { return m_ArraySize; }
 		uint32_t GetMipLevels() const { return m_MipLevels; }
-		
-		// SRGB는 뭘까?
-		DXGI_FORMAT GetSRVFormat(DXGI_FORMAT format);
-		DXGI_FORMAT GetDSVFormat(DXGI_FORMAT format);
-
+	
 		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_pShaderResourceView; }
 
 		void RegenerateMips();
+
+		// SRGB는 뭘까?
+		static DXGI_FORMAT GetSRVFormat(DXGI_FORMAT format);
+		static DXGI_FORMAT GetDSVFormat(DXGI_FORMAT format);
+
+		static uint32_t CalMipMaxLevel(uint32_t width, uint32_t height);
 
 	protected:
 		virtual bool Create() { return true; }
@@ -50,10 +52,5 @@ namespace Dive
 		
 		ID3D11Texture2D* m_pTexture2D = nullptr;
 		ID3D11ShaderResourceView* m_pShaderResourceView = nullptr;
-		// 배열일 수 있다. Texture2D의 경우 하나씩만 사용한다면
-		// Texture2D, Textur2DArray, TextureCube 마다 달리 선언하는 편이 낫다.
-		ID3D11RenderTargetView* m_pRenderTargetView = nullptr;
-		ID3D11DepthStencilView* m_pDepthStencilView = nullptr;
-		ID3D11DepthStencilView* m_pDepthStencilViewReadOnly = nullptr;
 	};
 }

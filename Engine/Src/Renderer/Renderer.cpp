@@ -32,12 +32,12 @@ namespace Dive
 
 	D3D11_VIEWPORT Renderer::m_Viewport;
 
-	Texture2D* Renderer::m_pGBufferAlbedo = nullptr;
-	Texture2D* Renderer::m_pGBufferNormal = nullptr;
-	Texture2D* Renderer::m_pGBufferMaterial = nullptr;
-	Texture2D* Renderer::m_pDepthStencilTex = nullptr;
+	DvTexture2D* Renderer::m_pGBufferAlbedo = nullptr;
+	DvTexture2D* Renderer::m_pGBufferNormal = nullptr;
+	DvTexture2D* Renderer::m_pGBufferMaterial = nullptr;
+	DvTexture2D* Renderer::m_pDepthStencilTex = nullptr;
 
-	Texture2D* Renderer::m_pFrameOutput = nullptr;
+	DvTexture2D* Renderer::m_pFrameOutput = nullptr;
 
 	void Renderer::Initialize(const WindowData* pData)
 	{
@@ -233,44 +233,39 @@ namespace Dive
 		unsigned int height = m_TextureHeight;
 		
 		// albedo: r8g8b8a8
-		DV_DELETE(m_pGBufferAlbedo);
-		//m_pGBufferAlbedo = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
-		m_pGBufferAlbedo = new Texture2D;
-		m_pGBufferAlbedo->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
+		if (!m_pGBufferAlbedo)
+		{
+			m_pGBufferAlbedo = new DvTexture2D;
+		}
+		m_pGBufferAlbedo->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, eTextureUsage::TEXTURE_RENDERTARGET);
 
 		// normal: r8g8b8a8 or r11g11b10
-		DV_DELETE(m_pGBufferNormal);
-		//m_pGBufferNormal = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
-		m_pGBufferNormal = new Texture2D;
-		m_pGBufferNormal->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
+		if (!m_pGBufferNormal)
+		{
+			m_pGBufferNormal = new DvTexture2D;
+		}
+		m_pGBufferNormal->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, eTextureUsage::TEXTURE_RENDERTARGET);
 
 		// material: r8g8b8a8
-		DV_DELETE(m_pGBufferMaterial);
-		m_pGBufferMaterial = new Texture2D;
-		m_pGBufferMaterial->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
+		if (!m_pGBufferMaterial)
+		{
+			m_pGBufferMaterial = new DvTexture2D;
+		}
+		m_pGBufferMaterial->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, eTextureUsage::TEXTURE_RENDERTARGET);
 
 		// Depth Stencil Buffer
-		DV_DELETE(m_pDepthStencilTex);
-		//m_pDepthStencilTex = Texture2D::Create(width, height, DXGI_FORMAT_R24G8_TYPELESS, DXGI_FORMAT_D24_UNORM_S8_UINT,
-		//	DXGI_FORMAT_R24_UNORM_X8_TYPELESS);
-		m_pDepthStencilTex = new Texture2D;
-		m_pDepthStencilTex->SetSize(width, height, DXGI_FORMAT_R24G8_TYPELESS, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL);
+		if (!m_pDepthStencilTex)
+		{
+			m_pDepthStencilTex = new DvTexture2D;
+		}
+		m_pDepthStencilTex->SetSize(width, height, DXGI_FORMAT_R24G8_TYPELESS, eTextureUsage::TEXTURE_DEPTHSTENCIL);
 
 		// frame output
-		DV_DELETE(m_pFrameOutput);
-		//m_pFrameOutput = Texture2D::Create(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, true);
-		m_pFrameOutput = new Texture2D;
-		m_pFrameOutput->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
-
-		// test
+		if (!m_pFrameOutput)
 		{
-			auto pTextureCube = new TextureCube;
-			pTextureCube->SetSize(10, DXGI_FORMAT_R16G16B16A16_FLOAT, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET);
-			delete pTextureCube;
-			pTextureCube = new TextureCube;
-			pTextureCube->SetSize(10, DXGI_FORMAT_R32_TYPELESS, D3D11_BIND_DEPTH_STENCIL);
-			delete pTextureCube;
+			m_pFrameOutput = new DvTexture2D;
 		}
+		m_pFrameOutput->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, eTextureUsage::TEXTURE_RENDERTARGET);
 	}
 
 	void Renderer::removeRenderTargets()

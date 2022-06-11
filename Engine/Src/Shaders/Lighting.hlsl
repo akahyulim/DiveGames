@@ -30,7 +30,7 @@ struct Pixel_Output
 	float4 FrameOutput : SV_TARGET0;
 };
 
-float3 CalcDirectionalLight(float3 pos, float depth, SurfaceData data)
+float3 CalcDirectionalLight(float3 pos, SurfaceData data)
 {
 	float3 dirLight = 0;
 
@@ -121,7 +121,7 @@ Pixel_Output mainPS(Pixel_Input input)
 
 	float3 lightColor = 0;
 	if (IsDirectionalLight())
-		lightColor = CalcDirectionalLight(pos, depth, data);
+		lightColor = CalcDirectionalLight(pos, data);
 	if (IsPointLight())
 		lightColor = CalcPointLight(pos, data);
 	if (IsSpotLight())

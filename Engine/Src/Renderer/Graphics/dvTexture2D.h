@@ -26,11 +26,22 @@ namespace Dive
 		// Texture2D::EndLoad()에서 SetData()에 생성된 Image를 전달하여 구성된다.
 		// BeginLoad(), EndLoad()는 Resource::Load() 내부에서 순차적으로 실행된다.
 
+		ID3D11RenderTargetView* GetRenderTargetView() { return m_pRenderTargetView; }
+		ID3D11DepthStencilView* GetDepthStencilView() { return m_pDepthStencilView; }
+		ID3D11DepthStencilView* GetDepthStencilViewReadOnly() { return m_pDepthStencilViewReadOnly; }
+
+		// temp
+		D3D11_VIEWPORT* GetViewport() { return &m_Viewport; }
 
 	protected:
 		bool Create() override;
 
 	private:
 	private:
+		ID3D11RenderTargetView* m_pRenderTargetView = nullptr;
+		ID3D11DepthStencilView* m_pDepthStencilView = nullptr;
+		ID3D11DepthStencilView* m_pDepthStencilViewReadOnly = nullptr;
+
+		D3D11_VIEWPORT m_Viewport;	// temp
 	};
 }
