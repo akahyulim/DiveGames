@@ -29,6 +29,11 @@ namespace Dive
 		uint32_t GetArraySize() const { return m_ArraySize; }
 		uint32_t GetMipLevels() const { return m_MipLevels; }
 	
+		uint32_t GetLevelWidth(uint32_t level) const;
+		uint32_t GetLevelHeight(uint32_t level) const;
+
+		uint32_t GetRowDataSize(uint32_t width) const;
+
 		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_pShaderResourceView; }
 
 		void RegenerateMips();

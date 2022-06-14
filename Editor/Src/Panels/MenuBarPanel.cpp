@@ -121,6 +121,29 @@ void MenuBarPanel::menuFile()
 
 		ImGui::Separator();
 
+		if (ImGui::MenuItem("Load Images"))
+		{
+			// array 1, mipLevel 1
+			Dive::Image img1;
+			img1.Load("Assets/Enviroment/stone.dds");
+
+			// array 6, mipLevel 1
+			Dive::Image img2;
+			img2.Load("Assets/Enviroment/Texture1.dds");
+
+			//Dive::Image img3;
+			//img3.Load("Assets/Textures/DokeV.jpeg");
+
+			// array 6, mipLevel 11
+			Dive::Image img4;
+			img4.Load("Assets/Enviroment/desertcube1024.dds");
+
+			//Dive::Image img5;
+			//img5.Load("Assets/Enviroment/Y+.tga");
+		}
+
+		ImGui::Separator();
+
 		if (ImGui::MenuItem("Exit"))
 		{
 			if (m_pActiveScene)

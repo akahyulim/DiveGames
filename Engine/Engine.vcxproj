@@ -195,6 +195,7 @@
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
     <ClInclude Include="Src\Renderer\Graphics\TextureCube.h" />
     <ClInclude Include="Src\Renderer\Graphics\VertexBuffer.h" />
+    <ClInclude Include="Src\Renderer\Image.h" />
     <ClInclude Include="Src\Renderer\Material.h" />
     <ClInclude Include="Src\Renderer\Mesh.h" />
     <ClInclude Include="Src\Renderer\Model.h" />
@@ -238,6 +239,7 @@
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\TextureCube.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="Src\Renderer\Image.cpp" />
     <ClCompile Include="Src\Renderer\Material.cpp" />
     <ClCompile Include="Src\Renderer\Mesh.cpp" />
     <ClCompile Include="Src\Renderer\Model.cpp" />

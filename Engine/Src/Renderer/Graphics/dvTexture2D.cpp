@@ -3,6 +3,7 @@
 #include "Base/Base.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Graphics/GraphicsDevice.h"
+#include "Renderer/Image.h"
 
 namespace Dive
 {
@@ -25,10 +26,26 @@ namespace Dive
 		DV_RELEASE(m_pTexture2D);
 	}
 
-	// 리소스를 생성하는 함수는 이 것만 공개된다.
+	bool DvTexture2D::LoadFromFile(const std::string& filepath)
+	{
+		// Begin / End Load로 나눌게 아니라면 멤버 변수일 필요가 없다.
+		auto pLoadImage = new Image;
+		if (!pLoadImage->Load(filepath))
+		{
+			// reset
+			return false;
+		}
+
+		auto bResult = SetData(pLoadImage);
+
+		// loadImage reset
+
+		return bResult;
+	}
+
 	bool DvTexture2D::SetSize(uint32_t width, uint32_t height, DXGI_FORMAT format, eTextureUsage usage)
 	{
-		if (width == 0 || height == 0)
+		if (width <= 0 || height <= 0)
 		{
 			DV_CORE_ERROR("잘못된 Texture 크기를 전달받았습니다.");
 			return false;
@@ -56,6 +73,85 @@ namespace Dive
 		m_MipLevels = m_Usage > eTextureUsage::TEXTURE_RENDERTARGET ? 1 : CalMipMaxLevel(m_Width, m_Height);
 
 		return Create();
+	}
+
+	// 특정 mipmap의 특정 좌표 값을 바꾼다.
+	bool DvTexture2D::SetData(uint32_t level, int x, int y, uint32_t width, uint32_t height, const void* pData)
+	{
+		if (!pData)
+		{
+			DV_CORE_ERROR("소스 데이터가 존재하지 않습니다.");
+			return false;
+		}
+
+		if (!m_pTexture2D)
+		{
+			DV_CORE_ERROR("Texture2D가 존재하지 않아 데이터를 설정할 수 없습니다.");
+			return false;
+		}
+
+		if(level >= m_MipLevels)
+		{
+			DV_CORE_ERROR("잘못된 MipLevel을 전달받았습니다.");
+			return false;
+		}
+
+		uint32_t levelWidth = GetLevelWidth(level);
+		uint32_t levelHeight = GetLevelHeight(level);
+		if (x < 0 || x + width  > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
+		{
+			DV_CORE_ERROR("잘못된 크기를 전달받았습니다.");
+			return false;
+		}
+
+		auto pSrc = (unsigned char*)pData;
+		auto rowSize = GetRowDataSize(width);
+		auto rowStart = GetRowDataSize(x);
+		auto subResource = D3D11CalcSubresource(level, 0, m_MipLevels);
+
+		if (m_Usage == eTextureUsage::TEXTURE_DYNAMIC)
+		{
+			D3D11_MAPPED_SUBRESOURCE mappedData;
+			mappedData.pData = nullptr;
+
+			auto hResult = Renderer::GetGraphicsDevice().GetImmediateContext()->Map(
+				(ID3D11Resource*)m_pTexture2D,
+				subResource,
+				D3D11_MAP_WRITE_DISCARD,
+				0,
+				&mappedData);
+
+			if (FAILED(hResult) || !mappedData.pData)
+			{
+				DV_CORE_ERROR("Texture Map에 실패하였습니다.");
+				return false;
+			}
+
+			for (uint32_t row = 0; row < height; ++row)
+			{
+				memcpy(
+					(unsigned char*)mappedData.pData + (row + y) * mappedData.RowPitch + rowStart,
+					pSrc + row * rowSize,
+					rowSize);
+
+				Renderer::GetGraphicsDevice().GetImmediateContext()->Unmap((ID3D11Resource*)m_pTexture2D, subResource);
+			}
+		}
+
+		return true;
+	}
+
+	bool DvTexture2D::SetData(Image* pImage, bool useAlpha)
+	{
+		if (!pImage)
+		{
+			DV_CORE_ERROR("Image를 잘못 전달 받았습니다.");
+			return false;
+		}
+
+		// 밉맵이 생성된 상태를 가정한다.
+
+		return true;
 	}
 
 	bool DvTexture2D::Create()
@@ -89,7 +185,7 @@ namespace Dive
 			texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
 		else if (m_Usage == eTextureUsage::TEXTURE_DEPTHSTENCIL)
 			texDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
-		texDesc.MiscFlags = 0;	// 임시
+		texDesc.MiscFlags = 0;	// 임시 generate mips가 될 수 있다.
 		texDesc.CPUAccessFlags = m_Usage == eTextureUsage::TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
 
 		if (FAILED(Renderer::GetGraphicsDevice().GetDevice()->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
@@ -105,7 +201,7 @@ namespace Dive
 			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 			ZeroMemory(&srvDesc, sizeof(srvDesc));
 			srvDesc.Format = GetSRVFormat(m_Format);
-			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;	// 임시
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;	// 임시, multi sample이 될 수 있다.
 			srvDesc.Texture2D.MipLevels = 1;		// 임시, -1이면 전체를 사용한다는 의미
 			srvDesc.Texture2D.MostDetailedMip = 0;	// 임시
 
@@ -123,7 +219,7 @@ namespace Dive
 			D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
 			ZeroMemory(&rtvDesc, sizeof(rtvDesc));
 			rtvDesc.Format = m_Format;
-			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;		// 임시
+			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;		// 임시, multi sample이 될 수 있다.
 			rtvDesc.Texture2D.MipSlice = 0;		// 임시
 
 			if (FAILED(Renderer::GetGraphicsDevice().GetDevice()->CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &rtvDesc, &m_pRenderTargetView)))
@@ -140,7 +236,7 @@ namespace Dive
 			D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
 			ZeroMemory(&dsvDesc, sizeof(dsvDesc));
 			dsvDesc.Format = GetDSVFormat(m_Format);
-			dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;	// 임시
+			dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;	// 임시, multi sample이 될 수 있다.
 			dsvDesc.Texture2D.MipSlice = 0;	// 임시
 
 			if (FAILED(Renderer::GetGraphicsDevice().GetDevice()->CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &dsvDesc, &m_pDepthStencilView)))

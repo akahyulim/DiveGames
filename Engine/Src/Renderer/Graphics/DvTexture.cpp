@@ -48,6 +48,64 @@ namespace Dive
 		return maxLevel;
 	}
 
+	uint32_t DvTexture::GetLevelWidth(uint32_t level) const
+	{
+		if (level >= m_MipLevels)
+			return 0;
+
+		return std::max<uint32_t>(m_Width >> level, 1);
+	}
+
+	uint32_t DvTexture::GetLevelHeight(uint32_t level) const
+	{
+		if (level >= m_MipLevels)
+			return 0;
+
+		return std::max<uint32_t>(m_Height >> level, 1);
+	}
+
+
+	uint32_t DvTexture::GetRowDataSize(uint32_t width) const
+	{
+		switch (m_Format)
+		{
+		case DXGI_FORMAT_R8_UNORM:
+		case DXGI_FORMAT_A8_UNORM:
+			return width;
+
+		case DXGI_FORMAT_R8G8_UNORM:
+		case DXGI_FORMAT_R16_UNORM:
+		case DXGI_FORMAT_R16_FLOAT:
+		case DXGI_FORMAT_R16_TYPELESS:
+			return width * 2;
+
+		case DXGI_FORMAT_R8G8B8A8_UNORM:
+		case DXGI_FORMAT_R16G16_UNORM:
+		case DXGI_FORMAT_R16G16_FLOAT:
+		case DXGI_FORMAT_R24G8_TYPELESS:
+		case DXGI_FORMAT_R32_FLOAT:
+		case DXGI_FORMAT_R32_TYPELESS:
+			return width * 4;
+
+		case DXGI_FORMAT_R16G16B16A16_UNORM:
+		case DXGI_FORMAT_R16G16B16A16_FLOAT:
+			return width * 8;
+
+		case DXGI_FORMAT_R32G32B32A32_FLOAT:
+			return width * 16;
+
+		case DXGI_FORMAT_BC1_UNORM:
+			return ((width + 3) >> 2) * 8;
+
+		case DXGI_FORMAT_BC2_UNORM:
+		case DXGI_FORMAT_BC3_UNORM:
+			return ((width + 3) >> 2) * 16;
+
+		default:
+			return 0;
+		}
+	}
+
 	void DvTexture::RegenerateMips()
 	{
 		if (!m_pShaderResourceView)
