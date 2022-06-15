@@ -125,14 +125,14 @@ void MenuBarPanel::menuFile()
 		{
 			// array 1, mipLevel 1
 			Dive::Image img1;
-			img1.Load("Assets/Enviroment/stone.dds");
+			//img1.Load("Assets/Enviroment/stone.dds");
 
 			// array 6, mipLevel 1
 			Dive::Image img2;
-			img2.Load("Assets/Enviroment/Texture1.dds");
+			//img2.Load("Assets/Enviroment/Texture1.dds");
 
-			//Dive::Image img3;
-			//img3.Load("Assets/Textures/DokeV.jpeg");
+			Dive::Image img3;
+			img3.Load("Assets/Textures/DokeV.jpeg");
 
 			// array 6, mipLevel 11
 			Dive::Image img4;

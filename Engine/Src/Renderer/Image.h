@@ -14,6 +14,8 @@ namespace Dive
 
 		bool Load(const std::string& filepath);
 
+		Image* GetNextSibling() { return m_pNextSibling; }
+
 	private:
 	private:
 		uint32_t m_Width = 0;
@@ -22,8 +24,12 @@ namespace Dive
 		uint32_t m_ArraySize = 1;
 		uint32_t m_MipLevels = 1;
 		bool m_bCubeMap = false;
+		bool m_bArray = false;
 		bool m_bUseAlpha = false;
 		
-		unsigned char* m_pData = nullptr;
+		uint8_t* m_pData = nullptr;
+
+		Image* m_pNextLevel = nullptr;
+		Image* m_pNextSibling = nullptr;
 	};
 }
