@@ -3,6 +3,7 @@
 #include "Renderer/Model.h"
 #include "Renderer/Material.h"
 #include "Renderer/Graphics/Texture2D.h"
+#include "Renderer/Graphics/Texture2D.h"
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
 #include "Scene/Component/MeshRenderable.h"
@@ -267,11 +268,8 @@ namespace Dive
                 if (AI_SUCCESS == pAiMaterial->GetTexture(assimpType, 0, &path))
                 {
                     const auto& texPath = Helper::FileSystem::GetDirectory(params.filepath) + path.C_Str();
-                    auto pTex = Texture2D::Create(texPath);
-                    if (!pTex)
-                    {
-                        DV_CORE_WARN("{:s} 로드에 실패하였습니다.", texPath);
-                    }
+                    auto pTex = new Texture2D;
+                    pTex->LoadFromFile(texPath);
                     pMaterial->SetMap(diveType, pTex);
 
                     if (diveType == eMaterialMapType::Albedo)

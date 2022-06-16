@@ -3,37 +3,40 @@
 
 namespace Dive
 {
-	// 밉맵과 배열은 제외
 	class Texture2D : public Texture
 	{
 		RESOURCE_CLASS_TYPE(Texture2D)
-	
+
 	public:
 		Texture2D();
-		Texture2D(unsigned long long id);
-		Texture2D(unsigned int bindFlags);
-		Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, uint32_t bindFlags, bool generateMips = false);
 		~Texture2D();
 
-		bool create() override;
+		void Release() override;
 
-		//bool SaveFromFile(const std::string& filepath);
-		//bool LoadFromFile(const std::string& filepath);
+		// 역시 밉맵과 멀티샘플링은 제외됐다.
+		bool LoadFromFile(const std::string& filepath) override;
 
-		bool CreateTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned bindFlags);
-		bool CreateShaderResourceView(DXGI_FORMAT format);
-		bool CreateRenderTargetView(DXGI_FORMAT format);
-		bool CreateDepthStencilView(DXGI_FORMAT format);
+		// 역시 밉맵과 멀티샘플링이 문제다.
+		// 일단 멀티샘플링을 빼놓는다 해도 밉맵 레벨과 생성 여부를 어떻게 전달할지 결정해야 한다.
+		bool SetSize(uint32_t width, uint32_t height, DXGI_FORMAT format, eTextureUsage usage = eTextureUsage::TEXTURE_STATIC);
+		bool SetData(uint32_t level, int x, int y, uint32_t width, uint32_t height, const void* pData);
+		
+		ID3D11RenderTargetView* GetRenderTargetView() { return m_pRenderTargetView; }
+		ID3D11DepthStencilView* GetDepthStencilView() { return m_pDepthStencilView; }
+		ID3D11DepthStencilView* GetDepthStencilViewReadOnly() { return m_pDepthStencilViewReadOnly; }
 
-		//bool operator==(const Texture& other) override;
+		// temp
+		D3D11_VIEWPORT* GetViewport() { return &m_Viewport; }
 
-		bool SetSize(int width, int height, DXGI_FORMAT format, unsigned int bindFlags);
+	protected:
+		bool Create() override;
 
-		// RenderTargetView + ShaderResourceView
-		static Texture2D* Create(unsigned int width, unsigned int height, DXGI_FORMAT format, bool srv = false, const std::string& name = "");
-		// DepthStencilView + ShaderResourceView 
-		static Texture2D* Create(unsigned int width, unsigned int height, DXGI_FORMAT texture2D, DXGI_FORMAT dsv, DXGI_FORMAT srv = DXGI_FORMAT_UNKNOWN, const std::string& name = "");
-		// ShaderResourceView
-		static Texture2D* Create(const std::string& path, const std::string& name = "");
+	private:
+	private:
+		ID3D11RenderTargetView* m_pRenderTargetView = nullptr;
+		ID3D11DepthStencilView* m_pDepthStencilView = nullptr;
+		ID3D11DepthStencilView* m_pDepthStencilViewReadOnly = nullptr;
+
+		D3D11_VIEWPORT m_Viewport;	// temp
 	};
 }

@@ -32,12 +32,12 @@ namespace Dive
 
 	D3D11_VIEWPORT Renderer::m_Viewport;
 
-	DvTexture2D* Renderer::m_pGBufferAlbedo = nullptr;
-	DvTexture2D* Renderer::m_pGBufferNormal = nullptr;
-	DvTexture2D* Renderer::m_pGBufferMaterial = nullptr;
-	DvTexture2D* Renderer::m_pDepthStencilTex = nullptr;
+	Texture2D* Renderer::m_pGBufferAlbedo = nullptr;
+	Texture2D* Renderer::m_pGBufferNormal = nullptr;
+	Texture2D* Renderer::m_pGBufferMaterial = nullptr;
+	Texture2D* Renderer::m_pDepthStencilTex = nullptr;
 
-	DvTexture2D* Renderer::m_pFrameOutput = nullptr;
+	Texture2D* Renderer::m_pFrameOutput = nullptr;
 
 	void Renderer::Initialize(const WindowData* pData)
 	{
@@ -235,35 +235,35 @@ namespace Dive
 		// albedo: r8g8b8a8
 		if (!m_pGBufferAlbedo)
 		{
-			m_pGBufferAlbedo = new DvTexture2D;
+			m_pGBufferAlbedo = new Texture2D;
 		}
 		m_pGBufferAlbedo->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, eTextureUsage::TEXTURE_RENDERTARGET);
 
 		// normal: r8g8b8a8 or r11g11b10
 		if (!m_pGBufferNormal)
 		{
-			m_pGBufferNormal = new DvTexture2D;
+			m_pGBufferNormal = new Texture2D;
 		}
 		m_pGBufferNormal->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, eTextureUsage::TEXTURE_RENDERTARGET);
 
 		// material: r8g8b8a8
 		if (!m_pGBufferMaterial)
 		{
-			m_pGBufferMaterial = new DvTexture2D;
+			m_pGBufferMaterial = new Texture2D;
 		}
 		m_pGBufferMaterial->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, eTextureUsage::TEXTURE_RENDERTARGET);
 
 		// Depth Stencil Buffer
 		if (!m_pDepthStencilTex)
 		{
-			m_pDepthStencilTex = new DvTexture2D;
+			m_pDepthStencilTex = new Texture2D;
 		}
 		m_pDepthStencilTex->SetSize(width, height, DXGI_FORMAT_R24G8_TYPELESS, eTextureUsage::TEXTURE_DEPTHSTENCIL);
 
 		// frame output
 		if (!m_pFrameOutput)
 		{
-			m_pFrameOutput = new DvTexture2D;
+			m_pFrameOutput = new Texture2D;
 		}
 		m_pFrameOutput->SetSize(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, eTextureUsage::TEXTURE_RENDERTARGET);
 	}

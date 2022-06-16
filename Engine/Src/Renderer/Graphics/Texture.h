@@ -3,18 +3,13 @@
 
 namespace Dive
 {
-
-	struct TextureMip
+	// 추후 GraphicsDefs로 이동
+	enum class eTextureUsage
 	{
-		uint32_t rowPitch = 0;
-		uint32_t slicePitch = 0;
-		std::vector<std::byte> pixels;
-	};
-
-	struct TextureResource
-	{
-		std::vector<TextureMip> mips;
-		uint32_t GetMipCount() const { return (uint32_t)mips.size(); }
+		TEXTURE_STATIC = 0,
+		TEXTURE_DYNAMIC,
+		TEXTURE_RENDERTARGET,
+		TEXTURE_DEPTHSTENCIL
 	};
 
 	class Texture : public Resource
@@ -23,74 +18,44 @@ namespace Dive
 
 	public:
 		Texture();
-		Texture(unsigned long long id);
-		//Texture(const std::string& name = "", unsigned long long id = 0);
 		virtual ~Texture() = default;
 
-		bool LoadFromFile(const std::string& filepath) override;
-
-		void Shutdown();
-
-		//virtual bool operator==(const Texture& other) = 0;
-
-		ID3D11Texture2D* GetTexture2D() { return m_pTexture2D; }
-		ID3D11ShaderResourceView* GetShaderResourceView() { return m_pShaderResourceView; }
-		ID3D11RenderTargetView* GetRenderTargetView() { return m_pRenderTargetView; }
-		ID3D11DepthStencilView* GetDepthStencilView() { return m_pDepthStencilView; }
-		ID3D11DepthStencilView* GetDepthStencilViewReadOnly() { return m_pDepthStencilViewReadOnly; }
-
-		D3D11_VIEWPORT* GetViewport() { return &m_Viewport; }
+		// 기존의 Destroy or Shutdown. 이쪽 이름이 더 마음에 든다.
+		// urho의 경우 GPUObject에 선언했다.
+		virtual void Release() {}
 
 		uint32_t GetWidth() const { return m_Width; }
-		void SetWidth(const uint32_t width) { m_Width = width; }
-
 		uint32_t GetHeight() const { return m_Height; }
-		void SetHeight(const uint32_t height) { m_Height = height; }
-
 		uint32_t GetArraySize() const { return m_ArraySize; }
-		void SetArraySize(const uint32_t size) { m_ArraySize = size; }
-
 		uint32_t GetMipLevels() const { return m_MipLevels; }
-		void SetMipLevels(const uint32_t levels) { m_MipLevels = levels; }
-
-		DXGI_FORMAT GetFormat() const { return m_Format; }
-		void SetFormat(const DXGI_FORMAT format) { m_Format = format; }
-
-		// row pitch
-
-
-		// slice pitch
-
-		// data
-
-		std::vector<TextureResource>& GetSubResources() { return m_SubResources; }
 	
-		unsigned int GetSRGBFormat(unsigned int format);
-		unsigned int GetSRVFormat(unsigned int format);
-		unsigned int GetDSVFormat(unsigned int format);
+		uint32_t GetLevelWidth(uint32_t level) const;
+		uint32_t GetLevelHeight(uint32_t level) const;
+
+		uint32_t GetRowDataSize(uint32_t width) const;
+
+		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_pShaderResourceView; }
+
+		void RegenerateMips();
+
+		// SRGB는 뭘까?
+		static DXGI_FORMAT GetSRVFormat(DXGI_FORMAT format);
+		static DXGI_FORMAT GetDSVFormat(DXGI_FORMAT format);
+
+		static uint32_t CalMipMaxLevel(uint32_t width, uint32_t height);
 
 	protected:
-		virtual bool create() { return true; }
+		virtual bool Create() { return true; }
 
 	protected:
-		ID3D11Device* m_pDevice = nullptr;
-
 		uint32_t m_Width = 0;
 		uint32_t m_Height = 0;
+		uint32_t m_ArraySize = 1;
+		uint32_t m_MipLevels = 1;
 		DXGI_FORMAT m_Format = DXGI_FORMAT_UNKNOWN;
-		unsigned int m_BindFlags = 0;
-		uint32_t m_ArraySize = 0;		// texture2d array, texture cube에만 사용된다.
-		uint32_t m_MipLevels = 0;
-
-		std::vector<TextureResource> m_SubResources;
-
+		eTextureUsage m_Usage = eTextureUsage::TEXTURE_STATIC;
+		
 		ID3D11Texture2D* m_pTexture2D = nullptr;
 		ID3D11ShaderResourceView* m_pShaderResourceView = nullptr;
-		// 배열로 바꿔야 할 수 있다.
-		ID3D11RenderTargetView* m_pRenderTargetView = nullptr;
-		ID3D11DepthStencilView* m_pDepthStencilView = nullptr;
-		ID3D11DepthStencilView* m_pDepthStencilViewReadOnly = nullptr;
-
-		D3D11_VIEWPORT m_Viewport;
 	};
 }

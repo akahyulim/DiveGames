@@ -1,170 +1,30 @@
 #include "divepch.h"
 #include "Texture2D.h"
-#include "Renderer/Renderer.h"
-#include "GraphicsDevice.h"
 #include "Base/Base.h"
-#include "Resource/ResourceManager.h"
-#include "Resource/Importer/ImageImporter.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/Graphics/GraphicsDevice.h"
 
 namespace Dive
 {
 	Texture2D::Texture2D()
 	{
 	}
-	
-	Texture2D::Texture2D(unsigned long long id)
-		: Texture(id)
-	{
-	}
-
-	Texture2D::Texture2D(unsigned int bindFlags)
-	{
-		m_BindFlags = bindFlags;
-	}
-
-	Texture2D::Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, uint32_t bindFlags, bool generateMips)
-	{
-		m_Width = width;
-		m_Height = height;
-		m_Format = format;
-		m_BindFlags = bindFlags;
-		m_ArraySize = 1;
-		m_MipLevels = generateMips ? 0 : 1;		// 명시적인 개수를 알 수 없다.
-	}
 
 	Texture2D::~Texture2D()
 	{
-		Shutdown();
+		Release();
 	}
-
-	bool Texture2D::create()
+	
+	void Texture2D::Release()
 	{
-		Shutdown();
+		// 명시적으로 사용중인 곳을 찾아 nullptr을 전달한다.
 
-		if (!m_pDevice || !m_Width || !m_Height)
-			return false;
-
-		D3D11_TEXTURE2D_DESC textureDesc;
-		ZeroMemory(&textureDesc, sizeof(textureDesc));
-
-		textureDesc.Format = m_Format;
-		textureDesc.Width = m_Width;
-		textureDesc.Height = m_Height;
-		textureDesc.ArraySize = m_ArraySize;
-		textureDesc.MipLevels = m_MipLevels;		// 0이면 최대, 1이면 멀티 샘플이라는데...
-		textureDesc.BindFlags = m_BindFlags;
-		textureDesc.Usage = D3D11_USAGE_DEFAULT;
-		textureDesc.SampleDesc.Count = 1;
-		textureDesc.SampleDesc.Quality = 0;
-		textureDesc.MiscFlags = 0;					// mip map 생성이 들어갈 수 있다. 다만 d3d11으로 생성할 경우에만 적용되는 듯
-		textureDesc.CPUAccessFlags = 0;
-
-		std::vector<D3D11_SUBRESOURCE_DATA> subResources;
-		if(!m_SubResources.empty() && !m_SubResources[0].mips.empty() && !m_SubResources[0].mips[0].pixels.empty())
-		{
-			for (uint32_t arrayIndex = 0; arrayIndex < m_ArraySize; arrayIndex++)
-			{
-				for (uint32_t mipIndex = 0; mipIndex < m_MipLevels; mipIndex++)
-				{
-					D3D11_SUBRESOURCE_DATA& data = subResources.emplace_back(D3D11_SUBRESOURCE_DATA{});
-
-					data.pSysMem = m_SubResources[arrayIndex].mips[mipIndex].pixels.data();
-					data.SysMemPitch = m_SubResources[arrayIndex].mips[mipIndex].rowPitch;
-					data.SysMemSlicePitch = 0;
-				}
-			}
-		}
-
-		if (FAILED(m_pDevice->CreateTexture2D(&textureDesc, subResources.data(), &m_pTexture2D)))
-		{
-			DV_CORE_ERROR("Texture2D 생성에 실패하였습니다.");
-			Shutdown();
-			return false;
-		}
-
-		if (m_BindFlags & D3D11_BIND_SHADER_RESOURCE)
-		{
-			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-			ZeroMemory(&srvDesc, sizeof(srvDesc));
-
-			srvDesc.Format = (DXGI_FORMAT)GetSRVFormat(textureDesc.Format);
-			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			srvDesc.Texture2D.MipLevels = -1;
-			srvDesc.Texture2D.MostDetailedMip = 0;
-
-			if (FAILED(m_pDevice->CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &srvDesc, &m_pShaderResourceView)))
-			{
-				DV_CORE_ERROR("ShaderResourceView 생성에 실패하였습니다.");
-				Shutdown();
-				return false;
-			}
-		}
-
-		if (m_BindFlags & D3D11_BIND_RENDER_TARGET)
-		{
-			D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
-			ZeroMemory(&rtvDesc, sizeof(rtvDesc));
-
-			rtvDesc.Format = textureDesc.Format;
-			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-			rtvDesc.Texture2D.MipSlice = 0;
-
-			// urho에 의하면 rtv는 각 면별로 존재하는 것 같다...
-			// 스파르탄 역시 rtv와 dsv는 배열로 생성한다.
-			if (FAILED(m_pDevice->CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &rtvDesc, &m_pRenderTargetView)))
-			{
-				DV_CORE_ERROR("RenderTargetView 생성에 실패하였습니다");
-				Shutdown();
-				return false;
-			}
-		}
-
-		if (m_BindFlags & D3D11_BIND_DEPTH_STENCIL)
-		{
-			D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-			ZeroMemory(&dsvDesc, sizeof(dsvDesc));
-
-			dsvDesc.Format = (DXGI_FORMAT)GetDSVFormat(textureDesc.Format);
-			dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-			dsvDesc.Texture2D.MipSlice = 0;
-			dsvDesc.Flags = 0;
-
-			if (FAILED(m_pDevice->CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &dsvDesc, &m_pDepthStencilView)))
-			{
-				DV_CORE_ERROR("DepthStencilView 생성에 실패하였습니다.");
-				Shutdown();
-				return false;
-			}
-
-			dsvDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
-			if (FAILED(m_pDevice->CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &dsvDesc, &m_pDepthStencilViewReadOnly)))
-			{
-				DV_CORE_ERROR("DepthStencilViewReadOnly 생성에 실패하였습니다.");
-				Shutdown();
-				return false;
-			}
-		}
-
-		// 이건 어디에서...?
-		m_Viewport.TopLeftX = 0.0f;
-		m_Viewport.TopLeftY = 0.0f;
-		m_Viewport.Width = static_cast<FLOAT>(m_Width);
-		m_Viewport.Height = static_cast<FLOAT>(m_Height);
-		m_Viewport.MinDepth = 0.0f;
-		m_Viewport.MaxDepth = 1.0f;
-
-
-		return true;
+		DV_RELEASE(m_pDepthStencilView);
+		DV_RELEASE(m_pRenderTargetView);
+		DV_RELEASE(m_pShaderResourceView);
+		DV_RELEASE(m_pTexture2D);
 	}
 
-	/*
-	bool Texture2D::SaveFromFile(const std::string& filepath)
-	{
-		return true;
-	}
-	*/
-	// 직접 하지 말고, DirectX Texture 부분을 Importer로 뽑아보자.
-	/*
 	bool Texture2D::LoadFromFile(const std::string& filepath)
 	{
 		DirectX::ScratchImage img;
@@ -189,110 +49,256 @@ namespace Dive
 
 		if (FAILED(hResult))
 		{
-			DV_CORE_WARN("{:s} 로드에 실패하였습니다.", filepath);
+			DV_CORE_ERROR("{:s} 로드에 실패하였습니다.", filepath);
 			return false;
 		}
 
-		// texture2d가 필요할 수 있다.
-		if (FAILED(DirectX::CreateTexture(m_pDevice, img.GetImages(), img.GetImageCount(), img.GetMetadata(), (ID3D11Resource**)&m_pTexture2D)))
+		if (img.GetMetadata().IsCubemap() || img.GetMetadata().arraySize > 1)
+		{
+			return false;
+		}
+
+		// data
+		m_Width = (uint32_t)img.GetMetadata().width;
+		m_Height = (uint32_t)img.GetMetadata().height;
+		m_Format = img.GetMetadata().format;
+		m_ArraySize = 1;
+		m_MipLevels = 1;
+
+		// create texture2d
+		if (FAILED(DirectX::CreateTexture(
+			Renderer::GetGraphicsDevice().GetDevice(),
+			img.GetImages(),
+			img.GetImageCount(),
+			img.GetMetadata(),
+			(ID3D11Resource**)&m_pTexture2D
+		)))
 		{
 			DV_CORE_ERROR("Texture2D 생성에 실패하였습니다.");
 			return false;
 		}
 
-		// texture2d를 만들었으므로 기본 함수를 호출하는 편이 낫다.
-		if (FAILED(DirectX::CreateShaderResourceView(m_pDevice, img.GetImages(), img.GetImageCount(), img.GetMetadata(), &m_pShaderResourceView)))
+		// srv
+		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Format = GetSRVFormat(m_Format);
+		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;	// MS일 수 있다.
+		desc.Texture2D.MipLevels = 1;
+		desc.Texture2D.MostDetailedMip = 0;
+
+		if (FAILED(Renderer::GetGraphicsDevice().GetDevice()->CreateShaderResourceView(
+			(ID3D11Resource*)m_pTexture2D,
+			&desc,
+			&m_pShaderResourceView
+		)))
 		{
-			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
+			DV_CORE_ERROR("ShaderResourceView 생성에 실패하였습니다.");
 			return false;
-		}
-
-		const auto& metaData = img.GetMetadata();
-		m_Format = metaData.format;
-		m_Width = static_cast<unsigned int>(metaData.width);
-		m_Height = static_cast<unsigned int>(metaData.height);
-
-		//SetFilepath(filepath);
-		//m_Name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
-		{
-			m_ExportedFilepath = filepath;
-			m_EngineFilepath = filepath;
-			m_Name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
 		}
 
 		return true;
 	}
-	*/
-	bool Texture2D::CreateTexture2D(unsigned int width, unsigned int height, DXGI_FORMAT format, unsigned bindFlags)
+
+	bool Texture2D::SetSize(uint32_t width, uint32_t height, DXGI_FORMAT format, eTextureUsage usage)
 	{
+		if (width <= 0 || height <= 0)
+		{
+			DV_CORE_ERROR("잘못된 Texture 크기를 전달받았습니다.");
+			return false;
+		}
+
 		m_Width = width;
 		m_Height = height;
 		m_Format = format;
+		m_Usage = usage;
 
-		D3D11_TEXTURE2D_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Width = m_Width;
-		desc.Height = m_Height;
-		desc.MipLevels = 1;
-		desc.ArraySize = 1;
-		desc.Format = m_Format;
-		desc.SampleDesc.Count = 1;
-		desc.SampleDesc.Quality = 0;
-		desc.Usage = D3D11_USAGE_DEFAULT;
-		desc.BindFlags = bindFlags;
-		desc.CPUAccessFlags = 0;
-		desc.MiscFlags = 0;
+		// 1. multiSample > 1 && autoResolve == false 면 1
+		// 2. SetNumLevels()에서 usage > TEXTURE_RENDERTARGET 이면 1	=> 여기까진 requestLevels
+		// 3. Create_D3D11에서	=> 여기서부턴 m_MipLevels
+		//	1. ChcekLevels에서 requestLevels == 0 또는 계산 결과보다 작으면 계산 결과 사용
+		//	2. USAGE == TEXTURE_DEPTHSTENCIL이면 1
+		//	3. TEXTURE_RENDERTARGET && mipLevels != 1 && multiSample == 1이면 generate mips 적용
+		//	4. srv생성 중 desc.Texture2D.MipLevels = usage != TEXTURE_DYNAMIC ? m_MipLevels : 1
 
-		auto& graphicsDevice = Renderer::GetGraphicsDevice();
-		if (!graphicsDevice.CreateTexture2D(&desc, nullptr, &m_pTexture2D))
+		// autoResolve는 밉맵 자동 생성 함수 사용여부를 뜻하는 듯 한데...
+		// 멤버 변수로도 저장한다.
+		// 하지만 역시 Sample에 영향을 받아 도중에 변경된다.
+		// 그런데 정작 RegenerateLevels()에선 확인을 하지 않는다.
+		// 물론 외부에서 GetAutoResolve()로 확인한 후 RegerateLevels()를 호출할 수 있다.
+
+		m_MipLevels = m_Usage > eTextureUsage::TEXTURE_RENDERTARGET ? 1 : CalMipMaxLevel(m_Width, m_Height);
+
+		return Create();
+	}
+
+	// 특정 mipmap의 특정 좌표 값을 바꾼다.
+	bool Texture2D::SetData(uint32_t level, int x, int y, uint32_t width, uint32_t height, const void* pData)
+	{
+		if (!pData)
 		{
-			DV_CORE_WARN("Resource Buffer 생성에 실패하였습니다.");
-			Shutdown();
+			DV_CORE_ERROR("소스 데이터가 존재하지 않습니다.");
 			return false;
+		}
+
+		if (!m_pTexture2D)
+		{
+			DV_CORE_ERROR("Texture2D가 존재하지 않아 데이터를 설정할 수 없습니다.");
+			return false;
+		}
+
+		if(level >= m_MipLevels)
+		{
+			DV_CORE_ERROR("잘못된 MipLevel을 전달받았습니다.");
+			return false;
+		}
+
+		uint32_t levelWidth = GetLevelWidth(level);
+		uint32_t levelHeight = GetLevelHeight(level);
+		if (x < 0 || x + width  > levelWidth || y < 0 || y + height > levelHeight || width <= 0 || height <= 0)
+		{
+			DV_CORE_ERROR("잘못된 크기를 전달받았습니다.");
+			return false;
+		}
+
+		auto pSrc = (unsigned char*)pData;
+		auto rowSize = GetRowDataSize(width);
+		auto rowStart = GetRowDataSize(x);
+		auto subResource = D3D11CalcSubresource(level, 0, m_MipLevels);
+
+		if (m_Usage == eTextureUsage::TEXTURE_DYNAMIC)
+		{
+			D3D11_MAPPED_SUBRESOURCE mappedData;
+			mappedData.pData = nullptr;
+
+			auto hResult = Renderer::GetGraphicsDevice().GetImmediateContext()->Map(
+				(ID3D11Resource*)m_pTexture2D,
+				subResource,
+				D3D11_MAP_WRITE_DISCARD,
+				0,
+				&mappedData);
+
+			if (FAILED(hResult) || !mappedData.pData)
+			{
+				DV_CORE_ERROR("Texture Map에 실패하였습니다.");
+				return false;
+			}
+
+			for (uint32_t row = 0; row < height; ++row)
+			{
+				memcpy(
+					(unsigned char*)mappedData.pData + (row + y) * mappedData.RowPitch + rowStart,
+					pSrc + row * rowSize,
+					rowSize);
+
+				Renderer::GetGraphicsDevice().GetImmediateContext()->Unmap((ID3D11Resource*)m_pTexture2D, subResource);
+			}
 		}
 
 		return true;
 	}
 
-	bool Texture2D::CreateShaderResourceView(DXGI_FORMAT format)
+	bool Texture2D::Create()
 	{
-		D3D11_SHADER_RESOURCE_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Format = format;
-		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		desc.Texture2D.MostDetailedMip = 0;
-		desc.Texture2D.MipLevels = -1;
+		Release();
 
-		DV_ASSERT(m_pTexture2D);
-		auto& graphicsDevice = Renderer::GetGraphicsDevice();
-		if (!graphicsDevice.CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &desc, &m_pShaderResourceView))
+		if (!m_Width || !m_Height)
+			return false;
+
+		// MipLevels 계산
+		// 1. 우선 width, height, requestedLevels?를 이용해 직접 계산한다.
+		// 2. DSV를 만들면 1로 다시 고정한다.
+		// 3. 마지막으로 multiSample == 1, !TEXTURE_DYNAMIC일 경우 앞선 값을, 아니라면 1로 고정한다.
+		// TEXTURE_RENDERTARGET, level != 1, multiSample == 1 일 경우 D3D11_RESOURCE_MISC_GENERATE_MIPS를 설정한다.
+		// GenerateMips() 함수가 랩핑되어 있다. rendertarget이 그려진 후, 샘플링 전에 호출된다는데...
+		// rastertek의 경우 srv를 로드한 후 호출했다. 즉, srv를 사용하기 전 호출하는 듯 하다.
+
+		// texture2d
+		D3D11_TEXTURE2D_DESC texDesc;
+		ZeroMemory(&texDesc, sizeof(texDesc));
+		texDesc.Width = (UINT)m_Width;
+		texDesc.Height = (UINT)m_Height;
+		texDesc.Format = m_Format;
+		texDesc.ArraySize = 1;
+		texDesc.MipLevels = 1;			// 임시
+		texDesc.SampleDesc.Count = 1;	// 임시
+		texDesc.SampleDesc.Quality = 0;	// 임시
+		texDesc.Usage = m_Usage == eTextureUsage::TEXTURE_DYNAMIC ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		if (m_Usage == eTextureUsage::TEXTURE_RENDERTARGET)
+			texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
+		else if (m_Usage == eTextureUsage::TEXTURE_DEPTHSTENCIL)
+			texDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
+		texDesc.MiscFlags = 0;	// 임시 generate mips가 될 수 있다.
+		texDesc.CPUAccessFlags = m_Usage == eTextureUsage::TEXTURE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
+
+		if (FAILED(Renderer::GetGraphicsDevice().GetDevice()->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
 		{
-			DV_CORE_WARN("ShaderResourceView 생성에 실패하였습니다.");
-			Shutdown();
+			DV_CORE_ERROR("Texture 생성에 실패하였습니다.");
+			Release();
 			return false;
 		}
 
-		return true;
-	}
-
-	// Viewport도 함께 설정
-	bool Texture2D::CreateRenderTargetView(DXGI_FORMAT format)
-	{
-		D3D11_RENDER_TARGET_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Format = format;
-		desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-		desc.Texture2D.MipSlice = 0;
-
-		DV_ASSERT(m_pTexture2D);
-		auto& graphicsDevice = Renderer::GetGraphicsDevice();
-		if (!graphicsDevice.CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &desc, &m_pRenderTargetView))
+		// srv
+		if (texDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE)
 		{
-			DV_CORE_WARN("RenderTargetView 생성에 실패하였습니다.");
-			Shutdown();
-			return false;
+			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+			ZeroMemory(&srvDesc, sizeof(srvDesc));
+			srvDesc.Format = GetSRVFormat(m_Format);
+			srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;	// 임시, multi sample이 될 수 있다.
+			srvDesc.Texture2D.MipLevels = 1;		// 임시, -1이면 전체를 사용한다는 의미
+			srvDesc.Texture2D.MostDetailedMip = 0;	// 임시
+
+			if (FAILED(Renderer::GetGraphicsDevice().GetDevice()->CreateShaderResourceView((ID3D11Resource*)m_pTexture2D, &srvDesc, &m_pShaderResourceView)))
+			{
+				DV_CORE_ERROR("ShaderReosurceView 생성에 실패하였습니다.");
+				Release();
+				return false;
+			}
 		}
 
+		// rtv
+		if (texDesc.BindFlags & D3D11_BIND_RENDER_TARGET)
+		{
+			D3D11_RENDER_TARGET_VIEW_DESC rtvDesc;
+			ZeroMemory(&rtvDesc, sizeof(rtvDesc));
+			rtvDesc.Format = m_Format;
+			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;		// 임시, multi sample이 될 수 있다.
+			rtvDesc.Texture2D.MipSlice = 0;		// 임시
+
+			if (FAILED(Renderer::GetGraphicsDevice().GetDevice()->CreateRenderTargetView((ID3D11Resource*)m_pTexture2D, &rtvDesc, &m_pRenderTargetView)))
+			{
+				DV_CORE_ERROR("RenderTargetView 생성에 실패하였습니다.");
+				Release();
+				return false;
+			}
+		}
+
+		// dsv
+		if (texDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL)
+		{
+			D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
+			ZeroMemory(&dsvDesc, sizeof(dsvDesc));
+			dsvDesc.Format = GetDSVFormat(m_Format);
+			dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;	// 임시, multi sample이 될 수 있다.
+			dsvDesc.Texture2D.MipSlice = 0;	// 임시
+
+			if (FAILED(Renderer::GetGraphicsDevice().GetDevice()->CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &dsvDesc, &m_pDepthStencilView)))
+			{
+				DV_CORE_ERROR("DepthStencilView 생성에 실패하였습니다.");
+				Release();
+				return false;
+			}
+
+			dsvDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH;
+			if (FAILED(Renderer::GetGraphicsDevice().GetDevice()->CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &dsvDesc, &m_pDepthStencilViewReadOnly)))
+			{
+				DV_CORE_ERROR("DepthStencilViewReadOnly 생성에 실패하였습니다.");
+				Release();
+				return false;
+			}
+		}
+
+		// temp
 		m_Viewport.TopLeftX = 0.0f;
 		m_Viewport.TopLeftY = 0.0f;
 		m_Viewport.Width = static_cast<FLOAT>(m_Width);
@@ -301,140 +307,5 @@ namespace Dive
 		m_Viewport.MaxDepth = 1.0f;
 
 		return true;
-	}
-
-	bool Texture2D::CreateDepthStencilView(DXGI_FORMAT format)
-	{
-		D3D11_DEPTH_STENCIL_VIEW_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Format = format;
-		desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		desc.Texture2D.MipSlice = 0;
-
-		DV_ASSERT(m_pTexture2D);
-		auto& graphicsDevice = Renderer::GetGraphicsDevice();
-		if (!graphicsDevice.CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &desc, &m_pDepthStencilView))
-		{
-			DV_CORE_WARN("DepthStencilView 생성에 실패하였습니다.");
-			Shutdown();
-			return false;
-		}
-
-		desc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
-		if (!graphicsDevice.CreateDepthStencilView((ID3D11Resource*)m_pTexture2D, &desc, &m_pDepthStencilViewReadOnly))
-		{
-			DV_CORE_WARN("DepthStencilViewReadOnly 생성에 실패하였습니다.");
-			Shutdown();
-			return false;
-		}
-
-		return true;
-	}
-
-	// 이걸 없애면 컴파일 오류가 발생한다..
-	//bool Texture2D::operator==(const Texture& other)
-	//{
-	//	return false;
-	//}
-
-	bool Texture2D::SetSize(int width, int height, DXGI_FORMAT format, unsigned int bindFlags)
-	{
-		if (width <= 0 || height <= 0)
-		{
-			DV_CORE_ERROR("");
-			return false;
-		}
-
-		m_Width = (unsigned int)width;
-		m_Height = (unsigned int)height;
-		m_Format = format;
-		m_BindFlags = bindFlags;
-
-		return create();
-	}
-
-	Texture2D* Texture2D::Create(unsigned int width, unsigned int height, DXGI_FORMAT format, bool srv, const std::string& name)
-	{
-		auto pTex = new Texture2D();
-		DV_ASSERT(pTex);
-
-		unsigned int bindFlags = D3D11_BIND_RENDER_TARGET;
-		if (srv)
-			bindFlags |= D3D11_BIND_SHADER_RESOURCE;
-
-		if (!pTex->CreateTexture2D(width, height, format, bindFlags))
-		{
-			DV_DELETE(pTex);
-			return nullptr;
-		}
-
-		if (!pTex->CreateRenderTargetView(format))
-		{
-			DV_DELETE(pTex);
-			return nullptr;
-		}
-
-		if (srv)
-		{
-			if (!pTex->CreateShaderResourceView(format))
-			{
-				DV_DELETE(pTex);
-				return nullptr;
-			}
-		}
-
-		pTex->SetName(name);
-
-		return pTex;
-	}
-
-	Texture2D* Texture2D::Create(unsigned int width, unsigned int height, DXGI_FORMAT texture2D, DXGI_FORMAT dsv, DXGI_FORMAT srv, const std::string& name)
-	{
-		auto pTex = new Texture2D();
-		DV_ASSERT(pTex);
-
-		unsigned int bindFlags = D3D11_BIND_DEPTH_STENCIL;
-		if (srv != DXGI_FORMAT_UNKNOWN)
-			bindFlags |= D3D11_BIND_SHADER_RESOURCE;
-
-		if (!pTex->CreateTexture2D(width, height, texture2D, bindFlags))
-		{
-			DV_DELETE(pTex);
-			return nullptr;
-		}
-
-		if (!pTex->CreateDepthStencilView(dsv))
-		{
-			DV_DELETE(pTex);
-			return nullptr;
-		}
-
-		if (srv != DXGI_FORMAT_UNKNOWN)
-		{
-			if (!pTex->CreateShaderResourceView(srv))
-			{
-				DV_DELETE(pTex);
-				return nullptr;
-			}
-		}
-
-		pTex->SetName(name);
-
-		return pTex;
-	}
-
-	Texture2D* Texture2D::Create(const std::string& path, const std::string& name)
-	{
-		auto pTexture = new Texture2D((unsigned int)D3D11_BIND_SHADER_RESOURCE);
-		ImageImporter ipt;
-		ipt.Load(path, pTexture, true);
-
-		//auto pTexture = ResourceManager::GetInstance().Load<Texture2D>(path);
-		if (!name.empty())
-		{
-			pTexture->SetName(name);
-		}
-
-		return pTexture;
 	}
 }

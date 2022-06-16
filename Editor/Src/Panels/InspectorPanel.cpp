@@ -179,6 +179,7 @@ void InspectorPanel::drawSpriteRenderer(Dive::GameObject* pSelectedObject)
 		{
 			auto rscMng = Dive::ResourceManager::GetInstance();
 
+			/*
 			switch (currentItem)
 			{
 			case 0:
@@ -205,6 +206,7 @@ void InspectorPanel::drawSpriteRenderer(Dive::GameObject* pSelectedObject)
 				pSpriteRenderer->SetSprite(rscMng.GetResource<Dive::Texture2D>("IU"));
 				break;
 			}
+			*/
 		}
 
 

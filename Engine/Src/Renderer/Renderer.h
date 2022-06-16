@@ -2,7 +2,7 @@
 #include "Base/Base.h"
 #include "Graphics/GraphicsDevice.h"
 #include "Graphics/Texture2D.h"
-#include "Graphics/DvTexture2D.h"
+#include "Graphics/Texture2D.h"
 #include "Events/EventSystem.h"
 #include "Events/EngineEvents.h"
 
@@ -171,12 +171,12 @@ namespace Dive
 
 		static void UpdateVisibility(Visibility& vis);
 
-		static DvTexture2D* GetGBufferAlbedo() { return m_pGBufferAlbedo; }
-		static DvTexture2D* GetGBufferNormal() { return m_pGBufferNormal; }
-		static DvTexture2D* GetGBufferMaterial() { return m_pGBufferMaterial; }
-		static DvTexture2D* GetDepthStencilTexture() { return m_pDepthStencilTex; }
+		static Texture2D* GetGBufferAlbedo() { return m_pGBufferAlbedo; }
+		static Texture2D* GetGBufferNormal() { return m_pGBufferNormal; }
+		static Texture2D* GetGBufferMaterial() { return m_pGBufferMaterial; }
+		static Texture2D* GetDepthStencilTexture() { return m_pDepthStencilTex; }
 
-		static DvTexture2D* GetFrameOutput() { return m_pFrameOutput; }
+		static Texture2D* GetFrameOutput() { return m_pFrameOutput; }
 
 
 	private:
@@ -225,11 +225,11 @@ namespace Dive
 		static D3D11_VIEWPORT m_Viewport;
 
 		// GBuffers
-		static DvTexture2D* m_pGBufferAlbedo;
-		static DvTexture2D* m_pGBufferNormal;
-		static DvTexture2D* m_pGBufferMaterial;
-		static DvTexture2D* m_pDepthStencilTex;
+		static Texture2D* m_pGBufferAlbedo;
+		static Texture2D* m_pGBufferNormal;
+		static Texture2D* m_pGBufferMaterial;
+		static Texture2D* m_pDepthStencilTex;
 
-		static DvTexture2D* m_pFrameOutput;
+		static Texture2D* m_pFrameOutput;
 	};
 }

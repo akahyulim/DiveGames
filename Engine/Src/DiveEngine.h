@@ -20,7 +20,6 @@
 #include "Events/EngineEvents.h"
 
 //= Resource ======================
-#include "Resource/Importer/ImageImporter.h"
 #include "Resource/Importer/ModelImporter.h"
 #include "Resource/FileStream.h"
 #include "Resource/Resource.h"
@@ -31,8 +30,6 @@
 #include "Renderer/Graphics/Texture.h"
 #include "Renderer/Graphics/Texture2D.h"
 #include "Renderer/Graphics/TextureCube.h"
-#include "Renderer/Graphics/DvTexture.h"
-#include "Renderer/Graphics/dvTexture2D.h"
 #include "Renderer/Graphics/VertexBuffer.h"
 #include "Renderer/Graphics/IndexBuffer.h"
 #include "Renderer/Graphics/ConstantBuffer.h"
@@ -41,7 +38,6 @@
 #include "Renderer/PipelineState.h"
 #include "Renderer/CommandList.h"
 #include "Renderer/RenderPath.h"
-#include "Renderer/Image.h"
 #include "Renderer/Mesh.h"
 #include "Renderer/Material.h"
 #include "Renderer/Model.h"

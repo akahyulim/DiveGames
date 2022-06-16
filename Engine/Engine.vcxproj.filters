@@ -28,9 +28,6 @@
     <ClInclude Include="Src\Renderer\Renderer.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\Texture.h">
-      <Filter>Src\Renderer\GraphicsDevice</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Scene\Scene.h">
       <Filter>Src\Scene</Filter>
     </ClInclude>
@@ -121,23 +118,14 @@
     <ClInclude Include="Src\Scene\Component\Light.h">
       <Filter>Src\Scene\Component</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\Texture2D.h">
-      <Filter>Src\Renderer\GraphicsDevice</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Renderer\Graphics\TextureCube.h">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Resource\Importer\ImageImporter.h">
-      <Filter>Src\Resource\Importer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\DvTexture.h">
+    <ClInclude Include="Src\Renderer\Graphics\Texture.h">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Renderer\Graphics\dvTexture2D.h">
+    <ClInclude Include="Src\Renderer\Graphics\Texture2D.h">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Image.h">
-      <Filter>Src\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -161,9 +149,6 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Renderer.cpp">
       <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Graphics\Texture.cpp">
-      <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClCompile>
     <ClCompile Include="Src\Scene\GameObject.cpp">
       <Filter>Src\Scene</Filter>
@@ -241,23 +226,14 @@
     <ClCompile Include="Src\Scene\Component\Light.cpp">
       <Filter>Src\Scene\Component</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Renderer\Graphics\Texture2D.cpp">
-      <Filter>Src\Renderer\GraphicsDevice</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\TextureCube.cpp">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Resource\Importer\ImageImporter.cpp">
-      <Filter>Src\Resource\Importer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Graphics\DvTexture.cpp">
+    <ClCompile Include="Src\Renderer\Graphics\Texture.cpp">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Renderer\Graphics\dvTexture2D.cpp">
+    <ClCompile Include="Src\Renderer\Graphics\Texture2D.cpp">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Image.cpp">
-      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
