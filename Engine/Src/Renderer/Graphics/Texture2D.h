@@ -18,6 +18,7 @@ namespace Dive
 
 		// 역시 밉맵과 멀티샘플링이 문제다.
 		// 일단 멀티샘플링을 빼놓는다 해도 밉맵 레벨과 생성 여부를 어떻게 전달할지 결정해야 한다.
+		// 이름이 SetXXX지만 결국 RenderTarget을 만드는 함수다.
 		bool SetSize(uint32_t width, uint32_t height, DXGI_FORMAT format, eTextureUsage usage = eTextureUsage::TEXTURE_STATIC);
 		bool SetData(uint32_t level, int x, int y, uint32_t width, uint32_t height, const void* pData);
 		

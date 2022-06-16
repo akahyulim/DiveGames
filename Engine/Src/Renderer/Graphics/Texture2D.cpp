@@ -17,8 +17,6 @@ namespace Dive
 	
 	void Texture2D::Release()
 	{
-		// 명시적으로 사용중인 곳을 찾아 nullptr을 전달한다.
-
 		DV_RELEASE(m_pDepthStencilView);
 		DV_RELEASE(m_pRenderTargetView);
 		DV_RELEASE(m_pShaderResourceView);
@@ -58,19 +56,39 @@ namespace Dive
 			return false;
 		}
 
+		// 밉맵이 없을 경우 직접 생성할 수 있지만
+		// 현재 성능 이슈가 발생했다.
+		
 		// data
 		m_Width = (uint32_t)img.GetMetadata().width;
 		m_Height = (uint32_t)img.GetMetadata().height;
 		m_Format = img.GetMetadata().format;
 		m_ArraySize = 1;
-		m_MipLevels = 1;
+		m_MipLevels = (uint32_t)img.GetMetadata().mipLevels;
+		if (m_MipLevels == 1)
+		{
+			m_MipLevels = CalMipMaxLevel(m_Width, m_Height);
+		}
+		m_Usage = eTextureUsage::TEXTURE_STATIC;	// 이것두 임시
+
+		// 만들어지는 것 같으나, sponza로 확인할 때 너무 버벅거린다.
+		DirectX::ScratchImage mipMap;
+
+		DirectX::GenerateMipMaps(
+			img.GetImages(),
+			img.GetImageCount(),
+			img.GetMetadata(),
+			DirectX::TEX_FILTER_DEFAULT,
+			(size_t)m_MipLevels,
+			mipMap
+		);
 
 		// create texture2d
 		if (FAILED(DirectX::CreateTexture(
 			Renderer::GetGraphicsDevice().GetDevice(),
-			img.GetImages(),
-			img.GetImageCount(),
-			img.GetMetadata(),
+			mipMap.GetImages(),
+			mipMap.GetImageCount(),
+			mipMap.GetMetadata(),
 			(ID3D11Resource**)&m_pTexture2D
 		)))
 		{
@@ -83,7 +101,7 @@ namespace Dive
 		ZeroMemory(&desc, sizeof(desc));
 		desc.Format = GetSRVFormat(m_Format);
 		desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;	// MS일 수 있다.
-		desc.Texture2D.MipLevels = 1;
+		desc.Texture2D.MipLevels = -1;
 		desc.Texture2D.MostDetailedMip = 0;
 
 		if (FAILED(Renderer::GetGraphicsDevice().GetDevice()->CreateShaderResourceView(
@@ -95,6 +113,11 @@ namespace Dive
 			DV_CORE_ERROR("ShaderResourceView 생성에 실패하였습니다.");
 			return false;
 		}
+
+		mipMap.Release();
+		img.Release();
+
+		DV_CORE_INFO("generated mipLevels: {:d}", m_MipLevels);
 
 		return true;
 	}

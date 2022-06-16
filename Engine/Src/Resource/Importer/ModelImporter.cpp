@@ -272,6 +272,8 @@ namespace Dive
                     pTex->LoadFromFile(texPath);
                     pMaterial->SetMap(diveType, pTex);
 
+                    DV_CORE_INFO("mtrl tex: {:s}", path.C_Str());
+
                     if (diveType == eMaterialMapType::Albedo)
                     {
                         // color를 0, 0, 0, 0으로 바꿨다. 이유는...   
