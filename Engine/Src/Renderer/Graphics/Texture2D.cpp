@@ -65,13 +65,14 @@ namespace Dive
 		m_Format = img.GetMetadata().format;
 		m_ArraySize = 1;
 		m_MipLevels = (uint32_t)img.GetMetadata().mipLevels;
-		if (m_MipLevels == 1)
+//		if (m_MipLevels == 1)
 		{
-			m_MipLevels = CalMipMaxLevel(m_Width, m_Height);
+//			m_MipLevels = CalMipMaxLevel(m_Width, m_Height);
 		}
 		m_Usage = eTextureUsage::TEXTURE_STATIC;	// 이것두 임시
 
-		// 만들어지는 것 같으나, sponza로 확인할 때 너무 버벅거린다.
+		// 성능 문제로 인해 일단 블락
+		/*
 		DirectX::ScratchImage mipMap;
 
 		DirectX::GenerateMipMaps(
@@ -82,13 +83,14 @@ namespace Dive
 			(size_t)m_MipLevels,
 			mipMap
 		);
+		*/
 
 		// create texture2d
 		if (FAILED(DirectX::CreateTexture(
 			Renderer::GetGraphicsDevice().GetDevice(),
-			mipMap.GetImages(),
-			mipMap.GetImageCount(),
-			mipMap.GetMetadata(),
+			img.GetImages(),
+			img.GetImageCount(),
+			img.GetMetadata(),
 			(ID3D11Resource**)&m_pTexture2D
 		)))
 		{
@@ -114,10 +116,8 @@ namespace Dive
 			return false;
 		}
 
-		mipMap.Release();
+		//mipMap.Release();
 		img.Release();
-
-		DV_CORE_INFO("generated mipLevels: {:d}", m_MipLevels);
 
 		return true;
 	}
