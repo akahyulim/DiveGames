@@ -11,9 +11,10 @@ namespace Dive
 	{
 		Texture,
 		Texture2D,
+		TextureArray,
+		TextureCube,
 		Model,
 		Material,
-		TextureCube,
 		Count
 	};
 
@@ -27,15 +28,13 @@ namespace Dive
 	{
 	public:
 		Resource();
-		Resource(unsigned long long id);
-		//Resource(const std::string& name = "", unsigned long long id = 0);
 		virtual ~Resource() = default;
 
 		virtual bool SaveToFile(const std::string& filepath) { return true; }
 		virtual bool LoadFromFile(const std::string& filepath)	{ return true; }
 
-		virtual eResourceType GetType()		const = 0;
-		virtual const char* GetTypeStr()	const = 0;
+		virtual eResourceType GetType()	const = 0;
+		virtual const char* GetTypeStr() const = 0;
 
 		const std::string GetExportedFilepath() const { return m_ExportedFilepath; }
 		const std::string GetEngineFilepath() const { return m_EngineFilepath; }

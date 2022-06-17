@@ -6,8 +6,8 @@
 
 namespace Dive
 {
-	Transform::Transform(GameObject* pGameObject, unsigned long long id)
-		: Component(pGameObject, id)
+	Transform::Transform(GameObject* pGameObject)
+		: Component(pGameObject)
 	{
 		Clear();
 	}
@@ -180,9 +180,9 @@ namespace Dive
 
 	DirectX::XMMATRIX Transform::GetLocalMatrix() const
 	{
-		auto vecLocalScale			= DirectX::XMLoadFloat3(&m_LocalScale);
-		auto vecLocalRotation		= DirectX::XMLoadFloat4(&m_LocalRotation);
-		auto vecLocalTranslation	= DirectX::XMLoadFloat3(&m_LocalTranslation);
+		auto vecLocalScale = DirectX::XMLoadFloat3(&m_LocalScale);
+		auto vecLocalRotation = DirectX::XMLoadFloat4(&m_LocalRotation);
+		auto vecLocalTranslation = DirectX::XMLoadFloat3(&m_LocalTranslation);
 
 		return DirectX::XMMatrixScalingFromVector(vecLocalScale) * DirectX::XMMatrixRotationQuaternion(vecLocalRotation)
 			* DirectX::XMMatrixTranslationFromVector(vecLocalTranslation);

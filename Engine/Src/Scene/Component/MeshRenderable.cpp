@@ -6,8 +6,8 @@
 
 namespace Dive
 {
-	MeshRenderable::MeshRenderable(GameObject* pGameObject, unsigned long long id)
-		: Renderable(pGameObject, id)
+	MeshRenderable::MeshRenderable(GameObject* pGameObject)
+		: Renderable(pGameObject)
 	{
 	}
 

@@ -6,14 +6,17 @@ namespace Dive
 	{
 	public:
 		Object();
-		Object(unsigned long long id);
-		//Object(const std::string& name = std::string(), unsigned long long id = 0);
 		virtual ~Object() = default;
 
-		unsigned long long GetInstanceID() const { return m_InstanceID; }
+		uint64_t GetInstanceID() const { return m_InstanceID; }
+		void SetInstanceID(uint64_t id) { m_InstanceID = id; }
+		static uint64_t GenerateInstanceID();
 
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
+
+		bool operator!=(const Object& rhs);
+		bool operator==(const Object& rhs);
 
 	private:
 		Object(const Object&) = delete;

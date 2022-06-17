@@ -18,17 +18,20 @@ namespace Dive
 		void Serialize(const std::string& filepath);
 		bool Deserialize(const std::string& filepath);
 
-		GameObject* CreateGameObject(const std::string& name = std::string(), unsigned long long id = 0);
-		void RemoveGameObject(unsigned long long id);
+		GameObject* CreateGameObject(const std::string& name = std::string());
+		GameObject* CreateGameObject(uint64_t id, const std::string& name = std::string());
+
+		void RemoveGameObject(uint64_t id);
 		void RemoveGameObject(GameObject* pTarget);
-		GameObject* GetGameObject(unsigned long long id);
+		
+		GameObject* GetGameObject(uint64_t id);
 
 		std::vector<GameObject*> GetRoots();
 		std::vector<GameObject*>& GetGameObjects() { return m_GameObjects; }	// ¿Ã∞ÕµŒ const??
 		unsigned int GetGameObjectCount() const { return static_cast<unsigned int>(m_GameObjects.size()); }
 
 		std::vector<Component*> GetComponents(eComponentType type);
-		Component* GetComponent(eComponentType type, unsigned long long id);
+		Component* GetComponent(eComponentType type, uint64_t id);
 
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }

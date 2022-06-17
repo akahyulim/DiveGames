@@ -14,10 +14,10 @@ namespace Dive
 
 	class Light : public Component
 	{
-	public:
 		COMPONENT_CLASS_TYPE(Light)
 
-		Light(GameObject* pGameObject, unsigned long long id = 0);
+	public:
+		Light(GameObject* pGameObject);
 		~Light();
 
 		eLightType GetLightType() const { return m_LightType; }

@@ -7,8 +7,8 @@
 
 namespace Dive
 {
-	SpriteRenderable::SpriteRenderable(GameObject* pGameObject, unsigned long long id)
-		: Renderable(pGameObject, id)
+	SpriteRenderable::SpriteRenderable(GameObject* pGameObject)
+		: Renderable(pGameObject)
 	{
 		// 유니티를 기준으로
 		// Sprite와 Material은 별개다.

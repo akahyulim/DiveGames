@@ -35,6 +35,12 @@ namespace Dive
 			return dynamic_cast<T*>(m_Resources.emplace_back(pResource));
 		}
 
+		// bug
+		// 이미 생성된 리소스가 있을 경우 해당 객체를 리턴한다.
+		// 텍스쳐의 경우 그냥 사용해도 문제가 없지만
+		// 모델의 경우 새로운 게임 오브젝트를 생성하지 못하고 있다.
+		// 스파르탄 코드를 참조한 것인데
+		// 이 함수의 문제라기보단 모델을 추가하는 패널에서 수정해야 할 것 같다.
 		template<class T>
 		T* Load(const std::string& filepath)
 		{
@@ -46,8 +52,6 @@ namespace Dive
 
 			auto name = Helper::FileSystem::GetFileNameWithoutExtension(filepath);
 
-			// 추가 로드를 시도해도 이미 만들어져 있는 것을 리턴한다...
-			// 따라서 복사한 후 리턴하도록 만들어야 한다.
 			if (HasResource<T>(name))
 				return GetResource<T>(name);
 

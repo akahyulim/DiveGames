@@ -12,10 +12,10 @@ namespace Dive
 	// SpriteRenderable과 interface가 상이해졌다.
 	class MeshRenderable : public Renderable
 	{
-	public:
 		COMPONENT_CLASS_TYPE(MeshRenderable)
-			
-		MeshRenderable(GameObject* pGameObject, unsigned long long id = 0);
+
+	public:
+		MeshRenderable(GameObject* pGameObject);
 		~MeshRenderable();
 
 		// 추후 bounding box까지

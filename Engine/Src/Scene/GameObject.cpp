@@ -5,18 +5,8 @@
 
 namespace Dive
 {
-	//GameObject::GameObject(Scene* pScene, const std::string& name, unsigned long long id)
-	//	: m_pScene(pScene), Object(name, id)
-	//{
-	//}
-
 	GameObject::GameObject(Scene* pScene)
 		: m_pScene(pScene)
-	{
-	}
-
-	GameObject::GameObject(Scene* pScene, unsigned long long id)
-		: m_pScene(pScene), Object(id)
 	{
 	}
 
@@ -25,10 +15,10 @@ namespace Dive
 		if (m_Components.empty())
 			return;
 
-		for(auto pComponent : m_Components)
+		for(auto com : m_Components)
 		{
-			FIRE_EVENT(ModifyGameObjectEvent(static_cast<Component*>(pComponent)));
-			DV_DELETE(pComponent);
+			FIRE_EVENT(ModifyGameObjectEvent(static_cast<Component*>(com)));
+			DV_DELETE(com);
 		}
 		m_Components.clear();
 	}
@@ -39,15 +29,15 @@ namespace Dive
 	{
 		if (pScene)
 		{
-			auto pGameObject = pScene->CreateGameObject();
-			pGameObject->AddComponent<Transform>();
-			pGameObject->AddComponent<MeshRenderable>();
+			auto gameObj = pScene->CreateGameObject();
+			gameObj->AddComponent<Transform>();
+			gameObj->AddComponent<MeshRenderable>();
 
 			// 결국 Meshfilter, Mesh가 존재한다. 즉, Resource가 있다는 거다.
 			// 외부 파일이라면 Importer가 필요한데, 아마도 Engine format이거나
 			// 코드화 된 mesh로 생성될 거다.
 
-			return pGameObject;
+			return gameObj;
 		}
 
 		return nullptr;

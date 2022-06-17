@@ -13,10 +13,10 @@ namespace Dive
 
 	class Transform : public Component
 	{
-	public:
 		COMPONENT_CLASS_TYPE(Transform)
-
-		Transform(GameObject* pGameObject, unsigned long long id = 0);
+	
+	public:
+		Transform(GameObject* pGameObject);
 		~Transform() = default;
 
 		void Clear();
@@ -26,6 +26,7 @@ namespace Dive
 		DirectX::XMVECTOR GetPositionVector() const;
 		void SetPosition(const DirectX::XMFLOAT3& trans);
 		DirectX::XMFLOAT3 GetLocalPosition() const { return m_LocalTranslation; }
+		// 자식이 변환되지 않는 것 같다.
 		void SetLocalPosition(const DirectX::XMFLOAT3& trans) { m_LocalTranslation = trans; }
 
 		// rotation

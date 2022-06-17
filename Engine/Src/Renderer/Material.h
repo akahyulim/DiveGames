@@ -22,8 +22,6 @@ namespace Dive
 	
 	public:
 		Material();
-		Material(unsigned long long id);
-		//Material(const std::string& name = "", unsigned long long id = 0);
 		virtual ~Material();
 
 		Texture2D* GetMap(const eMaterialMapType type);

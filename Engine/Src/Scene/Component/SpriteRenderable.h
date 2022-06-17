@@ -11,10 +11,10 @@ namespace Dive
 
 	class SpriteRenderable : public Renderable
 	{
-	public:
 		COMPONENT_CLASS_TYPE(SpriteRenderable)
 
-		SpriteRenderable(GameObject* pGameObject, unsigned long long id = 0);
+	public:
+		SpriteRenderable(GameObject* pGameObject);
 		~SpriteRenderable();
 
 		void Shutdown();

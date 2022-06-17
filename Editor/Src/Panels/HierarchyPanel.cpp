@@ -58,6 +58,10 @@ void HierarchyPanel::renderWindow()
 	}
 }
 
+// error
+// 현재 GameObject 생성시 InstanceID를 가지지 않아
+// 비교구문이 제대로 동작하지 않는다.
+// 따라서 계층구조를 올바르게 출력하지 못한다.
 void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 {
 	if (!pObject)
@@ -74,7 +78,7 @@ void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 	children.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
 	if (m_pSelectedObject)
 	{
-		nodeFlags |= (m_pSelectedObject->GetInstanceID() == pObject->GetInstanceID()) ? ImGuiTreeNodeFlags_Selected : 0;
+		nodeFlags |= (m_pSelectedObject == pObject) ? ImGuiTreeNodeFlags_Selected : 0;
 	}
 
 	bool bNodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)pObject->GetInstanceID(), nodeFlags, pObject->GetName().c_str());
@@ -86,7 +90,7 @@ void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 
 	if (ImGui::BeginDragDropSource())
 	{
-		unsigned long long id = pObject->GetInstanceID();
+		auto id = pObject->GetInstanceID();
 		ImGui::SetDragDropPayload("HIERARCHY_NODE", &id, sizeof(unsigned long long));
 		ImGui::EndDragDropSource();
 	}
@@ -98,7 +102,7 @@ void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 			auto pId = static_cast<unsigned long long*>(pPayload->Data);
 			auto pDroppedObject = m_pActiveScene->GetGameObject(*pId);
 
-			if (pDroppedObject->GetInstanceID() != pObject->GetInstanceID())
+			if (pDroppedObject != pObject)
 			{
 				if (pDroppedObject->HasComponent<Dive::Transform>())
 				{
@@ -141,7 +145,7 @@ void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 	if (bDelete)
 	{
 		m_pActiveScene->RemoveGameObject(pObject);
-		if (m_pSelectedObject && (m_pSelectedObject->GetInstanceID() == pObject->GetInstanceID()))
+		if (m_pSelectedObject && (m_pSelectedObject == pObject))
 			m_pSelectedObject = nullptr;
 	}
 

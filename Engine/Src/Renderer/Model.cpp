@@ -20,11 +20,6 @@ namespace Dive
     {
     }
 
-    Model::Model(unsigned long long id)
-        : Resource(id)
-    {
-    }
-
     Model::~Model()
     {
         Clear();

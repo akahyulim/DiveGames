@@ -7,12 +7,15 @@ namespace Dive
 	Component::Component(GameObject* pGameObject)
 		: m_pGameObject(pGameObject)
 	{
-		SetName(m_pGameObject->GetName());
 	}
 
-	Component::Component(GameObject* pGameObject, unsigned long long id)
-		: m_pGameObject(pGameObject), Object(id)
-	{
-		SetName(m_pGameObject->GetName());
+	uint64_t Component::GetInstanceID() const 
+	{ 
+		return !m_pGameObject ? 0 : m_pGameObject->GetInstanceID(); 
+	}
+
+	std::string Component::GetName() const 
+	{ 
+		return !m_pGameObject ? std::string() : m_pGameObject->GetName(); 
 	}
 }

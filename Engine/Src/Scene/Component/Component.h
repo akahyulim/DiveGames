@@ -12,22 +12,19 @@ namespace Dive
 		Camera,
 		SpriteRenderable, MeshRenderable, SkinnedMeshRenderable,
 		Light,
-		Terrain,
-		Particle,	// 유니티에서는 ParicleSystem
-		Skybox,
-		Unknown,	// 이건 일단 Base에서 사용하는 곳이 있다.
 		Count
 	};
 
-#define COMPONENT_CLASS_TYPE(type)	static eComponentType GetStaticType() { return eComponentType::type; } \
-									virtual eComponentType GetType() const override { return GetStaticType(); } \
-									virtual const char* GetTypeStr() const override { return #type; }
+#define COMPONENT_CLASS_TYPE(type)	\
+	public:	\
+	static eComponentType GetStaticType() { return eComponentType::type; } \
+	virtual eComponentType GetType() const override { return GetStaticType(); } \
+	virtual const char* GetTypeStr() const override { return #type; }
 
-	class Component : public Object
+	class Component
 	{
 	public:
 		Component(GameObject* pGameObject);
-		Component(GameObject* pGameObject, unsigned long long id);
 		virtual ~Component() = default;
 
 		// 일단 아무도 사용하지 않는다.
@@ -38,8 +35,11 @@ namespace Dive
 		virtual eComponentType GetType() const = 0;
 		virtual const char* GetTypeStr() const = 0;
 
+		uint64_t GetInstanceID() const;
+		std::string GetName() const;
+
 	protected:
-		GameObject* m_pGameObject	= nullptr;
+		GameObject* m_pGameObject = nullptr;
 	};
 
 

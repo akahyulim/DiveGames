@@ -15,10 +15,8 @@
 namespace Dive
 {
 	Scene::Scene(const std::string& name)
-		: m_Name(name)
 	{
-		if (m_Name.empty())
-			m_Name = "Untitled";
+		m_Name = name.empty() ? "Untitled" : name;
 
 		SUBSCRIBE_EVENT(eEventType::ModifyGameObject, EVENT_HANDLER(OnModifyComponents));
 	}
@@ -65,9 +63,9 @@ namespace Dive
 	{
 		if (!m_GameObjects.empty())
 		{
-			for (auto pGameObject : m_GameObjects)
+			for (auto gameObj : m_GameObjects)
 			{
-				DV_DELETE(pGameObject);
+				DV_DELETE(gameObj);
 			}
 			m_GameObjects.clear();
 			m_GameObjects.shrink_to_fit();
@@ -76,6 +74,7 @@ namespace Dive
 
 	void Scene::Serialize(const std::string& filepath)
 	{
+		/*
 		YAML::Emitter out;
 
 		// scene
@@ -221,10 +220,12 @@ namespace Dive
 
 		std::ofstream fout(filepath);
 		fout << out.c_str();
+		*/
 	}
 
 	bool Scene::Deserialize(const std::string& filepath)
 	{
+		/*
 		auto nodes = YAML::LoadAllFromFile(filepath);
 		if (nodes.empty())
 		{
@@ -245,16 +246,16 @@ namespace Dive
 			if (node["GameObject"])
 			{
 				// create game object
-				auto gameObject = node["GameObject"];
-				auto instanceID = gameObject["m_InstanceID"].as<unsigned long long>();
-				auto name = gameObject["m_Name"].as<std::string>();
-				auto bActive = gameObject["m_bActive"].as<int>();
+				auto gameObj = node["GameObject"];
+				auto instanceID = gameObj["m_InstanceID"].as<uint64_t>();
+				auto name = gameObj["m_Name"].as<std::string>();
+				auto bActive = gameObj["m_bActive"].as<int>();
 
-				auto pGameObject = CreateGameObject(name, instanceID);
+				auto pGameObject = CreateGameObject(instanceID, name);
 				pGameObject->SetActive(bActive);
 
 				// create components
-				auto components = gameObject["m_Component"];
+				auto components = gameObj["m_Component"];
 				for (auto component : components)
 				{
 					for (int i = 0; i < (int)eComponentType::Count; i++)
@@ -376,22 +377,29 @@ namespace Dive
 				pLight->SetSpotAngle(spotAngle);
 			}
 		}
-
+		*/
 		return true;
 	}
 
-	GameObject* Scene::CreateGameObject(const std::string& name, unsigned long long id)
+	GameObject* Scene::CreateGameObject(const std::string& name)
 	{
-		// 유니티에 따르자면 Transform이 기본 추가인데...
-		// Deserialize 과정에서 ID를 저장하기 위해 직접 추가하도록 만들어 놓았다.
-		auto pAddedGameObject = m_GameObjects.emplace_back(new GameObject(this, id));
-		pAddedGameObject->SetName(name);
+		auto gameObj = m_GameObjects.emplace_back(new GameObject(this));
+		gameObj->SetInstanceID(Object::GenerateInstanceID());
+		gameObj->SetName(name.empty() ? "GameObject" : name);
 
-		return pAddedGameObject;
+		return gameObj;
 	}
 
-	// 자식까지 모두 제거
-	void Scene::RemoveGameObject(unsigned long long id)
+	GameObject* Scene::CreateGameObject(uint64_t id, const std::string& name)
+	{
+		auto gameObj = m_GameObjects.emplace_back(new GameObject(this));
+		gameObj->SetInstanceID(id);
+		gameObj->SetName(name.empty() ? "GameObject" : name);
+
+		return gameObj;
+	}
+
+	void Scene::RemoveGameObject(uint64_t id)
 	{
 		if (m_GameObjects.empty())
 			return;
@@ -399,28 +407,29 @@ namespace Dive
 		if (!m_bDirty)
 			m_bDirty = true;
 
-		for (auto pGameObject : m_GameObjects)
+		// 재귀호출로 자식들까지 모두 제거
+		for (auto gameObj : m_GameObjects)
 		{
-			if (pGameObject->GetInstanceID() == id)
+			if (gameObj->GetInstanceID() == id)
 			{
-				auto pTransform = pGameObject->GetComponent<Transform>();
-				if (pTransform)
+				auto transformCom = gameObj->GetComponent<Transform>();
+				if (transformCom)
 				{
-					if (pTransform->HasChildren())
+					if (transformCom->HasChildren())
 					{
-						for (auto pChild : pTransform->GetChildren())
+						for (auto child : transformCom->GetChildren())
 						{
-							RemoveGameObject(pChild->GetGameObject()->GetInstanceID());
+							RemoveGameObject(child->GetGameObject()->GetInstanceID());
 						}
 					}
 
-					if (pTransform->HasParent())
+					if (transformCom->HasParent())
 					{
-						pTransform->SetParent(nullptr);
+						transformCom->SetParent(nullptr);
 					}
 				}
 
-				pGameObject->MarkRemoveTarget();
+				gameObj->MarkRemoveTarget();
 			}
 		}
 	}
@@ -433,12 +442,12 @@ namespace Dive
 		RemoveGameObject(pTarget->GetInstanceID());
 	}
 
-	GameObject* Scene::GetGameObject(unsigned long long id)
+	GameObject* Scene::GetGameObject(uint64_t id)
 	{
-		for (auto pGameObject : m_GameObjects)
+		for (auto gameObj : m_GameObjects)
 		{
-			if (pGameObject->GetInstanceID() == id)
-				return pGameObject;
+			if (gameObj->GetInstanceID() == id)
+				return gameObj;
 		}
 
 		return nullptr;
@@ -448,19 +457,19 @@ namespace Dive
 	{
 		std::vector<GameObject*> roots;
 
-		for (auto& pGameObject : m_GameObjects)
+		for (auto& gameObj : m_GameObjects)
 		{
-			auto pTransform = pGameObject->GetComponent<Transform>();
+			auto pTransform = gameObj->GetComponent<Transform>();
 			if( pTransform )
 			{
 				if (!pTransform->HasParent())
 				{
-					roots.emplace_back(pGameObject);
+					roots.emplace_back(gameObj);
 				}
 			}
 			else
 			{
-				roots.emplace_back(pGameObject);
+				roots.emplace_back(gameObj);
 			}
 		}
 
@@ -476,15 +485,15 @@ namespace Dive
 		return components;
 	}
 
-	Component* Scene::GetComponent(eComponentType type, unsigned long long id)
+	Component* Scene::GetComponent(eComponentType type, uint64_t id)
 	{
 		auto components = GetComponents(type);
 		if (!components.empty())
 		{
-			for (auto pComponent : components)
+			for (auto com : components)
 			{
-				if (pComponent->GetInstanceID() == id)
-					return pComponent;
+				if (com->GetInstanceID() == id)
+					return com;
 			}
 		}
 
@@ -496,14 +505,14 @@ namespace Dive
 	{
 		m_bDirty = true;
 
-		auto pComponent = dynamic_cast<const ModifyGameObjectEvent&>(e).GetComponent();
-		auto type = pComponent->GetType();
+		auto com = dynamic_cast<const ModifyGameObjectEvent&>(e).GetComponent();
+		auto type = com->GetType();
 		if (!m_Components[type].empty())
 		{
 			auto it = m_Components[type].begin();
 			for (it; it != m_Components[type].end(); it++)
 			{
-				if ((*it)->GetInstanceID() == pComponent->GetInstanceID())
+				if ((*it)->GetInstanceID() == com->GetInstanceID())
 				{
 					m_Components[type].erase(it);
 					return;
@@ -511,7 +520,7 @@ namespace Dive
 			}
 		}
 
-		m_Components[type].push_back(const_cast<Component*>(pComponent));
+		m_Components[type].push_back(const_cast<Component*>(com));
 	}
 
 }

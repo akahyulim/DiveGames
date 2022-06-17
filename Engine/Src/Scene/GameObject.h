@@ -26,58 +26,56 @@ namespace Dive
 	{
 	public:
 		GameObject(Scene* pScene);
-		GameObject(Scene* pScene, unsigned long long id);
-		//GameObject(Scene* pScene, const std::string& name = std::string(), unsigned long long id = 0);
 		~GameObject();
 
 		template<class T>
-		T* AddComponent(unsigned long long id = 0)
+		T* AddComponent()
 		{
 			if (HasComponent<T>())
 				return GetComponent<T>();
 
-			T* pAddedComponent = dynamic_cast<T*>(m_Components.emplace_back(new T(this, id)));
+			auto newCom = dynamic_cast<T*>(m_Components.emplace_back(new T(this)));
 
-			FIRE_EVENT(ModifyGameObjectEvent(static_cast<Component*>(pAddedComponent)));
+			FIRE_EVENT(ModifyGameObjectEvent(static_cast<Component*>(newCom)));
 
-			return pAddedComponent;
+			return newCom;
 		}
 
-		Component* AddComponent(eComponentType type, unsigned long long id = 0)
+		Component* AddComponent(eComponentType type)
 		{
 			if (HasComponent(type))
 				return GetComponent(type);
 
-			Component* pAddedComponent = nullptr;
+			Component* newCom = nullptr;
 
 			switch (type)
 			{
 			case eComponentType::Transform:
-				pAddedComponent = new Transform(this, id);
+				newCom = new Transform(this);
 				break;
 			case eComponentType::Camera:
-				//pAddedComponent = new Camera(this, id);
+				//newCom = new Camera(this);
 				break;
 			case eComponentType::SpriteRenderable:
-				pAddedComponent = new SpriteRenderable(this, id);
+				newCom = new SpriteRenderable(this);
 				break;
 			case eComponentType::MeshRenderable:
-				pAddedComponent = new MeshRenderable(this, id);
+				newCom = new MeshRenderable(this);
 				break;
 
 			case eComponentType::Light:
-				pAddedComponent = new Light(this, id);
+				newCom = new Light(this);
 				break;
 
 			default:
 				return nullptr;
 			}
 
-			m_Components.emplace_back(pAddedComponent);
+			m_Components.emplace_back(newCom);
 
-			FIRE_EVENT(ModifyGameObjectEvent(pAddedComponent));
+			FIRE_EVENT(ModifyGameObjectEvent(newCom));
 
-			return pAddedComponent;
+			return newCom;
 		}
 		
 		template<class T>
@@ -105,9 +103,9 @@ namespace Dive
 
 		bool HasComponent(eComponentType type)
 		{
-			for (auto pComponent : m_Components)
+			for (auto com : m_Components)
 			{
-				if (pComponent->GetType() == type)
+				if (com->GetType() == type)
 					return true;
 			}
 
@@ -124,11 +122,11 @@ namespace Dive
 		template<class T>
 		T* GetComponent()
 		{
-			for (auto pComponent : m_Components)
+			for (auto com : m_Components)
 			{
-				if (pComponent->GetType() == T::GetStaticType())
+				if (com->GetType() == T::GetStaticType())
 				{
-					return dynamic_cast<T*>(pComponent);
+					return dynamic_cast<T*>(com);
 				}
 			}
 
@@ -137,10 +135,10 @@ namespace Dive
 
 		Component* GetComponent(eComponentType type)
 		{
-			for (auto pComponent : m_Components)
+			for (auto com : m_Components)
 			{
-				if (pComponent->GetType() == type)
-					return static_cast<Component*>(pComponent);
+				if (com->GetType() == type)
+					return static_cast<Component*>(com);
 			}
 
 			return nullptr;
