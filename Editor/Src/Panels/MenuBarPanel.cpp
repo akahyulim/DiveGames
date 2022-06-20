@@ -161,16 +161,16 @@ void MenuBarPanel::menuGameObject()
 					// 유니티에선 스크립트 차원에서 함수가 존재한다.
 					// GameObject의 CreatePrimitive였나...
 
-					// 일단 스파르탄의 경우 static 함수로 만들었다.
-					// 과정은
-					// 1. 빈 게임오브젝트 생성
-					// 2. Renderable component 추가
-					// 3. Renderable에서 GeometrySet & UseDefaultMaterial
-					// 4. 마지막으로 이름 설정
-					// => 분석 결과 Model을 직접생성하고, vertices, indices를 직접 전달하여
-					// 버퍼를 생성한 후 해당 Renderable이 관리한다.
-					// 즉, Resource로서의 관리가 전혀 되지 않고 있다.
-					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cube.obj");
+					if (Dive::ResourceManager::GetInstance().HasResource<Dive::Model>("Cube"))
+					{
+						auto cube = Dive::ResourceManager::GetInstance().GetResource<Dive::Model>("Cube");
+						// game object를 얻을 수 없다...
+						// 사실 이름으로 찾는 것도 에바다.
+					}
+					else
+					{
+						Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cube.obj");
+					}
 				}
 			}
 

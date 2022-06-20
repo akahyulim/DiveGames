@@ -18,6 +18,13 @@ namespace Dive
 		bool operator!=(const Object& rhs);
 		bool operator==(const Object& rhs);
 
+		// 유니티의 interface지만
+		// virtual과 static은 양립할 수 없다...
+		// 직접 derived type을 확인한 후 복사하는 함수를 만들 순 있다.
+		// 일단은 GameObject에 생성하자.
+		//static Object* Instantiate(Object* pOriginal);
+		//static void Destroy(Object* pObj);
+
 	private:
 		Object(const Object&) = delete;
 

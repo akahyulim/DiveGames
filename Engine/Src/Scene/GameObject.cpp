@@ -23,6 +23,45 @@ namespace Dive
 		m_Components.clear();
 	}
 
+	GameObject* GameObject::Clone()
+	{
+		if(!m_pScene)
+			return nullptr;
+
+		auto clone = m_pScene->CreateGameObject();
+		clone->SetName(this->GetName());
+		clone->SetActive(this->IsActive());
+
+		if (HasComponent<Transform>())
+		{
+			auto cloneTransform = clone->GetComponent<Transform>();
+			if (!cloneTransform)
+				cloneTransform = clone->AddComponent<Transform>();
+
+			this->GetComponent<Transform>()->CopyAttributes(cloneTransform);
+		}
+		if (HasComponent<MeshRenderable>())
+		{
+			auto cloneMeshRenderable = clone->AddComponent<MeshRenderable>();
+			this->GetComponent<MeshRenderable>()->CopyAttributes(cloneMeshRenderable);
+		}
+		if (HasComponent<Light>())
+		{
+			auto cloneLight = clone->AddComponent<Light>();
+			this->GetComponent<Light>()->CopyAttributes(cloneLight);
+		}
+
+		auto children = GetComponent<Transform>()->GetChildren();
+		GameObject* childClone = nullptr;
+		for (auto child : children)
+		{
+			childClone = child->GetGameObject()->Clone();
+			childClone->GetComponent<Transform>()->SetParent(clone->GetComponent<Transform>());
+		}
+
+		return clone;
+	}
+
 	// 유니티 UI로 만들어 본 함수다. 이외에도 static 함수들이 몇 개 더 있다.
 	// Instantiate()는 Object로 부터 상속된 static 함수다.
 	GameObject* GameObject::CreatePrimitive(Scene* pScene, ePrimitiveType type)

@@ -38,6 +38,8 @@ namespace Dive
 		uint64_t GetInstanceID() const;
 		std::string GetName() const;
 
+		virtual void CopyAttributes(Component* pCloneCom) {}
+
 	protected:
 		GameObject* m_pGameObject = nullptr;
 	};

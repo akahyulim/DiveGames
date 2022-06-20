@@ -18,6 +18,8 @@ namespace Dive
 		MeshRenderable(GameObject* pGameObject);
 		~MeshRenderable();
 
+		void CopyAttributes(Component* pCloneCom) override;
+
 		// 추후 bounding box까지
 		void SetGeometry(const std::string& name, unsigned int vertexOffset, unsigned int vertexCount,
 			unsigned int indexOffset, unsigned int indexCount, Model* pModel);

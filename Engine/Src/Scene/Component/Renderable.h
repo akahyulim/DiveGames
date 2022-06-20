@@ -23,7 +23,7 @@ namespace Dive
 		bool HasMaterial() const { return m_pMaterial != nullptr; }
 
 	protected:
-	private:
+	protected:
 		// ¹öÆÛ
 		// count
 		// stride

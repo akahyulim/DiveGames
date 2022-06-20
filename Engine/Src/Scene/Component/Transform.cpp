@@ -21,6 +21,21 @@ namespace Dive
 		DirectX::XMStoreFloat4x4(&m_Matrix, DirectX::XMMatrixIdentity());
 	}
 
+	void Transform::CopyAttributes(Component* pCloneCom)
+	{
+		if (!pCloneCom)
+			return;
+
+		auto clone = dynamic_cast<Transform*>(pCloneCom);
+		if (!clone)
+			return;
+
+		clone->m_LocalTranslation = this->m_LocalTranslation;
+		clone->m_LocalScale = this->m_LocalScale;
+		clone->m_LocalRotation = this->m_LocalRotation;
+		clone->m_Matrix = this->m_Matrix;
+	}
+
 	DirectX::XMFLOAT3 Transform::GetPosition() const
 	{
 		return *((DirectX::XMFLOAT3*)&m_Matrix._41);

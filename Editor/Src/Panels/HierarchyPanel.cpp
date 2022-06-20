@@ -1,5 +1,7 @@
 #include "HierarchyPanel.h"
 
+// 현재 창이 선택된 상태에서 esc를 누르면 Selected를 해제하고 싶다.
+// 이는 ScenePanel에도 적용되어야 한다.
 HierarchyPanel::HierarchyPanel(Editor* pEditor)
 	: Panel(pEditor, "Hierarchy")
 {
@@ -58,10 +60,6 @@ void HierarchyPanel::renderWindow()
 	}
 }
 
-// error
-// 현재 GameObject 생성시 InstanceID를 가지지 않아
-// 비교구문이 제대로 동작하지 않는다.
-// 따라서 계층구조를 올바르게 출력하지 못한다.
 void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 {
 	if (!pObject)
@@ -134,7 +132,8 @@ void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 
 	if (bCopy)
 	{
-
+		if (m_pSelectedObject)
+			m_pSelectedObject->Clone();
 	}
 
 	if (bRename)

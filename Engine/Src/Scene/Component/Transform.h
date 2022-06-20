@@ -21,6 +21,8 @@ namespace Dive
 
 		void Clear();
 
+		void CopyAttributes(Component* pCloneCom) override;
+
 		// position
 		DirectX::XMFLOAT3 GetPosition() const;
 		DirectX::XMVECTOR GetPositionVector() const;

@@ -20,6 +20,8 @@ namespace Dive
 		Light(GameObject* pGameObject);
 		~Light();
 
+		void CopyAttributes(Component* pCloneCom) override;
+
 		eLightType GetLightType() const { return m_LightType; }
 		void SetLightType(eLightType type) { m_LightType = type; }
 

@@ -159,6 +159,8 @@ namespace Dive
 		Scene* GetScene() { return m_pScene; }
 		void SetScene(Scene* pScene) { m_pScene = pScene; }
 
+		GameObject* Clone();
+
 		static GameObject* CreatePrimitive(Scene* pScene, ePrimitiveType type);
 
 
