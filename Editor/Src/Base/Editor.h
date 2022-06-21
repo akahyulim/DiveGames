@@ -31,6 +31,8 @@ public:
 	unsigned int GetWidth() const;
 	unsigned int GetHeight() const;
 
+	HWND GetWindowHandle() { return m_hWnd; }
+
 	// 꼭! 좀 더 직관적인 방법을 찾자!
 	MenuBarPanel* GetMenuBar() { return m_pMenuBar; }
 	ScenePanel* GetScene() { return m_pScene; }
@@ -39,6 +41,9 @@ public:
 	AssetPanel* GetAsset() { return m_pAsset; }
 
 	SceneViewCamera* GetSceneViewCamera() { return &m_SceneViewCamera; }
+
+	static std::string FileOpen(const char* filter);
+	static std::string SaveFile(const char* filter);
 
 private:
 	// editor's window

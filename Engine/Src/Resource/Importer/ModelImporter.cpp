@@ -269,8 +269,17 @@ namespace Dive
                 {
                     const auto& texPath = Helper::FileSystem::GetDirectory(params.filepath) + path.C_Str();
                     auto pTex = new Texture2D;
+                    //if (!pTex->LoadFromFile(texPath))
                     pTex->LoadFromFile(texPath);
-                    pMaterial->SetMap(diveType, pTex);
+                    {
+                        // юс╫ц
+                    //    delete pTex;
+                        
+                     //   if(diveType == eMaterialMapType::Albedo)
+                      //      pTex = ResourceManager::GetInstance().Load<Texture2D>("Assets/Textures/no_texture.png");
+                    }
+                   // if(pTex)
+                        pMaterial->SetMap(diveType, pTex);
 
                     DV_CORE_INFO("mtrl tex: {:s}", path.C_Str());
 

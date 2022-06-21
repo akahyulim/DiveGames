@@ -240,28 +240,93 @@ void InspectorPanel::drawMeshRenderer(Dive::GameObject* pSelectedObject)
 	if (!pMeshRenderable)
 		return;
 
-	// 현재 MeshRenderable이 아닌 Material을 보여주고 있다.
 	if (ImGui::CollapsingHeader("Mesh Renderable", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 	{
-		// 현재 이게 없을 수도 있다. 그러한 경우 아래와 같이 임의 처리를 해놓았다.
-		// 그런데 추후 이게 없으면 안될 수 있다.
-		// => Default Material을 무조건 주는 것이 맞을 것 같다.
-		auto pMaterial = pMeshRenderable->GetMaterial();
-
 		// enabled
 		bool enabled = pMeshRenderable->IsEnabled();
 		ImGui::Checkbox("Enabled", &enabled);
 		pMeshRenderable->SetEnable(enabled);
 
-		// Color
-		DirectX::XMFLOAT4 color = pMaterial != nullptr ? pMaterial->GetAlbedoColor() : DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-		float col[4] = { color.x, color.y, color.z, color.w };
-		ImGui::Text("Albedo Color");
-		ImGui::SameLine();
-		ImGui::ColorEdit4("##background", col);
-		color = DirectX::XMFLOAT4(col[0], col[1], col[2], col[3]);
-		if(pMaterial)
+
+		// cast shadows
+
+		// receive shadows
+
+
+		// 현재 MeshRenderable이 아닌 Material을 보여주고 있다.
+		// 실제로는 선택을 하면 따로 창을 띄워 보여주던지, 유니티처럼 아래 정렬로 따로 보여 줘야 한다. 
+
+		// 현재 이게 없을 수도 있다. 그러한 경우 아래와 같이 임의 처리를 해놓았다.
+		// 그런데 추후 이게 없으면 안될 수 있다.
+		// => Default Material을 무조건 주는 것이 맞을 것 같다.
+		auto pMaterial = pMeshRenderable->GetMaterial();
+		if (pMaterial)
+		{
+			// Rendering Mode(opaque)
+
+			// albedo
+			// 단순 버튼을 통한 것인지, 아니면 실제 텍스쳐를 출력하는지 확인이 필요하다.
+			if (ImGui::Button("*"))
+			{
+				auto path = Editor::FileOpen("Image Files (*.bmp;*.png;*.jpg;*.jpeg)\0*.bmp;*.png;*.jpg;*.jpeg");
+				if(!path.empty())
+				{
+					const auto* pAlbedoTex = Dive::ResourceManager::GetInstance().Load<Dive::Texture2D>(path);
+					// 이것두 아래로 내리는 편이 나아 보인다.
+					pMaterial->SetMap(Dive::eMaterialMapType::Albedo, pAlbedoTex);
+				}
+			}
+			ImGui::SameLine();
+			ImGui::Text("Albedo");
+			ImGui::SameLine();
+			DirectX::XMFLOAT4 color = pMaterial->GetAlbedoColor();
+			float col[4] = { color.x, color.y, color.z, color.w };
+			ImGui::ColorEdit4("##background", col);
+			color = DirectX::XMFLOAT4(col[0], col[1], col[2], col[3]);
+
+			// metallic
+			ImGui::Text("Metallic");
+
+			// normal map
+			ImGui::Text("Normal Map");
+
+			// hight map
+			ImGui::Text("Hight Map");
+
+			// tiling
+			auto tiling = pMaterial->GetTiling();
+			ImGui::Text("Tiling");
+			ImGui::SameLine();
+			ImGui::Text("X");
+			ImGui::PushItemWidth(128.0);	// 기준이 뭐일까?
+			ImGui::SameLine();
+			ImGui::InputFloat("##tilingX", &tiling.x, 0.01f, 0.1f, "%.2f", ImGuiInputTextFlags_CharsDecimal);
+			ImGui::SameLine();
+			ImGui::Text("Y");
+			ImGui::SameLine();
+			ImGui::InputFloat("##tilingY", &tiling.y, 0.01f, 0.1f, "%.2f", ImGuiInputTextFlags_CharsDecimal);
+			ImGui::PopItemWidth();
+			
+
+			// offset
+			auto offset = pMaterial->GetOffset();
+			ImGui::Text("Offset");
+			ImGui::SameLine();
+			ImGui::Text("X");
+			ImGui::PushItemWidth(128.0);
+			ImGui::SameLine();
+			ImGui::InputFloat("##offsetX", &offset.x, 0.01f, 0.1f, "%.2f", ImGuiInputTextFlags_CharsDecimal);
+			ImGui::SameLine();
+			ImGui::Text("Y");
+			ImGui::SameLine();
+			ImGui::InputFloat("##offsetY", &offset.y, 0.01f, 0.1f, "%.2f", ImGuiInputTextFlags_CharsDecimal);
+			ImGui::PopItemWidth();
+
+			// 모아서 하는 편이 나아보인다.
 			pMaterial->SetAlbedoColor(color);
+			pMaterial->SetTiling(tiling);	// 현재 미적용
+			pMaterial->SetOffset(offset);	// 현재 미적용
+		}
 	}
 
 	ImGui::Separator();

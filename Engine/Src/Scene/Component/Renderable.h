@@ -12,6 +12,8 @@ namespace Dive
 		Renderable(GameObject* pGameObject) : Component(pGameObject) {}
 		virtual ~Renderable() = default;
 
+		void CopyAttributes(Component* pCloneCom) override;
+
 		// Behaviour의 Enalbed랑은 다르다. 이건 보이느냐 마느냐이다.
 		bool IsEnabled() const { return m_bEnabled; }
 		void SetEnable(bool enable) { m_bEnabled = enable; }
@@ -20,7 +22,10 @@ namespace Dive
 
 		Material* GetMaterial() { return m_pMaterial; }
 		void SetMaterial(Material* pMaterial);
+		void SetMaterial(const std::string& filepath);
+		std::string GetMaterialName() const;
 		bool HasMaterial() const { return m_pMaterial != nullptr; }
+		void UseDefaultMaterial();
 
 	protected:
 	protected:

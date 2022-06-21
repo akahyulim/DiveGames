@@ -169,6 +169,8 @@ void MenuBarPanel::menuGameObject()
 					}
 					else
 					{
+						// 이렇게 할 경우 일단 Material은 파일로부터 생성해버린다.
+						// 그리고 GameObject를 얻을 수 없어 UseDefaultMaterial()도 적용할 수 없다...
 						Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cube.obj");
 					}
 				}

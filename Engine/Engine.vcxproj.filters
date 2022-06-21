@@ -222,7 +222,6 @@
     <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp">
       <Filter>Src\Resource\Importer</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Scene\Component\Renderable.cpp" />
     <ClCompile Include="Src\Scene\Component\Light.cpp">
       <Filter>Src\Scene\Component</Filter>
     </ClCompile>
@@ -234,6 +233,9 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Graphics\Texture2D.cpp">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Renderable.cpp">
+      <Filter>Src\Scene\Component</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

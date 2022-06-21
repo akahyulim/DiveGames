@@ -9,6 +9,8 @@
 #include "Panels/InspectorPanel.h"
 #include "Panels/AssetPanel.h"
 
+#include <commdlg.h>
+
 static Editor* s_pEditor = nullptr;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -223,6 +225,58 @@ unsigned int Editor::GetHeight() const
 	::GetClientRect(m_hWnd, &rt);
 
 	return static_cast<unsigned int>(rt.bottom - rt.top);
+}
+
+std::string Editor::FileOpen(const char* filter)
+{
+	if (!s_pEditor)
+		return std::string();
+
+	OPENFILENAMEA ofn;
+	CHAR szFile[260] = { 0 };
+	CHAR currentDir[256] = { 0 };
+	ZeroMemory(&ofn, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = s_pEditor->GetWindowHandle();
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile);
+	if (GetCurrentDirectoryA(256, currentDir))
+		ofn.lpstrInitialDir = currentDir;
+	ofn.lpstrFilter = filter;
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+	if (GetOpenFileNameA(&ofn) == TRUE)
+		return ofn.lpstrFile;
+
+	return std::string();
+}
+
+std::string Editor::SaveFile(const char* filter)
+{
+	if (!s_pEditor)
+		return std::string();
+
+	OPENFILENAMEA ofn;
+	CHAR szFile[260] = { 0 };
+	CHAR currentDir[256] = { 0 };
+	ZeroMemory(&ofn, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = s_pEditor->GetWindowHandle();
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile);
+	if (GetCurrentDirectoryA(256, currentDir))
+		ofn.lpstrInitialDir = currentDir;
+	ofn.lpstrFilter = filter;
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_NOCHANGEDIR;
+
+	ofn.lpstrDefExt = strchr(filter, '\0') + 1;
+
+	if (GetSaveFileNameA(&ofn) == TRUE)
+		return ofn.lpstrFile;
+
+	return std::string();
 }
 
 void Editor::createWindow(HINSTANCE hInstance)
