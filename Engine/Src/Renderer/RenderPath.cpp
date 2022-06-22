@@ -232,10 +232,12 @@ namespace Dive
 								// map & unmap
 								auto pPtr = static_cast<UberBuffer*>(pCbUber->Map());
 								pPtr->world = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
-								pPtr->materialColor = pMaterial->GetAlbedoColor();
-								pPtr->materialTextures = 0;
-								pPtr->materialTextures |= pMaterial->HasMap(eMaterialMapType::Albedo) ? (1U << 0) : 0;
-								pPtr->materialTextures |= pMaterial->HasMap(eMaterialMapType::Normal) ? (1U << 1) : 0;
+								pPtr->mtrlColor = pMaterial->GetAlbedoColor();
+								pPtr->mtrlTiling = pMaterial->GetTiling();
+								pPtr->mtrlOffset = pMaterial->GetOffset();
+								pPtr->mtrlTextures = 0;
+								pPtr->mtrlTextures |= pMaterial->HasMap(eMaterialMapType::Albedo) ? (1U << 0) : 0;
+								pPtr->mtrlTextures |= pMaterial->HasMap(eMaterialMapType::Normal) ? (1U << 1) : 0;
 								pCbUber->Unmap();
 
 								pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);
@@ -273,11 +275,11 @@ namespace Dive
 		PipelineState ps;
 
 		// PreRender
-		auto pGBufferAlbedo			= Renderer::GetGBufferAlbedo()->GetRenderTargetView();
-		auto pGBufferNormal			= Renderer::GetGBufferNormal()->GetRenderTargetView();
-		auto pGBufferMaterial		= Renderer::GetGBufferMaterial()->GetRenderTargetView();
-		auto pGBufferDepthStencil	= Renderer::GetDepthStencilTexture()->GetDepthStencilView();
-		auto pDepthStencilState		= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthWriteLess_StencilOn);
+		auto pGBufferAlbedo	= Renderer::GetGBufferAlbedo()->GetRenderTargetView();
+		auto pGBufferNormal	= Renderer::GetGBufferNormal()->GetRenderTargetView();
+		auto pGBufferMaterial = Renderer::GetGBufferMaterial()->GetRenderTargetView();
+		auto pGBufferDepthStencil = Renderer::GetDepthStencilTexture()->GetDepthStencilView();
+		auto pDepthStencilState	= Renderer::GetDepthStencilState(eDepthStencilStateType::DepthWriteLess_StencilOn);
 
 		// clear
 		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -328,10 +330,12 @@ namespace Dive
 						// map & unmap
 						auto pPtr = static_cast<UberBuffer*>(pCbUber->Map());
 						pPtr->world = DirectX::XMMatrixTranspose(pTransform->GetMatrix());
-						pPtr->materialColor = pMaterial->GetAlbedoColor();
-						pPtr->materialTextures = 0;
-						pPtr->materialTextures |= pMaterial->HasMap(eMaterialMapType::Albedo) ? (1U << 0) : 0;
-						pPtr->materialTextures |= pMaterial->HasMap(eMaterialMapType::Normal) ? (1U << 1) : 0;
+						pPtr->mtrlColor = pMaterial->GetAlbedoColor();
+						pPtr->mtrlTiling = pMaterial->GetTiling();
+						pPtr->mtrlOffset = pMaterial->GetOffset();
+						pPtr->mtrlTextures = 0;
+						pPtr->mtrlTextures |= pMaterial->HasMap(eMaterialMapType::Albedo) ? (1U << 0) : 0;
+						pPtr->mtrlTextures |= pMaterial->HasMap(eMaterialMapType::Normal) ? (1U << 1) : 0;
 						pCbUber->Unmap();
 
 						//pCl->SetConstantBuffer(Scope_Vertex | Scope_Pixel, eConstantBufferSlot::Uber, pCbUber);

@@ -3,6 +3,16 @@
 
 namespace Dive
 {
+	enum class ePrimitiveType
+	{
+		Sphere,
+		Capsule,
+		Cylinder,
+		Cube,
+		Plane,
+		Quad
+	};
+
 	class GameObject;
 	class Model;
 
@@ -23,6 +33,8 @@ namespace Dive
 		// 추후 bounding box까지
 		void SetGeometry(const std::string& name, unsigned int vertexOffset, unsigned int vertexCount,
 			unsigned int indexOffset, unsigned int indexCount, Model* pModel);
+
+		void SetPrimitiveGeometry(ePrimitiveType type);
 
 		std::string GetGeometryName() const { return m_GeometryName; }
 

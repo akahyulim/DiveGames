@@ -18,7 +18,7 @@ Pixel_Input mainVS(Vertex_PosTexNorTan input)
 	output.position = mul(output.position, g_View);
 	output.position = mul(output.position, g_Proj);
 
-	output.texCoord = input.texCoord;
+	output.texCoord = (input.texCoord / g_MtrlTiling) + g_MtrlOffset;
 
 	output.normal = mul(input.normal, (float3x3)g_World);
 	output.normal = normalize(output.normal);
@@ -40,10 +40,11 @@ Pixel_GBuffer_Out mainPS(Pixel_Input input)
 {
 	Pixel_GBuffer_Out output;
 
-	float4 albedo = g_MatColor;
+	float4 albedo = g_MtrlColor;
 	if (HasAlbedoTexture())
 	{
 		// map이 있다면 material color는 무시하는 것이 맞겠지?
+		// => 유니티의 경우 위에 적용됐다.
 		albedo = material_Albedo.Sample(LinearSampler, input.texCoord);
 		albedo.w = 1.0f;
 	}

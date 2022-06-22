@@ -23,9 +23,12 @@ namespace Dive
 	{
 		DirectX::XMMATRIX world = DirectX::XMMatrixIdentity();
 
-		DirectX::XMFLOAT4 materialColor = { 0.0f, 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT4 mtrlColor = { 0.0f, 0.0f, 0.0f, 0.0f };
 
-		unsigned int materialTextures = 0;
+		DirectX::XMFLOAT2 mtrlTiling = { 1.0f, 1.0f };
+		DirectX::XMFLOAT2 mtrlOffset = { 0.0f, 0.0f };
+
+		unsigned int mtrlTextures = 0;
 		unsigned int padding[3] = { 0 };
 	};
 

@@ -46,4 +46,11 @@ namespace Dive
 		m_IndexCount	= indexCount;
 		m_pModel		= pModel;
 	}
+
+	void MeshRenderable::SetPrimitiveGeometry(ePrimitiveType type)
+	{
+		// 일단 Model이 존재하는지 알아본다. 
+
+		// 일단 vertices, indices를 가져온다.
+	}
 }

@@ -18,10 +18,13 @@ cbuffer UberBuffer : register(b1)
 {
 	matrix g_World;
 
-	float4 g_MatColor;
+	float4 g_MtrlColor;
+
+	float2 g_MtrlTiling;
+	float2 g_MtrlOffset;
 
 	// pdding¿ª ≤¿ ∏¬√Á¡‡æﬂ «—¥Ÿ..
-	uint g_MatTextures;
+	uint g_MtrlTextures;
 	uint3 g_Padding;
 }
 
@@ -52,8 +55,8 @@ cbuffer LightBuffer : register(b3)
 	uint g_LightOptions		: packoffset(c2.w);
 }
 
-bool HasAlbedoTexture() { return g_MatTextures & uint(1U << 0); }
-bool HasNormalTexture() { return g_MatTextures & uint(1U << 1); }
+bool HasAlbedoTexture() { return g_MtrlTextures & uint(1U << 0); }
+bool HasNormalTexture() { return g_MtrlTextures & uint(1U << 1); }
 
 bool HasSpriteTexture() { return g_SpriteOptions & uint(1U << 0); }
 bool IsSpriteFlipX() { return g_SpriteOptions & uint(1U << 1); }

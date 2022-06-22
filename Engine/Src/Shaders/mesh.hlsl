@@ -132,7 +132,7 @@ Pixel_GBuffer_Out mainPS(Pixel_Input input)
 	Pixel_GBuffer_Out output;
 
 	// albedo
-	float4 albedo = g_MatColor;
+	float4 albedo = g_MtrlColor;
 	if (HasAlbedoTexture())
 	{
 		// map이 있다면 material color는 무시하는 것이 맞겠지?

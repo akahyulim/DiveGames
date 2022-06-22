@@ -72,6 +72,10 @@ namespace Dive
 		auto pGameObject = pScene->CreateGameObject();
 		auto pMeshRenderable = pGameObject->AddComponent<MeshRenderable>();
 
+		// 최초엔 Model을 직접 생성해 버퍼를 구성하는 것이 맞다.
+		// 하지만 이후엔 복사를 통해 기존 버퍼를 재사용해야 한다.
+		// 이는 커스텀 오브젝트 역시 마찬가지다.
+		// 오리지날을 따로 관리하지 않는다면 삭제했을 경우 복제본들에 문제가 생긴다.
 		switch (type)
 		{
 		case ePrimitiveType::Sphere:

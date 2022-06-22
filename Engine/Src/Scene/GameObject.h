@@ -12,16 +12,6 @@ namespace Dive
 {
 	class Scene;
 
-	enum class ePrimitiveType
-	{
-		Sphere,
-		Capsule,
-		Cylinder,
-		Cube,
-		Plane,
-		Quad
-	};
-
 	class GameObject : public Object
 	{
 	public:

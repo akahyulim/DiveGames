@@ -37,11 +37,17 @@ namespace Dive
 		const DirectX::XMFLOAT2 GetOffset() const { return m_Offset; }
 		void SetOffset(const DirectX::XMFLOAT2& offset) { m_Offset = offset; }
 
+		// SetEditable()은 에바다. 하지만 어딘가에서 설정은 필요하다.
+		bool IsEditable() const { return m_bEditable; }
+
 		bool SaveToFile(const std::string& filepath) override;
 		bool LoadFromFile(const std::string& filepath) override;
 
 	private:
 	private:
+		// 수정이 불가능한 것도 있다. 예를 들면 Default Material
+		bool m_bEditable = true;
+
 		// shader
 		// rendering mode
 

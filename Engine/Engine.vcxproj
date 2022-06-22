@@ -201,6 +201,7 @@
     <ClInclude Include="Src\Renderer\RenderPath.h" />
     <ClInclude Include="Src\Resource\FileStream.h" />
     <ClInclude Include="Src\Resource\Importer\ModelImporter.h" />
+    <ClInclude Include="Src\Resource\PrimitiveGeometry.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceManager.h" />
     <ClInclude Include="Src\Scene\Component\Camera.h" />
