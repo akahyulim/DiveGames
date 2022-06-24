@@ -167,6 +167,7 @@
     <ClCompile Include="Src\Base\Editor.cpp" />
     <ClCompile Include="Src\Base\EditorRenderPath.cpp" />
     <ClCompile Include="Src\Base\SceneViewCamera.cpp" />
+    <ClCompile Include="Src\Importer\ModelImporter.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Panels\AssetPanel.cpp" />
     <ClCompile Include="Src\Panels\HierarchyPanel.cpp" />
@@ -194,6 +195,7 @@
     <ClInclude Include="Src\Base\Editor.h" />
     <ClInclude Include="Src\Base\EditorRenderPath.h" />
     <ClInclude Include="Src\Base\SceneViewCamera.h" />
+    <ClInclude Include="Src\Importer\ModelImporter.h" />
     <ClInclude Include="Src\Panels\AssetPanel.h" />
     <ClInclude Include="Src\Panels\HierarchyPanel.h" />
     <ClInclude Include="Src\Panels\InspectorPanel.h" />

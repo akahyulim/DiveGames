@@ -130,6 +130,9 @@
     <ClInclude Include="Src\Resource\PrimitiveGeometry.h">
       <Filter>Src\Resource</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\DvModel.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -239,6 +242,9 @@
     </ClCompile>
     <ClCompile Include="Src\Scene\Component\Renderable.cpp">
       <Filter>Src\Scene\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\DvModel.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

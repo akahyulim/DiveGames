@@ -8,6 +8,7 @@
 #include "panels/HierarchyPanel.h"
 #include "Panels/InspectorPanel.h"
 #include "Panels/AssetPanel.h"
+#include "Importer/ModelImporter.h"
 
 #include <commdlg.h>
 
@@ -87,6 +88,9 @@ Editor::Editor(HINSTANCE hInstance, const std::string& title)
 	ShowWindow(m_hWnd, SW_SHOW);
 	SetForegroundWindow(m_hWnd);
 	SetFocus(m_hWnd);
+
+	// 임시: 위치 조정 필요
+	m_pModelImporter = new DvModelImporter;
 }
 
 Editor::~Editor()
@@ -179,6 +183,9 @@ void Editor::Run()
 
 void Editor::Shutdown()
 {
+	// 임시
+	DV_DELETE(m_pModelImporter);
+
 	// delete panels
 	DV_DELETE(m_pMenuBar);
 	DV_DELETE(m_pScene);

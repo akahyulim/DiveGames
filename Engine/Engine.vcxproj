@@ -186,6 +186,7 @@
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\CommandList.h" />
     <ClInclude Include="Src\Renderer\ConstantBuffers.h" />
+    <ClInclude Include="Src\Renderer\DvModel.h" />
     <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture2D.h" />
@@ -227,6 +228,7 @@
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\CommandList.cpp" />
+    <ClCompile Include="Src\Renderer\DvModel.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture2D.cpp" />

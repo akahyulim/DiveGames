@@ -3,6 +3,7 @@
 #include "HierarchyPanel.h"
 #include "InspectorPanel.h"
 #include "AssetPanel.h"
+#include "Importer/ModelImporter.h"
 
 MenuBarPanel::MenuBarPanel(Editor* pEditor)
 	: Panel(pEditor, "MenuBar")
@@ -30,6 +31,7 @@ void MenuBarPanel::renderAlways()
 	menuFile();
 	menuGameObject();
 	menuComponent();
+	menuTools();
 	menuWindow();
 	menuHelp();
 
@@ -161,18 +163,12 @@ void MenuBarPanel::menuGameObject()
 					// 유니티에선 스크립트 차원에서 함수가 존재한다.
 					// GameObject의 CreatePrimitive였나...
 
-					if (Dive::ResourceManager::GetInstance().HasResource<Dive::Model>("Cube"))
-					{
-						auto cube = Dive::ResourceManager::GetInstance().GetResource<Dive::Model>("Cube");
-						// game object를 얻을 수 없다...
-						// 사실 이름으로 찾는 것도 에바다.
-					}
-					else
-					{
-						// 이렇게 할 경우 일단 Material은 파일로부터 생성해버린다.
-						// 그리고 GameObject를 얻을 수 없어 UseDefaultMaterial()도 적용할 수 없다...
-						Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cube.obj");
-					}
+					// 가장 기본적인 형태는
+					// GameObject를 생성하고
+					// MeshRenderable을 추가한 후
+					// ResourceManager를 통해 Model을 Set하는 것이다.
+
+					Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cube.obj");
 				}
 			}
 
@@ -316,6 +312,26 @@ void MenuBarPanel::menuComponent()
 						pSelected->AddComponent<Dive::Light>();
 					}
 				}
+			}
+		}
+
+		ImGui::EndMenu();
+	}
+}
+
+void MenuBarPanel::menuTools()
+{
+	if (ImGui::BeginMenu("Tools"))
+	{
+		// 새 창을 띄워 옵션을 선택토록 해야 한다.
+		// 유니티의 경우엔 파일 드래그를 하면 Inspector에 설정창이 뜬다.
+		if (ImGui::MenuItem("Model Import"))
+		{
+			auto path = Editor::FileOpen("All Files(*.*)\0");
+			if (!path.empty())
+			{
+				// 왜인지 모르겠지만 간헐적으로 두 번째 이상 로드 시도시 멈춘다.
+				m_pEditor->GetModelImporter()->LoadFromFile(path);
 			}
 		}
 

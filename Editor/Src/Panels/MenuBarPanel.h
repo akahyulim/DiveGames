@@ -20,6 +20,7 @@ private:
 	void menuFile();
 	void menuGameObject();
 	void menuComponent();
+	void menuTools();
 	void menuWindow();
 	void menuHelp();
 

@@ -14,7 +14,7 @@ class HierarchyPanel;
 class InspectorPanel;
 class AssetPanel;
 
-class ModelImporter;
+class DvModelImporter;
 
 class Editor
 {
@@ -41,6 +41,8 @@ public:
 	AssetPanel* GetAsset() { return m_pAsset; }
 
 	SceneViewCamera* GetSceneViewCamera() { return &m_SceneViewCamera; }
+
+	DvModelImporter* GetModelImporter() { return m_pModelImporter; }
 
 	static std::string FileOpen(const char* filter);
 	static std::string SaveFile(const char* filter);
@@ -85,4 +87,6 @@ private:
 
 	SceneViewCamera m_SceneViewCamera;
 	EditorRenderPath m_EditorRenderPath;
+
+	DvModelImporter* m_pModelImporter = nullptr;
 };
