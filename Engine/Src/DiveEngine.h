@@ -26,12 +26,14 @@
 #include "Resource/ResourceManager.h"
 
 //= Renderer ======================
+#include "Renderer/Graphics/GraphicsDef.h"
 #include "Renderer/Graphics/GraphicsDevice.h"
 #include "Renderer/Graphics/Texture.h"
 #include "Renderer/Graphics/Texture2D.h"
 #include "Renderer/Graphics/TextureCube.h"
 #include "Renderer/Graphics/VertexBuffer.h"
 #include "Renderer/Graphics/IndexBuffer.h"
+#include "Renderer/Graphics/DvIndexBuffer.h"
 #include "Renderer/Graphics/ConstantBuffer.h"
 #include "Renderer/ConstantBuffers.h"
 #include "Renderer/Renderer.h"
@@ -39,6 +41,7 @@
 #include "Renderer/CommandList.h"
 #include "Renderer/RenderPath.h"
 #include "Renderer/Mesh.h"
+#include "Renderer/DvMesh.h"
 #include "Renderer/Material.h"
 #include "Renderer/Model.h"
 #include "Renderer/DvModel.h"

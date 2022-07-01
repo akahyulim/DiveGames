@@ -16,8 +16,8 @@ struct OutModel
 	std::vector<aiNode*> meshNodes;
 	std::vector<aiNode*> bones;
 	std::vector<aiAnimation*> animations;
-	uint32_t vertexTotalCount = 0;
-	uint32_t indexTotalCount = 0;
+	uint32_t totalNumVertices = 0;
+	uint32_t totalNumIndices = 0;
 };
 
 class DvModelImporter
@@ -29,6 +29,7 @@ public:
 private:
 	void exportModel(aiNode* pRootNode, const std::string& outName);
 	void collectMeshes(OutModel& model, aiNode* pNode);
+	void collectBones(OutModel& model);
 	void buildAndSaveModel(OutModel& model);
 
 private:

@@ -133,6 +133,15 @@
     <ClInclude Include="Src\Renderer\DvModel.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\DvMesh.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\GraphicsDef.h">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Graphics\DvIndexBuffer.h">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -245,6 +254,12 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\DvModel.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\DvMesh.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Graphics\DvIndexBuffer.cpp">
+      <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
