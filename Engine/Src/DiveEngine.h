@@ -32,6 +32,7 @@
 #include "Renderer/Graphics/Texture2D.h"
 #include "Renderer/Graphics/TextureCube.h"
 #include "Renderer/Graphics/VertexBuffer.h"
+#include "Renderer/Graphics/DvVertexBuffer.h"
 #include "Renderer/Graphics/IndexBuffer.h"
 #include "Renderer/Graphics/DvIndexBuffer.h"
 #include "Renderer/Graphics/ConstantBuffer.h"

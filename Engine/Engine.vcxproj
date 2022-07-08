@@ -190,6 +190,7 @@
     <ClInclude Include="Src\Renderer\DvModel.h" />
     <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\DvIndexBuffer.h" />
+    <ClInclude Include="Src\Renderer\Graphics\DvVertexBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\GraphicsDef.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture.h" />
     <ClInclude Include="Src\Renderer\Graphics\Texture2D.h" />
@@ -235,6 +236,7 @@
     <ClCompile Include="Src\Renderer\DvModel.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\DvIndexBuffer.cpp" />
+    <ClCompile Include="Src\Renderer\Graphics\DvVertexBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\Texture2D.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\GraphicsDevice.cpp" />

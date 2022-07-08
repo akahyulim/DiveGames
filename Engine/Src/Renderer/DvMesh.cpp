@@ -1,7 +1,7 @@
 #include "divepch.h"
 #include "DvMesh.h"
 #include "Base/Base.h"
-#include "Graphics/VertexBuffer.h"
+#include "Graphics/DvVertexBuffer.h"
 #include "Graphics/DvIndexBuffer.h"
 
 namespace Dive
@@ -11,12 +11,12 @@ namespace Dive
 		SetNumVertexBuffers(1);
 	}
 
-	VertexBuffer* DvMesh::GetVertexBuffer(unsigned int index) const
+	DvVertexBuffer* DvMesh::GetVertexBuffer(unsigned int index) const
 	{
 		return index < static_cast<unsigned int>(m_VertexBuffers.size()) ? m_VertexBuffers[index] : nullptr;
 	}
 
-	void DvMesh::SetVertexBuffer(unsigned int index, VertexBuffer* pBuffer)
+	void DvMesh::SetVertexBuffer(unsigned int index, DvVertexBuffer* pBuffer)
 	{
 		if (index >= static_cast<unsigned int>(m_VertexBuffers.size()))
 		{

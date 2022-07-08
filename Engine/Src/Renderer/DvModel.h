@@ -3,7 +3,7 @@
 
 namespace Dive
 {
-	class VertexBuffer;
+	class DvVertexBuffer;
 	class DvIndexBuffer;
 	class DvMesh;
 
@@ -24,11 +24,12 @@ namespace Dive
 		unsigned int GetMeshCount() const { return static_cast<unsigned int>(m_Meshes.size()); }
 		void SetMeshCount(unsigned int count);
 
+		bool SetVertexBuffers(const std::vector<DvVertexBuffer*> buffers);
 		bool SetIndexBuffers(const std::vector<DvIndexBuffer*>& buffers);
 
 	private:
 	private:
-		std::vector<VertexBuffer*> m_VertexBuffers;
+		std::vector<DvVertexBuffer*> m_VertexBuffers;
 		std::vector<DvIndexBuffer*> m_IndexBuffers;
 		//std::vector<std::vector<DvMesh*>> m_Meshes;	// 인덱스, lod level로 저장한 거였다.
 		std::vector<DvMesh*> m_Meshes;

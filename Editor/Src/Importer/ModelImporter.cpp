@@ -1,10 +1,221 @@
 #include "ModelImporter.h"
 #include "DiveEngine.h"
 
-// vertices offset에서부터 시작하는 건 맞다.
-// 문제는
-// 1. 인덱스 값을 dest에 저장할 수 없는 크기이거나
-// 2. 
+static const unsigned int MAX_CHANNELS = 4;
+
+static DirectX::XMFLOAT3 aiVector3DToFloat3(const aiVector3D& vec)
+{
+    return DirectX::XMFLOAT3(vec.x, vec.y, vec.z);
+}
+
+static DirectX::XMFLOAT4 aiColor4DToFloat4(const aiColor4D& col)
+{
+    return DirectX::XMFLOAT4(col.r, col.g, col.b, col.a);
+}
+
+static DirectX::XMVECTOR ToVector(const aiVector3D& vec)
+{
+    DirectX::XMFLOAT3 float3 = aiVector3DToFloat3(vec);
+    return DirectX::XMLoadFloat3(&float3);
+}
+
+static std::vector<Dive::VertexElement> GetVertexType(aiMesh* pMesh)
+{
+    std::vector<Dive::VertexElement> ret;
+
+    // position
+    ret.emplace_back(Dive::eVertexElementType::Float3, Dive::eVertexElementSemantic::Position);
+
+    // normal
+    if (pMesh->HasNormals())
+    {
+        ret.emplace_back(Dive::eVertexElementType::Float3, Dive::eVertexElementSemantic::Normal);
+    }
+
+    // color
+    for (unsigned int i = 0; i < pMesh->GetNumColorChannels() && i < MAX_CHANNELS; ++i)
+    {
+        ret.emplace_back(Dive::eVertexElementType::Float4, Dive::eVertexElementSemantic::Color, i);
+    }
+
+    // texCoord
+    for (unsigned int i = 0; i < pMesh->GetNumUVChannels() && i < MAX_CHANNELS; ++i)
+    {
+        ret.emplace_back(Dive::eVertexElementType::Float2, Dive::eVertexElementSemantic::TexCoord, i);
+    }
+
+    // tangent
+    if (pMesh->HasTangentsAndBitangents())
+    {
+        ret.emplace_back(Dive::eVertexElementType::Float3, Dive::eVertexElementSemantic::Tangent);
+    }
+
+    // skinned
+    {
+        // weight
+        ret.emplace_back(Dive::eVertexElementType::Float4, Dive::eVertexElementSemantic::BlendWeight);
+
+        // bone index
+        ret.emplace_back(Dive::eVertexElementType::UByte4, Dive::eVertexElementSemantic::MaxBlendIndex);
+    }
+
+    return ret;
+}
+
+static unsigned int GetBoneIndex(OutModel& model, const std::string& boneName)
+{
+    for (unsigned int i = 0; i < model.bones.size(); ++i)
+    {
+        if (boneName == model.bones[i]->mName.C_Str())
+            return i;
+    }
+
+    return 0xffffffff;
+}
+
+static void GetBlendData(OutModel& model, aiMesh* pMesh, aiNode* pMeshNode, std::vector<unsigned int>& boneMappings,
+    std::vector<std::vector<unsigned char>>& blendIndices, std::vector<std::vector<float>>& blendWeights)
+{
+    blendIndices.resize(pMesh->mNumVertices);
+    blendWeights.resize(pMesh->mNumVertices);
+    boneMappings.clear();
+
+    if (model.bones.size() > 64)
+    {
+        if (pMesh->mNumBones > 64)
+        {
+            // error
+            return;
+        }
+
+        if (pMesh->mNumBones > 0)
+        {
+            boneMappings.resize(pMesh->mNumBones);
+            for (unsigned int i = 0; i < pMesh->mNumBones; ++i)
+            {
+                aiBone* pBone = pMesh->mBones[i];
+                std::string boneName = pBone->mName.C_Str();
+                unsigned int globalIndex = GetBoneIndex(model, boneName);
+                if (globalIndex == 0XFFFFFFFF)
+                    DV_APP_ERROR("뼈대({:s})(을)를 찾지 못하였습니다. ", boneName);
+
+                boneMappings[i] = globalIndex;
+
+                for (unsigned int j = 0; j < pBone->mNumWeights; ++j)
+                {
+                    unsigned int vertex = pBone->mWeights[j].mVertexId;
+                    blendIndices[vertex].emplace_back(globalIndex);
+                    blendWeights[vertex].emplace_back(pBone->mWeights[j].mWeight);
+                }
+            }
+        }
+        else
+        {
+
+        }
+    }
+    else
+    {
+        if (pMesh->mNumBones > 0)
+        {
+            for (unsigned int i = 0; i < pMesh->mNumBones; ++i)
+            {
+                aiBone* pBone = pMesh->mBones[i];
+                std::string boneName = pBone->mName.C_Str();
+                unsigned int globalIndex = GetBoneIndex(model, boneName);
+                if (globalIndex == 0XFFFFFFFF)
+                    DV_APP_ERROR("뼈대({:s})(을)를 찾지 못하였습니다. ", boneName);
+                
+                for (unsigned int j = 0; j < pBone->mNumWeights; ++j)
+                {
+                    unsigned int vertex = pBone->mWeights[j].mVertexId;
+                    blendIndices[vertex].emplace_back(globalIndex);
+                    blendWeights[vertex].emplace_back(pBone->mWeights[j].mWeight);
+                }
+            }
+        }
+        else
+        {
+
+        }
+    }
+}
+
+// 일단 bounding box는 제외
+static void WriteVertices(float*& dest, aiMesh* pMesh, unsigned int index, bool bSkinned, const DirectX::XMFLOAT4X4& vertexTransform,
+    const DirectX::XMFLOAT4X4& normalTransform, std::vector<std::vector<unsigned char>>& blendIndices, std::vector<std::vector<float>>& blendWeights)
+{
+    // vertex
+    // 변환시킨 후 넣어야 한다.
+    auto vertex = aiVector3DToFloat3(pMesh->mVertices[index]);
+    *dest++ = vertex.x;
+    *dest++ = vertex.y;
+    *dest++ = vertex.z;
+
+    // normal
+    if (pMesh->HasNormals())
+    {
+        // 역시 변환 후 넣어야 한다.
+        auto normal = aiVector3DToFloat3(pMesh->mNormals[index]);
+        *dest++ = normal.x;
+        *dest++ = normal.y;
+        *dest++ = normal.z;
+    }
+
+    // color
+    // 현재 대부분 값이 없다.
+    for(unsigned int i = 0; i < pMesh->GetNumColorChannels() && i < MAX_CHANNELS; ++i)
+    {
+        auto color = aiColor4DToFloat4(pMesh->mColors[i][index]);
+        *dest++ = color.x;
+        *dest++ = color.y;
+        *dest++ = color.z;
+        *dest++ = color.w;
+    }
+
+    // texCoord
+    for (unsigned int i = 0; i < pMesh->GetNumUVChannels() && i < MAX_CHANNELS; ++i)
+    {
+        // 예전에 값이 엉뚱해서 직접 수정했다.
+        auto texCoord = aiVector3DToFloat3(pMesh->mTextureCoords[i][index]);
+        *dest++ = texCoord.x;
+        *dest++ = texCoord.y;
+    }
+
+    // tangent
+    if (pMesh->HasTangentsAndBitangents())
+    {
+        // 여기도 NormalTransform으로 변환
+        auto tangent = aiVector3DToFloat3(pMesh->mTangents[index]);
+        *dest++ = tangent.x;
+        *dest++ = tangent.y;
+        *dest++ = tangent.z;
+    }
+ 
+    if (bSkinned)
+    {
+        // weights
+        for (unsigned int i = 0; i < 4; ++i)
+        {
+            if (i < blendWeights[index].size())
+                *dest++ = blendWeights[index][i];
+            else
+                *dest++ = 0.0f;
+        }
+
+        // indice
+        auto* pDestBytes = (unsigned char*)dest;
+        ++dest; // 이건 뭐지?
+        for (unsigned int i = 0; i < 4; ++i)
+        {
+            if (i < blendIndices[index].size())
+                *pDestBytes++ = blendIndices[index][i];
+            else
+                *pDestBytes++ = 0;
+        }
+    }
+}
+
 static void WriteShortIndices(unsigned short*& dest, aiMesh* pMesh, unsigned int index, unsigned int offset)
 {
     if (pMesh->mFaces[index].mNumIndices == 3)
@@ -59,43 +270,6 @@ static aiNode* GetNode(aiNode* pRootNode, std::string& name)
     return nullptr;
 }
 
-static void GetVertexElements(aiMesh* pMesh, bool bSkinned)
-{
-    if (!pMesh)
-        return;
-
-    std::vector<Dive::VertexElement> elements;
-
-    // position: XMFLOAT3
-    
-
-    if (pMesh->HasNormals())
-    {
-        // XMFLOAT3
-    }
-
-    for (size_t i = 0; i < pMesh->GetNumColorChannels(); ++i)
-    {
-        // XMFLOAT4
-    }
-
-    for (size_t i = 0; i < pMesh->GetNumUVChannels(); ++i)
-    {
-        // XMFLOAT2
-    }
-
-    if (pMesh->HasTangentsAndBitangents())
-    {
-        // XMFLOAT4
-    }
-
-    if (bSkinned)
-    {
-        // weight: XMFLOAT4
-        // index: XMUINT4??
-    }
-}
-
 static aiMatrix4x4 GetDerivedTransform(aiMatrix4x4 transform, aiNode* pNode, aiNode* pRootNode, bool bRootInclusive)
 {
     while (pNode && pNode != pRootNode)
@@ -136,17 +310,6 @@ static void GetPosRotScale(const aiMatrix4x4& transform, DirectX::XMFLOAT3& outP
     outPos = DirectX::XMFLOAT3(aiPos.x, aiPos.y, aiPos.z);
     outRot = DirectX::XMFLOAT4(aiRot.x, aiRot.y, aiRot.z, aiRot.w);
     outScale = DirectX::XMFLOAT3(aiScale.x, aiScale.y, aiScale.z);
-}
-
-static DirectX::XMFLOAT3 ToFloat3(const aiVector3D& vec)
-{
-    return DirectX::XMFLOAT3(vec.x, vec.y, vec.z);
-}
-
-static DirectX::XMVECTOR ToVector(const aiVector3D& vec)
-{
-    DirectX::XMFLOAT3 float3 = ToFloat3(vec);
-    return DirectX::XMLoadFloat3(&float3);
 }
 
 // 아직 불완전한 함수다.
@@ -236,14 +399,6 @@ void DvModelImporter::exportModel(aiNode* pRootNode, const std::string& outName)
     //collectBones(model);
     // build bone collision info
     buildAndSaveModel(model);
-
-    // 이걸 굳이 이 곳에 포함하는 게 맞나하는 생각이 든다.
-    // Material처럼 Export 함수를 따로 만드는 편이 낫다.
-    if (m_bAnimations)
-    {
-        // collection animations
-        // build and save anmations
-    }
 }
 
 // 루트노드부터 재귀적으로 모든 메시를 aiMesh에 저장한다.
@@ -387,53 +542,58 @@ void DvModelImporter::buildAndSaveModel(OutModel& model)
     }
 
     Dive::DvModel* pModel = new Dive::DvModel;
+    DV_ASSERT(pModel);
     
     unsigned int meshCount = 0;
-    
     bool bCombineBuffers = true;
+    auto vertexType = GetVertexType(model.meshes[0]);
     for (size_t i = 0; i < model.meshes.size(); ++i)
     {
         if (GetNumValidFaces(model.meshes[i]))
         {
             ++meshCount;
 
-            // 여기에서 0번째 vertex와 element를 비교하여 combine buffer 유무를 갱신한다.
+            // static과 skinned가 함께 있을 경우 개별 버퍼 구성 대상
+            if (i > 0 && vertexType != GetVertexType(model.meshes[i]))
+                bCombineBuffers = false;
         }
     }
 
     if (bCombineBuffers && model.totalNumVertices > 65535)
     {
-        bool bLargeIndices = true;
+        bool bAllUnder65k = true;
 
         for (size_t i = 0; i < model.meshes.size(); ++i)
         {
             if (GetNumValidFaces(model.meshes[i]))
             {
-                // 정점 개수가 2byte를 넘는데도 괜찮다고?
                 if (model.meshes[i]->mNumVertices > 65535)
-                    bLargeIndices = false;
+                {
+                    bAllUnder65k = false;
+                    break;
+                }
             }
         }
 
-        if (bLargeIndices == true)
+        if (bAllUnder65k == true)
             bCombineBuffers = false;
     }
 
     pModel->SetMeshCount(meshCount);
 
-    Dive::VertexBuffer* pVertexBuffer = nullptr;
+    Dive::DvVertexBuffer* pVertexBuffer = nullptr;
     Dive::DvIndexBuffer* pIndexBuffer = nullptr;
-    std::vector<Dive::VertexBuffer*> vertexBuffers;
+    std::vector<Dive::DvVertexBuffer*> vertexBuffers;
     std::vector<Dive::DvIndexBuffer*> indexBuffers;
     unsigned int vertexOffset = 0;
     unsigned int indexOffset = 0;
     unsigned int meshIndex = 0;
     bool bSkinned = model.bones.size() > 0;
 
-    // 메시별로 처리
     for (size_t i = 0; i < model.meshes.size(); ++i)
     {
         aiMesh* pMesh = model.meshes[i];
+        auto vertexType = GetVertexType(model.meshes[i]);
         unsigned int validFaces = GetNumValidFaces(pMesh);
         if (!validFaces)
             continue;
@@ -444,36 +604,37 @@ void DvModelImporter::buildAndSaveModel(OutModel& model)
         else
             bLargeIndices = pMesh->mNumVertices > 65535;
 
-        // 1. !bCombineBuffers일 경우 매 메시마다 생성
-        // 2. bCombineBuffers일 경우 최초 한 번만 생성?
+        // 통짜 버퍼일 경우 최초 한 번만 생성
+        // 아닐 경우 매 메시마다 버퍼 생성
         if (!bCombineBuffers || vertexBuffers.empty())
         {
-            pVertexBuffer = new Dive::VertexBuffer;
+            pVertexBuffer = new Dive::DvVertexBuffer;
             pIndexBuffer = new Dive::DvIndexBuffer;
 
             // 각각의 버퍼 크기 설정
-            // 이 과정에서 버퍼 구성까지 한다.
+            // 이 과정에서 버퍼 구성까지 한다. 그런데 리소스 설정이 에바다.
+            // 만약 로드 후 바로 사용할 생각이라면 버퍼를 완벽하게 구성해야 한다.
+            // 하지만 urho 역시 Model을 Cache로 생성하진 않았다.
             if (bCombineBuffers)
             {
-                // vertex size = total vertices, element type
-                // index size = total indices, largeIndices(4 or 2 byte)
-                DV_APP_INFO("vertex buffer size: {0:d}", model.totalNumVertices);
+                pVertexBuffer->SetSize(model.totalNumVertices, vertexType);
                 pIndexBuffer->SetSize(model.totalNumIndices, bLargeIndices);
             }
             else
             {
-                // vertex size = 메시 정점 개수, element type
-                // index size = validFace * 3, lageIndices(4 or 2byte)
-                DV_APP_INFO("vertex buffer size: {0:d}", pMesh->mNumVertices);
+                pVertexBuffer->SetSize(pMesh->mNumVertices, vertexType);
                 pIndexBuffer->SetSize(validFaces * 3, bLargeIndices);
             }
 
             vertexBuffers.emplace_back(pVertexBuffer);
             indexBuffers.emplace_back(pIndexBuffer);
+            vertexOffset = 0;
+            indexOffset = 0;
         }
 
         // 계층구조 정보: 부모를 저장하는 것이 아니라 변환 행렬을 누적한다.
         // VertexTransform, NormalTransform과 pos, rot, scale이 대상
+        // => 저장 대상은 Transform이다. 굳이 pos, rot, scale을 따로 계산할 필요가 있나...?
         DirectX::XMFLOAT3 pos, scale;
         DirectX::XMFLOAT4 rot;
         GetPosRotScale(GetMeshBakingTransform(model.meshNodes[i], model.pRootNode), pos, rot, scale);
@@ -487,24 +648,27 @@ void DvModelImporter::buildAndSaveModel(OutModel& model)
 
         // 앞서 동일한 변수명을 사용했다...
         // urho의 경우 Geomenty다.
-        Dive::DvMesh* pModelMesh = new Dive::DvMesh;
+        auto pModelMesh = new Dive::DvMesh;
+        DV_ASSERT(pModelMesh);
 
         // 각각 앞서 생성한 버퍼로부터 시작 지점을 가리킨다.
         // 버퍼 자체는 크기만 할당되어 있다. 그래야 데이터를 집어넣으니깐
-        unsigned char* pVertexData = nullptr;
-        auto pIndexData = pIndexBuffer->GetSubResource();
+        unsigned char* pVertexData = pVertexBuffer->GetData();
+        auto pIndexData = pIndexBuffer->GetData();
 
         // 2. build vertex 저장
-        unsigned char* pDest = nullptr; // vertexData + offset * vertexSize
+        std::vector<std::vector<unsigned char>> blendIndices;
+        std::vector<std::vector<float>> blendWeights;
+        std::vector<unsigned int> boneMappings;
+        if (!model.bones.empty())
+            GetBlendData(model, pMesh, model.meshNodes[i], boneMappings, blendIndices, blendWeights);
+
+        auto* pDest = (float*)((unsigned char*)pVertexData + vertexOffset * pVertexBuffer->GetVertexSize());
         for (size_t j = 0; j < pMesh->mNumVertices; ++j)
-        {
-            // vertex, normal transform도 쓴다.
-            // bSkinned, box, blendIndex, blendWeight 등도 쓴다.
-        }
-        // blendData는 한 번 더 쓴다.
+            WriteVertices(pDest, pMesh, (unsigned int)j, bSkinned, vertexTransform, DirectX::XMFLOAT4X4(), blendIndices, blendWeights);
 
         // 3. build index 저장
-        // 현재 메시를 구성하는 인덱스를 처리한다.
+        // map / unmap이 아니다.
         if (bLargeIndices)
         {
             auto pDest = (unsigned long*)pIndexData + indexOffset;
@@ -517,6 +681,7 @@ void DvModelImporter::buildAndSaveModel(OutModel& model)
             for (unsigned int j = 0; j < pMesh->mNumFaces; ++j)
                 WriteShortIndices(pDest, pMesh, j, vertexOffset);
         }
+
         // calculate center
         DirectX::XMFLOAT3 center{ 0.0f, 0.0f, 0.0f };
         if (validFaces)
@@ -525,15 +690,16 @@ void DvModelImporter::buildAndSaveModel(OutModel& model)
             {
                 if (pMesh->mFaces[j].mNumIndices == 3)
                 {
-                    //center += ToFloat3(pMesh->mVertices[pMesh->mFaces[j].mIndices[0]]);
-                    //center += ToFloat3(pMesh->mVertices[pMesh->mFaces[j].mIndices[1]]);
-                    //center += ToFloat3(pMesh->mVertices[pMesh->mFaces[j].mIndices[2]]);
+                    //center += aiVector3DToFloat3(pMesh->mVertices[pMesh->mFaces[j].mIndices[0]]);
+                    //center += aiVector3DToFloat3(pMesh->mVertices[pMesh->mFaces[j].mIndices[1]]);
+                    //center += aiVector3DToFloat3(pMesh->mVertices[pMesh->mFaces[j].mIndices[2]]);
                 }
             }
         }
 
 
-        // SetGeometry
+        // SetMesh(Geometry)
+        // 이렇게 하면 통합버퍼의 경우 계속 동일한 버퍼를 저장하게 된다. 문제는 안될듯...?
         pModelMesh->SetVertexBuffer(0, pVertexBuffer); // 0으로 하면 결국 버퍼가 하나라는 소린데... 그렇다면 2개 이상으로 만들 필요도 없고...
         pModelMesh->SetIndexBuffer(pIndexBuffer);
         // DrawRange: draw에 필요한 offset, count를 저장
@@ -545,9 +711,8 @@ void DvModelImporter::buildAndSaveModel(OutModel& model)
         ++meshIndex;
     }
 
-    // model은 전체 버퍼 벡터를 저장한다?
-    // SetVertexBuffers 
-    pModel->SetIndexBuffers(indexBuffers);  // SetIndexBuffers
+    pModel->SetVertexBuffers(vertexBuffers); // 추후 다른 버퍼도 추가해야 할 듯?
+    pModel->SetIndexBuffers(indexBuffers);
     // SetSkeleton
 
     // Save: 파일 생성 후 매개변수로 전달
