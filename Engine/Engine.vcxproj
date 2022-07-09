@@ -178,6 +178,7 @@
     <ClInclude Include="Src\Base\Engine.h" />
     <ClInclude Include="Src\Base\Log.h" />
     <ClInclude Include="Src\Base\Time.h" />
+    <ClInclude Include="Src\Engine\Application.h" />
     <ClInclude Include="Src\Events\EngineEvents.h" />
     <ClInclude Include="Src\Events\EventSystem.h" />
     <ClInclude Include="Src\Helper\FileSystem.h" />
@@ -228,6 +229,7 @@
     <ClCompile Include="Src\Base\Engine.cpp" />
     <ClCompile Include="Src\Base\Log.cpp" />
     <ClCompile Include="Src\Base\Time.cpp" />
+    <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Helper\FileSystem.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />

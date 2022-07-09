@@ -145,6 +145,9 @@
     <ClInclude Include="Src\Renderer\Graphics\DvVertexBuffer.h">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Engine\Application.h">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -267,6 +270,9 @@
     <ClCompile Include="Src\Renderer\Graphics\DvVertexBuffer.cpp">
       <Filter>Src\Renderer\GraphicsDevice</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Engine\Application.cpp">
+      <Filter>Src\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -310,6 +316,9 @@
     </Filter>
     <Filter Include="Src\Resource\Importer">
       <UniqueIdentifier>{3bdc49eb-8d93-41b9-86c6-1c154d84a343}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Engine">
+      <UniqueIdentifier>{3014dab7-0fbc-438f-b953-197ce26777e5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
