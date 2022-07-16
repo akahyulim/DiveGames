@@ -1,15 +1,16 @@
 #include "divepch.h"
 #include "Application.h"
-#include "Base/Engine.h"
+#include "DvEngine.h"
 
 namespace Dive
 {
-	Application::Application()
-		: m_ExitCode(EXIT_SUCCESS)
+	Application::Application(DvContext* pContext)
+		: DvObject(pContext),
+		m_ExitCode(EXIT_SUCCESS)
 	{
 		// engine parameters: 이건 아직 뭔지 모르겠다.
 
-		m_pEngine = std::make_shared<Engine>();
+		m_pEngine = new DvEngine(pContext);
 
 	}
 
@@ -19,7 +20,8 @@ namespace Dive
 		if (m_ExitCode)
 			return m_ExitCode;
 
-		// engine intialize: 엔진 파라미터를 전달
+		// 파라미터를 매개인자로 전달해야 한다.
+		if(!m_pEngine->Initialize())
 		{
 			ErrorExit();
 			return m_ExitCode;
@@ -29,8 +31,8 @@ namespace Dive
 		if (m_ExitCode)
 			return m_ExitCode;
 
-		// while engine runframe: 윈도우 생성 역시 엔진쪽에서 구현되어야 한다.
-		// 아무래도 Graphics에서 생성 및 관리를 하는 것 같다.
+		while (!m_pEngine->IsExiting())
+			m_pEngine->RunFrame();
 
 		Stop();
 

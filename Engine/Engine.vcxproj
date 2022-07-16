@@ -171,6 +171,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Src\Base\Object.h" />
+    <ClInclude Include="Src\Core\DvContext.h" />
+    <ClInclude Include="Src\Core\DvObject.h" />
+    <ClInclude Include="Src\Core\StringHash.h" />
+    <ClInclude Include="Src\Core\Variant.h" />
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\divepch.h" />
     <ClInclude Include="Src\Base\Base.h" />
@@ -179,8 +183,10 @@
     <ClInclude Include="Src\Base\Log.h" />
     <ClInclude Include="Src\Base\Time.h" />
     <ClInclude Include="Src\Engine\Application.h" />
+    <ClInclude Include="Src\Engine\DvEngine.h" />
     <ClInclude Include="Src\Events\EngineEvents.h" />
     <ClInclude Include="Src\Events\EventSystem.h" />
+    <ClInclude Include="Src\Graphics\DvGraphics.h" />
     <ClInclude Include="Src\Helper\FileSystem.h" />
     <ClInclude Include="Src\Helper\YamlHelper.h" />
     <ClInclude Include="Src\Input\Input.h" />
@@ -222,6 +228,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Base\Object.cpp" />
+    <ClCompile Include="Src\Core\DvContext.cpp" />
+    <ClCompile Include="Src\Core\DvObject.cpp" />
     <ClCompile Include="Src\Dive.cpp" />
     <ClCompile Include="Src\divepch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -230,6 +238,8 @@
     <ClCompile Include="Src\Base\Log.cpp" />
     <ClCompile Include="Src\Base\Time.cpp" />
     <ClCompile Include="Src\Engine\Application.cpp" />
+    <ClCompile Include="Src\Engine\DvEngine.cpp" />
+    <ClCompile Include="Src\Graphics\DvGraphics.cpp" />
     <ClCompile Include="Src\Helper\FileSystem.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />

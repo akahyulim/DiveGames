@@ -1,6 +1,8 @@
 #pragma once
 #include "Resource/Resource.h"
 
+#include <DirectXTex/DirectXTex.h>
+
 namespace Dive
 {
 	// 추후 GraphicsDefs로 이동

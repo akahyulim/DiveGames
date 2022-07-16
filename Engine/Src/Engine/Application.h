@@ -1,14 +1,18 @@
 #pragma once
+#include "Core/DvObject.h"
+#include "Core/DvContext.h"
 
 namespace Dive
 {
-	class Engine;
+	class DvEngine;
 
-	class Application
+	class Application : public DvObject
 	{
+		DIVE_OBJECT(Application, DvObject)
+
 	public:
 		// 생성자. 커맨드라인으로부터 엔진 파라미터를 파싱 한 후 엔진을 초기화되지 않은 상태로 생성.
-		Application();
+		explicit Application(DvContext* pContext);
 		virtual ~Application() = default;
 
 		// 엔진 초기화 이전에 호출. 이 곳에서 엔진 파라미터를 수정 가능.
@@ -27,9 +31,33 @@ namespace Dive
 
 	protected:
 		// Dive 엔진
-		std::shared_ptr<Engine> m_pEngine;
+		DvEngine* m_pEngine;
 		// 엔진 파라미터 맵
 		// 어플리케이션 종료 코드
 		int m_ExitCode;
 	};
+
+
+#define DEFINE_MAIN(function) \
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, PSTR cmdLine, int showCmd) \
+{ \
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF); \
+	return function; \
+}
+
+/*
+#define DEFINE_MAIN(function)	\
+int main()	\
+{	\
+	return function;	\
+}
+*/
+#define DEFINE_APPLICATION_MAIN(className)	\
+int RunApplication()	\
+{	\
+	auto pContext = new Dive::DvContext();	\
+	auto pApplication = std::make_shared<className>();	\
+	return pApplication->Run();	\
+}	\
+DEFINE_MAIN(RunApplication())
 }

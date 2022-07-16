@@ -15,6 +15,15 @@
 #include "Base/Time.h"
 #include "Base/Log.h"
 
+//= Core ==========================
+#include "Core/StringHash.h"
+#include "Core/DvContext.h"
+#include "Core/DvObject.h"
+
+//= Engine ========================
+#include "Engine/Application.h"
+#include "Engine/DvEngine.h"
+
 //= Events ========================
 #include "Events/EventSystem.h"
 #include "Events/EngineEvents.h"
@@ -24,6 +33,9 @@
 #include "Resource/FileStream.h"
 #include "Resource/Resource.h"
 #include "Resource/ResourceManager.h"
+
+//= Graphics ======================
+#include "Graphics/DvGraphics.h"
 
 //= Renderer ======================
 #include "Renderer/Graphics/GraphicsDef.h"

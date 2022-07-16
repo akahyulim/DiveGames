@@ -116,7 +116,9 @@ void Editor::Run()
 		MSG msg;
 		ZeroMemory(&msg, sizeof(MSG));
 
-		while (::PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+		// 이 부분이 원래 while이었다. 이해가 안된다.
+		// rastertek을 참조하여 if로 수정했다.
+		if (::PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
 		{
 			::TranslateMessage(&msg);
 			::DispatchMessageW(&msg);

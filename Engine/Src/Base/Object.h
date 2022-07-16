@@ -2,6 +2,11 @@
 
 namespace Dive
 {
+	// urho3d의 경우 object는 stringHash, event 처리 및 GetSubSystem이 주 역할이며,
+	// 대부분의 class의 base이다.
+	// 반면, id의 경우 node(=game object), component만 가지며
+	// scene에서 각각 관리한다.
+	// 리소스의 경우 이름을 통해 stringHash를 사용하는 듯 하다.
 	class Object
 	{
 	public:

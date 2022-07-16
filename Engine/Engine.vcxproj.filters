@@ -148,6 +148,24 @@
     <ClInclude Include="Src\Engine\Application.h">
       <Filter>Src\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Engine\DvEngine.h">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\DvGraphics.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DvContext.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DvObject.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\StringHash.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\Variant.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -273,6 +291,18 @@
     <ClCompile Include="Src\Engine\Application.cpp">
       <Filter>Src\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Engine\DvEngine.cpp">
+      <Filter>Src\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\DvGraphics.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\DvContext.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\DvObject.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -319,6 +349,12 @@
     </Filter>
     <Filter Include="Src\Engine">
       <UniqueIdentifier>{3014dab7-0fbc-438f-b953-197ce26777e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Graphics">
+      <UniqueIdentifier>{20158f07-2ec3-4164-a16c-cea82c4ca9f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Core">
+      <UniqueIdentifier>{0c347253-8f53-4068-be74-223121ffe2f5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
