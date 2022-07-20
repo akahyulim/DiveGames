@@ -13,7 +13,8 @@ namespace Dive
 	float,	\
 	long,	\
 	bool,	\
-	void*
+	void*,	\
+	std::string
 
 #define VARIANT_TYPES std::variant<_VARIANT_TYPES>
 typedef std::variant<_VARIANT_TYPES, VARIANT_TYPES> StdVariant;
@@ -24,7 +25,7 @@ typedef std::variant<_VARIANT_TYPES, VARIANT_TYPES> StdVariant;
 	using VariantVector = std::vector<Variant>;
 	using VariantMap = std::map<StringHash, Variant>;
 	
-		class Variant
+	class Variant
 	{
 	public:
 		Variant() = default;
@@ -37,6 +38,7 @@ typedef std::variant<_VARIANT_TYPES, VARIANT_TYPES> StdVariant;
 
 		template<class T>
 		const T& Get() const { return std::get<T>(m_Variant); }
+
 	private:
 		StdVariant m_Variant;
 	};

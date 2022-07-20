@@ -5,8 +5,8 @@
 namespace Dive
 {
 	class DvContext;
-	class DvEventHandler;
 
+	// 타입의 확인 및 비교에 사용된다.
 	class TypeInfo
 	{
 	public:
@@ -47,6 +47,7 @@ public:\
 		return &typeInfoStatic;	\
 	}
 
+	
 	class DvObject
 	{
 	public:
@@ -56,21 +57,12 @@ public:\
 		virtual StringHash GetType() const = 0;
 		virtual const std::string& GetTypeName() const = 0;
 		virtual const TypeInfo* GetTypeInfo() const = 0;
-		virtual void OnEvent(DvObject* pSender, StringHash eventType, VariantMap& eventData);
-
+		
 		static const TypeInfo* GetTypeInfoStatic() { return nullptr; }
 
 		bool IsInstanceOf(StringHash type) const;
 		bool IsInstanceOf(const TypeInfo* typeInfo) const;
 
-		// evnet control
-		void SubscribeEvent(StringHash eventType, DvEventHandler* pHandler);
-		void SubscribeEvent(DvObject* pSender, StringHash eventType, DvEventHandler* pHandler);
-		void UnsubscribeEvent(StringHash eventType);
-		void SendEvent(StringHash eventType);
-		void SendEvent(StringHash eventType, VariantMap& eventData);
-		
-		// get subsystem
 		DvObject* GetSubsystem(StringHash type) const;
 		template<class T> T* GetSubsystem() const;
 
@@ -78,11 +70,6 @@ public:\
 
 	protected:
 		DvContext* m_pContext;
-
-	private:
-		// event handler
-		std::list<DvEventHandler*> m_EventHandlers;
-		// bool m_bBlockEvents;
 	};
 
 	template<class T>
@@ -90,38 +77,4 @@ public:\
 	{
 		return static_cast<T*>(GetSubsystem(T::GetTypeStatic()));
 	}
-
-	// functual을 가지는 구체 클래스도 있다.
-	class DvEventHandler
-	{
-	public:
-		explicit DvEventHandler(DvObject* pReceiver, void* pUserData = nullptr)
-			: m_pSender(nullptr),
-			m_pReceiver(pReceiver),
-			m_pUserData(pUserData)
-		{}
-		virtual ~DvEventHandler() = default;
-
-		void SetSenderAndEventType(DvObject* pSender, StringHash evnetType)
-		{
-			m_pSender = pSender;
-			m_EventType = evnetType;
-		}
-
-		virtual void Invoke(VariantMap& eventData) = 0;
-		virtual DvEventHandler* Clone() const = 0;
-
-		DvObject* GetSender() const { return m_pSender; }
-		DvObject* GetReceiver() const { return m_pReceiver; }
-		StringHash GetEventType() const { return m_EventType; }
-		void* GetUserData() const { return m_pUserData; }
-
-	private:
-
-	protected:
-		DvObject* m_pSender;
-		DvObject* m_pReceiver;
-		StringHash m_EventType;
-		void* m_pUserData;
-	};
 }

@@ -4,7 +4,7 @@
 class Sandbox : public Dive::Application
 {
 public:
-	Sandbox();
+	Sandbox(Dive::DvContext* pContext);
 	~Sandbox();
 
 	void Setup() override;

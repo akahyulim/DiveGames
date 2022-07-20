@@ -166,6 +166,15 @@
     <ClInclude Include="Src\Core\Variant.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Engine\DvEngineDef.h">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\IO\DvLog.h">
+      <Filter>Src\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DvEventSystem.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -303,6 +312,9 @@
     <ClCompile Include="Src\Core\DvObject.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
+    <ClCompile Include="Src\IO\DvLog.cpp">
+      <Filter>Src\IO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="External">
@@ -355,6 +367,9 @@
     </Filter>
     <Filter Include="Src\Core">
       <UniqueIdentifier>{0c347253-8f53-4068-be74-223121ffe2f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\IO">
+      <UniqueIdentifier>{c3611e48-9531-40bb-9a94-61c0e6236541}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

@@ -4,21 +4,6 @@
 
 namespace Dive
 {
-	void EventReceiverGroup::Add(DvObject* pReceiver)
-	{
-		if (!pReceiver)
-			return;
-
-		m_Receivers.emplace_back(pReceiver);
-	}
-
-	void EventReceiverGroup::Remove(DvObject* pReceiver)
-	{
-		auto it = std::find(m_Receivers.begin(), m_Receivers.end(), pReceiver);
-		if (it != m_Receivers.end())
-			m_Receivers.erase(it);
-	}
-
 	DvContext::DvContext()
 	{
 	}
@@ -55,37 +40,5 @@ namespace Dive
 			return it->second;
 	
 		return nullptr;
-	}
-
-	void DvContext::AddEventReceiver(StringHash eventType, DvObject* pReceiver)
-	{
-		if (!pReceiver)
-			return;
-
-		auto pGroup = m_EventReceivers[eventType];
-		if (!pGroup)
-		{
-			pGroup = new EventReceiverGroup;
-			m_EventReceivers[eventType] = pGroup;
-		}
-
-		pGroup->Add(pReceiver);
-	}
-
-	void DvContext::RemoveEventReceiver(StringHash eventType, DvObject* pReceiver)
-	{
-		if (!pReceiver)
-			return;
-
-		auto pGroup = m_EventReceivers[eventType];
-		if (!pGroup)
-			return;
-
-		pGroup->Remove(pReceiver);
-	}
-
-	EventReceiverGroup* DvContext::GetEventReceivers(StringHash eventType)
-	{
-		return m_EventReceivers[eventType];
 	}
 }

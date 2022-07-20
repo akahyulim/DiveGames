@@ -8,6 +8,7 @@ namespace Dive
 	{
 	public:
 		StringHash() : m_Value(0) {}
+		StringHash(const std::string& str) : m_Value(Calcurate(str.c_str())) {}
 		StringHash(const char* pStr) : m_Value(Calcurate(pStr)) {}
 		StringHash(unsigned int value) : m_Value(value) {}
 		~StringHash() = default;

@@ -19,10 +19,15 @@
 #include "Core/StringHash.h"
 #include "Core/DvContext.h"
 #include "Core/DvObject.h"
+#include "Core/DvEventSystem.h"
 
 //= Engine ========================
+#include "Engine/DvEngineDef.h"
 #include "Engine/Application.h"
 #include "Engine/DvEngine.h"
+
+//= IO ============================
+#include "IO/DvLog.h"
 
 //= Events ========================
 #include "Events/EventSystem.h"

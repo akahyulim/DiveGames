@@ -172,6 +172,7 @@
   <ItemGroup>
     <ClInclude Include="Src\Base\Object.h" />
     <ClInclude Include="Src\Core\DvContext.h" />
+    <ClInclude Include="Src\Core\DvEventSystem.h" />
     <ClInclude Include="Src\Core\DvObject.h" />
     <ClInclude Include="Src\Core\StringHash.h" />
     <ClInclude Include="Src\Core\Variant.h" />
@@ -184,12 +185,14 @@
     <ClInclude Include="Src\Base\Time.h" />
     <ClInclude Include="Src\Engine\Application.h" />
     <ClInclude Include="Src\Engine\DvEngine.h" />
+    <ClInclude Include="Src\Engine\DvEngineDef.h" />
     <ClInclude Include="Src\Events\EngineEvents.h" />
     <ClInclude Include="Src\Events\EventSystem.h" />
     <ClInclude Include="Src\Graphics\DvGraphics.h" />
     <ClInclude Include="Src\Helper\FileSystem.h" />
     <ClInclude Include="Src\Helper\YamlHelper.h" />
     <ClInclude Include="Src\Input\Input.h" />
+    <ClInclude Include="Src\IO\DvLog.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\CommandList.h" />
     <ClInclude Include="Src\Renderer\ConstantBuffers.h" />
@@ -242,6 +245,7 @@
     <ClCompile Include="Src\Graphics\DvGraphics.cpp" />
     <ClCompile Include="Src\Helper\FileSystem.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
+    <ClCompile Include="Src\IO\DvLog.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\CommandList.cpp" />
     <ClCompile Include="Src\Renderer\DvMesh.cpp" />
