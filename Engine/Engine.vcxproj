@@ -189,6 +189,7 @@
     <ClInclude Include="Src\Events\EngineEvents.h" />
     <ClInclude Include="Src\Events\EventSystem.h" />
     <ClInclude Include="Src\Graphics\DvGraphics.h" />
+    <ClInclude Include="Src\Graphics\DvWindow.h" />
     <ClInclude Include="Src\Helper\FileSystem.h" />
     <ClInclude Include="Src\Helper\YamlHelper.h" />
     <ClInclude Include="Src\Input\Input.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Engine\DvEngine.cpp" />
     <ClCompile Include="Src\Graphics\DvGraphics.cpp" />
+    <ClCompile Include="Src\Graphics\DvWindow.cpp" />
     <ClCompile Include="Src\Helper\FileSystem.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\IO\DvLog.cpp" />

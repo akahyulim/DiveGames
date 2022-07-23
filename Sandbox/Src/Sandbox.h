@@ -9,6 +9,7 @@ public:
 
 	void Setup() override;
 	void Start() override;
+	void Stop() override;
 
 private:
 private:

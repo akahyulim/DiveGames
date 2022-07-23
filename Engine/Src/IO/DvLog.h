@@ -12,12 +12,16 @@
 #include <sstream>
 
 #define DV_LOG_ENGINE_TRACE(...) Dive::DvLog::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Trace, __VA_ARGS__)
+#define DV_LOG_ENGINE_DEBUG(...) Dive::DvLog::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Debug, __VA_ARGS__)
 #define DV_LOG_ENGINE_INFO(...) Dive::DvLog::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Info, __VA_ARGS__)
+#define DV_LOG_ENGINE_WRAN(...) Dive::DvLog::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Warn, __VA_ARGS__)
 #define DV_LOG_ENGINE_ERROR(...) Dive::DvLog::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Error, __VA_ARGS__)
 #define DV_LOG_ENGINE_CRITICAL(...) Dive::DvLog::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Critical, __VA_ARGS__)
 
 #define DV_LOG_CLIENT_TRACE(...) Dive::DvLog::Write(Dive::eLoggerNames::Client, Dive::eLogLevels::Trace, __VA_ARGS__)
+#define DV_LOG_CLIENT_DEBUG(...) Dive::DvLog::Write(Dive::eLoggerNames::Client, Dive::eLogLevels::Debug, __VA_ARGS__)
 #define DV_LOG_CLIENT_INFO(...) Dive::DvLog::Write(Dive::eLoggerNames::Client, Dive::eLogLevels::Info, __VA_ARGS__)
+#define DV_LOG_CLIENT_WARN(...) Dive::DvLog::Write(Dive::eLoggerNames::Client, Dive::eLogLevels::Warn, __VA_ARGS__)
 #define DV_LOG_CLIENT_ERROR(...) Dive::DvLog::Write(Dive::eLoggerNames::Client, Dive::eLogLevels::Error, __VA_ARGS__)
 #define DV_LOG_CLIENT_CRITICAL(...) Dive::DvLog::Write(Dive::eLoggerNames::Client, Dive::eLogLevels::Critical, __VA_ARGS__)
 
@@ -32,7 +36,9 @@ namespace Dive
 	enum class eLogLevels
 	{
 		Trace,
+		Debug,
 		Info,
+		Warn,
 		Error,
 		Critical
 	};
@@ -60,8 +66,14 @@ namespace Dive
 				case eLogLevels::Trace:
 					s_pEngineLogger->trace(fmt, args...);
 					break;
+				case eLogLevels::Debug:
+					s_pEngineLogger->debug(fmt, args...);
+					break;
 				case eLogLevels::Info:
 					s_pEngineLogger->info(fmt, args...);
+					break;
+				case eLogLevels::Warn:
+					s_pEngineLogger->warn(fmt, args...);
 					break;
 				case eLogLevels::Error:
 					s_pEngineLogger->error(fmt, args...);
@@ -78,8 +90,14 @@ namespace Dive
 				case eLogLevels::Trace:
 					s_pClientLogger->trace(fmt, args...);
 					break;
+				case eLogLevels::Debug:
+					s_pClientLogger->debug(fmt, args...);
+					break;
 				case eLogLevels::Info:
 					s_pClientLogger->info(fmt, args...);
+					break;
+				case eLogLevels::Warn:
+					s_pClientLogger->warn(fmt, args...);
 					break;
 				case eLogLevels::Error:
 					s_pClientLogger->error(fmt, args...);
@@ -90,9 +108,8 @@ namespace Dive
 				}
 			}
 
-			// 로그 래벨을 어떻게 넘길 것인가...
-			// Level과 Message를 구조체로 만든 후 Variant에 등록하는 방법이 있지만 너무 복잡해진다.
 			DV_EVENT_FIRE_PARAM(eDvEventType::LogMessage, s_Oss.str());
+			s_Oss.str("");
 		}
 
 	private:

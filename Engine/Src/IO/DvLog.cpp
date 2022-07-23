@@ -5,7 +5,6 @@ namespace Dive
 {
 	std::shared_ptr<spdlog::logger> DvLog::s_pEngineLogger;
 	std::shared_ptr<spdlog::logger> DvLog::s_pClientLogger;
-
 	std::ostringstream DvLog::s_Oss;
 
 	void DvLog::Initialize(const char* filename)
@@ -17,7 +16,7 @@ namespace Dive
 
 		logSinks[0]->set_pattern("%^[%T] %n: %v%$");
 		logSinks[1]->set_pattern("[%T] [%l] %n: %v");
-		logSinks[2]->set_pattern("%v%$");
+		logSinks[2]->set_pattern("%l: %v");
 
 		s_pEngineLogger = std::make_shared<spdlog::logger>("Engine", std::begin(logSinks), std::end(logSinks));
 		spdlog::register_logger(s_pEngineLogger);
@@ -28,7 +27,5 @@ namespace Dive
 		spdlog::register_logger(s_pClientLogger);
 		s_pClientLogger->set_level(spdlog::level::trace);
 		s_pClientLogger->flush_on(spdlog::level::trace);
-
-		//s_pEngineLogger->trace()
 	}
 }

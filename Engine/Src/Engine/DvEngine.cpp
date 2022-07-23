@@ -13,16 +13,15 @@ namespace Dive
 		m_bInitialized(false),
 		m_bExiting(false)
 	{
-		m_pContext->RegisterSubsystem(this);
-
 		// 기본 subsystem 생성: timer, loger, resource cache, input, filesystem
-		m_pContext->RegisterSubsystem(new DvLog(pContext));
+		m_pContext->RegisterSubsystem(std::make_shared<DvLog>(pContext));
 
 		DV_SUBSCRIBE_TO_EVENT(eDvEventType::ExitRequested, DV_EVENT_HANDLER(OnExitRequested));
 	}
 
 	DvEngine::~DvEngine()
 	{
+		DV_LOG_ENGINE_DEBUG("DvEngine 소멸자 호출");
 	}
 	
 	bool DvEngine::Initialize(const VariantMap& parameters)
@@ -31,16 +30,28 @@ namespace Dive
 			return true;
 
 		// subsystem 중 graphics, renderer 생성
-		m_pContext->RegisterSubsystem(new DvGraphics(m_pContext));
+		m_pContext->RegisterSubsystem(std::make_shared<DvGraphics>(m_pContext));
 
 		// 각종 subsystem 초기화
 		auto pLog = m_pContext->GetSubsystem<DvLog>();
 		pLog->Initialize("Dive.log");
 
 		// 그래픽스 초기화
+		// 각종 값들은 parameters로부터 얻는다.
 		{
 			auto pGraphics = m_pContext->GetSubsystem<DvGraphics>();
 			// 윈도우 생성
+			// title
+			// icon
+			// position
+			// setmode: size, full screen, vsync, triple buffers, multi sample, refresh rate
+			if (!pGraphics->SetMode(1600, 900, false, false, false, false))
+			{
+				// graphics도 제거?
+				return false;
+			}
+
+
 			// 그래픽스 디바이스 생성
 		}
 
@@ -55,6 +66,15 @@ namespace Dive
 	{
 		if (IsExiting())
 			return;
+
+		// temp
+		// 임시이긴 하지만 구조상 깔끔하다...
+		auto pGraphics = m_pContext->GetSubsystem<DvGraphics>();
+		if (!pGraphics->RunWindow())
+		{
+			m_bExiting = true;
+			return;
+		}
 
 		Update();
 
@@ -72,10 +92,7 @@ namespace Dive
 	{
 		auto pGraphics = m_pContext->GetSubsystem<DvGraphics>();
 		if (!pGraphics->BeginFrame())
-		{
-			m_bExiting = true;	// temp
 			return;
-		}
 
 		// renderer
 		// ui
@@ -102,6 +119,8 @@ namespace Dive
 		if (pGraphics)
 		{
 			// close
+			// Graphics를 제거하는 건 아니고
+			// 윈도우만 종료시킨다.
 		}
 
 		m_bExiting = true;
