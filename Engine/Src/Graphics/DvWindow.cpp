@@ -24,19 +24,22 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 namespace Dive 
 {
 	DvWindow::DvWindow()
-		: m_hInstance(nullptr),
-		m_hWnd(nullptr),
+		: m_hInstance(NULL),
+		m_hWnd(NULL),
 		m_Title(std::wstring()),
 		m_Size(DirectX::XMINT2(0, 0)),
-		m_Position(DirectX::XMINT2(0, 0))
+		m_Position(DirectX::XMINT2(0, 0)),
+		m_Styles(0),
+		m_Flags(0)
 	{
 	}
 
 	DvWindow::~DvWindow()
 	{
+		Destroy();
 	}
 
-	bool DvWindow::DvCreateWindow(const std::wstring& title, int x, int y, int width, int height, unsigned int flags)
+	bool DvWindow::Create(const std::wstring& title, int x, int y, int width, int height, unsigned int flags)
 	{
 		m_hInstance = GetModuleHandle(nullptr);
 
@@ -51,7 +54,7 @@ namespace Dive
 		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 		wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 		wc.lpszMenuName = NULL;
-		wc.lpszClassName = L"AppWnd";
+		wc.lpszClassName = WND_CLASS_NAME;
 		wc.cbSize = sizeof(WNDCLASSEX);
 		
 		RegisterClassEx(&wc);
@@ -63,27 +66,52 @@ namespace Dive
 
 		if ((width < 0 || width > sizeX) && (height < 0 || height > sizeY))
 		{
-			width = 800;
-			height = 600;
+			width = WND_WIDTH;
+			height = WND_HEIGHT;
 		}
 
-		if (x < 0 || x > sizeX)
-			x = (sizeX - width) / 2;
-		if (y < 0 || y > sizeY)
-			y = (sizeY - height) / 2;
+		m_Styles = 0;
+		if (flags & DV_WINDOW_BORDERLESS)
+		{
+			m_Styles = WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+		}
+		else
+		{
+			m_Styles = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE;
+			
+			if (flags & DV_WINDOW_RESIZABLE)
+			{
+				m_Styles |= WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+			}
+		}
 
-		m_hWnd = CreateWindowEx(WS_EX_APPWINDOW, L"AppWnd", title.c_str(),
-			WS_OVERLAPPEDWINDOW,
-			x, y, width, height, NULL, NULL, m_hInstance, NULL);
+		RECT rt = { 0, 0, width, height };
+		::AdjustWindowRect(&rt, m_Styles, FALSE);
 
-		ShowWindow(m_hWnd, SW_SHOW);
-		SetFocus(m_hWnd);
+		m_hWnd = CreateWindowEx(WS_EX_APPWINDOW, WND_CLASS_NAME, title.c_str(),
+			m_Styles, x, y, rt.right - rt.left, rt.bottom - rt.top, NULL, NULL, m_hInstance, NULL);
 
 		m_Title = title;
-		m_Size = DirectX::XMINT2(width, height);	// Client Rect 크기가 아니다.
+		m_Size = DirectX::XMINT2(width, height);
 		m_Position = DirectX::XMINT2(x, y);
+		m_Flags = flags;
 
 		return true;
+	}
+
+	void DvWindow::Destroy()
+	{
+		if (!m_hWnd)
+			return;
+
+		if (IsFullScreen())
+			::ChangeDisplaySettings(nullptr, 0);
+
+		::DestroyWindow(m_hWnd);
+		m_hWnd = NULL;
+
+		::UnregisterClassW(WND_CLASS_NAME, m_hInstance);
+		m_hInstance = NULL;
 	}
 
 	bool DvWindow::Run()
@@ -100,15 +128,219 @@ namespace Dive
 		return msg.message != WM_QUIT ? true : false;
 	}
 
-	void DvWindow::SetWindowTitle(const std::wstring& title)
+	void DvWindow::ChangeTitle(const std::wstring& title)
 	{
-		// 애매하다. 윈도우를 생성하기 전에 설정하면 의미가 없다.
-		// 반면 윈도우를 생성한 후라면 변경할 수 있어야 한다.
-		// => 윈도우를 생성한 후 호출하는 것이라 보아야 한다.
+		if (!m_hWnd)
+			return;
+
+		::SetWindowText(m_hWnd, title.c_str());
+
+		m_Title = title;
+	}
+
+	void DvWindow::Resize(int width, int height)
+	{
+		if (!m_hWnd)
+			return;
+
+		// 전체화면이라면 변경 불가.
+		if (m_Flags & DV_WINDOW_FULLSCREEN)
+			return;
+
+		RECT rt = { 0, 0, width, height };
+		::AdjustWindowRect(&rt, m_Styles, FALSE);
+
+		::SetWindowPos(m_hWnd, NULL, m_Position.x, m_Position.y,
+			rt.right - rt.left,
+			rt.bottom - rt.top,
+			SWP_SHOWWINDOW);
+
+		m_Size.x = width;
+		m_Size.y = height;
+
+		::GetWindowRect(m_hWnd, &rt);
+		DV_LOG_ENGINE_DEBUG("Window Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+
+		::GetClientRect(m_hWnd, &rt);
+		DV_LOG_ENGINE_DEBUG("Client Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+	}
+
+	void DvWindow::GetSize(int& outWidth, int& outHeight) const
+	{
+		outWidth = m_Flags & DV_WINDOW_FULLSCREEN ? ::GetSystemMetrics(SM_CXSCREEN) : m_Size.x;
+		outHeight = m_Flags & DV_WINDOW_FULLSCREEN ? ::GetSystemMetrics(SM_CYSCREEN) : m_Size.y;
 	}
 	
-	void DvWindow::SetWindowPosition(int x, int y)
+	void DvWindow::SetPosition(int x, int y)
 	{
-		// 위와 마찬가지다. 생성한 후 변경의 목적으로 만들어야 한다.
+		if (!m_hWnd)
+			return;
+
+		// 전체화면이라면 변경 불가.
+		if (m_Flags & DV_WINDOW_FULLSCREEN)
+			return;
+
+		RECT rt{ 0, 0, m_Size.x, m_Size.y };
+		::AdjustWindowRect(&rt, m_Styles, FALSE);
+
+		::SetWindowPos(m_hWnd, NULL, x, y,
+			rt.right - rt.left,
+			rt.bottom - rt.top,
+			SWP_SHOWWINDOW);
+		
+		m_Position.x = x;
+		m_Position.y = y;
+
+		::GetWindowRect(m_hWnd, &rt);
+		DV_LOG_ENGINE_DEBUG("Window Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+
+		::GetClientRect(m_hWnd, &rt);
+		DV_LOG_ENGINE_DEBUG("Client Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+	}
+
+	void DvWindow::GetPosition(int& outX, int& outY) const
+	{
+		outX = m_Flags & DV_WINDOW_FULLSCREEN ? 0 : m_Position.x;
+		outY = m_Flags & DV_WINDOW_FULLSCREEN ? 0 : m_Position.y;
+	}
+
+	void DvWindow::Show()
+	{
+		if (!m_hWnd)
+			return;
+
+		::ShowWindow(m_hWnd, SW_SHOW);
+		::SetFocus(m_hWnd);
+	}
+	
+	void DvWindow::Hide()
+	{
+		if (!m_hWnd)
+			return;
+
+		::ShowWindow(m_hWnd, SW_HIDE);
+	}
+
+	void DvWindow::Maximize()
+	{
+		if (!m_hWnd)
+			return;
+
+		::ShowWindow(m_hWnd, SW_MAXIMIZE);
+		::SetFocus(m_hWnd);
+	}
+	
+	void DvWindow::Minimize()
+	{
+		if (!m_hWnd)
+			return;
+
+		::ShowWindow(m_hWnd, SW_MINIMIZE);
+	}
+	
+	void DvWindow::SetFullscreen(bool bFullscreen)
+	{
+		if (!m_hWnd)
+			return;
+
+		if (bFullscreen)
+		{
+			if (m_Flags & DV_WINDOW_FULLSCREEN)
+				return;
+			else
+			{
+				m_Flags |= DV_WINDOW_FULLSCREEN;
+
+				// 기존 스타일로 돌아가기 위해 플래그는 변경하지 않는다.
+				if (!(m_Flags & DV_WINDOW_BORDERLESS))
+				{
+					m_Styles = WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+				}
+
+				int currentResolutionX = ::GetSystemMetrics(SM_CXSCREEN);
+				int currentResolutionY = ::GetSystemMetrics(SM_CYSCREEN);
+
+				RECT rt{ 0, 0, currentResolutionX, currentResolutionY };
+				::AdjustWindowRect(&rt, m_Styles, FALSE);
+				::SetWindowLongPtr(m_hWnd, GWL_STYLE, m_Styles);
+
+				// 기존 위치, 크기로 돌아가기 위해 해당 변수에 저장하지 않는다.
+				::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, rt.right - rt.left, rt.bottom - rt.top, SWP_SHOWWINDOW);
+			}
+		}
+		else
+		{
+			if (m_Flags & DV_WINDOW_FULLSCREEN)
+			{
+				m_Flags &= ~DV_WINDOW_FULLSCREEN;
+
+				if (!(m_Flags & DV_WINDOW_BORDERLESS))
+				{
+					m_Styles = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE;
+					if (m_Flags & DV_WINDOW_RESIZABLE)
+					{
+						m_Styles |= WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+					}
+				}
+
+				RECT rt{ 0, 0, m_Size.x, m_Size.y };
+				::AdjustWindowRect(&rt, m_Styles, FALSE);
+				::SetWindowLongPtr(m_hWnd, GWL_STYLE, m_Styles);
+				::SetWindowPos(m_hWnd, NULL, m_Position.x, m_Position.y, rt.right - rt.left, rt.bottom - rt.top, SWP_SHOWWINDOW);
+			}
+			else
+				return;
+		}
+
+		RECT rt;
+		::GetWindowRect(m_hWnd, &rt);
+		DV_LOG_ENGINE_DEBUG("Window Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+
+		::GetClientRect(m_hWnd, &rt);
+		DV_LOG_ENGINE_DEBUG("Client Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+	}
+	
+	void DvWindow::SetBorderless(bool bBordered)
+	{
+		if (!m_hWnd)
+			return;
+
+		if (!(m_Flags & DV_WINDOW_FULLSCREEN))
+		{
+			if (bBordered)
+			{
+				if (m_Flags & DV_WINDOW_BORDERLESS)
+					return;
+
+				m_Flags |= DV_WINDOW_BORDERLESS;
+
+				m_Styles = WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
+			}
+			else
+			{
+				if (m_Flags & DV_WINDOW_BORDERLESS)
+					m_Flags &= ~DV_WINDOW_BORDERLESS;
+				else
+					return;
+
+				m_Styles = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE;
+				if (m_Flags & DV_WINDOW_RESIZABLE)
+				{
+					m_Styles |= WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
+				}	
+			}
+
+			RECT rt{ 0, 0, m_Size.x, m_Size.y };
+			::AdjustWindowRect(&rt, m_Styles, FALSE);
+			::SetWindowLongPtr(m_hWnd, GWL_STYLE, m_Styles);
+			::SetWindowPos(m_hWnd, NULL, m_Position.x, m_Position.y, rt.right - rt.left, rt.bottom - rt.top, SWP_SHOWWINDOW);
+		}
+
+		RECT rt;
+		::GetWindowRect(m_hWnd, &rt);
+		DV_LOG_ENGINE_DEBUG("Window Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+
+		::GetClientRect(m_hWnd, &rt);
+		DV_LOG_ENGINE_DEBUG("Client Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 	}
 }

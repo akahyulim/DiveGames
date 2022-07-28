@@ -44,21 +44,29 @@ namespace Dive
 	public:
 		// 생성자.
 		explicit DvGraphics(DvContext* pContext);
-		// 소멸자
+		// 소멸자.
 		~DvGraphics();
 
-		// 초기화 여부 리턴.
+		// 초기화 완료 여부 리턴.
 		bool IsInitialized() const;
+
+		// 윈도우, D3D11 장치 및 리소스 제거.
+		void Destroy();
 
 		// 렌더링 프레임 시작.
 		bool BeginFrame();
 		// 렌더링 프레임 종료 후 스왑 체인.
 		void EndFrame();
 
+		// Draw 함수들: 총 5개
+
+		ID3D11Device* GetDevice() { return m_pDevice; }
+		ID3D11DeviceContext* GetDeviceContext() { return m_pDeviceContext; }
+
 		// 윈도우 타이틀 설정.
-		void SetWindowTitle(const std::wstring& title);
-		// 윈도우 중심 위치 설정.
-		void SetWindowPosition(int x, int y);
+		void ChangeTitle(const std::wstring& title);
+		// 윈도우 위치 설정.
+		void SetPosition(int x, int y);
 		
 		
 		// 윈도우, D3D11 디바이스 모드 설정 후 생성.
@@ -69,12 +77,17 @@ namespace Dive
 		bool RunWindow();
 
 	private:
+		// D3D11 Device, SwapChain 생성.
+		bool createDevice(int width, int height);
+		// 후면 버퍼 크기 변경에 맞춰 기본 텍스쳐 재생성.
+		bool updateSwapChain(int width, int height);
+
 	private:
 		// 윈도우 객체 포인터.
 		std::unique_ptr<DvWindow> m_pWindow;
-		// 윈도우 타이틀.
+		// 윈도우 타이틀. => 제거 대상.
 		std::wstring m_WindowTitle;
-		// 윈도우 중심 위치.
+		// 윈도우 중심 위치. => 제거 대상.
 		DirectX::XMINT2 m_WindowPosition{-1, -1};
 		// 스왑체인 생성시 저장된다.
 		int m_Width;
@@ -85,5 +98,15 @@ namespace Dive
 		// icon image
 
 		// Device
+		IDXGISwapChain* m_pSwapChain;
+		ID3D11Device* m_pDevice;
+		ID3D11DeviceContext* m_pDeviceContext;
+
+		// 후면 버퍼 렌더타겟뷰.
+		ID3D11RenderTargetView* m_pDefaultRenderTargetView = nullptr;
+		// 기본 깊이 스텐실 텍스쳐.
+		ID3D11Texture2D* m_pDefaultDepthStencilTexture = nullptr;
+		// 기본 깊이 스텐실 뷰.
+		ID3D11DepthStencilView* m_pDefaultDepthStencilView = nullptr;
 	};
 }

@@ -55,7 +55,7 @@ namespace Dive
 		m_pEngine->Exit();
 		m_ExitCode = EXIT_FAILURE;
 
-		if (message.empty())
+		if (!message.empty())
 		{
 			MessageBoxA(nullptr, message.c_str(), "ERROR", MB_OK);
 		}
@@ -77,7 +77,7 @@ namespace Dive
 		std::string level;
 		ss >> level;
 
-		if (ss.str() == "error")
+		if (level == "error:")
 		{
 			m_ErrorMessage = logMessage.substr(logMessage.find_first_of(' ') + 1);
 		}
