@@ -76,31 +76,28 @@ void Dive::DvGraphics::EndFrame()
 	// swapchain present
 }
 
-void Dive::DvGraphics::ChangeTitle(const std::wstring& title)
+void Dive::DvGraphics::SetTitle(const std::wstring& title)
 {
 	// 기본적으로 전달로 사용된다.
 	m_WindowTitle = title;
 	
-	if (!m_pWindow)
-		return;
-
-	m_pWindow->ChangeTitle(title);
+	if (m_pWindow) 
+		m_pWindow->ChangeTitle(title);
 }
 
 void Dive::DvGraphics::SetPosition(int x, int y)
 {
 	m_WindowPosition = DirectX::XMINT2(x, y);
 	
-	if (!m_pWindow)
-		return;
-
-	m_pWindow->SetPosition(x, y);
+	if (m_pWindow)
+		m_pWindow->SetPosition(x, y);
 }
 
-bool Dive::DvGraphics::SetMode(int width, int height, bool bFullScreen, bool bBorderless, bool bResizable, bool bVSync)
+bool Dive::DvGraphics::SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
+	bool tripleBuffer, int multiSample, int refreshRate)
 {
 	ScreenModeParams params;
-	params.bFullScreen = bFullScreen;
+	params.bFullScreen = bFullscreen;
 	params.bBorderless = bBorderless;
 	params.bResizable = bResizable;
 	params.bVSync = bVSync;
@@ -120,11 +117,10 @@ bool Dive::DvGraphics::SetMode(int width, int height, bool bFullScreen, bool bBo
 
 	if (!m_pWindow)
 	{
-		m_WindowTitle = L"Default Window";
 		unsigned int flags = 0;
-		flags = DV_WINDOW_RESIZABLE;
-		//flags = DV_WINDOW_BORDERLESS;
-		//flags = DV_WINDOW_BORDERLESS | DV_WINDOW_RESIZABLE;
+		flags |= bFullscreen ? DV_WINDOW_FULLSCREEN : 0;
+		flags |= bBorderless ? DV_WINDOW_BORDERLESS : 0;
+		flags |= bResizable ? DV_WINDOW_RESIZABLE : 0;
 
 		m_pWindow = std::make_unique<DvWindow>();
 		if (!m_pWindow->Create(m_WindowTitle, m_WindowPosition.x, m_WindowPosition.y, width, height, flags))
@@ -150,6 +146,15 @@ bool Dive::DvGraphics::RunWindow()
 		return false;
 
 	return m_pWindow->Run();
+}
+
+// 임시
+HWND Dive::DvGraphics::GetWindowHandle()
+{
+	if (!m_pWindow)
+		return NULL;
+
+	return m_pWindow->GetHandle();
 }
 
 bool Dive::DvGraphics::createDevice(int width, int height)

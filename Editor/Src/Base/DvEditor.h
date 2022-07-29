@@ -1,13 +1,13 @@
 #pragma once
 #include "DiveEngine.h"
 
-namespace Sandbox
+namespace Editor
 {
-	class Sandbox : public Dive::Application
+	class DvEditor : public Dive::Application
 	{
 	public:
-		Sandbox(Dive::DvContext* pContext);
-		~Sandbox();
+		DvEditor(Dive::DvContext* pContext);
+		~DvEditor();
 
 		void Setup() override;
 		void Start() override;

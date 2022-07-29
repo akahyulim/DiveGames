@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/DvObject.h"
 #include "Core/Variant.h"
+#include "DvEngineDef.h"
 
 namespace Dive
 {
@@ -17,7 +18,7 @@ namespace Dive
 		~DvEngine() override;
 
 		// 전달받은 파라미터로 엔진 초기화 및 윈도우 출력.
-		bool Initialize(const VariantMap& parameters);
+		bool Initialize(const EngineParameters& parameters);
 
 		// 프레임.
 		void RunFrame();
@@ -36,6 +37,8 @@ namespace Dive
 
 		// 종료 요청 이벤트 처리.
 		void OnExitRequested();
+
+		static bool HasParameter(const VariantMap& parameters, const std::string& parameter);
 
 	private:
 		// 실제 종료 수행.

@@ -46,7 +46,7 @@ namespace Dive
 		WNDCLASSEX wc;
 		wc.style = 0;
 		wc.hInstance = m_hInstance;
-		wc.lpfnWndProc = WndProc;		// 프로시저 함수 역시 멤버 변수로 두고 생성전에 설정하는 건 어떨까?
+		wc.lpfnWndProc = WndProc;
 		wc.cbClsExtra = 0;
 		wc.cbWndExtra = 0;
 		wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);

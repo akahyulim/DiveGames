@@ -1,4 +1,5 @@
 #pragma once
+#include "DvEngineDef.h"
 #include "Core/DvObject.h"
 #include "Core/DvContext.h"
 #include "Core/Variant.h"
@@ -36,8 +37,8 @@ namespace Dive
 	protected:
 		// 엔진 객체 포인터.
 		std::shared_ptr<DvEngine> m_pEngine;
-		// 엔진 파라미터 맵.
-		VariantMap m_EngineParameters;
+		// 엔진 파라미터.
+		EngineParameters m_EngineParameters;
 
 		// 어플리케이션 종료 코드.
 		int m_ExitCode;

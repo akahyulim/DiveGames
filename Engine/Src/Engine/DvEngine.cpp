@@ -24,7 +24,7 @@ namespace Dive
 		DV_LOG_ENGINE_DEBUG("DvEngine 소멸자 호출");
 	}
 	
-	bool DvEngine::Initialize(const VariantMap& parameters)
+	bool DvEngine::Initialize(const EngineParameters& parameters)
 	{
 		if(IsInitialized())
 			return true;
@@ -37,22 +37,27 @@ namespace Dive
 		pLog->Initialize("Dive.log");
 
 		// 그래픽스 초기화
-		// 각종 값들은 parameters로부터 얻는다.
 		{
 			auto pGraphics = m_pContext->GetSubsystem<DvGraphics>();
-			// 윈도우 생성
-			// title
+			pGraphics->SetTitle(parameters.title);
 			// icon
-			// position
-			// setmode: size, full screen, vsync, triple buffers, multi sample, refresh rate
-			if (!pGraphics->SetMode(1600, 900, false, false, false, false))
+			pGraphics->SetPosition(parameters.positionX, parameters.positionY);
+
+			if (!pGraphics->SetMode(
+				parameters.width,
+				parameters.height,
+				parameters.bFullscreen,
+				parameters.bBorderless,
+				parameters.bReSizable,
+				parameters.bVSync,
+				parameters.bTripleBuffer,
+				parameters.multiSample,
+				parameters.refreshRate))
 			{
-				// graphics도 제거?
 				return false;
 			}
 
-
-			// 그래픽스 디바이스 생성
+			// 그래픽스의 기타 설정
 		}
 
 		DV_LOG_ENGINE_INFO("엔진 초기화 성공");
@@ -113,14 +118,20 @@ namespace Dive
 		doExit();
 	}
 
+	bool DvEngine::HasParameter(const VariantMap& parameters, const std::string& parameter)
+	{
+		return parameters.find(StringHash(parameter)) != parameters.end();
+	}
+
 	void DvEngine::doExit()
 	{
 		auto* pGraphics = GetSubsystem<DvGraphics>();
 		if (pGraphics)
 		{
-			// close
+			// Graphics::Close()
 			// Graphics를 제거하는 건 아니고
 			// 윈도우만 종료시킨다.
+			// 이유를 아직 잘 모르겠다.
 		}
 
 		m_bExiting = true;

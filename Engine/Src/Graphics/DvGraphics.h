@@ -64,17 +64,21 @@ namespace Dive
 		ID3D11DeviceContext* GetDeviceContext() { return m_pDeviceContext; }
 
 		// 윈도우 타이틀 설정.
-		void ChangeTitle(const std::wstring& title);
+		void SetTitle(const std::wstring& title);
 		// 윈도우 위치 설정.
 		void SetPosition(int x, int y);
 		
 		
 		// 윈도우, D3D11 디바이스 모드 설정 후 생성.
 		// bool triple buffer, int multi sample, int refresh rate
-		bool SetMode(int width, int height, bool bFullScreen, bool bBorderless, bool bResizable, bool bVSync);
+		bool SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
+			bool tripleBuffer, int multiSample, int refreshRate);
 
 		// 임시: 윈도우 메시지 피킹 함수 호출.
 		bool RunWindow();
+
+		// 임시
+		HWND GetWindowHandle();
 
 	private:
 		// D3D11 Device, SwapChain 생성.
