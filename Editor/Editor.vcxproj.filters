@@ -99,6 +99,24 @@
     <ClCompile Include="Src\Base\DvEditor.cpp">
       <Filter>Src\Base</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Panels\DvPanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Panels\DvMenuBarPanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Panels\DvScenePanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Panels\DvHierarchyPanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Panels\DvInspectorPanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Panels\DvAssetPanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Base\Editor.h">
@@ -178,6 +196,24 @@
     </ClInclude>
     <ClInclude Include="Src\Base\DvEditor.h">
       <Filter>Src\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\DvPanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\DvMenuBarPanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\DvScenePanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\DvHierarchyPanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\DvInspectorPanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\DvAssetPanel.h">
+      <Filter>Src\Panels</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

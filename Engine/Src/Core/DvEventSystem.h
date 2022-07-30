@@ -21,6 +21,9 @@ namespace Dive
 {
 	enum class eDvEventType
 	{
+		// Graphics
+		BeginRender, EndRender,
+
 		// IO
 		LogMessage,	ExitRequested,
 	};

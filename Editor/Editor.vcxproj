@@ -171,6 +171,12 @@
     <ClCompile Include="Src\Importer\ModelImporter.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Panels\AssetPanel.cpp" />
+    <ClCompile Include="Src\Panels\DvAssetPanel.cpp" />
+    <ClCompile Include="Src\Panels\DvHierarchyPanel.cpp" />
+    <ClCompile Include="Src\Panels\DvInspectorPanel.cpp" />
+    <ClCompile Include="Src\Panels\DvMenuBarPanel.cpp" />
+    <ClCompile Include="Src\Panels\DvPanel.cpp" />
+    <ClCompile Include="Src\Panels\DvScenePanel.cpp" />
     <ClCompile Include="Src\Panels\HierarchyPanel.cpp" />
     <ClCompile Include="Src\Panels\InspectorPanel.cpp" />
     <ClCompile Include="Src\Panels\MenuBarPanel.cpp" />
@@ -199,6 +205,12 @@
     <ClInclude Include="Src\Base\SceneViewCamera.h" />
     <ClInclude Include="Src\Importer\ModelImporter.h" />
     <ClInclude Include="Src\Panels\AssetPanel.h" />
+    <ClInclude Include="Src\Panels\DvAssetPanel.h" />
+    <ClInclude Include="Src\Panels\DvInspectorPanel.h" />
+    <ClInclude Include="Src\Panels\DvMenuBarPanel.h" />
+    <ClInclude Include="Src\Panels\DvPanel.h" />
+    <ClInclude Include="Src\Panels\DvScenePanel.h" />
+    <ClInclude Include="Src\Panels\DvHierarchyPanel.h" />
     <ClInclude Include="Src\Panels\HierarchyPanel.h" />
     <ClInclude Include="Src\Panels\InspectorPanel.h" />
     <ClInclude Include="Src\Panels\MenuBarPanel.h" />

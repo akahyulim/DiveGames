@@ -80,6 +80,9 @@ namespace Dive
 		// 임시
 		HWND GetWindowHandle();
 
+		// 임시
+		ID3D11RenderTargetView* GetDefaultRenderTargetView() { return m_pDefaultRenderTargetView; }
+
 	private:
 		// D3D11 Device, SwapChain 생성.
 		bool createDevice(int width, int height);

@@ -65,6 +65,8 @@ bool Dive::DvGraphics::BeginFrame()
 	// => 4개짜리 배열을 전부 nullptr로 초기화한다.
 	// => GBuffer일 수도 있고, 아닐 수도 있다...
 
+	DV_EVENT_FIRE(eDvEventType::BeginRender);
+
 	return true;
 }
 
@@ -73,7 +75,11 @@ void Dive::DvGraphics::EndFrame()
 	if (!IsInitialized())
 		return;
 
-	// swapchain present
+	DV_EVENT_FIRE(eDvEventType::EndRender);
+
+	// vsync 여부를 멤버로 가져야 할 듯
+	// orho는 screenParam으로 전부 가진다.
+	m_pSwapChain->Present(1, 0);
 }
 
 void Dive::DvGraphics::SetTitle(const std::wstring& title)
