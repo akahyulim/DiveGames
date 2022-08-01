@@ -20,6 +20,7 @@
 #include "Core/DvContext.h"
 #include "Core/DvObject.h"
 #include "Core/DvEventSystem.h"
+#include "Core/DvTimer.h"
 
 //= Engine ========================
 #include "Engine/DvEngineDef.h"
@@ -55,6 +56,7 @@
 #include "Renderer/Graphics/ConstantBuffer.h"
 #include "Renderer/ConstantBuffers.h"
 #include "Renderer/Renderer.h"
+#include "Renderer/DvRenderer.h"
 #include "Renderer/PipelineState.h"
 #include "Renderer/CommandList.h"
 #include "Renderer/RenderPath.h"

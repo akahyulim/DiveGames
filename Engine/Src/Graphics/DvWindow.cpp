@@ -104,6 +104,8 @@ namespace Dive
 		if (!m_hWnd)
 			return;
 
+		ShowCursor(true);
+
 		if (IsFullScreen())
 			::ChangeDisplaySettings(nullptr, 0);
 

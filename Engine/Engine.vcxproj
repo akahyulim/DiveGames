@@ -174,6 +174,7 @@
     <ClInclude Include="Src\Core\DvContext.h" />
     <ClInclude Include="Src\Core\DvEventSystem.h" />
     <ClInclude Include="Src\Core\DvObject.h" />
+    <ClInclude Include="Src\Core\DvTimer.h" />
     <ClInclude Include="Src\Core\StringHash.h" />
     <ClInclude Include="Src\Core\Variant.h" />
     <ClInclude Include="Src\Dive.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="Src\Renderer\ConstantBuffers.h" />
     <ClInclude Include="Src\Renderer\DvMesh.h" />
     <ClInclude Include="Src\Renderer\DvModel.h" />
+    <ClInclude Include="Src\Renderer\DvRenderer.h" />
     <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\DvIndexBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\DvVertexBuffer.h" />
@@ -234,6 +236,7 @@
     <ClCompile Include="Src\Base\Object.cpp" />
     <ClCompile Include="Src\Core\DvContext.cpp" />
     <ClCompile Include="Src\Core\DvObject.cpp" />
+    <ClCompile Include="Src\Core\DvTimer.cpp" />
     <ClCompile Include="Src\Dive.cpp" />
     <ClCompile Include="Src\divepch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -252,6 +255,7 @@
     <ClCompile Include="Src\Renderer\CommandList.cpp" />
     <ClCompile Include="Src\Renderer\DvMesh.cpp" />
     <ClCompile Include="Src\Renderer\DvModel.cpp" />
+    <ClCompile Include="Src\Renderer\DvRenderer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\DvIndexBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\DvVertexBuffer.cpp" />

@@ -15,6 +15,7 @@ namespace Dive
 		// 윈도우를 사용하는 객체들만 제거하는 듯 하다.
 		// => 아무래도 모든 객체는 shared_ptr이 기본인 듯 하다.
 		// 이 구문이 특별한 이유는 순서를 지켜야 하기 때문인 듯
+		RemoveSubsystem("DvRenderer");
 		RemoveSubsystem("DvGraphics");
 	
 		m_Subsystems.clear();

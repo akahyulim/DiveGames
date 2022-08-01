@@ -67,12 +67,17 @@ namespace Dive
 		void SetTitle(const std::wstring& title);
 		// 윈도우 위치 설정.
 		void SetPosition(int x, int y);
+
+		// 윈도우 종료.
+		void CloseWindow();
 		
 		
 		// 윈도우, D3D11 디바이스 모드 설정 후 생성.
 		// bool triple buffer, int multi sample, int refresh rate
 		bool SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
 			bool tripleBuffer, int multiSample, int refreshRate);
+
+		bool IsDeviceLost();
 
 		// 임시: 윈도우 메시지 피킹 함수 호출.
 		bool RunWindow();

@@ -21,6 +21,9 @@ namespace Dive
 {
 	enum class eDvEventType
 	{
+		// Core
+		BeginFrame, Update, PostUpdate, RenderUpdate, PostRenderUpdate, EndFrame,
+
 		// Graphics
 		BeginRender, EndRender,
 

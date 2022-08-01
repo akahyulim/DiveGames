@@ -178,6 +178,12 @@
     <ClInclude Include="Src\Graphics\DvWindow.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\DvRenderer.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Core\DvTimer.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -320,6 +326,12 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\DvWindow.cpp">
       <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\DvRenderer.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\DvTimer.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

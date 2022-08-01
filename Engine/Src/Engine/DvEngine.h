@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/DvObject.h"
 #include "Core/Variant.h"
+#include "Core/DvTimer.h"
 #include "DvEngineDef.h"
 
 namespace Dive
@@ -38,7 +39,7 @@ namespace Dive
 		// 종료 요청 이벤트 처리.
 		void OnExitRequested();
 
-		static bool HasParameter(const VariantMap& parameters, const std::string& parameter);
+		void ApplyFrameLimit();
 
 	private:
 		// 실제 종료 수행.
@@ -49,6 +50,16 @@ namespace Dive
 		bool m_bInitialized;
 		// 종료 플래그.
 		bool m_bExiting;
+
+		//DvTimer m_FrameTimer;
+
+		//std::vector<float> m_LastTmeSteps;
+
+		float m_TimeStep;
+
+		//unsigned int m_MinFps;
+
+		//unsigned int m_MaxFps;
 	};
 }
 

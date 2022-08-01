@@ -99,6 +99,12 @@ void Dive::DvGraphics::SetPosition(int x, int y)
 		m_pWindow->SetPosition(x, y);
 }
 
+void Dive::DvGraphics::CloseWindow()
+{
+	if (m_pWindow)
+		m_pWindow->Destroy();
+}
+
 bool Dive::DvGraphics::SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
 	bool tripleBuffer, int multiSample, int refreshRate)
 {
@@ -144,6 +150,14 @@ bool Dive::DvGraphics::SetMode(int width, int height, bool bFullscreen, bool bBo
 	updateSwapChain(width, height);
 	
 	return true;
+}
+
+bool Dive::DvGraphics::IsDeviceLost()
+{
+	if (FAILED(m_pDevice->GetDeviceRemovedReason()))
+		return true;
+
+	return false;
 }
 
 bool Dive::DvGraphics::RunWindow()
