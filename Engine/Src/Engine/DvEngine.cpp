@@ -13,7 +13,8 @@ namespace Dive
 		: DvObject(pContext),
 		m_bInitialized(false),
 		m_bExiting(false),
-		m_TimeStep(0.0f)
+		m_DeltaTime(0.0f),
+		m_MaxFps(0)
 	{
 		// 기본 subsystem 생성: resource cache, input, filesystem
 		m_pContext->RegisterSubsystem(std::make_shared<DvLog>(pContext));
@@ -93,7 +94,7 @@ namespace Dive
 
 		auto* pTime = GetSubsystem<DvTime>();
 
-		pTime->BeginFrame(m_TimeStep);
+		pTime->BeginFrame(m_DeltaTime);
 
 		// temp: 임시긴 하지만 구조상 깔끔하다...
 		if (!GetSubsystem<DvGraphics>()->RunWindow())
@@ -106,14 +107,14 @@ namespace Dive
 
 		Render();
 
-		ApplyFrameLimit();
+		updateFrameTimer();
 
 		pTime->EndFrame();
 	}
 	
 	void DvEngine::Update()
 	{
-		float deltaTime = m_TimeStep;
+		float deltaTime = m_DeltaTime;
 
 		DV_EVENT_FIRE_PARAM(eDvEventType::Update, deltaTime);
 		DV_EVENT_FIRE_PARAM(eDvEventType::PostUpdate, deltaTime);
@@ -144,15 +145,16 @@ namespace Dive
 		doExit();
 	}
 
-	// frame 맞추기
-	void DvEngine::ApplyFrameLimit()
+	void DvEngine::updateFrameTimer()
 	{
 		if (!m_bInitialized)
 			return;
 
 		// max frame 이상이면 sleep
+		// 아니면 그냥 실행
+		// 이를 위해선 fps를 직접 계산해야 한다.
 
-		// 
+		m_DeltaTime = static_cast<float>(m_FrameTimer.GetMSec(false) * 0.0001f);
 	}
 
 	void DvEngine::doExit()

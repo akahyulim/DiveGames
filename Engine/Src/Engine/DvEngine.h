@@ -39,9 +39,12 @@ namespace Dive
 		// 종료 요청 이벤트 처리.
 		void OnExitRequested();
 
-		void ApplyFrameLimit();
+		unsigned int GetMaxFPS() const { return m_MaxFps; }
+		void SetMaxFPS(unsigned int targetFps) { m_MaxFps = targetFps; }
 
 	private:
+		// 프레임 시간 계산.
+		void updateFrameTimer();
 		// 실제 종료 수행.
 		void doExit();
 
@@ -51,15 +54,16 @@ namespace Dive
 		// 종료 플래그.
 		bool m_bExiting;
 
-		//DvTimer m_FrameTimer;
+		// 프레임 간격 측정 타이머.
+		DvTimer m_FrameTimer;
 
 		//std::vector<float> m_LastTmeSteps;
 
-		float m_TimeStep;
+		// 프레임 경과 시간.
+		float m_DeltaTime;
 
-		//unsigned int m_MinFps;
-
-		//unsigned int m_MaxFps;
+		// 최대 타겟 프레임.
+		unsigned int m_MaxFps;
 	};
 }
 

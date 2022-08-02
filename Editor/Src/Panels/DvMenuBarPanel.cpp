@@ -144,9 +144,7 @@ namespace Editor
 				}
 				*/
 				
-				// 좀 번거롭다.
-				auto* pEngine = m_pEditor->GetSubsystem<Dive::DvEngine>();
-				pEngine->Exit();
+				DV_EVENT_FIRE(Dive::eDvEventType::ExitRequested);
 			}
 
 			ImGui::EndMenu();
