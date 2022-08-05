@@ -1,5 +1,6 @@
 #include "divepch.h"
 #include "DvRenderer.h"
+#include "DvView.h"
 #include "Core/DvContext.h"
 #include "IO/DvLog.h"
 #include "Graphics/DvGraphics.h"
@@ -9,6 +10,7 @@ namespace Dive
 {
 	DvRenderer::DvRenderer(DvContext* pContext)
 		: DvObject(pContext),
+		m_pGraphics(nullptr),
 		m_bInitialized(false)
 	{
 		// E_SCREENMODE, HandleScreenMode 메시지 구독
@@ -47,10 +49,18 @@ namespace Dive
 
 		// assert로 graphics 초기화 및 lost 확인
 		// 자신의 initialize도 확인해야 할 것 같은데...
-		auto* pGraphics = GetSubsystem<DvGraphics>();	// 추후 weak_ptr로 변경
-		DV_ASSERT(pGraphics || pGraphics->IsInitialized() || !pGraphics->IsDeviceLost());
+		DV_ASSERT(m_pGraphics || m_pGraphics->IsInitialized() || !m_pGraphics->IsDeviceLost());
 
 		// 결국 View라는 것의 Render()를 수행한다.
+		// 역순으로 그린다.
+		for (int i = (int)m_Views.size() - 1; i >= 0; --i)
+		{
+			if (!m_Views[i])
+				continue;
+
+			// prepareViewRender()
+			m_Views[i]->Render();
+		}
 	}
 
 	void DvRenderer::OnRenderUpdate(const Variant& data)
@@ -59,16 +69,31 @@ namespace Dive
 		Update(deltaTime);
 	}
 
+	std::shared_ptr<DvView> DvRenderer::GetView(unsigned int index)
+	{
+		return m_Views.size() > index ? m_Views[index] : std::shared_ptr<DvView>();
+	}
+
+	void DvRenderer::SetView(unsigned int index, std::shared_ptr<DvView>& view)
+	{
+		if (m_Views.size() >= index)
+			m_Views.insert(m_Views.begin() + index, view);
+		else
+			m_Views.emplace_back(view);
+	}
+
 	void DvRenderer::initialize()
 	{
-		auto* pGraphics = GetSubsystem<DvGraphics>();
+		auto pGraphics = GetSubsystem<DvGraphics>();
 		// cache manager
 
 		// cache manager 도 확인 필요
 		if (!pGraphics || !pGraphics->IsInitialized())
 			return;
 
-		//m_pGraphics = pGraphics;
+		// 일반포인터로 받아 weak_ptr에 넣지 못한다...
+		// 실제로 일반 주소값으로는 weak_ptr을 생성할 수 없다고 한다...
+		m_pGraphics = pGraphics;
 
 		// cache manager로 부터 load
 		// default light ramp

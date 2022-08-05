@@ -2,6 +2,7 @@
 #include "DvContext.h"
 #include "DvObject.h"
 #include "Base/Base.h"	// core로 이동?
+#include "IO/DvLog.h"
 
 namespace Dive
 {
@@ -11,6 +12,8 @@ namespace Dive
 	
 	DvContext::~DvContext()
 	{
+		DV_LOG_ENGINE_DEBUG("DvContext 소멸자 호출");
+
 		// remove subsystems: audio, ui, input, renderer, graphics
 		// 윈도우를 사용하는 객체들만 제거하는 듯 하다.
 		// => 아무래도 모든 객체는 shared_ptr이 기본인 듯 하다.
@@ -23,7 +26,7 @@ namespace Dive
 
 	void DvContext::RegisterSubsystem(std::shared_ptr<DvObject> pObject)
 	{
-		if (!pObject.get())
+		if (!pObject)
 			return;
 
 		m_Subsystems[pObject->GetType()] = std::move(pObject);

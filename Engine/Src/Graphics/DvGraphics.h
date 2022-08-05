@@ -6,6 +6,17 @@ namespace Dive
 	class DvContext;
 	class DvWindow;
 
+	// 윈도우 클래스 이름.
+	const LPCWSTR WND_CLASS_NAME = L"AppWnd";
+
+	// 윈도우 모드 열거자.
+	enum eDvWindowFlags : unsigned int
+	{
+		DV_WINDOW_FULLSCREEN = 1,
+		DV_WINDOW_BORDERLESS = 1 << 1,
+		DV_WINDOW_RESIZABLE = 1 << 2
+	};
+
 	struct ScreenModeParams
 	{
 		bool operator==(const ScreenModeParams& rhs) const
@@ -53,6 +64,54 @@ namespace Dive
 		// 윈도우, D3D11 장치 및 리소스 제거.
 		void Destroy();
 
+		// 윈도우 생성.
+		bool WindowCreate(int width, int height, unsigned int flags);
+		// 윈도우 메시지 핸들러.
+		LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		// 윈도우 종료.
+		void CloseWindow();
+		// 윈도우 메시지 처리.
+		bool RunWindow();
+		// 윈도우 핸들러 리턴.
+		HWND GetWindowHandle() const { return m_hWnd; }
+		// 윈도우 타이틀 문구 리턴.
+		std::wstring GetWindowTitle() const { return m_WindowTitle; }
+		// 윈도우 타이틀 문구 설정.
+		void SetWindowTitle(const std::wstring& title);
+		// 윈도우 위치 리턴.
+		void GetWindowPosition(int& outX, int& outY) const;
+		// 윈도우 위치 설정.
+		void SetWindowPosition(int x, int y);
+		// 윈도우 클라이언트 영역 크기 리턴.
+		void GetWindowSize(int& outWidth, int&outHeight) const;
+		// 윈도우 클라이언트 영역 크기 재설정.
+		void ResizeWindow(int width, int height);
+		// 윈도우 보이기.
+		void ShowWindow();
+		// 윈도우 숨김.
+		void HideWindow();
+		// 전체 화면 전환.
+		void SetFullScreenWindow(bool bFullScreen);
+		// 보더리스 윈도우로 번환.
+		void SetBorderlessWindow(bool bBorderelss);
+		// 전체 화면 여부 리턴.
+		bool IsFullScreen() const;
+		// 보더리스 윈도우 여부 리턴.
+		bool IsBoderlessWindow() const;
+		// 윈도우 크기 변경 가능 여부 리턴.
+		bool IsResizable() const;
+		
+		// 윈도우, D3D11 디바이스 모드 설정 후 생성.
+		// bool triple buffer, int multi sample, int refresh rate
+		bool SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
+			bool tripleBuffer, int multiSample, int refreshRate);
+
+		void Clear(int flags, const DirectX::XMFLOAT4& color, float depth, float stencil);
+
+		bool IsDeviceLost();
+
+		void OnResizeWindow();
+
 		// 렌더링 프레임 시작.
 		bool BeginFrame();
 		// 렌더링 프레임 종료 후 스왑 체인.
@@ -62,28 +121,6 @@ namespace Dive
 
 		ID3D11Device* GetDevice() { return m_pDevice; }
 		ID3D11DeviceContext* GetDeviceContext() { return m_pDeviceContext; }
-
-		// 윈도우 타이틀 설정.
-		void SetTitle(const std::wstring& title);
-		// 윈도우 위치 설정.
-		void SetPosition(int x, int y);
-
-		// 윈도우 종료.
-		void CloseWindow();
-		
-		
-		// 윈도우, D3D11 디바이스 모드 설정 후 생성.
-		// bool triple buffer, int multi sample, int refresh rate
-		bool SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
-			bool tripleBuffer, int multiSample, int refreshRate);
-
-		bool IsDeviceLost();
-
-		// 임시: 윈도우 메시지 피킹 함수 호출.
-		bool RunWindow();
-
-		// 임시
-		HWND GetWindowHandle();
 
 		// 임시
 		ID3D11RenderTargetView* GetDefaultRenderTargetView() { return m_pDefaultRenderTargetView; }
@@ -95,15 +132,23 @@ namespace Dive
 		bool updateSwapChain(int width, int height);
 
 	private:
-		// 윈도우 객체 포인터.
-		std::unique_ptr<DvWindow> m_pWindow;
-		// 윈도우 타이틀. => 제거 대상.
+		// 인스턴스.
+		HINSTANCE m_hInstance;
+		// 윈도우 핸들러.
+		HWND m_hWnd;
+		// 윈도우 타이틀.
 		std::wstring m_WindowTitle;
-		// 윈도우 중심 위치. => 제거 대상.
+		// 윈도우 중심 위치.
 		DirectX::XMINT2 m_WindowPosition{-1, -1};
-		// 스왑체인 생성시 저장된다.
+		// 윈도우 스타일.
+		DWORD m_WindowStyles;
+		unsigned int m_WindowFlags;
+		// 화면 너비(==윈도우 클라이언트 영역 너비).
 		int m_Width;
+		// 화면 높이(==윈도우 클라이언트 영역 높이).
 		int m_Height;
+
+
 		// 디폴트 모드 같은데, 초기화 및 설정하는 부분을 찾지 못했다.
 		WindowModeParams m_WindowMode;
 		ScreenModeParams m_ScreenMode;

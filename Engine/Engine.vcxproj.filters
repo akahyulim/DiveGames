@@ -175,14 +175,14 @@
     <ClInclude Include="Src\Core\DvEventSystem.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\DvWindow.h">
-      <Filter>Src\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Renderer\DvRenderer.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\DvTimer.h">
       <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\DvView.h">
+      <Filter>Src\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -324,14 +324,14 @@
     <ClCompile Include="Src\IO\DvLog.cpp">
       <Filter>Src\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\DvWindow.cpp">
-      <Filter>Src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Renderer\DvRenderer.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\DvTimer.cpp">
       <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\DvView.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

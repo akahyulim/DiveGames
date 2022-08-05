@@ -43,9 +43,9 @@ namespace Dive
 		// 그래픽스 초기화
 		{
 			auto pGraphics = m_pContext->GetSubsystem<DvGraphics>();
-			pGraphics->SetTitle(parameters.title);
+			pGraphics->SetWindowTitle(parameters.title);
 			// icon
-			pGraphics->SetPosition(parameters.positionX, parameters.positionY);
+			//pGraphics->SetPosition(parameters.positionX, parameters.positionY);
 
 			if (!pGraphics->SetMode(
 				parameters.width,

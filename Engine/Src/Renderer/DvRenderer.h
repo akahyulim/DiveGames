@@ -5,6 +5,7 @@ namespace Dive
 {
 	class DvContext;
 	class DvGraphics;
+	class DvView;
 
 	class DvRenderer : public DvObject
 	{
@@ -19,12 +20,17 @@ namespace Dive
 
 		void OnRenderUpdate(const Variant& data);
 
+		std::shared_ptr<DvView> GetView(unsigned int index);
+		void SetView(unsigned int index, std::shared_ptr<DvView>& view);
+
 	private:
 		void initialize();
 
 	private:
-		std::weak_ptr<DvGraphics> m_pGraphics;
+		DvGraphics* m_pGraphics;
 
 		bool m_bInitialized;
+
+		std::vector<std::shared_ptr<DvView>> m_Views;
 	};
 }

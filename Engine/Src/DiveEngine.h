@@ -65,6 +65,7 @@
 #include "Renderer/Material.h"
 #include "Renderer/Model.h"
 #include "Renderer/DvModel.h"
+#include "Renderer/DvView.h"
 
 //= Input =========================
 #include "Input/input.h"

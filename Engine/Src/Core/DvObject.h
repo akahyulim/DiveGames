@@ -77,4 +77,4 @@ public:\
 	{
 		return static_cast<T*>(GetSubsystem(T::GetTypeStatic()));
 	}
-}
+ }

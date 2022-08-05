@@ -190,7 +190,6 @@
     <ClInclude Include="Src\Events\EngineEvents.h" />
     <ClInclude Include="Src\Events\EventSystem.h" />
     <ClInclude Include="Src\Graphics\DvGraphics.h" />
-    <ClInclude Include="Src\Graphics\DvWindow.h" />
     <ClInclude Include="Src\Helper\FileSystem.h" />
     <ClInclude Include="Src\Helper\YamlHelper.h" />
     <ClInclude Include="Src\Input\Input.h" />
@@ -201,6 +200,7 @@
     <ClInclude Include="Src\Renderer\DvMesh.h" />
     <ClInclude Include="Src\Renderer\DvModel.h" />
     <ClInclude Include="Src\Renderer\DvRenderer.h" />
+    <ClInclude Include="Src\Renderer\DvView.h" />
     <ClInclude Include="Src\Renderer\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\DvIndexBuffer.h" />
     <ClInclude Include="Src\Renderer\Graphics\DvVertexBuffer.h" />
@@ -247,7 +247,6 @@
     <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Engine\DvEngine.cpp" />
     <ClCompile Include="Src\Graphics\DvGraphics.cpp" />
-    <ClCompile Include="Src\Graphics\DvWindow.cpp" />
     <ClCompile Include="Src\Helper\FileSystem.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\IO\DvLog.cpp" />
@@ -256,6 +255,7 @@
     <ClCompile Include="Src\Renderer\DvMesh.cpp" />
     <ClCompile Include="Src\Renderer\DvModel.cpp" />
     <ClCompile Include="Src\Renderer\DvRenderer.cpp" />
+    <ClCompile Include="Src\Renderer\DvView.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\DvIndexBuffer.cpp" />
     <ClCompile Include="Src\Renderer\Graphics\DvVertexBuffer.cpp" />

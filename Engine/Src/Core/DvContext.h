@@ -20,7 +20,7 @@ namespace Dive
 
 		// 등록된 서브 시스템 객체를 리턴.
 		DvObject* GetSubsystem(StringHash type) const;
-		template<typename T> T* GetSubsystem() const;
+		template<class T> T* GetSubsystem() const;
 
 	private:
 	private:
@@ -28,7 +28,7 @@ namespace Dive
 		std::map<StringHash, std::shared_ptr<DvObject>> m_Subsystems;
 	};
 
-	template<typename T>
+	template<class T>
 	T* DvContext::GetSubsystem() const
 	{
 		return static_cast<T*>(GetSubsystem(T::GetTypeStatic()));

@@ -1,6 +1,7 @@
 #include "divepch.h"
 #include "DvObject.h"
 #include "DvContext.h"
+#include "Base/Base.h"
 
 namespace Dive
 {
@@ -47,8 +48,7 @@ namespace Dive
 	DvObject::DvObject(DvContext* pContext)
 		: m_pContext(pContext)
 	{
-		// dv assert로 바꾸기?
-		assert(m_pContext);
+		DV_ASSERT(m_pContext);
 	}
 
 	bool DvObject::IsInstanceOf(StringHash type) const
