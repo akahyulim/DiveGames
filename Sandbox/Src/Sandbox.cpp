@@ -22,7 +22,7 @@ namespace Sandbox
 		m_EngineParameters.height = 900;
 		m_EngineParameters.positionX = m_EngineParameters.GetCenterPositionX();
 		m_EngineParameters.positionY = m_EngineParameters.GetCenterPositionY();
-		m_EngineParameters.bReSizable = false;
+		m_EngineParameters.bReSizable = true;//false;
 
 		// resource paths?
 	}

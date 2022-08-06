@@ -51,7 +51,7 @@ namespace Dive
 
 		// 이벤트로 frame number와 time step 두 값을 전달해야 한다.
 
-		DV_LOG_ENGINE_DEBUG("frame: {0:d}, delta time: {1:f}", m_FrameCount, m_DeltaTime);
+		//DV_LOG_ENGINE_DEBUG("frame: {0:d}, delta time: {1:f}", m_FrameCount, m_DeltaTime);
 	}
 
 	void DvTime::EndFrame()

@@ -3,6 +3,7 @@
 #include "Core/DvContext.h"
 #include "Base/Base.h"
 #include "IO/DvLog.h"
+#include "Core/DvEventSystem.h"
 
 namespace Dive
 {
@@ -41,6 +42,9 @@ namespace Dive
 
 		// 쉐이더 경로 및 파일 포멧 설정
 		// 이외에도 기타 설정이 있다.
+
+		//DV_SUBSCRIBE_TO_EVENT(eDvEventType::ExitRequested, DV_EVENT_HANDLER(OnExitRequested));
+		DV_SUBSCRIBE_TO_EVENT(eDvEventType::ResizeWindow, DV_EVENT_HANDLER(OnResizeWindowHandler));
 	}
 
 	DvGraphics::~DvGraphics()
@@ -98,6 +102,7 @@ namespace Dive
 
 		RegisterClassEx(&wc);
 
+		// 최초 생성시 화면 중앙 정렬
 		m_WindowPosition.x = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
 		m_WindowPosition.y = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 
@@ -141,7 +146,9 @@ namespace Dive
 		
 		switch (msg)
 		{
-
+		case WM_SIZE:
+			DV_EVENT_FIRE(eDvEventType::ResizeWindow);
+			break;
 		}
 
 		return ::DefWindowProc(hWnd, msg, wParam, lParam);
@@ -166,7 +173,7 @@ namespace Dive
 
 	bool DvGraphics::RunWindow()
 	{
-		if (!m_hWnd)
+		if (!IsInitialized())
 			return false;
 
 		MSG msg;
@@ -200,7 +207,7 @@ namespace Dive
 
 	void DvGraphics::SetWindowPosition(int x, int y)
 	{
-		if (!m_hWnd)
+		if (!IsInitialized())
 			return;
 
 		// 전체화면이라면 변경 불가.
@@ -229,44 +236,44 @@ namespace Dive
 		DV_LOG_ENGINE_DEBUG("Client Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 	}
 
+	// 윈도우의 클라이언트 영역 크기를 전달.
 	void DvGraphics::GetWindowSize(int& outWidth, int& outHeight) const
 	{
 		if (!m_hWnd)
 			return;
 
-		outWidth = m_Width;
-		outHeight = m_Height;
+		RECT rt{ 0, 0, 0, 0 };
+		::GetClientRect(m_hWnd, &rt);
+
+		outWidth = static_cast<int>(rt.right - rt.left);
+		outHeight = static_cast<int>(rt.bottom - rt.top);
+
+		DV_LOG_ENGINE_DEBUG("Window width: {0:d}, height: {1:d}", outWidth, outHeight);
 	}
 
+
+	// 이건 앱에서 윈도우 크기 및 해상도를 변경하는 함수이다.
+	// 일단 이 곳에서 스왑체인을 리사이즈 하면 WM_SIZE가 발생하고
+	// 이를 통해 OnResizeWindowHandler()를 통해 백퍼버를 갱신한다.
 	void DvGraphics::ResizeWindow(int width, int height)
 	{
-		if (!m_hWnd)
+		if (!IsInitialized())
 			return;
 
-		// 전체화면이라면 변경 불가.
-		if (m_WindowFlags & DV_WINDOW_FULLSCREEN)
+		DXGI_MODE_DESC desc;
+		desc.Width = width;
+		desc.Height = height;
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.RefreshRate.Denominator = 1;
+		desc.RefreshRate.Numerator = 60;
+		desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	
+		if (FAILED(m_pSwapChain->ResizeTarget(&desc)))
+		{
+			DV_LOG_ENGINE_ERROR("스왑체인 타겟 리사이즈에 실패하였습니다.");
 			return;
-
-		RECT rt = { 0, 0, width, height };
-		::AdjustWindowRect(&rt, m_WindowStyles, FALSE);
-
-		::SetWindowPos(
-			m_hWnd, 
-			NULL, 
-			m_WindowPosition.x, 
-			m_WindowPosition.y,
-			rt.right - rt.left,
-			rt.bottom - rt.top,
-			SWP_SHOWWINDOW);
-
-		m_Width = rt.right - rt.left;
-		m_Height = rt.bottom - rt.top;
-
-		::GetWindowRect(m_hWnd, &rt);
-		DV_LOG_ENGINE_DEBUG("Window Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
-
-		::GetClientRect(m_hWnd, &rt);
-		DV_LOG_ENGINE_DEBUG("Client Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+		}
 	}
 
 	void DvGraphics::ShowWindow()
@@ -286,72 +293,23 @@ namespace Dive
 		::ShowWindow(m_hWnd, SW_HIDE);
 	}
 
-	// 이전 구현은 잘못된 이해를 기반한 듯 하다.
-	// 전체화면 자체는 스왑체인 생성때 결정된다.
-	// 그럼에도 불구하고 크기는 맞춰 주어야 하나...?
-	// 좀 더 생각해보자.
+	// 1. 전체화면 상태에서 스왑체인을 릴리즈하면 예외가 발생된다.
+	// 2. 지원 해상도와 매칭이 되어야 할 것 같다.
 	void DvGraphics::SetFullScreenWindow(bool bFullScreen)
 	{
-		/*
-		* if (!m_hWnd)
+		if (!IsInitialized())
 			return;
 
-		if (bFullscreen)
-		{
-			if (m_Flags & DV_WINDOW_FULLSCREEN)
-				return;
-			else
-			{
-				m_Flags |= DV_WINDOW_FULLSCREEN;
+		// output target이 필요하다.
+		m_pSwapChain->SetFullscreenState(bFullScreen, nullptr);
 
-				// 기존 스타일로 돌아가기 위해 플래그는 변경하지 않는다.
-				if (!(m_Flags & DV_WINDOW_BORDERLESS))
-				{
-					m_Styles = WS_POPUP | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
-				}
-
-				int currentResolutionX = ::GetSystemMetrics(SM_CXSCREEN);
-				int currentResolutionY = ::GetSystemMetrics(SM_CYSCREEN);
-
-				RECT rt{ 0, 0, currentResolutionX, currentResolutionY };
-				::AdjustWindowRect(&rt, m_Styles, FALSE);
-				::SetWindowLongPtr(m_hWnd, GWL_STYLE, m_Styles);
-
-				// 기존 위치, 크기로 돌아가기 위해 해당 변수에 저장하지 않는다.
-				::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, rt.right - rt.left, rt.bottom - rt.top, SWP_SHOWWINDOW);
-			}
-		}
-		else
-		{
-			if (m_Flags & DV_WINDOW_FULLSCREEN)
-			{
-				m_Flags &= ~DV_WINDOW_FULLSCREEN;
-
-				if (!(m_Flags & DV_WINDOW_BORDERLESS))
-				{
-					m_Styles = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE;
-					if (m_Flags & DV_WINDOW_RESIZABLE)
-					{
-						m_Styles |= WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-					}
-				}
-
-				RECT rt{ 0, 0, m_Size.x, m_Size.y };
-				::AdjustWindowRect(&rt, m_Styles, FALSE);
-				::SetWindowLongPtr(m_hWnd, GWL_STYLE, m_Styles);
-				::SetWindowPos(m_hWnd, NULL, m_Position.x, m_Position.y, rt.right - rt.left, rt.bottom - rt.top, SWP_SHOWWINDOW);
-			}
-			else
-				return;
-		}
-
-		RECT rt;
-		::GetWindowRect(m_hWnd, &rt);
-		DV_LOG_ENGINE_DEBUG("Window Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
-
-		::GetClientRect(m_hWnd, &rt);
-		DV_LOG_ENGINE_DEBUG("Client Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
-		*/
+		// 기존 크기에서 해상도만 바뀌는 듯 하다.
+		// 알트 + 엔터로 변경해도 wm_size는 발생하지 않는다.
+		// => 발생한다. 왜 인지 모르겠지만 두 번째 이후부터 발생한다.
+		// 크기는 윈도우 전체 크기로 백버퍼까지 변경된다.
+		int a, b;
+		GetWindowSize(a, b);
+		DV_LOG_ENGINE_DEBUG("FullScreen Size: {0:d} x {1:d}", a, b);
 	}
 
 	void DvGraphics::SetBorderlessWindow(bool bBorderelss)
@@ -466,6 +424,9 @@ namespace Dive
 		createDevice(width, height);
 		updateSwapChain(width, height);
 
+		//ResizeWindow(400, 300);
+		//SetFullScreenWindow(true);
+
 		return true;
 	}
 
@@ -515,14 +476,18 @@ namespace Dive
 		m_pSwapChain->Present(1, 0);
 	}
 
-	// 윈도우로부터 이벤트를 받아야 한다...
-	void DvGraphics::OnResizeWindow()
+	void DvGraphics::OnResizeWindowHandler()
 	{
-		// 크기를 전달받거나, Window로부터 얻어야 한다.
-		int width = 0;
+		if (!IsInitialized())
+			return;
+
+		DV_LOG_ENGINE_DEBUG("OnResizeWindowHandle");
+
+		int width = 0; 
 		int height = 0;
 
-		// backbuffer rendertarget을 새로 만든다.
+		GetWindowSize(width, height);
+
 		updateSwapChain(width, height);
 
 		// render targets들 + viewport 도 새로 만들어야 한다.
@@ -640,12 +605,7 @@ namespace Dive
 		m_Width = width;
 		m_Height = height;
 
-		RECT rt;
-		::GetWindowRect(m_hWnd, &rt);
-		DV_LOG_ENGINE_DEBUG("Window Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
-
-		::GetClientRect(m_hWnd, &rt);
-		DV_LOG_ENGINE_DEBUG("Client Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+		DV_LOG_ENGINE_DEBUG("Backbuffer Size: {0:d} x {1:d}", width, height);
 
 		return true;
 	}

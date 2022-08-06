@@ -25,7 +25,7 @@ namespace Dive
 		BeginFrame, Update, PostUpdate, RenderUpdate, PostRenderUpdate, EndFrame,
 
 		// Graphics
-		BeginRender, EndRender,
+		BeginRender, EndRender, ResizeWindow,
 
 		// IO
 		LogMessage,	ExitRequested,

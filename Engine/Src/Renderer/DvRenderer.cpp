@@ -30,7 +30,7 @@ namespace Dive
 	// EventHandler가 호출한다.
 	void DvRenderer::Update(float delta)
 	{
-		DV_LOG_ENGINE_DEBUG("Renderer::Update({:f})", delta);
+		//DV_LOG_ENGINE_DEBUG("Renderer::Update({:f})", delta);
 
 		// view clear
 
@@ -45,7 +45,7 @@ namespace Dive
 			initialize();
 		}
 
-		DV_LOG_ENGINE_DEBUG("Rendrer::Render()");
+		//DV_LOG_ENGINE_DEBUG("Rendrer::Render()");
 
 		// assert로 graphics 초기화 및 lost 확인
 		// 자신의 initialize도 확인해야 할 것 같은데...

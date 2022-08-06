@@ -70,7 +70,7 @@ namespace Dive
 		LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		// 윈도우 종료.
 		void CloseWindow();
-		// 윈도우 메시지 처리.
+		// 윈도우 메시지 처리 루프.
 		bool RunWindow();
 		// 윈도우 핸들러 리턴.
 		HWND GetWindowHandle() const { return m_hWnd; }
@@ -110,8 +110,6 @@ namespace Dive
 
 		bool IsDeviceLost();
 
-		void OnResizeWindow();
-
 		// 렌더링 프레임 시작.
 		bool BeginFrame();
 		// 렌더링 프레임 종료 후 스왑 체인.
@@ -124,6 +122,10 @@ namespace Dive
 
 		// 임시
 		ID3D11RenderTargetView* GetDefaultRenderTargetView() { return m_pDefaultRenderTargetView; }
+
+
+
+		void OnResizeWindowHandler();
 
 	private:
 		// D3D11 Device, SwapChain 생성.

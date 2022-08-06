@@ -23,7 +23,7 @@ namespace Dive
 
 	void DvView::Render()
 	{
-		DV_LOG_ENGINE_DEBUG("DvView::Render()");
+		//DV_LOG_ENGINE_DEBUG("DvView::Render()");
 
 		excuteRenderPathCommands();
 	}
