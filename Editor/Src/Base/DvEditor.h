@@ -22,6 +22,8 @@ namespace Editor
 		void OnBeginRender();
 		void OnEndRender();
 
+		void OnWindowEvent(const Dive::Variant& var);
+
 	private:
 		void drawPanels();
 

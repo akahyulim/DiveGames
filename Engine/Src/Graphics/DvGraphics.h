@@ -124,8 +124,8 @@ namespace Dive
 		ID3D11RenderTargetView* GetDefaultRenderTargetView() { return m_pDefaultRenderTargetView; }
 
 
-
-		void OnResizeWindowHandler();
+		// 윈도우 크기 변경시 호출. 백버퍼, 렌더타겟 재생성 함수 호출.
+		void OnResizeWindow();
 
 	private:
 		// D3D11 Device, SwapChain 생성.

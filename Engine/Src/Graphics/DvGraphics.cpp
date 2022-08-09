@@ -30,6 +30,8 @@ namespace Dive
 
 	DvGraphics::DvGraphics(DvContext* pContext)
 		: DvObject(pContext),
+		//m_hInstance(NULL),
+		//m_hWnd(NULL),
 		m_pSwapChain(nullptr),
 		m_pDevice(nullptr),
 		m_pDeviceContext(nullptr)
@@ -42,9 +44,6 @@ namespace Dive
 
 		// 쉐이더 경로 및 파일 포멧 설정
 		// 이외에도 기타 설정이 있다.
-
-		//DV_SUBSCRIBE_TO_EVENT(eDvEventType::ExitRequested, DV_EVENT_HANDLER(OnExitRequested));
-		DV_SUBSCRIBE_TO_EVENT(eDvEventType::ResizeWindow, DV_EVENT_HANDLER(OnResizeWindowHandler));
 	}
 
 	DvGraphics::~DvGraphics()
@@ -69,6 +68,11 @@ namespace Dive
 		DV_RELEASE(m_pDefaultDepthStencilTexture);
 		DV_RELEASE(m_pDefaultRenderTargetView);
 
+		// 전체화면에서 스왑체인 릴리즈시 예외 발생
+		if (IsFullScreen())
+		{
+			m_pSwapChain->SetFullscreenState(FALSE, nullptr);
+		}
 		DV_RELEASE(m_pSwapChain);
 		DV_RELEASE(m_pDeviceContext);
 		DV_RELEASE(m_pDevice);
@@ -142,13 +146,22 @@ namespace Dive
 
 	LRESULT DvGraphics::MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		// 이벤트 발신
-		
-		switch (msg)
+		if (IsInitialized())
 		{
-		case WM_SIZE:
-			DV_EVENT_FIRE(eDvEventType::ResizeWindow);
-			break;
+			// 이벤트 발신
+			DvWindowEvent variant;
+			variant.hWnd = hWnd;
+			variant.msg = msg;
+			variant.wParam = wParam;
+			variant.lParam = lParam;
+			DV_EVENT_FIRE_PARAM(eDvEventType::WindowEvent, &variant);
+
+			switch (msg)
+			{
+			case WM_SIZE:
+				OnResizeWindow();
+				break;
+			}
 		}
 
 		return ::DefWindowProc(hWnd, msg, wParam, lParam);
@@ -254,12 +267,13 @@ namespace Dive
 
 	// 이건 앱에서 윈도우 크기 및 해상도를 변경하는 함수이다.
 	// 일단 이 곳에서 스왑체인을 리사이즈 하면 WM_SIZE가 발생하고
-	// 이를 통해 OnResizeWindowHandler()를 통해 백퍼버를 갱신한다.
+	// 이를 통해 OnResizeWindow()를 통해 백퍼버와 렌더타켓을 갱신한다.
 	void DvGraphics::ResizeWindow(int width, int height)
 	{
 		if (!IsInitialized())
 			return;
 
+		// 현재 크기를 제외한 값들이 하드 코딩
 		DXGI_MODE_DESC desc;
 		desc.Width = width;
 		desc.Height = height;
@@ -373,6 +387,9 @@ namespace Dive
 		return m_WindowFlags & DV_WINDOW_RESIZABLE;
 	}
 
+	// 현재 윈도우 생성 후 바로 최소화하면 먹통이 되는 버그가 있다.
+	// 아무래도 크기를 저장하지 못했기 때문인 듯 하다?
+	// => 수정한 부분이 없는데 문제가 사라졌다...
 	bool DvGraphics::SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
 		bool tripleBuffer, int multiSample, int refreshRate)
 	{
@@ -390,42 +407,34 @@ namespace Dive
 		const bool maximize = (!width || !height) && !params.bFullScreen && !params.bBorderless && params.bResizable;
 
 		// 실제로는 함수들을 타고 들어가서
-		// 윈도우 생성 후 D3d11Device를 초기화한다.
-		// D3D11Device는 GraphicsImple이라는 추가 객체를 통해 관리한다. => 하지만 생성은 Graphics::CreateDevice_D3D11()에서 한다.
-		// 즉, Renderer, Graphics, GraphicsImple을 구분해 놓아야 한다.
-		// => 아무래도 Graphics와 GraphicsImple의 구분은 멀티 플랫폼때문에 API를 만들어 사용하기 때문인 듯 보인다.
+		// SetScreenMode에서 윈도우, d3d11 객체를 생성한다.
 
-		//if (!m_pWindow)
+		//if (!m_hWnd)
 		{
 			unsigned int flags = 0;
 			flags |= bFullscreen ? DV_WINDOW_FULLSCREEN : 0;
 			flags |= bBorderless ? DV_WINDOW_BORDERLESS : 0;
 			flags |= bResizable ? DV_WINDOW_RESIZABLE : 0;
 
-			//m_pWindow = std::make_unique<DvWindow>();
-			//if (!m_pWindow->Create(m_WindowTitle, m_WindowPosition.x, m_WindowPosition.y, width, height, flags))
-			{
-			//	m_pWindow.release();
-			//	DV_LOG_ENGINE_ERROR("윈도우 생성에 실패하였습니다.");
-			//	return false;
-			}
-
-			//m_pWindow->Show();
 			if (!WindowCreate(width, height, flags))
 			{
 				DV_LOG_ENGINE_ERROR("윈도우 생성에 실패하였습니다.");
 				return false;
 			}
-
-			::ShowWindow(m_hWnd, SW_SHOW);
 		}
 
 		// 현재 위치는 임시
+		// 순서는 이게 맞다.
 		createDevice(width, height);
 		updateSwapChain(width, height);
 
-		//ResizeWindow(400, 300);
-		//SetFullScreenWindow(true);
+		// clear
+		// present
+
+		// OnScreenModeChanged
+
+		// 이건 내가 추가.
+		ShowWindow();
 
 		return true;
 	}
@@ -476,22 +485,26 @@ namespace Dive
 		m_pSwapChain->Present(1, 0);
 	}
 
-	void DvGraphics::OnResizeWindowHandler()
+	void DvGraphics::OnResizeWindow()
 	{
 		if (!IsInitialized())
 			return;
 
-		DV_LOG_ENGINE_DEBUG("OnResizeWindowHandle");
-
-		int width = 0; 
-		int height = 0;
-
+		int width, height;
 		GetWindowSize(width, height);
+
+		if (width == m_Width && height == m_Height)
+			return;
 
 		updateSwapChain(width, height);
 
 		// render targets들 + viewport 도 새로 만들어야 한다.
 		// 그런데 orho는 reset만 한다. 아마 다른 곳에서 새로 만드나 보다.
+
+		// 이 함수와 함께 윈도우 모드 변경이 일어나는 다른 함수(OnScreenModeChanged)는 ScreenMode 이벤트를 발생시킨다.
+		// 이때 매개변수로 크기, 모드(풀 스크린, 크기 변경 가능), 모니터 등의 정보를 전달한다. 
+
+		DV_LOG_ENGINE_INFO("윈도우 크기가 {0:d} x {1:d}로 변경되었습니다.", width, height);
 	}
 
 	bool DvGraphics::createDevice(int width, int height)
@@ -604,8 +617,6 @@ namespace Dive
 		// 백버퍼 사이즈를 저장
 		m_Width = width;
 		m_Height = height;
-
-		DV_LOG_ENGINE_DEBUG("Backbuffer Size: {0:d} x {1:d}", width, height);
 
 		return true;
 	}

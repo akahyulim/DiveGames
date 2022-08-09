@@ -9,38 +9,9 @@
 #include "Panels/DvInspectorPanel.h"
 #include "Panels/DvAssetPanel.h"
 
-// temp
-#include <CommCtrl.h>
-#pragma comment(lib, "ComCtl32.lib") 
-
 DEFINE_APPLICATION_MAIN(Editor::DvEditor)
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-static LRESULT CALLBACK EditorSubclassProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, UINT_PTR uIdSubclass, DWORD_PTR RefData)
-{
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-		return true;
-
-	switch (msg)
-	{
-	case WM_DESTROY:
-	{
-		DV_LOG_CLIENT_DEBUG("서브클래싱 프로시져 종료 메시지");
-
-		PostQuitMessage(0);
-		return 0;
-	}
-	case WM_CLOSE:
-	{
-		PostQuitMessage(0);
-		return 0;
-	}
-	}
-
-	//return DefWindowProc(hWnd, msg, wParam, lParam);
-	return DefSubclassProc(hWnd, msg, wParam, lParam);
-}
 
 namespace Editor
 {
@@ -49,6 +20,7 @@ namespace Editor
 	{
 		DV_SUBSCRIBE_TO_EVENT(Dive::eDvEventType::BeginRender, DV_EVENT_HANDLER(OnBeginRender));
 		DV_SUBSCRIBE_TO_EVENT(Dive::eDvEventType::EndRender, DV_EVENT_HANDLER(OnEndRender));
+		DV_SUBSCRIBE_TO_EVENT(Dive::eDvEventType::WindowEvent, DV_EVENT_HANDLER_VARIANT(OnWindowEvent));
 	}
 
 	DvEditor::~DvEditor()
@@ -72,9 +44,6 @@ namespace Editor
 		
 		auto* pGraphics = m_pContext->GetSubsystem<Dive::DvGraphics>();
 		
-		// Window Subclassing
-		::SetWindowSubclass(pGraphics->GetWindowHandle(), EditorSubclassProc, 1, (DWORD_PTR)this);
-
 		// Initialize ImGui
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -148,10 +117,6 @@ namespace Editor
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
-
-		// RemoveSubcalssing
-		auto* pGraphics = m_pContext->GetSubsystem<Dive::DvGraphics>();
-		::RemoveWindowSubclass(pGraphics->GetWindowHandle(), EditorSubclassProc, (DWORD_PTR)this);
 	}
 
 	void DvEditor::OnBeginRender()
@@ -186,6 +151,18 @@ namespace Editor
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 		}
+	}
+
+	void DvEditor::OnWindowEvent(const Dive::Variant& var)
+	{
+		Dive::DvWindowEvent* pWndEvent = var.Get<Dive::DvWindowEvent*>();
+
+		ImGui_ImplWin32_WndProcHandler(
+			pWndEvent->hWnd,
+			pWndEvent->msg,
+			pWndEvent->wParam,
+			pWndEvent->lParam
+		);
 	}
 	
 	void DvEditor::drawPanels()

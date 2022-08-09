@@ -2,9 +2,18 @@
 #include <variant>
 #include <vector>
 #include <map>
+#include <string>
 
 namespace Dive
 {
+	struct DvWindowEvent
+	{
+		HWND hWnd;
+		UINT msg;
+		WPARAM wParam;
+		LPARAM lParam;
+	};
+
 #define _VARIANT_TYPES	\
 	char,	\
 	unsigned char,	\
@@ -14,7 +23,8 @@ namespace Dive
 	long,	\
 	bool,	\
 	void*,	\
-	std::string
+	std::string,	\
+	DvWindowEvent*
 
 #define VARIANT_TYPES std::variant<_VARIANT_TYPES>
 typedef std::variant<_VARIANT_TYPES, VARIANT_TYPES> StdVariant;
@@ -33,6 +43,10 @@ typedef std::variant<_VARIANT_TYPES, VARIANT_TYPES> StdVariant;
 		template<class T, class = std::enable_if<!std::is_same<T, Variant>::value>>
 		Variant(T value) { m_Variant = value; }
 		~Variant() = default;
+
+		Variant& operator=(const Variant& rhs);
+		template<class T, class = std::enable_if<!std::is_same<T, Variant>::value>>
+		Variant& operator=(T rhs) { return m_Variant = rhs; }
 	
 		const StdVariant& GetVariantRaw() const { return m_Variant; }
 

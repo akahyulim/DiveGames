@@ -23,6 +23,8 @@ namespace Dive
 		std::shared_ptr<DvView> GetView(unsigned int index);
 		void SetView(unsigned int index, std::shared_ptr<DvView>& view);
 
+		void OnScreenMode(const Variant& var);
+
 	private:
 		void initialize();
 

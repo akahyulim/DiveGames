@@ -40,6 +40,7 @@ namespace Dive
 	void DvRenderer::Render()
 	{
 		// 임시: 현재 initialize() 호출할 곳이 없다.
+		// 추후 이를 삭제하고 OnScreenMode로 처리.
 		if (!m_bInitialized)
 		{
 			initialize();
@@ -82,6 +83,18 @@ namespace Dive
 			m_Views.emplace_back(view);
 	}
 
+	// 이게 호출되려면 OnScreenModeChanged나 OnWindowResized가 호출되어야 한다.
+	// orho는 SetScreenMode의 마지막에 OnScreenModeChagned를 호출한다.
+	// OnScreenModeChanged는 설정을 로그로 출력하고, 데이터를 인자로 이벤트에 전달한다.
+	// private인 것으로 보아 이때(SetScreenMode)만 호출되는 듯 하다.
+	void DvRenderer::OnScreenMode(const Variant& var)
+	{
+		if (!m_bInitialized)
+			initialize();
+
+		// 이미 생성되었다면 m_bViewReset = true;
+	}
+
 	void DvRenderer::initialize()
 	{
 		auto pGraphics = GetSubsystem<DvGraphics>();
@@ -112,7 +125,6 @@ namespace Dive
 
 		m_bInitialized = true;
 
-		//DV_SUBSCRIBE_TO_EVENT(eDvEventType::ExitRequested, DV_EVENT_HANDLER(OnExitRequested));
 		DV_SUBSCRIBE_TO_EVENT(eDvEventType::RenderUpdate, DV_EVENT_HANDLER_VARIANT(OnRenderUpdate));
 		
 		DV_LOG_ENGINE_INFO("Renderer 초기화 성공");
