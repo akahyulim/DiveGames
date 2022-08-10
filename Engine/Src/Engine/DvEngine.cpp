@@ -3,6 +3,7 @@
 #include "DvEngineDef.h"
 #include "Core/DvContext.h"
 #include "Core/DvEventSystem.h"
+#include "Core/CoreEvents.h"
 #include "Graphics/DvGraphics.h"
 #include "Renderer/DvRenderer.h"
 #include "IO/DvLog.h"
@@ -20,7 +21,7 @@ namespace Dive
 		m_pContext->RegisterSubsystem(std::make_shared<DvLog>(pContext));
 		m_pContext->RegisterSubsystem(std::make_shared<DvTime>(pContext));
 
-		DV_SUBSCRIBE_TO_EVENT(eDvEventType::ExitRequested, DV_EVENT_HANDLER(OnExitRequested));
+		DV_SUBSCRIBE_EVENT(eDvEventType::ExitRequested, DV_EVENT_HANDLER(OnExitRequested));
 	}
 
 	DvEngine::~DvEngine()
@@ -116,10 +117,21 @@ namespace Dive
 	{
 		float deltaTime = m_DeltaTime;
 
-		DV_EVENT_FIRE_PARAM(eDvEventType::Update, deltaTime);
-		DV_EVENT_FIRE_PARAM(eDvEventType::PostUpdate, deltaTime);
-		DV_EVENT_FIRE_PARAM(eDvEventType::RenderUpdate, deltaTime);
-		DV_EVENT_FIRE_PARAM(eDvEventType::PostRenderUpdate, deltaTime);
+		UpdateEvent updateEvent;
+		updateEvent.SetDeltaTime(deltaTime);
+		DV_FIRE_EVENT(updateEvent);
+
+		PostUpdateEvent postUpdateEvent;
+		postUpdateEvent.SetDeltaTime(deltaTime);
+		DV_FIRE_EVENT(postUpdateEvent);
+
+		RenderUpdateEvent renderUpdateEvent;
+		renderUpdateEvent.SetDeltaTime(deltaTime);
+		DV_FIRE_EVENT(renderUpdateEvent);
+
+		PostRenderUpdateEvent postRenderUpdateEvent;
+		postRenderUpdateEvent.SetDeltaTime(deltaTime);
+		DV_FIRE_EVENT(postRenderUpdateEvent);
 	}
 	
 	void DvEngine::Render()
@@ -140,7 +152,7 @@ namespace Dive
 		doExit();
 	}
 
-	void DvEngine::OnExitRequested()
+	void DvEngine::OnExitRequested(const DvEvent& e)
 	{
 		doExit();
 	}

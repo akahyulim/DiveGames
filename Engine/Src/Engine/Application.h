@@ -7,6 +7,7 @@
 namespace Dive
 {
 	class DvEngine;
+	class DvEvent;
 
 	class Application : public DvObject
 	{
@@ -32,7 +33,7 @@ namespace Dive
 		// 에러 메시지를 출력. 메인 루프를 종료하고, 실패 종료 코드를 설정.
 		void ErrorExit(const std::string& message = std::string());
 		// 로그 메시지 중 에러 메시지를 저장.
-		void OnLogMessage(const Variant& data);
+		void OnLogMessage(const DvEvent& e);
 
 	protected:
 		// 엔진 객체 포인터.

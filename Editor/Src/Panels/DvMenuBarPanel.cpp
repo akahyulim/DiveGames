@@ -144,7 +144,7 @@ namespace Editor
 				}
 				*/
 				
-				DV_EVENT_FIRE(Dive::eDvEventType::ExitRequested);
+				DV_FIRE_EVENT(Dive::ExitRequestEvent());
 			}
 
 			ImGui::EndMenu();

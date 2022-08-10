@@ -3,6 +3,7 @@
 #include "DvEngine.h"
 #include "Core/DvEventSystem.h"
 #include "Base/Base.h"	// core로 옮기기?
+#include "IO/IOEvents.h"
 
 #include <sstream>
 
@@ -19,7 +20,7 @@ namespace Dive
 		m_pEngine = std::make_shared<DvEngine>(pContext);
 		m_pContext->RegisterSubsystem(m_pEngine);
 
-		DV_SUBSCRIBE_TO_EVENT(eDvEventType::LogMessage, DV_EVENT_HANDLER_VARIANT(OnLogMessage));
+		DV_SUBSCRIBE_EVENT(eDvEventType::LogMessage, DV_EVENT_HANDLER(OnLogMessage));
 	}
 
 	Application::~Application()
@@ -67,19 +68,16 @@ namespace Dive
 		}
 	}
 
-	void Application::OnLogMessage(const Variant& data)
+	void Application::OnLogMessage(const DvEvent& e)
 	{
-		auto logMessage = data.Get<std::string>();
+		auto& evnt = dynamic_cast<const LogMessageEvent&>(e);
 
-		std::stringstream ss;
-		ss.str(logMessage);
+		unsigned int levelErr = 4;
 
-		std::string level;
-		ss >> level;
-
-		if (level == "error:")
+		if (evnt.GetLogLevel() == levelErr)
 		{
-			m_ErrorMessage = logMessage.substr(logMessage.find_first_of(' ') + 1);
+			m_ErrorMessage.clear();
+			m_ErrorMessage = evnt.GetLogMessage();
 		}
 	}
 }

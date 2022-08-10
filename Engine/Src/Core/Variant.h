@@ -23,8 +23,7 @@ namespace Dive
 	long,	\
 	bool,	\
 	void*,	\
-	std::string,	\
-	DvWindowEvent*
+	std::string
 
 #define VARIANT_TYPES std::variant<_VARIANT_TYPES>
 typedef std::variant<_VARIANT_TYPES, VARIANT_TYPES> StdVariant;

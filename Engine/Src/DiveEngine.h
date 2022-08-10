@@ -29,6 +29,7 @@
 
 //= IO ============================
 #include "IO/DvLog.h"
+#include "IO/IOEvents.h"
 
 //= Events ========================
 #include "Events/EventSystem.h"
@@ -42,6 +43,7 @@
 
 //= Graphics ======================
 #include "Graphics/DvGraphics.h"
+#include "Graphics/GraphicsEvents.h"
 
 //= Renderer ======================
 #include "Renderer/Graphics/GraphicsDef.h"

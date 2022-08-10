@@ -3,6 +3,7 @@
 #include "DvContext.h"
 #include "IO/DvLog.h"
 #include "Core/DvEventSystem.h"
+#include "Core/CoreEvents.h"
 #include "Variant.h"
 
 namespace Dive
@@ -56,7 +57,7 @@ namespace Dive
 
 	void DvTime::EndFrame()
 	{
-		DV_EVENT_FIRE(eDvEventType::EndFrame);
+		DV_FIRE_EVENT(EndFrameEvent());
 	}
 
 	unsigned int DvTime::GetTime()

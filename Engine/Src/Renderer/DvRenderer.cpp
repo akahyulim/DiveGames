@@ -2,6 +2,7 @@
 #include "DvRenderer.h"
 #include "DvView.h"
 #include "Core/DvContext.h"
+#include "Core/CoreEvents.h"
 #include "IO/DvLog.h"
 #include "Graphics/DvGraphics.h"
 #include "Base/Base.h"
@@ -13,7 +14,7 @@ namespace Dive
 		m_pGraphics(nullptr),
 		m_bInitialized(false)
 	{
-		// E_SCREENMODE, HandleScreenMode 메시지 구독
+		// ScreenMode 메시지 구독
 
 		// 스크린 모드가 설정되지 않았다면 스킵한단다..
 		// 어떻게 스킵하는지 아직 확인 불가
@@ -64,10 +65,23 @@ namespace Dive
 		}
 	}
 
-	void DvRenderer::OnRenderUpdate(const Variant& data)
+	void DvRenderer::OnRenderUpdate(const DvEvent& e)
 	{
-		auto deltaTime = data.Get<float>();
-		Update(deltaTime);
+		auto& evnt = dynamic_cast<const RenderUpdateEvent&>(e);
+
+		Update(evnt.GetDeltaTime());
+	}
+
+	// 이게 호출되려면 OnScreenModeChanged나 OnWindowResized가 호출되어야 한다.
+	// orho는 SetScreenMode의 마지막에 OnScreenModeChagned를 호출한다.
+	// OnScreenModeChanged는 설정을 로그로 출력하고, 데이터를 인자로 이벤트에 전달한다.
+	// private인 것으로 보아 이때(SetScreenMode)만 호출되는 듯 하다.
+	void DvRenderer::OnScreenMode(const DvEvent& e)
+	{
+		if (!m_bInitialized)
+			initialize();
+
+		// 이미 생성되었다면 m_bViewReset = true;
 	}
 
 	std::shared_ptr<DvView> DvRenderer::GetView(unsigned int index)
@@ -81,18 +95,6 @@ namespace Dive
 			m_Views.insert(m_Views.begin() + index, view);
 		else
 			m_Views.emplace_back(view);
-	}
-
-	// 이게 호출되려면 OnScreenModeChanged나 OnWindowResized가 호출되어야 한다.
-	// orho는 SetScreenMode의 마지막에 OnScreenModeChagned를 호출한다.
-	// OnScreenModeChanged는 설정을 로그로 출력하고, 데이터를 인자로 이벤트에 전달한다.
-	// private인 것으로 보아 이때(SetScreenMode)만 호출되는 듯 하다.
-	void DvRenderer::OnScreenMode(const Variant& var)
-	{
-		if (!m_bInitialized)
-			initialize();
-
-		// 이미 생성되었다면 m_bViewReset = true;
 	}
 
 	void DvRenderer::initialize()
@@ -125,8 +127,8 @@ namespace Dive
 
 		m_bInitialized = true;
 
-		DV_SUBSCRIBE_TO_EVENT(eDvEventType::RenderUpdate, DV_EVENT_HANDLER_VARIANT(OnRenderUpdate));
-		
+		DV_SUBSCRIBE_EVENT(eDvEventType::RenderUpdate, DV_EVENT_HANDLER(OnRenderUpdate));
+
 		DV_LOG_ENGINE_INFO("Renderer 초기화 성공");
 	}
 }

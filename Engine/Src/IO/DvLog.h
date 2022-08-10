@@ -1,4 +1,5 @@
 #pragma once
+#include "IOEvents.h"
 #include "Core/DvObject.h"
 #include "Core/DvContext.h"
 #include "Core/DvEventSystem.h"
@@ -108,8 +109,10 @@ namespace Dive
 				}
 			}
 
-			DV_EVENT_FIRE_PARAM(eDvEventType::LogMessage, s_Oss.str());
-			s_Oss.str("");
+			LogMessageEvent e;
+			e.SetLogLevel((unsigned int)type);
+			e.SetLogMessage(s_Oss.str());
+			DV_FIRE_EVENT(e);
 		}
 
 	private:

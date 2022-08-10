@@ -18,9 +18,9 @@ namespace Editor
 	DvEditor::DvEditor(Dive::DvContext* pContext)
 		: Dive::Application(pContext)
 	{
-		DV_SUBSCRIBE_TO_EVENT(Dive::eDvEventType::BeginRender, DV_EVENT_HANDLER(OnBeginRender));
-		DV_SUBSCRIBE_TO_EVENT(Dive::eDvEventType::EndRender, DV_EVENT_HANDLER(OnEndRender));
-		DV_SUBSCRIBE_TO_EVENT(Dive::eDvEventType::WindowEvent, DV_EVENT_HANDLER_VARIANT(OnWindowEvent));
+		DV_SUBSCRIBE_EVENT(Dive::eDvEventType::BeginRender, DV_EVENT_HANDLER(OnBeginRender));
+		DV_SUBSCRIBE_EVENT(Dive::eDvEventType::EndRender, DV_EVENT_HANDLER(OnEndRender));
+		DV_SUBSCRIBE_EVENT(Dive::eDvEventType::WindowEvent, DV_EVENT_HANDLER(OnWindowEvent));
 	}
 
 	DvEditor::~DvEditor()
@@ -119,7 +119,7 @@ namespace Editor
 		ImGui::DestroyContext();
 	}
 
-	void DvEditor::OnBeginRender()
+	void DvEditor::OnBeginRender(const Dive::DvEvent& e)
 	{
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
@@ -129,15 +129,15 @@ namespace Editor
 		// draw panels
 		drawPanels();
 	}
-	
-	void DvEditor::OnEndRender()
+
+	void DvEditor::OnEndRender(const Dive::DvEvent& e)
 	{
 		auto* pGraphics = m_pContext->GetSubsystem<Dive::DvGraphics>();
 		auto* pDeviceContext = pGraphics->GetDeviceContext();
 		auto* pDefaultRenderTargetView = pGraphics->GetDefaultRenderTargetView();
-		
+
 		const float clear_color_with_alpha[4]{ 0.1f, 0.1f, 0.1f, 0.0f };
-		
+
 		ImGui::Render();
 
 		pDeviceContext->OMSetRenderTargets(1, &pDefaultRenderTargetView, NULL);
@@ -153,15 +153,15 @@ namespace Editor
 		}
 	}
 
-	void DvEditor::OnWindowEvent(const Dive::Variant& var)
+	void DvEditor::OnWindowEvent(const Dive::DvEvent& e)
 	{
-		Dive::DvWindowEvent* pWndEvent = var.Get<Dive::DvWindowEvent*>();
+		auto& evnt = dynamic_cast<const Dive::WindowEvent&>(e);
 
 		ImGui_ImplWin32_WndProcHandler(
-			pWndEvent->hWnd,
-			pWndEvent->msg,
-			pWndEvent->wParam,
-			pWndEvent->lParam
+			evnt.m_hWnd,
+			evnt.m_Msg,
+			evnt.m_wParam,
+			evnt.m_lParam
 		);
 	}
 	

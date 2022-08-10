@@ -3,19 +3,13 @@
 #include <vector>
 #include <functional>
 
-#include "Variant.h"
+#define DV_EVENT_HANDLER(function)				[this](const Dive::DvEvent& e) {function(e);}
+#define DV_EVENT_HANDLER_STATIC(function)		[](const Dive::DvEvent& e) { function(e);}
 
-#define DV_EVENT_HANDLER(function) [this](const Dive::Variant& var) { function();}
-#define DV_EVENT_HANDLER_STATIC(function) [](const Dive::Variant& var) { function();}
+#define DV_SUBSCRIBE_EVENT(type, function)		Dive::DvEventSystem::GetInstance().Subscribe(type, function);
+#define DV_UNSUBSCRIBE_EVENT(type, function)	Dive::DvEventSystem::GetInstance().Unsubscribe(type, function);
 
-#define DV_EVENT_HANDLER_VARIANT(function) [this](const Dive::Variant& var) { function(var);}
-#define DV_EVENT_HANDLER_STATIC_VARIANT(function) [](const Dive::Variant& var) { function(var);}
-
-#define DV_EVENT_FIRE(eventType) Dive::DvEventSystem::GetInstance().Fire(eventType)
-#define DV_EVENT_FIRE_PARAM(eventType, data) Dive::DvEventSystem::GetInstance().Fire(eventType, data)
-
-#define DV_SUBSCRIBE_TO_EVENT(eventType, function) Dive::DvEventSystem::GetInstance().Subscribe(eventType, function)
-#define DV_UNSUBSCRIBE_FROM_EVENT(eventType, function) Dive::DvEventSystem::GetInstance().Unsubscribe(eventType, function)
+#define DV_FIRE_EVENT(e)						Dive::DvEventSystem::GetInstance().Fire(e);
 
 namespace Dive
 {
@@ -31,10 +25,26 @@ namespace Dive
 		LogMessage,	ExitRequested,
 	};
 
-	using Subscriber = std::function<void(const Variant&)>;
+#define DV_EVENT_CLASS_TYPE(type) \
+public:	\
+	static eDvEventType GetStaticType() { return eDvEventType::type; }	\
+	virtual eDvEventType GetType() const override { return GetStaticType(); } \
+	virtual const char* GetName() const override { return #type; }
+
+	class DvEvent
+	{
+	public:
+		virtual ~DvEvent() = default;
+
+		virtual eDvEventType GetType() const = 0;
+		virtual const char* GetName() const = 0;
+		virtual std::string ToString() const { return GetName(); }
+	};
 
 	class DvEventSystem
 	{
+		using Subscriber = std::function<void(const DvEvent&)>;
+
 	public:
 		static DvEventSystem& GetInstance()
 		{
@@ -65,14 +75,14 @@ namespace Dive
 			}
 		}
 
-		void Fire(const eDvEventType eventType, const Variant& data = 0)
+		void Fire(const DvEvent& e)
 		{
-			if (m_Subscribers.find(eventType) == m_Subscribers.end())
+			if (m_Subscribers.find(e.GetType()) == m_Subscribers.end())
 				return;
 
-			for (const auto& subscriber : m_Subscribers[eventType])
+			for (const auto& subscriber : m_Subscribers[e.GetType()])
 			{
-				subscriber(data);
+				subscriber(e);
 			}
 		}
 

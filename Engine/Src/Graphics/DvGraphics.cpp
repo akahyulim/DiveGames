@@ -1,9 +1,11 @@
 #include "divepch.h"
 #include "DvGraphics.h"
+#include "GraphicsEvents.h"
 #include "Core/DvContext.h"
 #include "Base/Base.h"
 #include "IO/DvLog.h"
 #include "Core/DvEventSystem.h"
+#include "GraphicsEvents.h"
 
 namespace Dive
 {
@@ -148,13 +150,7 @@ namespace Dive
 	{
 		if (IsInitialized())
 		{
-			// 이벤트 발신
-			DvWindowEvent variant;
-			variant.hWnd = hWnd;
-			variant.msg = msg;
-			variant.wParam = wParam;
-			variant.lParam = lParam;
-			DV_EVENT_FIRE_PARAM(eDvEventType::WindowEvent, &variant);
+			DV_FIRE_EVENT(WindowEvent(hWnd, msg, wParam, lParam));
 
 			switch (msg)
 			{
@@ -468,7 +464,7 @@ namespace Dive
 		// => 4개짜리 배열을 전부 nullptr로 초기화한다.
 		// => GBuffer일 수도 있고, 아닐 수도 있다...
 
-		DV_EVENT_FIRE(eDvEventType::BeginRender);
+		DV_FIRE_EVENT(BeginRenderEvent());
 
 		return true;
 	}
@@ -478,7 +474,7 @@ namespace Dive
 		if (!IsInitialized())
 			return;
 
-		DV_EVENT_FIRE(eDvEventType::EndRender);
+		DV_FIRE_EVENT(EndRenderEvent());
 
 		// vsync 여부를 멤버로 가져야 할 듯
 		// orho는 screenParam으로 전부 가진다.

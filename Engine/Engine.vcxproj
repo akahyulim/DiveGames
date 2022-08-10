@@ -171,6 +171,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Src\Base\Object.h" />
+    <ClInclude Include="Src\Core\CoreEvents.h" />
     <ClInclude Include="Src\Core\DvContext.h" />
     <ClInclude Include="Src\Core\DvEventSystem.h" />
     <ClInclude Include="Src\Core\DvObject.h" />
@@ -190,10 +191,12 @@
     <ClInclude Include="Src\Events\EngineEvents.h" />
     <ClInclude Include="Src\Events\EventSystem.h" />
     <ClInclude Include="Src\Graphics\DvGraphics.h" />
+    <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
     <ClInclude Include="Src\Helper\FileSystem.h" />
     <ClInclude Include="Src\Helper\YamlHelper.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\IO\DvLog.h" />
+    <ClInclude Include="Src\IO\IOEvents.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\CommandList.h" />
     <ClInclude Include="Src\Renderer\ConstantBuffers.h" />

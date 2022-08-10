@@ -7,6 +7,7 @@
 namespace Dive
 {
 	class DvContext;
+	class DvEvent;
 
 	class DvEngine : public DvObject
 	{
@@ -37,7 +38,7 @@ namespace Dive
 		void Exit();
 
 		// 종료 요청 이벤트 처리.
-		void OnExitRequested();
+		void OnExitRequested(const DvEvent& e);
 
 		unsigned int GetMaxFPS() const { return m_MaxFps; }
 		void SetMaxFPS(unsigned int targetFps) { m_MaxFps = targetFps; }

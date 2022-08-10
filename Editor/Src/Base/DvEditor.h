@@ -19,10 +19,9 @@ namespace Editor
 		void Start() override;
 		void Stop() override;
 
-		void OnBeginRender();
-		void OnEndRender();
-
-		void OnWindowEvent(const Dive::Variant& var);
+		void OnBeginRender(const Dive::DvEvent& e);
+		void OnEndRender(const Dive::DvEvent& e);
+		void OnWindowEvent(const Dive::DvEvent& e);
 
 	private:
 		void drawPanels();

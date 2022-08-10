@@ -6,6 +6,7 @@ namespace Dive
 	class DvContext;
 	class DvGraphics;
 	class DvView;
+	class DvEvent;
 
 	class DvRenderer : public DvObject
 	{
@@ -18,12 +19,11 @@ namespace Dive
 		void Update(float delta);
 		void Render();
 
-		void OnRenderUpdate(const Variant& data);
+		void OnRenderUpdate(const DvEvent& e);
+		void OnScreenMode(const DvEvent& e);
 
 		std::shared_ptr<DvView> GetView(unsigned int index);
 		void SetView(unsigned int index, std::shared_ptr<DvView>& view);
-
-		void OnScreenMode(const Variant& var);
 
 	private:
 		void initialize();
