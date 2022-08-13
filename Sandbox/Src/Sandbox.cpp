@@ -5,7 +5,8 @@ DEFINE_APPLICATION_MAIN(Sandbox::Sandbox)
 namespace Sandbox
 {
 	Sandbox::Sandbox(Dive::Context* pContext)
-		: Dive::Application(pContext)
+		: Dive::Application(pContext),
+		m_pScene(nullptr)
 	{
 	}
 
@@ -18,8 +19,8 @@ namespace Sandbox
 	{
 		// ini 파일 등을 읽어오는 편이 낫다.
 		m_EngineParameters.title = L"Sandbox";
-		m_EngineParameters.width = 1600;
-		m_EngineParameters.height = 900;
+		m_EngineParameters.width = 800;
+		m_EngineParameters.height = 600;
 		m_EngineParameters.positionX = m_EngineParameters.GetCenterPositionX();
 		m_EngineParameters.positionY = m_EngineParameters.GetCenterPositionY();
 		m_EngineParameters.bReSizable = true;//false;
@@ -34,6 +35,16 @@ namespace Sandbox
 
 		// create scene content
 		// scene을 직접 생성한 후 cache를 이용하여 object를 구성
+		m_pScene = new Dive::Scene(m_pContext);
+		auto pA = m_pScene->CreateGameObject("AAA");
+		auto pB = m_pScene->CreateGameObject("BBB");
+		auto pC = m_pScene->CreateGameObject("CCC");
+		auto pD = m_pScene->CreateGameObject("DDD");
+
+		m_pScene->RemoveGameObject(pC->GetID());
+
+		m_pScene->CreateGameObject("EEE", 3);
+
 		// camera는 멤버 변수로 별도 관리
 
 		// create ui content
@@ -55,5 +66,6 @@ namespace Sandbox
 		DV_LOG_CLIENT_DEBUG("Sandbox::Stop 호출");
 
 		// Application Cleanup
+		DV_DELETE(m_pScene);
 	}
 }

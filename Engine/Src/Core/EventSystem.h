@@ -21,6 +21,9 @@ namespace Dive
 		// Graphics
 		WindowEvent, ScreenMode, BeginRender, EndRender,
 
+		// Scene
+		SceneUpdate, 
+
 		// IO
 		LogMessage,	ExitRequested,
 	};

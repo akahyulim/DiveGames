@@ -58,6 +58,12 @@
     <ClInclude Include="Src\Core\CoreDefs.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Scene\Scene.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\GameObject.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -89,6 +95,12 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\View.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Scene.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\GameObject.cpp">
+      <Filter>Src\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

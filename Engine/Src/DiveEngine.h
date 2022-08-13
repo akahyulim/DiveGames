@@ -37,6 +37,8 @@
 //= Input =========================
 
 //= Scene =========================
+#include "Scene/Scene.h" 
+#include "Scene/GameObject.h"
 
 //= Math ==========================
 

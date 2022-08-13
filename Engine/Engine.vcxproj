@@ -189,6 +189,8 @@
     <ClInclude Include="Src\IO\IOEvents.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\View.h" />
+    <ClInclude Include="Src\Scene\GameObject.h" />
+    <ClInclude Include="Src\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Core\Context.cpp" />
@@ -203,6 +205,8 @@
     <ClCompile Include="Src\IO\Log.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
+    <ClCompile Include="Src\Scene\GameObject.cpp" />
+    <ClCompile Include="Src\Scene\Scene.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

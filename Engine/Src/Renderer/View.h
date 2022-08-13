@@ -6,7 +6,7 @@ namespace Dive
 	class Graphics;
 	class Renderer;
 
-	// camera, renderpath를 이용해 scene을 그린다.
+	// scene, camera, render path를 참조하여 graphics로 render
 	class View : public Object
 	{
 		DIVE_OBJECT(View, Object)
