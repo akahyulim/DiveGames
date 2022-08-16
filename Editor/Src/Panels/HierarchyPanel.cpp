@@ -2,11 +2,11 @@
 
 namespace Editor
 {
-
 	// 현재 창이 선택된 상태에서 esc를 누르면 Selected를 해제하고 싶다.
 	// 이는 ScenePanel에도 적용되어야 한다.
 	HierarchyPanel::HierarchyPanel(Editor* pEditor)
-		: Panel(pEditor, "Hierarchy")
+		: Panel(pEditor, "Hierarchy"),
+		m_pSelectedObject(nullptr)
 	{
 		// 역시 CreateScene를 구독한다.
 		// 즉, 모든 패널이 구독하며, virtual 이벤트 핸들러가 있었을 것이다.
@@ -18,14 +18,14 @@ namespace Editor
 
 	void HierarchyPanel::renderWindow()
 	{
-		/*
-		if (!m_pActiveScene)
+		
+		if (!s_pActiveScene)
 		{
 			m_pSelectedObject = nullptr;
 			return;
 		}
 
-		if (ImGui::TreeNodeEx(m_pActiveScene->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::TreeNodeEx(s_pActiveScene->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// 일단 이 곳이랑 가장 아래 부분에서
 			// Transform 참조 오류가 발생한다.
@@ -33,6 +33,7 @@ namespace Editor
 			// 이는 반드시 수정되어야 한다.
 			// => 수정했지만 여전히 버그가 발생한다. 다른 곳에서 SelectedObject의 Transform을 요구하는 것 같다.
 			// => ScenePanel에서 ImGuizmo 때문에 발생한 문제였다. 일단 수정 및 테스트를 완료했다.
+			/*
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
@@ -54,10 +55,9 @@ namespace Editor
 					drawNode(pRoot);
 				}
 			}
-
+			*/
 			ImGui::TreePop();
 		}
-		*/
 	}
 	/*
 	void HierarchyPanel::drawNode(Dive::GameObject* pObject)

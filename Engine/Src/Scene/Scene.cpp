@@ -1,6 +1,7 @@
 #include "divepch.h"
 #include "Scene.h"
 #include "GameObject.h"
+#include "Component/Component.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
 #include "Core/EventSystem.h"
@@ -12,8 +13,10 @@ namespace Dive
 {
 	Scene::Scene(Context* pContext)
 		: Object(pContext),
+		m_Name("Untitled"),
 		m_bUpdateEnabled(true),
-		m_GameObjectID(FIRST_ID)
+		m_GameObjectID(FIRST_ID),
+		m_ComponentID(FIRST_ID)
 	{
 		SUBSCRIBE_EVENT(eEventType::Update, EVENT_HANDLER(OnUpdate));
 	}
@@ -22,7 +25,7 @@ namespace Dive
 	{
 		Clear();
 
-		DV_LOG_ENGINE_DEBUG("Scene 소멸자 호출");
+		DV_LOG_ENGINE_DEBUG("Scene({:s}) 소멸자 호출", m_Name);
 	}
 
 	void Scene::Clear()
@@ -33,8 +36,10 @@ namespace Dive
 			DV_DELETE(it->second);
 		}
 		m_GameObjects.clear();
+		m_Components.clear();
 
 		m_GameObjectID = FIRST_ID;
+		m_ComponentID = FIRST_ID;
 	}
 
 	void Scene::Update(float delta)
@@ -47,12 +52,13 @@ namespace Dive
 	{
 		auto* pNewGameObject = new GameObject(m_pContext);
 		pNewGameObject->SetName(name.empty() ? "GameObject" : name);
+		pNewGameObject->setScene(this);
 
 		if (!id || GetGameObject(id))
 		{
-			id = getFreeID();
+			id = getFreeGameObjectID();
 		}
-		pNewGameObject->SetID(id);
+		pNewGameObject->setID(id);
 
 		m_GameObjects[id] = pNewGameObject;
 
@@ -84,8 +90,39 @@ namespace Dive
 	GameObject* Scene::GetGameObject(unsigned int id)
 	{
 		auto it = m_GameObjects.find(id);
-
 		return it != m_GameObjects.end() ? it->second : nullptr;
+	}
+
+	void Scene::ComponentAdded(Component* pComponent, unsigned int id)
+	{
+		if (!pComponent)
+			return;
+
+		if (!id || GetComponent(id))
+		{
+			id = getFreeComponentID();
+		}
+		pComponent->setID(id);
+
+		m_Components[id] = pComponent;
+	}
+
+	void Scene::ComponentRemoved(Component* pComponent)
+	{
+		if (!pComponent)
+			return;
+
+		auto comID = pComponent->GetID();
+		if (GetComponent(comID))
+		{
+			m_Components.erase(comID);
+		}
+	}
+
+	Component* Scene::GetComponent(unsigned int id)
+	{
+		auto it = m_Components.find(id);
+		return it != m_Components.end() ? it->second : nullptr;
 	}
 
 	void Scene::SetUpdateEnabled(bool bEnable)
@@ -103,7 +140,7 @@ namespace Dive
 	}
 
 	// 언듯보기에 꽉 차면 무한으로 돌 거 같다...
-	unsigned int Scene::getFreeID()
+	unsigned int Scene::getFreeGameObjectID()
 	{
 		for (;;)
 		{
@@ -115,6 +152,24 @@ namespace Dive
 				m_GameObjectID = FIRST_ID;
 		
 			if (!m_GameObjects[freeID])
+				return freeID;
+		}
+	}
+
+	// 빈 공간을 찾는 다는건 한 공간에 관리 중이라는 말이다.
+	// 즉, 컨테이너를 scene에 마련해야 한다.
+	unsigned int Scene::getFreeComponentID()
+	{
+		for (;;)
+		{
+			auto freeID = m_ComponentID;
+
+			if (m_ComponentID < LAST_ID)
+				++m_ComponentID;
+			else
+				m_ComponentID = FIRST_ID;
+
+			if (!m_Components[freeID])
 				return freeID;
 		}
 	}

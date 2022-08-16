@@ -45,6 +45,20 @@ namespace Sandbox
 
 		m_pScene->CreateGameObject("EEE", 3);
 
+		auto* pCom = pA->CreateComponent<Dive::Transform>();
+		//pA->CreateComponent<Dive::Transform>();
+		//pA->RemoveComponent<Dive::Transform>();
+		//pA->RemoveComponent(pCom);
+
+		if (!m_pScene->GetComponent(pCom->GetID()))
+		{
+			DV_LOG_CLIENT_DEBUG("해당 Component가 Scene에 존재하지 않습니다.");
+		}
+		else
+		{
+			DV_LOG_CLIENT_DEBUG("Component가 Scene에 존재합니다.");
+		}
+
 		// camera는 멤버 변수로 별도 관리
 
 		// create ui content

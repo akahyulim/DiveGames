@@ -189,6 +189,8 @@
     <ClInclude Include="Src\IO\IOEvents.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\View.h" />
+    <ClInclude Include="Src\Scene\Component\Component.h" />
+    <ClInclude Include="Src\Scene\Component\Transform.h" />
     <ClInclude Include="Src\Scene\GameObject.h" />
     <ClInclude Include="Src\Scene\Scene.h" />
   </ItemGroup>
@@ -205,6 +207,8 @@
     <ClCompile Include="Src\IO\Log.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
+    <ClCompile Include="Src\Scene\Component\Component.cpp" />
+    <ClCompile Include="Src\Scene\Component\Transform.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />
   </ItemGroup>

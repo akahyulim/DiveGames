@@ -16,7 +16,12 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 namespace Editor
 {
 	Editor::Editor(Dive::Context* pContext)
-		: Dive::Application(pContext)
+		: Dive::Application(pContext),
+		m_pMenuBar(nullptr),
+		m_pScene(nullptr),
+		m_pHierarchy(nullptr),
+		m_pInspector(nullptr),
+		m_pAsset(nullptr)
 	{
 		SUBSCRIBE_EVENT(Dive::eEventType::BeginRender, EVENT_HANDLER(OnBeginRender));
 		SUBSCRIBE_EVENT(Dive::eEventType::EndRender, EVENT_HANDLER(OnEndRender));

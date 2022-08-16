@@ -15,6 +15,7 @@ namespace Editor
 	private:
 
 	private:
-		// Selected Object
+		// 이것두 static으로 만들면 되지 않을까?
+		Dive::GameObject* m_pSelectedObject;
 	};
 }

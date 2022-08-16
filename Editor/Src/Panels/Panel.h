@@ -38,5 +38,7 @@ namespace Editor
 		bool m_bWindow = true;
 
 		Editor* m_pEditor = nullptr;
+
+		static Dive::Scene* s_pActiveScene;
 	};
 }

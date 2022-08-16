@@ -2,6 +2,8 @@
 
 namespace Editor
 {
+	Dive::Scene* Panel::s_pActiveScene = nullptr;
+
 	Panel::Panel(Editor* pEditor, const std::string& title)
 		: m_pEditor(pEditor), m_Title(title)
 	{

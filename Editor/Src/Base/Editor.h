@@ -27,10 +27,10 @@ namespace Editor
 		void drawPanels();
 
 	private:
-		MenuBarPanel* m_pMenuBar = nullptr;
-		ScenePanel* m_pScene = nullptr;
-		HierarchyPanel* m_pHierarchy = nullptr;
-		InspectorPanel* m_pInspector = nullptr;
-		AssetPanel* m_pAsset = nullptr;
+		MenuBarPanel* m_pMenuBar;
+		ScenePanel* m_pScene;
+		HierarchyPanel* m_pHierarchy;
+		InspectorPanel* m_pInspector;
+		AssetPanel* m_pAsset;
 	};
 }

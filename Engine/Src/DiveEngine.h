@@ -39,6 +39,8 @@
 //= Scene =========================
 #include "Scene/Scene.h" 
 #include "Scene/GameObject.h"
+#include "Scene/Component/Component.h"
+#include "Scene/Component/Transform.h"
 
 //= Math ==========================
 

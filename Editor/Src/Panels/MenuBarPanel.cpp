@@ -41,18 +41,12 @@ namespace Editor
 				}
 				if (ImGui::MenuItem("Scene"))
 				{
-					/*
-					if (m_pActiveScene)
+					if (s_pActiveScene)
 					{
 						// 저장 여부 확인
 					}
 
-					m_pActiveScene = Dive::GetCurrentEngine()->CreateScene("new_world");
-					auto lightObj = m_pActiveScene->CreateGameObject("Directional_Light");
-					lightObj->AddComponent<Dive::Transform>();
-					auto lightCom = lightObj->AddComponent<Dive::Light>();
-					lightCom->SetLightType(Dive::eLightType::Directional);
-					*/
+					s_pActiveScene = new Dive::Scene(m_pEditor->GetContext());
 				}
 				ImGui::EndMenu();
 			}
@@ -86,11 +80,13 @@ namespace Editor
 
 			if (ImGui::MenuItem("Close"))
 			{
-				//if (m_pActiveScene)
+				if (s_pActiveScene)
 				{
 					// 저장 여부 확인
 
 					// Engine에서 Scene을 Close해야 한다.
+
+					DV_DELETE(s_pActiveScene);
 				}
 
 			}
@@ -126,12 +122,12 @@ namespace Editor
 
 			if (ImGui::MenuItem("Exit"))
 			{
-				/*
-				if (m_pActiveScene)
+				if (s_pActiveScene)
 				{
 					// 저장 여부 확인
+
+					DV_DELETE(s_pActiveScene);
 				}
-				*/
 				
 				FIRE_EVENT(Dive::ExitRequestEvent());
 			}
