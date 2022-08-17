@@ -1,6 +1,7 @@
 #include "divepch.h"
 #include "GameObject.h"
 #include "Component/Component.h"
+#include "Component/Transform.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
@@ -10,11 +11,12 @@ namespace Dive
 	GameObject::GameObject(Context* pContext)
 		: Object(pContext),
 		m_pScene(nullptr),
-		m_ID(0)
+		m_ID(0),
+		m_bActive(true),
+		m_bMarkedTarget(false)
 	{
 	}
 
-	// 추후 계층구조를 가지게 되면 제거 과정이 복잡해진다.
 	GameObject::~GameObject()
 	{
 		DV_LOG_ENGINE_DEBUG("GameObject( {0:s} : {1:d}) 소멸자 호출", m_Name, m_ID);
@@ -31,6 +33,7 @@ namespace Dive
 				
 				DV_DELETE(pComponent);
 			}
+			m_Components.clear();
 		}
 	}
 

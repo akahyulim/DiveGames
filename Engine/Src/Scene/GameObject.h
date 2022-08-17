@@ -25,6 +25,12 @@ namespace Dive
 		Scene* GetScene() const { return m_pScene; }
 		unsigned int GetID() const { return m_ID; }
 
+		bool IsActive() const { return m_bActive; }
+		void SetActive(bool bActive) { m_bActive = bActive; }
+
+		void MarkRemoveTarget() { m_bMarkedTarget = true; }
+		bool IsRemovedTarget() const { return m_bMarkedTarget; }
+
 		template<class T>
 		T* CreateComponent(unsigned int id = 0);
 
@@ -35,6 +41,9 @@ namespace Dive
 		template<class T>
 		T* GetComponent() const;
 
+		template<class T>
+		bool HasComponent() const;
+
 	private:
 		void setScene(Scene* pScene) { m_pScene = pScene; }
 		void setID(unsigned int id) { m_ID = id; }
@@ -43,6 +52,8 @@ namespace Dive
 		Scene* m_pScene;
 		std::string m_Name;
 		unsigned int m_ID;
+		bool m_bActive;
+		bool m_bMarkedTarget;
 
 		std::vector<Component*> m_Components;
 	};
@@ -84,5 +95,17 @@ namespace Dive
 		}
 
 		return nullptr;
+	}
+
+	template<class T>
+	bool GameObject::HasComponent() const
+	{
+		for (auto* pComponent : m_Components)
+		{
+			if (pComponent->GetType() == T::GetTypeStatic())
+				return true;
+		}
+
+		return false;
 	}
 }

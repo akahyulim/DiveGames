@@ -17,7 +17,7 @@ namespace Dive
 		Component(Context* pContext);
 		virtual ~Component() = default;
 
-		GameObject* GetGameObject() const { return m_pGameObject; }
+		GameObject* GetGameObject() { return m_pGameObject; }
 		unsigned int GetID() const { return m_ID; }
 
 	protected:

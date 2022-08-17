@@ -44,9 +44,12 @@ namespace Editor
 					if (s_pActiveScene)
 					{
 						// 저장 여부 확인
+						DV_DELETE(s_pActiveScene);
 					}
 
 					s_pActiveScene = new Dive::Scene(m_pEditor->GetContext());
+
+					DV_LOG_CLIENT_TRACE("새로운 Scene({:s})을 생성하였습니다.", s_pActiveScene->GetName());
 				}
 				ImGui::EndMenu();
 			}
@@ -86,7 +89,11 @@ namespace Editor
 
 					// Engine에서 Scene을 Close해야 한다.
 
+
+					auto sceneName = s_pActiveScene->GetName();
 					DV_DELETE(s_pActiveScene);
+
+					DV_LOG_CLIENT_TRACE("Scene({:s})을 닫았습니다.", sceneName);
 				}
 
 			}
@@ -142,13 +149,14 @@ namespace Editor
 		{
 			if (ImGui::MenuItem("Create Empty"))
 			{
-				/*
-				if (m_pActiveScene)
+				if (s_pActiveScene)
 				{
-					auto pAddedGameObject = m_pActiveScene->CreateGameObject("GameObject");
-					pAddedGameObject->AddComponent<Dive::Transform>();
+					auto* pNewGameObject = s_pActiveScene->CreateGameObject("GameObject");
+					pNewGameObject->CreateComponent<Dive::Transform>();
+					pNewGameObject->SetName("GameObject " + std::to_string(pNewGameObject->GetID()));
+
+					DV_LOG_CLIENT_TRACE("빈 GameObject를 생성하였습니다.");
 				}
-				*/
 			}
 
 			if (ImGui::BeginMenu("3D Object"))

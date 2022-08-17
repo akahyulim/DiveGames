@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "GameObject.h"
 #include "Component/Component.h"
+#include "Component/Transform.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
 #include "Core/EventSystem.h"
@@ -15,6 +16,7 @@ namespace Dive
 		: Object(pContext),
 		m_Name("Untitled"),
 		m_bUpdateEnabled(true),
+		m_bDirty(false),
 		m_GameObjectID(FIRST_ID),
 		m_ComponentID(FIRST_ID)
 	{
@@ -24,6 +26,8 @@ namespace Dive
 	Scene::~Scene()
 	{
 		Clear();
+
+		UNSUBSCRIBE_EVENT(eEventType::Update, EVENT_HANDLER(OnUpdate));
 
 		DV_LOG_ENGINE_DEBUG("Scene({:s}) 소멸자 호출", m_Name);
 	}
@@ -44,6 +48,23 @@ namespace Dive
 
 	void Scene::Update(float delta)
 	{
+		if (m_bDirty)
+		{
+			auto it = m_GameObjects.begin();
+			for (it; it != m_GameObjects.end();)
+			{
+				if (it->second->IsRemovedTarget())
+				{
+					DV_DELETE(it->second);
+					it = m_GameObjects.erase(it);
+				}
+				else
+					it++;
+			}
+
+			m_bDirty = false;
+		}
+
 		// 여기에서도 이벤트를 날린다.
 		// 데이터는 자신의 포인터와, delta에 timeScale을 곱한 값
 	}
@@ -73,17 +94,36 @@ namespace Dive
 		RemoveGameObject(pGameObject->GetID());
 	}
 
-	// 아마 이대로 사용하면 안될거다.
-	// 기존 프레임이 끝난 후 제거해야 한다.
 	void Scene::RemoveGameObject(unsigned int id)
 	{
 		if (!id || m_GameObjects.empty())
 			return;
 
-		auto it = m_GameObjects.find(id);
-		if (it != m_GameObjects.end())
+		if(!m_bDirty)
+			m_bDirty = true;
+
+		auto it = m_GameObjects.begin();
+		for (it; it != m_GameObjects.end(); ++it)
 		{
-			DV_DELETE(it->second);
+			if (it->first == id)
+			{
+				auto* pTransform = it->second->GetComponent<Transform>();
+				if (pTransform)
+				{
+					if (pTransform->HasChild())
+					{
+						for (auto* pChild : pTransform->GetChildren())
+						{
+							RemoveGameObject(pChild->GetGameObject()->GetID());
+						}
+					}
+
+					if (pTransform->HasParent())
+						pTransform->SetParent(nullptr);
+				}
+
+				it->second->MarkRemoveTarget();
+			}
 		}
 	}
 
@@ -91,6 +131,24 @@ namespace Dive
 	{
 		auto it = m_GameObjects.find(id);
 		return it != m_GameObjects.end() ? it->second : nullptr;
+	}
+
+	std::vector<GameObject*> Scene::GetRoots() const
+	{
+		std::vector<GameObject*> roots;
+
+		auto it = m_GameObjects.begin();
+		for (it; it != m_GameObjects.end(); ++it)
+		{
+			auto pTransform = it->second->GetComponent<Transform>();
+			if (pTransform)
+			{
+				if (!pTransform->HasParent())
+					roots.emplace_back(it->second);
+			}
+		}
+
+		return roots;
 	}
 
 	void Scene::ComponentAdded(Component* pComponent, unsigned int id)

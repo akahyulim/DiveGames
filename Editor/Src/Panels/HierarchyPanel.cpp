@@ -18,7 +18,6 @@ namespace Editor
 
 	void HierarchyPanel::renderWindow()
 	{
-		
 		if (!s_pActiveScene)
 		{
 			m_pSelectedObject = nullptr;
@@ -33,13 +32,12 @@ namespace Editor
 			// 이는 반드시 수정되어야 한다.
 			// => 수정했지만 여전히 버그가 발생한다. 다른 곳에서 SelectedObject의 Transform을 요구하는 것 같다.
 			// => ScenePanel에서 ImGuizmo 때문에 발생한 문제였다. 일단 수정 및 테스트를 완료했다.
-			/*
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 				{
-					auto pInstanceID = static_cast<unsigned long long*>(pPayload->Data);
-					auto pDroppedObject = m_pActiveScene->GetGameObject(*pInstanceID);
+					auto pID = static_cast<unsigned int*>(pPayload->Data);
+					auto pDroppedObject = s_pActiveScene->GetGameObject(*pID);
 					if (pDroppedObject->HasComponent<Dive::Transform>())
 						pDroppedObject->GetComponent<Dive::Transform>()->SetParent(nullptr);
 				}
@@ -47,19 +45,19 @@ namespace Editor
 				ImGui::EndDragDropTarget();
 			}
 
-			auto pRoots = m_pActiveScene->GetRoots();
-			if (!pRoots.empty())
+			auto roots = s_pActiveScene->GetRoots();
+			if (!roots.empty())
 			{
-				for (auto pRoot : pRoots)
+				for (auto pRoot : roots)
 				{
 					drawNode(pRoot);
 				}
 			}
-			*/
+			
 			ImGui::TreePop();
 		}
 	}
-	/*
+	
 	void HierarchyPanel::drawNode(Dive::GameObject* pObject)
 	{
 		if (!pObject)
@@ -79,7 +77,7 @@ namespace Editor
 			nodeFlags |= (m_pSelectedObject == pObject) ? ImGuiTreeNodeFlags_Selected : 0;
 		}
 
-		bool bNodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)pObject->GetInstanceID(), nodeFlags, pObject->GetName().c_str());
+		bool bNodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)pObject->GetID(), nodeFlags, pObject->GetName().c_str());
 
 		if (ImGui::IsItemClicked())
 		{
@@ -88,7 +86,7 @@ namespace Editor
 
 		if (ImGui::BeginDragDropSource())
 		{
-			auto id = pObject->GetInstanceID();
+			auto id = pObject->GetID();
 			ImGui::SetDragDropPayload("HIERARCHY_NODE", &id, sizeof(unsigned long long));
 			ImGui::EndDragDropSource();
 		}
@@ -97,8 +95,8 @@ namespace Editor
 		{
 			if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 			{
-				auto pId = static_cast<unsigned long long*>(pPayload->Data);
-				auto pDroppedObject = m_pActiveScene->GetGameObject(*pId);
+				auto pId = static_cast<unsigned int*>(pPayload->Data);
+				auto pDroppedObject = s_pActiveScene->GetGameObject(*pId);
 
 				if (pDroppedObject != pObject)
 				{
@@ -132,8 +130,8 @@ namespace Editor
 
 		if (bCopy)
 		{
-			if (m_pSelectedObject)
-				m_pSelectedObject->Clone();
+			//if (m_pSelectedObject)
+			//	m_pSelectedObject->Clone();
 		}
 
 		if (bRename)
@@ -143,7 +141,7 @@ namespace Editor
 
 		if (bDelete)
 		{
-			m_pActiveScene->RemoveGameObject(pObject);
+			s_pActiveScene->RemoveGameObject(pObject);
 			if (m_pSelectedObject && (m_pSelectedObject == pObject))
 				m_pSelectedObject = nullptr;
 		}
@@ -159,5 +157,4 @@ namespace Editor
 			ImGui::TreePop();
 		}
 	}
-	*/
 }

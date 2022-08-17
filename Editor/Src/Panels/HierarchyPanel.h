@@ -13,6 +13,7 @@ namespace Editor
 
 
 	private:
+		void drawNode(Dive::GameObject* pObject);
 
 	private:
 		// 이것두 static으로 만들면 되지 않을까?

@@ -37,6 +37,12 @@ namespace Dive
 		GameObject* GetGameObject(unsigned int id);
 		// 씬에 등록된 게임 오브젝트의 개수 리턴.
 		unsigned int GetGameObjectsCount() const { return static_cast<unsigned int>(m_GameObjects.size()); }
+		// 씬에 등록된 게임 오브젝트들 중 루트 노드들을 벡터로 구성하여 리턴.
+		// 이렇게 하기 보단 전체 GameObject를 전달한 다음
+		// Editor에서 위치도 변경할 수 있게끔 하는 것이 나을 것이라 생각했지만,
+		// 결국 같은 벡터이니... 차라리 const를 떼고 참조로 전달하는 것이 낫지 않을까 싶다.
+		// 그런데 현재, Hierarchy 창에서 요소 사이에 넣는 방법을 모른다.
+		std::vector<GameObject*> GetRoots() const;
 		
 		// 게임 오브젝트에 추가된 컴포넌트를 저장.
 		void ComponentAdded(Component* pComponent, unsigned int id);
@@ -65,6 +71,7 @@ namespace Dive
 	private:
 		std::string m_Name;
 		bool m_bUpdateEnabled;
+		bool m_bDirty;
 
 		std::unordered_map<unsigned int, GameObject*> m_GameObjects;
 		std::unordered_map<unsigned int, Component*> m_Components;
