@@ -60,6 +60,8 @@ namespace Dive
 
 		// 업데이트 적용 유무 설정.
 		void SetUpdateEnabled(bool bEnable);
+		// 업데이트 적용 유무 상태 확인.
+		bool IsUpdateEnabled() const { return m_bUpdateEnabled; }
 
 		// update(+ OnUpdate)
 		void OnUpdate(const Event& e);
@@ -79,5 +81,7 @@ namespace Dive
 		unsigned int m_GameObjectID;
 		unsigned int m_ComponentID;
 		// Component까지 이 곳에서 함께 관리하는 편이 나을 수 있다.
+
+		unsigned int m_OnUpdateSlotID;
 	};
 }

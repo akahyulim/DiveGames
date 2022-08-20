@@ -18,16 +18,17 @@ namespace Dive
 		m_bUpdateEnabled(true),
 		m_bDirty(false),
 		m_GameObjectID(FIRST_ID),
-		m_ComponentID(FIRST_ID)
+		m_ComponentID(FIRST_ID),
+		m_OnUpdateSlotID(0)
 	{
-		SUBSCRIBE_EVENT(eEventType::Update, EVENT_HANDLER(OnUpdate));
+		m_OnUpdateSlotID = SUBSCRIBE_EVENT(eEventType::Update, EVENT_HANDLER_PARAM(OnUpdate));
 	}
 
 	Scene::~Scene()
 	{
 		Clear();
 
-		UNSUBSCRIBE_EVENT(eEventType::Update, EVENT_HANDLER(OnUpdate));
+		UNSUBSCRIBE_EVENT(eEventType::Update, m_OnUpdateSlotID);
 
 		DV_LOG_ENGINE_DEBUG("Scene({:s}) º“∏Í¿⁄ »£√‚", m_Name);
 	}
@@ -193,7 +194,7 @@ namespace Dive
 		if (!m_bUpdateEnabled)
 			return;
 
-		auto evnt = dynamic_cast<const UpdateEvent&>(e);
+		auto& evnt = dynamic_cast<const UpdateEvent&>(e);
 		Update(evnt.GetDeltaTime());
 	}
 

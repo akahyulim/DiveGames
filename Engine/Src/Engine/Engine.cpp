@@ -21,12 +21,16 @@ namespace Dive
 		m_pContext->RegisterSubsystem(std::make_shared<Log>(pContext));
 		m_pContext->RegisterSubsystem(std::make_shared<Time>(pContext));
 
-		SUBSCRIBE_EVENT(eEventType::ExitRequested, EVENT_HANDLER(OnExitRequested));
+		SUBSCRIBE_EVENT(eEventType::ExitRequested, EVENT_HANDLER_PARAM(OnExitRequested));
 	}
 
 	Engine::~Engine()
 	{
 		DV_LOG_ENGINE_DEBUG("Engine 소멸자 호출");
+
+		// Context shut down??
+		// 이 것두 일단 넣어놓긴 했지만... 뭐 필요한 거 같긴 하다.
+		EventSystem::GetInstance().Clear();
 	}
 	
 	bool Engine::Initialize(const EngineParameters& parameters)

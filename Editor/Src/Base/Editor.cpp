@@ -23,9 +23,9 @@ namespace Editor
 		m_pInspector(nullptr),
 		m_pAsset(nullptr)
 	{
-		SUBSCRIBE_EVENT(Dive::eEventType::BeginRender, EVENT_HANDLER(OnBeginRender));
-		SUBSCRIBE_EVENT(Dive::eEventType::EndRender, EVENT_HANDLER(OnEndRender));
-		SUBSCRIBE_EVENT(Dive::eEventType::WindowEvent, EVENT_HANDLER(OnWindowEvent));
+		SUBSCRIBE_EVENT(Dive::eEventType::BeginRender, EVENT_HANDLER_PARAM(OnBeginRender));
+		SUBSCRIBE_EVENT(Dive::eEventType::EndRender, EVENT_HANDLER_PARAM(OnEndRender));
+		SUBSCRIBE_EVENT(Dive::eEventType::WindowEvent, EVENT_HANDLER_PARAM(OnWindowEvent));
 	}
 
 	Editor::~Editor()

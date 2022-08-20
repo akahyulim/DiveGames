@@ -20,7 +20,7 @@ namespace Dive
 		m_pEngine = std::make_shared<Engine>(pContext);
 		m_pContext->RegisterSubsystem(m_pEngine);
 
-		SUBSCRIBE_EVENT(eEventType::LogMessage, EVENT_HANDLER(OnLogMessage));
+		SUBSCRIBE_EVENT(eEventType::LogMessage, EVENT_HANDLER_PARAM(OnLogMessage));
 	}
 
 	Application::~Application()

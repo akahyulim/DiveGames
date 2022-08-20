@@ -3,13 +3,16 @@
 #include <vector>
 #include <functional>
 
-#define EVENT_HANDLER(function)				[this](const Dive::Event& e) {function(e);}
-#define EVENT_HANDLER_STATIC(function)		[](const Dive::Event& e) { function(e);}
+#define EVENT_HANDLER(function)					[this](const Dive::Event& e) { function(); }
+#define EVENT_HANDLER_STATIC(function)			[](const Dive::Event& e) { function(); }
 
-#define SUBSCRIBE_EVENT(type, function)		Dive::EventSystem::GetInstance().Subscribe(type, function);
-#define UNSUBSCRIBE_EVENT(type, function)	Dive::EventSystem::GetInstance().Unsubscribe(type, function);
+#define EVENT_HANDLER_PARAM(function)			[this](const Dive::Event& e) { function(e); }
+#define EVENT_HANDLER_PARAM_STATIC(function)	[](const Dive::Event& e) { function(e); }
 
-#define FIRE_EVENT(e)						Dive::EventSystem::GetInstance().Fire(e);
+#define SUBSCRIBE_EVENT(type, function)			Dive::EventSystem::GetInstance().Subscribe(type, function)
+#define UNSUBSCRIBE_EVENT(type, id)				Dive::EventSystem::GetInstance().Unsubscribe(type, id)
+
+#define FIRE_EVENT(e)							Dive::EventSystem::GetInstance().Fire(e)
 
 namespace Dive
 {
@@ -44,10 +47,11 @@ public:	\
 		virtual std::string ToString() const { return GetName(); }
 	};
 
+	using Subscriber = std::function<void(const Event&)>;
+
+
 	class EventSystem
 	{
-		using Subscriber = std::function<void(const Event&)>;
-
 	public:
 		static EventSystem& GetInstance()
 		{
@@ -55,22 +59,28 @@ public:	\
 			return instance;
 		}
 
-		void Subscribe(const eEventType eventType, Subscriber&& function)
+		unsigned int Subscribe(const eEventType eventType, Subscriber&& function)
 		{
-			m_Subscribers[eventType].emplace_back(std::forward<Subscriber>(function));
+			HandlerSlot handleSlot;
+			handleSlot.id = m_NextID++;
+			handleSlot.subscriber = std::forward<Subscriber>(function);
+
+			m_Subscribers[eventType].emplace_back(handleSlot);
+
+			return handleSlot.id;
 		}
 
-		void Unsubscribe(const eEventType eventType, Subscriber&& function)
+		void Unsubscribe(const eEventType eventType, unsigned int id)
 		{
-			const size_t functionAddr = *reinterpret_cast<long*>(reinterpret_cast<char*>(&function));
-			auto& subscribers = m_Subscribers[eventType];
+			if (m_Subscribers.find(eventType) == m_Subscribers.end())
+				return;
 
-			for (auto it = subscribers.begin(); it != subscribers.end();)
+			auto it = m_Subscribers[eventType].begin();
+			for (it; it != m_Subscribers[eventType].end();)
 			{
-				const size_t subscriberAddr = *reinterpret_cast<long*>(reinterpret_cast<char*>(&(*it)));
-				if (functionAddr == subscriberAddr)
+				if (it->id == id)
 				{
-					++it = subscribers.erase(it);
+					it = m_Subscribers[eventType].erase(it);
 					return;
 				}
 				else
@@ -83,13 +93,25 @@ public:	\
 			if (m_Subscribers.find(e.GetType()) == m_Subscribers.end())
 				return;
 
-			for (const auto& subscriber : m_Subscribers[e.GetType()])
+			for (const auto& handleSlot : m_Subscribers[e.GetType()])
 			{
-				subscriber(e);
+				handleSlot.subscriber(e);
 			}
 		}
 
+		void Clear()
+		{
+			m_Subscribers.clear();
+		}
+
 	private:
-		std::unordered_map<eEventType, std::vector<Subscriber>> m_Subscribers;
+		unsigned int m_NextID = 0;
+
+		struct HandlerSlot
+		{
+			unsigned int id;
+			Subscriber subscriber;
+		};
+		std::unordered_map<eEventType, std::vector<HandlerSlot>> m_Subscribers;
 	};
 }

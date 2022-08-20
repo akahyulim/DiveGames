@@ -127,7 +127,7 @@ namespace Dive
 
 		m_bInitialized = true;
 
-		SUBSCRIBE_EVENT(eEventType::RenderUpdate, EVENT_HANDLER(OnRenderUpdate));
+		SUBSCRIBE_EVENT(eEventType::RenderUpdate, EVENT_HANDLER_PARAM(OnRenderUpdate));
 
 		DV_LOG_ENGINE_INFO("Renderer 초기화 성공");
 	}
