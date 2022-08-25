@@ -63,7 +63,7 @@ namespace Dive
 	{
 		if (GetComponent<T>())
 		{
-			DV_LOG_ENGINE_WRAN("이미 존재하는 타입의 컴포넌트 생성을 시도하였습니다.");
+			DV_LOG_ENGINE_WARN("이미 존재하는 타입의 컴포넌트 생성을 시도하였습니다.");
 			return nullptr;
 		}
 

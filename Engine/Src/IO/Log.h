@@ -15,7 +15,7 @@
 #define DV_LOG_ENGINE_TRACE(...) Dive::Log::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Trace, __VA_ARGS__)
 #define DV_LOG_ENGINE_DEBUG(...) Dive::Log::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Debug, __VA_ARGS__)
 #define DV_LOG_ENGINE_INFO(...) Dive::Log::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Info, __VA_ARGS__)
-#define DV_LOG_ENGINE_WRAN(...) Dive::Log::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Warn, __VA_ARGS__)
+#define DV_LOG_ENGINE_WARN(...) Dive::Log::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Warn, __VA_ARGS__)
 #define DV_LOG_ENGINE_ERROR(...) Dive::Log::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Error, __VA_ARGS__)
 #define DV_LOG_ENGINE_CRITICAL(...) Dive::Log::Write(Dive::eLoggerNames::Engine, Dive::eLogLevels::Critical, __VA_ARGS__)
 

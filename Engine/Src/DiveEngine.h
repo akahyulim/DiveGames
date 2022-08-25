@@ -43,5 +43,6 @@
 #include "Scene/Component/Transform.h"
 
 //= Math ==========================
+#include "Math/Math.h"
 
 //= Helper ========================

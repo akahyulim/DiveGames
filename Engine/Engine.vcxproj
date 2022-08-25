@@ -187,6 +187,7 @@
     <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
     <ClInclude Include="Src\IO\Log.h" />
     <ClInclude Include="Src\IO\IOEvents.h" />
+    <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\View.h" />
     <ClInclude Include="Src\Scene\Component\Component.h" />
@@ -205,6 +206,7 @@
     <ClCompile Include="Src\Engine\Engine.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\IO\Log.cpp" />
+    <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
     <ClCompile Include="Src\Scene\Component\Component.cpp" />

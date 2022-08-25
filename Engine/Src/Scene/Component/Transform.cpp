@@ -4,6 +4,9 @@
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
+#include "Math/Math.h"
+
+using namespace DirectX;
 
 namespace Dive
 {
@@ -11,11 +14,201 @@ namespace Dive
 		: Component(pContext),
 		m_pParent(nullptr)
 	{
+		m_LocalPosition = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		m_LocalRotation = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		m_LocalScale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+
+		XMStoreFloat4x4(&m_Matrix, XMMatrixIdentity());
 	}
 
 	Transform::~Transform()
 	{
 		DV_LOG_ENGINE_DEBUG("Transform 소멸자 호출( {0:d}, {1:s})", m_ID, m_pGameObject->GetName());
+	}
+
+	void Transform::Clear()
+	{
+		SetPosition(0.0f, 0.0f, 0.0f);
+		SetRotation(0.0f, 0.0f, 0.0f);
+		SetScale(1.0f, 1.0f, 1.0f);
+	}
+
+	DirectX::XMFLOAT3 Transform::GetPosition() const
+	{
+		return *((XMFLOAT3*)&m_Matrix._41);
+	}
+
+	void Transform::SetPosition(const DirectX::XMFLOAT3& pos)
+	{
+		XMFLOAT3 newPos = pos;			   
+		XMFLOAT3 currentPos = GetPosition();
+		if ((currentPos.x == newPos.x) && (currentPos.y == newPos.y) && (currentPos.z == newPos.z))
+			return;
+
+		if (m_pParent)
+		{
+			XMVECTOR vecPos = XMVector3Transform(
+				XMLoadFloat3(&newPos), 
+				XMMatrixInverse(nullptr, m_pParent->GetMatrix())
+			);
+
+			XMStoreFloat3(&newPos, vecPos);
+		}
+
+		SetLocalPosition(newPos);
+	}
+
+	void Transform::SetPosition(float xPos, float yPos, float zPos)
+	{
+		SetPosition(XMFLOAT3(xPos, yPos, zPos));
+	}
+
+	void Transform::SetLocalPosition(float xPos, float yPos, float zPos)
+	{
+		SetLocalPosition(XMFLOAT3(xPos, yPos, zPos));
+	}
+
+	DirectX::XMFLOAT3 Transform::GetRotation() const
+	{
+		return Math::QuaternionToEularDegrees(GetRotationQuaternion());
+	}
+
+	DirectX::XMFLOAT4 Transform::GetRotationQuaternion() const
+	{
+		XMVECTOR pos, rot, scale;
+		XMMatrixDecompose(&scale, &rot, &pos, XMLoadFloat4x4(&m_Matrix));
+
+		XMFLOAT4 outRot;
+		XMStoreFloat4(&outRot, rot);
+
+		return outRot;
+	}
+
+	DirectX::XMFLOAT3 Transform::GetLocalRotation() const
+	{
+		return Math::QuaternionToEularDegrees(GetLocalRotationQuaternion());
+	}
+
+	void Transform::SetRotation(const DirectX::XMFLOAT3& angle)
+	{
+		float xRadian = XMConvertToRadians(angle.x);
+		float yRadian = XMConvertToRadians(angle.y);
+		float zRadian = XMConvertToRadians(angle.z);
+
+		XMFLOAT4 rotQuat;
+		XMStoreFloat4(&rotQuat, XMQuaternionRotationRollPitchYaw(xRadian, yRadian, zRadian));
+
+		SetRotation(rotQuat);
+	}
+
+	void Transform::SetRotation(float xAngle, float yAngle, float zAngle)
+	{
+		SetRotation(XMFLOAT3(xAngle, yAngle, zAngle));
+	}
+
+	void Transform::SetRotation(const DirectX::XMFLOAT4& quaternion)
+	{
+		XMFLOAT4 newRotQuat = quaternion;
+		XMFLOAT4 currentRotQuat = GetRotationQuaternion();
+		if ((currentRotQuat.x == newRotQuat.x) && (currentRotQuat.y == newRotQuat.y) &&
+			(currentRotQuat.z == newRotQuat.z) && (currentRotQuat.w == newRotQuat.w))
+			return;
+
+		if (m_pParent)
+		{
+			XMVECTOR newRotQuatVector = XMLoadFloat4(&newRotQuat);
+			XMFLOAT4 parentQuat = m_pParent->GetRotationQuaternion();
+			XMVECTOR parentQuatVector = XMLoadFloat4(&parentQuat);
+
+			newRotQuatVector = XMQuaternionMultiply(newRotQuatVector, XMQuaternionInverse(parentQuatVector));
+			XMStoreFloat4(&newRotQuat, newRotQuatVector);
+		}
+
+		SetLocalRotation(newRotQuat);
+	}
+
+	void Transform::SetLocalRotation(const DirectX::XMFLOAT3& angle)
+	{
+		float xRadian = XMConvertToRadians(angle.x);
+		float yRadian = XMConvertToRadians(angle.y);
+		float zRadian = XMConvertToRadians(angle.z);
+
+		XMStoreFloat4(&m_LocalRotation, XMQuaternionRotationRollPitchYaw(xRadian, yRadian, zRadian));
+	}
+
+	void Transform::SetLocalRotation(float xAngle, float yAngle, float zAngle)
+	{
+		SetLocalRotation(XMFLOAT3(xAngle, yAngle, zAngle));
+	}
+
+	DirectX::XMFLOAT3 Transform::GetScale() const
+	{
+		XMVECTOR pos, rot, scale;
+		XMMatrixDecompose(&scale, &rot, &pos, XMLoadFloat4x4(&m_Matrix));
+
+		XMFLOAT3 outScale;
+		XMStoreFloat3(&outScale, scale);
+
+		return outScale;
+	}
+
+	void Transform::SetScale(const DirectX::XMFLOAT3& scale)
+	{
+		XMFLOAT3 newScale = scale;
+		XMFLOAT3 currentScale = GetScale();
+		if ((newScale.x == currentScale.x) && (newScale.y == currentScale.y) && (newScale.z == currentScale.z))
+			return;
+
+		if (m_pParent)
+		{
+			XMFLOAT3 parentScale = m_pParent->GetScale();
+			newScale.x /= parentScale.x;
+			newScale.y /= parentScale.y;
+			newScale.z /= parentScale.z;
+		}
+
+		SetLocalScale(newScale);
+	}
+
+	void Transform::SetScale(float xScale, float yScale, float zScale)
+	{
+		SetScale(XMFLOAT3(xScale, yScale, zScale));
+	}
+
+	void Transform::SetLocalScale(float xScale, float yScale, float zScale)
+	{
+		SetLocalScale(XMFLOAT3(xScale, yScale, zScale));
+	}
+
+	XMMATRIX Transform::GetMatrix()
+	{
+		XMMATRIX mat = GetLocalMatrix();
+		if (m_pParent)
+			mat *= m_pParent->GetMatrix();
+
+		XMStoreFloat4x4(&m_Matrix, mat);
+	
+		return mat;
+	}
+
+	XMMATRIX Transform::GetLocalMatrix() const
+	{
+		auto vecLocalScale = XMLoadFloat3(&m_LocalScale);
+		auto vecLocalRotation = XMLoadFloat4(&m_LocalRotation);
+		auto vecLocalTranslation = XMLoadFloat3(&m_LocalPosition);
+
+		return XMMatrixScalingFromVector(vecLocalScale) * XMMatrixRotationQuaternion(vecLocalRotation)
+			* XMMatrixTranslationFromVector(vecLocalTranslation);
+	}
+
+	void Transform::SetLocalMatrix(const DirectX::XMFLOAT4X4& mat)
+	{
+		XMVECTOR pos, rot, scale;
+		XMMatrixDecompose(&scale, &rot, &pos, XMLoadFloat4x4(&m_Matrix));
+
+		XMStoreFloat3(&m_LocalPosition, pos);
+		XMStoreFloat4(&m_LocalRotation, rot);
+		XMStoreFloat3(&m_LocalScale, scale);
 	}
 
 	void Transform::SetParent(Transform* pParent)
@@ -30,17 +223,9 @@ namespace Dive
 				if (m_pParent->GetID() == pParent->GetID())
 					return;
 
-				if(pParent->IsChildOf(this))
-				{
-					// 자신의 자식 노드일 때
-					// 새로운 부모의 부모는 현재 자신의 부모
-					// 글고 그 새로운 부모에게 자신을 추가
-					// 기존 부모로부터 자신은 제거
-					// 자신의 부모로 새로운 부모를 추가
-
-
+				// 자식을 부모로 삼을 수 없다.
+				if (pParent->IsChildOf(this))
 					return;
-				}
 				else
 				{
 					auto it = m_pParent->m_Children.begin();
