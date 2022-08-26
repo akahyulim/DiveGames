@@ -36,27 +36,25 @@ namespace Sandbox
 		// create scene content
 		// scene을 직접 생성한 후 cache를 이용하여 object를 구성
 		m_pScene = new Dive::Scene(m_pContext);
-		auto pA = m_pScene->CreateGameObject("AAA");
-		auto pB = m_pScene->CreateGameObject("BBB");
-		auto pC = m_pScene->CreateGameObject("CCC");
-		auto pD = m_pScene->CreateGameObject("DDD");
-
-		m_pScene->RemoveGameObject(pC->GetID());
-
-		m_pScene->CreateGameObject("EEE", 3);
-
-		auto* pCom = pA->CreateComponent<Dive::Transform>();
-		//pA->CreateComponent<Dive::Transform>();
-		//pA->RemoveComponent<Dive::Transform>();
-		//pA->RemoveComponent(pCom);
-
-		if (!m_pScene->GetComponent(pCom->GetID()))
+		
+		// buffer test
 		{
-			DV_LOG_CLIENT_DEBUG("해당 Component가 Scene에 존재하지 않습니다.");
-		}
-		else
-		{
-			DV_LOG_CLIENT_DEBUG("Component가 Scene에 존재합니다.");
+			std::vector<Dive::VertexElement> elements;
+			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
+			//elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_NORMAL);
+			//elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
+
+			Dive::VertexBuffer buffer(GetContext());
+			buffer.SetBuffer(3, elements, true);
+
+			std::vector<DirectX::XMFLOAT3> triangle;
+			triangle.emplace_back(-0.5f, -0.5f, 0.0f);
+			triangle.emplace_back(0.5f, -0.5f, 0.0f);
+			triangle.emplace_back(0.5f, 0.5f, 0.0f);
+
+			buffer.SetData(triangle.data());
+
+			buffer.Release();
 		}
 
 		// camera는 멤버 변수로 별도 관리

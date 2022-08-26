@@ -184,7 +184,9 @@
     <ClInclude Include="Src\Engine\Engine.h" />
     <ClInclude Include="Src\Engine\EngineDef.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
+    <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
     <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
+    <ClInclude Include="Src\Graphics\VertexBuffer.h" />
     <ClInclude Include="Src\IO\Log.h" />
     <ClInclude Include="Src\IO\IOEvents.h" />
     <ClInclude Include="Src\Math\Math.h" />
@@ -205,6 +207,7 @@
     <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Engine\Engine.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
+    <ClCompile Include="Src\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Src\IO\Log.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />

@@ -27,8 +27,10 @@
 //= Resource ======================
 
 //= Graphics ======================
+#include "Graphics/GraphicsDefs.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/GraphicsEvents.h"
+#include "Graphics/VertexBuffer.h"
 
 //= Renderer ======================
 #include "Renderer/Renderer.h"

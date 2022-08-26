@@ -4,7 +4,7 @@
 namespace Dive
 {
 	class Context;
-	class DvWindow;
+	class VertexBuffer;
 
 	// 윈도우 클래스 이름.
 	const LPCWSTR WND_CLASS_NAME = L"AppWnd";
