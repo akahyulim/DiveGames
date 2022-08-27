@@ -28,8 +28,16 @@ namespace Dive
 		DV_RELEASE(m_pBuffer);
 	}
 
-	bool VertexBuffer::SetBuffer(unsigned int count, const std::vector<VertexElement>& elements, bool bDynamic)
+	bool VertexBuffer::CreateBuffer(unsigned int count, const std::vector<VertexElement>& elements, bool bDynamic)
 	{
+		Release();
+
+		if (!count)
+		{
+			DV_LOG_ENGINE_WARN("정점 개수를 잘못 전달받아 버퍼를 생성할 수 없습니다.");
+			return false;
+		}
+
 		m_Count = count;
 		m_Elements = elements;
 		m_bDynamic = bDynamic;
@@ -42,7 +50,21 @@ namespace Dive
 		}
 		m_Stride = elementOffset;
 
-		return create();
+		D3D11_BUFFER_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		desc.CPUAccessFlags = m_bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
+		desc.Usage = m_bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
+		desc.ByteWidth = (UINT)(m_Count * m_Stride);
+
+		if (FAILED(m_pGraphics->GetDevice()->CreateBuffer(&desc, nullptr, (ID3D11Buffer**)&m_pBuffer)))
+		{
+			DV_RELEASE(m_pBuffer);
+			DV_LOG_ENGINE_ERROR("정점 버퍼 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
 	}
 
 	bool VertexBuffer::SetData(void* pData)
@@ -50,6 +72,12 @@ namespace Dive
 		if (!pData)
 		{
 			DV_LOG_ENGINE_ERROR("정점 버퍼 데이터로 널 포인터를 전달받았습니다.");
+			return false;
+		}
+
+		if (!m_pBuffer)
+		{
+			DV_LOG_ENGINE_ERROR("정점 버퍼가 존재하지 않습니다.");
 			return false;
 		}
 
@@ -66,6 +94,7 @@ namespace Dive
 				return false;
 
 			memcpy(pDest, pData, (size_t)(m_Count * m_Stride));
+
 			Unmap();
 		}
 		else
@@ -93,45 +122,31 @@ namespace Dive
 
 	void* VertexBuffer::Map()
 	{
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		if (FAILED(m_pGraphics->GetDeviceContext()->Map((ID3D11Buffer*)m_pBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		if (m_pBuffer)
 		{
-			DV_LOG_ENGINE_ERROR("정점 버퍼 맵에 실패하였습니다.");
-			return nullptr;
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+			if (FAILED(m_pGraphics->GetDeviceContext()->Map(
+				(ID3D11Buffer*)m_pBuffer, 
+				0, 
+				D3D11_MAP_WRITE_DISCARD, 
+				0, 
+				&mappedResource)))
+			{
+				DV_LOG_ENGINE_ERROR("정점 버퍼 Map에 실패하였습니다.");
+				return nullptr;
+			}
+
+			return mappedResource.pData;
 		}
 
-		return mappedResource.pData;
+		return nullptr;
 	}
 
 	void VertexBuffer::Unmap()
 	{
-		if (!m_pGraphics || !m_pGraphics->IsInitialized() || !m_pBuffer)
-			return;
-
-		m_pGraphics->GetDeviceContext()->Unmap((ID3D11Buffer*)m_pBuffer, 0);
-	}
-
-	bool VertexBuffer::create()
-	{
-		Release();
-
-		if (!m_Count)
-			return false;
-
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		desc.CPUAccessFlags = m_bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
-		desc.Usage = m_bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
-		desc.ByteWidth = (UINT)(m_Count * m_Stride);
-
-		if (FAILED(m_pGraphics->GetDevice()->CreateBuffer(&desc, nullptr, (ID3D11Buffer**)&m_pBuffer)))
+		if (m_pBuffer)
 		{
-			DV_RELEASE(m_pBuffer);
-			DV_LOG_ENGINE_ERROR("정점 버퍼 생성에 실패하였습니다.");
-			return false;
+			m_pGraphics->GetDeviceContext()->Unmap((ID3D11Buffer*)m_pBuffer, 0);
 		}
-
-		return true;
 	}
 }

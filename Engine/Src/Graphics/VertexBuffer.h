@@ -19,7 +19,7 @@ namespace Dive
 		void Release();
 
 		// 버퍼 설정 후 생성.
-		bool SetBuffer(unsigned int count, const std::vector<VertexElement>& elements, bool bDynamic = false);
+		bool CreateBuffer(unsigned int count, const std::vector<VertexElement>& elements, bool bDynamic = false);
 		// 버퍼에 데이터 전달.
 		bool SetData(void* pData);
 		// 맵
@@ -35,10 +35,6 @@ namespace Dive
 		unsigned int GetStride() const { return m_Stride; }
 		// 다이나믹 버퍼 유무 리턴.
 		bool IsDynamic() const { return m_bDynamic; }
-		
-	private:
-		// 버퍼 생성.
-		bool create();
 
 	private:
 		// 그래픽 시스템 포인터.

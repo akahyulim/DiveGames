@@ -46,7 +46,7 @@ namespace Sandbox
 			//elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
 
 			Dive::VertexBuffer buffer(GetContext());
-			buffer.SetBuffer(3, elements, true);
+			buffer.CreateBuffer(3, elements, true);
 
 			std::vector<DirectX::XMFLOAT3> triangle;
 			triangle.emplace_back(-0.5f, -0.5f, 0.0f);

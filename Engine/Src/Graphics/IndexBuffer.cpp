@@ -69,7 +69,7 @@ namespace Dive
 
 		if (!m_pBuffer)
 		{
-			DV_LOG_ENGINE_ERROR("인덱스 버퍼 데이터가 존재하지 않습니다.");
+			DV_LOG_ENGINE_ERROR("인덱스 버퍼가 존재하지 않습니다.");
 			return false;
 		}
 
@@ -107,34 +107,31 @@ namespace Dive
 	
 	void* IndexBuffer::Map()
 	{
-		if (!m_pBuffer)
+		if (m_pBuffer)
 		{
-			DV_LOG_ENGINE_WARN("존재하지 않는 인덱스 버퍼에 Map을 시도하였습니다.");
-			return nullptr;
+			D3D11_MAPPED_SUBRESOURCE mappedSubresource;
+			if (FAILED(m_pGraphics->GetDeviceContext()->Map(
+				(ID3D11Buffer*)m_pBuffer,
+				0,
+				D3D11_MAP_WRITE_DISCARD,
+				0,
+				&mappedSubresource)))
+			{
+				DV_LOG_ENGINE_ERROR("인덱스 버퍼 Map에 실패하였습니다.");
+				return nullptr;
+			}
+
+			return mappedSubresource.pData;
 		}
 
-		D3D11_MAPPED_SUBRESOURCE mappedSubresource;
-		if (FAILED(m_pGraphics->GetDeviceContext()->Map(
-			(ID3D11Buffer*)m_pBuffer,
-			0,
-			D3D11_MAP_WRITE_DISCARD,
-			0,
-			&mappedSubresource)))
-		{
-			DV_LOG_ENGINE_ERROR("인덱스 버퍼 맵에 실패하였습니다.");
-			return nullptr;
-		}
-
-		return mappedSubresource.pData;
+		return nullptr;
 	}
 	
 	void IndexBuffer::Unmap()
 	{
-		if (!m_pBuffer)
+		if (m_pBuffer)
 		{
-			DV_LOG_ENGINE_WARN("존재하지 않는 인덱스 버퍼에 Unmap을 시도하였습니다.");
+			m_pGraphics->GetDeviceContext()->Unmap((ID3D11Buffer*)m_pBuffer, 0);
 		}
-
-		m_pGraphics->GetDeviceContext()->Unmap((ID3D11Buffer*)m_pBuffer, 0);
 	}
 }
