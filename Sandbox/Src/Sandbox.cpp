@@ -39,6 +39,7 @@ namespace Sandbox
 		
 		// buffer test
 		{
+			// vertices, indices 생성
 			std::vector<Dive::VertexElement> elements;
 			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
 			//elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_NORMAL);
@@ -54,7 +55,17 @@ namespace Sandbox
 
 			buffer.SetData(triangle.data());
 
+			Dive::IndexBuffer indexBuffer(GetContext());
+			indexBuffer.CreateBuffer(3, false);
+
+			std::vector<unsigned int> indices;
+			indices.emplace_back(0);
+			indices.emplace_back(1);
+			indices.emplace_back(2);
+			indexBuffer.SetData(indices.data());
+
 			buffer.Release();
+			indexBuffer.Release();
 		}
 
 		// camera는 멤버 변수로 별도 관리
