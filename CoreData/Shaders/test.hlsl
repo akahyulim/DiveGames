@@ -1,3 +1,4 @@
+
 cbuffer MatrixBuffer
 {
     matrix worldMatrix;
@@ -8,13 +9,13 @@ cbuffer MatrixBuffer
 struct VertexInputType
 {
     float4 position : POSITION;
-    float4 color : COLOR;
+//    float4 color : COLOR;
 };
 
 struct PixelInputType
 {
     float4 position : SV_POSITION;
-    float4 color : COLOR;
+ //   float4 color : COLOR;
 };
 
 PixelInputType mainVS(VertexInputType input)
@@ -31,7 +32,7 @@ PixelInputType mainVS(VertexInputType input)
     output.position = mul(output.position, projectionMatrix);
 
     // Store the input color for the pixel shader to use.
-    output.color = input.color;
+  //  output.color = input.color;
 
     return output;
 }
@@ -41,5 +42,6 @@ PixelInputType mainVS(VertexInputType input)
 ////////////////////////////////////////////////////////////////////////////////
 float4 mainPS(PixelInputType input) : SV_TARGET
 {
-    return input.color;
+    //  return input.color;
+      return float4(1.0f, 1.0f, 0.0f, 1.0f);
 }

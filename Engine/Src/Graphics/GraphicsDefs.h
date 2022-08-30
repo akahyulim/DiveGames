@@ -38,16 +38,26 @@ namespace Dive
 
 	struct VertexElement
 	{
-		VertexElement(eVertexElementType type, eVertexElementSemantic semantic, unsigned char index = 0)
+		VertexElement()
+			: m_Type(TYPE_VECTOR3),
+			m_Semantic(SEM_POSITION),
+			m_Index(0),
+			m_PerInstnace(false),
+			m_Offset(0)
+		{}
+
+		VertexElement(eVertexElementType type, eVertexElementSemantic semantic, unsigned char index = 0, bool perInstance = false)
 			: m_Type(type),
 			m_Semantic(semantic),
 			m_Index(index),
+			m_PerInstnace(perInstance),
 			m_Offset(0)
 		{}
 
 		eVertexElementType m_Type;
 		eVertexElementSemantic m_Semantic;
 		unsigned char m_Index;
+		bool m_PerInstnace;
 		unsigned int m_Offset;
 	};
 
@@ -62,4 +72,30 @@ namespace Dive
 		sizeof(unsigned int),
 		sizeof(unsigned int)
 	};
+
+	static const char* ELEMENT_SEMANTICNAMES[] =
+	{
+		"POSITION",
+		"NORMAL",
+		"BINORMAL",
+		"TANGENT",
+		"TEXCOORD",
+		"COLOR",
+		"BLENDWEIGHT",
+		"BLENDINDICES",
+		"OBJECTINDEX"
+	};
+	
+	const DXGI_FORMAT ELEMENT_FORMATS[] =
+	{
+		DXGI_FORMAT_R32_SINT,
+		DXGI_FORMAT_R32_FLOAT,
+		DXGI_FORMAT_R32G32_FLOAT,
+		DXGI_FORMAT_R32G32B32_FLOAT,
+		DXGI_FORMAT_R32G32B32A32_FLOAT,
+		DXGI_FORMAT_R8G8B8A8_UINT,
+		DXGI_FORMAT_R8G8B8A8_UNORM
+	};
+
+	inline constexpr int32_t MAX_VERTEX_STREAMS = 4;
 }

@@ -19,7 +19,7 @@ namespace Dive
 		void Release();
 
 		// 버퍼 설정 후 생성.
-		bool CreateBuffer(unsigned int count, const std::vector<VertexElement>& elements, bool bDynamic = false);
+		bool CreateBuffer(unsigned int vertexCount, const std::vector<VertexElement>& elements, bool bDynamic = false);
 		// 버퍼에 데이터 전달.
 		bool SetData(void* pData);
 		// 맵
@@ -30,9 +30,11 @@ namespace Dive
 		// 정점 버퍼 리턴.
 		ID3D11Buffer* GetBuffer() const { return m_pBuffer; }
 		// 정점 개수 리턴.
-		unsigned int GetCount() const { return m_Count; }
+		unsigned int GetVertexCount() const { return m_VertexCount; }
 		// 정점 크기 리턴.
-		unsigned int GetStride() const { return m_Stride; }
+		unsigned int GetVertexStride() const { return m_VertexStride; }
+		// 정점 요소 벡터 리턴.
+		const std::vector<VertexElement>& GetElements() const { return m_Elements; }
 		// 다이나믹 버퍼 유무 리턴.
 		bool IsDynamic() const { return m_bDynamic; }
 
@@ -42,9 +44,9 @@ namespace Dive
 		// 버퍼 포인터.
 		ID3D11Buffer* m_pBuffer;
 		// 정점 개수.
-		unsigned int m_Count;
+		unsigned int m_VertexCount;
 		// 정점 크기.
-		unsigned int m_Stride;
+		unsigned int m_VertexStride;
 		// 버퍼 구성 요소.
 		std::vector<VertexElement> m_Elements;
 		// 다이나믹 버퍼 유무.

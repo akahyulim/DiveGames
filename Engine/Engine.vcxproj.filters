@@ -85,6 +85,9 @@
     <ClInclude Include="Src\Graphics\Shader.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Graphics\InputLayout.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -139,6 +142,9 @@
       <Filter>Src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\Shader.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\InputLayout.cpp">
       <Filter>Src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

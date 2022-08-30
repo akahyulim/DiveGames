@@ -11,8 +11,8 @@ namespace Dive
 		: Object(pContext),
 		m_pGraphics(GetSubsystem<Graphics>()),
 		m_pBuffer(nullptr),
-		m_Count(0),
-		m_Stride(0),
+		m_VertexCount(0),
+		m_VertexStride(0),
 		m_bDynamic(false)
 	{
 		DV_ASSERT(m_pGraphics);
@@ -28,17 +28,17 @@ namespace Dive
 		DV_RELEASE(m_pBuffer);
 	}
 
-	bool VertexBuffer::CreateBuffer(unsigned int count, const std::vector<VertexElement>& elements, bool bDynamic)
+	bool VertexBuffer::CreateBuffer(unsigned int vertexCount, const std::vector<VertexElement>& elements, bool bDynamic)
 	{
 		Release();
 
-		if (!count)
+		if (!vertexCount)
 		{
 			DV_LOG_ENGINE_WARN("정점 개수를 잘못 전달받아 버퍼를 생성할 수 없습니다.");
 			return false;
 		}
 
-		m_Count = count;
+		m_VertexCount = vertexCount;
 		m_Elements = elements;
 		m_bDynamic = bDynamic;
 
@@ -48,14 +48,14 @@ namespace Dive
 			element.m_Offset = elementOffset;
 			elementOffset += ELEMENT_TYPESIZES[element.m_Type];
 		}
-		m_Stride = elementOffset;
+		m_VertexStride = elementOffset;
 
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		desc.CPUAccessFlags = m_bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 		desc.Usage = m_bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
-		desc.ByteWidth = (UINT)(m_Count * m_Stride);
+		desc.ByteWidth = (UINT)(m_VertexCount * m_VertexStride);
 
 		if (FAILED(m_pGraphics->GetDevice()->CreateBuffer(&desc, nullptr, (ID3D11Buffer**)&m_pBuffer)))
 		{
@@ -81,7 +81,7 @@ namespace Dive
 			return false;
 		}
 
-		if (!m_Stride)
+		if (!m_VertexStride)
 		{
 			DV_LOG_ENGINE_ERROR("정점 구성요소가 정의되지 않아, 정점 버퍼 데이터를 설정 할 수 없습니다.");
 			return false;
@@ -93,7 +93,7 @@ namespace Dive
 			if (!pDest)
 				return false;
 
-			memcpy(pDest, pData, (size_t)(m_Count * m_Stride));
+			memcpy(pDest, pData, (size_t)(m_VertexCount * m_VertexStride));
 
 			Unmap();
 		}
@@ -101,7 +101,7 @@ namespace Dive
 		{
 			D3D11_BOX destBox;
 			destBox.left = 0;
-			destBox.right = m_Count * m_Stride;
+			destBox.right = m_VertexCount * m_VertexStride;
 			destBox.top = 0;
 			destBox.bottom = 1;
 			destBox.front = 0;
