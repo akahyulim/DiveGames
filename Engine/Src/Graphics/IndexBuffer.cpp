@@ -11,7 +11,7 @@ namespace Dive
 		: Object(pContext),
 		m_pGraphics(GetSubsystem<Graphics>()),
 		m_pBuffer(nullptr),
-		m_Count(0),
+		m_IndexCount(0),
 		m_Stride(0),
 		m_bDynamic(false)
 	{
@@ -28,17 +28,17 @@ namespace Dive
 		DV_RELEASE(m_pBuffer);
 	}
 	
-	bool IndexBuffer::CreateBuffer(unsigned int count, bool bLargeIndices, bool bDynamic)
+	bool IndexBuffer::CreateBuffer(unsigned int indexCount, bool bLargeIndices, bool bDynamic)
 	{
 		Release();
 
-		if (!count)
+		if (!indexCount)
 		{
 			DV_LOG_ENGINE_WARN("인덱스 개수를 잘못 전달받아 버퍼를 생성할 수 없습니다.");
 			return false;
 		}
 
-		m_Count = count;
+		m_IndexCount = indexCount;
 		m_Stride = (unsigned int)(bLargeIndices ? sizeof(unsigned int) : sizeof(unsigned short));
 		m_bDynamic = bDynamic;
 
@@ -47,7 +47,7 @@ namespace Dive
 		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		desc.CPUAccessFlags = m_bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 		desc.Usage = m_bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
-		desc.ByteWidth = (UINT)(m_Count * m_Stride);
+		desc.ByteWidth = (UINT)(m_IndexCount * m_Stride);
 
 		if (FAILED(m_pGraphics->GetDevice()->CreateBuffer(&desc, nullptr, (ID3D11Buffer**)&m_pBuffer)))
 		{
@@ -79,7 +79,7 @@ namespace Dive
 			if (!pDest)
 				return false;
 
-			memcpy(pDest, pData, (size_t)(m_Count * m_Stride));
+			memcpy(pDest, pData, (size_t)(m_IndexCount * m_Stride));
 
 			Unmap();
 		}
@@ -87,7 +87,7 @@ namespace Dive
 		{
 			D3D11_BOX destBox;
 			destBox.left = 0;
-			destBox.right = m_Count * m_Stride;
+			destBox.right = m_IndexCount * m_Stride;
 			destBox.top = 0;
 			destBox.bottom = 1;
 			destBox.front = 0;
