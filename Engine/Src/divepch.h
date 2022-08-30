@@ -26,7 +26,6 @@
 #include <DXGI1_3.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
-//#include <DirectXTex/DirectXTex.h>
 #include <Xinput.h>
 
 #pragma comment(lib, "winmm.lib")

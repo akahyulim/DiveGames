@@ -32,6 +32,7 @@
 #include "Graphics/GraphicsEvents.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
+#include "Graphics/Shader.h"
 
 //= Renderer ======================
 #include "Renderer/Renderer.h"

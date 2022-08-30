@@ -2,6 +2,12 @@
 
 namespace Dive
 {
+	enum class eShaderType
+	{
+		Vertex,
+		Pixel
+	};
+
 	// 타입을 변수로 삼아야 했다.
 	enum eVertexElementType
 	{

@@ -37,35 +37,17 @@ namespace Sandbox
 		// scene을 직접 생성한 후 cache를 이용하여 object를 구성
 		m_pScene = new Dive::Scene(m_pContext);
 		
-		// buffer test
+		// test
 		{
-			// vertices, indices 생성
-			std::vector<Dive::VertexElement> elements;
-			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
-			//elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_NORMAL);
-			//elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
+			Dive::Shader vs(m_pContext, Dive::eShaderType::Vertex);
+			vs.Compile("../CoreData/Shaders/test.hlsl");
 
-			Dive::VertexBuffer buffer(GetContext());
-			buffer.CreateBuffer(3, elements, true);
+			Dive::Shader ps(m_pContext, Dive::eShaderType::Pixel);
+			ps.Compile("../CoreData/Shaders/test.hlsl");
 
-			std::vector<DirectX::XMFLOAT3> triangle;
-			triangle.emplace_back(-0.5f, -0.5f, 0.0f);
-			triangle.emplace_back(0.5f, -0.5f, 0.0f);
-			triangle.emplace_back(0.5f, 0.5f, 0.0f);
-
-			buffer.SetData(triangle.data());
-
-			Dive::IndexBuffer indexBuffer(GetContext());
-			indexBuffer.CreateBuffer(3, false);
-
-			std::vector<unsigned int> indices;
-			indices.emplace_back(0);
-			indices.emplace_back(1);
-			indices.emplace_back(2);
-			indexBuffer.SetData(indices.data());
-
-			buffer.Release();
-			indexBuffer.Release();
+			auto pDeviceContext = GetSubsystem<Dive::Graphics>()->GetDeviceContext();
+			pDeviceContext->VSSetShader(reinterpret_cast<ID3D11VertexShader*>(vs.GetShader()), NULL, 0);
+			pDeviceContext->PSSetShader(reinterpret_cast<ID3D11PixelShader*>(ps.GetShader()), NULL, 0);
 		}
 
 		// camera는 멤버 변수로 별도 관리
