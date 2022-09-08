@@ -39,7 +39,7 @@ namespace Sandbox
 		
 		// test
 		{
-			
+			saveModelTest();
 		}
 
 		// camera는 멤버 변수로 별도 관리
@@ -64,5 +64,45 @@ namespace Sandbox
 
 		// Application Cleanup
 		DV_DELETE(m_pScene);
+	}
+
+	void Sandbox::saveModelTest()
+	{
+		// 정점 버퍼 생성(ShadowData는 아직 없다.)
+		std::vector<Dive::VertexElement> elements;
+		elements.emplace_back(Dive::TYPE_VECTOR3, Dive::SEM_POSITION);
+		elements.emplace_back(Dive::TYPE_VECTOR3, Dive::SEM_NORMAL);
+		elements.emplace_back(Dive::TYPE_VECTOR3, Dive::SEM_COLOR);
+
+		auto pVb = new Dive::VertexBuffer(m_pContext);
+		pVb->SetSize(3, elements);
+
+		// 인덱스 버퍼 생성
+		unsigned short indices[] = { 0, 1, 2 };
+		auto pIb = new Dive::IndexBuffer(m_pContext);
+		pIb->SetSize(3, false);
+		{
+			auto* pDest = (unsigned short*)pIb->GetShadowData();
+			*pDest++ = indices[0];	*pDest++ = indices[1];	*pDest++ = indices[2];
+		}
+
+		// 메시 생성
+		auto pMesh = new Dive::Mesh(m_pContext);
+		pMesh->SetVertexBuffer(0, pVb);
+		pMesh->SetIndexBuffer(pIb);
+
+		// 모델 생성
+		auto pModel = new Dive::Model(m_pContext);
+		std::vector<Dive::VertexBuffer*> vertexBuffers;
+		vertexBuffers.emplace_back(pVb);
+		std::vector<Dive::IndexBuffer*> indexBuffers;
+		indexBuffers.emplace_back(pIb);
+		pModel->SetNumMeshes(1);
+		pModel->SetMesh(0, pMesh);
+		pModel->SetVertexBuffers(vertexBuffers);
+		pModel->SetIndexBuffers(indexBuffers);
+
+		// 모델 세이브
+		pModel->Save();
 	}
 }
