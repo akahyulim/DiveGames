@@ -1,10 +1,14 @@
 #pragma once
 #include "Core/Object.h"
+#include "GraphicsDefs.h"
 
 namespace Dive
 {
 	class Context;
 	class VertexBuffer;
+	class IndexBuffer;
+	class Shader;
+	class InputLayout;
 
 	// 윈도우 클래스 이름.
 	const LPCWSTR WND_CLASS_NAME = L"AppWnd";
@@ -115,7 +119,19 @@ namespace Dive
 		// 렌더링 프레임 종료 후 스왑 체인.
 		void EndFrame();
 
-		// Draw 함수들: 총 5개
+		// Draw 함수들: 총 5개(instance 2개 포함)
+		void Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int vertexStart);
+		void Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int indexCount, unsigned int indexStart);
+
+		// 단일 정점 버퍼 설정.
+		void SetVertexBuffer(VertexBuffer* pBuffer);
+		// 정점 버퍼 배열 설정.
+		bool SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, unsigned int instanceOffset = 0);
+		// 인덱스 버퍼 설정.
+		void SetIndexBuffer(IndexBuffer* pBuffer);
+		// 셰이더 설정.
+		void SetShaders(Shader* pVertexShader, Shader* pPixelShader);
+
 
 		ID3D11Device* GetDevice() { return m_pDevice; }
 		ID3D11DeviceContext* GetDeviceContext() { return m_pDeviceContext; }
@@ -132,6 +148,8 @@ namespace Dive
 		bool createDevice(int width, int height);
 		// 후면 버퍼 크기 변경에 맞춰 기본 텍스쳐 재생성.
 		bool updateSwapChain(int width, int height);
+
+		void prepareDraw();
 
 	private:
 		// 인스턴스.
@@ -156,16 +174,53 @@ namespace Dive
 		ScreenModeParams m_ScreenMode;
 		// icon image
 
-		// Device
+		// 스왑체인.
 		IDXGISwapChain* m_pSwapChain;
+		// 디바이스.
 		ID3D11Device* m_pDevice;
+		// 다바이스 컨텍스트.
 		ID3D11DeviceContext* m_pDeviceContext;
 
 		// 후면 버퍼 렌더타겟뷰.
-		ID3D11RenderTargetView* m_pDefaultRenderTargetView = nullptr;
+		ID3D11RenderTargetView* m_pDefaultRenderTargetView;
 		// 기본 깊이 스텐실 텍스쳐.
-		ID3D11Texture2D* m_pDefaultDepthStencilTexture = nullptr;
+		ID3D11Texture2D* m_pDefaultDepthStencilTexture;
 		// 기본 깊이 스텐실 뷰.
-		ID3D11DepthStencilView* m_pDefaultDepthStencilView = nullptr;
+		ID3D11DepthStencilView* m_pDefaultDepthStencilView;
+		// 현재 렌더 타겟 뷰들.
+		ID3D11RenderTargetView* m_RenderTargetViews[MAX_RENDERTARGETS];
+		// 현재 깊이 스텐실 뷰.
+		ID3D11DepthStencilView* m_pDepthStencilView;
+		// 블랜드 스테이트 객체들.
+		std::unordered_map<unsigned int, ID3D11BlendState*> m_BlendStates;
+		// 깊이 스텐실 스테이트 객체들.
+		std::unordered_map<unsigned int, ID3D11DepthStencilState*> m_DepthStencilStates;
+		// 래스터라이저 스테이트 객체들.
+		std::unordered_map<unsigned int, ID3D11RasterizerState*> m_ResterizerStates;
+		
+		// 현재 정점 버퍼 배열.
+		VertexBuffer* m_pVertexBuffers[MAX_VERTEX_STREAMS];
+		// 현재 정점 버퍼 배열의 오프셋 배열.
+		unsigned int m_VertexBufferOffsets[MAX_VERTEX_STREAMS];
+		// 현재 정점 버퍼 배열의 시작 슬롯 인덱스.
+		unsigned int m_VertexBufferFirstDirty;
+		// 현재 정점 버퍼 배열의 마지막 슬롯 인덱스.
+		unsigned int m_VertexBufferLastDirty;
+
+		// 현재 인덱스 버퍼.
+		IndexBuffer* m_pIndexBuffer;
+		// 현재 정점 셰이더.
+		Shader* m_pVertexShader;
+		// 현재 픽셀 셰이더.
+		Shader* m_pPixelShader;
+		// 입력 레이아웃 맵.
+		std::unordered_map<unsigned long long, InputLayout*> m_InputLayouts;
+		// 입력 레이아웃의 변화여부.
+		bool m_bInputLayoutDirty;
+
+		// 상수 버퍼 맵.
+		// 프리미티브 타입.
+		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveType;
+
 	};
 }

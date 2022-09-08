@@ -57,6 +57,7 @@ namespace Dive
 		eVertexElementType m_Type;
 		eVertexElementSemantic m_Semantic;
 		unsigned char m_Index;
+		// 인스턴싱 사용 유무.
 		bool m_PerInstnace;
 		unsigned int m_Offset;
 	};
@@ -97,5 +98,6 @@ namespace Dive
 		DXGI_FORMAT_R8G8B8A8_UNORM
 	};
 
-	inline constexpr int32_t MAX_VERTEX_STREAMS = 4;
+	inline constexpr int32_t MAX_RENDERTARGETS = 4;
+	inline constexpr int32_t MAX_VERTEX_STREAMS = 4;	// 왜 4개일까? 하나는 InstancingBuffer가 될 수 있다.
 }
