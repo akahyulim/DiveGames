@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Object.h"
-#include "Core/StringHash.h"
+#include "Math/StringHash.h"
 #include "Scene.h"
 #include "IO/Log.h"
 

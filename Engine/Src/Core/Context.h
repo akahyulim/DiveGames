@@ -1,5 +1,5 @@
 #pragma once
-#include "StringHash.h"
+#include "Math/StringHash.h"
 
 namespace Dive
 {

@@ -7,7 +7,6 @@
 #include "divepch.h"
 
 //= Core ==========================
-#include "Core/StringHash.h"
 #include "Core/CoreDefs.h"
 #include "Core/Context.h"
 #include "Core/Object.h"
@@ -32,6 +31,8 @@
 #include "Graphics/GraphicsEvents.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
+#include "Graphics/Model.h"
+#include "Graphics/Mesh.h"
 #include "Graphics/Shader.h"
 #include "Graphics/InputLayout.h"
 
@@ -48,6 +49,8 @@
 #include "Scene/Component/Transform.h"
 
 //= Math ==========================
+#include "Math/MathDefs.h"
+#include "Math/StringHash.h"
 #include "Math/Math.h"
 
 //= Helper ========================
