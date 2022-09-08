@@ -10,9 +10,6 @@
     <ClInclude Include="Src\Engine\Application.h">
       <Filter>Src\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\StringHash.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Core\Variant.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
@@ -85,8 +82,20 @@
     <ClInclude Include="Src\Graphics\Shader.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Graphics\Mesh.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\Model.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Math\StringHash.h">
+      <Filter>Src\Math</Filter>
+    </ClInclude>
     <ClInclude Include="Src\Graphics\InputLayout.h">
       <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Math\MathDefs.h">
+      <Filter>Src\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -144,8 +153,17 @@
     <ClCompile Include="Src\Graphics\Shader.cpp">
       <Filter>Src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Graphics\Mesh.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Model.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="Src\Graphics\InputLayout.cpp">
       <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Math\MathDefs.cpp">
+      <Filter>Src\Math</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

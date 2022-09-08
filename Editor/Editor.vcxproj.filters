@@ -84,6 +84,9 @@
     <ClCompile Include="Src\Panels\ScenePanel.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Importer\ModelImporter.cpp">
+      <Filter>Src\Importer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="External\imgui-docking\imconfig.h">
@@ -151,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="Src\Panels\ScenePanel.h">
       <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Importer\ModelImporter.h">
+      <Filter>Src\Importer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

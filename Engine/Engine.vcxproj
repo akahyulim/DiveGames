@@ -176,7 +176,6 @@
     <ClInclude Include="Src\Core\EventSystem.h" />
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\Timer.h" />
-    <ClInclude Include="Src\Core\StringHash.h" />
     <ClInclude Include="Src\Core\Variant.h" />
     <ClInclude Include="Src\divepch.h" />
     <ClInclude Include="Src\DiveEngine.h" />
@@ -188,11 +187,15 @@
     <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
     <ClInclude Include="Src\Graphics\IndexBuffer.h" />
     <ClInclude Include="Src\Graphics\InputLayout.h" />
+    <ClInclude Include="Src\Graphics\Mesh.h" />
+    <ClInclude Include="Src\Graphics\Model.h" />
     <ClInclude Include="Src\Graphics\Shader.h" />
     <ClInclude Include="Src\Graphics\VertexBuffer.h" />
     <ClInclude Include="Src\IO\Log.h" />
     <ClInclude Include="Src\IO\IOEvents.h" />
     <ClInclude Include="Src\Math\Math.h" />
+    <ClInclude Include="Src\Math\MathDefs.h" />
+    <ClInclude Include="Src\Math\StringHash.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\View.h" />
     <ClInclude Include="Src\Scene\Component\Component.h" />
@@ -212,10 +215,13 @@
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\InputLayout.cpp" />
+    <ClCompile Include="Src\Graphics\Mesh.cpp" />
+    <ClCompile Include="Src\Graphics\Model.cpp" />
     <ClCompile Include="Src\Graphics\Shader.cpp" />
     <ClCompile Include="Src\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Src\IO\Log.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
+    <ClCompile Include="Src\Math\MathDefs.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
     <ClCompile Include="Src\Scene\Component\Component.cpp" />

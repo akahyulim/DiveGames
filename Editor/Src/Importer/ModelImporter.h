@@ -1,0 +1,53 @@
+#pragma once
+
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/version.h>
+#include <assimp/scene.h>
+#include <assimp/DefaultLogger.hpp>
+#include <assimp/ProgressHandler.hpp>
+#include <string>
+
+namespace Editor
+{
+	struct OutModel
+	{
+		std::string outName;
+		aiNode* pRootNode = nullptr;
+		aiNode* pRootBone = nullptr;
+		std::vector<unsigned int> meshIndices;	// urho는 hasset으로 저장했다.
+		std::vector<aiMesh*> meshes;
+		std::vector<aiNode*> meshNodes;
+		std::vector<aiNode*> bones;
+		std::vector<aiAnimation*> animations;
+		uint32_t totalNumVertices = 0;
+		uint32_t totalNumIndices = 0;
+	};
+	
+	// 각종 설정을 외부에서 변경할 수 있어야 한다.
+	// 이후 이를 기반으로 파일을 읽어 들이고,
+	// 파싱 데이터를 이용해 모델로 익스포트하는 것이다.
+	// 유니티의 경우 설정창만 따로 존재하고
+	// 드래그 앤 드랍으로 로드와 익스포트를 처리하는 듯 하다.
+	class ModelImporter
+	{
+	public:
+		ModelImporter();
+		~ModelImporter();
+
+		bool LoadAndExportModel(const std::string& filepath);
+
+		// 각종 설정
+
+	private:
+		void collectMeshes(OutModel& model, aiNode* pNode);
+		bool saveModel();
+
+	private:
+		aiScene* m_pScene;
+		bool m_bAnimations;
+		bool m_bMaterials;
+
+		// 설정 값들을 관리해야 한다.
+	};
+}
