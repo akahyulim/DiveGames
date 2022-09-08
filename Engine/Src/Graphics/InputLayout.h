@@ -12,7 +12,7 @@ namespace Dive
 		DIVE_OBJECT(InputLayout, Object)
 
 	public:
-		explicit InputLayout(Context* pContext, VertexBuffer** ppBuffers, Shader* pVertexShader);
+		explicit InputLayout(Context* pContext, VertexBuffer* pBuffers, Shader* pVertexShader);
 		~InputLayout() override;
 
 		ID3D11InputLayout* GetInputLayout() const { return m_pInputLayout; }

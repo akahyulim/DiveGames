@@ -1,15 +1,10 @@
 #include "divepch.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "Shader.h"
-#include "InputLayout.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
-#include "Core/EventSystem.h"
-#include "Math/MathDefs.h"
 #include "IO/Log.h"
+#include "Core/EventSystem.h"
 
 namespace Dive
 {
@@ -36,32 +31,17 @@ namespace Dive
 
 	Graphics::Graphics(Context* pContext)
 		: Object(pContext),
-		m_hInstance(nullptr),
-		m_hWnd(nullptr),
+		//m_hInstance(NULL),
+		//m_hWnd(NULL),
 		m_pSwapChain(nullptr),
 		m_pDevice(nullptr),
-		m_pDeviceContext(nullptr),
-		m_pDefaultRenderTargetView(nullptr),
-		m_pDefaultDepthStencilTexture(nullptr),
-		m_pDefaultDepthStencilView(nullptr),
-		m_bInputLayoutDirty(false),
-		m_VertexBufferFirstDirty(M_MAX_UINT),
-		m_VertexBufferLastDirty(M_MAX_UINT),
-		m_pIndexBuffer(nullptr),
-		m_pVertexShader(nullptr),
-		m_pPixelShader(nullptr),
-		m_PrimitiveType(D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED)
+		m_pDeviceContext(nullptr)
 	{
 		s_pGraphics = this;
 
-		for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
-			m_RenderTargetViews[i] = nullptr;
-
-		for (unsigned int i = 0; i < MAX_VERTEX_STREAMS; ++i)
-		{
-			m_pVertexBuffers[i] = nullptr;
-			m_VertexBufferOffsets[i] = 0;
-		}
+		// Constructor_d3d11()
+		// GraphicsImple 생성
+		// => 별거 아니다.
 
 		// 쉐이더 경로 및 파일 포멧 설정
 		// 이외에도 기타 설정이 있다.
@@ -415,7 +395,7 @@ namespace Dive
 		params.bVSync = bVSync;
 
 		WindowModeParams windowMode;
-		windowMode.width = width;	
+		windowMode.width = width;
 		windowMode.height = height;
 		windowMode.screenModeParams = params;
 
@@ -498,177 +478,6 @@ namespace Dive
 		// vsync 여부를 멤버로 가져야 할 듯
 		// orho는 screenParam으로 전부 가진다.
 		m_pSwapChain->Present(1, 0);
-	}
-
-	void Graphics::Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int vertexStart)
-	{
-		// shader program?
-		if (!vertexCount)
-			return;
-
-		prepareDraw();
-
-		if (m_PrimitiveType != type)
-		{
-			m_pDeviceContext->IASetPrimitiveTopology(type);
-			m_PrimitiveType = type;
-		}
-
-		m_pDeviceContext->Draw(vertexCount, vertexStart);
-
-		// primitive count라는 걸 관리한다.
-		// bactch count를 증가시킨다.
-	}
-
-	void Graphics::Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int indexCount, unsigned int indexStart)
-	{
-		// shader program?
-		if (!vertexCount)
-			return;
-
-		prepareDraw();
-
-		if (m_PrimitiveType != type)
-		{
-			m_pDeviceContext->IASetPrimitiveTopology(type);
-			m_PrimitiveType = type;
-		}
-
-		m_pDeviceContext->DrawIndexed(indexCount, indexStart, 0);
-
-		// primitive count라는 걸 관리한다.
-		// bactch count를 증가시킨다.
-	}
-
-	void Graphics::SetVertexBuffer(VertexBuffer* pBuffer)
-	{
-		static std::vector<VertexBuffer*> vertexBuffers(1);
-		vertexBuffers[0] = pBuffer;
-
-		SetVertexBuffers(vertexBuffers);
-	}
-
-	bool Graphics::SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, unsigned int instanceOffset)
-	{
-		if (buffers.size() > MAX_VERTEX_STREAMS)
-		{
-			DV_LOG_ENGINE_ERROR("정점 버퍼 백터의 크기가 잘못 설정되었습니다.");
-			return false;
-		}
-
-		for (unsigned int i = 0; i < MAX_VERTEX_STREAMS; ++i)
-		{
-			VertexBuffer* pBuffer = nullptr;
-			bool bChanged = false;
-
-			pBuffer = i < (unsigned int)buffers.size() ? buffers[i] : nullptr;
-			if (pBuffer)
-			{
-				const std::vector<VertexElement>& elements = pBuffer->GetElements();
-				bool bHasInstanceData = elements.size() && elements[0].m_PerInstnace;
-				unsigned int offset = bHasInstanceData ? instanceOffset * pBuffer->GetVertexSize() : 0;
-
-				if (pBuffer != m_pVertexBuffers[i] || offset != m_VertexBufferOffsets[i])
-				{
-					m_pVertexBuffers[i] = pBuffer;
-					m_VertexBufferOffsets[i] = offset;
-					bChanged = true;
-				}
-				
-			}
-			else if (m_pVertexBuffers[i])
-			{
-				m_pVertexBuffers[i] = nullptr;
-				m_VertexBufferOffsets[i] = 0;
-				bChanged = true;
-			}
-
-			if (bChanged)
-			{
-				m_bInputLayoutDirty = true;
-
-				if (m_VertexBufferFirstDirty == M_MAX_UINT)
-					m_VertexBufferFirstDirty = m_VertexBufferLastDirty = i;
-				else
-				{
-					if (m_VertexBufferFirstDirty > i)
-						m_VertexBufferFirstDirty = i;
-					if (m_VertexBufferLastDirty < i)
-						m_VertexBufferLastDirty = i;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	void Graphics::SetIndexBuffer(IndexBuffer* pBuffer)
-	{
-		if (pBuffer != m_pIndexBuffer)
-		{
-			if (pBuffer)
-				m_pDeviceContext->IASetIndexBuffer(
-					pBuffer->GetBuffer(),
-					pBuffer->GetFormat(),
-					0
-				);
-			else
-				m_pDeviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
-
-			m_pIndexBuffer = pBuffer;
-		}
-	}
-
-	void Graphics::SetShaders(Shader* pVertexShader, Shader* pPixelShader)
-	{
-		if (pVertexShader->GetShaderType() != eShaderType::Vertex)
-		{
-			DV_LOG_ENGINE_ERROR("VertexShader를 잘못전달받았습니다.");
-			return;
-		}
-
-		if (pPixelShader->GetShaderType() != eShaderType::Pixel)
-		{
-			DV_LOG_ENGINE_ERROR("PixelShader를 잘못전달받았습니다.");
-			return;
-		}
-
-		if (pVertexShader == m_pVertexShader && pPixelShader == m_pPixelShader)
-			return;
-
-		if (pVertexShader != m_pVertexShader)
-		{
-			if (pVertexShader && !pVertexShader->GetShader())
-			{
-				// 직접 컴파일한다.
-				// 1. 이전 컴파일 과정에서 오류가 발생했었다면 nullptr
-				// 2. 그런 흔적이 없다면 다시 컴파일 => 경로를 직접 가지고 있어야 한다.
-				// 2-1. 컴파일 과정에서 오류가 발생했다면 nullptr
-			}
-
-			m_pDeviceContext->VSSetShader((ID3D11VertexShader*)(pVertexShader ? pVertexShader->GetShader() : nullptr), nullptr, 0);
-			m_pVertexShader = pVertexShader;
-			m_bInputLayoutDirty = true;
-		}
-
-		if (pPixelShader != m_pPixelShader)
-		{
-			if (pPixelShader && !pPixelShader->GetShader())
-			{
-				// 역시 직접 생성할 수 있다.
-			}
-
-			m_pDeviceContext->PSSetShader((ID3D11PixelShader*)(pPixelShader ? pPixelShader->GetShader() : nullptr), nullptr, 0);
-			m_pPixelShader = pPixelShader;
-			// 더티 저장.
-		}
-
-		// 업데이트 현재 셰이더의 파라미터와 constant buffers
-		if (m_pVertexShader && m_pPixelShader)
-		{
-			// 두 Shader를 Key로하는 ShaderProgram이라는 객체를 find하거나 생성한 후
-			// 각 Shader의 constant buffer를 얻어 bind한다.
-		}
 	}
 
 	void Graphics::OnResizeWindow()
@@ -805,55 +614,5 @@ namespace Dive
 		m_Height = height;
 
 		return true;
-	}
-
-	// 각종 리소스를 바인드... 직접 생성하기도 한다.
-	// 각종 Draw 함수 내부에서 호출된다.
-	void Graphics::prepareDraw()
-	{
-		// 렌더 타겟
-
-		// 셰이더 리소스 & 샘플러
-
-		// 정점 버퍼와 입력 레이아웃
-		if (m_bInputLayoutDirty && m_pVertexShader)
-		{
-			if (m_VertexBufferFirstDirty < M_MAX_UINT)
-			{
-				ID3D11Buffer* pBuffers[MAX_VERTEX_STREAMS] = { nullptr, };
-				unsigned int strides[MAX_VERTEX_STREAMS] = { 0, };
-
-				for (int i = 0; i < MAX_VERTEX_STREAMS; ++i)
-				{
-					pBuffers[i] = m_pVertexBuffers[i] ? m_pVertexBuffers[i]->GetBuffer() : nullptr;
-					strides[i] = m_pVertexBuffers[i] ? m_pVertexBuffers[i]->GetVertexSize() : 0;
-				}
-
-				m_pDeviceContext->IASetVertexBuffers(
-					m_VertexBufferFirstDirty,
-					m_VertexBufferLastDirty - m_VertexBufferFirstDirty + 1,
-					&pBuffers[m_VertexBufferFirstDirty],
-					&strides[m_VertexBufferFirstDirty],
-					&m_VertexBufferOffsets[m_VertexBufferFirstDirty]);
-
-				m_VertexBufferFirstDirty = m_VertexBufferLastDirty = M_MAX_UINT;
-			}
-
-			// InputLayout
-			// 현재 VertexBuffer의 BufferHash를 마련해 두었지만
-			// Shader의 ElementHash 구현 함수가 복잡해 구현을 미뤘다.
-			// 일단은 VertexBuffer의 배열 구성과 Instancing 사용 과정 등을 분석한 후
-			// InputLayout을 어떻게 생성하고 관리할 것인지 정해야 한다.
-
-			m_bInputLayoutDirty = false;
-		}
-
-		// 블랜드 스테이트
-
-		// 깊이 스텐실 스테이트
-
-		// 레스터라이즈 스테이트
-	
-		// 시저
 	}
 }
