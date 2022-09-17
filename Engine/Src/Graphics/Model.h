@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Object.h"
+#include "Resource/Resource.h"
 
 namespace Dive
 {
@@ -7,19 +8,18 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
 	class Mesh;
+	class FileStream;
 
-	// 추후 Resource로 만들어야 한다.
-	class Model : public Object
+	class Model : public Resource
 	{
-		DIVE_OBJECT(Model, Object)
+		DIVE_OBJECT(Model, Resource)
 
 	public:
 		explicit Model(Context* pContext);
 		~Model() override;
 
-		// 아무래도 Reosurce에서 override되어야 할 듯...
-		bool Load();
-		bool Save();
+		bool Load(FileStream* pDeserializer) override;
+		bool Save(FileStream* pSerializer) override;
 
 		const std::vector<VertexBuffer*>& GetVertexBuffers() const { return m_VertexBuffers; }
 		bool SetVertexBuffers(const std::vector<VertexBuffer*>& pBuffers);

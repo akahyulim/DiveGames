@@ -9,7 +9,7 @@
 namespace Dive
 {
 	Model::Model(Context* pContext)
-		: Object(pContext)
+		: Resource(pContext)
 	{
 	}
 
@@ -17,28 +17,26 @@ namespace Dive
 	{
 	}
 
-	bool Model::Load()
+	bool Model::Load(FileStream* pDeserializer)
 	{
-		
 		return false;
 	}
 
-	bool Model::Save()
+	bool Model::Save(FileStream* pSerializer)
 	{
-
 		// Vertex Buffer
 		{
 			auto vertexCount = m_VertexBuffers.size();
 			DV_LOG_ENGINE_DEBUG("VertexBuffer Count: {:d}", vertexCount);
 
-			for(const auto* pBuffer : m_VertexBuffers)
+			for (const auto* pBuffer : m_VertexBuffers)
 			{
 				auto numVertices = pBuffer->GetVertexCount();
 				DV_LOG_ENGINE_DEBUG("Num Vertices: {:d}", numVertices);
 
 				auto numElements = pBuffer->GetElements().size();
 				DV_LOG_ENGINE_DEBUG("Num Vertex Elements: {:d}", numElements);
-				
+
 				for (const auto element : pBuffer->GetElements())
 				{
 					// elementÀÇ Å¸ÀÔ, ½Ã¸ÇÆ½, ÀÎµ¦½º
@@ -54,7 +52,7 @@ namespace Dive
 			auto indexCount = m_IndexBuffers.size();
 			DV_LOG_ENGINE_DEBUG("IndexBuffer Count: {:d}", indexCount);
 
-			for(const auto* pBuffer : m_IndexBuffers)
+			for (const auto* pBuffer : m_IndexBuffers)
 			{
 				auto numIndex = pBuffer->GetIndexCount();
 				DV_LOG_ENGINE_DEBUG("Num Indices: {:d}", numIndex);
@@ -66,7 +64,7 @@ namespace Dive
 			}
 		}
 
-		return true;
+		return false;
 	}
 
 	bool Model::SetVertexBuffers(const std::vector<VertexBuffer*>& pBuffers)
