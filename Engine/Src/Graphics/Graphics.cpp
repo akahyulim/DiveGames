@@ -1,10 +1,13 @@
 #include "divepch.h"
 #include "Graphics.h"
 #include "GraphicsEvents.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "Shader.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
 #include "Core/EventSystem.h"
+#include "IO/Log.h"
 
 namespace Dive
 {
@@ -35,7 +38,14 @@ namespace Dive
 		//m_hWnd(NULL),
 		m_pSwapChain(nullptr),
 		m_pDevice(nullptr),
-		m_pDeviceContext(nullptr)
+		m_pDeviceContext(nullptr),
+		m_pDefaultRenderTargetView(nullptr),
+		m_pDefaultDepthStencilTexture(nullptr),
+		m_pDefaultDepthStencilView(nullptr),
+		m_PrimitiveType(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
+		m_pIndexBuffer(nullptr),
+		m_pVertexShader(nullptr),
+		m_pPixelShader(nullptr)
 	{
 		s_pGraphics = this;
 
@@ -45,6 +55,9 @@ namespace Dive
 
 		// 쉐이더 경로 및 파일 포멧 설정
 		// 이외에도 기타 설정이 있다.
+
+		for (unsigned int i = 0; i < MAX_VERTEX_STREAMS; ++i)
+			m_VertexBuffers[i] = nullptr;
 	}
 
 	Graphics::~Graphics()
@@ -480,6 +493,102 @@ namespace Dive
 		m_pSwapChain->Present(1, 0);
 	}
 
+	void Graphics::Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int vertexStart)
+	{
+		if (!vertexCount)
+			return;
+
+		prepareDraw();
+
+		if (m_PrimitiveType != type)
+		{
+			m_pDeviceContext->IASetPrimitiveTopology(type);
+			m_PrimitiveType = type;
+		}
+
+		m_pDeviceContext->Draw(vertexCount, vertexStart);
+	}
+
+	void Graphics::DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int indexStart, unsigned int baseVertexIndex)
+	{
+		// 이 곳에도 VertexCount를 받은 후 개수 확인하는 구문이 있으나 일단 건너띄기
+
+		prepareDraw();
+
+		if (m_PrimitiveType != type)
+		{
+			m_pDeviceContext->IASetPrimitiveTopology(type);
+			m_PrimitiveType = type;
+		}
+
+		m_pDeviceContext->DrawIndexed(indexCount, indexStart, baseVertexIndex);
+	}
+
+	VertexBuffer* Graphics::GetVertexBuffer(unsigned int index) const
+	{
+		return index < MAX_VERTEX_STREAMS ? m_VertexBuffers[index] : nullptr;
+	}
+
+	void Graphics::SetVertexBuffer(VertexBuffer* pBuffer)
+	{
+		static std::vector<VertexBuffer*> vertexBuffers(1);
+		vertexBuffers[0] = pBuffer;
+		SetVertexBuffers(vertexBuffers);
+	}
+
+	void Graphics::SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, unsigned int instanceOffset)
+	{
+	}
+
+	void Graphics::SetIndexBuffer(IndexBuffer* pBuffer)
+	{
+		if (m_pIndexBuffer != pBuffer)
+		{
+			if (pBuffer)
+			{
+				m_pDeviceContext->IASetIndexBuffer(
+					pBuffer->GetBuffer(),
+					pBuffer->GetIndexSize() == sizeof(unsigned short) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT,
+					0);
+			}
+			else
+				m_pDeviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+
+			m_pIndexBuffer = pBuffer;
+		}
+	}
+
+	// 직접 만들게 할 것인지 결정해야 한다.
+	void Graphics::SetShaders(Shader* pVertexShader, Shader* pPixelShader)
+	{
+		if (m_pVertexShader == pVertexShader && m_pPixelShader == pPixelShader)
+			return;
+
+		if (m_pVertexShader != pVertexShader)
+		{
+			// 전달받은 pVertexShader가 비어있다면 직접 만든다.
+
+			m_pDeviceContext->VSSetShader(
+				(ID3D11VertexShader*)(pVertexShader ? pVertexShader->GetShader() : nullptr),
+				nullptr, 0);
+
+			m_pVertexShader = pVertexShader;
+		}
+
+		if (m_pPixelShader != pPixelShader)
+		{
+			// 역시 셰이더가 비었다면 직접 만든다.
+
+			m_pDeviceContext->PSSetShader(
+				(ID3D11PixelShader*)(pPixelShader ? pPixelShader->GetShader() : nullptr),
+				nullptr, 0);
+
+			m_pPixelShader = pPixelShader;
+		}
+
+		// 이후 셰이더 파라미터와 상수버퍼를 업데이트
+	}
+
 	void Graphics::OnResizeWindow()
 	{
 		if (!IsInitialized())
@@ -490,7 +599,7 @@ namespace Dive
 
 		if (width == m_Width && height == m_Height)
 			return;
-
+		
 		updateSwapChain(width, height);
 
 		// render targets들 + viewport 도 새로 만들어야 한다.
@@ -614,5 +723,24 @@ namespace Dive
 		m_Height = height;
 
 		return true;
+	}
+
+	// 이름을 바꿨으면 좋겠다.
+	// 각종 bind를 수행하는 구문이다.
+	void Graphics::prepareDraw()
+	{
+		// render targets
+
+		// shader resources + samplers
+
+		// vertex buffer + inputlayout
+
+		// blend state
+
+		// depthstencil state
+
+		// rasterizer state
+
+		// RSSetScissorRect
 	}
 }

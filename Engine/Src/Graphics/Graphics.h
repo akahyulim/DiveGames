@@ -1,10 +1,13 @@
 #pragma once
 #include "Core/Object.h"
+#include "GraphicsDefs.h"
 
 namespace Dive
 {
 	class Context;
 	class VertexBuffer;
+	class IndexBuffer;
+	class Shader;
 
 	// 윈도우 클래스 이름.
 	const LPCWSTR WND_CLASS_NAME = L"AppWnd";
@@ -116,6 +119,28 @@ namespace Dive
 		void EndFrame();
 
 		// Draw 함수들: 총 5개
+		void Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int vertexStart);
+		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int indexStart, unsigned int baseVertexIndex = 0);
+		void DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int instanceCount, unsigned int indexStart);
+
+		VertexBuffer* GetVertexBuffer(unsigned int index) const;
+		void SetVertexBuffer(VertexBuffer* pBuffer);
+		void SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, unsigned int instanceOffset = 0);
+
+		IndexBuffer* GetIndexBuffer() const { return m_pIndexBuffer; }
+		void SetIndexBuffer(IndexBuffer* pBuffer);
+
+		Shader* GetShader(eShaderType type, const std::string& name, const std::string& defines = std::string()) const;
+		void SetShaders(Shader* pVertexShader, Shader* pPixelShader);
+
+		// 기타: 얘네들을 이용해 States를 실시간으로 생성하는 듯 하다.
+		// SetFillMode		fill_mode
+		// SetLineAntiAlias	bool
+		// SetClipPlane		bool
+		// SetColorWhite?	bool
+		// SetDepthBias		float, float
+		// SetScissorTest	bool
+		// SetStencilTest	bool
 
 		ID3D11Device* GetDevice() { return m_pDevice; }
 		ID3D11DeviceContext* GetDeviceContext() { return m_pDeviceContext; }
@@ -132,6 +157,8 @@ namespace Dive
 		bool createDevice(int width, int height);
 		// 후면 버퍼 크기 변경에 맞춰 기본 텍스쳐 재생성.
 		bool updateSwapChain(int width, int height);
+		// Draw 사전 준비.
+		void prepareDraw();
 
 	private:
 		// 인스턴스.
@@ -162,10 +189,18 @@ namespace Dive
 		ID3D11DeviceContext* m_pDeviceContext;
 
 		// 후면 버퍼 렌더타겟뷰.
-		ID3D11RenderTargetView* m_pDefaultRenderTargetView = nullptr;
+		ID3D11RenderTargetView* m_pDefaultRenderTargetView;
 		// 기본 깊이 스텐실 텍스쳐.
-		ID3D11Texture2D* m_pDefaultDepthStencilTexture = nullptr;
+		ID3D11Texture2D* m_pDefaultDepthStencilTexture;
 		// 기본 깊이 스텐실 뷰.
-		ID3D11DepthStencilView* m_pDefaultDepthStencilView = nullptr;
+		ID3D11DepthStencilView* m_pDefaultDepthStencilView;
+
+		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveType;
+
+		VertexBuffer* m_VertexBuffers[MAX_VERTEX_STREAMS];
+		IndexBuffer* m_pIndexBuffer;
+
+		Shader* m_pVertexShader;
+		Shader* m_pPixelShader;
 	};
 }

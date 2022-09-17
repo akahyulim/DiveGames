@@ -29,15 +29,14 @@ namespace Dive
 	{
 		if (m_pIndexBuffer && m_IndexCount > 0)
 		{
-			// Ä¿¹ÔÀÌ ²¿¿©¼­ ³¯·Á¹ö¸²...
-			//pGraphics->SetVertexBuffers(m_VertexBuffers);
-			//pGraphics->SetIndexBuffer(m_pIndexBuffer);
-			//pGraphics->Draw(m_PrimitiveType, m_VertexCount, m_IndexCount, m_IndexStart);
+			pGraphics->SetVertexBuffers(m_VertexBuffers);
+			pGraphics->SetIndexBuffer(m_pIndexBuffer);
+			pGraphics->DrawIndexed(m_PrimitiveType, m_VertexCount, m_IndexCount, m_IndexStart);
 		}
 		else if(m_VertexCount > 0)
 		{
-			//pGraphics->SetVertexBuffers(m_VertexBuffers);
-			//pGraphics->Draw(m_PrimitiveType, m_VertexCount, m_VertexStart);
+			pGraphics->SetVertexBuffers(m_VertexBuffers);
+			pGraphics->Draw(m_PrimitiveType, m_VertexCount, m_VertexStart);
 		}
 	}
 

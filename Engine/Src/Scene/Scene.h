@@ -12,7 +12,7 @@ namespace Dive
 	static const unsigned int LAST_ID = 0xffffffff;
 
 	// GameObject의 관리가 주 임무 + 추후 Octree를 추가할 수 있다.
-	// 구성된 Scene을 Serialization 할 수 있어야 한다.
+	// 구성된 Scene을 Serialization 할 수 있어야 한다. => Resource가 아니다... 큰 문제는 아닌듯...
 	// View가 GameObject와 Component를 참조하여 그려질 대상을 분류한다.
 	class Scene : public Object
 	{

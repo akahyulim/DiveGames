@@ -21,9 +21,13 @@
 
 //= IO ============================
 #include "IO/Log.h"
+#include "IO/FileStream.h"
+#include "IO/FileSystem.h"
 #include "IO/IOEvents.h"
 
 //= Resource ======================
+#include "Resource/Resource.h"
+#include "Resource/ResourceCache.h"
 
 //= Graphics ======================
 #include "Graphics/GraphicsDefs.h"
@@ -47,6 +51,7 @@
 #include "Scene/GameObject.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
+#include "Scene/Component/StaticModel.h"
 
 //= Math ==========================
 #include "Math/MathDefs.h"

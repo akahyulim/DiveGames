@@ -5,6 +5,7 @@ namespace Dive
 {
 	class Graphics;
 	class Renderer;
+	class Scene;
 
 	// scene, camera, render path를 참조하여 graphics로 render
 	class View : public Object
@@ -13,7 +14,7 @@ namespace Dive
 
 	public:
 		explicit View(Context* pContext);
-		// 기본 매개변수
+		View(Context* pContext, Scene* pScene);	// + camera, renderpath
 		// 기본 매개변수 + rect
 		~View();
 
@@ -37,7 +38,7 @@ namespace Dive
 
 	private:
 		// viewport part
-		// scene
+		Scene* m_pScene;
 		// camera
 		// render path
 		RECT m_Rect;
