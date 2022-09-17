@@ -6,6 +6,7 @@
 #include "Core/CoreEvents.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
+#include "Resource/ResourceCache.h"
 #include "IO/Log.h"
 
 namespace Dive
@@ -17,9 +18,10 @@ namespace Dive
 		m_DeltaTime(0.0f),
 		m_MaxFps(0)
 	{
-		// 扁夯 subsystem 积己: resource cache, input, filesystem
+		// 扁夯 subsystem 积己: input, filesystem
 		m_pContext->RegisterSubsystem(std::make_shared<Log>(pContext));
 		m_pContext->RegisterSubsystem(std::make_shared<Time>(pContext));
+		m_pContext->RegisterSubsystem(std::make_shared<ResourceCache>(pContext));
 
 		SUBSCRIBE_EVENT(eEventType::ExitRequested, EVENT_HANDLER_PARAM(OnExitRequested));
 	}
