@@ -6,7 +6,8 @@ namespace Sandbox
 {
 	Sandbox::Sandbox(Dive::Context* pContext)
 		: Dive::Application(pContext),
-		m_pScene(nullptr)
+		m_pScene(nullptr),
+		m_pTriangleModel(nullptr)
 	{
 	}
 
@@ -36,10 +37,16 @@ namespace Sandbox
 		// create scene content
 		// scene을 직접 생성한 후 cache를 이용하여 object를 구성
 		m_pScene = new Dive::Scene(m_pContext);
-		
+	
 		// test
-		{
-			saveModelTest();
+		{	
+			testSaveModel();
+			testCreateTriangleModel();
+
+
+			auto* pTriangle = m_pScene->CreateGameObject("Triangle");
+			auto* pStaticModel = pTriangle->CreateComponent<Dive::StaticModel>();
+			pStaticModel->SetModel(m_pTriangleModel);
 		}
 
 		// camera는 멤버 변수로 별도 관리
@@ -50,7 +57,7 @@ namespace Sandbox
 		// 1. viewport를 생성한 후 renderer에 set
 		// viewport는 scene, camera 그리고 필요하다면 render path를 전달하여 생성
 		// 2. render path가 없다면 cache로부터 load한 후 viewport에 set
-		auto pView = std::make_shared<Dive::View>(m_pContext);
+		auto pView = std::make_shared<Dive::View>(m_pContext, m_pScene);
 		GetSubsystem<Dive::Renderer>()->SetView(0, pView);
 
 		// subscirbe events
@@ -66,7 +73,7 @@ namespace Sandbox
 		DV_DELETE(m_pScene);
 	}
 
-	void Sandbox::saveModelTest()
+	void Sandbox::testSaveModel()
 	{
 		// 정점 버퍼 생성(ShadowData는 아직 없다.)
 		std::vector<Dive::VertexElement> elements;
@@ -103,6 +110,70 @@ namespace Sandbox
 		pModel->SetIndexBuffers(indexBuffers);
 
 		// 모델 세이브
-		pModel->Save();
+		pModel->Save(nullptr);
+	}
+
+	void Sandbox::testCreateTriangleModel()
+	{
+		// 정점 버퍼 생성
+		std::vector<Dive::VertexElement> elements;
+		elements.emplace_back(Dive::TYPE_VECTOR3, Dive::SEM_POSITION);
+		elements.emplace_back(Dive::TYPE_VECTOR3, Dive::SEM_COLOR);
+
+		float vertices[] = { 
+			-0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 0.0f, 0.0f,					// pos
+			1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f	// color
+		};
+
+		auto* pVb = new Dive::VertexBuffer(m_pContext);
+		pVb->CreateBuffer(3, elements, (const void*)vertices);
+
+		// 인덱스 버퍼 생성
+		unsigned short indices[] = { 0, 1, 2 };
+		
+		auto* pIb = new Dive::IndexBuffer(m_pContext);
+		pIb->CreateBuffer(3, false, (const void*)indices);
+
+		// 메시 생성
+		auto* pMesh = new Dive::Mesh(m_pContext);
+		pMesh->SetNumVertexBuffers(1);
+		pMesh->SetVertexBuffer(0, pVb);
+		pMesh->SetIndexBuffer(pIb);
+		pMesh->SetPrimitiveType(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+		// 모델 생성
+		std::vector<Dive::VertexBuffer*> vertexBuffers;
+		vertexBuffers.emplace_back(pVb);
+		std::vector<Dive::IndexBuffer*> indexBuffers;
+		indexBuffers.emplace_back(pIb);
+
+		m_pTriangleModel = new Dive::Model(m_pContext);
+		m_pTriangleModel->SetNumMeshes(1);
+		m_pTriangleModel->SetMesh(0, pMesh);
+		m_pTriangleModel->SetVertexBuffers(vertexBuffers);
+		m_pTriangleModel->SetIndexBuffers(indexBuffers);
+	}
+
+	void Sandbox::testFileStreamFuncitons()
+	{
+		DV_LOG_CLIENT_DEBUG("ToLowercase: {:s}", Dive::ToLowerCase("AaBbCcDdEe"));
+		DV_LOG_CLIENT_DEBUG("ToUppercase: {:s}", Dive::ToUpperCase("AaBbCcDdEe"));
+
+		std::string fullPath = "C:\\Dev\\Projects\\DiveGames\\CoreData\\Shaders\\test.hlsl";
+		DV_LOG_CLIENT_DEBUG("InternalPath: {:s}", Dive::GetInternalPath(fullPath));
+		DV_LOG_CLIENT_DEBUG("NativePath: {:s}", Dive::GetNativePath(Dive::GetInternalPath(fullPath)));
+
+		std::string path, name, extension;
+		Dive::SplitPath(fullPath, path, name, extension);
+		DV_LOG_CLIENT_DEBUG("Path: {0:s}, FileName: {1:s}, Extension: {2:s}", path, name, extension);
+		DV_LOG_CLIENT_DEBUG("Path: {0:s}, FileName: {1:s}, Extension: {2:s}", Dive::GetPath(fullPath), Dive::GetFileName(fullPath), Dive::GetExtension(fullPath));
+
+		DV_LOG_CLIENT_DEBUG("FileName+Extension: {:s}", Dive::GetFileNameAndExtension(fullPath));
+
+		DV_LOG_CLIENT_DEBUG("ParentPath: {:s}", Dive::GetParentPath(fullPath));
+
+		DV_LOG_CLIENT_DEBUG("Org: {0:s}, Trimmed: {1:s}", "   Knave ", Dive::StringTrim("   Knave "));
+
+		DV_LOG_CLIENT_DEBUG("AbsolutePath: {0:b}, RelativePath: {1:b}", Dive::IsAbsolutePath(fullPath), Dive::IsAbsolutePath("../CoreData/Shaders/test.hlsl"));
 	}
 }

@@ -97,6 +97,21 @@
     <ClInclude Include="Src\Math\MathDefs.h">
       <Filter>Src\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Scene\Component\StaticModel.h">
+      <Filter>Src\Scene\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\IO\FileSystem.h">
+      <Filter>Src\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Resource\ResourceCache.h">
+      <Filter>Src\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Resource\Resource.h">
+      <Filter>Src\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\IO\FileStream.h">
+      <Filter>Src\IO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -164,6 +179,21 @@
     </ClCompile>
     <ClCompile Include="Src\Math\MathDefs.cpp">
       <Filter>Src\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\StaticModel.cpp">
+      <Filter>Src\Scene\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\IO\FileSystem.cpp">
+      <Filter>Src\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Resource\ResourceCache.cpp">
+      <Filter>Src\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Resource\Resource.cpp">
+      <Filter>Src\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\IO\FileStream.cpp">
+      <Filter>Src\IO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

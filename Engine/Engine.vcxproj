@@ -191,6 +191,8 @@
     <ClInclude Include="Src\Graphics\Model.h" />
     <ClInclude Include="Src\Graphics\Shader.h" />
     <ClInclude Include="Src\Graphics\VertexBuffer.h" />
+    <ClInclude Include="Src\IO\FileStream.h" />
+    <ClInclude Include="Src\IO\FileSystem.h" />
     <ClInclude Include="Src\IO\Log.h" />
     <ClInclude Include="Src\IO\IOEvents.h" />
     <ClInclude Include="Src\Math\Math.h" />
@@ -198,7 +200,10 @@
     <ClInclude Include="Src\Math\StringHash.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\View.h" />
+    <ClInclude Include="Src\Resource\Resource.h" />
+    <ClInclude Include="Src\Resource\ResourceCache.h" />
     <ClInclude Include="Src\Scene\Component\Component.h" />
+    <ClInclude Include="Src\Scene\Component\StaticModel.h" />
     <ClInclude Include="Src\Scene\Component\Transform.h" />
     <ClInclude Include="Src\Scene\GameObject.h" />
     <ClInclude Include="Src\Scene\Scene.h" />
@@ -219,12 +224,17 @@
     <ClCompile Include="Src\Graphics\Model.cpp" />
     <ClCompile Include="Src\Graphics\Shader.cpp" />
     <ClCompile Include="Src\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="Src\IO\FileStream.cpp" />
+    <ClCompile Include="Src\IO\FileSystem.cpp" />
     <ClCompile Include="Src\IO\Log.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Math\MathDefs.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
+    <ClCompile Include="Src\Resource\Resource.cpp" />
+    <ClCompile Include="Src\Resource\ResourceCache.cpp" />
     <ClCompile Include="Src\Scene\Component\Component.cpp" />
+    <ClCompile Include="Src\Scene\Component\StaticModel.cpp" />
     <ClCompile Include="Src\Scene\Component\Transform.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />
