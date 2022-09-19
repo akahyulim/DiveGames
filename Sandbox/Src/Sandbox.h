@@ -17,6 +17,7 @@ namespace Sandbox
 		void testSaveModel();
 		void testCreateTriangleModel();
 		void testFileStreamFuncitons();
+		void testResourceCache();
 
 	private:
 		Dive::Scene* m_pScene;

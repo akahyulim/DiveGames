@@ -42,7 +42,7 @@ namespace Sandbox
 		{	
 			testSaveModel();
 			testCreateTriangleModel();
-
+			testResourceCache();
 
 			auto* pTriangle = m_pScene->CreateGameObject("Triangle");
 			auto* pStaticModel = pTriangle->CreateComponent<Dive::StaticModel>();
@@ -175,5 +175,57 @@ namespace Sandbox
 		DV_LOG_CLIENT_DEBUG("Org: {0:s}, Trimmed: {1:s}", "   Knave ", Dive::StringTrim("   Knave "));
 
 		DV_LOG_CLIENT_DEBUG("AbsolutePath: {0:b}, RelativePath: {1:b}", Dive::IsAbsolutePath(fullPath), Dive::IsAbsolutePath("../CoreData/Shaders/test.hlsl"));
+	}
+
+	void Sandbox::testResourceCache()
+	{
+		auto* pModelA = new Dive::Model(m_pContext);
+		pModelA->SetName("ModelA.md");
+		auto* pModelB = new Dive::Model(m_pContext);
+		pModelB->SetName("ModelB.md");
+		auto* pModelC = new Dive::Model(m_pContext);
+		pModelC->SetName("ModelC.md");
+		auto* pModelD = new Dive::Model(m_pContext);
+		pModelD->SetName("ModelD.md");
+		auto* pModelE = new Dive::Model(m_pContext);
+		pModelE->SetName("ModelE.md");
+
+		auto* pResourceCache = GetSubsystem<Dive::ResourceCache>();
+		pResourceCache->AddResource(pModelA);
+		pResourceCache->AddResource(pModelB);
+		pResourceCache->AddResource(pModelC);
+		pResourceCache->AddResource(pModelD);
+		pResourceCache->AddResource(pModelE);
+
+		// get
+		auto* pModel = pResourceCache->GetResource<Dive::Model>("ModelA.md");
+		DV_LOG_CLIENT_DEBUG("Current Resource Name: {:s}", pModel->GetName());
+		pModel = pResourceCache->GetResource<Dive::Model>("ModelC.md");
+		DV_LOG_CLIENT_DEBUG("Current Resource Name: {:s}", pModel->GetName());
+		pModel = pResourceCache->GetResource<Dive::Model>("ModelD.md");
+		DV_LOG_CLIENT_DEBUG("Current Resource Name: {:s}", pModel->GetName());
+
+		std::vector<Dive::Model*> models;
+		pResourceCache->GetResources<Dive::Model>(models);
+		for (auto* pCurModel : models)
+		{
+			DV_LOG_CLIENT_DEBUG("SameType Resource Name: {:s}", pCurModel->GetName());
+		}
+
+		// release
+		pResourceCache->RemoveResource<Dive::Model>("ModelB.md");
+		pResourceCache->RemoveResource<Dive::Model>("ModelC.md");
+		pResourceCache->GetResources<Dive::Model>( models);
+		for (auto* pCurModel : models)
+		{
+			DV_LOG_CLIENT_DEBUG("Existed Resource Name: {:s}", pCurModel->GetName());
+		}
+
+		pResourceCache->RemoveResources<Dive::Model>();
+		pResourceCache->GetResources<Dive::Model>(models);
+		if (models.empty())
+		{
+			DV_LOG_CLIENT_DEBUG("removed all Resources");
+		}
 	}
 }
