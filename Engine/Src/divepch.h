@@ -19,6 +19,8 @@
 #include <algorithm>
 #include <fstream>
 #include <filesystem>
+#include <locale>
+#include <codecvt>
 
 #include <Windows.h>
 

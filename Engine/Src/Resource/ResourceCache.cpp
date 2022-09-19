@@ -68,16 +68,17 @@ namespace Dive
 		m_ResourceGroups.clear();
 	}
 
-	// 이미 관리 중이라면 찾아서 리턴, 아니면 직접 생성 및 초기화한 후 저장하고 리턴.
+	// name은 Resource에 저장된 m_Name 혹은 파일 경로일 수 있다?
+	// 아니면 그냥 name이기에 타입으로 경로까지 유추하는 것일 수 있다.
 	Resource* ResourceCache::GetResource(StringHash type, const std::string& name)
 	{
 		// nameHash 만들기
 		// 원래 좀 더 복잡하다. 그리고 함수로 만들어 사용한다.
 		// => Reosurce에도 NameHash가 있다. 이경우에는 SetName을 통해 만들었다.
 		// 따라서 추후 아래 부분을 다듬어야 한다.
-		auto sanitateName = GetInternalPath(name);
-		sanitateName = GetFileNameAndExtension(sanitateName);
-		sanitateName = StringTrim(sanitateName);
+		auto sanitateName = FileSystem::GetInternalPath(name);
+		sanitateName = FileSystem::GetFileNameAndExtension(sanitateName);
+		sanitateName = FileSystem::StringTrim(sanitateName);
 		StringHash nameHash(sanitateName);
 
 		auto* pExistedResource = findResource(type, nameHash);
@@ -87,6 +88,7 @@ namespace Dive
 		auto* pNewResource = new Resource(m_pContext);
 		// name이 경로를 포함하지 않을 수 있다.
 		// 그렇다면 name을 통해 경로를 덧붙여야 한다.
+		// => Resource 객체의 SetName은 이 곳에서 호출되어야 한다.
 		if (!pNewResource->LoadFromFile(name))
 			return nullptr;
 
