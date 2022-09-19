@@ -43,6 +43,7 @@ namespace Sandbox
 			testSaveModel();
 			testCreateTriangleModel();
 			testResourceCache();
+			testFileSystem();
 
 			auto* pTriangle = m_pScene->CreateGameObject("Triangle");
 			auto* pStaticModel = pTriangle->CreateComponent<Dive::StaticModel>();
@@ -154,29 +155,6 @@ namespace Sandbox
 		m_pTriangleModel->SetIndexBuffers(indexBuffers);
 	}
 
-	void Sandbox::testFileStreamFuncitons()
-	{
-		DV_LOG_CLIENT_DEBUG("ToLowercase: {:s}", Dive::ToLowerCase("AaBbCcDdEe"));
-		DV_LOG_CLIENT_DEBUG("ToUppercase: {:s}", Dive::ToUpperCase("AaBbCcDdEe"));
-
-		std::string fullPath = "C:\\Dev\\Projects\\DiveGames\\CoreData\\Shaders\\test.hlsl";
-		DV_LOG_CLIENT_DEBUG("InternalPath: {:s}", Dive::GetInternalPath(fullPath));
-		DV_LOG_CLIENT_DEBUG("NativePath: {:s}", Dive::GetNativePath(Dive::GetInternalPath(fullPath)));
-
-		std::string path, name, extension;
-		Dive::SplitPath(fullPath, path, name, extension);
-		DV_LOG_CLIENT_DEBUG("Path: {0:s}, FileName: {1:s}, Extension: {2:s}", path, name, extension);
-		DV_LOG_CLIENT_DEBUG("Path: {0:s}, FileName: {1:s}, Extension: {2:s}", Dive::GetPath(fullPath), Dive::GetFileName(fullPath), Dive::GetExtension(fullPath));
-
-		DV_LOG_CLIENT_DEBUG("FileName+Extension: {:s}", Dive::GetFileNameAndExtension(fullPath));
-
-		DV_LOG_CLIENT_DEBUG("ParentPath: {:s}", Dive::GetParentPath(fullPath));
-
-		DV_LOG_CLIENT_DEBUG("Org: {0:s}, Trimmed: {1:s}", "   Knave ", Dive::StringTrim("   Knave "));
-
-		DV_LOG_CLIENT_DEBUG("AbsolutePath: {0:b}, RelativePath: {1:b}", Dive::IsAbsolutePath(fullPath), Dive::IsAbsolutePath("../CoreData/Shaders/test.hlsl"));
-	}
-
 	void Sandbox::testResourceCache()
 	{
 		auto* pModelA = new Dive::Model(m_pContext);
@@ -227,5 +205,37 @@ namespace Sandbox
 		{
 			DV_LOG_CLIENT_DEBUG("removed all Resources");
 		}
+	}
+
+	void Sandbox::testFileSystem()
+	{
+		auto* pFileSystem = GetSubsystem<Dive::FileSystem>();
+
+		DV_LOG_CLIENT_DEBUG("ToLowercase: {:s}", pFileSystem->ToLowerCase("AaBbCcDdEe"));
+		DV_LOG_CLIENT_DEBUG("ToUppercase: {:s}", pFileSystem->ToUpperCase("AaBbCcDdEe"));
+
+		std::string fullPath = "C:\\Dev\\Projects\\DiveGames\\CoreData\\Shaders\\test.hlsl";
+		DV_LOG_CLIENT_DEBUG("InternalPath: {:s}", pFileSystem->GetInternalPath(fullPath));
+		DV_LOG_CLIENT_DEBUG("NativePath: {:s}", pFileSystem->GetNativePath(pFileSystem->GetInternalPath(fullPath)));
+
+		std::string path, name, extension;
+		pFileSystem->SplitPath(fullPath, path, name, extension);
+		DV_LOG_CLIENT_DEBUG("Path: {0:s}, FileName: {1:s}, Extension: {2:s}", path, name, extension);
+		DV_LOG_CLIENT_DEBUG("Path: {0:s}, FileName: {1:s}, Extension: {2:s}", pFileSystem->GetPath(fullPath), pFileSystem->GetFileName(fullPath), pFileSystem->GetExtension(fullPath));
+
+		DV_LOG_CLIENT_DEBUG("FileName+Extension: {:s}", pFileSystem->GetFileNameAndExtension(fullPath));
+
+		DV_LOG_CLIENT_DEBUG("ParentPath: {:s}", pFileSystem->GetParentPath(fullPath));
+
+		DV_LOG_CLIENT_DEBUG("Org: {0:s}, Trimmed: {1:s}", "   Knave ", pFileSystem->StringTrim("   Knave "));
+
+		DV_LOG_CLIENT_DEBUG("AbsolutePath: {0:b}, RelativePath: {1:b}", pFileSystem->IsAbsolutePath(fullPath), pFileSystem->IsAbsolutePath("../CoreData/Shaders/test.hlsl"));
+
+		// copy
+		pFileSystem->Copy("C:/Users/akahy/Desktop/RenderPath.txt", "C:/Knave/Copied_RenderPath.txt");
+		// rename
+		pFileSystem->Rename("C:/Knave/Copied_RenderPath.txt", "C:/Knave/RenderPath.txt");
+		// delete
+		pFileSystem->Delete("C:/Knave/RenderPath.txt");
 	}
 }
