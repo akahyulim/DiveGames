@@ -199,6 +199,22 @@ namespace Sandbox
 			DV_LOG_CLIENT_DEBUG("Existed Resource Name: {:s}", pCurModel->GetName());
 		}
 
+		pResourceCache->AddResourceDir("Models");
+		pResourceCache->AddResourceDir("Textures");
+		pResourceCache->AddResourceDir("Materials");
+		auto resourceDirs = pResourceCache->GetResourceDirs();
+		for (auto dir : resourceDirs)
+		{
+			DV_LOG_CLIENT_DEBUG("ResourceDir: {:s}", dir);
+		}
+
+		pResourceCache->RemoveResourceDir("Materials");
+		resourceDirs = pResourceCache->GetResourceDirs();
+		for (auto dir : resourceDirs)
+		{
+			DV_LOG_CLIENT_DEBUG("ResourceDir: {:s}", dir);
+		}
+
 		pResourceCache->RemoveResources<Dive::Model>();
 		pResourceCache->GetResources<Dive::Model>(models);
 		if (models.empty())

@@ -68,14 +68,47 @@ namespace Dive
 		m_ResourceGroups.clear();
 	}
 
-	// name은 Resource에 저장된 m_Name 혹은 파일 경로일 수 있다?
-	// 아니면 그냥 name이기에 타입으로 경로까지 유추하는 것일 수 있다.
+	bool ResourceCache::AddResourceDir(const std::string& pathName)
+	{
+		if(pathName.empty())
+			return false;
+
+		auto fixedPath = Dive::FileSystem::AddTrailingSlash(pathName);
+		if (!Dive::FileSystem::IsAbsolutePath(fixedPath))
+			fixedPath = Dive::FileSystem::GetCurrentDir() + fixedPath;
+
+		auto it = std::find(m_ResourceDirs.begin(), m_ResourceDirs.end(), fixedPath);
+		if (m_ResourceDirs.empty() || it == m_ResourceDirs.end())
+			m_ResourceDirs.emplace_back(fixedPath);
+
+		return true;
+	}
+
+	void ResourceCache::RemoveResourceDir(const std::string& pathName)
+	{
+		if (pathName.empty())
+			return;
+
+		auto fixedPath = Dive::FileSystem::AddTrailingSlash(pathName);
+		if (!Dive::FileSystem::IsAbsolutePath(fixedPath))
+			fixedPath = Dive::FileSystem::GetCurrentDir() + fixedPath;
+
+		auto it = m_ResourceDirs.begin();
+		for (it; it != m_ResourceDirs.end();)
+		{
+			if ((*it) == fixedPath)
+				it = m_ResourceDirs.erase(it);
+			else
+				++it;
+		}
+	}
+
+	// name은 절대, 상대 경로, 폴더 + 이름 + 익스텐션(= Reosurce의 이름) 등 다양하게 올 수 있다.
+	// 반면 이 함수 내부에서는 파일의 경로와 Resource의 이름으로 나뉘어 사용된다.
 	Resource* ResourceCache::GetResource(StringHash type, const std::string& name)
 	{
-		// nameHash 만들기
-		// 원래 좀 더 복잡하다. 그리고 함수로 만들어 사용한다.
-		// => Reosurce에도 NameHash가 있다. 이경우에는 SetName을 통해 만들었다.
-		// 따라서 추후 아래 부분을 다듬어야 한다.
+		// nameHash
+		// 기본적으로 리소스 타입 폴더 + 이름 + 익스텐션으로 다듬어진다.
 		auto sanitateName = FileSystem::GetInternalPath(name);
 		sanitateName = FileSystem::GetFileNameAndExtension(sanitateName);
 		sanitateName = FileSystem::StringTrim(sanitateName);
@@ -86,11 +119,12 @@ namespace Dive
 			return pExistedResource;
 
 		auto* pNewResource = new Resource(m_pContext);
-		// name이 경로를 포함하지 않을 수 있다.
-		// 그렇다면 name을 통해 경로를 덧붙여야 한다.
-		// => Resource 객체의 SetName은 이 곳에서 호출되어야 한다.
+		// 그냥 name으로는 안될 수 있다.
+		// 실제로 urho는 File을 만들 때 각종 리소스 폴더 + name으로 파일 존재 여부를 확인한다.
 		if (!pNewResource->LoadFromFile(name))
 			return nullptr;
+
+		pNewResource->SetName(sanitateName);
 
 		m_ResourceGroups[type.Value()][nameHash.Value()] = pNewResource;
 

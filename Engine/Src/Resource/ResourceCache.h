@@ -30,6 +30,11 @@ namespace Dive
 		// 모든 리소스를 제거한다.
 		void RemoveAllResources();
 
+		// 리소스 폴더 등록.
+		bool AddResourceDir(const std::string& pathName);
+		// 리소스 폴더 등록 해제.
+		void RemoveResourceDir(const std::string& pathName);
+
 		// 해당 타입과 이름의 리소스를 리턴받는다. 존재하지 않는다면 생성 후 등록까지 수행한다.
 		template<class T> T* GetResource(const std::string& name);
 		// 해당 타입과 이름의 리소스를 리턴받는다. 존재하지 않는다면 생성 후 등록까지 수행한다.
@@ -39,12 +44,16 @@ namespace Dive
 		// 해당 타입의 리소스들을 전달한 벡터에 저장한다.
 		void GetResources(StringHash type, std::vector<Resource*>& outResources);
 
+		std::vector<std::string> GetResourceDirs() const { return m_ResourceDirs; }
+
 	private:
 		Resource* findResource(StringHash type, StringHash nameHash);
 
 	private:
 		using ResourceGroup = std::unordered_map<unsigned int, Resource*>;
 		std::unordered_map<unsigned int, ResourceGroup> m_ResourceGroups;
+
+		std::vector<std::string> m_ResourceDirs;
 	};
 
 	template<class T>
