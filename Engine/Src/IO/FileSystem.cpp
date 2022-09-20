@@ -61,6 +61,32 @@ namespace Dive
 		return StringLeftTrim(StringRightTrim(str, pTarget), pTarget);
 	}
 
+	std::string FileSystem::AddTrailingSlash(const std::string& pathName)
+	{
+		if (pathName.empty())
+			return std::string();
+
+		auto ret = pathName;
+		
+		if (ret.back() != '/')
+			ret += '/';
+
+		return ret;
+	}
+
+	std::string FileSystem::RemoveTrailingSlash(const std::string& pathName)
+	{
+		if(pathName.empty())
+			return std::string();
+
+		auto ret = pathName;
+
+		if (ret.back() == '/')
+			ret.resize(ret.length() - 1);
+
+		return ret;
+	}
+
 	std::wstring FileSystem::StringToWstring(const std::string& str)
 	{
 		if (str.empty())
@@ -117,6 +143,16 @@ namespace Dive
 			nullptr);
 
 		return ret;
+	}
+
+	std::string FileSystem::GetCurrentDir()
+	{
+		return std::filesystem::current_path().string();
+	}
+
+	void FileSystem::SetCurrentDir(const std::string& pathName)
+	{
+		std::filesystem::current_path(pathName);
 	}
 
 	std::string FileSystem::GetInternalPath(const std::string& fullPath)
