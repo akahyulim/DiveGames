@@ -237,5 +237,13 @@ namespace Sandbox
 		pFileSystem->Rename("C:/Knave/Copied_RenderPath.txt", "C:/Knave/RenderPath.txt");
 		// delete
 		pFileSystem->Delete("C:/Knave/RenderPath.txt");
+
+		DV_LOG_CLIENT_DEBUG("Current Path: {:s}", Dive::FileSystem::GetCurrentDir());
+		Dive::FileSystem::SetCurrentDir("C:/");
+		DV_LOG_CLIENT_DEBUG("Current Path: {:s}", Dive::FileSystem::GetCurrentDir());
+
+		std::string dir = Dive::FileSystem::AddTrailingSlash("dev/awsome_game");
+		DV_LOG_CLIENT_DEBUG("add: {:s}", dir);
+		DV_LOG_CLIENT_DEBUG("remove: {:s}", Dive::FileSystem::RemoveTrailingSlash(dir));
 	}
 }
