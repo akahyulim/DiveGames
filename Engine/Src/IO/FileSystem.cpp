@@ -66,7 +66,8 @@ namespace Dive
 		if (pathName.empty())
 			return std::string();
 
-		auto ret = pathName;
+		// \\를 모두 /로 변경
+		auto ret = GetInternalPath(pathName);
 		
 		if (ret.back() != '/')
 			ret += '/';
@@ -147,7 +148,10 @@ namespace Dive
 
 	std::string FileSystem::GetCurrentDir()
 	{
-		return std::filesystem::current_path().string();
+		auto ret = std::filesystem::current_path().string();
+		ret = GetInternalPath(ret);
+		
+		return AddTrailingSlash(ret);
 	}
 
 	void FileSystem::SetCurrentDir(const std::string& pathName)
