@@ -65,4 +65,10 @@ namespace Dive
 	{
 		return m_pContext->GetSubsystem(type);
 	}
+
+	ObjectFactory::ObjectFactory(Context* pContext)
+		: m_pContext(pContext)
+	{
+		DV_ASSERT(m_pContext);
+	}
 }

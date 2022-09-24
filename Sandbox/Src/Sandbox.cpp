@@ -51,6 +51,16 @@ namespace Sandbox
 		// subscirbe events
 		// update handle함수에서 camera move 함수 호출
 		// post render update handle 함수에서 debug geometry 호출
+
+		// temp test
+		{
+			auto pResourceCache = GetSubsystem<Dive::ResourceCache>();
+			pResourceCache->AddResourceDir("Assets/Models");
+			pResourceCache->AddResourceDir("Assets/Textures");
+			pResourceCache->AddResourceDir("Assets/Materials");
+
+			pResourceCache->GetResource<Dive::Model>("Assets/Models/Knave.md");
+		}
 	}
 
 	void Sandbox::Stop()

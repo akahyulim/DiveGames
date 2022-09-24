@@ -2,6 +2,7 @@
 #include "ResourceCache.h"
 #include "Core/CoreDefs.h"
 #include "Core/Context.h"
+#include "IO/FileStream.h"
 #include "IO/FileSystem.h"
 
 namespace Dive 
@@ -13,14 +14,21 @@ namespace Dive
 
 	ResourceCache::~ResourceCache()
 	{
+		RemoveAllResources();
 	}
 
-	// manual resource라고 구분해 놓았다.
-	bool ResourceCache::AddResource(Resource* pResource)
+	// 매뉴얼리소스는 반드시 이름이 존재해야 한다.
+	bool ResourceCache::AddManualResource(Resource* pResource)
 	{
 		if (!pResource)
 		{
-			DV_LOG_ENGINE_ERROR("잘못된 인자를 전달받았습니다.");
+			DV_LOG_ENGINE_ERROR("잘못된 인자를 전달받아 리소스를 추가할 수 없습니다.");
+			return false;
+		}
+
+		if (pResource->GetName().empty())
+		{
+			DV_LOG_ENGINE_ERROR("전달받은 리소스에 이름이 존재하지 않아 추가할 수 없습니다.");
 			return false;
 		}
 
@@ -29,9 +37,50 @@ namespace Dive
 		return true;
 	}
 
-	// 원래 전부 bForce라는 전달인자를 가졌다.
-	// 추후 UpdateResourceGroups() 등에서 확인을 거친 후 제거해야 할 수 있다.
-	// 하지만 urho에는 그런 구문이 없었다.
+	Resource* ResourceCache::GetResource(StringHash type, const std::string& name)
+	{
+		auto fixedName = fixResourceName(name);
+		StringHash nameHash(fixedName);
+
+		auto* pExistedResource = findResource(type, nameHash);
+		if (pExistedResource)
+			return pExistedResource;
+
+		auto* pNewResource = static_cast<Resource*>(m_pContext->CreateObject(type));
+
+		auto* pFileStream = getFileStream(fixedName);
+		if (!pFileStream)
+		{
+			DV_LOG_ENGINE_ERROR("리소스 파일 로드에 실패하였습니다.");
+			DV_DELETE(pNewResource);
+			return nullptr;
+		}
+
+		if (!pNewResource->Load(pFileStream))
+			return nullptr;
+		DV_DELETE(pFileStream);
+
+		pNewResource->SetName(fixedName);
+
+		m_ResourceGroups[type.Value()][nameHash.Value()] = pNewResource;
+
+		return pNewResource;
+	}
+
+	void ResourceCache::GetResources(StringHash type, std::vector<Resource*>& outResources)
+	{
+		outResources.clear();
+
+		auto i = m_ResourceGroups.find(type.Value());
+		if (i != m_ResourceGroups.end())
+		{
+			for (auto j = i->second.begin(); j != i->second.end(); ++j)
+			{
+				outResources.emplace_back(j->second);
+			}
+		}
+	}
+
 	void ResourceCache::RemoveResource(StringHash type, const std::string& name)
 	{
 		StringHash nameHash(name);
@@ -70,12 +119,16 @@ namespace Dive
 
 	bool ResourceCache::AddResourceDir(const std::string& pathName)
 	{
-		if(pathName.empty())
+		if (pathName.empty())
 			return false;
 
-		auto fixedPath = Dive::FileSystem::AddTrailingSlash(pathName);
-		if (!Dive::FileSystem::IsAbsolutePath(fixedPath))
-			fixedPath = Dive::FileSystem::GetCurrentDir() + fixedPath;
+		if (!FileSystem::DirExists(pathName))
+		{
+			DV_LOG_ENGINE_ERROR("전달받은 경로({:s})가 존재하지 않아 리소스 폴더로 저장할 수 없습니다.", pathName);
+			return false;
+		}
+
+		auto fixedPath = fixResourceDirName(pathName);
 
 		auto it = std::find(m_ResourceDirs.begin(), m_ResourceDirs.end(), fixedPath);
 		if (m_ResourceDirs.empty() || it == m_ResourceDirs.end())
@@ -89,9 +142,7 @@ namespace Dive
 		if (pathName.empty())
 			return;
 
-		auto fixedPath = Dive::FileSystem::AddTrailingSlash(pathName);
-		if (!Dive::FileSystem::IsAbsolutePath(fixedPath))
-			fixedPath = Dive::FileSystem::GetCurrentDir() + fixedPath;
+		auto fixedPath = fixResourceDirName(pathName);
 
 		auto it = m_ResourceDirs.begin();
 		for (it; it != m_ResourceDirs.end();)
@@ -100,48 +151,6 @@ namespace Dive
 				it = m_ResourceDirs.erase(it);
 			else
 				++it;
-		}
-	}
-
-	// name은 절대, 상대 경로, 폴더 + 이름 + 익스텐션(= Reosurce의 이름) 등 다양하게 올 수 있다.
-	// 반면 이 함수 내부에서는 파일의 경로와 Resource의 이름으로 나뉘어 사용된다.
-	Resource* ResourceCache::GetResource(StringHash type, const std::string& name)
-	{
-		// nameHash
-		// 기본적으로 리소스 타입 폴더 + 이름 + 익스텐션으로 다듬어진다.
-		auto sanitateName = FileSystem::GetInternalPath(name);
-		sanitateName = FileSystem::GetFileNameAndExtension(sanitateName);
-		sanitateName = FileSystem::StringTrim(sanitateName);
-		StringHash nameHash(sanitateName);
-
-		auto* pExistedResource = findResource(type, nameHash);
-		if (pExistedResource)
-			return pExistedResource;
-
-		auto* pNewResource = new Resource(m_pContext);
-		// 그냥 name으로는 안될 수 있다.
-		// 실제로 urho는 File을 만들 때 각종 리소스 폴더 + name으로 파일 존재 여부를 확인한다.
-		if (!pNewResource->LoadFromFile(name))
-			return nullptr;
-
-		pNewResource->SetName(sanitateName);
-
-		m_ResourceGroups[type.Value()][nameHash.Value()] = pNewResource;
-
-		return pNewResource;
-	}
-
-	void ResourceCache::GetResources(StringHash type, std::vector<Resource*>& outResources)
-	{
-		outResources.clear();
-
-		auto i = m_ResourceGroups.find(type.Value());
-		if (i != m_ResourceGroups.end())
-		{
-			for (auto j = i->second.begin(); j != i->second.end(); ++j)
-			{
-				outResources.emplace_back(j->second);
-			}
 		}
 	}
 
@@ -156,5 +165,62 @@ namespace Dive
 			return nullptr;
 
 		return j->second;
+	}
+
+	// 절대 경로 혹은 현재 위치에서의 상대 경로를 받아 
+	// '리소스 폴더/이름.확장자'형태로 리턴한다.
+	std::string ResourceCache::fixResourceName(const std::string& name) const
+	{
+		auto pathName = FileSystem::GetPath(name);
+
+		if (FileSystem::IsAbsolutePath(name))
+		{
+			for (unsigned int i = 0; i < (unsigned int)m_ResourceDirs.size(); ++i)
+			{
+				if (m_ResourceDirs[i] == pathName)
+					return FileSystem::AddTrailingSlash(FileSystem::GetLastPath(name)) + FileSystem::GetFileNameAndExtension(name);
+			}
+		}
+		else
+		{
+			auto fullPath = FileSystem::GetCurrentDir() + pathName;
+			
+			for (unsigned int i = 0; i < (unsigned int)m_ResourceDirs.size(); ++i)
+			{
+				if (m_ResourceDirs[i] == fullPath)
+					return FileSystem::AddTrailingSlash(FileSystem::GetLastPath(name)) + FileSystem::GetFileNameAndExtension(name);
+			}
+		}
+
+		return std::string();
+	}
+
+	std::string ResourceCache::fixResourceDirName(const std::string& name) const
+	{
+		auto fixedPath = FileSystem::AddTrailingSlash(name);
+
+		if (!FileSystem::IsAbsolutePath(name))
+			fixedPath = FileSystem::GetCurrentDir() + fixedPath;
+
+		return fixedPath;
+	}
+
+	FileStream* ResourceCache::getFileStream(const std::string& name) const
+	{
+		FileStream* pFileStream = nullptr;
+		auto filepath = FileSystem::GetFileNameAndExtension(name);
+
+		for (unsigned int i = 0; i < (unsigned int)m_ResourceDirs.size(); ++i)
+		{
+			filepath = m_ResourceDirs[i] + filepath;
+			if (FileSystem::FileExists(filepath))
+			{
+				pFileStream = new FileStream;
+				if (!pFileStream->Open(filepath, eFileStreamMode::Read))
+					DV_DELETE(pFileStream);
+			}
+		}
+
+		return pFileStream;
 	}
 }

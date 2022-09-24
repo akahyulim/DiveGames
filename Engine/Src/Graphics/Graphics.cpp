@@ -4,6 +4,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "Model.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
 #include "Core/EventSystem.h"
@@ -436,6 +437,9 @@ namespace Dive
 		createDevice(width, height);
 		updateSwapChain(width, height);
 
+		// 위치가 애매허다?
+		RegisterGraphicsObject(m_pContext);
+
 		// clear
 		// present
 
@@ -742,5 +746,10 @@ namespace Dive
 		// rasterizer state
 
 		// RSSetScissorRect
+	}
+
+	void RegisterGraphicsObject(Context* pContext)
+	{
+		Model::RegisterObject(pContext);
 	}
 }

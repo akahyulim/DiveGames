@@ -4,22 +4,31 @@
 
 namespace Dive
 {
-	FileStream::FileStream(const std::string& filepath, uint32_t flags)
+	FileStream::FileStream()
 		: m_bOpen(false),
-		m_Flags(flags)
+		m_Mode(eFileStreamMode::Unknown)
+	{
+	}
+
+	FileStream::~FileStream()
+	{
+		Close();
+	}
+
+	bool FileStream::Open(const std::string& filepath, eFileStreamMode mode)
 	{
 		int iosFlags = std::ios::binary;
-		iosFlags |= (flags & eFileStreamMode::Read) ? std::ios::in : 0;
-		iosFlags |= (flags & eFileStreamMode::Write) ? std::ios::out : 0;
-		iosFlags |= (flags & eFileStreamMode::Append) ? std::ios::app : 0;
+		iosFlags |= (mode == eFileStreamMode::Read) ? std::ios::in : 0;
+		iosFlags |= (mode == eFileStreamMode::Write) ? std::ios::out : 0;
+		iosFlags |= (mode == eFileStreamMode::Append) ? std::ios::app : 0;
 
 		if (m_Flags & eFileStreamMode::Write)
 		{
 			m_Out.open(filepath, iosFlags);
 			if (m_Out.fail())
 			{
-				DV_LOG_ENGINE_ERROR("파일을 쓰기모드로 여는데 실패하였습니다 - {:s}", filepath);
-				return;
+				DV_LOG_ENGINE_ERROR("파일({:s})을 쓰기모드로 여는데 실패하였습니다.", filepath);
+				m_bOpen = false;
 			}
 		}
 		else if (m_Flags & eFileStreamMode::Read)
@@ -27,17 +36,14 @@ namespace Dive
 			m_In.open(filepath, iosFlags);
 			if (m_In.fail())
 			{
-				DV_LOG_ENGINE_ERROR("파일을 읽기모드로 여는데 실패하였습니다 - {:s}", filepath);
-				return;
+				DV_LOG_ENGINE_ERROR("파일({:s})을 읽기모드로 여는데 실패하였습니다.", filepath);
+				m_bOpen = false;
 			}
 		}
 
 		m_bOpen = true;
-	}
 
-	FileStream::~FileStream()
-	{
-		Close();
+		return m_bOpen;
 	}
 
 	void FileStream::Close()

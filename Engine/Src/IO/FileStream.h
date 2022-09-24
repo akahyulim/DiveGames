@@ -2,19 +2,21 @@
 
 namespace Dive
 {
-    enum eFileStreamMode : uint32_t
+    enum eFileStreamMode
     {
-        Read = 1 << 0,
-        Write = 1 << 1,
-        Append = 1 << 2
+        Read,
+        Write,
+        Append,
+        Unknown
     };
 
     class FileStream
     {
     public:
-        FileStream(const std::string& filepath, uint32_t flags);
+        FileStream();
         ~FileStream();
 
+        bool Open(const std::string& filepath, eFileStreamMode mode);
         bool IsOpen() const { return m_bOpen; }
         void Close();
 
@@ -115,5 +117,6 @@ namespace Dive
         std::ifstream m_In;
         uint32_t m_Flags;
         bool m_bOpen;
+        eFileStreamMode m_Mode;
     };
 }

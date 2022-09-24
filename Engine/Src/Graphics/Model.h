@@ -18,6 +18,8 @@ namespace Dive
 		explicit Model(Context* pContext);
 		~Model() override;
 
+		static void RegisterObject(Context* pContext);
+
 		bool Load(FileStream* pDeserializer) override;
 		bool Save(FileStream* pSerializer) override;
 

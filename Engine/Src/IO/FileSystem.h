@@ -21,16 +21,19 @@ namespace Dive
 		static std::string StringTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
 		static std::string AddTrailingSlash(const std::string& pathName);
 		static std::string RemoveTrailingSlash(const std::string& pathName);
+		static std::string StringReplace(const std::string& str, const std::string& target, const std::string& replace);
 		static std::wstring StringToWstring(const std::string& str);
 		static std::string WstringToString(const std::wstring& str);
 		
 		// file and directory
 		static std::string GetCurrentDir();
 		static void SetCurrentDir(const std::string& pathName);
+		static std::string GetProgramDir();
 		static std::string GetInternalPath(const std::string& fullPath);
 		static std::string GetNativePath(const std::string& fullPath);
 		static void SplitPath(const std::string& fullPath, std::string& outPath, std::string& outFile, std::string& outExtension, bool bLowercaseExtension = true);
 		static std::string GetPath(const std::string& fullPath);
+		static std::string GetLastPath(const std::string& fullPath);
 		static std::string GetFileName(const std::string& fullPath);
 		static std::string GetExtension(const std::string& fullPath, bool bLowercase = true);
 		static std::string GetFileNameAndExtension(const std::string& fullPath, bool bLowercaseExtension = false);

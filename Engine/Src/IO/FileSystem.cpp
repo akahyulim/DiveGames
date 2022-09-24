@@ -88,6 +88,21 @@ namespace Dive
 		return ret;
 	}
 
+	std::string FileSystem::StringReplace(const std::string& str, const std::string& target, const std::string& replace)
+	{
+		if (str.empty())
+			return std::string();
+
+		auto ret = str;
+		size_t pos = 0;
+		while ((pos = ret.find(target)) != std::string::npos)
+		{
+			ret.replace(pos, target.size(), replace);
+		}
+
+		return ret;
+	}
+
 	std::wstring FileSystem::StringToWstring(const std::string& str)
 	{
 		if (str.empty())
@@ -159,6 +174,14 @@ namespace Dive
 		std::filesystem::current_path(pathName);
 	}
 
+	std::string FileSystem::GetProgramDir()
+	{
+		char exeName[MAX_PATH] = {0,};
+		GetModuleFileNameA(nullptr, exeName, MAX_PATH);
+		
+		return GetInternalPath(exeName);
+	}
+
 	std::string FileSystem::GetInternalPath(const std::string& fullPath)
 	{
 		auto copy = fullPath;
@@ -228,6 +251,13 @@ namespace Dive
 		SplitPath(fullPath, path, file, extension);
 
 		return path;
+	}
+
+	std::string FileSystem::GetLastPath(const std::string& fullPath)
+	{
+		std::filesystem::path fixedPath = fullPath;
+
+		return GetInternalPath(fixedPath.parent_path().filename().string());
 	}
 
 	std::string FileSystem::GetFileName(const std::string& fullPath)

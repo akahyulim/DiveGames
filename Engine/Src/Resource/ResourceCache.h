@@ -7,6 +7,7 @@
 namespace Dive
 {
 	class Context;
+	class FileStream;
 
 	class ResourceCache : public Object
 	{
@@ -16,38 +17,28 @@ namespace Dive
 		explicit ResourceCache(Context* pContext);
 		~ResourceCache() override;
 
-		// 개별 생성 리소스(manual resource?) 등록.
-		bool AddResource(Resource* pResource);
+		bool AddManualResource(Resource* pResource);
 
-		// 해당 타입과 이름의 리소스를 제거한다.
-		template<class T> void RemoveResource(const std::string& name);
-		// 해당 타입과 이름의 리소스를 제거한다.
-		void RemoveResource(StringHash type, const std::string& name);
-		// 해당 타입의 리소스들을 모두 제거한다.
-		template<class T> void RemoveResources();
-		// 해당 타입의 리소스들을 모두 제거한다.
-		void RemoveResources(StringHash type);
-		// 모든 리소스를 제거한다.
-		void RemoveAllResources();
-
-		// 리소스 폴더 등록.
-		bool AddResourceDir(const std::string& pathName);
-		// 리소스 폴더 등록 해제.
-		void RemoveResourceDir(const std::string& pathName);
-
-		// 해당 타입과 이름의 리소스를 리턴받는다. 존재하지 않는다면 생성 후 등록까지 수행한다.
 		template<class T> T* GetResource(const std::string& name);
-		// 해당 타입과 이름의 리소스를 리턴받는다. 존재하지 않는다면 생성 후 등록까지 수행한다.
 		Resource* GetResource(StringHash type, const std::string& name);
-		// 해당 타입의 리소스들을 전달한 벡터에 저장한다.
 		template<class T> void GetResources(std::vector<T*>& outReosurces);
-		// 해당 타입의 리소스들을 전달한 벡터에 저장한다.
 		void GetResources(StringHash type, std::vector<Resource*>& outResources);
 
+		template<class T> void RemoveResource(const std::string& name);
+		void RemoveResource(StringHash type, const std::string& name);
+		template<class T> void RemoveResources();
+		void RemoveResources(StringHash type);
+		void RemoveAllResources();
+
+		bool AddResourceDir(const std::string& pathName);
+		void RemoveResourceDir(const std::string& pathName);
 		std::vector<std::string> GetResourceDirs() const { return m_ResourceDirs; }
 
 	private:
 		Resource* findResource(StringHash type, StringHash nameHash);
+		std::string fixResourceName(const std::string& name) const;
+		std::string fixResourceDirName(const std::string& name) const;
+		FileStream* getFileStream(const std::string& name) const;
 
 	private:
 		using ResourceGroup = std::unordered_map<unsigned int, Resource*>;

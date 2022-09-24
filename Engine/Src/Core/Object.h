@@ -47,7 +47,6 @@ public:\
 		return &typeInfoStatic;	\
 	}
 
-	
 	class Object
 	{
 	public:
@@ -77,4 +76,35 @@ public:\
 	{
 		return static_cast<T*>(GetSubsystem(T::GetTypeStatic()));
 	}
- }
+
+	class ObjectFactory
+	{
+	public:
+		explicit ObjectFactory(Context* pContext);
+		virtual ~ObjectFactory() = default;
+
+		virtual Object* CreateObject() = 0;
+
+		Context* GetContext() const { return m_pContext; }
+		const TypeInfo* GetTypeInfo() const { return m_TypeInfo; }
+		StringHash GetType() const { return m_TypeInfo->GetType(); }
+		std::string GetTypeName() const { return m_TypeInfo->GetTypeName(); }
+ 
+	protected:
+		Context* m_pContext;
+		const TypeInfo* m_TypeInfo;
+	};
+
+	template<class T>
+	class ObjectFactoryImpl : public ObjectFactory
+	{
+	public:
+		explicit ObjectFactoryImpl(Context* pContext)
+			: ObjectFactory(pContext)
+		{
+			m_TypeInfo = T::GetTypeInfoStatic();
+		}
+		
+		Object* CreateObject() override { return new T(m_pContext); }
+	};
+}

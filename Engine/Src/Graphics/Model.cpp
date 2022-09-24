@@ -17,6 +17,11 @@ namespace Dive
 	{
 	}
 
+	void Model::RegisterObject(Context* pContext)
+	{
+		pContext->RegisterFactory<Model>();
+	}
+
 	bool Model::Load(FileStream* pDeserializer)
 	{
 		return false;

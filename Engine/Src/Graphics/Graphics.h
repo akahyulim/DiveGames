@@ -203,4 +203,6 @@ namespace Dive
 		Shader* m_pVertexShader;
 		Shader* m_pPixelShader;
 	};
+
+	void RegisterGraphicsObject(Context* pContext);
 }
