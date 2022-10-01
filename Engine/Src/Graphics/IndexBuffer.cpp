@@ -40,11 +40,12 @@ namespace Dive
 		}
 
 		m_IndexCount = indexCount;
-		m_IndexSize = (unsigned int)(bLargeIndices ? sizeof(unsigned int) : sizeof(unsigned short));
+		m_IndexSize = static_cast<unsigned int>(bLargeIndices ? sizeof(unsigned int) : sizeof(unsigned short));
 
 		if (m_pShadowData)
 			DV_DELETE_ARRAY(m_pShadowData);
 		m_pShadowData = new unsigned char[m_IndexCount * m_IndexSize];
+		memset(static_cast<void*>(m_pShadowData), NULL, m_IndexCount * m_IndexSize);
 
 		return true;
 	}
@@ -58,7 +59,7 @@ namespace Dive
 		}
 
 		m_IndexCount = indexCount;
-		m_IndexSize = (unsigned int)(bLargeIndices ? sizeof(unsigned int) : sizeof(unsigned short));
+		m_IndexSize = static_cast<unsigned int>(bLargeIndices ? sizeof(unsigned int) : sizeof(unsigned short));
 		m_bDynamic = pData == nullptr;
 
 		ReleaseBuffer();
@@ -97,39 +98,39 @@ namespace Dive
 			return false;
 		}
 
-		if (!m_pBuffer)
+		if (m_pShadowData && m_pShadowData != pData)
+			memcpy_s(m_pShadowData, m_IndexCount * m_IndexSize, pData, m_IndexCount * m_IndexSize);
+
+		if (m_pBuffer)
 		{
-			DV_LOG_ENGINE_ERROR("인덱스 버퍼가 존재하지 않습니다.");
-			return false;
-		}
+			if (m_bDynamic)
+			{
+				void* pDest = Map();
+				if (!pDest)
+					return false;
 
-		if (m_bDynamic)
-		{
-			void* pDest = Map();
-			if (!pDest)
-				return false;
+				memcpy_s(pDest, m_IndexCount * m_IndexSize, pData, m_IndexCount * m_IndexSize);
 
-			memcpy_s(pDest, m_IndexCount * m_IndexSize, pData, m_IndexCount * m_IndexSize);
+				Unmap();
+			}
+			else
+			{
+				D3D11_BOX destBox;
+				destBox.left = 0;
+				destBox.right = m_IndexCount * m_IndexSize;
+				destBox.top = 0;
+				destBox.bottom = 1;
+				destBox.front = 0;
+				destBox.back = 1;
 
-			Unmap();
-		}
-		else
-		{
-			D3D11_BOX destBox;
-			destBox.left = 0;
-			destBox.right = m_IndexCount * m_IndexSize;
-			destBox.top = 0;
-			destBox.bottom = 1;
-			destBox.front = 0;
-			destBox.back = 1;
-
-			m_pGraphics->GetDeviceContext()->UpdateSubresource(
-				(ID3D11Buffer*)m_pBuffer,
-				0,
-				&destBox,
-				pData,
-				0,
-				0);
+				m_pGraphics->GetDeviceContext()->UpdateSubresource(
+					(ID3D11Buffer*)m_pBuffer,
+					0,
+					&destBox,
+					pData,
+					0,
+					0);
+			}
 		}
 
 		return true;
@@ -153,6 +154,8 @@ namespace Dive
 
 			return mappedSubresource.pData;
 		}
+		else if (m_pShadowData)
+			return m_pShadowData;
 
 		return nullptr;
 	}

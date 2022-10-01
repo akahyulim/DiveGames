@@ -31,6 +31,8 @@ namespace Dive
 		DV_DELETE_ARRAY(m_pShadowData);
 	}
 
+	// 버퍼는 생성하지 않는다. 버퍼의 정보 저장용.
+	// => 이게 굳이 필요한 가 싶다. 결국은 버퍼까지 생성하는 편이 나을 것 같다.
 	bool VertexBuffer::SetSize(unsigned int vertexCount, const std::vector<VertexElement>& elements)
 	{
 		if (!vertexCount)
@@ -116,46 +118,46 @@ namespace Dive
 			return false;
 		}
 
-		if (!m_pBuffer)
-		{
-			DV_LOG_ENGINE_ERROR("정점 버퍼가 존재하지 않습니다.");
-			return false;
-		}
-
 		if (!m_VertexSize)
 		{
 			DV_LOG_ENGINE_ERROR("정점 구성요소가 정의되지 않아, 정점 버퍼 데이터를 설정 할 수 없습니다.");
 			return false;
 		}
 
-		if (m_bDynamic)
+		if (m_pShadowData && m_pShadowData != pData)
+			memcpy(m_pShadowData, pData, m_VertexCount * m_VertexSize);
+
+		if (m_pBuffer)
 		{
-			void* pDest = Map();
-			if (!pDest)
-				return false;
+			if (m_bDynamic)
+			{
+				void* pDest = Map();
+				if (!pDest)
+					return false;
 
-			memcpy_s(pDest, m_VertexCount * m_VertexSize, pData, m_VertexCount * m_VertexSize);
+				memcpy_s(pDest, m_VertexCount * m_VertexSize, pData, m_VertexCount * m_VertexSize);
 
-			Unmap();
-		}
-		else
-		{
-			D3D11_BOX destBox;
-			destBox.left = 0;
-			destBox.right = m_VertexCount * m_VertexSize;
-			destBox.top = 0;
-			destBox.bottom = 1;
-			destBox.front = 0;
-			destBox.back = 1;
+				Unmap();
+			}
+			else
+			{
+				D3D11_BOX destBox;
+				destBox.left = 0;
+				destBox.right = m_VertexCount * m_VertexSize;
+				destBox.top = 0;
+				destBox.bottom = 1;
+				destBox.front = 0;
+				destBox.back = 1;
 
-			m_pGraphics->GetDeviceContext()->UpdateSubresource(
-				(ID3D11Buffer*)m_pBuffer,
-				0,
-				&destBox,
-				pData,
-				0,
-				0
-			);
+				m_pGraphics->GetDeviceContext()->UpdateSubresource(
+					(ID3D11Buffer*)m_pBuffer,
+					0,
+					&destBox,
+					pData,
+					0,
+					0
+				);
+			}
 		}
 
 		return true;
@@ -163,14 +165,14 @@ namespace Dive
 
 	void* VertexBuffer::Map()
 	{
-		if (m_pBuffer)
+		if (m_pBuffer && m_bDynamic)
 		{
 			D3D11_MAPPED_SUBRESOURCE mappedResource;
 			if (FAILED(m_pGraphics->GetDeviceContext()->Map(
-				(ID3D11Buffer*)m_pBuffer, 
-				0, 
-				D3D11_MAP_WRITE_DISCARD, 
-				0, 
+				(ID3D11Buffer*)m_pBuffer,
+				0,
+				D3D11_MAP_WRITE_DISCARD,
+				0,
 				&mappedResource)))
 			{
 				DV_LOG_ENGINE_ERROR("정점 버퍼 Map에 실패하였습니다.");
@@ -179,6 +181,8 @@ namespace Dive
 
 			return mappedResource.pData;
 		}
+		else if (m_pShadowData)
+			return m_pShadowData;
 
 		return nullptr;
 	}

@@ -86,14 +86,19 @@ namespace Editor
         outModel.pRootNode = pRootNode;
 
         collectMeshes(outModel, outModel.pRootNode);
+        //printMeshData(outModel);
+        //collectBones(outModel);
 
         // 만약 파싱 데이터가 사라지면 이걸 마지막으로 하던가
         // 다른 로드 함수를 사용해야 한다.
         importer.FreeScene();
 
-        return saveModel();
+        saveModel(outModel);
+
+        return m_pScene != nullptr;
 	}
 
+    // 루트노드부터 시작해 모든 메시 정보를 취합.
     void ModelImporter::collectMeshes(OutModel& model, aiNode* pNode)
     {
         for (unsigned int i = 0; i < pNode->mNumMeshes; ++i)
@@ -102,6 +107,7 @@ namespace Editor
 
             for (unsigned int j = 0; j < model.meshes.size(); ++j)
             {
+                // sprtan의 경우 뒤에 +1을 붙였던 것 같다.
                 if (pMesh == model.meshes[j])
                 {
                     DV_LOG_CLIENT_WARN("동일한 메시가 중복 발견 되었습니다.");
@@ -109,25 +115,170 @@ namespace Editor
                 }
             }
 
-            model.meshIndices.emplace_back(pNode->mMeshes[i]);
+            model.meshIndices.insert(pNode->mMeshes[i]);
             model.meshes.emplace_back(pMesh);
             model.meshNodes.emplace_back(pNode);
             model.totalNumVertices += pMesh->mNumVertices;
             model.totalNumIndices += GetNumValidFaces(pMesh) * 3;
+
+            // aiNode, aiMesh에서 부모를 알아낼 수 없다.
+            // 오직 aiNode를 통해 자식들만 확인할 수 있다.
+            DV_LOG_CLIENT_DEBUG("mesh name: {:s}", pMesh->mName.C_Str());
         }
 
         for (unsigned int i = 0; i < pNode->mNumChildren; ++i)
             collectMeshes(model, pNode->mChildren[i]);
     }
 
-    // 이때 생성된 Model을 Scene에서 사용할 지
-    // 엔진 파일로 만들지도 생각해야 한다.
-    bool ModelImporter::saveModel()
+    // 루트뼈대와 계층구조화된 뼈대들을 저장한다.
+    void ModelImporter::collectBones(OutModel& model)
     {
-        // 파싱한 데이터를 이용해 버퍼를 만들고
-        // 이를 Model, Geometry에 전달한 후
-        // Model을 파일로 save한다.
+        // 여기에서 계층구조화 되는 듯 한데 정렬 기준을 모르겠다.
+        // => 기본적으로 부모의 왼쪽은 작고 오른쪽은 크도록 정렬된다고 한다.
+        // 그렇다면 aiNode에 대소 비교자가 오버로딩 되어 있어야 한다.
+        // 그런데 오버로드 되어 있지 않다고 나온다...
+        std::set<aiNode*> necessary;
+        std::set<aiNode*> rootNodes;
+
+        bool bHaveSkinnedMeshes = false;
+        for (unsigned int i = 0; i < (unsigned int)model.meshes.size(); ++i)
+        {
+            if (model.meshes[i]->HasBones())
+            {
+                bHaveSkinnedMeshes = true;
+                break;
+            }
+        }
+
+        for (unsigned int i = 0; i < (unsigned int)model.meshes.size(); ++i)
+        {
+            aiMesh* pMesh = model.meshes[i];
+            aiNode* pMeshNode = model.meshNodes[i];
+            aiNode* pMeshParentNode = pMeshNode->mParent;
+            aiNode* pRootNode = nullptr;
+
+            // 메시 하나에도 여러개의 뼈대가 존재할 수 있다.
+            // 뼈대가 있다는 건 스키닝 메시라는 말이다.
+            for (unsigned int j = 0; j < (unsigned int)pMesh->mNumBones; ++j)
+            {
+                auto* pBone = pMesh->mBones[j];
+                std::string boneName = pBone->mName.C_Str();
+                DV_LOG_CLIENT_DEBUG("bone name: {:s}", boneName);
+
+                auto* pBoneNode = getNode(boneName, model.pRootNode);
+                if (!pBoneNode)
+                {
+                    // 실행을 멈춰야 한다. urho는 errorExit를 호출했다.
+                    DV_LOG_CLIENT_ERROR("뼈대{:s}의 노드를 찾지 못하였습니다.", boneName);
+                    return;
+                }
+                necessary.insert(pBoneNode);
+                pRootNode = pBoneNode;
+
+                // 현재 boneNode의 부모 Node들을 전부 저장한다.
+                for (;;)
+                {
+                    pBoneNode = pBoneNode->mParent;
+
+                    if (!pBoneNode || (pBoneNode == pMeshNode || pBoneNode == pMeshParentNode)) // 마지막에 !animationOnly
+                        break;
+
+                    pRootNode = pBoneNode;
+                    necessary.insert(pBoneNode);
+                }
+
+                // 이름 그대로 루트노드들을 저장한다.
+                if (rootNodes.find(pRootNode) == rootNodes.end())
+                    rootNodes.insert(pRootNode);
+            }
+
+            // 이건 리지드 메시의 경우다.
+            // 그렇다면 리지드 메시 단독만 존재할 경우엔 처리가 안된다는 말인데...
+            // 실제로 mong.ase의 경우 뼈대 노드를 못찾는다.
+            // 다만 스키닝 메시와 리지드 메시가 함께 존재하는 경우엔 처리될 것 같다.
+            if (bHaveSkinnedMeshes && !pMesh->mNumBones)
+            {
+                auto* pBoneNode = pMeshNode;
+                necessary.insert(pBoneNode);
+                pRootNode = pBoneNode;
+
+                // 바로 위 for문 이하와 동일.
+                for (;;)
+                {
+                    pBoneNode = pBoneNode->mParent;
+
+                    if (!pBoneNode || (pBoneNode == pMeshNode || pBoneNode == pMeshParentNode)) // 마지막에 !animationOnly
+                        break;
+
+                    pRootNode = pBoneNode;
+                    necessary.insert(pBoneNode);
+                }
+
+                if (rootNodes.find(pRootNode) == rootNodes.end())
+                    rootNodes.insert(pRootNode);
+            }
+        }
+
+        // 루트 노드가 둘 이상을 경우를 multiple root nodes라 한다.
+        // 그리고 이들의 공통 부모를 찾아야 한다.
+        if (rootNodes.size() > 1)
+        {
+            DV_LOG_CLIENT_DEBUG("find multiple root node!");
+        }
+
+        if (rootNodes.empty())
+            return;
+
+        model.pRootBone = *(rootNodes.begin());
+
+    }
+
+    // Model, Animation, Material, Scene Export가 구분될 수 있어야 한다.
+    // 기본적인 개요는 Model, Animation 등을 Collect한 후 export하는 과정으로 이루어져 있다.
+    bool ModelImporter::saveModel(OutModel& model)
+    {
+        // 버퍼를 만들지 않는다. Model을 생성한 후 파일화한다.
+
+        // Mesh
+        // vertices, indices, offset, size가 기본 => 현재 shaodw data를 buffer들이 가지고 있다.
+        // parent, transform이 필요
+        // center pos, aabb
+
+        // Material
+        // static model에도 필요하다.
+
+        // Model
+        // Mesh들을 관리
+
+        // Animation
+        // dynamic model에 필요하다.
+        // 아직 어떤 데이터를 어떻게 구분해야 할 지 모르겠다.
+        // 다만 이 역시 component 형태로 구성될 것이다.
         
         return false;
+    }
+
+    aiNode* ModelImporter::getNode(const std::string& name, aiNode* pRootNode)
+    {
+        if (!pRootNode)
+            return nullptr;
+
+        if (name == pRootNode->mName.C_Str())
+            return pRootNode;
+
+        for (unsigned int i = 0; i < pRootNode->mNumChildren; ++i)
+        {
+            auto* pFound = getNode(name, pRootNode->mChildren[i]);
+            if (pFound)
+                return pFound;
+        }
+
+        return nullptr;
+    }
+
+    void ModelImporter::printMeshData(OutModel& model)
+    {
+        DV_LOG_CLIENT_DEBUG("num mesh: {0:d}, num vertices: {1:d}, num indices: {2:d}",
+            (unsigned int)model.meshes.size(), model.totalNumVertices, model.totalNumIndices);
     }
 }

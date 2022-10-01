@@ -1,9 +1,11 @@
 #include "MenuBarPanel.h"
+#include "Importer/ModelImporter.h"
 
 namespace Editor
 {
 	MenuBarPanel::MenuBarPanel(Editor* pEditor)
-		: Panel(pEditor, "MenuBar")
+		: Panel(pEditor, "MenuBar"),
+		m_pModelImporter(nullptr)
 	{
 		m_bWindow = false;
 
@@ -12,6 +14,7 @@ namespace Editor
 
 	MenuBarPanel::~MenuBarPanel()
 	{
+		DV_DELETE(m_pModelImporter);
 	}
 
 	// 메뉴바는 항상 그려져야 한다.
@@ -333,6 +336,14 @@ namespace Editor
 					m_pEditor->GetModelImporter()->LoadFromFile(path);
 				}
 				*/
+
+				if (!m_pModelImporter)
+					m_pModelImporter = new ModelImporter;
+
+				//m_pModelImporter->LoadAndExportModel("Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
+				//m_pModelImporter->LoadAndExportModel("Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
+				m_pModelImporter->LoadAndExportModel("Assets/Models/Sponza-master/sponza.obj");
+				//m_pModelImporter->LoadAndExportModel("Assets/Models/Mong/Mong.ase");
 			}
 
 			ImGui::EndMenu();

@@ -59,7 +59,51 @@ namespace Sandbox
 			pResourceCache->AddResourceDir("Assets/Textures");
 			pResourceCache->AddResourceDir("Assets/Materials");
 
-			pResourceCache->GetResource<Dive::Model>("Assets/Models/Knave.md");
+			{
+				// vertex buffer
+				std::vector<Dive::VertexElement> elements;
+				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
+				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_NORMAL);
+				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
+				Dive::VertexBuffer vb(m_pContext);
+				vb.SetSize(3, elements);
+				{
+					// 데이터를 어떻게 집어넣어야 할까...
+					auto* pDest = vb.GetShadowData();
+									
+				}
+				std::vector<Dive::VertexBuffer*> vertexBuffers;
+				vertexBuffers.emplace_back(&vb);
+
+				// index buffer
+				std::vector<unsigned short> indices;
+				indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
+				Dive::IndexBuffer ib(m_pContext);
+				ib.SetSize(3, false);
+				ib.SetData((const void*)indices.data());
+				std::vector<Dive::IndexBuffer*> indexBuffers;
+				indexBuffers.emplace_back(&ib);
+
+				// meshes
+				Dive::Mesh mesh(m_pContext);
+				mesh.SetNumVertexBuffers(1);
+				mesh.SetVertexBuffer(0, &vb);
+				mesh.SetIndexBuffer(&ib);
+
+				// model
+				Dive::Model model(m_pContext);
+				model.SetName("Triangle");
+				model.SetVertexBuffers(vertexBuffers);
+				model.SetIndexBuffers(indexBuffers);
+				model.SetNumMeshes(1);
+				model.SetMesh(0, &mesh);
+
+				model.SaveToFile("C:/Dev/Projects/DiveGames/Output/Assets/Models/Triangle.md");
+			}
+
+			{
+				auto* pModel = GetSubsystem<Dive::ResourceCache>()->GetResource<Dive::Model>("Assets/Models/Triangle.md");
+			}
 		}
 	}
 

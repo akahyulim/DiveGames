@@ -6,7 +6,7 @@
 #include <assimp/scene.h>
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/ProgressHandler.hpp>
-#include <string>
+#include <set>
 
 namespace Editor
 {
@@ -15,10 +15,11 @@ namespace Editor
 		std::string outName;
 		aiNode* pRootNode = nullptr;
 		aiNode* pRootBone = nullptr;
-		std::vector<unsigned int> meshIndices;	// urho는 hasset으로 저장했다.
+		std::set<unsigned int> meshIndices;
 		std::vector<aiMesh*> meshes;
 		std::vector<aiNode*> meshNodes;
 		std::vector<aiNode*> bones;
+		std::vector<aiNode*> pivotlessBones;
 		std::vector<aiAnimation*> animations;
 		uint32_t totalNumVertices = 0;
 		uint32_t totalNumIndices = 0;
@@ -29,6 +30,7 @@ namespace Editor
 	// 파싱 데이터를 이용해 모델로 익스포트하는 것이다.
 	// 유니티의 경우 설정창만 따로 존재하고
 	// 드래그 앤 드랍으로 로드와 익스포트를 처리하는 듯 하다.
+	//=> 실제로는 특정 폴더의 파일을 자동으로 변환할 듯?
 	class ModelImporter
 	{
 	public:
@@ -38,10 +40,17 @@ namespace Editor
 		bool LoadAndExportModel(const std::string& filepath);
 
 		// 각종 설정
-
+		
 	private:
 		void collectMeshes(OutModel& model, aiNode* pNode);
-		bool saveModel();
+		void collectBones(OutModel& model);
+
+		bool saveModel(OutModel& model);
+
+		aiNode* getNode(const std::string& name, aiNode* pRootNode);
+
+		// test 함수
+		void printMeshData(OutModel& model);
 
 	private:
 		aiScene* m_pScene;

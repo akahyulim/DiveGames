@@ -3,6 +3,8 @@
 
 namespace Editor
 {
+	class ModelImporter;
+
 	// 다른 Panel에 접근할 수 있어야 한다.
 	// SelectedObject 같은 것도 생각해두어야 한다.
 	class MenuBarPanel : public Panel
@@ -21,7 +23,9 @@ namespace Editor
 		void menuWindow();
 		void menuHelp();
 
-	private:
+		void modelImporterWindow();
 
+	private:
+		ModelImporter* m_pModelImporter;
 	};
 }

@@ -51,7 +51,6 @@ namespace Dive
 		auto* pFileStream = getFileStream(fixedName);
 		if (!pFileStream)
 		{
-			DV_LOG_ENGINE_ERROR("리소스 파일 로드에 실패하였습니다.");
 			DV_DELETE(pNewResource);
 			return nullptr;
 		}
@@ -183,6 +182,8 @@ namespace Dive
 		}
 		else
 		{
+			// 현재 파일명으로는 진행이 안된다. 이는 의도한 사항이다.
+			// 하지만 ResourceDir을 참조하여 얼마든지 찾는 시도는 해 볼 수 있을 것 같다.
 			auto fullPath = FileSystem::GetCurrentDir() + pathName;
 			
 			for (unsigned int i = 0; i < (unsigned int)m_ResourceDirs.size(); ++i)
@@ -215,12 +216,14 @@ namespace Dive
 			filepath = m_ResourceDirs[i] + filepath;
 			if (FileSystem::FileExists(filepath))
 			{
-				pFileStream = new FileStream;
-				if (!pFileStream->Open(filepath, eFileStreamMode::Read))
-					DV_DELETE(pFileStream);
+				pFileStream = new FileStream(filepath, eFileStreamMode::Read);
+				if (pFileStream->IsOpen())
+					return pFileStream;
+				else
+					delete pFileStream;
 			}
 		}
 
-		return pFileStream;
+		return nullptr;
 	}
 }

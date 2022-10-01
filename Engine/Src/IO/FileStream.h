@@ -2,21 +2,19 @@
 
 namespace Dive
 {
-    enum eFileStreamMode
+    enum eFileStreamMode : uint32_t
     {
-        Read,
-        Write,
-        Append,
-        Unknown
+        Read = 1,
+        Write  =1 << 1,
+        Append = 1 << 2
     };
 
     class FileStream
     {
     public:
-        FileStream();
+        FileStream(const std::string& path, uint32_t flags);
         ~FileStream();
 
-        bool Open(const std::string& filepath, eFileStreamMode mode);
         bool IsOpen() const { return m_bOpen; }
         void Close();
 
@@ -53,6 +51,7 @@ namespace Dive
         void Write(const std::vector<uint32_t>& value);
         void Write(const std::vector<unsigned char>& value);
         void Write(const std::vector<std::byte>& value);
+        void Write(const void* pData, unsigned int size);
 
         // read
         template <class T, class = typename std::enable_if<
@@ -85,6 +84,7 @@ namespace Dive
         void Read(std::vector<uint32_t>* pValue);
         void Read(std::vector<unsigned char>* pValue);
         void Read(std::vector<std::byte>* pValue);
+        void Read(void* pData, unsigned int size);
 
         template <class T, class = typename std::enable_if
             <
@@ -117,6 +117,5 @@ namespace Dive
         std::ifstream m_In;
         uint32_t m_Flags;
         bool m_bOpen;
-        eFileStreamMode m_Mode;
     };
 }

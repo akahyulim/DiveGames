@@ -4,46 +4,40 @@
 
 namespace Dive
 {
-	FileStream::FileStream()
+	FileStream::FileStream(const std::string& path, uint32_t flags)
 		: m_bOpen(false),
-		m_Mode(eFileStreamMode::Unknown)
+		m_Flags(flags)
 	{
+		std::ios_base::openmode iosFlags = std::ios::binary;
+		if (m_Flags & eFileStreamMode::Read) iosFlags |= std::ios::in;
+		if (m_Flags & eFileStreamMode::Write) iosFlags |= std::ios::out;
+		if (m_Flags & eFileStreamMode::Append) iosFlags |= std::ios::app;
+
+		if (m_Flags & eFileStreamMode::Write)
+		{
+			m_Out.open(path, iosFlags);
+			if (m_Out.fail())
+			{
+				DV_LOG_ENGINE_ERROR("파일({:s})을 쓰기모드로 여는데 실패하였습니다.", path);
+				return;
+			}
+		}
+		else if (m_Flags & eFileStreamMode::Read)
+		{
+			m_In.open(path, iosFlags);
+			if (m_Out.fail())
+			{
+				DV_LOG_ENGINE_ERROR("파일({:s})을 읽기모드로 여는데 실패하였습니다.", path);
+				return;
+			}
+		}
+
+		m_bOpen = true;
 	}
 
 	FileStream::~FileStream()
 	{
 		Close();
-	}
-
-	bool FileStream::Open(const std::string& filepath, eFileStreamMode mode)
-	{
-		int iosFlags = std::ios::binary;
-		iosFlags |= (mode == eFileStreamMode::Read) ? std::ios::in : 0;
-		iosFlags |= (mode == eFileStreamMode::Write) ? std::ios::out : 0;
-		iosFlags |= (mode == eFileStreamMode::Append) ? std::ios::app : 0;
-
-		if (m_Flags & eFileStreamMode::Write)
-		{
-			m_Out.open(filepath, iosFlags);
-			if (m_Out.fail())
-			{
-				DV_LOG_ENGINE_ERROR("파일({:s})을 쓰기모드로 여는데 실패하였습니다.", filepath);
-				m_bOpen = false;
-			}
-		}
-		else if (m_Flags & eFileStreamMode::Read)
-		{
-			m_In.open(filepath, iosFlags);
-			if (m_In.fail())
-			{
-				DV_LOG_ENGINE_ERROR("파일({:s})을 읽기모드로 여는데 실패하였습니다.", filepath);
-				m_bOpen = false;
-			}
-		}
-
-		m_bOpen = true;
-
-		return m_bOpen;
 	}
 
 	void FileStream::Close()
@@ -117,16 +111,26 @@ namespace Dive
 		m_Out.write(reinterpret_cast<const char*>(&value[0]), sizeof(std::byte) * size);
 	}
 
-	void FileStream::Read(std::string* pValue)
+	// 정점, 인덱스의 경우 크기가 다를 수 있다.
+	// 따라서 void*로 관리하고, size * count를 전달받아 저장 / 읽기를 하는 편이 편하다.
+	void FileStream::Write(const void* pData, unsigned int size)
 	{
-		if (pValue == nullptr)
+		if (!size)
 			return;
 
-		// 길이
-		auto length = ReadAs<uint32_t>();
-		pValue->resize(length);
+		m_Out.write(reinterpret_cast<const char*>(pData), size);
+	}
 
-		// 길이만큼 읽기
+	void FileStream::Read(std::string* pValue)
+	{
+		if (!m_bOpen || pValue == nullptr)
+			return;
+		
+		// 길이가 먼저 저장되어 있어야 한다.
+		uint32_t length = 0;
+		Read(&length);
+
+		pValue->resize(length);
 		m_In.read(const_cast<char*>(pValue->c_str()), length);
 	}
 
@@ -178,5 +182,13 @@ namespace Dive
 		pValue->resize(size);
 
 		m_In.read(reinterpret_cast<char*>(pValue->data()), sizeof(std::byte) * size);
+	}
+
+	void FileStream::Read(void* pData, unsigned int size)
+	{
+		if (!size)
+			return;
+
+		m_In.read(reinterpret_cast<char*>(pData), size);
 	}
 }

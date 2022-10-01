@@ -21,14 +21,14 @@ namespace Dive
 
 	bool Resource::LoadFromFile(const std::string& fileName)
 	{
-		FileStream deserializer;
-		return deserializer.Open(fileName, eFileStreamMode::Read) && Load(&deserializer);
+		FileStream deserializer(fileName, eFileStreamMode::Read);
+		return deserializer.IsOpen() && Load(&deserializer);
 	}
 
 	bool Resource::SaveToFile(const std::string& fileName)
 	{
-		FileStream serializer;
-		return serializer.Open(fileName, eFileStreamMode::Write) && Save(&serializer);
+		FileStream serializer(fileName, eFileStreamMode::Write);
+		return serializer.IsOpen() && Save(&serializer);
 	}
 
 	bool Resource::Load(FileStream* pDeserializer)
