@@ -4,6 +4,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "Texture2D.h"
 #include "Model.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
@@ -750,6 +751,7 @@ namespace Dive
 
 	void RegisterGraphicsObject(Context* pContext)
 	{
+		Texture2D::RegisterObject(pContext);
 		Model::RegisterObject(pContext);
 	}
 }

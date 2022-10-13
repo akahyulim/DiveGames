@@ -33,6 +33,8 @@
 #include "Graphics/GraphicsDefs.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/GraphicsEvents.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Texture2D.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/Model.h"

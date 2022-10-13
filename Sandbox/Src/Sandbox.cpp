@@ -1,4 +1,4 @@
-#include "Sandbox.h"
+ï»¿#include "Sandbox.h"
 
 DEFINE_APPLICATION_MAIN(Sandbox::Sandbox)
 
@@ -14,13 +14,13 @@ namespace Sandbox
 	{
 	}
 
-	// ¿£Áø »ý¼º Àü¿¡ È£Ãâ
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½
 	void Sandbox::Setup()
 	{
-		// ini ÆÄÀÏ µîÀ» ÀÐ¾î¿À´Â ÆíÀÌ ³´´Ù.
+		// ini ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ð¾ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
 		m_EngineParameters.title = L"Sandbox";
-		m_EngineParameters.width = 800;
-		m_EngineParameters.height = 600;
+		m_EngineParameters.width = 1280;
+		m_EngineParameters.height = 760;
 		m_EngineParameters.positionX = m_EngineParameters.GetCenterPositionX();
 		m_EngineParameters.positionY = m_EngineParameters.GetCenterPositionY();
 		m_EngineParameters.bReSizable = true;//false;
@@ -28,88 +28,39 @@ namespace Sandbox
 		// resource paths?
 	}
 
-	// ¿£Áø ÃÊ±âÈ­ ÈÄ È£Ãâ
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ ï¿½ï¿½ È£ï¿½ï¿½
 	void Sandbox::Start()
 	{
-		DV_LOG_CLIENT_DEBUG("Sandbox::Start È£Ãâ");
+		DV_LOG_CLIENT_DEBUG("Sandbox::Start È£ï¿½ï¿½");
 
 		// create scene content
-		// sceneÀ» Á÷Á¢ »ý¼ºÇÑ ÈÄ cache¸¦ ÀÌ¿ëÇÏ¿© object¸¦ ±¸¼º
+		// sceneï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ cacheï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½Ï¿ï¿½ objectï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		m_pScene = new Dive::Scene(m_pContext);
 
-		// camera´Â ¸â¹ö º¯¼ö·Î º°µµ °ü¸®
+		// cameraï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 		// create ui content
 
 		// setup viewport
-		// 1. viewport¸¦ »ý¼ºÇÑ ÈÄ renderer¿¡ set
-		// viewport´Â scene, camera ±×¸®°í ÇÊ¿äÇÏ´Ù¸é render path¸¦ Àü´ÞÇÏ¿© »ý¼º
-		// 2. render path°¡ ¾ø´Ù¸é cache·ÎºÎÅÍ loadÇÑ ÈÄ viewport¿¡ set
+		// 1. viewportï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ rendererï¿½ï¿½ set
+		// viewportï¿½ï¿½ scene, camera ï¿½×¸ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Ï´Ù¸ï¿½ render pathï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½
+		// 2. render pathï¿½ï¿½ ï¿½ï¿½ï¿½Ù¸ï¿½ cacheï¿½Îºï¿½ï¿½ï¿½ loadï¿½ï¿½ ï¿½ï¿½ viewportï¿½ï¿½ set
 		auto pView = std::make_shared<Dive::View>(m_pContext, m_pScene);
 		GetSubsystem<Dive::Renderer>()->SetView(0, pView);
 
 		// subscirbe events
-		// update handleÇÔ¼ö¿¡¼­ camera move ÇÔ¼ö È£Ãâ
-		// post render update handle ÇÔ¼ö¿¡¼­ debug geometry È£Ãâ
+		// update handleï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ camera move ï¿½Ô¼ï¿½ È£ï¿½ï¿½
+		// post render update handle ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ debug geometry È£ï¿½ï¿½
 
 		// temp test
 		{
-			auto pResourceCache = GetSubsystem<Dive::ResourceCache>();
-			pResourceCache->AddResourceDir("Assets/Models");
-			pResourceCache->AddResourceDir("Assets/Textures");
-			pResourceCache->AddResourceDir("Assets/Materials");
-
-			{
-				// vertex buffer
-				std::vector<Dive::VertexElement> elements;
-				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
-				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_NORMAL);
-				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
-				Dive::VertexBuffer vb(m_pContext);
-				vb.SetSize(3, elements);
-				{
-					// µ¥ÀÌÅÍ¸¦ ¾î¶»°Ô Áý¾î³Ö¾î¾ß ÇÒ±î...
-					auto* pDest = vb.GetShadowData();
-									
-				}
-				std::vector<Dive::VertexBuffer*> vertexBuffers;
-				vertexBuffers.emplace_back(&vb);
-
-				// index buffer
-				std::vector<unsigned short> indices;
-				indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
-				Dive::IndexBuffer ib(m_pContext);
-				ib.SetSize(3, false);
-				ib.SetData((const void*)indices.data());
-				std::vector<Dive::IndexBuffer*> indexBuffers;
-				indexBuffers.emplace_back(&ib);
-
-				// meshes
-				Dive::Mesh mesh(m_pContext);
-				mesh.SetNumVertexBuffers(1);
-				mesh.SetVertexBuffer(0, &vb);
-				mesh.SetIndexBuffer(&ib);
-
-				// model
-				Dive::Model model(m_pContext);
-				model.SetName("Triangle");
-				model.SetVertexBuffers(vertexBuffers);
-				model.SetIndexBuffers(indexBuffers);
-				model.SetNumMeshes(1);
-				model.SetMesh(0, &mesh);
-
-				model.SaveToFile("C:/Dev/Projects/DiveGames/Output/Assets/Models/Triangle.md");
-			}
-
-			{
-				auto* pModel = GetSubsystem<Dive::ResourceCache>()->GetResource<Dive::Model>("Assets/Models/Triangle.md");
-			}
+			
 		}
 	}
 
 	void Sandbox::Stop()
 	{
-		DV_LOG_CLIENT_DEBUG("Sandbox::Stop È£Ãâ");
+		DV_LOG_CLIENT_DEBUG("Sandbox::Stop È£ï¿½ï¿½");
 
 		// Application Cleanup
 		DV_DELETE(m_pScene);
