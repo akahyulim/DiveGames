@@ -192,6 +192,8 @@
     <ClInclude Include="Src\Graphics\Mesh.h" />
     <ClInclude Include="Src\Graphics\Model.h" />
     <ClInclude Include="Src\Graphics\Shader.h" />
+    <ClInclude Include="Src\Graphics\Texture.h" />
+    <ClInclude Include="Src\Graphics\Texture2D.h" />
     <ClInclude Include="Src\Graphics\VertexBuffer.h" />
     <ClInclude Include="Src\IO\FileStream.h" />
     <ClInclude Include="Src\IO\FileSystem.h" />
@@ -225,6 +227,8 @@
     <ClCompile Include="Src\Graphics\Mesh.cpp" />
     <ClCompile Include="Src\Graphics\Model.cpp" />
     <ClCompile Include="Src\Graphics\Shader.cpp" />
+    <ClCompile Include="Src\Graphics\Texture.cpp" />
+    <ClCompile Include="Src\Graphics\Texture2D.cpp" />
     <ClCompile Include="Src\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Src\IO\FileStream.cpp" />
     <ClCompile Include="Src\IO\FileSystem.cpp" />

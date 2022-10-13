@@ -1,30 +1,53 @@
 #include "ScenePanel.h"
+#include "ImGuizmo/ImGuizmo.h"
 
 namespace Editor
 {
-#include "ImGuizmo/ImGuizmo.h"
+	static Dive::Texture2D* s_pTexture = nullptr;
 
 	ScenePanel::ScenePanel(Editor* pEditor)
 		: Panel(pEditor, "Scene")
 	{
 		// 역시 CreateScene 이벤트를 구독한다.
+
+		s_pTexture = new Dive::Texture2D(m_pEditor->GetContext());
+		//s_pTexture->LoadFromFile("../Output/Assets/Textures/DokeV.jpeg");
+		s_pTexture->LoadFromFile("../Output/Assets/Textures/dmc.jpg");
+		//s_pTexture->LoadFromFile("../Output/Assets/Textures/ChoA.jpg");
+		//s_pTexture->LoadFromFile("../Output/Assets/Textures/IU.jpg");
+		//s_pTexture->LoadFromFile("../Output/Assets/Textures/Baseplate Grid.png");
+		//s_pTexture->LoadFromFile("../Output/Assets/Textures/no_texture.png");
+		s_pTexture->GenerateLevels();
 	}
 
 	ScenePanel::~ScenePanel()
 	{
+		DV_DELETE(s_pTexture);
 	}
 
 	// Scene이 있다면
 	// Enigne의 Backbuffer에서 rtv를 얻어와 그린다.
 	void ScenePanel::renderWindow()
 	{
-		/*
-		if (!m_pActiveScene)
+		if (!s_pActiveScene)
 			return;
 
-		// 크기를 계산한다. => 잘 모르겠다.
+		auto wndSize = ImGui::GetWindowSize();
 		auto width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		auto height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
+
+		ImGui::Image(
+			s_pTexture ? s_pTexture->GetShaderResourceView() : nullptr,
+			ImVec2(width, height),
+			ImVec2(0, 0),
+			ImVec2(1, 1),
+			ImColor(255, 255, 255, 255),
+			ImColor(50, 127, 166, 255)
+		);
+
+		/*
+		// 크기를 계산한다. => 잘 모르겠다.
+		
 
 		// renderer의 viewport를 설정한다.
 		// Editor용 Camera도 함께 설정??

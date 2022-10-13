@@ -36,8 +36,8 @@ namespace Editor
 	{
 		// Engine Mode 설정 가능
 		m_EngineParameters.title = L"Editor";
-		m_EngineParameters.width = 1600;
-		m_EngineParameters.height = 900;
+		m_EngineParameters.width = 1280;
+		m_EngineParameters.height = 760;
 		m_EngineParameters.positionX = m_EngineParameters.GetCenterPositionX();
 		m_EngineParameters.positionY = m_EngineParameters.GetCenterPositionY();
 	}

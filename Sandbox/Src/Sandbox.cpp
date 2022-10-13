@@ -19,8 +19,8 @@ namespace Sandbox
 	{
 		// ini 파일 등을 읽어오는 편이 낫다.
 		m_EngineParameters.title = L"Sandbox";
-		m_EngineParameters.width = 800;
-		m_EngineParameters.height = 600;
+		m_EngineParameters.width = 1280;
+		m_EngineParameters.height = 760;
 		m_EngineParameters.positionX = m_EngineParameters.GetCenterPositionX();
 		m_EngineParameters.positionY = m_EngineParameters.GetCenterPositionY();
 		m_EngineParameters.bReSizable = true;//false;
@@ -54,12 +54,7 @@ namespace Sandbox
 
 		// temp test
 		{
-			auto pResourceCache = GetSubsystem<Dive::ResourceCache>();
-			pResourceCache->AddResourceDir("Assets/Models");
-			pResourceCache->AddResourceDir("Assets/Textures");
-			pResourceCache->AddResourceDir("Assets/Materials");
-
-			pResourceCache->GetResource<Dive::Model>("Assets/Models/Knave.md");
+			
 		}
 	}
 

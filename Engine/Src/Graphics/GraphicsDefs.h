@@ -2,6 +2,14 @@
 
 namespace Dive
 {
+	enum class eTextureUsage
+	{
+		Static,
+		Dynamic,
+		RenderTarget,
+		DepthStencil
+	};
+
 	enum class eShaderType
 	{
 		Vertex,
