@@ -5,7 +5,7 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "Texture2D.h"
-#include "Model.h"
+#include "Renderer/Model.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
 #include "Core/EventSystem.h"

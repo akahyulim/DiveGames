@@ -2,8 +2,8 @@
 #include "StaticModel.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
-#include "Graphics/Model.h"
-#include "Graphics/Mesh.h"
+#include "Renderer/Model.h"
+#include "Renderer/Mesh.h"
 #include "IO/Log.h"
 
 namespace Dive

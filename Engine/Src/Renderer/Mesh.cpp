@@ -1,9 +1,9 @@
 #include "divepch.h"
 #include "Mesh.h"
-#include "Graphics.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "GraphicsDefs.h"
+#include "Graphics/Graphics.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
+#include "Graphics/GraphicsDefs.h"
 #include "Core/Context.h"
 #include "IO/Log.h"
 

@@ -1,8 +1,8 @@
 #include "divepch.h"
 #include "Model.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
 #include "Mesh.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
 #include "Core/Context.h"
 #include "IO/Log.h"
 

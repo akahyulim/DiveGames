@@ -37,13 +37,13 @@
 #include "Graphics/Texture2D.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
-#include "Graphics/Model.h"
-#include "Graphics/Mesh.h"
 #include "Graphics/Shader.h"
 #include "Graphics/InputLayout.h"
 
 //= Renderer ======================
 #include "Renderer/Renderer.h"
+#include "Renderer/Model.h"
+#include "Renderer/Mesh.h"
 #include "Renderer/View.h"
 
 //= Input =========================
