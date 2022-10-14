@@ -8,6 +8,7 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
 	class Shader;
+	class Texture2D;
 
 	// 윈도우 클래스 이름.
 	const LPCWSTR WND_CLASS_NAME = L"AppWnd";
@@ -123,6 +124,11 @@ namespace Dive
 		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int indexStart, unsigned int baseVertexIndex = 0);
 		void DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int instanceCount, unsigned int indexStart);
 
+		void SetDepthStencil(Texture2D* pTexture);
+
+		ID3D11RenderTargetView* GetRenderTarget(unsigned int index) const;
+		void SetRenderTarget(unsigned int index, Texture2D* pTexture);
+
 		VertexBuffer* GetVertexBuffer(unsigned int index) const;
 		void SetVertexBuffer(VertexBuffer* pBuffer);
 		void SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, unsigned int instanceOffset = 0);
@@ -197,11 +203,18 @@ namespace Dive
 
 		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveType;
 
-		VertexBuffer* m_VertexBuffers[MAX_VERTEX_STREAMS];
+		Texture2D* m_pDepthStencil;
+
+		Texture2D* m_pRenderTargets[MAX_RENDERTARGETS];
+
+		VertexBuffer* m_pVertexBuffers[MAX_VERTEX_STREAMS];
 		IndexBuffer* m_pIndexBuffer;
 
 		Shader* m_pVertexShader;
 		Shader* m_pPixelShader;
+
+		// dirty check 전부 모으기.
+		bool m_bRenderTargetsDirty;
 	};
 
 	void RegisterGraphicsObject(Context* pContext);

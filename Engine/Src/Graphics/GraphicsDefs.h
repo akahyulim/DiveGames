@@ -105,5 +105,6 @@ namespace Dive
 		DXGI_FORMAT_R8G8B8A8_UNORM
 	};
 
+	inline constexpr int32_t MAX_RENDERTARGETS = 4;
 	inline constexpr int32_t MAX_VERTEX_STREAMS = 4;
 }

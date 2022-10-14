@@ -58,8 +58,13 @@ namespace Dive
 		// 쉐이더 경로 및 파일 포멧 설정
 		// 이외에도 기타 설정이 있다.
 
+		for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
+			m_pRenderTargets[i] = nullptr;
+
+		m_bRenderTargetsDirty = true;
+
 		for (unsigned int i = 0; i < MAX_VERTEX_STREAMS; ++i)
-			m_VertexBuffers[i] = nullptr;
+			m_pVertexBuffers[i] = nullptr;
 	}
 
 	Graphics::~Graphics()
@@ -529,9 +534,36 @@ namespace Dive
 		m_pDeviceContext->DrawIndexed(indexCount, indexStart, baseVertexIndex);
 	}
 
+	void Graphics::SetDepthStencil(Texture2D* pTexture)
+	{
+		if (m_pDepthStencil != pTexture)
+			m_pDepthStencil = pTexture;
+
+		m_bRenderTargetsDirty = true;
+
+		// 이 곳에서 raseterizer dirty를 true로 한다. 그런데 아래 함수에선 안한다....
+	}
+
+	ID3D11RenderTargetView* Graphics::GetRenderTarget(unsigned int index) const
+	{
+		return index < MAX_RENDERTARGETS ? m_pRenderTargets[index]->GetRenderTargetView() : nullptr;
+	}
+
+	void Graphics::SetRenderTarget(unsigned int index, Texture2D* pTexture)
+	{
+		if (index >= MAX_RENDERTARGETS)
+			return;
+
+		if (pTexture != m_pRenderTargets[index])
+		{
+			m_pRenderTargets[index] = pTexture;
+			m_bRenderTargetsDirty = true;
+		}
+	}
+
 	VertexBuffer* Graphics::GetVertexBuffer(unsigned int index) const
 	{
-		return index < MAX_VERTEX_STREAMS ? m_VertexBuffers[index] : nullptr;
+		return index < MAX_VERTEX_STREAMS ? m_pVertexBuffers[index] : nullptr;
 	}
 
 	void Graphics::SetVertexBuffer(VertexBuffer* pBuffer)
@@ -732,9 +764,36 @@ namespace Dive
 
 	// 이름을 바꿨으면 좋겠다.
 	// 각종 bind를 수행하는 구문이다.
+	// Draw에서만 그려진다는 사실에 의미가 있다.
+	// 이로인해 Editor에서 ImGui가 그리는 부분과 엔진에서 그리는 부분이 자연스레 나뉘어졌다.
 	void Graphics::prepareDraw()
 	{
-		// render targets
+		// 현재 depthstencilview와 rendertargetview를 포인터 변수로 생성한 후
+		// 여러가지 확인을 거쳐 채워넣고 Set했다.
+		// 이는 추후 문제를 발생시킬 수 있다.
+		if (m_bRenderTargetsDirty)
+		{
+			ID3D11DepthStencilView* pDepthStencilView = nullptr;
+			pDepthStencilView = (m_pDepthStencil && m_pDepthStencil->GetUsage() == eTextureUsage::DepthStencil) ?
+				m_pDepthStencil->GetDepthStencilView() : m_pDefaultDepthStencilView;
+			// write가 아니라면 read only
+
+			ID3D11RenderTargetView* pRenderTargetViews[MAX_RENDERTARGETS] = { nullptr, };
+			for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
+			{
+				pRenderTargetViews[i] = (m_pRenderTargets[i] && m_pRenderTargets[i]->GetUsage() == eTextureUsage::RenderTarget) ?
+					m_pRenderTargets[i]->GetRenderTargetView() : nullptr;
+			}
+
+			if (!m_pRenderTargets[0] && (!m_pDepthStencil ||
+				(m_pDepthStencil && m_pDepthStencil->GetWidth() == m_Width && m_pDepthStencil->GetHeight() == m_Height)))
+			{
+				pRenderTargetViews[0] = m_pDefaultRenderTargetView;
+			}
+
+			m_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &pRenderTargetViews[0], pDepthStencilView);
+			m_bRenderTargetsDirty = false;
+		}
 
 		// shader resources + samplers
 
