@@ -49,6 +49,11 @@ namespace Dive
 		// start logging
 		GetSubsystem<Log>()->Initialize("Dive.log");
 
+		// add resource path
+		// 파라미터를 받는다.
+		if (!intializeResourceCache())
+			return false;
+
 		// 그래픽스 초기화
 		{
 			auto pGraphics = m_pContext->GetSubsystem<Graphics>();
@@ -188,5 +193,19 @@ namespace Dive
 		}
 
 		m_bExiting = true;
+	}
+
+	// 파라미터와 올드 지우기 두 개를 받는다.
+	// 일단 기본 경로만 등록하자.
+	bool Engine::intializeResourceCache()
+	{
+		auto* pCache = GetSubsystem<ResourceCache>();
+
+		//pCache->AddResourceDir("CoreData/RenderPaths");
+
+		pCache->AddResourceDir("Assets/Textures");
+		pCache->AddResourceDir("Assets/Models");
+
+		return true;
 	}
 }

@@ -37,31 +37,28 @@ namespace Dive
 		return true;
 	}
 
+	// 일단은 전체, 상대 경로로 받은 후 로드하도록 구현을 수정했다.
+	// 그리고 현재 fixResourceXXX() 함수들의 사용을 제거했으며,
+	// 리소스 폴더 설정도 무시한다.
+	// 실제로는 외부 경로 파일일 경우 리소스 폴더로 복사한 후 처리해야 한다.
 	Resource* ResourceCache::GetResource(StringHash type, const std::string& name)
 	{
-		auto fixedName = fixResourceName(name);
-		StringHash nameHash(fixedName);
+		auto fileName = FileSystem::GetFileNameAndExtension(name);
+		StringHash nameHash(fileName);
 
 		auto* pExistedResource = findResource(type, nameHash);
 		if (pExistedResource)
 			return pExistedResource;
 
 		auto* pNewResource = static_cast<Resource*>(m_pContext->CreateObject(type));
-
-		auto* pFileStream = getFileStream(fixedName);
-		if (!pFileStream)
+		if (!pNewResource->LoadFromFile(name))
 		{
-			DV_LOG_ENGINE_ERROR("리소스 파일 로드에 실패하였습니다.");
 			DV_DELETE(pNewResource);
 			return nullptr;
 		}
 
-		if (!pNewResource->Load(pFileStream))
-			return nullptr;
-		DV_DELETE(pFileStream);
-
-		pNewResource->SetName(fixedName);
-
+		pNewResource->SetName(fileName);
+		
 		m_ResourceGroups[type.Value()][nameHash.Value()] = pNewResource;
 
 		return pNewResource;

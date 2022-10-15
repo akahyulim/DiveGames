@@ -3,26 +3,21 @@
 
 namespace Editor
 {
-	static Dive::Texture2D* s_pTexture = nullptr;
-
 	ScenePanel::ScenePanel(Editor* pEditor)
 		: Panel(pEditor, "Scene")
 	{
 		// 역시 CreateScene 이벤트를 구독한다.
 
-		s_pTexture = new Dive::Texture2D(m_pEditor->GetContext());
-		//s_pTexture->LoadFromFile("../Output/Assets/Textures/DokeV.jpeg");
-		s_pTexture->LoadFromFile("../Output/Assets/Textures/dmc.jpg");
-		//s_pTexture->LoadFromFile("../Output/Assets/Textures/ChoA.jpg");
-		//s_pTexture->LoadFromFile("../Output/Assets/Textures/IU.jpg");
-		//s_pTexture->LoadFromFile("../Output/Assets/Textures/Baseplate Grid.png");
-		//s_pTexture->LoadFromFile("../Output/Assets/Textures/no_texture.png");
-		s_pTexture->GenerateLevels();
+		auto* pCache = m_pEditor->GetSubsystem<Dive::ResourceCache>();
+
+		pCache->GetResource<Dive::Texture2D>("Assets/Textures/DokeV.jpeg");
+		pCache->GetResource<Dive::Texture2D>("Assets/Textures/dmc.jpg");
+		pCache->GetResource<Dive::Texture2D>("Assets/Textures/IU.jpg");
+		pCache->GetResource<Dive::Texture2D>("Assets/Textures/ChoA.jpg");
 	}
 
 	ScenePanel::~ScenePanel()
 	{
-		DV_DELETE(s_pTexture);
 	}
 
 	// Scene이 있다면
@@ -36,8 +31,11 @@ namespace Editor
 		auto width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		auto height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
 
+		auto* pCache = m_pEditor->GetSubsystem<Dive::ResourceCache>();
+		auto* pTexture2D = pCache->GetResource<Dive::Texture2D>("DokeV.jpeg");
+
 		ImGui::Image(
-			s_pTexture ? s_pTexture->GetShaderResourceView() : nullptr,
+			pTexture2D ? pTexture2D->GetShaderResourceView() : nullptr,
 			ImVec2(width, height),
 			ImVec2(0, 0),
 			ImVec2(1, 1),

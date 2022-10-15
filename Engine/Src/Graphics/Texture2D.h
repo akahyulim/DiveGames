@@ -16,6 +16,7 @@ namespace Dive
 		static void RegisterObject(Context* pContext);
 
 		bool LoadFromFile(const std::string& fileName) override;
+		
 		void Release();
 
 		bool SetSize(int width, int height, DXGI_FORMAT format, eTextureUsage usage = eTextureUsage::Static);
