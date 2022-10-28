@@ -1,4 +1,4 @@
-ï»¿#include "Sandbox.h"
+#include "Sandbox.h"
 
 DEFINE_APPLICATION_MAIN(Sandbox::Sandbox)
 
@@ -14,55 +14,45 @@ namespace Sandbox
 	{
 	}
 
-	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½
+	// ¿£Áø »ý¼º Àü¿¡ È£Ãâ
 	void Sandbox::Setup()
 	{
-		// ini ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ð¾ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.
+		// ini ÆÄÀÏ µîÀ» ÀÐ¾î¿À´Â ÆíÀÌ ³´´Ù.
 		m_EngineParameters.title = L"Sandbox";
 		m_EngineParameters.width = 1280;
 		m_EngineParameters.height = 760;
 		m_EngineParameters.positionX = m_EngineParameters.GetCenterPositionX();
 		m_EngineParameters.positionY = m_EngineParameters.GetCenterPositionY();
-		m_EngineParameters.bReSizable = true;//false;
+		m_EngineParameters.bReSizable = true;// false;
 
 		// resource paths?
 	}
 
-	// ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ ï¿½ï¿½ È£ï¿½ï¿½
+	// ¿£Áø ÃÊ±âÈ­ ÈÄ È£Ãâ
 	void Sandbox::Start()
 	{
-		DV_LOG_CLIENT_DEBUG("Sandbox::Start È£ï¿½ï¿½");
+		DV_LOG_CLIENT_DEBUG("Sandbox::Start È£Ãâ");
 
-		// create scene content
-		// sceneï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ cacheï¿½ï¿½ ï¿½Ì¿ï¿½ï¿½Ï¿ï¿½ objectï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		m_pScene = new Dive::Scene(m_pContext);
+		auto pViewport = new Dive::Viewport(m_pContext);
+		pViewport->SetScene(m_pScene);
+		GetSubsystem<Dive::Renderer>()->SetViewport(0, pViewport);
 
-		// cameraï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-
-		// create ui content
-
-		// setup viewport
-		// 1. viewportï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ rendererï¿½ï¿½ set
-		// viewportï¿½ï¿½ scene, camera ï¿½×¸ï¿½ï¿½ï¿½ ï¿½Ê¿ï¿½ï¿½Ï´Ù¸ï¿½ render pathï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½
-		// 2. render pathï¿½ï¿½ ï¿½ï¿½ï¿½Ù¸ï¿½ cacheï¿½Îºï¿½ï¿½ï¿½ loadï¿½ï¿½ ï¿½ï¿½ viewportï¿½ï¿½ set
-		auto pView = std::make_shared<Dive::View>(m_pContext, m_pScene);
-		GetSubsystem<Dive::Renderer>()->SetView(0, pView);
-
-		// subscirbe events
-		// update handleï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ camera move ï¿½Ô¼ï¿½ È£ï¿½ï¿½
-		// post render update handle ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½ debug geometry È£ï¿½ï¿½
-
-		// temp test
+		// renderPath
 		{
-			
+
+		}
+
+		// model
+		{
+
 		}
 	}
 
 	void Sandbox::Stop()
 	{
-		DV_LOG_CLIENT_DEBUG("Sandbox::Stop È£ï¿½ï¿½");
+		DV_LOG_CLIENT_DEBUG("Sandbox::Stop È£Ãâ");
 
-		// Application Cleanup
 		DV_DELETE(m_pScene);
 	}
 }

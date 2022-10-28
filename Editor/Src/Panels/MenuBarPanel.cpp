@@ -92,7 +92,7 @@ namespace Editor
 
 					// Engine에서 Scene을 Close해야 한다.
 
-
+					// static이라 제거해도 주소가 남는 듯 하다...
 					auto sceneName = s_pActiveScene->GetName();
 					DV_DELETE(s_pActiveScene);
 

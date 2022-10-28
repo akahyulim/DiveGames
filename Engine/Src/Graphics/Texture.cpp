@@ -3,6 +3,7 @@
 #include "Graphics.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
+#include "Renderer/Viewport.h"
 #include "IO/Log.h"
 
 namespace Dive
@@ -17,6 +18,7 @@ namespace Dive
 		m_Depth(0),
 		m_MipmapCount(0),
 		m_bEnableMipmap(true),
+		m_bMipLevelsDirty(false),
 		m_pTexture2D(nullptr),
 		m_pShaderResourceView(nullptr),
 		m_pRenderTargetView(nullptr),
@@ -28,6 +30,12 @@ namespace Dive
 
 	Texture::~Texture()
 	{
+	}
+
+	void Texture::SetMipLevelsDirty()
+	{
+		if (m_Usage == eTextureUsage::RenderTarget && m_MipmapCount > 1)
+			m_bMipLevelsDirty = true;
 	}
 
 	// Graphics의 SetTexture에서 호출된다.
@@ -117,5 +125,13 @@ namespace Dive
 		}
 
 		return maxLevel;
+	}
+
+	void Texture::SetViewport(unsigned int index, Viewport* pViewport)
+	{
+		if (m_Viewports.size() >= index)
+			m_Viewports.insert(m_Viewports.begin() + index, pViewport);
+		else
+			m_Viewports.emplace_back(pViewport);
 	}
 }

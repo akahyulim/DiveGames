@@ -16,6 +16,14 @@ namespace Dive
 		Pixel
 	};
 
+	// 좀 애매해서 아직 사용하지 않았다.
+	enum eClearTarget : uint32_t
+	{
+		Color = 0x1,
+		Depth = 0x2,
+		Stencil = 0x4
+	};
+
 	// 타입을 변수로 삼아야 했다.
 	enum eVertexElementType
 	{
@@ -105,5 +113,6 @@ namespace Dive
 		DXGI_FORMAT_R8G8B8A8_UNORM
 	};
 
+	inline constexpr int32_t MAX_RENDERTARGETS = 4;
 	inline constexpr int32_t MAX_VERTEX_STREAMS = 4;
 }

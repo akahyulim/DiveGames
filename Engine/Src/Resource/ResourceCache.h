@@ -24,6 +24,9 @@ namespace Dive
 		template<class T> void GetResources(std::vector<T*>& outReosurces);
 		void GetResources(StringHash type, std::vector<Resource*>& outResources);
 
+		template<class T> T* GetExistingResource(const std::string& name);
+		Resource* GetExistingResource(StringHash type, const std::string& name);
+
 		template<class T> void RemoveResource(const std::string& name);
 		void RemoveResource(StringHash type, const std::string& name);
 		template<class T> void RemoveResources();
@@ -82,5 +85,12 @@ namespace Dive
 		{
 			outResources[i] = dynamic_cast<T*>(resources[i]);
 		}
+	}
+
+	template<class T> 
+	T* ResourceCache::GetExistingResource(const std::string& name)
+	{
+		StringHash type = T::GetTypeStatic();
+		return dynamic_cast<T*>(GetExistingResource(type, name));
 	}
 }

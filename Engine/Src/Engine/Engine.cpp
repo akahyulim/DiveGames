@@ -1,9 +1,9 @@
 #include "divepch.h"
 #include "Engine.h"
 #include "EngineDef.h"
+#include "EngineEvents.h"
 #include "Core/Context.h"
 #include "Core/EventSystem.h"
-#include "Core/CoreEvents.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
 #include "Resource/ResourceCache.h"
@@ -48,6 +48,11 @@ namespace Dive
 
 		// start logging
 		GetSubsystem<Log>()->Initialize("Dive.log");
+
+		// add resource path
+		// 파라미터를 받는다.
+		if (!intializeResourceCache())
+			return false;
 
 		// 그래픽스 초기화
 		{
@@ -123,7 +128,12 @@ namespace Dive
 	
 	void Engine::Update()
 	{
+		// 시간이 다 같지는 않을텐데...
 		float deltaTime = m_DeltaTime;
+
+		PreUpdateEvent preUdateEvent;
+		preUdateEvent.SetDeltaTime(deltaTime);
+		FIRE_EVENT(preUdateEvent);
 
 		UpdateEvent updateEvent;
 		updateEvent.SetDeltaTime(deltaTime);
@@ -133,6 +143,7 @@ namespace Dive
 		postUpdateEvent.SetDeltaTime(deltaTime);
 		FIRE_EVENT(postUpdateEvent);
 
+		// 아래 두 이벤트는 의미가 애매하다.
 		RenderUpdateEvent renderUpdateEvent;
 		renderUpdateEvent.SetDeltaTime(deltaTime);
 		FIRE_EVENT(renderUpdateEvent);
@@ -188,5 +199,19 @@ namespace Dive
 		}
 
 		m_bExiting = true;
+	}
+
+	// 파라미터와 올드 지우기 두 개를 받는다.
+	// 일단 기본 경로만 등록하자.
+	bool Engine::intializeResourceCache()
+	{
+		auto* pCache = GetSubsystem<ResourceCache>();
+
+		//pCache->AddResourceDir("CoreData/RenderPaths");
+
+		pCache->AddResourceDir("Assets/Textures");
+		pCache->AddResourceDir("Assets/Models");
+
+		return true;
 	}
 }

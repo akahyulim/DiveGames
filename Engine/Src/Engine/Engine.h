@@ -49,6 +49,8 @@ namespace Dive
 		// 실제 종료 수행.
 		void doExit();
 
+		bool intializeResourceCache();
+
 	private:
 		// 초기화 플래그.
 		bool m_bInitialized;

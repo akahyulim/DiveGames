@@ -173,7 +173,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\CoreDefs.h" />
-    <ClInclude Include="Src\Core\CoreEvents.h" />
     <ClInclude Include="Src\Core\Context.h" />
     <ClInclude Include="Src\Core\EventSystem.h" />
     <ClInclude Include="Src\Core\Object.h" />
@@ -184,13 +183,12 @@
     <ClInclude Include="Src\Engine\Application.h" />
     <ClInclude Include="Src\Engine\Engine.h" />
     <ClInclude Include="Src\Engine\EngineDef.h" />
+    <ClInclude Include="Src\Engine\EngineEvents.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
     <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
     <ClInclude Include="Src\Graphics\IndexBuffer.h" />
     <ClInclude Include="Src\Graphics\InputLayout.h" />
-    <ClInclude Include="Src\Graphics\Mesh.h" />
-    <ClInclude Include="Src\Graphics\Model.h" />
     <ClInclude Include="Src\Graphics\Shader.h" />
     <ClInclude Include="Src\Graphics\Texture.h" />
     <ClInclude Include="Src\Graphics\Texture2D.h" />
@@ -202,8 +200,13 @@
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Math\MathDefs.h" />
     <ClInclude Include="Src\Math\StringHash.h" />
+    <ClInclude Include="Src\Renderer\Mesh.h" />
+    <ClInclude Include="Src\Renderer\Model.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
+    <ClInclude Include="Src\Renderer\RendererEvents.h" />
+    <ClInclude Include="Src\Renderer\RenderPath.h" />
     <ClInclude Include="Src\Renderer\View.h" />
+    <ClInclude Include="Src\Renderer\Viewport.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceCache.h" />
     <ClInclude Include="Src\Scene\Component\Component.h" />
@@ -224,8 +227,6 @@
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\InputLayout.cpp" />
-    <ClCompile Include="Src\Graphics\Mesh.cpp" />
-    <ClCompile Include="Src\Graphics\Model.cpp" />
     <ClCompile Include="Src\Graphics\Shader.cpp" />
     <ClCompile Include="Src\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Graphics\Texture2D.cpp" />
@@ -235,8 +236,12 @@
     <ClCompile Include="Src\IO\Log.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Math\MathDefs.cpp" />
+    <ClCompile Include="Src\Renderer\Mesh.cpp" />
+    <ClCompile Include="Src\Renderer\Model.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
+    <ClCompile Include="Src\Renderer\RenderPath.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
+    <ClCompile Include="Src\Renderer\Viewport.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceCache.cpp" />
     <ClCompile Include="Src\Scene\Component\Component.cpp" />

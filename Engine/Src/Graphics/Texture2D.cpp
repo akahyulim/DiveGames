@@ -1,8 +1,12 @@
 #include "divepch.h"
 #include "Texture2D.h"
 #include "Graphics.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/Viewport.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
+#include "Engine/EngineEvents.h"
+#include "Renderer/RendererEvents.h"
 #include "IO/Log.h"
 #include "IO/FileSystem.h"
 
@@ -13,11 +17,16 @@ namespace Dive
 	Texture2D::Texture2D(Context* pContext)
 		: Texture(pContext)
 	{
+		// 그냥 생성자에서 한 번 구독시키고, 핸들러에서 usage를 확인하는 편이 나을 것 같다.
+		// 물론 이때문에 RenderTarget을 생성하지 않는데도 매 번 이벤트를 받는 오버헤드가 발생한다.
+		SUBSCRIBE_EVENT(eEventType::RenderTargetUpdate, EVENT_HANDLER_PARAM(OnUpdateRenderTarget));
 	}
 
 	Texture2D::~Texture2D()
 	{
 		Release();
+
+		DV_LOG_ENGINE_DEBUG("Texture2D 소멸자 호출");
 	}
 
 	void Texture2D::RegisterObject(Context* pContext)
@@ -238,5 +247,17 @@ namespace Dive
 		}
 
 		return true;
+	}
+
+	void Texture2D::OnUpdateRenderTarget(const Event& e)
+	{
+		if (m_Usage != eTextureUsage::RenderTarget || !m_pRenderTargetView)
+			return;
+
+		DV_LOG_ENGINE_DEBUG("Event - UpdateRenderTarget");
+
+		auto* pRenderer = GetSubsystem<Renderer>();
+		if (pRenderer)
+			pRenderer->QueueViewportByRenderTarget(this);
 	}
 }

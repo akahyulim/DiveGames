@@ -8,6 +8,7 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
 	class Shader;
+	class Texture2D;
 
 	// 윈도우 클래스 이름.
 	const LPCWSTR WND_CLASS_NAME = L"AppWnd";
@@ -86,7 +87,9 @@ namespace Dive
 		// 윈도우 위치 설정.
 		void SetWindowPosition(int x, int y);
 		// 윈도우 클라이언트 영역 크기 리턴.
-		void GetWindowSize(int& outWidth, int&outHeight) const;
+		int GetWidth() const { return m_Width; }
+		int GetHeight() const { return m_Height; }
+		DirectX::XMINT2 GetSize() const { return DirectX::XMINT2(m_Width, m_Height); }
 		// 윈도우 클라이언트 영역 크기 재설정.
 		void ResizeWindow(int width, int height);
 		// 윈도우 보이기.
@@ -109,7 +112,7 @@ namespace Dive
 		bool SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
 			bool tripleBuffer, int multiSample, int refreshRate);
 
-		void Clear(int flags, const DirectX::XMFLOAT4& color, float depth, float stencil);
+		void Clear(int flags, const DirectX::XMFLOAT4& color, float depth, int stencil);
 
 		bool IsDeviceLost();
 
@@ -122,6 +125,11 @@ namespace Dive
 		void Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int vertexStart);
 		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int indexStart, unsigned int baseVertexIndex = 0);
 		void DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int instanceCount, unsigned int indexStart);
+
+		void SetDepthStencil(Texture2D* pTexture);
+
+		ID3D11RenderTargetView* GetRenderTarget(unsigned int index) const;
+		void SetRenderTarget(unsigned int index, Texture2D* pTexture);
 
 		VertexBuffer* GetVertexBuffer(unsigned int index) const;
 		void SetVertexBuffer(VertexBuffer* pBuffer);
@@ -197,11 +205,20 @@ namespace Dive
 
 		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveType;
 
-		VertexBuffer* m_VertexBuffers[MAX_VERTEX_STREAMS];
-		IndexBuffer* m_pIndexBuffer;
+		Texture2D* m_pRenderTargets[MAX_RENDERTARGETS] = { nullptr, };
+		Texture2D* m_pDepthStencil = nullptr;
 
-		Shader* m_pVertexShader;
-		Shader* m_pPixelShader;
+		ID3D11RenderTargetView* m_pCurRenderTargetViews[MAX_RENDERTARGETS] = { nullptr, };
+		ID3D11DepthStencilView* m_pCurDepthStencilView = nullptr;
+
+		VertexBuffer* m_pVertexBuffers[MAX_VERTEX_STREAMS] = { nullptr, };
+		IndexBuffer* m_pIndexBuffer = nullptr;;
+
+		Shader* m_pVertexShader = nullptr;
+		Shader* m_pPixelShader = nullptr;
+
+		// dirty check 전부 모으기.
+		bool m_bRenderTargetsDirty = false;
 	};
 
 	void RegisterGraphicsObject(Context* pContext);

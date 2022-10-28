@@ -6,45 +6,35 @@ namespace Dive
 	class Graphics;
 	class Renderer;
 	class Scene;
+	class Texture;
+	class Viewport;
 
-	// scene, camera, render path를 참조하여 graphics로 render
+	enum class eRenderPath;
+
 	class View : public Object
 	{
 		DIVE_OBJECT(View, Object)
 
 	public:
 		explicit View(Context* pContext);
-		View(Context* pContext, Scene* pScene);	// + camera, renderpath
-		// 기본 매개변수 + rect
-		~View();
+		~View() override;
 
-		// view part
-		// update: FrameInfo = frame count, time step, view size, camera
+		void Update(float delta);
 		void Render();
 
-		// viewport part
-		// get, set scene
-		// get, set camera
-		// get, set, load render path
-		// get, set rect
-		// get screen ray
-		// world to screen point
-		// screen to world point
+		bool Define(Texture* pRenderTarget, Viewport* pViewport);
 
 	private:
-		void setRenderTargets(int command);
-
-		void excuteRenderPathCommands();
-
 	private:
-		// viewport part
-		Scene* m_pScene;
-		// camera
-		// render path
-		RECT m_Rect;
+		Graphics* m_pGraphics = nullptr;
+		Renderer* m_pRenderer = nullptr;
+		Scene* m_pScene = nullptr;
 
-		// view part
-		Graphics* m_pGraphics;
-		Renderer* m_pRenderer;
+		Texture* m_pRenderTarget = nullptr;
+		Texture* m_pCurrentRenderTarget = nullptr;
+
+		RECT m_ViewRect = { 0, 0, 0, 0 };
+		DirectX::XMINT2 m_ViewSize = { 0 ,0 };
+		DirectX::XMINT2 m_RenderTargetSize = { 0, 0 };
 	};
 }

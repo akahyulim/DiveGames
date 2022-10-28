@@ -18,11 +18,14 @@ namespace Dive
 {
 	enum class eEventType
 	{
-		// Core
-		BeginFrame, Update, PostUpdate, RenderUpdate, PostRenderUpdate, EndFrame,
+		// Engine
+		BeginFrame, PreUpdate, Update, PostUpdate, RenderUpdate, PostRenderUpdate, EndFrame,
 
 		// Graphics
 		WindowEvent, ScreenMode, BeginRender, EndRender,
+
+		// Renderer
+		RenderTargetUpdate,
 
 		// Scene
 		SceneUpdate, 
