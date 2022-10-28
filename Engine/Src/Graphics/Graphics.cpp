@@ -264,22 +264,6 @@ namespace Dive
 		DV_LOG_ENGINE_DEBUG("Client Size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 	}
 
-	// 윈도우의 클라이언트 영역 크기를 전달.
-	void Graphics::GetWindowSize(int& outWidth, int& outHeight) const
-	{
-		if (!m_hWnd)
-			return;
-
-		RECT rt{ 0, 0, 0, 0 };
-		::GetClientRect(m_hWnd, &rt);
-
-		outWidth = static_cast<int>(rt.right - rt.left);
-		outHeight = static_cast<int>(rt.bottom - rt.top);
-
-		DV_LOG_ENGINE_DEBUG("Window width: {0:d}, height: {1:d}", outWidth, outHeight);
-	}
-
-
 	// 이건 앱에서 윈도우 크기 및 해상도를 변경하는 함수이다.
 	// 일단 이 곳에서 스왑체인을 리사이즈 하면 WM_SIZE가 발생하고
 	// 이를 통해 OnResizeWindow()를 통해 백퍼버와 렌더타켓을 갱신한다.
@@ -336,9 +320,6 @@ namespace Dive
 		// 알트 + 엔터로 변경해도 wm_size는 발생하지 않는다.
 		// => 발생한다. 왜 인지 모르겠지만 두 번째 이후부터 발생한다.
 		// 크기는 윈도우 전체 크기로 백버퍼까지 변경된다.
-		int a, b;
-		GetWindowSize(a, b);
-		DV_LOG_ENGINE_DEBUG("FullScreen Size: {0:d} x {1:d}", a, b);
 	}
 
 	void Graphics::SetBorderlessWindow(bool bBorderelss)
@@ -457,13 +438,28 @@ namespace Dive
 		return true;
 	}
 
-	void Graphics::Clear(int flags, const DirectX::XMFLOAT4& color, float depth, float stencil)
+	// flags는 clear target flag다.
+	// 논리 합이 가능하게 enum으로 만들어야 할 듯 하다.
+	void Graphics::Clear(int flags, const DirectX::XMFLOAT4& color, float depth, int stencil)
 	{
-		// render target view, depth stencil view를 clear한다.
+		prepareDraw();
 
-		// 일단 임시로 backbuffer만 clear
-		float colors[]{ color.x, color.y, color.z, color.w };
-		m_pDeviceContext->ClearRenderTargetView(m_pDefaultRenderTargetView, colors);
+		// render target view clear
+		//if(flags & eClearTarget::Color)
+		{
+			float colors[]{ color.x, color.y, color.z, color.w };
+			for (int i = 0; i < 4; ++i)
+			{
+				if (m_pCurRenderTargetViews[i])
+					m_pDeviceContext->ClearRenderTargetView(m_pCurRenderTargetViews[i], colors);
+			}
+		}
+
+		// depth stencil view clear
+		//if(flags & (eClearTarget::Depth | eClearTarget::Stencil))
+		{
+
+		}
 	}
 
 	bool Graphics::IsDeviceLost()
@@ -482,9 +478,20 @@ namespace Dive
 		// 전체화면이면서 최소화 되어 있다면 false?
 		// => 가능한 조합이 아닌 듯 한데...? 
 
-		// reset render targets?
-		// => 4개짜리 배열을 전부 nullptr로 초기화한다.
-		// => GBuffer일 수도 있고, 아닐 수도 있다...
+		// 함수로 만들어져 있다.
+		// 이 곳이랑 OnWindowResized, UpdateSwapChain에서 호출된다.
+		{
+			for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
+				SetRenderTarget(i, nullptr);
+			SetDepthStencil(nullptr);
+			// viewport
+		}
+
+
+		// SetTexture
+		// 16개를 전부 nullptr로 한다.
+		// 어디에 사용하는 텍스쳐인지는 모르겠다.
+		// => shader resource view 같다. 즉, 모델에 붙일 텍스쳐 말이다.
 
 		FIRE_EVENT(BeginRenderEvent());
 
@@ -549,6 +556,7 @@ namespace Dive
 		return index < MAX_RENDERTARGETS ? m_pRenderTargets[index]->GetRenderTargetView() : nullptr;
 	}
 
+	// Textur2D가 아니라 Texture를 받아야 하지 않을까?
 	void Graphics::SetRenderTarget(unsigned int index, Texture2D* pTexture)
 	{
 		if (index >= MAX_RENDERTARGETS)
@@ -558,6 +566,15 @@ namespace Dive
 		{
 			m_pRenderTargets[index] = pTexture;
 			m_bRenderTargetsDirty = true;
+
+			if (pTexture)
+			{
+				if (pTexture->GetMipmapCount() > 1)
+					pTexture->SetMipLevelsDirty();
+
+				// 이외에도 몇가지 처리를 더 하는데... 잘 모르겠다.
+				// 그런데 SetTexture를 호출해야만 밉맵을 생성할텐데...
+			}
 		}
 	}
 
@@ -631,8 +648,11 @@ namespace Dive
 		if (!IsInitialized())
 			return;
 
-		int width, height;
-		GetWindowSize(width, height);
+		RECT rt{ 0, 0, 0, 0 };
+		::GetClientRect(m_hWnd, &rt);
+
+		int width = static_cast<int>(rt.right - rt.left);
+		int height = static_cast<int>(rt.bottom - rt.top);
 
 		if (width == m_Width && height == m_Height)
 			return;
@@ -718,8 +738,7 @@ namespace Dive
 		return true;
 	}
 
-	// render target을 재생성하는 함수 같다.
-	// 기존에 전체화면 과정에서 구현했던 함수랑 비슷하다.
+	// 전달받은 크기로 Default RenderTargetView, DepthStencilView를 생성한다.
 	bool Graphics::updateSwapChain(int width, int height)
 	{
 		// 빈 렌더타겟뷰를 Set
@@ -732,6 +751,10 @@ namespace Dive
 		DV_RELEASE(m_pDefaultDepthStencilView);
 
 		// 현재 렌더타겟배열, 뎁스스텐실 뷰 nullptr
+		for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
+			m_pCurRenderTargetViews[i] = nullptr;
+		m_pCurDepthStencilView = nullptr;
+		m_bRenderTargetsDirty = true;
 
 		// 리사이즈 버퍼
 		m_pSwapChain->ResizeBuffers(1, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
@@ -754,47 +777,76 @@ namespace Dive
 		DV_RELEASE(pBackbufferTexture);
 
 		// 디폴트 뎁스스텐실 생성
+		D3D11_TEXTURE2D_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Width = (UINT)width;
+		desc.Height = (UINT)height;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		desc.SampleDesc.Count = 1;// static_cast<UINT>(screenParams_.multiSample_);
+		desc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(desc.Format, screenParams_.multiSample_);
+		desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		desc.CPUAccessFlags = 0;
+		desc.MiscFlags = 0;
+
+		if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pDefaultDepthStencilTexture)))
+		{
+			DV_RELEASE(m_pDefaultDepthStencilTexture);
+			DV_LOG_ENGINE_ERROR("백버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
+			return false;
+		}
+
+		if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pDefaultDepthStencilTexture), nullptr, &m_pDefaultDepthStencilView)))
+		{
+			DV_RELEASE(m_pDefaultDepthStencilView);
+			DV_LOG_ENGINE_ERROR("백버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
+			return false;
+		}
 
 		// 백버퍼 사이즈를 저장
 		m_Width = width;
 		m_Height = height;
+
+		// ResetRenderTargets
+		{
+			for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
+				SetRenderTarget(i, nullptr);
+			SetDepthStencil(nullptr);
+			// viewport
+		}
 
 		return true;
 	}
 
 	// 이름을 바꿨으면 좋겠다.
 	// 각종 bind를 수행하는 구문이다.
-	// Draw에서만 그려진다는 사실에 의미가 있다.
-	// 이로인해 Editor에서 ImGui가 그리는 부분과 엔진에서 그리는 부분이 자연스레 나뉘어졌다.
 	void Graphics::prepareDraw()
 	{
-		// 현재 depthstencilview와 rendertargetview를 포인터 변수로 생성한 후
-		// 여러가지 확인을 거쳐 채워넣고 Set했다.
-		// 이는 추후 문제를 발생시킬 수 있다.
 		if (m_bRenderTargetsDirty)
 		{
-			ID3D11DepthStencilView* pDepthStencilView = nullptr;
-			pDepthStencilView = (m_pDepthStencil && m_pDepthStencil->GetUsage() == eTextureUsage::DepthStencil) ?
+			// 이렇게하면 ID3D11DepthstencilView를 무조건 사용하게 된다.
+			m_pCurDepthStencilView = (m_pDepthStencil && m_pDepthStencil->GetUsage() == eTextureUsage::DepthStencil) ?
 				m_pDepthStencil->GetDepthStencilView() : m_pDefaultDepthStencilView;
 			// write가 아니라면 read only
 
-			ID3D11RenderTargetView* pRenderTargetViews[MAX_RENDERTARGETS] = { nullptr, };
 			for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
 			{
-				pRenderTargetViews[i] = (m_pRenderTargets[i] && m_pRenderTargets[i]->GetUsage() == eTextureUsage::RenderTarget) ?
+				m_pCurRenderTargetViews[i] = (m_pRenderTargets[i] && m_pRenderTargets[i]->GetUsage() == eTextureUsage::RenderTarget) ?
 					m_pRenderTargets[i]->GetRenderTargetView() : nullptr;
 			}
 
 			if (!m_pRenderTargets[0] && (!m_pDepthStencil ||
 				(m_pDepthStencil && m_pDepthStencil->GetWidth() == m_Width && m_pDepthStencil->GetHeight() == m_Height)))
 			{
-				pRenderTargetViews[0] = m_pDefaultRenderTargetView;
+				m_pCurRenderTargetViews[0] = m_pDefaultRenderTargetView;
 			}
 
-			m_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &pRenderTargetViews[0], pDepthStencilView);
+			m_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &m_pCurRenderTargetViews[0], m_pCurDepthStencilView);
 			m_bRenderTargetsDirty = false;
 		}
-
+	
 		// shader resources + samplers
 
 		// vertex buffer + inputlayout

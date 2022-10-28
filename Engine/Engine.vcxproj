@@ -173,7 +173,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Src\Core\CoreDefs.h" />
-    <ClInclude Include="Src\Core\CoreEvents.h" />
     <ClInclude Include="Src\Core\Context.h" />
     <ClInclude Include="Src\Core\EventSystem.h" />
     <ClInclude Include="Src\Core\Object.h" />
@@ -184,6 +183,7 @@
     <ClInclude Include="Src\Engine\Application.h" />
     <ClInclude Include="Src\Engine\Engine.h" />
     <ClInclude Include="Src\Engine\EngineDef.h" />
+    <ClInclude Include="Src\Engine\EngineEvents.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
     <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
@@ -203,7 +203,10 @@
     <ClInclude Include="Src\Renderer\Mesh.h" />
     <ClInclude Include="Src\Renderer\Model.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
+    <ClInclude Include="Src\Renderer\RendererEvents.h" />
+    <ClInclude Include="Src\Renderer\RenderPath.h" />
     <ClInclude Include="Src\Renderer\View.h" />
+    <ClInclude Include="Src\Renderer\Viewport.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceCache.h" />
     <ClInclude Include="Src\Scene\Component\Component.h" />
@@ -236,7 +239,9 @@
     <ClCompile Include="Src\Renderer\Mesh.cpp" />
     <ClCompile Include="Src\Renderer\Model.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
+    <ClCompile Include="Src\Renderer\RenderPath.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
+    <ClCompile Include="Src\Renderer\Viewport.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceCache.cpp" />
     <ClCompile Include="Src\Scene\Component\Component.cpp" />

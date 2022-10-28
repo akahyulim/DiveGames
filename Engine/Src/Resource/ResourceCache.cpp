@@ -46,9 +46,9 @@ namespace Dive
 		auto fileName = FileSystem::GetFileNameAndExtension(name);
 		StringHash nameHash(fileName);
 
-		auto* pExistedResource = findResource(type, nameHash);
-		if (pExistedResource)
-			return pExistedResource;
+		auto* pExistingResource = findResource(type, nameHash);
+		if (pExistingResource)
+			return pExistingResource;
 
 		auto* pNewResource = static_cast<Resource*>(m_pContext->CreateObject(type));
 		if (!pNewResource->LoadFromFile(name))
@@ -76,6 +76,14 @@ namespace Dive
 				outResources.emplace_back(j->second);
 			}
 		}
+	}
+
+	Resource* ResourceCache::GetExistingResource(StringHash type, const std::string& name)
+	{
+		auto fileName = FileSystem::GetFileNameAndExtension(name);
+		auto nameHash = StringHash(fileName);
+
+		return findResource(type, nameHash);
 	}
 
 	void ResourceCache::RemoveResource(StringHash type, const std::string& name)

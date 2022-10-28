@@ -170,6 +170,7 @@ namespace Editor
 		);
 	}
 	
+	// 그냥 OnBeginRender()에 넣는 편이 나을 것 같다.
 	void Editor::drawPanels()
 	{
 		// Note: Switch this to true to enable dockspace

@@ -6,6 +6,7 @@ namespace Dive
 {
 	class Context;
 	class Graphics;
+	class Viewport;
 
 	// 일단 멀티 샘플링 미지원.
 	class Texture : public Resource
@@ -29,11 +30,16 @@ namespace Dive
 		bool GetEnableMipmap() const { return m_bEnableMipmap; }
 		void SetEnableMipmap(bool enable) { m_bEnableMipmap = enable; }
 
+		// 여기에서 관리한다는게 조금 애매하다.
+		ID3D11Texture2D* GetTexture2D() const { return m_pTexture2D; }
+		
 		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_pShaderResourceView; }
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_pRenderTargetView; }
 		ID3D11DepthStencilView* GetDepthStencilView() const { return m_pDepthStencilView; }
 		ID3D11DepthStencilView* GetDepthStencilViewReadOnly() const { return m_pDepthStencilViewReadOnly; }
 
+		void SetMipLevelsDirty();
+		bool GetMipLevelsDirty() const { return m_bMipLevelsDirty; }
 		void GenerateLevels();
 
 		unsigned int GetRowPitchSize(int width) const;
@@ -42,6 +48,10 @@ namespace Dive
 		static DXGI_FORMAT GetSRVFormat(DXGI_FORMAT format);
 		static DXGI_FORMAT GetDSVFormat(DXGI_FORMAT format);
 		static unsigned int CheckMaxMipmapCount(int width, int height);
+
+		unsigned int GetNumViewports() const { return static_cast<unsigned int>(m_Viewports.size()); }
+		Viewport* GetViewport(unsigned int index) const { return m_Viewports[index]; }
+		void SetViewport(unsigned int index, Viewport* pViewport);
 
 	private:
 
@@ -55,6 +65,8 @@ namespace Dive
 		unsigned int m_MipmapCount;
 		bool m_bEnableMipmap;
 
+		bool m_bMipLevelsDirty;	// 위의 변수와 차이가 있나...?
+
 
 		ID3D11Texture2D* m_pTexture2D;
 		ID3D11ShaderResourceView* m_pShaderResourceView;
@@ -62,5 +74,8 @@ namespace Dive
 		ID3D11DepthStencilView* m_pDepthStencilView;
 		ID3D11DepthStencilView* m_pDepthStencilViewReadOnly;
 		// Array, Cube용으로 추가가 필요할 것 같다.
+
+		// 벡터로 관리할 만큼 2개 이상을 사용할까?
+		std::vector<Viewport*> m_Viewports;
 	};
 }

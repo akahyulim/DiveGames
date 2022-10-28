@@ -1,9 +1,9 @@
 #include "divepch.h"
 #include "Engine.h"
 #include "EngineDef.h"
+#include "EngineEvents.h"
 #include "Core/Context.h"
 #include "Core/EventSystem.h"
-#include "Core/CoreEvents.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
 #include "Resource/ResourceCache.h"
@@ -128,7 +128,12 @@ namespace Dive
 	
 	void Engine::Update()
 	{
+		// 시간이 다 같지는 않을텐데...
 		float deltaTime = m_DeltaTime;
+
+		PreUpdateEvent preUdateEvent;
+		preUdateEvent.SetDeltaTime(deltaTime);
+		FIRE_EVENT(preUdateEvent);
 
 		UpdateEvent updateEvent;
 		updateEvent.SetDeltaTime(deltaTime);
@@ -138,6 +143,7 @@ namespace Dive
 		postUpdateEvent.SetDeltaTime(deltaTime);
 		FIRE_EVENT(postUpdateEvent);
 
+		// 아래 두 이벤트는 의미가 애매하다.
 		RenderUpdateEvent renderUpdateEvent;
 		renderUpdateEvent.SetDeltaTime(deltaTime);
 		FIRE_EVENT(renderUpdateEvent);

@@ -7,10 +7,12 @@ namespace Editor
 	{
 	public:
 		ScenePanel(Editor* pEditor);
-		~ScenePanel();
+		~ScenePanel() override;
 
 		void renderWindow() override;
 
 	private:
+		std::unique_ptr<Dive::Texture2D> m_pSceneRenderTarget;
+		Dive::Viewport* m_pSceneViewport = nullptr;
 	};
 }

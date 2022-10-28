@@ -13,9 +13,6 @@
     <ClInclude Include="Src\Core\Variant.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\CoreEvents.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\IO\IOEvents.h">
       <Filter>Src\IO</Filter>
     </ClInclude>
@@ -118,6 +115,18 @@
     <ClInclude Include="Src\Renderer\Model.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Renderer\RenderPath.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Viewport.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\RendererEvents.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Engine\EngineEvents.h">
+      <Filter>Src\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -205,6 +214,12 @@
       <Filter>Src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Model.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\RenderPath.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Viewport.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
