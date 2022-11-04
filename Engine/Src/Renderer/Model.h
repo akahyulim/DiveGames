@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Object.h"
 #include "Resource/Resource.h"
-#include "GraphicsDefs.h"
+#include "Graphics/GraphicsDefs.h"
 
 namespace Dive
 {
