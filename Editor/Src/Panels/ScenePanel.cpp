@@ -24,6 +24,7 @@ namespace Editor
 
 	ScenePanel::~ScenePanel()
 	{
+		DV_LOG_CLIENT_TRACE("ScenePanel 소멸자 호출");
 	}
 
 	void ScenePanel::renderWindow()

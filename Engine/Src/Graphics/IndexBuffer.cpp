@@ -9,97 +9,66 @@ namespace Dive
 {
 	IndexBuffer::IndexBuffer(Context* pContext)
 		: Object(pContext),
-		m_pGraphics(GetSubsystem<Graphics>()),
-		m_pShadowData(nullptr),
-		m_pBuffer(nullptr),
-		m_IndexCount(0),
-		m_IndexSize(0),
-		m_bDynamic(false)
+		m_pGraphics(GetSubsystem<Graphics>())
 	{
-		DV_ASSERT(m_pGraphics);
+		DV_ASSERT(m_pGraphics->IsInitialized());
 	}
 
 	IndexBuffer::~IndexBuffer()
 	{
-		ReleaseBuffer();
+		DV_LOG_ENGINE_TRACE("IndexBuffer 소멸자 호출");
 
-		DV_DELETE_ARRAY(m_pShadowData);
-	}
-	
-	void IndexBuffer::ReleaseBuffer()
-	{
-		DV_RELEASE(m_pBuffer);
+		DV_DELETE_ARRAY(m_pData);
 	}
 
-	bool IndexBuffer::SetSize(unsigned int indexCount, bool bLargeIndices)
+	bool IndexBuffer::SetSize(unsigned int indexCount, bool bLargeIndices, bool bDynamic)
 	{
 		if (!indexCount)
 		{
-			DV_LOG_ENGINE_ERROR("잘못된 인덱스 카운트({:d})를 전달받았습니다.", indexCount);
+			DV_LOG_ENGINE_ERROR("IndexBuffer::SetSize - 잘못된 인덱스 카운트({:d})를 전달받았습니다.", indexCount);
 			return false;
 		}
 
 		m_IndexCount = indexCount;
 		m_IndexSize = static_cast<unsigned int>(bLargeIndices ? sizeof(unsigned int) : sizeof(unsigned short));
+		m_bDynamic = bDynamic;
 
-		if (m_pShadowData)
-			DV_DELETE_ARRAY(m_pShadowData);
-		m_pShadowData = new unsigned char[m_IndexCount * m_IndexSize];
-		memset(static_cast<void*>(m_pShadowData), NULL, m_IndexCount * m_IndexSize);
+		if (m_pData)
+			DV_DELETE_ARRAY(m_pData);
+		m_pData = new unsigned char[m_IndexCount * m_IndexSize];
+		memset(static_cast<void*>(m_pData), NULL, m_IndexCount * m_IndexSize);
 
-		return true;
-	}
-
-	bool IndexBuffer::CreateBuffer(unsigned int indexCount, bool bLargeIndices, const void* pData)
-	{
-		if (!indexCount)
-		{
-			DV_LOG_ENGINE_ERROR("잘못된 인덱스 카운트({:d})를 전달받아 인덱스 버퍼를 생성할 수 없습니다.", indexCount);
-			return false;
-		}
-
-		m_IndexCount = indexCount;
-		m_IndexSize = static_cast<unsigned int>(bLargeIndices ? sizeof(unsigned int) : sizeof(unsigned short));
-		m_bDynamic = pData == nullptr;
-
-		ReleaseBuffer();
+		m_pBuffer.Reset();
 
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		desc.CPUAccessFlags = m_bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 		desc.Usage = m_bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
-		desc.ByteWidth = (UINT)(m_IndexCount * m_IndexSize);
-
-		D3D11_SUBRESOURCE_DATA data;
-		ZeroMemory(&data, sizeof(data));
-		data.pSysMem = pData;
-		data.SysMemPitch = 0;
-		data.SysMemSlicePitch = 0;
+		desc.ByteWidth = static_cast<UINT>(m_IndexCount * m_IndexSize);
 
 		if (FAILED(m_pGraphics->GetDevice()->CreateBuffer(
-			&desc, 
-			m_bDynamic ? nullptr : &data, 
-			(ID3D11Buffer**)&m_pBuffer)))
+			&desc,
+			nullptr,
+			m_pBuffer.GetAddressOf())))
 		{
-			DV_RELEASE(m_pBuffer);
-			DV_LOG_ENGINE_ERROR("인덱스 버퍼 생성에 실패하였습니다.");
+			DV_LOG_ENGINE_ERROR("IndexBuffer::SetSize - 인덱스 버퍼 생성에 실패하였습니다.");
 			return false;
 		}
 
 		return true;
 	}
-	
+
 	bool IndexBuffer::SetData(const void* pData)
 	{
 		if (!pData)
 		{
-			DV_LOG_ENGINE_ERROR("인덱스 버퍼 데이터로 널 포인터를 전달받았습니다.");
+			DV_LOG_ENGINE_ERROR("IndexBuffer::SetData - 인덱스 버퍼 데이터로 널 포인터를 전달받았습니다.");
 			return false;
 		}
 
-		if (m_pShadowData && m_pShadowData != pData)
-			memcpy_s(m_pShadowData, m_IndexCount * m_IndexSize, pData, m_IndexCount * m_IndexSize);
+		if (m_pData && m_pData != pData)
+			memcpy_s(m_pData, m_IndexCount * m_IndexSize, pData, m_IndexCount * m_IndexSize);
 
 		if (m_pBuffer)
 		{
@@ -117,14 +86,14 @@ namespace Dive
 			{
 				D3D11_BOX destBox;
 				destBox.left = 0;
-				destBox.right = m_IndexCount * m_IndexSize;
+				destBox.right = (m_IndexCount * m_IndexSize);
 				destBox.top = 0;
 				destBox.bottom = 1;
 				destBox.front = 0;
 				destBox.back = 1;
 
 				m_pGraphics->GetDeviceContext()->UpdateSubresource(
-					(ID3D11Buffer*)m_pBuffer,
+					static_cast<ID3D11Resource*>(m_pBuffer.Get()),
 					0,
 					&destBox,
 					pData,
@@ -142,20 +111,20 @@ namespace Dive
 		{
 			D3D11_MAPPED_SUBRESOURCE mappedSubresource;
 			if (FAILED(m_pGraphics->GetDeviceContext()->Map(
-				(ID3D11Buffer*)m_pBuffer,
+				static_cast<ID3D11Resource*>(m_pBuffer.Get()),
 				0,
 				D3D11_MAP_WRITE_DISCARD,
 				0,
 				&mappedSubresource)))
 			{
-				DV_LOG_ENGINE_ERROR("인덱스 버퍼 Map에 실패하였습니다.");
+				DV_LOG_ENGINE_ERROR("IndexBuffer::Map - 인덱스 버퍼 Map에 실패하였습니다.");
 				return nullptr;
 			}
 
 			return mappedSubresource.pData;
 		}
-		else if (m_pShadowData)
-			return m_pShadowData;
+		else if (m_pData)
+			return m_pData;
 
 		return nullptr;
 	}
@@ -164,7 +133,7 @@ namespace Dive
 	{
 		if (m_pBuffer)
 		{
-			m_pGraphics->GetDeviceContext()->Unmap((ID3D11Buffer*)m_pBuffer, 0);
+			m_pGraphics->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer.Get()), 0);
 		}
 	}
 }

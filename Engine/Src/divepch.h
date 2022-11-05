@@ -24,6 +24,7 @@
 
 #include <Windows.h>
 
+#include <wrl.h>
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
 #include <DirectXMath.h>

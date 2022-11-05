@@ -14,6 +14,7 @@ namespace Editor
 
 	HierarchyPanel::~HierarchyPanel()
 	{
+		DV_LOG_CLIENT_TRACE("HierarchyPanel 소멸자 호출");
 	}
 
 	void HierarchyPanel::renderWindow()

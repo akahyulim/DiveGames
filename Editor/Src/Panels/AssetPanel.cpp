@@ -11,6 +11,7 @@ namespace Editor
 
 	AssetPanel::~AssetPanel()
 	{
+		DV_LOG_CLIENT_TRACE("AssetPanel 소멸자 호출");
 	}
 
 	void AssetPanel::renderWindow()

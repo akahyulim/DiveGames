@@ -10,15 +10,14 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Texture2D.h"
+#include "Resource/ResourceCache.h"
 #include "IO/Log.h"
 
 
 namespace Dive
 {
 	Renderer::Renderer(Context* pContext)
-		: Object(pContext),
-		m_pGraphics(nullptr),
-		m_bInitialized(false)
+		: Object(pContext)
 	{
 		// ScreenMode 메시지 구독
 
@@ -31,7 +30,7 @@ namespace Dive
 
 	Renderer::~Renderer()
 	{
-		DV_LOG_ENGINE_DEBUG("Renderer 소멸자 호출");
+		DV_LOG_ENGINE_TRACE("Renderer 소멸자 호출");
 
 		for (int i = 0; i < static_cast<int>(m_Viewports.size()); ++i)
 			DV_DELETE(m_Viewports[i]);
@@ -42,9 +41,6 @@ namespace Dive
 	void Renderer::Update(float delta)
 	{
 		m_Views.clear();
-
-		if (!m_pGraphics || !m_pGraphics->IsInitialized() || m_pGraphics->IsDeviceLost())
-			return;
 
 		for (auto i = static_cast<int>(m_Viewports.size()) - 1; i >= 0; --i)
 			queueViewport(nullptr, m_Viewports[i]);
@@ -70,15 +66,9 @@ namespace Dive
 			initialize();
 		}
 
-		// assert로 graphics 초기화 및 lost 확인
-		// 자신의 initialize도 확인해야 할 것 같은데...
-		DV_ASSERT(m_pGraphics || m_pGraphics->IsInitialized() || !m_pGraphics->IsDeviceLost());
-
 		// 역순으로 Views' Render.
 		if (!m_Views.empty())
 		{
-			DV_LOG_ENGINE_DEBUG("numViews: {:d}", (int)m_Views.size());
-
 			for (int i = static_cast<int>(m_Views.size() - 1); i >= 0; --i)
 			{
 				if (!m_Views[i])
@@ -178,16 +168,10 @@ namespace Dive
 	void Renderer::initialize()
 	{
 		auto pGraphics = GetSubsystem<Graphics>();
-		// cache manager
-
-		// cache manager 도 확인 필요
 		if (!pGraphics || !pGraphics->IsInitialized())
 			return;
 
-		// 일반포인터로 받아 weak_ptr에 넣지 못한다...
-		// 실제로 일반 주소값으로는 weak_ptr을 생성할 수 없다고 한다...
-		m_pGraphics = pGraphics;
-
+		auto pCache = GetSubsystem<ResourceCache>();
 		// cache manager로 부터 load
 		// default light ramp
 		// default light spot
@@ -207,7 +191,7 @@ namespace Dive
 
 		SUBSCRIBE_EVENT(eEventType::RenderUpdate, EVENT_HANDLER_PARAM(OnRenderUpdate));
 
-		DV_LOG_ENGINE_INFO("Renderer 초기화 성공");
+		DV_LOG_ENGINE_TRACE("Renderer 초기화 성공");
 	}
 
 	void Renderer::queueViewport(Texture* pRenderTarget, Viewport* pViewport)

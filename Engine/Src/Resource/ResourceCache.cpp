@@ -14,6 +14,8 @@ namespace Dive
 
 	ResourceCache::~ResourceCache()
 	{
+		DV_LOG_ENGINE_TRACE("ResourceCache 소멸자 호출");
+
 		RemoveAllResources();
 	}
 

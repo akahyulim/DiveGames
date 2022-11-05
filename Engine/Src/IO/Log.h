@@ -51,7 +51,7 @@ namespace Dive
 	public:
 		explicit Log(Context* pContext)
 			: Object(pContext) {}
-		~Log() = default;
+		~Log() override;
 
 		void Initialize(const char* filename);
 

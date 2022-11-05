@@ -163,7 +163,7 @@ namespace Dive
 			}
 
 			// 정점 데이터 기록.
-			pSerializer->Write(m_VertexBuffers[i]->GetShadowData(), m_VertexBuffers[i]->GetVertexCount() * m_VertexBuffers[i]->GetVertexSize());
+			pSerializer->Write(m_VertexBuffers[i]->GetData(), m_VertexBuffers[i]->GetVertexCount() * m_VertexBuffers[i]->GetVertexSize());
 		}
 
 		// 인덱스 버퍼 개수 기록.
@@ -179,7 +179,7 @@ namespace Dive
 			pSerializer->Write(static_cast<unsigned int>(pIndexBuffer->GetIndexSize()));
 			
 			// 인덱스 데이터 기록.
-			pSerializer->Write(pIndexBuffer->GetShadowData(), pIndexBuffer->GetIndexCount() * pIndexBuffer->GetIndexSize());
+			pSerializer->Write(pIndexBuffer->GetData(), pIndexBuffer->GetIndexCount() * pIndexBuffer->GetIndexSize());
 		}
 
 		// 메시 개수 기록

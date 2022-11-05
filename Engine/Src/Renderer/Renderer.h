@@ -18,7 +18,7 @@ namespace Dive
 
 	public:
 		explicit Renderer(Context* pContext);
-		~Renderer();
+		~Renderer() override;
 
 		void Update(float delta);
 		void Render();
@@ -47,9 +47,7 @@ namespace Dive
 		void updateQueuedViewport(unsigned int index);
 
 	private:
-		Graphics* m_pGraphics;
-
-		bool m_bInitialized;
+		bool m_bInitialized = false;
 
 		// viewports, queuedViewports, views 이렇게 관리한다.
 

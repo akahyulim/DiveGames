@@ -30,13 +30,10 @@ namespace Dive
 
 	void View::Update(float delta)
 	{
-		DV_LOG_ENGINE_DEBUG("View::Update");
 	}
 	
 	void View::Render()
 	{
-		DV_LOG_ENGINE_DEBUG("View::Render: {0:d} x {1:d}", m_RenderTargetSize.x, m_RenderTargetSize.y);
-
 		// clear
 		{
 			m_pCurrentRenderTarget = m_pRenderTarget;

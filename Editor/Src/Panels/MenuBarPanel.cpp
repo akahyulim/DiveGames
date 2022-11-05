@@ -14,6 +14,8 @@ namespace Editor
 
 	MenuBarPanel::~MenuBarPanel()
 	{
+		DV_LOG_CLIENT_TRACE("MenuBarPanel 소멸자 호출");
+
 		DV_DELETE(m_pModelImporter);
 	}
 

@@ -12,8 +12,8 @@ namespace Editor
 	class Editor : public Dive::Application
 	{
 	public:
-		Editor(Dive::Context* pContext);
-		~Editor();
+		explicit Editor(Dive::Context* pContext);
+		~Editor() override;
 
 		void Setup() override;
 		void Start() override;
@@ -23,14 +23,20 @@ namespace Editor
 		void OnEndRender(const Dive::Event& e);
 		void OnWindowEvent(const Dive::Event& e);
 
+		MenuBarPanel* GetMenuBarPanel() const { return m_pMenuBar.get(); }
+		ScenePanel* GetScenePanel() const { return m_pScene.get(); }
+		HierarchyPanel* GetHierarchyPanel() const { return m_pHierarchy.get(); }
+		InspectorPanel* GetInspectorPanel() const { return m_pInspector.get(); }
+		AssetPanel* GetAssetPanel() const { return m_pAsset.get(); }
+	
 	private:
 		void drawPanels();
 
 	private:
-		MenuBarPanel* m_pMenuBar;
-		ScenePanel* m_pScene;
-		HierarchyPanel* m_pHierarchy;
-		InspectorPanel* m_pInspector;
-		AssetPanel* m_pAsset;
+		std::unique_ptr<MenuBarPanel> m_pMenuBar;
+		std::unique_ptr<ScenePanel> m_pScene;
+		std::unique_ptr<HierarchyPanel> m_pHierarchy;
+		std::unique_ptr<InspectorPanel> m_pInspector;
+		std::unique_ptr<AssetPanel> m_pAsset;
 	};
 }

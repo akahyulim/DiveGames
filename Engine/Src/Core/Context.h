@@ -7,17 +7,13 @@ namespace Dive
 	class Context
 	{
 	public:
-		// 생성자.
-		Context();
-		// 소멸자. 윈도우를 사용하는 서브 시스템 객체들을 제거.
+		Context() = default;
 		~Context();
 
-		// 서브 시스템 등록.
-		void RegisterSubsystem(std::shared_ptr<Object> pObject);
-		// 등록된 서브 시스템을 제거.
+		void RegisterSubsystem(Object* pObject);
+		template<class T> T* RegisterSubsystem();
 		void RemoveSubsystem(StringHash type);
 
-		// 등록된 서브 시스템 객체를 리턴.
 		Object* GetSubsystem(StringHash type) const;
 		template<class T> T* GetSubsystem() const;
 
@@ -27,12 +23,15 @@ namespace Dive
 		Object* CreateObject(StringHash type);
 
 	private:
-	private:
-		// 서브 시스템 맵.
-		std::map<StringHash, std::shared_ptr<Object>> m_Subsystems;
-
+		std::unordered_map<unsigned int, Object*> m_Subsystems;
 		std::unordered_map<unsigned int, ObjectFactory*> m_Factories;
 	};
+
+	template<class T>
+	T* Context::RegisterSubsystem()
+	{
+		return static_cast<T*>(RegisterSubsystem(new T(this)));
+	}
 
 	template<class T>
 	T* Context::GetSubsystem() const

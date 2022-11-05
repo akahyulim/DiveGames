@@ -7,6 +7,11 @@ namespace Dive
 	std::shared_ptr<spdlog::logger> Log::s_pClientLogger;
 	std::ostringstream Log::s_Oss;
 
+	Log::~Log()
+	{
+		DV_LOG_ENGINE_TRACE("Log 소멸자 호출");
+	}
+
 	void Log::Initialize(const char* filename)
 	{
 		std::vector<spdlog::sink_ptr> logSinks;

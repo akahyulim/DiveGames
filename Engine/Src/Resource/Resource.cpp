@@ -13,7 +13,7 @@ namespace Dive
 
 	Resource::~Resource()
 	{
-		DV_LOG_ENGINE_DEBUG("Resource 소멸자 호출: {0:d} - {1:d} - {2:s}",
+		DV_LOG_ENGINE_TRACE("Resource 소멸자 호출: {0:d} - {1:d} - {2:s}",
 			GetType().Value(),
 			GetNameHash().Value(),
 			GetName());

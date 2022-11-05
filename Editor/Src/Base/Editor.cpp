@@ -100,23 +100,16 @@ namespace Editor
 		io.Fonts->AddFontFromFileTTF("Assets/Fonts/Nanum/NanumBarunGothicBold.ttf", fontSize);
 
 		// Create Panels
-		m_pMenuBar = new MenuBarPanel(this);
-		m_pScene = new ScenePanel(this);
-		m_pHierarchy = new HierarchyPanel(this);
-		m_pInspector = new InspectorPanel(this);
-		m_pAsset = new AssetPanel(this);
+		m_pMenuBar = std::make_unique<MenuBarPanel>(this);
+		m_pScene = std::make_unique<ScenePanel>(this);
+		m_pHierarchy = std::make_unique<HierarchyPanel>(this);
+		m_pInspector = std::make_unique<InspectorPanel>(this);
+		m_pAsset = std::make_unique<AssetPanel>(this);
 	}
 	
 	void Editor::Stop()
 	{
 		DV_LOG_CLIENT_DEBUG("call Editor's Stop()");
-
-		// delete panels
-		DV_DELETE(m_pMenuBar);
-		DV_DELETE(m_pScene);
-		DV_DELETE(m_pHierarchy);
-		DV_DELETE(m_pInspector);
-		DV_DELETE(m_pAsset);
 
 		// destroy ImGui
 		ImGui_ImplDX11_Shutdown();

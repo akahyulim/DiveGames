@@ -254,8 +254,6 @@ namespace Dive
 		if (m_Usage != eTextureUsage::RenderTarget || !m_pRenderTargetView)
 			return;
 
-		DV_LOG_ENGINE_DEBUG("Event - UpdateRenderTarget");
-
 		auto* pRenderer = GetSubsystem<Renderer>();
 		if (pRenderer)
 			pRenderer->QueueViewportByRenderTarget(this);

@@ -13,18 +13,9 @@ namespace Dive
 		: Object(pContext),
 		m_ExitCode(EXIT_SUCCESS)
 	{
-		// engine parameters
-		// 엔진 파라미터의 디폴트 key와 value를 얻는 것 같다.
-		// Setup()에서 따로 설정되지 않으면 이를 바로 Engine::Initialize()에 전달한다.
-
-		m_pEngine = std::make_shared<Engine>(pContext);
-		m_pContext->RegisterSubsystem(m_pEngine);
+		m_pEngine = std::make_unique<Engine>(pContext);
 
 		SUBSCRIBE_EVENT(eEventType::LogMessage, EVENT_HANDLER_PARAM(OnLogMessage));
-	}
-
-	Application::~Application()
-	{
 	}
 
 	int Application::Run()

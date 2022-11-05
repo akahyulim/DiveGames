@@ -36,14 +36,9 @@ namespace Dive
 
 	Graphics::Graphics(Context* pContext)
 		: Object(pContext),
-		//m_hInstance(NULL),
-		//m_hWnd(NULL),
-		m_pSwapChain(nullptr),
-		m_pDevice(nullptr),
-		m_pDeviceContext(nullptr),
-		m_pDefaultRenderTargetView(nullptr),
-		m_pDefaultDepthStencilTexture(nullptr),
-		m_pDefaultDepthStencilView(nullptr),
+		m_pDefaultRTV(nullptr),
+		m_pDefaultDS(nullptr),
+		m_pDefaultDSV(nullptr),
 		m_PrimitiveType(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
 		m_pIndexBuffer(nullptr),
 		m_pVertexShader(nullptr),
@@ -69,7 +64,7 @@ namespace Dive
 
 	Graphics::~Graphics()
 	{
-		DV_LOG_ENGINE_DEBUG("Graphics 소멸자 호출");
+		DV_LOG_ENGINE_TRACE("Graphics 소멸자 호출");
 		Destroy();
 	}
 
@@ -85,19 +80,12 @@ namespace Dive
 	{
 		// 각종 states
 
-		DV_RELEASE(m_pDefaultDepthStencilView);
-		DV_RELEASE(m_pDefaultDepthStencilTexture);
-		DV_RELEASE(m_pDefaultRenderTargetView);
-
 		// 전체화면에서 스왑체인 릴리즈시 예외 발생
 		if (IsFullScreen())
 		{
 			m_pSwapChain->SetFullscreenState(FALSE, nullptr);
 		}
-		DV_RELEASE(m_pSwapChain);
-		DV_RELEASE(m_pDeviceContext);
-		DV_RELEASE(m_pDevice);
-
+		
 		if (m_hWnd)
 		{
 			CloseWindow();
@@ -421,7 +409,7 @@ namespace Dive
 
 		// 현재 위치는 임시
 		// 순서는 이게 맞다.
-		createDevice(width, height);
+		createDeviceAndSwapChain(width, height);
 		updateSwapChain(width, height);
 
 		// 위치가 애매허다?
@@ -668,7 +656,7 @@ namespace Dive
 		DV_LOG_ENGINE_INFO("윈도우 크기가 {0:d} x {1:d}로 변경되었습니다.", width, height);
 	}
 
-	bool Graphics::createDevice(int width, int height)
+	bool Graphics::createDeviceAndSwapChain(int width, int height)
 	{
 		if (!m_pDevice)
 		{
@@ -680,22 +668,17 @@ namespace Dive
 				nullptr,
 				0,
 				D3D11_SDK_VERSION,
-				&m_pDevice,
+				m_pDevice.GetAddressOf(),
 				nullptr,
-				&m_pDeviceContext
+				m_pDeviceContext.GetAddressOf()
 			)))
 			{
-				DV_RELEASE(m_pDevice);
-				DV_RELEASE(m_pDeviceContext);
-				DV_LOG_ENGINE_ERROR("D3D11 장치 생성에 실패하였습니다.");
+				DV_LOG_ENGINE_ERROR("Graphics::createDeviceAndSwapChain - D3D11 장치 생성에 실패하였습니다.");
 				return false;
 			}
 		}
 
 		// 멀티 샘플 레밸 체크?
-
-		if (m_pSwapChain)
-			DV_RELEASE(m_pSwapChain);
 
 		IDXGIDevice* pDxgiDevice = nullptr;
 		m_pDevice->QueryInterface(IID_IDXGIDevice, (void**)&pDxgiDevice);
@@ -722,16 +705,11 @@ namespace Dive
 		desc.OutputWindow = m_hWnd;
 		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
 
-		HRESULT hr = pDxgiFactory->CreateSwapChain(m_pDevice, &desc, &m_pSwapChain);
-
-		DV_RELEASE(pDxgiFactory);
-		DV_RELEASE(pDxgiAdapter);
-		DV_RELEASE(pDxgiDevice);
+		HRESULT hr = pDxgiFactory->CreateSwapChain(m_pDevice.Get(), &desc, m_pSwapChain.GetAddressOf());
 
 		if (FAILED(hr))
 		{
-			DV_RELEASE(m_pSwapChain);
-			DV_LOG_ENGINE_ERROR("D3D11 스왑체인 생성에 실패하였습니다.");
+			DV_LOG_ENGINE_ERROR("Graphics::createDeviceAndSwapChain - D3D11 스왑체인 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -745,12 +723,6 @@ namespace Dive
 		ID3D11RenderTargetView* pNullView = nullptr;
 		m_pDeviceContext->OMSetRenderTargets(1, &pNullView, nullptr);
 
-		// 디폴트 리소스들을 전부 릴리즈
-		DV_RELEASE(m_pDefaultRenderTargetView);
-		DV_RELEASE(m_pDefaultDepthStencilTexture);
-		DV_RELEASE(m_pDefaultDepthStencilView);
-
-		// 현재 렌더타겟배열, 뎁스스텐실 뷰 nullptr
 		for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
 			m_pCurRenderTargetViews[i] = nullptr;
 		m_pCurDepthStencilView = nullptr;
@@ -760,21 +732,20 @@ namespace Dive
 		m_pSwapChain->ResizeBuffers(1, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
 		// 백버퍼를 얻어와 디폴트 렌더타겟뷰 생성
-		ID3D11Texture2D* pBackbufferTexture = nullptr;
-		if (FAILED(m_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture)))
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> pBackbufferTexture;
+		if (FAILED(m_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)pBackbufferTexture.GetAddressOf())))
 		{
 			DV_RELEASE(pBackbufferTexture);
-			DV_LOG_ENGINE_ERROR("후면 버퍼 텍스쳐 생성에 실패하였습니다.");
+			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 후면 버퍼 텍스쳐 생성에 실패하였습니다.");
 			return false;
 		}
 
-		if (FAILED(m_pDevice->CreateRenderTargetView(pBackbufferTexture, nullptr, &m_pDefaultRenderTargetView)))
+		if (FAILED(m_pDevice->CreateRenderTargetView(
+			static_cast<ID3D11Resource*>(pBackbufferTexture.Get()), nullptr, m_pDefaultRTV.GetAddressOf())))
 		{
-			DV_RELEASE(m_pDefaultRenderTargetView);
-			DV_LOG_ENGINE_ERROR("후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
+			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
 			return false;
 		}
-		DV_RELEASE(pBackbufferTexture);
 
 		// 디폴트 뎁스스텐실 생성
 		D3D11_TEXTURE2D_DESC desc;
@@ -791,17 +762,18 @@ namespace Dive
 		desc.CPUAccessFlags = 0;
 		desc.MiscFlags = 0;
 
-		if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pDefaultDepthStencilTexture)))
+		if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, m_pDefaultDS.GetAddressOf())))
 		{
-			DV_RELEASE(m_pDefaultDepthStencilTexture);
-			DV_LOG_ENGINE_ERROR("백버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
+			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 백버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
 			return false;
 		}
 
-		if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pDefaultDepthStencilTexture), nullptr, &m_pDefaultDepthStencilView)))
+		if (FAILED(m_pDevice->CreateDepthStencilView(
+			static_cast<ID3D11Resource*>(m_pDefaultDS.Get()),
+			nullptr, 
+			m_pDefaultDSV.GetAddressOf())))
 		{
-			DV_RELEASE(m_pDefaultDepthStencilView);
-			DV_LOG_ENGINE_ERROR("백버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
+			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 백버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -828,7 +800,7 @@ namespace Dive
 		{
 			// 이렇게하면 ID3D11DepthstencilView를 무조건 사용하게 된다.
 			m_pCurDepthStencilView = (m_pDepthStencil && m_pDepthStencil->GetUsage() == eTextureUsage::DepthStencil) ?
-				m_pDepthStencil->GetDepthStencilView() : m_pDefaultDepthStencilView;
+				m_pDepthStencil->GetDepthStencilView() : m_pDefaultDSV.Get();
 			// write가 아니라면 read only
 
 			for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
@@ -840,7 +812,7 @@ namespace Dive
 			if (!m_pRenderTargets[0] && (!m_pDepthStencil ||
 				(m_pDepthStencil && m_pDepthStencil->GetWidth() == m_Width && m_pDepthStencil->GetHeight() == m_Height)))
 			{
-				m_pCurRenderTargetViews[0] = m_pDefaultRenderTargetView;
+				m_pCurRenderTargetViews[0] = m_pDefaultRTV.Get();
 			}
 
 			m_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &m_pCurRenderTargetViews[0], m_pCurDepthStencilView);

@@ -39,6 +39,7 @@ namespace Dive
 
 	Time::~Time()
 	{
+		DV_LOG_ENGINE_TRACE("Time 소멸자 호출");
 	}
 	
 	void Time::BeginFrame(float deltaTime)

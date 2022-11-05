@@ -27,7 +27,7 @@ namespace Dive
 
 	public:
 		explicit Time(Context* pContext);
-		~Time();
+		~Time() override;
 
 		// 프레임 시작.
 		void BeginFrame(float deltaTime);

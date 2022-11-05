@@ -79,6 +79,7 @@ namespace Editor
 
 	InspectorPanel::~InspectorPanel()
 	{
+		DV_LOG_CLIENT_TRACE("InspectorPanel 소멸자 호출");
 	}
 
 	void InspectorPanel::renderWindow()

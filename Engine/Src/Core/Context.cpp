@@ -5,47 +5,47 @@
 
 namespace Dive
 {
-	Context::Context()
-	{
-	}
-	
 	Context::~Context()
 	{
-		DV_LOG_ENGINE_DEBUG("Context 소멸자 호출");
+		DV_LOG_ENGINE_TRACE("Context 소멸자 호출");
 
-		// remove subsystems: audio, ui, input, renderer, graphics
-		// 윈도우를 사용하는 객체들만 제거하는 듯 하다.
-		// => 아무래도 모든 객체는 shared_ptr이 기본인 듯 하다.
-		// 이 구문이 특별한 이유는 순서를 지켜야 하기 때문인 듯
-		RemoveSubsystem("Renderer");
-		RemoveSubsystem("Graphics");
-	
+		for (auto& pFactory : m_Factories)
+		{
+			DV_DELETE(pFactory.second);
+		}
+		m_Factories.clear();
+
+		// 순서를 맞춰야 할 수 있다.
+		for (auto& pSubsystem : m_Subsystems)
+		{
+			DV_DELETE(pSubsystem.second);
+		}
 		m_Subsystems.clear();
 	}
 
-	void Context::RegisterSubsystem(std::shared_ptr<Object> pObject)
+	void Context::RegisterSubsystem(Object* pObject)
 	{
 		if (!pObject)
 			return;
 
-		m_Subsystems[pObject->GetType()] = std::move(pObject);
+		m_Subsystems[pObject->GetType().Value()] = pObject;
 	}
 
 	void Context::RemoveSubsystem(StringHash type)
 	{
-		auto it = m_Subsystems.find(type);
+		auto it = m_Subsystems.find(type.Value());
 		if (it != m_Subsystems.end())
 		{
-			(it->second).reset();
+			DV_DELETE(it->second);
 			m_Subsystems.erase(it);
 		}
 	}
 
 	Object* Context::GetSubsystem(StringHash type) const
 	{
-		auto it = m_Subsystems.find(type);
+		auto it = m_Subsystems.find(type.Value());
 		if (it != m_Subsystems.end())
-			return (it->second).get();
+			return (it->second);
 	
 		return nullptr;
 	}

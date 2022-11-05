@@ -31,7 +31,7 @@ namespace Sandbox
 	// 엔진 초기화 후 호출
 	void Sandbox::Start()
 	{
-		DV_LOG_CLIENT_DEBUG("Sandbox::Start 호출");
+		DV_LOG_CLIENT_TRACE("Sandbox::Start 호출");
 
 		m_pScene = new Dive::Scene(m_pContext);
 		auto pViewport = new Dive::Viewport(m_pContext);
@@ -51,7 +51,7 @@ namespace Sandbox
 
 	void Sandbox::Stop()
 	{
-		DV_LOG_CLIENT_DEBUG("Sandbox::Stop 호출");
+		DV_LOG_CLIENT_TRACE("Sandbox::Stop 호출");
 
 		DV_DELETE(m_pScene);
 	}

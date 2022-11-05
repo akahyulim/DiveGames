@@ -6,8 +6,8 @@ namespace Sandbox
 	class Sandbox : public Dive::Application
 	{
 	public:
-		Sandbox(Dive::Context* pContext);
-		~Sandbox();
+		explicit Sandbox(Dive::Context* pContext);
+		~Sandbox() override;
 
 		void Setup() override;
 		void Start() override;

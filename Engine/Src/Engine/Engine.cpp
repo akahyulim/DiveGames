@@ -20,17 +20,17 @@ namespace Dive
 		m_MaxFps(0)
 	{
 		// 기본 subsystem 생성: input
-		m_pContext->RegisterSubsystem(std::make_shared<Log>(pContext));
-		m_pContext->RegisterSubsystem(std::make_shared<Time>(pContext));
-		m_pContext->RegisterSubsystem(std::make_shared<ResourceCache>(pContext));
-		m_pContext->RegisterSubsystem(std::make_shared<FileSystem>(pContext));
+		m_pContext->RegisterSubsystem(new Log(pContext));
+		m_pContext->RegisterSubsystem(new Time(pContext));
+		m_pContext->RegisterSubsystem(new ResourceCache(pContext));
+		m_pContext->RegisterSubsystem(new FileSystem(pContext));
 
 		SUBSCRIBE_EVENT(eEventType::ExitRequested, EVENT_HANDLER_PARAM(OnExitRequested));
 	}
 
 	Engine::~Engine()
 	{
-		DV_LOG_ENGINE_DEBUG("Engine 소멸자 호출");
+		DV_LOG_ENGINE_TRACE("Engine 소멸자 호출");
 
 		// Context shut down??
 		// 이 것두 일단 넣어놓긴 했지만... 뭐 필요한 거 같긴 하다.
@@ -43,8 +43,8 @@ namespace Dive
 			return true;
 
 		// subsystem 중 graphics, renderer 생성
-		m_pContext->RegisterSubsystem(std::make_shared<Graphics>(m_pContext));
-		m_pContext->RegisterSubsystem(std::make_shared<Renderer>(m_pContext));
+		m_pContext->RegisterSubsystem(new Graphics(m_pContext));
+		m_pContext->RegisterSubsystem(new Renderer(m_pContext));
 
 		// start logging
 		GetSubsystem<Log>()->Initialize("Dive.log");
@@ -94,7 +94,7 @@ namespace Dive
 
 		// 이닛 인풋
 
-		DV_LOG_ENGINE_INFO("엔진 초기화 성공");
+		DV_LOG_ENGINE_TRACE("Engine 초기화 성공");
 		
 		m_bInitialized = true;
 

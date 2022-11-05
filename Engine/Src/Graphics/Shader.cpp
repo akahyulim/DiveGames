@@ -10,15 +10,15 @@ namespace Dive
 	Shader::Shader(Context* pContext, eShaderType type)
 		: Object(pContext),
 		m_pGraphics(GetSubsystem<Graphics>()),
-		m_Type(type),
-		m_pVertexShader(nullptr),
-		m_pPixelShader(nullptr)
+		m_Type(type)
 	{
 		DV_ASSERT(m_pGraphics);
 	}
 
 	Shader::~Shader()
 	{
+		DV_LOG_ENGINE_TRACE("Shader 소멸자 호출");
+
 		Release();
 	}
 
@@ -31,7 +31,7 @@ namespace Dive
 
 		if (!std::filesystem::exists(filepath))
 		{
-			DV_LOG_ENGINE_ERROR("전달받은 파일({:s})이 존재하지 않습니다.", filepath);
+			DV_LOG_ENGINE_ERROR("Shader::Compile - 전달받은 파일({:s})이 존재하지 않습니다.", filepath);
 			return false;
 		}
 
@@ -89,7 +89,7 @@ namespace Dive
 		{
 			if (pErrorMsg)
 			{
-				DV_LOG_ENGINE_ERROR("Shader Compile 실패: {:s}", (char*)pErrorMsg->GetBufferPointer());
+				DV_LOG_ENGINE_ERROR("Shader::Compile - Shader Compile 실패: {:s}", (char*)pErrorMsg->GetBufferPointer());
 				DV_RELEASE(pErrorMsg);
 			}
 			DV_RELEASE(pShaderBlob);
@@ -99,9 +99,9 @@ namespace Dive
 		{
 			// 전체 이름도 붙여서 출력하기.
 			if (m_Type == eShaderType::Vertex)
-				DV_LOG_ENGINE_DEBUG("정점 셰이더를 컴파일 하였습니다.");
+				DV_LOG_ENGINE_DEBUG("Shader::Compile - 정점 셰이더를 컴파일 하였습니다.");
 			else
-				DV_LOG_ENGINE_DEBUG("픽셀 셰이더를 컴파일 하였습니다.");
+				DV_LOG_ENGINE_DEBUG("Shader::Compile - 픽셀 셰이더를 컴파일 하였습니다.");
 
 			ID3DBlob* pStrippedCode = nullptr;
 			D3DStripShader(pShaderBlob->GetBufferPointer(), pShaderBlob->GetBufferSize(),
@@ -122,10 +122,9 @@ namespace Dive
 				m_ByteCode.data(),
 				m_ByteCode.size(),
 				NULL,
-				&m_pVertexShader)))
+				m_pVertexShader.GetAddressOf())))
 			{
-				DV_RELEASE(m_pVertexShader);
-				DV_LOG_ENGINE_ERROR("정점 셰이더({:s}) 생성에 실패하였습니다.", m_Name);
+				DV_LOG_ENGINE_ERROR("Shader::Compile - 정점 셰이더({:s}) 생성에 실패하였습니다.", m_Name);
 				return false;
 			}
 		}
@@ -135,10 +134,9 @@ namespace Dive
 				m_ByteCode.data(),
 				m_ByteCode.size(),
 				NULL,
-				&m_pPixelShader)))
+				m_pPixelShader.GetAddressOf())))
 			{
-				DV_RELEASE(m_pPixelShader);
-				DV_LOG_ENGINE_ERROR("픽셀 셰이더({:s}) 생성에 실패하였습니다.", m_Name);
+				DV_LOG_ENGINE_ERROR("Shader::Compile - 픽셀 셰이더({:s}) 생성에 실패하였습니다.", m_Name);
 				return false;
 			}
 		}
@@ -148,8 +146,9 @@ namespace Dive
 
 	void Shader::Release()
 	{
-		DV_RELEASE(m_pVertexShader);
-		DV_RELEASE(m_pPixelShader);
+		m_pPixelShader.Reset();
+		m_pVertexShader.Reset();
+
 		m_ByteCode.clear();
 		m_ByteCode.shrink_to_fit();
 	}
@@ -157,6 +156,6 @@ namespace Dive
 	void* Shader::GetShader()
 	{
 		return m_Type == eShaderType::Vertex ?
-			(void*)m_pVertexShader : (void*)m_pPixelShader;
+			static_cast<void*>(m_pVertexShader.Get()) : static_cast<void*>(m_pPixelShader.Get());
 	}
 }
