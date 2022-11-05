@@ -16,12 +16,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 namespace Editor
 {
 	Editor::Editor(Dive::Context* pContext)
-		: Dive::Application(pContext),
-		m_pMenuBar(nullptr),
-		m_pScene(nullptr),
-		m_pHierarchy(nullptr),
-		m_pInspector(nullptr),
-		m_pAsset(nullptr)
+		: Dive::Application(pContext)
 	{
 		SUBSCRIBE_EVENT(Dive::eEventType::BeginRender, EVENT_HANDLER_PARAM(OnBeginRender));
 		SUBSCRIBE_EVENT(Dive::eEventType::EndRender, EVENT_HANDLER_PARAM(OnEndRender));
@@ -100,11 +95,11 @@ namespace Editor
 		io.Fonts->AddFontFromFileTTF("Assets/Fonts/Nanum/NanumBarunGothicBold.ttf", fontSize);
 
 		// Create Panels
-		m_pMenuBar = std::make_unique<MenuBarPanel>(this);
-		m_pScene = std::make_unique<ScenePanel>(this);
-		m_pHierarchy = std::make_unique<HierarchyPanel>(this);
-		m_pInspector = std::make_unique<InspectorPanel>(this);
-		m_pAsset = std::make_unique<AssetPanel>(this);
+		m_Panels.emplace_back(std::make_unique<MenuBarPanel>(this));
+		m_Panels.emplace_back(std::make_unique<ScenePanel>(this));
+		m_Panels.emplace_back(std::make_unique<HierarchyPanel>(this));
+		m_Panels.emplace_back(std::make_unique<InspectorPanel>(this));
+		m_Panels.emplace_back(std::make_unique<AssetPanel>(this));
 	}
 	
 	void Editor::Stop()
@@ -217,11 +212,10 @@ namespace Editor
 		style.WindowMinSize.x = minWinSizeX;
 
 		// Render Panels
-		m_pMenuBar->Tick();
-		m_pScene->Tick();
-		m_pHierarchy->Tick();
-		m_pInspector->Tick();
-		m_pAsset->Tick();
+		for (const auto& pPanel : m_Panels)
+		{
+			pPanel->Tick();
+		}
 
 		ImGui::End();
 	}

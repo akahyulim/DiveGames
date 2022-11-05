@@ -1,4 +1,5 @@
 #include "HierarchyPanel.h"
+#include "InspectorPanel.h"
 
 namespace Editor
 {
@@ -83,6 +84,7 @@ namespace Editor
 		if (ImGui::IsItemClicked())
 		{
 			m_pSelectedObject = pObject;
+			setSelectedObject(pObject);
 		}
 
 		if (ImGui::BeginDragDropSource())
@@ -157,5 +159,10 @@ namespace Editor
 
 			ImGui::TreePop();
 		}
+	}
+
+	void HierarchyPanel::setSelectedObject(Dive::GameObject* pObject)
+	{
+		GetPanel<InspectorPanel>()->SetSelectedObject(pObject);
 	}
 }

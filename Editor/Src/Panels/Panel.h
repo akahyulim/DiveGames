@@ -24,6 +24,8 @@ namespace Editor
 
 		// Get & Set Active Scene
 
+		template<class T> T* GetPanel();
+
 	protected:
 		// 항상 그려져야 하는 것(ex. MenuBar)
 		virtual void renderAlways() {}
@@ -41,4 +43,13 @@ namespace Editor
 
 		static Dive::Scene* s_pActiveScene;
 	};
+
+	template<class T>
+	T* Panel::GetPanel()
+	{
+		if (!m_pEditor)
+			return nullptr;
+
+		return m_pEditor->GetPanel<T>();
+	}
 }

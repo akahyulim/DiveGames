@@ -9,6 +9,8 @@ namespace Editor
 		InspectorPanel(Editor* pEditor);
 		~InspectorPanel();
 
+		void SetSelectedObject(Dive::GameObject* pObject);
+
 		void renderWindow() override;
 
 	private:
@@ -16,6 +18,7 @@ namespace Editor
 		//void drawSpriteRenderer(Dive::GameObject* pSelectedObject);
 		//void drawMeshRenderer(Dive::GameObject* pSelectedObject);
 		//void drawLight(Dive::GameObject* pSelectedObject);
+
 
 	private:
 	};

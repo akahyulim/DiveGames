@@ -3,12 +3,8 @@
 
 namespace Editor
 {
-	class MenuBarPanel;
-	class ScenePanel;
-	class HierarchyPanel;
-	class InspectorPanel;
-	class AssetPanel;
-
+	class Panel;
+	
 	class Editor : public Dive::Application
 	{
 	public:
@@ -23,20 +19,24 @@ namespace Editor
 		void OnEndRender(const Dive::Event& e);
 		void OnWindowEvent(const Dive::Event& e);
 
-		MenuBarPanel* GetMenuBarPanel() const { return m_pMenuBar.get(); }
-		ScenePanel* GetScenePanel() const { return m_pScene.get(); }
-		HierarchyPanel* GetHierarchyPanel() const { return m_pHierarchy.get(); }
-		InspectorPanel* GetInspectorPanel() const { return m_pInspector.get(); }
-		AssetPanel* GetAssetPanel() const { return m_pAsset.get(); }
-	
+		template<class T> T* GetPanel();
+
 	private:
 		void drawPanels();
 
 	private:
-		std::unique_ptr<MenuBarPanel> m_pMenuBar;
-		std::unique_ptr<ScenePanel> m_pScene;
-		std::unique_ptr<HierarchyPanel> m_pHierarchy;
-		std::unique_ptr<InspectorPanel> m_pInspector;
-		std::unique_ptr<AssetPanel> m_pAsset;
+		std::vector<std::unique_ptr<Panel>> m_Panels;
 	};
+
+	template<class T>
+	T* Editor::GetPanel()
+	{
+		for (const auto& panel : m_Panels)
+		{
+			if (T* pPanel = dynamic_cast<T*>(panel.get()))
+				return pPanel;
+		}
+
+		return nullptr;
+	}
 }

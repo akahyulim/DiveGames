@@ -114,4 +114,10 @@ namespace Editor
 		}
 		*/
 	}
+
+	void InspectorPanel::SetSelectedObject(Dive::GameObject* pObject)
+	{
+		if (pObject)
+			DV_LOG_CLIENT_DEBUG("Selected Object: {:s}", pObject->GetName());
+	}
 }
