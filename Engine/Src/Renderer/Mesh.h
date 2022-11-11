@@ -18,16 +18,15 @@ namespace Dive
 
 		void Draw(Graphics* pGraphics);
 
-		bool SetNumVertexBuffers(unsigned int num);
-		bool SetVertexBuffer(unsigned int index, VertexBuffer* pBuffer);
-		VertexBuffer* GetVertexBuffer(unsigned int index) const;
+		VertexBuffer* GetVertexBuffer(size_t index) const;
+		bool SetNumVertexBuffers(size_t num);
+		bool SetVertexBuffer(size_t index, VertexBuffer* pBuffer);
 
-		// 정점, 인덱스의 개수, 오프셋은
-		// SetDrawRange라는 함수를 통해 결정된다.
-		// 이는 Model에서 설정하는 듯?
+		// SetDrawRange: primitve, indexCount, indexStart or vertexCount, vertexStart
+		// primitive를 왜 굳이 여기에서 저장할까?
 
-		void SetIndexBuffer(IndexBuffer* pBuffer);
 		IndexBuffer* GetIndexBuffer() const { return m_pIndexBuffer; }
+		void SetIndexBuffer(IndexBuffer* pBuffer);
 
 		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveType() const { return m_PrimitiveType; }
 		void SetPrimitiveType(D3D11_PRIMITIVE_TOPOLOGY type) { m_PrimitiveType = type; }

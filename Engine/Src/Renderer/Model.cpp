@@ -16,6 +16,7 @@ namespace Dive
 
 	Model::~Model()
 	{
+		// Mesh는 여기에서 제거하는 것이 맞을 것 같다.
 	}
 
 	void Model::RegisterObject(Context* pContext)
@@ -230,22 +231,22 @@ namespace Dive
 		return true;
 	}
 	
-	void Model::SetNumMeshes(unsigned int num)
+	void Model::SetNumMeshes(size_t num)
 	{
-		m_Meshes.resize((size_t)num);
+		m_Meshes.resize(num);
 	}
 	
-	Mesh* Model::GetMesh(unsigned int index)
+	Mesh* Model::GetMesh(size_t index)
 	{
-		if (index >= (unsigned int)m_Meshes.size())
+		if (index >= m_Meshes.size())
 			return nullptr;
 
 		return m_Meshes[index];
 	}
 	
-	bool Model::SetMesh(unsigned int index, Mesh* pMesh)
+	bool Model::SetMesh(size_t index, Mesh* pMesh)
 	{
-		if (index >= (unsigned int)m_Meshes.size())
+		if (index >= m_Meshes.size())
 		{
 			DV_LOG_ENGINE_ERROR("메시 인덱스를 잘못 전달받았습니다.");
 			return false;

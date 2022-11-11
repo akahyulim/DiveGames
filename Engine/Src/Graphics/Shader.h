@@ -6,6 +6,7 @@ namespace Dive
 {
 	class Graphics;
 
+	// 현재 리소스가 아니다.
 	class Shader : public Object
 	{
 		DIVE_OBJECT(Shader, Object)
@@ -15,9 +16,8 @@ namespace Dive
 		~Shader() override;
 
 		bool Compile(const std::string& filepath);
-		void Release();
-
-		const std::vector<unsigned char>& GetByteCode() const { return m_ByteCode; }
+		
+		ID3D10Blob* GetShaderBuffer() { return m_pShaderBuffer; }
 		void* GetShader();
 
 		eShaderType GetShaderType() const { return m_Type; }
@@ -32,7 +32,8 @@ namespace Dive
 		Graphics* m_pGraphics;
 		eShaderType m_Type;
 		std::string m_Name;
-		std::vector<unsigned char> m_ByteCode;
+		//Microsoft::WRL::ComPtr<ID3D10Blob> m_pShaderBuffer;
+		ID3D10Blob* m_pShaderBuffer = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_pVertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pPixelShader;
 		std::unordered_map<std::string, std::string> m_Defines;

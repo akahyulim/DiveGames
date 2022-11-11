@@ -43,9 +43,39 @@ namespace Sandbox
 
 		}
 
-		// model
+		// model: 버퍼 생성 확인!
 		{
+			std::vector<Dive::VertexElement> elements;
+			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
+			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
 
+			std::vector<float> vertices =
+				{ -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+				0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+				1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f };
+
+			Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
+			pVb->SetSize(3, elements);
+			pVb->SetData(static_cast<void*>(vertices.data()));
+
+			std::vector<unsigned short> indices = { 0, 1, 2 };
+			Dive::IndexBuffer* pIb = new Dive::IndexBuffer(m_pContext);
+			pIb->SetSize(3, false);
+			pIb->SetData(static_cast<void*>(indices.data()));
+
+			Dive::Mesh* pMesh = new Dive::Mesh(m_pContext);
+			pMesh->SetNumVertexBuffers(1);
+			pMesh->SetVertexBuffer(0, pVb);
+			pMesh->SetIndexBuffer(pIb);
+
+			static Dive::Model* pTriangleModel = new Dive::Model(m_pContext);
+			pTriangleModel->SetName("Triangle");
+			pTriangleModel->SetNumMeshes(1);
+			pTriangleModel->SetMesh(0, pMesh);
+
+			auto pTriangle = m_pScene->CreateGameObject("Triangle");
+			auto pModel = pTriangle->CreateComponent<Dive::StaticModel>();
+			pModel->SetModel(pTriangleModel);
 		}
 	}
 

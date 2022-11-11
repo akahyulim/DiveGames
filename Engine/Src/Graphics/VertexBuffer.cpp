@@ -44,6 +44,7 @@ namespace Dive
 		if (m_pData)
 			DV_DELETE_ARRAY(m_pData);
 		m_pData = new unsigned char[m_VertexCount * m_VertexSize];
+		memset(static_cast<void*>(m_pData), 0, m_VertexCount * m_VertexSize);
 
 		m_pBuffer.Reset();
 
@@ -81,7 +82,7 @@ namespace Dive
 		}
 
 		if (m_pData && m_pData != pData)
-			memcpy(m_pData, pData, m_VertexCount * m_VertexSize);
+			memcpy_s(m_pData, m_VertexCount * m_VertexSize, pData, m_VertexCount * m_VertexSize);
 
 		if (m_pBuffer)
 		{

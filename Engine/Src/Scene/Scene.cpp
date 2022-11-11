@@ -152,6 +152,19 @@ namespace Dive
 		return roots;
 	}
 
+	std::vector<GameObject*> Scene::GetAllGameObjects() const
+	{
+		if(m_GameObjects.empty())
+			return std::vector<GameObject*>();
+
+		std::vector<GameObject*> ret;
+		auto it = m_GameObjects.begin();
+		for (it; it != m_GameObjects.end(); ++it)
+			ret.emplace_back(it->second);
+
+		return ret;
+	}
+
 	void Scene::ComponentAdded(Component* pComponent, unsigned int id)
 	{
 		if (!pComponent)

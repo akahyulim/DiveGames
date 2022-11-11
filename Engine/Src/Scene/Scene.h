@@ -43,6 +43,9 @@ namespace Dive
 		// 결국 같은 벡터이니... 차라리 const를 떼고 참조로 전달하는 것이 낫지 않을까 싶다.
 		// 그런데 현재, Hierarchy 창에서 요소 사이에 넣는 방법을 모른다.
 		std::vector<GameObject*> GetRoots() const;
+
+		// 일단 추가
+		std::vector<GameObject*> GetAllGameObjects() const;
 		
 		// 게임 오브젝트에 추가된 컴포넌트를 저장.
 		void ComponentAdded(Component* pComponent, unsigned int id);

@@ -8,6 +8,7 @@ namespace Dive
 	class Scene;
 	class Texture;
 	class Viewport;
+	class Mesh;
 
 	enum class eRenderPath;
 
@@ -36,5 +37,7 @@ namespace Dive
 		RECT m_ViewRect = { 0, 0, 0, 0 };
 		DirectX::XMINT2 m_ViewSize = { 0 ,0 };
 		DirectX::XMINT2 m_RenderTargetSize = { 0, 0 };
+
+		std::vector<Mesh*> m_Drawables;
 	};
 }

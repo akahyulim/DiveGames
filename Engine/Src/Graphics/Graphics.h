@@ -8,6 +8,7 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
 	class Shader;
+	class InputLayout;
 	class Texture2D;
 
 	const LPCWSTR WND_CLASS_NAME = L"AppWnd";
@@ -58,8 +59,10 @@ namespace Dive
 		explicit Graphics(Context* pContext);
 		~Graphics() override;
 
-		bool IsInitialized() const;
+		bool SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
+			bool tripleBuffer, int multiSample, int refreshRate);
 		void Destroy();
+		bool IsInitialized() const;
 
 		// Window
 		bool WindowCreate(int width, int height, unsigned int flags);
@@ -93,15 +96,16 @@ namespace Dive
 		bool IsResizable() const;
 		
 		// DX11 Graphics & Resources
-		bool SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
-			bool tripleBuffer, int multiSample, int refreshRate);
+		bool CreateDeviceAndSwapChain(unsigned int width = 0, unsigned int height = 0);
 
-		void Clear(int flags, const DirectX::XMFLOAT4& color, float depth, int stencil);
+		bool UpdateSwapChain(unsigned int width = 0, unsigned int height = 0);
 
 		bool IsDeviceLost();
 
 		bool BeginFrame();
 		void EndFrame();
+
+		void Clear(int flags, const DirectX::XMFLOAT4& color, float depth, int stencil);
 
 		// Draw 함수들: 총 5개
 		void Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int vertexStart);
@@ -112,6 +116,12 @@ namespace Dive
 
 		ID3D11RenderTargetView* GetRenderTarget(unsigned int index) const;
 		void SetRenderTarget(unsigned int index, Texture2D* pTexture);
+		void ResetRenderTargets();
+
+		D3D11_VIEWPORT GetViewport() const { return m_Viewport; }
+		RECT GetViewportRect() const;
+		void SetViewport(const D3D11_VIEWPORT& viewport);
+		void SetViewportRect(const RECT& rect);
 
 		VertexBuffer* GetVertexBuffer(unsigned int index) const;
 		void SetVertexBuffer(VertexBuffer* pBuffer);
@@ -138,24 +148,26 @@ namespace Dive
 		// 임시
 		ID3D11RenderTargetView* GetDefaultRenderTargetView() { return m_pDefaultRTV.Get(); }
 
+		bool LoadShaders();
+		void SetDefaultShader();
+
+		Shader* GetDefaultVS() const { return m_pDefaultVS; }
 
 		// 윈도우 크기 변경시 호출. 백버퍼, 렌더타겟 재생성 함수 호출.
 		void OnResizeWindow();
 
 	private:
-		bool createDeviceAndSwapChain(int width, int height);
-		bool updateSwapChain(int width, int height);
 		void prepareDraw();
 
 	private:
-		HINSTANCE m_hInstance;
-		HWND m_hWnd;
-		std::wstring m_WindowTitle;
+		HINSTANCE m_hInstance = NULL;
+		HWND m_hWnd = NULL;
+		std::wstring m_WindowTitle = L"DIVE";
 		DirectX::XMINT2 m_WindowPosition{-1, -1};
-		DWORD m_WindowStyles;
-		unsigned int m_WindowFlags;
-		int m_Width;
-		int m_Height;
+		DWORD m_WindowStyles = 0;
+		unsigned int m_WindowFlags = 0;
+		int m_Width = 800;
+		int m_Height = 600;
 
 
 		// 디폴트 모드 같은데, 초기화 및 설정하는 부분을 찾지 못했다.
@@ -164,15 +176,17 @@ namespace Dive
 		// icon image
 
 		// DX11 Device & Default Resources
-		Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwapChain;
-		Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pDeviceContext;
+		Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwapChain = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pDeviceContext = nullptr;
 
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pDefaultRTV;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pDefaultDS;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDefaultDSV;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pDefaultRTV = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pDefaultDS = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDefaultDSV = nullptr;
 
-		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveType;
+		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+
+		D3D11_VIEWPORT m_Viewport;
 
 		Texture2D* m_pRenderTargets[MAX_RENDERTARGETS] = { nullptr, };
 		Texture2D* m_pDepthStencil = nullptr;
@@ -188,6 +202,20 @@ namespace Dive
 
 		// dirty check 전부 모으기.
 		bool m_bRenderTargetsDirty = false;
+
+		// temp
+		Shader* m_pDefaultVS = nullptr;
+		Shader* m_pDefaultPS = nullptr;
+		InputLayout* m_pDefaultIL = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pMatrixBuffer;
+
+		struct MatrixBufferType
+		{
+			DirectX::XMMATRIX world;
+			DirectX::XMMATRIX view;
+			DirectX::XMMATRIX proj;
+		};
+
 	};
 
 	void RegisterGraphicsObject(Context* pContext);

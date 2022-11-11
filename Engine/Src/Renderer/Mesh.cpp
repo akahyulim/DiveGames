@@ -23,6 +23,8 @@ namespace Dive
 
 	Mesh::~Mesh()
 	{
+		// 외부에서 생성된 버퍼를 Model과 나누어 관리하므로
+		// 어디에서 제거해야 할 지 애매해졌다.
 	}
 
 	void Mesh::Draw(Graphics* pGraphics)
@@ -40,22 +42,22 @@ namespace Dive
 		}
 	}
 
-	bool Mesh::SetNumVertexBuffers(unsigned int num)
+	bool Mesh::SetNumVertexBuffers(size_t num)
 	{
-		if (num >= MAX_VERTEX_STREAMS)
+		if (num >= static_cast<size_t>(MAX_VERTEX_STREAMS))
 		{
 			DV_LOG_ENGINE_ERROR("정점 버퍼 배열의 크기가 너무 큽니다.");
 			return false;
 		}
 
-		m_VertexBuffers.resize((size_t)num);
+		m_VertexBuffers.resize(num);
 
 		return true;
 	}
 	
-	bool Mesh::SetVertexBuffer(unsigned int index, VertexBuffer* pBuffer)
+	bool Mesh::SetVertexBuffer(size_t index, VertexBuffer* pBuffer)
 	{
-		if (index >= (unsigned int)m_VertexBuffers.size())
+		if (index >= m_VertexBuffers.size())
 		{
 			DV_LOG_ENGINE_ERROR("정점 버퍼 배열의 인덱스를 잘못 전달 받았습니다.");
 			return false;
@@ -66,9 +68,9 @@ namespace Dive
 		return true;
 	}
 	
-	VertexBuffer* Mesh::GetVertexBuffer(unsigned int index) const
+	VertexBuffer* Mesh::GetVertexBuffer(size_t index) const
 	{
-		return index < (unsigned int)m_VertexBuffers.size() ? m_VertexBuffers[index] : nullptr;
+		return index < m_VertexBuffers.size() ? m_VertexBuffers[index] : nullptr;
 	}
 	
 	void Mesh::SetIndexBuffer(IndexBuffer* pBuffer)

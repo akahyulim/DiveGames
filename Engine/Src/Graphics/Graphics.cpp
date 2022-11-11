@@ -4,6 +4,7 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
+#include "InputLayout.h"
 #include "Texture2D.h"
 #include "Renderer/Model.h"
 #include "Core/Context.h"
@@ -36,10 +37,6 @@ namespace Dive
 
 	Graphics::Graphics(Context* pContext)
 		: Object(pContext),
-		m_pDefaultRTV(nullptr),
-		m_pDefaultDS(nullptr),
-		m_pDefaultDSV(nullptr),
-		m_PrimitiveType(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
 		m_pIndexBuffer(nullptr),
 		m_pVertexShader(nullptr),
 		m_pPixelShader(nullptr)
@@ -68,10 +65,52 @@ namespace Dive
 		Destroy();
 	}
 
-	bool Graphics::IsInitialized() const
+	// 현재 윈도우 생성 후 바로 최소화하면 먹통이 되는 버그가 있다.
+	// 아무래도 크기를 저장하지 못했기 때문인 듯 하다?
+	// => 수정한 부분이 없는데 문제가 사라졌다...
+	bool Graphics::SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
+		bool tripleBuffer, int multiSample, int refreshRate)
 	{
-		if (!m_hWnd || !m_pDevice || !m_pDeviceContext)
+		ScreenModeParams params;
+		params.bFullScreen = bFullscreen;
+		params.bBorderless = bBorderless;
+		params.bResizable = bResizable;
+		params.bVSync = bVSync;
+
+		WindowModeParams windowMode;
+		windowMode.width = width;
+		windowMode.height = height;
+		windowMode.screenModeParams = params;
+
+		const bool maximize = (!width || !height) && !params.bFullScreen && !params.bBorderless && params.bResizable;
+
+		unsigned int flags = 0;
+		flags |= bFullscreen ? WINDOW_FULLSCREEN : 0;
+		flags |= bBorderless ? WINDOW_BORDERLESS : 0;
+		flags |= bResizable ? WINDOW_RESIZABLE : 0;
+
+		if (!WindowCreate(width, height, flags))
+		{
+			DV_LOG_ENGINE_ERROR("윈도우 생성에 실패하였습니다.");
 			return false;
+		}
+
+		if (!CreateDeviceAndSwapChain())
+			return false;
+
+		if (!UpdateSwapChain())
+			return false;
+
+		// 위치가 애매허다?
+		RegisterGraphicsObject(m_pContext);
+
+		// clear
+		// present
+
+		// OnScreenModeChanged
+
+		// 이건 내가 추가.
+		ShowWindow();
 
 		return true;
 	}
@@ -92,6 +131,11 @@ namespace Dive
 		}
 
 		s_pGraphics = nullptr;
+	}
+
+	bool Graphics::IsInitialized() const
+	{
+		return (m_hWnd && m_pDevice && m_pDeviceContext);
 	}
 
 	bool Graphics::WindowCreate(int width, int height, unsigned int flags)
@@ -150,7 +194,7 @@ namespace Dive
 			m_hInstance,
 			NULL);
 
-		return true;
+		return m_hWnd;
 	}
 
 	LRESULT Graphics::MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -163,7 +207,7 @@ namespace Dive
 			{
 			case WM_SIZE:
 				OnResizeWindow();
-				break;
+				return 0;
 			}
 		}
 
@@ -371,59 +415,181 @@ namespace Dive
 		return m_WindowFlags & WINDOW_RESIZABLE;
 	}
 
-	// 현재 윈도우 생성 후 바로 최소화하면 먹통이 되는 버그가 있다.
-	// 아무래도 크기를 저장하지 못했기 때문인 듯 하다?
-	// => 수정한 부분이 없는데 문제가 사라졌다...
-	bool Graphics::SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
-		bool tripleBuffer, int multiSample, int refreshRate)
+	bool Graphics::CreateDeviceAndSwapChain(unsigned int width, unsigned int height)
 	{
-		ScreenModeParams params;
-		params.bFullScreen = bFullscreen;
-		params.bBorderless = bBorderless;
-		params.bResizable = bResizable;
-		params.bVSync = bVSync;
-
-		WindowModeParams windowMode;
-		windowMode.width = width;
-		windowMode.height = height;
-		windowMode.screenModeParams = params;
-
-		const bool maximize = (!width || !height) && !params.bFullScreen && !params.bBorderless && params.bResizable;
-
-		// 실제로는 함수들을 타고 들어가서
-		// SetScreenMode에서 윈도우, d3d11 객체를 생성한다.
-
-		//if (!m_hWnd)
+		if (FAILED(D3D11CreateDevice(
+			nullptr,
+			D3D_DRIVER_TYPE_HARDWARE,
+			nullptr,
+			0,
+			nullptr,
+			0,
+			D3D11_SDK_VERSION,
+			m_pDevice.GetAddressOf(),
+			nullptr,
+			m_pDeviceContext.GetAddressOf()
+		)))
 		{
-			unsigned int flags = 0;
-			flags |= bFullscreen ? WINDOW_FULLSCREEN : 0;
-			flags |= bBorderless ? WINDOW_BORDERLESS : 0;
-			flags |= bResizable ? WINDOW_RESIZABLE : 0;
-
-			if (!WindowCreate(width, height, flags))
-			{
-				DV_LOG_ENGINE_ERROR("윈도우 생성에 실패하였습니다.");
-				return false;
-			}
+			DV_LOG_ENGINE_ERROR("Graphics::createDeviceAndSwapChain - D3D11 장치 생성에 실패하였습니다.");
+			return false;
 		}
 
-		// 현재 위치는 임시
-		// 순서는 이게 맞다.
-		createDeviceAndSwapChain(width, height);
-		updateSwapChain(width, height);
+		// 멀티 샘플 레밸 체크?
 
-		// 위치가 애매허다?
-		RegisterGraphicsObject(m_pContext);
+		IDXGIDevice* pDxgiDevice = nullptr;
+		m_pDevice->QueryInterface(IID_IDXGIDevice, (void**)&pDxgiDevice);
+		IDXGIAdapter* pDxgiAdapter = nullptr;
+		pDxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&pDxgiAdapter);
+		IDXGIFactory* pDxgiFactory = nullptr;
+		pDxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&pDxgiFactory);
 
-		// clear
-		// present
+		// 동일 해상도에서 최적화된 리플래쉬 레이트 설정
+		// 일단 건너뛴다.
 
-		// OnScreenModeChanged
+		DXGI_SWAP_CHAIN_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.BufferCount = 1;
+		desc.BufferDesc.Width = width;
+		desc.BufferDesc.Height = height;
+		desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// sRGB???
+		desc.BufferDesc.RefreshRate.Denominator = 1;			// 추후 수정(vsync에 따라 달라진다?)
+		desc.BufferDesc.RefreshRate.Numerator = 0;
+		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		desc.SampleDesc.Count = 1;								// 멀티 샘플링 off
+		desc.SampleDesc.Quality = 0;
+		desc.Windowed = IsFullScreen() ? FALSE : TRUE;	// orho는 TRUE 고정이다. 전체화면은 여기에서 결정된다.
+		desc.OutputWindow = m_hWnd;
+		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
 
-		// 이건 내가 추가.
-		ShowWindow();
+		if(FAILED(pDxgiFactory->CreateSwapChain(m_pDevice.Get(), &desc, m_pSwapChain.GetAddressOf())))
+		{
+			DV_LOG_ENGINE_ERROR("Graphics::createDeviceAndSwapChain - D3D11 스왑체인 생성에 실패하였습니다.");
+			return false;
+		}
 
 		return true;
+	}
+
+	// 전달받은 크기로 Default RenderTargetView, DepthStencilView를 생성한다.
+	bool Graphics::UpdateSwapChain(unsigned int width, unsigned int height)
+	{
+		m_pDeviceContext->OMSetRenderTargets(0, NULL, NULL);
+		m_pDefaultRTV.Reset();
+		m_pDefaultDS.Reset();
+		m_pDefaultDSV.Reset();
+
+		for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
+			m_pCurRenderTargetViews[i] = nullptr;
+		m_pCurDepthStencilView = nullptr;
+
+		m_pSwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+
+		// 백버퍼를 얻어와 디폴트 렌더타겟뷰 생성
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> pBackbufferTexture;
+		if (FAILED(m_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)pBackbufferTexture.GetAddressOf())))
+		{
+			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 후면 버퍼 텍스쳐 생성에 실패하였습니다.");
+			return false;
+		}
+
+		unsigned int currentWidth = width;
+		unsigned int currentHeight = height;
+
+		if (width == 0 || height == 0)
+		{
+			DXGI_SWAP_CHAIN_DESC swapChainDesc;
+			ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
+			m_pSwapChain->GetDesc(&swapChainDesc);
+
+			currentWidth = swapChainDesc.BufferDesc.Width;
+			currentHeight = swapChainDesc.BufferDesc.Height;
+		}
+
+		if (FAILED(m_pDevice->CreateRenderTargetView(
+			static_cast<ID3D11Resource*>(pBackbufferTexture.Get()), nullptr, m_pDefaultRTV.GetAddressOf())))
+		{
+			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
+			return false;
+		}
+
+		// 디폴트 뎁스스텐실 생성
+		D3D11_TEXTURE2D_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Width = currentWidth;
+		desc.Height = currentHeight;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		desc.SampleDesc.Count = 1;// static_cast<UINT>(screenParams_.multiSample_);
+		desc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(desc.Format, screenParams_.multiSample_);
+		desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		desc.CPUAccessFlags = 0;
+		desc.MiscFlags = 0;
+
+		if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, m_pDefaultDS.GetAddressOf())))
+		{
+			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 백버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
+			return false;
+		}
+
+		if (FAILED(m_pDevice->CreateDepthStencilView(
+			static_cast<ID3D11Resource*>(m_pDefaultDS.Get()),
+			nullptr,
+			m_pDefaultDSV.GetAddressOf())))
+		{
+			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 백버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
+			return false;
+		}
+
+		m_Width = static_cast<int>(currentWidth);
+		m_Height = static_cast<int>(currentHeight);
+
+		ResetRenderTargets();
+
+		m_bRenderTargetsDirty = true;
+
+		return true;
+	}
+
+	bool Graphics::IsDeviceLost()
+	{
+		if (FAILED(m_pDevice->GetDeviceRemovedReason()))
+			return true;
+
+		return false;
+	}
+
+	bool Graphics::BeginFrame()
+	{
+		if (!IsInitialized())
+			return false;
+
+		// 전체화면이면서 최소화 되어 있다면 false?
+		// => 가능한 조합이 아닌 듯 한데...? 
+
+		ResetRenderTargets();
+
+		// SetTexture
+		// 16개를 전부 nullptr로 한다.
+		// 어디에 사용하는 텍스쳐인지는 모르겠다.
+		// => shader resource view 같다. 즉, 모델에 붙일 텍스쳐 말이다.
+
+		FIRE_EVENT(BeginRenderEvent());
+
+		return true;
+	}
+
+	void Graphics::EndFrame()
+	{
+		if (!IsInitialized())
+			return;
+
+		FIRE_EVENT(EndRenderEvent());
+
+		// vsync 여부를 멤버로 가져야 할 듯
+		// orho는 screenParam으로 전부 가진다.
+		m_pSwapChain->Present(1, 0);
 	}
 
 	// flags는 clear target flag다.
@@ -448,54 +614,6 @@ namespace Dive
 		{
 
 		}
-	}
-
-	bool Graphics::IsDeviceLost()
-	{
-		if (FAILED(m_pDevice->GetDeviceRemovedReason()))
-			return true;
-
-		return false;
-	}
-
-	bool Graphics::BeginFrame()
-	{
-		if (!IsInitialized())
-			return false;
-
-		// 전체화면이면서 최소화 되어 있다면 false?
-		// => 가능한 조합이 아닌 듯 한데...? 
-
-		// 함수로 만들어져 있다.
-		// 이 곳이랑 OnWindowResized, UpdateSwapChain에서 호출된다.
-		{
-			for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
-				SetRenderTarget(i, nullptr);
-			SetDepthStencil(nullptr);
-			// viewport
-		}
-
-
-		// SetTexture
-		// 16개를 전부 nullptr로 한다.
-		// 어디에 사용하는 텍스쳐인지는 모르겠다.
-		// => shader resource view 같다. 즉, 모델에 붙일 텍스쳐 말이다.
-
-		FIRE_EVENT(BeginRenderEvent());
-
-		return true;
-	}
-
-	void Graphics::EndFrame()
-	{
-		if (!IsInitialized())
-			return;
-
-		FIRE_EVENT(EndRenderEvent());
-
-		// vsync 여부를 멤버로 가져야 할 듯
-		// orho는 screenParam으로 전부 가진다.
-		m_pSwapChain->Present(1, 0);
 	}
 
 	void Graphics::Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int vertexStart)
@@ -566,6 +684,59 @@ namespace Dive
 		}
 	}
 
+	void Graphics::ResetRenderTargets()
+	{
+		// render targets
+		for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
+			SetRenderTarget(i, nullptr);
+
+		// depth stencil
+		SetDepthStencil(nullptr);
+
+		// viewport
+		RECT viewportRect;
+		viewportRect.left = 0;
+		viewportRect.right = static_cast<LONG>(m_Width);
+		viewportRect.top = 0;
+		viewportRect.bottom = static_cast<LONG>(m_Height);
+
+		SetViewportRect(viewportRect);
+	}
+
+	RECT Graphics::GetViewportRect() const
+	{
+		RECT rect;
+		rect.left = static_cast<LONG>(m_Viewport.TopLeftX);
+		rect.right = rect.left + static_cast<LONG>(m_Viewport.Width);
+		rect.top = static_cast<LONG>(m_Viewport.TopLeftY);
+		rect.bottom = rect.top + static_cast<LONG>(m_Viewport.Height);
+
+		return rect;
+	}
+
+	void Graphics::SetViewport(const D3D11_VIEWPORT& viewport)
+	{
+		m_Viewport = viewport;
+
+		m_pDeviceContext->RSSetViewports(1, &m_Viewport);
+	}
+
+	void Graphics::SetViewportRect(const RECT& rect)
+	{
+		D3D11_VIEWPORT viewport;
+
+		viewport.TopLeftX = static_cast<float>(rect.left);
+		viewport.TopLeftY = static_cast<float>(rect.top);
+
+		viewport.Width = static_cast<float>(rect.right - rect.left);
+		viewport.Height = static_cast<float>(rect.bottom - rect.top);
+
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+
+		SetViewport(viewport);
+	}
+
 	VertexBuffer* Graphics::GetVertexBuffer(unsigned int index) const
 	{
 		return index < MAX_VERTEX_STREAMS ? m_pVertexBuffers[index] : nullptr;
@@ -580,6 +751,14 @@ namespace Dive
 
 	void Graphics::SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, unsigned int instanceOffset)
 	{
+		// 일단 버퍼 하나만
+		m_pVertexBuffers[0] = buffers[0];
+
+		unsigned int stride = m_pVertexBuffers[0]->GetVertexSize();
+		unsigned int offset = 0;
+		auto pVb = m_pVertexBuffers[0]->GetBuffer();
+
+		m_pDeviceContext->IASetVertexBuffers(0, 1, &pVb, &stride, &offset);
 	}
 
 	void Graphics::SetIndexBuffer(IndexBuffer* pBuffer)
@@ -631,171 +810,194 @@ namespace Dive
 		// 이후 셰이더 파라미터와 상수버퍼를 업데이트
 	}
 
+	bool Graphics::LoadShaders()
+	{
+		if (!m_pDefaultVS)
+		{
+			m_pDefaultVS = new Shader(m_pContext, eShaderType::Vertex);
+			if (!m_pDefaultVS->Compile("../Output/CoreData/Shaders/Color.hlsl"))
+				return false;
+		}
+
+		if (!m_pDefaultPS)
+		{
+			m_pDefaultPS = new Shader(m_pContext, eShaderType::Pixel);
+			if (!m_pDefaultPS->Compile("../Output/CoreData/Shaders/Color.hlsl"))
+				return false;
+		}
+
+		D3D11_BUFFER_DESC desc;
+		desc.Usage = D3D11_USAGE_DYNAMIC;
+		desc.ByteWidth = sizeof(MatrixBufferType);
+		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		desc.MiscFlags = 0;
+		desc.StructureByteStride = 0;
+
+		if (FAILED(m_pDevice->CreateBuffer(&desc, nullptr, m_pMatrixBuffer.GetAddressOf())))
+		{
+			DV_LOG_ENGINE_ERROR("Matrix Constant Buffer 생성 실패!");
+			return false;
+		}
+
+		// 일단 생성 후 바로 등록이지만 추후 바뀔 수 있다.
+		// depthstencilstate
+		{
+
+		}
+		// rssetstate
+		{
+			ID3D11RasterizerState* pRasterizerState = nullptr;
+
+			D3D11_RASTERIZER_DESC desc;
+			desc.AntialiasedLineEnable = false;
+			desc.CullMode = D3D11_CULL_BACK;
+			desc.DepthBias = 0;
+			desc.DepthBiasClamp = 0.0f;
+			desc.DepthClipEnable = true;
+			desc.FillMode = D3D11_FILL_SOLID;
+			desc.FrontCounterClockwise = false;
+			desc.MultisampleEnable = false;
+			desc.ScissorEnable = false;
+			desc.SlopeScaledDepthBias = 0.0f;
+
+			// Create the rasterizer state from the description we just filled out.
+			auto result = m_pDevice->CreateRasterizerState(&desc, &pRasterizerState);
+			if (FAILED(result))
+			{
+				return false;
+			}
+
+			// Now set the rasterizer state.
+			m_pDeviceContext->RSSetState(pRasterizerState);
+		}
+
+		return true;
+	}
+
+	void Graphics::SetDefaultShader()
+	{
+		if (!m_pDefaultVS || !m_pDefaultPS)
+			return;
+
+		auto pVs = static_cast<ID3D11VertexShader*>(m_pDefaultVS->GetShader());
+		m_pDeviceContext->VSSetShader(pVs, nullptr, 0);
+
+		auto pPs = static_cast<ID3D11PixelShader*>(m_pDefaultPS->GetShader());
+		m_pDeviceContext->PSSetShader(pPs, nullptr, 0);
+
+		if (!m_pDefaultIL)
+		{
+			auto pVb = m_pVertexBuffers[0];
+			m_pDefaultIL = new InputLayout(m_pContext, pVb, m_pDefaultVS);
+		}
+
+		m_pDeviceContext->IASetInputLayout(m_pDefaultIL->GetInputLayout());
+	}
+
 	void Graphics::OnResizeWindow()
 	{
 		if (!IsInitialized())
 			return;
 
-		RECT rt{ 0, 0, 0, 0 };
-		::GetClientRect(m_hWnd, &rt);
-
-		int width = static_cast<int>(rt.right - rt.left);
-		int height = static_cast<int>(rt.bottom - rt.top);
-
-		if (width == m_Width && height == m_Height)
-			return;
-		
-		updateSwapChain(width, height);
+		UpdateSwapChain();
 
 		// render targets들 + viewport 도 새로 만들어야 한다.
 		// 그런데 orho는 reset만 한다. 아마 다른 곳에서 새로 만드나 보다.
 
 		// 이 함수와 함께 윈도우 모드 변경이 일어나는 다른 함수(OnScreenModeChanged)는 ScreenMode 이벤트를 발생시킨다.
-		// 이때 매개변수로 크기, 모드(풀 스크린, 크기 변경 가능), 모니터 등의 정보를 전달한다. 
-
-		DV_LOG_ENGINE_INFO("윈도우 크기가 {0:d} x {1:d}로 변경되었습니다.", width, height);
-	}
-
-	bool Graphics::createDeviceAndSwapChain(int width, int height)
-	{
-		if (!m_pDevice)
-		{
-			if (FAILED(D3D11CreateDevice(
-				nullptr,
-				D3D_DRIVER_TYPE_HARDWARE,
-				nullptr,
-				0,
-				nullptr,
-				0,
-				D3D11_SDK_VERSION,
-				m_pDevice.GetAddressOf(),
-				nullptr,
-				m_pDeviceContext.GetAddressOf()
-			)))
-			{
-				DV_LOG_ENGINE_ERROR("Graphics::createDeviceAndSwapChain - D3D11 장치 생성에 실패하였습니다.");
-				return false;
-			}
-		}
-
-		// 멀티 샘플 레밸 체크?
-
-		IDXGIDevice* pDxgiDevice = nullptr;
-		m_pDevice->QueryInterface(IID_IDXGIDevice, (void**)&pDxgiDevice);
-		IDXGIAdapter* pDxgiAdapter = nullptr;
-		pDxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&pDxgiAdapter);
-		IDXGIFactory* pDxgiFactory = nullptr;
-		pDxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&pDxgiFactory);
-
-		// 동일 해상도에서 최적화된 리플래쉬 레이트 설정
-		// 일단 건너뛴다.
-
-		DXGI_SWAP_CHAIN_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.BufferCount = 1;
-		desc.BufferDesc.Width = (UINT)width;
-		desc.BufferDesc.Height = (UINT)height;
-		desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// sRGB???
-		desc.BufferDesc.RefreshRate.Denominator = 1;			// 추후 수정(vsync에 따라 달라진다?)
-		desc.BufferDesc.RefreshRate.Numerator = 0;
-		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		desc.SampleDesc.Count = 1;								// 멀티 샘플링 off
-		desc.SampleDesc.Quality = 0;
-		desc.Windowed = IsFullScreen() ? FALSE : TRUE;	// orho는 TRUE 고정이다. 전체화면은 여기에서 결정된다.
-		desc.OutputWindow = m_hWnd;
-		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
-
-		HRESULT hr = pDxgiFactory->CreateSwapChain(m_pDevice.Get(), &desc, m_pSwapChain.GetAddressOf());
-
-		if (FAILED(hr))
-		{
-			DV_LOG_ENGINE_ERROR("Graphics::createDeviceAndSwapChain - D3D11 스왑체인 생성에 실패하였습니다.");
-			return false;
-		}
-
-		return true;
-	}
-
-	// 전달받은 크기로 Default RenderTargetView, DepthStencilView를 생성한다.
-	bool Graphics::updateSwapChain(int width, int height)
-	{
-		// 빈 렌더타겟뷰를 Set
-		ID3D11RenderTargetView* pNullView = nullptr;
-		m_pDeviceContext->OMSetRenderTargets(1, &pNullView, nullptr);
-
-		for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
-			m_pCurRenderTargetViews[i] = nullptr;
-		m_pCurDepthStencilView = nullptr;
-		m_bRenderTargetsDirty = true;
-
-		// 리사이즈 버퍼
-		m_pSwapChain->ResizeBuffers(1, (UINT)width, (UINT)height, DXGI_FORMAT_UNKNOWN, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
-
-		// 백버퍼를 얻어와 디폴트 렌더타겟뷰 생성
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> pBackbufferTexture;
-		if (FAILED(m_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)pBackbufferTexture.GetAddressOf())))
-		{
-			DV_RELEASE(pBackbufferTexture);
-			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 후면 버퍼 텍스쳐 생성에 실패하였습니다.");
-			return false;
-		}
-
-		if (FAILED(m_pDevice->CreateRenderTargetView(
-			static_cast<ID3D11Resource*>(pBackbufferTexture.Get()), nullptr, m_pDefaultRTV.GetAddressOf())))
-		{
-			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
-			return false;
-		}
-
-		// 디폴트 뎁스스텐실 생성
-		D3D11_TEXTURE2D_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Width = (UINT)width;
-		desc.Height = (UINT)height;
-		desc.MipLevels = 1;
-		desc.ArraySize = 1;
-		desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		desc.SampleDesc.Count = 1;// static_cast<UINT>(screenParams_.multiSample_);
-		desc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(desc.Format, screenParams_.multiSample_);
-		desc.Usage = D3D11_USAGE_DEFAULT;
-		desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		desc.CPUAccessFlags = 0;
-		desc.MiscFlags = 0;
-
-		if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, m_pDefaultDS.GetAddressOf())))
-		{
-			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 백버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
-			return false;
-		}
-
-		if (FAILED(m_pDevice->CreateDepthStencilView(
-			static_cast<ID3D11Resource*>(m_pDefaultDS.Get()),
-			nullptr, 
-			m_pDefaultDSV.GetAddressOf())))
-		{
-			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 백버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
-			return false;
-		}
-
-		// 백버퍼 사이즈를 저장
-		m_Width = width;
-		m_Height = height;
-
-		// ResetRenderTargets
-		{
-			for (unsigned int i = 0; i < MAX_RENDERTARGETS; ++i)
-				SetRenderTarget(i, nullptr);
-			SetDepthStencil(nullptr);
-			// viewport
-		}
-
-		return true;
+		// 이때 매개변수로 크기, 모드(풀 스크린, 크기 변경 가능), 모니터 등의 정보를 전달한다.
 	}
 
 	// 이름을 바꿨으면 좋겠다.
 	// 각종 bind를 수행하는 구문이다.
 	void Graphics::prepareDraw()
 	{
+		// 임시
+		// world, view, proj 행렬을 constant buffer로 vs에 전달해야 한다.
+		{
+			using namespace DirectX;
+
+			// world
+			auto worldMatrix = DirectX::XMMatrixIdentity();
+
+			// view
+			XMFLOAT3 up, position, lookAt;
+			XMVECTOR upVector, positionVector, lookAtVector;
+			float yaw, pitch, roll;
+			XMMATRIX rotationMatrix;
+
+
+			// Setup the vector that points upwards.
+			up.x = 0.0f;
+			up.y = 1.0f;
+			up.z = 0.0f;
+
+			// Load it into a XMVECTOR structure.
+			upVector = XMLoadFloat3(&up);
+
+			// Setup the position of the camera in the world.
+			position.x = 0.0f;
+			position.y = 0.0f;
+			position.z = -5.0f;
+
+			// Load it into a XMVECTOR structure.
+			positionVector = XMLoadFloat3(&position);
+
+			// Setup where the camera is looking by default.
+			lookAt.x = 0.0f;
+			lookAt.y = 0.0f;
+			lookAt.z = 1.0f;
+
+			// Load it into a XMVECTOR structure.
+			lookAtVector = XMLoadFloat3(&lookAt);
+
+			// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
+			pitch = 0 * 0.0174532925f;
+			yaw = 0 * 0.0174532925f;
+			roll = 0 * 0.0174532925f;
+
+			// Create the rotation matrix from the yaw, pitch, and roll values.
+			rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+
+			// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
+			lookAtVector = XMVector3TransformCoord(lookAtVector, rotationMatrix);
+			upVector = XMVector3TransformCoord(upVector, rotationMatrix);
+
+			// Translate the rotated camera position to the location of the viewer.
+			lookAtVector = XMVectorAdd(positionVector, lookAtVector);
+
+			// Finally create the view matrix from the three updated vectors.
+			auto viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+
+			// proj
+			float fieldOfView = 3.141592654f / 4.0f;
+			float screenAspect = static_cast<float>(m_Width) / static_cast<float>(m_Height);
+			auto projMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
+
+			// constant buffer를 만들어 vs에 전달해야 한다.
+			worldMatrix = XMMatrixTranspose(worldMatrix);
+			viewMatrix = XMMatrixTranspose(viewMatrix);
+			projMatrix = XMMatrixTranspose(projMatrix);
+
+			D3D11_MAPPED_SUBRESOURCE mappedResource;
+			if (FAILED(m_pDeviceContext->Map(m_pMatrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+			{
+				DV_LOG_ENGINE_ERROR("Constant Buffer Mapping에 실패하였습니다.");
+				return;
+			}
+
+			auto pData = static_cast<MatrixBufferType*>(mappedResource.pData);
+			pData->world = worldMatrix;
+			pData->view = viewMatrix;
+			pData->proj = projMatrix;
+
+			m_pDeviceContext->Unmap(m_pMatrixBuffer.Get(), 0);
+
+			unsigned int bufferNumber = 0;
+			m_pDeviceContext->VSSetConstantBuffers(bufferNumber, 1, m_pMatrixBuffer.GetAddressOf());
+		}
+
 		if (m_bRenderTargetsDirty)
 		{
 			// 이렇게하면 ID3D11DepthstencilView를 무조건 사용하게 된다.
@@ -815,7 +1017,8 @@ namespace Dive
 				m_pCurRenderTargetViews[0] = m_pDefaultRTV.Get();
 			}
 
-			m_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &m_pCurRenderTargetViews[0], m_pCurDepthStencilView);
+			m_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &m_pCurRenderTargetViews[0], nullptr);// m_pCurDepthStencilView);
+			
 			m_bRenderTargetsDirty = false;
 		}
 	

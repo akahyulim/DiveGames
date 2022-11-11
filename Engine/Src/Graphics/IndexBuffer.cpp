@@ -36,7 +36,7 @@ namespace Dive
 		if (m_pData)
 			DV_DELETE_ARRAY(m_pData);
 		m_pData = new unsigned char[m_IndexCount * m_IndexSize];
-		memset(static_cast<void*>(m_pData), NULL, m_IndexCount * m_IndexSize);
+		memset(static_cast<void*>(m_pData), 0, m_IndexCount * m_IndexSize);
 
 		m_pBuffer.Reset();
 
