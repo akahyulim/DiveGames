@@ -184,6 +184,7 @@
     <ClInclude Include="Src\Engine\Engine.h" />
     <ClInclude Include="Src\Engine\EngineDef.h" />
     <ClInclude Include="Src\Engine\EngineEvents.h" />
+    <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
     <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
@@ -224,6 +225,7 @@
     </ClCompile>
     <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Engine\Engine.cpp" />
+    <ClCompile Include="Src\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\InputLayout.cpp" />

@@ -10,6 +10,7 @@ namespace Dive
 	class Shader;
 	class InputLayout;
 	class Texture2D;
+	class ConstantBuffer;
 
 	const LPCWSTR WND_CLASS_NAME = L"AppWnd";
 
@@ -207,7 +208,8 @@ namespace Dive
 		Shader* m_pDefaultVS = nullptr;
 		Shader* m_pDefaultPS = nullptr;
 		InputLayout* m_pDefaultIL = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pMatrixBuffer;
+		//Microsoft::WRL::ComPtr<ID3D11Buffer> m_pMatrixBuffer;
+		ConstantBuffer* m_pMatrixBuffer;
 
 		struct MatrixBufferType
 		{

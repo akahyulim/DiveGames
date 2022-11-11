@@ -3,6 +3,7 @@
 #include "GraphicsEvents.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "ConstantBuffer.h"
 #include "Shader.h"
 #include "InputLayout.h"
 #include "Texture2D.h"
@@ -808,6 +809,10 @@ namespace Dive
 		}
 
 		// 이후 셰이더 파라미터와 상수버퍼를 업데이트
+		if (m_pVertexShader && m_pPixelShader)
+		{
+
+		}
 	}
 
 	bool Graphics::LoadShaders()
@@ -826,19 +831,9 @@ namespace Dive
 				return false;
 		}
 
-		D3D11_BUFFER_DESC desc;
-		desc.Usage = D3D11_USAGE_DYNAMIC;
-		desc.ByteWidth = sizeof(MatrixBufferType);
-		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		desc.MiscFlags = 0;
-		desc.StructureByteStride = 0;
-
-		if (FAILED(m_pDevice->CreateBuffer(&desc, nullptr, m_pMatrixBuffer.GetAddressOf())))
-		{
-			DV_LOG_ENGINE_ERROR("Matrix Constant Buffer 생성 실패!");
-			return false;
-		}
+		// constant buffer
+		m_pMatrixBuffer = new ConstantBuffer(m_pContext);
+		m_pMatrixBuffer->CreateBuffer<MatrixBufferType>();
 
 		// 일단 생성 후 바로 등록이지만 추후 바뀔 수 있다.
 		// depthstencilstate
@@ -915,6 +910,9 @@ namespace Dive
 	{
 		// 임시
 		// world, view, proj 행렬을 constant buffer로 vs에 전달해야 한다.
+		// world: Model GameObject의 Transform으로부터 획득.
+		// view & proj: Camera Component로부터 획득.
+		// constant buffer의 구성 및 bind 역시 적절한 위치를 찾아야 한다.
 		{
 			using namespace DirectX;
 
@@ -980,22 +978,16 @@ namespace Dive
 			viewMatrix = XMMatrixTranspose(viewMatrix);
 			projMatrix = XMMatrixTranspose(projMatrix);
 
-			D3D11_MAPPED_SUBRESOURCE mappedResource;
-			if (FAILED(m_pDeviceContext->Map(m_pMatrixBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
-			{
-				DV_LOG_ENGINE_ERROR("Constant Buffer Mapping에 실패하였습니다.");
-				return;
-			}
+			MatrixBufferType matrixBuffer;
+			matrixBuffer.world = worldMatrix;
+			matrixBuffer.view = viewMatrix;
+			matrixBuffer.proj = projMatrix;
 
-			auto pData = static_cast<MatrixBufferType*>(mappedResource.pData);
-			pData->world = worldMatrix;
-			pData->view = viewMatrix;
-			pData->proj = projMatrix;
-
-			m_pDeviceContext->Unmap(m_pMatrixBuffer.Get(), 0);
+			m_pMatrixBuffer->Update(static_cast<void*>(&matrixBuffer));
+			auto pConstantBuffer = m_pMatrixBuffer->GetBuffer();
 
 			unsigned int bufferNumber = 0;
-			m_pDeviceContext->VSSetConstantBuffers(bufferNumber, 1, m_pMatrixBuffer.GetAddressOf());
+			m_pDeviceContext->VSSetConstantBuffers(bufferNumber, 1, m_pMatrixBuffer->GetBufferAddressOf());
 		}
 
 		if (m_bRenderTargetsDirty)
