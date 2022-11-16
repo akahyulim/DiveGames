@@ -57,11 +57,15 @@ namespace Sandbox
 			Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
 			pVb->SetSize(3, elements);
 			pVb->SetData(static_cast<void*>(vertices.data()));
+			// Elements를 전달하지 않아 InputLayout 생성이 잘못되었다.
+			// 1. Spartan처럼 Shader에서 InputLayout을 만들던지,
+			// 2. 어떻게든 Elements를 전달하는 수 밖에 없다.
+			// 문제는 InputLayout과 VertexShader의 Input 타입이 달라도 되느냐이다.
+			//pVb->Create<float>(vertices);
 
 			std::vector<unsigned short> indices = { 0, 1, 2 };
 			Dive::IndexBuffer* pIb = new Dive::IndexBuffer(m_pContext);
-			pIb->SetSize(3, false);
-			pIb->SetData(static_cast<void*>(indices.data()));
+			pIb->Create<unsigned short>(indices);
 
 			Dive::Mesh* pMesh = new Dive::Mesh(m_pContext);
 			pMesh->SetNumVertexBuffers(1);

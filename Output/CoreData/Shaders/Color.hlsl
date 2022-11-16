@@ -7,34 +7,35 @@ cbuffer MatrixBuffer
 	matrix projectionMatrix;
 };
 
-struct VertexInputType
+// position은 기본이고
+// 이후 인자부턴 파라미터로 확인한다.
+void mainVS(
+	float4 position : POSITION,
+#ifdef VERTEXCOLOR
+	float4 color : COLOR,
+#endif
+	out float4 oPosition : SV_POSITION,
+	out float4 oColor : COLOR				
+)
 {
-	float4 position : POSITION;
-	float4 color : COLOR;
-};
+	position.w = 1.0f;
 
-struct PixelInputType
-{
-	float4 position : SV_POSITION;
-	float4 color : COLOR;
-};
+	oPosition = mul(position, worldMatrix);
+	oPosition = mul(oPosition, viewMatrix);
+	oPosition = mul(oPosition, projectionMatrix);
 
-PixelInputType mainVS(VertexInputType input)
-{
-	PixelInputType output;
+#ifdef VERTEXCOLOR
+	oColor = color;
+#else
+	oColor = float4(1.0f, 1.0f, 0.0f, 1.0f);
+#endif
 
-	input.position.w = 1.0f;
-
-	output.position = mul(input.position, worldMatrix);
-	output.position = mul(output.position, viewMatrix);
-	output.position = mul(output.position, projectionMatrix);
-
-	output.color = input.color;
-
-	return output;
 }
 
-float4 mainPS(PixelInputType input) : SV_TARGET
+void mainPS(
+	float4 position : SV_POSITION,
+	float4 color : COLOR,				// mainVS의 out과 순서가 같아야 한다.
+	out float4 oColor : SV_TARGET)
 {
-	return input.color;
+	oColor = color;
 }

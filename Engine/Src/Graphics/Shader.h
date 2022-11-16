@@ -25,8 +25,11 @@ namespace Dive
 		const std::string& GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
 
-		void AddDefine(const std::string& define, const std::string& value = "1") { m_Defines[define] = value; }
 		const std::unordered_map<std::string, std::string>& GetDefines() const { return m_Defines; }
+		void AddDefine(const std::string& define, const std::string& value = "1") { m_Defines[define] = value; }
+		
+		//std::string GetDefines() const { return m_Defines; }
+		//void SetDefines(const std::string& defines) { m_Defines = defines; }
 
 	private:
 		Graphics* m_pGraphics;
@@ -37,5 +40,6 @@ namespace Dive
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_pVertexShader;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pPixelShader;
 		std::unordered_map<std::string, std::string> m_Defines;
+		//std::string m_Defines;
 	};
 }

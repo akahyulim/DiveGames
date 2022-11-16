@@ -770,7 +770,7 @@ namespace Dive
 			{
 				m_pDeviceContext->IASetIndexBuffer(
 					pBuffer->GetBuffer(),
-					pBuffer->GetIndexSize() == sizeof(unsigned short) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT,
+					pBuffer->GetFormat(),
 					0);
 			}
 			else
@@ -819,7 +819,13 @@ namespace Dive
 	{
 		if (!m_pDefaultVS)
 		{
+			// 하나의 Shader도 InputType에 따라 Define이 달라지면서 다양한 종류로 존재하게 된다.
+			// urho의 Shader와 ShaderVariable의 관계는 이러한 구현 특징때문인 듯 하다.
+			// 그런데 AddDefines()를 비롯한 Shader 생성 및 Batch에 설정하는 부분을 찾지 못했다. 
 			m_pDefaultVS = new Shader(m_pContext, eShaderType::Vertex);
+			// 이렇게 하나씩 추가하는 것이 아닌 듯 하다.
+			// ' '로 구분된 문자열 하나를 전달하고, 함수 이름 역시 Add가 아니라 SetDefines이다.
+			m_pDefaultVS->AddDefine("VERTEXCOLOR");
 			if (!m_pDefaultVS->Compile("../Output/CoreData/Shaders/Color.hlsl"))
 				return false;
 		}
@@ -827,6 +833,7 @@ namespace Dive
 		if (!m_pDefaultPS)
 		{
 			m_pDefaultPS = new Shader(m_pContext, eShaderType::Pixel);
+			//m_pDefaultPS->AddDefine("VERTEXCOLOR");
 			if (!m_pDefaultPS->Compile("../Output/CoreData/Shaders/Color.hlsl"))
 				return false;
 		}

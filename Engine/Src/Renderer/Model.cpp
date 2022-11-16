@@ -87,6 +87,7 @@ namespace Dive
 		}
 
 		// 인덱스 버퍼 개수 설정.
+		// => 버퍼 클래스를 수정 중이라 추후 변경이 필요하다
 		unsigned int numIndexBuffers = 0;
 		pDeserializer->Read(&numIndexBuffers);
 		DV_LOG_ENGINE_DEBUG("numIndexBuffers: {:d}", numIndexBuffers);
@@ -104,11 +105,11 @@ namespace Dive
 			DV_LOG_ENGINE_DEBUG("indexSize: {:d}", indexSize);
 
 			// 인덱스 개수, 크기 설정.
-			pIndexBuffer->SetSize(numIndices, indexSize > sizeof(unsigned short));
+			//pIndexBuffer->SetStride(numIndices, indexSize > sizeof(unsigned short));
 
 			// 인덱스 데이터 설정.
 			void* pDest = pIndexBuffer->Map();
-			pDeserializer->Read(pDest, pIndexBuffer->GetIndexCount() * pIndexBuffer->GetIndexSize());
+			pDeserializer->Read(pDest, pIndexBuffer->GetCount() * pIndexBuffer->GetStride());
 			pIndexBuffer->Unmap();
 
 			m_IndexBuffers[i] = pIndexBuffer;
@@ -174,13 +175,13 @@ namespace Dive
 			auto* pIndexBuffer = m_IndexBuffers[i];
 
 			// 인덱스 개수 기록.
-			pSerializer->Write(static_cast<unsigned int>(pIndexBuffer->GetIndexCount()));
+			pSerializer->Write(static_cast<unsigned int>(pIndexBuffer->GetCount()));
 
 			// 인덱스 크기 기록.
-			pSerializer->Write(static_cast<unsigned int>(pIndexBuffer->GetIndexSize()));
+			pSerializer->Write(static_cast<unsigned int>(pIndexBuffer->GetStride()));
 			
 			// 인덱스 데이터 기록.
-			pSerializer->Write(pIndexBuffer->GetData(), pIndexBuffer->GetIndexCount() * pIndexBuffer->GetIndexSize());
+			//pSerializer->Write(pIndexBuffer->GetData(), pIndexBuffer->GetIndexCount() * pIndexBuffer->GetIndexSize());
 		}
 
 		// 메시 개수 기록

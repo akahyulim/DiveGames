@@ -40,14 +40,14 @@ namespace Dive
 
 		if (!m_Stride)
 		{
-			DV_LOG_ENGINE_ERROR("ConstantBuffer::SetSize - 잘못된 크기를 전달받아 버퍼를 생성할 수 없습니다.");
+			DV_LOG_ENGINE_ERROR("ConstantBuffer::create - 잘못된 크기를 전달받아 버퍼를 생성할 수 없습니다.");
 			return false;
 		}
 
 		auto pGraphics = GetSubsystem<Graphics>();
 		if (!pGraphics || !pGraphics->IsInitialized())
 		{
-			DV_LOG_ENGINE_ERROR("ConstantBuffer::SetSize - Graphics system을 사용할 수 없습니다.");
+			DV_LOG_ENGINE_ERROR("ConstantBuffer::create - Graphics system을 사용할 수 없습니다.");
 			return false;
 		}
 
@@ -62,7 +62,7 @@ namespace Dive
 
 		if (FAILED(pGraphics->GetDevice()->CreateBuffer(&desc, nullptr, m_pBuffer.GetAddressOf())))
 		{
-			DV_LOG_ENGINE_ERROR("ConstantBuffer::SetSize - 버퍼 생성에 실패하였습니다.");
+			DV_LOG_ENGINE_ERROR("ConstantBuffer::create - 버퍼 생성에 실패하였습니다.");
 			return false;
 		}
 

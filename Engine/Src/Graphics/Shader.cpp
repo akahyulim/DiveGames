@@ -12,7 +12,7 @@ namespace Dive
 		m_pGraphics(GetSubsystem<Graphics>()),
 		m_Type(type)
 	{
-		DV_ASSERT(m_pGraphics);
+		DV_ASSERT(m_pGraphics->IsInitialized());
 	}
 
 	Shader::~Shader()
@@ -40,15 +40,23 @@ namespace Dive
 		flags |= D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_OPTIMIZATION_LEVEL3;
 #endif
 
+		// defines를 ' '로 구분해서 vector에 넣고
+		// 다시 이 vector의 값과 '1'을 macro로 추가한다.
+		// urho의 경우 d3d11은 추가 macro를 설정하기도 했다.
+		// 일단은 sparatan 구현으로 유지...
 		std::vector<D3D_SHADER_MACRO> macros =
 		{
 			D3D_SHADER_MACRO{"VS", m_Type == eShaderType::Vertex ? "1" : "0"},
 			D3D_SHADER_MACRO{"PS", m_Type == eShaderType::Pixel ? "1" : "0"}
 		};
+		// 매크로를 미리 설정한 후 컴파일한다면
+		// 결국 하나의 파일로 여러 종류의 셰이더가 만들어 질 수 밖에 없다.
+		// 그래서 이름에 매크로까지 추가한 것인가?
 		for (const auto& macro : m_Defines)
 		{
 			macros.emplace_back(D3D_SHADER_MACRO{ macro.first.c_str(), macro.second.c_str() });
 		}
+		// 마지막은 무조건 nullptr, nullptr이어야 하나 보다.
 		macros.emplace_back(D3D_SHADER_MACRO{ nullptr, nullptr });
 
 		const char* pEntryPoint = nullptr;
@@ -70,12 +78,12 @@ namespace Dive
 		ID3D10Blob* pErrorMsg = nullptr;
 
 		if (FAILED(D3DCompileFromFile(
-			L"../Output/CoreData/Shaders/Color.hlsl",//fileName.c_str(),
-			nullptr,//macros.data(),
+			fileName.c_str(),
+			macros.data(),
 			nullptr,
 			pEntryPoint,
 			pTarget,
-			D3D10_SHADER_ENABLE_STRICTNESS,//flags,
+			flags,
 			0,
 			&m_pShaderBuffer,
 			&pErrorMsg
