@@ -9,6 +9,8 @@ namespace Dive
 	class Texture;
 	class Viewport;
 	class Mesh;
+	class Drawable;
+	struct BatchRenderer;
 
 	enum class eRenderPath;
 
@@ -25,7 +27,12 @@ namespace Dive
 
 		bool Define(Texture* pRenderTarget, Viewport* pViewport);
 
+		Graphics* GetGraphics() const { return m_pGraphics; }
+
 	private:
+		void getDrawables();
+		void getBaseBatches();
+
 	private:
 		Graphics* m_pGraphics = nullptr;
 		Renderer* m_pRenderer = nullptr;
@@ -38,6 +45,7 @@ namespace Dive
 		DirectX::XMINT2 m_ViewSize = { 0 ,0 };
 		DirectX::XMINT2 m_RenderTargetSize = { 0, 0 };
 
-		std::vector<Mesh*> m_Drawables;
+		std::vector<Drawable*> m_Drawables;
+		std::vector<BatchRenderer> m_BaseBatchRenderers;
 	};
 }

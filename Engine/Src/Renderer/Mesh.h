@@ -22,8 +22,8 @@ namespace Dive
 		bool SetNumVertexBuffers(size_t num);
 		bool SetVertexBuffer(size_t index, VertexBuffer* pBuffer);
 
-		// SetDrawRange: primitve, indexCount, indexStart or vertexCount, vertexStart
-		// primitive를 왜 굳이 여기에서 저장할까?
+		bool SetDrawRange(D3D11_PRIMITIVE_TOPOLOGY primitiveType, unsigned int indexStart, unsigned int indexCount);
+		bool SetDrawRange(D3D11_PRIMITIVE_TOPOLOGY primitiveType, unsigned int vertexStart, unsigned int vertexCount, unsigned int indexStart, unsigned int indexCount);
 
 		IndexBuffer* GetIndexBuffer() const { return m_pIndexBuffer; }
 		void SetIndexBuffer(IndexBuffer* pBuffer);

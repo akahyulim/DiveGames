@@ -9,6 +9,7 @@ namespace Dive
 	class IndexBuffer;
 	class Shader;
 	class InputLayout;
+	class Texture;
 	class Texture2D;
 	class ConstantBuffer;
 
@@ -110,8 +111,8 @@ namespace Dive
 
 		// Draw 함수들: 총 5개
 		void Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int vertexStart);
-		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int indexStart, unsigned int baseVertexIndex = 0);
-		void DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int instanceCount, unsigned int indexStart);
+		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int indexStart, unsigned int vertexStart);
+		//void DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int instanceCount, unsigned int indexStart);
 
 		void SetDepthStencil(Texture2D* pTexture);
 
@@ -133,6 +134,18 @@ namespace Dive
 
 		Shader* GetShader(eShaderType type, const std::string& name, const std::string& defines = std::string()) const;
 		void SetShaders(Shader* pVertexShader, Shader* pPixelShader);
+
+		void SetShaderParameter(StringHash param, bool value);
+		void SetShaderParameter(StringHash param, float value);
+		void SetShaderParameter(StringHash param, int value);
+		void SetShaderParameter(StringHash param, const DirectX::XMFLOAT2& vector);
+		void SetShaderParameter(StringHash param, const DirectX::XMFLOAT3& vector);
+		void SetShaderParameter(StringHash param, const DirectX::XMFLOAT4& vector);
+		void SetShaderParameter(StringHash param, const DirectX::XMFLOAT4X4& matrix);
+		void SetShaderParamater(StringHash param, const float* pData, unsigned int count);	// 이건 아직 뭔지 감도 안잡힌다.
+
+		Texture* GetTexture(size_t index);
+		void SetTexture(size_t index, Texture* pTexture);
 
 		// 기타: 얘네들을 이용해 States를 실시간으로 생성하는 듯 하다.
 		// SetFillMode		fill_mode
@@ -200,6 +213,8 @@ namespace Dive
 
 		Shader* m_pVertexShader = nullptr;
 		Shader* m_pPixelShader = nullptr;
+
+		Texture* m_pTextures[16] = { nullptr, };
 
 		// dirty check 전부 모으기.
 		bool m_bRenderTargetsDirty = false;

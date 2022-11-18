@@ -633,7 +633,7 @@ namespace Dive
 		m_pDeviceContext->Draw(vertexCount, vertexStart);
 	}
 
-	void Graphics::DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int indexStart, unsigned int baseVertexIndex)
+	void Graphics::DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int indexStart, unsigned int vertexStart)
 	{
 		// 이 곳에도 VertexCount를 받은 후 개수 확인하는 구문이 있으나 일단 건너띄기
 
@@ -645,7 +645,9 @@ namespace Dive
 			m_PrimitiveType = type;
 		}
 
-		m_pDeviceContext->DrawIndexed(indexCount, indexStart, baseVertexIndex);
+		// urho는 마지막 요소의 차이로 인해 두개의 함수로 구현했다.
+		// 아직 그 차이점을 완전히 이해하지 못했다. 
+		m_pDeviceContext->DrawIndexed(indexCount, indexStart, vertexStart);
 	}
 
 	void Graphics::SetDepthStencil(Texture2D* pTexture)
@@ -815,6 +817,52 @@ namespace Dive
 		}
 	}
 
+	// 일단 현재 사용중인 MatrixBuffer를 어떻게 전달할 것이지부터 구현해보자.
+	void Graphics::SetShaderParameter(StringHash param, bool value)
+	{
+		// 이렇게 타입별로 개별 상수 버퍼를 구성해 전달한다면
+		// 상당히 복잡해질 것 같은데...
+
+		// 상수 버퍼를 가져와서 데이터를 집어넣는다.
+		// 즉, dynamic 같은데 현재 구현 상태로는 불가능하다.
+	}
+
+	Texture* Graphics::GetTexture(size_t index)
+	{
+		return index < 16 ? m_pTextures[index] : nullptr;
+	}
+
+	void Graphics::SetTexture(size_t index, Texture* pTexture)
+	{
+		if (index >= 16)
+			return;
+
+		if (pTexture)
+		{
+			// 렌더타겟 0과 동일한 주소라면
+			// 백업을 사용한다?
+
+			// 여기에서 더치체크 후 generateMips를 호출한다.
+			if (pTexture->GetMipLevelsDirty())
+				pTexture->SetMipLevelsDirty();
+		}
+
+		// 파라미터 더티 체크?
+
+		if (pTexture != m_pTextures[index])
+		{
+			// 뭔가 한다.
+
+			m_pTextures[index] = pTexture;
+			// 이 텍스쳐를 직접 사용하는 것이 아니라
+			// 셰이더 리소스 뷰와 샘플러가 따로 배열로 존재하고
+			// 거기에 이 텍스쳐의 정보를 저장하는 방식이다. => 굳이?
+			// 셰이더 리소스 뷰
+			// 샘플러
+			// 더티체크 트루 => Bind는 PrepareDraw에서 수행한다.
+		}
+	}
+
 	bool Graphics::LoadShaders()
 	{
 		if (!m_pDefaultVS)
@@ -887,14 +935,6 @@ namespace Dive
 
 		auto pPs = static_cast<ID3D11PixelShader*>(m_pDefaultPS->GetShader());
 		m_pDeviceContext->PSSetShader(pPs, nullptr, 0);
-
-		if (!m_pDefaultIL)
-		{
-			auto pVb = m_pVertexBuffers[0];
-			m_pDefaultIL = new InputLayout(m_pContext, pVb, m_pDefaultVS);
-		}
-
-		m_pDeviceContext->IASetInputLayout(m_pDefaultIL->GetInputLayout());
 	}
 
 	void Graphics::OnResizeWindow()
@@ -920,6 +960,7 @@ namespace Dive
 		// world: Model GameObject의 Transform으로부터 획득.
 		// view & proj: Camera Component로부터 획득.
 		// constant buffer의 구성 및 bind 역시 적절한 위치를 찾아야 한다.
+		// => 아마도 BatchRenderer의 prepare인 듯 하다.
 		{
 			using namespace DirectX;
 
@@ -1024,6 +1065,21 @@ namespace Dive
 		// shader resources + samplers
 
 		// vertex buffer + inputlayout
+		// 현재 확인 부분을 그냥 구현했다.
+		// 실제로는 입력레이아웃이 바뀌었고 셰이더가 존재하는 상태이다.
+		if(m_pVertexBuffers[0])
+		{
+			// vertex buffer 역시 이 곳에서 set한다.
+
+			if (!m_pDefaultIL)
+			{
+				// 정점 버퍼가 없으면 생성이 불가능하다.
+				auto pVb = m_pVertexBuffers[0];
+				m_pDefaultIL = new InputLayout(m_pContext, pVb, m_pDefaultVS);
+			}
+
+			m_pDeviceContext->IASetInputLayout(m_pDefaultIL->GetInputLayout());
+		}
 
 		// blend state
 

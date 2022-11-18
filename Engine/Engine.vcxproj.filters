@@ -88,9 +88,6 @@
     <ClInclude Include="Src\Math\MathDefs.h">
       <Filter>Src\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Scene\Component\StaticModel.h">
-      <Filter>Src\Scene\Component</Filter>
-    </ClInclude>
     <ClInclude Include="Src\IO\FileSystem.h">
       <Filter>Src\IO</Filter>
     </ClInclude>
@@ -129,6 +126,18 @@
     </ClInclude>
     <ClInclude Include="Src\Graphics\ConstantBuffer.h">
       <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Component\Drawable.h">
+      <Filter>Src\Scene\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Material.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Technique.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\BatchRenderer.h">
+      <Filter>Src\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -192,9 +201,6 @@
     <ClCompile Include="Src\Math\MathDefs.cpp">
       <Filter>Src\Math</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Scene\Component\StaticModel.cpp">
-      <Filter>Src\Scene\Component</Filter>
-    </ClCompile>
     <ClCompile Include="Src\IO\FileSystem.cpp">
       <Filter>Src\IO</Filter>
     </ClCompile>
@@ -227,6 +233,18 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\ConstantBuffer.cpp">
       <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Drawable.cpp">
+      <Filter>Src\Scene\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Material.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Technique.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\BatchRenderer.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

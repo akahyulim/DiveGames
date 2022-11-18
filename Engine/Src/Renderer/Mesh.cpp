@@ -33,7 +33,7 @@ namespace Dive
 		{
 			pGraphics->SetVertexBuffers(m_VertexBuffers);
 			pGraphics->SetIndexBuffer(m_pIndexBuffer);
-			pGraphics->DrawIndexed(m_PrimitiveType, m_VertexCount, m_IndexCount, m_IndexStart);
+			pGraphics->DrawIndexed(m_PrimitiveType, m_IndexCount, m_IndexStart, m_VertexStart);
 		}
 		else if(m_VertexCount > 0)
 		{
@@ -64,6 +64,41 @@ namespace Dive
 		}
 
 		m_VertexBuffers[index] = pBuffer;
+
+		return true;
+	}
+
+	bool Mesh::SetDrawRange(D3D11_PRIMITIVE_TOPOLOGY primitiveType, unsigned int indexStart, unsigned int indexCount)
+	{
+		// 버퍼 확인
+
+		m_PrimitiveType = primitiveType;
+		m_IndexStart = indexStart;
+		m_IndexCount = indexCount;
+
+		if (indexCount)
+		{
+			m_VertexStart = 0;
+			m_VertexCount = m_VertexBuffers[0] ? m_VertexBuffers[0]->GetVertexCount() : 0;
+		}
+		else
+		{
+			m_VertexStart = 0;
+			m_VertexCount = 0;
+		}
+
+		return true;
+	}
+
+	bool Mesh::SetDrawRange(D3D11_PRIMITIVE_TOPOLOGY primitiveType, unsigned int vertexStart, unsigned int vertexCount, unsigned int indexStart, unsigned int indexCount)
+	{
+		// 버퍼 확인
+
+		m_PrimitiveType = primitiveType;
+		m_VertexStart = vertexStart;
+		m_VertexCount = vertexCount;
+		m_IndexStart = indexStart;
+		m_IndexCount = indexCount;
 
 		return true;
 	}

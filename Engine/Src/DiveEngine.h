@@ -47,9 +47,12 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/Viewport.h"
 #include "Renderer/View.h"
+#include "Renderer/BatchRenderer.h"
 #include "Renderer/RenderPath.h"
 #include "Renderer/Model.h"
 #include "Renderer/Mesh.h"
+#include "Renderer/Material.h"
+#include "Renderer/Technique.h"
 
 //= Input =========================
 
@@ -58,7 +61,7 @@
 #include "Scene/GameObject.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
-#include "Scene/Component/StaticModel.h"
+#include "Scene/Component/Drawable.h"
 
 //= Math ==========================
 #include "Math/MathDefs.h"

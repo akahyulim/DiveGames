@@ -48,21 +48,20 @@ namespace Sandbox
 			std::vector<Dive::VertexElement> elements;
 			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
 			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
-
+			
+			// 이걸 사용하려면 Shader에 Define을 설정해야 한다.
+			std::vector<float> posVertices =
+			{ -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f };
+			
 			std::vector<float> vertices =
 				{ -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 				0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 				1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f };
-
+			
 			Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
 			pVb->SetSize(3, elements);
 			pVb->SetData(static_cast<void*>(vertices.data()));
-			// Elements를 전달하지 않아 InputLayout 생성이 잘못되었다.
-			// 1. Spartan처럼 Shader에서 InputLayout을 만들던지,
-			// 2. 어떻게든 Elements를 전달하는 수 밖에 없다.
-			// 문제는 InputLayout과 VertexShader의 Input 타입이 달라도 되느냐이다.
-			//pVb->Create<float>(vertices);
-
+			
 			std::vector<unsigned short> indices = { 0, 1, 2 };
 			Dive::IndexBuffer* pIb = new Dive::IndexBuffer(m_pContext);
 			pIb->Create<unsigned short>(indices);
@@ -71,6 +70,7 @@ namespace Sandbox
 			pMesh->SetNumVertexBuffers(1);
 			pMesh->SetVertexBuffer(0, pVb);
 			pMesh->SetIndexBuffer(pIb);
+			pMesh->SetDrawRange(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, 0, 3);
 
 			static Dive::Model* pTriangleModel = new Dive::Model(m_pContext);
 			pTriangleModel->SetName("Triangle");
@@ -78,8 +78,15 @@ namespace Sandbox
 			pTriangleModel->SetMesh(0, pMesh);
 
 			auto pTriangle = m_pScene->CreateGameObject("Triangle");
-			auto pModel = pTriangle->CreateComponent<Dive::StaticModel>();
-			pModel->SetModel(pTriangleModel);
+			auto pDrawable = pTriangle->CreateComponent<Dive::Drawable>();
+			pDrawable->SetModel(pTriangleModel);
+		}
+
+		// test technique 
+		{
+			Dive::Technique tech(m_pContext);
+			auto pPass = tech.CreatePass("Diff");
+			tech.RemovePass("Diff");
 		}
 	}
 

@@ -2,6 +2,7 @@
 #include "View.h"
 #include "Viewport.h"
 #include "Renderer.h"
+#include "BatchRenderer.h"
 #include "RenderPath.h"
 #include "Mesh.h"
 #include "Model.h"
@@ -14,8 +15,8 @@
 #include "Graphics/Texture2D.h"
 #include "Resource/ResourceCache.h"
 #include "Scene/Scene.h"
-#include "Scene/Component/StaticModel.h"
 #include "Scene/GameObject.h"
+#include "Scene/Component/Drawable.h"
 #include "IO/Log.h"
 #include "Math/Math.h"
 
@@ -39,21 +40,9 @@ namespace Dive
 		if (!m_pScene)
 			return;
 
-		// GetDrawables()
-		// 일단 그려져야 할 오브젝트부터 추린다.
-		// 옥트리와 컬링을 거친 오브젝트일 듯 하다.
-		{
-			m_Drawables.clear();
+		getDrawables();
+		getBaseBatches();
 
-			auto allGameObjects = m_pScene->GetAllGameObjects();
-			for (auto pGameObject : allGameObjects)
-			{
-				if (pGameObject->HasComponent<Dive::StaticModel>())
-					m_Drawables.emplace_back(pGameObject->GetComponent<Dive::StaticModel>()->GetMesh(0));
-			}
-		}
-
-		// GetBatches()
 		// 오브젝트를 일단 라이트와 일반으로 분리한다.
 		// 그리고 그려지는 방식에 따라 BatchGroup와 Batch로 나누어 관리한다.
 		{
@@ -86,25 +75,14 @@ namespace Dive
 		// Draw
 		{
 			auto pDeviceContext = m_pGraphics->GetDeviceContext();
-
-			for(const auto* pMesh : m_Drawables)
+			
+			for (auto batchRenderer : m_BaseBatchRenderers)
 			{
-				// set vertex buffer
-				m_pGraphics->SetVertexBuffer(pMesh->GetVertexBuffer(0));
-				
-				// set index buffer
-				m_pGraphics->SetIndexBuffer(pMesh->GetIndexBuffer());
-
-				// set shaders & inputlayout
-				m_pGraphics->SetDefaultShader();
-
-				// draw
-				// Mesh의 DrawRange를 구현하지 않았다.
-				auto indexCount = 3;// pMesh->GetIndexCount();
-				auto indexStart = 0;// pMesh->GetIndexStart();
-				auto primitiveType = pMesh->GetPrimitiveType();
-				m_pGraphics->DrawIndexed(primitiveType, indexCount, indexStart);
+				batchRenderer.Draw(this);
 			}
+
+			// 위치가 애매하다. 하지만 clear하는 것이 맞다.
+			m_BaseBatchRenderers.clear();
 		}
 	}
 	
@@ -138,5 +116,40 @@ namespace Dive
 		m_ViewSize = DirectX::XMINT2(m_ViewRect.right - m_ViewRect.left, m_ViewRect.bottom - m_ViewRect.top);
 
 		return true;
+	}
+	void View::getDrawables()
+	{
+		// 일단 그려져야 할 오브젝트부터 추린다.
+		// 옥트리와 컬링을 거친 오브젝트일 듯 하다.
+		// 그런데 Light도 Drawable일까?
+		// 실제로 Light가 Drwable을 상속했다... 굳이 따라할 필요는 없지 않나?
+
+
+		m_Drawables.clear();
+		auto allGameObjects = m_pScene->GetAllGameObjects();
+		for (auto pGameObject : allGameObjects)
+		{
+			// 이러면 SkinnedDrawable은 안될텐데...
+			// 미래의 내가 고치겠지.
+			if (pGameObject->HasComponent<Dive::Drawable>())
+				m_Drawables.emplace_back(pGameObject->GetComponent<Dive::Drawable>());
+		}
+	}
+
+	void View::getBaseBatches()
+	{
+		for (auto it = m_Drawables.begin(); it != m_Drawables.end(); ++it)
+		{
+			auto pDrawable = *it;
+
+			const auto& batches = pDrawable->GetBatches();
+
+			for (unsigned i = 0; i < static_cast<unsigned int>(batches.size()); ++i)
+			{
+				const auto& drawableBatch = batches[i];
+
+				m_BaseBatchRenderers.emplace_back(drawableBatch);
+			}
+		}
 	}
 }
