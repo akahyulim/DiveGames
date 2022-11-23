@@ -29,15 +29,16 @@ namespace Dive
 
 	void Mesh::Draw(Graphics* pGraphics)
 	{
+		// 현재 단일 버퍼만 사용토록 했다.
 		if (m_pIndexBuffer && m_IndexCount > 0)
 		{
-			pGraphics->SetVertexBuffers(m_VertexBuffers);
+			pGraphics->SetVertexBuffer(m_VertexBuffers[0]);
 			pGraphics->SetIndexBuffer(m_pIndexBuffer);
 			pGraphics->DrawIndexed(m_PrimitiveType, m_IndexCount, m_IndexStart, m_VertexStart);
 		}
 		else if(m_VertexCount > 0)
 		{
-			pGraphics->SetVertexBuffers(m_VertexBuffers);
+			pGraphics->SetVertexBuffer(m_VertexBuffers[0]);
 			pGraphics->Draw(m_PrimitiveType, m_VertexCount, m_VertexStart);
 		}
 	}

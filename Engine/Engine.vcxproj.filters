@@ -139,6 +139,9 @@
     <ClInclude Include="Src\Renderer\BatchRenderer.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Graphics\ShaderProgram.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -245,6 +248,9 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\BatchRenderer.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\ShaderProgram.cpp">
+      <Filter>Src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

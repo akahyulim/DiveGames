@@ -1,13 +1,14 @@
 #pragma once
 #include "Core/Object.h"
 #include "GraphicsDefs.h"
+#include "Shader.h"
+#include "ShaderProgram.h"
 
 namespace Dive
 {
 	class Context;
 	class VertexBuffer;
 	class IndexBuffer;
-	class Shader;
 	class InputLayout;
 	class Texture;
 	class Texture2D;
@@ -135,14 +136,17 @@ namespace Dive
 		Shader* GetShader(eShaderType type, const std::string& name, const std::string& defines = std::string()) const;
 		void SetShaders(Shader* pVertexShader, Shader* pPixelShader);
 
-		void SetShaderParameter(StringHash param, bool value);
-		void SetShaderParameter(StringHash param, float value);
-		void SetShaderParameter(StringHash param, int value);
-		void SetShaderParameter(StringHash param, const DirectX::XMFLOAT2& vector);
-		void SetShaderParameter(StringHash param, const DirectX::XMFLOAT3& vector);
-		void SetShaderParameter(StringHash param, const DirectX::XMFLOAT4& vector);
-		void SetShaderParameter(StringHash param, const DirectX::XMFLOAT4X4& matrix);
-		void SetShaderParamater(StringHash param, const float* pData, unsigned int count);	// 이건 아직 뭔지 감도 안잡힌다.
+		void SetShaderParameter(const std::string& param, bool value);
+		void SetShaderParameter(const std::string& param, float value);
+		void SetShaderParameter(const std::string& param, int value);
+		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT2& vector);
+		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT3& vector);
+		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT4& vector);
+		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT4X4& matrix);
+		void SetShaderParameter(const std::string& param, const DirectX::XMMATRIX& matrix);
+		//void SetShaderParameter(const std::string& param, const float* pData, unsigned int count);	// 이건 아직 뭔지 감도 안잡힌다.
+
+		ConstantBuffer* GetOrCreateConstantBuffer(eShaderType type, unsigned int index, unsigned int size);
 
 		Texture* GetTexture(size_t index);
 		void SetTexture(size_t index, Texture* pTexture);
@@ -183,7 +187,6 @@ namespace Dive
 		int m_Width = 800;
 		int m_Height = 600;
 
-
 		// 디폴트 모드 같은데, 초기화 및 설정하는 부분을 찾지 못했다.
 		WindowModeParams m_WindowMode;
 		ScreenModeParams m_ScreenMode;
@@ -208,8 +211,9 @@ namespace Dive
 		ID3D11RenderTargetView* m_pCurRenderTargetViews[MAX_RENDERTARGETS] = { nullptr, };
 		ID3D11DepthStencilView* m_pCurDepthStencilView = nullptr;
 
-		VertexBuffer* m_pVertexBuffers[MAX_VERTEX_STREAMS] = { nullptr, };
-		IndexBuffer* m_pIndexBuffer = nullptr;;
+		//VertexBuffer* m_pVertexBuffers[MAX_VERTEX_STREAMS] = { nullptr, };
+		VertexBuffer* m_pVertexBuffer = nullptr;
+		IndexBuffer* m_pIndexBuffer = nullptr;
 
 		Shader* m_pVertexShader = nullptr;
 		Shader* m_pPixelShader = nullptr;
@@ -217,14 +221,22 @@ namespace Dive
 		Texture* m_pTextures[16] = { nullptr, };
 
 		// dirty check 전부 모으기.
+		bool m_bVertexTypeDirty = true;
 		bool m_bRenderTargetsDirty = false;
+
+		// ConstantBuffers
+		std::map<std::pair<Shader*, Shader*>, ShaderProgram*> m_ShaderPrograms;
+		ShaderProgram* m_pCurrentShaderProgram = nullptr;
+		std::unordered_map<unsigned int, ConstantBuffer*> m_AllConstantBuffers;
+		std::vector<ConstantBuffer*> m_DirtyConstantBuffers;
+		ID3D11Buffer* m_pCurrentVSCBuffers[7] = { nullptr, };
+		ID3D11Buffer* m_pCurrentPSCBuffers[7] = { nullptr, };
 
 		// temp
 		Shader* m_pDefaultVS = nullptr;
 		Shader* m_pDefaultPS = nullptr;
 		InputLayout* m_pDefaultIL = nullptr;
 		//Microsoft::WRL::ComPtr<ID3D11Buffer> m_pMatrixBuffer;
-		ConstantBuffer* m_pMatrixBuffer;
 
 		struct MatrixBufferType
 		{

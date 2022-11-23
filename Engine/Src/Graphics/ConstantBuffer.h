@@ -11,28 +11,21 @@ namespace Dive
 
 	public:
 		explicit ConstantBuffer(Context* pContext);
-		~ConstantBuffer() override = default;
+		~ConstantBuffer() override;
 
-		template<typename T> bool CreateBuffer();
-
-		void Update(void* pData);
+		bool SetSize(unsigned int size);
+		void SetParameter(unsigned int offset, unsigned int size, const void* pData);
+		void Update();
 
 		ID3D11Buffer* GetBuffer() const { return m_pBuffer.Get(); }
 		ID3D11Buffer* const* GetBufferAddressOf() const { return m_pBuffer.GetAddressOf(); }
 
-	private:
-		bool create();
+		bool IsDirty() const { return m_bDirty; }
 
 	private:
+		unsigned char* m_pShadowData = nullptr;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pBuffer = nullptr;
 		unsigned int m_Stride = 0;
+		bool m_bDirty = false;
 	};
-
-	template<typename T>
-	bool ConstantBuffer::CreateBuffer()
-	{
-		m_Stride = static_cast<unsigned int>(sizeof(T));
-
-		return create();
-	}
 }

@@ -4,7 +4,6 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
-#include "Shader.h"
 #include "InputLayout.h"
 #include "Texture2D.h"
 #include "Renderer/Model.h"
@@ -56,8 +55,8 @@ namespace Dive
 
 		m_bRenderTargetsDirty = true;
 
-		for (unsigned int i = 0; i < MAX_VERTEX_STREAMS; ++i)
-			m_pVertexBuffers[i] = nullptr;
+		//for (unsigned int i = 0; i < MAX_VERTEX_STREAMS; ++i)
+		//	m_pVertexBuffers[i] = nullptr;
 	}
 
 	Graphics::~Graphics()
@@ -118,6 +117,20 @@ namespace Dive
 
 	void Graphics::Destroy()
 	{
+		m_pCurrentShaderProgram = nullptr;
+		for (auto pShaderProgram : m_ShaderPrograms)
+		{
+			DV_DELETE(pShaderProgram.second);
+		}
+		m_ShaderPrograms.clear();
+
+		// constant buffers
+		for (auto pConstantBuffer : m_AllConstantBuffers)
+		{
+			DV_DELETE(pConstantBuffer.second);
+		}
+		m_AllConstantBuffers.clear();
+
 		// 각종 states
 
 		// 전체화면에서 스왑체인 릴리즈시 예외 발생
@@ -742,18 +755,55 @@ namespace Dive
 
 	VertexBuffer* Graphics::GetVertexBuffer(unsigned int index) const
 	{
-		return index < MAX_VERTEX_STREAMS ? m_pVertexBuffers[index] : nullptr;
+		//return index < MAX_VERTEX_STREAMS ? m_pVertexBuffers[index] : nullptr;
+		return m_pVertexBuffer;
 	}
 
 	void Graphics::SetVertexBuffer(VertexBuffer* pBuffer)
 	{
-		static std::vector<VertexBuffer*> vertexBuffers(1);
-		vertexBuffers[0] = pBuffer;
-		SetVertexBuffers(vertexBuffers);
+		if (m_pVertexBuffer != pBuffer)
+		{
+			m_pVertexBuffer = pBuffer;
+			m_bVertexTypeDirty = true;
+		}
 	}
 
+	/*
+	// 일단은 임시다.
+	// 여기에서 멤버 변수 설정만 하고
+	// IASet은 PrepareDraw에서 한다.
 	void Graphics::SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, unsigned int instanceOffset)
 	{
+		// 크기 확인: 현재 크기 기준을 모르겠다.
+		if (buffers.size() > MAX_VERTEX_STREAMS)
+		{
+			DV_LOG_ENGINE_ERROR("Graphics::SetVertexBuffers - 크기를 초과한 버퍼를 전달받았습니다.");
+			return;
+		}
+
+		/*
+		for (unsigned int i = 0; i < MAX_VERTEX_STREAMS; ++i)
+		{
+			bool bChanged = false;
+
+			VertexBuffer* pBuffer = i < buffers.size() ? buffers[i] : nullptr;
+			if (pBuffer)
+			{
+				if (pBuffer != m_pVertexBuffers[i])
+				{
+					m_pVertexBuffers[i] = pBuffer;
+					// offset이 달라진다.
+
+					bChanged = true;
+				}
+			}
+			else if (m_pVertexBuffers[i])
+			{
+				// 해당 인덱스 버퍼는 NULL이 된다.
+				bChanged = true;
+			}
+		}
+		
 		// 일단 버퍼 하나만
 		m_pVertexBuffers[0] = buffers[0];
 
@@ -763,6 +813,7 @@ namespace Dive
 
 		m_pDeviceContext->IASetVertexBuffers(0, 1, &pVb, &stride, &offset);
 	}
+	*/
 
 	void Graphics::SetIndexBuffer(IndexBuffer* pBuffer)
 	{
@@ -782,7 +833,9 @@ namespace Dive
 		}
 	}
 
-	// 직접 만들게 할 것인지 결정해야 한다.
+	// 일단 셰이더가 이전 셰이더와 다르다면 바인딩한다.
+	// 이후 해당 셰이더가 사용하는 상수버퍼를 이전 상수버퍼와 비교한 후 
+	// 변경사항이 있다면 바인딩한다.
 	void Graphics::SetShaders(Shader* pVertexShader, Shader* pPixelShader)
 	{
 		if (m_pVertexShader == pVertexShader && m_pPixelShader == pPixelShader)
@@ -791,17 +844,26 @@ namespace Dive
 		if (m_pVertexShader != pVertexShader)
 		{
 			// 전달받은 pVertexShader가 비어있다면 직접 만든다.
+			if (!pVertexShader->GetShaderBuffer())
+			{
+
+			}
 
 			m_pDeviceContext->VSSetShader(
 				(ID3D11VertexShader*)(pVertexShader ? pVertexShader->GetShader() : nullptr),
 				nullptr, 0);
 
 			m_pVertexShader = pVertexShader;
+			m_bVertexTypeDirty = true;
 		}
 
 		if (m_pPixelShader != pPixelShader)
 		{
 			// 역시 셰이더가 비었다면 직접 만든다.
+			if (!pPixelShader->GetShaderBuffer())
+			{
+
+			}
 
 			m_pDeviceContext->PSSetShader(
 				(ID3D11PixelShader*)(pPixelShader ? pPixelShader->GetShader() : nullptr),
@@ -810,21 +872,218 @@ namespace Dive
 			m_pPixelShader = pPixelShader;
 		}
 
-		// 이후 셰이더 파라미터와 상수버퍼를 업데이트
+		// 일단 현재 셰이더의 버퍼를 가져온다.
+		// 꼭 셰이더가 둘 다 있어야 하는 것일까?
 		if (m_pVertexShader && m_pPixelShader)
 		{
+			auto key = std::pair(m_pVertexShader, m_pPixelShader);
+			auto it = m_ShaderPrograms.find(key);
+			if (it != m_ShaderPrograms.end())
+				m_pCurrentShaderProgram = it->second;
+			else
+			{
+				// 오직 여기에서만 사용한다면 unique가 맞다.
+				ShaderProgram* pNewShaderProgram = new ShaderProgram(this, m_pVertexShader, m_pPixelShader);
+				m_ShaderPrograms[key] = pNewShaderProgram;
+				m_pCurrentShaderProgram = pNewShaderProgram;
+			}
+		}
 
+		bool bVSCBufferChanged = false;
+		bool bPSCBufferChanged = false;
+
+		for (unsigned int i = 0; i < 7; ++i)
+		{
+			auto pVSConstantBuffer = m_pCurrentShaderProgram->m_pVSConstantBuffers[i] ?
+				m_pCurrentShaderProgram->m_pVSConstantBuffers[i]->GetBuffer() : nullptr;
+
+			if (pVSConstantBuffer != m_pCurrentVSCBuffers[i])
+			{
+				m_pCurrentVSCBuffers[i] = pVSConstantBuffer;
+				bVSCBufferChanged = true;
+			}
+
+			auto pPSConstantBuffer = m_pCurrentShaderProgram->m_pPSConstantBuffers[i] ?
+				m_pCurrentShaderProgram->m_pPSConstantBuffers[i]->GetBuffer() : nullptr;
+
+			if (pPSConstantBuffer != m_pCurrentPSCBuffers[i])
+			{
+				m_pCurrentPSCBuffers[i] = pPSConstantBuffer;
+				bPSCBufferChanged = true;
+			}
+		}
+
+		if (bVSCBufferChanged)
+			m_pDeviceContext->VSSetConstantBuffers(0, 7, &m_pCurrentVSCBuffers[0]);
+		if (bPSCBufferChanged)
+			m_pDeviceContext->PSSetConstantBuffers(0, 7, &m_pCurrentPSCBuffers[0]);
+	}
+
+	void Graphics::SetShaderParameter(const std::string& param, bool value)
+	{
+		if (!m_pCurrentShaderProgram)
+			return;
+
+		auto it = m_pCurrentShaderProgram->m_Parameters.find(param);
+		if (it == m_pCurrentShaderProgram->m_Parameters.end())
+			return;
+
+		ConstantBuffer* pBuffer = it->second.m_pBuffer;
+		if (pBuffer)
+		{
+			if (!pBuffer->IsDirty())
+				m_DirtyConstantBuffers.emplace_back(pBuffer);
+
+			pBuffer->SetParameter(it->second.m_Offset, sizeof(bool), &value);
 		}
 	}
 
-	// 일단 현재 사용중인 MatrixBuffer를 어떻게 전달할 것이지부터 구현해보자.
-	void Graphics::SetShaderParameter(StringHash param, bool value)
+	void Graphics::SetShaderParameter(const std::string& param, float value)
 	{
-		// 이렇게 타입별로 개별 상수 버퍼를 구성해 전달한다면
-		// 상당히 복잡해질 것 같은데...
+		if (!m_pCurrentShaderProgram)
+			return;
 
-		// 상수 버퍼를 가져와서 데이터를 집어넣는다.
-		// 즉, dynamic 같은데 현재 구현 상태로는 불가능하다.
+		auto it = m_pCurrentShaderProgram->m_Parameters.find(param);
+		if (it == m_pCurrentShaderProgram->m_Parameters.end())
+			return;
+
+		ConstantBuffer* pBuffer = it->second.m_pBuffer;
+		if (pBuffer)
+		{
+			if (!pBuffer->IsDirty())
+				m_DirtyConstantBuffers.emplace_back(pBuffer);
+
+			pBuffer->SetParameter(it->second.m_Offset, sizeof(float), &value);
+		}
+	}
+
+	void Graphics::SetShaderParameter(const std::string& param, int value)
+	{
+		if (!m_pCurrentShaderProgram)
+			return;
+
+		auto it = m_pCurrentShaderProgram->m_Parameters.find(param);
+		if (it == m_pCurrentShaderProgram->m_Parameters.end())
+			return;
+
+		ConstantBuffer* pBuffer = it->second.m_pBuffer;
+		if (pBuffer)
+		{
+			if (!pBuffer->IsDirty())
+				m_DirtyConstantBuffers.emplace_back(pBuffer);
+
+			pBuffer->SetParameter(it->second.m_Offset, sizeof(int), &value);
+		}
+	}
+
+	void Graphics::SetShaderParameter(const std::string& param, const DirectX::XMFLOAT2& vector)
+	{
+		if (!m_pCurrentShaderProgram)
+			return;
+
+		auto it = m_pCurrentShaderProgram->m_Parameters.find(param);
+		if (it == m_pCurrentShaderProgram->m_Parameters.end())
+			return;
+
+		ConstantBuffer* pBuffer = it->second.m_pBuffer;
+		if (pBuffer)
+		{
+			if (!pBuffer->IsDirty())
+				m_DirtyConstantBuffers.emplace_back(pBuffer);
+
+			pBuffer->SetParameter(it->second.m_Offset, sizeof(DirectX::XMFLOAT2), &vector);
+		}
+	}
+
+	void Graphics::SetShaderParameter(const std::string& param, const DirectX::XMFLOAT3& vector)
+	{
+		if (!m_pCurrentShaderProgram)
+			return;
+
+		auto it = m_pCurrentShaderProgram->m_Parameters.find(param);
+		if (it == m_pCurrentShaderProgram->m_Parameters.end())
+			return;
+
+		ConstantBuffer* pBuffer = it->second.m_pBuffer;
+		if (pBuffer)
+		{
+			if (!pBuffer->IsDirty())
+				m_DirtyConstantBuffers.emplace_back(pBuffer);
+
+			pBuffer->SetParameter(it->second.m_Offset, sizeof(DirectX::XMFLOAT3), &vector);
+		}
+	}
+
+	void Graphics::SetShaderParameter(const std::string& param, const DirectX::XMFLOAT4& vector)
+	{
+		if (!m_pCurrentShaderProgram)
+			return;
+
+		auto it = m_pCurrentShaderProgram->m_Parameters.find(param);
+		if (it == m_pCurrentShaderProgram->m_Parameters.end())
+			return;
+
+		ConstantBuffer* pBuffer = it->second.m_pBuffer;
+		if (pBuffer)
+		{
+			if (!pBuffer->IsDirty())
+				m_DirtyConstantBuffers.emplace_back(pBuffer);
+
+			pBuffer->SetParameter(it->second.m_Offset, sizeof(DirectX::XMFLOAT4), &vector);
+		}
+	}
+
+	void Graphics::SetShaderParameter(const std::string& param, const DirectX::XMFLOAT4X4& matrix)
+	{
+		if (!m_pCurrentShaderProgram)
+			return;
+
+		auto it = m_pCurrentShaderProgram->m_Parameters.find(param);
+		if (it == m_pCurrentShaderProgram->m_Parameters.end())
+			return;
+
+		ConstantBuffer* pBuffer = it->second.m_pBuffer;
+		if (pBuffer)
+		{
+			if (!pBuffer->IsDirty())
+				m_DirtyConstantBuffers.emplace_back(pBuffer);
+
+			pBuffer->SetParameter(it->second.m_Offset, sizeof(DirectX::XMFLOAT4X4), &matrix);
+		}
+	}
+
+	void Graphics::SetShaderParameter(const std::string& param, const DirectX::XMMATRIX& matrix)
+	{
+		if (!m_pCurrentShaderProgram)
+			return;
+
+		auto it = m_pCurrentShaderProgram->m_Parameters.find(param);
+		if (it == m_pCurrentShaderProgram->m_Parameters.end())
+			return;
+
+		ConstantBuffer* pBuffer = it->second.m_pBuffer;
+		if (pBuffer)
+		{
+			if (!pBuffer->IsDirty())
+				m_DirtyConstantBuffers.emplace_back(pBuffer);
+
+			pBuffer->SetParameter(it->second.m_Offset, sizeof(DirectX::XMMATRIX), &matrix);
+		}
+	}
+
+	ConstantBuffer* Graphics::GetOrCreateConstantBuffer(eShaderType type, unsigned int index, unsigned int size)
+	{
+		unsigned int key = static_cast<unsigned int>(type) | (index << 1) | (size << 4);
+		auto it = m_AllConstantBuffers.find(key);
+		if (it != m_AllConstantBuffers.end())
+			return it->second;
+		else
+		{
+			auto pNewConstantBuffer = new ConstantBuffer(m_pContext);
+			pNewConstantBuffer->SetSize(size);
+			m_AllConstantBuffers[key] = pNewConstantBuffer;
+			return pNewConstantBuffer;
+		}
 	}
 
 	Texture* Graphics::GetTexture(size_t index)
@@ -886,15 +1145,12 @@ namespace Dive
 				return false;
 		}
 
-		// constant buffer
-		m_pMatrixBuffer = new ConstantBuffer(m_pContext);
-		m_pMatrixBuffer->CreateBuffer<MatrixBufferType>();
-
 		// 일단 생성 후 바로 등록이지만 추후 바뀔 수 있다.
 		// depthstencilstate
 		{
 
 		}
+
 		// rssetstate
 		{
 			ID3D11RasterizerState* pRasterizerState = nullptr;
@@ -930,11 +1186,13 @@ namespace Dive
 		if (!m_pDefaultVS || !m_pDefaultPS)
 			return;
 
-		auto pVs = static_cast<ID3D11VertexShader*>(m_pDefaultVS->GetShader());
-		m_pDeviceContext->VSSetShader(pVs, nullptr, 0);
+		//auto pVs = static_cast<ID3D11VertexShader*>(m_pDefaultVS->GetShader());
+		//m_pDeviceContext->VSSetShader(pVs, nullptr, 0);
 
-		auto pPs = static_cast<ID3D11PixelShader*>(m_pDefaultPS->GetShader());
-		m_pDeviceContext->PSSetShader(pPs, nullptr, 0);
+		//auto pPs = static_cast<ID3D11PixelShader*>(m_pDefaultPS->GetShader());
+		//m_pDeviceContext->PSSetShader(pPs, nullptr, 0);
+
+		SetShaders(m_pDefaultVS, m_pDefaultPS);
 	}
 
 	void Graphics::OnResizeWindow()
@@ -955,89 +1213,6 @@ namespace Dive
 	// 각종 bind를 수행하는 구문이다.
 	void Graphics::prepareDraw()
 	{
-		// 임시
-		// world, view, proj 행렬을 constant buffer로 vs에 전달해야 한다.
-		// world: Model GameObject의 Transform으로부터 획득.
-		// view & proj: Camera Component로부터 획득.
-		// constant buffer의 구성 및 bind 역시 적절한 위치를 찾아야 한다.
-		// => 아마도 BatchRenderer의 prepare인 듯 하다.
-		{
-			using namespace DirectX;
-
-			// world
-			auto worldMatrix = DirectX::XMMatrixIdentity();
-
-			// view
-			XMFLOAT3 up, position, lookAt;
-			XMVECTOR upVector, positionVector, lookAtVector;
-			float yaw, pitch, roll;
-			XMMATRIX rotationMatrix;
-
-
-			// Setup the vector that points upwards.
-			up.x = 0.0f;
-			up.y = 1.0f;
-			up.z = 0.0f;
-
-			// Load it into a XMVECTOR structure.
-			upVector = XMLoadFloat3(&up);
-
-			// Setup the position of the camera in the world.
-			position.x = 0.0f;
-			position.y = 0.0f;
-			position.z = -5.0f;
-
-			// Load it into a XMVECTOR structure.
-			positionVector = XMLoadFloat3(&position);
-
-			// Setup where the camera is looking by default.
-			lookAt.x = 0.0f;
-			lookAt.y = 0.0f;
-			lookAt.z = 1.0f;
-
-			// Load it into a XMVECTOR structure.
-			lookAtVector = XMLoadFloat3(&lookAt);
-
-			// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
-			pitch = 0 * 0.0174532925f;
-			yaw = 0 * 0.0174532925f;
-			roll = 0 * 0.0174532925f;
-
-			// Create the rotation matrix from the yaw, pitch, and roll values.
-			rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
-
-			// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
-			lookAtVector = XMVector3TransformCoord(lookAtVector, rotationMatrix);
-			upVector = XMVector3TransformCoord(upVector, rotationMatrix);
-
-			// Translate the rotated camera position to the location of the viewer.
-			lookAtVector = XMVectorAdd(positionVector, lookAtVector);
-
-			// Finally create the view matrix from the three updated vectors.
-			auto viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
-
-			// proj
-			float fieldOfView = 3.141592654f / 4.0f;
-			float screenAspect = static_cast<float>(m_Width) / static_cast<float>(m_Height);
-			auto projMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
-
-			// constant buffer를 만들어 vs에 전달해야 한다.
-			worldMatrix = XMMatrixTranspose(worldMatrix);
-			viewMatrix = XMMatrixTranspose(viewMatrix);
-			projMatrix = XMMatrixTranspose(projMatrix);
-
-			MatrixBufferType matrixBuffer;
-			matrixBuffer.world = worldMatrix;
-			matrixBuffer.view = viewMatrix;
-			matrixBuffer.proj = projMatrix;
-
-			m_pMatrixBuffer->Update(static_cast<void*>(&matrixBuffer));
-			auto pConstantBuffer = m_pMatrixBuffer->GetBuffer();
-
-			unsigned int bufferNumber = 0;
-			m_pDeviceContext->VSSetConstantBuffers(bufferNumber, 1, m_pMatrixBuffer->GetBufferAddressOf());
-		}
-
 		if (m_bRenderTargetsDirty)
 		{
 			// 이렇게하면 ID3D11DepthstencilView를 무조건 사용하게 된다.
@@ -1065,20 +1240,29 @@ namespace Dive
 		// shader resources + samplers
 
 		// vertex buffer + inputlayout
-		// 현재 확인 부분을 그냥 구현했다.
-		// 실제로는 입력레이아웃이 바뀌었고 셰이더가 존재하는 상태이다.
-		if(m_pVertexBuffers[0])
+		if(m_bVertexTypeDirty && m_pVertexShader && m_pVertexShader->GetShader())
 		{
 			// vertex buffer 역시 이 곳에서 set한다.
+			unsigned int stride = m_pVertexBuffer->GetVertexSize();
+			unsigned int offset = 0;
+			auto pVb = m_pVertexBuffer->GetBuffer();
 
-			if (!m_pDefaultIL)
+			m_pDeviceContext->IASetVertexBuffers(0, 1, &pVb, &stride, &offset);
+
+			if (m_bVertexTypeDirty)
 			{
-				// 정점 버퍼가 없으면 생성이 불가능하다.
-				auto pVb = m_pVertexBuffers[0];
-				m_pDefaultIL = new InputLayout(m_pContext, pVb, m_pDefaultVS);
+				// 실제로는 VertexBuffer와 VertexShader의 Type을 이용해 찾거나 생성해야 한다.
+				if (!m_pDefaultIL)
+				{
+					// 정점 버퍼가 없으면 생성이 불가능하다.
+					auto pVb = m_pVertexBuffer;
+					m_pDefaultIL = new InputLayout(m_pContext, pVb, m_pDefaultVS);
+				}
+
+				m_pDeviceContext->IASetInputLayout(m_pDefaultIL->GetInputLayout());
 			}
 
-			m_pDeviceContext->IASetInputLayout(m_pDefaultIL->GetInputLayout());
+			m_bVertexTypeDirty = false;
 		}
 
 		// blend state
@@ -1088,6 +1272,10 @@ namespace Dive
 		// rasterizer state
 
 		// RSSetScissorRect
+
+		for (auto pConstantBuffer : m_DirtyConstantBuffers)
+			pConstantBuffer->Update();
+		m_DirtyConstantBuffers.clear();
 	}
 
 	void RegisterGraphicsObject(Context* pContext)

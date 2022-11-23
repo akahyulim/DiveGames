@@ -13,7 +13,8 @@ namespace Dive
 	enum class eShaderType
 	{
 		Vertex,
-		Pixel
+		Pixel,
+		None
 	};
 
 	// 좀 애매해서 아직 사용하지 않았다.
