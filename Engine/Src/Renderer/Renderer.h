@@ -10,7 +10,7 @@ namespace Dive
 	class Event;
 	class Texture;
 	class Texture2D;
-	class Shader;
+	class ShaderVariation;
 
 	class Renderer : public Object
 	{

@@ -5,14 +5,14 @@ namespace Dive
 {
 	class Context;
 	class VertexBuffer;
-	class Shader;
+	class ShaderVariation;
 
 	class InputLayout : public Object
 	{
 		DIVE_OBJECT(InputLayout, Object)
 
 	public:
-		explicit InputLayout(Context* pContext, VertexBuffer* pBuffers, Shader* pVertexShader);
+		explicit InputLayout(Context* pContext, VertexBuffer* pBuffers, ShaderVariation* pVertexShader);
 		~InputLayout() override = default;
 
 		ID3D11InputLayout* GetInputLayout() const { return m_pInputLayout.Get(); }

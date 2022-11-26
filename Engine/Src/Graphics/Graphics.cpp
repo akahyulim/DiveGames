@@ -6,10 +6,13 @@
 #include "ConstantBuffer.h"
 #include "InputLayout.h"
 #include "Texture2D.h"
+#include "Shader.h"
 #include "Renderer/Model.h"
+#include "Renderer/Material.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
 #include "Core/EventSystem.h"
+#include "Resource/ResourceCache.h"
 #include "IO/Log.h"
 
 namespace Dive
@@ -833,21 +836,34 @@ namespace Dive
 		}
 	}
 
+	ShaderVariation* Graphics::GetShader(eShaderType type, const std::string& name, const std::string& defines) const
+	{
+		auto pCache = GetSubsystem<ResourceCache>();
+
+		// 캐시에서 얻어온다.
+		// 이 과정에서 없다면 직접 생성한다.
+		
+		// 상위 객체가 필요할 수 있다.
+		// 1. urho 역시 ShaderVariation은 Resource가 아니다.
+		// 2. 하나의 hlsl에서 define에 따라 다양한 종류의 ShaderVariation이 만들어 질 수 있다. 이를 관리하는 객체가 필요하다.
+
+		return nullptr;
+	}
+
 	// 일단 셰이더가 이전 셰이더와 다르다면 바인딩한다.
 	// 이후 해당 셰이더가 사용하는 상수버퍼를 이전 상수버퍼와 비교한 후 
 	// 변경사항이 있다면 바인딩한다.
-	void Graphics::SetShaders(Shader* pVertexShader, Shader* pPixelShader)
+	void Graphics::SetShaders(ShaderVariation* pVertexShader, ShaderVariation* pPixelShader)
 	{
 		if (m_pVertexShader == pVertexShader && m_pPixelShader == pPixelShader)
 			return;
 
 		if (m_pVertexShader != pVertexShader)
 		{
-			// 전달받은 pVertexShader가 비어있다면 직접 만든다.
-			if (!pVertexShader->GetShaderBuffer())
-			{
-
-			}
+			// 이 부분은 문제가 생길 것 같다.
+			// 분명히 NULL을 전달받을 수도 있다.
+			if (!pVertexShader->GetShader())
+				pVertexShader->Create();
 
 			m_pDeviceContext->VSSetShader(
 				(ID3D11VertexShader*)(pVertexShader ? pVertexShader->GetShader() : nullptr),
@@ -859,11 +875,8 @@ namespace Dive
 
 		if (m_pPixelShader != pPixelShader)
 		{
-			// 역시 셰이더가 비었다면 직접 만든다.
-			if (!pPixelShader->GetShaderBuffer())
-			{
-
-			}
+			if (!pPixelShader->GetShader())
+				pPixelShader->Create();
 
 			m_pDeviceContext->PSSetShader(
 				(ID3D11PixelShader*)(pPixelShader ? pPixelShader->GetShader() : nullptr),
@@ -1124,12 +1137,15 @@ namespace Dive
 
 	bool Graphics::LoadShaders()
 	{
+		// 임시
+		auto pShader = std::make_unique<Shader>(m_pContext);
+
 		if (!m_pDefaultVS)
 		{
-			// 하나의 Shader도 InputType에 따라 Define이 달라지면서 다양한 종류로 존재하게 된다.
-			// urho의 Shader와 ShaderVariable의 관계는 이러한 구현 특징때문인 듯 하다.
-			// 그런데 AddDefines()를 비롯한 Shader 생성 및 Batch에 설정하는 부분을 찾지 못했다. 
-			m_pDefaultVS = new Shader(m_pContext, eShaderType::Vertex);
+			// 하나의 ShaderVariation도 InputType에 따라 Define이 달라지면서 다양한 종류로 존재하게 된다.
+			// urho의 ShaderVariation와 ShaderVariable의 관계는 이러한 구현 특징때문인 듯 하다.
+			// 그런데 AddDefines()를 비롯한 ShaderVariation 생성 및 Batch에 설정하는 부분을 찾지 못했다. 
+			m_pDefaultVS = new ShaderVariation(pShader.get(), eShaderType::Vertex);
 			// 이렇게 하나씩 추가하는 것이 아닌 듯 하다.
 			// ' '로 구분된 문자열 하나를 전달하고, 함수 이름 역시 Add가 아니라 SetDefines이다.
 			m_pDefaultVS->AddDefine("VERTEXCOLOR");
@@ -1139,7 +1155,7 @@ namespace Dive
 
 		if (!m_pDefaultPS)
 		{
-			m_pDefaultPS = new Shader(m_pContext, eShaderType::Pixel);
+			m_pDefaultPS = new ShaderVariation(pShader.get(), eShaderType::Pixel);
 			//m_pDefaultPS->AddDefine("VERTEXCOLOR");
 			if (!m_pDefaultPS->Compile("../Output/CoreData/Shaders/Color.hlsl"))
 				return false;
@@ -1185,12 +1201,6 @@ namespace Dive
 	{
 		if (!m_pDefaultVS || !m_pDefaultPS)
 			return;
-
-		//auto pVs = static_cast<ID3D11VertexShader*>(m_pDefaultVS->GetShader());
-		//m_pDeviceContext->VSSetShader(pVs, nullptr, 0);
-
-		//auto pPs = static_cast<ID3D11PixelShader*>(m_pDefaultPS->GetShader());
-		//m_pDeviceContext->PSSetShader(pPs, nullptr, 0);
 
 		SetShaders(m_pDefaultVS, m_pDefaultPS);
 	}
@@ -1256,7 +1266,7 @@ namespace Dive
 				{
 					// 정점 버퍼가 없으면 생성이 불가능하다.
 					auto pVb = m_pVertexBuffer;
-					m_pDefaultIL = new InputLayout(m_pContext, pVb, m_pDefaultVS);
+					m_pDefaultIL = new InputLayout(m_pContext, pVb, m_pVertexShader);
 				}
 
 				m_pDeviceContext->IASetInputLayout(m_pDefaultIL->GetInputLayout());
@@ -1282,5 +1292,7 @@ namespace Dive
 	{
 		Texture2D::RegisterObject(pContext);
 		Model::RegisterObject(pContext);
+		Shader::RegisterObject(pContext);
+		Material::RegisterObject(pContext);
 	}
 }

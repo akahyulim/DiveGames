@@ -24,13 +24,13 @@ namespace Dive
 	{
 		if (!pResource)
 		{
-			DV_LOG_ENGINE_ERROR("잘못된 인자를 전달받아 리소스를 추가할 수 없습니다.");
+			DV_LOG_ENGINE_ERROR("ResourceCache::AddManualResource - 잘못된 인자를 전달받아 리소스를 추가할 수 없습니다.");
 			return false;
 		}
 
 		if (pResource->GetName().empty())
 		{
-			DV_LOG_ENGINE_ERROR("전달받은 리소스에 이름이 존재하지 않아 추가할 수 없습니다.");
+			DV_LOG_ENGINE_ERROR("ResourceCache::AddManualResource - 전달받은 리소스에 이름이 존재하지 않아 추가할 수 없습니다.");
 			return false;
 		}
 

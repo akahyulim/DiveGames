@@ -191,6 +191,7 @@
     <ClInclude Include="Src\Graphics\IndexBuffer.h" />
     <ClInclude Include="Src\Graphics\InputLayout.h" />
     <ClInclude Include="Src\Graphics\Shader.h" />
+    <ClInclude Include="Src\Graphics\ShaderVariation.h" />
     <ClInclude Include="Src\Graphics\ShaderProgram.h" />
     <ClInclude Include="Src\Graphics\Texture.h" />
     <ClInclude Include="Src\Graphics\Texture2D.h" />
@@ -234,6 +235,7 @@
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\InputLayout.cpp" />
     <ClCompile Include="Src\Graphics\Shader.cpp" />
+    <ClCompile Include="Src\Graphics\ShaderVariation.cpp" />
     <ClCompile Include="Src\Graphics\ShaderProgram.cpp" />
     <ClCompile Include="Src\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Graphics\Texture2D.cpp" />

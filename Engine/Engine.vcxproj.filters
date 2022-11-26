@@ -76,9 +76,6 @@
     <ClInclude Include="Src\Graphics\IndexBuffer.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\Shader.h">
-      <Filter>Src\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Math\StringHash.h">
       <Filter>Src\Math</Filter>
     </ClInclude>
@@ -142,6 +139,12 @@
     <ClInclude Include="Src\Graphics\ShaderProgram.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Graphics\ShaderVariation.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\Shader.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -193,9 +196,6 @@
       <Filter>Src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp">
-      <Filter>Src\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Graphics\Shader.cpp">
       <Filter>Src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\InputLayout.cpp">
@@ -250,6 +250,12 @@
       <Filter>Src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\ShaderProgram.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\ShaderVariation.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Shader.cpp">
       <Filter>Src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,12 +1,12 @@
 #include "divepch.h"
 #include "FileStream.h"
+#include "FileSystem.h"
 #include "Log.h"
 
 namespace Dive
 {
 	FileStream::FileStream(const std::string& path, uint32_t flags)
-		: m_bOpen(false),
-		m_Flags(flags)
+		: m_Flags(flags)
 	{
 		std::ios_base::openmode iosFlags = std::ios::binary;
 		if (m_Flags & eFileStreamMode::Read) iosFlags |= std::ios::in;
@@ -18,19 +18,27 @@ namespace Dive
 			m_Out.open(path, iosFlags);
 			if (m_Out.fail())
 			{
-				DV_LOG_ENGINE_ERROR("파일({:s})을 쓰기모드로 여는데 실패하였습니다.", path);
+				DV_LOG_ENGINE_ERROR("FileStream::FileStream - 파일({:s})을 쓰기모드로 여는데 실패하였습니다.", path);
 				return;
 			}
 		}
 		else if (m_Flags & eFileStreamMode::Read)
 		{
 			m_In.open(path, iosFlags);
-			if (m_Out.fail())
+			if (m_In.fail())
 			{
-				DV_LOG_ENGINE_ERROR("파일({:s})을 읽기모드로 여는데 실패하였습니다.", path);
+				DV_LOG_ENGINE_ERROR("FileStream::FileStream - 파일({:s})을 읽기모드로 여는데 실패하였습니다.", path);
 				return;
 			}
+
+			// 크기 계산
+			m_In.seekg(0, std::ios::end);
+			m_Size = static_cast<unsigned int>(m_In.tellg());
+			m_In.seekg(0, std::ios::beg);
 		}
+
+		m_FilePath = path;
+		m_FileName = FileSystem::GetFileNameAndExtension(path);
 
 		m_bOpen = true;
 	}
@@ -190,5 +198,18 @@ namespace Dive
 			return;
 
 		m_In.read(reinterpret_cast<char*>(pData), size);
+	}
+
+	std::string FileStream::ReadLine()
+	{
+		std::string lineStr;
+		std::getline(m_In, lineStr);
+
+		return lineStr;
+	}
+
+	bool FileStream::IsEof()
+	{
+		return static_cast<unsigned int>(m_In.tellg()) >= m_Size;
 	}
 }

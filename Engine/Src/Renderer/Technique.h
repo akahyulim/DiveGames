@@ -5,7 +5,7 @@
 namespace Dive
 {
 	class Context;
-	class Shader;
+	class ShaderVariation;
 
 	class Pass
 	{
@@ -44,11 +44,11 @@ namespace Dive
 
 		std::string m_VertexShaderName;
 		std::string m_VertexShaderDefines;
-		std::vector<Shader*> m_VertexShaders;	// Set함수가 없다. 어떻게 설정한 것일까?
+		std::vector<ShaderVariation*> m_VertexShaders;	// Set함수가 없다. 어떻게 설정한 것일까?
 
 		std::string m_PixelShaderName;
 		std::string m_PixelShaderDefines;
-		std::vector<Shader*> m_PixelShaders;
+		std::vector<ShaderVariation*> m_PixelShaders;
 	};
 
 	class Technique : public Resource

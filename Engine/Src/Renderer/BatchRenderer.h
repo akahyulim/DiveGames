@@ -7,7 +7,7 @@ namespace Dive
 {
 	class View;
 	class Pass;
-	class Shader;
+	class ShaderVariation;
 
 	struct BatchRenderer
 	{
@@ -26,7 +26,7 @@ namespace Dive
 		Mesh* m_pMesh = nullptr;
 		Material* m_pMaterial = nullptr;
 		Pass* m_pPass = nullptr;
-		Shader* m_pVertexShader = nullptr;
-		Shader* m_pPixelShader = nullptr;
+		ShaderVariation* m_pVertexShader = nullptr;
+		ShaderVariation* m_pPixelShader = nullptr;
 	};
 }

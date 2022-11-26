@@ -1,5 +1,5 @@
 #include "divepch.h"
-#include "Shader.h"
+#include "ShaderVariation.h"
 #include "Graphics.h"
 #include "ConstantBuffer.h"
 #include "Math/StringHash.h"
@@ -7,7 +7,7 @@
 
 namespace Dive
 {
-	ShaderProgram::ShaderProgram(Graphics* pGraphics, Shader* pVS, Shader* pPS)
+	ShaderProgram::ShaderProgram(Graphics* pGraphics, ShaderVariation* pVS, ShaderVariation* pPS)
 	{
 		if (!pGraphics || !pGraphics->IsInitialized())
 			return;

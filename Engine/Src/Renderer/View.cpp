@@ -151,5 +151,14 @@ namespace Dive
 				m_BaseBatchRenderers.emplace_back(drawableBatch);
 			}
 		}
+
+		// 위의 과정에서 AddBatchToQueue라는 함수가 호출된다.
+		// 이는 이름대로 Batch들을 Queue에 추가하는 듯 하다.
+		// 이 과정에서 Tech를 참조해 Shader를 생성하거나 획득한 후
+		// Batch의 ShaderVariation에 저장하는 듯 하다.
+
+		// 좀 더 자세히 풀자면 AddBatchToQueue()에서 Renderer::SetBatchShaders()에 Batch를 전달한 후
+		// Batch로 부터 Pass를 얻어 생성 및 적용한다.
+		// 이 부분은 좀 복잡하므로 좀 더 분석이 필요하다.
 	}
 }

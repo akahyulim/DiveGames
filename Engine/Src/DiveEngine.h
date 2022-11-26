@@ -40,6 +40,7 @@
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/ConstantBuffer.h"
 #include "Graphics/Shader.h"
+#include "Graphics/ShaderVariation.h"
 #include "Graphics/ShaderProgram.h"
 #include "Graphics/InputLayout.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "Core/Object.h"
 #include "GraphicsDefs.h"
-#include "Shader.h"
+#include "ShaderVariation.h"
 #include "ShaderProgram.h"
 
 namespace Dive
@@ -128,13 +128,13 @@ namespace Dive
 
 		VertexBuffer* GetVertexBuffer(unsigned int index) const;
 		void SetVertexBuffer(VertexBuffer* pBuffer);
-		void SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, unsigned int instanceOffset = 0);
+		//void SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, unsigned int instanceOffset = 0);
 
 		IndexBuffer* GetIndexBuffer() const { return m_pIndexBuffer; }
 		void SetIndexBuffer(IndexBuffer* pBuffer);
 
-		Shader* GetShader(eShaderType type, const std::string& name, const std::string& defines = std::string()) const;
-		void SetShaders(Shader* pVertexShader, Shader* pPixelShader);
+		ShaderVariation* GetShader(eShaderType type, const std::string& name, const std::string& defines = std::string()) const;
+		void SetShaders(ShaderVariation* pVertexShader, ShaderVariation* pPixelShader);
 
 		void SetShaderParameter(const std::string& param, bool value);
 		void SetShaderParameter(const std::string& param, float value);
@@ -169,7 +169,7 @@ namespace Dive
 		bool LoadShaders();
 		void SetDefaultShader();
 
-		Shader* GetDefaultVS() const { return m_pDefaultVS; }
+		ShaderVariation* GetDefaultVS() const { return m_pDefaultVS; }
 
 		// 윈도우 크기 변경시 호출. 백버퍼, 렌더타겟 재생성 함수 호출.
 		void OnResizeWindow();
@@ -215,8 +215,8 @@ namespace Dive
 		VertexBuffer* m_pVertexBuffer = nullptr;
 		IndexBuffer* m_pIndexBuffer = nullptr;
 
-		Shader* m_pVertexShader = nullptr;
-		Shader* m_pPixelShader = nullptr;
+		ShaderVariation* m_pVertexShader = nullptr;
+		ShaderVariation* m_pPixelShader = nullptr;
 
 		Texture* m_pTextures[16] = { nullptr, };
 
@@ -225,7 +225,7 @@ namespace Dive
 		bool m_bRenderTargetsDirty = false;
 
 		// ConstantBuffers
-		std::map<std::pair<Shader*, Shader*>, ShaderProgram*> m_ShaderPrograms;
+		std::map<std::pair<ShaderVariation*, ShaderVariation*>, ShaderProgram*> m_ShaderPrograms;
 		ShaderProgram* m_pCurrentShaderProgram = nullptr;
 		std::unordered_map<unsigned int, ConstantBuffer*> m_AllConstantBuffers;
 		std::vector<ConstantBuffer*> m_DirtyConstantBuffers;
@@ -233,18 +233,9 @@ namespace Dive
 		ID3D11Buffer* m_pCurrentPSCBuffers[7] = { nullptr, };
 
 		// temp
-		Shader* m_pDefaultVS = nullptr;
-		Shader* m_pDefaultPS = nullptr;
+		ShaderVariation* m_pDefaultVS = nullptr;
+		ShaderVariation* m_pDefaultPS = nullptr;
 		InputLayout* m_pDefaultIL = nullptr;
-		//Microsoft::WRL::ComPtr<ID3D11Buffer> m_pMatrixBuffer;
-
-		struct MatrixBufferType
-		{
-			DirectX::XMMATRIX world;
-			DirectX::XMMATRIX view;
-			DirectX::XMMATRIX proj;
-		};
-
 	};
 
 	void RegisterGraphicsObject(Context* pContext);

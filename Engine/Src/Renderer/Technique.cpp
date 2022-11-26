@@ -2,7 +2,7 @@
 #include "Technique.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
-#include "Graphics/Shader.h"
+#include "Graphics/ShaderVariation.h"
 #include "IO/FileSystem.h"
 #include "IO/Log.h"
 
@@ -38,14 +38,11 @@ namespace Dive
 		releaseShaders();
 	}
 
+	// 이름을 바꾸자.
+	// ShaderVaritaion을 직접 지우진 않는다.
 	void Pass::releaseShaders()
 	{
-		for (auto pVertexShader : m_VertexShaders)
-			DV_DELETE(pVertexShader);
 		m_VertexShaders.clear();
-
-		for (auto pPixelShader : m_PixelShaders)
-			DV_DELETE(pPixelShader);
 		m_PixelShaders.clear();
 	}
 

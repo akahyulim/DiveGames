@@ -2,7 +2,7 @@
 #include "InputLayout.h"
 #include "Graphics.h"
 #include "VertexBuffer.h"
-#include "Shader.h"
+#include "ShaderVariation.h"
 #include "Graphics.h"
 #include "GraphicsDefs.h"
 #include "Core/Context.h"
@@ -12,7 +12,7 @@
 namespace Dive
 {
 	// InputSlot이 2개 이상일 경우를 대응하지 못했다.
-	InputLayout::InputLayout(Context* pContext, VertexBuffer* pBuffers, Shader* pVertexShader)
+	InputLayout::InputLayout(Context* pContext, VertexBuffer* pBuffers, ShaderVariation* pVertexShader)
 		: Object(pContext)
 	{
 		if (!pBuffers || !pVertexShader || pVertexShader->GetShaderType() != eShaderType::Vertex)

@@ -18,6 +18,9 @@ namespace Dive
         bool IsOpen() const { return m_bOpen; }
         void Close();
 
+        std::string GetFilePath() const { return m_FilePath; }
+        std::string GetFileName() const { return m_FileName; }
+
         void Skip(uint64_t n);
 
         // write
@@ -112,10 +115,16 @@ namespace Dive
             return value;
         }
 
+        std::string ReadLine();
+        bool IsEof();
+
     private:
+        std::string m_FilePath;
+        std::string m_FileName;
         std::ofstream m_Out;
         std::ifstream m_In;
-        uint32_t m_Flags;
-        bool m_bOpen;
+        uint32_t m_Flags = 0;
+        bool m_bOpen = false;
+        unsigned int m_Size = 0;
     };
 }

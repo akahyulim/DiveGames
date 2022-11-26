@@ -38,6 +38,8 @@ namespace Sandbox
 		pViewport->SetScene(m_pScene);
 		GetSubsystem<Dive::Renderer>()->SetViewport(0, pViewport);
 
+		auto pCache = GetSubsystem<Dive::ResourceCache>();
+
 		// renderPath
 		{
 
@@ -45,6 +47,7 @@ namespace Sandbox
 
 		// model: 버퍼 생성 확인!
 		{
+			// Model 구성
 			std::vector<Dive::VertexElement> elements;
 			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
 			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
@@ -72,21 +75,49 @@ namespace Sandbox
 			pMesh->SetIndexBuffer(pIb);
 			pMesh->SetDrawRange(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, 0, 3);
 
-			static Dive::Model* pTriangleModel = new Dive::Model(m_pContext);
-			pTriangleModel->SetName("Triangle");
+			Dive::Model* pTriangleModel = new Dive::Model(m_pContext);
+			pTriangleModel->SetName("TriangleModel");
 			pTriangleModel->SetNumMeshes(1);
 			pTriangleModel->SetMesh(0, pMesh);
+			pCache->AddManualResource(pTriangleModel);
 
+			DV_LOG_CLIENT_TRACE("Triangle Model 구성에 성공하였습니다.");
+
+			// Technique 구성
+			auto pDefaultTech = new Dive::Technique(m_pContext);
+			pDefaultTech->SetName("DefaultTech");
+			auto pPass = pDefaultTech->CreatePass("first");
+			pPass->SetVertexShader("CoreData/Shaders/color.hlsl");
+			pPass->SetPixelShader("CoreData/Shaders/color.hlsl");
+			pCache->AddManualResource(pDefaultTech);
+
+			DV_LOG_CLIENT_TRACE("Default Technique 구성에 성공하였습니다.");
+
+			// Material 구성
+			auto pDefaultMat = new Dive::Material(m_pContext);
+			pDefaultMat->SetName("DefaultMat");
+			pDefaultMat->SetTechnique(pDefaultTech);
+			pCache->AddManualResource(pDefaultMat);
+
+			DV_LOG_CLIENT_TRACE("Default Material 구성에 성공하였습니다.");
+
+			// Drawable에 Model과 Material을 추가
 			auto pTriangle = m_pScene->CreateGameObject("Triangle");
 			auto pDrawable = pTriangle->CreateComponent<Dive::Drawable>();
 			pDrawable->SetModel(pTriangleModel);
+			pDrawable->SetMaterial(pDefaultMat);
+
+			DV_LOG_CLIENT_TRACE("Triangle Drawable 구성에 성공하였습니다.");
 		}
 
-		// test technique 
+		// test create shader
 		{
-			Dive::Technique tech(m_pContext);
-			auto pPass = tech.CreatePass("Diff");
-			tech.RemovePass("Diff");
+			auto pShader = pCache->GetResource<Dive::Shader>("CoreData/Shaders/color.hlsl");
+
+			auto pVSVariation = pShader->GetVariation(Dive::eShaderType::Vertex, std::string());
+			auto pPSVariation = pShader->GetVariation(Dive::eShaderType::Pixel, std::string());
+
+			pPSVariation = pShader->GetVariation(Dive::eShaderType::Pixel, std::string());
 		}
 	}
 
