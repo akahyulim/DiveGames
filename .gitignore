@@ -2,12 +2,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudio
 
 # Project Output Files
-Output/Engine_d.*
-Output/Engine.*
-Output/Editor_d.*
-Output/Editor.*
-Output/Sandbox_d.*
-Output/Sandbox.*
+[Oo]utput/*.exe
+[Oo]utput/*.lib
 
 ### Windows ###
 # Windows thumbnail cache files
