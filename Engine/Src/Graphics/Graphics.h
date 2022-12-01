@@ -218,6 +218,10 @@ namespace Dive
 		ShaderVariation* m_pVertexShader = nullptr;
 		ShaderVariation* m_pPixelShader = nullptr;
 
+		// InputLayout
+		unsigned long long m_InputLayoutHash = 0;
+		std::unordered_map<unsigned long long, InputLayout*> m_InputLayouts;
+
 		Texture* m_pTextures[16] = { nullptr, };
 
 		// dirty check 전부 모으기.
@@ -235,7 +239,6 @@ namespace Dive
 		// temp
 		ShaderVariation* m_pDefaultVS = nullptr;
 		ShaderVariation* m_pDefaultPS = nullptr;
-		InputLayout* m_pDefaultIL = nullptr;
 	};
 
 	void RegisterGraphicsObject(Context* pContext);

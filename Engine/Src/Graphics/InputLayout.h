@@ -13,7 +13,7 @@ namespace Dive
 
 	public:
 		explicit InputLayout(Context* pContext, VertexBuffer* pBuffers, ShaderVariation* pVertexShader);
-		~InputLayout() override = default;
+		~InputLayout() override;
 
 		ID3D11InputLayout* GetInputLayout() const { return m_pInputLayout.Get(); }
 

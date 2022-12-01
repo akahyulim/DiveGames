@@ -33,9 +33,10 @@ namespace Dive
 		
 		const std::vector<VertexElement>& GetElements() const { return m_Elements; }
 		
-		unsigned long long GetElementHash() const { return m_ElementHash; }
-		unsigned long long GetBufferHash(unsigned int slot) const { return m_ElementHash << (slot * 16); }
-		
+		// VertexBuffers의 인덱스별로 나뉘어서 리턴하는데 이유는 모르겠다.
+		//unsigned long long GetBufferHash(unsigned int slot) const { return m_ElementsHash << (slot * 16); }
+		unsigned long long GetElementsHash() const { return m_ElementsHash; }
+
 		bool IsDynamic() const { return m_bDynamic; }
 
 	private:
@@ -48,7 +49,7 @@ namespace Dive
 		unsigned int m_Count = 0;
 		unsigned int m_Stride = 0;
 		std::vector<VertexElement> m_Elements;
-		unsigned long long m_ElementHash = 0;
+		unsigned long long m_ElementsHash = 0;
 		bool m_bDynamic = false;
 	};
 

@@ -33,13 +33,20 @@ namespace Dive
 		m_Elements = elements;
 		m_bDynamic = bDynamic;
 
-		unsigned int elementOffset = 0;
+		unsigned int elementSizes = 0;
+		m_ElementsHash = 0;
 		for (auto it = m_Elements.begin(); it != m_Elements.end(); ++it)
 		{
-			it->m_Offset = elementOffset;
-			elementOffset += ELEMENT_TYPESIZES[it->m_Type];
+			it->m_Offset = elementSizes;
+			elementSizes += ELEMENT_TYPESIZES[it->m_Type];
+
+			m_ElementsHash <<= 3;
+			m_ElementsHash += ((static_cast<int>(it->m_Semantic) + 1) + it->m_Index);
 		}
-		m_Stride = elementOffset;
+
+		// 직렬화를 위한 elementMask 설정 부분도 존재한다.
+
+		m_Stride = elementSizes;
 
 		if (m_pData)
 			DV_DELETE_ARRAY(m_pData);

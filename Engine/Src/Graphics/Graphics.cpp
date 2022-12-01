@@ -120,6 +120,13 @@ namespace Dive
 
 	void Graphics::Destroy()
 	{
+		// input Layouts
+		for (auto it : m_InputLayouts)
+		{
+			DV_DELETE(it.second);
+		}
+		m_InputLayouts.clear();
+
 		m_pCurrentShaderProgram = nullptr;
 		for (auto pShaderProgram : m_ShaderPrograms)
 		{
@@ -1151,6 +1158,8 @@ namespace Dive
 			m_pDefaultVS->AddDefine("VERTEXCOLOR");
 			if (!m_pDefaultVS->Compile("../Output/CoreData/Shaders/Color.hlsl"))
 				return false;
+
+			DV_LOG_ENGINE_INFO("VertexShader's SemanticsHash: {:d}", m_pDefaultVS->GetSemanticsHash());
 		}
 
 		if (!m_pDefaultPS)
@@ -1257,19 +1266,37 @@ namespace Dive
 			unsigned int offset = 0;
 			auto pVb = m_pVertexBuffer->GetBuffer();
 
+			// 버퍼를 배열로 관리할 경우 복잡해진다.
 			m_pDeviceContext->IASetVertexBuffers(0, 1, &pVb, &stride, &offset);
 
 			if (m_bVertexTypeDirty)
 			{
-				// 실제로는 VertexBuffer와 VertexShader의 Type을 이용해 찾거나 생성해야 한다.
-				if (!m_pDefaultIL)
+				if (m_pVertexBuffer)
 				{
-					// 정점 버퍼가 없으면 생성이 불가능하다.
-					auto pVb = m_pVertexBuffer;
-					m_pDefaultIL = new InputLayout(m_pContext, pVb, m_pVertexShader);
-				}
+					unsigned long long key = m_pVertexBuffer->GetElementsHash();
+					if (key != m_pVertexShader->GetSemanticsHash())
+					{
+						DV_LOG_ENGINE_ERROR("VertexBuffer와 VertexShader의 Hash가 동일하지 않습니다.");
+						return;
+					}
 
-				m_pDeviceContext->IASetInputLayout(m_pDefaultIL->GetInputLayout());
+					if (m_InputLayoutHash != key)
+					{
+						auto it = m_InputLayouts.find(key);
+						if (it != m_InputLayouts.end())
+						{
+							m_pDeviceContext->IASetInputLayout(it->second->GetInputLayout());
+						}
+						else
+						{
+							auto pNewInputLayout = new InputLayout(m_pContext, m_pVertexBuffer, m_pVertexShader);
+							m_InputLayouts.emplace(key, pNewInputLayout);
+							m_pDeviceContext->IASetInputLayout(pNewInputLayout->GetInputLayout());
+						}
+
+						m_InputLayoutHash = key;
+					}
+				}
 			}
 
 			m_bVertexTypeDirty = false;

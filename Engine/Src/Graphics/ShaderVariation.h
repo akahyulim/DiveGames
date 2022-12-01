@@ -50,6 +50,8 @@ namespace Dive
 		bool HasParameter(const std::string& name) const;
 		const std::unordered_map<std::string, ShaderParameter>& GetParameters() const { return m_Parameters; }
 
+		unsigned long long GetSemanticsHash() const { return m_SemanticsHash; }
+
 		const unsigned* GetConstantBufferSizes() const { return &m_ConstantBufferSizes[0]; }
 
 	private:
@@ -67,6 +69,8 @@ namespace Dive
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pPixelShader;
 		std::unordered_map<std::string, std::string> m_Defines;
 		//std::string m_Defines;
+
+		unsigned long long m_SemanticsHash = 0;
 
 		bool m_bUseTextureUnits[16] = { false, };
 		

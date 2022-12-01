@@ -109,16 +109,6 @@ namespace Sandbox
 
 			DV_LOG_CLIENT_TRACE("Triangle Drawable 구성에 성공하였습니다.");
 		}
-
-		// test create shader
-		{
-			auto pShader = pCache->GetResource<Dive::Shader>("CoreData/Shaders/color.hlsl");
-
-			auto pVSVariation = pShader->GetVariation(Dive::eShaderType::Vertex, std::string());
-			auto pPSVariation = pShader->GetVariation(Dive::eShaderType::Pixel, std::string());
-
-			pPSVariation = pShader->GetVariation(Dive::eShaderType::Pixel, std::string());
-		}
 	}
 
 	void Sandbox::Stop()

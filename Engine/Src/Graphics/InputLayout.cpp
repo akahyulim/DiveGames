@@ -11,7 +11,10 @@
 
 namespace Dive
 {
-	// InputSlot이 2개 이상일 경우를 대응하지 못했다.
+	// 1. InputSlot이 2개 이상일 경우를 대응하지 못했다.
+	// 2. 추후 버퍼 배열을 전달받도록 수정해야 한다.
+	// desc 구성 과정에는 VertexBuffer Elements가,
+	// create 과정에는 VertexShader의 Buffer 정보가 필요하다.
 	InputLayout::InputLayout(Context* pContext, VertexBuffer* pBuffers, ShaderVariation* pVertexShader)
 		: Object(pContext)
 	{
@@ -62,5 +65,10 @@ namespace Dive
 		{
 			DV_LOG_ENGINE_ERROR("InputLayout 생성에 실패하였습니다.");
 		}
+	}
+
+	InputLayout::~InputLayout()
+	{
+		DV_LOG_ENGINE_TRACE("InputLayout 소멸자 호출");
 	}
 }

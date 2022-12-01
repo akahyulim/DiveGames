@@ -14,6 +14,7 @@ namespace Dive
 
 		// 이건 임시다. ShaderVariation를 가지고 있어야 한다.
 		// 현재 Material, Technique, Pass의 과정을 거쳐 Shader의 이름과 Defines에 접근이 가능하다.
+		// => ShaderVariation 생성 및 설정까지 끝마친 후 코드를 다듬자.
 		pView->GetGraphics()->SetDefaultShader();
 
 		// Pass를 이용해

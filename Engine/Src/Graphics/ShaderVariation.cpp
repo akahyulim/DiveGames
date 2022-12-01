@@ -2,12 +2,26 @@
 #include "ShaderVariation.h"
 #include "Shader.h"
 #include "Graphics.h"
+#include "GraphicsDefs.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
 
 namespace Dive
 {
+	unsigned int SemanticToVertexElement(const char* semantic)
+	{
+		unsigned int i = 0;
+		while (ELEMENT_SEMANTICNAMES[i])
+		{
+			if (0 == strcmp(semantic, ELEMENT_SEMANTICNAMES[i]))
+				return i;
+			++i;
+		}
+
+		return eVertexElementSemantic::MAX_VERTEX_ELEMENT_SEMANTICS;
+	}
+
 	ShaderVariation::ShaderVariation(Shader* pOwner, eShaderType type)
 		: m_pOwner(pOwner),
 		m_pGraphics(pOwner->GetSubsystem<Graphics>()),
@@ -289,7 +303,18 @@ namespace Dive
 		D3D11_SHADER_DESC shaderDesc;
 		pReflection->GetDesc(&shaderDesc);
 
-		// vs의 입력 파라미터?로 해시를 만드는 듯
+		if (m_Type == eShaderType::Vertex)
+		{
+			m_SemanticsHash = 0;
+			for (unsigned int i = 0; i < shaderDesc.InputParameters; ++i)
+			{
+				D3D11_SIGNATURE_PARAMETER_DESC desc;
+				pReflection->GetInputParameterDesc(static_cast<UINT>(i), &desc);
+
+				m_SemanticsHash <<= 3;
+				m_SemanticsHash += (SemanticToVertexElement(desc.SemanticName) + 1) + desc.SemanticIndex;
+			}
+		}
 
 		std::map<std::string, unsigned int> cbRegisterMap;
 
