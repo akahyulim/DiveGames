@@ -4,8 +4,12 @@
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Core/Context.h"
+#include "Core/CoreDefs.h"
 #include "IO/FileStream.h"
 #include "IO/Log.h"
+
+// 1. Vertex, Index Buffer를 왜 직접 가지고 있을까?
+// 2. 계층구조는 어떻게 관리할까?
 
 namespace Dive
 {
@@ -16,14 +20,13 @@ namespace Dive
 
 	Model::~Model()
 	{
-		// Mesh는 여기에서 제거하는 것이 맞을 것 같다.
-	}
+		for (auto pMesh : m_Meshes)
+			DV_DELETE(pMesh);
+		m_Meshes.clear();
 
-	void Model::RegisterObject(Context* pContext)
-	{
-		pContext->RegisterFactory<Model>();
+		DV_LOG_ENGINE_INFO("Model({:s}) 소멸 완료", GetName());
 	}
-
+	
 	bool Model::Load(FileStream* pDeserializer)
 	{
 		if (!pDeserializer)
@@ -80,7 +83,7 @@ namespace Dive
 
 			// 정점 데이터 설정.
 			void* pDest = pVertexBuffer->Map();
-			pDeserializer->Read(pDest, pVertexBuffer->GetVertexCount() * pVertexBuffer->GetVertexSize());
+			pDeserializer->Read(pDest, pVertexBuffer->GetCount() * pVertexBuffer->GetSize());
 			pVertexBuffer->Unmap();
 
 			m_VertexBuffers[i] = pVertexBuffer;
@@ -147,7 +150,7 @@ namespace Dive
 			auto* pVertexBuffer = m_VertexBuffers[i];
 
 			// 정점 개수 기록.
-			pSerializer->Write(static_cast<unsigned int>(pVertexBuffer->GetVertexCount()));
+			pSerializer->Write(static_cast<unsigned int>(pVertexBuffer->GetCount()));
 
 			// 요소 개수 기록.
 			auto elements = pVertexBuffer->GetElements();
@@ -165,7 +168,7 @@ namespace Dive
 			}
 
 			// 정점 데이터 기록.
-			pSerializer->Write(m_VertexBuffers[i]->GetData(), m_VertexBuffers[i]->GetVertexCount() * m_VertexBuffers[i]->GetVertexSize());
+			pSerializer->Write(m_VertexBuffers[i]->GetData(), m_VertexBuffers[i]->GetCount() * m_VertexBuffers[i]->GetSize());
 		}
 
 		// 인덱스 버퍼 개수 기록.
@@ -196,13 +199,18 @@ namespace Dive
 		return true;
 	}
 
+	void Model::RegisterObject(Context* pContext)
+	{
+		pContext->RegisterFactory<Model>();
+	}
+
 	bool Model::SetVertexBuffers(const std::vector<VertexBuffer*>& pBuffers)
 	{
 		for (unsigned int i = 0; i < (unsigned int)pBuffers.size(); ++i)
 		{
 			if (!pBuffers[i])
 			{
-				DV_LOG_ENGINE_ERROR("모델 객체의 정점 버퍼를 잘못 전달 받았습니다.");
+				DV_LOG_ENGINE_ERROR("Model::SetVertexBuffers - 버퍼를 잘못 전달 받았습니다.");
 				return false;
 			}
 
@@ -220,7 +228,7 @@ namespace Dive
 		{
 			if (!pBuffers[i])
 			{
-				DV_LOG_ENGINE_ERROR("모델 객체의 인덱스 버퍼를 잘못 전달 받았습니다.");
+				DV_LOG_ENGINE_ERROR("Model::SetIndexBuffers - 버퍼를 잘못 전달 받았습니다.");
 				return false;
 			}
 
@@ -249,7 +257,7 @@ namespace Dive
 	{
 		if (index >= m_Meshes.size())
 		{
-			DV_LOG_ENGINE_ERROR("메시 인덱스를 잘못 전달받았습니다.");
+			DV_LOG_ENGINE_ERROR("Model::SetMesh - 메시 인덱스를 잘못 전달받았습니다.");
 			return false;
 		}
 

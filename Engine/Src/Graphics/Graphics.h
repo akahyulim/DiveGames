@@ -133,7 +133,7 @@ namespace Dive
 		IndexBuffer* GetIndexBuffer() const { return m_pIndexBuffer; }
 		void SetIndexBuffer(IndexBuffer* pBuffer);
 
-		ShaderVariation* GetShader(eShaderType type, const std::string& name, const std::string& defines = std::string()) const;
+		ShaderVariation* GetShader(eShaderType type, const std::string& name, const std::string& defines = std::string());
 		void SetShaders(ShaderVariation* pVertexShader, ShaderVariation* pPixelShader);
 
 		void SetShaderParameter(const std::string& param, bool value);
@@ -167,9 +167,6 @@ namespace Dive
 		ID3D11RenderTargetView* GetDefaultRenderTargetView() { return m_pDefaultRTV.Get(); }
 
 		bool LoadShaders();
-		void SetDefaultShader();
-
-		ShaderVariation* GetDefaultVS() const { return m_pDefaultVS; }
 
 		// 윈도우 크기 변경시 호출. 백버퍼, 렌더타겟 재생성 함수 호출.
 		void OnResizeWindow();
@@ -218,6 +215,9 @@ namespace Dive
 		ShaderVariation* m_pVertexShader = nullptr;
 		ShaderVariation* m_pPixelShader = nullptr;
 
+		std::string m_LastShaderName;
+		Shader* m_pLastShader = nullptr;
+
 		// InputLayout
 		unsigned long long m_InputLayoutHash = 0;
 		std::unordered_map<unsigned long long, InputLayout*> m_InputLayouts;
@@ -236,9 +236,6 @@ namespace Dive
 		ID3D11Buffer* m_pCurrentVSCBuffers[7] = { nullptr, };
 		ID3D11Buffer* m_pCurrentPSCBuffers[7] = { nullptr, };
 
-		// temp
-		ShaderVariation* m_pDefaultVS = nullptr;
-		ShaderVariation* m_pDefaultPS = nullptr;
 	};
 
 	void RegisterGraphicsObject(Context* pContext);

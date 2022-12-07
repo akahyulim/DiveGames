@@ -38,7 +38,7 @@ namespace Dive
 				// DrawalbBatch의 worldTransform을 저장한다.
 
 				// 원래는 ResetLodLevels에서 수행한다.
-				m_Batches[i].m_pMesh = meshes[i];
+				m_SourceDatas[i].m_pMesh = meshes[i];
 			}
 		}
 		else
@@ -49,37 +49,37 @@ namespace Dive
 
 	void Drawable::SetMaterial(Material* pMaterial)
 	{
-		for (unsigned int i = 0; i < static_cast<unsigned int>(m_Batches.size()); ++i)
-			m_Batches[i].m_pMaterial = pMaterial;
+		for (unsigned int i = 0; i < static_cast<unsigned int>(m_SourceDatas.size()); ++i)
+			m_SourceDatas[i].m_pMaterial = pMaterial;
 	}
 
 	Material* Drawable::GetMaterial(size_t index) const
 	{
-		return index < m_Batches.size() ? m_Batches[index].m_pMaterial : nullptr;
+		return index < m_SourceDatas.size() ? m_SourceDatas[index].m_pMaterial : nullptr;
 	}
 
 	bool Drawable::SetMaterial(size_t index, Material* pMaterial)
 	{
-		if (index >= m_Batches.size())
+		if (index >= m_SourceDatas.size())
 		{
 			DV_LOG_ENGINE_ERROR("Drawable::SetMaterial - 잘못된 인덱스를 전달받았습니다.");
 			return false;
 		}
 
-		m_Batches[index].m_pMaterial = pMaterial;
+		m_SourceDatas[index].m_pMaterial = pMaterial;
 		return true;
 	}
 
 	void Drawable::SetNumMesh(unsigned int num)
 	{
 		m_Meshes.resize(num);
-		m_Batches.resize(num);
+		m_SourceDatas.resize(num);
 	}
 
 	Mesh* Drawable::GetMesh(size_t batchIndex)
 	{
-		if (batchIndex < m_Batches.size())
-			return m_Batches[batchIndex].m_pMesh;
+		if (batchIndex < m_SourceDatas.size())
+			return m_SourceDatas[batchIndex].m_pMesh;
 		else
 			return nullptr;
 	}

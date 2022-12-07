@@ -2,10 +2,12 @@
 #include "View.h"
 #include "Viewport.h"
 #include "Renderer.h"
-#include "BatchRenderer.h"
+#include "Batch.h"
 #include "RenderPath.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "Material.h"
+#include "Technique.h"
 #include "Core/Context.h"
 #include "Core/EventSystem.h"
 #include "Graphics/Graphics.h"
@@ -42,25 +44,14 @@ namespace Dive
 
 		getDrawables();
 		getBaseBatches();
-
-		// 오브젝트를 일단 라이트와 일반으로 분리한다.
-		// 그리고 그려지는 방식에 따라 BatchGroup와 Batch로 나누어 관리한다.
-		{
-			// Scene이 Component를 가지고 관리 중이므로
-			// Light와 Model Component를 가져오면 될 듯 하다.
-			// 문제는 vector 단위가 아니라 index로 개별 component 접근만 가능하다.
-			// 물론 이는 vector를 참조리턴하는 함수를 추가하면 된다.
-			// urho는 octree component로 어찌하는 듯 하다.
-
-			// spartan은 renderer에서 object type별 entity vector를 관리한다.
-			// 그리고 매 프레임 scene으로부터 entity를 가져와 이를 갱신하며,
-			// pass에서 entity를 통해 component를 확인하여 그린다.
-		}
 	}
 	
 	void View::Render()
 	{
-		// clear
+		// UpdateGeometries
+
+		// 현재 RenderPath를 하드코딩 해놓은 상태이다.
+		// Clear
 		{
 			m_pCurrentRenderTarget = m_pRenderTarget;
 
@@ -72,7 +63,7 @@ namespace Dive
 			m_pGraphics->SetViewportRect(m_ViewRect);
 		}
 
-		// Draw
+		// ScenePass
 		{
 			auto pDeviceContext = m_pGraphics->GetDeviceContext();
 			
@@ -115,8 +106,20 @@ namespace Dive
 		}
 		m_ViewSize = DirectX::XMINT2(m_ViewRect.right - m_ViewRect.left, m_ViewRect.bottom - m_ViewRect.top);
 
+		// 각종 초기화
+		m_ScenePasses.clear();
+
+		// ScenePasses라는 것을 구성한다.
+		// 이는 RenderPathCommand와 Technique의 Pass를 연결하는 과정 같다.
+		{
+
+		}
+
+		// 이외에도 남은 처리가 존재한다.
+
 		return true;
 	}
+
 	void View::getDrawables()
 	{
 		// 일단 그려져야 할 오브젝트부터 추린다.
@@ -142,23 +145,57 @@ namespace Dive
 		{
 			auto pDrawable = *it;
 
-			const auto& batches = pDrawable->GetBatches();
+			const auto& sourceDatas = pDrawable->GetSourceDatas();
 
-			for (unsigned i = 0; i < static_cast<unsigned int>(batches.size()); ++i)
+			for (unsigned i = 0; i < static_cast<unsigned int>(sourceDatas.size()); ++i)
 			{
-				const auto& drawableBatch = batches[i];
+				const auto& drawableBatch = sourceDatas[i];
+				
+				// 실제로는 ScenePasses에 루프를 돌려 Batch를 생성한 후 AddBatchToQueue()에서 저장한다.
+				// 즉, Batches는 Pass에 맞춰 batch를 관리하는 구조체이다.
 
-				m_BaseBatchRenderers.emplace_back(drawableBatch);
+				// AddBatchToQueue()는 결국 static과 instance를 구분하여 저장하는 처리이다.
+				// 이를 이용해 batch rendering이 아닌 insctancing rendering이 가능하게 된다.
+
+				auto* pTech = drawableBatch.m_pMaterial->GetTechnique();
+				if (!pTech)
+					continue;
+
+				// ScenePasses 루프
+				{
+					// pTech로부터 pass를 가져와야하는데 인덱스가 필요하다.
+					// urho는 ScenePassInfo에 인덱스가 있다.
+					auto* pPass = pTech->GetPass(0);
+
+					Batch batch(drawableBatch);
+					batch.m_pPass = pPass;
+					
+					// Renderer::SetBatchShaders
+					{
+						auto vertexShaderVariations = pPass->GetVertexShaderVariations();
+						auto pixelShaderVariations = pPass->GetPixelShaderVariations();
+
+						if(vertexShaderVariations.empty() || pixelShaderVariations.empty())
+						{
+							// Renderer::LoadPassShaders
+							vertexShaderVariations.clear();
+							pixelShaderVariations.clear();
+
+							// graphics에 타입, 이름, defines를 전달해 얻어온다.
+							vertexShaderVariations.emplace_back(
+								m_pGraphics->GetShader(eShaderType::Vertex, pPass->GetVertexShaderName(), pPass->GetVertexShaderDefines()));
+
+							pixelShaderVariations.emplace_back(
+								m_pGraphics->GetShader(eShaderType::Pixel, pPass->GetPixelShaderName(), pPass->GetPixelShaderDefines()));
+						}
+
+						batch.m_pVertexShader = vertexShaderVariations[0];
+						batch.m_pPixelShader = pixelShaderVariations[0];
+					}
+
+					m_BaseBatchRenderers.emplace_back(batch);
+				}
 			}
 		}
-
-		// 위의 과정에서 AddBatchToQueue라는 함수가 호출된다.
-		// 이는 이름대로 Batch들을 Queue에 추가하는 듯 하다.
-		// 이 과정에서 Tech를 참조해 Shader를 생성하거나 획득한 후
-		// Batch의 ShaderVariation에 저장하는 듯 하다.
-
-		// 좀 더 자세히 풀자면 AddBatchToQueue()에서 Renderer::SetBatchShaders()에 Batch를 전달한 후
-		// Batch로 부터 Pass를 얻어 생성 및 적용한다.
-		// 이 부분은 좀 복잡하므로 좀 더 분석이 필요하다.
 	}
 }

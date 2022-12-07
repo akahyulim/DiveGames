@@ -38,7 +38,8 @@ namespace Dive
 		{
 			auto newVariation = new ShaderVariation(this, type);
 			newVariation->SetName(GetName());
-			newVariation->SetDefines(defines);
+			//newVariation->SetDefines(defines);		// 결국엔 이걸로 가야할 듯 한데...
+			newVariation->AddDefine(defines);
 
 			variations.emplace(defines, newVariation);
 

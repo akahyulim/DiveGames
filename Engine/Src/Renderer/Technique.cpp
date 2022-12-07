@@ -38,12 +38,10 @@ namespace Dive
 		releaseShaders();
 	}
 
-	// 이름을 바꾸자.
-	// ShaderVaritaion을 직접 지우진 않는다.
 	void Pass::releaseShaders()
 	{
-		m_VertexShaders.clear();
-		m_PixelShaders.clear();
+		m_VertexShaderVariations.clear();
+		m_PixelShaderVariations.clear();
 	}
 
 	std::unordered_map<std::string, unsigned int> Technique::m_PassIndices;
@@ -76,7 +74,8 @@ namespace Dive
 		else if (it->second < m_Passes.size() && m_Passes[it->second])
 		{
 			DV_DELETE(m_Passes[it->second]);
-			m_Passes[it->second] = nullptr;
+			m_Passes.erase(m_Passes.begin() + it->second);
+			m_PassIndices.erase(it);
 		}
 	}
 
@@ -92,9 +91,14 @@ namespace Dive
 		return it != m_PassIndices.end() && GetPass(it->second) != nullptr;
 	}
 
+	// 아직 분석이 덜 되었지만 RenderPathPass와 관련이 있다.
+	// pass name이 동일한 형태이다.
 	unsigned int Technique::GetPassIndex(const std::string& name)
 	{
 		// 일단 앞 8개의 index는 비워둔다.
+		{
+
+		}
 
 		auto lowerName = FileSystem::ToLowerCase(name);
 		auto it = m_PassIndices.find(lowerName);
@@ -107,5 +111,17 @@ namespace Dive
 			
 			return newPassIndex;
 		}
+	}
+
+	bool Technique::Load(FileStream* pDeserializer)
+	{
+		// 파일을 분석하여 멤버 변수를 채운다.
+
+		return true;
+	}
+
+	void Technique::RegisterObject(Context* pContext)
+	{
+		pContext->RegisterFactory<Technique>();
 	}
 }

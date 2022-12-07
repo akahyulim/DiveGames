@@ -20,7 +20,7 @@ namespace Dive
 		void* Map();
 		void Unmap();
 
-		ID3D11Buffer* GetBuffer() { return m_pBuffer.Get(); }
+		ID3D11Buffer* GetBuffer() { return m_pBuffer; }
 		
 		unsigned int GetCount() const { return m_Count; }
 		unsigned int GetStride() const { return m_Stride; }
@@ -34,7 +34,7 @@ namespace Dive
 
 	private:
 		Graphics* m_pGraphics = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pBuffer;
+		ID3D11Buffer* m_pBuffer = nullptr;
 		unsigned int m_Count = 0;
 		unsigned int m_Stride = 0;
 		bool m_bDynamic = false;

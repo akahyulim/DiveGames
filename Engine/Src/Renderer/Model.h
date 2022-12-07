@@ -19,10 +19,12 @@ namespace Dive
 		explicit Model(Context* pContext);
 		~Model() override;
 
-		static void RegisterObject(Context* pContext);
-
+		// override
 		bool Load(FileStream* pDeserializer) override;
 		bool Save(FileStream* pSerializer) override;
+
+		// static
+		static void RegisterObject(Context* pContext);
 
 		const std::vector<VertexBuffer*>& GetVertexBuffers() const { return m_VertexBuffers; }
 		bool SetVertexBuffers(const std::vector<VertexBuffer*>& pBuffers);

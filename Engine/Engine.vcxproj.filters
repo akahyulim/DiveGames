@@ -133,9 +133,6 @@
     <ClInclude Include="Src\Renderer\Technique.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Renderer\BatchRenderer.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Graphics\ShaderProgram.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
@@ -144,6 +141,9 @@
     </ClInclude>
     <ClInclude Include="Src\Graphics\Shader.h">
       <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Batch.h">
+      <Filter>Src\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -246,9 +246,6 @@
     <ClCompile Include="Src\Renderer\Technique.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Renderer\BatchRenderer.cpp">
-      <Filter>Src\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Graphics\ShaderProgram.cpp">
       <Filter>Src\Graphics</Filter>
     </ClCompile>
@@ -257,6 +254,9 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\Shader.cpp">
       <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Batch.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

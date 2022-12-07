@@ -6,6 +6,7 @@ namespace Dive
 {
 	class Context;
 	class ShaderVariation;
+	class FileStream;
 
 	class Pass
 	{
@@ -28,6 +29,9 @@ namespace Dive
 		void SetPixelShaderDefines(const std::string& defines);
 		const std::string& GetPixelShaderDefines() const { return m_PixelShaderDefines; }
 
+		std::vector<ShaderVariation*>& GetVertexShaderVariations() { return m_VertexShaderVariations; }
+		std::vector<ShaderVariation*>& GetPixelShaderVariations() { return m_PixelShaderVariations; }
+
 	private:
 		void releaseShaders();
 
@@ -44,11 +48,11 @@ namespace Dive
 
 		std::string m_VertexShaderName;
 		std::string m_VertexShaderDefines;
-		std::vector<ShaderVariation*> m_VertexShaders;	// Set함수가 없다. 어떻게 설정한 것일까?
+		std::vector<ShaderVariation*> m_VertexShaderVariations;
 
 		std::string m_PixelShaderName;
 		std::string m_PixelShaderDefines;
-		std::vector<ShaderVariation*> m_PixelShaders;
+		std::vector<ShaderVariation*> m_PixelShaderVariations;
 	};
 
 	class Technique : public Resource
@@ -68,10 +72,15 @@ namespace Dive
 		bool HasPass(unsigned int index) { return index < static_cast<unsigned int>(m_Passes.size()) && m_Passes[index] != nullptr; }
 		bool HasPass(const std::string& name);
 
-		static unsigned int GetPassIndex(const std::string& name);
-
 		// static index들이 있다.
 		// base, alpha, material, deferred, light, litBase, litAlpha, shadow 총 8개이다.
+
+		// override
+		bool Load(FileStream* pDeserializer) override;
+
+		// static
+		static unsigned int GetPassIndex(const std::string& name);
+		static void RegisterObject(Context* pContext);
 
 	private:
 

@@ -2,6 +2,14 @@
 
 namespace Dive
 {
+	enum class eGeometryType
+	{
+		Static,
+		Skinned,
+		Instanced,
+		Billboard,
+	};
+
 	enum class eTextureUsage
 	{
 		Static,

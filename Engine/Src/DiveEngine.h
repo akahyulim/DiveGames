@@ -49,7 +49,7 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/Viewport.h"
 #include "Renderer/View.h"
-#include "Renderer/BatchRenderer.h"
+#include "Renderer/Batch.h"
 #include "Renderer/RenderPath.h"
 #include "Renderer/Model.h"
 #include "Renderer/Mesh.h"

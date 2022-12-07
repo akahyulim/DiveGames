@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "RendererEvents.h"
 #include "RenderPath.h"
+#include "Technique.h"
 #include "Viewport.h"
 #include "View.h"
 #include "Core/CoreDefs.h"
@@ -98,6 +99,30 @@ namespace Dive
 		// 이미 생성되었다면 m_bViewReset = true;
 	}
 
+	void Renderer::SetDefaultRenderPath(RenderPath* pRenderPath)
+	{
+		if (pRenderPath)
+			m_pDefaultRenderPath = pRenderPath;
+	}
+
+	RenderPath* Renderer::GetDefaultRenderPath() const
+	{
+		// 비었다면 Cache에 파일명을 전달하여 직접생성한 후 설정
+		return m_pDefaultRenderPath;
+	}
+
+	void Renderer::SetDefaultTechnique(Technique* pTechnique)
+	{
+		if (pTechnique)
+			m_pDefaultTechnique = pTechnique;
+	}
+
+	Technique* Renderer::GetDefaultTechnique() const
+	{
+		// 비었다면 Cache에 파일명을 전달하여 직접생성한 후 설정
+		return m_pDefaultTechnique;
+	}
+
 	Viewport* Renderer::GetViewport(unsigned int index)
 	{
 		return m_Viewports.size() > index ? m_Viewports[index] : nullptr;
@@ -168,10 +193,12 @@ namespace Dive
 	void Renderer::initialize()
 	{
 		auto pGraphics = GetSubsystem<Graphics>();
-		if (!pGraphics || !pGraphics->IsInitialized())
+		auto pCache = GetSubsystem<ResourceCache>();
+		if (!pGraphics || !pGraphics->IsInitialized() || !pCache)
 			return;
 
-		auto pCache = GetSubsystem<ResourceCache>();
+		m_pGraphics = pGraphics;
+
 		// cache manager로 부터 load
 		// default light ramp
 		// default light spot

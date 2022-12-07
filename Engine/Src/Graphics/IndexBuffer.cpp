@@ -16,16 +16,18 @@ namespace Dive
 
 	IndexBuffer::~IndexBuffer()
 	{
-		DV_LOG_ENGINE_TRACE("IndexBuffer 소멸자 호출");
+		DV_RELEASE(m_pBuffer);
+
+		DV_LOG_ENGINE_INFO("IndexBuffer 소멸 완료");
 	}
 
 	void* IndexBuffer::Map()
 	{
-		if (m_pBuffer || m_bDynamic)
+		if (m_pBuffer && m_bDynamic)
 		{
 			D3D11_MAPPED_SUBRESOURCE mappedSubresource;
 			if (FAILED(m_pGraphics->GetDeviceContext()->Map(
-				static_cast<ID3D11Resource*>(m_pBuffer.Get()),
+				static_cast<ID3D11Resource*>(m_pBuffer),
 				0,
 				D3D11_MAP_WRITE_DISCARD,
 				0,
@@ -46,7 +48,7 @@ namespace Dive
 		if (!m_pBuffer || !m_bDynamic)
 			return;
 		
-		m_pGraphics->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer.Get()), 0);
+		m_pGraphics->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer), 0);
 	}
 
 	bool IndexBuffer::create(const void* pData)
@@ -56,6 +58,8 @@ namespace Dive
 			DV_LOG_ENGINE_ERROR("IndexBuffer::create - 잘못된 크기를 전달받아 버퍼를 생성할 수 없습니다.");
 			return false;
 		}
+
+		DV_RELEASE(m_pBuffer);
 
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
@@ -72,7 +76,7 @@ namespace Dive
 		data.SysMemPitch = 0;
 		data.SysMemSlicePitch = 0;
 
-		if (FAILED(m_pGraphics->GetDevice()->CreateBuffer(&desc, m_bDynamic ? nullptr : &data, m_pBuffer.ReleaseAndGetAddressOf())))
+		if (FAILED(m_pGraphics->GetDevice()->CreateBuffer(&desc, m_bDynamic ? nullptr : &data, &m_pBuffer)))
 		{
 			DV_LOG_ENGINE_ERROR("IndexBuffer::create - 버퍼 생성에 실패하였습니다.");
 			return false;

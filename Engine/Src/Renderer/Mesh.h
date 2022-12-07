@@ -18,12 +18,10 @@ namespace Dive
 
 		void Draw(Graphics* pGraphics);
 
-		VertexBuffer* GetVertexBuffer(size_t index) const;
-		bool SetNumVertexBuffers(size_t num);
-		bool SetVertexBuffer(size_t index, VertexBuffer* pBuffer);
+		bool SetDrawRange(unsigned int vertexStart, unsigned int vertexCount, unsigned int indexStart, unsigned int indexCount);
 
-		bool SetDrawRange(D3D11_PRIMITIVE_TOPOLOGY primitiveType, unsigned int indexStart, unsigned int indexCount);
-		bool SetDrawRange(D3D11_PRIMITIVE_TOPOLOGY primitiveType, unsigned int vertexStart, unsigned int vertexCount, unsigned int indexStart, unsigned int indexCount);
+		VertexBuffer* GetVertexBuffer() const { return m_pVertexBuffer; }
+		void SetVertexBuffer(VertexBuffer* pBuffer);
 
 		IndexBuffer* GetIndexBuffer() const { return m_pIndexBuffer; }
 		void SetIndexBuffer(IndexBuffer* pBuffer);
@@ -36,14 +34,18 @@ namespace Dive
 		unsigned int GetIndexCount() const { return m_IndexCount; }
 		unsigned int GetIndexStart() const { return m_IndexStart; }
 
+		float GetLodDistance() const { return m_LodDistance; }
+		void SetLodDistance(float distance);
+
 	private:
 	private:
-		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveType;
-		std::vector<VertexBuffer*> m_VertexBuffers;
-		IndexBuffer* m_pIndexBuffer;
-		unsigned int m_VertexStart;
-		unsigned int m_VertexCount;
-		unsigned int m_IndexStart;
-		unsigned int m_IndexCount;
+		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		VertexBuffer* m_pVertexBuffer = nullptr;
+		IndexBuffer* m_pIndexBuffer = nullptr;
+		unsigned int m_VertexStart = 0;
+		unsigned int m_VertexCount = 0;
+		unsigned int m_IndexStart = 0;
+		unsigned int m_IndexCount = 0;
+		float m_LodDistance = 0.0f;
 	};
 }

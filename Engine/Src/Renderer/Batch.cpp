@@ -1,5 +1,5 @@
 #include "divepch.h"
-#include "BatchRenderer.h"
+#include "Batch.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/View.h"
 #include "Renderer/Technique.h"
@@ -7,15 +7,13 @@
 
 namespace Dive
 {
-	// shader와 같이 개별 mesh에 적용되어야 할 리소스를 gpu로 보낸다.
-	void BatchRenderer::Prepare(View* pView)
+	// InstancingBatch에도 사용되므로 public이어야 한다.
+	void Batch::Prepare(View* pView)
 	{
-		// 일단 ShaderVariation에 vs, ps 둘 중 하나라도 없으면 리턴이다.
+		if (!m_pVertexShader || !m_pPixelShader)
+			return;
 
-		// 이건 임시다. ShaderVariation를 가지고 있어야 한다.
-		// 현재 Material, Technique, Pass의 과정을 거쳐 Shader의 이름과 Defines에 접근이 가능하다.
-		// => ShaderVariation 생성 및 설정까지 끝마친 후 코드를 다듬자.
-		pView->GetGraphics()->SetDefaultShader();
+		pView->GetGraphics()->SetShaders(m_pVertexShader, m_pPixelShader);
 
 		// Pass를 이용해
 		// graphics에 blend, cull, fill mode등을 전달한다.
@@ -29,7 +27,7 @@ namespace Dive
 		}
 	}
 
-	void BatchRenderer::Draw(View* pView)
+	void Batch::Draw(View* pView)
 	{
 		if (!m_pMesh)
 			return;

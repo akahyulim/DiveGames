@@ -18,18 +18,15 @@ namespace Dive
 		bool SetSize(unsigned int vertexCount, const std::vector<VertexElement>& elements, bool bDynamic = false);
 		bool SetData(void* pData);
 
-		template<typename T> bool Create(const std::vector<T>& vertices);
-		template<typename T> bool CreateDynamic(unsigned int count);
-
 		void* Map();
 		void Unmap();
 
 		unsigned char* GetData() const { return m_pData; }
 
-		ID3D11Buffer* GetBuffer() const { return m_pBuffer.Get(); }
+		ID3D11Buffer* GetBuffer() const { return m_pBuffer; }
 
-		unsigned int GetVertexCount() const { return m_Count; }
-		unsigned int GetVertexSize() const { return m_Stride; }
+		unsigned int GetCount() const { return m_Count; }
+		unsigned int GetSize() const { return m_Stride; }
 		
 		const std::vector<VertexElement>& GetElements() const { return m_Elements; }
 		
@@ -40,34 +37,13 @@ namespace Dive
 		bool IsDynamic() const { return m_bDynamic; }
 
 	private:
-		bool create(const void* pData);
-
-	private:
 		Graphics* m_pGraphics = nullptr;
 		unsigned char* m_pData = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pBuffer;
+		ID3D11Buffer* m_pBuffer = nullptr;
 		unsigned int m_Count = 0;
 		unsigned int m_Stride = 0;
 		std::vector<VertexElement> m_Elements;
 		unsigned long long m_ElementsHash = 0;
 		bool m_bDynamic = false;
 	};
-
-	template<typename T> bool VertexBuffer::Create(const std::vector<T>& vertices)
-	{
-		m_bDynamic = false;
-		m_Stride = static_cast<unsigned int>(sizeof(T));
-		m_Count = static_cast<unsigned int>(vertices.size());
-
-		return create(static_cast<const void*>(vertices.data()));
-	}
-
-	template<typename T> bool VertexBuffer::CreateDynamic(unsigned int count)
-	{
-		m_bDynamic = true;
-		m_Stride = static_cast<unsigned int>(sizeof(T));
-		m_Count = count;
-
-		return create(nullptr);
-	}
 }

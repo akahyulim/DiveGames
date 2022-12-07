@@ -11,6 +11,8 @@ namespace Dive
 	class Texture;
 	class Texture2D;
 	class ShaderVariation;
+	class RenderPath;
+	class Technique;
 
 	class Renderer : public Object
 	{
@@ -25,6 +27,12 @@ namespace Dive
 
 		void OnRenderUpdate(const Event& e);
 		void OnScreenMode(const Event& e);
+
+		void SetDefaultRenderPath(RenderPath* pRenderPath);
+		RenderPath* GetDefaultRenderPath() const;
+
+		void SetDefaultTechnique(Technique* pTechnique);
+		Technique* GetDefaultTechnique() const;
 
 		Viewport* GetViewport(unsigned int index);
 		void SetViewport(unsigned int index, Viewport* pView);
@@ -47,6 +55,10 @@ namespace Dive
 		void updateQueuedViewport(unsigned int index);
 
 	private:
+		Graphics* m_pGraphics = nullptr;
+		RenderPath* m_pDefaultRenderPath = nullptr;
+		Technique* m_pDefaultTechnique = nullptr;
+
 		bool m_bInitialized = false;
 
 		// viewports, queuedViewports, views 이렇게 관리한다.

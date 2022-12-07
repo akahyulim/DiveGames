@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "Graphics/GraphicsDefs.h"
 
 namespace Dive
 {
@@ -7,31 +8,22 @@ namespace Dive
 	class Mesh;
 	class Model;
 	class Material;
-
-	// 추후 GraphicsDef로 이동
-	enum class eMeshType
-	{
-		Static,
-		Skinned,
-		Instanced,
-		Billboard,
-	};
 	
-	// 하나의 모델이 다수의 메시와 머티리얼로 구성될 수 있기에
-	// 이들을 개별로 묶어 관리할 필요가 있다.
-	struct DrawableBatch
+	// urho의 SourceData
+	// Draw Call(Batch)의 source data이다.
+	struct DrawableSourceData
 	{
-		DrawableBatch() = default;
-		DrawableBatch(const DrawableBatch& rhs) = default;
-		~DrawableBatch() = default;
+		DrawableSourceData() = default;
+		DrawableSourceData(const DrawableSourceData& rhs) = default;
+		~DrawableSourceData() = default;
 
-		DrawableBatch& operator=(const DrawableBatch& rhs) = default;
+		DrawableSourceData& operator=(const DrawableSourceData& rhs) = default;
 
 		float m_Distance = 0.0f;
 		Mesh* m_pMesh = nullptr;
 		Material* m_pMaterial = nullptr;
 		DirectX::XMFLOAT4X4 m_WorldTransform;	// skinned 용이라고 한다...
-		eMeshType m_MeshType;
+		eGeometryType m_GeometryType = eGeometryType::Static;
 	};
 
 	class Drawable : public Component
@@ -59,7 +51,7 @@ namespace Dive
 		// 원래는 GetLodMesh(). 즉, lodLevel까지 받는다.
 		Mesh* GetMesh(size_t batchIndex);
 
-		const std::vector<DrawableBatch>& GetBatches() const { return m_Batches; }
+		const std::vector<DrawableSourceData>& GetSourceDatas() const { return m_SourceDatas; }
 
 	protected:
 		
@@ -69,6 +61,6 @@ namespace Dive
 		// 원래는 vector의 vector이다.
 		// lod별로 관리하는 듯 하다.
 		std::vector<Mesh*> m_Meshes;
-		std::vector<DrawableBatch> m_Batches;
+		std::vector<DrawableSourceData> m_SourceDatas;
 	};
 }

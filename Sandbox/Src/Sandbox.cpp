@@ -70,10 +70,8 @@ namespace Sandbox
 			pIb->Create<unsigned short>(indices);
 
 			Dive::Mesh* pMesh = new Dive::Mesh(m_pContext);
-			pMesh->SetNumVertexBuffers(1);
-			pMesh->SetVertexBuffer(0, pVb);
+			pMesh->SetVertexBuffer(pVb);
 			pMesh->SetIndexBuffer(pIb);
-			pMesh->SetDrawRange(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, 0, 3);
 
 			Dive::Model* pTriangleModel = new Dive::Model(m_pContext);
 			pTriangleModel->SetName("TriangleModel");
@@ -86,10 +84,13 @@ namespace Sandbox
 			// Technique 구성
 			auto pDefaultTech = new Dive::Technique(m_pContext);
 			pDefaultTech->SetName("DefaultTech");
-			auto pPass = pDefaultTech->CreatePass("first");
+			auto pPass = pDefaultTech->CreatePass("base");
+			// 실제로는 이름만 저장되어야 한다. urho3d는 Graphics에서 Load할 때 경로를 직접 추가한다.
 			pPass->SetVertexShader("CoreData/Shaders/color.hlsl");
 			pPass->SetPixelShader("CoreData/Shaders/color.hlsl");
+			pPass->SetVertexShaderDefines("VERTEXCOLOR");
 			pCache->AddManualResource(pDefaultTech);
+			//GetSubsystem<Dive::Renderer>()->SetDefaultTechnique(pDefaultTech);
 
 			DV_LOG_CLIENT_TRACE("Default Technique 구성에 성공하였습니다.");
 

@@ -203,7 +203,7 @@
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Math\MathDefs.h" />
     <ClInclude Include="Src\Math\StringHash.h" />
-    <ClInclude Include="Src\Renderer\BatchRenderer.h" />
+    <ClInclude Include="Src\Renderer\Batch.h" />
     <ClInclude Include="Src\Renderer\Material.h" />
     <ClInclude Include="Src\Renderer\Mesh.h" />
     <ClInclude Include="Src\Renderer\Model.h" />
@@ -245,7 +245,7 @@
     <ClCompile Include="Src\IO\Log.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Math\MathDefs.cpp" />
-    <ClCompile Include="Src\Renderer\BatchRenderer.cpp" />
+    <ClCompile Include="Src\Renderer\Batch.cpp" />
     <ClCompile Include="Src\Renderer\Material.cpp" />
     <ClCompile Include="Src\Renderer\Mesh.cpp" />
     <ClCompile Include="Src\Renderer\Model.cpp" />

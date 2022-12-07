@@ -16,9 +16,10 @@ namespace Dive
 
 	VertexBuffer::~VertexBuffer()
 	{
-		DV_LOG_ENGINE_TRACE("VertexBuffer 소멸자 호출");
-
 		DV_DELETE_ARRAY(m_pData);
+		DV_RELEASE(m_pBuffer);
+
+		DV_LOG_ENGINE_INFO("VertexBuffer({:d}) 소멸 완료", m_ElementsHash);
 	}
 
 	bool VertexBuffer::SetSize(unsigned int vertexCount, const std::vector<VertexElement>& elements, bool bDynamic)
@@ -43,29 +44,28 @@ namespace Dive
 			m_ElementsHash <<= 3;
 			m_ElementsHash += ((static_cast<int>(it->m_Semantic) + 1) + it->m_Index);
 		}
-
-		// 직렬화를 위한 elementMask 설정 부분도 존재한다.
-
 		m_Stride = elementSizes;
+		
+		// 직렬화를 위한 elementMask 설정 부분도 존재한다.
 
 		if (m_pData)
 			DV_DELETE_ARRAY(m_pData);
 		m_pData = new unsigned char[m_Count * m_Stride];
 		memset(static_cast<void*>(m_pData), 0, m_Count * m_Stride);
 
-		m_pBuffer.Reset();
+		DV_RELEASE(m_pBuffer);
 
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		desc.CPUAccessFlags = m_bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 		desc.Usage = m_bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
-		desc.ByteWidth = (UINT)(m_Count * m_Stride);
+		desc.ByteWidth = m_Count * m_Stride;
 
 		if (FAILED(m_pGraphics->GetDevice()->CreateBuffer(
 			&desc,
 			nullptr,
-			m_pBuffer.GetAddressOf())))
+			&m_pBuffer)))
 		{
 			DV_LOG_ENGINE_ERROR("VertexBuffer::CreateBuffer - 정점 버퍼 생성에 실패하였습니다.");
 			return false;
@@ -76,52 +76,49 @@ namespace Dive
 
 	bool VertexBuffer::SetData(void* pData)
 	{
+		if (!m_pBuffer)
+		{
+			DV_LOG_ENGINE_ERROR("VertexBuffer::SetData - 버퍼가 존재하지 않습니다.");
+			return false;
+		}
+
 		if (!pData)
 		{
 			DV_LOG_ENGINE_ERROR("VertexBuffer::SetData - 정점 버퍼 데이터로 널 포인터를 전달받았습니다.");
 			return false;
 		}
 
-		if (!m_Stride)
-		{
-			DV_LOG_ENGINE_ERROR("VertexBuffer::SetData - 정점 구성요소가 정의되지 않아, 정점 버퍼 데이터를 설정 할 수 없습니다.");
-			return false;
-		}
-
 		if (m_pData && m_pData != pData)
 			memcpy_s(m_pData, m_Count * m_Stride, pData, m_Count * m_Stride);
 
-		if (m_pBuffer)
+		if (m_bDynamic)
 		{
-			if (m_bDynamic)
-			{
-				void* pDest = Map();
-				if (!pDest)
-					return false;
+			void* pDest = Map();
+			if (!pDest)
+				return false;
 
-				memcpy_s(pDest, m_Count * m_Stride, pData, m_Count * m_Stride);
+			memcpy_s(pDest, m_Count * m_Stride, pData, m_Count * m_Stride);
 
-				Unmap();
-			}
-			else
-			{
-				D3D11_BOX destBox;
-				destBox.left = 0;
-				destBox.right = m_Count * m_Stride;
-				destBox.top = 0;
-				destBox.bottom = 1;
-				destBox.front = 0;
-				destBox.back = 1;
+			Unmap();
+		}
+		else
+		{
+			D3D11_BOX destBox;
+			destBox.left = 0;
+			destBox.right = m_Count * m_Stride;
+			destBox.top = 0;
+			destBox.bottom = 1;
+			destBox.front = 0;
+			destBox.back = 1;
 
-				m_pGraphics->GetDeviceContext()->UpdateSubresource(
-					static_cast<ID3D11Resource*>(m_pBuffer.Get()),
-					0,
-					&destBox,
-					pData,
-					0,
-					0
-				);
-			}
+			m_pGraphics->GetDeviceContext()->UpdateSubresource(
+				static_cast<ID3D11Resource*>(m_pBuffer),
+				0,
+				&destBox,
+				pData,
+				0,
+				0
+			);
 		}
 
 		return true;
@@ -129,11 +126,11 @@ namespace Dive
 
 	void* VertexBuffer::Map()
 	{
-		if (m_pBuffer || m_bDynamic)
+		if (m_pBuffer && m_bDynamic)
 		{
 			D3D11_MAPPED_SUBRESOURCE mappedSubresource;
 			if (FAILED(m_pGraphics->GetDeviceContext()->Map(
-				static_cast<ID3D11Resource*>(m_pBuffer.Get()),
+				static_cast<ID3D11Resource*>(m_pBuffer),
 				0,
 				D3D11_MAP_WRITE_DISCARD,
 				0,
@@ -154,38 +151,6 @@ namespace Dive
 		if (!m_pBuffer || !m_bDynamic)
 			return;
 
-		m_pGraphics->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer.Get()), 0);
-	}
-
-	bool VertexBuffer::create(const void* pData)
-	{
-		if (!m_Count)
-		{
-			DV_LOG_ENGINE_ERROR("VertexBuffer::create - 잘못된 크기를 전달받아 버퍼를 생성할 수 없습니다.");
-			return false;
-		}
-
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		desc.CPUAccessFlags = m_bDynamic ? D3D11_CPU_ACCESS_WRITE : 0;
-		desc.Usage = m_bDynamic ? D3D11_USAGE_DYNAMIC : D3D11_USAGE_DEFAULT;
-		desc.ByteWidth = static_cast<UINT>(m_Count * m_Stride);
-		desc.MiscFlags = 0;
-		desc.StructureByteStride = 0;
-
-		D3D11_SUBRESOURCE_DATA data;
-		ZeroMemory(&data, sizeof(data));
-		data.pSysMem = pData;
-		data.SysMemPitch = 0;
-		data.SysMemSlicePitch = 0;
-
-		if (FAILED(m_pGraphics->GetDevice()->CreateBuffer(&desc, m_bDynamic ? nullptr : &data, m_pBuffer.ReleaseAndGetAddressOf())))
-		{
-			DV_LOG_ENGINE_ERROR("VertexBuffer::create - 버퍼 생성에 실패하였습니다.");
-			return false;
-		}
-
-		return true;
+		m_pGraphics->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer), 0);
 	}
 }
