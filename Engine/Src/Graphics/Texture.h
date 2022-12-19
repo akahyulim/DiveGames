@@ -49,7 +49,7 @@ namespace Dive
 		static DXGI_FORMAT GetDSVFormat(DXGI_FORMAT format);
 		static unsigned int CheckMaxMipmapCount(int width, int height);
 
-		unsigned int GetNumViewports() const { return static_cast<unsigned int>(m_Viewports.size()); }
+		unsigned int GetViewportCount() const { return static_cast<unsigned int>(m_Viewports.size()); }
 		Viewport* GetViewport(unsigned int index) const { return m_Viewports[index]; }
 		void SetViewport(unsigned int index, Viewport* pViewport);
 

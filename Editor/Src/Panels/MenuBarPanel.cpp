@@ -157,7 +157,7 @@ namespace Editor
 				if (s_pActiveScene)
 				{
 					auto* pNewGameObject = s_pActiveScene->CreateGameObject("GameObject");
-					pNewGameObject->CreateComponent<Dive::Transform>();
+					//pNewGameObject->AddComponent<Dive::Transform>();
 					pNewGameObject->SetName("GameObject " + std::to_string(pNewGameObject->GetID()));
 
 					DV_LOG_CLIENT_TRACE("빈 GameObject를 생성하였습니다.");

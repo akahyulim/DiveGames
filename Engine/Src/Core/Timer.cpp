@@ -4,7 +4,6 @@
 #include "IO/Log.h"
 #include "Core/EventSystem.h"
 #include "Engine/EngineEvents.h"
-#include "Variant.h"
 
 namespace Dive
 {
@@ -13,7 +12,7 @@ namespace Dive
 		Reset();
 	}
 
-	double Timer::GetMSec(bool bReset)
+	uint32_t Timer::GetMSec(bool bReset)
 	{
 		auto current = std::chrono::high_resolution_clock::now();
 		std::chrono::duration<double, std::milli> elapsed = current - m_Start;
@@ -21,7 +20,7 @@ namespace Dive
 		if (bReset)
 			m_Start = current;
 
-		return elapsed.count();
+		return static_cast<uint32_t>(elapsed.count());
 	}
 
 	void Timer::Reset()
@@ -32,28 +31,25 @@ namespace Dive
 	Time::Time(Context* pContext)
 		: Object(pContext),
 		m_FrameCount(0),
-		m_DeltaTime(0.0f)
+		m_TimeStep(0.0f)
 	{
-		m_Time.Reset();
+		m_ElapsedTime.Reset();
 	}
 
 	Time::~Time()
 	{
-		DV_LOG_ENGINE_TRACE("Time 소멸자 호출");
+		DV_LOG_ENGINE_TRACE("Time 소멸 완료");
 	}
 	
-	void Time::BeginFrame(float deltaTime)
+	void Time::BeginFrame(float timeStep)
 	{
 		++m_FrameCount;
-		
 		if (!m_FrameCount)
 			++m_FrameCount;
 
-		m_DeltaTime = deltaTime;
+		m_TimeStep = timeStep;
 
-		// 이벤트로 frame number와 time step 두 값을 전달해야 한다.
-
-		//DV_LOG_ENGINE_DEBUG("frame: {0:d}, delta time: {1:f}", m_FrameCount, m_DeltaTime);
+		FIRE_EVENT(BeginFrameEvent(m_FrameCount, m_TimeStep));
 	}
 
 	void Time::EndFrame()
@@ -61,15 +57,18 @@ namespace Dive
 		FIRE_EVENT(EndFrameEvent());
 	}
 
-	unsigned int Time::GetTime()
+	float Time::GetElapsedTime()
 	{
-		return static_cast<unsigned int>(m_Time.GetMSec(false) / 1000.0f);
+		return static_cast<float>(m_ElapsedTime.GetMSec(false)) / 1000.0f;
 	}
 
-	// 장면의 시작시 m_TimeSinceLeveltLoad를 리셋해야 한다.
-	// 현재로서는 이벤트가 가장 적절해 보인다.
-	unsigned int Time::GetTimeSinceLevelLoad()
+	float Time::GetFPS() const
 	{
-		return static_cast<unsigned int>(m_TimeSinceLevelLoad.GetMSec(false) * 0.0001f);
+		return 1.0f / m_TimeStep;
+	}
+
+	void Time::Sleep(uint32_t milliSec)
+	{
+		::Sleep(static_cast<DWORD>(milliSec));
 	}
 }

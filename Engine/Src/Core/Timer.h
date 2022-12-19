@@ -3,14 +3,14 @@
 
 namespace Dive
 {
-	// timer
+	// 1/1000초 단위의 경과시간을 측정하는 타이머 클래스. 
 	class Timer
 	{
 	public:
 		Timer();
 		~Timer() = default;
 
-		double GetMSec(bool bReset);
+		uint32_t GetMSec(bool bReset);
 
 		void Reset();
 
@@ -20,7 +20,7 @@ namespace Dive
 
 	class Context;
 
-	// time
+	// 시스템 시간 클래스.
 	class Time : public Object
 	{
 		DIVE_OBJECT(Time, Object)
@@ -29,32 +29,20 @@ namespace Dive
 		explicit Time(Context* pContext);
 		~Time() override;
 
-		// 프레임 시작.
-		void BeginFrame(float deltaTime);
-		// 프레임 종료.
+		void BeginFrame(float timeStep);
 		void EndFrame();
 
-		// 프레임 개수.
-		unsigned int GetFrameCount() const { return m_FrameCount; }
-		// 프레임 간 경과 시간.
-		float GetDeltaTime() const { return m_DeltaTime; }
+		uint32_t GetFrameCount() const { return m_FrameCount; }
+		
+		float GetElapsedTime();
 
-		// 초단위 프로그램 실행 경과 시간.
-		unsigned int GetTime();
-		// 초단위 씬 실행 경과 시간.
-		unsigned int GetTimeSinceLevelLoad();
+		float GetFPS() const;
+
+		static void Sleep(uint32_t milliSec);
 
 	private:
-	private:
-		// 프로그램 실행 시간 타이머.
-		Timer m_Time;
-		// 씬 실행 시간 타이머.
-		Timer m_TimeSinceLevelLoad;
-
-		// 프레임 개수.
-		unsigned int m_FrameCount;
-
-		// 프레임 간격 시간.
-		float m_DeltaTime;
+		Timer m_ElapsedTime;
+		uint32_t m_FrameCount;
+		float m_TimeStep;
 	};
 }

@@ -15,26 +15,24 @@ namespace Dive
 		m_bActive(true),
 		m_bMarkedTarget(false)
 	{
+		AddComponent<Transform>();
 	}
 
 	GameObject::~GameObject()
 	{
-		DV_LOG_ENGINE_DEBUG("GameObject( {0:s} : {1:d}) 소멸자 호출", m_Name, m_ID);
-
-		// 일단 테스트
-		// 역시 Scene 혹은 다른 곳에 저장된 Component들을
-		// 직접 혹은 이벤트를 날려 제거해야 한다.
 		if (!m_Components.empty())
 		{
 			for (auto* pComponent : m_Components)
 			{
 				if (m_pScene)
-					m_pScene->ComponentRemoved(pComponent);
+					m_pScene->DeregisterComponent(pComponent);
 				
 				DV_DELETE(pComponent);
 			}
 			m_Components.clear();
 		}
+
+		DV_LOG_ENGINE_TRACE("GameObject 소멸 완료({0:d} : {1:s})", m_ID, m_Name);
 	}
 
 	void GameObject::RemoveComponent(Component* pComponent)
@@ -43,9 +41,7 @@ namespace Dive
 			return;
 
 		if (m_pScene)
-		{
-			m_pScene->ComponentRemoved(pComponent);
-		}
+			m_pScene->DeregisterComponent(pComponent);
 
 		auto it = m_Components.begin();
 		for (it; it != m_Components.end(); ++it)

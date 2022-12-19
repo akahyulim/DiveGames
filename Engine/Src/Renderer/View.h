@@ -17,11 +17,19 @@ namespace Dive
 
 	struct ScenePassInfo
 	{
-		unsigned int m_PassIndex = 0;
-		bool m_bAllowInstancing = false;
-		bool m_bMarkStencil = false;
-		bool m_bVertexLight = false;
-		BatchQueue* m_pBatchQueue = nullptr;
+		ScenePassInfo()
+			: PassIndex(0),
+			bAllowInstancing(false),
+			bMarkStencil(false),
+			bVertexLight(false),
+			pBatchQueue(nullptr)
+		{}
+
+		uint32_t PassIndex;
+		bool bAllowInstancing;
+		bool bMarkStencil;
+		bool bVertexLight;
+		BatchQueue* pBatchQueue;
 	};
 
 	class View : public Object
@@ -44,16 +52,16 @@ namespace Dive
 		void getBaseBatches();
 
 	private:
-		Graphics* m_pGraphics = nullptr;
-		Renderer* m_pRenderer = nullptr;
-		Scene* m_pScene = nullptr;
+		Graphics* m_pGraphics;
+		Renderer* m_pRenderer;
+		Scene* m_pScene;
 
-		Texture* m_pRenderTarget = nullptr;
-		Texture* m_pCurrentRenderTarget = nullptr;
+		Texture* m_pRenderTarget;
+		Texture* m_pCurRenderTarget;
 
-		RECT m_ViewRect = { 0, 0, 0, 0 };
-		DirectX::XMINT2 m_ViewSize = { 0 ,0 };
-		DirectX::XMINT2 m_RenderTargetSize = { 0, 0 };
+		RECT m_ViewRect;
+		DirectX::XMINT2 m_ViewSize;
+		DirectX::XMINT2 m_RenderTargetSize;
 
 		std::vector<ScenePassInfo> m_ScenePasses;
 

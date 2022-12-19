@@ -45,7 +45,7 @@ namespace Dive
 		bool SaveToFile(const std::string& filepath) override;
 
 		void AddCommand(const RenderPathCommand& command);
-		unsigned int GetNumCommands() const { return static_cast<unsigned int>(m_RenderPathCommands.size()); }
+		unsigned int GetCommandCount() const { return static_cast<unsigned int>(m_RenderPathCommands.size()); }
 
 	public:
 		std::vector<RenderTargetInfo> m_RenderTargetInfos;

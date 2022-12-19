@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/Object.h"
 #include "Math/StringHash.h"
-#include "IO/Log.h"
 #include "Resource.h"
 
 namespace Dive
@@ -9,6 +8,7 @@ namespace Dive
 	class Context;
 	class FileStream;
 
+	// 리소스 관리 클래스.
 	class ResourceCache : public Object
 	{
 		DIVE_OBJECT(ResourceCache, Object)
@@ -27,27 +27,21 @@ namespace Dive
 		template<class T> T* GetExistingResource(const std::string& name);
 		Resource* GetExistingResource(StringHash type, const std::string& name);
 
+		template<class T> bool IsExistingResource(const std::string& name);
+		bool IsExistingResource(StringHash type, const std::string& name);
+
 		template<class T> void RemoveResource(const std::string& name);
 		void RemoveResource(StringHash type, const std::string& name);
-		template<class T> void RemoveResources();
-		void RemoveResources(StringHash type);
+		template<class T> void RemoveSpecificTypeResources();
+		void RemoveSpecificTypeResources(StringHash type);
 		void RemoveAllResources();
-
-		bool AddResourceDir(const std::string& pathName);
-		void RemoveResourceDir(const std::string& pathName);
-		std::vector<std::string> GetResourceDirs() const { return m_ResourceDirs; }
 
 	private:
 		Resource* findResource(StringHash type, StringHash nameHash);
-		std::string fixResourceName(const std::string& name) const;
-		std::string fixResourceDirName(const std::string& name) const;
-		FileStream* getFileStream(const std::string& name) const;
 
 	private:
-		using ResourceGroup = std::unordered_map<unsigned int, Resource*>;
-		std::unordered_map<unsigned int, ResourceGroup> m_ResourceGroups;
-
-		std::vector<std::string> m_ResourceDirs;
+		using ResourceGroup = std::unordered_map<uint32_t, Resource*>;
+		std::unordered_map<uint32_t, ResourceGroup> m_ResourceGroups;
 	};
 
 	template<class T>
@@ -58,17 +52,16 @@ namespace Dive
 	}
 
 	template<class T>
-	void ResourceCache::RemoveResources()
+	void ResourceCache::RemoveSpecificTypeResources()
 	{
 		StringHash type = T::GetTypeStatic();
-		RemoveResources(type);
+		RemoveSpecificTypeResources(type);
 	}
 
 	template<class T>
 	T* ResourceCache::GetResource(const std::string& name)
 	{
 		StringHash type = T::GetTypeStatic();
-		// 왜 static_cast로 변환했을까...?
 		return dynamic_cast<T*>(GetResource(type, name));
 	}
 
@@ -81,7 +74,7 @@ namespace Dive
 		GetResources(type, resources);
 
 		outResources.resize(resources.size());
-		for (unsigned int i = 0; i < (unsigned int)resources.size(); ++i)
+		for (uint32_t i = 0; i < static_cast<uint32_t>(resources.size()); ++i)
 		{
 			outResources[i] = dynamic_cast<T*>(resources[i]);
 		}
@@ -92,5 +85,12 @@ namespace Dive
 	{
 		StringHash type = T::GetTypeStatic();
 		return dynamic_cast<T*>(GetExistingResource(type, name));
+	}
+
+	template<class T>
+	bool ResourceCache::IsExistingResource(const std::string& name)
+	{
+		StringHash type = T::GetTypeStatic();
+		return IsExistingResource(type, name);
 	}
 }

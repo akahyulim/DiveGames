@@ -17,8 +17,8 @@ namespace Dive
 		m_Name("Untitled"),
 		m_bUpdateEnabled(true),
 		m_bDirty(false),
-		m_GameObjectID(FIRST_ID),
-		m_ComponentID(FIRST_ID),
+		m_CurGameObjectID(FIRST_ID),
+		m_CurComponentID(FIRST_ID),
 		m_OnUpdateSlotID(0)
 	{
 		m_OnUpdateSlotID = SUBSCRIBE_EVENT(eEventType::Update, EVENT_HANDLER_PARAM(OnUpdate));
@@ -28,9 +28,11 @@ namespace Dive
 	{
 		Clear();
 
+		// Scene처럼 둘 이상의 객체가 존재할 때 구독해지를 명시적으로 해주어야 한다.
+		// 그렇지 않으면 Fire에서 이미 지워진 대상에게 이벤트를 전달하는 과정에서 에러가 발생한다.
 		UNSUBSCRIBE_EVENT(eEventType::Update, m_OnUpdateSlotID);
 
-		DV_LOG_ENGINE_DEBUG("Scene({:s}) 소멸자 호출", m_Name);
+		DV_LOG_ENGINE_TRACE("Scene 소멸 완료({:s})", m_Name);
 	}
 
 	void Scene::Clear()
@@ -43,8 +45,8 @@ namespace Dive
 		m_GameObjects.clear();
 		m_Components.clear();
 
-		m_GameObjectID = FIRST_ID;
-		m_ComponentID = FIRST_ID;
+		m_CurGameObjectID = FIRST_ID;
+		m_CurComponentID = FIRST_ID;
 	}
 
 	void Scene::Update(float delta)
@@ -70,7 +72,7 @@ namespace Dive
 		// 데이터는 자신의 포인터와, delta에 timeScale을 곱한 값
 	}
 
-	GameObject* Scene::CreateGameObject(const std::string& name, unsigned int id)
+	GameObject* Scene::CreateGameObject(const std::string& name, uint32_t id)
 	{
 		auto* pNewGameObject = new GameObject(m_pContext);
 		pNewGameObject->SetName(name.empty() ? "GameObject" : name);
@@ -81,8 +83,10 @@ namespace Dive
 			id = getFreeGameObjectID();
 		}
 		pNewGameObject->setID(id);
-
 		m_GameObjects[id] = pNewGameObject;
+
+		auto* pTransformCom = static_cast<Component*>(pNewGameObject->GetComponent<Transform>());
+		RegisterComponent(pTransformCom, pTransformCom->GetID());
 
 		return pNewGameObject;
 	}
@@ -95,7 +99,7 @@ namespace Dive
 		RemoveGameObject(pGameObject->GetID());
 	}
 
-	void Scene::RemoveGameObject(unsigned int id)
+	void Scene::RemoveGameObject(uint32_t id)
 	{
 		if (!id || m_GameObjects.empty())
 			return;
@@ -128,7 +132,7 @@ namespace Dive
 		}
 	}
 
-	GameObject* Scene::GetGameObject(unsigned int id)
+	GameObject* Scene::GetGameObject(uint32_t id)
 	{
 		auto it = m_GameObjects.find(id);
 		return it != m_GameObjects.end() ? it->second : nullptr;
@@ -165,7 +169,7 @@ namespace Dive
 		return ret;
 	}
 
-	void Scene::ComponentAdded(Component* pComponent, unsigned int id)
+	void Scene::RegisterComponent(Component* pComponent, uint32_t id)
 	{
 		if (!pComponent)
 			return;
@@ -179,19 +183,19 @@ namespace Dive
 		m_Components[id] = pComponent;
 	}
 
-	void Scene::ComponentRemoved(Component* pComponent)
+	void Scene::DeregisterComponent(Component* pComponent)
 	{
 		if (!pComponent)
 			return;
 
 		auto comID = pComponent->GetID();
-		if (GetComponent(comID))
+		if (m_Components.find(comID) != m_Components.end())
 		{
 			m_Components.erase(comID);
 		}
 	}
 
-	Component* Scene::GetComponent(unsigned int id)
+	Component* Scene::GetComponent(uint32_t id)
 	{
 		auto it = m_Components.find(id);
 		return it != m_Components.end() ? it->second : nullptr;
@@ -208,38 +212,36 @@ namespace Dive
 			return;
 
 		auto& evnt = dynamic_cast<const UpdateEvent&>(e);
-		Update(evnt.GetDeltaTime());
+		Update(evnt.GetTimeStep());
 	}
 
 	// 언듯보기에 꽉 차면 무한으로 돌 거 같다...
-	unsigned int Scene::getFreeGameObjectID()
+	uint32_t Scene::getFreeGameObjectID()
 	{
 		for (;;)
 		{
-			auto freeID = m_GameObjectID;
+			auto freeID = m_CurGameObjectID;
 
-			if (m_GameObjectID < LAST_ID)
-				++m_GameObjectID;
+			if (m_CurGameObjectID < LAST_ID)
+				++m_CurGameObjectID;
 			else
-				m_GameObjectID = FIRST_ID;
+				m_CurGameObjectID = FIRST_ID;
 		
 			if (!m_GameObjects[freeID])
 				return freeID;
 		}
 	}
 
-	// 빈 공간을 찾는 다는건 한 공간에 관리 중이라는 말이다.
-	// 즉, 컨테이너를 scene에 마련해야 한다.
-	unsigned int Scene::getFreeComponentID()
+	uint32_t Scene::getFreeComponentID()
 	{
 		for (;;)
 		{
-			auto freeID = m_ComponentID;
+			auto freeID = m_CurComponentID;
 
-			if (m_ComponentID < LAST_ID)
-				++m_ComponentID;
+			if (m_CurComponentID < LAST_ID)
+				++m_CurComponentID;
 			else
-				m_ComponentID = FIRST_ID;
+				m_CurComponentID = FIRST_ID;
 
 			if (!m_Components[freeID])
 				return freeID;

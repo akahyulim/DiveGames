@@ -8,12 +8,11 @@ namespace Dive
 	class Component;
 	class Event;
 
-	static const unsigned int FIRST_ID = 0x1;
-	static const unsigned int LAST_ID = 0xffffffff;
+	static const uint32_t FIRST_ID = 0x1;
+	static const uint32_t LAST_ID = 0xffffffff;
 
-	// GameObject의 관리가 주 임무 + 추후 Octree를 추가할 수 있다.
-	// 구성된 Scene을 Serialization 할 수 있어야 한다. => Resource가 아니다... 큰 문제는 아닌듯...
-	// View가 GameObject와 Component를 참조하여 그려질 대상을 분류한다.
+	// 게임 오브젝트를 관리하는 씬 클래스.
+	// 현재 리소스를 상속하지 않고 있다.
 	class Scene : public Object
 	{
 		DIVE_OBJECT(Scene, Object)
@@ -22,69 +21,48 @@ namespace Dive
 		explicit Scene(Context* pContext);
 		~Scene();
 
-		// 씬을 구성하는 모든 게임오브젝트를 제거.
 		void Clear();
-		// 씬을 업데이트.
+		
 		void Update(float delta);
 
-		// 새로운 게임 오브젝트를 생성.
-		GameObject* CreateGameObject(const std::string& name = std::string(), unsigned int id = 0);
-		// 씬에 등록된 게임 오브젝트를 제거.
+		GameObject* CreateGameObject(const std::string& name = std::string(), uint32_t id = 0);
 		void RemoveGameObject(GameObject* pGameObject);
-		// 씬에 등록된 게임 오브젝트를 제거.
-		void RemoveGameObject(unsigned int id);
-		// 씬에 등록된 게임 오브젝트를 ID로 획득.
-		GameObject* GetGameObject(unsigned int id);
-		// 씬에 등록된 게임 오브젝트의 개수 리턴.
-		unsigned int GetGameObjectsCount() const { return static_cast<unsigned int>(m_GameObjects.size()); }
-		// 씬에 등록된 게임 오브젝트들 중 루트 노드들을 벡터로 구성하여 리턴.
-		// 이렇게 하기 보단 전체 GameObject를 전달한 다음
-		// Editor에서 위치도 변경할 수 있게끔 하는 것이 나을 것이라 생각했지만,
-		// 결국 같은 벡터이니... 차라리 const를 떼고 참조로 전달하는 것이 낫지 않을까 싶다.
-		// 그런데 현재, Hierarchy 창에서 요소 사이에 넣는 방법을 모른다.
+		void RemoveGameObject(uint32_t id);
+		GameObject* GetGameObject(uint32_t id);
+		uint32_t GetGameObjectsCount() const { return static_cast<uint32_t>(m_GameObjects.size()); }
+		
 		std::vector<GameObject*> GetRoots() const;
-
-		// 일단 추가
 		std::vector<GameObject*> GetAllGameObjects() const;
 		
-		// 게임 오브젝트에 추가된 컴포넌트를 저장.
-		void ComponentAdded(Component* pComponent, unsigned int id);
-		// 게임 오브젝트에 제거된 컴포넌트를 삭제.
-		void ComponentRemoved(Component* pComponent);
-		// 컴포넌트의 ID로 관리중인 컴포넌트 포인터를 찾아 리턴.
-		Component* GetComponent(unsigned int id);
+		void RegisterComponent(Component* pComponent, uint32_t id);
+		void DeregisterComponent(Component* pComponent);
+		Component* GetComponent(uint32_t id);
 
 		// Serialization
 
-		// 씬 이름 리턴. 
 		std::string GetName() const { return m_Name; }
-		// 씬 이름 설정.
 		void SetName(const std::string& name) { m_Name = name; }
 
-		// 업데이트 적용 유무 설정.
 		void SetUpdateEnabled(bool bEnable);
-		// 업데이트 적용 유무 상태 확인.
 		bool IsUpdateEnabled() const { return m_bUpdateEnabled; }
 
-		// update(+ OnUpdate)
 		void OnUpdate(const Event& e);
 
 	private:
-		unsigned int getFreeGameObjectID();
-		unsigned int getFreeComponentID();
+		uint32_t getFreeGameObjectID();
+		uint32_t getFreeComponentID();
 
 	private:
 		std::string m_Name;
 		bool m_bUpdateEnabled;
 		bool m_bDirty;
 
-		std::unordered_map<unsigned int, GameObject*> m_GameObjects;
-		std::unordered_map<unsigned int, Component*> m_Components;
+		std::unordered_map<uint32_t, GameObject*> m_GameObjects;
+		std::unordered_map<uint32_t, Component*> m_Components;
 
-		unsigned int m_GameObjectID;
-		unsigned int m_ComponentID;
-		// Component까지 이 곳에서 함께 관리하는 편이 나을 수 있다.
+		uint32_t m_CurGameObjectID;
+		uint32_t m_CurComponentID;
 
-		unsigned int m_OnUpdateSlotID;
+		uint32_t m_OnUpdateSlotID;
 	};
 }

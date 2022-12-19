@@ -7,9 +7,13 @@
 
 namespace Dive
 {
-	IndexBuffer::IndexBuffer(Context* pContext)
-		: Object(pContext),
-		m_pGraphics(GetSubsystem<Graphics>())
+	IndexBuffer::IndexBuffer(Context* m_bDynamic)
+		: Object(m_bDynamic),
+		m_pGraphics(GetSubsystem<Graphics>()),
+		m_pBuffer(nullptr),
+		m_Count(0),
+		m_Stride(0),
+		m_bDynamic(false)
 	{
 		DV_ASSERT(m_pGraphics->IsInitialized());
 	}
@@ -18,7 +22,7 @@ namespace Dive
 	{
 		DV_RELEASE(m_pBuffer);
 
-		DV_LOG_ENGINE_INFO("IndexBuffer ¼Ò¸ê ¿Ï·á");
+		DV_LOG_ENGINE_TRACE("IndexBuffer ¼Ò¸ê ¿Ï·á");
 	}
 
 	void* IndexBuffer::Map()

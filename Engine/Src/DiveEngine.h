@@ -13,7 +13,6 @@
 #include "Core/EventSystem.h"
 #include "Engine/EngineEvents.h"
 #include "Core/Timer.h"
-#include "Core/Variant.h"
 
 //= Engine ========================
 #include "Engine/EngineDef.h"

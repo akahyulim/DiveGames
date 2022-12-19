@@ -16,6 +16,7 @@
 
 namespace Dive
 {
+	// 서브 시스템별 이벤트 타입 열거자.
 	enum class eEventType
 	{
 		// Engine
@@ -34,12 +35,14 @@ namespace Dive
 		LogMessage,	ExitRequested,
 	};
 
+// 이벤트 타입 함수 매크로.
 #define EVENT_CLASS_TYPE(type) \
 public:	\
 	static eEventType GetStaticType() { return eEventType::type; }	\
 	virtual eEventType GetType() const override { return GetStaticType(); } \
 	virtual const char* GetName() const override { return #type; }
 
+	// 이벤트 타입을 확인하는 기능을 가진 이벤트 베이스 클래스.
 	class Event
 	{
 	public:
@@ -50,9 +53,10 @@ public:	\
 		virtual std::string ToString() const { return GetName(); }
 	};
 
-	using Subscriber = std::function<void(const Event&)>;
+	// 이벤트 구독 Callable.
+	using Function = std::function<void(const Event&)>;
 
-
+	// 이벤트 구독자 관리 및 전달을 수행하는 이벤트 시스템 클래스.
 	class EventSystem
 	{
 	public:
@@ -62,18 +66,18 @@ public:	\
 			return instance;
 		}
 
-		unsigned int Subscribe(const eEventType eventType, Subscriber&& function)
+		uint32_t Subscribe(const eEventType eventType, Function&& function)
 		{
-			HandlerSlot handleSlot;
-			handleSlot.id = m_NextID++;
-			handleSlot.subscriber = std::forward<Subscriber>(function);
+			SubscriberInfo handler;
+			handler.ID = m_NextID++;
+			handler.Subscriber = std::forward<Function>(function);
 
-			m_Subscribers[eventType].emplace_back(handleSlot);
+			m_Subscribers[eventType].emplace_back(handler);
 
-			return handleSlot.id;
+			return handler.ID;
 		}
 
-		void Unsubscribe(const eEventType eventType, unsigned int id)
+		void Unsubscribe(const eEventType eventType, uint32_t id)
 		{
 			if (m_Subscribers.find(eventType) == m_Subscribers.end())
 				return;
@@ -81,7 +85,7 @@ public:	\
 			auto it = m_Subscribers[eventType].begin();
 			for (it; it != m_Subscribers[eventType].end();)
 			{
-				if (it->id == id)
+				if (it->ID == id)
 				{
 					it = m_Subscribers[eventType].erase(it);
 					return;
@@ -96,9 +100,9 @@ public:	\
 			if (m_Subscribers.find(e.GetType()) == m_Subscribers.end())
 				return;
 
-			for (const auto& handleSlot : m_Subscribers[e.GetType()])
+			for (const auto& handler : m_Subscribers[e.GetType()])
 			{
-				handleSlot.subscriber(e);
+				handler.Subscriber(e);
 			}
 		}
 
@@ -108,13 +112,17 @@ public:	\
 		}
 
 	private:
-		unsigned int m_NextID = 0;
+		EventSystem() : m_NextID(0) {}
 
-		struct HandlerSlot
+	private:
+		uint32_t m_NextID;
+
+		struct SubscriberInfo
 		{
-			unsigned int id;
-			Subscriber subscriber;
+			uint32_t ID;
+			Function Subscriber;
 		};
-		std::unordered_map<eEventType, std::vector<HandlerSlot>> m_Subscribers;
+
+		std::unordered_map<eEventType, std::vector<SubscriberInfo>> m_Subscribers;
 	};
 }

@@ -8,19 +8,26 @@
 namespace Dive
 {
 	ConstantBuffer::ConstantBuffer(Context* pContext)
-		: Object(pContext)
+		: Object(pContext),
+		m_pGraphics(GetSubsystem<Graphics>()),
+		m_pData(nullptr),
+		m_pBuffer(nullptr),
+		m_Stride(0),
+		m_bDirty(false)
 	{
+		DV_ASSERT(m_pGraphics->IsInitialized());
 	}
 
 	ConstantBuffer::~ConstantBuffer()
 	{
-		DV_LOG_ENGINE_DEBUG("ConstnatBuffer 소멸자 호출");
+		DV_DELETE_ARRAY(m_pData);
+		DV_RELEASE(m_pBuffer);
+
+		DV_LOG_ENGINE_TRACE("ConstnatBuffer 소멸 완료");
 	}
 
-	bool ConstantBuffer::SetSize(unsigned int size)
+	bool ConstantBuffer::SetSize(uint32_t size)
 	{
-		m_pBuffer.Reset();
-
 		if (!size)
 		{
 			DV_LOG_ENGINE_ERROR("ConstantBuffer::SetSize - 잘못된 크기({:d})를 전달받았습니다.", size);
@@ -31,17 +38,14 @@ namespace Dive
 		size += 15;
 		size &= 0xfffffff0;
 
+		DV_DELETE_ARRAY(m_pData);
+
 		m_Stride = size;
 		m_bDirty = false;
-		m_pShadowData = new unsigned char[m_Stride];
-		memset(m_pShadowData, 0, m_Stride);
+		m_pData = new uint8_t[m_Stride];
+		memset(m_pData, 0, m_Stride);
 
-		auto pGraphics = GetSubsystem<Graphics>();
-		if (!pGraphics || !pGraphics->IsInitialized())
-		{
-			DV_LOG_ENGINE_ERROR("ConstantBuffer::SetSize - Graphics system을 사용할 수 없습니다.");
-			return false;
-		}
+		DV_RELEASE(m_pBuffer);
 
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
@@ -52,7 +56,7 @@ namespace Dive
 		desc.MiscFlags = 0;
 		desc.StructureByteStride = 0;
 
-		if (FAILED(pGraphics->GetDevice()->CreateBuffer(&desc, nullptr, m_pBuffer.GetAddressOf())))
+		if (FAILED(m_pGraphics->GetDevice()->CreateBuffer(&desc, nullptr, &m_pBuffer)))
 		{
 			DV_LOG_ENGINE_ERROR("ConstantBuffer::SetSize - 버퍼 생성에 실패하였습니다.");
 			return false;
@@ -61,12 +65,12 @@ namespace Dive
 		return true;
 	}
 
-	void ConstantBuffer::SetParameter(unsigned int offset, unsigned int size, const void* pData)
+	void ConstantBuffer::SetParameter(uint32_t offset, uint32_t size, const void* pData)
 	{
 		if (offset + size > m_Stride)
 			return;
 
-		memcpy(&m_pShadowData[offset], pData, size);
+		memcpy(&m_pData[offset], pData, size);
 		m_bDirty = true;
 	}
 
@@ -74,15 +78,8 @@ namespace Dive
 	{
 		if (m_bDirty && m_pBuffer)
 		{
-			auto pGraphics = GetSubsystem<Graphics>();
-			if (!pGraphics || !pGraphics->IsInitialized())
-			{
-				DV_LOG_ENGINE_ERROR("ConstantBuffer::Update - Graphics system을 사용할 수 없습니다.");
-				return;
-			}
-
-			pGraphics->GetDeviceContext()->UpdateSubresource(
-				static_cast<ID3D11Resource*>(m_pBuffer.Get()), 0, 0, m_pShadowData, 0, 0);
+			m_pGraphics->GetDeviceContext()->UpdateSubresource(
+				static_cast<ID3D11Resource*>(m_pBuffer), 0, 0, m_pData, 0, 0);
 
 			m_bDirty = false;
 		}

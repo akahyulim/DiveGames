@@ -8,37 +8,37 @@ namespace Dive
 	{
 		EngineParameters()
 		{
-			title = L"no named";
-			width = 800;
-			height = 600;
-			positionX = 0;
-			positionY = 0;
+			Title = L"no named";
+			Width = 800;
+			Height = 600;
+			PositionX = 0;
+			PositionY = 0;
 			bFullscreen = false;
 			bReSizable = true;
 			bBorderless = false;
 
 			bVSync = false;
 			bTripleBuffer = false;
-			multiSample = 1;
-			refreshRate = 0;
+			MultiSample = 1;
+			RefreshRate = 0;
 		}
 
-		int GetCenterPositionX() const
+		int32_t GetCenterPositionX() const
 		{
-			return (::GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+			return (::GetSystemMetrics(SM_CXSCREEN) - Width) / 2;
 		}
 
-		int GetCenterPositionY() const
+		int32_t GetCenterPositionY() const
 		{
-			return (::GetSystemMetrics(SM_CYSCREEN) - height) / 2;
+			return (::GetSystemMetrics(SM_CYSCREEN) - Height) / 2;
 		}
 
 		// window
-		std::wstring title;
-		int width;
-		int height;
-		int positionX;
-		int positionY;
+		std::wstring Title;
+		int32_t Width;
+		int32_t Height;
+		int32_t PositionX;
+		int32_t PositionY;
 		bool bFullscreen;
 		bool bReSizable;
 		bool bBorderless;
@@ -46,8 +46,8 @@ namespace Dive
 		// graphics
 		bool bVSync;
 		bool bTripleBuffer;
-		int multiSample;
-		int refreshRate;
+		int32_t MultiSample;
+		int32_t RefreshRate;
 		// ¸ð´ÏÅÍ
 	};
 }

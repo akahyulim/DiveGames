@@ -18,10 +18,16 @@ namespace Dive
 		{}
 		~WindowEvent() = default;
 
-		HWND m_hWnd = 0;
-		UINT m_Msg = 0;
-		WPARAM m_wParam = 0;
-		LPARAM m_lParam = 0;
+		HWND GetWindowHandle() const { return m_hWnd; }
+		UINT GetWindowMsg() const { return m_Msg; }
+		WPARAM GetWindowWParam() const { return m_wParam; }
+		LPARAM GetWindowLParam() const { return m_lParam; }
+
+	private:
+		HWND m_hWnd;
+		UINT m_Msg;
+		WPARAM m_wParam;
+		LPARAM m_lParam;
 	};
 
 	// ScreenMode

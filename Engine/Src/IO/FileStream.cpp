@@ -6,14 +6,16 @@
 namespace Dive
 {
 	FileStream::FileStream(const std::string& path, uint32_t flags)
-		: m_Flags(flags)
+		: m_Flags(flags),
+		m_bOpen(false),
+		m_Size(0)
 	{
 		std::ios_base::openmode iosFlags = std::ios::binary;
-		if (m_Flags & eFileStreamMode::Read) iosFlags |= std::ios::in;
-		if (m_Flags & eFileStreamMode::Write) iosFlags |= std::ios::out;
-		if (m_Flags & eFileStreamMode::Append) iosFlags |= std::ios::app;
+		if (m_Flags & eFileStreamModeFlags::Read) iosFlags |= std::ios::in;
+		if (m_Flags & eFileStreamModeFlags::Write) iosFlags |= std::ios::out;
+		if (m_Flags & eFileStreamModeFlags::Append) iosFlags |= std::ios::app;
 
-		if (m_Flags & eFileStreamMode::Write)
+		if (m_Flags & eFileStreamModeFlags::Write)
 		{
 			m_Out.open(path, iosFlags);
 			if (m_Out.fail())
@@ -22,7 +24,7 @@ namespace Dive
 				return;
 			}
 		}
-		else if (m_Flags & eFileStreamMode::Read)
+		else if (m_Flags & eFileStreamModeFlags::Read)
 		{
 			m_In.open(path, iosFlags);
 			if (m_In.fail())
@@ -37,8 +39,8 @@ namespace Dive
 			m_In.seekg(0, std::ios::beg);
 		}
 
-		m_FilePath = path;
-		m_FileName = FileSystem::GetFileNameAndExtension(path);
+		m_Filepath = path;
+		m_Filename = FileSystem::GetFileNameAndExtension(path);
 
 		m_bOpen = true;
 	}
@@ -46,16 +48,18 @@ namespace Dive
 	FileStream::~FileStream()
 	{
 		Close();
+
+		DV_LOG_ENGINE_TRACE("FileStream ¼Ò¸ê ¿Ï·á({:s})", m_Filename);
 	}
 
 	void FileStream::Close()
 	{
-		if (m_Flags & eFileStreamMode::Write)
+		if (m_Flags & eFileStreamModeFlags::Write)
 		{
 			m_Out.flush();
 			m_Out.close();
 		}
-		else if (m_Flags & eFileStreamMode::Read)
+		else if (m_Flags & eFileStreamModeFlags::Read)
 		{
 			m_In.clear();
 			m_In.close();
@@ -66,11 +70,11 @@ namespace Dive
 
 	void FileStream::Skip(uint64_t n)
 	{
-		if (m_Flags & eFileStreamMode::Write)
+		if (m_Flags & eFileStreamModeFlags::Write)
 		{
 			m_Out.seekp(n, std::ios::cur);
 		}
-		else if (m_Flags & eFileStreamMode::Read)
+		else if (m_Flags & eFileStreamModeFlags::Read)
 		{
 			m_In.ignore(n, std::ios::cur);
 		}

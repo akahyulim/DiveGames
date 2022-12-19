@@ -32,7 +32,7 @@ namespace Dive
 		const std::vector<IndexBuffer*>& GetIndexBuffers() const { return m_IndexBuffers; }
 		bool SetIndexBuffers(const std::vector<IndexBuffer*>& pBuffers);
 
-		unsigned int GetNumMeshes() const { return static_cast<unsigned int>(m_Meshes.size()); }
+		unsigned int GetMeshCount() const { return static_cast<unsigned int>(m_Meshes.size()); }
 		void SetNumMeshes(size_t num);
 		
 		const std::vector<Mesh*>& GetMeshes() const { return m_Meshes; }

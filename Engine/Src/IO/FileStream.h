@@ -2,13 +2,14 @@
 
 namespace Dive
 {
-    enum eFileStreamMode : uint32_t
+    enum eFileStreamModeFlags : uint8_t
     {
         Read = 1,
-        Write  =1 << 1,
+        Write = 1 << 1,
         Append = 1 << 2
     };
 
+    // 타입을 변경하지 않았다.
     class FileStream
     {
     public:
@@ -18,8 +19,8 @@ namespace Dive
         bool IsOpen() const { return m_bOpen; }
         void Close();
 
-        std::string GetFilePath() const { return m_FilePath; }
-        std::string GetFileName() const { return m_FileName; }
+        std::string GetFilePath() const { return m_Filepath; }
+        std::string GetFileName() const { return m_Filename; }
 
         void Skip(uint64_t n);
 
@@ -119,12 +120,12 @@ namespace Dive
         bool IsEof();
 
     private:
-        std::string m_FilePath;
-        std::string m_FileName;
+        std::string m_Filepath;
+        std::string m_Filename;
         std::ofstream m_Out;
         std::ifstream m_In;
-        uint32_t m_Flags = 0;
-        bool m_bOpen = false;
-        unsigned int m_Size = 0;
+        uint32_t m_Flags;
+        bool m_bOpen;
+        unsigned int m_Size;
     };
 }

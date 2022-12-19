@@ -4,6 +4,7 @@
 namespace Dive
 {
 	class Context;
+	class Graphics;
 
 	class ConstantBuffer : public Object
 	{
@@ -13,19 +14,19 @@ namespace Dive
 		explicit ConstantBuffer(Context* pContext);
 		~ConstantBuffer() override;
 
-		bool SetSize(unsigned int size);
-		void SetParameter(unsigned int offset, unsigned int size, const void* pData);
+		bool SetSize(uint32_t size);
+		void SetParameter(uint32_t offset, uint32_t size, const void* pData);
 		void Update();
 
-		ID3D11Buffer* GetBuffer() const { return m_pBuffer.Get(); }
-		ID3D11Buffer* const* GetBufferAddressOf() const { return m_pBuffer.GetAddressOf(); }
-
+		ID3D11Buffer* GetBuffer() const { return m_pBuffer; }
+		
 		bool IsDirty() const { return m_bDirty; }
 
 	private:
-		unsigned char* m_pShadowData = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11Buffer> m_pBuffer = nullptr;
-		unsigned int m_Stride = 0;
-		bool m_bDirty = false;
+		Graphics* m_pGraphics;
+		uint8_t* m_pData;
+		ID3D11Buffer* m_pBuffer;
+		uint32_t m_Stride;
+		bool m_bDirty;
 	};
 }

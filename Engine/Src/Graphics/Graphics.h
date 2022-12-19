@@ -16,7 +16,7 @@ namespace Dive
 
 	const LPCWSTR WND_CLASS_NAME = L"AppWnd";
 
-	enum eWindowFlags : unsigned int
+	enum eWindowFlags : uint32_t
 	{
 		WINDOW_FULLSCREEN = 1,
 		WINDOW_BORDERLESS = 1 << 1,
@@ -43,14 +43,14 @@ namespace Dive
 		bool bResizable = false;
 		bool bVSync = false;
 		//bool bTripleBuffer;
-		//int multiSample
-		//int refreshRate;
+		//int32_t multiSample
+		//int32_t refreshRate;
 	};
 
 	struct WindowModeParams
 	{
-		int width = 0;
-		int height = 0;
+		int32_t width = 0;
+		int32_t height = 0;
 		ScreenModeParams screenModeParams;
 	};
 
@@ -62,31 +62,32 @@ namespace Dive
 		explicit Graphics(Context* pContext);
 		~Graphics() override;
 
-		bool SetMode(int width, int height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
-			bool tripleBuffer, int multiSample, int refreshRate);
+		bool SetMode(int32_t width, int32_t height, bool bFullscreen, bool bBorderless, bool bResizable, bool bVSync,
+			bool tripleBuffer, int32_t multiSample, int32_t refreshRate);
 		void Destroy();
+
 		bool IsInitialized() const;
 
 		// Window
-		bool WindowCreate(int width, int height, unsigned int flags);
+		bool WindowCreate(int32_t width, int32_t height, uint32_t flags);
 		LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 		void CloseWindow();
 		
 		bool RunWindow();
 		
-		HWND GetWindowHandle() const { return m_hWnd; }
+		HWND GetWindowHandle() const { return m_WindowHandle; }
 		std::wstring GetWindowTitle() const { return m_WindowTitle; }
 		
 		void SetWindowTitle(const std::wstring& title);
 		
-		void GetWindowPosition(int& outX, int& outY) const;
-		void SetWindowPosition(int x, int y);
+		void GetWindowPosition(int32_t& outX, int32_t& outY) const;
+		void SetWindowPosition(int32_t x, int32_t y);
 		
-		int GetWidth() const { return m_Width; }
-		int GetHeight() const { return m_Height; }
-		
+		int32_t GetWidth() const { return m_Width; }
+		int32_t GetHeight() const { return m_Height; }
 		DirectX::XMINT2 GetSize() const { return DirectX::XMINT2(m_Width, m_Height); }
-		void ResizeWindow(int width, int height);
+		
+		void ResizeWindow(int32_t width, int32_t height);
 		
 		void ShowWindow();
 		void HideWindow();
@@ -99,26 +100,26 @@ namespace Dive
 		bool IsResizable() const;
 		
 		// DX11 Graphics & Resources
-		bool CreateDeviceAndSwapChain(unsigned int width = 0, unsigned int height = 0);
+		bool CreateDeviceAndSwapChain(uint32_t width = 0, uint32_t height = 0);
 
-		bool UpdateSwapChain(unsigned int width = 0, unsigned int height = 0);
+		bool UpdateSwapChain(uint32_t width = 0, uint32_t height = 0);
 
 		bool IsDeviceLost();
 
 		bool BeginFrame();
 		void EndFrame();
 
-		void Clear(int flags, const DirectX::XMFLOAT4& color, float depth, int stencil);
+		void Clear(int32_t flags, const DirectX::XMFLOAT4& color, float depth, int32_t stencil);
 
 		// Draw 함수들: 총 5개
-		void Draw(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int vertexCount, unsigned int vertexStart);
-		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int indexStart, unsigned int vertexStart);
-		//void DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, unsigned int indexCount, unsigned int instanceCount, unsigned int indexStart);
+		void Draw(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t vertexCount, uint32_t vertexStart);
+		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t indexStart, uint32_t vertexStart);
+		//void DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t instanceCount, uint32_t indexStart);
 
 		void SetDepthStencil(Texture2D* pTexture);
 
-		ID3D11RenderTargetView* GetRenderTarget(unsigned int index) const;
-		void SetRenderTarget(unsigned int index, Texture2D* pTexture);
+		ID3D11RenderTargetView* GetRenderTarget(uint32_t index) const;
+		void SetRenderTarget(uint32_t index, Texture2D* pTexture);
 		void ResetRenderTargets();
 
 		D3D11_VIEWPORT GetViewport() const { return m_Viewport; }
@@ -126,9 +127,8 @@ namespace Dive
 		void SetViewport(const D3D11_VIEWPORT& viewport);
 		void SetViewportRect(const RECT& rect);
 
-		VertexBuffer* GetVertexBuffer(unsigned int index) const;
+		VertexBuffer* GetVertexBuffer(uint32_t index) const;
 		void SetVertexBuffer(VertexBuffer* pBuffer);
-		//void SetVertexBuffers(const std::vector<VertexBuffer*>& buffers, unsigned int instanceOffset = 0);
 
 		IndexBuffer* GetIndexBuffer() const { return m_pIndexBuffer; }
 		void SetIndexBuffer(IndexBuffer* pBuffer);
@@ -138,15 +138,15 @@ namespace Dive
 
 		void SetShaderParameter(const std::string& param, bool value);
 		void SetShaderParameter(const std::string& param, float value);
-		void SetShaderParameter(const std::string& param, int value);
+		void SetShaderParameter(const std::string& param, int32_t value);
 		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT2& vector);
 		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT3& vector);
 		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT4& vector);
 		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT4X4& matrix);
 		void SetShaderParameter(const std::string& param, const DirectX::XMMATRIX& matrix);
-		//void SetShaderParameter(const std::string& param, const float* pData, unsigned int count);	// 이건 아직 뭔지 감도 안잡힌다.
+		//void SetShaderParameter(const std::string& param, const float* pData, uint32_t count);	// 이건 아직 뭔지 감도 안잡힌다.
 
-		ConstantBuffer* GetOrCreateConstantBuffer(eShaderType type, unsigned int index, unsigned int size);
+		ConstantBuffer* GetOrCreateConstantBuffer(eShaderType type, uint32_t index, uint32_t size);
 
 		Texture* GetTexture(size_t index);
 		void SetTexture(size_t index, Texture* pTexture);
@@ -160,11 +160,11 @@ namespace Dive
 		// SetScissorTest	bool
 		// SetStencilTest	bool
 
-		ID3D11Device* GetDevice() { return m_pDevice.Get(); }
-		ID3D11DeviceContext* GetDeviceContext() { return m_pDeviceContext.Get(); }
+		ID3D11Device* GetDevice() { return m_pDevice; }
+		ID3D11DeviceContext* GetDeviceContext() { return m_pDeviceContext; }
 
 		// 임시
-		ID3D11RenderTargetView* GetDefaultRenderTargetView() { return m_pDefaultRTV.Get(); }
+		ID3D11RenderTargetView* GetDefaultRenderTargetView() { return m_pDefaultRenderTargetView; }
 
 		bool LoadShaders();
 
@@ -175,14 +175,14 @@ namespace Dive
 		void prepareDraw();
 
 	private:
-		HINSTANCE m_hInstance = NULL;
-		HWND m_hWnd = NULL;
-		std::wstring m_WindowTitle = L"DIVE";
-		DirectX::XMINT2 m_WindowPosition{-1, -1};
-		DWORD m_WindowStyles = 0;
-		unsigned int m_WindowFlags = 0;
-		int m_Width = 800;
-		int m_Height = 600;
+		HINSTANCE m_hInstance;
+		HWND m_WindowHandle;
+		std::wstring m_WindowTitle;
+		DirectX::XMINT2 m_WindowPosition;
+		DWORD m_WindowStyles;
+		uint32_t m_WindowFlags;
+		int32_t m_Width;
+		int32_t m_Height;
 
 		// 디폴트 모드 같은데, 초기화 및 설정하는 부분을 찾지 못했다.
 		WindowModeParams m_WindowMode;
@@ -190,52 +190,50 @@ namespace Dive
 		// icon image
 
 		// DX11 Device & Default Resources
-		Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwapChain = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pDeviceContext = nullptr;
+		ID3D11Device* m_pDevice;
+		ID3D11DeviceContext* m_pDeviceContext;
+		IDXGISwapChain* m_pSwapChain;
 
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pDefaultRTV = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_pDefaultDS = nullptr;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDefaultDSV = nullptr;
+		ID3D11RenderTargetView* m_pDefaultRenderTargetView;
+		ID3D11Texture2D* m_pDefaultDepthStencilTexture;
+		ID3D11DepthStencilView* m_pDefaultDepthStencilView;
 
 		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveType = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
 
 		D3D11_VIEWPORT m_Viewport;
 
-		Texture2D* m_pRenderTargets[MAX_RENDERTARGETS] = { nullptr, };
-		Texture2D* m_pDepthStencil = nullptr;
+		Texture2D* m_pRenderTargets[MAX_RENDERTARGETS];
+		Texture2D* m_pDepthStencil;
 
-		ID3D11RenderTargetView* m_pCurRenderTargetViews[MAX_RENDERTARGETS] = { nullptr, };
-		ID3D11DepthStencilView* m_pCurDepthStencilView = nullptr;
+		ID3D11RenderTargetView* m_pCurRenderTargetViews[MAX_RENDERTARGETS];
+		ID3D11DepthStencilView* m_pCurDepthStencilView;
 
-		//VertexBuffer* m_pVertexBuffers[MAX_VERTEX_STREAMS] = { nullptr, };
-		VertexBuffer* m_pVertexBuffer = nullptr;
-		IndexBuffer* m_pIndexBuffer = nullptr;
+		VertexBuffer* m_pVertexBuffer;
+		IndexBuffer* m_pIndexBuffer;
 
-		ShaderVariation* m_pVertexShader = nullptr;
-		ShaderVariation* m_pPixelShader = nullptr;
+		ShaderVariation* m_pVertexShaderVariation;
+		ShaderVariation* m_pPiexlShaderVariation;
 
 		std::string m_LastShaderName;
-		Shader* m_pLastShader = nullptr;
+		Shader* m_pLastShader;
 
 		// InputLayout
-		unsigned long long m_InputLayoutHash = 0;
-		std::unordered_map<unsigned long long, InputLayout*> m_InputLayouts;
+		uint64_t m_InputLayoutHash = 0;
+		std::unordered_map<uint64_t, InputLayout*> m_InputLayouts;
 
-		Texture* m_pTextures[16] = { nullptr, };
+		Texture* m_pTextures[16];
 
 		// dirty check 전부 모으기.
-		bool m_bVertexTypeDirty = true;
-		bool m_bRenderTargetsDirty = false;
+		bool m_bVertexTypeDirty;
+		bool m_bRenderTargetsDirty;
 
 		// ConstantBuffers
 		std::map<std::pair<ShaderVariation*, ShaderVariation*>, ShaderProgram*> m_ShaderPrograms;
-		ShaderProgram* m_pCurrentShaderProgram = nullptr;
-		std::unordered_map<unsigned int, ConstantBuffer*> m_AllConstantBuffers;
+		ShaderProgram* m_pCurShaderProgram ;
+		std::unordered_map<uint32_t, ConstantBuffer*> m_AllConstantBuffers;
 		std::vector<ConstantBuffer*> m_DirtyConstantBuffers;
-		ID3D11Buffer* m_pCurrentVSCBuffers[7] = { nullptr, };
-		ID3D11Buffer* m_pCurrentPSCBuffers[7] = { nullptr, };
-
+		ID3D11Buffer* m_pCurVertexShaderConstantBuffers[7];
+		ID3D11Buffer* m_pCurPixelShaderConstantBuffers[7];
 	};
 
 	void RegisterGraphicsObject(Context* pContext);

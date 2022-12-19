@@ -14,16 +14,24 @@
 namespace Dive
 {
 	Mesh::Mesh(Context* pContext)
-		: Object(pContext)
+		: Object(pContext),
+		m_PrimitiveType(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST),
+		m_pVertexBuffer(nullptr),
+		m_pIndexBuffer(nullptr),
+		m_VertexStart(0),
+		m_VertexCount(0),
+		m_IndexStart(0),
+		m_IndexCount(0),
+		m_LodDistance(0.0f)
 	{
 	}
 
 	Mesh::~Mesh()
 	{
-		DV_DELETE(m_pVertexBuffer);
 		DV_DELETE(m_pIndexBuffer);
+		DV_DELETE(m_pVertexBuffer);
 
-		DV_LOG_ENGINE_INFO("Mesh ¼Ò¸ê ¿Ï·á");
+		DV_LOG_ENGINE_TRACE("Mesh ¼Ò¸ê ¿Ï·á");
 	}
 
 	void Mesh::Draw(Graphics* pGraphics)
@@ -62,7 +70,6 @@ namespace Dive
 
 			m_IndexStart = indexStart;
 			m_IndexCount = indexCount;
-
 		}
 
 		m_IndexStart = 0;

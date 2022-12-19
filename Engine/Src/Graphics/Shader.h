@@ -22,7 +22,7 @@ namespace Dive
 
 		std::string GetFilePath() const { return m_FilePath; }
 
-		unsigned int GetNumVariations() const { return m_NumVariations; }
+		uint32_t GetVariationCount() const { return m_VariationCount; }
 
 		// override
 		bool Load(FileStream* pDeserializer) override;
@@ -39,6 +39,6 @@ namespace Dive
 		std::unordered_map<std::string, ShaderVariation*> m_VSVariations;
 		std::unordered_map<std::string, ShaderVariation*> m_PSVariations;
 
-		unsigned int m_NumVariations = 0;
+		uint32_t m_VariationCount;
 	};
 }

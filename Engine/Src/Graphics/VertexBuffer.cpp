@@ -9,7 +9,13 @@ namespace Dive
 {
 	VertexBuffer::VertexBuffer(Context* pContext)
 		: Object(pContext),
-		m_pGraphics(GetSubsystem<Graphics>())
+		m_pGraphics(GetSubsystem<Graphics>()),
+		m_pData(nullptr),
+		m_pBuffer(nullptr),
+		m_Count(0),
+		m_Stride(0),
+		m_ElementsHash(0),
+		m_bDynamic(false)
 	{
 		DV_ASSERT(m_pGraphics->IsInitialized());
 	}
@@ -19,10 +25,10 @@ namespace Dive
 		DV_DELETE_ARRAY(m_pData);
 		DV_RELEASE(m_pBuffer);
 
-		DV_LOG_ENGINE_INFO("VertexBuffer({:d}) 소멸 완료", m_ElementsHash);
+		DV_LOG_ENGINE_TRACE("VertexBuffer 소멸 완료");
 	}
 
-	bool VertexBuffer::SetSize(unsigned int vertexCount, const std::vector<VertexElement>& elements, bool bDynamic)
+	bool VertexBuffer::SetSize(uint32_t vertexCount, const std::vector<VertexElement>& elements, bool bDynamic)
 	{
 		if (!vertexCount)
 		{
@@ -34,13 +40,15 @@ namespace Dive
 		m_Elements = elements;
 		m_bDynamic = bDynamic;
 
-		unsigned int elementSizes = 0;
+		uint32_t elementSizes = 0;
 		m_ElementsHash = 0;
 		for (auto it = m_Elements.begin(); it != m_Elements.end(); ++it)
 		{
 			it->m_Offset = elementSizes;
 			elementSizes += ELEMENT_TYPESIZES[it->m_Type];
 
+			// 어쩌면 spratan처럼 미리 VertexType을 만들어 놓고 이를 해시로 만드는 편이 나을 수 있다.
+			// 왜냐하면 Static의 경우 최소한의 elements는 확복되어야 하기 때문이다.
 			m_ElementsHash <<= 3;
 			m_ElementsHash += ((static_cast<int>(it->m_Semantic) + 1) + it->m_Index);
 		}
@@ -50,7 +58,7 @@ namespace Dive
 
 		if (m_pData)
 			DV_DELETE_ARRAY(m_pData);
-		m_pData = new unsigned char[m_Count * m_Stride];
+		m_pData = new uint8_t[m_Count * m_Stride];
 		memset(static_cast<void*>(m_pData), 0, m_Count * m_Stride);
 
 		DV_RELEASE(m_pBuffer);
@@ -74,7 +82,7 @@ namespace Dive
 		return true;
 	}
 
-	bool VertexBuffer::SetData(void* pData)
+	bool VertexBuffer::SetData(void* data)
 	{
 		if (!m_pBuffer)
 		{
@@ -82,14 +90,14 @@ namespace Dive
 			return false;
 		}
 
-		if (!pData)
+		if (!data)
 		{
 			DV_LOG_ENGINE_ERROR("VertexBuffer::SetData - 정점 버퍼 데이터로 널 포인터를 전달받았습니다.");
 			return false;
 		}
 
-		if (m_pData && m_pData != pData)
-			memcpy_s(m_pData, m_Count * m_Stride, pData, m_Count * m_Stride);
+		if (m_pData && m_pData != data)
+			memcpy_s(m_pData, m_Count * m_Stride, data, m_Count * m_Stride);
 
 		if (m_bDynamic)
 		{
@@ -97,7 +105,7 @@ namespace Dive
 			if (!pDest)
 				return false;
 
-			memcpy_s(pDest, m_Count * m_Stride, pData, m_Count * m_Stride);
+			memcpy_s(pDest, m_Count * m_Stride, data, m_Count * m_Stride);
 
 			Unmap();
 		}
@@ -115,7 +123,7 @@ namespace Dive
 				static_cast<ID3D11Resource*>(m_pBuffer),
 				0,
 				&destBox,
-				pData,
+				data,
 				0,
 				0
 			);

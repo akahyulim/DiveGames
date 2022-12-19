@@ -28,12 +28,14 @@
 
 namespace Dive
 {
+	// 로거 타입 열거자.
 	enum class eLoggerNames
 	{
 		Engine,
 		Client
 	};
 
+	// 로그 레벨 열거자.
 	enum class eLogLevels
 	{
 		Trace,
@@ -53,71 +55,68 @@ namespace Dive
 			: Object(pContext) {}
 		~Log() override;
 
-		void Initialize(const char* filename);
+		void Initialize(const char* pFilename);
 
 		// set level
 
 		template<typename FormatString, typename... Args>
-		static void Write(eLoggerNames name, eLogLevels type, const FormatString& fmt, const Args &... args)
+		static void Write(eLoggerNames name, eLogLevels level, const FormatString& fmt, const Args &... args)
 		{
 			if (name == eLoggerNames::Engine)
 			{
-				switch (type)
+				switch (level)
 				{
 				case eLogLevels::Trace:
-					s_pEngineLogger->trace(fmt, args...);
+					s_EngineLogger->trace(fmt, args...);
 					break;
 				case eLogLevels::Debug:
-					s_pEngineLogger->debug(fmt, args...);
+					s_EngineLogger->debug(fmt, args...);
 					break;
 				case eLogLevels::Info:
-					s_pEngineLogger->info(fmt, args...);
+					s_EngineLogger->info(fmt, args...);
 					break;
 				case eLogLevels::Warn:
-					s_pEngineLogger->warn(fmt, args...);
+					s_EngineLogger->warn(fmt, args...);
 					break;
 				case eLogLevels::Error:
-					s_pEngineLogger->error(fmt, args...);
+					s_EngineLogger->error(fmt, args...);
 					break;
 				case eLogLevels::Critical:
-					s_pEngineLogger->critical(fmt, args...);
+					s_EngineLogger->critical(fmt, args...);
 					break;
 				}
 			}
 			else
 			{
-				switch (type)
+				switch (level)
 				{
 				case eLogLevels::Trace:
-					s_pClientLogger->trace(fmt, args...);
+					s_ClientLogger->trace(fmt, args...);
 					break;
 				case eLogLevels::Debug:
-					s_pClientLogger->debug(fmt, args...);
+					s_ClientLogger->debug(fmt, args...);
 					break;
 				case eLogLevels::Info:
-					s_pClientLogger->info(fmt, args...);
+					s_ClientLogger->info(fmt, args...);
 					break;
 				case eLogLevels::Warn:
-					s_pClientLogger->warn(fmt, args...);
+					s_ClientLogger->warn(fmt, args...);
 					break;
 				case eLogLevels::Error:
-					s_pClientLogger->error(fmt, args...);
+					s_ClientLogger->error(fmt, args...);
 					break;
 				case eLogLevels::Critical:
-					s_pClientLogger->critical(fmt, args...);
+					s_ClientLogger->critical(fmt, args...);
 					break;
 				}
 			}
 
-			LogMessageEvent e;
-			e.SetLogLevel((unsigned int)type);
-			e.SetLogMessage(s_Oss.str());
-			FIRE_EVENT(e);
+			FIRE_EVENT(LogMessageEvent(static_cast<uint32_t>(level), s_Oss.str()));
 		}
 
 	private:
-		static std::shared_ptr<spdlog::logger> s_pEngineLogger;
-		static std::shared_ptr<spdlog::logger> s_pClientLogger;
+		static std::shared_ptr<spdlog::logger> s_EngineLogger;
+		static std::shared_ptr<spdlog::logger> s_ClientLogger;
 
 		static std::ostringstream s_Oss;
 	};

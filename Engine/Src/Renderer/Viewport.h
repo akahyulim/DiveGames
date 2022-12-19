@@ -40,9 +40,9 @@ namespace Dive
 
 	private:
 	private:
-		Scene* m_pScene = nullptr;
+		Scene* m_pScene;
 		RECT m_Rect;
 		eRenderPath m_RenderPath;
-		View* m_pView = nullptr;
+		View* m_pView;
 	};
 }

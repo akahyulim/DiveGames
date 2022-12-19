@@ -19,21 +19,30 @@
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
 #include "Scene/Component/Drawable.h"
+#include "Core/CoreDefs.h"
 #include "IO/Log.h"
 #include "Math/Math.h"
 
 namespace Dive 
 {
 	View::View(Context* pContext)
-		: Object(pContext)
+		: Object(pContext),
+		m_pGraphics(GetSubsystem<Graphics>()),
+		m_pRenderer(GetSubsystem<Renderer>()),
+		m_pScene(nullptr),
+		m_pRenderTarget(nullptr),
+		m_pCurRenderTarget(nullptr)
 	{
-		m_pGraphics = GetSubsystem<Graphics>();
-		m_pRenderer = GetSubsystem<Renderer>();
+		DV_ASSERT(m_pGraphics->IsInitialized());
+
+		m_ViewRect = { 0, 0, 0, 0 };
+		m_ViewSize = { 0 ,0 };
+		m_RenderTargetSize = { 0, 0 };
 	}
 
 	View::~View()
 	{
-		DV_LOG_ENGINE_DEBUG("Destroy View");
+		DV_LOG_ENGINE_TRACE("View 소멸 완료");
 	}
 
 	void View::Update(float delta)
@@ -53,10 +62,10 @@ namespace Dive
 		// 현재 RenderPath를 하드코딩 해놓은 상태이다.
 		// Clear
 		{
-			m_pCurrentRenderTarget = m_pRenderTarget;
+			m_pCurRenderTarget = m_pRenderTarget;
 
 			//eClearTarget flags = eClearTarget::Color | eClearTarget::Depth | eClearTarget::Stencil;
-			m_pGraphics->SetRenderTarget(0, dynamic_cast<Texture2D*>(m_pCurrentRenderTarget));
+			m_pGraphics->SetRenderTarget(0, dynamic_cast<Texture2D*>(m_pCurRenderTarget));
 			m_pGraphics->Clear(0, DirectX::XMFLOAT4(1.0f, 1.0f, 0.6f, 1.0f), 1.0f, 0);
 
 			// 이건 임시 위치
@@ -147,7 +156,7 @@ namespace Dive
 
 			const auto& sourceDatas = pDrawable->GetSourceDatas();
 
-			for (unsigned i = 0; i < static_cast<unsigned int>(sourceDatas.size()); ++i)
+			for (unsigned i = 0; i < static_cast<uint32_t>(sourceDatas.size()); ++i)
 			{
 				const auto& drawableBatch = sourceDatas[i];
 				
@@ -157,7 +166,7 @@ namespace Dive
 				// AddBatchToQueue()는 결국 static과 instance를 구분하여 저장하는 처리이다.
 				// 이를 이용해 batch rendering이 아닌 insctancing rendering이 가능하게 된다.
 
-				auto* pTech = drawableBatch.m_pMaterial->GetTechnique();
+				auto* pTech = drawableBatch.pMaterial->GetTechnique();
 				if (!pTech)
 					continue;
 
@@ -175,13 +184,17 @@ namespace Dive
 						auto vertexShaderVariations = pPass->GetVertexShaderVariations();
 						auto pixelShaderVariations = pPass->GetPixelShaderVariations();
 
+						// Renderer::LoadPassShaders
 						if(vertexShaderVariations.empty() || pixelShaderVariations.empty())
 						{
-							// Renderer::LoadPassShaders
 							vertexShaderVariations.clear();
 							pixelShaderVariations.clear();
 
-							// graphics에 타입, 이름, defines를 전달해 얻어온다.
+							// 아래의 GetShader에는 Tech의 Define만 전달하여 생성하였다.
+							// 하지만 실제로는 geometry, light, deferredLight 등 Shader의 Input에 따라 배열로 지정한
+							// Define을 추가로 덧붙여 전달해야 한다.
+							// 이 과정을 통해 ShaderVariations는 배열의 형태를 띄게 된다.
+
 							vertexShaderVariations.emplace_back(
 								m_pGraphics->GetShader(eShaderType::Vertex, pPass->GetVertexShaderName(), pPass->GetVertexShaderDefines()));
 
@@ -189,8 +202,10 @@ namespace Dive
 								m_pGraphics->GetShader(eShaderType::Pixel, pPass->GetPixelShaderName(), pPass->GetPixelShaderDefines()));
 						}
 
-						batch.m_pVertexShader = vertexShaderVariations[0];
-						batch.m_pPixelShader = pixelShaderVariations[0];
+						// 위의 ::LoadPassShaders() 과정에서 배열로 구성된 ShaderVariations 중
+						// 현재 Batch에 맞는 Variation을 찾아 설정해 주어야 한다.
+						batch.m_pVertexShaderVariation = vertexShaderVariations[0];
+						batch.m_pPixelShaderVariation = pixelShaderVariations[0];
 					}
 
 					m_BaseBatchRenderers.emplace_back(batch);

@@ -24,7 +24,7 @@ namespace Dive
 			DV_DELETE(pMesh);
 		m_Meshes.clear();
 
-		DV_LOG_ENGINE_INFO("Model({:s}) ¼Ò¸ê ¿Ï·á", GetName());
+		DV_LOG_ENGINE_TRACE("Model ¼Ò¸ê ¿Ï·á({:s})", GetName());
 	}
 	
 	bool Model::Load(FileStream* pDeserializer)

@@ -6,22 +6,23 @@
 namespace Dive
 {
 	TypeInfo::TypeInfo(const char* pTypeName, const TypeInfo* pBaseTypeInfo)
-		: m_Type(pTypeName),
-		m_TypeName(pTypeName),
-		m_pBaseTypeInfo(pBaseTypeInfo)
+		: m_Hash(pTypeName),
+		m_Name(pTypeName),
+		m_BaseTypeInfo(pBaseTypeInfo)
 	{
+		DV_ASSERT(pTypeName);
 	}
 
-	bool TypeInfo::IsTypeOf(StringHash type) const
+	bool TypeInfo::IsTypeOf(StringHash typeHash) const
 	{
-		const TypeInfo* pCurrent = this;
+		const TypeInfo* pCurTypeInfo = this;
 
-		while (pCurrent)
+		while (pCurTypeInfo)
 		{
-			if (pCurrent->GetType() == type)
+			if (pCurTypeInfo->GetTypeHash() == typeHash)
 				return true;
 
-			pCurrent = pCurrent->GetBaseTypeInfo();
+			pCurTypeInfo = pCurTypeInfo->GetBaseTypeInfo();
 		}
 
 		return false;
@@ -32,14 +33,14 @@ namespace Dive
 		if (!pTypeInfo)
 			return false;
 
-		const TypeInfo* pCurrent = this;
+		const TypeInfo* pCurTypeInfo = this;
 
-		while (pCurrent)
+		while (pCurTypeInfo)
 		{
-			if (pCurrent == pTypeInfo || pCurrent->GetType() == pTypeInfo->GetType())
+			if (pCurTypeInfo == pTypeInfo || pCurTypeInfo->GetTypeHash() == pTypeInfo->GetTypeHash())
 				return true;
 
-			pCurrent = pCurrent->GetBaseTypeInfo();
+			pCurTypeInfo = pCurTypeInfo->GetBaseTypeInfo();
 		}
 
 		return false;
@@ -51,23 +52,24 @@ namespace Dive
 		DV_ASSERT(m_pContext);
 	}
 
-	bool Object::IsInstanceOf(StringHash type) const
+	bool Object::IsInstanceOf(StringHash typeHash) const
 	{
-		return GetTypeInfo()->IsTypeOf(type);
+		return GetTypeInfo()->IsTypeOf(typeHash);
 	}
 
-	bool Object::IsInstanceOf(const TypeInfo* typeInfo) const
+	bool Object::IsInstanceOf(const TypeInfo* pTypeInfo) const
 	{
-		return GetTypeInfo()->IsTypeOf(typeInfo);
+		return GetTypeInfo()->IsTypeOf(pTypeInfo);
 	}
 
-	Object* Object::GetSubsystem(StringHash type) const
+	Object* Object::GetSubsystem(StringHash typeHash) const
 	{
-		return m_pContext->GetSubsystem(type);
+		return m_pContext->GetSubsystem(typeHash);
 	}
 
 	ObjectFactory::ObjectFactory(Context* pContext)
-		: m_pContext(pContext)
+		: m_pContext(pContext),
+		m_pTypeInfo(nullptr)
 	{
 		DV_ASSERT(m_pContext);
 	}

@@ -9,10 +9,18 @@ namespace Dive
 		EVENT_CLASS_TYPE(BeginFrame)
 
 	public:
-		BeginFrameEvent() = default;
+		BeginFrameEvent(uint32_t frameNum, float timeStep)
+			: m_FrameNum(frameNum),
+			m_TimeStep(timeStep)
+		{}
 		~BeginFrameEvent() = default;
  
+		uint32_t GetFrameNum() const { return m_FrameNum; }
+		float GetTimeStep() const { return m_TimeStep; }
+
 	private:
+		uint32_t m_FrameNum;
+		float m_TimeStep;
 	};
 	
 	// PreUpdate
@@ -21,14 +29,15 @@ namespace Dive
 		EVENT_CLASS_TYPE(PreUpdate)
 
 	public:
-		PreUpdateEvent() = default;
+		PreUpdateEvent(float timeStep)
+			: m_TimeStep(timeStep)
+		{}
 		~PreUpdateEvent() = default;
 
-		float GetDeltaTime() const { return m_DeltaTime; }
-		void SetDeltaTime(float delta) { m_DeltaTime = delta; }
+		float GetTimeStep() const { return m_TimeStep; }
 
 	private:
-		float m_DeltaTime = 0.0f;
+		float m_TimeStep;
 	};
 
 	// Update
@@ -37,14 +46,15 @@ namespace Dive
 		EVENT_CLASS_TYPE(Update)
 
 	public:
-		UpdateEvent() = default;
+		UpdateEvent(float timeStep)
+			: m_TimeStep(timeStep)
+		{}
 		~UpdateEvent() = default;
 
-		float GetDeltaTime() const { return m_DeltaTime; }
-		void SetDeltaTime(float delta) { m_DeltaTime = delta; }
+		float GetTimeStep() const { return m_TimeStep; }
 
 	private:
-		float m_DeltaTime = 0.0f;
+		float m_TimeStep;
 	};
 
 	// PostUpdate
@@ -53,14 +63,15 @@ namespace Dive
 		EVENT_CLASS_TYPE(PostUpdate)
 
 	public:
-		PostUpdateEvent() = default;
+		PostUpdateEvent(float timeStep)
+			: m_TimeStep(timeStep)
+		{}
 		~PostUpdateEvent() = default;
 
-		float GetDeltaTime() const { return m_DeltaTime; }
-		void SetDeltaTime(float delta) { m_DeltaTime = delta; }
+		float GetTimeStep() const { return m_TimeStep; }
 
 	private:
-		float m_DeltaTime = 0.0f;
+		float m_TimeStep;
 	};
 
 	// RenderUpdate
@@ -69,14 +80,15 @@ namespace Dive
 		EVENT_CLASS_TYPE(RenderUpdate)
 
 	public:
-		RenderUpdateEvent() = default;
+		RenderUpdateEvent(float timeStep)
+			: m_TimeStep(timeStep)
+		{}
 		~RenderUpdateEvent() = default;
 
-		float GetDeltaTime() const { return m_DeltaTime; }
-		void SetDeltaTime(float delta) { m_DeltaTime = delta; }
+		float GetTimeStep() const { return m_TimeStep; }
 
 	private:
-		float m_DeltaTime = 0.0f;
+		float m_TimeStep;
 	};
 	
 	// PostRenderUpdate
@@ -85,14 +97,15 @@ namespace Dive
 		EVENT_CLASS_TYPE(PostRenderUpdate)
 
 	public:
-		PostRenderUpdateEvent() = default;
+		PostRenderUpdateEvent(float timeStep)
+			: m_TimeStep(timeStep)
+		{}
 		~PostRenderUpdateEvent() = default;
 
-		float GetDeltaTime() const { return m_DeltaTime; }
-		void SetDeltaTime(float delta) { m_DeltaTime = delta; }
+		float GetTimeStep() const { return m_TimeStep; }
 
 	private:
-		float m_DeltaTime = 0.0f;
+		float m_TimeStep;
 	};
 
 	// EndFrame

@@ -1,14 +1,13 @@
 #pragma once
 #include "EngineDef.h"
 #include "Core/Object.h"
-#include "Core/Context.h"
-#include "Core/Variant.h"
 
 namespace Dive
 {
 	class Engine;
 	class Event;
 
+	// 메인 루프를 구성하는 어플리케이션 베이스 클래스.
 	class Application : public Object
 	{
 		DIVE_OBJECT(Application, Object)
@@ -17,13 +16,11 @@ namespace Dive
 		explicit Application(Context* pContext);
 		virtual ~Application() = default;
 
-		// 엔진 초기화 이전에 호출됩니다.
+		// 엔진 초기화 이전에 호출.
 		virtual void Setup() {}
-		
-		// 엔진 초기화 후, 메인 루프 실행 전 호출됩니다.
+		// 엔진 초기화 후, 메인 루프 실행 전 호출.
 		virtual void Start() {}
-		
-		// 메인 루프 종류 후 호출됩니다.
+		// 메인 루프 종류 후 호출.
 		virtual void Stop() {}
 
 		int Run();
@@ -34,9 +31,7 @@ namespace Dive
 
 	protected:
 		std::unique_ptr<Engine> m_pEngine;
-		// 엔진 파라미터.
-		EngineParameters m_EngineParameters;
-
+		EngineParameters m_EngineParams;
 		int m_ExitCode;
 		std::string m_ErrorMessage;
 	};

@@ -15,9 +15,9 @@ namespace Dive
 		explicit InputLayout(Context* pContext, VertexBuffer* pBuffers, ShaderVariation* pVertexShader);
 		~InputLayout() override;
 
-		ID3D11InputLayout* GetInputLayout() const { return m_pInputLayout.Get(); }
+		ID3D11InputLayout* GetInputLayout() const { return m_pInputLayout; }
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_pInputLayout;
+		ID3D11InputLayout* m_pInputLayout;
 	};
 }

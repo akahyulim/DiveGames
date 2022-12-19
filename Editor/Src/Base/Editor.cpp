@@ -30,11 +30,11 @@ namespace Editor
 	void Editor::Setup()
 	{
 		// Engine Mode 설정 가능
-		m_EngineParameters.title = L"Editor";
-		m_EngineParameters.width = 1280;
-		m_EngineParameters.height = 760;
-		m_EngineParameters.positionX = m_EngineParameters.GetCenterPositionX();
-		m_EngineParameters.positionY = m_EngineParameters.GetCenterPositionY();
+		m_EngineParams.Title = L"Editor";
+		m_EngineParams.Width = 1280;
+		m_EngineParams.Height = 760;
+		m_EngineParams.PositionX = m_EngineParams.GetCenterPositionX();
+		m_EngineParams.PositionY = m_EngineParams.GetCenterPositionY();
 	}
 	
 	void Editor::Start()
@@ -151,10 +151,10 @@ namespace Editor
 		auto& evnt = dynamic_cast<const Dive::WindowEvent&>(e);
 
 		ImGui_ImplWin32_WndProcHandler(
-			evnt.m_hWnd,
-			evnt.m_Msg,
-			evnt.m_wParam,
-			evnt.m_lParam
+			evnt.GetWindowHandle(),
+			evnt.GetWindowMsg(),
+			evnt.GetWindowWParam(),
+			evnt.GetWindowLParam()
 		);
 	}
 	

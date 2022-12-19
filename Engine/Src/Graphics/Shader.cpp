@@ -11,13 +11,12 @@
 namespace Dive
 {
 	Shader::Shader(Context* pContext)
-		: Resource(pContext)
+		: Resource(pContext),
+		m_VariationCount(0)
 	{}
 
 	Shader::~Shader()
 	{
-		DV_LOG_ENGINE_TRACE("Shader 소멸자 호출");
-
 		m_VSSourceCode.clear();
 		m_PSSourceCode.clear();
 
@@ -28,6 +27,8 @@ namespace Dive
 		for (auto variation : m_PSVariations)
 			DV_DELETE(variation.second);
 		m_PSVariations.clear();
+
+		DV_LOG_ENGINE_TRACE("Shader 소멸 완료({:s})", GetName());
 	}
 
 	ShaderVariation* Shader::GetVariation(eShaderType type, const std::string& defines)
@@ -43,7 +44,7 @@ namespace Dive
 
 			variations.emplace(defines, newVariation);
 
-			++m_NumVariations;
+			++m_VariationCount;
 
 			return newVariation;
 		}
@@ -66,7 +67,6 @@ namespace Dive
 			sourceCode += "\n";
 		}
 
-		// 각자 필요없는 main함수부를 주석처리 할 필요가 있을까?
 		m_VSSourceCode = sourceCode;
 		m_PSSourceCode = sourceCode;
 

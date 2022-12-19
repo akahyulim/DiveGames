@@ -7,8 +7,6 @@ namespace Dive
 {
 	Context::~Context()
 	{
-		DV_LOG_ENGINE_TRACE("Context 소멸자 호출");
-
 		for (auto& pFactory : m_Factories)
 		{
 			DV_DELETE(pFactory.second);
@@ -16,11 +14,13 @@ namespace Dive
 		m_Factories.clear();
 
 		// 순서를 맞춰야 할 수 있다.
-		for (auto& pSubsystem : m_Subsystems)
+		for (auto& pSubsystem : m_Subsystmes)
 		{
 			DV_DELETE(pSubsystem.second);
 		}
-		m_Subsystems.clear();
+		m_Subsystmes.clear();
+
+		DV_LOG_ENGINE_TRACE("Context 소멸 완료");
 	}
 
 	void Context::RegisterSubsystem(Object* pObject)
@@ -28,23 +28,23 @@ namespace Dive
 		if (!pObject)
 			return;
 
-		m_Subsystems[pObject->GetType().Value()] = pObject;
+		m_Subsystmes[pObject->GetTypeHash().GetValue()] = pObject;
 	}
 
-	void Context::RemoveSubsystem(StringHash type)
+	void Context::RemoveSubsystem(StringHash typeHash)
 	{
-		auto it = m_Subsystems.find(type.Value());
-		if (it != m_Subsystems.end())
+		auto it = m_Subsystmes.find(typeHash.GetValue());
+		if (it != m_Subsystmes.end())
 		{
 			DV_DELETE(it->second);
-			m_Subsystems.erase(it);
+			m_Subsystmes.erase(it);
 		}
 	}
 
-	Object* Context::GetSubsystem(StringHash type) const
+	Object* Context::GetSubsystem(StringHash typeHash) const
 	{
-		auto it = m_Subsystems.find(type.Value());
-		if (it != m_Subsystems.end())
+		auto it = m_Subsystmes.find(typeHash.GetValue());
+		if (it != m_Subsystmes.end())
 			return (it->second);
 	
 		return nullptr;
@@ -55,12 +55,12 @@ namespace Dive
 		if (!pFactory)
 			return;
 
-		m_Factories[pFactory->GetType().Value()] = pFactory;
+		m_Factories[pFactory->GetTypeHash().GetValue()] = pFactory;
 	}
 	
-	Object* Context::CreateObject(StringHash type)
+	Object* Context::CreateObject(StringHash typeHash)
 	{
-		auto it = m_Factories.find(type.Value());
+		auto it = m_Factories.find(typeHash.GetValue());
 		if (it != m_Factories.end())
 			return it->second->CreateObject();
 

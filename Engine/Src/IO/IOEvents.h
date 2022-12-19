@@ -8,17 +8,17 @@ namespace Dive
 		EVENT_CLASS_TYPE(LogMessage)
 
 	public:
-		LogMessageEvent() = default;
+		LogMessageEvent(uint32_t level, const std::string& message)
+			: m_Level(level),
+			m_Message(message)
+		{}
 		~LogMessageEvent() = default;
 
-		unsigned int GetLogLevel() const { return m_Level; }
-		void SetLogLevel(unsigned int level) { m_Level = level; }
-
+		uint32_t GetLogLevel() const { return m_Level; }
 		std::string GetLogMessage() const { return m_Message; }
-		void SetLogMessage(const std::string& msg) { m_Message = msg; }
 
 	private:
-		unsigned int m_Level = 0;
+		uint32_t m_Level;
 		std::string m_Message;
 	};
 

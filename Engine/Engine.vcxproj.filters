@@ -10,9 +10,6 @@
     <ClInclude Include="Src\Engine\Application.h">
       <Filter>Src\Engine</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\Variant.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\IO\IOEvents.h">
       <Filter>Src\IO</Filter>
     </ClInclude>
@@ -165,9 +162,6 @@
     <ClCompile Include="Src\Engine\Engine.cpp">
       <Filter>Src\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\Graphics.cpp">
-      <Filter>Src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Src\IO\Log.cpp">
       <Filter>Src\IO</Filter>
     </ClCompile>
@@ -257,6 +251,12 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Batch.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Graphics_d3d11.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Graphics_window.cpp">
+      <Filter>Src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

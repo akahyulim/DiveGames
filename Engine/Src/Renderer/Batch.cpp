@@ -10,15 +10,21 @@ namespace Dive
 	// InstancingBatch에도 사용되므로 public이어야 한다.
 	void Batch::Prepare(View* pView)
 	{
-		if (!m_pVertexShader || !m_pPixelShader)
+		if (!m_pVertexShaderVariation || !m_pPixelShaderVariation)
 			return;
 
-		pView->GetGraphics()->SetShaders(m_pVertexShader, m_pPixelShader);
+		pView->GetGraphics()->SetShaders(m_pVertexShaderVariation, m_pPixelShaderVariation);
 
 		// Pass를 이용해
 		// graphics에 blend, cull, fill mode등을 전달한다.
 
 		// shaderParameter들을 graphics에 보낸다.
+		{
+			//pView->GetGraphics()->SetShaderParameter("cModel", *m_pWorldTransform);
+			auto worldTransform = DirectX::XMLoadFloat4x4(m_pWorldTransform);
+			worldTransform = DirectX::XMMatrixTranspose(worldTransform);
+			pView->GetGraphics()->SetShaderParameter("cModel", worldTransform);
+		}
 
 		// material의 텍스쳐를 graphics를 통해 set한다.
 		if (m_pMaterial)
@@ -100,7 +106,7 @@ namespace Dive
 			viewMatrix = XMMatrixTranspose(viewMatrix);
 			projMatrix = XMMatrixTranspose(projMatrix);
 
-			pView->GetGraphics()->SetShaderParameter("worldMatrix", worldMatrix);
+			//pView->GetGraphics()->SetShaderParameter("cModel", worldMatrix);
 			pView->GetGraphics()->SetShaderParameter("viewMatrix", viewMatrix);
 			pView->GetGraphics()->SetShaderParameter("projectionMatrix", projMatrix);
 		}

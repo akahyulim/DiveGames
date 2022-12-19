@@ -17,24 +17,23 @@ namespace Dive
 		m_bInitialized(false),
 		m_bExiting(false),
 		m_DeltaTime(0.0f),
-		m_MaxFps(0)
+		m_MaxFPS(0)
 	{
 		// 기본 subsystem 생성: input
-		m_pContext->RegisterSubsystem(new Log(pContext));
-		m_pContext->RegisterSubsystem(new Time(pContext));
-		m_pContext->RegisterSubsystem(new ResourceCache(pContext));
-		m_pContext->RegisterSubsystem(new FileSystem(pContext));
+		m_pContext->RegisterSubsystem<Log>();
+		m_pContext->RegisterSubsystem<Time>();
+		m_pContext->RegisterSubsystem<ResourceCache>();
+		m_pContext->RegisterSubsystem<FileSystem>();
 
 		SUBSCRIBE_EVENT(eEventType::ExitRequested, EVENT_HANDLER_PARAM(OnExitRequested));
 	}
 
 	Engine::~Engine()
 	{
-		DV_LOG_ENGINE_TRACE("Engine 소멸자 호출");
-
-		// Context shut down??
-		// 이 것두 일단 넣어놓긴 했지만... 뭐 필요한 거 같긴 하다.
 		EventSystem::GetInstance().Clear();
+
+
+		DV_LOG_ENGINE_TRACE("Engine 소멸 완료");
 	}
 	
 	bool Engine::Initialize(const EngineParameters& parameters)
@@ -42,11 +41,9 @@ namespace Dive
 		if(IsInitialized())
 			return true;
 
-		// subsystem 중 graphics, renderer 생성
-		m_pContext->RegisterSubsystem(new Graphics(m_pContext));
-		m_pContext->RegisterSubsystem(new Renderer(m_pContext));
+		m_pContext->RegisterSubsystem<Graphics>();
+		m_pContext->RegisterSubsystem<Renderer>();
 
-		// start logging
 		GetSubsystem<Log>()->Initialize("Dive.log");
 
 		// add resource path
@@ -57,20 +54,20 @@ namespace Dive
 		// 그래픽스 초기화
 		{
 			auto pGraphics = m_pContext->GetSubsystem<Graphics>();
-			pGraphics->SetWindowTitle(parameters.title);
+			pGraphics->SetWindowTitle(parameters.Title);
 			// icon
 			//pGraphics->SetPosition(parameters.positionX, parameters.positionY);
 
 			if (!pGraphics->SetMode(
-				parameters.width,
-				parameters.height,
+				parameters.Width,
+				parameters.Height,
 				parameters.bFullscreen,
 				parameters.bBorderless,
 				parameters.bReSizable,
 				parameters.bVSync,
 				parameters.bTripleBuffer,
-				parameters.multiSample,
-				parameters.refreshRate))
+				parameters.MultiSample,
+				parameters.RefreshRate))
 			{
 				return false;
 			}
@@ -113,7 +110,6 @@ namespace Dive
 
 		pTime->BeginFrame(m_DeltaTime);
 
-		// temp: 임시긴 하지만 구조상 깔끔하다...
 		if (!GetSubsystem<Graphics>()->RunWindow())
 		{
 			m_bExiting = true;
@@ -132,28 +128,15 @@ namespace Dive
 	void Engine::Update()
 	{
 		// 시간이 다 같지는 않을텐데...
-		float deltaTime = m_DeltaTime;
+		float timeStep = m_DeltaTime;
 
-		PreUpdateEvent preUdateEvent;
-		preUdateEvent.SetDeltaTime(deltaTime);
-		FIRE_EVENT(preUdateEvent);
-
-		UpdateEvent updateEvent;
-		updateEvent.SetDeltaTime(deltaTime);
-		FIRE_EVENT(updateEvent);
-
-		PostUpdateEvent postUpdateEvent;
-		postUpdateEvent.SetDeltaTime(deltaTime);
-		FIRE_EVENT(postUpdateEvent);
+		//FIRE_EVENT(PreUpdateEvent(timeStep));
+		FIRE_EVENT(UpdateEvent(timeStep));
+		FIRE_EVENT(PostUpdateEvent(timeStep));
 
 		// 아래 두 이벤트는 의미가 애매하다.
-		RenderUpdateEvent renderUpdateEvent;
-		renderUpdateEvent.SetDeltaTime(deltaTime);
-		FIRE_EVENT(renderUpdateEvent);
-
-		PostRenderUpdateEvent postRenderUpdateEvent;
-		postRenderUpdateEvent.SetDeltaTime(deltaTime);
-		FIRE_EVENT(postRenderUpdateEvent);
+		FIRE_EVENT(RenderUpdateEvent(timeStep));
+		FIRE_EVENT(PostRenderUpdateEvent(timeStep));
 	}
 	
 	void Engine::Render()
@@ -204,16 +187,14 @@ namespace Dive
 		m_bExiting = true;
 	}
 
-	// 파라미터와 올드 지우기 두 개를 받는다.
-	// 일단 기본 경로만 등록하자.
 	bool Engine::intializeResourceCache()
 	{
 		auto* pCache = GetSubsystem<ResourceCache>();
 
-		//pCache->AddResourceDir("CoreData/RenderPaths");
+		// 리소스 경로 설정
+		// 현재 ResourceCache에 관련 함수들을 모두 제거하였다.
 
-		pCache->AddResourceDir("Assets/Textures");
-		pCache->AddResourceDir("Assets/Models");
+		// 기본적으로 사용하는 리소스들 등록
 
 		return true;
 	}

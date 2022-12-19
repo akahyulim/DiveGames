@@ -6,7 +6,9 @@
 namespace Dive
 {
     Material::Material(Context* pContext)
-        : Resource(pContext)
+        : Resource(pContext),
+        m_pScene(nullptr),
+        m_pTechnique(nullptr)
     {
     }
 

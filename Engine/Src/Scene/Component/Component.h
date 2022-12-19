@@ -6,6 +6,7 @@ namespace Dive
 	class Scene;
 	class GameObject;
 
+	// 컴포넌트 베이스 클래스.
 	class Component : public Object
 	{
 		DIVE_OBJECT(Component, Object)
@@ -14,20 +15,18 @@ namespace Dive
 		friend class GameObject;
 
 	public:
-		Component(Context* pContext);
+		explicit Component(Context* pContext);
 		virtual ~Component() = default;
 
 		GameObject* GetGameObject() { return m_pGameObject; }
-		unsigned int GetID() const { return m_ID; }
+		uint32_t GetID() const { return m_ID; }
 
 	protected:
 		void setGameObject(GameObject* pGameObject);
-		void setID(unsigned int id);
+		void setID(uint32_t id);
 
 	protected:
 		GameObject* m_pGameObject;
-		// id를 gameobject가 관리하면 gameobject 단위로 나뉘어져 버린다.
-		// 따라서 scene가 관리해 주어야 한다.
-		unsigned int m_ID;
+		uint32_t m_ID;
 	};
 }

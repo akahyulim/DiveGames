@@ -24,10 +24,8 @@ namespace Dive
 			return;
 		}
 
-		std::vector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
-
 		const auto& srcElements = pBuffers->GetElements();
-
+		std::vector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
 		for (unsigned int i = 0; i < static_cast<unsigned int>(srcElements.size()); ++i)
 		{
 			const VertexElement& srcElement = srcElements[i];
@@ -37,7 +35,7 @@ namespace Dive
 			desc.SemanticName = pSemanticName;	
 			desc.SemanticIndex = srcElement.m_Index;
 			desc.Format = ELEMENT_FORMATS[srcElement.m_Type];
-			desc.InputSlot = 0;	// texCoord0, texCoord1 이런거다.
+			desc.InputSlot = 0;	// 이건 버퍼가 배열일 때 슬롯인 듯 하다.
 			desc.AlignedByteOffset = srcElement.m_Offset;
 			desc.InputSlotClass = srcElement.m_PerInstnace ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
 			desc.InstanceDataStepRate = srcElement.m_PerInstnace ? 1: 0;
@@ -48,7 +46,7 @@ namespace Dive
 		if (elementDescs.empty())
 			return;
 
-		auto pShaderBuffer = pVertexShader->GetShaderBuffer();
+		auto pShaderBuffer = pVertexShader->GetCompileBuffer();
 		if (!pShaderBuffer)
 			return;
 
@@ -61,7 +59,7 @@ namespace Dive
 			static_cast<UINT>(elementDescs.size()),
 			pShaderBuffer->GetBufferPointer(),
 			pShaderBuffer->GetBufferSize(),
-			m_pInputLayout.GetAddressOf())))
+			&m_pInputLayout)))
 		{
 			DV_LOG_ENGINE_ERROR("InputLayout 생성에 실패하였습니다.");
 		}
@@ -69,6 +67,6 @@ namespace Dive
 
 	InputLayout::~InputLayout()
 	{
-		DV_LOG_ENGINE_TRACE("InputLayout 소멸자 호출");
+		DV_LOG_ENGINE_TRACE("InputLayout 소멸 완료");
 	}
 }

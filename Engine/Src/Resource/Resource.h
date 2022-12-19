@@ -7,6 +7,7 @@ namespace Dive
 	class Context;
 	class FileStream;
 
+	// 리소스의 직렬화 인터페이스와 이름 관리 기능을 가진 리소스 베이스 클래스.
 	class Resource : public Object
 	{
 		DIVE_OBJECT(Resource, Object)

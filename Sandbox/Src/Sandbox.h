@@ -14,6 +14,8 @@ namespace Sandbox
 		void Stop() override;
 
 	private:
+		Dive::Model* GetModel(const std::string& name);
+		Dive::Material* GetMaterial(const std::string& name);
 
 	private:
 		Dive::Scene* m_pScene;

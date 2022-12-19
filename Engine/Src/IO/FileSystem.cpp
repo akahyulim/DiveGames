@@ -12,12 +12,13 @@ namespace Dive
 
 	FileSystem::~FileSystem()
 	{
+		DV_LOG_ENGINE_TRACE("FileSystem ¼Ò¸ê ¿Ï·á");
 	}
 
 	std::string FileSystem::ToUpperCase(const std::string& str)
 	{
 		auto copy = str;
-		for (int i = 0; i < (int)copy.size(); ++i)
+		for (int32_t i = 0; i < (int32_t)copy.size(); ++i)
 		{
 			if ('a' <= copy[i] && 'z' >= copy[i])
 			{
@@ -31,7 +32,7 @@ namespace Dive
 	std::string FileSystem::ToLowerCase(const std::string& str)
 	{
 		auto copy = str;
-		for (int i = 0; i < (int)copy.size(); ++i)
+		for (int32_t i = 0; i < (int32_t)copy.size(); ++i)
 		{
 			if ('A' <= copy[i] && 'Z' >= copy[i])
 				copy[i] += 32;
@@ -112,7 +113,7 @@ namespace Dive
 			CP_ACP, 
 			0, 
 			str.c_str(), 
-			static_cast<int>(str.size()), 
+			static_cast<int32_t>(str.size()), 
 			nullptr, 
 			0);
 		
@@ -123,9 +124,9 @@ namespace Dive
 			CP_ACP,
 			0,
 			str.c_str(),
-			static_cast<int>(str.size()),
+			static_cast<int32_t>(str.size()),
 			const_cast<wchar_t*>(ret.c_str()),
-			static_cast<int>(ret.size()));
+			static_cast<int32_t>(ret.size()));
 
 		return ret;
 	}
@@ -139,7 +140,7 @@ namespace Dive
 			CP_ACP,
 			0,
 			str.c_str(),
-			static_cast<int>(str.size()),
+			static_cast<int32_t>(str.size()),
 			nullptr,
 			0,
 			nullptr,
@@ -152,9 +153,9 @@ namespace Dive
 			CP_ACP,
 			0,
 			str.c_str(),
-			static_cast<int>(str.size()),
+			static_cast<int32_t>(str.size()),
 			const_cast<char*>(ret.c_str()),
-			static_cast<int>(ret.size()),
+			static_cast<int32_t>(ret.size()),
 			nullptr,
 			nullptr);
 
@@ -185,13 +186,13 @@ namespace Dive
 	std::string FileSystem::GetInternalPath(const std::string& fullPath)
 	{
 		auto copy = fullPath;
-		std::string target = "\\";
+		std::string pTarget = "\\";
 		std::string replace = "/";
 		size_t pos = 0;
 
-		while ((pos = copy.find(target)) != std::string::npos)
+		while ((pos = copy.find(pTarget)) != std::string::npos)
 		{
-			copy.replace(pos, target.size(), replace);
+			copy.replace(pos, pTarget.size(), replace);
 		}
 
 		return copy;
@@ -201,13 +202,13 @@ namespace Dive
 	std::string FileSystem::GetNativePath(const std::string& fullPath)
 	{
 		auto copy = fullPath;
-		std::string target = "/";
+		std::string pTarget = "/";
 		std::string replace = "\\";
 		size_t pos = 0;
 
-		while ((pos = copy.find(target)) != std::string::npos)
+		while ((pos = copy.find(pTarget)) != std::string::npos)
 		{
-			copy.replace(pos, target.size(), replace);
+			copy.replace(pos, pTarget.size(), replace);
 		}
 
 		return copy;

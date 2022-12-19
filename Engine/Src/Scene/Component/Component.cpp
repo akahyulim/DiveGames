@@ -18,7 +18,7 @@ namespace Dive
 		m_pGameObject = pGameObject;
 	}
 
-	void Component::setID(unsigned int id)
+	void Component::setID(uint32_t id)
 	{
 		m_ID = id;
 	}

@@ -13,22 +13,18 @@ namespace Dive
 
 	Resource::~Resource()
 	{
-		DV_LOG_ENGINE_TRACE("Resource º“∏Í¿⁄ »£√‚: {0:d} - {1:d} - {2:s}",
-			GetType().Value(),
-			GetNameHash().Value(),
-			GetName());
 	}
 
 	bool Resource::LoadFromFile(const std::string& fileName)
 	{
-		FileStream deserializer(fileName, eFileStreamMode::Read);
-		return deserializer.IsOpen() && Load(&deserializer);
+		FileStream pDeserializer(fileName, eFileStreamModeFlags::Read);
+		return pDeserializer.IsOpen() && Load(&pDeserializer);
 	}
 
 	bool Resource::SaveToFile(const std::string& fileName)
 	{
-		FileStream serializer(fileName, eFileStreamMode::Write);
-		return serializer.IsOpen() && Save(&serializer);
+		FileStream pSerializer(fileName, eFileStreamModeFlags::Write);
+		return pSerializer.IsOpen() && Save(&pSerializer);
 	}
 
 	bool Resource::Load(FileStream* pDeserializer)
@@ -46,6 +42,6 @@ namespace Dive
 	void Resource::SetName(const std::string& name)
 	{
 		m_Name = name;
-		m_NameHash = name;
+		m_NameHash = StringHash(name);
 	}
 }

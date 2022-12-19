@@ -23,7 +23,7 @@ namespace Dive
 
 	Transform::~Transform()
 	{
-		DV_LOG_ENGINE_DEBUG("Transform 소멸자 호출( {0:d}, {1:s})", m_ID, m_pGameObject->GetName());
+		DV_LOG_ENGINE_TRACE("Transform 소멸 완료({0:d}, {1:s})", m_ID, m_pGameObject->GetName());
 	}
 
 	void Transform::Clear()
@@ -41,8 +41,8 @@ namespace Dive
 	void Transform::SetPosition(const DirectX::XMFLOAT3& pos)
 	{
 		XMFLOAT3 newPos = pos;			   
-		XMFLOAT3 currentPos = GetPosition();
-		if ((currentPos.x == newPos.x) && (currentPos.y == newPos.y) && (currentPos.z == newPos.z))
+		XMFLOAT3 curPos = GetPosition();
+		if ((curPos.x == newPos.x) && (curPos.y == newPos.y) && (curPos.z == newPos.z))
 			return;
 
 		if (m_pParent)
@@ -91,12 +91,12 @@ namespace Dive
 
 	void Transform::SetRotation(const DirectX::XMFLOAT3& angle)
 	{
-		float xRadian = XMConvertToRadians(angle.x);
-		float yRadian = XMConvertToRadians(angle.y);
-		float zRadian = XMConvertToRadians(angle.z);
+		float radianX = XMConvertToRadians(angle.x);
+		float radianY = XMConvertToRadians(angle.y);
+		float radianZ = XMConvertToRadians(angle.z);
 
 		XMFLOAT4 rotQuat;
-		XMStoreFloat4(&rotQuat, XMQuaternionRotationRollPitchYaw(xRadian, yRadian, zRadian));
+		XMStoreFloat4(&rotQuat, XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ));
 
 		SetRotation(rotQuat);
 	}
@@ -109,9 +109,9 @@ namespace Dive
 	void Transform::SetRotation(const DirectX::XMFLOAT4& quaternion)
 	{
 		XMFLOAT4 newRotQuat = quaternion;
-		XMFLOAT4 currentRotQuat = GetRotationQuaternion();
-		if ((currentRotQuat.x == newRotQuat.x) && (currentRotQuat.y == newRotQuat.y) &&
-			(currentRotQuat.z == newRotQuat.z) && (currentRotQuat.w == newRotQuat.w))
+		XMFLOAT4 curRotQuat = GetRotationQuaternion();
+		if ((curRotQuat.x == newRotQuat.x) && (curRotQuat.y == newRotQuat.y) &&
+			(curRotQuat.z == newRotQuat.z) && (curRotQuat.w == newRotQuat.w))
 			return;
 
 		if (m_pParent)
@@ -129,11 +129,11 @@ namespace Dive
 
 	void Transform::SetLocalRotation(const DirectX::XMFLOAT3& angle)
 	{
-		float xRadian = XMConvertToRadians(angle.x);
-		float yRadian = XMConvertToRadians(angle.y);
-		float zRadian = XMConvertToRadians(angle.z);
+		float radianX = XMConvertToRadians(angle.x);
+		float radianY = XMConvertToRadians(angle.y);
+		float radianZ = XMConvertToRadians(angle.z);
 
-		XMStoreFloat4(&m_LocalRotation, XMQuaternionRotationRollPitchYaw(xRadian, yRadian, zRadian));
+		XMStoreFloat4(&m_LocalRotation, XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ));
 	}
 
 	void Transform::SetLocalRotation(float xAngle, float yAngle, float zAngle)
@@ -189,6 +189,17 @@ namespace Dive
 		XMStoreFloat4x4(&m_Matrix, mat);
 	
 		return mat;
+	}
+
+	// 좀 애매하다. 위의 함수 결과를 리턴했다. 위의 함수는 다른 계산 편의를 위해서도 필요해 보인다.
+	// 이름은 이쪽이 더 마음에 든다.
+	const DirectX::XMFLOAT4X4& Transform::GetWorldTransform()
+	{
+		// 지역변수라면 const &로 리턴해도 값이 지워진다...
+		// rastertek은 XMMATRIX를 멤버 변수로 사용한다.
+		// 하지만 여러 곳에서 멤버 변수 사용은 추천하지 않는다...
+		GetMatrix();
+		return m_Matrix;
 	}
 
 	XMMATRIX Transform::GetLocalMatrix() const
@@ -274,9 +285,9 @@ namespace Dive
 		return m_pParent->GetRoot();
 	}
 	
-	Transform* Transform::GetChild(unsigned int index) const
+	Transform* Transform::GetChild(uint32_t index) const
 	{
-		if(m_Children.empty() || static_cast<unsigned int>(m_Children.size()) < index)
+		if(m_Children.empty() || static_cast<uint32_t>(m_Children.size()) < index)
 			return nullptr;
 
 		return m_Children[index];

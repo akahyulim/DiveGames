@@ -40,12 +40,12 @@ namespace Dive
 
 	private:
 	private:
-		Scene* m_pScene = nullptr;
+		Scene* m_pScene;
 
 		std::unordered_map<eTextureUnit, Texture*> m_Textures;
 
 		// 원래는 lod때문에 랩핑한 구조체를 가진다.
-		Technique* m_pTechnique = nullptr;
+		Technique* m_pTechnique;
 
 		// ShaderDefines와 Parameter를 관리하지만 일단 뒤로 미룬다.
 	};

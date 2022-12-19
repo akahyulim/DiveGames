@@ -177,7 +177,6 @@
     <ClInclude Include="Src\Core\EventSystem.h" />
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\Timer.h" />
-    <ClInclude Include="Src\Core\Variant.h" />
     <ClInclude Include="Src\divepch.h" />
     <ClInclude Include="Src\DiveEngine.h" />
     <ClInclude Include="Src\Engine\Application.h" />
@@ -231,7 +230,8 @@
     <ClCompile Include="Src\Engine\Application.cpp" />
     <ClCompile Include="Src\Engine\Engine.cpp" />
     <ClCompile Include="Src\Graphics\ConstantBuffer.cpp" />
-    <ClCompile Include="Src\Graphics\Graphics.cpp" />
+    <ClCompile Include="Src\Graphics\Graphics_window.cpp" />
+    <ClCompile Include="Src\Graphics\Graphics_d3d11.cpp" />
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\InputLayout.cpp" />
     <ClCompile Include="Src\Graphics\Shader.cpp" />

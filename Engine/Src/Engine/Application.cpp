@@ -1,9 +1,11 @@
 #include "divepch.h"
 #include "Application.h"
 #include "Engine.h"
+#include "Core/Context.h"
 #include "Core/EventSystem.h"
 #include "Core/CoreDefs.h"
 #include "IO/IOEvents.h"
+#include "IO/Log.h"
 
 #include <sstream>
 
@@ -24,7 +26,7 @@ namespace Dive
 		if (m_ExitCode)
 			return m_ExitCode;
 
-		if(!m_pEngine->Initialize(m_EngineParameters))
+		if(!m_pEngine->Initialize(m_EngineParams))
 		{
 			ErrorExit();
 			return m_ExitCode;
@@ -59,13 +61,11 @@ namespace Dive
 		}
 	}
 
+	// 특정 로그래벨만 에러 메시지를 저장한다?
 	void Application::OnLogMessage(const Event& e)
 	{
 		auto& evnt = dynamic_cast<const LogMessageEvent&>(e);
-
-		unsigned int levelErr = 4;
-
-		if (evnt.GetLogLevel() == levelErr)
+		if (evnt.GetLogLevel() == static_cast<uint32_t>(eLogLevels::Error))
 		{
 			m_ErrorMessage.clear();
 			m_ErrorMessage = evnt.GetLogMessage();

@@ -14,11 +14,18 @@
 #include "Resource/ResourceCache.h"
 #include "IO/Log.h"
 
-
 namespace Dive
 {
+	// 각종 Shader에 대응하는 ShaderVaritaion들의 배열을 만들어 놓는다.
+	// 구분 기준은 vs, ps별 Input Defines인 듯 하다.
+
+
 	Renderer::Renderer(Context* pContext)
-		: Object(pContext)
+		: Object(pContext),
+		m_pGraphics(nullptr),
+		m_pDefaultRenderPath(nullptr),
+		m_pDefaultTechnique(nullptr),
+		m_bInitialized(false)
 	{
 		// ScreenMode 메시지 구독
 
@@ -31,11 +38,11 @@ namespace Dive
 
 	Renderer::~Renderer()
 	{
-		DV_LOG_ENGINE_TRACE("Renderer 소멸자 호출");
-
-		for (int i = 0; i < static_cast<int>(m_Viewports.size()); ++i)
+		for (int32_t i = 0; i < static_cast<int32_t>(m_Viewports.size()); ++i)
 			DV_DELETE(m_Viewports[i]);
 		m_Viewports.clear();
+
+		DV_LOG_ENGINE_TRACE("Renderer 소멸 완료");
 	}
 	
 	// EventHandler가 호출한다.
@@ -43,16 +50,16 @@ namespace Dive
 	{
 		m_Views.clear();
 
-		for (auto i = static_cast<int>(m_Viewports.size()) - 1; i >= 0; --i)
+		for (auto i = static_cast<int32_t>(m_Viewports.size()) - 1; i >= 0; --i)
 			queueViewport(nullptr, m_Viewports[i]);
 		
-		unsigned int numMainViewports = static_cast<unsigned int>(m_QueuedViewports.size());
-		for (unsigned int i = 0; i < numMainViewports; ++i)
+		uint32_t numMainViewports = static_cast<uint32_t>(m_QueuedViewports.size());
+		for (uint32_t i = 0; i < numMainViewports; ++i)
 			updateQueuedViewport(i);
 
 		FIRE_EVENT(RenderTargetUpdate());
 
-		for (unsigned int i = numMainViewports; i < static_cast<unsigned int>(m_QueuedViewports.size()); ++i)
+		for (uint32_t i = numMainViewports; i < static_cast<uint32_t>(m_QueuedViewports.size()); ++i)
 			updateQueuedViewport(i);
 
 		m_QueuedViewports.clear();
@@ -70,7 +77,7 @@ namespace Dive
 		// 역순으로 Views' Render.
 		if (!m_Views.empty())
 		{
-			for (int i = static_cast<int>(m_Views.size() - 1); i >= 0; --i)
+			for (int32_t i = static_cast<int32_t>(m_Views.size() - 1); i >= 0; --i)
 			{
 				if (!m_Views[i])
 					continue;
@@ -84,7 +91,7 @@ namespace Dive
 	{
 		auto& evnt = dynamic_cast<const RenderUpdateEvent&>(e);
 
-		Update(evnt.GetDeltaTime());
+		Update(evnt.GetTimeStep());
 	}
 
 	// 이게 호출되려면 OnScreenModeChanged나 OnWindowResized가 호출되어야 한다.
@@ -123,12 +130,12 @@ namespace Dive
 		return m_pDefaultTechnique;
 	}
 
-	Viewport* Renderer::GetViewport(unsigned int index)
+	Viewport* Renderer::GetViewport(uint32_t index)
 	{
 		return m_Viewports.size() > index ? m_Viewports[index] : nullptr;
 	}
 
-	void Renderer::SetViewport(unsigned int index, Viewport* pViewport)
+	void Renderer::SetViewport(uint32_t index, Viewport* pViewport)
 	{
 		if (m_Viewports.size() >= index)
 			m_Viewports.insert(m_Viewports.begin() + index, pViewport);
@@ -137,18 +144,18 @@ namespace Dive
 	}
 
 	// 이외에도 몇 가지를 더 전달받는다.
-	Texture* Renderer::GetScreenBuffer(int width, int height, DXGI_FORMAT format, bool bCubemap)
+	Texture* Renderer::GetScreenBuffer(int32_t width, int32_t height, DXGI_FORMAT format, bool bCubemap)
 	{
 		// format으로 depthstencil 여부를 판별
 
-		auto searchKey = static_cast<unsigned long long>(format) << 32u | width << 24u | height << 16u;
+		auto searchKey = static_cast<uint64_t>(format) << 32u | width << 24u | height << 16u;
 		
 		if (m_ScreenBuffers.find(searchKey) == m_ScreenBuffers.end())
 			m_ScreenBufferIndices[searchKey] = 0;
 
 		auto index = m_ScreenBufferIndices[searchKey];
 
-		if (index >= static_cast<unsigned int>(m_ScreenBuffers[searchKey].size()))
+		if (index >= static_cast<uint32_t>(m_ScreenBuffers[searchKey].size()))
 		{
 			Texture* pNewBuffer = nullptr;
 
@@ -185,8 +192,8 @@ namespace Dive
 		if (!pRenderTarget)
 			return;
 
-		auto numViewports = pRenderTarget->GetNumViewports();
-		for (unsigned int i = 0; i < numViewports; ++i)
+		auto numViewports = pRenderTarget->GetViewportCount();
+		for (uint32_t i = 0; i < numViewports; ++i)
 			queueViewport(pRenderTarget, pRenderTarget->GetViewport(i));
 	}
 
@@ -229,7 +236,7 @@ namespace Dive
 		m_QueuedViewports.emplace_back(std::make_pair(pRenderTarget, pViewport));
 	}
 
-	void Renderer::updateQueuedViewport(unsigned int index)
+	void Renderer::updateQueuedViewport(uint32_t index)
 	{
 		auto* pRenderTarget = m_QueuedViewports[index].first;
 		auto* pViewport = m_QueuedViewports[index].second;
