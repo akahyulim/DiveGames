@@ -251,6 +251,10 @@ namespace Dive
 		m_pDeviceContext->DrawIndexed(indexCount, indexStart, vertexStart);
 	}
 
+	void Graphics::DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t instanceCount, uint32_t indexStart)
+	{
+	}
+
 	void Graphics::SetDepthStencil(Texture2D* pTexture)
 	{
 		if (m_pDepthStencil != pTexture)
@@ -675,9 +679,10 @@ namespace Dive
 			// 이 텍스쳐를 직접 사용하는 것이 아니라
 			// 셰이더 리소스 뷰와 샘플러가 따로 배열로 존재하고
 			// 거기에 이 텍스쳐의 정보를 저장하는 방식이다. => 굳이?
-			// 셰이더 리소스 뷰
-			// 샘플러
+			// 셰이더 리소스 뷰 => 당연히 Texture에서 얻어온다.
+			// 샘플러 => Texture에서 얻어오고, 인덱스는 전달받은 것을 그대로 적용한다.
 			// 더티체크 트루 => Bind는 PrepareDraw에서 수행한다.
+			m_bTextureDirty = true;
 		}
 	}
 
@@ -763,6 +768,16 @@ namespace Dive
 		}
 
 		// shader resources + samplers
+		if (m_bTextureDirty) // + firstDirtyTexture?
+		{
+			// 총 16개의 shader reosurce와 sampler를 관리하기 위해 firstDirtyTexutre라는 index를 사용하고 있다.
+
+			// vertex shader
+
+			// pixel shader
+
+			m_bTextureDirty = false;
+		}
 
 		// vertex buffer + inputlayout
 		if (m_bVertexTypeDirty && m_pVertexShaderVariation && m_pVertexShaderVariation->GetShader())

@@ -6,12 +6,7 @@ namespace Dive
 	class Context;
 	class Scene;
 	class View;
-
-	enum class eRenderPath
-	{
-		Forward,
-		Deferred,
-	};
+	class RenderPath;
 
 	class Viewport : public Object
 	{
@@ -19,18 +14,19 @@ namespace Dive
 	
 	public:
 		explicit Viewport(Context* pContext);
-		Viewport(Context* pContext, Scene* pScene, eRenderPath renderPath); //+ camera
-		Viewport(Context* pContext, Scene* pScene, const RECT& rect, eRenderPath renderPath); // + camera
+		Viewport(Context* pContext, Scene* pScene, RenderPath* pRenderPath); //+ camera
+		Viewport(Context* pContext, Scene* pScene, RenderPath* pRenderPath, const RECT& rect); // + camera
 		~Viewport() override;
+
+		RenderPath* GetRenderPath() const { return m_pRenderPath; }
+		void SetRenderPath(RenderPath* pRenderPath);
+		// 파일로부터 직접 로드하는 함수도 가진다.
 
 		Scene* GetScene() const { return m_pScene; }
 		void SetScene(Scene* pScene) { m_pScene = pScene; }
 
 		RECT GetRect() const { return m_Rect; }
 		void SetRect(const RECT& rect) { m_Rect = rect; }
-
-		eRenderPath GetRenderPath() const { return m_RenderPath; }
-		void SetRenderPath(eRenderPath renderPath) { m_RenderPath = renderPath; }
 
 		// camera
 
@@ -41,8 +37,8 @@ namespace Dive
 	private:
 	private:
 		Scene* m_pScene;
-		RECT m_Rect;
-		eRenderPath m_RenderPath;
+		RenderPath* m_pRenderPath;
 		View* m_pView;
+		RECT m_Rect;
 	};
 }

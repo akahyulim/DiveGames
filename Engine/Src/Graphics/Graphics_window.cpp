@@ -61,6 +61,7 @@ namespace Dive
 		m_pIndexBuffer(nullptr),
 		m_pLastShader(nullptr),
 		m_InputLayoutHash(0),
+		m_bTextureDirty(true),
 		m_bVertexTypeDirty(true),
 		m_bRenderTargetsDirty(true),
 		m_pCurShaderProgram(nullptr),
@@ -81,6 +82,8 @@ namespace Dive
 		for (uint32_t i = 0; i < 16; ++i)
 		{
 			m_pTextures[i] = nullptr;
+			m_pShaderResourceViews[i] = nullptr;
+			m_pSamplers[i] = nullptr;
 		}
 
 		for (uint32_t i = 0; i < 7; ++i)
@@ -242,8 +245,6 @@ namespace Dive
 			DV_LOG_ENGINE_ERROR("Graphics::WindowCreate - 윈도우 생성에 실패하였습니다.");
 			return false;
 		}
-
-		DV_LOG_ENGINE_TRACE("윈도우를 생성하였습니다. {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 
 		return true;
 	}

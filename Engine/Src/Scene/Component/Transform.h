@@ -47,7 +47,7 @@ namespace Dive
 		void SetLocalScale(float xScale, float yScale, float zScale);
 
 		DirectX::XMMATRIX GetMatrix();
-		const DirectX::XMFLOAT4X4& GetWorldTransform();
+		DirectX::XMFLOAT4X4 GetWorldTransform();
 		DirectX::XMMATRIX GetLocalMatrix() const;
 		void SetLocalMatrix(const DirectX::XMFLOAT4X4& mat);
 

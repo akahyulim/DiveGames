@@ -3,11 +3,11 @@
 
 namespace Editor
 {
-    unsigned int GetNumValidFaces(aiMesh* pMesh)
+    uint32_t GetNumValidFaces(aiMesh* pMesh)
     {
-        unsigned int ret = 0;
+        uint32_t ret = 0;
 
-        for (unsigned int i = 0; i < pMesh->mNumFaces; ++i)
+        for (uint32_t i = 0; i < pMesh->mNumFaces; ++i)
         {
             if (pMesh->mFaces[i].mNumIndices == 3)
                 ++ret;
@@ -17,7 +17,7 @@ namespace Editor
     }
 
 	ModelImporter::ModelImporter()
-		: m_pScene(nullptr),
+		: m_pAiScene(nullptr),
         m_bAnimations(false),
         m_bMaterials(false)
 	{
@@ -27,7 +27,11 @@ namespace Editor
 	{
 	}
 	
-	bool ModelImporter::LoadAndExportModel(const std::string& filepath)
+    // 궁극적으로
+    // 1. 파일 설정 후 정보 출력
+    // 2. 익스포트 설정
+    // 3. 익스포트 세 가지 기능으로 구분해야한다.
+	bool ModelImporter::LoadAndExport(const std::string& filepath)
 	{
         // 일단 기본 설정 사용.
         const auto flags =
@@ -37,14 +41,14 @@ namespace Editor
             aiProcess_CalcTangentSpace |
             aiProcess_GenSmoothNormals |
             aiProcess_JoinIdenticalVertices |
-            aiProcess_OptimizeMeshes |              // reduce the number of meshes         
+            aiProcess_OptimizeMeshes |              // reduce the number of Meshes         
             aiProcess_ImproveCacheLocality |        // re-order triangles for better vertex cache locality.
             aiProcess_RemoveRedundantMaterials |    // remove redundant/unreferenced materials.
             aiProcess_LimitBoneWeights |
             aiProcess_SplitLargeMeshes |
             aiProcess_Triangulate |
             aiProcess_GenUVCoords |
-            aiProcess_SortByPType |                 // splits meshes with more than one primitive type in homogeneous sub-meshes.
+            aiProcess_SortByPType |                 // splits Meshes with more than one primitive type in homogeneous sub-Meshes.
             aiProcess_FindDegenerates |             // convert degenerate primitives to proper lines or points.
             aiProcess_FindInvalidData |
             aiProcess_FindInstances |
@@ -69,20 +73,20 @@ namespace Editor
 
         // Load
         // urho3d는 aiImportFileExWithProperties()와 aiImportFile()을 사용한다.
-        m_pScene = (aiScene*)importer.ReadFile(filepath, flags);
-        if (!m_pScene)
+        m_pAiScene = (aiScene*)importer.ReadFile(filepath, flags);
+        if (!m_pAiScene)
         {
             DV_LOG_CLIENT_ERROR("전달받은 파일(:s)을 열 수 없습니다.", filepath);
             return false;
         }
 
-        m_bAnimations = m_pScene->HasAnimations();
-        m_bMaterials = m_pScene->HasMaterials();
-        aiNode* pRootNode = m_pScene->mRootNode;
+        m_bAnimations = m_pAiScene->HasAnimations();
+        m_bMaterials = m_pAiScene->HasMaterials();
+        aiNode* pRootNode = m_pAiScene->mRootNode;
 
         // parsing start
         OutModel outModel;
-        //outModel.outName;
+        //outModel.OutName;
         outModel.pRootNode = pRootNode;
 
         collectMeshes(outModel, outModel.pRootNode);
@@ -95,38 +99,38 @@ namespace Editor
 
         saveModel(outModel);
 
-        return m_pScene != nullptr;
+        return m_pAiScene != nullptr;
 	}
 
     // 루트노드부터 시작해 모든 메시 정보를 취합.
     void ModelImporter::collectMeshes(OutModel& model, aiNode* pNode)
     {
-        for (unsigned int i = 0; i < pNode->mNumMeshes; ++i)
+        for (uint32_t i = 0; i < pNode->mNumMeshes; ++i)
         {
-            aiMesh* pMesh = m_pScene->mMeshes[pNode->mMeshes[i]];
+            aiMesh* pMesh = m_pAiScene->mMeshes[pNode->mMeshes[i]];
 
-            for (unsigned int j = 0; j < model.meshes.size(); ++j)
+            for (uint32_t j = 0; j < model.Meshes.size(); ++j)
             {
                 // sprtan의 경우 뒤에 +1을 붙였던 것 같다.
-                if (pMesh == model.meshes[j])
+                if (pMesh == model.Meshes[j])
                 {
-                    DV_LOG_CLIENT_WARN("동일한 메시가 중복 발견 되었습니다.");
+                    DV_LOG_CLIENT_WARN("ModelImporter::collectMeshes - 동일한 메시가 중복 발견 되었습니다.");
                     break;
                 }
             }
 
-            model.meshIndices.insert(pNode->mMeshes[i]);
-            model.meshes.emplace_back(pMesh);
-            model.meshNodes.emplace_back(pNode);
-            model.totalNumVertices += pMesh->mNumVertices;
-            model.totalNumIndices += GetNumValidFaces(pMesh) * 3;
+            model.MeshIndices.insert(pNode->mMeshes[i]);
+            model.Meshes.emplace_back(pMesh);
+            model.MeshNodes.emplace_back(pNode);
+            model.TotalVertexCount += pMesh->mNumVertices;
+            model.TotalIndexCount += GetNumValidFaces(pMesh) * 3;
 
             // aiNode, aiMesh에서 부모를 알아낼 수 없다.
             // 오직 aiNode를 통해 자식들만 확인할 수 있다.
             DV_LOG_CLIENT_DEBUG("mesh name: {:s}", pMesh->mName.C_Str());
         }
 
-        for (unsigned int i = 0; i < pNode->mNumChildren; ++i)
+        for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
             collectMeshes(model, pNode->mChildren[i]);
     }
 
@@ -141,25 +145,25 @@ namespace Editor
         std::set<aiNode*> rootNodes;
 
         bool bHaveSkinnedMeshes = false;
-        for (unsigned int i = 0; i < (unsigned int)model.meshes.size(); ++i)
+        for (uint32_t i = 0; i < (uint32_t)model.Meshes.size(); ++i)
         {
-            if (model.meshes[i]->HasBones())
+            if (model.Meshes[i]->HasBones())
             {
                 bHaveSkinnedMeshes = true;
                 break;
             }
         }
 
-        for (unsigned int i = 0; i < (unsigned int)model.meshes.size(); ++i)
+        for (uint32_t i = 0; i < (uint32_t)model.Meshes.size(); ++i)
         {
-            aiMesh* pMesh = model.meshes[i];
-            aiNode* pMeshNode = model.meshNodes[i];
+            aiMesh* pMesh = model.Meshes[i];
+            aiNode* pMeshNode = model.MeshNodes[i];
             aiNode* pMeshParentNode = pMeshNode->mParent;
             aiNode* pRootNode = nullptr;
 
             // 메시 하나에도 여러개의 뼈대가 존재할 수 있다.
             // 뼈대가 있다는 건 스키닝 메시라는 말이다.
-            for (unsigned int j = 0; j < (unsigned int)pMesh->mNumBones; ++j)
+            for (uint32_t j = 0; j < (uint32_t)pMesh->mNumBones; ++j)
             {
                 auto* pBone = pMesh->mBones[j];
                 std::string boneName = pBone->mName.C_Str();
@@ -169,7 +173,7 @@ namespace Editor
                 if (!pBoneNode)
                 {
                     // 실행을 멈춰야 한다. urho는 errorExit를 호출했다.
-                    DV_LOG_CLIENT_ERROR("뼈대{:s}의 노드를 찾지 못하였습니다.", boneName);
+                    DV_LOG_CLIENT_ERROR("ModelImporter::collectBones - 뼈대{:s}의 노드를 찾지 못하였습니다.", boneName);
                     return;
                 }
                 necessary.insert(pBoneNode);
@@ -223,7 +227,7 @@ namespace Editor
         // 그리고 이들의 공통 부모를 찾아야 한다.
         if (rootNodes.size() > 1)
         {
-            DV_LOG_CLIENT_DEBUG("find multiple root node!");
+            DV_LOG_CLIENT_DEBUG("ModelImporter::collectBones - 둘 이상의 루트노드를 가집니다.");
         }
 
         if (rootNodes.empty())
@@ -266,7 +270,7 @@ namespace Editor
         if (name == pRootNode->mName.C_Str())
             return pRootNode;
 
-        for (unsigned int i = 0; i < pRootNode->mNumChildren; ++i)
+        for (uint32_t i = 0; i < pRootNode->mNumChildren; ++i)
         {
             auto* pFound = getNode(name, pRootNode->mChildren[i]);
             if (pFound)
@@ -279,6 +283,6 @@ namespace Editor
     void ModelImporter::printMeshData(OutModel& model)
     {
         DV_LOG_CLIENT_DEBUG("num mesh: {0:d}, num vertices: {1:d}, num indices: {2:d}",
-            (unsigned int)model.meshes.size(), model.totalNumVertices, model.totalNumIndices);
+            (uint32_t)model.Meshes.size(), model.TotalVertexCount, model.TotalIndexCount);
     }
 }

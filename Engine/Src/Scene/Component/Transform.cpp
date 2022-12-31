@@ -193,7 +193,7 @@ namespace Dive
 
 	// 좀 애매하다. 위의 함수 결과를 리턴했다. 위의 함수는 다른 계산 편의를 위해서도 필요해 보인다.
 	// 이름은 이쪽이 더 마음에 든다.
-	const DirectX::XMFLOAT4X4& Transform::GetWorldTransform()
+	DirectX::XMFLOAT4X4 Transform::GetWorldTransform()
 	{
 		// 지역변수라면 const &로 리턴해도 값이 지워진다...
 		// rastertek은 XMMATRIX를 멤버 변수로 사용한다.

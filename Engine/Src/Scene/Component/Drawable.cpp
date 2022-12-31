@@ -54,7 +54,9 @@ namespace Dive
 				m_Meshes[i] = meshes[i];
 				// 이외에도 center와
 				// DrawalbBatch의 worldTransform을 저장한다.
-				m_SourceDatas[i].pWorldTransform = &m_pGameObject->GetComponent<Transform>()->GetWorldTransform();
+				// 이게 굳이 포인터여야 하나? 크기를 확인해보자.
+				// 현재 이 부분때문에 렌더링도 안된다.
+				m_SourceDatas[i].WorldTransform = m_pGameObject->GetComponent<Transform>()->GetWorldTransform();
 
 				// 원래는 ResetLodLevels에서 수행한다.
 				m_SourceDatas[i].pMesh = meshes[i];

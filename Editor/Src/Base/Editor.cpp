@@ -39,7 +39,7 @@ namespace Editor
 	
 	void Editor::Start()
 	{
-		DV_LOG_CLIENT_DEBUG("call Editor's Start()");
+		DV_LOG_CLIENT_TRACE("Editor Start");
 		// UI ¼³Á¤
 		
 		auto* pGraphics = m_pContext->GetSubsystem<Dive::Graphics>();
@@ -104,7 +104,7 @@ namespace Editor
 	
 	void Editor::Stop()
 	{
-		DV_LOG_CLIENT_DEBUG("call Editor's Stop()");
+		DV_LOG_CLIENT_TRACE("Editor Stop");
 
 		// destroy ImGui
 		ImGui_ImplDX11_Shutdown();

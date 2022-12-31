@@ -11,16 +11,10 @@ namespace Dive
 	
 	struct DrawableSourceData
 	{
-		DrawableSourceData() = default;
-		DrawableSourceData(const DrawableSourceData& rhs) = default;
-		~DrawableSourceData() = default;
-
-		DrawableSourceData& operator=(const DrawableSourceData& rhs) = default;
-
 		float Distance;
 		Mesh* pMesh;
 		Material* pMaterial;
-		const DirectX::XMFLOAT4X4* pWorldTransform;
+		DirectX::XMFLOAT4X4 WorldTransform;
 		eGeometryType GeometryType;
 	};
 
@@ -56,5 +50,13 @@ namespace Dive
 
 		std::vector<Mesh*> m_Meshes;
 		std::vector<DrawableSourceData> m_SourceDatas;
+
+		// 전체 메시 정보에서 부분을 그리는 geometry다.
+		// vertex와 index의 offset, count를 관리한다.
+		// material도 관리한다.
+		// model은 resource이지만
+		// 이를 포함한 gameobject는 어떻게 관리해야 할 지 생각해야 한다.
+		// 그리고 현재 구현 상태에 많은 변화를 수반할 것이다.
+		// instancing과 유니티의 구현 상태 그리고 SkinnedMesh 확장도 염두해야 한다.
 	};
 }

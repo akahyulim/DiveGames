@@ -42,6 +42,8 @@ namespace Sandbox
 
 		DV_LOG_CLIENT_TRACE("Sandbox Scene을 생성하였습니다.");
 
+		auto pRenderer = GetSubsystem<Dive::Renderer>();
+
 		auto pCache = GetSubsystem<Dive::ResourceCache>();
 
 		// renderPath
@@ -58,8 +60,8 @@ namespace Sandbox
 				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
 				pTransform->SetPosition(DirectX::XMFLOAT3(-5.0f, 0.0f, 5.0f));
 				auto pDrawable = pTriangle->AddComponent<Dive::Drawable>();
-				pDrawable->SetModel(GetModel("Triangle"));
-				pDrawable->SetMaterial(GetMaterial("Default"));
+				pDrawable->SetModel(getModel("Triangle"));
+				pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());
 
 				DV_LOG_CLIENT_TRACE("Triangle GameObject를 생성하였습니다.");
 			}
@@ -69,13 +71,31 @@ namespace Sandbox
 				auto pQuad = m_pScene->CreateGameObject("Quad");
 				auto pTransform = pQuad->GetComponent<Dive::Transform>();
 				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-				pTransform->SetPosition(DirectX::XMFLOAT3(2.0f, 0.0f, 3.0f));
-				pTransform->SetRotation(0.0f, 0.0f, 45.0f);
+				pTransform->SetPosition(DirectX::XMFLOAT3(5.0f, 0.0f, 5.0f));
+				//pTransform->SetRotation(0.0f, 0.0f, 45.0f);
 				auto pDrawable = pQuad->AddComponent<Dive::Drawable>();
-				pDrawable->SetModel(GetModel("Quad"));
-				pDrawable->SetMaterial(GetMaterial("Default"));
+				pDrawable->SetModel(getModel("Quad"));
+				pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());	// 아직까진 반드시 Material을 가져야 한다.
 
 				DV_LOG_CLIENT_TRACE("Quad GameObject를 생성하였습니다.");
+			}
+			
+			// Cube
+			{
+				auto pQuad = m_pScene->CreateGameObject("Cube");
+				auto pTransform = pQuad->GetComponent<Dive::Transform>();
+				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
+				pTransform->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
+				pTransform->SetRotation(45.0f, 45.0f, 0.0f);
+				auto pDrawable = pQuad->AddComponent<Dive::Drawable>();
+				pDrawable->SetModel(getModel("Cube"));
+				Dive::Material* pMat = new Dive::Material(m_pContext);
+				pMat->SetName("CubeMat");
+				pCache->AddManualResource(pMat);
+				pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
+				pDrawable->SetMaterial(pMat);
+
+				DV_LOG_CLIENT_TRACE("Cube GameObject를 생성하였습니다.");
 			}
 		}
 
@@ -91,7 +111,7 @@ namespace Sandbox
 		DV_DELETE(m_pScene);
 	}
 
-	Dive::Model* Sandbox::GetModel(const std::string& name)
+	Dive::Model* Sandbox::getModel(const std::string& name)
 	{
 		auto pCache = GetSubsystem<Dive::ResourceCache>();
 		auto pModel = pCache->GetExistingResource<Dive::Model>(name);
@@ -180,17 +200,55 @@ namespace Sandbox
 
 				std::vector<float> vertices =
 				{
-					-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-					-1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-					1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-					1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f
+					// front
+					-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+					0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+					0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+					-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+
+					// bottom
+					-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+					0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+					0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+					-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+
+					// back
+					-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+					0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+					0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+					-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+
+					// top
+					-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+					0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+					0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+					-0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+
+					// right
+					0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
+					0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
+					0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
+					0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
+
+					// left
+					-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
+					-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
+					-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
+					-0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f
 				};
 
 				Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
-				pVb->SetSize(4, elements);
+				pVb->SetSize(24, elements);
 				pVb->SetData(static_cast<void*>(vertices.data()));
 
-				std::vector<unsigned short> indices = { 0, 1, 2, 0, 2, 3 };
+				std::vector<unsigned short> indices = { 
+					0, 2, 3, 0, 1, 2,
+					4, 6, 7, 4, 5, 6,
+					9, 11, 10, 9, 8, 11,
+					12, 14, 15, 12, 13, 14, 
+					16, 18, 19, 16, 17, 18,
+					20, 22, 23, 20, 21, 22
+				};
 				Dive::IndexBuffer* pIb = new Dive::IndexBuffer(m_pContext);
 				pIb->Create<unsigned short>(indices);
 
@@ -213,49 +271,30 @@ namespace Sandbox
 		return nullptr;
 	}
 
-	// Technique의 ShaderDefine을 어떻게 설정해야 의도에 부합할지,
-	// Material은 언제 Technique을 Set하는지 생각하고 알아보자.
-	Dive::Material* Sandbox::GetMaterial(const std::string& name)
+	Dive::Technique* Sandbox::getTechnique(const std::string& name)
 	{
 		auto pCache = GetSubsystem<Dive::ResourceCache>();
-		auto pMaterial = pCache->GetExistingResource<Dive::Material>(name);
-		if (pMaterial)
-			return pMaterial;
+		Dive::Technique* pTechnique = pCache->GetExistingResource<Dive::Technique>(name);
+		if (pTechnique)
+			return pTechnique;
 		else
 		{
-			if (name == "Default")
+			if (name == "BasicVColorUnlitAlpha")
 			{
-				auto pDefaultTech = new Dive::Technique(m_pContext);
-				pDefaultTech->SetName("DefaultTech");
-				auto pPass = pDefaultTech->CreatePass("base");
-				// 실제로는 이름만 저장되어야 한다. urho3d는 Graphics에서 Load할 때 경로를 직접 추가한다.
-				pPass->SetVertexShader("CoreData/Shaders/color.hlsl");
-				pPass->SetPixelShader("CoreData/Shaders/color.hlsl");
-				// 이 부분은 잘못되었다.
-				// 실제로 Input Define는 ShaderVariation의 SetDefine으로 전달해야 한다.
-				// Path에서 추가하는 Define은 Main 내부에서 사용하는 것들이다.
+				pTechnique = new Dive::Technique(m_pContext);
+				pTechnique->SetName("BasicVColorUnlitAlpha");
+				Dive::Pass* pPass = pTechnique->CreatePass("alpha");
+				// global은 pass마다 저장하는 듯 하다.
+				// 개별 셰이더가 있다면 그때는 따로 저장한다.
+				pPass->SetVertexShader("CoreData/Shaders/Basic.hlsl");
+				pPass->SetVertexShaderDefines("VERTEXCOLOR");	// + DIFFMAP
+				pPass->SetPixelShader("CoreData/Shaders/Basic.hlsl");
+				pPass->SetPixelShaderDefines("VERTEXCOLOR");	// + DIFFMAP
+				// depthwrite = false
+				// blend = alpha
+				pCache->AddManualResource(pTechnique);
 
-				// 버퍼에는 존재하지만 InputLayout에는 포함하지 않으면 어떻게 될까?
-				// 현재 VertexBuffer와 Shader가 동일 hash여부를 확인하기 때문에
-				// 테스트가 불가능하다.
-				// => 실제로 urho는 VERTEXCOLOR를 Tech에 기술해 놓았다.
-				// 즉, VertexBuffer에 존재한다 해도 사용하지 않을 수 있어야 한다...
-				// => hash 비교구문을 주석처리하니 잘 적용된다.
-				// 흐음.. 이 부분부터 좀 더 알아보자.
-				// InputLayout은 VertexType에 맞춰 생성되었음을 확인하였다.
-				pPass->SetVertexShaderDefines("VERTEXCOLOR");
-				pPass->SetPixelShaderDefines("VERTEXCOLOR");
-				pCache->AddManualResource(pDefaultTech);
-
-				// Material 구성
-				auto pDefaultMat = new Dive::Material(m_pContext);
-				pDefaultMat->SetName("DefaultMat");
-				pDefaultMat->SetTechnique(pDefaultTech);
-				pCache->AddManualResource(pDefaultMat);
-
-				DV_LOG_CLIENT_TRACE("Default Material을 생성하였습니다.");
-
-				return pDefaultMat;
+				return pTechnique;
 			}
 		}
 

@@ -12,10 +12,10 @@ namespace Dive
 	{
 	public:
 		explicit Pass(const std::string& name);
-		~Pass() = default;
+		~Pass();
 
 		const std::string& GetName() const { return m_Name; }
-		unsigned int GetIndex() const { return m_Index; }
+		uint32_t GetIndex() const { return m_Index; }
 
 		void SetVertexShader(const std::string& name);
 		const std::string& GetVertexShaderName() const { return m_VertexShaderName; }
@@ -33,11 +33,12 @@ namespace Dive
 		std::vector<ShaderVariation*>& GetPixelShaderVariations() { return m_PixelShaderVariations; }
 
 	private:
+		// 결국 이 함수 하나때문에 클래스로 만들었다.
 		void releaseShaders();
 
 	private:
 		std::string m_Name;
-		unsigned int m_Index = 0;
+		uint32_t m_Index;
 
 		// 각종 Mode
 		// blendMode -> fog
@@ -61,15 +62,15 @@ namespace Dive
 
 	public:
 		explicit Technique(Context* pContext);
-		~Technique() override = default;
+		~Technique() override;
 
 		Pass* CreatePass(const std::string& name);
 		void RemovePass(const std::string& name);
 
-		Pass* GetPass(unsigned int index) { return index < static_cast<unsigned int>(m_Passes.size()) ? m_Passes[index] : nullptr; }
+		Pass* GetPass(uint32_t index) { return index < static_cast<uint32_t>(m_Passes.size()) ? m_Passes[index] : nullptr; }
 		Pass* GetPass(const std::string& name);
 		
-		bool HasPass(unsigned int index) { return index < static_cast<unsigned int>(m_Passes.size()) && m_Passes[index] != nullptr; }
+		bool HasPass(uint32_t index) { return index < static_cast<uint32_t>(m_Passes.size()) && m_Passes[index] != nullptr; }
 		bool HasPass(const std::string& name);
 
 		// static index들이 있다.
@@ -79,7 +80,7 @@ namespace Dive
 		bool Load(FileStream* pDeserializer) override;
 
 		// static
-		static unsigned int GetPassIndex(const std::string& name);
+		static uint32_t GetPassIndex(const std::string& name);
 		static void RegisterObject(Context* pContext);
 
 	private:
@@ -87,6 +88,6 @@ namespace Dive
 	private:
 		std::vector<Pass*> m_Passes;
 
-		static std::unordered_map<std::string, unsigned int> m_PassIndices;
+		static std::unordered_map<std::string, uint32_t> m_PassIndices;
 	};
 }

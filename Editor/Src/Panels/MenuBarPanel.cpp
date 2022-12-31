@@ -4,8 +4,7 @@
 namespace Editor
 {
 	MenuBarPanel::MenuBarPanel(Editor* pEditor)
-		: Panel(pEditor, "MenuBar"),
-		m_pModelImporter(nullptr)
+		: Panel(pEditor, "MenuBar")
 	{
 		m_bWindow = false;
 
@@ -14,9 +13,7 @@ namespace Editor
 
 	MenuBarPanel::~MenuBarPanel()
 	{
-		DV_LOG_CLIENT_TRACE("MenuBarPanel 소멸자 호출");
-
-		DV_DELETE(m_pModelImporter);
+		DV_LOG_CLIENT_TRACE("MenuBarPanel 소멸 완료");
 	}
 
 	// 메뉴바는 항상 그려져야 한다.
@@ -142,6 +139,8 @@ namespace Editor
 				}
 				
 				FIRE_EVENT(Dive::ExitRequestEvent());
+
+				DV_LOG_CLIENT_TRACE("Editor를 종료합니다.");
 			}
 
 			ImGui::EndMenu();
@@ -326,26 +325,17 @@ namespace Editor
 	{
 		if (ImGui::BeginMenu("Tools"))
 		{
-			// 새 창을 띄워 옵션을 선택토록 해야 한다.
-			// 유니티의 경우엔 파일 드래그를 하면 Inspector에 설정창이 뜬다.
+			// 인스펙터에 창을 그리는 편이 나아보인다.
 			if (ImGui::MenuItem("Model Import"))
 			{
-				/*
-				auto path = Editor::FileOpen("All Files(*.*)\0");
-				if (!path.empty())
-				{
-					// 왜인지 모르겠지만 간헐적으로 두 번째 이상 로드 시도시 멈춘다.
-					m_pEditor->GetModelImporter()->LoadFromFile(path);
-				}
-				*/
+				// 해당 창에서 파일 선택 및 기타 설정을 한 후 익스포트 버튼을 누르면 
+				// 정해진 장소에 mdl 파일을 만들어 저장하는 것이 가장 직관적일 듯 하다.
 
-				if (!m_pModelImporter)
-					m_pModelImporter = new ModelImporter;
-
-				//m_pModelImporter->LoadAndExportModel("Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
-				//m_pModelImporter->LoadAndExportModel("Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
-				m_pModelImporter->LoadAndExportModel("Assets/Models/Sponza-master/sponza.obj");
-				//m_pModelImporter->LoadAndExportModel("Assets/Models/Mong/Mong.ase");
+				m_ModelImporter.LoadAndExport("Assets/Models/Base/cube.obj");
+				//m_pModelImporter->LoadAndExport("Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
+				//m_pModelImporter->LoadAndExport("Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
+				//m_ModelImporter.LoadAndExport("Assets/Models/Sponza-master/sponza.obj");
+				//m_pModelImporter->LoadAndExport("Assets/Models/Mong/Mong.ase");
 			}
 
 			ImGui::EndMenu();

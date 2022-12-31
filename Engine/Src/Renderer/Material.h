@@ -12,7 +12,7 @@ namespace Dive
 	class FileStream;
 
 	// GraphicsDef로 옮기기
-	enum eTextureUnit
+	enum class eTextureUnit
 	{
 		Diffuse = 0,
 		Normal = 1,
@@ -29,14 +29,20 @@ namespace Dive
 		explicit Material(Context* pContext);
 		~Material() override;
 
-		Technique* GetTechnique() const { return m_pTechnique; }
-		void SetTechnique(Technique* pTech);
-		
 		// overide
 		bool Load(FileStream* pDeserializer) override;
 
 		// static
 		static void RegisterObject(Context* pContext);
+
+		Technique* GetTechnique() const { return m_pTechnique; }
+		void SetTechnique(Technique* pTech);
+
+		Texture* GetTexture(eTextureUnit unit) const;
+		void SetTexture(eTextureUnit unit, Texture* pTexture);
+		void AddTexture(eTextureUnit unit, const std::string& name);
+
+		void ResetToDefault();
 
 	private:
 	private:

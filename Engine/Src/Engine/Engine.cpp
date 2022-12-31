@@ -42,7 +42,7 @@ namespace Dive
 			return true;
 
 		m_pContext->RegisterSubsystem<Graphics>();
-		m_pContext->RegisterSubsystem<Renderer>();
+		//m_pContext->RegisterSubsystem<Renderer>();
 
 		GetSubsystem<Log>()->Initialize("Dive.log");
 
@@ -93,6 +93,8 @@ namespace Dive
 		// 이닛 프레임
 
 		// 이닛 인풋
+
+		m_pContext->RegisterSubsystem<Renderer>();	// 임시 위치(생성자 확인)
 
 		DV_LOG_ENGINE_TRACE("Engine 초기화 성공");
 		

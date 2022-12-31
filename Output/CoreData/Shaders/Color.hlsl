@@ -50,7 +50,7 @@ void mainPS(
 #ifdef VERTEXCOLOR
 	float4 color : COLOR,				// mainVS의 out과 순서가 같아야 한다.
 #endif
-	out float4 oColor : SV_TARGET)
+	out float4 oColor : SV_TARGET)		// urho는 OUTCOLOR0이라는 시맨틱을 사용하는데 나는 안된다. SV_TARGET인 듯 하다.
 {
 #ifdef VERTEXCOLOR
 	oColor = color;

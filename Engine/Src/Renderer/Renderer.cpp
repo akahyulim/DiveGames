@@ -1,16 +1,19 @@
 #include "divepch.h"
 #include "Renderer.h"
 #include "RendererEvents.h"
+#include "Material.h"
 #include "RenderPath.h"
 #include "Technique.h"
 #include "Viewport.h"
 #include "View.h"
+#include "Batch.h"
 #include "Core/CoreDefs.h"
 #include "Core/Context.h"
 #include "Engine/EngineEvents.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Texture2D.h"
+#include "Graphics/VertexBuffer.h"
 #include "Resource/ResourceCache.h"
 #include "IO/Log.h"
 
@@ -23,9 +26,11 @@ namespace Dive
 	Renderer::Renderer(Context* pContext)
 		: Object(pContext),
 		m_pGraphics(nullptr),
+		m_pDefaultMaterial(nullptr),
 		m_pDefaultRenderPath(nullptr),
 		m_pDefaultTechnique(nullptr),
-		m_bInitialized(false)
+		m_bInitialized(false),
+		m_pInstancingBuffer(nullptr)
 	{
 		// ScreenMode 메시지 구독
 
@@ -38,6 +43,14 @@ namespace Dive
 
 	Renderer::~Renderer()
 	{
+		DV_DELETE(m_pInstancingBuffer);
+
+		// 그러고 보니 이것두 직접 제거하네...
+		DV_DELETE(m_pDefaultRenderPath);
+
+		// 왜인지 모르겠지만 이건 리소스에 등록을 안했다.
+		DV_DELETE(m_pDefaultMaterial);
+
 		for (int32_t i = 0; i < static_cast<int32_t>(m_Viewports.size()); ++i)
 			DV_DELETE(m_Viewports[i]);
 		m_Viewports.clear();
@@ -105,6 +118,11 @@ namespace Dive
 
 		// 이미 생성되었다면 m_bViewReset = true;
 	}
+	
+	RenderPath* Renderer::GetDefaultRenderPath() const
+	{
+		return m_pDefaultRenderPath;
+	}
 
 	void Renderer::SetDefaultRenderPath(RenderPath* pRenderPath)
 	{
@@ -112,22 +130,23 @@ namespace Dive
 			m_pDefaultRenderPath = pRenderPath;
 	}
 
-	RenderPath* Renderer::GetDefaultRenderPath() const
+	// 원래는 const이다. 현재 직접 생성을 위해 제거했다.
+	Technique* Renderer::GetDefaultTechnique()
 	{
 		// 비었다면 Cache에 파일명을 전달하여 직접생성한 후 설정
-		return m_pDefaultRenderPath;
+		// NoTexture.xml
+		
+		// 현재 최초 생성은 Material의 ResetToDefault()에서 구성된다.
+		if (!m_pDefaultTechnique)
+			m_pDefaultTechnique = GetSubsystem<ResourceCache>()->GetResource<Technique>("DefaultTech");
+
+		return m_pDefaultTechnique;
 	}
 
 	void Renderer::SetDefaultTechnique(Technique* pTechnique)
 	{
 		if (pTechnique)
 			m_pDefaultTechnique = pTechnique;
-	}
-
-	Technique* Renderer::GetDefaultTechnique() const
-	{
-		// 비었다면 Cache에 파일명을 전달하여 직접생성한 후 설정
-		return m_pDefaultTechnique;
 	}
 
 	Viewport* Renderer::GetViewport(uint32_t index)
@@ -197,6 +216,45 @@ namespace Dive
 			queueViewport(pRenderTarget, pRenderTarget->GetViewport(i));
 	}
 
+	void Renderer::SetBatchShaders(Batch& batch, Technique& tech, bool bAllowShadow, const BatchQueue& queue)
+	{
+		Pass* pPass = batch.GetPass();
+
+		auto vertexShaderVariations = pPass->GetVertexShaderVariations();
+		auto pixelShaderVariations = pPass->GetPixelShaderVariations();
+
+		if (vertexShaderVariations.empty() || pixelShaderVariations.empty())
+		{
+			// 여기서부터 LoadPassShaders다.
+			// shader defines를 참조해 variation들을 만들거나 가져온다.
+
+			vertexShaderVariations.clear();
+			pixelShaderVariations.clear();
+
+			// shader defines부터 구성한다.
+
+			vertexShaderVariations.emplace_back(
+				m_pGraphics->GetShader(eShaderType::Vertex, pPass->GetVertexShaderName(), pPass->GetVertexShaderDefines()));
+
+			pixelShaderVariations.emplace_back(
+				m_pGraphics->GetShader(eShaderType::Pixel, pPass->GetPixelShaderName(), pPass->GetPixelShaderDefines()));
+		}
+
+		if (!vertexShaderVariations.empty() && !pixelShaderVariations.empty())
+		{
+			// batch geometry를 다시 설정한다. 이게 최종일 듯.
+
+			// 이후 현재 batch가 사용하는 최종 variation을 설정한다.
+			batch.SetVertexShaderVariation(vertexShaderVariations[0]);
+			batch.SetPixelShaderVariation(pixelShaderVariations[0]);
+		}
+
+		if (!batch.GetVertexShaderVariation() || !batch.GetPiexelShaderVariation())
+		{
+			DV_LOG_ENGINE_ERROR("Renderer::SetBatchShaders - ");
+		}
+	}
+
 	void Renderer::initialize()
 	{
 		auto pGraphics = GetSubsystem<Graphics>();
@@ -210,13 +268,46 @@ namespace Dive
 		// default light ramp
 		// default light spot
 
-		// default material 생성
+		// default material 생성: 내부에서 직접 초기화한다.
+		m_pDefaultMaterial = new Material(m_pContext);
 
 		// 객체를 생성한 후 cache manager로부터 load
+		// 그런데 왜 캐스로 부터 가져온 후 로드를 하는거지?
 		// default render path
+		m_pDefaultRenderPath = new RenderPath(m_pContext);
+		{
+			// 실제로는 forward.xml을 로드
+			{
+				RenderPathCommand command;
+				command.Type = eRenderCommandType::Clear;
+				command.ClearColor = { 0.6f, 0.6f, 0.6f, 1.0f };
+				command.ClearDepth = 1.0f;
+				command.ClearStencil = 0;
+				command.Outputs.resize(1);
+				command.Outputs.emplace_back("viewport", PositiveX);	// 원래는 Load에서 초기화된다.
+				m_pDefaultRenderPath->AddCommand(command);
+			}
+			{
+				RenderPathCommand command;
+				command.Type = eRenderCommandType::ScenePass;
+				command.Pass = "base";
+				m_pDefaultRenderPath->AddCommand(command);
+			}
+
+			{
+				RenderPathCommand command;
+				command.Type = eRenderCommandType::ScenePass;
+				// 얘네를 gpu로 보내야 하는데 어디서 수행할까?
+				command.Pass = "alpha";
+				command.bVertexLights = "true";
+				// sort와 meta data도 가진다.
+				m_pDefaultRenderPath->AddCommand(command);
+			}
+		}
 
 		// create geometries
 		// create instancing buffer
+		createInstancingBuffer();
 
 		// reset shadow map
 		// reset buffers
@@ -226,6 +317,22 @@ namespace Dive
 		SUBSCRIBE_EVENT(eEventType::RenderUpdate, EVENT_HANDLER_PARAM(OnRenderUpdate));
 
 		DV_LOG_ENGINE_TRACE("Renderer 초기화 성공");
+	}
+
+	// 하나의 오브젝트를 여러번 그리는 것이니
+	// 개별 버퍼가 아니라 하나의 버퍼로 관리하는 것이 효율적이다.
+	// 그렇다면 대상 오브젝트의 Elements 구성을 유지한 체
+	// 지오메트리 정보 또한 복사를 하고
+	// 다시 매 오브젝트마다 위치 변환 행렬을 lock/unlock해야 하는데...
+	// => 지오메트리 정보를 넣지 않는다.
+	// 변환행렬과 추가 인스턴스 데이터만 관리하는 버퍼이다.
+	// 그리고 SetVertexBuffers를 사용하여 배열로 적용시킨다.
+	void Renderer::createInstancingBuffer()
+	{
+		m_pInstancingBuffer = new VertexBuffer(m_pContext);
+		// elements를 구성한 후
+		// 최대개수 = 1024로 설정한다.
+		// ResizeInstancingBuffer()로 전달받은 개수 이상의 2진수 배열 크기로 만드는 함수도 필요하다.
 	}
 
 	void Renderer::queueViewport(Texture* pRenderTarget, Viewport* pViewport)
@@ -238,8 +345,8 @@ namespace Dive
 
 	void Renderer::updateQueuedViewport(uint32_t index)
 	{
-		auto* pRenderTarget = m_QueuedViewports[index].first;
-		auto* pViewport = m_QueuedViewports[index].second;
+		Texture* pRenderTarget = m_QueuedViewports[index].first;
+		Viewport* pViewport = m_QueuedViewports[index].second;
 
 		if (!pViewport->GetView())
 			pViewport->AllocateView();

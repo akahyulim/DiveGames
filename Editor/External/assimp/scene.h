@@ -83,9 +83,9 @@ struct ASSIMP_API aiNode {
     /** The name of the node.
      *
      * The name might be empty (length of zero) but all nodes which
-     * need to be referenced by either bones or animations are named.
+     * need to be referenced by either Bones or Animations are named.
      * Multiple nodes may have the same name, except for nodes which are referenced
-     * by bones (see #aiBone and #aiMesh::mBones). Their names *must* be unique.
+     * by Bones (see #aiBone and #aiMesh::mBones). Their names *must* be unique.
      *
      * Cameras and lights reference a specific node by name - if there
      * are multiple nodes with this name, they are assigned to each of them.
@@ -111,18 +111,18 @@ struct ASSIMP_API aiNode {
     C_STRUCT aiNode* mParent;
 
     /** The number of child nodes of this node. */
-    unsigned int mNumChildren;
+    uint32_t mNumChildren;
 
     /** The child nodes of this node. nullptr if mNumChildren is 0. */
     C_STRUCT aiNode** mChildren;
 
-    /** The number of meshes of this node. */
-    unsigned int mNumMeshes;
+    /** The number of Meshes of this node. */
+    uint32_t mNumMeshes;
 
-    /** The meshes of this node. Each entry is an index into the
+    /** The Meshes of this node. Each entry is an index into the
       * mesh list of the #aiScene.
       */
-    unsigned int* mMeshes;
+    uint32_t* mMeshes;
 
     /** Metadata associated with this node or nullptr if there is no metadata.
       *  Whether any metadata is generated depends on the source file format. See the
@@ -167,7 +167,7 @@ struct ASSIMP_API aiNode {
      * @param   numChildren  Number of children to add.
      * @param   children     The array with pointers showing to the children.
      */
-    void addChildren(unsigned int numChildren, aiNode **children);
+    void addChildren(uint32_t numChildren, aiNode **children);
 #endif // __cplusplus
 };
 
@@ -203,7 +203,7 @@ struct ASSIMP_API aiNode {
 
 /**
  * This flag is currently only set by the aiProcess_JoinIdenticalVertices step.
- * It indicates that the vertices of the output meshes aren't in the internal
+ * It indicates that the vertices of the output Meshes aren't in the internal
  * verbose format anymore. In the verbose format all vertices are unique,
  * no vertex is ever referenced by more than one face.
  */
@@ -247,7 +247,7 @@ struct aiScene
     * want to reject all scenes with the AI_SCENE_FLAGS_INCOMPLETE
     * bit set.
     */
-    unsigned int mFlags;
+    uint32_t mFlags;
 
     /** The root node of the hierarchy.
     *
@@ -258,10 +258,10 @@ struct aiScene
     */
     C_STRUCT aiNode* mRootNode;
 
-    /** The number of meshes in the scene. */
-    unsigned int mNumMeshes;
+    /** The number of Meshes in the scene. */
+    uint32_t mNumMeshes;
 
-    /** The array of meshes.
+    /** The array of Meshes.
     *
     * Use the indices given in the aiNode structure to access
     * this array. The array is mNumMeshes in size. If the
@@ -271,7 +271,7 @@ struct aiScene
     C_STRUCT aiMesh** mMeshes;
 
     /** The number of materials in the scene. */
-    unsigned int mNumMaterials;
+    uint32_t mNumMaterials;
 
     /** The array of materials.
     *
@@ -282,18 +282,18 @@ struct aiScene
     */
     C_STRUCT aiMaterial** mMaterials;
 
-    /** The number of animations in the scene. */
-    unsigned int mNumAnimations;
+    /** The number of Animations in the scene. */
+    uint32_t mNumAnimations;
 
-    /** The array of animations.
+    /** The array of Animations.
     *
-    * All animations imported from the given file are listed here.
+    * All Animations imported from the given file are listed here.
     * The array is mNumAnimations in size.
     */
     C_STRUCT aiAnimation** mAnimations;
 
     /** The number of textures embedded into the file */
-    unsigned int mNumTextures;
+    uint32_t mNumTextures;
 
     /** The array of embedded textures.
     *
@@ -306,7 +306,7 @@ struct aiScene
     /** The number of light sources in the scene. Light sources
     * are fully optional, in most cases this attribute will be 0
         */
-    unsigned int mNumLights;
+    uint32_t mNumLights;
 
     /** The array of light sources.
     *
@@ -318,7 +318,7 @@ struct aiScene
     /** The number of cameras in the scene. Cameras
     * are fully optional, in most cases this attribute will be 0
         */
-    unsigned int mNumCameras;
+    uint32_t mNumCameras;
 
     /** The array of cameras.
     *
@@ -345,7 +345,7 @@ struct aiScene
     /**
      *
      */
-    unsigned int mNumSkeletons;
+    uint32_t mNumSkeletons;
 
     /**
      *
@@ -360,7 +360,7 @@ struct aiScene
     //! Destructor
     ASSIMP_API ~aiScene();
 
-    //! Check whether the scene contains meshes
+    //! Check whether the scene contains Meshes
     //! Unless no special scene flags are set this will always be true.
     inline bool HasMeshes() const {
         return mMeshes != nullptr && mNumMeshes > 0;
@@ -387,7 +387,7 @@ struct aiScene
         return mCameras != nullptr && mNumCameras > 0;
     }
 
-    //! Check whether the scene contains animations
+    //! Check whether the scene contains Animations
     inline bool HasAnimations() const {
         return mAnimations != nullptr && mNumAnimations > 0;
     }
@@ -430,7 +430,7 @@ struct aiScene
             return std::make_pair(nullptr, -1);
         }
 
-        for (unsigned int i = 0; i < mNumTextures; i++) {
+        for (uint32_t i = 0; i < mNumTextures; i++) {
             const char* shortTextureFilename = GetShortFilename(mTextures[i]->mFilename.C_Str());
             if (strcmp(shortTextureFilename, shortFilename) == 0) {
                 return std::make_pair(mTextures[i], i);

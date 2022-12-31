@@ -114,7 +114,7 @@ namespace Dive
 		// Draw 함수들: 총 5개
 		void Draw(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t vertexCount, uint32_t vertexStart);
 		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t indexStart, uint32_t vertexStart);
-		//void DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t instanceCount, uint32_t indexStart);
+		void DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t instanceCount, uint32_t indexStart);
 
 		void SetDepthStencil(Texture2D* pTexture);
 
@@ -222,6 +222,10 @@ namespace Dive
 		std::unordered_map<uint64_t, InputLayout*> m_InputLayouts;
 
 		Texture* m_pTextures[16];
+		// 얘네는 원래 impl에서 관리하던 거다.
+		ID3D11ShaderResourceView* m_pShaderResourceViews[16];
+		ID3D11SamplerState* m_pSamplers[16];
+		bool m_bTextureDirty;	// 이것두 impl에서 관리했다.
 
 		// dirty check 전부 모으기.
 		bool m_bVertexTypeDirty;

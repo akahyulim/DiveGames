@@ -11,37 +11,45 @@ namespace Dive
 	class ShaderVariation;
 
 	// urho의 Batch이며, 결국 이게 Draw Call이다.
-	struct Batch
+	// 이름을 DrawCall로 바꾸는 것을 염두해두자.
+	// => StaticBatch가 나을 것 같다.
+	class Batch
 	{
-		Batch()
-			: m_pMesh(nullptr),
-			m_pMaterial(nullptr),
-			m_pWorldTransform(nullptr),
-			m_pPass(nullptr),
-			m_pVertexShaderVariation(nullptr),
-			m_pPixelShaderVariation(nullptr),
-			m_GeometryType(eGeometryType::Static)
-		{}
-
-		Batch(const DrawableSourceData& data)
-			: m_pMesh(data.pMesh),
-			m_pMaterial(data.pMaterial),
-			m_pWorldTransform(data.pWorldTransform),
-			m_pPass(nullptr),
-			m_pVertexShaderVariation(nullptr),
-			m_pPixelShaderVariation(nullptr), 
-			m_GeometryType(data.GeometryType)
-		{}
-
+	public:
+		Batch() = default;
+		Batch(const DrawableSourceData& data);
+		
 		// view와 camera를 받는다.
 		void Prepare(View* pView);
 		// 역시 view와 camera를 받는다.
 		void Draw(View* pView);
 
+		Mesh* GetMesh() const { return m_pMesh; }
+		
+		Material* GetMaterial() const { return m_pMaterial; }
+		void SetMaterial(Material* pMaterial) { m_pMaterial = pMaterial; }
+		
+		DirectX::XMFLOAT4X4 GetWorldTransform() const { return m_WorldTransform; }
+
+		Pass* GetPass() const { return m_pPass; }
+		void SetPass(Pass* pPass) { m_pPass = pPass; }
+
+		ShaderVariation* GetVertexShaderVariation() const { return m_pVertexShaderVariation; }
+		void SetVertexShaderVariation(ShaderVariation* pVariation) { m_pVertexShaderVariation = pVariation; }
+
+		ShaderVariation* GetPiexelShaderVariation() const { return m_pPixelShaderVariation; }
+		void SetPixelShaderVariation(ShaderVariation* pVariation) { m_pPixelShaderVariation = pVariation; }
+
+		eGeometryType GetGeometryType() const { return m_GeometryType; }
+		void SetGeometryType(eGeometryType type) { m_GeometryType = type; }
+
+	protected:
+		//float Distance;
 		Mesh* m_pMesh;
 		Material* m_pMaterial;
-		const DirectX::XMFLOAT4X4* m_pWorldTransform;
+		DirectX::XMFLOAT4X4 m_WorldTransform;
 		Pass* m_pPass;
+		// 사실 ShaderVariation들은 Pass에도 이미 존재한다.
 		ShaderVariation* m_pVertexShaderVariation;
 		ShaderVariation* m_pPixelShaderVariation;
 		eGeometryType m_GeometryType;
@@ -51,34 +59,27 @@ namespace Dive
 	// 인스턴싱에 사용될 데이터들을 관리하는 구조체
 	struct InstanceData
 	{
-		InstanceData()
-			: m_pInstancingData(nullptr),
-			m_pWorldTransform(nullptr),
-			m_Distance(0.0f)
-		{}
-
-		InstanceData(const void* pInstancingData, const DirectX::XMFLOAT4X4* pWorldTransform, float distance )
-			: m_pInstancingData(pInstancingData),
-			m_pWorldTransform(pWorldTransform),
-			m_Distance(distance)
-		{}
-
-		const void* m_pInstancingData;
-		const DirectX::XMFLOAT4X4* m_pWorldTransform;
-		float m_Distance;
+		// const라면 생성자에서 받아야 한다. 따라서 클래스로 만들어야 한다?
+		// => 포프는 구조체 뿐만 아니라 클래스에도 const 그리고 참조 멤버 변수를 만들지 마라고 한다.
+		void* pInstancingData;
+		DirectX::XMFLOAT4X4* pWorldTransform;
+		float Distance;
 	};
 
 	// batch group
 	// 인스턴싱 지오메트리를 관리하는 구조체
-	struct BatchGroup : public Batch
+	class InstancingBatch : public Batch
 	{
-		// AddTransforms
+	public:
+		void AddTransforms(const Batch& batch);
+		
+		void SetInstancingData(void* pLockedData, uint32_t stride, uint32_t& freeIndex);
 
-		// SetInstancingData
+		void Draw(View* pView);
 
-		// Draw : override?
-
+	private:
 		std::vector<InstanceData> m_InstanceDatas;
+		uint32_t m_StartIndex;	// 이건 최대값으로 초기화한다.
 	};
 
 	// batch group key
@@ -88,16 +89,32 @@ namespace Dive
 	// Batch와 BatchGroup를 가지는 큐
 	// 정렬함수와 draw 함수를 가지며,
 	// draw 함수의 경우 Batch, BatchGroup의 것을 사용한다.
-	struct BatchQueue
+	// => Pope는 Struct에 함수를 넣지 마라고 한다.
+	class BatchQueue
 	{
-		// clear
-		// draw
+	public:
+		BatchQueue() = default;
+		~BatchQueue() = default;
 
-		// sort - batckToFront, FrontToBack
+		void Clear();
 
-		// SetInatancingData 역시 이 곳에 있다.
+		void Draw(View* pView) const;
 
+		void AddStaticBatch(const Batch& batch) { m_Batches.emplace_back(batch); }
+		void AddInstancingBatch(const InstancingBatch& batch) { m_InstancingBatches.emplace_back(batch); }
+
+		void SortBackToFront();
+		void SortFrontToBack();
+
+		void SetInstancingData(void* pLockedData, uint32_t stride, uint32_t& freeIndex);
+		
+		bool IsEmpty() const { return m_Batches.empty() && m_InstancingBatches.empty(); }
+
+	private:
 		std::vector<Batch> m_Batches;
 		std::vector<Batch*> m_SortedBatches;
+
+		std::vector<InstancingBatch> m_InstancingBatches;	//key를 가지는 map이어야 한다.
+		std::vector<InstancingBatch*> m_SortedInstancingBatches;
 	};
 }

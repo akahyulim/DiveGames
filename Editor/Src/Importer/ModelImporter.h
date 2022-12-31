@@ -12,17 +12,24 @@ namespace Editor
 {
 	struct OutModel
 	{
-		std::string outName;
-		aiNode* pRootNode = nullptr;
-		aiNode* pRootBone = nullptr;
-		std::set<unsigned int> meshIndices;
-		std::vector<aiMesh*> meshes;
-		std::vector<aiNode*> meshNodes;
-		std::vector<aiNode*> bones;
-		std::vector<aiNode*> pivotlessBones;
-		std::vector<aiAnimation*> animations;
-		uint32_t totalNumVertices = 0;
-		uint32_t totalNumIndices = 0;
+		OutModel()
+			: pRootNode(nullptr),
+			pRootBone(nullptr),
+			TotalVertexCount(0),
+			TotalIndexCount(0)
+		{}
+
+		std::string OutName;
+		aiNode* pRootNode;
+		aiNode* pRootBone;
+		std::set<uint32_t> MeshIndices;
+		std::vector<aiMesh*> Meshes;
+		std::vector<aiNode*> MeshNodes;
+		std::vector<aiNode*> Bones;
+		std::vector<aiNode*> PivotlessBones;
+		std::vector<aiAnimation*> Animations;
+		uint32_t TotalVertexCount;
+		uint32_t TotalIndexCount;
 	};
 	
 	// 각종 설정을 외부에서 변경할 수 있어야 한다.
@@ -37,7 +44,7 @@ namespace Editor
 		ModelImporter();
 		~ModelImporter();
 
-		bool LoadAndExportModel(const std::string& filepath);
+		bool LoadAndExport(const std::string& filepath);
 
 		// 각종 설정
 		
@@ -53,7 +60,7 @@ namespace Editor
 		void printMeshData(OutModel& model);
 
 	private:
-		aiScene* m_pScene;
+		aiScene* m_pAiScene;
 		bool m_bAnimations;
 		bool m_bMaterials;
 

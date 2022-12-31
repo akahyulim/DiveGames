@@ -10,8 +10,12 @@ namespace Dive
 	class Event;
 	class Texture;
 	class Texture2D;
+	class VertexBuffer;
 	class ShaderVariation;
+	class Material;
 	class RenderPath;
+	class Batch;
+	class BatchQueue;
 	class Technique;
 
 	class Renderer : public Object
@@ -28,12 +32,14 @@ namespace Dive
 		void OnRenderUpdate(const Event& e);
 		void OnScreenMode(const Event& e);
 
-		void SetDefaultRenderPath(RenderPath* pRenderPath);
+		Material* GetDefaultMaterial() const { return m_pDefaultMaterial; }
+
 		RenderPath* GetDefaultRenderPath() const;
+		void SetDefaultRenderPath(RenderPath* pRenderPath);
 
+		Technique* GetDefaultTechnique();
 		void SetDefaultTechnique(Technique* pTechnique);
-		Technique* GetDefaultTechnique() const;
-
+		
 		Viewport* GetViewport(uint32_t index);
 		void SetViewport(uint32_t index, Viewport* pView);
 
@@ -41,10 +47,16 @@ namespace Dive
 
 		void QueueViewportByRenderTarget(Texture* pRenderTarget);
 
+		VertexBuffer* GetInstancingBuffer() { return m_pInstancingBuffer; }
+
+		void SetBatchShaders(Batch& batch, Technique& tech, bool bAllowShadow, const BatchQueue& queue);
+
 	private:
 		void initialize();
 
 		void createRenderTargets();
+
+		void createInstancingBuffer();
 
 		// shaders
 		// blenders
@@ -56,6 +68,8 @@ namespace Dive
 
 	private:
 		Graphics* m_pGraphics;
+
+		Material* m_pDefaultMaterial;
 		RenderPath* m_pDefaultRenderPath;
 		Technique* m_pDefaultTechnique;
 
@@ -71,5 +85,7 @@ namespace Dive
 		// 다만 그 과정에서 key를 사용한다는 점이 좀 복잡하다.
 		std::unordered_map<uint64_t, uint32_t> m_ScreenBufferIndices;
 		std::unordered_map<uint64_t, std::vector<Texture*>> m_ScreenBuffers;
+
+		VertexBuffer* m_pInstancingBuffer;
 	};
 }

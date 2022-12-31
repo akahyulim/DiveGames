@@ -6,12 +6,15 @@ namespace Dive
 	class Graphics;
 	class Renderer;
 	class Scene;
+	class RenderPath;
+	struct RenderPathCommand;
 	class Texture;
 	class Viewport;
 	class Mesh;
 	class Drawable;
-	struct Batch;
-	struct BatchQueue;
+	class Technique;
+	class Batch;
+	class BatchQueue;
 
 	enum class eRenderPath;
 
@@ -24,6 +27,7 @@ namespace Dive
 			bVertexLight(false),
 			pBatchQueue(nullptr)
 		{}
+		ScenePassInfo(const ScenePassInfo& rhs) = default;
 
 		uint32_t PassIndex;
 		bool bAllowInstancing;
@@ -46,15 +50,27 @@ namespace Dive
 		bool Define(Texture* pRenderTarget, Viewport* pViewport);
 
 		Graphics* GetGraphics() const { return m_pGraphics; }
+		Renderer* GetRenderer() const { return m_pRenderer; }
 
 	private:
 		void getDrawables();
 		void getBaseBatches();
 
+		void addBatchToQueue(BatchQueue& queue, Batch& batch, Technique* pTech, bool bAllowInstancing);
+
+		void executeRenderPathCommands();
+
+		void setRenderTargets(RenderPathCommand* pCommand);
+		void setTextures(RenderPathCommand* pCommand);
+
+		Texture* findNamedTexture(const std::string& name, bool bRenderTarget);
+
 	private:
 		Graphics* m_pGraphics;
 		Renderer* m_pRenderer;
 		Scene* m_pScene;
+
+		RenderPath* m_pRenderPath;
 
 		Texture* m_pRenderTarget;
 		Texture* m_pCurRenderTarget;
@@ -63,11 +79,9 @@ namespace Dive
 		DirectX::XMINT2 m_ViewSize;
 		DirectX::XMINT2 m_RenderTargetSize;
 
-		std::vector<ScenePassInfo> m_ScenePasses;
-
 		std::vector<Drawable*> m_Drawables;
 
-		// 이렇게 관리하면 안될 듯 하다. pass index와 BatchQueue로 관리해야 한다.
-		std::vector<Batch> m_BaseBatchRenderers;
+		std::vector<ScenePassInfo> m_ScenePasses;
+		std::unordered_map<uint32_t, BatchQueue> m_BatchQueues;
 	};
 }

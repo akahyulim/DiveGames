@@ -21,6 +21,7 @@
 #include "Scene/Component/Drawable.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
+#include "IO/FileSystem.h"
 #include "Math/Math.h"
 
 namespace Dive 
@@ -30,14 +31,14 @@ namespace Dive
 		m_pGraphics(GetSubsystem<Graphics>()),
 		m_pRenderer(GetSubsystem<Renderer>()),
 		m_pScene(nullptr),
+		m_pRenderPath(nullptr),
 		m_pRenderTarget(nullptr),
-		m_pCurRenderTarget(nullptr)
+		m_pCurRenderTarget(nullptr),
+		m_ViewRect({ 0,0,0,0 }),
+		m_ViewSize(0, 0),
+		m_RenderTargetSize(0, 0)
 	{
 		DV_ASSERT(m_pGraphics->IsInitialized());
-
-		m_ViewRect = { 0, 0, 0, 0 };
-		m_ViewSize = { 0 ,0 };
-		m_RenderTargetSize = { 0, 0 };
 	}
 
 	View::~View()
@@ -58,39 +59,18 @@ namespace Dive
 	void View::Render()
 	{
 		// UpdateGeometries
+		// 여기에서 queue를 sort를 한다.
 
-		// 현재 RenderPath를 하드코딩 해놓은 상태이다.
-		// Clear
-		{
-			m_pCurRenderTarget = m_pRenderTarget;
-
-			//eClearTarget flags = eClearTarget::Color | eClearTarget::Depth | eClearTarget::Stencil;
-			m_pGraphics->SetRenderTarget(0, dynamic_cast<Texture2D*>(m_pCurRenderTarget));
-			m_pGraphics->Clear(0, DirectX::XMFLOAT4(1.0f, 1.0f, 0.6f, 1.0f), 1.0f, 0);
-
-			// 이건 임시 위치
-			m_pGraphics->SetViewportRect(m_ViewRect);
-		}
-
-		// ScenePass
-		{
-			auto pDeviceContext = m_pGraphics->GetDeviceContext();
-			
-			for (auto batchRenderer : m_BaseBatchRenderers)
-			{
-				batchRenderer.Draw(this);
-			}
-
-			// 위치가 애매하다. 하지만 clear하는 것이 맞다.
-			m_BaseBatchRenderers.clear();
-		}
+		executeRenderPathCommands();
 	}
 	
 	bool View::Define(Texture* pRenderTarget, Viewport* pViewport)
 	{
-		m_pRenderTarget = pRenderTarget;
+		m_pRenderPath = pViewport->GetRenderPath();
+		if (!m_pRenderPath)
+			return false;
 
-		// pViewport로부터 RenderPath를 획득
+		m_pRenderTarget = pRenderTarget;
 		m_pScene = pViewport->GetScene();
 		// 카메라도 획득
 
@@ -98,7 +78,7 @@ namespace Dive
 		int height = pRenderTarget ? pRenderTarget->GetHeight() : m_pGraphics->GetHeight();
 		m_RenderTargetSize = DirectX::XMINT2(width, height);
 
-		auto rect = pViewport->GetRect();
+		RECT rect = pViewport->GetRect();
 		if (rect.left == 0 && rect.right == 0 && rect.top == 0 && rect.bottom == 0)
 		{
 			m_ViewRect.left = 0;
@@ -118,10 +98,28 @@ namespace Dive
 		// 각종 초기화
 		m_ScenePasses.clear();
 
-		// ScenePasses라는 것을 구성한다.
-		// 이는 RenderPathCommand와 Technique의 Pass를 연결하는 과정 같다.
+		// pass별 BatchQueue를 생성
+		for(uint32_t i = 0; i < m_pRenderPath->GetCommandCount(); ++i)
 		{
+			RenderPathCommand* pCommand = m_pRenderPath->GetCommand(i);
+			// unabled 확인
 
+			if (pCommand->Type == eRenderCommandType::ScenePass)
+			{
+				ScenePassInfo info;
+				info.PassIndex = pCommand->PassIndex = Technique::GetPassIndex(pCommand->Pass);
+				info.bAllowInstancing;
+				info.bMarkStencil;
+				info.bVertexLight = pCommand->bVertexLights;
+
+				// 현재 pass의 BatchQueue를 추가
+				auto it = m_BatchQueues.find(info.PassIndex);
+				if (it == m_BatchQueues.end())
+					m_BatchQueues.emplace(info.PassIndex, BatchQueue());
+				info.pBatchQueue = &m_BatchQueues[info.PassIndex];
+
+				m_ScenePasses.emplace_back(info);
+			}
 		}
 
 		// 이외에도 남은 처리가 존재한다.
@@ -148,69 +146,227 @@ namespace Dive
 		}
 	}
 
+	// 일단 이 ScenePass 등에 대한 이해를 다시 한 후
+	// BatchQueue를 구성하고 Draw까지 해보자.
 	void View::getBaseBatches()
 	{
 		for (auto it = m_Drawables.begin(); it != m_Drawables.end(); ++it)
 		{
-			auto pDrawable = *it;
-
+			Drawable* pDrawable = *it;
 			const auto& sourceDatas = pDrawable->GetSourceDatas();
 
-			for (unsigned i = 0; i < static_cast<uint32_t>(sourceDatas.size()); ++i)
+			for (uint32_t i = 0; i < static_cast<uint32_t>(sourceDatas.size()); ++i)
 			{
-				const auto& drawableBatch = sourceDatas[i];
+				const DrawableSourceData& drawableBatch = sourceDatas[i];
 				
-				// 실제로는 ScenePasses에 루프를 돌려 Batch를 생성한 후 AddBatchToQueue()에서 저장한다.
-				// 즉, Batches는 Pass에 맞춰 batch를 관리하는 구조체이다.
-
-				// AddBatchToQueue()는 결국 static과 instance를 구분하여 저장하는 처리이다.
-				// 이를 이용해 batch rendering이 아닌 insctancing rendering이 가능하게 된다.
-
-				auto* pTech = drawableBatch.pMaterial->GetTechnique();
+				// 여기에서 Material이 없다면 에러가 발생한다.
+				// urho는 GetTechnique이라는 함수를 만들어 drawable과 material을 전달하여 technique을 리턴받도록 했다.
+				Technique* pTech = drawableBatch.pMaterial->GetTechnique();
 				if (!pTech)
 					continue;
 
-				// ScenePasses 루프
+				// Pass별 BatchQueue에 Batch를 구성해 등록한다.
+				// 여기에서 Batch는 일반과 Instanced로 나누어 관리한다.
+				// 그리고 ScenePasses에 존재하는 BatchQueue는 m_BatchQueues의 요소이다.
+				// Draw는 여기에서 구성된 BatchQeueue를 m_BatchQeuue로 접근하여 사용하는 것이다.
+				for(uint32_t j = 0; j < static_cast<uint32_t>(m_ScenePasses.size()); ++j)
 				{
-					// pTech로부터 pass를 가져와야하는데 인덱스가 필요하다.
-					// urho는 ScenePassInfo에 인덱스가 있다.
-					auto* pPass = pTech->GetPass(0);
+					ScenePassInfo& info = m_ScenePasses[j];
+
+					// base index라는 걸 skip한다.. 아직 이해 불가.
+
+					Pass* pPass = pTech->GetPass(info.PassIndex);
+					if (!pPass)
+						continue;
 
 					Batch batch(drawableBatch);
-					batch.m_pPass = pPass;
-					
-					// Renderer::SetBatchShaders
+					batch.SetPass(pPass);
+
+					// vertexLight와 vertexColor은 다르다. 혼동한 듯 하다.
+					if (info.bVertexLight)
 					{
-						auto vertexShaderVariations = pPass->GetVertexShaderVariations();
-						auto pixelShaderVariations = pPass->GetPixelShaderVariations();
-
-						// Renderer::LoadPassShaders
-						if(vertexShaderVariations.empty() || pixelShaderVariations.empty())
-						{
-							vertexShaderVariations.clear();
-							pixelShaderVariations.clear();
-
-							// 아래의 GetShader에는 Tech의 Define만 전달하여 생성하였다.
-							// 하지만 실제로는 geometry, light, deferredLight 등 Shader의 Input에 따라 배열로 지정한
-							// Define을 추가로 덧붙여 전달해야 한다.
-							// 이 과정을 통해 ShaderVariations는 배열의 형태를 띄게 된다.
-
-							vertexShaderVariations.emplace_back(
-								m_pGraphics->GetShader(eShaderType::Vertex, pPass->GetVertexShaderName(), pPass->GetVertexShaderDefines()));
-
-							pixelShaderVariations.emplace_back(
-								m_pGraphics->GetShader(eShaderType::Pixel, pPass->GetPixelShaderName(), pPass->GetPixelShaderDefines()));
-						}
-
-						// 위의 ::LoadPassShaders() 과정에서 배열로 구성된 ShaderVariations 중
-						// 현재 Batch에 맞는 Variation을 찾아 설정해 주어야 한다.
-						batch.m_pVertexShaderVariation = vertexShaderVariations[0];
-						batch.m_pPixelShaderVariation = pixelShaderVariations[0];
+						// light를 찾아 등록한다. 자세히는 모르겠다.
+					}
+					else
+					{
+						// 여긴 batch의 lightQueue에 nullptr를 추가한다.
 					}
 
-					m_BaseBatchRenderers.emplace_back(batch);
+					// 마지막 인자인 allowInstancint 여부를 먼저 설정해야 한다.
+					addBatchToQueue(*info.pBatchQueue, batch, pTech, false);
 				}
 			}
 		}
+	}
+
+	// light, geometry queue가 다르기 때문에 인자로 받는다.
+	// 일단 allowShadows는 뺐다.
+	void View::addBatchToQueue(BatchQueue& queue, Batch& batch, Technique* pTech, bool bAllowInstancing)
+	{
+		if (!batch.GetMaterial())
+			batch.SetMaterial(m_pRenderer->GetDefaultMaterial());
+	
+		// batch의 eGeomtryType이 static이라도 allowInstancing이고 indexbuffer가 존재한다면 instancing으로 바꾼다.
+		// 일단 static만 구현하자.
+		batch.SetGeometryType(eGeometryType::Static);
+
+		if (batch.GetGeometryType() == eGeometryType::Instanced)
+		{
+			// 해당 batch로 hash key를 만든다.
+
+			// 전달받은 queue의 batchGroup에 해당 키를 가진 group이 있나 확인한다.
+			// 없는 경우 일단 group을 생성하고 queue에 추가한다.
+			{
+				// geometry type은 일단 static으로 한다. 이유는 단일 사용일 수 있기 때문? 
+			}
+
+			// 추가 처리
+		}
+		else
+		{
+			// static인 경우 queue의 batches에 추가한다.
+			// 다만 이때 worldTransform은 하나 혹은 다수일 어떤 처리를 하는데 아직 모르겠다.
+			m_pRenderer->SetBatchShaders(batch, *pTech, false, queue);
+			queue.AddStaticBatch(batch);
+		}
+	}
+
+	void View::executeRenderPathCommands()
+	{
+		for (uint32_t i = 0; i < m_pRenderPath->GetCommandCount(); ++i)
+		{
+			RenderPathCommand* pCommand = m_pRenderPath->GetCommand(i);
+
+			switch (pCommand->Type)
+			{
+			case eRenderCommandType::Clear:
+			{
+				setRenderTargets(pCommand);
+				// 첫 번째 인자 역시 command의 clear flags이다.
+				// 그런데 정의가 좀 생소하다.
+				m_pGraphics->Clear(0, pCommand->ClearColor, pCommand->ClearDepth, pCommand->ClearStencil);
+			}
+			break;
+
+			case eRenderCommandType::ScenePass:
+			{
+				BatchQueue& queue = m_BatchQueues[pCommand->PassIndex];
+				if (!queue.IsEmpty())
+				{
+					setRenderTargets(pCommand);
+					setTextures(pCommand);
+
+					queue.Draw(this);
+				}
+			}
+			break;
+
+			default:
+				return;
+			}
+		}
+	}
+
+	// command로부터 renderTarget, DepthStencil 그리고 Viewport를 참조하여 바인딩한다.
+	void View::setRenderTargets(RenderPathCommand* pCommand)
+	{
+		if (!pCommand)
+			return;
+
+		uint32_t index = 0;
+
+		while(index < static_cast<uint32_t>(pCommand->Outputs.size()))
+		{
+			if(pCommand->Outputs[index].first == "viewport")
+			{
+				m_pGraphics->SetRenderTarget(0, dynamic_cast<Texture2D*>(m_pCurRenderTarget));
+				// useViewportOutput = true;
+			}
+			else
+			{
+				// 일단 outputs에서 이름을 이용해 FindNamedTexture()에서 텍스쳐를 가져온다.
+
+				// 중간에 if문으로 구분을 하는데
+				// 결국 Graphics의 SetRenderTarget에 index와 텍스쳐를 전달한다.
+				// => SetRenderTarget는 Graphics의 m_RenderTargets 배열에 저장만 하기 때문에 가능하다.
+				// => 이후 prepareDraw에서 OMSetRenderTargets()로 전달한다.
+			}
+
+			++index;
+		}
+
+		while (index < 4)
+		{
+			m_pGraphics->SetRenderTarget(index, nullptr);
+			++index;
+		}
+
+		// depth stencil
+		// command의 depthstencilName이 존재할 경우
+		{
+			// 역시 FindNAmedTexture()에서 이름을 이용해 찾아온 후 
+			// Graphics의 SetDepthStencil에 전달한다.
+		}
+
+		// 여기에서 크기 설정이 추가된다. ViewRect은 이를 이용해 구성된다.
+		m_pGraphics->SetViewportRect(m_ViewRect);
+		// 위의 depthStencil이 존재하지 않을 때
+		// 다른 depthStencil을 가져완 SetDepthStencil을 한다. 이는 좀 더 찾아봐야 할 듯...
+	}
+
+	// 커맨드로부터 이름을 획득해 텍스쳐를 바인딩한다.
+	void View::setTextures(RenderPathCommand* pCommand)
+	{
+		if (!pCommand)
+			return;
+
+		for (uint32_t i = 0; i < 16; ++i)
+		{
+			if (pCommand->TextureNames[i].empty())
+				continue;
+
+			// 일종의 환경맵핑 같은데 왜 continue인지는 모르겠다.
+			if (pCommand->TextureNames[i] == "viewport")
+			{
+				m_pGraphics->SetTexture(i, m_pCurRenderTarget);
+				continue;
+			}
+
+			// 마지막으로 FindNamedTexture로부터 찾아와 SetTexture한다.
+			Texture* pTexture = findNamedTexture(pCommand->TextureNames[i], false);
+			if (pTexture)
+			{
+				m_pGraphics->SetTexture(i, pTexture);
+			}
+			else
+			{
+				// 존재하지 않는다면 커맨드를 수정한다.
+				// 그렇데 빈 값을 넣는게 이게 맞나?
+				pCommand->TextureNames[i] = std::string();
+			}
+		}
+	}
+
+	// 일단 이름은 경로를 포함토록 한다.
+	Texture* View::findNamedTexture(const std::string& name, bool bRenderTarget)
+	{
+		const std::string onlyName = FileSystem::GetFileName(name);
+		
+		ResourceCache* pCache = GetSubsystem<ResourceCache>();
+		Texture* pTexture = pCache->GetExistingResource<Texture2D>(onlyName);
+		if (pTexture)
+			return pTexture;
+		// 존재하지 않는다면 cube, 3d, 2d array도 시도한다.
+		
+		// 이게 의미하는바를 모르겠다.
+		if (!bRenderTarget)
+		{
+			// 우선 xml을 파싱해서 캐시로부터 찾거나 생성한다. 아직 잘 모르겠다.
+
+			// 아니면 전달받은 경로를 통해 캐시로부터 찾거나 생성한다.
+			return pCache->GetResource<Texture2D>(name);
+		}
+
+		return nullptr;
 	}
 }

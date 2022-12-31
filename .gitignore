@@ -4,6 +4,7 @@
 # Project Output Files
 [Oo]utput/*.exe
 [Oo]utput/*.lib
+[Oo]utput/imgui.ini
 
 ### Windows ###
 # Windows thumbnail cache files

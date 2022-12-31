@@ -9,9 +9,14 @@
 namespace Dive
 {
 	Pass::Pass(const std::string& name)
+		: m_Name(FileSystem::ToLowerCase(name)),
+		m_Index(Technique::GetPassIndex(name))
 	{
-		m_Name = FileSystem::ToLowerCase(name);
-		m_Index = Technique::GetPassIndex(name);
+	}
+
+	Pass::~Pass()
+	{
+		DV_LOG_ENGINE_TRACE("Pass 소멸 완료 - {:s}", GetName());
 	}
 
 	void Pass::SetVertexShader(const std::string& name)
@@ -44,11 +49,20 @@ namespace Dive
 		m_PixelShaderVariations.clear();
 	}
 
-	std::unordered_map<std::string, unsigned int> Technique::m_PassIndices;
+	std::unordered_map<std::string, uint32_t> Technique::m_PassIndices;
 
 	Technique::Technique(Context* pContext)
 		: Resource(pContext)
 	{
+	}
+
+	Technique::~Technique()
+	{
+		for (auto pPass : m_Passes)
+			DV_DELETE(pPass);
+		m_Passes.clear();
+
+		DV_LOG_ENGINE_TRACE("Technique 소멸 완료 - {:s}", GetName());
 	}
 
 	Pass* Technique::CreatePass(const std::string& name)
@@ -59,7 +73,7 @@ namespace Dive
 
 		auto pNewPass = new Pass(name);
 		auto passIndex = pNewPass->GetIndex();
-		if (passIndex >= static_cast<unsigned int>(m_Passes.size()))
+		if (passIndex >= static_cast<uint32_t>(m_Passes.size()))
 			m_Passes.resize(passIndex + 1);
 		m_Passes[passIndex] = pNewPass;
 
@@ -93,11 +107,19 @@ namespace Dive
 
 	// 아직 분석이 덜 되었지만 RenderPathPass와 관련이 있다.
 	// pass name이 동일한 형태이다.
-	unsigned int Technique::GetPassIndex(const std::string& name)
+	uint32_t Technique::GetPassIndex(const std::string& name)
 	{
-		// 일단 앞 8개의 index는 비워둔다.
+		// 빌트인 패스
+		if(m_PassIndices.empty())
 		{
-
+			m_PassIndices["base"] = 0;
+			m_PassIndices["alpha"] = 1;
+			m_PassIndices["material"] = 2;
+			m_PassIndices["deferred"] = 3;
+			m_PassIndices["light"] = 4;
+			m_PassIndices["litbase"] = 5;
+			m_PassIndices["litalpha"] = 6;
+			m_PassIndices["shadow"] = 7;
 		}
 
 		auto lowerName = FileSystem::ToLowerCase(name);
@@ -106,7 +128,7 @@ namespace Dive
 			return it->second;
 		else
 		{
-			unsigned int newPassIndex = static_cast<unsigned int>(m_PassIndices.size());
+			uint32_t newPassIndex = static_cast<uint32_t>(m_PassIndices.size());
 			m_PassIndices[lowerName] = newPassIndex;
 			
 			return newPassIndex;
