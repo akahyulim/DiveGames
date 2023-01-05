@@ -61,12 +61,14 @@ namespace Dive
 		m_pIndexBuffer(nullptr),
 		m_pLastShader(nullptr),
 		m_InputLayoutHash(0),
+		m_FirstDirtyTexture(0),
+		m_LastDirtyTexture(0),
 		m_bTextureDirty(true),
 		m_bVertexTypeDirty(true),
 		m_bRenderTargetsDirty(true),
 		m_pCurShaderProgram(nullptr),
 		m_pVertexShaderVariation(nullptr),
-		m_pPiexlShaderVariation(nullptr)
+		m_pPixelShaderVariation(nullptr)
 	{
 		s_pGraphics = this;
 

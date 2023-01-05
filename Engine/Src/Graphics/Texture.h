@@ -38,9 +38,18 @@ namespace Dive
 		ID3D11DepthStencilView* GetDepthStencilView() const { return m_pDepthStencilView; }
 		ID3D11DepthStencilView* GetDepthStencilViewReadOnly() const { return m_pDepthStencilViewReadOnly; }
 
+		ID3D11SamplerState* GetSampler() const { return m_pSampler; }
+
 		void SetMipLevelsDirty();
 		bool GetMipLevelsDirty() const { return m_bMipLevelsDirty; }
 		void GenerateLevels();
+
+		D3D11_FILTER m_FilterMode;
+		D3D11_TEXTURE_ADDRESS_MODE m_AddressMode;
+		// border color
+		// shaodw compare
+		bool GetParametersDirty() const { return m_bParametersDirty; }
+		void UpdateParameters();
 
 		unsigned int GetRowPitchSize(int width) const;
 		
@@ -74,6 +83,15 @@ namespace Dive
 		ID3D11DepthStencilView* m_pDepthStencilView;
 		ID3D11DepthStencilView* m_pDepthStencilViewReadOnly;
 		// Array, Cube용으로 추가가 필요할 것 같다.
+
+		// FilterMode
+		// AddressMode
+		// BorderColor
+		// ShadowCompare
+
+		ID3D11SamplerState* m_pSampler;
+
+		bool m_bParametersDirty;
 
 		// 벡터로 관리할 만큼 2개 이상을 사용할까?
 		std::vector<Viewport*> m_Viewports;

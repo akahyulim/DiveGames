@@ -49,10 +49,12 @@ namespace Dive
 
 		std::string m_VertexShaderName;
 		std::string m_VertexShaderDefines;
+		//std::vector<std::string> m_VertexShaderDefines;
 		std::vector<ShaderVariation*> m_VertexShaderVariations;
 
 		std::string m_PixelShaderName;
 		std::string m_PixelShaderDefines;
+		//std::vector<std::string> m_PixelShaderDefines;
 		std::vector<ShaderVariation*> m_PixelShaderVariations;
 	};
 

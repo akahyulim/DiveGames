@@ -20,7 +20,7 @@ namespace Dive
 
     Material::~Material()
     {
-        DV_LOG_ENGINE_TRACE("Mateiral 소멸자 호출 - {:s}", GetName().empty() ? "No name" : GetName());
+        DV_LOG_ENGINE_TRACE("Mateiral 소멸 완료 - {:s}", GetName().empty() ? "No name" : GetName());
     }
 
     bool Material::Load(FileStream* pDeserializer)
@@ -47,8 +47,9 @@ namespace Dive
 
         // textures
         // 타입(unit)과 이름들을 읽어온 후
-        // 캐스로부터 획득한 리소스를 SetTexture()에 타입과 함께 전달한다.
+        // 캐시로부터 획득한 리소스를 SetTexture()에 타입과 함께 전달한다.
         // => 하지만 이 과정으로는 texture에 sampler state를 생성하지 못한다.
+        // => 결국 Material에서 생성하는 것이 아님을 확인했다.
 
         // 이외에도 shader parameters, cullmode, fillmode 등도 읽어 온다.
 
@@ -120,9 +121,9 @@ namespace Dive
             //pPass->SetVertexShaderDefines("VERTEXCOLOR");
             //pPass->SetPixelShader("CoreData/Shaders/color.hlsl");
             //pPass->SetPixelShaderDefines("VERTEXCOLOR");
-            pPass->SetVertexShader("CoreData/Shaders/Basic.hlsl");
+            pPass->SetVertexShader("CoreData/Shaders/Color.hlsl");
             pPass->SetVertexShaderDefines("VERTEXCOLOR");
-            pPass->SetPixelShader("CoreData/Shaders/Basic.hlsl");
+            pPass->SetPixelShader("CoreData/Shaders/Color.hlsl");
             pPass->SetPixelShaderDefines("VERTEXCOLOR");
 
             auto pCache = GetSubsystem<ResourceCache>();

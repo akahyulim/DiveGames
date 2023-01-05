@@ -162,6 +162,28 @@ namespace Dive
 		return ret;
 	}
 
+	std::vector<std::string> FileSystem::StringSplit(const std::string& str, char seperator)
+	{
+		std::vector<std::string> ret;
+
+		size_t previous = 0;
+		size_t current = str.find(seperator);
+		if (current == std::string::npos)
+			ret.emplace_back(str);
+		else
+		{
+			while (current != std::string::npos)
+			{
+				ret.emplace_back(str.substr(previous, current - previous));
+				previous = current + 1;
+				current = str.find(seperator, previous);
+			}
+			ret.emplace_back(str.substr(previous, current - previous));
+		}
+
+		return ret;
+	}
+
 	std::string FileSystem::GetCurrentDir()
 	{
 		auto ret = std::filesystem::current_path().string();

@@ -62,6 +62,12 @@ namespace Sandbox
 				auto pDrawable = pTriangle->AddComponent<Dive::Drawable>();
 				pDrawable->SetModel(getModel("Triangle"));
 				pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());
+				//Dive::Material* pMat = new Dive::Material(m_pContext);
+				//pMat->SetName("TirangleMat");
+				//pCache->AddManualResource(pMat);
+				//pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
+				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/ChoA.jpg");
+				//pDrawable->SetMaterial(pMat);
 
 				DV_LOG_CLIENT_TRACE("Triangle GameObject를 생성하였습니다.");
 			}
@@ -75,7 +81,13 @@ namespace Sandbox
 				//pTransform->SetRotation(0.0f, 0.0f, 45.0f);
 				auto pDrawable = pQuad->AddComponent<Dive::Drawable>();
 				pDrawable->SetModel(getModel("Quad"));
-				pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());	// 아직까진 반드시 Material을 가져야 한다.
+				//pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());	// 아직까진 반드시 Material을 가져야 한다.
+				Dive::Material* pMat = new Dive::Material(m_pContext);
+				pMat->SetName("QuadMat");
+				pCache->AddManualResource(pMat);
+				pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
+				pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/dmc.jpg");
+				pDrawable->SetMaterial(pMat);
 
 				DV_LOG_CLIENT_TRACE("Quad GameObject를 생성하였습니다.");
 			}
@@ -89,10 +101,12 @@ namespace Sandbox
 				pTransform->SetRotation(45.0f, 45.0f, 0.0f);
 				auto pDrawable = pQuad->AddComponent<Dive::Drawable>();
 				pDrawable->SetModel(getModel("Cube"));
+				//pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());
 				Dive::Material* pMat = new Dive::Material(m_pContext);
 				pMat->SetName("CubeMat");
 				pCache->AddManualResource(pMat);
 				pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
+				pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Dokev.jpeg");
 				pDrawable->SetMaterial(pMat);
 
 				DV_LOG_CLIENT_TRACE("Cube GameObject를 생성하였습니다.");
@@ -161,13 +175,14 @@ namespace Sandbox
 				std::vector<Dive::VertexElement> elements;
 				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
 				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
+				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR2, Dive::eVertexElementSemantic::SEM_TEXCOORD);
 
 				std::vector<float> vertices =
 				{
-					-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
-					-1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-					1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-					1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f
+					-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+					-1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+					1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+					1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
 				};
 
 				Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
@@ -197,44 +212,45 @@ namespace Sandbox
 				std::vector<Dive::VertexElement> elements;
 				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
 				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
+				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR2, Dive::eVertexElementSemantic::SEM_TEXCOORD);
 
 				std::vector<float> vertices =
 				{
 					// front
-					-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
-					0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
-					0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
-					-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+					-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+					0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+					0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+					-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 
 					// bottom
-					-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
-					0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
-					0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
-					-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+					-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+					0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+					0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+					-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 
 					// back
-					-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
-					0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
-					0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
-					-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f,
+					-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+					0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+					0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+					-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 
 					// top
-					-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
-					0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
-					0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
-					-0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f,
+					-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+					0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+					0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+					-0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 
 					// right
-					0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
-					0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
-					0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
-					0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
+					0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+					0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+					0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+					0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 
 					// left
-					-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
-					-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
-					-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f,
-					-0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f
+					-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+					-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+					-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+					-0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f
 				};
 
 				Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
@@ -287,9 +303,9 @@ namespace Sandbox
 				// global은 pass마다 저장하는 듯 하다.
 				// 개별 셰이더가 있다면 그때는 따로 저장한다.
 				pPass->SetVertexShader("CoreData/Shaders/Basic.hlsl");
-				pPass->SetVertexShaderDefines("VERTEXCOLOR");	// + DIFFMAP
+				pPass->SetVertexShaderDefines("VERTEXCOLOR DIFFMAP");
 				pPass->SetPixelShader("CoreData/Shaders/Basic.hlsl");
-				pPass->SetPixelShaderDefines("VERTEXCOLOR");	// + DIFFMAP
+				pPass->SetPixelShaderDefines("VERTEXCOLOR DIFFMAP");
 				// depthwrite = false
 				// blend = alpha
 				pCache->AddManualResource(pTechnique);

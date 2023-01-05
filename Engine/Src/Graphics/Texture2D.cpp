@@ -26,7 +26,7 @@ namespace Dive
 	{
 		Release();
 
-		DV_LOG_ENGINE_DEBUG("Texture2D 소멸자 호출");
+		DV_LOG_ENGINE_TRACE("Texture2D 소멸 완료 - {:s}", GetName());
 	}
 
 	void Texture2D::RegisterObject(Context* pContext)

@@ -25,6 +25,7 @@ namespace Dive
 		static std::string StringReplace(const std::string& str, const std::string& target, const std::string& replace);
 		static std::wstring StringToWstring(const std::string& str);
 		static std::string WstringToString(const std::wstring& str);
+		static std::vector<std::string> StringSplit(const std::string& str, char seperator);
 		
 		// file and directory
 		static std::string GetCurrentDir();

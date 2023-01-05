@@ -18,6 +18,14 @@ namespace Dive
 		DepthStencil
 	};
 
+	enum class eTextureUnit
+	{
+		Diffuse = 0,
+		Normal = 1,
+		ShadowMap = 3,
+		Max = 4
+	};
+
 	enum class eShaderType
 	{
 		Vertex,

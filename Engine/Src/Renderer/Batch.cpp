@@ -25,7 +25,8 @@ namespace Dive
 		if (!m_pVertexShaderVariation || !m_pPixelShaderVariation)
 			return;
 
-		pView->GetGraphics()->SetShaders(m_pVertexShaderVariation, m_pPixelShaderVariation);
+		auto* pGraphics = pView->GetGraphics();
+		pGraphics->SetShaders(m_pVertexShaderVariation, m_pPixelShaderVariation);
 
 		// Pass별로
 		// graphics에 blend, cull, fill mode등을 전달한다.
@@ -34,13 +35,29 @@ namespace Dive
 		{
 			auto worldTransform = DirectX::XMLoadFloat4x4(&m_WorldTransform);
 			worldTransform = DirectX::XMMatrixTranspose(worldTransform);
-			pView->GetGraphics()->SetShaderParameter("cModel", worldTransform);
+			pGraphics->SetShaderParameter("cModel", worldTransform);
 		}
 
-		// material의 텍스쳐를 graphics를 통해 set한다.
+		// 이건 다양한 모드들
+		if (m_pPass && m_pMaterial)
+		{
+			// blend mode
+
+			// cull mode
+
+			// fill mode
+		}
+
+		// 이건 셰이더 파라미터 & 텍스쳐
 		if (m_pMaterial)
 		{
+			const auto& textures = m_pMaterial->GetTextures();
+			for (auto it = textures.begin(); it != textures.end(); ++it)
+			{
+				if (pGraphics->HasTextureUnit(it->first))
+					pGraphics->SetTexture(static_cast<uint32_t>(it->first), it->second);
 
+			}
 		}
 	}
 

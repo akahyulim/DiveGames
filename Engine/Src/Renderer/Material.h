@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Object.h"
+#include "Graphics/GraphicsDefs.h"
 #include "Resource/Resource.h"
 
 namespace Dive
@@ -10,15 +11,6 @@ namespace Dive
 	class Technique;
 	class Scene;
 	class FileStream;
-
-	// GraphicsDef로 옮기기
-	enum class eTextureUnit
-	{
-		Diffuse = 0,
-		Normal = 1,
-		ShadowMap = 3,
-		Max = 4
-	};
 
 	// 일단 텍스쳐 부분은 제외하고 구현
 	class Material : public Resource
@@ -38,6 +30,7 @@ namespace Dive
 		Technique* GetTechnique() const { return m_pTechnique; }
 		void SetTechnique(Technique* pTech);
 
+		const std::unordered_map<eTextureUnit, Texture*>& GetTextures() const { return m_Textures; }
 		Texture* GetTexture(eTextureUnit unit) const;
 		void SetTexture(eTextureUnit unit, Texture* pTexture);
 		void AddTexture(eTextureUnit unit, const std::string& name);

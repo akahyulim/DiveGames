@@ -18,12 +18,13 @@ namespace Dive
 		m_Depth(0),
 		m_MipmapCount(0),
 		m_bEnableMipmap(true),
-		m_bMipLevelsDirty(false),
+		m_bMipLevelsDirty(false),	// 이것두 true가 디폴트인가?
 		m_pTexture2D(nullptr),
 		m_pShaderResourceView(nullptr),
 		m_pRenderTargetView(nullptr),
 		m_pDepthStencilView(nullptr),
-		m_pDepthStencilViewReadOnly(nullptr)
+		m_pDepthStencilViewReadOnly(nullptr),
+		m_bParametersDirty(false)	// 추후 true로...
 	{
 		DV_ASSERT(m_pGraphics);
 	}
@@ -45,6 +46,36 @@ namespace Dive
 			return;
 
 		m_pGraphics->GetDeviceContext()->GenerateMips(m_pShaderResourceView);
+	}
+
+	void Texture::UpdateParameters()
+	{
+		if (!m_bParametersDirty && m_pSampler)
+			return;
+
+		D3D11_SAMPLER_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Filter;
+		desc.AddressU;
+		desc.AddressV;
+		desc.AddressW;
+		desc.MipLODBias;
+		desc.MaxAnisotropy;
+		desc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+		desc.BorderColor[0];
+		desc.BorderColor[1];
+		desc.BorderColor[2];
+		desc.BorderColor[3];
+		desc.MinLOD;
+		desc.MaxLOD;
+		if (FAILED(m_pGraphics->GetDevice()->CreateSamplerState(&desc, &m_pSampler)))
+		{
+			DV_RELEASE(m_pSampler);
+			DV_LOG_ENGINE_ERROR("Texture::UpdateParameters - Sampler 생성에 실패하였습니다.");
+			return;
+		}
+
+		m_bParametersDirty = false;
 	}
 
 	unsigned int Texture::GetRowPitchSize(int width) const

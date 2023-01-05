@@ -5,6 +5,7 @@
 #include "GraphicsDefs.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
+#include "IO/FileSystem.h"
 #include "IO/Log.h"
 
 namespace Dive
@@ -31,7 +32,7 @@ namespace Dive
 		m_pPixelShader(nullptr),
 		m_SemanticsHash(0)
 	{
-		for (uint32_t i = 0; i < 16; ++i)
+		for (uint32_t i = 0; i < static_cast<uint32_t>(eTextureUnit::Max); ++i)
 			m_bUseTextureUnits[i] = false;
 
 		for (uint32_t i = 0; i < 7; ++i)
@@ -94,6 +95,8 @@ namespace Dive
 
 		// defines를 ' '로 구분해서 vector에 넣고
 		// 다시 이 vector의 값과 '1'을 macro로 추가한다.
+		std::vector<std::string> defines = FileSystem::StringSplit(m_Defines, ' ');
+		
 		// urho의 경우 d3d11은 추가 macro를 설정하기도 했다.
 		// 일단은 sparatan 구현으로 유지...
 		std::vector<D3D_SHADER_MACRO> macros =
@@ -104,9 +107,9 @@ namespace Dive
 		// 매크로를 미리 설정한 후 컴파일한다면
 		// 결국 하나의 파일로 여러 종류의 셰이더가 만들어 질 수 밖에 없다.
 		// 그래서 이름에 매크로까지 추가한 것인가?
-		for (const auto& macro : m_Defines)
+		for (const auto& macro : defines)
 		{
-			macros.emplace_back(D3D_SHADER_MACRO{ macro.first.c_str(), macro.second.c_str() });
+			macros.emplace_back(D3D_SHADER_MACRO{ macro.c_str(), "1" });
 		}
 		// 마지막은 무조건 nullptr, nullptr이어야 하나 보다.
 		macros.emplace_back(D3D_SHADER_MACRO{ nullptr, nullptr });
@@ -267,7 +270,8 @@ namespace Dive
 			
 			if (desc.Type == D3D_SIT_CBUFFER)
 				cbRegisterMap[resourceName] = desc.BindPoint;
-			else if (desc.Type == D3D_SIT_SAMPLER && desc.BindPoint < 16)
+			// 원래는 SAMPLER로 비교한다. 하지만 현재 샘플러를 만들지 않았다.
+			else if (desc.Type == D3D_SIT_TEXTURE && desc.BindPoint < static_cast<uint32_t>(eTextureUnit::Max))
 				m_bUseTextureUnits[desc.BindPoint] = true;
 		}
 

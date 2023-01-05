@@ -19,7 +19,7 @@ void mainVS(
 #endif
 	out float4 oPosition : SV_POSITION,
 #ifdef DIFFMAP
-	float2 oTexCoord : TEXCOORD0, 
+	out float2 oTexCoord : TEXCOORD0, 
 #endif
 	out float4 oColor : COLOR				
 )

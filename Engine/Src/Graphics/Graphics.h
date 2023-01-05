@@ -146,10 +146,12 @@ namespace Dive
 		void SetShaderParameter(const std::string& param, const DirectX::XMMATRIX& matrix);
 		//void SetShaderParameter(const std::string& param, const float* pData, uint32_t count);	// 이건 아직 뭔지 감도 안잡힌다.
 
+		bool HasTextureUnit(eTextureUnit unit);
+
 		ConstantBuffer* GetOrCreateConstantBuffer(eShaderType type, uint32_t index, uint32_t size);
 
-		Texture* GetTexture(size_t index);
-		void SetTexture(size_t index, Texture* pTexture);
+		Texture* GetTexture(uint32_t index);
+		void SetTexture(uint32_t index, Texture* pTexture);
 
 		// 기타: 얘네들을 이용해 States를 실시간으로 생성하는 듯 하다.
 		// SetFillMode		fill_mode
@@ -212,7 +214,7 @@ namespace Dive
 		IndexBuffer* m_pIndexBuffer;
 
 		ShaderVariation* m_pVertexShaderVariation;
-		ShaderVariation* m_pPiexlShaderVariation;
+		ShaderVariation* m_pPixelShaderVariation;
 
 		std::string m_LastShaderName;
 		Shader* m_pLastShader;
@@ -225,6 +227,8 @@ namespace Dive
 		// 얘네는 원래 impl에서 관리하던 거다.
 		ID3D11ShaderResourceView* m_pShaderResourceViews[16];
 		ID3D11SamplerState* m_pSamplers[16];
+		uint32_t m_FirstDirtyTexture;
+		uint32_t m_LastDirtyTexture;
 		bool m_bTextureDirty;	// 이것두 impl에서 관리했다.
 
 		// dirty check 전부 모으기.

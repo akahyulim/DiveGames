@@ -56,14 +56,13 @@ namespace Dive
 		const std::string& GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
 
-		const std::unordered_map<std::string, std::string>& GetDefines() const { return m_Defines; }
-		void AddDefine(const std::string& define, const std::string& value = "1") { m_Defines[define] = value; }
-
-		//std::string GetDefines() const { return m_Defines; }
-		void SetDefines(const std::string& defines) {}//{ m_Defines = defines; }
+		std::string GetDefines() const { return m_Defines; }
+		void SetDefines(const std::string& defines) { m_Defines = defines; }
 
 		bool HasParameter(const std::string& name) const;
 		const std::unordered_map<std::string, ShaderParameter>& GetParameters() const { return m_Parameters; }
+
+		bool HasTextureUnit(eTextureUnit unit) const { return m_bUseTextureUnits[static_cast<uint32_t>(unit)]; }
 
 		uint64_t GetSemanticsHash() const { return m_SemanticsHash; }
 
@@ -81,12 +80,11 @@ namespace Dive
 		ID3D10Blob* m_pCompileBuffer;
 		ID3D11VertexShader* m_pVertexShader;
 		ID3D11PixelShader* m_pPixelShader;
-		std::unordered_map<std::string, std::string> m_Defines;
-		//std::string m_Defines;
+		std::string m_Defines;
 
 		uint64_t m_SemanticsHash;
 
-		bool m_bUseTextureUnits[16];
+		bool m_bUseTextureUnits[static_cast<uint32_t>(eTextureUnit::Max)];
 		
 		std::unordered_map<std::string, ShaderParameter> m_Parameters;
 

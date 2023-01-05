@@ -405,7 +405,7 @@ namespace Dive
 	// 변경사항이 있다면 바인딩한다.
 	void Graphics::SetShaders(ShaderVariation* pVertexShader, ShaderVariation* pPixelShader)
 	{
-		if (m_pVertexShaderVariation == pVertexShader && m_pPiexlShaderVariation == pPixelShader)
+		if (m_pVertexShaderVariation == pVertexShader && m_pPixelShaderVariation == pPixelShader)
 			return;
 
 		if (m_pVertexShaderVariation != pVertexShader)
@@ -423,7 +423,7 @@ namespace Dive
 			m_bVertexTypeDirty = true;
 		}
 
-		if (m_pPiexlShaderVariation != pPixelShader)
+		if (m_pPixelShaderVariation != pPixelShader)
 		{
 			if (!pPixelShader->GetShader())
 				pPixelShader->CompileAndCreate();
@@ -432,21 +432,21 @@ namespace Dive
 				static_cast<ID3D11PixelShader*>(pPixelShader ? pPixelShader->GetShader() : nullptr),
 				nullptr, 0);
 
-			m_pPiexlShaderVariation = pPixelShader;
+			m_pPixelShaderVariation = pPixelShader;
 		}
 
 		// 일단 현재 셰이더의 버퍼를 가져온다.
 		// 꼭 셰이더가 둘 다 있어야 하는 것일까?
-		if (m_pVertexShaderVariation && m_pPiexlShaderVariation)
+		if (m_pVertexShaderVariation && m_pPixelShaderVariation)
 		{
-			auto key = std::pair(m_pVertexShaderVariation, m_pPiexlShaderVariation);
+			auto key = std::pair(m_pVertexShaderVariation, m_pPixelShaderVariation);
 			auto it = m_ShaderPrograms.find(key);
 			if (it != m_ShaderPrograms.end())
 				m_pCurShaderProgram = it->second;
 			else
 			{
 				// 오직 여기에서만 사용한다면 unique가 맞다.
-				ShaderProgram* pNewShaderProgram = new ShaderProgram(this, m_pVertexShaderVariation, m_pPiexlShaderVariation);
+				ShaderProgram* pNewShaderProgram = new ShaderProgram(this, m_pVertexShaderVariation, m_pPixelShaderVariation);
 				m_ShaderPrograms[key] = pNewShaderProgram;
 				m_pCurShaderProgram = pNewShaderProgram;
 			}
@@ -634,6 +634,12 @@ namespace Dive
 		}
 	}
 
+	bool Graphics::HasTextureUnit(eTextureUnit unit)
+	{
+		return (m_pVertexShaderVariation && m_pVertexShaderVariation->HasTextureUnit(unit)) ||
+			(m_pPixelShaderVariation && m_pPixelShaderVariation->HasTextureUnit(unit));
+	}
+
 	ConstantBuffer* Graphics::GetOrCreateConstantBuffer(eShaderType type, uint32_t index, uint32_t size)
 	{
 		uint32_t key = static_cast<uint32_t>(type) | (index << 1) | (size << 4);
@@ -649,14 +655,14 @@ namespace Dive
 		}
 	}
 
-	Texture* Graphics::GetTexture(size_t index)
+	Texture* Graphics::GetTexture(uint32_t index)
 	{
-		return index < 16 ? m_pTextures[index] : nullptr;
+		return index < static_cast<uint32_t>(eTextureUnit::Max) ? m_pTextures[index] : nullptr;
 	}
 
-	void Graphics::SetTexture(size_t index, Texture* pTexture)
+	void Graphics::SetTexture(uint32_t index, Texture* pTexture)
 	{
-		if (index >= 16)
+		if (index >= static_cast<uint32_t>(eTextureUnit::Max))
 			return;
 
 		if (pTexture)
@@ -664,24 +670,29 @@ namespace Dive
 			// 렌더타겟 0과 동일한 주소라면
 			// 백업을 사용한다?
 
-			// 여기에서 더치체크 후 generateMips를 호출한다.
 			if (pTexture->GetMipLevelsDirty())
 				pTexture->SetMipLevelsDirty();
-		}
 
-		// 파라미터 더티 체크?
+			if (pTexture->GetParametersDirty())
+			{
+				pTexture->UpdateParameters();
+				m_pTextures[index] = nullptr;
+			}
+		}
 
 		if (pTexture != m_pTextures[index])
 		{
-			// 뭔가 한다.
+			if (m_FirstDirtyTexture == 0xffffffff)
+				m_FirstDirtyTexture = m_LastDirtyTexture = index;
+			else
+			{
+				if (index < m_FirstDirtyTexture)
+					m_FirstDirtyTexture = index;
+				if (index > m_LastDirtyTexture)
+					m_LastDirtyTexture = index;
+			}
 
 			m_pTextures[index] = pTexture;
-			// 이 텍스쳐를 직접 사용하는 것이 아니라
-			// 셰이더 리소스 뷰와 샘플러가 따로 배열로 존재하고
-			// 거기에 이 텍스쳐의 정보를 저장하는 방식이다. => 굳이?
-			// 셰이더 리소스 뷰 => 당연히 Texture에서 얻어온다.
-			// 샘플러 => Texture에서 얻어오고, 인덱스는 전달받은 것을 그대로 적용한다.
-			// 더티체크 트루 => Bind는 PrepareDraw에서 수행한다.
 			m_bTextureDirty = true;
 		}
 	}
@@ -768,14 +779,17 @@ namespace Dive
 		}
 
 		// shader resources + samplers
-		if (m_bTextureDirty) // + firstDirtyTexture?
+		if (m_bTextureDirty && m_FirstDirtyTexture < 0xffffffff)
 		{
-			// 총 16개의 shader reosurce와 sampler를 관리하기 위해 firstDirtyTexutre라는 index를 사용하고 있다.
+			auto pSrv = m_pTextures[m_FirstDirtyTexture] ? m_pTextures[m_FirstDirtyTexture]->GetShaderResourceView() : nullptr;
 
 			// vertex shader
+			m_pDeviceContext->VSSetShaderResources(m_FirstDirtyTexture, m_LastDirtyTexture - m_FirstDirtyTexture + 1, &pSrv);
 
 			// pixel shader
+			m_pDeviceContext->PSSetShaderResources(m_FirstDirtyTexture, m_LastDirtyTexture - m_FirstDirtyTexture + 1, &pSrv);
 
+			m_FirstDirtyTexture = m_LastDirtyTexture = 0xffffffff;
 			m_bTextureDirty = false;
 		}
 
