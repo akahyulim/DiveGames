@@ -15,6 +15,7 @@
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Texture2D.h"
+#include "Graphics/RenderTexture.h"
 #include "Resource/ResourceCache.h"
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
@@ -279,7 +280,7 @@ namespace Dive
 		{
 			if(pCommand->Outputs[index].first == "viewport")
 			{
-				m_pGraphics->SetRenderTarget(0, dynamic_cast<Texture2D*>(m_pCurRenderTarget));
+				m_pGraphics->SetRenderTarget(0, dynamic_cast<RenderTexture*>(m_pCurRenderTarget));
 				// useViewportOutput = true;
 			}
 			else
@@ -328,7 +329,8 @@ namespace Dive
 			// 일종의 환경맵핑 같은데 왜 continue인지는 모르겠다.
 			if (pCommand->TextureNames[i] == "viewport")
 			{
-				m_pGraphics->SetTexture(i, m_pCurRenderTarget);
+				// 텍스쳐 클래스 변경 중...
+				//m_pGraphics->SetTexture(i, m_pCurRenderTarget);
 				continue;
 			}
 
@@ -336,7 +338,8 @@ namespace Dive
 			Texture* pTexture = findNamedTexture(pCommand->TextureNames[i], false);
 			if (pTexture)
 			{
-				m_pGraphics->SetTexture(i, pTexture);
+				// 텍스쳐 클래스 변경 중...
+				//m_pGraphics->SetTexture(i, pTexture);
 			}
 			else
 			{

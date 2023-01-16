@@ -58,16 +58,20 @@ namespace Sandbox
 				auto pTriangle = m_pScene->CreateGameObject("Triangle");
 				auto pTransform = pTriangle->GetComponent<Dive::Transform>();
 				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-				pTransform->SetPosition(DirectX::XMFLOAT3(-5.0f, 0.0f, 5.0f));
+				pTransform->SetPosition(DirectX::XMFLOAT3(-2.5f, 0.0f, 10.0f));
+				//pTransform->SetScale(DirectX::XMFLOAT3(2.0f, 2.0f, 2.0f));
 				auto pDrawable = pTriangle->AddComponent<Dive::Drawable>();
 				pDrawable->SetModel(getModel("Triangle"));
-				pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());
-				//Dive::Material* pMat = new Dive::Material(m_pContext);
-				//pMat->SetName("TirangleMat");
-				//pCache->AddManualResource(pMat);
-				//pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
+				//pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());
+				Dive::Material* pMat = new Dive::Material(m_pContext);
+				pMat->SetName("TirangleMat");
+				pCache->AddManualResource(pMat);
+				pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
 				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/ChoA.jpg");
-				//pDrawable->SetMaterial(pMat);
+				pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/dmc.jpg");
+				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Dokev.jpeg");
+				//pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetRedTexture(m_pContext));
+				pDrawable->SetMaterial(pMat);
 
 				DV_LOG_CLIENT_TRACE("Triangle GameObject를 생성하였습니다.");
 			}
@@ -77,8 +81,9 @@ namespace Sandbox
 				auto pQuad = m_pScene->CreateGameObject("Quad");
 				auto pTransform = pQuad->GetComponent<Dive::Transform>();
 				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-				pTransform->SetPosition(DirectX::XMFLOAT3(5.0f, 0.0f, 5.0f));
-				//pTransform->SetRotation(0.0f, 0.0f, 45.0f);
+				pTransform->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 5.0f));
+				//pTransform->SetScale(DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f));
+				//pTransform->SetRotation(0.0f, 0.0f, -45.0f);
 				auto pDrawable = pQuad->AddComponent<Dive::Drawable>();
 				pDrawable->SetModel(getModel("Quad"));
 				//pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());	// 아직까진 반드시 Material을 가져야 한다.
@@ -87,6 +92,9 @@ namespace Sandbox
 				pCache->AddManualResource(pMat);
 				pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
 				pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/dmc.jpg");
+				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Dokev.jpeg");
+				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/no_texture.png");
+				//pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetWhiteTexture(m_pContext));
 				pDrawable->SetMaterial(pMat);
 
 				DV_LOG_CLIENT_TRACE("Quad GameObject를 생성하였습니다.");
@@ -97,8 +105,9 @@ namespace Sandbox
 				auto pQuad = m_pScene->CreateGameObject("Cube");
 				auto pTransform = pQuad->GetComponent<Dive::Transform>();
 				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-				pTransform->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
-				pTransform->SetRotation(45.0f, 45.0f, 0.0f);
+				pTransform->SetPosition(DirectX::XMFLOAT3(2.5f, 0.0f, 0.0f));
+				//pTransform->SetScale(DirectX::XMFLOAT3(5.0f, 5.0f, 5.0f));
+				//pTransform->SetRotation(45.0f, 45.0f, 0.0f);
 				auto pDrawable = pQuad->AddComponent<Dive::Drawable>();
 				pDrawable->SetModel(getModel("Cube"));
 				//pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());
@@ -106,7 +115,13 @@ namespace Sandbox
 				pMat->SetName("CubeMat");
 				pCache->AddManualResource(pMat);
 				pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
-				pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Dokev.jpeg");
+				// urho는 Cache로부터 GetResource한 결과물을
+				// matrix의 SetTexture()로 등록한다.
+				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Dokev.jpeg");
+				pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/dmc.jpg");
+				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/iu.jpg");
+				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/no_texture.png");
+				//pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetGrayTexture(m_pContext));
 				pDrawable->SetMaterial(pMat);
 
 				DV_LOG_CLIENT_TRACE("Cube GameObject를 생성하였습니다.");
@@ -115,6 +130,10 @@ namespace Sandbox
 
 		// test
 		{
+			//auto pBlackTex = Dive::Texture2D::GetBlackTexture(m_pContext);
+			//auto pRedTex = Dive::Texture2D::GetRedTexture(m_pContext);
+			//auto pGrayTex = Dive::Texture2D::GetGrayTexture(m_pContext);
+			//auto pWhiteTex = Dive::Texture2D::GetWhiteTexture(m_pContext);
 		}
 	}
 
@@ -141,12 +160,12 @@ namespace Sandbox
 				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
 				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
 				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR2, Dive::eVertexElementSemantic::SEM_TEXCOORD);
-				elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_NORMAL);
+				//elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_NORMAL);
 
 				std::vector<float> vertices =
-				{ -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-				0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-				1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f };
+				{ -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,// 0.0f, 0.0f, 1.0f,
+				0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.5f, 0.0f,// 0.0f, 0.0f, 1.0f,
+				1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f };//, 0.0f, 0.0f, 1.0f };
 
 				Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
 				pVb->SetSize(3, elements);
@@ -217,40 +236,40 @@ namespace Sandbox
 				std::vector<float> vertices =
 				{
 					// front
-					-0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-					0.5f, 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-					0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-					-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+					-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+					1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+					1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+					-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 
 					// bottom
-					-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-					0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-					0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-					-0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+					-1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+					1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+					1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+					-1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 
 					// back
-					-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-					0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-					0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-					-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+					-1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+					1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
+					1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
+					-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
 
 					// top
-					-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-					0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-					0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-					-0.5f, 0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+					-1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+					1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+					1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+					-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 
 					// right
-					0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-					0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-					0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-					0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+					1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+					1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+					1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+					1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
 
 					// left
-					-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-					-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-					-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-					-0.5f, -0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f
+					-1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+					-1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
+					-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
+					-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f
 				};
 
 				Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
@@ -303,9 +322,13 @@ namespace Sandbox
 				// global은 pass마다 저장하는 듯 하다.
 				// 개별 셰이더가 있다면 그때는 따로 저장한다.
 				pPass->SetVertexShader("CoreData/Shaders/Basic.hlsl");
-				pPass->SetVertexShaderDefines("VERTEXCOLOR DIFFMAP");
+				//pPass->SetVertexShaderDefines("VERTEXCOLOR DIFFMAP");
+				pPass->SetVertexShaderDefines("DIFFMAP");
 				pPass->SetPixelShader("CoreData/Shaders/Basic.hlsl");
-				pPass->SetPixelShaderDefines("VERTEXCOLOR DIFFMAP");
+				// 흐음 예상과 다르다. 순서를 맞춰야 한다.
+				//pPass->SetPixelShaderDefines("VERTEXCOLOR DIFFMAP");
+				pPass->SetPixelShaderDefines("DIFFMAP");
+				//pPass->SetPixelShaderDefines("VERTEXCOLOR");
 				// depthwrite = false
 				// blend = alpha
 				pCache->AddManualResource(pTechnique);

@@ -11,17 +11,19 @@
 // 그외(DIFFMAP 등)에는 Tech의 Pass에 기술된 Define으로 전달받는다. 
 void mainVS(
 	float4 position : POSITION,
+#ifdef VERTEXCOLOR
+	float4 color : COLOR,
+#endif
 #ifdef DIFFMAP
 	float2 texCoord : TEXCOORD0,
 #endif
 #ifdef VERTEXCOLOR
-	float4 color : COLOR,
+	out float4 oColor : COLOR,
 #endif
-	out float4 oPosition : SV_POSITION,
 #ifdef DIFFMAP
-	out float2 oTexCoord : TEXCOORD0, 
+	out float2 oTexCoord : TEXCOORD0,
 #endif
-	out float4 oColor : COLOR				
+	out float4 oPosition : SV_POSITION
 )
 {
 	position.w = 1.0f;
@@ -43,17 +45,17 @@ void mainVS(
 }
 
 void mainPS(
-	float4 position : SV_POSITION,
-#ifdef DIFMAP
-	float2 texCoord : TEXCOORD0,
-#endif
 #ifdef VERTEXCOLOR
-	float4 color : COLOR,				// mainVS의 out과 순서가 같아야 한다.
+	float4 iColor : COLOR,
 #endif
+#ifdef DIFFMAP
+	float2 iTexCoord : TEXCOORD0,
+#endif
+	float4 iPosition : SV_POSITION,
 	out float4 oColor : SV_TARGET)		// urho는 OUTCOLOR0이라는 시맨틱을 사용하는데 나는 안된다. SV_TARGET인 듯 하다.
 {
 #ifdef VERTEXCOLOR
-	oColor = color;
+	oColor = iColor;
 #else
 	oColor = float4(1.0f, 1.0f, 0.0f, 1.0f);
 #endif

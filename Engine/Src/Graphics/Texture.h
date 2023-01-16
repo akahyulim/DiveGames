@@ -4,11 +4,9 @@
 
 namespace Dive
 {
-	class Context;
 	class Graphics;
 	class Viewport;
 
-	// 일단 멀티 샘플링 미지원.
 	class Texture : public Resource
 	{
 		DIVE_OBJECT(Texture, Resource)
@@ -17,83 +15,74 @@ namespace Dive
 		explicit Texture(Context* pContext);
 		~Texture() override;
 
-		DXGI_FORMAT GetFormat() const { return m_Format; }
+		bool IsMipLevelsDirty() const { return m_bMipLevelDirty; }
+		void SetMipLevelsDirty();
+		void UpdateMipLevels();
 
-		eTextureUsage GetUsage() const { return m_Usage; }
+		bool IsSamplerStateDirty() const { return m_bSamplerStateDirty; }
+		void UpdateSamplerState();
+
+		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_pShaderResourceView; }
+		ID3D11SamplerState* GetSamplerState() const { return m_pSamplerState; }
 
 		int GetWidth() const { return m_Width; }
 		int GetHeight() const { return m_Height; }
-		int GetDepth() const { return m_Depth; }
 
-		unsigned int GetMipmapCount() const { return m_MipmapCount; }
-		
-		bool GetEnableMipmap() const { return m_bEnableMipmap; }
-		void SetEnableMipmap(bool enable) { m_bEnableMipmap = enable; }
+		DXGI_FORMAT GetFormat() const { return m_Format; }
 
-		// 여기에서 관리한다는게 조금 애매하다.
-		ID3D11Texture2D* GetTexture2D() const { return m_pTexture2D; }
-		
-		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_pShaderResourceView; }
-		ID3D11RenderTargetView* GetRenderTargetView() const { return m_pRenderTargetView; }
-		ID3D11DepthStencilView* GetDepthStencilView() const { return m_pDepthStencilView; }
-		ID3D11DepthStencilView* GetDepthStencilViewReadOnly() const { return m_pDepthStencilViewReadOnly; }
+		D3D11_FILTER GetFilter() const { return m_Filter; }
+		void SetFilter(D3D11_FILTER filter);
 
-		ID3D11SamplerState* GetSampler() const { return m_pSampler; }
+		D3D11_TEXTURE_ADDRESS_MODE SetAddressMode() const { return m_AddressMode; }
+		void SetAddressMode(D3D11_TEXTURE_ADDRESS_MODE mode);
 
-		void SetMipLevelsDirty();
-		bool GetMipLevelsDirty() const { return m_bMipLevelsDirty; }
-		void GenerateLevels();
+		DirectX::XMFLOAT4 GetBorderColor() const { return m_BorderColor; }
+		void SetBorderColor(const DirectX::XMFLOAT4& color);
 
-		D3D11_FILTER m_FilterMode;
-		D3D11_TEXTURE_ADDRESS_MODE m_AddressMode;
-		// border color
-		// shaodw compare
-		bool GetParametersDirty() const { return m_bParametersDirty; }
-		void UpdateParameters();
+		int GetAnisoLevel() const { return m_AnisoLevel; }
+		void SetAnisoLevel(int level);
 
-		unsigned int GetRowPitchSize(int width) const;
-		
-		// SRGB는 뭘까?
-		static DXGI_FORMAT GetSRVFormat(DXGI_FORMAT format);
-		static DXGI_FORMAT GetDSVFormat(DXGI_FORMAT format);
-		static unsigned int CheckMaxMipmapCount(int width, int height);
+		eTextureUsage GetUsage() const { return m_Usage; }
+
+		uint32_t GetRowPitchSize(int width) const;
 
 		unsigned int GetViewportCount() const { return static_cast<unsigned int>(m_Viewports.size()); }
 		Viewport* GetViewport(unsigned int index) const { return m_Viewports[index]; }
 		void SetViewport(unsigned int index, Viewport* pViewport);
 
-	private:
+		static DXGI_FORMAT GetSRGBFormat(DXGI_FORMAT format);
+		static DXGI_FORMAT GetSRVFormat(DXGI_FORMAT format);
+		static DXGI_FORMAT GetDSVFormat(DXGI_FORMAT format);
+
+		static int CheckMaxMipLevels(int width, int height, int requestedMipLevels);
+
+	protected:
+		virtual bool createResources() = 0;
 
 	protected:
 		Graphics* m_pGraphics;
-		DXGI_FORMAT m_Format;
-		eTextureUsage m_Usage;
-		int m_Width;
-		int m_Height;
-		int m_Depth;
-		unsigned int m_MipmapCount;
-		bool m_bEnableMipmap;
-
-		bool m_bMipLevelsDirty;	// 위의 변수와 차이가 있나...?
-
 
 		ID3D11Texture2D* m_pTexture2D;
 		ID3D11ShaderResourceView* m_pShaderResourceView;
-		ID3D11RenderTargetView* m_pRenderTargetView;
-		ID3D11DepthStencilView* m_pDepthStencilView;
-		ID3D11DepthStencilView* m_pDepthStencilViewReadOnly;
-		// Array, Cube용으로 추가가 필요할 것 같다.
+		ID3D11SamplerState* m_pSamplerState;
 
-		// FilterMode
-		// AddressMode
-		// BorderColor
-		// ShadowCompare
+		int m_Width;
+		int m_Height;
 
-		ID3D11SamplerState* m_pSampler;
+		DXGI_FORMAT m_Format;
+		bool m_bLinear;
+		eTextureUsage m_Usage;
 
-		bool m_bParametersDirty;
+		int m_RequestedMipLevels;
+		int m_MipLevels;
+		bool m_bMipLevelDirty;
 
-		// 벡터로 관리할 만큼 2개 이상을 사용할까?
+		D3D11_FILTER m_Filter;
+		D3D11_TEXTURE_ADDRESS_MODE m_AddressMode;	// 유니티는 u, v, w를 나누어 멤버 변수로 관리한다.
+		DirectX::XMFLOAT4 m_BorderColor;
+		int m_AnisoLevel;
+		bool m_bSamplerStateDirty;
+
 		std::vector<Viewport*> m_Viewports;
 	};
 }

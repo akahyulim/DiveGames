@@ -5,7 +5,6 @@
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
 #include "InputLayout.h"
-#include "Texture2D.h"
 #include "Shader.h"
 #include "Renderer/Model.h"
 #include "Renderer/Material.h"

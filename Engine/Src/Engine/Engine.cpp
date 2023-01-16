@@ -72,9 +72,6 @@ namespace Dive
 				return false;
 			}
 
-			// temp
-			pGraphics->LoadShaders();
-
 			// graphics set
 			// set shader cach dir
 			// begin dump shaders

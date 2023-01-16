@@ -84,7 +84,7 @@ namespace Dive
 
 		uint64_t m_SemanticsHash;
 
-		bool m_bUseTextureUnits[static_cast<uint32_t>(eTextureUnit::Max)];
+		bool m_bUseTextureUnits[16];
 		
 		std::unordered_map<std::string, ShaderParameter> m_Parameters;
 

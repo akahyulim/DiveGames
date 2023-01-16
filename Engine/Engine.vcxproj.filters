@@ -94,12 +94,6 @@
     <ClInclude Include="Src\IO\FileStream.h">
       <Filter>Src\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\Texture.h">
-      <Filter>Src\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Graphics\Texture2D.h">
-      <Filter>Src\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Renderer\Mesh.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
@@ -141,6 +135,18 @@
     </ClInclude>
     <ClInclude Include="Src\Renderer\Batch.h">
       <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Resource\Image.h">
+      <Filter>Src\Resource</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\Texture.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\Texture2D.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\RenderTexture.h">
+      <Filter>Src\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -210,12 +216,6 @@
     <ClCompile Include="Src\IO\FileStream.cpp">
       <Filter>Src\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\Texture.cpp">
-      <Filter>Src\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Graphics\Texture2D.cpp">
-      <Filter>Src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Renderer\Mesh.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
@@ -256,6 +256,18 @@
       <Filter>Src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\Graphics_window.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Resource\Image.cpp">
+      <Filter>Src\Resource</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Texture.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\Texture2D.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\RenderTexture.cpp">
       <Filter>Src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

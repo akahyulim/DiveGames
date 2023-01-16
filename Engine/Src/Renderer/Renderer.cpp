@@ -180,11 +180,11 @@ namespace Dive
 
 			if (!bCubemap)
 			{
-				Texture2D* pNewTex2D = new Texture2D(m_pContext);
+				auto pNewTex2D = new Texture2D(m_pContext);
 				// depthstencil 여부로 usage 설정.
 				pNewTex2D->SetSize(width, height, format);
 
-				pNewBuffer = pNewTex2D;
+				pNewBuffer = dynamic_cast<Texture*>(pNewTex2D);
 			}
 			else
 			{

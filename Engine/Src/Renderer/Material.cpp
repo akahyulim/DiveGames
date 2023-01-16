@@ -86,6 +86,9 @@ namespace Dive
     }
 
     // urho는 load에서만 텍스쳐를 로드하기에 직접 만들어봤다.
+    // 그런데 cache에서 GetResource한 후 위의 SetTexture하는게 맞지 않나 싶다.
+    // 하지만 이 구현이 힘든게 Cache의 GetResource는 일반 리소스 파일과 엔진의 설정 파일을
+    // 구분하여 로드할 수 있다는 것이다.
     void Material::AddTexture(eTextureUnit unit, const std::string& name)
     {
         if (unit < eTextureUnit::Max)
@@ -117,10 +120,6 @@ namespace Dive
             // 글로벌과 개별 섀이더로 나뉘지만 일단은 하나만 사용
             // 그리고 urho는 확장자도 없이 이름만 저장된다.
             // 그려면 Graphics에서 로드할 때 경로를 직접 붙인다.
-            //pPass->SetVertexShader("CoreData/Shaders/color.hlsl");
-            //pPass->SetVertexShaderDefines("VERTEXCOLOR");
-            //pPass->SetPixelShader("CoreData/Shaders/color.hlsl");
-            //pPass->SetPixelShaderDefines("VERTEXCOLOR");
             pPass->SetVertexShader("CoreData/Shaders/Color.hlsl");
             pPass->SetVertexShaderDefines("VERTEXCOLOR");
             pPass->SetPixelShader("CoreData/Shaders/Color.hlsl");

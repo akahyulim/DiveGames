@@ -10,7 +10,7 @@ void mainVS(
 	float2 iTexCoord : TEXCOORD0,
 #endif
 #ifdef VERTEXCOLOR
-	out float4 oColor : COLOR,
+	out float4 oColor : COLOR0,
 #endif
 #ifdef DIFFMAP
 	out float2 oTexCoord : TEXCOORD0,
@@ -31,20 +31,21 @@ void mainVS(
 #ifdef DIFFMAP
 	oTexCoord = iTexCoord;
 #endif
-
 }
 
-float4 texLoad(float2 texCoord)
+float4 loadTex(float2 texCoord)
 {
 	uint width, height;
-	tDiffMap.GetDimensions(width, height);
+	DiffMapTex.GetDimensions(width, height);
 	float3 texCoord3 = float3(texCoord.x * width, texCoord.y * height, 0);
-	return tDiffMap.Load(texCoord3);
+	return DiffMapTex.Load(texCoord3);
 }
 
+// 예상과 달리 ifdef를 걸어도 전달받은 data를 건너뛰는 건 아니다.
+// 따라서 결국 mainVS의 out과 동일한 형태의 shaderDefines가 설정되어 있어야 한다.
 void mainPS(
 #ifdef VERTEXCOLOR
-	float4 iColor : COLOR,
+	float4 iColor : COLOR0,
 #endif
 #ifdef DIFFMAP
 	float2 iTexCoord : TEXCOORD0,
@@ -64,9 +65,7 @@ void mainPS(
 #endif
 
 #ifdef DIFFMAP
-	// 텍스쳐와 샘플러가 필요하다.
-	// 둘 다 samplers.hlsl에 있다.
-	float4 diffInput = texLoad(iTexCoord);
+	float4 diffInput = DiffMapTex.Sample(DiffMapSampler, iTexCoord);
 
 	#ifdef ALPHAMASK
 		if (diffInput.a < 0.5)

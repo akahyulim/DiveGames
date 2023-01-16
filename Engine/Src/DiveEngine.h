@@ -28,6 +28,7 @@
 //= Resource ======================
 #include "Resource/Resource.h"
 #include "Resource/ResourceCache.h"
+#include "Resource/Image.h"
 
 //= Graphics ======================
 #include "Graphics/GraphicsEvents.h"
@@ -35,6 +36,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Texture2D.h"
+#include "Graphics/RenderTexture.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/ConstantBuffer.h"

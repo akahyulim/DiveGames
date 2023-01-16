@@ -6,6 +6,7 @@
 #include "ConstantBuffer.h"
 #include "InputLayout.h"
 #include "Texture2D.h"
+#include "RenderTexture.h"
 #include "Shader.h"
 #include "Renderer/Model.h"
 #include "Renderer/Material.h"
@@ -19,13 +20,16 @@ namespace Dive
 {
 	bool Graphics::CreateDeviceAndSwapChain(uint32_t width, uint32_t height)
 	{
+		/*
+		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
+
 		if (FAILED(D3D11CreateDevice(
 			nullptr,
 			D3D_DRIVER_TYPE_HARDWARE,
 			nullptr,
 			0,
-			nullptr,
-			0,
+			&featureLevel,//nullptr,
+			1, //0,
 			D3D11_SDK_VERSION,
 			&m_pDevice,
 			nullptr,
@@ -66,6 +70,66 @@ namespace Dive
 		{
 			DV_LOG_ENGINE_ERROR("Graphics::createDeviceAndSwapChain - D3D11 스왑체인 생성에 실패하였습니다.");
 			return false;
+		}
+		*/
+
+		UINT deviceFlags = 0;
+
+		std::vector<D3D_FEATURE_LEVEL> featureLevels
+		{
+			D3D_FEATURE_LEVEL_11_1,
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_10_1,
+			D3D_FEATURE_LEVEL_10_1,
+			D3D_FEATURE_LEVEL_9_3,
+			D3D_FEATURE_LEVEL_9_2,
+			D3D_FEATURE_LEVEL_9_1,
+		};
+
+		D3D_DRIVER_TYPE driverType = D3D_DRIVER_TYPE_HARDWARE;
+
+		DXGI_SWAP_CHAIN_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.OutputWindow = m_WindowHandle;
+		desc.BufferDesc.Width = m_Width;
+		desc.BufferDesc.Height = m_Height;
+		desc.Windowed = IsFullScreen() ? FALSE : TRUE;
+		desc.BufferCount = 1;
+		desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.BufferDesc.RefreshRate.Numerator = 0;//60;
+		desc.BufferDesc.RefreshRate.Denominator = 1;
+		//desc.BufferDesc.RefreshRate.Numerator = m_bVSync ? refreshRateNumerator : 0;
+		//desc.BufferDesc.RefreshRate.Denominator = m_bVSync ? refreshRateDenominator : 1;
+		desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		desc.SampleDesc.Count = 1;
+		desc.SampleDesc.Quality = 0;
+		desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+		desc.Flags = deviceFlags;
+
+		auto createDeviceAndSwapChain = [this, deviceFlags, featureLevels, driverType, desc]()
+		{
+			return D3D11CreateDeviceAndSwapChain(
+				nullptr,									// 역시 임시
+				driverType,
+				nullptr,
+				deviceFlags,
+				featureLevels.data(),
+				static_cast<UINT>(featureLevels.size()),
+				D3D11_SDK_VERSION,
+				&desc,
+				&m_pSwapChain,
+				&m_pDevice,
+				nullptr,
+				&m_pDeviceContext);
+		};
+
+		auto result = createDeviceAndSwapChain();
+		if (result == DXGI_ERROR_SDK_COMPONENT_MISSING)
+		{
+			deviceFlags &= ~D3D11_CREATE_DEVICE_DEBUG;
+			result = createDeviceAndSwapChain();
 		}
 
 		return true;
@@ -114,34 +178,46 @@ namespace Dive
 		}
 		DV_RELEASE(pBackbufferTexture);
 
-		// 디폴트 뎁스스텐실 생성
-		D3D11_TEXTURE2D_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Width = curWidth;
-		desc.Height = curHeight;
-		desc.MipLevels = 1;
-		desc.ArraySize = 1;
-		desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		desc.SampleDesc.Count = 1;// static_cast<UINT>(screenParams_.multiSample_);
-		desc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(desc.Format, screenParams_.multiSample_);
-		desc.Usage = D3D11_USAGE_DEFAULT;
-		desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		desc.CPUAccessFlags = 0;
-		desc.MiscFlags = 0;
-
-		if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pDefaultDepthStencilTexture)))
 		{
-			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 백버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
-			return false;
+			// 디폴트 뎁스스텐실 생성
+			D3D11_TEXTURE2D_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));
+			desc.Width = curWidth;
+			desc.Height = curHeight;
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			desc.SampleDesc.Count = 1;// static_cast<UINT>(screenParams_.multiSample_);
+			desc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(desc.Format, screenParams_.multiSample_);
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+			desc.CPUAccessFlags = 0;
+			desc.MiscFlags = 0;
+
+			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pDefaultDepthStencilTexture)))
+			{
+				DV_RELEASE(m_pDefaultDepthStencilTexture);
+				DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 백버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
+				return false;
+			}
 		}
 
-		if (FAILED(m_pDevice->CreateDepthStencilView(
-			static_cast<ID3D11Resource*>(m_pDefaultDepthStencilTexture),
-			nullptr,
-			&m_pDefaultDepthStencilView)))
 		{
-			DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 백버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
-			return false;
+			D3D11_DEPTH_STENCIL_VIEW_DESC desc;
+			ZeroMemory(&desc, sizeof(desc));
+			desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipSlice = 0;
+
+			if (FAILED(m_pDevice->CreateDepthStencilView(
+				static_cast<ID3D11Resource*>(m_pDefaultDepthStencilTexture),
+				&desc,//nullptr,		// urho가 nullptr을 전달했다. 역시나 sampler 문제는 해결되지 않았다.
+				&m_pDefaultDepthStencilView)))
+			{
+				DV_RELEASE(m_pDefaultDepthStencilView);
+				DV_LOG_ENGINE_ERROR("Graphics::updateSwapChain - 백버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
+				return false;
+			}
 		}
 
 		m_Width = static_cast<int32_t>(curWidth);
@@ -172,10 +248,8 @@ namespace Dive
 
 		ResetRenderTargets();
 
-		// SetTexture
-		// 16개를 전부 nullptr로 한다.
-		// 어디에 사용하는 텍스쳐인지는 모르겠다.
-		// => shader resource view 같다. 즉, 모델에 붙일 텍스쳐 말이다.
+		for (uint32_t i = 0; i < 16; ++i)
+			SetTexture(i, nullptr);
 
 		FIRE_EVENT(BeginRenderEvent());
 
@@ -214,7 +288,7 @@ namespace Dive
 		// depth stencil view clear
 		//if(flags & (eClearTarget::Depth | eClearTarget::Stencil))
 		{
-
+			m_pDeviceContext->ClearDepthStencilView(m_pCurDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 		}
 	}
 
@@ -255,14 +329,14 @@ namespace Dive
 	{
 	}
 
-	void Graphics::SetDepthStencil(Texture2D* pTexture)
+	void Graphics::SetDepthStencil(RenderTexture* pTexture)
 	{
+		// m_pDepthStencil이 Texture2D*이다.
+		// 즉, 잘못 관리 중이다.
 		if (m_pDepthStencil != pTexture)
 			m_pDepthStencil = pTexture;
 
 		m_bRenderTargetsDirty = true;
-
-		// 이 곳에서 raseterizer dirty를 true로 한다. 그런데 아래 함수에선 안한다....
 	}
 
 	ID3D11RenderTargetView* Graphics::GetRenderTarget(uint32_t index) const
@@ -271,7 +345,11 @@ namespace Dive
 	}
 
 	// Textur2D가 아니라 Texture를 받아야 하지 않을까?
-	void Graphics::SetRenderTarget(uint32_t index, Texture2D* pTexture)
+	// => urho는 RenderSurface라는 객체를 받는다.
+	// 아니면 현재처럼 Texture2D를 받고 거기에서 RenderSurface를 리턴받아 다시 위의 함수에 전달하는 방식이다.
+	// DepthStencil 역시 동일한 방법으로 다룬다.
+	// => RenderSurface를 유니티의 RenderTarget으로 치환하면 되지 않을까?
+	void Graphics::SetRenderTarget(uint32_t index, RenderTexture* pTexture)
 	{
 		if (index >= MAX_RENDERTARGETS)
 			return;
@@ -283,11 +361,9 @@ namespace Dive
 
 			if (pTexture)
 			{
-				if (pTexture->GetMipmapCount() > 1)
-					pTexture->SetMipLevelsDirty();
-
-				// 이외에도 몇가지 처리를 더 하는데... 잘 모르겠다.
-				// 그런데 SetTexture를 호출해야만 밉맵을 생성할텐데...
+				// 현재 RenderTarget은 Mipmap을 제공하지 않는다.
+				//if (pTexture->GetMipmapCount() > 1)
+				//	pTexture->SetMipLevelsDirty();
 			}
 		}
 	}
@@ -660,6 +736,9 @@ namespace Dive
 		return index < static_cast<uint32_t>(eTextureUnit::Max) ? m_pTextures[index] : nullptr;
 	}
 
+	// urho의 경우 Texture를 받고 GetShaderResourceView(), GetSampler() 등을 직접 호출하여 설정한다.
+	// 즉, 현재의 구현과 동일하다.
+	// 반면 RenderTarget의 경우 RenderSurface라는 객체로 관리한다.
 	void Graphics::SetTexture(uint32_t index, Texture* pTexture)
 	{
 		if (index >= static_cast<uint32_t>(eTextureUnit::Max))
@@ -670,12 +749,12 @@ namespace Dive
 			// 렌더타겟 0과 동일한 주소라면
 			// 백업을 사용한다?
 
-			if (pTexture->GetMipLevelsDirty())
-				pTexture->SetMipLevelsDirty();
+			if (pTexture->IsMipLevelsDirty())
+				pTexture->UpdateMipLevels();
 
-			if (pTexture->GetParametersDirty())
+			if (pTexture->IsSamplerStateDirty())
 			{
-				pTexture->UpdateParameters();
+				pTexture->UpdateSamplerState();
 				m_pTextures[index] = nullptr;
 			}
 		}
@@ -693,47 +772,10 @@ namespace Dive
 			}
 
 			m_pTextures[index] = pTexture;
+			m_pShaderResourceViews[index] = pTexture ? pTexture->GetShaderResourceView() : nullptr;
+			m_pSamplers[index] = pTexture ? pTexture->GetSamplerState() : nullptr;
 			m_bTextureDirty = true;
 		}
-	}
-
-	// 다른 설정이 물려있다.
-	bool Graphics::LoadShaders()
-	{
-		// 일단 생성 후 바로 등록이지만 추후 바뀔 수 있다.
-		// depthstencilstate
-		{
-
-		}
-
-		// rssetstate
-		{
-			ID3D11RasterizerState* pRasterizerState = nullptr;
-
-			D3D11_RASTERIZER_DESC desc;
-			desc.AntialiasedLineEnable = false;
-			desc.CullMode = D3D11_CULL_BACK;
-			desc.DepthBias = 0;
-			desc.DepthBiasClamp = 0.0f;
-			desc.DepthClipEnable = true;
-			desc.FillMode = D3D11_FILL_SOLID;
-			desc.FrontCounterClockwise = false;
-			desc.MultisampleEnable = false;
-			desc.ScissorEnable = false;
-			desc.SlopeScaledDepthBias = 0.0f;
-
-			// Create the rasterizer state from the description we just filled out.
-			auto result = m_pDevice->CreateRasterizerState(&desc, &pRasterizerState);
-			if (FAILED(result))
-			{
-				return false;
-			}
-
-			// Now set the rasterizer state.
-			m_pDeviceContext->RSSetState(pRasterizerState);
-		}
-
-		return true;
 	}
 
 	void Graphics::OnResizeWindow()
@@ -757,6 +799,7 @@ namespace Dive
 		if (m_bRenderTargetsDirty)
 		{
 			// 이렇게하면 ID3D11DepthstencilView를 무조건 사용하게 된다.
+			// 실제로는 nullptr인 상황도 있다.
 			m_pCurDepthStencilView = (m_pDepthStencil && m_pDepthStencil->GetUsage() == eTextureUsage::DepthStencil) ?
 				m_pDepthStencil->GetDepthStencilView() : m_pDefaultDepthStencilView;
 			// write가 아니라면 read only
@@ -773,7 +816,7 @@ namespace Dive
 				m_pCurRenderTargetViews[0] = m_pDefaultRenderTargetView;
 			}
 
-			m_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &m_pCurRenderTargetViews[0], nullptr);// m_pCurDepthStencilView);
+			m_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &m_pCurRenderTargetViews[0], m_pCurDepthStencilView);//nullptr);
 
 			m_bRenderTargetsDirty = false;
 		}
@@ -781,13 +824,10 @@ namespace Dive
 		// shader resources + samplers
 		if (m_bTextureDirty && m_FirstDirtyTexture < 0xffffffff)
 		{
-			auto pSrv = m_pTextures[m_FirstDirtyTexture] ? m_pTextures[m_FirstDirtyTexture]->GetShaderResourceView() : nullptr;
-
-			// vertex shader
-			m_pDeviceContext->VSSetShaderResources(m_FirstDirtyTexture, m_LastDirtyTexture - m_FirstDirtyTexture + 1, &pSrv);
-
-			// pixel shader
-			m_pDeviceContext->PSSetShaderResources(m_FirstDirtyTexture, m_LastDirtyTexture - m_FirstDirtyTexture + 1, &pSrv);
+			m_pDeviceContext->PSSetShaderResources(m_FirstDirtyTexture, m_LastDirtyTexture - m_FirstDirtyTexture + 1,
+				&m_pShaderResourceViews[m_FirstDirtyTexture]);
+			m_pDeviceContext->PSSetSamplers(m_FirstDirtyTexture, m_LastDirtyTexture - m_FirstDirtyTexture + 1,
+				&m_pSamplers[m_FirstDirtyTexture]);
 
 			m_FirstDirtyTexture = m_LastDirtyTexture = 0xffffffff;
 			m_bTextureDirty = false;
@@ -845,8 +885,68 @@ namespace Dive
 		// blend state
 
 		// depthstencil state
+		{
+			// 임시 구현
+			if (!m_pDepthStencilState)
+			{
+				D3D11_DEPTH_STENCIL_DESC desc;
+				ZeroMemory(&desc, sizeof(desc));
+
+				// Set up the description of the stencil state.
+				desc.DepthEnable = true;
+				desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+				desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+				desc.StencilEnable = true;
+				desc.StencilReadMask = 0xFF;
+				desc.StencilWriteMask = 0xFF;
+
+				// Stencil operations if pixel is front-facing.
+				desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+				desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+				desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+				desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+				// Stencil operations if pixel is back-facing.
+				desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+				desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+				desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+				desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+				if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_pDepthStencilState)))
+				{
+					DV_LOG_ENGINE_ERROR("DepthStencilState 생성에 실패하였습니다.");
+					return;
+				}
+			}
+			m_pDeviceContext->OMSetDepthStencilState(m_pDepthStencilState, 1);
+		}
 
 		// rasterizer state
+		{
+			// 임시 구현
+			if (!m_pRasterizerState)
+			{
+				D3D11_RASTERIZER_DESC desc;
+				desc.AntialiasedLineEnable = false;
+				desc.CullMode = D3D11_CULL_BACK;
+				desc.DepthBias = 0;
+				desc.DepthBiasClamp = 0.0f;
+				desc.DepthClipEnable = true;
+				desc.FillMode = D3D11_FILL_SOLID;
+				desc.FrontCounterClockwise = false;
+				desc.MultisampleEnable = false;
+				desc.ScissorEnable = false;
+				desc.SlopeScaledDepthBias = 0.0f;
+
+				if (FAILED(m_pDevice->CreateRasterizerState(&desc, &m_pRasterizerState)))
+				{
+					DV_LOG_ENGINE_ERROR("RasterizerState 생성에 실패하였습니다.");
+					return;
+				}
+			}
+			m_pDeviceContext->RSSetState(m_pRasterizerState);
+		}
 
 		// RSSetScissorRect
 
@@ -858,8 +958,11 @@ namespace Dive
 	void RegisterGraphicsObject(Context* pContext)
 	{
 		Texture2D::RegisterObject(pContext);
+		
 		Model::RegisterObject(pContext);
 		Shader::RegisterObject(pContext);
 		Material::RegisterObject(pContext);
+
+		Texture2D::RegisterObject(pContext);
 	}
 }

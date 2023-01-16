@@ -1,9 +1,8 @@
 #include "divepch.h"
 #include "Texture.h"
 #include "Graphics.h"
-#include "Core/Context.h"
-#include "Core/CoreDefs.h"
 #include "Renderer/Viewport.h"
+#include "Core/CoreDefs.h"
 #include "IO/Log.h"
 
 namespace Dive
@@ -11,74 +10,110 @@ namespace Dive
 	Texture::Texture(Context* pContext)
 		: Resource(pContext),
 		m_pGraphics(GetSubsystem<Graphics>()),
-		m_Format(DXGI_FORMAT_UNKNOWN),
-		m_Usage(eTextureUsage::Static),
-		m_Width(0),
-		m_Height(0),
-		m_Depth(0),
-		m_MipmapCount(0),
-		m_bEnableMipmap(true),
-		m_bMipLevelsDirty(false),	// 이것두 true가 디폴트인가?
 		m_pTexture2D(nullptr),
 		m_pShaderResourceView(nullptr),
-		m_pRenderTargetView(nullptr),
-		m_pDepthStencilView(nullptr),
-		m_pDepthStencilViewReadOnly(nullptr),
-		m_bParametersDirty(false)	// 추후 true로...
+		m_pSamplerState(nullptr),
+		m_RequestedMipLevels(0),
+		m_MipLevels(1),
+		m_bMipLevelDirty(true)
 	{
-		DV_ASSERT(m_pGraphics);
+		DV_ASSERT(m_pGraphics->IsInitialized());
 	}
 
 	Texture::~Texture()
 	{
+		DV_RELEASE(m_pSamplerState);
+		DV_RELEASE(m_pShaderResourceView);
+		DV_RELEASE(m_pTexture2D);
 	}
 
 	void Texture::SetMipLevelsDirty()
 	{
-		if (m_Usage == eTextureUsage::RenderTarget && m_MipmapCount > 1)
-			m_bMipLevelsDirty = true;
+		// rendertargetview가 있어야 한다.
+		// urho는 usage로 확인한다.
+		if (m_MipLevels > 1)
+			m_bMipLevelDirty = true;
 	}
 
-	// Graphics의 SetTexture에서 호출된다.
-	void Texture::GenerateLevels()
+	void Texture::UpdateMipLevels()
 	{
-		if (!m_pShaderResourceView)
-			return;
-
-		m_pGraphics->GetDeviceContext()->GenerateMips(m_pShaderResourceView);
+		if (m_pShaderResourceView)
+		{
+			m_pGraphics->GetDeviceContext()->GenerateMips(m_pShaderResourceView);
+			m_bMipLevelDirty = false;
+		}
 	}
-
-	void Texture::UpdateParameters()
+	
+	void Texture::UpdateSamplerState()
 	{
-		if (!m_bParametersDirty && m_pSampler)
+		if (!m_bSamplerStateDirty && m_pSamplerState)
 			return;
+
+		DV_RELEASE(m_pSamplerState);
 
 		D3D11_SAMPLER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
-		desc.Filter;
-		desc.AddressU;
-		desc.AddressV;
-		desc.AddressW;
-		desc.MipLODBias;
-		desc.MaxAnisotropy;
+		desc.Filter = m_Filter;
+		desc.AddressU = m_AddressMode;
+		desc.AddressV = m_AddressMode;
+		desc.AddressW = m_AddressMode;
+		desc.MipLODBias = 0.0f;
+		desc.MaxAnisotropy = m_AnisoLevel;
 		desc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
-		desc.BorderColor[0];
-		desc.BorderColor[1];
-		desc.BorderColor[2];
-		desc.BorderColor[3];
-		desc.MinLOD;
-		desc.MaxLOD;
-		if (FAILED(m_pGraphics->GetDevice()->CreateSamplerState(&desc, &m_pSampler)))
+		desc.BorderColor[0] = m_BorderColor.x;
+		desc.BorderColor[1] = m_BorderColor.y;
+		desc.BorderColor[2] = m_BorderColor.z;
+		desc.BorderColor[3] = m_BorderColor.w;
+		desc.MinLOD = -FLT_MAX;
+		desc.MaxLOD = FLT_MAX;
+
+		if (FAILED(m_pGraphics->GetDevice()->CreateSamplerState(&desc, &m_pSamplerState)))
 		{
-			DV_RELEASE(m_pSampler);
-			DV_LOG_ENGINE_ERROR("Texture::UpdateParameters - Sampler 생성에 실패하였습니다.");
+			DV_RELEASE(m_pSamplerState);
+			DV_LOG_ENGINE_ERROR("Texture::UpdateSamplerState - SamplerState 생성에 실패하였습니다.");
 			return;
 		}
 
-		m_bParametersDirty = false;
+		m_bSamplerStateDirty = false;
 	}
 
-	unsigned int Texture::GetRowPitchSize(int width) const
+	void Texture::SetFilter(D3D11_FILTER filter)
+	{
+		if (m_Filter != filter)
+		{
+			m_Filter = filter;
+			m_bSamplerStateDirty = true;
+		}
+	}
+
+	void Texture::SetAddressMode(D3D11_TEXTURE_ADDRESS_MODE mode)
+	{
+		if (m_AddressMode != mode)
+		{
+			m_AddressMode = mode;
+			m_bSamplerStateDirty = true;
+		}
+	}
+	
+	void Texture::SetBorderColor(const DirectX::XMFLOAT4& color)
+	{
+		if (m_BorderColor.x != color.x || m_BorderColor.y != color.y || m_BorderColor.z != color.z || m_BorderColor.w != color.w)
+		{
+			m_BorderColor = color;
+			m_bSamplerStateDirty = true;
+		}
+	}
+	
+	void Texture::SetAnisoLevel(int level)
+	{
+		if (m_AnisoLevel != level)
+		{
+			m_AnisoLevel = level;
+			m_bSamplerStateDirty = true;
+		}
+	}
+
+	uint32_t Texture::GetRowPitchSize(int width) const
 	{
 		switch (m_Format)
 		{
@@ -119,34 +154,75 @@ namespace Dive
 		}
 	}
 
+	void Texture::SetViewport(unsigned int index, Viewport* pViewport)
+	{
+		if (m_Viewports.size() >= index)
+			m_Viewports.insert(m_Viewports.begin() + index, pViewport);
+		else
+			m_Viewports.emplace_back(pViewport);
+	}
+
+	DXGI_FORMAT Texture::GetSRGBFormat(DXGI_FORMAT format)
+	{
+		switch (format)
+		{
+		case DXGI_FORMAT_R8G8B8A8_UNORM:
+			return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+		case DXGI_FORMAT_BC1_UNORM:
+			return DXGI_FORMAT_BC1_UNORM_SRGB;
+
+		case DXGI_FORMAT_BC2_UNORM:
+			return DXGI_FORMAT_BC2_UNORM_SRGB;
+
+		case DXGI_FORMAT_BC3_UNORM:
+			return DXGI_FORMAT_BC3_UNORM_SRGB;
+
+		default:
+			return format;
+		}
+	}
+	
 	DXGI_FORMAT Texture::GetSRVFormat(DXGI_FORMAT format)
 	{
-		if (format == DXGI_FORMAT_R24G8_TYPELESS)
+		switch (format)
+		{
+		case DXGI_FORMAT_R24G8_TYPELESS:
 			return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-		else if (format == DXGI_FORMAT_R16_TYPELESS)
-			return DXGI_FORMAT_R16_UNORM;
-		else if (format == DXGI_FORMAT_R32_TYPELESS)
-			return DXGI_FORMAT_R32_FLOAT;
-		else
-			return format;
-	}
 
+		case DXGI_FORMAT_R16_TYPELESS:
+			return DXGI_FORMAT_R16_UNORM;
+
+		case  DXGI_FORMAT_R32_TYPELESS:
+			return DXGI_FORMAT_R32_FLOAT;
+
+		default:
+			return format;
+		}
+	}
+	
 	DXGI_FORMAT Texture::GetDSVFormat(DXGI_FORMAT format)
 	{
-		if (format == DXGI_FORMAT_R24G8_TYPELESS)
+		switch (format)
+		{
+		case DXGI_FORMAT_R24G8_TYPELESS:
 			return DXGI_FORMAT_D24_UNORM_S8_UINT;
-		else if (format == DXGI_FORMAT_R16_TYPELESS)
-			return DXGI_FORMAT_D16_UNORM;
-		else if (DXGI_FORMAT_R32_TYPELESS)
-			return DXGI_FORMAT_D32_FLOAT;
-		else
-			return format;
-	}
 
-	unsigned int Texture::CheckMaxMipmapCount(int width, int height)
-	{
-		unsigned int maxLevel = 1;
+		case  DXGI_FORMAT_R16_TYPELESS:
+			return DXGI_FORMAT_D16_UNORM;
+
+		case DXGI_FORMAT_R32_TYPELESS:
+			return DXGI_FORMAT_D32_FLOAT;
+
+		default:
+			return format;
+		}
+	}
 	
+	int Texture::CheckMaxMipLevels(int width, int height, int requestedMipLevels)
+	{
+		int maxLevel = 1;
+
 		while (width > 1 || height > 1)
 		{
 			++maxLevel;
@@ -155,14 +231,9 @@ namespace Dive
 			height = height > 1 ? (height >> 1u) : 1;
 		}
 
-		return maxLevel;
-	}
-
-	void Texture::SetViewport(unsigned int index, Viewport* pViewport)
-	{
-		if (m_Viewports.size() >= index)
-			m_Viewports.insert(m_Viewports.begin() + index, pViewport);
+		if (!requestedMipLevels || maxLevel < requestedMipLevels)
+			return maxLevel;
 		else
-			m_Viewports.emplace_back(pViewport);
+			return requestedMipLevels;
 	}
 }

@@ -16,10 +16,10 @@ namespace Editor
 		// 역시 CreateScene 이벤트를 구독한다.
 		// => 리뉴얼과정에서 제거한 구문인데, 이에 맞춰 m_pSceneRenderTarget을 만들면 될 것 같다.
 		// => 그런데 Scene은 2개 이상을 수 있다.... Scene이름으로 매칭을 시킬 수 있을 것 같긴 하다.
-		m_pSceneRenderTarget = std::make_unique<Dive::Texture2D>(m_pEditor->GetContext());
-		m_pSceneRenderTarget->SetSize(800, 600, DXGI_FORMAT_R8G8B8A8_UNORM, Dive::eTextureUsage::RenderTarget);
+		m_pSceneRenderTarget = std::make_unique<Dive::RenderTexture>(m_pEditor->GetContext());
+		m_pSceneRenderTarget->SetSize(800, 600, DXGI_FORMAT_R8G8B8A8_UNORM);// , Dive::eTextureUsage::RenderTarget);
 		m_pSceneViewport = new Dive::Viewport(m_pEditor->GetContext());
-		m_pSceneRenderTarget->SetViewport(0, m_pSceneViewport);
+		//m_pSceneRenderTarget->SetViewport(0, m_pSceneViewport);
 	}
 
 	ScenePanel::~ScenePanel()
@@ -39,11 +39,14 @@ namespace Editor
 		// -> Graphics::ResetRenderTargets()후 괜찮아졌다.
 		if ((int)width != m_pSceneRenderTarget->GetWidth() || (int)height != m_pSceneRenderTarget->GetHeight())
 		{
-			m_pSceneRenderTarget->SetSize((int)width, (int)height, DXGI_FORMAT_R8G8B8A8_UNORM, Dive::eTextureUsage::RenderTarget);
+			m_pSceneRenderTarget->SetSize((int)width, (int)height, DXGI_FORMAT_R8G8B8A8_UNORM);// , Dive::eTextureUsage::RenderTarget);
 		}
 
+		auto* pCache = m_pEditor->GetSubsystem<Dive::ResourceCache>();
+		auto pDefaultTex = pCache->GetResource<Dive::Texture2D>("Assets/Textures/DokeV.jpeg")->GetShaderResourceView();
+
 		ImGui::Image(
-			m_pSceneRenderTarget ? m_pSceneRenderTarget->GetShaderResourceView() : nullptr,
+			m_pSceneRenderTarget ? m_pSceneRenderTarget->GetShaderResourceView() : pDefaultTex,
 			ImVec2(width, height),
 			ImVec2(0, 0),
 			ImVec2(1, 1),

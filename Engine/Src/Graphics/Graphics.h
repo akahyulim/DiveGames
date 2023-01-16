@@ -12,6 +12,7 @@ namespace Dive
 	class InputLayout;
 	class Texture;
 	class Texture2D;
+	class RenderTexture;
 	class ConstantBuffer;
 
 	const LPCWSTR WND_CLASS_NAME = L"AppWnd";
@@ -116,10 +117,10 @@ namespace Dive
 		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t indexStart, uint32_t vertexStart);
 		void DrawIndexedInstanced(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t instanceCount, uint32_t indexStart);
 
-		void SetDepthStencil(Texture2D* pTexture);
+		void SetDepthStencil(RenderTexture* pTexture);
 
 		ID3D11RenderTargetView* GetRenderTarget(uint32_t index) const;
-		void SetRenderTarget(uint32_t index, Texture2D* pTexture);
+		void SetRenderTarget(uint32_t index, RenderTexture* pTexture);
 		void ResetRenderTargets();
 
 		D3D11_VIEWPORT GetViewport() const { return m_Viewport; }
@@ -168,8 +169,6 @@ namespace Dive
 		// 임시
 		ID3D11RenderTargetView* GetDefaultRenderTargetView() { return m_pDefaultRenderTargetView; }
 
-		bool LoadShaders();
-
 		// 윈도우 크기 변경시 호출. 백버퍼, 렌더타겟 재생성 함수 호출.
 		void OnResizeWindow();
 
@@ -204,8 +203,8 @@ namespace Dive
 
 		D3D11_VIEWPORT m_Viewport;
 
-		Texture2D* m_pRenderTargets[MAX_RENDERTARGETS];
-		Texture2D* m_pDepthStencil;
+		RenderTexture* m_pRenderTargets[MAX_RENDERTARGETS];
+		RenderTexture* m_pDepthStencil;
 
 		ID3D11RenderTargetView* m_pCurRenderTargetViews[MAX_RENDERTARGETS];
 		ID3D11DepthStencilView* m_pCurDepthStencilView;
@@ -242,6 +241,10 @@ namespace Dive
 		std::vector<ConstantBuffer*> m_DirtyConstantBuffers;
 		ID3D11Buffer* m_pCurVertexShaderConstantBuffers[7];
 		ID3D11Buffer* m_pCurPixelShaderConstantBuffers[7];
+
+		// temp
+		ID3D11RasterizerState* m_pRasterizerState = nullptr;
+		ID3D11DepthStencilState* m_pDepthStencilState = nullptr;
 	};
 
 	void RegisterGraphicsObject(Context* pContext);

@@ -32,7 +32,7 @@ namespace Dive
 		m_pPixelShader(nullptr),
 		m_SemanticsHash(0)
 	{
-		for (uint32_t i = 0; i < static_cast<uint32_t>(eTextureUnit::Max); ++i)
+		for (uint32_t i = 0; i < 16; ++i)
 			m_bUseTextureUnits[i] = false;
 
 		for (uint32_t i = 0; i < 7; ++i)
@@ -245,6 +245,7 @@ namespace Dive
 		D3D11_SHADER_DESC shaderDesc;
 		pReflection->GetDesc(&shaderDesc);
 
+		// 정점 셰이더일 경우 시맨틱 해시 계산
 		if (m_Type == eShaderType::Vertex)
 		{
 			// 사실 이 해시를 생성하는 과정은 유의미하지 않다.
@@ -261,16 +262,17 @@ namespace Dive
 		}
 
 		std::map<std::string, uint32_t> cbRegisterMap;
-
 		for (uint32_t i = 0; i < shaderDesc.BoundResources; ++i)
 		{
 			D3D11_SHADER_INPUT_BIND_DESC desc;
 			pReflection->GetResourceBindingDesc(i, &desc);
 			std::string resourceName(desc.Name);
-			
+
 			if (desc.Type == D3D_SIT_CBUFFER)
 				cbRegisterMap[resourceName] = desc.BindPoint;
-			// 원래는 SAMPLER로 비교한다. 하지만 현재 샘플러를 만들지 않았다.
+			// 이 구문에서 SRV의 load가 반응한다... => 샘플러를 사용하지 않으니 텍스쳐 등록이 안된 것이다.
+			// 일단은 텍스쳐 기준으로 설정하자.
+			//else if (desc.Type == D3D_SIT_SAMPLER && desc.BindPoint < static_cast<uint32_t>(eTextureUnit::Max))
 			else if (desc.Type == D3D_SIT_TEXTURE && desc.BindPoint < static_cast<uint32_t>(eTextureUnit::Max))
 				m_bUseTextureUnits[desc.BindPoint] = true;
 		}

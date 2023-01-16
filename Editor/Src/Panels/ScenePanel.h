@@ -12,7 +12,7 @@ namespace Editor
 		void renderWindow() override;
 
 	private:
-		std::unique_ptr<Dive::Texture2D> m_pSceneRenderTarget;
+		std::unique_ptr<Dive::RenderTexture> m_pSceneRenderTarget;
 		Dive::Viewport* m_pSceneViewport = nullptr;
 	};
 }
