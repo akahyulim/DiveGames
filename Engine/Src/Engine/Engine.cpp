@@ -7,6 +7,7 @@
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
 #include "Resource/ResourceCache.h"
+#include "Input/Input.h"
 #include "IO/FileSystem.h"
 #include "IO/Log.h"
 
@@ -19,11 +20,11 @@ namespace Dive
 		m_DeltaTime(0.0f),
 		m_MaxFPS(0)
 	{
-		// 기본 subsystem 생성: input
 		m_pContext->RegisterSubsystem<Log>();
 		m_pContext->RegisterSubsystem<Time>();
 		m_pContext->RegisterSubsystem<ResourceCache>();
 		m_pContext->RegisterSubsystem<FileSystem>();
+		m_pContext->RegisterSubsystem<Input>();
 
 		SUBSCRIBE_EVENT(eEventType::ExitRequested, EVENT_HANDLER_PARAM(OnExitRequested));
 	}
@@ -52,8 +53,8 @@ namespace Dive
 			return false;
 
 		// 그래픽스 초기화
+		auto pGraphics = m_pContext->GetSubsystem<Graphics>();
 		{
-			auto pGraphics = m_pContext->GetSubsystem<Graphics>();
 			pGraphics->SetWindowTitle(parameters.Title);
 			// icon
 			//pGraphics->SetPosition(parameters.positionX, parameters.positionY);
@@ -90,6 +91,15 @@ namespace Dive
 		// 이닛 프레임
 
 		// 이닛 인풋
+		auto pInput = GetSubsystem<Input>();
+		if (!pInput->Initialize(
+			pGraphics->GetWindowInstance(), 
+			pGraphics->GetWindowHandle(), 
+			pGraphics->GetWidth(), 
+			pGraphics->GetHeight()))
+		{
+			return false;
+		}
 
 		m_pContext->RegisterSubsystem<Renderer>();	// 임시 위치(생성자 확인)
 

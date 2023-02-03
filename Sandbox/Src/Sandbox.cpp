@@ -34,6 +34,50 @@ namespace Sandbox
 	{
 		DV_LOG_CLIENT_TRACE("Sandbox::Start 호출");
 
+		createScene();
+
+		// test
+		{
+			//auto pBlackTex = Dive::Texture2D::GetBlackTexture(m_pContext);
+			//auto pRedTex = Dive::Texture2D::GetRedTexture(m_pContext);
+			//auto pGrayTex = Dive::Texture2D::GetGrayTexture(m_pContext);
+			//auto pWhiteTex = Dive::Texture2D::GetWhiteTexture(m_pContext);
+			auto pInput = GetSubsystem<Dive::Input>();
+			//if (pInput)
+			//	pInput->SetMousePosition(0.0f, 0.0f);
+		}
+
+		// urho는 subscribeToEvents()라는 메서드를 통해 아래 내용을 랩핑
+		SUBSCRIBE_EVENT(Dive::eEventType::Update, EVENT_HANDLER_PARAM(OnUpdate));
+	}
+
+	void Sandbox::Stop()
+	{
+		DV_LOG_CLIENT_TRACE("Sandbox::Stop 호출");
+
+		DV_DELETE(m_pScene);
+	}
+
+	void Sandbox::OnUpdate(const Dive::Event& evnt)
+	{
+		// 원래는 MoveCamera()로 제어
+		auto pInput = GetSubsystem<Dive::Input>();
+		if (pInput)
+		{
+			if (pInput->KeyDown(DIK_Q))
+				DV_LOG_CLIENT_DEBUG("Input Q");
+			if (pInput->KeyDown(DIK_W))
+				DV_LOG_CLIENT_DEBUG("Input W");
+			if (pInput->KeyDown(DIK_E))
+				DV_LOG_CLIENT_DEBUG("Input E");
+			if (pInput->KeyDown(DIK_R))
+				DV_LOG_CLIENT_DEBUG("Input R");
+		}
+	}
+
+	void Sandbox::createScene()
+	{
+		// 아래 내용은 사실상 CreateScene()이다.
 		m_pScene = new Dive::Scene(m_pContext);
 		m_pScene->SetName("Sandbox");
 		auto pViewport = new Dive::Viewport(m_pContext);
@@ -99,7 +143,7 @@ namespace Sandbox
 
 				DV_LOG_CLIENT_TRACE("Quad GameObject를 생성하였습니다.");
 			}
-			
+
 			// Cube
 			{
 				auto pQuad = m_pScene->CreateGameObject("Cube");
@@ -127,21 +171,6 @@ namespace Sandbox
 				DV_LOG_CLIENT_TRACE("Cube GameObject를 생성하였습니다.");
 			}
 		}
-
-		// test
-		{
-			//auto pBlackTex = Dive::Texture2D::GetBlackTexture(m_pContext);
-			//auto pRedTex = Dive::Texture2D::GetRedTexture(m_pContext);
-			//auto pGrayTex = Dive::Texture2D::GetGrayTexture(m_pContext);
-			//auto pWhiteTex = Dive::Texture2D::GetWhiteTexture(m_pContext);
-		}
-	}
-
-	void Sandbox::Stop()
-	{
-		DV_LOG_CLIENT_TRACE("Sandbox::Stop 호출");
-
-		DV_DELETE(m_pScene);
 	}
 
 	Dive::Model* Sandbox::getModel(const std::string& name)

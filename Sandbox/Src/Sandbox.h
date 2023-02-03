@@ -13,7 +13,10 @@ namespace Sandbox
 		void Start() override;
 		void Stop() override;
 
+		void OnUpdate(const Dive::Event& evnt);
+
 	private:
+		void createScene();
 		Dive::Model* getModel(const std::string& name);
 		Dive::Technique* getTechnique(const std::string& name);
 

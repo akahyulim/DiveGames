@@ -76,7 +76,8 @@ namespace Dive
 		
 		bool RunWindow();
 		
-		HWND GetWindowHandle() const { return m_WindowHandle; }
+		HINSTANCE GetWindowInstance() const { return m_hInstance; }
+ 		HWND GetWindowHandle() const { return m_WindowHandle; }
 		std::wstring GetWindowTitle() const { return m_WindowTitle; }
 		
 		void SetWindowTitle(const std::wstring& title);

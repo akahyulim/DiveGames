@@ -196,6 +196,7 @@
     <ClInclude Include="Src\Graphics\ShaderVariation.h" />
     <ClInclude Include="Src\Graphics\ShaderProgram.h" />
     <ClInclude Include="Src\Graphics\VertexBuffer.h" />
+    <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\IO\FileStream.h" />
     <ClInclude Include="Src\IO\FileSystem.h" />
     <ClInclude Include="Src\IO\Log.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="Src\Graphics\ShaderVariation.cpp" />
     <ClCompile Include="Src\Graphics\ShaderProgram.cpp" />
     <ClCompile Include="Src\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\IO\FileStream.cpp" />
     <ClCompile Include="Src\IO\FileSystem.cpp" />
     <ClCompile Include="Src\IO\Log.cpp" />

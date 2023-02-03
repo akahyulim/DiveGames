@@ -29,14 +29,16 @@
 #include <DXGI1_3.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
-#include <Xinput.h>
+#include <dinput.h>
+//#include <Xinput.h>
 
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
-#pragma comment(lib, "xinput.lib")
+#pragma comment(lib, "dinput8.lib")
+//#pragma comment(lib, "xinput.lib")
 
 
 using namespace std::string_literals;
