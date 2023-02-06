@@ -6,6 +6,7 @@ namespace Dive
 	class Context;
 	class Scene;
 	class View;
+	class Camera;
 	class RenderPath;
 
 	class Viewport : public Object
@@ -14,8 +15,8 @@ namespace Dive
 	
 	public:
 		explicit Viewport(Context* pContext);
-		Viewport(Context* pContext, Scene* pScene, RenderPath* pRenderPath); //+ camera
-		Viewport(Context* pContext, Scene* pScene, RenderPath* pRenderPath, const RECT& rect); // + camera
+		Viewport(Context* pContext, Scene* pScene, Camera* pCamera, RenderPath* pRenderPath);
+		Viewport(Context* pContext, Scene* pScene, Camera* pCamera, RenderPath* pRenderPath, const RECT& rect);
 		~Viewport() override;
 
 		RenderPath* GetRenderPath() const { return m_pRenderPath; }
@@ -28,9 +29,15 @@ namespace Dive
 		RECT GetRect() const { return m_Rect; }
 		void SetRect(const RECT& rect) { m_Rect = rect; }
 
-		// camera
+		Camera* GetCamera() const { return m_pCamera; }
+		void SetCamera(Camera* pCamera) { m_pCamera = pCamera; }
 
 		View* GetView() { return m_pView; }
+
+		// 전부 카메라를 활용하는 함수
+		// GetScreenRay
+		// worldToScreen
+		// screenToWorld
 
 		void AllocateView();
 
@@ -39,6 +46,7 @@ namespace Dive
 		Scene* m_pScene;
 		RenderPath* m_pRenderPath;
 		View* m_pView;
+		Camera* m_pCamera;
 		RECT m_Rect;
 	};
 }

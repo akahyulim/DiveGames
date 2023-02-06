@@ -33,8 +33,9 @@ namespace Dive
 		SetScale(1.0f, 1.0f, 1.0f);
 	}
 
-	DirectX::XMFLOAT3 Transform::GetPosition() const
+	DirectX::XMFLOAT3 Transform::GetPosition()// const
 	{
+		GetMatrix();
 		return *((XMFLOAT3*)&m_Matrix._41);
 	}
 
@@ -220,6 +221,63 @@ namespace Dive
 		XMStoreFloat3(&m_LocalPosition, pos);
 		XMStoreFloat4(&m_LocalRotation, rot);
 		XMStoreFloat3(&m_LocalScale, scale);
+	}
+
+	void Transform::Translate(DirectX::XMFLOAT3 translation, eSpace relativeTo)
+	{
+	}
+
+	void Transform::Translate(float x, float y, float z, eSpace relativeTo)
+	{
+	}
+
+	void Transform::Translate(DirectX::XMFLOAT3 translation, Transform relativeTo)
+	{
+	}
+
+	void Transform::Translate(float x, float y, float z, Transform relativeTo)
+	{
+	}
+
+	// 1. 현재 SetXXX로 Matrix가 생성되지 않는다.
+	// 2. 전방 벡터를 현재 위치에 상대적으로 계산해야 한다.
+	DirectX::XMFLOAT3 Transform::GetForward()// const
+	{
+		GetMatrix();
+		auto localRotationMatrix = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&m_LocalRotation));
+		auto forwardVector = DirectX::XMVector3Transform(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f), localRotationMatrix);
+		forwardVector = DirectX::XMVector3Normalize(forwardVector);
+
+		DirectX::XMFLOAT3 forward;
+		DirectX::XMStoreFloat3(&forward, forwardVector);
+
+		return forward;
+	}
+
+	DirectX::XMFLOAT3 Transform::GetUp()// const
+	{
+		GetMatrix();
+		auto localRotationMatrix = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&m_LocalRotation));
+		auto upVector = DirectX::XMVector3Transform(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f), localRotationMatrix);
+		upVector = DirectX::XMVector3Normalize(upVector);
+
+		DirectX::XMFLOAT3 up;
+		DirectX::XMStoreFloat3(&up, upVector);
+
+		return up;
+	}
+
+	DirectX::XMFLOAT3 Transform::GetRight()// const
+	{
+		GetMatrix();
+		auto localRotationMatrix = DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&m_LocalRotation));
+		auto rightVector = DirectX::XMVector3Transform(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f), localRotationMatrix);
+		rightVector = DirectX::XMVector3Normalize(rightVector);
+
+		DirectX::XMFLOAT3 right;
+		DirectX::XMStoreFloat3(&right, rightVector);
+
+		return right;
 	}
 
 	void Transform::SetParent(Transform* pParent)

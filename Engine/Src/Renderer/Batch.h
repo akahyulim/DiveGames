@@ -7,6 +7,7 @@
 namespace Dive
 {
 	class View;
+	class Camera;
 	class Pass;
 	class ShaderVariation;
 
@@ -21,8 +22,10 @@ namespace Dive
 		
 		// view와 camera를 받는다.
 		void Prepare(View* pView);
+		void Prepare(View* pView, Camera* pCamera);
 		// 역시 view와 camera를 받는다.
 		void Draw(View* pView);
+		void Draw(View* pView, Camera* pCamera);
 
 		Mesh* GetMesh() const { return m_pMesh; }
 		
@@ -76,6 +79,7 @@ namespace Dive
 		void SetInstancingData(void* pLockedData, uint32_t stride, uint32_t& freeIndex);
 
 		void Draw(View* pView);
+		void Draw(View* pView, Camera* pCamera);
 
 	private:
 		std::vector<InstanceData> m_InstanceDatas;
@@ -99,6 +103,7 @@ namespace Dive
 		void Clear();
 
 		void Draw(View* pView) const;
+		void Draw(View* pView, Camera* pCamera) const;
 
 		void AddStaticBatch(const Batch& batch) { m_Batches.emplace_back(batch); }
 		void AddInstancingBatch(const InstancingBatch& batch) { m_InstancingBatches.emplace_back(batch); }

@@ -66,6 +66,7 @@
 #include "Scene/GameObject.h"
 #include "Scene/Component/Component.h"
 #include "Scene/Component/Transform.h"
+#include "Scene/Component/Camera.h"
 #include "Scene/Component/Drawable.h"
 
 //= Math ==========================

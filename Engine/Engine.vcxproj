@@ -217,6 +217,7 @@
     <ClInclude Include="Src\Resource\Image.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceCache.h" />
+    <ClInclude Include="Src\Scene\Component\Camera.h" />
     <ClInclude Include="Src\Scene\Component\Component.h" />
     <ClInclude Include="Src\Scene\Component\Drawable.h" />
     <ClInclude Include="Src\Scene\Component\Transform.h" />
@@ -262,6 +263,7 @@
     <ClCompile Include="Src\Resource\Image.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceCache.cpp" />
+    <ClCompile Include="Src\Scene\Component\Camera.cpp" />
     <ClCompile Include="Src\Scene\Component\Component.cpp" />
     <ClCompile Include="Src\Scene\Component\Drawable.cpp" />
     <ClCompile Include="Src\Scene\Component\Transform.cpp" />

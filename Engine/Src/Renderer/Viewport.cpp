@@ -5,6 +5,7 @@
 #include "View.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
+#include "Scene/Component/Camera.h"
 #include "IO/Log.h"
 
 namespace Dive
@@ -13,6 +14,7 @@ namespace Dive
 		: Object(pContext),
 		m_pScene(nullptr),
 		m_pView(nullptr),
+		m_pCamera(nullptr),
 		m_Rect({0, 0, 0, 0})
 	{
 		SetRenderPath(nullptr);
@@ -20,19 +22,21 @@ namespace Dive
 		DV_LOG_ENGINE_TRACE("Viewport »ý¼º");
 	}
 
-	Viewport::Viewport(Context* pContext, Scene* pScene, RenderPath* pRenderPath) //+ camera
+	Viewport::Viewport(Context* pContext, Scene* pScene, Camera* pCamera, RenderPath* pRenderPath)
 		: Object(pContext),
 		m_pScene(pScene),
 		m_pView(nullptr),
+		m_pCamera(pCamera),
 		m_Rect({ 0, 0, 0, 0 })
 	{
 		SetRenderPath(pRenderPath);
 	}
 
-	Viewport::Viewport(Context* pContext, Scene* pScene, RenderPath* pRenderPath, const RECT& rect) // + camera
+	Viewport::Viewport(Context* pContext, Scene* pScene, Camera* pCamera, RenderPath* pRenderPath, const RECT& rect)
 		: Object(pContext),
 		m_pScene(pScene),
 		m_pView(nullptr),
+		m_pCamera(pCamera),
 		m_Rect(rect)
 	{
 		SetRenderPath(pRenderPath);

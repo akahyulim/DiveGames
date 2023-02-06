@@ -4,6 +4,7 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/View.h"
 #include "Renderer/Technique.h"
+#include "Scene/Component/Camera.h"
 #include "IO/Log.h"
 
 namespace Dive
@@ -61,6 +62,56 @@ namespace Dive
 		}
 	}
 
+	void Batch::Prepare(View* pView, Camera* pCamera)
+	{
+		if (!m_pVertexShaderVariation || !m_pPixelShaderVariation)
+			return;
+
+		auto* pGraphics = pView->GetGraphics();
+		pGraphics->SetShaders(m_pVertexShaderVariation, m_pPixelShaderVariation);
+
+		// Pass별로
+		// graphics에 blend, cull, fill mode등을 전달한다.
+
+		// shaderParameter들을 graphics에 보낸다.
+		{
+			auto worldTransform = DirectX::XMLoadFloat4x4(&m_WorldTransform);
+			worldTransform = DirectX::XMMatrixTranspose(worldTransform);
+			pGraphics->SetShaderParameter("cModel", worldTransform);
+		}
+
+		// 이건 다양한 모드들
+		if (m_pPass && m_pMaterial)
+		{
+			// blend mode
+
+			// cull mode
+
+			// fill mode
+		}
+
+		// 이건 셰이더 파라미터 & 텍스쳐
+		if (m_pMaterial)
+		{
+			const auto& textures = m_pMaterial->GetTextures();
+			for (auto it = textures.begin(); it != textures.end(); ++it)
+			{
+				if (pGraphics->HasTextureUnit(it->first))
+					pGraphics->SetTexture(static_cast<uint32_t>(it->first), it->second);
+
+			}
+		}
+
+		// camera
+		{
+			auto viewMatrix = XMMatrixTranspose(pCamera->GetViewMatrix());
+			auto projMatrix = XMMatrixTranspose(pCamera->GetProjectionMatrix());
+
+			pView->GetGraphics()->SetShaderParameter("viewMatrix", viewMatrix);
+			pView->GetGraphics()->SetShaderParameter("projectionMatrix", projMatrix);
+		}
+	}
+
 	void Batch::Draw(View* pView)
 	{
 		if (!m_pMesh)
@@ -71,9 +122,6 @@ namespace Dive
 		// test parameter
 		{
 			using namespace DirectX;
-
-			// world
-			auto worldMatrix = DirectX::XMMatrixIdentity();
 
 			// view
 			XMFLOAT3 up, position, lookAt;
@@ -130,7 +178,6 @@ namespace Dive
 			auto projMatrix = DirectX::XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, 0.1f, 1000.0f);
 
 			// constant buffer를 만들어 vs에 전달해야 한다.
-			worldMatrix = XMMatrixTranspose(worldMatrix);
 			viewMatrix = XMMatrixTranspose(viewMatrix);
 			projMatrix = XMMatrixTranspose(projMatrix);
 
@@ -138,6 +185,15 @@ namespace Dive
 			pView->GetGraphics()->SetShaderParameter("projectionMatrix", projMatrix);
 		}
 
+		m_pMesh->Draw(pView->GetGraphics());
+	}
+
+	void Batch::Draw(View* pView, Camera* pCamera)
+	{
+		if (!m_pMesh)
+			return;
+
+		Prepare(pView, pCamera);
 		m_pMesh->Draw(pView->GetGraphics());
 	}
 
@@ -199,6 +255,38 @@ namespace Dive
 		}
 	}
 
+	void InstancingBatch::Draw(View* pView, Camera* pCamera)
+	{
+		auto pGraphics = pView->GetGraphics();
+		auto pRenderer = pView->GetRenderer();
+
+		{
+			VertexBuffer* pInstancingBuffer = pRenderer->GetInstancingBuffer();
+
+			// 인스턴스 버퍼가 없거나, 인스턴스 타입이 아니거나, startIndex가 초기값일 경우
+			{
+				Batch::Prepare(pView, pCamera);
+
+				// set buffers
+
+				// 기타 + draw
+			}
+			{
+				Batch::Prepare(pView, pCamera);
+
+				// Graphics에서 VertexBuffer vector 획득
+				// 이건 아마도 이미 VertexBuffer를 bind한 상태일 것이다.
+				// 따라서 이 다음 배열에 InstancingBuffer를 추가한다.
+
+				// buffers bind
+
+				// DrawInstanced
+
+				// instancingBuffer를 VertexBuffer에서 pop하는 듯 하다.
+			}
+		}
+	}
+
 	void BatchQueue::Clear()
 	{
 		m_SortedInstancingBatches.clear();
@@ -228,6 +316,30 @@ namespace Dive
 			// scissor test?
 
 			batch.Draw(pView);
+		}
+	}
+
+	void BatchQueue::Draw(View* pView, Camera* pCamera) const
+	{
+		auto pGraphics = pView->GetGraphics();
+		auto pRenderer = pView->GetRenderer();
+
+		// instanced
+		for (auto instancingBatch : m_SortedInstancingBatches)
+		{
+			// stencil test?
+
+			instancingBatch->Draw(pView, pCamera);
+		}
+
+		// non-instanced
+		for (auto batch : m_Batches)//m_SortedBatches)
+		{
+			// stencil test?
+
+			// scissor test?
+
+			batch.Draw(pView, pCamera);
 		}
 	}
 

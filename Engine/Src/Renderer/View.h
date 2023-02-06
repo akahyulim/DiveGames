@@ -5,6 +5,7 @@ namespace Dive
 {
 	class Graphics;
 	class Renderer;
+	class Camera;
 	class Scene;
 	class RenderPath;
 	struct RenderPathCommand;
@@ -69,6 +70,8 @@ namespace Dive
 		Graphics* m_pGraphics;
 		Renderer* m_pRenderer;
 		Scene* m_pScene;
+
+		Camera* m_pCamera;
 
 		RenderPath* m_pRenderPath;
 

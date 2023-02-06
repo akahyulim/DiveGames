@@ -64,14 +64,16 @@ namespace Sandbox
 		auto pInput = GetSubsystem<Dive::Input>();
 		if (pInput)
 		{
-			if (pInput->KeyDown(DIK_Q))
-				DV_LOG_CLIENT_DEBUG("Input Q");
+			auto pTransform = m_pMainCamera->GetComponent<Dive::Transform>();
+
 			if (pInput->KeyDown(DIK_W))
-				DV_LOG_CLIENT_DEBUG("Input W");
-			if (pInput->KeyDown(DIK_E))
-				DV_LOG_CLIENT_DEBUG("Input E");
-			if (pInput->KeyDown(DIK_R))
-				DV_LOG_CLIENT_DEBUG("Input R");
+				pTransform->Translate(0.0f, 0.0f, 1.0f);
+			if (pInput->KeyDown(DIK_S))
+				pTransform->Translate(0.0f, 0.0f, -1.0f);
+			if (pInput->KeyDown(DIK_A))
+				pTransform->Translate(-1.0f, 0.0f, 0.0f);
+			if (pInput->KeyDown(DIK_D))
+				pTransform->Translate(1.0f, 0.0f, 0.0f);
 		}
 	}
 
@@ -97,12 +99,21 @@ namespace Sandbox
 
 		// Add GameObjects
 		{
+			// Main Camera
+			{
+				m_pMainCamera = m_pScene->CreateGameObject("Camera");
+				auto pCamera = m_pMainCamera->AddComponent<Dive::Camera>();
+				auto pTransform = m_pMainCamera->GetComponent<Dive::Transform>();
+				pTransform->SetPosition(0.0f, 0.0f, 0.0f);
+				pViewport->SetCamera(pCamera);
+			}
+
 			// Triangle
 			{
 				auto pTriangle = m_pScene->CreateGameObject("Triangle");
 				auto pTransform = pTriangle->GetComponent<Dive::Transform>();
 				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-				pTransform->SetPosition(DirectX::XMFLOAT3(-2.5f, 0.0f, 10.0f));
+				pTransform->SetPosition(-2.5f, 0.0f, 10.0f);
 				//pTransform->SetScale(DirectX::XMFLOAT3(2.0f, 2.0f, 2.0f));
 				auto pDrawable = pTriangle->AddComponent<Dive::Drawable>();
 				pDrawable->SetModel(getModel("Triangle"));
@@ -125,7 +136,7 @@ namespace Sandbox
 				auto pQuad = m_pScene->CreateGameObject("Quad");
 				auto pTransform = pQuad->GetComponent<Dive::Transform>();
 				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-				pTransform->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 5.0f));
+				pTransform->SetPosition(0.0f, 0.0f, 5.0f);
 				//pTransform->SetScale(DirectX::XMFLOAT3(0.5f, 0.5f, 0.5f));
 				//pTransform->SetRotation(0.0f, 0.0f, -45.0f);
 				auto pDrawable = pQuad->AddComponent<Dive::Drawable>();
@@ -149,7 +160,7 @@ namespace Sandbox
 				auto pQuad = m_pScene->CreateGameObject("Cube");
 				auto pTransform = pQuad->GetComponent<Dive::Transform>();
 				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-				pTransform->SetPosition(DirectX::XMFLOAT3(2.5f, 0.0f, 0.0f));
+				pTransform->SetPosition(2.5f, 0.0f, 0.0f);
 				//pTransform->SetScale(DirectX::XMFLOAT3(5.0f, 5.0f, 5.0f));
 				//pTransform->SetRotation(45.0f, 45.0f, 0.0f);
 				auto pDrawable = pQuad->AddComponent<Dive::Drawable>();

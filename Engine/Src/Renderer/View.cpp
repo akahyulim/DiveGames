@@ -19,6 +19,7 @@
 #include "Resource/ResourceCache.h"
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
+#include "Scene/Component/Camera.h"
 #include "Scene/Component/Drawable.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
@@ -32,6 +33,7 @@ namespace Dive
 		m_pGraphics(GetSubsystem<Graphics>()),
 		m_pRenderer(GetSubsystem<Renderer>()),
 		m_pScene(nullptr),
+		m_pCamera(nullptr),
 		m_pRenderPath(nullptr),
 		m_pRenderTarget(nullptr),
 		m_pCurRenderTarget(nullptr),
@@ -73,10 +75,11 @@ namespace Dive
 
 		m_pRenderTarget = pRenderTarget;
 		m_pScene = pViewport->GetScene();
-		// Ä«¸Þ¶óµµ È¹µæ
+		m_pCamera = pViewport->GetCamera();
 
 		int width = pRenderTarget ? pRenderTarget->GetWidth() : m_pGraphics->GetWidth();
 		int height = pRenderTarget ? pRenderTarget->GetHeight() : m_pGraphics->GetHeight();
+		m_pCamera->SetAspectRatio(static_cast<float>(width), static_cast<float>(height));
 		m_RenderTargetSize = DirectX::XMINT2(width, height);
 
 		RECT rect = pViewport->GetRect();
@@ -257,7 +260,7 @@ namespace Dive
 					setRenderTargets(pCommand);
 					setTextures(pCommand);
 
-					queue.Draw(this);
+					queue.Draw(this, m_pCamera);
 				}
 			}
 			break;

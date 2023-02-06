@@ -21,7 +21,7 @@ namespace Dive
 
 		void Clear();
 
-		DirectX::XMFLOAT3 GetPosition() const;
+		DirectX::XMFLOAT3 GetPosition(); //const;
 		DirectX::XMFLOAT3 GetLocalPosition() const { return m_LocalPosition; }
 		void SetPosition(const DirectX::XMFLOAT3& pos);
 		void SetPosition(float xPos, float yPos, float zPos);
@@ -65,9 +65,9 @@ namespace Dive
 		void LookAt(Transform target, DirectX::XMFLOAT3 worldUp = {0.0f, 1.0f, 0.0f});
 		void LookAt(DirectX::XMFLOAT3 worldPosition, DirectX::XMFLOAT3 worldUp = { 0.0f, 1.0f, 0.0f });
 
-		DirectX::XMFLOAT3 GetForward() const;
-		DirectX::XMFLOAT3 GetUp() const;
-		DirectX::XMFLOAT3 GetRight() const;
+		DirectX::XMFLOAT3 GetForward();// const;
+		DirectX::XMFLOAT3 GetUp();// const;
+		DirectX::XMFLOAT3 GetRight();// const;
 
 		bool HasParent() const { return m_pParent; }
 		Transform* GetParent() const { return m_pParent; }
