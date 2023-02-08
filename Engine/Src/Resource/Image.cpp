@@ -33,7 +33,7 @@ namespace Dive
 		{
 			hResult = DirectX::LoadFromDDSFile(filePath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
 		}
-		if (ext == ".tga")
+		else if (ext == ".tga")
 		{
 			hResult = DirectX::LoadFromTGAFile(filePath.c_str(), nullptr, img);
 		}

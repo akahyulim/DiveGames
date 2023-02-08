@@ -2,16 +2,16 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Src">
-      <UniqueIdentifier>{a6c64c7c-1b18-42c4-80f6-3104a21e75bf}</UniqueIdentifier>
+      <UniqueIdentifier>{7d45c240-4db9-4f48-9572-523e2a9279ed}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Sandbox.cpp">
+    <ClCompile Include="Src\ForwardLights.cpp">
       <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Sandbox.h">
+    <ClInclude Include="Src\ForwardLights.h">
       <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>

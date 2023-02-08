@@ -310,10 +310,9 @@ namespace Dive
 	void Graphics::SetWindowTitle(const std::wstring& title)
 	{
 		if (m_WindowHandle)
-		{
 			::SetWindowText(m_WindowHandle, title.c_str());
-			m_WindowTitle = title;
-		}
+		
+		m_WindowTitle = title;
 	}
 
 	void Graphics::GetWindowPosition(int32_t& outX, int32_t& outY) const

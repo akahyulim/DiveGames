@@ -154,6 +154,9 @@
     <ClInclude Include="Src\Scene\Component\Camera.h">
       <Filter>Src\Scene\Component</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Scene\Component\Light.h">
+      <Filter>Src\Scene\Component</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\divepch.cpp">
@@ -280,6 +283,9 @@
       <Filter>Src\Input</Filter>
     </ClCompile>
     <ClCompile Include="Src\Scene\Component\Camera.cpp">
+      <Filter>Src\Scene\Component</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Component\Light.cpp">
       <Filter>Src\Scene\Component</Filter>
     </ClCompile>
   </ItemGroup>
