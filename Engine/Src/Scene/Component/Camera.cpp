@@ -29,7 +29,9 @@ namespace Dive
 			return DirectX::XMMatrixIdentity();
 
 		auto position = pTransform->GetPosition();
+		// forward와 lookAt은 다르다. lookAt은 pos + forawrd라 할 수 있다.
 		auto focus = pTransform->GetForward();
+		focus.x += position.x; focus.y += position.y;	focus.z += position.z;
 		auto up = pTransform->GetUp();
 
 		return DirectX::XMMatrixLookAtLH(

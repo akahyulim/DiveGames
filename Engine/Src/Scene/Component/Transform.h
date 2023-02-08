@@ -21,43 +21,55 @@ namespace Dive
 
 		void Clear();
 
-		DirectX::XMFLOAT3 GetPosition(); //const;
+		DirectX::XMFLOAT3 GetPosition() const;
+		DirectX::XMVECTOR GetPositionVector() const;
 		DirectX::XMFLOAT3 GetLocalPosition() const { return m_LocalPosition; }
+		DirectX::XMVECTOR GetLocalPositionVector() const;
+		void SetPosition(float x, float y, float z);
 		void SetPosition(const DirectX::XMFLOAT3& pos);
-		void SetPosition(float xPos, float yPos, float zPos);
-		void SetLocalPosition(const DirectX::XMFLOAT3& pos) { m_LocalPosition = pos; }
-		void SetLocalPosition(float xPos, float yPos, float zPos);
+		void SetPositionVector(const DirectX::XMVECTOR& pos);
+		void SetLocalPosition(float x, float y, float z);
+		void SetLocalPosition(const DirectX::XMFLOAT3& pos);
+		void SetLocalPositionVector(const DirectX::XMVECTOR& pos);
 
 		DirectX::XMFLOAT3 GetRotation() const;
 		DirectX::XMFLOAT4 GetRotationQuaternion() const;
+		DirectX::XMVECTOR GetRotationQuaternionVector() const;
 		DirectX::XMFLOAT3 GetLocalRotation() const;
 		DirectX::XMFLOAT4 GetLocalRotationQuaternion() const { return m_LocalRotation; }
-		void SetRotation(const DirectX::XMFLOAT3& angle);
+		DirectX::XMVECTOR GetLocalRotationQuaternionVector() const;
 		void SetRotation(float xAngle, float yAngle, float zAngle);
-		void SetRotation(const DirectX::XMFLOAT4& quaternion);
-		void SetLocalRotation(const DirectX::XMFLOAT3& angle);
+		void SetRotation(const DirectX::XMFLOAT3& angle);
+		void SetRotationQuaternion(const DirectX::XMFLOAT4& quaternion);
+		void SetRotationQuaternionVector(const DirectX::XMVECTOR& quaternion);
 		void SetLocalRotation(float xAngle, float yAngle, float zAngle);
-		void SetLocalRotation(const DirectX::XMFLOAT4& quaternion) { m_LocalRotation = quaternion; }
+		void SetLocalRotation(const DirectX::XMFLOAT3& angle);
+		void SetLocalRotationQuaternion(const DirectX::XMFLOAT4& quaternion);
+		void SetLocalRotationQuaternionVector(const DirectX::XMVECTOR& quaternion);
 
 		DirectX::XMFLOAT3 GetScale() const;
+		DirectX::XMVECTOR GetScaleVector() const;
 		DirectX::XMFLOAT3 GetLocalScale() const { return m_LocalScale; }
+		DirectX::XMVECTOR GetLocalScaleVector() const;
+		void SetScale(float x, float y, float z);
 		void SetScale(const DirectX::XMFLOAT3& scale);
-		void SetScale(float xScale, float yScale, float zScale);
-		void SetLocalScale(const DirectX::XMFLOAT3& scale) { m_LocalScale = scale; }
-		void SetLocalScale(float xScale, float yScale, float zScale);
+		void SetScaleVector(const DirectX::XMVECTOR& scale);
+		void SetLocalScale(float x, float y, float z);
+		void SetLocalScale(const DirectX::XMFLOAT3& scale);
+		void SetLocalScaleVector(const DirectX::XMVECTOR& scale);
 
-		DirectX::XMMATRIX GetMatrix();
-		DirectX::XMFLOAT4X4 GetWorldTransform();
+		DirectX::XMMATRIX GetMatrix() const;
 		DirectX::XMMATRIX GetLocalMatrix() const;
-		void SetLocalMatrix(const DirectX::XMFLOAT4X4& mat);
 
-		void Translate(DirectX::XMFLOAT3 translation, eSpace relativeTo = eSpace::Self);
 		void Translate(float x, float y, float z, eSpace relativeTo = eSpace::Self);
-		void Translate(DirectX::XMFLOAT3 translation, Transform relativeTo);
-		void Translate(float x, float y, float z, Transform relativeTo);
+		void Translate(const DirectX::XMFLOAT3& translation, eSpace relativeTo = eSpace::Self);
+		void TranslateVector(const DirectX::XMVECTOR& translation, eSpace relativeTo = eSpace::Self);
+		void Translate(const DirectX::XMFLOAT3& translation, Transform relativeTo);
 
-		void Rotate(DirectX::XMFLOAT3 eulerAngle, eSpace relativeTo = eSpace::Self);
 		void Rotate(float xAngle, float yAngle, float zAngle, eSpace relativeTo = eSpace::Self);
+		void Rotate(const DirectX::XMFLOAT3& eulerAngle, eSpace relativeTo = eSpace::Self);
+		void RotateQuaternion(const DirectX::XMFLOAT4& quaternion, eSpace relativeTo = eSpace::Self);
+		void RotateQuaternionVector(const DirectX::XMVECTOR& quaternion, eSpace relativeTo = eSpace::Self);
 		void Rotate(DirectX::XMFLOAT3 axis, float angle, eSpace relativeTo = eSpace::Self);
 
 		void RotateAround(DirectX::XMFLOAT3 point, DirectX::XMFLOAT3 axis, float angle);
@@ -65,9 +77,9 @@ namespace Dive
 		void LookAt(Transform target, DirectX::XMFLOAT3 worldUp = {0.0f, 1.0f, 0.0f});
 		void LookAt(DirectX::XMFLOAT3 worldPosition, DirectX::XMFLOAT3 worldUp = { 0.0f, 1.0f, 0.0f });
 
-		DirectX::XMFLOAT3 GetForward();// const;
-		DirectX::XMFLOAT3 GetUp();// const;
-		DirectX::XMFLOAT3 GetRight();// const;
+		DirectX::XMFLOAT3 GetForward() const;
+		DirectX::XMFLOAT3 GetUp() const;
+		DirectX::XMFLOAT3 GetRight() const;
 
 		bool HasParent() const { return m_pParent; }
 		Transform* GetParent() const { return m_pParent; }
@@ -81,11 +93,15 @@ namespace Dive
 		std::vector<Transform*> GetChildren() const;
 
 	private:
+		void updateTransform();
+
+	private:
 		DirectX::XMFLOAT3 m_LocalPosition;
 		DirectX::XMFLOAT4 m_LocalRotation;
 		DirectX::XMFLOAT3 m_LocalScale;
 
 		DirectX::XMFLOAT4X4 m_Matrix;
+		DirectX::XMFLOAT4X4 m_LocalMatrix;
 
 		Transform* m_pParent;
 		std::vector<Transform*> m_Children;

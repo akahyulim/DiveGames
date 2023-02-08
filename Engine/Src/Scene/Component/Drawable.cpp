@@ -54,9 +54,11 @@ namespace Dive
 				m_Meshes[i] = meshes[i];
 				// 이외에도 center와
 				// DrawalbBatch의 worldTransform을 저장한다.
-				// 이게 굳이 포인터여야 하나? 크기를 확인해보자.
-				// 현재 이 부분때문에 렌더링도 안된다.
-				m_SourceDatas[i].WorldTransform = m_pGameObject->GetComponent<Transform>()->GetWorldTransform();
+
+				// transform을 다시 구현하면서 데이터형이 꼬였다.
+				DirectX::XMFLOAT4X4 worldMat;
+				DirectX::XMStoreFloat4x4(&worldMat, m_pGameObject->GetComponent<Transform>()->GetMatrix());
+				m_SourceDatas[i].WorldTransform = worldMat;
 
 				// 원래는 ResetLodLevels에서 수행한다.
 				m_SourceDatas[i].pMesh = meshes[i];

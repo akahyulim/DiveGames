@@ -60,21 +60,8 @@ namespace Sandbox
 
 	void Sandbox::OnUpdate(const Dive::Event& evnt)
 	{
-		// 원래는 MoveCamera()로 제어
-		auto pInput = GetSubsystem<Dive::Input>();
-		if (pInput)
-		{
-			auto pTransform = m_pMainCamera->GetComponent<Dive::Transform>();
-
-			if (pInput->KeyDown(DIK_W))
-				pTransform->Translate(0.0f, 0.0f, 1.0f);
-			if (pInput->KeyDown(DIK_S))
-				pTransform->Translate(0.0f, 0.0f, -1.0f);
-			if (pInput->KeyDown(DIK_A))
-				pTransform->Translate(-1.0f, 0.0f, 0.0f);
-			if (pInput->KeyDown(DIK_D))
-				pTransform->Translate(1.0f, 0.0f, 0.0f);
-		}
+		// 이벤트에서 delta를 얻어 전달해야 한다.
+		moveCamera(1.0f);
 	}
 
 	void Sandbox::createScene()
@@ -104,7 +91,7 @@ namespace Sandbox
 				m_pMainCamera = m_pScene->CreateGameObject("Camera");
 				auto pCamera = m_pMainCamera->AddComponent<Dive::Camera>();
 				auto pTransform = m_pMainCamera->GetComponent<Dive::Transform>();
-				pTransform->SetPosition(0.0f, 0.0f, 0.0f);
+				pTransform->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, -10.0f));
 				pViewport->SetCamera(pCamera);
 			}
 
@@ -113,8 +100,9 @@ namespace Sandbox
 				auto pTriangle = m_pScene->CreateGameObject("Triangle");
 				auto pTransform = pTriangle->GetComponent<Dive::Transform>();
 				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-				pTransform->SetPosition(-2.5f, 0.0f, 10.0f);
-				//pTransform->SetScale(DirectX::XMFLOAT3(2.0f, 2.0f, 2.0f));
+				pTransform->SetPosition(-10.0f, 0.0f, 10.0f);
+				pTransform->SetScale(2.0f, 2.0f, 2.0f);
+				pTransform->SetScale(3.0f, 0.0f, 3.0f);
 				auto pDrawable = pTriangle->AddComponent<Dive::Drawable>();
 				pDrawable->SetModel(getModel("Triangle"));
 				//pDrawable->SetMaterial(pRenderer->GetDefaultMaterial());
@@ -122,8 +110,8 @@ namespace Sandbox
 				pMat->SetName("TirangleMat");
 				pCache->AddManualResource(pMat);
 				pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
-				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/ChoA.jpg");
-				pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/dmc.jpg");
+				pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/ChoA.jpg");
+				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/dmc.jpg");
 				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Dokev.jpeg");
 				//pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetRedTexture(m_pContext));
 				pDrawable->SetMaterial(pMat);
@@ -160,7 +148,7 @@ namespace Sandbox
 				auto pQuad = m_pScene->CreateGameObject("Cube");
 				auto pTransform = pQuad->GetComponent<Dive::Transform>();
 				// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-				pTransform->SetPosition(2.5f, 0.0f, 0.0f);
+				pTransform->SetPosition(DirectX::XMFLOAT3(5.0f, 0.0f, 0.0f));
 				//pTransform->SetScale(DirectX::XMFLOAT3(5.0f, 5.0f, 5.0f));
 				//pTransform->SetRotation(45.0f, 45.0f, 0.0f);
 				auto pDrawable = pQuad->AddComponent<Dive::Drawable>();
@@ -172,8 +160,8 @@ namespace Sandbox
 				pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
 				// urho는 Cache로부터 GetResource한 결과물을
 				// matrix의 SetTexture()로 등록한다.
-				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Dokev.jpeg");
-				pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/dmc.jpg");
+				pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Dokev.jpeg");
+				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/dmc.jpg");
 				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/iu.jpg");
 				//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/no_texture.png");
 				//pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetGrayTexture(m_pContext));
@@ -378,5 +366,65 @@ namespace Sandbox
 		}
 
 		return nullptr;
+	}
+
+	void Sandbox::moveCamera(float delta)
+	{
+		static float MOVE_SPEED = 10.0f;
+		static DirectX::XMVECTOR FORWARD = { 0.0f, 0.0f, 1.0f };
+		static DirectX::XMVECTOR BACK = { 0.0f, 0.0f, -1.0f };
+		static DirectX::XMVECTOR LEFT = { -1.0f, 0.0f, 0.0f };
+		static DirectX::XMVECTOR RIGHT = { 1.0f, 0.0f, 0.0f };
+		static DirectX::XMVECTOR UP = { 0.0f, 1.0f, 0.0f };
+		static DirectX::XMVECTOR DOWN = { 0.0f, -1.0f, 0.0f };
+
+		auto pInput = GetSubsystem<Dive::Input>();
+		if (pInput)
+		{
+			auto pTransform = m_pMainCamera->GetComponent<Dive::Transform>();
+
+			// xmfloat3와 xmvector 전부 speed와 delta를 곱할 수가 없다.
+			if (pInput->KeyPress(DIK_W))
+			{
+				pTransform->TranslateVector(FORWARD);
+			}
+			if (pInput->KeyPress(DIK_S))
+			{
+				pTransform->Translate(DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f));
+			}
+			if (pInput->KeyPress(DIK_A))
+			{
+				pTransform->Translate(DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), Dive::eSpace::World);
+			}
+			if (pInput->KeyPress(DIK_D))
+			{
+				pTransform->Translate(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f));
+			}
+			if (pInput->KeyPress(DIK_C))
+			{
+				pTransform->Translate(DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f));
+			}
+			if (pInput->KeyPress(DIK_SPACE))
+			{
+				pTransform->Translate(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
+			}
+
+			if (pInput->KeyPress(DIK_LEFT))
+			{
+				pTransform->Rotate(DirectX::XMFLOAT3(0.0f, -2.0f, 0.0f));
+			}
+			if (pInput->KeyPress(DIK_RIGHT))
+			{
+				pTransform->Rotate(DirectX::XMFLOAT3(0.0f, 2.0f, 0.0f));
+			}
+			if (pInput->KeyPress(DIK_UP))
+			{
+				pTransform->Rotate(DirectX::XMFLOAT3(-2.0f, 0.0f, 0.0f));
+			}
+			if (pInput->KeyPress(DIK_DOWN))
+			{
+				pTransform->Rotate(DirectX::XMFLOAT3(2.0f, 0.0f, 0.0f));
+			}
+		}
 	}
 }
