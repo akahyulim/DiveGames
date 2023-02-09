@@ -284,9 +284,11 @@ namespace Dive
 	void Transform::TranslateVector(const DirectX::XMVECTOR& translation, eSpace relativeTo)
 	{
 		if (relativeTo == eSpace::World)
-			SetPositionVector(XMVectorAdd(GetPositionVector(), translation));
+			SetPositionVector(XMVector3Transform(translation, GetMatrix()));
+		
 		else
-			SetLocalPositionVector(XMVectorAdd(GetLocalPositionVector(), translation));
+			SetLocalPositionVector(XMVector3Transform(translation, GetLocalMatrix()));
+		
 	}
 
 	void Transform::Rotate(float xAngle, float yAngle, float zAngle, eSpace relativeTo)
