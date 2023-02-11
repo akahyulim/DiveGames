@@ -280,7 +280,7 @@ namespace Dive
 			{
 				RenderPathCommand command;
 				command.Type = eRenderCommandType::Clear;
-				command.ClearColor = { 0.6f, 0.6f, 0.6f, 1.0f };
+				command.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };//{ 0.6f, 0.6f, 0.6f, 1.0f };
 				command.ClearDepth = 1.0f;
 				command.ClearStencil = 0;
 				command.Outputs.resize(1);

@@ -4,7 +4,9 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/View.h"
 #include "Renderer/Technique.h"
+#include "Scene/GameObject.h"
 #include "Scene/Component/Camera.h"
+#include "Scene/Component/Transform.h"
 #include "IO/Log.h"
 
 namespace Dive
@@ -61,9 +63,11 @@ namespace Dive
 
 		// camera
 		{
+			auto cameraPos = pCamera->GetGameObject()->GetComponent<Transform>()->GetPosition();	// 상당히 번거롭다...
 			auto viewMatrix = XMMatrixTranspose(pCamera->GetViewMatrix());
 			auto projMatrix = XMMatrixTranspose(pCamera->GetProjectionMatrix());
 
+			pView->GetGraphics()->SetShaderParameter("cameraPos", cameraPos);
 			pView->GetGraphics()->SetShaderParameter("viewMatrix", viewMatrix);
 			pView->GetGraphics()->SetShaderParameter("projectionMatrix", projMatrix);
 		}

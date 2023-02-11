@@ -19,6 +19,8 @@ namespace Dive
 		explicit Transform(Context* pContext);
 		~Transform() override;
 
+		void Update(float delta) override;
+
 		void Clear();
 
 		DirectX::XMFLOAT3 GetPosition() const;
@@ -68,8 +70,8 @@ namespace Dive
 
 		void Rotate(float xAngle, float yAngle, float zAngle, eSpace relativeTo = eSpace::Self);
 		void Rotate(const DirectX::XMFLOAT3& eulerAngle, eSpace relativeTo = eSpace::Self);
-		void RotateQuaternion(const DirectX::XMFLOAT4& quaternion, eSpace relativeTo = eSpace::Self);
-		void RotateQuaternionVector(const DirectX::XMVECTOR& quaternion, eSpace relativeTo = eSpace::Self);
+		void RotateQuaternion(const DirectX::XMFLOAT4& delta, eSpace relativeTo = eSpace::Self);
+		void RotateQuaternionVector(const DirectX::XMVECTOR& delta, eSpace relativeTo = eSpace::Self);
 		void Rotate(DirectX::XMFLOAT3 axis, float angle, eSpace relativeTo = eSpace::Self);
 
 		void RotateAround(DirectX::XMFLOAT3 point, DirectX::XMFLOAT3 axis, float angle);

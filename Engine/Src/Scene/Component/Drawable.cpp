@@ -24,15 +24,31 @@ namespace Dive
 
 	// 실제로는 Update, UpdateBatches, UpdateGeometry 세 가지로 나뉘며
 	// 전부 FrameInfo를 전달받는다.
-	// 그런데 호출 주체가 쓰레드이다...
-	// 즉, Scene에서 GameObject들을 Update하는 구문이 없다.
-	void Drawable::Update()
+	void Drawable::Update(float delta)
 	{
 		// UpdateBatches
 		// WorldTransform, Distance를 획득한 후 m_SourceDatas에 저장한다.
 		// 이는 아래의 SetModel에서도 동일하다.
+		if (m_pModel)
 		{
-			auto pTransform = m_pGameObject->GetComponent<Transform>();
+			auto numMeshes = m_pModel->GetMeshCount();
+			//SetNumMesh(numMeshes);
+
+			const auto& meshes = m_pModel->GetMeshes();
+			for (uint32_t i = 0; i < numMeshes; ++i)
+			{
+				//m_Meshes[i] = meshes[i];
+				// 이외에도 center와
+				// DrawalbBatch의 worldTransform을 저장한다.
+
+				// transform을 다시 구현하면서 데이터형이 꼬였다.
+				DirectX::XMFLOAT4X4 worldMat;
+				DirectX::XMStoreFloat4x4(&worldMat, m_pGameObject->GetComponent<Transform>()->GetMatrix());
+				m_SourceDatas[i].WorldTransform = worldMat;
+
+				// 원래는 ResetLodLevels에서 수행한다.
+				//m_SourceDatas[i].pMesh = meshes[i];
+			}
 		}
 	}
 

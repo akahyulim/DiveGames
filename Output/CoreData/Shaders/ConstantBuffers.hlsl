@@ -4,18 +4,19 @@
 
 #ifdef COMPILEVS
 
-cbuffer MatrixBuffer : register(b0)
+// FrameVS
+cbuffer FrameVS : register(b0)
 {
-	//matrix worldMatrix;
+	float3 cameraPos;
+	float dummy;
 	matrix viewMatrix;
 	matrix projectionMatrix;
-};
 
-// FrameVS
+}
 // CameraVS : 여기에 cViewProj로 view와 proj의 곱을 저장하는 듯 하다.
 // LightVS
 // ObjectVS : 여기에 worldTransform이 cModel이름으로 전달된다.
-cbuffer ObjectVS : register(b1)
+cbuffer ObjectVS : register(b2)
 {
 	float4x4 cModel;
 }

@@ -19,6 +19,10 @@ namespace Dive
 		explicit GameObject(Context* pContext);
 		~GameObject();
 
+		void Start();
+		void Stop();
+		void Update(float delta);
+
 		template<class T> T* AddComponent(uint32_t id = 0);
 
 		template<class T> void RemoveComponent();

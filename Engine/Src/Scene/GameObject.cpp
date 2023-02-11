@@ -35,6 +35,17 @@ namespace Dive
 		DV_LOG_ENGINE_TRACE("GameObject ¼Ò¸ê ¿Ï·á({0:d} : {1:s})", m_ID, m_Name);
 	}
 
+	void GameObject::Update(float delta)
+	{
+		if (!m_bActive)
+			return;
+
+		for (auto pComponent : m_Components)
+		{
+			pComponent->Update(delta);
+		}
+	}
+
 	void GameObject::RemoveComponent(Component* pComponent)
 	{
 		if (!pComponent)

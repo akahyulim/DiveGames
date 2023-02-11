@@ -51,6 +51,12 @@ namespace Dive
 
 	void Scene::Update(float delta)
 	{
+		// Start, Stop은 엔진으로부터 상태를 확인해야 한다.
+		for (auto pGameObject : m_GameObjects)
+		{
+			pGameObject.second->Update(delta);
+		}
+
 		if (m_bDirty)
 		{
 			auto it = m_GameObjects.begin();

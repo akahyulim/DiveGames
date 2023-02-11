@@ -21,6 +21,7 @@
 #include "Scene/GameObject.h"
 #include "Scene/Component/Camera.h"
 #include "Scene/Component/Drawable.h"
+#include "Scene/Component/Light.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
 #include "IO/FileSystem.h"
@@ -54,6 +55,11 @@ namespace Dive
 		// 실제로는 octree와 cullCamera 이다.
 		if (!m_pScene)
 			return;
+
+		m_Drawables.clear();
+		m_Lights.clear();
+		for (auto& batchQueue : m_BatchQueues)
+			batchQueue.second.Clear();
 
 		getDrawables();
 		getBaseBatches();
@@ -139,7 +145,6 @@ namespace Dive
 		// 실제로 Light가 Drwable을 상속했다... 굳이 따라할 필요는 없지 않나?
 
 
-		m_Drawables.clear();
 		auto allGameObjects = m_pScene->GetAllGameObjects();
 		for (auto pGameObject : allGameObjects)
 		{
@@ -147,18 +152,21 @@ namespace Dive
 			// 미래의 내가 고치겠지.
 			if (pGameObject->HasComponent<Dive::Drawable>())
 				m_Drawables.emplace_back(pGameObject->GetComponent<Dive::Drawable>());
+
+			if (pGameObject->HasComponent<Dive::Light>())
+				m_Lights.emplace_back(pGameObject->GetComponent<Dive::Light>());
 		}
 	}
 
-	// 일단 이 ScenePass 등에 대한 이해를 다시 한 후
-	// BatchQueue를 구성하고 Draw까지 해보자.
 	void View::getBaseBatches()
 	{
+		// 1. Drawable 루프
 		for (auto it = m_Drawables.begin(); it != m_Drawables.end(); ++it)
 		{
 			Drawable* pDrawable = *it;
 			const auto& sourceDatas = pDrawable->GetSourceDatas();
 
+			// 2. Drawable을 구성하는 데이터 루프
 			for (uint32_t i = 0; i < static_cast<uint32_t>(sourceDatas.size()); ++i)
 			{
 				const DrawableSourceData& drawableBatch = sourceDatas[i];

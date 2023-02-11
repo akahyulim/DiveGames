@@ -5,7 +5,9 @@ DEFINE_APPLICATION_MAIN(ForwardLights)
 ForwardLights::ForwardLights(Dive::Context* pContext)
 	: Dive::Application(pContext),
 	m_pScene(nullptr),
-	m_pMainCamera(nullptr)
+	m_pMainCamera(nullptr),
+	m_pCubeObject(nullptr),
+	m_pTriangleObject(nullptr)
 {
 }
 
@@ -50,6 +52,20 @@ void ForwardLights::OnUpdate(const Dive::Event& evnt)
 {
 	// 이벤트에서 delta를 얻어 전달해야 한다.
 	moveCamera(1.0f);
+
+	{
+		if (m_pTriangleObject)
+		{
+			auto pTransform = m_pTriangleObject->GetComponent<Dive::Transform>();
+			pTransform->Rotate(0.0f, 1.0f, 0.0f);
+		}
+
+		if (m_pCubeObject)
+		{
+			auto pTransform = m_pCubeObject->GetComponent<Dive::Transform>();
+			pTransform->Rotate(0.0f, -1.0f, 0.0f);
+		}
+	}
 }
 
 void ForwardLights::createScene()
@@ -74,44 +90,66 @@ void ForwardLights::createScene()
 
 	// Add GameObject
 	{
-		// Sphere
+		// Quad
 		{
-			auto pSphereObject = m_pScene->CreateGameObject("RedSphere");
-			auto pTransform = pSphereObject->GetComponent<Dive::Transform>();
-			// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-			pTransform->SetPosition(DirectX::XMFLOAT3(-5.0f, 0.0f, 0.0f));
-			pTransform->SetScale(2.0f, 2.0f, 2.0f);
-			auto pDrawable = pSphereObject->AddComponent<Dive::Drawable>();
-			pDrawable->SetModel(getModel("Cube"));
+			auto pQuadObject = m_pScene->CreateGameObject("QuadObject");
+			auto pTransform = pQuadObject->GetComponent<Dive::Transform>();
+			pTransform->SetPosition(0.0f, -2.0f, 0.0f);
+			pTransform->SetScale(5.0f, 5.0f, 1.0f);
+			pTransform->SetRotation(90.0f, 0.0f, 0.0f);
+			auto pDrawable = pQuadObject->AddComponent<Dive::Drawable>();
+			pDrawable->SetModel(getModel("Quad"));
 			Dive::Material* pMat = new Dive::Material(m_pContext);
-			pMat->SetName("RedSphereMat");
+			pMat->SetName("QuadMat");
 			pCache->AddManualResource(pMat);
 			pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
-			pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetRedTexture(m_pContext));
+			pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetGrayTexture(m_pContext));
+			pDrawable->SetMaterial(pMat);
+		}
+
+		// Triangle
+		{
+			m_pTriangleObject = m_pScene->CreateGameObject("TriangleObject");
+			auto pTransform = m_pTriangleObject->GetComponent<Dive::Transform>();
+			pTransform->SetPosition(0.0f, 0.0f, 0.0f);
+			auto pDrawable = m_pTriangleObject->AddComponent<Dive::Drawable>();
+			pDrawable->SetModel(getModel("Triangle"));
+			Dive::Material* pMat = new Dive::Material(m_pContext);
+			pMat->SetName("TriangleMat");
+			pCache->AddManualResource(pMat);
+			pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
+			pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetWhiteTexture(m_pContext));
 			pDrawable->SetMaterial(pMat);
 		}
 
 		// Cube
 		{
-			auto pCubeObject = m_pScene->CreateGameObject("Cube");
-			auto pTransform = pCubeObject->GetComponent<Dive::Transform>();
-			// 현재 위치를 먼저 변경해 놓았다. Drawable::Update()를 할 수 있는 방법이 없기 때문이다.
-			pTransform->SetPosition(DirectX::XMFLOAT3(5.0f, 0.0f, 0.0f));
-			pTransform->SetScale(2.0f, 2.0f, 2.0f);
-			auto pDrawable = pCubeObject->AddComponent<Dive::Drawable>();
+			m_pCubeObject = m_pScene->CreateGameObject("CubeObject");
+			auto pTransform = m_pCubeObject->GetComponent<Dive::Transform>();
+			pTransform->SetParent(m_pTriangleObject->GetComponent<Dive::Transform>());
+			pTransform->SetLocalPosition(5.0f, 0.0f, 0.0f);
+			auto pDrawable = m_pCubeObject->AddComponent<Dive::Drawable>();
 			pDrawable->SetModel(getModel("Cube"));
 			Dive::Material* pMat = new Dive::Material(m_pContext);
 			pMat->SetName("CubeMat");
 			pCache->AddManualResource(pMat);
 			pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
-			pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/seafloor.dds");
+			pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/stone01.tga");
 			pDrawable->SetMaterial(pMat);
 		}
 	}
 
 	// Add Lights
 	{
-
+		// Directional Light
+		{
+			auto pDirLightObject = m_pScene->CreateGameObject("DirLightObject");
+			auto pTransform = pDirLightObject->GetComponent<Dive::Transform>();
+			pTransform->SetPosition(-1.0f, 1.0f, 1.0f);
+			auto pLight = pDirLightObject->AddComponent<Dive::Light>();
+			pLight->SetType(Dive::eLightType::Directional);
+			pLight->SetColor(1.0f, 0.0f, 7.0f);
+		}
 	}
 
 	DV_LOG_CLIENT_TRACE("ForwardLights Scene을 생성하였습니다.");
@@ -125,20 +163,18 @@ Dive::Model* ForwardLights::getModel(const std::string& name)
 		return pModel;
 	else
 	{
+		std::vector<Dive::VertexElement> elements;
+		elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
+		elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
+		elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR2, Dive::eVertexElementSemantic::SEM_TEXCOORD);
+		elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_NORMAL);
+
 		if (name == "Triangle")
 		{
-			// 결국 이러한 형태는 불가능한 듯 보인다.
-			// Geometry Type에 맞춰 Elements는 이미 구성된 상태라 유추할 수 있다.
-			std::vector<Dive::VertexElement> elements;
-			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
-			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
-			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR2, Dive::eVertexElementSemantic::SEM_TEXCOORD);
-			//elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_NORMAL);
-
 			std::vector<float> vertices =
-			{ -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,// 0.0f, 0.0f, 1.0f,
-			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.5f, 0.0f,// 0.0f, 0.0f, 1.0f,
-			1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f };//, 0.0f, 0.0f, 1.0f };
+			{ -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+			0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f,
+			1.0f, -1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f };
 
 			Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
 			pVb->SetSize(3, elements);
@@ -164,17 +200,12 @@ Dive::Model* ForwardLights::getModel(const std::string& name)
 		}
 		else if (name == "Quad")
 		{
-			std::vector<Dive::VertexElement> elements;
-			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
-			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
-			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR2, Dive::eVertexElementSemantic::SEM_TEXCOORD);
-
 			std::vector<float> vertices =
 			{
-				-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
-				-1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-				1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-				1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f
+				-1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+				-1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+				1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+				1.0f, -1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f
 			};
 
 			Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
@@ -201,48 +232,43 @@ Dive::Model* ForwardLights::getModel(const std::string& name)
 		}
 		else if (name == "Cube")
 		{
-			std::vector<Dive::VertexElement> elements;
-			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR3, Dive::eVertexElementSemantic::SEM_POSITION);
-			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR4, Dive::eVertexElementSemantic::SEM_COLOR);
-			elements.emplace_back(Dive::eVertexElementType::TYPE_VECTOR2, Dive::eVertexElementSemantic::SEM_TEXCOORD);
-
 			std::vector<float> vertices =
 			{
 				// front
-				-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-				1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-				1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-				-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+				-1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+				1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+				1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+				-1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
 
 				// bottom
-				-1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-				1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-				1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-				-1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+				-1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+				1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+				1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+				-1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
 
 				// back
-				-1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
-				1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f,
-				1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f,
-				-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f,
+				-1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+				1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+				1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+				-1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 
 				// top
-				-1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-				1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-				1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-				-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+				-1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+				1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+				1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+				-1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
 
 				// right
-				1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-				1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-				1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-				1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f,
+				1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+				1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+				1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+				1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
 
 				// left
-				-1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-				-1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f,
-				-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f,
-				-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f
+				-1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+				-1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+				-1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+				-1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f
 			};
 
 			Dive::VertexBuffer* pVb = new Dive::VertexBuffer(m_pContext);
@@ -274,9 +300,6 @@ Dive::Model* ForwardLights::getModel(const std::string& name)
 
 			return pCubeModel;
 		}
-		else if (name == "Sphere")
-		{
-		}
 	}
 
 	return nullptr;
@@ -297,10 +320,10 @@ Dive::Technique* ForwardLights::getTechnique(const std::string& name)
 			Dive::Pass* pPass = pTechnique->CreatePass("alpha");
 			// global은 pass마다 저장하는 듯 하다.
 			// 개별 셰이더가 있다면 그때는 따로 저장한다.
-			pPass->SetVertexShader("CoreData/Shaders/Basic.hlsl");
+			pPass->SetVertexShader("CoreData/Shaders/ForwardLight.hlsl");
 			//pPass->SetVertexShaderDefines("VERTEXCOLOR DIFFMAP");
 			pPass->SetVertexShaderDefines("DIFFMAP");
-			pPass->SetPixelShader("CoreData/Shaders/Basic.hlsl");
+			pPass->SetPixelShader("CoreData/Shaders/ForwardLight.hlsl");
 			// 흐음 예상과 다르다. 순서를 맞춰야 한다.
 			//pPass->SetPixelShaderDefines("VERTEXCOLOR DIFFMAP");
 			pPass->SetPixelShaderDefines("DIFFMAP");
@@ -359,19 +382,19 @@ void ForwardLights::moveCamera(float delta)
 
 		if (pInput->KeyPress(DIK_LEFT))
 		{
-			pTransform->Rotate(DirectX::XMFLOAT3(0.0f, -2.0f, 0.0f));
+			pTransform->Rotate(0.0f, -2.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_RIGHT))
 		{
-			pTransform->Rotate(DirectX::XMFLOAT3(0.0f, 2.0f, 0.0f));
+			pTransform->Rotate(0.0f, 2.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_UP))
 		{
-			pTransform->Rotate(DirectX::XMFLOAT3(-2.0f, 0.0f, 0.0f));
+			pTransform->Rotate(-2.0f, 0.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_DOWN))
 		{
-			pTransform->Rotate(DirectX::XMFLOAT3(2.0f, 0.0f, 0.0f));
+			pTransform->Rotate(2.0f, 0.0f, 0.0f);
 		}
 	}
 }

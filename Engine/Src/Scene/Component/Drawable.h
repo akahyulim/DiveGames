@@ -26,7 +26,7 @@ namespace Dive
 		explicit Drawable(Context* pContext);
 		~Drawable() override;
 
-		virtual void Update();
+		void Update(float delta) override;
 
 		Model* GetModel() const { return m_pModel; }
 		virtual void SetModel(Model* pModel);

@@ -59,7 +59,7 @@ namespace Dive
 		desc.AddressW = m_AddressMode;
 		desc.MipLODBias = 0.0f;
 		desc.MaxAnisotropy = m_AnisoLevel;
-		desc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+		desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;//D3D11_COMPARISON_LESS_EQUAL;
 		desc.BorderColor[0] = m_BorderColor.x;
 		desc.BorderColor[1] = m_BorderColor.y;
 		desc.BorderColor[2] = m_BorderColor.z;

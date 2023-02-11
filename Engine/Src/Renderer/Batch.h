@@ -110,6 +110,12 @@ namespace Dive
 		
 		bool IsEmpty() const { return m_Batches.empty() && m_InstancingBatches.empty(); }
 
+		// юс╫ц
+		size_t GetBatchCount() const
+		{
+			return m_Batches.empty() ? 0 : m_Batches.size();
+		}
+
 	private:
 		std::vector<Batch> m_Batches;
 		std::vector<Batch*> m_SortedBatches;

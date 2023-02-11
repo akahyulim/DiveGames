@@ -18,6 +18,8 @@ namespace Dive
 		explicit Component(Context* pContext);
 		virtual ~Component() = default;
 
+		virtual void Update(float delta) {}
+
 		GameObject* GetGameObject() { return m_pGameObject; }
 		uint32_t GetID() const { return m_ID; }
 

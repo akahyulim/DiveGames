@@ -27,6 +27,11 @@ namespace Dive
 		DV_LOG_ENGINE_TRACE("Transform 소멸 완료({0:d}, {1:s})", m_ID, m_pGameObject->GetName());
 	}
 
+	void Transform::Update(float delta)
+	{
+		updateTransform();
+	}
+
 	void Transform::Clear()
 	{
 		SetPosition(0.0f, 0.0f, 0.0f);
@@ -309,17 +314,43 @@ namespace Dive
 		RotateQuaternionVector(XMQuaternionRotationRollPitchYaw(radianX, radianY, radianZ), relativeTo);
 	}
 
-	void Transform::RotateQuaternion(const DirectX::XMFLOAT4& quaternion, eSpace relativeTo)
+	void Transform::RotateQuaternion(const DirectX::XMFLOAT4& delta, eSpace relativeTo)
 	{
-		RotateQuaternionVector(XMLoadFloat4(&quaternion), relativeTo);
+		RotateQuaternionVector(XMLoadFloat4(&delta), relativeTo);
 	}
 
-	void Transform::RotateQuaternionVector(const DirectX::XMVECTOR& quaternion, eSpace relativeTo)
+	void Transform::RotateQuaternionVector(const DirectX::XMVECTOR& delta, eSpace relativeTo)
 	{
 		if (relativeTo == eSpace::World)
-			SetRotationQuaternionVector(XMVector4Normalize(XMQuaternionMultiply(quaternion, GetRotationQuaternionVector())));
+		{
+			// 일단 이건 확실히 잘못된 듯 보인다.
+			// spartan의 경우 rotationLocal * GetRotation().Inverse() * delta * GetRotation()이다. 
+			SetRotationQuaternionVector(XMVector4Normalize(XMQuaternionMultiply(GetRotationQuaternionVector(), delta)));
+		}
 		else
-			SetLocalRotationQuaternionVector(XMVector4Normalize(XMQuaternionMultiply(quaternion, GetLocalRotationQuaternionVector())));
+		{
+			SetLocalRotationQuaternionVector(XMVector4Normalize(XMQuaternionMultiply(GetLocalRotationQuaternionVector(), delta)));
+		}
+	}
+
+	void Transform::LookAt(Transform target, DirectX::XMFLOAT3 worldUp)
+	{
+		LookAt(target.GetPosition(), worldUp);
+	}
+
+	// target을 바라보도록 되도록 회전시킨다.
+	void Transform::LookAt(DirectX::XMFLOAT3 worldPosition, DirectX::XMFLOAT3 worldUp)
+	{
+		auto forwardVector = XMVectorSubtract(XMLoadFloat3(&worldPosition), GetPositionVector());
+		forwardVector = XMVector3Normalize(forwardVector);
+
+		auto rightVector = XMVector3Cross(XMLoadFloat3(&worldUp), forwardVector);
+		rightVector = XMVector3Normalize(rightVector);
+
+		auto upVector = XMVector3Cross(forwardVector, rightVector);
+
+
+		// 이제 이것들로 어떻게 하냐...?
 	}
 
 	DirectX::XMFLOAT3 Transform::GetForward() const

@@ -13,6 +13,7 @@ namespace Dive
 	class Viewport;
 	class Mesh;
 	class Drawable;
+	class Light;
 	class Technique;
 	class Batch;
 	class BatchQueue;
@@ -83,6 +84,7 @@ namespace Dive
 		DirectX::XMINT2 m_RenderTargetSize;
 
 		std::vector<Drawable*> m_Drawables;
+		std::vector<Light*> m_Lights;
 
 		std::vector<ScenePassInfo> m_ScenePasses;
 		std::unordered_map<uint32_t, BatchQueue> m_BatchQueues;

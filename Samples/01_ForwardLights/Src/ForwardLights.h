@@ -26,4 +26,6 @@ private:
 private:
 	Dive::Scene* m_pScene;
 	Dive::GameObject* m_pMainCamera;
+	Dive::GameObject* m_pCubeObject;
+	Dive::GameObject* m_pTriangleObject;
 };

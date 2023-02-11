@@ -20,7 +20,6 @@ namespace Dive
 {
 	bool Graphics::CreateDeviceAndSwapChain(uint32_t width, uint32_t height)
 	{
-		/*
 		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
 
 		if (FAILED(D3D11CreateDevice(
@@ -71,7 +70,7 @@ namespace Dive
 			DV_LOG_ENGINE_ERROR("Graphics::createDeviceAndSwapChain - D3D11 스왑체인 생성에 실패하였습니다.");
 			return false;
 		}
-		*/
+		/*
 
 		UINT deviceFlags = 0;
 
@@ -131,7 +130,7 @@ namespace Dive
 			deviceFlags &= ~D3D11_CREATE_DEVICE_DEBUG;
 			result = createDeviceAndSwapChain();
 		}
-
+		*/
 		return true;
 	}
 
@@ -344,11 +343,6 @@ namespace Dive
 		return index < MAX_RENDERTARGETS ? m_pRenderTargets[index]->GetRenderTargetView() : nullptr;
 	}
 
-	// Textur2D가 아니라 Texture를 받아야 하지 않을까?
-	// => urho는 RenderSurface라는 객체를 받는다.
-	// 아니면 현재처럼 Texture2D를 받고 거기에서 RenderSurface를 리턴받아 다시 위의 함수에 전달하는 방식이다.
-	// DepthStencil 역시 동일한 방법으로 다룬다.
-	// => RenderSurface를 유니티의 RenderTarget으로 치환하면 되지 않을까?
 	void Graphics::SetRenderTarget(uint32_t index, RenderTexture* pTexture)
 	{
 		if (index >= MAX_RENDERTARGETS)
