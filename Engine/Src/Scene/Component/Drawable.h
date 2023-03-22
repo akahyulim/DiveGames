@@ -8,14 +8,15 @@ namespace Dive
 	class Mesh;
 	class Model;
 	class Material;
+	class Light;
 	
 	struct DrawableSourceData
 	{
-		float Distance;
+		eGeometryType GeometryType;
 		Mesh* pMesh;
 		Material* pMaterial;
 		DirectX::XMFLOAT4X4 WorldTransform;
-		eGeometryType GeometryType;
+		float Distance;
 	};
 
 	class Drawable : public Component
@@ -41,6 +42,9 @@ namespace Dive
 
 		Mesh* GetMesh(size_t batchIndex);
 
+		const std::vector<Light*>& GetLights() const { return m_Lights; }
+		void AddLight(Light* pLight);
+
 		const std::vector<DrawableSourceData>& GetSourceDatas() const { return m_SourceDatas; }
 
 	protected:
@@ -50,6 +54,11 @@ namespace Dive
 
 		std::vector<Mesh*> m_Meshes;
 		std::vector<DrawableSourceData> m_SourceDatas;
+
+		float m_Distance;
+
+		// urho는 vertex, pixel을 나누었다.
+		std::vector<Light*> m_Lights;
 
 		// 전체 메시 정보에서 부분을 그리는 geometry다.
 		// vertex와 index의 offset, count를 관리한다.

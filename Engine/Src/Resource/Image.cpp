@@ -31,7 +31,8 @@ namespace Dive
 
 		if (ext == ".dds")
 		{
-			hResult = DirectX::LoadFromDDSFile(filePath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
+			//hResult = DirectX::LoadFromDDSFile(filePath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
+			hResult = DirectX::LoadFromDDSFile(filePath.c_str(), DirectX::DDS_FLAGS_FORCE_RGB, nullptr, img);
 		}
 		else if (ext == ".tga")
 		{
@@ -39,7 +40,10 @@ namespace Dive
 		}
 		else
 		{
-			hResult = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
+			// https://github.com/microsoft/DirectXTex/wiki/WIC-I-O-Functions
+			//hResult = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
+			hResult = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_FORCE_RGB, nullptr, img);
+			//hResult = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_FORCE_LINEAR , nullptr, img);
 		}
 
 		if (FAILED(hResult))

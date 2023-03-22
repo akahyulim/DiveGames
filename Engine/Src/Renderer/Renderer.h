@@ -14,7 +14,7 @@ namespace Dive
 	class ShaderVariation;
 	class Material;
 	class RenderPath;
-	class Batch;
+	class StaticBatch;
 	class BatchQueue;
 	class Technique;
 
@@ -49,7 +49,7 @@ namespace Dive
 
 		VertexBuffer* GetInstancingBuffer() { return m_pInstancingBuffer; }
 
-		void SetBatchShaders(Batch& batch, Technique& tech, bool bAllowShadow, const BatchQueue& queue);
+		void SetBatchShaders(StaticBatch& batch, Technique& tech, bool bAllowShadow, const BatchQueue& queue);
 
 	private:
 		void initialize();

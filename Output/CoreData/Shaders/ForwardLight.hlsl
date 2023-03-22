@@ -21,13 +21,17 @@ void mainVS(
 #if !defined(BILLBOARD)
 	out float3 oNormal : NORMAL,
 #endif
+#ifdef LIGHT
+	//out float3 oToEye : TEXCOORD1,
+	out float3 oWorldPos : TEXCOORD1,
+#endif
 	out float4 oPosition : SV_POSITION
 )
 {
 	iPosition.w = 1.0f;
 
-	oPosition = mul(iPosition, cModel);
-	oPosition = mul(oPosition, viewMatrix);
+	float4 worldPos = mul(iPosition, cModel);
+	oPosition = mul(worldPos, viewMatrix);
 	oPosition = mul(oPosition, projectionMatrix);
 
 #ifdef VERTEXCOLOR
@@ -41,6 +45,12 @@ void mainVS(
 #if !defined(BILLBOARD)
 	oNormal = mul(iNormal, (float3x3)cModel);
 	oNormal = normalize(oNormal);
+#endif
+
+#ifdef LIGHT
+	//oToEye = cameraPos - worldPos.xyz;
+	//oToEye = normalize(oToEye);
+	oWorldPos = worldPos.xyz;
 #endif
 }
 
@@ -63,6 +73,10 @@ void mainPS(
 #endif
 #if !defined(BILLBOARD)
 	float3 iNormal : NORMAL,
+#endif
+#ifdef LIGHT
+	//float3 iToEye : TEXCOORD1,
+	float3 iWorldPos : TEXCOORD1,
 #endif
 	float4 iPosition : SV_POSITION,
 	out float4 oColor : SV_TARGET)
@@ -88,22 +102,22 @@ void mainPS(
 	oColor = diffColor * diffInput;
 #endif
 
-	// Directional Light
-	float3 DirToLight = float3(-1.0f, 1.0f, -1.0f);
-	float3 DirLightColor = float3(1.0f, 1.0f, 1.0f);
+#ifdef LIGHT																		  
+	float3 dirToLight = -lightDir;
+	float3 DirLightColor = lightColor.xyz;
 
 	// phong diffuse
-	float NDotL = dot(DirToLight, iNormal);
+	float NDotL = dot(dirToLight, iNormal);
 	float3 finalColor = DirLightColor * saturate(NDotL);
 
 	// blinn specular
-	float3 toEye = float3(0.0f, 0.0f, -10.0f) - iPosition.xyz;
-	// 일단 cameraPos를 이용하면 이상해진다.
-	//float3 toEye = cameraPos - iPosition.xyz;
+	float3 toEye = cameraPos - iWorldPos;
 	toEye = normalize(toEye);
-	float3 halfWay = normalize(toEye + DirToLight);
+	float3 halfWay = normalize(toEye + dirToLight);
 	float NDotH = saturate(dot(halfWay, iNormal));
-	finalColor += DirLightColor * pow(NDotH, 250.0f) * 0.25;
+	//finalColor += DirLightColor * pow(NDotH, 250.0f) * 0.25f;		
+	finalColor += DirLightColor * pow(NDotH, 32.0f);
 
 	oColor.xyz *= finalColor;
+#endif
 }

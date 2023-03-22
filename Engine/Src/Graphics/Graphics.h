@@ -144,6 +144,7 @@ namespace Dive
 		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT2& vector);
 		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT3& vector);
 		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT4& vector);
+		void SetShaderParameter(const std::string& param, const DirectX::XMVECTOR& vector);
 		void SetShaderParameter(const std::string& param, const DirectX::XMFLOAT4X4& matrix);
 		void SetShaderParameter(const std::string& param, const DirectX::XMMATRIX& matrix);
 		//void SetShaderParameter(const std::string& param, const float* pData, uint32_t count);	// 이건 아직 뭔지 감도 안잡힌다.

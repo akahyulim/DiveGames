@@ -6,19 +6,18 @@
 
 namespace Dive
 {
+	class Light;
 	class View;
 	class Camera;
 	class Pass;
 	class ShaderVariation;
+	struct LightBatchQueue;
 
-	// urho의 Batch이며, 결국 이게 Draw Call이다.
-	// 이름을 DrawCall로 바꾸는 것을 염두해두자.
-	// => StaticBatch가 나을 것 같다.
-	class Batch
+	class StaticBatch
 	{
 	public:
-		Batch() = default;
-		Batch(const DrawableSourceData& data);
+		StaticBatch() = default;
+		StaticBatch(const DrawableSourceData& data);
 		
 		void Prepare(View* pView, Camera* pCamera);
 		
@@ -53,6 +52,10 @@ namespace Dive
 		ShaderVariation* m_pVertexShaderVariation;
 		ShaderVariation* m_pPixelShaderVariation;
 		eGeometryType m_GeometryType;
+
+		// LightBatchQueue는 BatchQueue를
+		// StaticBatch는 LightBatchQueue를 가진다.
+		LightBatchQueue* m_pLightBatchQueue;
 	};
 
 	// geometry instance data
@@ -61,19 +64,19 @@ namespace Dive
 	{
 		// const라면 생성자에서 받아야 한다. 따라서 클래스로 만들어야 한다?
 		// => 포프는 구조체 뿐만 아니라 클래스에도 const 그리고 참조 멤버 변수를 만들지 마라고 한다.
-		void* pInstancingData;
+		void* pInstanceData;
 		DirectX::XMFLOAT4X4* pWorldTransform;
 		float Distance;
 	};
 
 	// batch group
 	// 인스턴싱 지오메트리를 관리하는 구조체
-	class InstancingBatch : public Batch
+	class InstanceBatch : public StaticBatch
 	{
 	public:
-		void AddTransforms(const Batch& batch);
+		void AddTransforms(const StaticBatch& batch);
 		
-		void SetInstancingData(void* pLockedData, uint32_t stride, uint32_t& freeIndex);
+		void SetInstanceData(void* pLockedData, uint32_t stride, uint32_t& freeIndex);
 
 		void Draw(View* pView, Camera* pCamera);
 
@@ -83,12 +86,12 @@ namespace Dive
 	};
 
 	// batch group key
-	// Batch를 전달받아 각각의 요소들을 저장하고
+	// StaticBatch를 전달받아 각각의 요소들을 저장하고
 	// 이들을 비교 및 hash를 생성에 활용한다.
 
-	// Batch와 BatchGroup를 가지는 큐
+	// StaticBatch와 BatchGroup를 가지는 큐
 	// 정렬함수와 draw 함수를 가지며,
-	// draw 함수의 경우 Batch, BatchGroup의 것을 사용한다.
+	// draw 함수의 경우 StaticBatch, BatchGroup의 것을 사용한다.
 	// => Pope는 Struct에 함수를 넣지 마라고 한다.
 	class BatchQueue
 	{
@@ -100,27 +103,33 @@ namespace Dive
 
 		void Draw(View* pView, Camera* pCamera) const;
 
-		void AddStaticBatch(const Batch& batch) { m_Batches.emplace_back(batch); }
-		void AddInstancingBatch(const InstancingBatch& batch) { m_InstancingBatches.emplace_back(batch); }
+		void AddStaticBatch(const StaticBatch& batch) { m_StaticBatches.emplace_back(batch); }
+		void AddInstancingBatch(const InstanceBatch& batch) { m_InstanceBatches.emplace_back(batch); }
 
 		void SortBackToFront();
 		void SortFrontToBack();
 
-		void SetInstancingData(void* pLockedData, uint32_t stride, uint32_t& freeIndex);
+		void SetInstanceData(void* pLockedData, uint32_t stride, uint32_t& freeIndex);
 		
-		bool IsEmpty() const { return m_Batches.empty() && m_InstancingBatches.empty(); }
+		bool IsEmpty() const { return m_StaticBatches.empty() && m_InstanceBatches.empty(); }
 
 		// 임시
-		size_t GetBatchCount() const
+		size_t GetStaticBatchCount() const
 		{
-			return m_Batches.empty() ? 0 : m_Batches.size();
+			return m_StaticBatches.empty() ? 0 : m_StaticBatches.size();
 		}
 
 	private:
-		std::vector<Batch> m_Batches;
-		std::vector<Batch*> m_SortedBatches;
+		std::vector<StaticBatch> m_StaticBatches;
+		std::vector<StaticBatch*> m_SortedStaticBatches;
 
-		std::vector<InstancingBatch> m_InstancingBatches;	//key를 가지는 map이어야 한다.
-		std::vector<InstancingBatch*> m_SortedInstancingBatches;
+		std::vector<InstanceBatch> m_InstanceBatches;	//key를 가지는 map이어야 한다.
+		std::vector<InstanceBatch*> m_SortedInstanceBatches;
+	};
+
+	struct LightBatchQueue
+	{
+		Light* pLight;
+		BatchQueue BaseLitBatches;
 	};
 }

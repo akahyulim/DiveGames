@@ -13,6 +13,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Texture2D.h"
+#include "Graphics/RenderTexture.h"
 #include "Graphics/VertexBuffer.h"
 #include "Resource/ResourceCache.h"
 #include "IO/Log.h"
@@ -216,10 +217,12 @@ namespace Dive
 			queueViewport(pRenderTarget, pRenderTarget->GetViewport(i));
 	}
 
-	void Renderer::SetBatchShaders(Batch& batch, Technique& tech, bool bAllowShadow, const BatchQueue& queue)
+	void Renderer::SetBatchShaders(StaticBatch& batch, Technique& tech, bool bAllowShadow, const BatchQueue& queue)
 	{
+		// Tech의 Pass부분에 pass name, file path, defines가 저장되어 있다.
 		Pass* pPass = batch.GetPass();
 
+		// 이게 왜 단일 포인터가 아닌 벡터일까?
 		auto vertexShaderVariations = pPass->GetVertexShaderVariations();
 		auto pixelShaderVariations = pPass->GetPixelShaderVariations();
 
@@ -280,18 +283,19 @@ namespace Dive
 			{
 				RenderPathCommand command;
 				command.Type = eRenderCommandType::Clear;
-				command.ClearColor = { 0.0f, 0.0f, 0.0f, 1.0f };//{ 0.6f, 0.6f, 0.6f, 1.0f };
+				command.ClearColor = { 0.05f, 0.1f, 0.15f, 1.0f };// { 0.1f, 0.1f, 0.1f, 1.0f };
 				command.ClearDepth = 1.0f;
 				command.ClearStencil = 0;
 				command.Outputs.resize(1);
 				command.Outputs.emplace_back("viewport", PositiveX);	// 원래는 Load에서 초기화된다.
 				m_pDefaultRenderPath->AddCommand(command);
 			}
+
 			{
 				RenderPathCommand command;
 				command.Type = eRenderCommandType::ScenePass;
 				command.Pass = "base";
-				m_pDefaultRenderPath->AddCommand(command);
+				//m_pDefaultRenderPath->AddCommand(command);
 			}
 
 			{
@@ -354,7 +358,7 @@ namespace Dive
 		auto* pView = pViewport->GetView();
 		DV_ASSERT(pView);
 
-		if (!pView->Define(pRenderTarget, pViewport))
+		if (!pView->Define(dynamic_cast<RenderTexture*>(pRenderTarget), pViewport))
 			return;
 
 		m_Views.emplace_back(pView);

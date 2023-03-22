@@ -1,6 +1,7 @@
 #include "divepch.h"
 #include "Drawable.h"
 #include "Transform.h"
+#include "Light.h"
 #include "Scene/GameObject.h"
 #include "Core/Context.h"
 #include "Core/CoreDefs.h"
@@ -13,7 +14,8 @@ namespace Dive
 {
 	Drawable::Drawable(Context* pContext)
 		: Component(pContext),
-		m_pModel(nullptr)
+		m_pModel(nullptr),
+		m_Distance(0.0f)
 	{
 	}
 
@@ -95,6 +97,17 @@ namespace Dive
 	Material* Drawable::GetMaterial(size_t index) const
 	{
 		return index < m_SourceDatas.size() ? m_SourceDatas[index].pMaterial : nullptr;
+	}
+
+	void Drawable::AddLight(Light* pLight)
+	{
+		if (!pLight)
+			return;
+
+		// firstLight라는게 있다.
+
+		// maxLights가 아니여야 추가한다.
+		m_Lights.emplace_back(pLight);
 	}
 
 	bool Drawable::SetMaterial(size_t index, Material* material)

@@ -63,6 +63,7 @@ namespace Dive
 
 		getDrawables();
 		getBaseBatches();
+		getLightBatches();
 	}
 	
 	void View::Render()
@@ -108,21 +109,23 @@ namespace Dive
 		// 각종 초기화
 		m_ScenePasses.clear();
 
-		// pass별 BatchQueue를 생성
+		// ScenePass Command의 일부정보로 m_ScenePasses 구성
 		for(uint32_t i = 0; i < m_pRenderPath->GetCommandCount(); ++i)
 		{
 			RenderPathCommand* pCommand = m_pRenderPath->GetCommand(i);
 			// unabled 확인
 
+			// 결국 다른 패스에서는 m_ScenePasses와 m_BatchQueues가 구성되지 않는다.
+			// 라이트의 경우 m_LightQueues를 사용하니 구성 과정도 구분되는 것 같다.
 			if (pCommand->Type == eRenderCommandType::ScenePass)
 			{
 				ScenePassInfo info;
 				info.PassIndex = pCommand->PassIndex = Technique::GetPassIndex(pCommand->Pass);
-				info.bAllowInstancing;
+				info.bAllowInstancing = false;	// command.sortMode != SORT_BACKTOFRONT
 				info.bMarkStencil;
 				info.bVertexLight = pCommand->bVertexLights;
 
-				// 현재 pass의 BatchQueue를 추가
+				// 현재 Pass의 m_BatchQueues와 m_ScenePassed의 BatchQueue를 연결
 				auto it = m_BatchQueues.find(info.PassIndex);
 				if (it == m_BatchQueues.end())
 					m_BatchQueues.emplace(info.PassIndex, BatchQueue());
@@ -143,6 +146,7 @@ namespace Dive
 		// 옥트리와 컬링을 거친 오브젝트일 듯 하다.
 		// 그런데 Light도 Drawable일까?
 		// 실제로 Light가 Drwable을 상속했다... 굳이 따라할 필요는 없지 않나?
+		// => 하지만 한 곳에서 분류하는 것이 더 낫긴하다.
 
 
 		auto allGameObjects = m_pScene->GetAllGameObjects();
@@ -160,13 +164,10 @@ namespace Dive
 
 	void View::getBaseBatches()
 	{
-		// 1. Drawable 루프
-		for (auto it = m_Drawables.begin(); it != m_Drawables.end(); ++it)
+		for(const auto* pDrawable : m_Drawables)
 		{
-			Drawable* pDrawable = *it;
 			const auto& sourceDatas = pDrawable->GetSourceDatas();
 
-			// 2. Drawable을 구성하는 데이터 루프
 			for (uint32_t i = 0; i < static_cast<uint32_t>(sourceDatas.size()); ++i)
 			{
 				const DrawableSourceData& drawableBatch = sourceDatas[i];
@@ -177,10 +178,9 @@ namespace Dive
 				if (!pTech)
 					continue;
 
-				// Pass별 BatchQueue에 Batch를 구성해 등록한다.
-				// 여기에서 Batch는 일반과 Instanced로 나누어 관리한다.
-				// 그리고 ScenePasses에 존재하는 BatchQueue는 m_BatchQueues의 요소이다.
-				// Draw는 여기에서 구성된 BatchQeueue를 m_BatchQeuue로 접근하여 사용하는 것이다.
+				// 이게 BaseBatche의 특이점이다.
+				// Pass별로 BatchQueue를 구성하고 있다.
+				// 즉, 하나의 Mesh도 Pass에 따라 다양한 형태의 Shading을 적용할 수 있다는 것이다.
 				for(uint32_t j = 0; j < static_cast<uint32_t>(m_ScenePasses.size()); ++j)
 				{
 					ScenePassInfo& info = m_ScenePasses[j];
@@ -191,7 +191,7 @@ namespace Dive
 					if (!pPass)
 						continue;
 
-					Batch batch(drawableBatch);
+					StaticBatch batch(drawableBatch);
 					batch.SetPass(pPass);
 
 					// vertexLight와 vertexColor은 다르다. 혼동한 듯 하다.
@@ -204,23 +204,58 @@ namespace Dive
 						// 여긴 batch의 lightQueue에 nullptr를 추가한다.
 					}
 
-					// 마지막 인자인 allowInstancint 여부를 먼저 설정해야 한다.
-					addBatchToQueue(*info.pBatchQueue, batch, pTech, false);
+					bool allowInstancing = info.bAllowInstancing;
+					// 추가 설정 판단 구문이 더 있다.
+
+					addBatchToQueue(*info.pBatchQueue, batch, pTech, allowInstancing);
 				}
 			}
 		}
 	}
 
+	/*
+		1. LightBatchQueue는 Light 하나에 BatchQueue가 매칭된다.
+		ForwardLight일 경우엔 draw call이 동일하지만 deferred는 좀 더 생각해봐야 한다.
+		2. LightBatchQueue에서 BatchQueue를 어디에서 가져올지 고민해봐야 한다.
+		3. StaticBatch 역시 LightBatchQueue를 가진다. 역시 어디에서 어떻게 연결되는지 분석이 필요하다.
+		=> 복잡한 구현을 한 번에 따라갈 필요는 없다.
+	*/
+	void View::getLightBatches()
+	{
+		if (m_Lights.empty())
+			return;
+
+		// 특정 pass의 BatchQueue를 사용하는데... 그게 뭔지 모르겠다.
+		//BatchQueue* pAlphaQueue = 
+
+		// 결국 forwardlight는 light * mesh로 draw call이 발생한다.
+		m_LightBatchQueues.resize(m_Lights.size());
+
+		size_t queueIndex = 0;
+		for (auto* pLight : m_Lights)
+		{
+			LightBatchQueue& lightQueue = m_LightBatchQueues[queueIndex++];
+			lightQueue.pLight = pLight;
+			lightQueue.BaseLitBatches.Clear();
+		}
+
+		// GetLitBatches()라는 곳에서 다시 AddBatchToQueue()를 이용해 최종적으로 lightQueue의 BaseLitBatches를 구성한다.
+		// GetLitBatches()는 일단 Drawable 중에서 Light의 영향을 받는 것들을 추려놓는 함수인듯 하다. 
+		// 그런데 alphaQueue는 왜 전달하지?
+	}
+
 	// light, geometry queue가 다르기 때문에 인자로 받는다.
 	// 일단 allowShadows는 뺐다.
-	void View::addBatchToQueue(BatchQueue& queue, Batch& batch, Technique* pTech, bool bAllowInstancing)
+	void View::addBatchToQueue(BatchQueue& queue, StaticBatch& batch, Technique* pTech, bool allowInstancing)
 	{
 		if (!batch.GetMaterial())
 			batch.SetMaterial(m_pRenderer->GetDefaultMaterial());
 	
 		// batch의 eGeomtryType이 static이라도 allowInstancing이고 indexbuffer가 존재한다면 instancing으로 바꾼다.
 		// 일단 static만 구현하자.
-		batch.SetGeometryType(eGeometryType::Static);
+		//batch.SetGeometryType(eGeometryType::Static);
+		if (allowInstancing && batch.GetGeometryType() == eGeometryType::Static && batch.GetMesh()->GetIndexBuffer())
+			batch.SetGeometryType(eGeometryType::Instanced);
 
 		if (batch.GetGeometryType() == eGeometryType::Instanced)
 		{
@@ -269,6 +304,20 @@ namespace Dive
 					setTextures(pCommand);
 
 					queue.Draw(this, m_pCamera);
+				}
+			}
+			break;
+
+			case eRenderCommandType::ForwardLights:
+			{
+				if (!m_LightBatchQueues.empty())
+				{
+					setRenderTargets(pCommand);
+
+					for (auto it = m_LightBatchQueues.begin(); it != m_LightBatchQueues.end(); ++it)
+					{
+						it->BaseLitBatches.Draw(this, m_pCamera);
+					}
 				}
 			}
 			break;

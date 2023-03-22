@@ -63,7 +63,7 @@ void ForwardLights::OnUpdate(const Dive::Event& evnt)
 		if (m_pCubeObject)
 		{
 			auto pTransform = m_pCubeObject->GetComponent<Dive::Transform>();
-			pTransform->Rotate(0.0f, -1.0f, 0.0f);
+			pTransform->Rotate(1.0f, 0.0f, 0.0f);
 		}
 	}
 }
@@ -81,11 +81,15 @@ void ForwardLights::createScene()
 	pRenderer->SetViewport(0, pViewport);
 	GetSubsystem<Dive::Graphics>()->SetWindowTitle(Dive::FileSystem::StringToWstring(m_pScene->GetName()));
 
+	// 현재 RenderTarget의 Clear색상으로 초기화된다.
+	// 하지만 urho의 경우 Scene에서 Zone이라는 노드를 생성한 후 각종 설정을 해놓았다.
+
 	// Add Main Camera
 	m_pMainCamera = m_pScene->CreateGameObject("MainCamera");
 	auto pCamera = m_pMainCamera->AddComponent<Dive::Camera>();
 	auto pTransform = m_pMainCamera->GetComponent<Dive::Transform>();
-	pTransform->SetPosition(DirectX::XMFLOAT3(0.0f, 0.0f, -10.0f));
+	pTransform->SetPosition(DirectX::XMFLOAT3(0.0f, 5.0f, -10.0f));
+	pTransform->LookAt(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
 	pViewport->SetCamera(pCamera);
 
 	// Add GameObject
@@ -103,7 +107,9 @@ void ForwardLights::createScene()
 			pMat->SetName("QuadMat");
 			pCache->AddManualResource(pMat);
 			pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
-			pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetGrayTexture(m_pContext));
+			//pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetGrayTexture(m_pContext));
+			//pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/seafloor.dds");
+			pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/no_texture.png"); 
 			pDrawable->SetMaterial(pMat);
 		}
 
@@ -118,7 +124,8 @@ void ForwardLights::createScene()
 			pMat->SetName("TriangleMat");
 			pCache->AddManualResource(pMat);
 			pMat->SetTechnique(getTechnique("BasicVColorUnlitAlpha"));
-			pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetWhiteTexture(m_pContext));
+			//pMat->SetTexture(Dive::eTextureUnit::Diffuse, Dive::Texture2D::GetWhiteTexture(m_pContext));
+			pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Baseplate Grid.png");
 			pDrawable->SetMaterial(pMat);
 		}
 
@@ -144,11 +151,10 @@ void ForwardLights::createScene()
 		// Directional Light
 		{
 			auto pDirLightObject = m_pScene->CreateGameObject("DirLightObject");
-			auto pTransform = pDirLightObject->GetComponent<Dive::Transform>();
-			pTransform->SetPosition(-1.0f, 1.0f, 1.0f);
 			auto pLight = pDirLightObject->AddComponent<Dive::Light>();
 			pLight->SetType(Dive::eLightType::Directional);
-			pLight->SetColor(1.0f, 0.0f, 7.0f);
+			pLight->SetColor(1.0f, 0.0f, 0.0f);//0.85f, 0.8f, 0.5f);// 1.0f, 0.0f, 0.7f);
+			pLight->SetDir(1.0f, -1.0f, 1.0f);
 		}
 	}
 
@@ -322,11 +328,11 @@ Dive::Technique* ForwardLights::getTechnique(const std::string& name)
 			// 개별 셰이더가 있다면 그때는 따로 저장한다.
 			pPass->SetVertexShader("CoreData/Shaders/ForwardLight.hlsl");
 			//pPass->SetVertexShaderDefines("VERTEXCOLOR DIFFMAP");
-			pPass->SetVertexShaderDefines("DIFFMAP");
+			pPass->SetVertexShaderDefines("DIFFMAP LIGHT");
 			pPass->SetPixelShader("CoreData/Shaders/ForwardLight.hlsl");
 			// 흐음 예상과 다르다. 순서를 맞춰야 한다.
 			//pPass->SetPixelShaderDefines("VERTEXCOLOR DIFFMAP");
-			pPass->SetPixelShaderDefines("DIFFMAP");
+			pPass->SetPixelShaderDefines("DIFFMAP LIGHT");
 			//pPass->SetPixelShaderDefines("VERTEXCOLOR");
 			// depthwrite = false
 			// blend = alpha
@@ -341,14 +347,6 @@ Dive::Technique* ForwardLights::getTechnique(const std::string& name)
 
 void ForwardLights::moveCamera(float delta)
 {
-	static float MOVE_SPEED = 10.0f;
-	static DirectX::XMVECTOR FORWARD = { 0.0f, 0.0f, 1.0f };
-	static DirectX::XMVECTOR BACK = { 0.0f, 0.0f, -1.0f };
-	static DirectX::XMVECTOR LEFT = { -1.0f, 0.0f, 0.0f };
-	static DirectX::XMVECTOR RIGHT = { 1.0f, 0.0f, 0.0f };
-	static DirectX::XMVECTOR UP = { 0.0f, 1.0f, 0.0f };
-	static DirectX::XMVECTOR DOWN = { 0.0f, -1.0f, 0.0f };
-
 	auto pInput = GetSubsystem<Dive::Input>();
 	if (pInput)
 	{
@@ -357,44 +355,52 @@ void ForwardLights::moveCamera(float delta)
 		// xmfloat3와 xmvector 전부 speed와 delta를 곱할 수가 없다.
 		if (pInput->KeyPress(DIK_W))
 		{
-			pTransform->TranslateVector(FORWARD);
+			pTransform->Translate(0.0f, 0.0f, 1.0f);
 		}
 		if (pInput->KeyPress(DIK_S))
 		{
-			pTransform->Translate(DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f));
+			pTransform->Translate(0.0f, 0.0f, -1.0f);
 		}
 		if (pInput->KeyPress(DIK_A))
 		{
-			pTransform->Translate(DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), Dive::eSpace::World);
+			pTransform->Translate(-1.0f, 0.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_D))
 		{
-			pTransform->Translate(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f));
+			pTransform->Translate(1.0f, 0.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_C))
 		{
-			pTransform->Translate(DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f));
+			pTransform->Translate(0.0f, -1.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_SPACE))
 		{
-			pTransform->Translate(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
+			pTransform->Translate(0.0f, 1.0f, 0.0f);
 		}
 
+		if (pInput->KeyPress(DIK_Q))
+		{
+			pTransform->Rotate(0.0f, 0.0f, -1.0f);
+		}
+		if (pInput->KeyPress(DIK_E))
+		{
+			pTransform->Rotate(0.0f, 0.0f, 1.0f);
+		}
 		if (pInput->KeyPress(DIK_LEFT))
 		{
-			pTransform->Rotate(0.0f, -2.0f, 0.0f);
+			pTransform->Rotate(0.0f, -1.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_RIGHT))
 		{
-			pTransform->Rotate(0.0f, 2.0f, 0.0f);
+			pTransform->Rotate(0.0f, 1.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_UP))
 		{
-			pTransform->Rotate(-2.0f, 0.0f, 0.0f);
+			pTransform->Rotate(-1.0f, 0.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_DOWN))
 		{
-			pTransform->Rotate(2.0f, 0.0f, 0.0f);
+			pTransform->Rotate(1.0f, 0.0f, 0.0f);
 		}
 	}
 }

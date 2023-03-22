@@ -507,6 +507,7 @@ namespace Dive
 
 		// 일단 현재 셰이더의 버퍼를 가져온다.
 		// 꼭 셰이더가 둘 다 있어야 하는 것일까?
+		// => 둘을 페어하여 키로 사용하기 때문이다.
 		if (m_pVertexShaderVariation && m_pPixelShaderVariation)
 		{
 			auto key = std::pair(m_pVertexShaderVariation, m_pPixelShaderVariation);
@@ -663,6 +664,25 @@ namespace Dive
 				m_DirtyConstantBuffers.emplace_back(pBuffer);
 
 			pBuffer->SetParameter(it->second.Offset, sizeof(DirectX::XMFLOAT4), &vector);
+		}
+	}
+
+	void Graphics::SetShaderParameter(const std::string& param, const DirectX::XMVECTOR& vector)
+	{
+		if (!m_pCurShaderProgram)
+			return;
+
+		auto it = m_pCurShaderProgram->m_Parameters.find(param);
+		if (it == m_pCurShaderProgram->m_Parameters.end())
+			return;
+
+		ConstantBuffer* pBuffer = it->second.pBuffer;
+		if (pBuffer)
+		{
+			if (!pBuffer->IsDirty())
+				m_DirtyConstantBuffers.emplace_back(pBuffer);
+
+			pBuffer->SetParameter(it->second.Offset, sizeof(DirectX::XMVECTOR), &vector);
 		}
 	}
 

@@ -15,11 +15,13 @@ namespace Dive
 	class Drawable;
 	class Light;
 	class Technique;
-	class Batch;
+	class StaticBatch;
 	class BatchQueue;
+	struct LightBatchQueue;
 
 	enum class eRenderPath;
 
+	// ScenePass Command의 일부 정보와 BatchQueue 포인터
 	struct ScenePassInfo
 	{
 		ScenePassInfo()
@@ -54,11 +56,16 @@ namespace Dive
 		Graphics* GetGraphics() const { return m_pGraphics; }
 		Renderer* GetRenderer() const { return m_pRenderer; }
 
+		// 임시
+		bool UseLights() const { return !m_Lights.empty(); }
+		std::vector<Light*> GetLights() const { return m_Lights; }
+
 	private:
 		void getDrawables();
 		void getBaseBatches();
+		void getLightBatches();
 
-		void addBatchToQueue(BatchQueue& queue, Batch& batch, Technique* pTech, bool bAllowInstancing);
+		void addBatchToQueue(BatchQueue& queue, StaticBatch& batch, Technique* pTech, bool allowInstancing);
 
 		void executeRenderPathCommands();
 
@@ -88,5 +95,7 @@ namespace Dive
 
 		std::vector<ScenePassInfo> m_ScenePasses;
 		std::unordered_map<uint32_t, BatchQueue> m_BatchQueues;
+
+		std::vector<LightBatchQueue> m_LightBatchQueues;
 	};
 }

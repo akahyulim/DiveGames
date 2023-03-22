@@ -79,6 +79,7 @@ namespace Dive
 		
 		// SetParameters에서 설정되어야 하는 항목들
 		m_bLinear = true;
+		//m_bLinear = m_Format != DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 		// Mipmap의 경우 0 or 1로 받으며
 		// 0이면 최대, 1이면 사용하지 않음을 뜻하게 된다.
 		// 이는 m_RequestedMipLevels에 저장한다.

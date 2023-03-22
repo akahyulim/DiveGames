@@ -7,21 +7,23 @@
 #include "Scene/GameObject.h"
 #include "Scene/Component/Camera.h"
 #include "Scene/Component/Transform.h"
+#include "Scene/Component/Light.h"
 #include "IO/Log.h"
 
 namespace Dive
 {
-	Batch::Batch(const DrawableSourceData& data)
+	StaticBatch::StaticBatch(const DrawableSourceData& data)
 		: m_pMesh(data.pMesh),
 		m_pMaterial(data.pMaterial),
 		m_WorldTransform(data.WorldTransform),
 		m_pPass(nullptr),
 		m_pVertexShaderVariation(nullptr),
 		m_pPixelShaderVariation(nullptr),
-		m_GeometryType(data.GeometryType)
+		m_GeometryType(data.GeometryType),
+		m_pLightBatchQueue(nullptr)
 	{}
 
-	void Batch::Prepare(View* pView, Camera* pCamera)
+	void StaticBatch::Prepare(View* pView, Camera* pCamera)
 	{
 		if (!m_pVertexShaderVariation || !m_pPixelShaderVariation)
 			return;
@@ -49,6 +51,20 @@ namespace Dive
 			// fill mode
 		}
 
+		// light
+		if (m_pLightBatchQueue)
+		{
+			Light* pLight = m_pLightBatchQueue->pLight;
+
+			pView->GetGraphics()->SetShaderParameter("lightColor", pLight->GetColor());
+			pView->GetGraphics()->SetShaderParameter("lightDir", pLight->GetDir());
+		}
+		else
+		{
+			pView->GetGraphics()->SetShaderParameter("lightColor", DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f));// 0.5f, 0.75f, 1.0f));
+			pView->GetGraphics()->SetShaderParameter("lightDir", DirectX::XMFLOAT3(1.0f, -1.0f, 1.0f));
+		}
+
 		// 이건 셰이더 파라미터 & 텍스쳐
 		if (m_pMaterial)
 		{
@@ -67,13 +83,14 @@ namespace Dive
 			auto viewMatrix = XMMatrixTranspose(pCamera->GetViewMatrix());
 			auto projMatrix = XMMatrixTranspose(pCamera->GetProjectionMatrix());
 
+			// 그냥 전달만 하면 각각의 셰이더에서 사용하는 변수에 넣어준다.
 			pView->GetGraphics()->SetShaderParameter("cameraPos", cameraPos);
 			pView->GetGraphics()->SetShaderParameter("viewMatrix", viewMatrix);
 			pView->GetGraphics()->SetShaderParameter("projectionMatrix", projMatrix);
 		}
 	}
 
-	void Batch::Draw(View* pView, Camera* pCamera)
+	void StaticBatch::Draw(View* pView, Camera* pCamera)
 	{
 		if (!m_pMesh)
 			return;
@@ -82,18 +99,18 @@ namespace Dive
 		m_pMesh->Draw(pView->GetGraphics());
 	}
 
-	void InstancingBatch::AddTransforms(const Batch& batch)
+	void InstanceBatch::AddTransforms(const StaticBatch& batch)
 	{
 		//InstanceData data;
 		//data.Distance;
-		//data.pInstancingData;
+		//data.pInstanceData;
 
 		// numWorldTransform만큼 루프를 돌며
 		// worldTransform을 저장한 후
 		// 완성된 InstanceData를 m_InstanceDatas에 넣는다.
 	}
 	
-	void InstancingBatch::SetInstancingData(void* pLockedData, uint32_t stride, uint32_t& freeIndex)
+	void InstanceBatch::SetInstanceData(void* pLockedData, uint32_t stride, uint32_t& freeIndex)
 	{
 		if (m_GeometryType != eGeometryType::Instanced)
 			return;
@@ -108,7 +125,7 @@ namespace Dive
 		// 최종적으로 freeIndex를 갱신한다.
 	}
 
-	void InstancingBatch::Draw(View* pView, Camera* pCamera)
+	void InstanceBatch::Draw(View* pView, Camera* pCamera)
 	{
 		auto pGraphics = pView->GetGraphics();
 		auto pRenderer = pView->GetRenderer();
@@ -118,14 +135,14 @@ namespace Dive
 
 			// 인스턴스 버퍼가 없거나, 인스턴스 타입이 아니거나, startIndex가 초기값일 경우
 			{
-				Batch::Prepare(pView, pCamera);
+				StaticBatch::Prepare(pView, pCamera);
 
 				// set buffers
 
 				// 기타 + draw
 			}
 			{
-				Batch::Prepare(pView, pCamera);
+				StaticBatch::Prepare(pView, pCamera);
 
 				// Graphics에서 VertexBuffer vector 획득
 				// 이건 아마도 이미 VertexBuffer를 bind한 상태일 것이다.
@@ -142,10 +159,10 @@ namespace Dive
 
 	void BatchQueue::Clear()
 	{
-		m_SortedInstancingBatches.clear();
-		m_SortedBatches.clear();
-		m_InstancingBatches.clear();
-		m_Batches.clear();
+		m_SortedInstanceBatches.clear();
+		m_SortedStaticBatches.clear();
+		m_InstanceBatches.clear();
+		m_StaticBatches.clear();
 	}
 
 	void BatchQueue::Draw(View* pView, Camera* pCamera) const
@@ -154,7 +171,7 @@ namespace Dive
 		auto pRenderer = pView->GetRenderer();
 
 		// instanced
-		for (auto instancingBatch : m_SortedInstancingBatches)
+		for (auto instancingBatch : m_SortedInstanceBatches)
 		{
 			// stencil test?
 
@@ -162,24 +179,24 @@ namespace Dive
 		}
 
 		// non-instanced
-		for (auto batch : m_Batches)//m_SortedBatches)
+		for (auto staticBatch : m_StaticBatches)//m_SortedStaticBatches)
 		{
 			// stencil test?
 
 			// scissor test?
 
-			batch.Draw(pView, pCamera);
+			staticBatch.Draw(pView, pCamera);
 		}
 	}
 
 	// View의 UpdateGeometry에서 수행하는데 아직 분석을 하지 못했다.
 	void BatchQueue::SortBackToFront()
 	{
-		m_SortedBatches.resize(m_Batches.size());
+		m_SortedStaticBatches.resize(m_StaticBatches.size());
 
-		for (size_t i = 0; i < m_Batches.size(); ++i)
+		for (size_t i = 0; i < m_StaticBatches.size(); ++i)
 		{
-			m_SortedBatches[i] = &m_Batches[i];
+			m_SortedStaticBatches[i] = &m_StaticBatches[i];
 		}
 
 		// renderOlder, distance, sortKey 순으로 정렬한다.
@@ -194,11 +211,11 @@ namespace Dive
 	}
 
 	// 마지막 인자는 왜 참조일까? 리턴해야 하는 값이면 추후 out을 이름 앞에 붙이자.
-	void BatchQueue::SetInstancingData(void* pLockedData, uint32_t stride, uint32_t& freeIndex)
+	void BatchQueue::SetInstanceData(void* pLockedData, uint32_t stride, uint32_t& freeIndex)
 	{
 		// 아직 group의 key를 만들지 않았다.
-		auto it = m_InstancingBatches.begin();
-		for (it; it != m_InstancingBatches.end(); it++)
-			it->SetInstancingData(pLockedData, stride, freeIndex);
+		auto it = m_InstanceBatches.begin();
+		for (it; it != m_InstanceBatches.end(); it++)
+			it->SetInstanceData(pLockedData, stride, freeIndex);
 	}
 }

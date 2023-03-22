@@ -28,16 +28,20 @@ namespace Dive
 		if (!pTransform)
 			return DirectX::XMMatrixIdentity();
 
-		auto position = pTransform->GetPosition();
-		// forward와 lookAt은 다르다. lookAt은 pos + forawrd라 할 수 있다.
-		auto focus = pTransform->GetForward();
-		focus.x += position.x;	focus.y += position.y;	focus.z += position.z;
-		auto up = pTransform->GetUp();
+		auto lookAt = pTransform->GetLookAt();
+
+		// 역시나 이 곳에서도 lookAt은 Camera와 동일하다.
+		DirectX::XMFLOAT3 lk;
+		DirectX::XMStoreFloat3(&lk, lookAt);
+		//DV_LOG_ENGINE_DEBUG("Camera's LookAt: {0:f}, {1:f}, {2:f}", lk.x, lk.y, lk.z);
 
 		return DirectX::XMMatrixLookAtLH(
-			DirectX::XMLoadFloat3(&position),
-			DirectX::XMLoadFloat3(&focus),
-			DirectX::XMLoadFloat3(&up));
+			pTransform->GetPosition(),
+			//DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f),
+			//pTransform->GetLookAt(),
+			lookAt,
+			//DirectX::XMVectorAdd(pTransform->GetForward(), pTransform->GetPosition()),
+			pTransform->GetUp());
 	}
 	
 	DirectX::XMMATRIX Camera::GetProjectionMatrix() const

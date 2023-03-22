@@ -359,14 +359,6 @@ Dive::Technique* Sandbox::getTechnique(const std::string& name)
 
 void Sandbox::moveCamera(float delta)
 {
-	static float MOVE_SPEED = 10.0f;
-	static DirectX::XMVECTOR FORWARD = { 0.0f, 0.0f, 1.0f };
-	static DirectX::XMVECTOR BACK = { 0.0f, 0.0f, -1.0f };
-	static DirectX::XMVECTOR LEFT = { -1.0f, 0.0f, 0.0f };
-	static DirectX::XMVECTOR RIGHT = { 1.0f, 0.0f, 0.0f };
-	static DirectX::XMVECTOR UP = { 0.0f, 1.0f, 0.0f };
-	static DirectX::XMVECTOR DOWN = { 0.0f, -1.0f, 0.0f };
-
 	auto pInput = GetSubsystem<Dive::Input>();
 	if (pInput)
 	{
@@ -375,44 +367,52 @@ void Sandbox::moveCamera(float delta)
 		// xmfloat3와 xmvector 전부 speed와 delta를 곱할 수가 없다.
 		if (pInput->KeyPress(DIK_W))
 		{
-			pTransform->TranslateVector(FORWARD);
+			pTransform->Translate(0.0f, 0.0f, 1.0f);
 		}
 		if (pInput->KeyPress(DIK_S))
 		{
-			pTransform->Translate(DirectX::XMFLOAT3(0.0f, 0.0f, -1.0f));
+			pTransform->Translate(0.0f, 0.0f, -1.0f);
 		}
 		if (pInput->KeyPress(DIK_A))
 		{
-			pTransform->Translate(DirectX::XMFLOAT3(-1.0f, 0.0f, 0.0f), Dive::eSpace::World);
+			pTransform->Translate(-1.0f, 0.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_D))
 		{
-			pTransform->Translate(DirectX::XMFLOAT3(1.0f, 0.0f, 0.0f));
+			pTransform->Translate(1.0f, 0.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_C))
 		{
-			pTransform->Translate(DirectX::XMFLOAT3(0.0f, -1.0f, 0.0f));
+			pTransform->Translate(0.0f, -1.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_SPACE))
 		{
-			pTransform->Translate(DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
+			pTransform->Translate(0.0f, 1.0f, 0.0f);
 		}
 
+		if (pInput->KeyPress(DIK_Q))
+		{
+			pTransform->Rotate(0.0f, 0.0f, -1.0f);
+		}
+		if (pInput->KeyPress(DIK_E))
+		{
+			pTransform->Rotate(0.0f, 0.0f, 1.0f);
+		}
 		if (pInput->KeyPress(DIK_LEFT))
 		{
-			pTransform->Rotate(DirectX::XMFLOAT3(0.0f, -2.0f, 0.0f));
+			pTransform->Rotate(0.0f, -1.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_RIGHT))
 		{
-			pTransform->Rotate(DirectX::XMFLOAT3(0.0f, 2.0f, 0.0f));
+			pTransform->Rotate(0.0f, 1.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_UP))
 		{
-			pTransform->Rotate(DirectX::XMFLOAT3(-2.0f, 0.0f, 0.0f));
+			pTransform->Rotate(-1.0f, 0.0f, 0.0f);
 		}
 		if (pInput->KeyPress(DIK_DOWN))
 		{
-			pTransform->Rotate(DirectX::XMFLOAT3(2.0f, 0.0f, 0.0f));
+			pTransform->Rotate(1.0f, 0.0f, 0.0f);
 		}
 	}
 }

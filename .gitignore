@@ -5,6 +5,7 @@
 [Oo]utput/*.exe
 [Oo]utput/*.lib
 [Oo]utput/imgui.ini
+[Oo]utput/Assets/
 
 ### Windows ###
 # Windows thumbnail cache files
