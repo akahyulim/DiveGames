@@ -12,17 +12,31 @@
 // Graphics
 #include "Graphics/GraphicsDefs.h"
 #include "Graphics/Graphics.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
 
 // Input
 #include "Input/Input.h"
 
 // IO
 #include "IO/Log.h"
+#include "IO/FileSystem.h"
 
 // Scene
+#include "Scene/Scene.h"
+#include "Scene/GameObject.h"
+#include "Scene/Components/Component.h"
+#include "Scene/Components/Transform.h"
+#include "Scene/Components/Drawable.h"
 
 // Resource
+#include "Resource/Importer/ModelImporter.h"
+#include "Resource/Resource.h"
+#include "Resource/ResourceCache.h"
 
 // Renderer
+#include "Renderer/RendererDefs.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/View.h"
+#include "Renderer/Material.h"
+#include "Renderer/Model.h"

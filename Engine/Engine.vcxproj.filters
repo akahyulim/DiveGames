@@ -314,9 +314,6 @@
     <Filter Include="Src\Scene\Component">
       <UniqueIdentifier>{9d00574e-8829-4d1b-bf2e-35026b52a632}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Helper">
-      <UniqueIdentifier>{1a508884-ccc2-4368-af28-f45cc023c966}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Src\Engine">
       <UniqueIdentifier>{3014dab7-0fbc-438f-b953-197ce26777e5}</UniqueIdentifier>
     </Filter>

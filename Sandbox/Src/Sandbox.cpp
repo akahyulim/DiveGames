@@ -2,6 +2,9 @@
 
 DEFINE_APPLICATION_MAIN(Sandbox)
 
+Sandbox::Sandbox()
+{}
+
 Sandbox::~Sandbox()
 {
 	DV_TRACE("Sandbox ¼Ò¸êÀÚ");
@@ -16,8 +19,15 @@ void Sandbox::Start()
 {
 	DV_TRACE("Sandbox::Start()");
 
-	Dive::View* pView = new Dive::View;
-	Dive::Renderer::SetView(0, pView);
+	{
+		Dive::View* pView = new Dive::View;
+		Dive::Renderer::SetView(0, pView);
+
+		{
+			auto* pModel = Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/silly_dancing.fbx");
+				//Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/sponza.obj");
+		}
+	}
 
 	SUBSCRIBE_EVENT(Dive::eEventType::Update, EVENT_HANDLER_PARAM(OnUpdate));
 }

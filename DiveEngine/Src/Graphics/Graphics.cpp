@@ -8,8 +8,8 @@ namespace Dive
 	static HINSTANCE s_hInstance = 0;
 	static HWND s_hWnd = 0;
 	static std::wstring s_WindowTitle = L"DiveGames";
-	static int s_Width = 1024;
-	static int s_Height = 768;
+	static int s_Width = 800;
+	static int s_Height = 600;
 
 	static IDXGISwapChain* s_pSwapChain = nullptr;
 	static ID3D11Device* s_pDevice = nullptr;

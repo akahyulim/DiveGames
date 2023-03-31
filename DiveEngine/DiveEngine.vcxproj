@@ -115,17 +115,22 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>DivePch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>Src;External;</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>external/libs;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc141-mtd.lib</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -154,10 +159,24 @@
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
+    <ClInclude Include="Src\Graphics\IndexBuffer.h" />
+    <ClInclude Include="Src\Graphics\VertexBuffer.h" />
     <ClInclude Include="Src\Input\Input.h" />
+    <ClInclude Include="Src\IO\FileSystem.h" />
     <ClInclude Include="Src\IO\Log.h" />
+    <ClInclude Include="Src\Renderer\Material.h" />
+    <ClInclude Include="Src\Renderer\Model.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
+    <ClInclude Include="Src\Renderer\RendererDefs.h" />
     <ClInclude Include="Src\Renderer\View.h" />
+    <ClInclude Include="Src\Resource\Importer\ModelImporter.h" />
+    <ClInclude Include="Src\Resource\Resource.h" />
+    <ClInclude Include="Src\Resource\ResourceCache.h" />
+    <ClInclude Include="Src\Scene\Components\Component.h" />
+    <ClInclude Include="Src\Scene\Components\Drawable.h" />
+    <ClInclude Include="Src\Scene\Components\Transform.h" />
+    <ClInclude Include="Src\Scene\GameObject.h" />
+    <ClInclude Include="Src\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Core\Application.cpp" />
@@ -168,10 +187,23 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
+    <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
+    <ClCompile Include="Src\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
+    <ClCompile Include="Src\IO\FileSystem.cpp" />
     <ClCompile Include="Src\IO\Log.cpp" />
+    <ClCompile Include="Src\Renderer\Material.cpp" />
+    <ClCompile Include="Src\Renderer\Model.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
+    <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp" />
+    <ClCompile Include="Src\Resource\Resource.cpp" />
+    <ClCompile Include="Src\Resource\ResourceCache.cpp" />
+    <ClCompile Include="Src\Scene\Components\Component.cpp" />
+    <ClCompile Include="Src\Scene\Components\Drawable.cpp" />
+    <ClCompile Include="Src\Scene\Components\Transform.cpp" />
+    <ClCompile Include="Src\Scene\GameObject.cpp" />
+    <ClCompile Include="Src\Scene\Scene.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

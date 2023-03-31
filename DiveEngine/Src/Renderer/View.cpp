@@ -3,6 +3,7 @@
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
 #include "IO/Log.h"
+#include "Scene/Scene.h"
 
 namespace Dive
 {

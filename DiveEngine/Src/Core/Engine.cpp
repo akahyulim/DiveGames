@@ -4,6 +4,8 @@
 #include "CoreEvents.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
+#include "Scene/Scene.h"
+#include "Resource/ResourceCache.h"
 #include "Input/Input.h"
 #include "IO/Log.h"
 
@@ -21,7 +23,13 @@ namespace Dive
 		if (!Renderer::Initialize())
 			return false;
 
+		if (!ResourceCache::Initialize())
+			return false;
+
 		if (!Input::Initialize(Graphics::GetWindowInstance(), Graphics::GetWindowHandle()))
+			return false;
+
+		if (!Scene::Initialize())
 			return false;
 
 		DV_CORE_TRACE("Engine 초기화에 성공하였습니다.");
@@ -31,7 +39,9 @@ namespace Dive
 
 	void Engine::Shutdown()
 	{
+		Scene::Shutdown();
 		Input::Shutdown();
+		ResourceCache::Shutdown();
 		Renderer::Shutdown();
 		Graphics::Shutdown();
 
@@ -60,6 +70,7 @@ namespace Dive
 
 		Input::Update(deltaTime);
 		Renderer::Update(deltaTime);
+		Scene::Update(deltaTime);
 
 		FIRE_EVENT(UpdateEvent(deltaTime));
 	}
