@@ -14,6 +14,8 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
+#include "Graphics/ShaderVariation.h"
+#include "Graphics/InputLayout.h"
 
 // Input
 #include "Input/Input.h"
@@ -21,6 +23,7 @@
 // IO
 #include "IO/Log.h"
 #include "IO/FileSystem.h"
+#include "IO/FileStream.h"
 
 // Scene
 #include "Scene/Scene.h"
@@ -35,7 +38,6 @@
 #include "Resource/ResourceCache.h"
 
 // Renderer
-#include "Renderer/RendererDefs.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/View.h"
 #include "Renderer/Material.h"

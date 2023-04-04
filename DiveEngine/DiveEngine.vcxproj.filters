@@ -99,9 +99,6 @@
     <ClInclude Include="Src\Renderer\Material.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Renderer\RendererDefs.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Graphics\IndexBuffer.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
@@ -115,6 +112,15 @@
       <Filter>Src\Resource\Importer</Filter>
     </ClInclude>
     <ClInclude Include="Src\IO\FileSystem.h">
+      <Filter>Src\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\InputLayout.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\ShaderVariation.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\IO\FileStream.h">
       <Filter>Src\IO</Filter>
     </ClInclude>
   </ItemGroup>
@@ -186,6 +192,15 @@
       <Filter>Src\Resource\Importer</Filter>
     </ClCompile>
     <ClCompile Include="Src\IO\FileSystem.cpp">
+      <Filter>Src\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\InputLayout.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\ShaderVariation.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\IO\FileStream.cpp">
       <Filter>Src\IO</Filter>
     </ClCompile>
   </ItemGroup>

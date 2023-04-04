@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "ModelImporter.h"
 #include "Core/CoreDefs.h"
-#include "Renderer/RendererDefs.h"
+#include "Graphics/GraphicsDefs.h"
 #include "Renderer/Model.h"
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"

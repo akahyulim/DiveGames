@@ -10,6 +10,7 @@ namespace Dive
 		TextureCube,
 		Material,
 		Model,
+		Shader,
 		Unknown
 	};
 

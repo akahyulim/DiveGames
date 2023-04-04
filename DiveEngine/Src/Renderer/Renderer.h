@@ -14,5 +14,8 @@ namespace Dive
 		static void Render();
 
 		static void SetView(uint32_t index, View* pView);
+
+	private:
+		static bool createShaders();
 	};
 }

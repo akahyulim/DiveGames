@@ -1,5 +1,5 @@
 #pragma once
-#include "RendererDefs.h"
+#include "Graphics/GraphicsDefs.h"
 #include "Resource/Resource.h"
 
 
