@@ -12,10 +12,14 @@
 // Graphics
 #include "Graphics/GraphicsDefs.h"
 #include "Graphics/Graphics.h"
+#include "Graphics/Texture.h"
+#include "Graphics/Texture2D.h"
+#include "Graphics/RenderTexture.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/ShaderVariation.h"
 #include "Graphics/InputLayout.h"
+#include "Graphics/ConstantBuffer.h"
 
 // Input
 #include "Input/Input.h"
@@ -30,12 +34,14 @@
 #include "Scene/GameObject.h"
 #include "Scene/Components/Component.h"
 #include "Scene/Components/Transform.h"
+#include "Scene/Components/Camera.h"
 #include "Scene/Components/Drawable.h"
 
 // Resource
 #include "Resource/Importer/ModelImporter.h"
 #include "Resource/Resource.h"
 #include "Resource/ResourceCache.h"
+#include "Resource/Image.h"
 
 // Renderer
 #include "Renderer/Renderer.h"

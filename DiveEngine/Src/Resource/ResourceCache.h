@@ -15,13 +15,30 @@ namespace Dive
 		static void Shutdown();
 
 		template<class T>
+		static bool AddManualResource(T* pResource)
+		{
+			DV_ASSERT(pResource);
+
+			if (pResource->GetName().empty())
+			{
+				DV_CORE_WARN("이름이 존재하지 않는 리소스를 매뉴얼 리소스로 저장할 수 없습니다.");
+				return false;
+			}
+
+			return Cache<T>(pResource);
+		}
+
+		template<class T>
 		static T* Cache(T* pResource)
 		{
 			if (!pResource)
 				return nullptr;
 
 			if (IsCached<T>(pResource->GetName()))
+			{
+				DV_CORE_WARN("이미 캐시된 리소스를 시도하였습니다.");
 				return pResource;
+			}
 
 			auto id = getFreeID();
 			if (id == 0)
@@ -33,7 +50,7 @@ namespace Dive
 			m_Resources[id] = static_cast<Resource*>(pResource);
 			pResource->SetID(id);
 
-			DV_CORE_TRACE("리소스({0:s} - {1:d})를 캐시하였습니다", pResource->GetName(), pResource->GetID());
+			DV_CORE_DEBUG("리소스({0:s} - {1:d})를 캐시하였습니다", pResource->GetName(), pResource->GetID());
 
 			return pResource;
 		}
@@ -58,7 +75,7 @@ namespace Dive
 					resource.second->GetName() == name)
 				{
 					DV_DELETE(resource.second);
-					DV_CORE_INFO("{:s} 리소스 객체를 캐시에서 제거하였습니다.", name);
+					DV_CORE_DEBUG("{:s} 리소스 객체를 캐시에서 제거하였습니다.", name);
 					return;
 				}
 			}
@@ -72,7 +89,7 @@ namespace Dive
 				if (resource.second->GetResourceType() == Resource::TypeToEnum<T>() &&
 					resource.second->GetName() == name)
 				{
-					DV_CORE_INFO("이미 캐시된 리소스입니다.");
+					DV_CORE_DEBUG("이미 캐시된 리소스입니다.");
 					return true;
 				}
 			}
@@ -126,7 +143,7 @@ namespace Dive
 		template<class T>
 		static T* GetResourceByPath(const std::string& filePath)
 		{
-			DV_CORE_TRACE("ResourceCache::GetResourceByPath - {:s}", filePath);
+			DV_CORE_DEBUG("ResourceCache::GetResourceByPath - {:s}", filePath);
 
 			return nullptr;
 		}

@@ -43,6 +43,7 @@ namespace Dive
 		ID3D11Buffer* GetBuffer() const { return m_pBuffer; }
 		uint32_t GetStride() const { return m_Stride; }
 		uint32_t GetCount() const { return m_Count; }
+		DXGI_FORMAT GetFormat() const { return m_Stride == sizeof(uint16_t) ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT; }
 
 	private:
 		bool createBuffer(const void* pIndices);

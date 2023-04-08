@@ -11,6 +11,8 @@ namespace Dive
 
 		bool Create(ID3D10Blob* pShaderBuffer, eVertexType type);
 
+		ID3D11InputLayout* GetInputLayout() const { return m_pInputLayout; }
+
 	private:
 
 	private:

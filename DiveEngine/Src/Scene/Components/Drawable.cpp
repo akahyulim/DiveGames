@@ -22,7 +22,7 @@ namespace Dive
 	void Drawable::SetMesh(Model* pModel, const std::string& name, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount)
 	{
 		m_pModel = pModel;
-		m_MeshName = name;
+		m_Name = m_MeshName = name;
 		m_MeshVertexOffset = vertexOffset;
 		m_MeshVertexCount = vertexCount;
 		m_MeshIndexOffset = indexOffset;

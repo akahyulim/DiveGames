@@ -16,4 +16,5 @@ public:
 private:
 
 private:
+	Dive::Camera* m_pMainCamera;
 };

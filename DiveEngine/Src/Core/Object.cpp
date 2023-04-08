@@ -4,7 +4,6 @@
 namespace Dive
 {
 	Object::Object()
-		: m_ID(0),
-		m_Name("no_name")
+		: m_ID(0)
 	{}
 }

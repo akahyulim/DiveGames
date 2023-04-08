@@ -5,8 +5,9 @@ namespace Dive
 {
 	enum class eResourceType
 	{
-		Texture,
+		Image,
 		Texture2D,
+		RenderTexture,
 		TextureCube,
 		Material,
 		Model,

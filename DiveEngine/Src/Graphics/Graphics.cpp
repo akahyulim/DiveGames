@@ -1,5 +1,10 @@
 #include "DivePch.h"
 #include "Graphics.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+#include "ShaderVariation.h"
+#include "ConstantBuffer.h"
+#include "InputLayout.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
 
@@ -22,6 +27,16 @@ namespace Dive
 	static ID3D11RenderTargetView* s_pRenderTargetView = nullptr;
 	static ID3D11DepthStencilView* s_pDepthStencilView = nullptr;
 	static bool s_bRenderTargetsDirty = false;
+
+	static D3D11_PRIMITIVE_TOPOLOGY s_PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+
+	static VertexBuffer* s_pVertexBuffer = nullptr;
+	static IndexBuffer* s_pIndexBuffer = nullptr;
+
+	static InputLayout* s_pInputLayout = nullptr;
+	static ShaderVariation* s_pVertexShaderVariation = nullptr;
+	static ShaderVariation* s_pPixelShaderVariation = nullptr;
+	static ShaderVariation* s_pComputeShaderVariation = nullptr;
 
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
@@ -188,6 +203,11 @@ namespace Dive
 	int Graphics::GetHeight()
 	{
 		return s_Height;
+	}
+
+	DirectX::XMINT2 Graphics::GetSize()
+	{
+		return DirectX::XMINT2(s_Width, s_Height);
 	}
 
 	void Graphics::SetWindowTitle(const std::wstring& title)
@@ -359,6 +379,8 @@ namespace Dive
 
 	void Graphics::ClearRenderTargets(uint32_t target, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil)
 	{
+		DV_ASSERT(IsInitialized());
+
 		prepareDraw();
 
 		if(target & eClearTarget::Color)
@@ -374,6 +396,176 @@ namespace Dive
 			flags |= (target & eClearTarget::Stencil) ? D3D11_CLEAR_STENCIL : 0;
 
 			s_pDeviceContext->ClearDepthStencilView(s_pDepthStencilView, flags, depth, stencil);
+		}
+	}
+
+	void Graphics::Draw(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t vertexCount, uint32_t vertexStart)
+	{
+		DV_ASSERT(IsInitialized());
+
+		if (!vertexCount)
+			return;
+
+		prepareDraw();
+
+		if (s_PrimitiveTopology != type)
+		{
+			s_pDeviceContext->IASetPrimitiveTopology(type);
+			s_PrimitiveTopology = type;
+		}
+
+		s_pDeviceContext->Draw(vertexCount, vertexStart);
+	}
+
+	void Graphics::DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t indexStart, uint32_t vertexStart)
+	{
+		DV_ASSERT(IsInitialized());
+
+		prepareDraw();
+
+		if (s_PrimitiveTopology != type)
+		{
+			s_pDeviceContext->IASetPrimitiveTopology(type);
+			s_PrimitiveTopology = type;
+		}
+
+		s_pDeviceContext->DrawIndexed(indexCount, indexStart, vertexStart);
+	}
+
+	VertexBuffer* Graphics::GetVertexBuffer()
+	{
+		return s_pVertexBuffer;
+	}
+
+	void Graphics::SetVertexBuffer(VertexBuffer* pVertexBuffer, uint32_t offset)
+	{
+		DV_ASSERT(IsInitialized());
+
+		if (pVertexBuffer != s_pVertexBuffer)
+		{
+			if (pVertexBuffer)
+			{
+				ID3D11Buffer* pBuffer = pVertexBuffer->GetBuffer();
+				UINT stride = pVertexBuffer->GetStride();
+				UINT offsets[] = { offset };
+
+				//ID3D11Buffer* pOldBuffer = nullptr;
+				//UINT oldOffsets = 0;
+				//s_pDeviceContext->IAGetVertexBuffers(0, 1, &pOldBuffer, &stride, &oldOffsets);
+
+				//if (offset != oldOffsets)
+				{
+					s_pDeviceContext->IASetVertexBuffers(0, 1, &pBuffer, &stride, offsets);
+					DV_CORE_DEBUG("Set VertexBuffer");
+				}
+			}
+
+			s_pVertexBuffer = pVertexBuffer;
+		}
+	}
+
+	IndexBuffer* Graphics::GetIndexBuffer()
+	{
+		return s_pIndexBuffer;
+	}
+
+	void Graphics::SetIndexBuffer(IndexBuffer* pIndexBuffer, uint32_t offset)
+	{
+		DV_ASSERT(IsInitialized());
+
+		if (pIndexBuffer != s_pIndexBuffer)
+		{
+			if (pIndexBuffer)
+			{
+				ID3D11Buffer* pOldBuffer = nullptr;
+				DXGI_FORMAT oldFormat = pIndexBuffer->GetFormat();
+				//UINT oldOffset = 0;
+				//s_pDeviceContext->IAGetIndexBuffer(&pOldBuffer, &oldFormat, &oldOffset);
+
+				//if (offset != oldOffset)
+				{
+					s_pDeviceContext->IASetIndexBuffer(pIndexBuffer->GetBuffer(), pIndexBuffer->GetFormat(), offset);
+					DV_CORE_DEBUG("Set IndexBuffer");
+				}
+			}
+			else
+			{
+				s_pDeviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+			}
+
+			s_pIndexBuffer = pIndexBuffer;
+		}
+	}
+
+	InputLayout* Graphics::GetInputLayout()
+	{
+		return s_pInputLayout;
+	}
+
+	void Graphics::SetShaderVariation(ShaderVariation* pShaderVariation)
+	{
+		DV_ASSERT(IsInitialized());
+
+		if (pShaderVariation)
+		{
+			auto type = pShaderVariation->GetShaderType();
+
+			if (type == eShaderType::VertexShader)
+			{
+				if (s_pVertexShaderVariation != pShaderVariation)
+				{
+					s_pDeviceContext->VSSetShader(static_cast<ID3D11VertexShader*>(pShaderVariation->GetShderResource()), nullptr, 0);
+					s_pVertexShaderVariation = pShaderVariation;
+					DV_CORE_DEBUG("Set VertexShader");
+
+					if (s_pInputLayout != pShaderVariation->GetInputLayout())
+					{
+						s_pDeviceContext->IASetInputLayout(pShaderVariation->GetInputLayout()->GetInputLayout());
+						s_pInputLayout = pShaderVariation->GetInputLayout();
+						DV_CORE_DEBUG("Set InputLayout");
+					}
+				}
+			}
+			else if (type == eShaderType::PixelShader)
+			{
+				if (s_pPixelShaderVariation != pShaderVariation)
+				{
+					s_pDeviceContext->PSSetShader(static_cast<ID3D11PixelShader*>(pShaderVariation->GetShderResource()), nullptr, 0);
+					s_pPixelShaderVariation = pShaderVariation;
+					DV_CORE_DEBUG("Set PixelShader");
+				}
+			}
+			else
+			{
+				if (s_pComputeShaderVariation != pShaderVariation)
+				{
+					s_pDeviceContext->CSSetShader(static_cast<ID3D11ComputeShader*>(pShaderVariation->GetShderResource()), nullptr, 0);
+					s_pComputeShaderVariation = pShaderVariation;
+					DV_CORE_DEBUG("Set ComputeShader");
+				}
+			}
+		}
+	}
+
+	// 1. 어떤 종류의 ConstantBuffer인지 전달받아야 한다. 현재 구현은 하나만 사용한다.
+	// 2. type을 논리연산으로 처리할 수 있다면 편하지만, 현재 ShaderVariation이 하나의 type만 가지도록 구현되었다.
+	void Graphics::SetConstantBuffer(eShaderType type, ConstantBuffer* pBuffer)
+	{
+		DV_ASSERT(IsInitialized());
+
+		auto pConstantBuffer = pBuffer->GetBuffer();
+
+		if (type == eShaderType::VertexShader)
+		{
+			s_pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+		}
+		if (type == eShaderType::PixelShader)
+		{
+			s_pDeviceContext->PSSetConstantBuffers(0, 1, &pConstantBuffer);
+		}
+		if (type == eShaderType::ComputeShader)
+		{
+			s_pDeviceContext->CSSetConstantBuffers(0, 1, &pConstantBuffer);
 		}
 	}
 
@@ -417,6 +609,8 @@ namespace Dive
 
 	void Graphics::prepareDraw()
 	{
+		DV_ASSERT(IsInitialized());
+
 		if (s_bRenderTargetsDirty)
 		{
 			s_pDeviceContext->OMSetRenderTargets(1, &s_pRenderTargetView, s_pDepthStencilView);

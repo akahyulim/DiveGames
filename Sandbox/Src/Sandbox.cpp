@@ -3,6 +3,7 @@
 DEFINE_APPLICATION_MAIN(Sandbox)
 
 Sandbox::Sandbox()
+	: m_pMainCamera(nullptr)
 {}
 
 Sandbox::~Sandbox()
@@ -21,11 +22,19 @@ void Sandbox::Start()
 
 	{
 		Dive::View* pView = new Dive::View;
+		pView->SetName("MainView");
+
+		m_pMainCamera = Dive::Scene::CreateGameObject("MainCamera")->AddComponent<Dive::Camera>();
+		m_pMainCamera->GetGameObject()->GetComponent<Dive::Transform>()->SetPosition(0.0f, 0.0f, -10.0f);
+		pView->SetCamera(m_pMainCamera);
+
 		Dive::Renderer::SetView(0, pView);
 
 		{
 			auto* pModel = Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/silly_dancing.fbx");
 				//Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/sponza.obj");
+
+			auto* pTexture2D = Dive::ResourceCache::LoadFromFile<Dive::Texture2D>("Assets/Textures/DokeV.jpeg");
 		}
 	}
 
@@ -39,12 +48,56 @@ void Sandbox::Stop()
 
 void Sandbox::OnUpdate(const Dive::Event& evnt)
 {
-	if (Dive::Input::KeyDown(DIK_W))
-		DV_CORE_INFO("W 키를 눌렀습니다.");
-	else if (Dive::Input::KeyDown(DIK_A))
-		DV_CORE_INFO("A 키를 눌렀습니다.");
-	else if (Dive::Input::KeyDown(DIK_S))
-		DV_CORE_INFO("S 키를 눌렀습니다.");
-	else if (Dive::Input::KeyDown(DIK_D))
-		DV_CORE_INFO("D 키를 눌렀습니다.");
+	auto pTransform = m_pMainCamera->GetGameObject()->GetTransform();
+
+	// xmfloat3와 xmvector 전부 speed와 delta를 곱할 수가 없다.
+	if (Dive::Input::KeyPress(DIK_W))
+	{
+		pTransform->Translate(0.0f, 0.0f, 1.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_S))
+	{
+		pTransform->Translate(0.0f, 0.0f, -1.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_A))
+	{
+		pTransform->Translate(-1.0f, 0.0f, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_D))
+	{
+		pTransform->Translate(1.0f, 0.0f, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_C))
+	{
+		pTransform->Translate(0.0f, -1.0f, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_SPACE))
+	{
+		pTransform->Translate(0.0f, 1.0f, 0.0f);
+	}
+
+	if (Dive::Input::KeyPress(DIK_Q))
+	{
+		pTransform->Rotate(0.0f, 0.0f, -1.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_E))
+	{
+		pTransform->Rotate(0.0f, 0.0f, 1.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_LEFT))
+	{
+		pTransform->Rotate(0.0f, -1.0f, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_RIGHT))
+	{
+		pTransform->Rotate(0.0f, 1.0f, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_UP))
+	{
+		pTransform->Rotate(-1.0f, 0.0f, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_DOWN))
+	{
+		pTransform->Rotate(1.0f, 0.0f, 0.0f);
+	}
 }

@@ -2,7 +2,15 @@
 
 namespace Dive
 {
-	enum eClearTarget : uint32_t
+	enum class eTextureUsage
+	{
+		Static,
+		Dynamic,
+		RenderTarget,
+		DepthStencil
+	};
+
+	enum eClearTarget : uint8_t
 	{
 		Color = 0x1,
 		Depth = 0x2,
@@ -15,6 +23,14 @@ namespace Dive
 		VertexShader,
 		PixelShader,
 		ComputeShader
+	};
+
+	enum class eTextureUnit
+	{
+		Diffuse = 0,
+		Normal = 1,
+		ShadowMap = 3,
+		Max = 4
 	};
 
 	enum class eVertexType

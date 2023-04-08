@@ -129,7 +129,7 @@
     </Link>
     <Lib>
       <AdditionalLibraryDirectories>external/libs;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc141-mtd.lib</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc141-mtd.lib;DirectXTex_Debug.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,11 +157,15 @@
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
+    <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
     <ClInclude Include="Src\Graphics\IndexBuffer.h" />
     <ClInclude Include="Src\Graphics\InputLayout.h" />
+    <ClInclude Include="Src\Graphics\RenderTexture.h" />
     <ClInclude Include="Src\Graphics\ShaderVariation.h" />
+    <ClInclude Include="Src\Graphics\Texture.h" />
+    <ClInclude Include="Src\Graphics\Texture2D.h" />
     <ClInclude Include="Src\Graphics\VertexBuffer.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\IO\FileStream.h" />
@@ -171,9 +175,11 @@
     <ClInclude Include="Src\Renderer\Model.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\View.h" />
+    <ClInclude Include="Src\Resource\Image.h" />
     <ClInclude Include="Src\Resource\Importer\ModelImporter.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceCache.h" />
+    <ClInclude Include="Src\Scene\Components\Camera.h" />
     <ClInclude Include="Src\Scene\Components\Component.h" />
     <ClInclude Include="Src\Scene\Components\Drawable.h" />
     <ClInclude Include="Src\Scene\Components\Transform.h" />
@@ -188,10 +194,14 @@
     <ClCompile Include="Src\DivePch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Src\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\InputLayout.cpp" />
+    <ClCompile Include="Src\Graphics\RenderTexture.cpp" />
     <ClCompile Include="Src\Graphics\ShaderVariation.cpp" />
+    <ClCompile Include="Src\Graphics\Texture.cpp" />
+    <ClCompile Include="Src\Graphics\Texture2D.cpp" />
     <ClCompile Include="Src\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\IO\FileStream.cpp" />
@@ -201,9 +211,11 @@
     <ClCompile Include="Src\Renderer\Model.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
+    <ClCompile Include="Src\Resource\Image.cpp" />
     <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceCache.cpp" />
+    <ClCompile Include="Src\Scene\Components\Camera.cpp" />
     <ClCompile Include="Src\Scene\Components\Component.cpp" />
     <ClCompile Include="Src\Scene\Components\Drawable.cpp" />
     <ClCompile Include="Src\Scene\Components\Transform.cpp" />

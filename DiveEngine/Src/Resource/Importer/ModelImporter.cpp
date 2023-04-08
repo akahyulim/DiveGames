@@ -3,10 +3,12 @@
 #include "Core/CoreDefs.h"
 #include "Graphics/GraphicsDefs.h"
 #include "Renderer/Model.h"
+#include "Renderer/Material.h"
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
 #include "Scene/Components/Drawable.h"
 #include "Scene/Components/Transform.h"
+#include "Resource/ResourceCache.h"
 #include "IO/Log.h"
 #include "IO/FileSystem.h"
 
@@ -35,6 +37,8 @@ namespace Dive
 		m_pModel->SetName(m_Name);
 
         Assimp::Importer importer;
+
+        /*
         // Set normal smoothing angle
         importer.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, 80.0f);
         // Set tangent smoothing angle
@@ -67,8 +71,44 @@ namespace Dive
             aiProcess_FindInvalidData |
             aiProcess_FindInstances |
             aiProcess_ValidateDataStructure;
+        */
+        const auto flags =
+            aiProcess_MakeLeftHanded |              // directx style.
+            aiProcess_FlipUVs |                     // directx style.
+            aiProcess_FlipWindingOrder |            // directx style.
+            aiProcess_CalcTangentSpace |
+            aiProcess_GenSmoothNormals |
+            aiProcess_JoinIdenticalVertices |
+            aiProcess_OptimizeMeshes |              // reduce the number of meshes         
+            aiProcess_ImproveCacheLocality |        // re-order triangles for better vertex cache locality.
+            aiProcess_RemoveRedundantMaterials |    // remove redundant/unreferenced materials.
+            aiProcess_LimitBoneWeights |
+            aiProcess_SplitLargeMeshes |
+            aiProcess_Triangulate |
+            aiProcess_GenUVCoords |
+            aiProcess_SortByPType |                 // splits meshes with more than one primitive type in homogeneous sub-meshes.
+            aiProcess_FindDegenerates |             // convert degenerate primitives to proper lines or points.
+            aiProcess_FindInvalidData |
+            aiProcess_FindInstances |
+            aiProcess_ValidateDataStructure |
+            aiProcess_Debone;
 
-        if (const aiScene* pScene = importer.ReadFile(filePath, importer_flags))
+        // Set normal smoothing angle
+        importer.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, 80.0f);
+        // Set tangent smoothing angle
+        importer.SetPropertyFloat(AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, 80.0f);
+        // Maximum number of triangles in a mesh (before splitting)    
+        importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 1000000);
+        // Maximum number of vertices in a mesh (before splitting)    
+        importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 1000000);
+        // Remove points and lines.
+        importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
+        // Remove cameras and lights
+        importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_CAMERAS | aiComponent_LIGHTS);
+        // Enable progress tracking
+        importer.SetPropertyBool(AI_CONFIG_GLOB_MEASURE_TIME, true);
+
+        if (const aiScene* pScene = importer.ReadFile(filePath, flags))
         {
             m_pAiScene = pScene;
             m_bAnimation = pScene->mNumAnimations != 0;
@@ -88,7 +128,7 @@ namespace Dive
 
         importer.FreeScene();
 
-		DV_CORE_INFO("ModelImporter가 Model({:s})(을)를 구성을 완료하였습니다.", filePath);
+		DV_CORE_DEBUG("ModelImporter가 Model({:s})(을)를 구성을 완료하였습니다.", filePath);
 
 		return m_pAiScene != nullptr;
 	}
@@ -194,7 +234,7 @@ namespace Dive
         {
             const auto& face = pAiMesh->mFaces[i];
             const uint32_t index = (i * 3);
-            indices[index + 0] = face.mIndices[0];
+            indices[index] = face.mIndices[0];
             indices[index + 1] = face.mIndices[1];
             indices[index + 2] = face.mIndices[2];
         }
@@ -214,6 +254,30 @@ namespace Dive
             indexOffset,
             static_cast<uint32_t>(indices.size()));
 
-        DV_CORE_INFO("{0:s}'s VertexCount: {1:d}, IndexCount: {2:d}", pAiMesh->mName.C_Str(), vertexCount, indexCount);
+        if (m_pAiScene->HasMaterials())
+            parseMaterial(pAiMesh);
+
+        DV_CORE_DEBUG("{0:s}'s VertexCount: {1:d}, IndexCount: {2:d}", pAiMesh->mName.C_Str(), vertexCount, indexCount);
+    }
+
+    void ModelImporter::parseMaterial(aiMesh* pAiMesh)
+    {
+        DV_ASSERT(pAiMesh);
+
+        const auto* pAiMaterial = m_pAiScene->mMaterials[pAiMesh->mMaterialIndex];
+        if (!pAiMaterial)
+            return;
+
+        auto pMaterial = new Material();
+
+        // name
+
+        // color
+
+        // oapcity
+
+        // textures
+
+        ResourceCache::AddManualResource<Material>(pMaterial);
     }
 }
