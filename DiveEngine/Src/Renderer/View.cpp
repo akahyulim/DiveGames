@@ -1,6 +1,7 @@
 #include "DivePch.h"
 #include "View.h"
 #include "Model.h"
+#include "Material.h"
 #include "Renderer.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
@@ -76,6 +77,12 @@ namespace Dive
 						viewport.TopLeftX = 0.0f;
 						viewport.TopLeftY = 0.0f;
 						Graphics::GetDeviceContext()->RSSetViewports(1, &viewport);
+					}
+
+					if (pDrawable->HasMaterial())
+					{
+						auto pMaterial = pDrawable->GetMaterial();
+						Graphics::SetTexture(0, pMaterial->GetTexture(eTextureUnit::Diffuse));
 					}
 
 					auto pMatrixBuffer = Renderer::GetMatrixBuffer();

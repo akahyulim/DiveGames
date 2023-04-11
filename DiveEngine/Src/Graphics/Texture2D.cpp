@@ -42,10 +42,10 @@ namespace Dive
 
 	// 현재 m_pLoadImage는 Cache에 등록되지 않고
 	// 이 클래스 내부에서 관리한다.
-	bool Texture2D::LoadFromFile(const std::string& fileName)
+	bool Texture2D::LoadFromFile(const std::string& filePath)
 	{
 		m_pLoadImage = new Image();
-		if (!m_pLoadImage->LoadFromFile(fileName))
+		if (!m_pLoadImage->LoadFromFile(filePath))
 		{
 			DV_DELETE(m_pLoadImage);
 			return false;
@@ -58,6 +58,9 @@ namespace Dive
 			return false;
 
 		DV_DELETE(m_pLoadImage);
+
+		m_FilePath = filePath;
+		SetName(FileSystem::GetFileName(filePath));
 
 		return true;
 	}

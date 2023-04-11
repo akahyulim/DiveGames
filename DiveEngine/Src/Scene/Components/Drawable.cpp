@@ -1,6 +1,8 @@
 #include "DivePch.h"
 #include "Drawable.h"
 #include "Renderer/Model.h"
+#include "Renderer/Material.h"
+#include "Resource/ResourceCache.h"
 #include "IO/Log.h"
 
 namespace Dive
@@ -11,7 +13,8 @@ namespace Dive
 		m_MeshVertexOffset(0),
 		m_MeshVertexCount(0),
 		m_MeshIndexOffset(0),
-		m_MeshIndexCount(0)
+		m_MeshIndexCount(0),
+		m_pMaterial(nullptr)
 	{
 	}
 
@@ -27,5 +30,10 @@ namespace Dive
 		m_MeshVertexCount = vertexCount;
 		m_MeshIndexOffset = indexOffset;
 		m_MeshIndexCount = indexCount;
+	}
+
+	void Drawable::SetMaterial(const std::string& filePath)
+	{
+		m_pMaterial = ResourceCache::GetResourceByPath<Material>(filePath);
 	}
 }

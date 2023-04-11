@@ -20,8 +20,13 @@ namespace Dive
 		void SetTexture(eTextureUnit unit, Texture* pTexture);
 		void AddTexture(eTextureUnit unit, const std::string& name);
 
+		DirectX::XMFLOAT4 GetColorAlbedo() const { return m_Albedo; }
+		void SetColorAlbedo(float r, float g, float b, float a) { SetColorAlbedo(DirectX::XMFLOAT4(r, g, b, a)); }
+		void SetColorAlbedo(const DirectX::XMFLOAT4& color) { m_Albedo = color; }
+
 	private:
 	private:
 		std::unordered_map<eTextureUnit, Texture*> m_Textures;
+		DirectX::XMFLOAT4 m_Albedo;
 	};
 }

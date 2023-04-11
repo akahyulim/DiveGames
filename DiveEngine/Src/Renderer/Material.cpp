@@ -13,7 +13,6 @@ namespace Dive
 		
 	Material::~Material()
 	{
-
 	}
 
 	bool Material::LoadFromFile(const std::string& filePath)

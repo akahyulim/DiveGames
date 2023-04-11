@@ -9,6 +9,7 @@
 namespace Dive
 {
 	class Model;
+	class Material;
 	class GameObject;
 
 	class ModelImporter
@@ -23,7 +24,7 @@ namespace Dive
 		void parseNode(const aiNode* pNode, GameObject* pParentGameObject = nullptr);
 		void parseNodeMeshes(const aiNode* pNode, GameObject* pNodeGameObject);
 		void parseMesh(aiMesh* pAiMesh, GameObject* pMeshGameObject);
-		void parseMaterial(aiMesh* pAiMesh);
+		Material* parseMaterial(aiMesh* pAiMesh);
 
 	private:
 		std::string m_FilePath;

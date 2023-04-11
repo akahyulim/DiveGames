@@ -13,7 +13,7 @@ namespace Dive
 		Texture2D();
 		~Texture2D() override;
 
-		bool LoadFromFile(const std::string& fileName) override;
+		bool LoadFromFile(const std::string& filePath) override;
 
 		bool SetImage(Image* pImage);
 		bool SetSize(int width, int height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, int mipCount = 0, bool linear = false);

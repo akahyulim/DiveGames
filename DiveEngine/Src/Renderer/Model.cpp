@@ -36,6 +36,9 @@ namespace Dive
 		if (!ResourceCache::GetModelImporter()->Load(this, filePath))
 			return false;
 
+		m_FilePath = filePath;
+		SetName(FileSystem::GetFileName(filePath));
+
 		return true;
 	}
 	

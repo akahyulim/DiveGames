@@ -36,7 +36,7 @@ namespace Dive
 
 			if (IsCached<T>(pResource->GetName()))
 			{
-				DV_CORE_WARN("이미 캐시된 리소스를 시도하였습니다.");
+				DV_CORE_WARN("이미 저장된 리소스({0:s} : {1:d})의 캐시를 시도하였습니다.", pResource->GetName(), pResource->GetID());
 				return pResource;
 			}
 
@@ -89,7 +89,7 @@ namespace Dive
 				if (resource.second->GetResourceType() == Resource::TypeToEnum<T>() &&
 					resource.second->GetName() == name)
 				{
-					DV_CORE_DEBUG("이미 캐시된 리소스입니다.");
+					DV_CORE_DEBUG("이미 캐시된 리소스({0:s} : {1:d})입니다.", resource.second->GetName(), resource.second->GetID());
 					return true;
 				}
 			}
@@ -141,25 +141,32 @@ namespace Dive
 		}
 
 		template<class T>
-		static T* GetResourceByPath(const std::string& filePath)
-		{
-			DV_CORE_DEBUG("ResourceCache::GetResourceByPath - {:s}", filePath);
-
-			return nullptr;
-		}
-
-		template<class T>
 		static std::vector<T*> GetResourcesByType()
 		{
 			std::vector<T*> resources;
 
 			for (auto& resource : m_Resources)
 			{
-				if (resource.second->GetResourceType() == Resource::TypeToEnum())
+				if (resource.second->GetResourceType() == Resource::TypeToEnum<T>())
 					resources.emplace_back(resource.second);
 			}
 
 			return resources;
+		}
+
+		template<class T>
+		static T* GetResourceByPath(const std::string& filePath)
+		{
+			for (auto& resource : m_Resources)
+			{
+				if (resource.second->GetResourceType() == Resource::TypeToEnum<T>())
+				{
+					if (resource.second->GetFilePath() == filePath)
+						return static_cast<T*>(resource.second);
+				}
+			}
+
+			return LoadFromFile<T>(filePath);
 		}
 
 		static ModelImporter* GetModelImporter();

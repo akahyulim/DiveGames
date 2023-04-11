@@ -2,6 +2,9 @@
 #include "Graphics.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "Texture.h"
+#include "Texture2D.h"
+#include "RenderTexture.h"
 #include "ShaderVariation.h"
 #include "ConstantBuffer.h"
 #include "InputLayout.h"
@@ -37,6 +40,12 @@ namespace Dive
 	static ShaderVariation* s_pVertexShaderVariation = nullptr;
 	static ShaderVariation* s_pPixelShaderVariation = nullptr;
 	static ShaderVariation* s_pComputeShaderVariation = nullptr;
+
+	static Texture* s_pTexture = nullptr;
+	static ID3D11ShaderResourceView* s_pShaderResourceView = nullptr;
+	static ID3D11SamplerState* s_pSamplerState = nullptr;
+	static bool s_bTextureDirty = false;
+
 
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
@@ -587,6 +596,34 @@ namespace Dive
 		s_bRenderTargetsDirty = true;
 	}
 
+	Texture* Graphics::GetTexture(uint32_t index)
+	{
+		return s_pTexture;
+	}
+
+	void Graphics::SetTexture(uint32_t index, Texture* pTexture)
+	{
+		if (pTexture)
+		{
+			if (pTexture->IsMipLevelsDirty())
+				pTexture->UpdateMipLevels();
+
+			if (pTexture->IsSamplerStateDirty())
+			{
+				pTexture->UpdateSamplerState();
+				s_pTexture = nullptr;
+			}
+		}
+
+		if (pTexture != s_pTexture)
+		{
+			s_pTexture = pTexture;
+			s_pShaderResourceView = pTexture? pTexture->GetShaderResourceView() : nullptr;
+			s_pSamplerState = pTexture ? pTexture->GetSamplerState() : nullptr;
+			s_bTextureDirty = true;
+		}
+	}
+
 	ID3D11Device* Graphics::GetDevice()
 	{
 		return s_pDevice;
@@ -616,6 +653,14 @@ namespace Dive
 			s_pDeviceContext->OMSetRenderTargets(1, &s_pRenderTargetView, s_pDepthStencilView);
 
 			s_bRenderTargetsDirty = false;
+		}
+
+		if (s_bTextureDirty)
+		{
+			s_pDeviceContext->PSSetShaderResources(0, 1, &s_pShaderResourceView);
+			s_pDeviceContext->PSSetSamplers(0, 1, &s_pSamplerState);
+
+			s_bTextureDirty = false;
 		}
 	}
 }

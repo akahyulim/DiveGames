@@ -31,10 +31,12 @@ void Sandbox::Start()
 		Dive::Renderer::SetView(0, pView);
 
 		{
-			auto* pModel = Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/silly_dancing.fbx");
-				//Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/sponza.obj");
+			auto* pModel = //Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
+				//Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/sponza-master/sponza.obj");
+				Dive::ResourceCache::GetResourceByPath<Dive::Model>("Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
 
-			auto* pTexture2D = Dive::ResourceCache::LoadFromFile<Dive::Texture2D>("Assets/Textures/DokeV.jpeg");
+			//auto* pTexture2D = Dive::ResourceCache::GetResourceByPath<Dive::Texture2D>("Assets/Models/Stormtrooper_D.png");
+			//Dive::Graphics::SetTexture(0, static_cast<Dive::Texture*>(pTexture2D));
 		}
 	}
 

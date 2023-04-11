@@ -4,6 +4,7 @@
 namespace Dive
 {
 	class Model;
+	class Material;
 
 	class Drawable : public Component
 	{
@@ -23,6 +24,10 @@ namespace Dive
 		uint32_t GetMeshIndexOffset() const { return m_MeshIndexOffset; }
 		uint32_t GetMeshIndexCount() const { return m_MeshIndexCount; }
 
+		bool HasMaterial() const { return m_pMaterial; }
+		Material* GetMaterial() const { return m_pMaterial; }
+		void SetMaterial(Material* pMaterial) { m_pMaterial = pMaterial; }
+		void SetMaterial(const std::string& filePath);
 
 	private:
 		Model* m_pModel;
@@ -34,5 +39,7 @@ namespace Dive
 
 		uint32_t m_MeshIndexOffset;
 		uint32_t m_MeshIndexCount;
+
+		Material* m_pMaterial;
 	};
 }

@@ -5,6 +5,7 @@ namespace Dive
 {
 	class VertexBuffer;
 	class IndexBuffer;
+	class Texture;
 	class InputLayout;
 	class ShaderVariation;
 	class ConstantBuffer;
@@ -57,6 +58,9 @@ namespace Dive
 
 		static void SetRenderTargetViews(uint32_t index, ID3D11RenderTargetView* pViews);
 		static void SetDepthStencilView(ID3D11DepthStencilView* pView);
+
+		static Texture* GetTexture(uint32_t index);
+		static void SetTexture(uint32_t index, Texture* pTexture);
 
 		static ID3D11Device* GetDevice();
 		static ID3D11DeviceContext* GetDeviceContext();

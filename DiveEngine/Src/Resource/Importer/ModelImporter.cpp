@@ -2,6 +2,7 @@
 #include "ModelImporter.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/GraphicsDefs.h"
+#include "Graphics/Texture2D.h"
 #include "Renderer/Model.h"
 #include "Renderer/Material.h"
 #include "Scene/Scene.h"
@@ -255,29 +256,47 @@ namespace Dive
             static_cast<uint32_t>(indices.size()));
 
         if (m_pAiScene->HasMaterials())
-            parseMaterial(pAiMesh);
+        {
+            auto pMaterial = parseMaterial(pAiMesh);
+            if(pMaterial)
+                pDrawable->SetMaterial(pMaterial);
+        }
 
         DV_CORE_DEBUG("{0:s}'s VertexCount: {1:d}, IndexCount: {2:d}", pAiMesh->mName.C_Str(), vertexCount, indexCount);
     }
 
-    void ModelImporter::parseMaterial(aiMesh* pAiMesh)
+    Material* ModelImporter::parseMaterial(aiMesh* pAiMesh)
     {
         DV_ASSERT(pAiMesh);
 
         const auto* pAiMaterial = m_pAiScene->mMaterials[pAiMesh->mMaterialIndex];
         if (!pAiMaterial)
-            return;
+            return nullptr;
 
-        auto pMaterial = new Material();
+        aiString name;
+        aiGetMaterialString(pAiMaterial, AI_MATKEY_NAME, &name);
 
-        // name
+        aiColor4D diffuse(1.0f, 1.0f, 1.0f, 1.0f);
+        aiGetMaterialColor(pAiMaterial, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
 
-        // color
-
-        // oapcity
+        aiColor4D opacity(1.0f, 1.0f, 1.0f, 1.0f);
+        aiGetMaterialColor(pAiMaterial, AI_MATKEY_OPACITY, &opacity);
 
         // textures
+        aiString texturePath;
+        if (pAiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) != AI_SUCCESS)
+            pAiMaterial->GetTexture(aiTextureType_BASE_COLOR, 0, &texturePath);
 
+        auto diffTexPath = //FileSystem::GetFileNameAndExtension(texturePath.C_Str());
+            texturePath.C_Str();
+        //diffTexPath = "Assets/Models/sponza-master/textures/" + diffTexPath;
+
+        auto pMaterial = new Material();
+        pMaterial->SetName(name.C_Str());
+        pMaterial->SetColorAlbedo(diffuse.r, diffuse.g, diffuse.b, opacity.r);
+        pMaterial->SetTexture(eTextureUnit::Diffuse, ResourceCache::GetResourceByPath<Texture2D>(diffTexPath));
         ResourceCache::AddManualResource<Material>(pMaterial);
+
+        return pMaterial;
     }
 }

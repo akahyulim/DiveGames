@@ -47,7 +47,7 @@ namespace Dive
 	{
 		if (m_Resources[id])
 		{
-			DV_CORE_WARN("이미 캐시된 리소스 ID({:d})입니다.", id);
+			DV_CORE_WARN("이미 캐시된 리소스({0:s} : ({1:d})입니다.", m_Resources[id]->GetName(), id);
 			return true;
 		}
 
