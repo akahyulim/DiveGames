@@ -25,7 +25,7 @@ void Sandbox::Start()
 		pView->SetName("MainView");
 
 		m_pMainCamera = Dive::Scene::CreateGameObject("MainCamera")->AddComponent<Dive::Camera>();
-		m_pMainCamera->GetGameObject()->GetComponent<Dive::Transform>()->SetPosition(0.0f, 0.0f, -10.0f);
+		m_pMainCamera->GetGameObject()->GetComponent<Dive::Transform>()->SetPosition(0.0f, 10.0f, -20.0f);
 		pView->SetCamera(m_pMainCamera);
 
 		Dive::Renderer::SetView(0, pView);
@@ -35,8 +35,9 @@ void Sandbox::Start()
 				//Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/sponza-master/sponza.obj");
 				Dive::ResourceCache::GetResourceByPath<Dive::Model>("Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
 
-			//auto* pTexture2D = Dive::ResourceCache::GetResourceByPath<Dive::Texture2D>("Assets/Models/Stormtrooper_D.png");
-			//Dive::Graphics::SetTexture(0, static_cast<Dive::Texture*>(pTexture2D));
+			auto* pTexture2D = Dive::ResourceCache::GetResourceByPath<Dive::Texture2D>("Assets/Models/pilot-avatar/textures/Material.002_Base_Color.png");
+			Dive::Graphics::SetTexture(0, static_cast<Dive::Texture*>(pTexture2D));
+			Dive::Graphics::SetTexture(1, Dive::ResourceCache::GetResourceByPath<Dive::Texture2D>("Assets/Models/pilot-avatar/textures/Material.002_Normal_OpenGL.png"));
 		}
 	}
 

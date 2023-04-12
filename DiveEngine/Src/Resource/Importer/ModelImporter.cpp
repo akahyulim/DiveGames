@@ -291,12 +291,17 @@ namespace Dive
             texturePath.C_Str();
         //diffTexPath = "Assets/Models/sponza-master/textures/" + diffTexPath;
 
-        auto pMaterial = new Material();
-        pMaterial->SetName(name.C_Str());
-        pMaterial->SetColorAlbedo(diffuse.r, diffuse.g, diffuse.b, opacity.r);
-        pMaterial->SetTexture(eTextureUnit::Diffuse, ResourceCache::GetResourceByPath<Texture2D>(diffTexPath));
-        ResourceCache::AddManualResource<Material>(pMaterial);
+        auto diffTex = ResourceCache::GetResourceByPath<Texture2D>(diffTexPath);
+        if (diffTex)
+        {
+            auto pMaterial = new Material();
+            pMaterial->SetName(name.C_Str());
+            pMaterial->SetColorAlbedo(diffuse.r, diffuse.g, diffuse.b, opacity.r);
+            pMaterial->SetTexture(eTextureUnit::Diffuse, diffTex);
+            ResourceCache::AddManualResource<Material>(pMaterial);
+            return pMaterial;
+        }
 
-        return pMaterial;
+        return nullptr;
     }
 }

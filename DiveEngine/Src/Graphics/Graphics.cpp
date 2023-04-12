@@ -41,9 +41,11 @@ namespace Dive
 	static ShaderVariation* s_pPixelShaderVariation = nullptr;
 	static ShaderVariation* s_pComputeShaderVariation = nullptr;
 
-	static Texture* s_pTexture = nullptr;
-	static ID3D11ShaderResourceView* s_pShaderResourceView = nullptr;
-	static ID3D11SamplerState* s_pSamplerState = nullptr;
+	static ID3D11Buffer* s_pVertexShaderConstantBuffers[2] = { nullptr, };
+
+	static Texture* s_pTextures[2] = { nullptr, };
+	static ID3D11ShaderResourceView* s_pShaderResourceViews[2] = { nullptr, };
+	static ID3D11SamplerState* s_pSamplerStates[2] = { nullptr, };
 	static bool s_bTextureDirty = false;
 
 
@@ -556,25 +558,21 @@ namespace Dive
 		}
 	}
 
-	// 1. 어떤 종류의 ConstantBuffer인지 전달받아야 한다. 현재 구현은 하나만 사용한다.
-	// 2. type을 논리연산으로 처리할 수 있다면 편하지만, 현재 ShaderVariation이 하나의 type만 가지도록 구현되었다.
-	void Graphics::SetConstantBuffer(eShaderType type, ConstantBuffer* pBuffer)
+	// urho의 경우 SetShaders()에서 해당 Shader가 사용하는 Buffer를 직접 구성한다.
+	// 추후 참조하자.
+	void Graphics::SetConstantBuffer(uint8_t index, eShaderType type, ConstantBuffer* pBuffer)
 	{
-		DV_ASSERT(IsInitialized());
-
 		auto pConstantBuffer = pBuffer->GetBuffer();
 
 		if (type == eShaderType::VertexShader)
 		{
-			s_pDeviceContext->VSSetConstantBuffers(0, 1, &pConstantBuffer);
+			s_pVertexShaderConstantBuffers[index] = pConstantBuffer;
 		}
 		if (type == eShaderType::PixelShader)
 		{
-			s_pDeviceContext->PSSetConstantBuffers(0, 1, &pConstantBuffer);
 		}
 		if (type == eShaderType::ComputeShader)
 		{
-			s_pDeviceContext->CSSetConstantBuffers(0, 1, &pConstantBuffer);
 		}
 	}
 
@@ -598,7 +596,7 @@ namespace Dive
 
 	Texture* Graphics::GetTexture(uint32_t index)
 	{
-		return s_pTexture;
+		return s_pTextures[index];
 	}
 
 	void Graphics::SetTexture(uint32_t index, Texture* pTexture)
@@ -611,15 +609,15 @@ namespace Dive
 			if (pTexture->IsSamplerStateDirty())
 			{
 				pTexture->UpdateSamplerState();
-				s_pTexture = nullptr;
+				s_pTextures[index] = nullptr;
 			}
 		}
 
-		if (pTexture != s_pTexture)
+		if (pTexture != s_pTextures[index])
 		{
-			s_pTexture = pTexture;
-			s_pShaderResourceView = pTexture? pTexture->GetShaderResourceView() : nullptr;
-			s_pSamplerState = pTexture ? pTexture->GetSamplerState() : nullptr;
+			s_pTextures[index] = pTexture;
+			s_pShaderResourceViews[index] = pTexture? pTexture->GetShaderResourceView() : nullptr;
+			s_pSamplerStates[index] = pTexture ? pTexture->GetSamplerState() : nullptr;
 			s_bTextureDirty = true;
 		}
 	}
@@ -657,10 +655,14 @@ namespace Dive
 
 		if (s_bTextureDirty)
 		{
-			s_pDeviceContext->PSSetShaderResources(0, 1, &s_pShaderResourceView);
-			s_pDeviceContext->PSSetSamplers(0, 1, &s_pSamplerState);
+			s_pDeviceContext->PSSetShaderResources(0, 2, &s_pShaderResourceViews[0]);
+			s_pDeviceContext->PSSetSamplers(0, 2, &s_pSamplerStates[0]);
 
 			s_bTextureDirty = false;
+		}
+
+		{
+			s_pDeviceContext->VSSetConstantBuffers(0, 2, &s_pVertexShaderConstantBuffers[0]);
 		}
 	}
 }

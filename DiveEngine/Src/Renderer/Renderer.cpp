@@ -15,7 +15,10 @@ namespace Dive
 	static ShaderVariation* s_pBasicVertexShader = nullptr;
 	static ShaderVariation* s_pBasicPixelShader = nullptr;
 
-	static ConstantBuffer* s_pMatrixBuffer = nullptr;
+	static ConstantBuffer* s_pCameraVertexShaderBuffer = nullptr;
+	static ConstantBuffer* s_pModelVertexShaderBuffer = nullptr;
+	static ConstantBuffer* s_pCameraPixelShaderBuffer = nullptr;
+	static ConstantBuffer* s_pLightPixelShaderBuffer = nullptr;
 
 	static ID3D11DepthStencilState* s_pDepthStencilState = nullptr;
 	static ID3D11RasterizerState* s_pRasterizerState = nullptr;
@@ -50,9 +53,13 @@ namespace Dive
 	void Renderer::Shutdown()
 	{
 		{
+			DV_DELETE(s_pLightPixelShaderBuffer);
+			DV_DELETE(s_pCameraPixelShaderBuffer);
+			DV_DELETE(s_pModelVertexShaderBuffer);
+			DV_DELETE(s_pCameraVertexShaderBuffer);
+
 			DV_RELEASE(s_pRasterizerState);
 			DV_RELEASE(s_pDepthStencilState);
-			DV_DELETE(s_pMatrixBuffer);
 			DV_DELETE(s_pBasicPixelShader);
 			DV_DELETE(s_pBasicVertexShader);
 		}
@@ -103,9 +110,24 @@ namespace Dive
 		return s_pBasicPixelShader;
 	}
 
-	ConstantBuffer* Renderer::GetMatrixBuffer()
+	ConstantBuffer* Renderer::GetCameraVertexShaderBuffer()
 	{
-		return s_pMatrixBuffer;
+		return s_pCameraVertexShaderBuffer;
+	}
+
+	ConstantBuffer* Renderer::GetModelVertexShaderBuffer()
+	{
+		return s_pModelVertexShaderBuffer;
+	}
+
+	ConstantBuffer* Renderer::GetCameraPixelShaderBuffer()
+	{
+		return s_pCameraPixelShaderBuffer;
+	}
+
+	ConstantBuffer* Renderer::GetLightPixelShaderBuffer()
+	{
+		return s_pLightPixelShaderBuffer;
 	}
 
 	ID3D11DepthStencilState* Renderer::GetDepthStencilState()
@@ -133,10 +155,31 @@ namespace Dive
 
 	bool Renderer::createConstantBuffers()
 	{
-		// matrix buffer
+		// camera vertex shader
 		{
-			s_pMatrixBuffer = new ConstantBuffer("MatrixBuffer");
-			if (!s_pMatrixBuffer->Create<MatrixBuffer>())
+			s_pCameraVertexShaderBuffer = new ConstantBuffer("CameraVertexShaderBuffer");
+			if (!s_pCameraVertexShaderBuffer->Create<CameraVertexShaderBuffer>())
+				return false;
+		}
+
+		// model vertex shader
+		{
+			s_pModelVertexShaderBuffer = new ConstantBuffer("ModelVertexShaderBuffer");
+			if (!s_pModelVertexShaderBuffer->Create<ModelVertexShaderBuffer>())
+				return false;
+		}
+
+		// camera pixel shader
+		{
+			s_pCameraPixelShaderBuffer = new ConstantBuffer("CameraPixelShaderBuffer");
+			if (!s_pCameraPixelShaderBuffer->Create<CameraPixelShaderBuffer>())
+				return false;
+		}
+
+		// light pixel shader
+		{
+			s_pLightPixelShaderBuffer = new ConstantBuffer("LightPixelShaderBuffer");
+			if (!s_pLightPixelShaderBuffer->Create<LightPixelShaderBuffer>())
 				return false;
 		}
 

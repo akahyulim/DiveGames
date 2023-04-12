@@ -85,13 +85,38 @@ namespace Dive
 						Graphics::SetTexture(0, pMaterial->GetTexture(eTextureUnit::Diffuse));
 					}
 
-					auto pMatrixBuffer = Renderer::GetMatrixBuffer();
-					auto pMappedData = static_cast<MatrixBuffer*>(pMatrixBuffer->Map());
-					pMappedData->worldMatrix = DirectX::XMMatrixTranspose(pDrawable->GetGameObject()->GetTransform()->GetMatrix());
-					pMappedData->viewMatrix = DirectX::XMMatrixTranspose(m_pCamera->GetViewMatrix());
-					pMappedData->projMatrix = DirectX::XMMatrixTranspose(m_pCamera->GetProjectionMatrix());
-					pMatrixBuffer->Unmap();
-					Graphics::SetConstantBuffer(eShaderType::VertexShader, pMatrixBuffer);
+					// camera vertex shader buffer
+					{
+						auto pBuffer = Renderer::GetCameraVertexShaderBuffer();
+						auto pMappedData = static_cast<CameraVertexShaderBuffer*>(pBuffer->Map());
+						pMappedData->viewMatrix = DirectX::XMMatrixTranspose(m_pCamera->GetViewMatrix());
+						pMappedData->projMatrix = DirectX::XMMatrixTranspose(m_pCamera->GetProjectionMatrix());
+						pBuffer->Unmap();
+						Graphics::SetConstantBuffer(0, eShaderType::VertexShader, pBuffer);
+					}
+
+					// model vertex shader buffer
+					{
+						auto pBuffer = Renderer::GetModelVertexShaderBuffer();
+						auto pMappedData = static_cast<ModelVertexShaderBuffer*>(pBuffer->Map());
+						pMappedData->worldMatrix = DirectX::XMMatrixTranspose(pDrawable->GetGameObject()->GetTransform()->GetMatrix());
+						pBuffer->Unmap();
+						Graphics::SetConstantBuffer(1, eShaderType::VertexShader, pBuffer);
+					}
+
+					// camera pixel shader buffer
+					{
+						//auto pBuffer = Renderer::GetCameraPixelShaderBuffer();
+						//auto pMappedData = static_cast<CameraPixelShaderBuffer*>(pBuffer->Map());
+						//pMappedData->cameraPos = m_pCamera->GetGameObject()->GetTransform()->GetPosition();
+						//pBuffer->Unmap();
+						//Graphics::SetConstantBuffer(eShaderType::PixelShader, pBuffer);
+					}
+
+					// light pixel shader buffer
+					{
+
+					}
 
 					Graphics::SetVertexBuffer(pDrawable->GetModel()->GetVertexBuffer());
 					Graphics::SetIndexBuffer(pDrawable->GetModel()->GetIndexBuffer());

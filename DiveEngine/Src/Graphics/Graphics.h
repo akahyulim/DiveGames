@@ -54,7 +54,7 @@ namespace Dive
 		static InputLayout* GetInputLayout();
 		static void SetShaderVariation(ShaderVariation* pShaderVariation);
 
-		static void SetConstantBuffer(eShaderType type, ConstantBuffer* pBuffer);
+		static void SetConstantBuffer(uint8_t index, eShaderType type, ConstantBuffer* pBuffer);
 
 		static void SetRenderTargetViews(uint32_t index, ID3D11RenderTargetView* pViews);
 		static void SetDepthStencilView(ID3D11DepthStencilView* pView);
