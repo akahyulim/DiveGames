@@ -42,6 +42,7 @@ namespace Dive
 	static ShaderVariation* s_pComputeShaderVariation = nullptr;
 
 	static ID3D11Buffer* s_pVertexShaderConstantBuffers[2] = { nullptr, };
+	static ID3D11Buffer* s_pPixelShaderConstantBuffers[3] = { nullptr, };
 
 	static Texture* s_pTextures[2] = { nullptr, };
 	static ID3D11ShaderResourceView* s_pShaderResourceViews[2] = { nullptr, };
@@ -467,7 +468,6 @@ namespace Dive
 				//if (offset != oldOffsets)
 				{
 					s_pDeviceContext->IASetVertexBuffers(0, 1, &pBuffer, &stride, offsets);
-					DV_CORE_DEBUG("Set VertexBuffer");
 				}
 			}
 
@@ -496,7 +496,6 @@ namespace Dive
 				//if (offset != oldOffset)
 				{
 					s_pDeviceContext->IASetIndexBuffer(pIndexBuffer->GetBuffer(), pIndexBuffer->GetFormat(), offset);
-					DV_CORE_DEBUG("Set IndexBuffer");
 				}
 			}
 			else
@@ -527,13 +526,11 @@ namespace Dive
 				{
 					s_pDeviceContext->VSSetShader(static_cast<ID3D11VertexShader*>(pShaderVariation->GetShderResource()), nullptr, 0);
 					s_pVertexShaderVariation = pShaderVariation;
-					DV_CORE_DEBUG("Set VertexShader");
-
+					
 					if (s_pInputLayout != pShaderVariation->GetInputLayout())
 					{
 						s_pDeviceContext->IASetInputLayout(pShaderVariation->GetInputLayout()->GetInputLayout());
 						s_pInputLayout = pShaderVariation->GetInputLayout();
-						DV_CORE_DEBUG("Set InputLayout");
 					}
 				}
 			}
@@ -543,7 +540,6 @@ namespace Dive
 				{
 					s_pDeviceContext->PSSetShader(static_cast<ID3D11PixelShader*>(pShaderVariation->GetShderResource()), nullptr, 0);
 					s_pPixelShaderVariation = pShaderVariation;
-					DV_CORE_DEBUG("Set PixelShader");
 				}
 			}
 			else
@@ -552,7 +548,6 @@ namespace Dive
 				{
 					s_pDeviceContext->CSSetShader(static_cast<ID3D11ComputeShader*>(pShaderVariation->GetShderResource()), nullptr, 0);
 					s_pComputeShaderVariation = pShaderVariation;
-					DV_CORE_DEBUG("Set ComputeShader");
 				}
 			}
 		}
@@ -570,6 +565,7 @@ namespace Dive
 		}
 		if (type == eShaderType::PixelShader)
 		{
+			s_pPixelShaderConstantBuffers[index] = pConstantBuffer;
 		}
 		if (type == eShaderType::ComputeShader)
 		{
@@ -663,6 +659,7 @@ namespace Dive
 
 		{
 			s_pDeviceContext->VSSetConstantBuffers(0, 2, &s_pVertexShaderConstantBuffers[0]);
+			s_pDeviceContext->PSSetConstantBuffers(0, 3, &s_pPixelShaderConstantBuffers[0]);
 		}
 	}
 }

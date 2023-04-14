@@ -30,14 +30,37 @@ void Sandbox::Start()
 
 		Dive::Renderer::SetView(0, pView);
 
+		// Objects
 		{
 			auto* pModel = //Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
 				//Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/sponza-master/sponza.obj");
 				Dive::ResourceCache::GetResourceByPath<Dive::Model>("Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
+		}
 
-			auto* pTexture2D = Dive::ResourceCache::GetResourceByPath<Dive::Texture2D>("Assets/Models/pilot-avatar/textures/Material.002_Base_Color.png");
-			Dive::Graphics::SetTexture(0, static_cast<Dive::Texture*>(pTexture2D));
-			Dive::Graphics::SetTexture(1, Dive::ResourceCache::GetResourceByPath<Dive::Texture2D>("Assets/Models/pilot-avatar/textures/Material.002_Normal_OpenGL.png"));
+		// Lights
+		{	
+			auto pDirLight = Dive::Scene::CreateGameObject("Directional Light")->AddComponent<Dive::Light>();
+			pDirLight->SetType(Dive::eLightType::Directional);
+			pDirLight->SetColor(1.f, 1.0f, 1.0f);
+			pDirLight->SetDir(1.0f, -1.0f, 1.0f);
+			
+			auto pPointLightRed = Dive::Scene::CreateGameObject("Point Light Red")->AddComponent<Dive::Light>();
+			pPointLightRed->SetType(Dive::eLightType::Point);
+			pPointLightRed->SetColor(1.0f, 0.0f, 0.0f);
+			pPointLightRed->SetRange(50.0f);
+			pPointLightRed->GetGameObject()->GetTransform()->SetPosition(0.0f, 10.0f, -10.0f);
+			
+			auto pPointLightGreen = Dive::Scene::CreateGameObject("Point Light Green")->AddComponent<Dive::Light>();
+			pPointLightGreen->SetType(Dive::eLightType::Point);
+			pPointLightGreen->SetColor(0.0f, 1.0f, 0.0f);
+			pPointLightGreen->SetRange(50.0f);
+			pPointLightGreen->GetGameObject()->GetTransform()->SetPosition(10.0f, 10.0f, 0.0f);
+
+			auto pPointLightBlue = Dive::Scene::CreateGameObject("Point Light Blue")->AddComponent<Dive::Light>();
+			pPointLightBlue->SetType(Dive::eLightType::Point);
+			pPointLightBlue->SetColor(0.0f, 0.0f, 1.0f);
+			pPointLightBlue->SetRange(50.0f);
+			pPointLightBlue->GetGameObject()->GetTransform()->SetPosition(-10.0f, 10.0f, 0.0f);
 		}
 	}
 

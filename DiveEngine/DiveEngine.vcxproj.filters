@@ -141,6 +141,9 @@
     <ClInclude Include="Src\Graphics\RenderTexture.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Scene\Components\Light.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DivePch.cpp">
@@ -238,6 +241,9 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\RenderTexture.cpp">
       <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\Light.cpp">
+      <Filter>Src\Scene\Components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

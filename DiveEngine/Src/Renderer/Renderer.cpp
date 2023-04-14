@@ -12,16 +12,22 @@ namespace Dive
 {
 	static std::vector<View*> s_Views;
 
-	static ShaderVariation* s_pBasicVertexShader = nullptr;
-	static ShaderVariation* s_pBasicPixelShader = nullptr;
+	static ShaderVariation* s_pForwardLightVertexShader = nullptr;
+	static ShaderVariation* s_pDirectionalLightPixelShader = nullptr;
+	static ShaderVariation* s_pPointLightPixelShader = nullptr;
 
 	static ConstantBuffer* s_pCameraVertexShaderBuffer = nullptr;
 	static ConstantBuffer* s_pModelVertexShaderBuffer = nullptr;
 	static ConstantBuffer* s_pCameraPixelShaderBuffer = nullptr;
 	static ConstantBuffer* s_pLightPixelShaderBuffer = nullptr;
+	static ConstantBuffer* s_pMaterialPixelShaderBuffer = nullptr;
 
 	static ID3D11DepthStencilState* s_pDepthStencilState = nullptr;
+	static ID3D11DepthStencilState* s_pForwardLightDS = nullptr;
+
 	static ID3D11RasterizerState* s_pRasterizerState = nullptr;
+
+	static ID3D11BlendState* s_pBlendState = nullptr;
 
 	bool Renderer::Initialize()
 	{
@@ -44,6 +50,11 @@ namespace Dive
 		{
 			DV_CORE_WARN("RasterizerStates 생성에 실패하였습니다.");
 		}
+
+		if (!createBlendStates())
+		{
+			DV_CORE_WARN("BlendStates 생성에 실패하였습니다.");
+		}
 		
 		DV_CORE_TRACE("Renderer 초기화에 성공하였습니다.");
 
@@ -53,6 +64,7 @@ namespace Dive
 	void Renderer::Shutdown()
 	{
 		{
+			DV_DELETE(s_pMaterialPixelShaderBuffer);
 			DV_DELETE(s_pLightPixelShaderBuffer);
 			DV_DELETE(s_pCameraPixelShaderBuffer);
 			DV_DELETE(s_pModelVertexShaderBuffer);
@@ -60,8 +72,9 @@ namespace Dive
 
 			DV_RELEASE(s_pRasterizerState);
 			DV_RELEASE(s_pDepthStencilState);
-			DV_DELETE(s_pBasicPixelShader);
-			DV_DELETE(s_pBasicVertexShader);
+			DV_DELETE(s_pDirectionalLightPixelShader);
+			DV_DELETE(s_pPointLightPixelShader);
+			DV_DELETE(s_pForwardLightVertexShader);
 		}
 
 		for (auto pView : s_Views)
@@ -100,14 +113,19 @@ namespace Dive
 		return static_cast<uint32_t>(s_Views.size());
 	}
 
-	ShaderVariation* Renderer::GetVertexShaderVariation()
+	ShaderVariation* Renderer::GetForwardLightVertexShaderVariation()
 	{
-		return s_pBasicVertexShader;
+		return s_pForwardLightVertexShader;
 	}
 
-	ShaderVariation* Renderer::GetPixelShaderVariation()
+	ShaderVariation* Renderer::GetDirectionalLightPixelShaderVariation()
 	{
-		return s_pBasicPixelShader;
+		return s_pDirectionalLightPixelShader;
+	}
+
+	ShaderVariation* Renderer::GetPointLightPixelShaderVariation()
+	{
+		return s_pPointLightPixelShader;
 	}
 
 	ConstantBuffer* Renderer::GetCameraVertexShaderBuffer()
@@ -130,9 +148,19 @@ namespace Dive
 		return s_pLightPixelShaderBuffer;
 	}
 
+	ConstantBuffer* Renderer::GetMaterialPixelShaderBuffer()
+	{
+		return s_pMaterialPixelShaderBuffer;
+	}
+
 	ID3D11DepthStencilState* Renderer::GetDepthStencilState()
 	{
 		return s_pDepthStencilState;
+	}
+
+	ID3D11DepthStencilState* Renderer::GetForwardLightDS()
+	{
+		return s_pForwardLightDS;
 	}
 
 	ID3D11RasterizerState* Renderer::GetRasterizerState()
@@ -140,15 +168,25 @@ namespace Dive
 		return s_pRasterizerState;
 	}
 
+	ID3D11BlendState* Renderer::GetBlendState()
+	{
+		return s_pBlendState;
+	}
+
 	bool Renderer::createShaders()
 	{
-		s_pBasicVertexShader = new ShaderVariation;
-		if (!s_pBasicVertexShader->CompileAndCreate(eShaderType::VertexShader, "Assets/Shaders/basic.hlsl", eVertexType::Model))
-			return false;
-
-		s_pBasicPixelShader = new ShaderVariation;
-		if (!s_pBasicPixelShader->CompileAndCreate(eShaderType::PixelShader, "Assets/Shaders/basic.hlsl"))
-			return false;
+		// forward light
+		{
+			s_pForwardLightVertexShader = new ShaderVariation;
+			if (!s_pForwardLightVertexShader->CompileAndCreate(eShaderType::VertexShader, "CoreData/Shaders/ForwardLightCommon.hlsl", eVertexType::Model))
+				return false;
+			s_pDirectionalLightPixelShader = new ShaderVariation;
+			if (!s_pDirectionalLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "CoreData/Shaders/DirectionalLight.hlsl"))
+				return false;
+			s_pPointLightPixelShader = new ShaderVariation;
+			if (!s_pPointLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "CoreData/Shaders/PointLight.hlsl"))
+				return false;
+		}
 
 		return true;
 	}
@@ -183,6 +221,13 @@ namespace Dive
 				return false;
 		}
 
+		// material pixel shader
+		{
+			s_pMaterialPixelShaderBuffer = new ConstantBuffer("MaterialPixelShaderBuffer");
+			if (!s_pMaterialPixelShaderBuffer->Create<MaterialPixelShaderBuffer>())
+				return false;
+		}
+
 		return true;
 	}
 
@@ -191,33 +236,58 @@ namespace Dive
 		DV_ASSERT(Graphics::IsInitialized());
 
 		D3D11_DEPTH_STENCIL_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
 
-		// Set up the description of the stencil state.
-		desc.DepthEnable = true;
-		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		desc.DepthFunc = D3D11_COMPARISON_LESS;
-
-		desc.StencilEnable = true;
-		desc.StencilReadMask = 0xFF;
-		desc.StencilWriteMask = 0xFF;
-
-		// Stencil operations if pixel is front-facing.
-		desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-		desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-		// Stencil operations if pixel is back-facing.
-		desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-		desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-		if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_pDepthStencilState)))
+		// default?
 		{
-			DV_CORE_ERROR("DepthStencilState 생성에 실패하였습니다.");
-			return false;
+			ZeroMemory(&desc, sizeof(desc));
+
+			// Set up the description of the stencil state.
+			desc.DepthEnable = true;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+			desc.StencilEnable = true;
+			desc.StencilReadMask = 0xFF;
+			desc.StencilWriteMask = 0xFF;
+
+			// Stencil operations if pixel is front-facing.
+			desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+			desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+			// Stencil operations if pixel is back-facing.
+			desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+			desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_pDepthStencilState)))
+			{
+				DV_CORE_ERROR("DepthStencilState 생성에 실패하였습니다.");
+				return false;
+			}
+		}
+
+		// forwardLightDS
+		{
+			ZeroMemory(&desc, sizeof(desc));
+
+			desc.DepthEnable = TRUE;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+			desc.StencilEnable = FALSE;
+			desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+			desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+			const D3D11_DEPTH_STENCILOP_DESC noSkyStencilOp = { D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_COMPARISON_EQUAL };
+			desc.FrontFace = noSkyStencilOp;
+			desc.BackFace = noSkyStencilOp;
+
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_pForwardLightDS)))
+			{
+				DV_CORE_ERROR("DepthStencilState 생성에 실패하였습니다.");
+				return false;
+			}
 		}
 
 		return true;
@@ -244,6 +314,33 @@ namespace Dive
 		{
 			DV_CORE_ERROR("RasterizerState 생성에 실패하였습니다.");
 			return false;
+		}
+
+		return true;
+	}
+
+	bool Renderer::createBlendStates()
+	{
+		// addictive blend state
+		{
+			D3D11_BLEND_DESC desc;
+			desc.AlphaToCoverageEnable = FALSE;
+			desc.IndependentBlendEnable = FALSE;
+			const D3D11_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc =
+			{
+				TRUE,
+				D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD,
+				D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD,
+				D3D11_COLOR_WRITE_ENABLE_ALL,
+			};
+			for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+				desc.RenderTarget[i] = defaultRenderTargetBlendDesc;
+			
+			if (FAILED(Graphics::GetDevice()->CreateBlendState(&desc, &s_pBlendState)))
+			{
+				DV_CORE_ERROR("BlandState 생성에 실패하였습니다.");
+				return false;
+			}
 		}
 
 		return true;

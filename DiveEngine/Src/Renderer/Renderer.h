@@ -26,16 +26,23 @@ namespace Dive
 
 	struct CameraPixelShaderBuffer
 	{
-		DirectX::XMFLOAT4 cameraPos;
+		DirectX::XMFLOAT3 cameraPos;
+		float poo;
 	};
 
 	struct LightPixelShaderBuffer
 	{
-		DirectX::XMFLOAT4 lightColor;
-		DirectX::XMFLOAT4 lightDir;
+		DirectX::XMFLOAT3 lightPos;
 		float lightRange;
+		DirectX::XMFLOAT3 lightColor;
 		float lightSpotAngle;
-		float dump[2] = { 0.0, };	// 4byte로 나누어떨어지지 않으면 버퍼 생성시 오류가 발생한다.
+		DirectX::XMFLOAT3 lightDir;
+		float poo;
+	};
+
+	struct MaterialPixelShaderBuffer
+	{
+		DirectX::XMFLOAT4 diffColor;
 	};
 
 	class Renderer
@@ -52,21 +59,28 @@ namespace Dive
 		static uint32_t GetViewCount();
 
 		// test
-		static ShaderVariation* GetVertexShaderVariation();
-		static ShaderVariation* GetPixelShaderVariation();
+		static ShaderVariation* GetForwardLightVertexShaderVariation();
+		static ShaderVariation* GetDirectionalLightPixelShaderVariation();
+		static ShaderVariation* GetPointLightPixelShaderVariation();
 
 		static ConstantBuffer* GetCameraVertexShaderBuffer();
 		static ConstantBuffer* GetModelVertexShaderBuffer();
 		static ConstantBuffer* GetCameraPixelShaderBuffer();
 		static ConstantBuffer* GetLightPixelShaderBuffer();
+		static ConstantBuffer* GetMaterialPixelShaderBuffer();
 		
 		static ID3D11DepthStencilState* GetDepthStencilState();
+		static ID3D11DepthStencilState* GetForwardLightDS();
+
 		static ID3D11RasterizerState* GetRasterizerState();
+
+		static ID3D11BlendState* GetBlendState();
 
 	private:
 		static bool createShaders();
 		static bool createConstantBuffers();
 		static bool createDepthStencilStates();
 		static bool createRasterizerStates();
+		static bool createBlendStates();
 	};
 }

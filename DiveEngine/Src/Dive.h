@@ -36,6 +36,7 @@
 #include "Scene/Components/Transform.h"
 #include "Scene/Components/Camera.h"
 #include "Scene/Components/Drawable.h"
+#include "Scene/Components/Light.h"
 
 // Resource
 #include "Resource/Importer/ModelImporter.h"

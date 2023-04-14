@@ -5,23 +5,39 @@ namespace Dive
 {
 	class Camera;
 	class Drawable;
+	class Light;
+
+	enum class eRenderPath
+	{
+		Forward,
+		Deferred,
+	};
 
 	class View : public Object
 	{
 	public:
-		View();
-		View(Camera* pCamera);
+		View(eRenderPath path = eRenderPath::Forward);
+		View(Camera* pCamera, eRenderPath path = eRenderPath::Forward);
 		~View();
 
 		void Update(float delta);
 		void Render();
 
+		eRenderPath GetRenderPath() const { return m_RenderPath; }
+		void SetRenderPath(eRenderPath path) { m_RenderPath = path; }
+
 		Camera* GetCamera() const { return m_pCamera; }
 		void SetCamera(Camera* pCamera) { m_pCamera = pCamera; }
 
 	private:
+		void renderPathForward();
+		void renderPathDeferred();
+
 	private:
 		Camera* m_pCamera;
 		std::vector<Drawable*> m_Drawables;
+		std::vector<Light*> m_Lights;
+
+		eRenderPath m_RenderPath;
 	};
 }
