@@ -57,7 +57,7 @@ namespace Dive
 	protected:
 		ID3D11Texture2D* m_pTexture2D;
 		ID3D11ShaderResourceView* m_pShaderResourceView;
-		ID3D11SamplerState* m_pSamplerState;
+		ID3D11SamplerState* m_pSamplerState;	// 아무래도 Texture마다 직접 관리하는 건 부담된다.
 
 		int m_Width;
 		int m_Height;

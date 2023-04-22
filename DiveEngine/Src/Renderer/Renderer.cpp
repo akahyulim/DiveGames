@@ -12,9 +12,17 @@ namespace Dive
 {
 	static std::vector<View*> s_Views;
 
+	// Shader는 Cache에서 관리하는 것이 맞을 듯 하다.
+	// 그리고 Drawable, Light 등이 각자 포인터를 가지는 거다.
+	// 문제는 어느 시점에 누가 생성을 하느냐 이다.
+	// urho는 Renderer와 Graphics 둘 다 관여했던 것 같다.
 	static ShaderVariation* s_pForwardLightVertexShader = nullptr;
 	static ShaderVariation* s_pDirectionalLightPixelShader = nullptr;
 	static ShaderVariation* s_pPointLightPixelShader = nullptr;
+	static ShaderVariation* s_pDeferredShadingVertexShader = nullptr;
+	static ShaderVariation* s_pDeferredShadingPixelShader = nullptr;
+	static ShaderVariation* s_pDeferredDirLightVertexShader = nullptr;
+	static ShaderVariation* s_pDeferredDirLightPixelShader = nullptr;
 
 	static ConstantBuffer* s_pCameraVertexShaderBuffer = nullptr;
 	static ConstantBuffer* s_pModelVertexShaderBuffer = nullptr;
@@ -128,6 +136,26 @@ namespace Dive
 		return s_pPointLightPixelShader;
 	}
 
+	ShaderVariation* Renderer::GetDeferredShadingVertexShaderVariation()
+	{
+		return s_pDeferredShadingVertexShader;
+	}
+
+	ShaderVariation* Renderer::GetDeferredShadingPixelShaderVariation()
+	{
+		return s_pDeferredShadingPixelShader;
+	}
+
+	ShaderVariation* Renderer::GetDeferredDirLightVertexShaderVariation()
+	{
+		return s_pDeferredDirLightVertexShader;
+	}
+
+	ShaderVariation* Renderer::GetDeferredDirLightPixelShaderVariation()
+	{
+		return s_pDeferredDirLightPixelShader;
+	}
+
 	ConstantBuffer* Renderer::GetCameraVertexShaderBuffer()
 	{
 		return s_pCameraVertexShaderBuffer;
@@ -178,13 +206,30 @@ namespace Dive
 		// forward light
 		{
 			s_pForwardLightVertexShader = new ShaderVariation;
-			if (!s_pForwardLightVertexShader->CompileAndCreate(eShaderType::VertexShader, "CoreData/Shaders/ForwardLightCommon.hlsl", eVertexType::Model))
+			if (!s_pForwardLightVertexShader->CompileAndCreate(eShaderType::VertexShader, "../CoreData/Shaders/ForwardLightCommon.hlsl", eVertexType::Model))
 				return false;
 			s_pDirectionalLightPixelShader = new ShaderVariation;
-			if (!s_pDirectionalLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "CoreData/Shaders/DirectionalLight.hlsl"))
+			if (!s_pDirectionalLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "../CoreData/Shaders/DirectionalLight.hlsl"))
 				return false;
 			s_pPointLightPixelShader = new ShaderVariation;
-			if (!s_pPointLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "CoreData/Shaders/PointLight.hlsl"))
+			if (!s_pPointLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "../CoreData/Shaders/PointLight.hlsl"))
+				return false;
+		}
+
+		// Deferred Shading
+		{
+			s_pDeferredShadingVertexShader = new ShaderVariation;
+			if (!s_pDeferredShadingVertexShader->CompileAndCreate(eShaderType::VertexShader, "../CoreData/Shaders/DeferredShading.hlsl", eVertexType::Model))
+				return false;
+			s_pDeferredShadingPixelShader = new ShaderVariation;
+			if (!s_pDeferredShadingPixelShader->CompileAndCreate(eShaderType::PixelShader, "../CoreData/Shaders/DeferredShading.hlsl"))
+				return false;
+
+			s_pDeferredDirLightVertexShader = new ShaderVariation;
+			if (!s_pDeferredDirLightVertexShader->CompileAndCreate(eShaderType::VertexShader, "../CoreData/Shaders/DeferredDirLight.hlsl"))
+				return false;
+			s_pDeferredDirLightPixelShader = new ShaderVariation;
+			if (!s_pDeferredDirLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "../CoreData/Shaders/DeferredDirLight.hlsl"))
 				return false;
 		}
 

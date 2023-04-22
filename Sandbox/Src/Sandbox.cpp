@@ -23,6 +23,8 @@ void Sandbox::Start()
 	{
 		Dive::View* pView = new Dive::View;
 		pView->SetName("MainView");
+		pView->SetRenderPath(Dive::eRenderPath::Deferred);
+		//pView->SetRenderPath(Dive::eRenderPath::Forward);
 
 		m_pMainCamera = Dive::Scene::CreateGameObject("MainCamera")->AddComponent<Dive::Camera>();
 		m_pMainCamera->GetGameObject()->GetComponent<Dive::Transform>()->SetPosition(0.0f, 10.0f, -20.0f);
@@ -32,9 +34,9 @@ void Sandbox::Start()
 
 		// Objects
 		{
-			auto* pModel = //Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
-				//Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/sponza-master/sponza.obj");
-				Dive::ResourceCache::GetResourceByPath<Dive::Model>("Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
+			auto* pModel = //Dive::ResourceCache::LoadFromFile<Dive::Model>("../Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
+				//Dive::ResourceCache::LoadFromFile<Dive::Model>("../Assets/Models/sponza-master/sponza.obj");
+				Dive::ResourceCache::GetResourceByPath<Dive::Model>("../Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
 		}
 
 		// Lights
@@ -54,13 +56,13 @@ void Sandbox::Start()
 			pPointLightGreen->SetType(Dive::eLightType::Point);
 			pPointLightGreen->SetColor(0.0f, 1.0f, 0.0f);
 			pPointLightGreen->SetRange(50.0f);
-			pPointLightGreen->GetGameObject()->GetTransform()->SetPosition(10.0f, 10.0f, 0.0f);
+			pPointLightGreen->GetGameObject()->GetTransform()->SetPosition(-10.0f, 10.0f, 0.0f);
 
 			auto pPointLightBlue = Dive::Scene::CreateGameObject("Point Light Blue")->AddComponent<Dive::Light>();
 			pPointLightBlue->SetType(Dive::eLightType::Point);
 			pPointLightBlue->SetColor(0.0f, 0.0f, 1.0f);
 			pPointLightBlue->SetRange(50.0f);
-			pPointLightBlue->GetGameObject()->GetTransform()->SetPosition(-10.0f, 10.0f, 0.0f);
+			pPointLightBlue->GetGameObject()->GetTransform()->SetPosition(10.0f, 10.0f, 0.0f);
 		}
 	}
 
@@ -125,5 +127,10 @@ void Sandbox::OnUpdate(const Dive::Event& evnt)
 	if (Dive::Input::KeyPress(DIK_DOWN))
 	{
 		pTransform->Rotate(1.0f, 0.0f, 0.0f);
+	}
+
+	{
+		auto* pModel = Dive::ResourceCache::GetResourceByPath<Dive::Model>("../Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
+		pModel->GetRootGameObject()->GetTransform()->Rotate(0.0f, 1.0f, 0.0f);
 	}
 }

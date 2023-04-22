@@ -19,7 +19,7 @@ namespace Dive
 
 		std::string GetFilePath() const { return m_FilePath; }
 		eShaderType GetShaderType() const { return m_ShaderType; }
-		void* GetShderResource() const { return m_pShaderResource; }
+		void* GetShaderResource() const { return m_pShaderResource; }
 		InputLayout* GetInputLayout() const;
 
 	private:

@@ -289,7 +289,7 @@ namespace Dive
 
         auto diffTexPath = //FileSystem::GetFileNameAndExtension(texturePath.C_Str());
             //texturePath.C_Str();
-            "Assets/Models/pilot-avatar/textures/Material.002_Base_Color.png";
+            "../Assets/Models/pilot-avatar/textures/Material.002_Base_Color.png";
         //diffTexPath = "Assets/Models/sponza-master/textures/" + diffTexPath;
 
         auto diffTex = ResourceCache::GetResourceByPath<Texture2D>(diffTexPath);

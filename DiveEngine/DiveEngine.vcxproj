@@ -159,6 +159,7 @@
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Src\Graphics\GBuffer.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
     <ClInclude Include="Src\Graphics\IndexBuffer.h" />
@@ -197,6 +198,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Src\Graphics\ConstantBuffer.cpp" />
+    <ClCompile Include="Src\Graphics\GBuffer.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\InputLayout.cpp" />

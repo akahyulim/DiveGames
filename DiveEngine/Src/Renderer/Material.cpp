@@ -38,7 +38,7 @@ namespace Dive
 
     void Material::SetTexture(eTextureUnit unit, Texture* pTexture)
     {
-        if (unit < eTextureUnit::Max)
+        if (unit < eTextureUnit::Max_Num)
         {
             if (pTexture)
                 m_Textures[unit] = pTexture;
@@ -53,7 +53,7 @@ namespace Dive
     // 구분하여 로드할 수 있다는 것이다.
     void Material::AddTexture(eTextureUnit unit, const std::string& name)
     {
-        if (unit < eTextureUnit::Max)
+        if (unit < eTextureUnit::Max_Num)
         {
             // 원래는 타입에 맞춰서 시도해야 한다.
             Texture2D* pTexture = ResourceCache::GetResourceByName<Texture2D>(name);

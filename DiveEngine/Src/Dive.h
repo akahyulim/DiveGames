@@ -20,6 +20,7 @@
 #include "Graphics/ShaderVariation.h"
 #include "Graphics/InputLayout.h"
 #include "Graphics/ConstantBuffer.h"
+#include "Graphics/GBuffer.h"
 
 // Input
 #include "Input/Input.h"

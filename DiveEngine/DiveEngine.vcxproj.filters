@@ -144,6 +144,9 @@
     <ClInclude Include="Src\Scene\Components\Light.h">
       <Filter>Src\Scene\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Graphics\GBuffer.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DivePch.cpp">
@@ -244,6 +247,9 @@
     </ClCompile>
     <ClCompile Include="Src\Scene\Components\Light.cpp">
       <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\GBuffer.cpp">
+      <Filter>Src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

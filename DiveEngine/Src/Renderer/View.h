@@ -6,6 +6,7 @@ namespace Dive
 	class Camera;
 	class Drawable;
 	class Light;
+	class GBuffer;
 
 	enum class eRenderPath
 	{
@@ -39,5 +40,7 @@ namespace Dive
 		std::vector<Light*> m_Lights;
 
 		eRenderPath m_RenderPath;
+
+		GBuffer* m_pGBuffer;
 	};
 }

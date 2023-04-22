@@ -185,8 +185,8 @@ namespace Dive
 
 		if (vertexType == eVertexType::Undefined)
 		{
-			DV_CORE_ERROR("잘못된 정점 타입을 전달받아 ID3D11InputLayout 생성에 실패하였습니다.");
-			return false;
+			DV_CORE_INFO("{:s} - VertexType 설정이 정의되지 않아 InputLayout을 생성하지 않았습니다.", GetName());
+			return true;
 		}
 
 		m_pInputLayout = new InputLayout;

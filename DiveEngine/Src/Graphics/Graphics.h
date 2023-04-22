@@ -6,6 +6,7 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
 	class Texture;
+	class RenderTexture;
 	class InputLayout;
 	class ShaderVariation;
 	class ConstantBuffer;
@@ -40,7 +41,7 @@ namespace Dive
 		static bool BeginFrame();
 		static void EndFrame();
 
-		static void ClearRenderTargets(uint32_t target, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil);
+		static void ClearViews(uint32_t target, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil);
 		
 		static void Draw(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t vertexCount, uint32_t vertexStart);
 		static void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t indexStart, uint32_t vertexStart = 0);
@@ -52,21 +53,25 @@ namespace Dive
 		static void SetIndexBuffer(IndexBuffer* pIndexBuffer, uint32_t offset = 0);
 
 		static InputLayout* GetInputLayout();
-		static void SetShaderVariation(ShaderVariation* pShaderVariation);
+		static void SetShaderVariation(eShaderType type, ShaderVariation* pShaderVariation);
 
 		static void SetConstantBuffer(uint8_t index, eShaderType type, ConstantBuffer* pBuffer);
 
-		static void SetRenderTargetViews(uint32_t index, ID3D11RenderTargetView* pViews);
+		static void SetRenderTargetView(uint32_t index, ID3D11RenderTargetView* pView);
+		static void SetRenderTargetViews(uint32_t start, uint32_t count, ID3D11RenderTargetView** ppViews);
 		static void SetDepthStencilView(ID3D11DepthStencilView* pView);
 
-		static Texture* GetTexture(uint32_t index);
-		static void SetTexture(uint32_t index, Texture* pTexture);
+		static void SetDepthStencilState(ID3D11DepthStencilState* pDepthStencilState, uint32_t stencilRef = 0);
+
+		static Texture* GetTexture(eTextureUnit unit);
+		static void SetTexture(eTextureUnit unit, Texture* pTexture);
 
 		static ID3D11Device* GetDevice();
 		static ID3D11DeviceContext* GetDeviceContext();
 
 		static ID3D11RenderTargetView* GetDefaultRenderTargetView();
 		static ID3D11DepthStencilView* GetDefaultDepthStencilView();
+
 
 	private:
 		static void prepareDraw();

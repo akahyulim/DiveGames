@@ -13,7 +13,11 @@ namespace Dive
 		m_pSamplerState(nullptr),
 		m_RequestedMipLevels(0),
 		m_MipLevels(1),
-		m_bMipLevelDirty(true)
+		m_bMipLevelDirty(true),
+		m_Filter(D3D11_FILTER_MIN_MAG_MIP_LINEAR),
+		m_AddressMode(D3D11_TEXTURE_ADDRESS_WRAP),
+		m_BorderColor(0.0f, 0.0f, 0.0f, 0.0f),
+		m_AnisoLevel(1)
 	{
 	}
 
@@ -58,7 +62,7 @@ namespace Dive
 		desc.AddressW = m_AddressMode;
 		desc.MipLODBias = 0.0f;
 		desc.MaxAnisotropy = m_AnisoLevel;
-		desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;//D3D11_COMPARISON_LESS_EQUAL;
+		desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 		desc.BorderColor[0] = m_BorderColor.x;
 		desc.BorderColor[1] = m_BorderColor.y;
 		desc.BorderColor[2] = m_BorderColor.z;

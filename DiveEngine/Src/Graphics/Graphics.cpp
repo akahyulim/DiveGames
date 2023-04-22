@@ -27,9 +27,20 @@ namespace Dive
 	static ID3D11Texture2D* s_pDefaultDepthStencilTexture = nullptr;
 	static ID3D11DepthStencilView* s_pDefaultDepthStencilView = nullptr;
 
-	static ID3D11RenderTargetView* s_pRenderTargetView = nullptr;
+	static ID3D11RenderTargetView* s_pRenderTargetViews[MAX_RENDERTARGETS] = { nullptr, };
 	static ID3D11DepthStencilView* s_pDepthStencilView = nullptr;
 	static bool s_bRenderTargetsDirty = false;
+
+	static Texture* s_pTextures[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr, };
+	static ID3D11ShaderResourceView* s_pShaderResourceViews[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr, };
+	static ID3D11SamplerState* s_pSamplerStates[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr, };
+	static bool s_bTextureDirty = false;
+	static uint32_t s_TextureDirtyStart = 0xffffffff;
+	static uint32_t s_TextureDirtyEnd = 0xffffffff;
+
+	static ID3D11DepthStencilState* s_pDepthStencilState = nullptr;
+	static uint32_t s_StencilRef = 0;
+	static bool s_bDepthStencilStateDirty = false;
 
 	static D3D11_PRIMITIVE_TOPOLOGY s_PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
 
@@ -43,11 +54,6 @@ namespace Dive
 
 	static ID3D11Buffer* s_pVertexShaderConstantBuffers[2] = { nullptr, };
 	static ID3D11Buffer* s_pPixelShaderConstantBuffers[3] = { nullptr, };
-
-	static Texture* s_pTextures[2] = { nullptr, };
-	static ID3D11ShaderResourceView* s_pShaderResourceViews[2] = { nullptr, };
-	static ID3D11SamplerState* s_pSamplerStates[2] = { nullptr, };
-	static bool s_bTextureDirty = false;
 
 
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -389,7 +395,7 @@ namespace Dive
 		s_pSwapChain->Present(1, 0);
 	}
 
-	void Graphics::ClearRenderTargets(uint32_t target, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil)
+	void Graphics::ClearViews(uint32_t target, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil)
 	{
 		DV_ASSERT(IsInitialized());
 
@@ -398,7 +404,8 @@ namespace Dive
 		if(target & eClearTarget::Color)
 		{
 			float clearColor[4] = { color.x, color.y, color.z, color.w };
-			s_pDeviceContext->ClearRenderTargetView(s_pRenderTargetView, clearColor);
+			for (uint32_t i = 0; i < MAX_RENDERTARGETS; ++i)
+				s_pDeviceContext->ClearRenderTargetView(s_pRenderTargetViews[i], clearColor);
 		}
 
 		if((target & eClearTarget::Depth) || (target & eClearTarget::Stencil))
@@ -461,14 +468,11 @@ namespace Dive
 				UINT stride = pVertexBuffer->GetStride();
 				UINT offsets[] = { offset };
 
-				//ID3D11Buffer* pOldBuffer = nullptr;
-				//UINT oldOffsets = 0;
-				//s_pDeviceContext->IAGetVertexBuffers(0, 1, &pOldBuffer, &stride, &oldOffsets);
-
-				//if (offset != oldOffsets)
-				{
-					s_pDeviceContext->IASetVertexBuffers(0, 1, &pBuffer, &stride, offsets);
-				}
+				s_pDeviceContext->IASetVertexBuffers(0, 1, &pBuffer, &stride, offsets);
+			}
+			else
+			{
+				s_pDeviceContext->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
 			}
 
 			s_pVertexBuffer = pVertexBuffer;
@@ -490,13 +494,8 @@ namespace Dive
 			{
 				ID3D11Buffer* pOldBuffer = nullptr;
 				DXGI_FORMAT oldFormat = pIndexBuffer->GetFormat();
-				//UINT oldOffset = 0;
-				//s_pDeviceContext->IAGetIndexBuffer(&pOldBuffer, &oldFormat, &oldOffset);
-
-				//if (offset != oldOffset)
-				{
-					s_pDeviceContext->IASetIndexBuffer(pIndexBuffer->GetBuffer(), pIndexBuffer->GetFormat(), offset);
-				}
+				
+				s_pDeviceContext->IASetIndexBuffer(pIndexBuffer->GetBuffer(), pIndexBuffer->GetFormat(), offset);
 			}
 			else
 			{
@@ -512,43 +511,42 @@ namespace Dive
 		return s_pInputLayout;
 	}
 
-	void Graphics::SetShaderVariation(ShaderVariation* pShaderVariation)
+	void Graphics::SetShaderVariation(eShaderType type, ShaderVariation* pShaderVariation)
 	{
 		DV_ASSERT(IsInitialized());
 
-		if (pShaderVariation)
+		if (type == eShaderType::VertexShader)
 		{
-			auto type = pShaderVariation->GetShaderType();
-
-			if (type == eShaderType::VertexShader)
+			if (s_pVertexShaderVariation != pShaderVariation)
 			{
-				if (s_pVertexShaderVariation != pShaderVariation)
-				{
-					s_pDeviceContext->VSSetShader(static_cast<ID3D11VertexShader*>(pShaderVariation->GetShderResource()), nullptr, 0);
-					s_pVertexShaderVariation = pShaderVariation;
+				s_pDeviceContext->VSSetShader(pShaderVariation ?
+					static_cast<ID3D11VertexShader*>(pShaderVariation->GetShaderResource()) : nullptr, nullptr, 0);
+				s_pVertexShaderVariation = pShaderVariation;
 					
-					if (s_pInputLayout != pShaderVariation->GetInputLayout())
-					{
-						s_pDeviceContext->IASetInputLayout(pShaderVariation->GetInputLayout()->GetInputLayout());
-						s_pInputLayout = pShaderVariation->GetInputLayout();
-					}
+				if (pShaderVariation && s_pInputLayout != pShaderVariation->GetInputLayout())
+				{
+					s_pDeviceContext->IASetInputLayout(pShaderVariation->GetInputLayout() ? 
+						pShaderVariation->GetInputLayout()->GetInputLayout() : nullptr);
+					s_pInputLayout = pShaderVariation->GetInputLayout();
 				}
 			}
-			else if (type == eShaderType::PixelShader)
+		}
+		else if (type == eShaderType::PixelShader)
+		{
+			if (s_pPixelShaderVariation != pShaderVariation)
 			{
-				if (s_pPixelShaderVariation != pShaderVariation)
-				{
-					s_pDeviceContext->PSSetShader(static_cast<ID3D11PixelShader*>(pShaderVariation->GetShderResource()), nullptr, 0);
-					s_pPixelShaderVariation = pShaderVariation;
-				}
+				s_pDeviceContext->PSSetShader(pShaderVariation ?
+					static_cast<ID3D11PixelShader*>(pShaderVariation->GetShaderResource()) : nullptr, nullptr, 0);
+				s_pPixelShaderVariation = pShaderVariation;
 			}
-			else
+		}
+		else
+		{
+			if (s_pComputeShaderVariation != pShaderVariation)
 			{
-				if (s_pComputeShaderVariation != pShaderVariation)
-				{
-					s_pDeviceContext->CSSetShader(static_cast<ID3D11ComputeShader*>(pShaderVariation->GetShderResource()), nullptr, 0);
-					s_pComputeShaderVariation = pShaderVariation;
-				}
+				s_pDeviceContext->CSSetShader(pShaderVariation ?
+					static_cast<ID3D11ComputeShader*>(pShaderVariation->GetShaderResource()) : nullptr, nullptr, 0);
+				s_pComputeShaderVariation = pShaderVariation;
 			}
 		}
 	}
@@ -572,13 +570,29 @@ namespace Dive
 		}
 	}
 
-	void Graphics::SetRenderTargetViews(uint32_t index, ID3D11RenderTargetView* pViews)
+	void Graphics::SetRenderTargetView(uint32_t index, ID3D11RenderTargetView* pView)
 	{
-		if (s_pRenderTargetView == pViews)
+		DV_ASSERT(index < MAX_RENDERTARGETS);
+
+		if (s_pRenderTargetViews[index] == pView)
 			return;
 
-		s_pRenderTargetView = pViews;
+		s_pRenderTargetViews[index] = pView;
 		s_bRenderTargetsDirty = true;
+	}
+
+	void Graphics::SetRenderTargetViews(uint32_t start, uint32_t count, ID3D11RenderTargetView** ppViews)
+	{
+		DV_ASSERT(start + count < MAX_RENDERTARGETS);
+
+		for (uint32_t i = 0; i < count; ++i)
+		{
+			if (s_pRenderTargetViews[start + i] != ppViews[i])
+			{
+				s_pRenderTargetViews[start + i] = ppViews[i];
+				s_bRenderTargetsDirty = true;
+			}
+		}
 	}
 
 	void Graphics::SetDepthStencilView(ID3D11DepthStencilView* pView)
@@ -590,13 +604,27 @@ namespace Dive
 		s_bRenderTargetsDirty = true;
 	}
 
-	Texture* Graphics::GetTexture(uint32_t index)
+	void Graphics::SetDepthStencilState(ID3D11DepthStencilState* pDepthStencilState, uint32_t stencilRef)
 	{
-		return s_pTextures[index];
+		if (s_pDepthStencilState != pDepthStencilState)
+		{
+			s_pDepthStencilState = pDepthStencilState;
+			s_StencilRef = stencilRef;
+			s_bDepthStencilStateDirty = true;
+		}
 	}
 
-	void Graphics::SetTexture(uint32_t index, Texture* pTexture)
+	Texture* Graphics::GetTexture(eTextureUnit unit)
 	{
+		return s_pTextures[static_cast<uint32_t>(unit)];
+	}
+
+	void Graphics::SetTexture(eTextureUnit unit, Texture* pTexture)
+	{
+		DV_ASSERT(unit != eTextureUnit::Max_Num);
+
+		uint32_t index = static_cast<uint32_t>(unit);
+
 		if (pTexture)
 		{
 			if (pTexture->IsMipLevelsDirty())
@@ -609,10 +637,20 @@ namespace Dive
 			}
 		}
 
+		if (s_TextureDirtyStart == 0xffffffff)
+			s_TextureDirtyStart = s_TextureDirtyEnd = index;
+		else
+		{
+			if (index < s_TextureDirtyStart)
+				s_TextureDirtyStart = index;
+			else if (index > s_TextureDirtyEnd)
+				s_TextureDirtyEnd = index;
+		}
+
 		if (pTexture != s_pTextures[index])
 		{
 			s_pTextures[index] = pTexture;
-			s_pShaderResourceViews[index] = pTexture? pTexture->GetShaderResourceView() : nullptr;
+			s_pShaderResourceViews[index] = pTexture ? pTexture->GetShaderResourceView() : nullptr;
 			s_pSamplerStates[index] = pTexture ? pTexture->GetSamplerState() : nullptr;
 			s_bTextureDirty = true;
 		}
@@ -638,22 +676,37 @@ namespace Dive
 		return s_pDefaultDepthStencilView;
 	}
 
+	// 단순 캡슐함수 이상의 역할을 하지 못하고 있다...
+	// => 각종 리소스들은 배열로 관리한 후 한 번에 보내는 편이 나아보인다. 그러므로 쓸모 있다.
 	void Graphics::prepareDraw()
 	{
 		DV_ASSERT(IsInitialized());
 
 		if (s_bRenderTargetsDirty)
 		{
-			s_pDeviceContext->OMSetRenderTargets(1, &s_pRenderTargetView, s_pDepthStencilView);
+			s_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &s_pRenderTargetViews[0], s_pDepthStencilView);
 
 			s_bRenderTargetsDirty = false;
 		}
 
+		if (s_bDepthStencilStateDirty)
+		{
+			s_pDeviceContext->OMSetDepthStencilState(s_pDepthStencilState, s_StencilRef);
+			s_bDepthStencilStateDirty = false;
+		}
+
 		if (s_bTextureDirty)
 		{
-			s_pDeviceContext->PSSetShaderResources(0, 2, &s_pShaderResourceViews[0]);
-			s_pDeviceContext->PSSetSamplers(0, 2, &s_pSamplerStates[0]);
+			s_pDeviceContext->PSSetShaderResources(
+				s_TextureDirtyStart, 
+				s_TextureDirtyEnd - s_TextureDirtyStart + 1, 
+				&s_pShaderResourceViews[s_TextureDirtyStart]);
+			s_pDeviceContext->PSSetSamplers(
+				s_TextureDirtyStart,
+				s_TextureDirtyEnd - s_TextureDirtyStart + 1, 
+				&s_pSamplerStates[s_TextureDirtyStart]);
 
+			s_TextureDirtyStart = s_TextureDirtyEnd = 0xffffffff;
 			s_bTextureDirty = false;
 		}
 

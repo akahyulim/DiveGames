@@ -10,7 +10,6 @@ namespace Dive
 		: Texture(eResourceType::RenderTexture),
 		m_pRenderTargetView(nullptr),
 		m_pDepthStencilView(nullptr),
-		m_Depth(0),
 		m_bReadOnly(true)
 	{
 	}
@@ -19,9 +18,7 @@ namespace Dive
 	{
 	}
 	
-	// 역시나 유니티엔 mipCount가 존재한다.
-	// 일단은 1로 고정
-	bool RenderTexture::SetSize(int width, int height, DXGI_FORMAT format)
+	bool RenderTexture::SetRenderTarget(int width, int height, DXGI_FORMAT format)
 	{
 		m_Width = width;
 		m_Height = height;
@@ -33,12 +30,10 @@ namespace Dive
 		return createResources();
 	}
 	
-	// format과 readonly는 디폴트 값이 있다.
-	bool RenderTexture::SetSize(int width, int height, int depth, DXGI_FORMAT format, bool readOnly)
+	bool RenderTexture::SetDepthStencil(int width, int height, DXGI_FORMAT format, bool readOnly)
 	{
 		m_Width = width;
 		m_Height = height;
-		m_Depth = depth;
 		m_Format = format;
 		m_bLinear = true;
 		m_Usage = eTextureUsage::DepthStencil;
@@ -67,7 +62,7 @@ namespace Dive
 		texDesc.MipLevels = m_MipLevels;	// 현재 1로 고정. 밉맵 사용 안함.
 		texDesc.SampleDesc.Count = 1;		// 현재 멀티 샘플링 미지원.
 		texDesc.SampleDesc.Quality = 0;		// 현재 멀티 샘플링 미지원.
-		texDesc.Usage = m_bReadOnly ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
 		// deferred에 사용되는 gbuffer가 srv+rtv, srv+dsv 이렇게 구분되었던가?
 		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		if (m_Usage == eTextureUsage::RenderTarget)
@@ -75,7 +70,7 @@ namespace Dive
 		else if(m_Usage == eTextureUsage::DepthStencil)
 			texDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
 		texDesc.MiscFlags = 0;	// 현재 밉맵 사용 안함.
-		texDesc.CPUAccessFlags = m_bReadOnly ? 0 : D3D11_CPU_ACCESS_WRITE;
+		texDesc.CPUAccessFlags = 0;
 
 		if (FAILED(Graphics::GetDevice()->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
 		{
@@ -123,8 +118,33 @@ namespace Dive
 
 		if (texDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL)
 		{
-			D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc;
-			ZeroMemory(&dsvDesc, sizeof(dsvDesc));
+			D3D11_DEPTH_STENCIL_VIEW_DESC dsvd = {
+			DXGI_FORMAT_UNKNOWN,
+			D3D11_DSV_DIMENSION_TEXTURE2D,
+			0 };
+
+			dsvd.Format = GetDSVFormat(texDesc.Format);
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilView(
+				static_cast<ID3D11Resource*>(m_pTexture2D),
+				&dsvd,
+				&m_pDepthStencilView)))
+			{
+				DV_CORE_ERROR("RenderTexture::createResources - DepthStencilView 생성에 실패하였습니다.");
+				return false;
+			}
+
+			if (m_bReadOnly)
+			{
+				dsvd.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
+				if (FAILED(Graphics::GetDevice()->CreateDepthStencilView(
+					static_cast<ID3D11Resource*>(m_pTexture2D),
+					&dsvd,
+					&m_pDepthStencilViewReadOnly)))
+				{
+					DV_CORE_ERROR("RenderTexture::createResources - DepthStencilView ReadOnly 생성에 실패하였습니다.");
+					return false;
+				}
+			}
 		}
 
 		return true;

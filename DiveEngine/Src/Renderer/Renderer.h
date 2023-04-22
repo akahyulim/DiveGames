@@ -62,6 +62,10 @@ namespace Dive
 		static ShaderVariation* GetForwardLightVertexShaderVariation();
 		static ShaderVariation* GetDirectionalLightPixelShaderVariation();
 		static ShaderVariation* GetPointLightPixelShaderVariation();
+		static ShaderVariation* GetDeferredShadingVertexShaderVariation();
+		static ShaderVariation* GetDeferredShadingPixelShaderVariation();
+		static ShaderVariation* GetDeferredDirLightVertexShaderVariation();
+		static ShaderVariation* GetDeferredDirLightPixelShaderVariation();
 
 		static ConstantBuffer* GetCameraVertexShaderBuffer();
 		static ConstantBuffer* GetModelVertexShaderBuffer();

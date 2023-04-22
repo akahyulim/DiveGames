@@ -2,14 +2,6 @@
 
 namespace Dive
 {
-	enum class eTextureUsage
-	{
-		Static,
-		Dynamic,
-		RenderTarget,
-		DepthStencil
-	};
-
 	enum eClearTarget : uint8_t
 	{
 		Color = 0x1,
@@ -24,13 +16,24 @@ namespace Dive
 		PixelShader,
 		ComputeShader
 	};
+	
+	enum class eTextureUsage
+	{
+		Static,
+		Dynamic,
+		RenderTarget,
+		DepthStencil
+	};
 
-	enum class eTextureUnit
+	enum class eTextureUnit : uint32_t
 	{
 		Diffuse = 0,
-		Normal = 1,
-		ShadowMap = 3,
-		Max = 4
+		Normal,
+		DepthTex,
+		ColorSpecIntTex,
+		NormalTex,
+		SpecPowTex,
+		Max_Num
 	};
 
 	enum class eVertexType
@@ -72,4 +75,6 @@ namespace Dive
 		float normal[3] = { 0.0f, };
 		float tangent[3] = { 0.0f, };
 	};
+
+	inline constexpr uint32_t MAX_RENDERTARGETS = 4;
 }
