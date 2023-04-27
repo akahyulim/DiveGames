@@ -16,21 +16,49 @@ struct VS_OUTPUT
 	float2 cpPos : TEXCOORD0;
 };
 
+// 책과 달리 0 ~ 3이 맞는 듯 보인다.
 VS_OUTPUT MainVS(uint VertexID : SV_VERTEXID)
 {
 	VS_OUTPUT output;
 
-	output.position = float4(arrBasePos[VertexID].xy, 0.0, 1.0);	// projection space
-	output.cpPos = output.position.xy;								// clip space
+	output.position = float4(arrBasePos[VertexID].xy, 0.0, 1.0);
+	output.cpPos = output.position.xy;
 
 	return output;
 }
 
 float4 MainPS(VS_OUTPUT input) : SV_TARGET
 {
-	// 어찌됐든 출력까진 완료
+	// Diff Color
 	int3 location3 = int3(input.position.xy, 0);
 	float4 diffMap = ColorSpecIntTex.Load(location3);
 
-	return float4(diffMap.xyz, 1.0f);
+	// Linear Depth
+	float depth = DepthTex.Load(location3).x;
+	float linearDepth = perspectiveValue.z / (depth + perspectiveValue.w);
+
+	// World Position
+	float4 position;
+	position.xy = input.cpPos.xy * perspectiveValue.xy * linearDepth;
+	position.z = linearDepth;
+	position.w = 1.0f;
+	position = mul(position, viewInv);
+
+	// Normal
+	float3 normal;
+	normal = NormalTex.Load(location3);
+	normal = normalize(normal * 2.0f - 1.0f);
+
+	// Phong diffuse
+	float NDotL = dot(-lightDir, normal);
+	float3 dirLightColor = lightColor * saturate(NDotL);
+
+	// Blinn specular
+	float3 toEye = cameraPos - position.xyz;
+	toEye = normalize(toEye);
+	float3 halfWay = normalize(toEye + -lightDir);
+	float NDotH = saturate(dot(halfWay, normal));
+	dirLightColor += lightColor * pow(NDotH, 250.0f) * 0.25f;
+
+	return diffMap * float4(dirLightColor, 1.0f) * materialDiffColor;
 }

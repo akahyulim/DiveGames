@@ -14,6 +14,7 @@ cbuffer CameraVS : register(b0)
 	matrix viewMatrix;
 	matrix projectionMatrix;
 
+
 }
 // LightVS
 // ObjectVS : 여기에 worldTransform이 cModel이름으로 전달된다.
@@ -32,6 +33,8 @@ cbuffer CameraPS : register(b0)
 {
 	float3 cameraPos;	// 이름이 같으면 안된다.
 	float cameraPoo;
+	float4 perspectiveValue;
+	matrix viewInv;
 }
 
 // LightPS

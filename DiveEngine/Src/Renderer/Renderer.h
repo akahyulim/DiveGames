@@ -28,6 +28,8 @@ namespace Dive
 	{
 		DirectX::XMFLOAT3 cameraPos;
 		float poo;
+		DirectX::XMFLOAT4 perspectiveValues;
+		DirectX::XMMATRIX viewInv;
 	};
 
 	struct LightPixelShaderBuffer

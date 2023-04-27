@@ -94,6 +94,13 @@ namespace Dive
 						auto pMappedData = static_cast<CameraPixelShaderBuffer*>(pBuffer->Map());	
 						DirectX::XMStoreFloat3(&pos, m_pCamera->GetGameObject()->GetTransform()->GetPosition());
 						pMappedData->cameraPos = pos;
+						DirectX::XMFLOAT4X4 proj;
+						DirectX::XMStoreFloat4x4(&proj, m_pCamera->GetProjectionMatrix());
+						pMappedData->perspectiveValues.x = 1.0f / proj._11;
+						pMappedData->perspectiveValues.y = 1.0f / proj._22;
+						pMappedData->perspectiveValues.z = proj._43;
+						pMappedData->perspectiveValues.w = -proj._33;
+						pMappedData->viewInv = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, m_pCamera->GetViewMatrix()));
 						pBuffer->Unmap();
 						Graphics::SetConstantBuffer(0, eShaderType::PixelShader, pBuffer);
 					}
@@ -286,22 +293,72 @@ namespace Dive
 			Graphics::SetDepthStencilView(pDSV);
 			Graphics::ClearViews(eClearTarget::Color | eClearTarget::Depth, DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 0);
 
-			Graphics::SetTexture(eTextureUnit::DepthTex , static_cast<Texture*>(m_pGBuffer->GetDepthStencilTexture()));
-			Graphics::SetTexture(eTextureUnit::ColorSpecIntTex, static_cast<Texture*>(m_pGBuffer->GetColorSpecIntTexture()));
-			Graphics::SetTexture(eTextureUnit::NormalTex, static_cast<Texture*>(m_pGBuffer->GetNormalTexture()));
-			Graphics::SetTexture(eTextureUnit::SpecPowTex, static_cast<Texture*>(m_pGBuffer->GetSpecPowTexture()));
-
-			Graphics::SetShaderVariation(eShaderType::VertexShader, Renderer::GetDeferredDirLightVertexShaderVariation());
-			Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetDeferredDirLightPixelShaderVariation());
-			Graphics::SetVertexBuffer(nullptr);
-			Graphics::Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, 4, 0);
-
-			// clean up
+			// camera pixel shader buffer
 			{
-				Graphics::SetTexture(eTextureUnit::DepthTex, nullptr);
-				Graphics::SetTexture(eTextureUnit::ColorSpecIntTex, nullptr);
-				Graphics::SetTexture(eTextureUnit::NormalTex, nullptr);
-				Graphics::SetTexture(eTextureUnit::SpecPowTex, nullptr);
+				DirectX::XMFLOAT3 pos;
+				auto pBuffer = Renderer::GetCameraPixelShaderBuffer();
+				auto pMappedData = static_cast<CameraPixelShaderBuffer*>(pBuffer->Map());
+				DirectX::XMStoreFloat3(&pos, m_pCamera->GetGameObject()->GetTransform()->GetPosition());
+				pMappedData->cameraPos = pos;
+				DirectX::XMFLOAT4X4 proj;
+				DirectX::XMStoreFloat4x4(&proj, m_pCamera->GetProjectionMatrix());
+				pMappedData->perspectiveValues.x = 1.0f / proj._11;
+				pMappedData->perspectiveValues.y = 1.0f / proj._22;
+				pMappedData->perspectiveValues.z = proj._43;
+				pMappedData->perspectiveValues.w = -proj._33;
+				pMappedData->viewInv = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, m_pCamera->GetViewMatrix()));
+				pBuffer->Unmap();
+				Graphics::SetConstantBuffer(0, eShaderType::PixelShader, pBuffer);
+			}
+
+			if (!m_Lights.empty())
+			{
+				
+				for (uint32_t i = 0; i < static_cast<uint32_t>(m_Lights.size()); ++i)
+				{
+					if (i == 0)
+					{
+						Graphics::SetDepthStencilState(Renderer::GetForwardLightDS(), 0);
+					}
+					else if (i == 1)
+					{
+						Graphics::GetDeviceContext()->OMSetBlendState(Renderer::GetBlendState(), NULL, 0xffffffff);
+					}
+
+					// light pixel shader buffer
+					auto pLight = m_Lights[i];
+					auto pBuffer = Renderer::GetLightPixelShaderBuffer();
+					auto pMappedData = static_cast<LightPixelShaderBuffer*>(pBuffer->Map());
+					DirectX::XMFLOAT3 pos;
+					DirectX::XMStoreFloat3(&pos, pLight->GetGameObject()->GetTransform()->GetPosition());
+					pMappedData->lightPos = pos;
+					pMappedData->lightRange = 1.0f / pLight->GetRange();
+					pMappedData->lightColor = pLight->GetColor();
+					pMappedData->lightDir = pLight->GetDir();
+					pBuffer->Unmap();
+					Graphics::SetConstantBuffer(1, eShaderType::PixelShader, pBuffer);
+					
+					Graphics::SetTexture(eTextureUnit::DepthTex, static_cast<Texture*>(m_pGBuffer->GetDepthStencilTexture()));
+					Graphics::SetTexture(eTextureUnit::ColorSpecIntTex, static_cast<Texture*>(m_pGBuffer->GetColorSpecIntTexture()));
+					Graphics::SetTexture(eTextureUnit::NormalTex, static_cast<Texture*>(m_pGBuffer->GetNormalTexture()));
+					Graphics::SetTexture(eTextureUnit::SpecPowTex, static_cast<Texture*>(m_pGBuffer->GetSpecPowTexture()));
+
+					Graphics::SetShaderVariation(eShaderType::VertexShader, Renderer::GetDeferredDirLightVertexShaderVariation());
+					Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetDeferredDirLightPixelShaderVariation());
+					Graphics::SetVertexBuffer(nullptr);
+					Graphics::Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, 4, 0);
+
+					// clean up
+					{
+						Graphics::SetTexture(eTextureUnit::DepthTex, nullptr);
+						Graphics::SetTexture(eTextureUnit::ColorSpecIntTex, nullptr);
+						Graphics::SetTexture(eTextureUnit::NormalTex, nullptr);
+						Graphics::SetTexture(eTextureUnit::SpecPowTex, nullptr);
+
+						Graphics::SetDepthStencilState(nullptr, 0);
+						Graphics::GetDeviceContext()->OMSetBlendState(NULL, nullptr, 0xffffffff);
+					}
+				}
 			}
 			
 			Graphics::SetShaderVariation(eShaderType::VertexShader, nullptr);
