@@ -23,9 +23,9 @@ void Sandbox::Start()
 	{
 		Dive::View* pView = new Dive::View;
 		pView->SetName("MainView");
-		pView->SetRenderPath(Dive::eRenderPath::Deferred);
-		//pView->SetRenderPath(Dive::eRenderPath::Forward);
-
+		pView->SetRenderPath(Dive::eRenderPath::Forward);
+		//pView->SetRenderPath(Dive::eRenderPath::Deferred);
+		
 		m_pMainCamera = Dive::Scene::CreateGameObject("MainCamera")->AddComponent<Dive::Camera>();
 		m_pMainCamera->GetGameObject()->GetComponent<Dive::Transform>()->SetPosition(0.0f, 10.0f, -20.0f);
 		pView->SetCamera(m_pMainCamera);

@@ -1,7 +1,9 @@
 
-// 역시 앞에 c를 붙이는 편이 나을 것 같다.
-// 그리고 vs와 ps의 변수명이 같을 경우 뒤에 ps를 추가로 붙이기도 했다.
-// 크기를 4바이트로 맞추지 않아도 되나? urho는 따로 더미를 넣지 않았다.
+// urho3d 기준
+// frame, camera, zone, light, material 총 5개 + objectVS로 구성
+// 기본적으로 vs와 ps의 구성이 다르지만, 같거나 중복전달하는 경우도 존재
+// map/unmap은 batch에서 개별 요소마다 업데이트
+// bind는 Graphics::SetShaders() 내부에서 한 번에 실행
 
 #ifdef COMPILEVS
 
@@ -10,9 +12,9 @@
 // CameraVS : 여기에 cViewProj로 view와 proj의 곱을 저장하는 듯 하다.
 cbuffer CameraVS : register(b0)
 {
-//	float3 cameraPos;
-	matrix viewMatrix;
-	matrix projectionMatrix;
+//	float3 cbCameraPosPS;
+	matrix cbViewMatrixVS;
+	matrix cbProjMatrixVS;
 
 
 }
@@ -20,7 +22,7 @@ cbuffer CameraVS : register(b0)
 // ObjectVS : 여기에 worldTransform이 cModel이름으로 전달된다.
 cbuffer ObjectVS : register(b1)
 {
-	matrix worldMatrix;
+	matrix cbWorldMatrixVS;
 }
 
 #endif
@@ -31,20 +33,20 @@ cbuffer ObjectVS : register(b1)
 // CameraPS
 cbuffer CameraPS : register(b0)
 {
-	float3 cameraPos;	// 이름이 같으면 안된다.
+	float3 cbCameraPosPS;	// 이름이 같으면 안된다.
 	float cameraPoo;
-	float4 perspectiveValue;
-	matrix viewInv;
+	float4 cbPerspectiveValuePS;
+	matrix cbViewInvPS;
 }
 
 // LightPS
 cbuffer LightPS : register(b1)
 {
-	float3 lightPos;
-	float lightRange;
-	float3 lightColor;
-	float lightSpotAngle;
-	float3 lightDir;
+	float3 cbLightPosPS;
+	float cbLightRangePS;
+	float3 cbLightColorPS;
+	float cbLightSpotAnglePS;
+	float3 cbLightDirPS;
 	float lightPoo;
 	//float lightIntensity;	// 이건 material 특성인 듯 하다.
 }
@@ -52,7 +54,7 @@ cbuffer LightPS : register(b1)
 // MaterialPS
 cbuffer MaterialPS : register(b2)
 {
-	float4 materialDiffColor;
+	float4 cbMaterialDiffColorPS;
 }
 
 #endif

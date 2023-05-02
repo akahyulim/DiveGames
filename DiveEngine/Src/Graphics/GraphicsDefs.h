@@ -45,6 +45,14 @@ namespace Dive
 		Model,
 	};
 
+	enum class eConstantBufferIndex
+	{
+		Frame = 0,
+		Camera,
+		Light,
+		Material
+	};
+
 	struct VertexModel
 	{
 		VertexModel() = default;

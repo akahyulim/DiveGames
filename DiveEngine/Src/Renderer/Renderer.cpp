@@ -219,10 +219,10 @@ namespace Dive
 		// Deferred Shading
 		{
 			s_pDeferredShadingVertexShader = new ShaderVariation;
-			if (!s_pDeferredShadingVertexShader->CompileAndCreate(eShaderType::VertexShader, "../CoreData/Shaders/DeferredShading.hlsl", eVertexType::Model))
+			if (!s_pDeferredShadingVertexShader->CompileAndCreate(eShaderType::VertexShader, "../CoreData/Shaders/Deferred.hlsl", eVertexType::Model))
 				return false;
 			s_pDeferredShadingPixelShader = new ShaderVariation;
-			if (!s_pDeferredShadingPixelShader->CompileAndCreate(eShaderType::PixelShader, "../CoreData/Shaders/DeferredShading.hlsl"))
+			if (!s_pDeferredShadingPixelShader->CompileAndCreate(eShaderType::PixelShader, "../CoreData/Shaders/Deferred.hlsl"))
 				return false;
 
 			s_pDeferredDirLightVertexShader = new ShaderVariation;

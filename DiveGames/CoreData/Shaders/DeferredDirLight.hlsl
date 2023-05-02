@@ -35,14 +35,14 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
 
 	// Linear Depth
 	float depth = DepthTex.Load(location3).x;
-	float linearDepth = perspectiveValue.z / (depth + perspectiveValue.w);
+	float linearDepth = cbPerspectiveValuePS.z / (depth + cbPerspectiveValuePS.w);
 
 	// World Position
 	float4 position;
-	position.xy = input.cpPos.xy * perspectiveValue.xy * linearDepth;
+	position.xy = input.cpPos.xy * cbPerspectiveValuePS.xy * linearDepth;
 	position.z = linearDepth;
 	position.w = 1.0f;
-	position = mul(position, viewInv);
+	position = mul(position, cbViewInvPS);
 
 	// Normal
 	float3 normal;
@@ -50,15 +50,15 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
 	normal = normalize(normal * 2.0f - 1.0f);
 
 	// Phong diffuse
-	float NDotL = dot(-lightDir, normal);
-	float3 dirLightColor = lightColor * saturate(NDotL);
+	float NDotL = dot(-cbLightDirPS, normal);
+	float3 dirLightColor = cbLightColorPS * saturate(NDotL);
 
 	// Blinn specular
-	float3 toEye = cameraPos - position.xyz;
+	float3 toEye = cbCameraPosPS - position.xyz;
 	toEye = normalize(toEye);
-	float3 halfWay = normalize(toEye + -lightDir);
+	float3 halfWay = normalize(toEye + -cbLightDirPS);
 	float NDotH = saturate(dot(halfWay, normal));
-	dirLightColor += lightColor * pow(NDotH, 250.0f) * 0.25f;
+	dirLightColor += cbLightColorPS * pow(NDotH, 250.0f) * 0.25f;
 
-	return diffMap * float4(dirLightColor, 1.0f) * materialDiffColor;
+	return diffMap * float4(dirLightColor, 1.0f) * cbMaterialDiffColorPS;
 }
