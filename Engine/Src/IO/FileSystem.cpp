@@ -1,20 +1,9 @@
-#include "divepch.h"
+#include "DivePch.h"
 #include "FileSystem.h"
 #include "Log.h"
-#include "Core/Context.h"
 
 namespace Dive
 {
-	FileSystem::FileSystem(Context* pContext)
-		: Object(pContext)
-	{
-	}
-
-	FileSystem::~FileSystem()
-	{
-		DV_LOG_ENGINE_TRACE("FileSystem 소멸 완료");
-	}
-
 	std::string FileSystem::ToUpperCase(const std::string& str)
 	{
 		auto copy = str;
@@ -69,7 +58,7 @@ namespace Dive
 
 		// \\를 모두 /로 변경
 		auto ret = GetInternalPath(pathName);
-		
+
 		if (ret.back() != '/')
 			ret += '/';
 
@@ -78,7 +67,7 @@ namespace Dive
 
 	std::string FileSystem::RemoveTrailingSlash(const std::string& pathName)
 	{
-		if(pathName.empty())
+		if (pathName.empty())
 			return std::string();
 
 		auto ret = pathName;
@@ -110,13 +99,13 @@ namespace Dive
 			return std::wstring();
 
 		auto size = ::MultiByteToWideChar(
-			CP_ACP, 
-			0, 
-			str.c_str(), 
-			static_cast<int32_t>(str.size()), 
-			nullptr, 
+			CP_ACP,
+			0,
+			str.c_str(),
+			static_cast<int32_t>(str.size()),
+			nullptr,
 			0);
-		
+
 		std::wstring ret;
 		ret.resize(size);
 
@@ -188,7 +177,7 @@ namespace Dive
 	{
 		auto ret = std::filesystem::current_path().string();
 		ret = GetInternalPath(ret);
-		
+
 		return AddTrailingSlash(ret);
 	}
 
@@ -199,9 +188,9 @@ namespace Dive
 
 	std::string FileSystem::GetProgramDir()
 	{
-		char exeName[MAX_PATH] = {0,};
+		char exeName[MAX_PATH] = { 0, };
 		GetModuleFileNameA(nullptr, exeName, MAX_PATH);
-		
+
 		return GetInternalPath(exeName);
 	}
 
@@ -354,13 +343,13 @@ namespace Dive
 	{
 		if (!FileExists(sourceFileName))
 		{
-			DV_LOG_ENGINE_ERROR("원본 파일({:s})이 존재하지 않아 복사를 수행할 수 없습니다.", sourceFileName);
+			DV_CORE_ERROR("원본 파일({:s})이 존재하지 않아 복사를 수행할 수 없습니다.", sourceFileName);
 			return false;
 		}
 
 		if (sourceFileName == destFileName)
 		{
-			DV_LOG_ENGINE_WARN("동일한 파일 이름을 전달받아 복사를 수행할 수 없습니다. : {0:s} == {:1s}",
+			DV_CORE_WARN("동일한 파일 이름을 전달받아 복사를 수행할 수 없습니다. : {0:s} == {:1s}",
 				sourceFileName, destFileName);
 			return false;
 		}
@@ -378,13 +367,13 @@ namespace Dive
 	{
 		if (!FileExists(sourceFileName))
 		{
-			DV_LOG_ENGINE_ERROR("원본 파일({:s})이 존재하지 않아 이름을 변경할 수 없습니다.", sourceFileName);
+			DV_CORE_ERROR("원본 파일({:s})이 존재하지 않아 이름을 변경할 수 없습니다.", sourceFileName);
 			return false;
 		}
 
 		if (destFileName.empty())
 		{
-			DV_LOG_ENGINE_ERROR("파일의 새로운 이름({:s})을 잘못 전달받아 변경할 수 없습니다.", destFileName);
+			DV_CORE_ERROR("파일의 새로운 이름({:s})을 잘못 전달받아 변경할 수 없습니다.", destFileName);
 			return false;
 		}
 

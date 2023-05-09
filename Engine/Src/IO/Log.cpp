@@ -1,36 +1,38 @@
-#include "divepch.h"
+#include "DivePch.h"
 #include "Log.h"
 
 namespace Dive
 {
-	std::shared_ptr<spdlog::logger> Log::s_EngineLogger;
-	std::shared_ptr<spdlog::logger> Log::s_ClientLogger;
-	std::ostringstream Log::s_Oss;
+	static std::shared_ptr<spdlog::logger> s_pEngineLogger;
+	static std::shared_ptr<spdlog::logger> s_pAppLogger;
 
-	Log::~Log()
-	{
-		DV_LOG_ENGINE_TRACE("Log ¼Ò¸ê ¿Ï·á");
-	}
-
-	void Log::Initialize(const char* pFilename)
+	void Log::Initialize()
 	{
 		std::vector<spdlog::sink_ptr> logSinks;
 		logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(pFilename, true));
-		logSinks.emplace_back(std::make_shared<spdlog::sinks::ostream_sink_mt>(s_Oss));
+		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Dive.log", true));
 
 		logSinks[0]->set_pattern("%^[%T] %n: %v%$");
 		logSinks[1]->set_pattern("[%T] [%l] %n: %v");
-		logSinks[2]->set_pattern("%v");
 
-		s_EngineLogger = std::make_shared<spdlog::logger>("Engine", std::begin(logSinks), std::end(logSinks));
-		spdlog::register_logger(s_EngineLogger);
-		s_EngineLogger->set_level(spdlog::level::trace);
-		s_EngineLogger->flush_on(spdlog::level::trace);
+		s_pEngineLogger = std::make_shared<spdlog::logger>("CORE", std::begin(logSinks), std::end(logSinks));
+		spdlog::register_logger(s_pEngineLogger);
+		s_pEngineLogger->set_level(spdlog::level::trace);
+		s_pEngineLogger->flush_on(spdlog::level::trace);
 
-		s_ClientLogger = std::make_shared<spdlog::logger>("Client", std::begin(logSinks), std::end(logSinks));
-		spdlog::register_logger(s_ClientLogger);
-		s_ClientLogger->set_level(spdlog::level::trace);
-		s_ClientLogger->flush_on(spdlog::level::trace);
+		s_pAppLogger = std::make_shared<spdlog::logger>("APP", std::begin(logSinks), std::end(logSinks));
+		spdlog::register_logger(s_pAppLogger);
+		s_pAppLogger->set_level(spdlog::level::trace);
+		s_pAppLogger->flush_on(spdlog::level::trace);
+	}
+	
+	spdlog::logger* Log::GetEngineLogger()
+	{
+		return s_pEngineLogger.get();
+	}
+
+	spdlog::logger* Log::GetAppLogger()
+	{
+		return s_pAppLogger.get();
 	}
 }

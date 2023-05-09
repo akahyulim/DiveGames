@@ -1,72 +1,60 @@
-#include "divepch.h"
+#include "DivePch.h"
 #include "InputLayout.h"
-#include "Graphics.h"
-#include "VertexBuffer.h"
-#include "ShaderVariation.h"
-#include "Graphics.h"
-#include "GraphicsDefs.h"
-#include "Core/Context.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
 
 namespace Dive
 {
-	// 1. InputSlot이 2개 이상일 경우를 대응하지 못했다.
-	// 2. 추후 버퍼 배열을 전달받도록 수정해야 한다.
-	// desc 구성 과정에는 VertexBuffer Elements가,
-	// create 과정에는 VertexShader의 Buffer 정보가 필요하다.
-	InputLayout::InputLayout(Context* pContext, VertexBuffer* pBuffers, ShaderVariation* pVertexShader)
-		: Object(pContext)
+	InputLayout::InputLayout()
+		: m_VertexType(eVertexType::Undefined),
+		m_pInputLayout(nullptr)
 	{
-		if (!pBuffers || !pVertexShader || pVertexShader->GetShaderType() != eShaderType::Vertex)
+	}
+	
+	InputLayout::~InputLayout()
+	{
+		DV_RELEASE(m_pInputLayout);
+	}
+
+	bool InputLayout::Create(ID3D10Blob* pShaderBuffer, eVertexType type)
+	{
+		DV_ASSERT(pShaderBuffer);
+		DV_ASSERT(type != eVertexType::Undefined);
+
+		std::vector<D3D11_INPUT_ELEMENT_DESC> elements = {
+			D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 } };
+
+		if (type == eVertexType::PosCol)
 		{
-			DV_LOG_ENGINE_ERROR("잘못된 인자를 전달받아 InputLayout 생성에 실패하였습니다.");
-			return;
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+		}
+		else if (type == eVertexType::PosTex)
+		{
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+		}
+		else if (type == eVertexType::Model)
+		{
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 		}
 
-		const auto& srcElements = pBuffers->GetElements();
-		std::vector<D3D11_INPUT_ELEMENT_DESC> elementDescs;
-		for (unsigned int i = 0; i < static_cast<unsigned int>(srcElements.size()); ++i)
-		{
-			const VertexElement& srcElement = srcElements[i];
-			const char* pSemanticName = ELEMENT_SEMANTICNAMES[srcElement.m_Semantic];
+		auto* pDevice = Graphics::GetDevice();
+		DV_ASSERT(pDevice);
 
-			D3D11_INPUT_ELEMENT_DESC desc;
-			desc.SemanticName = pSemanticName;	
-			desc.SemanticIndex = srcElement.m_Index;
-			desc.Format = ELEMENT_FORMATS[srcElement.m_Type];
-			desc.InputSlot = 0;	// 이건 버퍼가 배열일 때 슬롯인 듯 하다.
-			desc.AlignedByteOffset = srcElement.m_Offset;
-			desc.InputSlotClass = srcElement.m_PerInstnace ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
-			desc.InstanceDataStepRate = srcElement.m_PerInstnace ? 1: 0;
-
-			elementDescs.emplace_back(desc);
-		}
-
-		if (elementDescs.empty())
-			return;
-
-		auto pShaderBuffer = pVertexShader->GetCompileBuffer();
-		if (!pShaderBuffer)
-			return;
-
-		auto pGraphics = GetSubsystem<Graphics>();
-		if (!pGraphics || !pGraphics->IsInitialized())
-			return;
-
-		if (FAILED(pGraphics->GetDevice()->CreateInputLayout(
-			elementDescs.data(),
-			static_cast<UINT>(elementDescs.size()),
+		if (FAILED(pDevice->CreateInputLayout(
+			elements.data(),
+			static_cast<UINT>(elements.size()),
 			pShaderBuffer->GetBufferPointer(),
 			pShaderBuffer->GetBufferSize(),
 			&m_pInputLayout)))
 		{
-			DV_LOG_ENGINE_ERROR("InputLayout 생성에 실패하였습니다.");
+			DV_CORE_ERROR("InputLayout 생성에 실패하였습니다.");
+			return false;
 		}
-	}
 
-	InputLayout::~InputLayout()
-	{
-		DV_LOG_ENGINE_TRACE("InputLayout 소멸 완료");
+		m_VertexType = type;
+
+		return true;
 	}
 }

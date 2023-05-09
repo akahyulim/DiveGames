@@ -4,90 +4,36 @@
 
 namespace Dive
 {
-	class Graphics;
-	class ConstantBuffer;
-	class Shader;
+	class InputLayout;
 
-	struct ShaderParameter
-	{
-		ShaderParameter()
-			: Type(eShaderType::None),
-			Name(""),
-			Offset(0),
-			Size(0),
-			Index(0),
-			pBuffer(nullptr)
-		{}
-
-		ShaderParameter(eShaderType type, const std::string& name, uint32_t offset, uint32_t size, uint32_t index)
-			: Type(type), 
-			Name(name), 
-			Offset(offset), 
-			Size(size), 
-			Index(index),
-			pBuffer(nullptr)
-		{}
-
-		eShaderType Type;
-		std::string Name;
-		uint32_t Offset;
-		uint32_t Size;
-		uint32_t Index;		// constant buffer index
-		ConstantBuffer* pBuffer;
-	};
-
-	class ShaderVariation
+	class ShaderVariation : public Object
 	{
 	public:
-		explicit ShaderVariation(Shader* pOwner, eShaderType type);
+		ShaderVariation();
 		~ShaderVariation();
 
-		bool CompileAndCreate();
-		bool Compile();
-		bool CreateVertexShader();
-		bool CreatePixelShader();
+		bool CompileAndCreate(eShaderType type, const std::string& filePath, eVertexType vertexType = eVertexType::Undefined);
+		bool Compile(eShaderType type, const std::string& filePath);
+		bool CreateShader(eShaderType type, eVertexType vertexType = eVertexType::Undefined);
+		bool CreateInputLayout(eVertexType vertexType);
 
-		ID3D10Blob* GetCompileBuffer() { return m_pCompileBuffer; }
-
-		void* GetShader();
-
-		eShaderType GetShaderType() const { return m_Type; }
-
-		const std::string& GetName() const { return m_Name; }
-		void SetName(const std::string& name) { m_Name = name; }
-
-		std::string GetDefines() const { return m_Defines; }
-		void SetDefines(const std::string& defines) { m_Defines = defines; }
-
-		bool HasParameter(const std::string& name) const;
-		const std::unordered_map<std::string, ShaderParameter>& GetParameters() const { return m_Parameters; }
-
-		bool HasTextureUnit(eTextureUnit unit) const { return m_bUseTextureUnits[static_cast<uint32_t>(unit)]; }
-
-		uint64_t GetSemanticsHash() const { return m_SemanticsHash; }
-
-		const unsigned* GetConstantBufferSizes() const { return &m_ConstantBufferSizes[0]; }
+		std::string GetFilePath() const { return m_FilePath; }
+		eShaderType GetShaderType() const { return m_ShaderType; }
+		void* GetShaderResource() const { return m_pShaderResource; }
+		InputLayout* GetInputLayout() const;
 
 	private:
-		void parseParameters();
-		void calculateConstantBufferSizes();
+
 
 	private:
-		Graphics* m_pGraphics;
-		Shader* m_pOwner;
-		eShaderType m_Type;
-		std::string m_Name;
-		ID3D10Blob* m_pCompileBuffer;
-		ID3D11VertexShader* m_pVertexShader;
-		ID3D11PixelShader* m_pPixelShader;
-		std::string m_Defines;
+		std::string m_FilePath;
 
-		uint64_t m_SemanticsHash;
+		eShaderType m_ShaderType;
 
-		bool m_bUseTextureUnits[16];
-		
-		std::unordered_map<std::string, ShaderParameter> m_Parameters;
+		ID3D10Blob* m_pShaderBuffer;
 
-		uint32_t m_ConstantBufferSizes[7];
+		void* m_pShaderResource;
+	
+		InputLayout* m_pInputLayout;
 	};
 }

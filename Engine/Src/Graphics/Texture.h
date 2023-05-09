@@ -2,17 +2,14 @@
 #include "Resource/Resource.h"
 #include "GraphicsDefs.h"
 
+#include <DirectXTex/DirectXTex.h>
+
 namespace Dive
 {
-	class Graphics;
-	class Viewport;
-
 	class Texture : public Resource
 	{
-		DIVE_OBJECT(Texture, Resource)
-
 	public:
-		explicit Texture(Context* pContext);
+		Texture(eResourceType type);
 		~Texture() override;
 
 		bool IsMipLevelsDirty() const { return m_bMipLevelDirty; }
@@ -46,9 +43,9 @@ namespace Dive
 
 		uint32_t GetRowPitchSize(int width) const;
 
-		unsigned int GetViewportCount() const { return static_cast<unsigned int>(m_Viewports.size()); }
-		Viewport* GetViewport(unsigned int index) const { return m_Viewports[index]; }
-		void SetViewport(unsigned int index, Viewport* pViewport);
+		//unsigned int GetViewportCount() const { return static_cast<unsigned int>(m_Viewports.size()); }
+		//Viewport* GetViewport(unsigned int index) const { return m_Viewports[index]; }
+		//void SetViewport(unsigned int index, Viewport* pViewport);
 
 		static DXGI_FORMAT GetSRGBFormat(DXGI_FORMAT format);
 		static DXGI_FORMAT GetSRVFormat(DXGI_FORMAT format);
@@ -60,11 +57,9 @@ namespace Dive
 		virtual bool createResources() = 0;
 
 	protected:
-		Graphics* m_pGraphics;
-
 		ID3D11Texture2D* m_pTexture2D;
 		ID3D11ShaderResourceView* m_pShaderResourceView;
-		ID3D11SamplerState* m_pSamplerState;
+		ID3D11SamplerState* m_pSamplerState;	// 아무래도 Texture마다 직접 관리하는 건 부담된다.
 
 		int m_Width;
 		int m_Height;
@@ -83,6 +78,6 @@ namespace Dive
 		int m_AnisoLevel;
 		bool m_bSamplerStateDirty;
 
-		std::vector<Viewport*> m_Viewports;
+		//std::vector<Viewport*> m_Viewports;
 	};
 }

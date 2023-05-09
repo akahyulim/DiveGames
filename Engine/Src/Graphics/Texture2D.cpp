@@ -6,8 +6,6 @@
 #include "IO/FileSystem.h"
 #include "IO/Log.h"
 
-#include <DirectXTex/DirectXTex.h>
-
 /*
 * 파일 Load
 * - Mipmap을 사용하지 않을 땐 ShaderResourceView만 생성
@@ -27,8 +25,8 @@ namespace Dive
 	Texture2D* Texture2D::s_pRedTexture = nullptr;
 	Texture2D* Texture2D::s_pWhiteTexture = nullptr;
 
-	Texture2D::Texture2D(Context* pContext)
-		: Texture(pContext),
+	Texture2D::Texture2D()
+		: Texture(eResourceType::Texture2D),
 		m_pRenderTargetView(nullptr),
 		m_pLoadImage(nullptr)
 	{
@@ -40,11 +38,12 @@ namespace Dive
 		DV_RELEASE(m_pRenderTargetView);
 	}
 
-
-	bool Texture2D::LoadFromFile(const std::string& fileName)
+	// 현재 m_pLoadImage는 Cache에 등록되지 않고
+	// 이 클래스 내부에서 관리한다.
+	bool Texture2D::LoadFromFile(const std::string& filePath)
 	{
-		m_pLoadImage = new Image(m_pContext);
-		if (!m_pLoadImage->LoadFromFile(fileName))
+		m_pLoadImage = new Image();
+		if (!m_pLoadImage->LoadFromFile(filePath))
 		{
 			DV_DELETE(m_pLoadImage);
 			return false;
@@ -58,6 +57,9 @@ namespace Dive
 
 		DV_DELETE(m_pLoadImage);
 
+		m_FilePath = filePath;
+		SetName(FileSystem::GetFileName(filePath));
+
 		return true;
 	}
 
@@ -68,7 +70,7 @@ namespace Dive
 	{
 		if (!pImage)
 		{
-			DV_LOG_ENGINE_ERROR("Texture2D::SetImage - 잘못된 Image를 전달받았습니다.");
+			DV_CORE_ERROR("Texture2D::SetImage - 잘못된 Image를 전달받았습니다.");
 			return false;
 		}
 
@@ -128,14 +130,14 @@ namespace Dive
 		unsigned int subResource = 0;
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		
-		if (FAILED(m_pGraphics->GetDeviceContext()->Map(
+		if (FAILED(Graphics::GetDeviceContext()->Map(
 			static_cast<ID3D11Resource*>(m_pTexture2D),
 			subResource,
 			D3D11_MAP_WRITE_DISCARD,
 			0,
 			&mappedResource)))
 		{
-			DV_LOG_ENGINE_ERROR("Texture2D::SetRawTextureData - 텍스쳐 맵에 실패하였습니다.");
+			DV_CORE_ERROR("Texture2D::SetRawTextureData - 텍스쳐 맵에 실패하였습니다.");
 			return;
 		}
 
@@ -157,27 +159,27 @@ namespace Dive
 			}
 		}
 
-		m_pGraphics->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pTexture2D), subResource);
+		Graphics::GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pTexture2D), subResource);
 	}
 
 	bool Texture2D::SetRawTextureData(const uint8_t* pData)
 	{
 		if (!m_pTexture2D)
 		{
-			DV_LOG_ENGINE_ERROR("Texture2D::SetRawTextureData - 텍스쳐가 존재하지 않아 데이터를 전달할 수 없습니다.");
+			DV_CORE_ERROR("Texture2D::SetRawTextureData - 텍스쳐가 존재하지 않아 데이터를 전달할 수 없습니다.");
 			return false;
 		}
 
 		if (!pData)
 		{
-			DV_LOG_ENGINE_ERROR("Texture2D::SetRawTextureData - 비어있는 데이터를 전달받았습니다.");
+			DV_CORE_ERROR("Texture2D::SetRawTextureData - 비어있는 데이터를 전달받았습니다.");
 			return false;
 		}
 
 		const uint8_t* pSrc = pData;
 		unsigned int rowPitch = GetRowPitchSize(m_Width);
 
-		m_pGraphics->GetDeviceContext()->UpdateSubresource(
+		Graphics::GetDeviceContext()->UpdateSubresource(
 			m_pTexture2D,
 			0,
 			nullptr,
@@ -188,17 +190,15 @@ namespace Dive
 		return true;
 	}
 
-	Texture2D* Texture2D::GetBlackTexture(Context* pContext)
+	Texture2D* Texture2D::GetBlackTexture()
 	{
+		DV_ASSERT(Graphics::IsInitialized());
+
 		if (!s_pBlackTexture)
 		{
-			Graphics* pGraphics = pContext->GetSubsystem<Graphics>();
-			if (!pGraphics->IsInitialized())
-				return nullptr;
+			DirectX::XMINT2 size = Graphics::GetSize();
 
-			DirectX::XMINT2 size = pGraphics->GetSize();
-
-			s_pBlackTexture = new Texture2D(pContext);
+			s_pBlackTexture = new Texture2D();
 			s_pBlackTexture->SetSize(size.x, size.y);
 			
 			std::vector<DirectX::XMINT4> colors;
@@ -210,17 +210,15 @@ namespace Dive
 		return s_pBlackTexture;
 	}
 
-	Texture2D* Texture2D::GetGrayTexture(Context* pContext)
+	Texture2D* Texture2D::GetGrayTexture()
 	{
+		DV_ASSERT(Graphics::IsInitialized());
+
 		if (!s_pGrayTexture)
 		{
-			Graphics* pGraphics = pContext->GetSubsystem<Graphics>();
-			if (!pGraphics->IsInitialized())
-				return nullptr;
+			DirectX::XMINT2 size = Graphics::GetSize();
 
-			DirectX::XMINT2 size = pGraphics->GetSize();
-
-			s_pGrayTexture = new Texture2D(pContext);
+			s_pGrayTexture = new Texture2D();
 			s_pGrayTexture->SetSize(size.x, size.y);
 
 			std::vector<DirectX::XMINT4> colors;
@@ -232,17 +230,15 @@ namespace Dive
 		return s_pGrayTexture;
 	}
 
-	Texture2D* Texture2D::GetRedTexture(Context* pContext)
+	Texture2D* Texture2D::GetRedTexture()
 	{
+		DV_ASSERT(Graphics::IsInitialized());
+
 		if (!s_pRedTexture)
 		{
-			Graphics* pGraphics = pContext->GetSubsystem<Graphics>();
-			if (!pGraphics->IsInitialized())
-				return nullptr;
+			DirectX::XMINT2 size = Graphics::GetSize();
 
-			DirectX::XMINT2 size = pGraphics->GetSize();
-
-			s_pRedTexture = new Texture2D(pContext);
+			s_pRedTexture = new Texture2D();
 			s_pRedTexture->SetSize(size.x, size.y);
 
 			std::vector<DirectX::XMINT4> colors;
@@ -254,17 +250,15 @@ namespace Dive
 		return s_pRedTexture;
 	}
 
-	Texture2D* Texture2D::GetWhiteTexture(Context* pContext)
+	Texture2D* Texture2D::GetWhiteTexture()
 	{
+		DV_ASSERT(Graphics::IsInitialized());
+
 		if (!s_pWhiteTexture)
 		{
-			Graphics* pGraphics = pContext->GetSubsystem<Graphics>();
-			if (!pGraphics->IsInitialized())
-				return nullptr;
+			DirectX::XMINT2 size = Graphics::GetSize();
 
-			DirectX::XMINT2 size = pGraphics->GetSize();
-
-			s_pWhiteTexture = new Texture2D(pContext);
+			s_pWhiteTexture = new Texture2D();
 			s_pWhiteTexture->SetSize(size.x, size.y);
 
 			std::vector<DirectX::XMINT4> colors;
@@ -274,11 +268,6 @@ namespace Dive
 		}
 
 		return s_pWhiteTexture;
-	}
-
-	void Texture2D::RegisterObject(Context* pContext)
-	{
-		pContext->RegisterFactory<Texture2D>();
 	}
 
 	bool Texture2D::createResources()
@@ -303,10 +292,10 @@ namespace Dive
 		texDesc.MiscFlags = m_MipLevels > 1 ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 		texDesc.CPUAccessFlags = m_Usage == eTextureUsage::Dynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 
-		if (FAILED(m_pGraphics->GetDevice()->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
+		if (FAILED(Graphics::GetDevice()->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
 		{
 			DV_RELEASE(m_pTexture2D);
-			DV_LOG_ENGINE_ERROR("Texture2D::createResources - Texture2D 생성에 실패하였습니다.");
+			DV_CORE_ERROR("Texture2D::createResources - Texture2D 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -318,13 +307,13 @@ namespace Dive
 		//srvDesc.Texture2D.MipLevels = m_bDynamic ? 1 : -1;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 
-		if (FAILED(m_pGraphics->GetDevice()->CreateShaderResourceView(
+		if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(
 			static_cast<ID3D11Resource*>(m_pTexture2D),
 			&srvDesc,
 			&m_pShaderResourceView)))
 		{
 			DV_RELEASE(m_pShaderResourceView);
-			DV_LOG_ENGINE_ERROR("Texture2D::createResources - ShaderResourceView 생성에 실패하였습니다.");
+			DV_CORE_ERROR("Texture2D::createResources - ShaderResourceView 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -336,13 +325,13 @@ namespace Dive
 			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;		// 멀티 샘플링 미지원.
 			rtvDesc.Texture2D.MipSlice = 0;
 
-			if (FAILED(m_pGraphics->GetDevice()->CreateRenderTargetView(
+			if (FAILED(Graphics::GetDevice()->CreateRenderTargetView(
 				static_cast<ID3D11Resource*>(m_pTexture2D),
 				&rtvDesc,
 				&m_pRenderTargetView)))
 			{
 				DV_RELEASE(m_pRenderTargetView);
-				DV_LOG_ENGINE_ERROR("Texture2D::createResources - RenderTargetView 생성에 실패하였습니다.");
+				DV_CORE_ERROR("Texture2D::createResources - RenderTargetView 생성에 실패하였습니다.");
 				return false;
 			}
 		}

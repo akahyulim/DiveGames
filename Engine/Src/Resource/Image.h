@@ -5,10 +5,8 @@ namespace Dive
 {
 	class Image : public Resource
 	{
-		DIVE_OBJECT(Image, Resource)
-
 	public:
-		explicit Image(Context* pContext);
+		Image();
 		~Image() override;
 
 		bool LoadFromFile(const std::string& fileName) override;

@@ -1,23 +1,24 @@
 #include "divepch.h"
 #include "Texture.h"
 #include "Graphics.h"
-#include "Renderer/Viewport.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
 
 namespace Dive
 {
-	Texture::Texture(Context* pContext)
-		: Resource(pContext),
-		m_pGraphics(GetSubsystem<Graphics>()),
+	Texture::Texture(eResourceType type)
+		: Resource(type),
 		m_pTexture2D(nullptr),
 		m_pShaderResourceView(nullptr),
 		m_pSamplerState(nullptr),
 		m_RequestedMipLevels(0),
 		m_MipLevels(1),
-		m_bMipLevelDirty(true)
+		m_bMipLevelDirty(true),
+		m_Filter(D3D11_FILTER_MIN_MAG_MIP_LINEAR),
+		m_AddressMode(D3D11_TEXTURE_ADDRESS_WRAP),
+		m_BorderColor(0.0f, 0.0f, 0.0f, 0.0f),
+		m_AnisoLevel(1)
 	{
-		DV_ASSERT(m_pGraphics->IsInitialized());
 	}
 
 	Texture::~Texture()
@@ -37,9 +38,11 @@ namespace Dive
 
 	void Texture::UpdateMipLevels()
 	{
+		DV_ASSERT(Graphics::IsInitialized ());
+
 		if (m_pShaderResourceView)
 		{
-			m_pGraphics->GetDeviceContext()->GenerateMips(m_pShaderResourceView);
+			Graphics::GetDeviceContext()->GenerateMips(m_pShaderResourceView);
 			m_bMipLevelDirty = false;
 		}
 	}
@@ -59,7 +62,7 @@ namespace Dive
 		desc.AddressW = m_AddressMode;
 		desc.MipLODBias = 0.0f;
 		desc.MaxAnisotropy = m_AnisoLevel;
-		desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;//D3D11_COMPARISON_LESS_EQUAL;
+		desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
 		desc.BorderColor[0] = m_BorderColor.x;
 		desc.BorderColor[1] = m_BorderColor.y;
 		desc.BorderColor[2] = m_BorderColor.z;
@@ -67,10 +70,10 @@ namespace Dive
 		desc.MinLOD = -FLT_MAX;
 		desc.MaxLOD = FLT_MAX;
 
-		if (FAILED(m_pGraphics->GetDevice()->CreateSamplerState(&desc, &m_pSamplerState)))
+		if (FAILED(Graphics::GetDevice()->CreateSamplerState(&desc, &m_pSamplerState)))
 		{
 			DV_RELEASE(m_pSamplerState);
-			DV_LOG_ENGINE_ERROR("Texture::UpdateSamplerState - SamplerState 생성에 실패하였습니다.");
+			DV_CORE_ERROR("Texture::UpdateSamplerState - SamplerState 생성에 실패하였습니다.");
 			return;
 		}
 
@@ -154,6 +157,7 @@ namespace Dive
 		}
 	}
 
+	/*
 	void Texture::SetViewport(unsigned int index, Viewport* pViewport)
 	{
 		if (m_Viewports.size() >= index)
@@ -161,7 +165,7 @@ namespace Dive
 		else
 			m_Viewports.emplace_back(pViewport);
 	}
-
+	*/
 	DXGI_FORMAT Texture::GetSRGBFormat(DXGI_FORMAT format)
 	{
 		switch (format)

@@ -34,6 +34,13 @@ void Sandbox::Start()
 
 		// Objects
 		{
+			// GameObject로 받아야 한다.
+			// 아에 clone으로 받는 것이 가장 좋을 듯 하다.
+			// 하지만 Cache는 type으로 리턴하는 것이 당연하다.
+			// 즉, 어쩔 수 없이 Model로 받고 다시 clone으로 추가하는 편이 나을 것 같다.
+			// 하지만 이 경우에도 오리지널은 여전히 구별된다.
+			// GameObject WorldView 창 같은건 그냥 별도로 구현하면 될 것 같다.
+			// 이대로 사용하지는 이야기다.
 			auto* pModel = //Dive::ResourceCache::LoadFromFile<Dive::Model>("../Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
 				//Dive::ResourceCache::LoadFromFile<Dive::Model>("../Assets/Models/sponza-master/sponza.obj");
 				Dive::ResourceCache::GetResourceByPath<Dive::Model>("../Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");

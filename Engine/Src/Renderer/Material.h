@@ -1,51 +1,32 @@
 #pragma once
-#include "Core/Object.h"
-#include "Graphics/GraphicsDefs.h"
 #include "Resource/Resource.h"
+#include "Graphics/GraphicsDefs.h"
 
 namespace Dive
 {
-	class Context;
 	class Texture;
-	class Texture2D;
-	class Technique;
-	class Scene;
-	class FileStream;
 
-	// 일단 텍스쳐 부분은 제외하고 구현
 	class Material : public Resource
 	{
-		DIVE_OBJECT(Material, Resource)
-
 	public:
-		explicit Material(Context* pContext);
+		Material();
 		~Material() override;
 
-		// overide
-		bool Load(FileStream* pDeserializer) override;
-
-		// static
-		static void RegisterObject(Context* pContext);
-
-		Technique* GetTechnique() const { return m_pTechnique; }
-		void SetTechnique(Technique* pTech);
+		bool LoadFromFile(const std::string& filePath) override;
+		bool SaveToFile(const std::string& filePath) override;
 
 		const std::unordered_map<eTextureUnit, Texture*>& GetTextures() const { return m_Textures; }
 		Texture* GetTexture(eTextureUnit unit) const;
 		void SetTexture(eTextureUnit unit, Texture* pTexture);
 		void AddTexture(eTextureUnit unit, const std::string& name);
 
-		void ResetToDefault();
+		DirectX::XMFLOAT4 GetColorAlbedo() const { return m_Albedo; }
+		void SetColorAlbedo(float r, float g, float b, float a) { SetColorAlbedo(DirectX::XMFLOAT4(r, g, b, a)); }
+		void SetColorAlbedo(const DirectX::XMFLOAT4& color) { m_Albedo = color; }
 
 	private:
 	private:
-		Scene* m_pScene;
-
 		std::unordered_map<eTextureUnit, Texture*> m_Textures;
-
-		// 원래는 lod때문에 랩핑한 구조체를 가진다.
-		Technique* m_pTechnique;
-
-		// ShaderDefines와 Parameter를 관리하지만 일단 뒤로 미룬다.
+		DirectX::XMFLOAT4 m_Albedo;
 	};
 }

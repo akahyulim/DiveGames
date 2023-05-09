@@ -1,23 +1,23 @@
 #pragma once
-#include "Core/Object.h"
+#include "Graphics.h"
 
 namespace Dive
 {
-	class Context;
-	class VertexBuffer;
-	class ShaderVariation;
-
-	class InputLayout : public Object
+	class InputLayout
 	{
-		DIVE_OBJECT(InputLayout, Object)
-
 	public:
-		explicit InputLayout(Context* pContext, VertexBuffer* pBuffers, ShaderVariation* pVertexShader);
-		~InputLayout() override;
+		InputLayout();
+		~InputLayout();
+
+		bool Create(ID3D10Blob* pShaderBuffer, eVertexType type);
 
 		ID3D11InputLayout* GetInputLayout() const { return m_pInputLayout; }
 
 	private:
+
+	private:
+		eVertexType m_VertexType;
+
 		ID3D11InputLayout* m_pInputLayout;
 	};
 }

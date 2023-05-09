@@ -1,34 +1,39 @@
 #pragma once
 #include "Core/Object.h"
-#include "Math/StringHash.h"
 
-namespace Dive 
+namespace Dive
 {
-	class Context;
-	class FileStream;
+	enum class eResourceType
+	{
+		Image,
+		Texture2D,
+		RenderTexture,
+		TextureCube,
+		Material,
+		Model,
+		Shader,
+		Unknown
+	};
 
-	// 리소스의 직렬화 인터페이스와 이름 관리 기능을 가진 리소스 베이스 클래스.
 	class Resource : public Object
 	{
-		DIVE_OBJECT(Resource, Object)
-
 	public:
-		explicit Resource(Context* pContext);
-		~Resource() override;
-	
-		virtual bool LoadFromFile(const std::string& fileName);
-		virtual bool SaveToFile(const std::string& fileName);
+		Resource(eResourceType type = eResourceType::Unknown) : m_ResourceType(type) {}
+		~Resource() override = default;
 
-		virtual bool Load(FileStream* pDeserializer);
-		virtual bool Save(FileStream* pSerializer);
-	
-		std::string GetName() const { return m_Name; }
-		StringHash GetNameHash() const { return m_NameHash; }
-		void SetName(const std::string& name);
+		virtual bool LoadFromFile(const std::string& filePath) { return true; }
+		virtual bool SaveToFile(const std::string& filePath) { return true; }
 
-	private:
-	private:
-		std::string m_Name;
-		StringHash m_NameHash;
+		eResourceType GetResourceType() const { return m_ResourceType; }
+
+		template<typename T>
+		static constexpr eResourceType TypeToEnum();
+
+		std::string GetFilePath() const { return m_FilePath; }
+		void SetFilePath(const std::string& filePath) { m_FilePath = filePath; }
+
+	protected:
+		eResourceType m_ResourceType;
+		std::string m_FilePath;
 	};
 }

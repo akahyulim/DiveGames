@@ -1,57 +1,29 @@
 #pragma once
-#include "Core/Object.h"
 
 namespace Dive
 {
-	class Context;
-	class Event;
-
-	// 일단 dinput으로 구현하고 추후 xinput도...
-	class Input : public Object
+	class Input
 	{
-		DIVE_OBJECT(Input, Object)
-
 	public:
-		explicit Input(Context* pContext);
-		~Input() override;
+		static bool Initialize(HINSTANCE hInstance, HWND hWnd);
+		static void Shutdown();
 
-		bool Initialize(HINSTANCE hInstance, HWND hWnd, int width, int height);
-		void Destroy();
+		static void Update(float deltaTime);
 
-		void Update();
+		static bool KeyState(int key);
+		static bool KeyDown(int key);
+		static bool KeyUp(int key);
+		static bool KeyPress(int key);
 
-		bool KeyState(int key);
-		bool KeyDown(int key);
-		bool KeyUp(int key);
-		bool KeyPress(int key);
+		static bool MouseButtonState(int btn);
+		static bool MouseButtonDown(int btn);
+		static bool MouseButtonUp(int btn);
+		static bool MouseButtonPress(int btn);
 
-		bool MouseButtonState(int btn);
-		bool MouseButtonDown(int btn);
-		bool MouseButtonUp(int btn);
-		bool MouseButtonPress(int btn);
-
-		void OnBeginFrame(const Event& evnt);
+		static bool IsInitialized();
 
 	private:
-		bool readKeyboard();
-		bool readMouse();
-
-	private:
-		HWND m_WindowHandle;
-
-		IDirectInput8* m_pDirectInput;
-		IDirectInputDevice8* m_pKeyboard;
-		IDirectInputDevice8* m_pMouse;
-
-		DIMOUSESTATE m_MouseState;
-
-		uint8_t m_KeyStates[256];
-		uint8_t m_OldKeyStates[256];
-
-		uint8_t m_MouseButtons[4];
-		uint8_t m_OldMouseButtons[4];
-
-		int m_ScreenWidth;
-		int m_ScreenHeight;
+		static bool readKeyboard();
+		static bool readMouse();
 	};
 }

@@ -1,146 +1,81 @@
-#include "divepch.h"
+#include "DivePch.h"
 #include "ResourceCache.h"
-#include "Core/CoreDefs.h"
-#include "Core/Context.h"
-#include "IO/FileStream.h"
-#include "IO/FileSystem.h"
-#include "IO/Log.h"
+#include "Importer/ModelImporter.h"
 
-namespace Dive 
+namespace Dive
 {
-	ResourceCache::ResourceCache(Context* pContext)
-		: Object(pContext)
+	static const uint64_t FIRST_ID = 0x1;
+	static const uint64_t LAST_ID = 0xffffffffffffffff;
+
+	uint64_t ResourceCache::m_CurResourceID = FIRST_ID;
+	std::unordered_map<uint64_t, Resource*> ResourceCache::m_Resources;
+
+	static ModelImporter* s_pModelImporter = nullptr;
+
+	bool ResourceCache::Initialize()
 	{
-	}
+		s_pModelImporter = new ModelImporter;
+		DV_ASSERT(s_pModelImporter);
 
-	ResourceCache::~ResourceCache()
-	{
-		RemoveAllResources();
-
-
-		DV_LOG_ENGINE_TRACE("ResourceCache 소멸 완료");
-	}
-
-	// 매뉴얼리소스는 반드시 이름이 존재해야 한다.
-	bool ResourceCache::AddManualResource(Resource* pResource)
-	{
-		if (!pResource)
-		{
-			DV_LOG_ENGINE_ERROR("ResourceCache::AddManualResource - 잘못된 인자를 전달받아 리소스를 추가할 수 없습니다.");
-			return false;
-		}
-
-		if (pResource->GetName().empty())
-		{
-			DV_LOG_ENGINE_ERROR("ResourceCache::AddManualResource - 전달받은 리소스에 이름이 존재하지 않아 추가할 수 없습니다.");
-			return false;
-		}
-
-		m_ResourceGroups[pResource->GetTypeHash().GetValue()][pResource->GetNameHash().GetValue()] = pResource;
+		DV_CORE_TRACE("ResourceCache 초기화에 성공하였습니다.");
 
 		return true;
 	}
 
-	Resource* ResourceCache::GetResource(StringHash type, const std::string& name)
+	void ResourceCache::Shutdown()
 	{
-		auto fileName = FileSystem::GetFileNameAndExtension(name);
-		StringHash nameHash(fileName);
+		for (auto& resource : m_Resources)
+			DV_DELETE(resource.second);
+		m_Resources.clear();
 
-		auto* pExistingResource = findResource(type, nameHash);
-		if (pExistingResource)
-			return pExistingResource;
+		DV_DELETE(s_pModelImporter);
 
-		auto* pNewResource = dynamic_cast<Resource*>(m_pContext->CreateObject(type));
-		if (!pNewResource->LoadFromFile(name))
+		DV_CORE_TRACE("ResoruceCache 종료에 성공하였습니다.");
+	}
+
+	void ResourceCache::RemoveByID(uint64_t id)
+	{
+		auto it = m_Resources.find(id);
+		if (it != m_Resources.end())
+			DV_DELETE(it->second);
+		m_Resources.erase(it);
+
+		DV_CORE_TRACE("Resource ID({0:d}) 객체를 제거하였습니다.", id);
+	}
+
+	bool ResourceCache::IsCachedByID(uint64_t id)
+	{
+		if (m_Resources[id])
 		{
-			DV_DELETE(pNewResource);
-			return nullptr;
+			DV_CORE_WARN("이미 캐시된 리소스({0:s} : ({1:d})입니다.", m_Resources[id]->GetName(), id);
+			return true;
 		}
 
-		pNewResource->SetName(fileName);
-		
-		m_ResourceGroups[type.GetValue()][nameHash.GetValue()] = pNewResource;
-
-		return pNewResource;
+		return false;
 	}
 
-	void ResourceCache::GetResources(StringHash type, std::vector<Resource*>& outResources)
+	ModelImporter* ResourceCache::GetModelImporter()
 	{
-		outResources.clear();
+		return s_pModelImporter;
+	}
 
-		auto i = m_ResourceGroups.find(type.GetValue());
-		if (i != m_ResourceGroups.end())
+	uint64_t ResourceCache::getFreeID()
+	{
+		auto checkID = m_CurResourceID;
+
+		for (;;)
 		{
-			for (auto j = i->second.begin(); j != i->second.end(); ++j)
-			{
-				outResources.emplace_back(j->second);
-			}
+			auto freeID = m_CurResourceID;
+
+			if (m_CurResourceID < LAST_ID)
+				++m_CurResourceID;
+			else
+				m_CurResourceID = FIRST_ID;
+
+			if (checkID == m_CurResourceID)
+				return 0;
+			else if (!m_Resources[freeID])
+				return freeID;
 		}
-	}
-
-	Resource* ResourceCache::GetExistingResource(StringHash type, const std::string& name)
-	{
-		auto fileName = FileSystem::GetFileNameAndExtension(name);
-		auto nameHash = StringHash(fileName);
-
-		return findResource(type, nameHash);
-	}
-
-	bool ResourceCache::IsExistingResource(StringHash type, const std::string& name)
-	{
-		auto fileName = FileSystem::GetFileNameAndExtension(name);
-		auto nameHash = StringHash(fileName);
-
-		return findResource(type, nameHash);
-	}
-
-	void ResourceCache::RemoveResource(StringHash type, const std::string& name)
-	{
-		auto fileName = FileSystem::GetFileNameAndExtension(name);
-		StringHash nameHash(fileName);
-		auto* pExistingResource = findResource(type, nameHash);
-		if (!pExistingResource)
-			return;
-
-		DV_DELETE(pExistingResource);
-		m_ResourceGroups[type.GetValue()].erase(nameHash.GetValue());
-	}
-
-	void ResourceCache::RemoveSpecificTypeResources(StringHash type)
-	{
-		auto i = m_ResourceGroups.find(type.GetValue());
-		if (i == m_ResourceGroups.end())
-			return;
-
-		for (auto j = i->second.begin(); j != i->second.end(); ++j)
-			DV_DELETE(j->second);
-
-		m_ResourceGroups.erase(i);
-	}
-
-	void ResourceCache::RemoveAllResources()
-	{
-		for (auto i = m_ResourceGroups.begin(); i != m_ResourceGroups.end(); ++i)
-		{
-			for (auto j = i->second.begin(); j != i->second.end(); ++j)
-			{
-				DV_DELETE(j->second);
-			}
-		}
-
-		m_ResourceGroups.clear();
-	}
-
-	Resource* ResourceCache::findResource(StringHash type, StringHash nameHash)
-	{
-		auto i = m_ResourceGroups.find(type.GetValue());
-		if (i == m_ResourceGroups.end())
-			return nullptr;
-
-		auto j = i->second.find(nameHash.GetValue());
-		if (j == i->second.end())
-			return nullptr;
-
-		return j->second;
 	}
 }

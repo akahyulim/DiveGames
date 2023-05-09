@@ -1,19 +1,10 @@
 #pragma once
-#include "Core/Object.h"
 
-namespace Dive 
+namespace Dive
 {
-	class Context;
-
-	// 문자열 및 파일 시스템을 처리하는 정적 함수로 구성된 파일 시스템 클래스.
-	class FileSystem : public Object
+	class FileSystem
 	{
-		DIVE_OBJECT(FileSystem, Object)
-
 	public:
-		explicit FileSystem(Context* pContext);
-		~FileSystem() override;
-
 		// strings
 		static std::string ToUpperCase(const std::string& str);
 		static std::string ToLowerCase(const std::string& str);
@@ -26,7 +17,7 @@ namespace Dive
 		static std::wstring StringToWstring(const std::string& str);
 		static std::string WstringToString(const std::wstring& str);
 		static std::vector<std::string> StringSplit(const std::string& str, char seperator);
-		
+
 		// file and directory
 		static std::string GetCurrentDir();
 		static void SetCurrentDir(const std::string& pathName);

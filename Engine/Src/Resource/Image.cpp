@@ -7,8 +7,8 @@
 
 namespace Dive
 {
-	Image::Image(Context* pContext)
-		: Resource(pContext),
+	Image::Image()
+		: Resource(eResourceType::Image),
 		m_Width(0),
 		m_Height(0),
 		m_Depth(0),
@@ -48,7 +48,7 @@ namespace Dive
 
 		if (FAILED(hResult))
 		{
-			DV_LOG_ENGINE_ERROR("Image::LoadFromFile - {:s} 로드에 실패하였습니다.", fileName);
+			DV_CORE_ERROR("Image::LoadFromFile - {:s} 로드에 실패하였습니다.", fileName);
 			return false;
 		}
 

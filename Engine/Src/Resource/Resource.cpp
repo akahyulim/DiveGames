@@ -1,47 +1,24 @@
-#include "divepch.h"
+#include "DivePch.h"
 #include "Resource.h"
-#include "Core/Context.h"
-#include "IO/FileStream.h"
-#include "IO/Log.h"
+#include "Image.h"
+#include "Renderer/Model.h"
+#include "Renderer/Material.h"
+#include "Graphics/Texture2D.h"
+#include "Graphics/RenderTexture.h"
 
-namespace Dive
+namespace Dive 
 {
-	Resource::Resource(Context* pContext)
-		: Object(pContext)
-	{
-	}
+	template<typename T>
+	inline constexpr eResourceType Resource::TypeToEnum() { return eResourceType::Unknown; }
 
-	Resource::~Resource()
-	{
-	}
-
-	bool Resource::LoadFromFile(const std::string& fileName)
-	{
-		FileStream pDeserializer(fileName, eFileStreamModeFlags::Read);
-		return pDeserializer.IsOpen() && Load(&pDeserializer);
-	}
-
-	bool Resource::SaveToFile(const std::string& fileName)
-	{
-		FileStream pSerializer(fileName, eFileStreamModeFlags::Write);
-		return pSerializer.IsOpen() && Save(&pSerializer);
-	}
-
-	bool Resource::Load(FileStream* pDeserializer)
-	{
-		DV_LOG_ENGINE_ERROR("{:s}(은)는 불러오기를 지원하지 않습니다.", GetTypeName());
-		return false;
-	}
-
-	bool Resource::Save(FileStream* pSerializer)
-	{
-		DV_LOG_ENGINE_ERROR("{:s}(은)는 저장을 지원하지 않습니다.", GetTypeName());
-		return false;
-	}
-
-	void Resource::SetName(const std::string& name)
-	{
-		m_Name = name;
-		m_NameHash = StringHash(name);
-	}
+	template<typename T>
+	inline constexpr void validate_resource_type() { static_assert(std::is_base_of<Resource, T>::value, "Resource를 상속하지 않은 타입입니다."); }
 }
+
+#define INSTANTIATE_TO_RESOURCE_TYPE(T, enumT) template<> Dive::eResourceType Dive::Resource::TypeToEnum<T>() { Dive::validate_resource_type<T>(); return enumT; }
+
+INSTANTIATE_TO_RESOURCE_TYPE(Dive::Model, Dive::eResourceType::Model)
+INSTANTIATE_TO_RESOURCE_TYPE(Dive::Material, Dive::eResourceType::Material)
+INSTANTIATE_TO_RESOURCE_TYPE(Dive::Image, Dive::eResourceType::Image)
+INSTANTIATE_TO_RESOURCE_TYPE(Dive::Texture2D, Dive::eResourceType::Texture2D)
+INSTANTIATE_TO_RESOURCE_TYPE(Dive::RenderTexture, Dive::eResourceType::RenderTexture)

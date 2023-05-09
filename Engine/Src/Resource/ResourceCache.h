@@ -1,96 +1,181 @@
 #pragma once
-#include "Core/Object.h"
-#include "Math/StringHash.h"
 #include "Resource.h"
+#include "Core/CoreDefs.h"
+#include "IO/FileSystem.h"
+#include "IO/Log.h"
 
 namespace Dive
 {
-	class Context;
-	class FileStream;
+	class ModelImporter;
 
-	// 리소스 관리 클래스.
-	class ResourceCache : public Object
+	class ResourceCache
 	{
-		DIVE_OBJECT(ResourceCache, Object)
-
 	public:
-		explicit ResourceCache(Context* pContext);
-		~ResourceCache() override;
+		static bool Initialize();
+		static void Shutdown();
 
-		bool AddManualResource(Resource* pResource);
-
-		template<class T> T* GetResource(const std::string& name);
-		Resource* GetResource(StringHash type, const std::string& name);
-		template<class T> void GetResources(std::vector<T*>& outReosurces);
-		void GetResources(StringHash type, std::vector<Resource*>& outResources);
-
-		template<class T> T* GetExistingResource(const std::string& name);
-		Resource* GetExistingResource(StringHash type, const std::string& name);
-
-		template<class T> bool IsExistingResource(const std::string& name);
-		bool IsExistingResource(StringHash type, const std::string& name);
-
-		template<class T> void RemoveResource(const std::string& name);
-		void RemoveResource(StringHash type, const std::string& name);
-		template<class T> void RemoveSpecificTypeResources();
-		void RemoveSpecificTypeResources(StringHash type);
-		void RemoveAllResources();
-
-	private:
-		Resource* findResource(StringHash type, StringHash nameHash);
-
-	private:
-		using ResourceGroup = std::unordered_map<uint32_t, Resource*>;
-		std::unordered_map<uint32_t, ResourceGroup> m_ResourceGroups;
-	};
-
-	template<class T>
-	void ResourceCache::RemoveResource(const std::string& name)
-	{
-		StringHash type = T::GetTypeStatic();
-		RemoveResource(type, name);
-	}
-
-	template<class T>
-	void ResourceCache::RemoveSpecificTypeResources()
-	{
-		StringHash type = T::GetTypeStatic();
-		RemoveSpecificTypeResources(type);
-	}
-
-	template<class T>
-	T* ResourceCache::GetResource(const std::string& name)
-	{
-		StringHash type = T::GetTypeStatic();
-		return dynamic_cast<T*>(GetResource(type, name));
-	}
-
-	template<class T>
-	void ResourceCache::GetResources(std::vector<T*>& outResources)
-	{
-		std::vector<Resource*> resources;
-
-		StringHash type = T::GetTypeStatic();
-		GetResources(type, resources);
-
-		outResources.resize(resources.size());
-		for (uint32_t i = 0; i < static_cast<uint32_t>(resources.size()); ++i)
+		template<class T>
+		static bool AddManualResource(T* pResource)
 		{
-			outResources[i] = dynamic_cast<T*>(resources[i]);
+			DV_ASSERT(pResource);
+
+			if (pResource->GetName().empty())
+			{
+				DV_CORE_WARN("이름이 존재하지 않는 리소스를 매뉴얼 리소스로 저장할 수 없습니다.");
+				return false;
+			}
+
+			return Cache<T>(pResource);
 		}
-	}
 
-	template<class T> 
-	T* ResourceCache::GetExistingResource(const std::string& name)
-	{
-		StringHash type = T::GetTypeStatic();
-		return dynamic_cast<T*>(GetExistingResource(type, name));
-	}
+		template<class T>
+		static T* Cache(T* pResource)
+		{
+			if (!pResource)
+				return nullptr;
 
-	template<class T>
-	bool ResourceCache::IsExistingResource(const std::string& name)
-	{
-		StringHash type = T::GetTypeStatic();
-		return IsExistingResource(type, name);
-	}
+			if (IsCached<T>(pResource->GetName()))
+			{
+				DV_CORE_WARN("이미 저장된 리소스({0:s} : {1:d})의 캐시를 시도하였습니다.", pResource->GetName(), pResource->GetID());
+				return pResource;
+			}
+
+			auto id = getFreeID();
+			if (id == 0)
+			{
+				DV_CORE_ERROR("더이상 리소스 객체를 캐시할 수 없습니다.");
+				return pResource;
+			}
+
+			m_Resources[id] = static_cast<Resource*>(pResource);
+			pResource->SetID(id);
+
+			DV_CORE_DEBUG("리소스({0:s} - {1:d})를 캐시하였습니다", pResource->GetName(), pResource->GetID());
+
+			return pResource;
+		}
+
+		template<class T>
+		static void Remove(T* pResource)
+		{
+			if (!pResource)
+				return;
+
+			RemoveByName<T>(pResource->GetName());
+		}
+
+		static void RemoveByID(uint64_t id);
+
+		template<class T>
+		static void RemoveByName(const std::string& name)
+		{
+			for (auto& resource : m_Resources)
+			{
+				if (resource.second->GetResourceType() == Resource::TypeToEnum<T>() &&
+					resource.second->GetName() == name)
+				{
+					DV_DELETE(resource.second);
+					DV_CORE_DEBUG("{:s} 리소스 객체를 캐시에서 제거하였습니다.", name);
+					return;
+				}
+			}
+		}
+
+		template<class T>
+		static bool IsCached(const std::string& name)
+		{
+			for (auto& resource : m_Resources)
+			{
+				if (resource.second->GetResourceType() == Resource::TypeToEnum<T>() &&
+					resource.second->GetName() == name)
+				{
+					DV_CORE_DEBUG("이미 캐시된 리소스({0:s} : {1:d})입니다.", resource.second->GetName(), resource.second->GetID());
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		static bool IsCachedByID(uint64_t id);
+
+		template<class T>
+		static T* LoadFromFile(const std::string& filePath)
+		{
+			if (!FileSystem::FileExists(filePath))
+			{
+				DV_CORE_ERROR("파일({:s})(이)가 존재하지 않습니다.", filePath);
+				return nullptr;
+			}
+
+			auto pNewResource = new T;
+			if (!pNewResource->LoadFromFile(filePath))
+			{
+				DV_DELETE(pNewResource);
+				return nullptr;
+			}
+
+			return Cache<T>(pNewResource);
+		}
+
+		template<class T>
+		static T* GetResourceByID(uint64_t id)
+		{
+			auto it = m_Resources.find(id);
+			return it != m_Resources.end() ? dynamic_cast<T*>(it->second) : nullptr;
+		}
+
+		template<class T>
+		static T* GetResourceByName(const std::string& name)
+		{
+			for (auto& resource : m_Resources)
+			{
+				if (resource.second->GetResourceType() == Resource::TypeToEnum<T>() &&
+					resource.second->GetName() == name)
+				{
+					return dynamic_cast<T*>(resource.second);
+				}
+			}
+
+			return nullptr;
+		}
+
+		template<class T>
+		static std::vector<T*> GetResourcesByType()
+		{
+			std::vector<T*> resources;
+
+			for (auto& resource : m_Resources)
+			{
+				if (resource.second->GetResourceType() == Resource::TypeToEnum<T>())
+					resources.emplace_back(resource.second);
+			}
+
+			return resources;
+		}
+
+		template<class T>
+		static T* GetResourceByPath(const std::string& filePath)
+		{
+			for (auto& resource : m_Resources)
+			{
+				if (resource.second->GetResourceType() == Resource::TypeToEnum<T>())
+				{
+					if (resource.second->GetFilePath() == filePath)
+						return static_cast<T*>(resource.second);
+				}
+			}
+
+			return LoadFromFile<T>(filePath);
+		}
+
+		static ModelImporter* GetModelImporter();
+
+	private:
+		static uint64_t getFreeID();
+
+	private:
+		static uint64_t m_CurResourceID;
+		static std::unordered_map<uint64_t, Resource*> m_Resources;
+	};
 }

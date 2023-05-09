@@ -9,13 +9,11 @@ namespace Dive
 	// 추가로 특정 크기의 텍스쳐를 만들어 놓고 색상을 set, get -> rtv
 	class Texture2D : public Texture
 	{
-		DIVE_OBJECT(Texture2D, Texture)
-
 	public:
-		explicit Texture2D(Context* pContext);
+		Texture2D();
 		~Texture2D() override;
 
-		bool LoadFromFile(const std::string& fileName) override;
+		bool LoadFromFile(const std::string& filePath) override;
 
 		bool SetImage(Image* pImage);
 		bool SetSize(int width, int height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, int mipCount = 0, bool linear = false);
@@ -30,12 +28,10 @@ namespace Dive
 
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_pRenderTargetView; }
 
-		static Texture2D* GetBlackTexture(Context* pContext);
-		static Texture2D* GetGrayTexture(Context* pContext);
-		static Texture2D* GetRedTexture(Context* pContext);
-		static Texture2D* GetWhiteTexture(Context* pContext);
-
-		static void RegisterObject(Context* pContext);
+		static Texture2D* GetBlackTexture();
+		static Texture2D* GetGrayTexture();
+		static Texture2D* GetRedTexture();
+		static Texture2D* GetWhiteTexture();
 
 	private:
 		bool createResources() override;

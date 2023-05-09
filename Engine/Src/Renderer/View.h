@@ -1,101 +1,46 @@
 #pragma once
 #include "Core/Object.h"
 
-namespace Dive 
+namespace Dive
 {
-	class Graphics;
-	class Renderer;
 	class Camera;
-	class Scene;
-	class RenderPath;
-	struct RenderPathCommand;
-	class Texture;
-	class Viewport;
-	class Mesh;
 	class Drawable;
 	class Light;
-	class Technique;
-	class StaticBatch;
-	class BatchQueue;
-	struct LightBatchQueue;
+	class GBuffer;
 
-	enum class eRenderPath;
-
-	// ScenePass Command의 일부 정보와 BatchQueue 포인터
-	struct ScenePassInfo
+	enum class eRenderPath
 	{
-		ScenePassInfo()
-			: PassIndex(0),
-			bAllowInstancing(false),
-			bMarkStencil(false),
-			bVertexLight(false),
-			pBatchQueue(nullptr)
-		{}
-		ScenePassInfo(const ScenePassInfo& rhs) = default;
-
-		uint32_t PassIndex;
-		bool bAllowInstancing;
-		bool bMarkStencil;
-		bool bVertexLight;
-		BatchQueue* pBatchQueue;
+		Forward,
+		Deferred,
 	};
 
 	class View : public Object
 	{
-		DIVE_OBJECT(View, Object)
-
 	public:
-		explicit View(Context* pContext);
-		~View() override;
+		View(eRenderPath path = eRenderPath::Forward);
+		View(Camera* pCamera, eRenderPath path = eRenderPath::Forward);
+		~View();
 
 		void Update(float delta);
 		void Render();
 
-		bool Define(Texture* pRenderTarget, Viewport* pViewport);
+		eRenderPath GetRenderPath() const { return m_RenderPath; }
+		void SetRenderPath(eRenderPath path) { m_RenderPath = path; }
 
-		Graphics* GetGraphics() const { return m_pGraphics; }
-		Renderer* GetRenderer() const { return m_pRenderer; }
-
-		// 임시
-		bool UseLights() const { return !m_Lights.empty(); }
-		std::vector<Light*> GetLights() const { return m_Lights; }
+		Camera* GetCamera() const { return m_pCamera; }
+		void SetCamera(Camera* pCamera) { m_pCamera = pCamera; }
 
 	private:
-		void getDrawables();
-		void getBaseBatches();
-		void getLightBatches();
-
-		void addBatchToQueue(BatchQueue& queue, StaticBatch& batch, Technique* pTech, bool allowInstancing);
-
-		void executeRenderPathCommands();
-
-		void setRenderTargets(RenderPathCommand* pCommand);
-		void setTextures(RenderPathCommand* pCommand);
-
-		Texture* findNamedTexture(const std::string& name, bool bRenderTarget);
+		void renderPathForward();
+		void renderPathDeferred();
 
 	private:
-		Graphics* m_pGraphics;
-		Renderer* m_pRenderer;
-		Scene* m_pScene;
-
 		Camera* m_pCamera;
-
-		RenderPath* m_pRenderPath;
-
-		Texture* m_pRenderTarget;
-		Texture* m_pCurRenderTarget;
-
-		RECT m_ViewRect;
-		DirectX::XMINT2 m_ViewSize;
-		DirectX::XMINT2 m_RenderTargetSize;
-
 		std::vector<Drawable*> m_Drawables;
 		std::vector<Light*> m_Lights;
 
-		std::vector<ScenePassInfo> m_ScenePasses;
-		std::unordered_map<uint32_t, BatchQueue> m_BatchQueues;
+		eRenderPath m_RenderPath;
 
-		std::vector<LightBatchQueue> m_LightBatchQueues;
+		GBuffer* m_pGBuffer;
 	};
 }

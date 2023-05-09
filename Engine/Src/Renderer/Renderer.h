@@ -1,91 +1,92 @@
 #pragma once
-#include "Core/Object.h"
 
 namespace Dive
 {
-	class Context;
-	class Graphics;
-	class Viewport;
 	class View;
-	class Event;
-	class Texture;
-	class Texture2D;
-	class VertexBuffer;
 	class ShaderVariation;
-	class Material;
-	class RenderPath;
-	class StaticBatch;
-	class BatchQueue;
-	class Technique;
+	class ConstantBuffer;
 
-	class Renderer : public Object
+	struct MatrixBuffer
 	{
-		DIVE_OBJECT(Renderer, Object)
+		DirectX::XMMATRIX worldMatrix;
+		DirectX::XMMATRIX viewMatrix;
+		DirectX::XMMATRIX projMatrix;
+	};
 
+	struct CameraVertexShaderBuffer
+	{
+		DirectX::XMMATRIX viewMatrix;
+		DirectX::XMMATRIX projMatrix;
+	};
+
+	struct ModelVertexShaderBuffer
+	{
+		DirectX::XMMATRIX worldMatrix;
+	};
+
+	struct CameraPixelShaderBuffer
+	{
+		DirectX::XMFLOAT3 cameraPos;
+		float poo;
+		DirectX::XMFLOAT4 perspectiveValues;
+		DirectX::XMMATRIX viewInv;
+	};
+
+	struct LightPixelShaderBuffer
+	{
+		DirectX::XMFLOAT3 lightPos;
+		float lightRange;
+		DirectX::XMFLOAT3 lightColor;
+		float lightSpotAngle;
+		DirectX::XMFLOAT3 lightDir;
+		float poo;
+	};
+
+	struct MaterialPixelShaderBuffer
+	{
+		DirectX::XMFLOAT4 diffColor;
+	};
+
+	class Renderer
+	{
 	public:
-		explicit Renderer(Context* pContext);
-		~Renderer() override;
+		static bool Initialize();
+		static void Shutdown();
 
-		void Update(float delta);
-		void Render();
+		static void Update(float delta);
+		static void Render();
 
-		void OnRenderUpdate(const Event& e);
-		void OnScreenMode(const Event& e);
+		static View* GetView(uint32_t index);
+		static void SetView(uint32_t index, View* pView);
+		static uint32_t GetViewCount();
 
-		Material* GetDefaultMaterial() const { return m_pDefaultMaterial; }
+		// test
+		static ShaderVariation* GetForwardLightVertexShaderVariation();
+		static ShaderVariation* GetDirectionalLightPixelShaderVariation();
+		static ShaderVariation* GetPointLightPixelShaderVariation();
+		static ShaderVariation* GetDeferredShadingVertexShaderVariation();
+		static ShaderVariation* GetDeferredShadingPixelShaderVariation();
+		static ShaderVariation* GetDeferredDirLightVertexShaderVariation();
+		static ShaderVariation* GetDeferredDirLightPixelShaderVariation();
 
-		RenderPath* GetDefaultRenderPath() const;
-		void SetDefaultRenderPath(RenderPath* pRenderPath);
-
-		Technique* GetDefaultTechnique();
-		void SetDefaultTechnique(Technique* pTechnique);
+		static ConstantBuffer* GetCameraVertexShaderBuffer();
+		static ConstantBuffer* GetModelVertexShaderBuffer();
+		static ConstantBuffer* GetCameraPixelShaderBuffer();
+		static ConstantBuffer* GetLightPixelShaderBuffer();
+		static ConstantBuffer* GetMaterialPixelShaderBuffer();
 		
-		Viewport* GetViewport(uint32_t index);
-		void SetViewport(uint32_t index, Viewport* pView);
+		static ID3D11DepthStencilState* GetDepthStencilState();
+		static ID3D11DepthStencilState* GetForwardLightDS();
 
-		Texture* GetScreenBuffer(int32_t width, int32_t height, DXGI_FORMAT format, bool bCubemap);
+		static ID3D11RasterizerState* GetRasterizerState();
 
-		void QueueViewportByRenderTarget(Texture* pRenderTarget);
-
-		VertexBuffer* GetInstancingBuffer() { return m_pInstancingBuffer; }
-
-		void SetBatchShaders(StaticBatch& batch, Technique& tech, bool bAllowShadow, const BatchQueue& queue);
+		static ID3D11BlendState* GetBlendState();
 
 	private:
-		void initialize();
-
-		void createRenderTargets();
-
-		void createInstancingBuffer();
-
-		// shaders
-		// blenders
-		// depthstencil states
-		// rasterizer states
-
-		void queueViewport(Texture* pRenderTarget, Viewport* pViewport);
-		void updateQueuedViewport(uint32_t index);
-
-	private:
-		Graphics* m_pGraphics;
-
-		Material* m_pDefaultMaterial;
-		RenderPath* m_pDefaultRenderPath;
-		Technique* m_pDefaultTechnique;
-
-		bool m_bInitialized;
-
-		// viewports, queuedViewports, views 이렇게 관리한다.
-
-		std::vector<Viewport*> m_Viewports;
-		std::vector<std::pair<Texture*, Viewport*>> m_QueuedViewports;
-		std::vector<View*> m_Views;
-
-		// renderTargets를 직접 관리하는 것은 맞았다.
-		// 다만 그 과정에서 key를 사용한다는 점이 좀 복잡하다.
-		std::unordered_map<uint64_t, uint32_t> m_ScreenBufferIndices;
-		std::unordered_map<uint64_t, std::vector<Texture*>> m_ScreenBuffers;
-
-		VertexBuffer* m_pInstancingBuffer;
+		static bool createShaders();
+		static bool createConstantBuffers();
+		static bool createDepthStencilStates();
+		static bool createRasterizerStates();
+		static bool createBlendStates();
 	};
 }
