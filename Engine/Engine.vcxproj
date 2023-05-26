@@ -80,7 +80,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)_d</TargetName>
-    <OutDir>$(SolutionDir)\DiveGames\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)\bin\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -117,12 +117,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>DivePch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Src;External;$(SolutionDir)\External\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Src;$(SolutionDir)\External\include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -130,8 +130,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalLibraryDirectories>external/libs;$(SolutionDir)\External\libs;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc141-mtd.lib;DirectXTex_D.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\External\libs;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc141-mtd.lib;DirectXTex_D.lib;yaml-cpp_d.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -157,6 +157,7 @@
     <ClInclude Include="Src\Core\Engine.h" />
     <ClInclude Include="Src\Core\EventHandler.h" />
     <ClInclude Include="Src\Core\Object.h" />
+    <ClInclude Include="Src\Core\ProcessUtils.h" />
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
@@ -171,12 +172,15 @@
     <ClInclude Include="Src\Graphics\Texture2D.h" />
     <ClInclude Include="Src\Graphics\VertexBuffer.h" />
     <ClInclude Include="Src\Input\Input.h" />
+    <ClInclude Include="Src\IO\ConvertYAML.h" />
     <ClInclude Include="Src\IO\FileStream.h" />
     <ClInclude Include="Src\IO\FileSystem.h" />
     <ClInclude Include="Src\IO\Log.h" />
     <ClInclude Include="Src\Renderer\Material.h" />
+    <ClInclude Include="Src\Renderer\Mesh.h" />
     <ClInclude Include="Src\Renderer\Model.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
+    <ClInclude Include="Src\Renderer\SkinnedMesh.h" />
     <ClInclude Include="Src\Renderer\View.h" />
     <ClInclude Include="Src\Resource\Image.h" />
     <ClInclude Include="Src\Resource\Importer\ModelImporter.h" />
@@ -195,6 +199,7 @@
     <ClCompile Include="Src\Core\Engine.cpp" />
     <ClCompile Include="Src\Core\EventHandler.cpp" />
     <ClCompile Include="Src\Core\Object.cpp" />
+    <ClCompile Include="Src\Core\ProcessUtils.cpp" />
     <ClCompile Include="Src\DivePch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -213,8 +218,10 @@
     <ClCompile Include="Src\IO\FileSystem.cpp" />
     <ClCompile Include="Src\IO\Log.cpp" />
     <ClCompile Include="Src\Renderer\Material.cpp" />
+    <ClCompile Include="Src\Renderer\Mesh.cpp" />
     <ClCompile Include="Src\Renderer\Model.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
+    <ClCompile Include="Src\Renderer\SkinnedMesh.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
     <ClCompile Include="Src\Resource\Image.cpp" />
     <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp" />

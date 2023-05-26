@@ -25,6 +25,27 @@ namespace Dive
 	{
 	}
 
+	bool Transform::LoadFromFile(const std::string& filePath)
+	{
+		return true;
+	}
+
+	bool Transform::SaveToFile(const std::string& filePath)
+	{
+		DV_CORE_INFO("Save Transform: {:d}", GetID());
+
+		return true;
+	}
+
+	bool Transform::SaveToYAML(YAML::Emitter& out)
+	{
+		//out << YAML::BeginMap;
+		out << YAML::Key << "Transform" << YAML::Value << GetID();
+		//out << YAML::EndMap;
+
+		return true;
+	}
+
 	void Transform::Update(float delta)
 	{
 		updateTransform();
@@ -238,9 +259,29 @@ namespace Dive
 		return XMLoadFloat4x4(&m_Matrix);
 	}
 
+	void Transform::SetMatrix(const DirectX::XMFLOAT4X4& matrix)
+	{
+		XMVECTOR pos, rot, scale;
+		XMMatrixDecompose(&scale, &rot, &pos, XMLoadFloat4x4(&matrix));
+
+		SetPosition(pos);
+		SetRotationQuaternion(rot);
+		SetScale(scale);
+	}
+
 	XMMATRIX Transform::GetLocalMatrix() const
 	{
 		return XMLoadFloat4x4(&m_LocalMatrix);
+	}
+
+	void Transform::SetLocalMatrix(const DirectX::XMFLOAT4X4& matrix)
+	{
+		XMVECTOR pos, rot, scale;
+		XMMatrixDecompose(&scale, &rot, &pos, XMLoadFloat4x4(&matrix));
+
+		SetLocalPosition(pos);
+		SetLocalRotationQuaternion(rot);
+		SetLocalScale(scale);
 	}
 
 	void Transform::Translate(float x, float y, float z, eSpace relativeTo)

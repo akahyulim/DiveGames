@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Object.h"
 #include "Scene/Scene.h"
+#include <yaml-cpp/yaml.h>
 
 namespace Dive
 {
@@ -15,6 +16,11 @@ namespace Dive
 		~GameObject() override;
 
 		void Update(float delta);
+
+		bool LoadFromFile(const std::string& name);
+		bool SaveToFile(const std::string& name);
+		bool SaveToYAML(YAML::Emitter& out);
+
 
 		template<class T>
 		T* AddComponent(uint64_t id = 0)
@@ -61,7 +67,6 @@ namespace Dive
 		bool IsRemovedTarget() const { return m_bMarkedTarget; }
 
 		Transform* GetTransform() const { return m_pTransform; }
-		Drawable* GetDrawable() const { return m_pDrawable; }
 
 	private:
 	private:
@@ -70,6 +75,5 @@ namespace Dive
 		std::vector<Component*> m_Components;
 
 		Transform* m_pTransform;
-		Drawable* m_pDrawable;
 	};
 }

@@ -22,6 +22,18 @@ namespace Dive
 	{
 	}
 
+	bool Drawable::LoadFromFile(const std::string& filePath)
+	{
+		return true;
+	}
+
+	bool Drawable::SaveToFile(const std::string& filePath)
+	{
+		DV_CORE_INFO("Save Drawable: {:d}", GetID());
+
+		return true;
+	}
+
 	void Drawable::SetMesh(Model* pModel, const std::string& name, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount)
 	{
 		m_pModel = pModel;

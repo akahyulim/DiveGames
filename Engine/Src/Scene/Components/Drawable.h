@@ -12,6 +12,9 @@ namespace Dive
 		Drawable(GameObject* pGameObject);
 		~Drawable();
 
+		bool LoadFromFile(const std::string& filePath) override;
+		bool SaveToFile(const std::string& filePath) override;
+
 		void SetMesh(Model* pModel, const std::string& name, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount);
 
 		Model* GetModel() const { return m_pModel; }

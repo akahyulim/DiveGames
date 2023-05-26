@@ -17,6 +17,10 @@ namespace Dive
 		Transform(GameObject* pGameObject);
 		~Transform() override;
 
+		bool LoadFromFile(const std::string& filePath) override;
+		bool SaveToFile(const std::string& filePath) override;
+		bool SaveToYAML(YAML::Emitter& out) override;
+
 		void Update(float delta) override;
 
 		void Clear();
@@ -51,7 +55,9 @@ namespace Dive
 		void SetLocalScale(const DirectX::XMVECTOR& scale);
 
 		DirectX::XMMATRIX GetMatrix() const;
+		void SetMatrix(const DirectX::XMFLOAT4X4& matrix);
 		DirectX::XMMATRIX GetLocalMatrix() const;
+		void SetLocalMatrix(const DirectX::XMFLOAT4X4& matrix);
 
 		void Translate(float x, float y, float z, eSpace relativeTo = eSpace::Self);
 		void Translate(const DirectX::XMFLOAT3& translation, eSpace relativeTo = eSpace::Self);

@@ -3,6 +3,7 @@
 
 // Core
 #include "Core/CoreDefs.h"
+//#include "Core/ProcessUtils.h"
 #include "Core/EventHandler.h"
 #include "Core/CoreEvents.h"
 #include "Core/Engine.h"
@@ -29,6 +30,7 @@
 #include "IO/Log.h"
 #include "IO/FileSystem.h"
 #include "IO/FileStream.h"
+#include "IO/ConvertYAML.h"
 
 // Scene
 #include "Scene/Scene.h"
@@ -49,4 +51,6 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/View.h"
 #include "Renderer/Material.h"
+#include "Renderer/Mesh.h"
+#include "Renderer/SkinnedMesh.h"
 #include "Renderer/Model.h"

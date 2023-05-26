@@ -25,6 +25,7 @@ namespace Dive
 		void parseNodeMeshes(const aiNode* pNode, GameObject* pNodeGameObject);
 		void parseMesh(aiMesh* pAiMesh, GameObject* pMeshGameObject);
 		Material* parseMaterial(aiMesh* pAiMesh);
+		void loadBones(aiMesh* pAiMesh);
 
 	private:
 		std::string m_FilePath;

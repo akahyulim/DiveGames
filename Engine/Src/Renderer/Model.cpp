@@ -1,13 +1,17 @@
 #include "DivePch.h"
 #include "Model.h"
+#include "Mesh.h"
 #include "Material.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Scene/GameObject.h"
+#include "Scene/Components/Transform.h"
 #include "Resource/ResourceCache.h"
 #include "Resource/Importer/ModelImporter.h"
 #include "IO/FileSystem.h"
 #include "IO/Log.h"
+
+#include <yaml-cpp/yaml.h>
 
 namespace Dive
 {
@@ -37,14 +41,36 @@ namespace Dive
 			return false;
 
 		m_FilePath = filePath;
-		SetName(FileSystem::GetFileName(filePath));
 
 		return true;
 	}
 	
 	bool Model::SaveToFile(const std::string& filePath)
 	{
-		DV_CORE_TRACE("Model::SaveToFile - 현재 모델 구성상태를 '{:s}'파일로 저장", filePath);
+		if (!m_pRootGameObject)
+		{
+			DV_CORE_ERROR("Root GameObject가 존재하지 않아 파일 저장에 실패하였습니다.");
+			return false;
+		}
+
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << "type" << YAML::Value << "model";
+		out << YAML::EndMap;
+
+		// 실제로는 생성된 파일의 스트림을 전달
+		//m_pRootGameObject->SaveToFile(filePath);
+		m_pRootGameObject->SaveToYAML(out);
+
+		// 직접 mesh 정보 저장?
+		// urho의 경우 model에서 저장했다.
+		for (IMesh* pMesh : m_Meshes)
+		{
+			// 할려면 구체 타입으로 변환한 뒤 구현을 나누어야 한다.
+		}
+
+		std::ofstream fout(filePath);
+		fout << out.c_str();
 
 		return true;
 	}
@@ -53,6 +79,8 @@ namespace Dive
 	{
 		DV_DELETE(m_pIndexBuffer);
 		DV_DELETE(m_pVertexBuffer);
+
+		//DV_DELETE(m_pMesh);
 
 		if (!m_Vertices.empty())
 		{
@@ -67,7 +95,7 @@ namespace Dive
 		}
 	}
 	
-	void Model::AddVertices(std::vector<VertexModel>& vertices, uint32_t* pOffset)
+	void Model::AddVertices(std::vector<VertexStatic>& vertices, uint32_t* pOffset)
 	{
 		if (pOffset)
 			*pOffset = static_cast<uint32_t>(m_Vertices.size());
@@ -89,7 +117,7 @@ namespace Dive
 		DV_ASSERT(!m_Indices.empty());
 
 		m_pVertexBuffer = new VertexBuffer;
-		if (!m_pVertexBuffer->Create<VertexModel>(m_Vertices))
+		if (!m_pVertexBuffer->Create<VertexStatic>(m_Vertices))
 			return false;
 
 		m_pIndexBuffer = new IndexBuffer;

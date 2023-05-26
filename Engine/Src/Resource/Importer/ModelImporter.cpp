@@ -15,6 +15,17 @@
 
 namespace Dive
 {
+    static DirectX::XMFLOAT4X4 ConvertMatrix(const aiMatrix4x4& transform)
+    {
+        return DirectX::XMFLOAT4X4
+        (
+            transform.a1, transform.b1, transform.c1, transform.d1,
+            transform.a2, transform.b2, transform.c2, transform.d2,
+            transform.a3, transform.b3, transform.c3, transform.d3,
+            transform.a4, transform.b4, transform.c4, transform.d4
+        );
+    }
+
 	ModelImporter::ModelImporter()
 		: m_pAiScene(nullptr),
 		m_pModel(nullptr),
@@ -39,40 +50,6 @@ namespace Dive
 
         Assimp::Importer importer;
 
-        /*
-        // Set normal smoothing angle
-        importer.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, 80.0f);
-        // Set tangent smoothing angle
-        importer.SetPropertyFloat(AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, 80.0f);
-        // Maximum number of triangles in a mesh (before splitting)
-        importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 1000000);
-        // Maximum number of vertices in a mesh (before splitting)
-        importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 1000000);
-        // Remove points and lines.
-        importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
-        // Remove cameras and lights
-        importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_CAMERAS | aiComponent_LIGHTS);
-        // Enable progress tracking
-        importer.SetPropertyBool(AI_CONFIG_GLOB_MEASURE_TIME, true);
-        //importer.SetProgressHandler(new AssimpProgress(filePath));
-
-        const auto importer_flags =
-            aiProcess_MakeLeftHanded |           // directx style.
-            aiProcess_FlipUVs |                  // directx style.
-            aiProcess_FlipWindingOrder |         // directx style.
-            aiProcess_CalcTangentSpace |
-            aiProcess_GenSmoothNormals |
-            aiProcess_GenUVCoords |
-            aiProcess_JoinIdenticalVertices |
-            aiProcess_ImproveCacheLocality |     // re-order triangles for better vertex cache locality.
-            aiProcess_LimitBoneWeights |
-            aiProcess_Triangulate |
-            aiProcess_SortByPType |              // splits meshes with more than one primitive type in homogeneous sub-meshes.
-            aiProcess_FindDegenerates |          // convert degenerate primitives to proper lines or points.
-            aiProcess_FindInvalidData |
-            aiProcess_FindInstances |
-            aiProcess_ValidateDataStructure;
-        */
         const auto flags =
             aiProcess_MakeLeftHanded |              // directx style.
             aiProcess_FlipUVs |                     // directx style.
@@ -134,6 +111,10 @@ namespace Dive
 		return m_pAiScene != nullptr;
 	}
 
+    // 루트노드부터 시작해 재귀적으로 수행
+    // 노드마다 GameObject를 생성한 후 Transform을 추가해 계층구조를 구성
+    // 메시가 존재한다면 파싱 호출
+    // 이때 계층구조 노드는 bone의 노드일 수도 있다.
     void ModelImporter::parseNode(const aiNode* pNode, GameObject* pParentGameObject)
     {
         DV_ASSERT(pNode);
@@ -153,6 +134,8 @@ namespace Dive
             pNodeGameObject->SetName(pNode->mName.C_Str());
         }
 
+        pNodeGameObject->GetTransform()->SetMatrix(ConvertMatrix(pNode->mTransformation));
+
         if (pNode->mNumMeshes > 0)
             parseNodeMeshes(pNode, pNodeGameObject);
 
@@ -160,6 +143,9 @@ namespace Dive
             parseNode(pNode->mChildren[i], pNodeGameObject);
     }
 
+    // 노드 파싱 과정에서 메시가 존재할 때만 호출
+    // 일단 해당 게임 오브젝트에 메시의 이름을 설정한 후
+    // 본격적으로 메시를 파싱하는 함수를 호출
     void ModelImporter::parseNodeMeshes(const aiNode* pNode, GameObject* pNodeGameObject)
     {
         DV_ASSERT(pNode);
@@ -185,6 +171,8 @@ namespace Dive
         }
     }
 
+    // 메시를 읽어들인 후 Model에 저장한다.
+    // 그리고 이때 Drawable에 offset과 count가 저장된다.
     void ModelImporter::parseMesh(aiMesh* pAiMesh, GameObject* pMeshGameObject)
     {
         DV_ASSERT(pAiMesh);
@@ -193,7 +181,7 @@ namespace Dive
         uint32_t vertexCount = pAiMesh->mNumVertices;
         uint32_t indexCount = pAiMesh->mNumFaces * 3;
 
-        std::vector<VertexModel> vertices;
+        std::vector<VertexStatic> vertices;
         vertices.resize(vertexCount);
         for (uint32_t i = 0; i < vertexCount; ++i)
         {
@@ -255,6 +243,8 @@ namespace Dive
             indexOffset,
             static_cast<uint32_t>(indices.size()));
 
+        loadBones(pAiMesh);
+
         if (m_pAiScene->HasMaterials())
         {
             auto pMaterial = parseMaterial(pAiMesh);
@@ -289,7 +279,7 @@ namespace Dive
 
         auto diffTexPath = //FileSystem::GetFileNameAndExtension(texturePath.C_Str());
             //texturePath.C_Str();
-            "../Assets/Models/pilot-avatar/textures/Material.002_Base_Color.png";
+            "Assets/Models/pilot-avatar/textures/Material.002_Base_Color.png";
         //diffTexPath = "Assets/Models/sponza-master/textures/" + diffTexPath;
 
         auto diffTex = ResourceCache::GetResourceByPath<Texture2D>(diffTexPath);
@@ -304,5 +294,15 @@ namespace Dive
         }
 
         return nullptr;
+    }
+
+    void ModelImporter::loadBones(aiMesh* pAiMesh)
+    {
+        for (uint32_t i = 0; i < pAiMesh->mNumBones; ++i)
+        {
+            std::string name = pAiMesh->mBones[i]->mName.C_Str();
+
+            DV_CORE_DEBUG("{0:s}'s bone: {1:s}", pAiMesh->mName.C_Str(), name);
+        }
     }
 }

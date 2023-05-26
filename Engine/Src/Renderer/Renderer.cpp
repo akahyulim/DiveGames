@@ -206,30 +206,30 @@ namespace Dive
 		// forward light
 		{
 			s_pForwardLightVertexShader = new ShaderVariation;
-			if (!s_pForwardLightVertexShader->CompileAndCreate(eShaderType::VertexShader, "../CoreData/Shaders/ForwardLightCommon.hlsl", eVertexType::Model))
+			if (!s_pForwardLightVertexShader->CompileAndCreate(eShaderType::VertexShader, "Assets/CoreData/Shaders/ForwardLightCommon.hlsl", eVertexType::Model))
 				return false;
 			s_pDirectionalLightPixelShader = new ShaderVariation;
-			if (!s_pDirectionalLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "../CoreData/Shaders/DirectionalLight.hlsl"))
+			if (!s_pDirectionalLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "Assets/CoreData/Shaders/DirectionalLight.hlsl"))
 				return false;
 			s_pPointLightPixelShader = new ShaderVariation;
-			if (!s_pPointLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "../CoreData/Shaders/PointLight.hlsl"))
+			if (!s_pPointLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "Assets/CoreData/Shaders/PointLight.hlsl"))
 				return false;
 		}
 
 		// Deferred Shading
 		{
 			s_pDeferredShadingVertexShader = new ShaderVariation;
-			if (!s_pDeferredShadingVertexShader->CompileAndCreate(eShaderType::VertexShader, "../CoreData/Shaders/Deferred.hlsl", eVertexType::Model))
+			if (!s_pDeferredShadingVertexShader->CompileAndCreate(eShaderType::VertexShader, "Assets/CoreData/Shaders/Deferred.hlsl", eVertexType::Model))
 				return false;
 			s_pDeferredShadingPixelShader = new ShaderVariation;
-			if (!s_pDeferredShadingPixelShader->CompileAndCreate(eShaderType::PixelShader, "../CoreData/Shaders/Deferred.hlsl"))
+			if (!s_pDeferredShadingPixelShader->CompileAndCreate(eShaderType::PixelShader, "Assets/CoreData/Shaders/Deferred.hlsl"))
 				return false;
 
 			s_pDeferredDirLightVertexShader = new ShaderVariation;
-			if (!s_pDeferredDirLightVertexShader->CompileAndCreate(eShaderType::VertexShader, "../CoreData/Shaders/DeferredDirLight.hlsl"))
+			if (!s_pDeferredDirLightVertexShader->CompileAndCreate(eShaderType::VertexShader, "Assets/CoreData/Shaders/DeferredDirLight.hlsl"))
 				return false;
 			s_pDeferredDirLightPixelShader = new ShaderVariation;
-			if (!s_pDeferredDirLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "../CoreData/Shaders/DeferredDirLight.hlsl"))
+			if (!s_pDeferredDirLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "Assets/CoreData/Shaders/DeferredDirLight.hlsl"))
 				return false;
 		}
 
