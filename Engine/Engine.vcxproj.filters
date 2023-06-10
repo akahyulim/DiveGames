@@ -108,7 +108,7 @@
     <ClInclude Include="Src\Scene\Components\Transform.h">
       <Filter>Src\Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Resource\Importer\ModelImporter.h">
+    <ClInclude Include="Src\Resource\Importer\AssetImporter.h">
       <Filter>Src\Resource\Importer</Filter>
     </ClInclude>
     <ClInclude Include="Src\IO\FileSystem.h">
@@ -158,6 +158,9 @@
     </ClInclude>
     <ClInclude Include="Src\IO\ConvertYAML.h">
       <Filter>Src\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\MeshRenderer.h">
+      <Filter>Src\Scene\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -224,7 +227,7 @@
     <ClCompile Include="Src\Scene\Components\Transform.cpp">
       <Filter>Src\Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Resource\Importer\ModelImporter.cpp">
+    <ClCompile Include="Src\Resource\Importer\AssetImporter.cpp">
       <Filter>Src\Resource\Importer</Filter>
     </ClCompile>
     <ClCompile Include="Src\IO\FileSystem.cpp">
@@ -271,6 +274,9 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\SkinnedMesh.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\MeshRenderer.cpp">
+      <Filter>Src\Scene\Components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

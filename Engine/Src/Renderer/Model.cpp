@@ -7,7 +7,7 @@
 #include "Scene/GameObject.h"
 #include "Scene/Components/Transform.h"
 #include "Resource/ResourceCache.h"
-#include "Resource/Importer/ModelImporter.h"
+#include "Resource/Importer/AssetImporter.h"
 #include "IO/FileSystem.h"
 #include "IO/Log.h"
 

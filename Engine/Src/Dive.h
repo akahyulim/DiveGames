@@ -42,7 +42,7 @@
 #include "Scene/Components/Light.h"
 
 // Resource
-#include "Resource/Importer/ModelImporter.h"
+#include "Resource/Importer/AssetImporter.h"
 #include "Resource/Resource.h"
 #include "Resource/ResourceCache.h"
 #include "Resource/Image.h"

@@ -2,6 +2,8 @@
 #include "Material.h"
 #include "Graphics/Texture2D.h"
 #include "Resource/ResourceCache.h"
+#include "IO/FileStream.h"
+#include "IO/ConvertYAML.h"
 #include "IO/Log.h"
 
 namespace Dive
@@ -17,7 +19,25 @@ namespace Dive
 
 	bool Material::LoadFromFile(const std::string& filePath)
 	{
-		DV_CORE_DEBUG("Material LoadFromFile: {:s}", filePath);
+        auto nodes = YAML::LoadAllFromFile(filePath);
+        if (nodes.empty())
+        {
+            DV_CORE_WARN("{:s}가 존재하지 않습니다.", filePath);
+            return false;
+        }
+
+        for (auto node : nodes)
+        {
+            if (node["Material"])
+            {
+                auto mat = node["Material"];
+                auto diffMap = mat["DiffuseMap"].as<std::string>();
+                auto diffColor = mat["DiffColor"].as<DirectX::XMFLOAT4>();
+
+                AddTexture(eTextureUnit::Diffuse, diffMap);
+                SetColorAlbedo(diffColor);
+            }
+        }
 		
 		return true;
 	}
@@ -56,7 +76,7 @@ namespace Dive
         if (unit < eTextureUnit::Max_Num)
         {
             // 원래는 타입에 맞춰서 시도해야 한다.
-            Texture2D* pTexture = ResourceCache::GetResourceByName<Texture2D>(name);
+            Texture2D* pTexture = ResourceCache::GetResourceByPath<Texture2D>(name);    // 원래 ByName으로 했는데, 캐시에서 찾는거라 적용이 안될 수 있었다.
             SetTexture(unit, dynamic_cast<Texture*>(pTexture));
         }
     }

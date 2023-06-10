@@ -12,7 +12,7 @@ namespace Dive
 	{
 	}
 	
-	void SkinnedMesh::AppendVertices(const std::vector<VertexDynamic>& vertices, uint32_t* pOffset)
+	void SkinnedMesh::AppendVertices(const std::vector<VertexSkinned>& vertices, uint32_t* pOffset)
 	{
 		if (pOffset)
 			*pOffset = static_cast<uint32_t>(vertices.size());

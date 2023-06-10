@@ -10,6 +10,13 @@ namespace Dive
 	class IndexBuffer;
 	class GameObject;
 	class IMesh;
+	
+	// 디버그 렌더링을 위해 class로 만들어 Draw를 추가할 수 있다.
+	struct BoneInfo
+	{
+		int32_t id;
+		DirectX::XMFLOAT4X4 offsetMatrix;
+	};
 
 	class Model : public Resource
 	{
@@ -37,6 +44,8 @@ namespace Dive
 
 		//============================================================================================
 
+		std::unordered_map<std::string, BoneInfo>& GetBoneInfoMap() { return m_BoneInfoMap; }
+
 		bool CreateBuffers();
 		VertexBuffer* GetVertexBuffer() { return m_pVertexBuffer; }
 		IndexBuffer* GetIndexBuffer() { return m_pIndexBuffer; }
@@ -53,6 +62,8 @@ namespace Dive
 		std::vector<VertexStatic> m_Vertices;
 		std::vector<uint32_t> m_Indices;
 		std::vector<IMesh*> m_Meshes;		// urho는 lod까지 적용해서 vector가 둘이다.
+
+		std::unordered_map<std::string, BoneInfo> m_BoneInfoMap;
 
 		// 특정 상황에서 버퍼가 둘 이상으로 나누어질 수 있다.
 		VertexBuffer* m_pVertexBuffer;

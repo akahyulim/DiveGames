@@ -233,21 +233,6 @@ namespace Dive
 						Graphics::GetDeviceContext()->RSSetViewports(1, &viewport);
 					}
 
-					if (pDrawable->HasMaterial())
-					{
-						auto pMaterial = pDrawable->GetMaterial();
-						Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
-
-						// material pixel shader buffer
-						{
-							auto pBuffer = Renderer::GetMaterialPixelShaderBuffer();
-							auto pMappedData = static_cast<MaterialPixelShaderBuffer*>(pBuffer->Map());
-							pMappedData->diffColor = pMaterial->GetColorAlbedo();
-							pBuffer->Unmap();
-							Graphics::SetConstantBuffer(2, eShaderType::PixelShader, pBuffer);
-						}
-					}
-
 					// camera vertex shader buffer
 					{
 						auto pBuffer = Renderer::GetCameraVertexShaderBuffer();
@@ -258,26 +243,44 @@ namespace Dive
 						Graphics::SetConstantBuffer(0, eShaderType::VertexShader, pBuffer);
 					}
 
-					// model vertex shader buffer
+					// MeshRenderer에서 처리할 수 있는 사항들
 					{
-						auto pBuffer = Renderer::GetModelVertexShaderBuffer();
-						auto pMappedData = static_cast<ModelVertexShaderBuffer*>(pBuffer->Map());
-						pMappedData->worldMatrix = DirectX::XMMatrixTranspose(pDrawable->GetGameObject()->GetTransform()->GetMatrix());
-						pBuffer->Unmap();
-						Graphics::SetConstantBuffer(1, eShaderType::VertexShader, pBuffer);
+						if (pDrawable->HasMaterial())
+						{
+							auto pMaterial = pDrawable->GetMaterial();
+							Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
+
+							// material pixel shader buffer
+							{
+								auto pBuffer = Renderer::GetMaterialPixelShaderBuffer();
+								auto pMappedData = static_cast<MaterialPixelShaderBuffer*>(pBuffer->Map());
+								pMappedData->diffColor = pMaterial->GetColorAlbedo();
+								pBuffer->Unmap();
+								Graphics::SetConstantBuffer(2, eShaderType::PixelShader, pBuffer);
+							}
+						}
+
+						// model vertex shader buffer
+						{
+							auto pBuffer = Renderer::GetModelVertexShaderBuffer();
+							auto pMappedData = static_cast<ModelVertexShaderBuffer*>(pBuffer->Map());
+							pMappedData->worldMatrix = DirectX::XMMatrixTranspose(pDrawable->GetGameObject()->GetTransform()->GetMatrix());
+							pBuffer->Unmap();
+							Graphics::SetConstantBuffer(1, eShaderType::VertexShader, pBuffer);
+						}
+
+						Graphics::SetVertexBuffer(pDrawable->GetModel()->GetVertexBuffer());
+						Graphics::SetIndexBuffer(pDrawable->GetModel()->GetIndexBuffer());
+
+						Graphics::SetShaderVariation(eShaderType::VertexShader, Renderer::GetDeferredShadingVertexShaderVariation());
+						Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetDeferredShadingPixelShaderVariation());
+
+						Graphics::DrawIndexed(
+							D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+							pDrawable->GetMeshIndexCount(),
+							pDrawable->GetMeshIndexOffset(),
+							pDrawable->GetMeshVertexOffset());
 					}
-
-					Graphics::SetVertexBuffer(pDrawable->GetModel()->GetVertexBuffer());
-					Graphics::SetIndexBuffer(pDrawable->GetModel()->GetIndexBuffer());
-
-					Graphics::SetShaderVariation(eShaderType::VertexShader, Renderer::GetDeferredShadingVertexShaderVariation());
-					Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetDeferredShadingPixelShaderVariation());
-
-					Graphics::DrawIndexed(
-						D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-						pDrawable->GetMeshIndexCount(),
-						pDrawable->GetMeshIndexOffset(),
-						pDrawable->GetMeshVertexOffset());
 				}
 			}
 			

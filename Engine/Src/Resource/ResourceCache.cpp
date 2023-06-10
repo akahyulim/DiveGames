@@ -1,6 +1,6 @@
 #include "DivePch.h"
 #include "ResourceCache.h"
-#include "Importer/ModelImporter.h"
+#include "Importer/AssetImporter.h"
 
 namespace Dive
 {
@@ -10,11 +10,11 @@ namespace Dive
 	uint64_t ResourceCache::m_CurResourceID = FIRST_ID;
 	std::unordered_map<uint64_t, Resource*> ResourceCache::m_Resources;
 
-	static ModelImporter* s_pModelImporter = nullptr;
+	static AssetImporter* s_pModelImporter = nullptr;
 
 	bool ResourceCache::Initialize()
 	{
-		s_pModelImporter = new ModelImporter;
+		s_pModelImporter = new AssetImporter;
 		DV_ASSERT(s_pModelImporter);
 
 		DV_CORE_TRACE("ResourceCache 초기화에 성공하였습니다.");
@@ -54,7 +54,7 @@ namespace Dive
 		return false;
 	}
 
-	ModelImporter* ResourceCache::GetModelImporter()
+	AssetImporter* ResourceCache::GetModelImporter()
 	{
 		return s_pModelImporter;
 	}

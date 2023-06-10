@@ -17,4 +17,7 @@ private:
 
 private:
 	Dive::Camera* m_pMainCamera;
+
+	Dive::Model* m_pPilot;
+	Dive::Model* m_pStormTrooper;
 };

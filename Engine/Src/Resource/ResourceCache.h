@@ -6,7 +6,7 @@
 
 namespace Dive
 {
-	class ModelImporter;
+	class AssetImporter;
 
 	class ResourceCache
 	{
@@ -169,7 +169,7 @@ namespace Dive
 			return LoadFromFile<T>(filePath);
 		}
 
-		static ModelImporter* GetModelImporter();
+		static AssetImporter* GetModelImporter();
 
 	private:
 		static uint64_t getFreeID();

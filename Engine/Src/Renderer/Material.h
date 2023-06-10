@@ -6,6 +6,8 @@ namespace Dive
 {
 	class Texture;
 
+	// 유니티는 Material에서 Shader를 선택할 수 있으며,
+	// 기본적으로 Standard(pbs 포함)와 Legacy 두 빌트인 셰이더를 제공한다.
 	class Material : public Resource
 	{
 	public:

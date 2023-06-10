@@ -23,9 +23,9 @@ void Sandbox::Start()
 	{
 		Dive::View* pView = new Dive::View;
 		pView->SetName("MainView");
-		pView->SetRenderPath(Dive::eRenderPath::Forward);
-		//pView->SetRenderPath(Dive::eRenderPath::Deferred);
-		
+		//pView->SetRenderPath(Dive::eRenderPath::Forward);
+		pView->SetRenderPath(Dive::eRenderPath::Deferred);
+
 		m_pMainCamera = Dive::Scene::CreateGameObject("MainCamera")->AddComponent<Dive::Camera>();
 		m_pMainCamera->GetGameObject()->GetComponent<Dive::Transform>()->SetPosition(0.0f, 10.0f, -20.0f);
 		pView->SetCamera(m_pMainCamera);
@@ -34,15 +34,43 @@ void Sandbox::Start()
 
 		// Objects
 		{
-			auto* pModel = //Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/dancing-stormtrooper/source/silly_dancing.fbx");
-				//Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/sponza-master/sponza.obj");
-				Dive::ResourceCache::GetResourceByPath<Dive::Model>("Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
-			Dive::GameObject* pModelObject = pModel->GetRootGameObject();
-			pModelObject->GetTransform()->SetScale(0.01f, 0.01f, 0.01f);
+			{
+				m_pPilot = Dive::ResourceCache::GetResourceByPath<Dive::Model>("Assets/Models/pilot/Pilot_LP_Animated.fbx");
+				auto* pTransform = m_pPilot->GetRootGameObject()->GetTransform();
+				pTransform->SetPosition(5.0f, 0.0f, 0.0f);
+				pTransform->SetScale(0.01f, 0.01f, 0.01f);
 
-			pModel->SaveToFile("noname.mdl");
+				for (auto* pChild : pTransform->GetChildren())
+				{
+					auto* pDrawable = pChild->GetGameObject()->GetComponent<Dive::Drawable>();
+					if (pDrawable)
+					{
+						pDrawable->SetMaterial("Assets/Materials/Pilot/pilot.yaml");
+						break;
+					}
+				}
+			}
+
+			{
+				m_pStormTrooper = Dive::ResourceCache::LoadFromFile<Dive::Model>("Assets/Models/stormtrooper/silly_dancing.fbx");
+				auto* pTransform = m_pStormTrooper->GetRootGameObject()->GetTransform();
+				pTransform->SetPosition(-5.0f, 0.0f, 0.0f);
+				pTransform->SetScale(5.0f, 5.0f, 5.0f);
+
+				for (auto* pChild : pTransform->GetChildren())
+				{
+					auto* pDrawable = pChild->GetGameObject()->GetComponent<Dive::Drawable>();
+					if (pDrawable)
+					{
+						pDrawable->SetMaterial("Assets/Materials/StormTrooper/StormTrooper.yaml");
+						break;
+					}
+				}
+			}
 		}
 
+		// 현재 광원 적용이 이상하다.
+		// DeferredPoint를 안만든 듯 하다.
 		// Lights
 		{	
 			auto pDirLight = Dive::Scene::CreateGameObject("Directional Light")->AddComponent<Dive::Light>();
@@ -50,23 +78,25 @@ void Sandbox::Start()
 			pDirLight->SetColor(1.f, 1.0f, 1.0f);
 			pDirLight->SetDir(1.0f, -1.0f, 1.0f);
 			
+			/*
 			auto pPointLightRed = Dive::Scene::CreateGameObject("Point Light Red")->AddComponent<Dive::Light>();
 			pPointLightRed->SetType(Dive::eLightType::Point);
 			pPointLightRed->SetColor(1.0f, 0.0f, 0.0f);
-			pPointLightRed->SetRange(50.0f);
-			pPointLightRed->GetGameObject()->GetTransform()->SetPosition(0.0f, 10.0f, -10.0f);
+			pPointLightRed->SetRange(10.0f);
+			pPointLightRed->GetGameObject()->GetTransform()->SetPosition(0.0f, 10.0f, 0.0f);
 			
 			auto pPointLightGreen = Dive::Scene::CreateGameObject("Point Light Green")->AddComponent<Dive::Light>();
 			pPointLightGreen->SetType(Dive::eLightType::Point);
 			pPointLightGreen->SetColor(0.0f, 1.0f, 0.0f);
-			pPointLightGreen->SetRange(50.0f);
-			pPointLightGreen->GetGameObject()->GetTransform()->SetPosition(-10.0f, 10.0f, 0.0f);
+			pPointLightGreen->SetRange(10.0f);
+			pPointLightGreen->GetGameObject()->GetTransform()->SetPosition(-5.0f, 5.0f, 0.0f);
 
 			auto pPointLightBlue = Dive::Scene::CreateGameObject("Point Light Blue")->AddComponent<Dive::Light>();
 			pPointLightBlue->SetType(Dive::eLightType::Point);
 			pPointLightBlue->SetColor(0.0f, 0.0f, 1.0f);
-			pPointLightBlue->SetRange(50.0f);
-			pPointLightBlue->GetGameObject()->GetTransform()->SetPosition(10.0f, 10.0f, 0.0f);
+			pPointLightBlue->SetRange(10.0f);
+			pPointLightBlue->GetGameObject()->GetTransform()->SetPosition(5.0f, 0.0f, 0.0f);
+			*/
 		}
 	}
 
@@ -134,7 +164,7 @@ void Sandbox::OnUpdate(const Dive::Event& evnt)
 	}
 
 	{
-		auto* pModel = Dive::ResourceCache::GetResourceByPath<Dive::Model>("Assets/Models/pilot-avatar/source/Pilot_LP_Animated.fbx");
-		pModel->GetRootGameObject()->GetTransform()->Rotate(0.0f, 1.0f, 0.0f);
+		m_pStormTrooper->GetRootGameObject()->GetTransform()->Rotate(0.0f, 1.0f, 0.0f);
+		m_pPilot->GetRootGameObject()->GetTransform()->Rotate(0.0f, 1.0f, 0.0f);
 	}
 }

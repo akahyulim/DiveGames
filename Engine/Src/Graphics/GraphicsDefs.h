@@ -84,10 +84,10 @@ namespace Dive
 		float tangent[3] = { 0.0f, };
 	};
 
-	struct VertexDynamic
+	struct VertexSkinned
 	{
-		VertexDynamic() = default;
-		VertexDynamic(
+		VertexSkinned() = default;
+		VertexSkinned(
 			const DirectX::XMFLOAT3& pos,
 			const DirectX::XMFLOAT2& tex,
 			const DirectX::XMFLOAT3& normal,

@@ -21,10 +21,9 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{1c48907d-25b4-4337-827c-46ad2c1361b3}</ProjectGuid>
-    <RootNamespace>DiveEngine</RootNamespace>
+    <ProjectGuid>{661b6f74-61da-4d04-840d-e0fe5b6a19cf}</ProjectGuid>
+    <RootNamespace>AssetExporter</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>Engine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -41,7 +40,7 @@
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -79,8 +78,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(ProjectName)_d</TargetName>
     <OutDir>$(SolutionDir)\bin\</OutDir>
+    <TargetName>$(ProjectName)_d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -117,22 +116,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;__DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>DivePch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>Src;$(SolutionDir)\External\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\External\include;$(SolutionDir)\Engine/Src;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
-    <Lib>
-      <AdditionalLibraryDirectories>$(SolutionDir)\External\libs;</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc141-mtd.lib;DirectXTex_D.lib;yaml-cpp_d.lib;</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -151,91 +144,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Core\Application.h" />
-    <ClInclude Include="Src\Core\CoreDefs.h" />
-    <ClInclude Include="Src\Core\CoreEvents.h" />
-    <ClInclude Include="Src\Core\Engine.h" />
-    <ClInclude Include="Src\Core\EventHandler.h" />
-    <ClInclude Include="Src\Core\Object.h" />
-    <ClInclude Include="Src\Core\ProcessUtils.h" />
-    <ClInclude Include="Src\Dive.h" />
-    <ClInclude Include="Src\DivePch.h" />
-    <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
-    <ClInclude Include="Src\Graphics\GBuffer.h" />
-    <ClInclude Include="Src\Graphics\Graphics.h" />
-    <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
-    <ClInclude Include="Src\Graphics\IndexBuffer.h" />
-    <ClInclude Include="Src\Graphics\InputLayout.h" />
-    <ClInclude Include="Src\Graphics\RenderTexture.h" />
-    <ClInclude Include="Src\Graphics\ShaderVariation.h" />
-    <ClInclude Include="Src\Graphics\Texture.h" />
-    <ClInclude Include="Src\Graphics\Texture2D.h" />
-    <ClInclude Include="Src\Graphics\VertexBuffer.h" />
-    <ClInclude Include="Src\Input\Input.h" />
-    <ClInclude Include="Src\IO\ConvertYAML.h" />
-    <ClInclude Include="Src\IO\FileStream.h" />
-    <ClInclude Include="Src\IO\FileSystem.h" />
-    <ClInclude Include="Src\IO\Log.h" />
-    <ClInclude Include="Src\Renderer\Material.h" />
-    <ClInclude Include="Src\Renderer\Mesh.h" />
-    <ClInclude Include="Src\Renderer\Model.h" />
-    <ClInclude Include="Src\Renderer\Renderer.h" />
-    <ClInclude Include="Src\Renderer\SkinnedMesh.h" />
-    <ClInclude Include="Src\Renderer\View.h" />
-    <ClInclude Include="Src\Resource\Image.h" />
-    <ClInclude Include="Src\Resource\Importer\AssetImporter.h" />
-    <ClInclude Include="Src\Resource\Resource.h" />
-    <ClInclude Include="Src\Resource\ResourceCache.h" />
-    <ClInclude Include="Src\Scene\Components\Camera.h" />
-    <ClInclude Include="Src\Scene\Components\Component.h" />
-    <ClInclude Include="Src\Scene\Components\Drawable.h" />
-    <ClInclude Include="Src\Scene\Components\Light.h" />
-    <ClInclude Include="Src\Scene\Components\MeshRenderer.h" />
-    <ClInclude Include="Src\Scene\Components\Transform.h" />
-    <ClInclude Include="Src\Scene\GameObject.h" />
-    <ClInclude Include="Src\Scene\Scene.h" />
+    <ProjectReference Include="..\Engine\Engine.vcxproj">
+      <Project>{1c48907d-25b4-4337-827c-46ad2c1361b3}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Core\Application.cpp" />
-    <ClCompile Include="Src\Core\Engine.cpp" />
-    <ClCompile Include="Src\Core\EventHandler.cpp" />
-    <ClCompile Include="Src\Core\Object.cpp" />
-    <ClCompile Include="Src\Core\ProcessUtils.cpp" />
-    <ClCompile Include="Src\DivePch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="Src\Graphics\ConstantBuffer.cpp" />
-    <ClCompile Include="Src\Graphics\GBuffer.cpp" />
-    <ClCompile Include="Src\Graphics\Graphics.cpp" />
-    <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
-    <ClCompile Include="Src\Graphics\InputLayout.cpp" />
-    <ClCompile Include="Src\Graphics\RenderTexture.cpp" />
-    <ClCompile Include="Src\Graphics\ShaderVariation.cpp" />
-    <ClCompile Include="Src\Graphics\Texture.cpp" />
-    <ClCompile Include="Src\Graphics\Texture2D.cpp" />
-    <ClCompile Include="Src\Graphics\VertexBuffer.cpp" />
-    <ClCompile Include="Src\Input\Input.cpp" />
-    <ClCompile Include="Src\IO\FileStream.cpp" />
-    <ClCompile Include="Src\IO\FileSystem.cpp" />
-    <ClCompile Include="Src\IO\Log.cpp" />
-    <ClCompile Include="Src\Renderer\Material.cpp" />
-    <ClCompile Include="Src\Renderer\Mesh.cpp" />
-    <ClCompile Include="Src\Renderer\Model.cpp" />
-    <ClCompile Include="Src\Renderer\Renderer.cpp" />
-    <ClCompile Include="Src\Renderer\SkinnedMesh.cpp" />
-    <ClCompile Include="Src\Renderer\View.cpp" />
-    <ClCompile Include="Src\Resource\Image.cpp" />
-    <ClCompile Include="Src\Resource\Importer\AssetImporter.cpp" />
-    <ClCompile Include="Src\Resource\Resource.cpp" />
-    <ClCompile Include="Src\Resource\ResourceCache.cpp" />
-    <ClCompile Include="Src\Scene\Components\Camera.cpp" />
-    <ClCompile Include="Src\Scene\Components\Component.cpp" />
-    <ClCompile Include="Src\Scene\Components\Drawable.cpp" />
-    <ClCompile Include="Src\Scene\Components\Light.cpp" />
-    <ClCompile Include="Src\Scene\Components\MeshRenderer.cpp" />
-    <ClCompile Include="Src\Scene\Components\Transform.cpp" />
-    <ClCompile Include="Src\Scene\GameObject.cpp" />
-    <ClCompile Include="Src\Scene\Scene.cpp" />
+    <ClCompile Include="Src\Animation.cpp" />
+    <ClCompile Include="Src\Animator.cpp" />
+    <ClCompile Include="Src\Bone.cpp" />
+    <ClCompile Include="Src\main.cpp" />
+    <ClCompile Include="Src\Mesh.cpp" />
+    <ClCompile Include="Src\Model.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Src\Animation.h" />
+    <ClInclude Include="Src\Animator.h" />
+    <ClInclude Include="Src\AssimpHelpers.h" />
+    <ClInclude Include="Src\Bone.h" />
+    <ClInclude Include="Src\Mesh.h" />
+    <ClInclude Include="Src\Model.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
