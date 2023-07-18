@@ -43,6 +43,7 @@ namespace Dive
 		PosCol,
 		PosTex,
 		Model,
+		Skinned,
 	};
 
 	enum class eConstantBufferIndex
@@ -57,17 +58,17 @@ namespace Dive
 	{
 		VertexStatic() = default;
 		VertexStatic(
-			const DirectX::XMFLOAT3& pos,
-			const DirectX::XMFLOAT2& tex,
+			const DirectX::XMFLOAT3& position,
+			const DirectX::XMFLOAT2& texCoords,
 			const DirectX::XMFLOAT3& normal,
 			const DirectX::XMFLOAT3& tangent)
 		{
-			this->pos[0] = pos.x;
-			this->pos[1] = pos.y;
-			this->pos[2] = pos.z;
+			this->position[0] = position.x;
+			this->position[1] = position.y;
+			this->position[2] = position.z;
 
-			this->tex[0] = tex.x;
-			this->tex[1] = tex.y;
+			this->texCoords[0] = texCoords.x;
+			this->texCoords[1] = texCoords.y;
 
 			this->normal[0] = normal.x;
 			this->normal[1] = normal.y;
@@ -78,8 +79,8 @@ namespace Dive
 			this->tangent[2] = tangent.z;
 		}
 
-		float pos[3] = { 0.0f, };
-		float tex[2] = { 0.0f, };
+		float position[3] = { 0.0f, };
+		float texCoords[2] = { 0.0f, };
 		float normal[3] = { 0.0f, };
 		float tangent[3] = { 0.0f, };
 	};
@@ -88,19 +89,19 @@ namespace Dive
 	{
 		VertexSkinned() = default;
 		VertexSkinned(
-			const DirectX::XMFLOAT3& pos,
-			const DirectX::XMFLOAT2& tex,
+			const DirectX::XMFLOAT3& position,
+			const DirectX::XMFLOAT2& texCoords,
 			const DirectX::XMFLOAT3& normal,
 			const DirectX::XMFLOAT3& tangent,
-			const DirectX::XMFLOAT4& boneIdx,
+			const DirectX::XMINT4& boneIDs,
 			const DirectX::XMFLOAT4& weights)
 		{
-			this->pos[0] = pos.x;
-			this->pos[1] = pos.y;
-			this->pos[2] = pos.z;
+			this->position[0] = position.x;
+			this->position[1] = position.y;
+			this->position[2] = position.z;
 
-			this->tex[0] = tex.x;
-			this->tex[1] = tex.y;
+			this->texCoords[0] = texCoords.x;
+			this->texCoords[1] = texCoords.y;
 
 			this->normal[0] = normal.x;
 			this->normal[1] = normal.y;
@@ -110,10 +111,10 @@ namespace Dive
 			this->tangent[1] = tangent.y;
 			this->tangent[2] = tangent.z;
 
-			this->boneIndexes[0] = boneIdx.x;
-			this->boneIndexes[1] = boneIdx.y;
-			this->boneIndexes[2] = boneIdx.z;
-			this->boneIndexes[3] = boneIdx.w;
+			this->boneIDs[0] = boneIDs.x;
+			this->boneIDs[1] = boneIDs.y;
+			this->boneIDs[2] = boneIDs.z;
+			this->boneIDs[3] = boneIDs.w;
 
 			this->weights[0] = weights.x;
 			this->weights[1] = weights.y;
@@ -121,12 +122,18 @@ namespace Dive
 			this->weights[3] = weights.w;
 		}
 
-		float pos[3] = { 0.0f, };
-		float tex[2] = { 0.0f, };
-		float normal[3] = { 0.0f, };
-		float tangent[3] = { 0.0f, };
-		float boneIndexes[4] = { 0.0f, };
-		float weights[4] = { 0.0f, };
+		float position[3] = { 0.0f, 0.0f, 0.0f };
+		float texCoords[2] = { 0.0f, 0.0f };
+		float normal[3] = { 0.0f, 0.0f, 0.0f };
+		float tangent[3] = { 0.0f, 0.0f, 0.0f };
+		int boneIDs[4] = { -1, -1, -1, -1 };
+		float weights[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	};
+
+	struct BoneInfo
+	{
+		int id;
+		DirectX::XMFLOAT4X4 offsetTransform;
 	};
 
 	inline constexpr uint32_t MAX_RENDERTARGETS = 4;

@@ -1,129 +1,166 @@
 #include "DivePch.h"
 #include "Model.h"
-#include "Mesh.h"
-#include "Material.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/IndexBuffer.h"
-#include "Scene/GameObject.h"
-#include "Scene/Components/Transform.h"
-#include "Resource/ResourceCache.h"
-#include "Resource/Importer/AssetImporter.h"
-#include "IO/FileSystem.h"
+#include "Core/CoreDefs.h"
 #include "IO/Log.h"
 
-#include <yaml-cpp/yaml.h>
+#include "Scene/Scene.h"
+//#include "Scene/GameObject.h"
+//#include "Scene/Components/Transform.h"
+#include "Scene/Components/MeshRenderer.h"
+#include "Scene/Components/SkinnedMeshRenderer.h"
 
 namespace Dive
 {
 	Model::Model()
 		: Resource(eResourceType::Model),
-		m_pRootGameObject(nullptr),
-		m_pVertexBuffer(nullptr),
-		m_pIndexBuffer(nullptr)
+		m_pRootGameObject(nullptr)
 	{
+		//m_pRootGameObject = Scene::CreateGameObject();
 	}
 
 	Model::~Model()
 	{
-		Clear();
-		DV_CORE_TRACE("Model 소멸자 호출 - {:s}", GetName());
+		// GameObject는 다음번 Update에서 정리되지만
+		Scene::RemoveGameObject(m_pRootGameObject);
+
+		// Mesh와 Buffer는 즉시 삭제된다.
+		// 하지만 View에선 이 사실을 알 수 없으므로 접근 오류가 발생하는 것이다.
+		{
+			auto it = m_StaticMeshes.begin();
+			for (it; it != m_StaticMeshes.end(); ++it)
+			{
+				DV_DELETE(it->second);
+			}
+			m_StaticMeshes.clear();
+		}
+
+		{
+			auto it = m_SkinnedMeshes.begin();
+			for (it; it != m_SkinnedMeshes.end(); ++it)
+			{
+				DV_DELETE(it->second);
+			}
+			m_SkinnedMeshes.clear();
+		}
 	}
 
 	bool Model::LoadFromFile(const std::string& filePath)
 	{
-		if (!FileSystem::FileExists(filePath))
-		{
-			DV_CORE_ERROR("파일({:s})(이)가 존재하지 않습니다.", filePath);
-			return false;
-		}
-
-		if (!ResourceCache::GetModelImporter()->Load(this, filePath))
-			return false;
-
-		m_FilePath = filePath;
-
-		return true;
+		return false;
 	}
-	
+
 	bool Model::SaveToFile(const std::string& filePath)
 	{
-		if (!m_pRootGameObject)
-		{
-			DV_CORE_ERROR("Root GameObject가 존재하지 않아 파일 저장에 실패하였습니다.");
-			return false;
-		}
-
-		YAML::Emitter out;
-		out << YAML::BeginMap;
-		out << YAML::Key << "type" << YAML::Value << "model";
-		out << YAML::EndMap;
-
-		// 실제로는 생성된 파일의 스트림을 전달
-		//m_pRootGameObject->SaveToFile(filePath);
-		m_pRootGameObject->SaveToYAML(out);
-
-		// 직접 mesh 정보 저장?
-		// urho의 경우 model에서 저장했다.
-		for (IMesh* pMesh : m_Meshes)
-		{
-			// 할려면 구체 타입으로 변환한 뒤 구현을 나누어야 한다.
-		}
-
-		std::ofstream fout(filePath);
-		fout << out.c_str();
-
-		return true;
-	}
-
-	void Model::Clear()
-	{
-		DV_DELETE(m_pIndexBuffer);
-		DV_DELETE(m_pVertexBuffer);
-
-		//DV_DELETE(m_pMesh);
-
-		if (!m_Vertices.empty())
-		{
-			m_Vertices.clear();
-			m_Vertices.shrink_to_fit();
-		}
-
-		if (!m_Indices.empty())
-		{
-			m_Indices.clear();
-			m_Indices.shrink_to_fit();
-		}
+		return false;
 	}
 	
-	void Model::AddVertices(std::vector<VertexStatic>& vertices, uint32_t* pOffset)
+	DvStaticMesh* Model::InsertStaticMesh(DvStaticMesh* pMesh)
 	{
-		if (pOffset)
-			*pOffset = static_cast<uint32_t>(m_Vertices.size());
+		const std::string& name = pMesh->GetName();
+		if (m_StaticMeshes.find(name) != m_StaticMeshes.end())
+		{
+			DV_CORE_ERROR("Model::InsertStaticMesh: 이미 존재하는 Mesh({:s})는 추가할 수 없습니다.",name);
+			return nullptr;
+		}
 
-		m_Vertices.insert(m_Vertices.end(), vertices.begin(), vertices.end());
-	}
-	
-	void Model::AddIndices(std::vector<uint32_t>& indices, uint32_t* pOffset)
-	{
-		if (pOffset)
-			*pOffset = static_cast<uint32_t>(m_Indices.size());
+		m_StaticMeshes[name] = pMesh;
 
-		m_Indices.insert(m_Indices.end(), indices.begin(), indices.end());
+		return m_StaticMeshes[name];
 	}
 
-	bool Model::CreateBuffers()
+	SkinnedMesh* Model::InsertSkinnedMesh(SkinnedMesh* pMesh)
 	{
-		DV_ASSERT(!m_Vertices.empty());
-		DV_ASSERT(!m_Indices.empty());
+		const std::string& name = pMesh->GetName();
+		if (m_SkinnedMeshes.find(name) != m_SkinnedMeshes.end())
+		{
+			DV_CORE_ERROR("Model::InsertSkinnedMesh: 이미 존재하는 Mesh({:s})는 추가할 수 없습니다.", name);
+			return nullptr;
+		}
 
-		m_pVertexBuffer = new VertexBuffer;
-		if (!m_pVertexBuffer->Create<VertexStatic>(m_Vertices))
-			return false;
+		m_SkinnedMeshes[name] = pMesh;
 
-		m_pIndexBuffer = new IndexBuffer;
-		if (!m_pIndexBuffer->Create<uint32_t>(m_Indices))
-			return false;
+		return m_SkinnedMeshes[name];
+	}
 
-		return true;
+	void Model::BuildMeshBuffers()
+	{
+		if (m_StaticMeshes.empty() && m_SkinnedMeshes.empty())
+			return;
+
+		for (auto& mesh : m_StaticMeshes)
+		{
+			mesh.second->CreateVertexBuffer();
+			mesh.second->CreateIndexBuffer();
+		}
+
+		for (auto& mesh : m_SkinnedMeshes)
+		{
+			mesh.second->CreateVertexBuffer();
+			mesh.second->CreateIndexBuffer();
+		}
+	}
+
+	// BuildModelPrefab 등의 이름도 괜찮을듯...
+	void Model::Build()
+	{
+		BuildMeshBuffers();
+
+		// 하나의 모델에 동일한 타입의 메시가 둘 이상일 수 있나?
+		/*
+		m_pRootGameObject = Scene::CreateGameObject();
+		for (auto& mesh : m_StaticMeshes)
+		{
+			auto pMeshRenderer = m_pRootGameObject->AddComponent<MeshRenderer>();
+			pMeshRenderer->SetMesh(&mesh.second);
+		}
+		for (auto& mesh : m_SkinnedMeshes)
+		{
+			auto pMeshRenderer = m_pRootGameObject->AddComponent<SkinnedMeshRenderer>();
+			pMeshRenderer->SetMesh(&mesh.second);
+		}
+		*/
+
+		// 추후 이 부분은 Animation으로 넘기는 것이 나아보인다.
+		// 대신 Mesh들은 이 곳에서 위와 같이 직접 만드는 형식으로 해야할 듯 하다.
+		buildHierarchy(&m_RootNodeInfo, nullptr);
+	}
+
+	// 안쓰기로 했다.
+	void Model::buildHierarchy(NodeInfo* pNode, Transform* pParent)
+	{
+		std::string nodeName = pNode->name;
+		GameObject* pGameObject = Scene::CreateGameObject(nodeName);
+		
+		if (!pParent)
+		{
+			m_pRootGameObject = pGameObject;
+		}
+
+		Transform* pTransform = pGameObject->GetTransform();
+		pTransform->SetLocalMatrix(pNode->transform);
+		pTransform->SetParent(pParent);
+
+		for (auto it = m_StaticMeshes.begin(); it != m_StaticMeshes.end(); ++it)
+		{
+			if (it->second->GetNodeName() == nodeName)
+			{
+				DV_CORE_INFO("MeshRenderer를 {:s} GameObject에 추가", nodeName);
+				pGameObject->AddComponent<MeshRenderer>()->SetMesh(it->second);
+			}
+		}
+
+		for (auto it = m_SkinnedMeshes.begin(); it != m_SkinnedMeshes.end(); ++it)
+		{
+			if (it->second->GetNodeName() == nodeName)
+			{
+				DV_CORE_INFO("DvSkinnedRenderer를 {:s} GameObject에 추가", nodeName);
+				pGameObject->AddComponent<SkinnedMeshRenderer>()->SetMesh(it->second);
+			}
+		}
+
+		for (uint32_t i = 0; i < pNode->numChildren; ++i)
+		{
+			buildHierarchy(&pNode->children[i], pTransform);
+		}
 	}
 }

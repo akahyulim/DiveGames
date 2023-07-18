@@ -12,6 +12,15 @@ Model::~Model()
 
 }
 
+// 참고문서에서는 Shader를 전달받았다.
+void Model::Draw()
+{
+	for (Mesh& mesh : m_Meshes)
+	{
+		mesh.Draw();
+	}
+}
+
 void Model::loadModel(const std::string& filePath)
 {
 	Assimp::Importer importer;
@@ -26,6 +35,9 @@ void Model::loadModel(const std::string& filePath)
 	processNode(pScene->mRootNode, pScene);
 }
 
+// 루트노드부터 재귀적으로 호출하면서
+// mesh를 구성하고 저장한다.
+// 이 과정에서 mesh의 계층구조는 따로 관리하지 않고 있다.
 void Model::processNode(aiNode* pNode, const aiScene* pScene) 
 {
 	for (uint32_t i = 0; i < pNode->mNumMeshes; ++i)
@@ -90,6 +102,7 @@ void Model::extractBoneWeightForVertices(std::vector<VertexSkinned>& vertices, a
 {
 	for (uint32_t i = 0; i < pMesh->mNumBones; ++i)
 	{
+		// BoneInfoMap 구성: name을 key로, BoneInfo는 id와 offsetTransform으로 구성
 		int boneID = -1;
 		aiBone* pBone = pMesh->mBones[i];
 		std::string boneName = pBone->mName.C_Str();
@@ -106,6 +119,7 @@ void Model::extractBoneWeightForVertices(std::vector<VertexSkinned>& vertices, a
 			boneID = m_BoneInfoMap[boneName].id;
 		}
 
+		// 전달받은 vertices에 bone정보(id, weight) 저장
 		auto weights = pBone->mWeights;
 		int numWeights = pBone->mNumWeights;
 

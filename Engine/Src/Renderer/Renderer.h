@@ -22,6 +22,8 @@ namespace Dive
 	struct ModelVertexShaderBuffer
 	{
 		DirectX::XMMATRIX worldMatrix;
+
+		DirectX::XMMATRIX skinMatrix[100];
 	};
 
 	struct CameraPixelShaderBuffer
@@ -61,6 +63,10 @@ namespace Dive
 		static uint32_t GetViewCount();
 
 		// test
+		static ShaderVariation* GetBasicVertexShaderVariation();
+		static ShaderVariation* GetBasicPixelShaderVariation();
+		static ShaderVariation* GetBasicSkinnedVertexShaderVariation();
+		static ShaderVariation* GetBasicSkinnedPixelShaderVariation();
 		static ShaderVariation* GetForwardLightVertexShaderVariation();
 		static ShaderVariation* GetDirectionalLightPixelShaderVariation();
 		static ShaderVariation* GetPointLightPixelShaderVariation();

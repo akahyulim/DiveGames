@@ -10,12 +10,9 @@ namespace Dive
 	uint64_t ResourceCache::m_CurResourceID = FIRST_ID;
 	std::unordered_map<uint64_t, Resource*> ResourceCache::m_Resources;
 
-	static AssetImporter* s_pModelImporter = nullptr;
-
 	bool ResourceCache::Initialize()
 	{
-		s_pModelImporter = new AssetImporter;
-		DV_ASSERT(s_pModelImporter);
+		// AssetImporter 추가?
 
 		DV_CORE_TRACE("ResourceCache 초기화에 성공하였습니다.");
 
@@ -27,8 +24,6 @@ namespace Dive
 		for (auto& resource : m_Resources)
 			DV_DELETE(resource.second);
 		m_Resources.clear();
-
-		DV_DELETE(s_pModelImporter);
 
 		DV_CORE_TRACE("ResoruceCache 종료에 성공하였습니다.");
 	}
@@ -52,11 +47,6 @@ namespace Dive
 		}
 
 		return false;
-	}
-
-	AssetImporter* ResourceCache::GetModelImporter()
-	{
-		return s_pModelImporter;
 	}
 
 	uint64_t ResourceCache::getFreeID()

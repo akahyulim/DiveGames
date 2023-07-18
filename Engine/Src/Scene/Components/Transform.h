@@ -14,6 +14,7 @@ namespace Dive
 	class Transform : public Component
 	{
 	public:
+		Transform();
 		Transform(GameObject* pGameObject);
 		~Transform() override;
 

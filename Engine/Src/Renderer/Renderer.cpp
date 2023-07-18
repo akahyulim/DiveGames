@@ -16,6 +16,10 @@ namespace Dive
 	// 그리고 Drawable, Light 등이 각자 포인터를 가지는 거다.
 	// 문제는 어느 시점에 누가 생성을 하느냐 이다.
 	// urho는 Renderer와 Graphics 둘 다 관여했던 것 같다.
+	static ShaderVariation* s_pBasicVertexShader = nullptr;
+	static ShaderVariation* s_pBasicPixelShader = nullptr;
+	static ShaderVariation* s_pBasicSkinnedVertexShader = nullptr;
+	static ShaderVariation* s_pBasicSkinnedPixelShader = nullptr;
 	static ShaderVariation* s_pForwardLightVertexShader = nullptr;
 	static ShaderVariation* s_pDirectionalLightPixelShader = nullptr;
 	static ShaderVariation* s_pPointLightPixelShader = nullptr;
@@ -121,6 +125,26 @@ namespace Dive
 		return static_cast<uint32_t>(s_Views.size());
 	}
 
+	ShaderVariation* Renderer::GetBasicVertexShaderVariation()
+	{
+		return s_pBasicVertexShader;
+	}
+
+	ShaderVariation* Renderer::GetBasicPixelShaderVariation()
+	{
+		return s_pBasicPixelShader;
+	}
+
+	ShaderVariation* Renderer::GetBasicSkinnedVertexShaderVariation()
+	{
+		return s_pBasicSkinnedVertexShader;
+	}
+
+	ShaderVariation* Renderer::GetBasicSkinnedPixelShaderVariation()
+	{
+		return s_pBasicSkinnedPixelShader;
+	}
+
 	ShaderVariation* Renderer::GetForwardLightVertexShaderVariation()
 	{
 		return s_pForwardLightVertexShader;
@@ -201,8 +225,27 @@ namespace Dive
 		return s_pBlendState;
 	}
 
+	// 유니티의 경우 material에서 선택하는 shader는 legacy와 standard 두 가지로만 나뉜다.
+	// Light 및 post procssing은 어떻게 적용하는지 아직 모르겠다.
 	bool Renderer::createShaders()
 	{
+		// basic
+		{
+			s_pBasicVertexShader = new ShaderVariation;
+			if (!s_pBasicVertexShader->CompileAndCreate(eShaderType::VertexShader, "Assets/CoreData/Shaders/Basic.hlsl", eVertexType::Model))
+				return false;
+			s_pBasicPixelShader = new ShaderVariation;
+			if (!s_pBasicPixelShader->CompileAndCreate(eShaderType::PixelShader, "Assets/CoreData/Shaders/Basic.hlsl"))
+				return false;
+
+			s_pBasicSkinnedVertexShader = new ShaderVariation;
+			if (!s_pBasicSkinnedVertexShader->CompileAndCreate(eShaderType::VertexShader, "Assets/CoreData/Shaders/Basic_Skinned.hlsl", eVertexType::Skinned))
+				return false;
+			s_pBasicSkinnedPixelShader = new ShaderVariation;
+			if (!s_pBasicSkinnedPixelShader->CompileAndCreate(eShaderType::PixelShader, "Assets/CoreData/Shaders/Basic_Skinned.hlsl"))
+				return false;
+		}
+
 		// forward light
 		{
 			s_pForwardLightVertexShader = new ShaderVariation;

@@ -39,6 +39,9 @@ namespace Dive
             }
         }
 		
+        SetFilePath(filePath);
+        SetName(FileSystem::GetFileName(filePath));
+
 		return true;
 	}
 

@@ -1,6 +1,5 @@
 #include "DivePch.h"
 #include "View.h"
-#include "Model.h"
 #include "Material.h"
 #include "Renderer.h"
 #include "Core/CoreDefs.h"
@@ -13,9 +12,11 @@
 #include "Scene/GameObject.h"
 #include "Scene/Components/Transform.h"
 #include "Scene/Components/Camera.h"
-#include "Scene/Components/Drawable.h"
 #include "Scene/Components/Light.h"
 #include "IO/Log.h"
+
+#include "Scene/Components/MeshRenderer.h"
+#include "Scene/Components/SkinnedMeshRenderer.h"
 
 namespace Dive
 {
@@ -42,29 +43,41 @@ namespace Dive
 
 	void View::Update(float delta)
 	{
-		m_Drawables.clear();
-		m_Lights.clear();
+		//m_Drawables.clear();
+		//m_Lights.clear();
+		m_MeshRenderers.clear();
 
 		const auto& allGameObjects = Scene::GetAllGameObjects();
 		for (auto pGameObject : allGameObjects)
 		{
-			if (pGameObject->HasComponent<Drawable>())
-				m_Drawables.emplace_back(pGameObject->GetComponent<Drawable>());
-			else if (pGameObject->HasComponent<Light>())
-				m_Lights.emplace_back(pGameObject->GetComponent<Light>());
+			//if (pGameObject->HasComponent<Drawable>())
+			//	m_Drawables.emplace_back(pGameObject->GetComponent<Drawable>());
+			//else if (pGameObject->HasComponent<Light>())
+			//	m_Lights.emplace_back(pGameObject->GetComponent<Light>());
+
+			if (pGameObject->HasComponent<MeshRenderer>())
+				m_MeshRenderers.emplace_back(pGameObject->GetComponent<MeshRenderer>());
+			else if (pGameObject->HasComponent<SkinnedMeshRenderer>())
+				m_MeshRenderers.emplace_back(pGameObject->GetComponent<SkinnedMeshRenderer>());
 		}
 	}
 
 	// 기존에는 command별로 알아서 그렸다. 그리고 그 구현을 지향해야 한다.
 	// view마다 path가 다를 수 있기 때문이다.
+	// forward와 deferred로 구분했지만
+	// 유니티의 경우엔 legacy와 standard로 나누었다.
 	void View::Render()
 	{
+		/*
 		if (m_RenderPath == eRenderPath::Forward)
 			renderPathForward();
 		else
 			renderPathDeferred();
+		*/
+		renderPathEndeavor();
 	}
 
+	/*
 	void View::renderPathForward()
 	{
 		// Clear
@@ -244,7 +257,15 @@ namespace Dive
 					}
 
 					// MeshRenderer에서 처리할 수 있는 사항들
+					// => Event를 보내는 편이 나을 것 같다.
+					// => 정렬된 형태로 묶은 후 함수를 호출하는 편이 낫지 않을까?
 					{
+						// test
+						for (auto pMeshRenderer : m_MeshRenderers)
+						{
+							pMeshRenderer->Draw();
+						}
+
 						if (pDrawable->HasMaterial())
 						{
 							auto pMaterial = pDrawable->GetMaterial();
@@ -366,6 +387,53 @@ namespace Dive
 			
 			Graphics::SetShaderVariation(eShaderType::VertexShader, nullptr);
 			Graphics::SetShaderVariation(eShaderType::PixelShader, nullptr);
+		}
+	}
+	*/
+	void View::renderPathEndeavor()
+	{
+		// set render target
+		{
+			auto* pRTV = Graphics::GetDefaultRenderTargetView();
+			auto* pDSV = Graphics::GetDefaultDepthStencilView();
+
+			Graphics::SetRenderTargetView(0, pRTV);
+			Graphics::SetDepthStencilView(pDSV);
+
+			Graphics::ClearViews(eClearTarget::Color | eClearTarget::Depth, DirectX::XMFLOAT4(0.75f, 0.75f, 1.0f, 1.0f), 1.0f, 0);
+		}
+
+		if (m_pCamera)
+		{
+			// 이걸 매 drawcall마다 보내야 할까?
+			{
+				Graphics::GetDeviceContext()->RSSetState(Renderer::GetRasterizerState());
+
+				D3D11_VIEWPORT viewport;
+				viewport.Width = 800;
+				viewport.Height = 600;
+				viewport.MinDepth = 0.0f;
+				viewport.MaxDepth = 1.0f;
+				viewport.TopLeftX = 0.0f;
+				viewport.TopLeftY = 0.0f;
+				Graphics::GetDeviceContext()->RSSetViewports(1, &viewport);
+			
+				auto pBuffer = Renderer::GetCameraVertexShaderBuffer();
+				auto pMappedData = static_cast<CameraVertexShaderBuffer*>(pBuffer->Map());
+				pMappedData->viewMatrix = DirectX::XMMatrixTranspose(m_pCamera->GetViewMatrix());
+				pMappedData->projMatrix = DirectX::XMMatrixTranspose(m_pCamera->GetProjectionMatrix());
+				pBuffer->Unmap();
+				Graphics::SetConstantBuffer(0, eShaderType::VertexShader, pBuffer);
+			}
+
+			// draw MeshRenderer
+			{
+				auto it = m_MeshRenderers.begin();
+				for (it; it != m_MeshRenderers.end(); ++it)
+				{
+					(*it)->Draw();
+				}
+			}
 		}
 	}
 }

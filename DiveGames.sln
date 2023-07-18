@@ -7,7 +7,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine\Engine.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Sandbox\Sandbox.vcxproj", "{DA7EB339-F6D3-4A49-846C-2BF5F56A7412}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssetExporter", "AssetExporter\AssetExporter.vcxproj", "{661B6F74-61DA-4D04-840D-E0FE5B6A19CF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssetViewer", "AssetViewer\AssetViewer.vcxproj", "{467CAA1E-5201-4FDB-967A-50C9E741C511}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1C48907D-25B4-4337-827C-46AD2C1361B3} = {1C48907D-25B4-4337-827C-46AD2C1361B3}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,14 +36,14 @@ Global
 		{DA7EB339-F6D3-4A49-846C-2BF5F56A7412}.Release|x64.Build.0 = Release|x64
 		{DA7EB339-F6D3-4A49-846C-2BF5F56A7412}.Release|x86.ActiveCfg = Release|Win32
 		{DA7EB339-F6D3-4A49-846C-2BF5F56A7412}.Release|x86.Build.0 = Release|Win32
-		{661B6F74-61DA-4D04-840D-E0FE5B6A19CF}.Debug|x64.ActiveCfg = Debug|x64
-		{661B6F74-61DA-4D04-840D-E0FE5B6A19CF}.Debug|x64.Build.0 = Debug|x64
-		{661B6F74-61DA-4D04-840D-E0FE5B6A19CF}.Debug|x86.ActiveCfg = Debug|Win32
-		{661B6F74-61DA-4D04-840D-E0FE5B6A19CF}.Debug|x86.Build.0 = Debug|Win32
-		{661B6F74-61DA-4D04-840D-E0FE5B6A19CF}.Release|x64.ActiveCfg = Release|x64
-		{661B6F74-61DA-4D04-840D-E0FE5B6A19CF}.Release|x64.Build.0 = Release|x64
-		{661B6F74-61DA-4D04-840D-E0FE5B6A19CF}.Release|x86.ActiveCfg = Release|Win32
-		{661B6F74-61DA-4D04-840D-E0FE5B6A19CF}.Release|x86.Build.0 = Release|Win32
+		{467CAA1E-5201-4FDB-967A-50C9E741C511}.Debug|x64.ActiveCfg = Debug|x64
+		{467CAA1E-5201-4FDB-967A-50C9E741C511}.Debug|x64.Build.0 = Debug|x64
+		{467CAA1E-5201-4FDB-967A-50C9E741C511}.Debug|x86.ActiveCfg = Debug|Win32
+		{467CAA1E-5201-4FDB-967A-50C9E741C511}.Debug|x86.Build.0 = Debug|Win32
+		{467CAA1E-5201-4FDB-967A-50C9E741C511}.Release|x64.ActiveCfg = Release|x64
+		{467CAA1E-5201-4FDB-967A-50C9E741C511}.Release|x64.Build.0 = Release|x64
+		{467CAA1E-5201-4FDB-967A-50C9E741C511}.Release|x86.ActiveCfg = Release|Win32
+		{467CAA1E-5201-4FDB-967A-50C9E741C511}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

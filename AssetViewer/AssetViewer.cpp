@@ -1,0 +1,507 @@
+#include "AssetViewer.h"
+
+DEFINE_APPLICATION_MAIN(AssetViewer)
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+static std::string FileOpen(const char* pFilter)
+{
+	OPENFILENAMEA ofn;
+	CHAR szFile[260] = { 0 };
+	CHAR currentDir[256] = { 0 };
+	ZeroMemory(&ofn, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = nullptr;
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile);
+	if (GetCurrentDirectoryA(256, currentDir))
+		ofn.lpstrInitialDir = currentDir;
+	ofn.lpstrFilter = pFilter;
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+	if (GetOpenFileNameA(&ofn) == TRUE)
+		return ofn.lpstrFile;
+
+	return std::string();
+}
+
+static void DrawVec3Control(const std::string& label, DirectX::XMFLOAT3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	auto pBoldFont = io.Fonts->Fonts[1];
+
+	ImGui::PushID(label.c_str());
+
+	ImGui::Columns(2);
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label.c_str());
+	ImGui::NextColumn();
+
+	ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+	ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+	ImGui::PushFont(pBoldFont);
+	if (ImGui::Button("X", buttonSize))
+		values.x = resetValue;
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+	ImGui::PushFont(pBoldFont);
+	if (ImGui::Button("Y", buttonSize))
+		values.y = resetValue;
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+	ImGui::SameLine();
+
+	ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+	ImGui::PushFont(pBoldFont);
+	if (ImGui::Button("Z", buttonSize))
+		values.z = resetValue;
+	ImGui::PopFont();
+	ImGui::PopStyleColor(3);
+
+	ImGui::SameLine();
+	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::PopItemWidth();
+
+	ImGui::PopStyleVar();
+
+	ImGui::Columns(1);
+
+	ImGui::PopID();
+}
+
+AssetViewer::AssetViewer()
+	: m_pCamera(nullptr),
+	m_pLoadedModel(nullptr),
+	m_pSelectedNode(nullptr)
+{
+	m_ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+}
+
+AssetViewer::~AssetViewer()
+{
+}
+
+void AssetViewer::Setup()
+{
+	// Engine Setup
+	Dive::Graphics::SetWindowTitle(L"AssetViewer");
+
+	// Subscribe Events
+	SUBSCRIBE_EVENT(Dive::eEventType::BeginRender, EVENT_HANDLER_PARAM(OnBeginRender));
+	SUBSCRIBE_EVENT(Dive::eEventType::EndRender, EVENT_HANDLER_PARAM(OnEndRender));
+	SUBSCRIBE_EVENT(Dive::eEventType::WindowEvent, EVENT_HANDLER_PARAM(OnWindowEvent));
+	SUBSCRIBE_EVENT(Dive::eEventType::Update, EVENT_HANDLER_PARAM(OnUpdate));
+}
+
+void AssetViewer::Start()
+{
+	initializeImGui();
+
+	m_pCamera = Dive::Scene::CreateGameObject("MainCamera");
+	Dive::Camera* pCamera = m_pCamera->AddComponent<Dive::Camera>();
+	pCamera->SetAspectRatio(static_cast<float>(Dive::Graphics::GetWidth()), static_cast<float>(Dive::Graphics::GetHeight()));
+	m_pCamera->GetComponent<Dive::Transform>()->SetPosition(0.0f, 10.0f, -20.0f);
+}
+
+void AssetViewer::Stop()
+{
+	// destroy ImGui
+	ImGui_ImplDX11_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+}
+
+void AssetViewer::OnBeginRender(const Dive::Event& e)
+{
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	
+	static bool bOpen = false;
+
+	// main menu
+	{
+		ImGui::Begin("Menu");
+
+		if (ImGui::Button("Import"))
+		{
+			m_Importer.Clear();
+			m_pLoadedModel = nullptr;
+			m_pSelectedNode = nullptr;
+			m_MeshRenderers.clear();
+			bOpen = false;
+
+			const std::string filePath = FileOpen("All Files(*.*)\0");
+			if (m_Importer.LoadFromFile(filePath))
+			{
+				m_pLoadedModel = m_Importer.GetModel()->GetRootGameObject();
+				bOpen = true;
+			}
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Clear"))
+		{
+			m_Importer.Clear();
+			m_pLoadedModel = nullptr;
+			m_pSelectedNode = nullptr;
+			m_MeshRenderers.clear();
+			bOpen = false;
+		}
+
+		if (ImGui::Button("Export"))
+		{
+			// model
+			// material
+			// animation
+		}
+
+		if (ImGui::Button("Exit"))
+		{
+			Dive::Engine::Exit();
+		}
+		
+		ImGui::ColorEdit3("Clear Color", (float*)&m_ClearColor);
+		ImGui::End();
+	}
+
+	if(bOpen)
+	{
+		// Model Hierarchy
+		{
+			if (!ImGui::Begin("Hierarchy"))
+			{
+				ImGui::End();
+				return;
+			}
+			
+			drawTree(m_pLoadedModel);
+			
+			ImGui::End();
+		}
+
+		if (m_pSelectedNode)
+		{
+			ImGui::Begin("Inspector");
+			{
+				// transform
+				Dive::Transform* pTransform = m_pSelectedNode->GetComponent<Dive::Transform>();
+				if (pTransform)
+				{
+					if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						// position
+						DirectX::XMFLOAT3 position;
+						DirectX::XMStoreFloat3(&position, pTransform->GetLocalPosition());
+						DrawVec3Control("Position", position);
+						pTransform->SetLocalPosition(position);
+
+						// rotation
+						//auto rotation = pTransform->GetLocalRotationDegrees();
+						//DrawVec3Control("Rotation", rotation);
+						//pTransform->SetLocalRotation(rotation);
+
+						// scale
+						DirectX::XMFLOAT3 scale;
+						DirectX::XMStoreFloat3(&scale, pTransform->GetLocalScale());
+						DrawVec3Control("Scale", scale, 1.0f);
+						pTransform->SetLocalScale(scale);
+					}
+				}
+
+				ImGui::Separator();
+
+				// material
+				Dive::IMeshRenderer* pMeshRenderer = m_pSelectedNode->GetComponent<Dive::IMeshRenderer>();
+				if (pMeshRenderer)
+				{
+					if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						Dive::Material* pMat = pMeshRenderer->GetMaterial();
+
+						ImGui::Text(pMat->GetName().c_str());
+
+						if (ImGui::Button("Stormtrooper"))
+						{
+							pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Stormtrooper/Stormtrooper.png");
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Pilot"))
+						{
+							pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/pilot/Material.002_Base_Color.png");
+						}
+
+						ImGui::SameLine();
+
+						if (ImGui::Button("Vampire"))
+						{
+							pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/vampire/Vampire_diffuse.png");
+						}
+
+					}
+				}
+
+				ImGui::End();
+			}
+		}
+	}
+}
+
+void AssetViewer::OnEndRender(const Dive::Event& e)
+{
+	auto* pDeviceContext = Dive::Graphics::GetDeviceContext();
+	auto* pDefaultRenderTargetView = Dive::Graphics::GetDefaultRenderTargetView();
+
+	const float clearColor[4] = { m_ClearColor.x * m_ClearColor.w, m_ClearColor.y * m_ClearColor.w, m_ClearColor.z * m_ClearColor.w, m_ClearColor.w };
+
+	ImGui::Render();
+
+	pDeviceContext->OMSetRenderTargets(1, &pDefaultRenderTargetView, NULL);
+	pDeviceContext->ClearRenderTargetView(pDefaultRenderTargetView, clearColor);
+
+	// View를 사용하지 않으므로 직접 render path를 구성한다.
+	// 여기에서 그려야 UI 뒤쪽이 된다.
+	{
+		// Graphics의 ClearViews에서 prepareDraw()를 호출한다.
+		// 즉, 현재 구현에서는 이 부분을 건너 띄었다.
+
+		{
+			//Dive::Graphics::GetDeviceContext()->RSSetState(Dive::Renderer::GetRasterizerState());
+
+			D3D11_VIEWPORT viewport;
+			viewport.Width = static_cast<float>(Dive::Graphics::GetWidth());
+			viewport.Height = static_cast<float>(Dive::Graphics::GetHeight());
+			viewport.MinDepth = 0.0f;
+			viewport.MaxDepth = 1.0f;
+			viewport.TopLeftX = 0.0f;
+			viewport.TopLeftY = 0.0f;
+			Dive::Graphics::GetDeviceContext()->RSSetViewports(1, &viewport);
+
+			auto pBuffer = Dive::Renderer::GetCameraVertexShaderBuffer();
+			auto pMappedData = static_cast<Dive::CameraVertexShaderBuffer*>(pBuffer->Map());
+			pMappedData->viewMatrix = DirectX::XMMatrixTranspose(m_pCamera->GetComponent<Dive::Camera>()->GetViewMatrix());
+			pMappedData->projMatrix = DirectX::XMMatrixTranspose(m_pCamera->GetComponent<Dive::Camera>()->GetProjectionMatrix());
+			pBuffer->Unmap();
+			Dive::Graphics::SetConstantBuffer(0, Dive::eShaderType::VertexShader, pBuffer);
+		}
+
+		// mesh renderers
+		{
+			auto it = m_MeshRenderers.begin();
+			for (it; it != m_MeshRenderers.end(); ++it)
+			{
+				(*it)->Draw();
+			}
+		}
+	}
+
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+	// Update and Render additional Platform Windows
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+	}
+}
+
+void AssetViewer::OnWindowEvent(const Dive::Event& e)
+{
+	auto& evnt = dynamic_cast<const Dive::WindowEvent&>(e);
+
+	ImGui_ImplWin32_WndProcHandler(
+		evnt.m_hWnd,
+		evnt.m_Msg,
+		evnt.m_wParam,
+		evnt.m_lParam
+	);
+}
+
+void AssetViewer::initializeImGui()
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+	ImGui::StyleColorsDark();
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
+
+	ImGui_ImplWin32_Init(Dive::Graphics::GetWindowHandle());
+	ImGui_ImplDX11_Init(
+		Dive::Graphics::GetDevice(),
+		Dive::Graphics::GetDeviceContext()
+	);
+
+	// Set ImGui Theme
+	auto& colors = ImGui::GetStyle().Colors;
+	colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
+	colors[ImGuiCol_Header] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+	colors[ImGuiCol_HeaderHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
+	colors[ImGuiCol_HeaderActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+	colors[ImGuiCol_Button] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+	colors[ImGuiCol_ButtonHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
+	colors[ImGuiCol_ButtonActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+	colors[ImGuiCol_FrameBg] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+	colors[ImGuiCol_FrameBgHovered] = ImVec4{ 0.3f, 0.305f, 0.31f, 1.0f };
+	colors[ImGuiCol_FrameBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+	colors[ImGuiCol_Tab] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+	colors[ImGuiCol_TabHovered] = ImVec4{ 0.38f, 0.3805f, 0.381f, 1.0f };
+	colors[ImGuiCol_TabActive] = ImVec4{ 0.28f, 0.2805f, 0.281f, 1.0f };
+	colors[ImGuiCol_TabUnfocused] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+	colors[ImGuiCol_TabUnfocusedActive] = ImVec4{ 0.2f, 0.205f, 0.21f, 1.0f };
+	colors[ImGuiCol_TitleBg] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+	colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+	colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
+
+	// load resources
+	float fontSize = 15.0f;
+	io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", fontSize);
+	io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", fontSize);
+}
+
+void AssetViewer::OnUpdate(const Dive::Event& evnt)
+{
+	// View를 사용하지 않으므로 직접 구성한다.
+	if (m_pLoadedModel)
+	{
+		m_MeshRenderers.clear();
+
+		const auto& allGameObjects = Dive::Scene::GetAllGameObjects();
+		for (auto pGameObject : allGameObjects)
+		{
+			if (pGameObject->HasComponent<Dive::MeshRenderer>())
+				m_MeshRenderers.emplace_back(pGameObject->GetComponent<Dive::MeshRenderer>());
+			else if (pGameObject->HasComponent<Dive::SkinnedMeshRenderer>())
+				m_MeshRenderers.emplace_back(pGameObject->GetComponent<Dive::SkinnedMeshRenderer>());
+		}
+	}
+
+	if (!m_pCamera)
+		return;
+
+	const auto& e = dynamic_cast<const Dive::UpdateEvent&>(evnt);
+
+	auto pTransform = m_pCamera->GetTransform();
+	if (Dive::Input::KeyPress(DIK_W))
+	{
+		pTransform->Translate(0.0f, 0.0f, 5.0f * e.GetDeltaTime());
+	}
+	if (Dive::Input::KeyPress(DIK_S))
+	{
+		pTransform->Translate(0.0f, 0.0f, -5.0f * e.GetDeltaTime());
+	}
+	if (Dive::Input::KeyPress(DIK_A))
+	{
+		pTransform->Translate(-5.0f * e.GetDeltaTime(), 0.0f, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_D))
+	{
+		pTransform->Translate(5.0f * e.GetDeltaTime(), 0.0f, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_C))
+	{
+		pTransform->Translate(0.0f, -5.0f * e.GetDeltaTime(), 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_SPACE))
+	{
+		pTransform->Translate(0.0f, 5.0f * e.GetDeltaTime(), 0.0f);
+	}
+
+	if (Dive::Input::KeyPress(DIK_Q))
+	{
+		pTransform->Rotate(0.0f, 0.0f, -5.0f * e.GetDeltaTime());
+	}
+	if (Dive::Input::KeyPress(DIK_E))
+	{
+		pTransform->Rotate(0.0f, 0.0f, 5.0f * e.GetDeltaTime());
+	}
+
+	if (m_pLoadedModel)
+	{
+		Dive::Transform* pTransform = m_pLoadedModel->GetTransform();
+
+		if (Dive::Input::KeyPress(DIK_LEFT))
+		{
+			pTransform->Rotate(0.0f, -50.0f * e.GetDeltaTime(), 0.0f);
+		}
+		if (Dive::Input::KeyPress(DIK_RIGHT))
+		{
+			pTransform->Rotate(0.0f, 50.0f * e.GetDeltaTime(), 0.0f);
+		}
+		if (Dive::Input::KeyPress(DIK_UP))
+		{
+			pTransform->Rotate(-50.0f * e.GetDeltaTime(), 0.0f, 0.0f);
+		}
+		if (Dive::Input::KeyPress(DIK_DOWN))
+		{
+			pTransform->Rotate(50.0f * e.GetDeltaTime(), 0.0f, 0.0f);
+		}
+	}
+}
+
+void AssetViewer::drawTree(Dive::GameObject* pNode)
+{
+	if (!pNode)
+		return;
+
+	auto children = pNode->GetTransform()->GetChildren();
+
+	ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
+	children.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
+
+	if (m_pSelectedNode)
+	{
+		nodeFlags |= (m_pSelectedNode == pNode) ? ImGuiTreeNodeFlags_Selected : 0;
+	}
+
+	bool nodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)pNode->GetID(), nodeFlags, pNode->GetName().c_str());
+	
+	if (ImGui::IsItemClicked())
+	{
+		m_pSelectedNode = pNode;
+	}
+
+	if (nodeOpen)
+	{
+		for (Dive::Transform* pChild : children)
+			drawTree(pChild->GetGameObject());
+
+		ImGui::TreePop();
+	}
+}

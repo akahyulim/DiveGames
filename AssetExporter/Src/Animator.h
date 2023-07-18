@@ -4,6 +4,7 @@
 #include "Animation.h"
 #include "Bone.h"
 
+// animation 실행 후 변환 결과를 관리
 class Animator
 {
 public:

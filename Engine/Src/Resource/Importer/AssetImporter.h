@@ -9,46 +9,42 @@
 namespace Dive
 {
 	class Model;
-	class Material;
+	class Animation;
+	struct VertexSkinned;
 	class GameObject;
+	struct NodeInfo;
 
-	struct AssimpNodeData
-	{
-		DirectX::XMFLOAT4X4 transformation;
-		std::string name;
-		int childrenCount;
-		std::vector<AssimpNodeData> children;
-	};
-
-	// 이름 그대로 Importer다. 즉, 외부 파일을 읽어 사용할 수 있는 오브젝트를 구성하는 기능을 가진다.
-	// 그리고 추후 AssetExporter를 만들어야 한다.
 	class AssetImporter
 	{
 	public:
 		AssetImporter();
-		~AssetImporter() = default;
+		~AssetImporter();
 
-		bool Load(Model* pModel, const std::string& filePath);
+		bool LoadFromFile(const std::string& filePath);
+
+		// 차리리 LoadFromFile에 참조로 전달하던가 리턴하는 것이 나을 것 같다.
+		Model* GetModel() const { return m_pModel; }
+		Animation* GetAnimation() const { return m_pAnimation; }
 
 	private:
-		void parseNode(const aiNode* pNode, GameObject* pParentGameObject = nullptr);
-		void parseNodeMeshes(const aiNode* pNode, GameObject* pNodeGameObject);
-		void parseMesh(aiMesh* pAiMesh, GameObject* pMeshGameObject);
-		Material* parseMaterial(aiMesh* pAiMesh);
-		
-		void collectBones(aiMesh* pMesh);
+		void extractBoneWeightForVertices(std::vector<VertexSkinned>& vertices, aiMesh* pMesh, const aiScene* pScene);
+		void setVertexBoneData(VertexSkinned& vertex, int boneID, float weight);
 
-		void buildStaticMesh(aiMesh* pMesh, GameObject* pMeshGameObject);
-		void buildSkinnedMesh(aiMesh* pMesh, GameObject* pMeshGameObject);
+		void processNode(const aiScene* pScene, aiNode* pNode, GameObject* pParentGameObject = nullptr);
+		void processMeshes(const aiScene* pScene, aiNode* pNode, GameObject* pNodeGameObject);
+
+		void processAnimation(aiAnimation* pAnimation);
+
+		void parseNodes(const aiScene* pScene, aiNode* pNode, NodeInfo* pNodeInfo);
+		void parseMeshes(const aiScene* pScene, aiNode* pNode);
+
 
 	private:
 		std::string m_FilePath;
-		std::string m_Name;
 
-		const aiScene* m_pAiScene;
+		int m_BoneCounter;
 
 		Model* m_pModel;
-
-		bool m_bAnimation;
+		Animation* m_pAnimation;
 	};
 }

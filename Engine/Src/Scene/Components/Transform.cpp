@@ -7,6 +7,20 @@ using namespace DirectX;
 
 namespace Dive
 {
+	Transform::Transform()
+		: Component(nullptr),
+		m_pParent(nullptr)
+	{
+		m_LocalPosition = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		m_LocalRotation = XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+		m_LocalScale = XMFLOAT3(1.0f, 1.0f, 1.0f);
+
+		m_LookAt = XMFLOAT3(0.0f, 0.0f, 1.0f);
+
+		XMStoreFloat4x4(&m_LocalMatrix, XMMatrixIdentity());
+		XMStoreFloat4x4(&m_Matrix, XMMatrixIdentity());
+	}
+
 	Transform::Transform(GameObject* pGameObject)
 		: Component(pGameObject),
 		m_pParent(nullptr)
@@ -23,6 +37,7 @@ namespace Dive
 
 	Transform::~Transform()
 	{
+		DV_CORE_TRACE("Destroy Transform: {:s}", GetName());
 	}
 
 	bool Transform::LoadFromFile(const std::string& filePath)
@@ -524,9 +539,13 @@ namespace Dive
 			XMStoreFloat4x4(&m_Matrix, matrix);
 		}
 		else
+		{
 			m_Matrix = m_LocalMatrix;
+		}
 
 		for (auto pChild : m_Children)
+		{
 			pChild->updateTransform();
+		}
 	}
 }

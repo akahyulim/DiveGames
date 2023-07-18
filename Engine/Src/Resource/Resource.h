@@ -11,6 +11,7 @@ namespace Dive
 		TextureCube,
 		Material,
 		Model,
+		Animation,
 		Shader,
 		Unknown
 	};

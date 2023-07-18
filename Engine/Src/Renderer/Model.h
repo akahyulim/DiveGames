@@ -1,80 +1,68 @@
 #pragma once
-#include "Core/CoreDefs.h"
-#include "Graphics/GraphicsDefs.h"
 #include "Resource/Resource.h"
-
+#include "Mesh.h"
+#include "SkinnedMesh.h"
+#include "Graphics/GraphicsDefs.h"
+#include "Scene/Components/Transform.h"
+#include "Scene/GameObject.h"
 
 namespace Dive
 {
-	class VertexBuffer;
-	class IndexBuffer;
-	class GameObject;
-	class IMesh;
-	
-	// 디버그 렌더링을 위해 class로 만들어 Draw를 추가할 수 있다.
-	struct BoneInfo
+	// 노드 계층구조를 직접 관리
+	struct NodeInfo
 	{
-		int32_t id;
-		DirectX::XMFLOAT4X4 offsetMatrix;
+		std::string name;
+		DirectX::XMFLOAT4X4 transform;
+		uint32_t numChildren;
+		std::vector<NodeInfo> children;
 	};
 
+	// 기본적으로 Mesh를 관리하는 클래스다.
+	// 따라서 Load, Save 등의 함수는 Mesh 정보를 파일에서 읽어 구성하고나 파일에 쓰는 작업으로 이루어져야 한다.
+	// 문제는 각 Mesh가 노드를 가질 수 있다는 사실과
+	// BoneInfoMap을 직접 가질 필요가 있는가 하는 것이다. => 이게 Animation과 연계되는 것도 좀 에바다.
 	class Model : public Resource
 	{
 	public:
 		Model();
-		~Model();
+		virtual ~Model();
 
 		bool LoadFromFile(const std::string& filePath) override;
 		bool SaveToFile(const std::string& filePath) override;
 
-		void Clear();
+		DvStaticMesh* InsertStaticMesh(DvStaticMesh* pMesh);
+		SkinnedMesh* InsertSkinnedMesh(SkinnedMesh* pMesh);
+	
+		auto& GetBoneInfoMap() { return m_BoneInfoMap; }
 
-		// mesh로 변경 ===============================================================================
-		void AddVertices(std::vector<VertexStatic>& vertices, uint32_t* pOffset = nullptr);
-		void AddIndices(std::vector<uint32_t>& indices, uint32_t* pOffset = nullptr);
+		void BuildMeshBuffers();
+		void Build();
 
-		std::vector<VertexStatic>& GetVertices() { return m_Vertices; }
-		std::vector<uint32_t>& GetIndices() { return m_Indices; }
+		const auto& GetStaticMeshes() const { return m_StaticMeshes; }
+		const auto& GetSkinnedMeshes() const { return m_SkinnedMeshes; }
 
-		uint32_t GetVertexCount() const { return static_cast<uint32_t>(m_Vertices.size()); }
-		uint32_t GetIndexCount() const { return static_cast<uint32_t>(m_Indices.size()); }
-
-		template<class T>
-		void AppendMesh(const std::vector<T>& vertices, const std::vector<uint32_t>& indices, uint32_t* pVertexOffset = nullptr, uint32_t* pIndexOffset = nullptr) const;
-
-		//============================================================================================
-
-		std::unordered_map<std::string, BoneInfo>& GetBoneInfoMap() { return m_BoneInfoMap; }
-
-		bool CreateBuffers();
-		VertexBuffer* GetVertexBuffer() { return m_pVertexBuffer; }
-		IndexBuffer* GetIndexBuffer() { return m_pIndexBuffer; }
+		// test
+		uint32_t GetNumStaticMeshes() const { return static_cast<uint32_t>(m_StaticMeshes.size()); }
+		uint32_t GetNumSkinnedMeshes() const { return static_cast<uint32_t>(m_SkinnedMeshes.size()); }
 
 		GameObject* GetRootGameObject() { return m_pRootGameObject; }
 		void SetRootGameObject(GameObject* pRoot) { m_pRootGameObject = pRoot; }
 
-	private:
-	private:
-		// GameObject를 상속한 다른 객체였으면 좋겠다.
-		GameObject* m_pRootGameObject;
+		uint32_t GetBoneCount() { return static_cast<uint32_t>(m_BoneInfoMap.size()); }
 
-		// 적어도 static과 skinned 두 타입으로 구분해야 한다.
-		std::vector<VertexStatic> m_Vertices;
-		std::vector<uint32_t> m_Indices;
-		std::vector<IMesh*> m_Meshes;		// urho는 lod까지 적용해서 vector가 둘이다.
+		NodeInfo& GetRootNodeInfo() { return m_RootNodeInfo; }
+
+	private:
+		void buildHierarchy(NodeInfo* pNode, Transform* pParent);
+
+	private:
+		std::unordered_map<std::string, DvStaticMesh*> m_StaticMeshes;
+		std::unordered_map<std::string, SkinnedMesh*> m_SkinnedMeshes;
 
 		std::unordered_map<std::string, BoneInfo> m_BoneInfoMap;
 
-		// 특정 상황에서 버퍼가 둘 이상으로 나누어질 수 있다.
-		VertexBuffer* m_pVertexBuffer;
-		IndexBuffer* m_pIndexBuffer;
+		GameObject* m_pRootGameObject;
+		
+		NodeInfo m_RootNodeInfo;
 	};
-	
-	template<class T>
-	void Model::AppendMesh(const std::vector<T>& vertices, const std::vector<uint32_t>& indices, uint32_t* pVertexOffset, uint32_t* pIndexOffset) const
-	{
-		DV_ASSERT(!vertices.empty());
-		DV_ASSERT(!indices.empty());
-
-	}
 }

@@ -17,6 +17,8 @@ public:
 	Model(const std::string& filePath);
 	~Model();
 
+	void Draw();
+
 	std::unordered_map<std::string, BoneInfo>& GetBoneInfoMap() { return m_BoneInfoMap; }
 	uint32_t& GetBoneCount() { return m_BoneCounter; }
 

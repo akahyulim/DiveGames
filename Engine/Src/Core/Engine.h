@@ -12,6 +12,8 @@ namespace Dive
 		static void Update();
 		static void Render();
 
+		static void Exit();
+
 		static bool IsExiting();
 	};
 }

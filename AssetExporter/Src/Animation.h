@@ -38,8 +38,8 @@ private:
 	void readMissingBones(const aiAnimation* pAnimation, Model* pModel);
 
 private:
-	float m_Duration;
-	float m_TickPerSecond;
+	double m_Duration;
+	double m_TickPerSecond;
 
 	std::vector<Bone> m_Bones;
 	AssimpNodeData m_RootNodeData;

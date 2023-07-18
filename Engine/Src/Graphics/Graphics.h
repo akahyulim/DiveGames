@@ -23,6 +23,8 @@ namespace Dive
 
 		static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+		static void Close();
+
 		static bool IsInitialized();
 
 		static HINSTANCE GetWindowInstance();

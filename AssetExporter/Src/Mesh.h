@@ -16,6 +16,8 @@ class Mesh
 public:
 	Mesh(std::vector<VertexSkinned> vertices, std::vector<uint32_t> indices);
 
+	void Draw();
+
 	std::vector<VertexSkinned> GetVertices() const { return m_Vertices; }
 
 private:

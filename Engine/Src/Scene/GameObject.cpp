@@ -1,7 +1,6 @@
 #include "DivePch.h"
 #include "GameObject.h"
 #include "Components/Transform.h"
-#include "Components/Drawable.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
 
@@ -14,6 +13,8 @@ namespace Dive
 	{
 		SetName(name);
 		m_pTransform = AddComponent<Transform>();
+
+		DV_CORE_TRACE("Create GameObject: {:s}", name);
 	}
 
 	GameObject::~GameObject()
@@ -28,6 +29,8 @@ namespace Dive
 			m_Components.clear();
 			m_Components.shrink_to_fit();
 		}
+
+		DV_CORE_TRACE("Destroy GameObject: {:s}", GetName());
 	}
 
 	void GameObject::Update(float delta)
@@ -53,10 +56,6 @@ namespace Dive
 		if (m_pTransform)
 			m_pTransform->SaveToFile(name);
 
-		Drawable* pDrawable = GetComponent<Drawable>();
-		if (pDrawable)
-			pDrawable->SaveToFile(name);
-
 		// 자식들 직렬화
 		for (Transform* pChild : m_pTransform->GetChildren())
 			pChild->GetGameObject()->SaveToFile(name);
@@ -80,10 +79,6 @@ namespace Dive
 
 		out << YAML::EndMap;
 		out << YAML::EndMap;
-
-		//Drawable* pDrawable = GetComponent<Drawable>();
-		//if (pDrawable)
-		//	pDrawable->SaveToFile(name);
 
 		// 자식들 직렬화
 		for (Transform* pChild : m_pTransform->GetChildren())

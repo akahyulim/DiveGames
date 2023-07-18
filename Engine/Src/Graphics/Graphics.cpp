@@ -1,5 +1,6 @@
 #include "DivePch.h"
 #include "Graphics.h"
+#include "GraphicsEvents.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Texture.h"
@@ -16,8 +17,8 @@ namespace Dive
 	static HINSTANCE s_hInstance = 0;
 	static HWND s_hWnd = 0;
 	static std::wstring s_WindowTitle = L"DiveGames";
-	static int s_Width = 800;
-	static int s_Height = 600;
+	static int s_Width = 1280;
+	static int s_Height = 720;
 
 	static IDXGISwapChain* s_pSwapChain = nullptr;
 	static ID3D11Device* s_pDevice = nullptr;
@@ -183,6 +184,8 @@ namespace Dive
 	{
 		if (IsInitialized())
 		{
+			FIRE_EVENT(WindowEvent(hWnd, msg, wParam, lParam));
+
 			//switch (msg)
 			{
 				//default:
@@ -191,6 +194,11 @@ namespace Dive
 		}
 
 		return ::DefWindowProc(hWnd, msg, wParam, lParam);
+	}
+
+	void Graphics::Close()
+	{
+		SendMessage(s_hWnd, WM_CLOSE, 0, 0);
 	}
 
 	bool Graphics::IsInitialized()
@@ -384,6 +392,8 @@ namespace Dive
 		if (!IsInitialized())
 			return false;
 
+		FIRE_EVENT(BeginRender());
+
 		return true;
 	}
 
@@ -391,6 +401,8 @@ namespace Dive
 	{
 		if (!IsInitialized())
 			return;
+
+		FIRE_EVENT(EndRender());
 
 		s_pSwapChain->Present(1, 0);
 	}

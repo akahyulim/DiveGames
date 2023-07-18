@@ -84,17 +84,11 @@
     <ClInclude Include="Src\Scene\Components\Component.h">
       <Filter>Src\Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Scene\Components\Drawable.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Resource\Resource.h">
       <Filter>Src\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Src\Resource\ResourceCache.h">
       <Filter>Src\Resource</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\Model.h">
-      <Filter>Src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Src\Renderer\Material.h">
       <Filter>Src\Renderer</Filter>
@@ -107,9 +101,6 @@
     </ClInclude>
     <ClInclude Include="Src\Scene\Components\Transform.h">
       <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Resource\Importer\AssetImporter.h">
-      <Filter>Src\Resource\Importer</Filter>
     </ClInclude>
     <ClInclude Include="Src\IO\FileSystem.h">
       <Filter>Src\IO</Filter>
@@ -147,9 +138,6 @@
     <ClInclude Include="Src\Graphics\GBuffer.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\ProcessUtils.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Renderer\Mesh.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
@@ -159,8 +147,29 @@
     <ClInclude Include="Src\IO\ConvertYAML.h">
       <Filter>Src\IO</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Scene\Components\SkinnedMeshRenderer.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
     <ClInclude Include="Src\Scene\Components\MeshRenderer.h">
       <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Resource\Importer\AssetImporter.h">
+      <Filter>Src\Resource\Importer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Model.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Animation.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Bone.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Animator.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\GraphicsEvents.h">
+      <Filter>Src\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -203,17 +212,11 @@
     <ClCompile Include="Src\Scene\Components\Component.cpp">
       <Filter>Src\Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Scene\Components\Drawable.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Resource\Resource.cpp">
       <Filter>Src\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Src\Resource\ResourceCache.cpp">
       <Filter>Src\Resource</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\Model.cpp">
-      <Filter>Src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Material.cpp">
       <Filter>Src\Renderer</Filter>
@@ -226,9 +229,6 @@
     </ClCompile>
     <ClCompile Include="Src\Scene\Components\Transform.cpp">
       <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Resource\Importer\AssetImporter.cpp">
-      <Filter>Src\Resource\Importer</Filter>
     </ClCompile>
     <ClCompile Include="Src\IO\FileSystem.cpp">
       <Filter>Src\IO</Filter>
@@ -266,17 +266,32 @@
     <ClCompile Include="Src\Graphics\GBuffer.cpp">
       <Filter>Src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Core\ProcessUtils.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Renderer\Mesh.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\SkinnedMesh.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Scene\Components\SkinnedMeshRenderer.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
     <ClCompile Include="Src\Scene\Components\MeshRenderer.cpp">
       <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Resource\Importer\AssetImporter.cpp">
+      <Filter>Src\Resource\Importer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Model.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Animation.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Bone.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Animator.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

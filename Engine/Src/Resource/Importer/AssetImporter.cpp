@@ -1,17 +1,21 @@
 #include "DivePch.h"
 #include "AssetImporter.h"
 #include "Core/CoreDefs.h"
+#include "Resource/ResourceCache.h"
 #include "Graphics/GraphicsDefs.h"
-#include "Graphics/Texture2D.h"
+#include "Renderer/Bone.h"
+#include "Renderer/Mesh.h"
+#include "Renderer/SkinnedMesh.h"
 #include "Renderer/Model.h"
-#include "Renderer/Material.h"
+#include "Renderer/Animation.h"
 #include "Scene/Scene.h"
 #include "Scene/GameObject.h"
-#include "Scene/Components/Drawable.h"
 #include "Scene/Components/Transform.h"
-#include "Resource/ResourceCache.h"
+#include "Scene/Components/MeshRenderer.h"
+#include "Scene/Components/SkinnedMeshRenderer.h"
+#include "IO/FileStream.h"
 #include "IO/Log.h"
-#include "IO/FileSystem.h"
+
 
 namespace Dive
 {
@@ -26,50 +30,79 @@ namespace Dive
         );
     }
 
-    static aiNode* GetNodeByName(const std::string& name, aiNode* pNode)
+    static DirectX::XMFLOAT3 ConvertVector3(const aiVector3D& vector)
     {
-        if (!pNode)
-            return nullptr;
+        return DirectX::XMFLOAT3{
+            vector.x,
+            vector.y,
+            vector.z
+        };
+    }
 
+    static DirectX::XMFLOAT4 ConvertQuaternion(const aiQuaternion& quaternion)
+    {
+        return DirectX::XMFLOAT4{
+            quaternion.x,
+            quaternion.y,
+            quaternion.z,
+            quaternion.w
+        };
+    }
+
+    static aiNode* GetNodeByName(aiNode* pNode, std::string name)
+    {
         if (pNode->mName.C_Str() == name)
-            return pNode;
-
-        for (uint32_t i = 0; i < pNode->mNumChildren; ++i) 
         {
-            aiNode* pFound = GetNodeByName(name, pNode->mChildren[i]);
-            if (pFound)
-                return pFound;
+            return pNode;
+        }
+        else
+        {
+            for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
+            {
+                aiNode* pTarget = GetNodeByName(pNode->mChildren[i], name);
+                if (pTarget != nullptr)
+                    return pTarget;
+            }
         }
 
         return nullptr;
     }
 
-	AssetImporter::AssetImporter()
-		: m_pAiScene(nullptr),
-		m_pModel(nullptr),
-		m_bAnimation(false)
-	{
-	}
+    static uint32_t GetNumValidFaces(aiMesh* pMesh)
+    {
+        uint32_t ret = 0;
 
-    // LoadAndBuild
-	bool AssetImporter::Load(Model* pModel, const std::string& filePath)
-	{
-        DV_ASSERT(pModel);
+        for (uint32_t i = 0; i < pMesh->mNumFaces; ++i)
+        {
+            if (pMesh->mFaces[i].mNumIndices == 3)
+                ++ret;
+        }
 
-		if (!FileSystem::FileExists(filePath))
-		{
-			DV_CORE_ERROR("존재하지 않는 파일 경로({:s})를 전달받아 모델 로드에 실패하였습니다.", filePath);
-			return false;
-		}
+        return ret;
+    }
 
-		m_FilePath = filePath;
-		m_Name = FileSystem::GetFileName(filePath);
-		m_pModel = pModel;
-		m_pModel->SetName(m_Name);
+    AssetImporter::AssetImporter()
+        : m_BoneCounter(0),
+        m_pModel(nullptr)
+    {
+    }
+    
+    AssetImporter::~AssetImporter()
+    {
+    }
 
+    bool AssetImporter::LoadFromFile(const std::string& filePath)
+    {
         Assimp::Importer importer;
+        //importer.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, 80.0f);
+        //importer.SetPropertyFloat(AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, 80.0f);
+        //importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 1000000);
+        //importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 1000000);
+        //importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
+        //importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_CAMERAS | aiComponent_LIGHTS);
+        //importer.SetPropertyBool(AI_CONFIG_GLOB_MEASURE_TIME, true);
 
-        const auto flags =
+        uint32_t spartan_flags =
             aiProcess_MakeLeftHanded |              // directx style.
             aiProcess_FlipUVs |                     // directx style.
             aiProcess_FlipWindingOrder |            // directx style.
@@ -90,425 +123,517 @@ namespace Dive
             aiProcess_ValidateDataStructure |
             aiProcess_Debone;
 
-        // Set normal smoothing angle
-        importer.SetPropertyFloat(AI_CONFIG_PP_GSN_MAX_SMOOTHING_ANGLE, 80.0f);
-        // Set tangent smoothing angle
-        importer.SetPropertyFloat(AI_CONFIG_PP_CT_MAX_SMOOTHING_ANGLE, 80.0f);
-        // Maximum number of triangles in a mesh (before splitting)    
-        importer.SetPropertyInteger(AI_CONFIG_PP_SLM_TRIANGLE_LIMIT, 1000000);
-        // Maximum number of vertices in a mesh (before splitting)    
-        importer.SetPropertyInteger(AI_CONFIG_PP_SLM_VERTEX_LIMIT, 1000000);
-        // Remove points and lines.
-        importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
-        // Remove cameras and lights
-        importer.SetPropertyInteger(AI_CONFIG_PP_RVC_FLAGS, aiComponent_CAMERAS | aiComponent_LIGHTS);
-        // Enable progress tracking
-        importer.SetPropertyBool(AI_CONFIG_GLOB_MEASURE_TIME, true);
+        uint32_t urho3d_flags = 
+            aiProcess_ConvertToLeftHanded |
+            aiProcess_JoinIdenticalVertices |
+            aiProcess_Triangulate |
+            aiProcess_GenSmoothNormals |
+            aiProcess_LimitBoneWeights |
+            aiProcess_ImproveCacheLocality |
+            aiProcess_RemoveRedundantMaterials |
+            aiProcess_FixInfacingNormals |
+            aiProcess_FindInvalidData |
+            aiProcess_GenUVCoords |
+            aiProcess_FindInstances |
+            aiProcess_OptimizeMeshes;
 
-        if (const aiScene* pScene = importer.ReadFile(filePath, flags))
+        uint32_t doc_flags =
+            aiProcess_Triangulate |
+            aiProcess_GenSmoothNormals |
+            aiProcess_CalcTangentSpace;
+
+        const aiScene* pScene = importer.ReadFile(filePath,
+            //spartan_flags);
+            //urho3d_flags);
+            //doc_flags);
+            aiProcess_ConvertToLeftHanded |
+            aiProcess_Triangulate |
+            aiProcess_GenSmoothNormals |
+            aiProcess_CalcTangentSpace);
+        if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode)
         {
-            m_pAiScene = pScene;
-            m_bAnimation = pScene->mNumAnimations != 0;
-
-            parseNode(pScene->mRootNode);
-
-            if (!m_pModel->CreateBuffers())
-            {
-                m_pModel->Clear();
-                return false;
-            }
+            DV_CORE_ERROR("{:s}", importer.GetErrorString());
+            return false;
         }
-        else
-        {
-            DV_CORE_ERROR("AssetImporter::Load - {:s}", importer.GetErrorString());
-        }
+
+        // CreateAndBuildModel
+        m_pModel = new Model;
+        m_pModel->SetName(FileSystem::GetFileName(filePath));
+        ResourceCache::Cache<Model>(m_pModel);
+        parseNodes(pScene, pScene->mRootNode, &m_pModel->GetRootNodeInfo());
+        m_pModel->Build();
+
+        // CreateAndBuildAnimation
+        aiAnimation* anim = pScene->mAnimations[0];
+        m_pAnimation = new Animation(
+            anim->mName.C_Str(),
+            static_cast<float>(anim->mDuration),
+            static_cast<float>(anim->mTicksPerSecond),
+            anim->mNumChannels);
+        ResourceCache::Cache<Animation>(m_pAnimation);
+        processAnimation(anim);
+        m_pAnimation->SetRootGameObject(m_pModel->GetRootGameObject());     // 다시 살펴보기
+
+        /*
+        // 계층구조와 mesh를 파싱하면서 model을 구성
+        processNode(pScene, pScene->mRootNode);
+        // 구성된 model의 mesh를 build
+        m_pModel->BuildMeshBuffers();
+
+        // animaiton 생성 및 cache
+        aiAnimation* anim = pScene->mAnimations[0];
+        m_pAnimation = new Animation(
+            anim->mName.C_Str(), 
+            static_cast<float>(anim->mDuration),
+            static_cast<float>(anim->mTicksPerSecond),
+            anim->mNumChannels);
+        ResourceCache::Cache<Animation>(m_pAnimation);
+
+        processAnimation(pScene->mAnimations[0]);
+        */
 
         importer.FreeScene();
 
-		DV_CORE_DEBUG("AssetImporter가 Model({:s})(을)를 구성을 완료하였습니다.", filePath);
-
-		return m_pAiScene != nullptr;
-	}
-
-    // 루트노드부터 시작해 재귀적으로 수행
-    // 노드마다 GameObject를 생성한 후 Transform을 추가해 계층구조를 구성
-    // 메시가 존재한다면 파싱 호출
-    // 이때 계층구조 노드는 bone의 노드일 수도 있다.
-    void AssetImporter::parseNode(const aiNode* pNode, GameObject* pParentGameObject)
-    {
-        DV_ASSERT(pNode);
-
-        auto pNodeGameObject = Scene::CreateGameObject();
-
-        bool bRootNode = pParentGameObject == nullptr;
-        if (bRootNode) 
-        {
-            m_pModel->SetRootGameObject(pNodeGameObject);
-            pNodeGameObject->GetTransform()->SetParent(nullptr);
-            pNodeGameObject->SetName(m_Name);
-        }
-        else
-        {
-            pNodeGameObject->GetTransform()->SetParent(pParentGameObject->GetTransform());
-            pNodeGameObject->SetName(pNode->mName.C_Str());
-        }
-
-        pNodeGameObject->GetTransform()->SetMatrix(ConvertMatrix(pNode->mTransformation));
-
-        if (pNode->mNumMeshes > 0)
-            parseNodeMeshes(pNode, pNodeGameObject);
-
-        for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
-            parseNode(pNode->mChildren[i], pNodeGameObject);
+        return true;
     }
 
-    // 노드 파싱 과정에서 메시가 존재할 때만 호출
-    // 일단 해당 게임 오브젝트에 메시의 이름을 설정한 후
-    // 본격적으로 메시를 파싱하는 함수를 호출
-    void AssetImporter::parseNodeMeshes(const aiNode* pNode, GameObject* pNodeGameObject)
+    void AssetImporter::extractBoneWeightForVertices(std::vector<VertexSkinned>& vertices, aiMesh* pMesh, const aiScene* pScene)
     {
-        DV_ASSERT(pNode);
-        DV_ASSERT(pNodeGameObject);
+        // bone name이 key, bone id와 offset이 value
+        auto& boneInfoMap = m_pModel->GetBoneInfoMap();
 
-        for (uint32_t i = 0; i < pNode->mNumMeshes; ++i)
-        {
-            auto pMeshGameObject = pNodeGameObject;
-            aiMesh* pMesh = m_pAiScene->mMeshes[pNode->mMeshes[i]];
-            std::string name = pMesh->mName.C_Str();
-
-            if (pNode->mNumMeshes > 1)
-            {
-                pMeshGameObject = Scene::CreateGameObject();
-                pMeshGameObject->GetTransform()->SetParent(pNodeGameObject->GetTransform());
-
-                // 원래 이름이 다를 수 있는데 이건 너무 강제적이다.
-                name += "_" + std::to_string(i + 1);
-            }
-
-            pMeshGameObject->SetName(name);
-
-            if (pMesh->mBones)
-                buildSkinnedMesh(pMesh, pNodeGameObject);
-            else
-                buildStaticMesh(pMesh, pNodeGameObject);
-            //parseMesh(pAiMesh, pMeshGameObject);
-        }
-    }
-
-    // 메시를 읽어들인 후 Model에 저장한다.
-    // 그리고 이때 Drawable에 offset과 count가 저장된다.
-    void AssetImporter::parseMesh(aiMesh* pAiMesh, GameObject* pMeshGameObject)
-    {
-        DV_ASSERT(pAiMesh);
-        DV_ASSERT(pMeshGameObject);
-
-        uint32_t vertexCount = pAiMesh->mNumVertices;
-        uint32_t indexCount = pAiMesh->mNumFaces * 3;
-
-        // 하나의 Model에 두 가지 타입의 Mesh가 존재할 수 있다.
-        // 따라서 Mesh별로 타입을 확인한 후 MeshRenderer를 맞춰 생성해야 한다.
-        std::vector<VertexStatic> vertices;
-        vertices.resize(vertexCount);
-        for (uint32_t i = 0; i < vertexCount; ++i)
-        {
-            auto& vertex = vertices[i];
-
-            const auto& pos = pAiMesh->mVertices[i];
-            vertex.pos[0] = pos.x;
-            vertex.pos[1] = pos.y;
-            vertex.pos[2] = pos.z;
-
-            if (pAiMesh->mNormals)
-            {
-                const auto& normal = pAiMesh->mNormals[i];
-                vertex.normal[0] = normal.x;
-                vertex.normal[1] = normal.y;
-                vertex.normal[2] = normal.z;
-            }
-
-            if (pAiMesh->mTangents)
-            {
-                const auto& tangent = pAiMesh->mTangents[i];
-                vertex.tangent[0] = tangent.x;
-                vertex.tangent[1] = tangent.y;
-                vertex.tangent[2] = tangent.z;
-            }
-
-            const uint32_t uvChannel = 0;
-            if (pAiMesh->HasTextureCoords(uvChannel))
-            {
-                const auto& texCoords = pAiMesh->mTextureCoords[uvChannel][i];
-                vertex.tex[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
-                vertex.tex[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
-             }
-        }
-
-        std::vector<uint32_t> indices;
-        indices.resize(indexCount);
-        for (uint32_t i = 0; i < pAiMesh->mNumFaces; ++i)
-        {
-            const auto& face = pAiMesh->mFaces[i];
-            const uint32_t index = (i * 3);
-            indices[index] = face.mIndices[0];
-            indices[index + 1] = face.mIndices[1];
-            indices[index + 2] = face.mIndices[2];
-        }
-
-        uint32_t vertexOffset = 0;
-        m_pModel->AddVertices(vertices, &vertexOffset);
-
-        uint32_t indexOffset = 0;
-        m_pModel->AddIndices(indices, &indexOffset);
-
-        auto pDrawable = pMeshGameObject->AddComponent<Drawable>();
-        pDrawable->SetMesh(
-            m_pModel, 
-            pAiMesh->mName.C_Str(), 
-            vertexOffset, 
-            static_cast<uint32_t>(vertices.size()),
-            indexOffset,
-            static_cast<uint32_t>(indices.size()));
-
-        collectBones(pAiMesh);
-
-        pDrawable->SetMaterial(parseMaterial(pAiMesh));
-    }
-
-    // 현재 문서의 구현을 따랐지만 노드 누적변환에 대한 부분을 찾지 못했다.
-    void AssetImporter::collectBones(aiMesh* pMesh)
-    {
-        auto boneInfoMap = m_pModel->GetBoneInfoMap();
-        uint32_t boneCounter = 0;
-
-        for (uint32_t boneIndex = 0; boneIndex < pMesh->mNumBones; ++boneIndex)
+        // 현재 mesh에 영향을 주는 bones
+        for (uint32_t i = 0; i < pMesh->mNumBones; ++i)
         {
             int boneID = -1;
-            aiBone* pBone = pMesh->mBones[boneIndex];
+            aiBone* pBone = pMesh->mBones[i];
             std::string boneName = pBone->mName.C_Str();
-
             if (boneInfoMap.find(boneName) == boneInfoMap.end())
             {
-                BoneInfo boneInfo;
-                boneInfo.id = boneCounter;
-                boneInfo.offsetMatrix = ConvertMatrix(pBone->mOffsetMatrix);
-
-                boneInfoMap[boneName] = boneInfo;
-
-                boneID = boneCounter++;
+                BoneInfo newBoneInfo;
+                newBoneInfo.id = boneID = m_BoneCounter++;
+                newBoneInfo.offsetTransform = ConvertMatrix(pBone->mOffsetMatrix);
+                boneInfoMap[boneName] = newBoneInfo;
             }
             else
             {
                 boneID = boneInfoMap[boneName].id;
             }
 
+            DV_ASSERT(boneID != -1);
+
+            // 현재 bone이 영향을 주는 wights들
+            // bone은 mesh를 구성하는 다수의 vertex들에게 영향을 주므로
+            // mnumWeights는 영향을 주는 vertices 개수,
+            // weights에는 영향을 주는 vertex의 index가 들어있다.
             auto weights = pBone->mWeights;
-            uint32_t numWeights = pBone->mNumWeights;
+            int numWeights = pBone->mNumWeights;
 
-            for (uint32_t weightIndex = 0; weightIndex < numWeights; ++weightIndex)
+            for (int j = 0; j < numWeights; ++j)
             {
-                uint32_t vertexIndex = weights[weightIndex].mVertexId;
-                float weight = weights[weightIndex].mWeight;
+                uint32_t vertexID = weights[j].mVertexId;
+                float weight = weights[j].mWeight;
+                DV_ASSERT(vertexID <= static_cast<uint32_t>(vertices.size()));
+                setVertexBoneData(vertices[vertexID], boneID, weight);
 
-                // set vertex bone data
-                // 이건 함수로 한다. 그런데 예제는 본 함수에 Vertices를 전달받았다.
-                // model에서 해당 mesh의 raw data를 참조로 가져온다면... 좀 복잡한가...?
+                //DV_CORE_DEBUG("{0:d}번째 bone, {1:d}번째 weight vertexID: {2:d}, weight: {3:f}", i, j, vertexID, weight);
             }
         }
     }
 
-    void AssetImporter::buildStaticMesh(aiMesh* pMesh, GameObject* pMeshGameObject)
+    void AssetImporter::setVertexBoneData(VertexSkinned& vertex, int boneID, float weight)
     {
-        uint32_t vertexCount = pMesh->mNumVertices;
-        uint32_t indexCount = pMesh->mNumFaces * 3;
-
-        std::vector<VertexStatic> vertices;
-        vertices.resize(vertexCount);
-        for (uint32_t i = 0; i < vertexCount; ++i)
+        for (uint32_t i = 0; i < 4; ++i)
         {
-            auto& vertex = vertices[i];
-
-            const auto& pos = pMesh->mVertices[i];
-            vertex.pos[0] = pos.x;
-            vertex.pos[1] = pos.y;
-            vertex.pos[2] = pos.z;
-
-            if (pMesh->mNormals)
+            if (vertex.boneIDs[i] < 0)
             {
-                const auto& normal = pMesh->mNormals[i];
-                vertex.normal[0] = normal.x;
-                vertex.normal[1] = normal.y;
-                vertex.normal[2] = normal.z;
-            }
-
-            if (pMesh->mTangents)
-            {
-                const auto& tangent = pMesh->mTangents[i];
-                vertex.tangent[0] = tangent.x;
-                vertex.tangent[1] = tangent.y;
-                vertex.tangent[2] = tangent.z;
-            }
-
-            const uint32_t uvChannel = 0;
-            if (pMesh->HasTextureCoords(uvChannel))
-            {
-                const auto& texCoords = pMesh->mTextureCoords[uvChannel][i];
-                vertex.tex[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
-                vertex.tex[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
+                vertex.boneIDs[i] = boneID;
+                vertex.weights[i] = weight;
+                break;
             }
         }
-
-        std::vector<uint32_t> indices;
-        indices.resize(indexCount);
-        for (uint32_t i = 0; i < pMesh->mNumFaces; ++i)
-        {
-            const auto& face = pMesh->mFaces[i];
-            const uint32_t index = (i * 3);
-            indices[index] = face.mIndices[0];
-            indices[index + 1] = face.mIndices[1];
-            indices[index + 2] = face.mIndices[2];
-        }
-
-        uint32_t vertexOffset = 0;
-        m_pModel->AddVertices(vertices, &vertexOffset);
-
-        uint32_t indexOffset = 0;
-        m_pModel->AddIndices(indices, &indexOffset);
-
-        auto pDrawable = pMeshGameObject->AddComponent<Drawable>();
-        pDrawable->SetMesh(
-            m_pModel,
-            pMesh->mName.C_Str(),
-            vertexOffset,
-            static_cast<uint32_t>(vertices.size()),
-            indexOffset,
-            static_cast<uint32_t>(indices.size()));
-
-        pDrawable->SetMaterial(parseMaterial(pMesh));
     }
 
-    void AssetImporter::buildSkinnedMesh(aiMesh* pMesh, GameObject* pMeshGameObject)
+    void AssetImporter::processNode(const aiScene* pScene, aiNode* pNode, GameObject* pParentGameObject)
     {
-        uint32_t vertexCount = pMesh->mNumVertices;
-        uint32_t indexCount = pMesh->mNumFaces * 3;
+        GameObject* pNewNode = Scene::CreateGameObject();//new GameObject;
+        pNewNode->SetName(pNode->mName.C_Str());
+        pNewNode->GetTransform()->SetLocalMatrix(ConvertMatrix(pNode->mTransformation));
 
-        std::vector<VertexSkinned> vertices;
-        vertices.resize(vertexCount);
-        for (uint32_t i = 0; i < vertexCount; ++i)
+        bool bRootNode = pParentGameObject == nullptr;
+        if (bRootNode)
         {
-            auto& vertex = vertices[i];
-
-            const auto& pos = pMesh->mVertices[i];
-            vertex.pos[0] = pos.x;
-            vertex.pos[1] = pos.y;
-            vertex.pos[2] = pos.z;
-
-            if (pMesh->mNormals)
-            {
-                const auto& normal = pMesh->mNormals[i];
-                vertex.normal[0] = normal.x;
-                vertex.normal[1] = normal.y;
-                vertex.normal[2] = normal.z;
-            }
-
-            if (pMesh->mTangents)
-            {
-                const auto& tangent = pMesh->mTangents[i];
-                vertex.tangent[0] = tangent.x;
-                vertex.tangent[1] = tangent.y;
-                vertex.tangent[2] = tangent.z;
-            }
-
-            const uint32_t uvChannel = 0;
-            if (pMesh->HasTextureCoords(uvChannel))
-            {
-                const auto& texCoords = pMesh->mTextureCoords[uvChannel][i];
-                vertex.tex[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
-                vertex.tex[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
-            }
+            m_pModel->SetRootGameObject(pNewNode);
+            pNewNode->GetTransform()->SetParent(nullptr);
+        }
+        else
+        {
+            pNewNode->GetTransform()->SetParent(pParentGameObject->GetTransform());
         }
 
-        std::vector<uint32_t> indices;
-        indices.resize(indexCount);
-        for (uint32_t i = 0; i < pMesh->mNumFaces; ++i)
+        if (pNode->mMeshes)
+            processMeshes(pScene, pNode, pNewNode);
+
+        for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
         {
-            const auto& face = pMesh->mFaces[i];
-            const uint32_t index = (i * 3);
-            indices[index] = face.mIndices[0];
-            indices[index + 1] = face.mIndices[1];
-            indices[index + 2] = face.mIndices[2];
+            processNode(pScene, pNode->mChildren[i], pNewNode);
         }
-
-        /*
-        uint32_t vertexOffset = 0;
-        m_pModel->AddVertices(vertices, &vertexOffset);
-
-        uint32_t indexOffset = 0;
-        m_pModel->AddIndices(indices, &indexOffset);
-
-        auto pDrawable = pMeshGameObject->AddComponent<Drawable>();
-        pDrawable->SetMesh(
-            m_pModel,
-            pMesh->mName.C_Str(),
-            vertexOffset,
-            static_cast<uint32_t>(vertices.size()),
-            indexOffset,
-            static_cast<uint32_t>(indices.size()));
-        */
-
-        collectBones(pMesh);
-
-        //pDrawable->SetMaterial(parseMaterial(pMesh));
     }
 
-    Material* AssetImporter::parseMaterial(aiMesh* pAiMesh)
+    void AssetImporter::processMeshes(const aiScene* pScene, aiNode* pNode, GameObject* pNodeGameObject)
     {
-        DV_ASSERT(pAiMesh);
-
-        const auto* pAiMaterial = m_pAiScene->mMaterials[pAiMesh->mMaterialIndex];
-        if (!pAiMaterial)
-            return ResourceCache::GetResourceByPath<Material>("Assets/Materials/Default.yaml");
-
-        aiString name;
-        aiGetMaterialString(pAiMaterial, AI_MATKEY_NAME, &name);
-
-        aiColor4D diffuse(1.0f, 1.0f, 1.0f, 1.0f);
-        aiGetMaterialColor(pAiMaterial, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
-
-        aiColor4D opacity(1.0f, 1.0f, 1.0f, 1.0f);
-        aiGetMaterialColor(pAiMaterial, AI_MATKEY_OPACITY, &opacity);
-
-        // textures
-        aiString texturePath;
-        if (pAiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) != AI_SUCCESS)
-            pAiMaterial->GetTexture(aiTextureType_BASE_COLOR, 0, &texturePath);
-
-        DV_CORE_INFO("Original Material Path: {:s}", texturePath.C_Str());
-
-        /*
-        * 1. 우선 파싱한 경로에서 파일을 찾아본다.
-        * 2. texture 폴더에서 파일을 찾아본다.
-        * 3. texture 폴더에서 다른 확장자로 파일을 찾아본다.
-        * 4. 디폴트 재질을 전달한다.
-        */
-
-        /*
-        auto diffTexPath = //FileSystem::GetFileNameAndExtension(texturePath.C_Str());
-            //texturePath.C_Str();
-            "Assets/Models/pilot-avatar/textures/Material.002_Base_Color.png";
-            //"Assets/Models/dancing-stormtrooper/textures/stormtrooper_D.png";
-        //diffTexPath = "Assets/Models/sponza-master/textures/" + diffTexPath;
-        
-        auto diffTex = ResourceCache::GetResourceByPath<Texture2D>(diffTexPath);
-        if (diffTex)
+        for (uint32_t i = 0; i < pNode->mNumMeshes; ++i)
         {
-            auto pMaterial = new Material();
-            pMaterial->SetName(name.C_Str());
-            pMaterial->SetColorAlbedo(diffuse.r, diffuse.g, diffuse.b, opacity.r);
-            pMaterial->SetTexture(eTextureUnit::Diffuse, diffTex);
-            ResourceCache::AddManualResource<Material>(pMaterial);
-            return pMaterial;
+            aiMesh* pMesh = pScene->mMeshes[pNode->mMeshes[i]];
+            const std::string& name = pMesh->mName.C_Str();
+            
+            pNodeGameObject->SetName(name);
+
+            // indices
+            uint32_t numIndices = pMesh->mNumFaces * 3;
+            std::vector<uint32_t> indices;
+            indices.resize(numIndices);
+
+            for (uint32_t i = 0; i < pMesh->mNumFaces; ++i)
+            {
+                const auto& face = pMesh->mFaces[i];
+                const uint32_t index = (i * 3);
+                indices[index] = face.mIndices[0];
+                indices[index + 1] = face.mIndices[1];
+                indices[index + 2] = face.mIndices[2];
+            }
+
+            // vertices
+            uint32_t numVertices = pMesh->mNumVertices;
+            if (!pMesh->mNumBones)
+            {
+                std::vector<VertexStatic> vertices;
+                vertices.resize(numVertices);
+
+                for (uint32_t i = 0; i < numVertices; ++i)
+                {
+                    VertexStatic& vertex = vertices[i];
+
+                    // position
+                    const auto& position = pMesh->mVertices[i];
+                    vertex.position[0] = position.x;
+                    vertex.position[1] = position.y;
+                    vertex.position[2] = position.z;
+
+                    // texCoords
+                    const uint32_t uvChannel = 0;
+                    if (pMesh->HasTextureCoords(uvChannel))
+                    {
+                        const auto& texCoords = pMesh->mTextureCoords[uvChannel][i];
+                        vertex.texCoords[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
+                        vertex.texCoords[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
+                    }
+
+                    // normal
+                    if (pMesh->mNormals)
+                    {
+                        const auto& normal = pMesh->mNormals[i];
+                        vertex.normal[0] = normal.x;
+                        vertex.normal[1] = normal.y;
+                        vertex.normal[2] = normal.z;
+                    }
+
+                    // tangent
+                    if (pMesh->mTangents)
+                    {
+                        const auto& tangent = pMesh->mTangents[i];
+                        vertex.tangent[0] = tangent.x;
+                        vertex.tangent[1] = tangent.y;
+                        vertex.tangent[2] = tangent.z;
+                    }
+                }
+
+                // model에 넣어서 mesh를 형성하고
+                //DvStaticMesh* pStaticMesh = m_pModel->InsertStaticMesh(DvStaticMesh(pNode->mName.C_Str(), name, vertices, indices));
+
+                // game object에 meshRenderer를 추가하고 mesh를 연결
+                //MeshRenderer* pMeshRenderer = pNodeGameObject->AddComponent<MeshRenderer>();
+                //pMeshRenderer->SetMesh(pStaticMesh);
+            }
+            else
+            {
+                std::vector<VertexSkinned> vertices;
+                vertices.resize(numVertices);
+
+                for (uint32_t i = 0; i < numVertices; ++i)
+                {
+                    VertexSkinned& vertex = vertices[i];
+
+                    // position
+                    const auto& position = pMesh->mVertices[i];
+                    vertex.position[0] = position.x;
+                    vertex.position[1] = position.y;
+                    vertex.position[2] = position.z;
+
+                    // texCoords
+                    const uint32_t uvChannel = 0;
+                    if (pMesh->HasTextureCoords(uvChannel))
+                    {
+                        const auto& texCoords = pMesh->mTextureCoords[uvChannel][i];
+                        vertex.texCoords[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
+                        vertex.texCoords[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
+                    }
+
+                    // normal
+                    if (pMesh->mNormals)
+                    {
+                        const auto& normal = pMesh->mNormals[i];
+                        vertex.normal[0] = normal.x;
+                        vertex.normal[1] = normal.y;
+                        vertex.normal[2] = normal.z;
+                    }
+
+                    // tangent
+                    if (pMesh->mTangents)
+                    {
+                        const auto& tangent = pMesh->mTangents[i];
+                        vertex.tangent[0] = tangent.x;
+                        vertex.tangent[1] = tangent.y;
+                        vertex.tangent[2] = tangent.z;
+                    }
+                }
+
+                extractBoneWeightForVertices(vertices, pMesh, pScene);
+
+                // model에 넣어서 mesh를 형성하고
+                //SkinnedMesh* pSkinnedMesh = m_pModel->InsertSkinnedMesh(SkinnedMesh(pNode->mName.C_Str(), name, vertices, indices));
+
+                // game object에 meshRenderer를 추가하고 mesh를 연결
+                //SkinnedMeshRenderer* pSkinnedMeshRenderer = pNodeGameObject->AddComponent<SkinnedMeshRenderer>();
+                //pSkinnedMeshRenderer->SetMesh(pSkinnedMesh);
+            }
         }
-        */
-        return ResourceCache::GetResourceByPath<Material>("Assets/Materials/Default.yaml");
     }
+
+    void AssetImporter::processAnimation(aiAnimation* pAnimation)
+    {
+        uint32_t numChannels = pAnimation->mNumChannels;
+        auto& boneInfoMap = m_pModel->GetBoneInfoMap();
+        uint32_t boneCount = m_pModel->GetBoneCount();
+
+        // 채널단위 접근
+        // 결국 채널이란게 뼈대별 key 정보라는 의미인듯....
+        for (uint32_t i = 0; i < numChannels; ++i)
+        {
+            aiNodeAnim* pChannel = pAnimation->mChannels[i];
+            std::string boneName = pChannel->mNodeName.C_Str();
+
+            if (boneInfoMap.find(boneName) == boneInfoMap.end())
+            {
+                boneInfoMap[boneName].id = boneCount;
+                boneCount++;
+
+                DV_CORE_DEBUG("read missing bone: {:s}", boneName);
+            }
+
+            // create bone
+            {
+                uint32_t numPosKeys = pChannel->mNumPositionKeys;
+                std::vector<KeyPosition> positionKeys;
+                positionKeys.reserve(numPosKeys);
+                for (uint32_t j = 0; j < numPosKeys; ++j)
+                {
+                    double time = pChannel->mPositionKeys[j].mTime;
+                    DirectX::XMFLOAT3 value = ConvertVector3(pChannel->mPositionKeys[j].mValue);
+
+                    positionKeys.emplace_back(time, value);
+                }
+                
+                uint32_t numRotKeys = pChannel->mNumRotationKeys;
+                std::vector<KeyRotation> rotationKeys;
+                rotationKeys.reserve(numRotKeys);
+                for (uint32_t j = 0; j < numRotKeys; ++j)
+                {
+                    double time = pChannel->mRotationKeys[j].mTime;
+                    DirectX::XMFLOAT4 value = ConvertQuaternion(pChannel->mRotationKeys[j].mValue);
+
+                    rotationKeys.emplace_back(time, value);
+                }
+                
+                uint32_t numSclKeys = pChannel->mNumScalingKeys;
+                std::vector<KeyScale> scaleKeys;
+                scaleKeys.reserve(numSclKeys);
+                for (uint32_t j = 0; j < numSclKeys; ++j)
+                {
+                    double time = pChannel->mScalingKeys[j].mTime;
+                    DirectX::XMFLOAT3 value = ConvertVector3(pChannel->mScalingKeys[j].mValue);
+
+                    scaleKeys.emplace_back(time, value);
+                }
+
+                // 채널에 매칭된 뼈대를 생성한 후 애니메이션에 추가
+                Bone bone(boneName, boneInfoMap[boneName].id);
+                bone.SetPositions(positionKeys);
+                bone.SetRotations(rotationKeys);
+                bone.SetScales(scaleKeys);
+
+                m_pAnimation->InsertBone(bone);
+            }
+        }
+
+        m_pAnimation->SetBoneIDMap(boneInfoMap);
+    }
+
+    void AssetImporter::parseNodes(const aiScene* pScene, aiNode* pNode, NodeInfo* pNodeInfo)
+    {
+        // nodeInfo는 Model의 RootNodeInfo부터 시작해 재귀적으로 저장된다.
+        pNodeInfo->name = pNode->mName.C_Str();
+        pNodeInfo->transform = ConvertMatrix(pNode->mTransformation);
+        pNodeInfo->numChildren = pNode->mNumChildren;
+        pNodeInfo->children.resize(pNode->mNumChildren);
+
+        if (pNode->mMeshes) 
+        {
+            parseMeshes(pScene, pNode);
+        }
+
+        for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
+        {
+            parseNodes(pScene, pNode->mChildren[i], &pNodeInfo->children[i]);
+        }
+    }
+
+    void AssetImporter::parseMeshes(const aiScene* pScene, aiNode* pNode)
+    {
+        for (uint32_t i = 0; i < pNode->mNumMeshes; ++i)
+        {
+            aiMesh* pMesh = pScene->mMeshes[pNode->mMeshes[i]];
+
+            // indices
+            uint32_t numIndices = pMesh->mNumFaces * 3;//GetNumValidFaces(pMesh) * 3;
+            std::vector<uint32_t> indices;
+            indices.resize(numIndices);
+
+            for (uint32_t i = 0; i < pMesh->mNumFaces; ++i)
+            {
+                const auto& face = pMesh->mFaces[i];
+                const uint32_t index = (i * 3);
+                indices[index] = face.mIndices[0];
+                indices[index + 1] = face.mIndices[1];
+                indices[index + 2] = face.mIndices[2];
+            }
+
+            // vertices
+            uint32_t numVertices = pMesh->mNumVertices;
+            if (!pMesh->mNumBones)
+            {
+                std::vector<VertexStatic> vertices;
+                vertices.resize(numVertices);
+
+                for (uint32_t i = 0; i < numVertices; ++i)
+                {
+                    VertexStatic& vertex = vertices[i];
+
+                    // position
+                    const auto& position = pMesh->mVertices[i];
+                    vertex.position[0] = position.x;
+                    vertex.position[1] = position.y;
+                    vertex.position[2] = position.z;
+
+                    // texCoords
+                    const uint32_t uvChannel = 0;
+                    if (pMesh->HasTextureCoords(uvChannel))
+                    {
+                        const auto& texCoords = pMesh->mTextureCoords[uvChannel][i];
+                        vertex.texCoords[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
+                        vertex.texCoords[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
+                    }
+
+                    // normal
+                    if (pMesh->mNormals)
+                    {
+                        const auto& normal = pMesh->mNormals[i];
+                        vertex.normal[0] = normal.x;
+                        vertex.normal[1] = normal.y;
+                        vertex.normal[2] = normal.z;
+                    }
+
+                    // tangent
+                    if (pMesh->mTangents)
+                    {
+                        const auto& tangent = pMesh->mTangents[i];
+                        vertex.tangent[0] = tangent.x;
+                        vertex.tangent[1] = tangent.y;
+                        vertex.tangent[2] = tangent.z;
+                    }
+                }
+
+                // model에 넣어서 mesh를 형성하고
+                //m_pModel->InsertStaticMesh(DvStaticMesh(pNode->mName.C_Str(), pMesh->mName.C_Str(), vertices, indices));
+            }
+            else
+            {
+                std::vector<VertexSkinned> vertices;
+                vertices.resize(numVertices);
+
+                for (uint32_t i = 0; i < numVertices; ++i)
+                {
+                    VertexSkinned& vertex = vertices[i];
+
+                    // position
+                    const auto& position = pMesh->mVertices[i];
+                    vertex.position[0] = position.x;
+                    vertex.position[1] = position.y;
+                    vertex.position[2] = position.z;
+
+                    // texCoords
+                    const uint32_t uvChannel = 0;
+                    if (pMesh->HasTextureCoords(uvChannel))
+                    {
+                        const auto& texCoords = pMesh->mTextureCoords[uvChannel][i];
+                        vertex.texCoords[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
+                        vertex.texCoords[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
+                    }
+
+                    // normal
+                    if (pMesh->mNormals)
+                    {
+                        const auto& normal = pMesh->mNormals[i];
+                        vertex.normal[0] = normal.x;
+                        vertex.normal[1] = normal.y;
+                        vertex.normal[2] = normal.z;
+                    }
+
+                    // tangent
+                    if (pMesh->mTangents)
+                    {
+                        const auto& tangent = pMesh->mTangents[i];
+                        vertex.tangent[0] = tangent.x;
+                        vertex.tangent[1] = tangent.y;
+                        vertex.tangent[2] = tangent.z;
+                    }
+                }
+
+                //extractBoneWeightForVertices(vertices, pMesh, pScene);
+
+                //m_pModel->InsertSkinnedMesh(SkinnedMesh(pNode->mName.C_Str(), pMesh->mName.C_Str(), vertices, indices));
+
+                /*
+                for (size_t i = 0; i < vertices.size(); ++i)
+                {
+                    DV_CORE_DEBUG("{0:n}번째 vertex bondID: {1:d}, {2:d}, {3:d}, {4:d}", 
+                        i, vertices[i].boneIDs[0], vertices[i].boneIDs[1], vertices[i].boneIDs[2], vertices[i].boneIDs[3]);
+
+                    float totalWeight = vertices[i].weights[0] + vertices[i].weights[1] + vertices[i].weights[2] + vertices[i].weights[3];
+                    if (totalWeight > 1.0f)
+                    {
+                        DV_CORE_ERROR("{0:n}번째 vertex weight: {1:f}, {2:f}, {3:f}, {4:f}, total weights: {5:f}",
+                            i, vertices[i].weights[0], vertices[i].weights[1], vertices[i].weights[2], vertices[i].weights[3], totalWeight);
+                    }
+                    else
+                    {
+                        DV_CORE_DEBUG("{0:n}번째 vertex weight: {1:f}, {2:f}, {3:f}, {4:f}, total weights: {5:f}",
+                            i, vertices[i].weights[0], vertices[i].weights[1], vertices[i].weights[2], vertices[i].weights[3], totalWeight);
+                    }
+                }
+                */
+            }
+        }
+    }
+
 }

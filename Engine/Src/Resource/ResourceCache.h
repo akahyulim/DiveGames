@@ -6,8 +6,6 @@
 
 namespace Dive
 {
-	class AssetImporter;
-
 	class ResourceCache
 	{
 	public:
@@ -168,8 +166,6 @@ namespace Dive
 
 			return LoadFromFile<T>(filePath);
 		}
-
-		static AssetImporter* GetModelImporter();
 
 	private:
 		static uint64_t getFreeID();

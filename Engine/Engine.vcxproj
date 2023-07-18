@@ -157,13 +157,13 @@
     <ClInclude Include="Src\Core\Engine.h" />
     <ClInclude Include="Src\Core\EventHandler.h" />
     <ClInclude Include="Src\Core\Object.h" />
-    <ClInclude Include="Src\Core\ProcessUtils.h" />
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Src\Graphics\GBuffer.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
+    <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
     <ClInclude Include="Src\Graphics\IndexBuffer.h" />
     <ClInclude Include="Src\Graphics\InputLayout.h" />
     <ClInclude Include="Src\Graphics\RenderTexture.h" />
@@ -176,9 +176,12 @@
     <ClInclude Include="Src\IO\FileStream.h" />
     <ClInclude Include="Src\IO\FileSystem.h" />
     <ClInclude Include="Src\IO\Log.h" />
+    <ClInclude Include="Src\Renderer\Animation.h" />
+    <ClInclude Include="Src\Renderer\Animator.h" />
+    <ClInclude Include="Src\Renderer\Bone.h" />
+    <ClInclude Include="Src\Renderer\Model.h" />
     <ClInclude Include="Src\Renderer\Material.h" />
     <ClInclude Include="Src\Renderer\Mesh.h" />
-    <ClInclude Include="Src\Renderer\Model.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\SkinnedMesh.h" />
     <ClInclude Include="Src\Renderer\View.h" />
@@ -188,9 +191,9 @@
     <ClInclude Include="Src\Resource\ResourceCache.h" />
     <ClInclude Include="Src\Scene\Components\Camera.h" />
     <ClInclude Include="Src\Scene\Components\Component.h" />
-    <ClInclude Include="Src\Scene\Components\Drawable.h" />
-    <ClInclude Include="Src\Scene\Components\Light.h" />
     <ClInclude Include="Src\Scene\Components\MeshRenderer.h" />
+    <ClInclude Include="Src\Scene\Components\SkinnedMeshRenderer.h" />
+    <ClInclude Include="Src\Scene\Components\Light.h" />
     <ClInclude Include="Src\Scene\Components\Transform.h" />
     <ClInclude Include="Src\Scene\GameObject.h" />
     <ClInclude Include="Src\Scene\Scene.h" />
@@ -200,7 +203,6 @@
     <ClCompile Include="Src\Core\Engine.cpp" />
     <ClCompile Include="Src\Core\EventHandler.cpp" />
     <ClCompile Include="Src\Core\Object.cpp" />
-    <ClCompile Include="Src\Core\ProcessUtils.cpp" />
     <ClCompile Include="Src\DivePch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -218,9 +220,12 @@
     <ClCompile Include="Src\IO\FileStream.cpp" />
     <ClCompile Include="Src\IO\FileSystem.cpp" />
     <ClCompile Include="Src\IO\Log.cpp" />
+    <ClCompile Include="Src\Renderer\Animator.cpp" />
+    <ClCompile Include="Src\Renderer\Animation.cpp" />
+    <ClCompile Include="Src\Renderer\Bone.cpp" />
+    <ClCompile Include="Src\Renderer\Model.cpp" />
     <ClCompile Include="Src\Renderer\Material.cpp" />
     <ClCompile Include="Src\Renderer\Mesh.cpp" />
-    <ClCompile Include="Src\Renderer\Model.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\SkinnedMesh.cpp" />
     <ClCompile Include="Src\Renderer\View.cpp" />
@@ -230,9 +235,9 @@
     <ClCompile Include="Src\Resource\ResourceCache.cpp" />
     <ClCompile Include="Src\Scene\Components\Camera.cpp" />
     <ClCompile Include="Src\Scene\Components\Component.cpp" />
-    <ClCompile Include="Src\Scene\Components\Drawable.cpp" />
-    <ClCompile Include="Src\Scene\Components\Light.cpp" />
     <ClCompile Include="Src\Scene\Components\MeshRenderer.cpp" />
+    <ClCompile Include="Src\Scene\Components\SkinnedMeshRenderer.cpp" />
+    <ClCompile Include="Src\Scene\Components\Light.cpp" />
     <ClCompile Include="Src\Scene\Components\Transform.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />

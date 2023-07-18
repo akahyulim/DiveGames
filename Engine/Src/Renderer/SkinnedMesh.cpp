@@ -4,27 +4,42 @@
 
 namespace Dive
 {
-	SkinnedMesh::SkinnedMesh()
+	SkinnedMesh::SkinnedMesh(const std::string& name, std::vector<VertexSkinned>& vertices, std::vector<uint32_t>& indices)
+		: m_Vertices(vertices),
+		m_Indices(indices)
 	{
+		m_Name = name;
+	}
+
+	SkinnedMesh::SkinnedMesh(const std::string& nodeName, const std::string& name, std::vector<VertexSkinned>& vertices, std::vector<uint32_t>& indices)
+		: m_Vertices(vertices),
+		m_Indices(indices)
+	{
+		m_NodeName = nodeName;
+		m_Name = name.empty() ? nodeName : name;
 	}
 
 	SkinnedMesh::~SkinnedMesh()
 	{
 	}
-	
-	void SkinnedMesh::AppendVertices(const std::vector<VertexSkinned>& vertices, uint32_t* pOffset)
-	{
-		if (pOffset)
-			*pOffset = static_cast<uint32_t>(vertices.size());
 
-		m_Vertices.insert(m_Vertices.end(), vertices.begin(), vertices.end());
+	void SkinnedMesh::CreateVertexBuffer()
+	{
+		m_pVertexBuffer = new VertexBuffer;
+		if (!m_pVertexBuffer->Create<VertexSkinned>(m_Vertices))
+		{
+			DV_CORE_ERROR("SkinnedMesh::CreateVertexBuffer: VertexBuffer 생성에 실패하였습니다.");
+			return;
+		}
 	}
-	
-	void SkinnedMesh::AppendIndices(const std::vector<uint32_t>& indices, uint32_t* pOffset)
-	{
-		if (pOffset)
-			*pOffset = static_cast<uint32_t>(indices.size());
 
-		m_Indices.insert(m_Indices.end(), indices.begin(), indices.end());
+	void SkinnedMesh::CreateIndexBuffer()
+	{
+		m_pIndexBuffer = new IndexBuffer;
+		if (!m_pIndexBuffer->Create<uint32_t>(m_Indices))
+		{
+			DV_CORE_ERROR("SkinnedMesh::CreateIndexBuffer: IndexBuffer 생성에 실패하였습니다.");
+			return;
+		}
 	}
 }

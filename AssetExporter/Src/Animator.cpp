@@ -33,6 +33,7 @@ void Animator::PlayAnimation(Animation* pAnimation)
 	m_CurrentTime = 0.0f;
 }
 
+// root node부터 재귀적으로 수행
 void Animator::CalculateBoneTransform(const AssimpNodeData* pNode, DirectX::XMFLOAT4X4 parentTransform)
 {
 	auto nodeName = pNode->name;
@@ -40,17 +41,22 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* pNode, DirectX::XMFL
 
 	Bone* pBone = m_pCurrentAnimation->FindBone(nodeName);
 
+	// 뼈대가 존재할 경우 node가 아닌 Bone의 Animation LocalTransform을 사용
 	if (pBone) 
 	{
 		pBone->Update(m_CurrentTime);
 		nodeTransform = pBone->GetLocalTransform();
 	}
 
+	// 누적 = 현재 노드 * 부모 노드
 	DirectX::XMFLOAT4X4 globalTransformation;
-	DirectX::XMStoreFloat4x4(&globalTransformation, DirectX::XMMatrixIdentity());
+	//DirectX::XMStoreFloat4x4(&globalTransformation, DirectX::XMMatrixIdentity());
 	DirectX::XMStoreFloat4x4(&globalTransformation, 
 		DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&parentTransform), DirectX::XMLoadFloat4x4(&nodeTransform)));
 
+	// 다시 offsetTransform을 곱한다.
+	// boneInfoMap을 사용하는 이유는 pBone를 통해 ID는 접근할 순 있지만
+	// offsetTransform은 BoneInfo에만 저장되어 있기 때문인듯 하다.
 	auto boneInfoMap = m_pCurrentAnimation->GetBoneIDMap();
 	if (boneInfoMap.find(nodeName) != boneInfoMap.end())
 	{
@@ -60,6 +66,7 @@ void Animator::CalculateBoneTransform(const AssimpNodeData* pNode, DirectX::XMFL
 			DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&globalTransformation), DirectX::XMLoadFloat4x4(&offset)));
 	}
 
+	// 재귀호출을 통해 모든 노드를 누적 변환
 	for (uint32_t i = 0; i < pNode->numChildren; ++i)
 		CalculateBoneTransform(&pNode->children[i], globalTransformation);
 }

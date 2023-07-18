@@ -7,6 +7,7 @@ namespace Dive
 	class Drawable;
 	class Light;
 	class GBuffer;
+	class IMeshRenderer;
 
 	enum class eRenderPath
 	{
@@ -31,8 +32,7 @@ namespace Dive
 		void SetCamera(Camera* pCamera) { m_pCamera = pCamera; }
 
 	private:
-		void renderPathForward();
-		void renderPathDeferred();
+		void renderPathEndeavor();
 
 	private:
 		Camera* m_pCamera;
@@ -42,5 +42,7 @@ namespace Dive
 		eRenderPath m_RenderPath;
 
 		GBuffer* m_pGBuffer;
+
+		std::vector<IMeshRenderer*> m_MeshRenderers;
 	};
 }

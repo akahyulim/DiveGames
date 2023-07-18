@@ -17,5 +17,6 @@ namespace Dive
 
 	Light::~Light()
 	{
+		DV_CORE_TRACE("Destroy Light: {:s}", GetName());
 	}
 }

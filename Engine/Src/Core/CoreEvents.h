@@ -46,15 +46,15 @@ namespace Dive
 		EVENT_CLASS_TYPE(Update)
 
 	public:
-		UpdateEvent(float timeStep)
-			: m_TimeStep(timeStep)
+		UpdateEvent(float deltaTime)
+			: m_DeltaTime(deltaTime)
 		{}
 		~UpdateEvent() = default;
 
-		float GetTimeStep() const { return m_TimeStep; }
+		float GetDeltaTime() const { return m_DeltaTime; }
 
 	private:
-		float m_TimeStep;
+		float m_DeltaTime;
 	};
 
 	// PostUpdate

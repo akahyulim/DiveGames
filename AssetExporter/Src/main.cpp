@@ -11,16 +11,17 @@ int main(int argc, char** argv)
 	Model model(pFile);
 	// Bone, Hierarcht 구성
 	Animation animation(pFile, &model);
-
+	// currentAnimation에 위의 animation을 등록
 	Animator animator(&animation);
 
 	// loop
 	{
 		// delta time
 
+		// 시간에 맞춰 모든 bone을 계층구조에 맞춰 누적변환
 		// animator.UpdateAnimation(deltaTime);
 
-		// 모든 뼈대의 애니메이션 누적 변환 결과 획득
+		// 변환결과를 index에 맞춰 저장한 finalBone 획득
 		// animator.GetFinalBoneMatrices();
 
 		// model.Draw();
