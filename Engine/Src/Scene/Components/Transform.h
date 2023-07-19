@@ -37,6 +37,7 @@ namespace Dive
 
 		DirectX::XMVECTOR GetRotation() const;
 		DirectX::XMVECTOR GetLocalRotation() const;
+		DirectX::XMFLOAT3 GetLocalRotationDegrees() const;
 		void SetRotation(float xAngle, float yAngle, float zAngle);
 		void SetRotation(const DirectX::XMFLOAT3& angle);
 		void SetRotationQuaternion(const DirectX::XMFLOAT4& quaternion);

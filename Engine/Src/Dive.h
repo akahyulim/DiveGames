@@ -37,6 +37,9 @@
 // Input
 #include "Input/Input.h"
 
+// Math
+#include "Math/Math.h"
+
 // IO
 #include "IO/Log.h"
 #include "IO/FileSystem.h"

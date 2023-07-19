@@ -108,6 +108,7 @@ void AssetViewer::Setup()
 {
 	// Engine Setup
 	Dive::Graphics::SetWindowTitle(L"AssetViewer");
+	//Dive::Graphics::ResizeWindow(800, 600);
 
 	// Subscribe Events
 	SUBSCRIBE_EVENT(Dive::eEventType::BeginRender, EVENT_HANDLER_PARAM(OnBeginRender));
@@ -122,7 +123,7 @@ void AssetViewer::Start()
 
 	m_pCamera = Dive::Scene::CreateGameObject("MainCamera");
 	Dive::Camera* pCamera = m_pCamera->AddComponent<Dive::Camera>();
-	pCamera->SetAspectRatio(static_cast<float>(Dive::Graphics::GetWidth()), static_cast<float>(Dive::Graphics::GetHeight()));
+	pCamera->SetAspectRatio(static_cast<float>(Dive::Graphics::GetWindowWidth()), static_cast<float>(Dive::Graphics::GetWindowHeight()));
 	m_pCamera->GetComponent<Dive::Transform>()->SetPosition(0.0f, 10.0f, -20.0f);
 }
 
@@ -155,10 +156,13 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 			bOpen = false;
 
 			const std::string filePath = FileOpen("All Files(*.*)\0");
-			if (m_Importer.LoadFromFile(filePath))
+			if (!filePath.empty())
 			{
-				m_pLoadedModel = m_Importer.GetModel()->GetRootGameObject();
-				bOpen = true;
+				if (m_Importer.LoadFromFile(filePath))
+				{
+					m_pLoadedModel = m_Importer.GetModel()->GetRootGameObject();
+					bOpen = true;
+				}
 			}
 		}
 
@@ -184,11 +188,24 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 		{
 			Dive::Engine::Exit();
 		}
-		
-		ImGui::ColorEdit3("Clear Color", (float*)&m_ClearColor);
+
 		ImGui::End();
 	}
 
+	// etc
+	{
+		ImGui::Begin("Info");
+
+		// window size
+		ImGui::Text("Window Size: %d x %d", Dive::Graphics::GetWindowWidth(), Dive::Graphics::GetWindowHeight());
+
+		// clear color
+		ImGui::ColorEdit3("Clear Color", (float*)&m_ClearColor);
+		
+		ImGui::End();
+	}
+
+	// Model Info
 	if(bOpen)
 	{
 		// Model Hierarchy
@@ -221,9 +238,9 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 						pTransform->SetLocalPosition(position);
 
 						// rotation
-						//auto rotation = pTransform->GetLocalRotationDegrees();
-						//DrawVec3Control("Rotation", rotation);
-						//pTransform->SetLocalRotation(rotation);
+						auto rotation = pTransform->GetLocalRotationDegrees();
+						DrawVec3Control("Rotation", rotation);
+						pTransform->SetLocalRotation(rotation);
 
 						// scale
 						DirectX::XMFLOAT3 scale;
@@ -245,23 +262,15 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 
 						ImGui::Text(pMat->GetName().c_str());
 
-						if (ImGui::Button("Stormtrooper"))
-						{
-							pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/Stormtrooper/Stormtrooper.png");
-						}
+						ImGui::Text("Diffuse: %s", pMat->GetTexture(Dive::eTextureUnit::Diffuse)->GetName().c_str());
 
 						ImGui::SameLine();
 
-						if (ImGui::Button("Pilot"))
+						if (ImGui::Button("Load"))
 						{
-							pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/pilot/Material.002_Base_Color.png");
-						}
-
-						ImGui::SameLine();
-
-						if (ImGui::Button("Vampire"))
-						{
-							pMat->AddTexture(Dive::eTextureUnit::Diffuse, "Assets/Textures/vampire/Vampire_diffuse.png");
+							const std::string filePath = FileOpen("All Files(*.*)\0");
+							if(!filePath.empty())
+								pMat->AddTexture(Dive::eTextureUnit::Diffuse, filePath);
 						}
 
 					}
@@ -294,9 +303,12 @@ void AssetViewer::OnEndRender(const Dive::Event& e)
 		{
 			//Dive::Graphics::GetDeviceContext()->RSSetState(Dive::Renderer::GetRasterizerState());
 
+			m_pCamera->GetComponent<Dive::Camera>()->SetAspectRatio(
+				static_cast<float>(Dive::Graphics::GetWindowWidth()), static_cast<float>(Dive::Graphics::GetWindowHeight()));
+
 			D3D11_VIEWPORT viewport;
-			viewport.Width = static_cast<float>(Dive::Graphics::GetWidth());
-			viewport.Height = static_cast<float>(Dive::Graphics::GetHeight());
+			viewport.Width = static_cast<float>(Dive::Graphics::GetWindowWidth());
+			viewport.Height = static_cast<float>(Dive::Graphics::GetWindowHeight());
 			viewport.MinDepth = 0.0f;
 			viewport.MaxDepth = 1.0f;
 			viewport.TopLeftX = 0.0f;

@@ -31,6 +31,9 @@
     <Filter Include="Src\Resource\Importer">
       <UniqueIdentifier>{e4e57786-4ea1-409e-92dc-1061955beac4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Math">
+      <UniqueIdentifier>{0f9a36da-95a4-474d-9306-b50c57b82511}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Dive.h">
@@ -171,6 +174,9 @@
     <ClInclude Include="Src\Graphics\GraphicsEvents.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Math\Math.h">
+      <Filter>Src\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DivePch.cpp">
@@ -292,6 +298,9 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Animator.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Math\Math.cpp">
+      <Filter>Src\Math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

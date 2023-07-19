@@ -1,6 +1,7 @@
 #include "DivePch.h"
 #include "Transform.h"
 #include "Scene/GameObject.h"
+#include "Math/Math.h"
 #include "IO/Log.h"
 
 using namespace DirectX;
@@ -133,6 +134,11 @@ namespace Dive
 	DirectX::XMVECTOR Transform::GetLocalRotation() const
 	{
 		return XMLoadFloat4(&m_LocalRotation);
+	}
+
+	DirectX::XMFLOAT3 Transform::GetLocalRotationDegrees() const
+	{
+		return Math::QuaternionToEularDegrees(m_LocalRotation);
 	}
 
 	void Transform::SetRotation(float xAngle, float yAngle, float zAngle)

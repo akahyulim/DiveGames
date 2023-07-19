@@ -196,7 +196,7 @@ namespace Dive
 
 		if (!s_pBlackTexture)
 		{
-			DirectX::XMINT2 size = Graphics::GetSize();
+			DirectX::XMINT2 size = Graphics::GetWindowSize();
 
 			s_pBlackTexture = new Texture2D();
 			s_pBlackTexture->SetSize(size.x, size.y);
@@ -216,7 +216,7 @@ namespace Dive
 
 		if (!s_pGrayTexture)
 		{
-			DirectX::XMINT2 size = Graphics::GetSize();
+			DirectX::XMINT2 size = Graphics::GetWindowSize();
 
 			s_pGrayTexture = new Texture2D();
 			s_pGrayTexture->SetSize(size.x, size.y);
@@ -236,7 +236,7 @@ namespace Dive
 
 		if (!s_pRedTexture)
 		{
-			DirectX::XMINT2 size = Graphics::GetSize();
+			DirectX::XMINT2 size = Graphics::GetWindowSize();
 
 			s_pRedTexture = new Texture2D();
 			s_pRedTexture->SetSize(size.x, size.y);
@@ -256,7 +256,7 @@ namespace Dive
 
 		if (!s_pWhiteTexture)
 		{
-			DirectX::XMINT2 size = Graphics::GetSize();
+			DirectX::XMINT2 size = Graphics::GetWindowSize();
 
 			s_pWhiteTexture = new Texture2D();
 			s_pWhiteTexture->SetSize(size.x, size.y);

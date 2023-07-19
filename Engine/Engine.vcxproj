@@ -176,6 +176,7 @@
     <ClInclude Include="Src\IO\FileStream.h" />
     <ClInclude Include="Src\IO\FileSystem.h" />
     <ClInclude Include="Src\IO\Log.h" />
+    <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\Animation.h" />
     <ClInclude Include="Src\Renderer\Animator.h" />
     <ClInclude Include="Src\Renderer\Bone.h" />
@@ -220,6 +221,7 @@
     <ClCompile Include="Src\IO\FileStream.cpp" />
     <ClCompile Include="Src\IO\FileSystem.cpp" />
     <ClCompile Include="Src\IO\Log.cpp" />
+    <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\Animator.cpp" />
     <ClCompile Include="Src\Renderer\Animation.cpp" />
     <ClCompile Include="Src\Renderer\Bone.cpp" />

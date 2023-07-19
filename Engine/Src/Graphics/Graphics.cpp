@@ -186,10 +186,13 @@ namespace Dive
 		{
 			FIRE_EVENT(WindowEvent(hWnd, msg, wParam, lParam));
 
-			//switch (msg)
+			switch (msg)
 			{
-				//default:
-				//	return 0;
+			case WM_SIZE:
+				UpdateSwapChain();
+				break;
+			default:
+				break;
 			}
 		}
 
@@ -221,27 +224,79 @@ namespace Dive
 		return s_WindowTitle;
 	}
 
-	int Graphics::GetWidth()
-	{
-		return s_Width;
-	}
-	
-	int Graphics::GetHeight()
-	{
-		return s_Height;
-	}
-
-	DirectX::XMINT2 Graphics::GetSize()
-	{
-		return DirectX::XMINT2(s_Width, s_Height);
-	}
-
 	void Graphics::SetWindowTitle(const std::wstring& title)
 	{
 		if (s_hWnd)
 			::SetWindowText(s_hWnd, title.c_str());
 
 		s_WindowTitle = title;
+	}
+
+	void Graphics::GetWindowSize(int& width, int& height)
+	{
+		RECT rt;
+		GetClientRect(s_hWnd, &rt);
+
+		DV_ASSERT(s_Width == rt.right - rt.left);
+		DV_ASSERT(s_Height == rt.bottom - rt.top);
+
+		width = s_Width;
+		height = s_Height;
+	}
+
+	DirectX::XMINT2 Graphics::GetWindowSize()
+	{
+		RECT rt;
+		GetClientRect(s_hWnd, &rt);
+
+		DV_ASSERT(s_Width == rt.right - rt.left);
+		DV_ASSERT(s_Height == rt.bottom - rt.top);
+
+		return DirectX::XMINT2(s_Width, s_Height);
+	}
+
+	int Graphics::GetWindowWidth()
+	{
+		return s_Width;
+	}
+
+	int Graphics::GetWindowHeight()
+	{
+		return s_Height;
+	}
+
+	// 이건 앱에서 윈도우 크기 및 해상도를 변경하는 함수이다.
+	// 일단 이 곳에서 스왑체인을 리사이즈 하면 WM_SIZE가 발생하고
+	// 이를 통해 OnResizeWindow()를 통해 백퍼버와 렌더타켓을 갱신한다.
+	void Graphics::ResizeWindow(int width, int height)
+	{
+		if (!IsInitialized())
+		{
+			s_Width = width;
+			s_Height = height;
+		}
+		else
+		{
+			DXGI_MODE_DESC desc;
+			desc.Width = width;
+			desc.Height = height;
+			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.RefreshRate.Denominator = 1;		// 하드 코딩
+			desc.RefreshRate.Numerator = 60;		// 하드 코딩
+			desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+			desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+
+			if (FAILED(s_pSwapChain->ResizeTarget(&desc)))
+			{
+				DV_CORE_ERROR("Graphics::ResizeWindow - 스왑체인 타겟 리사이즈에 실패하였습니다.");
+				return;
+			}
+		}
+	}
+
+	void Graphics::ResizeWindow(DirectX::XMINT2 size)
+	{
+		ResizeWindow(size.x, size.y);
 	}
 
 	/*

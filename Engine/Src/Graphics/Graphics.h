@@ -30,11 +30,14 @@ namespace Dive
 		static HINSTANCE GetWindowInstance();
 		static HWND GetWindowHandle();
 		static std::wstring GetWindowTitle();
-		static int GetWidth();
-		static int GetHeight();
-		static DirectX::XMINT2 GetSize();
-
 		static void SetWindowTitle(const std::wstring& title);
+
+		static void GetWindowSize(int& width, int& height);
+		static DirectX::XMINT2 GetWindowSize();
+		static int GetWindowWidth();
+		static int GetWindowHeight();
+		static void ResizeWindow(int width, int height);
+		static void ResizeWindow(DirectX::XMINT2 size);
 		
 		static bool CreateDeviceAndSwapChain();
 
@@ -73,7 +76,6 @@ namespace Dive
 
 		static ID3D11RenderTargetView* GetDefaultRenderTargetView();
 		static ID3D11DepthStencilView* GetDefaultDepthStencilView();
-
 
 	private:
 		static void prepareDraw();
