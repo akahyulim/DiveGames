@@ -41,7 +41,7 @@ namespace Dive
 		DV_CORE_TRACE("{:s} ¼Ò¸ê", m_Name );
 	}
 
-	void View::Update(float delta)
+	void View::Update()
 	{
 		//m_Drawables.clear();
 		//m_Lights.clear();

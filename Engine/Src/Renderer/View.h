@@ -22,7 +22,7 @@ namespace Dive
 		View(Camera* pCamera, eRenderPath path = eRenderPath::Forward);
 		~View();
 
-		void Update(float delta);
+		void Update();
 		void Render();
 
 		eRenderPath GetRenderPath() const { return m_RenderPath; }

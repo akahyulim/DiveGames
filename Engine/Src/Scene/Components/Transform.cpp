@@ -62,7 +62,7 @@ namespace Dive
 		return true;
 	}
 
-	void Transform::Update(float delta)
+	void Transform::Update()
 	{
 		updateTransform();
 	}

@@ -33,13 +33,13 @@ namespace Dive
 		DV_CORE_TRACE("Destroy GameObject: {:s}", GetName());
 	}
 
-	void GameObject::Update(float delta)
+	void GameObject::Update()
 	{
 		if (!m_bActive)
 			return;
 
 		for (auto* pComponent : m_Components)
-			pComponent->Update(delta);
+			pComponent->Update();
 	}
 
 	bool GameObject::LoadFromFile(const std::string& name)

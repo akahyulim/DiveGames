@@ -15,7 +15,7 @@ namespace Dive
 		GameObject(const std::string& name = "GameObject");
 		~GameObject() override;
 
-		void Update(float delta);
+		void Update();
 
 		bool LoadFromFile(const std::string& name);
 		bool SaveToFile(const std::string& name);

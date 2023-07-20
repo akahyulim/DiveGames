@@ -8,7 +8,7 @@ namespace Dive
 		static bool Initialize(HINSTANCE hInstance, HWND hWnd);
 		static void Shutdown();
 
-		static void Update(float deltaTime);
+		static void Update();
 
 		static bool KeyState(int key);
 		static bool KeyDown(int key);

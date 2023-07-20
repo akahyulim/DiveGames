@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "CoreDefs.h"
 #include "CoreEvents.h"
+#include "Timer.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
 #include "Scene/Scene.h"
@@ -12,10 +13,6 @@
 namespace Dive
 {
 	static bool s_bExiting = false;
-
-	// temp
-	static float s_DeltaTime = 0.0f;
-	static float s_LastTime = 0.0f;
 
 	bool Engine::Initialize()
 	{
@@ -70,17 +67,14 @@ namespace Dive
 
 	void Engine::Update()
 	{
-		// temp
-		float currentTime = static_cast<float>(timeGetTime()) * 0.001f;
-		s_DeltaTime = currentTime - s_LastTime;
-		s_LastTime = currentTime;
-
 		// 순서가 중요하다. 특히 Scene의 업데이트 후 Renderer가 업데이트 되어야 한다.
-		Input::Update(s_DeltaTime);
-		Scene::Update(s_DeltaTime);
-		Renderer::Update(s_DeltaTime);
+		Input::Update();
+		Scene::Update();
+		Renderer::Update();
 
-		FIRE_EVENT(UpdateEvent(s_DeltaTime));
+		Timer::Update();
+
+		FIRE_EVENT(UpdateEvent());
 	}
 
 	void Engine::Render()

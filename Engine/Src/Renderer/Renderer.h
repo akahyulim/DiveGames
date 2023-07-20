@@ -55,7 +55,7 @@ namespace Dive
 		static bool Initialize();
 		static void Shutdown();
 
-		static void Update(float delta);
+		static void Update();
 		static void Render();
 
 		static View* GetView(uint32_t index);

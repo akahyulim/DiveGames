@@ -22,7 +22,7 @@ namespace Dive
 
 		virtual bool SaveToYAML(YAML::Emitter& out) { return true; }
 
-		virtual void Update(float delta) {}
+		virtual void Update() {}
 
 		GameObject* GetGameObject() const { return m_pGameObject; }
 

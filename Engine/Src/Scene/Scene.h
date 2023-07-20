@@ -15,7 +15,7 @@ namespace Dive
 		static void New();
 		static void Clear();
 
-		static void Update(float delta);
+		static void Update();
 
 		static bool LoadFromFile(const std::string& filePath);
 		static bool SaveToFile(const std::string& filePath);

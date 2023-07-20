@@ -98,7 +98,7 @@ namespace Dive
 		DV_CORE_TRACE("Input 종료에 성공하였습니다.");
 	}
 
-	void Input::Update(float deltaTime)
+	void Input::Update()
 	{
 		if (IsInitialized())
 		{

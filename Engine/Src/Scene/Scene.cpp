@@ -51,10 +51,10 @@ namespace Dive
 		s_CurComponentID = FIRST_ID;
 	}
 
-	void Scene::Update(float delta)
+	void Scene::Update()
 	{
 		for (auto pGameObject : s_GameObjects)
-			pGameObject.second->Update(delta);
+			pGameObject.second->Update();
 
 		if (s_bDirty)
 		{

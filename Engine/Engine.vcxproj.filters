@@ -177,6 +177,9 @@
     <ClInclude Include="Src\Math\Math.h">
       <Filter>Src\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\Timer.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DivePch.cpp">
@@ -301,6 +304,9 @@
     </ClCompile>
     <ClCompile Include="Src\Math\Math.cpp">
       <Filter>Src\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\Timer.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

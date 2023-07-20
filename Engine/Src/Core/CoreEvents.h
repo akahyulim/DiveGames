@@ -44,17 +44,6 @@ namespace Dive
 	class UpdateEvent : public Event
 	{
 		EVENT_CLASS_TYPE(Update)
-
-	public:
-		UpdateEvent(float deltaTime)
-			: m_DeltaTime(deltaTime)
-		{}
-		~UpdateEvent() = default;
-
-		float GetDeltaTime() const { return m_DeltaTime; }
-
-	private:
-		float m_DeltaTime;
 	};
 
 	// PostUpdate

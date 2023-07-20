@@ -22,7 +22,7 @@ namespace Dive
 		bool SaveToFile(const std::string& filePath) override;
 		bool SaveToYAML(YAML::Emitter& out) override;
 
-		void Update(float delta) override;
+		void Update() override;
 
 		void Clear();
 

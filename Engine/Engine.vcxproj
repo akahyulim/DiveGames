@@ -157,6 +157,7 @@
     <ClInclude Include="Src\Core\Engine.h" />
     <ClInclude Include="Src\Core\EventHandler.h" />
     <ClInclude Include="Src\Core\Object.h" />
+    <ClInclude Include="Src\Core\Timer.h" />
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
@@ -204,6 +205,7 @@
     <ClCompile Include="Src\Core\Engine.cpp" />
     <ClCompile Include="Src\Core\EventHandler.cpp" />
     <ClCompile Include="Src\Core\Object.cpp" />
+    <ClCompile Include="Src\Core\Timer.cpp" />
     <ClCompile Include="Src\DivePch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>

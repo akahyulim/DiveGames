@@ -95,10 +95,10 @@ namespace Dive
 		DV_CORE_TRACE("Renderer 종료에 성공하였습니다.");
 	}
 
-	void Renderer::Update(float delta)
+	void Renderer::Update()
 	{
 		for (auto pView : s_Views)
-			pView->Update(delta);
+			pView->Update();
 	}
 
 	void Renderer::Render()

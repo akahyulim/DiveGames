@@ -147,6 +147,9 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 	{
 		ImGui::Begin("Menu");
 
+		// clear color
+		ImGui::ColorEdit3("Clear Color", (float*)&m_ClearColor);
+
 		if (ImGui::Button("Import"))
 		{
 			m_Importer.Clear();
@@ -192,15 +195,20 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 		ImGui::End();
 	}
 
-	// etc
+	// text info
 	{
-		ImGui::Begin("Info");
+		ImGui::Begin("Text Info");
+
+		// fps
+		ImGui::Text("FPS: %.1f", static_cast<float>(1000.0 / Dive::Timer::GetDeltaTimeMS()));
 
 		// window size
 		ImGui::Text("Window Size: %d x %d", Dive::Graphics::GetWindowWidth(), Dive::Graphics::GetWindowHeight());
 
-		// clear color
-		ImGui::ColorEdit3("Clear Color", (float*)&m_ClearColor);
+		// camera position
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMStoreFloat3(&pos, m_pCamera->GetTransform()->GetPosition());
+		ImGui::Text("Camera Position: %.3f, %.3f, %.3f", pos.x, pos.y, pos.z);
 		
 		ImGui::End();
 	}
@@ -428,40 +436,41 @@ void AssetViewer::OnUpdate(const Dive::Event& evnt)
 		return;
 
 	const auto& e = dynamic_cast<const Dive::UpdateEvent&>(evnt);
+	float deltaTime = static_cast<float>(Dive::Timer::GetDeltaTimeSec());
 
 	auto pTransform = m_pCamera->GetTransform();
 	if (Dive::Input::KeyPress(DIK_W))
 	{
-		pTransform->Translate(0.0f, 0.0f, 5.0f * e.GetDeltaTime());
+		pTransform->Translate(0.0f, 0.0f, 5.0f * deltaTime);
 	}
 	if (Dive::Input::KeyPress(DIK_S))
 	{
-		pTransform->Translate(0.0f, 0.0f, -5.0f * e.GetDeltaTime());
+		pTransform->Translate(0.0f, 0.0f, -5.0f * deltaTime);
 	}
 	if (Dive::Input::KeyPress(DIK_A))
 	{
-		pTransform->Translate(-5.0f * e.GetDeltaTime(), 0.0f, 0.0f);
+		pTransform->Translate(-5.0f * deltaTime, 0.0f, 0.0f);
 	}
 	if (Dive::Input::KeyPress(DIK_D))
 	{
-		pTransform->Translate(5.0f * e.GetDeltaTime(), 0.0f, 0.0f);
+		pTransform->Translate(5.0f * deltaTime, 0.0f, 0.0f);
 	}
 	if (Dive::Input::KeyPress(DIK_C))
 	{
-		pTransform->Translate(0.0f, -5.0f * e.GetDeltaTime(), 0.0f);
+		pTransform->Translate(0.0f, -5.0f * deltaTime, 0.0f);
 	}
 	if (Dive::Input::KeyPress(DIK_SPACE))
 	{
-		pTransform->Translate(0.0f, 5.0f * e.GetDeltaTime(), 0.0f);
+		pTransform->Translate(0.0f, 5.0f * deltaTime, 0.0f);
 	}
 
 	if (Dive::Input::KeyPress(DIK_Q))
 	{
-		pTransform->Rotate(0.0f, 0.0f, -5.0f * e.GetDeltaTime());
+		pTransform->Rotate(0.0f, 0.0f, -5.0f * deltaTime);
 	}
 	if (Dive::Input::KeyPress(DIK_E))
 	{
-		pTransform->Rotate(0.0f, 0.0f, 5.0f * e.GetDeltaTime());
+		pTransform->Rotate(0.0f, 0.0f, 5.0f * deltaTime);
 	}
 
 	if (m_pLoadedModel)
@@ -470,19 +479,19 @@ void AssetViewer::OnUpdate(const Dive::Event& evnt)
 
 		if (Dive::Input::KeyPress(DIK_LEFT))
 		{
-			pTransform->Rotate(0.0f, -50.0f * e.GetDeltaTime(), 0.0f);
+			pTransform->Rotate(0.0f, -50.0f * deltaTime, 0.0f);
 		}
 		if (Dive::Input::KeyPress(DIK_RIGHT))
 		{
-			pTransform->Rotate(0.0f, 50.0f * e.GetDeltaTime(), 0.0f);
+			pTransform->Rotate(0.0f, 50.0f * deltaTime, 0.0f);
 		}
 		if (Dive::Input::KeyPress(DIK_UP))
 		{
-			pTransform->Rotate(-50.0f * e.GetDeltaTime(), 0.0f, 0.0f);
+			pTransform->Rotate(-50.0f * deltaTime, 0.0f, 0.0f);
 		}
 		if (Dive::Input::KeyPress(DIK_DOWN))
 		{
-			pTransform->Rotate(50.0f * e.GetDeltaTime(), 0.0f, 0.0f);
+			pTransform->Rotate(50.0f * deltaTime, 0.0f, 0.0f);
 		}
 	}
 }

@@ -5,6 +5,7 @@
 #include "Core/CoreDefs.h"
 #include "Core/EventHandler.h"
 #include "Core/CoreEvents.h"
+#include "Core/Timer.h"
 #include "Core/Engine.h"
 #include "Core/Application.h"
 #include "Core/Object.h"

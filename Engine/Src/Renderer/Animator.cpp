@@ -5,6 +5,7 @@
 #include "Animator.h"
 #include "Core/EventHandler.h"
 #include "Core/CoreEvents.h"
+#include "Core/Timer.h"
 
 #include "Scene/GameObject.h"
 #include "Scene/Components/Transform.h"
@@ -43,12 +44,9 @@ namespace Dive
 
 	void Animator::OnUpdate(const Event& evnt)
 	{
-		const auto& e = dynamic_cast<const Dive::UpdateEvent&>(evnt);
-		m_DeltaTime = e.GetDeltaTime();
-
 		if (m_pCurrentAnimation)
 		{
-			m_CurrentTime += m_pCurrentAnimation->GetTickPerSecond() * e.GetDeltaTime();
+			m_CurrentTime += m_pCurrentAnimation->GetTickPerSecond() * Timer::GetDeltaTimeSec();
 			m_CurrentTime = fmod(m_CurrentTime, m_pCurrentAnimation->GetDuration());
 
 			calcuBoneTransform(m_pCurrentAnimation->GetRootGameObject(), DirectX::XMMatrixIdentity());
