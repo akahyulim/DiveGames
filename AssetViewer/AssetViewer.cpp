@@ -4,26 +4,26 @@ DEFINE_APPLICATION_MAIN(AssetViewer)
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-static std::string FileOpen(const char* pFilter)
+static std::string FileOpen(const char* pDir, const char* pFilter = nullptr)
 {
+	char filePath[MAX_PATH] = { 0 };
+	std::string initialDir = Dive::FileSystem::GetNativePath(Dive::FileSystem::GetCurrentDir() + pDir);
+
 	OPENFILENAMEA ofn;
-	CHAR szFile[260] = { 0 };
-	CHAR currentDir[256] = { 0 };
 	ZeroMemory(&ofn, sizeof(OPENFILENAME));
 	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = nullptr;
-	ofn.lpstrFile = szFile;
-	ofn.nMaxFile = sizeof(szFile);
-	if (GetCurrentDirectoryA(256, currentDir))
-		ofn.lpstrInitialDir = currentDir;
-	ofn.lpstrFilter = pFilter;
+	ofn.hwndOwner = Dive::Graphics::GetWindowHandle();
+	ofn.lpstrFile = filePath;
+	ofn.nMaxFile = sizeof(filePath);
+	ofn.lpstrInitialDir = initialDir.c_str();
+	ofn.lpstrFilter = (pFilter != nullptr) ? pFilter : "All Files(*.*)\0";
 	ofn.nFilterIndex = 1;
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+	ofn.Flags =  OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
 
-	if (GetOpenFileNameA(&ofn) == TRUE)
-		return ofn.lpstrFile;
+	if (!GetOpenFileNameA(&ofn))
+		return std::string();
 
-	return std::string();
+	return ofn.lpstrFile;
 }
 
 static void DrawVec3Control(const std::string& label, DirectX::XMFLOAT3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
@@ -158,7 +158,7 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 			m_MeshRenderers.clear();
 			bOpen = false;
 
-			const std::string filePath = FileOpen("All Files(*.*)\0");
+			const std::string filePath = FileOpen("Assets/Models", "외부 모델 파일\0*.obj;*.dae;*.fbx\0");
 			if (!filePath.empty())
 			{
 				if (m_Importer.LoadFromFile(filePath))
@@ -276,7 +276,7 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 
 						if (ImGui::Button("Load"))
 						{
-							const std::string filePath = FileOpen("All Files(*.*)\0");
+							const std::string filePath = FileOpen("Assets/Textures");
 							if(!filePath.empty())
 								pMat->AddTexture(Dive::eTextureUnit::Diffuse, filePath);
 						}
@@ -504,7 +504,7 @@ void AssetViewer::drawTree(Dive::GameObject* pNode)
 	auto children = pNode->GetTransform()->GetChildren();
 
 	ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
-	children.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
+	nodeFlags |= (children.empty()) ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_OpenOnArrow;
 
 	if (m_pSelectedNode)
 	{
