@@ -2,10 +2,10 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudio
 
 # Project Output Files
-[Oo]utput/*.exe
-[Oo]utput/*.lib
-[Oo]utput/imgui.ini
-[Oo]utput/Assets/
+DiveGames/*.exe
+DiveGames/*.lib
+DiveGames/*.pdb
+DiveGames/Assets/
 
 ### Windows ###
 # Windows thumbnail cache files
