@@ -459,7 +459,7 @@ namespace Dive
 
 		FIRE_EVENT(EndRender());
 
-		s_pSwapChain->Present(1, 0);
+		s_pSwapChain->Present(0, 0);
 	}
 
 	void Graphics::ClearViews(uint32_t target, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil)

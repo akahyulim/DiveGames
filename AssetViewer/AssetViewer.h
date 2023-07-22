@@ -40,4 +40,6 @@ private:
 
 	// menu
 	ImVec4 m_ClearColor;
+
+	uint32_t m_Fps;
 };

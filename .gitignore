@@ -4,6 +4,7 @@
 # Project Output Files
 DiveGames/*.exe
 DiveGames/*.lib
+DiveGames/*.idb
 DiveGames/*.pdb
 DiveGames/Assets/
 

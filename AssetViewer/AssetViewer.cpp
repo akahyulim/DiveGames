@@ -95,7 +95,8 @@ static void DrawVec3Control(const std::string& label, DirectX::XMFLOAT3& values,
 AssetViewer::AssetViewer()
 	: m_pCamera(nullptr),
 	m_pLoadedModel(nullptr),
-	m_pSelectedNode(nullptr)
+	m_pSelectedNode(nullptr),
+	m_Fps(0)
 {
 	m_ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
@@ -200,7 +201,7 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 		ImGui::Begin("Text Info");
 
 		// fps
-		ImGui::Text("FPS: %.1f", static_cast<float>(1000.0 / Dive::Timer::GetDeltaTimeMS()));
+		ImGui::Text("fps: %d", m_Fps);
 
 		// window size
 		ImGui::Text("Window Size: %d x %d", Dive::Graphics::GetWindowWidth(), Dive::Graphics::GetWindowHeight());
@@ -429,6 +430,20 @@ void AssetViewer::OnUpdate(const Dive::Event& evnt)
 				m_MeshRenderers.emplace_back(pGameObject->GetComponent<Dive::MeshRenderer>());
 			else if (pGameObject->HasComponent<Dive::SkinnedMeshRenderer>())
 				m_MeshRenderers.emplace_back(pGameObject->GetComponent<Dive::SkinnedMeshRenderer>());
+		}
+	}
+
+	// calcu fps
+	{
+		static double lastTime = Dive::Timer::GetTimeMS();
+		static uint32_t tickCount = 0;
+		tickCount++;
+
+		if (Dive::Timer::GetTimeMS() >= (lastTime + 1000.0))
+		{
+			m_Fps = tickCount;
+			tickCount = 0;
+			lastTime = Dive::Timer::GetTimeMS();
 		}
 	}
 
