@@ -12,10 +12,13 @@ AssetImporter::~AssetImporter()
 
 bool AssetImporter::LoadFromFile(const std::string& filePath)
 {
-	Clear();
-   // DV_DELETE(m_pModel);
+    if (Dive::FileSystem::FileExists(filePath))
+    {
+        Clear();
+        return loadExternalExtension(filePath);
+    }
 
-	return loadExternalExtension(filePath);
+    return false;
 }
 
 bool AssetImporter::SaveToFile(const std::string& filePath)

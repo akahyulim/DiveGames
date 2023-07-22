@@ -153,18 +153,14 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 
 		if (ImGui::Button("Import"))
 		{
-			m_Importer.Clear();
-			m_pLoadedModel = nullptr;
-			m_pSelectedNode = nullptr;
-			m_MeshRenderers.clear();
-			bOpen = false;
-
 			const std::string filePath = FileOpen("Assets/Models", "외부 모델 파일\0*.obj;*.dae;*.fbx\0");
 			if (!filePath.empty())
 			{
 				if (m_Importer.LoadFromFile(filePath))
 				{
 					m_pLoadedModel = m_Importer.GetModel()->GetRootGameObject();
+					m_pSelectedNode = nullptr;
+					m_MeshRenderers.clear();
 					bOpen = true;
 				}
 			}
