@@ -28,13 +28,13 @@ namespace Dive
 	static ID3D11Texture2D* s_pDefaultDepthStencilTexture = nullptr;
 	static ID3D11DepthStencilView* s_pDefaultDepthStencilView = nullptr;
 
-	static ID3D11RenderTargetView* s_pRenderTargetViews[MAX_RENDERTARGETS] = { nullptr, };
+	static ID3D11RenderTargetView* s_pRenderTargetViews[MAX_RENDERTARGETS] = { nullptr };
 	static ID3D11DepthStencilView* s_pDepthStencilView = nullptr;
 	static bool s_bRenderTargetsDirty = false;
 
-	static Texture* s_pTextures[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr, };
-	static ID3D11ShaderResourceView* s_pShaderResourceViews[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr, };
-	static ID3D11SamplerState* s_pSamplerStates[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr, };
+	static Texture* s_pTextures[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr };
+	static ID3D11ShaderResourceView* s_pShaderResourceViews[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr };
+	static ID3D11SamplerState* s_pSamplerStates[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr };
 	static bool s_bTextureDirty = false;
 	static uint32_t s_TextureDirtyStart = 0xffffffff;
 	static uint32_t s_TextureDirtyEnd = 0xffffffff;
@@ -53,8 +53,8 @@ namespace Dive
 	static ShaderVariation* s_pPixelShaderVariation = nullptr;
 	static ShaderVariation* s_pComputeShaderVariation = nullptr;
 
-	static ID3D11Buffer* s_pVertexShaderConstantBuffers[2] = { nullptr, };
-	static ID3D11Buffer* s_pPixelShaderConstantBuffers[3] = { nullptr, };
+	static ID3D11Buffer* s_pVertexShaderConstantBuffers[2] = { nullptr };
+	static ID3D11Buffer* s_pPixelShaderConstantBuffers[3] = { nullptr };
 
 
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

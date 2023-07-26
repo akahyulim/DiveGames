@@ -32,5 +32,5 @@ Pixel_PosTex MainVS(Vertex_Skinned input)
 
 float4 MainPS(Pixel_PosTex input) : SV_TARGET0
 {
-	return AlbedoMap.Sample(AlbedoMapSampler, input.tex);
+	return AlbedoMap.Sample(AlbedoMapSampler, cbMaterialOffsetPS + input.tex * cbMaterialTilingPS);
 }

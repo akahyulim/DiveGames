@@ -58,8 +58,8 @@ cbuffer MaterialPS : register(b2)
 {
 	float4 cbMaterialAlbedoColorPS;
 
-	float2 cbMaterialTiling;
-	float2 cbMaterialOffset;
+	float2 cbMaterialTilingPS;
+	float2 cbMaterialOffsetPS;
 }
 
 #endif

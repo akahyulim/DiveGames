@@ -9,7 +9,10 @@
 namespace Dive
 {
 	Material::Material()
-		: Resource(eResourceType::Material)
+		: Resource(eResourceType::Material),
+        m_AlbedoColor(1.0f, 1.0f, 1.0f, 1.0f),
+        m_Tiling(1.0f, 1.0f),
+        m_Offset(0.0f, 0.0f)
 	{
 	}
 		

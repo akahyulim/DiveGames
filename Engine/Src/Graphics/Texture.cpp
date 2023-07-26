@@ -17,7 +17,8 @@ namespace Dive
 		m_Filter(D3D11_FILTER_MIN_MAG_MIP_LINEAR),
 		m_AddressMode(D3D11_TEXTURE_ADDRESS_WRAP),
 		m_BorderColor(0.0f, 0.0f, 0.0f, 0.0f),
-		m_AnisoLevel(1)
+		m_AnisoLevel(1),
+		m_bSamplerStateDirty(true)
 	{
 	}
 

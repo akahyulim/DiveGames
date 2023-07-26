@@ -36,6 +36,8 @@ namespace Dive
 				auto pBuffer = Renderer::GetMaterialPixelShaderBuffer();
 				auto pMappedData = static_cast<MaterialPixelShaderBuffer*>(pBuffer->Map());
 				pMappedData->albedoColor = m_pMaterial->GetAlbedoColor();
+				pMappedData->tiling = m_pMaterial->GetTiling();
+				pMappedData->offset = m_pMaterial->GetOffset();
 				pBuffer->Unmap();
 				Graphics::SetConstantBuffer(2, eShaderType::PixelShader, pBuffer);
 			}

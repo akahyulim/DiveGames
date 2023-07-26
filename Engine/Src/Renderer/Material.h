@@ -31,12 +31,12 @@ namespace Dive
 		// slide bar, smoothness?, source?
 
 		DirectX::XMFLOAT2 GetTiling() const { return m_Tiling; }
-		void SetTiling(DirectX::XMFLOAT2 tiling);
-		void SetTiling(float x, float y);
+		void SetTiling(DirectX::XMFLOAT2 tiling) { m_Tiling = tiling; }
+		void SetTiling(float x, float y) { m_Tiling.x = x; m_Tiling.y = y; }
 
 		DirectX::XMFLOAT2 GetOffset() const { return m_Offset; }
-		void SetOffset(DirectX::XMFLOAT2 offset);
-		void SetOffset(float x, float y);
+		void SetOffset(DirectX::XMFLOAT2 offset) { m_Offset = offset; }
+		void SetOffset(float x, float y) { m_Offset.x = x; m_Offset.y = y; }
 
 	private:
 	private:
