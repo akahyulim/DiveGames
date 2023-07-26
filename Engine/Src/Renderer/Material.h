@@ -22,13 +22,29 @@ namespace Dive
 		void SetTexture(eTextureUnit unit, Texture* pTexture);
 		void AddTexture(eTextureUnit unit, const std::string& name);
 
-		DirectX::XMFLOAT4 GetColorAlbedo() const { return m_Albedo; }
-		void SetColorAlbedo(float r, float g, float b, float a) { SetColorAlbedo(DirectX::XMFLOAT4(r, g, b, a)); }
-		void SetColorAlbedo(const DirectX::XMFLOAT4& color) { m_Albedo = color; }
+		// albeo
+		DirectX::XMFLOAT4 GetAlbedoColor() const { return m_AlbedoColor; }
+		void SetAlbedoColor(float r, float g, float b, float a) { SetAlbedoColor(DirectX::XMFLOAT4(r, g, b, a)); }
+		void SetAlbedoColor(const DirectX::XMFLOAT4& color) { m_AlbedoColor = color; }
+
+		// metalic
+		// slide bar, smoothness?, source?
+
+		DirectX::XMFLOAT2 GetTiling() const { return m_Tiling; }
+		void SetTiling(DirectX::XMFLOAT2 tiling);
+		void SetTiling(float x, float y);
+
+		DirectX::XMFLOAT2 GetOffset() const { return m_Offset; }
+		void SetOffset(DirectX::XMFLOAT2 offset);
+		void SetOffset(float x, float y);
 
 	private:
 	private:
 		std::unordered_map<eTextureUnit, Texture*> m_Textures;
-		DirectX::XMFLOAT4 m_Albedo;
+		DirectX::XMFLOAT4 m_AlbedoColor;
+
+		DirectX::XMFLOAT2 m_Tiling;
+		DirectX::XMFLOAT2 m_Offset;
+		
 	};
 }

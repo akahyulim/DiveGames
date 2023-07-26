@@ -31,11 +31,11 @@ namespace Dive
             if (node["Material"])
             {
                 auto mat = node["Material"];
-                auto diffMap = mat["DiffuseMap"].as<std::string>();
-                auto diffColor = mat["DiffColor"].as<DirectX::XMFLOAT4>();
+                auto albedoMap = mat["AlbedoMap"].as<std::string>();
+                auto albedoColor = mat["AlbedoColor"].as<DirectX::XMFLOAT4>();
 
-                AddTexture(eTextureUnit::Diffuse, diffMap);
-                SetColorAlbedo(diffColor);
+                AddTexture(eTextureUnit::Albedo, albedoMap);
+                SetAlbedoColor(albedoColor);
             }
         }
 		

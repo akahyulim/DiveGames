@@ -2,7 +2,7 @@
 
 float4 MainPS(PixelInput input) : SV_TARGET0
 {
-	float4 diffMap = DiffMapTex.Sample(DiffMapSampler, input.tex);
+	float4 albedo = AlbedoMap.Sample(AlbedoMapSampler, input.tex);
 
 	float3 toLight = cbLightPosPS - input.worldPos;
 	float3 toEye = cbCameraPosPS - input.worldPos;
@@ -22,7 +22,7 @@ float4 MainPS(PixelInput input) : SV_TARGET0
 	// Attenution
 	float distToLightNorm = 1.0f - saturate(distToLight * cbLightRangePS);
 	float attn = distToLightNorm * distToLightNorm;
-	pointLightColor *= cbMaterialDiffColorPS.xyz * attn;
+	pointLightColor *= cbMaterialAlbedoColorPS.xyz * attn;
 
-	return diffMap * float4(pointLightColor, 1.0f);
+	return albedo * float4(pointLightColor, 1.0f);
 }

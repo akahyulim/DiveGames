@@ -29,13 +29,13 @@ namespace Dive
 	{
 		// Material
 		{
-			Graphics::SetTexture(eTextureUnit::Diffuse, m_pMaterial->GetTexture(eTextureUnit::Diffuse));
+			Graphics::SetTexture(eTextureUnit::Albedo, m_pMaterial->GetTexture(eTextureUnit::Albedo));
 
 			// material pixel shader buffer
 			{
 				auto pBuffer = Renderer::GetMaterialPixelShaderBuffer();
 				auto pMappedData = static_cast<MaterialPixelShaderBuffer*>(pBuffer->Map());
-				pMappedData->diffColor = m_pMaterial->GetColorAlbedo();
+				pMappedData->albedoColor = m_pMaterial->GetAlbedoColor();
 				pBuffer->Unmap();
 				Graphics::SetConstantBuffer(2, eShaderType::PixelShader, pBuffer);
 			}

@@ -265,9 +265,12 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 					{
 						Dive::Material* pMat = pMeshRenderer->GetMaterial();
 
+						// Material을 직접 만들 수 있어야 한다.
+						// 이때 저장도 되어야 한다.
+						// 그리고 로드도 가능해야 한다.
 						ImGui::Text(pMat->GetName().c_str());
 
-						ImGui::Text("Diffuse: %s", pMat->GetTexture(Dive::eTextureUnit::Diffuse)->GetName().c_str());
+						ImGui::Text("Albedo: %s", pMat->GetTexture(Dive::eTextureUnit::Albedo)->GetName().c_str());
 
 						ImGui::SameLine();
 
@@ -275,8 +278,14 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 						{
 							const std::string filePath = FileOpen("Assets/Textures");
 							if(!filePath.empty())
-								pMat->AddTexture(Dive::eTextureUnit::Diffuse, filePath);
+								pMat->AddTexture(Dive::eTextureUnit::Albedo, filePath);
 						}
+
+						ImGui::Text("Metalic");
+
+						ImGui::Text("Normal");
+
+						ImGui::Text("Occlusion");
 
 					}
 				}

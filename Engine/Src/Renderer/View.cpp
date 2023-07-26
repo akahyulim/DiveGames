@@ -166,13 +166,13 @@ namespace Dive
 						if (pDrawable->HasMaterial())
 						{
 							auto pMaterial = pDrawable->GetMaterial();
-							Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
+							Graphics::SetTexture(eTextureUnit::Albedo, pMaterial->GetTexture(eTextureUnit::Albedo));
 
 							// material pixel shader buffer
 							{
 								auto pBuffer = Renderer::GetMaterialPixelShaderBuffer();
 								auto pMappedData = static_cast<MaterialPixelShaderBuffer*>(pBuffer->Map());
-								pMappedData->diffColor = pMaterial->GetColorAlbedo();
+								pMappedData->albedoColor = pMaterial->GetAlbedoColor();
 								pBuffer->Unmap();
 								Graphics::SetConstantBuffer(2, eShaderType::PixelShader, pBuffer);
 							}
@@ -269,13 +269,13 @@ namespace Dive
 						if (pDrawable->HasMaterial())
 						{
 							auto pMaterial = pDrawable->GetMaterial();
-							Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
+							Graphics::SetTexture(eTextureUnit::Albedo, pMaterial->GetTexture(eTextureUnit::Albedo));
 
 							// material pixel shader buffer
 							{
 								auto pBuffer = Renderer::GetMaterialPixelShaderBuffer();
 								auto pMappedData = static_cast<MaterialPixelShaderBuffer*>(pBuffer->Map());
-								pMappedData->diffColor = pMaterial->GetColorAlbedo();
+								pMappedData->albedoColor = pMaterial->GetAlbedoColor();
 								pBuffer->Unmap();
 								Graphics::SetConstantBuffer(2, eShaderType::PixelShader, pBuffer);
 							}

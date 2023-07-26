@@ -35,7 +35,7 @@ namespace Dive
 	};
 
 	struct LightPixelShaderBuffer
-	{
+	{	
 		DirectX::XMFLOAT3 lightPos;
 		float lightRange;
 		DirectX::XMFLOAT3 lightColor;
@@ -46,7 +46,10 @@ namespace Dive
 
 	struct MaterialPixelShaderBuffer
 	{
-		DirectX::XMFLOAT4 diffColor;
+		DirectX::XMFLOAT4 albedoColor;
+
+		DirectX::XMFLOAT2 tiling;
+		DirectX::XMFLOAT2 offset;
 	};
 
 	class Renderer

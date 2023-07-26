@@ -16,5 +16,5 @@ Pixel_PosTex MainVS(Vertex_PosTexNorTan input)
 
 float4 MainPS(Pixel_PosTex input) : SV_TARGET0
 {
-	return DiffMapTex.Sample(DiffMapSampler, input.tex);
+	return AlbedoMap.Sample(AlbedoMapSampler, input.tex);
 }

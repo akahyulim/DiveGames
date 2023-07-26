@@ -60,5 +60,5 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
 	float NDotH = saturate(dot(halfWay, normal));
 	dirLightColor += cbLightColorPS * pow(NDotH, 250.0f) * 0.25f;
 
-	return diffMap * float4(dirLightColor, 1.0f) * cbMaterialDiffColorPS;
+	return diffMap * float4(dirLightColor, 1.0f) * cbMaterialAlbedoColorPS;
 }

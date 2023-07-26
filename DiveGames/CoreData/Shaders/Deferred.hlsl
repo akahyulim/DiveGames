@@ -42,9 +42,9 @@ PS_GBUFFER MainPS(PixelInput input)
 {
 	PS_GBUFFER output;
 
-	float4 diffMap = DiffMapTex.Sample(DiffMapSampler, input.tex);
-	diffMap *= diffMap;	// ¿Ö Á¦°ö?
-	output.colorSpecIntensity = diffMap;
+	float4 albedo = AlbedoMap.Sample(AlbedoMapSampler, input.tex);
+	albedo *= albedo;	// ¿Ö Á¦°ö?
+	output.colorSpecIntensity = albedo;
 
 	output.normal = float4(input.normal * 0.5 + 0.5, 0.0);
 

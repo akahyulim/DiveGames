@@ -56,7 +56,10 @@ cbuffer LightPS : register(b1)
 // MaterialPS
 cbuffer MaterialPS : register(b2)
 {
-	float4 cbMaterialDiffColorPS;
+	float4 cbMaterialAlbedoColorPS;
+
+	float2 cbMaterialTiling;
+	float2 cbMaterialOffset;
 }
 
 #endif

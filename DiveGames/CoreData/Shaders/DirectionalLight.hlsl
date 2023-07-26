@@ -2,7 +2,7 @@
 
 float4 MainPS(PixelInput input) : SV_TARGET0
 {
-	float4 diffMap = DiffMapTex.Sample(DiffMapSampler, input.tex);
+	float4 albedo = AlbedoMap.Sample(AlbedoMapSampler, input.tex);
 
 	// Phong diffuse
 	float NDotL = dot(-cbLightDirPS, input.normal);
@@ -15,5 +15,5 @@ float4 MainPS(PixelInput input) : SV_TARGET0
 	float NDotH = saturate(dot(halfWay, input.normal));
 	dirLightColor += cbLightColorPS * pow(NDotH, 250.0f) * 0.25f;
 
-	return diffMap * float4(dirLightColor, 1.0f) * cbMaterialDiffColorPS;
+	return albedo * float4(dirLightColor, 1.0f) * cbMaterialAlbedoColorPS;
 }
