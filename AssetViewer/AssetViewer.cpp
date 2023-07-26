@@ -176,7 +176,7 @@ void AssetViewer::Start()
 	m_pCamera = Dive::Scene::CreateGameObject("MainCamera");
 	Dive::Camera* pCamera = m_pCamera->AddComponent<Dive::Camera>();
 	pCamera->SetAspectRatio(static_cast<float>(Dive::Graphics::GetWindowWidth()), static_cast<float>(Dive::Graphics::GetWindowHeight()));
-	m_pCamera->GetComponent<Dive::Transform>()->SetPosition(0.0f, 10.0f, -20.0f);
+	m_pCamera->GetComponent<Dive::Transform>()->SetPosition(0.0f, 0.0f, -10.0f);
 }
 
 void AssetViewer::Stop()
@@ -361,12 +361,21 @@ void AssetViewer::OnEndRender(const Dive::Event& e)
 	auto* pDeviceContext = Dive::Graphics::GetDeviceContext();
 	auto* pDefaultRenderTargetView = Dive::Graphics::GetDefaultRenderTargetView();
 
-	const float clearColor[4] = { m_ClearColor.x * m_ClearColor.w, m_ClearColor.y * m_ClearColor.w, m_ClearColor.z * m_ClearColor.w, m_ClearColor.w };
-
 	ImGui::Render();
 
-	pDeviceContext->OMSetRenderTargets(1, &pDefaultRenderTargetView, NULL);
-	pDeviceContext->ClearRenderTargetView(pDefaultRenderTargetView, clearColor);
+	{
+		DirectX::XMFLOAT4 clearColor = { m_ClearColor.x * m_ClearColor.w, m_ClearColor.y * m_ClearColor.w, m_ClearColor.z * m_ClearColor.w, m_ClearColor.w };
+
+		auto* pRTV = Dive::Graphics::GetDefaultRenderTargetView();
+		auto* pDSV = Dive::Graphics::GetDefaultDepthStencilView();
+
+		Dive::Graphics::SetRenderTargetView(0, pRTV);
+		Dive::Graphics::SetDepthStencilView(pDSV);
+
+		Dive::Graphics::ClearViews(Dive::eClearTarget::Color | Dive::eClearTarget::Depth, clearColor, 1.0f, 0);
+
+		pDeviceContext->OMSetRenderTargets(1, &pRTV, pDSV);
+	}
 
 	// View를 사용하지 않으므로 직접 render path를 구성한다.
 	// 여기에서 그려야 UI 뒤쪽이 된다.
