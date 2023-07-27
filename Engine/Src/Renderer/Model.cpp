@@ -54,7 +54,7 @@ namespace Dive
 		return false;
 	}
 	
-	DvStaticMesh* Model::InsertStaticMesh(DvStaticMesh* pMesh)
+	StaticMesh* Model::InsertStaticMesh(StaticMesh* pMesh)
 	{
 		const std::string& name = pMesh->GetName();
 		if (m_StaticMeshes.find(name) != m_StaticMeshes.end())

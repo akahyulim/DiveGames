@@ -2,7 +2,7 @@
 
 float4 MainPS(PixelInput input) : SV_TARGET0
 {
-	float4 albedo = AlbedoMap.Sample(AlbedoMapSampler, input.tex);
+	float4 diffuse = DiffuseMap.Sample(DiffuseMapSampler, input.tex);
 
 	float3 toLight = cbLightPosPS - input.worldPos;
 	float3 toEye = cbCameraPosPS - input.worldPos;
@@ -24,5 +24,5 @@ float4 MainPS(PixelInput input) : SV_TARGET0
 	float attn = distToLightNorm * distToLightNorm;
 	pointLightColor *= cbMaterialAlbedoColorPS.xyz * attn;
 
-	return albedo * float4(pointLightColor, 1.0f);
+	return diffuse * float4(pointLightColor, 1.0f);
 }

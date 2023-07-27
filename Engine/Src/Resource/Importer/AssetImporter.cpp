@@ -349,7 +349,7 @@ namespace Dive
                 }
 
                 // model에 넣어서 mesh를 형성하고
-                //DvStaticMesh* pStaticMesh = m_pModel->InsertStaticMesh(DvStaticMesh(pNode->mName.C_Str(), name, vertices, indices));
+                //StaticMesh* pStaticMesh = m_pModel->InsertStaticMesh(StaticMesh(pNode->mName.C_Str(), name, vertices, indices));
 
                 // game object에 meshRenderer를 추가하고 mesh를 연결
                 //MeshRenderer* pMeshRenderer = pNodeGameObject->AddComponent<MeshRenderer>();
@@ -564,7 +564,7 @@ namespace Dive
                 }
 
                 // model에 넣어서 mesh를 형성하고
-                //m_pModel->InsertStaticMesh(DvStaticMesh(pNode->mName.C_Str(), pMesh->mName.C_Str(), vertices, indices));
+                //m_pModel->InsertStaticMesh(StaticMesh(pNode->mName.C_Str(), pMesh->mName.C_Str(), vertices, indices));
             }
             else
             {

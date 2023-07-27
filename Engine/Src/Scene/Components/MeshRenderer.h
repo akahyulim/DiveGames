@@ -5,7 +5,7 @@ namespace Dive
 {
 	class GameObject;
 	class IMesh;
-	class DvStaticMesh;
+	class StaticMesh;
 	class Material;
 
 	// 이름이 좀 아쉽다.
@@ -43,6 +43,6 @@ namespace Dive
 	private:
 
 	private:
-		DvStaticMesh* m_pMesh;
+		StaticMesh* m_pMesh;
 	};
 }

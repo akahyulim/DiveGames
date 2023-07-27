@@ -321,7 +321,7 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 						// 그리고 로드도 가능해야 한다.
 						ImGui::Text(pMat->GetName().c_str());
 
-						ImGui::Text("Albedo: %s", pMat->GetTexture(Dive::eTextureUnit::Albedo)->GetName().c_str());
+						ImGui::Text("Diffuse: %s", pMat->GetTexture(Dive::eTextureUnit::Diffuse)->GetName().c_str());
 
 						ImGui::SameLine();
 
@@ -329,14 +329,12 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 						{
 							const std::string filePath = FileOpen("Assets/Textures");
 							if(!filePath.empty())
-								pMat->AddTexture(Dive::eTextureUnit::Albedo, filePath);
+								pMat->AddTexture(Dive::eTextureUnit::Diffuse, filePath);
 						}
-
-						ImGui::Text("Metalic");
 
 						ImGui::Text("Normal");
 
-						ImGui::Text("Occlusion");
+						ImGui::Text("Specular");
 
 						// titling
 						DirectX::XMFLOAT2 tiling = pMat->GetTiling();

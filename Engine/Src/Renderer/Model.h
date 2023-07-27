@@ -30,7 +30,7 @@ namespace Dive
 		bool LoadFromFile(const std::string& filePath) override;
 		bool SaveToFile(const std::string& filePath) override;
 
-		DvStaticMesh* InsertStaticMesh(DvStaticMesh* pMesh);
+		StaticMesh* InsertStaticMesh(StaticMesh* pMesh);
 		SkinnedMesh* InsertSkinnedMesh(SkinnedMesh* pMesh);
 	
 		auto& GetBoneInfoMap() { return m_BoneInfoMap; }
@@ -56,7 +56,7 @@ namespace Dive
 		void buildHierarchy(NodeInfo* pNode, Transform* pParent);
 
 	private:
-		std::unordered_map<std::string, DvStaticMesh*> m_StaticMeshes;
+		std::unordered_map<std::string, StaticMesh*> m_StaticMeshes;
 		std::unordered_map<std::string, SkinnedMesh*> m_SkinnedMeshes;
 
 		std::unordered_map<std::string, BoneInfo> m_BoneInfoMap;

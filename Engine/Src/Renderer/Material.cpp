@@ -10,7 +10,7 @@ namespace Dive
 {
 	Material::Material()
 		: Resource(eResourceType::Material),
-        m_AlbedoColor(1.0f, 1.0f, 1.0f, 1.0f),
+        m_DiffuseColor(1.0f, 1.0f, 1.0f, 1.0f),
         m_Tiling(1.0f, 1.0f),
         m_Offset(0.0f, 0.0f)
 	{
@@ -34,11 +34,11 @@ namespace Dive
             if (node["Material"])
             {
                 auto mat = node["Material"];
-                auto albedoMap = mat["AlbedoMap"].as<std::string>();
-                auto albedoColor = mat["AlbedoColor"].as<DirectX::XMFLOAT4>();
+                auto albedoMap = mat["DiffuseMap"].as<std::string>();
+                auto diffuseColor = mat["DiffuseColor"].as<DirectX::XMFLOAT4>();
 
-                AddTexture(eTextureUnit::Albedo, albedoMap);
-                SetAlbedoColor(albedoColor);
+                AddTexture(eTextureUnit::Diffuse, albedoMap);
+                SetDiffuseColor(diffuseColor);
             }
         }
 		

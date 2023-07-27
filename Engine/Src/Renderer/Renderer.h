@@ -46,7 +46,7 @@ namespace Dive
 
 	struct MaterialPixelShaderBuffer
 	{
-		DirectX::XMFLOAT4 albedoColor;
+		DirectX::XMFLOAT4 diffuseColor;
 
 		DirectX::XMFLOAT2 tiling;
 		DirectX::XMFLOAT2 offset;

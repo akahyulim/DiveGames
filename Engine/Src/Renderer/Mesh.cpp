@@ -17,14 +17,14 @@ namespace Dive
 		DV_DELETE(m_pIndexBuffer);
 	}
 
-	DvStaticMesh::DvStaticMesh(const std::string& name, std::vector<VertexStatic>& vertices, std::vector<uint32_t>& indices)
+	StaticMesh::StaticMesh(const std::string& name, std::vector<VertexStatic>& vertices, std::vector<uint32_t>& indices)
 		: m_Vertices(vertices),
 		m_Indices(indices)
 	{
 		m_Name = name;
 	}
 
-	DvStaticMesh::DvStaticMesh(const std::string& nodeName, const std::string& name, std::vector<VertexStatic>& vertices, std::vector<uint32_t>& indices)
+	StaticMesh::StaticMesh(const std::string& nodeName, const std::string& name, std::vector<VertexStatic>& vertices, std::vector<uint32_t>& indices)
 		: m_Vertices(vertices),
 		m_Indices(indices)
 	{
@@ -32,27 +32,27 @@ namespace Dive
 		m_Name = name.empty() ? nodeName : name;
 	}
 
-	DvStaticMesh::~DvStaticMesh()
+	StaticMesh::~StaticMesh()
 	{
 
 	}
 
-	void DvStaticMesh::CreateVertexBuffer()
+	void StaticMesh::CreateVertexBuffer()
 	{
 		m_pVertexBuffer = new VertexBuffer;
 		if (!m_pVertexBuffer->Create<VertexStatic>(m_Vertices))
 		{
-			DV_CORE_ERROR("DvStaticMesh::CreateVertexBuffer: VertexBuffer 생성에 실패하였습니다.");
+			DV_CORE_ERROR("StaticMesh::CreateVertexBuffer: VertexBuffer 생성에 실패하였습니다.");
 			return;
 		}
 	}
 
-	void DvStaticMesh::CreateIndexBuffer()
+	void StaticMesh::CreateIndexBuffer()
 	{
 		m_pIndexBuffer = new IndexBuffer;
 		if (!m_pIndexBuffer->Create<uint32_t>(m_Indices))
 		{
-			DV_CORE_ERROR("DvStaticMesh::CreateIndexBuffer: IndexBuffer 생성에 실패하였습니다.");
+			DV_CORE_ERROR("StaticMesh::CreateIndexBuffer: IndexBuffer 생성에 실패하였습니다.");
 			return;
 		}
 	}

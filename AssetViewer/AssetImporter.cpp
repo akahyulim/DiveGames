@@ -161,7 +161,7 @@ void AssetImporter::parseAndCreateMeshes(const aiScene* pScene, aiNode* pNode, D
             }
 
             // Model의 Mesh에 vertices, indices를 넣는다.
-            auto pStaticMesh = m_pModel->InsertStaticMesh(new Dive::DvStaticMesh(pMesh->mName.C_Str(), vertices, indices));
+            auto pStaticMesh = m_pModel->InsertStaticMesh(new Dive::StaticMesh(pMesh->mName.C_Str(), vertices, indices));
 
             // 현재 GameObject에 MeshRenderer를 생성한 후 Mesh를 연결한다.
             auto pMeshRenderer = pGameObject->AddComponent<Dive::MeshRenderer>();

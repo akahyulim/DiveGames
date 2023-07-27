@@ -34,13 +34,13 @@ namespace Dive
 		IndexBuffer* m_pIndexBuffer;
 	};
 
-	class DvStaticMesh : public IMesh
+	class StaticMesh : public IMesh
 	{
 	public:
-		DvStaticMesh() = default;
-		DvStaticMesh(const std::string& name, std::vector<VertexStatic>& vertices, std::vector<uint32_t>& indices);
-		DvStaticMesh(const std::string& nodeName, const std::string& name, std::vector<VertexStatic>& vertices, std::vector<uint32_t>& indices);
-		virtual ~DvStaticMesh();
+		StaticMesh() = default;
+		StaticMesh(const std::string& name, std::vector<VertexStatic>& vertices, std::vector<uint32_t>& indices);
+		StaticMesh(const std::string& nodeName, const std::string& name, std::vector<VertexStatic>& vertices, std::vector<uint32_t>& indices);
+		virtual ~StaticMesh();
 
 		void CreateVertexBuffer() override;
 		void CreateIndexBuffer() override;

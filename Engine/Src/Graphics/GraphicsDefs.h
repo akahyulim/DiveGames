@@ -27,10 +27,9 @@ namespace Dive
 
 	enum class eTextureUnit : uint32_t
 	{
-		Albedo = 0,
-		Metalic,
+		Diffuse = 0,
 		Normal,
-		Occlusion,
+		Specular,
 		Max_Num
 	};
 

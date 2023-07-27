@@ -16,5 +16,5 @@ Pixel_PosTex MainVS(Vertex_PosTexNorTan input)
 
 float4 MainPS(Pixel_PosTex input) : SV_TARGET0
 {
-	return AlbedoMap.Sample(AlbedoMapSampler, cbMaterialOffsetPS + input.tex * cbMaterialTilingPS);
+	return DiffuseMap.Sample(DiffuseMapSampler, cbMaterialOffsetPS + input.tex * cbMaterialTilingPS);
 }
