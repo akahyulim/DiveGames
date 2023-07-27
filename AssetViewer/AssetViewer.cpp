@@ -105,7 +105,7 @@ static void DrawVec3Control(const std::string& label, DirectX::XMFLOAT3& values,
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();
-	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.3f");
 	ImGui::PopItemWidth();
 	ImGui::SameLine();
 
@@ -119,7 +119,7 @@ static void DrawVec3Control(const std::string& label, DirectX::XMFLOAT3& values,
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();
-	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.3f");
 	ImGui::PopItemWidth();
 	ImGui::SameLine();
 
@@ -133,7 +133,7 @@ static void DrawVec3Control(const std::string& label, DirectX::XMFLOAT3& values,
 	ImGui::PopStyleColor(3);
 
 	ImGui::SameLine();
-	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+	ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.3f");
 	ImGui::PopItemWidth();
 
 	ImGui::PopStyleVar();
@@ -147,7 +147,9 @@ AssetViewer::AssetViewer()
 	: m_pCamera(nullptr),
 	m_pLoadedModel(nullptr),
 	m_pSelectedNode(nullptr),
-	m_Fps(0)
+	m_Fps(0),
+	m_CameraMoveSpeed(5.0f),
+	m_CameraRotationSpeed(10.0f)
 {
 	m_ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
@@ -199,9 +201,6 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 	{
 		ImGui::Begin("Menu");
 
-		// clear color
-		ImGui::ColorEdit3("Clear Color", (float*)&m_ClearColor);
-
 		if (ImGui::Button("Import"))
 		{
 			const std::string filePath = FileOpen("Assets/Models", "외부 모델 파일\0*.obj;*.dae;*.fbx\0");
@@ -243,21 +242,58 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 		ImGui::End();
 	}
 
-	// text info
+	// info
 	{
-		ImGui::Begin("Text Info");
+		ImGui::Begin("Info");
 
 		// fps
 		ImGui::Text("fps: %d", m_Fps);
-
+		
 		// window size
 		ImGui::Text("Window Size: %d x %d", Dive::Graphics::GetWindowWidth(), Dive::Graphics::GetWindowHeight());
 
-		// camera position
-		DirectX::XMFLOAT3 pos;
-		DirectX::XMStoreFloat3(&pos, m_pCamera->GetTransform()->GetPosition());
-		ImGui::Text("Camera Position: %.3f, %.3f, %.3f", pos.x, pos.y, pos.z);
-		
+		ImGui::End();
+	}
+
+	// camera
+	{
+		ImGui::Begin("Camera");
+
+		// position
+		Dive::Transform* pCameraTransform = m_pCamera->GetTransform();
+		DirectX::XMFLOAT3 position;
+		DirectX::XMStoreFloat3(&position, pCameraTransform->GetLocalPosition());
+		DrawVec3Control("Position", position, 0.0f, 115.0f);
+		pCameraTransform->SetLocalPosition(position);
+
+		// near & far plane
+		Dive::Camera* pCamera = m_pCamera->GetComponent<Dive::Camera>();
+		DirectX::XMFLOAT2 cameraPlane;
+		cameraPlane.x = pCamera->GetNearClipPlane();
+		cameraPlane.y = pCamera->GetFarClipPlane();
+		DrawVec2Control("near & far Plane", cameraPlane, 0.0f, 115.0f);
+		pCamera->SetNearClipPlane(cameraPlane.x);
+		pCamera->SetFarClipPlane(cameraPlane.y);
+
+		// camera pov
+		//DirectX::XMFLOAT2 cameraPov;
+		//cameraPov.x = pCamera->GetAspectRatio();
+		//cameraPov.y = pCamera->GetNearClipPlane();
+		//DrawVec2Control("Camera Pov", cameraPov, 0.0f, 120.0f);
+		//pCamera->SetAspectRatio(cameraPov.x, cameraPov.y);
+
+		// Move speed
+		ImGui::Text("Move Speed");
+		ImGui::SameLine();
+		ImGui::SliderFloat("##MoveSpeed", &m_CameraMoveSpeed, 1.0f, 1000.0f, "%.1f");
+
+		ImGui::Text("Rotation Speed");
+		ImGui::SameLine();
+		ImGui::SliderFloat("##RotationSpeed", &m_CameraRotationSpeed, 1.0f, 500.0f, "%.1f");
+
+		// clear color
+		ImGui::ColorEdit3("Clear Color", (float*)&m_ClearColor);
+
 		ImGui::End();
 	}
 
@@ -528,58 +564,52 @@ void AssetViewer::OnUpdate(const Dive::Event& evnt)
 	auto pTransform = m_pCamera->GetTransform();
 	if (Dive::Input::KeyPress(DIK_W))
 	{
-		pTransform->Translate(0.0f, 0.0f, 5.0f * deltaTime);
+		pTransform->Translate(0.0f, 0.0f, m_CameraMoveSpeed * deltaTime);
 	}
 	if (Dive::Input::KeyPress(DIK_S))
 	{
-		pTransform->Translate(0.0f, 0.0f, -5.0f * deltaTime);
+		pTransform->Translate(0.0f, 0.0f, -m_CameraMoveSpeed * deltaTime);
 	}
 	if (Dive::Input::KeyPress(DIK_A))
 	{
-		pTransform->Translate(-5.0f * deltaTime, 0.0f, 0.0f);
+		pTransform->Translate(-m_CameraMoveSpeed * deltaTime, 0.0f, 0.0f);
 	}
 	if (Dive::Input::KeyPress(DIK_D))
 	{
-		pTransform->Translate(5.0f * deltaTime, 0.0f, 0.0f);
+		pTransform->Translate(m_CameraMoveSpeed * deltaTime, 0.0f, 0.0f);
 	}
 	if (Dive::Input::KeyPress(DIK_C))
 	{
-		pTransform->Translate(0.0f, -5.0f * deltaTime, 0.0f);
+		pTransform->Translate(0.0f, -m_CameraMoveSpeed * deltaTime, 0.0f);
 	}
 	if (Dive::Input::KeyPress(DIK_SPACE))
 	{
-		pTransform->Translate(0.0f, 5.0f * deltaTime, 0.0f);
+		pTransform->Translate(0.0f, m_CameraMoveSpeed * deltaTime, 0.0f);
 	}
 
 	if (Dive::Input::KeyPress(DIK_Q))
 	{
-		pTransform->Rotate(0.0f, 0.0f, -5.0f * deltaTime);
+		pTransform->Rotate(0.0f, 0.0f, -m_CameraRotationSpeed * deltaTime);
 	}
 	if (Dive::Input::KeyPress(DIK_E))
 	{
-		pTransform->Rotate(0.0f, 0.0f, 5.0f * deltaTime);
+		pTransform->Rotate(0.0f, 0.0f, m_CameraRotationSpeed * deltaTime);
 	}
-
-	if (m_pLoadedModel)
+	if (Dive::Input::KeyPress(DIK_LEFT))
 	{
-		Dive::Transform* pTransform = m_pLoadedModel->GetTransform();
-
-		if (Dive::Input::KeyPress(DIK_LEFT))
-		{
-			pTransform->Rotate(0.0f, -50.0f * deltaTime, 0.0f);
-		}
-		if (Dive::Input::KeyPress(DIK_RIGHT))
-		{
-			pTransform->Rotate(0.0f, 50.0f * deltaTime, 0.0f);
-		}
-		if (Dive::Input::KeyPress(DIK_UP))
-		{
-			pTransform->Rotate(-50.0f * deltaTime, 0.0f, 0.0f);
-		}
-		if (Dive::Input::KeyPress(DIK_DOWN))
-		{
-			pTransform->Rotate(50.0f * deltaTime, 0.0f, 0.0f);
-		}
+		pTransform->Rotate(0.0f, -m_CameraRotationSpeed * deltaTime, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_RIGHT))
+	{
+		pTransform->Rotate(0.0f, m_CameraRotationSpeed * deltaTime, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_UP))
+	{
+		pTransform->Rotate(-m_CameraRotationSpeed * deltaTime, 0.0f, 0.0f);
+	}
+	if (Dive::Input::KeyPress(DIK_DOWN))
+	{
+		pTransform->Rotate(m_CameraRotationSpeed * deltaTime, 0.0f, 0.0f);
 	}
 }
 

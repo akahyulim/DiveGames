@@ -42,4 +42,7 @@ private:
 	ImVec4 m_ClearColor;
 
 	uint32_t m_Fps;
+
+	float m_CameraMoveSpeed;
+	float m_CameraRotationSpeed;
 };
