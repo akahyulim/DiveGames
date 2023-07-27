@@ -327,7 +327,7 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 
 						if (ImGui::Button("Load"))
 						{
-							const std::string filePath = FileOpen("Assets/Textures");
+							const std::string filePath = FileOpen("Assets/Models");
 							if(!filePath.empty())
 								pMat->AddTexture(Dive::eTextureUnit::Diffuse, filePath);
 						}

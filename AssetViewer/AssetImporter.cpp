@@ -48,6 +48,8 @@ bool AssetImporter::loadExternalExtension(const std::string& filePath)
 		return false;
 	}
 
+    m_FilePath = filePath;
+
     DV_ASSERT(!m_pModel);
     m_pModel = new Dive::Model();
     m_pModel->SetName(Dive::FileSystem::GetFileName(filePath));
@@ -238,38 +240,27 @@ Dive::Material* AssetImporter::parseAndCreateMaterials(const aiScene* pScene, ai
     aiColor4D opacity(1.0f, 1.0f, 1.0f, 1.0f);
     aiGetMaterialColor(pAiMaterial, AI_MATKEY_OPACITY, &opacity);
 
-    // textures
+    // diffuse map
     aiString texturePath;
     if (pAiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) != AI_SUCCESS)
         pAiMaterial->GetTexture(aiTextureType_BASE_COLOR, 0, &texturePath);
 
-    DV_CORE_INFO("Original Material Path: {:s}", texturePath.C_Str());
-
-    /*
-    * 1. 우선 파싱한 경로에서 파일을 찾아본다.
-    * 2. texture 폴더에서 파일을 찾아본다.
-    * 3. texture 폴더에서 다른 확장자로 파일을 찾아본다.
-    * 4. 디폴트 재질을 전달한다.
-    */
-
-    /*
-    auto diffTexPath = //FileSystem::GetFileNameAndExtension(texturePath.C_Str());
-        //texturePath.C_Str();
-        "Assets/Models/pilot-avatar/textures/Material.002_Base_Color.png";
-        //"Assets/Models/dancing-stormtrooper/textures/stormtrooper_D.png";
-    //diffTexPath = "Assets/Models/sponza-master/textures/" + diffTexPath;
-
-    auto diffTex = ResourceCache::GetResourceByPath<Texture2D>(diffTexPath);
-    if (diffTex)
+    // material
+    auto diffuseTexturePath = Dive::FileSystem::GetPath(m_FilePath) + "textures/";
+    diffuseTexturePath += Dive::FileSystem::GetFileNameAndExtension(texturePath.C_Str());
+    auto pDiffuseTex = Dive::ResourceCache::GetResourceByPath<Dive::Texture2D>(diffuseTexturePath);
+    if (pDiffuseTex)
     {
-        auto pMaterial = new Material();
-        pMaterial->SetName(name.C_Str());
-        pMaterial->SetColorAlbedo(diffuse.r, diffuse.g, diffuse.b, opacity.r);
-        pMaterial->SetTexture(eTextureUnit::Diffuse, diffTex);
-        ResourceCache::AddManualResource<Material>(pMaterial);
-        return pMaterial;
+        Dive::Material* pMat = new Dive::Material;
+        pMat->SetName(Dive::FileSystem::GetFileName(m_FilePath));
+        pMat->SetTexture(Dive::eTextureUnit::Diffuse, pDiffuseTex);
+
+        Dive::ResourceCache::AddManualResource<Dive::Material>(pMat);
+
+        return pMat;
     }
-    */
+
+   // 없다면 디폴트 리턴
     return Dive::ResourceCache::GetResourceByPath<Dive::Material>("Assets/Materials/Default.yaml");
 }
 

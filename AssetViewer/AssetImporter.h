@@ -19,6 +19,7 @@ public:
 
 	void Clear();
 
+	std::string GetFilePath() const { return m_FilePath; }
 	Dive::Model* GetModel() const { return m_pModel; }
 
 private:
@@ -31,5 +32,6 @@ private:
 	Dive::Material* parseAndCreateMaterials(const aiScene* pScene, aiMesh* pMesh);
 
 private:
+	std::string m_FilePath;
 	Dive::Model* m_pModel;
 };
