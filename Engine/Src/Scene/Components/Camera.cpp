@@ -2,6 +2,7 @@
 #include "Camera.h"
 #include "Transform.h"
 #include "Core/CoreDefs.h"
+#include "Graphics/Graphics.h"
 #include "Scene/GameObject.h"
 #include "IO/Log.h"
 
@@ -10,11 +11,15 @@ namespace Dive
 	Camera::Camera(GameObject* pGameObject)
 		: Component(pGameObject),
 		m_bOrthographic(false),
-		m_OrthoViewSize(1.0f, 1.0f),
+		m_ViewWidth(800.0f),
+		m_ViewHeight(600.0f),
 		m_FieldOfView(45.0f),
-		m_AspectRatio(1.0f),
 		m_NearClipPlane(0.1f),
-		m_FarClipPlane(1000.0f)
+		m_FarClipPlane(5000.0f),
+		m_ViewportRectX(0.0f),
+		m_ViewportRectY(0.0f),
+		m_ViewportRectH(1.0f),
+		m_ViewportRectW(1.0f)
 	{
 	}
 
@@ -55,8 +60,8 @@ namespace Dive
 	DirectX::XMMATRIX Camera::GetOrthographicProjMatrix() const
 	{
 		return DirectX::XMMatrixOrthographicLH(
-			m_OrthoViewSize.x,
-			m_OrthoViewSize.y,
+			m_ViewWidth,
+			m_ViewHeight,
 			m_NearClipPlane,
 			m_FarClipPlane);
 	}
@@ -64,34 +69,63 @@ namespace Dive
 	DirectX::XMMATRIX Camera::GetPerspectiveProjMatrix() const
 	{
 		return DirectX::XMMatrixPerspectiveFovLH(
-			m_FieldOfView,
-			m_AspectRatio,
+			DirectX::XMConvertToRadians(m_FieldOfView),
+			GetAspectRatio(),
 			m_NearClipPlane,
 			m_FarClipPlane);
 	}
 
-	void Camera::SetOrthoViewSize(float size)
+	float Camera::GetAspectRatio() const
 	{
-		m_OrthoViewSize.x = size;
-		m_OrthoViewSize.y = size;
-		m_AspectRatio = 1.0f;
-	}
+		float width = static_cast<float>(Graphics::GetWindowWidth());
+		float height = static_cast<float>(Graphics::GetWindowHeight());
 
-	void Camera::SetOrthoViewSize(const DirectX::XMFLOAT2& size)
-	{
-		m_OrthoViewSize.x = size.x;
-		m_OrthoViewSize.y = size.y;
-		m_AspectRatio = size.x / size.y;
+		return ((width * m_ViewportRectW) - (width * m_ViewportRectX)) /
+			((height * m_ViewportRectH) - (height * m_ViewportRectY));
 	}
 
 	// min, max를 따로 선언해 놓는 편이 낫다.
 	void Camera::SetFieldOfView(float fov)
 	{
 		if (fov < 0.0f)
-			m_FieldOfView = 0.0f;
+			m_FieldOfView = 1.0f;
 		else if (fov > 160.0f)
 			m_FieldOfView = 160.0f;
 		else
 			m_FieldOfView = fov;
+	}
+
+	void Camera::GetViewportRect(float& x, float& y, float& w, float& h)
+	{
+		x = m_ViewportRectX;
+		y = m_ViewportRectY;
+		w = m_ViewportRectW;
+		h = m_ViewportRectH;
+	}
+	
+	void Camera::SetViewportRect(float x, float y, float w, float h)
+	{
+		if ((x < 0.0f || x >= m_ViewportRectW) || (y < 0.0f || y >= m_ViewportRectH) || 
+			(w <= m_ViewportRectX || w > 1.0f) || (h <= m_ViewportRectY || h > 1.0f))
+			return;
+
+		m_ViewportRectX = x;
+		m_ViewportRectY = y;
+		m_ViewportRectW = w;
+		m_ViewportRectH = h;
+	}
+
+	D3D11_VIEWPORT Camera::GetViewport()
+	{
+		D3D11_VIEWPORT viewport;
+
+		viewport.TopLeftX = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectX;
+		viewport.TopLeftY = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectY;
+		viewport.Width = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectW;
+		viewport.Height = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectH;
+		viewport.MinDepth = 0.0f;
+		viewport.MaxDepth = 1.0f;
+
+		return viewport;
 	}
 }

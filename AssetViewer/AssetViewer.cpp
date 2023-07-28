@@ -177,7 +177,7 @@ void AssetViewer::Start()
 
 	m_pCamera = Dive::Scene::CreateGameObject("MainCamera");
 	Dive::Camera* pCamera = m_pCamera->AddComponent<Dive::Camera>();
-	pCamera->SetAspectRatio(static_cast<float>(Dive::Graphics::GetWindowWidth()), static_cast<float>(Dive::Graphics::GetWindowHeight()));
+	pCamera->SetViewSize(static_cast<float>(Dive::Graphics::GetWindowWidth()), static_cast<float>(Dive::Graphics::GetWindowHeight()));
 	m_pCamera->GetComponent<Dive::Transform>()->SetPosition(0.0f, 0.0f, -10.0f);
 }
 
@@ -266,21 +266,28 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 		DrawVec3Control("Position", position, 0.0f, 115.0f);
 		pCameraTransform->SetLocalPosition(position);
 
-		// near & far plane
+		// Clipping Planes
 		Dive::Camera* pCamera = m_pCamera->GetComponent<Dive::Camera>();
-		DirectX::XMFLOAT2 cameraPlane;
-		cameraPlane.x = pCamera->GetNearClipPlane();
-		cameraPlane.y = pCamera->GetFarClipPlane();
-		DrawVec2Control("near & far Plane", cameraPlane, 0.0f, 115.0f);
-		pCamera->SetNearClipPlane(cameraPlane.x);
-		pCamera->SetFarClipPlane(cameraPlane.y);
+		DirectX::XMFLOAT2 clippingPlanes;
+		clippingPlanes.x = pCamera->GetNearClipPlane();
+		clippingPlanes.y = pCamera->GetFarClipPlane();
+		DrawVec2Control("Clipping Planes", clippingPlanes, 0.0f, 115.0f);
+		pCamera->SetNearClipPlane(clippingPlanes.x);
+		pCamera->SetFarClipPlane(clippingPlanes.y);
 
-		// camera pov
-		//DirectX::XMFLOAT2 cameraPov;
-		//cameraPov.x = pCamera->GetAspectRatio();
-		//cameraPov.y = pCamera->GetNearClipPlane();
-		//DrawVec2Control("Camera Pov", cameraPov, 0.0f, 120.0f);
-		//pCamera->SetAspectRatio(cameraPov.x, cameraPov.y);
+		// Viewport Rect
+		DirectX::XMFLOAT2 topLeft, viewSize;
+		pCamera->GetViewportRect(topLeft.x, topLeft.y, viewSize.x, viewSize.y);
+		DrawVec2Control("Viewport Rect", topLeft, 0.0f, 115.0f);
+		DrawVec2Control("##Viewport Rect", viewSize, 0.0f, 115.0f);
+		pCamera->SetViewportRect(topLeft.x, topLeft.y, viewSize.x, viewSize.y);
+		
+		// Field of View
+		ImGui::Text("Field of View");
+		ImGui::SameLine();
+		float fov = pCamera->GetFieldOfView();
+		ImGui::SliderFloat("##Field of View", &fov, 1.0f, 160.0f, "%.1f");
+		pCamera->SetFieldOfView(fov);
 
 		// Move speed
 		ImGui::Text("Move Speed");
@@ -291,8 +298,10 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 		ImGui::SameLine();
 		ImGui::SliderFloat("##RotationSpeed", &m_CameraRotationSpeed, 1.0f, 500.0f, "%.1f");
 
-		// clear color
-		ImGui::ColorEdit3("Clear Color", (float*)&m_ClearColor);
+		// Background
+		ImGui::Text("Background");
+		ImGui::SameLine();
+		ImGui::ColorEdit3("##Background", (float*)&m_ClearColor);
 
 		ImGui::End();
 	}
@@ -420,16 +429,7 @@ void AssetViewer::OnEndRender(const Dive::Event& e)
 		{
 			//Dive::Graphics::GetDeviceContext()->RSSetState(Dive::Renderer::GetRasterizerState());
 
-			m_pCamera->GetComponent<Dive::Camera>()->SetAspectRatio(
-				static_cast<float>(Dive::Graphics::GetWindowWidth()), static_cast<float>(Dive::Graphics::GetWindowHeight()));
-
-			D3D11_VIEWPORT viewport;
-			viewport.Width = static_cast<float>(Dive::Graphics::GetWindowWidth());
-			viewport.Height = static_cast<float>(Dive::Graphics::GetWindowHeight());
-			viewport.MinDepth = 0.0f;
-			viewport.MaxDepth = 1.0f;
-			viewport.TopLeftX = 0.0f;
-			viewport.TopLeftY = 0.0f;
+			D3D11_VIEWPORT viewport = m_pCamera->GetComponent<Dive::Camera>()->GetViewport();
 			Dive::Graphics::GetDeviceContext()->RSSetViewports(1, &viewport);
 
 			auto pBuffer = Dive::Renderer::GetCameraVertexShaderBuffer();

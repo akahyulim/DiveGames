@@ -15,14 +15,14 @@ namespace Dive
 		DirectX::XMMATRIX GetOrthographicProjMatrix() const;
 		DirectX::XMMATRIX GetPerspectiveProjMatrix() const;
 
+		float GetViewWidth() const { return m_ViewWidth; }
+		float GetViewHeight() const { return m_ViewHeight; }
+		void SetViewSize(float width, float height) { m_ViewWidth = width; m_ViewHeight = height; }
+
 		bool IsOrthographic() const { return m_bOrthographic; }
 		void SetOrthographic(bool orthographic) { m_bOrthographic = orthographic; }
-		void SetOrthoViewSize(float size);
-		void SetOrthoViewSize(const DirectX::XMFLOAT2& size);
 
-		float GetAspectRatio() const { return m_AspectRatio; }
-		void SetAspectRatio(float aspect) { m_AspectRatio = aspect; }
-		void SetAspectRatio(float width, float height) { m_AspectRatio = width / height; }
+		float GetAspectRatio() const;
 
 		float GetFieldOfView() const { return m_FieldOfView; }
 		void SetFieldOfView(float fov);
@@ -33,14 +33,25 @@ namespace Dive
 		float GetFarClipPlane() const { return m_FarClipPlane; }
 		void SetFarClipPlane(float farPlane) { m_FarClipPlane = farPlane; }
 
+		void GetViewportRect(float& x, float& y, float& w, float& h);
+		void SetViewportRect(float x, float y, float w, float h);
+		D3D11_VIEWPORT GetViewport();
+
 	private:
 	private:
 		bool m_bOrthographic;
-		DirectX::XMFLOAT2 m_OrthoViewSize;
+		
+		float m_ViewWidth;
+		float m_ViewHeight;
 
 		float m_FieldOfView;
-		float m_AspectRatio;
+
 		float m_NearClipPlane;
 		float m_FarClipPlane;
+
+		float m_ViewportRectX;
+		float m_ViewportRectY;
+		float m_ViewportRectW;
+		float m_ViewportRectH;
 	};
 }
