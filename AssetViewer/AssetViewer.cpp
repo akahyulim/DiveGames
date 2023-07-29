@@ -25,7 +25,25 @@ static std::string FileOpen(const char* pDir, const char* pFilter = nullptr)
 
 	return ofn.lpstrFile;
 }
-static void DrawVec2Control(const std::string& label, DirectX::XMFLOAT2& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+
+static void DrawFloatControl(const std::string& label, float& value, float resetValue = 0.0f, float columnWidth = 100.0f)
+{
+	ImGui::PushID(label.c_str());
+
+	ImGui::Columns(2);
+
+	ImGui::SetColumnWidth(0, columnWidth);
+	ImGui::Text(label.c_str());
+	ImGui::NextColumn();
+
+	ImGui::DragFloat("##X", &value, 0.1f, 0.0f, 0.0f, "%.2f");
+	
+	ImGui::Columns(1);
+
+	ImGui::PopID();
+}
+
+static void DrawVec2Control(const std::string& label, DirectX::XMFLOAT2& values, float resetValue = 0.0f, float columnWidth = 100.0f, const std::string& a = "X", const std::string& b = "Y")
 {
 	ImGuiIO& io = ImGui::GetIO();
 	auto pBoldFont = io.Fonts->Fonts[1];
@@ -47,7 +65,7 @@ static void DrawVec2Control(const std::string& label, DirectX::XMFLOAT2& values,
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
 	ImGui::PushFont(pBoldFont);
-	if (ImGui::Button("X", buttonSize))
+	if (ImGui::Button(a.c_str(), buttonSize))
 		values.x = resetValue;
 	ImGui::PopFont();
 	ImGui::PopStyleColor(3);
@@ -61,7 +79,7 @@ static void DrawVec2Control(const std::string& label, DirectX::XMFLOAT2& values,
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
 	ImGui::PushFont(pBoldFont);
-	if (ImGui::Button("Y", buttonSize))
+	if (ImGui::Button(b.c_str(), buttonSize))
 		values.y = resetValue;
 	ImGui::PopFont();
 	ImGui::PopStyleColor(3);
@@ -162,7 +180,6 @@ void AssetViewer::Setup()
 {
 	// Engine Setup
 	Dive::Graphics::SetWindowTitle(L"AssetViewer");
-	//Dive::Graphics::ResizeWindow(800, 600);
 
 	// Subscribe Events
 	SUBSCRIBE_EVENT(Dive::eEventType::BeginRender, EVENT_HANDLER_PARAM(OnBeginRender));
@@ -259,49 +276,63 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 	{
 		ImGui::Begin("Camera");
 
-		// position
+		// lookAt & position & rotation
 		Dive::Transform* pCameraTransform = m_pCamera->GetTransform();
+		DirectX::XMFLOAT3 lookAt;
+		DirectX::XMStoreFloat3(&lookAt, pCameraTransform->GetLookAt());
+		DrawVec3Control("LookAt", lookAt, 0.0f, 115.0f);
+		pCameraTransform->LookAt(lookAt);
 		DirectX::XMFLOAT3 position;
 		DirectX::XMStoreFloat3(&position, pCameraTransform->GetLocalPosition());
 		DrawVec3Control("Position", position, 0.0f, 115.0f);
 		pCameraTransform->SetLocalPosition(position);
+		DirectX::XMFLOAT3 rotation = pCameraTransform->GetLocalRotationDegrees();
+		DrawVec3Control("Rotation", rotation, 0.0f, 115.0f);
+		pCameraTransform->SetRotation(rotation);
+		ImGui::Separator();
+
 
 		// Clipping Planes
 		Dive::Camera* pCamera = m_pCamera->GetComponent<Dive::Camera>();
 		DirectX::XMFLOAT2 clippingPlanes;
 		clippingPlanes.x = pCamera->GetNearClipPlane();
 		clippingPlanes.y = pCamera->GetFarClipPlane();
-		DrawVec2Control("Clipping Planes", clippingPlanes, 0.0f, 115.0f);
+		DrawVec2Control("Clipping Planes", clippingPlanes, 0.0f, 115.0f, "N", "F");
 		pCamera->SetNearClipPlane(clippingPlanes.x);
 		pCamera->SetFarClipPlane(clippingPlanes.y);
+		ImGui::Separator();
 
 		// Viewport Rect
 		DirectX::XMFLOAT2 topLeft, viewSize;
 		pCamera->GetViewportRect(topLeft.x, topLeft.y, viewSize.x, viewSize.y);
 		DrawVec2Control("Viewport Rect", topLeft, 0.0f, 115.0f);
-		DrawVec2Control("##Viewport Rect", viewSize, 0.0f, 115.0f);
+		DrawVec2Control("", viewSize, 1.0f, 115.0f, "U", "V");
 		pCamera->SetViewportRect(topLeft.x, topLeft.y, viewSize.x, viewSize.y);
-		
+		ImGui::Separator();
+
 		// Field of View
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, 115.0f);
 		ImGui::Text("Field of View");
-		ImGui::SameLine();
-		float fov = pCamera->GetFieldOfView();
-		ImGui::SliderFloat("##Field of View", &fov, 1.0f, 160.0f, "%.1f");
-		pCamera->SetFieldOfView(fov);
+		ImGui::NextColumn();
+		int fov = static_cast<int>(pCamera->GetFieldOfView());
+		ImGui::SliderInt("##Field of View", &fov, 1, 160);
+		pCamera->SetFieldOfView(static_cast<float>(fov));
+		ImGui::Columns(1);
+		ImGui::Separator();
 
-		// Move speed
-		ImGui::Text("Move Speed");
-		ImGui::SameLine();
-		ImGui::SliderFloat("##MoveSpeed", &m_CameraMoveSpeed, 1.0f, 1000.0f, "%.1f");
-
-		ImGui::Text("Rotation Speed");
-		ImGui::SameLine();
-		ImGui::SliderFloat("##RotationSpeed", &m_CameraRotationSpeed, 1.0f, 500.0f, "%.1f");
+		// Control Speed
+		DrawFloatControl("Move Speed", m_CameraMoveSpeed, 0.0f, 115.0f);
+		DrawFloatControl("Rotation Speed", m_CameraRotationSpeed, 0.0f, 115.0f);
+		ImGui::Separator();
 
 		// Background
+		ImGui::Columns(2);
+		ImGui::SetColumnWidth(0, 115.0f);
 		ImGui::Text("Background");
-		ImGui::SameLine();
+		ImGui::NextColumn(); 
 		ImGui::ColorEdit3("##Background", (float*)&m_ClearColor);
+		ImGui::Columns(1);
 
 		ImGui::End();
 	}
