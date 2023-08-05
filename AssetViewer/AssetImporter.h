@@ -8,6 +8,19 @@
 #include <assimp/Importer.hpp>
 #include <assimp/ProgressHandler.hpp>
 
+struct OutModel
+{
+	std::string name;
+	aiNode* pRootNode;
+	aiNode* pRootBone;
+	std::vector<aiMesh*> meshes;
+	std::vector<aiNode*> meshNodes;
+	std::vector<aiNode*> bones;		// 흐음... aiBone*이 아니다.
+	std::vector<aiAnimation*> animations;
+	uint32_t numVertices;
+	uint32_t numIndices;
+};
+
 class AssetImporter
 {
 public:
@@ -21,6 +34,12 @@ public:
 
 	std::string GetFilePath() const { return m_FilePath; }
 	Dive::Model* GetModel() const { return m_pModel; }
+
+	void CollectMeshes(OutModel& model, aiNode* pNode, const aiScene* pScene);
+	void CollectBones(OutModel& model, const aiScene* pScene);
+	void CollectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& necessary, aiNode* pNode);
+
+	void BuildAndSaveModel(OutModel& model, const aiScene* pScene);
 
 private:
 	bool loadExternalExtension(const std::string& filePath);
