@@ -1,31 +1,43 @@
 #include "DivePch.h"
 #include "SkinnedMeshRenderer.h"
 #include "Transform.h"
+#include "Animator.h"
+#include "Core/Timer.h"
 #include "Scene/GameObject.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Material.h"
 #include "Renderer/SkinnedMesh.h"
+#include "Renderer/Animation.h"
+#include "Renderer/Bone.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/ConstantBuffer.h"
 #include "IO/Log.h"
 
-#include "Renderer/Animator.h"
+#include "Renderer/Skeleton.h"
 
 namespace Dive
 {
 	SkinnedMeshRenderer::SkinnedMeshRenderer(GameObject* pGameObject)
 		: IMeshRenderer(pGameObject),
-		m_pAnimator(nullptr)
+		m_CurrentTime(0.0f)
 	{
-		m_pAnimator = new Animator;
+		DirectX::XMFLOAT4X4 matIdentity;
+		DirectX::XMStoreFloat4x4(&matIdentity, DirectX::XMMatrixIdentity());
+		m_SkinMatrices.reserve(100);
+		for (uint32_t i = 0; i < 100; ++i)
+			m_SkinMatrices.emplace_back(matIdentity);
 	}
 
 	SkinnedMeshRenderer::~SkinnedMeshRenderer()
 	{
-		DV_CORE_TRACE("Destroy SkinnedMeshRenderer: {:s}", GetName());
 	}
 
-	void SkinnedMeshRenderer::Draw() const
+	void SkinnedMeshRenderer::Update()
+	{
+		
+	}
+
+	void SkinnedMeshRenderer::Draw()
 	{
 		// Material
 		{
@@ -48,26 +60,54 @@ namespace Dive
 			Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetBasicSkinnedPixelShaderVariation());
 		}
 
-		// Mesh Draw
+		// 이걸 update에 넣어버리면 마지막 모델의 값만 저장된다. 따라서 그냥 한 번에 그려야 한다.
 		{
+			float deltaTime = static_cast<float>(Dive::Timer::GetDeltaTimeSec());
+
+			m_pCurrentAnimation = m_pGameObject->GetComponent<Dive::Animator>()->GetCurrentAnimation();
+			if (m_pCurrentAnimation)
+			{
+				m_CurrentTime += m_pCurrentAnimation->GetTickPerSecond() * deltaTime;
+				m_CurrentTime = fmod(m_CurrentTime, m_pCurrentAnimation->GetDuration());
+
+				if (!m_Bones.empty())
+				{
+					auto pRootNode = GetGameObject()->GetTransform()->GetParent();
+					Transform* pRootBone = nullptr;
+					for (auto pChild : pRootNode->GetChildren())
+					{
+						if (pChild != GetGameObject()->GetTransform())
+						{
+							pRootBone = pChild;
+							break;
+						}
+					}
+
+					DirectX::XMFLOAT4X4 matIdentity;
+					DirectX::XMStoreFloat4x4(&matIdentity, DirectX::XMMatrixIdentity());
+					// 이게 꽤나 부담을 준다.
+					calcuBoneTransform(pRootBone, 
+						//pRootNode,
+						matIdentity);
+				}
+			}
+
 			auto pBuffer = Renderer::GetModelVertexShaderBuffer();
 			auto pMappedData = static_cast<ModelVertexShaderBuffer*>(pBuffer->Map());
 			pMappedData->worldMatrix = DirectX::XMMatrixTranspose(m_pGameObject->GetTransform()->GetMatrix());
-			{
-				//auto boneTransforms = m_pAnimator->GetFinalBoneMatrices();
-				//for (size_t i = 0; i < boneTransforms.size(); ++i)
-				{
-				//	DirectX::XMFLOAT4X4 boneFinal = boneTransforms[i];
-				//	pMappedData->skinMatrix[i] = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&boneFinal));
-				}
-			}
+			for (uint32_t i = 0; i < static_cast<uint32_t>(m_SkinMatrices.size()); ++i)
+				pMappedData->skinMatrix[i] = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&m_SkinMatrices[i]));
 			pBuffer->Unmap();
 			Graphics::SetConstantBuffer(1, eShaderType::VertexShader, pBuffer);
+		}
 
+		// Mesh Draw
+		{
 			Graphics::SetVertexBuffer(m_pMesh->GetVertexBuffer());
 			Graphics::SetIndexBuffer(m_pMesh->GetIndexBuffer());
 			Graphics::DrawIndexed(
 				D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+				//D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
 				m_pMesh->GetNumIndices(),
 				0, 0);
 		}
@@ -83,11 +123,49 @@ namespace Dive
 		m_pMesh = dynamic_cast<SkinnedMesh*>(pMesh);
 	}
 
-	void SkinnedMeshRenderer::SetAnimation(Animation* pAnim)
+	void SkinnedMeshRenderer::InsertBone(BoneInfo* pBone)
 	{
-		if (!m_pAnimator)
-			return;
+		m_Bones.emplace_back(*pBone);
+	}
 
-		m_pAnimator->SetAnimation(pAnim);
+	void SkinnedMeshRenderer::SetBones(const std::vector<BoneInfo>& bones)
+	{
+		m_Bones.clear();
+		m_BoneInfoMap.clear();
+
+		m_Bones = bones;
+
+		// 임시 구현이다. 실제로는 완성된 걸 받아오는 편이 나아보인다.
+		for (const auto& bone : m_Bones)
+		{
+			m_BoneInfoMap[bone.name] = bone;
+		}
+	}
+
+	void SkinnedMeshRenderer::calcuBoneTransform(Transform* pNode, DirectX::XMFLOAT4X4 parent)
+	{
+		auto nodeName = pNode->GetName();
+		auto localTransform = pNode->GetLocalMatrix();
+		
+		auto pBone = m_pCurrentAnimation->FindBone(nodeName);
+		if (pBone)
+		{
+			pBone->Update(m_CurrentTime);
+			localTransform = pBone->GetLocalTransform();
+		}
+
+		auto worldTransform = localTransform * DirectX::XMLoadFloat4x4(&parent);
+
+		auto it = m_BoneInfoMap.find(nodeName);
+		if (it != m_BoneInfoMap.end())
+		{
+			auto finalBoneTransform = DirectX::XMLoadFloat4x4(&it->second.offsetMatrix) * worldTransform;
+			DirectX::XMStoreFloat4x4(&m_SkinMatrices[it->second.index], finalBoneTransform);
+		}
+
+		DirectX::XMFLOAT4X4 world;
+		DirectX::XMStoreFloat4x4(&world, worldTransform);
+		for (auto pChild : pNode->GetChildren())
+			calcuBoneTransform(pChild, world);
 	}
 }

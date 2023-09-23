@@ -16,7 +16,7 @@ namespace Dive
 		IMeshRenderer(GameObject* pGameObject);
 		virtual ~IMeshRenderer();
 
-		virtual void Draw() const = 0;
+		virtual void Draw() = 0;
 
 		virtual IMesh* GetMesh() = 0;
 		virtual void SetMesh(IMesh* pMesh) = 0;
@@ -35,7 +35,7 @@ namespace Dive
 		MeshRenderer(GameObject* pGameObject);
 		virtual ~MeshRenderer();
 
-		void Draw() const override;
+		void Draw() override;
 
 		IMesh* GetMesh() override;
 		void SetMesh(IMesh* pMesh) override;

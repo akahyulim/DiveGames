@@ -4,79 +4,76 @@ namespace Dive
 {
 	struct KeyPosition
 	{
-		KeyPosition(double time, DirectX::XMFLOAT3 pos)
+		KeyPosition(float time, const DirectX::XMFLOAT3& value)
 		{
 			timeStamp = time;
-			position = pos;
+			position = value;
 		}
 
-		double timeStamp;
+		float timeStamp = 0.0f;
 		DirectX::XMFLOAT3 position;
 	};
 
 	struct KeyRotation
 	{
-		KeyRotation(double time, DirectX::XMFLOAT4 rot)
+		KeyRotation(float time, const DirectX::XMFLOAT4& value)
 		{
 			timeStamp = time;
-			rotation = rot;
+			rotation = value;
 		}
 
-		double timeStamp;
+		float timeStamp = 0.0f;
 		DirectX::XMFLOAT4 rotation;
 	};
 
 	struct KeyScale
 	{
-		KeyScale(double time, DirectX::XMFLOAT3 scl)
+		KeyScale(float time, const DirectX::XMFLOAT3& value)
 		{
 			timeStamp = time;
-			scale = scl;
+			scale = value;
 		}
 
-		double timeStamp;
+		float timeStamp = 0.0f;
 		DirectX::XMFLOAT3 scale;
 	};
 
 	class Bone
 	{
 	public:
-		Bone(const std::string& name, int32_t id);
-		~Bone();
+		// 참고문서에서는 Animation의 생성자 과정에서 생성된다.
+		Bone(const std::string& name);
+		~Bone() = default;
 
 		void Update(float delta);
 
-		// 상당히 허접하다.
-		void SetPositions(const std::vector<KeyPosition>& positions) { m_Positions = positions; m_NumPositionKeys = static_cast<uint32_t>(m_Positions.size()); }
-		void SetRotations(const std::vector<KeyRotation>& rotations) { m_Rotations = rotations; m_NumRotationKeys = static_cast<uint32_t>(m_Rotations.size()); }
-		void SetScales(const std::vector<KeyScale>& scales) { m_Scales = scales; m_NumScaleKeys = static_cast<uint32_t>(m_Scales.size()); }
+		void InsertPositionKey(float time, const DirectX::XMFLOAT3& value) { m_Positions.emplace_back(time, value); }
+		void InsertRotationKey(float time, const DirectX::XMFLOAT4& value) { m_Rotations.emplace_back(time, value); }
+		void InsertScaleKey(float time, const DirectX::XMFLOAT3& value) { m_Scales.emplace_back(time, value); }
 
-		DirectX::XMFLOAT4X4 GetLocalTransform() const { return m_LocalTransform; }
+		uint32_t GetPositionIndex(float time);
+		uint32_t GetRotationIndex(float time);
+		uint32_t GetScaleIndex(float time);
+
+		uint32_t GetNumPositionKeys() const { return static_cast<uint32_t>(m_Positions.size()); }
+		uint32_t GetNumRotationKeys() const { return static_cast<uint32_t>(m_Rotations.size()); }
+		uint32_t GetNumScaleKeys() const { return static_cast<uint32_t>(m_Scales.size()); }
 
 		std::string GetBoneName() const { return m_Name; }
-
-		int GetPositionIndex(float delta);
-		int GetRotationIndex(float delta);
-		int GetScaleIndex(float delta);
+		DirectX::XMMATRIX GetLocalTransform() const { return DirectX::XMLoadFloat4x4(&m_LocalTransform); }
 
 	private:
-		float getScaleFactor(float lastTimeStamp, float nextTimeStamp, float delta);
-
-		DirectX::XMFLOAT3 interpolatePosition(float deltaTime);
-		DirectX::XMFLOAT4 interpolateRotation(float deltaTime);
-		DirectX::XMFLOAT3 interpolateScale(float deltaTime);
+		float getScaleFactor(float lastTimeStamp, float nextTimeStamp, float time);
+		DirectX::XMMATRIX interpolatePosition(float time);
+		DirectX::XMMATRIX interpolateRotation(float time);
+		DirectX::XMMATRIX interpolateScale(float time);
 
 	private:
 		std::string m_Name;
-		int32_t m_ID;
 
 		std::vector<KeyPosition> m_Positions;
 		std::vector<KeyRotation> m_Rotations;
 		std::vector<KeyScale> m_Scales;
-
-		uint32_t m_NumPositionKeys;
-		uint32_t m_NumRotationKeys;
-		uint32_t m_NumScaleKeys;
 
 		DirectX::XMFLOAT4X4 m_LocalTransform;
 	};

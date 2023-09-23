@@ -1,6 +1,21 @@
 #include "AssetImporter.h"
 
-static DirectX::XMFLOAT4X4 aiMatrix4x4ToXMFLOAT4X4(aiMatrix4x4 matrix)
+static std::string s_FilePath;
+static std::string s_ModelName;
+static const aiScene* s_pScene = nullptr;
+static Dive::Model* s_pModel = nullptr;
+
+DirectX::XMFLOAT3 ConvertXMFLOAT3(const aiVector3D& vec)
+{
+    return DirectX::XMFLOAT3(vec.x, vec.y, vec.z);
+}
+
+DirectX::XMFLOAT4 ConvertXMFLOAT4(const aiQuaternion& vec)
+{
+    return DirectX::XMFLOAT4(vec.x, vec.y, vec.z, vec.w);
+}
+
+DirectX::XMFLOAT4X4 ConvertXMFLOAT4X4(const aiMatrix4x4& matrix)
 {
     return DirectX::XMFLOAT4X4(
         matrix.a1, matrix.b1, matrix.c1, matrix.d1,
@@ -10,17 +25,17 @@ static DirectX::XMFLOAT4X4 aiMatrix4x4ToXMFLOAT4X4(aiMatrix4x4 matrix)
     );
 }
 
-static aiNode* GetNode(const std::string& name, aiNode* pRootNode)
+aiNode* FindNodeByName(aiNode* pNode, const aiString& name)
 {
-    if (!pRootNode)
+    if (!pNode)
         return nullptr;
 
-    if (name == pRootNode->mName.C_Str())
-        return pRootNode;
+    if (pNode->mName == name)
+        return pNode;
 
-    for (size_t i = 0; i < pRootNode->mNumChildren; ++i)
+    for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
     {
-        aiNode* pFound = GetNode(name, pRootNode->mChildren[i]);
+        auto pFound = FindNodeByName(pNode->mChildren[i], name);
         if (pFound)
             return pFound;
     }
@@ -28,710 +43,123 @@ static aiNode* GetNode(const std::string& name, aiNode* pRootNode)
     return nullptr;
 }
 
-static uint32_t GetBoneIndex(OutModel& model, const std::string& name)
+void GetBlendData(aiMesh* pMesh, std::vector<std::vector<int>>& outBlendIndices, std::vector<std::vector<float>>& outBlendWeights)
 {
-    for (size_t i = 0; i < model.bones.size(); ++i)
+    if (!pMesh || pMesh->mNumBones == 0)
+        return;
+
+    outBlendIndices.resize(pMesh->mNumVertices);
+    outBlendWeights.resize(pMesh->mNumVertices);
+
+    for (uint32_t i = 0; i < pMesh->mNumBones; ++i)
     {
-        if (model.bones[i]->mName.C_Str() == name)
-            return i;
-    }
-
-    return 0xFFFFFFFF;
-}
-
-static void GetBlendData(OutModel& model, aiMesh* pMesh, aiNode* pMeshNode, std::vector<uint32_t>& boneMappings,
-    std::vector<std::vector<unsigned char>>& blendIndices, std::vector<std::vector<float>>& blendWeights)
-{
-    boneMappings.clear();
-    blendIndices.resize(pMesh->mNumVertices);
-    blendWeights.resize(pMesh->mNumVertices);
-
-    // bone이 64개를 초과하면 boneMappings로 관리한다는 뜻인 듯 하다.
-    if (model.bones.size() > 64)
-    {
-        if (pMesh->mNumBones > 64)
+        aiBone* pBone = pMesh->mBones[i];
+        for (uint32_t j = 0; j < pBone->mNumWeights; ++j)
         {
-            DV_ERROR("bone 개수가 64를 넘겼습니다.");
-            return;
-        }
-
-        if (pMesh->mNumBones > 0)
-        {
-            boneMappings.resize(pMesh->mNumBones, 0);
-            for (uint32_t i = 0; i < pMesh->mNumBones; ++i)
-            {
-                aiBone* pBone = pMesh->mBones[i];
-                std::string boneName = pBone->mName.C_Str();
-                uint32_t index = GetBoneIndex(model, boneName);
-                boneMappings[i] = index;
-
-                for (uint32_t j = 0; j < pBone->mNumWeights; ++j)
-                {
-                    uint32_t vertexID = pBone->mWeights[j].mVertexId;
-                    blendIndices[vertexID].emplace_back(i);
-                    blendWeights[vertexID].emplace_back(pBone->mWeights[j].mWeight);
-                }
-            }
-        }
-        else
-        {
-            std::string boneName = pMesh->mName.C_Str();
-            uint32_t index = GetBoneIndex(model, boneName);
-            boneMappings.emplace_back(index);       // resize 상태라 좀 애매하다.
-            for (uint32_t i = 0; i < pMesh->mNumVertices; ++i)
-            {
-                blendIndices[i].emplace_back(0);
-                blendWeights[i].emplace_back(1.0f);
-            }
-        }
-    }
-    else
-    {
-        if (pMesh->mNumBones > 0)
-        {
-            for (uint32_t i = 0; i < pMesh->mNumBones; ++i)
-            {
-                aiBone* pBone = pMesh->mBones[i];
-                std::string boneName = pBone->mName.C_Str();
-                uint32_t index = GetBoneIndex(model, boneName);
-               
-                for (uint32_t j = 0; j < pBone->mNumWeights; ++j)
-                {
-                    uint32_t vertexID = pBone->mWeights[j].mVertexId;
-                    blendIndices[vertexID].emplace_back(index);
-                    blendWeights[vertexID].emplace_back(pBone->mWeights[j].mWeight);
-                }
-            }
-        }
-        else
-        {
-            std::string boneName = pMesh->mName.C_Str();
-            uint32_t index = GetBoneIndex(model, boneName);
-            for (uint32_t i = 0; i < pMesh->mNumVertices; ++i)
-            {
-                blendIndices[i].emplace_back(index);
-                blendWeights[i].emplace_back(1.0f);
-            }
+            uint32_t vertexID = pBone->mWeights[j].mVertexId;
+            outBlendIndices[vertexID].emplace_back(i);
+            outBlendWeights[vertexID].emplace_back(pBone->mWeights[j].mWeight);
         }
     }
 
-    // weight를 정규화
-    for (size_t i = 0; i < blendWeights.size(); ++i)
+    // outBlendWeights를 정규화
+    for (uint32_t i = 0; i < static_cast<uint32_t>(outBlendWeights.size()); ++i)
     {
-        // 1. 4개를 초과할 경우
-        // 4개가 될 때 까지 가장 작은 wegiht와 bone을 제거한다.
-        if (blendWeights[i].size() > 4)
+        // 1. 뼈대가 4개를 초과할 경우 가장 작은 wegiht와 bone을 제거
+        if (outBlendWeights[i].size() > 4)
         {
             DV_WARN("{:d}번째 정점에 영향을 주는 뼈대가 4개 이상입니다.", i);
 
-            while (blendWeights[i].size() > 4)
+            while (outBlendWeights[i].size() > 4)
             {
                 size_t lowestIndex = 0;
                 float lowest = std::numeric_limits<float>::infinity();
-                for (size_t j = 0; j < blendWeights[i].size(); ++j)
+                for (uint32_t j = 0; j < static_cast<uint32_t>(outBlendWeights[i].size()); ++j)
                 {
-                    if (blendWeights[i][j] < lowest)
+                    if (outBlendWeights[i][j] < lowest)
                     {
-                        lowest = blendWeights[i][j];
+                        lowest = outBlendWeights[i][j];
                         lowestIndex = j;
                     }
                 }
 
-                // erase라 빈 공간이 남을 수 있다.
-                blendWeights[i].erase(blendWeights[i].begin() + lowestIndex);
-                blendIndices[i].erase(blendIndices[i].begin() + lowestIndex);
+                outBlendWeights[i].erase(outBlendWeights[i].begin() + lowestIndex);
+                outBlendIndices[i].erase(outBlendIndices[i].begin() + lowestIndex);
             }
         }
-        
-        // 2. 총 합이 1.0 이상이거나 0.0이 아닐 경우
+
+        // 2. 총 합이 1.0 이상이거나 0.0이 아닐 경우 정규화
         float sum = 0.0f;
-        for (uint32_t j = 0; j < blendWeights[i].size(); ++j)
-            sum += blendWeights[i][j];
+        for (uint32_t j = 0; j < static_cast<uint32_t>(outBlendWeights[i].size()); ++j)
+            sum += outBlendWeights[i][j];
         if (sum != 1.0f && sum != 0.0f)
         {
-            for (uint32_t j = 0; j < blendWeights[i].size(); ++j)
-                blendWeights[i][j] /= sum;
+            DV_WARN("Weight 총합이 1.0이 아니어서 정규화를 수행");
+
+            for (uint32_t j = 0; j < static_cast<uint32_t>(outBlendWeights[i].size()); ++j)
+                outBlendWeights[i][j] /= sum;
         }
     }
 }
 
-static DirectX::XMFLOAT4X4 GetBoneOffset(OutModel& model, const std::string& boneName)
+Dive::GameObject* GetNodeObjectByBoneName(Dive::GameObject* pNodeObject, const std::string& boneName)
 {
-    for (size_t i = 0; i < model.meshes.size(); ++i)
+    if (!pNodeObject || boneName.empty())
+        return nullptr;
+
+    if (pNodeObject->GetName() == boneName)
+        return pNodeObject;
+
+    for (Dive::Transform* pChild : pNodeObject->GetTransform()->GetChildren())
     {
-        aiMesh* pMesh = model.meshes[i];
-        aiNode* pMeshNode = model.meshNodes[i];
-
-        for (uint32_t j = 0; j < pMesh->mNumBones; ++j)
-        {
-            aiBone* pBone = pMesh->mBones[j];
-            if (pBone->mName.C_Str() == boneName)
-            {
-                auto offset =  aiMatrix4x4ToXMFLOAT4X4(pBone->mOffsetMatrix);
-                // rootnode부터 meshNode까지 누적하고 다시 offset을 누적한 후 리턴하는 듯 하다.
-            }
-        }
+        Dive::GameObject* pNode = GetNodeObjectByBoneName(pChild->GetGameObject(), boneName);
+        if (pNode)
+            return pNode;
     }
 
-    return DirectX::XMFLOAT4X4(
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    );
+    return nullptr;
 }
 
-AssetImporter::AssetImporter()
-	: m_pModel(nullptr)
+Dive::Material* ParseAndCreateMaterials(aiMesh* pMesh)
 {
-}
-
-AssetImporter::~AssetImporter()
-{
-	Clear();
-}
-
-bool AssetImporter::LoadFromFile(const std::string& filePath)
-{
-    if (Dive::FileSystem::FileExists(filePath))
-    {
-        Clear();
-        return loadExternalExtension(filePath);
-    }
-
-    return false;
-}
-
-bool AssetImporter::SaveToFile(const std::string& filePath)
-{
-	return false;
-}
-
-void AssetImporter::Clear()
-{
-    DV_DELETE(m_pModel);
-}
-
-// 전체 노드를 순환하면서 aiMesh와 해당 aiNode를 수집
-void AssetImporter::CollectMeshes(OutModel& model, aiNode* pNode, const aiScene* pScene)
-{
-    for (uint32_t i = 0; i < pNode->mNumMeshes; ++i)
-    {
-        aiMesh* pMesh = pScene->mMeshes[pNode->mMeshes[i]];
-        for (uint32_t j = 0; j < static_cast<uint32_t>(model.meshes.size()); ++j)
-        {
-            if (pMesh == model.meshes[j])
-            {
-                DV_WARN("동일한 메시({:s})가 여러번 발견되었습니다.", pMesh->mName.C_Str());
-                break;
-            }
-        }
-
-        model.meshes.emplace_back(pMesh);
-        model.meshNodes.emplace_back(pNode);
-        model.numVertices += pMesh->mNumVertices;
-        model.numIndices += pMesh->mNumFaces * 3;
-    }
-
-    for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
-        CollectMeshes(model, pNode->mChildren[i], pScene);
-}
-
-void AssetImporter::CollectBones(OutModel& model, const aiScene* pScene)
-{
-    // 이걸 왜 굳이 set으로 관리하는지 모르겠다.
-    // 일단 동일한 요소가 중복저장되지 않는 특성은 유용한 듯 하다.
-    std::set<aiNode*> necessary;
-    std::set<aiNode*> rootNodes;
-
-    bool bHaveSkinnedMesh = false;
-    for (size_t i = 0; i < model.meshes.size(); ++i)
-    {
-        if (model.meshes[i]->HasBones())
-        {
-            bHaveSkinnedMesh = true;
-            break;
-        }
-    }
-
-    for (size_t i = 0; i < model.meshes.size(); ++i)
-    {
-        aiMesh* pMesh = model.meshes[i];
-        aiNode* pMeshNode = model.meshNodes[i];
-        aiNode* pMeshParentNode = pMeshNode->mParent;
-        aiNode* pRootNode = nullptr;
-
-        // bone이 없다면 실행도 안된다.
-        for (size_t j = 0; j < pMesh->mNumBones; ++j)
-        {
-            // 일단 bone과 boneNode를 찾는다.
-            aiBone* pBone = pMesh->mBones[j];
-            std::string boneName = pBone->mName.C_Str();
-            aiNode* pBoneNode = GetNode(boneName, pScene->mRootNode);
-
-            if (!pBoneNode)
-            {
-                DV_ERROR("Bone {:s}의 Node를 찾지못하였습니다.", boneName);
-                return; // 실제로는 프로그램을 종료해야 한다.
-            }
-
-            // boneNode를 necessary에 넣는다. 이때 순서대로 저장된다.
-            necessary.emplace(pBoneNode);
-            pRootNode = pBoneNode;
-
-            // 현재 bone의 node에서부터 rootNode에 도달할때까지 부모 node를 necessary에 추가한다.
-            for(;;)
-            {
-                pBoneNode = pBoneNode->mParent;
-                // 사실상 rootNode까지 반복된다는 의미
-                if (!pBoneNode || (pBoneNode == pMeshNode || pBoneNode == pMeshParentNode))
-                {
-                    break;
-                }
-                pRootNode = pBoneNode;
-                // boneNode들의 부모는 이 곳에
-                necessary.emplace(pBoneNode);
-            }
-
-            // boneNode의 rootNode는 이 곳에 저장되는 듯 하다.
-            // 왠만하면 Scene의 rootNode이겠지?
-            if (rootNodes.find(pRootNode) == rootNodes.end())
-                rootNodes.emplace(pRootNode);
-        }
-
-        // 이건 skinned와 rigid가 섞여있는 경우인듯...
-        if (bHaveSkinnedMesh && !pMesh->mNumBones)
-        {
-            aiNode* pBoneNode = pMeshNode;
-            necessary.emplace(pBoneNode);
-            pRootNode = pBoneNode;
-
-            // 이하 부부은 위와 같다.
-            for (;;)
-            {
-                pBoneNode = pBoneNode->mParent;
-                if (!pBoneNode || (pBoneNode == pMeshNode || pBoneNode == pMeshParentNode))
-                    break;
-                pRootNode = pBoneNode;
-                necessary.emplace(pBoneNode);
-            }
-
-            if (rootNodes.find(pRootNode) == rootNodes.end())
-                rootNodes.emplace(pRootNode);
-        }
-    }
-
-    if (rootNodes.empty())
-        return;
-
-    model.pRootBone = *rootNodes.begin();
-
-    // 위의 과정으로 추출된 aiBone을 이용해 aiNode를 구성한다.
-    // 이때 저장된 순서는 중요하다.
-    // 이를 기반으로 vertex에 boneID가 저장된다.
-    // 문제는 뼈대노드가 다른 노드와 계층구조일 수 있다는 것이다.
-    // 뼈대노드만으로 계층구조를 구성하여 사용할 수 있게끔 누적 변환이 필요해진다.
-    // 그리고 현재 뼈대에 존재하는 값(offset)에 어떻게 접근할 것인지도 모른다.
-    CollectBonesFinal(model.bones, necessary, model.pRootBone);
-}
-
-void AssetImporter::CollectBonesFinal(std::vector<aiNode*>& dest, const std::set<aiNode*>& necessary, aiNode* pNode)
-{
-    bool bIncludeBone = necessary.find(pNode) != necessary.end();
-    std::string boneName = pNode->mName.C_Str();
-
-    if (bIncludeBone)
-        dest.emplace_back(pNode);
-
-    for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
-        CollectBonesFinal(dest, necessary, pNode->mChildren[i]);
-}
-
-void AssetImporter::BuildAndSaveModel(OutModel& model, const aiScene* pScene)
-{
-    if (!model.pRootNode)
-    {
-        DV_ERROR("루트노드가 존재하지 않아 진행을 중지합니다.");
-        return;
-    }
-
-    // 일단 루트노드는 게임오브젝트(+트랜스폼)으로 생성되어야 한다.
-    Dive::GameObject* pRoot = Dive::Scene::CreateGameObject(model.name);
-    DirectX::XMFLOAT4X4 transform = aiMatrix4x4ToXMFLOAT4X4(model.pRootNode->mTransformation);
-    pRoot->GetTransform()->SetLocalMatrix(transform);
-    m_pModel->SetRootGameObject(pRoot);
-
-    for (size_t i = 0; i < model.meshes.size(); ++i)
-    {
-        aiNode* pMeshNode = model.meshNodes[i];
-        aiMesh* pMesh = model.meshes[i];
-
-        // indices
-        uint32_t numIndices = pMesh->mNumFaces * 3;
-        std::vector<uint32_t> indices;
-        indices.resize(numIndices);
-        for (uint32_t i = 0; i < pMesh->mNumFaces; ++i)
-        {
-            const auto& face = pMesh->mFaces[i];
-            const uint32_t index = (i * 3);
-            indices[index] = face.mIndices[0];
-            indices[index + 1] = face.mIndices[1];
-            indices[index + 2] = face.mIndices[2];
-        }
-
-        // vertices
-        uint32_t numVertices = pMesh->mNumVertices;
-        if(!pMesh->mNumBones)
-        {
-            std::vector<Dive::VertexStatic> vertices;
-            vertices.resize(numVertices);
-
-            for (uint32_t i = 0; i < numVertices; ++i)
-            {
-                Dive::VertexStatic& vertex = vertices[i];
-
-                // position
-                const auto& position = pMesh->mVertices[i];
-                vertex.position[0] = position.x;
-                vertex.position[1] = position.y;
-                vertex.position[2] = position.z;
-
-                // texCoords
-                const uint32_t uvChannel = 0;
-                if (pMesh->HasTextureCoords(uvChannel))
-                {
-                    const auto& texCoords = pMesh->mTextureCoords[uvChannel][i];
-                    vertex.texCoords[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
-                    vertex.texCoords[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
-                }
-
-                // normal
-                if (pMesh->mNormals)
-                {
-                    const auto& normal = pMesh->mNormals[i];
-                    vertex.normal[0] = normal.x;
-                    vertex.normal[1] = normal.y;
-                    vertex.normal[2] = normal.z;
-                }
-
-                // tangent
-                if (pMesh->mTangents)
-                {
-                    const auto& tangent = pMesh->mTangents[i];
-                    vertex.tangent[0] = tangent.x;
-                    vertex.tangent[1] = tangent.y;
-                    vertex.tangent[2] = tangent.z;
-                }
-            }
-
-            // Model의 Mesh에 vertices, indices를 넣는다.
-            auto pStaticMesh = m_pModel->InsertStaticMesh(new Dive::StaticMesh(pMesh->mName.C_Str(), vertices, indices));
-
-            // 현재 GameObject에 MeshRenderer를 생성한 후 Mesh를 연결한다.
-            Dive::GameObject* pGameObject = Dive::Scene::CreateGameObject(pMesh->mName.C_Str());
-            auto transform = aiMatrix4x4ToXMFLOAT4X4(pMeshNode->mTransformation);
-            pGameObject->GetTransform()->SetLocalMatrix(transform);
-            pGameObject->GetTransform()->SetParent(pRoot->GetTransform());
-
-            auto pMeshRenderer = pGameObject->AddComponent<Dive::MeshRenderer>();
-            pMeshRenderer->SetMesh(pStaticMesh);
-            pMeshRenderer->SetMaterial(parseAndCreateMaterials(pScene, pMesh));
-        }
-        else
-        {
-            // blend datas
-            std::vector<uint32_t> boneMappings;
-            std::vector<std::vector<unsigned char>> blendIndices;
-            std::vector<std::vector<float>> blendWeights;
-            GetBlendData(model, pMesh, model.meshNodes[i], boneMappings, blendIndices, blendWeights);
-
-            std::vector<Dive::VertexSkinned> vertices;
-            vertices.resize(numVertices);
-
-            for (uint32_t i = 0; i < numVertices; ++i)
-            {
-                Dive::VertexSkinned& vertex = vertices[i];
-
-                // position
-                const auto& position = pMesh->mVertices[i];
-                vertex.position[0] = position.x;
-                vertex.position[1] = position.y;
-                vertex.position[2] = position.z;
-
-                // texCoords
-                const uint32_t uvChannel = 0;
-                if (pMesh->HasTextureCoords(uvChannel))
-                {
-                    const auto& texCoords = pMesh->mTextureCoords[uvChannel][i];
-                    vertex.texCoords[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
-                    vertex.texCoords[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
-                }
-
-                // normal
-                if (pMesh->mNormals)
-                {
-                    const auto& normal = pMesh->mNormals[i];
-                    vertex.normal[0] = normal.x;
-                    vertex.normal[1] = normal.y;
-                    vertex.normal[2] = normal.z;
-                }
-
-                // tangent
-                if (pMesh->mTangents)
-                {
-                    const auto& tangent = pMesh->mTangents[i];
-                    vertex.tangent[0] = tangent.x;
-                    vertex.tangent[1] = tangent.y;
-                    vertex.tangent[2] = tangent.z;
-                }
-
-                // boneIDs
-                for (size_t j = 0; j < blendIndices[i].size(); ++j)
-                    vertex.boneIDs[j] = blendIndices[i][j];
-                
-                // weights
-                for(size_t j = 0; j < blendWeights[i].size(); ++j)
-                    vertex.weights[j] = blendWeights[i][j];
-            }
-
-            // Model의 Mesh에 vertices, indices를 넣는다.
-            auto pSkinnedMesh = new Dive::SkinnedMesh(pMesh->mName.C_Str(), vertices, indices);
-            m_pModel->InsertSkinnedMesh(pSkinnedMesh);
-
-            // 현재 GameObject에 MeshRenderer를 생성한 후 Mesh를 연결한다.
-            Dive::GameObject* pGameObject = Dive::Scene::CreateGameObject(pMesh->mName.C_Str());
-            auto transform = aiMatrix4x4ToXMFLOAT4X4(pMeshNode->mTransformation);
-            pGameObject->GetTransform()->SetLocalMatrix(transform);
-            pGameObject->GetTransform()->SetParent(pRoot->GetTransform());
-
-            auto pMeshRenderer = pGameObject->AddComponent<Dive::SkinnedMeshRenderer>();
-            pMeshRenderer->SetMesh(pSkinnedMesh);
-            pMeshRenderer->SetMaterial(parseAndCreateMaterials(pScene, pMesh));
-        }
-    }
-
-    m_pModel->BuildMeshBuffers();
-
-    // 빌드까지 끝마치면 파일화한다.
-}
-
-bool AssetImporter::loadExternalExtension(const std::string& filePath)
-{
-	Assimp::Importer importer;
-
-	uint32_t flags =
-		aiProcess_ConvertToLeftHanded |
-		aiProcess_Triangulate |
-		aiProcess_GenSmoothNormals |
-		aiProcess_CalcTangentSpace;
-	
-	const aiScene* pScene = importer.ReadFile(filePath, flags);
-	if (!pScene || pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !pScene->mRootNode)
-	{
-		DV_ERROR("{:s}", importer.GetErrorString());
-		return false;
-	}
-
-    m_FilePath = filePath;
-
-    DV_ASSERT(!m_pModel);
-    m_pModel = new Dive::Model();
-    m_pModel->SetName(Dive::FileSystem::GetFileName(filePath));
-    /*
-    Dive::GameObject* pRoot = Dive::Scene::CreateGameObject(Dive::FileSystem::GetFileName(filePath));
-    parseAndCreateNode(pScene, pScene->mRootNode, pRoot);
-    m_pModel->SetRootGameObject(pRoot);
-    m_pModel->BuildMeshBuffers();
-    */
-
-    // urho3d는 OutModel이라는 구조체로 aiMesh, aiBone 등을 뽑아놓은 후 BuildAndSaveModel이라는 함수에서 Model을 구성하고 파일화한다.
-    OutModel model;
-    model.name = Dive::FileSystem::GetFileName(filePath);
-    model.pRootNode = pScene->mRootNode;
-
-    CollectMeshes(model, model.pRootNode, pScene);
-    CollectBones(model, pScene);
-
-    BuildAndSaveModel(model, pScene);
-
-	importer.FreeScene();
-
-	return true;
-}
-
-bool AssetImporter::loadEngineExtension(const std::string& filePath)
-{
-	return false;
-}
-
-void AssetImporter::parseAndCreateNode(const aiScene* pScene, aiNode* pNode, Dive::GameObject* pNodeGameObject, Dive::Transform* pParent)
-{
-    if (pParent)
-    {
-        pNodeGameObject->SetName(pNode->mName.C_Str());
-        pNodeGameObject->GetTransform()->SetParent(pParent);
-    }
-
-    auto transform = pNode->mTransformation;
-    DirectX::XMFLOAT4X4 localMatrix = {
-        transform.a1, transform.b1, transform.c1, transform.d1,
-        transform.a2, transform.b2, transform.c2, transform.d2,
-        transform.a3, transform.b3, transform.c3, transform.d3,
-        transform.a4, transform.b4, transform.c4, transform.d4
-    };
-    pNodeGameObject->GetComponent<Dive::Transform>()->SetLocalMatrix(localMatrix);
-
-    if (pNode->mMeshes)
-        parseAndCreateMeshes(pScene, pNode, pNodeGameObject);
-
-    for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
-    {
-        // 일단 필요없는 노드를 제거하기 위해 이렇게 만들었다.
-        // 하지만 Skinned의 경우엔 적어도 bone node는 필요하다.
-        // 문제는 node에서 bone 소지 여부를 알 수 없다는 것이다.
-        // mesh에서 bone을 찾은 후 다시 bone의 node로 확인해야 한다.
-        //if (pNode->mChildren[i]->mMeshes)
-        {
-            auto pChild = Dive::Scene::CreateGameObject();
-            parseAndCreateNode(pScene, pNode->mChildren[i], pChild, pNodeGameObject->GetTransform());
-        }
-    }
-}
-
-void AssetImporter::parseAndCreateMeshes(const aiScene* pScene, aiNode* pNode, Dive::GameObject* pGameObject)
-{
-	uint32_t numMeshes = pNode->mNumMeshes;
-    for (uint32_t i = 0; i < numMeshes; ++i)
-    {
-        aiMesh* pMesh = pScene->mMeshes[pNode->mMeshes[i]];
-
-        // indices
-        uint32_t numIndices = pMesh->mNumFaces * 3;
-        std::vector<uint32_t> indices;
-        indices.resize(numIndices);
-
-        for (uint32_t i = 0; i < pMesh->mNumFaces; ++i)
-        {
-            const auto& face = pMesh->mFaces[i];
-            const uint32_t index = (i * 3);
-            indices[index] = face.mIndices[0];
-            indices[index + 1] = face.mIndices[1];
-            indices[index + 2] = face.mIndices[2];
-        }
-
-        // vertices
-        uint32_t numVertices = pMesh->mNumVertices;
-        if (!pMesh->mNumBones)
-        {
-            std::vector<Dive::VertexStatic> vertices;
-            vertices.resize(numVertices);
-
-            for (uint32_t i = 0; i < numVertices; ++i)
-            {
-                Dive::VertexStatic& vertex = vertices[i];
-
-                // position
-                const auto& position = pMesh->mVertices[i];
-                vertex.position[0] = position.x;
-                vertex.position[1] = position.y;
-                vertex.position[2] = position.z;
-
-                // texCoords
-                const uint32_t uvChannel = 0;
-                if (pMesh->HasTextureCoords(uvChannel))
-                {
-                    const auto& texCoords = pMesh->mTextureCoords[uvChannel][i];
-                    vertex.texCoords[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
-                    vertex.texCoords[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
-                }
-
-                // normal
-                if (pMesh->mNormals)
-                {
-                    const auto& normal = pMesh->mNormals[i];
-                    vertex.normal[0] = normal.x;
-                    vertex.normal[1] = normal.y;
-                    vertex.normal[2] = normal.z;
-                }
-
-                // tangent
-                if (pMesh->mTangents)
-                {
-                    const auto& tangent = pMesh->mTangents[i];
-                    vertex.tangent[0] = tangent.x;
-                    vertex.tangent[1] = tangent.y;
-                    vertex.tangent[2] = tangent.z;
-                }
-            }
-
-            // Model의 Mesh에 vertices, indices를 넣는다.
-            auto pStaticMesh = m_pModel->InsertStaticMesh(new Dive::StaticMesh(pMesh->mName.C_Str(), vertices, indices));
-
-            // 현재 GameObject에 MeshRenderer를 생성한 후 Mesh를 연결한다.
-            auto pMeshRenderer = pGameObject->AddComponent<Dive::MeshRenderer>();
-            pMeshRenderer->SetMesh(pStaticMesh);
-            pMeshRenderer->SetMaterial(parseAndCreateMaterials(pScene, pMesh));
-        }
-        else
-        {
-            std::vector<Dive::VertexSkinned> vertices;
-            vertices.resize(numVertices);
-
-            for (uint32_t i = 0; i < numVertices; ++i)
-            {
-                Dive::VertexSkinned& vertex = vertices[i];
-
-                // position
-                const auto& position = pMesh->mVertices[i];
-                vertex.position[0] = position.x;
-                vertex.position[1] = position.y;
-                vertex.position[2] = position.z;
-
-                // texCoords
-                const uint32_t uvChannel = 0;
-                if (pMesh->HasTextureCoords(uvChannel))
-                {
-                    const auto& texCoords = pMesh->mTextureCoords[uvChannel][i];
-                    vertex.texCoords[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
-                    vertex.texCoords[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
-                }
-
-                // normal
-                if (pMesh->mNormals)
-                {
-                    const auto& normal = pMesh->mNormals[i];
-                    vertex.normal[0] = normal.x;
-                    vertex.normal[1] = normal.y;
-                    vertex.normal[2] = normal.z;
-                }
-
-                // tangent
-                if (pMesh->mTangents)
-                {
-                    const auto& tangent = pMesh->mTangents[i];
-                    vertex.tangent[0] = tangent.x;
-                    vertex.tangent[1] = tangent.y;
-                    vertex.tangent[2] = tangent.z;
-                }
-            }
-
-            // Model의 Mesh에 vertices, indices를 넣는다.
-            auto pSkinnedMesh = new Dive::SkinnedMesh(pMesh->mName.C_Str(), vertices, indices);
-            m_pModel->InsertSkinnedMesh(pSkinnedMesh);
-
-            // 현재 GameObject에 MeshRenderer를 생성한 후 Mesh를 연결한다.
-            auto pMeshRenderer = pGameObject->AddComponent<Dive::SkinnedMeshRenderer>();
-            pMeshRenderer->SetMesh(pSkinnedMesh);
-            pMeshRenderer->SetMaterial(parseAndCreateMaterials(pScene, pMesh));
-        }
-    }
-}
-
-Dive::Material* AssetImporter::parseAndCreateMaterials(const aiScene* pScene, aiMesh* pMesh)
-{
-    const auto* pAiMaterial = pScene->mMaterials[pMesh->mMaterialIndex];
+    const auto* pAiMaterial = s_pScene->mMaterials[pMesh->mMaterialIndex];
     if (!pAiMaterial)
         return Dive::ResourceCache::GetResourceByPath<Dive::Material>("Assets/Materials/Default.yaml");
+
+    {
+        aiString stringVal;
+        float floatVal;
+        int intVal;
+        aiColor3D colorVal;
+
+        std::string diffuseTexName, normalTexName, specularTexName, lightmapTexName, emissiveTexName;
+
+        if (pAiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), stringVal) == AI_SUCCESS)
+            diffuseTexName = Dive::FileSystem::GetFileNameAndExtension(stringVal.C_Str());
+        if (pAiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), stringVal) == AI_SUCCESS)
+            normalTexName = Dive::FileSystem::GetFileNameAndExtension(stringVal.C_Str());
+        if (pAiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_SPECULAR, 0), stringVal) == AI_SUCCESS)
+            specularTexName = Dive::FileSystem::GetFileNameAndExtension(stringVal.C_Str());
+        if (pAiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_LIGHTMAP, 0), stringVal) == AI_SUCCESS)
+            lightmapTexName = Dive::FileSystem::GetFileNameAndExtension(stringVal.C_Str());
+        if (pAiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE, 0), stringVal) == AI_SUCCESS)
+            emissiveTexName = Dive::FileSystem::GetFileNameAndExtension(stringVal.C_Str());
+
+        std::cout << "diffuseTexName: " << diffuseTexName.c_str() << std::endl;
+
+        if (auto pInsideTex = s_pScene->GetEmbeddedTexture(diffuseTexName.c_str()))
+        {
+            auto height = pInsideTex->mHeight;
+            auto width = pInsideTex->mWidth;
+            
+            // 대략 이렇게 하는 듯 한데 height가 0이다... 직접 계산해야 하나?
+            // https://github.com/assimp/assimp/blob/master/samples/SimpleTexturedDirectx11/SimpleTexturedDirectx11/ModelLoader.cpp
+            // 예제가 있다.
+            Dive::Texture2D* pDiffTex = new Dive::Texture2D();
+            
+        }
+
+    }
 
     aiString name;
     aiGetMaterialString(pAiMaterial, AI_MATKEY_NAME, &name);
@@ -748,13 +176,13 @@ Dive::Material* AssetImporter::parseAndCreateMaterials(const aiScene* pScene, ai
         pAiMaterial->GetTexture(aiTextureType_BASE_COLOR, 0, &texturePath);
 
     // material
-    auto diffuseTexturePath = Dive::FileSystem::GetPath(m_FilePath) + "textures/";
+    auto diffuseTexturePath = Dive::FileSystem::GetPath(s_FilePath) + "textures/";
     diffuseTexturePath += Dive::FileSystem::GetFileNameAndExtension(texturePath.C_Str());
     auto pDiffuseTex = Dive::ResourceCache::GetResourceByPath<Dive::Texture2D>(diffuseTexturePath);
     if (pDiffuseTex)
     {
         Dive::Material* pMat = new Dive::Material;
-        pMat->SetName(Dive::FileSystem::GetFileName(m_FilePath));
+        pMat->SetName(Dive::FileSystem::GetFileName(s_FilePath));
         pMat->SetTexture(Dive::eTextureUnit::Diffuse, pDiffuseTex);
 
         Dive::ResourceCache::AddManualResource<Dive::Material>(pMat);
@@ -762,7 +190,388 @@ Dive::Material* AssetImporter::parseAndCreateMaterials(const aiScene* pScene, ai
         return pMat;
     }
 
-   // 없다면 디폴트 리턴
+    // 없다면 디폴트 리턴
     return Dive::ResourceCache::GetResourceByPath<Dive::Material>("Assets/Materials/Default.yaml");
 }
 
+void ParseCreateMeshes(aiMesh* pMesh, Dive::GameObject* pGameObject)
+{
+    // indices
+    uint32_t numIndices = pMesh->mNumFaces * 3;
+    std::vector<uint32_t> indices;
+    indices.resize(numIndices);
+
+    for (uint32_t faceIndex = 0; faceIndex < pMesh->mNumFaces; ++faceIndex)
+    {
+        const auto& face = pMesh->mFaces[faceIndex];
+        const uint32_t index = (faceIndex * 3);
+        indices[index] = face.mIndices[0];
+        indices[(size_t)index + 1] = face.mIndices[1];
+        indices[(size_t)index + 2] = face.mIndices[2];
+    }
+
+    // vertices
+    uint32_t numVertices = pMesh->mNumVertices;
+    if (!pMesh->mNumBones)
+    {
+        std::vector<Dive::VertexStatic> vertices;
+        vertices.resize(numVertices);
+
+        for (uint32_t vertexIndex = 0; vertexIndex < numVertices; ++vertexIndex)
+        {
+            Dive::VertexStatic& vertex = vertices[vertexIndex];
+
+            // position
+            const auto& position = pMesh->mVertices[vertexIndex];
+            vertex.position[0] = position.x;
+            vertex.position[1] = position.y;
+            vertex.position[2] = position.z;
+
+            // texCoords
+            const uint32_t uvChannel = 0;
+            if (pMesh->HasTextureCoords(uvChannel))
+            {
+                const auto& texCoords = pMesh->mTextureCoords[uvChannel][vertexIndex];
+                vertex.texCoords[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
+                vertex.texCoords[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
+            }
+
+            // normal
+            if (pMesh->mNormals)
+            {
+                const auto& normal = pMesh->mNormals[vertexIndex];
+                vertex.normal[0] = normal.x;
+                vertex.normal[1] = normal.y;
+                vertex.normal[2] = normal.z;
+            }
+
+            // tangent
+            if (pMesh->mTangents)
+            {
+                const auto& tangent = pMesh->mTangents[vertexIndex];
+                vertex.tangent[0] = tangent.x;
+                vertex.tangent[1] = tangent.y;
+                vertex.tangent[2] = tangent.z;
+            }
+        }
+
+        auto pStaticMesh = s_pModel->InsertStaticMesh(new Dive::StaticMesh(pMesh->mName.C_Str(), vertices, indices));
+        auto pMeshRenderer = pGameObject->AddComponent<Dive::MeshRenderer>();
+        pMeshRenderer->SetMesh(pStaticMesh);
+        pMeshRenderer->SetMaterial(ParseAndCreateMaterials(pMesh));
+    }
+    else
+    {
+        std::vector<std::vector<int>> blendIndices;
+        std::vector<std::vector<float>> blendWeights;
+        GetBlendData(pMesh, blendIndices, blendWeights);
+
+        std::vector<Dive::VertexSkinned> vertices;
+        vertices.resize(numVertices);
+
+        for (uint32_t vertexIndex = 0; vertexIndex < numVertices; ++vertexIndex)
+        {
+            Dive::VertexSkinned& vertex = vertices[vertexIndex];
+
+            // position
+            const auto& position = pMesh->mVertices[vertexIndex];
+            vertex.position[0] = position.x;
+            vertex.position[1] = position.y;
+            vertex.position[2] = position.z;
+
+            // texCoords
+            const uint32_t uvChannel = 0;
+            if (pMesh->HasTextureCoords(uvChannel))
+            {
+                const auto& texCoords = pMesh->mTextureCoords[uvChannel][vertexIndex];
+                vertex.texCoords[0] = texCoords.x > 1.0f ? texCoords.x - 1.0f : texCoords.x;
+                vertex.texCoords[1] = texCoords.y > 1.0f ? texCoords.y - 1.0f : texCoords.y;
+            }
+
+            // normal
+            if (pMesh->mNormals)
+            {
+                const auto& normal = pMesh->mNormals[vertexIndex];
+                vertex.normal[0] = normal.x;
+                vertex.normal[1] = normal.y;
+                vertex.normal[2] = normal.z;
+            }
+
+            // tangent
+            if (pMesh->mTangents)
+            {
+                const auto& tangent = pMesh->mTangents[vertexIndex];
+                vertex.tangent[0] = tangent.x;
+                vertex.tangent[1] = tangent.y;
+                vertex.tangent[2] = tangent.z;
+            }
+
+            // boneIDs
+            for (uint32_t j = 0; j < static_cast<uint32_t>(blendIndices[vertexIndex].size()); ++j)
+                vertex.boneIDs[j] = blendIndices[vertexIndex][j];
+
+            // weights
+            for (uint32_t j = 0; j < static_cast<uint32_t>(blendWeights[vertexIndex].size()); ++j)
+                vertex.weights[j] = blendWeights[vertexIndex][j];
+        }
+
+        // 메시가 2개 이상이라도 사용하는 뼈대의 개수는 같다는 것을 확인
+        DV_INFO("Mesh({0:s})의 bone 개수: {1:d}", pMesh->mName.C_Str(), pMesh->mNumBones);
+
+        // 현재 하나의 노드에 둘 이상의 메시가 존재할 경우
+        // 메시를 추가로 생성하고 있다.
+        // 이때 아래의 과정도 함께 수행되는데
+        // 정작 Model은 하나의 Skeleton만 가질 수 있다.
+        Dive::Skeleton skeleton;
+        auto& bones = skeleton.GetModifiableBones();
+        bones.resize(pMesh->mNumBones);
+        // 현재 스켈레톤이 두 개 이상일 수 있지만 model에서 하나만 관리한다.
+        // 따라서 아에 참고문서처럼 model에서 하나만 관리토록 할 생각이다.
+        auto& boneInfoMap = s_pModel->GetBoneInfoMap();
+
+        // 현재 메시가 사용하는 뼈대의 정보를 모아서 관리하는 것이다.
+        for (uint32_t boneIndex = 0; boneIndex < pMesh->mNumBones; ++boneIndex)
+        {
+            aiBone* pBone = pMesh->mBones[boneIndex];
+            bones[boneIndex].name = pBone->mName.C_Str();
+            bones[boneIndex].index = boneIndex;
+            bones[boneIndex].offsetMatrix = ConvertXMFLOAT4X4(pBone->mOffsetMatrix);
+
+            // id는... 문서를 좀 더 보자.
+            std::string boneName = pBone->mName.C_Str();
+            if (boneInfoMap.find(boneName) == boneInfoMap.end())
+            {
+                Dive::BoneInfo newBoneInfo;
+                newBoneInfo.index = boneIndex;
+                newBoneInfo.offsetMatrix = ConvertXMFLOAT4X4(pBone->mOffsetMatrix);
+                boneInfoMap[boneName] = newBoneInfo;
+            }
+        }
+        s_pModel->SetSkeleton(skeleton);
+
+        auto pSkinnedMesh = new Dive::SkinnedMesh(pGameObject->GetName(), vertices, indices);
+        s_pModel->InsertSkinnedMesh(pSkinnedMesh);
+
+        auto pMeshRenderer = pGameObject->AddComponent<Dive::SkinnedMeshRenderer>();
+        pMeshRenderer->SetMesh(pSkinnedMesh);
+        pMeshRenderer->SetMaterial(ParseAndCreateMaterials(pMesh));
+
+        // temp: 이 곳에서 SkinnedMeshRenderer에 BoneInfo를 전달할 수 있다.
+        pMeshRenderer->SetBones(bones);
+
+        // temp
+        auto pAnimator = pGameObject->AddComponent<Dive::Animator>();
+        // 아직 애니메이션이 구성되지 않았다.
+        //pAnimator->SetAnimation(Dive::ResourceCache::GetResourceByName<Dive::Animation>("TestAnim"));
+    }
+}
+
+void ParseAndCreateMeshes(aiNode* pNode, Dive::GameObject* pGameObject)
+{
+    for (uint32_t meshIndex = 0; meshIndex < pNode->mNumMeshes; ++meshIndex)
+    {
+        auto pNodeObject = pGameObject;
+        auto pMesh = s_pScene->mMeshes[pNode->mMeshes[meshIndex]];
+        std::string name = pNode->mName.C_Str();
+        
+        if (meshIndex > 0)
+        {
+            pNodeObject = Dive::Scene::CreateGameObject();
+            auto pTransform = pNodeObject->GetTransform();
+            pTransform->SetParent(pGameObject->GetTransform()->GetParent());
+            pTransform->SetLocalMatrix(ConvertXMFLOAT4X4(pNode->mTransformation));
+            // 이전 이름들과 비교하는 방법도 시도해보자.
+            name += "_" + std::to_string(meshIndex);
+        }
+        pNodeObject->SetName(name);
+
+        ParseCreateMeshes(pMesh, pNodeObject);
+    }
+}
+
+// static variable를 사용한다. 즉, 적어도 멤버 함수로 만드는 것이 어울린다.
+void ParseAndCreateNodes(aiNode* pNode, Dive::Transform* pParent)
+{
+    auto pNodeObject = Dive::Scene::CreateGameObject();
+    auto pTransform = pNodeObject->GetTransform();
+    if (pParent)
+        pTransform->SetParent(pParent);
+    else
+        s_pModel->SetRootGameObject(pNodeObject);
+    pTransform->SetLocalMatrix(ConvertXMFLOAT4X4(pNode->mTransformation));
+    
+    pNodeObject->SetName(pParent ? pNode->mName.data : s_ModelName);
+
+    if (pNode->mNumMeshes > 0)
+        ParseAndCreateMeshes(pNode, pNodeObject);
+
+    for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
+        ParseAndCreateNodes(pNode->mChildren[i], pTransform);
+}
+
+AssetImporter::~AssetImporter()
+{
+	Clear();
+}
+
+bool AssetImporter::LoadFromFile(const std::string& filePath)
+{
+    Clear();
+
+    if (Dive::FileSystem::FileExists(filePath))
+        return LoadExternalFile(filePath);
+
+    return false;
+}
+
+bool AssetImporter::LoadExternalFile(const std::string& filePath)
+{
+    Assimp::Importer importer;
+
+    uint32_t flags =
+        aiProcess_LimitBoneWeights |
+        aiProcess_ConvertToLeftHanded |
+        aiProcess_Triangulate |
+        aiProcess_GenSmoothNormals |
+        aiProcess_CalcTangentSpace;
+
+    // 이게 빈 노드들을 제거해주었다.
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+    
+    s_pScene = importer.ReadFile(filePath, flags);
+    if (!s_pScene || s_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !s_pScene->mRootNode)
+    {
+        DV_ERROR("{:s}", importer.GetErrorString());
+        return false;
+    }
+
+    s_FilePath = filePath;
+    s_ModelName = Dive::FileSystem::GetFileName(filePath);
+
+    DV_ASSERT(!s_pModel);
+    s_pModel = new Dive::Model();
+    s_pModel->SetName(s_ModelName);
+    
+    ParseAndCreateNodes(s_pScene->mRootNode, nullptr);
+
+    CollectAnimations();
+
+    auto pRootObject = s_pModel->GetRootGameObject();
+
+    // skeleton으로부터 bones를 가져온 후 BoneRenderer를 만들고 SkinnedMeshRenderer에 bones를 추가하는 과정
+    {
+        auto skeleton = s_pModel->GetSkeleton();
+        const auto& bones = skeleton.GetBones();
+        for (uint32_t i = 0; i < static_cast<uint32_t>(bones.size()); ++i)
+        {
+            Dive::GameObject* pNodeObject = GetNodeObjectByBoneName(pRootObject, bones[i].name);
+            if (!pNodeObject)
+            {
+                DV_ERROR("{:s} GameObject가 존재하지 않습니다.", bones[i].name.c_str());
+                continue;
+            }
+            pNodeObject->AddComponent<Dive::BoneRenderer>();
+        }
+
+        std::function<void (Dive::GameObject*)> func = [&func](Dive::GameObject* pNode)
+        {
+            if (!pNode)
+                return;
+
+            auto pAnimator = pNode->GetComponent<Dive::Animator>();
+            if (pAnimator)
+                pAnimator->SetAnimation(Dive::ResourceCache::GetResourceByName<Dive::Animation>("TestAnim"));
+
+            auto pTransform = pNode->GetTransform();
+            for (auto pChild : pTransform->GetChildren())
+                func(pChild->GetGameObject());
+        };
+
+        func(pRootObject);
+    }
+    s_pModel->BuildMeshBuffers();
+ 
+    importer.FreeScene();
+
+    DV_INFO("Model({:s}) successfully loaded.", filePath);
+
+    return true;
+}
+
+bool AssetImporter::LoadEngineFile(const std::string& filePath)
+{
+    return false;
+}
+
+bool AssetImporter::SaveToEngineFile(const std::string& filePath)
+{
+    return false;
+}
+
+void AssetImporter::Clear()
+{
+    DV_DELETE(s_pModel);
+}
+
+std::string AssetImporter::GetFilePath()
+{
+    return s_FilePath;
+}
+
+Dive::Model* AssetImporter::GetModel()
+{
+    return s_pModel;
+}
+
+// BoneInfoMap에는 등록되었지만
+// 아래의 과정에서 생성되지 않은 Bone이 존재한다.
+// 이는 참고문서의 ReadMissingBones와 반대 상황이다.
+void AssetImporter::CollectAnimations()
+{
+    auto numAnims = s_pScene->mNumAnimations;
+    for(uint32_t i = 0; i < numAnims; ++i)
+    {
+        auto pAnim = s_pScene->mAnimations[i];
+        auto pAnimation = new Dive::Animation();
+        pAnimation->SetName("TestAnim");//pAnim->mName.data);
+        pAnimation->SetTickPerSecond(static_cast<float>(pAnim->mTicksPerSecond));
+        pAnimation->SetDuration(static_cast<float>(pAnim->mDuration));
+        Dive::ResourceCache::AddManualResource<Dive::Animation>(pAnimation);
+
+        auto numChannels = pAnim->mNumChannels; 
+        for (uint32_t j = 0; j < numChannels; ++j)
+        {
+            auto pChannel = pAnim->mChannels[j];
+            Dive::Bone bone(pChannel->mNodeName.C_Str());
+
+            for (uint32_t index = 0; index < pChannel->mNumPositionKeys; ++index)
+            {
+                auto key = pChannel->mPositionKeys[index];               
+                bone.InsertPositionKey(static_cast<float>(key.mTime), ConvertXMFLOAT3(key.mValue));
+            }
+
+            for (uint32_t index = 0; index < pChannel->mNumRotationKeys; ++index)
+            {
+                auto key = pChannel->mRotationKeys[index];
+                bone.InsertRotationKey(static_cast<float>(key.mTime), ConvertXMFLOAT4(key.mValue));
+            }
+
+            for (uint32_t index = 0; index < pChannel->mNumScalingKeys; ++index)
+            {
+                auto key = pChannel->mScalingKeys[index];
+                bone.InsertScaleKey(static_cast<float>(key.mTime), ConvertXMFLOAT3(key.mValue));
+            }
+
+            pAnimation->InsertBone(bone);
+        }
+    }
+}
+
+void AssetImporter::loadMaterialTextures(aiMaterial* pMat, aiTextureType type, std::string typeName)
+{
+    for (UINT i = 0; i < pMat->GetTextureCount(type); ++i)
+    {
+        aiString texPath;
+        pMat->GetTexture(type, i, &texPath);
+    }
+}

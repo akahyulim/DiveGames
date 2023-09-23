@@ -1,6 +1,7 @@
 #pragma once
 #include "Dive.h"
 #include "AssetImporter.h"
+#include "DvAssetImporter.h"
 
 #include <imgui-docking/imgui.h>
 #include <imgui-docking/imgui_impl_win32.h>
@@ -30,7 +31,7 @@ private:
 	void drawTree(Dive::GameObject* pNode);
 
 private:
-	AssetImporter m_Importer;
+	DvAssetImporter m_AssetImporter;
 
 	Dive::GameObject* m_pCamera;
 	Dive::GameObject* m_pLoadedModel;

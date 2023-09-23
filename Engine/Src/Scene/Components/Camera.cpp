@@ -25,7 +25,6 @@ namespace Dive
 
 	Camera::~Camera()
 	{
-		DV_CORE_TRACE("Destroy Camera: {:s}", GetName());
 	}
 
 	DirectX::XMMATRIX Camera::GetViewMatrix() const

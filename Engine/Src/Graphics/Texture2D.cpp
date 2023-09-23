@@ -91,7 +91,7 @@ namespace Dive
 		if (!createResources())
 			return false;
 
-		if (!SetRawTextureData(pImage->GetPixels()))
+		if (!SetRawTextureData(static_cast<const void*>(pImage->GetPixels())))
 			return false;
 
 		return true;
@@ -162,7 +162,7 @@ namespace Dive
 		Graphics::GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pTexture2D), subResource);
 	}
 
-	bool Texture2D::SetRawTextureData(const uint8_t* pData)
+	bool Texture2D::SetRawTextureData(const void* pData)
 	{
 		if (!m_pTexture2D)
 		{
@@ -176,7 +176,7 @@ namespace Dive
 			return false;
 		}
 
-		const uint8_t* pSrc = pData;
+		const void* pSrc = pData;
 		unsigned int rowPitch = GetRowPitchSize(m_Width);
 
 		Graphics::GetDeviceContext()->UpdateSubresource(
@@ -202,7 +202,7 @@ namespace Dive
 			s_pBlackTexture->SetSize(size.x, size.y);
 			
 			std::vector<DirectX::XMINT4> colors;
-			colors.assign(size.x * size.y, DirectX::XMINT4(0, 0, 0, 0));
+			colors.assign((size_t)(size.x * size.y), DirectX::XMINT4(0, 0, 0, 0));
 
 			s_pBlackTexture->SetPixels(colors);
 		}
@@ -222,7 +222,7 @@ namespace Dive
 			s_pGrayTexture->SetSize(size.x, size.y);
 
 			std::vector<DirectX::XMINT4> colors;
-			colors.assign(size.x * size.y, DirectX::XMINT4(128, 128, 128, 128));
+			colors.assign((size_t)(size.x * size.y), DirectX::XMINT4(128, 128, 128, 128));
 
 			s_pGrayTexture->SetPixels(colors);
 		}
@@ -242,7 +242,7 @@ namespace Dive
 			s_pRedTexture->SetSize(size.x, size.y);
 
 			std::vector<DirectX::XMINT4> colors;
-			colors.assign(size.x * size.y, DirectX::XMINT4(255, 0, 0, 0));
+			colors.assign((size_t)(size.x * size.y), DirectX::XMINT4(255, 0, 0, 0));
 
 			s_pRedTexture->SetPixels(colors);
 		}
@@ -262,7 +262,7 @@ namespace Dive
 			s_pWhiteTexture->SetSize(size.x, size.y);
 
 			std::vector<DirectX::XMINT4> colors;
-			colors.assign(size.x * size.y, DirectX::XMINT4(255, 255, 255, 255));
+			colors.assign((size_t)(size.x * size.y), DirectX::XMINT4(255, 255, 255, 255));
 
 			s_pWhiteTexture->SetPixels(colors);
 		}

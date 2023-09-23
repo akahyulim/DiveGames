@@ -1,6 +1,5 @@
 #include "DivePch.h"
 #include "ResourceCache.h"
-#include "Importer/AssetImporter.h"
 
 namespace Dive
 {

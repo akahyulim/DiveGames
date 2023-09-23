@@ -13,8 +13,6 @@ namespace Dive
 	{
 		SetName(name);
 		m_pTransform = AddComponent<Transform>();
-
-		DV_CORE_TRACE("Create GameObject: {:s}", name);
 	}
 
 	GameObject::~GameObject()
@@ -29,8 +27,6 @@ namespace Dive
 			m_Components.clear();
 			m_Components.shrink_to_fit();
 		}
-
-		DV_CORE_TRACE("Destroy GameObject: {:s}", GetName());
 	}
 
 	void GameObject::Update()

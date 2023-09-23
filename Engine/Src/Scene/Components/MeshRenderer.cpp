@@ -30,11 +30,10 @@ namespace Dive
 
 	MeshRenderer::~MeshRenderer()
 	{
-		DV_CORE_TRACE("Destroy MeshRenderer: {:s}", GetName());
 	}
 
 	// 매개변수로 primitive topology 정도는 받아도 될 것 같다.
-	void MeshRenderer::Draw() const
+	void MeshRenderer::Draw()
 	{
 		// Material
 		{

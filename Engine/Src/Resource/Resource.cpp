@@ -2,8 +2,8 @@
 #include "Resource.h"
 #include "Image.h"
 #include "Renderer/Model.h"
-#include "Renderer/Animation.h"
 #include "Renderer/Material.h"
+#include "Renderer/Animation.h"
 #include "Graphics/Texture2D.h"
 #include "Graphics/RenderTexture.h"
 
@@ -19,8 +19,8 @@ namespace Dive
 #define INSTANTIATE_TO_RESOURCE_TYPE(T, enumT) template<> Dive::eResourceType Dive::Resource::TypeToEnum<T>() { Dive::validate_resource_type<T>(); return enumT; }
 
 INSTANTIATE_TO_RESOURCE_TYPE(Dive::Model, Dive::eResourceType::Model)
-INSTANTIATE_TO_RESOURCE_TYPE(Dive::Animation, Dive::eResourceType::Animation)
 INSTANTIATE_TO_RESOURCE_TYPE(Dive::Material, Dive::eResourceType::Material)
+INSTANTIATE_TO_RESOURCE_TYPE(Dive::Animation, Dive::eResourceType::Animation)
 INSTANTIATE_TO_RESOURCE_TYPE(Dive::Image, Dive::eResourceType::Image)
 INSTANTIATE_TO_RESOURCE_TYPE(Dive::Texture2D, Dive::eResourceType::Texture2D)
 INSTANTIATE_TO_RESOURCE_TYPE(Dive::RenderTexture, Dive::eResourceType::RenderTexture)

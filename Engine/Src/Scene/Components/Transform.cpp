@@ -38,7 +38,6 @@ namespace Dive
 
 	Transform::~Transform()
 	{
-		DV_CORE_TRACE("Destroy Transform: {:s}", GetName());
 	}
 
 	bool Transform::LoadFromFile(const std::string& filePath)
@@ -62,6 +61,7 @@ namespace Dive
 		return true;
 	}
 
+	// 좀 애매하다.
 	void Transform::Update()
 	{
 		updateTransform();
@@ -530,6 +530,21 @@ namespace Dive
 		}
 		m_Children.clear();
 		m_Children.shrink_to_fit();
+	}
+
+	Transform* Transform::FindByName(const std::string& name)
+	{
+		if (GetName() == name)
+			return this;
+
+		for (uint32_t i = 0; i < GetChildCount(); ++i)
+		{
+			auto pFound = m_Children[i]->FindByName(name);
+			if (pFound)
+				return pFound;
+		}
+
+		return nullptr;
 	}
 
 	void Transform::updateTransform()

@@ -166,8 +166,8 @@ AssetViewer::AssetViewer()
 	m_pLoadedModel(nullptr),
 	m_pSelectedNode(nullptr),
 	m_Fps(0),
-	m_CameraMoveSpeed(5.0f),
-	m_CameraRotationSpeed(10.0f)
+	m_CameraMoveSpeed(10.0f),
+	m_CameraRotationSpeed(100.0f)
 {
 	m_ClearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
@@ -220,16 +220,27 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 
 		if (ImGui::Button("Import"))
 		{
-			const std::string filePath = FileOpen("Assets/Models", "외부 모델 파일\0*.obj;*.dae;*.fbx\0");
+			const std::string filePath = FileOpen("Assets/Models", "외부 모델 파일\0*.obj;*.dae;*.fbx;*.gltf\0");
 			if (!filePath.empty())
 			{
-				if (m_Importer.LoadFromFile(filePath))
+				/*
+				if (AssetImporter::LoadFromFile(filePath))
 				{
-					m_pLoadedModel = m_Importer.GetModel()->GetRootGameObject();
+					m_pLoadedModel = AssetImporter::GetModel()->GetRootGameObject();
 					m_pSelectedNode = nullptr;
 					m_MeshRenderers.clear();
 					bOpen = true;
 				}
+				*/
+				/**/
+				if (m_AssetImporter.Load(filePath))
+				{
+					m_pLoadedModel = m_AssetImporter.GetModel()->GetRootGameObject();
+					m_pSelectedNode = nullptr;
+					m_MeshRenderers.clear();
+					bOpen = true;
+				}
+				/**/
 			}
 		}
 
@@ -237,7 +248,8 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 
 		if (ImGui::Button("Clear"))
 		{
-			m_Importer.Clear();
+			//AssetImporter::Clear();
+			m_AssetImporter.Clear();
 			m_pLoadedModel = nullptr;
 			m_pSelectedNode = nullptr;
 			m_MeshRenderers.clear();
@@ -382,12 +394,27 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 					}
 				}
 
-				ImGui::Separator();
+				// BoneRenderer
+				Dive::BoneRenderer* pBoneRenderer = m_pSelectedNode->GetComponent<Dive::BoneRenderer>();
+				if (pBoneRenderer)
+				{
+					ImGui::Separator();
+
+					if (ImGui::CollapsingHeader("Bone Renderer", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						// 이게 안된다.
+						auto pBone = pBoneRenderer->GetBone();
+						//if(pBone)
+						//	ImGui::Text(pBone->name.c_str());
+					}
+				}
 
 				// material
 				Dive::IMeshRenderer* pMeshRenderer = m_pSelectedNode->GetComponent<Dive::IMeshRenderer>();
 				if (pMeshRenderer)
 				{
+					ImGui::Separator();
+
 					if (ImGui::CollapsingHeader("Material", ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_DefaultOpen))
 					{
 						Dive::Material* pMat = pMeshRenderer->GetMaterial();
@@ -404,7 +431,7 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 						if (ImGui::Button("Load"))
 						{
 							const std::string filePath = FileOpen("Assets/Models");
-							if(!filePath.empty())
+							if (!filePath.empty())
 								pMat->AddTexture(Dive::eTextureUnit::Diffuse, filePath);
 						}
 
@@ -416,7 +443,7 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 						DirectX::XMFLOAT2 tiling = pMat->GetTiling();
 						DrawVec2Control("Tiling", tiling, 1.0f);
 						pMat->SetTiling(tiling);
-						
+
 						// offset
 						DirectX::XMFLOAT2 offset = pMat->GetOffset();
 						DrawVec2Control("Offset", offset);

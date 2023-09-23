@@ -21,7 +21,7 @@ namespace Dive
 		void SetPixel(int x, int y, const DirectX::XMINT4& color, int mipLevel = 0);
 		void SetPixels(const std::vector<DirectX::XMINT4>& colors, int mipLevel = 0);
 
-		bool SetRawTextureData(const uint8_t* pData);
+		bool SetRawTextureData(const void* pData);
 
 		DirectX::XMINT4 GetPixel(int x, int y, int mipLevel = 0);
 		DirectX::XMINT4 GetPixels(int mipLevel = 0);

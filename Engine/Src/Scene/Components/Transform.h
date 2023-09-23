@@ -93,6 +93,8 @@ namespace Dive
 		void DetachChildren();
 		std::vector<Transform*> GetChildren() const { return m_Children; }
 
+		Transform* FindByName(const std::string& name);
+
 	private:
 		void updateTransform();
 

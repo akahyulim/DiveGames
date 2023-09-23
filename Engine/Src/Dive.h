@@ -27,13 +27,13 @@
 // Renderer
 #include "Renderer/Renderer.h"
 #include "Renderer/View.h"
-#include "Renderer/Animator.h"
 #include "Renderer/Material.h"
-#include "Renderer/Bone.h"
+#include "Renderer/Skeleton.h"
 #include "Renderer/Mesh.h"
 #include "Renderer/SkinnedMesh.h"
 #include "Renderer/Model.h"
 #include "Renderer/Animation.h"
+#include "Renderer/Bone.h"
 
 // Input
 #include "Input/Input.h"
@@ -48,7 +48,6 @@
 #include "IO/ConvertYAML.h"
 
 // Resource
-#include "Resource/Importer/AssetImporter.h"
 #include "Resource/Resource.h"
 #include "Resource/ResourceCache.h"
 #include "Resource/Image.h"
@@ -62,4 +61,6 @@
 #include "Scene/Components/Light.h"
 #include "Scene/Components/MeshRenderer.h"
 #include "Scene/Components/SkinnedMeshRenderer.h"
+#include "Scene/Components/BoneRenderer.h"
+#include "Scene/Components/Animator.h"
 

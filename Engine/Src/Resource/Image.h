@@ -10,6 +10,7 @@ namespace Dive
 		~Image() override;
 
 		bool LoadFromFile(const std::string& fileName) override;
+		bool LoadFromWICMemory(size_t size, const void* pSrcData);
 
 		bool SetSize(int width, int height, DXGI_FORMAT format);
 		bool SetSize(int widht, int height, int depth, DXGI_FORMAT format);

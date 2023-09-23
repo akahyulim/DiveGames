@@ -2,10 +2,7 @@
 #include "Model.h"
 #include "Core/CoreDefs.h"
 #include "IO/Log.h"
-
 #include "Scene/Scene.h"
-//#include "Scene/GameObject.h"
-//#include "Scene/Components/Transform.h"
 #include "Scene/Components/MeshRenderer.h"
 #include "Scene/Components/SkinnedMeshRenderer.h"
 
@@ -15,7 +12,6 @@ namespace Dive
 		: Resource(eResourceType::Model),
 		m_pRootGameObject(nullptr)
 	{
-		//m_pRootGameObject = Scene::CreateGameObject();
 	}
 
 	Model::~Model()
@@ -70,7 +66,8 @@ namespace Dive
 
 	SkinnedMesh* Model::InsertSkinnedMesh(SkinnedMesh* pMesh)
 	{
-		const std::string& name = pMesh->GetName();
+		// 현재 동일한 이름으로 2개의 skinned mesh를 가지는 fbx가 존재한다....
+		std::string name = pMesh->GetName();
 		if (m_SkinnedMeshes.find(name) != m_SkinnedMeshes.end())
 		{
 			DV_CORE_ERROR("Model::InsertSkinnedMesh: 이미 존재하는 Mesh({:s})는 추가할 수 없습니다.", name);
@@ -82,6 +79,8 @@ namespace Dive
 		return m_SkinnedMeshes[name];
 	}
 
+	// mesh들은 각각의 meshrenderer에 포인터로 저장되어 있다.
+	// 따라서 이 곳에서 만들어도 버퍼에 접근이 가능해진다.
 	void Model::BuildMeshBuffers()
 	{
 		if (m_StaticMeshes.empty() && m_SkinnedMeshes.empty())
@@ -100,67 +99,8 @@ namespace Dive
 		}
 	}
 
-	// BuildModelPrefab 등의 이름도 괜찮을듯...
 	void Model::Build()
 	{
 		BuildMeshBuffers();
-
-		// 하나의 모델에 동일한 타입의 메시가 둘 이상일 수 있나?
-		/*
-		m_pRootGameObject = Scene::CreateGameObject();
-		for (auto& mesh : m_StaticMeshes)
-		{
-			auto pMeshRenderer = m_pRootGameObject->AddComponent<MeshRenderer>();
-			pMeshRenderer->SetMesh(&mesh.second);
-		}
-		for (auto& mesh : m_SkinnedMeshes)
-		{
-			auto pMeshRenderer = m_pRootGameObject->AddComponent<SkinnedMeshRenderer>();
-			pMeshRenderer->SetMesh(&mesh.second);
-		}
-		*/
-
-		// 추후 이 부분은 Animation으로 넘기는 것이 나아보인다.
-		// 대신 Mesh들은 이 곳에서 위와 같이 직접 만드는 형식으로 해야할 듯 하다.
-		buildHierarchy(&m_RootNodeInfo, nullptr);
-	}
-
-	// 안쓰기로 했다.
-	void Model::buildHierarchy(NodeInfo* pNode, Transform* pParent)
-	{
-		std::string nodeName = pNode->name;
-		GameObject* pGameObject = Scene::CreateGameObject(nodeName);
-		
-		if (!pParent)
-		{
-			m_pRootGameObject = pGameObject;
-		}
-
-		Transform* pTransform = pGameObject->GetTransform();
-		pTransform->SetLocalMatrix(pNode->transform);
-		pTransform->SetParent(pParent);
-
-		for (auto it = m_StaticMeshes.begin(); it != m_StaticMeshes.end(); ++it)
-		{
-			if (it->second->GetNodeName() == nodeName)
-			{
-				DV_CORE_INFO("MeshRenderer를 {:s} GameObject에 추가", nodeName);
-				pGameObject->AddComponent<MeshRenderer>()->SetMesh(it->second);
-			}
-		}
-
-		for (auto it = m_SkinnedMeshes.begin(); it != m_SkinnedMeshes.end(); ++it)
-		{
-			if (it->second->GetNodeName() == nodeName)
-			{
-				DV_CORE_INFO("DvSkinnedRenderer를 {:s} GameObject에 추가", nodeName);
-				pGameObject->AddComponent<SkinnedMeshRenderer>()->SetMesh(it->second);
-			}
-		}
-
-		for (uint32_t i = 0; i < pNode->numChildren; ++i)
-		{
-			buildHierarchy(&pNode->children[i], pTransform);
-		}
 	}
 }

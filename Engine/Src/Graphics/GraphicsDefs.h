@@ -90,7 +90,7 @@ namespace Dive
 			const DirectX::XMFLOAT2& texCoords,
 			const DirectX::XMFLOAT3& normal,
 			const DirectX::XMFLOAT3& tangent,
-			const DirectX::XMINT4& boneIDs,
+			const DirectX::XMUINT4& boneIDs,
 			const DirectX::XMFLOAT4& weights)
 		{
 			this->position[0] = position.x;
@@ -123,15 +123,15 @@ namespace Dive
 		float texCoords[2] = { 0.0f, 0.0f };
 		float normal[3] = { 0.0f, 0.0f, 0.0f };
 		float tangent[3] = { 0.0f, 0.0f, 0.0f };
-		int boneIDs[4] = { -1, -1, -1, -1 };
+		uint32_t boneIDs[4] = { 100, 100, 100, 100 };
 		float weights[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	};
 
-	struct BoneInfo
-	{
-		int id;
-		DirectX::XMFLOAT4X4 offsetTransform;
-	};
+	//struct BoneInfo
+	//{
+	//	int id;
+	//	DirectX::XMFLOAT4X4 offsetTransform;
+	//};
 
 	inline constexpr uint32_t MAX_RENDERTARGETS = 4;
 }

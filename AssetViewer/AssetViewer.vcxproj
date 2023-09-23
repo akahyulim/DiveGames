@@ -156,6 +156,7 @@
     <ClCompile Include="..\External\include\imgui-docking\imgui_widgets.cpp" />
     <ClCompile Include="AssetImporter.cpp" />
     <ClCompile Include="AssetViewer.cpp" />
+    <ClCompile Include="DvAssetImporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\External\include\imgui-docking\imconfig.h" />
@@ -169,6 +170,7 @@
     <ClInclude Include="..\External\include\imgui-docking\imstb_truetype.h" />
     <ClInclude Include="AssetImporter.h" />
     <ClInclude Include="AssetViewer.h" />
+    <ClInclude Include="DvAssetImporter.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">

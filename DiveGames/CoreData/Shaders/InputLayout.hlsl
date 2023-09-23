@@ -25,7 +25,7 @@ struct Vertex_Skinned
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL0;
 	float3 tangent : TANGENT0;
-	int4 boneIDs : BLENDINDICES;
+	uint4 boneIDs : BLENDINDICES;
 	float4 boneWeights: BLENDWEIGHT;
 };
 
@@ -40,4 +40,10 @@ struct Pixel_PosTex
 {
 	float4 position : SV_POSITION;
 	float2 tex : TEXCOORD0;
+};
+
+struct Pixel_Test
+{
+	float4 position : SV_POSITION;
+	float4 color : COLOR0;
 };

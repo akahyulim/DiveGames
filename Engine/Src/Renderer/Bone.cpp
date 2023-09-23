@@ -4,145 +4,118 @@
 
 namespace Dive
 {
-	Bone::Bone(const std::string& name, int32_t id)
-		: m_Name(name),
-		m_ID(id),
-		m_NumPositionKeys(0),
-		m_NumRotationKeys(0),
-		m_NumScaleKeys(0)
+	Bone::Bone(const std::string& name)
+		: m_Name(name)
 	{
 		DirectX::XMStoreFloat4x4(&m_LocalTransform, DirectX::XMMatrixIdentity());
 	}
 
-	Bone::~Bone()
-	{
-	}
-
 	void Bone::Update(float delta)
 	{
-		DirectX::XMFLOAT3 pos = interpolatePosition(delta);
-		DirectX::XMFLOAT4 rot = interpolateRotation(delta);
-		DirectX::XMFLOAT3 scl = interpolateScale(delta);
-
-		DirectX::XMMATRIX localTransform = 
-			DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&scl)) *
-			DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&rot)) *
-			DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&pos));
-
-		DirectX::XMStoreFloat4x4(&m_LocalTransform, localTransform);
+		DirectX::XMStoreFloat4x4(&m_LocalTransform,
+			interpolateScale(delta) * interpolateRotation(delta) * interpolatePosition(delta));
 	}
 
-	int Bone::GetPositionIndex(float delta)
+	uint32_t Bone::GetPositionIndex(float time)
 	{
-		for (int index = 0; index < m_NumPositionKeys - 1; ++index)
+		for (uint32_t index = 0; index < static_cast<uint32_t>(m_Positions.size()); ++index)
 		{
-			if (delta < m_Positions[index + 1].timeStamp)
+			if (time < m_Positions[(size_t)index + 1].timeStamp)
 				return index;
 		}
 
-		return -1;
-	}
-
-	int Bone::GetRotationIndex(float delta)
-	{
-		for (int index = 0; index < m_NumRotationKeys - 1; ++index)
-		{
-			if (delta < m_Rotations[index + 1].timeStamp)
-				return index;
-		}
-
-		return -1;
-	}
-
-	int Bone::GetScaleIndex(float delta)
-	{
-		for (int index = 0; index < m_NumScaleKeys - 1; ++index)
-		{
-			if (delta < m_Scales[index + 1].timeStamp)
-				return index;
-		}
-
-		return -1;
-	}
-
-	float Bone::getScaleFactor(float lastTimeStamp, float nextTimeStamp, float delta)
-	{
-		return (delta - lastTimeStamp) / (nextTimeStamp - lastTimeStamp);
-	}
-
-	DirectX::XMFLOAT3 Bone::interpolatePosition(float deltaTime)
-	{
-		if (1 == m_NumPositionKeys)
-		{
-			return m_Positions[0].position;
-		}
-
-		int preIndex = GetPositionIndex(deltaTime);
-		int nextIndex = preIndex + 1;
-		float scaleFactor = getScaleFactor(m_Positions[preIndex].timeStamp, m_Positions[nextIndex].timeStamp, deltaTime);
-
-		DirectX::XMFLOAT3 finalPosition;
-		DirectX::XMStoreFloat3(&finalPosition,
-			DirectX::XMVectorLerp(
-				DirectX::XMLoadFloat3(&m_Positions[preIndex].position),
-				DirectX::XMLoadFloat3(&m_Positions[nextIndex].position),
-				scaleFactor)
-		);
-
-		return finalPosition;
+		return 0;
 	}
 	
-	DirectX::XMFLOAT4 Bone::interpolateRotation(float deltaTime)
+	uint32_t Bone::GetRotationIndex(float time)
 	{
-		DirectX::XMFLOAT4 finalRotation;
-		DirectX::XMVECTOR quaternion;
-
-		if (1 == m_NumRotationKeys)
+		for (uint32_t index = 0; index < static_cast<uint32_t>(m_Rotations.size()); ++index)
 		{
-			quaternion = DirectX::XMQuaternionNormalize(
-				DirectX::XMLoadFloat4(&m_Rotations[0].rotation)
-			);
-			
-			DirectX::XMStoreFloat4(&finalRotation, quaternion);
-
-			return finalRotation;
+			if (time < m_Rotations[(size_t)index + 1].timeStamp)
+				return index;
 		}
 
-		int preIndex = GetRotationIndex(deltaTime);
-		int nextIndex = preIndex + 1;
-		float scaleFactor = getScaleFactor(m_Rotations[preIndex].timeStamp, m_Rotations[nextIndex].timeStamp, deltaTime);
-
-		quaternion = DirectX::XMQuaternionNormalize(
-			DirectX::XMQuaternionSlerp(
-				DirectX::XMLoadFloat4(&m_Rotations[preIndex].rotation),
-				DirectX::XMLoadFloat4(&m_Rotations[nextIndex].rotation),
-				scaleFactor)
-		);
-
-		DirectX::XMStoreFloat4(&finalRotation, quaternion);
-
-		return finalRotation;
+		return 0;
 	}
 	
-	DirectX::XMFLOAT3 Bone::interpolateScale(float deltaTime)
+	uint32_t Bone::GetScaleIndex(float time)
 	{
-		if (1 == m_NumScaleKeys)
+		for (uint32_t index = 0; index < static_cast<uint32_t>(m_Scales.size()); ++index)
 		{
-			return m_Scales[0].scale;
+			if (time < m_Scales[(size_t)index + 1].timeStamp)
+				return index;
 		}
 
-		int preIndex = GetScaleIndex(deltaTime);
-		int nextIndex = preIndex + 1;
-		float scaleFactor = getScaleFactor(m_Scales[preIndex].timeStamp, m_Scales[nextIndex].timeStamp, deltaTime);
+		return 0;
+	}
 
-		DirectX::XMFLOAT3 finalScale;
-		DirectX::XMStoreFloat3(&finalScale,
-			DirectX::XMVectorLerp(
-				DirectX::XMLoadFloat3(&m_Scales[preIndex].scale),
-				DirectX::XMLoadFloat3(&m_Scales[nextIndex].scale),
-				scaleFactor)
-		);
+	float Bone::getScaleFactor(float lastTimeStamp, float nextTimeStamp, float time)
+	{
+		float scaleFactor = 0.0f;
+		float midWayLength = time - lastTimeStamp;
+		float framesDiff = nextTimeStamp - lastTimeStamp;
+		scaleFactor = midWayLength / framesDiff;
 
-		return finalScale;
+		return scaleFactor;
+	}
+
+	DirectX::XMMATRIX Bone::interpolatePosition(float time)
+	{
+		if (1 == m_Positions.size())
+			return DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&m_Positions[0].position));
+
+		uint32_t lastIndex = GetPositionIndex(time);
+		uint32_t nextIndex = lastIndex + 1;
+		float scaleFactor = getScaleFactor(
+			m_Positions[lastIndex].timeStamp,
+			m_Positions[nextIndex].timeStamp,
+			time);
+		auto finalPos = DirectX::XMVectorLerp(
+			DirectX::XMLoadFloat3(&m_Positions[lastIndex].position),
+			DirectX::XMLoadFloat3(&m_Positions[nextIndex].position),
+			scaleFactor);
+
+		return DirectX::XMMatrixTranslationFromVector(finalPos);
+	}
+	
+	DirectX::XMMATRIX Bone::interpolateRotation(float time)
+	{
+		if (1 == m_Rotations.size())
+		{
+			auto rotation = DirectX::XMQuaternionNormalize(DirectX::XMLoadFloat4(&m_Rotations[0].rotation));
+			return DirectX::XMMatrixRotationQuaternion(rotation);
+		}
+		uint32_t lastIndex = GetRotationIndex(time);
+		uint32_t nextIndex = lastIndex + 1;
+		float scaleFactor = getScaleFactor(
+			m_Rotations[lastIndex].timeStamp, 
+			m_Rotations[nextIndex].timeStamp,
+			time);
+		auto finalRot = DirectX::XMQuaternionSlerp(
+			DirectX::XMLoadFloat4(&m_Rotations[lastIndex].rotation),
+			DirectX::XMLoadFloat4(&m_Rotations[nextIndex].rotation),
+			scaleFactor);
+		finalRot = DirectX::XMQuaternionNormalize(finalRot);
+
+		return DirectX::XMMatrixRotationQuaternion(finalRot);
+	}
+	
+	DirectX::XMMATRIX Bone::interpolateScale(float time)
+	{
+		if (1 == m_Scales.size())
+			return DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&m_Scales[0].scale));
+
+		uint32_t lastIndex = GetScaleIndex(time);
+		uint32_t nextIndex = lastIndex + 1;
+		float scaleFactor = getScaleFactor(
+			m_Scales[lastIndex].timeStamp, 
+			m_Scales[nextIndex].timeStamp,
+			time);
+		auto finalScl = DirectX::XMVectorLerp(
+			DirectX::XMLoadFloat3(&m_Scales[lastIndex].scale),
+			DirectX::XMLoadFloat3(&m_Scales[nextIndex].scale),
+			scaleFactor);
+
+		return DirectX::XMMatrixScalingFromVector(finalScl);
 	}
 }
