@@ -41,6 +41,9 @@ namespace Dive
 		GameObject* GetRootGameObject() { return m_pRootGameObject; }
 		void SetRootGameObject(GameObject* pRoot) { m_pRootGameObject = pRoot; }
 
+		GameObject* GetRootBone() const { return m_pRootBone; }
+		void SetRootBone(GameObject* pRootBone) { m_pRootBone = pRootBone; }
+
 	private:
 		std::unordered_map<std::string, StaticMesh*> m_StaticMeshes;
 		std::unordered_map<std::string, SkinnedMesh*> m_SkinnedMeshes;
@@ -49,5 +52,6 @@ namespace Dive
 		std::unordered_map<std::string, BoneInfo> m_BoneInfoMap;
 
 		GameObject* m_pRootGameObject;
+		GameObject* m_pRootBone;
 	};
 }

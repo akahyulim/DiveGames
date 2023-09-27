@@ -14,12 +14,14 @@
 #include "IO/Log.h"
 
 #include "Renderer/Skeleton.h"
+#include "BoneRenderer.h"
 
 namespace Dive
 {
 	SkinnedMeshRenderer::SkinnedMeshRenderer(GameObject* pGameObject)
 		: IMeshRenderer(pGameObject),
-		m_CurrentTime(0.0f)
+		m_CurrentTime(0.0f),
+		m_pRootBone(nullptr)
 	{
 		DirectX::XMFLOAT4X4 matIdentity;
 		DirectX::XMStoreFloat4x4(&matIdentity, DirectX::XMMatrixIdentity());
@@ -70,31 +72,19 @@ namespace Dive
 				m_CurrentTime += m_pCurrentAnimation->GetTickPerSecond() * deltaTime;
 				m_CurrentTime = fmod(m_CurrentTime, m_pCurrentAnimation->GetDuration());
 
-				if (!m_Bones.empty())
+				if (!m_Bones.empty() && m_pRootBone)
 				{
-					auto pRootNode = GetGameObject()->GetTransform()->GetParent();
-					Transform* pRootBone = nullptr;
-					for (auto pChild : pRootNode->GetChildren())
-					{
-						if (pChild != GetGameObject()->GetTransform())
-						{
-							pRootBone = pChild;
-							break;
-						}
-					}
-
 					DirectX::XMFLOAT4X4 matIdentity;
 					DirectX::XMStoreFloat4x4(&matIdentity, DirectX::XMMatrixIdentity());
-					// 이게 꽤나 부담을 준다.
-					calcuBoneTransform(pRootBone, 
-						//pRootNode,
-						matIdentity);
+					calcuBoneTransform(m_pRootBone->GetTransform(), matIdentity);
 				}
 			}
 
 			auto pBuffer = Renderer::GetModelVertexShaderBuffer();
 			auto pMappedData = static_cast<ModelVertexShaderBuffer*>(pBuffer->Map());
 			pMappedData->worldMatrix = DirectX::XMMatrixTranspose(m_pGameObject->GetTransform()->GetMatrix());
+			// 1. XMMatrixTranspose()때문에 memcpy 같은걸 못쓴다.
+			// 2. XMMATRIX와 XMFLOAT4의 변환이 걸리는데, calcuBoneTransform()에서 계산할때 어차피 타입이 수시로 바뀐다.
 			for (uint32_t i = 0; i < static_cast<uint32_t>(m_SkinMatrices.size()); ++i)
 				pMappedData->skinMatrix[i] = DirectX::XMMatrixTranspose(DirectX::XMLoadFloat4x4(&m_SkinMatrices[i]));
 			pBuffer->Unmap();
@@ -107,7 +97,6 @@ namespace Dive
 			Graphics::SetIndexBuffer(m_pMesh->GetIndexBuffer());
 			Graphics::DrawIndexed(
 				D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-				//D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
 				m_pMesh->GetNumIndices(),
 				0, 0);
 		}
@@ -150,7 +139,7 @@ namespace Dive
 		auto pBone = m_pCurrentAnimation->FindBone(nodeName);
 		if (pBone)
 		{
-			pBone->Update(m_CurrentTime);
+			pBone->Update(m_CurrentTime); 
 			localTransform = pBone->GetLocalTransform();
 		}
 

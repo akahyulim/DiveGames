@@ -1,49 +1,26 @@
 #include "AssetImporter.h"
 
-static std::string s_FilePath;
-static std::string s_ModelName;
-static const aiScene* s_pScene = nullptr;
-static Dive::Model* s_pModel = nullptr;
-
-DirectX::XMFLOAT3 ConvertXMFLOAT3(const aiVector3D& vec)
+static DirectX::XMFLOAT3 ConvertXMFLOAT3(const aiVector3D& vec)
 {
     return DirectX::XMFLOAT3(vec.x, vec.y, vec.z);
 }
 
-DirectX::XMFLOAT4 ConvertXMFLOAT4(const aiQuaternion& vec)
+static DirectX::XMFLOAT4 ConvertXMFLOAT4(const aiQuaternion& vec)
 {
     return DirectX::XMFLOAT4(vec.x, vec.y, vec.z, vec.w);
 }
 
-DirectX::XMFLOAT4X4 ConvertXMFLOAT4X4(const aiMatrix4x4& matrix)
+static DirectX::XMFLOAT4X4 ConvertXMFLOAT4X4(const aiMatrix4x4& mat)
 {
     return DirectX::XMFLOAT4X4(
-        matrix.a1, matrix.b1, matrix.c1, matrix.d1,
-        matrix.a2, matrix.b2, matrix.c2, matrix.d2,
-        matrix.a3, matrix.b3, matrix.c3, matrix.d3,
-        matrix.a4, matrix.b4, matrix.c4, matrix.d4
+        mat.a1, mat.b1, mat.c1, mat.d1,
+        mat.a2, mat.b2, mat.c2, mat.d2,
+        mat.a3, mat.b3, mat.c3, mat.d3,
+        mat.a4, mat.b4, mat.c4, mat.d4
     );
 }
 
-aiNode* FindNodeByName(aiNode* pNode, const aiString& name)
-{
-    if (!pNode)
-        return nullptr;
-
-    if (pNode->mName == name)
-        return pNode;
-
-    for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
-    {
-        auto pFound = FindNodeByName(pNode->mChildren[i], name);
-        if (pFound)
-            return pFound;
-    }
-
-    return nullptr;
-}
-
-void GetBlendData(aiMesh* pMesh, std::vector<std::vector<int>>& outBlendIndices, std::vector<std::vector<float>>& outBlendWeights)
+static void GetBlendData(aiMesh* pMesh, std::vector<std::vector<int>>& outBlendIndices, std::vector<std::vector<float>>& outBlendWeights)
 {
     if (!pMesh || pMesh->mNumBones == 0)
         return;
@@ -102,7 +79,7 @@ void GetBlendData(aiMesh* pMesh, std::vector<std::vector<int>>& outBlendIndices,
     }
 }
 
-Dive::GameObject* GetNodeObjectByBoneName(Dive::GameObject* pNodeObject, const std::string& boneName)
+static Dive::GameObject* GetNodeObjectByBoneName(Dive::GameObject* pNodeObject, const std::string& boneName)
 {
     if (!pNodeObject || boneName.empty())
         return nullptr;
@@ -120,81 +97,169 @@ Dive::GameObject* GetNodeObjectByBoneName(Dive::GameObject* pNodeObject, const s
     return nullptr;
 }
 
-Dive::Material* ParseAndCreateMaterials(aiMesh* pMesh)
+static Dive::GameObject* FindRootBone(Dive::GameObject* pNodeObject, const std::vector<Dive::BoneInfo>& boneInfos)
 {
-    const auto* pAiMaterial = s_pScene->mMaterials[pMesh->mMaterialIndex];
-    if (!pAiMaterial)
-        return Dive::ResourceCache::GetResourceByPath<Dive::Material>("Assets/Materials/Default.yaml");
-
+    for (const Dive::BoneInfo& boneInfo : boneInfos)
     {
-        aiString stringVal;
-        float floatVal;
-        int intVal;
-        aiColor3D colorVal;
-
-        std::string diffuseTexName, normalTexName, specularTexName, lightmapTexName, emissiveTexName;
-
-        if (pAiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_DIFFUSE, 0), stringVal) == AI_SUCCESS)
-            diffuseTexName = Dive::FileSystem::GetFileNameAndExtension(stringVal.C_Str());
-        if (pAiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_NORMALS, 0), stringVal) == AI_SUCCESS)
-            normalTexName = Dive::FileSystem::GetFileNameAndExtension(stringVal.C_Str());
-        if (pAiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_SPECULAR, 0), stringVal) == AI_SUCCESS)
-            specularTexName = Dive::FileSystem::GetFileNameAndExtension(stringVal.C_Str());
-        if (pAiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_LIGHTMAP, 0), stringVal) == AI_SUCCESS)
-            lightmapTexName = Dive::FileSystem::GetFileNameAndExtension(stringVal.C_Str());
-        if (pAiMaterial->Get(AI_MATKEY_TEXTURE(aiTextureType_EMISSIVE, 0), stringVal) == AI_SUCCESS)
-            emissiveTexName = Dive::FileSystem::GetFileNameAndExtension(stringVal.C_Str());
-
-        std::cout << "diffuseTexName: " << diffuseTexName.c_str() << std::endl;
-
-        if (auto pInsideTex = s_pScene->GetEmbeddedTexture(diffuseTexName.c_str()))
-        {
-            auto height = pInsideTex->mHeight;
-            auto width = pInsideTex->mWidth;
-            
-            // 대략 이렇게 하는 듯 한데 height가 0이다... 직접 계산해야 하나?
-            // https://github.com/assimp/assimp/blob/master/samples/SimpleTexturedDirectx11/SimpleTexturedDirectx11/ModelLoader.cpp
-            // 예제가 있다.
-            Dive::Texture2D* pDiffTex = new Dive::Texture2D();
-            
-        }
-
+        if (pNodeObject->GetName() == boneInfo.name)
+            return pNodeObject;
     }
 
-    aiString name;
-    aiGetMaterialString(pAiMaterial, AI_MATKEY_NAME, &name);
-
-    aiColor4D diffuse(1.0f, 1.0f, 1.0f, 1.0f);
-    aiGetMaterialColor(pAiMaterial, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
-
-    aiColor4D opacity(1.0f, 1.0f, 1.0f, 1.0f);
-    aiGetMaterialColor(pAiMaterial, AI_MATKEY_OPACITY, &opacity);
-
-    // diffuse map
-    aiString texturePath;
-    if (pAiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) != AI_SUCCESS)
-        pAiMaterial->GetTexture(aiTextureType_BASE_COLOR, 0, &texturePath);
-
-    // material
-    auto diffuseTexturePath = Dive::FileSystem::GetPath(s_FilePath) + "textures/";
-    diffuseTexturePath += Dive::FileSystem::GetFileNameAndExtension(texturePath.C_Str());
-    auto pDiffuseTex = Dive::ResourceCache::GetResourceByPath<Dive::Texture2D>(diffuseTexturePath);
-    if (pDiffuseTex)
+    auto pTransform = pNodeObject->GetTransform();
+    for (auto pChild : pTransform->GetChildren())
     {
-        Dive::Material* pMat = new Dive::Material;
-        pMat->SetName(Dive::FileSystem::GetFileName(s_FilePath));
-        pMat->SetTexture(Dive::eTextureUnit::Diffuse, pDiffuseTex);
-
-        Dive::ResourceCache::AddManualResource<Dive::Material>(pMat);
-
-        return pMat;
+        auto pRootBone = FindRootBone(pChild->GetGameObject(), boneInfos);
+        if (pRootBone)
+            return pRootBone;
     }
 
-    // 없다면 디폴트 리턴
-    return Dive::ResourceCache::GetResourceByPath<Dive::Material>("Assets/Materials/Default.yaml");
+    return nullptr;
 }
 
-void ParseCreateMeshes(aiMesh* pMesh, Dive::GameObject* pGameObject)
+AssetImporter::AssetImporter()
+	: m_FileDirectory(),
+    m_FileName(),
+	m_ModelName(),
+	m_pScene(nullptr),
+	m_pModel(nullptr)
+{
+}
+
+bool AssetImporter::Load(const std::string& fileName)
+{
+	if (Dive::FileSystem::FileExists(fileName))
+		return LoadExternalFile(fileName);
+	
+	return false;
+}
+
+bool AssetImporter::LoadExternalFile(const std::string& fileName)
+{
+    Assimp::Importer importer;
+
+    uint32_t flags =
+        aiProcess_LimitBoneWeights |
+        aiProcess_ConvertToLeftHanded |
+        aiProcess_Triangulate |
+        aiProcess_GenSmoothNormals |
+        aiProcess_CalcTangentSpace;
+
+    // 이게 빈 노드들을 제거해주었다.
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+
+    m_pScene = importer.ReadFile(fileName, flags);
+    if (!m_pScene || m_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !m_pScene->mRootNode)
+    {
+        DV_ERROR("{:s}", importer.GetErrorString());
+        return false;
+    }
+
+    m_FileDirectory = fileName.substr(0, fileName.find_last_of("/\\"));
+    m_FileName = fileName;
+    m_ModelName = Dive::FileSystem::GetFileName(fileName);
+
+    m_pModel = new Dive::Model;
+    m_pModel->SetName(m_ModelName);
+
+    processNode(m_pScene->mRootNode, nullptr);
+
+    processAnimation();
+    // skeleton으로부터 bones를 가져온 후 BoneRenderer를 만들고 SkinnedMeshRenderer에 bones를 추가하는 과정
+    {
+        auto pRootObject = m_pModel->GetRootGameObject();
+        auto skeleton = m_pModel->GetSkeleton();
+        const auto& boneInfos = skeleton.GetBones();
+
+        // rootBone 검색 후 저장
+        auto pRootBone = FindRootBone(pRootObject, boneInfos);
+        m_pModel->SetRootBone(pRootBone);
+
+        // BoneRenderer를 모두 추가
+        for (uint32_t i = 0; i < static_cast<uint32_t>(boneInfos.size()); ++i)
+        {
+            Dive::GameObject* pNodeObject = GetNodeObjectByBoneName(pRootObject, boneInfos[i].name);
+            if (!pNodeObject)
+            {
+                DV_ERROR("{:s} GameObject가 존재하지 않습니다.", boneInfos[i].name.c_str());
+                continue;
+            }
+            pNodeObject->AddComponent<Dive::BoneRenderer>();
+        }
+
+        // SkinnedMeshRenderer에 rootBone 저장
+        // Animaition에 TestAnim 저장
+        std::function<void(Dive::GameObject*)> func = [&func, &pRootBone](Dive::GameObject* pNode)
+        {
+            if (!pNode)
+                return;
+
+            auto pSkinnedMeshRenderer = pNode->GetComponent<Dive::SkinnedMeshRenderer>();
+            if (pSkinnedMeshRenderer)
+                pSkinnedMeshRenderer->SetRootBone(pRootBone);
+
+            auto pAnimator = pNode->GetComponent<Dive::Animator>();
+            if (pAnimator)
+                pAnimator->SetAnimation(Dive::ResourceCache::GetResourceByName<Dive::Animation>("TestAnim"));
+
+            auto pTransform = pNode->GetTransform();
+            for (auto pChild : pTransform->GetChildren())
+                func(pChild->GetGameObject());
+        };
+
+        func(pRootObject);
+    }
+    m_pModel->BuildMeshBuffers();
+
+	return true;
+}
+
+bool AssetImporter::LoadEngineFile(const std::string& fileName)
+{
+	return false;
+}
+
+void AssetImporter::Clear()
+{
+    DV_DELETE(m_pModel);
+}
+
+void AssetImporter::processNode(aiNode* pNode, Dive::Transform* pParent)
+{
+    auto pNodeObject = Dive::Scene::CreateGameObject();
+    pNodeObject->SetName(pParent ? pNode->mName.data : m_ModelName);
+    auto pNodeTransform = pNodeObject->GetTransform();
+    pNodeTransform->SetParent(pParent);
+    pNodeTransform->SetLocalMatrix(ConvertXMFLOAT4X4(pNode->mTransformation));
+
+    if (!pParent)
+        m_pModel->SetRootGameObject(pNodeObject);
+
+    for (uint32_t i = 0; i < pNode->mNumMeshes; ++i)
+    {
+        auto pMeshNodeObject = pNodeObject;
+        auto pMesh = m_pScene->mMeshes[pNode->mMeshes[i]];
+        std::string meshName = pMesh->mName.C_Str();
+
+        if (i > 0)
+        {
+            pMeshNodeObject = Dive::Scene::CreateGameObject();
+            pMeshNodeObject->GetTransform()->SetParent(pNodeObject->GetTransform()->GetParent());
+            pMeshNodeObject->GetTransform()->SetLocalMatrix(ConvertXMFLOAT4X4(pNode->mTransformation));
+            
+            // 동일한 이름을 가지는 경우가 있어 인덱스를 추가
+            // 이전 이름들과 비교하는 방법도 시도해보자.
+            meshName += "_" + std::to_string(i + 1);
+        }
+        pMeshNodeObject->SetName(meshName);
+
+        processMesh(pMesh, pMeshNodeObject);
+    }
+
+    for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
+        processNode(pNode->mChildren[i], pNodeTransform);
+}
+
+void AssetImporter::processMesh(aiMesh* pMesh, Dive::GameObject* pMeshNodeObject)
 {
     // indices
     uint32_t numIndices = pMesh->mNumFaces * 3;
@@ -255,10 +320,10 @@ void ParseCreateMeshes(aiMesh* pMesh, Dive::GameObject* pGameObject)
             }
         }
 
-        auto pStaticMesh = s_pModel->InsertStaticMesh(new Dive::StaticMesh(pMesh->mName.C_Str(), vertices, indices));
-        auto pMeshRenderer = pGameObject->AddComponent<Dive::MeshRenderer>();
+        auto pStaticMesh = m_pModel->InsertStaticMesh(new Dive::StaticMesh(pMesh->mName.C_Str(), vertices, indices));
+        auto pMeshRenderer = pMeshNodeObject->AddComponent<Dive::MeshRenderer>();
         pMeshRenderer->SetMesh(pStaticMesh);
-        pMeshRenderer->SetMaterial(ParseAndCreateMaterials(pMesh));
+        pMeshRenderer->SetMaterial(loadMaterial(pMesh));
     }
     else
     {
@@ -315,9 +380,6 @@ void ParseCreateMeshes(aiMesh* pMesh, Dive::GameObject* pGameObject)
                 vertex.weights[j] = blendWeights[vertexIndex][j];
         }
 
-        // 메시가 2개 이상이라도 사용하는 뼈대의 개수는 같다는 것을 확인
-        DV_INFO("Mesh({0:s})의 bone 개수: {1:d}", pMesh->mName.C_Str(), pMesh->mNumBones);
-
         // 현재 하나의 노드에 둘 이상의 메시가 존재할 경우
         // 메시를 추가로 생성하고 있다.
         // 이때 아래의 과정도 함께 수행되는데
@@ -327,7 +389,7 @@ void ParseCreateMeshes(aiMesh* pMesh, Dive::GameObject* pGameObject)
         bones.resize(pMesh->mNumBones);
         // 현재 스켈레톤이 두 개 이상일 수 있지만 model에서 하나만 관리한다.
         // 따라서 아에 참고문서처럼 model에서 하나만 관리토록 할 생각이다.
-        auto& boneInfoMap = s_pModel->GetBoneInfoMap();
+        auto& boneInfoMap = m_pModel->GetBoneInfoMap();
 
         // 현재 메시가 사용하는 뼈대의 정보를 모아서 관리하는 것이다.
         for (uint32_t boneIndex = 0; boneIndex < pMesh->mNumBones; ++boneIndex)
@@ -347,198 +409,108 @@ void ParseCreateMeshes(aiMesh* pMesh, Dive::GameObject* pGameObject)
                 boneInfoMap[boneName] = newBoneInfo;
             }
         }
-        s_pModel->SetSkeleton(skeleton);
+        m_pModel->SetSkeleton(skeleton);
 
-        auto pSkinnedMesh = new Dive::SkinnedMesh(pGameObject->GetName(), vertices, indices);
-        s_pModel->InsertSkinnedMesh(pSkinnedMesh);
+        auto pSkinnedMesh = new Dive::SkinnedMesh(pMeshNodeObject->GetName(), vertices, indices);
+        m_pModel->InsertSkinnedMesh(pSkinnedMesh);
 
-        auto pMeshRenderer = pGameObject->AddComponent<Dive::SkinnedMeshRenderer>();
+        auto pMeshRenderer = pMeshNodeObject->AddComponent<Dive::SkinnedMeshRenderer>();
         pMeshRenderer->SetMesh(pSkinnedMesh);
-        pMeshRenderer->SetMaterial(ParseAndCreateMaterials(pMesh));
+        pMeshRenderer->SetMaterial(loadMaterial(pMesh));
 
         // temp: 이 곳에서 SkinnedMeshRenderer에 BoneInfo를 전달할 수 있다.
         pMeshRenderer->SetBones(bones);
 
         // temp
-        auto pAnimator = pGameObject->AddComponent<Dive::Animator>();
+        auto pAnimator = pMeshNodeObject->AddComponent<Dive::Animator>();
         // 아직 애니메이션이 구성되지 않았다.
         //pAnimator->SetAnimation(Dive::ResourceCache::GetResourceByName<Dive::Animation>("TestAnim"));
     }
 }
 
-void ParseAndCreateMeshes(aiNode* pNode, Dive::GameObject* pGameObject)
+Dive::Material* AssetImporter::loadMaterial(aiMesh* pMesh)
 {
-    for (uint32_t meshIndex = 0; meshIndex < pNode->mNumMeshes; ++meshIndex)
+    auto pMaterial = m_pScene->mMaterials[pMesh->mMaterialIndex];
+    if (!pMaterial)
+        return nullptr;
+
+    aiString name;
+    aiGetMaterialString(pMaterial, AI_MATKEY_NAME, &name);
+
+    aiColor4D diffuse(1.0f, 1.0f, 1.0f, 1.0f);
+    aiGetMaterialColor(pMaterial, AI_MATKEY_COLOR_DIFFUSE, &diffuse);
+    aiColor4D opacity(1.0f, 1.0f, 1.0f, 1.0f);
+    aiGetMaterialColor(pMaterial, AI_MATKEY_OPACITY, &opacity);
+
+    // textures
+    aiString texturePath;
+    if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) != AI_SUCCESS)
+        pMaterial->GetTexture(aiTextureType_BASE_COLOR, 0, &texturePath);
+
+    Dive::Texture2D* pDiffuseTex = nullptr;
+    const aiTexture* pEmbeddedTexture = m_pScene->GetEmbeddedTexture(texturePath.C_Str());
+    if (pEmbeddedTexture)
     {
-        auto pNodeObject = pGameObject;
-        auto pMesh = s_pScene->mMeshes[pNode->mMeshes[meshIndex]];
-        std::string name = pNode->mName.C_Str();
-        
-        if (meshIndex > 0)
-        {
-            pNodeObject = Dive::Scene::CreateGameObject();
-            auto pTransform = pNodeObject->GetTransform();
-            pTransform->SetParent(pGameObject->GetTransform()->GetParent());
-            pTransform->SetLocalMatrix(ConvertXMFLOAT4X4(pNode->mTransformation));
-            // 이전 이름들과 비교하는 방법도 시도해보자.
-            name += "_" + std::to_string(meshIndex);
-        }
-        pNodeObject->SetName(name);
-
-        ParseCreateMeshes(pMesh, pNodeObject);
+        // 파일 내부에서 데이터를 얻어와 직접 만들기
+        pDiffuseTex = loadEmbeddedTexture(pEmbeddedTexture);
     }
-}
-
-// static variable를 사용한다. 즉, 적어도 멤버 함수로 만드는 것이 어울린다.
-void ParseAndCreateNodes(aiNode* pNode, Dive::Transform* pParent)
-{
-    auto pNodeObject = Dive::Scene::CreateGameObject();
-    auto pTransform = pNodeObject->GetTransform();
-    if (pParent)
-        pTransform->SetParent(pParent);
     else
-        s_pModel->SetRootGameObject(pNodeObject);
-    pTransform->SetLocalMatrix(ConvertXMFLOAT4X4(pNode->mTransformation));
-    
-    pNodeObject->SetName(pParent ? pNode->mName.data : s_ModelName);
-
-    if (pNode->mNumMeshes > 0)
-        ParseAndCreateMeshes(pNode, pNodeObject);
-
-    for (uint32_t i = 0; i < pNode->mNumChildren; ++i)
-        ParseAndCreateNodes(pNode->mChildren[i], pTransform);
-}
-
-AssetImporter::~AssetImporter()
-{
-	Clear();
-}
-
-bool AssetImporter::LoadFromFile(const std::string& filePath)
-{
-    Clear();
-
-    if (Dive::FileSystem::FileExists(filePath))
-        return LoadExternalFile(filePath);
-
-    return false;
-}
-
-bool AssetImporter::LoadExternalFile(const std::string& filePath)
-{
-    Assimp::Importer importer;
-
-    uint32_t flags =
-        aiProcess_LimitBoneWeights |
-        aiProcess_ConvertToLeftHanded |
-        aiProcess_Triangulate |
-        aiProcess_GenSmoothNormals |
-        aiProcess_CalcTangentSpace;
-
-    // 이게 빈 노드들을 제거해주었다.
-    importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-    
-    s_pScene = importer.ReadFile(filePath, flags);
-    if (!s_pScene || s_pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !s_pScene->mRootNode)
     {
-        DV_ERROR("{:s}", importer.GetErrorString());
-        return false;
+        // 이건 외부에 존재하는 파일을 로드
+        auto diffuseTexturePath = Dive::FileSystem::GetPath(m_FileName) + "textures/";
+        diffuseTexturePath += Dive::FileSystem::GetFileNameAndExtension(texturePath.C_Str());
+        pDiffuseTex = Dive::ResourceCache::GetResourceByPath<Dive::Texture2D>(diffuseTexturePath);
     }
 
-    s_FilePath = filePath;
-    s_ModelName = Dive::FileSystem::GetFileName(filePath);
+    auto pDvMat = new Dive::Material();
+    pDvMat->SetName(name.data);
+    pDvMat->SetDiffuseColor(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
+    pDvMat->SetTexture(Dive::eTextureUnit::Diffuse, pDiffuseTex);
+    Dive::ResourceCache::AddManualResource<Dive::Material>(pDvMat);
 
-    DV_ASSERT(!s_pModel);
-    s_pModel = new Dive::Model();
-    s_pModel->SetName(s_ModelName);
-    
-    ParseAndCreateNodes(s_pScene->mRootNode, nullptr);
+    return pDvMat;
+}
 
-    CollectAnimations();
+// 예제에서는 ID3D11ShaderResourceView를 생성한 후 리턴한다.
+// https://github.com/assimp/assimp/blob/master/samples/SimpleTexturedDirectx11/SimpleTexturedDirectx11/ModelLoader.cpp
+Dive::Texture2D* AssetImporter::loadEmbeddedTexture(const aiTexture* pEmbeddedTexture)
+{
+    auto pDvTexture = new Dive::Texture2D();
 
-    auto pRootObject = s_pModel->GetRootGameObject();
-
-    // skeleton으로부터 bones를 가져온 후 BoneRenderer를 만들고 SkinnedMeshRenderer에 bones를 추가하는 과정
+    if (pEmbeddedTexture->mHeight != 0)
     {
-        auto skeleton = s_pModel->GetSkeleton();
-        const auto& bones = skeleton.GetBones();
-        for (uint32_t i = 0; i < static_cast<uint32_t>(bones.size()); ++i)
-        {
-            Dive::GameObject* pNodeObject = GetNodeObjectByBoneName(pRootObject, bones[i].name);
-            if (!pNodeObject)
-            {
-                DV_ERROR("{:s} GameObject가 존재하지 않습니다.", bones[i].name.c_str());
-                continue;
-            }
-            pNodeObject->AddComponent<Dive::BoneRenderer>();
-        }
-
-        std::function<void (Dive::GameObject*)> func = [&func](Dive::GameObject* pNode)
-        {
-            if (!pNode)
-                return;
-
-            auto pAnimator = pNode->GetComponent<Dive::Animator>();
-            if (pAnimator)
-                pAnimator->SetAnimation(Dive::ResourceCache::GetResourceByName<Dive::Animation>("TestAnim"));
-
-            auto pTransform = pNode->GetTransform();
-            for (auto pChild : pTransform->GetChildren())
-                func(pChild->GetGameObject());
-        };
-
-        func(pRootObject);
+        pDvTexture->SetSize(pEmbeddedTexture->mWidth, pEmbeddedTexture->mHeight);
+        pDvTexture->SetRawTextureData((const void*)pEmbeddedTexture->pcData);
+        // 될 것 같긴한데 두 번에 걸쳐서 생성하는게 마음에 걸린다.
+        // => urho3d를 참고한 인터페이스다. 
     }
-    s_pModel->BuildMeshBuffers();
- 
-    importer.FreeScene();
+    const size_t size = pEmbeddedTexture->mWidth;
+    const void* pSrcData = (const void*)pEmbeddedTexture->pcData;
+    Dive::Image img;
+    if(!img.LoadFromMemory(Dive::FileSystem::GetExtension(pEmbeddedTexture->mFilename.C_Str()), size, pSrcData))
+        return nullptr;
+    pDvTexture->SetImage(&img);
 
-    DV_INFO("Model({:s}) successfully loaded.", filePath);
+    // 매뉴얼 등록
+    pDvTexture->SetName(Dive::FileSystem::GetFileNameAndExtension(pEmbeddedTexture->mFilename.C_Str()));
+    Dive::ResourceCache::AddManualResource<Dive::Texture2D>(pDvTexture);
 
-    return true;
+    return pDvTexture;
 }
 
-bool AssetImporter::LoadEngineFile(const std::string& filePath)
+void AssetImporter::processAnimation()
 {
-    return false;
-}
-
-bool AssetImporter::SaveToEngineFile(const std::string& filePath)
-{
-    return false;
-}
-
-void AssetImporter::Clear()
-{
-    DV_DELETE(s_pModel);
-}
-
-std::string AssetImporter::GetFilePath()
-{
-    return s_FilePath;
-}
-
-Dive::Model* AssetImporter::GetModel()
-{
-    return s_pModel;
-}
-
-// BoneInfoMap에는 등록되었지만
-// 아래의 과정에서 생성되지 않은 Bone이 존재한다.
-// 이는 참고문서의 ReadMissingBones와 반대 상황이다.
-void AssetImporter::CollectAnimations()
-{
-    auto numAnims = s_pScene->mNumAnimations;
-    for(uint32_t i = 0; i < numAnims; ++i)
+    auto numAnims = m_pScene->mNumAnimations;
+    for (uint32_t i = 0; i < numAnims; ++i)
     {
-        auto pAnim = s_pScene->mAnimations[i];
+        auto pAnim = m_pScene->mAnimations[i];
         auto pAnimation = new Dive::Animation();
         pAnimation->SetName("TestAnim");//pAnim->mName.data);
         pAnimation->SetTickPerSecond(static_cast<float>(pAnim->mTicksPerSecond));
         pAnimation->SetDuration(static_cast<float>(pAnim->mDuration));
         Dive::ResourceCache::AddManualResource<Dive::Animation>(pAnimation);
 
-        auto numChannels = pAnim->mNumChannels; 
+        auto numChannels = pAnim->mNumChannels;
         for (uint32_t j = 0; j < numChannels; ++j)
         {
             auto pChannel = pAnim->mChannels[j];
@@ -546,7 +518,7 @@ void AssetImporter::CollectAnimations()
 
             for (uint32_t index = 0; index < pChannel->mNumPositionKeys; ++index)
             {
-                auto key = pChannel->mPositionKeys[index];               
+                auto key = pChannel->mPositionKeys[index];
                 bone.InsertPositionKey(static_cast<float>(key.mTime), ConvertXMFLOAT3(key.mValue));
             }
 
@@ -564,14 +536,5 @@ void AssetImporter::CollectAnimations()
 
             pAnimation->InsertBone(bone);
         }
-    }
-}
-
-void AssetImporter::loadMaterialTextures(aiMaterial* pMat, aiTextureType type, std::string typeName)
-{
-    for (UINT i = 0; i < pMat->GetTextureCount(type); ++i)
-    {
-        aiString texPath;
-        pMat->GetTexture(type, i, &texPath);
     }
 }

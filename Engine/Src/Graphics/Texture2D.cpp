@@ -55,6 +55,8 @@ namespace Dive
 		if (!SetImage(m_pLoadImage))
 			return false;
 
+		// 왜 또 굳이 지웠냐...?
+		// 그럼 동적생성한 의미가 없잖아...
 		DV_DELETE(m_pLoadImage);
 
 		m_FilePath = filePath;

@@ -31,6 +31,8 @@ namespace Dive
 		void InsertBone(BoneInfo* pBone);
 		void SetBones(const std::vector<BoneInfo>& bones);
 
+		GameObject* GetRootBone() const { return m_pRootBone; }
+		void SetRootBone(GameObject* pRootBone) { m_pRootBone = pRootBone; }
 
 	private:
 		void calcuBoneTransform(Transform* pNode, DirectX::XMFLOAT4X4 parent);
@@ -43,6 +45,8 @@ namespace Dive
 
 		std::vector<DirectX::XMFLOAT4X4> m_SkinMatrices;
 		float m_CurrentTime;
+
+		GameObject* m_pRootBone;
 
 		Animation* m_pCurrentAnimation;
 	};

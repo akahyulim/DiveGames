@@ -10,7 +10,8 @@ namespace Dive
 {
 	Model::Model()
 		: Resource(eResourceType::Model),
-		m_pRootGameObject(nullptr)
+		m_pRootGameObject(nullptr),
+		m_pRootBone(nullptr)
 	{
 	}
 

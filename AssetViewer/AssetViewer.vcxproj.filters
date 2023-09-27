@@ -42,9 +42,6 @@
     <ClCompile Include="AssetImporter.cpp">
       <Filter>Src</Filter>
     </ClCompile>
-    <ClCompile Include="DvAssetImporter.cpp">
-      <Filter>Src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetViewer.h">
@@ -78,9 +75,6 @@
       <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="AssetImporter.h">
-      <Filter>Src</Filter>
-    </ClInclude>
-    <ClInclude Include="DvAssetImporter.h">
       <Filter>Src</Filter>
     </ClInclude>
   </ItemGroup>

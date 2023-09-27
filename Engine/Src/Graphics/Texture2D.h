@@ -15,6 +15,12 @@ namespace Dive
 
 		bool LoadFromFile(const std::string& filePath) override;
 
+		// urho3d는 기본적으로 SetSize와 SetData 둘로 나뉜다.
+		// SetSize는 아무래도 RenderTargetView용인듯 하고
+		// SetData는 ShaderResourceView용인듯 하다. 
+		// => 아니다. SetSize로 생성된 텍스쳐를 이용해서 무언가를 한다.
+		// => 현재 SetRawTextureData와 같다.
+
 		bool SetImage(Image* pImage);
 		bool SetSize(int width, int height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, int mipCount = 0, bool linear = false);
 

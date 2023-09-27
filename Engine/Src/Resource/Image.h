@@ -1,16 +1,18 @@
 #pragma once
 #include "Resource.h"
+#include <DirectXTex/DirectXTex.h>
 
 namespace Dive
 {
+	// 굳이 Texture와 Image를 구분할 필요가 없을 것 같다.
 	class Image : public Resource
 	{
 	public:
 		Image();
-		~Image() override;
+		~Image() override = default;
 
 		bool LoadFromFile(const std::string& fileName) override;
-		bool LoadFromWICMemory(size_t size, const void* pSrcData);
+		bool LoadFromMemory(const std::string& extension, size_t size, const void* pSrcData);
 
 		bool SetSize(int width, int height, DXGI_FORMAT format);
 		bool SetSize(int widht, int height, int depth, DXGI_FORMAT format);
@@ -34,6 +36,8 @@ namespace Dive
 		DirectX::XMFLOAT4 GetPixel(int width, int height, int depth);
 
 	private:
+		void loadScrachImage(const DirectX::ScratchImage& img);
+
 	private:
 		int m_Width;
 		int m_Height;

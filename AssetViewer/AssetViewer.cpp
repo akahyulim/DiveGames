@@ -223,16 +223,6 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 			const std::string filePath = FileOpen("Assets/Models", "외부 모델 파일\0*.obj;*.dae;*.fbx;*.gltf\0");
 			if (!filePath.empty())
 			{
-				/*
-				if (AssetImporter::LoadFromFile(filePath))
-				{
-					m_pLoadedModel = AssetImporter::GetModel()->GetRootGameObject();
-					m_pSelectedNode = nullptr;
-					m_MeshRenderers.clear();
-					bOpen = true;
-				}
-				*/
-				/**/
 				if (m_AssetImporter.Load(filePath))
 				{
 					m_pLoadedModel = m_AssetImporter.GetModel()->GetRootGameObject();
@@ -240,7 +230,6 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 					m_MeshRenderers.clear();
 					bOpen = true;
 				}
-				/**/
 			}
 		}
 
@@ -248,7 +237,6 @@ void AssetViewer::OnBeginRender(const Dive::Event& e)
 
 		if (ImGui::Button("Clear"))
 		{
-			//AssetImporter::Clear();
 			m_AssetImporter.Clear();
 			m_pLoadedModel = nullptr;
 			m_pSelectedNode = nullptr;
