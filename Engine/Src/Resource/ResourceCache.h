@@ -2,7 +2,7 @@
 #include "Resource.h"
 #include "Core/CoreDefs.h"
 #include "IO/FileSystem.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
@@ -15,7 +15,7 @@ namespace Dive
 		template<class T>
 		static bool AddManualResource(T* pResource)
 		{
-			DV_ASSERT(pResource);
+			DV_CORE_ASSERT(pResource);
 
 			if (pResource->GetName().empty())
 			{

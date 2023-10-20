@@ -2,7 +2,7 @@
 #include "Graphics.h"
 #include "Core/Object.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
@@ -15,7 +15,7 @@ namespace Dive
 		template<typename T>
 		bool Create()
 		{
-			DV_ASSERT(Graphics::IsInitialized());
+			DV_CORE_ASSERT(Graphics::IsInitialized());
 		
 			m_Stride = static_cast<uint32_t>(sizeof(T));
 			

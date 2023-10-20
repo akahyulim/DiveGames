@@ -2,7 +2,7 @@
 #include "RenderTexture.h"
 #include "Graphics.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {

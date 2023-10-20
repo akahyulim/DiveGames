@@ -1,7 +1,7 @@
 #include "divepch.h"
 #include "Image.h"
 #include "IO/FileSystem.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {

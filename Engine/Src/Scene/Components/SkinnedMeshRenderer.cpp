@@ -11,7 +11,7 @@
 #include "Renderer/Bone.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/ConstantBuffer.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 #include "Renderer/Skeleton.h"
 #include "BoneRenderer.h"
@@ -58,8 +58,8 @@ namespace Dive
 
 			// 일단 셰이더를 별도로 만들어 사용했다.
 			// 렌더링엔 성공했다.
-			Graphics::SetShaderVariation(eShaderType::VertexShader, Renderer::GetBasicSkinnedVertexShaderVariation());
-			Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetBasicSkinnedPixelShaderVariation());
+			Graphics::SetShaderVariation(eShaderType::VertexShader, Renderer::GetDeferredSkinnedShadingVertexShaderVariation());//GetBasicSkinnedVertexShaderVariation());
+			Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetDeferredSkinnedShadingPixelShaderVariation());//GetBasicSkinnedPixelShaderVariation());
 		}
 
 		// 이걸 update에 넣어버리면 마지막 모델의 값만 저장된다. 따라서 그냥 한 번에 그려야 한다.

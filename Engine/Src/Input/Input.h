@@ -9,6 +9,8 @@ namespace Dive
 		static void Shutdown();
 
 		static void Update();
+		static void ReadKeyboard();
+		static void ReadMouse();
 
 		static bool KeyState(int key);
 		static bool KeyDown(int key);
@@ -19,11 +21,5 @@ namespace Dive
 		static bool MouseButtonDown(int btn);
 		static bool MouseButtonUp(int btn);
 		static bool MouseButtonPress(int btn);
-
-		static bool IsInitialized();
-
-	private:
-		static bool readKeyboard();
-		static bool readMouse();
 	};
 }

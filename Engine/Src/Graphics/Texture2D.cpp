@@ -4,7 +4,7 @@
 #include "Core/CoreDefs.h"
 #include "Resource/Image.h"
 #include "IO/FileSystem.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 /*
 * ÆÄÀÏ Load
@@ -194,7 +194,7 @@ namespace Dive
 
 	Texture2D* Texture2D::GetBlackTexture()
 	{
-		DV_ASSERT(Graphics::IsInitialized());
+		DV_CORE_ASSERT(Graphics::IsInitialized());
 
 		if (!s_pBlackTexture)
 		{
@@ -214,7 +214,7 @@ namespace Dive
 
 	Texture2D* Texture2D::GetGrayTexture()
 	{
-		DV_ASSERT(Graphics::IsInitialized());
+		DV_CORE_ASSERT(Graphics::IsInitialized());
 
 		if (!s_pGrayTexture)
 		{
@@ -234,7 +234,7 @@ namespace Dive
 
 	Texture2D* Texture2D::GetRedTexture()
 	{
-		DV_ASSERT(Graphics::IsInitialized());
+		DV_CORE_ASSERT(Graphics::IsInitialized());
 
 		if (!s_pRedTexture)
 		{
@@ -254,7 +254,7 @@ namespace Dive
 
 	Texture2D* Texture2D::GetWhiteTexture()
 	{
-		DV_ASSERT(Graphics::IsInitialized());
+		DV_CORE_ASSERT(Graphics::IsInitialized());
 
 		if (!s_pWhiteTexture)
 		{

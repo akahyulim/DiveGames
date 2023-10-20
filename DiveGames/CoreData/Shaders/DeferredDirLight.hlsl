@@ -27,7 +27,9 @@ VS_OUTPUT MainVS(uint VertexID : SV_VERTEXID)
 	return output;
 }
 
-float4 MainPS(VS_OUTPUT input) : SV_TARGET
+float4 frameRender : SV_TARGET0;
+
+float4 MainPS(VS_OUTPUT input) : SV_TARGET0
 {
 	// Diff Color
 	int3 location3 = int3(input.position.xy, 0);
@@ -60,5 +62,5 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
 	float NDotH = saturate(dot(halfWay, normal));
 	dirLightColor += cbLightColorPS * pow(NDotH, 250.0f) * 0.25f;
 
-	return diffMap * float4(dirLightColor, 1.0f) * cbMaterialAlbedoColorPS;
+	return diffMap;// *float4(dirLightColor, 1.0f)* cbMaterialAlbedoColorPS;
 }

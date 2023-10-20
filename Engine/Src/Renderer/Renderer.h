@@ -1,8 +1,11 @@
 #pragma once
+#include "RendererDefs.h"
 
 namespace Dive
 {
-	class View;
+	class RenderTexture;
+
+	class Layer;
 	class ShaderVariation;
 	class ConstantBuffer;
 
@@ -59,11 +62,16 @@ namespace Dive
 		static void Shutdown();
 
 		static void Update();
-		static void Render();
 
-		static View* GetView(uint32_t index);
-		static void SetView(uint32_t index, View* pView);
-		static uint32_t GetViewCount();
+		static DirectX::XMFLOAT2 GetResolutionRender();
+		static void SetResolutionRender(uint32_t width, uint32_t height);
+		static void SetResolutionRender(DirectX::XMINT2 size);
+
+		static RenderTexture* GetRenderTarget(const eRenderTarget renderTarget);
+
+		static ID3D11RasterizerState* GetRasterizerState(const eRasterizerState state);
+		static ID3D11DepthStencilState* GetDepthStencilState(const eDepthStencilState state);
+		static ID3D11BlendState* GetBlendState(const eBlendState state);
 
 		// test
 		static ShaderVariation* GetBasicVertexShaderVariation();
@@ -75,6 +83,8 @@ namespace Dive
 		static ShaderVariation* GetPointLightPixelShaderVariation();
 		static ShaderVariation* GetDeferredShadingVertexShaderVariation();
 		static ShaderVariation* GetDeferredShadingPixelShaderVariation();
+		static ShaderVariation* GetDeferredSkinnedShadingVertexShaderVariation();
+		static ShaderVariation* GetDeferredSkinnedShadingPixelShaderVariation();
 		static ShaderVariation* GetDeferredDirLightVertexShaderVariation();
 		static ShaderVariation* GetDeferredDirLightPixelShaderVariation();
 
@@ -83,19 +93,14 @@ namespace Dive
 		static ConstantBuffer* GetCameraPixelShaderBuffer();
 		static ConstantBuffer* GetLightPixelShaderBuffer();
 		static ConstantBuffer* GetMaterialPixelShaderBuffer();
-		
-		static ID3D11DepthStencilState* GetDepthStencilState();
-		static ID3D11DepthStencilState* GetForwardLightDS();
-
-		static ID3D11RasterizerState* GetRasterizerState();
-
-		static ID3D11BlendState* GetBlendState();
 
 	private:
+		static void createRasterizerStates();
+		static void createDepthStencilStates();
+		static void createBlendStates();
 		static bool createShaders();
 		static bool createConstantBuffers();
-		static bool createDepthStencilStates();
-		static bool createRasterizerStates();
-		static bool createBlendStates();
+
+		static void createRenderTargets();
 	};
 }

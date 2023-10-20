@@ -8,7 +8,7 @@ Sandbox::Sandbox()
 
 Sandbox::~Sandbox()
 {
-	DV_TRACE("Sandbox ¼Ò¸êÀÚ");
+	DV_INFO("Sandbox ¼Ò¸êÀÚ");
 }
 
 void Sandbox::Setup()
@@ -18,28 +18,27 @@ void Sandbox::Setup()
 
 void Sandbox::Start()
 {
-	DV_TRACE("Sandbox::Start()");
+	DV_INFO("Sandbox::Start()");
 
-	Dive::View* pView = new Dive::View;
-	pView->SetName("MainView");
-	//pView->SetRenderPath(Dive::eRenderPath::Forward);
-	pView->SetRenderPath(Dive::eRenderPath::Deferred);
+	Dive::Layer* pLayer = new Dive::Layer;
+	pLayer->SetName("Default");
+	//pLayer->SetRenderPath(Dive::eRenderPath::Forward);
+	pLayer->SetRenderPath(Dive::eRenderPath::Deferred);
 
 	m_pMainCamera = Dive::Scene::CreateGameObject("MainCamera")->AddComponent<Dive::Camera>();
 	m_pMainCamera->GetGameObject()->GetComponent<Dive::Transform>()->SetPosition(0.0f, 10.0f, -20.0f);
-	pView->SetCamera(m_pMainCamera);
+	pLayer->SetCamera(m_pMainCamera);
 
-	Dive::Renderer::SetView(0, pView);
+	Dive::Renderer::SetLayer(0, pLayer);
 
 	SUBSCRIBE_EVENT(Dive::eEventType::Update, EVENT_HANDLER_PARAM(OnUpdate));
 }
 
 void Sandbox::Stop()
 {
-	DV_TRACE("Sandbox::Stop()");
+	DV_INFO("Sandbox::Stop()");
 }
 
 void Sandbox::OnUpdate(const Dive::Event& evnt)
 {
-	const auto& e = dynamic_cast<const Dive::UpdateEvent&>(evnt);
 }

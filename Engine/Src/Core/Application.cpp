@@ -4,10 +4,6 @@
 
 namespace Dive
 {
-	Application::Application()
-	{
-	}
-
 	Application::~Application()
 	{
 		Engine::Shutdown();
@@ -22,7 +18,7 @@ namespace Dive
 			Start();
 
 			while (!Engine::IsExiting())
-				Engine::RunFrame();
+				Engine::Tick();
 
 			Stop();
 		}

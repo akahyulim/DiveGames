@@ -36,6 +36,7 @@ namespace Dive
 	private:
 	};
 
+	/*
 	// BeginRender
 	class BeginRender : public Event
 	{
@@ -59,5 +60,5 @@ namespace Dive
 
 	private:
 	};
-
+	*/
 }

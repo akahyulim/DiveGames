@@ -2,7 +2,7 @@
 #include "VertexBuffer.h"
 #include "Core/CoreDefs.h"
 #include "Graphics.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
@@ -24,7 +24,7 @@ namespace Dive
 
 	void* VertexBuffer::Map()
 	{
-		DV_ASSERT(m_pBuffer);
+		DV_CORE_ASSERT(m_pBuffer);
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -44,7 +44,7 @@ namespace Dive
 
 	void VertexBuffer::Unmap()
 	{
-		DV_ASSERT(m_pBuffer);
+		DV_CORE_ASSERT(m_pBuffer);
 
 		Graphics::GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer), 0);
 	}

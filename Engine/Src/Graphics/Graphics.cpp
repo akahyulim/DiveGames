@@ -10,7 +10,6 @@
 #include "ConstantBuffer.h"
 #include "InputLayout.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
 
 namespace Dive
 {
@@ -87,7 +86,7 @@ namespace Dive
 		if (!UpdateSwapChain())
 			return false;
 
-		DV_CORE_TRACE("Graphics 초기화에 성공하였습니다.");
+		DV_CORE_INFO("Graphics 초기화에 성공하였습니다.");
 
 		return true;
 	}
@@ -101,7 +100,7 @@ namespace Dive
 		::DestroyWindow(s_hWnd);
 		::UnregisterClassW(L"Dive", s_hInstance);
 
-		DV_CORE_TRACE("Graphics 종료에 성공하였습니다.");
+		DV_CORE_INFO("Graphics 종료에 성공하였습니다.");
 	}
 
 	bool Graphics::WindowCreate()
@@ -147,18 +146,18 @@ namespace Dive
 
 		if (!s_hWnd)
 		{
-			DV_CORE_ERROR("Graphics::WindowCreate() - 윈도우 생성에 실패하였습니다.");
+			DV_CORE_ERROR("윈도우 생성에 실패하였습니다.");
 			return false;
 		}
 
 		GetClientRect(s_hWnd, &rt);
-		DV_ASSERT(s_Width == rt.right - rt.left);
-		DV_ASSERT(s_Height == rt.bottom - rt.top);
+		DV_CORE_ASSERT(s_Width == rt.right - rt.left);
+		DV_CORE_ASSERT(s_Height == rt.bottom - rt.top);
 
 		::ShowWindow(s_hWnd, SW_SHOW);
 		::SetFocus(s_hWnd);
 
-		DV_CORE_TRACE("{0:d} x {1:d} 윈도우 생성에 성공하였습니다.", s_Width, s_Height);
+		DV_CORE_INFO("{0:d} x {1:d} 윈도우 생성에 성공하였습니다.", s_Width, s_Height);
 
 		return true;
 	}
@@ -189,8 +188,11 @@ namespace Dive
 			switch (msg)
 			{
 			case WM_SIZE:
-				UpdateSwapChain();
+			{
+				bool bUpdated = UpdateSwapChain();
+				DV_CORE_ASSERT(bUpdated);
 				break;
+			}
 			default:
 				break;
 			}
@@ -226,32 +228,21 @@ namespace Dive
 
 	void Graphics::SetWindowTitle(const std::wstring& title)
 	{
+		// 이미 생성된 윈도우의 타이틀 변경
 		if (s_hWnd)
 			::SetWindowText(s_hWnd, title.c_str());
 
 		s_WindowTitle = title;
 	}
 
-	void Graphics::GetWindowSize(int& width, int& height)
+	void Graphics::GetWindowSize(int* const pOutWidth, int* const pOutHeight)
 	{
-		RECT rt;
-		GetClientRect(s_hWnd, &rt);
-
-		DV_ASSERT(s_Width == rt.right - rt.left);
-		DV_ASSERT(s_Height == rt.bottom - rt.top);
-
-		width = s_Width;
-		height = s_Height;
+		*pOutWidth = s_Width;
+		*pOutHeight = s_Height;
 	}
 
 	DirectX::XMINT2 Graphics::GetWindowSize()
 	{
-		RECT rt;
-		GetClientRect(s_hWnd, &rt);
-
-		DV_ASSERT(s_Width == rt.right - rt.left);
-		DV_ASSERT(s_Height == rt.bottom - rt.top);
-
 		return DirectX::XMINT2(s_Width, s_Height);
 	}
 
@@ -265,9 +256,6 @@ namespace Dive
 		return s_Height;
 	}
 
-	// 이건 앱에서 윈도우 크기 및 해상도를 변경하는 함수이다.
-	// 일단 이 곳에서 스왑체인을 리사이즈 하면 WM_SIZE가 발생하고
-	// 이를 통해 OnResizeWindow()를 통해 백퍼버와 렌더타켓을 갱신한다.
 	void Graphics::ResizeWindow(int width, int height)
 	{
 		if (!IsInitialized())
@@ -288,7 +276,7 @@ namespace Dive
 
 			if (FAILED(s_pSwapChain->ResizeTarget(&desc)))
 			{
-				DV_CORE_ERROR("Graphics::ResizeWindow - 스왑체인 타겟 리사이즈에 실패하였습니다.");
+				DV_CORE_ERROR("스왑체인 타겟 리사이즈에 실패하여 윈도우 크기를 변경할 수 없습니다.");
 				return;
 			}
 		}
@@ -318,7 +306,7 @@ namespace Dive
 			nullptr,
 			&s_pDeviceContext)))
 		{
-			DV_CORE_ERROR("Graphics::CreateDeviceAndSwapChain - D3D11 장치 생성에 실패하였습니다.");
+			DV_CORE_ERROR("D3D11 장치 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -346,7 +334,7 @@ namespace Dive
 
 		if (FAILED(pDxgiFactory->CreateSwapChain(s_pDevice, &desc, &s_pSwapChain)))
 		{
-			DV_CORE_ERROR("Graphics::CreateDeviceAndSwapChain - D3D11 스왑체인 생성에 실패하였습니다.");
+			DV_CORE_ERROR("D3D11 스왑체인 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -365,13 +353,25 @@ namespace Dive
 
 		s_pSwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
-		// 백버퍼를 얻어와 디폴트 렌더타겟뷰 생성
+		// 후면 버퍼 텍스쳐 획득
 		ID3D11Texture2D* pBackbufferTexture = nullptr;
 		if (FAILED(s_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture)))
 		{
-			DV_CORE_ERROR("Graphics::UpdateSwapChain - 후면 버퍼 텍스쳐 생성에 실패하였습니다.");
+			DV_RELEASE(pBackbufferTexture);
+			DV_CORE_ERROR("후면 버퍼 텍스쳐를 얻어오는데 실패하였습니다.");
 			return false;
 		}
+		
+		// 후면 버퍼 텍스쳐의 렌더타겟뷰 생성
+		if (FAILED(s_pDevice->CreateRenderTargetView(
+			static_cast<ID3D11Resource*>(pBackbufferTexture), nullptr, &s_pDefaultRenderTargetView)))
+		{
+			DV_RELEASE(pBackbufferTexture); 
+			DV_RELEASE(s_pDefaultRenderTargetView);
+			DV_CORE_ERROR("후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
+			return false;
+		}
+		DV_RELEASE(pBackbufferTexture);
 
 		uint32_t curWidth = width;
 		uint32_t curHeight = height;
@@ -386,85 +386,58 @@ namespace Dive
 			curHeight = swapChainDesc.BufferDesc.Height;
 		}
 
-		if (FAILED(s_pDevice->CreateRenderTargetView(
-			static_cast<ID3D11Resource*>(pBackbufferTexture), nullptr, &s_pDefaultRenderTargetView)))
+		// 후면 버퍼 깊이 스텐실 텍스쳐 생성
+		D3D11_TEXTURE2D_DESC texDesc;
+		ZeroMemory(&texDesc, sizeof(texDesc));
+		texDesc.Width = curWidth;
+		texDesc.Height = curHeight;
+		texDesc.MipLevels = 1;
+		texDesc.ArraySize = 1;
+		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		texDesc.SampleDesc.Count = 1;// static_cast<UINT>(screenParams_.multiSample_);
+		texDesc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(texDesc.Format, screenParams_.multiSample_);
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		texDesc.CPUAccessFlags = 0;
+		texDesc.MiscFlags = 0;
+
+		if (FAILED(s_pDevice->CreateTexture2D(&texDesc, nullptr, &s_pDefaultDepthStencilTexture)))
 		{
-			DV_CORE_ERROR("Graphics::UpdateSwapChain - 후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
+			DV_RELEASE(s_pDefaultDepthStencilTexture);
+			DV_CORE_ERROR("후면 버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
 			return false;
 		}
-		DV_RELEASE(pBackbufferTexture);
 
+		D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc;
+		ZeroMemory(&viewDesc, sizeof(viewDesc));
+		viewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		viewDesc.Texture2D.MipSlice = 0;
+
+		if (FAILED(s_pDevice->CreateDepthStencilView(
+			static_cast<ID3D11Resource*>(s_pDefaultDepthStencilTexture),
+			&viewDesc,//nullptr,		// urho가 nullptr을 전달했다. 역시나 sampler 문제는 해결되지 않았다.
+			&s_pDefaultDepthStencilView)))
 		{
-			// 디폴트 뎁스스텐실 생성
-			D3D11_TEXTURE2D_DESC desc;
-			ZeroMemory(&desc, sizeof(desc));
-			desc.Width = curWidth;
-			desc.Height = curHeight;
-			desc.MipLevels = 1;
-			desc.ArraySize = 1;
-			desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-			desc.SampleDesc.Count = 1;// static_cast<UINT>(screenParams_.multiSample_);
-			desc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(desc.Format, screenParams_.multiSample_);
-			desc.Usage = D3D11_USAGE_DEFAULT;
-			desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-			desc.CPUAccessFlags = 0;
-			desc.MiscFlags = 0;
-
-			if (FAILED(s_pDevice->CreateTexture2D(&desc, nullptr, &s_pDefaultDepthStencilTexture)))
-			{
-				DV_RELEASE(s_pDefaultDepthStencilTexture);
-				DV_CORE_ERROR("Graphics::UpdateSwapChain - 백버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
-				return false;
-			}
+			DV_RELEASE(s_pDefaultDepthStencilView);
+			DV_CORE_ERROR("후면 버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
+			return false;
 		}
-
-		{
-			D3D11_DEPTH_STENCIL_VIEW_DESC desc;
-			ZeroMemory(&desc, sizeof(desc));
-			desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipSlice = 0;
-
-			if (FAILED(s_pDevice->CreateDepthStencilView(
-				static_cast<ID3D11Resource*>(s_pDefaultDepthStencilTexture),
-				&desc,//nullptr,		// urho가 nullptr을 전달했다. 역시나 sampler 문제는 해결되지 않았다.
-				&s_pDefaultDepthStencilView)))
-			{
-				DV_RELEASE(s_pDefaultDepthStencilView);
-				DV_CORE_ERROR("Graphics::UpdateSwapChain - 백버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
-				return false;
-			}
-		}
-
+		
 		s_Width = static_cast<int32_t>(curWidth);
 		s_Height = static_cast<int32_t>(curHeight);
 
 		return true;
 	}
 
-	bool Graphics::BeginFrame()
+	void Graphics::Present()
 	{
-		if (!IsInitialized())
-			return false;
-
-		FIRE_EVENT(BeginRender());
-
-		return true;
-	}
-
-	void Graphics::EndFrame()
-	{
-		if (!IsInitialized())
-			return;
-
-		FIRE_EVENT(EndRender());
-
-		s_pSwapChain->Present(0, 0);
+		s_pSwapChain->Present(0, 0);	// vsync 적용. 이상하다. 30프레임이다.
 	}
 
 	void Graphics::ClearViews(uint32_t target, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil)
 	{
-		DV_ASSERT(IsInitialized());
+		DV_CORE_ASSERT(IsInitialized());
 
 		prepareDraw();
 
@@ -487,7 +460,7 @@ namespace Dive
 
 	void Graphics::Draw(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t vertexCount, uint32_t vertexStart)
 	{
-		DV_ASSERT(IsInitialized());
+		DV_CORE_ASSERT(IsInitialized());
 
 		if (!vertexCount)
 			return;
@@ -505,7 +478,7 @@ namespace Dive
 
 	void Graphics::DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t indexStart, uint32_t vertexStart)
 	{
-		DV_ASSERT(IsInitialized());
+		DV_CORE_ASSERT(IsInitialized());
 
 		prepareDraw();
 
@@ -525,7 +498,7 @@ namespace Dive
 
 	void Graphics::SetVertexBuffer(VertexBuffer* pVertexBuffer, uint32_t offset)
 	{
-		DV_ASSERT(IsInitialized());
+		DV_CORE_ASSERT(IsInitialized());
 
 		if (pVertexBuffer != s_pVertexBuffer)
 		{
@@ -553,7 +526,7 @@ namespace Dive
 
 	void Graphics::SetIndexBuffer(IndexBuffer* pIndexBuffer, uint32_t offset)
 	{
-		DV_ASSERT(IsInitialized());
+		DV_CORE_ASSERT(IsInitialized());
 
 		if (pIndexBuffer != s_pIndexBuffer)
 		{
@@ -580,7 +553,7 @@ namespace Dive
 
 	void Graphics::SetShaderVariation(eShaderType type, ShaderVariation* pShaderVariation)
 	{
-		DV_ASSERT(IsInitialized());
+		DV_CORE_ASSERT(IsInitialized());
 
 		if (type == eShaderType::VertexShader)
 		{
@@ -639,7 +612,7 @@ namespace Dive
 
 	void Graphics::SetRenderTargetView(uint32_t index, ID3D11RenderTargetView* pView)
 	{
-		DV_ASSERT(index < MAX_RENDERTARGETS);
+		DV_CORE_ASSERT(index < MAX_RENDERTARGETS);
 
 		if (s_pRenderTargetViews[index] == pView)
 			return;
@@ -650,7 +623,7 @@ namespace Dive
 
 	void Graphics::SetRenderTargetViews(uint32_t start, uint32_t count, ID3D11RenderTargetView** ppViews)
 	{
-		DV_ASSERT(start + count < MAX_RENDERTARGETS);
+		DV_CORE_ASSERT(start + count < MAX_RENDERTARGETS);
 
 		for (uint32_t i = 0; i < count; ++i)
 		{
@@ -688,7 +661,7 @@ namespace Dive
 
 	void Graphics::SetTexture(eTextureUnit unit, Texture* pTexture)
 	{
-		DV_ASSERT(unit != eTextureUnit::Max_Num);
+		DV_CORE_ASSERT(unit != eTextureUnit::Max_Num);
 
 		uint32_t index = static_cast<uint32_t>(unit);
 
@@ -747,12 +720,11 @@ namespace Dive
 	// => 각종 리소스들은 배열로 관리한 후 한 번에 보내는 편이 나아보인다. 그러므로 쓸모 있다.
 	void Graphics::prepareDraw()
 	{
-		DV_ASSERT(IsInitialized());
+		DV_CORE_ASSERT(IsInitialized());
 
 		if (s_bRenderTargetsDirty)
 		{
 			s_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &s_pRenderTargetViews[0], s_pDepthStencilView);
-
 			s_bRenderTargetsDirty = false;
 		}
 
@@ -777,9 +749,7 @@ namespace Dive
 			s_bTextureDirty = false;
 		}
 
-		{
-			s_pDeviceContext->VSSetConstantBuffers(0, 2, &s_pVertexShaderConstantBuffers[0]);
-			s_pDeviceContext->PSSetConstantBuffers(0, 3, &s_pPixelShaderConstantBuffers[0]);
-		}
+		s_pDeviceContext->VSSetConstantBuffers(0, 2, &s_pVertexShaderConstantBuffers[0]);
+		s_pDeviceContext->PSSetConstantBuffers(0, 3, &s_pPixelShaderConstantBuffers[0]);
 	}
 }

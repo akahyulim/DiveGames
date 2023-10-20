@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "Light.h"
 #include "Transform.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {

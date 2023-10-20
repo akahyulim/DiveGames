@@ -6,7 +6,7 @@
 #include "Renderer/Renderer.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/ConstantBuffer.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {

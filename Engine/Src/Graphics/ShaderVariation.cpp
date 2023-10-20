@@ -4,7 +4,7 @@
 #include "Graphics.h"
 #include "Core/CoreDefs.h"
 #include "IO/FileSystem.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
@@ -31,7 +31,7 @@ namespace Dive
 			((ID3D11ComputeShader*)m_pShaderResource)->Release();
 		m_pShaderResource = nullptr;
 
-		DV_CORE_TRACE("ShaderVariation 소멸자 호출 - {0:s} - {1:d}", m_Name, m_ID);
+		DV_CORE_INFO("ShaderVariation 소멸자 호출 - {0:s} - {1:d}", m_Name, m_ID);
 	}
 
 	bool ShaderVariation::CompileAndCreate(eShaderType type, const std::string& filePath, eVertexType vertexType)
@@ -48,7 +48,7 @@ namespace Dive
 	// 추가한 매크로를 전달할 수 있어야 한다.
 	bool ShaderVariation::Compile(eShaderType type, const std::string& filePath)
 	{
-		DV_ASSERT(type != eShaderType::UnknownShader);
+		DV_CORE_ASSERT(type != eShaderType::UnknownShader);
 
 		if (!FileSystem::FileExists(filePath))
 		{
@@ -118,7 +118,7 @@ namespace Dive
 
 	bool ShaderVariation::CreateShader(eShaderType type, eVertexType vertexType)
 	{
-		DV_ASSERT(type != eShaderType::UnknownShader);
+		DV_CORE_ASSERT(type != eShaderType::UnknownShader);
 
 		if (!m_pShaderBuffer)
 		{
@@ -127,7 +127,7 @@ namespace Dive
 		}
 
 		auto pDevice = Graphics::GetDevice();
-		DV_ASSERT(pDevice);
+		DV_CORE_ASSERT(pDevice);
 
 		if (m_ShaderType != type)
 			m_ShaderType = type;

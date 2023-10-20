@@ -6,6 +6,7 @@ namespace Dive
 	{
 	public:
 		Object();
+		Object(const std::string& name);
 		virtual ~Object() = default;
 
 		uint64_t GetID() const { return m_ID; }

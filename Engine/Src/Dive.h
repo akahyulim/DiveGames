@@ -22,11 +22,10 @@
 #include "Graphics/ShaderVariation.h"
 #include "Graphics/InputLayout.h"
 #include "Graphics/ConstantBuffer.h"
-#include "Graphics/GBuffer.h"
 
 // Renderer
+#include "Renderer/RendererDefs.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/View.h"
 #include "Renderer/Material.h"
 #include "Renderer/Skeleton.h"
 #include "Renderer/Mesh.h"
@@ -42,7 +41,7 @@
 #include "Math/Math.h"
 
 // IO
-#include "IO/Log.h"
+#include "Core/Log.h"
 #include "IO/FileSystem.h"
 #include "IO/FileStream.h"
 #include "IO/ConvertYAML.h"

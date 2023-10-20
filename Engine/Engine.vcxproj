@@ -156,12 +156,12 @@
     <ClInclude Include="Src\Core\CoreEvents.h" />
     <ClInclude Include="Src\Core\Engine.h" />
     <ClInclude Include="Src\Core\EventHandler.h" />
+    <ClInclude Include="Src\Core\Log.h" />
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\Timer.h" />
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
-    <ClInclude Include="Src\Graphics\GBuffer.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
     <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
@@ -176,7 +176,6 @@
     <ClInclude Include="Src\IO\ConvertYAML.h" />
     <ClInclude Include="Src\IO\FileStream.h" />
     <ClInclude Include="Src\IO\FileSystem.h" />
-    <ClInclude Include="Src\IO\Log.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\Animation.h" />
     <ClInclude Include="Src\Renderer\Bone.h" />
@@ -184,9 +183,9 @@
     <ClInclude Include="Src\Renderer\Material.h" />
     <ClInclude Include="Src\Renderer\Mesh.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
+    <ClInclude Include="Src\Renderer\RendererDefs.h" />
     <ClInclude Include="Src\Renderer\Skeleton.h" />
     <ClInclude Include="Src\Renderer\SkinnedMesh.h" />
-    <ClInclude Include="Src\Renderer\View.h" />
     <ClInclude Include="Src\Resource\Image.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceCache.h" />
@@ -205,13 +204,13 @@
     <ClCompile Include="Src\Core\Application.cpp" />
     <ClCompile Include="Src\Core\Engine.cpp" />
     <ClCompile Include="Src\Core\EventHandler.cpp" />
+    <ClCompile Include="Src\Core\Log.cpp" />
     <ClCompile Include="Src\Core\Object.cpp" />
     <ClCompile Include="Src\Core\Timer.cpp" />
     <ClCompile Include="Src\DivePch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Src\Graphics\ConstantBuffer.cpp" />
-    <ClCompile Include="Src\Graphics\GBuffer.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\InputLayout.cpp" />
@@ -223,7 +222,6 @@
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\IO\FileStream.cpp" />
     <ClCompile Include="Src\IO\FileSystem.cpp" />
-    <ClCompile Include="Src\IO\Log.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\Animation.cpp" />
     <ClCompile Include="Src\Renderer\Bone.cpp" />
@@ -233,7 +231,6 @@
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\Skeleton.cpp" />
     <ClCompile Include="Src\Renderer\SkinnedMesh.cpp" />
-    <ClCompile Include="Src\Renderer\View.cpp" />
     <ClCompile Include="Src\Resource\Image.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceCache.cpp" />

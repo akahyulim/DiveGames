@@ -2,7 +2,7 @@
 #include "BoneRenderer.h"
 #include "Transform.h"
 #include "Scene/GameObject.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {

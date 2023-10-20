@@ -2,7 +2,7 @@
 #include "IndexBuffer.h"
 #include "Graphics.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
@@ -25,7 +25,7 @@ namespace Dive
 
 	void* IndexBuffer::Map()
 	{
-		DV_ASSERT(m_pBuffer);
+		DV_CORE_ASSERT(m_pBuffer);
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 
@@ -45,7 +45,7 @@ namespace Dive
 
 	void IndexBuffer::Unmap()
 	{
-		DV_ASSERT(m_pBuffer);
+		DV_CORE_ASSERT(m_pBuffer);
 
 		Graphics::GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer), 0);
 	}

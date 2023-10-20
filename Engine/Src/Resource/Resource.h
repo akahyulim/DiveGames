@@ -20,7 +20,7 @@ namespace Dive
 	{
 	public:
 		Resource(eResourceType type = eResourceType::Unknown) : m_ResourceType(type) {}
-		~Resource() override = default;
+		virtual ~Resource() {}
 
 		virtual bool LoadFromFile(const std::string& filePath) { return true; }
 		virtual bool SaveToFile(const std::string& filePath) { return true; }

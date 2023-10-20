@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "InputLayout.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
@@ -18,8 +18,8 @@ namespace Dive
 
 	bool InputLayout::Create(ID3D10Blob* pShaderBuffer, eVertexType type)
 	{
-		DV_ASSERT(pShaderBuffer);
-		DV_ASSERT(type != eVertexType::Undefined);
+		DV_CORE_ASSERT(pShaderBuffer);
+		DV_CORE_ASSERT(type != eVertexType::Undefined);
 
 		std::vector<D3D11_INPUT_ELEMENT_DESC> elements = {
 			D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 } };
@@ -48,7 +48,7 @@ namespace Dive
 		}
 
 		auto* pDevice = Graphics::GetDevice();
-		DV_ASSERT(pDevice);
+		DV_CORE_ASSERT(pDevice);
 
 		if (FAILED(pDevice->CreateInputLayout(
 			elements.data(),

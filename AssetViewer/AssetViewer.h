@@ -18,15 +18,12 @@ public:
 	void Start() override;
 	void Stop() override;
 
-	void OnBeginRender(const Dive::Event& e);
-	void OnEndRender(const Dive::Event& e);
-	void OnWindowEvent(const Dive::Event& e);
-
 	void OnUpdate(const Dive::Event& e);
+	void OnPostUpdate(const Dive::Event& e);
+	void OnWindowEvent(const Dive::Event& e);
 
 private:
 	void initializeImGui();
-
 	void drawTree(Dive::GameObject* pNode);
 
 private:

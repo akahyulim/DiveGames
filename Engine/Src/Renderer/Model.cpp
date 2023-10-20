@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "Model.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 #include "Scene/Scene.h"
 #include "Scene/Components/MeshRenderer.h"
 #include "Scene/Components/SkinnedMeshRenderer.h"

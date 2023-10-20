@@ -17,7 +17,7 @@ namespace Dive
 
 	void* ConstantBuffer::Map()
 	{
-		DV_ASSERT(Graphics::IsInitialized());
+		DV_CORE_ASSERT(Graphics::IsInitialized());
 
 		if(!m_pBuffer)
 			return nullptr;
@@ -39,7 +39,7 @@ namespace Dive
 
 	void ConstantBuffer::Unmap()
 	{
-		DV_ASSERT(Graphics::IsInitialized());
+		DV_CORE_ASSERT(Graphics::IsInitialized());
 
 		if (!m_pBuffer)
 			return;

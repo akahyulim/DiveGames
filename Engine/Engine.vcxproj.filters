@@ -57,9 +57,6 @@
     <ClInclude Include="Src\Core\Object.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\IO\Log.h">
-      <Filter>Src\IO</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Input\Input.h">
       <Filter>Src\Input</Filter>
     </ClInclude>
@@ -67,9 +64,6 @@
       <Filter>Src\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Src\Renderer\Renderer.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\View.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\GraphicsDefs.h">
@@ -135,9 +129,6 @@
     <ClInclude Include="Src\Scene\Components\Light.h">
       <Filter>Src\Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\GBuffer.h">
-      <Filter>Src\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Renderer\Mesh.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
@@ -180,6 +171,12 @@
     <ClInclude Include="Src\Renderer\Bone.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\Log.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\RendererDefs.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DivePch.cpp">
@@ -197,9 +194,6 @@
     <ClCompile Include="Src\Core\Object.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
-    <ClCompile Include="Src\IO\Log.cpp">
-      <Filter>Src\IO</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Input\Input.cpp">
       <Filter>Src\Input</Filter>
     </ClCompile>
@@ -207,9 +201,6 @@
       <Filter>Src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Renderer.cpp">
-      <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\View.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Scene\GameObject.cpp">
@@ -272,9 +263,6 @@
     <ClCompile Include="Src\Scene\Components\Light.cpp">
       <Filter>Src\Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\GBuffer.cpp">
-      <Filter>Src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Renderer\Mesh.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
@@ -310,6 +298,9 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Bone.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\Log.cpp">
+      <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

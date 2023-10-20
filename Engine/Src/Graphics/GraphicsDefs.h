@@ -30,6 +30,10 @@ namespace Dive
 		Diffuse = 0,
 		Normal,
 		Specular,
+		GBuffer_DepthStencil,
+		GBuffer_Color_SpecIntensity,
+		GBuffer_Normal,
+		GBuffer_SpecPower,
 		Max_Num
 	};
 

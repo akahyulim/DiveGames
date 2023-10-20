@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "Renderer/RendererDefs.h"
 
 namespace Dive
 {
@@ -19,6 +20,9 @@ namespace Dive
 		float GetViewHeight() const { return m_ViewHeight; }
 		void SetViewSize(float width, float height) { m_ViewWidth = width; m_ViewHeight = height; }
 
+		DirectX::XMFLOAT4 GetBackgroundColor() const { return m_BackgroundColor; }
+		void SetBackgroundColor(DirectX::XMFLOAT4 color) { m_BackgroundColor = color; }
+
 		bool IsOrthographic() const { return m_bOrthographic; }
 		void SetOrthographic(bool orthographic) { m_bOrthographic = orthographic; }
 
@@ -33,25 +37,32 @@ namespace Dive
 		float GetFarClipPlane() const { return m_FarClipPlane; }
 		void SetFarClipPlane(float farPlane) { m_FarClipPlane = farPlane; }
 
-		void GetViewportRect(float& x, float& y, float& w, float& h);
-		void SetViewportRect(float x, float y, float w, float h);
+		void GetViewportRectRate(float& outX, float& outY, float& outWidth, float& outHeight);
+		void SetViewportRectRate(float x, float y, float width, float height);
 		D3D11_VIEWPORT GetViewport();
 
-	private:
+		eRenderingPath GetRenderingPath() const { return m_RenderingPath; }
+		void SetRenderingPath(eRenderingPath path) { m_RenderingPath = path; }
+
+	private: 
 	private:
 		bool m_bOrthographic;
 		
 		float m_ViewWidth;
 		float m_ViewHeight;
 
+		DirectX::XMFLOAT4 m_BackgroundColor;
+
 		float m_FieldOfView;
 
 		float m_NearClipPlane;
 		float m_FarClipPlane;
 
-		float m_ViewportRectX;
-		float m_ViewportRectY;
-		float m_ViewportRectW;
-		float m_ViewportRectH;
+		float m_ViewportRectRateX;
+		float m_ViewportRectRateY;
+		float m_ViewportRectRateWidth;
+		float m_ViewportRectRateHeight;
+
+		eRenderingPath m_RenderingPath;
 	};
 }

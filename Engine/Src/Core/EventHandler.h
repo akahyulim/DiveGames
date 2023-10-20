@@ -11,14 +11,14 @@
 
 namespace Dive
 {
-	// 서브 시스템별 이벤트 타입 열거자.
+	// 서브 시스템별 이벤트 타입 열거자
 	enum class eEventType
 	{
 		// Core
-		BeginFrame, PreUpdate, Update, PostUpdate, RenderUpdate, PostRenderUpdate, EndFrame,
+		PreUpdate, Update, PostUpdate,
 
 		// Graphics
-		WindowEvent, ScreenMode, BeginRender, EndRender,
+		WindowEvent, ScreenMode,
 
 		// Renderer
 		RenderTargetUpdate,
@@ -30,14 +30,14 @@ namespace Dive
 		LogMessage, ExitRequested,
 	};
 
-	// 이벤트 타입 함수 매크로.
+	// 이벤트 타입 함수 매크로
 #define EVENT_CLASS_TYPE(type) \
 public:	\
 	static eEventType GetStaticType() { return eEventType::type; }	\
 	virtual eEventType GetType() const override { return GetStaticType(); } \
 	virtual const char* GetName() const override { return #type; }
 
-	// 이벤트 타입을 확인하는 기능을 가진 이벤트 베이스 클래스.
+	// 이벤트 타입을 확인하는 기능을 가진 이벤트 베이스 클래스
 	class Event
 	{
 	public:
@@ -48,10 +48,10 @@ public:	\
 		virtual std::string ToString() const { return GetName(); }
 	};
 
-	// 이벤트 구독 Callable.
+	// 이벤트 구독 Callable
 	using Function = std::function<void(const Event&)>;
 
-	// 이벤트 구독자 관리 및 전달을 수행하는 이벤트 시스템 클래스.
+	// 이벤트 구독자 관리 및 전달을 수행하는 이벤트 시스템 클래스
 	class EventHandler
 	{
 	public:

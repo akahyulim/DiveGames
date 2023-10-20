@@ -42,6 +42,14 @@ struct Pixel_PosTex
 	float2 tex : TEXCOORD0;
 };
 
+struct Pixel_PosTexNorTan
+{
+	float4 position : SV_POSITION;
+	float2 tex : TEXCOORD0;
+	float3 normal : NORMAL0;
+	float3 tangent : TANGENT0;
+};
+
 struct Pixel_Test
 {
 	float4 position : SV_POSITION;

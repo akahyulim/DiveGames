@@ -8,7 +8,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/ConstantBuffer.h"
 #include "Resource/ResourceCache.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
@@ -52,8 +52,8 @@ namespace Dive
 
 			// 위치는 여기가 맞지만 좀 애매하다.
 			// 그리고 InputLayout 문제가 남아있다.
-			Graphics::SetShaderVariation(eShaderType::VertexShader, Renderer::GetBasicVertexShaderVariation());
-			Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetBasicPixelShaderVariation());
+			Graphics::SetShaderVariation(eShaderType::VertexShader, Renderer::GetDeferredShadingVertexShaderVariation());//Renderer::GetBasicVertexShaderVariation());
+			Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetDeferredShadingPixelShaderVariation());//Renderer::GetBasicPixelShaderVariation());
 		}
  
 		// Mesh Draw

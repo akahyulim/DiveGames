@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "FileStream.h"
 #include "FileSystem.h"
-#include "Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
@@ -20,7 +20,7 @@ namespace Dive
 			m_Out.open(path, iosFlags);
 			if (m_Out.fail())
 			{
-				DV_CORE_ERROR("FileStream::FileStream - 파일({:s})을 쓰기모드로 여는데 실패하였습니다.", path);
+				DV_CORE_ERROR("파일({:s})을 쓰기모드로 여는데 실패하였습니다.", path);
 				return;
 			}
 		}
@@ -29,7 +29,7 @@ namespace Dive
 			m_In.open(path, iosFlags);
 			if (m_In.fail())
 			{
-				DV_CORE_ERROR("FileStream::FileStream - 파일({:s})을 읽기모드로 여는데 실패하였습니다.", path);
+				DV_CORE_ERROR("파일({:s})을 읽기모드로 여는데 실패하였습니다.", path);
 				return;
 			}
 
@@ -49,7 +49,7 @@ namespace Dive
 	{
 		Close();
 
-		DV_CORE_TRACE("FileStream 소멸 완료({:s})", m_Filename);
+		DV_CORE_INFO("FileStream 소멸 완료({:s})", m_Filename);
 	}
 
 	void FileStream::Close()

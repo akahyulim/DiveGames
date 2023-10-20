@@ -2,7 +2,7 @@
 #include "Transform.h"
 #include "Scene/GameObject.h"
 #include "Math/Math.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 using namespace DirectX;
 

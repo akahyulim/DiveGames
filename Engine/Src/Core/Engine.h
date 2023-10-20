@@ -8,9 +8,7 @@ namespace Dive
 		static bool Initialize();
 		static void Shutdown();
 
-		static void RunFrame();
-		static void Update();
-		static void Render();
+		static void Tick();
 
 		static void Exit();
 

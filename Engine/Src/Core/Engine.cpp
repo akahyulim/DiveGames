@@ -8,7 +8,6 @@
 #include "Scene/Scene.h"
 #include "Resource/ResourceCache.h"
 #include "Input/Input.h"
-#include "IO/Log.h"
 
 namespace Dive
 {
@@ -16,8 +15,6 @@ namespace Dive
 
 	bool Engine::Initialize()
 	{
-		Log::Initialize();
-
 		if (!Graphics::Initialize())
 			return false;
 
@@ -33,7 +30,7 @@ namespace Dive
 		if (!Scene::Initialize())
 			return false;
 
-		DV_CORE_TRACE("Engine 초기화에 성공하였습니다.");
+		DV_CORE_INFO("Engine 초기화에 성공하였습니다.");
 
 		return true;
 	}
@@ -46,47 +43,29 @@ namespace Dive
 		Renderer::Shutdown();
 		Graphics::Shutdown();
 
-		DV_CORE_TRACE("Engine 종료에 성공하였습니다.");
+		DV_CORE_INFO("Engine을 종료하였습니다.");
 	}
-
-	void Engine::RunFrame()
+	
+	void Engine::Tick()
 	{
-		if (IsExiting())
-			return;
+		// pre update
+		FIRE_EVENT(PreUpdateEvent());
 
+		// update
 		if (!Graphics::RunWindow())
 		{
 			s_bExiting = true;
 			return;
 		}
-
-		Update();
-		Render();
-		
-	}
-
-	void Engine::Update()
-	{
-		// 순서가 중요하다. 특히 Scene의 업데이트 후 Renderer가 업데이트 되어야 한다.
+		Timer::Update();
 		Input::Update();
 		Scene::Update();
 		Renderer::Update();
-
-		Timer::Update();
-
 		FIRE_EVENT(UpdateEvent());
-	}
 
-	void Engine::Render()
-	{
-		if (!Graphics::IsInitialized())
-			return;
-
-		Graphics::BeginFrame();
-
-		Renderer::Render();
-
-		Graphics::EndFrame();
+		// post update
+		Graphics::Present();
+		FIRE_EVENT(PostUpdateEvent());
 	}
 
 	void Engine::Exit()

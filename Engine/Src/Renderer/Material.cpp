@@ -4,7 +4,7 @@
 #include "Resource/ResourceCache.h"
 #include "IO/FileStream.h"
 #include "IO/ConvertYAML.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {

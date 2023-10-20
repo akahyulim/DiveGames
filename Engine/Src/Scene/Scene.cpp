@@ -1,14 +1,15 @@
 #include "DivePch.h"
 #include "Scene.h"
 #include "GameObject.h"
-#include "Components/Transform.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
+#include "Components/Transform.h"
 
 namespace Dive
 {
-	static const uint64_t FIRST_ID = 0x1;
-	static const uint64_t LAST_ID = 0xffffffffffffffff;
+	// 카메라??? 그렇다면 view는...?
+	// 결국 Scnee, View, Renderer의 관계를 다시 생각해봐야 한다.
+	static constexpr uint64_t FIRST_ID = 0x1;
+	static constexpr uint64_t LAST_ID = 0xffffffffffffffff;
 
 	static std::string s_SceneName = "Empty World";
 	static std::string s_SceneFilepath;
@@ -23,7 +24,7 @@ namespace Dive
 
 	bool Scene::Initialize()
 	{
-		DV_CORE_TRACE("Scene::Initialize()");
+		DV_CORE_INFO("Scene::Initialize()");
 		return true;
 	}
 
@@ -31,12 +32,14 @@ namespace Dive
 	{
 		Clear();
 
-		DV_CORE_TRACE("Scene::Shutdown() - {:s}", GetName());
+		DV_CORE_INFO("Scene::Shutdown() - {:s}", GetName());
 	}
 
 	void Scene::New()
 	{
-		DV_CORE_TRACE("Scene::New() - {:s}", GetName());
+		Clear();
+
+		DV_CORE_INFO("Scene::New() - {:s}", GetName());
 	}
 
 	void Scene::Clear()
@@ -51,11 +54,13 @@ namespace Dive
 		s_CurComponentID = FIRST_ID;
 	}
 
+	// layer를 사용한다면 이건 필요없어진다.
 	void Scene::Update()
 	{
 		for (auto pGameObject : s_GameObjects)
 			pGameObject.second->Update();
 
+		// 스파르탄 최신버전에선 이 방법이 아니다.
 		if (s_bDirty)
 		{
 			auto it = s_GameObjects.begin();
@@ -72,30 +77,33 @@ namespace Dive
 
 			s_bDirty = false;
 		}
+
+		// 스파르탄은 resolved가 되면 WorldResolved라는 이벤트에 entity 벡터를 실어 Renderer로 보낸다.
+		// 하지만 이 경우 하나의 World == View만 관리가 가능하다.
 	}
 
 	bool Scene::LoadFromFile(const std::string& filePath)
 	{
-		DV_CORE_TRACE("Scene::LoadFromFile() - {:s}", filePath);
+		DV_CORE_INFO("Scene::LoadFromFile() - {:s}", filePath);
 		return true;
 	}
 
 	bool Scene::SaveToFile(const std::string& filePath)
 	{
-		DV_CORE_TRACE("Scene::SaveToFile() - {:s}", filePath);
+		DV_CORE_INFO("Scene::SaveToFile() - {:s}", filePath);
 		return true;
 	}
 
 	std::string Scene::GetName()
 	{
-		DV_CORE_TRACE("Scene::GetName() - {:s}", s_SceneName);
+		DV_CORE_INFO("Scene::GetName() - {:s}", s_SceneName);
 		
 		return s_SceneName;
 	}
 
 	std::string Scene::GetFilepath()
 	{
-		DV_CORE_TRACE("Scene::GetFilepath()");
+		DV_CORE_INFO("Scene::GetFilepath()");
 		return std::string("");
 	}
 
@@ -109,7 +117,7 @@ namespace Dive
 		}
 
 		auto pNewGameObject = new GameObject(name);
-		DV_ASSERT(pNewGameObject);
+		DV_CORE_ASSERT(pNewGameObject);
 
 		s_GameObjects[id] = pNewGameObject;
 		pNewGameObject->SetID(id);

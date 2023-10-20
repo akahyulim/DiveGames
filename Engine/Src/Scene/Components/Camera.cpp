@@ -4,22 +4,24 @@
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
 #include "Scene/GameObject.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
 	Camera::Camera(GameObject* pGameObject)
-		: Component(pGameObject),
-		m_bOrthographic(false),
-		m_ViewWidth(800.0f),
-		m_ViewHeight(600.0f),
-		m_FieldOfView(45.0f),
-		m_NearClipPlane(0.1f),
-		m_FarClipPlane(5000.0f),
-		m_ViewportRectX(0.0f),
-		m_ViewportRectY(0.0f),
-		m_ViewportRectH(1.0f),
-		m_ViewportRectW(1.0f)
+		: Component(pGameObject)
+		, m_bOrthographic(false)
+		, m_ViewWidth(800.0f)
+		, m_ViewHeight(600.0f)
+		, m_BackgroundColor(1.0f, 1.0f, 1.0f, 1.0f)
+		, m_FieldOfView(45.0f)
+		, m_NearClipPlane(0.1f)
+		, m_FarClipPlane(5000.0f)
+		, m_ViewportRectRateX(0.0f)
+		, m_ViewportRectRateY(0.0f)
+		, m_ViewportRectRateHeight(1.0f)
+		, m_ViewportRectRateWidth(1.0f)
+		, m_RenderingPath(eRenderingPath::Deferred)
 	{
 	}
 
@@ -29,7 +31,7 @@ namespace Dive
 
 	DirectX::XMMATRIX Camera::GetViewMatrix() const
 	{
-		DV_ASSERT(m_pGameObject);
+		DV_CORE_ASSERT(m_pGameObject);
 
 		auto pTransform = m_pGameObject->GetComponent<Transform>();
 		if (!pTransform)
@@ -56,11 +58,14 @@ namespace Dive
 		return m_bOrthographic ? GetOrthographicProjMatrix() : GetPerspectiveProjMatrix();
 	}
 
+	// 아직 제대로된 테스트도 못했다.
 	DirectX::XMMATRIX Camera::GetOrthographicProjMatrix() const
 	{
 		return DirectX::XMMatrixOrthographicLH(
-			m_ViewWidth,
-			m_ViewHeight,
+			//m_ViewWidth,
+			//m_ViewHeight,
+			m_ViewportRectRateHeight,
+			m_ViewportRectRateWidth,
 			m_NearClipPlane,
 			m_FarClipPlane);
 	}
@@ -79,8 +84,8 @@ namespace Dive
 		float width = static_cast<float>(Graphics::GetWindowWidth());
 		float height = static_cast<float>(Graphics::GetWindowHeight());
 
-		return ((width * m_ViewportRectW) - (width * m_ViewportRectX)) /
-			((height * m_ViewportRectH) - (height * m_ViewportRectY));
+		return ((width * m_ViewportRectRateWidth) - (width * m_ViewportRectRateX)) /
+			((height * m_ViewportRectRateHeight) - (height * m_ViewportRectRateY));
 	}
 
 	// min, max를 따로 선언해 놓는 편이 낫다.
@@ -94,34 +99,33 @@ namespace Dive
 			m_FieldOfView = fov;
 	}
 
-	void Camera::GetViewportRect(float& x, float& y, float& w, float& h)
+	void Camera::GetViewportRectRate(float& outX, float& outY, float& outWidth, float& outHeight)
 	{
-		x = m_ViewportRectX;
-		y = m_ViewportRectY;
-		w = m_ViewportRectW;
-		h = m_ViewportRectH;
+		outX = m_ViewportRectRateX;
+		outY = m_ViewportRectRateY;
+		outWidth = m_ViewportRectRateWidth;
+		outHeight = m_ViewportRectRateHeight;
 	}
 	
-	void Camera::SetViewportRect(float x, float y, float w, float h)
+	void Camera::SetViewportRectRate(float x, float y, float width, float height)
 	{
-		if ((x < 0.0f || x >= m_ViewportRectW) || (y < 0.0f || y >= m_ViewportRectH) || 
-			(w <= m_ViewportRectX || w > 1.0f) || (h <= m_ViewportRectY || h > 1.0f))
+		if ((x < 0.0f || x >= 1.0f) || (y < 0.0f || y >= 1.0f)
+			|| (width < 0.0f || width > 1.0f || 0.0f >= width - x) || (height < 0.0f || height > 1.0f))
 			return;
 
-		m_ViewportRectX = x;
-		m_ViewportRectY = y;
-		m_ViewportRectW = w;
-		m_ViewportRectH = h;
+		m_ViewportRectRateX = x;
+		m_ViewportRectRateY = y;
+		m_ViewportRectRateWidth = width;
+		m_ViewportRectRateHeight = height;
 	}
 
 	D3D11_VIEWPORT Camera::GetViewport()
 	{
 		D3D11_VIEWPORT viewport;
-
-		viewport.TopLeftX = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectX;
-		viewport.TopLeftY = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectY;
-		viewport.Width = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectW;
-		viewport.Height = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectH;
+		viewport.TopLeftX = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectRateX;
+		viewport.TopLeftY = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectRateY;
+		viewport.Width = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectRateWidth;
+		viewport.Height = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectRateHeight;
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 

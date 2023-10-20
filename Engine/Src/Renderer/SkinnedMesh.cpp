@@ -1,6 +1,6 @@
 #include "DivePch.h"
 #include "SkinnedMesh.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {

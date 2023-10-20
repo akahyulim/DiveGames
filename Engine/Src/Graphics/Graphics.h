@@ -32,7 +32,7 @@ namespace Dive
 		static std::wstring GetWindowTitle();
 		static void SetWindowTitle(const std::wstring& title);
 
-		static void GetWindowSize(int& width, int& height);
+		static void GetWindowSize(int* const pOutWidth, int* const pOutHeight);
 		static DirectX::XMINT2 GetWindowSize();
 		static int GetWindowWidth();
 		static int GetWindowHeight();
@@ -43,8 +43,7 @@ namespace Dive
 
 		static bool UpdateSwapChain(uint32_t width = 0, uint32_t height = 0);
 
-		static bool BeginFrame();
-		static void EndFrame();
+		static void Present();
 
 		static void ClearViews(uint32_t target, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil);
 		

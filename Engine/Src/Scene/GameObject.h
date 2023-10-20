@@ -15,6 +15,7 @@ namespace Dive
 		GameObject(const std::string& name = "GameObject");
 		~GameObject() override;
 
+		// start, stop 그리고 preUpdate 추가?
 		void Update();
 
 		bool LoadFromFile(const std::string& name);

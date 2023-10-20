@@ -2,7 +2,7 @@
 #include "Texture.h"
 #include "Graphics.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
@@ -39,7 +39,7 @@ namespace Dive
 
 	void Texture::UpdateMipLevels()
 	{
-		DV_ASSERT(Graphics::IsInitialized ());
+		DV_CORE_ASSERT(Graphics::IsInitialized ());
 
 		if (m_pShaderResourceView)
 		{

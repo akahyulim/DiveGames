@@ -3,8 +3,8 @@
 
 namespace Dive
 {
-	static const uint64_t FIRST_ID = 0x1;
-	static const uint64_t LAST_ID = 0xffffffffffffffff;
+	static constexpr uint64_t FIRST_ID = 0x1;
+	static constexpr uint64_t LAST_ID = 0xffffffffffffffff;
 
 	uint64_t ResourceCache::m_CurResourceID = FIRST_ID;
 	std::unordered_map<uint64_t, Resource*> ResourceCache::m_Resources;
@@ -13,7 +13,7 @@ namespace Dive
 	{
 		// AssetImporter 추가?
 
-		DV_CORE_TRACE("ResourceCache 초기화에 성공하였습니다.");
+		DV_CORE_INFO("ResourceCache 초기화에 성공하였습니다.");
 
 		return true;
 	}
@@ -24,7 +24,7 @@ namespace Dive
 			DV_DELETE(resource.second);
 		m_Resources.clear();
 
-		DV_CORE_TRACE("ResoruceCache 종료에 성공하였습니다.");
+		DV_CORE_INFO("ResoruceCache 종료에 성공하였습니다.");
 	}
 
 	void ResourceCache::RemoveByID(uint64_t id)
@@ -34,7 +34,7 @@ namespace Dive
 			DV_DELETE(it->second);
 		m_Resources.erase(it);
 
-		DV_CORE_TRACE("Resource ID({0:d}) 객체를 제거하였습니다.", id);
+		DV_CORE_INFO("Resource ID({0:d}) 객체를 제거하였습니다.", id);
 	}
 
 	bool ResourceCache::IsCachedByID(uint64_t id)

@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "Mesh.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {

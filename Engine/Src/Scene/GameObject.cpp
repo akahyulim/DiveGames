@@ -2,16 +2,16 @@
 #include "GameObject.h"
 #include "Components/Transform.h"
 #include "Core/CoreDefs.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
 	GameObject::GameObject(const std::string& name)
-		: m_bActive(true),
-		m_bMarkedTarget(false),
-		m_pTransform(nullptr)
+		: Object(name) 
+		, m_bActive(true)
+		, m_bMarkedTarget(false)
+		, m_pTransform(nullptr)
 	{
-		SetName(name);
 		m_pTransform = AddComponent<Transform>();
 	}
 

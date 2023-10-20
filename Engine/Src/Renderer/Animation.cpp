@@ -1,6 +1,6 @@
 #include "DivePch.h"
 #include "Animation.h"
-#include "IO/Log.h"
+#include "Core/Log.h"
 
 namespace Dive
 {
