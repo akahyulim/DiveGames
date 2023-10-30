@@ -8,6 +8,7 @@
 
 namespace Dive
 {
+	// 스파르탄의 최신 버전에서는 기존 메시의 기능을 합쳐 메시라 이름을 변경했다.
 	Model::Model()
 		: Resource(eResourceType::Model),
 		m_pRootGameObject(nullptr),
@@ -43,11 +44,25 @@ namespace Dive
 
 	bool Model::LoadFromFile(const std::string& filePath)
 	{
+		// 스파르탄의 경우 
+		// 엔진 파일 확장자일 경우 리소스 파일 경로 설정, 인덱스 읽어오기, 버텍스 읽어오기 순서로 진행한 후
+		// 바운딩 박스 계산, 크기 설정 후 버퍼를 생성한다.
+		// 반면 외부 파일 확장자일 경우 이 곳에서 모델 임포터의 로드 함수를 호출한다. 
+		
 		return false;
 	}
 
+	// 임시
+	// 프리팹은 다양한 컴포넌트로 구성된 게임오브젝트를 파일화하는 것이다.
+	// 프리팹을 인스턴화하여 동일한 형태의 게임오브젝트를 사용할 수 있다.
 	bool Model::SaveToFile(const std::string& filePath)
 	{
+		// 스파르탄의 경우
+		// 리소스 파일 경로, 인덱스들, 버텍스들만 파일에 저장한다.
+
+		// 리소스캐시에서 캐시 과정 중 호출된다.
+		// 이게 좀 복잡한데 리소스캐시에서 메시 로드를 호출하고 다시 메시 로드에서 모델임포터를 호출한다.
+		
 		return false;
 	}
 	

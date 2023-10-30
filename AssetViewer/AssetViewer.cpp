@@ -417,9 +417,12 @@ void AssetViewer::OnPostUpdate(const Dive::Event& evnt)
 				const std::string filePath = FileOpen("Assets/Models", "외부 모델 파일\0*.obj;*.dae;*.fbx;*.gltf\0");
 				if (!filePath.empty())
 				{
+					// 순서가 잘못됐다.
+					// 임포터로부터 로드하는 것이 아니라
+					// 모델객체의 로드 함수에 경로를 전달하면 내부에서 임포터로 모델 게임 오브젝트를 구성한 후 리턴토록 해야한다.
 					if (m_AssetImporter.Load(filePath))
 					{
-						m_pLoadedModel = m_AssetImporter.GetModel()->GetRootGameObject();
+						m_pLoadedModel = m_AssetImporter.GetImportedModel()->GetRootGameObject();
 						m_pSelectedNode = nullptr;
 						m_MeshRenderers.clear();
 						bOpen = true;

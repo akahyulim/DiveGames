@@ -1,5 +1,14 @@
 #include "AssetImporter.h"
 
+// 현재 구현은 스파르탄 구버전 모델이다.
+// 파싱 과정에서 계층구조는 게임 오브젝트의 트랜스폼 컴포넌트를 통해
+// 메시는 모델을 통해 만들고
+// 게임 오브젝트의 메시 렌더러 컴포넌트에 메시를 저장함으로서
+// 하나의 모델 게임 오브젝트가 구성되는 것이다.
+// 이때 모델이 모델 게임 오브젝트의 루트 노드를 관리한다.
+// 문제는 이 구현의 경우 모델 게임 오브젝트의 복사 구현이 필요하고
+// 시리얼라이즈 역시 복잡해진다.
+
 static DirectX::XMFLOAT3 ConvertXMFLOAT3(const aiVector3D& vec)
 {
     return DirectX::XMFLOAT3(vec.x, vec.y, vec.z);
@@ -121,15 +130,21 @@ AssetImporter::AssetImporter()
     m_FileName(),
 	m_ModelName(),
 	m_pScene(nullptr),
-	m_pModel(nullptr)
+	m_pImportedModel(nullptr)
 {
 }
 
 bool AssetImporter::Load(const std::string& fileName)
 {
-	if (Dive::FileSystem::FileExists(fileName))
-		return LoadExternalFile(fileName);
-	
+    if (Dive::FileSystem::FileExists(fileName))
+    {
+        m_FileDirectory = fileName.substr(0, fileName.find_last_of("/\\"));
+        m_FileName = fileName;
+        m_ModelName = Dive::FileSystem::GetFileName(fileName);
+
+        return LoadExternalFile(fileName);
+    }
+
 	return false;
 }
 
@@ -154,25 +169,21 @@ bool AssetImporter::LoadExternalFile(const std::string& fileName)
         return false;
     }
 
-    m_FileDirectory = fileName.substr(0, fileName.find_last_of("/\\"));
-    m_FileName = fileName;
-    m_ModelName = Dive::FileSystem::GetFileName(fileName);
-
-    m_pModel = new Dive::Model;
-    m_pModel->SetName(m_ModelName);
+    m_pImportedModel = new Dive::Model;
+    m_pImportedModel->SetName(m_ModelName);
 
     processNode(m_pScene->mRootNode, nullptr);
 
     processAnimation();
     // skeleton으로부터 bones를 가져온 후 BoneRenderer를 만들고 SkinnedMeshRenderer에 bones를 추가하는 과정
     {
-        auto pRootObject = m_pModel->GetRootGameObject();
-        auto skeleton = m_pModel->GetSkeleton();
+        auto pRootObject = m_pImportedModel->GetRootGameObject();
+        auto skeleton = m_pImportedModel->GetSkeleton();
         const auto& boneInfos = skeleton.GetBones();
 
         // rootBone 검색 후 저장
         auto pRootBone = FindRootBone(pRootObject, boneInfos);
-        m_pModel->SetRootBone(pRootBone);
+        m_pImportedModel->SetRootBone(pRootBone);
 
         // BoneRenderer를 모두 추가
         for (uint32_t i = 0; i < static_cast<uint32_t>(boneInfos.size()); ++i)
@@ -208,7 +219,7 @@ bool AssetImporter::LoadExternalFile(const std::string& fileName)
 
         func(pRootObject);
     }
-    m_pModel->BuildMeshBuffers();
+    m_pImportedModel->BuildMeshBuffers();
 
 	return true;
 }
@@ -220,7 +231,7 @@ bool AssetImporter::LoadEngineFile(const std::string& fileName)
 
 void AssetImporter::Clear()
 {
-    DV_DELETE(m_pModel);
+    DV_DELETE(m_pImportedModel);
 }
 
 void AssetImporter::processNode(aiNode* pNode, Dive::Transform* pParent)
@@ -232,7 +243,7 @@ void AssetImporter::processNode(aiNode* pNode, Dive::Transform* pParent)
     pNodeTransform->SetLocalMatrix(ConvertXMFLOAT4X4(pNode->mTransformation));
 
     if (!pParent)
-        m_pModel->SetRootGameObject(pNodeObject);
+        m_pImportedModel->SetRootGameObject(pNodeObject);
 
     for (uint32_t i = 0; i < pNode->mNumMeshes; ++i)
     {
@@ -320,7 +331,12 @@ void AssetImporter::processMesh(aiMesh* pMesh, Dive::GameObject* pMeshNodeObject
             }
         }
 
-        auto pStaticMesh = m_pModel->InsertStaticMesh(new Dive::StaticMesh(pMesh->mName.C_Str(), vertices, indices));
+        // 최신버전 스파르탄의 경우 메시를 하나만 다룬다.
+        // 렌더러블은 자신이 그릴 메시의 오프셋과 개수를 저장하는 방식이다.
+        // 이렇게 구현할 경우 씬을 로드하면 모든 오브젝트가 하나의 메시로 만들어져 버린다.
+        // 그리고 스태틱과 스킨드 메시를 구분하여 관리하기도 힘들어진다.
+        // 하지만 모델임포터에서 씬을 로드하는게 과연 옳은 사용일까?
+        auto pStaticMesh = m_pImportedModel->InsertStaticMesh(new Dive::StaticMesh(pMesh->mName.C_Str(), vertices, indices));
         auto pMeshRenderer = pMeshNodeObject->AddComponent<Dive::MeshRenderer>();
         pMeshRenderer->SetMesh(pStaticMesh);
         pMeshRenderer->SetMaterial(loadMaterial(pMesh));
@@ -389,7 +405,7 @@ void AssetImporter::processMesh(aiMesh* pMesh, Dive::GameObject* pMeshNodeObject
         bones.resize(pMesh->mNumBones);
         // 현재 스켈레톤이 두 개 이상일 수 있지만 model에서 하나만 관리한다.
         // 따라서 아에 참고문서처럼 model에서 하나만 관리토록 할 생각이다.
-        auto& boneInfoMap = m_pModel->GetBoneInfoMap();
+        auto& boneInfoMap = m_pImportedModel->GetBoneInfoMap();
 
         // 현재 메시가 사용하는 뼈대의 정보를 모아서 관리하는 것이다.
         for (uint32_t boneIndex = 0; boneIndex < pMesh->mNumBones; ++boneIndex)
@@ -409,10 +425,10 @@ void AssetImporter::processMesh(aiMesh* pMesh, Dive::GameObject* pMeshNodeObject
                 boneInfoMap[boneName] = newBoneInfo;
             }
         }
-        m_pModel->SetSkeleton(skeleton);
+        m_pImportedModel->SetSkeleton(skeleton);
 
         auto pSkinnedMesh = new Dive::SkinnedMesh(pMeshNodeObject->GetName(), vertices, indices);
-        m_pModel->InsertSkinnedMesh(pSkinnedMesh);
+        m_pImportedModel->InsertSkinnedMesh(pSkinnedMesh);
 
         auto pMeshRenderer = pMeshNodeObject->AddComponent<Dive::SkinnedMeshRenderer>();
         pMeshRenderer->SetMesh(pSkinnedMesh);
