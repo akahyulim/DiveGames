@@ -43,7 +43,7 @@ PS_GBUFFER MainPS(PixelInput input)
 	PS_GBUFFER output;
 
 	float4 diffuse = DiffuseMap.Sample(DiffuseMapSampler, input.tex);
-	diffuse *= diffuse;	// ¿Ö Á¦°ö?
+    //diffuse *= diffuse; // ¿Ö Á¦°ö?
 	output.colorSpecIntensity = diffuse;
 
 	output.normal = float4(input.normal * 0.5 + 0.5, 0.0);

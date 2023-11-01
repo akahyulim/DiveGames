@@ -52,15 +52,6 @@ namespace Dive
 		return true;
 	}
 
-	bool Transform::SaveToYAML(YAML::Emitter& out)
-	{
-		//out << YAML::BeginMap;
-		out << YAML::Key << "Transform" << YAML::Value << GetID();
-		//out << YAML::EndMap;
-
-		return true;
-	}
-
 	// 좀 애매하다.
 	void Transform::Update()
 	{

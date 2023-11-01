@@ -7,7 +7,10 @@ namespace Dive
 	class Application
 	{
 	public:
-		Application() = default;
+		// 생성자는 매개인자를 받도록 하고 디폴트 값을 넣어놓는 편이 나을 것 같다.
+		// 매개인자는 일단 이름과 윈도우 프로퍼티(크기, 전체 화면 유무, 싱크 유무) 정도면 된다.
+		// 스파키의 경우 윈도우 프로퍼티를 윈도우와 D3DContext 객체에 전부 전달 및 저장하여 사용한다.
+		Application() = default; 
 		virtual ~Application();
 
 		// 엔진 생성 및 초기화 이전에 호출

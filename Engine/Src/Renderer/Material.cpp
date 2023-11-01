@@ -3,7 +3,6 @@
 #include "Graphics/Texture2D.h"
 #include "Resource/ResourceCache.h"
 #include "IO/FileStream.h"
-#include "IO/ConvertYAML.h"
 #include "Core/Log.h"
 
 namespace Dive
@@ -22,29 +21,6 @@ namespace Dive
 
 	bool Material::LoadFromFile(const std::string& filePath)
 	{
-        auto nodes = YAML::LoadAllFromFile(filePath);
-        if (nodes.empty())
-        {
-            DV_CORE_WARN("{:s}가 존재하지 않습니다.", filePath);
-            return false;
-        }
-
-        for (auto node : nodes)
-        {
-            if (node["Material"])
-            {
-                auto mat = node["Material"];
-                auto albedoMap = mat["DiffuseMap"].as<std::string>();
-                auto diffuseColor = mat["DiffuseColor"].as<DirectX::XMFLOAT4>();
-
-                AddTexture(eTextureUnit::Diffuse, albedoMap);
-                SetDiffuseColor(diffuseColor);
-            }
-        }
-		
-        SetFilePath(filePath);
-        SetName(FileSystem::GetFileName(filePath));
-
 		return true;
 	}
 

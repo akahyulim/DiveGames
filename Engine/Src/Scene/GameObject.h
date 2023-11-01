@@ -1,7 +1,6 @@
 #pragma once
 #include "Core/Object.h"
 #include "Scene/Scene.h"
-#include <yaml-cpp/yaml.h>
 
 namespace Dive
 {
@@ -20,8 +19,6 @@ namespace Dive
 
 		bool LoadFromFile(const std::string& name);
 		bool SaveToFile(const std::string& name);
-		bool SaveToYAML(YAML::Emitter& out);
-
 
 		template<class T>
 		T* AddComponent(uint64_t id = 0)

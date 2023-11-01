@@ -6,8 +6,9 @@ namespace Dive
 {
 	class Texture;
 
-	// 유니티는 Material에서 Shader를 선택할 수 있으며,
-	// 기본적으로 Standard(pbs 포함)와 Legacy 두 빌트인 셰이더를 제공한다.
+	// 머티리얼이 셰이더를 가지는건 일반적인 구현인듯 하다.
+	// 문제는 머티리얼을 누가 가지느냐이다.
+	// 기본적으로 메시렌더러와 메시가 1:1 매칭이 되지만 아닐 경우 존재하기 때문이다.
 	class Material : public Resource
 	{
 	public:
