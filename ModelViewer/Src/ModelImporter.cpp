@@ -1,4 +1,4 @@
-#include "AssetImporter.h"
+#include "ModelImporter.h"
 
 // 현재 구현은 스파르탄 구버전 모델이다.
 // 파싱 과정에서 계층구조는 게임 오브젝트의 트랜스폼 컴포넌트를 통해
@@ -125,16 +125,16 @@ static Dive::GameObject* FindRootBone(Dive::GameObject* pNodeObject, const std::
     return nullptr;
 }
 
-AssetImporter::AssetImporter()
-	: m_FileDirectory(),
+ModelImporter::ModelImporter()
+    : m_FileDirectory(),
     m_FileName(),
-	m_ModelName(),
-	m_pScene(nullptr),
-	m_pImportedModel(nullptr)
+    m_ModelName(),
+    m_pScene(nullptr),
+    m_pImportedModel(nullptr)
 {
 }
 
-bool AssetImporter::Load(const std::string& fileName)
+bool ModelImporter::Load(const std::string& fileName)
 {
     if (Dive::FileSystem::FileExists(fileName))
     {
@@ -145,10 +145,10 @@ bool AssetImporter::Load(const std::string& fileName)
         return LoadExternalFile(fileName);
     }
 
-	return false;
+    return false;
 }
 
-bool AssetImporter::LoadExternalFile(const std::string& fileName)
+bool ModelImporter::LoadExternalFile(const std::string& fileName)
 {
     Assimp::Importer importer;
 
@@ -200,41 +200,41 @@ bool AssetImporter::LoadExternalFile(const std::string& fileName)
         // SkinnedMeshRenderer에 rootBone 저장
         // Animaition에 TestAnim 저장
         std::function<void(Dive::GameObject*)> func = [&func, &pRootBone](Dive::GameObject* pNode)
-        {
-            if (!pNode)
-                return;
+            {
+                if (!pNode)
+                    return;
 
-            auto pSkinnedMeshRenderer = pNode->GetComponent<Dive::SkinnedMeshRenderer>();
-            if (pSkinnedMeshRenderer)
-                pSkinnedMeshRenderer->SetRootBone(pRootBone);
+                auto pSkinnedMeshRenderer = pNode->GetComponent<Dive::SkinnedMeshRenderer>();
+                if (pSkinnedMeshRenderer)
+                    pSkinnedMeshRenderer->SetRootBone(pRootBone);
 
-            auto pAnimator = pNode->GetComponent<Dive::Animator>();
-            if (pAnimator)
-                pAnimator->SetAnimation(Dive::ResourceCache::GetResourceByName<Dive::Animation>("TestAnim"));
+                auto pAnimator = pNode->GetComponent<Dive::Animator>();
+                if (pAnimator)
+                    pAnimator->SetAnimation(Dive::ResourceCache::GetResourceByName<Dive::Animation>("TestAnim"));
 
-            auto pTransform = pNode->GetTransform();
-            for (auto pChild : pTransform->GetChildren())
-                func(pChild->GetGameObject());
-        };
+                auto pTransform = pNode->GetTransform();
+                for (auto pChild : pTransform->GetChildren())
+                    func(pChild->GetGameObject());
+            };
 
         func(pRootObject);
     }
     m_pImportedModel->BuildMeshBuffers();
 
-	return true;
+    return true;
 }
 
-bool AssetImporter::LoadEngineFile(const std::string& fileName)
+bool ModelImporter::LoadEngineFile(const std::string& fileName)
 {
-	return false;
+    return false;
 }
 
-void AssetImporter::Clear()
+void ModelImporter::Clear()
 {
     DV_DELETE(m_pImportedModel);
 }
 
-void AssetImporter::processNode(aiNode* pNode, Dive::Transform* pParent)
+void ModelImporter::processNode(aiNode* pNode, Dive::Transform* pParent)
 {
     auto pNodeObject = Dive::Scene::CreateGameObject();
     pNodeObject->SetName(pParent ? pNode->mName.data : m_ModelName);
@@ -256,7 +256,7 @@ void AssetImporter::processNode(aiNode* pNode, Dive::Transform* pParent)
             pMeshNodeObject = Dive::Scene::CreateGameObject();
             pMeshNodeObject->GetTransform()->SetParent(pNodeObject->GetTransform()->GetParent());
             pMeshNodeObject->GetTransform()->SetLocalMatrix(ConvertXMFLOAT4X4(pNode->mTransformation));
-            
+
             // 동일한 이름을 가지는 경우가 있어 인덱스를 추가
             // 이전 이름들과 비교하는 방법도 시도해보자.
             meshName += "_" + std::to_string(i + 1);
@@ -270,7 +270,7 @@ void AssetImporter::processNode(aiNode* pNode, Dive::Transform* pParent)
         processNode(pNode->mChildren[i], pNodeTransform);
 }
 
-void AssetImporter::processMesh(aiMesh* pMesh, Dive::GameObject* pMeshNodeObject)
+void ModelImporter::processMesh(aiMesh* pMesh, Dive::GameObject* pMeshNodeObject)
 {
     // indices
     uint32_t numIndices = pMesh->mNumFaces * 3;
@@ -430,6 +430,7 @@ void AssetImporter::processMesh(aiMesh* pMesh, Dive::GameObject* pMeshNodeObject
         auto pSkinnedMesh = new Dive::SkinnedMesh(pMeshNodeObject->GetName(), vertices, indices);
         m_pImportedModel->InsertSkinnedMesh(pSkinnedMesh);
 
+        // 이부분에서 오류가 난 적이 있다. 하지만 특별한 조치없이 고쳐졌다. 찝찝하다.
         auto pMeshRenderer = pMeshNodeObject->AddComponent<Dive::SkinnedMeshRenderer>();
         pMeshRenderer->SetMesh(pSkinnedMesh);
         pMeshRenderer->SetMaterial(loadMaterial(pMesh));
@@ -444,11 +445,14 @@ void AssetImporter::processMesh(aiMesh* pMesh, Dive::GameObject* pMeshNodeObject
     }
 }
 
-Dive::Material* AssetImporter::loadMaterial(aiMesh* pMesh)
+Dive::Material* ModelImporter::loadMaterial(aiMesh* pMesh)
 {
     auto pMaterial = m_pScene->mMaterials[pMesh->mMaterialIndex];
     if (!pMaterial)
+    {
+        // 그래픽 혹은 렌더러에서 생성한 디폴트 머티리얼을 가져와야 한다.
         return nullptr;
+    }
 
     aiString name;
     aiGetMaterialString(pMaterial, AI_MATKEY_NAME, &name);
@@ -489,7 +493,7 @@ Dive::Material* AssetImporter::loadMaterial(aiMesh* pMesh)
 
 // 예제에서는 ID3D11ShaderResourceView를 생성한 후 리턴한다.
 // https://github.com/assimp/assimp/blob/master/samples/SimpleTexturedDirectx11/SimpleTexturedDirectx11/ModelLoader.cpp
-Dive::Texture2D* AssetImporter::loadEmbeddedTexture(const aiTexture* pEmbeddedTexture)
+Dive::Texture2D* ModelImporter::loadEmbeddedTexture(const aiTexture* pEmbeddedTexture)
 {
     auto pDvTexture = new Dive::Texture2D();
 
@@ -503,7 +507,7 @@ Dive::Texture2D* AssetImporter::loadEmbeddedTexture(const aiTexture* pEmbeddedTe
     const size_t size = pEmbeddedTexture->mWidth;
     const void* pSrcData = (const void*)pEmbeddedTexture->pcData;
     Dive::Image img;
-    if(!img.LoadFromMemory(Dive::FileSystem::GetExtension(pEmbeddedTexture->mFilename.C_Str()), size, pSrcData))
+    if (!img.LoadFromMemory(Dive::FileSystem::GetExtension(pEmbeddedTexture->mFilename.C_Str()), size, pSrcData))
         return nullptr;
     pDvTexture->SetImage(&img);
 
@@ -514,7 +518,7 @@ Dive::Texture2D* AssetImporter::loadEmbeddedTexture(const aiTexture* pEmbeddedTe
     return pDvTexture;
 }
 
-void AssetImporter::processAnimation()
+void ModelImporter::processAnimation()
 {
     auto numAnims = m_pScene->mNumAnimations;
     for (uint32_t i = 0; i < numAnims; ++i)

@@ -15,7 +15,7 @@ namespace Dive
 	enum class eEventType
 	{
 		// Core
-		PreUpdate, Update, PostUpdate,
+		PreUpdate, PostUpdate, PreRender, PostRender,
 
 		// Graphics
 		WindowEvent, ScreenMode,

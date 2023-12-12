@@ -11,11 +11,11 @@
 // 일단 특성상 static이 어울린다.
 // 주 기능은 외부 파일을 엔진 파일로 변환하는 것이다.
 // model, material, animation 세 가지로 구분하여 파일화시켜야 한다.
-class AssetImporter
+class ModelImporter
 {
 public:
-	AssetImporter();
-	~AssetImporter() = default;
+	ModelImporter();
+	~ModelImporter() = default;
 
 	bool Load(const std::string& fileName);
 	bool LoadExternalFile(const std::string& fileName);

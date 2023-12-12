@@ -32,7 +32,10 @@ namespace Dive
 	{
 	}
 
-	// 매개변수로 primitive topology 정도는 받아도 될 것 같다.
+	// 현재 렌더러의 업데이트에서 이 함수를 호출하고 있다.
+	// 반면 스파키는 씬에서 엔터티로부터 메시를 획득한 후 메시의 렌더 함수를 호출한다.
+	// 어찌됐든 둘 다 이 메시렌더러라는 이름과는 어울리지 않는다...
+	// 일단 현재 목표는 렌더러에서 레이어를 어떻게 해보는 것이다.
 	void MeshRenderer::Draw()
 	{
 		// Material
@@ -60,7 +63,7 @@ namespace Dive
 		{
 			auto pBuffer = Renderer::GetModelVertexShaderBuffer();
 			auto pMappedData = static_cast<ModelVertexShaderBuffer*>(pBuffer->Map());
-			pMappedData->worldMatrix = DirectX::XMMatrixTranspose(m_pGameObject->GetTransform()->GetMatrix());
+			pMappedData->worldMatrix = DirectX::XMMatrixTranspose(m_pGameObject->GetTransform()->GetWorldMatrix());
 			pBuffer->Unmap();
 			Graphics::SetConstantBuffer(1, eShaderType::VertexShader, pBuffer);
 

@@ -24,7 +24,7 @@ namespace Dive
 		if (!ResourceCache::Initialize())
 			return false;
 
-		if (!Input::Initialize(Graphics::GetWindowInstance(), Graphics::GetWindowHandle()))
+		if (!Input::Initialize())
 			return false;
 
 		if (!Scene::Initialize())
@@ -48,24 +48,29 @@ namespace Dive
 	
 	void Engine::Tick()
 	{
-		// pre update
-		FIRE_EVENT(PreUpdateEvent());
-
-		// update
 		if (!Graphics::RunWindow())
 		{
 			s_bExiting = true;
 			return;
 		}
-		Timer::Update();
-		Input::Update();
-		Scene::Update();
-		Renderer::Update();
-		FIRE_EVENT(UpdateEvent());
 
-		// post update
-		Graphics::Present();
-		FIRE_EVENT(PostUpdateEvent());
+		// update
+		{	
+			FIRE_EVENT(PreUpdateEvent());
+			Timer::Update();
+			Input::Update();
+			Scene::Update();
+			Renderer::Update();
+			FIRE_EVENT(PostUpdateEvent());
+		}
+
+		// render
+		{
+			FIRE_EVENT(PreRenderEvent());
+			Renderer::Render();
+			FIRE_EVENT(PostRenderEvent());	
+			Graphics::Present();
+		}
 	}
 
 	void Engine::Exit()

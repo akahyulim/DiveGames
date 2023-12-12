@@ -82,7 +82,7 @@ namespace Dive
 
 			auto pBuffer = Renderer::GetModelVertexShaderBuffer();
 			auto pMappedData = static_cast<ModelVertexShaderBuffer*>(pBuffer->Map());
-			pMappedData->worldMatrix = DirectX::XMMatrixTranspose(m_pGameObject->GetTransform()->GetMatrix());
+			pMappedData->worldMatrix = DirectX::XMMatrixTranspose(m_pGameObject->GetTransform()->GetWorldMatrix());
 			// 1. XMMatrixTranspose()때문에 memcpy 같은걸 못쓴다.
 			// 2. XMMATRIX와 XMFLOAT4의 변환이 걸리는데, calcuBoneTransform()에서 계산할때 어차피 타입이 수시로 바뀐다.
 			for (uint32_t i = 0; i < static_cast<uint32_t>(m_SkinMatrices.size()); ++i)

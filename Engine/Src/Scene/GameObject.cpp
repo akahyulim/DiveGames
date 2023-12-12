@@ -37,25 +37,4 @@ namespace Dive
 		for (auto* pComponent : m_Components)
 			pComponent->Update();
 	}
-
-	bool GameObject::LoadFromFile(const std::string& name)
-	{
-		return false;
-	}
-	
-	bool GameObject::SaveToFile(const std::string& name)
-	{
-		// game object 직렬화
-		DV_CORE_INFO("Save GameObject: {0:s}, {1:d}", GetName(), GetID());
-
-		// component 직렬화
-		if (m_pTransform)
-			m_pTransform->SaveToFile(name);
-
-		// 자식들 직렬화
-		for (Transform* pChild : m_pTransform->GetChildren())
-			pChild->GetGameObject()->SaveToFile(name);
-
-		return true;
-	}
 }

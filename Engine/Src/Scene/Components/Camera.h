@@ -4,14 +4,23 @@
 
 namespace Dive
 {
+	class Skydome;
+
 	class Camera : public Component
 	{
 	public:
 		Camera(GameObject* pGameObject);
 		~Camera() override;
 
+		bool IsInViewFrustum(const DirectX::XMFLOAT3& center, const DirectX::XMFLOAT3& extents) const;
+
+		DirectX::XMMATRIX GetWorldMatrix() const;
+
+		// 유니티에서는 WorldToCameraMatrix
+		// 반대인 CameraToWorldMatrix도 존재한다.
 		DirectX::XMMATRIX GetViewMatrix() const;
 
+		// 이건 유니티에서 ProjectionMatrix
 		DirectX::XMMATRIX GetProjectionMatrix() const;
 		DirectX::XMMATRIX GetOrthographicProjMatrix() const;
 		DirectX::XMMATRIX GetPerspectiveProjMatrix() const;
@@ -44,8 +53,29 @@ namespace Dive
 		eRenderingPath GetRenderingPath() const { return m_RenderingPath; }
 		void SetRenderingPath(eRenderingPath path) { m_RenderingPath = path; }
 
+		float GetMoveSpeed() const { return m_MoveSpeed; }
+		void SetMoveSpeed(float speed) { m_MoveSpeed = speed; }
+
+		float GetRotateSpeed() const { return m_RotateSpeed; }
+		void SetRotateSpeed(float speed) { m_RotateSpeed = speed; }
+
+		// temp : 유니티를 따라하긴 했는데 굳이 여기에서 관리해야 하나...?
+		// Renderer 혹은 RendererSettings 같은걸 만들자.
+		void SetSkydome(Skydome* pSkydome) { m_pSkydome = pSkydome; }
+		Skydome* GetSkydome() const { return m_pSkydome; }
+
+		// 유니티 api에는 특정 포인트를 특정 좌표계로 계산해주는 함수들이 있다.
+		// ScreenPointToRay
+		// ScreenToWorldPoint
+		// ScreenToViewportPoint
+		// ViewportPointToRay
+		// ViewportToScreenPoint
+		// ViewportToWorldPoint
+		// WorldToScreenPoint
+		// WorldToViewportPoint
+
 	private: 
-	private:
+	protected:
 		bool m_bOrthographic;
 		
 		float m_ViewWidth;
@@ -63,6 +93,11 @@ namespace Dive
 		float m_ViewportRectRateWidth;
 		float m_ViewportRectRateHeight;
 
+		float m_MoveSpeed;
+		float m_RotateSpeed;
+
 		eRenderingPath m_RenderingPath;
+
+		Skydome* m_pSkydome;
 	};
 }

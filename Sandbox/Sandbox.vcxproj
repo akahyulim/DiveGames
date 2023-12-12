@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{467caa1e-5201-4fdb-967a-50c9e741c511}</ProjectGuid>
-    <RootNamespace>AssetViewer</RootNamespace>
+    <ProjectGuid>{820a4474-f69d-4ed9-ae9f-dab0fcbdad8d}</ProjectGuid>
+    <RootNamespace>Sandbox</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,19 +70,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)\DiveGames\</OutDir>
     <TargetName>$(ProjectName)_d</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -125,8 +115,6 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>
-      </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,29 +134,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\External\include\imgui-docking\imgui.cpp" />
-    <ClCompile Include="..\External\include\imgui-docking\imgui_demo.cpp" />
-    <ClCompile Include="..\External\include\imgui-docking\imgui_draw.cpp" />
-    <ClCompile Include="..\External\include\imgui-docking\imgui_impl_dx11.cpp" />
-    <ClCompile Include="..\External\include\imgui-docking\imgui_impl_win32.cpp" />
-    <ClCompile Include="..\External\include\imgui-docking\imgui_stdlib.cpp" />
-    <ClCompile Include="..\External\include\imgui-docking\imgui_tables.cpp" />
-    <ClCompile Include="..\External\include\imgui-docking\imgui_widgets.cpp" />
-    <ClCompile Include="AssetViewer.cpp" />
-    <ClCompile Include="AssetImporter.cpp" />
+    <ClCompile Include="Sandbox.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\External\include\imgui-docking\imconfig.h" />
-    <ClInclude Include="..\External\include\imgui-docking\imgui.h" />
-    <ClInclude Include="..\External\include\imgui-docking\imgui_impl_dx11.h" />
-    <ClInclude Include="..\External\include\imgui-docking\imgui_impl_win32.h" />
-    <ClInclude Include="..\External\include\imgui-docking\imgui_internal.h" />
-    <ClInclude Include="..\External\include\imgui-docking\imgui_stdlib.h" />
-    <ClInclude Include="..\External\include\imgui-docking\imstb_rectpack.h" />
-    <ClInclude Include="..\External\include\imgui-docking\imstb_textedit.h" />
-    <ClInclude Include="..\External\include\imgui-docking\imstb_truetype.h" />
-    <ClInclude Include="AssetViewer.h" />
-    <ClInclude Include="AssetImporter.h" />
+    <ClInclude Include="Sandbox.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">

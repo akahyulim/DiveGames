@@ -12,12 +12,12 @@
 // CameraVS : 여기에 cViewProj로 view와 proj의 곱을 저장하는 듯 하다.
 cbuffer CameraVS : register(b0)
 {
-//	float3 cbCameraPosPS;
+	//float3 cbCameraPosVS;
+	matrix cbCameraMatrixVS;
 	matrix cbViewMatrixVS;
 	matrix cbProjMatrixVS;
-
-
 }
+
 // LightVS
 // ObjectVS : 여기에 worldTransform이 cModel이름으로 전달된다.
 cbuffer ObjectVS : register(b1)

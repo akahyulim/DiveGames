@@ -5,7 +5,7 @@ namespace Dive
 	class Input
 	{
 	public:
-		static bool Initialize(HINSTANCE hInstance, HWND hWnd);
+		static bool Initialize();
 		static void Shutdown();
 
 		static void Update();
@@ -21,5 +21,12 @@ namespace Dive
 		static bool MouseButtonDown(int btn);
 		static bool MouseButtonUp(int btn);
 		static bool MouseButtonPress(int btn);
+
+		static const DirectX::XMFLOAT2& GetMouseMoveDelta();
+			
+		static const DirectX::XMFLOAT2& GetMousePosition();
+
+		static bool GetMouseIsInValidRect();
+		static void SetMouseIsInValidRect(bool valid);
 	};
 }

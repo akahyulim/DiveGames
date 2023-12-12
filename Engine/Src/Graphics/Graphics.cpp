@@ -100,7 +100,7 @@ namespace Dive
 		::DestroyWindow(s_hWnd);
 		::UnregisterClassW(L"Dive", s_hInstance);
 
-		DV_CORE_INFO("Graphics 종료에 성공하였습니다.");
+		DV_CORE_INFO("Graphics 종료에 성공하였습니다."); 
 	}
 
 	bool Graphics::WindowCreate()

@@ -55,10 +55,11 @@ namespace Dive
 	}
 
 	// layer를 사용한다면 이건 필요없어진다.
+	// -> why?
 	void Scene::Update()
 	{
-		for (auto pGameObject : s_GameObjects)
-			pGameObject.second->Update();
+		for (const auto& gameObjects : s_GameObjects)
+			gameObjects.second->Update();
 
 		// 스파르탄 최신버전에선 이 방법이 아니다.
 		if (s_bDirty)
@@ -80,18 +81,6 @@ namespace Dive
 
 		// 스파르탄은 resolved가 되면 WorldResolved라는 이벤트에 entity 벡터를 실어 Renderer로 보낸다.
 		// 하지만 이 경우 하나의 World == View만 관리가 가능하다.
-	}
-
-	bool Scene::LoadFromFile(const std::string& filePath)
-	{
-		DV_CORE_INFO("Scene::LoadFromFile() - {:s}", filePath);
-		return true;
-	}
-
-	bool Scene::SaveToFile(const std::string& filePath)
-	{
-		DV_CORE_INFO("Scene::SaveToFile() - {:s}", filePath);
-		return true;
 	}
 
 	std::string Scene::GetName()

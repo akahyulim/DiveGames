@@ -6,7 +6,8 @@ namespace Dive
 {
 	class Component;
 	class Transform;
-	class Drawable;
+	//class Drawable;
+	//class SkinnedMeshRenderer;
 
 	class GameObject : public Object
 	{
@@ -16,9 +17,6 @@ namespace Dive
 
 		// start, stop 그리고 preUpdate 추가?
 		void Update();
-
-		bool LoadFromFile(const std::string& name);
-		bool SaveToFile(const std::string& name);
 
 		template<class T>
 		T* AddComponent(uint64_t id = 0)

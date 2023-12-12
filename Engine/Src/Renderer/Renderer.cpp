@@ -18,8 +18,7 @@ namespace Dive
 {
 	static DirectX::XMFLOAT2 s_ResolutionRender;
 
-	static std::unordered_map<eRendererGameObject, std::vector<GameObject*>> s_Renderables;
-	static Camera* s_pCamera = nullptr;
+	static std::vector<Layer*> s_Layers;
 
 	static std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> s_RasterizerStates;
 	static std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> s_DepthStencilStates;
@@ -45,6 +44,8 @@ namespace Dive
 	static ShaderVariation* s_pDeferredSkinnedShadingPixelShader = nullptr;
 	static ShaderVariation* s_pDeferredDirLightVertexShader = nullptr;
 	static ShaderVariation* s_pDeferredDirLightPixelShader = nullptr;
+	static ShaderVariation* s_pSkydomeVertexShader = nullptr;
+	static ShaderVariation* s_pSkydomePixelShader = nullptr;
 
 	static ConstantBuffer* s_pCameraVertexShaderBuffer = nullptr;
 	static ConstantBuffer* s_pModelVertexShaderBuffer = nullptr;
@@ -81,6 +82,11 @@ namespace Dive
 
 	void Renderer::Shutdown()
 	{
+		for (auto* pLayer : s_Layers)
+		{
+			DV_DELETE(pLayer);
+		}
+
 		{
 			DV_DELETE(s_pMaterialPixelShaderBuffer);
 			DV_DELETE(s_pLightPixelShaderBuffer);
@@ -111,161 +117,14 @@ namespace Dive
 
 	void Renderer::Update()
 	{
-		// 매 프레임 실행된다.
-		// 따라서 렌더링을 마친 후 초기화 되어야 한다.
-		s_Renderables.clear();
-		s_pCamera = nullptr;
+		for (auto* pLayer : s_Layers)
+			pLayer->Update();
+	}
 
-		auto allGameObjects = Scene::GetAllGameObjects();
-		for (auto* pGameObject : allGameObjects)
-		{
-			if (Camera* pCamera = pGameObject->GetComponent<Camera>())
-			{
-				s_Renderables[eRendererGameObject::Camera].emplace_back(pGameObject);
-				s_pCamera = pCamera;
-			}
-
-			if (Light* pLight = pGameObject->GetComponent<Light>())
-			{
-				s_Renderables[eRendererGameObject::Light].emplace_back(pGameObject);
-			}
-
-			if (MeshRenderer* pMeshRenderer = pGameObject->GetComponent<MeshRenderer>())
-			{
-				s_Renderables[eRendererGameObject::Geometry].emplace_back(pGameObject);
-			}
-
-			if (SkinnedMeshRenderer* pSkinnedMeshRenderer = pGameObject->GetComponent<SkinnedMeshRenderer>())
-			{
-				s_Renderables[eRendererGameObject::SkinnedGeometry].emplace_back(pGameObject);
-			}
-		}
-		// Gemetries를 Camera 기준으로 정렬한다. 투명, 불투명을 따로 한다.
-		// 나같은 경우 Skinned도 따로 해야 한다.
-
-		// 각종 pass 구분
-		// 일단 render target이 필요하다. backbuffer로는 안된다.
-		// 카메라가 render target을 가질 수도 있다.
-		
-		// Deferred 1 - GBuffer에 MeshRenderer를 그린다.
-		{
-			// pre render
-			ID3D11RenderTargetView* pRenderTextures[] = {
-				GetRenderTarget(eRenderTarget::GBuffer_Color_SpecIntensity)->GetRenderTargetView(),
-				GetRenderTarget(eRenderTarget::GBuffer_Normal)->GetRenderTargetView(),
-				GetRenderTarget(eRenderTarget::GBuffer_SpecPower)->GetRenderTargetView()
-			};
-			Graphics::SetRenderTargetViews(0, 3, pRenderTextures);
-			Graphics::SetDepthStencilView(GetRenderTarget(eRenderTarget::GBuffer_DepthStencil)->GetDepthStencilView());
-			Graphics::ClearViews(eClearTarget::Color | eClearTarget::Depth | eClearTarget::Stencil, s_pCamera->GetBackgroundColor(), 1.0, 0);
-			Graphics::SetDepthStencilState(s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::GBuffer)], 1);
-
-			// camera 정보
-			D3D11_VIEWPORT viewport = s_pCamera->GetViewport();
-			Dive::Graphics::GetDeviceContext()->RSSetViewports(1, &viewport);
-			auto pMappedData = static_cast<CameraVertexShaderBuffer*>(s_pCameraVertexShaderBuffer->Map());
-			pMappedData->viewMatrix = DirectX::XMMatrixTranspose(s_pCamera->GetViewMatrix());
-			pMappedData->projMatrix = DirectX::XMMatrixTranspose(s_pCamera->GetProjectionMatrix());
-			s_pCameraVertexShaderBuffer->Unmap();
-			Dive::Graphics::SetConstantBuffer(0, Dive::eShaderType::VertexShader, s_pCameraVertexShaderBuffer);
-
-			// MeshRenderer 그리기
-			for (auto* pMeshRenderer : s_Renderables[eRendererGameObject::Geometry])
-			{
-				pMeshRenderer->GetComponent<MeshRenderer>()->Draw();
-			}
-			for (auto* pSkinnedMeshRenderer : s_Renderables[eRendererGameObject::SkinnedGeometry])
-			{
-				pSkinnedMeshRenderer->GetComponent<SkinnedMeshRenderer>()->Draw();
-			}
-
-			// post render
-			ID3D11RenderTargetView* pRenderTargetViews[] = { nullptr, nullptr, nullptr };
-			Graphics::SetRenderTargetViews(0, 3, pRenderTargetViews);
-			Graphics::SetDepthStencilView(GetRenderTarget(eRenderTarget::GBuffer_DepthStencil)->GetDepthStencilViewReadOnly());
-		}
-
-		// Deferred 2 - GBuffer의 정보와 광원을 계산하여 타겟에 출력한다.
-		// 이걸 디퍼드라고 하기보단 Lighting이라고 하는 편이 나을 것 같기도...
-		{
-			// pre render
-			Graphics::SetRenderTargetView(0, GetRenderTarget(eRenderTarget::FrameRender)->GetRenderTargetView());
-			Graphics::SetDepthStencilView(Graphics::GetDefaultDepthStencilView());	// 이건 좀 에바?
-			Graphics::ClearViews(eClearTarget::Color | eClearTarget::Depth, DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 0);
-
-			// camera
-			DirectX::XMFLOAT3 pos;
-			auto pBuffer = Renderer::GetCameraPixelShaderBuffer();
-			auto pMappedData = static_cast<CameraPixelShaderBuffer*>(pBuffer->Map());
-			DirectX::XMStoreFloat3(&pos, s_pCamera->GetGameObject()->GetTransform()->GetPosition());
-			pMappedData->cameraPos = pos;
-			DirectX::XMFLOAT4X4 proj;
-			DirectX::XMStoreFloat4x4(&proj, s_pCamera->GetProjectionMatrix());
-			pMappedData->perspectiveValues.x = 1.0f / proj._11;
-			pMappedData->perspectiveValues.y = 1.0f / proj._22;
-			pMappedData->perspectiveValues.z = proj._43;
-			pMappedData->perspectiveValues.w = -proj._33;
-			pMappedData->viewInv = DirectX::XMMatrixTranspose(DirectX::XMMatrixInverse(nullptr, s_pCamera->GetViewMatrix()));
-			pBuffer->Unmap();
-			Graphics::SetConstantBuffer(0, eShaderType::PixelShader, pBuffer);
-
-			// 여기서부터 광원 유무에 따라 처리가 달라져야 한다.
-			{
-				// 기존에는 아에 이 부분을 건너 띄었지만
-				// diff만 출력하는 것도 한 방법이다.
-
-				// 광원이 존재한다면 루프를 돌려야 한다.
-				// for (uint32_t i = 0; i < static_cast<uint32_t>(m_Lights.size()); ++i)
-				{
-					// 그리고 광원이 첫 번째이냐 아니냐에 따라
-					// DepthStencil과 Blend State가 달라진다.
-					//if (i == 0)
-					//	Graphics::SetDepthStencilState(Renderer::GetForwardLightDS(), 0);
-					//else if (i == 1)
-					//	Graphics::GetDeviceContext()->OMSetBlendState(Renderer::GetBlendState(), NULL, 0xffffffff);
-
-					// 광원에 대한 정보를 GPU로 전달한다. Constant Buffer로 말이다.
-					// 그런데 현재 DirLight만 구현해 놓았다. 
-					//auto pLight = m_Lights[i];
-					//auto pBuffer = Renderer::GetLightPixelShaderBuffer();
-					//auto pMappedData = static_cast<LightPixelShaderBuffer*>(pBuffer->Map());
-					//DirectX::XMFLOAT3 pos;
-					//DirectX::XMStoreFloat3(&pos, pLight->GetGameObject()->GetTransform()->GetPosition());
-					//pMappedData->lightPos = pos;
-					//pMappedData->lightRange = 1.0f / pLight->GetRange();
-					//pMappedData->lightColor = pLight->GetColor();
-					//pMappedData->lightDir = pLight->GetDir();
-					//pBuffer->Unmap();
-					//Graphics::SetConstantBuffer(1, eShaderType::PixelShader, pBuffer);
-
-					Graphics::SetTexture(eTextureUnit::GBuffer_DepthStencil, static_cast<Texture*>(GetRenderTarget(eRenderTarget::GBuffer_DepthStencil)));
-					Graphics::SetTexture(eTextureUnit::GBuffer_Color_SpecIntensity, static_cast<Texture*>(GetRenderTarget(eRenderTarget::GBuffer_Color_SpecIntensity)));
-					Graphics::SetTexture(eTextureUnit::GBuffer_Normal, static_cast<Texture*>(GetRenderTarget(eRenderTarget::GBuffer_Normal)));
-					Graphics::SetTexture(eTextureUnit::GBuffer_SpecPower, static_cast<Texture*>(GetRenderTarget(eRenderTarget::GBuffer_SpecPower)));
-
-					// RenderTarget에 그리는 shader 전달
-					Graphics::SetShaderVariation(eShaderType::VertexShader, GetDeferredDirLightVertexShaderVariation());
-					Graphics::SetShaderVariation(eShaderType::PixelShader, GetDeferredDirLightPixelShaderVariation());
-
-					Graphics::SetVertexBuffer(nullptr);
-					Graphics::Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, 4, 0);
-
-					// clean up
-					// 이 부분이 꼭 필요하다. 이유는 아직 모르겠다.
-					{
-						Graphics::SetTexture(eTextureUnit::GBuffer_DepthStencil, nullptr);
-						Graphics::SetTexture(eTextureUnit::GBuffer_Color_SpecIntensity, nullptr);
-						Graphics::SetTexture(eTextureUnit::GBuffer_Normal, nullptr);
-						Graphics::SetTexture(eTextureUnit::GBuffer_SpecPower, nullptr);
-
-						Graphics::SetDepthStencilState(nullptr, 0);
-						//Graphics::GetDeviceContext()->OMSetBlendState(NULL, nullptr, 0xffffffff);
-					}
-				}
-			}
-			//Graphics::SetShaderVariation(eShaderType::VertexShader, nullptr);
-			//Graphics::SetShaderVariation(eShaderType::PixelShader, nullptr);
-		}
+	void Renderer::Render()
+	{
+		for (auto* pLayer : s_Layers)
+			pLayer->Render();
 	}
 
 	DirectX::XMFLOAT2 Renderer::GetResolutionRender()
@@ -309,6 +168,24 @@ namespace Dive
 	ID3D11BlendState* Renderer::GetBlendState(const eBlendState state)
 	{
 		return s_BlendStates[static_cast<size_t>(state)];
+	}
+
+	void Renderer::PushLayer(Layer* pLayer)
+	{
+		s_Layers.emplace_back(pLayer);
+	}
+
+	void Renderer::SetLayer(uint32_t index, Layer* pLayer)
+	{
+		if (index >= GetNumLayers())
+			s_Layers.resize(index + 1);
+
+		s_Layers[index] = pLayer;
+	}
+
+	uint32_t Renderer::GetNumLayers()
+	{
+		return static_cast<uint32_t>(s_Layers.size());
 	}
 
 	ShaderVariation* Renderer::GetBasicVertexShaderVariation()
@@ -376,6 +253,11 @@ namespace Dive
 		return s_pDeferredDirLightPixelShader;
 	}
 
+	ShaderVariation* Renderer::GetSkydomeShaderVariation(eShaderType type)
+	{
+		return type == eShaderType::VertexShader ? s_pSkydomeVertexShader : s_pSkydomePixelShader;
+	}
+
 	ConstantBuffer* Renderer::GetCameraVertexShaderBuffer()
 	{
 		return s_pCameraVertexShaderBuffer;
@@ -422,6 +304,13 @@ namespace Dive
 		{
 			DV_CORE_ERROR("RasterizerState FillSolid_CullBack 생성에 실패하였습니다.");
 		}
+
+		// FillSolid_CullNone
+		desc.CullMode = D3D11_CULL_NONE;
+		if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &s_RasterizerStates[static_cast<size_t>(eRasterizerState::FillSolid_CullNone)])))
+		{
+			DV_CORE_ERROR("RasterizerState FillSolid_CullNode 생성에 실패하였습니다.");
+		}
 	}
 
 	// DepthWriteMask에서 ZERO가 끄기, ALL이 켜기. READ는 기본?
@@ -448,7 +337,7 @@ namespace Dive
 			}
 		}
 
-		// DepthReadWrite_StencilReadWrite
+		// DepthReadWrite_StencilReadWrite => Skydome에서 on
 		{
 			ZeroMemory(&desc, sizeof(desc));
 			desc.DepthEnable = TRUE;
@@ -490,6 +379,30 @@ namespace Dive
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::GBuffer)])))
 			{
 				DV_CORE_ERROR("DepthStencilState GBuffer 생성에 실패하였습니다.");
+			}
+		}
+
+		// skydome에서 depth off용
+		{
+			ZeroMemory(&desc, sizeof(desc));
+			desc.DepthEnable = FALSE;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			desc.DepthFunc = D3D11_COMPARISON_LESS;
+			desc.StencilEnable = TRUE;
+			desc.StencilReadMask = 0xFF;
+			desc.StencilWriteMask = 0xFF;
+			desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+			desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+			desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+			desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+			desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthDiabled)])))
+			{
+				DV_CORE_ERROR("DepthDisabledStencilState 생성에 실패하였습니다.");
 			}
 		}
 	}
@@ -574,6 +487,17 @@ namespace Dive
 				return false;
 		}
 
+		// skydome
+		{
+			s_pSkydomeVertexShader = new ShaderVariation;
+			if (!s_pSkydomeVertexShader->CompileAndCreate(eShaderType::VertexShader, "CoreData/Shaders/Skydome.hlsl", eVertexType::Model))
+				return false;
+
+			s_pSkydomePixelShader = new ShaderVariation;
+			if (!s_pSkydomePixelShader->CompileAndCreate(eShaderType::PixelShader, "CoreData/Shaders/Skydome.hlsl"))
+				return false;
+		}
+
 		return true;
 	}
 
@@ -617,6 +541,7 @@ namespace Dive
 		return true;
 	}
 
+	// 현재 모든 렌더타겟이 백버퍼 크기로 생성된다.
 	void Renderer::createRenderTargets()
 	{
 		for (auto* pRenderTarget : s_RenderTargets)

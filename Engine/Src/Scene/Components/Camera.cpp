@@ -3,8 +3,12 @@
 #include "Transform.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/Skydome.h"
 #include "Scene/GameObject.h"
 #include "Core/Log.h"
+#include "Core/Timer.h"
+#include "Input/Input.h"
 
 namespace Dive
 {
@@ -21,12 +25,31 @@ namespace Dive
 		, m_ViewportRectRateY(0.0f)
 		, m_ViewportRectRateHeight(1.0f)
 		, m_ViewportRectRateWidth(1.0f)
+		, m_MoveSpeed(10.0f)
+		, m_RotateSpeed(50.0f)
 		, m_RenderingPath(eRenderingPath::Deferred)
 	{
 	}
 
 	Camera::~Camera()
 	{
+	}
+
+	// 이외에도 MeshRenderer를 전달받아 AABB boundbox의 center, extents로 확인하는 함수가 필요하다. 
+	bool Camera::IsInViewFrustum(const DirectX::XMFLOAT3& center, const DirectX::XMFLOAT3& extents) const
+	{
+		// 절두체 내부에 포함되는지 확인
+		// 실제로는 프러스텀에 판정 함수까지 구현한다.
+		return false;
+	}
+
+	DirectX::XMMATRIX Camera::GetWorldMatrix() const
+	{
+		auto pTransform = m_pGameObject->GetComponent<Transform>();
+		if (!pTransform)
+			return DirectX::XMMatrixIdentity();
+
+		return DirectX::XMMatrixTranslationFromVector(pTransform->GetPositionVector());
 	}
 
 	DirectX::XMMATRIX Camera::GetViewMatrix() const
@@ -37,20 +60,12 @@ namespace Dive
 		if (!pTransform)
 			return DirectX::XMMatrixIdentity();
 
-		auto lookAt = pTransform->GetLookAt();
-
-		// 역시나 이 곳에서도 lookAt은 Camera와 동일하다.
-		DirectX::XMFLOAT3 lk;
-		DirectX::XMStoreFloat3(&lk, lookAt);
-		//DV_LOG_ENGINE_DEBUG("Camera's LookAt: {0:f}, {1:f}, {2:f}", lk.x, lk.y, lk.z);
-
-		return DirectX::XMMatrixLookAtLH(
-			pTransform->GetPosition(),
-			//DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f),
-			//pTransform->GetLookAt(),
-			lookAt,
-			//DirectX::XMVectorAdd(pTransform->GetForward(), pTransform->GetPosition()),
-			pTransform->GetUp());
+		// api를 살펴보면 마지막 매개변수는 카메라의 상향벡터이다.
+		// 그런데 또 일반적으로 0, 1, 0이라고 적어놓았다...
+		return DirectX::XMMatrixLookToLH(
+			pTransform->GetPositionVector(),
+			pTransform->GetForwardVector(),
+			pTransform->GetUpwardVector());
 	}
 
 	DirectX::XMMATRIX Camera::GetProjectionMatrix() const
@@ -119,13 +134,18 @@ namespace Dive
 		m_ViewportRectRateHeight = height;
 	}
 
+	// 흐음 직접 가져와서 계산하네...
 	D3D11_VIEWPORT Camera::GetViewport()
 	{
 		D3D11_VIEWPORT viewport;
-		viewport.TopLeftX = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectRateX;
-		viewport.TopLeftY = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectRateY;
-		viewport.Width = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectRateWidth;
-		viewport.Height = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectRateHeight;
+		//viewport.TopLeftX = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectRateX;
+		//viewport.TopLeftY = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectRateY;
+		//viewport.Width = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectRateWidth;
+		//viewport.Height = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectRateHeight;
+		viewport.TopLeftX = Renderer::GetResolutionRender().x * m_ViewportRectRateX;
+		viewport.TopLeftY = Renderer::GetResolutionRender().y * m_ViewportRectRateY;
+		viewport.Width = Renderer::GetResolutionRender().x * m_ViewportRectRateWidth;
+		viewport.Height = Renderer::GetResolutionRender().y * m_ViewportRectRateHeight;
 		viewport.MinDepth = 0.0f;
 		viewport.MaxDepth = 1.0f;
 

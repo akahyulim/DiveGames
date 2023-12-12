@@ -21,6 +21,7 @@ namespace Dive
     enum class eRasterizerState
     {
         FillSolid_CullBack,
+        FillSolid_CullNone,
         Count
     };
 
@@ -29,6 +30,7 @@ namespace Dive
         DepthReadWrite,
         DepthReadWrite_StencilReadWrite,
         GBuffer,
+        DepthDiabled,   // skydome에서 off용으로...
         Count
     };
 

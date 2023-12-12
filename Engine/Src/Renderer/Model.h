@@ -9,6 +9,9 @@
 
 namespace Dive
 {
+	// 현재 문제는 모델과 메시를 따로 사용할 수 있다는 것이다.
+	// 모델로 로드할 경우 리소스로 관리되지만
+	// 메시로 생성할 경우 리소그가 아니므로 버퍼 해제 주체가 메시가 되어야만 한다.
 	class Model : public Resource
 	{
 	public:

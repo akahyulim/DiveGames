@@ -8,13 +8,18 @@ namespace Dive
 		EVENT_CLASS_TYPE(PreUpdate)
 	};
 
-	class UpdateEvent : public Event
-	{
-		EVENT_CLASS_TYPE(Update)
-	};
-
 	class PostUpdateEvent : public Event
 	{
 		EVENT_CLASS_TYPE(PostUpdate)
+	};
+
+	class PreRenderEvent : public Event
+	{
+		EVENT_CLASS_TYPE(PreRender)
+	};
+
+	class PostRenderEvent : public Event
+	{
+		EVENT_CLASS_TYPE(PostRender)
 	};
 }

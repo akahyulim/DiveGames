@@ -1,11 +1,12 @@
 #pragma once
 #include "RendererDefs.h"
+#include "Graphics/GraphicsDefs.h"
+#include "Layer.h"
 
 namespace Dive
 {
 	class RenderTexture;
 
-	class Layer;
 	class ShaderVariation;
 	class ConstantBuffer;
 
@@ -18,6 +19,7 @@ namespace Dive
 
 	struct CameraVertexShaderBuffer
 	{
+		DirectX::XMMATRIX cameraMatrix;
 		DirectX::XMMATRIX viewMatrix;
 		DirectX::XMMATRIX projMatrix;
 	};
@@ -62,6 +64,7 @@ namespace Dive
 		static void Shutdown();
 
 		static void Update();
+		static void Render();
 
 		static DirectX::XMFLOAT2 GetResolutionRender();
 		static void SetResolutionRender(uint32_t width, uint32_t height);
@@ -73,7 +76,11 @@ namespace Dive
 		static ID3D11DepthStencilState* GetDepthStencilState(const eDepthStencilState state);
 		static ID3D11BlendState* GetBlendState(const eBlendState state);
 
-		// test
+		static void PushLayer(Layer* pLayer);
+		static void SetLayer(uint32_t index, Layer* pLayer);
+		static uint32_t GetNumLayers();
+
+		// test: 아무리봐도 에바다...
 		static ShaderVariation* GetBasicVertexShaderVariation();
 		static ShaderVariation* GetBasicPixelShaderVariation();
 		static ShaderVariation* GetBasicSkinnedVertexShaderVariation();
@@ -87,6 +94,7 @@ namespace Dive
 		static ShaderVariation* GetDeferredSkinnedShadingPixelShaderVariation();
 		static ShaderVariation* GetDeferredDirLightVertexShaderVariation();
 		static ShaderVariation* GetDeferredDirLightPixelShaderVariation();
+		static ShaderVariation* GetSkydomeShaderVariation(eShaderType type);
 
 		static ConstantBuffer* GetCameraVertexShaderBuffer();
 		static ConstantBuffer* GetModelVertexShaderBuffer();

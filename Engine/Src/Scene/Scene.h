@@ -17,9 +17,6 @@ namespace Dive
 
 		static void Update();
 
-		static bool LoadFromFile(const std::string& filePath);
-		static bool SaveToFile(const std::string& filePath);
-
 		static std::string GetName();
 		static std::string GetFilepath();
 
