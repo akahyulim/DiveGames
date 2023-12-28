@@ -32,12 +32,15 @@ namespace Dive
 	{
 	}
 
-	// 현재 렌더러의 업데이트에서 이 함수를 호출하고 있다.
-	// 반면 스파키는 씬에서 엔터티로부터 메시를 획득한 후 메시의 렌더 함수를 호출한다.
-	// 어찌됐든 둘 다 이 메시렌더러라는 이름과는 어울리지 않는다...
-	// 일단 현재 목표는 렌더러에서 레이어를 어떻게 해보는 것이다.
 	void MeshRenderer::Draw()
 	{
+		// 객체화를 생각한다면 Material과 Mesh에 각각 Draw 함수가 존재하는 것이 맞지 않나 싶다.
+		// 실제로 스파키의 경우 Mesh가 Renderable을 상속한 클래스인데
+		// Render에서 Material, Vertex & Index Buffer의 Bind 후 Draw
+		// 그리고 역순으로 Unbind를 수행한다.
+		// 스파키의 경우 MeshComponent는 단순히 Mesh를 가진다. 거의 모든 Component가 이런 형태다...
+		// 이왕 스파키를 참고할거면 좀 더 분석해본 후 적용여부를 판단하자.
+		
 		// Material
 		{
 			Graphics::SetTexture(eTextureUnit::Diffuse, m_pMaterial->GetTexture(eTextureUnit::Diffuse));
@@ -49,6 +52,8 @@ namespace Dive
 				pMappedData->diffuseColor = m_pMaterial->GetDiffuseColor();
 				pMappedData->tiling = m_pMaterial->GetTiling();
 				pMappedData->offset = m_pMaterial->GetOffset();
+				pMappedData->properties = 0; 
+				pMappedData->properties  |= m_pMaterial->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
 				pBuffer->Unmap();
 				Graphics::SetConstantBuffer(2, eShaderType::PixelShader, pBuffer);
 			}

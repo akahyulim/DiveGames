@@ -9,6 +9,13 @@
 #include "Scene/Components/MeshRenderer.h"
 #include "Scene/Components/SkinnedMeshRenderer.h"
 
+// 스파키를 참고
+// Layer는 윈도우 객체를 관리하며 초기화함수와 다수의 콜백함수로 구성된다.
+// 그리고 구체 Layer에서 해당 함수들을 구현하여 사용한다.
+// 구체 Layer는 기본적으로 Scene과 Rendere를 가지며
+// 콜백 함수는 일들을 이용해 처리를 수행한다.
+// 여기에서 Renderer는 나의 Graphics + Renderer의 기능을 가지는 클래스로
+// 바인드함수와 각종 리소스 버퍼(상수 버퍼)들을 관리한다.
 namespace Dive
 {
     Layer::Layer()
@@ -23,8 +30,8 @@ namespace Dive
     
     void Layer::Update()
     {
+		m_pCamera = nullptr;
         m_Renderables.clear();
-        m_pCamera = nullptr;
 
         auto allGameObjects = Scene::GetAllGameObjects();
         for (auto* pGameObject : allGameObjects)
@@ -54,26 +61,19 @@ namespace Dive
         }
     }
 
-    // 목표는 여기에서 커맨드별로 렌더링을 수행토록 하는 것이다.
-    // 물론 복잡할 것 같다.
     void Layer::Render()
     {
-        deferredRender();
-        // 렌더패스의 커맨드대로 수행된다.
-
-        // 레이어마다 렌더 타겟이 다를 수 있다.
-        // 동일할 경우 해당 렌더 타겟에 덧그리는 것이다.
-
-        // 하나의 렌더패스에서 디퍼드와 후처리까지 다 처리되어야 한다.
-  
+        deferredRendering();  
     }
 
 	// 현재 Graphics에 랩핑된 함수와 직접 Context를 받아와 바인드 하는 함수가 섞여있다.
-    void Layer::deferredRender()
+	// Graphics가 필요한가라는 생각이 든다. 
+	// sparky의 경우 각자의 bind, draw 함수에서 dxcontext로부터 devicecontext를 가져와 직접 호출한다.
+	// 그런데 문제는 SetRenderTarget()은 아직 찾지 못했다는거다... => 이건 프로젝트의 단순함때문인 듯 하다.
+    void Layer::deferredRendering()
     {
-		// Deferred 1 - GBuffer에 MeshRenderer를 그린다.
+		// cmdClear
 		{
-			// pre render
 			ID3D11RenderTargetView* pRenderTextures[] = {
 				Renderer::GetRenderTarget(eRenderTarget::GBuffer_Color_SpecIntensity)->GetRenderTargetView(),
 				Renderer::GetRenderTarget(eRenderTarget::GBuffer_Normal)->GetRenderTargetView(),
@@ -82,10 +82,21 @@ namespace Dive
 			Graphics::SetRenderTargetViews(0, 3, pRenderTextures);
 			Graphics::SetDepthStencilView(Renderer::GetRenderTarget(eRenderTarget::GBuffer_DepthStencil)->GetDepthStencilView());
 			Graphics::ClearViews(eClearTarget::Color | eClearTarget::Depth | eClearTarget::Stencil, m_pCamera->GetBackgroundColor(), 1.0, 0);
+		}
 
-			// camera 정보 - 뷰 좌표계 변환용
-			D3D11_VIEWPORT viewport = m_pCamera->GetViewport();
+		// cmdScenePass - Deferred
+		{
+			ID3D11RenderTargetView* pRenderTextures[] = {
+				Renderer::GetRenderTarget(eRenderTarget::GBuffer_Color_SpecIntensity)->GetRenderTargetView(),
+				Renderer::GetRenderTarget(eRenderTarget::GBuffer_Normal)->GetRenderTargetView(),
+				Renderer::GetRenderTarget(eRenderTarget::GBuffer_SpecPower)->GetRenderTargetView()
+			};
+			Graphics::SetRenderTargetViews(0, 3, pRenderTextures);
+			Graphics::SetDepthStencilView(Renderer::GetRenderTarget(eRenderTarget::GBuffer_DepthStencil)->GetDepthStencilView());
+
+			const D3D11_VIEWPORT viewport = m_pCamera->GetViewport();
 			Dive::Graphics::GetDeviceContext()->RSSetViewports(1, &viewport);
+
 			auto pMappedData = static_cast<CameraVertexShaderBuffer*>(Renderer::GetCameraVertexShaderBuffer()->Map());
 			pMappedData->cameraMatrix = DirectX::XMMatrixTranspose(m_pCamera->GetWorldMatrix());
 			pMappedData->viewMatrix = DirectX::XMMatrixTranspose(m_pCamera->GetViewMatrix());
@@ -94,9 +105,7 @@ namespace Dive
 			Dive::Graphics::SetConstantBuffer(0, Dive::eShaderType::VertexShader, Renderer::GetCameraVertexShaderBuffer());
 
 			if (m_pCamera->GetSkydome())
-			{
 				m_pCamera->GetSkydome()->Render();
-			}
 
 			Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::GBuffer), 1);
 			// 기본적으론 컬백이 맞으나 plane이나 triangle처럼 하나의 면으로 만들어진 메시는 좀 애매하다.
@@ -112,19 +121,16 @@ namespace Dive
 				pSkinnedMeshRenderer->GetComponent<SkinnedMeshRenderer>()->Draw();
 			}
 
-			// post render
 			ID3D11RenderTargetView* pRenderTargetViews[] = { nullptr, nullptr, nullptr };
 			Graphics::SetRenderTargetViews(0, 3, pRenderTargetViews);
 			Graphics::SetDepthStencilView(Renderer::GetRenderTarget(eRenderTarget::GBuffer_DepthStencil)->GetDepthStencilViewReadOnly());
 		}
 		
-		// Deferred 2 - GBuffer의 정보와 광원을 계산하여 타겟에 출력한다.
-		// 이걸 디퍼드라고 하기보단 Lighting이라고 하는 편이 나을 것 같기도...
+		// cmdLightVolumes - DeferredLight
 		{
-			// pre render
 			Graphics::SetRenderTargetView(0, Renderer::GetRenderTarget(eRenderTarget::FrameRender)->GetRenderTargetView());
 			Graphics::SetDepthStencilView(Graphics::GetDefaultDepthStencilView());	// 이건 좀 에바?
-			Graphics::ClearViews(eClearTarget::Color | eClearTarget::Depth, DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 0);
+			Graphics::ClearViews(eClearTarget::Color | eClearTarget::Depth, m_pCamera->GetBackgroundColor(), 1.0f, 0);
 
 			// camera - 기타 정보(광원 계산용)
 			//DirectX::XMFLOAT3 pos;
@@ -148,7 +154,7 @@ namespace Dive
 				// diff만 출력하는 것도 한 방법이다.
 
 				// 광원이 존재한다면 루프를 돌려야 한다.
-				// for (uint32_t i = 0; i < static_cast<uint32_t>(m_Lights.size()); ++i)
+				//for (uint32_t i = 0; i < static_cast<uint32_t>(m_Lights.size()); ++i)
 				{
 					// 그리고 광원이 첫 번째이냐 아니냐에 따라
 					// DepthStencil과 Blend State가 달라진다.
@@ -196,8 +202,8 @@ namespace Dive
 					}
 				}
 			}
-			//Graphics::SetShaderVariation(eShaderType::VertexShader, nullptr);
-			//Graphics::SetShaderVariation(eShaderType::PixelShader, nullptr);
+			Graphics::SetShaderVariation(eShaderType::VertexShader, nullptr);
+			Graphics::SetShaderVariation(eShaderType::PixelShader, nullptr);
 		}
     }
 }

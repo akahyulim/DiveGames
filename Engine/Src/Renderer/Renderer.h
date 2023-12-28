@@ -49,12 +49,16 @@ namespace Dive
 		float poo;
 	};
 
+	// 여기에 uint32_t로 option을 두고 1bit씩 0n/Off를 저장할 수 있다.
 	struct MaterialPixelShaderBuffer
 	{
-		DirectX::XMFLOAT4 diffuseColor;
+		DirectX::XMFLOAT4 diffuseColor = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-		DirectX::XMFLOAT2 tiling;
-		DirectX::XMFLOAT2 offset;
+		DirectX::XMFLOAT2 tiling = { 0.0f, 0.0f };
+		DirectX::XMFLOAT2 offset = { 0.0f, 0.0f };
+
+		uint32_t properties = 0;
+		DirectX::XMFLOAT3 padding;
 	};
 
 	class Renderer

@@ -6,8 +6,6 @@
 
 namespace Dive
 {
-	// 카메라??? 그렇다면 view는...?
-	// 결국 Scnee, View, Renderer의 관계를 다시 생각해봐야 한다.
 	static constexpr uint64_t FIRST_ID = 0x1;
 	static constexpr uint64_t LAST_ID = 0xffffffffffffffff;
 

@@ -1,4 +1,5 @@
 #include "MenuTabsPanel.h"
+#include "../ModelViewer.h"
 
 #include <imgui-docking/Imgui.h>
 #include <Imgui-docking/imgui_internal.h>
@@ -171,22 +172,11 @@ ImVec4 XMFloat4ToImVec4(const DirectX::XMFLOAT4& value)
 	return { value.x, value.y, value.z, value.w };
 }
 
-MenuTabsPanel::MenuTabsPanel()
-	: Panel("MenuTabs")
-	, m_pLoadedModel(nullptr)
-	, m_pCameraObject(nullptr)
+MenuTabsPanel::MenuTabsPanel(ModelViewer* pModelViewer)
+	: Panel(pModelViewer)
 {
-}
-
-MenuTabsPanel::~MenuTabsPanel()
-{
-}
-
-void MenuTabsPanel::Initialize(Dive::GameObject* pCameraObject)
-{
-	DV_ASSERT(pCameraObject);
-
-	m_pCameraObject = pCameraObject;
+	m_PanelName = "MenuTabs";
+	m_pMainCamera = pModelViewer->GetCamera();
 }
 
 // CameraBackgroundColor, Skydome 등이 탭 활성에 여부에 따라 적용된다.
@@ -276,14 +266,12 @@ void MenuTabsPanel::showFileTab()
 
 void MenuTabsPanel::showCameraTab()
 {
-	DV_ASSERT(m_pCameraObject);
-
 	ImGui::NewLine();
 	ImGui::NewLine();
 	ImGui::NewLine();
 
-	Dive::Transform* pTransformCom = m_pCameraObject->GetTransform();
-	Dive::Camera* pCameraCom = m_pCameraObject->GetComponent<Dive::Camera>();
+	auto pTransformCom = m_pMainCamera->GetTransform();
+	auto pCameraCom = m_pMainCamera->GetComponent<Dive::Camera>();
 
 	// lookAt & position & rotation
 	//DirectX::XMFLOAT3 lookAt = pTransformCom->GetLookAt();
@@ -364,7 +352,7 @@ void MenuTabsPanel::showEnvironmentTab()
 
 	// skydome
 	{
-		auto pSkydome = m_pCameraObject->GetComponent<Dive::Camera>()->GetSkydome();
+		auto pSkydome = m_pMainCamera->GetComponent<Dive::Camera>()->GetSkydome();
 
 		static ImVec4 apexColor = XMFloat4ToImVec4(pSkydome->GetApexColor());
 		ImGui::Columns(2);

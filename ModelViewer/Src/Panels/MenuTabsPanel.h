@@ -6,10 +6,8 @@
 class MenuTabsPanel : public Panel
 {
 public:
-	MenuTabsPanel();
-	~MenuTabsPanel() override;
-
-	void Initialize(Dive::GameObject* pCameraObject);
+	MenuTabsPanel(ModelViewer* pModelViewer);
+	~MenuTabsPanel() = default;
 
 	void OnRender() override;
 
@@ -22,6 +20,6 @@ private:
 private:
 	ModelImporter m_ModelImporter;	// 추후 static 함수 클래스로 변경
 	
-	Dive::GameObject* m_pCameraObject;
-	Dive::GameObject* m_pLoadedModel;
+	Dive::GameObject* m_pMainCamera		= nullptr;
+	Dive::GameObject* m_pLoadedModel	= nullptr;
 };

@@ -6,8 +6,6 @@ namespace Dive
 {
 	class Component;
 	class Transform;
-	//class Drawable;
-	//class SkinnedMeshRenderer;
 
 	class GameObject : public Object
 	{
@@ -15,7 +13,6 @@ namespace Dive
 		GameObject(const std::string& name = "GameObject");
 		~GameObject() override;
 
-		// start, stop 그리고 preUpdate 추가?
 		void Update();
 
 		template<class T>
@@ -64,7 +61,6 @@ namespace Dive
 
 		Transform* GetTransform() const { return m_pTransform; }
 
-	private:
 	private:
 		bool m_bActive;
 		bool m_bMarkedTarget;

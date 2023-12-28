@@ -6,6 +6,8 @@ namespace Dive
 {
 	class InputLayout;
 
+	// 굳이 Object를 상속해야 하나?
+	// Name은 사용할 수 있지만 ID는 사용하지 않는다.
 	class ShaderVariation : public Object
 	{
 	public:

@@ -51,8 +51,8 @@ struct PS_GBUFFER
 PS_GBUFFER MainPS(PixelInput input)
 {
 	PS_GBUFFER output;
-
-	float4 diffuse = DiffuseMap.Sample(DiffuseMapSampler, cbMaterialOffsetPS + input.tex * cbMaterialTilingPS);
+	
+    float4 diffuse = has_texture_diffse() ? DiffuseMap.Sample(DiffuseMapSampler, input.tex) : cbMaterialAlbedoColorPS;
 	diffuse *= diffuse;	// ¿Ö Á¦°ö?
 	output.colorSpecIntensity = diffuse;
 

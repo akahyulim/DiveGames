@@ -10,7 +10,6 @@ namespace Dive
 		: Object(name) 
 		, m_bActive(true)
 		, m_bMarkedTarget(false)
-		, m_pTransform(nullptr)
 	{
 		m_pTransform = AddComponent<Transform>();
 	}

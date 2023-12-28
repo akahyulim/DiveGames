@@ -185,14 +185,12 @@
     <ClInclude Include="Src\Renderer\Mesh.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\RendererDefs.h" />
-    <ClInclude Include="Src\Renderer\RenderPath.h" />
     <ClInclude Include="Src\Renderer\Skeleton.h" />
     <ClInclude Include="Src\Renderer\SkinnedMesh.h" />
     <ClInclude Include="Src\Renderer\Skydome.h" />
     <ClInclude Include="Src\Resource\Image.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceCache.h" />
-    <ClInclude Include="Src\Scene\Components\BoneRenderer.h" />
     <ClInclude Include="Src\Scene\Components\Camera.h" />
     <ClInclude Include="Src\Scene\Components\Component.h" />
     <ClInclude Include="Src\Scene\Components\Animator.h" />
@@ -200,7 +198,6 @@
     <ClInclude Include="Src\Scene\Components\SkinnedMeshRenderer.h" />
     <ClInclude Include="Src\Scene\Components\Light.h" />
     <ClInclude Include="Src\Scene\Components\Transform.h" />
-    <ClInclude Include="Src\Scene\DvScene.h" />
     <ClInclude Include="Src\Scene\GameObject.h" />
     <ClInclude Include="Src\Scene\Scene.h" />
   </ItemGroup>
@@ -235,7 +232,6 @@
     <ClCompile Include="Src\Renderer\Material.cpp" />
     <ClCompile Include="Src\Renderer\Mesh.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
-    <ClCompile Include="Src\Renderer\RenderPath.cpp" />
     <ClCompile Include="Src\Renderer\Skeleton.cpp" />
     <ClCompile Include="Src\Renderer\SkinnedMesh.cpp" />
     <ClCompile Include="Src\Renderer\Skydome.cpp" />
@@ -243,14 +239,12 @@
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceCache.cpp" />
     <ClCompile Include="Src\Scene\Components\Animator.cpp" />
-    <ClCompile Include="Src\Scene\Components\BoneRenderer.cpp" />
     <ClCompile Include="Src\Scene\Components\Camera.cpp" />
     <ClCompile Include="Src\Scene\Components\Component.cpp" />
     <ClCompile Include="Src\Scene\Components\MeshRenderer.cpp" />
     <ClCompile Include="Src\Scene\Components\SkinnedMeshRenderer.cpp" />
     <ClCompile Include="Src\Scene\Components\Light.cpp" />
     <ClCompile Include="Src\Scene\Components\Transform.cpp" />
-    <ClCompile Include="Src\Scene\DvScene.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />
   </ItemGroup>

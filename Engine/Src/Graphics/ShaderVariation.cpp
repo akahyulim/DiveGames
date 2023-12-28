@@ -31,7 +31,7 @@ namespace Dive
 			((ID3D11ComputeShader*)m_pShaderResource)->Release();
 		m_pShaderResource = nullptr;
 
-		DV_CORE_INFO("ShaderVariation 소멸자 호출 - {0:s} - {1:d}", m_Name, m_ID);
+		DV_CORE_INFO("ShaderVariation 소멸자 호출 - {0:s} - {1:d}", GetName(), GetID());
 	}
 
 	bool ShaderVariation::CompileAndCreate(eShaderType type, const std::string& filePath, eVertexType vertexType)

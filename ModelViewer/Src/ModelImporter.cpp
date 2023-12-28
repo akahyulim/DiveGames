@@ -185,18 +185,6 @@ bool ModelImporter::LoadExternalFile(const std::string& fileName)
         auto pRootBone = FindRootBone(pRootObject, boneInfos);
         m_pImportedModel->SetRootBone(pRootBone);
 
-        // BoneRenderer를 모두 추가
-        for (uint32_t i = 0; i < static_cast<uint32_t>(boneInfos.size()); ++i)
-        {
-            Dive::GameObject* pNodeObject = GetNodeObjectByBoneName(pRootObject, boneInfos[i].name);
-            if (!pNodeObject)
-            {
-                DV_ERROR("{:s} GameObject가 존재하지 않습니다.", boneInfos[i].name.c_str());
-                continue;
-            }
-            pNodeObject->AddComponent<Dive::BoneRenderer>();
-        }
-
         // SkinnedMeshRenderer에 rootBone 저장
         // Animaition에 TestAnim 저장
         std::function<void(Dive::GameObject*)> func = [&func, &pRootBone](Dive::GameObject* pNode)

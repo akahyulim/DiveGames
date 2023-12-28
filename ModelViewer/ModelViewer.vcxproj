@@ -167,6 +167,7 @@
     <ClCompile Include="Src\ModelImporter.cpp" />
     <ClCompile Include="Src\ModelViewer.cpp" />
     <ClCompile Include="Src\Panels\MenuTabsPanel.cpp" />
+    <ClCompile Include="Src\Panels\Panel.cpp" />
     <ClCompile Include="Src\Panels\SceneViewPanel.cpp" />
     <ClCompile Include="Src\SceneViewCamera.cpp" />
   </ItemGroup>

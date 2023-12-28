@@ -5,49 +5,27 @@ namespace Dive
 {
 	class GameObject;
 
-	/// <summary>
-	/// 좌표계를 월드, 로컬로 구분하기 위한 열거자입니다.
-	/// </summary>
 	enum class eSpace
 	{
 		World, 
 		Local
 	};
 
-	// 값들은 XMFLOAT로 저장
-	// 매개변수 및 리턴값은 XMFLOAT, XMVECTOR, XMMATRIX 모두 사용
 	class Transform : public Component
 	{
 	public:
-		Transform(GameObject* pGameObject = nullptr);
-		~Transform() override = default;
+		Transform(GameObject* pGameObject);
+		~Transform() = default;
 
-		void Update() override { updateTransform(); }
+		void Update() override;
 
-		void Clear() {}
-
-		/// <summary>
-		/// 월드 좌표계 기준 위치값을 리턴합니다.
-		/// </summary>
 		DirectX::XMFLOAT3 GetPosition() const;
 		DirectX::XMVECTOR GetPositionVector() const;
-
-		/// <summary>
-		/// 로컬 좌표계 기준 위치값을 리턴합니다.
-		/// </summary>
 		DirectX::XMFLOAT3 GetLocalPosition() const { return m_LocalPosition; }
 		DirectX::XMVECTOR GetLocalPositionVector() const { return DirectX::XMLoadFloat3(&m_LocalPosition); }
-
-		/// <summary>
-		/// 월드 좌표계 기준 위치를 설정합니다.
-		/// </summary>
 		void SetPosition(float posX, float posY, float posZ);
 		void SetPosition(const DirectX::XMFLOAT3& pos);
 		void SetPosition(const DirectX::XMVECTOR& pos);
-
-		/// <summary>
-		/// 로컬 좌표계 기준 위치를 설정합니다. 
-		/// </summary>
 		void SetLocalPosition(float posX, float posY, float posZ);
 		void SetLocalPosition(const DirectX::XMFLOAT3& pos);
 		void SetLocalPosition(const DirectX::XMVECTOR& pos);
@@ -61,7 +39,7 @@ namespace Dive
 		void SetRotation(float degreeX, float degreeY, float degreeZ);
 		void SetRotation(const DirectX::XMFLOAT3& degree);
 		void SetRotation(const DirectX::XMFLOAT4& quaternion);
-		void SetRotation(const DirectX::XMVECTOR& quaternion); 
+		void SetRotation(const DirectX::XMVECTOR& quaternion);
 		void SetLocalRotation(float degreeX, float degreeY, float degreeZ);
 		void SetLocalRotation(const DirectX::XMFLOAT3& degree);
 		void SetLocalRotation(const DirectX::XMFLOAT4& quaternion);
@@ -121,7 +99,6 @@ namespace Dive
 		DirectX::XMFLOAT3 GetRightward() const;
 		DirectX::XMVECTOR GetRightwardVector() const;
 
-		// hierarchy
 		bool HasParent() const;
 		Transform* GetParent() const { return m_pParent; }
 		void SetParent(Transform* pParent);
@@ -132,7 +109,6 @@ namespace Dive
 		bool IsChildOf(Transform* pParent) const;
 		void DetachChildren();
 		std::vector<Transform*> GetChildren() const { return m_Children; }
-
 		Transform* FindByName(const std::string& name);
 
 	private:
@@ -145,8 +121,6 @@ namespace Dive
 
 		DirectX::XMFLOAT4X4 m_WorldMatrix;
 		DirectX::XMFLOAT4X4 m_LocalMatrix;
-
-		DirectX::XMFLOAT3 m_LookAt;
 
 		Transform* m_pParent;
 		std::vector<Transform*> m_Children;

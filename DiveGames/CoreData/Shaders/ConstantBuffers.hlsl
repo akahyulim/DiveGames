@@ -5,6 +5,9 @@
 // map/unmap은 batch에서 개별 요소마다 업데이트
 // bind는 Graphics::SetShaders() 내부에서 한 번에 실행
 
+// 이렇게 데이터마다 개별 이름을 두는 것 보다
+// 구조체로 만들고 다시 cbuffer로 선언하는 편이 나아보인다.
+
 #ifdef COMPILEVS
 
 // FrameVS
@@ -60,6 +63,11 @@ cbuffer MaterialPS : register(b2)
 
 	float2 cbMaterialTilingPS;
 	float2 cbMaterialOffsetPS;
+
+	uint cbProperties;
+	float3 padding;
 }
+
+bool has_texture_diffse()                     { return cbProperties & uint(1U << 0); }
 
 #endif

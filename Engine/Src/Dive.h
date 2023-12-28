@@ -27,7 +27,6 @@
 #include "Renderer/RendererDefs.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Layer.h"
-#include "Renderer/RenderPath.h"
 #include "Renderer/Material.h"
 #include "Renderer/Skeleton.h"
 #include "Renderer/Mesh.h"
@@ -56,7 +55,6 @@
 
 // Scene
 #include "Scene/Scene.h"
-#include "Scene/DvScene.h"
 #include "Scene/GameObject.h"
 #include "Scene/Components/Component.h"
 #include "Scene/Components/Transform.h"
@@ -64,6 +62,5 @@
 #include "Scene/Components/Light.h"
 #include "Scene/Components/MeshRenderer.h"
 #include "Scene/Components/SkinnedMeshRenderer.h"
-#include "Scene/Components/BoneRenderer.h"
 #include "Scene/Components/Animator.h"
 

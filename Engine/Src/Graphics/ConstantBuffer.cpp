@@ -4,8 +4,9 @@
 namespace Dive 
 {
 	ConstantBuffer::ConstantBuffer(const std::string& name)
-		: m_pBuffer(nullptr),
-		m_Stride(0)
+		: Object(name)
+		, m_pBuffer(nullptr)
+		, m_Stride(0)
 	{
 		SetName(name);
 	}
@@ -30,7 +31,7 @@ namespace Dive
 			0,
 			&mappedData)))
 		{
-			DV_CORE_ERROR("ConstantBuffer({:s})의 Map에 실패하였습니다.", m_Name);
+			DV_CORE_ERROR("ConstantBuffer({:s})의 Map에 실패하였습니다.", GetName());
 			return nullptr;
 		}
 

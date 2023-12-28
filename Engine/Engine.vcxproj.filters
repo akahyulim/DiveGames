@@ -150,9 +150,6 @@
     <ClInclude Include="Src\Renderer\Skeleton.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Scene\Components\BoneRenderer.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Scene\Components\Animator.h">
       <Filter>Src\Scene\Components</Filter>
     </ClInclude>
@@ -173,12 +170,6 @@
     </ClInclude>
     <ClInclude Include="Src\Renderer\Layer.h">
       <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\RenderPath.h">
-      <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Scene\DvScene.h">
-      <Filter>Src\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Src\Scene\Scene.h">
       <Filter>Src\Scene</Filter>
@@ -293,9 +284,6 @@
     <ClCompile Include="Src\Renderer\Skeleton.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Scene\Components\BoneRenderer.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Scene\Components\Animator.cpp">
       <Filter>Src\Scene\Components</Filter>
     </ClCompile>
@@ -313,12 +301,6 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Layer.cpp">
       <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Renderer\RenderPath.cpp">
-      <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\DvScene.cpp">
-      <Filter>Src\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Src\Scene\Scene.cpp">
       <Filter>Src\Scene</Filter>

@@ -25,12 +25,8 @@ namespace Dive
 	static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> s_BlendStates;
 
 	static std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> s_RenderTargets;
-	// shader
-	// sampler?
-	// constant buffer
-
-	// 현재 vertex와 pixel이 나뉘어 있어 조금 복잡하다.
-	// 그리고 추후 inputlayout별로 생성되면 더 복잡해질 수 있다.
+	
+	// 적어도 셰이더는 리소스 매니저가 관리하는 편이 나을 것 같다.
 	static ShaderVariation* s_pBasicVertexShader = nullptr;
 	static ShaderVariation* s_pBasicPixelShader = nullptr;
 	static ShaderVariation* s_pBasicSkinnedVertexShader = nullptr;
@@ -47,6 +43,10 @@ namespace Dive
 	static ShaderVariation* s_pSkydomeVertexShader = nullptr;
 	static ShaderVariation* s_pSkydomePixelShader = nullptr;
 
+	// 스파키를 참조하자면
+	// 셰이더 객체를 통해 상수버퍼의 크기 및 정의를 참조하여
+	// 렌더패쓰와 머티리얼에서 동적생성한 후 
+	// 셰이더에 바인딩하는 방식으로 구현할 수 있다.
 	static ConstantBuffer* s_pCameraVertexShaderBuffer = nullptr;
 	static ConstantBuffer* s_pModelVertexShaderBuffer = nullptr;
 	static ConstantBuffer* s_pCameraPixelShaderBuffer = nullptr;

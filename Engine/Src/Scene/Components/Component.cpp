@@ -7,16 +7,28 @@
 namespace Dive
 {
 	Component::Component(GameObject* pGameObject)
-		: m_ID(0)
-		, m_pGameObject(pGameObject)
+		: m_pGameObject(pGameObject)
 		, m_pTransform(nullptr)
 	{
-		DV_ASSERT(pGameObject);
-		m_pTransform = m_pGameObject->GetTransform();
+		DV_CORE_ASSERT(pGameObject);
 	}
 
 	std::string Component::GetName() const
 	{
 		return m_pGameObject->GetName();
+	}
+
+	GameObject* Component::GetGameObject() const
+	{
+		return m_pGameObject;
+	}
+
+	Transform* Component::GetTransform()
+	{
+		if (!m_pTransform)
+			m_pTransform = m_pGameObject->GetTransform();
+
+		DV_CORE_ASSERT(m_pTransform);
+		return m_pTransform;
 	}
 }

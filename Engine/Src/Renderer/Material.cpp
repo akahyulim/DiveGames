@@ -9,10 +9,13 @@ namespace Dive
 {
 	Material::Material()
 		: Resource(eResourceType::Material),
-        m_DiffuseColor(1.0f, 1.0f, 1.0f, 1.0f),
+        m_DiffuseColor(1.0f, 0.0f, 0.0f, 1.0f),
         m_Tiling(1.0f, 1.0f),
         m_Offset(0.0f, 0.0f)
 	{
+        // sparky는 shader를 가진다.
+        // 따라서 이 곳에서 shader를 통해 constantbuffer의 userbuffer 정보(크기, 타입)을 참조하여 버퍼를 직접 구성한다.
+        // 그리고 bind에서 shader에 해당 버퍼를 건내주면 복사(map/unmap)를 한 후 bind한다. 
 	}
 		
 	Material::~Material()
@@ -30,6 +33,21 @@ namespace Dive
 		
 		return true;
 	}
+
+    void Material::Bind()
+    {
+        // 쉐이더 바인드
+
+        // 쉐이더에 상수 버퍼 전달 
+
+        // 텍스쳐 바인드
+    }
+
+    void Material::Unbind()
+    {
+        // 사용한 텍스쳐들을 언바인드
+        // 그런데 스파키의 경우 텍스쳐조차 바인드/언바인드가 있다.
+    }
 
     Texture* Material::GetTexture(eTextureUnit unit) const
     {
@@ -61,5 +79,10 @@ namespace Dive
             Texture2D* pTexture = ResourceCache::GetResourceByPath<Texture2D>(name);    // 원래 ByName으로 했는데, 캐시에서 찾는거라 적용이 안될 수 있었다.
             SetTexture(unit, dynamic_cast<Texture*>(pTexture));
         }
+    }
+
+    bool Material::HasTexture(eTextureUnit unit)
+    {
+        return m_Textures[unit] != nullptr;
     }
 }

@@ -4,8 +4,8 @@
 class SceneViewPanel : public Panel
 {
 public:
-	SceneViewPanel();
-	~SceneViewPanel() override;
+	SceneViewPanel(ModelViewer* pModelViewer);
+	~SceneViewPanel() = default;
 
 	void OnRender() override;
 

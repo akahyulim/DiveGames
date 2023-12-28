@@ -6,8 +6,6 @@ namespace Dive
 {
 	class Texture;
 
-	// 스파키에선 바인드함수까지 가진다.
-	// 즉, 쉐이더와 상수 버퍼 그리고 텍스쳐까지 바인드한다.
 	class Material : public Resource
 	{
 	public:
@@ -17,13 +15,17 @@ namespace Dive
 		bool LoadFromFile(const std::string& filePath) override;
 		bool SaveToFile(const std::string& filePath) override;
 
+		void Bind();
+		void Unbind();
+
 		const std::unordered_map<eTextureUnit, Texture*>& GetTextures() const { return m_Textures; }
 		Texture* GetTexture(eTextureUnit unit) const;
 		void SetTexture(eTextureUnit unit, Texture* pTexture);
 		void AddTexture(eTextureUnit unit, const std::string& name);
+		bool HasTexture(eTextureUnit unit);
 
 		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_DiffuseColor; }
-		void SetDiffuseColor(float r, float g, float b, float a) { SetDiffuseColor(DirectX::XMFLOAT4(r, g, b, a)); }
+		void SetDiffuseColor(float r, float g, float b, float a) { m_DiffuseColor = { r, g, b, a }; }
 		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_DiffuseColor = color; }
 
 		DirectX::XMFLOAT2 GetTiling() const { return m_Tiling; }

@@ -12,56 +12,46 @@
 
 namespace Dive
 {
+	static constexpr float FOV_MIN = 1.0f;
+	static constexpr float FOV_MAX = 160.0f;
+
 	Camera::Camera(GameObject* pGameObject)
 		: Component(pGameObject)
-		, m_bOrthographic(false)
-		, m_ViewWidth(800.0f)
-		, m_ViewHeight(600.0f)
-		, m_BackgroundColor(1.0f, 1.0f, 1.0f, 1.0f)
-		, m_FieldOfView(45.0f)
-		, m_NearClipPlane(0.1f)
-		, m_FarClipPlane(5000.0f)
-		, m_ViewportRectRateX(0.0f)
-		, m_ViewportRectRateY(0.0f)
-		, m_ViewportRectRateHeight(1.0f)
-		, m_ViewportRectRateWidth(1.0f)
-		, m_MoveSpeed(10.0f)
-		, m_RotateSpeed(50.0f)
-		, m_RenderingPath(eRenderingPath::Deferred)
 	{
+		m_ProjectionType = eProjectionType::Perspective;
+		m_BackgroundColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		m_FieldOfView = 45.0f;
+		m_NearClipPlane = 0.1f;
+		m_FarClipPlane = 5000.0f;
+		m_ViewportRectRateX = 0.0f;
+		m_ViewportRectRateY = 0.0f;
+		m_ViewportRectRateHeight = 1.0f;
+		m_ViewportRectRateWidth = 1.0f;
+		m_MoveSpeed = 10.0f;
+		m_RotateSpeed = 50.0f;
+		m_pSkydome = nullptr;
 	}
 
 	Camera::~Camera()
 	{
+		DV_DELETE(m_pSkydome);
 	}
 
-	// 이외에도 MeshRenderer를 전달받아 AABB boundbox의 center, extents로 확인하는 함수가 필요하다. 
-	bool Camera::IsInViewFrustum(const DirectX::XMFLOAT3& center, const DirectX::XMFLOAT3& extents) const
+	DirectX::XMMATRIX Camera::GetWorldMatrix()
 	{
-		// 절두체 내부에 포함되는지 확인
-		// 실제로는 프러스텀에 판정 함수까지 구현한다.
-		return false;
-	}
-
-	DirectX::XMMATRIX Camera::GetWorldMatrix() const
-	{
-		auto pTransform = m_pGameObject->GetComponent<Transform>();
+		auto pTransform = GetTransform();
 		if (!pTransform)
 			return DirectX::XMMatrixIdentity();
 
 		return DirectX::XMMatrixTranslationFromVector(pTransform->GetPositionVector());
 	}
 
-	DirectX::XMMATRIX Camera::GetViewMatrix() const
+	DirectX::XMMATRIX Camera::GetViewMatrix()
 	{
-		DV_CORE_ASSERT(m_pGameObject);
-
-		auto pTransform = m_pGameObject->GetComponent<Transform>();
+		auto pTransform = GetTransform();
 		if (!pTransform)
 			return DirectX::XMMatrixIdentity();
 
-		// api를 살펴보면 마지막 매개변수는 카메라의 상향벡터이다.
-		// 그런데 또 일반적으로 0, 1, 0이라고 적어놓았다...
 		return DirectX::XMMatrixLookToLH(
 			pTransform->GetPositionVector(),
 			pTransform->GetForwardVector(),
@@ -70,17 +60,17 @@ namespace Dive
 
 	DirectX::XMMATRIX Camera::GetProjectionMatrix() const
 	{
-		return m_bOrthographic ? GetOrthographicProjMatrix() : GetPerspectiveProjMatrix();
+		return m_ProjectionType == eProjectionType::Orthographic ? GetOrthographicProjMatrix() : GetPerspectiveProjMatrix();
 	}
 
 	// 아직 제대로된 테스트도 못했다.
 	DirectX::XMMATRIX Camera::GetOrthographicProjMatrix() const
 	{
+		auto viewSize = Renderer::GetResolutionRender();
+
 		return DirectX::XMMatrixOrthographicLH(
-			//m_ViewWidth,
-			//m_ViewHeight,
-			m_ViewportRectRateHeight,
-			m_ViewportRectRateWidth,
+			viewSize.x,
+			viewSize.y,
 			m_NearClipPlane,
 			m_FarClipPlane);
 	}
@@ -96,19 +86,17 @@ namespace Dive
 
 	float Camera::GetAspectRatio() const
 	{
-		float width = static_cast<float>(Graphics::GetWindowWidth());
-		float height = static_cast<float>(Graphics::GetWindowHeight());
+		auto viewSize = Renderer::GetResolutionRender();
 
-		return ((width * m_ViewportRectRateWidth) - (width * m_ViewportRectRateX)) /
-			((height * m_ViewportRectRateHeight) - (height * m_ViewportRectRateY));
+		return ((viewSize.x * m_ViewportRectRateWidth) - (viewSize.x * m_ViewportRectRateX)) /
+			((viewSize.y * m_ViewportRectRateHeight) - (viewSize.y * m_ViewportRectRateY));
 	}
 
-	// min, max를 따로 선언해 놓는 편이 낫다.
 	void Camera::SetFieldOfView(float fov)
 	{
-		if (fov < 0.0f)
+		if (fov < FOV_MIN)
 			m_FieldOfView = 1.0f;
-		else if (fov > 160.0f)
+		else if (fov > FOV_MAX)
 			m_FieldOfView = 160.0f;
 		else
 			m_FieldOfView = fov;
@@ -134,21 +122,18 @@ namespace Dive
 		m_ViewportRectRateHeight = height;
 	}
 
-	// 흐음 직접 가져와서 계산하네...
-	D3D11_VIEWPORT Camera::GetViewport()
+	D3D11_VIEWPORT Camera::GetViewport() const
 	{
-		D3D11_VIEWPORT viewport;
-		//viewport.TopLeftX = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectRateX;
-		//viewport.TopLeftY = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectRateY;
-		//viewport.Width = static_cast<float>(Graphics::GetWindowWidth()) * m_ViewportRectRateWidth;
-		//viewport.Height = static_cast<float>(Graphics::GetWindowHeight()) * m_ViewportRectRateHeight;
-		viewport.TopLeftX = Renderer::GetResolutionRender().x * m_ViewportRectRateX;
-		viewport.TopLeftY = Renderer::GetResolutionRender().y * m_ViewportRectRateY;
-		viewport.Width = Renderer::GetResolutionRender().x * m_ViewportRectRateWidth;
-		viewport.Height = Renderer::GetResolutionRender().y * m_ViewportRectRateHeight;
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
+		auto viewSize = Renderer::GetResolutionRender();
 
-		return viewport;
+		return D3D11_VIEWPORT
+		{
+			viewSize.x * m_ViewportRectRateX,
+			viewSize.y * m_ViewportRectRateY,
+			viewSize.x * m_ViewportRectRateWidth,
+			viewSize.y * m_ViewportRectRateHeight,
+			0.0f,
+			1.0f,
+		};
 	}
 }

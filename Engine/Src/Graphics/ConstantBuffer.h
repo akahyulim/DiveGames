@@ -6,6 +6,8 @@
 
 namespace Dive
 {
+	// 굳이 Object를 상속해야 하나?
+	// Name은 사용할 수 있지만 ID는 사용하지 않는다.
 	class ConstantBuffer : public Object
 	{
 	public:
@@ -32,7 +34,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateBuffer(&desc, nullptr, &m_pBuffer)))
 			{
-				DV_CORE_ERROR("ConstantBuffer({:s}) 생성에 실패하였습니다.", m_Name);
+				DV_CORE_ERROR("ConstantBuffer({:s}) 생성에 실패하였습니다.", GetName());
 				return false;
 			}
 
@@ -45,8 +47,6 @@ namespace Dive
 		ID3D11Buffer* GetBuffer() const { return m_pBuffer; }
 
 		uint32_t GetStride() const { return m_Stride; }
-
-	private:
 
 	private:
 		ID3D11Buffer* m_pBuffer;

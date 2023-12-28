@@ -14,7 +14,6 @@
 #include "Core/Log.h"
 
 #include "Renderer/Skeleton.h"
-#include "BoneRenderer.h"
 
 namespace Dive
 {
@@ -52,14 +51,15 @@ namespace Dive
 				pMappedData->diffuseColor = m_pMaterial->GetDiffuseColor();
 				pMappedData->tiling = m_pMaterial->GetTiling();
 				pMappedData->offset = m_pMaterial->GetOffset();
+				pMappedData->properties = 0; 
+				pMappedData->properties  |= m_pMaterial->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
 				pBuffer->Unmap();
 				Graphics::SetConstantBuffer(2, eShaderType::PixelShader, pBuffer);
 			}
 
-			// 일단 셰이더를 별도로 만들어 사용했다.
-			// 렌더링엔 성공했다.
-			Graphics::SetShaderVariation(eShaderType::VertexShader, Renderer::GetDeferredSkinnedShadingVertexShaderVariation());//GetBasicSkinnedVertexShaderVariation());
-			Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetDeferredSkinnedShadingPixelShaderVariation());//GetBasicSkinnedPixelShaderVariation());
+			// 이 역시 머티리얼에서 관리해야 한다.
+			Graphics::SetShaderVariation(eShaderType::VertexShader, Renderer::GetDeferredSkinnedShadingVertexShaderVariation());
+			Graphics::SetShaderVariation(eShaderType::PixelShader, Renderer::GetDeferredSkinnedShadingPixelShaderVariation());
 		}
 
 		// 이걸 update에 넣어버리면 마지막 모델의 값만 저장된다. 따라서 그냥 한 번에 그려야 한다.
@@ -82,7 +82,7 @@ namespace Dive
 
 			auto pBuffer = Renderer::GetModelVertexShaderBuffer();
 			auto pMappedData = static_cast<ModelVertexShaderBuffer*>(pBuffer->Map());
-			pMappedData->worldMatrix = DirectX::XMMatrixTranspose(m_pGameObject->GetTransform()->GetWorldMatrix());
+			pMappedData->worldMatrix = DirectX::XMMatrixTranspose(GetTransform()->GetWorldMatrix());
 			// 1. XMMatrixTranspose()때문에 memcpy 같은걸 못쓴다.
 			// 2. XMMATRIX와 XMFLOAT4의 변환이 걸리는데, calcuBoneTransform()에서 계산할때 어차피 타입이 수시로 바뀐다.
 			for (uint32_t i = 0; i < static_cast<uint32_t>(m_SkinMatrices.size()); ++i)
@@ -148,7 +148,7 @@ namespace Dive
 		auto it = m_BoneInfoMap.find(nodeName);
 		if (it != m_BoneInfoMap.end())
 		{
-			auto finalBoneTransform = DirectX::XMLoadFloat4x4(&it->second.offsetMatrix) * worldTransform;
+			auto finalBoneTransform = DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&it->second.offsetMatrix), worldTransform);
 			DirectX::XMStoreFloat4x4(&m_SkinMatrices[it->second.index], finalBoneTransform);
 		}
 

@@ -1,21 +1,12 @@
 #include "divepch.h"
 #include "Transform.h"
+#include "Core/CoreDefs.h"
 #include "Math/Math.h"
 
 using namespace DirectX;
 
 namespace Dive
 {
-	static bool XMFloat3Equal(const XMFLOAT3& F1, const XMFLOAT3& F2)
-	{
-		return (F1.x == F2.x) && (F1.y == F2.y) && (F1.z == F2.z);
-	}
-
-	static bool XMFloat4Equal(const XMFLOAT4& F1, const XMFLOAT4& F2)
-	{
-		return (F1.x == F2.x) && (F1.y == F2.y) && (F1.z == F2.z) && (F1.w == F2.w);
-	}
-
 	Transform::Transform(GameObject* pGameObject)
 		: Component(pGameObject)
 		, m_pParent(nullptr)
@@ -24,10 +15,13 @@ namespace Dive
 		m_LocalRotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 		m_LocalScale = { 1.0f, 1.0f, 1.0f };
 
-		m_LookAt = { 0.0f, 0.0f, 1.0f };
-
 		XMStoreFloat4x4(&m_LocalMatrix, XMMatrixIdentity());
 		XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
+	}
+
+	void Transform::Update()
+	{
+		updateTransform();
 	}
 
 	DirectX::XMFLOAT3 Transform::GetPosition() const
@@ -66,7 +60,7 @@ namespace Dive
 
 	void Transform::SetLocalPosition(const DirectX::XMFLOAT3& pos)
 	{
-		if (!XMFloat3Equal(m_LocalPosition, pos))
+		if(!XMVector3Equal(GetLocalPositionVector(), XMLoadFloat3(&pos)))
 		{
 			m_LocalPosition = pos;
 			updateTransform();
@@ -225,7 +219,7 @@ namespace Dive
 
 	void Transform::SetLocalScale(const DirectX::XMFLOAT3& scale)
 	{
-		if (!XMFloat3Equal(m_LocalScale, scale))
+		if (!XMVector3Equal(GetLocalScaleVector(), XMLoadFloat3(&scale)))
 		{
 			m_LocalScale = scale;
 			updateTransform();
@@ -234,8 +228,7 @@ namespace Dive
 
 	void Transform::SetLocalScale(const DirectX::XMVECTOR& scale)
 	{
-		auto curLocalScale = GetLocalScaleVector();
-		if (!XMVector3Equal(curLocalScale, scale))
+		if (!XMVector3Equal(GetLocalScaleVector(), scale))
 		{
 			XMStoreFloat3(&m_LocalScale, scale);
 			updateTransform();
@@ -402,8 +395,7 @@ namespace Dive
 
 	bool Transform::IsChildOf(Transform* pParent) const
 	{
-		if (!pParent)
-			return false;
+		DV_CORE_ASSERT(pParent);
 
 		if (this->GetID() == pParent->GetID())
 			return true;
@@ -441,7 +433,6 @@ namespace Dive
 
 	void Transform::updateTransform()
 	{
-		// 자신의 스케일, 회전, 위치를 기준으로 좌표계를 만든다. 
 		const auto localMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&m_LocalScale)) *
 			XMMatrixRotationQuaternion(XMLoadFloat4(&m_LocalRotation)) *
 			XMMatrixTranslationFromVector(XMLoadFloat3(&m_LocalPosition));
@@ -575,36 +566,5 @@ namespace Dive
 	DirectX::XMVECTOR Transform::GetLookAtVector()
 	{
 		return XMVectorAdd(GetPositionVector(), GetForwardVector());
-	}
-	
-	void Transform::SetLookAt(const Transform& target, const DirectX::XMFLOAT3& worldUp)
-	{
-		SetLookAt(target.GetPosition(), worldUp);
-	}
-
-	void Transform::SetLookAt(float posX, float posY, float posZ, const DirectX::XMFLOAT3& worldUp)
-	{
-		SetLookAt(XMVectorSet(posX, posY, posZ, 1.0f), worldUp); 
-	}
-
-	void Transform::SetLookAt(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& worldUp)
-	{
-		SetLookAt(XMLoadFloat3(&pos), worldUp);
-	}
-
-	// 대상 지점을 바라보도록 회전해야 한다.
-	void Transform::SetLookAt(const DirectX::XMVECTOR& pos, const DirectX::XMFLOAT3& worldUp)
-	{
-		// 로컬 좌표계를 계산할 순 있다.
-		XMVECTOR localZ = XMVector3Normalize(XMVectorSubtract(pos, GetPositionVector()));
-		XMVECTOR localX = XMVector3Normalize(XMVector3Cross(XMLoadFloat3(&worldUp), localZ));
-		XMVECTOR localY = XMVector3Normalize(XMVector3Cross(localZ, localX));
-
-		// 문제는 어떻게 회전하느냐이다.
-		auto angleX = XMVector3AngleBetweenVectors(GetRightwardVector(), localX);
-		auto angleY = XMVector3AngleBetweenVectors(GetUpwardVector(), localY);
-		auto angleZ = XMVector3AngleBetweenVectors(GetForwardVector(), localZ);
-
-		Rotate(XMQuaternionRotationRollPitchYaw(XMVectorGetX(angleX), XMVectorGetX(angleY), XMVectorGetX(angleZ)));
 	}
 }
