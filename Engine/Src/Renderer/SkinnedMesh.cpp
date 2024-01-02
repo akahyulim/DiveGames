@@ -42,4 +42,8 @@ namespace Dive
 			return;
 		}
 	}
+
+	void SkinnedMesh::Render(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology)
+	{
+	}
 }

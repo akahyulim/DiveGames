@@ -4,7 +4,7 @@
 namespace Dive
 {
 	class GameObject;
-	class IMesh;
+	class Mesh;
 	class StaticMesh;
 	class Material;
 
@@ -22,8 +22,8 @@ namespace Dive
 
 		virtual void Draw() = 0;
 
-		virtual IMesh* GetMesh() = 0;
-		virtual void SetMesh(IMesh* pMesh) = 0;
+		virtual Mesh* GetMesh() = 0;
+		virtual void SetMesh(Mesh* pMesh) = 0;
 
 		bool HasMaterial() const { return m_pMaterial; }
 		Material* GetMaterial() const { return m_pMaterial; }
@@ -41,8 +41,8 @@ namespace Dive
 
 		void Draw() override;
 
-		IMesh* GetMesh() override;
-		void SetMesh(IMesh* pMesh) override;
+		Mesh* GetMesh() override;
+		void SetMesh(Mesh* pMesh) override;
 
 	private:
 

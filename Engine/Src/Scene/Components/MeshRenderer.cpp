@@ -81,12 +81,12 @@ namespace Dive
 		}
 	}
 
-	IMesh* MeshRenderer::GetMesh()
+	Mesh* MeshRenderer::GetMesh()
 	{
-		return m_pMesh ? static_cast<IMesh*>(m_pMesh) : nullptr;
+		return m_pMesh ? static_cast<Mesh*>(m_pMesh) : nullptr;
 	}
 
-	void MeshRenderer::SetMesh(IMesh* pMesh)
+	void MeshRenderer::SetMesh(Mesh* pMesh)
 	{
 		m_pMesh = dynamic_cast<StaticMesh*>(pMesh);
 	}

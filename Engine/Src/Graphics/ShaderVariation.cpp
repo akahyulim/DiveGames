@@ -126,6 +126,32 @@ namespace Dive
 			return false;
 		}
 
+		// test
+		// 컴파일한 셰이더버퍼를 이용해 인풋 파라미터와 상수 버퍼 정보를 얻을 수 있는 듯 하다.
+		{
+			unsigned char* bufData = (unsigned char*)m_pShaderBuffer->GetBufferPointer();
+			unsigned bufSize = (unsigned)m_pShaderBuffer->GetBufferSize();
+
+			ID3D11ShaderReflection* reflection = nullptr;
+			D3D11_SHADER_DESC shaderDesc;
+
+			HRESULT hr = D3DReflect(bufData, bufSize, IID_ID3D11ShaderReflection, (void**)&reflection);
+			if (FAILED(hr) || !reflection)
+			{
+				return false;
+			}
+
+			reflection->GetDesc(&shaderDesc);
+
+			for (unsigned i = 0; i < shaderDesc.InputParameters; ++i)
+			{
+				D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
+				reflection->GetInputParameterDesc((UINT)i, &paramDesc);
+
+				DV_CORE_DEBUG("param semantic: {:s}", paramDesc.SemanticName);
+			}
+		}
+
 		auto pDevice = Graphics::GetDevice();
 		DV_CORE_ASSERT(pDevice);
 

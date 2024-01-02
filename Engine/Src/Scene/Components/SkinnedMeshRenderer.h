@@ -4,7 +4,7 @@
 
 namespace Dive
 {
-	class IMesh;
+	class Mesh;
 	class SkinnedMesh;
 	struct ModelVertexShaderBuffer;	// 임시
 	struct BoneInfo;	// 역시 임시
@@ -19,8 +19,8 @@ namespace Dive
 		void Update() override;
 		void Draw() override;
 
-		IMesh* GetMesh() override;
-		void SetMesh(IMesh* pMesh) override;
+		Mesh* GetMesh() override;
+		void SetMesh(Mesh* pMesh) override;
 
 		// 유니티에서 멤버변수는 배열로 관리하지만
 		// ui에선 root bone을 다루고 있다.

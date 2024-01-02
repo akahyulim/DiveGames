@@ -85,13 +85,6 @@ namespace Dive
 		static uint32_t GetNumLayers();
 
 		// test: 아무리봐도 에바다...
-		static ShaderVariation* GetBasicVertexShaderVariation();
-		static ShaderVariation* GetBasicPixelShaderVariation();
-		static ShaderVariation* GetBasicSkinnedVertexShaderVariation();
-		static ShaderVariation* GetBasicSkinnedPixelShaderVariation();
-		static ShaderVariation* GetForwardLightVertexShaderVariation();
-		static ShaderVariation* GetDirectionalLightPixelShaderVariation();
-		static ShaderVariation* GetPointLightPixelShaderVariation();
 		static ShaderVariation* GetDeferredShadingVertexShaderVariation();
 		static ShaderVariation* GetDeferredShadingPixelShaderVariation();
 		static ShaderVariation* GetDeferredSkinnedShadingVertexShaderVariation();

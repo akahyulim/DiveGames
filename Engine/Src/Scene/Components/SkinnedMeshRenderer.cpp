@@ -102,12 +102,12 @@ namespace Dive
 		}
 	}
 
-	IMesh* SkinnedMeshRenderer::GetMesh()
+	Mesh* SkinnedMeshRenderer::GetMesh()
 	{
-		return m_pMesh ? static_cast<IMesh*>(m_pMesh) : nullptr;
+		return m_pMesh ? static_cast<Mesh*>(m_pMesh) : nullptr;
 	}
 	
-	void SkinnedMeshRenderer::SetMesh(IMesh* pMesh)
+	void SkinnedMeshRenderer::SetMesh(Mesh* pMesh)
 	{
 		m_pMesh = dynamic_cast<SkinnedMesh*>(pMesh);
 	}

@@ -27,13 +27,6 @@ namespace Dive
 	static std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> s_RenderTargets;
 	
 	// 적어도 셰이더는 리소스 매니저가 관리하는 편이 나을 것 같다.
-	static ShaderVariation* s_pBasicVertexShader = nullptr;
-	static ShaderVariation* s_pBasicPixelShader = nullptr;
-	static ShaderVariation* s_pBasicSkinnedVertexShader = nullptr;
-	static ShaderVariation* s_pBasicSkinnedPixelShader = nullptr;
-	static ShaderVariation* s_pForwardLightVertexShader = nullptr;
-	static ShaderVariation* s_pDirectionalLightPixelShader = nullptr;
-	static ShaderVariation* s_pPointLightPixelShader = nullptr;
 	static ShaderVariation* s_pDeferredShadingVertexShader = nullptr;
 	static ShaderVariation* s_pDeferredShadingPixelShader = nullptr;
 	static ShaderVariation* s_pDeferredSkinnedShadingVertexShader = nullptr;
@@ -93,10 +86,6 @@ namespace Dive
 			DV_DELETE(s_pCameraPixelShaderBuffer);
 			DV_DELETE(s_pModelVertexShaderBuffer);
 			DV_DELETE(s_pCameraVertexShaderBuffer);
-
-			DV_DELETE(s_pDirectionalLightPixelShader);
-			DV_DELETE(s_pPointLightPixelShader);
-			DV_DELETE(s_pForwardLightVertexShader);
 		}
 
 		for (auto* pRasterizerState : s_RasterizerStates)
@@ -186,41 +175,6 @@ namespace Dive
 	uint32_t Renderer::GetNumLayers()
 	{
 		return static_cast<uint32_t>(s_Layers.size());
-	}
-
-	ShaderVariation* Renderer::GetBasicVertexShaderVariation()
-	{
-		return s_pBasicVertexShader;
-	}
-
-	ShaderVariation* Renderer::GetBasicPixelShaderVariation()
-	{
-		return s_pBasicPixelShader;
-	}
-
-	ShaderVariation* Renderer::GetBasicSkinnedVertexShaderVariation()
-	{
-		return s_pBasicSkinnedVertexShader;
-	}
-
-	ShaderVariation* Renderer::GetBasicSkinnedPixelShaderVariation()
-	{
-		return s_pBasicSkinnedPixelShader;
-	}
-
-	ShaderVariation* Renderer::GetForwardLightVertexShaderVariation()
-	{
-		return s_pForwardLightVertexShader;
-	}
-
-	ShaderVariation* Renderer::GetDirectionalLightPixelShaderVariation()
-	{
-		return s_pDirectionalLightPixelShader;
-	}
-
-	ShaderVariation* Renderer::GetPointLightPixelShaderVariation()
-	{
-		return s_pPointLightPixelShader;
 	}
 
 	ShaderVariation* Renderer::GetDeferredShadingVertexShaderVariation()
@@ -433,36 +387,6 @@ namespace Dive
 	// Light 및 post procssing은 어떻게 적용하는지 아직 모르겠다.
 	bool Renderer::createShaders()
 	{
-		// basic
-		{
-			s_pBasicVertexShader = new ShaderVariation;
-			if (!s_pBasicVertexShader->CompileAndCreate(eShaderType::VertexShader, "CoreData/Shaders/Basic.hlsl", eVertexType::Model))
-				return false;
-			s_pBasicPixelShader = new ShaderVariation;
-			if (!s_pBasicPixelShader->CompileAndCreate(eShaderType::PixelShader, "CoreData/Shaders/Basic.hlsl"))
-				return false;
-
-			s_pBasicSkinnedVertexShader = new ShaderVariation;
-			if (!s_pBasicSkinnedVertexShader->CompileAndCreate(eShaderType::VertexShader, "CoreData/Shaders/Basic_Skinned.hlsl", eVertexType::Skinned))
-				return false;
-			s_pBasicSkinnedPixelShader = new ShaderVariation;
-			if (!s_pBasicSkinnedPixelShader->CompileAndCreate(eShaderType::PixelShader, "CoreData/Shaders/Basic_Skinned.hlsl"))
-				return false;
-		}
-
-		// forward light
-		{
-			s_pForwardLightVertexShader = new ShaderVariation;
-			if (!s_pForwardLightVertexShader->CompileAndCreate(eShaderType::VertexShader, "CoreData/Shaders/ForwardLightCommon.hlsl", eVertexType::Model))
-				return false;
-			s_pDirectionalLightPixelShader = new ShaderVariation;
-			if (!s_pDirectionalLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "CoreData/Shaders/DirectionalLight.hlsl"))
-				return false;
-			s_pPointLightPixelShader = new ShaderVariation;
-			if (!s_pPointLightPixelShader->CompileAndCreate(eShaderType::PixelShader, "CoreData/Shaders/PointLight.hlsl"))
-				return false;
-		}
-
 		// Deferred Shading
 		{
 			s_pDeferredShadingVertexShader = new ShaderVariation;

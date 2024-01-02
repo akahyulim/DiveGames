@@ -8,11 +8,11 @@ namespace Dive
 	// 스파키는 메시가 머티리얼을 가지며
 	// 렌더함수에서 직접 바인드까지 한다.
 	// 그리고 버퍼를 생성자에서 전달받지만 해제는 직접한다.
-	class IMesh
+	class Mesh
 	{
 	public:
-		IMesh();
-		virtual ~IMesh();
+		Mesh();
+		virtual ~Mesh();
 
 		virtual uint32_t GetNumVertices() const = 0;
 		virtual uint32_t GetNumIndices() const = 0;
@@ -26,6 +26,8 @@ namespace Dive
 		virtual void CreateVertexBuffer() = 0;
 		virtual void CreateIndexBuffer() = 0;
 
+		virtual void Render(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) = 0;
+ 
 		VertexBuffer* GetVertexBuffer() const { return m_pVertexBuffer; }
 		IndexBuffer* GetIndexBuffer() const { return m_pIndexBuffer; }
 
@@ -37,7 +39,7 @@ namespace Dive
 		IndexBuffer* m_pIndexBuffer;
 	};
 
-	class StaticMesh : public IMesh
+	class StaticMesh : public Mesh
 	{
 	public:
 		StaticMesh() = default;
@@ -47,6 +49,8 @@ namespace Dive
 
 		void CreateVertexBuffer() override;
 		void CreateIndexBuffer() override;
+
+		void Render(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) override;
 
 		uint32_t GetNumVertices() const override { return static_cast<uint32_t>(m_Vertices.size()); }
 		uint32_t GetNumIndices() const override { return static_cast<uint32_t>(m_Indices.size()); }
