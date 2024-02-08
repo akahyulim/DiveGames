@@ -5,14 +5,15 @@ namespace Dive
 {
 	class GameObject;
 
-	enum class eSpace
-	{
-		World, 
-		Local
-	};
-
 	class Transform : public Component
 	{
+	public:
+		enum class eSpace
+		{
+			World,
+			Local
+		};
+
 	public:
 		Transform(GameObject* pGameObject);
 		~Transform() = default;

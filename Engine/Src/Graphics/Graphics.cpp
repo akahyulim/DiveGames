@@ -441,18 +441,18 @@ namespace Dive
 
 		prepareDraw();
 
-		if(target & eClearTarget::Color)
+		if(target & eClearFlags::Color)
 		{
 			float clearColor[4] = { color.x, color.y, color.z, color.w };
 			for (uint32_t i = 0; i < MAX_RENDERTARGETS; ++i)
 				s_pDeviceContext->ClearRenderTargetView(s_pRenderTargetViews[i], clearColor);
 		}
 
-		if((target & eClearTarget::Depth) || (target & eClearTarget::Stencil))
+		if((target & eClearFlags::Depth) || (target & eClearFlags::Stencil))
 		{
 			uint32_t flags = 0;
-			flags |= (target & eClearTarget::Depth) ? D3D11_CLEAR_DEPTH : 0;
-			flags |= (target & eClearTarget::Stencil) ? D3D11_CLEAR_STENCIL : 0;
+			flags |= (target & eClearFlags::Depth) ? D3D11_CLEAR_DEPTH : 0;
+			flags |= (target & eClearFlags::Stencil) ? D3D11_CLEAR_STENCIL : 0;
 
 			s_pDeviceContext->ClearDepthStencilView(s_pDepthStencilView, flags, depth, stencil);
 		}

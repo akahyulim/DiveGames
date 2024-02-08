@@ -22,6 +22,7 @@ namespace Dive
 		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_pShaderResourceView; }
 		ID3D11SamplerState* GetSamplerState() const { return m_pSamplerState; }
 
+		DirectX::XMFLOAT2 GetSize() const { return { (float)m_Width, (float)m_Height }; }
 		int GetWidth() const { return m_Width; }
 		int GetHeight() const { return m_Height; }
 

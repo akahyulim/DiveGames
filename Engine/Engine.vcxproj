@@ -79,8 +79,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>$(ProjectName)_d</TargetName>
-    <OutDir>$(SolutionDir)\DiveGames\</OutDir>
+    <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(SolutionDir)\bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -159,11 +159,20 @@
     <ClInclude Include="Src\Core\Log.h" />
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\Timer.h" />
+    <ClInclude Include="Src\Core\DvApplication.h" />
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Src\Graphics\DvConstantBuffer.h" />
+    <ClInclude Include="Src\Graphics\DvIndexBuffer.h" />
+    <ClInclude Include="Src\Graphics\DvRenderTexture.h" />
+    <ClInclude Include="Src\Graphics\DvShader.h" />
+    <ClInclude Include="Src\Graphics\DvTexture.h" />
+    <ClInclude Include="Src\Graphics\DvTexture2D.h" />
+    <ClInclude Include="Src\Graphics\DvVertexBuffer.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\GraphicsDefs.h" />
+    <ClInclude Include="Src\Graphics\GraphicsDevice.h" />
     <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
     <ClInclude Include="Src\Graphics\IndexBuffer.h" />
     <ClInclude Include="Src\Graphics\InputLayout.h" />
@@ -172,12 +181,17 @@
     <ClInclude Include="Src\Graphics\Texture.h" />
     <ClInclude Include="Src\Graphics\Texture2D.h" />
     <ClInclude Include="Src\Graphics\VertexBuffer.h" />
+    <ClInclude Include="Src\Input\DvInput.h" />
     <ClInclude Include="Src\Input\Input.h" />
     <ClInclude Include="Src\IO\FileStream.h" />
     <ClInclude Include="Src\IO\FileSystem.h" />
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\Animation.h" />
     <ClInclude Include="Src\Renderer\Bone.h" />
+    <ClInclude Include="Src\Renderer\DvMaterial.h" />
+    <ClInclude Include="Src\Renderer\DvMesh.h" />
+    <ClInclude Include="Src\Renderer\DvMeshFactory.h" />
+    <ClInclude Include="Src\Renderer\DvRenderer.h" />
     <ClInclude Include="Src\Renderer\Layer.h" />
     <ClInclude Include="Src\Renderer\MeshFactory.h" />
     <ClInclude Include="Src\Renderer\Model.h" />
@@ -185,6 +199,7 @@
     <ClInclude Include="Src\Renderer\Mesh.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\RendererDefs.h" />
+    <ClInclude Include="Src\Renderer\ViewScreen.h" />
     <ClInclude Include="Src\Renderer\Skeleton.h" />
     <ClInclude Include="Src\Renderer\SkinnedMesh.h" />
     <ClInclude Include="Src\Renderer\Skydome.h" />
@@ -194,10 +209,17 @@
     <ClInclude Include="Src\Scene\Components\Camera.h" />
     <ClInclude Include="Src\Scene\Components\Component.h" />
     <ClInclude Include="Src\Scene\Components\Animator.h" />
+    <ClInclude Include="Src\Scene\Components\DvCamera.h" />
+    <ClInclude Include="Src\Scene\Components\DvComponent.h" />
+    <ClInclude Include="Src\Scene\Components\DvLight.h" />
+    <ClInclude Include="Src\Scene\Components\DvTransform.h" />
     <ClInclude Include="Src\Scene\Components\MeshRenderer.h" />
+    <ClInclude Include="Src\Scene\Components\Renderable.h" />
     <ClInclude Include="Src\Scene\Components\SkinnedMeshRenderer.h" />
     <ClInclude Include="Src\Scene\Components\Light.h" />
     <ClInclude Include="Src\Scene\Components\Transform.h" />
+    <ClInclude Include="Src\Scene\DvGameObject.h" />
+    <ClInclude Include="Src\Scene\DvScene.h" />
     <ClInclude Include="Src\Scene\GameObject.h" />
     <ClInclude Include="Src\Scene\Scene.h" />
   </ItemGroup>
@@ -208,11 +230,20 @@
     <ClCompile Include="Src\Core\Log.cpp" />
     <ClCompile Include="Src\Core\Object.cpp" />
     <ClCompile Include="Src\Core\Timer.cpp" />
+    <ClCompile Include="Src\Core\DvApplication.cpp" />
     <ClCompile Include="Src\DivePch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Src\Graphics\ConstantBuffer.cpp" />
+    <ClCompile Include="Src\Graphics\DvConstantBuffer.cpp" />
+    <ClCompile Include="Src\Graphics\DvIndexBuffer.cpp" />
+    <ClCompile Include="Src\Graphics\DvRenderTexture.cpp" />
+    <ClCompile Include="Src\Graphics\DvShader.cpp" />
+    <ClCompile Include="Src\Graphics\DvTexture.cpp" />
+    <ClCompile Include="Src\Graphics\DvTexture2D.cpp" />
+    <ClCompile Include="Src\Graphics\DvVertexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
+    <ClCompile Include="Src\Graphics\GraphicsDevice.cpp" />
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\InputLayout.cpp" />
     <ClCompile Include="Src\Graphics\RenderTexture.cpp" />
@@ -220,12 +251,17 @@
     <ClCompile Include="Src\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Graphics\Texture2D.cpp" />
     <ClCompile Include="Src\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="Src\Input\DvInput.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />
     <ClCompile Include="Src\IO\FileStream.cpp" />
     <ClCompile Include="Src\IO\FileSystem.cpp" />
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\Animation.cpp" />
     <ClCompile Include="Src\Renderer\Bone.cpp" />
+    <ClCompile Include="Src\Renderer\DvMaterial.cpp" />
+    <ClCompile Include="Src\Renderer\DvMesh.cpp" />
+    <ClCompile Include="Src\Renderer\DvMeshFactory.cpp" />
+    <ClCompile Include="Src\Renderer\DvRenderer.cpp" />
     <ClCompile Include="Src\Renderer\Layer.cpp" />
     <ClCompile Include="Src\Renderer\MeshFactory.cpp" />
     <ClCompile Include="Src\Renderer\Model.cpp" />
@@ -235,16 +271,24 @@
     <ClCompile Include="Src\Renderer\Skeleton.cpp" />
     <ClCompile Include="Src\Renderer\SkinnedMesh.cpp" />
     <ClCompile Include="Src\Renderer\Skydome.cpp" />
+    <ClCompile Include="Src\Renderer\ViewScreen.cpp" />
     <ClCompile Include="Src\Resource\Image.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceCache.cpp" />
     <ClCompile Include="Src\Scene\Components\Animator.cpp" />
     <ClCompile Include="Src\Scene\Components\Camera.cpp" />
     <ClCompile Include="Src\Scene\Components\Component.cpp" />
+    <ClCompile Include="Src\Scene\Components\DvCamera.cpp" />
+    <ClCompile Include="Src\Scene\Components\DvComponent.cpp" />
+    <ClCompile Include="Src\Scene\Components\DvLight.cpp" />
+    <ClCompile Include="Src\Scene\Components\DvTransform.cpp" />
     <ClCompile Include="Src\Scene\Components\MeshRenderer.cpp" />
+    <ClCompile Include="Src\Scene\Components\Renderable.cpp" />
     <ClCompile Include="Src\Scene\Components\SkinnedMeshRenderer.cpp" />
     <ClCompile Include="Src\Scene\Components\Light.cpp" />
     <ClCompile Include="Src\Scene\Components\Transform.cpp" />
+    <ClCompile Include="Src\Scene\DvGameObject.cpp" />
+    <ClCompile Include="Src\Scene\DvScene.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />
   </ItemGroup>

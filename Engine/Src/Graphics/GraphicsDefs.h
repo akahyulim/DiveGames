@@ -2,7 +2,7 @@
 
 namespace Dive
 {
-	enum eClearTarget : uint8_t
+	enum eClearFlags : uint8_t
 	{
 		Color = 0x1,
 		Depth = 0x2,

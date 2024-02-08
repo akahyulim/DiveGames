@@ -2,7 +2,7 @@
 
 namespace Dive
 {
-    enum class eRenderingPath
+    enum class eRenderPath
     {
         Forward,
         Deferred
@@ -37,11 +37,6 @@ namespace Dive
     enum class eBlendState
     {
         Addictive,
-        Count
-    };
-
-    enum class eConstantBuffer
-    {
         Count
     };
 

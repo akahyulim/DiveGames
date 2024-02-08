@@ -180,6 +180,72 @@
     <ClInclude Include="Src\Scene\Components\Transform.h">
       <Filter>Src\Scene\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\DvApplication.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\GraphicsDevice.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\DvScene.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\DvGameObject.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\DvComponent.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\DvTransform.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\DvRenderTexture.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\DvCamera.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\Renderable.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\Components\DvLight.h">
+      <Filter>Src\Scene\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\DvIndexBuffer.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\DvVertexBuffer.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\DvShader.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\DvConstantBuffer.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\DvRenderer.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\ViewScreen.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\DvTexture.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\DvTexture2D.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\DvMaterial.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\DvMesh.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\DvMeshFactory.h">
+      <Filter>Src\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Input\DvInput.h">
+      <Filter>Src\Input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DivePch.cpp">
@@ -310,6 +376,72 @@
     </ClCompile>
     <ClCompile Include="Src\Scene\Components\Transform.cpp">
       <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\DvApplication.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\GraphicsDevice.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\DvScene.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\DvGameObject.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\DvComponent.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\DvTransform.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\DvRenderTexture.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\DvCamera.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\Renderable.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\Components\DvLight.cpp">
+      <Filter>Src\Scene\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\DvIndexBuffer.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\DvVertexBuffer.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\DvShader.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\DvConstantBuffer.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\DvRenderer.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\ViewScreen.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\DvTexture.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Graphics\DvTexture2D.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\DvMaterial.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\DvMesh.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\DvMeshFactory.cpp">
+      <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Input\DvInput.cpp">
+      <Filter>Src\Input</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -6,18 +6,20 @@ namespace Dive
 {
 	class Skydome;
 
-	enum class eProjectionType
-	{
-		Perspective,
-		Orthographic
-	};
-
 	class Camera : public Component
 	{
+	public:
+		enum class eProjectionType
+		{
+			Perspective,
+			Orthographic
+		};
+
 	public:
 		Camera(GameObject* pGameObject);
 		~Camera() override;
 
+		DirectX::XMFLOAT3 GetPosition();
 		DirectX::XMMATRIX GetWorldMatrix();
 		DirectX::XMMATRIX GetViewMatrix();
 		DirectX::XMMATRIX GetProjectionMatrix() const;

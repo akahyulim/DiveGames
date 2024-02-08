@@ -56,6 +56,8 @@ namespace Dive
 
 		// update
 		{	
+			// urho3d는 update, postupdata, renderupdate, postrenderupdate 총 네 개의 이벤트로만 처리했다.
+			// 서브시스템의 직접 호출은 없다.
 			FIRE_EVENT(PreUpdateEvent());
 			Timer::Update();
 			Input::Update();
@@ -66,6 +68,9 @@ namespace Dive
 
 		// render
 		{
+			// urho3d는 begin/end 사이에
+			// renderer와 ui의 render함수를 순서대로 실행했다.
+			// 즉, 이벤트는 없다.
 			FIRE_EVENT(PreRenderEvent());
 			Renderer::Render();
 			FIRE_EVENT(PostRenderEvent());	

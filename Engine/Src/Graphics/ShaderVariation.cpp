@@ -99,7 +99,7 @@ namespace Dive
 			&m_pShaderBuffer,
 			&pErrorMsgs)))
 		{
-			DV_CORE_ERROR("셰이더 파일({:s}) 컴파일에 실패하였습니다.", filePath);
+			//DV_CORE_ERROR("셰이더 파일({:s}) 컴파일에 실패하였습니다.", filePath);
 			if (pErrorMsgs)
 				DV_CORE_ERROR("{:s}", (char*)pErrorMsgs->GetBufferPointer());
 			pErrorMsgs->Release();

@@ -80,8 +80,8 @@ namespace Dive
 		static ID3D11DepthStencilState* GetDepthStencilState(const eDepthStencilState state);
 		static ID3D11BlendState* GetBlendState(const eBlendState state);
 
-		static void PushLayer(Layer* pLayer);
-		static void SetLayer(uint32_t index, Layer* pLayer);
+		static void PushLayer(Layer* pViewport);
+		static void SetLayer(uint32_t index, Layer* pViewport);
 		static uint32_t GetNumLayers();
 
 		// test: 아무리봐도 에바다...

@@ -81,7 +81,7 @@ namespace Dive
 			};
 			Graphics::SetRenderTargetViews(0, 3, pRenderTextures);
 			Graphics::SetDepthStencilView(Renderer::GetRenderTarget(eRenderTarget::GBuffer_DepthStencil)->GetDepthStencilView());
-			Graphics::ClearViews(eClearTarget::Color | eClearTarget::Depth | eClearTarget::Stencil, m_pCamera->GetBackgroundColor(), 1.0, 0);
+			Graphics::ClearViews(eClearFlags::Color | eClearFlags::Depth | eClearFlags::Stencil, m_pCamera->GetBackgroundColor(), 1.0, 0);
 		}
 
 		// cmdScenePass - Deferred
@@ -130,7 +130,7 @@ namespace Dive
 		{
 			Graphics::SetRenderTargetView(0, Renderer::GetRenderTarget(eRenderTarget::FrameRender)->GetRenderTargetView());
 			Graphics::SetDepthStencilView(Graphics::GetDefaultDepthStencilView());	// 이건 좀 에바?
-			Graphics::ClearViews(eClearTarget::Color | eClearTarget::Depth, m_pCamera->GetBackgroundColor(), 1.0f, 0);
+			Graphics::ClearViews(eClearFlags::Color | eClearFlags::Depth, m_pCamera->GetBackgroundColor(), 1.0f, 0);
 
 			// camera - 기타 정보(광원 계산용)
 			//DirectX::XMFLOAT3 pos;

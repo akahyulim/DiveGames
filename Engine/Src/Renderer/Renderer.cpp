@@ -75,9 +75,9 @@ namespace Dive
 
 	void Renderer::Shutdown()
 	{
-		for (auto* pLayer : s_Layers)
+		for (auto* pViewport : s_Layers)
 		{
-			DV_DELETE(pLayer);
+			DV_DELETE(pViewport);
 		}
 
 		{
@@ -106,14 +106,14 @@ namespace Dive
 
 	void Renderer::Update()
 	{
-		for (auto* pLayer : s_Layers)
-			pLayer->Update();
+		for (auto* pViewport : s_Layers)
+			pViewport->Update();
 	}
 
 	void Renderer::Render()
 	{
-		for (auto* pLayer : s_Layers)
-			pLayer->Render();
+		for (auto* pViewport : s_Layers)
+			pViewport->Render();
 	}
 
 	DirectX::XMFLOAT2 Renderer::GetResolutionRender()
@@ -159,17 +159,17 @@ namespace Dive
 		return s_BlendStates[static_cast<size_t>(state)];
 	}
 
-	void Renderer::PushLayer(Layer* pLayer)
+	void Renderer::PushLayer(Layer* pViewport)
 	{
-		s_Layers.emplace_back(pLayer);
+		s_Layers.emplace_back(pViewport);
 	}
 
-	void Renderer::SetLayer(uint32_t index, Layer* pLayer)
+	void Renderer::SetLayer(uint32_t index, Layer* pViewport)
 	{
 		if (index >= GetNumLayers())
 			s_Layers.resize(index + 1);
 
-		s_Layers[index] = pLayer;
+		s_Layers[index] = pViewport;
 	}
 
 	uint32_t Renderer::GetNumLayers()

@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{820a4474-f69d-4ed9-ae9f-dab0fcbdad8d}</ProjectGuid>
+    <ProjectGuid>{7ba7f6fe-46f3-4f83-8695-646b47686120}</ProjectGuid>
     <RootNamespace>Sandbox</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -71,8 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)\DiveGames\</OutDir>
-    <TargetName>$(ProjectName)_d</TargetName>
+    <OutDir>$(SolutionDir)\bin\$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -106,7 +105,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)\External\include;$(SolutionDir)\Engine\Src;</AdditionalIncludeDirectories>
@@ -134,15 +133,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Sandbox.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Sandbox.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Engine\Engine.vcxproj">
       <Project>{1c48907d-25b4-4337-827c-46ad2c1361b3}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Src\Sandbox.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Src\Sandbox.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

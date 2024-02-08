@@ -244,7 +244,7 @@ void ModelViewer::OnPostRender(const Dive::Event& e)
 			Dive::Graphics::SetRenderTargetView(0, pRTV);
 			Dive::Graphics::SetDepthStencilView(pDSV);
 
-			Dive::Graphics::ClearViews(Dive::eClearTarget::Color | Dive::eClearTarget::Depth, DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 0);
+			Dive::Graphics::ClearViews(Dive::eClearFlags::Color | Dive::eClearFlags::Depth, DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f, 0);
 			pDeviceContext->OMSetRenderTargets(1, &pRTV, pDSV);
 		}
 

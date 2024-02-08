@@ -37,6 +37,15 @@ namespace Dive
 		DV_DELETE(m_pSkydome);
 	}
 
+	DirectX::XMFLOAT3 Camera::GetPosition()
+	{
+		auto pTransform = GetTransform();
+		if (!pTransform)
+			return DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+		return pTransform->GetPosition();
+	}
+
 	DirectX::XMMATRIX Camera::GetWorldMatrix()
 	{
 		auto pTransform = GetTransform();

@@ -5,9 +5,8 @@
 
 namespace Dive
 {
-	// 스파키는 메시가 머티리얼을 가지며
-	// 렌더함수에서 직접 바인드까지 한다.
-	// 그리고 버퍼를 생성자에서 전달받지만 해제는 직접한다.
+	// StaticMesh를 Mesh로 통합?
+	// 그리고 Type enum 만들기
 	class Mesh
 	{
 	public:
