@@ -11,11 +11,11 @@ namespace Dive
 		Skinned_Model
 	};
 
-	class DvShader : public Resource
+	class Shader : public Resource
 	{
 	public:
-		DvShader(const std::string& name, const std::wstring& filepath, eVertexLayout layout = eVertexLayout::Static_Model);
-		~DvShader();
+		Shader(const std::string& name, const std::wstring& filepath, eVertexLayout layout = eVertexLayout::Static_Model);
+		~Shader();
 
 		ID3D11VertexShader* GetVertexShader() const { return m_pVertexShader; }
 		ID3D11PixelShader* GetPixelShader() const { return m_pPixelShader; }
@@ -29,7 +29,7 @@ namespace Dive
 		void createInputLayout();
 
 	public:
-		static DvShader* CreateFromFile(const std::string& name, const std::wstring& filepath, eVertexLayout layout = eVertexLayout::Static_Model);
+		static Shader* CreateFromFile(const std::string& name, const std::wstring& filepath, eVertexLayout layout = eVertexLayout::Static_Model);
 
 	private:
 	private:

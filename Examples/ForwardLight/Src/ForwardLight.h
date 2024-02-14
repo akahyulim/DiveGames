@@ -3,7 +3,7 @@
 
 namespace ForwardLight
 {
-	class ForwardLight : public Dive::DvApplication
+	class ForwardLight : public Dive::Application
 	{
 	public:
 		ForwardLight();
@@ -17,11 +17,11 @@ namespace ForwardLight
 
 	private:
 	private:
-		Dive::DvScene* m_pScene;
-		Dive::DvGameObject* m_pMainCam;
+		Dive::Scene* m_pScene;
+		Dive::GameObject* m_pMainCam;
 
-		Dive::DvGameObject* m_pCube;
-		Dive::DvGameObject* m_pTriangle;
-		Dive::DvGameObject* m_pSphere;
+		Dive::GameObject* m_pCube;
+		Dive::GameObject* m_pTriangle;
+		Dive::GameObject* m_pSphere;
 	};
 }

@@ -1,7 +1,8 @@
-#include "DivePch.h"
+#include "divepch.h"
 #include "Scene.h"
 #include "GameObject.h"
 #include "Core/CoreDefs.h"
+#include "Components/Component.h"
 #include "Components/Transform.h"
 
 namespace Dive
@@ -9,89 +10,28 @@ namespace Dive
 	static constexpr uint64_t FIRST_ID = 0x1;
 	static constexpr uint64_t LAST_ID = 0xffffffffffffffff;
 
-	static std::string s_SceneName = "Empty World";
-	static std::string s_SceneFilepath;
-
-	static std::unordered_map<uint64_t, GameObject*> s_GameObjects;
-	static std::unordered_map<uint64_t, Component*> s_Components;
-
-	static uint64_t s_CurGameObjectID = FIRST_ID;
-	static uint64_t s_CurComponentID = FIRST_ID;
-
-	static bool s_bDirty = false;
-
-	bool Scene::Initialize()
+	Scene::Scene(const std::string& name)
+		: m_Name(name)
+		, m_CurGameObjectID(FIRST_ID)
+		, m_CurComponentID(FIRST_ID)
+		, m_bDirty(true)
 	{
-		DV_CORE_INFO("Scene::Initialize()");
-		return true;
 	}
 
-	void Scene::Shutdown()
+	Scene::~Scene()
 	{
-		Clear();
-
-		DV_CORE_INFO("Scene::Shutdown() - {:s}", GetName());
 	}
-
-	void Scene::New()
-	{
-		Clear();
-
-		DV_CORE_INFO("Scene::New() - {:s}", GetName());
-	}
-
+	
 	void Scene::Clear()
 	{
-		auto it = s_GameObjects.begin();
-		for (it; it != s_GameObjects.end(); ++it)
+		auto it = m_GameObjects.begin();
+		for (it; it != m_GameObjects.end(); ++it)
 			DV_DELETE(it->second);
-		s_GameObjects.clear();
-		s_Components.clear();
+		m_GameObjects.clear();
+		m_Components.clear();
 
-		s_CurGameObjectID = FIRST_ID;
-		s_CurComponentID = FIRST_ID;
-	}
-
-	// layer를 사용한다면 이건 필요없어진다.
-	// -> why?
-	void Scene::Update()
-	{
-		for (const auto& gameObjects : s_GameObjects)
-			gameObjects.second->Update();
-
-		// 스파르탄 최신버전에선 이 방법이 아니다.
-		if (s_bDirty)
-		{
-			auto it = s_GameObjects.begin();
-			for (it; it != s_GameObjects.end();)
-			{
-				if (it->second->IsRemovedTarget())
-				{
-					DV_DELETE(it->second);
-					it = s_GameObjects.erase(it);
-				}
-				else
-					it++;
-			}
-
-			s_bDirty = false;
-		}
-
-		// 스파르탄은 resolved가 되면 WorldResolved라는 이벤트에 entity 벡터를 실어 Renderer로 보낸다.
-		// 하지만 이 경우 하나의 World == View만 관리가 가능하다.
-	}
-
-	std::string Scene::GetName()
-	{
-		DV_CORE_INFO("Scene::GetName() - {:s}", s_SceneName);
-		
-		return s_SceneName;
-	}
-
-	std::string Scene::GetFilepath()
-	{
-		DV_CORE_INFO("Scene::GetFilepath()");
-		return std::string("");
+		m_CurGameObjectID = FIRST_ID;
+		m_CurComponentID = FIRST_ID;
 	}
 
 	GameObject* Scene::CreateGameObject(const std::string& name)
@@ -103,10 +43,10 @@ namespace Dive
 			return nullptr;
 		}
 
-		auto pNewGameObject = new GameObject(name);
+		auto pNewGameObject = new GameObject(this, name);
 		DV_CORE_ASSERT(pNewGameObject);
 
-		s_GameObjects[id] = pNewGameObject;
+		m_GameObjects[id] = pNewGameObject;
 		pNewGameObject->SetID(id);
 
 		return pNewGameObject;
@@ -114,7 +54,7 @@ namespace Dive
 
 	void Scene::RemoveGameObject(GameObject* pGameObject)
 	{
-		if (!pGameObject || s_GameObjects.empty())
+		if (!pGameObject || m_GameObjects.empty())
 			return;
 
 		RemoveGameObjectByID(pGameObject->GetID());
@@ -122,14 +62,14 @@ namespace Dive
 
 	void Scene::RemoveGameObjectByID(uint64_t id)
 	{
-		if (!id || s_GameObjects.empty())
+		if (!id || m_GameObjects.empty())
 			return;
-	
-		if (!s_bDirty)
-			s_bDirty = true;
 
-		auto it = s_GameObjects.begin();
-		for (it; it != s_GameObjects.end(); ++it)
+		if (!m_bDirty)
+			m_bDirty = true;
+
+		auto it = m_GameObjects.begin();
+		for (it; it != m_GameObjects.end(); ++it)
 		{
 			if (it->first == id)
 			{
@@ -153,13 +93,13 @@ namespace Dive
 
 	GameObject* Scene::GetGameObjectByID(uint64_t id)
 	{
-		auto it = s_GameObjects.begin();
-		return it != s_GameObjects.end() ? it->second : nullptr;
+		auto it = m_GameObjects.begin();
+		return it != m_GameObjects.end() ? it->second : nullptr;
 	}
 
 	bool Scene::ExistsGameObject(GameObject* pGameObject)
 	{
-		if(!pGameObject)
+		if (!pGameObject)
 			return false;
 
 		return ExistsGameObjectByID(pGameObject->GetID());
@@ -167,16 +107,16 @@ namespace Dive
 
 	bool Scene::ExistsGameObjectByID(uint64_t id)
 	{
-		auto it = s_GameObjects.find(id);
-		return it != s_GameObjects.end();
+		auto it = m_GameObjects.find(id);
+		return it != m_GameObjects.end();
 	}
 
 	std::vector<GameObject*> Scene::GetRootGameObjects()
 	{
 		std::vector<GameObject*> rootGameObjects;
 
-		auto it = s_GameObjects.begin();
-		for (it; it != s_GameObjects.end(); ++it)
+		auto it = m_GameObjects.begin();
+		for (it; it != m_GameObjects.end(); ++it)
 		{
 			auto pTransform = it->second->GetComponent<Transform>();
 			if (!pTransform)
@@ -193,8 +133,8 @@ namespace Dive
 	{
 		std::vector<GameObject*> allGameObjects;
 
-		auto it = s_GameObjects.begin();
-		for (it; it != s_GameObjects.end(); ++it)
+		auto it = m_GameObjects.begin();
+		for (it; it != m_GameObjects.end(); ++it)
 			allGameObjects.emplace_back(it->second);
 
 		return allGameObjects;
@@ -202,7 +142,7 @@ namespace Dive
 
 	uint64_t Scene::GetGameObjectsCount()
 	{
-		return static_cast<uint64_t>(s_GameObjects.size());
+		return static_cast<uint64_t>(m_GameObjects.size());
 	}
 
 	void Scene::RegisterComponent(Component* pComponent, uint64_t id)
@@ -220,7 +160,7 @@ namespace Dive
 			}
 		}
 
-		s_Components[id] = pComponent;
+		m_Components[id] = pComponent;
 		pComponent->SetID(id);
 	}
 
@@ -237,52 +177,52 @@ namespace Dive
 		if (!GetComponent(id))
 			return;
 
-		if (s_Components.find(id) != s_Components.end())
-			s_Components.erase(id);
+		if (m_Components.find(id) != m_Components.end())
+			m_Components.erase(id);
 	}
 
 	Component* Scene::GetComponent(uint64_t id)
 	{
-		auto it = s_Components.find(id);
-		return it != s_Components.end() ? it->second : nullptr;
+		auto it = m_Components.find(id);
+		return it != m_Components.end() ? it->second : nullptr;
 	}
 
 	uint64_t Scene::getFreeGameObjectID()
 	{
-		auto checkID = s_CurGameObjectID;
+		auto checkID = m_CurGameObjectID;
 
 		for (;;)
 		{
-			auto freeID = s_CurGameObjectID;
+			auto freeID = m_CurGameObjectID;
 
-			if (s_CurGameObjectID < LAST_ID)
-				++s_CurGameObjectID;
+			if (m_CurGameObjectID < LAST_ID)
+				++m_CurGameObjectID;
 			else
-				s_CurGameObjectID = FIRST_ID;
+				m_CurGameObjectID = FIRST_ID;
 
-			if (checkID == s_CurGameObjectID)
+			if (checkID == m_CurGameObjectID)
 				return 0;
-			else if (!s_GameObjects[freeID])
+			else if (!m_GameObjects[freeID])
 				return freeID;
 		}
 	}
 
 	uint64_t Scene::getFreeComponentID()
 	{
-		auto checkID = s_CurComponentID;
+		auto checkID = m_CurComponentID;
 
 		for (;;)
 		{
-			auto freeID = s_CurComponentID;
+			auto freeID = m_CurComponentID;
 
-			if (s_CurComponentID < LAST_ID)
-				++s_CurComponentID;
+			if (m_CurComponentID < LAST_ID)
+				++m_CurComponentID;
 			else
-				s_CurComponentID = FIRST_ID;
+				m_CurComponentID = FIRST_ID;
 
-			if (checkID == s_CurComponentID)
+			if (checkID == m_CurComponentID)
 				return 0;
-			else if (!s_Components[freeID])
+			else if (!m_Components[freeID])
 				return freeID;
 		}
 	}

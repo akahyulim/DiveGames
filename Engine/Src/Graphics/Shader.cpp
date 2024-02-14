@@ -1,6 +1,6 @@
 #include "divepch.h"
-#include "DvShader.h"
-#include "GraphicsDevice.h"
+#include "Shader.h"
+#include "Graphics.h"
 #include "Core/CoreDefs.h"
 
 namespace Dive
@@ -67,8 +67,8 @@ namespace Dive
 		return elements;
 	}
 
-	DvShader::DvShader(const std::string& name, const std::wstring& filepath, eVertexLayout layout)
-		: Resource(eResourceType::DvShader)
+	Shader::Shader(const std::string& name, const std::wstring& filepath, eVertexLayout layout)
+		: Resource(eResourceType::Shader)
 		, m_FilePath(filepath)
 		, m_pVertexShaderBlob(nullptr)
 		, m_pVertexShader(nullptr)
@@ -81,7 +81,7 @@ namespace Dive
 		createInputLayout();
 	}
 	
-	DvShader::~DvShader()
+	Shader::~Shader()
 	{
 		DV_RELEASE(m_pPixelShader);
 		DV_RELEASE(m_pVertexShader);
@@ -89,9 +89,9 @@ namespace Dive
 		DV_RELEASE(m_pInputLayout);
 	}
 
-	void DvShader::loadFromFile(const std::wstring& filepath)
+	void Shader::loadFromFile(const std::wstring& filepath)
 	{
-		auto pDevice = GraphicsDevice::GetDevice();
+		auto pDevice = Graphics::GetDevice();
 
 		m_pVertexShaderBlob = CompileFromFile(filepath, "vs_5_0", "MainVS");
 		pDevice->CreateVertexShader(m_pVertexShaderBlob->GetBufferPointer(), m_pVertexShaderBlob->GetBufferSize(), NULL, &m_pVertexShader);
@@ -100,13 +100,13 @@ namespace Dive
 		pDevice->CreatePixelShader(pPixelShaderBlob->GetBufferPointer(), pPixelShaderBlob->GetBufferSize(), NULL, &m_pPixelShader);
 	}
 
-	void DvShader::createInputLayout()
+	void Shader::createInputLayout()
 	{
 		DV_CORE_ASSERT(m_pVertexShaderBlob);
 
 		auto inputElements = GetInputElements(m_VertexLayout);
 
-		if (FAILED(GraphicsDevice::GetDevice()->CreateInputLayout(
+		if (FAILED(Graphics::GetDevice()->CreateInputLayout(
 			inputElements.data(),
 			static_cast<UINT>(inputElements.size()),
 			m_pVertexShaderBlob->GetBufferPointer(),
@@ -115,8 +115,8 @@ namespace Dive
 			DV_CORE_ERROR("InputLayout 생성에 실패하였습니다.");
 	}
 	
-	DvShader* DvShader::CreateFromFile(const std::string& name, const std::wstring& filepath, eVertexLayout layout)
+	Shader* Shader::CreateFromFile(const std::string& name, const std::wstring& filepath, eVertexLayout layout)
 	{
-		return new DvShader(name, filepath, layout);
+		return new Shader(name, filepath, layout);
 	}
 }

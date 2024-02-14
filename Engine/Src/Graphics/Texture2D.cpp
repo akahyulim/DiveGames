@@ -192,6 +192,7 @@ namespace Dive
 		return true;
 	}
 
+	/*
 	Texture2D* Texture2D::GetBlackTexture()
 	{
 		DV_CORE_ASSERT(Graphics::IsInitialized());
@@ -271,7 +272,7 @@ namespace Dive
 
 		return s_pWhiteTexture;
 	}
-
+	*/
 	bool Texture2D::createResources()
 	{
 		DV_RELEASE(m_pTexture2D);
@@ -306,7 +307,7 @@ namespace Dive
 		srvDesc.Format = GetSRVFormat(texDesc.Format);
 		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;		// 멀티 샘플링 미지원.
 		srvDesc.Texture2D.MipLevels = -1;// m_MipLevels;// m_Usage == eTextureUsage::Dynamic ? m_MipLevels : 1;
-		//srvDesc.Texture2D.MipLevels = m_bDynamic ? 1 : -1;
+		//srvDesc.DTexture2D.MipLevels = m_bDynamic ? 1 : -1;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 
 		if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(

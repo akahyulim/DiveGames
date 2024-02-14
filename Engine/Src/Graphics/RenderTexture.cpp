@@ -17,7 +17,7 @@ namespace Dive
 	RenderTexture::~RenderTexture()
 	{
 	}
-	
+
 	bool RenderTexture::SetRenderTarget(int width, int height, DXGI_FORMAT format)
 	{
 		m_Width = width;
@@ -29,7 +29,7 @@ namespace Dive
 
 		return createResources();
 	}
-	
+
 	bool RenderTexture::SetDepthStencil(int width, int height, DXGI_FORMAT format, bool readOnly)
 	{
 		m_Width = width;
@@ -67,7 +67,7 @@ namespace Dive
 		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 		if (m_Usage == eTextureUsage::RenderTarget)
 			texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
-		else if(m_Usage == eTextureUsage::DepthStencil)
+		else if (m_Usage == eTextureUsage::DepthStencil)
 			texDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
 		texDesc.MiscFlags = 0;	// ÇöÀç ¹Ó¸Ê »ç¿ë ¾ÈÇÔ.
 		texDesc.CPUAccessFlags = 0;

@@ -1,16 +1,17 @@
 #pragma once
 #include "Core/Object.h"
-#include "Scene/Scene.h"
+#include "Scene.h"
 
 namespace Dive
 {
+	class Scene;
 	class Component;
 	class Transform;
 
 	class GameObject : public Object
 	{
 	public:
-		GameObject(const std::string& name = "GameObject");
+		GameObject(Scene* pScene, const std::string& name = "GameObject");
 		~GameObject() override;
 
 		void Update();
@@ -24,7 +25,7 @@ namespace Dive
 
 			auto pNewComponent = new T(this);
 			m_Components.emplace_back(pNewComponent);
-			Scene::RegisterComponent(pNewComponent, id);
+			m_pScene->RegisterComponent(pNewComponent, id);
 
 			return pNewComponent;
 		}
@@ -62,6 +63,7 @@ namespace Dive
 		Transform* GetTransform() const { return m_pTransform; }
 
 	private:
+		Scene* m_pScene;
 		bool m_bActive;
 		bool m_bMarkedTarget;
 		std::vector<Component*> m_Components;

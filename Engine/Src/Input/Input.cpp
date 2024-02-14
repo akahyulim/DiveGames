@@ -26,11 +26,8 @@ namespace Dive
 
 	static bool s_MouseIsInValidRect = false;
 
-	bool Input::Initialize()
+	bool Input::Initialize(HINSTANCE hInstance, HWND hWnd)
 	{
-		HINSTANCE hInstance = Graphics::GetWindowInstance();
-		HWND hWnd = Graphics::GetWindowHandle();
-		
 		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&s_pDirectInput, nullptr)))
 		{
 			DV_CORE_ERROR("DirectInput 객체 생성에 실패하였습니다.");
@@ -97,8 +94,6 @@ namespace Dive
 				return false;
 			}
 		}
-	
-		DV_CORE_INFO("Input 초기화에 성공하였습니다.");
 
 		return true;
 	}
@@ -118,8 +113,6 @@ namespace Dive
 		}
 
 		DV_RELEASE(s_pDirectInput);
-
-		DV_CORE_INFO("Input 종료에 성공하였습니다.");
 	}
 
 	void Input::Update()
@@ -127,7 +120,6 @@ namespace Dive
 		ReadKeyboard();
 		ReadMouse();
 	}
-
 
 	void Input::ReadKeyboard()
 	{
@@ -177,6 +169,7 @@ namespace Dive
 		s_MousePosition.x += static_cast<float>(s_MouseState.lX);
 		s_MousePosition.y += static_cast<float>(s_MouseState.lY);
 
+		/*
 		// 추후 이벤트를 통해 갱신하자.
 		DirectX::XMFLOAT2 windowSize = Renderer::GetResolutionRender();
 
@@ -189,7 +182,7 @@ namespace Dive
 			s_MousePosition.y = 0;
 		if (s_MousePosition.y > windowSize.y)
 			s_MousePosition.y = windowSize.y;
-			
+		*/
 		s_MouseDelta.x = s_MousePosition.x - s_OldMousePosition.x;
 		s_MouseDelta.y = s_MousePosition.y - s_OldMousePosition.y;
 	}

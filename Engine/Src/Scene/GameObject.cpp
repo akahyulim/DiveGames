@@ -1,13 +1,13 @@
-#include "DivePch.h"
+#include "divepch.h"
 #include "GameObject.h"
-#include "Components/Transform.h"
 #include "Core/CoreDefs.h"
-#include "Core/Log.h"
+#include "Components/Transform.h"
 
 namespace Dive
 {
-	GameObject::GameObject(const std::string& name)
-		: Object(name) 
+	GameObject::GameObject(Scene* pScene, const std::string& name)
+		: Object(name)
+		, m_pScene(pScene)
 		, m_bActive(true)
 		, m_bMarkedTarget(false)
 	{
@@ -20,7 +20,7 @@ namespace Dive
 		{
 			for (auto* pComponent : m_Components)
 			{
-				Scene::DeregisterComponentByID(pComponent->GetID());
+				m_pScene->DeregisterComponentByID(pComponent->GetID());
 				DV_DELETE(pComponent);
 			}
 			m_Components.clear();

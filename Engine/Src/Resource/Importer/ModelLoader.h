@@ -8,8 +8,8 @@
 
 namespace Dive
 {
-	class DvScene;
-	class DvGameObject;
+	class Scene;
+	class GameObject;
 
 	class ModelLoader
 	{

@@ -3,12 +3,10 @@
 #include "Transform.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
-#include "Renderer/Renderer.h"
-#include "Renderer/Skydome.h"
+#include "Graphics/RenderTexture.h"
 #include "Scene/GameObject.h"
 #include "Core/Log.h"
 #include "Core/Timer.h"
-#include "Input/Input.h"
 
 namespace Dive
 {
@@ -17,24 +15,21 @@ namespace Dive
 
 	Camera::Camera(GameObject* pGameObject)
 		: Component(pGameObject)
+		, m_pRenderTarget(nullptr)
 	{
 		m_ProjectionType = eProjectionType::Perspective;
-		m_BackgroundColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+		m_BackgroundColor[0] = m_BackgroundColor[1] = m_BackgroundColor[2] = m_BackgroundColor[3] = 1.0f;
 		m_FieldOfView = 45.0f;
 		m_NearClipPlane = 0.1f;
 		m_FarClipPlane = 5000.0f;
-		m_ViewportRectRateX = 0.0f;
-		m_ViewportRectRateY = 0.0f;
-		m_ViewportRectRateHeight = 1.0f;
-		m_ViewportRectRateWidth = 1.0f;
 		m_MoveSpeed = 10.0f;
 		m_RotateSpeed = 50.0f;
-		m_pSkydome = nullptr;
+		m_Viewport = {0, 0, (LONG)Graphics::GetBackbufferWidth(), (LONG)Graphics::GetBackbufferHeight()};
 	}
 
 	Camera::~Camera()
 	{
-		DV_DELETE(m_pSkydome);
+		DV_DELETE(m_pRenderTarget);
 	}
 
 	DirectX::XMFLOAT3 Camera::GetPosition()
@@ -75,7 +70,7 @@ namespace Dive
 	// 아직 제대로된 테스트도 못했다.
 	DirectX::XMMATRIX Camera::GetOrthographicProjMatrix() const
 	{
-		auto viewSize = Renderer::GetResolutionRender();
+		auto viewSize = GetRenderTargetSize();
 
 		return DirectX::XMMatrixOrthographicLH(
 			viewSize.x,
@@ -93,12 +88,15 @@ namespace Dive
 			m_FarClipPlane);
 	}
 
+	void Camera::SetBackgroundColor(float r, float g, float b, float a)
+	{
+		m_BackgroundColor[0] = r;	m_BackgroundColor[1] = g;	m_BackgroundColor[2] = b;	m_BackgroundColor[3] = a;
+	}
+
 	float Camera::GetAspectRatio() const
 	{
-		auto viewSize = Renderer::GetResolutionRender();
-
-		return ((viewSize.x * m_ViewportRectRateWidth) - (viewSize.x * m_ViewportRectRateX)) /
-			((viewSize.y * m_ViewportRectRateHeight) - (viewSize.y * m_ViewportRectRateY));
+		auto viewSize = GetRenderTargetSize();
+		return viewSize.x / viewSize.y;
 	}
 
 	void Camera::SetFieldOfView(float fov)
@@ -111,38 +109,13 @@ namespace Dive
 			m_FieldOfView = fov;
 	}
 
-	void Camera::GetViewportRectRate(float& outX, float& outY, float& outWidth, float& outHeight)
+	ID3D11RenderTargetView* Camera::GetRenderTargetView() const
 	{
-		outX = m_ViewportRectRateX;
-		outY = m_ViewportRectRateY;
-		outWidth = m_ViewportRectRateWidth;
-		outHeight = m_ViewportRectRateHeight;
-	}
-	
-	void Camera::SetViewportRectRate(float x, float y, float width, float height)
-	{
-		if ((x < 0.0f || x >= 1.0f) || (y < 0.0f || y >= 1.0f)
-			|| (width < 0.0f || width > 1.0f || 0.0f >= width - x) || (height < 0.0f || height > 1.0f))
-			return;
-
-		m_ViewportRectRateX = x;
-		m_ViewportRectRateY = y;
-		m_ViewportRectRateWidth = width;
-		m_ViewportRectRateHeight = height;
+		return m_pRenderTarget ? m_pRenderTarget->GetRenderTargetView() : Graphics::GetDefaultRenderTargetView();
 	}
 
-	D3D11_VIEWPORT Camera::GetViewport() const
+	DirectX::XMFLOAT2 Camera::GetRenderTargetSize() const
 	{
-		auto viewSize = Renderer::GetResolutionRender();
-
-		return D3D11_VIEWPORT
-		{
-			viewSize.x * m_ViewportRectRateX,
-			viewSize.y * m_ViewportRectRateY,
-			viewSize.x * m_ViewportRectRateWidth,
-			viewSize.y * m_ViewportRectRateHeight,
-			0.0f,
-			1.0f,
-		};
+		return m_pRenderTarget ? m_pRenderTarget->GetSize() : Graphics::GetBackbufferSize();
 	}
 }

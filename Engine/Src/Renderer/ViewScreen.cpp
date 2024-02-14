@@ -1,22 +1,22 @@
 #include "divepch.h"
 #include "ViewScreen.h"
-#include "DvMaterial.h"
-#include "DvMesh.h"
-#include "Graphics/GraphicsDevice.h"
-#include "Graphics/DvRenderTexture.h"
-#include "Graphics/DvConstantBuffer.h"
+#include "Material.h"
+#include "Mesh.h"
+#include "Graphics/Graphics.h"
+#include "Graphics/RenderTexture.h"
+#include "Graphics/ConstantBuffer.h"
 #include "Core/CoreDefs.h"
-#include "Scene/DvScene.h"
-#include "Scene/DvGameObject.h"
-#include "Scene/Components/DvTransform.h"
-#include "Scene/Components/DvCamera.h"
+#include "Scene/Scene.h"
+#include "Scene/GameObject.h"
+#include "Scene/Components/Transform.h"
+#include "Scene/Components/Camera.h"
 #include "Scene/Components/Renderable.h"
-#include "Scene/Components/DvLight.h"
+#include "Scene/Components/Light.h"
 
 
 namespace Dive
 {
-	ViewScreen::ViewScreen(DvScene* pScene, DvCamera* pCamera, eRenderPath renderPath)
+	ViewScreen::ViewScreen(Scene* pScene, Camera* pCamera, eRenderPath renderPath)
 		: m_pScene(pScene)
 		, m_pCamera(pCamera)
 		, m_RenderPath(renderPath)
@@ -56,7 +56,7 @@ namespace Dive
 					continue;
 				}
 
-				auto pLightCom = pGameObject->GetComponent<DvLight>();
+				auto pLightCom = pGameObject->GetComponent<Light>();
 				if (pLightCom)
 				{
 					m_Lights.push_back(pLightCom);
@@ -103,20 +103,20 @@ namespace Dive
 	{
 		// set & clear rendertarget
 		{
-			GraphicsDevice::SetRenderTargetView(0, m_pCamera->GetRenderTargetView());
-			GraphicsDevice::SetDepthStencilView(GraphicsDevice::GetDefaultDepthStencilView());
-			GraphicsDevice::ClearViews(eClearFlags::Color | eClearFlags::Depth, m_pCamera->GetBackgroundColor(), 1.0f, 0);
+			Graphics::SetRenderTargetView(0, m_pCamera->GetRenderTargetView());
+			Graphics::SetDepthStencilView(Graphics::GetDefaultDepthStencilView());
+			Graphics::ClearViews(eClearFlags::Color | eClearFlags::Depth, m_pCamera->GetBackgroundColor(), 1.0f, 0);
 		}
 
 		// urho 구조상 이 부분도 Batch::Prepare()에 속한다.
 		// 즉, Batch별로 호출되므로 중복 체크를 확인하는 편이 맞아보인다.
 		{
 			// 뷰포트
-			GraphicsDevice::SetViewport(m_pCamera->GetViewport());
+			Graphics::SetViewport(m_pCamera->GetViewport());
 
 			{
 				// 버퍼를 Renderer가 관리한다면 cpu버퍼는 이 곳이 아니라 GraphcisDevice가 관리하는 것이 맞다.
-				// 다만 이 곳에서 GraphicsDevice에 전달하기 위해선
+				// 다만 이 곳에서 Graphics에 전달하기 위해선
 				// 1. 버퍼의 종류, 2. 적절한 데이터, 3. offset이 필요해 보인다.
 				// urho의 경우 SetShaderParamter라는 함수가 이를 수행하는데
 				// 버퍼 이름과 타입별 데이터를 전달하면
@@ -130,7 +130,7 @@ namespace Dive
 				m_cpuCameraBuffer.position = m_pCamera->GetPosition();
 
 				// 애매하지만 드로우콜마다 한 번만 해도 되는 작업이다.
-				auto pCameraBuffer = DvRenderer::GetConstantBuffer(eConstantBuffer::Camera);
+				auto pCameraBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Camera);
 				pCameraBuffer->Update((void*)&m_cpuCameraBuffer);
 				pCameraBuffer->Bind();
 			}
@@ -140,9 +140,9 @@ namespace Dive
 			// 결국 RenderPath에 맞춰 어떤 State를 어느 시점에 사용하느냐를 파악해야 한다.
 			// 그리고 urho를 따라갈 필요 없이 일단 하드 코딩으로 사용 state를 전달하는 것이 맞아 보인다.
 			{
-				GraphicsDevice::SetRasterizerState(DvRenderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
-				GraphicsDevice::SetDepthStencilState(DvRenderer::GetDepthStencilState(eDepthStencilState::DepthReadWrite));
-				//GraphicsDevice::SetBlendState(DvRenderer::GetBlendState(eBlendState::Addictive));
+				Graphics::SetRasterizerState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
+				Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::DepthReadWrite));
+				//Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
 			}
 		}
 
@@ -156,14 +156,14 @@ namespace Dive
 				switch (light->GetType())
 				{
 
-				case DvLight::eLightType::Directional:
+				case Light::eLightType::Directional:
 					m_cpuLightBuffer.options = (1U << 0);
 					m_cpuLightBuffer.direction = light->GetDir();
 					break;
-				case DvLight::eLightType::Point:
+				case Light::eLightType::Point:
 					m_cpuLightBuffer.options = (1U << 1);
 					break;
-				case DvLight::eLightType::Spot:
+				case Light::eLightType::Spot:
 					m_cpuLightBuffer.options = (1U << 2);
 					break;
 				default:
@@ -172,12 +172,12 @@ namespace Dive
 
 				m_cpuLightBuffer.color = light->GetColor();
 
-				auto pLightBuffer = DvRenderer::GetConstantBuffer(eConstantBuffer::Light);
+				auto pLightBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Light);
 				pLightBuffer->Update((void*)&m_cpuLightBuffer);
 				pLightBuffer->Bind();
 
 				if(i >= 1)
-					GraphicsDevice::SetBlendState(DvRenderer::GetBlendState(eBlendState::Addictive));
+					Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
 
 				// draw opaque
 				{
@@ -189,22 +189,22 @@ namespace Dive
 							{
 								m_cpuFrameBuffer.world = DirectX::XMMatrixTranspose(renderableBatch.worldTransform);
 
-								auto pFrameBuffer = DvRenderer::GetConstantBuffer(eConstantBuffer::Frame);
+								auto pFrameBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Frame);
 								pFrameBuffer->Update((void*)&m_cpuFrameBuffer);
 								pFrameBuffer->Bind();	// 셰이더 타입별 바인드 및 슬롯 관리때문에 이 방법이 더 편하다...
 
 								auto pShader = renderableBatch.pMaterial->GetShader();
-								GraphicsDevice::SetShader(pShader);
+								Graphics::SetShader(pShader);
 
 								m_cpuMaterialBuffer.diffuseColor = renderableBatch.pMaterial->GetDiffuseColor();
 								m_cpuMaterialBuffer.properties = 0;
 								m_cpuMaterialBuffer.properties |= renderableBatch.pMaterial->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
 
-								auto pMaterialBuffer = DvRenderer::GetConstantBuffer(eConstantBuffer::Material);
+								auto pMaterialBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Material);
 								pMaterialBuffer->Update((void*)&m_cpuMaterialBuffer);
 								pMaterialBuffer->Bind();
 
-								GraphicsDevice::SetTexture(eTextureUnit::Diffuse, renderableBatch.pMaterial->GetTexture(eTextureUnit::Diffuse));
+								Graphics::SetTexture(eTextureUnit::Diffuse, renderableBatch.pMaterial->GetTexture(eTextureUnit::Diffuse));
 							}
 
 							// urho의 Geometry::Draw()

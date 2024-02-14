@@ -1,26 +1,38 @@
 #pragma once
-#include "Object.h"
-#include "CoreDefs.h"
 
 namespace Dive
 {
 	class Application
 	{
 	public:
-		// 생성자는 매개인자를 받도록 하고 디폴트 값을 넣어놓는 편이 나을 것 같다.
-		// 매개인자는 일단 이름과 윈도우 프로퍼티(크기, 전체 화면 유무, 싱크 유무) 정도면 된다.
-		// 스파키의 경우 윈도우 프로퍼티를 윈도우와 D3DContext 객체에 전부 전달 및 저장하여 사용한다.
-		Application() = default; 
+		Application(const std::wstring title = L"DIVE", uint32_t windowWidth = 800, uint32_t windowHeight = 600, bool fullscreen = false);
 		virtual ~Application();
 
-		// 엔진 생성 및 초기화 이전에 호출
-		virtual void Setup() {}
-		// 엔진 초기화 이후, 실행 이전에 호출
-		virtual void Start() {}
-		// 엔진 루프를 탈출한 후 호출
-		virtual void Stop() {}
-
+		bool InitializeWindow();
+		
 		int Run();
+
+		virtual void OnSetup() {}
+		virtual void OnStart() {}
+		virtual void OnStop() {}
+
+		 uint32_t GetWindowWidth() const { return m_WindowWidth; }
+		 uint32_t GetWindowHeight() const { return m_WindowHeight; }
+		 DirectX::XMFLOAT2 GetWindowSize() const { return { (float)m_WindowWidth, (float)m_WindowHeight }; }
+
+		 std::wstring GetTitle() const { return m_Title; }
+		void SetTitle(const std::wstring& title);
+
+		 static Application& GetApplication() { return *s_pInstance; }
+
+	private:
+		std::wstring m_Title;
+		uint32_t m_WindowWidth;
+		uint32_t m_WindowHeight;
+		bool m_bFullscreen;
+		bool m_bRunning;
+
+		static Application* s_pInstance;
 	};
 }
 

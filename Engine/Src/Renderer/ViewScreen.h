@@ -1,24 +1,24 @@
 #pragma once
 #include "RendererDefs.h"		// eRenderPath용. 추후 Renderer에 흡수시키자.
-#include "DvRenderer.h"
+#include "Renderer.h"
 
 namespace Dive
 {
-	class DvScene;
-	class DvCamera;
+	class Scene;
+	class Camera;
 	class Renderable;
-	class DvLight;
-	class DvMesh;
-	class DvMaterial;
+	class Light;
+	class Mesh;
+	class Material;
 
 	// urho처럼 하려면 이게 batch와 같이 함수를 지닌 클래스여야 한다.
 	struct RenderableBatch
 	{
 		// camera distance
 		DirectX::XMMATRIX worldTransform;
-		DvMesh* pMesh;
+		Mesh* pMesh;
 		// mesh type
-		DvMaterial* pMaterial;
+		Material* pMaterial;
 	};
 
 	struct LightBatch
@@ -31,24 +31,24 @@ namespace Dive
 	class ViewScreen
 	{
 	public:
-		ViewScreen(DvScene* pScene, DvCamera* pCamera, eRenderPath renderPath = eRenderPath::Forward);
+		ViewScreen(Scene* pScene, Camera* pCamera, eRenderPath renderPath = eRenderPath::Forward);
 
 		void Update();
 		void Render();
 
-		DvScene* GetScene() { return m_pScene; }
+		Scene* GetScene() { return m_pScene; }
 
 	private:
 		void forwardRender();
 		void deferredRender();
 
 	private:
-		DvScene* m_pScene;
-		DvCamera* m_pCamera;
+		Scene* m_pScene;
+		Camera* m_pCamera;
 		eRenderPath m_RenderPath;
 
 		std::vector<Renderable*> m_Renderables;
-		std::vector<DvLight*> m_Lights;
+		std::vector<Light*> m_Lights;
 
 		std::vector<RenderableBatch> m_RenderableBatches;
 		std::vector<LightBatch> m_LightBatches;

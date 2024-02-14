@@ -3,16 +3,18 @@
 
 namespace Dive
 {
-	enum class eLightType
-	{
-		Directional,
-		Point
-	};
-
 	class GameObject;
 
 	class Light : public Component
 	{
+	public:
+		enum class eLightType
+		{
+			Directional,
+			Point,
+			Spot
+		};
+
 	public:
 		Light(GameObject* pGameObject);
 		~Light() override;
@@ -31,10 +33,6 @@ namespace Dive
 		float GetRange() const { return m_Range; }
 		void SetRange(float range) { m_Range = range; }
 
-		// 몇몇 component들은 behavior을 통해 enable을 관리한다.
-		bool IsEnabled() const { return m_bEnabled; }
-		void SetEnable(bool enable) { m_bEnabled = enable; }
-
 	private:
 	private:
 		eLightType m_Type;
@@ -43,8 +41,5 @@ namespace Dive
 		DirectX::XMFLOAT3 m_Color;
 
 		float m_Range;
-
-		// behavior을 만들건가?
-		bool m_bEnabled;
 	};
 }

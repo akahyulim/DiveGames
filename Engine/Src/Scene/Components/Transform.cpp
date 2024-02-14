@@ -60,7 +60,7 @@ namespace Dive
 
 	void Transform::SetLocalPosition(const DirectX::XMFLOAT3& pos)
 	{
-		if(!XMVector3Equal(GetLocalPositionVector(), XMLoadFloat3(&pos)))
+		if (!XMVector3Equal(GetLocalPositionVector(), XMLoadFloat3(&pos)))
 		{
 			m_LocalPosition = pos;
 			updateTransform();
@@ -238,7 +238,7 @@ namespace Dive
 	// 로컬 좌표 위의 한 점을 월드 좌표로...
 	DirectX::XMMATRIX Transform::GetLocalToWorldMatrix() const
 	{
-		return HasParent()? GetParent()->GetWorldMatrix() : XMMatrixIdentity();
+		return HasParent() ? GetParent()->GetWorldMatrix() : XMMatrixIdentity();
 	}
 
 	// 월드 좌표 위의 한 점을 로컬 좌표로...
@@ -454,10 +454,10 @@ namespace Dive
 	{
 		XMFLOAT3 forward;
 		XMStoreFloat3(&forward, GetForwardVector());
-		
+
 		return forward;
 	}
-	
+
 	DirectX::XMVECTOR Transform::GetForwardVector() const
 	{
 		return XMVector3Transform(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), GetRotationMatrix());
@@ -525,7 +525,7 @@ namespace Dive
 
 		Rotate(XMQuaternionRotationRollPitchYaw(angleX, angleY, angleZ), relativeTo);
 	}
-	
+
 	void Transform::Rotate(const DirectX::XMFLOAT3& degree, eSpace relativeTo)
 	{
 		float angleX = XMConvertToRadians(degree.x);
@@ -534,12 +534,12 @@ namespace Dive
 
 		Rotate(XMQuaternionRotationRollPitchYaw(angleX, angleY, angleZ), relativeTo);
 	}
-	
-	void Transform::Rotate(const DirectX::XMFLOAT4& delta, eSpace relativeTo) 
+
+	void Transform::Rotate(const DirectX::XMFLOAT4& delta, eSpace relativeTo)
 	{
 		Rotate(XMLoadFloat4(&delta), relativeTo);
 	}
-	
+
 	void Transform::Rotate(const DirectX::XMVECTOR& delta, eSpace relativeTo)
 	{
 		// 단순하게 보자면 그냥 스페이스에 맞춰 회전 행렬을 가져온 후 곱하고 새로운 회전으로 저장하면 될 것 같은데...

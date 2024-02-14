@@ -1,62 +1,29 @@
 #pragma once
-#include "Graphics/GraphicsDefs.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/IndexBuffer.h"
+#include "Resource/Resource.h"
 
 namespace Dive
 {
-	// StaticMesh를 Mesh로 통합?
-	// 그리고 Type enum 만들기
-	class Mesh
+	class VertexBuffer;
+	class IndexBuffer;
+
+	class Mesh : public Resource
 	{
 	public:
-		Mesh();
-		virtual ~Mesh();
+		// 생성자 혹은 SetMacro등의 함수로 매크로를 정의해 Input Type을 다양하게 만들 수 있다.
+		// 이 말은 타입 정의의 개수만큼 셰이더도 추가로 생성된다는 의미다.
+		// 셰이더 내부에서의 사용은 쉬워지지만 셰이더 자체의 관리는 어렵게 된다.
+		Mesh(VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer);	// 지울까?
+		Mesh(const std::string& name, VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer);
+		~Mesh();
 
-		virtual uint32_t GetNumVertices() const = 0;
-		virtual uint32_t GetNumIndices() const = 0;
+		void Draw(D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		std::string GetName() const { return m_Name; }
-		void SetName(std::string name) { m_Name = name; }
+	public:
+		static Mesh* Create(const std::string& name, VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer);
 
-		std::string GetNodeName() const { return m_NodeName; }
-		void SetNodeName(std::string nodeName) { m_NodeName = nodeName; }
-
-		virtual void CreateVertexBuffer() = 0;
-		virtual void CreateIndexBuffer() = 0;
-
-		virtual void Render(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) = 0;
- 
-		VertexBuffer* GetVertexBuffer() const { return m_pVertexBuffer; }
-		IndexBuffer* GetIndexBuffer() const { return m_pIndexBuffer; }
-
-	protected:
-		std::string m_Name;
-		std::string m_NodeName;
-
+	private:
+	private:
 		VertexBuffer* m_pVertexBuffer;
 		IndexBuffer* m_pIndexBuffer;
-	};
-
-	class StaticMesh : public Mesh
-	{
-	public:
-		StaticMesh() = default;
-		StaticMesh(const std::string& name, std::vector<VertexStatic>& vertices, std::vector<uint32_t>& indices);
-		StaticMesh(const std::string& nodeName, const std::string& name, std::vector<VertexStatic>& vertices, std::vector<uint32_t>& indices);
-		virtual ~StaticMesh();
-
-		void CreateVertexBuffer() override;
-		void CreateIndexBuffer() override;
-
-		void Render(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) override;
-
-		uint32_t GetNumVertices() const override { return static_cast<uint32_t>(m_Vertices.size()); }
-		uint32_t GetNumIndices() const override { return static_cast<uint32_t>(m_Indices.size()); }
-
-	private:
-	private:
-		std::vector<VertexStatic> m_Vertices;
-		std::vector<uint32_t> m_Indices;
 	};
 }

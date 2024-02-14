@@ -6,7 +6,7 @@ namespace Dive
 	// srv는 기본 제공
 	// rtv or dsv 선택 제공
 	class RenderTexture : public Texture
-	{	
+	{
 	public:
 		RenderTexture();
 		~RenderTexture() override;

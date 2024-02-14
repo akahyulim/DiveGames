@@ -1,27 +1,22 @@
 #pragma once
-#include "Graphics.h"
-#include "Core/Object.h"
 #include "Core/CoreDefs.h"
-#include "Core/Log.h"
+#include "GraphicsDefs.h"
+#include "Graphics.h"
 
 namespace Dive
 {
-	// 굳이 Object를 상속해야 하나?
-	// Name은 사용할 수 있지만 ID는 사용하지 않는다.
-	class ConstantBuffer : public Object
+	class ConstantBuffer
 	{
 	public:
-		ConstantBuffer(const std::string& name);
-		~ConstantBuffer() override;
+		ConstantBuffer(const std::string& name, eShaderType type, uint32_t slot);
+		~ConstantBuffer();
 
 		template<typename T>
-		bool Create()
+		bool CreateBuffer()
 		{
-			DV_CORE_ASSERT(Graphics::IsInitialized());
+			DV_RELEASE(m_pBuffer);
 		
 			m_Stride = static_cast<uint32_t>(sizeof(T));
-			
-			DV_RELEASE(m_pBuffer);
 
 			D3D11_BUFFER_DESC desc;
 			ZeroMemory(&desc, sizeof(desc));
@@ -41,14 +36,30 @@ namespace Dive
 			return true;
 		}
 
-		void* Map();
-		void Unmap();
+		void Update(void* pData);
 
-		ID3D11Buffer* GetBuffer() const { return m_pBuffer; }
+		void Bind();
 
+		uint32_t GetSlot() const { return m_Slot; }
+		std::string GetName() const { return m_Name; }
+		ID3D11Buffer* const* GetBuffer() const{ return &m_pBuffer; }
 		uint32_t GetStride() const { return m_Stride; }
 
+		template<typename T>
+		static ConstantBuffer* Create(const std::string& name, eShaderType type, uint32_t slot)
+		{
+			auto pBuffer = new ConstantBuffer(name, type, slot);
+			pBuffer->CreateBuffer<T>();
+
+			return pBuffer;
+		}
+
 	private:
+		std::string m_Name;
+		eShaderType m_ShaderType;
+
+		uint32_t m_Slot;
+
 		ID3D11Buffer* m_pBuffer;
 
 		uint32_t m_Stride;

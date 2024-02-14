@@ -34,10 +34,10 @@ namespace Dive
 
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_pRenderTargetView; }
 
-		static Texture2D* GetBlackTexture();
-		static Texture2D* GetGrayTexture();
-		static Texture2D* GetRedTexture();
-		static Texture2D* GetWhiteTexture();
+		//static Texture2D* GetBlackTexture();
+		//static Texture2D* GetGrayTexture();
+		//static Texture2D* GetRedTexture();
+		//static Texture2D* GetWhiteTexture();
 
 	private:
 		bool createResources() override;

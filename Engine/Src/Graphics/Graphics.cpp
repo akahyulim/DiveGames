@@ -1,296 +1,48 @@
-#include "DivePch.h"
+#include "divepch.h"
 #include "Graphics.h"
-#include "GraphicsEvents.h"
+#include "Shader.h"
+#include "Texture2D.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-#include "Texture.h"
-#include "Texture2D.h"
-#include "RenderTexture.h"
-#include "ShaderVariation.h"
-#include "ConstantBuffer.h"
-#include "InputLayout.h"
 #include "Core/CoreDefs.h"
 
 namespace Dive
 {
-	static HINSTANCE s_hInstance = 0;
-	static HWND s_hWnd = 0;
-	static std::wstring s_WindowTitle = L"DiveGames";
-	static int s_Width = 1280;
-	static int s_Height = 720;
+	IDXGISwapChain* Graphics::s_pSwapChain = nullptr;
+	ID3D11Device* Graphics::s_pDevice = nullptr;
+	ID3D11DeviceContext* Graphics::s_pDeviceContext = nullptr;
 
-	static IDXGISwapChain* s_pSwapChain = nullptr;
-	static ID3D11Device* s_pDevice = nullptr;
-	static ID3D11DeviceContext* s_pDeviceContext = nullptr;
+	ID3D11RenderTargetView* Graphics::s_pDefaultRenderTargetView = nullptr;
+	ID3D11DepthStencilView* Graphics::s_pDefaultDepthStencilView = nullptr;
+	ID3D11Texture2D* Graphics::s_pDefaultDepthTexture = nullptr;
 
-	static ID3D11RenderTargetView* s_pDefaultRenderTargetView = nullptr;
-	static ID3D11Texture2D* s_pDefaultDepthStencilTexture = nullptr;
-	static ID3D11DepthStencilView* s_pDefaultDepthStencilView = nullptr;
+	uint32_t Graphics::s_BackbufferWidth = 0;
+	uint32_t Graphics::s_BackbufferHeight = 0;
 
-	static ID3D11RenderTargetView* s_pRenderTargetViews[MAX_RENDERTARGETS] = { nullptr };
-	static ID3D11DepthStencilView* s_pDepthStencilView = nullptr;
-	static bool s_bRenderTargetsDirty = false;
+	bool Graphics::s_bVSync = false;
 
-	static Texture* s_pTextures[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr };
-	static ID3D11ShaderResourceView* s_pShaderResourceViews[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr };
-	static ID3D11SamplerState* s_pSamplerStates[static_cast<uint32_t>(eTextureUnit::Max_Num)] = { nullptr };
-	static bool s_bTextureDirty = false;
-	static uint32_t s_TextureDirtyStart = 0xffffffff;
-	static uint32_t s_TextureDirtyEnd = 0xffffffff;
+	D3D11_PRIMITIVE_TOPOLOGY Graphics::s_PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
 
-	static ID3D11DepthStencilState* s_pDepthStencilState = nullptr;
-	static uint32_t s_StencilRef = 0;
-	static bool s_bDepthStencilStateDirty = false;
+	ID3D11RenderTargetView* Graphics::s_RenderTargetViews[4] = { nullptr, };
+	ID3D11DepthStencilView* Graphics::s_pDepthStencilView = nullptr;
 
-	static D3D11_PRIMITIVE_TOPOLOGY s_PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
+	bool Graphics::s_bRenderTargetViewsDirty = true;
 
-	static VertexBuffer* s_pVertexBuffer = nullptr;
-	static IndexBuffer* s_pIndexBuffer = nullptr;
+	Shader* Graphics::s_pShader = nullptr;
 
-	static InputLayout* s_pInputLayout = nullptr;
-	static ShaderVariation* s_pVertexShaderVariation = nullptr;
-	static ShaderVariation* s_pPixelShaderVariation = nullptr;
-	static ShaderVariation* s_pComputeShaderVariation = nullptr;
+	VertexBuffer* Graphics::s_pVertexBuffer = nullptr;
+	IndexBuffer* Graphics::s_pIndexBuffer = nullptr;
 
-	static ID3D11Buffer* s_pVertexShaderConstantBuffers[2] = { nullptr };
-	static ID3D11Buffer* s_pPixelShaderConstantBuffers[3] = { nullptr };
+	ID3D11DepthStencilState* Graphics::s_pDepthStencilState = nullptr;
+	ID3D11RasterizerState* Graphics::s_pRasterizerState = nullptr;
+	ID3D11BlendState* Graphics::s_pBlendState = nullptr;
 
+	ID3D11ShaderResourceView* Graphics::s_ShaderResourceViews[(uint32_t)eTextureUnit::Max_Num] = { nullptr, };
+	ID3D11SamplerState* Graphics::s_SamplerStates[(uint32_t)eTextureUnit::Max_Num] = { nullptr, };
 
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		switch (msg)
-		{
-		case WM_DESTROY:
-		{
-			PostQuitMessage(0);
-			return 0;
-		}
-		case WM_CLOSE:
-		{
-			PostQuitMessage(0);
-			return 0;
-		}
-		}
+	bool Graphics::s_bTextureDirty = true;
 
-		return Graphics::MessageHandler(hWnd, msg, wParam, lParam);
-	}
-
-	bool Graphics::Initialize()
-	{
-		if (!WindowCreate())
-			return false;
-
-		if (!CreateDeviceAndSwapChain())
-			return false;
-
-		if (!UpdateSwapChain())
-			return false;
-
-		DV_CORE_INFO("Graphics 초기화에 성공하였습니다.");
-
-		return true;
-	}
-
-	void Graphics::Shutdown()
-	{
-		DV_RELEASE(s_pSwapChain);
-		DV_RELEASE(s_pDeviceContext);
-		DV_RELEASE(s_pDevice);
-
-		::DestroyWindow(s_hWnd);
-		::UnregisterClassW(L"Dive", s_hInstance);
-
-		DV_CORE_INFO("Graphics 종료에 성공하였습니다."); 
-	}
-
-	bool Graphics::WindowCreate()
-	{
-		s_hInstance = GetModuleHandle(nullptr);
-
-		WNDCLASSEX wc;
-		wc.style = 0;
-		wc.hInstance = s_hInstance;
-		wc.lpfnWndProc = WndProc;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
-		wc.hIconSm = wc.hIcon;
-		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-		wc.lpszMenuName = NULL;
-		wc.lpszClassName = L"Dive";
-		wc.cbSize = sizeof(WNDCLASSEX);
-		RegisterClassEx(&wc);
-
-		DWORD style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_VISIBLE | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-
-		RECT rt = { 0, 0, s_Width, s_Height };
-		::AdjustWindowRect(&rt, style, FALSE);
-
-		int windowWidth = rt.right - rt.left;
-		int windowHeight = rt.bottom - rt.top;
-
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - windowWidth) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - windowHeight) / 2;
-
-		s_hWnd = CreateWindowEx(
-			WS_EX_APPWINDOW,
-			L"Dive",
-			s_WindowTitle.c_str(),
-			style,
-			posX, posY,
-			windowWidth, windowHeight,
-			NULL, NULL,
-			s_hInstance,
-			NULL);
-
-		if (!s_hWnd)
-		{
-			DV_CORE_ERROR("윈도우 생성에 실패하였습니다.");
-			return false;
-		}
-
-		GetClientRect(s_hWnd, &rt);
-		DV_CORE_ASSERT(s_Width == rt.right - rt.left);
-		DV_CORE_ASSERT(s_Height == rt.bottom - rt.top);
-
-		::ShowWindow(s_hWnd, SW_SHOW);
-		::SetFocus(s_hWnd);
-
-		DV_CORE_INFO("{0:d} x {1:d} 윈도우 생성에 성공하였습니다.", s_Width, s_Height);
-
-		return true;
-	}
-
-	bool Graphics::RunWindow()
-	{
-		if (!IsInitialized())
-			return false;
-
-		MSG msg;
-		ZeroMemory(&msg, sizeof(msg));
-
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
-		}
-
-		return msg.message != WM_QUIT;
-	}
-
-	LRESULT Graphics::MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-	{
-		if (IsInitialized())
-		{
-			FIRE_EVENT(WindowEvent(hWnd, msg, wParam, lParam));
-
-			switch (msg)
-			{
-			case WM_SIZE:
-			{
-				bool bUpdated = UpdateSwapChain();
-				DV_CORE_ASSERT(bUpdated);
-				break;
-			}
-			default:
-				break;
-			}
-		}
-
-		return ::DefWindowProc(hWnd, msg, wParam, lParam);
-	}
-
-	void Graphics::Close()
-	{
-		SendMessage(s_hWnd, WM_CLOSE, 0, 0);
-	}
-
-	bool Graphics::IsInitialized()
-	{
-		return (s_hWnd && s_pDevice && s_pDeviceContext);
-	}
-
-	HINSTANCE Graphics::GetWindowInstance()
-	{
-		return s_hInstance;
-	}
-
-	HWND Graphics::GetWindowHandle()
-	{
-		return s_hWnd;
-	}
-	
-	std::wstring Graphics::GetWindowTitle()
-	{
-		return s_WindowTitle;
-	}
-
-	void Graphics::SetWindowTitle(const std::wstring& title)
-	{
-		// 이미 생성된 윈도우의 타이틀 변경
-		if (s_hWnd)
-			::SetWindowText(s_hWnd, title.c_str());
-
-		s_WindowTitle = title;
-	}
-
-	void Graphics::GetWindowSize(int* const pOutWidth, int* const pOutHeight)
-	{
-		*pOutWidth = s_Width;
-		*pOutHeight = s_Height;
-	}
-
-	DirectX::XMINT2 Graphics::GetWindowSize()
-	{
-		return DirectX::XMINT2(s_Width, s_Height);
-	}
-
-	int Graphics::GetWindowWidth()
-	{
-		return s_Width;
-	}
-
-	int Graphics::GetWindowHeight()
-	{
-		return s_Height;
-	}
-
-	void Graphics::ResizeWindow(int width, int height)
-	{
-		if (!IsInitialized())
-		{
-			s_Width = width;
-			s_Height = height;
-		}
-		else
-		{
-			DXGI_MODE_DESC desc;
-			desc.Width = width;
-			desc.Height = height;
-			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			desc.RefreshRate.Denominator = 1;		// 하드 코딩
-			desc.RefreshRate.Numerator = 60;		// 하드 코딩
-			desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-			desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-
-			if (FAILED(s_pSwapChain->ResizeTarget(&desc)))
-			{
-				DV_CORE_ERROR("스왑체인 타겟 리사이즈에 실패하여 윈도우 크기를 변경할 수 없습니다.");
-				return;
-			}
-		}
-	}
-
-	void Graphics::ResizeWindow(DirectX::XMINT2 size)
-	{
-		ResizeWindow(size.x, size.y);
-	}
-
-	/*
-	현재 창모드로 강제되어 있다.
-	*/
-	bool Graphics::CreateDeviceAndSwapChain()
+	bool Graphics::Initialize(HWND hWnd, uint32_t width, uint32_t height, bool fullScreen)
 	{
 		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
 
@@ -306,7 +58,7 @@ namespace Dive
 			nullptr,
 			&s_pDeviceContext)))
 		{
-			DV_CORE_ERROR("D3D11 장치 생성에 실패하였습니다.");
+			DV_CORE_ERROR("ID3D11Device & ID3D11DeviceContext 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -320,8 +72,8 @@ namespace Dive
 		DXGI_SWAP_CHAIN_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
 		desc.BufferCount = 1;
-		desc.BufferDesc.Width = s_Width;
-		desc.BufferDesc.Height = s_Height;
+		desc.BufferDesc.Width = width;
+		desc.BufferDesc.Height = height;
 		desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// sRGB???
 		desc.BufferDesc.RefreshRate.Denominator = 1;			// 추후 수정(vsync에 따라 달라진다?)
 		desc.BufferDesc.RefreshRate.Numerator = 0;
@@ -329,31 +81,47 @@ namespace Dive
 		desc.SampleDesc.Count = 1;								// 멀티 샘플링 off
 		desc.SampleDesc.Quality = 0;
 		desc.Windowed = true;
-		desc.OutputWindow = s_hWnd;
+		desc.OutputWindow = hWnd;
 		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
 
 		if (FAILED(pDxgiFactory->CreateSwapChain(s_pDevice, &desc, &s_pSwapChain)))
 		{
-			DV_CORE_ERROR("D3D11 스왑체인 생성에 실패하였습니다.");
+			DV_CORE_ERROR("IDXGISwapchain 생성에 실패하였습니다.");
+			return false;
+		}
+
+		if (!UpdateSwapChain(width, height))
+		{
+			DV_CORE_ERROR("후면버퍼 갱신에 실패하였습니다.");
 			return false;
 		}
 
 		return true;
 	}
 
+	void Graphics::Shutdown()
+	{
+		DV_RELEASE(s_pDefaultDepthTexture);
+		DV_RELEASE(s_pDefaultDepthStencilView);
+		DV_RELEASE(s_pDefaultRenderTargetView);
+
+		DV_RELEASE(s_pDeviceContext);
+		DV_RELEASE(s_pDeviceContext);
+		DV_RELEASE(s_pSwapChain);
+	}
+
 	bool Graphics::UpdateSwapChain(uint32_t width, uint32_t height)
 	{
-		if (!IsInitialized())
-			return false;
+		if (s_BackbufferWidth == width && s_BackbufferHeight == height)
+			return true;
 
 		s_pDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
 		DV_RELEASE(s_pDefaultRenderTargetView);
-		DV_RELEASE(s_pDefaultDepthStencilTexture);
+		DV_RELEASE(s_pDefaultDepthTexture);
 		DV_RELEASE(s_pDefaultDepthStencilView);
 
 		s_pSwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
 
-		// 후면 버퍼 텍스쳐 획득
 		ID3D11Texture2D* pBackbufferTexture = nullptr;
 		if (FAILED(s_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture)))
 		{
@@ -361,12 +129,11 @@ namespace Dive
 			DV_CORE_ERROR("후면 버퍼 텍스쳐를 얻어오는데 실패하였습니다.");
 			return false;
 		}
-		
-		// 후면 버퍼 텍스쳐의 렌더타겟뷰 생성
+
 		if (FAILED(s_pDevice->CreateRenderTargetView(
 			static_cast<ID3D11Resource*>(pBackbufferTexture), nullptr, &s_pDefaultRenderTargetView)))
 		{
-			DV_RELEASE(pBackbufferTexture); 
+			DV_RELEASE(pBackbufferTexture);
 			DV_RELEASE(s_pDefaultRenderTargetView);
 			DV_CORE_ERROR("후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
 			return false;
@@ -386,7 +153,6 @@ namespace Dive
 			curHeight = swapChainDesc.BufferDesc.Height;
 		}
 
-		// 후면 버퍼 깊이 스텐실 텍스쳐 생성
 		D3D11_TEXTURE2D_DESC texDesc;
 		ZeroMemory(&texDesc, sizeof(texDesc));
 		texDesc.Width = curWidth;
@@ -401,9 +167,9 @@ namespace Dive
 		texDesc.CPUAccessFlags = 0;
 		texDesc.MiscFlags = 0;
 
-		if (FAILED(s_pDevice->CreateTexture2D(&texDesc, nullptr, &s_pDefaultDepthStencilTexture)))
+		if (FAILED(s_pDevice->CreateTexture2D(&texDesc, nullptr, &s_pDefaultDepthTexture)))
 		{
-			DV_RELEASE(s_pDefaultDepthStencilTexture);
+			DV_RELEASE(s_pDefaultDepthTexture);
 			DV_CORE_ERROR("후면 버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
 			return false;
 		}
@@ -415,7 +181,7 @@ namespace Dive
 		viewDesc.Texture2D.MipSlice = 0;
 
 		if (FAILED(s_pDevice->CreateDepthStencilView(
-			static_cast<ID3D11Resource*>(s_pDefaultDepthStencilTexture),
+			static_cast<ID3D11Resource*>(s_pDefaultDepthTexture),
 			&viewDesc,//nullptr,		// urho가 nullptr을 전달했다. 역시나 sampler 문제는 해결되지 않았다.
 			&s_pDefaultDepthStencilView)))
 		{
@@ -423,333 +189,257 @@ namespace Dive
 			DV_CORE_ERROR("후면 버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
 			return false;
 		}
-		
-		s_Width = static_cast<int32_t>(curWidth);
-		s_Height = static_cast<int32_t>(curHeight);
+
+		s_BackbufferWidth = curWidth;
+		s_BackbufferHeight = curHeight;
+
+		resetViews();
 
 		return true;
 	}
 
-	void Graphics::Present()
+	bool Graphics::IsInitialized()
 	{
-		s_pSwapChain->Present(0, 0);	// vsync 적용. 이상하다. 30프레임이다.
+		return s_pDevice != nullptr;
 	}
 
-	void Graphics::ClearViews(uint32_t target, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil)
+	bool Graphics::BeginFrame()
 	{
-		DV_CORE_ASSERT(IsInitialized());
+		if(!IsInitialized())
+			return false;
 
-		prepareDraw();
+		resetViews();
 
-		if(target & eClearFlags::Color)
-		{
-			float clearColor[4] = { color.x, color.y, color.z, color.w };
-			for (uint32_t i = 0; i < MAX_RENDERTARGETS; ++i)
-				s_pDeviceContext->ClearRenderTargetView(s_pRenderTargetViews[i], clearColor);
-		}
+		// Max_Num은 constexptr로 하는게 나아보인다?
+		for (uint32_t i = 0; i < (uint32_t)eTextureUnit::Max_Num; i++)
+			SetTexture((eTextureUnit)i, nullptr);
 
-		if((target & eClearFlags::Depth) || (target & eClearFlags::Stencil))
-		{
-			uint32_t flags = 0;
-			flags |= (target & eClearFlags::Depth) ? D3D11_CLEAR_DEPTH : 0;
-			flags |= (target & eClearFlags::Stencil) ? D3D11_CLEAR_STENCIL : 0;
-
-			s_pDeviceContext->ClearDepthStencilView(s_pDepthStencilView, flags, depth, stencil);
-		}
+		return true;
 	}
 
-	void Graphics::Draw(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t vertexCount, uint32_t vertexStart)
+	void Graphics::EndFrame()
 	{
-		DV_CORE_ASSERT(IsInitialized());
-
-		if (!vertexCount)
+		if (!IsInitialized())
 			return;
 
+		s_pSwapChain->Present(s_bVSync ? 1 : 0, 0);
+	}
+
+	void Graphics::ClearViews(uint8_t flags, const float* pColor, float depth, uint8_t stencil)
+	{
+		// 이 곳에서 SetRenderTarget과 SetDepthStencil의 더티체크 후 바인딩을 하기 때문이다.
+		// 따라서 이름이 더 어울리지 않게 되었다.
+		// 어쩌면 해당 부분을 분리하는 것이 더 나을수도 있을 것 같다.
 		prepareDraw();
 
-		if (s_PrimitiveTopology != type)
+		if (flags & eClearFlags::Color)
+			s_pDeviceContext->ClearRenderTargetView(s_RenderTargetViews[0], pColor);
+		
+		if ((flags & eClearFlags::Depth) || (flags & eClearFlags::Stencil))
 		{
-			s_pDeviceContext->IASetPrimitiveTopology(type);
-			s_PrimitiveTopology = type;
+			uint32_t clearFlags = 0;
+			clearFlags |= (flags & eClearFlags::Depth) ? D3D11_CLEAR_DEPTH : 0;
+			clearFlags |= (flags & eClearFlags::Stencil) ? D3D11_CLEAR_STENCIL : 0;
+
+			s_pDeviceContext->ClearDepthStencilView(s_pDepthStencilView, clearFlags, depth, stencil);
+		}
+	}
+
+	void Graphics::SetRenderTargetView(uint32_t index, ID3D11RenderTargetView* pRenderTargetView)
+	{
+		// 추후 상수를 constexpr로 바꾸기
+		if (index >= 4)
+			return;
+
+		if (pRenderTargetView != s_RenderTargetViews[index])
+		{
+			s_RenderTargetViews[index] = pRenderTargetView;
+			s_bRenderTargetViewsDirty = true;
+		}
+	}
+
+	// read only 때문에 조금 애매해졌다. 
+	// RenderTexture를 받아야 하나...?
+	void Graphics::SetDepthStencilView(ID3D11DepthStencilView* pDepthStencilView)
+	{
+		if (pDepthStencilView != s_pDepthStencilView)
+		{
+			s_pDepthStencilView = pDepthStencilView;
+			s_bRenderTargetViewsDirty = true;
+		}
+	}
+
+	void Graphics::SetViewport(const RECT& rt)
+	{
+		static D3D11_VIEWPORT viewport;
+		viewport.TopLeftX = (float)rt.left;
+		viewport.TopLeftY = (float)rt.top;
+		viewport.Width = (float)(rt.right - rt.left);
+		viewport.Height = (float)(rt.bottom - rt.top);
+		viewport.MaxDepth = 1.0f;
+		viewport.MinDepth = 0.0f;
+
+		s_pDeviceContext->RSSetViewports(1, &viewport);
+	}
+
+	void Graphics::SetDepthStencilState(ID3D11DepthStencilState* pState)
+	{
+		if (pState != s_pDepthStencilState)
+		{
+			s_pDeviceContext->OMSetDepthStencilState(pState, 1);
+			s_pDepthStencilState = pState;
+		}
+	}
+
+	void Graphics::SetRasterizerState(ID3D11RasterizerState* pState)
+	{
+		if (pState != s_pRasterizerState)
+		{
+			s_pDeviceContext->RSSetState(pState);
+			s_pRasterizerState = pState;
+		}
+	}
+
+	void Graphics::SetBlendState(ID3D11BlendState* pState)
+	{
+		if (pState != s_pBlendState)
+		{
+			float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			s_pDeviceContext->OMSetBlendState(pState, blendFactor, 0xffffffff);
+			s_pBlendState = pState;
+		}
+	}
+
+	void Graphics::SetTexture(eTextureUnit index, Texture* pTexture)
+	{
+		if (pTexture)
+		{
+			if (pTexture->GetShaderResourceView() != s_ShaderResourceViews[(uint32_t)index])
+			{
+				if (pTexture->IsMipLevelsDirty())
+					pTexture->UpdateMipLevels();
+
+				if (pTexture->IsSamplerStateDirty())
+					pTexture->UpdateSamplerState();
+
+				s_ShaderResourceViews[(uint32_t)index] = pTexture->GetShaderResourceView();
+				s_SamplerStates[(uint32_t)index] = pTexture->GetSamplerState();
+
+				s_bTextureDirty = true;
+			}
+		}
+		else
+		{
+			if (s_ShaderResourceViews[(uint32_t)index])
+			{
+				s_ShaderResourceViews[(uint32_t)index] = nullptr;
+				s_SamplerStates[(uint32_t)index] = nullptr;
+
+				s_bTextureDirty = true;
+			}
+		}
+	}
+
+	void Graphics::SetShader(Shader* pShader)
+	{
+		if (pShader != s_pShader)
+		{
+			s_pDeviceContext->IASetInputLayout(pShader->GetInputLayout());
+			s_pDeviceContext->VSSetShader(pShader->GetVertexShader(), nullptr, 0);
+			s_pDeviceContext->PSSetShader(pShader->GetPixelShader(), nullptr, 0);
+
+			s_pShader = pShader;
+		}
+	}
+
+	// 단일 버퍼만 다루고 있다.
+	void Graphics::SetVertexBuffer(VertexBuffer* pBuffer)
+	{
+		if (pBuffer != s_pVertexBuffer)
+		{
+			if (pBuffer)
+				s_pDeviceContext->IASetVertexBuffers(0, 1, pBuffer->GetBuffer(), pBuffer->GetStride(), pBuffer->GetOffset());
+			else
+				s_pDeviceContext->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
+
+			s_pVertexBuffer = pBuffer;
+		}
+	}
+
+	void Graphics::SetIndexBuffer(IndexBuffer* pBuffer)
+	{
+		if (pBuffer != s_pIndexBuffer)
+		{
+			if (pBuffer)
+				s_pDeviceContext->IASetIndexBuffer(pBuffer->GetBuffer(), pBuffer->GetFormat(), 0);
+			else
+				s_pDeviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
+
+			s_pIndexBuffer = pBuffer;
+		}
+	}
+
+	void Graphics::Draw(D3D11_PRIMITIVE_TOPOLOGY topology, uint32_t vertexCount, uint32_t vertexStart)
+	{
+		prepareDraw();
+
+		if (s_PrimitiveTopology != topology)
+		{
+			s_pDeviceContext->IASetPrimitiveTopology(topology);
+			s_PrimitiveTopology = topology;
 		}
 
 		s_pDeviceContext->Draw(vertexCount, vertexStart);
 	}
 
-	void Graphics::DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY type, uint32_t indexCount, uint32_t indexStart, uint32_t vertexStart)
+	void Graphics::DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY topology, uint32_t indexCount, uint32_t indexStart)
 	{
-		DV_CORE_ASSERT(IsInitialized());
-
 		prepareDraw();
 
-		if (s_PrimitiveTopology != type)
+		if (s_PrimitiveTopology != topology)
 		{
-			s_pDeviceContext->IASetPrimitiveTopology(type);
-			s_PrimitiveTopology = type;
+			s_pDeviceContext->IASetPrimitiveTopology(topology);
+			s_PrimitiveTopology = topology;
 		}
 
-		s_pDeviceContext->DrawIndexed(indexCount, indexStart, vertexStart);
+		s_pDeviceContext->DrawIndexed(indexCount, indexStart, 0);
 	}
 
-	VertexBuffer* Graphics::GetVertexBuffer()
-	{
-		return s_pVertexBuffer;
-	}
-
-	void Graphics::SetVertexBuffer(VertexBuffer* pVertexBuffer, uint32_t offset)
-	{
-		DV_CORE_ASSERT(IsInitialized());
-
-		if (pVertexBuffer != s_pVertexBuffer)
-		{
-			if (pVertexBuffer)
-			{
-				ID3D11Buffer* pBuffer = pVertexBuffer->GetBuffer();
-				UINT stride = pVertexBuffer->GetStride();
-				UINT offsets[] = { offset };
-
-				s_pDeviceContext->IASetVertexBuffers(0, 1, &pBuffer, &stride, offsets);
-			}
-			else
-			{
-				s_pDeviceContext->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
-			}
-
-			s_pVertexBuffer = pVertexBuffer;
-		}
-	}
-
-	IndexBuffer* Graphics::GetIndexBuffer()
-	{
-		return s_pIndexBuffer;
-	}
-
-	void Graphics::SetIndexBuffer(IndexBuffer* pIndexBuffer, uint32_t offset)
-	{
-		DV_CORE_ASSERT(IsInitialized());
-
-		if (pIndexBuffer != s_pIndexBuffer)
-		{
-			if (pIndexBuffer)
-			{
-				ID3D11Buffer* pOldBuffer = nullptr;
-				DXGI_FORMAT oldFormat = pIndexBuffer->GetFormat();
-				
-				s_pDeviceContext->IASetIndexBuffer(pIndexBuffer->GetBuffer(), pIndexBuffer->GetFormat(), offset);
-			}
-			else
-			{
-				s_pDeviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
-			}
-
-			s_pIndexBuffer = pIndexBuffer;
-		}
-	}
-
-	InputLayout* Graphics::GetInputLayout()
-	{
-		return s_pInputLayout;
-	}
-
-	void Graphics::SetShaderVariation(eShaderType type, ShaderVariation* pShaderVariation)
-	{
-		DV_CORE_ASSERT(IsInitialized());
-
-		if (type == eShaderType::VertexShader)
-		{
-			if (s_pVertexShaderVariation != pShaderVariation)
-			{
-				s_pDeviceContext->VSSetShader(pShaderVariation ?
-					static_cast<ID3D11VertexShader*>(pShaderVariation->GetShaderResource()) : nullptr, nullptr, 0);
-				s_pVertexShaderVariation = pShaderVariation;
-					
-				if (pShaderVariation && s_pInputLayout != pShaderVariation->GetInputLayout())
-				{
-					s_pDeviceContext->IASetInputLayout(pShaderVariation->GetInputLayout() ? 
-						pShaderVariation->GetInputLayout()->GetInputLayout() : nullptr);
-					s_pInputLayout = pShaderVariation->GetInputLayout();
-				}
-			}
-		}
-		else if (type == eShaderType::PixelShader)
-		{
-			if (s_pPixelShaderVariation != pShaderVariation)
-			{
-				s_pDeviceContext->PSSetShader(pShaderVariation ?
-					static_cast<ID3D11PixelShader*>(pShaderVariation->GetShaderResource()) : nullptr, nullptr, 0);
-				s_pPixelShaderVariation = pShaderVariation;
-			}
-		}
-		else
-		{
-			if (s_pComputeShaderVariation != pShaderVariation)
-			{
-				s_pDeviceContext->CSSetShader(pShaderVariation ?
-					static_cast<ID3D11ComputeShader*>(pShaderVariation->GetShaderResource()) : nullptr, nullptr, 0);
-				s_pComputeShaderVariation = pShaderVariation;
-			}
-		}
-	}
-
-	// urho의 경우 SetShaders()에서 해당 Shader가 사용하는 Buffer를 직접 구성한다.
-	// 추후 참조하자.
-	void Graphics::SetConstantBuffer(uint8_t index, eShaderType type, ConstantBuffer* pBuffer)
-	{
-		auto pConstantBuffer = pBuffer->GetBuffer();
-
-		if (type == eShaderType::VertexShader)
-		{
-			s_pVertexShaderConstantBuffers[index] = pConstantBuffer;
-		}
-		if (type == eShaderType::PixelShader)
-		{
-			s_pPixelShaderConstantBuffers[index] = pConstantBuffer;
-		}
-		if (type == eShaderType::ComputeShader)
-		{
-		}
-	}
-
-	void Graphics::SetRenderTargetView(uint32_t index, ID3D11RenderTargetView* pView)
-	{
-		DV_CORE_ASSERT(index < MAX_RENDERTARGETS);
-
-		if (s_pRenderTargetViews[index] == pView)
-			return;
-
-		s_pRenderTargetViews[index] = pView;
-		s_bRenderTargetsDirty = true;
-	}
-
-	void Graphics::SetRenderTargetViews(uint32_t start, uint32_t count, ID3D11RenderTargetView** ppViews)
-	{
-		DV_CORE_ASSERT(start + count < MAX_RENDERTARGETS);
-
-		for (uint32_t i = 0; i < count; ++i)
-		{
-			if (s_pRenderTargetViews[start + i] != ppViews[i])
-			{
-				s_pRenderTargetViews[start + i] = ppViews[i];
-				s_bRenderTargetsDirty = true;
-			}
-		}
-	}
-
-	void Graphics::SetDepthStencilView(ID3D11DepthStencilView* pView)
-	{
-		if (s_pDepthStencilView == pView)
-			return;
-
-		s_pDepthStencilView = pView;
-		s_bRenderTargetsDirty = true;
-	}
-
-	void Graphics::SetDepthStencilState(ID3D11DepthStencilState* pDepthStencilState, uint32_t stencilRef)
-	{
-		if (s_pDepthStencilState != pDepthStencilState)
-		{
-			s_pDepthStencilState = pDepthStencilState;
-			s_StencilRef = stencilRef;
-			s_bDepthStencilStateDirty = true;
-		}
-	}
-
-	Texture* Graphics::GetTexture(eTextureUnit unit)
-	{
-		return s_pTextures[static_cast<uint32_t>(unit)];
-	}
-
-	void Graphics::SetTexture(eTextureUnit unit, Texture* pTexture)
-	{
-		DV_CORE_ASSERT(unit != eTextureUnit::Max_Num);
-
-		uint32_t index = static_cast<uint32_t>(unit);
-
-		if (pTexture)
-		{
-			if (pTexture->IsMipLevelsDirty())
-				pTexture->UpdateMipLevels();
-
-			if (pTexture->IsSamplerStateDirty())
-			{
-				pTexture->UpdateSamplerState();
-				s_pTextures[index] = nullptr;
-			}
-		}
-
-		if (s_TextureDirtyStart == 0xffffffff)
-			s_TextureDirtyStart = s_TextureDirtyEnd = index;
-		else
-		{
-			if (index < s_TextureDirtyStart)
-				s_TextureDirtyStart = index;
-			else if (index > s_TextureDirtyEnd)
-				s_TextureDirtyEnd = index;
-		}
-
-		if (pTexture != s_pTextures[index])
-		{
-			s_pTextures[index] = pTexture;
-			s_pShaderResourceViews[index] = pTexture ? pTexture->GetShaderResourceView() : nullptr;
-			s_pSamplerStates[index] = pTexture ? pTexture->GetSamplerState() : nullptr;
-			s_bTextureDirty = true;
-		}
-	}
-
-	ID3D11Device* Graphics::GetDevice()
-	{
-		return s_pDevice;
-	}
-	
-	ID3D11DeviceContext* Graphics::GetDeviceContext()
-	{
-		return s_pDeviceContext;
-	}
-
-	ID3D11RenderTargetView* Graphics::GetDefaultRenderTargetView()
-	{
-		return s_pDefaultRenderTargetView;
-	}
-
-	ID3D11DepthStencilView* Graphics::GetDefaultDepthStencilView()
-	{
-		return s_pDefaultDepthStencilView;
-	}
-
-	// 단순 캡슐함수 이상의 역할을 하지 못하고 있다...
-	// => 각종 리소스들은 배열로 관리한 후 한 번에 보내는 편이 나아보인다. 그러므로 쓸모 있다.
+	// 여전히 이름이 마음에 들지 않는다.
+	// 결국 모든 bind에 대응하지 않는다.
+	// 더티체크를 기반으로 변경여부를 확인하고 필요할 경우 직접 생성하는 리소스만 처리하는 함수였다.
+	// => SetRenderTargets, SetTexture만 잘 처리하면 필요가 없어질 것 같다.
 	void Graphics::prepareDraw()
 	{
-		DV_CORE_ASSERT(IsInitialized());
-
-		if (s_bRenderTargetsDirty)
+		if (s_bRenderTargetViewsDirty)
 		{
-			s_pDeviceContext->OMSetRenderTargets(MAX_RENDERTARGETS, &s_pRenderTargetViews[0], s_pDepthStencilView);
-			s_bRenderTargetsDirty = false;
-		}
+			// 1. DepthStencilView가 존재한다면 적용 없다면 디폴트 깊이버퍼
+			// 2. !깊이쓰기, DepthSTencilView가 ReadOnly라면 ReadOnly로...
+			// 3. RenderTargets[0]이 비었고, DepthStencil가 없거나, 있지만 크기가 백버퍼랑 같을 때 디폴트 렌더타겟
 
-		if (s_bDepthStencilStateDirty)
-		{
-			s_pDeviceContext->OMSetDepthStencilState(s_pDepthStencilState, s_StencilRef);
-			s_bDepthStencilStateDirty = false;
+			s_pDeviceContext->OMSetRenderTargets(4, &s_RenderTargetViews[0], s_pDefaultDepthStencilView);
+
+			s_bRenderTargetViewsDirty = false;
 		}
 
 		if (s_bTextureDirty)
 		{
-			s_pDeviceContext->PSSetShaderResources(
-				s_TextureDirtyStart, 
-				s_TextureDirtyEnd - s_TextureDirtyStart + 1, 
-				&s_pShaderResourceViews[s_TextureDirtyStart]);
-			s_pDeviceContext->PSSetSamplers(
-				s_TextureDirtyStart,
-				s_TextureDirtyEnd - s_TextureDirtyStart + 1, 
-				&s_pSamplerStates[s_TextureDirtyStart]);
+			s_pDeviceContext->PSSetShaderResources(0, (uint32_t)eTextureUnit::Max_Num, &s_ShaderResourceViews[0]);
+			s_pDeviceContext->PSSetSamplers(0, (uint32_t)eTextureUnit::Max_Num, &s_SamplerStates[0]);
 
-			s_TextureDirtyStart = s_TextureDirtyEnd = 0xffffffff;
 			s_bTextureDirty = false;
 		}
+	}
 
-		s_pDeviceContext->VSSetConstantBuffers(0, 2, &s_pVertexShaderConstantBuffers[0]);
-		s_pDeviceContext->PSSetConstantBuffers(0, 3, &s_pPixelShaderConstantBuffers[0]);
+	// beginFrame(), reiszeBackbuffer() 등에서 호출
+	void Graphics::resetViews()
+	{
+		for (uint32_t i = 0; i < 4; i++)
+			SetRenderTargetView(i, nullptr);
+
+		SetDepthStencilView(nullptr);
+
+		RECT rt = { 0, 0, (LONG)s_BackbufferWidth, (LONG)s_BackbufferHeight };
+		SetViewport(rt);
 	}
 }

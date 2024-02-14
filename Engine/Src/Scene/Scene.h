@@ -1,5 +1,4 @@
 #pragma once
-#include "Core/Object.h"
 
 namespace Dive
 {
@@ -9,34 +8,42 @@ namespace Dive
 	class Scene
 	{
 	public:
-		static bool Initialize();
-		static void Shutdown();
+		Scene(const std::string& name = "Untitled");
+		~Scene();
 
-		static void New();
-		static void Clear();
+		void Clear();
+		
+		GameObject* CreateGameObject(const std::string& name = "GameObject");
+		void RemoveGameObject(GameObject* pGameObject);
+		void RemoveGameObjectByID(uint64_t id);
+		GameObject* GetGameObjectByID(uint64_t id);
+		bool ExistsGameObject(GameObject* pGameObject);
+		bool ExistsGameObjectByID(uint64_t id);
+		std::vector<GameObject*> GetRootGameObjects();
+		std::vector<GameObject*> GetAllGameObjects();
+		uint64_t GetGameObjectsCount();
+		 bool IsEmpty() const { return m_GameObjects.empty(); }
 
-		static void Update();
+		void RegisterComponent(Component* pComponent, uint64_t id = 0);
+		void DeregisterComponent(Component* pComponent);
+		void DeregisterComponentByID(uint64_t id);
+		Component* GetComponent(uint64_t id);
 
-		static std::string GetName();
-		static std::string GetFilepath();
-
-		static GameObject* CreateGameObject(const std::string& name = "GameObject");
-		static void RemoveGameObject(GameObject* pGameObject);
-		static void RemoveGameObjectByID(uint64_t id);
-		static GameObject* GetGameObjectByID(uint64_t id);
-		static bool ExistsGameObject(GameObject* pGameObject);
-		static bool ExistsGameObjectByID(uint64_t id);
-		static std::vector<GameObject*> GetRootGameObjects();
-		static std::vector<GameObject*> GetAllGameObjects();
-		static uint64_t GetGameObjectsCount();
-
-		static void RegisterComponent(Component* pComponent, uint64_t id = 0);
-		static void DeregisterComponent(Component* pComponent);
-		static void DeregisterComponentByID(uint64_t id);
-		static Component* GetComponent(uint64_t id);
+		 std::string GetName() { return m_Name; }
 
 	private:
-		static uint64_t getFreeGameObjectID();
-		static uint64_t getFreeComponentID();
+		uint64_t getFreeGameObjectID();
+		uint64_t getFreeComponentID();
+	
+	private:
+		std::string m_Name;
+
+		std::unordered_map<uint64_t, GameObject*> m_GameObjects;
+		std::unordered_map<uint64_t, Component*> m_Components;
+
+		uint64_t m_CurGameObjectID;
+		uint64_t m_CurComponentID;
+
+		bool m_bDirty;
 	};
 }
