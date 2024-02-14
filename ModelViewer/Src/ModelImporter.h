@@ -1,12 +1,12 @@
 #pragma once
 #include "Dive.h"
 
-#include <assimp/postprocess.h>
-#include <assimp/version.h>
-#include <assimp/scene.h>
-#include <assimp/material.h>
-#include <assimp/Importer.hpp>
-#include <assimp/ProgressHandler.hpp>
+//#include <assimp/postprocess.h>
+//#include <assimp/version.h>
+//#include <assimp/scene.h>
+//#include <assimp/material.h>
+//#include <assimp/Importer.hpp>
+//#include <assimp/ProgressHandler.hpp>
 
 // 일단 특성상 static이 어울린다.
 // 주 기능은 외부 파일을 엔진 파일로 변환하는 것이다.

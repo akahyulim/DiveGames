@@ -30,7 +30,10 @@ namespace Dive
 		static T* Cache(T* pResource)
 		{
 			if (!pResource)
+			{
+				DV_CORE_WARN("잘못된 리소스 캐시를 시도하였습니다.");
 				return nullptr;
+			}
 
 			if (IsCached<T>(pResource->GetName()))
 			{
@@ -48,7 +51,7 @@ namespace Dive
 			m_Resources[id] = static_cast<Resource*>(pResource);
 			pResource->SetID(id);
 
-			DV_CORE_DEBUG("리소스({0:s} - {1:d})를 캐시하였습니다", pResource->GetName(), pResource->GetID());
+			DV_CORE_INFO("ResoruceCache에 ({0:s} - {1:d})를 캐시하였습니다", pResource->GetName(), pResource->GetID());
 
 			return pResource;
 		}
@@ -64,6 +67,7 @@ namespace Dive
 
 		static void RemoveByID(uint64_t id);
 
+		// 동일한 타입에 동일한 이름을 가지는 경우가 발생할 수 있다.
 		template<class T>
 		static void RemoveByName(const std::string& name)
 		{
@@ -79,6 +83,9 @@ namespace Dive
 			}
 		}
 
+		// 동일한 타입에 동일한 이름을 가지는 경우가 발생할 수 있다.
+		// 그렇다면 결국 id로 구분해야 하는데 
+		// 현재 구현은 캐시 여부를 확인한 후 id를 부여하기 때문에 애매해졌다.
 		template<class T>
 		static bool IsCached(const std::string& name)
 		{
@@ -123,6 +130,7 @@ namespace Dive
 			return it != m_Resources.end() ? dynamic_cast<T*>(it->second) : nullptr;
 		}
 
+		// 역시 동일한 타입에 동일한 이름을 가지는 경우가 발생할 수 있다.
 		template<class T>
 		static T* GetResourceByName(const std::string& name)
 		{
@@ -172,6 +180,8 @@ namespace Dive
 
 	private:
 		static uint64_t m_CurResourceID;
+
+		// urho3d는 typeHash을 key로 사용했다. 그리고 second도 구조체 배열이다.
 		static std::unordered_map<uint64_t, Resource*> m_Resources;
 	};
 }

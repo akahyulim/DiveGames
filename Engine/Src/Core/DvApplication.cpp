@@ -6,6 +6,7 @@
 #include "Timer.h"
 #include "Graphics/GraphicsDevice.h"
 #include "Renderer/DvRenderer.h"
+#include "Resource/ResourceCache.h"
 #include "Input/DvInput.h"
 
 namespace Dive
@@ -31,6 +32,8 @@ namespace Dive
 
 	DvApplication::~DvApplication()
 	{
+		ResourceCache::Shutdown();
+		DvRenderer::Shutdown();
 		GraphicsDevice::Shutdown();
 
 		::DestroyWindow(s_hWnd);

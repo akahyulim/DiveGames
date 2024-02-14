@@ -7,14 +7,18 @@ namespace Dive
 	{
 		Image,
 		Texture2D,
-		DvTexture2D,
 		RenderTexture,
-		DvRenderTexture,
 		TextureCube,
 		Material,
 		Model,
 		Animation,
 		Shader,
+
+		DvRenderTexture,
+		DvTexture2D,
+		DvMaterial,
+		DvMesh,
+		DvShader,
 		Unknown
 	};
 

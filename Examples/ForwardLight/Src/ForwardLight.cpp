@@ -14,6 +14,7 @@ namespace ForwardLight
 		, m_pMainCam(nullptr)
 		, m_pCube(nullptr)
 		, m_pTriangle(nullptr)
+		, m_pSphere(nullptr)
 	{
 	}
 
@@ -48,24 +49,38 @@ namespace ForwardLight
 				auto pTexStone = Dive::ResourceCache::LoadFromFile<Dive::DvTexture2D>("Assets/Textures/Stone01.tga");
 
 				// shader, material, meshes
-				// 현재 관리주체가 없다. ResourceCache가 적절해보인다.
+				// 일단 AddManualResource로 캐시에 저장했다.
+				// 파일 로드가 아니기에 LoadFromFile()을 사용할 수 없기 때문이다.
 				auto pShader = Dive::DvShader::CreateFromFile("ForwardLight", L"CoreData/Shaders/ForwardLight.hlsl", Dive::eVertexLayout::Static_Model);
+				Dive::ResourceCache::AddManualResource<Dive::DvShader>(pShader);
 				auto pTriangleMesh = Dive::MeshFactory::CreateTriangle(5.0f);
-				auto pTriangleMaterial = Dive::DvMaterial::Create(pShader);
+				Dive::ResourceCache::AddManualResource<Dive::DvMesh>(pTriangleMesh);
+				// Material은 이름이 좀 애매하다.
+				// Default(Legacy)와 Pbs로 구분하는게 맞는 듯 한데...
+				// 정 필요하다면 Renderable에서 Mesh의 이름을 참조할 수 있다.
+				// 하지만 AddMenualResource() 시점이 애매해진다.
+				auto pTriangleMaterial = Dive::DvMaterial::Create("TriangleMaterial", pShader);
 				pTriangleMaterial->SetDiffuseColor(1.0f, 1.0f, 0.0f, 1.0f);
 				pTriangleMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexDMC);
+				Dive::ResourceCache::AddManualResource<Dive::DvMaterial>(pTriangleMaterial);
 				auto pCubeMesh = Dive::MeshFactory::CreateCube(5.0f);
-				auto pCubeMaterial = Dive::DvMaterial::Create(pShader);
+				Dive::ResourceCache::AddManualResource<Dive::DvMesh>(pCubeMesh);
+				auto pCubeMaterial = Dive::DvMaterial::Create("CubeMaterial", pShader);
 				pCubeMaterial->SetDiffuseColor(0.0f, 1.0f, 1.0f, 1.0f);
 				pCubeMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexDOKEV);
+				Dive::ResourceCache::AddManualResource<Dive::DvMaterial>(pCubeMaterial);
 				auto pSphereMesh = Dive::MeshFactory::CreateSphere(5.0f);
-				auto pSphereMaterial = Dive::DvMaterial::Create(pShader);
+				Dive::ResourceCache::AddManualResource<Dive::DvMesh>(pSphereMesh);
+				auto pSphereMaterial = Dive::DvMaterial::Create("SphereMaterial", pShader);
 				pSphereMaterial->SetDiffuseColor(1.0f, 0.0f, 0.0f, 1.0f);
 				//pSphereMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexStone);
+				Dive::ResourceCache::AddManualResource<Dive::DvMaterial>(pSphereMaterial);
 				auto pPlaneMesh = Dive::MeshFactory::CreatePlane(50, 50);
-				auto pPlaneMaterial = Dive::DvMaterial::Create(pShader);
+				Dive::ResourceCache::AddManualResource<Dive::DvMesh>(pPlaneMesh);
+				auto pPlaneMaterial = Dive::DvMaterial::Create("PlaneMaterial", pShader);
 				pPlaneMaterial->SetDiffuseColor(0.1f, 0.1f, 0.1f, 1.0f);
 				pPlaneMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexPlane);
+				Dive::ResourceCache::AddManualResource<Dive::DvMaterial>(pPlaneMaterial);
 
 				// tirangle gameobject
 				m_pTriangle = m_pScene->CreateGameObject("Triangle");
@@ -101,13 +116,7 @@ namespace ForwardLight
 				auto pDirLightCom = pDirLight->AddComponent<Dive::DvLight>();
 				pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
 				pDirLightCom->SetType(Dive::DvLight::eLightType::Directional);
-				pDirLightCom->SetDir(1.0f, 0.0f, 1.0f);
-
-				auto pDirLight2 = m_pScene->CreateGameObject("DirectionalLight2");
-				auto pDirLightCom2 = pDirLight2->AddComponent<Dive::DvLight>();
-				pDirLightCom2->SetColor(1.0f, 1.0f, 0.0f);
-				pDirLightCom2->SetType(Dive::DvLight::eLightType::Directional);
-				pDirLightCom2->SetDir(0.0f, 1.0f, 0.0f);
+				pDirLightCom->SetDir(1.0f, -1.0f, 1.0f);
 			}
 		}
 

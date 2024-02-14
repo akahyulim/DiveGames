@@ -27,6 +27,25 @@ namespace Dive
 		return true;
 	}
 
+	void DvRenderer::Shutdown()
+	{
+		for (auto pViewScreen : m_ViewScreens)
+			DV_DELETE(pViewScreen);
+		m_ViewScreens.clear();
+
+		for (auto pConstantBuffer : m_ConstantBuffers)
+			DV_DELETE(pConstantBuffer);
+
+		for (auto pBlendState : m_BlendStates)
+			DV_RELEASE(pBlendState);
+
+		for (auto pDepthStencilState : m_DepthStencilStates)
+			DV_RELEASE(pDepthStencilState);
+
+		for (auto pRasterizerState : m_RasterizerStates)
+			DV_RELEASE(pRasterizerState);
+	}
+
 	// renderable을 분류한다.
 	void DvRenderer::Update()
 	{

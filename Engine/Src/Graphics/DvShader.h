@@ -1,4 +1,5 @@
 #pragma once
+#include "Resource/Resource.h"
 
 namespace Dive
 {
@@ -10,7 +11,7 @@ namespace Dive
 		Skinned_Model
 	};
 
-	class DvShader
+	class DvShader : public Resource
 	{
 	public:
 		DvShader(const std::string& name, const std::wstring& filepath, eVertexLayout layout = eVertexLayout::Static_Model);
@@ -32,8 +33,7 @@ namespace Dive
 
 	private:
 	private:
-		std::string m_Name;
-		std::wstring m_FilePath;
+		std::wstring m_FilePath;		// Resource´Â sringÀÌ´Ù..
 
 		ID3DBlob* m_pVertexShaderBlob;
 

@@ -117,7 +117,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -204,6 +204,7 @@
     <ClInclude Include="Src\Renderer\SkinnedMesh.h" />
     <ClInclude Include="Src\Renderer\Skydome.h" />
     <ClInclude Include="Src\Resource\Image.h" />
+    <ClInclude Include="Src\Resource\Importer\ModelLoader.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceCache.h" />
     <ClInclude Include="Src\Scene\Components\Camera.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="Src\Renderer\Skydome.cpp" />
     <ClCompile Include="Src\Renderer\ViewScreen.cpp" />
     <ClCompile Include="Src\Resource\Image.cpp" />
+    <ClCompile Include="Src\Resource\Importer\ModelLoader.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceCache.cpp" />
     <ClCompile Include="Src\Scene\Components\Animator.cpp" />

@@ -68,7 +68,7 @@ namespace Dive
 	}
 
 	DvShader::DvShader(const std::string& name, const std::wstring& filepath, eVertexLayout layout)
-		: m_Name(name)
+		: Resource(eResourceType::DvShader)
 		, m_FilePath(filepath)
 		, m_pVertexShaderBlob(nullptr)
 		, m_pVertexShader(nullptr)
@@ -76,6 +76,7 @@ namespace Dive
 		, m_VertexLayout(layout)
 		, m_pInputLayout(nullptr)
 	{
+		SetName(name);
 		loadFromFile(filepath);
 		createInputLayout();
 	}

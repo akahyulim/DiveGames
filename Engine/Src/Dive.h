@@ -65,6 +65,7 @@
 #include "IO/FileStream.h"
 
 // Resource
+#include "Resource/Importer/ModelLoader.h"
 #include "Resource/Resource.h"
 #include "Resource/ResourceCache.h"
 #include "Resource/Image.h"

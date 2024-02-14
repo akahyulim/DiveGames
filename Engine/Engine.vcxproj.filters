@@ -31,6 +31,9 @@
     <Filter Include="Src\Math">
       <UniqueIdentifier>{0f9a36da-95a4-474d-9306-b50c57b82511}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Resource\Importer">
+      <UniqueIdentifier>{f628aa4f-cd3d-47d9-8df4-a09c23323eb8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Dive.h">
@@ -246,6 +249,9 @@
     <ClInclude Include="Src\Input\DvInput.h">
       <Filter>Src\Input</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Resource\Importer\ModelLoader.h">
+      <Filter>Src\Resource\Importer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DivePch.cpp">
@@ -442,6 +448,9 @@
     </ClCompile>
     <ClCompile Include="Src\Input\DvInput.cpp">
       <Filter>Src\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Resource\Importer\ModelLoader.cpp">
+      <Filter>Src\Resource\Importer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

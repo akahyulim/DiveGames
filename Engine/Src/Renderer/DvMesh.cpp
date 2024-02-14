@@ -9,9 +9,18 @@
 namespace Dive
 {
 	DvMesh::DvMesh(DvVertexBuffer* pVertexBuffer, DvIndexBuffer* pIndexBuffer)
-		: m_pVertexBuffer(pVertexBuffer)
+		: Resource(eResourceType::DvMesh)
+		, m_pVertexBuffer(pVertexBuffer)
 		, m_pIndexBuffer(pIndexBuffer)
 	{
+	}
+
+	DvMesh::DvMesh(const std::string& name, DvVertexBuffer* pVertexBuffer, DvIndexBuffer* pIndexBuffer)
+		: Resource(eResourceType::DvMesh)
+		, m_pVertexBuffer(pVertexBuffer)
+		, m_pIndexBuffer(pIndexBuffer)
+	{
+		SetName(name);
 	}
 	
 	DvMesh::~DvMesh()
@@ -36,9 +45,9 @@ namespace Dive
 		}
 	}
 
-	DvMesh* DvMesh::Create(DvVertexBuffer* pVertexBuffer, DvIndexBuffer* pIndexBuffer)
+	DvMesh* DvMesh::Create(const std::string& name, DvVertexBuffer* pVertexBuffer, DvIndexBuffer* pIndexBuffer)
 	{
-		return new DvMesh(pVertexBuffer, pIndexBuffer);
+		return new DvMesh(name, pVertexBuffer, pIndexBuffer);
 	}
 };
 

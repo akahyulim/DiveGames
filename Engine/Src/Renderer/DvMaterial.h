@@ -1,16 +1,17 @@
 #pragma once
 #include "Graphics/GraphicsDefs.h"
+#include "Resource/Resource.h"
 
 namespace Dive
 {
 	class DvShader;
 	class DvTexture;
 
-	class DvMaterial
+	class DvMaterial : public Resource
 	{
 	public:
 		DvMaterial();
-		DvMaterial(DvShader* pShader);
+		DvMaterial(const std::string& name, DvShader* pShader);
 		~DvMaterial();
 
 		 DvShader* GetShader() const { return m_pShader; }
@@ -35,7 +36,7 @@ namespace Dive
 		 void SetOffset(float x, float y) { m_Offset.x = x; m_Offset.y = y; }
 
 	public:
-		static DvMaterial* Create(DvShader* pShader);
+		static DvMaterial* Create(const std::string& name, DvShader* pShader);
 
 	private:
 	private:

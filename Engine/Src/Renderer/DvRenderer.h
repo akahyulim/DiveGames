@@ -56,6 +56,7 @@ namespace Dive
 	{
 	public:
 		static bool Initialize();
+		static void Shutdown();
 
 		static void Update();
 		static void Render();

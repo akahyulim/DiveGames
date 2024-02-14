@@ -21,10 +21,17 @@ namespace Dive
 	void ResourceCache::Shutdown()
 	{
 		for (auto& resource : m_Resources)
+		{
+			uint64_t id = resource.second->GetID();
+			std::string name = resource.second->GetName();
+
 			DV_DELETE(resource.second);
+
+			DV_CORE_INFO("ResoruceCache에서 ({0:s} - {1:d})를 제거하였습니다.", name, id);
+		}
 		m_Resources.clear();
 
-		DV_CORE_INFO("ResoruceCache 종료에 성공하였습니다.");
+		DV_CORE_INFO("ResoruceCache 종료하였습니다.");
 	}
 
 	void ResourceCache::RemoveByID(uint64_t id)

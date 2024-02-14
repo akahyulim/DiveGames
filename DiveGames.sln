@@ -17,8 +17,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sandbox", "Sandbox\Sandbox.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{6C91AE93-1751-45FA-841A-380BC4BE8434}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{AA6EBD79-72CB-453C-B0C6-07FB1787FE00}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ForwardLight", "Examples\ForwardLight\ForwardLight.vcxproj", "{7525CFC2-373D-4687-99EC-B1863370CFE3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{1C48907D-25B4-4337-827C-46AD2C1361B3} = {1C48907D-25B4-4337-827C-46AD2C1361B3}

@@ -29,7 +29,7 @@ namespace Dive
 
 			auto pIndexBuffer = Dive::DvIndexBuffer::Create(indices.data(), (uint32_t)indices.size());
 
-			return DvMesh::Create(pVertexBuffer, pIndexBuffer);
+			return DvMesh::Create("TriangleMesh", pVertexBuffer, pIndexBuffer);
 		}
 
 		DvMesh* CreateQuad()
@@ -110,7 +110,7 @@ namespace Dive
 			
 			auto pIndexBuffer = Dive::DvIndexBuffer::Create(indices.data(), (uint32_t)indices.size());
 			
-			return DvMesh::Create(pVertexBuffer, pIndexBuffer);
+			return DvMesh::Create("CubeMesh", pVertexBuffer, pIndexBuffer);
 		}
 
 		DvMesh* CreatePlane(float length, float depth)
@@ -152,7 +152,7 @@ namespace Dive
 
 			auto pIndexBuffer = Dive::DvIndexBuffer::Create(indices.data(), (uint32_t)indices.size());
 
-			return DvMesh::Create(pVertexBuffer, pIndexBuffer);
+			return DvMesh::Create("PlaneMesh", pVertexBuffer, pIndexBuffer);
 		}
 
 		DvMesh* CreateSphere(float radius, int slices, int stacks)
@@ -231,7 +231,7 @@ namespace Dive
 
 			auto pIndexBuffer = Dive::DvIndexBuffer::Create(indices.data(), (uint32_t)indices.size());
 
-			return DvMesh::Create(pVertexBuffer, pIndexBuffer);
+			return DvMesh::Create("SphereMesh", pVertexBuffer, pIndexBuffer);
 		}
 	}
 }

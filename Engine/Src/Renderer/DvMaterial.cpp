@@ -8,19 +8,22 @@
 namespace Dive
 {
 	DvMaterial::DvMaterial()
-		: m_pShader(nullptr)
+		: Resource(eResourceType::DvMaterial)
+        , m_pShader(nullptr)
         , m_DiffuseColor(1.0f, 1.0f, 1.0f, 1.0f)
         , m_Tiling(1.0f, 1.0f)
         , m_Offset(0.0f, 0.0f)
 	{
 	}
 
-	DvMaterial::DvMaterial(DvShader* pShader)
-		: m_pShader(pShader)
+	DvMaterial::DvMaterial(const std::string& name, DvShader* pShader)
+		: Resource(eResourceType::DvMaterial)
+        , m_pShader(pShader)
         , m_DiffuseColor(1.0f, 1.0f, 1.0f, 1.0f)
         , m_Tiling(1.0f, 1.0f)
         , m_Offset(0.0f, 0.0f)
 	{
+        SetName(name);
 	}
 
 	DvMaterial::~DvMaterial()
@@ -64,8 +67,8 @@ namespace Dive
         return m_Textures[unit] != nullptr;
     }
 
-    DvMaterial* DvMaterial::Create(DvShader* pShader)
+    DvMaterial* DvMaterial::Create(const std::string& name, DvShader* pShader)
     {
-        return new DvMaterial(pShader);
+        return new DvMaterial(name, pShader);
     }
 }
