@@ -29,7 +29,7 @@ namespace Dive
 		eProjectionType GetProjectionType() const { return m_ProjectionType; }
 		void SetProjectionType(eProjectionType type) { m_ProjectionType = type; }
 
-		const float* GetBackgroundColor() const { return m_BackgroundColor; }
+		const DirectX::XMFLOAT4& GetBackgroundColor() const { return m_BackgroundColor; }
 		void SetBackgroundColor(float r, float g, float b, float a);
 
 		float GetAspectRatio() const;
@@ -43,6 +43,8 @@ namespace Dive
 		float GetFarClipPlane() const { return m_FarClipPlane; }
 		void SetFarClipPlane(float farPlane) { m_FarClipPlane = farPlane; }
 
+		// 뷰포트라기보단 비율을 설정할 수 있었던 것인데
+		// 어느샌가 기능이 누락된 듯 하다.
 		const RECT& GetViewport() const { return m_Viewport; }
 		void SetViewport(const RECT& rt) { m_Viewport = rt; }
 
@@ -60,8 +62,8 @@ namespace Dive
 	protected:
 		eProjectionType m_ProjectionType;
 
-		//DirectX::XMFLOAT4 m_BackgroundColor;
-		float m_BackgroundColor[4];
+		DirectX::XMFLOAT4 m_BackgroundColor;
+		//float m_BackgroundColor[4];
 
 		float m_FieldOfView;
 

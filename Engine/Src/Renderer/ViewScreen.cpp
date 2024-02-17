@@ -112,7 +112,8 @@ namespace Dive
 		// 즉, Batch별로 호출되므로 중복 체크를 확인하는 편이 맞아보인다.
 		{
 			// 뷰포트
-			Graphics::SetViewport(m_pCamera->GetViewport());
+			// 일단 제외시켰지만 카메라가 특정 부분을 비출 수 있어야 한다.
+			//Graphics::SetViewport(m_pCamera->GetViewport());
 
 			{
 				// 버퍼를 Renderer가 관리한다면 cpu버퍼는 이 곳이 아니라 GraphcisDevice가 관리하는 것이 맞다.

@@ -7,6 +7,7 @@
 #include "Core/CoreEvents.h"
 #include "Core/Timer.h"
 #include "Core/Application.h"
+#include "Core/Engine.h"
 #include "Core/Object.h"
 
 // Graphics

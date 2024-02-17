@@ -8,6 +8,15 @@
 
 namespace Dive
 {
+	constexpr LPCWSTR DV_WINCLASS_NAME = L"DIVE_WINDOW";
+
+	HINSTANCE Graphics::s_hInstance = NULL;
+	HWND Graphics::s_hWnd = NULL;
+	std::wstring Graphics::s_WindowTitle = L"DiveGames";
+	bool Graphics::s_bFullScreen = false;
+	uint32_t Graphics::s_ResolutionWidth = 0;
+	uint32_t Graphics::s_ResolutionHeight = 0;
+
 	IDXGISwapChain* Graphics::s_pSwapChain = nullptr;
 	ID3D11Device* Graphics::s_pDevice = nullptr;
 	ID3D11DeviceContext* Graphics::s_pDeviceContext = nullptr;
@@ -15,9 +24,6 @@ namespace Dive
 	ID3D11RenderTargetView* Graphics::s_pDefaultRenderTargetView = nullptr;
 	ID3D11DepthStencilView* Graphics::s_pDefaultDepthStencilView = nullptr;
 	ID3D11Texture2D* Graphics::s_pDefaultDepthTexture = nullptr;
-
-	uint32_t Graphics::s_BackbufferWidth = 0;
-	uint32_t Graphics::s_BackbufferHeight = 0;
 
 	bool Graphics::s_bVSync = false;
 
@@ -41,60 +47,47 @@ namespace Dive
 	ID3D11SamplerState* Graphics::s_SamplerStates[(uint32_t)eTextureUnit::Max_Num] = { nullptr, };
 
 	bool Graphics::s_bTextureDirty = true;
-
-	bool Graphics::Initialize(HWND hWnd, uint32_t width, uint32_t height, bool fullScreen)
+	
+	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
+		LRESULT result = NULL;
 
-		if (FAILED(D3D11CreateDevice(
-			nullptr,
-			D3D_DRIVER_TYPE_HARDWARE,
-			nullptr,
-			0,
-			&featureLevel,//nullptr,
-			1, //0,
-			D3D11_SDK_VERSION,
-			&s_pDevice,
-			nullptr,
-			&s_pDeviceContext)))
+		switch (msg)
 		{
-			DV_CORE_ERROR("ID3D11Device & ID3D11DeviceContext 생성에 실패하였습니다.");
-			return false;
+		case WM_CLOSE:
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			return 0;
 		}
 
-		IDXGIDevice* pDxgiDevice = nullptr;
-		s_pDevice->QueryInterface(IID_IDXGIDevice, (void**)&pDxgiDevice);
-		IDXGIAdapter* pDxgiAdapter = nullptr;
-		pDxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&pDxgiAdapter);
-		IDXGIFactory* pDxgiFactory = nullptr;
-		pDxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&pDxgiFactory);
+		return Graphics::MessageHandler(hWnd, msg, wParam, lParam);
+	}
 
-		DXGI_SWAP_CHAIN_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.BufferCount = 1;
-		desc.BufferDesc.Width = width;
-		desc.BufferDesc.Height = height;
-		desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// sRGB???
-		desc.BufferDesc.RefreshRate.Denominator = 1;			// 추후 수정(vsync에 따라 달라진다?)
-		desc.BufferDesc.RefreshRate.Numerator = 0;
-		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		desc.SampleDesc.Count = 1;								// 멀티 샘플링 off
-		desc.SampleDesc.Quality = 0;
-		desc.Windowed = true;
-		desc.OutputWindow = hWnd;
-		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
-
-		if (FAILED(pDxgiFactory->CreateSwapChain(s_pDevice, &desc, &s_pSwapChain)))
+	// urho는 fullScreen부터 resizable까지 ScreenModeParams이라는 구조체로 관리
+	// vsync도 해당 구조체에서 관리한다.
+	bool Graphics::SetScreenMode(uint32_t width, uint32_t height, bool fullScreen, bool borderless)
+	{
+		// 윈도우 생성
+		if (!s_hWnd)
 		{
-			DV_CORE_ERROR("IDXGISwapchain 생성에 실패하였습니다.");
-			return false;
+			if (!createWindow(width, height, borderless))
+				return false;
 		}
+		AdjustWindow(width, height, borderless);
 
-		if (!UpdateSwapChain(width, height))
+		// 디바이스 & 스왑체인 생성
+		if (!s_pDevice)
 		{
-			DV_CORE_ERROR("후면버퍼 갱신에 실패하였습니다.");
-			return false;
+			if (!createDevice(width, height))
+				return false;
 		}
+		updateSwapChain(width, height);
+
+		ClearViews(eClearFlags::Color, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f));
+		s_pSwapChain->Present(0, 0);
+
+		ShowWindow(s_hWnd, SW_SHOW);
+		SetFocus(s_hWnd);
 
 		return true;
 	}
@@ -108,99 +101,101 @@ namespace Dive
 		DV_RELEASE(s_pDeviceContext);
 		DV_RELEASE(s_pDeviceContext);
 		DV_RELEASE(s_pSwapChain);
+
+		::DestroyWindow(s_hWnd);
+		::UnregisterClassW(DV_WINCLASS_NAME, s_hInstance);
 	}
 
-	bool Graphics::UpdateSwapChain(uint32_t width, uint32_t height)
+	bool Graphics::RunWindow()
 	{
-		if (s_BackbufferWidth == width && s_BackbufferHeight == height)
-			return true;
+		DV_CORE_ASSERT(IsInitialized());
+		
+		MSG msg;
+		ZeroMemory(&msg, sizeof(msg));
 
-		s_pDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
-		DV_RELEASE(s_pDefaultRenderTargetView);
-		DV_RELEASE(s_pDefaultDepthTexture);
-		DV_RELEASE(s_pDefaultDepthStencilView);
-
-		s_pSwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
-
-		ID3D11Texture2D* pBackbufferTexture = nullptr;
-		if (FAILED(s_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture)))
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			DV_RELEASE(pBackbufferTexture);
-			DV_CORE_ERROR("후면 버퍼 텍스쳐를 얻어오는데 실패하였습니다.");
-			return false;
+			TranslateMessage(&msg);
+			DispatchMessageW(&msg);
 		}
 
-		if (FAILED(s_pDevice->CreateRenderTargetView(
-			static_cast<ID3D11Resource*>(pBackbufferTexture), nullptr, &s_pDefaultRenderTargetView)))
+		return msg.message != WM_QUIT;
+	}
+
+	LRESULT Graphics::MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (msg)
 		{
-			DV_RELEASE(pBackbufferTexture);
-			DV_RELEASE(s_pDefaultRenderTargetView);
-			DV_CORE_ERROR("후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
-			return false;
+		case WM_SIZE:
+			if(IsInitialized())
+				updateSwapChain(0, 0);
+			return 0;
 		}
-		DV_RELEASE(pBackbufferTexture);
+		return ::DefWindowProc(hWnd, msg, wParam, lParam);
+	}
 
-		uint32_t curWidth = width;
-		uint32_t curHeight = height;
+	// 이 함수만 호출하는데도 updateSwapchain()이 호출되는 경우가 발생한다.
+	// 윈도우 크기가 변경되면서 WM_SIZE가 호출되고 그 결과인듯 하다.
+	void Graphics::AdjustWindow(uint32_t width, uint32_t height, bool borderless)
+	{
+		DWORD style = borderless ? WS_POPUP : WS_OVERLAPPEDWINDOW;
 
-		if (width == 0 || height == 0)
-		{
-			DXGI_SWAP_CHAIN_DESC swapChainDesc;
-			ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
-			s_pSwapChain->GetDesc(&swapChainDesc);
+		auto curStyle = ::GetWindowLongPtr(s_hWnd, GWL_STYLE);
+		if (curStyle != style)
+			::SetWindowLongPtr(s_hWnd, GWL_STYLE, style);
 
-			curWidth = swapChainDesc.BufferDesc.Width;
-			curHeight = swapChainDesc.BufferDesc.Height;
-		}
+		RECT rt = { 0, 0, (LONG)width, (LONG)height };
+		::AdjustWindowRect(&rt, style, FALSE);
 
-		D3D11_TEXTURE2D_DESC texDesc;
-		ZeroMemory(&texDesc, sizeof(texDesc));
-		texDesc.Width = curWidth;
-		texDesc.Height = curHeight;
-		texDesc.MipLevels = 1;
-		texDesc.ArraySize = 1;
-		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		texDesc.SampleDesc.Count = 1;// static_cast<UINT>(screenParams_.multiSample_);
-		texDesc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(texDesc.Format, screenParams_.multiSample_);
-		texDesc.Usage = D3D11_USAGE_DEFAULT;
-		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-		texDesc.CPUAccessFlags = 0;
-		texDesc.MiscFlags = 0;
+		width = rt.right - rt.left;
+		height = rt.bottom - rt.top;
 
-		if (FAILED(s_pDevice->CreateTexture2D(&texDesc, nullptr, &s_pDefaultDepthTexture)))
-		{
-			DV_RELEASE(s_pDefaultDepthTexture);
-			DV_CORE_ERROR("후면 버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
-			return false;
-		}
+		int posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+		int posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 
-		D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc;
-		ZeroMemory(&viewDesc, sizeof(viewDesc));
-		viewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		viewDesc.Texture2D.MipSlice = 0;
+		::SetWindowPos(s_hWnd, NULL, posX, posY, width, height, SWP_DRAWFRAME);
 
-		if (FAILED(s_pDevice->CreateDepthStencilView(
-			static_cast<ID3D11Resource*>(s_pDefaultDepthTexture),
-			&viewDesc,//nullptr,		// urho가 nullptr을 전달했다. 역시나 sampler 문제는 해결되지 않았다.
-			&s_pDefaultDepthStencilView)))
-		{
-			DV_RELEASE(s_pDefaultDepthStencilView);
-			DV_CORE_ERROR("후면 버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
-			return false;
-		}
+		GetWindowRect(s_hWnd, &rt);
+		DV_CORE_INFO("WindowRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+		GetClientRect(s_hWnd, &rt);
+		DV_CORE_INFO("ClientRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 
-		s_BackbufferWidth = curWidth;
-		s_BackbufferHeight = curHeight;
-
-		resetViews();
-
-		return true;
+		ShowWindow(s_hWnd, SW_SHOW);
+		SetFocus(s_hWnd);
 	}
 
 	bool Graphics::IsInitialized()
 	{
 		return s_pDevice != nullptr;
+	}
+
+	void Graphics::SetWindowTitle(const std::wstring& title)
+	{
+		if (s_hWnd)
+			SetWindowText(s_hWnd, title.c_str());
+
+		s_WindowTitle = title;
+	}
+
+	void Graphics::ResizeResolution(uint32_t width, uint32_t height)
+	{
+		if (!s_pSwapChain)
+			return;
+
+		DXGI_MODE_DESC desc;
+		desc.Width = width;
+		desc.Height = height;
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.RefreshRate.Denominator = 1;		// 하드 코딩
+		desc.RefreshRate.Numerator = 60;		// 하드 코딩
+		desc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		desc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+
+		if (FAILED(s_pSwapChain->ResizeTarget(&desc)))
+		{
+			DV_CORE_ERROR("스왑체인 타겟 리사이즈에 실패하여 윈도우 크기를 변경할 수 없습니다.");
+			return;
+		}
 	}
 
 	bool Graphics::BeginFrame()
@@ -225,16 +220,18 @@ namespace Dive
 		s_pSwapChain->Present(s_bVSync ? 1 : 0, 0);
 	}
 
-	void Graphics::ClearViews(uint8_t flags, const float* pColor, float depth, uint8_t stencil)
+	void Graphics::ClearViews(uint8_t flags, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil)
 	{
 		// 이 곳에서 SetRenderTarget과 SetDepthStencil의 더티체크 후 바인딩을 하기 때문이다.
 		// 따라서 이름이 더 어울리지 않게 되었다.
 		// 어쩌면 해당 부분을 분리하는 것이 더 나을수도 있을 것 같다.
 		prepareDraw();
 
+		float clearColor[4] = { color.x, color.y, color.z, color.w };
+
 		if (flags & eClearFlags::Color)
-			s_pDeviceContext->ClearRenderTargetView(s_RenderTargetViews[0], pColor);
-		
+			s_pDeviceContext->ClearRenderTargetView(s_RenderTargetViews[0], clearColor);
+
 		if ((flags & eClearFlags::Depth) || (flags & eClearFlags::Stencil))
 		{
 			uint32_t clearFlags = 0;
@@ -405,6 +402,211 @@ namespace Dive
 		s_pDeviceContext->DrawIndexed(indexCount, indexStart, 0);
 	}
 
+	bool Graphics::createWindow(uint32_t width, uint32_t height, bool borderless)
+	{
+		s_hInstance = GetModuleHandle(NULL);
+
+		WNDCLASSEX wc;
+		wc.style = 0;
+		wc.hInstance = s_hInstance;
+		wc.lpfnWndProc = WndProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+		wc.hIconSm = wc.hIcon;
+		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = DV_WINCLASS_NAME;
+		wc.cbSize = sizeof(WNDCLASSEX);
+
+		if (!RegisterClassEx(&wc))
+		{
+			DV_CORE_ERROR("윈도우클래스 등록에 실패하였습니다.");
+			return false;
+		}
+
+		DWORD style = borderless ? WS_POPUP : WS_OVERLAPPEDWINDOW;
+
+		int posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+		int posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
+
+		s_hWnd = CreateWindowEx(
+			WS_EX_APPWINDOW,
+			DV_WINCLASS_NAME,
+			s_WindowTitle.c_str(),
+			style,
+			posX, posY,
+			width, height,
+			NULL, NULL,
+			s_hInstance,
+			NULL);
+
+		if (!s_hWnd)
+		{
+			DV_CORE_ERROR("윈도우 생성에 실패하였습니다.");
+			return false;
+		}
+
+		SetForegroundWindow(s_hWnd);
+
+		return true;
+	}
+
+	bool Graphics::createDevice(uint32_t width, uint32_t height)
+	{
+		if (!s_pDevice)
+		{
+			//D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
+
+			if (FAILED(D3D11CreateDevice(
+				nullptr,
+				D3D_DRIVER_TYPE_HARDWARE,
+				nullptr,
+				0,
+				nullptr, //&featureLevel,//nullptr,
+				0, //1, //0,
+				D3D11_SDK_VERSION,
+				&s_pDevice,
+				nullptr,
+				&s_pDeviceContext)))
+			{
+				DV_RELEASE(s_pDevice);
+				DV_RELEASE(s_pDeviceContext);
+				DV_CORE_ERROR("D3D11 장치 생성에 실패하였습니다.");
+				return false;
+			}
+		}
+
+		if (s_pSwapChain)
+			DV_RELEASE(s_pSwapChain);
+
+		IDXGIDevice* pDxgiDevice = nullptr;
+		s_pDevice->QueryInterface(IID_IDXGIDevice, (void**)&pDxgiDevice);
+		IDXGIAdapter* pDxgiAdapter = nullptr;
+		pDxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&pDxgiAdapter);
+		IDXGIFactory* pDxgiFactory = nullptr;
+		pDxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&pDxgiFactory);
+
+		DXGI_SWAP_CHAIN_DESC desc;
+		ZeroMemory(&desc, sizeof(desc));
+		desc.BufferCount = 1;
+		desc.BufferDesc.Width = width;
+		desc.BufferDesc.Height = height;
+		desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// sRGB 적용 여부에 따라 달라진다.
+		desc.BufferDesc.RefreshRate.Denominator = 1;			// 추후 수정(vsync에 따라 달라진다?)
+		desc.BufferDesc.RefreshRate.Numerator = 0;
+		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		desc.SampleDesc.Count = 1;								// 멀티 샘플링 off
+		desc.SampleDesc.Quality = 0;
+		desc.Windowed = true;
+		desc.OutputWindow = GetWindowHandle();
+		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
+
+		if (FAILED(pDxgiFactory->CreateSwapChain(s_pDevice, &desc, &s_pSwapChain)))
+		{
+			DV_RELEASE(s_pSwapChain);
+			DV_CORE_ERROR("D3D11 스왑체인 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Graphics::updateSwapChain(uint32_t width, uint32_t height)
+	{
+		if (s_ResolutionWidth == width && s_ResolutionHeight == height)
+			return true;
+
+		s_pDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
+		DV_RELEASE(s_pDefaultRenderTargetView);
+		DV_RELEASE(s_pDefaultDepthTexture);
+		DV_RELEASE(s_pDefaultDepthStencilView);
+
+		s_pSwapChain->ResizeBuffers(1, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH);
+
+		ID3D11Texture2D* pBackbufferTexture = nullptr;
+		if (FAILED(s_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture)))
+		{
+			DV_RELEASE(pBackbufferTexture);
+			DV_CORE_ERROR("후면 버퍼 텍스쳐를 얻어오는데 실패하였습니다.");
+			return false;
+		}
+
+		if (FAILED(s_pDevice->CreateRenderTargetView(
+			static_cast<ID3D11Resource*>(pBackbufferTexture), nullptr, &s_pDefaultRenderTargetView)))
+		{
+			DV_RELEASE(pBackbufferTexture);
+			DV_RELEASE(s_pDefaultRenderTargetView);
+			DV_CORE_ERROR("후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
+			return false;
+		}
+		DV_RELEASE(pBackbufferTexture);
+
+		uint32_t curWidth = width;
+		uint32_t curHeight = height;
+
+		if (width == 0 || height == 0)
+		{
+			DXGI_SWAP_CHAIN_DESC swapChainDesc;
+			ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
+			s_pSwapChain->GetDesc(&swapChainDesc);
+
+			curWidth = swapChainDesc.BufferDesc.Width;
+			curHeight = swapChainDesc.BufferDesc.Height;
+		}
+
+		D3D11_TEXTURE2D_DESC texDesc;
+		ZeroMemory(&texDesc, sizeof(texDesc));
+		texDesc.Width = curWidth;
+		texDesc.Height = curHeight;
+		texDesc.MipLevels = 1;
+		texDesc.ArraySize = 1;
+		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		texDesc.SampleDesc.Count = 1;// static_cast<UINT>(screenParams_.multiSample_);
+		texDesc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(texDesc.Format, screenParams_.multiSample_);
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		texDesc.CPUAccessFlags = 0;
+		texDesc.MiscFlags = 0;
+
+		if (FAILED(s_pDevice->CreateTexture2D(&texDesc, nullptr, &s_pDefaultDepthTexture)))
+		{
+			DV_RELEASE(s_pDefaultDepthTexture);
+			DV_CORE_ERROR("후면 버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
+			return false;
+		}
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc;
+		ZeroMemory(&viewDesc, sizeof(viewDesc));
+		viewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		viewDesc.Texture2D.MipSlice = 0;
+
+		if (FAILED(s_pDevice->CreateDepthStencilView(
+			static_cast<ID3D11Resource*>(s_pDefaultDepthTexture),
+			&viewDesc,//nullptr,		// urho가 nullptr을 전달했다. 역시나 sampler 문제는 해결되지 않았다.
+			&s_pDefaultDepthStencilView)))
+		{
+			DV_RELEASE(s_pDefaultDepthStencilView);
+			DV_CORE_ERROR("후면 버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
+			return false;
+		}
+
+		s_ResolutionWidth = curWidth;
+		s_ResolutionHeight = curHeight;
+
+		RECT rt;
+		GetClientRect(s_hWnd, &rt);
+		DV_CORE_ASSERT(s_ResolutionWidth == (rt.right - rt.left));
+		DV_CORE_ASSERT(s_ResolutionHeight == (rt.bottom - rt.top));
+		DV_CORE_INFO("Resolution: {0:d} x {1:d}", s_ResolutionWidth, s_ResolutionHeight);
+
+		resetViews();
+
+		return true;
+	}
+
 	// 여전히 이름이 마음에 들지 않는다.
 	// 결국 모든 bind에 대응하지 않는다.
 	// 더티체크를 기반으로 변경여부를 확인하고 필요할 경우 직접 생성하는 리소스만 처리하는 함수였다.
@@ -439,7 +641,7 @@ namespace Dive
 
 		SetDepthStencilView(nullptr);
 
-		RECT rt = { 0, 0, (LONG)s_BackbufferWidth, (LONG)s_BackbufferHeight };
+		RECT rt = { 0, 0, (LONG)s_ResolutionWidth, (LONG)s_ResolutionHeight };
 		SetViewport(rt);
 	}
 }

@@ -18,13 +18,13 @@ namespace Dive
 		, m_pRenderTarget(nullptr)
 	{
 		m_ProjectionType = eProjectionType::Perspective;
-		m_BackgroundColor[0] = m_BackgroundColor[1] = m_BackgroundColor[2] = m_BackgroundColor[3] = 1.0f;
+		m_BackgroundColor = { 1.0f, 1.0, 1.0f, 1.0f };
 		m_FieldOfView = 45.0f;
 		m_NearClipPlane = 0.1f;
 		m_FarClipPlane = 5000.0f;
 		m_MoveSpeed = 10.0f;
 		m_RotateSpeed = 50.0f;
-		m_Viewport = {0, 0, (LONG)Graphics::GetBackbufferWidth(), (LONG)Graphics::GetBackbufferHeight()};
+		m_Viewport = {0, 0, (LONG)Graphics::GetResolutionWidth(), (LONG)Graphics::GetResolutionHeight()};
 	}
 
 	Camera::~Camera()
@@ -90,7 +90,7 @@ namespace Dive
 
 	void Camera::SetBackgroundColor(float r, float g, float b, float a)
 	{
-		m_BackgroundColor[0] = r;	m_BackgroundColor[1] = g;	m_BackgroundColor[2] = b;	m_BackgroundColor[3] = a;
+		m_BackgroundColor = { r, g, b, a };
 	}
 
 	float Camera::GetAspectRatio() const
@@ -116,6 +116,6 @@ namespace Dive
 
 	DirectX::XMFLOAT2 Camera::GetRenderTargetSize() const
 	{
-		return m_pRenderTarget ? m_pRenderTarget->GetSize() : Graphics::GetBackbufferSize();
+		return m_pRenderTarget ? m_pRenderTarget->GetSize() : Graphics::GetResolution();
 	}
 }

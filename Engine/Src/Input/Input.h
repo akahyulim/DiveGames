@@ -5,7 +5,7 @@ namespace Dive
 	class Input
 	{
 	public:
-		static bool Initialize(HINSTANCE hInstance, HWND hWnd);
+		static bool Initialize();
 		static void Shutdown();
 
 		static void Update();

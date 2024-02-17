@@ -9,7 +9,7 @@ DEFINE_APPLICATION_MAIN(ForwardLight::ForwardLight)
 namespace ForwardLight
 {
 	ForwardLight::ForwardLight()
-		: Dive::Application(L"ForwardLight", 1600, 900, false)
+		: Dive::Application()
 		, m_pScene(nullptr)
 		, m_pMainCam(nullptr)
 		, m_pCube(nullptr)
@@ -26,6 +26,11 @@ namespace ForwardLight
 	{
 		// 여기는 서브 시스템 설정
 		// 추후엔 파일 경로를 전달받아 서브 시스템을 설정
+
+		// Title도 구조체에 포함시켜야 하나...?
+		Dive::Graphics::SetWindowTitle(L"Forward Light");
+		m_WindowWidth = 1600;
+		m_WindowHeight = 900;
 	}
 
 	void ForwardLight::OnStart()
@@ -37,7 +42,7 @@ namespace ForwardLight
 			// main camera
 			m_pMainCam = m_pScene->CreateGameObject("MainCam");
 			auto pCamCom = m_pMainCam->AddComponent<Dive::Camera>();
-			pCamCom->SetBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
+			pCamCom->SetBackgroundColor(0.1f, 0.1f, 0.1f, 1.0f);
 			m_pMainCam->GetTransform()->SetPosition(0.0f, 5.0f, -30.0f);
 
 			// game objects
@@ -177,6 +182,27 @@ namespace ForwardLight
 			if (Input::KeyPress(DIK_RIGHT))
 			{
 				pTransform->Translate(m_MoveSpeed * deltaTime * boost, 0.0f, 0.0f);
+			}
+
+			if (Input::KeyDown(DIK_H))
+			{
+				Dive::Graphics::ResizeResolution(1600, 900);
+				return;
+			}
+			if (Input::KeyDown(DIK_R))
+			{
+				Dive::Graphics::ResizeResolution(1024, 768);
+				return;
+			}
+			if (Input::KeyDown(DIK_K))
+			{
+				Graphics::AdjustWindow(Graphics::GetResolutionWidth(), Graphics::GetResolutionHeight(), false);
+				return;
+			}
+			if (Input::KeyDown(DIK_L))
+			{
+				Graphics::AdjustWindow(Graphics::GetResolutionWidth(), Graphics::GetResolutionHeight(), true);
+				return;
 			}
 
 			if (Input::MouseButtonPress(1))

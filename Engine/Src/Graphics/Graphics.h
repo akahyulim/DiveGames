@@ -11,32 +11,20 @@ namespace Dive
 	class Graphics
 	{
 	public:
-		static bool Initialize(HWND hWnd, uint32_t width, uint32_t height, bool fullScreen);
+		static bool SetScreenMode(uint32_t width, uint32_t height, bool fullScreen, bool borderless);
 		static void Shutdown();
 
-		static bool UpdateSwapChain(uint32_t width = 0, uint32_t height = 0);
+		static bool RunWindow();
 
-		static IDXGISwapChain* GetSwapChain() { return s_pSwapChain; }
-		static ID3D11Device* GetDevice() { return s_pDevice; }
-		static ID3D11DeviceContext* GetDeviceContext() { return s_pDeviceContext; }
+		static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-		static ID3D11RenderTargetView* GetDefaultRenderTargetView() { return s_pDefaultRenderTargetView; }
-		static ID3D11DepthStencilView* GetDefaultDepthStencilView() { return s_pDefaultDepthStencilView; }
-		static ID3D11Texture2D* GetDefaultDepthTexture() { return s_pDefaultDepthTexture; }
-
-		static uint32_t GetBackbufferWidth() { return s_BackbufferWidth; }
-		static uint32_t GetBackbufferHeight() { return s_BackbufferHeight; }
-		static DirectX::XMFLOAT2 GetBackbufferSize() { return { (float)s_BackbufferWidth, (float)s_BackbufferHeight }; }
-
-		static bool IsVSync() { return s_bVSync; }
-		static void SetVSync(bool enabled) { s_bVSync = enabled; }
-
-		static bool IsInitialized();
+		// 스타일만 변경가능한 함수가 있다면 다시 private으로...
+		static void AdjustWindow(uint32_t width, uint32_t height, bool borderless);
 
 		static bool BeginFrame();
 		static void EndFrame();
 
-		static void ClearViews(uint8_t flags, const float* pColor, float depth, uint8_t stencil);
+		static void ClearViews(uint8_t flags, const DirectX::XMFLOAT4& color, float depth = 1.0f, uint8_t stencil = 0);
 		static void SetRenderTargetView(uint32_t index, ID3D11RenderTargetView* pRenderTargetView);
 		static void SetDepthStencilView(ID3D11DepthStencilView* pDepthStencilView);
 		static void SetViewport(const RECT& rt);
@@ -50,14 +38,53 @@ namespace Dive
 		static void Draw(D3D11_PRIMITIVE_TOPOLOGY topology, uint32_t vertexCount, uint32_t vertexStart);
 		static void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY topology, uint32_t indexCount, uint32_t indexStart);
 
+		static bool IsInitialized();
+
+		static HINSTANCE GetWindowInstance() { return s_hInstance; }
+		static HWND GetWindowHandle() { return s_hWnd; }
+
+		static std::wstring GetWindowTitle() { return s_WindowTitle; }
+		static void SetWindowTitle(const std::wstring& title);
+
+		static bool IsFullScreen() { return s_bFullScreen; }
+		static void SetFullScreen(bool enabled);
+
+		static uint32_t GetResolutionWidth() { return s_ResolutionWidth; };
+		static uint32_t GetResolutionHeight() { return s_ResolutionHeight; }
+		static DirectX::XMFLOAT2 GetResolution() { return { (float)s_ResolutionWidth, (float)s_ResolutionHeight }; }
+		static void ResizeResolution(uint32_t width, uint32_t height);
+
+		static IDXGISwapChain* GetSwapChain() { return s_pSwapChain; }
+		static ID3D11Device* GetDevice() { return s_pDevice; }
+		static ID3D11DeviceContext* GetDeviceContext() { return s_pDeviceContext; }
+
+		static ID3D11RenderTargetView* GetDefaultRenderTargetView() { return s_pDefaultRenderTargetView; }
+		static ID3D11DepthStencilView* GetDefaultDepthStencilView() { return s_pDefaultDepthStencilView; }
+		static ID3D11Texture2D* GetDefaultDepthTexture() { return s_pDefaultDepthTexture; }
+
+		static bool IsVSync() { return s_bVSync; }
+		static void SetVSync(bool enabled) { s_bVSync = enabled; }
+		
 		static D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() { return s_PrimitiveTopology; }
 
+
 	private:
+		static bool createWindow(uint32_t width, uint32_t height, bool borderless);
+		static bool createDevice(uint32_t width, uint32_t height);
+		static bool updateSwapChain(uint32_t width, uint32_t height);
+
 		static void prepareDraw();
 		static void resetViews();
 
 
 	private:
+		static HINSTANCE s_hInstance;
+		static HWND s_hWnd;
+		static std::wstring s_WindowTitle;
+		static bool s_bFullScreen;
+		static uint32_t s_ResolutionWidth;
+		static uint32_t s_ResolutionHeight;
+
 		static IDXGISwapChain* s_pSwapChain;
 		static ID3D11Device* s_pDevice;
 		static ID3D11DeviceContext* s_pDeviceContext;
@@ -65,9 +92,6 @@ namespace Dive
 		static ID3D11RenderTargetView* s_pDefaultRenderTargetView;
 		static ID3D11DepthStencilView* s_pDefaultDepthStencilView;
 		static ID3D11Texture2D* s_pDefaultDepthTexture;
-
-		static uint32_t s_BackbufferWidth;
-		static uint32_t s_BackbufferHeight;
 
 		static bool s_bVSync;
 

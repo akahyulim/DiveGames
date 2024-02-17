@@ -153,6 +153,7 @@
   <ItemGroup>
     <ClInclude Include="Src\Core\CoreDefs.h" />
     <ClInclude Include="Src\Core\CoreEvents.h" />
+    <ClInclude Include="Src\Core\Engine.h" />
     <ClInclude Include="Src\Core\EventHandler.h" />
     <ClInclude Include="Src\Core\Log.h" />
     <ClInclude Include="Src\Core\Object.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="Src\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Src\Core\Engine.cpp" />
     <ClCompile Include="Src\Core\EventHandler.cpp" />
     <ClCompile Include="Src\Core\Log.cpp" />
     <ClCompile Include="Src\Core\Object.cpp" />

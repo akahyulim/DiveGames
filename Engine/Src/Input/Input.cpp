@@ -26,8 +26,11 @@ namespace Dive
 
 	static bool s_MouseIsInValidRect = false;
 
-	bool Input::Initialize(HINSTANCE hInstance, HWND hWnd)
+	bool Input::Initialize()
 	{
+		HINSTANCE hInstance = Graphics::GetWindowInstance();
+		HWND hWnd = Graphics::GetWindowHandle();
+
 		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&s_pDirectInput, nullptr)))
 		{
 			DV_CORE_ERROR("DirectInput 객체 생성에 실패하였습니다.");
