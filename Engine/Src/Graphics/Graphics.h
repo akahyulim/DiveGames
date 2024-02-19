@@ -18,7 +18,6 @@ namespace Dive
 
 		static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-		// 스타일만 변경가능한 함수가 있다면 다시 private으로...
 		static void AdjustWindow(uint32_t width, uint32_t height, bool borderless);
 
 		static bool BeginFrame();

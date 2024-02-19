@@ -184,24 +184,39 @@ namespace ForwardLight
 				pTransform->Translate(m_MoveSpeed * deltaTime * boost, 0.0f, 0.0f);
 			}
 
-			if (Input::KeyDown(DIK_H))
+			if (Input::KeyDown(DIK_1))
+			{
+				Dive::Graphics::ResizeResolution(1920, 1080);
+				return;
+			}
+			if (Input::KeyDown(DIK_2))
 			{
 				Dive::Graphics::ResizeResolution(1600, 900);
 				return;
 			}
-			if (Input::KeyDown(DIK_R))
+			if (Input::KeyDown(DIK_3))
 			{
 				Dive::Graphics::ResizeResolution(1024, 768);
 				return;
 			}
-			if (Input::KeyDown(DIK_K))
+			if (Input::KeyDown(DIK_F1))
 			{
 				Graphics::AdjustWindow(Graphics::GetResolutionWidth(), Graphics::GetResolutionHeight(), false);
 				return;
 			}
-			if (Input::KeyDown(DIK_L))
+			if (Input::KeyDown(DIK_F2))
 			{
 				Graphics::AdjustWindow(Graphics::GetResolutionWidth(), Graphics::GetResolutionHeight(), true);
+				return;
+			}
+			if (Input::KeyDown(DIK_F3))
+			{
+				Graphics::SetFullScreen(true);
+				return;
+			}
+			if (Input::KeyDown(DIK_F4))
+			{
+				Graphics::SetFullScreen(false);
 				return;
 			}
 

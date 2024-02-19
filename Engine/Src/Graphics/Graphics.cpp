@@ -134,10 +134,14 @@ namespace Dive
 		return ::DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
-	// 이 함수만 호출하는데도 updateSwapchain()이 호출되는 경우가 발생한다.
-	// 윈도우 크기가 변경되면서 WM_SIZE가 호출되고 그 결과인듯 하다.
 	void Graphics::AdjustWindow(uint32_t width, uint32_t height, bool borderless)
 	{
+		if (!s_hWnd)
+		{
+			DV_CORE_WARN("제어할 윈도우가 존재하지 않습니다.");
+			return;
+		}
+
 		DWORD style = borderless ? WS_POPUP : WS_OVERLAPPEDWINDOW;
 
 		auto curStyle = ::GetWindowLongPtr(s_hWnd, GWL_STYLE);
@@ -161,7 +165,6 @@ namespace Dive
 		DV_CORE_INFO("ClientRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 
 		ShowWindow(s_hWnd, SW_SHOW);
-		SetFocus(s_hWnd);
 	}
 
 	bool Graphics::IsInitialized()
@@ -171,10 +174,30 @@ namespace Dive
 
 	void Graphics::SetWindowTitle(const std::wstring& title)
 	{
-		if (s_hWnd)
-			SetWindowText(s_hWnd, title.c_str());
+		if (!s_hWnd)
+			return;
 
-		s_WindowTitle = title;
+		if (s_WindowTitle != title)
+		{
+			SetWindowText(s_hWnd, title.c_str());
+			s_WindowTitle = title;
+		}
+	}
+
+	void Graphics::SetFullScreen(bool enabled)
+	{
+		if (!s_pSwapChain)
+			return;
+
+		if (s_bFullScreen != enabled)
+		{
+			s_pSwapChain->SetFullscreenState(enabled, nullptr);
+			s_bFullScreen = enabled;
+		}
+
+		RECT rt;
+		GetClientRect(s_hWnd, &rt);
+		DV_CORE_INFO("ClientRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 	}
 
 	void Graphics::ResizeResolution(uint32_t width, uint32_t height)
@@ -499,7 +522,7 @@ namespace Dive
 		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		desc.SampleDesc.Count = 1;								// 멀티 샘플링 off
 		desc.SampleDesc.Quality = 0;
-		desc.Windowed = true;
+		desc.Windowed = !s_bFullScreen;
 		desc.OutputWindow = GetWindowHandle();
 		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
 
