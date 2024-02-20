@@ -202,6 +202,24 @@ namespace Dive
 				DV_CORE_ERROR("DepthDisabledStencilState 생성에 실패하였습니다.");
 			}
 		}
+
+		// forwardLight
+		{
+			desc.DepthEnable = TRUE;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+			desc.StencilEnable = FALSE;
+			desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+			desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+			const D3D11_DEPTH_STENCILOP_DESC noSkyStencilOp = { D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_COMPARISON_EQUAL };
+			desc.FrontFace = noSkyStencilOp;
+			desc.BackFace = noSkyStencilOp;
+
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilState::ForwardLight)])))
+			{
+				DV_CORE_ERROR("DepthDisabledStencilState 생성에 실패하였습니다.");
+			}
+		}
 	}
 	
 	void Renderer::createBlendStates()

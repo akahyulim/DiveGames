@@ -43,13 +43,26 @@ namespace Dive
 	struct LightBuffer
 	{
 		DirectX::XMFLOAT3 color;
-		float spotAngle;
+		float cosOuterCone;
 
 		DirectX::XMFLOAT3 position;
-		float range;
+		float rangeRcp;
 
-		DirectX::XMFLOAT3 direction;
+		DirectX::XMFLOAT3 dirToLight;
 		uint32_t options;
+
+		float cosInnerConeRcp;
+		DirectX::XMFLOAT3 padding;
+	};
+
+	enum class eDepthStencilState
+	{
+		DepthReadWrite,
+		DepthReadWrite_StencilReadWrite,
+		GBuffer,
+		DepthDiabled,   // skydome에서 off용으로...
+		ForwardLight,
+		Count
 	};
 
 	class Renderer

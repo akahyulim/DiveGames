@@ -142,8 +142,9 @@ namespace Dive
 			// 그리고 urho를 따라갈 필요 없이 일단 하드 코딩으로 사용 state를 전달하는 것이 맞아 보인다.
 			{
 				Graphics::SetRasterizerState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
-				Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::DepthReadWrite));
-				//Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
+				// 생각해보니 현재는 여기에서 연결해도 된다.
+				Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
+				Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
 			}
 		}
 
@@ -153,19 +154,27 @@ namespace Dive
 			for (int i = 0; i < (int)m_Lights.size(); i++)
 			{
 				auto light = m_Lights[i];
+				if (!light->IsEnabled())
+					continue;
 
 				switch (light->GetType())
 				{
-
-				case Light::eLightType::Directional:
+				case eLightType::Directional:
 					m_cpuLightBuffer.options = (1U << 0);
-					m_cpuLightBuffer.direction = light->GetDir();
+					m_cpuLightBuffer.dirToLight = { -light->GetDirection().x, -light->GetDirection().y, -light->GetDirection().z };
 					break;
-				case Light::eLightType::Point:
+				case eLightType::Point:
 					m_cpuLightBuffer.options = (1U << 1);
+					m_cpuLightBuffer.position = light->GetTransform()->GetPosition();
+					m_cpuLightBuffer.rangeRcp = 1.0f / light->GetRange();
 					break;
-				case Light::eLightType::Spot:
+				case eLightType::Spot:
 					m_cpuLightBuffer.options = (1U << 2);
+					m_cpuLightBuffer.position = light->GetTransform()->GetPosition();
+					m_cpuLightBuffer.dirToLight = { -light->GetDirection().x, -light->GetDirection().y, -light->GetDirection().z };
+					m_cpuLightBuffer.rangeRcp = 1.0f / light->GetRange();
+					m_cpuLightBuffer.cosOuterCone = cosf(light->GetOuterAngleRadian());
+					m_cpuLightBuffer.cosInnerConeRcp = 1.0f / cosf(light->GetInnerAngleRadian());
 					break;
 				default:
 					break;
@@ -177,8 +186,14 @@ namespace Dive
 				pLightBuffer->Update((void*)&m_cpuLightBuffer);
 				pLightBuffer->Bind();
 
-				if(i >= 1)
-					Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
+				// 1. 괜히 복잡하다.
+				// eState를 전달하면 Graphics의 해당 함수 내부에서 Renderer를 통해 설정해도 되지 않을까?
+				// 아니, 그냥 Graphics에서 생성하고 관리하면 안되나..?
+				// 2. 이 부분때문에 Light 꺼도 결과가 이상해진다.
+				//if (i == 0)
+				//	Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
+				//else if (i >= 1)
+				//	Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
 
 				// draw opaque
 				{
@@ -215,6 +230,9 @@ namespace Dive
 					}
 				}
 			}
+
+			Graphics::SetDepthStencilState(NULL);
+			Graphics::SetBlendState(NULL);
 		}
 	}
 	

@@ -15,6 +15,13 @@ namespace ForwardLight
 		, m_pCube(nullptr)
 		, m_pTriangle(nullptr)
 		, m_pSphere(nullptr)
+		, m_pDirLightA(nullptr)
+		, m_pPointLightA(nullptr)
+		, m_pPointLightB(nullptr)
+		, m_pPointLightC(nullptr)
+		, m_pSpotLightA(nullptr)
+		, m_pSpotLightB(nullptr)
+		, m_pSpotLightC(nullptr)
 	{
 	}
 
@@ -89,7 +96,7 @@ namespace ForwardLight
 
 				// tirangle gameobject
 				m_pTriangle = m_pScene->CreateGameObject("Triangle");
-				m_pTriangle->GetTransform()->SetPosition(5.0f, 5.0f, -15.0f);
+				m_pTriangle->GetTransform()->SetPosition(5.0f, 5.0f, -10.0f);
 				auto pTriangleRenderableCom = m_pTriangle->AddComponent<Dive::Renderable>();
 				pTriangleRenderableCom->SetMesh(pTriangleMesh);
 				pTriangleRenderableCom->SetMaterial(pTriangleMaterial);
@@ -117,11 +124,66 @@ namespace ForwardLight
 
 			// lights
 			{
-				auto pDirLight = m_pScene->CreateGameObject("DirectionalLight");
-				auto pDirLightCom = pDirLight->AddComponent<Dive::Light>();
-				pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
-				pDirLightCom->SetType(Dive::Light::eLightType::Directional);
-				pDirLightCom->SetDir(1.0f, -1.0f, 1.0f);
+				// Directional Light
+				m_pDirLightA = m_pScene->CreateGameObject("DirectionalLightA");
+				auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
+				pDirLightCom->SetColor(0.9f, 0.9f, 0.9f);
+				pDirLightCom->SetType(Dive::eLightType::Directional);
+				pDirLightCom->SetLookAt(1.0f, -1.0f, 1.0f);
+				
+				// PointLights
+				{
+					m_pPointLightA = m_pScene->CreateGameObject("PointLightA");
+					m_pPointLightA->GetTransform()->SetPosition(0.0f, 5.0f, -15.0f);
+					auto pPointLightCom = m_pPointLightA->AddComponent<Dive::Light>();
+					pPointLightCom->SetType(Dive::eLightType::Point);
+					pPointLightCom->SetRange(30.0f);
+					pPointLightCom->SetColor(1.0f, 0.0f, 0.0f);
+
+					m_pPointLightB = m_pScene->CreateGameObject("PointLightB");
+					m_pPointLightB->GetTransform()->SetPosition(-10.0f, 5.0f, 15.0f);
+					pPointLightCom = m_pPointLightB->AddComponent<Dive::Light>();
+					pPointLightCom->SetType(Dive::eLightType::Point);
+					pPointLightCom->SetRange(30.0f);
+					pPointLightCom->SetColor(0.0f, 1.0f, 0.0f);
+
+					m_pPointLightC = m_pScene->CreateGameObject("PointLightC");
+					m_pPointLightC->GetTransform()->SetPosition(10.0f, 5.0f, 15.0f);
+					pPointLightCom = m_pPointLightC->AddComponent<Dive::Light>();
+					pPointLightCom->SetType(Dive::eLightType::Point);
+					pPointLightCom->SetRange(30.0f);
+					pPointLightCom->SetColor(0.0f, 0.0f, 1.0f);
+				}
+				
+				// SpotLights
+				{
+					m_pSpotLightA = m_pScene->CreateGameObject("SpotLightA");
+					m_pSpotLightA->GetTransform()->SetPosition(0.0f, 20.0f, -30.0f);
+					auto pSpotLightCom = m_pSpotLightA->AddComponent<Dive::Light>();
+					pSpotLightCom->SetType(Dive::eLightType::Spot);
+					pSpotLightCom->SetRange(60.0f);
+					pSpotLightCom->SetColor(1.0f, 1.0f, 0.0f);
+					pSpotLightCom->SetLookAt(0.0f, 10.0f, 0.0f);
+					pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+
+					m_pSpotLightB = m_pScene->CreateGameObject("SpotLightB");
+					m_pSpotLightB->GetTransform()->SetPosition(30.0f, 20.0f, 0.0f);
+					pSpotLightCom = m_pSpotLightB->AddComponent<Dive::Light>();
+					pSpotLightCom->SetType(Dive::eLightType::Spot);
+					pSpotLightCom->SetRange(60.0f);
+					pSpotLightCom->SetColor(0.0f, 1.0f, 1.0f);
+					pSpotLightCom->SetLookAt(0.0f, 10.0f, 0.0f);
+					pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+
+					m_pSpotLightC = m_pScene->CreateGameObject("SpotLightC");
+					m_pSpotLightC->GetTransform()->SetPosition(-30.0f, 20.0f, 0.0f);
+					pSpotLightCom = m_pSpotLightC->AddComponent<Dive::Light>();
+					pSpotLightCom->SetType(Dive::eLightType::Spot);
+					pSpotLightCom->SetRange(60.0f);
+					pSpotLightCom->SetColor(1.0f, 0.0f, 1.0f);
+					pSpotLightCom->SetLookAt(0.0f, 10.0f, 0.0f);
+					pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+				}
 			}
 		}
 
@@ -184,17 +246,17 @@ namespace ForwardLight
 				pTransform->Translate(m_MoveSpeed * deltaTime * boost, 0.0f, 0.0f);
 			}
 
-			if (Input::KeyDown(DIK_1))
+			if (Input::KeyDown(DIK_F5))
 			{
 				Dive::Graphics::ResizeResolution(1920, 1080);
 				return;
 			}
-			if (Input::KeyDown(DIK_2))
+			if (Input::KeyDown(DIK_F6))
 			{
 				Dive::Graphics::ResizeResolution(1600, 900);
 				return;
 			}
-			if (Input::KeyDown(DIK_3))
+			if (Input::KeyDown(DIK_F7))
 			{
 				Dive::Graphics::ResizeResolution(1024, 768);
 				return;
@@ -219,6 +281,49 @@ namespace ForwardLight
 				Graphics::SetFullScreen(false);
 				return;
 			}
+			if (Input::KeyDown(DIK_1))
+			{
+				auto pLightCom = m_pDirLightA->GetComponent<Dive::Light>();
+				pLightCom->SetEnabled(pLightCom->IsEnabled() ? false : true);
+				return;
+			}
+			if (Input::KeyDown(DIK_2))
+			{
+				auto pLightCom = m_pPointLightA->GetComponent<Dive::Light>();
+				pLightCom->SetEnabled(pLightCom->IsEnabled() ? false : true);
+				return;
+			}
+			if (Input::KeyDown(DIK_3))
+			{
+				auto pLightCom = m_pPointLightB->GetComponent<Dive::Light>();
+				pLightCom->SetEnabled(pLightCom->IsEnabled() ? false : true);
+				return;
+			}
+			if (Input::KeyDown(DIK_4))
+			{
+				auto pLightCom = m_pPointLightC->GetComponent<Dive::Light>();
+				pLightCom->SetEnabled(pLightCom->IsEnabled() ? false : true);		
+				return;
+			}
+			if (Input::KeyDown(DIK_5))
+			{
+				auto pLightCom = m_pSpotLightA->GetComponent<Dive::Light>();
+				pLightCom->SetEnabled(pLightCom->IsEnabled() ? false : true);
+				return;
+			}
+			if (Input::KeyDown(DIK_6))
+			{
+				auto pLightCom = m_pSpotLightB->GetComponent<Dive::Light>();
+				pLightCom->SetEnabled(pLightCom->IsEnabled() ? false : true);
+				return;
+			}
+			if (Input::KeyDown(DIK_7))
+			{
+				auto pLightCom = m_pSpotLightC->GetComponent<Dive::Light>();
+				pLightCom->SetEnabled(pLightCom->IsEnabled() ? false : true);
+				return;
+			}
+
 
 			if (Input::MouseButtonPress(1))
 			{

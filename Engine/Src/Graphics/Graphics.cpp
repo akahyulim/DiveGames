@@ -306,7 +306,7 @@ namespace Dive
 	{
 		if (pState != s_pDepthStencilState)
 		{
-			s_pDeviceContext->OMSetDepthStencilState(pState, 1);
+			s_pDeviceContext->OMSetDepthStencilState(pState, 0);
 			s_pDepthStencilState = pState;
 		}
 	}

@@ -25,15 +25,6 @@ namespace Dive
         Count
     };
 
-    enum class eDepthStencilState
-    {
-        DepthReadWrite,
-        DepthReadWrite_StencilReadWrite,
-        GBuffer,
-        DepthDiabled,   // skydome에서 off용으로...
-        Count
-    };
-
     enum class eBlendState
     {
         Addictive,
