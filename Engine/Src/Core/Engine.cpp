@@ -10,21 +10,9 @@
 
 namespace Dive
 {
-	Engine::Engine()
-		: m_bInitialized(false)
-		, m_bExit(false)
-	{
-	}
+	static bool s_bInitialized = false;
+	static bool s_bExit = false;
 
-	Engine::~Engine()
-	{
-		ResourceCache::Shutdown();
-		Renderer::Shutdown();
-		Graphics::Shutdown();
-
-		DV_CORE_TRACE("엔진 종료");
-	}
-	
 	bool Engine::Initialize(uint32_t width, uint32_t height, bool fullScreen)
 	{
 		Log::Initialize();
@@ -38,16 +26,25 @@ namespace Dive
 		if (!Input::Initialize())
 			return false;
 
-		m_bInitialized = true;
+		s_bInitialized = true;
 		DV_CORE_TRACE("엔진 초기화 성공");
 		return true;
 	}
 
+	void Engine::Shutdown()
+	{
+		ResourceCache::Shutdown();
+		Renderer::Shutdown();
+		Graphics::Shutdown();
+
+		DV_CORE_TRACE("엔진 셧다운");
+	}
+	
 	void Engine::RunFrame()
 	{
 		if (!Graphics::RunWindow())
 		{
-			m_bExit = true;
+			s_bExit = true;
 			return;
 		}
 
@@ -55,9 +52,11 @@ namespace Dive
 
 		OnRender();
 	}
-
+	
 	void Engine::OnUpdate()
 	{
+		FIRE_EVENT(PreUpdateEvent());
+
 		Timer::Update();
 		Input::Update();
 		Renderer::Update();
@@ -68,7 +67,23 @@ namespace Dive
 	void Engine::OnRender()
 	{
 		Graphics::BeginFrame();
+		
+		FIRE_EVENT(PreRenderEvent());
+
 		Renderer::Render();
+
+		FIRE_EVENT(PostRenderEvent());
+
 		Graphics::EndFrame();
+	}
+	
+	bool Engine::IsInitialized()
+	{
+		return s_bInitialized;
+	}
+	
+	bool Engine::IsExit()
+	{
+		return s_bExit;
 	}
 }

@@ -34,8 +34,7 @@ namespace ForwardLight
 		// 여기는 서브 시스템 설정
 		// 추후엔 파일 경로를 전달받아 서브 시스템을 설정
 
-		// Title도 구조체에 포함시켜야 하나...?
-		Dive::Graphics::SetWindowTitle(L"Forward Light");
+		m_Title = L"Forward Light";
 		m_WindowWidth = 1600;
 		m_WindowHeight = 900;
 	}

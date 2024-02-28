@@ -19,7 +19,6 @@ namespace Dive
 		, m_WindowHeight(600)
 		, m_bFullscreen(false)
 	{
-		m_pEngine = std::make_unique<Engine>();
 	}
 
 	Application::~Application()
@@ -33,15 +32,17 @@ namespace Dive
 		// 구조체가 가장 어울린다.
 		// 파일을 로드하거나 OnSet()에서 설정 가능해야 하므로
 		// 멤버 변수여야 한다.
-		if (!m_pEngine->Initialize(m_WindowWidth, m_WindowHeight, m_bFullscreen))
+		if (!Engine::Initialize(m_WindowWidth, m_WindowHeight, m_bFullscreen))
 			return -1;
 
 		OnStart();
 
-		while (!m_pEngine->IsExit())
-			m_pEngine->RunFrame();
+		while (!Engine::IsExit())
+			Engine::RunFrame();
 
 		OnStop();
+
+		Engine::Shutdown();
 
 		return 0;
 	}

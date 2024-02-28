@@ -159,9 +159,9 @@ namespace Dive
 
 		::SetWindowPos(s_hWnd, NULL, posX, posY, width, height, SWP_DRAWFRAME);
 
-		GetWindowRect(s_hWnd, &rt);
+		::GetWindowRect(s_hWnd, &rt);
 		DV_CORE_INFO("WindowRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
-		GetClientRect(s_hWnd, &rt);
+		::GetClientRect(s_hWnd, &rt);
 		DV_CORE_INFO("ClientRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 
 		ShowWindow(s_hWnd, SW_SHOW);

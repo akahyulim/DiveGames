@@ -5,19 +5,14 @@ namespace Dive
 	class Engine
 	{
 	public:
-		Engine();
-		~Engine();
+		static bool Initialize(uint32_t width, uint32_t height, bool fullScreen);
+		static void Shutdown();
 
-		bool Initialize(uint32_t width, uint32_t height, bool fullScreen);
-		void RunFrame();
-		void OnUpdate();
-		void OnRender();
+		static void RunFrame();
+		static void OnUpdate();
+		static void OnRender();
 
-		bool IsInitialized() const { return m_bInitialized; }
-		bool IsExit() const { return m_bExit; }
-
-	private:
-		bool m_bInitialized;
-		bool m_bExit;
+		static bool IsInitialized();
+		static bool IsExit();
 	};
 }

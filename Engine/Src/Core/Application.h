@@ -25,8 +25,6 @@ namespace Dive
 		uint32_t m_WindowWidth;
 		uint32_t m_WindowHeight;
 		bool m_bFullscreen;
-
-		std::unique_ptr<Engine> m_pEngine;
 	};
 }
 
