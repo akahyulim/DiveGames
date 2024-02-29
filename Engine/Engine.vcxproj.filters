@@ -159,6 +159,9 @@
     <ClInclude Include="Src\Core\Engine.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Core\TypeInfo.h">
+      <Filter>Src\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DivePch.cpp">
@@ -264,6 +267,9 @@
       <Filter>Src\Resource\Importer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Engine.cpp">
+      <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Core\TypeInfo.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>

@@ -13,13 +13,15 @@ namespace Dive
 	Scene::Scene(const std::string& name)
 		: m_Name(name)
 		, m_CurGameObjectID(FIRST_ID)
-		, m_CurComponentID(FIRST_ID)
 		, m_bDirty(true)
 	{
 	}
 
 	Scene::~Scene()
 	{
+		Clear();
+
+		DV_CORE_TRACE("씬({:s}) 소멸", m_Name);
 	}
 	
 	void Scene::Clear()
@@ -28,10 +30,7 @@ namespace Dive
 		for (it; it != m_GameObjects.end(); ++it)
 			DV_DELETE(it->second);
 		m_GameObjects.clear();
-		m_Components.clear();
-
 		m_CurGameObjectID = FIRST_ID;
-		m_CurComponentID = FIRST_ID;
 	}
 
 	GameObject* Scene::CreateGameObject(const std::string& name)
@@ -145,48 +144,6 @@ namespace Dive
 		return static_cast<uint64_t>(m_GameObjects.size());
 	}
 
-	void Scene::RegisterComponent(Component* pComponent, uint64_t id)
-	{
-		if (!pComponent)
-			return;
-
-		if (id == 0 || GetComponent(id))
-		{
-			id = getFreeComponentID();
-			if (id == 0)
-			{
-				DV_CORE_ERROR("더이상 Component를 등록할 수 없습니다.");
-				return;
-			}
-		}
-
-		m_Components[id] = pComponent;
-		pComponent->SetID(id);
-	}
-
-	void Scene::DeregisterComponent(Component* pComponent)
-	{
-		if (!pComponent)
-			return;
-
-		DeregisterComponentByID(pComponent->GetID());
-	}
-
-	void Scene::DeregisterComponentByID(uint64_t id)
-	{
-		if (!GetComponent(id))
-			return;
-
-		if (m_Components.find(id) != m_Components.end())
-			m_Components.erase(id);
-	}
-
-	Component* Scene::GetComponent(uint64_t id)
-	{
-		auto it = m_Components.find(id);
-		return it != m_Components.end() ? it->second : nullptr;
-	}
-
 	uint64_t Scene::getFreeGameObjectID()
 	{
 		auto checkID = m_CurGameObjectID;
@@ -203,26 +160,6 @@ namespace Dive
 			if (checkID == m_CurGameObjectID)
 				return 0;
 			else if (!m_GameObjects[freeID])
-				return freeID;
-		}
-	}
-
-	uint64_t Scene::getFreeComponentID()
-	{
-		auto checkID = m_CurComponentID;
-
-		for (;;)
-		{
-			auto freeID = m_CurComponentID;
-
-			if (m_CurComponentID < LAST_ID)
-				++m_CurComponentID;
-			else
-				m_CurComponentID = FIRST_ID;
-
-			if (checkID == m_CurComponentID)
-				return 0;
-			else if (!m_Components[freeID])
 				return freeID;
 		}
 	}

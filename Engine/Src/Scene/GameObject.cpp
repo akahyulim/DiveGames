@@ -16,16 +16,10 @@ namespace Dive
 
 	GameObject::~GameObject()
 	{
-		if (!m_Components.empty())
-		{
-			for (auto* pComponent : m_Components)
-			{
-				m_pScene->DeregisterComponentByID(pComponent->GetID());
-				DV_DELETE(pComponent);
-			}
-			m_Components.clear();
-			m_Components.shrink_to_fit();
-		}
+		for (auto& it : m_Components)
+			DV_DELETE(it.second);
+
+		DV_CORE_TRACE("게임오브젝트({0:s}, {1:d}) 소멸", GetName(), GetID());
 	}
 
 	void GameObject::Update()
@@ -33,7 +27,22 @@ namespace Dive
 		if (!m_bActive)
 			return;
 
-		for (auto* pComponent : m_Components)
-			pComponent->Update();
+		for (auto& it : m_Components)
+			it.second->Update();
+	}
+
+	bool GameObject::HashComponent(size_t typeHash) const
+	{
+		auto it = m_Components.find(typeHash);
+		return it != m_Components.end();
+	}
+
+	Component* GameObject::GetComponent(size_t typeHash) const
+	{
+		auto it = m_Components.find(typeHash);
+		if (it != m_Components.end())
+			return it->second;
+
+		return nullptr;
 	}
 }

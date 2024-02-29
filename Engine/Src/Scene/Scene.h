@@ -24,25 +24,17 @@ namespace Dive
 		uint64_t GetGameObjectsCount();
 		 bool IsEmpty() const { return m_GameObjects.empty(); }
 
-		void RegisterComponent(Component* pComponent, uint64_t id = 0);
-		void DeregisterComponent(Component* pComponent);
-		void DeregisterComponentByID(uint64_t id);
-		Component* GetComponent(uint64_t id);
-
 		 std::string GetName() { return m_Name; }
 
 	private:
 		uint64_t getFreeGameObjectID();
-		uint64_t getFreeComponentID();
 	
 	private:
 		std::string m_Name;
 
 		std::unordered_map<uint64_t, GameObject*> m_GameObjects;
-		std::unordered_map<uint64_t, Component*> m_Components;
 
 		uint64_t m_CurGameObjectID;
-		uint64_t m_CurComponentID;
 
 		bool m_bDirty;
 	};

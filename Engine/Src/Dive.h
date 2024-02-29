@@ -3,12 +3,13 @@
 
 // Core
 #include "Core/CoreDefs.h"
+#include "Core/TypeInfo.h"
+#include "Core/Object.h"
 #include "Core/EventHandler.h"
 #include "Core/CoreEvents.h"
 #include "Core/Timer.h"
-#include "Core/Application.h"
 #include "Core/Engine.h"
-#include "Core/Object.h"
+#include "Core/Application.h"
 
 // Graphics
 #include "Graphics/GraphicsDefs.h"

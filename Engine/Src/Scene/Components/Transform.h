@@ -14,9 +14,11 @@ namespace Dive
 			Local
 		};
 
+		DIVE_TYPEINFO(Transform, Component);
+
 	public:
 		Transform(GameObject* pGameObject);
-		~Transform() = default;
+		~Transform();
 
 		void Update() override;
 

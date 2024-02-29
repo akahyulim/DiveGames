@@ -14,9 +14,11 @@ namespace Dive
 
 	class Light : public Component
 	{
+		DIVE_TYPEINFO(Light, Component);
+	
 	public:
 		Light(GameObject* pGameObject);
-		~Light() override = default;
+		~Light() override ;
 
 		eLightType GetType() const { return m_Type; }
 		void SetType(eLightType type) { m_Type = type; }

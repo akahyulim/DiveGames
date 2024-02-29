@@ -9,6 +9,8 @@ namespace Dive
 
 	class Renderable : public Component
 	{
+		DIVE_TYPEINFO(Renderable, Component);
+
 	public:
 		Renderable(GameObject* pGameObject);
 		~Renderable() override;

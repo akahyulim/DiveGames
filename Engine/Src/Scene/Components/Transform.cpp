@@ -19,6 +19,11 @@ namespace Dive
 		XMStoreFloat4x4(&m_WorldMatrix, XMMatrixIdentity());
 	}
 
+	Transform::~Transform()
+	{
+		DV_CORE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
+	}
+
 	void Transform::Update()
 	{
 		updateTransform();
@@ -326,12 +331,12 @@ namespace Dive
 	{
 		if (pParent)
 		{
-			if (pParent->GetID() == this->GetID())
+			if (pParent == this)
 				return;
 
 			if (m_pParent)
 			{
-				if (m_pParent->GetID() == pParent->GetID())
+				if (m_pParent == pParent)
 					return;
 
 				// 자식을 부모로 삼을 수 없다.
@@ -342,7 +347,7 @@ namespace Dive
 					auto it = m_pParent->m_Children.begin();
 					for (it; it != m_pParent->m_Children.end(); ++it)
 					{
-						if ((*it)->GetID() == this->GetID())
+						if ((*it) == this)
 						{
 							m_pParent->m_Children.erase(it);
 							break;
@@ -366,7 +371,7 @@ namespace Dive
 				auto it = m_pParent->m_Children.begin();
 				for (it; it != m_pParent->m_Children.end(); ++it)
 				{
-					if ((*it)->GetID() == this->GetID())
+					if ((*it) == this)
 					{
 						m_pParent->m_Children.erase(it);
 						break;
@@ -397,7 +402,7 @@ namespace Dive
 	{
 		DV_CORE_ASSERT(pParent);
 
-		if (this->GetID() == pParent->GetID())
+		if (this == pParent)
 			return true;
 
 		if (!m_pParent)

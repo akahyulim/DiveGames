@@ -14,5 +14,6 @@ namespace Dive
 
 	Renderable::~Renderable()
 	{
+		DV_CORE_TRACE("ÄÄÆ÷³ÍÆ®({0:s}'s {1:s}) ¼Ò¸ê", GetName(), GetTypeName());
 	}
 }

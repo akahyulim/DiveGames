@@ -16,6 +16,11 @@ namespace Dive
 		, m_bEnabled(true)
 	{
 	}
+
+	Light::~Light()
+	{
+		DV_CORE_TRACE("ÄÄÆ÷³ÍÆ®({0:s}'s {1:s}) ¼Ò¸ê", GetName(), GetTypeName());
+	}
 	
 	DirectX::XMFLOAT3 Light::GetDirection()
 	{
