@@ -4,7 +4,7 @@
 #include "Timer.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
-#include "Resource/ResourceCache.h"
+#include "Resource/ResourceManager.h"
 #include "Input/Input.h"
 #include "CoreEvents.h"
 
@@ -33,7 +33,7 @@ namespace Dive
 
 	void Engine::Shutdown()
 	{
-		ResourceCache::Shutdown();
+		ResourceManager::Shutdown();
 		Renderer::Shutdown();
 		Graphics::Shutdown();
 

@@ -7,12 +7,17 @@ namespace Dive
 	class Shader;
 	class Texture;
 
+	// 현재는 legacy다. 추후 pbs가 추가될 수 있다.
 	class Material : public Resource
 	{
+		DV_OBJECT(Material, Resource);
+
 	public:
 		Material();
-		Material(const std::string& name, Shader* pShader);
 		~Material();
+
+		bool LoadFromFile(const std::string& fileName) override;
+		bool SaveToFile(const std::string& fileName) override;
 
 		 Shader* GetShader() const { return m_pShader; }
 		 void SetShader(Shader* pShader) { m_pShader = pShader; }
@@ -35,17 +40,14 @@ namespace Dive
 		 void SetOffset(DirectX::XMFLOAT2 offset) { m_Offset = offset; }
 		 void SetOffset(float x, float y) { m_Offset.x = x; m_Offset.y = y; }
 
-	public:
-		static Material* Create(const std::string& name, Shader* pShader);
-
-	private:
 	private:
 		Shader* m_pShader;
-
 		std::unordered_map<eTextureUnit, Texture*> m_Textures;
 		DirectX::XMFLOAT4 m_DiffuseColor;
-
 		DirectX::XMFLOAT2 m_Tiling;
 		DirectX::XMFLOAT2 m_Offset;
 	};
+
+	Material* LoadMaterialFromFile(const std::string& fileName);
+	Material* CreateMaterial(const std::string& name);
 }

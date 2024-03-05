@@ -2,22 +2,10 @@
 
 namespace Dive
 {
+	// 이걸 왜 굳이 클래스로 묶었을까?
 	class FileSystem
 	{
 	public:
-		// strings
-		static std::string ToUpperCase(const std::string& str);
-		static std::string ToLowerCase(const std::string& str);
-		static std::string StringLeftTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
-		static std::string StringRightTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
-		static std::string StringTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
-		static std::string AddTrailingSlash(const std::string& pathName);
-		static std::string RemoveTrailingSlash(const std::string& pathName);
-		static std::string StringReplace(const std::string& str, const std::string& target, const std::string& replace);
-		static std::wstring StringToWstring(const std::string& str);
-		static std::string WstringToString(const std::wstring& str);
-		static std::vector<std::string> StringSplit(const std::string& str, char seperator);
-
 		// file and directory
 		static std::string GetCurrentDir();
 		static void SetCurrentDir(const std::string& pathName);
@@ -39,4 +27,17 @@ namespace Dive
 		static bool Rename(const std::string& sourceFileName, const std::string& destFileName);
 		static bool Delete(const std::string& fileName);
 	};
+
+	// strings
+	std::string ToUpperCase(const std::string& str);
+	std::string ToLowerCase(const std::string& str);
+	std::string StringLeftTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
+	std::string StringRightTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
+	std::string StringTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
+	std::string AddTrailingSlash(const std::string& pathName);
+	std::string RemoveTrailingSlash(const std::string& pathName);
+	std::string StringReplace(const std::string& str, const std::string& target, const std::string& replace);
+	std::wstring StringToWstring(const std::string& str);
+	std::string WstringToString(const std::wstring& str);
+	std::vector<std::string> StringSplit(const std::string& str, char seperator);
 }

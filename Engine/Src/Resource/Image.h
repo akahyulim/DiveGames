@@ -4,9 +4,12 @@
 
 namespace Dive
 {
-	// 굳이 Texture와 Image를 구분할 필요가 없을 것 같다.
+	// 굳이 Texture와 Image를 구분할 필요가 있을까?
+	// 그리고 Model, Mesh의 관계처럼 리소스일 필요가 있을까?
 	class Image : public Resource
 	{
+		DV_OBJECT(Image, Resource);
+
 	public:
 		Image();
 		~Image() override = default;

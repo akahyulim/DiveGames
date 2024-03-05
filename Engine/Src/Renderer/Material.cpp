@@ -3,32 +3,33 @@
 #include "Graphics/Shader.h"
 #include "Graphics/Texture2D.h"
 #include "Core/CoreDefs.h"
-#include "Resource/ResourceCache.h"
+#include "Resource/ResourceManager.h"
 
 namespace Dive
 {
-	Material::Material()
-		: Resource(eResourceType::Material)
-        , m_pShader(nullptr)
+    Material::Material()
+        : m_pShader(nullptr)
         , m_DiffuseColor(1.0f, 1.0f, 1.0f, 1.0f)
         , m_Tiling(1.0f, 1.0f)
         , m_Offset(0.0f, 0.0f)
-	{
-	}
+    {
+    }
 
-	Material::Material(const std::string& name, Shader* pShader)
-		: Resource(eResourceType::Material)
-        , m_pShader(pShader)
-        , m_DiffuseColor(1.0f, 1.0f, 1.0f, 1.0f)
-        , m_Tiling(1.0f, 1.0f)
-        , m_Offset(0.0f, 0.0f)
-	{
-        SetName(name);
-	}
+    Material::~Material()
+    {
+        DV_CORE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
+            GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
+    }
 
-	Material::~Material()
-	{
-	}
+    bool Material::LoadFromFile(const std::string& fileName)
+    {
+        return true;
+    }
+
+    bool Material::SaveToFile(const std::string& fileName)
+    {
+        return true;
+    }
 
     Texture* Material::GetTexture(eTextureUnit unit) const
     {
@@ -56,9 +57,8 @@ namespace Dive
     {
         if (unit < eTextureUnit::Max_Num)
         {
-            // 원래는 타입에 맞춰서 시도해야 한다.
-            Texture2D* pTexture = ResourceCache::GetResourceByPath<Texture2D>(name);    // 원래 ByName으로 했는데, 캐시에서 찾는거라 적용이 안될 수 있었다.
-            SetTexture(unit, dynamic_cast<Texture*>(pTexture));
+            auto pTexture = ResourceManager::GetResource<Texture2D>(name);
+            SetTexture(unit, static_cast<Texture*>(pTexture));
         }
     }
 
@@ -67,8 +67,31 @@ namespace Dive
         return m_Textures[unit] != nullptr;
     }
 
-    Material* Material::Create(const std::string& name, Shader* pShader)
+    Material* LoadMaterialFromFile(const std::string& fileName)
     {
-        return new Material(name, pShader);
+        Material* pObject = new Material;
+        if (!pObject->LoadFromFile(fileName))
+        {
+            DV_DELETE(pObject);
+            return nullptr;
+        }
+
+        pObject->SetName(fileName);
+
+        return pObject;
+    }
+
+    Material* CreateMaterial(const std::string& name)
+    {
+        if (name.empty())
+        {
+            DV_CORE_ERROR("잘못된 이름({:s})을 전달받았습니다.", name);
+            return nullptr;
+        }
+
+        Material* pObject = new Material();
+        pObject->SetName(name);
+
+        return pObject;
     }
 }

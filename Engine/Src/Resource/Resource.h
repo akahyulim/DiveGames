@@ -3,36 +3,23 @@
 
 namespace Dive
 {
-	enum class eResourceType
+	class Resource : public DvObject
 	{
-		Image,
-		RenderTexture,
-		Texture2D,
-		Material,
-		Mesh,
-		Shader,
-		Unknown
-	};
+		DV_OBJECT(Resource, DvObject);
 
-	class Resource : public Object
-	{
 	public:
-		Resource(eResourceType type = eResourceType::Unknown) : m_ResourceType(type) {}
-		virtual ~Resource() {}
+		Resource();
+		virtual ~Resource() = default;
 
-		virtual bool LoadFromFile(const std::string& filePath) { return true; }
-		virtual bool SaveToFile(const std::string& filePath) { return true; }
+		virtual bool LoadFromFile(const std::string& fileName) { return true; }
+		virtual bool SaveToFile(const std::string& fileName) { return true; }
 
-		eResourceType GetResourceType() const { return m_ResourceType; }
+		void SetName(const std::string& name);
+		const std::string& GetName() const { return m_Name; }
+		size_t GetNameHash() const { return m_NameHash; }
 
-		template<typename T>
-		static constexpr eResourceType TypeToEnum();
-
-		std::string GetFilePath() const { return m_FilePath; }
-		void SetFilePath(const std::string& filePath) { m_FilePath = filePath; }
-
-	protected:
-		eResourceType m_ResourceType;
-		std::string m_FilePath;
+	private:
+		std::string m_Name;
+		size_t m_NameHash;
 	};
 }

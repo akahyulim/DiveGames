@@ -8,8 +8,10 @@ namespace Dive
 {
 	class Texture : public Resource
 	{
+		DV_OBJECT(Texture, Resource);
+
 	public:
-		Texture(eResourceType type);
+		Texture();
 		~Texture() override;
 
 		bool IsMipLevelsDirty() const { return m_bMipLevelDirty; }
@@ -58,6 +60,9 @@ namespace Dive
 		virtual bool createResources() = 0;
 
 	protected:
+		ID3D11Device* m_pDevice;
+		ID3D11DeviceContext* m_pDeviceContext;
+
 		ID3D11Texture2D* m_pTexture2D;
 		ID3D11ShaderResourceView* m_pShaderResourceView;
 		ID3D11SamplerState* m_pSamplerState;	// 아무래도 Texture마다 직접 관리하는 건 부담된다.

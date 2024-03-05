@@ -15,7 +15,7 @@ namespace Dive
 			Orthographic
 		};
 
-		DIVE_TYPEINFO(Camera, Component);
+		DV_OBJECT(Camera, Component);
 
 	public:
 		Camera(GameObject* pGameObject);

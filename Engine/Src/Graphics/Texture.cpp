@@ -6,9 +6,8 @@
 
 namespace Dive
 {
-	Texture::Texture(eResourceType type)
-		: Resource(type),
-		m_pTexture2D(nullptr),
+	Texture::Texture()
+		: m_pTexture2D(nullptr),
 		m_pShaderResourceView(nullptr),
 		m_pSamplerState(nullptr),
 		m_RequestedMipLevels(0),
@@ -20,6 +19,8 @@ namespace Dive
 		m_AnisoLevel(1),
 		m_bSamplerStateDirty(true)
 	{
+		m_pDevice = Graphics::GetDevice();
+		m_pDeviceContext = Graphics::GetDeviceContext();
 	}
 
 	Texture::~Texture()
@@ -43,7 +44,7 @@ namespace Dive
 
 		if (m_pShaderResourceView)
 		{
-			Graphics::GetDeviceContext()->GenerateMips(m_pShaderResourceView);
+			m_pDeviceContext->GenerateMips(m_pShaderResourceView);
 			m_bMipLevelDirty = false;
 		}
 	}
@@ -71,7 +72,7 @@ namespace Dive
 		desc.MinLOD = -FLT_MAX;
 		desc.MaxLOD = FLT_MAX;
 
-		if (FAILED(Graphics::GetDevice()->CreateSamplerState(&desc, &m_pSamplerState)))
+		if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_pSamplerState)))
 		{
 			DV_RELEASE(m_pSamplerState);
 			DV_CORE_ERROR("Texture::UpdateSamplerState - SamplerState 생성에 실패하였습니다.");

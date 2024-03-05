@@ -159,7 +159,6 @@
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\Timer.h" />
     <ClInclude Include="Src\Core\Application.h" />
-    <ClInclude Include="Src\Core\TypeInfo.h" />
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
@@ -185,7 +184,7 @@
     <ClInclude Include="Src\Resource\Image.h" />
     <ClInclude Include="Src\Resource\Importer\ModelLoader.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
-    <ClInclude Include="Src\Resource\ResourceCache.h" />
+    <ClInclude Include="Src\Resource\ResourceManager.h" />
     <ClInclude Include="Src\Scene\Components\Camera.h" />
     <ClInclude Include="Src\Scene\Components\Component.h" />
     <ClInclude Include="Src\Scene\Components\Light.h" />
@@ -201,7 +200,6 @@
     <ClCompile Include="Src\Core\Object.cpp" />
     <ClCompile Include="Src\Core\Timer.cpp" />
     <ClCompile Include="Src\Core\Application.cpp" />
-    <ClCompile Include="Src\Core\TypeInfo.cpp" />
     <ClCompile Include="Src\DivePch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -225,7 +223,7 @@
     <ClCompile Include="Src\Resource\Image.cpp" />
     <ClCompile Include="Src\Resource\Importer\ModelLoader.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
-    <ClCompile Include="Src\Resource\ResourceCache.cpp" />
+    <ClCompile Include="Src\Resource\ResourceManager.cpp" />
     <ClCompile Include="Src\Scene\Components\Camera.cpp" />
     <ClCompile Include="Src\Scene\Components\Component.cpp" />
     <ClCompile Include="Src\Scene\Components\Light.cpp" />

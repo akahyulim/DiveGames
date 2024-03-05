@@ -1,16 +1,18 @@
 #pragma once
-#include "Core/TypeInfo.h"
+#include "Core/Object.h"
 
 namespace Dive
 {
 	class GameObject;
 	class Transform;
 
-	class Component
+	class Component : public DvObject
 	{
+		DV_OBJECT(Component, DvObject);
+
 	public:
 		Component(GameObject* pGameObject);
-		virtual ~Component() = default;
+		~Component() override = default;
 
 		virtual void Update() {}
 
@@ -18,11 +20,6 @@ namespace Dive
 
 		GameObject* GetGameObject() const;
 		Transform* GetTransform();
-
-		virtual size_t GetTypeHash() const = 0;
-		virtual const std::string& GetTypeName() const = 0;
-		virtual const TypeInfo* GetTypeInfo() const = 0;
-		static const TypeInfo* GetTypeInfoStatic() { return nullptr; }
 
 	protected:
 		GameObject* m_pGameObject;

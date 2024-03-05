@@ -3,7 +3,6 @@
 
 // Core
 #include "Core/CoreDefs.h"
-#include "Core/TypeInfo.h"
 #include "Core/Object.h"
 #include "Core/EventHandler.h"
 #include "Core/CoreEvents.h"
@@ -46,7 +45,7 @@
 // Resource
 #include "Resource/Importer/ModelLoader.h"
 #include "Resource/Resource.h"
-#include "Resource/ResourceCache.h"
+#include "Resource/ResourceManager.h"
 #include "Resource/Image.h"
 
 // Scene

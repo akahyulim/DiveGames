@@ -6,8 +6,7 @@
 namespace Dive
 {
 	Image::Image()
-		: Resource(eResourceType::Image),
-		m_Width(0),
+		: m_Width(0),
 		m_Height(0),
 		m_Depth(0),
 		m_Format(DXGI_FORMAT_R8G8B8A8_UNORM),
@@ -17,7 +16,7 @@ namespace Dive
 
 	bool Image::LoadFromFile(const std::string& fileName)
 	{
-		auto filePath = FileSystem::StringToWstring(fileName);
+		auto filePath = StringToWstring(fileName);
 		auto ext = FileSystem::GetExtension(fileName);
 		DirectX::ScratchImage img;
 		HRESULT hResult = 0;

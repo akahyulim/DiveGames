@@ -9,6 +9,8 @@ namespace Dive
 	// 추가로 특정 크기의 텍스쳐를 만들어 놓고 색상을 set, get -> rtv
 	class Texture2D : public Texture
 	{
+		DV_OBJECT(Texture2D, Texture);
+
 	public:
 		Texture2D();
 		~Texture2D() override;
@@ -52,4 +54,6 @@ namespace Dive
 		static Texture2D* s_pRedTexture;
 		static Texture2D* s_pWhiteTexture;
 	};
+
+	Texture2D* LoadTexture2dFromFile(const std::string& fileName);
 }

@@ -60,7 +60,7 @@
     <ClInclude Include="Src\Resource\Resource.h">
       <Filter>Src\Resource</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Resource\ResourceCache.h">
+    <ClInclude Include="Src\Resource\ResourceManager.h">
       <Filter>Src\Resource</Filter>
     </ClInclude>
     <ClInclude Include="Src\IO\FileSystem.h">
@@ -159,9 +159,6 @@
     <ClInclude Include="Src\Core\Engine.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\TypeInfo.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DivePch.cpp">
@@ -176,7 +173,7 @@
     <ClCompile Include="Src\Resource\Resource.cpp">
       <Filter>Src\Resource</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Resource\ResourceCache.cpp">
+    <ClCompile Include="Src\Resource\ResourceManager.cpp">
       <Filter>Src\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Src\IO\FileSystem.cpp">
@@ -267,9 +264,6 @@
       <Filter>Src\Resource\Importer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Engine.cpp">
-      <Filter>Src\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\TypeInfo.cpp">
       <Filter>Src\Core</Filter>
     </ClCompile>
   </ItemGroup>

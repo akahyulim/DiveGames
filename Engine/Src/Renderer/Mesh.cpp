@@ -9,15 +9,13 @@
 namespace Dive
 {
 	Mesh::Mesh(VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer)
-		: Resource(eResourceType::Mesh)
-		, m_pVertexBuffer(pVertexBuffer)
+		: m_pVertexBuffer(pVertexBuffer)
 		, m_pIndexBuffer(pIndexBuffer)
 	{
 	}
 
 	Mesh::Mesh(const std::string& name, VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer)
-		: Resource(eResourceType::Mesh)
-		, m_pVertexBuffer(pVertexBuffer)
+		: m_pVertexBuffer(pVertexBuffer)
 		, m_pIndexBuffer(pIndexBuffer)
 	{
 		SetName(name);
@@ -27,6 +25,9 @@ namespace Dive
 	{
 		DV_DELETE(m_pIndexBuffer);
 		DV_DELETE(m_pVertexBuffer);
+
+		DV_CORE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
+			GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
 	}
 	
 	// 현재 urho3d의 Geometry::Draw와 완전히 같다.
@@ -45,8 +46,14 @@ namespace Dive
 		}
 	}
 
-	Mesh* Mesh::Create(const std::string& name, VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer)
+	Mesh* CreateMesh(const std::string& name, VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer)
 	{
+		if (!pVertexBuffer)
+		{
+			DV_CORE_ERROR("버텍스 버퍼가 존재하지 않아 메시를 생성할 수 없습니다.");
+			return nullptr;
+		}
+
 		return new Mesh(name, pVertexBuffer, pIndexBuffer);
 	}
 };

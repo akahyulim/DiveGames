@@ -9,7 +9,7 @@ namespace Dive
 
 	class Renderable : public Component
 	{
-		DIVE_TYPEINFO(Renderable, Component);
+		DV_OBJECT(Renderable, Component);
 
 	public:
 		Renderable(GameObject* pGameObject);

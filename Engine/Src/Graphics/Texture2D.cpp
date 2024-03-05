@@ -26,8 +26,7 @@ namespace Dive
 	Texture2D* Texture2D::s_pWhiteTexture = nullptr;
 
 	Texture2D::Texture2D()
-		: Texture(eResourceType::Texture2D),
-		m_pRenderTargetView(nullptr),
+		: m_pRenderTargetView(nullptr),
 		m_pLoadImage(nullptr)
 	{
 	}
@@ -36,6 +35,9 @@ namespace Dive
 	{
 		DV_DELETE(m_pLoadImage);
 		DV_RELEASE(m_pRenderTargetView);
+
+		DV_CORE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
+			GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
 	}
 
 	// 현재 m_pLoadImage는 Cache에 등록되지 않고
@@ -59,7 +61,7 @@ namespace Dive
 		// 그럼 동적생성한 의미가 없잖아...
 		DV_DELETE(m_pLoadImage);
 
-		m_FilePath = filePath;
+		//m_FilePath = filePath;
 		SetName(FileSystem::GetFileName(filePath));
 
 		return true;
@@ -132,7 +134,7 @@ namespace Dive
 		unsigned int subResource = 0;
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		
-		if (FAILED(Graphics::GetDeviceContext()->Map(
+		if (FAILED(m_pDeviceContext->Map(
 			static_cast<ID3D11Resource*>(m_pTexture2D),
 			subResource,
 			D3D11_MAP_WRITE_DISCARD,
@@ -161,7 +163,7 @@ namespace Dive
 			}
 		}
 
-		Graphics::GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pTexture2D), subResource);
+		m_pDeviceContext->Unmap(static_cast<ID3D11Resource*>(m_pTexture2D), subResource);
 	}
 
 	bool Texture2D::SetRawTextureData(const void* pData)
@@ -181,7 +183,7 @@ namespace Dive
 		const void* pSrc = pData;
 		unsigned int rowPitch = GetRowPitchSize(m_Width);
 
-		Graphics::GetDeviceContext()->UpdateSubresource(
+		m_pDeviceContext->UpdateSubresource(
 			m_pTexture2D,
 			0,
 			nullptr,
@@ -295,7 +297,7 @@ namespace Dive
 		texDesc.MiscFlags = m_MipLevels > 1 ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 		texDesc.CPUAccessFlags = m_Usage == eTextureUsage::Dynamic ? D3D11_CPU_ACCESS_WRITE : 0;
 
-		if (FAILED(Graphics::GetDevice()->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
+		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
 		{
 			DV_RELEASE(m_pTexture2D);
 			DV_CORE_ERROR("Texture2D::createResources - Texture2D 생성에 실패하였습니다.");
@@ -310,7 +312,7 @@ namespace Dive
 		//srvDesc.DTexture2D.MipLevels = m_bDynamic ? 1 : -1;
 		srvDesc.Texture2D.MostDetailedMip = 0;
 
-		if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(
+		if (FAILED(m_pDevice->CreateShaderResourceView(
 			static_cast<ID3D11Resource*>(m_pTexture2D),
 			&srvDesc,
 			&m_pShaderResourceView)))
@@ -328,7 +330,7 @@ namespace Dive
 			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;		// 멀티 샘플링 미지원.
 			rtvDesc.Texture2D.MipSlice = 0;
 
-			if (FAILED(Graphics::GetDevice()->CreateRenderTargetView(
+			if (FAILED(m_pDevice->CreateRenderTargetView(
 				static_cast<ID3D11Resource*>(m_pTexture2D),
 				&rtvDesc,
 				&m_pRenderTargetView)))
@@ -342,4 +344,17 @@ namespace Dive
 		return true;
 	}
 
+	Texture2D* LoadTexture2dFromFile(const std::string& fileName)
+	{
+		Texture2D* pObject = new Texture2D();
+		if (!pObject->LoadFromFile(fileName))
+		{
+			DV_DELETE(pObject);
+			return nullptr;
+		}
+
+		pObject->SetName(fileName);
+
+		return pObject;
+	}
 }

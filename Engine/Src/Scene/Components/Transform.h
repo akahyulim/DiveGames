@@ -14,7 +14,7 @@ namespace Dive
 			Local
 		};
 
-		DIVE_TYPEINFO(Transform, Component);
+		DV_OBJECT(Transform, Component);
 
 	public:
 		Transform(GameObject* pGameObject);

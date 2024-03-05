@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <string>
+#include <atlconv.h>
 #include <memory>
 #include <chrono>
 #include <random>

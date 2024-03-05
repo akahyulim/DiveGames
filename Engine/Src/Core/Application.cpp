@@ -8,7 +8,7 @@
 #include "Timer.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
-#include "Resource/ResourceCache.h"
+#include "Resource/ResourceManager.h"
 #include "Input/Input.h"
 
 namespace Dive

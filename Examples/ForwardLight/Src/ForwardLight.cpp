@@ -54,44 +54,51 @@ namespace ForwardLight
 			// game objects
 			{
 				// textures
-				auto pTexDMC = Dive::ResourceCache::LoadFromFile<Dive::Texture2D>("Assets/Textures/dmc.jpg");
-				auto pTexDOKEV = Dive::ResourceCache::LoadFromFile<Dive::Texture2D>("Assets/Textures/dokev.jpeg");
-				auto pTexPlane = Dive::ResourceCache::LoadFromFile<Dive::Texture2D>("Assets/Textures/WornWood/WornWood_Albedo.tga");
-				auto pTexStone = Dive::ResourceCache::LoadFromFile<Dive::Texture2D>("Assets/Textures/Stone01.tga");
-
-				// shader, material, meshes
-				// 일단 AddManualResource로 캐시에 저장했다.
-				// 파일 로드가 아니기에 LoadFromFile()을 사용할 수 없기 때문이다.
-				auto pShader = Dive::Shader::CreateFromFile("ForwardLight", L"CoreData/Shaders/ForwardLight.hlsl", Dive::eVertexLayout::Static_Model);
-				Dive::ResourceCache::AddManualResource<Dive::Shader>(pShader);
+				auto pTexDMC = Dive::ResourceManager::GetResource<Dive::Texture2D>("Assets/Textures/dmc.jpg");
+				auto pTexDOKEV = Dive::ResourceManager::GetResource<Dive::Texture2D>("Assets/Textures/dokev.jpeg");
+				auto pTexPlane = Dive::ResourceManager::GetResource<Dive::Texture2D>("Assets/Textures/WornWood/WornWood_Albedo.tga");
+				auto pTexStone = Dive::ResourceManager::GetResource<Dive::Texture2D>("Assets/Textures/Stone01.tga");
+				
+				// shader
+				auto pShader = Dive::ResourceManager::GetResource<Dive::Shader>("CoreData/Shaders/ForwardLight.hlsl");
+				pShader->CreateInputLayout(Dive::eVertexLayout::Static_Model);
+				
+				// meshes
 				auto pTriangleMesh = Dive::MeshFactory::CreateTriangle(5.0f);
-				Dive::ResourceCache::AddManualResource<Dive::Mesh>(pTriangleMesh);
-				// Material은 이름이 좀 애매하다.
-				// Default(Legacy)와 Pbs로 구분하는게 맞는 듯 한데...
-				// 정 필요하다면 Renderable에서 Mesh의 이름을 참조할 수 있다.
-				// 하지만 AddMenualResource() 시점이 애매해진다.
-				auto pTriangleMaterial = Dive::Material::Create("TriangleMaterial", pShader);
+				Dive::ResourceManager::AddManualResource(pTriangleMesh);
+
+				auto pCubeMesh = Dive::MeshFactory::CreateCube(5.0f);
+				Dive::ResourceManager::AddManualResource(pCubeMesh);
+				
+				auto pSphereMesh = Dive::MeshFactory::CreateSphere(5.0f);
+				Dive::ResourceManager::AddManualResource(pSphereMesh);
+				
+				auto pPlaneMesh = Dive::MeshFactory::CreatePlane(50, 50);
+				Dive::ResourceManager::AddManualResource(pPlaneMesh);
+
+				// materials
+				auto pTriangleMaterial = Dive::CreateMaterial("TriangleMaterial");
+				pTriangleMaterial->SetShader(pShader);
 				pTriangleMaterial->SetDiffuseColor(1.0f, 1.0f, 0.0f, 1.0f);
 				pTriangleMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexDMC);
-				Dive::ResourceCache::AddManualResource<Dive::Material>(pTriangleMaterial);
-				auto pCubeMesh = Dive::MeshFactory::CreateCube(5.0f);
-				Dive::ResourceCache::AddManualResource<Dive::Mesh>(pCubeMesh);
-				auto pCubeMaterial = Dive::Material::Create("CubeMaterial", pShader);
+				Dive::ResourceManager::AddManualResource(pTriangleMaterial);
+				
+				auto pCubeMaterial = Dive::CreateMaterial("CubeMaterial");
+				pCubeMaterial->SetShader(pShader);
 				pCubeMaterial->SetDiffuseColor(0.0f, 1.0f, 1.0f, 1.0f);
 				pCubeMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexDOKEV);
-				Dive::ResourceCache::AddManualResource<Dive::Material>(pCubeMaterial);
-				auto pSphereMesh = Dive::MeshFactory::CreateSphere(5.0f);
-				Dive::ResourceCache::AddManualResource<Dive::Mesh>(pSphereMesh);
-				auto pSphereMaterial = Dive::Material::Create("SphereMaterial", pShader);
+				Dive::ResourceManager::AddManualResource(pCubeMaterial);
+
+				auto pSphereMaterial = Dive::CreateMaterial("SphereMaterial");
+				pSphereMaterial->SetShader(pShader);
 				pSphereMaterial->SetDiffuseColor(1.0f, 0.0f, 0.0f, 1.0f);
-				//pSphereMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexStone);
-				Dive::ResourceCache::AddManualResource<Dive::Material>(pSphereMaterial);
-				auto pPlaneMesh = Dive::MeshFactory::CreatePlane(50, 50);
-				Dive::ResourceCache::AddManualResource<Dive::Mesh>(pPlaneMesh);
-				auto pPlaneMaterial = Dive::Material::Create("PlaneMaterial", pShader);
+				Dive::ResourceManager::AddManualResource(pSphereMaterial);
+				
+				auto pPlaneMaterial = Dive::CreateMaterial("PlaneMaterial");
+				pPlaneMaterial->SetShader(pShader);
 				pPlaneMaterial->SetDiffuseColor(0.1f, 0.1f, 0.1f, 1.0f);
 				pPlaneMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexPlane);
-				Dive::ResourceCache::AddManualResource<Dive::Material>(pPlaneMaterial);
+				Dive::ResourceManager::AddManualResource(pPlaneMaterial);
 
 				// tirangle gameobject
 				m_pTriangle = m_pScene->CreateGameObject("Triangle");

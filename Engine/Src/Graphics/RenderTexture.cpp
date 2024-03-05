@@ -7,8 +7,7 @@
 namespace Dive
 {
 	RenderTexture::RenderTexture()
-		: Texture(eResourceType::RenderTexture),
-		m_pRenderTargetView(nullptr),
+		: m_pRenderTargetView(nullptr),
 		m_pDepthStencilView(nullptr),
 		m_bReadOnly(true)
 	{
@@ -72,7 +71,7 @@ namespace Dive
 		texDesc.MiscFlags = 0;	// 현재 밉맵 사용 안함.
 		texDesc.CPUAccessFlags = 0;
 
-		if (FAILED(Graphics::GetDevice()->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
+		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
 		{
 			DV_RELEASE(m_pTexture2D);
 			DV_CORE_ERROR("RenderTexture::createResources - Texture2D 생성에 실패하였습니다.");
@@ -87,7 +86,7 @@ namespace Dive
 		srvDesc.Texture2D.MipLevels = 1;
 		srvDesc.Texture2D.MostDetailedMip = 0;						// 밉맵 사용 안함.
 
-		if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(
+		if (FAILED(m_pDevice->CreateShaderResourceView(
 			static_cast<ID3D11Resource*>(m_pTexture2D),
 			&srvDesc,
 			&m_pShaderResourceView)))
@@ -105,7 +104,7 @@ namespace Dive
 			rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;		// 멀티 샘플링 미지원.
 			rtvDesc.Texture2D.MipSlice = 0;
 
-			if (FAILED(Graphics::GetDevice()->CreateRenderTargetView(
+			if (FAILED(m_pDevice->CreateRenderTargetView(
 				static_cast<ID3D11Resource*>(m_pTexture2D),
 				&rtvDesc,
 				&m_pRenderTargetView)))
@@ -124,7 +123,7 @@ namespace Dive
 			0 };
 
 			dsvd.Format = GetDSVFormat(texDesc.Format);
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilView(
+			if (FAILED(m_pDevice->CreateDepthStencilView(
 				static_cast<ID3D11Resource*>(m_pTexture2D),
 				&dsvd,
 				&m_pDepthStencilView)))
@@ -136,7 +135,7 @@ namespace Dive
 			if (m_bReadOnly)
 			{
 				dsvd.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
-				if (FAILED(Graphics::GetDevice()->CreateDepthStencilView(
+				if (FAILED(m_pDevice->CreateDepthStencilView(
 					static_cast<ID3D11Resource*>(m_pTexture2D),
 					&dsvd,
 					&m_pDepthStencilViewReadOnly)))

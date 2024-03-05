@@ -4,175 +4,6 @@
 
 namespace Dive
 {
-	std::string FileSystem::ToUpperCase(const std::string& str)
-	{
-		auto copy = str;
-		for (int32_t i = 0; i < (int32_t)copy.size(); ++i)
-		{
-			if ('a' <= copy[i] && 'z' >= copy[i])
-			{
-				copy[i] -= 32;
-			}
-		}
-
-		return copy;
-	}
-
-	std::string FileSystem::ToLowerCase(const std::string& str)
-	{
-		auto copy = str;
-		for (int32_t i = 0; i < (int32_t)copy.size(); ++i)
-		{
-			if ('A' <= copy[i] && 'Z' >= copy[i])
-				copy[i] += 32;
-		}
-
-		return copy;
-	}
-
-	std::string FileSystem::StringLeftTrim(const std::string& str, const char* pTarget)
-	{
-		auto copy = str;
-		copy.erase(0, copy.find_first_not_of(pTarget));
-
-		return copy;
-	}
-
-	std::string FileSystem::StringRightTrim(const std::string& str, const char* pTarget)
-	{
-		auto copy = str;
-		copy.erase(copy.find_last_not_of(pTarget) + 1);
-
-		return copy;
-	}
-
-	std::string FileSystem::StringTrim(const std::string& str, const char* pTarget)
-	{
-		return StringLeftTrim(StringRightTrim(str, pTarget), pTarget);
-	}
-
-	std::string FileSystem::AddTrailingSlash(const std::string& pathName)
-	{
-		if (pathName.empty())
-			return std::string();
-
-		// \\를 모두 /로 변경
-		auto ret = GetInternalPath(pathName);
-
-		if (ret.back() != '/')
-			ret += '/';
-
-		return ret;
-	}
-
-	std::string FileSystem::RemoveTrailingSlash(const std::string& pathName)
-	{
-		if (pathName.empty())
-			return std::string();
-
-		auto ret = pathName;
-
-		if (ret.back() == '/')
-			ret.resize(ret.length() - 1);
-
-		return ret;
-	}
-
-	std::string FileSystem::StringReplace(const std::string& str, const std::string& target, const std::string& replace)
-	{
-		if (str.empty())
-			return std::string();
-
-		auto ret = str;
-		size_t pos = 0;
-		while ((pos = ret.find(target)) != std::string::npos)
-		{
-			ret.replace(pos, target.size(), replace);
-		}
-
-		return ret;
-	}
-
-	std::wstring FileSystem::StringToWstring(const std::string& str)
-	{
-		if (str.empty())
-			return std::wstring();
-
-		auto size = ::MultiByteToWideChar(
-			CP_ACP,
-			0,
-			str.c_str(),
-			static_cast<int32_t>(str.size()),
-			nullptr,
-			0);
-
-		std::wstring ret;
-		ret.resize(size);
-
-		::MultiByteToWideChar(
-			CP_ACP,
-			0,
-			str.c_str(),
-			static_cast<int32_t>(str.size()),
-			const_cast<wchar_t*>(ret.c_str()),
-			static_cast<int32_t>(ret.size()));
-
-		return ret;
-	}
-
-	std::string FileSystem::WstringToString(const std::wstring& str)
-	{
-		if (str.empty())
-			return std::string();
-
-		auto size = ::WideCharToMultiByte(
-			CP_ACP,
-			0,
-			str.c_str(),
-			static_cast<int32_t>(str.size()),
-			nullptr,
-			0,
-			nullptr,
-			nullptr);
-
-		std::string ret;
-		ret.resize(size);
-
-		::WideCharToMultiByte(
-			CP_ACP,
-			0,
-			str.c_str(),
-			static_cast<int32_t>(str.size()),
-			const_cast<char*>(ret.c_str()),
-			static_cast<int32_t>(ret.size()),
-			nullptr,
-			nullptr);
-
-		return ret;
-	}
-
-	std::vector<std::string> FileSystem::StringSplit(const std::string& str, char seperator)
-	{
-		std::vector<std::string> ret;
-
-		size_t previous = 0;
-		size_t current = str.find(seperator);
-		if (current == std::string::npos)
-			ret.emplace_back(str);
-		else
-		{
-			while (current != std::string::npos)
-			{
-				ret.emplace_back(str.substr(previous, current - previous));
-				previous = current + 1;
-				current = str.find(seperator, previous);
-			}
-			ret.emplace_back(str.substr(previous, current - previous));
-		}
-
-		return ret;
-	}
-
 	std::string FileSystem::GetCurrentDir()
 	{
 		auto ret = std::filesystem::current_path().string();
@@ -384,5 +215,174 @@ namespace Dive
 	bool FileSystem::Delete(const std::string& fileName)
 	{
 		return std::filesystem::exists(fileName) && std::filesystem::remove(fileName);
+	}
+
+	std::string ToUpperCase(const std::string& str)
+	{
+		auto copy = str;
+		for (int32_t i = 0; i < (int32_t)copy.size(); ++i)
+		{
+			if ('a' <= copy[i] && 'z' >= copy[i])
+			{
+				copy[i] -= 32;
+			}
+		}
+
+		return copy;
+	}
+
+	std::string ToLowerCase(const std::string& str)
+	{
+		auto copy = str;
+		for (int32_t i = 0; i < (int32_t)copy.size(); ++i)
+		{
+			if ('A' <= copy[i] && 'Z' >= copy[i])
+				copy[i] += 32;
+		}
+
+		return copy;
+	}
+
+	std::string StringLeftTrim(const std::string& str, const char* pTarget)
+	{
+		auto copy = str;
+		copy.erase(0, copy.find_first_not_of(pTarget));
+
+		return copy;
+	}
+
+	std::string StringRightTrim(const std::string& str, const char* pTarget)
+	{
+		auto copy = str;
+		copy.erase(copy.find_last_not_of(pTarget) + 1);
+
+		return copy;
+	}
+
+	std::string StringTrim(const std::string& str, const char* pTarget)
+	{
+		return StringLeftTrim(StringRightTrim(str, pTarget), pTarget);
+	}
+
+	std::string AddTrailingSlash(const std::string& pathName)
+	{
+		if (pathName.empty())
+			return std::string();
+
+		// \\를 모두 /로 변경
+		auto ret = FileSystem::GetInternalPath(pathName);
+
+		if (ret.back() != '/')
+			ret += '/';
+
+		return ret;
+	}
+
+	std::string RemoveTrailingSlash(const std::string& pathName)
+	{
+		if (pathName.empty())
+			return std::string();
+
+		auto ret = pathName;
+
+		if (ret.back() == '/')
+			ret.resize(ret.length() - 1);
+
+		return ret;
+	}
+
+	std::string StringReplace(const std::string& str, const std::string& target, const std::string& replace)
+	{
+		if (str.empty())
+			return std::string();
+
+		auto ret = str;
+		size_t pos = 0;
+		while ((pos = ret.find(target)) != std::string::npos)
+		{
+			ret.replace(pos, target.size(), replace);
+		}
+
+		return ret;
+	}
+
+	std::wstring StringToWstring(const std::string& str)
+	{
+		if (str.empty())
+			return std::wstring();
+
+		auto size = ::MultiByteToWideChar(
+			CP_ACP,
+			0,
+			str.c_str(),
+			static_cast<int32_t>(str.size()),
+			nullptr,
+			0);
+
+		std::wstring ret;
+		ret.resize(size);
+
+		::MultiByteToWideChar(
+			CP_ACP,
+			0,
+			str.c_str(),
+			static_cast<int32_t>(str.size()),
+			const_cast<wchar_t*>(ret.c_str()),
+			static_cast<int32_t>(ret.size()));
+
+		return ret;
+	}
+
+	std::string WstringToString(const std::wstring& str)
+	{
+		if (str.empty())
+			return std::string();
+
+		auto size = ::WideCharToMultiByte(
+			CP_ACP,
+			0,
+			str.c_str(),
+			static_cast<int32_t>(str.size()),
+			nullptr,
+			0,
+			nullptr,
+			nullptr);
+
+		std::string ret;
+		ret.resize(size);
+
+		::WideCharToMultiByte(
+			CP_ACP,
+			0,
+			str.c_str(),
+			static_cast<int32_t>(str.size()),
+			const_cast<char*>(ret.c_str()),
+			static_cast<int32_t>(ret.size()),
+			nullptr,
+			nullptr);
+
+		return ret;
+	}
+
+	std::vector<std::string> StringSplit(const std::string& str, char seperator)
+	{
+		std::vector<std::string> ret;
+
+		size_t previous = 0;
+		size_t current = str.find(seperator);
+		if (current == std::string::npos)
+			ret.emplace_back(str);
+		else
+		{
+			while (current != std::string::npos)
+			{
+				ret.emplace_back(str.substr(previous, current - previous));
+				previous = current + 1;
+				current = str.find(seperator, previous);
+			}
+			ret.emplace_back(str.substr(previous, current - previous));
+		}
+
+		return ret;
 	}
 }

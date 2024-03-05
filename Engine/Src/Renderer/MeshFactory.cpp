@@ -21,15 +21,15 @@ namespace Dive
 			vertices.emplace_back(XMFLOAT3(0.0f, size / 2.0f, 0.0f), XMFLOAT2(0.5f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f));
 			vertices.emplace_back(XMFLOAT3(size / 2.0f, -size / 2.0f, 0.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f));
 			
-			auto pVertexBuffer = Dive::VertexBuffer::Create(vertices.data(), sizeof(VertexStatic), (uint32_t)vertices.size());
+			auto pVertexBuffer = VertexBuffer::Create(vertices.data(), sizeof(VertexStatic), (uint32_t)vertices.size());
 
 			// index buffer
 			std::vector<uint16_t> indices;
 			indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
 
-			auto pIndexBuffer = Dive::IndexBuffer::Create(indices.data(), (uint32_t)indices.size());
+			auto pIndexBuffer = IndexBuffer::Create(indices.data(), (uint32_t)indices.size());
 
-			return Mesh::Create("TriangleMesh", pVertexBuffer, pIndexBuffer);
+			return CreateMesh("TriangleMesh", pVertexBuffer, pIndexBuffer);
 		}
 
 		Mesh* CreateQuad()
@@ -79,7 +79,7 @@ namespace Dive
 			vertices.emplace_back(XMFLOAT3(size / 2.0f, -size / 2.0f, size / 2.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
 			vertices.emplace_back(XMFLOAT3(size / 2.0f, size / 2.0f, size / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f));
 
-			auto pVertexBuffer = Dive::VertexBuffer::Create(vertices.data(), sizeof(VertexStatic), (uint32_t)vertices.size());
+			auto pVertexBuffer = VertexBuffer::Create(vertices.data(), sizeof(VertexStatic), (uint32_t)vertices.size());
 			
 			// index buffer
 			std::vector<uint16_t> indices;
@@ -108,9 +108,9 @@ namespace Dive
 			indices.emplace_back(20);	indices.emplace_back(21);	indices.emplace_back(22);
 			indices.emplace_back(22);	indices.emplace_back(21);	indices.emplace_back(23);
 			
-			auto pIndexBuffer = Dive::IndexBuffer::Create(indices.data(), (uint32_t)indices.size());
+			auto pIndexBuffer = IndexBuffer::Create(indices.data(), (uint32_t)indices.size());
 			
-			return Mesh::Create("CubeMesh", pVertexBuffer, pIndexBuffer);
+			return CreateMesh("CubeMesh", pVertexBuffer, pIndexBuffer);
 		}
 
 		Mesh* CreatePlane(float length, float depth)
@@ -142,7 +142,7 @@ namespace Dive
 				DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f),
 				DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f) };
 
-			auto pVertexBuffer = Dive::VertexBuffer::Create(vertices.data(), sizeof(VertexStatic), (uint32_t)vertices.size());
+			auto pVertexBuffer = VertexBuffer::Create(vertices.data(), sizeof(VertexStatic), (uint32_t)vertices.size());
 
 			std::vector<uint32_t> indices;
 			indices.resize(6);
@@ -150,9 +150,9 @@ namespace Dive
 			indices[0] = 0;	indices[1] = 1;	indices[2] = 2;
 			indices[3] = 1;	indices[4] = 3;	indices[5] = 2;
 
-			auto pIndexBuffer = Dive::IndexBuffer::Create(indices.data(), (uint32_t)indices.size());
+			auto pIndexBuffer = IndexBuffer::Create(indices.data(), (uint32_t)indices.size());
 
-			return Mesh::Create("PlaneMesh", pVertexBuffer, pIndexBuffer);
+			return CreateMesh("PlaneMesh", pVertexBuffer, pIndexBuffer);
 		}
 
 		Mesh* CreateSphere(float radius, int slices, int stacks)
@@ -195,7 +195,7 @@ namespace Dive
 			tan = { 1.0f, 0.0f, 0.0f };
 			vertices.emplace_back(pos, uv, nor, tan);
 
-			auto pVertexBuffer = Dive::VertexBuffer::Create(vertices.data(), sizeof(VertexStatic), (uint32_t)vertices.size());
+			auto pVertexBuffer = VertexBuffer::Create(vertices.data(), sizeof(VertexStatic), (uint32_t)vertices.size());
 
 			std::vector<uint32_t> indices;
 
@@ -229,9 +229,9 @@ namespace Dive
 				indices.emplace_back(baseIndex + i + 1);
 			}
 
-			auto pIndexBuffer = Dive::IndexBuffer::Create(indices.data(), (uint32_t)indices.size());
+			auto pIndexBuffer = IndexBuffer::Create(indices.data(), (uint32_t)indices.size());
 
-			return Mesh::Create("SphereMesh", pVertexBuffer, pIndexBuffer);
+			return CreateMesh("SphereMesh", pVertexBuffer, pIndexBuffer);
 		}
 	}
 }
