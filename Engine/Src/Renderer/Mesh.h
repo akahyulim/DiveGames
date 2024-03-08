@@ -14,7 +14,10 @@ namespace Dive
 		Mesh() = default;
 		Mesh(VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer);
 		Mesh(const std::string& name, VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer);
-		~Mesh();
+		~Mesh() override;
+
+		bool LoadFromFile(const std::string& fileName) override;
+		bool SaveToFile(const std::string& fileName) override;
 
 		VertexBuffer* GetVertexBuffer() const { return m_pVertexBuffer; }		
 		void SetVertexBuffer(VertexBuffer* pBuffer) { m_pVertexBuffer = pBuffer; }

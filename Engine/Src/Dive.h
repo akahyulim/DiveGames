@@ -50,6 +50,7 @@
 
 // Scene
 #include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 #include "Scene/GameObject.h"
 #include "Scene/Components/Component.h"
 #include "Scene/Components/Transform.h"

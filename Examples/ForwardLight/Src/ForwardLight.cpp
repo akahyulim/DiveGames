@@ -10,7 +10,6 @@ namespace ForwardLight
 {
 	ForwardLight::ForwardLight()
 		: Dive::Application()
-		, m_pScene(nullptr)
 		, m_pMainCam(nullptr)
 		, m_pCube(nullptr)
 		, m_pTriangle(nullptr)
@@ -43,10 +42,11 @@ namespace ForwardLight
 	{
 		// create scene
 		{
-			m_pScene = new Dive::Scene;
+			Dive::Scene* pScene = Dive::SceneManager::CreateScene("ForwardLight World");
+			Dive::SceneManager::SetActiveScene(pScene);
 
 			// main camera
-			m_pMainCam = m_pScene->CreateGameObject("MainCam");
+			m_pMainCam = pScene->CreateGameObject("MainCam");
 			auto pCamCom = m_pMainCam->AddComponent<Dive::Camera>();
 			pCamCom->SetBackgroundColor(0.1f, 0.1f, 0.1f, 1.0f);
 			m_pMainCam->GetTransform()->SetPosition(0.0f, 5.0f, -30.0f);
@@ -101,28 +101,28 @@ namespace ForwardLight
 				Dive::ResourceManager::AddManualResource(pPlaneMaterial);
 
 				// tirangle gameobject
-				m_pTriangle = m_pScene->CreateGameObject("Triangle");
+				m_pTriangle = pScene->CreateGameObject("Triangle");
 				m_pTriangle->GetTransform()->SetPosition(5.0f, 5.0f, -10.0f);
 				auto pTriangleRenderableCom = m_pTriangle->AddComponent<Dive::Renderable>();
 				pTriangleRenderableCom->SetMesh(pTriangleMesh);
 				pTriangleRenderableCom->SetMaterial(pTriangleMaterial);
 
 				// cube gameobject
-				m_pCube = m_pScene->CreateGameObject("Cube");
+				m_pCube = pScene->CreateGameObject("Cube");
 				m_pCube->GetTransform()->SetPosition(-15.0f, 2.5f, 0.0f);
 				auto pCubeRenderableCom = m_pCube->AddComponent<Dive::Renderable>();
 				pCubeRenderableCom->SetMesh(pCubeMesh);
 				pCubeRenderableCom->SetMaterial(pCubeMaterial);
 
 				// sphere gameObject
-				m_pSphere = m_pScene->CreateGameObject("Sphere");
+				m_pSphere = pScene->CreateGameObject("Sphere");
 				m_pSphere->GetTransform()->SetPosition(0.0f, 5.0f, 10.0f);
 				auto pCSphereRenderableCom = m_pSphere->AddComponent<Dive::Renderable>();
 				pCSphereRenderableCom->SetMesh(pSphereMesh);
 				pCSphereRenderableCom->SetMaterial(pSphereMaterial);
 
 				// bottom gameobject
-				auto pBottom = m_pScene->CreateGameObject("Bottom");
+				auto pBottom = pScene->CreateGameObject("Bottom");
 				auto pBottomRenderableCom = pBottom->AddComponent<Dive::Renderable>();
 				pBottomRenderableCom->SetMesh(pPlaneMesh);
 				pBottomRenderableCom->SetMaterial(pPlaneMaterial);
@@ -131,7 +131,7 @@ namespace ForwardLight
 			// lights
 			{
 				// Directional Light
-				m_pDirLightA = m_pScene->CreateGameObject("DirectionalLightA");
+				m_pDirLightA = pScene->CreateGameObject("DirectionalLightA");
 				auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
 				pDirLightCom->SetColor(0.9f, 0.9f, 0.9f);
 				pDirLightCom->SetType(Dive::eLightType::Directional);
@@ -139,21 +139,21 @@ namespace ForwardLight
 				
 				// PointLights
 				{
-					m_pPointLightA = m_pScene->CreateGameObject("PointLightA");
+					m_pPointLightA = pScene->CreateGameObject("PointLightA");
 					m_pPointLightA->GetTransform()->SetPosition(0.0f, 5.0f, -15.0f);
 					auto pPointLightCom = m_pPointLightA->AddComponent<Dive::Light>();
 					pPointLightCom->SetType(Dive::eLightType::Point);
 					pPointLightCom->SetRange(30.0f);
 					pPointLightCom->SetColor(1.0f, 0.0f, 0.0f);
 
-					m_pPointLightB = m_pScene->CreateGameObject("PointLightB");
+					m_pPointLightB = pScene->CreateGameObject("PointLightB");
 					m_pPointLightB->GetTransform()->SetPosition(-10.0f, 5.0f, 15.0f);
 					pPointLightCom = m_pPointLightB->AddComponent<Dive::Light>();
 					pPointLightCom->SetType(Dive::eLightType::Point);
 					pPointLightCom->SetRange(30.0f);
 					pPointLightCom->SetColor(0.0f, 1.0f, 0.0f);
 
-					m_pPointLightC = m_pScene->CreateGameObject("PointLightC");
+					m_pPointLightC = pScene->CreateGameObject("PointLightC");
 					m_pPointLightC->GetTransform()->SetPosition(10.0f, 5.0f, 15.0f);
 					pPointLightCom = m_pPointLightC->AddComponent<Dive::Light>();
 					pPointLightCom->SetType(Dive::eLightType::Point);
@@ -163,7 +163,7 @@ namespace ForwardLight
 				
 				// SpotLights
 				{
-					m_pSpotLightA = m_pScene->CreateGameObject("SpotLightA");
+					m_pSpotLightA = pScene->CreateGameObject("SpotLightA");
 					m_pSpotLightA->GetTransform()->SetPosition(0.0f, 20.0f, -30.0f);
 					auto pSpotLightCom = m_pSpotLightA->AddComponent<Dive::Light>();
 					pSpotLightCom->SetType(Dive::eLightType::Spot);
@@ -172,7 +172,7 @@ namespace ForwardLight
 					pSpotLightCom->SetLookAt(0.0f, 10.0f, 0.0f);
 					pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
 
-					m_pSpotLightB = m_pScene->CreateGameObject("SpotLightB");
+					m_pSpotLightB = pScene->CreateGameObject("SpotLightB");
 					m_pSpotLightB->GetTransform()->SetPosition(30.0f, 20.0f, 0.0f);
 					pSpotLightCom = m_pSpotLightB->AddComponent<Dive::Light>();
 					pSpotLightCom->SetType(Dive::eLightType::Spot);
@@ -181,7 +181,7 @@ namespace ForwardLight
 					pSpotLightCom->SetLookAt(0.0f, 10.0f, 0.0f);
 					pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
 
-					m_pSpotLightC = m_pScene->CreateGameObject("SpotLightC");
+					m_pSpotLightC = pScene->CreateGameObject("SpotLightC");
 					m_pSpotLightC->GetTransform()->SetPosition(-30.0f, 20.0f, 0.0f);
 					pSpotLightCom = m_pSpotLightC->AddComponent<Dive::Light>();
 					pSpotLightCom->SetType(Dive::eLightType::Spot);
@@ -195,7 +195,9 @@ namespace ForwardLight
 
 		// setup renderLayer
 		{
-			auto pViewScreen = new Dive::ViewScreen(m_pScene, m_pMainCam->GetComponent<Dive::Camera>());
+			// 실제로는 Scene을 전달할 필요가 없다.
+			// ViewScreen 내부에서 ActiveScene을 획득하여 사용할 것이다.
+			auto pViewScreen = new Dive::ViewScreen(m_pMainCam->GetComponent<Dive::Camera>());
 			Dive::Renderer::SetViewScreen(0, pViewScreen);
 		}
 
@@ -203,11 +205,15 @@ namespace ForwardLight
 		{
 			SUBSCRIBE_EVENT(Dive::eEventType::PostUpdate, EVENT_HANDLER_PARAM(HandleUpdate));
 		}
+
+		// test
+		{
+			auto pHelmet = Dive::ResourceManager::GetResource<Dive::Mesh>("Assets/Models/damaged_helmet/DamagedHelmet.gltf");
+		}
 	}
 	
 	void ForwardLight::OnStop()
 	{
-		DV_DELETE(m_pScene);
 	}
 
 	void ForwardLight::HandleUpdate(const Dive::Event& e)

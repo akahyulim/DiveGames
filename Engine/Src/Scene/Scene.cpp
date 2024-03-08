@@ -10,10 +10,12 @@ namespace Dive
 	static constexpr uint64_t FIRST_ID = 0x1;
 	static constexpr uint64_t LAST_ID = 0xffffffffffffffff;
 
-	Scene::Scene(const std::string& name)
-		: m_Name(name)
+	Scene::Scene(int index, const std::string& name)
+		: m_Index(index)
+		, m_Name(name)
 		, m_CurGameObjectID(FIRST_ID)
 		, m_bDirty(true)
+		, m_bLoaded(false)
 	{
 	}
 
@@ -21,7 +23,7 @@ namespace Dive
 	{
 		Clear();
 
-		DV_CORE_TRACE("¾À({:s}) ¼Ò¸ê", m_Name);
+		DV_CORE_TRACE("¾À(index: {0:d}, name: {1:s}) ¼Ò¸ê", m_Index, m_Name);
 	}
 	
 	void Scene::Clear()
@@ -31,6 +33,20 @@ namespace Dive
 			DV_DELETE(it->second);
 		m_GameObjects.clear();
 		m_CurGameObjectID = FIRST_ID;
+
+		m_bLoaded = false;
+	}
+
+	bool Scene::LoadFromFile(const std::string& fileName)
+	{
+		m_bLoaded = true;
+
+		return true;
+	}
+
+	bool Scene::SaveToFile(const std::string& fileName)
+	{
+		return false;
 	}
 
 	GameObject* Scene::CreateGameObject(const std::string& name)

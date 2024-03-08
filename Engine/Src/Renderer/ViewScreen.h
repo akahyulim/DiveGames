@@ -26,24 +26,22 @@ namespace Dive
 
 	};
 
-	// sparky는 layer를 layer2d, layer3d로 구체화했다.
-	// 그리고 각각의 객체는 renderpath를 render2d, render3d(forwardrenderer, deferredrenderer)를 사용한다.
+	// 아무래도 이건 유니티 혹은 sparky의 Layer가 어울린다.
+	// 추후 더 생각해보자.
 	class ViewScreen
 	{
 	public:
-		ViewScreen(Scene* pScene, Camera* pCamera, eRenderPath renderPath = eRenderPath::Forward);
+		ViewScreen(Camera* pCamera, eRenderPath renderPath = eRenderPath::Forward);
 
 		void Update();
 		void Render();
-
-		Scene* GetScene() { return m_pScene; }
 
 	private:
 		void forwardRender();
 		void deferredRender();
 
 	private:
-		Scene* m_pScene;
+		Scene* m_pActiveScene;
 		Camera* m_pCamera;
 		eRenderPath m_RenderPath;
 

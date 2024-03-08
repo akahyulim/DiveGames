@@ -14,7 +14,7 @@ namespace Dive
 
 	public:
 		Material();
-		~Material();
+		~Material() override;
 
 		bool LoadFromFile(const std::string& fileName) override;
 		bool SaveToFile(const std::string& fileName) override;

@@ -4,7 +4,7 @@
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Core/CoreDefs.h"
-#include "Core/Log.h"
+#include "Resource/Importer/ModelLoader.h"
 
 namespace Dive
 {
@@ -28,6 +28,20 @@ namespace Dive
 
 		DV_CORE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
 			GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
+	}
+
+	bool Mesh::LoadFromFile(const std::string& fileName)
+	{
+		// Scene을 전달할 수 없다.
+		if (!ModelLoader::Load(this, fileName))
+			return false;
+
+		return true;
+	}
+
+	bool Mesh::SaveToFile(const std::string& fileName)
+	{
+		return true;
 	}
 	
 	// 현재 urho3d의 Geometry::Draw와 완전히 같다.

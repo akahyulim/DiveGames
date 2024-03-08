@@ -2,11 +2,12 @@
 #include "Engine.h"
 #include "CoreDefs.h"
 #include "Timer.h"
+#include "CoreEvents.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
 #include "Resource/ResourceManager.h"
 #include "Input/Input.h"
-#include "CoreEvents.h"
+#include "Scene/SceneManager.h"
 
 namespace Dive
 {
@@ -33,6 +34,7 @@ namespace Dive
 
 	void Engine::Shutdown()
 	{
+		SceneManager::Shutdown();
 		ResourceManager::Shutdown();
 		Renderer::Shutdown();
 		Graphics::Shutdown();

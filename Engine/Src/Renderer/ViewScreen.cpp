@@ -7,6 +7,7 @@
 #include "Graphics/ConstantBuffer.h"
 #include "Core/CoreDefs.h"
 #include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 #include "Scene/GameObject.h"
 #include "Scene/Components/Transform.h"
 #include "Scene/Components/Camera.h"
@@ -16,11 +17,12 @@
 
 namespace Dive
 {
-	ViewScreen::ViewScreen(Scene* pScene, Camera* pCamera, eRenderPath renderPath)
-		: m_pScene(pScene)
-		, m_pCamera(pCamera)
+	ViewScreen::ViewScreen(Camera* pCamera, eRenderPath renderPath)
+		: m_pCamera(pCamera)
 		, m_RenderPath(renderPath)
 	{
+		m_pActiveScene = SceneManager::GetActiveScene();
+
 		// 임시: create constant buffer 
 		ZeroMemory(&m_cpuFrameBuffer, sizeof(m_cpuFrameBuffer));
 		ZeroMemory(&m_cpuMaterialBuffer,sizeof(m_cpuMaterialBuffer));
@@ -30,7 +32,7 @@ namespace Dive
 
 	void ViewScreen::Update()
 	{
-		if (m_pScene->IsEmpty())
+		if (!m_pActiveScene || m_pActiveScene->IsEmpty())
 			return;
 
 		m_Renderables.clear();
@@ -47,7 +49,7 @@ namespace Dive
 
 		// GetDrawables()
 		{
-			for (auto pGameObject : m_pScene->GetAllGameObjects())
+			for (auto pGameObject : m_pActiveScene->GetAllGameObjects())
 			{
 				auto pRenderableCom = pGameObject->GetComponent<Renderable>();
 				if (pRenderableCom)
@@ -113,6 +115,8 @@ namespace Dive
 		{
 			// 뷰포트
 			// 일단 제외시켰지만 카메라가 특정 부분을 비출 수 있어야 한다.
+			// => 이게 결국 ViewRect아닌가? 현재 오락가락한다.
+			// => 그런데 애초에 urho에서 이름이 Viewport다.
 			//Graphics::SetViewport(m_pCamera->GetViewport());
 
 			{

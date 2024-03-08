@@ -19,7 +19,7 @@ namespace Dive
 
 	public:
 		Shader();
-		~Shader();
+		~Shader() override;
 
 		bool LoadFromFile(const std::string& fileName) override;
 		bool CreateInputLayout(eVertexLayout layout);

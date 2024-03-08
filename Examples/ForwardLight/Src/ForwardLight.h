@@ -17,7 +17,6 @@ namespace ForwardLight
 
 	private:
 	private:
-		Dive::Scene* m_pScene;
 		Dive::GameObject* m_pMainCam;
 
 		Dive::GameObject* m_pCube;
