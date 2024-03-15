@@ -14,7 +14,7 @@ namespace Dive
 
 	class Light : public Component
 	{
-		DV_OBJECT(Light, Component);
+		DV_CLASS(Light, Component);
 	
 	public:
 		Light(GameObject* pGameObject);

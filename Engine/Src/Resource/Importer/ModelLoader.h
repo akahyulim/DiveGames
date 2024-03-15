@@ -8,15 +8,30 @@
 
 namespace Dive
 {
+	class Model;
 	class Scene;
 	class GameObject;
+	class Material;
+	class Texture2D;
 
 	class ModelLoader
 	{
 	public:
-
+		static bool Load(Model* pModel, const std::string& fileName);
 
 	private:
+		static void parseNode(const aiNode* pNode, GameObject* pParent = nullptr);
+		static void parseMesh(const aiMesh* pMesh, GameObject* pMeshNodeObject);
+		static Material* loadMaterial(const aiMesh* pMesh);
+		static Texture2D* loadEmbeddedTexture(const aiTexture* pTexture);
+
 	private:
+		static const aiScene* s_aiScene;
+
+		static std::string s_FileName;
+		static std::string s_ModelName;
+
+		static Scene* s_pActiveScene;
+		static Model* s_pModel;
 	};
 }

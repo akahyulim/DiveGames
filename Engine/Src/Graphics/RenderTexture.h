@@ -7,7 +7,7 @@ namespace Dive
 	// rtv or dsv 선택 제공
 	class RenderTexture : public Texture
 	{
-		DV_OBJECT(RenderTexture, Texture);
+		DV_CLASS(RenderTexture, Texture);
 
 	public:
 		RenderTexture();

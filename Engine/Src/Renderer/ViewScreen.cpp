@@ -38,69 +38,35 @@ namespace Dive
 		m_Renderables.clear();
 		m_Lights.clear();
 
-		m_RenderableBatches.clear();
-		m_LightBatches.clear();
-
 		// 임시
 		ZeroMemory(&m_cpuFrameBuffer, sizeof(m_cpuFrameBuffer));
 		ZeroMemory(&m_cpuMaterialBuffer, sizeof(m_cpuMaterialBuffer));
 		ZeroMemory(&m_cpuCameraBuffer, sizeof(m_cpuCameraBuffer));
 		ZeroMemory(&m_cpuLightBuffer, sizeof(m_cpuLightBuffer));
 
-		// GetDrawables()
+		for (auto pGameObject : m_pActiveScene->GetAllGameObjects())
 		{
-			for (auto pGameObject : m_pActiveScene->GetAllGameObjects())
+			auto pRenderableCom = pGameObject->GetComponent<Renderable>();
+			if (pRenderableCom)
 			{
-				auto pRenderableCom = pGameObject->GetComponent<Renderable>();
-				if (pRenderableCom)
-				{
-					m_Renderables.push_back(pRenderableCom);
-					continue;
-				}
-
-				auto pLightCom = pGameObject->GetComponent<Light>();
-				if (pLightCom)
-				{
-					m_Lights.push_back(pLightCom);
-					continue;
-				}
+				m_Renderables.push_back(pRenderableCom);
+				continue;
 			}
 
-		}
-
-		// GetBatches()
-		{
-			for (auto pRenderable : m_Renderables)
+			auto pLightCom = pGameObject->GetComponent<Light>();
+			if (pLightCom)
 			{
-				RenderableBatch batch;
-				batch.pMesh = pRenderable->GetMesh();
-				batch.pMaterial = pRenderable->GetMaterial();
-				batch.worldTransform = pRenderable->GetTransform()->GetWorldMatrix();
-
-				m_RenderableBatches.emplace_back(batch);
+				m_Lights.push_back(pLightCom);
+				continue;
 			}
-		}
+		}	
 	}
 	
 	void ViewScreen::Render()
 	{
-		switch (m_RenderPath)
-		{
-		case eRenderPath::Forward:
-			forwardRender();
-			return;
-		case eRenderPath::Deferred:
-			deferredRender();
-			return;
-		default:
-			DV_CORE_ERROR("정의되지 않은 렌더패스는 수행할 수 없습니다.");
-			return;
-		}
+		forwardRender();
 	}
 
-	// 일단 한 곳에서 쭉 구성해보고
-	// 추후엔 draw call별로 함수화 시켜야할 듯 하다.
-	// command list를 적용할 것이라면 더 그래야 한다.
 	void ViewScreen::forwardRender()
 	{
 		// set & clear rendertarget
@@ -147,8 +113,8 @@ namespace Dive
 			{
 				Graphics::SetRasterizerState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
 				// 생각해보니 현재는 여기에서 연결해도 된다.
-				Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
-				Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
+				//Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
+				//Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
 			}
 		}
 
@@ -194,43 +160,36 @@ namespace Dive
 				// eState를 전달하면 Graphics의 해당 함수 내부에서 Renderer를 통해 설정해도 되지 않을까?
 				// 아니, 그냥 Graphics에서 생성하고 관리하면 안되나..?
 				// 2. 이 부분때문에 Light 꺼도 결과가 이상해진다.
-				//if (i == 0)
-				//	Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
-				//else if (i >= 1)
-				//	Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
+				if (i == 0)
+					Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
+				else if (i >= 1)
+					Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
 
 				// draw opaque
 				{
-					for (auto& renderableBatch : m_RenderableBatches)
+					for (auto pRenderable : m_Renderables)
 					{
-						// urho의 Batch::Draw()
-						{
-							// urho의 Batch::Prepare()
-							{
-								m_cpuFrameBuffer.world = DirectX::XMMatrixTranspose(renderableBatch.worldTransform);
+						m_cpuFrameBuffer.world = DirectX::XMMatrixTranspose(pRenderable->GetTransform()->GetWorldMatrix());
 
-								auto pFrameBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Frame);
-								pFrameBuffer->Update((void*)&m_cpuFrameBuffer);
-								pFrameBuffer->Bind();	// 셰이더 타입별 바인드 및 슬롯 관리때문에 이 방법이 더 편하다...
+						auto pFrameBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Frame);
+						pFrameBuffer->Update((void*)&m_cpuFrameBuffer);
+						pFrameBuffer->Bind();	// 셰이더 타입별 바인드 및 슬롯 관리때문에 이 방법이 더 편하다...
 
-								auto pShader = renderableBatch.pMaterial->GetShader();
-								Graphics::SetShader(pShader);
+						auto pShader = pRenderable->GetMaterial()->GetShader();
+						Graphics::SetShader(pShader);
 
-								m_cpuMaterialBuffer.diffuseColor = renderableBatch.pMaterial->GetDiffuseColor();
-								m_cpuMaterialBuffer.properties = 0;
-								m_cpuMaterialBuffer.properties |= renderableBatch.pMaterial->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
+						m_cpuMaterialBuffer.diffuseColor = pRenderable->GetMaterial()->GetDiffuseColor();
+						m_cpuMaterialBuffer.properties = 0;
+						m_cpuMaterialBuffer.properties |= pRenderable->GetMaterial()->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
 
-								auto pMaterialBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Material);
-								pMaterialBuffer->Update((void*)&m_cpuMaterialBuffer);
-								pMaterialBuffer->Bind();
+						auto pMaterialBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Material);
+						pMaterialBuffer->Update((void*)&m_cpuMaterialBuffer);
+						pMaterialBuffer->Bind();
 
-								Graphics::SetTexture(eTextureUnit::Diffuse, renderableBatch.pMaterial->GetTexture(eTextureUnit::Diffuse));
-							}
+						Graphics::SetTexture(eTextureUnit::Diffuse, pRenderable->GetMaterial()->GetTexture(eTextureUnit::Diffuse));
 
-							// urho의 Geometry::Draw()
-							renderableBatch.pMesh->Draw();
-
-						}
+						// 사실 위의 내용도 여기에서 다 처리할 수 있는데...
+						pRenderable->Draw();
 					}
 				}
 			}
@@ -239,7 +198,7 @@ namespace Dive
 			Graphics::SetBlendState(NULL);
 		}
 	}
-	
+
 	void ViewScreen::deferredRender()
 	{
 		// set & clear g buffer

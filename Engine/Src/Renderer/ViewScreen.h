@@ -11,21 +11,6 @@ namespace Dive
 	class Mesh;
 	class Material;
 
-	// urho처럼 하려면 이게 batch와 같이 함수를 지닌 클래스여야 한다.
-	struct RenderableBatch
-	{
-		// camera distance
-		DirectX::XMMATRIX worldTransform;
-		Mesh* pMesh;
-		// mesh type
-		Material* pMaterial;
-	};
-
-	struct LightBatch
-	{
-
-	};
-
 	// 아무래도 이건 유니티 혹은 sparky의 Layer가 어울린다.
 	// 추후 더 생각해보자.
 	class ViewScreen
@@ -47,9 +32,6 @@ namespace Dive
 
 		std::vector<Renderable*> m_Renderables;
 		std::vector<Light*> m_Lights;
-
-		std::vector<RenderableBatch> m_RenderableBatches;
-		std::vector<LightBatch> m_LightBatches;
 
 		FrameBuffer m_cpuFrameBuffer;
 		MaterialBuffer m_cpuMaterialBuffer;

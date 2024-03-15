@@ -5,32 +5,55 @@ namespace Dive
 {
 	class VertexBuffer;
 	class IndexBuffer;
+    struct VertexStatic;
+    class GameObject;
 
-	class Mesh : public Resource
+	class Mesh
 	{
-		DV_OBJECT(Mesh, Resource);
+    public:
+        Mesh();
+        ~Mesh();
 
-	public:
-		Mesh() = default;
-		Mesh(VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer);
-		Mesh(const std::string& name, VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer);
-		~Mesh() override;
+        void Clear();
 
-		bool LoadFromFile(const std::string& fileName) override;
-		bool SaveToFile(const std::string& fileName) override;
+        void GetGeometry(
+            uint32_t vertexOffset,
+            uint32_t vertexCount,
+            uint32_t indexOffset,
+            uint32_t indexCount,
+            std::vector<uint32_t>* indices,
+            std::vector<VertexStatic>* vertices
+        );
 
-		VertexBuffer* GetVertexBuffer() const { return m_pVertexBuffer; }		
-		void SetVertexBuffer(VertexBuffer* pBuffer) { m_pVertexBuffer = pBuffer; }
+        void AddVertices(const std::vector<VertexStatic>& vertices, uint32_t* pOutVertexOffset = nullptr);
+        void AddIndices(const std::vector<uint32_t>& indices, uint32_t* pOutIndexOffset = nullptr);
 
-		IndexBuffer* GetIndexBuffer() const { return m_pIndexBuffer; }
-		void SetIndexBuffer(IndexBuffer* pBuffer) { m_pIndexBuffer = pBuffer; }
+        std::string GetName() const { return m_Name; }
+        void SetName(const std::string& name) { m_Name = name; }
 
-		void Draw(D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        std::vector<VertexStatic>& GetVertices() { return m_Vertices; }
+        std::vector<uint32_t>& GetIndices() { return m_Indices; }
 
-	private:
-		VertexBuffer* m_pVertexBuffer;
-		IndexBuffer* m_pIndexBuffer;
+        uint32_t GetVertexCount() const;
+        uint32_t GetIndexCount() const;
+
+        void CreateGpuBuffers();
+        IndexBuffer* GetIndexBuffer() { return m_pIndexBuffer; }
+        VertexBuffer* GetVertexBuffer() { return m_pVertexBuffer; }
+
+        // mesh로부터 gameObject와 renderer까지 접근할 수 있다.
+        GameObject* GetGameObject() const { return m_pGameObject; }
+        void SetGameObject(GameObject* pGameObject) { m_pGameObject = pGameObject; }
+
+    private:
+        std::string m_Name;
+
+        std::vector<VertexStatic> m_Vertices;
+        std::vector<uint32_t> m_Indices;
+
+        VertexBuffer* m_pVertexBuffer;
+        IndexBuffer* m_pIndexBuffer;
+
+        GameObject* m_pGameObject;
 	};
-
-	Mesh* CreateMesh(const std::string& name, VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer);
 }

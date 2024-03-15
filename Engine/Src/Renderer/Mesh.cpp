@@ -1,6 +1,7 @@
 #include "DivePch.h"
 #include "Mesh.h"
 #include "Graphics/Graphics.h"
+#include "Graphics/GraphicsDefs.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Core/CoreDefs.h"
@@ -8,67 +9,88 @@
 
 namespace Dive
 {
-	Mesh::Mesh(VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer)
-		: m_pVertexBuffer(pVertexBuffer)
-		, m_pIndexBuffer(pIndexBuffer)
+	Mesh::Mesh()
+		: m_pVertexBuffer(nullptr)
+		, m_pIndexBuffer(nullptr)
+		, m_pGameObject(nullptr)
 	{
+
 	}
 
-	Mesh::Mesh(const std::string& name, VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer)
-		: m_pVertexBuffer(pVertexBuffer)
-		, m_pIndexBuffer(pIndexBuffer)
-	{
-		SetName(name);
-	}
-	
 	Mesh::~Mesh()
 	{
-		DV_DELETE(m_pIndexBuffer);
+		Clear();
+	}
+
+	void Mesh::Clear()
+	{
+		m_Vertices.clear();
+		m_Vertices.shrink_to_fit();
 		DV_DELETE(m_pVertexBuffer);
 
-		DV_CORE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
-			GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
+		m_Indices.clear();
+		m_Indices.shrink_to_fit();
+		DV_DELETE(m_pIndexBuffer);
 	}
 
-	bool Mesh::LoadFromFile(const std::string& fileName)
+	void Mesh::GetGeometry(uint32_t vertexOffset, uint32_t vertexCount,  uint32_t indexOffset, uint32_t indexCount,
+		std::vector<uint32_t>* indices, std::vector<VertexStatic>* vertices)
 	{
-		// Scene을 전달할 수 없다.
-		if (!ModelLoader::Load(this, fileName))
-			return false;
-
-		return true;
-	}
-
-	bool Mesh::SaveToFile(const std::string& fileName)
-	{
-		return true;
-	}
-	
-	// 현재 urho3d의 Geometry::Draw와 완전히 같다.
-	void Mesh::Draw(D3D11_PRIMITIVE_TOPOLOGY topology)
-	{	
-		if (m_pIndexBuffer && m_pIndexBuffer->GetCount() > 0)
+		if (vertices)
 		{
-			Graphics::SetVertexBuffer(m_pVertexBuffer);
-			Graphics::SetIndexBuffer(m_pIndexBuffer);
-			Graphics::DrawIndexed(topology, m_pIndexBuffer->GetCount(), 0);
+			DV_CORE_ASSERT(vertexCount != 0);
+
+			const auto vertex_first = m_Vertices.begin() + vertexOffset;
+			const auto vertex_last = m_Vertices.begin() + vertexOffset + vertexCount;
+			*vertices = std::vector<VertexStatic>(vertex_first, vertex_last);
 		}
-		else if (m_pVertexBuffer->GetCount() > 0)
+		if (indices)
 		{
-			Graphics::SetVertexBuffer(m_pVertexBuffer);
-			Graphics::Draw(topology, m_pVertexBuffer->GetCount(), 0);
+			DV_CORE_ASSERT(indexCount != 0);
+			
+			const auto index_first = m_Indices.begin() + indexOffset;
+			const auto index_last = m_Indices.begin() + indexOffset + indexCount;
+			*indices = std::vector<uint32_t>(index_first, index_last);
 		}
 	}
 
-	Mesh* CreateMesh(const std::string& name, VertexBuffer* pVertexBuffer, IndexBuffer* pIndexBuffer)
+	void Mesh::AddVertices(const std::vector<VertexStatic>& vertices, uint32_t* pOutVertexOffset)
 	{
-		if (!pVertexBuffer)
+		if (pOutVertexOffset)
 		{
-			DV_CORE_ERROR("버텍스 버퍼가 존재하지 않아 메시를 생성할 수 없습니다.");
-			return nullptr;
+			*pOutVertexOffset = static_cast<uint32_t>(m_Vertices.size());
 		}
 
-		return new Mesh(name, pVertexBuffer, pIndexBuffer);
+		m_Vertices.insert(m_Vertices.end(), vertices.begin(), vertices.end());
 	}
-};
+
+	void Mesh::AddIndices(const std::vector<uint32_t>& indices, uint32_t* pOutIndexOffset)
+	{
+		if (pOutIndexOffset)
+		{
+			*pOutIndexOffset = static_cast<uint32_t>(m_Indices.size());
+		}
+
+		m_Indices.insert(m_Indices.end(), indices.begin(), indices.end());
+	}
+
+	uint32_t Mesh::GetVertexCount() const 
+	{
+		return static_cast<uint32_t>(m_Vertices.size());
+	}
+
+	uint32_t Mesh::GetIndexCount() const 
+	{
+		return static_cast<uint32_t>(m_Indices.size());
+	}
+
+	void Mesh::CreateGpuBuffers()
+	{
+		if(!m_Vertices.empty())
+			m_pVertexBuffer = VertexBuffer::Create(m_Vertices.data(), sizeof(VertexStatic), (uint32_t)m_Vertices.size());
+
+		if(!m_Indices.empty())
+			m_pIndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32_t)m_Indices.size());
+	}
+}
 

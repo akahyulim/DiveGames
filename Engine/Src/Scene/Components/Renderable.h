@@ -6,25 +6,44 @@ namespace Dive
 	class GameObejct;
 	class Material;
 	class Mesh;
+	class VertexBuffer;
+	class IndexBuffer;
 
 	class Renderable : public Component
 	{
-		DV_OBJECT(Renderable, Component);
+		DV_CLASS(Renderable, Component);
 
 	public:
 		Renderable(GameObject* pGameObject);
 		~Renderable() override;
 
-		 bool HasMaterial() const { return m_pMaterial; }
-		 Material* GetMaterial() const { return m_pMaterial; }
-		 void SetMaterial(Material* pMaterial) { m_pMaterial = pMaterial; }
+		void SetGeometry(Mesh* pMesh, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount);
 
-		 Mesh* GetMesh() { return m_pMesh; }
-		 void SetMesh(Mesh* pMesh) { m_pMesh = pMesh; }
+		bool HasMaterial() const { return m_pMaterial; }
+		Material* GetMaterial() const { return m_pMaterial; }
+		void SetMaterial(Material* pMaterial) { m_pMaterial = pMaterial; }
+
+		Mesh* GetMesh() { return m_pMesh; }
+
+		VertexBuffer* GetVertexBuffer() const;
+		uint32_t GetVertexOffset() const { return m_VertexOffset; }
+		uint32_t GetVertexCount() const { return m_VertexCount; }
+
+		IndexBuffer* GetIndexBuffer() const;
+		uint32_t GetIndexOffset() const { return m_IndexOffset; }
+		uint32_t GetIndexCount() const { return m_IndexCount; }
+
+		void Draw(D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	private:
+
 	private:
-		Material* m_pMaterial;
 		Mesh* m_pMesh;
+		Material* m_pMaterial;
+
+		uint32_t m_VertexOffset;
+		uint32_t m_VertexCount;
+		uint32_t m_IndexOffset;
+		uint32_t m_IndexCount;
 	};
 }

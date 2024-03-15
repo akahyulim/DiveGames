@@ -50,7 +50,7 @@ namespace Dive
 		return IsTypeOf(T::GetTypeInfoStatic());
 	}
 
-#define DV_OBJECT(typeName, baseTypeName) \
+#define DV_CLASS(typeName, baseTypeName) \
 	public: \
 		virtual size_t GetTypeHash() const override { return GetTypeInfoStatic()->GetTypeHash(); }	\
 		virtual const std::string& GetTypeName() const override { return GetTypeInfoStatic()->GetTypeName(); }	\

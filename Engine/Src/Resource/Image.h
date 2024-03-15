@@ -8,7 +8,7 @@ namespace Dive
 	// 그리고 Model, Mesh의 관계처럼 리소스일 필요가 있을까?
 	class Image : public Resource
 	{
-		DV_OBJECT(Image, Resource);
+		DV_CLASS(Image, Resource);
 
 	public:
 		Image();

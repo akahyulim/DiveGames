@@ -32,6 +32,9 @@ namespace Dive
 
 		Transform* GetTransform() const { return m_pTransform; }
 
+		GameObject* GetParentGameObject() const;
+		void SetParentGameObject(GameObject* pGameObject);
+
 	private:
 		Scene* m_pScene;
 		bool m_bActive;

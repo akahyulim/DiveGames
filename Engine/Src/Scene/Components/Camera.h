@@ -15,7 +15,7 @@ namespace Dive
 			Orthographic
 		};
 
-		DV_OBJECT(Camera, Component);
+		DV_CLASS(Camera, Component);
 
 	public:
 		Camera(GameObject* pGameObject);

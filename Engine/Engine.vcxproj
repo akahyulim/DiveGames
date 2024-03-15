@@ -177,7 +177,8 @@
     <ClInclude Include="Src\Math\Math.h" />
     <ClInclude Include="Src\Renderer\Material.h" />
     <ClInclude Include="Src\Renderer\Mesh.h" />
-    <ClInclude Include="Src\Renderer\MeshFactory.h" />
+    <ClInclude Include="Src\Renderer\ModelFactory.h" />
+    <ClInclude Include="Src\Renderer\Model.h" />
     <ClInclude Include="Src\Renderer\Renderer.h" />
     <ClInclude Include="Src\Renderer\RendererDefs.h" />
     <ClInclude Include="Src\Renderer\ViewScreen.h" />
@@ -192,6 +193,7 @@
     <ClInclude Include="Src\Scene\Components\Renderable.h" />
     <ClInclude Include="Src\Scene\GameObject.h" />
     <ClInclude Include="Src\Scene\Scene.h" />
+    <ClInclude Include="Src\Scene\SceneManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Core\Engine.cpp" />
@@ -217,7 +219,8 @@
     <ClCompile Include="Src\Math\Math.cpp" />
     <ClCompile Include="Src\Renderer\Material.cpp" />
     <ClCompile Include="Src\Renderer\Mesh.cpp" />
-    <ClCompile Include="Src\Renderer\MeshFactory.cpp" />
+    <ClCompile Include="Src\Renderer\ModelFactory.cpp" />
+    <ClCompile Include="Src\Renderer\Model.cpp" />
     <ClCompile Include="Src\Renderer\Renderer.cpp" />
     <ClCompile Include="Src\Renderer\ViewScreen.cpp" />
     <ClCompile Include="Src\Resource\Image.cpp" />
@@ -231,6 +234,7 @@
     <ClCompile Include="Src\Scene\Components\Renderable.cpp" />
     <ClCompile Include="Src\Scene\GameObject.cpp" />
     <ClCompile Include="Src\Scene\Scene.cpp" />
+    <ClCompile Include="Src\Scene\SceneManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

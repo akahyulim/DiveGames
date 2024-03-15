@@ -8,7 +8,7 @@ namespace Dive
 {
 	class Texture : public Resource
 	{
-		DV_OBJECT(Texture, Resource);
+		DV_CLASS(Texture, Resource);
 
 	public:
 		Texture();

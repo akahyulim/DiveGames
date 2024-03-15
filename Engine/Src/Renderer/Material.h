@@ -10,7 +10,7 @@ namespace Dive
 	// 현재는 legacy다. 추후 pbs가 추가될 수 있다.
 	class Material : public Resource
 	{
-		DV_OBJECT(Material, Resource);
+		DV_CLASS(Material, Resource);
 
 	public:
 		Material();

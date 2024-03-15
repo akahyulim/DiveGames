@@ -207,6 +207,7 @@ namespace Dive
 		SetScale(XMLoadFloat3(&scale));
 	}
 
+	// 현재 이게 안먹힌다.
 	void Transform::SetScale(const DirectX::XMVECTOR& scale)
 	{
 		auto curScale = GetScaleVector();

@@ -25,10 +25,11 @@ namespace Dive
 
 	Transform* Component::GetTransform()
 	{
+		DV_CORE_ASSERT(m_pGameObject);
+
 		if (!m_pTransform)
 			m_pTransform = m_pGameObject->GetTransform();
 
-		DV_CORE_ASSERT(m_pTransform);
 		return m_pTransform;
 	}
 }

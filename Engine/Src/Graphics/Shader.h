@@ -15,7 +15,7 @@ namespace Dive
 	// 그리고 shader만 리소스를 상속한다.
 	class Shader : public Resource
 	{
-		DV_OBJECT(Shader, Resource);
+		DV_CLASS(Shader, Resource);
 
 	public:
 		Shader();

@@ -16,12 +16,16 @@ namespace ForwardLight
 		void HandleUpdate(const Dive::Event& e);
 
 	private:
+		void createGameObjects(Dive::Scene* pActiveScene);
+		void createLights(Dive::Scene* pActiveScene);
+
 	private:
 		Dive::GameObject* m_pMainCam;
 
 		Dive::GameObject* m_pCube;
 		Dive::GameObject* m_pTriangle;
 		Dive::GameObject* m_pSphere;
+		Dive::GameObject* m_pCar;
 
 		Dive::GameObject* m_pDirLightA;
 		Dive::GameObject* m_pPointLightA;

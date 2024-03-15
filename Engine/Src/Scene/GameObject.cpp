@@ -45,4 +45,14 @@ namespace Dive
 
 		return nullptr;
 	}
+
+	GameObject* GameObject::GetParentGameObject() const
+	{
+		return m_pTransform->GetParent() ? m_pTransform->GetParent()->GetGameObject() : nullptr;
+	}
+	
+	void GameObject::SetParentGameObject(GameObject* pGameObject)
+	{
+		m_pTransform->SetParent(pGameObject ? pGameObject->GetTransform() : nullptr);
+	}
 }

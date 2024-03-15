@@ -147,7 +147,7 @@
     <ClInclude Include="Src\Renderer\Mesh.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Renderer\MeshFactory.h">
+    <ClInclude Include="Src\Renderer\ModelFactory.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Src\Input\Input.h">
@@ -158,6 +158,12 @@
     </ClInclude>
     <ClInclude Include="Src\Core\Engine.h">
       <Filter>Src\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Scene\SceneManager.h">
+      <Filter>Src\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Renderer\Model.h">
+      <Filter>Src\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -254,7 +260,7 @@
     <ClCompile Include="Src\Renderer\Mesh.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Renderer\MeshFactory.cpp">
+    <ClCompile Include="Src\Renderer\ModelFactory.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="Src\Input\Input.cpp">
@@ -265,6 +271,12 @@
     </ClCompile>
     <ClCompile Include="Src\Core\Engine.cpp">
       <Filter>Src\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Scene\SceneManager.cpp">
+      <Filter>Src\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Renderer\Model.cpp">
+      <Filter>Src\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -27,9 +27,9 @@
 #include "Renderer/Renderer.h"
 #include "Renderer/ViewScreen.h"
 #include "Renderer/Mesh.h"
-#include "Renderer/MeshFactory.h"
+#include "Renderer/ModelFactory.h"
 #include "Renderer/Material.h"
-
+#include "Renderer/Model.h"
 
 // Input
 #include "Input/Input.h"
