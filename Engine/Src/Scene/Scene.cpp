@@ -3,7 +3,6 @@
 #include "GameObject.h"
 #include "Core/CoreDefs.h"
 #include "Components/Component.h"
-#include "Components/Transform.h"
 
 namespace Dive
 {
@@ -88,17 +87,15 @@ namespace Dive
 		{
 			if (it->first == id)
 			{
-				auto* pTransform = it->second->GetComponent<Transform>();
-				if (pTransform)
+				if (it->second->HasChild())
 				{
-					if (pTransform->HasChild())
+					for (auto* pChild : it->second->GetChildren())
 					{
-						for (auto* pChild : pTransform->GetChildren())
-							RemoveGameObjectByID(pChild->GetGameObject()->GetID());
+						RemoveGameObjectByID(pChild->GetID());
 					}
 
-					if (pTransform->HasParent())
-						pTransform->SetParent(nullptr);
+					if (!it->second->IsRoot())
+						it->second->SetParent(nullptr);
 				}
 
 				it->second->MarkRemoveTarget();
@@ -132,12 +129,8 @@ namespace Dive
 
 		auto it = m_GameObjects.begin();
 		for (it; it != m_GameObjects.end(); ++it)
-		{
-			auto pTransform = it->second->GetComponent<Transform>();
-			if (!pTransform)
-				continue;
-
-			if (pTransform->HasParent())
+		{	
+			if(it->second->IsRoot())
 				rootGameObjects.emplace_back(it->second);
 		}
 

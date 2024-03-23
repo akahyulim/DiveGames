@@ -4,7 +4,6 @@
 namespace Dive
 {
 	class GameObject;
-	class Transform;
 
 	class Component : public DvObject
 	{
@@ -19,10 +18,8 @@ namespace Dive
 		std::string GetName() const;
 
 		GameObject* GetGameObject() const;
-		Transform* GetTransform();
-
+		
 	protected:
 		GameObject* m_pGameObject;
-		Transform* m_pTransform;
 	};
 }

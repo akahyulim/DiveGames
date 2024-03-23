@@ -9,7 +9,7 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 #include "Scene/GameObject.h"
-#include "Scene/Components/Transform.h"
+//#include "Scene/Components/Transform.h"
 #include "Scene/Components/Camera.h"
 #include "Scene/Components/Renderable.h"
 #include "Scene/Components/Light.h"
@@ -135,12 +135,12 @@ namespace Dive
 					break;
 				case eLightType::Point:
 					m_cpuLightBuffer.options = (1U << 1);
-					m_cpuLightBuffer.position = light->GetTransform()->GetPosition();
+					m_cpuLightBuffer.position = light->GetGameObject()->GetPosition();
 					m_cpuLightBuffer.rangeRcp = 1.0f / light->GetRange();
 					break;
 				case eLightType::Spot:
 					m_cpuLightBuffer.options = (1U << 2);
-					m_cpuLightBuffer.position = light->GetTransform()->GetPosition();
+					m_cpuLightBuffer.position = light->GetGameObject()->GetPosition();
 					m_cpuLightBuffer.dirToLight = { -light->GetDirection().x, -light->GetDirection().y, -light->GetDirection().z };
 					m_cpuLightBuffer.rangeRcp = 1.0f / light->GetRange();
 					m_cpuLightBuffer.cosOuterCone = cosf(light->GetOuterAngleRadian());
@@ -169,7 +169,7 @@ namespace Dive
 				{
 					for (auto pRenderable : m_Renderables)
 					{
-						m_cpuFrameBuffer.world = DirectX::XMMatrixTranspose(pRenderable->GetTransform()->GetWorldMatrix());
+						m_cpuFrameBuffer.world = DirectX::XMMatrixTranspose(pRenderable->GetGameObject()->GetMatrix());
 
 						auto pFrameBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Frame);
 						pFrameBuffer->Update((void*)&m_cpuFrameBuffer);

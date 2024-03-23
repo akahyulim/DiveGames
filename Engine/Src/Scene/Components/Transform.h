@@ -5,6 +5,7 @@ namespace Dive
 {
 	class GameObject;
 
+	// 추후 GameObject에 포함시키자.
 	class Transform : public Component
 	{
 	public:
@@ -19,8 +20,6 @@ namespace Dive
 	public:
 		Transform(GameObject* pGameObject);
 		~Transform();
-
-		void Update() override;
 
 		DirectX::XMFLOAT3 GetPosition() const;
 		DirectX::XMVECTOR GetPositionVector() const;

@@ -53,7 +53,6 @@
 #include "Scene/SceneManager.h"
 #include "Scene/GameObject.h"
 #include "Scene/Components/Component.h"
-#include "Scene/Components/Transform.h"
 #include "Scene/Components/Camera.h"
 #include "Scene/Components/Light.h"
 #include "Scene/Components/Renderable.h"

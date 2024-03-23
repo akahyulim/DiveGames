@@ -1,6 +1,5 @@
 #include "DivePch.h"
 #include "Light.h"
-#include "Transform.h"
 #include "Core/CoreDefs.h"
 
 namespace Dive
@@ -37,7 +36,8 @@ namespace Dive
 		}
 		case eLightType::Spot:
 		{
-			vecDir = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&m_LookAt), GetTransform()->GetPositionVector());
+			vecDir = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&m_LookAt));
+			//vecDir = DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&m_LookAt), GetTransform()->GetPositionVector());
 			vecDir = DirectX::XMVector3Normalize(vecDir);
 			DirectX::XMStoreFloat3(&dir, vecDir);
 			break;

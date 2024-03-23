@@ -24,11 +24,6 @@ namespace Dive
 		DV_CORE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
 	}
 
-	void Transform::Update()
-	{
-		updateTransform();
-	}
-
 	DirectX::XMFLOAT3 Transform::GetPosition() const
 	{
 		return { m_WorldMatrix._41, m_WorldMatrix._42, m_WorldMatrix._43 };
@@ -379,6 +374,11 @@ namespace Dive
 					}
 				}
 				m_pParent = nullptr;
+
+				// 부모를 없앴다면 루트노드가 된다는 의미이고
+				// 그렇다면 worldPos가 localPos가 되어야 한다.
+				// 하지만 현재 updateTransform()은 local 기준으로 변환된다.
+				updateTransform();
 			}
 		}
 	}
@@ -464,6 +464,7 @@ namespace Dive
 		return forward;
 	}
 
+	// GetRotationMatrix, GetLocalRotationMatrix 둘 다 변환해봤지만 회전이 먹히지 않는다.
 	DirectX::XMVECTOR Transform::GetForwardVector() const
 	{
 		return XMVector3Transform(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), GetRotationMatrix());

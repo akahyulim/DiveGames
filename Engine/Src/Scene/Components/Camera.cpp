@@ -1,6 +1,5 @@
 #include "DivePch.h"
 #include "Camera.h"
-#include "Transform.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/RenderTexture.h"
@@ -36,32 +35,20 @@ namespace Dive
 
 	DirectX::XMFLOAT3 Camera::GetPosition()
 	{
-		auto pTransform = GetTransform();
-		if (!pTransform)
-			return DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f);
-
-		return pTransform->GetPosition();
+		return m_pGameObject->GetPosition();
 	}
 
 	DirectX::XMMATRIX Camera::GetWorldMatrix()
 	{
-		auto pTransform = GetTransform();
-		if (!pTransform)
-			return DirectX::XMMatrixIdentity();
-
-		return DirectX::XMMatrixTranslationFromVector(pTransform->GetPositionVector());
+		return DirectX::XMMatrixTranslationFromVector(m_pGameObject->GetPositionVector());
 	}
 
 	DirectX::XMMATRIX Camera::GetViewMatrix()
 	{
-		auto pTransform = GetTransform();
-		if (!pTransform)
-			return DirectX::XMMatrixIdentity();
-
 		return DirectX::XMMatrixLookToLH(
-			pTransform->GetPositionVector(),
-			pTransform->GetForwardVector(),
-			pTransform->GetUpwardVector());
+			m_pGameObject->GetPositionVector(),
+			m_pGameObject->GetForwardVector(),
+			m_pGameObject->GetUpwardVector());
 	}
 
 	DirectX::XMMATRIX Camera::GetProjectionMatrix() const

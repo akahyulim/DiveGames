@@ -34,5 +34,6 @@ namespace ForwardLight
 		Dive::GameObject* m_pSpotLightA;
 		Dive::GameObject* m_pSpotLightB;
 		Dive::GameObject* m_pSpotLightC;
+		Dive::GameObject* m_pSpotLightForCar;
 	};
 }

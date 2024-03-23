@@ -12,7 +12,6 @@
 #include "Resource/ResourceManager.h"
 #include "Scene/SceneManager.h"
 #include "Scene/GameObject.h"
-#include "Scene/Components/Transform.h"
 #include "Scene/Components/Renderable.h"
 
 namespace Dive
@@ -158,8 +157,8 @@ namespace Dive
     {
         auto pNodeObject = s_pActiveScene->CreateGameObject();
         pNodeObject->SetName(pParent ? pNode->mName.data : s_ModelName);
-        pNodeObject->SetParentGameObject(pParent);
-        pNodeObject->GetTransform()->SetLocalMatrix(ConvertXMFLOAT4X4(pNode->mTransformation));
+        pNodeObject->SetParent(pParent);
+        pNodeObject->SetLocalTransform(ConvertXMFLOAT4X4(pNode->mTransformation));
 
         if (!pParent)
             s_pModel->SetRootObject(pNodeObject);
@@ -175,8 +174,8 @@ namespace Dive
             if (i > 0)
             {
                 pMeshNodeObject = s_pActiveScene->CreateGameObject();
-                pMeshNodeObject->GetTransform()->SetParent(pNodeObject->GetTransform());
-                pMeshNodeObject->GetTransform()->SetLocalMatrix(ConvertXMFLOAT4X4(pNode->mTransformation));
+                pMeshNodeObject->SetParent(pNodeObject);
+                pMeshNodeObject->SetLocalTransform(ConvertXMFLOAT4X4(pNode->mTransformation));
 
                 // 동일한 이름을 가지는 경우가 있어 인덱스를 추가
                 // 이전 이름들과 비교하는 방법도 시도해보자.

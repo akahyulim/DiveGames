@@ -102,9 +102,6 @@
     <ClInclude Include="Src\Scene\Components\Component.h">
       <Filter>Src\Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Scene\Components\Transform.h">
-      <Filter>Src\Scene\Components</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Graphics\RenderTexture.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
@@ -213,9 +210,6 @@
       <Filter>Src\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Src\Scene\Components\Component.cpp">
-      <Filter>Src\Scene\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Scene\Components\Transform.cpp">
       <Filter>Src\Scene\Components</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\RenderTexture.cpp">
