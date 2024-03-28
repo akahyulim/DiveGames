@@ -77,6 +77,11 @@ namespace Dive
 		void Translate(float x, float y, float z, eSpace relativeTo = eSpace::Self);
 		void Rotate(float degreeX, float degreeY, float degreeZ, eSpace relativeTo = eSpace::Self);
 
+		void LookAt(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f);
+		void LookAt(const DirectX::XMFLOAT3& target, const DirectX::XMFLOAT3& up = { 0.0f, 1.0f, 0.0f });
+		void LookAt(const DirectX::XMVECTOR& target, const DirectX::XMVECTOR& up = { 0.0f, 1.0f, 0.0f, 1.0f });
+		void LookAt(const GameObject* pTarget, const DirectX::XMVECTOR& up = { 0.0f, 1.0f, 0.0f, 1.0f });
+
 		DirectX::XMFLOAT4X4 GetWorldTransform() const { return m_Transform; }	// 추후 이름에서 World 제거
 		void SetTransform(const DirectX::XMFLOAT4X4& world);
 		DirectX::XMMATRIX GetMatrix() const { return DirectX::XMLoadFloat4x4(&m_Transform); }

@@ -298,6 +298,30 @@ namespace Dive
 		updateTransform();
 	}
 
+	void GameObject::LookAt(float x, float y, float z, float upX, float upY, float upZ)
+	{
+		LookAt(DirectX::XMVectorSet(x, y, z, 1.0f), DirectX::XMVectorSet(upX, upY, upZ, 1.0f));
+	}
+
+	void GameObject::LookAt(const DirectX::XMFLOAT3& target, const DirectX::XMFLOAT3& up)
+	{
+		LookAt(DirectX::XMVectorSet(target.x, target.y, target.z, 1.0f), DirectX::XMVectorSet(up.x, up.y, up.z, 1.0f));
+	}
+
+	void GameObject::LookAt(const DirectX::XMVECTOR& target, const DirectX::XMVECTOR& up)
+	{
+		auto lookAtMatrix = DirectX::XMMatrixLookAtLH(GetPositionVector(), target, up);
+		auto rotation = DirectX::XMQuaternionRotationMatrix(lookAtMatrix);
+		SetRotation(DirectX::XMQuaternionInverse(rotation));
+	}
+
+	void GameObject::LookAt(const GameObject* pTarget, const DirectX::XMVECTOR& up)
+	{
+		DV_CORE_ASSERT(pTarget);
+
+		LookAt(pTarget->GetPositionVector(), up);
+	}
+
 	void GameObject::SetTransform(const DirectX::XMFLOAT4X4& world)
 	{
 		auto worldMatrix = DirectX::XMLoadFloat4x4(&world);
@@ -346,7 +370,7 @@ namespace Dive
 	DirectX::XMVECTOR GameObject::GetForwardVector() const
 	{
 		const auto rotationMatrix = DirectX::XMMatrixRotationQuaternion(GetRotationQuaternionVector());
-		auto forward = DirectX::XMVector3Transform(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f), rotationMatrix);
+		auto forward = DirectX::XMVector3Transform(DirectX::XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f), rotationMatrix);
 
 		return DirectX::XMVector3Normalize(forward);
 	}
@@ -362,7 +386,7 @@ namespace Dive
 	DirectX::XMVECTOR GameObject::GetUpwardVector() const
 	{
 		const auto rotationMatrix = DirectX::XMMatrixRotationQuaternion(GetRotationQuaternionVector());
-		auto upward = DirectX::XMVector3Transform(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f), rotationMatrix);
+		auto upward = DirectX::XMVector3Transform(DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 1.0f), rotationMatrix);
 
 		return DirectX::XMVector3Normalize(upward);
 	}
@@ -378,7 +402,7 @@ namespace Dive
 	DirectX::XMVECTOR GameObject::GetRightwardVector() const
 	{
 		const auto rotationMatrix = DirectX::XMMatrixRotationQuaternion(GetRotationQuaternionVector());
-		auto rightward = DirectX::XMVector3Transform(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f), rotationMatrix);
+		auto rightward = DirectX::XMVector3Transform(DirectX::XMVectorSet(1.0f, 0.0f, 0.0f, 1.0f), rotationMatrix);
 
 		return DirectX::XMVector3Normalize(rightward);
 	}
