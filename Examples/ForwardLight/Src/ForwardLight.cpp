@@ -22,7 +22,7 @@ namespace ForwardLight
 		, m_pSpotLightA(nullptr)
 		, m_pSpotLightB(nullptr)
 		, m_pSpotLightC(nullptr)
-		, m_pSpotLightForCar(nullptr)
+		, m_pFlashLight(nullptr)
 	{
 	}
 
@@ -77,10 +77,8 @@ namespace ForwardLight
 
 	void ForwardLight::HandleUpdate(const Dive::Event& e)
 	{
-		static float angle = 0.0f;
-		angle += 0.1f;
-		if (angle >= 360.0f)
-			angle = 0.0f;
+		using namespace Dive;
+		float deltaTime = static_cast<float>(Timer::GetDeltaTimeSec());
 
 		// rotate
 		{
@@ -95,52 +93,26 @@ namespace ForwardLight
 					bTouchBottom = false;
 
 				if (bTouchBottom)
-					m_pCube->Translate(0.0f, 0.05f, 0.0f);
+					m_pCube->Translate(0.0f, 5.0f * deltaTime, 0.0f);
 				else if(!bTouchBottom)
-					m_pCube->Translate(0.0f, -0.05f, 0.0f);
+					m_pCube->Translate(0.0f, -5.0f * deltaTime, 0.0f);
 			}
+
 			if (m_pTriangle)
-				m_pTriangle->Rotate(0.0f, 0.0f, 1.0f);
+				m_pTriangle->Rotate(0.0f, 0.0f, 100.0f * deltaTime);
 			if (m_pCar)
-				m_pCar->Rotate(0.0f, 0.1f, 0.0f);
+				m_pCar->Rotate(0.0f, 10.0f * deltaTime, 0.0f, Dive::eSpace::World);
 
 			const auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/material_ball_in_3d-coat/Scene.gltf");
 			if (pBallModel)
-				pBallModel->GetRootObject()->Rotate(0.0f, 0.1f, 0.0f, Dive::eSpace::World);
+				pBallModel->GetRootObject()->Rotate(0.0f, 1000.0f * deltaTime, 0.0f, Dive::eSpace::World);
 
 			const auto pBoxModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/Cube/Cube_fbx.fbx");
 			if (pBoxModel)
-				pBoxModel->GetRootObject()->Rotate(0.0f, -0.5f, 0.0f);
-		}
-
-		// change light color
-		{
-			static double elapsedTime = 0;
-			if (elapsedTime < 1)
-				elapsedTime += Dive::Timer::GetDeltaTimeSec();
-			else if (elapsedTime >= 1)
-			{
-				elapsedTime = 0;
-
-				static std::random_device rd;
-				static std::mt19937 gen(rd());
-				static std::uniform_real_distribution<> dist(0, 1);
-
-				float r, g, b;
-				r = (float)dist(gen);
-				g = (float)dist(gen);
-				b = (float)dist(gen);
-
-				//auto pLightCom = m_pSpotLightForCar->GetComponent<Dive::Light>();
-				//pLightCom->SetColor(r, g, b);
-			}
+				pBoxModel->GetRootObject()->Rotate(0.0f, -25.00f * deltaTime, 0.0f);
 		}
 
 		{
-			using namespace Dive;
-
-			float deltaTime = static_cast<float>(Timer::GetDeltaTimeSec());
-
 			static float m_MoveSpeed = 10.0f;
 			static float boost = 1.0f;
 			if (Input::KeyPress(DIK_LSHIFT))
@@ -343,20 +315,20 @@ namespace ForwardLight
 		Dive::ResourceManager::AddManualResource(pPlaneMaterial);
 		
 		// tirangle gameobject
-		//m_pTriangle = pActiveScene->CreateGameObject("Triangle");
-		//m_pTriangle->SetPosition(20.0f, 2.5f, -20.0f);
-		//auto pTriangleRenderableCom = m_pTriangle->AddComponent<Dive::Renderable>();
+		m_pTriangle = pActiveScene->CreateGameObject("Triangle");
+		m_pTriangle->SetPosition(20.0f, 2.5f, -20.0f);
+		auto pTriangleRenderableCom = m_pTriangle->AddComponent<Dive::Renderable>();
 		// 모델로 받으면 이 부분이 애매해진다.
-		//Dive::Mesh* pMesh = pTriangleModel->GetMeshAt();
-		//pTriangleRenderableCom->SetGeometry(pMesh, 0, pMesh->GetVertexCount(), 0, pMesh->GetIndexCount());
-		//pTriangleRenderableCom->SetMaterial(pTriangleMaterial);
-		//pTriangleModel->SetRootObject(m_pTriangle);
+		Dive::Mesh* pMesh = pTriangleModel->GetMeshAt();
+		pTriangleRenderableCom->SetGeometry(pMesh, 0, pMesh->GetVertexCount(), 0, pMesh->GetIndexCount());
+		pTriangleRenderableCom->SetMaterial(pTriangleMaterial);
+		pTriangleModel->SetRootObject(m_pTriangle);
 		
 		// cube gameobject
 		m_pCube = pActiveScene->CreateGameObject("Cube");
 		m_pCube->SetPosition(-20.0f, 2.5f, -20.0f);
 		auto pCubeRenderableCom = m_pCube->AddComponent<Dive::Renderable>();
-		auto pMesh = pCubeModel->GetMeshAt();
+		pMesh = pCubeModel->GetMeshAt();
 		pCubeRenderableCom->SetGeometry(pMesh, 0, pMesh->GetVertexCount(), 0, pMesh->GetIndexCount());
 		pCubeRenderableCom->SetMaterial(pCubeMaterial);
 		pCubeModel->SetRootObject(m_pCube);
@@ -383,6 +355,7 @@ namespace ForwardLight
 			{
 				auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/material_ball_in_3d-coat/Scene.gltf");
 				pBallModel->GetRootObject()->SetPosition(20.0f, 7.5f, 0.0f);
+				pBallModel->GetRootObject()->SetParent(m_pCube);
 				
 				auto pSphereModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/Sphere.obj");
 				pSphereModel->GetRootObject()->SetPosition(20.0f, 15.0f, -30.0f);
@@ -393,22 +366,21 @@ namespace ForwardLight
 				pBoxModel->GetRootObject()->SetScale(0.1f, 0.1f, 0.1f);
 				pBoxModel->GetRootObject()->SetPosition(-20.0f, 0.0f, 20.0f);
 				pBoxModel->GetRootObject()->SetRotation(0.0f, -45.0f, 0.0f);
+				pBoxModel->GetRootObject()->SetParent(m_pCube);
 
 				auto pHelmetModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/damaged_helmet/DamagedHelmet.gltf");
 				pHelmetModel->GetRootObject()->SetPosition(-20.0f, 20.0f, 20.0f);
 				pHelmetModel->GetRootObject()->SetScale(5.0f, 5.0f, 5.0f); 
 				pHelmetModel->GetRootObject()->SetParent(pBoxModel->GetRootObject());
-
-				const auto angles = pHelmetModel->GetRootObject()->GetRotationDegrees();
-				DV_DEBUG("HelmetModel Rotation Angles: {0:f}, {1:f}, {2:f}", angles.x, angles.y, angles.z);
 			}
 
 			// scene
 			{
 				
-				//auto pCarModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/toyota_ae86_sprinter_trueno_zenki/scene.gltf");
-				//m_pCar = pCarModel->GetRootObject(); 
-				//m_pCar->SetScale(0.1f, 0.1f, 0.1f);
+				auto pCarModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/toyota_ae86_sprinter_trueno_zenki/scene.gltf");
+				m_pCar = pCarModel->GetRootObject(); 
+				m_pCar->SetScale(0.05f, 0.05f, 0.05f);
+				m_pCar->SetParent(m_pCube);
 
 				//Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/sponza/sponza.obj");
 			}
@@ -422,38 +394,49 @@ namespace ForwardLight
 				//Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/vampire/dancing_vampire.dae");
 				//Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/stormtrooper/silly_dancing.fbx");
 			}
+
+			// test
+			{
+				size_t size1 = sizeof(DirectX::XMFLOAT3);
+				size_t size2 = sizeof(uint32_t);
+				DV_INFO("size1 = {0:d}, size2 = {1:d}", size1, size2);
+			}
 		}
 	}
 
 	void ForwardLight::createLights(Dive::Scene* pActiveScene)
 	{
-		
 		// Directional Light
 		m_pDirLightA = pActiveScene->CreateGameObject("DirectionalLightA");
+		m_pDirLightA->SetRotation(45.0f, 45.0f, 45.0f);
 		auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
-		pDirLightCom->SetColor(0.9f, 0.9f, 0.9f);
+		pDirLightCom->SetColor(0.0f, 0.0f, 0.0f);
 		pDirLightCom->SetType(Dive::eLightType::Directional);
-		pDirLightCom->SetLookAt(1.0f, -1.0f, 1.0f);
+
+		auto pSphereModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/Sphere.obj")->GetRootObject();
+		auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/material_ball_in_3d-coat/Scene.gltf")->GetRootObject();
+		auto pHelmetModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/damaged_helmet/DamagedHelmet.gltf")->GetRootObject();
 
 		// PointLights
 		{
+			/*
 			m_pPointLightA = pActiveScene->CreateGameObject("PointLightA");
-			m_pPointLightA->SetPosition(0.0f, 5.0f, -15.0f);
+			m_pPointLightA->SetPosition(0.0f, 5.0f, -20.0f);
 			auto pPointLightCom = m_pPointLightA->AddComponent<Dive::Light>();
 			pPointLightCom->SetType(Dive::eLightType::Point);
-			pPointLightCom->SetRange(30.0f);
+			pPointLightCom->SetRange(100.0f);
 			pPointLightCom->SetColor(1.0f, 0.0f, 0.0f);
 
 			m_pPointLightB = pActiveScene->CreateGameObject("PointLightB");
-			m_pPointLightB->SetPosition(-10.0f, 5.0f, 15.0f);
+			m_pPointLightB->SetPosition(-20.0f, 5.0f, 20.0f);
 			pPointLightCom = m_pPointLightB->AddComponent<Dive::Light>();
 			pPointLightCom->SetType(Dive::eLightType::Point);
 			pPointLightCom->SetRange(30.0f);
 			pPointLightCom->SetColor(0.0f, 1.0f, 0.0f);
-
+			*/
 			m_pPointLightC = pActiveScene->CreateGameObject("PointLightC");
-			m_pPointLightC->SetPosition(10.0f, 5.0f, 15.0f);
-			pPointLightCom = m_pPointLightC->AddComponent<Dive::Light>();
+			m_pPointLightC->SetPosition(20.0f, 5.0f, 20.0f);
+			auto pPointLightCom = m_pPointLightC->AddComponent<Dive::Light>();
 			pPointLightCom->SetType(Dive::eLightType::Point);
 			pPointLightCom->SetRange(30.0f);
 			pPointLightCom->SetColor(0.0f, 0.0f, 1.0f);
@@ -461,65 +444,47 @@ namespace ForwardLight
 		
 		// SpotLights
 		{
-			
 			m_pSpotLightA = pActiveScene->CreateGameObject("SpotLightA");
-			m_pSpotLightA->SetPosition(0.0f, 20.0f, -30.0f);
+			m_pSpotLightA->SetPosition(pBallModel->GetPosition().x, pBallModel->GetPosition().y + 10.0f, pBallModel->GetPosition().z);
+			m_pSpotLightA->LookAt(pSphereModel);
+			m_pSpotLightA->SetParent(pBallModel);
 			auto pSpotLightCom = m_pSpotLightA->AddComponent<Dive::Light>();
 			pSpotLightCom->SetType(Dive::eLightType::Spot);
 			pSpotLightCom->SetRange(60.0f);
-			pSpotLightCom->SetColor(1.0f, 1.0f, 0.0f);
-			pSpotLightCom->SetLookAt(0.0f, 10.0f, 0.0f);
-			pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
-
+			pSpotLightCom->SetColor(1.0f, 0.0f, 0.0f);
+			pSpotLightCom->SetSpotLightAngles(65.0f, 55.0f);
+			
 			m_pSpotLightB = pActiveScene->CreateGameObject("SpotLightB");
-			m_pSpotLightB->SetPosition(30.0f, 20.0f, 0.0f);
+			m_pSpotLightB->SetPosition(m_pCube->GetPosition());
+			m_pSpotLightB->SetRotation(90.0f, 0.0f, 0.0f);
+			m_pSpotLightB->SetParent(m_pCube);
 			pSpotLightCom = m_pSpotLightB->AddComponent<Dive::Light>();
 			pSpotLightCom->SetType(Dive::eLightType::Spot);
 			pSpotLightCom->SetRange(60.0f);
-			pSpotLightCom->SetColor(0.0f, 1.0f, 1.0f);
-			pSpotLightCom->SetLookAt(0.0f, 10.0f, 0.0f);
-			pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
-
+			pSpotLightCom->SetColor(1.0f, 1.0f, 0.0f);
+			pSpotLightCom->SetSpotLightAngles(65.0f, 55.0f);
+			
 			m_pSpotLightC = pActiveScene->CreateGameObject("SpotLightC");
-			m_pSpotLightC->SetPosition(-30.0f, 20.0f, 0.0f);
+			m_pSpotLightC->SetPosition(pHelmetModel->GetPosition().x, pHelmetModel->GetPosition().y + 10.0f, pHelmetModel->GetPosition().z);
+			m_pSpotLightC->SetRotation(90.0f, 0.0f, 0.0f);
 			pSpotLightCom = m_pSpotLightC->AddComponent<Dive::Light>();
 			pSpotLightCom->SetType(Dive::eLightType::Spot);
 			pSpotLightCom->SetRange(60.0f);
-			pSpotLightCom->SetColor(1.0f, 0.0f, 1.0f);
-			pSpotLightCom->SetLookAt(0.0f, 10.0f, 0.0f);
-			pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
-			
-
-			m_pSpotLightForCar = pActiveScene->CreateGameObject("SpotLightC");
-			if (m_pSpotLightForCar)
+			pSpotLightCom->SetColor(0.0f, 1.0f, 1.0f);
+			pSpotLightCom->SetSpotLightAngles(45.0f, 35.0f);
+		
+			m_pFlashLight = pActiveScene->CreateGameObject("FlashLight");
+			if (m_pFlashLight)
 			{
-				m_pSpotLightForCar->SetPosition(m_pMainCam->GetPosition());
-				// 왜인지 모르겠지만 카메라의 이동을 따라가지 못한다.
-				// 정확하게는 의도와는 다르다.
-				// 처음에는 디폴트 위치인 0, 0, 0 이지만
-				// 첫 이동을 인식하면 카메라의 위치와 동기화된다.
-				m_pSpotLightForCar->SetParent(m_pMainCam);
-				auto pSpotLightCom = m_pSpotLightForCar->AddComponent<Dive::Light>();
+				m_pFlashLight->SetPosition(m_pMainCam->GetPosition());
+				m_pFlashLight->SetParent(m_pMainCam);
+				auto pSpotLightCom = m_pFlashLight->AddComponent<Dive::Light>();
 				pSpotLightCom->SetType(Dive::eLightType::Spot);
 				pSpotLightCom->SetRange(100.0f);
 				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
-				// 회전이 먹히지 않는다.
-				pSpotLightCom->SetLookAt(m_pMainCam->GetForward());
-				pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+				const auto forward = DirectX::XMVectorAdd(m_pMainCam->GetForwardVector(), m_pMainCam->GetPositionVector());
+				pSpotLightCom->SetSpotLightAngles(60.0f, 45.0f);
 			}
-
-			/*
-			auto pHeadlights = pActiveScene->CreateGameObject("Headlights");
-			auto pCarModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/toyota_ae86_sprinter_trueno_zenki/scene.gltf");
-			auto pHeadlightsObject = pCarModel->GetMeshByName("Headlights_LampCovers_0")->GetGameObject();
-			pHeadlights->SetParentGameObject(pHeadlightsObject);
-			pSpotLightCom = pHeadlights->AddComponent<Dive::Light>();
-			pSpotLightCom->SetType(Dive::eLightType::Spot);
-			pSpotLightCom->SetRange(60.0f);
-			pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
-			pSpotLightCom->SetLookAt(0.0f, 0.0f, 10.0f);
-			pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
-			*/
 		}
 	}
 }

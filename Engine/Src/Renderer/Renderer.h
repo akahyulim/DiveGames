@@ -43,15 +43,15 @@ namespace Dive
 	struct LightBuffer
 	{
 		DirectX::XMFLOAT3 color;
-		float cosOuterCone;
+		float outerConeAngle;
 
 		DirectX::XMFLOAT3 position;
 		float rangeRcp;
 
-		DirectX::XMFLOAT3 dirToLight;
+		DirectX::XMFLOAT3 direction;
+		float innerConeAngle;
+		
 		uint32_t options;
-
-		float cosInnerConeRcp;
 		DirectX::XMFLOAT3 padding;
 	};
 

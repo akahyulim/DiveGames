@@ -257,9 +257,9 @@ namespace Dive
 			ConstantBuffer::Create<MaterialBuffer>("Material", eShaderType::PixelShader, 0);
 
 		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::Camera)] =
-			ConstantBuffer::Create<MaterialBuffer>("Camera", eShaderType::PixelShader, 1);
+			ConstantBuffer::Create<CameraBuffer>("Camera", eShaderType::PixelShader, 1);
 
 		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::Light)] =
-			ConstantBuffer::Create<MaterialBuffer>("Light", eShaderType::PixelShader, 2);
+			ConstantBuffer::Create<LightBuffer>("Light", eShaderType::PixelShader, 2);
 	}
 }

@@ -9,7 +9,6 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 #include "Scene/GameObject.h"
-//#include "Scene/Components/Transform.h"
 #include "Scene/Components/Camera.h"
 #include "Scene/Components/Renderable.h"
 #include "Scene/Components/Light.h"
@@ -127,30 +126,35 @@ namespace Dive
 				if (!light->IsEnabled())
 					continue;
 
+				const auto pLightGameObject = light->GetGameObject();
+				DV_CORE_ASSERT(pLightGameObject);
+
 				switch (light->GetType())
 				{
 				case eLightType::Directional:
 					m_cpuLightBuffer.options = (1U << 0);
-					m_cpuLightBuffer.dirToLight = { -light->GetDirection().x, -light->GetDirection().y, -light->GetDirection().z };
+					m_cpuLightBuffer.direction = pLightGameObject->GetForward();
 					break;
 				case eLightType::Point:
 					m_cpuLightBuffer.options = (1U << 1);
-					m_cpuLightBuffer.position = light->GetGameObject()->GetPosition();
+					m_cpuLightBuffer.position = pLightGameObject->GetPosition();
 					m_cpuLightBuffer.rangeRcp = 1.0f / light->GetRange();
 					break;
 				case eLightType::Spot:
 					m_cpuLightBuffer.options = (1U << 2);
-					m_cpuLightBuffer.position = light->GetGameObject()->GetPosition();
-					m_cpuLightBuffer.dirToLight = { -light->GetDirection().x, -light->GetDirection().y, -light->GetDirection().z };
+					m_cpuLightBuffer.position = pLightGameObject->GetPosition();
+					m_cpuLightBuffer.direction = pLightGameObject->GetForward();
 					m_cpuLightBuffer.rangeRcp = 1.0f / light->GetRange();
-					m_cpuLightBuffer.cosOuterCone = cosf(light->GetOuterAngleRadian());
-					m_cpuLightBuffer.cosInnerConeRcp = 1.0f / cosf(light->GetInnerAngleRadian());
+					m_cpuLightBuffer.outerConeAngle = light->GetOuterAngleRadian();
+					m_cpuLightBuffer.innerConeAngle = light->GetInnerAngleRadian();
 					break;
 				default:
 					break;
 				}
 
-				m_cpuLightBuffer.color = light->GetColor();
+				m_cpuLightBuffer.color = { light->GetColor().x * light->GetColor().x
+					, light->GetColor().y * light->GetColor().y
+					, light->GetColor().z * light->GetColor().z };
 
 				auto pLightBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Light);
 				pLightBuffer->Update((void*)&m_cpuLightBuffer);
@@ -162,7 +166,7 @@ namespace Dive
 				// 2. 이 부분때문에 Light 꺼도 결과가 이상해진다.
 				if (i == 0)
 					Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
-				else if (i >= 1)
+				else if (i == 1)
 					Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
 
 				// draw opaque
