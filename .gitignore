@@ -6,7 +6,12 @@ DiveGames/*.exe
 DiveGames/*.lib
 DiveGames/*.idb
 DiveGames/*.pdb
-DiveGames/Assets/
+
+# Assets
+[Ff]onts/
+[Mm]aterials/
+[Mm]odels/
+[Tt]extures/
 
 ### Windows ###
 # Windows thumbnail cache files

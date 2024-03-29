@@ -428,7 +428,7 @@ namespace Dive
         ResourceManager::AddManualResource(pMat);
 
         // 이걸 어디에서 해야하나...
-        auto pShader = ResourceManager::GetResource<Shader>("CoreData/Shaders/ForwardLight.hlsl");
+        auto pShader = ResourceManager::GetResource<Shader>("../../Assets/Shaders/ForwardLight.hlsl");
         pMat->SetShader(pShader);
 
         return pMat;

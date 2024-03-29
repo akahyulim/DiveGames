@@ -103,11 +103,11 @@ namespace ForwardLight
 			if (m_pCar)
 				m_pCar->Rotate(0.0f, 10.0f * deltaTime, 0.0f, Dive::eSpace::World);
 
-			const auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/material_ball_in_3d-coat/Scene.gltf");
+			const auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf");
 			if (pBallModel)
 				pBallModel->GetRootObject()->Rotate(0.0f, 1000.0f * deltaTime, 0.0f, Dive::eSpace::World);
 
-			const auto pBoxModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/Cube/Cube_fbx.fbx");
+			const auto pBoxModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Cube/Cube_fbx.fbx");
 			if (pBoxModel)
 				pBoxModel->GetRootObject()->Rotate(0.0f, -25.00f * deltaTime, 0.0f);
 		}
@@ -267,13 +267,13 @@ namespace ForwardLight
 	void ForwardLight::createGameObjects(Dive::Scene* pActiveScene)
 	{
 		// textures
-		auto pTexDMC = Dive::ResourceManager::GetResource<Dive::Texture2D>("Assets/Textures/dmc.jpg");
-		auto pTexDOKEV = Dive::ResourceManager::GetResource<Dive::Texture2D>("Assets/Textures/dokev.jpeg");
-		auto pTexPlane = Dive::ResourceManager::GetResource<Dive::Texture2D>("Assets/Textures/WornWood/WornWood_Albedo.tga");
-		auto pTexStone = Dive::ResourceManager::GetResource<Dive::Texture2D>("Assets/Textures/Stone01.tga");
+		auto pTexDMC = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/dmc.jpg");
+		auto pTexDOKEV = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/dokev.jpeg");
+		auto pTexPlane = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/WornWood/WornWood_Albedo.tga");
+		auto pTexStone = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/Stone01.tga");
 
 		// shader
-		auto pShader = Dive::ResourceManager::GetResource<Dive::Shader>("CoreData/Shaders/ForwardLight.hlsl");
+		auto pShader = Dive::ResourceManager::GetResource<Dive::Shader>("../../Assets/Shaders/ForwardLight.hlsl");
 		pShader->CreateInputLayout(Dive::eVertexLayout::Static_Model);
 		
 		// meshes
@@ -353,22 +353,22 @@ namespace ForwardLight
 		{
 			// static
 			{
-				auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/material_ball_in_3d-coat/Scene.gltf");
+				auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf");
 				pBallModel->GetRootObject()->SetPosition(20.0f, 7.5f, 0.0f);
 				pBallModel->GetRootObject()->SetParent(m_pCube);
 				
-				auto pSphereModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/Sphere.obj");
+				auto pSphereModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Sphere.obj");
 				pSphereModel->GetRootObject()->SetPosition(20.0f, 15.0f, -30.0f);
 				pSphereModel->GetRootObject()->SetScale(5.0f, 5.0f, 5.0f);
 				pSphereModel->GetRootObject()->SetParent(pBallModel->GetRootObject());
 
-				auto pBoxModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/Cube/Cube_fbx.fbx");
+				auto pBoxModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Cube/Cube_fbx.fbx");
 				pBoxModel->GetRootObject()->SetScale(0.1f, 0.1f, 0.1f);
 				pBoxModel->GetRootObject()->SetPosition(-20.0f, 0.0f, 20.0f);
 				pBoxModel->GetRootObject()->SetRotation(0.0f, -45.0f, 0.0f);
 				pBoxModel->GetRootObject()->SetParent(m_pCube);
 
-				auto pHelmetModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/damaged_helmet/DamagedHelmet.gltf");
+				auto pHelmetModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/damaged_helmet/DamagedHelmet.gltf");
 				pHelmetModel->GetRootObject()->SetPosition(-20.0f, 20.0f, 20.0f);
 				pHelmetModel->GetRootObject()->SetScale(5.0f, 5.0f, 5.0f); 
 				pHelmetModel->GetRootObject()->SetParent(pBoxModel->GetRootObject());
@@ -377,22 +377,22 @@ namespace ForwardLight
 			// scene
 			{
 				
-				auto pCarModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/toyota_ae86_sprinter_trueno_zenki/scene.gltf");
+				auto pCarModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/toyota_ae86_sprinter_trueno_zenki/scene.gltf");
 				m_pCar = pCarModel->GetRootObject(); 
 				m_pCar->SetScale(0.05f, 0.05f, 0.05f);
 				m_pCar->SetParent(m_pCube);
 
-				//Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/sponza/sponza.obj");
+				//Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/sponza/sponza.obj");
 			}
 
 			// skinned
 			{
-				//Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/sitting.fbx");
-				//Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/Y Bot@Zombie Stumbling.fbx");
-				//Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/start walking.fbx");
-				//Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/pilot/Pilot_LP_Animated.fbx");
-				//Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/vampire/dancing_vampire.dae");
-				//Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/stormtrooper/silly_dancing.fbx");
+				//Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/sitting.fbx");
+				//Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Y Bot@Zombie Stumbling.fbx");
+				//Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/start walking.fbx");
+				//Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/pilot/Pilot_LP_Animated.fbx");
+				//Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/vampire/dancing_vampire.dae");
+				//Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/stormtrooper/silly_dancing.fbx");
 			}
 
 			// test
@@ -413,9 +413,9 @@ namespace ForwardLight
 		pDirLightCom->SetColor(0.0f, 0.0f, 0.0f);
 		pDirLightCom->SetType(Dive::eLightType::Directional);
 
-		auto pSphereModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/Sphere.obj")->GetRootObject();
-		auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/material_ball_in_3d-coat/Scene.gltf")->GetRootObject();
-		auto pHelmetModel = Dive::ResourceManager::GetResource<Dive::Model>("Assets/Models/damaged_helmet/DamagedHelmet.gltf")->GetRootObject();
+		auto pSphereModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Sphere.obj")->GetRootObject();
+		auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf")->GetRootObject();
+		auto pHelmetModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/damaged_helmet/DamagedHelmet.gltf")->GetRootObject();
 
 		// PointLights
 		{
