@@ -7,6 +7,8 @@ namespace Dive
 	public:
 		static void Update();
 
+		static double GetFps();
+
 		static double GetTimeMS();
 		static double GetTimeSec();
 

@@ -51,8 +51,12 @@ namespace Dive
 		}
 
 		OnUpdate();
-
 		OnRender();
+
+		// fps
+		{
+			DV_CORE_INFO("fps: {:f}", Timer::GetFps());
+		}
 	}
 	
 	void Engine::OnUpdate()
