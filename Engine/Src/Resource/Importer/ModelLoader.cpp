@@ -8,6 +8,7 @@
 #include "Renderer/Material.h"
 #include "Renderer/Model.h"
 #include "IO/FileSystem.h"
+#include "Math/BoundingBox.h"
 #include "Resource/Image.h"
 #include "Resource/ResourceManager.h"
 #include "Scene/SceneManager.h"
@@ -139,15 +140,6 @@ namespace Dive
         // 루트노드부터 파싱
         parseNode(s_aiScene->mRootNode);
 
-        // 지오메트리 업데이트
-        {
-            // 메시 옵티마이즈
-            // aabb 계산
-            // normalize scale
-            // 메시에서 버퍼 생성
-            s_pModel->GenerateBuffers();
-        }
-
         importer.FreeScene();
 
         return true;
@@ -264,6 +256,9 @@ namespace Dive
 
             uint32_t indexOffset = 0;
             pAddedMesh->AddIndices(indices, &indexOffset);
+
+            pAddedMesh->ComputeBouingBox();
+            pAddedMesh->CreateBuffers();
 
             auto pMeshRenderer = pMeshNodeObject->AddComponent<Renderable>();
             pMeshRenderer->SetGeometry(pAddedMesh, vertexOffset, (uint32_t)vertices.size(), indexOffset, (uint32_t)indices.size());

@@ -1,11 +1,10 @@
 #include "DivePch.h"
 #include "Camera.h"
 #include "Core/CoreDefs.h"
+#include "Core/Timer.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/RenderTexture.h"
 #include "Scene/GameObject.h"
-#include "Core/Log.h"
-#include "Core/Timer.h"
 
 namespace Dive
 {
@@ -20,7 +19,7 @@ namespace Dive
 		m_BackgroundColor = { 1.0f, 1.0, 1.0f, 1.0f };
 		m_FieldOfView = 45.0f;
 		m_NearClipPlane = 0.1f;
-		m_FarClipPlane = 5000.0f;
+		m_FarClipPlane = 1000.0f;
 		m_MoveSpeed = 10.0f;
 		m_RotateSpeed = 50.0f;
 		m_Viewport = {0, 0, (LONG)Graphics::GetResolutionWidth(), (LONG)Graphics::GetResolutionHeight()};

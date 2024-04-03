@@ -68,6 +68,13 @@ namespace Dive
 
 	void ViewScreen::forwardRender()
 	{
+		// frustum 갱신
+		{
+			// 마지막 인자는 카메라에서 볼 수 있는 최대 거리를 뜻하는 듯 하다.
+			// 그런데 spartan은 근거리를 설정해놓았다.
+			m_Frustum.Construct(m_pCamera->GetViewMatrix(), m_pCamera->GetProjectionMatrix(), m_pCamera->GetFarClipPlane());
+		}
+
 		// set & clear rendertarget
 		{
 			Graphics::SetRenderTargetView(0, m_pCamera->GetRenderTargetView());
@@ -173,6 +180,10 @@ namespace Dive
 				{
 					for (auto pRenderable : m_Renderables)
 					{
+						const auto& boundingBox = pRenderable->GetBoundingBox();
+						if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
+							continue;
+
 						m_cpuFrameBuffer.world = DirectX::XMMatrixTranspose(pRenderable->GetGameObject()->GetMatrix());
 
 						auto pFrameBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Frame);

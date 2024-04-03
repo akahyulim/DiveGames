@@ -1,5 +1,5 @@
 #pragma once
-#include "Resource/Resource.h"
+#include "Math/BoundingBox.h"
 
 namespace Dive
 {
@@ -37,9 +37,12 @@ namespace Dive
         uint32_t GetVertexCount() const;
         uint32_t GetIndexCount() const;
 
-        void CreateGpuBuffers();
+        void CreateBuffers();
         IndexBuffer* GetIndexBuffer() { return m_pIndexBuffer; }
         VertexBuffer* GetVertexBuffer() { return m_pVertexBuffer; }
+
+        void ComputeBouingBox();
+        const BoundingBox& GetBoundingBox() const { return m_BoundingBox; }
 
         // mesh로부터 gameObject와 renderer까지 접근할 수 있다.
         GameObject* GetGameObject() const { return m_pGameObject; }
@@ -53,6 +56,8 @@ namespace Dive
 
         VertexBuffer* m_pVertexBuffer;
         IndexBuffer* m_pIndexBuffer;
+
+        BoundingBox m_BoundingBox;
 
         GameObject* m_pGameObject;
 	};

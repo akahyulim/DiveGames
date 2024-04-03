@@ -30,12 +30,13 @@ namespace Dive
 			uint32_t vertexOffset = 0;
 			pMesh->AddVertices(vertices);
 			pMesh->AddIndices(indices);
+			pMesh->ComputeBouingBox();
+			pMesh->CreateBuffers();
 			pMesh->SetName("Triangle");
 
 			Model* pModel = new Model;
 			pModel->AddMesh(pMesh);
 			pModel->SetName("Triangle");
-			pModel->GenerateBuffers();
 			
 			return pModel;
 		}
@@ -111,12 +112,13 @@ namespace Dive
 			Mesh* pMesh = new Mesh;
 			pMesh->AddVertices(vertices);
 			pMesh->AddIndices(indices);
+			pMesh->ComputeBouingBox();
+			pMesh->CreateBuffers();
 			pMesh->SetName("Cube");
 			
 			Model* pModel = new Model;
 			pModel->AddMesh(pMesh);
 			pModel->SetName("Cube");
-			pModel->GenerateBuffers();
 
 			return pModel;
 		}
@@ -159,12 +161,13 @@ namespace Dive
 			Mesh* pMesh = new Mesh;
 			pMesh->AddVertices(vertices);
 			pMesh->AddIndices(indices);
+			pMesh->ComputeBouingBox();
+			pMesh->CreateBuffers();
 			pMesh->SetName("Plane");
 			
 			Model* pModel = new Model;
 			pModel->AddMesh(pMesh);
 			pModel->SetName("Plane");
-			pModel->GenerateBuffers();
 
 			return pModel;
 		}
@@ -244,12 +247,13 @@ namespace Dive
 			Mesh* pMesh = new Mesh;
 			pMesh->AddVertices(vertices);
 			pMesh->AddIndices(indices);
+			pMesh->ComputeBouingBox();
+			pMesh->CreateBuffers();
 			pMesh->SetName("Sphere");
 			
 			Model* pModel = new Model;
 			pModel->AddMesh(pMesh);
 			pModel->SetName("Sphere");
-			pModel->GenerateBuffers();
 
 			return pModel;
 		}

@@ -1,6 +1,7 @@
 #pragma once
 #include "RendererDefs.h"		// eRenderPath용. 추후 Renderer에 흡수시키자.
 #include "Renderer.h"
+#include "Math/Frustum.h"
 
 namespace Dive
 {
@@ -37,5 +38,7 @@ namespace Dive
 		MaterialBuffer m_cpuMaterialBuffer;
 		CameraBuffer m_cpuCameraBuffer;
 		LightBuffer m_cpuLightBuffer;
+
+		Frustum m_Frustum;
 	};
 }

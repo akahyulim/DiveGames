@@ -38,12 +38,6 @@ namespace Dive
 			DV_DELETE(pMesh);
 		m_Meshes.clear();
 	}
-
-	void Model::GenerateBuffers()
-	{
-		for (auto pMesh : m_Meshes)
-			pMesh->CreateGpuBuffers();
-	}
 	
 	Mesh* Model::GetMeshAt(uint32_t index)
 	{

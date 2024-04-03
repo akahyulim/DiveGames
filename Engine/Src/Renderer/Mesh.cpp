@@ -1,10 +1,10 @@
 #include "DivePch.h"
 #include "Mesh.h"
+#include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/GraphicsDefs.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
-#include "Core/CoreDefs.h"
 #include "Resource/Importer/ModelLoader.h"
 
 namespace Dive
@@ -84,13 +84,20 @@ namespace Dive
 		return static_cast<uint32_t>(m_Indices.size());
 	}
 
-	void Mesh::CreateGpuBuffers()
+	void Mesh::CreateBuffers()
 	{
 		if(!m_Vertices.empty())
 			m_pVertexBuffer = VertexBuffer::Create(m_Vertices.data(), sizeof(VertexStatic), (uint32_t)m_Vertices.size());
 
 		if(!m_Indices.empty())
 			m_pIndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32_t)m_Indices.size());
+	}
+
+	void Mesh::ComputeBouingBox()
+	{
+		DV_CORE_ASSERT(!m_Vertices.empty());
+
+		m_BoundingBox = BoundingBox(static_cast<VertexStatic*>(m_Vertices.data()), static_cast<uint32_t>(m_Vertices.size()));
 	}
 }
 

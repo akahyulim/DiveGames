@@ -105,7 +105,7 @@ namespace ForwardLight
 
 			const auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf");
 			if (pBallModel)
-				pBallModel->GetRootObject()->Rotate(0.0f, 1000.0f * deltaTime, 0.0f, Dive::eSpace::World);
+				pBallModel->GetRootObject()->Rotate(0.0f, 5.0f * deltaTime, 0.0f, Dive::eSpace::World);
 
 			const auto pBoxModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Cube/Cube_fbx.fbx");
 			if (pBoxModel)
@@ -283,8 +283,8 @@ namespace ForwardLight
 		auto pCubeModel = Dive::ModelFactory::CreateCube(5.0f);
 		Dive::ResourceManager::AddManualResource(pCubeModel);
 
-		auto pSphereModel = Dive::ModelFactory::CreateSphere(5.0f);
-		Dive::ResourceManager::AddManualResource(pSphereModel);
+		//auto pSphereModel = Dive::ModelFactory::CreateSphere(5.0f);
+		//Dive::ResourceManager::AddManualResource(pSphereModel);
 
 		auto pPlaneModel = Dive::ModelFactory::CreatePlane(80, 80);
 		Dive::ResourceManager::AddManualResource(pPlaneModel);
@@ -355,7 +355,7 @@ namespace ForwardLight
 			{
 				auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf");
 				pBallModel->GetRootObject()->SetPosition(20.0f, 7.5f, 0.0f);
-				pBallModel->GetRootObject()->SetParent(m_pCube);
+				//pBallModel->GetRootObject()->SetParent(m_pCube);
 				
 				auto pSphereModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Sphere.obj");
 				pSphereModel->GetRootObject()->SetPosition(20.0f, 15.0f, -30.0f);
@@ -366,7 +366,7 @@ namespace ForwardLight
 				pBoxModel->GetRootObject()->SetScale(0.1f, 0.1f, 0.1f);
 				pBoxModel->GetRootObject()->SetPosition(-20.0f, 0.0f, 20.0f);
 				pBoxModel->GetRootObject()->SetRotation(0.0f, -45.0f, 0.0f);
-				pBoxModel->GetRootObject()->SetParent(m_pCube);
+				//pBoxModel->GetRootObject()->SetParent(m_pCube);
 
 				auto pHelmetModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/damaged_helmet/DamagedHelmet.gltf");
 				pHelmetModel->GetRootObject()->SetPosition(-20.0f, 20.0f, 20.0f);
@@ -376,11 +376,10 @@ namespace ForwardLight
 
 			// scene
 			{
-				
 				auto pCarModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/toyota_ae86_sprinter_trueno_zenki/scene.gltf");
 				m_pCar = pCarModel->GetRootObject(); 
 				m_pCar->SetScale(0.05f, 0.05f, 0.05f);
-				m_pCar->SetParent(m_pCube);
+				//m_pCar->SetParent(m_pCube);
 
 				//Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/sponza/sponza.obj");
 			}
@@ -397,9 +396,6 @@ namespace ForwardLight
 
 			// test
 			{
-				size_t size1 = sizeof(DirectX::XMFLOAT3);
-				size_t size2 = sizeof(uint32_t);
-				DV_INFO("size1 = {0:d}, size2 = {1:d}", size1, size2);
 			}
 		}
 	}
@@ -412,14 +408,13 @@ namespace ForwardLight
 		auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
 		pDirLightCom->SetColor(0.0f, 0.0f, 0.0f);
 		pDirLightCom->SetType(Dive::eLightType::Directional);
-
+		
 		auto pSphereModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Sphere.obj")->GetRootObject();
 		auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf")->GetRootObject();
 		auto pHelmetModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/damaged_helmet/DamagedHelmet.gltf")->GetRootObject();
 
 		// PointLights
 		{
-			/*
 			m_pPointLightA = pActiveScene->CreateGameObject("PointLightA");
 			m_pPointLightA->SetPosition(0.0f, 5.0f, -20.0f);
 			auto pPointLightCom = m_pPointLightA->AddComponent<Dive::Light>();
@@ -433,10 +428,10 @@ namespace ForwardLight
 			pPointLightCom->SetType(Dive::eLightType::Point);
 			pPointLightCom->SetRange(30.0f);
 			pPointLightCom->SetColor(0.0f, 1.0f, 0.0f);
-			*/
+			
 			m_pPointLightC = pActiveScene->CreateGameObject("PointLightC");
 			m_pPointLightC->SetPosition(20.0f, 5.0f, 20.0f);
-			auto pPointLightCom = m_pPointLightC->AddComponent<Dive::Light>();
+			pPointLightCom = m_pPointLightC->AddComponent<Dive::Light>();
 			pPointLightCom->SetType(Dive::eLightType::Point);
 			pPointLightCom->SetRange(30.0f);
 			pPointLightCom->SetColor(0.0f, 0.0f, 1.0f);

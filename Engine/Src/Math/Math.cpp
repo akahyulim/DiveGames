@@ -5,6 +5,31 @@ namespace Dive
 {
 	namespace Math
 	{
+		bool CompareXMFLOAT4X4(const DirectX::XMFLOAT4X4& a, const DirectX::XMFLOAT4X4& b)
+		{
+			for (int i = 0; i < 4; ++i)
+			{
+				for (int j = 0; j < 4; ++j)
+				{
+					if (a.m[i][j] != b.m[i][j])
+					{
+						return false;
+					}
+				}
+			}
+
+			return true;
+		}
+		
+		bool CompareXMMATRIX(const DirectX::XMMATRIX& mat1, const DirectX::XMMATRIX& mat2)
+		{
+			DirectX::XMFLOAT4X4 a, b;
+			DirectX::XMStoreFloat4x4(&a, mat1);
+			DirectX::XMStoreFloat4x4(&b, mat2);
+
+			return CompareXMFLOAT4X4(a, b);
+		}
+
 		DirectX::XMFLOAT3 QuaternionToEuler(const DirectX::XMVECTOR& quaternion)
 		{
 			DirectX::XMFLOAT3 euler;

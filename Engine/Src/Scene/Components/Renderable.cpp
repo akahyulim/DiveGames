@@ -3,10 +3,10 @@
 #include "Scene/GameObject.h"
 #include "Core/CoreDefs.h"
 #include "Renderer/Mesh.h"
-
 #include "Graphics/Graphics.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
+#include "Math/Math.h"
 
 namespace Dive
 {
@@ -19,6 +19,7 @@ namespace Dive
 		, m_IndexOffset(0)
 		, m_IndexCount(0)
 	{
+		DirectX::XMStoreFloat4x4(&m_LastTransform, DirectX::XMMatrixIdentity());
 	}
 	
 	Renderable::~Renderable()
@@ -29,6 +30,8 @@ namespace Dive
 	void Renderable::SetGeometry(Mesh* pMesh, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount)
 	{
 		m_pMesh = pMesh;
+		m_BoundingBox = pMesh->GetBoundingBox();
+		m_TransformdBoundingBox = pMesh->GetBoundingBox();
 		m_VertexOffset = vertexOffset;
 		m_VertexCount = vertexCount;
 		m_IndexOffset = indexOffset;
@@ -51,6 +54,18 @@ namespace Dive
 			return nullptr;
 
 		return m_pMesh->GetIndexBuffer();
+	}
+
+	const BoundingBox& Renderable::GetBoundingBox()
+	{
+		const auto currentTransform = m_pGameObject->GetMatrix();
+		if (!Math::CompareXMMATRIX(DirectX::XMLoadFloat4x4(&m_LastTransform), currentTransform))
+		{
+			m_TransformdBoundingBox = m_BoundingBox.Transform(currentTransform);
+			DirectX::XMStoreFloat4x4(&m_LastTransform, currentTransform);
+		}
+
+		return m_TransformdBoundingBox;
 	}
 
 	void Renderable::Draw(D3D11_PRIMITIVE_TOPOLOGY topology)

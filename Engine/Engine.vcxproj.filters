@@ -162,6 +162,12 @@
     <ClInclude Include="Src\Renderer\Model.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Math\Frustum.h">
+      <Filter>Src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Math\BoundingBox.h">
+      <Filter>Src\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\DivePch.cpp">
@@ -271,6 +277,12 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\Model.cpp">
       <Filter>Src\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Math\Frustum.cpp">
+      <Filter>Src\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Math\BoundingBox.cpp">
+      <Filter>Src\Math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

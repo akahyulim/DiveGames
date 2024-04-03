@@ -1,5 +1,6 @@
 #pragma once
 #include "Component.h"
+#include "Math/BoundingBox.h"
 
 namespace Dive
 {
@@ -33,6 +34,8 @@ namespace Dive
 		uint32_t GetIndexOffset() const { return m_IndexOffset; }
 		uint32_t GetIndexCount() const { return m_IndexCount; }
 
+		const BoundingBox& GetBoundingBox();
+
 		void Draw(D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	private:
@@ -45,5 +48,10 @@ namespace Dive
 		uint32_t m_VertexCount;
 		uint32_t m_IndexOffset;
 		uint32_t m_IndexCount;
+
+		BoundingBox m_BoundingBox;
+		BoundingBox m_TransformdBoundingBox;
+
+		DirectX::XMFLOAT4X4 m_LastTransform;
 	};
 }

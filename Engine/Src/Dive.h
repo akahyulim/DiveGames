@@ -36,6 +36,8 @@
 
 // Math
 #include "Math/Math.h"
+#include "Math/BoundingBox.h"
+#include "Math/Frustum.h"
 
 // IO
 #include "Core/Log.h"

@@ -19,8 +19,6 @@ namespace Dive
 
 		void Clear();
 
-		void GenerateBuffers();
-
 		GameObject* GetRootObject() const { return m_pRootObject; }
 		void SetRootObject(GameObject* pRootObject) { m_pRootObject = pRootObject; }
 
