@@ -62,9 +62,10 @@ namespace Dive
         }
     }
 
-    bool Material::HasTexture(eTextureUnit unit)
+    bool Material::HasTexture(eTextureUnit unit) const
     {
-        return m_Textures[unit] != nullptr;
+        auto it = m_Textures.find(unit);
+        return it != m_Textures.end() && it->second != nullptr;
     }
 
     Material* LoadMaterialFromFile(const std::string& fileName)
@@ -93,5 +94,16 @@ namespace Dive
         pObject->SetName(name);
 
         return pObject;
+    }
+
+    bool Material::IsOpaque() const
+    {
+        auto it = m_Textures.find(eTextureUnit::Diffuse);
+        if (it != m_Textures.end())
+        {
+            return it->second->IsOpaque();
+        }
+
+        return m_DiffuseColor.w == 1.0f;
     }
 }

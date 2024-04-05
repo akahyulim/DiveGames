@@ -29,13 +29,16 @@ namespace Dive
 		ZeroMemory(&m_cpuLightBuffer, sizeof(m_cpuLightBuffer));
 	}
 
+	// 스파르탄은 이벤트 컬링 함수에서 구현한다.
 	void ViewScreen::Update()
 	{
 		if (!m_pActiveScene || m_pActiveScene->IsEmpty())
 			return;
 
-		m_Renderables.clear();
-		m_Lights.clear();
+		for (auto it = m_Renderables.begin(); it != m_Renderables.end(); ++it)
+		{
+			it->second.clear();
+		}
 
 		// 임시
 		ZeroMemory(&m_cpuFrameBuffer, sizeof(m_cpuFrameBuffer));
@@ -45,20 +48,25 @@ namespace Dive
 
 		for (auto pGameObject : m_pActiveScene->GetAllGameObjects())
 		{
-			auto pRenderableCom = pGameObject->GetComponent<Renderable>();
-			if (pRenderableCom)
-			{
-				m_Renderables.push_back(pRenderableCom);
+			if (!pGameObject->IsActive())
 				continue;
+
+			if (auto pRenderableCom = pGameObject->GetComponent<Renderable>())
+			{
+				if (auto pMaterial = pRenderableCom->GetMaterial())
+				{
+					m_Renderables[pMaterial->IsOpaque() ? eRenderable::Opaque : eRenderable::Transparent].emplace_back(pGameObject);
+				}
 			}
 
-			auto pLightCom = pGameObject->GetComponent<Light>();
-			if (pLightCom)
+			if (auto pLightCom = pGameObject->GetComponent<Light>())
 			{
-				m_Lights.push_back(pLightCom);
-				continue;
+				m_Renderables[eRenderable::Light].emplace_back(pGameObject);
 			}
-		}	
+		}
+
+		// 반투명 오브젝트는 카메라에서 먼 것 부터 그려야 하므로 정렬이 필요하다고 한다.
+		// 스파르탄에서 해당 부분은 아직 찾지 못했다.
 	}
 	
 	void ViewScreen::Render()
@@ -118,94 +126,157 @@ namespace Dive
 			// 그리고 urho를 따라갈 필요 없이 일단 하드 코딩으로 사용 state를 전달하는 것이 맞아 보인다.
 			{
 				Graphics::SetRasterizerState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
-				// 생각해보니 현재는 여기에서 연결해도 된다.
-				//Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
-				//Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
 			}
 		}
 
 		// bind lights
 		// forward light는 light x mesh
 		{
-			for (int i = 0; i < (int)m_Lights.size(); i++)
+			for (int i = 0; i < (int)m_Renderables[eRenderable::Light].size(); i++)
 			{
-				auto light = m_Lights[i];
-				if (!light->IsEnabled())
-					continue;
+				const auto* pLight = m_Renderables[eRenderable::Light][i];
+				const auto* pLightComponent = pLight->GetComponent<Light>();
 
-				const auto pLightGameObject = light->GetGameObject();
-				DV_CORE_ASSERT(pLightGameObject);
-
-				switch (light->GetType())
+				switch (pLightComponent->GetType())
 				{
 				case eLightType::Directional:
 					m_cpuLightBuffer.options = (1U << 0);
-					m_cpuLightBuffer.direction = pLightGameObject->GetForward();
+					m_cpuLightBuffer.direction = pLight->GetForward();
 					break;
 				case eLightType::Point:
 					m_cpuLightBuffer.options = (1U << 1);
-					m_cpuLightBuffer.position = pLightGameObject->GetPosition();
-					m_cpuLightBuffer.rangeRcp = 1.0f / light->GetRange();
+					m_cpuLightBuffer.position = pLight->GetPosition();
+					m_cpuLightBuffer.rangeRcp = 1.0f / pLightComponent->GetRange();
 					break;
 				case eLightType::Spot:
 					m_cpuLightBuffer.options = (1U << 2);
-					m_cpuLightBuffer.position = pLightGameObject->GetPosition();
-					m_cpuLightBuffer.direction = pLightGameObject->GetForward();
-					m_cpuLightBuffer.rangeRcp = 1.0f / light->GetRange();
-					m_cpuLightBuffer.outerConeAngle = light->GetOuterAngleRadian();
-					m_cpuLightBuffer.innerConeAngle = light->GetInnerAngleRadian();
+					m_cpuLightBuffer.position = pLight->GetPosition();
+					m_cpuLightBuffer.direction = pLight->GetForward();
+					m_cpuLightBuffer.rangeRcp = 1.0f / pLightComponent->GetRange();
+					m_cpuLightBuffer.outerConeAngle = pLightComponent->GetOuterAngleRadian();
+					m_cpuLightBuffer.innerConeAngle = pLightComponent->GetInnerAngleRadian();
 					break;
 				default:
 					break;
 				}
 
-				m_cpuLightBuffer.color = { light->GetColor().x * light->GetColor().x
-					, light->GetColor().y * light->GetColor().y
-					, light->GetColor().z * light->GetColor().z };
+				m_cpuLightBuffer.color = { pLightComponent->GetColor().x * pLightComponent->GetColor().x
+					, pLightComponent->GetColor().y * pLightComponent->GetColor().y
+					, pLightComponent->GetColor().z * pLightComponent->GetColor().z };
 
 				auto pLightBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Light);
 				pLightBuffer->Update((void*)&m_cpuLightBuffer);
 				pLightBuffer->Bind();
 
-				// 1. 괜히 복잡하다.
-				// eState를 전달하면 Graphics의 해당 함수 내부에서 Renderer를 통해 설정해도 되지 않을까?
-				// 아니, 그냥 Graphics에서 생성하고 관리하면 안되나..?
-				// 2. 이 부분때문에 Light 꺼도 결과가 이상해진다.
 				if (i == 0)
 					Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
 				else if (i == 1)
-					Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Addictive));
+					Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Additive));
 
-				// draw opaque
+				// draw opaques
+				for (const auto* pOpaque : m_Renderables[eRenderable::Opaque])
 				{
-					for (auto pRenderable : m_Renderables)
-					{
-						const auto& boundingBox = pRenderable->GetBoundingBox();
-						if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
-							continue;
+					auto* pRenderableComponent = pOpaque->GetComponent<Renderable>();
+					const auto* pMaterial = pRenderableComponent->GetMaterial();
+					const auto& boundingBox = pRenderableComponent->GetBoundingBox();
 
-						m_cpuFrameBuffer.world = DirectX::XMMatrixTranspose(pRenderable->GetGameObject()->GetMatrix());
+					if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
+						continue;
 
-						auto pFrameBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Frame);
-						pFrameBuffer->Update((void*)&m_cpuFrameBuffer);
-						pFrameBuffer->Bind();	// 셰이더 타입별 바인드 및 슬롯 관리때문에 이 방법이 더 편하다...
+					m_cpuFrameBuffer.world = DirectX::XMMatrixTranspose(pOpaque->GetMatrix());
 
-						auto pShader = pRenderable->GetMaterial()->GetShader();
-						Graphics::SetShader(pShader);
+					auto pFrameBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Frame);
+					pFrameBuffer->Update((void*)&m_cpuFrameBuffer);
+					pFrameBuffer->Bind();	// 셰이더 타입별 바인드 및 슬롯 관리때문에 이 방법이 더 편하다...
 
-						m_cpuMaterialBuffer.diffuseColor = pRenderable->GetMaterial()->GetDiffuseColor();
-						m_cpuMaterialBuffer.properties = 0;
-						m_cpuMaterialBuffer.properties |= pRenderable->GetMaterial()->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
+					auto pShader = pMaterial->GetShader();
+					Graphics::SetShader(pShader);
 
-						auto pMaterialBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Material);
-						pMaterialBuffer->Update((void*)&m_cpuMaterialBuffer);
-						pMaterialBuffer->Bind();
+					m_cpuMaterialBuffer.diffuseColor = pMaterial->GetDiffuseColor();
+					m_cpuMaterialBuffer.properties = 0;
+					m_cpuMaterialBuffer.properties |= pMaterial->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
 
-						Graphics::SetTexture(eTextureUnit::Diffuse, pRenderable->GetMaterial()->GetTexture(eTextureUnit::Diffuse));
+					auto pMaterialBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Material);
+					pMaterialBuffer->Update((void*)&m_cpuMaterialBuffer);
+					pMaterialBuffer->Bind();
 
-						// 사실 위의 내용도 여기에서 다 처리할 수 있는데...
-						pRenderable->Draw();
-					}
+					Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
+
+					// 사실 위의 내용도 여기에서 다 처리할 수 있는데...
+					pRenderableComponent->Draw();
+				}
+			}
+
+			for (int i = 0; i < (int)m_Renderables[eRenderable::Light].size(); i++)
+			{
+				const auto* pLight = m_Renderables[eRenderable::Light][i];
+				const auto* pLightComponent = pLight->GetComponent<Light>();
+
+				switch (pLightComponent->GetType())
+				{
+				case eLightType::Directional:
+					m_cpuLightBuffer.options = (1U << 0);
+					m_cpuLightBuffer.direction = pLight->GetForward();
+					break;
+				case eLightType::Point:
+					m_cpuLightBuffer.options = (1U << 1);
+					m_cpuLightBuffer.position = pLight->GetPosition();
+					m_cpuLightBuffer.rangeRcp = 1.0f / pLightComponent->GetRange();
+					break;
+				case eLightType::Spot:
+					m_cpuLightBuffer.options = (1U << 2);
+					m_cpuLightBuffer.position = pLight->GetPosition();
+					m_cpuLightBuffer.direction = pLight->GetForward();
+					m_cpuLightBuffer.rangeRcp = 1.0f / pLightComponent->GetRange();
+					m_cpuLightBuffer.outerConeAngle = pLightComponent->GetOuterAngleRadian();
+					m_cpuLightBuffer.innerConeAngle = pLightComponent->GetInnerAngleRadian();
+					break;
+				default:
+					break;
+				}
+
+				m_cpuLightBuffer.color = { pLightComponent->GetColor().x * pLightComponent->GetColor().x
+					, pLightComponent->GetColor().y * pLightComponent->GetColor().y
+					, pLightComponent->GetColor().z * pLightComponent->GetColor().z };
+
+				auto pLightBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Light);
+				pLightBuffer->Update((void*)&m_cpuLightBuffer);
+				pLightBuffer->Bind();
+
+				Graphics::SetDepthStencilState(NULL);
+				Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Transparent));
+
+				// draw transparents
+				for (const auto* pTransparent : m_Renderables[eRenderable::Transparent])
+				{
+					auto* pRenderableComponent = pTransparent->GetComponent<Renderable>();
+					const auto* pMaterial = pRenderableComponent->GetMaterial();
+					const auto& boundingBox = pRenderableComponent->GetBoundingBox();
+
+					if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
+						continue;
+
+					m_cpuFrameBuffer.world = DirectX::XMMatrixTranspose(pTransparent->GetMatrix());
+
+					auto pFrameBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Frame);
+					pFrameBuffer->Update((void*)&m_cpuFrameBuffer);
+					pFrameBuffer->Bind();	// 셰이더 타입별 바인드 및 슬롯 관리때문에 이 방법이 더 편하다...
+
+					auto pShader = pMaterial->GetShader();
+					Graphics::SetShader(pShader);
+
+					m_cpuMaterialBuffer.diffuseColor = pMaterial->GetDiffuseColor();
+					m_cpuMaterialBuffer.properties = 0;
+					m_cpuMaterialBuffer.properties |= pMaterial->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
+
+					auto pMaterialBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Material);
+					pMaterialBuffer->Update((void*)&m_cpuMaterialBuffer);
+					pMaterialBuffer->Bind();
+
+					Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
+
+					// 사실 위의 내용도 여기에서 다 처리할 수 있는데...
+					pRenderableComponent->Draw();
 				}
 			}
 

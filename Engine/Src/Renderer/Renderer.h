@@ -96,10 +96,10 @@ namespace Dive
 	private:
 		static std::vector<ViewScreen*> m_ViewScreens;	// 유니티의 레이어와는 다르다. 착각하지 말자.
 
-		static std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> m_RasterizerStates;
+		static std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Total)> m_RasterizerStates;
 		static std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> m_DepthStencilStates;
-		static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> m_BlendStates;
-		static std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> m_RenderTargets;
+		static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Total)> m_BlendStates;
+		static std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Total)> m_RenderTargets;
 		static std::array<ConstantBuffer*, static_cast<size_t>(eConstantBuffer::Count)> m_ConstantBuffers;
 	};
 }

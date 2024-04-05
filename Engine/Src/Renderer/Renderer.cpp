@@ -9,11 +9,11 @@ namespace Dive
 {
 	std::vector<ViewScreen*> Renderer::m_ViewScreens;
 
-	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> Renderer::m_RasterizerStates;
+	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Total)> Renderer::m_RasterizerStates;
 	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> Renderer::m_DepthStencilStates;
-	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> Renderer::m_BlendStates;
+	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Total)> Renderer::m_BlendStates;
 
-	std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> Renderer::m_RenderTargets;
+	std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Total)> Renderer::m_RenderTargets;
 	
 	std::array<ConstantBuffer*, static_cast<size_t>(eConstantBuffer::Count)> Renderer::m_ConstantBuffers;
 
@@ -224,23 +224,44 @@ namespace Dive
 	
 	void Renderer::createBlendStates()
 	{
-		// Addictive
 		D3D11_BLEND_DESC desc;
-		desc.AlphaToCoverageEnable = FALSE;
-		desc.IndependentBlendEnable = FALSE;
-		const D3D11_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc =
-		{
-			TRUE,
-			D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD,
-			D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD,
-			D3D11_COLOR_WRITE_ENABLE_ALL,
-		};
-		for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
-			desc.RenderTarget[i] = defaultRenderTargetBlendDesc;
+		ZeroMemory(&desc, sizeof(desc));
 
-		if (FAILED(Graphics::GetDevice()->CreateBlendState(&desc, &m_BlendStates[static_cast<size_t>(eBlendState::Addictive)])))
+		// Additive
 		{
-			DV_CORE_ERROR("BlandState Addictive 생성에 실패하였습니다.");
+			desc.AlphaToCoverageEnable = FALSE;
+			desc.IndependentBlendEnable = FALSE;
+			const D3D11_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc =
+			{
+				TRUE,
+				D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD,
+				D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD,
+				D3D11_COLOR_WRITE_ENABLE_ALL,
+			};
+			for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+				desc.RenderTarget[i] = defaultRenderTargetBlendDesc;
+
+			if (FAILED(Graphics::GetDevice()->CreateBlendState(&desc, &m_BlendStates[static_cast<size_t>(eBlendState::Additive)])))
+			{
+				DV_CORE_ERROR("BlandState Additive 생성에 실패하였습니다.");
+			}
+		}
+
+		// transparent
+		{
+			desc.RenderTarget[0].BlendEnable = TRUE;
+			desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+			desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+			desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+			desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+			desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+			desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+			desc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+			if (FAILED(Graphics::GetDevice()->CreateBlendState(&desc, &m_BlendStates[static_cast<size_t>(eBlendState::Transparent)])))
+			{
+				DV_CORE_ERROR("BlandState Transparent 생성에 실패하였습니다.");
+			}
 		}
 	}
 	

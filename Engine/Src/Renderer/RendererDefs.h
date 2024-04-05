@@ -22,13 +22,14 @@ namespace Dive
     {
         FillSolid_CullBack,
         FillSolid_CullNone,
-        Count
+        Total
     };
 
     enum class eBlendState
     {
-        Addictive,
-        Count
+        Additive,
+        Transparent,
+        Total
     };
 
     enum class eRenderTarget
@@ -39,6 +40,6 @@ namespace Dive
         GBuffer_SpecPower,
         FrameRender,
         FrameOutput,
-        Count
+        Total
     };
 }

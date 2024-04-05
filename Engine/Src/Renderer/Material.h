@@ -26,7 +26,7 @@ namespace Dive
 		 Texture* GetTexture(eTextureUnit unit) const;
 		 void SetTexture(eTextureUnit unit, Texture* pTexture);
 		 void AddTexture(eTextureUnit unit, const std::string& name);
-		 bool HasTexture(eTextureUnit unit);
+		 bool HasTexture(eTextureUnit unit) const;
 
 		 DirectX::XMFLOAT4 GetDiffuseColor() const { return m_DiffuseColor; }
 		 void SetDiffuseColor(float r, float g, float b, float a) { m_DiffuseColor = { r, g, b, a }; }
@@ -39,6 +39,8 @@ namespace Dive
 		 DirectX::XMFLOAT2 GetOffset() const { return m_Offset; }
 		 void SetOffset(DirectX::XMFLOAT2 offset) { m_Offset = offset; }
 		 void SetOffset(float x, float y) { m_Offset.x = x; m_Offset.y = y; }
+
+		 bool IsOpaque() const;
 
 	private:
 		Shader* m_pShader;

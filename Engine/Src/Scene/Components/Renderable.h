@@ -36,7 +36,7 @@ namespace Dive
 
 		const BoundingBox& GetBoundingBox();
 
-		void Draw(D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		void Draw(D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) const;
 
 	private:
 

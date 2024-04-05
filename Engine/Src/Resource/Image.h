@@ -38,6 +38,8 @@ namespace Dive
 		DirectX::XMFLOAT4 GetPixel(int width, int height);
 		DirectX::XMFLOAT4 GetPixel(int width, int height, int depth);
 
+		bool IsOpaque() const { return m_bOpaque; }
+
 	private:
 		void loadScrachImage(const DirectX::ScratchImage& img);
 
@@ -48,6 +50,7 @@ namespace Dive
 
 		DXGI_FORMAT m_Format;
 
+		bool m_bOpaque;
 		bool m_bCubemap;
 
 		std::vector<uint8_t> m_Pixels;

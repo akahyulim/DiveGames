@@ -16,8 +16,8 @@ namespace ForwardLight
 		void HandleUpdate(const Dive::Event& e);
 
 	private:
-		void createGameObjects(Dive::Scene* pActiveScene);
-		void createLights(Dive::Scene* pActiveScene);
+		void createTestScene();
+		void createSponzaScene();
 
 	private:
 		Dive::GameObject* m_pMainCam;

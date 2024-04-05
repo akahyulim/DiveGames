@@ -68,7 +68,7 @@ namespace Dive
 		return m_TransformdBoundingBox;
 	}
 
-	void Renderable::Draw(D3D11_PRIMITIVE_TOPOLOGY topology)
+	void Renderable::Draw(D3D11_PRIMITIVE_TOPOLOGY topology) const
 	{
 		if (GetIndexBuffer() && GetIndexCount() > 0)
 		{

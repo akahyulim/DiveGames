@@ -123,5 +123,5 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
     else if (IsSpotLight())
         lightColor = CalcuSpotLight(input.worldPos, input.normal, diff.xyz);
        
-    return float4(lightColor, 1.0f);
+    return float4(lightColor, diff.a);
 }

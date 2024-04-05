@@ -92,5 +92,7 @@ namespace Dive
 		m_Pixels.resize(slicePitch);
 		for (size_t i = 0; i != slicePitch; ++i)
 			m_Pixels[i] = pPixels[i];
+
+		m_bOpaque = img.IsAlphaAllOpaque();
 	}
 }

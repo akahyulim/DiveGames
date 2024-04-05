@@ -46,9 +46,7 @@ namespace Dive
 
 		uint32_t GetRowPitchSize(int width) const;
 
-		//unsigned int GetViewportCount() const { return static_cast<unsigned int>(m_Viewports.size()); }
-		//Viewport* GetViewport(unsigned int index) const { return m_Viewports[index]; }
-		//void SetViewport(unsigned int index, Viewport* pViewport);
+		bool IsOpaque() const { return m_bOpaque; }
 
 		static DXGI_FORMAT GetSRGBFormat(DXGI_FORMAT format);
 		static DXGI_FORMAT GetSRVFormat(DXGI_FORMAT format);
@@ -84,6 +82,6 @@ namespace Dive
 		int m_AnisoLevel;
 		bool m_bSamplerStateDirty;
 
-		//std::vector<Viewport*> m_Viewports;
+		bool m_bOpaque;
 	};
 }

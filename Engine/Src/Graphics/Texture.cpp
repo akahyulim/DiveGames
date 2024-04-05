@@ -7,17 +7,18 @@
 namespace Dive
 {
 	Texture::Texture()
-		: m_pTexture2D(nullptr),
-		m_pShaderResourceView(nullptr),
-		m_pSamplerState(nullptr),
-		m_RequestedMipLevels(0),
-		m_MipLevels(1),
-		m_bMipLevelDirty(true),
-		m_Filter(D3D11_FILTER_MIN_MAG_MIP_LINEAR),
-		m_AddressMode(D3D11_TEXTURE_ADDRESS_WRAP),
-		m_BorderColor(0.0f, 0.0f, 0.0f, 0.0f),
-		m_AnisoLevel(1),
-		m_bSamplerStateDirty(true)
+		: m_pTexture2D(nullptr)
+		, m_pShaderResourceView(nullptr)
+		, m_pSamplerState(nullptr)
+		, m_RequestedMipLevels(0)
+		, m_MipLevels(1)
+		, m_bMipLevelDirty(true)
+		, m_Filter(D3D11_FILTER_MIN_MAG_MIP_LINEAR)
+		, m_AddressMode(D3D11_TEXTURE_ADDRESS_WRAP)
+		, m_BorderColor(0.0f, 0.0f, 0.0f, 0.0f)
+		, m_AnisoLevel(1)
+		, m_bSamplerStateDirty(true)
+		, m_bOpaque(true)
 	{
 		m_pDevice = Graphics::GetDevice();
 		m_pDeviceContext = Graphics::GetDeviceContext();
@@ -159,15 +160,6 @@ namespace Dive
 		}
 	}
 
-	/*
-	void Texture::SetViewport(unsigned int index, Viewport* pViewport)
-	{
-		if (m_Viewports.size() >= index)
-			m_Viewports.insert(m_Viewports.begin() + index, pViewport);
-		else
-			m_Viewports.emplace_back(pViewport);
-	}
-	*/
 	DXGI_FORMAT Texture::GetSRGBFormat(DXGI_FORMAT format)
 	{
 		switch (format)

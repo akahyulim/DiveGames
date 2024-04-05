@@ -5,12 +5,21 @@
 
 namespace Dive
 {
+	class GameObject;
 	class Scene;
 	class Camera;
 	class Renderable;
 	class Light;
 	class Mesh;
 	class Material;
+
+	enum class eRenderable
+	{
+		Opaque,
+		Transparent,
+		Light,
+		Camera
+	};
 
 	// 아무래도 이건 유니티 혹은 sparky의 Layer가 어울린다.
 	// 추후 더 생각해보자.
@@ -31,8 +40,7 @@ namespace Dive
 		Camera* m_pCamera;
 		eRenderPath m_RenderPath;
 
-		std::vector<Renderable*> m_Renderables;
-		std::vector<Light*> m_Lights;
+		std::unordered_map<eRenderable, std::vector<GameObject*>> m_Renderables;
 
 		FrameBuffer m_cpuFrameBuffer;
 		MaterialBuffer m_cpuMaterialBuffer;

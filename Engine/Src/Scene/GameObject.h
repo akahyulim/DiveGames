@@ -32,7 +32,7 @@ namespace Dive
 		template<class T> bool HasComponent();
 		bool HashComponent(size_t typeHash) const;
 		
-		template<class T> T* GetComponent();
+		template<class T> T* GetComponent() const;
 		Component* GetComponent(size_t typeHash) const;
 
 		// transform
@@ -152,7 +152,7 @@ namespace Dive
 	}
 
 	template<class T>
-	T* GameObject::GetComponent()
+	T* GameObject::GetComponent() const
 	{
 		auto it = m_Components.find(T::GetTypeHashStatic());
 		if (it != m_Components.end())

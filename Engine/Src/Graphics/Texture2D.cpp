@@ -82,6 +82,7 @@ namespace Dive
 		m_Height = pImage->GetHeight();
 		m_Format = pImage->GetFormat();
 		m_Usage = eTextureUsage::Static;
+		m_bOpaque = pImage->IsOpaque();
 		
 		// SetParameters에서 설정되어야 하는 항목들
 		m_bLinear = true;
@@ -91,6 +92,7 @@ namespace Dive
 		// 이는 m_RequestedMipLevels에 저장한다.
 		m_RequestedMipLevels = 0;
 		m_MipLevels = CheckMaxMipLevels(pImage->GetWidth(), pImage->GetHeight(), m_RequestedMipLevels);
+
 
 		if (!createResources())
 			return false;
