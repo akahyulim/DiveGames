@@ -11,6 +11,7 @@ struct FrameBufferData
 struct MaterialBufferData
 {
     float4 color;
+    float4 normal;
     
     float2 tiling;
     float2 offset;
@@ -82,4 +83,9 @@ bool IsSpotLight()
 bool HasDiffuseTexture()
 {
     return cbMaterial.properties & uint(1U << 0);
+}
+
+bool HasNormalTexture()
+{
+    return cbMaterial.properties & uint(1U << 1);
 }

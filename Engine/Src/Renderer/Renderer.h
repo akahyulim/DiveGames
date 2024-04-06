@@ -26,6 +26,7 @@ namespace Dive
 	struct MaterialBuffer
 	{
 		DirectX::XMFLOAT4 diffuseColor;
+		DirectX::XMFLOAT4 normal;	// xmfloat3이어야 하나...
 
 		DirectX::XMFLOAT2 tiling;
 		DirectX::XMFLOAT2 offset;

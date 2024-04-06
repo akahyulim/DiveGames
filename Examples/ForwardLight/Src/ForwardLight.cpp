@@ -44,8 +44,9 @@ namespace ForwardLight
 	{
 		// create scene
 		{
-			//createTestScene();
-			createSponzaScene();
+			createTestScene();
+			//createCarScene();
+			//createSponzaScene();
 		}
 
 		// setup renderLayer
@@ -70,36 +71,42 @@ namespace ForwardLight
 		using namespace Dive;
 		float deltaTime = static_cast<float>(Timer::GetDeltaTimeSec());
 
-		if(Dive::SceneManager::GetActiveScene()->GetName() == "Test World")
+		static bool bMove = false;
+
+		if (bMove)
 		{
-			if (m_pCube)
+			if (Dive::SceneManager::GetActiveScene()->GetName() == "Test World")
 			{
-				static bool bTouchBottom = false;
-				const auto position = m_pCube->GetPosition();
+				if (m_pCube)
+				{
+					static bool bTouchBottom = false;
+					const auto position = m_pCube->GetPosition();
 
-				if (position.y <= 2.5f)
-					bTouchBottom = true;
-				else if (position.y >= 20.0f)
-					bTouchBottom = false;
+					if (position.y <= 2.5f)
+						bTouchBottom = true;
+					else if (position.y >= 20.0f)
+						bTouchBottom = false;
 
-				if (bTouchBottom)
-					m_pCube->Translate(0.0f, 5.0f * deltaTime, 0.0f);
-				else if(!bTouchBottom)
-					m_pCube->Translate(0.0f, -5.0f * deltaTime, 0.0f);
+					if (bTouchBottom)
+						m_pCube->Translate(0.0f, 5.0f * deltaTime, 0.0f);
+					else if (!bTouchBottom)
+						m_pCube->Translate(0.0f, -5.0f * deltaTime, 0.0f);
+				}
+
+				if (m_pTriangle)
+					m_pTriangle->Rotate(0.0f, 0.0f, 100.0f * deltaTime);
+
+				const auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf");
+				if (pBallModel)
+					pBallModel->GetRootObject()->Rotate(0.0f, 5.0f * deltaTime, 0.0f, Dive::eSpace::World);
+
+				const auto pBoxModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Cube/Cube_fbx.fbx");
+				if (pBoxModel)
+					pBoxModel->GetRootObject()->Rotate(0.0f, -25.00f * deltaTime, 0.0f);
 			}
 
-			if (m_pTriangle)
-				m_pTriangle->Rotate(0.0f, 0.0f, 100.0f * deltaTime);
 			if (m_pCar)
 				m_pCar->Rotate(0.0f, 10.0f * deltaTime, 0.0f, Dive::eSpace::World);
-
-			const auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf");
-			if (pBallModel)
-				pBallModel->GetRootObject()->Rotate(0.0f, 5.0f * deltaTime, 0.0f, Dive::eSpace::World);
-
-			const auto pBoxModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Cube/Cube_fbx.fbx");
-			if (pBoxModel)
-				pBoxModel->GetRootObject()->Rotate(0.0f, -25.00f * deltaTime, 0.0f);
 		}
 
 		{
@@ -244,6 +251,15 @@ namespace ForwardLight
 					return;
 				}		
 			}
+
+			// etc
+			{
+				if (Input::KeyDown(DIK_SPACE))
+				{
+					bMove = !bMove;
+					return;
+				}
+			}
 		}
 	}
 
@@ -264,7 +280,9 @@ namespace ForwardLight
 			auto pTexDMC = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/dmc.jpg");
 			auto pTexDOKEV = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/dokev.jpeg");
 			auto pTexPlane = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/WornWood/WornWood_Albedo.tga");
-			auto pTexStone = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/Stone01.tga");
+			auto pTexPlaneNormal = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/WornWood/WornWood_Normal.tga");
+			auto pTexStone = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/stone01.tga");
+			auto pTexNormal = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/normal01.tga");
 			auto pTexNoTexture = Dive::ResourceManager::GetResource<Dive::Texture2D>("../../Assets/Textures/bright-squares.png");
 
 			// shader
@@ -285,30 +303,29 @@ namespace ForwardLight
 			// 셰이더를 직접 전달하지 않아도 RenderPath에 맞는 Default가 적용되어 있어야 한다.
 			auto pTriangleMaterial = Dive::CreateMaterial("TriangleMaterial");
 			pTriangleMaterial->SetShader(pShader);
-			pTriangleMaterial->SetDiffuseColor(1.0f, 1.0f, 0.0f, 1.0f);
 			pTriangleMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexDMC);
 			Dive::ResourceManager::AddManualResource(pTriangleMaterial);
 
 			auto pCubeMaterial = Dive::CreateMaterial("CubeMaterial");
 			pCubeMaterial->SetShader(pShader);
-			pCubeMaterial->SetDiffuseColor(0.0f, 1.0f, 1.0f, 1.0f);
 			pCubeMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexDOKEV);
 			Dive::ResourceManager::AddManualResource(pCubeMaterial);
 
-			auto pSphereMaterial = Dive::CreateMaterial("SphereMaterial");
-			pSphereMaterial->SetShader(pShader);
-			pSphereMaterial->SetDiffuseColor(1.0f, 0.0f, 0.0f, 1.0f);
-			Dive::ResourceManager::AddManualResource(pSphereMaterial);
-
 			auto pPlaneMaterial = Dive::CreateMaterial("PlaneMaterial");
 			pPlaneMaterial->SetShader(pShader);
-			pPlaneMaterial->SetDiffuseColor(0.1f, 0.1f, 0.1f, 1.0f);
 			pPlaneMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexPlane);
+			pPlaneMaterial->SetTexture(Dive::eTextureUnit::Normal, pTexPlaneNormal);
 			Dive::ResourceManager::AddManualResource(pPlaneMaterial);
+
+			auto pStoneMaterial = Dive::CreateMaterial("StoneMaterial");
+			pStoneMaterial->SetShader(pShader);
+			pStoneMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexStone);
+			pStoneMaterial->SetTexture(Dive::eTextureUnit::Normal, pTexNormal);
+			Dive::ResourceManager::AddManualResource(pStoneMaterial);
 
 			auto pTransparentMaterial = Dive::CreateMaterial("TransparentMaterial");
 			pTransparentMaterial->SetShader(pShader);
-			pTransparentMaterial->SetDiffuseColor(1.0f, 1.0f, 0.1f, 0.5f);
+			pTransparentMaterial->SetDiffuseColor(1.0f, 1.0f, 0.0f, 0.75f);
 			//pTransparentMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexNoTexture);
 			Dive::ResourceManager::AddManualResource(pTransparentMaterial);
 
@@ -328,7 +345,7 @@ namespace ForwardLight
 			auto pCubeRenderableCom = m_pCube->AddComponent<Dive::Renderable>();
 			pMesh = pCubeModel->GetMeshAt();
 			pCubeRenderableCom->SetGeometry(pMesh, 0, pMesh->GetVertexCount(), 0, pMesh->GetIndexCount());
-			pCubeRenderableCom->SetMaterial(pTransparentMaterial);// pCubeMaterial);
+			pCubeRenderableCom->SetMaterial(pTransparentMaterial);//pStoneMaterial);
 			pCubeModel->SetRootObject(m_pCube);
 
 			// bottom gameobject
@@ -356,10 +373,9 @@ namespace ForwardLight
 			pHelmetModel->GetRootObject()->SetPosition(-20.0f, 20.0f, 20.0f);
 			pHelmetModel->GetRootObject()->SetScale(5.0f, 5.0f, 5.0f);
 			pHelmetModel->GetRootObject()->SetParent(pBoxModel->GetRootObject());
-				
-			auto pCarModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/toyota_ae86_sprinter_trueno_zenki/scene.gltf");
-			m_pCar = pCarModel->GetRootObject(); 
-			m_pCar->SetScale(0.05f, 0.05f, 0.05f);
+
+			auto pFlightHelmetModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/flight_helmet/FlightHelmet.gltf");
+			pFlightHelmetModel->GetRootObject()->SetScale(30.0f, 30.0f, 30.0f);
 		}
 
 		// lights
@@ -442,6 +458,55 @@ namespace ForwardLight
 					const auto forward = DirectX::XMVectorAdd(m_pMainCam->GetForwardVector(), m_pMainCam->GetPositionVector());
 					pSpotLightCom->SetSpotLightAngles(60.0f, 45.0f);
 				}
+			}
+		}
+	}
+
+	void ForwardLight::createCarScene()
+	{
+		Dive::Scene* pActiveScene = Dive::SceneManager::CreateScene("Car World");
+		Dive::SceneManager::SetActiveScene(pActiveScene);
+
+		// main camera
+		m_pMainCam = pActiveScene->CreateGameObject("MainCam");
+		auto pCamCom = m_pMainCam->AddComponent<Dive::Camera>();
+		pCamCom->SetBackgroundColor(0.1f, 0.1f, 0.1f, 1.0f);
+		m_pMainCam->SetPosition(0.0f, 100.0f, -400.0f);
+
+		// shader
+		auto pShader = Dive::ResourceManager::GetResource<Dive::Shader>("../../Assets/Shaders/ForwardLight.hlsl");
+		pShader->CreateInputLayout(Dive::eVertexLayout::Static_Model);
+
+		// car sceneauto 
+		auto pCarModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/toyota_ae86_sprinter_trueno_zenki/scene.gltf");
+		m_pCar = pCarModel->GetRootObject();
+
+		// lights
+		{
+			// Directional Light
+			m_pDirLightA = pActiveScene->CreateGameObject("DirectionalLightA");
+			m_pDirLightA->SetRotation(45.0f, 45.0f, 45.0f);
+			auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
+			pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
+			pDirLightCom->SetType(Dive::eLightType::Directional);
+
+			auto pDirLightB = pActiveScene->CreateGameObject("DirectionalLightB");
+			pDirLightB->SetRotation(-45.0f, 45.0f, -45.0f);
+			pDirLightCom = pDirLightB->AddComponent<Dive::Light>();
+			pDirLightCom->SetColor(1.0f, 0.0f, 0.0f);
+			pDirLightCom->SetType(Dive::eLightType::Directional);
+
+			m_pFlashLight = pActiveScene->CreateGameObject("FlashLight");
+			if (m_pFlashLight)
+			{
+				m_pFlashLight->SetPosition(m_pMainCam->GetPosition());
+				m_pFlashLight->SetParent(m_pMainCam);
+				auto pSpotLightCom = m_pFlashLight->AddComponent<Dive::Light>();
+				pSpotLightCom->SetType(Dive::eLightType::Spot);
+				pSpotLightCom->SetRange(1000.0f);
+				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
+				const auto forward = DirectX::XMVectorAdd(m_pMainCam->GetForwardVector(), m_pMainCam->GetPositionVector());
+				pSpotLightCom->SetSpotLightAngles(60.0f, 45.0f);
 			}
 		}
 	}

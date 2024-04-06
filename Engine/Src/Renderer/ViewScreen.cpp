@@ -195,12 +195,14 @@ namespace Dive
 					m_cpuMaterialBuffer.diffuseColor = pMaterial->GetDiffuseColor();
 					m_cpuMaterialBuffer.properties = 0;
 					m_cpuMaterialBuffer.properties |= pMaterial->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
+					m_cpuMaterialBuffer.properties |= pMaterial->HasTexture(eTextureUnit::Normal) ? (1U << 1) : 0;
 
 					auto pMaterialBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Material);
 					pMaterialBuffer->Update((void*)&m_cpuMaterialBuffer);
 					pMaterialBuffer->Bind();
 
 					Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
+					Graphics::SetTexture(eTextureUnit::Normal, pMaterial->GetTexture(eTextureUnit::Normal));
 
 					// 사실 위의 내용도 여기에서 다 처리할 수 있는데...
 					pRenderableComponent->Draw();
@@ -268,12 +270,14 @@ namespace Dive
 					m_cpuMaterialBuffer.diffuseColor = pMaterial->GetDiffuseColor();
 					m_cpuMaterialBuffer.properties = 0;
 					m_cpuMaterialBuffer.properties |= pMaterial->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
+					m_cpuMaterialBuffer.properties |= pMaterial->HasTexture(eTextureUnit::Normal) ? (1U << 1) : 0;
 
 					auto pMaterialBuffer = Renderer::GetConstantBuffer(eConstantBuffer::Material);
 					pMaterialBuffer->Update((void*)&m_cpuMaterialBuffer);
 					pMaterialBuffer->Bind();
 
 					Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
+					Graphics::SetTexture(eTextureUnit::Normal, pMaterial->GetTexture(eTextureUnit::Normal));
 
 					// 사실 위의 내용도 여기에서 다 처리할 수 있는데...
 					pRenderableComponent->Draw();

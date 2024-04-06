@@ -29,6 +29,8 @@ VS_OUTPUT MainVS(VS_INPUT input)
     output.position = mul(output.position, mul(cbFrame.view, cbFrame.projection));
     output.normal = mul(input.normal, (float3x3)cbFrame.world);
     output.normal = normalize(output.normal);
+    output.tangent = mul(input.tangent, (float3x3) cbFrame.world);
+    output.tangent = normalize(output.tangent);
     output.tex = input.tex;
     
     return output;
@@ -114,14 +116,28 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
         diff = cbMaterial.color;
     else
         diff = DiffuseMap.Sample(DiffuseMapSampler, input.tex);
+    
+    float3 normal = input.normal;
+    if (HasNormalTexture())
+    {
+        float4 bumpMap = NormalMap.Sample(NormalMapSampler, input.tex);
+        bumpMap = (bumpMap * 2.0f) - 1.0f;
+
+        float3 N = normalize(input.normal);
+        float3 T = normalize(input.tangent);
+        float3 B = cross(N, T);     // 추후 cpu에서 계산하는 것도 염두해두자.
+        float3x3 TBN = float3x3(T, B, N);
+
+        normal = normalize(mul(bumpMap.xyz, TBN));
+    }
 
     float3 lightColor;
     if (IsDirectionalLight())
-        lightColor = CalcuDirLight(input.worldPos, input.normal, diff.xyz);
+        lightColor = CalcuDirLight(input.worldPos, normal, diff.xyz);
     else if (IsPointLight())
-        lightColor = CalcuPointLight(input.worldPos, input.normal, diff.xyz);
+        lightColor = CalcuPointLight(input.worldPos, normal, diff.xyz);
     else if (IsSpotLight())
-        lightColor = CalcuSpotLight(input.worldPos, input.normal, diff.xyz);
-       
+        lightColor = CalcuSpotLight(input.worldPos, normal, diff.xyz);
+    
     return float4(lightColor, diff.a);
 }

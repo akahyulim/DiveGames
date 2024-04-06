@@ -17,6 +17,7 @@ namespace ForwardLight
 
 	private:
 		void createTestScene();
+		void createCarScene();
 		void createSponzaScene();
 
 	private:

@@ -262,6 +262,8 @@ namespace Dive
 
             auto pMeshRenderer = pMeshNodeObject->AddComponent<Renderable>();
             pMeshRenderer->SetGeometry(pAddedMesh, vertexOffset, (uint32_t)vertices.size(), indexOffset, (uint32_t)indices.size());
+            // 일단 aiMaterial이 존재하는지 부터 확인해야 한다.
+            // 없다면 디폴트 머티리얼을 전달하는 것이 맞다.
             pMeshRenderer->SetMaterial(loadMaterial(pMesh));
 
             s_pModel->AddMesh(pAddedMesh);
@@ -396,36 +398,61 @@ namespace Dive
         aiColor4D opacity(1.0f, 1.0f, 1.0f, 1.0f);
         aiGetMaterialColor(pMaterial, AI_MATKEY_OPACITY, &opacity);
 
-        // textures
-        aiString texturePath;
-        if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) != AI_SUCCESS)
-            pMaterial->GetTexture(aiTextureType_BASE_COLOR, 0, &texturePath);
-
-        Texture2D* pDiffuseTex = nullptr;
-        const aiTexture* pTexture = s_aiScene->GetEmbeddedTexture(texturePath.C_Str());
-        if (pTexture)
-        {
-            // 파일 내부에서 데이터를 얻어와 직접 만들기
-            pDiffuseTex = loadEmbeddedTexture(pTexture);
-        }
-        else
-        {
-            // 이건 외부에 존재하는 파일을 로드
-            auto diffuseTexturePath = FileSystem::GetPath(s_FileName) + "textures/";
-            diffuseTexturePath += FileSystem::GetFileNameAndExtension(texturePath.C_Str());
-            pDiffuseTex = ResourceManager::GetResource<Texture2D>(diffuseTexturePath);
-        }
-
         auto pMat = new Material();
         pMat->SetName(name.data);
         pMat->SetDiffuseColor(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-        pMat->SetTexture(eTextureUnit::Diffuse, pDiffuseTex);
         ResourceManager::AddManualResource(pMat);
-
-        // 이걸 어디에서 해야하나...
+        // 이걸 어디에서 해야하나... 이렇게 직접 전달하기 싫다면
+        // Material::GetShader()에서 리소스매니저로부터 직접 디폴트 셰이더를 전달하는 방법도 있다.
         auto pShader = ResourceManager::GetResource<Shader>("../../Assets/Shaders/ForwardLight.hlsl");
         pMat->SetShader(pShader);
 
+        aiString texturePath;
+
+        // 맵핑 텍스쳐 로드 및 등록
+        // static 함수로 뽑아내려 했으나 일단 실패했다.
+        // diff map
+        if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
+        {
+            Texture2D* pDiffuseTex = nullptr;
+            const aiTexture* pTexture = s_aiScene->GetEmbeddedTexture(texturePath.C_Str());
+            if (pTexture)
+            {
+                // 파일 내부에서 데이터를 얻어와 직접 만들기
+                pDiffuseTex = loadEmbeddedTexture(pTexture);
+            }
+            else
+            {
+                // 이건 외부에 존재하는 파일을 로드
+                auto diffuseTexturePath = FileSystem::GetPath(s_FileName) + "textures/";
+                diffuseTexturePath += FileSystem::GetFileNameAndExtension(texturePath.C_Str());
+                pDiffuseTex = ResourceManager::GetResource<Texture2D>(diffuseTexturePath);
+            }
+            pMat->SetTexture(eTextureUnit::Diffuse, pDiffuseTex);
+            DV_CORE_INFO("Load DiffuseMap");
+        }
+
+        // normal map
+        if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS)
+        {
+            Texture2D* pNormalTex = nullptr;
+            const aiTexture* pTexture = s_aiScene->GetEmbeddedTexture(texturePath.C_Str());
+            if (pTexture)
+            {
+                // 파일 내부에서 데이터를 얻어와 직접 만들기
+                pNormalTex = loadEmbeddedTexture(pTexture);
+            }
+            else
+            {
+                // 이건 외부에 존재하는 파일을 로드
+                auto normalTexturePath = FileSystem::GetPath(s_FileName) + "textures/";
+                normalTexturePath += FileSystem::GetFileNameAndExtension(texturePath.C_Str());
+                pNormalTex = ResourceManager::GetResource<Texture2D>(normalTexturePath);
+            }
+            pMat->SetTexture(eTextureUnit::Normal, pNormalTex);
+            DV_CORE_INFO("Load NormalMap");
+        }
+        
         return pMat;
     }
 
