@@ -21,11 +21,12 @@ namespace Dive
 		}
 
 		// sponza에서 동일한 이름때문에 문제가 발생했다. 
+		// 일단 ModelLoader쪽의 AddManualResource()를 모두 주석처리 했다.
 		auto it = s_ResourceGroups[pResource->GetTypeHash()].find(pResource->GetNameHash());
 		if (it != s_ResourceGroups[pResource->GetTypeHash()].end())
 		{
 			DV_CORE_WARN("동일한 이름의 리소스({0:s}: {1:s})가 이미 등록되어 있습니다.", pResource->GetTypeName(), name);
-			//return false;
+			return false;
 		}
 
 		s_ResourceGroups[pResource->GetTypeHash()].emplace(pResource->GetNameHash(), pResource);

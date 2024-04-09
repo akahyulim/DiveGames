@@ -30,6 +30,20 @@ namespace Dive
 			return CompareXMFLOAT4X4(a, b);
 		}
 
+		DirectX::XMFLOAT3 CalcuBiTangent(const DirectX::XMFLOAT3& normal, const DirectX::XMFLOAT3& tangent)
+		{
+			const auto normalVector = DirectX::XMLoadFloat3(&normal);
+			const auto tangentVector = DirectX::XMLoadFloat3(&tangent);
+
+			auto biTangentVector = DirectX::XMVector3Cross(normalVector, tangentVector);
+			biTangentVector = DirectX::XMVector3Normalize(biTangentVector);
+
+			DirectX::XMFLOAT3 biTangent;
+			DirectX::XMStoreFloat3(&biTangent, biTangentVector);
+
+			return biTangent;
+		}
+
 		DirectX::XMFLOAT3 QuaternionToEuler(const DirectX::XMVECTOR& quaternion)
 		{
 			DirectX::XMFLOAT3 euler;

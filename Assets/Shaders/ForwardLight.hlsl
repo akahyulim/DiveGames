@@ -4,19 +4,21 @@
 
 struct VS_INPUT
 {
-    float4 position : POSITION0;
-    float2 tex      : TEXCOORD0;
-    float3 normal   : NORMAL0;
-    float3 tangent  : TANGENT0;
+    float4 position     : POSITION0;
+    float2 tex          : TEXCOORD0;
+    float3 normal       : NORMAL0;
+    float3 tangent      : TANGENT0;
+    float3 bitangent    : BINORMAL0;
 };
 
 struct VS_OUTPUT
 {
-    float4 position : SV_POSITION;
-    float2 tex      : TEXCOORD0;
-    float3 worldPos : TEXCOORD1;
-    float3 normal   : NORMAL0;
-    float3 tangent  : TANGENT0;
+    float4 position     : SV_POSITION;
+    float2 tex          : TEXCOORD0;
+    float3 worldPos     : TEXCOORD1;
+    float3 normal       : NORMAL0;
+    float3 tangent      : TANGENT0;
+    float3 bitangent    : BINORMAL0;
 };
 
 VS_OUTPUT MainVS(VS_INPUT input)
@@ -27,11 +29,13 @@ VS_OUTPUT MainVS(VS_INPUT input)
     output.position = mul(input.position, cbFrame.world);
     output.worldPos = output.position.xyz;
     output.position = mul(output.position, mul(cbFrame.view, cbFrame.projection));
+    output.tex = input.tex;
     output.normal = mul(input.normal, (float3x3)cbFrame.world);
     output.normal = normalize(output.normal);
     output.tangent = mul(input.tangent, (float3x3) cbFrame.world);
     output.tangent = normalize(output.tangent);
-    output.tex = input.tex;
+    output.bitangent = mul(input.bitangent, (float3x3) cbFrame.world);
+    output.bitangent = normalize(output.bitangent);
     
     return output;
 }
@@ -123,17 +127,14 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
         float4 bumpMap = NormalMap.Sample(NormalMapSampler, input.tex);
         bumpMap = (bumpMap * 2.0f) - 1.0f;
 
-        float3 N = normalize(input.normal);
-        float3 T = normalize(input.tangent);
-        float3 B = cross(N, T);     // 추후 cpu에서 계산하는 것도 염두해두자.
-        float3x3 TBN = float3x3(T, B, N);
-
-        normal = normalize(mul(bumpMap.xyz, TBN));
+        normal = normalize((bumpMap.x * input.tangent) + (bumpMap.y * input.bitangent) + (bumpMap.z * input.normal));
     }
 
+    float3 ambient = float3(0.2f, 0.2f, 0.2f);
+    
     float3 lightColor;
     if (IsDirectionalLight())
-        lightColor = CalcuDirLight(input.worldPos, normal, diff.xyz);
+        lightColor = CalcuDirLight(input.worldPos, normal, diff.xyz) + (ambient * diff.xyz);
     else if (IsPointLight())
         lightColor = CalcuPointLight(input.worldPos, normal, diff.xyz);
     else if (IsSpotLight())

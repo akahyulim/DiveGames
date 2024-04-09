@@ -62,7 +62,8 @@ namespace Dive
 			const DirectX::XMFLOAT3& position,
 			const DirectX::XMFLOAT2& texCoords,
 			const DirectX::XMFLOAT3& normal,
-			const DirectX::XMFLOAT3& tangent)
+			const DirectX::XMFLOAT3& tangent,
+			const DirectX::XMFLOAT3& bitangent)
 		{
 			this->position[0] = position.x;
 			this->position[1] = position.y;
@@ -78,12 +79,17 @@ namespace Dive
 			this->tangent[0] = tangent.x;
 			this->tangent[1] = tangent.y;
 			this->tangent[2] = tangent.z;
+
+			this->bitangent[0] = bitangent.x;
+			this->bitangent[1] = bitangent.y;
+			this->bitangent[2] = bitangent.z;
 		}
 
 		float position[3] = { 0.0f, };
 		float texCoords[2] = { 0.0f, };
 		float normal[3] = { 0.0f, };
 		float tangent[3] = { 0.0f, };
+		float bitangent[3] = { 0.0f, };
 	};
 
 	struct VertexSkinned

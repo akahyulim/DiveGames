@@ -73,6 +73,12 @@ namespace ForwardLight
 
 		static bool bMove = false;
 
+		static float boost = 0;
+		if (Input::KeyPress(DIK_LSHIFT))
+			boost = 5.0f;
+		else
+			boost = 1.0f;
+
 		if (bMove)
 		{
 			if (Dive::SceneManager::GetActiveScene()->GetName() == "Test World")
@@ -88,77 +94,73 @@ namespace ForwardLight
 						bTouchBottom = false;
 
 					if (bTouchBottom)
-						m_pCube->Translate(0.0f, 5.0f * deltaTime, 0.0f);
+						m_pCube->Translate(0.0f, 5.0f * deltaTime * boost, 0.0f);
 					else if (!bTouchBottom)
-						m_pCube->Translate(0.0f, -5.0f * deltaTime, 0.0f);
+						m_pCube->Translate(0.0f, -5.0f * deltaTime * boost, 0.0f);
 				}
 
 				if (m_pTriangle)
-					m_pTriangle->Rotate(0.0f, 0.0f, 100.0f * deltaTime);
+					m_pTriangle->Rotate(0.0f, 0.0f, 100.0f * deltaTime * boost);
 
 				const auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf");
 				if (pBallModel)
-					pBallModel->GetRootObject()->Rotate(0.0f, 5.0f * deltaTime, 0.0f, Dive::eSpace::World);
+					pBallModel->GetRootObject()->Rotate(0.0f, 5.0f * deltaTime * boost, 0.0f, Dive::eSpace::World);
 
 				const auto pBoxModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Cube/Cube_fbx.fbx");
 				if (pBoxModel)
-					pBoxModel->GetRootObject()->Rotate(0.0f, -25.00f * deltaTime, 0.0f);
+					pBoxModel->GetRootObject()->Rotate(0.0f, -25.00f * deltaTime * boost, 0.0f);
 			}
 
 			if (m_pCar)
-				m_pCar->Rotate(0.0f, 10.0f * deltaTime, 0.0f, Dive::eSpace::World);
+				m_pCar->Rotate(0.0f, 10.0f * deltaTime * boost, 0.0f, Dive::eSpace::World);
 		}
 
 		{
-			static float m_MoveSpeed = (Dive::SceneManager::GetActiveScene()->GetName() == "Test World") ? 10.0f : 100.0f;
-			static float boost = (Dive::SceneManager::GetActiveScene()->GetName() == "Test World") ? 1.0f : 100.0f;
-			if (Input::KeyPress(DIK_LSHIFT))
-				boost = 5.0f;
-			else
-				boost = 1.0f;
+			static float rotateSpeed = 100.0f;
+			static float moveSpeed = (Dive::SceneManager::GetActiveScene()->GetName() == "Test World") ? 10.0f : 100.0f;
 
 			// move controll
 			{
 				if (Input::KeyPress(DIK_UP))
 				{
-					m_pMainCam->Rotate(-m_MoveSpeed * deltaTime * boost, 0.0f, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Rotate(-rotateSpeed * deltaTime, 0.0f, 0.0f, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_DOWN))
 				{
-					m_pMainCam->Rotate(m_MoveSpeed * deltaTime * boost, 0.0f, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Rotate(rotateSpeed * deltaTime, 0.0f, 0.0f, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_LEFT))
 				{
-					m_pMainCam->Rotate(0.0f, -m_MoveSpeed * deltaTime * boost, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Rotate(0.0f, -rotateSpeed * deltaTime, 0.0f, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_RIGHT))
 				{
-					m_pMainCam->Rotate(0.0f, m_MoveSpeed * deltaTime * boost, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Rotate(0.0f, rotateSpeed * deltaTime, 0.0f, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_W))
 				{
-					m_pMainCam->Translate(0.0f, 0.0f, m_MoveSpeed * deltaTime * boost, Dive::eSpace::Self);
+					m_pMainCam->Translate(0.0f, 0.0f, moveSpeed * deltaTime * boost, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_S))
 				{
-					m_pMainCam->Translate(0.0f, 0.0f, -m_MoveSpeed * deltaTime * boost, Dive::eSpace::Self);
+					m_pMainCam->Translate(0.0f, 0.0f, -moveSpeed * deltaTime * boost, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_A))
 				{
-					m_pMainCam->Translate(-m_MoveSpeed * deltaTime * boost, 0.0f, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Translate(-moveSpeed * deltaTime * boost, 0.0f, 0.0f, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_D))
 				{
-					m_pMainCam->Translate(m_MoveSpeed * deltaTime * boost, 0.0f, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Translate(moveSpeed * deltaTime * boost, 0.0f, 0.0f, Dive::eSpace::Self);
 				}
 
 				if (Input::KeyPress(DIK_Q))
 				{
-					m_pMainCam->Translate(0.0f, m_MoveSpeed * deltaTime * boost, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Translate(0.0f, moveSpeed * deltaTime * boost, 0.0f, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_E))
 				{
-					m_pMainCam->Translate(0.0f, -m_MoveSpeed * deltaTime * boost, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Translate(0.0f, -moveSpeed * deltaTime * boost, 0.0f, Dive::eSpace::Self);
 				}
 			}
 
@@ -485,15 +487,9 @@ namespace ForwardLight
 		{
 			// Directional Light
 			m_pDirLightA = pActiveScene->CreateGameObject("DirectionalLightA");
-			m_pDirLightA->SetRotation(45.0f, 45.0f, 45.0f);
+			m_pDirLightA->SetRotation(45.0f, 0.0f, 0.0f);
 			auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
 			pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
-			pDirLightCom->SetType(Dive::eLightType::Directional);
-
-			auto pDirLightB = pActiveScene->CreateGameObject("DirectionalLightB");
-			pDirLightB->SetRotation(-45.0f, 45.0f, -45.0f);
-			pDirLightCom = pDirLightB->AddComponent<Dive::Light>();
-			pDirLightCom->SetColor(1.0f, 0.0f, 0.0f);
 			pDirLightCom->SetType(Dive::eLightType::Directional);
 
 			m_pFlashLight = pActiveScene->CreateGameObject("FlashLight");

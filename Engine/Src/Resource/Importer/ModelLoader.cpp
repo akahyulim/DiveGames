@@ -246,6 +246,15 @@ namespace Dive
                     vertex.tangent[1] = tangent.y;
                     vertex.tangent[2] = tangent.z;
                 }
+
+                // bitangent
+                if (pMesh->mBitangents)
+                {
+                    const auto& bitangent = pMesh->mBitangents[vertexIndex];
+                    vertex.bitangent[0] = bitangent.x;
+                    vertex.bitangent[1] = bitangent.y;
+                    vertex.bitangent[2] = bitangent.z;
+                }
             }
 
             Mesh* pAddedMesh = new Mesh;
@@ -401,7 +410,7 @@ namespace Dive
         auto pMat = new Material();
         pMat->SetName(name.data);
         pMat->SetDiffuseColor(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-        ResourceManager::AddManualResource(pMat);
+        //ResourceManager::AddManualResource(pMat);
         // 이걸 어디에서 해야하나... 이렇게 직접 전달하기 싫다면
         // Material::GetShader()에서 리소스매니저로부터 직접 디폴트 셰이더를 전달하는 방법도 있다.
         auto pShader = ResourceManager::GetResource<Shader>("../../Assets/Shaders/ForwardLight.hlsl");
@@ -478,7 +487,7 @@ namespace Dive
 
         // 매뉴얼 등록
         pTex->SetName(FileSystem::GetFileNameAndExtension(pTexture->mFilename.C_Str()));
-        ResourceManager::AddManualResource(pTex);
+        //ResourceManager::AddManualResource(pTex);
 
         return pTex;
     }
