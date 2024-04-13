@@ -42,17 +42,27 @@ VS_OUTPUT MainVS(VS_INPUT input)
 
 float3 CalcuDirLight(float3 worldPos, float3 normal, float3 materialDiff)
 {
+    float3 finalColor;
+    
+    // Ambient
+    float3 ambientColor = float3(0.05f, 0.05f, 0.05f);
+    finalColor = ambientColor;
+    
     // Phong diffuse
     float NDotL = saturate(dot(-cbLight.direction, normal));
-    float3 finalColor = cbLight.color * NDotL;
-
+    if(NDotL > 0.0f)
+    {
+        finalColor += cbLight.color * NDotL;
+    }
+    
 	// Blinn specular
     float3 toEye = cbCamera.position - worldPos;
     toEye = normalize(toEye);
     float3 halfWay = normalize(toEye + -cbLight.direction);
     float NDotH = saturate(dot(halfWay, normal));
     
-    finalColor += cbLight.color * pow(NDotH, 250.0f) * 0.25f;
+    finalColor += cbLight.color * 
+    pow(NDotH, 250.0f) * 0.25f;
     
     return finalColor * materialDiff;
 }
@@ -130,11 +140,9 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
         normal = normalize((bumpMap.x * input.tangent) + (bumpMap.y * input.bitangent) + (bumpMap.z * input.normal));
     }
 
-    float3 ambient = float3(0.2f, 0.2f, 0.2f);
-    
     float3 lightColor;
     if (IsDirectionalLight())
-        lightColor = CalcuDirLight(input.worldPos, normal, diff.xyz) + (ambient * diff.xyz);
+        lightColor = CalcuDirLight(input.worldPos, normal, diff.xyz);
     else if (IsPointLight())
         lightColor = CalcuPointLight(input.worldPos, normal, diff.xyz);
     else if (IsSpotLight())

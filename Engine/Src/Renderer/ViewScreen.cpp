@@ -135,7 +135,7 @@ namespace Dive
 			for (int i = 0; i < (int)m_Renderables[eRenderable::Light].size(); i++)
 			{
 				const auto* pLight = m_Renderables[eRenderable::Light][i];
-				const auto* pLightComponent = pLight->GetComponent<Light>();
+				auto* pLightComponent = pLight->GetComponent<Light>();
 
 				switch (pLightComponent->GetType())
 				{
@@ -212,7 +212,7 @@ namespace Dive
 			for (int i = 0; i < (int)m_Renderables[eRenderable::Light].size(); i++)
 			{
 				const auto* pLight = m_Renderables[eRenderable::Light][i];
-				const auto* pLightComponent = pLight->GetComponent<Light>();
+				auto* pLightComponent = pLight->GetComponent<Light>();
 
 				switch (pLightComponent->GetType())
 				{
