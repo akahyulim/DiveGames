@@ -4,6 +4,7 @@
 namespace Dive
 {
 	class GameObject;
+	class RenderTexture;
 
 	enum class eLightType
 	{
@@ -12,6 +13,8 @@ namespace Dive
 		Spot
 	};
 
+	// 유니티의 경우 디렉셔널 라이트를 2개 이상 설정할 수 있지만 그림자를 만드는 것은 하나로 제한된다.
+	// 언리얼의 경우 포워드 셰이딩의 경우 하나의 디렉셔널 라이트만 사용된다.
 	class Light : public Component
 	{
 		DV_CLASS(Light, Component);
@@ -39,6 +42,18 @@ namespace Dive
 		bool IsEnabled() const { return m_bEnabled; }
 		void SetEnabled(bool enabled) { m_bEnabled = enabled; }
 
+		// Texture*로 해야하나...?
+		RenderTexture* GetShadowMap() const { return m_pShadowMap; }
+
+		DirectX::XMMATRIX GetViewMatrix();
+		DirectX::XMMATRIX GetProjectionMatrix();
+		DirectX::XMMATRIX GetShaodwMatrix();
+
+		float GetShadowMapSize() const { return m_ShadowMapSize; }
+		void SetShadowMapSize(float size);
+
+
+
 	private:
 		eLightType m_Type;
 
@@ -49,5 +64,8 @@ namespace Dive
 		float m_InnerAngle;
 
 		bool m_bEnabled;
+
+		RenderTexture* m_pShadowMap;
+		float m_ShadowMapSize;
 	};
 }

@@ -36,7 +36,7 @@ namespace Sandbox
 		// 여기는 서브 시스템 설정
 		// 추후엔 파일 경로를 전달받아 서브 시스템을 설정
 
-		m_Title = L"Forward Light";
+		m_Title = L"Sandbox";
 		m_WindowWidth = 1600;
 		m_WindowHeight = 900;
 	}
@@ -45,16 +45,16 @@ namespace Sandbox
 	{
 		// create scene
 		{
-			//createBaseScene();
+			createBaseScene();
 			//createCarScene();
 			//createSponzaScene();
-			createShadowScene();
+			//createShadowScene();
 		}
 
 		// setup renderLayer
 		{
 			// ViewScreen에서 Forward, Deferred를 설정한다.
-			auto pViewScreen = new Dive::ViewScreen(m_pMainCam->GetComponent<Dive::Camera>());
+			auto pViewScreen = new Dive::ViewScreen(m_pMainCam->GetComponent<Dive::Camera>());// , Dive::eRenderPath::Deferred);
 			Dive::Renderer::SetViewScreen(0, pViewScreen);
 		}
 
@@ -75,11 +75,11 @@ namespace Sandbox
 
 		static bool bMove = false;
 
-		static float boost = 0;
+		static float bSlow = 0;
 		if (Input::KeyPress(DIK_LSHIFT))
-			boost = 5.0f;
+			bSlow = 1.0f;
 		else
-			boost = 1.0f;
+			bSlow = 5.0f;
 
 		if (bMove)
 		{
@@ -96,33 +96,49 @@ namespace Sandbox
 						bTouchBottom = false;
 
 					if (bTouchBottom)
-						m_pCube->Translate(0.0f, 5.0f * deltaTime * boost, 0.0f);
+						m_pCube->Translate(0.0f, 5.0f * deltaTime * bSlow, 0.0f);
 					else if (!bTouchBottom)
-						m_pCube->Translate(0.0f, -5.0f * deltaTime * boost, 0.0f);
+						m_pCube->Translate(0.0f, -5.0f * deltaTime * bSlow, 0.0f);
 				}
 
 				if (m_pTriangle)
-					m_pTriangle->Rotate(0.0f, 0.0f, 100.0f * deltaTime * boost);
+					m_pTriangle->Rotate(0.0f, 0.0f, 100.0f * deltaTime * bSlow);
 
 				const auto pBallModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf");
 				if (pBallModel)
-					pBallModel->GetRootObject()->Rotate(0.0f, 5.0f * deltaTime * boost, 0.0f, Dive::eSpace::World);
+					pBallModel->GetRootObject()->Rotate(0.0f, 5.0f * deltaTime * bSlow, 0.0f, Dive::eSpace::World);
 
 				const auto pBoxModel = Dive::ResourceManager::GetResource<Dive::Model>("../../Assets/Models/Cube/Cube_fbx.fbx");
 				if (pBoxModel)
-					pBoxModel->GetRootObject()->Rotate(0.0f, -25.00f * deltaTime * boost, 0.0f);
+					pBoxModel->GetRootObject()->Rotate(0.0f, -25.00f * deltaTime * bSlow, 0.0f);
 			}
 			else if (m_SceneType == eSceneType::Car)
 			{
-				m_pCar->Rotate(0.0f, 10.0f * deltaTime * boost, 0.0f, Dive::eSpace::World);
+				m_pCar->Rotate(0.0f, 10.0f * deltaTime * bSlow, 0.0f, Dive::eSpace::World);
 			}
 			else if (m_SceneType == eSceneType::Shadow)
 			{
 				if(m_pDirLightA)
-					m_pDirLightA->Rotate(0.0f, 30.0f * deltaTime * boost, 0.0f, Dive::eSpace::World);
+					m_pDirLightA->Rotate(0.0f, 30.0f * deltaTime * bSlow, 0.0f, Dive::eSpace::World);
 
 				if(m_pDummy)
-					m_pDummy->Rotate(0.0f, 10.0f * deltaTime * boost, 0.0f);
+					m_pDummy->Rotate(0.0f, 10.0f * deltaTime * bSlow, 0.0f);
+
+				if (m_pCube)
+				{
+					static bool bTouchBottom = false;
+					const auto position = m_pCube->GetPosition();
+
+					if (position.y <= 5.0f)
+						bTouchBottom = true;
+					else if (position.y >= 20.0f)
+						bTouchBottom = false;
+
+					if (bTouchBottom)
+						m_pCube->Translate(0.0f, 5.0f * deltaTime * bSlow, 0.0f);
+					else if (!bTouchBottom)
+						m_pCube->Translate(0.0f, -5.0f * deltaTime * bSlow, 0.0f);
+				}
 			}
 		}
 
@@ -150,28 +166,28 @@ namespace Sandbox
 				}
 				if (Input::KeyPress(DIK_W))
 				{
-					m_pMainCam->Translate(0.0f, 0.0f, moveSpeed * deltaTime * boost, Dive::eSpace::Self);
+					m_pMainCam->Translate(0.0f, 0.0f, moveSpeed * deltaTime * bSlow, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_S))
 				{
-					m_pMainCam->Translate(0.0f, 0.0f, -moveSpeed * deltaTime * boost, Dive::eSpace::Self);
+					m_pMainCam->Translate(0.0f, 0.0f, -moveSpeed * deltaTime * bSlow, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_A))
 				{
-					m_pMainCam->Translate(-moveSpeed * deltaTime * boost, 0.0f, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Translate(-moveSpeed * deltaTime * bSlow, 0.0f, 0.0f, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_D))
 				{
-					m_pMainCam->Translate(moveSpeed * deltaTime * boost, 0.0f, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Translate(moveSpeed * deltaTime * bSlow, 0.0f, 0.0f, Dive::eSpace::Self);
 				}
 
 				if (Input::KeyPress(DIK_Q))
 				{
-					m_pMainCam->Translate(0.0f, moveSpeed * deltaTime * boost, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Translate(0.0f, moveSpeed * deltaTime * bSlow, 0.0f, Dive::eSpace::Self);
 				}
 				if (Input::KeyPress(DIK_E))
 				{
-					m_pMainCam->Translate(0.0f, -moveSpeed * deltaTime * boost, 0.0f, Dive::eSpace::Self);
+					m_pMainCam->Translate(0.0f, -moveSpeed * deltaTime * bSlow, 0.0f, Dive::eSpace::Self);
 				}
 			}
 
@@ -285,7 +301,8 @@ namespace Sandbox
 		m_pMainCam = pActiveScene->CreateGameObject("MainCam");
 		auto pCamCom = m_pMainCam->AddComponent<Dive::Camera>();
 		pCamCom->SetBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
-		m_pMainCam->SetPosition(0.0f, 10.0f, -55.0f);
+		m_pMainCam->SetPosition(0.0f, 50.0f, -100.0f);
+		m_pMainCam->LookAt(0.0f, 0.0f, 0.0f);
 
 		// objects
 		{
@@ -300,6 +317,7 @@ namespace Sandbox
 
 			// shader
 			auto pShader = Dive::ResourceManager::GetResource<Dive::Shader>("../../Assets/Shaders/ForwardLight.hlsl");
+			//auto pShader = Dive::ResourceManager::GetResource<Dive::Shader>("../../Assets/Shaders/Deferred.hlsl");
 			pShader->CreateInputLayout(Dive::eVertexLayout::Static_Model);
 
 			// meshes
@@ -436,7 +454,7 @@ namespace Sandbox
 				m_pSpotLightA->SetParent(pBallModel);
 				auto pSpotLightCom = m_pSpotLightA->AddComponent<Dive::Light>();
 				pSpotLightCom->SetType(Dive::eLightType::Spot);
-				pSpotLightCom->SetRange(60.0f);
+				pSpotLightCom->SetRange(1000.0f);
 				pSpotLightCom->SetColor(1.0f, 0.0f, 0.0f);
 				pSpotLightCom->SetSpotLightAngles(45.0f, 35.0f);
 
@@ -452,22 +470,23 @@ namespace Sandbox
 
 				m_pSpotLightC = pActiveScene->CreateGameObject("SpotLightC");
 				m_pSpotLightC->SetPosition(pHelmetModel->GetPosition().x, pHelmetModel->GetPosition().y + 10.0f, pHelmetModel->GetPosition().z);
-				m_pSpotLightC->SetRotation(90.0f, 0.0f, 0.0f);
+				m_pSpotLightC->LookAt(0.0f, 0.0f, 0.0f);
 				pSpotLightCom = m_pSpotLightC->AddComponent<Dive::Light>();
 				pSpotLightCom->SetType(Dive::eLightType::Spot);
-				pSpotLightCom->SetRange(900.0f);
+				pSpotLightCom->SetRange(1000.0f);
 				pSpotLightCom->SetColor(0.0f, 1.0f, 1.0f);
-				pSpotLightCom->SetSpotLightAngles(45.0f, 35.0f);
+				pSpotLightCom->SetSpotLightAngles(30.0f, 20.0f);
 
 				m_pFlashLight = pActiveScene->CreateGameObject("FlashLight");
 				m_pFlashLight->SetPosition(m_pMainCam->GetPosition());
+				m_pFlashLight->LookAt(m_pMainCam->GetForward(), m_pMainCam->GetUpward());
 				m_pFlashLight->SetParent(m_pMainCam);
 				m_pFlashLight->SetActive(false);
 				pSpotLightCom = m_pFlashLight->AddComponent<Dive::Light>();
 				pSpotLightCom->SetType(Dive::eLightType::Spot);
-				pSpotLightCom->SetRange(100.0f);
+				pSpotLightCom->SetRange(1000.0f);
 				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f); 
-				pSpotLightCom->SetSpotLightAngles(60.0f, 45.0f);
+				pSpotLightCom->SetSpotLightAngles(30.0f, 15.0f);
 			}
 		}
 
@@ -544,6 +563,7 @@ namespace Sandbox
 			pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
 			pDirLightCom->SetType(Dive::eLightType::Directional);
 
+			// Flash Light
 			m_pFlashLight = pActiveScene->CreateGameObject("FlashLight");
 			m_pFlashLight->SetPosition(m_pMainCam->GetPosition());
 			m_pFlashLight->SetParent(m_pMainCam);
@@ -551,8 +571,19 @@ namespace Sandbox
 			auto pSpotLightCom = m_pFlashLight->AddComponent<Dive::Light>();
 			pSpotLightCom->SetType(Dive::eLightType::Spot);
 			pSpotLightCom->SetRange(1000.0f);
-			pSpotLightCom->SetColor(1.0f, 1.0f, 0.0f);
-			pSpotLightCom->SetSpotLightAngles(60.0f, 45.0f);
+			pSpotLightCom->SetColor(1.0f, 1.0f, 0.7f);
+			pSpotLightCom->SetSpotLightAngles(30.0f, 10.0f);
+
+			// SpotLight left
+			auto pLeftSpotLight = pActiveScene->CreateGameObject("LeftSpotLight");
+			pLeftSpotLight->SetPosition(-50.0f, 100.0f, 0.0f);
+			pLeftSpotLight->LookAt(50.0f, 100.0f, 0.0f);
+			pLeftSpotLight->SetActive(true);
+			pSpotLightCom = pLeftSpotLight->AddComponent<Dive::Light>();
+			pSpotLightCom->SetType(Dive::eLightType::Spot);
+			pSpotLightCom->SetRange(10000.0f);
+			pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
+			pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
 		}
 
 		m_SceneType = eSceneType::Sponza;
@@ -568,7 +599,7 @@ namespace Sandbox
 		auto pCamCom = m_pMainCam->AddComponent<Dive::Camera>();
 		pCamCom->SetBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
 		m_pMainCam->SetPosition(0.0f, 30.0f, -50.0f);
-		m_pMainCam->SetRotation(30.0f, 0.0f, 0.0f);
+		m_pMainCam->LookAt(0.0f, 0.0f, 0.0f);
 
 		// objects
 		{
@@ -632,38 +663,45 @@ namespace Sandbox
 
 		// lights
 		{
-			/*
-			// Directional Light
-			m_pDirLightA = pActiveScene->CreateGameObject("DirectionalLightA");
-			m_pDirLightA->SetRotation(45.0f, 0.0f, 0.0f);
-			auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
-			pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
-			pDirLightCom->SetType(Dive::eLightType::Directional);
-			*/
-			
 			m_pDummy = pActiveScene->CreateGameObject("Dummy");
-			m_pDummy->SetPosition(0.0f, 40.0f, 0.0f);
+			m_pDummy->SetPosition(0.0f, 0.0f, 0.0f);
 
-			auto pMainSpotLight = pActiveScene->CreateGameObject("MainSpotLight");
-			pMainSpotLight->SetPosition(20.0f, 40.0f, 0.0f);
-			pMainSpotLight->LookAt(0.0f, 0.0f, 0.0f);
-			pMainSpotLight->SetParent(m_pDummy);
-			pMainSpotLight->SetActive(true);
-			auto pSpotLightCom = pMainSpotLight->AddComponent<Dive::Light>();
-			pSpotLightCom->SetType(Dive::eLightType::Spot);
-			pSpotLightCom->SetRange(1000.0f);
-			pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
-			pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+			// SpotLights
+			{
+				// MovingSpotLight
+				auto pMovingSpotLight = pActiveScene->CreateGameObject("MovingSpotLight");
+				pMovingSpotLight->SetPosition(30.0f, 30.0f, -30.0f);
+				pMovingSpotLight->LookAt(0.0f, 0.0f, 0.0f);
+				pMovingSpotLight->SetParent(m_pDummy);
+				pMovingSpotLight->SetActive(true);
+				auto pSpotLightCom = pMovingSpotLight->AddComponent<Dive::Light>();
+				pSpotLightCom->SetType(Dive::eLightType::Spot);
+				pSpotLightCom->SetRange(5000.0f);
+				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
+				pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
 
-			m_pFlashLight = pActiveScene->CreateGameObject("FlashLight");
-			m_pFlashLight->SetPosition(m_pMainCam->GetPosition());
-			m_pFlashLight->SetParent(m_pMainCam);
-			m_pFlashLight->SetActive(false);
-			pSpotLightCom = m_pFlashLight->AddComponent<Dive::Light>();
-			pSpotLightCom->SetType(Dive::eLightType::Spot);
-			pSpotLightCom->SetRange(1000.0f);
-			pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
-			pSpotLightCom->SetSpotLightAngles(30.0f, 20.0f);
+				// TopSpotLight
+				auto pTopSpotLight = pActiveScene->CreateGameObject("TopSpotLight");
+				pTopSpotLight->SetPosition(0.0f, 100.0f, 0.0f);
+				pTopSpotLight->LookAt(0.0f, 0.0f, 0.0f);
+				pTopSpotLight->SetActive(true);
+				pSpotLightCom = pTopSpotLight->AddComponent<Dive::Light>();
+				pSpotLightCom->SetType(Dive::eLightType::Spot);
+				pSpotLightCom->SetRange(1000.0f);
+				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
+				pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+
+				// left
+				auto pLeftSpotLight = pActiveScene->CreateGameObject("LeftSpotLight");
+				pLeftSpotLight->SetPosition(-50.0f, 30.0f, 50.0f);
+				pLeftSpotLight->LookAt(0.0f, 0.0f, 0.0f);
+				pLeftSpotLight->SetActive(true);
+				pSpotLightCom = pLeftSpotLight->AddComponent<Dive::Light>();
+				pSpotLightCom->SetType(Dive::eLightType::Spot);
+				pSpotLightCom->SetRange(1000.0f);
+				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
+				pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+			}
 		}
 
 		m_SceneType = eSceneType::Shadow;

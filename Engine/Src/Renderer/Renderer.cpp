@@ -3,6 +3,8 @@
 #include "ViewScreen.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/ConstantBuffer.h"
+#include "Graphics/RenderTexture.h"
+#include "Graphics/Shader.h"
 #include "Core/CoreDefs.h"
 
 namespace Dive
@@ -17,6 +19,10 @@ namespace Dive
 	
 	std::array<ConstantBuffer*, static_cast<size_t>(eConstantBuffer::Count)> Renderer::m_ConstantBuffers;
 
+	std::array<Shader*, static_cast<size_t>(eShader::Total)> Renderer::m_Shaders;
+
+	std::array<RenderTexture*, static_cast<size_t>(eGBuffer::Total)> Renderer::m_GBuffer;
+
 	bool Renderer::Initialize()
 	{
 		createRasterizerStates();
@@ -24,11 +30,17 @@ namespace Dive
 		createBlendStates();
 		createConstantBuffers();
 
+		createShaders();
+		createGBuffer();
+
 		return true;
 	}
 
 	void Renderer::Shutdown()
 	{
+		for (auto pRenderTexture : m_GBuffer)
+			DV_DELETE(pRenderTexture);
+
 		for (auto pViewScreen : m_ViewScreens)
 			DV_DELETE(pViewScreen);
 		m_ViewScreens.clear();
@@ -108,6 +120,35 @@ namespace Dive
 		if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &m_RasterizerStates[static_cast<size_t>(eRasterizerState::FillSolid_CullNone)])))
 		{
 			DV_CORE_ERROR("RasterizerState FillSolid_CullNode 생성에 실패하였습니다.");
+		}
+
+		{
+			// NoDepthClipFront
+			D3D11_RASTERIZER_DESC desc = {
+				D3D11_FILL_SOLID,
+				D3D11_CULL_FRONT,
+				FALSE,
+				D3D11_DEFAULT_DEPTH_BIAS,
+				D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
+				D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
+				TRUE,
+				FALSE,
+				FALSE,
+				FALSE };
+
+			if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &m_RasterizerStates[static_cast<size_t>(eRasterizerState::NoDepthClipFront)])))
+			{
+				DV_CORE_ERROR("RasterizerState NoDepthClipFront 생성에 실패하였습니다.");
+			}
+
+			// ShadowGen
+			desc.CullMode = D3D11_CULL_BACK;
+			desc.DepthBias = 85;
+			desc.SlopeScaledDepthBias = 5.0f;
+			if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &m_RasterizerStates[static_cast<size_t>(eRasterizerState::ShadowGen)])))
+			{
+				DV_CORE_ERROR("RasterizerState ShadowGen 생성에 실패하였습니다.");
+			}
 		}
 	}
 	
@@ -197,7 +238,7 @@ namespace Dive
 			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthDiabled)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &m_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthDisabled)])))
 			{
 				DV_CORE_ERROR("DepthDisabledStencilState 생성에 실패하였습니다.");
 			}
@@ -271,9 +312,14 @@ namespace Dive
 
 	void Renderer::createConstantBuffers()
 	{
+		// vs
 		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::Frame)] =
 			ConstantBuffer::Create<FrameBuffer>("Frame", eShaderType::VertexShader, 0);
 
+		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::LightVS)] =
+			ConstantBuffer::Create<LightVSBuffer>("LightVS", eShaderType::VertexShader, 1);
+
+		// ps
 		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::Material)] =
 			ConstantBuffer::Create<MaterialBuffer>("Material", eShaderType::PixelShader, 0);
 
@@ -282,5 +328,57 @@ namespace Dive
 
 		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::Light)] =
 			ConstantBuffer::Create<LightBuffer>("Light", eShaderType::PixelShader, 2);
+	}
+
+	void Renderer::createShaders()
+	{
+		// 기존에는 ResourceManager로 관리했었다.
+		auto pShader = LoadShaderFromFile("../../Assets/Shaders/ForwardLight.hlsl");
+		pShader->CreateInputLayout(Dive::eVertexLayout::Static_Model);
+		m_Shaders[static_cast<size_t>(eShader::ForwardLight)] = pShader;
+
+		pShader = LoadShaderFromFile("../../Assets/Shaders/Deferred.hlsl");
+		pShader->CreateInputLayout(Dive::eVertexLayout::Static_Model);
+		m_Shaders[static_cast<size_t>(eShader::Deferred)] = pShader;
+
+		pShader = LoadShaderFromFile("../../Assets/Shaders/DeferredLights.hlsl");
+		//pShader->CreateInputLayout(Dive::eVertexLayout::Static_Model);
+		m_Shaders[static_cast<size_t>(eShader::DeferredLights)] = pShader;
+
+		pShader = LoadShaderFromFile("../../Assets/Shaders/ForwardLightShadow.hlsl");
+		pShader->CreateInputLayout(Dive::eVertexLayout::Static_Model);
+		m_Shaders[static_cast<size_t>(eShader::ForwardLightShadow)] = pShader;
+
+		pShader = LoadShaderFromFile("../../Assets/Shaders/ShadowGen.hlsl");
+		pShader->CreateInputLayout();
+		m_Shaders[static_cast<size_t>(eShader::ShadowGen)] = pShader;
+	}
+
+	void Renderer::createGBuffer()
+	{
+		const int width = Graphics::GetResolutionWidth();
+		const int height = Graphics::GetResolutionHeight();
+
+		// DepthStencil
+		// 운이 좋았을 뿐. 이렇게 포맷을 전달하면 Texture2D가 생성되지 않을 수 있다.
+		// 따라서 RTV와 DSV를 생성하는 함수를 통합하고 Texture2D의 포멧을 전달하도록 변경해야 한다.
+		auto pDepthStencilTexture = new RenderTexture();
+		pDepthStencilTexture->SetDepthStencil(width, height, DXGI_FORMAT_R24G8_TYPELESS, true);
+		m_GBuffer[static_cast<size_t>(eGBuffer::DepthStencil)] = pDepthStencilTexture;
+
+		// ColorSpecIntensity
+		auto pColorTexture = new RenderTexture();
+		pColorTexture->SetRenderTarget(width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
+		m_GBuffer[static_cast<size_t>(eGBuffer::ColorSpecIntensity)] = pColorTexture;
+
+		// Normal
+		auto pNormalTexture = new RenderTexture();
+		pNormalTexture->SetRenderTarget(width, height, DXGI_FORMAT_R11G11B10_FLOAT);
+		m_GBuffer[static_cast<size_t>(eGBuffer::Normal)] = pNormalTexture;
+
+		// SpecPower
+		auto pSpecTexture = new RenderTexture();
+		pSpecTexture->SetRenderTarget(width, height, DXGI_FORMAT_R8G8B8A8_UNORM);
+		m_GBuffer[static_cast<size_t>(eGBuffer::SpecPower)] = pSpecTexture;
 	}
 }

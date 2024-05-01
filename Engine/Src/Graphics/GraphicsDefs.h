@@ -34,6 +34,7 @@ namespace Dive
 		GBuffer_Color_SpecIntensity,
 		GBuffer_Normal,
 		GBuffer_SpecPower,
+		SpotShadowMap,
 		Max_Num
 	};
 

@@ -1,4 +1,3 @@
-//#ifdef COMPILEPS
 
 Texture2D DiffuseMap : register(t0);
 Texture2D NormalMap: register(t1);
@@ -9,10 +8,12 @@ Texture2D<float4> ColorSpecIntTex : register(t4);
 Texture2D<float3> NormalTex : register(t5);
 Texture2D<float4> SpecPowTex : register(t6);
 
+Texture2D<float> SpotShadowMap : register(t7);
+
 // 역시 s0 ~ s15까지
 SamplerState DiffuseMapSampler : register(s0);
 SamplerState NormalMapSampler : register(s1);
 SamplerState SpecularMapSampler : register(s2);
 
-
-//#endif
+SamplerComparisonState SpotPCFSampler : register(s7);
+//SamplerState SpotPCFSampler : register(s7);

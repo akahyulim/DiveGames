@@ -22,6 +22,8 @@ namespace Dive
     {
         FillSolid_CullBack,
         FillSolid_CullNone,
+        ShadowGen,
+        NoDepthClipFront,
         Total
     };
 

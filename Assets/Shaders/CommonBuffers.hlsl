@@ -6,6 +6,12 @@ struct FrameBufferData
     matrix projection;
 };
 
+// 어쩔 수 없이 셰이더별로 분리해야한다.
+struct LightVS
+{
+    matrix shadow;
+};
+
 // 역시 공용이라 볼 수 없다.
 // Material이 여러가지로 분화될 수 있기 때문이다.
 struct MaterialBufferData
@@ -23,7 +29,11 @@ struct MaterialBufferData
 struct CameraData
 {
     float3 position;
-    float p0;
+    float padding;
+    
+    float4 perspectiveValue;
+    
+    matrix viewInverse;
 };
 
 struct LightBufferData
@@ -39,53 +49,61 @@ struct LightBufferData
     
     uint options;
     float3 padding;
+    
+    matrix shadow;
 };
 
 // VS ConstantBuffers
-cbuffer cbFrame : register(b0)
+cbuffer cbFrameVertex : register(b0)
 { 
-    FrameBufferData cbFrame;
+    FrameBufferData cbFrameVertex;
+}
+
+// naming을 cbLightVertex 이런식으로 하자.
+cbuffer cbLightVertex : register(b1)
+{
+    LightVS cbLightVertex;
 }
 
 // PS Constantuffers
-cbuffer cbMaterial : register(b0)
+cbuffer cbMaterialPixel : register(b0)
 {
-    MaterialBufferData cbMaterial;
+    MaterialBufferData cbMaterialPixel;
 }
 
-cbuffer cbCamera : register(b1)
+cbuffer cbCameraPixel : register(b1)
 {
-    CameraData cbCamera;
+    CameraData cbCameraPixel;
 }
 
-cbuffer cbLight : register(b2)
+cbuffer cbLightPixel : register(b2)
 {
-    LightBufferData cbLight;
+    LightBufferData cbLightPixel;
 }
 
-// cbLight options
+// cbLightPixel options
 bool IsDirectionalLight() 
 { 
-    return cbLight.options & uint(1U << 0); 
+    return cbLightPixel.options & uint(1U << 0); 
 }
 
 bool IsPointLight()
 {
-    return cbLight.options & uint(1U << 1);
+    return cbLightPixel.options & uint(1U << 1);
 }
 
 bool IsSpotLight()
 {
-    return cbLight.options & uint(1U << 2);
+    return cbLightPixel.options & uint(1U << 2);
 }
 
-// cbMaterial options
+// cbMaterialPixel options
 bool HasDiffuseTexture()
 {
-    return cbMaterial.properties & uint(1U << 0);
+    return cbMaterialPixel.properties & uint(1U << 0);
 }
 
 bool HasNormalTexture()
 {
-    return cbMaterial.properties & uint(1U << 1);
+    return cbMaterialPixel.properties & uint(1U << 1);
 }

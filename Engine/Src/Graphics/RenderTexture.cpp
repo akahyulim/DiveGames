@@ -17,6 +17,8 @@ namespace Dive
 	{
 	}
 
+	// format이 rtv, dsv의 것이 아니다. texture2d의 것이어야 한다.
+	// 따라서 생성 타입을 지정하는 매개변수를 추가하고 아래의 함수와 통합하는 편이 나을 것 같다.
 	bool RenderTexture::SetRenderTarget(int width, int height, DXGI_FORMAT format)
 	{
 		m_Width = width;
@@ -71,7 +73,9 @@ namespace Dive
 		texDesc.MiscFlags = 0;	// 현재 밉맵 사용 안함.
 		texDesc.CPUAccessFlags = 0;
 
-		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
+		//if (FAILED(
+		auto bResult = m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D);
+		if(FAILED(bResult))
 		{
 			DV_RELEASE(m_pTexture2D);
 			DV_CORE_ERROR("RenderTexture::createResources - Texture2D 생성에 실패하였습니다.");

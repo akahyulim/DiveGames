@@ -71,6 +71,7 @@ namespace Dive
 
 		return elements;
 	}
+
 	Shader::Shader()
 		: m_pVertexShaderBlob(nullptr)
 		, m_pVertexShader(nullptr)
@@ -107,7 +108,7 @@ namespace Dive
 
 		auto pPixelShaderBlob = CompileFromFile(fileName, "ps_5_0", "MainPS");
 		if (!pPixelShaderBlob)
-			return false;
+			return true; // юс╫ц
 
 		if (FAILED(pDevice->CreatePixelShader(pPixelShaderBlob->GetBufferPointer(), pPixelShaderBlob->GetBufferSize(), NULL, &m_pPixelShader)))
 		{

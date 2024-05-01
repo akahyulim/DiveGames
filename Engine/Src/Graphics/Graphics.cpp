@@ -243,28 +243,6 @@ namespace Dive
 		s_pSwapChain->Present(s_bVSync ? 1 : 0, 0);
 	}
 
-	void Graphics::ClearViews(uint8_t flags, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil)
-	{
-		// 이 곳에서 SetRenderTarget과 SetDepthStencil의 더티체크 후 바인딩을 하기 때문이다.
-		// 따라서 이름이 더 어울리지 않게 되었다.
-		// 어쩌면 해당 부분을 분리하는 것이 더 나을수도 있을 것 같다.
-		prepareDraw();
-
-		float clearColor[4] = { color.x, color.y, color.z, color.w };
-
-		if (flags & eClearFlags::Color)
-			s_pDeviceContext->ClearRenderTargetView(s_RenderTargetViews[0], clearColor);
-
-		if ((flags & eClearFlags::Depth) || (flags & eClearFlags::Stencil))
-		{
-			uint32_t clearFlags = 0;
-			clearFlags |= (flags & eClearFlags::Depth) ? D3D11_CLEAR_DEPTH : 0;
-			clearFlags |= (flags & eClearFlags::Stencil) ? D3D11_CLEAR_STENCIL : 0;
-
-			s_pDeviceContext->ClearDepthStencilView(s_pDepthStencilView, clearFlags, depth, stencil);
-		}
-	}
-
 	void Graphics::SetRenderTargetView(uint32_t index, ID3D11RenderTargetView* pRenderTargetView)
 	{
 		// 추후 상수를 constexpr로 바꾸기
@@ -286,6 +264,38 @@ namespace Dive
 		{
 			s_pDepthStencilView = pDepthStencilView;
 			s_bRenderTargetViewsDirty = true;
+		}
+	}
+
+	void Graphics::ClearViews(uint8_t flags, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil)
+	{
+		// 이걸 주석처리해버리면 SRV가 Set되지 않는 문제가 발생한다.
+		prepareDraw();
+
+		if (flags & eClearFlags::Color)
+		{
+			float clearColor[4] = { color.x, color.y, color.z, color.w };
+
+			for (uint32_t i = 0; i < 4; ++i)
+			{
+				if (s_RenderTargetViews[i])
+				{
+					s_pDeviceContext->ClearRenderTargetView(s_RenderTargetViews[i], clearColor);
+				}
+			}
+		}
+
+		if ((flags & eClearFlags::Depth) || (flags & eClearFlags::Stencil))
+		{
+			if (s_pDepthStencilView)
+			{
+				uint32_t clearFlags = 0;
+				clearFlags |= (flags & eClearFlags::Depth) ? D3D11_CLEAR_DEPTH : 0;
+				clearFlags |= (flags & eClearFlags::Stencil) ? D3D11_CLEAR_STENCIL : 0;
+
+
+				s_pDeviceContext->ClearDepthStencilView(s_pDepthStencilView, clearFlags, depth, stencil);
+			}
 		}
 	}
 
@@ -358,21 +368,29 @@ namespace Dive
 				s_bTextureDirty = true;
 			}
 		}
+
+		// 일단 prepareDraw에서 떼어냈다.
+		s_pDeviceContext->PSSetShaderResources((uint32_t)index, 1, &s_ShaderResourceViews[(size_t)index]);
+		s_pDeviceContext->PSSetSamplers((uint32_t)index, 1, &s_SamplerStates[(size_t)index]);
 	}
 
 	void Graphics::SetShader(Shader* pShader)
 	{
 		if (pShader != s_pShader)
 		{
-			s_pDeviceContext->IASetInputLayout(pShader->GetInputLayout());
-			s_pDeviceContext->VSSetShader(pShader->GetVertexShader(), nullptr, 0);
-			s_pDeviceContext->PSSetShader(pShader->GetPixelShader(), nullptr, 0);
+			s_pDeviceContext->IASetInputLayout(pShader ? pShader->GetInputLayout(): NULL);
+			
+			s_pDeviceContext->VSSetShader(pShader ? pShader->GetVertexShader() : NULL, nullptr, 0);
+			//s_pDeviceContext->GSSetShader(nullptr, nullptr, 0);
+			//s_pDeviceContext->HSSetShader(nullptr, nullptr, 0);
+			s_pDeviceContext->PSSetShader(pShader ? pShader->GetPixelShader() : NULL, nullptr, 0);
 
 			s_pShader = pShader;
 		}
 	}
 
 	// 단일 버퍼만 다루고 있다.
+	// 초기화된 값과 NULL을 전달받았을 때 그냥 넘어가버린다.
 	void Graphics::SetVertexBuffer(VertexBuffer* pBuffer)
 	{
 		if (pBuffer != s_pVertexBuffer)
@@ -630,27 +648,29 @@ namespace Dive
 		return true;
 	}
 
-	// 여전히 이름이 마음에 들지 않는다.
-	// 결국 모든 bind에 대응하지 않는다.
-	// 더티체크를 기반으로 변경여부를 확인하고 필요할 경우 직접 생성하는 리소스만 처리하는 함수였다.
-	// => SetRenderTargets, SetTexture만 잘 처리하면 필요가 없어질 것 같다.
+	// 한 번의 드로우콜에만 호출되는 것이 아니라면 오히려 낭비다.
+	// 문제는 드로우콜이 아니라도 설정되어야 하는 경우가 발생할 수 있다는 것이다.
 	void Graphics::prepareDraw()
 	{
+		// 이건 이 곳이 어울리는 게 맞다.
+		// 아니면 RTV와 DSV를 하나의 함수로 설정해야 하는데
+		// 이는 아래의 OMSetRenderTargets()의 래퍼함수에 지나지 않는다. => 이게 무슨 문제라도? 
 		if (s_bRenderTargetViewsDirty)
 		{
 			// 1. DepthStencilView가 존재한다면 적용 없다면 디폴트 깊이버퍼
 			// 2. !깊이쓰기, DepthSTencilView가 ReadOnly라면 ReadOnly로...
 			// 3. RenderTargets[0]이 비었고, DepthStencil가 없거나, 있지만 크기가 백버퍼랑 같을 때 디폴트 렌더타겟
+			// => 위의 조건들이 무슨소리인지 모르겠다.
 
-			s_pDeviceContext->OMSetRenderTargets(4, &s_RenderTargetViews[0], s_pDefaultDepthStencilView);
+			s_pDeviceContext->OMSetRenderTargets(4, s_RenderTargetViews, s_pDepthStencilView);
 
 			s_bRenderTargetViewsDirty = false;
 		}
 
 		if (s_bTextureDirty)
 		{
-			s_pDeviceContext->PSSetShaderResources(0, (uint32_t)eTextureUnit::Max_Num, &s_ShaderResourceViews[0]);
-			s_pDeviceContext->PSSetSamplers(0, (uint32_t)eTextureUnit::Max_Num, &s_SamplerStates[0]);
+			//s_pDeviceContext->PSSetShaderResources(0, (uint32_t)eTextureUnit::Max_Num, s_ShaderResourceViews);
+			//s_pDeviceContext->PSSetSamplers(0, (uint32_t)eTextureUnit::Max_Num, s_SamplerStates);
 
 			s_bTextureDirty = false;
 		}

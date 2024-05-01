@@ -3,8 +3,10 @@
 
 namespace Dive
 {
+	// NULL도 추가하는 편이 나으려나...
 	enum class eVertexLayout
 	{
+		Pos,
 		Pos_Tex,
 		Pos_Tex_Nor,
 		Static_Model,
@@ -22,7 +24,7 @@ namespace Dive
 		~Shader() override;
 
 		bool LoadFromFile(const std::string& fileName) override;
-		bool CreateInputLayout(eVertexLayout layout);
+		bool CreateInputLayout(eVertexLayout layout = eVertexLayout::Pos);	// 기본을 NULL로 해야하나..
 
 		ID3D11VertexShader* GetVertexShader() const { return m_pVertexShader; }
 		ID3D11PixelShader* GetPixelShader() const { return m_pPixelShader; }

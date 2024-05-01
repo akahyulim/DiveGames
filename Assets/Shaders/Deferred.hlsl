@@ -1,34 +1,41 @@
 #include "Common.hlsl"
 
-struct PixelInput
+struct VS_INPUT
 {
-	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
-	float3 worldPos : TEXCOORD1;
-	float3 normal : NORMAL;
-	float3 tangent : TANGENT;
+    float4 position : POSITION0;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL0;
+    float3 tangent : TANGENT0;
+    float3 bitangent : BINORMAL0;
 };
 
-PixelInput MainVS(Vertex_PosTexNorTan input)
+struct VS_OUTPUT
 {
-	PixelInput output;
+    float4 position : SV_POSITION;
+    float2 tex : TEXCOORD0;
+    float3 worldPos : TEXCOORD1;
+    float3 normal : NORMAL0;
+    float3 tangent : TANGENT0;
+    float3 bitangent : BINORMAL0;
+};
 
-	input.position.w = 1.0f;
-	output.position = mul(input.position, cbWorldMatrixVS);
-	output.position = mul(output.position, cbViewMatrixVS);
-	output.position = mul(output.position, cbProjMatrixVS);
-
-	output.worldPos = mul(input.position, cbWorldMatrixVS).xyz;
-
-	output.tex = input.tex;
-
-	output.normal = mul(input.normal, (float3x3)cbWorldMatrixVS);
-	output.normal = normalize(output.normal);
-
-	output.tangent = mul(input.tangent, (float3x3)cbWorldMatrixVS);
-	output.tangent = normalize(output.tangent);
-
-	return output;
+VS_OUTPUT MainVS(VS_INPUT input)
+{
+    VS_OUTPUT output;
+    
+    input.position.w = 1.0f;
+    output.position = mul(input.position, cbFrameVertex.world);
+    output.worldPos = output.position.xyz;
+    output.position = mul(output.position, mul(cbFrameVertex.view, cbFrameVertex.projection));
+    output.tex = input.tex;
+    output.normal = mul(input.normal, (float3x3) cbFrameVertex.world);
+    output.normal = normalize(output.normal);
+    output.tangent = mul(input.tangent, (float3x3) cbFrameVertex.world);
+    output.tangent = normalize(output.tangent);
+    output.bitangent = mul(input.bitangent, (float3x3) cbFrameVertex.world);
+    output.bitangent = normalize(output.bitangent);
+    
+    return output;
 }
 
 struct PS_GBUFFER
@@ -38,15 +45,29 @@ struct PS_GBUFFER
 	float4 specPower : SV_TARGET2;
 };
 
-PS_GBUFFER MainPS(PixelInput input)
+PS_GBUFFER MainPS(VS_OUTPUT input)
 {
 	PS_GBUFFER output;
 
-    float4 diffuse = has_texture_diffse() ? DiffuseMap.Sample(DiffuseMapSampler, input.tex) : cbMaterialAlbedoColorPS;
-    diffuse *= diffuse; // ¿Ö Á¦°ö?
-	output.colorSpecIntensity = diffuse;
+    // diffuse
+    float4 diff;
+    if (!HasDiffuseTexture())
+        diff = cbMaterialPixel.color;
+    else
+        diff = DiffuseMap.Sample(DiffuseMapSampler, input.tex);
+    diff *= diff; // linear space
+	output.colorSpecIntensity.xyz = diff.xyz;
 
-	output.normal = float4(input.normal * 0.5 + 0.5, 0.0);
+    // normal
+    float3 normal = input.normal;
+    if (HasNormalTexture())
+    {
+        float4 bumpMap = NormalMap.Sample(NormalMapSampler, input.tex);
+        bumpMap = (bumpMap * 2.0f) - 1.0f;
 
-	return output;
+        normal = normalize((bumpMap.x * input.tangent) + (bumpMap.y * input.bitangent) + (bumpMap.z * input.normal));
+    }
+	output.normal = float4(normal * 0.5f + 0.5f, 0.0);
+
+    return output;
 }

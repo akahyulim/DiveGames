@@ -6,6 +6,7 @@ namespace Dive
 	class ViewScreen;
 	class RenderTexture;
 	class ConstantBuffer;
+	class Shader;
 
 	enum class eConstantBuffer
 	{
@@ -13,6 +14,7 @@ namespace Dive
 		Material,
 		Camera,
 		Light,
+		LightVS,
 		Count
 	};
 
@@ -38,7 +40,11 @@ namespace Dive
 	struct CameraBuffer
 	{
 		DirectX::XMFLOAT3 position;
-		float p0;
+		float padding;
+
+		DirectX::XMFLOAT4 perspectiveValue;
+
+		DirectX::XMMATRIX viewInverse;
 	};
 
 	struct LightBuffer
@@ -54,6 +60,13 @@ namespace Dive
 		
 		uint32_t options;
 		DirectX::XMFLOAT3 padding;
+
+		DirectX::XMMATRIX shadow;
+	};
+
+	struct LightVSBuffer
+	{
+		DirectX::XMMATRIX shadow;
 	};
 
 	enum class eDepthStencilState
@@ -61,9 +74,28 @@ namespace Dive
 		DepthReadWrite,
 		DepthReadWrite_StencilReadWrite,
 		GBuffer,
-		DepthDiabled,   // skydome에서 off용으로...
+		DepthDisabled,   // skydome에서 off용으로...
 		ForwardLight,
 		Count
+	};
+
+	enum class eGBuffer
+	{
+		DepthStencil,
+		ColorSpecIntensity,
+		Normal,
+		SpecPower,
+		Total
+	};
+
+	enum class eShader
+	{
+		ForwardLight,
+		Deferred,
+		DeferredLights,
+		ShadowGen,
+		ForwardLightShadow,
+		Total
 	};
 
 	class Renderer
@@ -86,12 +118,18 @@ namespace Dive
 		static ID3D11BlendState* GetBlendState(eBlendState bs) { return m_BlendStates[(size_t)bs]; }
 		static ConstantBuffer* GetConstantBuffer(eConstantBuffer cb) { return m_ConstantBuffers[(size_t)cb]; }
 
+		static Shader* GetShader(eShader type) { return m_Shaders[(size_t)type]; }
+
+		static RenderTexture* GetGBufferTexture(eGBuffer type) { return m_GBuffer[(size_t)type]; }
+
 	private:
 		static void createRasterizerStates();
 		static void createDepthStencilStates();
 		static void createBlendStates();
 		static void createRenderTextures();
 		static void createConstantBuffers();
+		static void createShaders();
+		static void createGBuffer();
 
 
 	private:
@@ -102,5 +140,9 @@ namespace Dive
 		static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Total)> m_BlendStates;
 		static std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Total)> m_RenderTargets;
 		static std::array<ConstantBuffer*, static_cast<size_t>(eConstantBuffer::Count)> m_ConstantBuffers;
+
+		static std::array<Shader*, static_cast<size_t>(eShader::Total)> m_Shaders;
+
+		static std::array<RenderTexture*, static_cast<size_t>(eGBuffer::Total)> m_GBuffer;
 	};
 }

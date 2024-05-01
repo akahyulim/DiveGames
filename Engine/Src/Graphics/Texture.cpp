@@ -15,6 +15,7 @@ namespace Dive
 		, m_bMipLevelDirty(true)
 		, m_Filter(D3D11_FILTER_MIN_MAG_MIP_LINEAR)
 		, m_AddressMode(D3D11_TEXTURE_ADDRESS_WRAP)
+		, m_ComparisonFunc(D3D11_COMPARISON_ALWAYS)
 		, m_BorderColor(0.0f, 0.0f, 0.0f, 0.0f)
 		, m_AnisoLevel(1)
 		, m_bSamplerStateDirty(true)
@@ -65,7 +66,7 @@ namespace Dive
 		desc.AddressW = m_AddressMode;
 		desc.MipLODBias = 0.0f;
 		desc.MaxAnisotropy = m_AnisoLevel;
-		desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+		desc.ComparisonFunc = m_ComparisonFunc;
 		desc.BorderColor[0] = m_BorderColor.x;
 		desc.BorderColor[1] = m_BorderColor.y;
 		desc.BorderColor[2] = m_BorderColor.z;
@@ -97,6 +98,15 @@ namespace Dive
 		if (m_AddressMode != mode)
 		{
 			m_AddressMode = mode;
+			m_bSamplerStateDirty = true;
+		}
+	}
+
+	void Texture::SetComparisonFunc(D3D11_COMPARISON_FUNC func)
+	{
+		if (m_ComparisonFunc != func)
+		{
+			m_ComparisonFunc = func;
 			m_bSamplerStateDirty = true;
 		}
 	}

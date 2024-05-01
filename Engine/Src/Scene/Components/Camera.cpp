@@ -44,10 +44,13 @@ namespace Dive
 
 	DirectX::XMMATRIX Camera::GetViewMatrix()
 	{
-		return DirectX::XMMatrixLookToLH(
-			m_pGameObject->GetPositionVector(),
-			m_pGameObject->GetForwardVector(),
-			m_pGameObject->GetUpwardVector());
+		const auto& pos = m_pGameObject->GetPositionVector();
+		const auto& forward = m_pGameObject->GetForwardVector();
+		const auto& up = m_pGameObject->GetUpwardVector();
+
+		const auto& focus = DirectX::XMVectorAdd(pos, forward);
+
+		return DirectX::XMMatrixLookAtLH(pos, focus, up);
 	}
 
 	DirectX::XMMATRIX Camera::GetProjectionMatrix() const

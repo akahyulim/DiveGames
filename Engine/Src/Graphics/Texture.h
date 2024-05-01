@@ -36,6 +36,9 @@ namespace Dive
 		D3D11_TEXTURE_ADDRESS_MODE SetAddressMode() const { return m_AddressMode; }
 		void SetAddressMode(D3D11_TEXTURE_ADDRESS_MODE mode);
 
+		D3D11_COMPARISON_FUNC GetCompariaonFunc() const { m_ComparisonFunc; }
+		void SetComparisonFunc(D3D11_COMPARISON_FUNC func);
+
 		DirectX::XMFLOAT4 GetBorderColor() const { return m_BorderColor; }
 		void SetBorderColor(const DirectX::XMFLOAT4& color);
 
@@ -78,6 +81,7 @@ namespace Dive
 
 		D3D11_FILTER m_Filter;
 		D3D11_TEXTURE_ADDRESS_MODE m_AddressMode;	// 유니티는 u, v, w를 나누어 멤버 변수로 관리한다.
+		D3D11_COMPARISON_FUNC m_ComparisonFunc;
 		DirectX::XMFLOAT4 m_BorderColor;
 		int m_AnisoLevel;
 		bool m_bSamplerStateDirty;

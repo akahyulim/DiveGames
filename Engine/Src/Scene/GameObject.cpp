@@ -298,6 +298,7 @@ namespace Dive
 		updateTransform();
 	}
 
+	// pos와 동일하면 안된다.
 	void GameObject::LookAt(float x, float y, float z, float upX, float upY, float upZ)
 	{
 		LookAt(DirectX::XMVectorSet(x, y, z, 1.0f), DirectX::XMVectorSet(upX, upY, upZ, 1.0f));

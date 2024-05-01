@@ -23,17 +23,23 @@ namespace Dive
 		static bool BeginFrame();
 		static void EndFrame();
 
-		static void ClearViews(uint8_t flags, const DirectX::XMFLOAT4& color, float depth = 1.0f, uint8_t stencil = 0);
 		static void SetRenderTargetView(uint32_t index, ID3D11RenderTargetView* pRenderTargetView);
 		static void SetDepthStencilView(ID3D11DepthStencilView* pDepthStencilView);
+		static void ClearViews(uint8_t flags, const DirectX::XMFLOAT4& color, float depth = 1.0f, uint8_t stencil = 0);
+		
 		static void SetViewport(const RECT& rt);
+
 		static void SetDepthStencilState(ID3D11DepthStencilState* pState);
 		static void SetRasterizerState(ID3D11RasterizerState* pState);
 		static void SetBlendState(ID3D11BlendState* pState);
+		
 		static void SetTexture(eTextureUnit index, Texture* pTexture);
+		
 		static void SetShader(Shader* pShader);
+		
 		static void SetVertexBuffer(VertexBuffer* pBuffer);
 		static void SetIndexBuffer(IndexBuffer* pBuffer);
+		
 		static void Draw(D3D11_PRIMITIVE_TOPOLOGY topology, uint32_t vertexCount, uint32_t vertexStart);
 		static void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY topology, uint32_t indexCount, uint32_t indexStart);
 

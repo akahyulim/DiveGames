@@ -27,7 +27,7 @@ VS_OUTPUT MainVS(uint VertexID : SV_VERTEXID)
 	return output;
 }
 
-float4 frameRender : SV_TARGET0;
+//float4 frameRender : SV_TARGET0;
 
 float4 MainPS(VS_OUTPUT input) : SV_TARGET0
 {

@@ -1,24 +1,22 @@
 #include "Common.hlsl"
 
-// legacy light
-
 struct VS_INPUT
 {
-    float4 position     : POSITION0;
-    float2 tex          : TEXCOORD0;
-    float3 normal       : NORMAL0;
-    float3 tangent      : TANGENT0;
-    float3 bitangent    : BINORMAL0;
+    float4 position : POSITION0;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL0;
+    float3 tangent : TANGENT0;
+    float3 bitangent : BINORMAL0;
 };
 
 struct VS_OUTPUT
 {
-    float4 position     : SV_POSITION;
-    float2 tex          : TEXCOORD0;
-    float3 worldPos     : TEXCOORD1;
-    float3 normal       : NORMAL0;
-    float3 tangent      : TANGENT0;
-    float3 bitangent    : BINORMAL0;
+    float4 position : SV_POSITION;
+    float2 tex : TEXCOORD0;
+    float3 worldPos : TEXCOORD1;
+    float3 normal : NORMAL0;
+    float3 tangent : TANGENT0;
+    float3 bitangent : BINORMAL0;
 };
 
 VS_OUTPUT MainVS(VS_INPUT input)
@@ -30,7 +28,7 @@ VS_OUTPUT MainVS(VS_INPUT input)
     output.worldPos = output.position.xyz;
     output.position = mul(output.position, mul(cbFrameVertex.view, cbFrameVertex.projection));
     output.tex = input.tex;
-    output.normal = mul(input.normal, (float3x3)cbFrameVertex.world);
+    output.normal = mul(input.normal, (float3x3) cbFrameVertex.world);
     output.normal = normalize(output.normal);
     output.tangent = mul(input.tangent, (float3x3) cbFrameVertex.world);
     output.tangent = normalize(output.tangent);
@@ -50,7 +48,7 @@ float3 CalcuDirLight(float3 worldPos, float3 normal, float3 diff)
     
     // Phong diffuse
     float NDotL = saturate(dot(-cbLightPixel.direction, normal));
-    if(NDotL > 0.0f)
+    if (NDotL > 0.0f)
     {
         finalColor += cbLightPixel.color * NDotL;
     }
@@ -61,7 +59,7 @@ float3 CalcuDirLight(float3 worldPos, float3 normal, float3 diff)
     float3 halfWay = normalize(toEye + -cbLightPixel.direction);
     float NDotH = saturate(dot(halfWay, normal));
     
-    finalColor += cbLightPixel.color * 
+    finalColor += cbLightPixel.color *
     pow(NDotH, 250.0f) * 0.25f;
     
     return finalColor * diff;
@@ -93,6 +91,16 @@ float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diff)
     return finalColor;
 }
 
+float SpotShadowPCF(float3 position)
+{
+    float4 shadowMapPos = mul(float4(position, 1.0f), cbLightPixel.shadow);
+    float3 uvd = shadowMapPos.xyz / shadowMapPos.w;
+    uvd.xy = 0.5f * uvd.xy + 0.5f;
+    uvd.y = 1.0f - uvd.y;
+    
+    return SpotShadowMap.SampleCmpLevelZero(SpotPCFSampler, uvd.xy, uvd.z);
+}
+
 float3 CalcuSpotLight(float3 worldPos, float3 normal, float3 diff)
 {
     float3 toLight = cbLightPixel.position - worldPos;
@@ -118,7 +126,9 @@ float3 CalcuSpotLight(float3 worldPos, float3 normal, float3 diff)
     float cosAng = acos(dot(-cbLightPixel.direction, toLight));
     float coneAtt = 1.0f * smoothstep(cbLightPixel.outerConeAngle, cbLightPixel.innerConeAngle, cosAng);
     
-    finalColor *= diff * distAttn * coneAtt;
+    float shadowAtt = SpotShadowPCF(worldPos);
+    
+    finalColor *= diff * distAttn * coneAtt * shadowAtt;
     
     return finalColor;
 }
@@ -150,4 +160,7 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
         lightColor = CalcuSpotLight(input.worldPos, normal, diff.xyz);
     
     return float4(lightColor, diff.a);
+    
+    //float pos = SpotShadowPCF(input.worldPos);
+    //return float4(pos, pos, pos, 1.0f);
 }
