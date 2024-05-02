@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "Math/BoundingBox.h"
+#include "Renderer/Renderer.h"
 
 namespace Dive
 {
@@ -17,6 +18,8 @@ namespace Dive
 	public:
 		Renderable(GameObject* pGameObject);
 		~Renderable() override;
+
+		void Update() override;
 
 		void SetGeometry(Mesh* pMesh, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount);
 
@@ -38,6 +41,9 @@ namespace Dive
 
 		void Draw(D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) const;
 
+		const ModelConstantBufferVS& GetCBufferVS() const { return m_CBufferVS; }
+		const MaterialConstantBufferPS& GetCBufferPS() const { return m_CBufferPS; }
+
 	private:
 
 	private:
@@ -53,5 +59,8 @@ namespace Dive
 		BoundingBox m_TransformdBoundingBox;
 
 		DirectX::XMFLOAT4X4 m_LastTransform;
+
+		ModelConstantBufferVS m_CBufferVS;
+		MaterialConstantBufferPS m_CBufferPS;
 	};
 }

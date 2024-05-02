@@ -26,15 +26,15 @@ VS_OUTPUT MainVS(VS_INPUT input)
     VS_OUTPUT output;
     
     input.position.w = 1.0f;
-    output.position = mul(input.position, cbFrameVertex.world);
+    output.position = mul(input.position, cbModelVertex.world);
     output.worldPos = output.position.xyz;
-    output.position = mul(output.position, mul(cbFrameVertex.view, cbFrameVertex.projection));
+    output.position = mul(output.position, mul(cbCameraVertex.view, cbCameraVertex.projection));
     output.tex = input.tex;
-    output.normal = mul(input.normal, (float3x3)cbFrameVertex.world);
+    output.normal = mul(input.normal, (float3x3)cbModelVertex.world);
     output.normal = normalize(output.normal);
-    output.tangent = mul(input.tangent, (float3x3) cbFrameVertex.world);
+    output.tangent = mul(input.tangent, (float3x3) cbModelVertex.world);
     output.tangent = normalize(output.tangent);
-    output.bitangent = mul(input.bitangent, (float3x3) cbFrameVertex.world);
+    output.bitangent = mul(input.bitangent, (float3x3) cbModelVertex.world);
     output.bitangent = normalize(output.bitangent);
     
     return output;

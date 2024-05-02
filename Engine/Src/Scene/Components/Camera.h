@@ -1,6 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "Renderer/RendererDefs.h"
+#include "Renderer/Renderer.h"
 
 namespace Dive
 {
@@ -20,6 +21,8 @@ namespace Dive
 	public:
 		Camera(GameObject* pGameObject);
 		~Camera() override;
+
+		void Update() override;
 
 		DirectX::XMFLOAT3 GetPosition();
 		DirectX::XMMATRIX GetWorldMatrix();
@@ -61,6 +64,9 @@ namespace Dive
 		void SetRenderTarget(RenderTexture* pRenderTarget) { m_pRenderTarget = pRenderTarget; }
 		DirectX::XMFLOAT2 GetRenderTargetSize() const;
 
+		const CameraConstantBufferVS& GetCBufferVS() const { return m_CBufferVS; }
+		const CameraConstantBufferPS& GetCBufferPS() const { return m_CBufferPS; }
+
 	protected:
 		eProjectionType m_ProjectionType;
 
@@ -78,5 +84,8 @@ namespace Dive
 		RECT m_Viewport;
 
 		RenderTexture* m_pRenderTarget;
+
+		CameraConstantBufferVS m_CBufferVS;
+		CameraConstantBufferPS m_CBufferPS;
 	};
 }

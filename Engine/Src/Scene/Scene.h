@@ -16,6 +16,8 @@ namespace Dive
 
 		void Clear();
 
+		void Update();
+
 		bool LoadFromFile(const std::string& fileName);
 		bool SaveToFile(const std::string& fileName);
 		

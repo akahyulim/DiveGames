@@ -35,9 +35,6 @@ namespace Dive
 		void forwardRender();
 		void deferredRender();
 
-		void passOpaque();
-		void passTransparent();
-
 		void passShadowGen();
 		void passOpaqueDraw();
 		void passTransparentDraw();
@@ -49,15 +46,6 @@ namespace Dive
 		eRenderPath m_RenderPath;
 
 		std::unordered_map<eRenderable, std::vector<GameObject*>> m_Renderables;
-
-		// vs
-		FrameBuffer m_cpuFrameBuffer;
-		LightVSBuffer m_cpuLightVSBuffer;
-
-		// ps
-		MaterialBuffer m_cpuMaterialBuffer;
-		CameraBuffer m_cpuCameraBuffer;
-		LightBuffer m_cpuLightBuffer;
 
 		Frustum m_Frustum;
 	};

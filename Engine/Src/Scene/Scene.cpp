@@ -36,6 +36,13 @@ namespace Dive
 		m_bLoaded = false;
 	}
 
+	// 일단 간단하게 만들었다.
+	void Scene::Update()
+	{
+		for (auto gameObject : m_GameObjects)
+			gameObject.second->Update();
+	}
+
 	bool Scene::LoadFromFile(const std::string& fileName)
 	{
 		m_bLoaded = true;

@@ -1,7 +1,11 @@
 // 공용이라면 Renderer3D 아니면 적어도 ForwardRenderer에서 만들고 관리해야 한다.
-struct FrameBufferData
+struct ModelBufferData
 {
     matrix world;
+};
+
+struct CameraVS
+{
     matrix view;
     matrix projection;
 };
@@ -54,13 +58,18 @@ struct LightBufferData
 };
 
 // VS ConstantBuffers
-cbuffer cbFrameVertex : register(b0)
+cbuffer cbModelVertex : register(b0)
 { 
-    FrameBufferData cbFrameVertex;
+    ModelBufferData cbModelVertex;
+}
+
+cbuffer cbCameraVertex : register(b1)
+{
+    CameraVS cbCameraVertex;
 }
 
 // naming을 cbLightVertex 이런식으로 하자.
-cbuffer cbLightVertex : register(b1)
+cbuffer cbLightVertex : register(b2)
 {
     LightVS cbLightVertex;
 }

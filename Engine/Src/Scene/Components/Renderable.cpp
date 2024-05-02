@@ -3,6 +3,7 @@
 #include "Scene/GameObject.h"
 #include "Core/CoreDefs.h"
 #include "Renderer/Mesh.h"
+#include "Renderer/Material.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
@@ -20,11 +21,27 @@ namespace Dive
 		, m_IndexCount(0)
 	{
 		DirectX::XMStoreFloat4x4(&m_LastTransform, DirectX::XMMatrixIdentity());
+
+		ZeroMemory(&m_CBufferVS, sizeof(ModelConstantBufferVS));
+		ZeroMemory(&m_CBufferPS, sizeof(MaterialConstantBufferPS));
 	}
 	
 	Renderable::~Renderable()
 	{
 		DV_CORE_TRACE("ÄÄÆ÷³ÍÆ®({0:s}'s {1:s}) ¼Ò¸ê", GetName(), GetTypeName());
+	}
+
+	void Renderable::Update()
+	{
+		m_CBufferVS.world = DirectX::XMMatrixTranspose(m_pGameObject->GetMatrix());
+
+		if (!m_pMaterial)
+			return;
+
+		m_CBufferPS.diffuseColor = m_pMaterial->GetDiffuseColor();
+		m_CBufferPS.properties = 0;
+		m_CBufferPS.properties |= m_pMaterial->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
+		m_CBufferPS.properties |= m_pMaterial->HasTexture(eTextureUnit::Normal) ? (1U << 1) : 0;
 	}
 	
 	void Renderable::SetGeometry(Mesh* pMesh, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount)

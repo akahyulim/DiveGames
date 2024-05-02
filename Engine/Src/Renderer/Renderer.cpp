@@ -17,7 +17,8 @@ namespace Dive
 
 	std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Total)> Renderer::m_RenderTargets;
 	
-	std::array<ConstantBuffer*, static_cast<size_t>(eConstantBuffer::Count)> Renderer::m_ConstantBuffers;
+	std::array<ConstantBuffer*, static_cast<size_t>(eVSConstantBuffers::Count)> Renderer::m_VSConstantBuffers;
+	std::array<ConstantBuffer*, static_cast<size_t>(ePSConstantBuffers::Count)> Renderer::m_PSConstantBuffers;
 
 	std::array<Shader*, static_cast<size_t>(eShader::Total)> Renderer::m_Shaders;
 
@@ -45,7 +46,9 @@ namespace Dive
 			DV_DELETE(pViewScreen);
 		m_ViewScreens.clear();
 
-		for (auto pConstantBuffer : m_ConstantBuffers)
+		for (auto pConstantBuffer : m_PSConstantBuffers)
+			DV_DELETE(pConstantBuffer);
+		for (auto pConstantBuffer : m_VSConstantBuffers)
 			DV_DELETE(pConstantBuffer);
 
 		for (auto pBlendState : m_BlendStates)
@@ -313,21 +316,24 @@ namespace Dive
 	void Renderer::createConstantBuffers()
 	{
 		// vs
-		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::Frame)] =
-			ConstantBuffer::Create<FrameBuffer>("Frame", eShaderType::VertexShader, 0);
+		m_VSConstantBuffers[static_cast<uint32_t>(eVSConstantBuffers::Model)] =
+			ConstantBuffer::Create<ModelConstantBufferVS>("Model", eShaderType::VertexShader, (uint32_t)eVSConstantBuffers::Model);
 
-		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::LightVS)] =
-			ConstantBuffer::Create<LightVSBuffer>("LightVS", eShaderType::VertexShader, 1);
+		m_VSConstantBuffers[static_cast<uint32_t>(eVSConstantBuffers::Camera)] =
+			ConstantBuffer::Create<CameraConstantBufferVS>("Camera", eShaderType::VertexShader, (uint32_t)eVSConstantBuffers::Camera);
+
+		m_VSConstantBuffers[static_cast<uint32_t>(eVSConstantBuffers::Light)] =
+			ConstantBuffer::Create<LightConstantBufferVS>("Light", eShaderType::VertexShader, (uint32_t)eVSConstantBuffers::Light);
 
 		// ps
-		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::Material)] =
-			ConstantBuffer::Create<MaterialBuffer>("Material", eShaderType::PixelShader, 0);
+		m_PSConstantBuffers[static_cast<uint32_t>(ePSConstantBuffers::Material)] =
+			ConstantBuffer::Create<MaterialConstantBufferPS>("Material", eShaderType::PixelShader, (uint32_t)ePSConstantBuffers::Material);
 
-		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::Camera)] =
-			ConstantBuffer::Create<CameraBuffer>("Camera", eShaderType::PixelShader, 1);
+		m_PSConstantBuffers[static_cast<uint32_t>(ePSConstantBuffers::Camera)] =
+			ConstantBuffer::Create<CameraConstantBufferPS>("Camera", eShaderType::PixelShader, (uint32_t)ePSConstantBuffers::Camera);
 
-		m_ConstantBuffers[static_cast<size_t>(eConstantBuffer::Light)] =
-			ConstantBuffer::Create<LightBuffer>("Light", eShaderType::PixelShader, 2);
+		m_PSConstantBuffers[static_cast<uint32_t>(ePSConstantBuffers::Light)] =
+			ConstantBuffer::Create<LightConstantBufferPS>("Light", eShaderType::PixelShader, (uint32_t)ePSConstantBuffers::Light);
 	}
 
 	void Renderer::createShaders()

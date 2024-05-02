@@ -8,24 +8,39 @@ namespace Dive
 	class ConstantBuffer;
 	class Shader;
 
-	enum class eConstantBuffer
+	enum class eVSConstantBuffers
 	{
-		Frame,
-		Material,
+		Model,
 		Camera,
 		Light,
-		LightVS,
 		Count
 	};
 
-	struct FrameBuffer
+	enum class ePSConstantBuffers
+	{
+		Material,
+		Camera,
+		Light,
+		Count
+	};
+
+	struct ModelConstantBufferVS
 	{
 		DirectX::XMMATRIX world;
+	};
+
+	struct CameraConstantBufferVS
+	{
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
 	};
 
-	struct MaterialBuffer
+	struct LightConstantBufferVS
+	{
+		DirectX::XMMATRIX shadow;
+	};
+
+	struct MaterialConstantBufferPS
 	{
 		DirectX::XMFLOAT4 diffuseColor;
 		DirectX::XMFLOAT4 normal;	// xmfloat3이어야 하나...
@@ -37,7 +52,7 @@ namespace Dive
 		DirectX::XMFLOAT3 padding;
 	};
 
-	struct CameraBuffer
+	struct CameraConstantBufferPS
 	{
 		DirectX::XMFLOAT3 position;
 		float padding;
@@ -47,7 +62,7 @@ namespace Dive
 		DirectX::XMMATRIX viewInverse;
 	};
 
-	struct LightBuffer
+	struct LightConstantBufferPS
 	{
 		DirectX::XMFLOAT3 color;
 		float outerConeAngle;
@@ -61,11 +76,6 @@ namespace Dive
 		uint32_t options;
 		DirectX::XMFLOAT3 padding;
 
-		DirectX::XMMATRIX shadow;
-	};
-
-	struct LightVSBuffer
-	{
 		DirectX::XMMATRIX shadow;
 	};
 
@@ -116,7 +126,9 @@ namespace Dive
 		static ID3D11RasterizerState* GetRasterizerState(eRasterizerState rs) { return m_RasterizerStates[(size_t)rs]; }
 		static ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilState ds) { return m_DepthStencilStates[(size_t)ds]; }
 		static ID3D11BlendState* GetBlendState(eBlendState bs) { return m_BlendStates[(size_t)bs]; }
-		static ConstantBuffer* GetConstantBuffer(eConstantBuffer cb) { return m_ConstantBuffers[(size_t)cb]; }
+		
+		static ConstantBuffer* GetVSConstantBuffer(eVSConstantBuffers type) { return m_VSConstantBuffers[(uint32_t)type]; }
+		static ConstantBuffer* GetPSConstantBuffer(ePSConstantBuffers type) { return m_PSConstantBuffers[(uint32_t)type]; }
 
 		static Shader* GetShader(eShader type) { return m_Shaders[(size_t)type]; }
 
@@ -139,7 +151,10 @@ namespace Dive
 		static std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> m_DepthStencilStates;
 		static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Total)> m_BlendStates;
 		static std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Total)> m_RenderTargets;
-		static std::array<ConstantBuffer*, static_cast<size_t>(eConstantBuffer::Count)> m_ConstantBuffers;
+		
+		static std::array<ConstantBuffer*, static_cast<size_t>(eVSConstantBuffers::Count)> m_VSConstantBuffers;
+		static std::array<ConstantBuffer*, static_cast<size_t>(ePSConstantBuffers::Count)> m_PSConstantBuffers;
+
 
 		static std::array<Shader*, static_cast<size_t>(eShader::Total)> m_Shaders;
 

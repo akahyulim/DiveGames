@@ -23,6 +23,9 @@ namespace Dive
 		m_MoveSpeed = 10.0f;
 		m_RotateSpeed = 50.0f;
 		m_Viewport = {0, 0, (LONG)Graphics::GetResolutionWidth(), (LONG)Graphics::GetResolutionHeight()};
+
+		ZeroMemory(&m_CBufferVS, sizeof(CameraConstantBufferVS));
+		ZeroMemory(&m_CBufferPS, sizeof(CameraConstantBufferPS));
 	}
 
 	Camera::~Camera()
@@ -30,6 +33,32 @@ namespace Dive
 		DV_DELETE(m_pRenderTarget);
 
 		DV_CORE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
+	}
+
+	void Camera::Update()
+	{
+		// 역시 더티체크가 있으면 더 좋을 듯
+
+		//vs
+		{
+			m_CBufferVS.view = DirectX::XMMatrixTranspose(GetViewMatrix());
+			m_CBufferVS.projection = DirectX::XMMatrixTranspose(GetProjectionMatrix());
+		}
+
+		// ps
+		{
+			m_CBufferPS.position = GetPosition();
+
+			DirectX::XMFLOAT4X4 proj;
+			DirectX::XMStoreFloat4x4(&proj, GetProjectionMatrix());
+			m_CBufferPS.perspectiveValue.x = 1.0f / proj._11;
+			m_CBufferPS.perspectiveValue.y = 1.0f / proj._22;
+			m_CBufferPS.perspectiveValue.z = proj._43;
+			m_CBufferPS.perspectiveValue.w = -proj._33;
+
+			auto viewInv = DirectX::XMMatrixInverse(nullptr, GetViewMatrix());
+			m_CBufferPS.viewInverse = DirectX::XMMatrixTranspose(viewInv);
+		}
 	}
 
 	DirectX::XMFLOAT3 Camera::GetPosition()

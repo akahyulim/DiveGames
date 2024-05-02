@@ -45,16 +45,16 @@ namespace Sandbox
 	{
 		// create scene
 		{
-			createBaseScene();
+			//createBaseScene();
 			//createCarScene();
-			//createSponzaScene();
+			createSponzaScene();
 			//createShadowScene();
 		}
 
 		// setup renderLayer
 		{
 			// ViewScreen에서 Forward, Deferred를 설정한다.
-			auto pViewScreen = new Dive::ViewScreen(m_pMainCam->GetComponent<Dive::Camera>());// , Dive::eRenderPath::Deferred);
+			auto pViewScreen = new Dive::ViewScreen(m_pMainCam->GetComponent<Dive::Camera>());//, Dive::eRenderPath::Deferred);
 			Dive::Renderer::SetViewScreen(0, pViewScreen);
 		}
 
@@ -470,12 +470,13 @@ namespace Sandbox
 
 				m_pSpotLightC = pActiveScene->CreateGameObject("SpotLightC");
 				m_pSpotLightC->SetPosition(pHelmetModel->GetPosition().x, pHelmetModel->GetPosition().y + 10.0f, pHelmetModel->GetPosition().z);
-				m_pSpotLightC->LookAt(0.0f, 0.0f, 0.0f);
+				m_pSpotLightC->LookAt(pHelmetModel->GetPosition().x, 0.0f, -100.0f);
 				pSpotLightCom = m_pSpotLightC->AddComponent<Dive::Light>();
 				pSpotLightCom->SetType(Dive::eLightType::Spot);
 				pSpotLightCom->SetRange(1000.0f);
 				pSpotLightCom->SetColor(0.0f, 1.0f, 1.0f);
 				pSpotLightCom->SetSpotLightAngles(30.0f, 20.0f);
+				//pSpotLightCom->SetLightShadows(Dive::eLightShadows::None);
 
 				m_pFlashLight = pActiveScene->CreateGameObject("FlashLight");
 				m_pFlashLight->SetPosition(m_pMainCam->GetPosition());
@@ -679,6 +680,7 @@ namespace Sandbox
 				pSpotLightCom->SetRange(5000.0f);
 				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
 				pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+				//pSpotLightCom->SetLightShadows(Dive::eLightShadows::None);
 
 				// TopSpotLight
 				auto pTopSpotLight = pActiveScene->CreateGameObject("TopSpotLight");
