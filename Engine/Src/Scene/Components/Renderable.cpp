@@ -22,19 +22,20 @@ namespace Dive
 	{
 		DirectX::XMStoreFloat4x4(&m_LastTransform, DirectX::XMMatrixIdentity());
 
-		ZeroMemory(&m_CBufferVS, sizeof(ModelConstantBufferVS));
-		ZeroMemory(&m_CBufferPS, sizeof(MaterialConstantBufferPS));
+		ZeroMemory(&m_CBufferVS, sizeof(VSConstBuf_Model));
+		ZeroMemory(&m_CBufferPS, sizeof(PSConstBuf_Model));
 	}
 	
 	Renderable::~Renderable()
 	{
-		DV_CORE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
+		DV_ENGINE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
 	}
 
 	void Renderable::Update()
 	{
 		m_CBufferVS.world = DirectX::XMMatrixTranspose(m_pGameObject->GetMatrix());
 
+		// 없다면 초기화된 값을 전달해야 한다.
 		if (!m_pMaterial)
 			return;
 
@@ -44,6 +45,8 @@ namespace Dive
 		m_CBufferPS.properties |= m_pMaterial->HasTexture(eTextureUnit::Normal) ? (1U << 1) : 0;
 	}
 	
+	// 렌더러블이 그릴 메시의 정보를 받는 메서드다.
+	// 메시는 단일 정점 버퍼를 사용하기에 오프셋은 사실상 전부 0이다.
 	void Renderable::SetGeometry(Mesh* pMesh, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount)
 	{
 		m_pMesh = pMesh;
@@ -55,6 +58,8 @@ namespace Dive
 		m_IndexCount = indexCount;
 
 		pMesh->SetGameObject(GetGameObject());
+
+		DV_ENGINE_DEBUG("vertex offset: {0:d}, indexOffset: {1:d}", vertexOffset, indexOffset);
 	}
 
 	VertexBuffer* Renderable::GetVertexBuffer() const
@@ -89,14 +94,14 @@ namespace Dive
 	{
 		if (GetIndexBuffer() && GetIndexCount() > 0)
 		{
-			Graphics::SetVertexBuffer(GetVertexBuffer());
-			Graphics::SetIndexBuffer(GetIndexBuffer());
-			Graphics::DrawIndexed(topology, m_IndexCount, m_IndexOffset);
+			Graphics::GetInstance()->SetVertexBuffer(GetVertexBuffer());
+			Graphics::GetInstance()->SetIndexBuffer(GetIndexBuffer());
+			Graphics::GetInstance()->DrawIndexed(topology, m_IndexCount, m_IndexOffset);
 		}
 		else if (GetVertexCount() > 0)
 		{
-			Graphics::SetVertexBuffer(GetVertexBuffer());
-			Graphics::Draw(topology, m_VertexCount, m_VertexOffset);
+			Graphics::GetInstance()->SetVertexBuffer(GetVertexBuffer());
+			Graphics::GetInstance()->Draw(topology, m_VertexCount, m_VertexOffset);
 		}
 	}
 }

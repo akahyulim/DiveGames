@@ -30,6 +30,7 @@ namespace Dive
 	private:
 		GameObject* m_pRootObject;
 
+		// urho는 geometry뿐만 아니라 모든 Buffer도 관리한다.
 		std::vector<Mesh*> m_Meshes;
 	};
 }

@@ -7,7 +7,8 @@
 namespace Dive
 {
 	GameObject::GameObject(Scene* pScene, const std::string& name)
-		: Object(name)
+		: m_Name(name)
+		, m_ID(0)
 		, m_pScene(pScene)
 		, m_bActive(true)
 		, m_bMarkedTarget(false)
@@ -26,7 +27,7 @@ namespace Dive
 		for (auto& it : m_Components)
 			DV_DELETE(it.second);
 
-		DV_CORE_TRACE("게임오브젝트({0:s}, {1:d}) 소멸", GetName(), GetID());
+		DV_ENGINE_TRACE("게임오브젝트({0:s}, {1:d}) 소멸", GetName(), GetID());
 	}
 
 	void GameObject::Update()
@@ -75,7 +76,7 @@ namespace Dive
 
 	void GameObject::SetPosition(const DirectX::XMVECTOR& position)
 	{
-		auto localPosition = position;
+		DirectX::XMVECTOR localPosition = position;
 
 		if (m_pParent)
 		{
@@ -220,7 +221,7 @@ namespace Dive
 
 	void GameObject::SetScale(const DirectX::XMVECTOR& scale)
 	{
-		auto localScale = scale;
+		DirectX::XMVECTOR localScale = scale;
 
 		if (m_pParent)
 		{
@@ -318,7 +319,7 @@ namespace Dive
 
 	void GameObject::LookAt(const GameObject* pTarget, const DirectX::XMVECTOR& up)
 	{
-		DV_CORE_ASSERT(pTarget);
+		DV_ENGINE_ASSERT(pTarget);
 
 		LookAt(pTarget->GetPositionVector(), up);
 	}
@@ -497,7 +498,7 @@ namespace Dive
 
 	bool GameObject::IsChildOf(GameObject* pParent) const
 	{
-		DV_CORE_ASSERT(pParent);
+		DV_ENGINE_ASSERT(pParent);
 
 		if (pParent == this)
 			return true;

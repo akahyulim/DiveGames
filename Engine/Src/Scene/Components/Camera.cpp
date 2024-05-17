@@ -1,7 +1,6 @@
 #include "DivePch.h"
 #include "Camera.h"
 #include "Core/CoreDefs.h"
-#include "Core/Timer.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/RenderTexture.h"
 #include "Scene/GameObject.h"
@@ -22,43 +21,36 @@ namespace Dive
 		m_FarClipPlane = 1000.0f;
 		m_MoveSpeed = 10.0f;
 		m_RotateSpeed = 50.0f;
-		m_Viewport = {0, 0, (LONG)Graphics::GetResolutionWidth(), (LONG)Graphics::GetResolutionHeight()};
+		m_Viewport = {0, 0, (LONG)Graphics::GetInstance()->GetResolutionWidth(), (LONG)Graphics::GetInstance()->GetResolutionHeight()};
 
-		ZeroMemory(&m_CBufferVS, sizeof(CameraConstantBufferVS));
-		ZeroMemory(&m_CBufferPS, sizeof(CameraConstantBufferPS));
+		ZeroMemory(&m_CBufferVS, sizeof(VSConstBuf_Camera));
+		ZeroMemory(&m_CBufferPS, sizeof(PSConstBuf_Camera));
 	}
 
 	Camera::~Camera()
 	{
 		DV_DELETE(m_pRenderTarget);
 
-		DV_CORE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
+		DV_ENGINE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
 	}
 
 	void Camera::Update()
 	{
-		// 역시 더티체크가 있으면 더 좋을 듯
-
 		//vs
-		{
-			m_CBufferVS.view = DirectX::XMMatrixTranspose(GetViewMatrix());
-			m_CBufferVS.projection = DirectX::XMMatrixTranspose(GetProjectionMatrix());
-		}
+		m_CBufferVS.view = DirectX::XMMatrixTranspose(GetViewMatrix());
+		m_CBufferVS.projection = DirectX::XMMatrixTranspose(GetProjectionMatrix());
 
 		// ps
-		{
-			m_CBufferPS.position = GetPosition();
+		m_CBufferPS.position = GetPosition();
+		DirectX::XMFLOAT4X4 proj;
+		DirectX::XMStoreFloat4x4(&proj, GetProjectionMatrix());
+		m_CBufferPS.perspectiveValue.x = 1.0f / proj._11;
+		m_CBufferPS.perspectiveValue.y = 1.0f / proj._22;
+		m_CBufferPS.perspectiveValue.z = proj._43;
+		m_CBufferPS.perspectiveValue.w = -proj._33;
 
-			DirectX::XMFLOAT4X4 proj;
-			DirectX::XMStoreFloat4x4(&proj, GetProjectionMatrix());
-			m_CBufferPS.perspectiveValue.x = 1.0f / proj._11;
-			m_CBufferPS.perspectiveValue.y = 1.0f / proj._22;
-			m_CBufferPS.perspectiveValue.z = proj._43;
-			m_CBufferPS.perspectiveValue.w = -proj._33;
-
-			auto viewInv = DirectX::XMMatrixInverse(nullptr, GetViewMatrix());
-			m_CBufferPS.viewInverse = DirectX::XMMatrixTranspose(viewInv);
-		}
+		auto viewInv = DirectX::XMMatrixInverse(nullptr, GetViewMatrix());
+		m_CBufferPS.viewInverse = DirectX::XMMatrixTranspose(viewInv);
 	}
 
 	DirectX::XMFLOAT3 Camera::GetPosition()
@@ -131,11 +123,11 @@ namespace Dive
 
 	ID3D11RenderTargetView* Camera::GetRenderTargetView() const
 	{
-		return m_pRenderTarget ? m_pRenderTarget->GetRenderTargetView() : Graphics::GetDefaultRenderTargetView();
+		return m_pRenderTarget ? m_pRenderTarget->GetRenderTargetView() : Graphics::GetInstance()->GetDefaultRenderTargetView();
 	}
 
 	DirectX::XMFLOAT2 Camera::GetRenderTargetSize() const
 	{
-		return m_pRenderTarget ? m_pRenderTarget->GetSize() : Graphics::GetResolution();
+		return m_pRenderTarget ? m_pRenderTarget->GetSize() : Graphics::GetInstance()->GetResolution();
 	}
 }

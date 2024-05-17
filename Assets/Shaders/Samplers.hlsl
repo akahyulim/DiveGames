@@ -16,4 +16,3 @@ SamplerState NormalMapSampler : register(s1);
 SamplerState SpecularMapSampler : register(s2);
 
 SamplerComparisonState SpotPCFSampler : register(s7);
-//SamplerState SpotPCFSampler : register(s7);

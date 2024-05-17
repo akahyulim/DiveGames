@@ -3,9 +3,9 @@
 
 namespace Dive
 {
-	class Resource : public DvObject
+	class Resource : public Object
 	{
-		DV_CLASS(Resource, DvObject);
+		DV_CLASS(Resource, Object);
 
 	public:
 		Resource();

@@ -52,7 +52,7 @@ PS_GBUFFER MainPS(VS_OUTPUT input)
     // diffuse
     float4 diff;
     if (!HasDiffuseTexture())
-        diff = cbMaterialPixel.color;
+        diff = cbModelPixel.color;
     else
         diff = DiffuseMap.Sample(DiffuseMapSampler, input.tex);
     diff *= diff; // linear space

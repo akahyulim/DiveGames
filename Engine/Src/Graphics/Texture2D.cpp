@@ -36,7 +36,7 @@ namespace Dive
 		DV_DELETE(m_pLoadImage);
 		DV_RELEASE(m_pRenderTargetView);
 
-		DV_CORE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
+		DV_ENGINE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
 			GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
 	}
 
@@ -74,7 +74,7 @@ namespace Dive
 	{
 		if (!pImage)
 		{
-			DV_CORE_ERROR("Texture2D::SetImage - 잘못된 Image를 전달받았습니다.");
+			DV_ENGINE_ERROR("Texture2D::SetImage - 잘못된 Image를 전달받았습니다.");
 			return false;
 		}
 
@@ -143,7 +143,7 @@ namespace Dive
 			0,
 			&mappedResource)))
 		{
-			DV_CORE_ERROR("Texture2D::SetRawTextureData - 텍스쳐 맵에 실패하였습니다.");
+			DV_ENGINE_ERROR("Texture2D::SetRawTextureData - 텍스쳐 맵에 실패하였습니다.");
 			return;
 		}
 
@@ -172,13 +172,13 @@ namespace Dive
 	{
 		if (!m_pTexture2D)
 		{
-			DV_CORE_ERROR("Texture2D::SetRawTextureData - 텍스쳐가 존재하지 않아 데이터를 전달할 수 없습니다.");
+			DV_ENGINE_ERROR("Texture2D::SetRawTextureData - 텍스쳐가 존재하지 않아 데이터를 전달할 수 없습니다.");
 			return false;
 		}
 
 		if (!pData)
 		{
-			DV_CORE_ERROR("Texture2D::SetRawTextureData - 비어있는 데이터를 전달받았습니다.");
+			DV_ENGINE_ERROR("Texture2D::SetRawTextureData - 비어있는 데이터를 전달받았습니다.");
 			return false;
 		}
 
@@ -199,11 +199,11 @@ namespace Dive
 	/*
 	Texture2D* Texture2D::GetBlackTexture()
 	{
-		DV_CORE_ASSERT(Graphics::IsInitialized());
+		DV_ENGINE_ASSERT(Graphics::GetInstance()->IsInitialized());
 
 		if (!s_pBlackTexture)
 		{
-			DirectX::XMINT2 size = Graphics::GetWindowSize();
+			DirectX::XMINT2 size = Graphics::GetInstance()->GetWindowSize();
 
 			s_pBlackTexture = new Texture2D();
 			s_pBlackTexture->SetSize(size.x, size.y);
@@ -219,11 +219,11 @@ namespace Dive
 
 	Texture2D* Texture2D::GetGrayTexture()
 	{
-		DV_CORE_ASSERT(Graphics::IsInitialized());
+		DV_ENGINE_ASSERT(Graphics::GetInstance()->IsInitialized());
 
 		if (!s_pGrayTexture)
 		{
-			DirectX::XMINT2 size = Graphics::GetWindowSize();
+			DirectX::XMINT2 size = Graphics::GetInstance()->GetWindowSize();
 
 			s_pGrayTexture = new Texture2D();
 			s_pGrayTexture->SetSize(size.x, size.y);
@@ -239,11 +239,11 @@ namespace Dive
 
 	Texture2D* Texture2D::GetRedTexture()
 	{
-		DV_CORE_ASSERT(Graphics::IsInitialized());
+		DV_ENGINE_ASSERT(Graphics::GetInstance()->IsInitialized());
 
 		if (!s_pRedTexture)
 		{
-			DirectX::XMINT2 size = Graphics::GetWindowSize();
+			DirectX::XMINT2 size = Graphics::GetInstance()->GetWindowSize();
 
 			s_pRedTexture = new Texture2D();
 			s_pRedTexture->SetSize(size.x, size.y);
@@ -259,11 +259,11 @@ namespace Dive
 
 	Texture2D* Texture2D::GetWhiteTexture()
 	{
-		DV_CORE_ASSERT(Graphics::IsInitialized());
+		DV_ENGINE_ASSERT(Graphics::GetInstance()->IsInitialized());
 
 		if (!s_pWhiteTexture)
 		{
-			DirectX::XMINT2 size = Graphics::GetWindowSize();
+			DirectX::XMINT2 size = Graphics::GetInstance()->GetWindowSize();
 
 			s_pWhiteTexture = new Texture2D();
 			s_pWhiteTexture->SetSize(size.x, size.y);
@@ -302,7 +302,7 @@ namespace Dive
 		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
 		{
 			DV_RELEASE(m_pTexture2D);
-			DV_CORE_ERROR("Texture2D::createResources - Texture2D 생성에 실패하였습니다.");
+			DV_ENGINE_ERROR("Texture2D::createResources - Texture2D 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -320,7 +320,7 @@ namespace Dive
 			&m_pShaderResourceView)))
 		{
 			DV_RELEASE(m_pShaderResourceView);
-			DV_CORE_ERROR("Texture2D::createResources - ShaderResourceView 생성에 실패하였습니다.");
+			DV_ENGINE_ERROR("Texture2D::createResources - ShaderResourceView 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -338,7 +338,7 @@ namespace Dive
 				&m_pRenderTargetView)))
 			{
 				DV_RELEASE(m_pRenderTargetView);
-				DV_CORE_ERROR("Texture2D::createResources - RenderTargetView 생성에 실패하였습니다.");
+				DV_ENGINE_ERROR("Texture2D::createResources - RenderTargetView 생성에 실패하였습니다.");
 				return false;
 			}
 		}

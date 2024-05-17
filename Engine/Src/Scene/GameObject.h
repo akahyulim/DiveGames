@@ -13,13 +13,19 @@ namespace Dive
 		World
 	};
 
-	class GameObject : public Object
+	class GameObject
 	{
 	public:
 		GameObject(Scene* pScene, const std::string& name = "GameObject");
-		~GameObject() override;
+		~GameObject();
 
 		void Update();
+
+		void SetName(const std::string& name) { m_Name = name; }
+		const std::string& GetName() const { return m_Name; }
+		
+		void SetID(uint64_t id) { m_ID = id; }
+		uint64_t GetID() const { return m_ID; }
 
 		bool IsActive() const { return m_bActive; }
 		void SetActive(bool active) { m_bActive = active; }
@@ -114,6 +120,9 @@ namespace Dive
 		void updateTransform();
 
 	private:
+		std::string m_Name;
+		uint64_t m_ID;
+
 		Scene* m_pScene;
 		bool m_bActive;
 		bool m_bMarkedTarget;

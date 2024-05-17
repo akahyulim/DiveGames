@@ -9,12 +9,14 @@ namespace Dive
 		Stencil = 0x4
 	};
 
-	enum class eShaderType
+	enum class eShaderType : uint8_t
 	{
-		UnknownShader,
-		VertexShader,
-		PixelShader,
-		ComputeShader
+		Undefined,
+		Vertex,
+		Hull,
+		Domain,
+		Pixel,
+		Compute
 	};
 	
 	enum class eTextureUsage
@@ -25,7 +27,7 @@ namespace Dive
 		DepthStencil
 	};
 
-	enum class eTextureUnit : uint32_t
+	enum class eTextureUnit : uint8_t
 	{
 		Diffuse = 0,
 		Normal,
@@ -35,7 +37,7 @@ namespace Dive
 		GBuffer_Normal,
 		GBuffer_SpecPower,
 		SpotShadowMap,
-		Max_Num
+		Count
 	};
 
 	enum class eVertexType

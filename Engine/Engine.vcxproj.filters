@@ -78,9 +78,6 @@
     <ClInclude Include="Src\Math\Math.h">
       <Filter>Src\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Core\Timer.h">
-      <Filter>Src\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Core\Log.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
@@ -147,9 +144,6 @@
     <ClInclude Include="Src\Renderer\ModelFactory.h">
       <Filter>Src\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Input\Input.h">
-      <Filter>Src\Input</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Resource\Importer\ModelLoader.h">
       <Filter>Src\Resource\Importer</Filter>
     </ClInclude>
@@ -167,6 +161,9 @@
     </ClInclude>
     <ClInclude Include="Src\Math\BoundingBox.h">
       <Filter>Src\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Input\Input.h">
+      <Filter>Src\Input</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -196,9 +193,6 @@
     </ClCompile>
     <ClCompile Include="Src\Math\Math.cpp">
       <Filter>Src\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Core\Timer.cpp">
-      <Filter>Src\Core</Filter>
     </ClCompile>
     <ClCompile Include="Src\Core\Log.cpp">
       <Filter>Src\Core</Filter>
@@ -263,9 +257,6 @@
     <ClCompile Include="Src\Renderer\ModelFactory.cpp">
       <Filter>Src\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Input\Input.cpp">
-      <Filter>Src\Input</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Resource\Importer\ModelLoader.cpp">
       <Filter>Src\Resource\Importer</Filter>
     </ClCompile>
@@ -283,6 +274,9 @@
     </ClCompile>
     <ClCompile Include="Src\Math\BoundingBox.cpp">
       <Filter>Src\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Input\Input.cpp">
+      <Filter>Src\Input</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -8,7 +8,7 @@ namespace Dive
 	class ConstantBuffer;
 	class Shader;
 
-	enum class eVSConstantBuffers
+	enum class eVSConstBuf
 	{
 		Model,
 		Camera,
@@ -16,31 +16,31 @@ namespace Dive
 		Count
 	};
 
-	enum class ePSConstantBuffers
+	enum class ePSConstBuf
 	{
-		Material,
+		Model,
 		Camera,
 		Light,
 		Count
 	};
 
-	struct ModelConstantBufferVS
+	struct VSConstBuf_Model
 	{
 		DirectX::XMMATRIX world;
 	};
 
-	struct CameraConstantBufferVS
+	struct VSConstBuf_Camera
 	{
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
 	};
 
-	struct LightConstantBufferVS
+	struct VSConstBuf_Light
 	{
 		DirectX::XMMATRIX shadow;
 	};
 
-	struct MaterialConstantBufferPS
+	struct PSConstBuf_Model
 	{
 		DirectX::XMFLOAT4 diffuseColor;
 		DirectX::XMFLOAT4 normal;	// xmfloat3이어야 하나...
@@ -52,7 +52,7 @@ namespace Dive
 		DirectX::XMFLOAT3 padding;
 	};
 
-	struct CameraConstantBufferPS
+	struct PSConstBuf_Camera
 	{
 		DirectX::XMFLOAT3 position;
 		float padding;
@@ -62,7 +62,7 @@ namespace Dive
 		DirectX::XMMATRIX viewInverse;
 	};
 
-	struct LightConstantBufferPS
+	struct PSConstBuf_Light
 	{
 		DirectX::XMFLOAT3 color;
 		float outerConeAngle;
@@ -74,12 +74,13 @@ namespace Dive
 		float innerConeAngle;
 		
 		uint32_t options;
-		DirectX::XMFLOAT3 padding;
+		int shadowEnabled;
+		DirectX::XMFLOAT2 padding;
 
 		DirectX::XMMATRIX shadow;
 	};
 
-	enum class eDepthStencilState
+	enum class eDepthStencilState : uint8_t
 	{
 		DepthReadWrite,
 		DepthReadWrite_StencilReadWrite,
@@ -89,75 +90,102 @@ namespace Dive
 		Count
 	};
 
-	enum class eGBuffer
+	enum class eGBuffer : uint8_t
 	{
 		DepthStencil,
 		ColorSpecIntensity,
 		Normal,
 		SpecPower,
-		Total
+		Count
 	};
 
-	enum class eShader
+	enum class eShader : uint8_t
 	{
-		ForwardLight,
+		LightDepth,
+		ForwardLightShadow,
 		Deferred,
 		DeferredLights,
-		ShadowGen,
-		ForwardLightShadow,
-		Total
+		Count
+	};
+
+	enum class eRendererShader : uint8_t
+	{
+		Depth_VS,
+		ForwardLight_VS,
+		ForwardLight_PS,
+		GBuffer_VS,
+		GBuffer_PS,
+		DeferredLight_VS,
+		DeferredLight_PS,
+		Count
 	};
 
 	class Renderer
 	{
 	public:
-		static bool Initialize();
-		static void Shutdown();
+		Renderer(const Renderer&) = delete;
+		void operator=(const Renderer&) = delete;
 
-		static void Update();
-		static void Render();
+		static Renderer* GetInstance()
+		{
+			if (!s_pInstance)
+				s_pInstance = new Renderer;
 
-		static uint32_t GetNumViewScreens() { return (uint32_t)m_ViewScreens.size(); }
-		static void SetNumViewScreens(uint32_t count);
+			return s_pInstance;
+		}
 
-		static ViewScreen* GetViewScreen(uint32_t index);
-		static void SetViewScreen(uint32_t index, ViewScreen* pViewScreen);
+		bool Initialize();
+		void Shutdown();
 
-		static ID3D11RasterizerState* GetRasterizerState(eRasterizerState rs) { return m_RasterizerStates[(size_t)rs]; }
-		static ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilState ds) { return m_DepthStencilStates[(size_t)ds]; }
-		static ID3D11BlendState* GetBlendState(eBlendState bs) { return m_BlendStates[(size_t)bs]; }
-		
-		static ConstantBuffer* GetVSConstantBuffer(eVSConstantBuffers type) { return m_VSConstantBuffers[(uint32_t)type]; }
-		static ConstantBuffer* GetPSConstantBuffer(ePSConstantBuffers type) { return m_PSConstantBuffers[(uint32_t)type]; }
+		void Update();
+		void Render();
 
-		static Shader* GetShader(eShader type) { return m_Shaders[(size_t)type]; }
+		uint32_t GetNumViewScreens() { return (uint32_t)m_ViewScreens.size(); }
+		void SetNumViewScreens(uint32_t count);
 
-		static RenderTexture* GetGBufferTexture(eGBuffer type) { return m_GBuffer[(size_t)type]; }
+		ViewScreen* GetViewScreen(uint32_t index);
+		void SetViewScreen(uint32_t index, ViewScreen* pViewScreen);
+
+		ID3D11RasterizerState* GetRasterizerState(eRasterizerState rs) { return m_RasterizerStates[(size_t)rs]; }
+		ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilState ds) { return m_DepthStencilStates[(size_t)ds]; }
+		ID3D11BlendState* GetBlendState(eBlendState bs) { return m_BlendStates[(size_t)bs]; }
+
+		ConstantBuffer* GetVSConstantBuffer(eVSConstBuf type) { return m_VSConstantBuffers[(uint32_t)type]; }
+		ConstantBuffer* GetPSConstantBuffer(ePSConstBuf type) { return m_PSConstantBuffers[(uint32_t)type]; }
+
+		Shader* GetShader(eRendererShader type) { return m_Shaders[static_cast<uint32_t>(type)]; }
+
+		RenderTexture* GetGBufferTexture(eGBuffer type) { return m_GBuffer[(size_t)type]; }
 
 	private:
-		static void createRasterizerStates();
-		static void createDepthStencilStates();
-		static void createBlendStates();
-		static void createRenderTextures();
-		static void createConstantBuffers();
-		static void createShaders();
-		static void createGBuffer();
+		Renderer();
+		~Renderer();
 
+		void createRasterizerStates();
+		void createDepthStencilStates();
+		void createBlendStates();
+		void createRenderTextures();
+		void createConstantBuffers();
+		void createShaders();
+		void createGBuffer();
 
 	private:
-		static std::vector<ViewScreen*> m_ViewScreens;	// 유니티의 레이어와는 다르다. 착각하지 말자.
+		static Renderer* s_pInstance;
 
-		static std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Total)> m_RasterizerStates;
-		static std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> m_DepthStencilStates;
-		static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Total)> m_BlendStates;
-		static std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Total)> m_RenderTargets;
-		
-		static std::array<ConstantBuffer*, static_cast<size_t>(eVSConstantBuffers::Count)> m_VSConstantBuffers;
-		static std::array<ConstantBuffer*, static_cast<size_t>(ePSConstantBuffers::Count)> m_PSConstantBuffers;
+		std::vector<ViewScreen*> m_ViewScreens;	// 유니티의 레이어와는 다르다. 착각하지 말자.
 
+		std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> m_RasterizerStates;
+		std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> m_DepthStencilStates;
+		std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> m_BlendStates;
+		std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> m_RenderTargets;
 
-		static std::array<Shader*, static_cast<size_t>(eShader::Total)> m_Shaders;
+		std::array<ConstantBuffer*, static_cast<size_t>(eVSConstBuf::Count)> m_VSConstantBuffers;
+		std::array<ConstantBuffer*, static_cast<size_t>(ePSConstBuf::Count)> m_PSConstantBuffers;
 
-		static std::array<RenderTexture*, static_cast<size_t>(eGBuffer::Total)> m_GBuffer;
+		std::array<Shader*, static_cast<uint32_t>(eRendererShader::Count)> m_Shaders;
+
+		std::array<RenderTexture*, static_cast<size_t>(eGBuffer::Count)> m_GBuffer;
 	};
+
+	Renderer* GetRenderer();
 }

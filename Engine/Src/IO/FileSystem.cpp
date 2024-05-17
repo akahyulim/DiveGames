@@ -174,13 +174,13 @@ namespace Dive
 	{
 		if (!FileExists(sourceFileName))
 		{
-			DV_CORE_ERROR("원본 파일({:s})이 존재하지 않아 복사를 수행할 수 없습니다.", sourceFileName);
+			DV_ENGINE_ERROR("원본 파일({:s})이 존재하지 않아 복사를 수행할 수 없습니다.", sourceFileName);
 			return false;
 		}
 
 		if (sourceFileName == destFileName)
 		{
-			DV_CORE_WARN("동일한 파일 이름을 전달받아 복사를 수행할 수 없습니다. : {0:s} == {:1s}",
+			DV_ENGINE_WARN("동일한 파일 이름을 전달받아 복사를 수행할 수 없습니다. : {0:s} == {:1s}",
 				sourceFileName, destFileName);
 			return false;
 		}
@@ -198,13 +198,13 @@ namespace Dive
 	{
 		if (!FileExists(sourceFileName))
 		{
-			DV_CORE_ERROR("원본 파일({:s})이 존재하지 않아 이름을 변경할 수 없습니다.", sourceFileName);
+			DV_ENGINE_ERROR("원본 파일({:s})이 존재하지 않아 이름을 변경할 수 없습니다.", sourceFileName);
 			return false;
 		}
 
 		if (destFileName.empty())
 		{
-			DV_CORE_ERROR("파일의 새로운 이름({:s})을 잘못 전달받아 변경할 수 없습니다.", destFileName);
+			DV_ENGINE_ERROR("파일의 새로운 이름({:s})을 잘못 전달받아 변경할 수 없습니다.", destFileName);
 			return false;
 		}
 

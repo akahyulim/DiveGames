@@ -3,10 +3,15 @@
 
 namespace Dive
 {
-	static std::shared_ptr<spdlog::logger> s_pEngineLogger;
-	static std::shared_ptr<spdlog::logger> s_pAppLogger;
+	Log* Log::s_pInstance = nullptr;
 
-	void Log::Initialize()
+	Log::Log()
+		: m_pEngineLogger(nullptr)
+		, m_pAppLogger(nullptr)
+	{
+	}
+
+	void Log::Initialize(spdlog::level::level_enum setLevel, spdlog::level::level_enum flushLevel)
 	{
 		std::vector<spdlog::sink_ptr> logSinks;
 		logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
@@ -15,24 +20,24 @@ namespace Dive
 		logSinks[0]->set_pattern("%^[%T] %n: %v%$");
 		logSinks[1]->set_pattern("[%T] [%l] %n: %v");
 
-		s_pEngineLogger = std::make_shared<spdlog::logger>("CORE", std::begin(logSinks), std::end(logSinks));
-		spdlog::register_logger(s_pEngineLogger);
-		s_pEngineLogger->set_level(spdlog::level::trace);
-		s_pEngineLogger->flush_on(spdlog::level::trace);
+		m_pEngineLogger = std::make_shared<spdlog::logger>("ENGINE", std::begin(logSinks), std::end(logSinks));
+		spdlog::register_logger(m_pEngineLogger);
+		m_pEngineLogger->set_level(setLevel);
+		m_pEngineLogger->flush_on(flushLevel);
 
-		s_pAppLogger = std::make_shared<spdlog::logger>("APP", std::begin(logSinks), std::end(logSinks));
-		spdlog::register_logger(s_pAppLogger);
-		s_pAppLogger->set_level(spdlog::level::trace);
-		s_pAppLogger->flush_on(spdlog::level::trace);
+		m_pAppLogger = std::make_shared<spdlog::logger>("APP", std::begin(logSinks), std::end(logSinks));
+		spdlog::register_logger(m_pAppLogger);
+		m_pAppLogger->set_level(setLevel);
+		m_pAppLogger->flush_on(flushLevel);
 	}
 	
 	spdlog::logger* Log::GetEngineLogger()
 	{
-		return s_pEngineLogger.get();
+		return m_pEngineLogger.get();
 	}
 
 	spdlog::logger* Log::GetAppLogger()
 	{
-		return s_pAppLogger.get();
+		return m_pAppLogger.get();
 	}
 }

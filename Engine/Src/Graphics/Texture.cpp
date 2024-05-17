@@ -21,8 +21,8 @@ namespace Dive
 		, m_bSamplerStateDirty(true)
 		, m_bOpaque(true)
 	{
-		m_pDevice = Graphics::GetDevice();
-		m_pDeviceContext = Graphics::GetDeviceContext();
+		m_pDevice = Graphics::GetInstance()->GetDevice();
+		m_pDeviceContext = Graphics::GetInstance()->GetDeviceContext();
 	}
 
 	Texture::~Texture()
@@ -42,7 +42,7 @@ namespace Dive
 
 	void Texture::UpdateMipLevels()
 	{
-		DV_CORE_ASSERT(Graphics::IsInitialized ());
+		DV_ENGINE_ASSERT(Graphics::GetInstance()->IsInitialized ());
 
 		if (m_pShaderResourceView)
 		{
@@ -77,7 +77,7 @@ namespace Dive
 		if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_pSamplerState)))
 		{
 			DV_RELEASE(m_pSamplerState);
-			DV_CORE_ERROR("Texture::UpdateSamplerState - SamplerState 생성에 실패하였습니다.");
+			DV_ENGINE_ERROR("Texture::UpdateSamplerState - SamplerState 생성에 실패하였습니다.");
 			return;
 		}
 

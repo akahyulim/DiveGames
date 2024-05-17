@@ -78,7 +78,7 @@ namespace Dive
 		if(FAILED(bResult))
 		{
 			DV_RELEASE(m_pTexture2D);
-			DV_CORE_ERROR("RenderTexture::createResources - Texture2D 생성에 실패하였습니다.");
+			DV_ENGINE_ERROR("RenderTexture::createResources - Texture2D 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -96,7 +96,7 @@ namespace Dive
 			&m_pShaderResourceView)))
 		{
 			DV_RELEASE(m_pShaderResourceView);
-			DV_CORE_ERROR("RenderTexture::createResources - ShaderResourceView 생성에 실패하였습니다.");
+			DV_ENGINE_ERROR("RenderTexture::createResources - ShaderResourceView 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -114,7 +114,7 @@ namespace Dive
 				&m_pRenderTargetView)))
 			{
 				DV_RELEASE(m_pRenderTargetView);
-				DV_CORE_ERROR("RenderTexture::createResources - RenderTargetView 생성에 실패하였습니다.");
+				DV_ENGINE_ERROR("RenderTexture::createResources - RenderTargetView 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -132,7 +132,7 @@ namespace Dive
 				&dsvd,
 				&m_pDepthStencilView)))
 			{
-				DV_CORE_ERROR("RenderTexture::createResources - DepthStencilView 생성에 실패하였습니다.");
+				DV_ENGINE_ERROR("RenderTexture::createResources - DepthStencilView 생성에 실패하였습니다.");
 				return false;
 			}
 
@@ -144,7 +144,7 @@ namespace Dive
 					&dsvd,
 					&m_pDepthStencilViewReadOnly)))
 				{
-					DV_CORE_ERROR("RenderTexture::createResources - DepthStencilView ReadOnly 생성에 실패하였습니다.");
+					DV_ENGINE_ERROR("RenderTexture::createResources - DepthStencilView ReadOnly 생성에 실패하였습니다.");
 					return false;
 				}
 			}

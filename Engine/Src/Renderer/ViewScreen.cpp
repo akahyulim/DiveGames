@@ -24,7 +24,7 @@ namespace Dive
 		: m_pCamera(pCamera)
 		, m_RenderPath(renderPath)
 	{
-		m_pActiveScene = SceneManager::GetActiveScene();
+		m_pActiveScene = GetSceneManager()->GetActiveScene();
 	}
 
 	// 스파르탄은 이벤트 컬링 함수에서 구현한다.
@@ -73,14 +73,14 @@ namespace Dive
 			// frame buffer
 			// 매번 갱신할 필요가 없어 위치가 이상해졌지만 bind는 draw에서 한다.
 			{
-				auto pCameraBuffer = Renderer::GetVSConstantBuffer(eVSConstantBuffers::Camera);
+				auto pCameraBuffer = GetRenderer()->GetVSConstantBuffer(eVSConstBuf::Camera);
 				pCameraBuffer->Update((void*)&m_pCamera->GetCBufferVS());
 				pCameraBuffer->Bind();
 			}
 
 			// camera buffer
 			{
-				auto pCameraBuffer = Renderer::GetPSConstantBuffer(ePSConstantBuffers::Camera);
+				auto pCameraBuffer = GetRenderer()->GetPSConstantBuffer(ePSConstBuf::Camera);
 				pCameraBuffer->Update((void*)&m_pCamera->GetCBufferPS());
 				pCameraBuffer->Bind();
 			}
@@ -108,34 +108,43 @@ namespace Dive
 
 	void ViewScreen::forwardRender()
 	{
-		// 스파르탄의 경우 opaque와 transparent pass묶음을 완전히 분리해놨다.
-		passShadowGen();	// passDepth가 어울린다. 스파르탄은 매개변수를 통해 opaque와 trnasparent를 구분한다.
+		passDepth();
 		passOpaqueDraw();
 		passTransparentDraw();
 
-		// urho의 경우 path가 파일화 되어 있다.
-		// commnad type이라는 큰 pass 안에 세부 pass 타입이 있고 이후 설정을 매개변수로 받는다.
-		// 가장 기초적인 forward의 경우
-		// clear, scenepass(base), forwardlights(light), scenepass(postopaque), scenepass(refract), scenepass(alpha), scenepass(postalpha)로 구성된다.
-		// 이것들을 함수화하고 Path에 순서대로 구성하여 호출하도록 하자.
-
-		// Clear: color, rendertargets(dsv 포함)를 받고 clear
-		// ScenePass
-		// ForwardLights: rende shadow maps + opaque objects' additive lgihting이란다.
+		/*
+		스파르탄의 구성을 따르는 게 나을 것 같다.
+		Pass_Visibility(cmd_list);
+        Pass_Depth_Prepass(cmd_list, false);
+        Pass_GBuffer(cmd_list);
+        Pass_Ssgi(cmd_list);
+        Pass_Ssr(cmd_list, rt_render);
+        Pass_Sss(cmd_list);
+        Pass_Light(cmd_list);                        // compute diffuse and specular buffers
+        Pass_Light_Composition(cmd_list, rt_render); // compose diffuse, specular, ssgi, volumetric etc.
+        Pass_Light_ImageBased(cmd_list, rt_render);  // apply IBL and SSR
+		
+		Pass_Depth_Prepass(cmd_list, do_transparent_pass);
+        Pass_GBuffer(cmd_list, do_transparent_pass);
+        Pass_Ssr(cmd_list, rt_render, do_transparent_pass);
+        Pass_Light(cmd_list, do_transparent_pass);
+        Pass_Light_Composition(cmd_list, rt_render, do_transparent_pass);
+        Pass_Light_ImageBased(cmd_list, rt_render, do_transparent_pass);
+		*/
 	}
 
 	void ViewScreen::deferredRender()
 	{
 		// set & clear g buffer
-		Graphics::SetRenderTargetView(0, Renderer::GetGBufferTexture(eGBuffer::ColorSpecIntensity)->GetRenderTargetView());
-		Graphics::SetRenderTargetView(1, Renderer::GetGBufferTexture(eGBuffer::Normal)->GetRenderTargetView());
-		Graphics::SetRenderTargetView(2, Renderer::GetGBufferTexture(eGBuffer::SpecPower)->GetRenderTargetView());
-		Graphics::SetDepthStencilView(Renderer::GetGBufferTexture(eGBuffer::DepthStencil)->GetDepthStencilView());
-		Graphics::ClearViews(eClearFlags::Color | eClearFlags::Depth, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 0);	
+		GetGraphics()->SetRenderTargetView(0, GetRenderer()->GetGBufferTexture(eGBuffer::ColorSpecIntensity)->GetRenderTargetView());
+		GetGraphics()->SetRenderTargetView(1, GetRenderer()->GetGBufferTexture(eGBuffer::Normal)->GetRenderTargetView());
+		GetGraphics()->SetRenderTargetView(2, GetRenderer()->GetGBufferTexture(eGBuffer::SpecPower)->GetRenderTargetView());
+		GetGraphics()->SetDepthStencilView(GetRenderer()->GetGBufferTexture(eGBuffer::DepthStencil)->GetDepthStencilView());
+		GetGraphics()->ClearViews(eClearFlags::Color | eClearFlags::Depth, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 0.0f), 1.0f, 0);	
 
 		// states
-		Graphics::SetRasterizerState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
-		Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::GBuffer));
+		GetGraphics()->SetRasterizerState(GetRenderer()->GetRasterizerState(eRasterizerState::FillSolid_CullBack));
+		GetGraphics()->SetDepthStencilState(GetRenderer()->GetDepthStencilState(eDepthStencilState::GBuffer));
 
 		// draw on g buffer
 		{
@@ -148,36 +157,39 @@ namespace Dive
 				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 					continue;
 
-				auto pModelBuffer = Renderer::GetVSConstantBuffer(eVSConstantBuffers::Model);
+				auto pModelBuffer = GetRenderer()->GetVSConstantBuffer(eVSConstBuf::Model);
 				pModelBuffer->Update((void*)&pRenderableCom->GetCBufferVS());
 				pModelBuffer->Bind();
 
-				Graphics::SetShader(Renderer::GetShader(eShader::Deferred));
+				auto pVertexShader = GetRenderer()->GetShader(eRendererShader::GBuffer_VS);
+				auto pPixelShader = GetRenderer()->GetShader(eRendererShader::GBuffer_PS);
+				GetGraphics()->SetShader(eShaderType::Vertex, pVertexShader);
+				GetGraphics()->SetShader(eShaderType::Pixel, pPixelShader);
 
-				auto pMaterialBuffer = Renderer::GetPSConstantBuffer(ePSConstantBuffers::Material);
+				auto pMaterialBuffer = GetRenderer()->GetPSConstantBuffer(ePSConstBuf::Model);
 				pMaterialBuffer->Update((void*)&pRenderableCom->GetCBufferPS());
 				pMaterialBuffer->Bind();
 
-				Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
-				Graphics::SetTexture(eTextureUnit::Normal, pMaterial->GetTexture(eTextureUnit::Normal));
+				GetGraphics()->SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
+				GetGraphics()->SetTexture(eTextureUnit::Normal, pMaterial->GetTexture(eTextureUnit::Normal));
 
 				pRenderableCom->Draw();
 			}
 
-			Graphics::SetRenderTargetView(0, NULL);
-			Graphics::SetRenderTargetView(1, NULL);
-			Graphics::SetRenderTargetView(2, NULL);
+			GetGraphics()->SetRenderTargetView(0, NULL);
+			GetGraphics()->SetRenderTargetView(1, NULL);
+			GetGraphics()->SetRenderTargetView(2, NULL);
 		}
 
 		// draw light
 		{
-			Graphics::SetRenderTargetView(0, m_pCamera->GetRenderTargetView());
-			Graphics::ClearViews(eClearFlags::Color, m_pCamera->GetBackgroundColor());
+			GetGraphics()->SetRenderTargetView(0, m_pCamera->GetRenderTargetView());
+			GetGraphics()->ClearViews(eClearFlags::Color, m_pCamera->GetBackgroundColor());
 
-			Graphics::SetTexture(eTextureUnit::GBuffer_Color_SpecIntensity, Renderer::GetGBufferTexture(eGBuffer::ColorSpecIntensity));
-			Graphics::SetTexture(eTextureUnit::GBuffer_Normal, Renderer::GetGBufferTexture(eGBuffer::Normal));
-			Graphics::SetTexture(eTextureUnit::GBuffer_SpecPower, Renderer::GetGBufferTexture(eGBuffer::SpecPower));
-			Graphics::SetTexture(eTextureUnit::GBuffer_DepthStencil, Renderer::GetGBufferTexture(eGBuffer::DepthStencil));
+			GetGraphics()->SetTexture(eTextureUnit::GBuffer_Color_SpecIntensity, GetRenderer()->GetGBufferTexture(eGBuffer::ColorSpecIntensity));
+			GetGraphics()->SetTexture(eTextureUnit::GBuffer_Normal, GetRenderer()->GetGBufferTexture(eGBuffer::Normal));
+			GetGraphics()->SetTexture(eTextureUnit::GBuffer_SpecPower, GetRenderer()->GetGBufferTexture(eGBuffer::SpecPower));
+			GetGraphics()->SetTexture(eTextureUnit::GBuffer_DepthStencil, GetRenderer()->GetGBufferTexture(eGBuffer::DepthStencil));
 
 			// directional lights: 일반적으로 하나만 사용하는 듯 하다.
 			for (int i = 0; i < (int)m_Renderables[eRenderable::Light].size(); i++)
@@ -188,17 +200,21 @@ namespace Dive
 				if (pLightCom->GetType() != eLightType::Directional)
 					continue;
 	
-				auto pLightBuffer = Renderer::GetPSConstantBuffer(ePSConstantBuffers::Light);
+				auto pLightBuffer = GetRenderer()->GetPSConstantBuffer(ePSConstBuf::Light);
 				pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
 				pLightBuffer->Bind();
 
-				Graphics::SetShader(Renderer::GetShader(eShader::DeferredLights));
-				Graphics::SetVertexBuffer(nullptr);
-				Graphics::Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, 4, 0);
+				auto pVertexShader = GetRenderer()->GetShader(eRendererShader::DeferredLight_VS);
+				auto pPixelShader = GetRenderer()->GetShader(eRendererShader::DeferredLight_PS);
+				GetGraphics()->SetShader(eShaderType::Vertex, pVertexShader);
+				GetGraphics()->SetShader(eShaderType::Pixel, pPixelShader);
+
+				GetGraphics()->SetVertexBuffer(nullptr);
+				GetGraphics()->Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, 4, 0);
 			}
 
-			Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
-			Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Additive));
+			GetGraphics()->SetDepthStencilState(GetRenderer()->GetDepthStencilState(eDepthStencilState::ForwardLight));
+			GetGraphics()->SetBlendState(GetRenderer()->GetBlendState(eBlendState::Additive));
 
 			// point lights
 			// additive alpha blending을 사용한다.(이건 directional light가 무조건 존재한다는 가정이다.)
@@ -212,13 +228,17 @@ namespace Dive
 				if (pLightCom->GetType() != eLightType::Point)
 					continue;
 
-				auto pLightBuffer = Renderer::GetPSConstantBuffer(ePSConstantBuffers::Light);
+				auto pLightBuffer = GetRenderer()->GetPSConstantBuffer(ePSConstBuf::Light);
 				pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
 				pLightBuffer->Bind();
 
-				Graphics::SetShader(Renderer::GetShader(eShader::DeferredLights));
-				Graphics::SetVertexBuffer(nullptr);
-				Graphics::Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, 4, 0);
+				auto pVertexShader = GetRenderer()->GetShader(eRendererShader::DeferredLight_VS);
+				auto pPixelShader = GetRenderer()->GetShader(eRendererShader::DeferredLight_PS);
+				GetGraphics()->SetShader(eShaderType::Vertex, pVertexShader);
+				GetGraphics()->SetShader(eShaderType::Pixel, pPixelShader);
+
+				GetGraphics()->SetVertexBuffer(nullptr);
+				GetGraphics()->Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, 4, 0);
 			}
 
 			// spot lights
@@ -230,33 +250,39 @@ namespace Dive
 				if (pLightCom->GetType() != eLightType::Spot)
 					continue;
 
-				auto pLightBuffer = Renderer::GetPSConstantBuffer(ePSConstantBuffers::Light);
+				auto pLightBuffer = GetRenderer()->GetPSConstantBuffer(ePSConstBuf::Light);
 				pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
 				pLightBuffer->Bind();
 
-				Graphics::SetShader(Renderer::GetShader(eShader::DeferredLights));
-				Graphics::SetVertexBuffer(nullptr);
-				Graphics::Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, 4, 0);
+				auto pVertexShader = GetRenderer()->GetShader(eRendererShader::DeferredLight_VS);
+				auto pPixelShader = GetRenderer()->GetShader(eRendererShader::DeferredLight_PS);
+				GetGraphics()->SetShader(eShaderType::Vertex, pVertexShader);
+				GetGraphics()->SetShader(eShaderType::Pixel, pPixelShader);
+
+				GetGraphics()->SetVertexBuffer(nullptr);
+				GetGraphics()->Draw(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP, 4, 0);
 			}
 
-			Graphics::SetDepthStencilState(nullptr);
-			Graphics::SetBlendState(nullptr);
+			GetGraphics()->SetDepthStencilState(nullptr);
+			GetGraphics()->SetBlendState(nullptr);
 
-			Graphics::SetTexture(eTextureUnit::GBuffer_Color_SpecIntensity, nullptr);
-			Graphics::SetTexture(eTextureUnit::GBuffer_Normal, nullptr);
-			Graphics::SetTexture(eTextureUnit::GBuffer_SpecPower, nullptr);
-			Graphics::SetTexture(eTextureUnit::GBuffer_DepthStencil, nullptr);
+			GetGraphics()->SetTexture(eTextureUnit::GBuffer_Color_SpecIntensity, nullptr);
+			GetGraphics()->SetTexture(eTextureUnit::GBuffer_Normal, nullptr);
+			GetGraphics()->SetTexture(eTextureUnit::GBuffer_SpecPower, nullptr);
+			GetGraphics()->SetTexture(eTextureUnit::GBuffer_DepthStencil, nullptr);
 		}
 	}
 
-	void ViewScreen::passShadowGen()
+	// pass마다 Pipeline을 구성하고 drawcall 후 초기화하는 것이 디폴트인듯 하다.
+	// 하지만 pass로는구분되어 있지만 pipeline의 일부 요소는 공유해야 하는 경우가 존재한다.
+	void ViewScreen::passDepth()
 	{
 		// set state
-		Graphics::SetRasterizerState(Renderer::GetRasterizerState(eRasterizerState::ShadowGen));
-		Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::DepthReadWrite));
+		GetGraphics()->SetRasterizerState(GetRenderer()->GetRasterizerState(eRasterizerState::ShadowGen));
+		GetGraphics()->SetDepthStencilState(GetRenderer()->GetDepthStencilState(eDepthStencilState::DepthReadWrite));
 
-		auto pShader = Renderer::GetShader(eShader::ShadowGen);
-		Graphics::SetShader(pShader);
+		auto pVertexShader = GetRenderer()->GetShader(eRendererShader::Depth_VS);
+		GetGraphics()->SetShader(eShaderType::Vertex, pVertexShader);
 
 		for (const auto light : m_Renderables[eRenderable::Light])
 		{
@@ -268,11 +294,11 @@ namespace Dive
 			// 하지만 초기화는 시켜줘야 한다. 
 			// 그렇지 않다면 그림자맵을 넘기는 부분에서 다시 유, 무를 판단해야 한다.
 			// => 리소스 차원에서는 그게 더 나을수도...
-			if (lightCom->GetLightShadows() == eLightShadows::None)
+			if(!lightCom->IsShadowEnabled())
 			{
-				Graphics::SetRenderTargetView(0, nullptr);
-				Graphics::SetDepthStencilView(lightCom->GetShadowMap()->GetDepthStencilView());
-				Graphics::ClearViews(eClearFlags::Depth, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
+				GetGraphics()->SetRenderTargetView(0, nullptr);
+				GetGraphics()->SetDepthStencilView(lightCom->GetShadowMap()->GetDepthStencilView());
+				GetGraphics()->ClearViews(eClearFlags::Depth, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 				continue;
 			}
 
@@ -283,14 +309,14 @@ namespace Dive
 			rt.right = lightCom->GetShadowMapSize();
 			rt.top = 0;
 			rt.bottom = lightCom->GetShadowMapSize();
-			Graphics::SetViewport(rt);
+			GetGraphics()->SetViewport(rt);
 
 			// set & clear views
-			Graphics::SetRenderTargetView(0, nullptr);
-			Graphics::SetDepthStencilView(lightCom->GetShadowMap()->GetDepthStencilView());
-			Graphics::ClearViews(eClearFlags::Depth, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
+			GetGraphics()->SetRenderTargetView(0, nullptr);
+			GetGraphics()->SetDepthStencilView(lightCom->GetShadowMap()->GetDepthStencilView());
+			GetGraphics()->ClearViews(eClearFlags::Depth, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 		
-			auto pLightVSBuffer = Renderer::GetVSConstantBuffer(eVSConstantBuffers::Light);
+			auto pLightVSBuffer = GetRenderer()->GetVSConstantBuffer(eVSConstBuf::Light);
 			pLightVSBuffer->Update((void*)&lightCom->GetCBufferVS());
 			pLightVSBuffer->Bind();
 			
@@ -305,10 +331,11 @@ namespace Dive
 				const auto* pMaterial = pRenderableCom->GetMaterial();
 				const auto& boundingBox = pRenderableCom->GetBoundingBox();
 
+				// 컬링때문에 그림자가 사라진다.
 				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 					continue;
 
-				auto pModelBuffer = Renderer::GetVSConstantBuffer(eVSConstantBuffers::Model);
+				auto pModelBuffer = GetRenderer()->GetVSConstantBuffer(eVSConstBuf::Model);
 				pModelBuffer->Update((void*)&pRenderableCom->GetCBufferVS());
 				pModelBuffer->Bind();
 
@@ -324,7 +351,7 @@ namespace Dive
 				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 					continue;
 
-				auto pModelBuffer = Renderer::GetVSConstantBuffer(eVSConstantBuffers::Model);
+				auto pModelBuffer = GetRenderer()->GetVSConstantBuffer(eVSConstBuf::Model);
 				pModelBuffer->Update((void*)&pRenderableCom->GetCBufferVS());
 				pModelBuffer->Bind();
 
@@ -332,40 +359,41 @@ namespace Dive
 			}
 		}
 
-		Graphics::SetRenderTargetView(0, nullptr);
-		Graphics::SetDepthStencilView(nullptr);
-		Graphics::SetShader(nullptr);
+		GetGraphics()->SetRenderTargetView(0, nullptr);
+		GetGraphics()->SetDepthStencilView(nullptr);
 	}
 
 	void ViewScreen::passOpaqueDraw()
 	{
 		// viewport
-		Graphics::SetViewport(m_pCamera->GetViewport());
+		GetGraphics()->SetViewport(m_pCamera->GetViewport());
 
 		// set & clear views
-		Graphics::SetRenderTargetView(0, m_pCamera->GetRenderTargetView());
-		Graphics::SetDepthStencilView(Graphics::GetDefaultDepthStencilView());
-		Graphics::ClearViews(eClearFlags::Color | eClearFlags::Depth, m_pCamera->GetBackgroundColor(), 1.0f, 0);
+		GetGraphics()->SetRenderTargetView(0, m_pCamera->GetRenderTargetView());
+		GetGraphics()->SetDepthStencilView(GetGraphics()->GetDefaultDepthStencilView());
+		GetGraphics()->ClearViews(eClearFlags::Color | eClearFlags::Depth, m_pCamera->GetBackgroundColor(), 1.0f, 0);
 
-		Graphics::SetRasterizerState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
+		GetGraphics()->SetRasterizerState(GetRenderer()->GetRasterizerState(eRasterizerState::FillSolid_CullBack));
 
-		auto pShader = Renderer::GetShader(eShader::ForwardLightShadow);
-		Graphics::SetShader(pShader);
+		auto pVertexShader = GetRenderer()->GetShader(eRendererShader::ForwardLight_VS);
+		auto pPixelShader = GetRenderer()->GetShader(eRendererShader::ForwardLight_PS);
+		GetGraphics()->SetShader(eShaderType::Vertex, pVertexShader);
+		GetGraphics()->SetShader(eShaderType::Pixel, pPixelShader);
 
 		for (int i = 0; i != (int)m_Renderables[eRenderable::Light].size(); ++i)
 		{
 			auto light = m_Renderables[eRenderable::Light][i];
 			auto lightCom = light->GetComponent<Light>();
 			
-			auto pLightBuffer = Renderer::GetPSConstantBuffer(ePSConstantBuffers::Light);
+			auto pLightBuffer = GetRenderer()->GetPSConstantBuffer(ePSConstBuf::Light);
 			pLightBuffer->Update((void*)&lightCom->GetCBufferPS());
 			pLightBuffer->Bind();
 			
 			if (i == 0)
-				Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::ForwardLight));
+				GetGraphics()->SetDepthStencilState(GetRenderer()->GetDepthStencilState(eDepthStencilState::ForwardLight));
 			else if (i == 1)
-				Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Additive));
-			//Graphics::SetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::DepthReadWrite));
+				GetGraphics()->SetBlendState(GetRenderer()->GetBlendState(eBlendState::Additive));
+			//GetGraphics()->SetDepthStencilState(GetRenderer()->GetDepthStencilState(eDepthStencilState::DepthReadWrite));
 
 			// draw opaques
 			for (const auto* pOpaque : m_Renderables[eRenderable::Opaque])
@@ -377,56 +405,57 @@ namespace Dive
 				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 					continue;
 			
-				auto pModelBuffer = Renderer::GetVSConstantBuffer(eVSConstantBuffers::Model);
+				auto pModelBuffer = GetRenderer()->GetVSConstantBuffer(eVSConstBuf::Model);
 				pModelBuffer->Update((void*)&pRenderableCom->GetCBufferVS());
 				pModelBuffer->Bind();
 
-				auto pMaterialBuffer = Renderer::GetPSConstantBuffer(ePSConstantBuffers::Material);
+				auto pMaterialBuffer = GetRenderer()->GetPSConstantBuffer(ePSConstBuf::Model);
 				pMaterialBuffer->Update((void*)&pRenderableCom->GetCBufferPS());
 				pMaterialBuffer->Bind();
 
-				Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
-				Graphics::SetTexture(eTextureUnit::Normal, pMaterial->GetTexture(eTextureUnit::Normal));
+				GetGraphics()->SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
+				GetGraphics()->SetTexture(eTextureUnit::Normal, pMaterial->GetTexture(eTextureUnit::Normal));
 				if (lightCom->GetType() == eLightType::Spot)
-					Graphics::SetTexture(eTextureUnit::SpotShadowMap, lightCom->GetShadowMap());
+					GetGraphics()->SetTexture(eTextureUnit::SpotShadowMap, lightCom->GetShadowMap());
 
 				pRenderableCom->Draw();
 			}
 		}
 
-		Graphics::SetBlendState(nullptr);
-		//Graphics::SetRenderTargetView(0, nullptr);
-		//Graphics::SetDepthStencilView(nullptr);
-		Graphics::SetShader(nullptr);
+		GetGraphics()->SetBlendState(nullptr);
+		//GetGraphics()->SetRenderTargetView(0, nullptr);
+		//GetGraphics()->SetDepthStencilView(nullptr);
 	}
 
 	// passOpaqueDraw()와 RTV를 공유한다.
 	void ViewScreen::passTransparentDraw()
 	{
 		// viewport
-		Graphics::SetViewport(m_pCamera->GetViewport());
+		GetGraphics()->SetViewport(m_pCamera->GetViewport());
 
 		// set & clear views
-		//Graphics::SetRenderTargetView(0, m_pCamera->GetRenderTargetView());
-		//Graphics::SetDepthStencilView(Graphics::GetDefaultDepthStencilView());
-		//Graphics::ClearViews(eClearFlags::Color | eClearFlags::Depth, m_pCamera->GetBackgroundColor(), 1.0f, 0);
+		//GetGraphics()->SetRenderTargetView(0, m_pCamera->GetRenderTargetView());
+		//GetGraphics()->SetDepthStencilView(GetGraphics()->GetDefaultDepthStencilView());
+		//GetGraphics()->ClearViews(eClearFlags::Color | eClearFlags::Depth, m_pCamera->GetBackgroundColor(), 1.0f, 0);
 
-		auto pShader = Renderer::GetShader(eShader::ForwardLightShadow);
-		Graphics::SetShader(pShader);
+		auto pVertexShader = GetRenderer()->GetShader(eRendererShader::ForwardLight_VS);
+		auto pPixelShader = GetRenderer()->GetShader(eRendererShader::ForwardLight_PS);
+		GetGraphics()->SetShader(eShaderType::Vertex, pVertexShader);
+		GetGraphics()->SetShader(eShaderType::Pixel, pPixelShader);
 
-		Graphics::SetRasterizerState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
+		GetGraphics()->SetRasterizerState(GetRenderer()->GetRasterizerState(eRasterizerState::FillSolid_CullBack));
 
 		for (int i = 0; i < (int)m_Renderables[eRenderable::Light].size(); i++)
 		{
 			const auto* light = m_Renderables[eRenderable::Light][i];
 			auto* lightCom = light->GetComponent<Light>();
 	
-			auto lightBuffer = Renderer::GetPSConstantBuffer(ePSConstantBuffers::Light);
+			auto lightBuffer = GetRenderer()->GetPSConstantBuffer(ePSConstBuf::Light);
 			lightBuffer->Update((void*)&lightCom->GetCBufferPS());
 			lightBuffer->Bind();
 
-			Graphics::SetDepthStencilState(NULL);
-			Graphics::SetBlendState(Renderer::GetBlendState(eBlendState::Transparent));
+			GetGraphics()->SetDepthStencilState(NULL);
+			GetGraphics()->SetBlendState(GetRenderer()->GetBlendState(eBlendState::Transparent));
 
 			// draw transparents
 			for (const auto* pTransparent : m_Renderables[eRenderable::Transparent])
@@ -438,27 +467,26 @@ namespace Dive
 				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 					continue;
 
-				auto pModelBuffer = Renderer::GetVSConstantBuffer(eVSConstantBuffers::Model);
+				auto pModelBuffer = GetRenderer()->GetVSConstantBuffer(eVSConstBuf::Model);
 				pModelBuffer->Update((void*)&pRenderableCom->GetCBufferVS());
 				pModelBuffer->Bind();
 				
-				auto pMaterialBuffer = Renderer::GetPSConstantBuffer(ePSConstantBuffers::Material);
+				auto pMaterialBuffer = GetRenderer()->GetPSConstantBuffer(ePSConstBuf::Model);
 				pMaterialBuffer->Update((void*)&pRenderableCom->GetCBufferPS());
 				pMaterialBuffer->Bind();
 
-				Graphics::SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
-				Graphics::SetTexture(eTextureUnit::Normal, pMaterial->GetTexture(eTextureUnit::Normal));
+				GetGraphics()->SetTexture(eTextureUnit::Diffuse, pMaterial->GetTexture(eTextureUnit::Diffuse));
+				GetGraphics()->SetTexture(eTextureUnit::Normal, pMaterial->GetTexture(eTextureUnit::Normal));
 				if (lightCom->GetType() == eLightType::Spot)
-					Graphics::SetTexture(eTextureUnit::SpotShadowMap, lightCom->GetShadowMap());
+					GetGraphics()->SetTexture(eTextureUnit::SpotShadowMap, lightCom->GetShadowMap());
 
 				// 사실 위의 내용도 여기에서 다 처리할 수 있는데...
 				pRenderableCom->Draw();
 			}
 		}
 
-		Graphics::SetBlendState(nullptr);
-		Graphics::SetRenderTargetView(0, nullptr);
-		Graphics::SetDepthStencilView(nullptr);
-		Graphics::SetShader(nullptr);
+		GetGraphics()->SetBlendState(nullptr);
+		GetGraphics()->SetRenderTargetView(0, nullptr);
+		GetGraphics()->SetDepthStencilView(nullptr);
 	}
 }

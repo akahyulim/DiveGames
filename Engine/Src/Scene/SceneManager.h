@@ -7,25 +7,47 @@ namespace Dive
 	class SceneManager
 	{
 	public:
+		SceneManager(const SceneManager&) = delete;
+		void operator=(const SceneManager&) = delete;
 
-		static void Shutdown();
+		static SceneManager* GetInstance()
+		{
+			if (!s_pInstance)
+				s_pInstance = new SceneManager;
 
-		static Scene* CreateScene(const std::string& sceneName);
+			return s_pInstance;
+		}
 
-		static void LoadScene(const std::string& sceneName);
-		static void LoadScene(int index);
+		void Shutdown();
+
+		Scene* CreateScene(const std::string& sceneName);
+
+		void LoadScene(const std::string& sceneName);
+		void LoadScene(int index);
 		// 비동기 로드
 
-		static bool UnloadScene(const std::string& sceneName);
-		static bool UnloadScene(int index);
+		bool UnloadScene(const std::string& sceneName);
+		bool UnloadScene(int index);
 
-		static Scene* GetActiveScene();
-		static bool SetActiveScene(Scene* pScene);
+		Scene* GetActiveScene();
+		bool SetActiveScene(Scene* pScene);
 
-		static Scene* GetSceneAt(int index);
-		static Scene* GetSceneByName(const std::string& sceneName);
-		static Scene* GetSceneByPath(const std::string& scenePath);
+		Scene* GetSceneAt(int index);
+		Scene* GetSceneByName(const std::string& sceneName);
+		Scene* GetSceneByPath(const std::string& scenePath);
 
-		static uint32_t GetSceneCount();
+		uint32_t GetSceneCount();
+	
+	private:
+		SceneManager();
+		~SceneManager();
+
+	private:
+		static SceneManager* s_pInstance;
+
+		std::vector<Scene*> m_Scenes;
+		Scene* m_pActiveScene;
 	};
+
+	SceneManager* GetSceneManager();
 }

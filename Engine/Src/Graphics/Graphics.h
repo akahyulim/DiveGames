@@ -11,116 +11,137 @@ namespace Dive
 	class Graphics
 	{
 	public:
-		static bool SetScreenMode(uint32_t width, uint32_t height, bool fullScreen, bool borderless);
-		static void Shutdown();
+		Graphics(const Graphics&) = delete;
+		void operator=(const Graphics&) = delete;
 
-		static bool RunWindow();
+		static Graphics* GetInstance()
+		{
+			if (!s_pInstance)
+				s_pInstance = new Graphics;
 
-		static LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+			return s_pInstance;
+		}
 
-		static void AdjustWindow(uint32_t width, uint32_t height, bool borderless);
+		bool Initialize(uint32_t width, uint32_t height, bool fullScreen, bool borderless);
+		void Shutdown();
 
-		static bool BeginFrame();
-		static void EndFrame();
+		bool RunWindow();
 
-		static void SetRenderTargetView(uint32_t index, ID3D11RenderTargetView* pRenderTargetView);
-		static void SetDepthStencilView(ID3D11DepthStencilView* pDepthStencilView);
-		static void ClearViews(uint8_t flags, const DirectX::XMFLOAT4& color, float depth = 1.0f, uint8_t stencil = 0);
-		
-		static void SetViewport(const RECT& rt);
+		LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-		static void SetDepthStencilState(ID3D11DepthStencilState* pState);
-		static void SetRasterizerState(ID3D11RasterizerState* pState);
-		static void SetBlendState(ID3D11BlendState* pState);
-		
-		static void SetTexture(eTextureUnit index, Texture* pTexture);
-		
-		static void SetShader(Shader* pShader);
-		
-		static void SetVertexBuffer(VertexBuffer* pBuffer);
-		static void SetIndexBuffer(IndexBuffer* pBuffer);
-		
-		static void Draw(D3D11_PRIMITIVE_TOPOLOGY topology, uint32_t vertexCount, uint32_t vertexStart);
-		static void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY topology, uint32_t indexCount, uint32_t indexStart);
+		void AdjustWindow(uint32_t width, uint32_t height, bool borderless);
 
-		static bool IsInitialized();
+		bool BeginFrame();
+		void EndFrame();
 
-		static HINSTANCE GetWindowInstance() { return s_hInstance; }
-		static HWND GetWindowHandle() { return s_hWnd; }
+		void SetRenderTargetView(uint32_t index, ID3D11RenderTargetView* pRenderTargetView);
+		void SetDepthStencilView(ID3D11DepthStencilView* pDepthStencilView);
+		void ClearViews(uint8_t flags, const DirectX::XMFLOAT4& color, float depth = 1.0f, uint8_t stencil = 0);
 
-		static std::wstring GetWindowTitle() { return s_WindowTitle; }
-		static void SetWindowTitle(const std::wstring& title);
+		void SetViewport(const RECT& rt);
 
-		static bool IsFullScreen() { return s_bFullScreen; }
-		static void SetFullScreen(bool enabled);
+		void SetDepthStencilState(ID3D11DepthStencilState* pState);
+		void SetRasterizerState(ID3D11RasterizerState* pState);
+		void SetBlendState(ID3D11BlendState* pState);
 
-		static uint32_t GetResolutionWidth() { return s_ResolutionWidth; };
-		static uint32_t GetResolutionHeight() { return s_ResolutionHeight; }
-		static DirectX::XMFLOAT2 GetResolution() { return { (float)s_ResolutionWidth, (float)s_ResolutionHeight }; }
-		static void ResizeResolution(uint32_t width, uint32_t height);
+		void SetTexture(eTextureUnit index, Texture* pTexture);
 
-		static IDXGISwapChain* GetSwapChain() { return s_pSwapChain; }
-		static ID3D11Device* GetDevice() { return s_pDevice; }
-		static ID3D11DeviceContext* GetDeviceContext() { return s_pDeviceContext; }
+		void SetShader(eShaderType type, Shader* pShader);
 
-		static ID3D11RenderTargetView* GetDefaultRenderTargetView() { return s_pDefaultRenderTargetView; }
-		static ID3D11DepthStencilView* GetDefaultDepthStencilView() { return s_pDefaultDepthStencilView; }
-		static ID3D11Texture2D* GetDefaultDepthTexture() { return s_pDefaultDepthTexture; }
+		void SetVertexBuffer(VertexBuffer* pBuffer);
+		void SetIndexBuffer(IndexBuffer* pBuffer);
 
-		static bool IsVSync() { return s_bVSync; }
-		static void SetVSync(bool enabled) { s_bVSync = enabled; }
-		
-		static D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() { return s_PrimitiveTopology; }
+		void Draw(D3D11_PRIMITIVE_TOPOLOGY topology, uint32_t vertexCount, uint32_t vertexStart);
+		void DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY topology, uint32_t indexCount, uint32_t indexStart);
+
+		bool IsInitialized();
+
+		HINSTANCE GetWindowInstance() { return m_hInstance; }
+		HWND GetWindowHandle() { return m_hWnd; }
+
+		std::wstring GetWindowTitle() { return m_WindowTitle; }
+		void SetWindowTitle(const std::wstring& title);
+
+		bool IsFullScreen() { return m_bFullScreen; }
+		void SetFullScreen(bool enabled);
+
+		uint32_t GetResolutionWidth() { return m_ResolutionWidth; };
+		uint32_t GetResolutionHeight() { return m_ResolutionHeight; }
+		DirectX::XMFLOAT2 GetResolution() { return { (float)m_ResolutionWidth, (float)m_ResolutionHeight }; }
+		void ResizeResolution(uint32_t width, uint32_t height);
+
+		IDXGISwapChain* GetSwapChain() { return m_pSwapChain; }
+		ID3D11Device* GetDevice() { return m_pDevice; }
+		ID3D11DeviceContext* GetDeviceContext() { return m_pDeviceContext; }
+
+		ID3D11RenderTargetView* GetDefaultRenderTargetView() { return m_pDefaultRenderTargetView; }
+		ID3D11DepthStencilView* GetDefaultDepthStencilView() { return m_pDefaultDepthStencilView; }
+		ID3D11Texture2D* GetDefaultDepthTexture() { return m_pDefaultDepthTexture; }
+
+		bool IsVSync() { return m_bVSync; }
+		void SetVSync(bool enabled) { m_bVSync = enabled; }
+
+		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() { return m_PrimitiveTopology; }
+
+	private:
+		Graphics();
+		~Graphics();
+
+		bool createWindow(uint32_t width, uint32_t height, bool borderless);
+		bool createDevice(uint32_t width, uint32_t height);
+		bool updateSwapChain(uint32_t width, uint32_t height);
+
+		void prepareDraw();
+		void resetViews();
 
 
 	private:
-		static bool createWindow(uint32_t width, uint32_t height, bool borderless);
-		static bool createDevice(uint32_t width, uint32_t height);
-		static bool updateSwapChain(uint32_t width, uint32_t height);
+		static Graphics* s_pInstance;
 
-		static void prepareDraw();
-		static void resetViews();
+		HINSTANCE m_hInstance;
+		HWND m_hWnd;
+		std::wstring m_WindowTitle;
+		bool m_bFullScreen;
+		uint32_t m_ResolutionWidth;
+		uint32_t m_ResolutionHeight;
 
+		IDXGISwapChain* m_pSwapChain;
+		ID3D11Device* m_pDevice;
+		ID3D11DeviceContext* m_pDeviceContext;
 
-	private:
-		static HINSTANCE s_hInstance;
-		static HWND s_hWnd;
-		static std::wstring s_WindowTitle;
-		static bool s_bFullScreen;
-		static uint32_t s_ResolutionWidth;
-		static uint32_t s_ResolutionHeight;
+		ID3D11RenderTargetView* m_pDefaultRenderTargetView;
+		ID3D11DepthStencilView* m_pDefaultDepthStencilView;
+		ID3D11Texture2D* m_pDefaultDepthTexture;
 
-		static IDXGISwapChain* s_pSwapChain;
-		static ID3D11Device* s_pDevice;
-		static ID3D11DeviceContext* s_pDeviceContext;
+		bool m_bVSync;
 
-		static ID3D11RenderTargetView* s_pDefaultRenderTargetView;
-		static ID3D11DepthStencilView* s_pDefaultDepthStencilView;
-		static ID3D11Texture2D* s_pDefaultDepthTexture;
+		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveTopology;
 
-		static bool s_bVSync;
+		ID3D11RenderTargetView* m_RenderTargetViews[4];
+		ID3D11DepthStencilView* m_pDepthStencilView;
 
-		static D3D11_PRIMITIVE_TOPOLOGY s_PrimitiveTopology;
+		bool m_bRenderTargetViewsDirty;
 
-		static ID3D11RenderTargetView* s_RenderTargetViews[4];
-		static ID3D11DepthStencilView* s_pDepthStencilView;
+		VertexBuffer* m_pVertexBuffer;
+		IndexBuffer* m_pIndexBuffer;
 
-		static bool s_bRenderTargetViewsDirty;
+		Shader* m_pVertexShader;
+		Shader* m_pHullShader;
+		Shader* m_pDomainShader;
+		Shader* m_pComputeShader;
+		Shader* m_pPixelShader;
 
-		static VertexBuffer* s_pVertexBuffer;
-		static IndexBuffer* s_pIndexBuffer;
-
-		static Shader* s_pShader;
-		
 		// ConstantBuffer를 vs, ps별 배열 즉, 이차원 배열로 관리한다.
 
-		static ID3D11DepthStencilState* s_pDepthStencilState;
-		static ID3D11RasterizerState* s_pRasterizerState;
-		static ID3D11BlendState* s_pBlendState;
+		ID3D11DepthStencilState* m_pDepthStencilState;
+		ID3D11RasterizerState* m_pRasterizerState;
+		ID3D11BlendState* m_pBlendState;
 
-		static ID3D11ShaderResourceView* s_ShaderResourceViews[(uint32_t)eTextureUnit::Max_Num];
-		static ID3D11SamplerState* s_SamplerStates[(uint32_t)eTextureUnit::Max_Num];
+		ID3D11ShaderResourceView* m_ShaderResourceViews[(uint32_t)eTextureUnit::Count];
+		ID3D11SamplerState* m_SamplerStates[(uint32_t)eTextureUnit::Count];
 
-		static bool s_bTextureDirty;
+		bool m_bTextureDirty;
 	};
+
+	Graphics* GetGraphics();
 }

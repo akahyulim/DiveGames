@@ -27,9 +27,9 @@ namespace Dive
 			desc.MiscFlags = 0;
 			desc.StructureByteStride = 0;
 
-			if (FAILED(Graphics::GetDevice()->CreateBuffer(&desc, nullptr, &m_pBuffer)))
+			if (FAILED(Graphics::GetInstance()->GetDevice()->CreateBuffer(&desc, nullptr, &m_pBuffer)))
 			{
-				DV_CORE_ERROR("ConstantBuffer({:s}) 생성에 실패하였습니다.", GetName());
+				DV_ENGINE_ERROR("ConstantBuffer({:s}) 생성에 실패하였습니다.", GetName());
 				return false;
 			}
 
@@ -44,6 +44,7 @@ namespace Dive
 		std::string GetName() const { return m_Name; }
 		ID3D11Buffer* const* GetBuffer() const{ return &m_pBuffer; }
 		uint32_t GetStride() const { return m_Stride; }
+		eShaderType GetShaderType() const { return m_ShaderType; }
 
 		template<typename T>
 		static ConstantBuffer* Create(const std::string& name, eShaderType type, uint32_t slot)

@@ -8,7 +8,6 @@
 
 namespace Dive
 {
-	// 왜인지 모르겠지만 위치를 0, 0, 0으로 설정하면 오류가 발생한다.
 	Light::Light(GameObject* pGameObject)
 		: Component(pGameObject)
 		, m_Type(eLightType::Directional)
@@ -19,7 +18,7 @@ namespace Dive
 		, m_bEnabled(true)
 		, m_pShadowMap(nullptr)
 		, m_ShadowMapSize(1024.0f)
-		, m_Shadows(eLightShadows::Soft)
+		, m_bShadowEnabled(true)
 	{
 		m_pShadowMap = new RenderTexture();
 		m_pShadowMap->SetDepthStencil(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
@@ -27,23 +26,19 @@ namespace Dive
 		m_pShadowMap->SetFilter(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
 		m_pShadowMap->SetComparisonFunc(D3D11_COMPARISON_LESS_EQUAL);
 
-		ZeroMemory(&m_CBufferVS, sizeof(LightConstantBufferVS));
-		ZeroMemory(&m_CBufferPS, sizeof(LightConstantBufferPS));
+		ZeroMemory(&m_CBufferVS, sizeof(VSConstBuf_Light));
+		ZeroMemory(&m_CBufferPS, sizeof(PSConstBuf_Light));
 	}
 
 	Light::~Light()
 	{
 		DV_DELETE(m_pShadowMap);
 
-		DV_CORE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
+		DV_ENGINE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
 	}
 
-	// 호출이 안된다.
-	// Scene::Update가 없어서 GameObject::Update도 호출되지 않는다.
 	void Light::Update()
 	{
-		// 더티 체크?
-
 		switch (GetType())
 		{
 		case eLightType::Directional:
@@ -65,6 +60,7 @@ namespace Dive
 			m_CBufferPS.outerConeAngle = GetOuterAngleRadian();
 			m_CBufferPS.innerConeAngle = GetInnerAngleRadian();
 			m_CBufferPS.shadow = DirectX::XMMatrixTranspose(GetShaodwMatrix());
+			m_CBufferPS.shadowEnabled = m_bShadowEnabled ? 1: 0;	// 현재 그림자는 spot만 존재하기 때문
 			break;
 		default:
 			break;

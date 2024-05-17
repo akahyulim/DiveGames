@@ -5,9 +5,9 @@ namespace Dive
 {
 	class GameObject;
 
-	class Component : public DvObject
+	class Component : public Object
 	{
-		DV_CLASS(Component, DvObject);
+		DV_CLASS(Component, Object);
 
 	public:
 		Component(GameObject* pGameObject);

@@ -5,11 +5,20 @@
 
 namespace Dive
 {
-	VertexBuffer::VertexBuffer(const void* pData, uint32_t stride, uint32_t count)
+	VertexBuffer::VertexBuffer()
 		: m_pBuffer(nullptr)
-		, m_Stride(stride)
+		, m_Stride(0)
 		, m_Offset(0)
-		, m_Count(count)
+		, m_Count(0)
+	{
+	}
+	
+	VertexBuffer::~VertexBuffer()
+	{
+		Destroy();
+	}
+
+	bool VertexBuffer::CreateBuffer(const void* pData, uint32_t stride, uint32_t count)
 	{
 		D3D11_BUFFER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
@@ -26,17 +35,29 @@ namespace Dive
 		data.SysMemPitch = 0;
 		data.SysMemSlicePitch = 0;
 
-		if (FAILED(Graphics::GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
+		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
+		{
 			DV_ERROR("VertexBuffer 생성에 실패하였습니다.");
+			return false;
+		}
+
+		m_Stride = stride;
+		m_Count = count;
+
+		return true;
 	}
-	
-	VertexBuffer::~VertexBuffer()
+
+	void VertexBuffer::Destroy()
 	{
 		DV_RELEASE(m_pBuffer);
 	}
 
 	VertexBuffer* VertexBuffer::Create(const void* pData, uint32_t stride, uint32_t count)
 	{
-		return new VertexBuffer(pData, stride, count);
+		auto pVertexBuffer = new VertexBuffer();
+		if (!pVertexBuffer->CreateBuffer(pData, stride, count))
+			DV_DELETE(pVertexBuffer);
+
+		return pVertexBuffer;
 	}
 }

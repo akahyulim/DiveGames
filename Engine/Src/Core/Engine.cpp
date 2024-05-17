@@ -1,7 +1,6 @@
 #include "divepch.h"
 #include "Engine.h"
 #include "CoreDefs.h"
-#include "Timer.h"
 #include "CoreEvents.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
@@ -11,85 +10,148 @@
 
 namespace Dive
 {
-	static bool s_bInitialized = false;
-	static bool s_bExit = false;
+	Engine* Engine::s_pInstance = nullptr;
+
+	Engine::Engine()
+		: m_bInitialized(false)
+		, m_bExit(false)
+		, m_TimeMS(0.0)
+		, m_DeltaTimeMS(0.0)
+		, m_LastTickTime(std::chrono::steady_clock::now())
+		, m_FrameCount(0)
+		, m_LastTime(0)
+		, m_Fps(0.0)
+	{
+	}
 
 	bool Engine::Initialize(uint32_t width, uint32_t height, bool fullScreen)
 	{
-		Log::Initialize();
+		Log::GetInstance()->Initialize(spdlog::level::trace, spdlog::level::trace);
 
-		if (!Graphics::SetScreenMode(width, height, fullScreen, false))
+		if (!Graphics::GetInstance()->Initialize(width, height, fullScreen, false))
+		{
+			DV_ENGINE_CRITICAL("그래픽스 시스템 초기화에 실패하였습니다.");
 			return false;
+		}
 
-		if (!Renderer::Initialize())
+		if (!Renderer::GetInstance()->Initialize())
+		{
+			DV_ENGINE_CRITICAL("렌더러 시스템 초기화에 실패하였습니다.");
 			return false;
+		}
 
-		if (!Input::Initialize())
+		if (!Input::GetInstance()->Initialize())
+		{
+			DV_ENGINE_CRITICAL("인풋 시스템 초기화에 실패하였습니다.");
 			return false;
+		}
 
-		s_bInitialized = true;
-		DV_CORE_TRACE("엔진 초기화 성공");
+		m_bInitialized = true;
+
+		DV_ENGINE_TRACE("엔진 초기화에 성공하였습니다.");
+
 		return true;
 	}
 
 	void Engine::Shutdown()
 	{
-		SceneManager::Shutdown();
-		ResourceManager::Shutdown();
-		Renderer::Shutdown();
-		Graphics::Shutdown();
+		SceneManager::GetInstance()->Shutdown();	// 자주 사용하지 않는 객체를 굳이 멤버 변수로 관리할 필요는 없어보인다.
+		ResourceManager::GetInstance()->Shutdown();
 
-		DV_CORE_TRACE("엔진 셧다운");
+		Input::GetInstance()->Shutdown();
+		Renderer::GetInstance()->Shutdown();
+		Graphics::GetInstance()->Shutdown();
+
+		DV_ENGINE_TRACE("엔진 셧다운에 성공하였습니다.");
 	}
 	
 	void Engine::RunFrame()
 	{
-		if (!Graphics::RunWindow())
+		if (!Graphics::GetInstance()->RunWindow())
 		{
-			s_bExit = true;
+			m_bExit = true;
 			return;
+		}
+
+		m_DeltaTimeMS = static_cast<double>(std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - m_LastTickTime).count());
+		m_TimeMS += m_DeltaTimeMS;
+		m_LastTickTime = std::chrono::steady_clock::now();
+
+		m_FrameCount++;
+		if (m_TimeMS - m_LastTime >= 1000.0)
+		{
+			m_Fps = m_FrameCount;
+			m_FrameCount = 0;
+			m_LastTime = m_TimeMS;
 		}
 
 		OnUpdate();
 		OnRender();
-
-		// fps
-		{
-			DV_CORE_INFO("fps: {:f}", Timer::GetFps());
-		}
 	}
 	
 	void Engine::OnUpdate()
 	{
 		FIRE_EVENT(PreUpdateEvent());
 
-		Timer::Update();
-		Input::Update();
-		Renderer::Update();
+		Renderer::GetInstance()->Update();
+		Input::GetInstance()->Update();
 
 		FIRE_EVENT(PostUpdateEvent());
 	}
 	
 	void Engine::OnRender()
 	{
-		Graphics::BeginFrame();
+		Graphics::GetInstance()->BeginFrame();
 		
 		FIRE_EVENT(PreRenderEvent());
 
-		Renderer::Render();
+		Renderer::GetInstance()->Render();
 
 		FIRE_EVENT(PostRenderEvent());
 
-		Graphics::EndFrame();
+		Graphics::GetInstance()->EndFrame();
 	}
 	
 	bool Engine::IsInitialized()
 	{
-		return s_bInitialized;
+		return m_bInitialized;
 	}
 	
 	bool Engine::IsExit()
 	{
-		return s_bExit;
+		return m_bExit;
+	}
+
+	double Engine::GetFps()
+	{
+		return m_Fps;
+	}
+
+	double Engine::GetTimeMS()
+	{
+		return m_TimeMS;
+	}
+
+	double Engine::GetTimeSec()
+	{
+		return m_TimeMS / 1000.0;
+	}
+
+	double Engine::GetDeltaTimeMS()
+	{
+		return m_DeltaTimeMS;
+	}
+
+	double Engine::GetDeltaTimeSec()
+	{
+		return m_DeltaTimeMS / 1000.0;
+	}
+
+	Engine* GetEngine()
+	{
+		if (Engine::GetInstance()->IsInitialized())
+			return Engine::GetInstance();
+
+		return nullptr;
 	}
 }

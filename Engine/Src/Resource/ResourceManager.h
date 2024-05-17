@@ -11,22 +11,36 @@ namespace Dive
 	class ResourceManager
 	{
 	public:
-	
-	public:
-		static bool AddManualResource(Resource* pResource);
-		template<class T> static T* GetResource(const std::string& name);
+		ResourceManager(const ResourceManager&) = delete;
+		void operator=(const ResourceManager&) = delete;
 
-		static void Shutdown();
+		static ResourceManager* GetInstance()
+		{
+			if (!s_pInstance)
+				s_pInstance = new ResourceManager;
+
+			return s_pInstance;
+		}
+
+		bool AddManualResource(Resource* pResource);
+		template<class T> T* GetResource(const std::string& name);
+
+		void Shutdown();
 
 	private:
-		static Resource* findResource(size_t typeHash, size_t nameHash);
+		ResourceManager();
+		~ResourceManager();
+
+		Resource* findResource(size_t typeHash, size_t nameHash);
 
 	private:
-		static std::unordered_map<size_t, ResourceGroup> s_ResourceGroups;
+		static ResourceManager* s_pInstance;
+
+		std::unordered_map<size_t, ResourceGroup> m_ResourceGroups;
 	};
 
 	template<class T>
-	static T* ResourceManager::GetResource(const std::string& name)
+	T* ResourceManager::GetResource(const std::string& name)
 	{
 		// 추가적인 가공이 필요할 수 있다.
 		size_t nameHash = std::hash<std::string>{}(name);
@@ -44,8 +58,10 @@ namespace Dive
 		}
 
 		pNewObject->SetName(name);
-		s_ResourceGroups[typeHash].emplace(nameHash, static_cast<Resource*>(pNewObject));
+		m_ResourceGroups[typeHash].emplace(nameHash, static_cast<Resource*>(pNewObject));
 
 		return pNewObject;
 	}
+
+	ResourceManager* GetResourceManager();
 }

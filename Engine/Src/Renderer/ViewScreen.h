@@ -35,7 +35,7 @@ namespace Dive
 		void forwardRender();
 		void deferredRender();
 
-		void passShadowGen();
+		void passDepth();
 		void passOpaqueDraw();
 		void passTransparentDraw();
 		

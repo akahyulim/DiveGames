@@ -3,18 +3,6 @@
 
 namespace Dive
 {
-	Object::Object()
-		: m_ID(0)
-	{}
-
-	Object::Object(const std::string& name)
-		: m_ID(0)
-		, m_Name(name)
-	{}
-}
-
-namespace Dive
-{
 	TypeInfo::TypeInfo(const std::string& typeName, const TypeInfo* pBaseTypeInfo)
 		: m_TypeHash(std::hash<std::string>{}(typeName))
 		, m_TypeName(typeName)

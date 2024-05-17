@@ -15,7 +15,7 @@ namespace Dive
 	{
 		Clear();
 
-		DV_CORE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
+		DV_ENGINE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
 			GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
 	}
 
@@ -43,7 +43,7 @@ namespace Dive
 	{
 		if (index >= static_cast<uint32_t>(m_Meshes.size()))
 		{
-			DV_CORE_WARN("잘못된 메시 컨테이너 인덱스를 전달받았습니다.");
+			DV_ENGINE_WARN("잘못된 메시 컨테이너 인덱스를 전달받았습니다.");
 			return nullptr;
 		}
 

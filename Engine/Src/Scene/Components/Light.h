@@ -14,13 +14,6 @@ namespace Dive
 		Spot
 	};
 
-	enum class eLightShadows
-	{
-		None, 
-		Hard,
-		Soft
-	};
-
 	// 유니티의 경우 디렉셔널 라이트를 2개 이상 설정할 수 있지만 그림자를 만드는 것은 하나로 제한된다.
 	// 언리얼의 경우 포워드 셰이딩의 경우 하나의 디렉셔널 라이트만 사용된다.
 	class Light : public Component
@@ -62,11 +55,11 @@ namespace Dive
 		float GetShadowMapSize() const { return m_ShadowMapSize; }
 		void SetShadowMapSize(float size);
 
-		eLightShadows GetLightShadows() const { return m_Shadows; }
-		void SetLightShadows(eLightShadows lightShadow) { m_Shadows = lightShadow; }
+		bool IsShadowEnabled() const { return m_bShadowEnabled; }
+		void EnableShadow(bool enable) { m_bShadowEnabled = enable; }
 
-		const LightConstantBufferVS& GetCBufferVS() const { return m_CBufferVS; }
-		const LightConstantBufferPS& GetCBufferPS() const { return m_CBufferPS; }
+		const VSConstBuf_Light& GetCBufferVS() const { return m_CBufferVS; }
+		const PSConstBuf_Light& GetCBufferPS() const { return m_CBufferPS; }
 
 	private:
 		eLightType m_Type;
@@ -82,9 +75,9 @@ namespace Dive
 		RenderTexture* m_pShadowMap;
 		float m_ShadowMapSize;
 
-		eLightShadows m_Shadows;
+		bool m_bShadowEnabled;
 
-		LightConstantBufferVS m_CBufferVS;
-		LightConstantBufferPS m_CBufferPS;
+		VSConstBuf_Light m_CBufferVS;
+		PSConstBuf_Light m_CBufferPS;
 	};
 }

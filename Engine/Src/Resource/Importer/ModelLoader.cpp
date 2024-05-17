@@ -130,10 +130,10 @@ namespace Dive
             return false;
         }
 
-        s_pActiveScene = SceneManager::GetActiveScene();
+        s_pActiveScene = SceneManager::GetInstance()->GetActiveScene();
         if (!s_pActiveScene)
         {
-            DV_CORE_ERROR("활성화된 Scene이 존재하지 않습니다.");
+            DV_ENGINE_ERROR("모델 파일을 저장할 활성화된 Scene이 존재하지 않습니다.");
             return false;
         }
 
@@ -262,7 +262,8 @@ namespace Dive
            
             uint32_t vertexOffset = 0;
             pAddedMesh->AddVertices(vertices, &vertexOffset);
-
+            // 오프셋을 전달하는 이유는 하나의 버퍼에 메시를 누적하는 과정인 듯 하다.
+            // 허나 현재 메시당 버퍼가 하나이므로 오프셋을 저장할 필요가 없다. 실제로 전부 0이다.
             uint32_t indexOffset = 0;
             pAddedMesh->AddIndices(indices, &indexOffset);
 
@@ -398,7 +399,7 @@ namespace Dive
         // 일단 동일한 이름의 머티리얼이 존재한다면 리턴하도록 했지만
         // 추후 동일한 이름을 허용해야할 수도 있다.
         // 이건 현재 적용이 불안정한 듯 하다. => 역시 안먹힌다.
-        //auto pExisted = ResourceManager::GetResource<Material>(name.C_Str());
+        //auto pExisted = ResourceManager::GetInstance()->GetResource<Material>(name.C_Str());
         //if (pExisted)
         //    return pExisted;
 
@@ -410,11 +411,11 @@ namespace Dive
         auto pMat = new Material();
         pMat->SetName(name.data);
         pMat->SetDiffuseColor(diffuse.r, diffuse.g, diffuse.b, diffuse.a);
-        //ResourceManager::AddManualResource(pMat);
+        //ResourceManager::GetInstance()->AddManualResource(pMat);
         // 이걸 어디에서 해야하나... 이렇게 직접 전달하기 싫다면
         // Material::GetShader()에서 리소스매니저로부터 직접 디폴트 셰이더를 전달하는 방법도 있다.
-        auto pShader = ResourceManager::GetResource<Shader>("../../Assets/Shaders/ForwardLight.hlsl");
-        pMat->SetShader(pShader);
+        //auto pShader = ResourceManager::GetInstance()->GetResource<Shader>("../../Assets/Shaders/ForwardLight.hlsl");
+        //pMat->SetShader(pShader);
 
         aiString texturePath;
 
@@ -435,10 +436,10 @@ namespace Dive
                 // 이건 외부에 존재하는 파일을 로드
                 auto diffuseTexturePath = FileSystem::GetPath(s_FileName) + "textures/";
                 diffuseTexturePath += FileSystem::GetFileNameAndExtension(texturePath.C_Str());
-                pDiffuseTex = ResourceManager::GetResource<Texture2D>(diffuseTexturePath);
+                pDiffuseTex = ResourceManager::GetInstance()->GetResource<Texture2D>(diffuseTexturePath);
             }
             pMat->SetTexture(eTextureUnit::Diffuse, pDiffuseTex);
-            DV_CORE_INFO("Load DiffuseMap");
+            DV_ENGINE_INFO("Load DiffuseMap");
         }
 
         // normal map
@@ -456,10 +457,10 @@ namespace Dive
                 // 이건 외부에 존재하는 파일을 로드
                 auto normalTexturePath = FileSystem::GetPath(s_FileName) + "textures/";
                 normalTexturePath += FileSystem::GetFileNameAndExtension(texturePath.C_Str());
-                pNormalTex = ResourceManager::GetResource<Texture2D>(normalTexturePath);
+                pNormalTex = ResourceManager::GetInstance()->GetResource<Texture2D>(normalTexturePath);
             }
             pMat->SetTexture(eTextureUnit::Normal, pNormalTex);
-            DV_CORE_INFO("Load NormalMap");
+            DV_ENGINE_INFO("Load NormalMap");
         }
         
         return pMat;
@@ -487,7 +488,7 @@ namespace Dive
 
         // 매뉴얼 등록
         pTex->SetName(FileSystem::GetFileNameAndExtension(pTexture->mFilename.C_Str()));
-        //ResourceManager::AddManualResource(pTex);
+        //ResourceManager::GetInstance()->AddManualResource(pTex);
 
         return pTex;
     }

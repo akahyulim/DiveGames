@@ -126,7 +126,9 @@ float3 CalcuSpotLight(float3 worldPos, float3 normal, float3 diff)
     float cosAng = acos(dot(-cbLightPixel.direction, toLight));
     float coneAtt = 1.0f * smoothstep(cbLightPixel.outerConeAngle, cbLightPixel.innerConeAngle, cosAng);
     
-    float shadowAtt = SpotShadowPCF(worldPos);
+    float shadowAtt = 1.0f;
+    if(cbLightPixel.shadowEnabled)
+        shadowAtt = SpotShadowPCF(worldPos);
     
     finalColor *= diff * distAttn * coneAtt * shadowAtt;
     
@@ -137,7 +139,7 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
 {
     float4 diff;
     if (!HasDiffuseTexture())
-        diff = cbMaterialPixel.color;
+        diff = cbModelPixel.color;
     else
         diff = DiffuseMap.Sample(DiffuseMapSampler, input.tex);
     diff *= diff; // linear space

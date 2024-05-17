@@ -31,7 +31,6 @@ namespace Dive
 			indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
 
 			Mesh* pMesh = new Mesh;
-			uint32_t vertexOffset = 0;
 			pMesh->AddVertices(vertices);
 			pMesh->AddIndices(indices);
 			pMesh->ComputeBouingBox();

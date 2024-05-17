@@ -5,31 +5,43 @@
 
 namespace Dive
 {
-	static std::vector<Scene*> s_Scenes;
-	static Scene* s_pActiveScene = nullptr;
+	SceneManager* SceneManager::s_pInstance = nullptr;
+
+	SceneManager::SceneManager()
+		: m_pActiveScene(nullptr)
+	{
+	}
+
+	SceneManager::~SceneManager()
+	{
+		Shutdown();
+	}
 
 	void SceneManager::Shutdown()
 	{
-		for (auto pScene : s_Scenes)
+		for (auto pScene : m_Scenes)
 		{
 			pScene->Clear();
 			DV_DELETE(pScene);
 		}
-		s_Scenes.clear();
+
+		m_pActiveScene = nullptr;
+
+		DV_ENGINE_TRACE("씬 매니져 셧다운에 성공하였습니다.");
 	}
 
 	Scene* SceneManager::CreateScene(const std::string& sceneName)
 	{
-		for (auto pScene : s_Scenes)
+		for (auto pScene : m_Scenes)
 		{
 			if (pScene->GetName() == sceneName)
 			{
-				DV_CORE_WARN("동일한 이름의 씬({:s})이 이미 존재합니다.", sceneName);
+				DV_ENGINE_WARN("동일한 이름의 씬({:s})이 이미 존재합니다.", sceneName);
 				return nullptr;
 			}
 		}
 
-		return s_Scenes.emplace_back(new Scene((int)s_Scenes.size(), sceneName));
+		return m_Scenes.emplace_back(new Scene((int)m_Scenes.size(), sceneName));
 	}
 
 	void SceneManager::LoadScene(const std::string& sceneName)
@@ -41,9 +53,9 @@ namespace Dive
 
 	void SceneManager::LoadScene(int index)
 	{
-		if (index < 0 || index >= s_Scenes.size())
+		if (index < 0 || index >= m_Scenes.size())
 		{
-			DV_CORE_WARN("잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
+			DV_ENGINE_WARN("잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
 			return;
 		}
 
@@ -55,10 +67,10 @@ namespace Dive
 	bool SceneManager::UnloadScene(const std::string& sceneName)
 	{
 		Scene* pScene = GetSceneByName(sceneName);
-		if(!pScene)
+		if (!pScene)
 			return false;
 
-		if(pScene->IsLoaded())
+		if (pScene->IsLoaded())
 			pScene->Clear();
 
 		return true;
@@ -66,9 +78,9 @@ namespace Dive
 
 	bool SceneManager::UnloadScene(int index)
 	{
-		if (index < 0 || index >= s_Scenes.size())
+		if (index < 0 || index >= m_Scenes.size())
 		{
-			DV_CORE_WARN("잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
+			DV_ENGINE_WARN("잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
 			return false;
 		}
 
@@ -84,7 +96,7 @@ namespace Dive
 
 	Scene* SceneManager::GetActiveScene()
 	{
-		return s_pActiveScene;
+		return m_pActiveScene;
 	}
 
 	bool SceneManager::SetActiveScene(Scene* pScene)
@@ -97,25 +109,25 @@ namespace Dive
 		//if (!pScene->IsLoaded())
 		//	return false;
 
-		s_pActiveScene = pScene;
+		m_pActiveScene = pScene;
 
 		return true;
 	}
-	
+
 	Scene* SceneManager::GetSceneAt(int index)
 	{
-		if (index < 0 || index >= s_Scenes.size())
+		if (index < 0 || index >= m_Scenes.size())
 		{
-			DV_CORE_WARN("잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
+			DV_ENGINE_WARN("잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
 			return nullptr;
 		}
 
-		return s_Scenes[index];
+		return m_Scenes[index];
 	}
-	
+
 	Scene* SceneManager::GetSceneByName(const std::string& sceneName)
 	{
-		for (auto pScene : s_Scenes)
+		for (auto pScene : m_Scenes)
 		{
 			if (pScene->GetName() == sceneName)
 				return pScene;
@@ -123,10 +135,10 @@ namespace Dive
 
 		return nullptr;
 	}
-	
+
 	Scene* SceneManager::GetSceneByPath(const std::string& scenePath)
 	{
-		for (auto pScene : s_Scenes)
+		for (auto pScene : m_Scenes)
 		{
 			if (pScene->GetPath() == scenePath)
 				return pScene;
@@ -137,6 +149,11 @@ namespace Dive
 
 	uint32_t SceneManager::GetSceneCount()
 	{
-		return static_cast<uint32_t>(s_Scenes.size());
+		return static_cast<uint32_t>(m_Scenes.size());
+	}
+
+	SceneManager* GetSceneManager()
+	{
+		return SceneManager::GetInstance();
 	}
 }

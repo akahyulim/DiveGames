@@ -64,14 +64,13 @@ namespace Dive
 		void SetRenderTarget(RenderTexture* pRenderTarget) { m_pRenderTarget = pRenderTarget; }
 		DirectX::XMFLOAT2 GetRenderTargetSize() const;
 
-		const CameraConstantBufferVS& GetCBufferVS() const { return m_CBufferVS; }
-		const CameraConstantBufferPS& GetCBufferPS() const { return m_CBufferPS; }
+		const VSConstBuf_Camera& GetCBufferVS() const { return m_CBufferVS; }
+		const PSConstBuf_Camera& GetCBufferPS() const { return m_CBufferPS; }
 
 	protected:
 		eProjectionType m_ProjectionType;
 
 		DirectX::XMFLOAT4 m_BackgroundColor;
-		//float m_BackgroundColor[4];
 
 		float m_FieldOfView;
 
@@ -85,7 +84,7 @@ namespace Dive
 
 		RenderTexture* m_pRenderTarget;
 
-		CameraConstantBufferVS m_CBufferVS;
-		CameraConstantBufferPS m_CBufferPS;
+		VSConstBuf_Camera m_CBufferVS;
+		PSConstBuf_Camera m_CBufferPS;
 	};
 }

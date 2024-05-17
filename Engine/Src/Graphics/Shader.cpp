@@ -6,11 +6,39 @@
 
 namespace Dive
 {
-	// 현재 매크로는 사용하지 않고 있다.
-	ID3DBlob* CompileFromFile(const std::string& fileName, const std::string& profile, const std::string& entryPoint)
+	ID3DBlob* CompileFromFile(const std::string& fileName, eShaderType type)
 	{
 		ID3DBlob* pShaderBlob = nullptr;
 		ID3DBlob* pErrorMsgs = nullptr;
+
+		std::string entryPoint;
+		std::string profile;
+		switch (type)
+		{
+		case eShaderType::Vertex:
+			entryPoint = "MainVS";
+			profile = "vs_5_0";
+			break;
+		case eShaderType::Hull:
+			entryPoint = "MainHS";
+			profile = "hs_5_0";
+			break;
+		case eShaderType::Domain:
+			entryPoint = "MainDS";
+			profile = "ds_5_0";
+			break;
+		case eShaderType::Pixel:
+			entryPoint = "MainPS";
+			profile = "ps_5_0";
+			break;
+		case eShaderType::Compute:
+			entryPoint = "MainCS";
+			profile = "cs_5_0";
+			break;
+		default:
+			DV_ENGINE_ERROR("잘못된 셰이더 타입을 전달받아 셰이더 파일 컴파일에 실패하였습니다.");
+			return nullptr;
+		}
 
 		std::wstring filePath = StringToWstring(fileName);
 
@@ -26,9 +54,9 @@ namespace Dive
 			&pErrorMsgs)))
 		{
 			if (pErrorMsgs)
-				DV_CORE_ERROR("{:s}", (char*)pErrorMsgs->GetBufferPointer());
+				DV_ENGINE_ERROR("{:s}", (char*)pErrorMsgs->GetBufferPointer());
 			else
-				DV_CORE_ERROR("셰이더 파일({:s}) 컴파일에 실패하였습니다.", fileName);
+				DV_ENGINE_ERROR("셰이더 파일({:s}) 컴파일에 실패하였습니다.", fileName);
 
 			DV_RELEASE(pErrorMsgs);
 			DV_RELEASE(pShaderBlob);
@@ -39,34 +67,43 @@ namespace Dive
 		return pShaderBlob;
 	}
 
-	std::vector<D3D11_INPUT_ELEMENT_DESC> GetInputElements(eVertexLayout layout)
+	std::vector<D3D11_INPUT_ELEMENT_DESC> GetInputElements(eInputLayout layout)
 	{
-		std::vector<D3D11_INPUT_ELEMENT_DESC> elements = {
-			D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 } };
+		std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
 
-		if (layout == eVertexLayout::Pos_Tex)
+		switch (layout)
 		{
+		case eInputLayout::Pos:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			break;
+		case eInputLayout::Pos_Tex:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-		}
-		else if (layout == eVertexLayout::Pos_Tex_Nor)
-		{
+			break;
+		case eInputLayout::Pos_Tex_Nor:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0});
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-		}
-		else if (layout == eVertexLayout::Static_Model)
-		{
+			break;
+		case eInputLayout::Static_Model:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-		}
-		else if (layout == eVertexLayout::Skinned_Model)
-		{
+			break;
+		case eInputLayout::Skinned_Model:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			//elements.emplace_back("BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0);
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			break;
+		default:
+			DV_ENGINE_ERROR("잘못된 입력 레이아웃 타입을 전달받아 입력 레이아웃 구성에 실패하였습니다.");
+			elements.clear();
 		}
 
 		return elements;
@@ -74,7 +111,11 @@ namespace Dive
 
 	Shader::Shader()
 		: m_pVertexShaderBlob(nullptr)
+		, m_Type(eShaderType::Undefined)
 		, m_pVertexShader(nullptr)
+		, m_pHullShader(nullptr)
+		, m_pDomainShader(nullptr)
+		, m_pComputeShader(nullptr)
 		, m_pPixelShader(nullptr)
 		, m_pInputLayout(nullptr)
 	{
@@ -83,56 +124,111 @@ namespace Dive
 	Shader::~Shader()
 	{
 		DV_RELEASE(m_pPixelShader);
+		DV_RELEASE(m_pComputeShader);
+		DV_RELEASE(m_pDomainShader);
+		DV_RELEASE(m_pHullShader);
 		DV_RELEASE(m_pVertexShader);
 		DV_RELEASE(m_pVertexShaderBlob);
 		DV_RELEASE(m_pInputLayout);
 
-		DV_CORE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
+		DV_ENGINE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
 			GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
 	}
 
-	// 셰이더 파일이 아니라 inputlayout과 shader file을 정의한 다른 파일일 수 있다.
-	bool Shader::LoadFromFile(const std::string& fileName)
+	// pShaderBlob은 무조건 release 해줘야 한다.
+	bool Shader::CompileAndCreateShader(const std::string& filename, eShaderType type, eInputLayout layout)
 	{
-		auto pDevice = Graphics::GetDevice();
+		ID3D10Blob* pShaderBlob = CompileFromFile(filename, type);
+	
+		auto pDevice = Graphics::GetInstance()->GetDevice();
 
-		m_pVertexShaderBlob = CompileFromFile(fileName, "vs_5_0", "MainVS");
-		if (!m_pVertexShaderBlob)
-			return false;
-
-		if (FAILED(pDevice->CreateVertexShader(m_pVertexShaderBlob->GetBufferPointer(), m_pVertexShaderBlob->GetBufferSize(), NULL, &m_pVertexShader)))
+		switch (type)
 		{
-			DV_CORE_ERROR("버텍스 셰이더 생성에 실패하였습니다.");
+		case eShaderType::Vertex:
+			if (FAILED(pDevice->CreateVertexShader(
+				pShaderBlob->GetBufferPointer(), 
+				pShaderBlob->GetBufferSize(), 
+				NULL, 
+				&m_pVertexShader)))
+			{
+				DV_ENGINE_ERROR("VertexShader 생성에 실패하였습니다.");
+				return false;
+			}
+
+			if (!createInputLayout(pShaderBlob, layout))
+				return false;
+
+			break;
+		case eShaderType::Hull:
+			if (FAILED(pDevice->CreateHullShader(
+				pShaderBlob->GetBufferPointer(), 
+				pShaderBlob->GetBufferSize(), 
+				NULL, 
+				&m_pHullShader)))
+			{
+				DV_ENGINE_ERROR("HullShader 생성에 실패하였습니다.");
+				return false;
+			}
+			break;
+		case eShaderType::Domain:
+			if (FAILED(pDevice->CreateDomainShader(
+				pShaderBlob->GetBufferPointer(), 
+				pShaderBlob->GetBufferSize(), 
+				NULL, 
+				&m_pDomainShader)))
+			{
+				DV_ENGINE_ERROR("DomainShader 생성에 실패하였습니다.");
+				return false;
+			}
+			break;
+		case eShaderType::Pixel:
+			if (FAILED(pDevice->CreatePixelShader(
+				pShaderBlob->GetBufferPointer(), 
+				pShaderBlob->GetBufferSize(), 
+				NULL, 
+				&m_pPixelShader)))
+			{
+				DV_ENGINE_ERROR("Pixel Shader 생성에 실패하였습니다.");
+				return false;
+			}
+			break;
+		case eShaderType::Compute:
+			if (FAILED(pDevice->CreateComputeShader(
+				pShaderBlob->GetBufferPointer(),
+				pShaderBlob->GetBufferSize(),
+				NULL,
+				&m_pComputeShader)))
+			{
+				DV_ENGINE_ERROR("ComputeShader 생성에 실패하였습니다.");
+				return false;
+			}
+			break;
+		default:
+			DV_ENGINE_ERROR("잘못된 셰이더 타입을 전달받아 셰이더 생성에 실패하였습니다.");
 			return false;
 		}
 
-		auto pPixelShaderBlob = CompileFromFile(fileName, "ps_5_0", "MainPS");
-		if (!pPixelShaderBlob)
-			return true; // 임시
+		pShaderBlob->Release();
 
-		if (FAILED(pDevice->CreatePixelShader(pPixelShaderBlob->GetBufferPointer(), pPixelShaderBlob->GetBufferSize(), NULL, &m_pPixelShader)))
-		{
-			DV_CORE_ERROR("픽셀 셰이더 생성에 실패하였습니다.");
-			return false;
-		}
+		m_Type = type;
 
 		return true;
 	}
 
-	bool Shader::CreateInputLayout(eVertexLayout layout)
+	bool Shader::CreateInputLayout(eInputLayout layout)
 	{
-		DV_CORE_ASSERT(m_pVertexShaderBlob);
+		DV_ENGINE_ASSERT(m_pVertexShaderBlob);
 
 		auto inputElements = GetInputElements(layout);
 
-		if (FAILED(Graphics::GetDevice()->CreateInputLayout(
+		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateInputLayout(
 			inputElements.data(),
 			static_cast<UINT>(inputElements.size()),
 			m_pVertexShaderBlob->GetBufferPointer(),
 			m_pVertexShaderBlob->GetBufferSize(),
 			&m_pInputLayout)))
 		{
-			DV_CORE_ERROR("InputLayout 생성에 실패하였습니다.");
+			DV_ENGINE_ERROR("InputLayout 생성에 실패하였습니다.");
 
 			return false;
 		}
@@ -140,31 +236,52 @@ namespace Dive
 		return true;
 	}
 
-	Shader* LoadShaderFromFile(const std::string& fileName)
+	void Shader::SetShader()
 	{
-		Shader* pObject = new Shader;
-		if (!pObject->LoadFromFile(fileName))
+		auto pDeviceContext = Graphics::GetInstance()->GetDeviceContext();
+
+		switch (m_Type)
 		{
-			DV_DELETE(pObject);
-			return nullptr;
+		case eShaderType::Vertex:
+			pDeviceContext->IASetInputLayout(m_pInputLayout);
+			pDeviceContext->VSSetShader(m_pVertexShader, nullptr, 0);
+			break;
+		case eShaderType::Hull:
+			pDeviceContext->HSSetShader(m_pHullShader, nullptr, 0);
+			break;
+		case eShaderType::Domain:
+			pDeviceContext->DSSetShader(m_pDomainShader, nullptr, 0);
+			break;
+		case eShaderType::Compute:
+			pDeviceContext->CSSetShader(m_pComputeShader, nullptr, 0);
+			break;
+		case eShaderType::Pixel:
+			pDeviceContext->PSSetShader(m_pPixelShader, nullptr, 0);
+			break;
+		default:
+			DV_ENGINE_ERROR("올바른 셰이더 타입이 아닙니다. 셰이더를 연결할 수 없습니다.");
+			return;
 		}
-
-		pObject->SetName(fileName);
-
-		return pObject;
 	}
 
-	Shader* CreateShader(const std::string& name)
+	bool Shader::createInputLayout(ID3D10Blob* pShaderBlob, eInputLayout layout)
 	{
-		if (name.empty())
+		DV_ENGINE_ASSERT(pShaderBlob);
+		DV_ENGINE_ASSERT(layout != eInputLayout::None);
+
+		auto inputElements = GetInputElements(layout);
+
+		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateInputLayout(
+			inputElements.data(),
+			static_cast<UINT>(inputElements.size()),
+			pShaderBlob->GetBufferPointer(),
+			pShaderBlob->GetBufferSize(),
+			&m_pInputLayout)))
 		{
-			DV_CORE_ERROR("잘못된 이름({:s})을 전달받았습니다.", name);
-			return nullptr;
+			DV_ENGINE_ERROR("InputLayout 생성에 실패하였습니다.");
+			return false;
 		}
 
-		Shader* pObject = new Shader;
-		pObject->SetName(name);
-
-		return pObject;
+		return true;
 	}
 }

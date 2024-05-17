@@ -38,7 +38,7 @@ namespace Dive
 	{
 		if (vertices)
 		{
-			DV_CORE_ASSERT(vertexCount != 0);
+			DV_ENGINE_ASSERT(vertexCount != 0);
 
 			const auto vertex_first = m_Vertices.begin() + vertexOffset;
 			const auto vertex_last = m_Vertices.begin() + vertexOffset + vertexCount;
@@ -46,7 +46,7 @@ namespace Dive
 		}
 		if (indices)
 		{
-			DV_CORE_ASSERT(indexCount != 0);
+			DV_ENGINE_ASSERT(indexCount != 0);
 			
 			const auto index_first = m_Indices.begin() + indexOffset;
 			const auto index_last = m_Indices.begin() + indexOffset + indexCount;
@@ -56,6 +56,8 @@ namespace Dive
 
 	void Mesh::AddVertices(const std::vector<VertexStatic>& vertices, uint32_t* pOutVertexOffset)
 	{
+		// 현재 저장되어 있는 개수를 오프셋으로 리턴한다.
+		// 
 		if (pOutVertexOffset)
 		{
 			*pOutVertexOffset = static_cast<uint32_t>(m_Vertices.size());
@@ -87,15 +89,15 @@ namespace Dive
 	void Mesh::CreateBuffers()
 	{
 		if(!m_Vertices.empty())
-			m_pVertexBuffer = VertexBuffer::Create(m_Vertices.data(), sizeof(VertexStatic), (uint32_t)m_Vertices.size());
+			m_pVertexBuffer = VertexBuffer::Create(m_Vertices.data(), sizeof(VertexStatic), static_cast<uint32_t>(m_Vertices.size()));
 
 		if(!m_Indices.empty())
-			m_pIndexBuffer = IndexBuffer::Create(m_Indices.data(), (uint32_t)m_Indices.size());
+			m_pIndexBuffer = IndexBuffer::Create(m_Indices.data(), static_cast<uint32_t>(m_Indices.size()));
 	}
 
 	void Mesh::ComputeBouingBox()
 	{
-		DV_CORE_ASSERT(!m_Vertices.empty());
+		DV_ENGINE_ASSERT(!m_Vertices.empty());
 
 		m_BoundingBox = BoundingBox(static_cast<VertexStatic*>(m_Vertices.data()), static_cast<uint32_t>(m_Vertices.size()));
 	}

@@ -1,24 +1,20 @@
-// 공용이라면 Renderer3D 아니면 적어도 ForwardRenderer에서 만들고 관리해야 한다.
-struct ModelBufferData
+struct VSConstBuf_Model
 {
     matrix world;
 };
 
-struct CameraVS
+struct VSConstBuf_Camera
 {
     matrix view;
     matrix projection;
 };
 
-// 어쩔 수 없이 셰이더별로 분리해야한다.
-struct LightVS
+struct VSConstBuf_Light
 {
     matrix shadow;
 };
 
-// 역시 공용이라 볼 수 없다.
-// Material이 여러가지로 분화될 수 있기 때문이다.
-struct MaterialBufferData
+struct PSConstBuf_Model
 {
     float4 color;
     float4 normal;
@@ -30,7 +26,7 @@ struct MaterialBufferData
     float3 padding;
 };
 
-struct CameraData
+struct PSConstBuf_Camera
 {
     float3 position;
     float padding;
@@ -40,7 +36,7 @@ struct CameraData
     matrix viewInverse;
 };
 
-struct LightBufferData
+struct PSConstBuf_Light
 {
     float3 color;
     float outerConeAngle;
@@ -52,42 +48,42 @@ struct LightBufferData
     float innerConeAngle;
     
     uint options;
-    float3 padding;
+    int shadowEnabled;
+    float2 padding;
     
     matrix shadow;
 };
 
 // VS ConstantBuffers
-cbuffer cbModelVertex : register(b0)
+cbuffer VS_Model : register(b0)
 { 
-    ModelBufferData cbModelVertex;
+    VSConstBuf_Model cbModelVertex;
 }
 
-cbuffer cbCameraVertex : register(b1)
+cbuffer VS_Camera : register(b1)
 {
-    CameraVS cbCameraVertex;
+    VSConstBuf_Camera cbCameraVertex;
 }
 
-// naming을 cbLightVertex 이런식으로 하자.
-cbuffer cbLightVertex : register(b2)
+cbuffer VS_Light : register(b2)
 {
-    LightVS cbLightVertex;
+    VSConstBuf_Light cbLightVertex;
 }
 
 // PS Constantuffers
-cbuffer cbMaterialPixel : register(b0)
+cbuffer PS_Model : register(b0)
 {
-    MaterialBufferData cbMaterialPixel;
+    PSConstBuf_Model cbModelPixel;
 }
 
-cbuffer cbCameraPixel : register(b1)
+cbuffer PS_Camera : register(b1)
 {
-    CameraData cbCameraPixel;
+    PSConstBuf_Camera cbCameraPixel;
 }
 
-cbuffer cbLightPixel : register(b2)
+cbuffer PS_Light : register(b2)
 {
-    LightBufferData cbLightPixel;
+    PSConstBuf_Light cbLightPixel;
 }
 
 // cbLightPixel options
@@ -106,13 +102,13 @@ bool IsSpotLight()
     return cbLightPixel.options & uint(1U << 2);
 }
 
-// cbMaterialPixel options
+// cbModelPixel options
 bool HasDiffuseTexture()
 {
-    return cbMaterialPixel.properties & uint(1U << 0);
+    return cbModelPixel.properties & uint(1U << 0);
 }
 
 bool HasNormalTexture()
 {
-    return cbMaterialPixel.properties & uint(1U << 1);
+    return cbModelPixel.properties & uint(1U << 1);
 }

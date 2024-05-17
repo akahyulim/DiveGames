@@ -40,7 +40,7 @@ namespace Dive
 
 		if (FAILED(hResult))
 		{
-			DV_CORE_ERROR("Image::LoadFromFile - {:s} 로드에 실패하였습니다.", fileName);
+			DV_ENGINE_ERROR("Image::LoadFromFile - {:s} 로드에 실패하였습니다.", fileName);
 			return false;
 		}
 
@@ -64,7 +64,7 @@ namespace Dive
 
 		if (FAILED(hResult))
 		{
-			DV_CORE_ERROR("Image::LoadFromMemory() - {:s} 형식의 파일 로드에 실패하였습니다.", extension);
+			DV_ENGINE_ERROR("Image::LoadFromMemory() - {:s} 형식의 파일 로드에 실패하였습니다.", extension);
 			return false;
 		}
 

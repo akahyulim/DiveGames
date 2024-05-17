@@ -2,120 +2,133 @@
 #include "Input.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
-#include "Renderer/Renderer.h"
 
 namespace Dive
 {
-	static constexpr uint16_t MAX_NUM_KEYS = 256;
-	static constexpr uint8_t MAX_NUM_BUTTONS = 4;
+	Input* Input::s_pInstance = nullptr;
 
-	static IDirectInput8* s_pDirectInput = nullptr;
-	static IDirectInputDevice8* s_pKeyboard = nullptr;
-	static IDirectInputDevice8* s_pMouse = nullptr;
+	Input::Input()
+		: m_pDirectInput(nullptr)
+		, m_pKeyboard(nullptr)
+		, m_pMouse(nullptr)
+		, m_MousePosition({0.0f, 0.0f})
+		, m_OldMousePosition({0.0f, 0.0f})
+		, m_MouseDelta({0.0f, 0.0f})
+		, m_MouseIsInValidRect(false)
+	{
+		for (uint16_t i = 0; i < MAX_NUM_KEYS; ++i)
+		{
+			m_KeyStates[i] = 0;
+			m_OldKeyStates[i] = 0;
+		}
+		
+		ZeroMemory(&m_MouseState, sizeof(m_MouseState));
 
-	static uint8_t s_KeyStates[MAX_NUM_KEYS] = { 0, };
-	static uint8_t s_OldKeyStates[MAX_NUM_KEYS] = { 0, };
+		for (uint8_t i = 0; i < MAX_NUM_BUTTONS; ++i)
+		{
+			m_MouseButtons[i] = 0;
+			m_OldMouseButtons[i] = 0;
+		}
+	}
 
-	static DIMOUSESTATE s_MouseState;
-
-	static uint8_t s_MouseButtons[MAX_NUM_BUTTONS] = { 0, };
-	static uint8_t s_OldMouseButtons[MAX_NUM_BUTTONS] = { 0, };
-	static DirectX::XMFLOAT2 s_MousePosition = { 0.0f, 0.0f };
-	static DirectX::XMFLOAT2 s_OldMousePosition = { 0.0f, 0.0f };
-	static DirectX::XMFLOAT2 s_MouseDelta = { 0.0f, 0.0f };
-
-	static bool s_MouseIsInValidRect = false;
+	Input::~Input()
+	{
+		Shutdown();
+	}
 
 	bool Input::Initialize()
 	{
-		HINSTANCE hInstance = Graphics::GetWindowInstance();
-		HWND hWnd = Graphics::GetWindowHandle();
-
-		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&s_pDirectInput, nullptr)))
+		if (!Graphics::GetInstance()->IsInitialized())
 		{
-			DV_CORE_ERROR("DirectInput 객체 생성에 실패하였습니다.");
+			DV_ENGINE_ERROR("윈도우가 존재하지 않아 인풋 시스템을 초기화할 수 없습니다.");
+			return false;
+		}
+
+		HINSTANCE hInstance = Graphics::GetInstance()->GetWindowInstance();
+		HWND hWnd = Graphics::GetInstance()->GetWindowHandle();
+
+		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, nullptr)))
+		{
+			DV_ENGINE_ERROR("Input 초기화 과정 중 DirectInput 객체 생성에 실패하였습니다.");
 			return false;
 		}
 
 		// 키보드 생성
 		{
-			if (FAILED(s_pDirectInput->CreateDevice(GUID_SysKeyboard, &s_pKeyboard, nullptr)))
+			if (FAILED(m_pDirectInput->CreateDevice(GUID_SysKeyboard, &m_pKeyboard, nullptr)))
 			{
-				DV_CORE_ERROR("키보드 장치 객체 생성에 실패하였습니다.");
+				DV_ENGINE_ERROR("Input 초기화 과정 중 키보드 장치 객체 생성에 실패하였습니다.");
 				return false;
 			}
 
-			if (FAILED(s_pKeyboard->SetDataFormat(&c_dfDIKeyboard)))
+			if (FAILED(m_pKeyboard->SetDataFormat(&c_dfDIKeyboard)))
 			{
-				DV_CORE_ERROR("키보드 데이터 포멧 설정에 실패하였습니다.");
+				DV_ENGINE_ERROR("Input 초기화 과정 중 키보드 데이터 포멧 설정에 실패하였습니다.");
 				return false;
 			}
 
-			// 일단 독점을 해제했다.
-			if (FAILED(s_pKeyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
+			if (FAILED(m_pKeyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
 			{
-				DV_CORE_ERROR("키보드 코퍼레이트 레벨 설정에 실패하였습니다.");
+				DV_ENGINE_ERROR("Input 초기화 과정 중 키보드 코퍼레이트 레벨 설정에 실패하였습니다.");
 				return false;
 			}
 
-			if (FAILED(s_pKeyboard->Acquire()))
+			if (FAILED(m_pKeyboard->Acquire()))
 			{
-				DV_CORE_ERROR("키보드 획득에 실패하였습니다.");
+				DV_ENGINE_ERROR("Input 초기화 과정 중 키보드 획득에 실패하였습니다.");
 				return false;
 			}
-		}
-
-		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&s_pDirectInput, NULL)))
-		{
-			DV_CORE_ERROR("DirectInput 객체 생성에 실패하였습니다.");
-			return false;
 		}
 
 		// 마우스 생성
 		{
-			if (FAILED(s_pDirectInput->CreateDevice(GUID_SysMouse, &s_pMouse, NULL)))
+			if (FAILED(m_pDirectInput->CreateDevice(GUID_SysMouse, &m_pMouse, NULL)))
 			{
-				DV_CORE_ERROR("마우스 장치 객체 생성에 실패하였습니다.");
+				DV_ENGINE_ERROR("Input 초기화 과정 중 마우스 장치 객체 생성에 실패하였습니다.");
 				return false;
 			}
 
-			if (FAILED(s_pMouse->SetDataFormat(&c_dfDIMouse)))
+			if (FAILED(m_pMouse->SetDataFormat(&c_dfDIMouse)))
 			{
-				DV_CORE_ERROR("마우스 데이터 포멧 설정에 실패하였습니다.");
+				DV_ENGINE_ERROR("Input 초기화 과정 중 마우스 데이터 포멧 설정에 실패하였습니다.");
 				return false;
 			}
 
-			if (FAILED(s_pMouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
+			if (FAILED(m_pMouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
 			{
-				DV_CORE_ERROR("마우스 코퍼레이트 레벨 설정에 실패하였습니다.");
+				DV_ENGINE_ERROR("Input 초기화 과정 중 마우스 코퍼레이트 레벨 설정에 실패하였습니다.");
 				return false;
 			}
 
-			if (FAILED(s_pMouse->Acquire()))
+			if (FAILED(m_pMouse->Acquire()))
 			{
-				DV_CORE_ERROR("마우스 획득에 실패하였습니다.");
+				DV_ENGINE_ERROR("Input 초기화 과정 중 마우스 획득에 실패하였습니다.");
 				return false;
 			}
 		}
+
+		DV_ENGINE_TRACE("인풋 시스템 초기화에 성공하였습니다.");
 
 		return true;
 	}
 
 	void Input::Shutdown()
 	{
-		if (s_pMouse)
+		if (m_pMouse)
 		{
-			s_pMouse->Unacquire();
-			DV_RELEASE(s_pMouse);
+			m_pMouse->Unacquire();
+			DV_RELEASE(m_pMouse);
 		}
 
-		if (s_pKeyboard)
+		if (m_pKeyboard)
 		{
-			s_pKeyboard->Unacquire();
-			DV_RELEASE(s_pKeyboard);
+			m_pKeyboard->Unacquire();
+			DV_RELEASE(m_pKeyboard);
 		}
 
-		DV_RELEASE(s_pDirectInput);
+		DV_RELEASE(m_pDirectInput);
+
+		DV_ENGINE_TRACE("인풋 시스템 셧다운에 성공하였습니다.");
 	}
 
 	void Input::Update()
@@ -126,21 +139,21 @@ namespace Dive
 
 	void Input::ReadKeyboard()
 	{
-		if (!s_pDirectInput && !s_pKeyboard)
+		if (!m_pDirectInput && !m_pKeyboard)
 			return;
 
-		memcpy(s_OldKeyStates, s_KeyStates, sizeof(s_KeyStates));
-		
-		HRESULT hResult = s_pKeyboard->GetDeviceState(sizeof(s_KeyStates), static_cast<LPVOID>(&s_KeyStates));
+		memcpy(m_OldKeyStates, m_KeyStates, sizeof(m_KeyStates));
+
+		HRESULT hResult = m_pKeyboard->GetDeviceState(sizeof(m_KeyStates), static_cast<LPVOID>(&m_KeyStates));
 		if (FAILED(hResult))
 		{
-			ZeroMemory(&s_KeyStates, sizeof(s_KeyStates));
+			ZeroMemory(&m_KeyStates, sizeof(m_KeyStates));
 
 			if ((hResult == DIERR_INPUTLOST) || (hResult == DIERR_NOTACQUIRED))
-				s_pKeyboard->Acquire();
+				m_pKeyboard->Acquire();
 			else
 			{
-				DV_CORE_ASSERT("키보드 연결에 실패하였습니다.");
+				DV_ENGINE_ASSERT("키보드 연결에 실패하였습니다.");
 				return;
 			}
 		}
@@ -148,105 +161,110 @@ namespace Dive
 
 	void Input::ReadMouse()
 	{
-		if (!s_pDirectInput && !s_pMouse)
+		if (!m_pDirectInput && !m_pMouse)
 			return;
 
-		memcpy(s_OldMouseButtons, s_MouseButtons, sizeof(s_MouseButtons));
-		s_OldMousePosition = s_MousePosition;
+		memcpy(m_OldMouseButtons, m_MouseButtons, sizeof(m_MouseButtons));
+		m_OldMousePosition = m_MousePosition;
 
-		HRESULT hResult = s_pMouse->GetDeviceState(sizeof(DIMOUSESTATE), static_cast<LPVOID>(&s_MouseState));
+		HRESULT hResult = m_pMouse->GetDeviceState(sizeof(DIMOUSESTATE), static_cast<LPVOID>(&m_MouseState));
 		if (FAILED(hResult))
 		{
 			if ((hResult == DIERR_INPUTLOST) || (hResult == DIERR_NOTACQUIRED))
-				s_pMouse->Acquire();
+				m_pMouse->Acquire();
 			else
 			{
-				DV_CORE_ASSERT("마우스 연결에 실패하였습니다.");
+				DV_ENGINE_ASSERT("마우스 연결에 실패하였습니다.");
 				return;
 			}
 		}
 
 		for (int i = 0; i < MAX_NUM_BUTTONS; ++i)
-			s_MouseButtons[i] = s_MouseState.rgbButtons[i] ? 1 : 0;
+			m_MouseButtons[i] = m_MouseState.rgbButtons[i] ? 1 : 0;
 
-		s_MousePosition.x += static_cast<float>(s_MouseState.lX);
-		s_MousePosition.y += static_cast<float>(s_MouseState.lY);
+		m_MousePosition.x += static_cast<float>(m_MouseState.lX);
+		m_MousePosition.y += static_cast<float>(m_MouseState.lY);
 
 		/*
 		// 추후 이벤트를 통해 갱신하자.
 		DirectX::XMFLOAT2 windowSize = Renderer::GetResolutionRender();
 
-		if (s_MousePosition.x < 0)
-			s_MousePosition.x = 0;
-		if (s_MousePosition.x > windowSize.x)
-			s_MousePosition.x = windowSize.x;
+		if (m_MousePosition.x < 0)
+			m_MousePosition.x = 0;
+		if (m_MousePosition.x > windowSize.x)
+			m_MousePosition.x = windowSize.x;
 
-		if (s_MousePosition.y < 0)
-			s_MousePosition.y = 0;
-		if (s_MousePosition.y > windowSize.y)
-			s_MousePosition.y = windowSize.y;
+		if (m_MousePosition.y < 0)
+			m_MousePosition.y = 0;
+		if (m_MousePosition.y > windowSize.y)
+			m_MousePosition.y = windowSize.y;
 		*/
-		s_MouseDelta.x = s_MousePosition.x - s_OldMousePosition.x;
-		s_MouseDelta.y = s_MousePosition.y - s_OldMousePosition.y;
+		m_MouseDelta.x = m_MousePosition.x - m_OldMousePosition.x;
+		m_MouseDelta.y = m_MousePosition.y - m_OldMousePosition.y;
 	}
 
 	bool Input::KeyState(int key)
 	{
-		return s_KeyStates[key] & 0X80;
+		return m_KeyStates[key] & 0X80;
 	}
 
 	bool Input::KeyDown(int key)
 	{
-		return (s_KeyStates[key] & 0X80) && !(s_OldKeyStates[key] & 0X80);
+		return (m_KeyStates[key] & 0X80) && !(m_OldKeyStates[key] & 0X80);
 	}
 
 	bool Input::KeyUp(int key)
 	{
-		return !(s_KeyStates[key] & 0X80) && (s_OldKeyStates[key] & 0X80);
+		return !(m_KeyStates[key] & 0X80) && (m_OldKeyStates[key] & 0X80);
 	}
 
 	bool Input::KeyPress(int key)
 	{
-		return (s_KeyStates[key] & 0X80) && (s_OldKeyStates[key] & 0X80);
+		return (m_KeyStates[key] & 0X80) && (m_OldKeyStates[key] & 0X80);
 	}
 
 	bool Input::MouseButtonState(int btn)
 	{
-		return s_MouseButtons[btn] == 1;
+		return m_MouseButtons[btn] == 1;
 	}
 
 	bool Input::MouseButtonDown(int btn)
 	{
-		return (s_MouseButtons[btn] == 1) && !(s_OldMouseButtons[btn] == 1);
+		return (m_MouseButtons[btn] == 1) && !(m_OldMouseButtons[btn] == 1);
 	}
 
 	bool Input::MouseButtonUp(int btn)
 	{
-		return !(s_MouseButtons[btn] == 1) && (s_OldMouseButtons[btn] == 1);
+		return !(m_MouseButtons[btn] == 1) && (m_OldMouseButtons[btn] == 1);
 	}
 
 	bool Input::MouseButtonPress(int btn)
 	{
-		return (s_MouseButtons[btn] == 1) && (s_OldMouseButtons[btn] == 1);
+		return (m_MouseButtons[btn] == 1) && (m_OldMouseButtons[btn] == 1);
 	}
 
 	const DirectX::XMFLOAT2& Input::GetMouseMoveDelta()
 	{
-		return s_MouseDelta;
+		return m_MouseDelta;
 	}
 
 	const DirectX::XMFLOAT2& Input::GetMousePosition()
 	{
-		return s_MousePosition;
+		return m_MousePosition;
 	}
 
 	bool Input::GetMouseIsInValidRect()
 	{
-		return s_MouseIsInValidRect;
+		return m_MouseIsInValidRect;
 	}
-	
+
 	void Input::SetMouseIsInValidRect(bool valid)
 	{
-		s_MouseIsInValidRect = valid;
+		m_MouseIsInValidRect = valid;
+	}
+
+	Input* GetInput()
+	{
+		return Input::GetInstance();
 	}
 }

@@ -2,27 +2,6 @@
 
 namespace Dive
 {
-	class Object
-	{
-	public:
-		Object();
-		Object(const std::string& name);
-		virtual ~Object() = default;
-
-		uint64_t GetID() const { return m_ID; }
-		void SetID(uint64_t id) { m_ID = id; }
-
-		virtual std::string GetName() const { return m_Name; }
-		virtual void SetName(const std::string& name) { m_Name = name; }
-
-	private:
-		uint64_t m_ID;
-		std::string m_Name;
-	};
-}
-
-namespace Dive
-{
 	class TypeInfo
 	{
 	public:
@@ -59,11 +38,11 @@ namespace Dive
 		static const std::string& GetTypeNameStatic() { return GetTypeInfoStatic()->GetTypeName(); }	\
 		static const TypeInfo* GetTypeInfoStatic() { static const TypeInfo typeInfoStatic(#typeName, baseTypeName::GetTypeInfoStatic()); return &typeInfoStatic; }
 
-	class DvObject
+	class Object
 	{
 	public:
-		DvObject() = default;
-		virtual ~DvObject() = default;
+		Object() = default;
+		virtual ~Object() = default;
 
 		virtual size_t GetTypeHash() const = 0;
 		virtual const std::string& GetTypeName() const = 0;

@@ -1,6 +1,5 @@
 #include "divepch.h"
 #include "Material.h"
-#include "Graphics/Shader.h"
 #include "Graphics/Texture2D.h"
 #include "Core/CoreDefs.h"
 #include "Resource/ResourceManager.h"
@@ -8,8 +7,7 @@
 namespace Dive
 {
     Material::Material()
-        : m_pShader(nullptr)
-        , m_DiffuseColor(1.0f, 1.0f, 1.0f, 1.0f)
+        : m_DiffuseColor(1.0f, 1.0f, 1.0f, 1.0f)
         , m_Tiling(1.0f, 1.0f)
         , m_Offset(0.0f, 0.0f)
     {
@@ -17,7 +15,7 @@ namespace Dive
 
     Material::~Material()
     {
-        DV_CORE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
+        DV_ENGINE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
             GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
     }
 
@@ -40,7 +38,7 @@ namespace Dive
 
     void Material::SetTexture(eTextureUnit unit, Texture* pTexture)
     {
-        if (unit < eTextureUnit::Max_Num)
+        if (unit < eTextureUnit::Count)
         {
             if (pTexture)
                 m_Textures[unit] = pTexture;
@@ -55,9 +53,9 @@ namespace Dive
     // 구분하여 로드할 수 있다는 것이다.
     void Material::AddTexture(eTextureUnit unit, const std::string& name)
     {
-        if (unit < eTextureUnit::Max_Num)
+        if (unit < eTextureUnit::Count)
         {
-            auto pTexture = ResourceManager::GetResource<Texture2D>(name);
+            auto pTexture = ResourceManager::GetInstance()->GetResource<Texture2D>(name);
             SetTexture(unit, static_cast<Texture*>(pTexture));
         }
     }
@@ -86,7 +84,7 @@ namespace Dive
     {
         if (name.empty())
         {
-            DV_CORE_ERROR("잘못된 이름({:s})을 전달받았습니다.", name);
+            DV_ENGINE_ERROR("잘못된 이름({:s})을 전달받았습니다.", name);
             return nullptr;
         }
 

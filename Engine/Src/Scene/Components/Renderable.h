@@ -41,8 +41,8 @@ namespace Dive
 
 		void Draw(D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) const;
 
-		const ModelConstantBufferVS& GetCBufferVS() const { return m_CBufferVS; }
-		const MaterialConstantBufferPS& GetCBufferPS() const { return m_CBufferPS; }
+		const VSConstBuf_Model& GetCBufferVS() const { return m_CBufferVS; }
+		const PSConstBuf_Model& GetCBufferPS() const { return m_CBufferPS; }
 
 	private:
 
@@ -60,7 +60,7 @@ namespace Dive
 
 		DirectX::XMFLOAT4X4 m_LastTransform;
 
-		ModelConstantBufferVS m_CBufferVS;
-		MaterialConstantBufferPS m_CBufferPS;
+		VSConstBuf_Model m_CBufferVS;
+		PSConstBuf_Model m_CBufferPS;
 	};
 }

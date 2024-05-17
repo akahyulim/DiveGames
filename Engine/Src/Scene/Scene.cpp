@@ -22,7 +22,7 @@ namespace Dive
 	{
 		Clear();
 
-		DV_CORE_TRACE("씬(index: {0:d}, name: {1:s}) 소멸", m_Index, m_Name);
+		DV_ENGINE_TRACE("씬(index: {0:d}, name: {1:s}) 소멸", m_Index, m_Name);
 	}
 	
 	void Scene::Clear()
@@ -39,7 +39,7 @@ namespace Dive
 	// 일단 간단하게 만들었다.
 	void Scene::Update()
 	{
-		for (auto gameObject : m_GameObjects)
+		for (auto& gameObject : m_GameObjects)
 			gameObject.second->Update();
 	}
 
@@ -60,12 +60,12 @@ namespace Dive
 		auto id = getFreeGameObjectID();
 		if (id == 0)
 		{
-			DV_CORE_ERROR("더이상 새로운 GameObjecrt를 생성할 수 없습니다.");
+			DV_ENGINE_ERROR("더이상 새로운 GameObjecrt를 생성할 수 없습니다.");
 			return nullptr;
 		}
 
 		auto pNewGameObject = new GameObject(this, name);
-		DV_CORE_ASSERT(pNewGameObject);
+		DV_ENGINE_ASSERT(pNewGameObject);
 
 		m_GameObjects[id] = pNewGameObject;
 		pNewGameObject->SetID(id);

@@ -19,41 +19,41 @@ namespace Dive
 
 	void ConstantBuffer::Update(void* pData)
 	{
-		DV_CORE_ASSERT(m_pBuffer);
-		DV_CORE_ASSERT(pData);
+		DV_ENGINE_ASSERT(m_pBuffer);
+		DV_ENGINE_ASSERT(pData);
 
 		D3D11_MAPPED_SUBRESOURCE mappedData;
-		if (FAILED(Graphics::GetDeviceContext()->Map(
+		if (FAILED(Graphics::GetInstance()->GetDeviceContext()->Map(
 			static_cast<ID3D11Resource*>(m_pBuffer),
 			0,
 			D3D11_MAP_WRITE_DISCARD,
 			0,
 			&mappedData)))
 		{
-			DV_CORE_ERROR("ConstantBuffer({:s})의 Map에 실패하였습니다.", GetName());
+			DV_ENGINE_ERROR("ConstantBuffer({:s})의 Map에 실패하였습니다.", GetName());
 			return;
 		}
 
 		memcpy(mappedData.pData, pData, m_Stride);
 
-		Graphics::GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer), 0);
+		Graphics::GetInstance()->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer), 0);
 	}
 
 	// start slot도 변수로 관리해야 하나?
 	void ConstantBuffer::Bind()
 	{
-		auto pDeviceContext = Graphics::GetDeviceContext();
+		auto pDeviceContext = Graphics::GetInstance()->GetDeviceContext();
 
 		switch (m_ShaderType)
 		{
-		case eShaderType::VertexShader:
+		case eShaderType::Vertex:
 			pDeviceContext->VSSetConstantBuffers(m_Slot, 1, &m_pBuffer);
 			return;
-		case eShaderType::PixelShader:
+		case eShaderType::Pixel:
 			pDeviceContext->PSSetConstantBuffers(m_Slot, 1, &m_pBuffer);
 			return;
 		default:
-			DV_CORE_ERROR("셰이더 타입을 불분명해 바인딩할 수 없습니다.");
+			DV_ENGINE_ERROR("셰이더 타입을 불분명해 바인딩할 수 없습니다.");
 			return;
 		}
 	}
