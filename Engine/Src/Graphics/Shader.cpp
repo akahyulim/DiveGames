@@ -140,7 +140,7 @@ namespace Dive
 	{
 		ID3D10Blob* pShaderBlob = CompileFromFile(filename, type);
 	
-		auto pDevice = Graphics::GetInstance()->GetDevice();
+		auto pDevice = GetGraphics()->GetDevice();
 
 		switch (type)
 		{
@@ -221,7 +221,7 @@ namespace Dive
 
 		auto inputElements = GetInputElements(layout);
 
-		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateInputLayout(
+		if (FAILED(GetGraphics()->GetDevice()->CreateInputLayout(
 			inputElements.data(),
 			static_cast<UINT>(inputElements.size()),
 			m_pVertexShaderBlob->GetBufferPointer(),
@@ -236,9 +236,9 @@ namespace Dive
 		return true;
 	}
 
-	void Shader::SetShader()
+	void Shader::Bind()
 	{
-		auto pDeviceContext = Graphics::GetInstance()->GetDeviceContext();
+		auto pDeviceContext = GetGraphics()->GetDeviceContext();
 
 		switch (m_Type)
 		{
@@ -271,7 +271,7 @@ namespace Dive
 
 		auto inputElements = GetInputElements(layout);
 
-		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateInputLayout(
+		if (FAILED(GetGraphics()->GetDevice()->CreateInputLayout(
 			inputElements.data(),
 			static_cast<UINT>(inputElements.size()),
 			pShaderBlob->GetBufferPointer(),

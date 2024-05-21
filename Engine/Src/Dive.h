@@ -20,6 +20,7 @@
 #include "Graphics/ConstantBuffer.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Texture2D.h"
+#include "Graphics/Pipeline.h"
 
 // Renderer
 #include "Renderer/RendererDefs.h"

@@ -4,6 +4,7 @@
 #include "Texture2D.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "Pipeline.h"
 #include "Core/CoreDefs.h"
 
 namespace Dive
@@ -41,7 +42,6 @@ namespace Dive
 		, m_pDefaultDepthTexture(nullptr)
 		, m_bVSync(false)
 		, m_PrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED)
-		, m_RenderTargetViews{ nullptr, nullptr, nullptr, nullptr }
 		, m_pDepthStencilView(nullptr)
 		, m_bRenderTargetViewsDirty(true)
 		, m_pVertexShader(nullptr)
@@ -56,6 +56,11 @@ namespace Dive
 		, m_pBlendState(nullptr)
 		, m_bTextureDirty(true)
 	{
+		for (size_t i = 0; i != MAX_NUM_RENDERTARGETS; ++i)
+		{
+			m_RenderTargetViews[i] = nullptr;
+		}
+
 		for (uint32_t i = 0; i != static_cast<uint32_t>(eTextureUnit::Count); ++i)
 		{
 			m_ShaderResourceViews[i] = nullptr;
@@ -347,6 +352,7 @@ namespace Dive
 		}
 	}
 
+	// shader resource가 더 잘 어울릴 듯 한데...
 	void Graphics::SetTexture(eTextureUnit index, Texture* pTexture)
 	{
 		if (pTexture)
@@ -359,18 +365,18 @@ namespace Dive
 				if (pTexture->IsSamplerStateDirty())
 					pTexture->UpdateSamplerState();
 
-				m_ShaderResourceViews[(uint32_t)index] = pTexture->GetShaderResourceView();
-				m_SamplerStates[(uint32_t)index] = pTexture->GetSamplerState();
+				m_ShaderResourceViews[static_cast<size_t>(index)] = pTexture->GetShaderResourceView();
+				m_SamplerStates[static_cast<size_t>(index)] = pTexture->GetSamplerState();
 
 				m_bTextureDirty = true;
 			}
 		}
 		else
 		{
-			if (m_ShaderResourceViews[(uint32_t)index])
+			if (m_ShaderResourceViews[static_cast<size_t>(index)])
 			{
-				m_ShaderResourceViews[(uint32_t)index] = nullptr;
-				m_SamplerStates[(uint32_t)index] = nullptr;
+				m_ShaderResourceViews[static_cast<size_t>(index)] = nullptr;
+				m_SamplerStates[static_cast<size_t>(index)] = nullptr;
 
 				m_bTextureDirty = true;
 			}
@@ -387,7 +393,7 @@ namespace Dive
 		{
 			if (type != pShader->GetType())
 			{
-				DV_ENGINE_ERROR("");
+				DV_ENGINE_ERROR("셰이더 바인딩에 실패하였습니다. 잘못된 셰이더 타입으로 시도하였습니다.");
 				return;
 			}
 		}
@@ -416,13 +422,11 @@ namespace Dive
 			m_pDeviceContext->PSSetShader(m_pPixelShader ? m_pPixelShader->GetPixelShader() : nullptr, nullptr, 0);
 			return;
 		default:
-			DV_ENGINE_ERROR("");
+			DV_ENGINE_ERROR("셰이더 바인딩에 실패하였습니다. 지원하지 않는 타입의 셰이더로 시도하였습니다.");
 			return;
 		}
 	}
 
-	// 단일 버퍼만 다루고 있다.
-	// 초기화된 값과 NULL을 전달받았을 때 그냥 넘어가버린다.
 	void Graphics::SetVertexBuffer(VertexBuffer* pBuffer)
 	{
 		if (pBuffer != m_pVertexBuffer)
@@ -680,13 +684,11 @@ namespace Dive
 		return true;
 	}
 
-	// 한 번의 드로우콜에만 호출되는 것이 아니라면 오히려 낭비다.
-	// 문제는 드로우콜이 아니라도 설정되어야 하는 경우가 발생할 수 있다는 것이다.
+	// 이걸 살리는 방향으로 가야할 것 같다.
+	// 이름은 update or bind Pipeline 정도로 변경?
+	// 그리고 드로우콜때만 해당 함수에서 호출하도록 하는 것이...
 	void Graphics::prepareDraw()
 	{
-		// 이건 이 곳이 어울리는 게 맞다.
-		// 아니면 RTV와 DSV를 하나의 함수로 설정해야 하는데
-		// 이는 아래의 OMSetRenderTargets()의 래퍼함수에 지나지 않는다. => 이게 무슨 문제라도? 
 		if (m_bRenderTargetViewsDirty)
 		{
 			// 1. DepthStencilView가 존재한다면 적용 없다면 디폴트 깊이버퍼
@@ -699,6 +701,7 @@ namespace Dive
 			m_bRenderTargetViewsDirty = false;
 		}
 
+		// 이름은 shaderReosurce가 어울린다.
 		if (m_bTextureDirty)
 		{
 			//m_pDeviceContext->PSSetShaderResources(0, (uint32_t)eTextureUnit::Count, m_ShaderResourceViews);
@@ -706,6 +709,14 @@ namespace Dive
 
 			m_bTextureDirty = false;
 		}
+
+		// vertex buffer : input layout와 묶어서 처리
+
+		// index buffer : setIndexBuffer에서 자체 처리
+
+		// cbuffers
+
+		// shaders : SetShader에서 처리
 	}
 
 	// beginFrame(), reiszeBackbuffer() 등에서 호출

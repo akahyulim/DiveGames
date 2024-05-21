@@ -37,7 +37,7 @@ namespace Dive
 
 		eShaderType GetType() const { return m_Type; }
 
-		void SetShader();
+		void Bind();
 
 	private:
 		bool createInputLayout(ID3D10Blob* pShaderBlob, eInputLayout layout);

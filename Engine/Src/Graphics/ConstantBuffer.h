@@ -42,6 +42,7 @@ namespace Dive
 
 		uint32_t GetSlot() const { return m_Slot; }
 		std::string GetName() const { return m_Name; }
+		ID3D11Buffer* GetBufferNew() const { return m_pBuffer; }
 		ID3D11Buffer* const* GetBuffer() const{ return &m_pBuffer; }
 		uint32_t GetStride() const { return m_Stride; }
 		eShaderType GetShaderType() const { return m_ShaderType; }

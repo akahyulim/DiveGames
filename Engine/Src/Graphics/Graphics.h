@@ -7,6 +7,9 @@ namespace Dive
 	class IndexBuffer;
 	class Texture;
 	class Shader;
+	class Pipeline;
+
+	constexpr size_t MAX_NUM_RENDERTARGETS = 4;
 
 	class Graphics
 	{
@@ -117,7 +120,7 @@ namespace Dive
 
 		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveTopology;
 
-		ID3D11RenderTargetView* m_RenderTargetViews[4];
+		ID3D11RenderTargetView* m_RenderTargetViews[MAX_NUM_RENDERTARGETS];
 		ID3D11DepthStencilView* m_pDepthStencilView;
 
 		bool m_bRenderTargetViewsDirty;

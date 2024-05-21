@@ -162,6 +162,7 @@
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Src\Graphics\IndexBuffer.h" />
+    <ClInclude Include="Src\Graphics\Pipeline.h" />
     <ClInclude Include="Src\Graphics\RenderTexture.h" />
     <ClInclude Include="Src\Graphics\Shader.h" />
     <ClInclude Include="Src\Graphics\Texture.h" />
@@ -206,6 +207,7 @@
     </ClCompile>
     <ClCompile Include="Src\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
+    <ClCompile Include="Src\Graphics\Pipeline.cpp" />
     <ClCompile Include="Src\Graphics\RenderTexture.cpp" />
     <ClCompile Include="Src\Graphics\Shader.cpp" />
     <ClCompile Include="Src\Graphics\Texture.cpp" />

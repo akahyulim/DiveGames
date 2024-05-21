@@ -32,12 +32,14 @@ namespace Dive
 		void Render();
 
 	private:
+		void passDepth();
+		void passDepthNew();
+		void passOpaqueDraw();
+		void passTransparentDraw();
+
 		void forwardRender();
 		void deferredRender();
 
-		void passDepth();
-		void passOpaqueDraw();
-		void passTransparentDraw();
 		
 
 	private:

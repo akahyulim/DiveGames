@@ -11,6 +11,7 @@ namespace Dive
 		bool CreateBuffer(const void* pData, uint32_t stride, uint32_t count);
 		void Destroy();
 
+		ID3D11Buffer* GetBufferNew() const { return m_pBuffer; }
 		ID3D11Buffer* const* GetBuffer() const { return &m_pBuffer; }
 		const uint32_t* GetStride() const { return &m_Stride; }
 		const uint32_t* GetOffset() const { return &m_Offset; }
