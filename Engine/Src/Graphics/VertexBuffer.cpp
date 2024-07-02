@@ -8,7 +8,6 @@ namespace Dive
 	VertexBuffer::VertexBuffer()
 		: m_pBuffer(nullptr)
 		, m_Stride(0)
-		, m_Offset(0)
 		, m_Count(0)
 	{
 	}

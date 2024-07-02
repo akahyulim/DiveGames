@@ -1,12 +1,24 @@
 #pragma once
 #include "Resource/Resource.h"
-#include "GraphicsDefs.h"
 
 namespace Dive
 {
-	enum class eInputLayout
+	//-------------------------------------------------------------------------------------
+	// enum class
+	//-------------------------------------------------------------------------------------
+	enum class eShaderType : uint8_t
 	{
-		None,
+		Undefined = 0,
+		Vertex,
+		Hull,
+		Domain,
+		Pixel,
+		Compute
+	};
+
+	enum class eInputLayout : uint8_t
+	{
+		None = 0,
 		Pos,
 		Pos_Tex,
 		Pos_Tex_Nor,
@@ -25,19 +37,15 @@ namespace Dive
 		~Shader() override;
 
 		bool CompileAndCreateShader(const std::string& filename, eShaderType type, eInputLayout layout = eInputLayout::None);
-		bool CreateInputLayout(eInputLayout layout = eInputLayout::Pos);	// 기본을 NULL로 해야하나..
-
+		
 		ID3D11VertexShader* GetVertexShader() const { return m_pVertexShader; }
 		ID3D11HullShader* GetHullShader() const { return m_pHullShader; }
 		ID3D11DomainShader* GetDomainShader() const { return m_pDomainShader; }
 		ID3D11ComputeShader* GetComputeShader() const { return m_pComputeShader; }
 		ID3D11PixelShader* GetPixelShader() const { return m_pPixelShader; }
 		ID3D11InputLayout* GetInputLayout() const { return m_pInputLayout; }
-		ID3DBlob* GetVertexShaderBlob() const { return m_pVertexShaderBlob; }
-
+		
 		eShaderType GetType() const { return m_Type; }
-
-		void Bind();
 
 	private:
 		bool createInputLayout(ID3D10Blob* pShaderBlob, eInputLayout layout);
@@ -47,7 +55,7 @@ namespace Dive
 
 		eShaderType m_Type;
 
-		ID3DBlob* m_pVertexShaderBlob;
+		ID3D11Device* m_pDevice;
 
 		ID3D11VertexShader* m_pVertexShader;
 		ID3D11HullShader* m_pHullShader;

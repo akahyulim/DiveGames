@@ -98,7 +98,7 @@ float SpotShadowPCF(float3 position)
     uvd.xy = 0.5f * uvd.xy + 0.5f;
     uvd.y = 1.0f - uvd.y;
     
-    return SpotShadowMap.SampleCmpLevelZero(SpotPCFSampler, uvd.xy, uvd.z);
+    return SpotShadowMap.SampleCmpLevelZero(PcfSampler, uvd.xy, uvd.z);
 }
 
 float3 CalcuSpotLight(float3 worldPos, float3 normal, float3 diff)
@@ -139,15 +139,19 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
 {
     float4 diff;
     if (!HasDiffuseTexture())
+    {
         diff = cbModelPixel.color;
+    }
     else
-        diff = DiffuseMap.Sample(DiffuseMapSampler, input.tex);
-    diff *= diff; // linear space
-    
+    {
+        diff = DiffuseMap.Sample(BaseSampler, input.tex);
+        //diff = float4(diff.rgb * diff.rgb, diff.a);
+    }
+
     float3 normal = input.normal;
     if (HasNormalTexture())
     {
-        float4 bumpMap = NormalMap.Sample(NormalMapSampler, input.tex);
+        float4 bumpMap = NormalMap.Sample(BaseSampler, input.tex);
         bumpMap = (bumpMap * 2.0f) - 1.0f;
 
         normal = normalize((bumpMap.x * input.tangent) + (bumpMap.y * input.bitangent) + (bumpMap.z * input.normal));
@@ -155,14 +159,12 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
 
     float3 lightColor;
     if (IsDirectionalLight())
-        lightColor = CalcuDirLight(input.worldPos, normal, diff.xyz);
+        lightColor = CalcuDirLight(input.worldPos, normal, diff.rgb);
     else if (IsPointLight())
-        lightColor = CalcuPointLight(input.worldPos, normal, diff.xyz);
+        lightColor = CalcuPointLight(input.worldPos, normal, diff.rgb);
     else if (IsSpotLight())
-        lightColor = CalcuSpotLight(input.worldPos, normal, diff.xyz);
+        lightColor = CalcuSpotLight(input.worldPos, normal, diff.rgb);
     
-    return float4(lightColor, diff.a);
-    
-    //float pos = SpotShadowPCF(input.worldPos);
-    //return float4(pos, pos, pos, 1.0f);
+    //return float4(sqrt(lightColor.rgb), diff.a);
+    return float4(lightColor.rgb, diff.a);
 }

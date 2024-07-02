@@ -1,10 +1,26 @@
 #pragma once
-#include "RendererDefs.h"		// eRenderPath용. 추후 Renderer에 흡수시키자.
 #include "Renderer.h"
+#include "Graphics/GBuffer.h"
 #include "Math/Frustum.h"
 
 namespace Dive
 {
+	//-------------------------------------------------------------------------------------
+	// enum class
+	//-------------------------------------------------------------------------------------
+	enum class eRenderableType
+	{
+		Opaque,
+		Transparent,
+		Light,
+		Camera
+	};
+
+	//-------------------------------------------------------------------------------------
+	// forward declarations
+	//-------------------------------------------------------------------------------------
+	class Graphics;
+	class Renderer;
 	class GameObject;
 	class Scene;
 	class Camera;
@@ -13,42 +29,34 @@ namespace Dive
 	class Mesh;
 	class Material;
 
-	enum class eRenderable
-	{
-		Opaque,
-		Transparent,
-		Light,
-		Camera
-	};
-
-	// 아무래도 이건 유니티 혹은 sparky의 Layer가 어울린다.
-	// 추후 더 생각해보자.
 	class ViewScreen
 	{
 	public:
-		ViewScreen(Camera* pCamera, eRenderPath renderPath = eRenderPath::Forward);
+		ViewScreen(Camera* pCamera, eRenderPathType renderPath = eRenderPathType::Forward);
+		~ViewScreen() = default;
 
 		void Update();
 		void Render();
 
 	private:
 		void passDepth();
-		void passDepthNew();
 		void passOpaqueDraw();
 		void passTransparentDraw();
 
 		void forwardRender();
 		void deferredRender();
 
-		
-
 	private:
+		Graphics* m_pGraphics;
+		Renderer* m_pRenderer;
 		Scene* m_pActiveScene;
 		Camera* m_pCamera;
-		eRenderPath m_RenderPath;
 
-		std::unordered_map<eRenderable, std::vector<GameObject*>> m_Renderables;
+		eRenderPathType m_RenderPath;
 
+		std::unordered_map<eRenderableType, std::vector<GameObject*>> m_Renderables;
+
+		GBuffer m_GBuffer;
 		Frustum m_Frustum;
 	};
 }

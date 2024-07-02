@@ -1,7 +1,7 @@
 #include "divepch.h"
 #include "BoundingBox.h"
 #include "Core/CoreDefs.h"
-#include "Graphics/GraphicsDefs.h"
+#include "Graphics/Graphics.h"
 
 namespace Dive
 {

@@ -1,7 +1,7 @@
 #include "divepch.h"
 #include "ModelLoader.h"
 #include "Core/CoreDefs.h"
-#include "Graphics/GraphicsDefs.h"
+#include "Graphics/Graphics.h"
 #include "Graphics/Texture2D.h"
 #include "Graphics/Shader.h"
 #include "Renderer/Mesh.h"
@@ -9,7 +9,6 @@
 #include "Renderer/Model.h"
 #include "IO/FileSystem.h"
 #include "Math/BoundingBox.h"
-#include "Resource/Image.h"
 #include "Resource/ResourceManager.h"
 #include "Scene/SceneManager.h"
 #include "Scene/GameObject.h"
@@ -425,20 +424,21 @@ namespace Dive
         if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
         {
             Texture2D* pDiffuseTex = nullptr;
-            const aiTexture* pTexture = s_aiScene->GetEmbeddedTexture(texturePath.C_Str());
-            if (pTexture)
+            const aiTexture* pEmbeddedTex = s_aiScene->GetEmbeddedTexture(texturePath.C_Str());
+            if (pEmbeddedTex)
             {
                 // 파일 내부에서 데이터를 얻어와 직접 만들기
-                pDiffuseTex = loadEmbeddedTexture(pTexture);
+                pDiffuseTex = loadEmbeddedTexture(pEmbeddedTex);
             }
             else
             {
                 // 이건 외부에 존재하는 파일을 로드
                 auto diffuseTexturePath = FileSystem::GetPath(s_FileName) + "textures/";
                 diffuseTexturePath += FileSystem::GetFileNameAndExtension(texturePath.C_Str());
+                //pDiffuseTex = ResourceManager::GetInstance()->GetResource<Texture2D>(diffuseTexturePath);
                 pDiffuseTex = ResourceManager::GetInstance()->GetResource<Texture2D>(diffuseTexturePath);
             }
-            pMat->SetTexture(eTextureUnit::Diffuse, pDiffuseTex);
+            pMat->SetTexture(eTextureUnitType::Diffuse, pDiffuseTex);
             DV_ENGINE_INFO("Load DiffuseMap");
         }
 
@@ -446,51 +446,55 @@ namespace Dive
         if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS)
         {
             Texture2D* pNormalTex = nullptr;
-            const aiTexture* pTexture = s_aiScene->GetEmbeddedTexture(texturePath.C_Str());
-            if (pTexture)
+            const aiTexture* pEmbeddedTex = s_aiScene->GetEmbeddedTexture(texturePath.C_Str());
+            if (pEmbeddedTex)
             {
                 // 파일 내부에서 데이터를 얻어와 직접 만들기
-                pNormalTex = loadEmbeddedTexture(pTexture);
+                pNormalTex = loadEmbeddedTexture(pEmbeddedTex);
             }
             else
             {
                 // 이건 외부에 존재하는 파일을 로드
                 auto normalTexturePath = FileSystem::GetPath(s_FileName) + "textures/";
                 normalTexturePath += FileSystem::GetFileNameAndExtension(texturePath.C_Str());
+                //pNormalTex = ResourceManager::GetInstance()->GetResource<Texture2D>(normalTexturePath);
                 pNormalTex = ResourceManager::GetInstance()->GetResource<Texture2D>(normalTexturePath);
             }
-            pMat->SetTexture(eTextureUnit::Normal, pNormalTex);
+            pMat->SetTexture(eTextureUnitType::Normal, pNormalTex);
             DV_ENGINE_INFO("Load NormalMap");
         }
         
         return pMat;
     }
 
-    // 예제에서는 ID3D11ShaderResourceView를 생성한 후 리턴한다.
     // https://github.com/assimp/assimp/blob/master/samples/SimpleTexturedDirectx11/SimpleTexturedDirectx11/ModelLoader.cpp
-    Texture2D* ModelLoader::loadEmbeddedTexture(const aiTexture* pTexture)
+    Texture2D* ModelLoader::loadEmbeddedTexture(const aiTexture* pEmbeddedTex)
     {
-        auto pTex = new Texture2D();
+        Texture2D* pLoadedTex = nullptr;
 
-        if (pTexture->mHeight != 0)
+        // 압축되지 않은 이미지
+        if (pEmbeddedTex->mHeight != 0)
         {
-            pTex->SetSize(pTexture->mWidth, pTexture->mHeight);
-            pTex->SetRawTextureData((const void*)pTexture->pcData);
-            // 될 것 같긴한데 두 번에 걸쳐서 생성하는게 마음에 걸린다.
-            // => urho3d를 참고한 인터페이스다. 
+            pLoadedTex = new Texture2D(pEmbeddedTex->mWidth, pEmbeddedTex->mHeight);
+            pLoadedTex->UpdateSubresource(
+                (const void*)pEmbeddedTex->pcData, 
+                Texture::CalcuRowPitchSize(pEmbeddedTex->mWidth, 
+                    DXGI_FORMAT_R8G8B8A8_UNORM));
         }
-        const size_t size = pTexture->mWidth;
-        const void* pSrcData = (const void*)pTexture->pcData;
-        Image img;
-        if (!img.LoadFromMemory(FileSystem::GetExtension(pTexture->mFilename.C_Str()), size, pSrcData))
-            return nullptr;
-        pTex->SetImage(&img);
+        // 압축된 이미지
+        else
+        {
+            const size_t bufferSize = static_cast<size_t>(pEmbeddedTex->mWidth);
+            const void* pSrcData = (const void*)pEmbeddedTex->pcData;
 
-        // 매뉴얼 등록
-        pTex->SetName(FileSystem::GetFileNameAndExtension(pTexture->mFilename.C_Str()));
-        //ResourceManager::GetInstance()->AddManualResource(pTex);
+            pLoadedTex = new Texture2D;
+            pLoadedTex->LoadFromMemory(
+                pEmbeddedTex->mFilename.C_Str(), 
+                static_cast<size_t>(pEmbeddedTex->mWidth), 
+                (const void*)pEmbeddedTex->pcData);
 
-        return pTex;
+        }
+
+        return pLoadedTex;
     }
-
 }

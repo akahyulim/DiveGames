@@ -7,191 +7,32 @@
 namespace Dive
 {
 	Texture::Texture()
-		: m_pTexture2D(nullptr)
-		, m_pShaderResourceView(nullptr)
-		, m_pSamplerState(nullptr)
-		, m_RequestedMipLevels(0)
-		, m_MipLevels(1)
-		, m_bMipLevelDirty(true)
-		, m_Filter(D3D11_FILTER_MIN_MAG_MIP_LINEAR)
-		, m_AddressMode(D3D11_TEXTURE_ADDRESS_WRAP)
-		, m_ComparisonFunc(D3D11_COMPARISON_ALWAYS)
-		, m_BorderColor(0.0f, 0.0f, 0.0f, 0.0f)
-		, m_AnisoLevel(1)
-		, m_bSamplerStateDirty(true)
+		: m_Width(0)
+		, m_Height(0)
+		, m_Format(DXGI_FORMAT_UNKNOWN)
+		, m_bUseMipMap(false)
 		, m_bOpaque(true)
 	{
 		m_pDevice = Graphics::GetInstance()->GetDevice();
+		DV_ENGINE_ASSERT(m_pDevice);
+
 		m_pDeviceContext = Graphics::GetInstance()->GetDeviceContext();
+		DV_ENGINE_ASSERT(m_pDeviceContext);
 	}
 
-	Texture::~Texture()
+	void Texture::SetWidth(uint32_t width)
 	{
-		DV_RELEASE(m_pSamplerState);
-		DV_RELEASE(m_pShaderResourceView);
-		DV_RELEASE(m_pTexture2D);
-	}
-
-	void Texture::SetMipLevelsDirty()
-	{
-		// rendertargetview가 있어야 한다.
-		// urho는 usage로 확인한다.
-		if (m_MipLevels > 1)
-			m_bMipLevelDirty = true;
-	}
-
-	void Texture::UpdateMipLevels()
-	{
-		DV_ENGINE_ASSERT(Graphics::GetInstance()->IsInitialized ());
-
-		if (m_pShaderResourceView)
-		{
-			m_pDeviceContext->GenerateMips(m_pShaderResourceView);
-			m_bMipLevelDirty = false;
-		}
+		DV_ENGINE_ASSERT(width > 0);
+		m_Width = width;
 	}
 	
-	void Texture::UpdateSamplerState()
+	void Texture::SetHeight(uint32_t height)
 	{
-		if (!m_bSamplerStateDirty && m_pSamplerState)
-			return;
-
-		DV_RELEASE(m_pSamplerState);
-
-		D3D11_SAMPLER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.Filter = m_Filter;
-		desc.AddressU = m_AddressMode;
-		desc.AddressV = m_AddressMode;
-		desc.AddressW = m_AddressMode;
-		desc.MipLODBias = 0.0f;
-		desc.MaxAnisotropy = m_AnisoLevel;
-		desc.ComparisonFunc = m_ComparisonFunc;
-		desc.BorderColor[0] = m_BorderColor.x;
-		desc.BorderColor[1] = m_BorderColor.y;
-		desc.BorderColor[2] = m_BorderColor.z;
-		desc.BorderColor[3] = m_BorderColor.w;
-		desc.MinLOD = -FLT_MAX;
-		desc.MaxLOD = FLT_MAX;
-
-		if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_pSamplerState)))
-		{
-			DV_RELEASE(m_pSamplerState);
-			DV_ENGINE_ERROR("Texture::UpdateSamplerState - SamplerState 생성에 실패하였습니다.");
-			return;
-		}
-
-		m_bSamplerStateDirty = false;
+		DV_ENGINE_ASSERT(height > 0);
+		m_Height = height;
 	}
 
-	void Texture::SetFilter(D3D11_FILTER filter)
-	{
-		if (m_Filter != filter)
-		{
-			m_Filter = filter;
-			m_bSamplerStateDirty = true;
-		}
-	}
-
-	void Texture::SetAddressMode(D3D11_TEXTURE_ADDRESS_MODE mode)
-	{
-		if (m_AddressMode != mode)
-		{
-			m_AddressMode = mode;
-			m_bSamplerStateDirty = true;
-		}
-	}
-
-	void Texture::SetComparisonFunc(D3D11_COMPARISON_FUNC func)
-	{
-		if (m_ComparisonFunc != func)
-		{
-			m_ComparisonFunc = func;
-			m_bSamplerStateDirty = true;
-		}
-	}
-	
-	void Texture::SetBorderColor(const DirectX::XMFLOAT4& color)
-	{
-		if (m_BorderColor.x != color.x || m_BorderColor.y != color.y || m_BorderColor.z != color.z || m_BorderColor.w != color.w)
-		{
-			m_BorderColor = color;
-			m_bSamplerStateDirty = true;
-		}
-	}
-	
-	void Texture::SetAnisoLevel(int level)
-	{
-		if (m_AnisoLevel != level)
-		{
-			m_AnisoLevel = level;
-			m_bSamplerStateDirty = true;
-		}
-	}
-
-	uint32_t Texture::GetRowPitchSize(int width) const
-	{
-		switch (m_Format)
-		{
-		case DXGI_FORMAT_R8_UNORM:
-		case DXGI_FORMAT_A8_UNORM:
-			return static_cast<unsigned int>(width);
-
-		case DXGI_FORMAT_R8G8_UNORM:
-		case DXGI_FORMAT_R16_UNORM:
-		case DXGI_FORMAT_R16_FLOAT:
-		case DXGI_FORMAT_R16_TYPELESS:
-			return static_cast<unsigned int>(width * 2);
-
-		case DXGI_FORMAT_R8G8B8A8_UNORM:
-		case DXGI_FORMAT_R16G16_UNORM:
-		case DXGI_FORMAT_R16G16_FLOAT:
-		case DXGI_FORMAT_R32_FLOAT:
-		case DXGI_FORMAT_R24G8_TYPELESS:
-		case DXGI_FORMAT_R32_TYPELESS:
-			return static_cast<unsigned int>(width * 4);
-
-		case DXGI_FORMAT_R16G16B16A16_UNORM:
-		case DXGI_FORMAT_R16G16B16A16_FLOAT:
-			return static_cast<unsigned int>(width * 8);
-
-		case DXGI_FORMAT_R32G32B32A32_FLOAT:
-			return static_cast<unsigned int>(width * 16);
-
-		case DXGI_FORMAT_BC1_UNORM:
-			return static_cast<unsigned int>(((width + 3) >> 2) * 8);
-
-		case DXGI_FORMAT_BC2_UNORM:
-		case DXGI_FORMAT_BC3_UNORM:
-			return static_cast<unsigned int>(((width + 3) >> 2) * 16);
-
-		default:
-			return 0;
-		}
-	}
-
-	DXGI_FORMAT Texture::GetSRGBFormat(DXGI_FORMAT format)
-	{
-		switch (format)
-		{
-		case DXGI_FORMAT_R8G8B8A8_UNORM:
-			return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
-
-		case DXGI_FORMAT_BC1_UNORM:
-			return DXGI_FORMAT_BC1_UNORM_SRGB;
-
-		case DXGI_FORMAT_BC2_UNORM:
-			return DXGI_FORMAT_BC2_UNORM_SRGB;
-
-		case DXGI_FORMAT_BC3_UNORM:
-			return DXGI_FORMAT_BC3_UNORM_SRGB;
-
-		default:
-			return format;
-		}
-	}
-	
-	DXGI_FORMAT Texture::GetSRVFormat(DXGI_FORMAT format)
+	DXGI_FORMAT Texture::GetShaderResourceViewFormat(DXGI_FORMAT format)
 	{
 		switch (format)
 		{
@@ -208,8 +49,8 @@ namespace Dive
 			return format;
 		}
 	}
-	
-	DXGI_FORMAT Texture::GetDSVFormat(DXGI_FORMAT format)
+
+	DXGI_FORMAT Texture::GetDepthStencilViewFormat(DXGI_FORMAT format)
 	{
 		switch (format)
 		{
@@ -226,22 +67,47 @@ namespace Dive
 			return format;
 		}
 	}
-	
-	int Texture::CheckMaxMipLevels(int width, int height, int requestedMipLevels)
+
+	uint32_t Texture::CalcuRowPitchSize(uint32_t width, DXGI_FORMAT format)
 	{
-		int maxLevel = 1;
-
-		while (width > 1 || height > 1)
+		switch (format)
 		{
-			++maxLevel;
+		case DXGI_FORMAT_R8_UNORM:
+		case DXGI_FORMAT_A8_UNORM:
+			return width;
 
-			width = width > 1 ? (width >> 1u) : 1;
-			height = height > 1 ? (height >> 1u) : 1;
+		case DXGI_FORMAT_R8G8_UNORM:
+		case DXGI_FORMAT_R16_UNORM:
+		case DXGI_FORMAT_R16_FLOAT:
+		case DXGI_FORMAT_R16_TYPELESS:
+			return width * 2;
+
+		case DXGI_FORMAT_R8G8B8A8_UNORM:
+		case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+		case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
+		case DXGI_FORMAT_R16G16_UNORM:
+		case DXGI_FORMAT_R16G16_FLOAT:
+		case DXGI_FORMAT_R32_FLOAT:
+		case DXGI_FORMAT_R24G8_TYPELESS:
+		case DXGI_FORMAT_R32_TYPELESS:
+			return width * 4;
+
+		case DXGI_FORMAT_R16G16B16A16_UNORM:
+		case DXGI_FORMAT_R16G16B16A16_FLOAT:
+			return width * 8;
+
+		case DXGI_FORMAT_R32G32B32A32_FLOAT:
+			return width * 16;
+
+		case DXGI_FORMAT_BC1_UNORM:
+			return ((width + 3) >> 2) * 8;
+
+		case DXGI_FORMAT_BC2_UNORM:
+		case DXGI_FORMAT_BC3_UNORM:
+			return ((width + 3) >> 2) * 16;
+
+		default:
+			return 0;
 		}
-
-		if (!requestedMipLevels || maxLevel < requestedMipLevels)
-			return maxLevel;
-		else
-			return requestedMipLevels;
 	}
 }

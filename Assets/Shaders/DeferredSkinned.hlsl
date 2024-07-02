@@ -52,7 +52,7 @@ PS_GBUFFER MainPS(PixelInput input)
 {
 	PS_GBUFFER output;
 	
-    float4 diffuse = has_texture_diffse() ? DiffuseMap.Sample(DiffuseMapSampler, input.tex) : cbMaterialAlbedoColorPS;
+    float4 diffuse = has_texture_diffse() ? DiffuseMap.Sample(BaseSampler, input.tex) : cbMaterialAlbedoColorPS;
 	diffuse *= diffuse;	// ¿Ö Á¦°ö?
 	output.colorSpecIntensity = diffuse;
 

@@ -29,16 +29,16 @@ namespace Dive
         return true;
     }
 
-    Texture* Material::GetTexture(eTextureUnit unit) const
+    Texture* Material::GetTexture(eTextureUnitType unit) const
     {
         auto it = m_Textures.find(unit);
 
         return it != m_Textures.end() ? it->second : nullptr;
     }
-
-    void Material::SetTexture(eTextureUnit unit, Texture* pTexture)
+    
+    void Material::SetTexture(eTextureUnitType unit, Texture* pTexture)
     {
-        if (unit < eTextureUnit::Count)
+        if (unit < eTextureUnitType::Count)
         {
             if (pTexture)
                 m_Textures[unit] = pTexture;
@@ -46,21 +46,21 @@ namespace Dive
                 m_Textures.erase(unit); // 이게 맞나 모르겠다.
         }
     }
-
+   
     // urho는 load에서만 텍스쳐를 로드하기에 직접 만들어봤다.
     // 그런데 cache에서 GetResource한 후 위의 SetTexture하는게 맞지 않나 싶다.
     // 하지만 이 구현이 힘든게 Cache의 GetResource는 일반 리소스 파일과 엔진의 설정 파일을
     // 구분하여 로드할 수 있다는 것이다.
-    void Material::AddTexture(eTextureUnit unit, const std::string& name)
+    void Material::AddTexture(eTextureUnitType unit, const std::string& name)
     {
-        if (unit < eTextureUnit::Count)
+        if (unit < eTextureUnitType::Count)
         {
             auto pTexture = ResourceManager::GetInstance()->GetResource<Texture2D>(name);
             SetTexture(unit, static_cast<Texture*>(pTexture));
         }
     }
-
-    bool Material::HasTexture(eTextureUnit unit) const
+    
+    bool Material::HasTexture(eTextureUnitType unit) const
     {
         auto it = m_Textures.find(unit);
         return it != m_Textures.end() && it->second != nullptr;
@@ -96,7 +96,7 @@ namespace Dive
 
     bool Material::IsOpaque() const
     {
-        auto it = m_Textures.find(eTextureUnit::Diffuse);
+        auto it = m_Textures.find(eTextureUnitType::Diffuse);
         if (it != m_Textures.end())
         {
             return it->second->IsOpaque();

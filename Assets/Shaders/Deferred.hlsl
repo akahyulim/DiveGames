@@ -54,7 +54,7 @@ PS_GBUFFER MainPS(VS_OUTPUT input)
     if (!HasDiffuseTexture())
         diff = cbModelPixel.color;
     else
-        diff = DiffuseMap.Sample(DiffuseMapSampler, input.tex);
+        diff = DiffuseMap.Sample(BaseSampler, input.tex);
     diff *= diff; // linear space
 	output.colorSpecIntensity.xyz = diff.xyz;
 
@@ -62,7 +62,7 @@ PS_GBUFFER MainPS(VS_OUTPUT input)
     float3 normal = input.normal;
     if (HasNormalTexture())
     {
-        float4 bumpMap = NormalMap.Sample(NormalMapSampler, input.tex);
+        float4 bumpMap = NormalMap.Sample(BaseSampler, input.tex);
         bumpMap = (bumpMap * 2.0f) - 1.0f;
 
         normal = normalize((bumpMap.x * input.tangent) + (bumpMap.y * input.bitangent) + (bumpMap.z * input.normal));

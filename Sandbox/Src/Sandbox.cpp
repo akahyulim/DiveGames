@@ -6,6 +6,8 @@ namespace Sandbox
 {
 	Sandbox::Sandbox()
 		: Dive::Application()
+		, m_pGraphics(nullptr)
+		, m_pInput(nullptr)
 		, m_pMainCam(nullptr)
 		, m_pDummy(nullptr)
 		, m_pCube(nullptr)
@@ -32,7 +34,6 @@ namespace Sandbox
 	{
 		// 여기는 서브 시스템 설정
 		// 추후엔 파일 경로를 전달받아 서브 시스템을 설정
-
 		m_Title = L"Sandbox";
 		m_WindowWidth = 1600;
 		m_WindowHeight = 900;
@@ -40,6 +41,9 @@ namespace Sandbox
 
 	void Sandbox::OnStart()
 	{
+		m_pGraphics = Dive::Graphics::GetInstance();
+		m_pInput = Dive::Input::GetInstance();
+
 		// create scene
 		{
 			switch (m_SceneType)
@@ -56,6 +60,9 @@ namespace Sandbox
 			case eSceneType::Shadow:
 				createShadowScene();
 				break;
+			case eSceneType::Texture:
+				createTextureScene();
+				break;
 			default:
 				DV_CRITICAL("잘못된 씬을 선택하였습니다. 시스템을 종료합니다.");
 				OnStop();
@@ -65,9 +72,10 @@ namespace Sandbox
 
 		// setup renderLayer
 		{
-			// ViewScreen에서 Forward, Deferred를 설정한다.
-			auto pViewScreen = new Dive::ViewScreen(m_pMainCam->GetComponent<Dive::Camera>());// , Dive::eRenderPath::Deferred);
-			Dive::GetRenderer()->SetViewScreen(0, pViewScreen);
+			// 디퍼드는 미완 - 일단 DepthStencilState를 더 추가해야 할 것 같다.
+			// 현재 디퍼드는 특정 광원을 켜면 일부 적용되는 상태다.
+			auto pViewScreen = new Dive::ViewScreen(m_pMainCam->GetComponent<Dive::Camera>());//, Dive::eRenderPathType::Deferred);
+			Dive::Renderer::GetInstance()->SetViewScreen(0, pViewScreen);
 		}
 
 		// subscribe events
@@ -88,7 +96,7 @@ namespace Sandbox
 		static bool bMove = false;
 
 		static float bSlow = 0;
-		if (Dive::GetInput()->KeyPress(DIK_LSHIFT))
+		if (m_pInput->KeyPress(DIK_LSHIFT))
 			bSlow = 1.0f;
 		else
 			bSlow = 5.0f;
@@ -160,44 +168,44 @@ namespace Sandbox
 
 			// move controll
 			{
-				if (Dive::GetInput()->KeyPress(DIK_UP))
+				if (m_pInput->KeyPress(DIK_UP))
 				{
 					m_pMainCam->Rotate(-rotateSpeed * deltaTime, 0.0f, 0.0f, Dive::eSpace::Self);
 				}
-				if (Dive::GetInput()->KeyPress(DIK_DOWN))
+				if (m_pInput->KeyPress(DIK_DOWN))
 				{
 					m_pMainCam->Rotate(rotateSpeed * deltaTime, 0.0f, 0.0f, Dive::eSpace::Self);
 				}
-				if (Dive::GetInput()->KeyPress(DIK_LEFT))
+				if (m_pInput->KeyPress(DIK_LEFT))
 				{
 					m_pMainCam->Rotate(0.0f, -rotateSpeed * deltaTime, 0.0f, Dive::eSpace::Self);
 				}
-				if (Dive::GetInput()->KeyPress(DIK_RIGHT))
+				if (m_pInput->KeyPress(DIK_RIGHT))
 				{
 					m_pMainCam->Rotate(0.0f, rotateSpeed * deltaTime, 0.0f, Dive::eSpace::Self);
 				}
-				if (Dive::GetInput()->KeyPress(DIK_W))
+				if (m_pInput->KeyPress(DIK_W))
 				{
 					m_pMainCam->Translate(0.0f, 0.0f, moveSpeed * deltaTime * bSlow, Dive::eSpace::Self);
 				}
-				if (Dive::GetInput()->KeyPress(DIK_S))
+				if (m_pInput->KeyPress(DIK_S))
 				{
 					m_pMainCam->Translate(0.0f, 0.0f, -moveSpeed * deltaTime * bSlow, Dive::eSpace::Self);
 				}
-				if (Dive::GetInput()->KeyPress(DIK_A))
+				if (m_pInput->KeyPress(DIK_A))
 				{
 					m_pMainCam->Translate(-moveSpeed * deltaTime * bSlow, 0.0f, 0.0f, Dive::eSpace::Self);
 				}
-				if (Dive::GetInput()->KeyPress(DIK_D))
+				if (m_pInput->KeyPress(DIK_D))
 				{
 					m_pMainCam->Translate(moveSpeed * deltaTime * bSlow, 0.0f, 0.0f, Dive::eSpace::Self);
 				}
 
-				if (Dive::GetInput()->KeyPress(DIK_Q))
+				if (m_pInput->KeyPress(DIK_Q))
 				{
 					m_pMainCam->Translate(0.0f, moveSpeed * deltaTime * bSlow, 0.0f, Dive::eSpace::Self);
 				}
-				if (Dive::GetInput()->KeyPress(DIK_E))
+				if (m_pInput->KeyPress(DIK_E))
 				{
 					m_pMainCam->Translate(0.0f, -moveSpeed * deltaTime * bSlow, 0.0f, Dive::eSpace::Self);
 				}
@@ -205,88 +213,88 @@ namespace Sandbox
 
 			// window controll
 			{
-				if (Dive::GetInput()->KeyDown(DIK_F5))
+				if (m_pInput->KeyDown(DIK_F5))
 				{
-					Dive::GetGraphics()->ResizeResolution(1920, 1080);
+					m_pGraphics->ResizeResolution(1920, 1080);
 					return;
 				}
-				if (Dive::GetInput()->KeyDown(DIK_F6))
+				if (m_pInput->KeyDown(DIK_F6))
 				{
-					Dive::GetGraphics()->ResizeResolution(1600, 900);
+					m_pGraphics->ResizeResolution(1600, 900);
 					return;
 				}
-				if (Dive::GetInput()->KeyDown(DIK_F7))
+				if (m_pInput->KeyDown(DIK_F7))
 				{
-					Dive::GetGraphics()->ResizeResolution(1024, 768);
+					m_pGraphics->ResizeResolution(1024, 768);
 					return;
 				}
-				if (Dive::GetInput()->KeyDown(DIK_F1))
+				if (m_pInput->KeyDown(DIK_F1))
 				{
-					Dive::GetGraphics()->AdjustWindow(Dive::GetGraphics()->GetResolutionWidth(), Dive::GetGraphics()->GetResolutionHeight(), false);
+					m_pGraphics->AdjustWindow(m_pGraphics->GetResolutionWidth(), m_pGraphics->GetResolutionHeight(), false);
 					return;
 				}
-				if (Dive::GetInput()->KeyDown(DIK_F2))
+				if (m_pInput->KeyDown(DIK_F2))
 				{
-					Dive::GetGraphics()->AdjustWindow(Dive::GetGraphics()->GetResolutionWidth(), Dive::GetGraphics()->GetResolutionHeight(), true);
+					m_pGraphics->AdjustWindow(m_pGraphics->GetResolutionWidth(), m_pGraphics->GetResolutionHeight(), true);
 					return;
 				}
-				if (Dive::GetInput()->KeyDown(DIK_F3))
+				if (m_pInput->KeyDown(DIK_F3))
 				{
-					Dive::GetGraphics()->SetFullScreen(true);
+					m_pGraphics->SetFullScreen(true);
 					return;
 				}
-				if (Dive::GetInput()->KeyDown(DIK_F4))
+				if (m_pInput->KeyDown(DIK_F4))
 				{
-					Dive::GetGraphics()->SetFullScreen(false);
+					m_pGraphics->SetFullScreen(false);
 					return;
 				}
 			}
 
 			// light controll
 			{
-				if (Dive::GetInput()->KeyDown(DIK_1) && m_pDirLightA)
+				if (m_pInput->KeyDown(DIK_1) && m_pDirLightA)
 				{
 					m_pDirLightA->SetActive(m_pDirLightA->IsActive() ? false : true);
 					return;
 				}
 				
-				if (Dive::GetInput()->KeyDown(DIK_2) && m_pPointLightA)
+				if (m_pInput->KeyDown(DIK_2) && m_pPointLightA)
 				{
 					m_pPointLightA->SetActive(m_pPointLightA->IsActive() ? false : true);
 					return;
 				}
 		
-				if (Dive::GetInput()->KeyDown(DIK_3) && m_pPointLightB)
+				if (m_pInput->KeyDown(DIK_3) && m_pPointLightB)
 				{
 					m_pPointLightB->SetActive(m_pPointLightB->IsActive() ? false : true);
 					return;
 				}
 				
-				if (Dive::GetInput()->KeyDown(DIK_4) && m_pPointLightC)
+				if (m_pInput->KeyDown(DIK_4) && m_pPointLightC)
 				{
 					m_pPointLightC->SetActive(m_pPointLightC->IsActive() ? false : true);
 					return;
 				}
 				
-				if (Dive::GetInput()->KeyDown(DIK_5) && m_pSpotLightA)
+				if (m_pInput->KeyDown(DIK_5) && m_pSpotLightA)
 				{
 					m_pSpotLightA->SetActive(m_pSpotLightA->IsActive() ? false : true);
 					return;
 				}
 				
-				if (Dive::GetInput()->KeyDown(DIK_6) && m_pSpotLightB)
+				if (m_pInput->KeyDown(DIK_6) && m_pSpotLightB)
 				{
 					m_pSpotLightB->SetActive(m_pSpotLightB->IsActive() ? false : true);
 					return;
 				}
 				
-				if (Dive::GetInput()->KeyDown(DIK_7) && m_pSpotLightC)
+				if (m_pInput->KeyDown(DIK_7) && m_pSpotLightC)
 				{
 					m_pSpotLightC->SetActive(m_pSpotLightC->IsActive() ? false : true);
 					return;
 				}
 				
-				if (Dive::GetInput()->KeyDown(DIK_8) && m_pFlashLight)
+				if (m_pInput->KeyDown(DIK_8) && m_pFlashLight)
 				{
 					m_pFlashLight->SetActive(m_pFlashLight->IsActive() ? false : true);
 					return;
@@ -295,7 +303,7 @@ namespace Sandbox
 
 			// etc
 			{
-				if (Dive::GetInput()->KeyDown(DIK_SPACE))
+				if (m_pInput->KeyDown(DIK_SPACE))
 				{
 					bMove = !bMove;
 					return;
@@ -306,6 +314,8 @@ namespace Sandbox
 
 	void Sandbox::createBaseScene()
 	{
+		m_pGraphics->SetWindowTitle(L"Opaque and Transparent");
+
 		Dive::Scene* pActiveScene = Dive::GetSceneManager()->CreateScene("Test World");
 		Dive::GetSceneManager()->SetActiveScene(pActiveScene);
 
@@ -340,26 +350,26 @@ namespace Sandbox
 			// materials
 			// 셰이더를 직접 전달하지 않아도 RenderPath에 맞는 Default가 적용되어 있어야 한다.
 			auto pTriangleMaterial = Dive::CreateMaterial("TriangleMaterial");
-			pTriangleMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexDMC);
+			pTriangleMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexDMC);
 			Dive::GetResourceManager()->AddManualResource(pTriangleMaterial);
 
 			auto pCubeMaterial = Dive::CreateMaterial("CubeMaterial");
-			pCubeMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexDOKEV);
+			pCubeMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexDOKEV);
 			Dive::GetResourceManager()->AddManualResource(pCubeMaterial);
 
 			auto pPlaneMaterial = Dive::CreateMaterial("PlaneMaterial");
-			pPlaneMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexPlane);
-			pPlaneMaterial->SetTexture(Dive::eTextureUnit::Normal, pTexPlaneNormal);
+			pPlaneMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexPlane);
+			pPlaneMaterial->SetTexture(Dive::eTextureUnitType::Normal, pTexPlaneNormal);
 			Dive::GetResourceManager()->AddManualResource(pPlaneMaterial);
 
 			auto pStoneMaterial = Dive::CreateMaterial("StoneMaterial");
-			pStoneMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexStone);
-			pStoneMaterial->SetTexture(Dive::eTextureUnit::Normal, pTexNormal);
+			pStoneMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexStone);
+			pStoneMaterial->SetTexture(Dive::eTextureUnitType::Normal, pTexNormal);
 			Dive::GetResourceManager()->AddManualResource(pStoneMaterial);
 
 			auto pTransparentMaterial = Dive::CreateMaterial("TransparentMaterial");
 			pTransparentMaterial->SetDiffuseColor(1.0f, 1.0f, 0.0f, 0.75f);
-			//pTransparentMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexNoTexture);
+			//pTransparentMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexNoTexture);
 			Dive::GetResourceManager()->AddManualResource(pTransparentMaterial);
 
 			// tirangle gameobject
@@ -378,7 +388,8 @@ namespace Sandbox
 			auto pCubeRenderableCom = m_pCube->AddComponent<Dive::Renderable>();
 			pMesh = pCubeModel->GetMeshAt();
 			pCubeRenderableCom->SetGeometry(pMesh, 0, pMesh->GetVertexCount(), 0, pMesh->GetIndexCount());
-			pCubeRenderableCom->SetMaterial(pTransparentMaterial);//pStoneMaterial);
+			pCubeRenderableCom->SetMaterial//(pTransparentMaterial);
+				(pStoneMaterial);
 			pCubeModel->SetRootObject(m_pCube);
 
 			// bottom gameobject
@@ -498,6 +509,8 @@ namespace Sandbox
 
 	void Sandbox::createCarScene()
 	{
+		m_pGraphics->SetWindowTitle(L"Car");
+
 		Dive::Scene* pActiveScene = Dive::GetSceneManager()->CreateScene("Car World");
 		Dive::GetSceneManager()->SetActiveScene(pActiveScene);
 
@@ -536,6 +549,8 @@ namespace Sandbox
 
 	void Sandbox::createSponzaScene()
 	{
+		m_pGraphics->SetWindowTitle(L"Sponza");
+	
 		Dive::Scene* pActiveScene = Dive::GetSceneManager()->CreateScene("Sponza World");
 		Dive::GetSceneManager()->SetActiveScene(pActiveScene);
 
@@ -586,54 +601,33 @@ namespace Sandbox
 
 	void Sandbox::createShadowScene()
 	{
+		m_pGraphics->SetWindowTitle(L"Shadow Test");
+
 		Dive::Scene* pActiveScene = Dive::GetSceneManager()->CreateScene("Shadow Test World");
 		Dive::GetSceneManager()->SetActiveScene(pActiveScene);
 
 		// main camera
 		m_pMainCam = pActiveScene->CreateGameObject("MainCam");
 		auto pCamCom = m_pMainCam->AddComponent<Dive::Camera>();
-		pCamCom->SetBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
-		m_pMainCam->SetPosition(0.0f, 30.0f, -50.0f);
-		m_pMainCam->LookAt(0.0f, 0.0f, 0.0f);
+		pCamCom->SetBackgroundColor(0.65f, 0.65f, 1.0f, 1.0f);
+		m_pMainCam->SetPosition(0.0f, 20.0f, -50.0f);
+		m_pMainCam->LookAt(0.0f, 10.0f, 0.0f);
 
 		// objects
 		{
 			// texture
 			auto pTexPlane = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/WornWood/WornWood_Albedo.tga");
 			auto pTexPlaneNormal = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/WornWood/WornWood_Normal.tga");
-			auto pTexStone = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/stone01.tga");
-			auto pTexNormal = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/normal01.tga");
-
+			
 			// meshes
-			auto pCubeModel = Dive::ModelFactory::CreateCube(10.0f);
-			Dive::GetResourceManager()->AddManualResource(pCubeModel);
-
-			auto pPlaneModel = Dive::ModelFactory::CreatePlane(50.0f, 50.0f);
+			auto pPlaneModel = Dive::ModelFactory::CreatePlane(100.0f, 100.0f);
 			Dive::GetResourceManager()->AddManualResource(pPlaneModel);
 
 			// materials
-			auto pCubeMaterial = Dive::CreateMaterial("CubeMaterial");
-			pCubeMaterial->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-			Dive::GetResourceManager()->AddManualResource(pCubeMaterial);
-
 			auto pPlaneMaterial = Dive::CreateMaterial("PlaneMaterial");
-			pPlaneMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexPlane);
-			pPlaneMaterial->SetTexture(Dive::eTextureUnit::Normal, pTexPlaneNormal);
+			pPlaneMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexPlane);
+			pPlaneMaterial->SetTexture(Dive::eTextureUnitType::Normal, pTexPlaneNormal);
 			Dive::GetResourceManager()->AddManualResource(pPlaneMaterial);
-
-			auto pStoneMaterial = Dive::CreateMaterial("StoneMaterial");
-			pStoneMaterial->SetTexture(Dive::eTextureUnit::Diffuse, pTexStone);
-			pStoneMaterial->SetTexture(Dive::eTextureUnit::Normal, pTexNormal);
-			Dive::GetResourceManager()->AddManualResource(pStoneMaterial);
-
-			// cube gameobject
-			m_pCube = pActiveScene->CreateGameObject("Cube");
-			m_pCube->SetPosition(-10.0f, 5.0f, 0.0f);
-			auto pCubeRenderableCom = m_pCube->AddComponent<Dive::Renderable>();
-			auto pMesh = pCubeModel->GetMeshAt();
-			pCubeRenderableCom->SetGeometry(pMesh, 0, pMesh->GetVertexCount(), 0, pMesh->GetIndexCount());
-			pCubeRenderableCom->SetMaterial(pStoneMaterial);
-			pCubeModel->SetRootObject(m_pCube);
 
 			// bottom gameobject
 			auto pBottom = pActiveScene->CreateGameObject("Bottom");
@@ -643,10 +637,18 @@ namespace Sandbox
 			pBottomRenderableCom->SetMaterial(pPlaneMaterial);
 			pPlaneModel->SetRootObject(pBottom);
 
-			// Sphere
-			auto pSphereModel = Dive::GetResourceManager()->GetResource<Dive::Model>("../../Assets/Models/Sphere.obj");
-			pSphereModel->GetRootObject()->SetPosition(10.0f, 5.0f, 0.0f);
-			pSphereModel->GetRootObject()->SetScale(5.0f, 5.0f, 5.0f);
+			// Models
+			auto pTreeModel = Dive::GetResourceManager()->GetResource<Dive::Model>("../../Assets/Models/tree/GenTree-103_AE3D_03122023-F1.fbx");
+			pTreeModel->GetRootObject()->SetPosition(0.0f, 0.0f, 0.0f);
+			pTreeModel->GetRootObject()->SetScale(0.02f, 0.02f, 0.02f);
+
+			auto pVampire = Dive::GetResourceManager()->GetResource<Dive::Model>("../../Assets/Models/Defeated.fbx");
+			pVampire->GetRootObject()->SetPosition(-10.0f, 0.0f, 0.0f);
+			pVampire->GetRootObject()->SetScale(0.05f, 0.05f, 0.05f);
+
+			auto pDummy = Dive::GetResourceManager()->GetResource<Dive::Model>("../../Assets/Models/Y Bot@Zombie Stumbling.fbx");
+			pDummy->GetRootObject()->SetPosition(10.0f, 0.0f, 0.0f);
+			pDummy->GetRootObject()->SetScale(0.05f, 0.05f, 0.05f);
 		}
 
 		// lights
@@ -658,7 +660,7 @@ namespace Sandbox
 			{
 				// MovingSpotLight
 				auto pMovingSpotLight = pActiveScene->CreateGameObject("MovingSpotLight");
-				pMovingSpotLight->SetPosition(30.0f, 30.0f, -30.0f);
+				pMovingSpotLight->SetPosition(50.0f, 50.0f, -50.0f);
 				pMovingSpotLight->LookAt(0.0f, 0.0f, 0.0f);
 				pMovingSpotLight->SetParent(m_pDummy);
 				pMovingSpotLight->SetActive(true);
@@ -667,7 +669,6 @@ namespace Sandbox
 				pSpotLightCom->SetRange(5000.0f);
 				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
 				pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
-				//pSpotLightCom->EnableShadow(false);
 
 				// TopSpotLight
 				auto pTopSpotLight = pActiveScene->CreateGameObject("TopSpotLight");
@@ -679,22 +680,75 @@ namespace Sandbox
 				pSpotLightCom->SetRange(1000.0f);
 				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
 				pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
-
-				// left
-				/*
-				auto pLeftSpotLight = pActiveScene->CreateGameObject("LeftSpotLight");
-				pLeftSpotLight->SetPosition(-50.0f, 30.0f, 50.0f);
-				pLeftSpotLight->LookAt(0.0f, 0.0f, 0.0f);
-				pLeftSpotLight->SetActive(true);
-				pSpotLightCom = pLeftSpotLight->AddComponent<Dive::Light>();
-				pSpotLightCom->SetType(Dive::eLightType::Spot);
-				pSpotLightCom->SetRange(1000.0f);
-				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
-				pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
-				*/
 			}
 		}
 
 		m_SceneType = eSceneType::Shadow;
+	}
+
+	void Sandbox::createTextureScene()
+	{
+		m_pGraphics->SetWindowTitle(L"TextureScene");
+
+		Dive::Scene* pActiveScene = Dive::GetSceneManager()->CreateScene("Test World");
+		Dive::GetSceneManager()->SetActiveScene(pActiveScene);
+
+		// main camera
+		m_pMainCam = pActiveScene->CreateGameObject("MainCam");
+		auto pCamCom = m_pMainCam->AddComponent<Dive::Camera>();
+		pCamCom->SetBackgroundColor(0.0f, 0.0f, 0.0f, 1.0f);
+		m_pMainCam->SetPosition(0.0f, 0.0f, -10.0f);
+		m_pMainCam->LookAt(0.0f, 0.0f, 0.0f);
+
+		// objects
+		{
+			// textures
+			auto pTexDMC = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/dmc.jpg");
+			auto pTexDOKEV = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/dokev.jpeg");
+
+			// models
+			auto pDmcPlaneModel = Dive::ModelFactory::CreatePlane(80, 80);
+			Dive::GetResourceManager()->AddManualResource(pDmcPlaneModel);
+
+			auto pDokevPlaneModel = Dive::ModelFactory::CreatePlane(80, 80);
+			Dive::GetResourceManager()->AddManualResource(pDmcPlaneModel);
+
+			// materials
+			auto pDmcMaterial = Dive::CreateMaterial("DmcMaterial");
+			pDmcMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexDMC);
+			Dive::GetResourceManager()->AddManualResource(pDmcMaterial);
+
+			auto pDokevMaterial = Dive::CreateMaterial("DokevMaterial");
+			pDokevMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexDOKEV);
+			Dive::GetResourceManager()->AddManualResource(pDokevMaterial);
+
+			// gameobjects
+			auto pDmcPlane = pActiveScene->CreateGameObject("DmcPlane");
+			pDmcPlane->SetPosition(50, 0.0f, 120.0f);
+			pDmcPlane->SetRotation(-90.0f, 0.0f, 0.0f);
+			auto pRenderableCom = pDmcPlane->AddComponent<Dive::Renderable>();
+			auto pPlaneMesh = pDmcPlaneModel->GetMeshAt();
+			pRenderableCom->SetGeometry(pPlaneMesh, 0, pPlaneMesh->GetVertexCount(), 0, pPlaneMesh->GetIndexCount());
+			pRenderableCom->SetMaterial(pDokevMaterial);
+			pDmcPlaneModel->SetRootObject(pDmcPlane);
+
+			auto pDokevPlane = pActiveScene->CreateGameObject("DokevPlane");
+			pDokevPlane->SetPosition(-50, 0.0f, 120.0f);
+			pDokevPlane->SetRotation(-90.0f, 0.0f, 0.0f);
+			pRenderableCom = pDokevPlane->AddComponent<Dive::Renderable>();
+			pPlaneMesh = pDokevPlaneModel->GetMeshAt();
+			pRenderableCom->SetGeometry(pPlaneMesh, 0, pPlaneMesh->GetVertexCount(), 0, pPlaneMesh->GetIndexCount());
+			pRenderableCom->SetMaterial(pDmcMaterial);
+			pDokevPlaneModel->SetRootObject(pDokevPlane);
+		}
+
+		// Directional Light
+		m_pDirLightA = pActiveScene->CreateGameObject("DirectionalLight");
+		m_pDirLightA->SetRotation(0.0f, 0.0f, 0.0f);
+		auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
+		pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
+		pDirLightCom->SetType(Dive::eLightType::Directional);
+
+		m_SceneType = eSceneType::Texture;
 	}
 }

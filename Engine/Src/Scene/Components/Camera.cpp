@@ -21,8 +21,7 @@ namespace Dive
 		m_FarClipPlane = 1000.0f;
 		m_MoveSpeed = 10.0f;
 		m_RotateSpeed = 50.0f;
-		m_Viewport = {0, 0, (LONG)Graphics::GetInstance()->GetResolutionWidth(), (LONG)Graphics::GetInstance()->GetResolutionHeight()};
-
+		
 		ZeroMemory(&m_CBufferVS, sizeof(VSConstBuf_Camera));
 		ZeroMemory(&m_CBufferPS, sizeof(PSConstBuf_Camera));
 	}

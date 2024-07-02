@@ -53,10 +53,8 @@ namespace Dive
     private:
         std::string m_Name;
 
-        // urho는 이 부분이 버퍼 내부에 들어간다.
-        // 버퍼를 외부에서 먼저 생성한 후 mesh에 포함시키는 형태다.
-        // 그런데 geometry는 또 raw data라며 가지고 있다... 심지어 vertex element까지...
-        // => 굳이 urho를 따라할 필요는 없다는 결론을 내렸다.
+        // 1. BonuingBox를 만들려면 적어도 정점 정보는 가지고 있어야 하는 것이 맞다.
+        // 2. VertexSkinned를 관리하려면 상속 클래스를 만드는 편이 나아보인다. 
         std::vector<VertexStatic> m_Vertices;
         std::vector<uint32_t> m_Indices;
 

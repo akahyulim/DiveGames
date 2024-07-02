@@ -10,7 +10,6 @@
 #include "Core/Application.h"
 
 // Graphics
-#include "Graphics/GraphicsDefs.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/GraphicsEvents.h"
 #include "Graphics/RenderTexture.h"
@@ -20,10 +19,8 @@
 #include "Graphics/ConstantBuffer.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Texture2D.h"
-#include "Graphics/Pipeline.h"
 
 // Renderer
-#include "Renderer/RendererDefs.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/ViewScreen.h"
 #include "Renderer/Mesh.h"
@@ -48,7 +45,6 @@
 #include "Resource/Importer/ModelLoader.h"
 #include "Resource/Resource.h"
 #include "Resource/ResourceManager.h"
-#include "Resource/Image.h"
 
 // Scene
 #include "Scene/Scene.h"

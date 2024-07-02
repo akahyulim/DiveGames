@@ -54,9 +54,6 @@
     <ClInclude Include="Src\Core\Object.h">
       <Filter>Src\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\GraphicsDefs.h">
-      <Filter>Src\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Resource\Resource.h">
       <Filter>Src\Resource</Filter>
     </ClInclude>
@@ -69,9 +66,6 @@
     <ClInclude Include="Src\IO\FileStream.h">
       <Filter>Src\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Resource\Image.h">
-      <Filter>Src\Resource</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Graphics\GraphicsEvents.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
@@ -80,9 +74,6 @@
     </ClInclude>
     <ClInclude Include="Src\Core\Log.h">
       <Filter>Src\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Renderer\RendererDefs.h">
-      <Filter>Src\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="Src\Core\Application.h">
       <Filter>Src\Core</Filter>
@@ -165,7 +156,10 @@
     <ClInclude Include="Src\Input\Input.h">
       <Filter>Src\Input</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\Pipeline.h">
+    <ClInclude Include="Src\Graphics\Graphics.h">
+      <Filter>Src\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Graphics\GBuffer.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -190,9 +184,6 @@
     </ClCompile>
     <ClCompile Include="Src\IO\FileStream.cpp">
       <Filter>Src\IO</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Resource\Image.cpp">
-      <Filter>Src\Resource</Filter>
     </ClCompile>
     <ClCompile Include="Src\Math\Math.cpp">
       <Filter>Src\Math</Filter>
@@ -281,7 +272,7 @@
     <ClCompile Include="Src\Input\Input.cpp">
       <Filter>Src\Input</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\Pipeline.cpp">
+    <ClCompile Include="Src\Graphics\GBuffer.cpp">
       <Filter>Src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

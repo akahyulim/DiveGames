@@ -110,8 +110,8 @@ namespace Dive
 	}
 
 	Shader::Shader()
-		: m_pVertexShaderBlob(nullptr)
-		, m_Type(eShaderType::Undefined)
+		: m_Type(eShaderType::Undefined)
+		, m_pDevice(Graphics::GetInstance()->GetDevice())
 		, m_pVertexShader(nullptr)
 		, m_pHullShader(nullptr)
 		, m_pDomainShader(nullptr)
@@ -119,6 +119,7 @@ namespace Dive
 		, m_pPixelShader(nullptr)
 		, m_pInputLayout(nullptr)
 	{
+		DV_ENGINE_ASSERT(m_pDevice);
 	}
 	
 	Shader::~Shader()
@@ -128,7 +129,6 @@ namespace Dive
 		DV_RELEASE(m_pDomainShader);
 		DV_RELEASE(m_pHullShader);
 		DV_RELEASE(m_pVertexShader);
-		DV_RELEASE(m_pVertexShaderBlob);
 		DV_RELEASE(m_pInputLayout);
 
 		DV_ENGINE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
@@ -140,12 +140,10 @@ namespace Dive
 	{
 		ID3D10Blob* pShaderBlob = CompileFromFile(filename, type);
 	
-		auto pDevice = GetGraphics()->GetDevice();
-
 		switch (type)
 		{
 		case eShaderType::Vertex:
-			if (FAILED(pDevice->CreateVertexShader(
+			if (FAILED(m_pDevice->CreateVertexShader(
 				pShaderBlob->GetBufferPointer(), 
 				pShaderBlob->GetBufferSize(), 
 				NULL, 
@@ -160,7 +158,7 @@ namespace Dive
 
 			break;
 		case eShaderType::Hull:
-			if (FAILED(pDevice->CreateHullShader(
+			if (FAILED(m_pDevice->CreateHullShader(
 				pShaderBlob->GetBufferPointer(), 
 				pShaderBlob->GetBufferSize(), 
 				NULL, 
@@ -171,7 +169,7 @@ namespace Dive
 			}
 			break;
 		case eShaderType::Domain:
-			if (FAILED(pDevice->CreateDomainShader(
+			if (FAILED(m_pDevice->CreateDomainShader(
 				pShaderBlob->GetBufferPointer(), 
 				pShaderBlob->GetBufferSize(), 
 				NULL, 
@@ -182,7 +180,7 @@ namespace Dive
 			}
 			break;
 		case eShaderType::Pixel:
-			if (FAILED(pDevice->CreatePixelShader(
+			if (FAILED(m_pDevice->CreatePixelShader(
 				pShaderBlob->GetBufferPointer(), 
 				pShaderBlob->GetBufferSize(), 
 				NULL, 
@@ -193,7 +191,7 @@ namespace Dive
 			}
 			break;
 		case eShaderType::Compute:
-			if (FAILED(pDevice->CreateComputeShader(
+			if (FAILED(m_pDevice->CreateComputeShader(
 				pShaderBlob->GetBufferPointer(),
 				pShaderBlob->GetBufferSize(),
 				NULL,
@@ -214,56 +212,7 @@ namespace Dive
 
 		return true;
 	}
-
-	bool Shader::CreateInputLayout(eInputLayout layout)
-	{
-		DV_ENGINE_ASSERT(m_pVertexShaderBlob);
-
-		auto inputElements = GetInputElements(layout);
-
-		if (FAILED(GetGraphics()->GetDevice()->CreateInputLayout(
-			inputElements.data(),
-			static_cast<UINT>(inputElements.size()),
-			m_pVertexShaderBlob->GetBufferPointer(),
-			m_pVertexShaderBlob->GetBufferSize(),
-			&m_pInputLayout)))
-		{
-			DV_ENGINE_ERROR("InputLayout 생성에 실패하였습니다.");
-
-			return false;
-		}
-
-		return true;
-	}
-
-	void Shader::Bind()
-	{
-		auto pDeviceContext = GetGraphics()->GetDeviceContext();
-
-		switch (m_Type)
-		{
-		case eShaderType::Vertex:
-			pDeviceContext->IASetInputLayout(m_pInputLayout);
-			pDeviceContext->VSSetShader(m_pVertexShader, nullptr, 0);
-			break;
-		case eShaderType::Hull:
-			pDeviceContext->HSSetShader(m_pHullShader, nullptr, 0);
-			break;
-		case eShaderType::Domain:
-			pDeviceContext->DSSetShader(m_pDomainShader, nullptr, 0);
-			break;
-		case eShaderType::Compute:
-			pDeviceContext->CSSetShader(m_pComputeShader, nullptr, 0);
-			break;
-		case eShaderType::Pixel:
-			pDeviceContext->PSSetShader(m_pPixelShader, nullptr, 0);
-			break;
-		default:
-			DV_ENGINE_ERROR("올바른 셰이더 타입이 아닙니다. 셰이더를 연결할 수 없습니다.");
-			return;
-		}
-	}
-
+	
 	bool Shader::createInputLayout(ID3D10Blob* pShaderBlob, eInputLayout layout)
 	{
 		DV_ENGINE_ASSERT(pShaderBlob);
@@ -271,7 +220,7 @@ namespace Dive
 
 		auto inputElements = GetInputElements(layout);
 
-		if (FAILED(GetGraphics()->GetDevice()->CreateInputLayout(
+		if (FAILED(m_pDevice->CreateInputLayout(
 			inputElements.data(),
 			static_cast<UINT>(inputElements.size()),
 			pShaderBlob->GetBufferPointer(),

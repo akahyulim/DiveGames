@@ -10,9 +10,5 @@ Texture2D<float4> SpecPowTex : register(t6);
 
 Texture2D<float> SpotShadowMap : register(t7);
 
-// 역시 s0 ~ s15까지
-SamplerState DiffuseMapSampler : register(s0);
-SamplerState NormalMapSampler : register(s1);
-SamplerState SpecularMapSampler : register(s2);
-
-SamplerComparisonState SpotPCFSampler : register(s7);
+SamplerState BaseSampler : register(s0);
+SamplerComparisonState PcfSampler : register(s1);

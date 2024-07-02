@@ -1,14 +1,14 @@
 #pragma once
 #include "Core/CoreDefs.h"
-#include "GraphicsDefs.h"
 #include "Graphics.h"
+#include "Shader.h"		// eShaderType 때문에... 
 
 namespace Dive
 {
 	class ConstantBuffer
 	{
 	public:
-		ConstantBuffer(const std::string& name, eShaderType type, uint32_t slot);
+		ConstantBuffer(const std::string& name, eShaderType type, uint32_t index);
 		~ConstantBuffer();
 
 		template<typename T>
@@ -40,17 +40,16 @@ namespace Dive
 
 		void Bind();
 
-		uint32_t GetSlot() const { return m_Slot; }
+		uint32_t GetIndex() const { return m_Index; }
 		std::string GetName() const { return m_Name; }
-		ID3D11Buffer* GetBufferNew() const { return m_pBuffer; }
-		ID3D11Buffer* const* GetBuffer() const{ return &m_pBuffer; }
+		ID3D11Buffer* GetBuffer() const { return m_pBuffer; }
 		uint32_t GetStride() const { return m_Stride; }
 		eShaderType GetShaderType() const { return m_ShaderType; }
 
 		template<typename T>
-		static ConstantBuffer* Create(const std::string& name, eShaderType type, uint32_t slot)
+		static ConstantBuffer* Create(const std::string& name, eShaderType type, uint32_t index)
 		{
-			auto pBuffer = new ConstantBuffer(name, type, slot);
+			auto pBuffer = new ConstantBuffer(name, type, index);
 			pBuffer->CreateBuffer<T>();
 
 			return pBuffer;
@@ -60,10 +59,10 @@ namespace Dive
 		std::string m_Name;
 		eShaderType m_ShaderType;
 
-		uint32_t m_Slot;
+		uint32_t m_Index;
 
 		ID3D11Buffer* m_pBuffer;
 
-		uint32_t m_Stride;
+		uint32_t m_Stride; // eVSConstBufType로 관리하는 편이 낫다. renderer.h에 선언되어 있다.
 	};
 }

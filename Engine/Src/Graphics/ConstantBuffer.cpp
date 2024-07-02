@@ -3,10 +3,10 @@
 
 namespace Dive
 {
-	ConstantBuffer::ConstantBuffer(const std::string& name, eShaderType type, uint32_t slot)
+	ConstantBuffer::ConstantBuffer(const std::string& name, eShaderType type, uint32_t index)
 		: m_Name(name)
 		, m_ShaderType(type)
-		, m_Slot(slot)
+		, m_Index(index)
 		, m_pBuffer(nullptr)
 		, m_Stride(0)
 	{
@@ -39,7 +39,7 @@ namespace Dive
 		Graphics::GetInstance()->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer), 0);
 	}
 
-	// start slot도 변수로 관리해야 하나?
+	// start index도 변수로 관리해야 하나?
 	void ConstantBuffer::Bind()
 	{
 		auto pDeviceContext = Graphics::GetInstance()->GetDeviceContext();
@@ -47,10 +47,10 @@ namespace Dive
 		switch (m_ShaderType)
 		{
 		case eShaderType::Vertex:
-			pDeviceContext->VSSetConstantBuffers(m_Slot, 1, &m_pBuffer);
+			pDeviceContext->VSSetConstantBuffers(m_Index, 1, &m_pBuffer);
 			return;
 		case eShaderType::Pixel:
-			pDeviceContext->PSSetConstantBuffers(m_Slot, 1, &m_pBuffer);
+			pDeviceContext->PSSetConstantBuffers(m_Index, 1, &m_pBuffer);
 			return;
 		default:
 			DV_ENGINE_ERROR("셰이더 타입을 불분명해 바인딩할 수 없습니다.");

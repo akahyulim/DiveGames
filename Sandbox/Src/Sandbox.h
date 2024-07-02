@@ -8,7 +8,8 @@ namespace Sandbox
 		Base,
 		Car,
 		Sponza,
-		Shadow
+		Shadow,
+		Texture
 	};
 
 	class Sandbox : public Dive::Application
@@ -28,8 +29,12 @@ namespace Sandbox
 		void createCarScene();
 		void createSponzaScene();
 		void createShadowScene();
+		void createTextureScene();
 
 	private:
+		Dive::Graphics* m_pGraphics;
+		Dive::Input* m_pInput;
+
 		Dive::GameObject* m_pMainCam;
 
 		Dive::GameObject* m_pDummy;

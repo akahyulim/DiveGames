@@ -1,29 +1,31 @@
 #pragma once
-#include "RendererDefs.h"		// 추후 이 곳으로 흡수시키기
+#include "Graphics/Graphics.h"
 
 namespace Dive
 {
-	class ViewScreen;
-	class RenderTexture;
-	class ConstantBuffer;
-	class Shader;
-
-	enum class eVSConstBuf
+	//-------------------------------------------------------------------------------------
+	// enum class
+	//-------------------------------------------------------------------------------------
+	enum class eRenderPathType : uint8_t
 	{
-		Model,
-		Camera,
-		Light,
+		Forward = 0,
+		Deferred
+	};
+
+	enum class eRenderTargetType : uint8_t
+	{
+		GBuffer_DepthStencil = 0,
+		GBuffer_Color_SpecIntensity,
+		GBuffer_Normal,
+		GBuffer_SpecPower,
+		FrameRender,
+		FrameOutput,
 		Count
 	};
 
-	enum class ePSConstBuf
-	{
-		Model,
-		Camera,
-		Light,
-		Count
-	};
-
+	//-------------------------------------------------------------------------------------
+	// structures: VS, PS Constant Buffers
+	//-------------------------------------------------------------------------------------
 	struct VSConstBuf_Model
 	{
 		DirectX::XMMATRIX world;
@@ -72,7 +74,7 @@ namespace Dive
 
 		DirectX::XMFLOAT3 direction;
 		float innerConeAngle;
-		
+
 		uint32_t options;
 		int shadowEnabled;
 		DirectX::XMFLOAT2 padding;
@@ -80,46 +82,19 @@ namespace Dive
 		DirectX::XMMATRIX shadow;
 	};
 
-	enum class eDepthStencilState : uint8_t
-	{
-		DepthReadWrite,
-		DepthReadWrite_StencilReadWrite,
-		GBuffer,
-		DepthDisabled,   // skydome에서 off용으로...
-		ForwardLight,
-		Count
-	};
+	//-------------------------------------------------------------------------------------
+	// forward declarations
+	//-------------------------------------------------------------------------------------
+	class ViewScreen;
+	class RenderTexture;
+	class ConstantBuffer;
+	class Shader;
 
-	enum class eGBuffer : uint8_t
-	{
-		DepthStencil,
-		ColorSpecIntensity,
-		Normal,
-		SpecPower,
-		Count
-	};
-
-	enum class eShader : uint8_t
-	{
-		LightDepth,
-		ForwardLightShadow,
-		Deferred,
-		DeferredLights,
-		Count
-	};
-
-	enum class eRendererShader : uint8_t
-	{
-		Depth_VS,
-		ForwardLight_VS,
-		ForwardLight_PS,
-		GBuffer_VS,
-		GBuffer_PS,
-		DeferredLight_VS,
-		DeferredLight_PS,
-		Count
-	};
-
+	// urho3d는 뷰포트와 각종 렌더링 설정(그림자, 테크닉, 필터모드, 그림자 맵 사이즈 등)을 관리하고
+	// 이들을 이용해 update와 render를 수행한다.
+	// 정확하게는 manages drawing of 3d views라고 설명해 놓았다.
+	// 문제는 urho3d처럼 구조를 짤 때 리소스들의 생성을 누가 하느냐이다.
+	// => 몇몇 요소는 Graphics에서 동적으로 생성하며 직접 관리하는 듯 하다.
 	class Renderer
 	{
 	public:
@@ -140,51 +115,42 @@ namespace Dive
 		void Update();
 		void Render();
 
-		uint32_t GetNumViewScreens() { return (uint32_t)m_ViewScreens.size(); }
+		uint32_t GetNumViewScreens() { return static_cast<uint32_t>(m_ViewScreens.size()); }
 		void SetNumViewScreens(uint32_t count);
 
 		ViewScreen* GetViewScreen(uint32_t index);
 		void SetViewScreen(uint32_t index, ViewScreen* pViewScreen);
 
-		ID3D11RasterizerState* GetRasterizerState(eRasterizerState rs) { return m_RasterizerStates[(size_t)rs]; }
-		ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilState ds) { return m_DepthStencilStates[(size_t)ds]; }
-		ID3D11BlendState* GetBlendState(eBlendState bs) { return m_BlendStates[(size_t)bs]; }
+		ConstantBuffer* GetVSConstantBuffer(eVSConstBufType type) const { return m_VSConstantBuffers[static_cast<uint8_t>(type)]; }
+		ConstantBuffer* GetPSConstantBuffer(ePSConstBufType type) const { return m_PSConstantBuffers[static_cast<uint8_t>(type)]; }
 
-		ConstantBuffer* GetVSConstantBuffer(eVSConstBuf type) { return m_VSConstantBuffers[(uint32_t)type]; }
-		ConstantBuffer* GetPSConstantBuffer(ePSConstBuf type) { return m_PSConstantBuffers[(uint32_t)type]; }
+		ID3D11SamplerState* GetSampler(eSamplerType type) const { return m_Samplers[static_cast<uint8_t>(type)]; }
 
-		Shader* GetShader(eRendererShader type) { return m_Shaders[static_cast<uint32_t>(type)]; }
-
-		RenderTexture* GetGBufferTexture(eGBuffer type) { return m_GBuffer[(size_t)type]; }
+		bool IsInitialized() const { return m_bInitialized; }
 
 	private:
 		Renderer();
 		~Renderer();
 
-		void createRasterizerStates();
-		void createDepthStencilStates();
-		void createBlendStates();
-		void createRenderTextures();
-		void createConstantBuffers();
-		void createShaders();
-		void createGBuffer();
+		bool createRenderTextures();
+		bool createConstantBuffers();
+		bool createSamplers();
 
 	private:
 		static Renderer* s_pInstance;
 
+		ID3D11Device* m_pDevice;
+
 		std::vector<ViewScreen*> m_ViewScreens;	// 유니티의 레이어와는 다르다. 착각하지 말자.
 
-		std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> m_RasterizerStates;
-		std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> m_DepthStencilStates;
-		std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> m_BlendStates;
-		std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> m_RenderTargets;
+		std::array<RenderTexture*, static_cast<uint8_t>(eRenderTargetType::Count)> m_RenderTargets;
 
-		std::array<ConstantBuffer*, static_cast<size_t>(eVSConstBuf::Count)> m_VSConstantBuffers;
-		std::array<ConstantBuffer*, static_cast<size_t>(ePSConstBuf::Count)> m_PSConstantBuffers;
+		std::array<ConstantBuffer*, static_cast<uint8_t>(eVSConstBufType::Count)> m_VSConstantBuffers;
+		std::array<ConstantBuffer*, static_cast<uint8_t>(ePSConstBufType::Count)> m_PSConstantBuffers;
+		
+		std::array<ID3D11SamplerState*, static_cast<uint8_t>(eSamplerType::Count)> m_Samplers;
 
-		std::array<Shader*, static_cast<uint32_t>(eRendererShader::Count)> m_Shaders;
-
-		std::array<RenderTexture*, static_cast<size_t>(eGBuffer::Count)> m_GBuffer;
+		bool m_bInitialized;
 	};
 
 	Renderer* GetRenderer();

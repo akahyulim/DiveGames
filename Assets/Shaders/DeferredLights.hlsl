@@ -3,10 +3,10 @@
 // 이건 클립 스페이스다.( -1.0 ~ 1.0 )
 static const float2 arrBasePos[4] =
 {
-    float2(-1.0, 1.0), // 좌상
-	float2(1.0, 1.0), // 우상
+    float2(-1.0, 1.0),  // 좌상
+	float2(1.0, 1.0),   // 우상
 	float2(-1.0, -1.0), // 좌하
-	float2(1.0, -1.0), // 우하
+	float2(1.0, -1.0),  // 우하
 };
 
 struct VS_OUTPUT
@@ -52,6 +52,7 @@ float3 CalcuDirLight(float3 worldPos, float3 normal, float3 diff)
     
     return finalColor * diff;
 }
+
 float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diff)
 {
     float3 toLight = cbLightPixel.position - worldPos;
@@ -139,4 +140,5 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
         lightColor = CalcuSpotLight(position.xyz, normal, diffMap.xyz);
     
     return float4(lightColor.xyz, 1.0f);
+    //return float4(diffMap.xyz, 1.0f);
 }

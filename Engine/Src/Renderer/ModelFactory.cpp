@@ -3,7 +3,7 @@
 #include "Mesh.h"
 #include "Model.h"
 #include "Core/CoreDefs.h"
-#include "Graphics/GraphicsDefs.h"
+#include "Graphics/Graphics.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Math/Math.h"
@@ -29,6 +29,10 @@ namespace Dive
 
 			std::vector<uint32_t> indices;
 			indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
+
+			// vb, ib는 이런식으로 생성한 후 mesh에 추가할 수 있다.
+			VertexBuffer vb;
+			vb.CreateBuffer(vertices.data(), sizeof(VertexStatic), static_cast<uint32_t>(vertices.size()));
 
 			Mesh* pMesh = new Mesh;
 			pMesh->AddVertices(vertices);

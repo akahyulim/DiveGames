@@ -11,8 +11,8 @@ namespace Dive
 		Resource();
 		virtual ~Resource() = default;
 
-		virtual bool LoadFromFile(const std::string& fileName) { return true; }
-		virtual bool SaveToFile(const std::string& fileName) { return true; }
+		virtual bool LoadFromFile(const std::string& filename) { return true; }
+		virtual bool SaveToFile(const std::string& filename) { return true; }
 
 		void SetName(const std::string& name);
 		const std::string& GetName() const { return m_Name; }

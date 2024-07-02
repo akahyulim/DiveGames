@@ -21,11 +21,8 @@ namespace Dive
 		, m_bShadowEnabled(true)
 	{
 		m_pShadowMap = new RenderTexture();
-		m_pShadowMap->SetDepthStencil(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
-		m_pShadowMap->SetAddressMode(D3D11_TEXTURE_ADDRESS_CLAMP);
-		m_pShadowMap->SetFilter(D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR);
-		m_pShadowMap->SetComparisonFunc(D3D11_COMPARISON_LESS_EQUAL);
-
+		m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
+		
 		ZeroMemory(&m_CBufferVS, sizeof(VSConstBuf_Light));
 		ZeroMemory(&m_CBufferPS, sizeof(PSConstBuf_Light));
 	}
@@ -93,11 +90,12 @@ namespace Dive
 
 	DirectX::XMMATRIX Light::GetShaodwMatrix()
 	{
+		// rasterTek에서는 직교투영행렬을 사용한다.
 		return DirectX::XMMatrixMultiply(GetViewMatrix(), GetProjectionMatrix());
 	}
 
 	void Light::SetShadowMapSize(float size)
-	{
+	{ 
 		// 추후 2의 제곱으로 확인해야 할 듯
 		if (m_ShadowMapSize == size)
 			return;
@@ -105,6 +103,6 @@ namespace Dive
 		m_ShadowMapSize = size;
 
 		// 갱신을 위해 필요하다. 추후 좀 다듬자.
-		m_pShadowMap->SetDepthStencil(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
+		m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
 	}
 }

@@ -41,8 +41,8 @@ namespace Dive
 
 		m_CBufferPS.diffuseColor = m_pMaterial->GetDiffuseColor();
 		m_CBufferPS.properties = 0;
-		m_CBufferPS.properties |= m_pMaterial->HasTexture(eTextureUnit::Diffuse) ? (1U << 0) : 0;
-		m_CBufferPS.properties |= m_pMaterial->HasTexture(eTextureUnit::Normal) ? (1U << 1) : 0;
+		m_CBufferPS.properties |= m_pMaterial->HasTexture(eTextureUnitType::Diffuse) ? (1U << 0) : 0;
+		m_CBufferPS.properties |= m_pMaterial->HasTexture(eTextureUnitType::Normal) ? (1U << 1) : 0;
 	}
 	
 	// 렌더러블이 그릴 메시의 정보를 받는 메서드다.
@@ -90,18 +90,19 @@ namespace Dive
 		return m_TransformdBoundingBox;
 	}
 
+	// 제거대상 - 사용하지 않는다.
 	void Renderable::Draw(D3D11_PRIMITIVE_TOPOLOGY topology) const
 	{
 		if (GetIndexBuffer() && GetIndexCount() > 0)
 		{
 			Graphics::GetInstance()->SetVertexBuffer(GetVertexBuffer());
 			Graphics::GetInstance()->SetIndexBuffer(GetIndexBuffer());
-			Graphics::GetInstance()->DrawIndexed(topology, m_IndexCount, m_IndexOffset);
+			Graphics::GetInstance()->DrawIndexed(m_IndexCount, m_IndexOffset);
 		}
 		else if (GetVertexCount() > 0)
 		{
 			Graphics::GetInstance()->SetVertexBuffer(GetVertexBuffer());
-			Graphics::GetInstance()->Draw(topology, m_VertexCount, m_VertexOffset);
+			Graphics::GetInstance()->Draw(m_VertexCount, m_VertexOffset);
 		}
 	}
 }

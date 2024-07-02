@@ -1,6 +1,5 @@
 #include "DivePch.h"
 #include "Resource.h"
-#include "Image.h"
 #include "Graphics/Texture2D.h"
 #include "Graphics/RenderTexture.h"
 #include "Graphics/Shader.h"

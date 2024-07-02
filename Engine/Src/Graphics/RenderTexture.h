@@ -3,8 +3,6 @@
 
 namespace Dive
 {
-	// srv는 기본 제공
-	// rtv or dsv 선택 제공
 	class RenderTexture : public Texture
 	{
 		DV_CLASS(RenderTexture, Texture);
@@ -13,21 +11,23 @@ namespace Dive
 		RenderTexture();
 		~RenderTexture() override;
 
-		bool SetRenderTarget(int width, int height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
-		bool SetDepthStencil(int width, int height, DXGI_FORMAT format, bool readOnly = false);
+		bool CreateRenderTargetView(uint32_t width, uint32_t height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMipMap = true);
+		bool CreateDepthStencilView(uint32_t width, uint32_t height, DXGI_FORMAT format, bool readOnly = false);
+		void Release();
 
+		ID3D11ShaderResourceView* GetShaderResourceView() override { return m_pShaderResourceView; }
+		
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_pRenderTargetView; }
 		ID3D11DepthStencilView* GetDepthStencilView() const { return m_pDepthStencilView; }
-		ID3D11DepthStencilView* GetDepthStencilViewReadOnly() const { return m_pDepthStencilViewReadOnly; }
+
+		bool IsDepthReadOnly() const { return m_bDepthReadOnly; }
 
 	private:
-		bool createResources() override;
-
-	private:
+		ID3D11Texture2D* m_pTexture2D;
+		ID3D11ShaderResourceView* m_pShaderResourceView;
 		ID3D11RenderTargetView* m_pRenderTargetView;
 		ID3D11DepthStencilView* m_pDepthStencilView;
-		ID3D11DepthStencilView* m_pDepthStencilViewReadOnly;
 
-		bool m_bReadOnly;
+		bool m_bDepthReadOnly;
 	};
 }

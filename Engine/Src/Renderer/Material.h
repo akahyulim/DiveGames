@@ -1,11 +1,13 @@
 #pragma once
-#include "Graphics/GraphicsDefs.h"
+#include "Graphics/Graphics.h"
 #include "Resource/Resource.h"
 
 namespace Dive
 {
 	class Texture;
 
+	// 현재 Texture는 opaque 여부를 판단하지 않는다.
+	// 이는 유니티의 설정을 따른 것으로, 유니티의 경우 머티리얼에서 확인한다.
 	// 현재는 legacy다. 추후 pbs가 추가될 수 있다.
 	class Material : public Resource
 	{
@@ -18,11 +20,11 @@ namespace Dive
 		bool LoadFromFile(const std::string& fileName) override;
 		bool SaveToFile(const std::string& fileName) override;
 
-		const std::unordered_map<eTextureUnit, Texture*>& GetTextures() const { return m_Textures; }
-		Texture* GetTexture(eTextureUnit unit) const;
-		void SetTexture(eTextureUnit unit, Texture* pTexture);
-		void AddTexture(eTextureUnit unit, const std::string& name);
-		bool HasTexture(eTextureUnit unit) const;
+		const std::unordered_map<eTextureUnitType, Texture*>& GetTextures() const { return m_Textures; }
+		Texture* GetTexture(eTextureUnitType unit) const;
+		void SetTexture(eTextureUnitType unit, Texture* pTexture);
+		void AddTexture(eTextureUnitType unit, const std::string& name);
+		bool HasTexture(eTextureUnitType unit) const;
 
 		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_DiffuseColor; }
 		void SetDiffuseColor(float r, float g, float b, float a) { m_DiffuseColor = { r, g, b, a }; }
@@ -39,7 +41,8 @@ namespace Dive
 		bool IsOpaque() const;
 
 	private:
-		std::unordered_map<eTextureUnit, Texture*> m_Textures;
+		std::unordered_map<eTextureUnitType, Texture*> m_Textures;
+		
 		DirectX::XMFLOAT4 m_DiffuseColor;
 		DirectX::XMFLOAT2 m_Tiling;
 		DirectX::XMFLOAT2 m_Offset;

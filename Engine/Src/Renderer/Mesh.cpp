@@ -2,7 +2,7 @@
 #include "Mesh.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
-#include "Graphics/GraphicsDefs.h"
+#include "Graphics/Graphics.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Resource/Importer/ModelLoader.h"
@@ -88,6 +88,10 @@ namespace Dive
 
 	void Mesh::CreateBuffers()
 	{
+		// 여기에서 버퍼 생성을 위해 객체에 ID3D11Device를 전달한다면
+		// Mehs는 또 어떻게 해당 객체를 가지고 있느냐는 문제에 빠지게 된다.
+		// 1. 물론 메시는 Graphics나 ID3D11Device를 가지지 않고 이 함수의 매개변수에서 전달받을 순 있다.
+		// 2. 버퍼를 외부에서 생성하고 메시에 포함시키는 방법도 있다.
 		if(!m_Vertices.empty())
 			m_pVertexBuffer = VertexBuffer::Create(m_Vertices.data(), sizeof(VertexStatic), static_cast<uint32_t>(m_Vertices.size()));
 

@@ -1,6 +1,5 @@
 #pragma once
 #include "Component.h"
-#include "Renderer/RendererDefs.h"
 #include "Renderer/Renderer.h"
 
 namespace Dive
@@ -48,11 +47,6 @@ namespace Dive
 		float GetFarClipPlane() const { return m_FarClipPlane; }
 		void SetFarClipPlane(float farPlane) { m_FarClipPlane = farPlane; }
 
-		// 뷰포트라기보단 비율을 설정할 수 있었던 것인데
-		// 어느샌가 기능이 누락된 듯 하다.
-		const RECT& GetViewport() const { return m_Viewport; }
-		void SetViewport(const RECT& rt) { m_Viewport = rt; }
-
 		float GetMoveSpeed() const { return m_MoveSpeed; }
 		void SetMoveSpeed(float speed) { m_MoveSpeed = speed; }
 
@@ -79,8 +73,6 @@ namespace Dive
 
 		float m_MoveSpeed;
 		float m_RotateSpeed;
-
-		RECT m_Viewport;
 
 		RenderTexture* m_pRenderTarget;
 
