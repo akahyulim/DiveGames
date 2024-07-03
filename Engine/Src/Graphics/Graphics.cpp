@@ -311,12 +311,9 @@ namespace Dive
 		}
 	}
 
-	// 현재 Texture2D에 DepthStencilView가 없다.
-	// RenderTexture에 있다.
 	void Graphics::BindDepthStencilView(RenderTexture* pTexture)
 	{
-		ID3D11DepthStencilView* pDsv{};
-		
+		BindDepthStencilView(pTexture ? pTexture->GetDepthStencilView() : nullptr);
 	}
 
 	void Graphics::ClearViews(uint8_t flags, const DirectX::XMFLOAT4& color, float depth, uint8_t stencil)
@@ -893,7 +890,49 @@ namespace Dive
 			}
 		}
 
-		// GBuffe - Depth Stencil Mark DS(Less에다가 Stencil을 적용)
+		// GBuffer - 책 참고. GBuffer에 쓰는 깊이 테스트
+		{
+			ZeroMemory(&desc, sizeof(desc));
+			desc.DepthEnable = TRUE;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			desc.DepthFunc = D3D11_COMPARISON_LESS;
+			desc.StencilEnable = TRUE;
+			desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+			desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+			const D3D11_DEPTH_STENCILOP_DESC op = { D3D11_STENCIL_OP_REPLACE, D3D11_STENCIL_OP_REPLACE, D3D11_STENCIL_OP_REPLACE, D3D11_COMPARISON_ALWAYS };
+			desc.FrontFace = op;
+			desc.BackFace = op;
+
+			index = static_cast<uint8_t>(eDepthStencilStateType::GBuffer);
+
+			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
+			{
+				DV_ENGINE_ERROR("DepthStencilState GBuffer 생성에 실패하였습니다.");
+				return false;
+			}
+		}
+
+		// Light - 책 참고. GBuffer 후 Light를 적용할 때 readOnly dsv를 사용하여 깊이 테스트
+		{
+			ZeroMemory(&desc, sizeof(desc));
+			desc.DepthEnable = TRUE;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+			desc.DepthFunc = D3D11_COMPARISON_LESS;
+			desc.StencilEnable = TRUE;
+			desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+			desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+			const D3D11_DEPTH_STENCILOP_DESC op = { D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_COMPARISON_EQUAL };
+			desc.FrontFace = op;
+			desc.BackFace = op;
+
+			index = static_cast<uint8_t>(eDepthStencilStateType::Light);
+
+			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
+			{
+				DV_ENGINE_ERROR("DepthStencilState Light 생성에 실패하였습니다.");
+				return false;
+			}
+		}
 
 		// Depth Less / No Write, Stencil Mark DS
 
@@ -1050,13 +1089,13 @@ namespace Dive
 			m_VertexShaders[index] = pShader;
 
 			pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/Deferred.hlsl", eShaderType::Vertex, eInputLayout::Static_Model))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/GBuffer.hlsl", eShaderType::Vertex, eInputLayout::Static_Model))
 				return false;
 			index = static_cast<uint8_t>(eVertexShaderType::GBuffer);
 			m_VertexShaders[index] = pShader;
 
 			pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredLights.hlsl", eShaderType::Vertex, eInputLayout::Pos))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredLight.hlsl", eShaderType::Vertex, eInputLayout::Pos))
 				return false;
 			index = static_cast<uint8_t>(eVertexShaderType::DeferredLight);
 			m_VertexShaders[index] = pShader;
@@ -1074,13 +1113,13 @@ namespace Dive
 			m_PixelShaders[index] = pShader;
 
 			pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/Deferred.hlsl", eShaderType::Pixel))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/GBuffer.hlsl", eShaderType::Pixel))
 				return false;
 			index = static_cast<uint8_t>(ePixelShaderType::GBuffer);
 			m_PixelShaders[index] = pShader;
 
 			pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredLights.hlsl", eShaderType::Pixel))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredLight.hlsl", eShaderType::Pixel))
 				return false;
 			index = static_cast<uint8_t>(ePixelShaderType::DeferredLight);
 			m_PixelShaders[index] = pShader;

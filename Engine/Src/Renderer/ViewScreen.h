@@ -42,8 +42,10 @@ namespace Dive
 		void passDepth();
 		void passOpaqueDraw();
 		void passTransparentDraw();
-
 		void forwardRender();
+
+		void passGBuffer();
+		void passLight();
 		void deferredRender();
 
 	private:
@@ -55,6 +57,14 @@ namespace Dive
 		eRenderPathType m_RenderPath;
 
 		std::unordered_map<eRenderableType, std::vector<GameObject*>> m_Renderables;
+
+		// LightManager를 만드는 것도 생각해보자.
+		GameObject* m_pDirectionalLight;
+		std::vector<GameObject*> m_SpotLights;
+		std::vector<GameObject*> m_PointLights;
+
+		std::vector<GameObject*> m_OpaqueModels;
+		std::vector<GameObject*> m_TransparentModels;
 
 		GBuffer m_GBuffer;
 		Frustum m_Frustum;

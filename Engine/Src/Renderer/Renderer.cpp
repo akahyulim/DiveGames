@@ -136,10 +136,9 @@ namespace Dive
 			desc.AddressU = desc.AddressV = desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 			desc.MaxAnisotropy = 1;
 			desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-			desc.MinLOD = -FLT_MAX;
-			desc.MaxLOD = FLT_MAX;
+			desc.MaxLOD = D3D11_FLOAT32_MAX;
 
-			if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_Samplers[static_cast<uint8_t>(eSamplerType::Base)])))
+			if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_Samplers[static_cast<uint8_t>(eSamplerType::Linear)])))
 			{
 				DV_ENGINE_ERROR("Base Sampler 생성에 실패하였습니다.");
 				return false;

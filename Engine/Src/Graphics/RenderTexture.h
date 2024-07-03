@@ -19,15 +19,13 @@ namespace Dive
 		
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_pRenderTargetView; }
 		ID3D11DepthStencilView* GetDepthStencilView() const { return m_pDepthStencilView; }
-
-		bool IsDepthReadOnly() const { return m_bDepthReadOnly; }
+		ID3D11DepthStencilView* GetDepthStencilViewReadOnly() const { return m_pDepthStencilViewReadOnly; }
 
 	private:
 		ID3D11Texture2D* m_pTexture2D;
 		ID3D11ShaderResourceView* m_pShaderResourceView;
 		ID3D11RenderTargetView* m_pRenderTargetView;
 		ID3D11DepthStencilView* m_pDepthStencilView;
-
-		bool m_bDepthReadOnly;
+		ID3D11DepthStencilView* m_pDepthStencilViewReadOnly;
 	};
 }

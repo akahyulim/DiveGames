@@ -15,9 +15,9 @@ namespace Dive
 	enum class eRenderTargetType : uint8_t
 	{
 		GBuffer_DepthStencil = 0,
-		GBuffer_Color_SpecIntensity,
+		GBuffer_Diffuse,
 		GBuffer_Normal,
-		GBuffer_SpecPower,
+		GBuffer_Specular,
 		FrameRender,
 		FrameOutput,
 		Count

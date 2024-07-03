@@ -11,6 +11,8 @@ namespace Dive
 		Null = 0,
 		DepthLess,
 		DepthEqual,
+		GBuffer,
+		Light,
 		Count
 	}; 
 	
@@ -49,7 +51,7 @@ namespace Dive
 
 	enum class eSamplerType : uint8_t
 	{
-		Base = 0,
+		Linear = 0,
 		Pcf,
 		Count
 	};
@@ -61,9 +63,9 @@ namespace Dive
 		Normal,
 		Specular,
 		GBuffer_DepthStencil,
-		GBuffer_Color_SpecIntensity,
+		GBuffer_Diffuse,
 		GBuffer_Normal,
-		GBuffer_SpecPower,
+		GBuffer_Specular,
 		SpotShadowMap,
 		Count
 	};

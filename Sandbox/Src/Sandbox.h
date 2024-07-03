@@ -8,7 +8,7 @@ namespace Sandbox
 		Base,
 		Car,
 		Sponza,
-		Shadow,
+		Field,
 		Texture
 	};
 
@@ -28,7 +28,7 @@ namespace Sandbox
 		void createBaseScene();
 		void createCarScene();
 		void createSponzaScene();
-		void createShadowScene();
+		void createFieldScene();
 		void createTextureScene();
 
 	private:

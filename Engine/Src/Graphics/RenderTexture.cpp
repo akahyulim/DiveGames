@@ -11,7 +11,7 @@ namespace Dive
 		, m_pShaderResourceView(nullptr)
 		, m_pRenderTargetView(nullptr)
 		, m_pDepthStencilView(nullptr)
-		, m_bDepthReadOnly(false)
+		, m_pDepthStencilViewReadOnly(nullptr)
 	{
 	}
 
@@ -122,8 +122,6 @@ namespace Dive
 		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
 		dsvDesc.Format = GetDepthStencilViewFormat(format);
 		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		dsvDesc.Texture2D.MipSlice = 0;
-		dsvDesc.Flags = m_bDepthReadOnly ? D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL : 0;
 
 		if (FAILED(m_pDevice->CreateDepthStencilView(
 			static_cast<ID3D11Resource*>(m_pTexture2D),
@@ -135,6 +133,21 @@ namespace Dive
 			return false;
 		}
 
+		if (readOnly)
+		{
+			dsvDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
+
+			if (FAILED(m_pDevice->CreateDepthStencilView(
+				static_cast<ID3D11Resource*>(m_pTexture2D),
+				&dsvDesc,
+				&m_pDepthStencilViewReadOnly)))
+			{
+				Release();
+				DV_ENGINE_ERROR("DepthStencilViewReadOnly 생성에 실패하였습니다.");
+				return false;
+			}
+		}
+
 		m_Width = width;
 		m_Height = height;
 		m_Format = format;
@@ -144,6 +157,7 @@ namespace Dive
 	
 	void RenderTexture::Release()
 	{
+		DV_RELEASE(m_pDepthStencilViewReadOnly);
 		DV_RELEASE(m_pDepthStencilView);
 		DV_RELEASE(m_pRenderTargetView);
 		DV_RELEASE(m_pShaderResourceView);
