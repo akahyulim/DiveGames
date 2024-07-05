@@ -932,6 +932,16 @@ namespace Dive
 				DV_ENGINE_ERROR("DepthStencilState Light 생성에 실패하였습니다.");
 				return false;
 			}
+
+			desc.DepthEnable = D3D11_COMPARISON_GREATER_EQUAL;
+
+			index = static_cast<uint8_t>(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
+
+			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
+			{
+				DV_ENGINE_ERROR("DepthStencilState NoDepthWriteGreaterStencilMask 생성에 실패하였습니다.");
+				return false;
+			}
 		}
 
 		// Depth Less / No Write, Stencil Mark DS
@@ -1024,7 +1034,8 @@ namespace Dive
 		// Additive
 		{
 			ZeroMemory(&desc, sizeof(desc));
-			//desc.AlphaToCoverageEnable = TRUE;
+			desc.IndependentBlendEnable = FALSE;
+			desc.AlphaToCoverageEnable = FALSE;
 			desc.RenderTarget[0].BlendEnable = TRUE;
 			desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
 			desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;

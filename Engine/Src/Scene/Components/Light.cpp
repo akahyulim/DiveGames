@@ -48,7 +48,7 @@ namespace Dive
 			m_CBufferPS.rangeRcp = 1.0f / GetRange();
 			break;
 		case eLightType::Spot:
-			m_CBufferVS.shadow = DirectX::XMMatrixTranspose(GetShaodwMatrix());
+			m_CBufferVS.shadow = DirectX::XMMatrixTranspose(GetShadowMatrix());
 
 			m_CBufferPS.options = (1U << 2);
 			m_CBufferPS.position = m_pGameObject->GetPosition();
@@ -56,8 +56,7 @@ namespace Dive
 			m_CBufferPS.rangeRcp = 1.0f / GetRange();
 			m_CBufferPS.outerConeAngle = GetOuterAngleRadian();
 			m_CBufferPS.innerConeAngle = GetInnerAngleRadian();
-			m_CBufferPS.shadow = DirectX::XMMatrixTranspose(GetShaodwMatrix());
-			m_CBufferPS.shadowEnabled = m_bShadowEnabled ? 1: 0;	// 현재 그림자는 spot만 존재하기 때문
+			m_CBufferPS.shadow = DirectX::XMMatrixTranspose(GetShadowMatrix());
 			break;
 		default:
 			break;
@@ -65,6 +64,8 @@ namespace Dive
 		m_CBufferPS.color = { GetColor().x * GetColor().x
 		, GetColor().y * GetColor().y
 		, GetColor().z * GetColor().z };
+
+		m_CBufferPS.shadowEnabled = m_bShadowEnabled ? 1 : 0;
 	}
 
 	DirectX::XMMATRIX Light::GetViewMatrix()
@@ -88,7 +89,7 @@ namespace Dive
 		);
 	}
 
-	DirectX::XMMATRIX Light::GetShaodwMatrix()
+	DirectX::XMMATRIX Light::GetShadowMatrix()
 	{
 		// rasterTek에서는 직교투영행렬을 사용한다.
 		return DirectX::XMMatrixMultiply(GetViewMatrix(), GetProjectionMatrix());

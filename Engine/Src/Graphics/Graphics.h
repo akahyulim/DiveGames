@@ -13,6 +13,7 @@ namespace Dive
 		DepthEqual,
 		GBuffer,
 		Light,
+		NoDepthWriteGreaterStencilMask,
 		Count
 	}; 
 	

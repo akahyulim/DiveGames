@@ -38,7 +38,7 @@ VS_OUTPUT MainVS(VS_INPUT input)
     return output;
 }
 
-float3 CalcuDirLight(float3 worldPos, float3 normal, float3 diff)
+float3 CalcuDirLight(float3 worldPos, float3 normal, float3 diffColor)
 {
     float3 finalColor;
     
@@ -62,10 +62,10 @@ float3 CalcuDirLight(float3 worldPos, float3 normal, float3 diff)
     finalColor += cbLightPixel.color *
     pow(NDotH, 250.0f) * 0.25f;
     
-    return finalColor * diff;
+    return diffColor * finalColor;
 }
 
-float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diff)
+float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diffColor)
 {
     float3 toLight = cbLightPixel.position - worldPos;
     float3 toEye = cbCameraPixel.position - worldPos;
@@ -86,7 +86,7 @@ float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diff)
     float distToLightNorm = 1.0f - saturate(distance * cbLightPixel.rangeRcp);
     float attn = distToLightNorm * distToLightNorm;
     
-    finalColor *= diff * attn;
+    finalColor *= diffColor * attn;
     
     return finalColor;
 }
@@ -101,7 +101,7 @@ float SpotShadowPCF(float3 position)
     return SpotShadowMap.SampleCmpLevelZero(PcfSampler, uvd.xy, uvd.z);
 }
 
-float3 CalcuSpotLight(float3 worldPos, float3 normal, float3 diff)
+float3 CalcuSpotLight(float3 worldPos, float3 normal, float3 diffColor)
 {
     float3 toLight = cbLightPixel.position - worldPos;
     float3 toEye = cbCameraPixel.position - worldPos;
@@ -130,22 +130,22 @@ float3 CalcuSpotLight(float3 worldPos, float3 normal, float3 diff)
     if(cbLightPixel.shadowEnabled)
         shadowAtt = SpotShadowPCF(worldPos);
     
-    finalColor *= diff * distAttn * coneAtt * shadowAtt;
+    finalColor *= diffColor * distAttn * coneAtt * shadowAtt;
     
     return finalColor;
 }
 
 float4 MainPS(VS_OUTPUT input) : SV_TARGET
 {
-    float4 diff;
+    float4 diffColor;
     if (!HasDiffuseTexture())
     {
-        diff = cbModelPixel.color;
+        diffColor = cbModelPixel.color;
     }
     else
     {
-        diff = DiffuseMap.Sample(BaseSampler, input.tex);
-        //diff = float4(diff.rgb * diff.rgb, diff.a);
+        diffColor = DiffuseMap.Sample(BaseSampler, input.tex);
+        //diffColor = float4(diffColor.rgb * diffColor.rgb, diffColor.a);
     }
 
     float3 normal = input.normal;
@@ -159,12 +159,12 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
 
     float3 lightColor;
     if (IsDirectionalLight())
-        lightColor = CalcuDirLight(input.worldPos, normal, diff.rgb);
-    else if (IsPointLight())
-        lightColor = CalcuPointLight(input.worldPos, normal, diff.rgb);
-    else if (IsSpotLight())
-        lightColor = CalcuSpotLight(input.worldPos, normal, diff.rgb);
+        lightColor = CalcuDirLight(input.worldPos, normal, diffColor.rgb);
+    if (IsPointLight())
+        lightColor = CalcuPointLight(input.worldPos, normal, diffColor.rgb);
+    if (IsSpotLight())
+        lightColor = CalcuSpotLight(input.worldPos, normal, diffColor.rgb);
     
-    //return float4(sqrt(lightColor.rgb), diff.a);
-    return float4(lightColor.rgb, diff.a);
+    //return float4(sqrt(lightColor.rgb), diffColor.a);
+    return float4(lightColor.rgb, diffColor.a);
 }

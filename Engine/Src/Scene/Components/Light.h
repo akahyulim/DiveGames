@@ -50,7 +50,7 @@ namespace Dive
 
 		DirectX::XMMATRIX GetViewMatrix();
 		DirectX::XMMATRIX GetProjectionMatrix();
-		DirectX::XMMATRIX GetShaodwMatrix();
+		DirectX::XMMATRIX GetShadowMatrix();
 
 		float GetShadowMapSize() const { return m_ShadowMapSize; }
 		void SetShadowMapSize(float size);

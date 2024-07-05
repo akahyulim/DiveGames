@@ -59,62 +59,19 @@ namespace Dive
 				if (auto pMaterial = pRenderableCom->GetMaterial())
 				{
 					m_Renderables[pMaterial->IsOpaque() ? eRenderableType::Opaque : eRenderableType::Transparent].emplace_back(pGameObject);
-
-					pMaterial->IsOpaque() ? m_OpaqueModels.emplace_back(pGameObject) : m_TransparentModels.emplace_back(pGameObject);
 				}
 			}
 
 			if (auto pLightCom = pGameObject->GetComponent<Light>())
 			{
 				m_Renderables[eRenderableType::Light].emplace_back(pGameObject);
-
-				switch (pLightCom->GetType())
-				{
-				case eLightType::Directional:
-					m_pDirectionalLight = pGameObject;
-					break;
-
-				case eLightType::Point:
-					m_PointLights.emplace_back(pGameObject);
-					break;
-
-				case eLightType::Spot:
-					m_SpotLights.emplace_back(pGameObject);
-					break;
-
-				default:
-					break;
-				}
 			}
 		}
 
 		// 반투명 오브젝트는 카메라에서 먼 것 부터 그려야 하므로 정렬이 필요하다고 한다.
 		// 스파르탄에서 해당 부분은 아직 찾지 못했다.
 
-		// update에 어울린다.
 		m_Frustum.Construct(m_pCamera->GetViewMatrix(), m_pCamera->GetProjectionMatrix(), m_pCamera->GetFarClipPlane());
-
-		// constant buffer 처리이지만 이 곳도 나쁘지 않다.
-		// 추후 좀 더 생각해보자.
-		// => 사실 이 곳에서 구현하면 안된다.
-		// constant buffer는 셰이더에 귀속된 정보기에 렌더링에서 바인딩 되어야 한다.
-		{
-			// 제거 대상
-			// frame buffer
-			// 매번 갱신할 필요가 없어 위치가 이상해졌지만 bind는 draw에서 한다.
-			{
-			//	auto pCameraBuffer = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Camera);
-			//	pCameraBuffer->Update((void*)&m_pCamera->GetCBufferVS());
-			//	pCameraBuffer->Bind();
-			}
-
-			// camera buffer
-			{
-			//	auto pCameraBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Camera);
-			//	pCameraBuffer->Update((void*)&m_pCamera->GetCBufferPS());
-			//	pCameraBuffer->Bind();
-			}
-		}
 	}
 	
 	// 결국 이 곳에서 Renderer와 Graphics를 전부 활용하기 때문에
@@ -180,6 +137,7 @@ namespace Dive
 		*/
 	}
 
+	// 스파르탄은 opaque와 transparent를 구분하는 것 같다.
 	void ViewScreen::passDepth()
 	{
 		m_pGraphics->SetRasterizerState(eRasterizerStateType::ShadowGen);
@@ -272,8 +230,6 @@ namespace Dive
 		m_pGraphics->SetVertexShader(eVertexShaderType::ForwardLight);
 		m_pGraphics->SetPixelShader(ePixelShaderType::ForwardLight);
 
-		// 1. 샘플러는 더 다양해야 한다. 유니티를 예로 들면 point, linear, trilinear 세 가지 필터링 모드가 존재한다.
-		// 2. srv에 따라 사용하는 샘플러가 달라야 한다.(이 역시 유니티의 구성이다)
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
 
@@ -282,6 +238,7 @@ namespace Dive
 			auto light = m_Renderables[eRenderableType::Light][i];
 			auto pLightCom = light->GetComponent<Light>();
 
+			// 굳이 Component에도 Enabled가 필요한가?
 			if (!pLightCom->IsEnabled())
 				continue;
 
@@ -289,10 +246,8 @@ namespace Dive
 			pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
 			m_pGraphics->BindPSCBuffer(pLightBuffer);
 
-			// 인덱스가 아니라 활성화된 광원의 개수를 파악해야 한다.
-			if (i == 0)
-				m_pGraphics->SetBlendState(eBlendStateType::Null);
-			else if (i == 1)
+			// 두 번째 광원부터는 이전 드로우 콜 결과를 혼합한다.
+			if(i == 1)
 				m_pGraphics->SetBlendState(eBlendStateType::Additive);
 			
 			// draw opaques
@@ -326,6 +281,8 @@ namespace Dive
 				m_pGraphics->DrawIndexed(pRenderableCom->GetIndexCount());
 			}
 		}
+
+		m_pGraphics->SetBlendState(eBlendStateType::Null);
 	}
 
 	void ViewScreen::passTransparentDraw()
@@ -437,7 +394,7 @@ namespace Dive
 	void ViewScreen::passLight()
 	{
 		m_pGraphics->BindRenderTargetView(m_pCamera->GetRenderTargetView(), 0);
-		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());	// 따로 클리어가 필요한 듯 하다.
+		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());
 		m_pGraphics->ClearViews(eClearFlags::Color, m_pCamera->GetBackgroundColor());
 		m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_pGraphics->SetViewport(0, 0, static_cast<float>(m_pGraphics->GetResolutionWidth()), static_cast<float>(m_pGraphics->GetResolutionHeight()));
@@ -453,8 +410,6 @@ namespace Dive
 		auto pPSCBufferCamera = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Camera);
 		pPSCBufferCamera->Update((void*)&m_pCamera->GetCBufferPS());
 		m_pGraphics->BindPSCBuffer(pPSCBufferCamera);
-
-		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::Light);
 	
 		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex(), eTextureUnitType::GBuffer_Diffuse);
 		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex(), eTextureUnitType::GBuffer_Normal);
@@ -462,38 +417,27 @@ namespace Dive
 		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex(), eTextureUnitType::GBuffer_DepthStencil);
 
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);
-		// 책에서는 일단 Directional Light에서는 BlendState를 사용하지 않는다.
-		//m_pGraphics->SetBlendState(eBlendStateType::Additive);
-
-		if(m_pDirectionalLight)
-		{
-			auto* pLightCom = m_pDirectionalLight->GetComponent<Light>();
-			auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
-			pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
-			m_pGraphics->BindPSCBuffer(pLightBuffer);
-
-			m_pGraphics->SetVertexShader(eVertexShaderType::DeferredLight);
-			m_pGraphics->SetPixelShader(ePixelShaderType::DeferredLight);
-
-			m_pGraphics->SetVertexBuffer(nullptr);
-			m_pGraphics->Draw(4, 0);
-		}
-
-		//m_pGraphics->SetDepthStencilState(eDepthStencilStateType::DepthEqual);
-		//m_pGraphics->SetBlendState(eBlendStateType::Null);
 		
-		/*
-		// point lights
-		// additive alpha blending을 사용한다.(이건 directional light가 무조건 존재한다는 가정이다.)
-		// rasterizer state는 cull front로 한다.
-		// depthstencil state는 greater than equals depth comparision test를 사용한다.
 		for (int i = 0; i < (int)m_Renderables[eRenderableType::Light].size(); i++)
 		{
 			const auto* pLight = m_Renderables[eRenderableType::Light][i];
 			auto* pLightCom = pLight->GetComponent<Light>();
 
-			if (pLightCom->GetType() != eLightType::Point)
-				continue;
+			if (pLightCom->GetType() == eLightType::Spot)
+			{
+				m_pGraphics->BindPSResource(pLightCom->GetShadowMap(), eTextureUnitType::SpotShadowMap);
+				m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
+			}
+
+			if (1 == 0)
+			{
+				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::Light);
+			}
+			else if (i == 1)
+			{
+				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
+				m_pGraphics->SetBlendState(eBlendStateType::Additive);
+			}
 
 			auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
 			pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
@@ -505,28 +449,7 @@ namespace Dive
 			m_pGraphics->SetVertexBuffer(nullptr);
 			m_pGraphics->Draw(4, 0);
 		}
-
-		// spot lights
-		for (int i = 0; i < (int)m_Renderables[eRenderableType::Light].size(); i++)
-		{
-			const auto* pLight = m_Renderables[eRenderableType::Light][i];
-			auto* pLightCom = pLight->GetComponent<Light>();
-
-			if (pLightCom->GetType() != eLightType::Spot)
-				continue;
-
-			auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
-			pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
-			m_pGraphics->BindPSCBuffer(pLightBuffer);
-
-			m_pGraphics->SetVertexShader(eVertexShaderType::DeferredLight);
-			m_pGraphics->SetPixelShader(ePixelShaderType::DeferredLight);
-
-			m_pGraphics->SetVertexBuffer(nullptr);
-			m_pGraphics->Draw(4, 0);
-		}
-		*/
-		//m_pGraphics->SetDepthStencilState(nullptr);
+	
 		m_pGraphics->SetBlendState(eBlendStateType::Null);
 
 		// 현재 Texture 테스트 때문에 동일한 이름의 메서드가 존재한다.
@@ -540,6 +463,7 @@ namespace Dive
 	// 책에서는 Direcitonal과 Spot & Point의 Depth Func가 다르다.
 	void ViewScreen::deferredRender()
 	{
+		passDepth();
 		passGBuffer();
 		passLight();
 	}
