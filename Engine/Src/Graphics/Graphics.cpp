@@ -54,6 +54,9 @@ namespace Dive
 		, m_VSConstBufs{}
 		, m_VSConstBufSlots{}
 		, m_bVSConstBufDirty(true)
+		, m_DSConstBufs{}
+		, m_DSConstBufSlots{}
+		, m_bDSConstBufDirty(true)
 		, m_PSConstBufs{}
 		, m_PSConstBufSlots{}
 		, m_bPSConstBufDirty(true)
@@ -455,6 +458,30 @@ namespace Dive
 		}
 	}
 
+	void Graphics::SetHullShader(eHullShaderType type)
+	{
+		if (type != m_HullShaderType)
+		{
+			auto index = static_cast<uint8_t>(type);
+			auto pShader = m_HullShaders[index];
+			m_pDeviceContext->HSSetShader(pShader ? pShader->GetHullShader() : nullptr, nullptr, 0);
+
+			m_HullShaderType = type;
+		}
+	}
+
+	void Graphics::SetDomainShader(eDomainShaderType type)
+	{
+		if (type != m_DomainShaderType)
+		{
+			auto index = static_cast<uint8_t>(type);
+			auto pShader = m_DomainShaders[index];
+			m_pDeviceContext->DSSetShader(pShader ? pShader->GetDomainShader() : nullptr, nullptr, 0);
+
+			m_DomainShaderType = type;
+		}
+	}
+
 	void Graphics::SetPixelShader(ePixelShaderType type)
 	{
 		if (type != m_PixelShaderType)
@@ -487,11 +514,26 @@ namespace Dive
 		// 후자의 경우엔 결국 셰이더마다 슬롯 인덱스도 수동으로 설정해주어야 한다.
 	}
 
+	void Graphics::BindDSCBuffer(const ConstantBuffer* pBuffer)
+	{
+		DV_ENGINE_ASSERT(pBuffer);
+
+		// pBuffer가 nullptr이면 index를 얻을 수 없다.
+		if (pBuffer != m_DSConstBufs[pBuffer->GetIndex()])
+		{
+			m_DSConstBufs[pBuffer->GetIndex()] = const_cast<ConstantBuffer*>(pBuffer);
+			m_bDSConstBufDirty = true;
+		}
+	}
+
 	// 모으는 편이 낫다.
 	void Graphics::BindPSCBuffer(const ConstantBuffer* pBuffer)
 	{
 		DV_ENGINE_ASSERT(pBuffer);
 
+		// 세부 값이 달라지지만 버퍼 포인터 자체는 동일할 수 있다.
+		// 현재 lightCom의 ConstBuffer가 그렇다.
+		// => 버퍼 바인딩을 시키면 이후부턴 다시 PSSetConstantBuffers를 할 필요가 없는 듯 하다.
 		if (pBuffer != m_PSConstBufs[pBuffer->GetIndex()])
 		{
 			m_PSConstBufs[pBuffer->GetIndex()] = const_cast<ConstantBuffer*>(pBuffer);
@@ -596,6 +638,16 @@ namespace Dive
 
 			m_pDeviceContext->VSSetConstantBuffers(0, MAX_NUM_VS_CONSTANT_BUFFERS, buffers);
 			m_bVSConstBufDirty = false;
+		}
+
+		if (m_bDSConstBufDirty)
+		{
+			ID3D11Buffer* buffers[MAX_NUM_DS_CONSTANT_BUFFERS]{};
+			for (uint8_t i = 0; i != MAX_NUM_DS_CONSTANT_BUFFERS; ++i)
+				buffers[i] = m_DSConstBufs[i] ? m_DSConstBufs[i]->GetBuffer() : nullptr;
+
+			m_pDeviceContext->DSSetConstantBuffers(0, MAX_NUM_DS_CONSTANT_BUFFERS, buffers);
+			m_bDSConstBufDirty = false;
 		}
 
 		if (m_bPSConstBufDirty)
@@ -891,6 +943,8 @@ namespace Dive
 		}
 
 		// GBuffer - 책 참고. GBuffer에 쓰는 깊이 테스트
+		// 깊이 테스트는 깊이값이 더 작을 때 통과하며 버퍼에 기록된다.
+		// 스텐실 테스트는 항상 통과하며 어떤 경우라도 레퍼런스 값으로 저장된다.
 		{
 			ZeroMemory(&desc, sizeof(desc));
 			desc.DepthEnable = TRUE;
@@ -912,11 +966,13 @@ namespace Dive
 			}
 		}
 
-		// Light - 책 참고. GBuffer 후 Light를 적용할 때 readOnly dsv를 사용하여 깊이 테스트
+		// NoDepthWriteLessStencilMask - 책 참고. GBuffer 후 Light를 적용할 때 readOnly dsv를 사용하여 깊이 테스트
+		// 깊이 테스트는 깊이값이 더 작을 때 통과하지만 버퍼에는 기록하지 않는다. => 카메라 초근거리라 사실상 항상 테스트 통과
+		// 버퍼와 레퍼런스 값이 동일할 때 테스트를 통과하지만 버퍼는 기존 값을 유지한다.
 		{
 			ZeroMemory(&desc, sizeof(desc));
 			desc.DepthEnable = TRUE;
-			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;	// read only
 			desc.DepthFunc = D3D11_COMPARISON_LESS;
 			desc.StencilEnable = TRUE;
 			desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
@@ -925,15 +981,17 @@ namespace Dive
 			desc.FrontFace = op;
 			desc.BackFace = op;
 
-			index = static_cast<uint8_t>(eDepthStencilStateType::Light);
+			index = static_cast<uint8_t>(eDepthStencilStateType::NoDepthWriteLessStencilMask);
 
 			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
 			{
-				DV_ENGINE_ERROR("DepthStencilState Light 생성에 실패하였습니다.");
+				DV_ENGINE_ERROR("DepthStencilState NoDepthWriteLessStencilMask 생성에 실패하였습니다.");
 				return false;
 			}
 
-			desc.DepthEnable = D3D11_COMPARISON_GREATER_EQUAL;
+			// NoDepthWriteGreaterStencilMask
+			// 깊이 테스트는 깊이값이 더 크거나 같을 때 통과하지만 버퍼에는 기록하지 않는다.
+			desc.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
 
 			index = static_cast<uint8_t>(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
 
@@ -1106,11 +1164,48 @@ namespace Dive
 			m_VertexShaders[index] = pShader;
 
 			pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredLight.hlsl", eShaderType::Vertex, eInputLayout::Pos))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredLight.hlsl", eShaderType::Vertex))//, eInputLayout::Pos))
 				return false;
 			index = static_cast<uint8_t>(eVertexShaderType::DeferredLight);
 			m_VertexShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredDirLight.hlsl", eShaderType::Vertex))//, eInputLayout::None))
+				return false;
+			index = static_cast<uint8_t>(eVertexShaderType::DeferredDirLight);
+			m_VertexShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredPointLight.hlsl", eShaderType::Vertex))//, eInputLayout::None))
+				return false;
+			index = static_cast<uint8_t>(eVertexShaderType::DeferredPointLight);
+			m_VertexShaders[index] = pShader;
 		}
+
+		// hull shaders
+		{
+			auto index = static_cast<uint8_t>(eHullShaderType::Null);
+			m_HullShaders[index] = nullptr;
+
+			auto pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredPointLight.hlsl", eShaderType::Hull))
+				return false;
+			index = static_cast<uint8_t>(eHullShaderType::DeferredPointLight);
+			m_HullShaders[index] = pShader;
+		}
+
+		// domain shaders
+		{
+			auto index = static_cast<uint8_t>(eDomainShaderType::Null);
+			m_DomainShaders[index] = nullptr;
+
+			auto pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredPointLight.hlsl", eShaderType::Domain))
+				return false;
+			index = static_cast<uint8_t>(eDomainShaderType::DeferredPointLight);
+			m_DomainShaders[index] = pShader;
+		}
+
 
 		// pixel shaders
 		{
@@ -1133,6 +1228,18 @@ namespace Dive
 			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredLight.hlsl", eShaderType::Pixel))
 				return false;
 			index = static_cast<uint8_t>(ePixelShaderType::DeferredLight);
+			m_PixelShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredDirLight.hlsl", eShaderType::Pixel))
+				return false;
+			index = static_cast<uint8_t>(ePixelShaderType::DeferredDirLight);
+			m_PixelShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredPointLight.hlsl", eShaderType::Pixel))
+				return false;
+			index = static_cast<uint8_t>(ePixelShaderType::DeferredPointLight);
 			m_PixelShaders[index] = pShader;
 		}
 

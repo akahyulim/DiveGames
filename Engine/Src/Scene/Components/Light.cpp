@@ -24,6 +24,7 @@ namespace Dive
 		m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
 		
 		ZeroMemory(&m_CBufferVS, sizeof(VSConstBuf_Light));
+		ZeroMemory(&m_CBufferDS, sizeof(DSConstBuf_Light));
 		ZeroMemory(&m_CBufferPS, sizeof(PSConstBuf_Light));
 	}
 
@@ -36,18 +37,37 @@ namespace Dive
 
 	void Light::Update()
 	{
+		ZeroMemory(&m_CBufferVS, sizeof(VSConstBuf_Light));
+		ZeroMemory(&m_CBufferDS, sizeof(DSConstBuf_Light));
+		ZeroMemory(&m_CBufferPS, sizeof(PSConstBuf_Light));
+
 		switch (GetType())
 		{
 		case eLightType::Directional:
+		{	
 			m_CBufferPS.options = (1U << 0);
 			m_CBufferPS.direction = m_pGameObject->GetForward();
 			break;
+		}
 		case eLightType::Point:
+		{
+			{
+				DirectX::XMMATRIX lightWorldScale = DirectX::XMMatrixScaling(m_Range, m_Range, m_Range);
+				DirectX::XMMATRIX lightWorldTrans = DirectX::XMMatrixTranslation(m_pGameObject->GetPosition().x, m_pGameObject->GetPosition().y, m_pGameObject->GetPosition().z);
+				// 아래 두 행렬은 카메라의 것이어야 한다.
+				DirectX::XMMATRIX view = GetViewMatrix();
+				DirectX::XMMATRIX proj = GetProjectionMatrix();
+				DirectX::XMMATRIX worldViewProjection = lightWorldScale * lightWorldTrans * view * proj;
+				m_CBufferDS.lightProjection = DirectX::XMMatrixTranspose(worldViewProjection);
+			}
+
 			m_CBufferPS.options = (1U << 1);
 			m_CBufferPS.position = m_pGameObject->GetPosition();
 			m_CBufferPS.rangeRcp = 1.0f / GetRange();
 			break;
+		}
 		case eLightType::Spot:
+		{
 			m_CBufferVS.shadow = DirectX::XMMatrixTranspose(GetShadowMatrix());
 
 			m_CBufferPS.options = (1U << 2);
@@ -58,6 +78,7 @@ namespace Dive
 			m_CBufferPS.innerConeAngle = GetInnerAngleRadian();
 			m_CBufferPS.shadow = DirectX::XMMatrixTranspose(GetShadowMatrix());
 			break;
+		}
 		default:
 			break;
 		}

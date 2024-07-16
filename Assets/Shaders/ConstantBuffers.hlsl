@@ -1,3 +1,5 @@
+// 현재 사용하지 않지만 Skinning 등에 활용되었기에 참고에 필요할 수 있다.
+
 
 // urho3d 기준
 // frame, camera, zone, light, material 총 5개 + objectVS로 구성

@@ -12,7 +12,7 @@ namespace Dive
 		DepthLess,
 		DepthEqual,
 		GBuffer,
-		Light,
+		NoDepthWriteLessStencilMask,
 		NoDepthWriteGreaterStencilMask,
 		Count
 	}; 
@@ -35,6 +35,14 @@ namespace Dive
 	}; 
 	
 	enum class eVSConstBufType : uint8_t
+	{
+		Model = 0,
+		Camera,
+		Light,
+		Count
+	};
+
+	enum class eDSConstBufType : uint8_t
 	{
 		Model = 0,
 		Camera,
@@ -85,6 +93,22 @@ namespace Dive
 		ForwardLight,
 		GBuffer,
 		DeferredLight,
+		DeferredDirLight,
+		DeferredPointLight,
+		Count
+	};
+
+	enum class eHullShaderType : uint8_t
+	{
+		Null = 0,
+		DeferredPointLight,
+		Count
+	};
+
+	enum class eDomainShaderType : uint8_t
+	{
+		Null = 0,
+		DeferredPointLight,
 		Count
 	};
 
@@ -94,6 +118,8 @@ namespace Dive
 		ForwardLight,
 		GBuffer,
 		DeferredLight,
+		DeferredDirLight,
+		DeferredPointLight,
 		Count
 	};
 
@@ -102,6 +128,7 @@ namespace Dive
 	//-------------------------------------------------------------------------------------
 	inline constexpr uint8_t MAX_NUM_RENDER_VIEWS = 4;
 	inline constexpr uint8_t MAX_NUM_VS_CONSTANT_BUFFERS = 6;
+	inline constexpr uint8_t MAX_NUM_DS_CONSTANT_BUFFERS = 6;	// vs, ps와 같을 필요는 없다.
 	inline constexpr uint8_t MAX_NUM_PS_CONSTANT_BUFFERS = 6;
 	inline constexpr uint8_t MAX_NUM_SHADER_RESOURCES = 128;
 	inline constexpr uint8_t MAX_NUM_SAMPLERS = 16;
@@ -250,9 +277,12 @@ namespace Dive
 		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topology);
 
 		void SetVertexShader(eVertexShaderType type);
+		void SetHullShader(eHullShaderType type);
+		void SetDomainShader(eDomainShaderType type);
 		void SetPixelShader(ePixelShaderType type);
 		void BindVSCBuffer(const ConstantBuffer* pBuffer);
 		void BindVSConstBuf(eVSConstBufType type);
+		void BindDSCBuffer(const ConstantBuffer* pBuffer);
 		void BindPSCBuffer(const ConstantBuffer* pBuffer);
 		void BindPSResource(ID3D11ShaderResourceView* pResourceView, eTextureUnitType unit);
 		void BindPSResource(Texture* pTexture, eTextureUnitType unit);	// enum class보단 uint8_t를 받는 게 나아보인다.
@@ -359,6 +389,18 @@ namespace Dive
 		ConstantBuffer* m_VSConstBufs[static_cast<uint8_t>(eVSConstBufType::Count)];
 		ID3D11Buffer* m_VSConstBufSlots[MAX_NUM_VS_CONSTANT_BUFFERS];
 		bool m_bVSConstBufDirty;
+
+		// hull shader
+		Shader* m_HullShaders[static_cast<uint8_t>(eHullShaderType::Count)];
+		eHullShaderType m_HullShaderType;
+
+		ConstantBuffer* m_DSConstBufs[static_cast<uint8_t>(eDSConstBufType::Count)];
+		ID3D11Buffer* m_DSConstBufSlots[MAX_NUM_VS_CONSTANT_BUFFERS];
+		bool m_bDSConstBufDirty;
+
+		// domain shader
+		Shader* m_DomainShaders[static_cast<uint8_t>(eDomainShaderType::Count)];
+		eDomainShaderType m_DomainShaderType;
 
 		// pixel shader
 		Shader* m_PixelShaders[static_cast<uint8_t>(ePixelShaderType::Count)];

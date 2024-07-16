@@ -22,7 +22,7 @@ namespace Sandbox
 		, m_pSpotLightB(nullptr)
 		, m_pSpotLightC(nullptr)
 		, m_pFlashLight(nullptr)
-		, m_SceneType(eSceneType::Field)		// Scene을 런타임에서 바꾸고 싶다.
+		, m_SceneType(eSceneType::Sponza)		// Scene을 런타임에서 바꾸고 싶다.
 	{
 	}
 
@@ -436,24 +436,24 @@ namespace Sandbox
 			// PointLights
 			{
 				m_pPointLightA = pActiveScene->CreateGameObject("PointLightA");
-				m_pPointLightA->SetPosition(0.0f, 5.0f, -20.0f);
+				m_pPointLightA->SetPosition(20.0f, 5.0f, -20.0f);
 				auto pPointLightCom = m_pPointLightA->AddComponent<Dive::Light>();
 				pPointLightCom->SetType(Dive::eLightType::Point);
 				pPointLightCom->SetRange(100.0f);
 				pPointLightCom->SetColor(1.0f, 0.0f, 0.0f);
 				
 				m_pPointLightB = pActiveScene->CreateGameObject("PointLightB");
-				m_pPointLightB->SetPosition(-20.0f, 5.0f, 20.0f);
+				m_pPointLightB->SetPosition(0.0f, 5.0f, -20.0f);
 				pPointLightCom = m_pPointLightB->AddComponent<Dive::Light>();
 				pPointLightCom->SetType(Dive::eLightType::Point);
-				pPointLightCom->SetRange(30.0f);
+				pPointLightCom->SetRange(100.0f);
 				pPointLightCom->SetColor(0.0f, 1.0f, 0.0f);
 
 				m_pPointLightC = pActiveScene->CreateGameObject("PointLightC");
-				m_pPointLightC->SetPosition(20.0f, 5.0f, 20.0f);
+				m_pPointLightC->SetPosition(-20.0f, 5.0f, -20.0f);
 				pPointLightCom = m_pPointLightC->AddComponent<Dive::Light>();
 				pPointLightCom->SetType(Dive::eLightType::Point);
-				pPointLightCom->SetRange(30.0f);
+				pPointLightCom->SetRange(100.0f);
 				pPointLightCom->SetColor(0.0f, 0.0f, 1.0f);
 			}
 

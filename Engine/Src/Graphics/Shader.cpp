@@ -153,9 +153,11 @@ namespace Dive
 				return false;
 			}
 
-			if (!createInputLayout(pShaderBlob, layout))
-				return false;
-
+			if (layout != eInputLayout::None)
+			{
+				if (!createInputLayout(pShaderBlob, layout))
+					return false;
+			}
 			break;
 		case eShaderType::Hull:
 			if (FAILED(m_pDevice->CreateHullShader(
@@ -216,7 +218,7 @@ namespace Dive
 	bool Shader::createInputLayout(ID3D10Blob* pShaderBlob, eInputLayout layout)
 	{
 		DV_ENGINE_ASSERT(pShaderBlob);
-		DV_ENGINE_ASSERT(layout != eInputLayout::None);
+		//DV_ENGINE_ASSERT(layout != eInputLayout::None);
 
 		auto inputElements = GetInputElements(layout);
 

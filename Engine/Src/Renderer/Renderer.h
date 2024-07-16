@@ -26,6 +26,7 @@ namespace Dive
 	//-------------------------------------------------------------------------------------
 	// structures: VS, PS Constant Buffers
 	//-------------------------------------------------------------------------------------
+#pragma pack(push, 1)
 	struct VSConstBuf_Model
 	{
 		DirectX::XMMATRIX world;
@@ -40,6 +41,11 @@ namespace Dive
 	struct VSConstBuf_Light
 	{
 		DirectX::XMMATRIX shadow;
+	};
+
+	struct DSConstBuf_Light
+	{
+		DirectX::XMMATRIX lightProjection;
 	};
 
 	struct PSConstBuf_Model
@@ -81,6 +87,7 @@ namespace Dive
 
 		DirectX::XMMATRIX shadow;
 	};
+#pragma pack(pop)
 
 	//-------------------------------------------------------------------------------------
 	// forward declarations
@@ -122,6 +129,7 @@ namespace Dive
 		void SetViewScreen(uint32_t index, ViewScreen* pViewScreen);
 
 		ConstantBuffer* GetVSConstantBuffer(eVSConstBufType type) const { return m_VSConstantBuffers[static_cast<uint8_t>(type)]; }
+		ConstantBuffer* GetDSConstantBuffer(eDSConstBufType type) const { return m_DSConstantBuffers[static_cast<uint8_t>(type)]; }
 		ConstantBuffer* GetPSConstantBuffer(ePSConstBufType type) const { return m_PSConstantBuffers[static_cast<uint8_t>(type)]; }
 
 		ID3D11SamplerState* GetSampler(eSamplerType type) const { return m_Samplers[static_cast<uint8_t>(type)]; }
@@ -146,6 +154,7 @@ namespace Dive
 		std::array<RenderTexture*, static_cast<uint8_t>(eRenderTargetType::Count)> m_RenderTargets;
 
 		std::array<ConstantBuffer*, static_cast<uint8_t>(eVSConstBufType::Count)> m_VSConstantBuffers;
+		std::array<ConstantBuffer*, static_cast<uint8_t>(eDSConstBufType::Count)> m_DSConstantBuffers;
 		std::array<ConstantBuffer*, static_cast<uint8_t>(ePSConstBufType::Count)> m_PSConstantBuffers;
 		
 		std::array<ID3D11SamplerState*, static_cast<uint8_t>(eSamplerType::Count)> m_Samplers;

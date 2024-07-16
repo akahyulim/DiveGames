@@ -15,6 +15,7 @@ namespace Dive
 		: m_pDevice(Graphics::GetInstance()->GetDevice())
 		, m_RenderTargets{}
 		, m_VSConstantBuffers{}
+		, m_DSConstantBuffers{}
 		, m_PSConstantBuffers{}
 		, m_Samplers{}
 		, m_bInitialized(false)
@@ -55,6 +56,8 @@ namespace Dive
 		m_ViewScreens.clear();
 
 		for (auto pConstantBuffer : m_PSConstantBuffers)
+			DV_DELETE(pConstantBuffer);
+		for (auto pConstantBuffer : m_DSConstantBuffers)
 			DV_DELETE(pConstantBuffer);
 		for (auto pConstantBuffer : m_VSConstantBuffers)
 			DV_DELETE(pConstantBuffer);
@@ -111,6 +114,10 @@ namespace Dive
 
 		m_VSConstantBuffers[static_cast<uint32_t>(eVSConstBufType::Light)] =
 			ConstantBuffer::Create<VSConstBuf_Light>("Light", eShaderType::Vertex, (uint32_t)eVSConstBufType::Light);
+
+		// ds
+		m_DSConstantBuffers[static_cast<uint32_t>(eDSConstBufType::Light)] =
+			ConstantBuffer::Create<DSConstBuf_Light>("Light", eShaderType::Domain, 0);// (uint32_t)eDSConstBufType::Light);
 
 		// ps
 		m_PSConstantBuffers[static_cast<uint32_t>(ePSConstBufType::Model)] =

@@ -14,6 +14,11 @@ struct VSConstBuf_Light
     matrix shadow;
 };
 
+struct DSConstBuf_Light
+{
+    matrix lightProjection;
+};
+
 struct PSConstBuf_Model
 {
     float4 color;
@@ -68,6 +73,12 @@ cbuffer VS_Camera : register(b1)
 cbuffer VS_Light : register(b2)
 {
     VSConstBuf_Light cbLightVertex;
+}
+
+// DS Constantbuffer
+cbuffer DS_Light : register(b0)
+{
+    DSConstBuf_Light cbLightDomain;
 }
 
 // PS Constantuffers

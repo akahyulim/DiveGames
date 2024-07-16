@@ -242,6 +242,7 @@ namespace Dive
 			if (!pLightCom->IsEnabled())
 				continue;
 
+			// 여기에서도 두 번째 광원부터 갱신이 안될 것 같은데...
 			auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
 			pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
 			m_pGraphics->BindPSCBuffer(pLightBuffer);
@@ -394,19 +395,22 @@ namespace Dive
 	void ViewScreen::passLight()
 	{
 		m_pGraphics->BindRenderTargetView(m_pCamera->GetRenderTargetView(), 0);
-		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());
+		//m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilView());	// 이것도 사용이 가능해 할 것 같은데...
+		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());	// 읽기 전용
 		m_pGraphics->ClearViews(eClearFlags::Color, m_pCamera->GetBackgroundColor());
-		m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 		m_pGraphics->SetViewport(0, 0, static_cast<float>(m_pGraphics->GetResolutionWidth()), static_cast<float>(m_pGraphics->GetResolutionHeight()));
 
 		// 책에서는 렌더타겟 바인드 후 
 		// GBuffer::PrepareForUnpack()이라고 하여 
 		// 카메라의 프로젝션 행렬, 뷰 역행렬을 상수 버퍼로 전달한다.
 		// 일단 나는 직접 전달했다.
-		auto pVSCBufferCamera = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Camera);
-		pVSCBufferCamera->Update((void*)&m_pCamera->GetCBufferVS());
-		m_pGraphics->BindVSCBuffer(pVSCBufferCamera);
+		
+		// 얘네는 정점 셰이더에서 사용하지 않는다.
+		//auto pVSCBufferCamera = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Camera);
+		//pVSCBufferCamera->Update((void*)&m_pCamera->GetCBufferVS());
+		//m_pGraphics->BindVSCBuffer(pVSCBufferCamera);
 
+		// 바인딩은 한 번만 하지만 업데이트는 유효함을 확인했다.
 		auto pPSCBufferCamera = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Camera);
 		pPSCBufferCamera->Update((void*)&m_pCamera->GetCBufferPS());
 		m_pGraphics->BindPSCBuffer(pPSCBufferCamera);
@@ -418,39 +422,89 @@ namespace Dive
 
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);
 		
-		for (int i = 0; i < (int)m_Renderables[eRenderableType::Light].size(); i++)
+		for (int i = 0; i < static_cast<int>(m_Renderables[eRenderableType::Light].size()); i++)
 		{
 			const auto* pLight = m_Renderables[eRenderableType::Light][i];
 			auto* pLightCom = pLight->GetComponent<Light>();
-
-			if (pLightCom->GetType() == eLightType::Spot)
-			{
-				m_pGraphics->BindPSResource(pLightCom->GetShadowMap(), eTextureUnitType::SpotShadowMap);
-				m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
-			}
-
-			if (1 == 0)
-			{
-				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::Light);
-			}
-			else if (i == 1)
-			{
-				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
-				m_pGraphics->SetBlendState(eBlendStateType::Additive);
-			}
 
 			auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
 			pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
 			m_pGraphics->BindPSCBuffer(pLightBuffer);
 
-			m_pGraphics->SetVertexShader(eVertexShaderType::DeferredLight);
-			m_pGraphics->SetPixelShader(ePixelShaderType::DeferredLight);
+			if(i >= 1)
+			{
+				m_pGraphics->SetBlendState(eBlendStateType::Additive);
+			}
 
-			m_pGraphics->SetVertexBuffer(nullptr);
-			m_pGraphics->Draw(4, 0);
+			switch (pLightCom->GetType())
+			{
+			case eLightType::Directional:
+			{
+				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteLessStencilMask);
+
+				m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+				m_pGraphics->GetDeviceContext()->RSSetState(nullptr);
+
+				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredDirLight);
+				m_pGraphics->SetHullShader(eHullShaderType::Null);
+				m_pGraphics->SetDomainShader(eDomainShaderType::Null);
+				m_pGraphics->SetPixelShader(ePixelShaderType::DeferredDirLight);
+
+				m_pGraphics->SetVertexBuffer(nullptr);
+				m_pGraphics->Draw(4, 0);
+				break;
+			}
+			
+			case eLightType::Point:
+			{
+				// 역시 이 곳으로 옮기니 문제가 해결됐다.
+				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
+				m_pGraphics->SetRasterizerState(eRasterizerStateType::NoDepthClipFront);
+
+				// 책에는 1이지만 정황상 2가 어울린다.
+				m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
+				
+				// 렌더러가 상수버퍼를 가지는 게 맞나...?
+				auto pLightBuffer = m_pRenderer->GetDSConstantBuffer(eDSConstBufType::Light);
+				DirectX::XMMATRIX lightWorldScale = DirectX::XMMatrixScaling(pLightCom->GetRange(), pLightCom->GetRange(), pLightCom->GetRange());
+				DirectX::XMMATRIX lightWorldTrans = DirectX::XMMatrixTranslation(
+					pLight->GetPosition().x, pLight->GetPosition().y, pLight->GetPosition().z);
+					//m_pGameObject->GetPosition().x, m_pGameObject->GetPosition().y, m_pGameObject->GetPosition().z);
+				DirectX::XMMATRIX view = m_pCamera->GetViewMatrix();//GetViewMatrix();
+				DirectX::XMMATRIX proj = m_pCamera->GetProjectionMatrix();
+				DirectX::XMMATRIX worldViewProjection = DirectX::XMMatrixTranspose(lightWorldScale * lightWorldTrans * view * proj);
+				//pLightBuffer->Update((void*)&pLightCom->GetCBufferDS());
+				pLightBuffer->Update((void*)&worldViewProjection);
+				// XXXCBufferDS() 형태의 이름으로 통일시키자.
+				m_pGraphics->BindDSCBuffer(pLightBuffer);
+
+				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredPointLight);
+				m_pGraphics->SetHullShader(eHullShaderType::DeferredPointLight);
+				m_pGraphics->SetDomainShader(eDomainShaderType::DeferredPointLight);
+				m_pGraphics->SetPixelShader(ePixelShaderType::DeferredPointLight);
+
+				m_pGraphics->SetVertexBuffer(nullptr);
+				m_pGraphics->Draw(2, 0);
+				break;
+			}
+			
+			case eLightType::Spot:
+			{
+				break;
+			}
+
+			default:
+				break;
+			}
 		}
 	
 		m_pGraphics->SetBlendState(eBlendStateType::Null);
+		m_pGraphics->GetDeviceContext()->RSSetState(nullptr);	// 추후 수정 필요
+
+		m_pGraphics->SetVertexShader(eVertexShaderType::Null);
+		m_pGraphics->SetHullShader(eHullShaderType::Null);
+		m_pGraphics->SetDomainShader(eDomainShaderType::Null);
+		m_pGraphics->SetPixelShader(ePixelShaderType::Null);
 
 		// 현재 Texture 테스트 때문에 동일한 이름의 메서드가 존재한다.
 		m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_Diffuse);

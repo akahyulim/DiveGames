@@ -59,6 +59,7 @@ namespace Dive
 		void EnableShadow(bool enable) { m_bShadowEnabled = enable; }
 
 		const VSConstBuf_Light& GetCBufferVS() const { return m_CBufferVS; }
+		const DSConstBuf_Light& GetCBufferDS() const { return m_CBufferDS; }
 		const PSConstBuf_Light& GetCBufferPS() const { return m_CBufferPS; }
 
 	private:
@@ -77,7 +78,10 @@ namespace Dive
 
 		bool m_bShadowEnabled;
 
+		// CBuffer라는 이름이지만 그냥 구조체 객체다.
+		// 실제 CBuffer는 Renderer가 생성하고 관리한다.
 		VSConstBuf_Light m_CBufferVS;
+		DSConstBuf_Light m_CBufferDS;	// 참고) 책에선 DomainCB 이런식으로 명명했다.
 		PSConstBuf_Light m_CBufferPS;
 	};
 }
