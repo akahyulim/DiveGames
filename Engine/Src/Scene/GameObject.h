@@ -34,6 +34,7 @@ namespace Dive
 		bool IsRemovedTarget() const { return m_bMarkedTarget; }
 
 		template<class T> T* AddComponent();
+		template<class T> bool AddComponent(T* pComponent);
 
 		template<class T> bool HasComponent();
 		bool HashComponent(size_t typeHash) const;
@@ -151,6 +152,21 @@ namespace Dive
 		m_Components[T::GetTypeHashStatic()] = static_cast<Component*>(pNewComponent);
 
 		return pNewComponent;
+	}
+
+	template<class T> 
+	bool GameObject::AddComponent(T* pComponent)
+	{
+		if (!pComponent)
+			return false;
+
+		auto pExisted = GetComponent<T>();
+		if (pExisted)
+			return false;
+
+		m_Components[T::GetTypeHashStatic()] = static_cast<Component*>(pComponent);
+		pComponent->SetGameObject(this);
+		return true;
 	}
 
 	template<class T>

@@ -8,7 +8,6 @@ namespace Dive
 	Component::Component(GameObject* pGameObject)
 		: m_pGameObject(pGameObject)
 	{
-		DV_ENGINE_ASSERT(pGameObject);
 	}
 
 	std::string Component::GetName() const

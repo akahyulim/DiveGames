@@ -22,7 +22,7 @@ namespace Sandbox
 		, m_pSpotLightB(nullptr)
 		, m_pSpotLightC(nullptr)
 		, m_pFlashLight(nullptr)
-		, m_SceneType(eSceneType::Sponza)		// Scene을 런타임에서 바꾸고 싶다.
+		, m_SceneType(eSceneType::Base)		// Scene을 런타임에서 바꾸고 싶다.
 	{
 	}
 
@@ -423,12 +423,18 @@ namespace Sandbox
 		// lights
 		{
 			// Directional Light
+			//m_pDirLightA = pActiveScene->CreateGameObject("DirectionalLightA");
+			//m_pDirLightA->SetRotation(45.0f, -45.0f, 45.0f);
+			//auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
+			//pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
+			//pDirLightCom->SetType(Dive::eLightType::Directional);
+
 			m_pDirLightA = pActiveScene->CreateGameObject("DirectionalLightA");
 			m_pDirLightA->SetRotation(45.0f, -45.0f, 45.0f);
-			auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
-			pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
-			pDirLightCom->SetType(Dive::eLightType::Directional);
-			
+			auto pDirLight = new Dive::DirectionalLight();
+			pDirLight->SetColor(1.0f, 1.0f, 1.0f);
+			m_pDirLightA->AddComponent<Dive::DvLight>(static_cast<Dive::DvLight*>(pDirLight));
+
 			auto pSphereModel = Dive::GetResourceManager()->GetResource<Dive::Model>("../../Assets/Models/Sphere.obj")->GetRootObject();
 			auto pBallModel = Dive::GetResourceManager()->GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf")->GetRootObject();
 			auto pHelmetModel = Dive::GetResourceManager()->GetResource<Dive::Model>("../../Assets/Models/damaged_helmet/DamagedHelmet.gltf")->GetRootObject();
@@ -437,24 +443,27 @@ namespace Sandbox
 			{
 				m_pPointLightA = pActiveScene->CreateGameObject("PointLightA");
 				m_pPointLightA->SetPosition(20.0f, 5.0f, -20.0f);
-				auto pPointLightCom = m_pPointLightA->AddComponent<Dive::Light>();
-				pPointLightCom->SetType(Dive::eLightType::Point);
+				auto pPointLightCom = new Dive::PointLight();//m_pPointLightA->AddComponent<Dive::Light>();
+				//pPointLightCom->SetType(Dive::eLightType::Point);
 				pPointLightCom->SetRange(100.0f);
 				pPointLightCom->SetColor(1.0f, 0.0f, 0.0f);
+				m_pPointLightA->AddComponent<Dive::DvLight>(pPointLightCom);
 				
 				m_pPointLightB = pActiveScene->CreateGameObject("PointLightB");
 				m_pPointLightB->SetPosition(0.0f, 5.0f, -20.0f);
-				pPointLightCom = m_pPointLightB->AddComponent<Dive::Light>();
-				pPointLightCom->SetType(Dive::eLightType::Point);
+				pPointLightCom = new Dive::PointLight();//m_pPointLightB->AddComponent<Dive::Light>();
+				//pPointLightCom->SetType(Dive::eLightType::Point);
 				pPointLightCom->SetRange(100.0f);
 				pPointLightCom->SetColor(0.0f, 1.0f, 0.0f);
+				m_pPointLightB->AddComponent<Dive::DvLight>(pPointLightCom);
 
 				m_pPointLightC = pActiveScene->CreateGameObject("PointLightC");
 				m_pPointLightC->SetPosition(-20.0f, 5.0f, -20.0f);
-				pPointLightCom = m_pPointLightC->AddComponent<Dive::Light>();
-				pPointLightCom->SetType(Dive::eLightType::Point);
+				pPointLightCom = new Dive::PointLight();//m_pPointLightC->AddComponent<Dive::Light>();
+				//pPointLightCom->SetType(Dive::eLightType::Point);
 				pPointLightCom->SetRange(100.0f);
 				pPointLightCom->SetColor(0.0f, 0.0f, 1.0f);
+				m_pPointLightC->AddComponent<Dive::DvLight>(pPointLightCom);
 			}
 
 			// SpotLights
@@ -463,41 +472,41 @@ namespace Sandbox
 				m_pSpotLightA->SetPosition(pBallModel->GetPosition().x, pBallModel->GetPosition().y + 10.0f, pBallModel->GetPosition().z);
 				m_pSpotLightA->LookAt(pSphereModel);
 				m_pSpotLightA->SetParent(pBallModel);
-				auto pSpotLightCom = m_pSpotLightA->AddComponent<Dive::Light>();
-				pSpotLightCom->SetType(Dive::eLightType::Spot);
-				pSpotLightCom->SetRange(1000.0f);
+				auto pSpotLightCom = new Dive::SpotLight();
+				pSpotLightCom->SetRange(500.0f);
 				pSpotLightCom->SetColor(1.0f, 0.0f, 0.0f);
-				pSpotLightCom->SetSpotLightAngles(45.0f, 35.0f);
+				pSpotLightCom->SetAngles(35.0f, 45.0f);
+				m_pSpotLightA->AddComponent<Dive::DvLight>(pSpotLightCom);
 				
 				m_pSpotLightB = pActiveScene->CreateGameObject("SpotLightB");
 				m_pSpotLightB->SetPosition(m_pCube->GetPosition());
 				m_pSpotLightB->SetRotation(90.0f, 0.0f, 0.0f);
 				m_pSpotLightB->SetParent(m_pCube);
-				pSpotLightCom = m_pSpotLightB->AddComponent<Dive::Light>();
-				pSpotLightCom->SetType(Dive::eLightType::Spot);
-				pSpotLightCom->SetRange(60.0f);
+				pSpotLightCom = new Dive::SpotLight();
+				pSpotLightCom->SetRange(500.0f);
 				pSpotLightCom->SetColor(1.0f, 1.0f, 0.0f);
-				pSpotLightCom->SetSpotLightAngles(65.0f, 55.0f);
-				
+				pSpotLightCom->SetAngles(55.0f, 65.0f);
+				m_pSpotLightB->AddComponent<Dive::DvLight>(pSpotLightCom);
+
 				m_pSpotLightC = pActiveScene->CreateGameObject("SpotLightC");
 				m_pSpotLightC->SetPosition(pHelmetModel->GetPosition().x, pHelmetModel->GetPosition().y + 10.0f, pHelmetModel->GetPosition().z);
 				m_pSpotLightC->LookAt(pHelmetModel->GetPosition().x, 0.0f, -100.0f);
-				pSpotLightCom = m_pSpotLightC->AddComponent<Dive::Light>();
-				pSpotLightCom->SetType(Dive::eLightType::Spot);
-				pSpotLightCom->SetRange(1000.0f);
+				pSpotLightCom = new Dive::SpotLight();
+				pSpotLightCom->SetRange(500.0f);
 				pSpotLightCom->SetColor(0.0f, 1.0f, 1.0f);
-				pSpotLightCom->SetSpotLightAngles(30.0f, 20.0f);
-				
+				pSpotLightCom->SetAngles(20.0f, 30.0f);
+				m_pSpotLightC->AddComponent<Dive::DvLight>(pSpotLightCom);
+
 				m_pFlashLight = pActiveScene->CreateGameObject("FlashLight");
 				m_pFlashLight->SetPosition(m_pMainCam->GetPosition());
 				m_pFlashLight->LookAt(m_pMainCam->GetForward(), m_pMainCam->GetUpward());
 				m_pFlashLight->SetParent(m_pMainCam);
 				m_pFlashLight->SetActive(false);
-				pSpotLightCom = m_pFlashLight->AddComponent<Dive::Light>();
-				pSpotLightCom->SetType(Dive::eLightType::Spot);
-				pSpotLightCom->SetRange(1000.0f);
+				pSpotLightCom = new Dive::SpotLight();
+				pSpotLightCom->SetRange(500.0f);
 				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f); 
-				pSpotLightCom->SetSpotLightAngles(30.0f, 15.0f);
+				pSpotLightCom->SetAngles(15.0f, 30.0f);
+				m_pFlashLight->AddComponent<Dive::DvLight>(pSpotLightCom);
 			}
 		}
 
@@ -566,31 +575,33 @@ namespace Sandbox
 			// Directional Light
 			m_pDirLightA = pActiveScene->CreateGameObject("DirectionalLightA");
 			m_pDirLightA->SetRotation(45.0f, -45.0f, 45.0f);
-			auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
+			auto pDirLightCom = new Dive::DirectionalLight();
+			m_pDirLightA->AddComponent<Dive::DvLight>(pDirLightCom);
 			pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
-			pDirLightCom->SetType(Dive::eLightType::Directional);
+
+			// SpotLight
+			auto pSpotLightObj = pActiveScene->CreateGameObject("SpotLight");
+			pSpotLightObj->SetPosition(-50.0f, 100.0f, 0.0f);
+			//pSpotLightObj->LookAt(50.0f, 100.0f, 0.0f);
+			pSpotLightObj->SetRotation(90.0f, 0.0f, 0.0f);
+			//pSpotLightObj->SetActive(false);
+			auto pSpotLightCom = new Dive::SpotLight();
+			pSpotLightObj->AddComponent<Dive::DvLight>(pSpotLightCom);
+			pSpotLightCom->SetRange(1000.0f);
+			pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
+			pSpotLightCom->SetAngles(50.0f, 60.0f);
+
 
 			// Flash Light
 			m_pFlashLight = pActiveScene->CreateGameObject("FlashLight");
 			m_pFlashLight->SetPosition(m_pMainCam->GetPosition());
 			m_pFlashLight->SetParent(m_pMainCam);
 			m_pFlashLight->SetActive(false);
-			auto pSpotLightCom = m_pFlashLight->AddComponent<Dive::Light>();
-			pSpotLightCom->SetType(Dive::eLightType::Spot);
+			pSpotLightCom = new Dive::SpotLight();
+			m_pFlashLight->AddComponent<Dive::DvLight>(pSpotLightCom);
 			pSpotLightCom->SetRange(1000.0f);
 			pSpotLightCom->SetColor(1.0f, 1.0f, 0.7f);
-			pSpotLightCom->SetSpotLightAngles(30.0f, 10.0f);
-
-			// SpotLight left
-			auto pLeftSpotLight = pActiveScene->CreateGameObject("LeftSpotLight");
-			pLeftSpotLight->SetPosition(-50.0f, 100.0f, 0.0f);
-			pLeftSpotLight->LookAt(50.0f, 100.0f, 0.0f);
-			//pLeftSpotLight->SetActive(false);
-			pSpotLightCom = pLeftSpotLight->AddComponent<Dive::Light>();
-			pSpotLightCom->SetType(Dive::eLightType::Spot);
-			pSpotLightCom->SetRange(5000.0f);
-			pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
-			pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+			pSpotLightCom->SetAngles(10.0f, 30.0f);
 		}
 
 		m_SceneType = eSceneType::Sponza;
@@ -653,9 +664,9 @@ namespace Sandbox
 			// Directional Light
 			m_pDirLightA = pActiveScene->CreateGameObject("DirectionalLightA");
 			m_pDirLightA->SetRotation(45.0f, -45.0f, 45.0f);
-			auto pDirLightCom = m_pDirLightA->AddComponent<Dive::Light>();
+			auto pDirLightCom = new Dive::DirectionalLight();
+			m_pDirLightA->AddComponent<Dive::DvLight>(pDirLightCom);
 			pDirLightCom->SetColor(1.0f, 1.0f, 1.0f);
-			pDirLightCom->SetType(Dive::eLightType::Directional);
 		
 			m_pDummy = pActiveScene->CreateGameObject("Dummy");
 			m_pDummy->SetPosition(0.0f, 0.0f, 0.0f);
@@ -668,22 +679,23 @@ namespace Sandbox
 				pMovingSpotLight->LookAt(0.0f, 0.0f, 0.0f);
 				pMovingSpotLight->SetParent(m_pDummy);
 				pMovingSpotLight->SetActive(true);
-				auto pSpotLightCom = pMovingSpotLight->AddComponent<Dive::Light>();
-				pSpotLightCom->SetType(Dive::eLightType::Spot);
-				pSpotLightCom->SetRange(5000.0f);
-				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
-				pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+				auto pSpotLightCom = new Dive::SpotLight();
+				pMovingSpotLight->AddComponent<Dive::DvLight>(pSpotLightCom);
+				pSpotLightCom->SetRange(500.0f);
+				pSpotLightCom->SetColor(1.0f, 0.0f, 1.0f);
+				pSpotLightCom->SetAngles(25.0f, 30.0f);
 			
 				// TopSpotLight
 				auto pTopSpotLight = pActiveScene->CreateGameObject("TopSpotLight");
 				pTopSpotLight->SetPosition(0.0f, 100.0f, 0.0f);
-				pTopSpotLight->LookAt(0.0f, 0.0f, 0.0f);
+				pTopSpotLight->SetRotation(90.0f, 0.0f, 0.0f);
+				//pTopSpotLight->LookAt(0.0f, 0.0f, 0.0f);
 				pTopSpotLight->SetActive(true);
-				pSpotLightCom = pTopSpotLight->AddComponent<Dive::Light>();
-				pSpotLightCom->SetType(Dive::eLightType::Spot);
-				pSpotLightCom->SetRange(1000.0f);
-				pSpotLightCom->SetColor(1.0f, 1.0f, 1.0f);
-				pSpotLightCom->SetSpotLightAngles(30.0f, 25.0f);
+				pSpotLightCom = new Dive::SpotLight();
+				pTopSpotLight->AddComponent<Dive::DvLight>(pSpotLightCom);
+				pSpotLightCom->SetRange(500.0f);
+				pSpotLightCom->SetColor(1.0f, 1.0f, 0.0f);
+				pSpotLightCom->SetAngles(25.0f, 30.0f);
 			}
 		}
 

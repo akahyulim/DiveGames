@@ -14,9 +14,6 @@ namespace Dive
 	Renderer::Renderer()
 		: m_pDevice(Graphics::GetInstance()->GetDevice())
 		, m_RenderTargets{}
-		, m_VSConstantBuffers{}
-		, m_DSConstantBuffers{}
-		, m_PSConstantBuffers{}
 		, m_Samplers{}
 		, m_bInitialized(false)
 	{
@@ -32,9 +29,6 @@ namespace Dive
 	{
 		if (IsInitialized())
 			Shutdown();
-		
-		if (!createConstantBuffers())
-			return false;
 		
 		if (!createSamplers())
 			return false;
@@ -54,13 +48,6 @@ namespace Dive
 		for (auto pViewScreen : m_ViewScreens)
 			DV_DELETE(pViewScreen);
 		m_ViewScreens.clear();
-
-		for (auto pConstantBuffer : m_PSConstantBuffers)
-			DV_DELETE(pConstantBuffer);
-		for (auto pConstantBuffer : m_DSConstantBuffers)
-			DV_DELETE(pConstantBuffer);
-		for (auto pConstantBuffer : m_VSConstantBuffers)
-			DV_DELETE(pConstantBuffer);
 
 		DV_ENGINE_TRACE("렌더러 시스템 셧다운에 성공하였습니다.");
 	}
@@ -100,35 +87,6 @@ namespace Dive
 
 	bool Renderer::createRenderTextures()
 	{
-		return true;
-	}
-
-	bool Renderer::createConstantBuffers()
-	{
-		// vs
-		m_VSConstantBuffers[static_cast<uint32_t>(eVSConstBufType::Model)] =
-			ConstantBuffer::Create<VSConstBuf_Model>("Model", eShaderType::Vertex, (uint32_t)eVSConstBufType::Model);
-
-		m_VSConstantBuffers[static_cast<uint32_t>(eVSConstBufType::Camera)] =
-			ConstantBuffer::Create<VSConstBuf_Camera>("Camera", eShaderType::Vertex, (uint32_t)eVSConstBufType::Camera);
-
-		m_VSConstantBuffers[static_cast<uint32_t>(eVSConstBufType::Light)] =
-			ConstantBuffer::Create<VSConstBuf_Light>("Light", eShaderType::Vertex, (uint32_t)eVSConstBufType::Light);
-
-		// ds
-		m_DSConstantBuffers[static_cast<uint32_t>(eDSConstBufType::Light)] =
-			ConstantBuffer::Create<DSConstBuf_Light>("Light", eShaderType::Domain, 0);// (uint32_t)eDSConstBufType::Light);
-
-		// ps
-		m_PSConstantBuffers[static_cast<uint32_t>(ePSConstBufType::Model)] =
-			ConstantBuffer::Create<PSConstBuf_Model>("Material", eShaderType::Pixel, (uint32_t)ePSConstBufType::Model);
-
-		m_PSConstantBuffers[static_cast<uint32_t>(ePSConstBufType::Camera)] =
-			ConstantBuffer::Create<PSConstBuf_Camera>("Camera", eShaderType::Pixel, (uint32_t)ePSConstBufType::Camera);
-
-		m_PSConstantBuffers[static_cast<uint32_t>(ePSConstBufType::Light)] =
-			ConstantBuffer::Create<PSConstBuf_Light>("Light", eShaderType::Pixel, (uint32_t)ePSConstBufType::Light);
-
 		return true;
 	}
 

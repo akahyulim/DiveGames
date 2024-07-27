@@ -5,17 +5,19 @@
 namespace Dive
 {
 	class RenderTexture;
+	class ConstantBuffer;
 
 	class Camera : public Component
 	{
 	public:
+		// 이건 왜 또 안에 넣어놨냐...
 		enum class eProjectionType
 		{
 			Perspective,
 			Orthographic
 		};
 
-		DV_CLASS(Camera, Component);
+		DV_CLASS(Camera, Component)
 
 	public:
 		Camera(GameObject* pGameObject);
@@ -58,8 +60,10 @@ namespace Dive
 		void SetRenderTarget(RenderTexture* pRenderTarget) { m_pRenderTarget = pRenderTarget; }
 		DirectX::XMFLOAT2 GetRenderTargetSize() const;
 
-		const VSConstBuf_Camera& GetCBufferVS() const { return m_CBufferVS; }
-		const PSConstBuf_Camera& GetCBufferPS() const { return m_CBufferPS; }
+		// 위치 옮기기?
+		ConstantBuffer* GetConstantBufferVS() override { return m_pCBufferVS; }
+		ConstantBuffer* GetConstantBufferDS() override { return m_pCBufferDS; }
+		ConstantBuffer* GetConstantBufferPS() override { return m_pCBufferPS; }
 
 	protected:
 		eProjectionType m_ProjectionType;
@@ -76,7 +80,8 @@ namespace Dive
 
 		RenderTexture* m_pRenderTarget;
 
-		VSConstBuf_Camera m_CBufferVS;
-		PSConstBuf_Camera m_CBufferPS;
+		ConstantBuffer* m_pCBufferVS;
+		ConstantBuffer* m_pCBufferDS;
+		ConstantBuffer* m_pCBufferPS;
 	};
 }

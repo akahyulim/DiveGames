@@ -4,9 +4,6 @@
 
 namespace Dive
 {
-	class GameObject;
-	class RenderTexture;
-
 	enum class eLightType
 	{
 		Directional,
@@ -14,11 +11,116 @@ namespace Dive
 		Spot
 	};
 
+	class GameObject;
+	class RenderTexture;
+
+	class DvLight : public Component
+	{
+		DV_CLASS(DvLight, Component)
+
+	public:
+		DvLight(GameObject* pGameObject, eLightType type);
+		virtual ~DvLight();
+
+		ConstantBuffer* GetConstantBufferVS() override { return m_pCBufferVS; }
+		ConstantBuffer* GetConstantBufferPS() override { return m_pCBufferPS; }
+		
+		eLightType GetType() const { return m_Type; }
+
+		DirectX::XMFLOAT3 GetColor() const { return m_Color; }
+		void SetColor(float r, float g, float b) { m_Color = { r, g, b }; }
+
+		bool IsShadowEnabled() const { return m_bShadowEnabled; }
+		void SetShadowEnabled(bool enabled) { m_bShadowEnabled = enabled; }
+
+	protected:
+		eLightType m_Type;
+
+		DirectX::XMFLOAT3 m_Color;
+
+		//RenderTexture* m_pShadowMap;
+		//float m_ShadowMapSize;
+
+		bool m_bShadowEnabled;
+
+		ConstantBuffer* m_pCBufferVS;
+		ConstantBuffer* m_pCBufferPS;
+	};
+
 	// 유니티의 경우 디렉셔널 라이트를 2개 이상 설정할 수 있지만 그림자를 만드는 것은 하나로 제한된다.
 	// 언리얼의 경우 포워드 셰이딩의 경우 하나의 디렉셔널 라이트만 사용된다.
+	class DirectionalLight : public DvLight
+	{
+		DV_CLASS(DirectionalLight, DvLight)
+			
+	public:
+		DirectionalLight();
+		DirectionalLight(GameObject* pGameObject);
+		virtual ~DirectionalLight() = default;
+
+		void Update() override;
+	};
+
+	class PointLight : public DvLight
+	{
+		DV_CLASS(PointLight, DvLight)
+
+	public:
+		PointLight();
+		PointLight(GameObject* pGameObject);
+		virtual ~PointLight();
+
+		void Update() override;
+
+		ConstantBuffer* GetConstantBufferDS() override { return m_pCBufferDS; }
+
+		float GetRange() const { return m_Range; }
+		void SetRange(float range) { m_Range = range; }
+
+	private:
+		ConstantBuffer* m_pCBufferDS;
+
+		float m_Range;
+	};
+
+	class SpotLight : public DvLight
+	{
+		DV_CLASS(SpotLight, DvLight)
+
+	public:
+		SpotLight();
+		SpotLight(GameObject* pGameObject);
+		virtual ~SpotLight();
+
+		void Update() override;
+ 
+		ConstantBuffer* GetConstantBufferDS() override { return m_pCBufferDS; }
+
+		float GetRange() const { return m_Range; }
+		void SetRange(float range) { m_Range = range; }
+
+		float GetInnerAngle() const { return m_InnerAngle; }
+		void SetInnerAngle(float angle) { m_InnerAngle = angle; }
+
+		float GetOutterAngle() const { return m_OutterAngle; }
+		void SetOutterAngle(float angle) { m_OutterAngle = angle; }
+
+		void SetAngles(float inner, float outter) { m_InnerAngle = inner; m_OutterAngle = outter; }
+
+	private:
+	private:
+		ConstantBuffer* m_pCBufferDS;
+
+		float m_Range;
+		float m_InnerAngle;
+		float m_OutterAngle;
+	};
+
+	//==================================================================================================
+
 	class Light : public Component
 	{
-		DV_CLASS(Light, Component);
+		DV_CLASS(Light, Component)
 	
 	public:
 		Light(GameObject* pGameObject);
@@ -58,10 +160,6 @@ namespace Dive
 		bool IsShadowEnabled() const { return m_bShadowEnabled; }
 		void EnableShadow(bool enable) { m_bShadowEnabled = enable; }
 
-		const VSConstBuf_Light& GetCBufferVS() const { return m_CBufferVS; }
-		const DSConstBuf_Light& GetCBufferDS() const { return m_CBufferDS; }
-		const PSConstBuf_Light& GetCBufferPS() const { return m_CBufferPS; }
-
 	private:
 		eLightType m_Type;
 
@@ -77,11 +175,5 @@ namespace Dive
 		float m_ShadowMapSize;
 
 		bool m_bShadowEnabled;
-
-		// CBuffer라는 이름이지만 그냥 구조체 객체다.
-		// 실제 CBuffer는 Renderer가 생성하고 관리한다.
-		VSConstBuf_Light m_CBufferVS;
-		DSConstBuf_Light m_CBufferDS;	// 참고) 책에선 DomainCB 이런식으로 명명했다.
-		PSConstBuf_Light m_CBufferPS;
 	};
 }

@@ -24,15 +24,15 @@ VS_OUTPUT MainVS(VS_INPUT input)
     VS_OUTPUT output;
     
     input.position.w = 1.0f;
-    output.position = mul(input.position, cbModelVertex.world);
+    output.position = mul(input.position, ObjectWorld); //cbModelVertex.world);
     output.worldPos = output.position.xyz;
-    output.position = mul(output.position, mul(cbCameraVertex.view, cbCameraVertex.projection));
+    output.position = mul(output.position, mul(CameraView, CameraProj)); //cbCameraVertex.view, cbCameraVertex.projection));
     output.tex = input.tex;
-    output.normalTex = mul(input.normalTex, (float3x3) cbModelVertex.world);
+    output.normalTex = mul(input.normalTex, (float3x3) ObjectWorld); //cbModelVertex.world);
     output.normalTex = normalize(output.normalTex);
-    output.tangent = mul(input.tangent, (float3x3) cbModelVertex.world);
+    output.tangent = mul(input.tangent, (float3x3) ObjectWorld); //cbModelVertex.world);
     output.tangent = normalize(output.tangent);
-    output.bitangent = mul(input.bitangent, (float3x3) cbModelVertex.world);
+    output.bitangent = mul(input.bitangent, (float3x3) ObjectWorld); // cbModelVertex.world);
     output.bitangent = normalize(output.bitangent);
     
     return output;
@@ -52,7 +52,7 @@ PS_GBUFFER MainPS(VS_OUTPUT input)
     // diffuse
     float4 diff;
     if (!HasDiffuseTexture())
-        diff = cbModelPixel.color;
+        diff = MaterialDiff; //cbModelPixel.color;
     else
         diff = DiffuseMap.Sample(BaseSampler, input.tex);
     diff *= diff; // linear space

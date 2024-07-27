@@ -10,16 +10,20 @@ namespace Dive
 	class Mesh;
 	class VertexBuffer;
 	class IndexBuffer;
+	class ConstantBuffer;
 
 	class Renderable : public Component
 	{
-		DV_CLASS(Renderable, Component);
+		DV_CLASS(Renderable, Component)
 
 	public:
 		Renderable(GameObject* pGameObject);
 		~Renderable() override;
 
 		void Update() override;
+
+		ConstantBuffer* GetConstantBufferVS() override { return m_pCBufferVS; }
+		ConstantBuffer* GetConstantBufferPS() override { return m_pCBufferPS; }
 
 		void SetGeometry(Mesh* pMesh, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount);
 
@@ -41,9 +45,6 @@ namespace Dive
 
 		void Draw(D3D11_PRIMITIVE_TOPOLOGY topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST) const;
 
-		const VSConstBuf_Model& GetCBufferVS() const { return m_CBufferVS; }
-		const PSConstBuf_Model& GetCBufferPS() const { return m_CBufferPS; }
-
 	private:
 
 	private:
@@ -60,7 +61,7 @@ namespace Dive
 
 		DirectX::XMFLOAT4X4 m_LastTransform;
 
-		VSConstBuf_Model m_CBufferVS;
-		PSConstBuf_Model m_CBufferPS;
+		ConstantBuffer* m_pCBufferVS;
+		ConstantBuffer* m_pCBufferPS;
 	};
 }

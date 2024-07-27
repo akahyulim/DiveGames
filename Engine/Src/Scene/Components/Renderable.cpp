@@ -7,10 +7,30 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
+#include "Graphics/ConstantBuffer.h"
 #include "Math/Math.h"
 
 namespace Dive
 {
+#pragma pack(push, 1)
+	struct CB_OBJECT_VS
+	{
+		DirectX::XMMATRIX world;
+	};
+
+	struct CB_MATERIAL_PS
+	{
+		DirectX::XMFLOAT4 diffuse;
+		DirectX::XMFLOAT4 normal;
+
+		DirectX::XMFLOAT2 tiling;
+		DirectX::XMFLOAT2 offset;
+
+		uint32_t properties;
+		DirectX::XMFLOAT3 padding;
+	};
+#pragma pack(pop)
+
 	Renderable::Renderable(GameObject* pGameObject)
 		: Component(pGameObject)
 		, m_pMaterial(nullptr)
@@ -19,30 +39,46 @@ namespace Dive
 		, m_VertexCount(0)
 		, m_IndexOffset(0)
 		, m_IndexCount(0)
+		, m_pCBufferVS(nullptr)
+		, m_pCBufferPS(nullptr)
 	{
 		DirectX::XMStoreFloat4x4(&m_LastTransform, DirectX::XMMatrixIdentity());
-
-		ZeroMemory(&m_CBufferVS, sizeof(VSConstBuf_Model));
-		ZeroMemory(&m_CBufferPS, sizeof(PSConstBuf_Model));
 	}
 	
 	Renderable::~Renderable()
 	{
-		DV_ENGINE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
+		DV_DELETE(m_pCBufferPS);
+		DV_DELETE(m_pCBufferVS);
 	}
 
 	void Renderable::Update()
 	{
-		m_CBufferVS.world = DirectX::XMMatrixTranspose(m_pGameObject->GetMatrix());
+		// vs constant buffer
+		{
+			if (!m_pCBufferVS)
+				m_pCBufferVS = ConstantBuffer::Create("CB_OBJECT_VS", sizeof(CB_OBJECT_VS));
 
-		// 없다면 초기화된 값을 전달해야 한다.
-		if (!m_pMaterial)
-			return;
+			auto pMappedData = reinterpret_cast<CB_OBJECT_VS*>(m_pCBufferVS->Map());
+			pMappedData->world = DirectX::XMMatrixTranspose(m_pGameObject->GetMatrix());
+			m_pCBufferVS->Unmap();
+		}
+		
+		// ps constant buffer
+		{
+			// 없다면 초기화된 값을 전달해야 한다.
+			if (!m_pMaterial)
+				return;
 
-		m_CBufferPS.diffuseColor = m_pMaterial->GetDiffuseColor();
-		m_CBufferPS.properties = 0;
-		m_CBufferPS.properties |= m_pMaterial->HasTexture(eTextureUnitType::Diffuse) ? (1U << 0) : 0;
-		m_CBufferPS.properties |= m_pMaterial->HasTexture(eTextureUnitType::Normal) ? (1U << 1) : 0;
+			if (!m_pCBufferPS)
+				m_pCBufferPS = ConstantBuffer::Create("CB_MATERIAL_PS", sizeof(CB_MATERIAL_PS));
+			
+			auto pMappedData = reinterpret_cast<CB_MATERIAL_PS*>(m_pCBufferPS->Map());
+			pMappedData->diffuse = m_pMaterial->GetDiffuseColor();
+			pMappedData->properties = 0;
+			pMappedData->properties |= m_pMaterial->HasTexture(eTextureUnitType::Diffuse) ? (1U << 0) : 0;
+			pMappedData->properties |= m_pMaterial->HasTexture(eTextureUnitType::Normal) ? (1U << 1) : 0;
+			m_pCBufferPS->Unmap();
+		}
 	}
 	
 	// 렌더러블이 그릴 메시의 정보를 받는 메서드다.

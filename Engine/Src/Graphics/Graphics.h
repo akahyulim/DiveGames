@@ -95,6 +95,7 @@ namespace Dive
 		DeferredLight,
 		DeferredDirLight,
 		DeferredPointLight,
+		DeferredSpotLight,
 		Count
 	};
 
@@ -102,6 +103,7 @@ namespace Dive
 	{
 		Null = 0,
 		DeferredPointLight,
+		DeferredSpotLight,
 		Count
 	};
 
@@ -109,6 +111,7 @@ namespace Dive
 	{
 		Null = 0,
 		DeferredPointLight,
+		DeferredSpotLight,
 		Count
 	};
 
@@ -120,6 +123,7 @@ namespace Dive
 		DeferredLight,
 		DeferredDirLight,
 		DeferredPointLight,
+		DeferredSpotLight,
 		Count
 	};
 
@@ -280,10 +284,11 @@ namespace Dive
 		void SetHullShader(eHullShaderType type);
 		void SetDomainShader(eDomainShaderType type);
 		void SetPixelShader(ePixelShaderType type);
-		void BindVSCBuffer(const ConstantBuffer* pBuffer);
-		void BindVSConstBuf(eVSConstBufType type);
-		void BindDSCBuffer(const ConstantBuffer* pBuffer);
-		void BindPSCBuffer(const ConstantBuffer* pBuffer);
+		
+		void VSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot);
+		void DSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot);
+		void PSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot);
+		
 		void BindPSResource(ID3D11ShaderResourceView* pResourceView, eTextureUnitType unit);
 		void BindPSResource(Texture* pTexture, eTextureUnitType unit);	// enum class보단 uint8_t를 받는 게 나아보인다.
 		void BindPSResource(Texture2D* pTexture, eTextureUnitType unit);
@@ -387,7 +392,7 @@ namespace Dive
 		// vertex shader constant buffers
 		// 생성된 버퍼와 바인드될 버퍼 공간 둘로 구분된다.
 		ConstantBuffer* m_VSConstBufs[static_cast<uint8_t>(eVSConstBufType::Count)];
-		ID3D11Buffer* m_VSConstBufSlots[MAX_NUM_VS_CONSTANT_BUFFERS];
+		ID3D11Buffer* m_VSConstBufSlots[MAX_NUM_VS_CONSTANT_BUFFERS];	// 현재 이건 사용되지 않고 있다.
 		bool m_bVSConstBufDirty;
 
 		// hull shader

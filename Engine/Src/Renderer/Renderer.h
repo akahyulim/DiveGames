@@ -24,72 +24,6 @@ namespace Dive
 	};
 
 	//-------------------------------------------------------------------------------------
-	// structures: VS, PS Constant Buffers
-	//-------------------------------------------------------------------------------------
-#pragma pack(push, 1)
-	struct VSConstBuf_Model
-	{
-		DirectX::XMMATRIX world;
-	};
-
-	struct VSConstBuf_Camera
-	{
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX projection;
-	};
-
-	struct VSConstBuf_Light
-	{
-		DirectX::XMMATRIX shadow;
-	};
-
-	struct DSConstBuf_Light
-	{
-		DirectX::XMMATRIX lightProjection;
-	};
-
-	struct PSConstBuf_Model
-	{
-		DirectX::XMFLOAT4 diffuseColor;
-		DirectX::XMFLOAT4 normal;	// xmfloat3이어야 하나...
-
-		DirectX::XMFLOAT2 tiling;
-		DirectX::XMFLOAT2 offset;
-
-		uint32_t properties;
-		DirectX::XMFLOAT3 padding;
-	};
-
-	struct PSConstBuf_Camera
-	{
-		DirectX::XMFLOAT3 position;
-		float padding;
-
-		DirectX::XMFLOAT4 perspectiveValue;
-
-		DirectX::XMMATRIX viewInverse;
-	};
-
-	struct PSConstBuf_Light
-	{
-		DirectX::XMFLOAT3 color;
-		float outerConeAngle;
-
-		DirectX::XMFLOAT3 position;
-		float rangeRcp;
-
-		DirectX::XMFLOAT3 direction;
-		float innerConeAngle;
-
-		uint32_t options;
-		int shadowEnabled;
-		DirectX::XMFLOAT2 padding;
-
-		DirectX::XMMATRIX shadow;
-	};
-#pragma pack(pop)
-
-	//-------------------------------------------------------------------------------------
 	// forward declarations
 	//-------------------------------------------------------------------------------------
 	class ViewScreen;
@@ -128,10 +62,6 @@ namespace Dive
 		ViewScreen* GetViewScreen(uint32_t index);
 		void SetViewScreen(uint32_t index, ViewScreen* pViewScreen);
 
-		ConstantBuffer* GetVSConstantBuffer(eVSConstBufType type) const { return m_VSConstantBuffers[static_cast<uint8_t>(type)]; }
-		ConstantBuffer* GetDSConstantBuffer(eDSConstBufType type) const { return m_DSConstantBuffers[static_cast<uint8_t>(type)]; }
-		ConstantBuffer* GetPSConstantBuffer(ePSConstBufType type) const { return m_PSConstantBuffers[static_cast<uint8_t>(type)]; }
-
 		ID3D11SamplerState* GetSampler(eSamplerType type) const { return m_Samplers[static_cast<uint8_t>(type)]; }
 
 		bool IsInitialized() const { return m_bInitialized; }
@@ -141,7 +71,6 @@ namespace Dive
 		~Renderer();
 
 		bool createRenderTextures();
-		bool createConstantBuffers();
 		bool createSamplers();
 
 	private:
@@ -152,10 +81,6 @@ namespace Dive
 		std::vector<ViewScreen*> m_ViewScreens;	// 유니티의 레이어와는 다르다. 착각하지 말자.
 
 		std::array<RenderTexture*, static_cast<uint8_t>(eRenderTargetType::Count)> m_RenderTargets;
-
-		std::array<ConstantBuffer*, static_cast<uint8_t>(eVSConstBufType::Count)> m_VSConstantBuffers;
-		std::array<ConstantBuffer*, static_cast<uint8_t>(eDSConstBufType::Count)> m_DSConstantBuffers;
-		std::array<ConstantBuffer*, static_cast<uint8_t>(ePSConstBufType::Count)> m_PSConstantBuffers;
 		
 		std::array<ID3D11SamplerState*, static_cast<uint8_t>(eSamplerType::Count)> m_Samplers;
 

@@ -1,5 +1,6 @@
 #include "Common.hlsl"
 
+
 float4 MainVS() : SV_Position
 {
     return float4(0.0, 0.0, 0.0, 1.0);
@@ -46,6 +47,11 @@ HS_OUTPUT MainHS(uint patchID : SV_PrimitiveID)
     return output;
 }
 
+cbuffer cbDomain : register(b1)
+{
+    matrix World : packoffset(c0);
+};
+
 struct DS_OUTPUT
 {
     float4 position : SV_POSITION;
@@ -72,7 +78,8 @@ DS_OUTPUT MainDS(HS_CONSTANT_DATA_OUTPUT input, float2 uv : SV_DomainLocation, c
 	// Transform all the way to projected space
     // 사이즈, 위치, 뷰, 프로젝션 모두 적용
     DS_OUTPUT output;
-    output.position = mul(posLS, cbLightDomain.lightProjection);
+    matrix lightProjection = mul(World, CameraViewProj);
+    output.position = mul(posLS, lightProjection); //cbLightDomain.lightProjection);
 
 	// Store the clip space position
     output.cpPos = output.position.xy / output.position.w;
@@ -80,25 +87,33 @@ DS_OUTPUT MainDS(HS_CONSTANT_DATA_OUTPUT input, float2 uv : SV_DomainLocation, c
     return output;
 }
 
+cbuffer cbPixel : register(b2)
+{
+    float3 Color        : packoffset(c0);
+    float RangeRcp      : packoffset(c0.w);
+    float3 Position     : packoffset(c1);
+    uint ShadowEnabled  : packoffset(c1.w);
+};
+
 float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diffColor)
 {
-    float3 toLight = cbLightPixel.position - worldPos;
-    float3 toEye = cbCameraPixel.position - worldPos;
+    float3 toLight = Position - worldPos;
+    float3 toEye = Position - worldPos;
     float distance = length(toLight);
     
     // phong diffuse
     toLight /= distance;
     float NDotL = saturate(dot(toLight, normal));
-    float3 finalColor = cbLightPixel.color * NDotL;
+    float3 finalColor = Color * NDotL;
     
     // blinn specular
     toEye = normalize(toEye);
     float3 halfWay = normalize(toEye + toLight);
     float NDotH = saturate(dot(halfWay, normal));
-    finalColor += cbLightPixel.color * pow(NDotH, 250.0f) * 0.25f;
+    finalColor += Color * pow(NDotH, 250.0f) * 0.25f;
     
     // attenuation
-    float distToLightNorm = 1.0f - saturate(distance * cbLightPixel.rangeRcp);
+    float distToLightNorm = 1.0f - saturate(distance * RangeRcp);
     float attn = distToLightNorm * distToLightNorm;
     
     // shadow
@@ -113,6 +128,7 @@ float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diffColor)
 
 float4 MainPS(DS_OUTPUT input) : SV_TARGET
 {
+    /*
     // Diff Color
     int3 location3 = int3(input.position.xy, 0);
     float4 diffColor = DiffuseTex.Load(location3);
@@ -128,6 +144,26 @@ float4 MainPS(DS_OUTPUT input) : SV_TARGET
     position.w = 1.0f;
     position.xyz = mul(position, cbCameraPixel.viewInverse).xyz;
     
+	// Normal
+    float3 normal;
+    normal = NormalTex.Load(location3);
+    normal = normalize(normal * 2.0f - 1.0f);
+*/    
+    // Diff Color
+    int3 location3 = int3(input.position.xy, 0);
+    float4 diffColor = DiffuseTex.Load(location3);
+    
+	// Linear Depth
+    float depth = DepthTex.Load(location3).x;
+    float linearDepth = CameraPerspectiveValue.z / (depth + CameraPerspectiveValue.w); //cbCameraPixel.perspectiveValue.z / (depth + cbCameraPixel.perspectiveValue.w);
+
+	// World Position
+    float4 position;
+    position.xy = input.cpPos.xy * CameraPerspectiveValue.xy * linearDepth; //cbCameraPixel.perspectiveValue.xy * linearDepth;
+    position.z = linearDepth;
+    position.w = 1.0f;
+    position.xyz = mul(position, CameraViewInverse).xyz; //cbCameraPixel.viewInverse).xyz;
+
 	// Normal
     float3 normal;
     normal = NormalTex.Load(location3);

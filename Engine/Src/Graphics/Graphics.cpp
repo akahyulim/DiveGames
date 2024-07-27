@@ -494,49 +494,30 @@ namespace Dive
 		}
 	}
 
-	void Graphics::BindVSCBuffer(const ConstantBuffer* pBuffer)
+	// 이름을 다시 BindConstantBufferVS로 바꾸자.
+	void Graphics::VSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot)
 	{
-		DV_ENGINE_ASSERT(pBuffer);
-
-		// pBuffer가 nullptr이면 index를 얻을 수 없다.
-		if (pBuffer != m_VSConstBufs[pBuffer->GetIndex()])
+		if (pBuffer != m_VSConstBufs[slot])
 		{
-			m_VSConstBufs[pBuffer->GetIndex()] = const_cast<ConstantBuffer*>(pBuffer);
+			m_VSConstBufs[slot] = pBuffer;
 			m_bVSConstBufDirty = true;
 		}
 	}
 
-	void Graphics::BindVSConstBuf(eVSConstBufType type)
+	void Graphics::DSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot)
 	{
-		// 나는 현재 상수버퍼를 모든 셰이더에서 동일하게 접근하도록 전역으로 슬롯을 지정해 놓았지만
-		// 사실 셰이더마다 상수버퍼를 개별적으로 만들어 사용하는 것이 일반적이다.
-		// 이는 아마도 셰이더 리소스나 샘플러 등도 동일할 것이다.
-		// 후자의 경우엔 결국 셰이더마다 슬롯 인덱스도 수동으로 설정해주어야 한다.
-	}
-
-	void Graphics::BindDSCBuffer(const ConstantBuffer* pBuffer)
-	{
-		DV_ENGINE_ASSERT(pBuffer);
-
-		// pBuffer가 nullptr이면 index를 얻을 수 없다.
-		if (pBuffer != m_DSConstBufs[pBuffer->GetIndex()])
+		if (pBuffer != m_DSConstBufs[slot])
 		{
-			m_DSConstBufs[pBuffer->GetIndex()] = const_cast<ConstantBuffer*>(pBuffer);
+			m_DSConstBufs[slot] = pBuffer;
 			m_bDSConstBufDirty = true;
 		}
 	}
 
-	// 모으는 편이 낫다.
-	void Graphics::BindPSCBuffer(const ConstantBuffer* pBuffer)
+	void Graphics::PSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot)
 	{
-		DV_ENGINE_ASSERT(pBuffer);
-
-		// 세부 값이 달라지지만 버퍼 포인터 자체는 동일할 수 있다.
-		// 현재 lightCom의 ConstBuffer가 그렇다.
-		// => 버퍼 바인딩을 시키면 이후부턴 다시 PSSetConstantBuffers를 할 필요가 없는 듯 하다.
-		if (pBuffer != m_PSConstBufs[pBuffer->GetIndex()])
+		if (pBuffer != m_PSConstBufs[slot])
 		{
-			m_PSConstBufs[pBuffer->GetIndex()] = const_cast<ConstantBuffer*>(pBuffer);
+			m_PSConstBufs[slot] = pBuffer;
 			m_bPSConstBufDirty = true;
 		}
 	}
@@ -1180,6 +1161,12 @@ namespace Dive
 				return false;
 			index = static_cast<uint8_t>(eVertexShaderType::DeferredPointLight);
 			m_VertexShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredSpotLight.hlsl", eShaderType::Vertex))
+				return false;
+			index = static_cast<uint8_t>(eVertexShaderType::DeferredSpotLight);
+			m_VertexShaders[index] = pShader;
 		}
 
 		// hull shaders
@@ -1192,6 +1179,12 @@ namespace Dive
 				return false;
 			index = static_cast<uint8_t>(eHullShaderType::DeferredPointLight);
 			m_HullShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredSpotLight.hlsl", eShaderType::Hull))
+				return false;
+			index = static_cast<uint8_t>(eHullShaderType::DeferredSpotLight);
+			m_HullShaders[index] = pShader;
 		}
 
 		// domain shaders
@@ -1203,6 +1196,12 @@ namespace Dive
 			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredPointLight.hlsl", eShaderType::Domain))
 				return false;
 			index = static_cast<uint8_t>(eDomainShaderType::DeferredPointLight);
+			m_DomainShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredSpotLight.hlsl", eShaderType::Domain))
+				return false;
+			index = static_cast<uint8_t>(eDomainShaderType::DeferredSpotLight);
 			m_DomainShaders[index] = pShader;
 		}
 
@@ -1240,6 +1239,12 @@ namespace Dive
 			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredPointLight.hlsl", eShaderType::Pixel))
 				return false;
 			index = static_cast<uint8_t>(ePixelShaderType::DeferredPointLight);
+			m_PixelShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredSpotLight.hlsl", eShaderType::Pixel))
+				return false;
+			index = static_cast<uint8_t>(ePixelShaderType::DeferredSpotLight);
 			m_PixelShaders[index] = pShader;
 		}
 

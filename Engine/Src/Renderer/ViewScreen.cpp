@@ -62,7 +62,12 @@ namespace Dive
 				}
 			}
 
-			if (auto pLightCom = pGameObject->GetComponent<Light>())
+			//if (auto pLightCom = pGameObject->GetComponent<Light>())
+			{
+			//	m_Renderables[eRenderableType::Light].emplace_back(pGameObject);
+			}
+
+			if (auto pLightCom = pGameObject->GetComponent<DvLight>())
 			{
 				m_Renderables[eRenderableType::Light].emplace_back(pGameObject);
 			}
@@ -145,13 +150,12 @@ namespace Dive
 		m_pGraphics->SetVertexShader(eVertexShaderType::LightDepth);
 		m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		auto pVSCBufferCamera = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Camera);
-		pVSCBufferCamera->Update((void*)&m_pCamera->GetCBufferVS());
-		m_pGraphics->BindVSCBuffer(pVSCBufferCamera);
-
-		auto pPSCBufferCamera = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Camera);
-		pPSCBufferCamera->Update((void*)&m_pCamera->GetCBufferPS());
-		m_pGraphics->BindPSCBuffer(pPSCBufferCamera); 
+		// urho는 파라미터 세팅을 함수로 묶어 호출하였고
+		// 바인딩은 셰이더와 함께 했다.
+		
+		// Common? ConstantBuffers: 이게 0번째 슬롯이어야 더 자연스러운데...?
+		m_pGraphics->VSBindConstantBuffer(m_pCamera->GetConstantBufferVS(), 0);
+		m_pGraphics->PSBindConstantBuffer(m_pCamera->GetConstantBufferPS(), 0);
 
 		for (const auto light : m_Renderables[eRenderableType::Light])
 		{
@@ -170,9 +174,10 @@ namespace Dive
 			// viewport
 			m_pGraphics->SetViewport(0, 0, pLightCom->GetShadowMapSize(), pLightCom->GetShadowMapSize());
 
-			auto pLightVSBuffer = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Light);
-			pLightVSBuffer->Update((void*)&pLightCom->GetCBufferVS());
-			m_pGraphics->BindVSCBuffer(pLightVSBuffer);
+			//auto pLightVSBuffer = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Light);
+			//pLightVSBuffer->Update((void*)&pLightCom->GetCBufferVS());
+			//m_pGraphics->BindVSCBuffer(pLightVSBuffer);
+			m_pGraphics->DSBindConstantBuffer(pLightCom->GetConstantBufferVS(), 2);
 
 			// draw opaque's depth			
 			for (const auto* pOpaque : m_Renderables[eRenderableType::Opaque])
@@ -184,9 +189,7 @@ namespace Dive
 				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 					continue;
 
-				auto pModelBuffer = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Model);
-				pModelBuffer->Update((void*)&pRenderableCom->GetCBufferVS());
-				m_pGraphics->BindVSCBuffer(pModelBuffer);
+				m_pGraphics->VSBindConstantBuffer(pRenderableCom->GetConstantBufferVS(), 1);
 
 				m_pGraphics->SetVertexBuffer(pRenderableCom->GetVertexBuffer());
 				m_pGraphics->SetIndexBuffer(pRenderableCom->GetIndexBuffer());
@@ -203,9 +206,7 @@ namespace Dive
 				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 					continue;
 
-				auto pModelBuffer = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Model);
-				pModelBuffer->Update((void*)&pRenderableCom->GetCBufferVS());
-				m_pGraphics->BindVSCBuffer(pModelBuffer);
+				m_pGraphics->VSBindConstantBuffer(pRenderableCom->GetConstantBufferVS(), 1);
 
 				m_pGraphics->SetVertexBuffer(pRenderableCom->GetVertexBuffer());
 				m_pGraphics->SetIndexBuffer(pRenderableCom->GetIndexBuffer());
@@ -243,9 +244,10 @@ namespace Dive
 				continue;
 
 			// 여기에서도 두 번째 광원부터 갱신이 안될 것 같은데...
-			auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
-			pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
-			m_pGraphics->BindPSCBuffer(pLightBuffer);
+			//auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
+			//pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
+			//m_pGraphics->BindPSCBuffer(pLightBuffer);
+			m_pGraphics->PSBindConstantBuffer(pLightCom->GetConstantBufferPS(), 2);
 
 			// 두 번째 광원부터는 이전 드로우 콜 결과를 혼합한다.
 			if(i == 1)
@@ -261,13 +263,8 @@ namespace Dive
 				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 					continue;
 
-				auto pModelBuffer = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Model);
-				pModelBuffer->Update((void*)&pRenderableCom->GetCBufferVS());
-				m_pGraphics->BindVSCBuffer(pModelBuffer);
-
-				auto pMaterialBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Model);
-				pMaterialBuffer->Update((void*)&pRenderableCom->GetCBufferPS());
-				m_pGraphics->BindPSCBuffer(pMaterialBuffer);
+				m_pGraphics->VSBindConstantBuffer(pRenderableCom->GetConstantBufferVS(), 1);
+				m_pGraphics->PSBindConstantBuffer(pRenderableCom->GetConstantBufferPS(), 5);	// 추후 1로 바꾸어야 한다.
 
 				// 위의 샘플러도 그렇고 매개변수 구성이 좀 별루다.
 				// 상수버퍼처럼 텍스쳐가 slot을 가지면 깔끔해진다.
@@ -303,9 +300,10 @@ namespace Dive
 			if (!pLightCom->IsEnabled())
 				continue;
 
-			auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
-			pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
-			m_pGraphics->BindPSCBuffer(pLightBuffer);
+			//auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
+			//pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
+			//m_pGraphics->BindPSCBuffer(pLightBuffer);
+			m_pGraphics->PSBindConstantBuffer(pLightCom->GetConstantBufferPS(), 2);
 
 			// draw transparents
 			for (const auto* pTransparent : m_Renderables[eRenderableType::Transparent])
@@ -317,13 +315,8 @@ namespace Dive
 				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 					continue;
 
-				auto pModelBuffer = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Model);
-				pModelBuffer->Update((void*)&pRenderableCom->GetCBufferVS());
-				m_pGraphics->BindVSCBuffer(pModelBuffer);
-
-				auto pMaterialBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Model);
-				pMaterialBuffer->Update((void*)&pRenderableCom->GetCBufferPS());
-				m_pGraphics->BindPSCBuffer(pMaterialBuffer);
+				m_pGraphics->VSBindConstantBuffer(pRenderableCom->GetConstantBufferVS(), 1);
+				m_pGraphics->PSBindConstantBuffer(pRenderableCom->GetConstantBufferPS(), 5);
 
 				m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Diffuse), eTextureUnitType::Diffuse);
 				m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Normal), eTextureUnitType::Normal);
@@ -355,6 +348,9 @@ namespace Dive
 		m_pGraphics->SetRasterizerState(eRasterizerStateType::FillSolid_CullBack);
 		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::GBuffer);		// 책은 이 State까지 GBuffer에서 관리한다.
 
+		// 이걸 사용한다.
+		m_pGraphics->VSBindConstantBuffer(m_pCamera->GetConstantBufferVS(), 0);
+
 		// draw on g buffer
 		for (const auto* pOpaque : m_Renderables[eRenderableType::Opaque])
 		{
@@ -365,19 +361,14 @@ namespace Dive
 			if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 				continue;
 
-			auto pModelBuffer = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Model);
-			pModelBuffer->Update((void*)&pRenderableCom->GetCBufferVS());
-			pModelBuffer->Bind();
-
-			m_pGraphics->SetVertexShader(eVertexShaderType::GBuffer);
-			m_pGraphics->SetPixelShader(ePixelShaderType::GBuffer);
-
-			auto pMaterialBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Model);
-			pMaterialBuffer->Update((void*)&pRenderableCom->GetCBufferPS());
-			m_pGraphics->BindPSCBuffer(pMaterialBuffer);
+			m_pGraphics->VSBindConstantBuffer(pRenderableCom->GetConstantBufferVS(), 1);
+			m_pGraphics->PSBindConstantBuffer(pRenderableCom->GetConstantBufferPS(), 5);
 
 			m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Diffuse), eTextureUnitType::Diffuse);
 			m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Normal), eTextureUnitType::Normal);
+
+			m_pGraphics->SetVertexShader(eVertexShaderType::GBuffer);
+			m_pGraphics->SetPixelShader(ePixelShaderType::GBuffer);
 
 			m_pGraphics->SetVertexBuffer(pRenderableCom->GetVertexBuffer());
 			m_pGraphics->SetIndexBuffer(pRenderableCom->GetIndexBuffer());
@@ -410,11 +401,9 @@ namespace Dive
 		//pVSCBufferCamera->Update((void*)&m_pCamera->GetCBufferVS());
 		//m_pGraphics->BindVSCBuffer(pVSCBufferCamera);
 
-		// 바인딩은 한 번만 하지만 업데이트는 유효함을 확인했다.
-		auto pPSCBufferCamera = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Camera);
-		pPSCBufferCamera->Update((void*)&m_pCamera->GetCBufferPS());
-		m_pGraphics->BindPSCBuffer(pPSCBufferCamera);
-	
+		// ConstantBuffers
+		m_pGraphics->PSBindConstantBuffer(m_pCamera->GetConstantBufferPS(), 0);
+
 		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex(), eTextureUnitType::GBuffer_Diffuse);
 		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex(), eTextureUnitType::GBuffer_Normal);
 		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex(), eTextureUnitType::GBuffer_Specular);
@@ -425,11 +414,12 @@ namespace Dive
 		for (int i = 0; i < static_cast<int>(m_Renderables[eRenderableType::Light].size()); i++)
 		{
 			const auto* pLight = m_Renderables[eRenderableType::Light][i];
-			auto* pLightCom = pLight->GetComponent<Light>();
+			auto* pLightCom = pLight->GetComponent<DvLight>();
 
-			auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
-			pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
-			m_pGraphics->BindPSCBuffer(pLightBuffer);
+			//auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
+			//pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
+			//m_pGraphics->BindPSCBuffer(pLightBuffer);
+			m_pGraphics->PSBindConstantBuffer(pLightCom->GetConstantBufferPS(), 2);
 
 			if(i >= 1)
 			{
@@ -465,8 +455,12 @@ namespace Dive
 				m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
 				
 				// 렌더러가 상수버퍼를 가지는 게 맞나...?
+				/*
 				auto pLightBuffer = m_pRenderer->GetDSConstantBuffer(eDSConstBufType::Light);
-				DirectX::XMMATRIX lightWorldScale = DirectX::XMMatrixScaling(pLightCom->GetRange(), pLightCom->GetRange(), pLightCom->GetRange());
+				DirectX::XMMATRIX lightWorldScale = DirectX::XMMatrixScaling(
+					dynamic_cast<PointLight*>(pLightCom)->GetRange(),
+					dynamic_cast<PointLight*>(pLightCom)->GetRange(),
+					dynamic_cast<PointLight*>(pLightCom)->GetRange());
 				DirectX::XMMATRIX lightWorldTrans = DirectX::XMMatrixTranslation(
 					pLight->GetPosition().x, pLight->GetPosition().y, pLight->GetPosition().z);
 					//m_pGameObject->GetPosition().x, m_pGameObject->GetPosition().y, m_pGameObject->GetPosition().z);
@@ -474,9 +468,12 @@ namespace Dive
 				DirectX::XMMATRIX proj = m_pCamera->GetProjectionMatrix();
 				DirectX::XMMATRIX worldViewProjection = DirectX::XMMatrixTranspose(lightWorldScale * lightWorldTrans * view * proj);
 				//pLightBuffer->Update((void*)&pLightCom->GetCBufferDS());
-				pLightBuffer->Update((void*)&worldViewProjection);
+				//pLightBuffer->Update((void*)&worldViewProjection);
 				// XXXCBufferDS() 형태의 이름으로 통일시키자.
-				m_pGraphics->BindDSCBuffer(pLightBuffer);
+				//m_pGraphics->BindDSCBuffer(pLightBuffer);
+				*/
+				m_pGraphics->DSBindConstantBuffer(m_pCamera->GetConstantBufferDS(), 0);
+				m_pGraphics->DSBindConstantBuffer(pLightCom->GetConstantBufferDS(), 1);
 
 				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredPointLight);
 				m_pGraphics->SetHullShader(eHullShaderType::DeferredPointLight);
@@ -490,6 +487,21 @@ namespace Dive
 			
 			case eLightType::Spot:
 			{
+				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
+				m_pGraphics->SetRasterizerState(eRasterizerStateType::NoDepthClipFront);
+
+				m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
+
+				m_pGraphics->DSBindConstantBuffer(m_pCamera->GetConstantBufferDS(), 0);
+				m_pGraphics->DSBindConstantBuffer(pLightCom->GetConstantBufferDS(), 1);
+
+				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredSpotLight);
+				m_pGraphics->SetHullShader(eHullShaderType::DeferredSpotLight);
+				m_pGraphics->SetDomainShader(eDomainShaderType::DeferredSpotLight);
+				m_pGraphics->SetPixelShader(ePixelShaderType::DeferredSpotLight);
+
+				m_pGraphics->SetVertexBuffer(nullptr);
+				m_pGraphics->Draw(1, 0);
 				break;
 			}
 
@@ -517,7 +529,7 @@ namespace Dive
 	// 책에서는 Direcitonal과 Spot & Point의 Depth Func가 다르다.
 	void ViewScreen::deferredRender()
 	{
-		passDepth();
+		//passDepth();
 		passGBuffer();
 		passLight();
 	}

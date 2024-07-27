@@ -3,16 +3,43 @@
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/RenderTexture.h"
+#include "Graphics/ConstantBuffer.h"
 #include "Scene/GameObject.h"
 
 namespace Dive
 {
+#pragma pack(push, 1)
+	struct CB_CAMERA_VS
+	{
+		DirectX::XMMATRIX view;
+		DirectX::XMMATRIX proj;
+	};
+
+	struct CB_CAMERA_DS
+	{
+		DirectX::XMMATRIX viewProj;
+	};
+
+	struct CB_CAMERA_PS
+	{
+		DirectX::XMFLOAT3 position;
+		float padding;
+
+		DirectX::XMFLOAT4 perspectiveValue;
+
+		DirectX::XMMATRIX viewInverse;
+	};
+#pragma pack(pop)
+
 	static constexpr float FOV_MIN = 1.0f;
 	static constexpr float FOV_MAX = 160.0f;
 
 	Camera::Camera(GameObject* pGameObject)
 		: Component(pGameObject)
 		, m_pRenderTarget(nullptr)
+		, m_pCBufferVS(nullptr)
+		, m_pCBufferDS(nullptr)
+		, m_pCBufferPS(nullptr)
 	{
 		m_ProjectionType = eProjectionType::Perspective;
 		m_BackgroundColor = { 1.0f, 1.0, 1.0f, 1.0f };
@@ -21,35 +48,59 @@ namespace Dive
 		m_FarClipPlane = 1000.0f;
 		m_MoveSpeed = 10.0f;
 		m_RotateSpeed = 50.0f;
-		
-		ZeroMemory(&m_CBufferVS, sizeof(VSConstBuf_Camera));
-		ZeroMemory(&m_CBufferPS, sizeof(PSConstBuf_Camera));
 	}
 
 	Camera::~Camera()
 	{
+		DV_DELETE(m_pCBufferPS);
+		DV_DELETE(m_pCBufferDS);
+		DV_DELETE(m_pCBufferVS);
 		DV_DELETE(m_pRenderTarget);
-
-		DV_ENGINE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
 	}
 
+	// 버퍼를 생성 및 관리하는 것은 맞지 않다.
+	// 갱신된 데이터로 버퍼를 업데이트하도록 구현해야 한다.
 	void Camera::Update()
 	{
-		//vs
-		m_CBufferVS.view = DirectX::XMMatrixTranspose(GetViewMatrix());
-		m_CBufferVS.projection = DirectX::XMMatrixTranspose(GetProjectionMatrix());
+		// vs constant buffer
+		{
+			if(!m_pCBufferVS)
+				m_pCBufferVS = ConstantBuffer::Create("CB_CAMERA_VS", sizeof(CB_CAMERA_VS));
 
-		// ps
-		m_CBufferPS.position = GetPosition();
-		DirectX::XMFLOAT4X4 proj;
-		DirectX::XMStoreFloat4x4(&proj, GetProjectionMatrix());
-		m_CBufferPS.perspectiveValue.x = 1.0f / proj._11;
-		m_CBufferPS.perspectiveValue.y = 1.0f / proj._22;
-		m_CBufferPS.perspectiveValue.z = proj._43;
-		m_CBufferPS.perspectiveValue.w = -proj._33;
+			auto pMappedData = static_cast<CB_CAMERA_VS*>(m_pCBufferVS->Map());
+			pMappedData->view = DirectX::XMMatrixTranspose(GetViewMatrix());
+			pMappedData->proj = DirectX::XMMatrixTranspose(GetProjectionMatrix());
+			m_pCBufferVS->Unmap();
+		}
 
-		auto viewInv = DirectX::XMMatrixInverse(nullptr, GetViewMatrix());
-		m_CBufferPS.viewInverse = DirectX::XMMatrixTranspose(viewInv);
+		// ds constant buffer
+		{
+			if(!m_pCBufferDS)
+				m_pCBufferDS = ConstantBuffer::Create("CB_CAMERA_DS", sizeof(CB_CAMERA_DS));
+
+			auto pMappedData = static_cast<CB_CAMERA_DS*>(m_pCBufferDS->Map());
+			pMappedData->viewProj = DirectX::XMMatrixTranspose(GetViewMatrix() * GetProjectionMatrix());
+			m_pCBufferDS->Unmap();
+		}
+
+		// ps constant buffer
+		{
+			if(!m_pCBufferPS)
+				m_pCBufferPS = ConstantBuffer::Create("CB_CAMERA_PS", sizeof(CB_CAMERA_PS));
+
+			auto pMappedData = reinterpret_cast<CB_CAMERA_PS*>(m_pCBufferPS->Map());
+			pMappedData->position = GetPosition();
+			pMappedData->padding = 0.0f;
+			DirectX::XMFLOAT4X4 proj;
+			DirectX::XMStoreFloat4x4(&proj, GetProjectionMatrix());
+			pMappedData->perspectiveValue.x = 1.0f / proj._11;
+			pMappedData->perspectiveValue.y = 1.0f / proj._22;
+			pMappedData->perspectiveValue.z = proj._43;
+			pMappedData->perspectiveValue.w = -proj._33;
+			DirectX::XMMATRIX viewInv = DirectX::XMMatrixInverse(nullptr, GetViewMatrix());
+			pMappedData->viewInverse = DirectX::XMMatrixTranspose(viewInv);
+			m_pCBufferPS->Unmap();
+		}
 	}
 
 	DirectX::XMFLOAT3 Camera::GetPosition()

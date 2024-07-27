@@ -1,3 +1,39 @@
+// 추후 파일이름을 ConstantBuffer로 바꾸자
+
+cbuffer cbCameraVertex : register(b0)
+{
+    matrix CameraView : packoffset(c0);
+    matrix CameraProj : packoffset(c4);
+};
+
+cbuffer cbCameraDomain : register(b0)
+{
+    matrix CameraViewProj : packoffset(c0);
+};
+
+cbuffer cbCameraPixel : register(b0)
+{
+    float3 CameraPos                : packoffset(c0);
+    float4 CameraPerspectiveValue   : packoffset(c1);
+    matrix CameraViewInverse        : packoffset(c2);
+};
+
+cbuffer cbObjectVertex : register(b1)
+{
+    matrix ObjectWorld : packoffset(c0);
+};
+
+cbuffer cbMaterialPixel : register(b5)  // 왜 b1은 에러가 날까?
+{
+    float4 MaterialDiff         : packoffset(c0);
+    float4 MaterialNormal       : packoffset(c1);
+    float2 MaterialTexTiling    : packoffset(c2);
+    float2 MaterialOffset       : packoffset(c2.z);
+    uint MaterialProperties     : packoffset(c3);
+};
+
+//======================================================================================
+
 struct VSConstBuf_Model
 {
     matrix world;
@@ -92,7 +128,7 @@ cbuffer PS_Camera : register(b1)
     PSConstBuf_Camera cbCameraPixel;
 }
 
-cbuffer PS_Light : register(b2)
+cbuffer PS_Light : register(b3)     // 임시
 {
     PSConstBuf_Light cbLightPixel;
 }
@@ -116,10 +152,12 @@ bool IsSpotLight()
 // cbModelPixel options
 bool HasDiffuseTexture()
 {
-    return cbModelPixel.properties & uint(1U << 0);
+    //return cbModelPixel.properties & uint(1U << 0);
+    return MaterialProperties & uint(1U << 0);
 }
 
 bool HasNormalTexture()
 {
-    return cbModelPixel.properties & uint(1U << 1);
+    //return cbModelPixel.properties & uint(1U << 1);
+    return MaterialProperties & uint(1U << 1);
 }
