@@ -28,7 +28,7 @@ VS_OUTPUT MainVS(uint VertexID : SV_VERTEXID)
 
 cbuffer cbPixel : register(b2)
 {
-    float3 Color        : packoffset(c0);
+    float3 LightColor   : packoffset(c0);
     float3 ToLight      : packoffset(c1);
     uint ShadowEnabled  : packoffset(c1.w);
 };
@@ -40,42 +40,38 @@ float3 CalcuDirLight(float3 worldPos, float3 normal, float3 diffColor, bool shad
     
     // Ambient
     float3 ambientColor = float3(0.05f, 0.05f, 0.05f);
-    finalColor = ambientColor;
     
     // Phong diffuse
-    float NDotL = saturate(dot(-ToLight, normal)); //-cbLightPixel.ToLight, normal));
-    if (NDotL > 0.0f)
-    {
-        finalColor += Color * NDotL; //cbLightPixel.Color * NDotL;
-    }
+    float NDotL = saturate(dot(ToLight, normal));
+    finalColor = diffColor * NDotL;
     
 	// Blinn specular
-    float3 toEye = CameraPos - worldPos; //cbCameraPixel.position - worldPos;
-    toEye = normalize(toEye);
-    float3 halfWay = normalize(toEye + -ToLight); //-cbLightPixel.direction);
+    float3 toCamera = CameraPos - worldPos;
+    toCamera = normalize(toCamera);
+    float3 halfWay = normalize(toCamera + ToLight);
     float NDotH = saturate(dot(halfWay, normal));
     
-    finalColor += Color * pow(NDotH, 250.0) * 0.25; //cbLightPixel.Color * pow(NDotH, 250.0f) * 0.25f;
+    finalColor += pow(NDotH, 250.0) * 0.25;
     
-    return diffColor * finalColor;
+    return LightColor * finalColor;
 }
 
-float4 MainPS(VS_OUTPUT input) : SV_TARGET
+float4 MainPS(VS_OUTPUT input) : SV_TARGET0
 {
-	// Diff Color
+	// Diff LightColor
     int3 location3 = int3(input.position.xy, 0);
     float4 diffColor = DiffuseTex.Load(location3);
     
 	// Linear Depth
     float depth = DepthTex.Load(location3).x;
-    float linearDepth = CameraPerspectiveValue.z / (depth + CameraPerspectiveValue.w); //cbCameraPixel.perspectiveValue.z / (depth + cbCameraPixel.perspectiveValue.w);
-
+    float linearDepth = CameraPerspectiveValue.z / (depth + CameraPerspectiveValue.w);
+    
 	// World Position
     float4 position;
-    position.xy = input.cpPos.xy * CameraPerspectiveValue.xy * linearDepth; //cbCameraPixel.perspectiveValue.xy * linearDepth;
+    position.xy = input.cpPos.xy * CameraPerspectiveValue.xy * linearDepth;
     position.z = linearDepth;
     position.w = 1.0f;
-    position.xyz = mul(position, CameraViewInverse).xyz; //cbCameraPixel.viewInverse).xyz;
+    position.xyz = mul(position, CameraViewInverse).xyz;
 
 	// Normal
     float3 normal;

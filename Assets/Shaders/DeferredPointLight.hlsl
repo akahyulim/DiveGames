@@ -65,7 +65,7 @@ DS_OUTPUT MainDS(HS_CONSTANT_DATA_OUTPUT input, float2 uv : SV_DomainLocation, c
 	// 0 ~ 1 ÁÂÇ¥°è¸¦ -1 ~ 1 ÁÂÇ¥°è·Î º¯È¯
     float2 posClipSpace = uv.xy * 2.0 - 1.0;
 
-	// Find the absulate maximum distance from the center
+	// Find the absulate maximum distToLight from the center
     float2 posClipSpaceAbs = abs(posClipSpace.xy);
     float maxLen = max(posClipSpaceAbs.x, posClipSpaceAbs.y);
 
@@ -89,81 +89,60 @@ DS_OUTPUT MainDS(HS_CONSTANT_DATA_OUTPUT input, float2 uv : SV_DomainLocation, c
 
 cbuffer cbPixel : register(b2)
 {
-    float3 Color        : packoffset(c0);
-    float RangeRcp      : packoffset(c0.w);
-    float3 Position     : packoffset(c1);
-    uint ShadowEnabled  : packoffset(c1.w);
+    float3 LightColor       : packoffset(c0);
+    float LightRangeRcp     : packoffset(c0.w);
+    float3 LightPos         : packoffset(c1);
+    uint ShadowEnabled      : packoffset(c1.w);
 };
 
 float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diffColor)
 {
-    float3 toLight = Position - worldPos;
-    float3 toEye = Position - worldPos;
-    float distance = length(toLight);
+    float3 toLight = LightPos - worldPos;
+    float3 toCamera = CameraPos - worldPos;
+    float distToLight = length(toLight);
     
     // phong diffuse
-    toLight /= distance;
+    toLight /= distToLight;
     float NDotL = saturate(dot(toLight, normal));
-    float3 finalColor = Color * NDotL;
+    float3 finalColor = diffColor * NDotL;
     
     // blinn specular
-    toEye = normalize(toEye);
-    float3 halfWay = normalize(toEye + toLight);
+    toCamera = normalize(toCamera);
+    float3 halfWay = normalize(toCamera + toLight);
     float NDotH = saturate(dot(halfWay, normal));
-    finalColor += Color * pow(NDotH, 250.0f) * 0.25f;
+    finalColor += pow(NDotH, 250.0f) * 0.25f;
     
     // attenuation
-    float distToLightNorm = 1.0f - saturate(distance * RangeRcp);
-    float attn = distToLightNorm * distToLightNorm;
+    float distToLightNorm = 1.0f - saturate(distToLight * LightRangeRcp);
+    float distAtt = distToLightNorm * distToLightNorm;
     
     // shadow
     float shadowAtt = 1.0f;
     //if (cbLightPixel.shadowEnabled)
     //   shadowAtt = PointShadowPCF(worldPos - cbLightPixel.position);
     
-    finalColor *= diffColor * attn * shadowAtt;
+    finalColor *= LightColor * distAtt * shadowAtt;
     
     return finalColor;
 }
 
-float4 MainPS(DS_OUTPUT input) : SV_TARGET
+float4 MainPS(DS_OUTPUT input) : SV_TARGET0
 {
-    /*
-    // Diff Color
+    // Diff LightColor
     int3 location3 = int3(input.position.xy, 0);
     float4 diffColor = DiffuseTex.Load(location3);
     
 	// Linear Depth
     float depth = DepthTex.Load(location3).x;
-    float linearDepth = cbCameraPixel.perspectiveValue.z / (depth + cbCameraPixel.perspectiveValue.w);
-
-	// World Position   
+    float linearDepth = CameraPerspectiveValue.z / (depth + CameraPerspectiveValue.w);
+    
+	// World LightPos
     float4 position;
-    position.xy = input.cpPos.xy * cbCameraPixel.perspectiveValue.xy * linearDepth;
+    position.xy = input.cpPos.xy * CameraPerspectiveValue.xy * linearDepth;
     position.z = linearDepth;
     position.w = 1.0f;
-    position.xyz = mul(position, cbCameraPixel.viewInverse).xyz;
+    position.xyz = mul(position, CameraViewInverse).xyz;
     
-	// Normal
-    float3 normal;
-    normal = NormalTex.Load(location3);
-    normal = normalize(normal * 2.0f - 1.0f);
-*/    
-    // Diff Color
-    int3 location3 = int3(input.position.xy, 0);
-    float4 diffColor = DiffuseTex.Load(location3);
-    
-	// Linear Depth
-    float depth = DepthTex.Load(location3).x;
-    float linearDepth = CameraPerspectiveValue.z / (depth + CameraPerspectiveValue.w); //cbCameraPixel.perspectiveValue.z / (depth + cbCameraPixel.perspectiveValue.w);
-
-	// World Position
-    float4 position;
-    position.xy = input.cpPos.xy * CameraPerspectiveValue.xy * linearDepth; //cbCameraPixel.perspectiveValue.xy * linearDepth;
-    position.z = linearDepth;
-    position.w = 1.0f;
-    position.xyz = mul(position, CameraViewInverse).xyz; //cbCameraPixel.viewInverse).xyz;
-
 	// Normal
     float3 normal;
     normal = NormalTex.Load(location3);

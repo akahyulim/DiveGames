@@ -67,7 +67,11 @@ namespace Dive
 		{
 			// 없다면 초기화된 값을 전달해야 한다.
 			if (!m_pMaterial)
-				return;
+			{
+				m_pMaterial = new Material();
+				m_pMaterial->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+				//return;
+			}
 
 			if (!m_pCBufferPS)
 				m_pCBufferPS = ConstantBuffer::Create("CB_MATERIAL_PS", sizeof(CB_MATERIAL_PS));

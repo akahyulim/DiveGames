@@ -22,9 +22,6 @@ namespace Dive
 
 	struct CB_CAMERA_PS
 	{
-		DirectX::XMFLOAT3 position;
-		float padding;
-
 		DirectX::XMFLOAT4 perspectiveValue;
 
 		DirectX::XMMATRIX viewInverse;
@@ -89,8 +86,6 @@ namespace Dive
 				m_pCBufferPS = ConstantBuffer::Create("CB_CAMERA_PS", sizeof(CB_CAMERA_PS));
 
 			auto pMappedData = reinterpret_cast<CB_CAMERA_PS*>(m_pCBufferPS->Map());
-			pMappedData->position = GetPosition();
-			pMappedData->padding = 0.0f;
 			DirectX::XMFLOAT4X4 proj;
 			DirectX::XMStoreFloat4x4(&proj, GetProjectionMatrix());
 			pMappedData->perspectiveValue.x = 1.0f / proj._11;
@@ -98,7 +93,7 @@ namespace Dive
 			pMappedData->perspectiveValue.z = proj._43;
 			pMappedData->perspectiveValue.w = -proj._33;
 			DirectX::XMMATRIX viewInv = DirectX::XMMatrixInverse(nullptr, GetViewMatrix());
-			pMappedData->viewInverse = DirectX::XMMatrixTranspose(viewInv);
+			pMappedData->viewInverse = DirectX::XMMatrixTranspose(m_pGameObject->GetMatrix());
 			m_pCBufferPS->Unmap();
 		}
 	}
@@ -117,9 +112,9 @@ namespace Dive
 	{
 		const auto& pos = m_pGameObject->GetPositionVector();
 		const auto& forward = m_pGameObject->GetForwardVector();
-		const auto& up = m_pGameObject->GetUpwardVector();
-
 		const auto& focus = DirectX::XMVectorAdd(pos, forward);
+
+		const auto& up = m_pGameObject->GetUpwardVector();
 
 		return DirectX::XMMatrixLookAtLH(pos, focus, up);
 	}

@@ -36,6 +36,7 @@ namespace Sandbox
 		Dive::Input* m_pInput;
 
 		Dive::GameObject* m_pMainCam;
+		DirectX::XMFLOAT3 m_CamDefaultPos;
 
 		Dive::GameObject* m_pDummy;
 

@@ -82,6 +82,8 @@ namespace Dive
 		void SetLocalScale(const DirectX::XMVECTOR& scale);
 
 		void Translate(float x, float y, float z, eSpace relativeTo = eSpace::Self);
+
+		void Rotate(const DirectX::XMVECTOR& quaternion, eSpace relativeTo = eSpace::Self);
 		void Rotate(float degreeX, float degreeY, float degreeZ, eSpace relativeTo = eSpace::Self);
 
 		void LookAt(float x, float y, float z, float upX = 0.0f, float upY = 1.0f, float upZ = 0.0f);

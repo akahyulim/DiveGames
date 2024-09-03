@@ -103,7 +103,7 @@ namespace Dive
 	// pass는 드로우콜(셰이더) 단위로 구분된다.
 	void ViewScreen::forwardRender()
 	{
-		passDepth();
+		passLightDepth();
 		passOpaqueDraw();
 		passTransparentDraw();
 
@@ -111,7 +111,7 @@ namespace Dive
 		책에서는 light, scene, gbuffer 각자의 객체에서
 		pass별 메서드를 가지며 이를 조합해 path를 구성한다.
 		
-		현재 passDepth를 세분화
+		현재 passLightDepth를 세분화
 		lightManager::PrepareNextShadowLight
 		sceneManager::RenderSceneNoShaders
 
@@ -143,24 +143,26 @@ namespace Dive
 	}
 
 	// 스파르탄은 opaque와 transparent를 구분하는 것 같다.
-	void ViewScreen::passDepth()
+	// 광원의 그림자맵을 깊이 버퍼로 사용
+	// 오브젝트를 광원의 뷰, 프로젝션으로 변환한 후 기록
+	void ViewScreen::passLightDepth()
 	{
-		m_pGraphics->SetRasterizerState(eRasterizerStateType::ShadowGen);
-		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::DepthLess);
-		m_pGraphics->SetVertexShader(eVertexShaderType::LightDepth);
 		m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		// urho는 파라미터 세팅을 함수로 묶어 호출하였고
-		// 바인딩은 셰이더와 함께 했다.
-		
-		// Common? ConstantBuffers: 이게 0번째 슬롯이어야 더 자연스러운데...?
-		m_pGraphics->VSBindConstantBuffer(m_pCamera->GetConstantBufferVS(), 0);
-		m_pGraphics->PSBindConstantBuffer(m_pCamera->GetConstantBufferPS(), 0);
+		m_pGraphics->SetRasterizerState(eRasterizerStateType::ShadowGen);
+		// 책에는 없는 것 같은데...
+		// 제외해도 변화가 없다.
+		//m_pGraphics->SetDepthStencilState(eDepthStencilStateType::DepthLess);	
 
+		m_pGraphics->SetVertexShader(eVertexShaderType::LightDepth);
+		m_pGraphics->SetHullShader(eHullShaderType::Null);
+		m_pGraphics->SetDomainShader(eDomainShaderType::Null);
+		m_pGraphics->SetPixelShader(ePixelShaderType::Null);
+		
 		for (const auto light : m_Renderables[eRenderableType::Light])
 		{
-			auto pLightCom = light->GetComponent<Light>();
-			if (pLightCom->GetType() != eLightType::Spot)
+			auto pLightCom = light->GetComponent<DvLight>();
+			if (pLightCom->GetType() != eLightType::Spot || !pLightCom->IsShadowEnabled())
 				continue;
 
 			// set & clear views
@@ -168,16 +170,10 @@ namespace Dive
 			m_pGraphics->BindDepthStencilView(pLightCom->GetShadowMap()->GetDepthStencilView());
 			m_pGraphics->ClearViews(eClearFlags::Depth, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 
-			if (!pLightCom->IsShadowEnabled())
-				continue;
-
 			// viewport
 			m_pGraphics->SetViewport(0, 0, pLightCom->GetShadowMapSize(), pLightCom->GetShadowMapSize());
 
-			//auto pLightVSBuffer = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Light);
-			//pLightVSBuffer->Update((void*)&pLightCom->GetCBufferVS());
-			//m_pGraphics->BindVSCBuffer(pLightVSBuffer);
-			m_pGraphics->DSBindConstantBuffer(pLightCom->GetConstantBufferVS(), 2);
+			m_pGraphics->VSBindConstantBuffer(pLightCom->GetConstantBufferVS(), 2);
 
 			// draw opaque's depth			
 			for (const auto* pOpaque : m_Renderables[eRenderableType::Opaque])
@@ -186,8 +182,9 @@ namespace Dive
 				const auto& boundingBox = pRenderableCom->GetBoundingBox();
 
 				// 컬링때문에 그림자가 사라진다.
-				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
-					continue;
+				// 깊이도 컬링을 해야 하나...?
+				//if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
+				//	continue;
 
 				m_pGraphics->VSBindConstantBuffer(pRenderableCom->GetConstantBufferVS(), 1);
 
@@ -197,6 +194,7 @@ namespace Dive
 				m_pGraphics->DrawIndexed(pRenderableCom->GetIndexCount());
 			}
 
+			/*
 			// draw transparent's depth
 			for (const auto* pTransparent : m_Renderables[eRenderableType::Transparent])
 			{
@@ -213,6 +211,7 @@ namespace Dive
 
 				m_pGraphics->DrawIndexed(pRenderableCom->GetIndexCount());
 			}
+			*/
 		}
 	}
 
@@ -386,20 +385,9 @@ namespace Dive
 	void ViewScreen::passLight()
 	{
 		m_pGraphics->BindRenderTargetView(m_pCamera->GetRenderTargetView(), 0);
-		//m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilView());	// 이것도 사용이 가능해 할 것 같은데...
 		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());	// 읽기 전용
 		m_pGraphics->ClearViews(eClearFlags::Color, m_pCamera->GetBackgroundColor());
 		m_pGraphics->SetViewport(0, 0, static_cast<float>(m_pGraphics->GetResolutionWidth()), static_cast<float>(m_pGraphics->GetResolutionHeight()));
-
-		// 책에서는 렌더타겟 바인드 후 
-		// GBuffer::PrepareForUnpack()이라고 하여 
-		// 카메라의 프로젝션 행렬, 뷰 역행렬을 상수 버퍼로 전달한다.
-		// 일단 나는 직접 전달했다.
-		
-		// 얘네는 정점 셰이더에서 사용하지 않는다.
-		//auto pVSCBufferCamera = m_pRenderer->GetVSConstantBuffer(eVSConstBufType::Camera);
-		//pVSCBufferCamera->Update((void*)&m_pCamera->GetCBufferVS());
-		//m_pGraphics->BindVSCBuffer(pVSCBufferCamera);
 
 		// ConstantBuffers
 		m_pGraphics->PSBindConstantBuffer(m_pCamera->GetConstantBufferPS(), 0);
@@ -410,15 +398,13 @@ namespace Dive
 		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex(), eTextureUnitType::GBuffer_DepthStencil);
 
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);
+		//m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
 		
 		for (int i = 0; i < static_cast<int>(m_Renderables[eRenderableType::Light].size()); i++)
 		{
 			const auto* pLight = m_Renderables[eRenderableType::Light][i];
 			auto* pLightCom = pLight->GetComponent<DvLight>();
 
-			//auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
-			//pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
-			//m_pGraphics->BindPSCBuffer(pLightBuffer);
 			m_pGraphics->PSBindConstantBuffer(pLightCom->GetConstantBufferPS(), 2);
 
 			if(i >= 1)
@@ -431,10 +417,10 @@ namespace Dive
 			case eLightType::Directional:
 			{
 				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteLessStencilMask);
+				//m_pGraphics->GetDeviceContext()->RSSetState(nullptr);
 
 				m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-				m_pGraphics->GetDeviceContext()->RSSetState(nullptr);
-
+				
 				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredDirLight);
 				m_pGraphics->SetHullShader(eHullShaderType::Null);
 				m_pGraphics->SetDomainShader(eDomainShaderType::Null);
@@ -453,32 +439,14 @@ namespace Dive
 
 				// 책에는 1이지만 정황상 2가 어울린다.
 				m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
-				
-				// 렌더러가 상수버퍼를 가지는 게 맞나...?
-				/*
-				auto pLightBuffer = m_pRenderer->GetDSConstantBuffer(eDSConstBufType::Light);
-				DirectX::XMMATRIX lightWorldScale = DirectX::XMMatrixScaling(
-					dynamic_cast<PointLight*>(pLightCom)->GetRange(),
-					dynamic_cast<PointLight*>(pLightCom)->GetRange(),
-					dynamic_cast<PointLight*>(pLightCom)->GetRange());
-				DirectX::XMMATRIX lightWorldTrans = DirectX::XMMatrixTranslation(
-					pLight->GetPosition().x, pLight->GetPosition().y, pLight->GetPosition().z);
-					//m_pGameObject->GetPosition().x, m_pGameObject->GetPosition().y, m_pGameObject->GetPosition().z);
-				DirectX::XMMATRIX view = m_pCamera->GetViewMatrix();//GetViewMatrix();
-				DirectX::XMMATRIX proj = m_pCamera->GetProjectionMatrix();
-				DirectX::XMMATRIX worldViewProjection = DirectX::XMMatrixTranspose(lightWorldScale * lightWorldTrans * view * proj);
-				//pLightBuffer->Update((void*)&pLightCom->GetCBufferDS());
-				//pLightBuffer->Update((void*)&worldViewProjection);
-				// XXXCBufferDS() 형태의 이름으로 통일시키자.
-				//m_pGraphics->BindDSCBuffer(pLightBuffer);
-				*/
-				m_pGraphics->DSBindConstantBuffer(m_pCamera->GetConstantBufferDS(), 0);
-				m_pGraphics->DSBindConstantBuffer(pLightCom->GetConstantBufferDS(), 1);
 
 				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredPointLight);
 				m_pGraphics->SetHullShader(eHullShaderType::DeferredPointLight);
 				m_pGraphics->SetDomainShader(eDomainShaderType::DeferredPointLight);
 				m_pGraphics->SetPixelShader(ePixelShaderType::DeferredPointLight);
+
+				m_pGraphics->DSBindConstantBuffer(m_pCamera->GetConstantBufferDS(), 0);
+				m_pGraphics->DSBindConstantBuffer(pLightCom->GetConstantBufferDS(), 1);
 
 				m_pGraphics->SetVertexBuffer(nullptr);
 				m_pGraphics->Draw(2, 0);
@@ -487,18 +455,24 @@ namespace Dive
 			
 			case eLightType::Spot:
 			{
+				// 현재는 이 곳에서만 사용
+				m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
+
 				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
 				m_pGraphics->SetRasterizerState(eRasterizerStateType::NoDepthClipFront);
 
-				m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
+				m_pGraphics->BindPSResource(pLightCom->GetShadowMap(), eTextureUnitType::SpotShadowMap);
 
-				m_pGraphics->DSBindConstantBuffer(m_pCamera->GetConstantBufferDS(), 0);
-				m_pGraphics->DSBindConstantBuffer(pLightCom->GetConstantBufferDS(), 1);
+				m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
 
 				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredSpotLight);
 				m_pGraphics->SetHullShader(eHullShaderType::DeferredSpotLight);
 				m_pGraphics->SetDomainShader(eDomainShaderType::DeferredSpotLight);
 				m_pGraphics->SetPixelShader(ePixelShaderType::DeferredSpotLight);
+
+				// BindDomainCBuffer로 이름 변경?
+				m_pGraphics->DSBindConstantBuffer(m_pCamera->GetConstantBufferDS(), 0);
+				m_pGraphics->DSBindConstantBuffer(pLightCom->GetConstantBufferDS(), 1);
 
 				m_pGraphics->SetVertexBuffer(nullptr);
 				m_pGraphics->Draw(1, 0);
@@ -510,6 +484,7 @@ namespace Dive
 			}
 		}
 	
+		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::Null);
 		m_pGraphics->SetBlendState(eBlendStateType::Null);
 		m_pGraphics->GetDeviceContext()->RSSetState(nullptr);	// 추후 수정 필요
 
@@ -523,13 +498,14 @@ namespace Dive
 		m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_Normal);
 		m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_Specular);
 		m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_DepthStencil);
+		m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::SpotShadowMap);
 	}
 
 	// depthStencilState 처리가 미비한 듯 하다.
 	// 책에서는 Direcitonal과 Spot & Point의 Depth Func가 다르다.
 	void ViewScreen::deferredRender()
 	{
-		//passDepth();
+		passLightDepth();
 		passGBuffer();
 		passLight();
 	}

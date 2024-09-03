@@ -30,6 +30,13 @@ namespace Dive
 		DirectX::XMFLOAT3 GetColor() const { return m_Color; }
 		void SetColor(float r, float g, float b) { m_Color = { r, g, b }; }
 
+		RenderTexture* GetShadowMap() const { return m_pShadowMap; }
+
+		// 가로, 세로 크기가 다를 수도 있지 않을까?
+		float GetShadowMapSize() const { return m_ShadowMapSize; }
+
+		virtual DirectX::XMMATRIX GetShadowViewProj();
+
 		bool IsShadowEnabled() const { return m_bShadowEnabled; }
 		void SetShadowEnabled(bool enabled) { m_bShadowEnabled = enabled; }
 
@@ -38,8 +45,8 @@ namespace Dive
 
 		DirectX::XMFLOAT3 m_Color;
 
-		//RenderTexture* m_pShadowMap;
-		//float m_ShadowMapSize;
+		RenderTexture* m_pShadowMap;
+		float m_ShadowMapSize;
 
 		bool m_bShadowEnabled;
 
@@ -96,24 +103,27 @@ namespace Dive
  
 		ConstantBuffer* GetConstantBufferDS() override { return m_pCBufferDS; }
 
+		// GetViewProjMatrix()가 더 어울린다.
+		DirectX::XMMATRIX GetShadowViewProj() override;
+
 		float GetRange() const { return m_Range; }
 		void SetRange(float range) { m_Range = range; }
 
 		float GetInnerAngle() const { return m_InnerAngle; }
 		void SetInnerAngle(float angle) { m_InnerAngle = angle; }
 
-		float GetOutterAngle() const { return m_OutterAngle; }
-		void SetOutterAngle(float angle) { m_OutterAngle = angle; }
+		float GetOuterAngle() const { return m_OuterAngle; }
+		void SetOuterAngle(float angle) { m_OuterAngle = angle; }
 
-		void SetAngles(float inner, float outter) { m_InnerAngle = inner; m_OutterAngle = outter; }
+		void SetAngles(float inner, float outer) { m_InnerAngle = inner; m_OuterAngle = outer; }
 
 	private:
 	private:
-		ConstantBuffer* m_pCBufferDS;
+		ConstantBuffer* m_pCBufferDS;	// m_pDomainCBuffer로 변경
 
 		float m_Range;
 		float m_InnerAngle;
-		float m_OutterAngle;
+		float m_OuterAngle;
 	};
 
 	//==================================================================================================

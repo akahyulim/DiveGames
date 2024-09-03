@@ -5,7 +5,7 @@ namespace Dive
 {
 	class Texture2D : public Texture
 	{
-		DV_CLASS(Texture2D, Texture);
+		DV_CLASS(Texture2D, Texture)
 
 	public:
 		Texture2D() = default;

@@ -370,6 +370,12 @@ namespace Dive
 	{
 		if (type != m_RasterizerStateType)
 		{
+			// юс╫ц
+			if (type == eRasterizerStateType::Count)
+			{
+				m_pDeviceContext->RSSetState(nullptr);
+				return;
+			}
 			auto index = static_cast<uint8_t>(type);
 			m_pDeviceContext->RSSetState(m_RasterizerStates[index]);
 			m_RasterizerStateType =type;
@@ -1050,8 +1056,9 @@ namespace Dive
 
 			// ShadowGen
 			desc.CullMode = D3D11_CULL_BACK;
-			desc.DepthBias = 85;
-			desc.SlopeScaledDepthBias = 5.0f;
+			desc.DepthBias = 100;//85;
+			desc.SlopeScaledDepthBias = 4.0f;//5.0f;
+			desc.DepthBiasClamp = 0.0f;
 			
 			index = static_cast<uint8_t>(eRasterizerStateType::ShadowGen);
 
@@ -1235,7 +1242,7 @@ namespace Dive
 			index = static_cast<uint8_t>(ePixelShaderType::DeferredDirLight);
 			m_PixelShaders[index] = pShader;
 
-			pShader = new Shader();
+			pShader = new Shader(); 
 			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredPointLight.hlsl", eShaderType::Pixel))
 				return false;
 			index = static_cast<uint8_t>(ePixelShaderType::DeferredPointLight);

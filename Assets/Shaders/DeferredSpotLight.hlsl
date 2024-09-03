@@ -42,9 +42,9 @@ HS_OUTPUT MainHS()
 
 cbuffer cbDomain : register(b1)
 {
-    matrix World            : packoffset(c0);
-    float SinOutterAngle    : packoffset(c4);
-    float CosOutterAngle    : packoffset(c4.y);
+    matrix LightWorld            : packoffset(c0);
+    float SinOuterAngle     : packoffset(c4);
+    float CosOuterAngle     : packoffset(c4.y);
 };
 
 struct DS_OUTPUT
@@ -75,18 +75,18 @@ DS_OUTPUT MainDS(HS_CONSTANT_DATA_OUTPUT input, float2 UV : SV_DomainLocation, c
     float3 halfSpherePos = normalize(float3(posClipSpaceNoCyl.xy, 1.0 - maxLenNoCapsule));
 
 	// Scale the sphere to the size of the cones rounded base
-    halfSpherePos = normalize(float3(halfSpherePos.xy * SinOutterAngle, CosOutterAngle));
+    halfSpherePos = normalize(float3(halfSpherePos.xy * SinOuterAngle, CosOuterAngle));
 
 	// Find the offsets for the cone vertices (0 for cone base)
     float cylinderOffsetZ = saturate((maxLen * ExpendAmount - 1.0) / CylinderPortion);
 
 	// Offset the cone vertices to thier final position
-    float4 posLS = float4(halfSpherePos.xy * (1.0 - cylinderOffsetZ), halfSpherePos.z - cylinderOffsetZ * CosOutterAngle, 1.0);
+    float4 posLS = float4(halfSpherePos.xy * (1.0 - cylinderOffsetZ), halfSpherePos.z - cylinderOffsetZ * CosOuterAngle, 1.0);
 
 	// Transform all the way to projected space and generate the UV coordinates
     DS_OUTPUT Output;
-    matrix lightProjection = mul(World, CameraViewProj);
-    Output.position = mul(posLS, lightProjection);
+    matrix lightTransform = mul(LightWorld, CameraViewProj);
+    Output.position = mul(posLS, lightTransform);
     Output.cpPos = Output.position.xy / Output.position.w;
 
     return Output;
@@ -95,20 +95,21 @@ DS_OUTPUT MainDS(HS_CONSTANT_DATA_OUTPUT input, float2 UV : SV_DomainLocation, c
 cbuffer cbPixel : register(b2)
 {
     float3 LightColor       : packoffset(c0);
-    float RangeRcp          : packoffset(c0.w);
+    float LightRangeRcp     : packoffset(c0.w);
     float3 LightPos         : packoffset(c1);
-    float CosOutterCone     : packoffset(c1.w);
+    float CosOuterCone      : packoffset(c1.w);
     float3 DirToLight       : packoffset(c2);
     float CosConeAttRange   : packoffset(c2.w);
-    uint ShadowEnabled      : packoffset(c3);
+    matrix LightViewProj    : packoffset(c3);
+    uint ShadowEnabled      : packoffset(c7);
 };
 
 float SpotShadowPCF(float3 position)
 {
-    float4 shadowMapPos = mul(float4(position, 1.0f), cbLightPixel.shadow);
+    float4 shadowMapPos = mul(float4(position, 1.0), LightViewProj);
     float3 uvd = shadowMapPos.xyz / shadowMapPos.w;
-    uvd.xy = 0.5f * uvd.xy + 0.5f;
-    uvd.y = 1.0f - uvd.y;
+    uvd.xy = 0.5 * uvd.xy + 0.5;
+    uvd.y = 1.0 - uvd.y;
     
     return SpotShadowMap.SampleCmpLevelZero(PcfSampler, uvd.xy, uvd.z);
 }
@@ -116,44 +117,44 @@ float SpotShadowPCF(float3 position)
 float3 CalcuSpotLight(float3 worldPos, float3 normal, float3 diffColor)
 {
     float3 toLight = LightPos - worldPos;
-    float3 toEye = CameraPos - worldPos;
+    float3 toCamera = CameraPos - worldPos;
     float distToLight = length(toLight);
     
     // phong diffuse
     toLight /= distToLight;
     float NDotL = saturate(dot(toLight, normal));
-    float3 finalColor = LightColor * NDotL;
+    float3 finalColor = diffColor * NDotL;
     
     // blinn specular
-    toEye = normalize(toEye);
-    float3 halfWay = normalize(toEye + toLight);
+    toCamera = normalize(toCamera);
+    float3 halfWay = normalize(toCamera + toLight);
     float NDotH = saturate(dot(halfWay, normal));
-    finalColor += LightColor * pow(NDotH, 250.0f) * 0.25f;
+    finalColor += pow(NDotH, 250.0f) * 0.25f;
     
-    // cone attenuation
-    //float cosAng = acos(dot(-DirToLight, toLight));
-    //float coneAtt = 1.0f * smoothstep(OutterConeCos, InnerConeAttCos, cosAng);
-    float cosAng = dot(-DirToLight, toLight);
-    float coneAtt = saturate((cosAng - CosOutterCone) / CosConeAttRange);
-    coneAtt *= coneAtt;
+    // °Å¸® °¨¼è
+    float distAtt = 1.0f - saturate(distToLight * LightRangeRcp);
+    distAtt *= distAtt;
     
-    // attenuation
-    float distToLightNorm = 1.0f - saturate(distToLight * RangeRcp);
-    float distAttn = distToLightNorm * distToLightNorm;
+    // ÄÜ °¨¼è
+    float cosAng = dot(DirToLight, toLight);
+    float conAtt = saturate((cosAng - CosOuterCone) / CosConeAttRange);
+    conAtt *= conAtt;
     
-    // shadow
-    float shadowAtt = 1.0f;
-    //if (ShadowEnabled)
-    //    shadowAtt = SpotShadowPCF(worldPos);
+    // ±×¸²ÀÚ °¨¼è
+    float shadowAtt = 1.0;
+    if (ShadowEnabled)
+        shadowAtt = SpotShadowPCF(worldPos);
     
-    finalColor *= diffColor * distAttn * coneAtt; // * shadowAtt;
-    
+    finalColor *= LightColor * distAtt * conAtt * shadowAtt;
+   
     return finalColor;
+    //return float3(shadowAtt, shadowAtt, shadowAtt);
+    //return float3(conAtt, conAtt, conAtt);
 }
 
-float4 MainPS(DS_OUTPUT input) : SV_TARGET
+float4 MainPS(DS_OUTPUT input) : SV_TARGET0
 {
-    // Diff LightColor
+    // Diff Color
     int3 location3 = int3(input.position.xy, 0);
     float4 diffColor = DiffuseTex.Load(location3);
     

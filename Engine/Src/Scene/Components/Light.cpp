@@ -13,8 +13,8 @@ namespace Dive
 		: Component(pGameObject)
 		, m_Type(type)
 		, m_Color{1.0f, 1.0f, 1.0f}
-		//, m_pShadowMap(nullptr)
-		//, m_ShadowMapSize(0.0f)
+		, m_pShadowMap(nullptr)
+		, m_ShadowMapSize(0.0f)
 		, m_bShadowEnabled(false)
 		, m_pCBufferVS(nullptr)
 		, m_pCBufferPS(nullptr)
@@ -23,22 +23,29 @@ namespace Dive
 
 	DvLight::~DvLight()
 	{
+		DV_DELETE(m_pShadowMap);
+
 		DV_DELETE(m_pCBufferPS);
 		DV_DELETE(m_pCBufferVS);
+	}
+
+	DirectX::XMMATRIX DvLight::GetShadowViewProj()
+	{
+		return DirectX::XMMatrixIdentity();
 	}
 
 #pragma pack(push, 1)
 	struct CB_DIRECTIONAL_VS
 	{
-		// shadowViewProj
+		// matViewProj
 	};
 
 	struct CB_DIRECTIONAL_PS
 	{
-		DirectX::XMFLOAT3 color;
+		DirectX::XMFLOAT3 lightColor;
 		float padding;
 
-		DirectX::XMFLOAT3 direction;
+		DirectX::XMFLOAT3 dirToLight;
 		uint32_t shadowEnabled;
 	};
 #pragma pack(pop)
@@ -59,8 +66,8 @@ namespace Dive
 			m_pCBufferPS = ConstantBuffer::Create("CB_DIRECTIONAL_PS", sizeof(CB_DIRECTIONAL_PS));
 
 		auto pMappedData = reinterpret_cast<CB_DIRECTIONAL_PS*>(m_pCBufferPS->Map());
-		pMappedData->color = m_Color;
-		pMappedData->direction = m_pGameObject->GetForward();
+		pMappedData->lightColor = m_Color;
+		pMappedData->dirToLight = { -1.0f * m_pGameObject->GetForward().x, -1.0f * m_pGameObject->GetForward().y, -1.0f * m_pGameObject->GetForward().z };
 		pMappedData->shadowEnabled = m_bShadowEnabled ? 1 : 0;
 		m_pCBufferPS->Unmap();
 	}
@@ -73,10 +80,10 @@ namespace Dive
 
 	struct CB_POINT_PS
 	{
-		DirectX::XMFLOAT3 color;
-		float rangeRcp;
+		DirectX::XMFLOAT3 lightColor;
+		float lightRangeRcp;
 
-		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT3 lightPos;
 		uint32_t shadowEnabled;
 	};
 #pragma pack(pop)
@@ -122,34 +129,41 @@ namespace Dive
 				m_pCBufferPS = ConstantBuffer::Create("CB_POINT_PS", sizeof(CB_POINT_PS));
 
 			auto pMappedData = reinterpret_cast<CB_POINT_PS*>(m_pCBufferPS->Map());
-			pMappedData->color = m_Color;
-			pMappedData->rangeRcp = 1 / m_Range;
-			pMappedData->position = m_pGameObject->GetPosition();
+			pMappedData->lightColor = m_Color;
+			pMappedData->lightRangeRcp = 1 / m_Range;
+			pMappedData->lightPos = m_pGameObject->GetPosition();
 			pMappedData->shadowEnabled = m_bShadowEnabled ? 1 : 0;
 			m_pCBufferPS->Unmap();
 		}
 	}
 
 #pragma pack(push, 1)
+	struct CB_SPOTLIGHT_VS
+	{
+		DirectX::XMMATRIX matViewProj;
+	};
+
 	struct CB_SPOTLIGHT_DS
 	{
 		DirectX::XMMATRIX world;
 
-		float sinOtterAngle;
-		float cosOutterAngle;
+		float sinOuter;
+		float cosOuter;
 		float padding[2];
 	};
 
 	struct CB_SPOTLIGHT_PS
 	{
-		DirectX::XMFLOAT3 color;
-		float rangeRcp;
+		DirectX::XMFLOAT3 lightColor;
+		float lightRangeRcp;
 
-		DirectX::XMFLOAT3 position;
-		float cosOutterCone;
+		DirectX::XMFLOAT3 lightPos;
+		float cosOuterCone;
 
-		DirectX::XMFLOAT3 direction;
+		DirectX::XMFLOAT3 dirToLight;
 		float cosConeAttRange;
+
+		DirectX::XMMATRIX matViewProj;
 
 		uint32_t shadowEnabled;
 		float padding[3];
@@ -161,8 +175,15 @@ namespace Dive
 		, m_pCBufferDS(nullptr)
 		, m_Range(0.0f)
 		, m_InnerAngle(0.0f)
-		, m_OutterAngle(0.0f)
+		, m_OuterAngle(0.0f)
 	{
+		// 임시 위치
+		// 기본적으로 nullptr이 맞고
+		// 그림자를 적용하고자 할 때 생성하는 것이 맞는 듯 하다.
+		// 다만 현재 크기가 고정되어 있다.
+		m_ShadowMapSize = 1024.0f;
+		m_pShadowMap = new RenderTexture();
+		m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
 	}
 
 	SpotLight::SpotLight(GameObject* pGameObject)
@@ -170,8 +191,11 @@ namespace Dive
 		, m_pCBufferDS(nullptr)
 		, m_Range(0.0f)
 		, m_InnerAngle(0.0f)
-		, m_OutterAngle(0.0f)
+		, m_OuterAngle(0.0f)
 	{
+		m_ShadowMapSize = 1024.0f;
+		m_pShadowMap = new RenderTexture();
+		m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
 	}
 
 	SpotLight::~SpotLight()
@@ -181,26 +205,37 @@ namespace Dive
 
 	void SpotLight::Update()
 	{
-		float outterAngle = DirectX::XMConvertToRadians(m_OutterAngle);
-		float innerAngle = DirectX::XMConvertToRadians(m_InnerAngle);
+		auto matViewProj = GetShadowViewProj();
 
-		float sinOutterAngle = DirectX::XMScalarSin(outterAngle);
-		float cosOutterAngle = DirectX::XMScalarCos(outterAngle);
-		float cosInnerAngle = DirectX::XMScalarCos(innerAngle);
+		// vs constant buffer
+		{
+			if (!m_pCBufferVS)
+				m_pCBufferVS = ConstantBuffer::Create("CB_SPOTLIGHT_VS", sizeof(CB_SPOTLIGHT_VS));
+
+			auto pMappedData = reinterpret_cast<CB_SPOTLIGHT_VS*>(m_pCBufferVS->Map());
+			pMappedData->matViewProj = DirectX::XMMatrixTranspose(matViewProj);
+			m_pCBufferVS->Unmap();
+		}
+
+		float outerRad = DirectX::XMConvertToRadians(m_OuterAngle);
+		float innerRad = DirectX::XMConvertToRadians(m_InnerAngle);
+
+		float sinOuter = sinf(outerRad);
+		float cosOuter = cosf(outerRad);
+		float cosInner = cosf(innerRad);
 
 		// ds constant buffer
 		{
 			if (!m_pCBufferDS)
 				m_pCBufferDS = ConstantBuffer::Create("CB_SPOTLIGHT_DS", sizeof(CB_SPOTLIGHT_DS));
 
-			auto scale = DirectX::XMMatrixScaling(m_Range, m_Range, m_Range);
-			auto trans = m_pGameObject->GetMatrix();
-			auto world = DirectX::XMMatrixTranspose(scale * trans);
+			m_pGameObject->SetScale(m_Range, m_Range, m_Range);
+			auto world = m_pGameObject->GetMatrix();
 
 			auto pMappedData = reinterpret_cast<CB_SPOTLIGHT_DS*>(m_pCBufferDS->Map());
-			pMappedData->world = world;
-			pMappedData->sinOtterAngle = sinOutterAngle;
-			pMappedData->cosOutterAngle = cosOutterAngle;
+			pMappedData->world = DirectX::XMMatrixTranspose(world);
+			pMappedData->sinOuter = sinOuter;
+			pMappedData->cosOuter = cosOuter;
 			m_pCBufferDS->Unmap();
 		}
 
@@ -210,15 +245,36 @@ namespace Dive
 				m_pCBufferPS = ConstantBuffer::Create("CB_SPOTLIGHT_PS", sizeof(CB_SPOTLIGHT_PS));
 
 			auto pMappedData = reinterpret_cast<CB_SPOTLIGHT_PS*>(m_pCBufferPS->Map());
-			pMappedData->color = m_Color;
-			pMappedData->rangeRcp = 1.0f / m_Range;
-			pMappedData->position = m_pGameObject->GetPosition();
-			pMappedData->cosOutterCone = cosOutterAngle;
-			pMappedData->direction = m_pGameObject->GetForward();
-			pMappedData->cosConeAttRange = cosInnerAngle - cosOutterAngle;
+			pMappedData->lightColor = m_Color;
+			pMappedData->lightRangeRcp = 1.0f / m_Range;
+			pMappedData->lightPos = m_pGameObject->GetPosition();
+			pMappedData->cosOuterCone = cosOuter;
+			pMappedData->dirToLight = { -1.0f * m_pGameObject->GetForward().x, -1.0f * m_pGameObject->GetForward().y, -1.0f * m_pGameObject->GetForward().z };
+			pMappedData->cosConeAttRange = cosInner - cosOuter;
+			pMappedData->matViewProj = DirectX::XMMatrixTranspose(matViewProj);
 			pMappedData->shadowEnabled = m_bShadowEnabled ? 1 : 0;
 			m_pCBufferPS->Unmap();
 		}
+	}
+
+	DirectX::XMMATRIX SpotLight::GetShadowViewProj()
+	{
+		const auto& pos = m_pGameObject->GetPositionVector();
+		const auto& forward = m_pGameObject->GetForwardVector();
+		const auto& focus = DirectX::XMVectorAdd(pos, DirectX::XMVectorScale(forward, m_Range));
+
+		const auto& up = m_pGameObject->GetUpwardVector();
+		
+		auto view = DirectX::XMMatrixLookAtLH(pos, focus, up);
+
+		auto proj = DirectX::XMMatrixPerspectiveFovLH(
+			2.0f * DirectX::XMConvertToRadians(m_OuterAngle),
+			1.0f,			// 가로, 세로 비율이라 1인듯 하다.
+			5.0f,			// 책에서도 상수를 멤버 변수로 관리했다. ShadowGen Rasterizer State와 관련이 있나? => 아닌듯?
+			m_Range
+		);	
+
+		return DirectX::XMMatrixMultiply(view, proj);
 	}
 
 	//========================================================================================================================================================
@@ -254,7 +310,7 @@ namespace Dive
 		case eLightType::Directional:
 		{	
 			m_CBufferPS.options = (1U << 0);
-			m_CBufferPS.direction = m_pGameObject->GetForward();
+			m_CBufferPS.dirToLight = m_pGameObject->GetForward();
 			break;
 		}
 		case eLightType::Point:
@@ -274,8 +330,8 @@ namespace Dive
 			}
 
 			m_CBufferPS.options = (1U << 1);
-			m_CBufferPS.position = m_pGameObject->GetPosition();
-			m_CBufferPS.rangeRcp = 1.0f / GetRange();
+			m_CBufferPS.lightPos = m_pGameObject->GetPosition();
+			m_CBufferPS.lightRangeRcp = 1.0f / GetRange();
 			break;
 		}
 		case eLightType::Spot:
@@ -283,9 +339,9 @@ namespace Dive
 			m_CBufferVS.shadow = DirectX::XMMatrixTranspose(GetShadowMatrix());
 
 			m_CBufferPS.options = (1U << 2);
-			m_CBufferPS.position = m_pGameObject->GetPosition();
-			m_CBufferPS.direction = m_pGameObject->GetForward();
-			m_CBufferPS.rangeRcp = 1.0f / GetRange();
+			m_CBufferPS.lightPos = m_pGameObject->GetPosition();
+			m_CBufferPS.dirToLight = m_pGameObject->GetForward();
+			m_CBufferPS.lightRangeRcp = 1.0f / GetRange();
 			m_CBufferPS.outerConeAngle = GetOuterAngleRadian();
 			m_CBufferPS.innerConeAngle = GetInnerAngleRadian();
 			m_CBufferPS.shadow = DirectX::XMMatrixTranspose(GetShadowMatrix());
@@ -294,7 +350,7 @@ namespace Dive
 		default:
 			break;
 		}
-		m_CBufferPS.color = { GetColor().x * GetColor().x
+		m_CBufferPS.lightColor = { GetColor().x * GetColor().x
 		, GetColor().y * GetColor().y
 		, GetColor().z * GetColor().z };
 

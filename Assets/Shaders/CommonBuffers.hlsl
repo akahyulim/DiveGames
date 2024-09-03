@@ -13,10 +13,11 @@ cbuffer cbCameraDomain : register(b0)
 
 cbuffer cbCameraPixel : register(b0)
 {
-    float3 CameraPos                : packoffset(c0);
-    float4 CameraPerspectiveValue   : packoffset(c1);
-    matrix CameraViewInverse        : packoffset(c2);
+    float4 CameraPerspectiveValue   : packoffset(c0);
+    matrix CameraViewInverse        : packoffset(c1);
 };
+
+#define CameraPos (CameraViewInverse[3].xyz)
 
 cbuffer cbObjectVertex : register(b1)
 {

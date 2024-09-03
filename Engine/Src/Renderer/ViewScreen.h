@@ -39,7 +39,7 @@ namespace Dive
 		void Render();
 
 	private:
-		void passDepth();
+		void passLightDepth();
 		void passOpaqueDraw();
 		void passTransparentDraw();
 		void forwardRender();

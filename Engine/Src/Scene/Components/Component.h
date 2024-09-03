@@ -16,6 +16,7 @@ namespace Dive
 
 		virtual void Update() {}
 
+		// 이름을 GetVertexCBuffer()로 바꾸기
 		virtual ConstantBuffer* GetConstantBufferVS() { return nullptr; }
 		virtual ConstantBuffer* GetConstantBufferDS() { return nullptr; }
 		virtual ConstantBuffer* GetConstantBufferPS() { return nullptr; }
