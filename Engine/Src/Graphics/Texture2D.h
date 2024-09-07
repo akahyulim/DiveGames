@@ -15,6 +15,8 @@ namespace Dive
 		bool LoadFromFile(const std::string& filename) override;
 		bool LoadFromMemory(const std::string& filename, size_t size, const void* pSource);
 
+		// RenderTexture의 Create와 동일하게 만들자.
+		// 아니 아에 이 둘을 Texture에서 순수가상함수로 선언하는 편이 나을 듯?
 		bool CreateResource(uint32_t width, uint32_t height, DXGI_FORMAT format, bool useMipMap);
 		void Release();
 

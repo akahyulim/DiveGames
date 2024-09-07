@@ -29,20 +29,20 @@ namespace Dive
 
 		Release();
 
-		m_pDiffuseTex = new RenderTexture();
-		if(!m_pDiffuseTex->CreateRenderTargetView(width, height))
+		m_pDiffuseTex = new RenderTexture(width, height);
+		if (!m_pDiffuseTex->Create())
 			return false;
 
-		m_pNormalTex = new RenderTexture();
-		if (!m_pNormalTex->CreateRenderTargetView(width, height, DXGI_FORMAT_R11G11B10_FLOAT))
+		m_pNormalTex = new RenderTexture(width, height, DXGI_FORMAT_R11G11B10_FLOAT);
+		if (!m_pNormalTex->Create())
 			return false;
 
-		m_pSpecularTex = new RenderTexture();
-		if (!m_pSpecularTex->CreateRenderTargetView(width, height))
+		m_pSpecularTex = new RenderTexture(width, height);
+		if (!m_pSpecularTex->Create())
 			return false;
 
-		m_pDepthTex = new RenderTexture();
-		if (!m_pDepthTex->CreateDepthStencilView(width, height, DXGI_FORMAT_R24G8_TYPELESS, true))
+		m_pDepthTex = new RenderTexture(width, height, 24, true);
+		if (!m_pDepthTex->Create())
 			return false;
 
 		m_Width = width;

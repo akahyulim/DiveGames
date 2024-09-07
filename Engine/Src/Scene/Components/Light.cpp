@@ -53,11 +53,17 @@ namespace Dive
 	DirectionalLight::DirectionalLight()
 		: DvLight(nullptr, eLightType::Directional)
 	{
+		m_pShadowMap = new RenderTexture(1024, 1024, 32);
+		m_pShadowMap->SetArraySize(3);
+		m_pShadowMap->Create();
 	}
 
 	DirectionalLight::DirectionalLight(GameObject* pGameObject)
 		: DvLight(pGameObject, eLightType::Directional)
 	{
+		m_pShadowMap = new RenderTexture(1024, 1024, 32);
+		m_pShadowMap->SetArraySize(3);
+		m_pShadowMap->Create();
 	}
 	
 	void DirectionalLight::Update()
@@ -182,8 +188,8 @@ namespace Dive
 		// 그림자를 적용하고자 할 때 생성하는 것이 맞는 듯 하다.
 		// 다만 현재 크기가 고정되어 있다.
 		m_ShadowMapSize = 1024.0f;
-		m_pShadowMap = new RenderTexture();
-		m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
+		m_pShadowMap = new RenderTexture(1024, 1024, 32);
+		m_pShadowMap->Create();
 	}
 
 	SpotLight::SpotLight(GameObject* pGameObject)
@@ -194,8 +200,8 @@ namespace Dive
 		, m_OuterAngle(0.0f)
 	{
 		m_ShadowMapSize = 1024.0f;
-		m_pShadowMap = new RenderTexture();
-		m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
+		m_pShadowMap = new RenderTexture(1024, 1024, 32);
+		m_pShadowMap->Create();
 	}
 
 	SpotLight::~SpotLight()
@@ -292,7 +298,9 @@ namespace Dive
 		, m_bShadowEnabled(true)
 	{
 		m_pShadowMap = new RenderTexture();
-		m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
+		m_pShadowMap->SetSize(m_ShadowMapSize, m_ShadowMapSize);
+		m_pShadowMap->SetDepthFormat(DXGI_FORMAT_R32_TYPELESS);
+		m_pShadowMap->Create();
 	}
 
 	Light::~Light()
@@ -394,6 +402,6 @@ namespace Dive
 		m_ShadowMapSize = size;
 
 		// 갱신을 위해 필요하다. 추후 좀 다듬자.
-		m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
+		//m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
 	}
 }

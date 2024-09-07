@@ -554,6 +554,8 @@ namespace Dive
 		}
 	}
 
+	// 아래 세 개의 메서드는 제거하는 편이 낫다???
+	// 허나 아직 사용하는 코드가 있다.
 	void Graphics::BindPSResource(Texture* pTexture, eTextureUnitType unit)
 	{
 		BindPSResource(pTexture ? pTexture->GetShaderResourceView() : nullptr, unit);

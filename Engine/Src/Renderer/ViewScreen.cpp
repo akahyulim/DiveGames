@@ -335,10 +335,10 @@ namespace Dive
 		m_pGraphics->SetViewport(0, 0, static_cast<float>(m_GBuffer.GetWidth()), static_cast<float>(m_GBuffer.GetHeight()));
 
 		// set & clear g buffer
-		m_pGraphics->BindRenderTargetView(m_GBuffer.GetDiffuseTex(), 0);
-		m_pGraphics->BindRenderTargetView(m_GBuffer.GetNormalTex(), 1);
-		m_pGraphics->BindRenderTargetView(m_GBuffer.GetSpecularTex(), 2);
-		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex());
+		m_pGraphics->BindRenderTargetView(m_GBuffer.GetDiffuseTex()->GetRenderTargetView(), 0);
+		m_pGraphics->BindRenderTargetView(m_GBuffer.GetNormalTex()->GetRenderTargetView(), 1);
+		m_pGraphics->BindRenderTargetView(m_GBuffer.GetSpecularTex()->GetRenderTargetView(), 2);
+		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilView());
 		m_pGraphics->ClearViews(eClearFlags::Color | eClearFlags::Depth | eClearFlags::Stencil, m_pCamera->GetBackgroundColor(), 1.0f, 0);
 
 		m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -392,10 +392,10 @@ namespace Dive
 		// ConstantBuffers
 		m_pGraphics->PSBindConstantBuffer(m_pCamera->GetConstantBufferPS(), 0);
 
-		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex(), eTextureUnitType::GBuffer_Diffuse);
-		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex(), eTextureUnitType::GBuffer_Normal);
-		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex(), eTextureUnitType::GBuffer_Specular);
-		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex(), eTextureUnitType::GBuffer_DepthStencil);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Diffuse);
+		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Normal);
+		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Specular);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex()->GetDepthShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
 
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);
 		//m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
@@ -461,7 +461,8 @@ namespace Dive
 				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
 				m_pGraphics->SetRasterizerState(eRasterizerStateType::NoDepthClipFront);
 
-				m_pGraphics->BindPSResource(pLightCom->GetShadowMap(), eTextureUnitType::SpotShadowMap);
+				if(pLightCom->IsShadowEnabled())
+					m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetDepthShaderResourceView(), eTextureUnitType::SpotShadowMap);
 
 				m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
 

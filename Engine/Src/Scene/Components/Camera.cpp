@@ -52,7 +52,6 @@ namespace Dive
 		DV_DELETE(m_pCBufferPS);
 		DV_DELETE(m_pCBufferDS);
 		DV_DELETE(m_pCBufferVS);
-		DV_DELETE(m_pRenderTarget);
 	}
 
 	// 버퍼를 생성 및 관리하는 것은 맞지 않다.

@@ -6,13 +6,55 @@
 
 namespace Dive
 {
-	RenderTexture::RenderTexture()
-		: m_pTexture2D(nullptr)
-		, m_pShaderResourceView(nullptr)
+	RenderTexture::RenderTexture(uint32_t width, uint32_t height, DXGI_FORMAT format, bool useMipmap)
+		: m_pColorTexture2D(nullptr)
 		, m_pRenderTargetView(nullptr)
+		, m_pColorShaderResourceView(nullptr)
+		, m_pDepthTexture2D(nullptr)
 		, m_pDepthStencilView(nullptr)
 		, m_pDepthStencilViewReadOnly(nullptr)
+		, m_pDepthShaderResourceView(nullptr)
+		, m_ColorFormat(format)
+		, m_DepthFormat(DXGI_FORMAT_UNKNOWN)
+		, m_ArraySize(1)
+		, m_bDepthStencilReadOnly(false)
 	{
+		m_Width = width;
+		m_Height = height;
+		m_bUseMipMap = useMipmap;
+	}
+
+	RenderTexture::RenderTexture(uint32_t width, uint32_t height, uint32_t depth, bool readOnly)
+		: m_pColorTexture2D(nullptr)
+		, m_pRenderTargetView(nullptr)
+		, m_pColorShaderResourceView(nullptr)
+		, m_pDepthTexture2D(nullptr)
+		, m_pDepthStencilView(nullptr)
+		, m_pDepthStencilViewReadOnly(nullptr)
+		, m_pDepthShaderResourceView(nullptr)
+		, m_ColorFormat(DXGI_FORMAT_UNKNOWN)
+		, m_ArraySize(1)
+		, m_bDepthStencilReadOnly(readOnly)
+	{
+		m_Width = width;
+		m_Height = height;
+
+		switch (depth)
+		{
+		case 16:
+			m_DepthFormat = DXGI_FORMAT_R16_TYPELESS;
+			break;
+		case 24:
+			m_DepthFormat = DXGI_FORMAT_R24G8_TYPELESS;
+			break;
+		case 32:
+			m_DepthFormat = DXGI_FORMAT_R32_TYPELESS;
+			break;
+
+		default:
+			m_DepthFormat = DXGI_FORMAT_UNKNOWN;
+			break;
+		}
 	}
 
 	RenderTexture::~RenderTexture()
@@ -20,147 +62,167 @@ namespace Dive
 		Release();
 	}
 
-	bool RenderTexture::CreateRenderTargetView(uint32_t width, uint32_t height, DXGI_FORMAT format, bool useMipMap)
+	bool RenderTexture::Create()
 	{
-		D3D11_TEXTURE2D_DESC texDesc{};
-		texDesc.Width = width;
-		texDesc.Height = height;
-		texDesc.Format = format;
-		texDesc.ArraySize = 1;
-		texDesc.MipLevels = useMipMap ? 0 : 1;
-		texDesc.SampleDesc.Count = 1;
-		texDesc.SampleDesc.Quality = 0;
-		texDesc.Usage = D3D11_USAGE_DEFAULT;
-		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-		texDesc.MiscFlags = useMipMap ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
-		texDesc.CPUAccessFlags = 0;
-
-		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
+		if (m_ColorFormat != DXGI_FORMAT_UNKNOWN)
 		{
-			Release();
-			DV_ENGINE_ERROR("Texture2D 생성에 실패하였습니다.");
-			return false;
-		}
+			D3D11_TEXTURE2D_DESC texDesc{};
+			texDesc.Format = m_ColorFormat;
+			texDesc.Width = m_Width;
+			texDesc.Height = m_Height;
+			texDesc.ArraySize = m_ArraySize;
+			texDesc.MipLevels = m_bUseMipMap ? 0 : 1;
+			texDesc.SampleDesc.Count = 1;
+			texDesc.SampleDesc.Quality = 0;
+			texDesc.Usage = D3D11_USAGE_DEFAULT;
+			texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+			texDesc.MiscFlags = m_bUseMipMap ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+			texDesc.CPUAccessFlags = 0;
 
-		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-		srvDesc.Format = format;
-		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = -1;
-		srvDesc.Texture2D.MostDetailedMip = 0;
-
-		if (FAILED(m_pDevice->CreateShaderResourceView(
-			static_cast<ID3D11Resource*>(m_pTexture2D),
-			&srvDesc,
-			&m_pShaderResourceView)))
-		{
-			Release();
-			DV_ENGINE_ERROR("ShaderResourceView 생성에 실패하였습니다.");
-			return false;
-		}
-
-		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc{};
-		rtvDesc.Format = format;
-		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-		rtvDesc.Texture2D.MipSlice = 0;
-
-		if (FAILED(m_pDevice->CreateRenderTargetView(
-			static_cast<ID3D11Resource*>(m_pTexture2D),
-			&rtvDesc,
-			&m_pRenderTargetView)))
-		{
-			Release();
-			DV_ENGINE_ERROR("RenderTargetView 생성에 실패하였습니다.");
-			return false;
-		}
-
-		m_Width = width;
-		m_Height = height;
-		m_Format = format;
-		m_bUseMipMap = useMipMap;
-
-		return true;
-	}
-
-	bool RenderTexture::CreateDepthStencilView(uint32_t width, uint32_t height, DXGI_FORMAT format, bool readOnly)
-	{
-		D3D11_TEXTURE2D_DESC texDesc{};
-		texDesc.Width = width;
-		texDesc.Height = height;
-		texDesc.Format = format;
-		texDesc.ArraySize = 1;
-		texDesc.MipLevels = 1;
-		texDesc.SampleDesc.Count = 1;
-		texDesc.SampleDesc.Quality = 0;
-		texDesc.Usage = D3D11_USAGE_DEFAULT;
-		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
-		texDesc.MiscFlags = 0;
-		texDesc.CPUAccessFlags = 0;
-
-		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
-		{
-			Release();
-			DV_ENGINE_ERROR("Texture2D 생성에 실패하였습니다.");
-			return false;
-		}
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-		srvDesc.Format = GetShaderResourceViewFormat(format);
-		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = -1;
-		srvDesc.Texture2D.MostDetailedMip = 0;
-
-		if (FAILED(m_pDevice->CreateShaderResourceView(
-			static_cast<ID3D11Resource*>(m_pTexture2D),
-			&srvDesc,
-			&m_pShaderResourceView)))
-		{
-			Release();
-			DV_ENGINE_ERROR("ShaderResourceView 생성에 실패하였습니다.");
-			return false;
-		}
-
-		D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
-		dsvDesc.Format = GetDepthStencilViewFormat(format);
-		dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-
-		if (FAILED(m_pDevice->CreateDepthStencilView(
-			static_cast<ID3D11Resource*>(m_pTexture2D),
-			&dsvDesc,
-			&m_pDepthStencilView)))
-		{
-			Release();
-			DV_ENGINE_ERROR("DepthStencilView 생성에 실패하였습니다.");
-			return false;
-		}
-
-		if (readOnly)
-		{
-			dsvDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
-
-			if (FAILED(m_pDevice->CreateDepthStencilView(
-				static_cast<ID3D11Resource*>(m_pTexture2D),
-				&dsvDesc,
-				&m_pDepthStencilViewReadOnly)))
+			if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pColorTexture2D)))
 			{
-				Release();
-				DV_ENGINE_ERROR("DepthStencilViewReadOnly 생성에 실패하였습니다.");
+				DV_ERROR("생성실패");
+				return false;
+			}
+
+			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+			srvDesc.Format = m_ColorFormat;
+			if (m_ArraySize == 1)
+			{
+				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				srvDesc.Texture2D.MipLevels = -1;
+				srvDesc.Texture2D.MostDetailedMip = 0;
+			}
+			else
+			{
+				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+				srvDesc.Texture2DArray.ArraySize = m_ArraySize;
+				srvDesc.Texture2DArray.FirstArraySlice = 0;
+				srvDesc.Texture2DArray.MipLevels = -1;
+				srvDesc.Texture2DArray.MostDetailedMip = 0;
+			}
+
+			if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pColorTexture2D), &srvDesc, &m_pColorShaderResourceView)))
+			{
+				DV_ERROR("생성실패");
+				return false;
+			}
+
+			D3D11_RENDER_TARGET_VIEW_DESC rtvDesc{};
+			rtvDesc.Format = m_ColorFormat;
+			if (m_ArraySize == 1)
+			{
+				rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+				rtvDesc.Texture2D.MipSlice = 0;
+			}
+			else
+			{
+				rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+				rtvDesc.Texture2DArray.ArraySize = m_ArraySize;
+				rtvDesc.Texture2DArray.FirstArraySlice = 0;
+				rtvDesc.Texture2DArray.MipSlice = 0;
+			}
+			if (FAILED(m_pDevice->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_pColorTexture2D), &rtvDesc, &m_pRenderTargetView)))
+			{
+				DV_ERROR("생성실패");
 				return false;
 			}
 		}
 
-		m_Width = width;
-		m_Height = height;
-		m_Format = format;
-		
+		if (m_DepthFormat != DXGI_FORMAT_UNKNOWN)
+		{
+			D3D11_TEXTURE2D_DESC texDesc{};
+			texDesc.Format = m_DepthFormat;
+			texDesc.Width = m_Width;
+			texDesc.Height = m_Height;
+			texDesc.ArraySize = m_ArraySize;
+			texDesc.MipLevels = 1;
+			texDesc.SampleDesc.Count = 1;
+			texDesc.SampleDesc.Quality = 0;
+			texDesc.Usage = D3D11_USAGE_DEFAULT;
+			texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
+			texDesc.MiscFlags = 0;
+			texDesc.CPUAccessFlags = 0;
+
+			if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pDepthTexture2D)))
+			{
+				DV_ERROR("생성실패");
+				return false;
+			}
+
+			D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+			srvDesc.Format = GetShaderResourceViewFormat(m_DepthFormat);
+			if (m_ArraySize == 1)
+			{
+				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				srvDesc.Texture2D.MipLevels = 1;
+				srvDesc.Texture2D.MostDetailedMip = 0;
+			}
+			else
+			{
+				srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+				srvDesc.Texture2DArray.ArraySize = m_ArraySize;
+				srvDesc.Texture2DArray.FirstArraySlice = 0;
+				srvDesc.Texture2DArray.MipLevels = 1;
+				srvDesc.Texture2DArray.MostDetailedMip = 0;
+			}
+
+			if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pDepthTexture2D), &srvDesc, &m_pDepthShaderResourceView)))
+			{
+				DV_ERROR("생성실패");
+				return false;
+			}
+
+			D3D11_DEPTH_STENCIL_VIEW_DESC dsvDesc{};
+			dsvDesc.Format = GetDepthStencilViewFormat(m_DepthFormat);
+			if (m_ArraySize == 1)
+			{
+				dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+				dsvDesc.Texture2D.MipSlice = 0;
+			}
+			else
+			{
+				dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+				dsvDesc.Texture2DArray.ArraySize = m_ArraySize;
+				dsvDesc.Texture2DArray.FirstArraySlice = 0;
+				dsvDesc.Texture2DArray.MipSlice = 0;
+			}
+
+			if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pDepthTexture2D), &dsvDesc, &m_pDepthStencilView)))
+			{
+				DV_ENGINE_ERROR("DepthStencilView 생성에 실패하였습니다.");
+				return false;
+			}
+
+			if (m_bDepthStencilReadOnly)
+			{
+				dsvDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
+
+				if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pDepthTexture2D), &dsvDesc, &m_pDepthStencilViewReadOnly)))
+				{
+					DV_ENGINE_ERROR("DepthStencilViewReadOnly 생성에 실패하였습니다.");
+					return false;
+				}
+			}
+		}
+
 		return true;
 	}
-	
+
 	void RenderTexture::Release()
 	{
-		DV_RELEASE(m_pDepthStencilViewReadOnly);
-		DV_RELEASE(m_pDepthStencilView);
-		DV_RELEASE(m_pRenderTargetView);
-		DV_RELEASE(m_pShaderResourceView);
-		DV_RELEASE(m_pTexture2D);
+		// color
+		{
+			DV_RELEASE(m_pColorShaderResourceView);
+			DV_RELEASE(m_pRenderTargetView);
+			DV_RELEASE(m_pColorTexture2D);
+		}
+
+		// depth
+		{
+			DV_RELEASE(m_pDepthShaderResourceView);
+			DV_RELEASE(m_pDepthStencilView);
+			DV_RELEASE(m_pDepthTexture2D);
+		}
 	}
 }

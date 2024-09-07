@@ -542,6 +542,13 @@ namespace Sandbox
 		}
 
 		m_SceneType = eSceneType::Base;
+
+		// test
+		//auto pRenderTex = new Dive::RenderTexture();
+		//pRenderTex->SetSize(1024, 1024);
+		//pRenderTex->SetArraySize(3);
+		//pRenderTex->SetDepthFormat(DXGI_FORMAT_R32_TYPELESS);
+		//pRenderTex->Create();
 	}
 
 	void Sandbox::createCarScene()
