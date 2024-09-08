@@ -53,6 +53,7 @@ namespace Dive
 
 		default:
 			m_DepthFormat = DXGI_FORMAT_UNKNOWN;
+			DV_ENGINE_ERROR("잘못된 깊이 비트를 전달받았습니다.");
 			break;
 		}
 	}

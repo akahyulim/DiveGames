@@ -14,13 +14,13 @@ namespace Dive
 	class GameObject;
 	class RenderTexture;
 
-	class DvLight : public Component
+	class Light : public Component
 	{
-		DV_CLASS(DvLight, Component)
+		DV_CLASS(Light, Component)
 
 	public:
-		DvLight(GameObject* pGameObject, eLightType type);
-		virtual ~DvLight();
+		Light(GameObject* pGameObject, eLightType type);
+		virtual ~Light();
 
 		ConstantBuffer* GetConstantBufferVS() override { return m_pCBufferVS; }
 		ConstantBuffer* GetConstantBufferPS() override { return m_pCBufferPS; }
@@ -54,23 +54,73 @@ namespace Dive
 		ConstantBuffer* m_pCBufferPS;
 	};
 
+	class CascadedMatrixSet
+	{
+	public:
+		CascadedMatrixSet();
+		~CascadedMatrixSet() = default;
+		
+		void Initialize(uint32_t size, GameObject* pCamera);
+		void Update(const DirectX::XMVECTOR& dir);
+
+		DirectX::XMMATRIX GetWorldToShadowSpace() const { return DirectX::XMLoadFloat4x4(&m_WorldToShadowSpace); }
+		DirectX::XMMATRIX GetWorldToCascadeProj(uint32_t index) const { return DirectX::XMLoadFloat4x4(&m_ArrWorldToCascadeProj[index]); }
+		DirectX::XMVECTOR GetToCascadeOffsetX() const { return DirectX::XMVectorSet(m_ToCascadeOffsetX[0], m_ToCascadeOffsetX[1], m_ToCascadeOffsetX[2], m_ToCascadeOffsetX[3]); }
+		DirectX::XMVECTOR GetToCascadeOffsetY() const { return DirectX::XMVectorSet(m_ToCascadeOffsetY[0], m_ToCascadeOffsetY[1], m_ToCascadeOffsetY[2], m_ToCascadeOffsetY[3]); }
+		DirectX::XMVECTOR GetToCascadeScale() const { return DirectX::XMVectorSet(m_ToCascadeScale[0], m_ToCascadeScale[1], m_ToCascadeScale[2], m_ToCascadeScale[3]); }
+
+	private:
+		void extractFrustumPoints(float nearClip, float farClip, DirectX::XMVECTOR* pArrFrustumCorners);
+		void extractFrustumBoundSphere(float nearClip, float farClip, DirectX::XMVECTOR& boundCenter, float& boundRadius);
+
+		bool cascadeNeedsUpdate(const DirectX::XMMATRIX& shadowView, int cascadeIndex, const DirectX::XMVECTOR& newCenter, DirectX::XMVECTOR& offset);
+
+	private:
+		uint32_t m_MapSize;
+		float m_CascadeTotalRange;
+		float m_ArrCascadeRagnes[4];
+
+		DirectX::XMFLOAT3 m_ShadowBoundCenter;
+		float m_ShadowBoundRadius;
+		DirectX::XMFLOAT3 m_ArrCascadeBoundCenter[3];
+		float m_ArrCascadeBoundRadius[3];
+
+		DirectX::XMFLOAT4X4 m_WorldToShadowSpace;
+		DirectX::XMFLOAT4X4 m_ArrWorldToCascadeProj[3];
+
+		float m_ToCascadeOffsetX[4];
+		float m_ToCascadeOffsetY[4];
+		float m_ToCascadeScale[4];
+
+		GameObject* m_pCamera;
+	};
+
 	// 유니티의 경우 디렉셔널 라이트를 2개 이상 설정할 수 있지만 그림자를 만드는 것은 하나로 제한된다.
 	// 언리얼의 경우 포워드 셰이딩의 경우 하나의 디렉셔널 라이트만 사용된다.
-	class DirectionalLight : public DvLight
+	class DirectionalLight : public Light
 	{
-		DV_CLASS(DirectionalLight, DvLight)
+		DV_CLASS(DirectionalLight, Light)
 			
 	public:
 		DirectionalLight();
 		DirectionalLight(GameObject* pGameObject);
 		virtual ~DirectionalLight() = default;
 
+		void InitializeCascadedMatrixSet(GameObject* pCamera);
+
 		void Update() override;
+
+		ConstantBuffer* GetConstantBufferGS() override { return m_pCBufferGS; }
+
+	private:
+		CascadedMatrixSet m_CascadedMatrixSet;
+
+		ConstantBuffer* m_pCBufferGS;
 	};
 
-	class PointLight : public DvLight
+	class PointLight : public Light
 	{
-		DV_CLASS(PointLight, DvLight)
+		DV_CLASS(PointLight, Light)
 
 	public:
 		PointLight();
@@ -90,9 +140,9 @@ namespace Dive
 		float m_Range;
 	};
 
-	class SpotLight : public DvLight
+	class SpotLight : public Light
 	{
-		DV_CLASS(SpotLight, DvLight)
+		DV_CLASS(SpotLight, Light)
 
 	public:
 		SpotLight();
@@ -124,66 +174,5 @@ namespace Dive
 		float m_Range;
 		float m_InnerAngle;
 		float m_OuterAngle;
-	};
-
-	//==================================================================================================
-
-	class Light : public Component
-	{
-		DV_CLASS(Light, Component)
-	
-	public:
-		Light(GameObject* pGameObject);
-		~Light() override ;
-
-		void Update() override;
-
-		eLightType GetType() const { return m_Type; }
-		void SetType(eLightType type) { m_Type = type; }
-
-		DirectX::XMFLOAT3 GetColor() const { return m_Color; }
-		void SetColor(float red, float green, float blue) { m_Color = { red, green, blue }; }
-		void SetColor(const DirectX::XMFLOAT3& color) { m_Color = color; }
-
-		float GetRange() const { return m_Range; }
-		void SetRange(float range) { m_Range = range; }
-
-		float GetOuterAngleDegree() const { return m_OuterAngle; }
-		float GetOuterAngleRadian() const { return DirectX::XMConvertToRadians(m_OuterAngle); }
-		float GetInnerAngleDegree() const { return m_InnerAngle; }
-		float GetInnerAngleRadian() const { return DirectX::XMConvertToRadians(m_InnerAngle); }
-		void SetSpotLightAngles(float outerAngle, float innerAngle) { m_OuterAngle = outerAngle;  m_InnerAngle = innerAngle; }
-
-		bool IsEnabled() const { return m_bEnabled; }
-		void SetEnabled(bool enabled) { m_bEnabled = enabled; }
-
-		// Texture*로 해야하나...?
-		RenderTexture* GetShadowMap() const { return m_pShadowMap; }
-
-		DirectX::XMMATRIX GetViewMatrix();
-		DirectX::XMMATRIX GetProjectionMatrix();
-		DirectX::XMMATRIX GetShadowMatrix();
-
-		float GetShadowMapSize() const { return m_ShadowMapSize; }
-		void SetShadowMapSize(float size);
-
-		bool IsShadowEnabled() const { return m_bShadowEnabled; }
-		void EnableShadow(bool enable) { m_bShadowEnabled = enable; }
-
-	private:
-		eLightType m_Type;
-
-		DirectX::XMFLOAT3 m_Color;
-
-		float m_Range;
-		float m_OuterAngle;
-		float m_InnerAngle;
-
-		bool m_bEnabled;
-
-		RenderTexture* m_pShadowMap;
-		float m_ShadowMapSize;
-
-		bool m_bShadowEnabled;
 	};
 }

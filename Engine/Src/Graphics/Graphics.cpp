@@ -57,6 +57,9 @@ namespace Dive
 		, m_DSConstBufs{}
 		, m_DSConstBufSlots{}
 		, m_bDSConstBufDirty(true)
+		, m_GSConstBufs{}
+		, m_GSConstBufSlots{}
+		, m_bGSConstBufDirty(true)
 		, m_PSConstBufs{}
 		, m_PSConstBufSlots{}
 		, m_bPSConstBufDirty(true)
@@ -410,6 +413,11 @@ namespace Dive
 		SetViewport(viewport);
 	}
 
+	void Graphics::SetViewports(uint32_t count, const D3D11_VIEWPORT* pViewports)
+	{
+		m_pDeviceContext->RSSetViewports(count, pViewports);
+	}
+
 	void Graphics::SetVertexBuffer(VertexBuffer* pBuffer)
 	{
 		if (pBuffer != m_pVertexBuffer)
@@ -488,6 +496,18 @@ namespace Dive
 		}
 	}
 
+	void Graphics::SetGeometryShader(eGeometryShaderType type)
+	{
+		if (type != m_GeometryShaderType)
+		{
+			auto index = static_cast<uint8_t>(type);
+			auto pShader = m_GeometryShaders[index];
+			m_pDeviceContext->GSSetShader(pShader ? pShader->GetGeometryShader() : nullptr, nullptr, 0);
+
+			m_GeometryShaderType = type;
+		}
+	}
+
 	void Graphics::SetPixelShader(ePixelShaderType type)
 	{
 		if (type != m_PixelShaderType)
@@ -516,6 +536,15 @@ namespace Dive
 		{
 			m_DSConstBufs[slot] = pBuffer;
 			m_bDSConstBufDirty = true;
+		}
+	}
+
+	void Graphics::GSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot)
+	{
+		if (pBuffer != m_GSConstBufs[slot])
+		{
+			m_GSConstBufs[slot] = pBuffer;
+			m_bGSConstBufDirty = true;
 		}
 	}
 
@@ -637,6 +666,16 @@ namespace Dive
 
 			m_pDeviceContext->DSSetConstantBuffers(0, MAX_NUM_DS_CONSTANT_BUFFERS, buffers);
 			m_bDSConstBufDirty = false;
+		}
+
+		if (m_bGSConstBufDirty)
+		{
+			ID3D11Buffer* buffers[MAX_NUM_GS_CONSTANT_BUFFERS]{};
+			for (uint8_t i = 0; i != MAX_NUM_GS_CONSTANT_BUFFERS; ++i)
+				buffers[i] = m_GSConstBufs[i] ? m_GSConstBufs[i]->GetBuffer() : nullptr;
+
+			m_pDeviceContext->GSSetConstantBuffers(0, MAX_NUM_GS_CONSTANT_BUFFERS, buffers);
+			m_bGSConstBufDirty = false;
 		}
 
 		if (m_bPSConstBufDirty)
@@ -995,6 +1034,31 @@ namespace Dive
 
 		// Depth Greater / No Write, Stencil Mask DS(ds가 뭐지?)
 
+		// shadow gen
+		{
+			D3D11_DEPTH_STENCIL_DESC desc;
+			desc.DepthEnable = TRUE;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+			desc.DepthFunc = D3D11_COMPARISON_LESS;
+			desc.StencilEnable = TRUE;
+			desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+			desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+			const D3D11_DEPTH_STENCILOP_DESC noSkyStencilOp = { D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_COMPARISON_EQUAL };
+			desc.FrontFace = noSkyStencilOp;
+			desc.BackFace = noSkyStencilOp;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			desc.StencilEnable = FALSE;
+			desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+			index = static_cast<uint8_t>(eDepthStencilStateType::ShadowGen);
+
+			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
+			{
+				DV_ENGINE_ERROR("DepthStencilState ShdowGen 생성에 실패하였습니다.");
+				return false;
+			}
+		}
+
 		return true;
 	}
 	
@@ -1057,6 +1121,7 @@ namespace Dive
 			}
 
 			// ShadowGen
+			// cascaded 후에 사용되지 않는다.
 			desc.CullMode = D3D11_CULL_BACK;
 			desc.DepthBias = 100;//85;
 			desc.SlopeScaledDepthBias = 4.0f;//5.0f;
@@ -1067,6 +1132,33 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateRasterizerState(&desc, &m_RasterizerStates[index])))
 			{
 				DV_ENGINE_ERROR("RasterizerState ShadowGen 생성에 실패하였습니다.");
+				return false;
+			}
+
+			// Cascaded Shadow Gen
+			desc  = {
+			D3D11_FILL_SOLID,
+			D3D11_CULL_FRONT,
+			FALSE,
+			D3D11_DEFAULT_DEPTH_BIAS,
+			D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
+			D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
+			TRUE,
+			FALSE,
+			FALSE,
+			FALSE
+			};
+			desc.CullMode = D3D11_CULL_BACK;
+			desc.FillMode = D3D11_FILL_SOLID;
+			desc.DepthBias = 6;
+			desc.SlopeScaledDepthBias = 1.0f;
+			desc.DepthClipEnable = FALSE;
+
+			index = static_cast<uint8_t>(eRasterizerStateType::CascadedShadowGen);
+
+			if (FAILED(m_pDevice->CreateRasterizerState(&desc, &m_RasterizerStates[index])))
+			{
+				DV_ENGINE_ERROR("RasterizerState CascadedShadowGen 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -1142,6 +1234,12 @@ namespace Dive
 			m_VertexShaders[index] = pShader;
 
 			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DirLightDepth.hlsl", eShaderType::Vertex, eInputLayout::Pos))
+				return false;
+			index = static_cast<uint8_t>(eVertexShaderType::DirLightDepth);
+			m_VertexShaders[index] = pShader;
+
+			pShader = new Shader();
 			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/ForwardLight.hlsl", eShaderType::Vertex, eInputLayout::Static_Model))
 				return false;
 			index = static_cast<uint8_t>(eVertexShaderType::ForwardLight);
@@ -1214,6 +1312,17 @@ namespace Dive
 			m_DomainShaders[index] = pShader;
 		}
 
+		// geometry shaders
+		{
+			auto index = static_cast<uint8_t>(eGeometryShaderType::Null);
+			m_GeometryShaders[index] = nullptr;
+
+			auto pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DirLightDepth.hlsl", eShaderType::Geometry))
+				return false;
+			index = static_cast<uint8_t>(eGeometryShaderType::CascadeShadowMaps);
+			m_GeometryShaders[index] = pShader;
+		}
 
 		// pixel shaders
 		{

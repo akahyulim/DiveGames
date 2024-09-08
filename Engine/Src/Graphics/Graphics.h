@@ -14,6 +14,7 @@ namespace Dive
 		GBuffer,
 		NoDepthWriteLessStencilMask,
 		NoDepthWriteGreaterStencilMask,
+		ShadowGen,
 		Count
 	}; 
 	
@@ -22,6 +23,7 @@ namespace Dive
 		FillSolid_CullBack = 0,
 		FillSolid_CullNone,
 		ShadowGen,
+		CascadedShadowGen,
 		NoDepthClipFront,
 		Count
 	};
@@ -43,6 +45,16 @@ namespace Dive
 	};
 
 	enum class eDSConstBufType : uint8_t
+	{
+		Model = 0,
+		Camera,
+		Light,
+		Count
+	};
+
+	// 현재 Light 하나만 사용하지만 구색을 갖췄다.
+	// 추후 다른 셰이더들도 하나로 합칠 수 있지 않을까?
+	enum class eGSConstBufType : uint8_t
 	{
 		Model = 0,
 		Camera,
@@ -76,6 +88,7 @@ namespace Dive
 		GBuffer_Normal,
 		GBuffer_Specular,
 		SpotShadowMap,
+		CascadeShadowMap,
 		Count
 	};
 
@@ -90,6 +103,7 @@ namespace Dive
 	{
 		Null = 0,
 		LightDepth,
+		DirLightDepth,
 		ForwardLight,
 		GBuffer,
 		DeferredLight,
@@ -115,6 +129,13 @@ namespace Dive
 		Count
 	};
 
+	enum class eGeometryShaderType : uint8_t
+	{
+		Null = 0,
+		CascadeShadowMaps,
+		Count
+	};
+
 	enum class ePixelShaderType : uint8_t
 	{
 		Null = 0,
@@ -133,6 +154,7 @@ namespace Dive
 	inline constexpr uint8_t MAX_NUM_RENDER_VIEWS = 4;
 	inline constexpr uint8_t MAX_NUM_VS_CONSTANT_BUFFERS = 6;
 	inline constexpr uint8_t MAX_NUM_DS_CONSTANT_BUFFERS = 6;	// vs, ps와 같을 필요는 없다.
+	inline constexpr uint8_t MAX_NUM_GS_CONSTANT_BUFFERS = 6;	// 구성해놓고 보니 전부 동일하다.. 나중에 합쳐보자.
 	inline constexpr uint8_t MAX_NUM_PS_CONSTANT_BUFFERS = 6;
 	inline constexpr uint8_t MAX_NUM_SHADER_RESOURCES = 128;
 	inline constexpr uint8_t MAX_NUM_SAMPLERS = 16;
@@ -274,6 +296,7 @@ namespace Dive
 
 		void SetViewport(D3D11_VIEWPORT viewport);
 		void SetViewport(float topLeftX, float topLeftY, float width, float height, float minDepth = 0.0f, float maxDepth = 1.0f);
+		void SetViewports(uint32_t count, const D3D11_VIEWPORT* pViewports);
 
 		void SetVertexBuffer(VertexBuffer* pBuffer);
 		void SetIndexBuffer(IndexBuffer* pBuffer);
@@ -283,10 +306,12 @@ namespace Dive
 		void SetVertexShader(eVertexShaderType type);
 		void SetHullShader(eHullShaderType type);
 		void SetDomainShader(eDomainShaderType type);
+		void SetGeometryShader(eGeometryShaderType type);
 		void SetPixelShader(ePixelShaderType type);
 		
 		void VSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot);
 		void DSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot);
+		void GSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot);
 		void PSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot);
 		
 		void BindPSResource(ID3D11ShaderResourceView* pResourceView, eTextureUnitType unit);
@@ -406,6 +431,14 @@ namespace Dive
 		// domain shader
 		Shader* m_DomainShaders[static_cast<uint8_t>(eDomainShaderType::Count)];
 		eDomainShaderType m_DomainShaderType;
+
+		// geometry shader
+		Shader* m_GeometryShaders[static_cast<uint8_t>(eGeometryShaderType::Count)];
+		eGeometryShaderType m_GeometryShaderType;
+
+		ConstantBuffer* m_GSConstBufs[static_cast<uint8_t>(eGSConstBufType::Count)];
+		ID3D11Buffer* m_GSConstBufSlots[MAX_NUM_GS_CONSTANT_BUFFERS];
+		bool m_bGSConstBufDirty;
 
 		// pixel shader
 		Shader* m_PixelShaders[static_cast<uint8_t>(ePixelShaderType::Count)];

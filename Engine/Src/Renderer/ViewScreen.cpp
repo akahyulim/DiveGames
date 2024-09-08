@@ -67,7 +67,7 @@ namespace Dive
 			//	m_Renderables[eRenderableType::Light].emplace_back(pGameObject);
 			}
 
-			if (auto pLightCom = pGameObject->GetComponent<DvLight>())
+			if (auto pLightCom = pGameObject->GetComponent<Light>())
 			{
 				m_Renderables[eRenderableType::Light].emplace_back(pGameObject);
 			}
@@ -147,33 +147,75 @@ namespace Dive
 	// 오브젝트를 광원의 뷰, 프로젝션으로 변환한 후 기록
 	void ViewScreen::passLightDepth()
 	{
+		// 참고프로젝트에선 찾을 수 없었지만 코파일럿은 이게 필요하다고 한다.
 		m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		m_pGraphics->SetRasterizerState(eRasterizerStateType::ShadowGen);
-		// 책에는 없는 것 같은데...
-		// 제외해도 변화가 없다.
-		//m_pGraphics->SetDepthStencilState(eDepthStencilStateType::DepthLess);	
-
-		m_pGraphics->SetVertexShader(eVertexShaderType::LightDepth);
-		m_pGraphics->SetHullShader(eHullShaderType::Null);
-		m_pGraphics->SetDomainShader(eDomainShaderType::Null);
-		m_pGraphics->SetPixelShader(ePixelShaderType::Null);
+		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::ShadowGen);	
 		
 		for (const auto light : m_Renderables[eRenderableType::Light])
 		{
-			auto pLightCom = light->GetComponent<DvLight>();
-			if (pLightCom->GetType() != eLightType::Spot || !pLightCom->IsShadowEnabled())
+			auto pLightCom = light->GetComponent<Light>();
+			if (!light->IsActive() || !pLightCom->IsShadowEnabled())
 				continue;
 
-			// set & clear views
+			// 렌더타겟: 사실상 spot과 동일하다.
 			m_pGraphics->BindRenderTargetView((ID3D11RenderTargetView*)nullptr, 0);
 			m_pGraphics->BindDepthStencilView(pLightCom->GetShadowMap()->GetDepthStencilView());
 			m_pGraphics->ClearViews(eClearFlags::Depth, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
 
-			// viewport
-			m_pGraphics->SetViewport(0, 0, pLightCom->GetShadowMapSize(), pLightCom->GetShadowMapSize());
+			switch (pLightCom->GetType())
+			{
+				// 역시 이 곳에서 문제가 일어나고 있다.
+			case eLightType::Directional:
+			{
+				m_pGraphics->SetRasterizerState(eRasterizerStateType::CascadedShadowGen);
 
-			m_pGraphics->VSBindConstantBuffer(pLightCom->GetConstantBufferVS(), 2);
+				// 3개의 viewport
+				auto size = pLightCom->GetShadowMapSize();
+				D3D11_VIEWPORT viewports[3] = { {0.0f, 0.0f, size, size, 0.0f, 1.0f}, 
+					{0.0f, 0.0f, size, size, 0.0f, 1.0f}, {0.0f, 0.0f, size, size, 0.0f, 1.0f} };
+				//m_pGraphics->SetViewports(3, viewports);
+				//m_pGraphics->GetDeviceContext()->RSSetViewports(3, viewports);
+				m_pGraphics->SetViewport(0, 0, size, size);
+
+				// 렌더타겟: 사실상 spot과 동일하다.
+				//m_pGraphics->BindRenderTargetView((ID3D11RenderTargetView*)nullptr, 0);
+				//m_pGraphics->BindDepthStencilView(pLightCom->GetShadowMap()->GetDepthStencilView());
+				//m_pGraphics->ClearViews(eClearFlags::Depth, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
+				
+				m_pGraphics->GSBindConstantBuffer(pLightCom->GetConstantBufferGS(), 2);
+
+				m_pGraphics->SetVertexShader(eVertexShaderType::DirLightDepth);
+				m_pGraphics->SetHullShader(eHullShaderType::Null);
+				m_pGraphics->SetDomainShader(eDomainShaderType::Null);
+				m_pGraphics->SetGeometryShader(eGeometryShaderType::CascadeShadowMaps);
+				m_pGraphics->SetPixelShader(ePixelShaderType::Null);
+				break;
+			}
+			case eLightType::Spot:
+			{
+				m_pGraphics->SetRasterizerState(eRasterizerStateType::Count);
+
+				// set & clear views
+				//m_pGraphics->BindRenderTargetView((ID3D11RenderTargetView*)nullptr, 0);
+				//m_pGraphics->BindDepthStencilView(pLightCom->GetShadowMap()->GetDepthStencilView());
+				//m_pGraphics->ClearViews(eClearFlags::Depth, DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f), 1.0f, 0);
+
+				// viewport
+				m_pGraphics->SetViewport(0, 0, pLightCom->GetShadowMapSize(), pLightCom->GetShadowMapSize());
+
+				m_pGraphics->VSBindConstantBuffer(pLightCom->GetConstantBufferVS(), 2);
+
+				m_pGraphics->SetVertexShader(eVertexShaderType::LightDepth);
+				m_pGraphics->SetHullShader(eHullShaderType::Null);
+				m_pGraphics->SetDomainShader(eDomainShaderType::Null);
+				m_pGraphics->SetGeometryShader(eGeometryShaderType::Null);
+				m_pGraphics->SetPixelShader(ePixelShaderType::Null);
+				break;
+			}
+			default:
+				continue;
+			}
 
 			// draw opaque's depth			
 			for (const auto* pOpaque : m_Renderables[eRenderableType::Opaque])
@@ -238,10 +280,6 @@ namespace Dive
 			auto light = m_Renderables[eRenderableType::Light][i];
 			auto pLightCom = light->GetComponent<Light>();
 
-			// 굳이 Component에도 Enabled가 필요한가?
-			if (!pLightCom->IsEnabled())
-				continue;
-
 			// 여기에서도 두 번째 광원부터 갱신이 안될 것 같은데...
 			//auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
 			//pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
@@ -295,9 +333,6 @@ namespace Dive
 		{
 			const auto* light = m_Renderables[eRenderableType::Light][i];
 			auto* pLightCom = light->GetComponent<Light>();
-
-			if (!pLightCom->IsEnabled())
-				continue;
 
 			//auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
 			//pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
@@ -367,6 +402,9 @@ namespace Dive
 			m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Normal), eTextureUnitType::Normal);
 
 			m_pGraphics->SetVertexShader(eVertexShaderType::GBuffer);
+			m_pGraphics->SetHullShader(eHullShaderType::Null);
+			m_pGraphics->SetDomainShader(eDomainShaderType::Null);
+			m_pGraphics->SetGeometryShader(eGeometryShaderType::Null);	// 역시 이게 문제였다.
 			m_pGraphics->SetPixelShader(ePixelShaderType::GBuffer);
 
 			m_pGraphics->SetVertexBuffer(pRenderableCom->GetVertexBuffer());
@@ -398,12 +436,15 @@ namespace Dive
 		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex()->GetDepthShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
 
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);
-		//m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
+		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
 		
 		for (int i = 0; i < static_cast<int>(m_Renderables[eRenderableType::Light].size()); i++)
 		{
 			const auto* pLight = m_Renderables[eRenderableType::Light][i];
-			auto* pLightCom = pLight->GetComponent<DvLight>();
+			auto* pLightCom = pLight->GetComponent<Light>();
+
+			if (!pLight->IsActive())
+				continue;
 
 			m_pGraphics->PSBindConstantBuffer(pLightCom->GetConstantBufferPS(), 2);
 
@@ -416,14 +457,21 @@ namespace Dive
 			{
 			case eLightType::Directional:
 			{
-				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteLessStencilMask);
-				//m_pGraphics->GetDeviceContext()->RSSetState(nullptr);
+				//m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
 
+				// 예제에서는 2를 변수로 관리했다.
+				// skybox와 관련있는 듯 하다.
+				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteLessStencilMask);// , 2);
+				
 				m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+				if (pLightCom->IsShadowEnabled())
+					m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetDepthShaderResourceView(), eTextureUnitType::CascadeShadowMap);
 				
 				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredDirLight);
 				m_pGraphics->SetHullShader(eHullShaderType::Null);
 				m_pGraphics->SetDomainShader(eDomainShaderType::Null);
+				m_pGraphics->SetGeometryShader(eGeometryShaderType::Null);
 				m_pGraphics->SetPixelShader(ePixelShaderType::DeferredDirLight);
 
 				m_pGraphics->SetVertexBuffer(nullptr);
@@ -434,7 +482,7 @@ namespace Dive
 			case eLightType::Point:
 			{
 				// 역시 이 곳으로 옮기니 문제가 해결됐다.
-				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
+				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);// , 2);
 				m_pGraphics->SetRasterizerState(eRasterizerStateType::NoDepthClipFront);
 
 				// 책에는 1이지만 정황상 2가 어울린다.
@@ -455,10 +503,9 @@ namespace Dive
 			
 			case eLightType::Spot:
 			{
-				// 현재는 이 곳에서만 사용
-				m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
+				//m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
 
-				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
+				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);// , 2);
 				m_pGraphics->SetRasterizerState(eRasterizerStateType::NoDepthClipFront);
 
 				if(pLightCom->IsShadowEnabled())
@@ -500,6 +547,7 @@ namespace Dive
 		m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_Specular);
 		m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_DepthStencil);
 		m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::SpotShadowMap);
+		m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::CascadeShadowMap);
 	}
 
 	// depthStencilState 처리가 미비한 듯 하다.
@@ -509,5 +557,76 @@ namespace Dive
 		passLightDepth();
 		passGBuffer();
 		passLight();
+		//passDirLight();
+	}
+
+	void ViewScreen::passDirLight()
+	{
+		const auto* pLight = m_Renderables[eRenderableType::Light][0];
+		auto* pLightCom = pLight->GetComponent<Light>();
+
+		if (!pLight->IsActive() || pLightCom->GetType() != eLightType::Directional)
+			return;
+
+		// rendertargets
+		m_pGraphics->BindRenderTargetView(m_pCamera->GetRenderTargetView(), 0);
+		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());	// 읽기 전용
+		m_pGraphics->ClearViews(eClearFlags::Color, m_pCamera->GetBackgroundColor());
+		m_pGraphics->SetViewport(0, 0, static_cast<float>(m_pGraphics->GetResolutionWidth()), static_cast<float>(m_pGraphics->GetResolutionHeight()));
+
+		// ConstantBuffers
+		m_pGraphics->PSBindConstantBuffer(m_pCamera->GetConstantBufferPS(), 0);
+		m_pGraphics->PSBindConstantBuffer(pLightCom->GetConstantBufferPS(), 2);
+
+		// gbuffer resources
+		// 아무리봐도 이게 바인딩되지 않는 것 같다.
+		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex()->GetDepthShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Diffuse);
+		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Normal);
+		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Specular);
+
+		// samplers
+		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);
+		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
+
+		// states	
+		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteLessStencilMask);
+		//m_pGraphics->SetBlendState(eBlendStateType::Null);
+		//m_pGraphics->GetDeviceContext()->RSSetState(nullptr);
+
+		m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+		if (pLightCom->IsShadowEnabled())
+			m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetDepthShaderResourceView(), eTextureUnitType::CascadeShadowMap);
+
+		// shaders
+		m_pGraphics->SetVertexShader(eVertexShaderType::DeferredDirLight);
+		m_pGraphics->SetHullShader(eHullShaderType::Null);
+		m_pGraphics->SetDomainShader(eDomainShaderType::Null);
+		m_pGraphics->SetGeometryShader(eGeometryShaderType::Null);
+		m_pGraphics->SetPixelShader(ePixelShaderType::DeferredDirLight);
+
+		m_pGraphics->SetVertexBuffer(nullptr);
+		m_pGraphics->Draw(4, 0);
+			
+		{
+			m_pGraphics->SetDepthStencilState(eDepthStencilStateType::Null);
+			m_pGraphics->SetBlendState(eBlendStateType::Null);
+			m_pGraphics->GetDeviceContext()->RSSetState(nullptr);	// 추후 수정 필요
+
+			m_pGraphics->SetVertexShader(eVertexShaderType::Null);
+			m_pGraphics->SetHullShader(eHullShaderType::Null);
+			m_pGraphics->SetDomainShader(eDomainShaderType::Null);
+			m_pGraphics->SetGeometryShader(eGeometryShaderType::Null);
+			m_pGraphics->SetPixelShader(ePixelShaderType::Null);
+
+			// 현재 Texture 테스트 때문에 동일한 이름의 메서드가 존재한다.
+			m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_Diffuse);
+			m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_Normal);
+			m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_Specular);
+			m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_DepthStencil);
+			m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::SpotShadowMap);
+			m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::CascadeShadowMap);
+		}
 	}
 }

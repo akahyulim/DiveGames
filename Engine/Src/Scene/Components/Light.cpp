@@ -4,12 +4,14 @@
 #include "Graphics/RenderTexture.h"
 #include "Graphics/ConstantBuffer.h"
 #include "Scene/GameObject.h"
-
+#include "Camera.h"
 #include "Graphics/Graphics.h"
+
+using namespace DirectX;
 
 namespace Dive
 {
-	DvLight::DvLight(GameObject* pGameObject, eLightType type)
+	Light::Light(GameObject* pGameObject, eLightType type)
 		: Component(pGameObject)
 		, m_Type(type)
 		, m_Color{1.0f, 1.0f, 1.0f}
@@ -21,7 +23,7 @@ namespace Dive
 	{
 	}
 
-	DvLight::~DvLight()
+	Light::~Light()
 	{
 		DV_DELETE(m_pShadowMap);
 
@@ -29,9 +31,157 @@ namespace Dive
 		DV_DELETE(m_pCBufferVS);
 	}
 
-	DirectX::XMMATRIX DvLight::GetShadowViewProj()
+	XMMATRIX Light::GetShadowViewProj()
 	{
-		return DirectX::XMMatrixIdentity();
+		return XMMatrixIdentity();
+	}
+
+	CascadedMatrixSet::CascadedMatrixSet()
+		: m_CascadeTotalRange(50.0f)
+		, m_pCamera(nullptr)
+	{
+	}
+
+	void CascadedMatrixSet::Initialize(uint32_t size, GameObject* pCamera)
+	{
+		m_MapSize = size;
+		m_pCamera = pCamera;
+		
+		m_ArrCascadeRagnes[0] = m_pCamera->GetComponent<Camera>()->GetNearClipPlane();
+		m_ArrCascadeRagnes[1] = 10.0f;
+		m_ArrCascadeRagnes[2] = 25.0f;
+		m_ArrCascadeRagnes[3] = m_CascadeTotalRange;
+
+		for (uint32_t i = 0; i < 3; i++)
+		{
+			m_ArrCascadeBoundCenter[i] = { 0.0f, 0.0f, 0.0f };
+			m_ArrCascadeBoundRadius[i] = 0.0f;
+		}
+	}
+
+	void CascadedMatrixSet::Update(const DirectX::XMVECTOR& dir)
+	{
+		auto pos = XMVectorAdd(m_pCamera->GetPositionVector(), XMVectorScale(m_pCamera->GetForwardVector(), m_CascadeTotalRange * 0.5f));
+		auto focus = XMVectorAdd(pos, XMVectorScale(dir, m_pCamera->GetComponent<Camera>()->GetFarClipPlane()));
+		auto view = XMMatrixLookAtLH(pos, focus, m_pCamera->GetUpwardVector());
+
+		XMVECTOR boundCenter;
+		float radius;
+		extractFrustumBoundSphere(m_ArrCascadeRagnes[0], m_ArrCascadeRagnes[3], boundCenter, radius);
+		XMStoreFloat3(&m_ShadowBoundCenter, boundCenter);
+		m_ShadowBoundRadius = std::max(m_ShadowBoundRadius, radius);
+
+		auto proj = XMMatrixOrthographicLH(-m_ShadowBoundRadius, m_ShadowBoundRadius, -m_ShadowBoundRadius, m_ShadowBoundRadius);
+
+		auto worldToSpace = XMMatrixMultiply(view, proj);
+		XMStoreFloat4x4(&m_WorldToShadowSpace, worldToSpace);
+
+		for (uint32_t i = 0; i < 3; i++)
+		{
+			XMMATRIX cascadeTrans;
+			XMMATRIX cascadeScale;
+
+			{
+				XMVECTOR newCenter;
+				extractFrustumBoundSphere(m_ArrCascadeRagnes[i], m_ArrCascadeRagnes[i + 1], newCenter, radius);
+				m_ArrCascadeBoundRadius[i] = std::max(m_ArrCascadeBoundRadius[i], radius);
+
+				XMVECTOR offset;
+				if (cascadeNeedsUpdate(view, i, newCenter, offset))
+				{
+					XMVECTOR offsetOut;
+					offsetOut = XMVector3TransformNormal(offset, XMMatrixTranspose(view));
+
+					XMVECTOR boundCenter = XMLoadFloat3(&m_ArrCascadeBoundCenter[i]);
+					boundCenter += offsetOut;
+					XMStoreFloat3(&m_ArrCascadeBoundCenter[i], boundCenter);
+				}
+
+				XMVECTOR centerShadowSpace = XMVector3TransformCoord(boundCenter, worldToSpace);
+
+				m_ToCascadeOffsetX[i] = -XMVectorGetX(centerShadowSpace);
+				m_ToCascadeOffsetY[i] = -XMVectorGetY(centerShadowSpace);
+				cascadeTrans = XMMatrixTranslation(m_ToCascadeOffsetX[i], m_ToCascadeOffsetY[i], 0.0f);
+
+				m_ToCascadeScale[i] = m_ShadowBoundRadius / m_ArrCascadeBoundRadius[i];
+				cascadeScale = XMMatrixScaling(m_ToCascadeScale[i], m_ToCascadeScale[i], 1.0f);
+			}
+
+			auto worldToProj = worldToSpace * cascadeTrans * cascadeScale;
+			XMStoreFloat4x4(&m_ArrWorldToCascadeProj[i], worldToProj);
+		}
+
+		// 상당히 이상하다.
+		m_ToCascadeOffsetX[3] = 250.0f;
+		m_ToCascadeOffsetY[3] = 250.0f;
+		m_ToCascadeScale[3] = 0.1f;
+	}
+
+	void CascadedMatrixSet::extractFrustumPoints(float nearClip, float farClip, DirectX::XMVECTOR* pArrFrustumCorners)
+	{
+		const auto& camPos = m_pCamera->GetPositionVector();
+		const auto& camRight = m_pCamera->GetRightwardVector();
+		const auto& camUp = m_pCamera->GetUpwardVector();
+		const auto& camForward = m_pCamera->GetForwardVector();
+
+		auto pCameraCom = m_pCamera->GetComponent<Camera>();
+
+		const float tanFovX = tanf(pCameraCom->GetAspectRatio() * pCameraCom->GetFieldOfView());
+		const float tanFovY = tanf(pCameraCom->GetAspectRatio());
+
+		pArrFrustumCorners[0] = XMVectorAdd(camPos, XMVectorScale(XMVectorAdd(XMVectorAdd(XMVectorNegate(XMVectorScale(camRight, tanFovX)), XMVectorScale(camUp, tanFovY)), camForward), nearClip));
+		pArrFrustumCorners[1] = XMVectorAdd(camPos, XMVectorScale(XMVectorAdd(XMVectorAdd(XMVectorScale(camRight, tanFovX), XMVectorScale(camUp, tanFovY)), camForward), nearClip));
+		pArrFrustumCorners[2] = XMVectorAdd(camPos, XMVectorScale(XMVectorAdd(XMVectorAdd(XMVectorScale(camRight, tanFovX), XMVectorNegate(XMVectorScale(camUp, tanFovY))), camForward), nearClip));
+		pArrFrustumCorners[3] = XMVectorAdd(camPos, XMVectorScale(XMVectorAdd(XMVectorAdd(XMVectorNegate(XMVectorScale(camRight, tanFovX)), XMVectorNegate(XMVectorScale(camUp, tanFovY))), camForward), nearClip));
+
+		pArrFrustumCorners[4] = XMVectorAdd(camPos, XMVectorScale(XMVectorAdd(XMVectorAdd(XMVectorNegate(XMVectorScale(camRight, tanFovX)), XMVectorScale(camUp, tanFovY)), camForward), farClip));
+		pArrFrustumCorners[5] = XMVectorAdd(camPos, XMVectorScale(XMVectorAdd(XMVectorAdd(XMVectorScale(camRight, tanFovX), XMVectorScale(camUp, tanFovY)), camForward), farClip));
+		pArrFrustumCorners[6] = XMVectorAdd(camPos, XMVectorScale(XMVectorAdd(XMVectorAdd(XMVectorScale(camRight, tanFovX), XMVectorNegate(XMVectorScale(camUp, tanFovY))), camForward), farClip));
+		pArrFrustumCorners[7] = XMVectorAdd(camPos, XMVectorScale(XMVectorAdd(XMVectorAdd(XMVectorNegate(XMVectorScale(camRight, tanFovX)), XMVectorNegate(XMVectorScale(camUp, tanFovY))), camForward), farClip));
+	}
+
+	void CascadedMatrixSet::extractFrustumBoundSphere(float nearClip, float farClip, DirectX::XMVECTOR& boundCenter, float& boundRadius)
+	{
+		auto pCameraCom = m_pCamera->GetComponent<Camera>();
+
+		const float tanFovX = tanf(pCameraCom->GetAspectRatio() * pCameraCom->GetFieldOfView());
+		const float tanFovY = tanf(pCameraCom->GetAspectRatio());
+
+		auto cameraPos = m_pCamera->GetPositionVector();
+		auto cameraForward = m_pCamera->GetForwardVector();
+		boundCenter = XMVectorAdd(cameraPos, XMVectorScale(cameraForward, nearClip + 0.5f * (nearClip + farClip)));
+
+		auto cameraRight = m_pCamera->GetRightwardVector();
+		auto cameraUp = m_pCamera->GetUpwardVector();
+		auto rightComponent = XMVectorNegate(XMVectorScale(cameraRight, tanFovX));
+		auto upComponent = XMVectorScale(cameraUp, tanFovY);
+		auto forwardComponent = cameraForward;
+
+		auto boundSpan = XMVectorAdd(cameraPos, XMVectorScale(XMVectorAdd(XMVectorAdd(rightComponent, upComponent), forwardComponent), farClip));
+
+		boundRadius = XMVectorGetX(XMVector3Length(boundSpan));
+	}
+
+	bool CascadedMatrixSet::cascadeNeedsUpdate(const DirectX::XMMATRIX& shadowView, int cascadeIndex, const DirectX::XMVECTOR& newCenter, DirectX::XMVECTOR& offset)
+	{
+		auto oldCenterInCascade = XMVector3TransformCoord(XMLoadFloat3(&m_ArrCascadeBoundCenter[cascadeIndex]), shadowView);
+		auto newCenterInCascade = XMVector3TransformCoord(newCenter, shadowView);
+		auto centerDiff = newCenterInCascade - oldCenterInCascade;
+
+		auto pixelSize = static_cast<float>(m_MapSize) / (2.0f * m_ArrCascadeBoundRadius[cascadeIndex]);
+
+		auto pixelOffX = XMVectorGetX(centerDiff) * pixelSize;
+		auto pixelOffY = XMVectorGetY(centerDiff) * pixelSize;
+
+		bool bNeedUpdate = std::abs(pixelOffX) > 0.5f || std::abs(pixelOffY) > 0.5f;
+		if (bNeedUpdate)
+		{
+			offset = { std::floorf(0.5f + pixelOffX) / pixelSize,
+				std::floorf(0.5f + pixelOffY) / pixelSize,
+				XMVectorGetZ(centerDiff) };
+		}
+
+		return bNeedUpdate;
 	}
 
 #pragma pack(push, 1)
@@ -40,69 +190,113 @@ namespace Dive
 		// matViewProj
 	};
 
+	struct CB_DIRECTIONAL_GS
+	{
+		XMFLOAT4X4 cascadeViewProj[3];
+	};
+
 	struct CB_DIRECTIONAL_PS
 	{
-		DirectX::XMFLOAT3 lightColor;
+		XMFLOAT3 lightColor;
 		float padding;
 
-		DirectX::XMFLOAT3 dirToLight;
+		XMFLOAT3 dirToLight;
 		uint32_t shadowEnabled;
+
+		XMFLOAT4X4 toShadowSpace;
+		XMFLOAT4 toCascadeOffsetX;
+		XMFLOAT4 toCascadeOffsetY;
+		XMFLOAT4 toCascadeScale;
 	};
 #pragma pack(pop)
 
 	DirectionalLight::DirectionalLight()
-		: DvLight(nullptr, eLightType::Directional)
+		: Light(nullptr, eLightType::Directional)
+		, m_pCBufferGS(nullptr)
 	{
+		m_ShadowMapSize = 1024.0f;
 		m_pShadowMap = new RenderTexture(1024, 1024, 32);
 		m_pShadowMap->SetArraySize(3);
 		m_pShadowMap->Create();
 	}
 
 	DirectionalLight::DirectionalLight(GameObject* pGameObject)
-		: DvLight(pGameObject, eLightType::Directional)
+		: Light(pGameObject, eLightType::Directional)
+		, m_pCBufferGS(nullptr)
 	{
+		m_ShadowMapSize = 1024.0f;
 		m_pShadowMap = new RenderTexture(1024, 1024, 32);
 		m_pShadowMap->SetArraySize(3);
 		m_pShadowMap->Create();
 	}
 	
+	// 생성자에 넣을 수 없어 별도의 메서드로 분리했다.
+	void DirectionalLight::InitializeCascadedMatrixSet(GameObject* pCamera)
+	{
+		m_CascadedMatrixSet.Initialize(1024, pCamera);
+	}
+
 	void DirectionalLight::Update()
 	{
-		if(!m_pCBufferPS)
-			m_pCBufferPS = ConstantBuffer::Create("CB_DIRECTIONAL_PS", sizeof(CB_DIRECTIONAL_PS));
+		m_CascadedMatrixSet.Update(m_pGameObject->GetForwardVector());
+	
+		// ds constant buffer
+		{
+			if (!m_pCBufferGS)
+				m_pCBufferGS = ConstantBuffer::Create("CB_DIRECTIONAL_GS", sizeof(CB_DIRECTIONAL_GS));
 
-		auto pMappedData = reinterpret_cast<CB_DIRECTIONAL_PS*>(m_pCBufferPS->Map());
-		pMappedData->lightColor = m_Color;
-		pMappedData->dirToLight = { -1.0f * m_pGameObject->GetForward().x, -1.0f * m_pGameObject->GetForward().y, -1.0f * m_pGameObject->GetForward().z };
-		pMappedData->shadowEnabled = m_bShadowEnabled ? 1 : 0;
-		m_pCBufferPS->Unmap();
+			auto pMappedData = reinterpret_cast<CB_DIRECTIONAL_GS*>(m_pCBufferGS->Map());
+			for (uint32_t i = 0; i != 3; i++)
+			{
+				XMStoreFloat4x4(&pMappedData->cascadeViewProj[i], XMMatrixTranspose(//XMMatrixIdentity()));
+					m_CascadedMatrixSet.GetWorldToCascadeProj(i)));
+			}
+			m_pCBufferGS->Unmap();
+		}
+		
+		// ps constant buffer
+		{
+			if (!m_pCBufferPS)
+				m_pCBufferPS = ConstantBuffer::Create("CB_DIRECTIONAL_PS", sizeof(CB_DIRECTIONAL_PS));
+
+			auto pMappedData = reinterpret_cast<CB_DIRECTIONAL_PS*>(m_pCBufferPS->Map());
+			//ZeroMemory(pMappedData, sizeof(CB_DIRECTIONAL_PS));
+			pMappedData->lightColor = m_Color;
+			XMStoreFloat3(&pMappedData->dirToLight, XMVectorNegate(m_pGameObject->GetForwardVector()));
+			pMappedData->shadowEnabled = m_bShadowEnabled ? 1 : 0;
+			XMStoreFloat4x4(&pMappedData->toShadowSpace, XMMatrixTranspose(m_CascadedMatrixSet.GetWorldToShadowSpace()));
+			XMStoreFloat4(&pMappedData->toCascadeOffsetX, m_CascadedMatrixSet.GetToCascadeOffsetX());
+			XMStoreFloat4(&pMappedData->toCascadeOffsetY, m_CascadedMatrixSet.GetToCascadeOffsetY());
+			XMStoreFloat4(&pMappedData->toCascadeScale, m_CascadedMatrixSet.GetToCascadeScale());
+			m_pCBufferPS->Unmap();
+		}
 	}
 
 #pragma pack(push, 1)
 	struct CB_POINT_DS
 	{
-		DirectX::XMMATRIX world;
+		XMFLOAT4X4 world;
 	};
 
 	struct CB_POINT_PS
 	{
-		DirectX::XMFLOAT3 lightColor;
+		XMFLOAT3 lightColor;
 		float lightRangeRcp;
 
-		DirectX::XMFLOAT3 lightPos;
+		XMFLOAT3 lightPos;
 		uint32_t shadowEnabled;
 	};
 #pragma pack(pop)
 
 	PointLight::PointLight()
-		: DvLight(nullptr, eLightType::Point)
+		: Light(nullptr, eLightType::Point)
 		, m_pCBufferDS(nullptr)
 		, m_Range(0.0f)
 	{
 	}
 
 	PointLight::PointLight(GameObject* pGameObject)
-		: DvLight(pGameObject, eLightType::Point)
+		: Light(pGameObject, eLightType::Point)
 		, m_pCBufferDS(nullptr)
 		, m_Range(0.0f)
 	{
@@ -117,15 +311,15 @@ namespace Dive
 	{
 		// ds constant buffer
 		{
+
 			if(!m_pCBufferDS)
 				m_pCBufferDS = ConstantBuffer::Create("CB_POINT_DS", sizeof(CB_POINT_DS));
 			
-			auto scale = DirectX::XMMatrixScaling(m_Range, m_Range, m_Range);
-			auto trans = DirectX::XMMatrixTranslation(m_pGameObject->GetPosition().x, m_pGameObject->GetPosition().y, m_pGameObject->GetPosition().z);
-			auto world = DirectX::XMMatrixTranspose(scale * trans);
+			auto scale = XMMatrixScaling(m_Range, m_Range, m_Range);
+			auto trans = XMMatrixTranslation(m_pGameObject->GetPosition().x, m_pGameObject->GetPosition().y, m_pGameObject->GetPosition().z);
 
 			auto pMappedData = reinterpret_cast<CB_POINT_DS*>(m_pCBufferDS->Map());
-			pMappedData->world = world;
+			XMStoreFloat4x4(&pMappedData->world, XMMatrixTranspose(scale * trans));
 			m_pCBufferDS->Unmap();
 		}
 
@@ -146,12 +340,12 @@ namespace Dive
 #pragma pack(push, 1)
 	struct CB_SPOTLIGHT_VS
 	{
-		DirectX::XMMATRIX matViewProj;
+		XMFLOAT4X4 viewProj;
 	};
 
 	struct CB_SPOTLIGHT_DS
 	{
-		DirectX::XMMATRIX world;
+		XMFLOAT4X4 world;
 
 		float sinOuter;
 		float cosOuter;
@@ -160,16 +354,16 @@ namespace Dive
 
 	struct CB_SPOTLIGHT_PS
 	{
-		DirectX::XMFLOAT3 lightColor;
+		XMFLOAT3 lightColor;
 		float lightRangeRcp;
 
-		DirectX::XMFLOAT3 lightPos;
+		XMFLOAT3 lightPos;
 		float cosOuterCone;
 
-		DirectX::XMFLOAT3 dirToLight;
+		XMFLOAT3 dirToLight;
 		float cosConeAttRange;
 
-		DirectX::XMMATRIX matViewProj;
+		XMFLOAT4X4 viewProj;
 
 		uint32_t shadowEnabled;
 		float padding[3];
@@ -177,7 +371,7 @@ namespace Dive
 #pragma pack(pop)
 
 	SpotLight::SpotLight()
-		: DvLight(nullptr, eLightType::Spot)
+		: Light(nullptr, eLightType::Spot)
 		, m_pCBufferDS(nullptr)
 		, m_Range(0.0f)
 		, m_InnerAngle(0.0f)
@@ -193,7 +387,7 @@ namespace Dive
 	}
 
 	SpotLight::SpotLight(GameObject* pGameObject)
-		: DvLight(pGameObject, eLightType::Spot)
+		: Light(pGameObject, eLightType::Spot)
 		, m_pCBufferDS(nullptr)
 		, m_Range(0.0f)
 		, m_InnerAngle(0.0f)
@@ -211,7 +405,7 @@ namespace Dive
 
 	void SpotLight::Update()
 	{
-		auto matViewProj = GetShadowViewProj();
+		auto viewProj = GetShadowViewProj();
 
 		// vs constant buffer
 		{
@@ -219,12 +413,12 @@ namespace Dive
 				m_pCBufferVS = ConstantBuffer::Create("CB_SPOTLIGHT_VS", sizeof(CB_SPOTLIGHT_VS));
 
 			auto pMappedData = reinterpret_cast<CB_SPOTLIGHT_VS*>(m_pCBufferVS->Map());
-			pMappedData->matViewProj = DirectX::XMMatrixTranspose(matViewProj);
+			XMStoreFloat4x4(&pMappedData->viewProj, XMMatrixTranspose(viewProj));
 			m_pCBufferVS->Unmap();
 		}
 
-		float outerRad = DirectX::XMConvertToRadians(m_OuterAngle);
-		float innerRad = DirectX::XMConvertToRadians(m_InnerAngle);
+		float outerRad = XMConvertToRadians(m_OuterAngle);
+		float innerRad = XMConvertToRadians(m_InnerAngle);
 
 		float sinOuter = sinf(outerRad);
 		float cosOuter = cosf(outerRad);
@@ -236,10 +430,9 @@ namespace Dive
 				m_pCBufferDS = ConstantBuffer::Create("CB_SPOTLIGHT_DS", sizeof(CB_SPOTLIGHT_DS));
 
 			m_pGameObject->SetScale(m_Range, m_Range, m_Range);
-			auto world = m_pGameObject->GetMatrix();
-
+			
 			auto pMappedData = reinterpret_cast<CB_SPOTLIGHT_DS*>(m_pCBufferDS->Map());
-			pMappedData->world = DirectX::XMMatrixTranspose(world);
+			XMStoreFloat4x4(& pMappedData->world, XMMatrixTranspose(m_pGameObject->GetMatrix()));
 			pMappedData->sinOuter = sinOuter;
 			pMappedData->cosOuter = cosOuter;
 			m_pCBufferDS->Unmap();
@@ -255,153 +448,31 @@ namespace Dive
 			pMappedData->lightRangeRcp = 1.0f / m_Range;
 			pMappedData->lightPos = m_pGameObject->GetPosition();
 			pMappedData->cosOuterCone = cosOuter;
-			pMappedData->dirToLight = { -1.0f * m_pGameObject->GetForward().x, -1.0f * m_pGameObject->GetForward().y, -1.0f * m_pGameObject->GetForward().z };
+			XMStoreFloat3(&pMappedData->dirToLight, XMVectorNegate(m_pGameObject->GetForwardVector()));
 			pMappedData->cosConeAttRange = cosInner - cosOuter;
-			pMappedData->matViewProj = DirectX::XMMatrixTranspose(matViewProj);
+			XMStoreFloat4x4(&pMappedData->viewProj, XMMatrixTranspose(viewProj));
 			pMappedData->shadowEnabled = m_bShadowEnabled ? 1 : 0;
 			m_pCBufferPS->Unmap();
 		}
 	}
 
-	DirectX::XMMATRIX SpotLight::GetShadowViewProj()
+	XMMATRIX SpotLight::GetShadowViewProj()
 	{
 		const auto& pos = m_pGameObject->GetPositionVector();
 		const auto& forward = m_pGameObject->GetForwardVector();
-		const auto& focus = DirectX::XMVectorAdd(pos, DirectX::XMVectorScale(forward, m_Range));
+		const auto& focus = XMVectorAdd(pos, XMVectorScale(forward, m_Range));
 
 		const auto& up = m_pGameObject->GetUpwardVector();
 		
-		auto view = DirectX::XMMatrixLookAtLH(pos, focus, up);
+		auto view = XMMatrixLookAtLH(pos, focus, up);
 
-		auto proj = DirectX::XMMatrixPerspectiveFovLH(
-			2.0f * DirectX::XMConvertToRadians(m_OuterAngle),
+		auto proj = XMMatrixPerspectiveFovLH(
+			2.0f * XMConvertToRadians(m_OuterAngle),
 			1.0f,			// 가로, 세로 비율이라 1인듯 하다.
 			5.0f,			// 책에서도 상수를 멤버 변수로 관리했다. ShadowGen Rasterizer State와 관련이 있나? => 아닌듯?
 			m_Range
 		);	
 
-		return DirectX::XMMatrixMultiply(view, proj);
-	}
-
-	//========================================================================================================================================================
-
-	Light::Light(GameObject* pGameObject)
-		: Component(pGameObject)
-		, m_Type(eLightType::Directional)
-		, m_Color(1.0f, 1.0f, 1.0f)
-		, m_Range(10.0f)
-		, m_OuterAngle(30.0f)
-		, m_InnerAngle(15.0f)
-		, m_bEnabled(true)
-		, m_pShadowMap(nullptr)
-		, m_ShadowMapSize(1024.0f)
-		, m_bShadowEnabled(true)
-	{
-		m_pShadowMap = new RenderTexture();
-		m_pShadowMap->SetSize(m_ShadowMapSize, m_ShadowMapSize);
-		m_pShadowMap->SetDepthFormat(DXGI_FORMAT_R32_TYPELESS);
-		m_pShadowMap->Create();
-	}
-
-	Light::~Light()
-	{
-		DV_DELETE(m_pShadowMap);
-
-		DV_ENGINE_TRACE("컴포넌트({0:s}'s {1:s}) 소멸", GetName(), GetTypeName());
-	}
-
-	void Light::Update()
-	{
-		/*
-		switch (GetType())
-		{
-		case eLightType::Directional:
-		{	
-			m_CBufferPS.options = (1U << 0);
-			m_CBufferPS.dirToLight = m_pGameObject->GetForward();
-			break;
-		}
-		case eLightType::Point:
-		{
-			{
-				DirectX::XMMATRIX lightWorldScale = DirectX::XMMatrixScaling(m_Range, m_Range, m_Range);
-				DirectX::XMMATRIX lightWorldTrans = DirectX::XMMatrixTranslation(m_pGameObject->GetPosition().x, m_pGameObject->GetPosition().y, m_pGameObject->GetPosition().z);
-				// 아래 두 행렬은 카메라의 것이어야 한다.
-				// 직접 가져오는 것이 애매하다면 위의 두 값으로 world만 계산한 후 전달하고
-				// 셰이더 내부에서 카메라로 부터 전달받은 view와 proj를 곱하는 방법도 있다.
-				// 물론 이 경우 카메라에도 cb_domain을 추가해야 한다.
-				// 그것도 귀찮다면 어떻게든 카메라를 가져오는 수도 있다.
-				DirectX::XMMATRIX view = GetViewMatrix();
-				DirectX::XMMATRIX proj = GetProjectionMatrix();
-				DirectX::XMMATRIX worldViewProjection = lightWorldScale * lightWorldTrans * view * proj;
-				m_CBufferDS.lightProjection = DirectX::XMMatrixTranspose(worldViewProjection);
-			}
-
-			m_CBufferPS.options = (1U << 1);
-			m_CBufferPS.lightPos = m_pGameObject->GetPosition();
-			m_CBufferPS.lightRangeRcp = 1.0f / GetRange();
-			break;
-		}
-		case eLightType::Spot:
-		{
-			m_CBufferVS.shadow = DirectX::XMMatrixTranspose(GetShadowMatrix());
-
-			m_CBufferPS.options = (1U << 2);
-			m_CBufferPS.lightPos = m_pGameObject->GetPosition();
-			m_CBufferPS.dirToLight = m_pGameObject->GetForward();
-			m_CBufferPS.lightRangeRcp = 1.0f / GetRange();
-			m_CBufferPS.outerConeAngle = GetOuterAngleRadian();
-			m_CBufferPS.innerConeAngle = GetInnerAngleRadian();
-			m_CBufferPS.shadow = DirectX::XMMatrixTranspose(GetShadowMatrix());
-			break;
-		}
-		default:
-			break;
-		}
-		m_CBufferPS.lightColor = { GetColor().x * GetColor().x
-		, GetColor().y * GetColor().y
-		, GetColor().z * GetColor().z };
-
-		m_CBufferPS.shadowEnabled = m_bShadowEnabled ? 1 : 0;
-		*/
-	}
-
-	DirectX::XMMATRIX Light::GetViewMatrix()
-	{
-		const auto& pos = m_pGameObject->GetPositionVector();
-		const auto& forward = m_pGameObject->GetForwardVector();
-		const auto& up = m_pGameObject->GetUpwardVector();
-
-		const auto& focus = DirectX::XMVectorAdd(pos, DirectX::XMVectorMultiply(forward, DirectX::XMVectorReplicate(m_Range)));
-
-		return DirectX::XMMatrixLookAtLH(pos, focus, up);
-	}
-
-	DirectX::XMMATRIX Light::GetProjectionMatrix()
-	{
-		return DirectX::XMMatrixPerspectiveFovLH(
-			DirectX::XMConvertToRadians(2.0f * m_OuterAngle),
-			1.0f,
-			5.0f,			// 책에서도 상수를 멤버 변수로 관리했다.
-			m_Range
-		);
-	}
-
-	DirectX::XMMATRIX Light::GetShadowMatrix()
-	{
-		// rasterTek에서는 직교투영행렬을 사용한다.
-		return DirectX::XMMatrixMultiply(GetViewMatrix(), GetProjectionMatrix());
-	}
-
-	void Light::SetShadowMapSize(float size)
-	{ 
-		// 추후 2의 제곱으로 확인해야 할 듯
-		if (m_ShadowMapSize == size)
-			return;
-
-		m_ShadowMapSize = size;
-
-		// 갱신을 위해 필요하다. 추후 좀 다듬자.
-		//m_pShadowMap->CreateDepthStencilView(m_ShadowMapSize, m_ShadowMapSize, DXGI_FORMAT_R32_TYPELESS);
+		return XMMatrixMultiply(view, proj);
 	}
 }

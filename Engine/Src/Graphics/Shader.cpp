@@ -27,6 +27,10 @@ namespace Dive
 			entryPoint = "MainDS";
 			profile = "ds_5_0";
 			break;
+		case eShaderType::Geometry:
+			entryPoint = "MainGS";
+			profile = "gs_5_0";
+			break;
 		case eShaderType::Pixel:
 			entryPoint = "MainPS";
 			profile = "ps_5_0";
@@ -116,6 +120,7 @@ namespace Dive
 		, m_pHullShader(nullptr)
 		, m_pDomainShader(nullptr)
 		, m_pComputeShader(nullptr)
+		, m_pGeometryShader(nullptr)
 		, m_pPixelShader(nullptr)
 		, m_pInputLayout(nullptr)
 	{
@@ -126,6 +131,7 @@ namespace Dive
 	{
 		DV_RELEASE(m_pPixelShader);
 		DV_RELEASE(m_pComputeShader);
+		DV_RELEASE(m_pGeometryShader);
 		DV_RELEASE(m_pDomainShader);
 		DV_RELEASE(m_pHullShader);
 		DV_RELEASE(m_pVertexShader);
@@ -180,7 +186,18 @@ namespace Dive
 				DV_ENGINE_ERROR("DomainShader 생성에 실패하였습니다.");
 				return false;
 			}
-			break;
+			break; 
+		case eShaderType::Geometry:
+				if (FAILED(m_pDevice->CreateGeometryShader(
+					pShaderBlob->GetBufferPointer(),
+					pShaderBlob->GetBufferSize(),
+					NULL,
+					&m_pGeometryShader)))
+				{
+					DV_ENGINE_ERROR("GeometryShader 생성에 실패하였습니다.");
+					return false;
+				}
+				break;
 		case eShaderType::Pixel:
 			if (FAILED(m_pDevice->CreatePixelShader(
 				pShaderBlob->GetBufferPointer(), 

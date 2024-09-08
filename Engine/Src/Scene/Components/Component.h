@@ -19,6 +19,7 @@ namespace Dive
 		// 이름을 GetVertexCBuffer()로 바꾸기
 		virtual ConstantBuffer* GetConstantBufferVS() { return nullptr; }
 		virtual ConstantBuffer* GetConstantBufferDS() { return nullptr; }
+		virtual ConstantBuffer* GetConstantBufferGS() { return nullptr; }
 		virtual ConstantBuffer* GetConstantBufferPS() { return nullptr; }
 
 		std::string GetName() const;

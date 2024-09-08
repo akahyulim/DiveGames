@@ -25,7 +25,7 @@ namespace Dive
 	class Scene;
 	class Camera;
 	class Renderable;
-	class Light;
+	//class Light;
 	class Mesh;
 	class Material;
 
@@ -47,6 +47,8 @@ namespace Dive
 		void passGBuffer();
 		void passLight();
 		void deferredRender();
+
+		void passDirLight();
 
 	private:
 		Graphics* m_pGraphics;

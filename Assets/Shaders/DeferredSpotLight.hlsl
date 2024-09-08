@@ -42,7 +42,7 @@ HS_OUTPUT MainHS()
 
 cbuffer cbDomain : register(b1)
 {
-    matrix LightWorld            : packoffset(c0);
+    matrix LightWorld       : packoffset(c0);
     float SinOuterAngle     : packoffset(c4);
     float CosOuterAngle     : packoffset(c4.y);
 };
@@ -142,14 +142,12 @@ float3 CalcuSpotLight(float3 worldPos, float3 normal, float3 diffColor)
     
     // ±×¸²ÀÚ °¨¼è
     float shadowAtt = 1.0;
-    if (ShadowEnabled)
+    if (ShadowEnabled == 1)
         shadowAtt = SpotShadowPCF(worldPos);
     
     finalColor *= LightColor * distAtt * conAtt * shadowAtt;
    
     return finalColor;
-    //return float3(shadowAtt, shadowAtt, shadowAtt);
-    //return float3(conAtt, conAtt, conAtt);
 }
 
 float4 MainPS(DS_OUTPUT input) : SV_TARGET0
