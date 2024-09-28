@@ -19,6 +19,10 @@
 #include "Graphics/ConstantBuffer.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Texture2D.h"
+#include "Graphics/DvTexture.h"
+#include "Graphics/DvTexture2D.h"
+#include "Graphics/DvTexture2DArray.h"
+
 
 // Renderer
 #include "Renderer/Renderer.h"

@@ -8,7 +8,7 @@ namespace Dive
 		DV_CLASS(Texture2D, Texture)
 
 	public:
-		Texture2D() = default;
+		Texture2D() = default;	// 현재 구조상 밉맵을 생성할 수 없다. 리소스 매니저와 연관되어 있다.
 		Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMipMap = true);
 		~Texture2D() override;
 

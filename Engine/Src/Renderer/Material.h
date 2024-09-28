@@ -5,6 +5,7 @@
 namespace Dive
 {
 	class Texture;
+	class DvTexture2D;
 
 	// 현재 Texture는 opaque 여부를 판단하지 않는다.
 	// 이는 유니티의 설정을 따른 것으로, 유니티의 경우 머티리얼에서 확인한다.
@@ -20,11 +21,11 @@ namespace Dive
 		bool LoadFromFile(const std::string& fileName) override;
 		bool SaveToFile(const std::string& fileName) override;
 
-		const std::unordered_map<eTextureUnitType, Texture*>& GetTextures() const { return m_Textures; }
-		Texture* GetTexture(eTextureUnitType unit) const;
-		void SetTexture(eTextureUnitType unit, Texture* pTexture);
-		void AddTexture(eTextureUnitType unit, const std::string& name);
+		const std::unordered_map<eTextureUnitType, DvTexture2D*>& GetDvTextures() const { return m_DvTextures; }
+		DvTexture2D* GetDvTexture(eTextureUnitType unit) const;
+		void SetDvTexture(eTextureUnitType unit, DvTexture2D* pTexture);
 		bool HasTexture(eTextureUnitType unit) const;
+		void AddTexture(eTextureUnitType unit, const std::string& name);
 
 		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_DiffuseColor; }
 		void SetDiffuseColor(float r, float g, float b, float a) { m_DiffuseColor = { r, g, b, a }; }
@@ -41,7 +42,7 @@ namespace Dive
 		bool IsOpaque() const;
 
 	private:
-		std::unordered_map<eTextureUnitType, Texture*> m_Textures;
+		std::unordered_map<eTextureUnitType, DvTexture2D*> m_DvTextures;
 		
 		DirectX::XMFLOAT4 m_DiffuseColor;
 		DirectX::XMFLOAT2 m_Tiling;

@@ -1,6 +1,7 @@
 #include "divepch.h"
 #include "Material.h"
 #include "Graphics/Texture2D.h"
+#include "Graphics/DvTexture2D.h"
 #include "Core/CoreDefs.h"
 #include "Resource/ResourceManager.h"
 
@@ -29,41 +30,42 @@ namespace Dive
         return true;
     }
 
-    Texture* Material::GetTexture(eTextureUnitType unit) const
+    DvTexture2D* Material::GetDvTexture(eTextureUnitType unit) const
     {
-        auto it = m_Textures.find(unit);
+        auto it = m_DvTextures.find(unit);
 
-        return it != m_Textures.end() ? it->second : nullptr;
+        return it != m_DvTextures.end() ? it->second : nullptr;
     }
-    
-    void Material::SetTexture(eTextureUnitType unit, Texture* pTexture)
+
+    void Material::SetDvTexture(eTextureUnitType unit, DvTexture2D* pTexture)
     {
         if (unit < eTextureUnitType::Count)
         {
             if (pTexture)
-                m_Textures[unit] = pTexture;
+                m_DvTextures[unit] = pTexture;
             else
-                m_Textures.erase(unit); // 이게 맞나 모르겠다.
+                m_DvTextures.erase(unit); // 이게 맞나 모르겠다.
         }
     }
-   
+
+    // Renderable의 Update에서 리소스 유무를 파악하는데 사용
+    bool Material::HasTexture(eTextureUnitType unit) const
+    {
+        auto it = m_DvTextures.find(unit);
+        return it != m_DvTextures.end() && it->second != nullptr;
+    }
+
     // urho는 load에서만 텍스쳐를 로드하기에 직접 만들어봤다.
-    // 그런데 cache에서 GetResource한 후 위의 SetTexture하는게 맞지 않나 싶다.
-    // 하지만 이 구현이 힘든게 Cache의 GetResource는 일반 리소스 파일과 엔진의 설정 파일을
-    // 구분하여 로드할 수 있다는 것이다.
+   // 그런데 cache에서 GetResource한 후 위의 SetTexture하는게 맞지 않나 싶다.
+   // 하지만 이 구현이 힘든게 Cache의 GetResource는 일반 리소스 파일과 엔진의 설정 파일을
+   // 구분하여 로드할 수 있다는 것이다.
     void Material::AddTexture(eTextureUnitType unit, const std::string& name)
     {
         if (unit < eTextureUnitType::Count)
         {
-            auto pTexture = ResourceManager::GetInstance()->GetResource<Texture2D>(name);
-            SetTexture(unit, static_cast<Texture*>(pTexture));
+            auto pTexture = ResourceManager::GetInstance()->GetResource<DvTexture2D>(name);
+            SetDvTexture(unit, pTexture);
         }
-    }
-    
-    bool Material::HasTexture(eTextureUnitType unit) const
-    {
-        auto it = m_Textures.find(unit);
-        return it != m_Textures.end() && it->second != nullptr;
     }
 
     Material* LoadMaterialFromFile(const std::string& fileName)
@@ -96,8 +98,8 @@ namespace Dive
 
     bool Material::IsOpaque() const
     {
-        auto it = m_Textures.find(eTextureUnitType::Diffuse);
-        if (it != m_Textures.end())
+        auto it = m_DvTextures.find(eTextureUnitType::Diffuse);
+        if (it != m_DvTextures.end())
         {
             return it->second->IsOpaque();
         }

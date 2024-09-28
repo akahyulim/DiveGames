@@ -3,6 +3,8 @@
 #include "ConstantBuffer.h"
 #include "Texture2D.h"
 #include "RenderTexture.h"
+#include "DvTexture2D.h"
+#include "DvTexture2DArray.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Core/CoreDefs.h"
@@ -308,6 +310,17 @@ namespace Dive
 		return BindRenderTargetView(pRtv, index);
 	}
 
+	bool Graphics::BindRenderTargetView(DvTexture2D* pTexture, uint8_t index)
+	{
+		ID3D11RenderTargetView* pRtv{};
+		if (pTexture)
+			pRtv = pTexture->GetRenderTargetView();
+
+		//return BindRenderTargetView(pRtv, index);
+		// 아래의 코드가 더 깔끔한 듯?
+		return BindRenderTargetView(pTexture ? pTexture->GetRenderTargetView() : nullptr, index);
+	}
+
 	void Graphics::BindDepthStencilView(ID3D11DepthStencilView* pDsv)
 	{
 		if (pDsv != m_pDepthStencilView)
@@ -319,6 +332,12 @@ namespace Dive
 
 	void Graphics::BindDepthStencilView(RenderTexture* pTexture)
 	{
+		BindDepthStencilView(pTexture ? pTexture->GetDepthStencilView() : nullptr);
+	}
+
+	void Graphics::BindDepthStencilView(DvTexture2D* pTexture)
+	{
+
 		BindDepthStencilView(pTexture ? pTexture->GetDepthStencilView() : nullptr);
 	}
 
@@ -598,6 +617,17 @@ namespace Dive
 	void Graphics::BindPSResource(RenderTexture* pRenderTexture, eTextureUnitType unit)
 	{
 		BindPSResource(pRenderTexture ? pRenderTexture->GetShaderResourceView() : nullptr, unit);
+	}
+
+	void Graphics::BindPSResource(DvTexture* pTexture, eTextureUnitType unit)
+	{
+		BindPSResource(pTexture ? pTexture->GetShaderResourceView() : nullptr, unit);
+	}
+
+	// 위에 베이스를 전달하는 메서드가 있기 때문에 불필요하다.
+	void Graphics::BindPSResource(DvTexture2D* pTexture, eTextureUnitType unit)
+	{
+		BindPSResource(pTexture ? pTexture->GetShaderResourceView() : nullptr, unit);
 	}
 
 	// size_t를 eSamplerType로 바꾸어야 할 듯

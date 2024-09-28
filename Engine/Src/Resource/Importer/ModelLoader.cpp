@@ -2,7 +2,7 @@
 #include "ModelLoader.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
-#include "Graphics/Texture2D.h"
+#include "Graphics/DvTexture2D.h"
 #include "Graphics/Shader.h"
 #include "Renderer/Mesh.h"
 #include "Renderer/Material.h"
@@ -423,7 +423,7 @@ namespace Dive
         // diff map
         if (pMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &texturePath) == AI_SUCCESS)
         {
-            Texture2D* pDiffuseTex = nullptr;
+            DvTexture2D* pDiffuseTex = nullptr;
             const aiTexture* pEmbeddedTex = s_aiScene->GetEmbeddedTexture(texturePath.C_Str());
             if (pEmbeddedTex)
             {
@@ -436,16 +436,16 @@ namespace Dive
                 auto diffuseTexturePath = FileSystem::GetPath(s_FileName) + "textures/";
                 diffuseTexturePath += FileSystem::GetFileNameAndExtension(texturePath.C_Str());
                 //pDiffuseTex = ResourceManager::GetInstance()->GetResource<Texture2D>(diffuseTexturePath);
-                pDiffuseTex = ResourceManager::GetInstance()->GetResource<Texture2D>(diffuseTexturePath);
+                pDiffuseTex = ResourceManager::GetInstance()->GetResource<DvTexture2D>(diffuseTexturePath);
             }
-            pMat->SetTexture(eTextureUnitType::Diffuse, pDiffuseTex);
+            pMat->SetDvTexture(eTextureUnitType::Diffuse, pDiffuseTex);
             DV_ENGINE_INFO("Load DiffuseMap");
         }
 
         // normal map
         if (pMaterial->GetTexture(aiTextureType_NORMALS, 0, &texturePath) == AI_SUCCESS)
         {
-            Texture2D* pNormalTex = nullptr;
+            DvTexture2D* pNormalTex = nullptr;
             const aiTexture* pEmbeddedTex = s_aiScene->GetEmbeddedTexture(texturePath.C_Str());
             if (pEmbeddedTex)
             {
@@ -458,9 +458,9 @@ namespace Dive
                 auto normalTexturePath = FileSystem::GetPath(s_FileName) + "textures/";
                 normalTexturePath += FileSystem::GetFileNameAndExtension(texturePath.C_Str());
                 //pNormalTex = ResourceManager::GetInstance()->GetResource<Texture2D>(normalTexturePath);
-                pNormalTex = ResourceManager::GetInstance()->GetResource<Texture2D>(normalTexturePath);
+                pNormalTex = ResourceManager::GetInstance()->GetResource<DvTexture2D>(normalTexturePath);
             }
-            pMat->SetTexture(eTextureUnitType::Normal, pNormalTex);
+            pMat->SetDvTexture(eTextureUnitType::Normal, pNormalTex);
             DV_ENGINE_INFO("Load NormalMap");
         }
         
@@ -468,17 +468,17 @@ namespace Dive
     }
 
     // https://github.com/assimp/assimp/blob/master/samples/SimpleTexturedDirectx11/SimpleTexturedDirectx11/ModelLoader.cpp
-    Texture2D* ModelLoader::loadEmbeddedTexture(const aiTexture* pEmbeddedTex)
+    DvTexture2D* ModelLoader::loadEmbeddedTexture(const aiTexture* pEmbeddedTex)
     {
-        Texture2D* pLoadedTex = nullptr;
+        DvTexture2D* pLoadedTex = nullptr;
 
         // 압축되지 않은 이미지
         if (pEmbeddedTex->mHeight != 0)
         {
-            pLoadedTex = new Texture2D(pEmbeddedTex->mWidth, pEmbeddedTex->mHeight);
+            pLoadedTex = new DvTexture2D(pEmbeddedTex->mWidth, pEmbeddedTex->mHeight);
             pLoadedTex->UpdateSubresource(
                 (const void*)pEmbeddedTex->pcData, 
-                Texture::CalcuRowPitchSize(pEmbeddedTex->mWidth, 
+                DvTexture::CalcuRowPitchSize(pEmbeddedTex->mWidth, 
                     DXGI_FORMAT_R8G8B8A8_UNORM));
         }
         // 압축된 이미지
@@ -487,7 +487,7 @@ namespace Dive
             const size_t bufferSize = static_cast<size_t>(pEmbeddedTex->mWidth);
             const void* pSrcData = (const void*)pEmbeddedTex->pcData;
 
-            pLoadedTex = new Texture2D;
+            pLoadedTex = new DvTexture2D;
             pLoadedTex->LoadFromMemory(
                 pEmbeddedTex->mFilename.C_Str(), 
                 static_cast<size_t>(pEmbeddedTex->mWidth), 

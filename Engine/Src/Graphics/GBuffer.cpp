@@ -2,6 +2,7 @@
 #include "GBuffer.h"
 #include "Graphics.h"
 #include "RenderTexture.h"
+#include "DvTexture2D.h"
 #include "Core/CoreDefs.h"
 
 
@@ -16,6 +17,10 @@ namespace Dive
 		, m_Width(0)
 		, m_Height(0)
 	{
+		m_pDiffuseTexDv = nullptr;
+		m_pNormalTexDv = nullptr;
+		m_pSpecularTexDv = nullptr;
+		m_pDepthTexDv = nullptr;
 	}
 	
 	GBuffer::~GBuffer()
@@ -45,6 +50,23 @@ namespace Dive
 		if (!m_pDepthTex->Create())
 			return false;
 
+
+		m_pDiffuseTexDv = new DvTexture2D(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+		//if (!m_pDiffuseTex->Create())
+		//	return false;
+
+		m_pNormalTexDv = new DvTexture2D(width, height, DXGI_FORMAT_R11G11B10_FLOAT, false);
+		//if (!m_pNormalTex->Create())
+		//	return false;
+
+		m_pSpecularTexDv = new DvTexture2D(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+		//if (!m_pSpecularTex->Create())
+		//	return false;
+
+		m_pDepthTexDv = new DvTexture2D(width, height, 24, true);
+		//if (!m_pDepthTex->Create())
+		//	return false;
+
 		m_Width = width;
 		m_Height = height;
 		 
@@ -57,5 +79,11 @@ namespace Dive
 		DV_DELETE(m_pSpecularTex);
 		DV_DELETE(m_pNormalTex);
 		DV_DELETE(m_pDiffuseTex);
+
+
+		DV_DELETE(m_pDepthTexDv);
+		DV_DELETE(m_pSpecularTexDv);
+		DV_DELETE(m_pNormalTexDv);
+		DV_DELETE(m_pDiffuseTexDv);
 	}
 }
