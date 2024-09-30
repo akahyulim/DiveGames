@@ -1,10 +1,10 @@
 #include "divepch.h"
-#include "DvTexture2DArray.h"
+#include "Texture2DArray.h"
 #include "Core/CoreDefs.h"
 
 namespace Dive
 {
-    DvTexture2DArray::DvTexture2DArray(uint32_t width, uint32_t height, uint32_t arraySize, DXGI_FORMAT format, bool mipChain)
+    Texture2DArray::Texture2DArray(uint32_t width, uint32_t height, uint32_t arraySize, DXGI_FORMAT format, bool mipChain)
         : m_Format(format)
         , m_ArraySize(arraySize)
     {
@@ -15,7 +15,7 @@ namespace Dive
         createColorBuffer();
     }
     
-    DvTexture2DArray::DvTexture2DArray(uint32_t width, uint32_t height, uint32_t arraySize, DXGI_FORMAT format, uint32_t mipCount)
+    Texture2DArray::Texture2DArray(uint32_t width, uint32_t height, uint32_t arraySize, DXGI_FORMAT format, uint32_t mipCount)
         : m_Format(format)
         , m_ArraySize(arraySize)
     {
@@ -26,7 +26,7 @@ namespace Dive
         createColorBuffer();
     }
 
-    DvTexture2DArray::DvTexture2DArray(uint32_t width, uint32_t height, uint32_t depth, uint32_t arraySize, bool readOnly)
+    Texture2DArray::Texture2DArray(uint32_t width, uint32_t height, uint32_t depth, uint32_t arraySize, bool readOnly)
         : m_ArraySize(arraySize)
     {
         m_Width = width;
@@ -53,7 +53,7 @@ namespace Dive
         createDepthBuffer(readOnly);
     }
     
-    bool DvTexture2DArray::createColorBuffer()
+    bool Texture2DArray::createColorBuffer()
     {
         // Texture2DArray
         {
@@ -119,7 +119,7 @@ namespace Dive
         return true;
     }
 
-    bool DvTexture2DArray::createDepthBuffer(bool readOnly)
+    bool Texture2DArray::createDepthBuffer(bool readOnly)
     {
 		// BindFlags만 다르다.
 		{

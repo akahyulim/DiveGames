@@ -2,9 +2,7 @@
 #include "Graphics.h"
 #include "ConstantBuffer.h"
 #include "Texture2D.h"
-#include "RenderTexture.h"
-#include "DvTexture2D.h"
-#include "DvTexture2DArray.h"
+#include "Texture2DArray.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Core/CoreDefs.h"
@@ -301,16 +299,7 @@ namespace Dive
 	}
 
 	// 이건 BindTextureToRenderTargetView()처럼 이름을 구체화하는 편이 나을 것 같다.
-	bool Graphics::BindRenderTargetView(RenderTexture* pTexture, uint8_t index)
-	{
-		ID3D11RenderTargetView* pRtv{};
-		if (pTexture)
-			pRtv = pTexture->GetRenderTargetView();
-
-		return BindRenderTargetView(pRtv, index);
-	}
-
-	bool Graphics::BindRenderTargetView(DvTexture2D* pTexture, uint8_t index)
+	bool Graphics::BindRenderTargetView(Texture2D* pTexture, uint8_t index)
 	{
 		ID3D11RenderTargetView* pRtv{};
 		if (pTexture)
@@ -330,12 +319,7 @@ namespace Dive
 		}
 	}
 
-	void Graphics::BindDepthStencilView(RenderTexture* pTexture)
-	{
-		BindDepthStencilView(pTexture ? pTexture->GetDepthStencilView() : nullptr);
-	}
-
-	void Graphics::BindDepthStencilView(DvTexture2D* pTexture)
+	void Graphics::BindDepthStencilView(Texture2D* pTexture)
 	{
 
 		BindDepthStencilView(pTexture ? pTexture->GetDepthStencilView() : nullptr);
@@ -602,30 +586,15 @@ namespace Dive
 		}
 	}
 
-	// 아래 세 개의 메서드는 제거하는 편이 낫다???
+	// 아래 세 개의 메서드(하나는 구현안한듯)는 제거하는 편이 낫다???
 	// 허나 아직 사용하는 코드가 있다.
 	void Graphics::BindPSResource(Texture* pTexture, eTextureUnitType unit)
 	{
 		BindPSResource(pTexture ? pTexture->GetShaderResourceView() : nullptr, unit);
 	}
 
-	void Graphics::BindPSResource(Texture2D* pTexture, eTextureUnitType unit)
-	{
-		BindPSResource(pTexture ? pTexture->GetShaderResourceView() : nullptr, unit);
-	}
-
-	void Graphics::BindPSResource(RenderTexture* pRenderTexture, eTextureUnitType unit)
-	{
-		BindPSResource(pRenderTexture ? pRenderTexture->GetShaderResourceView() : nullptr, unit);
-	}
-
-	void Graphics::BindPSResource(DvTexture* pTexture, eTextureUnitType unit)
-	{
-		BindPSResource(pTexture ? pTexture->GetShaderResourceView() : nullptr, unit);
-	}
-
 	// 위에 베이스를 전달하는 메서드가 있기 때문에 불필요하다.
-	void Graphics::BindPSResource(DvTexture2D* pTexture, eTextureUnitType unit)
+	void Graphics::BindPSResource(Texture2D* pTexture, eTextureUnitType unit)
 	{
 		BindPSResource(pTexture ? pTexture->GetShaderResourceView() : nullptr, unit);
 	}

@@ -342,13 +342,13 @@ namespace Sandbox
 		// objects
 		{
 			// textures
-			auto pTexDMC = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/dmc.jpg");
-			auto pTexDOKEV = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/dokev.jpeg");
-			auto pTexPlane = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/WornWood/WornWood_Albedo.tga");
-			auto pTexPlaneNormal = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/WornWood/WornWood_Normal.tga");
-			auto pTexStone = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/stone01.tga");
-			auto pTexNormal = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/normal01.tga");
-			auto pTexNoTexture = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/bright-squares.png");
+			auto pTexDMC = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/dmc.jpg");
+			auto pTexDOKEV = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/dokev.jpeg");
+			auto pTexPlane = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/WornWood/WornWood_Albedo.tga");
+			auto pTexPlaneNormal = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/WornWood/WornWood_Normal.tga");
+			auto pTexStone = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/stone01.tga");
+			auto pTexNormal = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/normal01.tga");
+			auto pTexNoTexture = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/bright-squares.png");
 
 			// meshes
 			auto pTriangleModel = Dive::ModelFactory::CreateTriangle(5.0f);
@@ -676,8 +676,8 @@ namespace Sandbox
 		// objects
 		{
 			// texture
-			auto pTexPlane = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/WornWood/WornWood_Albedo.tga");
-			auto pTexPlaneNormal = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/WornWood/WornWood_Normal.tga");
+			auto pTexPlane = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/WornWood/WornWood_Albedo.tga");
+			auto pTexPlaneNormal = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/WornWood/WornWood_Normal.tga");
 			
 			// meshes
 			auto pPlaneModel = Dive::ModelFactory::CreatePlane(100.0f, 100.0f);
@@ -796,8 +796,8 @@ namespace Sandbox
 		// objects
 		{
 			// textures
-			auto pTexDMC = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/dmc.jpg");
-			auto pTexDOKEV = Dive::GetResourceManager()->GetResource<Dive::DvTexture2D>("../../Assets/Textures/dokev.jpeg");
+			auto pTexDMC = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/dmc.jpg");
+			auto pTexDOKEV = Dive::GetResourceManager()->GetResource<Dive::Texture2D>("../../Assets/Textures/dokev.jpeg");
 
 			// models
 			auto pDmcPlaneModel = Dive::ModelFactory::CreatePlane(80, 80);

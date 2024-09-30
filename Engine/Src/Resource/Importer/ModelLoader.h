@@ -12,7 +12,7 @@ namespace Dive
 	class Scene;
 	class GameObject;
 	class Material;
-	class DvTexture2D;
+	class Texture2D;
 
 	class ModelLoader
 	{
@@ -23,7 +23,7 @@ namespace Dive
 		static void parseNode(const aiNode* pNode, GameObject* pParent = nullptr);
 		static void parseMesh(const aiMesh* pMesh, GameObject* pMeshNodeObject);
 		static Material* loadMaterial(const aiMesh* pMesh);
-		static DvTexture2D* loadEmbeddedTexture(const aiTexture* pEmbeddedTex);
+		static Texture2D* loadEmbeddedTexture(const aiTexture* pEmbeddedTex);
 
 	private:
 		static const aiScene* s_aiScene;

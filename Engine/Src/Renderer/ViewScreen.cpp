@@ -3,7 +3,6 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Graphics/Graphics.h"
-#include "Graphics/RenderTexture.h"
 #include "Graphics/ConstantBuffer.h"
 #include "Core/CoreDefs.h"
 #include "Scene/Scene.h"
@@ -17,7 +16,6 @@
 #include "Graphics/Shader.h"
 #include "Resource/ResourceManager.h"
 #include "Graphics/Texture2D.h"
-#include "Graphics/DvTexture2D.h"
 
 namespace Dive
 {
@@ -371,10 +369,10 @@ namespace Dive
 		m_pGraphics->SetViewport(0, 0, static_cast<float>(m_GBuffer.GetWidth()), static_cast<float>(m_GBuffer.GetHeight()));
 
 		// set & clear g buffer
-		m_pGraphics->BindRenderTargetView(m_GBuffer.GetDiffuseTexDv()->GetRenderTargetView(), 0);
-		m_pGraphics->BindRenderTargetView(m_GBuffer.GetNormalTexDv()->GetRenderTargetView(), 1);
-		m_pGraphics->BindRenderTargetView(m_GBuffer.GetSpecularTexDv()->GetRenderTargetView(), 2);
-		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTexDv()->GetDepthStencilView());
+		m_pGraphics->BindRenderTargetView(m_GBuffer.GetDiffuseTex()->GetRenderTargetView(), 0);
+		m_pGraphics->BindRenderTargetView(m_GBuffer.GetNormalTex()->GetRenderTargetView(), 1);
+		m_pGraphics->BindRenderTargetView(m_GBuffer.GetSpecularTex()->GetRenderTargetView(), 2);
+		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilView());
 		m_pGraphics->ClearViews(eClearFlags::Color | eClearFlags::Depth | eClearFlags::Stencil, m_pCamera->GetBackgroundColor(), 1.0f, 0);
 
 		m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -424,17 +422,17 @@ namespace Dive
 	void ViewScreen::passLight()
 	{
 		m_pGraphics->BindRenderTargetView(m_pCamera->GetRenderTargetView(), 0);
-		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTexDv()->GetDepthStencilViewReadOnly());	// 읽기 전용
+		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());	// 읽기 전용
 		m_pGraphics->ClearViews(eClearFlags::Color, m_pCamera->GetBackgroundColor());
 		m_pGraphics->SetViewport(0, 0, static_cast<float>(m_pGraphics->GetResolutionWidth()), static_cast<float>(m_pGraphics->GetResolutionHeight()));
 
 		// ConstantBuffers
 		m_pGraphics->PSBindConstantBuffer(m_pCamera->GetConstantBufferPS(), 0);
 
-		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTexDv()->GetShaderResourceView(), eTextureUnitType::GBuffer_Diffuse);
-		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTexDv()->GetShaderResourceView(), eTextureUnitType::GBuffer_Normal);
-		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTexDv()->GetShaderResourceView(), eTextureUnitType::GBuffer_Specular);
-		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTexDv()->GetShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Diffuse);
+		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Normal);
+		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Specular);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
 
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
@@ -580,11 +578,10 @@ namespace Dive
 		m_pGraphics->PSBindConstantBuffer(pLightCom->GetConstantBufferPS(), 2);
 
 		// gbuffer resources
-		// 아무리봐도 이게 바인딩되지 않는 것 같다.
-		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex()->GetDepthShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
-		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Diffuse);
-		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Normal);
-		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Specular);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Diffuse);
+		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Normal);
+		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Specular);
 
 		// samplers
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);

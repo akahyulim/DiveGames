@@ -93,9 +93,6 @@
     <ClInclude Include="Src\Scene\Components\Component.h">
       <Filter>Src\Scene\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\RenderTexture.h">
-      <Filter>Src\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Scene\Components\Camera.h">
       <Filter>Src\Scene\Components</Filter>
     </ClInclude>
@@ -122,12 +119,6 @@
     </ClInclude>
     <ClInclude Include="Src\Renderer\ViewScreen.h">
       <Filter>Src\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Graphics\Texture.h">
-      <Filter>Src\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Graphics\Texture2D.h">
-      <Filter>Src\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Src\Renderer\Material.h">
       <Filter>Src\Renderer</Filter>
@@ -168,13 +159,13 @@
     <ClInclude Include="Src\Graphics\DvCubeMap.h">
       <Filter>Src\Graphics\DvTexture</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\DvTexture.h">
+    <ClInclude Include="Src\Graphics\Texture.h">
       <Filter>Src\Graphics\DvTexture</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\DvTexture2D.h">
+    <ClInclude Include="Src\Graphics\Texture2D.h">
       <Filter>Src\Graphics\DvTexture</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\DvTexture2DArray.h">
+    <ClInclude Include="Src\Graphics\Texture2DArray.h">
       <Filter>Src\Graphics\DvTexture</Filter>
     </ClInclude>
   </ItemGroup>
@@ -221,9 +212,6 @@
     <ClCompile Include="Src\Scene\Components\Component.cpp">
       <Filter>Src\Scene\Components</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\RenderTexture.cpp">
-      <Filter>Src\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Scene\Components\Camera.cpp">
       <Filter>Src\Scene\Components</Filter>
     </ClCompile>
@@ -250,12 +238,6 @@
     </ClCompile>
     <ClCompile Include="Src\Renderer\ViewScreen.cpp">
       <Filter>Src\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Graphics\Texture.cpp">
-      <Filter>Src\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Graphics\Texture2D.cpp">
-      <Filter>Src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Renderer\Material.cpp">
       <Filter>Src\Renderer</Filter>
@@ -290,13 +272,13 @@
     <ClCompile Include="Src\Graphics\GBuffer.cpp">
       <Filter>Src\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\DvTexture.cpp">
+    <ClCompile Include="Src\Graphics\Texture.cpp">
       <Filter>Src\Graphics\DvTexture</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\DvTexture2D.cpp">
+    <ClCompile Include="Src\Graphics\Texture2D.cpp">
       <Filter>Src\Graphics\DvTexture</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Graphics\DvTexture2DArray.cpp">
+    <ClCompile Include="Src\Graphics\Texture2DArray.cpp">
       <Filter>Src\Graphics\DvTexture</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\DvCubeMap.cpp">

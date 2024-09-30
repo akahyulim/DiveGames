@@ -1,11 +1,11 @@
 #pragma once
-#include "DvTexture.h"
+#include "Texture.h"
 
 namespace Dive
 {
-	class DvCubeMap : public DvTexture
+	class DvCubeMap : public Texture
 	{
-		DV_CLASS(DvCubeMap, DvTexture)
+		DV_CLASS(DvCubeMap, Texture)
 
 	public:
 	private:

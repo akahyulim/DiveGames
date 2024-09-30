@@ -12,7 +12,7 @@ namespace Dive
 	};
 
 	class GameObject;
-	class DvTexture;
+	class Texture;
 
 	class Light : public Component
 	{
@@ -30,7 +30,7 @@ namespace Dive
 		DirectX::XMFLOAT3 GetColor() const { return m_Color; }
 		void SetColor(float r, float g, float b) { m_Color = { r, g, b }; }
 
-		DvTexture* GetShadowMap() const { return m_pShadowMap; }
+		Texture* GetShadowMap() const { return m_pShadowMap; }
 
 		// 가로, 세로 크기가 다를 수도 있지 않을까?
 		float GetShadowMapSize() const { return m_ShadowMapSize; }
@@ -45,7 +45,7 @@ namespace Dive
 
 		DirectX::XMFLOAT3 m_Color;
 
-		DvTexture* m_pShadowMap;
+		Texture* m_pShadowMap;
 		float m_ShadowMapSize;
 
 		bool m_bShadowEnabled;

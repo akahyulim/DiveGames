@@ -1,29 +1,137 @@
 #include "divepch.h"
 #include "Texture2D.h"
-#include "Graphics.h"
 #include "Core/CoreDefs.h"
 #include "IO/FileSystem.h"
-#include "Core/Log.h"
 
-/*
-* LoadFromFile의 경우 밉맵을 자동 생성
-* 색 공간을 고려하지 않음
-* 멀티 샘플링 미지원
-*/
+#include <DirectXTex/DirectXTex.h>
+
 namespace Dive
-{	
-	Texture2D::Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, bool useMipMap)
-		: m_pTexture2D(nullptr)
-		, m_pShaderResourceView(nullptr)
+{
+	Texture2D::Texture2D()
+		: m_Format(DXGI_FORMAT_UNKNOWN)
 	{
-		CreateResource(width, height, format, useMipMap);
 	}
 
-	Texture2D::~Texture2D()
+	Texture2D::Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, bool mipChain)
+        : m_Format(format)
 	{
-		Release();
+		m_Width = width;
+		m_Height = height; 
+		m_MipLevels = mipChain ? CalculateMipmapLevels(width, height, -1) : 1;
+
+        createColorBuffer();
 	}
-	
+
+	// mipCount가 -1일 경우 최대 개수로 생성, 0일 경우 생성하지 않음
+	Texture2D::Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, uint32_t mipCount)
+        : m_Format(format)
+	{
+		m_Width = width;
+		m_Height = height;
+		m_MipLevels = CalculateMipmapLevels(width, height, mipCount);
+
+		createColorBuffer();
+	}
+
+	Texture2D::Texture2D(uint32_t width, uint32_t height, uint32_t depth, bool readOnly)
+	{
+		m_Width = width;
+		m_Height = height;
+
+        switch (depth)
+        {
+        case 16:
+            m_Format = DXGI_FORMAT_R16_TYPELESS;
+            break;
+        case 24:
+            m_Format = DXGI_FORMAT_R24G8_TYPELESS;
+            break;
+        case 32:
+            m_Format = DXGI_FORMAT_R32_TYPELESS;
+            break;
+
+        default:
+            m_Format = DXGI_FORMAT_UNKNOWN;
+            DV_ENGINE_ERROR("Texture2D 생성 도중 잘못된 깊이 비트를 전달받았습니다.");
+            break;
+        }
+
+        createDepthBuffer(readOnly);
+	}
+
+	Texture2D::Texture2D(const std::string& filename, bool mipChain)
+	{
+		auto file = StringToWstring(filename);
+		auto ext = FileSystem::GetExtension(filename);
+		DirectX::ScratchImage img;
+		HRESULT hResult = 0;
+
+		if (ext == ".dds")
+		{
+			hResult = DirectX::LoadFromDDSFile(file.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
+		}
+		else if (ext == ".tga")
+		{
+			// 색 공간 정보를 포함하지 않는다.
+			hResult = DirectX::LoadFromTGAFile(file.c_str(), nullptr, img);
+		}
+		else
+		{
+			hResult = DirectX::LoadFromWICFile(file.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
+		}
+
+		if (FAILED(hResult))
+			DV_ENGINE_ERROR("Texture2D 생성 과정 중 파일 {:s} 로드에 실패하였습니다.", filename);
+
+		m_Width = static_cast<uint32_t>(img.GetImages()->width);
+		m_Height = static_cast<uint32_t>(img.GetImages()->height);
+		m_Format = img.GetImages()->format;
+		m_MipLevels = mipChain ? CalculateMipmapLevels(m_Width, m_Height, -1) : 1;
+		m_bOpaque = img.IsAlphaAllOpaque();
+
+		createColorBuffer();
+
+		UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch));
+
+		SetName(FileSystem::GetFileName(filename));
+	}
+
+	Texture2D::Texture2D(const std::string& filename, uint32_t size, const void* pSource, bool mipChain)
+	{
+		DirectX::ScratchImage img;
+		HRESULT hResult = 0;
+
+		auto extension = FileSystem::GetExtension(filename);
+
+		if (extension == "dds")
+		{
+			hResult = DirectX::LoadFromDDSMemory(pSource, size, DirectX::DDS_FLAGS_NONE, nullptr, img);
+		}
+		else if (extension == "tga")
+		{
+			hResult = DirectX::LoadFromTGAMemory(pSource, size, nullptr, img);
+		}
+		else
+		{
+			hResult = DirectX::LoadFromWICMemory(pSource, size, DirectX::WIC_FLAGS_NONE, nullptr, img);
+		}
+
+		if (FAILED(hResult))
+			DV_ENGINE_ERROR("{:s} 형식의 메모리 로드에 실패하였습니다.", extension);
+
+		m_Width = static_cast<uint32_t>(img.GetImages()->width);
+		m_Height = static_cast<uint32_t>(img.GetImages()->height);
+		m_Format = img.GetImages()->format;
+		m_MipLevels = mipChain ? CalculateMipmapLevels(m_Width, m_Height, -1) : 1;
+		m_bOpaque = img.IsAlphaAllOpaque();
+		
+		createColorBuffer();
+
+		UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch));
+
+		SetName(FileSystem::GetFileName(filename));
+	}
+
 	bool Texture2D::LoadFromFile(const std::string& filename)
 	{
 		auto file = StringToWstring(filename);
@@ -46,21 +154,64 @@ namespace Dive
 		}
 
 		if (FAILED(hResult))
-		{
-			DV_ENGINE_ERROR("파일 {:s} 로드에 실패하여 Texture2D를 생성이 중단되었습니다.", filename);
-			return false;
-		}
+			DV_ENGINE_ERROR("Texture2D 생성 과정 중 파일 {:s} 로드에 실패하였습니다.", filename);
 
-		if (!CreateResource(
-			static_cast<uint32_t>(img.GetImages()->width),
-			static_cast<uint32_t>(img.GetImages()->height),
-			img.GetImages()->format, true))
-			return false;
+		// 생성자에서 임의로 전달받은 데이터들을 실제 파일 데이터로 갱신
+		m_Width = static_cast<uint32_t>(img.GetImages()->width);
+		m_Height = static_cast<uint32_t>(img.GetImages()->height);
+		m_Format = img.GetImages()->format;
+		// opaque 유무 img.IsAlphaAllOpaque();
+		// 일단 임시로 무조건 생성
+		m_MipLevels = CalculateMipmapLevels(m_Width, m_Height);
+
+		//if (!createColorBuffer())
+		//	return false;
+
+		{
+			// Texture2D
+			{
+				D3D11_TEXTURE2D_DESC desc{};
+				desc.Format = m_Format;
+				desc.Width = m_Width;
+				desc.Height = m_Height;
+				desc.ArraySize = 1;
+				desc.MipLevels = m_MipLevels;
+				desc.SampleDesc.Count = 1;
+				desc.SampleDesc.Quality = 0;
+				desc.Usage = D3D11_USAGE_DEFAULT;
+				desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+				desc.MiscFlags = m_MipLevels > 1 ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+				desc.CPUAccessFlags = 0;
+
+				if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
+				{
+					DV_ENGINE_ERROR("Texture2D의 ID3D11Texture2D 생성에 실패하였습니다.");
+					DV_RELEASE(m_pTexture);
+					return false;
+				}
+			}
+
+			// ShaderResourceView
+			{
+				D3D11_SHADER_RESOURCE_VIEW_DESC desc{};
+				desc.Format = m_Format;
+				desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				desc.Texture2D.MipLevels = m_MipLevels;
+				desc.Texture2D.MostDetailedMip = 0;
+
+				if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
+				{
+					DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
+					DV_RELEASE(m_pTexture);
+					DV_RELEASE(m_pShaderResourceView);
+					return false;
+				}
+			}
+		}
 
 		if (!UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch)))
 			return false;
 
-		m_bOpaque = img.IsAlphaAllOpaque();
 		SetName(FileSystem::GetFileName(filename));
 
 		return true;
@@ -87,85 +238,26 @@ namespace Dive
 		}
 
 		if (FAILED(hResult))
-		{
 			DV_ENGINE_ERROR("{:s} 형식의 메모리 로드에 실패하였습니다.", extension);
-			return false;
-		}
 
-		if (!CreateResource(
-			static_cast<uint32_t>(img.GetImages()->width),
-			static_cast<uint32_t>(img.GetImages()->height),
-			img.GetImages()->format, true))
-			return false;
+		// 역시 실제 데이터로 갱신
+		m_Width = static_cast<uint32_t>(img.GetImages()->width);
+		m_Height = static_cast<uint32_t>(img.GetImages()->height);
+		m_Format = img.GetImages()->format;
+		//m_bOpaque = img.IsAlphaAllOpaque();
 
-		if (!UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch)))
-			return false;
+		createColorBuffer();
 
-		m_bOpaque = img.IsAlphaAllOpaque();
+		UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch));
+
 		SetName(FileSystem::GetFileName(filename));
 
 		return true;
 	}
-	
-	bool Texture2D::CreateResource(uint32_t width, uint32_t height, DXGI_FORMAT format, bool useMipMap)
-	{
-		Release();
-
-		D3D11_TEXTURE2D_DESC texDesc{};
-		texDesc.Width = width;
-		texDesc.Height = height;
-		texDesc.Format = format;
-		texDesc.ArraySize = 1;
-		texDesc.MipLevels = m_bUseMipMap ? 0 : 1;
-		texDesc.SampleDesc.Count = 1;
-		texDesc.SampleDesc.Quality = 0;
-		texDesc.Usage = D3D11_USAGE_DEFAULT;
-		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-		if (useMipMap)
-			texDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
-		texDesc.MiscFlags = useMipMap ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
-		texDesc.CPUAccessFlags = 0;
-
-		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pTexture2D)))
-		{
-			Release();
-			DV_ENGINE_ERROR("Texture2D 생성에 실패하였습니다.");
-			return false;
-		}
-
-		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-		srvDesc.Format = texDesc.Format;
-		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		srvDesc.Texture2D.MipLevels = -1;
-		srvDesc.Texture2D.MostDetailedMip = 0;
-
-		if (FAILED(m_pDevice->CreateShaderResourceView(
-			static_cast<ID3D11Resource*>(m_pTexture2D),
-			&srvDesc,
-			&m_pShaderResourceView)))
-		{
-			Release();
-			DV_ENGINE_ERROR("ShaderResourceView 생성에 실패하였습니다.");
-			return false;
-		}
-
-		m_Width = width;
-		m_Height = height;
-		m_Format = format;
-		m_bUseMipMap = useMipMap;
-
-		return true;
-	}
-	
-	void Texture2D::Release()
-	{
-		DV_RELEASE(m_pShaderResourceView);
-		DV_RELEASE(m_pTexture2D);
-	}
 
 	bool Texture2D::UpdateSubresource(const void* pData, uint32_t rowPitch)
 	{
-		if (!m_pTexture2D)
+		if (!m_pTexture)
 		{
 			DV_ENGINE_ERROR("ID3D11Texture2D 객체가 존재하지 않아 서브 리소스 업데이트에 실패하였습니다.");
 			return false;
@@ -177,16 +269,154 @@ namespace Dive
 			return false;
 		}
 
-		m_pDeviceContext->UpdateSubresource(
-			m_pTexture2D,
-			0,
-			nullptr,
-			pData,
-			rowPitch,
-			0);
+		m_pDeviceContext->UpdateSubresource(static_cast<ID3D11Resource*>(m_pTexture),
+			0, nullptr, pData, rowPitch, 0);
 
-		if (m_bUseMipMap)
+		if (m_MipLevels > 1)
 			m_pDeviceContext->GenerateMips(m_pShaderResourceView);
+
+		return true;
+	}
+
+	bool Texture2D::createColorBuffer()
+	{
+		// 위치가 조금 애매하다.
+		// 허나 생성자 호출 후 LoadFromFile 순으로 진행하려면 이전에 생성한 객체를 제거해야 한다.
+		// => 현재 매개변수를 받지 않는 생성자를 되살렸다. ResourceManager에서 객체를 생성하기 위해선 어쩔 수 없었다.
+		DV_RELEASE(m_pTexture);
+		DV_RELEASE(m_pRenderTargetView);
+		DV_RELEASE(m_pShaderResourceView);
+
+        // Texture2D
+        {
+            D3D11_TEXTURE2D_DESC desc{};
+            desc.Format = m_Format;
+            desc.Width = m_Width;
+            desc.Height = m_Height;
+            desc.ArraySize = 1;
+            desc.MipLevels = m_MipLevels;
+            desc.SampleDesc.Count = 1;
+            desc.SampleDesc.Quality = 0;
+            desc.Usage = D3D11_USAGE_DEFAULT;
+            desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+            desc.MiscFlags = m_MipLevels > 1 ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+            desc.CPUAccessFlags = 0;
+
+            if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
+            {
+                DV_ENGINE_ERROR("Texture2D의 ID3D11Texture2D 생성에 실패하였습니다.");
+				DV_RELEASE(m_pTexture);
+				return false;
+            }
+        }
+
+        // RenderTargetView
+        {
+            D3D11_RENDER_TARGET_VIEW_DESC desc{};
+            desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+            desc.Texture2D.MipSlice = 0;
+
+            if (FAILED(m_pDevice->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pRenderTargetView)))
+            {
+                DV_ENGINE_ERROR("Texture2D의 ID3D11RenderTargetView 생성에 실패하였습니다.");
+                DV_RELEASE(m_pTexture);
+				DV_RELEASE(m_pRenderTargetView);
+                return false;
+            }
+        }
+
+        
+        // ShaderResourceView
+        {
+            D3D11_SHADER_RESOURCE_VIEW_DESC desc{};
+            desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+            desc.Texture2D.MipLevels = m_MipLevels;
+            desc.Texture2D.MostDetailedMip = 0;
+
+            if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
+            {
+                DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
+                DV_RELEASE(m_pTexture);
+				DV_RELEASE(m_pShaderResourceView);
+                return false;
+            }
+        }
+
+		return true;
+	}
+	
+	bool Texture2D::createDepthBuffer(bool readOnly)
+	{
+		// BindFlags만 다르다.
+		{
+			D3D11_TEXTURE2D_DESC desc{};
+			desc.Format = m_Format;
+			desc.Width = m_Width;
+			desc.Height = m_Height;
+			desc.ArraySize = 1;
+			desc.MipLevels = m_MipLevels;
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
+			desc.MiscFlags = 0;
+			desc.CPUAccessFlags = 0;
+
+			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
+			{
+				DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
+				DV_RELEASE(m_pTexture);
+				return false;
+			}
+		}
+
+		{
+			D3D11_DEPTH_STENCIL_VIEW_DESC desc{};
+			desc.Format = GetDepthStencilViewFormat(m_Format);
+			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipSlice = 0;
+
+			if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pDepthStencilView)))
+			{
+				DV_ENGINE_ERROR("Texture2D의 ID3D11DepthStencilView 생성에 실패하였습니다.");
+				DV_RELEASE(m_pTexture);
+				DV_RELEASE(m_pDepthStencilView);
+				return false;
+			}
+
+			if (readOnly)
+			{
+				desc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
+
+				if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pDepthStencilViewReadOnly)))
+				{
+					DV_ENGINE_ERROR("Texture2D의 ID3D11DepthStencilView(readOnly) 생성에 실패하였습니다.");
+					DV_RELEASE(m_pTexture);
+					DV_RELEASE(m_pDepthStencilView);
+					DV_RELEASE(m_pDepthStencilViewReadOnly);
+					return false;
+				}
+			}
+		}
+
+		// 포멧을 따로 전달받아야 한다.
+		{
+			D3D11_SHADER_RESOURCE_VIEW_DESC desc{};
+			desc.Format = GetShaderResourceViewFormat(m_Format);
+			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			desc.Texture2D.MipLevels = m_MipLevels;
+			desc.Texture2D.MostDetailedMip = 0;
+			
+			if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
+			{
+				DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
+				DV_RELEASE(m_pTexture);
+				DV_RELEASE(m_pDepthStencilView);
+				DV_RELEASE(m_pDepthStencilViewReadOnly);
+				DV_RELEASE(m_pShaderResourceView);
+				return false;
+			}
+		}
 
 		return true;
 	}

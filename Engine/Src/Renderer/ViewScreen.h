@@ -24,8 +24,6 @@ namespace Dive
 	class GameObject;
 	class Scene;
 	class Camera;
-	class Renderable;
-	//class Light;
 	class Mesh;
 	class Material;
 

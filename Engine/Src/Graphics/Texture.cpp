@@ -2,35 +2,44 @@
 #include "Texture.h"
 #include "Graphics.h"
 #include "Core/CoreDefs.h"
-#include "Core/Log.h"
 
 namespace Dive
 {
-	Texture::Texture()
-		: m_Width(0)
-		, m_Height(0)
-		, m_Format(DXGI_FORMAT_UNKNOWN)
-		, m_bUseMipMap(false)
+    Texture::Texture()
+        : m_pTexture(nullptr)
+        , m_pRenderTargetView(nullptr)
+        , m_pDepthStencilView(nullptr)
+        , m_pDepthStencilViewReadOnly(nullptr)
+        , m_pShaderResourceView(nullptr)
+        , m_Width(0)
+        , m_Height(0)
+        , m_MipLevels(1)
 		, m_bOpaque(true)
-	{
-		m_pDevice = Graphics::GetInstance()->GetDevice();
-		DV_ENGINE_ASSERT(m_pDevice);
+    {
+        m_pDevice = Graphics::GetInstance()->GetDevice();
+        DV_ASSERT(m_pDevice);
 
-		m_pDeviceContext = Graphics::GetInstance()->GetDeviceContext();
-		DV_ENGINE_ASSERT(m_pDeviceContext);
-	}
+        m_pDeviceContext = Graphics::GetInstance()->GetDeviceContext();
+        DV_ASSERT(m_pDeviceContext);
+    }
+    
+    Texture::~Texture()
+    {
+        DV_RELEASE(m_pRenderTargetView);
+        DV_RELEASE(m_pDepthStencilView);
+        DV_RELEASE(m_pDepthStencilViewReadOnly);
+        DV_RELEASE(m_pShaderResourceView);
+    }
 
-	void Texture::SetWidth(uint32_t width)
-	{
-		DV_ENGINE_ASSERT(width > 0);
-		m_Width = width;
-	}
-	
-	void Texture::SetHeight(uint32_t height)
-	{
-		DV_ENGINE_ASSERT(height > 0);
-		m_Height = height;
-	}
+    uint32_t Texture::CalculateMipmapLevels(uint32_t width, uint32_t height, int maxLevel)
+    {
+        if(maxLevel == 0)
+            return 1;
+
+        uint32_t levels = static_cast<uint32_t>(std::log2(std::max(width, height))) + 1;
+
+        return maxLevel == -1 ? levels : std::min(levels, static_cast<uint32_t>(maxLevel));
+    }
 
 	DXGI_FORMAT Texture::GetShaderResourceViewFormat(DXGI_FORMAT format)
 	{

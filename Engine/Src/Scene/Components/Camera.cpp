@@ -2,7 +2,7 @@
 #include "Camera.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
-#include "Graphics/RenderTexture.h"
+#include "Graphics/Texture2D.h"
 #include "Graphics/ConstantBuffer.h"
 #include "Scene/GameObject.h"
 
@@ -33,7 +33,7 @@ namespace Dive
 
 	Camera::Camera(GameObject* pGameObject)
 		: Component(pGameObject)
-		, m_pRenderTarget(nullptr)
+		, m_pRenderTargetTex(nullptr)
 		, m_pCBufferVS(nullptr)
 		, m_pCBufferDS(nullptr)
 		, m_pCBufferPS(nullptr)
@@ -52,6 +52,8 @@ namespace Dive
 		DV_DELETE(m_pCBufferPS);
 		DV_DELETE(m_pCBufferDS);
 		DV_DELETE(m_pCBufferVS);
+
+		// 렌더타겟은 외부에서 가져오기 때문에 직접 제거하는 건 에바다. 
 	}
 
 	// 버퍼를 생성 및 관리하는 것은 맞지 않다.
@@ -167,11 +169,11 @@ namespace Dive
 
 	ID3D11RenderTargetView* Camera::GetRenderTargetView() const
 	{
-		return m_pRenderTarget ? m_pRenderTarget->GetRenderTargetView() : Graphics::GetInstance()->GetDefaultRenderTargetView();
+		return m_pRenderTargetTex ? m_pRenderTargetTex->GetRenderTargetView() : Graphics::GetInstance()->GetDefaultRenderTargetView();
 	}
-
+	
 	DirectX::XMFLOAT2 Camera::GetRenderTargetSize() const
 	{
-		return m_pRenderTarget ? m_pRenderTarget->GetSize() : Graphics::GetInstance()->GetResolution();
+		return m_pRenderTargetTex ? m_pRenderTargetTex->GetSize() : Graphics::GetInstance()->GetResolution();
 	}
 }

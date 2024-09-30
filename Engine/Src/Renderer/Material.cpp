@@ -1,7 +1,6 @@
 #include "divepch.h"
 #include "Material.h"
 #include "Graphics/Texture2D.h"
-#include "Graphics/DvTexture2D.h"
 #include "Core/CoreDefs.h"
 #include "Resource/ResourceManager.h"
 
@@ -30,14 +29,14 @@ namespace Dive
         return true;
     }
 
-    DvTexture2D* Material::GetDvTexture(eTextureUnitType unit) const
+    Texture2D* Material::GetDvTexture(eTextureUnitType unit) const
     {
         auto it = m_DvTextures.find(unit);
 
         return it != m_DvTextures.end() ? it->second : nullptr;
     }
 
-    void Material::SetDvTexture(eTextureUnitType unit, DvTexture2D* pTexture)
+    void Material::SetDvTexture(eTextureUnitType unit, Texture2D* pTexture)
     {
         if (unit < eTextureUnitType::Count)
         {
@@ -63,7 +62,7 @@ namespace Dive
     {
         if (unit < eTextureUnitType::Count)
         {
-            auto pTexture = ResourceManager::GetInstance()->GetResource<DvTexture2D>(name);
+            auto pTexture = ResourceManager::GetInstance()->GetResource<Texture2D>(name);
             SetDvTexture(unit, pTexture);
         }
     }
