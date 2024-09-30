@@ -161,7 +161,7 @@
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
-    <ClInclude Include="Src\Graphics\DvCubeMap.h" />
+    <ClInclude Include="Src\Graphics\Cubemap.h" />
     <ClInclude Include="Src\Graphics\Texture.h" />
     <ClInclude Include="Src\Graphics\Texture2D.h" />
     <ClInclude Include="Src\Graphics\Texture2DArray.h" />
@@ -204,7 +204,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Src\Graphics\ConstantBuffer.cpp" />
-    <ClCompile Include="Src\Graphics\DvCubeMap.cpp" />
+    <ClCompile Include="Src\Graphics\Cubemap.cpp" />
     <ClCompile Include="Src\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Graphics\Texture2D.cpp" />
     <ClCompile Include="Src\Graphics\GBuffer.cpp" />

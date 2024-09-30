@@ -8,15 +8,15 @@
 namespace Dive
 {
 	Texture2D::Texture2D()
-		: m_Format(DXGI_FORMAT_UNKNOWN)
 	{
+		m_Format = DXGI_FORMAT_UNKNOWN;
 	}
 
 	Texture2D::Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, bool mipChain)
-        : m_Format(format)
 	{
 		m_Width = width;
 		m_Height = height; 
+		m_Format = format;
 		m_MipLevels = mipChain ? CalculateMipmapLevels(width, height, -1) : 1;
 
         createColorBuffer();
@@ -24,16 +24,18 @@ namespace Dive
 
 	// mipCount가 -1일 경우 최대 개수로 생성, 0일 경우 생성하지 않음
 	Texture2D::Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, uint32_t mipCount)
-        : m_Format(format)
-	{
+ 	{
 		m_Width = width;
 		m_Height = height;
+		m_Format = format;
 		m_MipLevels = CalculateMipmapLevels(width, height, mipCount);
 
 		createColorBuffer();
 	}
 
-	Texture2D::Texture2D(uint32_t width, uint32_t height, uint32_t depth, bool readOnly)
+	// 유니티의 인터페이스를 참조했지만 세 번째 매개변수가 굳이 depth일 필요가 있나하는 생각이 든다.
+	// 그리고 useReadOnly는 Color buffer에도 적용할 수 있어야 하는 것 아닌가 싶다.
+	Texture2D::Texture2D(uint32_t width, uint32_t height, uint32_t depth, bool useReadOnly)
 	{
 		m_Width = width;
 		m_Height = height;
@@ -56,7 +58,7 @@ namespace Dive
             break;
         }
 
-        createDepthBuffer(readOnly);
+        createDepthBuffer(useReadOnly);
 	}
 
 	Texture2D::Texture2D(const std::string& filename, bool mipChain)
@@ -186,7 +188,7 @@ namespace Dive
 				if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
 				{
 					DV_ENGINE_ERROR("Texture2D의 ID3D11Texture2D 생성에 실패하였습니다.");
-					DV_RELEASE(m_pTexture);
+					Release();
 					return false;
 				}
 			}
@@ -202,8 +204,7 @@ namespace Dive
 				if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
 				{
 					DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
-					DV_RELEASE(m_pTexture);
-					DV_RELEASE(m_pShaderResourceView);
+					Release();
 					return false;
 				}
 			}
@@ -283,9 +284,7 @@ namespace Dive
 		// 위치가 조금 애매하다.
 		// 허나 생성자 호출 후 LoadFromFile 순으로 진행하려면 이전에 생성한 객체를 제거해야 한다.
 		// => 현재 매개변수를 받지 않는 생성자를 되살렸다. ResourceManager에서 객체를 생성하기 위해선 어쩔 수 없었다.
-		DV_RELEASE(m_pTexture);
-		DV_RELEASE(m_pRenderTargetView);
-		DV_RELEASE(m_pShaderResourceView);
+		Release();
 
         // Texture2D
         {
@@ -305,7 +304,7 @@ namespace Dive
             if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
             {
                 DV_ENGINE_ERROR("Texture2D의 ID3D11Texture2D 생성에 실패하였습니다.");
-				DV_RELEASE(m_pTexture);
+				Release();
 				return false;
             }
         }
@@ -319,9 +318,8 @@ namespace Dive
             if (FAILED(m_pDevice->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pRenderTargetView)))
             {
                 DV_ENGINE_ERROR("Texture2D의 ID3D11RenderTargetView 생성에 실패하였습니다.");
-                DV_RELEASE(m_pTexture);
-				DV_RELEASE(m_pRenderTargetView);
-                return false;
+				Release(); 
+				return false;
             }
         }
 
@@ -336,16 +334,15 @@ namespace Dive
             if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
             {
                 DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
-                DV_RELEASE(m_pTexture);
-				DV_RELEASE(m_pShaderResourceView);
-                return false;
+				Release(); 
+				return false;
             }
         }
 
 		return true;
 	}
 	
-	bool Texture2D::createDepthBuffer(bool readOnly)
+	bool Texture2D::createDepthBuffer(bool useReadOnly)
 	{
 		// BindFlags만 다르다.
 		{
@@ -365,7 +362,7 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
 			{
 				DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
-				DV_RELEASE(m_pTexture);
+				Release(); 
 				return false;
 			}
 		}
@@ -379,21 +376,18 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pDepthStencilView)))
 			{
 				DV_ENGINE_ERROR("Texture2D의 ID3D11DepthStencilView 생성에 실패하였습니다.");
-				DV_RELEASE(m_pTexture);
-				DV_RELEASE(m_pDepthStencilView);
+				Release(); 
 				return false;
 			}
 
-			if (readOnly)
+			if (useReadOnly)
 			{
 				desc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
 
 				if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pDepthStencilViewReadOnly)))
 				{
-					DV_ENGINE_ERROR("Texture2D의 ID3D11DepthStencilView(readOnly) 생성에 실패하였습니다.");
-					DV_RELEASE(m_pTexture);
-					DV_RELEASE(m_pDepthStencilView);
-					DV_RELEASE(m_pDepthStencilViewReadOnly);
+					DV_ENGINE_ERROR("Texture2D의 ID3D11DepthStencilView(useReadOnly) 생성에 실패하였습니다.");
+					Release(); 
 					return false;
 				}
 			}
@@ -410,10 +404,7 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
 			{
 				DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
-				DV_RELEASE(m_pTexture);
-				DV_RELEASE(m_pDepthStencilView);
-				DV_RELEASE(m_pDepthStencilViewReadOnly);
-				DV_RELEASE(m_pShaderResourceView);
+				Release(); 
 				return false;
 			}
 		}

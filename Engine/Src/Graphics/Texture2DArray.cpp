@@ -5,28 +5,28 @@
 namespace Dive
 {
     Texture2DArray::Texture2DArray(uint32_t width, uint32_t height, uint32_t arraySize, DXGI_FORMAT format, bool mipChain)
-        : m_Format(format)
-        , m_ArraySize(arraySize)
+        : m_ArraySize(arraySize)
     {
         m_Width = width;
         m_Height = height; 
+        m_Format = format;
         m_MipLevels = mipChain ? CalculateMipmapLevels(width, height, -1) : 1;
 
         createColorBuffer();
     }
     
     Texture2DArray::Texture2DArray(uint32_t width, uint32_t height, uint32_t arraySize, DXGI_FORMAT format, uint32_t mipCount)
-        : m_Format(format)
-        , m_ArraySize(arraySize)
+        : m_ArraySize(arraySize)
     {
         m_Width = width;
         m_Height = height;
+        m_Format = format;
         m_MipLevels = CalculateMipmapLevels(width, height, mipCount);
 
         createColorBuffer();
     }
 
-    Texture2DArray::Texture2DArray(uint32_t width, uint32_t height, uint32_t depth, uint32_t arraySize, bool readOnly)
+    Texture2DArray::Texture2DArray(uint32_t width, uint32_t height, uint32_t depth, uint32_t arraySize, bool useReadOnly)
         : m_ArraySize(arraySize)
     {
         m_Width = width;
@@ -50,7 +50,7 @@ namespace Dive
             break;
         }
 
-        createDepthBuffer(readOnly);
+        createDepthBuffer(useReadOnly);
     }
     
     bool Texture2DArray::createColorBuffer()
@@ -73,7 +73,7 @@ namespace Dive
             if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
             {
                 DV_ENGINE_ERROR("Texture2DArray의 ID3D11Texture2D 생성에 실패하였습니다.");
-                DV_RELEASE(m_pTexture);
+                Release();
                 return false;
             }
         }
@@ -90,8 +90,7 @@ namespace Dive
             if (FAILED(m_pDevice->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pRenderTargetView)))
             {
                 DV_ENGINE_ERROR("Texture2DArray의 ID3D11RenderTargetView 생성에 실패하였습니다.");
-                DV_RELEASE(m_pTexture);
-                DV_RELEASE(m_pRenderTargetView);
+                Release(); 
                 return false;
             }
         }
@@ -110,8 +109,7 @@ namespace Dive
             if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
             {
                 DV_ENGINE_ERROR("Texture2DArray의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
-                DV_RELEASE(m_pTexture);
-                DV_RELEASE(m_pShaderResourceView);
+                Release(); 
                 return false;
             }
         }
@@ -119,7 +117,7 @@ namespace Dive
         return true;
     }
 
-    bool Texture2DArray::createDepthBuffer(bool readOnly)
+    bool Texture2DArray::createDepthBuffer(bool useReadOnly)
     {
 		// BindFlags만 다르다.
 		{
@@ -139,8 +137,8 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
 			{
 				DV_ENGINE_ERROR("Texture2DArray의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
-				DV_RELEASE(m_pTexture);
-				return false;
+                Release(); 
+                return false;
 			}
 		}
 
@@ -155,22 +153,19 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pDepthStencilView)))
 			{
 				DV_ENGINE_ERROR("Texture2DArray의 ID3D11DepthStencilView 생성에 실패하였습니다.");
-				DV_RELEASE(m_pTexture);
-				DV_RELEASE(m_pDepthStencilView);
-				return false;
+                Release(); 
+                return false;
 			}
 
-			if (readOnly)
+			if (useReadOnly)
 			{
 				desc.Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
 
 				if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pDepthStencilViewReadOnly)))
 				{
-					DV_ENGINE_ERROR("Texture2DArray의 ID3D11DepthStencilView(readOnly) 생성에 실패하였습니다.");
-					DV_RELEASE(m_pTexture);
-					DV_RELEASE(m_pDepthStencilView);
-					DV_RELEASE(m_pDepthStencilViewReadOnly);
-					return false;
+					DV_ENGINE_ERROR("Texture2DArray의 ID3D11DepthStencilView(useReadOnly) 생성에 실패하였습니다.");
+                    Release(); 
+                    return false;
 				}
 			}
 		}
@@ -188,11 +183,8 @@ namespace Dive
 			if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
 			{
 				DV_ENGINE_ERROR("Texture2DArray의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
-				DV_RELEASE(m_pTexture);
-				DV_RELEASE(m_pDepthStencilView);
-				DV_RELEASE(m_pDepthStencilViewReadOnly);
-				DV_RELEASE(m_pShaderResourceView);
-				return false;
+                Release(); 
+                return false;
 			}
 		}
 

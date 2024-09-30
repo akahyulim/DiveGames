@@ -19,6 +19,7 @@
 #include "Graphics/Texture.h"
 #include "Graphics/Texture2D.h"
 #include "Graphics/Texture2DArray.h"
+#include "Graphics/Cubemap.h"
 
 
 // Renderer

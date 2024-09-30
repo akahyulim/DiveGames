@@ -34,9 +34,6 @@
     <Filter Include="Src\Resource\Importer">
       <UniqueIdentifier>{f628aa4f-cd3d-47d9-8df4-a09c23323eb8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Src\Graphics\DvTexture">
-      <UniqueIdentifier>{c5742e85-5774-48b9-ac55-bb29e2e6777f}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Dive.h">
@@ -156,17 +153,17 @@
     <ClInclude Include="Src\Graphics\GBuffer.h">
       <Filter>Src\Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Graphics\DvCubeMap.h">
-      <Filter>Src\Graphics\DvTexture</Filter>
+    <ClInclude Include="Src\Graphics\Cubemap.h">
+      <Filter>Src\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\Texture.h">
-      <Filter>Src\Graphics\DvTexture</Filter>
+      <Filter>Src\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\Texture2D.h">
-      <Filter>Src\Graphics\DvTexture</Filter>
+      <Filter>Src\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Src\Graphics\Texture2DArray.h">
-      <Filter>Src\Graphics\DvTexture</Filter>
+      <Filter>Src\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -272,17 +269,17 @@
     <ClCompile Include="Src\Graphics\GBuffer.cpp">
       <Filter>Src\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Graphics\Cubemap.cpp">
+      <Filter>Src\Graphics</Filter>
+    </ClCompile>
     <ClCompile Include="Src\Graphics\Texture.cpp">
-      <Filter>Src\Graphics\DvTexture</Filter>
+      <Filter>Src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\Texture2D.cpp">
-      <Filter>Src\Graphics\DvTexture</Filter>
+      <Filter>Src\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Src\Graphics\Texture2DArray.cpp">
-      <Filter>Src\Graphics\DvTexture</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Graphics\DvCubeMap.cpp">
-      <Filter>Src\Graphics\DvTexture</Filter>
+      <Filter>Src\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

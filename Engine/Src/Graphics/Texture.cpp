@@ -25,11 +25,16 @@ namespace Dive
     
     Texture::~Texture()
     {
-        DV_RELEASE(m_pRenderTargetView);
-        DV_RELEASE(m_pDepthStencilView);
-        DV_RELEASE(m_pDepthStencilViewReadOnly);
-        DV_RELEASE(m_pShaderResourceView);
+		Release();
     }
+
+	void Texture::Release()
+	{
+		DV_RELEASE(m_pRenderTargetView);
+		DV_RELEASE(m_pDepthStencilView);
+		DV_RELEASE(m_pDepthStencilViewReadOnly);
+		DV_RELEASE(m_pShaderResourceView);
+	}
 
     uint32_t Texture::CalculateMipmapLevels(uint32_t width, uint32_t height, int maxLevel)
     {

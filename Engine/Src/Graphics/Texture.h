@@ -12,6 +12,8 @@ namespace Dive
 		Texture();
 		virtual ~Texture();
 
+		void Release();
+
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_pRenderTargetView; }
 		ID3D11DepthStencilView* GetDepthStencilView() const { return m_pDepthStencilView; }
 		ID3D11DepthStencilView* GetDepthStencilViewReadOnly() const { return m_pDepthStencilViewReadOnly; }
@@ -20,6 +22,8 @@ namespace Dive
 		uint32_t GetWidth() const { return m_Width; }
 		uint32_t GetHeight() const { return m_Height; }
 		DirectX::XMFLOAT2 GetSize() const { return { static_cast<float>(m_Width), static_cast<float>(m_Height) }; }
+
+		DXGI_FORMAT GetFormat() const { return m_Format; }
 
 		bool IsOpaque() const { return m_bOpaque; }
 
@@ -41,6 +45,9 @@ namespace Dive
 
 		uint32_t m_Width;
 		uint32_t m_Height;
+
+		DXGI_FORMAT m_Format;
+
 		// 필터 모드? 포인트, 바일니얼?, 트릴니얼 세 가지
 		// read only?
 		uint32_t m_MipLevels;

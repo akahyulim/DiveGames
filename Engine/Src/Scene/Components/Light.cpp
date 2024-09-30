@@ -3,6 +3,7 @@
 #include "Core/CoreDefs.h"
 #include "Graphics/Texture2D.h"
 #include "Graphics/Texture2DArray.h"
+#include "Graphics/Cubemap.h"
 #include "Graphics/ConstantBuffer.h"
 #include "Scene/GameObject.h"
 #include "Camera.h"
@@ -290,6 +291,8 @@ namespace Dive
 		, m_pCBufferDS(nullptr)
 		, m_Range(0.0f)
 	{
+		m_ShadowMapSize = 1024;
+		m_pShadowMap = static_cast<Texture*>(new Cubemap(1024, 32));
 	}
 
 	PointLight::PointLight(GameObject* pGameObject)
@@ -297,6 +300,8 @@ namespace Dive
 		, m_pCBufferDS(nullptr)
 		, m_Range(0.0f)
 	{
+		m_ShadowMapSize = 1024;
+		m_pShadowMap = static_cast<Texture*>(new Cubemap(1024, 32));
 	}
 
 	PointLight::~PointLight()
