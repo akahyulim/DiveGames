@@ -438,7 +438,7 @@ namespace Dive
                 //pDiffuseTex = ResourceManager::GetInstance()->GetResource<Texture2D>(diffuseTexturePath);
                 pDiffuseTex = ResourceManager::GetInstance()->GetResource<Texture2D>(diffuseTexturePath);
             }
-            pMat->SetTexture(eTextureUnitType::Diffuse, pDiffuseTex);
+            pMat->SetDvTexture(eTextureUnitType::Diffuse, pDiffuseTex);
             DV_ENGINE_INFO("Load DiffuseMap");
         }
 
@@ -460,7 +460,7 @@ namespace Dive
                 //pNormalTex = ResourceManager::GetInstance()->GetResource<Texture2D>(normalTexturePath);
                 pNormalTex = ResourceManager::GetInstance()->GetResource<Texture2D>(normalTexturePath);
             }
-            pMat->SetTexture(eTextureUnitType::Normal, pNormalTex);
+            pMat->SetDvTexture(eTextureUnitType::Normal, pNormalTex);
             DV_ENGINE_INFO("Load NormalMap");
         }
         

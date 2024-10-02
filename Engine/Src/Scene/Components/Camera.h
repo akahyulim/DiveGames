@@ -4,7 +4,7 @@
 
 namespace Dive
 {
-	class RenderTexture;
+	class Texture2D;
 	class ConstantBuffer;
 
 	class Camera : public Component
@@ -56,9 +56,10 @@ namespace Dive
 		void SetRotateSpeed(float speed) { m_RotateSpeed = speed; }
 
 		ID3D11RenderTargetView* GetRenderTargetView() const;
-		RenderTexture* GetRenderTarget() const { return m_pRenderTarget; }
-		void SetRenderTarget(RenderTexture* pRenderTarget) { m_pRenderTarget = pRenderTarget; }
+		Texture2D* GetRenderTargetTex() const { return m_pRenderTargetTex; }
+		void SetRenderTargetTex(Texture2D* pRenderTarget) { m_pRenderTargetTex = pRenderTarget; }
 		DirectX::XMFLOAT2 GetRenderTargetSize() const;
+
 
 		// 위치 옮기기?
 		ConstantBuffer* GetConstantBufferVS() override { return m_pCBufferVS; }
@@ -78,7 +79,7 @@ namespace Dive
 		float m_MoveSpeed;
 		float m_RotateSpeed;
 
-		RenderTexture* m_pRenderTarget;
+		Texture2D* m_pRenderTargetTex;
 
 		ConstantBuffer* m_pCBufferVS;
 		ConstantBuffer* m_pCBufferDS;

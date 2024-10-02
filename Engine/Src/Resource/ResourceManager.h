@@ -39,6 +39,7 @@ namespace Dive
 		std::unordered_map<size_t, ResourceGroup> m_ResourceGroups;
 	};
 
+	// 유니티처럼 Load로 바꾸자.
 	template<class T>
 	T* ResourceManager::GetResource(const std::string& name)
 	{

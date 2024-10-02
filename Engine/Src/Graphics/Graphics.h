@@ -251,8 +251,7 @@ namespace Dive
 	class IndexBuffer;
 	class Texture;
 	class Texture2D;
-	class Texture2D;
-	class RenderTexture;
+	class Texture2DArray;
 	class Shader;
 	class ConstantBuffer;
 	
@@ -284,9 +283,10 @@ namespace Dive
 		void EndFrame();
 
 		bool BindRenderTargetView(ID3D11RenderTargetView* pRtv, uint8_t index);
-		bool BindRenderTargetView(RenderTexture* pTexture, uint8_t index);
+		bool BindRenderTargetView(Texture2D* pTexture, uint8_t index);
+
 		void BindDepthStencilView(ID3D11DepthStencilView* pDsv);
-		void BindDepthStencilView(RenderTexture* pTexture);
+		void BindDepthStencilView(Texture2D* pTexture);
 
 		void ClearViews(uint8_t flags, const DirectX::XMFLOAT4& color, float depth = 1.0f, uint8_t stencil = 0);
 
@@ -315,9 +315,9 @@ namespace Dive
 		void PSBindConstantBuffer(ConstantBuffer* pBuffer, size_t slot);
 		
 		void BindPSResource(ID3D11ShaderResourceView* pResourceView, eTextureUnitType unit);
-		void BindPSResource(Texture* pTexture, eTextureUnitType unit);	// enum class보단 uint8_t를 받는 게 나아보인다.
+		void BindPSResource(Texture* pTexture, eTextureUnitType unit);
 		void BindPSResource(Texture2D* pTexture, eTextureUnitType unit);
-		void BindPSResource(RenderTexture* pRenderTexture, eTextureUnitType unit);
+		//void BindPSResource(Texture2DArray* pTextureArray, eTextureUnitType unit);
 		void BindPSSampler(ID3D11SamplerState* pState, uint8_t index);
 		void BindPSSampler(uint8_t index, ID3D11SamplerState* pSampler);
 

@@ -12,13 +12,15 @@
 // Graphics
 #include "Graphics/Graphics.h"
 #include "Graphics/GraphicsEvents.h"
-#include "Graphics/RenderTexture.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/Shader.h"
 #include "Graphics/ConstantBuffer.h"
 #include "Graphics/Texture.h"
 #include "Graphics/Texture2D.h"
+#include "Graphics/Texture2DArray.h"
+#include "Graphics/Cubemap.h"
+
 
 // Renderer
 #include "Renderer/Renderer.h"

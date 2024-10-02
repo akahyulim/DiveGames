@@ -3,7 +3,6 @@
 #include "ViewScreen.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/ConstantBuffer.h"
-#include "Graphics/RenderTexture.h"
 #include "Graphics/Shader.h"
 #include "Core/CoreDefs.h"
 

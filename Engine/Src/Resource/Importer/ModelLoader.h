@@ -13,7 +13,6 @@ namespace Dive
 	class GameObject;
 	class Material;
 	class Texture2D;
-	class Texture2D;
 
 	class ModelLoader
 	{

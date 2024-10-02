@@ -161,13 +161,14 @@
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Src\Graphics\Cubemap.h" />
+    <ClInclude Include="Src\Graphics\Texture.h" />
+    <ClInclude Include="Src\Graphics\Texture2D.h" />
+    <ClInclude Include="Src\Graphics\Texture2DArray.h" />
     <ClInclude Include="Src\Graphics\GBuffer.h" />
     <ClInclude Include="Src\Graphics\Graphics.h" />
     <ClInclude Include="Src\Graphics\IndexBuffer.h" />
-    <ClInclude Include="Src\Graphics\RenderTexture.h" />
     <ClInclude Include="Src\Graphics\Shader.h" />
-    <ClInclude Include="Src\Graphics\Texture.h" />
-    <ClInclude Include="Src\Graphics\Texture2D.h" />
     <ClInclude Include="Src\Graphics\VertexBuffer.h" />
     <ClInclude Include="Src\Graphics\GraphicsEvents.h" />
     <ClInclude Include="Src\Input\Input.h" />
@@ -203,12 +204,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Src\Graphics\ConstantBuffer.cpp" />
-    <ClCompile Include="Src\Graphics\GBuffer.cpp" />
-    <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
-    <ClCompile Include="Src\Graphics\RenderTexture.cpp" />
-    <ClCompile Include="Src\Graphics\Shader.cpp" />
+    <ClCompile Include="Src\Graphics\Cubemap.cpp" />
     <ClCompile Include="Src\Graphics\Texture.cpp" />
     <ClCompile Include="Src\Graphics\Texture2D.cpp" />
+    <ClCompile Include="Src\Graphics\GBuffer.cpp" />
+    <ClCompile Include="Src\Graphics\IndexBuffer.cpp" />
+    <ClCompile Include="Src\Graphics\Shader.cpp" />
+    <ClCompile Include="Src\Graphics\Texture2DArray.cpp" />
     <ClCompile Include="Src\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="Src\Graphics\Graphics.cpp" />
     <ClCompile Include="Src\Input\Input.cpp" />

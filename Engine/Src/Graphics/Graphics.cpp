@@ -2,7 +2,7 @@
 #include "Graphics.h"
 #include "ConstantBuffer.h"
 #include "Texture2D.h"
-#include "RenderTexture.h"
+#include "Texture2DArray.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "Core/CoreDefs.h"
@@ -299,13 +299,15 @@ namespace Dive
 	}
 
 	// 이건 BindTextureToRenderTargetView()처럼 이름을 구체화하는 편이 나을 것 같다.
-	bool Graphics::BindRenderTargetView(RenderTexture* pTexture, uint8_t index)
+	bool Graphics::BindRenderTargetView(Texture2D* pTexture, uint8_t index)
 	{
 		ID3D11RenderTargetView* pRtv{};
 		if (pTexture)
 			pRtv = pTexture->GetRenderTargetView();
 
-		return BindRenderTargetView(pRtv, index);
+		//return BindRenderTargetView(pRtv, index);
+		// 아래의 코드가 더 깔끔한 듯?
+		return BindRenderTargetView(pTexture ? pTexture->GetRenderTargetView() : nullptr, index);
 	}
 
 	void Graphics::BindDepthStencilView(ID3D11DepthStencilView* pDsv)
@@ -317,8 +319,9 @@ namespace Dive
 		}
 	}
 
-	void Graphics::BindDepthStencilView(RenderTexture* pTexture)
+	void Graphics::BindDepthStencilView(Texture2D* pTexture)
 	{
+
 		BindDepthStencilView(pTexture ? pTexture->GetDepthStencilView() : nullptr);
 	}
 
@@ -583,21 +586,17 @@ namespace Dive
 		}
 	}
 
-	// 아래 세 개의 메서드는 제거하는 편이 낫다???
+	// 아래 세 개의 메서드(하나는 구현안한듯)는 제거하는 편이 낫다???
 	// 허나 아직 사용하는 코드가 있다.
 	void Graphics::BindPSResource(Texture* pTexture, eTextureUnitType unit)
 	{
 		BindPSResource(pTexture ? pTexture->GetShaderResourceView() : nullptr, unit);
 	}
 
+	// 위에 베이스를 전달하는 메서드가 있기 때문에 불필요하다.
 	void Graphics::BindPSResource(Texture2D* pTexture, eTextureUnitType unit)
 	{
 		BindPSResource(pTexture ? pTexture->GetShaderResourceView() : nullptr, unit);
-	}
-
-	void Graphics::BindPSResource(RenderTexture* pRenderTexture, eTextureUnitType unit)
-	{
-		BindPSResource(pRenderTexture ? pRenderTexture->GetShaderResourceView() : nullptr, unit);
 	}
 
 	// size_t를 eSamplerType로 바꾸어야 할 듯

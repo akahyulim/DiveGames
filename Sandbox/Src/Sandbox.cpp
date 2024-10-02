@@ -363,27 +363,27 @@ namespace Sandbox
 			// materials
 			// 셰이더를 직접 전달하지 않아도 RenderPath에 맞는 Default가 적용되어 있어야 한다.
 			auto pTriangleMaterial = Dive::CreateMaterial("TriangleMaterial");
-			pTriangleMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexDMC);
+			pTriangleMaterial->SetDvTexture(Dive::eTextureUnitType::Diffuse, pTexDMC);
 			Dive::GetResourceManager()->AddManualResource(pTriangleMaterial);
 
 			auto pCubeMaterial = Dive::CreateMaterial("CubeMaterial");
-			pCubeMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexDOKEV);
+			pCubeMaterial->SetDvTexture(Dive::eTextureUnitType::Diffuse, pTexDOKEV);
 			Dive::GetResourceManager()->AddManualResource(pCubeMaterial);
 
 			auto pPlaneMaterial = Dive::CreateMaterial("PlaneMaterial");
 			pPlaneMaterial->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-			//pPlaneMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexPlane);
-			pPlaneMaterial->SetTexture(Dive::eTextureUnitType::Normal, pTexPlaneNormal);
+			//pPlaneMaterial->SetDvTexture(Dive::eTextureUnitType::Diffuse, pTexPlane);
+			pPlaneMaterial->SetDvTexture(Dive::eTextureUnitType::Normal, pTexPlaneNormal);
 			Dive::GetResourceManager()->AddManualResource(pPlaneMaterial);
 
 			auto pStoneMaterial = Dive::CreateMaterial("StoneMaterial");
-			pStoneMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexStone);
-			pStoneMaterial->SetTexture(Dive::eTextureUnitType::Normal, pTexNormal);
+			pStoneMaterial->SetDvTexture(Dive::eTextureUnitType::Diffuse, pTexStone);
+			pStoneMaterial->SetDvTexture(Dive::eTextureUnitType::Normal, pTexNormal);
 			Dive::GetResourceManager()->AddManualResource(pStoneMaterial);
 
 			auto pTransparentMaterial = Dive::CreateMaterial("TransparentMaterial");
 			pTransparentMaterial->SetDiffuseColor(1.0f, 1.0f, 0.0f, 0.75f);
-			//pTransparentMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexNoTexture);
+			//pTransparentMaterial->SetDvTexture(Dive::eTextureUnitType::Diffuse, pTexNoTexture);
 			Dive::GetResourceManager()->AddManualResource(pTransparentMaterial);
 
 			// tirangle gameobject
@@ -685,8 +685,8 @@ namespace Sandbox
 
 			// materials
 			auto pPlaneMaterial = Dive::CreateMaterial("PlaneMaterial");
-			pPlaneMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexPlane);
-			pPlaneMaterial->SetTexture(Dive::eTextureUnitType::Normal, pTexPlaneNormal);
+			pPlaneMaterial->SetDvTexture(Dive::eTextureUnitType::Diffuse, pTexPlane);
+			pPlaneMaterial->SetDvTexture(Dive::eTextureUnitType::Normal, pTexPlaneNormal);
 			Dive::GetResourceManager()->AddManualResource(pPlaneMaterial);
 
 			// bottom gameobject
@@ -808,11 +808,11 @@ namespace Sandbox
 
 			// materials
 			auto pDmcMaterial = Dive::CreateMaterial("DmcMaterial");
-			pDmcMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexDMC);
+			pDmcMaterial->SetDvTexture(Dive::eTextureUnitType::Diffuse, pTexDMC);
 			Dive::GetResourceManager()->AddManualResource(pDmcMaterial);
 
 			auto pDokevMaterial = Dive::CreateMaterial("DokevMaterial");
-			pDokevMaterial->SetTexture(Dive::eTextureUnitType::Diffuse, pTexDOKEV);
+			pDokevMaterial->SetDvTexture(Dive::eTextureUnitType::Diffuse, pTexDOKEV);
 			Dive::GetResourceManager()->AddManualResource(pDokevMaterial);
 
 			// gameobjects

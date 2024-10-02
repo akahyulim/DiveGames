@@ -1,7 +1,9 @@
 #include "DivePch.h"
 #include "Light.h"
 #include "Core/CoreDefs.h"
-#include "Graphics/RenderTexture.h"
+#include "Graphics/Texture2D.h"
+#include "Graphics/Texture2DArray.h"
+#include "Graphics/Cubemap.h"
 #include "Graphics/ConstantBuffer.h"
 #include "Scene/GameObject.h"
 #include "Camera.h"
@@ -215,9 +217,7 @@ namespace Dive
 		, m_pCBufferGS(nullptr)
 	{
 		m_ShadowMapSize = 1024.0f;
-		m_pShadowMap = new RenderTexture(1024, 1024, 32);
-		m_pShadowMap->SetArraySize(3);
-		m_pShadowMap->Create();
+		m_pShadowMap = static_cast<Texture*>(new Texture2DArray(1024, 1024, 32, 3));
 	}
 
 	DirectionalLight::DirectionalLight(GameObject* pGameObject)
@@ -225,9 +225,7 @@ namespace Dive
 		, m_pCBufferGS(nullptr)
 	{
 		m_ShadowMapSize = 1024.0f;
-		m_pShadowMap = new RenderTexture(1024, 1024, 32);
-		m_pShadowMap->SetArraySize(3);
-		m_pShadowMap->Create();
+		m_pShadowMap = static_cast<Texture*>(new Texture2DArray(1024, 1024, 32, 3));
 	}
 	
 	// 생성자에 넣을 수 없어 별도의 메서드로 분리했다.
@@ -293,6 +291,8 @@ namespace Dive
 		, m_pCBufferDS(nullptr)
 		, m_Range(0.0f)
 	{
+		m_ShadowMapSize = 1024;
+		m_pShadowMap = static_cast<Texture*>(new Cubemap(1024, 32));
 	}
 
 	PointLight::PointLight(GameObject* pGameObject)
@@ -300,6 +300,8 @@ namespace Dive
 		, m_pCBufferDS(nullptr)
 		, m_Range(0.0f)
 	{
+		m_ShadowMapSize = 1024;
+		m_pShadowMap = static_cast<Texture*>(new Cubemap(1024, 32));
 	}
 
 	PointLight::~PointLight()
@@ -382,8 +384,7 @@ namespace Dive
 		// 그림자를 적용하고자 할 때 생성하는 것이 맞는 듯 하다.
 		// 다만 현재 크기가 고정되어 있다.
 		m_ShadowMapSize = 1024.0f;
-		m_pShadowMap = new RenderTexture(1024, 1024, 32);
-		m_pShadowMap->Create();
+		m_pShadowMap = static_cast<Texture*>(new Texture2D(1024, 1024, 32));
 	}
 
 	SpotLight::SpotLight(GameObject* pGameObject)
@@ -394,8 +395,7 @@ namespace Dive
 		, m_OuterAngle(0.0f)
 	{
 		m_ShadowMapSize = 1024.0f;
-		m_pShadowMap = new RenderTexture(1024, 1024, 32);
-		m_pShadowMap->Create();
+		m_pShadowMap = static_cast<Texture*>(new Texture2D(1024, 1024, 32));
 	}
 
 	SpotLight::~SpotLight()

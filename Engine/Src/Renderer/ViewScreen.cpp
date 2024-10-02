@@ -3,7 +3,6 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Graphics/Graphics.h"
-#include "Graphics/RenderTexture.h"
 #include "Graphics/ConstantBuffer.h"
 #include "Core/CoreDefs.h"
 #include "Scene/Scene.h"
@@ -305,8 +304,8 @@ namespace Dive
 
 				// 위의 샘플러도 그렇고 매개변수 구성이 좀 별루다.
 				// 상수버퍼처럼 텍스쳐가 slot을 가지면 깔끔해진다.
-				m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Diffuse), eTextureUnitType::Diffuse);
-				m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Normal), eTextureUnitType::Normal);
+				m_pGraphics->BindPSResource(pMaterial->GetDvTexture(eTextureUnitType::Diffuse), eTextureUnitType::Diffuse);
+				m_pGraphics->BindPSResource(pMaterial->GetDvTexture(eTextureUnitType::Normal), eTextureUnitType::Normal);
 				if (pLightCom->GetType() == eLightType::Spot)
 					m_pGraphics->BindPSResource(pLightCom->GetShadowMap(), eTextureUnitType::SpotShadowMap);
 
@@ -352,8 +351,8 @@ namespace Dive
 				m_pGraphics->VSBindConstantBuffer(pRenderableCom->GetConstantBufferVS(), 1);
 				m_pGraphics->PSBindConstantBuffer(pRenderableCom->GetConstantBufferPS(), 5);
 
-				m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Diffuse), eTextureUnitType::Diffuse);
-				m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Normal), eTextureUnitType::Normal);
+				m_pGraphics->BindPSResource(pMaterial->GetDvTexture(eTextureUnitType::Diffuse), eTextureUnitType::Diffuse);
+				m_pGraphics->BindPSResource(pMaterial->GetDvTexture(eTextureUnitType::Normal), eTextureUnitType::Normal);
 				if (pLightCom->GetType() == eLightType::Spot)
 					m_pGraphics->BindPSResource(pLightCom->GetShadowMap(), eTextureUnitType::SpotShadowMap);
 
@@ -398,8 +397,8 @@ namespace Dive
 			m_pGraphics->VSBindConstantBuffer(pRenderableCom->GetConstantBufferVS(), 1);
 			m_pGraphics->PSBindConstantBuffer(pRenderableCom->GetConstantBufferPS(), 5);
 
-			m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Diffuse), eTextureUnitType::Diffuse);
-			m_pGraphics->BindPSResource(pMaterial->GetTexture(eTextureUnitType::Normal), eTextureUnitType::Normal);
+			m_pGraphics->BindPSResource(pMaterial->GetDvTexture(eTextureUnitType::Diffuse), eTextureUnitType::Diffuse);
+			m_pGraphics->BindPSResource(pMaterial->GetDvTexture(eTextureUnitType::Normal), eTextureUnitType::Normal);
 
 			m_pGraphics->SetVertexShader(eVertexShaderType::GBuffer);
 			m_pGraphics->SetHullShader(eHullShaderType::Null);
@@ -430,10 +429,10 @@ namespace Dive
 		// ConstantBuffers
 		m_pGraphics->PSBindConstantBuffer(m_pCamera->GetConstantBufferPS(), 0);
 
-		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Diffuse);
-		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Normal);
-		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Specular);
-		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex()->GetDepthShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Diffuse);
+		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Normal);
+		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Specular);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
 
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Pcf), 1);
@@ -466,7 +465,7 @@ namespace Dive
 				m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 				if (pLightCom->IsShadowEnabled())
-					m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetDepthShaderResourceView(), eTextureUnitType::CascadeShadowMap);
+					m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetShaderResourceView(), eTextureUnitType::CascadeShadowMap);
 				
 				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredDirLight);
 				m_pGraphics->SetHullShader(eHullShaderType::Null);
@@ -509,7 +508,7 @@ namespace Dive
 				m_pGraphics->SetRasterizerState(eRasterizerStateType::NoDepthClipFront);
 
 				if(pLightCom->IsShadowEnabled())
-					m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetDepthShaderResourceView(), eTextureUnitType::SpotShadowMap);
+					m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetShaderResourceView(), eTextureUnitType::SpotShadowMap);
 
 				m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
 
@@ -579,11 +578,10 @@ namespace Dive
 		m_pGraphics->PSBindConstantBuffer(pLightCom->GetConstantBufferPS(), 2);
 
 		// gbuffer resources
-		// 아무리봐도 이게 바인딩되지 않는 것 같다.
-		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex()->GetDepthShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
-		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Diffuse);
-		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Normal);
-		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex()->GetColorShaderResourceView(), eTextureUnitType::GBuffer_Specular);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDepthTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_DepthStencil);
+		m_pGraphics->BindPSResource(m_GBuffer.GetDiffuseTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Diffuse);
+		m_pGraphics->BindPSResource(m_GBuffer.GetNormalTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Normal);
+		m_pGraphics->BindPSResource(m_GBuffer.GetSpecularTex()->GetShaderResourceView(), eTextureUnitType::GBuffer_Specular);
 
 		// samplers
 		m_pGraphics->BindPSSampler(m_pRenderer->GetSampler(eSamplerType::Linear), 0);
@@ -597,7 +595,7 @@ namespace Dive
 		m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 		if (pLightCom->IsShadowEnabled())
-			m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetDepthShaderResourceView(), eTextureUnitType::CascadeShadowMap);
+			m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetShaderResourceView(), eTextureUnitType::CascadeShadowMap);
 
 		// shaders
 		m_pGraphics->SetVertexShader(eVertexShaderType::DeferredDirLight);
