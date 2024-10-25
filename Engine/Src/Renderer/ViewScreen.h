@@ -44,9 +44,8 @@ namespace Dive
 
 		void passGBuffer();
 		void passLight();
+		void passDebugLight();
 		void deferredRender();
-
-		void passDirLight();
 
 	private:
 		Graphics* m_pGraphics;

@@ -50,6 +50,7 @@ namespace Dive
 		, m_RasterizerStateType(eRasterizerStateType::Count)
 		, m_BlendStates{}
 		, m_BlendStateType(eBlendStateType::Count)
+		, m_Samplers{}
 		, m_Viewport{}
 		, m_VSConstBufs{}
 		, m_VSConstBufSlots{}
@@ -116,6 +117,9 @@ namespace Dive
 		if (!createBlendStates())
 			return false;
 
+		if (!createSamplerStates())
+			return false;
+
 		if (!createShaders())
 			return false;
 
@@ -132,6 +136,9 @@ namespace Dive
 
 	void Graphics::Shutdown()
 	{
+		for (auto pSamplerState : m_Samplers)
+			DV_RELEASE(pSamplerState);
+
 		DV_RELEASE(m_pDefaultDepthTexture);
 		DV_RELEASE(m_pDefaultDepthStencilView);
 		DV_RELEASE(m_pDefaultRenderTargetView);
@@ -402,8 +409,9 @@ namespace Dive
 
 	void Graphics::SetViewport(D3D11_VIEWPORT viewport)
 	{
-		if (m_Viewport.TopLeftX != viewport.TopLeftX || m_Viewport.TopLeftY != viewport.TopLeftY || m_Viewport.Width != viewport.Width
-			|| m_Viewport.Height != viewport.Height || m_Viewport.MinDepth != viewport.MinDepth || m_Viewport.MaxDepth != viewport.MaxDepth)
+		// 개수가 다를 수 있기 때문에 크기로만 결정하면 안된다.
+		//if (m_Viewport.TopLeftX != viewport.TopLeftX || m_Viewport.TopLeftY != viewport.TopLeftY || m_Viewport.Width != viewport.Width
+		//	|| m_Viewport.Height != viewport.Height || m_Viewport.MinDepth != viewport.MinDepth || m_Viewport.MaxDepth != viewport.MaxDepth)
 		{
 			m_pDeviceContext->RSSetViewports(1, &viewport);
 			m_Viewport = viewport;
@@ -599,36 +607,17 @@ namespace Dive
 		BindPSResource(pTexture ? pTexture->GetShaderResourceView() : nullptr, unit);
 	}
 
-	// size_t를 eSamplerType로 바꾸어야 할 듯
-	// 추후엔 SamplerState도 랩핑 클래스를 만들고 내부에서 슬롯 인덱스를 관리하는 편이 나을 수도...
-	void Graphics::BindPSSampler(ID3D11SamplerState* pSampler, uint8_t index)
+	void Graphics::BindPSSampler(eSamplerType type)
 	{
-		if (pSampler != m_PSSamplers[index])
-		{
-			if (m_PSSamplerDirtyFirst == MAX_NUM_SHADER_RESOURCES)
-				m_PSSamplerDirtyFirst = m_PSSamplerDirtyLast = index;
-			else
-			{
-				if (index < m_PSSamplerDirtyFirst)
-					m_PSSamplerDirtyFirst = index;
-				if (index > m_PSSamplerDirtyLast)
-					m_PSSamplerDirtyLast = index;
-			}
+		uint8_t index = static_cast<uint8_t>(type);
 
-			m_PSSamplers[index] = pSampler;
-			m_bPSSamplerDirty = true;
-		}
-	}
-
-	void Graphics::BindPSSampler(uint8_t index, ID3D11SamplerState* pSampler)
-	{
 		if (index >= static_cast<uint8_t>(eSamplerType::Count))
 		{
 			DV_ENGINE_ERROR("");
 			return;
 		}
 
-		if (pSampler != m_PSSamplers[index])
+		if (m_Samplers[index] != m_PSSamplers[index])
 		{
 			if (m_PSSamplerDirtyFirst == MAX_NUM_SHADER_RESOURCES)
 				m_PSSamplerDirtyFirst = m_PSSamplerDirtyLast = index;
@@ -640,7 +629,7 @@ namespace Dive
 					m_PSSamplerDirtyLast = index;
 			}
 
-			m_PSSamplers[index] = pSampler;
+			m_PSSamplers[index] = m_Samplers[index];
 			m_bPSSamplerDirty = true;
 		}
 	}
@@ -1035,19 +1024,16 @@ namespace Dive
 
 		// shadow gen
 		{
-			D3D11_DEPTH_STENCIL_DESC desc;
+			D3D11_DEPTH_STENCIL_DESC desc{};
 			desc.DepthEnable = TRUE;
-			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+			desc.StencilEnable = FALSE;
 			desc.DepthFunc = D3D11_COMPARISON_LESS;
-			desc.StencilEnable = TRUE;
 			desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
 			desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
 			const D3D11_DEPTH_STENCILOP_DESC noSkyStencilOp = { D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_COMPARISON_EQUAL };
 			desc.FrontFace = noSkyStencilOp;
 			desc.BackFace = noSkyStencilOp;
-			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-			desc.StencilEnable = FALSE;
-			desc.DepthFunc = D3D11_COMPARISON_LESS;
 
 			index = static_cast<uint8_t>(eDepthStencilStateType::ShadowGen);
 
@@ -1099,6 +1085,7 @@ namespace Dive
 
 		{
 			// NoDepthClipFront
+			// 책의 설정 복붙이다.
 			D3D11_RASTERIZER_DESC desc = {
 				D3D11_FILL_SOLID,
 				D3D11_CULL_FRONT,
@@ -1119,12 +1106,23 @@ namespace Dive
 				return false;
 			}
 
-			// ShadowGen
-			// cascaded 후에 사용되지 않는다.
+			// wire frame
 			desc.CullMode = D3D11_CULL_BACK;
-			desc.DepthBias = 100;//85;
-			desc.SlopeScaledDepthBias = 4.0f;//5.0f;
-			desc.DepthBiasClamp = 0.0f;
+			desc.FillMode = D3D11_FILL_WIREFRAME;
+
+			index = static_cast<uint8_t>(eRasterizerStateType::WireFrame);
+
+			if (FAILED(m_pDevice->CreateRasterizerState(&desc, &m_RasterizerStates[index])))
+			{
+				DV_ENGINE_ERROR("RasterizerState WireFrame 생성에 실패하였습니다.");
+				return false;
+			}
+
+			// ShadowGen
+			// 역시 설정에 문제가 없다.
+			desc.FillMode = D3D11_FILL_SOLID;
+			desc.DepthBias = 85;
+			desc.SlopeScaledDepthBias = 5.0f;
 			
 			index = static_cast<uint8_t>(eRasterizerStateType::ShadowGen);
 
@@ -1219,6 +1217,48 @@ namespace Dive
 		return true;
 	}
 
+	bool Graphics::createSamplerStates()
+	{
+		D3D11_SAMPLER_DESC desc{};
+
+		// Linear
+		desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		desc.AddressU = desc.AddressV = desc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		desc.MaxAnisotropy = 1;
+		desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+		desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+		if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_Samplers[static_cast<uint8_t>(eSamplerType::Linear)])))
+		{
+			DV_ENGINE_ERROR("Base Sampler 생성에 실패하였습니다.");
+			return false;
+		}
+
+		// point
+		desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_Samplers[static_cast<uint8_t>(eSamplerType::Point)])))
+		{
+			DV_ENGINE_ERROR("Point Sampler 생성에 실패하였습니다.");
+			return false;
+		}
+
+		// pcf
+		ZeroMemory(&desc, sizeof(desc));
+		desc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
+		desc.AddressU = desc.AddressV = desc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+		desc.MaxAnisotropy = 1;
+		desc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
+		desc.MaxLOD = D3D11_FLOAT32_MAX;
+
+		if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_Samplers[static_cast<uint8_t>(eSamplerType::Pcf)])))
+		{
+			DV_ENGINE_ERROR("Pcf Sampler 생성에 실패하였습니다.");
+			return false;
+		}
+
+		return true;
+	}
+
 	bool Graphics::createShaders()
 	{
 		// vertex shaders
@@ -1226,16 +1266,25 @@ namespace Dive
 			auto index = static_cast<uint8_t>(eVertexShaderType::Null);
 			m_VertexShaders[index] = nullptr;
 
+			// 이름을 DirectionalShadowGenVS 이런식으로 짓자.
+
+			// shaodw depth는 타입을 셰이더에 전달하여 구분할 수 있을 것 같기도 하다.
 			auto pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/LightDepth.hlsl", eShaderType::Vertex, eInputLayout::Pos))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/SpotLightDepth.hlsl", eShaderType::Vertex, eInputLayout::Pos))
 				return false;
-			index = static_cast<uint8_t>(eVertexShaderType::LightDepth);
+			index = static_cast<uint8_t>(eVertexShaderType::SpotLightDepth);
 			m_VertexShaders[index] = pShader;
 
 			pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DirLightDepth.hlsl", eShaderType::Vertex, eInputLayout::Pos))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/PointLightDepth.hlsl", eShaderType::Vertex, eInputLayout::Pos))
 				return false;
-			index = static_cast<uint8_t>(eVertexShaderType::DirLightDepth);
+			index = static_cast<uint8_t>(eVertexShaderType::PointLightDepth);
+			m_VertexShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DirectionalLightDepth.hlsl", eShaderType::Vertex, eInputLayout::Pos))
+				return false;
+			index = static_cast<uint8_t>(eVertexShaderType::DirectionalLightDepth);
 			m_VertexShaders[index] = pShader;
 
 			pShader = new Shader();
@@ -1257,13 +1306,13 @@ namespace Dive
 			m_VertexShaders[index] = pShader;
 
 			pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredDirLight.hlsl", eShaderType::Vertex))//, eInputLayout::None))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredDirectionalLight.hlsl", eShaderType::Vertex))//, eInputLayout::None))
 				return false;
-			index = static_cast<uint8_t>(eVertexShaderType::DeferredDirLight);
+			index = static_cast<uint8_t>(eVertexShaderType::DeferredDirectionalLight);
 			m_VertexShaders[index] = pShader;
 
 			pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredPointLight.hlsl", eShaderType::Vertex))//, eInputLayout::None))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredPointLight.hlsl", eShaderType::Vertex))
 				return false;
 			index = static_cast<uint8_t>(eVertexShaderType::DeferredPointLight);
 			m_VertexShaders[index] = pShader;
@@ -1317,9 +1366,15 @@ namespace Dive
 			m_GeometryShaders[index] = nullptr;
 
 			auto pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DirLightDepth.hlsl", eShaderType::Geometry))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DirectionalLightDepth.hlsl", eShaderType::Geometry))
 				return false;
 			index = static_cast<uint8_t>(eGeometryShaderType::CascadeShadowMaps);
+			m_GeometryShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/PointLightDepth.hlsl", eShaderType::Geometry))
+				return false;
+			index = static_cast<uint8_t>(eGeometryShaderType::CubeShadowMap);
 			m_GeometryShaders[index] = pShader;
 		}
 
@@ -1347,9 +1402,9 @@ namespace Dive
 			m_PixelShaders[index] = pShader;
 
 			pShader = new Shader();
-			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredDirLight.hlsl", eShaderType::Pixel))
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredDirectionalLight.hlsl", eShaderType::Pixel))
 				return false;
-			index = static_cast<uint8_t>(ePixelShaderType::DeferredDirLight);
+			index = static_cast<uint8_t>(ePixelShaderType::DeferredDirectionalLight);
 			m_PixelShaders[index] = pShader;
 
 			pShader = new Shader(); 
@@ -1362,6 +1417,12 @@ namespace Dive
 			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DeferredSpotLight.hlsl", eShaderType::Pixel))
 				return false;
 			index = static_cast<uint8_t>(ePixelShaderType::DeferredSpotLight);
+			m_PixelShaders[index] = pShader;
+
+			pShader = new Shader();
+			if (!pShader->CompileAndCreateShader("../../Assets/Shaders/DebugLight.hlsl", eShaderType::Pixel))
+				return false;
+			index = static_cast<uint8_t>(ePixelShaderType::DebugLight);
 			m_PixelShaders[index] = pShader;
 		}
 

@@ -62,9 +62,9 @@ namespace Dive
 
 
 		// 위치 옮기기?
-		ConstantBuffer* GetConstantBufferVS() override { return m_pCBufferVS; }
-		ConstantBuffer* GetConstantBufferDS() override { return m_pCBufferDS; }
-		ConstantBuffer* GetConstantBufferPS() override { return m_pCBufferPS; }
+		ConstantBuffer* GetConstantBufferVS() override;// { return m_pCBufferVS; }
+		ConstantBuffer* GetConstantBufferDS() override;// { return m_pCBufferDS; }
+		ConstantBuffer* GetConstantBufferPS() override;// { return m_pCBufferPS; }
 
 	protected:
 		eProjectionType m_ProjectionType;

@@ -113,7 +113,7 @@ namespace Dive
 			desc.SampleDesc.Quality = 0;
 			desc.Usage = D3D11_USAGE_DEFAULT;
 			desc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-			desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+			desc.MiscFlags = D3D10_RESOURCE_MISC_TEXTURECUBE;
 
 			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
 			{
@@ -129,6 +129,7 @@ namespace Dive
 			desc.Format = GetDepthStencilViewFormat(m_Format);
 			desc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
 			desc.Texture2DArray.ArraySize = 6;
+			desc.Texture2DArray.FirstArraySlice = 0;
 
 			if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pDepthStencilView)))
 			{
@@ -144,6 +145,7 @@ namespace Dive
 			desc.Format = GetShaderResourceViewFormat(m_Format);
 			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 			desc.TextureCube.MipLevels = m_MipLevels;
+			desc.TextureCube.MostDetailedMip = 0;
 
 			if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
 			{
