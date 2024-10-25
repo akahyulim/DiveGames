@@ -424,6 +424,24 @@ namespace Sandbox
 			pWall->SetRotation(-90.0f, 0.0f, 0.0f);
 			pWall->SetPosition(0.0f, 80.0f, 80.0f);
 
+			// left wall object
+			auto pLeftWall = pActiveScene->CreateGameObject("Bottom");
+			auto pLeftWallRenderableCom = pLeftWall->AddComponent<Dive::Renderable>();
+			auto pLeftWallMesh = pPlaneModel->GetMeshAt();
+			pLeftWallRenderableCom->SetGeometry(pLeftWallMesh, 0, pLeftWallMesh->GetVertexCount(), 0, pLeftWallMesh->GetIndexCount());
+			//pLeftWallRenderableCom->SetMaterial(pPlaneMaterial);
+			pLeftWall->SetPosition(-80.0f, 80.0f, 0.0f);
+			pLeftWall->SetRotation(0.0f, 0.0f, -90.0f);		
+
+			// right wall object
+			auto pRightWall = pActiveScene->CreateGameObject("Bottom");
+			auto pRightWallRenderableCom = pRightWall->AddComponent<Dive::Renderable>();
+			auto pRightWallMesh = pPlaneModel->GetMeshAt();
+			pRightWallRenderableCom->SetGeometry(pRightWallMesh, 0, pRightWallMesh->GetVertexCount(), 0, pRightWallMesh->GetIndexCount());
+			//pRightWallRenderableCom->SetMaterial(pPlaneMaterial);
+			pRightWall->SetPosition(80.0f, 80.0f, 0.0f);
+			pRightWall->SetRotation(0.0f, 0.0f, 90.0f);
+
 			auto pBallModel = Dive::GetResourceManager()->GetResource<Dive::Model>("../../Assets/Models/material_ball_in_3d-coat/Scene.gltf");
 			pBallModel->GetRootObject()->SetPosition(0.0f, 7.5f, 0.0f);
 					
@@ -467,26 +485,32 @@ namespace Sandbox
 			// PointLights
 			{
 				m_pPointLightA = pActiveScene->CreateGameObject("PointLightA");
-				m_pPointLightA->SetPosition(-60.0f, 20.0f, -60.0f);
+				m_pPointLightA->SetPosition(-60.0f, 25.0f, 30.0f);
 				auto pPointLightCom = new Dive::PointLight();
 				pPointLightCom->SetRange(100.0f);
-				pPointLightCom->SetColor(1.0f, 0.0f, 0.0f);
+				pPointLightCom->SetColor(0.0f, 0.0f, 1.0f);
+				pPointLightCom->SetShadowEnabled(true);
 				m_pPointLightA->AddComponent<Dive::Light>(pPointLightCom);
 				m_pPointLightA->SetActive(false);
 				
 				m_pPointLightB = pActiveScene->CreateGameObject("PointLightB");
-				m_pPointLightB->SetPosition(0.0f, 20.0f, -60.0f);
+				m_pPointLightB->SetPosition(60.0f, 25.0f, 30.0f);
 				pPointLightCom = new Dive::PointLight();
 				pPointLightCom->SetRange(100.0f);
 				pPointLightCom->SetColor(0.0f, 1.0f, 0.0f);
+				pPointLightCom->SetShadowEnabled(true);
 				m_pPointLightB->AddComponent<Dive::Light>(pPointLightCom);
 				m_pPointLightB->SetActive(false);
 
 				m_pPointLightC = pActiveScene->CreateGameObject("PointLightC");
-				m_pPointLightC->SetPosition(60.0f, 20.0f, -60.0f);
+				//m_pPointLightC->SetPosition(60.0f, 50.0f, 60.0f);
+				auto pSphereModel = Dive::GetResourceManager()->GetResource<Dive::Model>("../../Assets/Models/Sphere.obj");
+				m_pPointLightC->SetPosition(pSphereModel->GetRootObject()->GetPosition());
+				m_pPointLightC->SetParent(pSphereModel->GetRootObject());
 				pPointLightCom = new Dive::PointLight();
-				pPointLightCom->SetRange(100.0f);
-				pPointLightCom->SetColor(0.0f, 0.0f, 1.0f);
+				pPointLightCom->SetRange(50.0f);
+				pPointLightCom->SetColor(1.0f, 0.0f, 0.0f);
+				pPointLightCom->SetShadowEnabled(true);
 				m_pPointLightC->AddComponent<Dive::Light>(pPointLightCom);
 				m_pPointLightC->SetActive(false);
 			}
@@ -499,7 +523,7 @@ namespace Sandbox
 				m_pSpotLightA->LookAt(pSphereModel);
 				m_pSpotLightA->SetParent(pBallModel);
 				auto pSpotLightCom = new Dive::SpotLight();
-				pSpotLightCom->SetRange(200.0f);
+				pSpotLightCom->SetRange(150.0f);
 				pSpotLightCom->SetColor(1.0f, 0.0f, 0.0f);
 				pSpotLightCom->SetAngles(20.0f, 30.0f);
 				pSpotLightCom->SetShadowEnabled(true);
@@ -524,8 +548,8 @@ namespace Sandbox
 
 				// green-blue
 				m_pSpotLightC = pActiveScene->CreateGameObject("SpotLightC");
-				m_pSpotLightC->SetPosition(0.0f, 0.0f, -40.0f);
-				m_pSpotLightC->LookAt(0.0f, 40.0f, 80.0f);
+				m_pSpotLightC->SetPosition(50.0f, 0.0f, -40.0f);
+				m_pSpotLightC->LookAt(50.0f, 40.0f, 80.0f);
 				pSpotLightCom = new Dive::SpotLight();
 				pSpotLightCom->SetRange(200.0f);
 				pSpotLightCom->SetColor(0.0f, 1.0f, 1.0f);

@@ -79,7 +79,7 @@ DS_OUTPUT MainDS(HS_CONSTANT_DATA_OUTPUT input, float2 uv : SV_DomainLocation, c
     // 사이즈, 위치, 뷰, 프로젝션 모두 적용
     DS_OUTPUT output;
     matrix lightProjection = mul(World, CameraViewProj);
-    output.position = mul(posLS, lightProjection); //cbLightDomain.lightProjection);
+    output.position = mul(posLS, lightProjection);
 
 	// Store the clip space position
     output.cpPos = output.position.xy / output.position.w;
@@ -89,11 +89,21 @@ DS_OUTPUT MainDS(HS_CONSTANT_DATA_OUTPUT input, float2 uv : SV_DomainLocation, c
 
 cbuffer cbPixel : register(b2)
 {
-    float3 LightColor       : packoffset(c0);
-    float LightRangeRcp     : packoffset(c0.w);
-    float3 LightPos         : packoffset(c1);
-    uint ShadowEnabled      : packoffset(c1.w);
+    float3 LightColor               : packoffset(c0);
+    float LightRangeRcp             : packoffset(c0.w);
+    float3 LightPos                 : packoffset(c1);
+    uint ShadowEnabled              : packoffset(c1.w);
+    float2 LightPerspectiveValues   : packoffset(c2);
 };
+
+float PointShadowPCF(float3 toPixel)
+{
+    float3 toPixelAbs = abs(toPixel);
+    float z = max(toPixelAbs.x, max(toPixelAbs.y, toPixelAbs.z));
+    float depth = (LightPerspectiveValues.x * z + LightPerspectiveValues.y) / z;
+    
+    return PointShadowMap.SampleCmpLevelZero(PcfSampler, toPixel, depth);
+}
 
 float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diffColor)
 {
@@ -110,16 +120,16 @@ float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diffColor)
     toCamera = normalize(toCamera);
     float3 halfWay = normalize(toCamera + toLight);
     float NDotH = saturate(dot(halfWay, normal));
-    finalColor += pow(NDotH, 250.0f) * 0.25f;
+    finalColor += pow(NDotH, 250.0) * 0.25;
     
     // attenuation
-    float distToLightNorm = 1.0f - saturate(distToLight * LightRangeRcp);
+    float distToLightNorm = 1.0 - saturate(distToLight * LightRangeRcp);
     float distAtt = distToLightNorm * distToLightNorm;
     
     // shadow
-    float shadowAtt = 1.0f;
-    //if (cbLightPixel.shadowEnabled)
-    //   shadowAtt = PointShadowPCF(worldPos - cbLightPixel.position);
+    float shadowAtt = 1.0;
+    if (ShadowEnabled == 1)   
+        shadowAtt = PointShadowPCF(worldPos - LightPos);
     
     finalColor *= LightColor * distAtt * shadowAtt;
     
@@ -128,8 +138,8 @@ float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diffColor)
 
 float4 MainPS(DS_OUTPUT input) : SV_TARGET0
 {
-    // Diff LightColor
-    int3 location3 = int3(input.position.xy, 0);
+    // Diff Color
+    int3 location3 = int3(input.position.xy, 0);    // 0은 mipLevel. 즉, 원본에서 색상 추출
     float4 diffColor = DiffuseTex.Load(location3);
     
 	// Linear Depth
@@ -140,16 +150,16 @@ float4 MainPS(DS_OUTPUT input) : SV_TARGET0
     float4 position;
     position.xy = input.cpPos.xy * CameraPerspectiveValue.xy * linearDepth;
     position.z = linearDepth;
-    position.w = 1.0f;
+    position.w = 1.0;
     position.xyz = mul(position, CameraViewInverse).xyz;
     
 	// Normal
     float3 normal;
     normal = NormalTex.Load(location3);
-    normal = normalize(normal * 2.0f - 1.0f);
+    normal = normalize(normal * 2.0 - 1.0);
     
      // 추후 상수버퍼를 통해 그림자 적용 여부를 전달받아야 한다.
     float3 lightColor = CalcuPointLight(position.xyz, normal, diffColor.rgb);
     
-    return float4(lightColor.xyz, 1.0f);
+    return float4(lightColor.xyz, 1.0);
 }

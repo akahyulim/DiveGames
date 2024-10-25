@@ -60,6 +60,8 @@ namespace Dive
 	// 갱신된 데이터로 버퍼를 업데이트하도록 구현해야 한다.
 	void Camera::Update()
 	{
+		return;
+
 		// vs constant buffer
 		{
 			if(!m_pCBufferVS)
@@ -175,5 +177,54 @@ namespace Dive
 	DirectX::XMFLOAT2 Camera::GetRenderTargetSize() const
 	{
 		return m_pRenderTargetTex ? m_pRenderTargetTex->GetSize() : Graphics::GetInstance()->GetResolution();
+	}
+
+	ConstantBuffer* Camera::GetConstantBufferVS()
+	{
+		if (!m_pCBufferVS)
+			m_pCBufferVS = ConstantBuffer::Create("CB_CAMERA_VS", sizeof(CB_CAMERA_VS));
+
+		auto pMappedData = static_cast<CB_CAMERA_VS*>(m_pCBufferVS->Map());
+		{
+			pMappedData->view = DirectX::XMMatrixTranspose(GetViewMatrix());
+			pMappedData->proj = DirectX::XMMatrixTranspose(GetProjectionMatrix());
+		}
+		m_pCBufferVS->Unmap();
+
+		return m_pCBufferVS;
+	}
+	
+	ConstantBuffer* Camera::GetConstantBufferDS()
+	{
+		if (!m_pCBufferDS)
+			m_pCBufferDS = ConstantBuffer::Create("CB_CAMERA_DS", sizeof(CB_CAMERA_DS));
+
+		auto pMappedData = static_cast<CB_CAMERA_DS*>(m_pCBufferDS->Map());
+		{
+			pMappedData->viewProj = DirectX::XMMatrixTranspose(GetViewMatrix() * GetProjectionMatrix());
+		}
+		m_pCBufferDS->Unmap();
+		
+		return m_pCBufferDS;
+	}
+	
+	ConstantBuffer* Camera::GetConstantBufferPS()
+	{
+		if (!m_pCBufferPS)
+			m_pCBufferPS = ConstantBuffer::Create("CB_CAMERA_PS", sizeof(CB_CAMERA_PS));
+
+		auto pMappedData = reinterpret_cast<CB_CAMERA_PS*>(m_pCBufferPS->Map());
+		{
+			DirectX::XMFLOAT4X4 proj;
+			DirectX::XMStoreFloat4x4(&proj, GetProjectionMatrix());
+			pMappedData->perspectiveValue.x = 1.0f / proj._11;
+			pMappedData->perspectiveValue.y = 1.0f / proj._22;
+			pMappedData->perspectiveValue.z = proj._43;
+			pMappedData->perspectiveValue.w = -proj._33;
+			pMappedData->viewInverse = DirectX::XMMatrixTranspose(m_pGameObject->GetMatrix());
+		}
+		m_pCBufferPS->Unmap();
+
+		return m_pCBufferPS;
 	}
 }

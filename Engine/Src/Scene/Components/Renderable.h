@@ -22,8 +22,8 @@ namespace Dive
 
 		void Update() override;
 
-		ConstantBuffer* GetConstantBufferVS() override { return m_pCBufferVS; }
-		ConstantBuffer* GetConstantBufferPS() override { return m_pCBufferPS; }
+		ConstantBuffer* GetConstantBufferVS() override;// { return m_pCBufferVS; }
+		ConstantBuffer* GetConstantBufferPS() override;// { return m_pCBufferPS; }
 
 		void SetGeometry(Mesh* pMesh, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount);
 

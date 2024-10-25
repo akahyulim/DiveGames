@@ -53,6 +53,17 @@ namespace Dive
 
 	void Renderable::Update()
 	{
+		// 이 부분을 건너띄면 안그려지는 것이 생긴다.
+		// 아마도 Material로 확인하는 코드 때문인 것 같다.
+		if (!m_pMaterial)
+		{
+			m_pMaterial = new Material();
+			m_pMaterial->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+			//return;
+		}
+
+		return;
+
 		// vs constant buffer
 		{
 			if (!m_pCBufferVS)
@@ -83,6 +94,45 @@ namespace Dive
 			pMappedData->properties |= m_pMaterial->HasTexture(eTextureUnitType::Normal) ? (1U << 1) : 0;
 			m_pCBufferPS->Unmap();
 		}
+	}
+	
+	ConstantBuffer* Renderable::GetConstantBufferVS()
+	{
+		if (!m_pCBufferVS)
+			m_pCBufferVS = ConstantBuffer::Create("CB_OBJECT_VS", sizeof(CB_OBJECT_VS));
+
+		auto pMappedData = reinterpret_cast<CB_OBJECT_VS*>(m_pCBufferVS->Map());
+		{
+			pMappedData->world = DirectX::XMMatrixTranspose(m_pGameObject->GetMatrix());
+		}
+		m_pCBufferVS->Unmap();
+
+		return m_pCBufferVS;
+	}
+
+	ConstantBuffer* Renderable::GetConstantBufferPS()
+	{
+		if(!m_pCBufferPS)
+			m_pCBufferPS = ConstantBuffer::Create("CB_MATERIAL_PS", sizeof(CB_MATERIAL_PS));
+
+		// 없다면 초기화된 값을 전달해야 한다.
+		if (!m_pMaterial)
+		{
+			m_pMaterial = new Material();
+			m_pMaterial->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+			//return;
+		}
+
+		auto pMappedData = reinterpret_cast<CB_MATERIAL_PS*>(m_pCBufferPS->Map());
+		{
+			pMappedData->diffuse = m_pMaterial->GetDiffuseColor();
+			pMappedData->properties = 0;
+			pMappedData->properties |= m_pMaterial->HasTexture(eTextureUnitType::Diffuse) ? (1U << 0) : 0;
+			pMappedData->properties |= m_pMaterial->HasTexture(eTextureUnitType::Normal) ? (1U << 1) : 0;
+		}
+		m_pCBufferPS->Unmap();
+		
+		return m_pCBufferPS;
 	}
 	
 	// 렌더러블이 그릴 메시의 정보를 받는 메서드다.

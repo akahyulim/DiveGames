@@ -62,8 +62,6 @@ namespace Dive
 		ViewScreen* GetViewScreen(uint32_t index);
 		void SetViewScreen(uint32_t index, ViewScreen* pViewScreen);
 
-		ID3D11SamplerState* GetSampler(eSamplerType type) const { return m_Samplers[static_cast<uint8_t>(type)]; }
-
 		bool IsInitialized() const { return m_bInitialized; }
 
 	private:
@@ -71,7 +69,6 @@ namespace Dive
 		~Renderer();
 
 		bool createRenderTextures();
-		bool createSamplers();
 
 	private:
 		static Renderer* s_pInstance;
@@ -81,8 +78,6 @@ namespace Dive
 		std::vector<ViewScreen*> m_ViewScreens;	// 유니티의 레이어와는 다르다. 착각하지 말자.
 
 		std::array<RenderTexture*, static_cast<uint8_t>(eRenderTargetType::Count)> m_RenderTargets;
-		
-		std::array<ID3D11SamplerState*, static_cast<uint8_t>(eSamplerType::Count)> m_Samplers;
 
 		bool m_bInitialized;
 	};

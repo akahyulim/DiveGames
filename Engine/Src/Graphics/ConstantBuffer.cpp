@@ -30,8 +30,6 @@ namespace Dive
 		desc.ByteWidth = m_Stride;
 		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		desc.MiscFlags = 0;
-		desc.StructureByteStride = 0;
 
 		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateBuffer(&desc, nullptr, &m_pBuffer)))
 		{

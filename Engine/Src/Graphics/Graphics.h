@@ -25,6 +25,7 @@ namespace Dive
 		ShadowGen,
 		CascadedShadowGen,
 		NoDepthClipFront,
+		WireFrame,
 		Count
 	};
 
@@ -73,6 +74,7 @@ namespace Dive
 	enum class eSamplerType : uint8_t
 	{
 		Linear = 0,
+		Point,
 		Pcf,
 		Count
 	};
@@ -88,7 +90,8 @@ namespace Dive
 		GBuffer_Normal,
 		GBuffer_Specular,
 		SpotShadowMap,
-		CascadeShadowMap,
+		CascadeShadowMap,	// DirectionalShaodwMap으로 변경하기
+		PointShadowMap,
 		Count
 	};
 
@@ -102,12 +105,13 @@ namespace Dive
 	enum class eVertexShaderType : uint8_t
 	{
 		Null = 0,
-		LightDepth,
-		DirLightDepth,
+		SpotLightDepth,
+		PointLightDepth,
+		DirectionalLightDepth,
 		ForwardLight,
 		GBuffer,
 		DeferredLight,
-		DeferredDirLight,
+		DeferredDirectionalLight,
 		DeferredPointLight,
 		DeferredSpotLight,
 		Count
@@ -133,6 +137,7 @@ namespace Dive
 	{
 		Null = 0,
 		CascadeShadowMaps,
+		CubeShadowMap,
 		Count
 	};
 
@@ -142,9 +147,10 @@ namespace Dive
 		ForwardLight,
 		GBuffer,
 		DeferredLight,
-		DeferredDirLight,
+		DeferredDirectionalLight,
 		DeferredPointLight,
 		DeferredSpotLight,
+		DebugLight,
 		Count
 	};
 
@@ -318,8 +324,7 @@ namespace Dive
 		void BindPSResource(Texture* pTexture, eTextureUnitType unit);
 		void BindPSResource(Texture2D* pTexture, eTextureUnitType unit);
 		//void BindPSResource(Texture2DArray* pTextureArray, eTextureUnitType unit);
-		void BindPSSampler(ID3D11SamplerState* pState, uint8_t index);
-		void BindPSSampler(uint8_t index, ID3D11SamplerState* pSampler);
+		void BindPSSampler(eSamplerType type);
 
 		void SetBoundResources();
 
@@ -368,6 +373,7 @@ namespace Dive
 		bool createDepthStencilStates();
 		bool createRasterizerStates();
 		bool createBlendStates();
+		bool createSamplerStates();
 
 		bool createShaders();
 
@@ -407,6 +413,8 @@ namespace Dive
 		
 		ID3D11BlendState* m_BlendStates[static_cast<uint8_t>(eBlendStateType::Count)];
 		eBlendStateType m_BlendStateType;
+
+		std::array<ID3D11SamplerState*, static_cast<uint8_t>(eSamplerType::Count)> m_Samplers;
 
 		D3D11_VIEWPORT m_Viewport;
 

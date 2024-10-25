@@ -14,7 +14,9 @@ Texture2D<float4> SpecularTex : register(t6);
 // shadow
 Texture2D<float> SpotShadowMap : register(t7);
 Texture2DArray<float> CascadeShadowMap : register(t8);
+TextureCube<float> PointShadowMap : register(t9);
 
 // samplers
-SamplerState BaseSampler : register(s0);
-SamplerComparisonState PcfSampler : register(s1);
+SamplerState LinearSampler : register(s0);
+SamplerState PointSampler : register(s1);
+SamplerComparisonState PcfSampler : register(s2);

@@ -144,14 +144,14 @@ float4 MainPS(VS_OUTPUT input) : SV_TARGET
     }
     else
     {
-        diffColor = DiffuseMap.Sample(BaseSampler, input.tex);
+        diffColor = DiffuseMap.Sample(LinearSampler, input.tex);
         //diffColor = float4(diffColor.rgb * diffColor.rgb, diffColor.a);
     }
 
     float3 normal = input.normal;
     if (HasNormalTexture())
     {
-        float4 bumpMap = NormalMap.Sample(BaseSampler, input.tex);
+        float4 bumpMap = NormalMap.Sample(LinearSampler, input.tex);
         bumpMap = (bumpMap * 2.0f) - 1.0f;
 
         normal = normalize((bumpMap.x * input.tangent) + (bumpMap.y * input.bitangent) + (bumpMap.z * input.normal));

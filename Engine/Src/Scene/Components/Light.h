@@ -110,7 +110,11 @@ namespace Dive
 
 		void Update() override;
 
-		ConstantBuffer* GetConstantBufferGS() override { return m_pCBufferGS; }
+		// 테스트
+		ConstantBuffer* GetConstantBufferVS() override;
+		ConstantBuffer* GetConstantBufferDS() override;// { return m_pCBufferDS; }
+		ConstantBuffer* GetConstantBufferGS() override;// { return m_pCBufferGS; }
+		ConstantBuffer* GetConstantBufferPS() override;
 
 	private:
 		CascadedMatrixSet m_CascadedMatrixSet;
@@ -129,13 +133,17 @@ namespace Dive
 
 		void Update() override;
 
-		ConstantBuffer* GetConstantBufferDS() override { return m_pCBufferDS; }
+		// 테스트용
+		ConstantBuffer* GetConstantBufferDS() override;// { return m_pCBufferDS; }
+		ConstantBuffer* GetConstantBufferGS() override;// { return m_pCBufferGS; }
+		ConstantBuffer* GetConstantBufferPS() override;
 
 		float GetRange() const { return m_Range; }
 		void SetRange(float range) { m_Range = range; }
 
 	private:
 		ConstantBuffer* m_pCBufferDS;
+		ConstantBuffer* m_pCBufferGS;
 
 		float m_Range;
 	};

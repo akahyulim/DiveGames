@@ -13,6 +13,8 @@ using namespace DirectX;
 
 namespace Dive
 {
+	const static float s_NearPlane = 5.0f;
+
 	Light::Light(GameObject* pGameObject, eLightType type)
 		: Component(pGameObject)
 		, m_Type(type)
@@ -238,7 +240,9 @@ namespace Dive
 	{
 		m_CascadedMatrixSet.Update(m_pGameObject->GetForwardVector());
 	
-		// ds constant buffer
+		return;
+
+		// gs constant buffer
 		{
 			if (!m_pCBufferGS)
 				m_pCBufferGS = ConstantBuffer::Create("CB_DIRECTIONAL_GS", sizeof(CB_DIRECTIONAL_GS));
@@ -246,8 +250,8 @@ namespace Dive
 			auto pMappedData = reinterpret_cast<CB_DIRECTIONAL_GS*>(m_pCBufferGS->Map());
 			for (uint32_t i = 0; i != 3; i++)
 			{
-				XMStoreFloat4x4(&pMappedData->cascadeViewProj[i], XMMatrixTranspose(//XMMatrixIdentity()));
-					m_CascadedMatrixSet.GetWorldToCascadeProj(i)));
+				XMStoreFloat4x4(&pMappedData->cascadeViewProj[i], 
+					XMMatrixTranspose(m_CascadedMatrixSet.GetWorldToCascadeProj(i)));
 			}
 			m_pCBufferGS->Unmap();
 		}
@@ -258,7 +262,7 @@ namespace Dive
 				m_pCBufferPS = ConstantBuffer::Create("CB_DIRECTIONAL_PS", sizeof(CB_DIRECTIONAL_PS));
 
 			auto pMappedData = reinterpret_cast<CB_DIRECTIONAL_PS*>(m_pCBufferPS->Map());
-			//ZeroMemory(pMappedData, sizeof(CB_DIRECTIONAL_PS));
+			
 			pMappedData->lightColor = m_Color;
 			XMStoreFloat3(&pMappedData->dirToLight, XMVectorNegate(m_pGameObject->GetForwardVector()));
 			pMappedData->shadowEnabled = m_bShadowEnabled ? 1 : 0;
@@ -266,14 +270,66 @@ namespace Dive
 			XMStoreFloat4(&pMappedData->toCascadeOffsetX, m_CascadedMatrixSet.GetToCascadeOffsetX());
 			XMStoreFloat4(&pMappedData->toCascadeOffsetY, m_CascadedMatrixSet.GetToCascadeOffsetY());
 			XMStoreFloat4(&pMappedData->toCascadeScale, m_CascadedMatrixSet.GetToCascadeScale());
+			
 			m_pCBufferPS->Unmap();
 		}
+	}
+
+	ConstantBuffer* DirectionalLight::GetConstantBufferVS()
+	{
+		return nullptr;
+	}
+
+	ConstantBuffer* DirectionalLight::GetConstantBufferDS()
+	{
+		return nullptr;
+	}
+
+	ConstantBuffer* DirectionalLight::GetConstantBufferGS()
+	{
+		if (!m_pCBufferGS)
+			m_pCBufferGS = ConstantBuffer::Create("CB_DIRECTIONAL_GS", sizeof(CB_DIRECTIONAL_GS));
+
+		auto pMappedData = reinterpret_cast<CB_DIRECTIONAL_GS*>(m_pCBufferGS->Map());
+		for (uint32_t i = 0; i != 3; i++)
+		{
+			XMStoreFloat4x4(&pMappedData->cascadeViewProj[i],
+				XMMatrixTranspose(m_CascadedMatrixSet.GetWorldToCascadeProj(i)));
+		}
+		m_pCBufferGS->Unmap();
+
+		return m_pCBufferGS;
+	}
+
+	ConstantBuffer* DirectionalLight::GetConstantBufferPS()
+	{
+		if (!m_pCBufferPS)
+			m_pCBufferPS = ConstantBuffer::Create("CB_DIRECTIONAL_PS", sizeof(CB_DIRECTIONAL_PS));
+
+		auto pMappedData = reinterpret_cast<CB_DIRECTIONAL_PS*>(m_pCBufferPS->Map());
+		{
+			pMappedData->lightColor = m_Color;
+			XMStoreFloat3(&pMappedData->dirToLight, XMVectorNegate(m_pGameObject->GetForwardVector()));
+			pMappedData->shadowEnabled = m_bShadowEnabled ? 1 : 0;
+			XMStoreFloat4x4(&pMappedData->toShadowSpace, XMMatrixTranspose(m_CascadedMatrixSet.GetWorldToShadowSpace()));
+			XMStoreFloat4(&pMappedData->toCascadeOffsetX, m_CascadedMatrixSet.GetToCascadeOffsetX());
+			XMStoreFloat4(&pMappedData->toCascadeOffsetY, m_CascadedMatrixSet.GetToCascadeOffsetY());
+			XMStoreFloat4(&pMappedData->toCascadeScale, m_CascadedMatrixSet.GetToCascadeScale());
+		}
+		m_pCBufferPS->Unmap();
+
+		return m_pCBufferPS;
 	}
 
 #pragma pack(push, 1)
 	struct CB_POINT_DS
 	{
 		XMFLOAT4X4 world;
+	};
+
+	struct CB_POINT_GS
+	{
+		XMFLOAT4X4 cubeViewProj[6];
 	};
 
 	struct CB_POINT_PS
@@ -283,60 +339,123 @@ namespace Dive
 
 		XMFLOAT3 lightPos;
 		uint32_t shadowEnabled;
+
+		XMFLOAT2 lightPerspectiveValues;
+		float padding[2];
 	};
 #pragma pack(pop)
 
 	PointLight::PointLight()
 		: Light(nullptr, eLightType::Point)
 		, m_pCBufferDS(nullptr)
+		, m_pCBufferGS(nullptr)
 		, m_Range(0.0f)
 	{
-		m_ShadowMapSize = 1024;
+		m_ShadowMapSize = 1024.0f;
 		m_pShadowMap = static_cast<Texture*>(new Cubemap(1024, 32));
 	}
 
 	PointLight::PointLight(GameObject* pGameObject)
 		: Light(pGameObject, eLightType::Point)
 		, m_pCBufferDS(nullptr)
+		, m_pCBufferGS(nullptr)
 		, m_Range(0.0f)
 	{
-		m_ShadowMapSize = 1024;
+		m_ShadowMapSize = 1024.0f;
 		m_pShadowMap = static_cast<Texture*>(new Cubemap(1024, 32));
 	}
 
 	PointLight::~PointLight()
 	{
+		DV_DELETE(m_pCBufferGS);
 		DV_DELETE(m_pCBufferDS);
 	}
 
 	void PointLight::Update()
 	{
-		// ds constant buffer
+		return;
+	}
+	
+	ConstantBuffer* PointLight::GetConstantBufferDS()
+	{
+		if (!m_pCBufferDS)
+			m_pCBufferDS = ConstantBuffer::Create("CB_POINT_DS", sizeof(CB_POINT_DS));
+
+		auto scale = XMMatrixScaling(m_Range, m_Range, m_Range);
+		auto trans = XMMatrixTranslationFromVector(m_pGameObject->GetPositionVector());
+
+		auto pMappedData = reinterpret_cast<CB_POINT_DS*>(m_pCBufferDS->Map());
 		{
-
-			if(!m_pCBufferDS)
-				m_pCBufferDS = ConstantBuffer::Create("CB_POINT_DS", sizeof(CB_POINT_DS));
-			
-			auto scale = XMMatrixScaling(m_Range, m_Range, m_Range);
-			auto trans = XMMatrixTranslation(m_pGameObject->GetPosition().x, m_pGameObject->GetPosition().y, m_pGameObject->GetPosition().z);
-
-			auto pMappedData = reinterpret_cast<CB_POINT_DS*>(m_pCBufferDS->Map());
 			XMStoreFloat4x4(&pMappedData->world, XMMatrixTranspose(scale * trans));
-			m_pCBufferDS->Unmap();
 		}
+		m_pCBufferDS->Unmap();
 
-		// ps constant buffer
+		return m_pCBufferDS;
+	}
+
+	// 이 값은 월드변환된 오브젝트를 큐브맵을 이루는 6개의 각 면으로 변환하기 위한 뷰, 프로젝션 행렬이다.
+	ConstantBuffer* PointLight::GetConstantBufferGS()
+	{
+		if (!m_pCBufferGS)
+			m_pCBufferGS = ConstantBuffer::Create("CB_POINT_GS", sizeof(CB_POINT_GS));
+
+		auto center = XMMatrixTranslationFromVector(XMVectorNegate(m_pGameObject->GetPositionVector()));
+		auto proj = XMMatrixPerspectiveFovLH(XM_PIDIV2, 1.0f, s_NearPlane, m_Range);
+
+		auto pMappedData = reinterpret_cast<CB_POINT_GS*>(m_pCBufferGS->Map());
 		{
-			if(!m_pCBufferPS)
-				m_pCBufferPS = ConstantBuffer::Create("CB_POINT_PS", sizeof(CB_POINT_PS));
+			// Cube +X
+			XMMATRIX view =  center * XMMatrixRotationY(-XM_PIDIV2);
+			XMStoreFloat4x4(&pMappedData->cubeViewProj[0], XMMatrixTranspose(view * proj));
 
-			auto pMappedData = reinterpret_cast<CB_POINT_PS*>(m_pCBufferPS->Map());
+			// Cube -X
+			view = center * XMMatrixRotationY(XM_PIDIV2);
+			XMStoreFloat4x4(&pMappedData->cubeViewProj[1], XMMatrixTranspose(view * proj));
+
+			// Cube +Y
+			view = center * XMMatrixRotationX(XM_PIDIV2);
+			XMStoreFloat4x4(&pMappedData->cubeViewProj[2], XMMatrixTranspose(view * proj));
+
+			// Cube -Y
+			view = center * XMMatrixRotationX(-XM_PIDIV2);
+			XMStoreFloat4x4(&pMappedData->cubeViewProj[3], XMMatrixTranspose(view * proj));
+
+			// Cube +Z
+			view = center;
+			XMStoreFloat4x4(&pMappedData->cubeViewProj[4], XMMatrixTranspose(view * proj));
+
+			// Cube -Z
+			view = center * XMMatrixRotationY(XM_PI);
+			XMStoreFloat4x4(&pMappedData->cubeViewProj[5], XMMatrixTranspose(view * proj));
+		}
+		m_pCBufferGS->Unmap();
+
+		return m_pCBufferGS;;
+	}
+
+	ConstantBuffer* PointLight::GetConstantBufferPS()
+	{
+		if (!m_pCBufferPS)
+			m_pCBufferPS = ConstantBuffer::Create("CB_POINT_PS", sizeof(CB_POINT_PS));
+
+		auto pMappedData = reinterpret_cast<CB_POINT_PS*>(m_pCBufferPS->Map());
+		{
 			pMappedData->lightColor = m_Color;
 			pMappedData->lightRangeRcp = 1 / m_Range;
 			pMappedData->lightPos = m_pGameObject->GetPosition();
 			pMappedData->shadowEnabled = m_bShadowEnabled ? 1 : 0;
-			m_pCBufferPS->Unmap();
+
+			if (m_bShadowEnabled)
+			{
+				auto proj = XMMatrixPerspectiveFovLH(XM_PIDIV2, 1.0f, s_NearPlane, m_Range);
+				XMFLOAT4X4 projFloat4x4;
+				XMStoreFloat4x4(&projFloat4x4, proj);
+				pMappedData->lightPerspectiveValues = { projFloat4x4._33, projFloat4x4._43 };
+			}
 		}
+		m_pCBufferPS->Unmap();
+
+		return m_pCBufferPS;
 	}
 
 #pragma pack(push, 1)
@@ -469,7 +588,7 @@ namespace Dive
 		auto proj = XMMatrixPerspectiveFovLH(
 			2.0f * XMConvertToRadians(m_OuterAngle),
 			1.0f,			// 가로, 세로 비율이라 1인듯 하다.
-			5.0f,			// 책에서도 상수를 멤버 변수로 관리했다. ShadowGen Rasterizer State와 관련이 있나? => 아닌듯?
+			s_NearPlane,			// 책에서도 상수를 멤버 변수로 관리했다. ShadowGen Rasterizer State와 관련이 있나? => 아닌듯?
 			m_Range
 		);	
 
