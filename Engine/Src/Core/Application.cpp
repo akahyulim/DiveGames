@@ -20,9 +20,7 @@ namespace Dive
 	{
 		OnSetup();
 
-		// 구조체가 가장 어울린다.
-		// 파일을 로드하거나 OnSet()에서 설정 가능해야 하므로
-		// 멤버 변수여야 한다.
+		// 구조체 뿐만 아니라 다양한 조합을 지원하도록 오버로딩해야 한다.
 		if (!m_pEngine->Initialize(m_WindowWidth, m_WindowHeight, m_bFullscreen))
 		{
 			DV_CRITICAL("엔진 초기화에 실패하여 프로그램을 종료합니다.");

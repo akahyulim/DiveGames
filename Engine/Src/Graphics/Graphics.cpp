@@ -196,13 +196,13 @@ namespace Dive
 		RECT rt = { 0, 0, (LONG)width, (LONG)height };
 		::AdjustWindowRect(&rt, style, FALSE);
 
-		width = rt.right - rt.left;
-		height = rt.bottom - rt.top;
+		int clientWidth = rt.right - rt.left;
+		int clientHeight = rt.bottom - rt.top;
 
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
+		int posX = (GetSystemMetrics(SM_CXSCREEN) - clientWidth) / 2;
+		int posY = (GetSystemMetrics(SM_CYSCREEN) - clientHeight) / 2;
 
-		::SetWindowPos(m_hWnd, NULL, posX, posY, width, height, SWP_DRAWFRAME);
+		::SetWindowPos(m_hWnd, NULL, posX, posY, clientWidth, clientHeight, SWP_DRAWFRAME);
 
 		::GetWindowRect(m_hWnd, &rt);
 		DV_ENGINE_INFO("WindowRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
@@ -735,15 +735,16 @@ namespace Dive
 
 		DWORD style = borderless ? WS_POPUP : WS_OVERLAPPEDWINDOW;
 
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - width) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - height) / 2;
+		int posX = (GetSystemMetrics(SM_CXSCREEN) - static_cast<int>(width)) / 2;
+		int posY = (GetSystemMetrics(SM_CYSCREEN) - static_cast<int>(height)) / 2;
 
 		m_hWnd = CreateWindowEx(
 			WS_EX_APPWINDOW,
 			DV_WINCLASS_NAME,
 			m_WindowTitle.c_str(),
 			style,
-			posX, posY,
+			posX > 0 ? posX : 0, 
+			posY > 0 ? posY : 0,
 			width, height,
 			NULL, NULL,
 			m_hInstance,

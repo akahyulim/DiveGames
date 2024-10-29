@@ -98,7 +98,7 @@ namespace Dive
 
 		FIRE_EVENT(PostUpdateEvent());
 	}
-	
+	// Update와 Render는 확장성을 고려해 앱에서 직접 호출하도록 만드는 편이 나을 것 같다.
 	void Engine::OnRender()
 	{
 		Graphics::GetInstance()->BeginFrame();

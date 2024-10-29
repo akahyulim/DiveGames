@@ -5,10 +5,10 @@ DEFINE_APPLICATION_MAIN(Sandbox::Sandbox)
 namespace Sandbox
 {
 	Sandbox::Sandbox()
-		: Dive::Application()
-		, m_pGraphics(nullptr)
+		: m_pGraphics(nullptr)
 		, m_pInput(nullptr)
 		, m_pMainCam(nullptr)
+		, m_CamDefaultPos(0.0f, 10.0f, -10.0f)
 		, m_pDummy(nullptr)
 		, m_pCube(nullptr)
 		, m_pTriangle(nullptr)
