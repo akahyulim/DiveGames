@@ -279,6 +279,8 @@ namespace Dive
 		bool Initialize(uint32_t width, uint32_t height, bool fullScreen, bool borderless);
 		void Shutdown();
 
+		bool CreateAppWindow(uint32_t width, uint32_t height, bool borderless = false);
+
 		bool RunWindow();
 
 		LRESULT CALLBACK MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

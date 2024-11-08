@@ -3,6 +3,7 @@
 
 // Core
 #include "Core/CoreDefs.h"
+#include "Core/Window.h"
 #include "Core/Object.h"
 #include "Core/EventHandler.h"
 #include "Core/CoreEvents.h"

@@ -8,6 +8,35 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+bool LightViewer::Initialize()
+{
+	Dive::Log::GetInstance()->Initialize(spdlog::level::trace);
+
+	Dive::Window* pAppWindow = new Dive::Window();
+	pAppWindow->Create(1600, 900, true);
+	Dive::DvEngine::SetAppWindow(pAppWindow);
+	::ShowWindow(pAppWindow->GetHandle(), SW_SHOW);
+
+	RECT rt;
+	::GetClientRect(pAppWindow->GetHandle(),  & rt);
+	DV_INFO("Window Client Rect Size : {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+
+	return true;
+}
+
+bool LightViewer::Run()
+{
+	MSG msg{};
+	if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	{
+		::TranslateMessage(&msg);
+		::DispatchMessageW(&msg);
+	}
+
+	return msg.message != WM_QUIT;
+}
+
+/*
 DEFINE_APPLICATION_MAIN(LightViewer)
 
 LightViewer::LightViewer()
@@ -136,3 +165,4 @@ void LightViewer::initializeImGui()
 	io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothic.ttf", fontSize);
 	io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothicBold.ttf", fontSize);
 }
+*/

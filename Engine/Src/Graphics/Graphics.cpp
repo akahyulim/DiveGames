@@ -153,15 +153,67 @@ namespace Dive
 		DV_ENGINE_TRACE("그래픽스 시스템 셧다운에 성공하였습니다.");
 	}
 
+	bool Graphics::CreateAppWindow(uint32_t width, uint32_t height, bool borderless)
+	{
+		m_hInstance = ::GetModuleHandle(NULL);
+
+		WNDCLASSEX wc{};
+		wc.style = 0;
+		wc.hInstance = m_hInstance;
+		wc.lpfnWndProc = WndProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+		wc.hIconSm = wc.hIcon;
+		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = DV_WINCLASS_NAME;
+		wc.cbSize = sizeof(WNDCLASSEX);
+
+		if (!::RegisterClassEx(&wc))
+		{
+			DV_ENGINE_ERROR("윈도우클래스 등록에 실패하였습니다.");
+			return false;
+		}
+
+		DWORD style = borderless ? WS_POPUP : WS_OVERLAPPEDWINDOW;
+
+		int posX = (::GetSystemMetrics(SM_CXSCREEN) - static_cast<int>(width)) / 2;
+		int posY = (::GetSystemMetrics(SM_CYSCREEN) - static_cast<int>(height)) / 2;
+
+		m_hWnd = ::CreateWindowEx(
+			WS_EX_APPWINDOW,
+			DV_WINCLASS_NAME,
+			m_WindowTitle.c_str(),
+			style,
+			posX > 0 ? posX : 0,
+			posY > 0 ? posY : 0,
+			width, height,
+			NULL, NULL,
+			m_hInstance,
+			NULL);
+
+		if (!m_hWnd)
+		{
+			DV_ENGINE_ERROR("윈도우 생성에 실패하였습니다.");
+			return false;
+		}
+
+		::SetForegroundWindow(m_hWnd);
+
+		return true;
+	}
+
 	bool Graphics::RunWindow()
 	{
-		DV_ENGINE_ASSERT(IsInitialized());
+		//DV_ENGINE_ASSERT(IsInitialized());
 
 		MSG msg{};
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
-			TranslateMessage(&msg);
-			DispatchMessageW(&msg);
+			::TranslateMessage(&msg);
+			::DispatchMessageW(&msg);
 		}
 
 		return msg.message != WM_QUIT;
@@ -199,8 +251,8 @@ namespace Dive
 		int clientWidth = rt.right - rt.left;
 		int clientHeight = rt.bottom - rt.top;
 
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - clientWidth) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - clientHeight) / 2;
+		int posX = (::GetSystemMetrics(SM_CXSCREEN) - clientWidth) / 2;
+		int posY = (::GetSystemMetrics(SM_CYSCREEN) - clientHeight) / 2;
 
 		::SetWindowPos(m_hWnd, NULL, posX, posY, clientWidth, clientHeight, SWP_DRAWFRAME);
 
@@ -209,7 +261,7 @@ namespace Dive
 		::GetClientRect(m_hWnd, &rt);
 		DV_ENGINE_INFO("ClientRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 
-		ShowWindow(m_hWnd, SW_SHOW);
+		::ShowWindow(m_hWnd, SW_SHOW);
 	}
 
 	bool Graphics::IsInitialized()
@@ -241,7 +293,7 @@ namespace Dive
 		}
 
 		RECT rt{};
-		GetClientRect(m_hWnd, &rt);
+		::GetClientRect(m_hWnd, &rt);
 		DV_ENGINE_INFO("ClientRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 	}
 

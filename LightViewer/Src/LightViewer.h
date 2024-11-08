@@ -1,6 +1,17 @@
 #pragma once
 #include "Dive.h"
 
+class LightViewer
+{
+public:
+
+	bool Initialize();
+	bool Run();
+
+private:
+};
+
+/*
 class LightViewer : public Dive::Application
 {
 public:
@@ -23,3 +34,4 @@ private:
 	Dive::GameObject* m_pMainCam;
 	DirectX::XMFLOAT3 m_CamDefaultPos;
 };
+*/

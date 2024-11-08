@@ -39,6 +39,9 @@
     <ClCompile Include="..\External\include\imgui-docking\imgui_widgets.cpp">
       <Filter>External\ImGui-Docking</Filter>
     </ClCompile>
+    <ClCompile Include="Src\main.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\LightViewer.h">

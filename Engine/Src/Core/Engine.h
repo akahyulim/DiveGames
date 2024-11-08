@@ -2,6 +2,25 @@
 
 namespace Dive
 {
+	class Window;
+
+	class DvEngine
+	{
+	public:
+
+		//static bool Initialize();
+		//static void Release();
+
+		static Window* GetAppWindow();
+		static void SetAppWindow(Window* pWindow);
+
+		static LRESULT MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+	private:
+	private:
+		static Window* m_pAppWindow;
+	};
+
 	class Engine
 	{
 	public:

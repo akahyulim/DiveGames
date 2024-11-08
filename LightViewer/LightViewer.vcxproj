@@ -144,6 +144,7 @@
     <ClCompile Include="..\External\include\imgui-docking\imgui_tables.cpp" />
     <ClCompile Include="..\External\include\imgui-docking\imgui_widgets.cpp" />
     <ClCompile Include="Src\LightViewer.cpp" />
+    <ClCompile Include="Src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\External\include\imgui-docking\imconfig.h" />

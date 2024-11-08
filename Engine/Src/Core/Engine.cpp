@@ -1,6 +1,7 @@
 #include "divepch.h"
 #include "Engine.h"
 #include "CoreDefs.h"
+#include "Window.h"
 #include "CoreEvents.h"
 #include "Graphics/Graphics.h"
 #include "Renderer/Renderer.h"
@@ -10,6 +11,30 @@
 
 namespace Dive
 {
+	Window* DvEngine::m_pAppWindow = nullptr;
+
+	Window* DvEngine::GetAppWindow()
+	{
+		return m_pAppWindow;
+	}
+
+	void DvEngine::SetAppWindow(Window* pWindow)
+	{
+		m_pAppWindow = pWindow;
+	}
+	
+	LRESULT DvEngine::MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		switch (msg)
+		{
+		case WM_SIZE:
+			//if (IsInitialized())
+			//	updateSwapChain(0, 0);
+			return 0;
+		}
+		return ::DefWindowProc(hWnd, msg, wParam, lParam);
+	}
+
 	Engine* Engine::s_pInstance = nullptr;
 
 	Engine::Engine()
