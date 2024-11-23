@@ -33,7 +33,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateBuffer(&desc, nullptr, &m_pBuffer)))
 		{
-			DV_ENGINE_ERROR("ConstantBuffer({:s}) 생성에 실패하였습니다.", GetName());
+			DV_LOG(ConstantBuffer, err, "ConstantBuffer({:s}) 생성에 실패하였습니다.", GetName());
 			return false;
 		}
 
@@ -47,7 +47,7 @@ namespace Dive
 
 	void* ConstantBuffer::Map()
 	{
-		DV_ENGINE_ASSERT(m_pBuffer);
+		DV_ASSERT(ConstantBuffer, m_pBuffer);
 
 		D3D11_MAPPED_SUBRESOURCE mappedData;
 		if (FAILED(Graphics::GetInstance()->GetDeviceContext()->Map(
@@ -57,7 +57,7 @@ namespace Dive
 			0,
 			&mappedData)))
 		{
-			DV_ENGINE_ERROR("ConstantBuffer({:s})의 Map에 실패하였습니다.", GetName());
+			DV_LOG(ConstantBuffer, err, "ConstantBuffer({:s})의 Map에 실패하였습니다.", GetName());
 			return nullptr;
 		}
 

@@ -5,7 +5,7 @@
 #include "Graphics/Texture2DArray.h"
 #include "Graphics/Cubemap.h"
 #include "Graphics/ConstantBuffer.h"
-#include "Scene/GameObject.h"
+#include "World/GameObject.h"
 #include "Camera.h"
 #include "Graphics/Graphics.h"
 

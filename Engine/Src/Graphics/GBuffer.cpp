@@ -22,7 +22,7 @@ namespace Dive
 
 	bool GBuffer::Initialize(uint32_t width, uint32_t height)
 	{
-		DV_ENGINE_ASSERT(width != 0 && height != 0);
+		DV_ASSERT(GBuffer, width != 0 && height != 0);
 
 		Release();
 

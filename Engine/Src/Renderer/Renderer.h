@@ -31,6 +31,42 @@ namespace Dive
 	class ConstantBuffer;
 	class Shader;
 
+	class DvRenderer
+	{
+	public:
+		static bool Initialize();
+		static void Shutdown();
+
+		static ID3D11RenderTargetView* GetScreenBufferView() { return s_pScreenRenderTargetView; }
+		static ID3D11DepthStencilView* GetScreenDepthStencilView() { return s_pScreenDepthStencilView; }
+
+		static ID3D11Device* GetDevice() { return s_pDevice; }
+		static ID3D11DeviceContext* GetDeviceContext() { return s_pDeviceContext; }
+
+		static const DirectX::XMFLOAT2& GetRenderTargetSize() { return s_RenerTargetSize; }
+		static void SetRenderTargetSize(uint32_t width, uint32_t height);
+
+		static const DirectX::XMFLOAT2& GetScreenSize() { return s_ScreenSize; }
+		static void ChangeScreenSize(uint32_t width, uint32_t height);
+
+	private:
+		static bool createRenderTargets();
+		static bool updateScreenViews();
+
+	private:
+		static IDXGISwapChain* s_pSwapChain;
+		static ID3D11Device* s_pDevice;
+		static ID3D11DeviceContext* s_pDeviceContext;
+		static ID3D11RenderTargetView* s_pScreenRenderTargetView;			// 버퍼라는 이름이 마음에 들지 않는다.
+		static ID3D11Texture2D* s_pScreenDepthStencilTexture;
+		static ID3D11DepthStencilView* s_pScreenDepthStencilView;
+
+		static DirectX::XMFLOAT2 s_RenerTargetSize;	// 직접 설정?
+		static DirectX::XMFLOAT2 s_ScreenSize;
+		static BOOL s_bWindowed;
+
+	};
+
 	// urho3d는 뷰포트와 각종 렌더링 설정(그림자, 테크닉, 필터모드, 그림자 맵 사이즈 등)을 관리하고
 	// 이들을 이용해 update와 render를 수행한다.
 	// 정확하게는 manages drawing of 3d views라고 설명해 놓았다.

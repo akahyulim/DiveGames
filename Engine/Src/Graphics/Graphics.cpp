@@ -7,11 +7,236 @@
 #include "IndexBuffer.h"
 #include "Core/CoreDefs.h"
 
+#include "Core/Engine.h"
+
 namespace Dive
 {
 	Graphics* Graphics::s_pInstance = nullptr;
 	constexpr LPCWSTR DV_WINCLASS_NAME = L"DIVE_WINDOW";
 
+	DvGraphics::DvGraphics()
+		: m_pSwapChain(nullptr)
+		, m_pDevice(nullptr)
+		, m_pDeviceContext(nullptr)
+		, m_bFullScreen(false)
+		, m_Width(8)
+		, m_Height(8)
+		, m_pDefaultRenderTargetView(nullptr)
+		, m_pDefaultDepthStencilBuffer(nullptr)
+		, m_pDefaultDepthStencilView(nullptr)
+	{
+	}
+
+	DvGraphics::~DvGraphics()
+	{
+		DV_RELEASE(m_pDefaultDepthStencilView);
+		DV_RELEASE(m_pDefaultDepthStencilBuffer);
+		DV_RELEASE(m_pDefaultRenderTargetView);
+
+		DV_RELEASE(m_pDeviceContext);
+		DV_RELEASE(m_pDevice);
+		DV_RELEASE(m_pSwapChain);
+
+		DV_LOG(Graphics, trace, "소멸자 호출");
+	}
+
+	bool DvGraphics::Initialize(uint32_t width, uint32_t height, HWND hWnd, bool fullScreen)
+	{
+		m_Width = width;
+		m_Height = height;
+		m_bFullScreen = fullScreen;
+
+		//D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
+
+		if (FAILED(D3D11CreateDevice(
+			nullptr,
+			D3D_DRIVER_TYPE_HARDWARE,
+			nullptr,
+			0,
+			nullptr, //&featureLevel,//nullptr,
+			0, //1, //0,
+			D3D11_SDK_VERSION,
+			&m_pDevice,
+			nullptr,
+			&m_pDeviceContext)))
+		{
+			DV_RELEASE(m_pDevice);
+			DV_RELEASE(m_pDeviceContext);
+			DV_LOG(Graphics, err, "D3D11Device & D3D11DeviceContext 생성 실패");
+			return false;
+		}
+
+		IDXGIDevice* pDxgiDevice{};
+		m_pDevice->QueryInterface(IID_IDXGIDevice, (void**)&pDxgiDevice);
+		IDXGIAdapter* pDxgiAdapter{};
+		pDxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&pDxgiAdapter);
+		IDXGIFactory* pDxgiFactory{};
+		pDxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&pDxgiFactory);
+
+		DXGI_SWAP_CHAIN_DESC desc{};
+		desc.BufferCount = 2;
+		desc.BufferDesc.Width = width;
+		desc.BufferDesc.Height = height;
+		desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// sRGB 적용 여부에 따라 달라진다.
+		desc.BufferDesc.RefreshRate.Denominator = 1;			// 추후 수정(vsync에 따라 달라진다?)
+		desc.BufferDesc.RefreshRate.Numerator = 0;
+		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		desc.SampleDesc.Count = 1;								// 멀티 샘플링 off
+		desc.SampleDesc.Quality = 0;
+		desc.Windowed = !m_bFullScreen;
+		desc.OutputWindow = hWnd;
+		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
+
+		if (FAILED(pDxgiFactory->CreateSwapChain(m_pDevice, &desc, &m_pSwapChain)))
+		{
+			DV_RELEASE(m_pSwapChain);
+			DV_LOG(Graphics, err, "D3D11SwapChain 생성 실패");
+			return false;
+		}
+
+		if (!updateRenderResources())
+			return false;
+
+		DV_LOG(Graphics, trace, "초기화 성공");
+
+		return true;
+	}
+
+	bool DvGraphics::ResizeBackBuffers(uint32_t width, uint32_t height)
+	{
+		if (m_Width == width && m_Height == height)
+			return true;
+
+		// 이유는 알 수 없지만 직접 바인딩된 뷰가 아니라 얘네들을 릴리즈 해야 한다.
+		//DV_RELEASE(m_pDefaultDepthStencilBuffer);
+		//DV_RELEASE(m_pDefaultDepthStencilView);
+		DV_RELEASE(m_pDefaultRenderTargetView);		// 정확히는 후면 버퍼를 참조해 만든 얘를 릴리즈 해야 한다.
+		m_pDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
+
+		if (FAILED(m_pSwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0)))
+		{
+			DV_LOG(Graphics, err, "후면 버퍼 크기 갱신 실패");
+			return false;
+		}
+
+		return updateRenderResources();
+	}
+
+	void DvGraphics::ChangeResolution(uint32_t width, uint32_t height)
+	{
+		DXGI_MODE_DESC desc{};
+		desc.Width = width;
+		desc.Height = height;
+		desc.RefreshRate.Numerator = 60;
+		desc.RefreshRate.Denominator = 1;
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		if (FAILED(m_pSwapChain->ResizeTarget(&desc)))
+		{
+			DV_LOG(Graphics, err, "해상도 {0:d}x{1:d} 변경 실패", width, height);
+			return;
+		}
+
+		if (FAILED(m_pSwapChain->SetFullscreenState(TRUE, nullptr)))
+		{
+			DV_LOG(Graphics, err, "전체화면 적용 실패");
+			return;
+		}
+
+		updateRenderResources();
+
+		{
+			DXGI_SWAP_CHAIN_DESC desc{};
+			m_pSwapChain->GetDesc(&desc);
+
+			DV_LOG(Graphics, info, "해상도 변경 - {0:d}x{1:d}", desc.BufferDesc.Width, desc.BufferDesc.Height);
+		}
+	}
+
+	bool DvGraphics::IsInitialized() const
+	{
+		return (m_pSwapChain && m_pDevice && m_pDeviceContext);
+	}
+
+	bool DvGraphics::IsFullScreen() const
+	{
+		BOOL fullScreen;
+		IDXGIOutput* pTarget = nullptr;
+
+		m_pSwapChain->GetFullscreenState(&fullScreen, nullptr);
+
+		return static_cast<bool>(fullScreen);
+	}
+
+	bool DvGraphics::updateRenderResources()
+	{
+		DV_RELEASE(m_pDefaultRenderTargetView);
+		DV_RELEASE(m_pDefaultDepthStencilBuffer);
+		DV_RELEASE(m_pDefaultDepthStencilView);
+
+		ID3D11Texture2D* pBackbufferTexture{};
+		if (FAILED(m_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture)))
+		{
+			DV_RELEASE(pBackbufferTexture);
+			DV_LOG(Graphics, err, "후면 버퍼 텍스쳐 획득 실패");
+			return false;
+		}
+
+		if (FAILED(m_pDevice->CreateRenderTargetView(
+			static_cast<ID3D11Resource*>(pBackbufferTexture), nullptr, &m_pDefaultRenderTargetView)))
+		{
+			DV_RELEASE(pBackbufferTexture);
+			DV_RELEASE(m_pDefaultRenderTargetView);
+			DV_LOG(Graphics, err, "후면 버퍼 렌더타겟뷰 생성 실패");
+			return false;
+		}
+		DV_RELEASE(pBackbufferTexture);
+
+		DXGI_SWAP_CHAIN_DESC desc{};
+		m_pSwapChain->GetDesc(&desc);
+
+		D3D11_TEXTURE2D_DESC texDesc{};
+		texDesc.Width = desc.BufferDesc.Width;
+		texDesc.Height = desc.BufferDesc.Height;
+		texDesc.MipLevels = 1;
+		texDesc.ArraySize = 1;
+		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		texDesc.SampleDesc.Count = 1;// static_cast<UINT>(screenParamm_.multiSample_);
+		texDesc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(texDesc.Format, screenParamm_.multiSample_);
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		texDesc.CPUAccessFlags = 0;
+		texDesc.MiscFlags = 0;
+
+		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pDefaultDepthStencilBuffer)))
+		{
+			DV_RELEASE(m_pDefaultDepthStencilBuffer);
+			DV_LOG(Graphics, err, "후면 버퍼 깊이 스텐실 텍스쳐 생성 실패");
+			return false;
+		}
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc{};
+		viewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		viewDesc.Texture2D.MipSlice = 0;
+
+		if (FAILED(m_pDevice->CreateDepthStencilView(
+			static_cast<ID3D11Resource*>(m_pDefaultDepthStencilBuffer),
+			&viewDesc,//nullptr,		// urho가 nullptr을 전달했다. 역시나 sampler 문제는 해결되지 않았다.
+			&m_pDefaultDepthStencilView)))
+		{
+			DV_RELEASE(m_pDefaultDepthStencilView);
+			DV_LOG(Graphics, err, "후면 버퍼 깊이 스텐실 뷰 생성 실패");
+			return false;
+		}
+
+		DV_LOG(Graphics, info, "후면 버퍼 리소스 뷰 크기: {0:d}x{1:d}", desc.BufferDesc.Width, desc.BufferDesc.Height);
+
+		return true;
+	}
+
+	//==========================================================================================================================================
+	
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		LRESULT result = NULL;
@@ -90,6 +315,212 @@ namespace Dive
 		Shutdown();
 	}
 
+	bool Graphics::CreateDevice(uint32_t width, uint32_t height, HWND hWnd, bool fullScreen)
+	{
+		if (IsInitialized())
+			return false;
+
+		m_ResolutionWidth = width;
+		m_ResolutionHeight = height;
+		m_bFullScreen = fullScreen;
+
+		//D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
+
+		if (FAILED(D3D11CreateDevice(
+			nullptr,
+			D3D_DRIVER_TYPE_HARDWARE,
+			nullptr,
+			0,
+			nullptr, //&featureLevel,//nullptr,
+			0, //1, //0,
+			D3D11_SDK_VERSION,
+			&m_pDevice,
+			nullptr,
+			&m_pDeviceContext)))
+		{
+			DV_RELEASE(m_pDevice);
+			DV_RELEASE(m_pDeviceContext);
+			DV_LOG(Graphics, err, "D3D11 장치 생성에 실패하였습니다.");
+			return false;
+		}
+
+		IDXGIDevice* pDxgiDevice{};
+		m_pDevice->QueryInterface(IID_IDXGIDevice, (void**)&pDxgiDevice);
+		IDXGIAdapter* pDxgiAdapter{};
+		pDxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&pDxgiAdapter);
+		IDXGIFactory* pDxgiFactory{};
+		pDxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&pDxgiFactory);
+
+		DXGI_SWAP_CHAIN_DESC desc{};
+		desc.BufferCount = 2;
+		desc.BufferDesc.Width = width;
+		desc.BufferDesc.Height = height;
+		desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// sRGB 적용 여부에 따라 달라진다.
+		desc.BufferDesc.RefreshRate.Denominator = 1;			// 추후 수정(vsync에 따라 달라진다?)
+		desc.BufferDesc.RefreshRate.Numerator = 0;
+		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		desc.SampleDesc.Count = 1;								// 멀티 샘플링 off
+		desc.SampleDesc.Quality = 0;
+		desc.Windowed = !m_bFullScreen;
+		desc.OutputWindow = hWnd;
+		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
+
+		if (FAILED(pDxgiFactory->CreateSwapChain(m_pDevice, &desc, &m_pSwapChain)))
+		{
+			DV_RELEASE(m_pSwapChain);
+			DV_LOG(Graphics, err, "D3D11 스왑체인 생성에 실패하였습니다.");
+			return false;
+		}
+
+		updateRenderResources();
+
+		return true;
+	}
+
+	void Graphics::Release()
+	{
+
+	}
+
+	// 윈도우 크기가 변경되었을 경우 wm_size가 발생하면 호출된다.
+	// 전달받은 크기로 백버퍼 크기를 재설정하며
+	// 이와 함께 사용되는 컬러, 깊이 버퍼도 새롭게 생성한다.
+	bool Graphics::ResizeBackBuffers(uint32_t width, uint32_t height)
+	{
+		if (m_ResolutionWidth == width && m_ResolutionHeight == height)
+			return true;
+
+		ID3D11RenderTargetView* pRenderTargetViews[MAX_NUM_RENDER_VIEWS]{};
+		ID3D11DepthStencilView* pDepthStencilView{};
+		m_pDeviceContext->OMGetRenderTargets(MAX_NUM_RENDER_VIEWS, pRenderTargetViews, &pDepthStencilView);
+		for (int i = 0; i != MAX_NUM_RENDER_VIEWS; i++)
+		{
+			DV_RELEASE(pRenderTargetViews[i]);
+		}
+		DV_RELEASE(pDepthStencilView);
+		m_pDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
+
+		if (FAILED(m_pSwapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0)))//DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH)))
+		{
+			DV_LOG(Graphics, err, "후면 버퍼 크기 갱신에 실패하였습니다.");
+			return false;
+		}
+
+		return updateRenderResources();
+	}
+
+	// 해상도 변경 == 전체화면
+	// 부수적으로 윈도우 크기와 렌더타겟, 깊이 버퍼도 변경하여야 한다.
+	void Graphics::ChangeResolution(uint32_t width, uint32_t height)
+	{
+		DXGI_MODE_DESC desc{};
+		desc.Width = width;
+		desc.Height = height;
+		desc.RefreshRate.Numerator = 60;
+		desc.RefreshRate.Denominator = 1;
+		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		if (FAILED(m_pSwapChain->ResizeTarget(&desc)))
+		{
+			DV_LOG(Graphics, err, "해상도 {0:d}x{1:d} 변경에 실패하였습니다.", width, height);
+			return;
+		}
+
+		if (FAILED(m_pSwapChain->SetFullscreenState(TRUE, nullptr)))
+		{
+			DV_LOG(Graphics, err, "전체화면 적용에 실패하였습니다.");
+			return;
+		}
+
+		updateRenderResources();
+		
+#ifdef _DEBUG
+		{
+			DXGI_SWAP_CHAIN_DESC desc{};
+			m_pSwapChain->GetDesc(&desc);
+
+			DV_LOG(Graphics, info, "해상도가 {0:d}x{1:d}로 변경되었습니다.", desc.BufferDesc.Width, desc.BufferDesc.Height);
+		}
+#endif
+	}
+
+	bool Graphics::IsFullScreen() const
+	{
+		BOOL fullScreen;
+		IDXGIOutput* pTarget = nullptr;
+
+		m_pSwapChain->GetFullscreenState(&fullScreen, nullptr);
+		
+		return static_cast<bool>(fullScreen);
+	}
+
+	bool Graphics::updateRenderResources()
+	{
+		DV_RELEASE(m_pDefaultRenderTargetView);
+		DV_RELEASE(m_pDefaultDepthTexture);
+		DV_RELEASE(m_pDefaultDepthStencilView);
+
+		ID3D11Texture2D* pBackbufferTexture{};
+		if (FAILED(m_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture)))
+		{
+			DV_RELEASE(pBackbufferTexture);
+			DV_LOG(Graphics, err, "후면 버퍼 텍스쳐를 얻어오는데 실패하였습니다.");
+			return false;
+		}
+
+		if (FAILED(m_pDevice->CreateRenderTargetView(
+			static_cast<ID3D11Resource*>(pBackbufferTexture), nullptr, &m_pDefaultRenderTargetView)))
+		{
+			DV_RELEASE(pBackbufferTexture);
+			DV_RELEASE(m_pDefaultRenderTargetView);
+			DV_LOG(Graphics, err, "후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
+			return false;
+		}
+		DV_RELEASE(pBackbufferTexture);
+
+		DXGI_SWAP_CHAIN_DESC desc{};
+		m_pSwapChain->GetDesc(&desc);
+
+		D3D11_TEXTURE2D_DESC texDesc{};
+		texDesc.Width = desc.BufferDesc.Width;
+		texDesc.Height = desc.BufferDesc.Height;
+		texDesc.MipLevels = 1;
+		texDesc.ArraySize = 1;
+		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		texDesc.SampleDesc.Count = 1;// static_cast<UINT>(screenParamm_.multiSample_);
+		texDesc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(texDesc.Format, screenParamm_.multiSample_);
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		texDesc.CPUAccessFlags = 0;
+		texDesc.MiscFlags = 0;
+
+		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pDefaultDepthTexture)))
+		{
+			DV_RELEASE(m_pDefaultDepthTexture);
+			DV_LOG(Graphics, err, "후면 버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
+			return false;
+		}
+
+		D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc{};
+		viewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		viewDesc.Texture2D.MipSlice = 0;
+
+		if (FAILED(m_pDevice->CreateDepthStencilView(
+			static_cast<ID3D11Resource*>(m_pDefaultDepthTexture),
+			&viewDesc,//nullptr,		// urho가 nullptr을 전달했다. 역시나 sampler 문제는 해결되지 않았다.
+			&m_pDefaultDepthStencilView)))
+		{
+			DV_RELEASE(m_pDefaultDepthStencilView);
+			DV_LOG(Graphics, err, "후면 버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
+			return false;
+		}
+
+		DV_LOG(Graphics, info, "RenderResources size: {0:d}x{1:d}", desc.BufferDesc.Width, desc.BufferDesc.Height);
+
+		return true;
+	}
+
 	bool Graphics::Initialize(uint32_t width, uint32_t height, bool fullScreen, bool borderless)
 	{
 		// 윈도우 생성
@@ -129,7 +560,7 @@ namespace Dive
 		ShowWindow(m_hWnd, SW_SHOW);
 		SetFocus(m_hWnd);
 
-		DV_ENGINE_TRACE("그래픽스 시스템 초기화에 성공하였습니다.");
+		DV_LOG(Graphics, trace, "그래픽스 시스템 초기화에 성공하였습니다.");
 
 		return true;
 	}
@@ -150,7 +581,7 @@ namespace Dive
 		::DestroyWindow(m_hWnd);
 		::UnregisterClassW(DV_WINCLASS_NAME, m_hInstance);
 
-		DV_ENGINE_TRACE("그래픽스 시스템 셧다운에 성공하였습니다.");
+		DV_LOG(Graphics, trace, "그래픽스 시스템 셧다운에 성공하였습니다.");
 	}
 
 	bool Graphics::CreateAppWindow(uint32_t width, uint32_t height, bool borderless)
@@ -173,7 +604,7 @@ namespace Dive
 
 		if (!::RegisterClassEx(&wc))
 		{
-			DV_ENGINE_ERROR("윈도우클래스 등록에 실패하였습니다.");
+			DV_LOG(Graphics, err, "윈도우클래스 등록에 실패하였습니다.");
 			return false;
 		}
 
@@ -196,7 +627,7 @@ namespace Dive
 
 		if (!m_hWnd)
 		{
-			DV_ENGINE_ERROR("윈도우 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "윈도우 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -207,7 +638,7 @@ namespace Dive
 
 	bool Graphics::RunWindow()
 	{
-		//DV_ENGINE_ASSERT(IsInitialized());
+		//DV_ASSERT(Graphics, IsInitialized());
 
 		MSG msg{};
 		if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -235,7 +666,7 @@ namespace Dive
 	{
 		if (!m_hWnd)
 		{
-			DV_ENGINE_WARN("제어할 윈도우가 존재하지 않습니다.");
+			DV_LOG(CubeMap, warn, "제어할 윈도우가 존재하지 않습니다.");
 			return;
 		}
 
@@ -257,9 +688,9 @@ namespace Dive
 		::SetWindowPos(m_hWnd, NULL, posX, posY, clientWidth, clientHeight, SWP_DRAWFRAME);
 
 		::GetWindowRect(m_hWnd, &rt);
-		DV_ENGINE_INFO("WindowRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+		DV_LOG(Graphics, info, "WindowRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 		::GetClientRect(m_hWnd, &rt);
-		DV_ENGINE_INFO("ClientRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+		DV_LOG(Graphics, info, "ClientRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 
 		::ShowWindow(m_hWnd, SW_SHOW);
 	}
@@ -294,9 +725,13 @@ namespace Dive
 
 		RECT rt{};
 		::GetClientRect(m_hWnd, &rt);
-		DV_ENGINE_INFO("ClientRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
+		DV_LOG(Graphics, info, "ClientRect size: {0:d} x {1:d}", rt.right - rt.left, rt.bottom - rt.top);
 	}
 
+	// 코파일럿에 의하면 백버퍼의 크기를 변경한다고..
+	// 윈도우는 이후 추가로 변경시켜주어야 한다.
+	// 전체화면 전화 여부도 이 곳에서 수행해야 한다.
+	// => 참고 문서와는 좀 다르다.
 	void Graphics::ResizeResolution(uint32_t width, uint32_t height)
 	{
 		if (!m_pSwapChain)
@@ -313,7 +748,7 @@ namespace Dive
 
 		if (FAILED(m_pSwapChain->ResizeTarget(&desc)))
 		{
-			DV_ENGINE_ERROR("스왑체인 타겟 리사이즈에 실패하여 윈도우 크기를 변경할 수 없습니다.");
+			DV_LOG(Graphics, err, "스왑체인 타겟 리사이즈에 실패하여 윈도우 크기를 변경할 수 없습니다.");
 			return;
 		}
 	}
@@ -344,7 +779,7 @@ namespace Dive
 	{
 		if (index >= MAX_NUM_RENDER_VIEWS)
 		{
-			DV_ENGINE_ERROR("잘못된 렌더 타겟 뷰의 슬롯 인덱스({:d})를 전달받아 바인딩에 실패하였습니다.", index);
+			DV_LOG(Graphics, err, "잘못된 렌더 타겟 뷰의 슬롯 인덱스({:d})를 전달받아 바인딩에 실패하였습니다.", index);
 			return false;
 		}
 
@@ -624,7 +1059,7 @@ namespace Dive
 	{
 		if (unit >= eTextureUnitType::Count)
 		{
-			DV_ENGINE_ERROR("잘못된 픽셀 셰이더 리소스 뷰의 인덱스({:d})를 전달받아 바인딩에 실패하였습니다.", static_cast<uint8_t>(unit));
+			DV_LOG(Graphics, err, "잘못된 픽셀 셰이더 리소스 뷰의 인덱스({:d})를 전달받아 바인딩에 실패하였습니다.", static_cast<uint8_t>(unit));
 			return;
 		}
 
@@ -665,7 +1100,7 @@ namespace Dive
 
 		if (index >= static_cast<uint8_t>(eSamplerType::Count))
 		{
-			DV_ENGINE_ERROR("");
+			DV_LOG(Graphics, err, "");
 			return;
 		}
 
@@ -781,7 +1216,7 @@ namespace Dive
 
 		if (!RegisterClassEx(&wc))
 		{
-			DV_ENGINE_ERROR("윈도우클래스 등록에 실패하였습니다.");
+			DV_LOG(Graphics, err, "윈도우클래스 등록에 실패하였습니다.");
 			return false;
 		}
 
@@ -804,7 +1239,7 @@ namespace Dive
 
 		if (!m_hWnd)
 		{
-			DV_ENGINE_ERROR("윈도우 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "윈도우 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -833,7 +1268,7 @@ namespace Dive
 			{
 				DV_RELEASE(m_pDevice);
 				DV_RELEASE(m_pDeviceContext);
-				DV_ENGINE_ERROR("D3D11 장치 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "D3D11 장치 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -865,7 +1300,7 @@ namespace Dive
 		if (FAILED(pDxgiFactory->CreateSwapChain(m_pDevice, &desc, &m_pSwapChain)))
 		{
 			DV_RELEASE(m_pSwapChain);
-			DV_ENGINE_ERROR("D3D11 스왑체인 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "D3D11 스왑체인 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -888,7 +1323,7 @@ namespace Dive
 		if (FAILED(m_pSwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture)))
 		{
 			DV_RELEASE(pBackbufferTexture);
-			DV_ENGINE_ERROR("후면 버퍼 텍스쳐를 얻어오는데 실패하였습니다.");
+			DV_LOG(Graphics, err, "후면 버퍼 텍스쳐를 얻어오는데 실패하였습니다.");
 			return false;
 		}
 
@@ -897,7 +1332,7 @@ namespace Dive
 		{
 			DV_RELEASE(pBackbufferTexture);
 			DV_RELEASE(m_pDefaultRenderTargetView);
-			DV_ENGINE_ERROR("후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "후면 버퍼 렌더타겟뷰 생성에 실패하였습니다.");
 			return false;
 		}
 		DV_RELEASE(pBackbufferTexture);
@@ -931,7 +1366,7 @@ namespace Dive
 		if (FAILED(m_pDevice->CreateTexture2D(&texDesc, nullptr, &m_pDefaultDepthTexture)))
 		{
 			DV_RELEASE(m_pDefaultDepthTexture);
-			DV_ENGINE_ERROR("후면 버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "후면 버퍼 깊이 스텐실 텍스쳐 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -946,7 +1381,7 @@ namespace Dive
 			&m_pDefaultDepthStencilView)))
 		{
 			DV_RELEASE(m_pDefaultDepthStencilView);
-			DV_ENGINE_ERROR("후면 버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "후면 버퍼 깊이 스텐실 뷰 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -955,9 +1390,9 @@ namespace Dive
 
 		RECT rt{};
 		GetClientRect(m_hWnd, &rt);
-		DV_ENGINE_ASSERT(m_ResolutionWidth == (rt.right - rt.left));
-		DV_ENGINE_ASSERT(m_ResolutionHeight == (rt.bottom - rt.top));
-		DV_ENGINE_INFO("Resolution: {0:d} x {1:d}", m_ResolutionWidth, m_ResolutionHeight);
+		DV_ASSERT(Graphics, m_ResolutionWidth == (rt.right - rt.left));
+		DV_ASSERT(Graphics, m_ResolutionHeight == (rt.bottom - rt.top));
+		DV_LOG(Graphics, info, "Resolution: {0:d} x {1:d}", m_ResolutionWidth, m_ResolutionHeight);
 
 		resetViews();
 
@@ -990,7 +1425,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
 			{
-				DV_ENGINE_ERROR("DepthStencilState DepthLess 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "DepthStencilState DepthLess 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -1006,7 +1441,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
 			{
-				DV_ENGINE_ERROR("DepthStencilState DepthEqual 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "DepthStencilState DepthEqual 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -1030,7 +1465,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
 			{
-				DV_ENGINE_ERROR("DepthStencilState GBuffer 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "DepthStencilState GBuffer 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -1054,7 +1489,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
 			{
-				DV_ENGINE_ERROR("DepthStencilState NoDepthWriteLessStencilMask 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "DepthStencilState NoDepthWriteLessStencilMask 생성에 실패하였습니다.");
 				return false;
 			}
 
@@ -1066,7 +1501,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
 			{
-				DV_ENGINE_ERROR("DepthStencilState NoDepthWriteGreaterStencilMask 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "DepthStencilState NoDepthWriteGreaterStencilMask 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -1092,7 +1527,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateDepthStencilState(&desc, &m_DepthStencilStates[index])))
 			{
-				DV_ENGINE_ERROR("DepthStencilState ShdowGen 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "DepthStencilState ShdowGen 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -1121,7 +1556,7 @@ namespace Dive
 
 		if (FAILED(m_pDevice->CreateRasterizerState(&desc, &m_RasterizerStates[index])))
 		{
-			DV_ENGINE_ERROR("RasterizerState FillSolid_CullBack 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "RasterizerState FillSolid_CullBack 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -1132,7 +1567,7 @@ namespace Dive
 
 		if (FAILED(m_pDevice->CreateRasterizerState(&desc, &m_RasterizerStates[index])))
 		{
-			DV_ENGINE_ERROR("RasterizerState FillSolid_CullNode 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "RasterizerState FillSolid_CullNode 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -1155,7 +1590,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateRasterizerState(&desc, &m_RasterizerStates[index])))
 			{
-				DV_ENGINE_ERROR("RasterizerState NoDepthClipFront 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "RasterizerState NoDepthClipFront 생성에 실패하였습니다.");
 				return false;
 			}
 
@@ -1167,7 +1602,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateRasterizerState(&desc, &m_RasterizerStates[index])))
 			{
-				DV_ENGINE_ERROR("RasterizerState WireFrame 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "RasterizerState WireFrame 생성에 실패하였습니다.");
 				return false;
 			}
 
@@ -1181,7 +1616,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateRasterizerState(&desc, &m_RasterizerStates[index])))
 			{
-				DV_ENGINE_ERROR("RasterizerState ShadowGen 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "RasterizerState ShadowGen 생성에 실패하였습니다.");
 				return false;
 			}
 
@@ -1208,7 +1643,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateRasterizerState(&desc, &m_RasterizerStates[index])))
 			{
-				DV_ENGINE_ERROR("RasterizerState CascadedShadowGen 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "RasterizerState CascadedShadowGen 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -1239,7 +1674,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateBlendState(&desc, &m_BlendStates[index])))
 			{
-				DV_ENGINE_ERROR("BlandState Additive 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "BlandState Additive 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -1262,7 +1697,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateBlendState(&desc, &m_BlendStates[index])))
 			{
-				DV_ENGINE_ERROR("BlandState Transparent 생성에 실패하였습니다.");
+				DV_LOG(Graphics, err, "BlandState Transparent 생성에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -1283,7 +1718,7 @@ namespace Dive
 
 		if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_Samplers[static_cast<uint8_t>(eSamplerType::Linear)])))
 		{
-			DV_ENGINE_ERROR("Base Sampler 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "Base Sampler 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -1291,7 +1726,7 @@ namespace Dive
 		desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 		if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_Samplers[static_cast<uint8_t>(eSamplerType::Point)])))
 		{
-			DV_ENGINE_ERROR("Point Sampler 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "Point Sampler 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -1305,7 +1740,7 @@ namespace Dive
 
 		if (FAILED(m_pDevice->CreateSamplerState(&desc, &m_Samplers[static_cast<uint8_t>(eSamplerType::Pcf)])))
 		{
-			DV_ENGINE_ERROR("Pcf Sampler 생성에 실패하였습니다.");
+			DV_LOG(Graphics, err, "Pcf Sampler 생성에 실패하였습니다.");
 			return false;
 		}
 

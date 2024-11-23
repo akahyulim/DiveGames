@@ -54,7 +54,7 @@ namespace Dive
 
         default:
             m_Format = DXGI_FORMAT_UNKNOWN;
-            DV_ENGINE_ERROR("Texture2D 생성 도중 잘못된 깊이 비트를 전달받았습니다.");
+            DV_LOG(Texture2D, err, "Texture2D 생성 도중 잘못된 깊이 비트를 전달받았습니다.");
             break;
         }
 
@@ -83,7 +83,7 @@ namespace Dive
 		}
 
 		if (FAILED(hResult))
-			DV_ENGINE_ERROR("Texture2D 생성 과정 중 파일 {:s} 로드에 실패하였습니다.", filename);
+			DV_LOG(Texture2D, err, "Texture2D 생성 과정 중 파일 {:s} 로드에 실패하였습니다.", filename);
 
 		m_Width = static_cast<uint32_t>(img.GetImages()->width);
 		m_Height = static_cast<uint32_t>(img.GetImages()->height);
@@ -119,7 +119,7 @@ namespace Dive
 		}
 
 		if (FAILED(hResult))
-			DV_ENGINE_ERROR("{:s} 형식의 메모리 로드에 실패하였습니다.", extension);
+			DV_LOG(Texture2D, err, "{:s} 형식의 메모리 로드에 실패하였습니다.", extension);
 
 		m_Width = static_cast<uint32_t>(img.GetImages()->width);
 		m_Height = static_cast<uint32_t>(img.GetImages()->height);
@@ -156,7 +156,7 @@ namespace Dive
 		}
 
 		if (FAILED(hResult))
-			DV_ENGINE_ERROR("Texture2D 생성 과정 중 파일 {:s} 로드에 실패하였습니다.", filename);
+			DV_LOG(Texture2D, err, "Texture2D 생성 과정 중 파일 {:s} 로드에 실패하였습니다.", filename);
 
 		// 생성자에서 임의로 전달받은 데이터들을 실제 파일 데이터로 갱신
 		m_Width = static_cast<uint32_t>(img.GetImages()->width);
@@ -187,7 +187,7 @@ namespace Dive
 
 				if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
 				{
-					DV_ENGINE_ERROR("Texture2D의 ID3D11Texture2D 생성에 실패하였습니다.");
+					DV_LOG(Texture2D, err, "Texture2D의 ID3D11Texture2D 생성에 실패하였습니다.");
 					Release();
 					return false;
 				}
@@ -203,7 +203,7 @@ namespace Dive
 
 				if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
 				{
-					DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
+					DV_LOG(Texture2D, err, "Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
 					Release();
 					return false;
 				}
@@ -239,7 +239,7 @@ namespace Dive
 		}
 
 		if (FAILED(hResult))
-			DV_ENGINE_ERROR("{:s} 형식의 메모리 로드에 실패하였습니다.", extension);
+			DV_LOG(Texture2D, err, "{:s} 형식의 메모리 로드에 실패하였습니다.", extension);
 
 		// 역시 실제 데이터로 갱신
 		m_Width = static_cast<uint32_t>(img.GetImages()->width);
@@ -260,13 +260,13 @@ namespace Dive
 	{
 		if (!m_pTexture)
 		{
-			DV_ENGINE_ERROR("ID3D11Texture2D 객체가 존재하지 않아 서브 리소스 업데이트에 실패하였습니다.");
+			DV_LOG(Texture2D, err, "ID3D11Texture2D 객체가 존재하지 않아 서브 리소스 업데이트에 실패하였습니다.");
 			return false;
 		}
 
 		if (!pData)
 		{
-			DV_ENGINE_ERROR("비어있는 데이터를 전달받아 서브 리소스 업데이트에 실패하였습니다.");
+			DV_LOG(Texture2D, err, "비어있는 데이터를 전달받아 서브 리소스 업데이트에 실패하였습니다.");
 			return false;
 		}
 
@@ -303,7 +303,7 @@ namespace Dive
 
             if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
             {
-                DV_ENGINE_ERROR("Texture2D의 ID3D11Texture2D 생성에 실패하였습니다.");
+                DV_LOG(Texture2D, err, "Texture2D의 ID3D11Texture2D 생성에 실패하였습니다.");
 				Release();
 				return false;
             }
@@ -317,7 +317,7 @@ namespace Dive
 
             if (FAILED(m_pDevice->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pRenderTargetView)))
             {
-                DV_ENGINE_ERROR("Texture2D의 ID3D11RenderTargetView 생성에 실패하였습니다.");
+                DV_LOG(Texture2D, err, "Texture2D의 ID3D11RenderTargetView 생성에 실패하였습니다.");
 				Release(); 
 				return false;
             }
@@ -333,7 +333,7 @@ namespace Dive
 
             if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
             {
-                DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
+                DV_LOG(Texture2D, err, "Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
 				Release(); 
 				return false;
             }
@@ -361,7 +361,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
 			{
-				DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
+				DV_LOG(Texture2D, err, "Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
 				Release(); 
 				return false;
 			}
@@ -375,7 +375,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pDepthStencilView)))
 			{
-				DV_ENGINE_ERROR("Texture2D의 ID3D11DepthStencilView 생성에 실패하였습니다.");
+				DV_LOG(Texture2D, err, "Texture2D의 ID3D11DepthStencilView 생성에 실패하였습니다.");
 				Release(); 
 				return false;
 			}
@@ -386,7 +386,7 @@ namespace Dive
 
 				if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pDepthStencilViewReadOnly)))
 				{
-					DV_ENGINE_ERROR("Texture2D의 ID3D11DepthStencilView(useReadOnly) 생성에 실패하였습니다.");
+					DV_LOG(Texture2D, err, "Texture2D의 ID3D11DepthStencilView(useReadOnly) 생성에 실패하였습니다.");
 					Release(); 
 					return false;
 				}
@@ -403,7 +403,7 @@ namespace Dive
 			
 			if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
 			{
-				DV_ENGINE_ERROR("Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
+				DV_LOG(Texture2D, err, "Texture2D의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
 				Release(); 
 				return false;
 			}

@@ -155,10 +155,12 @@
     <ClInclude Include="Src\Core\CoreEvents.h" />
     <ClInclude Include="Src\Core\Engine.h" />
     <ClInclude Include="Src\Core\EventHandler.h" />
+    <ClInclude Include="Src\Core\FileUtils.h" />
     <ClInclude Include="Src\Core\Log.h" />
     <ClInclude Include="Src\Core\Object.h" />
     <ClInclude Include="Src\Core\Application.h" />
     <ClInclude Include="Src\Core\Window.h" />
+    <ClInclude Include="Src\Core\StringUtils.h" />
     <ClInclude Include="Src\Dive.h" />
     <ClInclude Include="Src\DivePch.h" />
     <ClInclude Include="Src\Graphics\ConstantBuffer.h" />
@@ -187,20 +189,23 @@
     <ClInclude Include="Src\Resource\Importer\ModelLoader.h" />
     <ClInclude Include="Src\Resource\Resource.h" />
     <ClInclude Include="Src\Resource\ResourceManager.h" />
-    <ClInclude Include="Src\Scene\Components\Camera.h" />
-    <ClInclude Include="Src\Scene\Components\Component.h" />
-    <ClInclude Include="Src\Scene\Components\Light.h" />
-    <ClInclude Include="Src\Scene\Components\Renderable.h" />
-    <ClInclude Include="Src\Scene\GameObject.h" />
-    <ClInclude Include="Src\Scene\Scene.h" />
-    <ClInclude Include="Src\Scene\SceneManager.h" />
+    <ClInclude Include="Src\World\Components\Camera.h" />
+    <ClInclude Include="Src\World\Components\Component.h" />
+    <ClInclude Include="Src\World\Components\Light.h" />
+    <ClInclude Include="Src\World\Components\Renderable.h" />
+    <ClInclude Include="Src\World\GameObject.h" />
+    <ClInclude Include="Src\World\SceneManager.h" />
+    <ClInclude Include="Src\World\Scene.h" />
+    <ClInclude Include="Src\World\World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Core\Engine.cpp" />
     <ClCompile Include="Src\Core\EventHandler.cpp" />
+    <ClCompile Include="Src\Core\FileUtils.cpp" />
     <ClCompile Include="Src\Core\Log.cpp" />
     <ClCompile Include="Src\Core\Object.cpp" />
     <ClCompile Include="Src\Core\Application.cpp" />
+    <ClCompile Include="Src\Core\StringUtils.cpp" />
     <ClCompile Include="Src\Core\Window.cpp" />
     <ClCompile Include="Src\DivePch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -230,13 +235,14 @@
     <ClCompile Include="Src\Resource\Importer\ModelLoader.cpp" />
     <ClCompile Include="Src\Resource\Resource.cpp" />
     <ClCompile Include="Src\Resource\ResourceManager.cpp" />
-    <ClCompile Include="Src\Scene\Components\Camera.cpp" />
-    <ClCompile Include="Src\Scene\Components\Component.cpp" />
-    <ClCompile Include="Src\Scene\Components\Light.cpp" />
-    <ClCompile Include="Src\Scene\Components\Renderable.cpp" />
-    <ClCompile Include="Src\Scene\GameObject.cpp" />
-    <ClCompile Include="Src\Scene\Scene.cpp" />
-    <ClCompile Include="Src\Scene\SceneManager.cpp" />
+    <ClCompile Include="Src\World\Components\Camera.cpp" />
+    <ClCompile Include="Src\World\Components\Component.cpp" />
+    <ClCompile Include="Src\World\Components\Light.cpp" />
+    <ClCompile Include="Src\World\Components\Renderable.cpp" />
+    <ClCompile Include="Src\World\GameObject.cpp" />
+    <ClCompile Include="Src\World\SceneManager.cpp" />
+    <ClCompile Include="Src\World\Scene.cpp" />
+    <ClCompile Include="Src\World\World.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

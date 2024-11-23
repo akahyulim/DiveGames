@@ -4,7 +4,7 @@
 namespace Dive
 {
 	ResourceManager* ResourceManager::s_pInstance = nullptr;
-
+	
 	ResourceManager::ResourceManager()
 	{
 	}
@@ -18,14 +18,14 @@ namespace Dive
 	{
 		if (!pResource)
 		{
-			DV_ENGINE_WARN("잘못된 리소스 포인터를 전달받았습니다.");
+			DV_LOG(ResourceManager, warn, "잘못된 리소스 포인터를 전달받았습니다.");
 			return false;
 		}
 
 		auto& name = pResource->GetName();
 		if (name.empty())
 		{
-			DV_ENGINE_WARN("매뉴얼 리소스를 추가하기 위해선 리소스에 이름이 존재해야 합니다.");
+			DV_LOG(ResourceManager, warn, "매뉴얼 리소스를 추가하기 위해선 리소스에 이름이 존재해야 합니다.");
 			return false;
 		}
 
@@ -34,7 +34,7 @@ namespace Dive
 		auto it = m_ResourceGroups[pResource->GetTypeHash()].find(pResource->GetNameHash());
 		if (it != m_ResourceGroups[pResource->GetTypeHash()].end())
 		{
-			DV_ENGINE_WARN("동일한 이름의 리소스({0:s}: {1:s})가 이미 등록되어 있습니다.", pResource->GetTypeName(), name);
+			DV_LOG(ResourceManager, warn, "동일한 이름의 리소스({0:s}: {1:s})가 이미 등록되어 있습니다.", pResource->GetTypeName(), name);
 			return false;
 		}
 
@@ -53,7 +53,7 @@ namespace Dive
 		}
 		m_ResourceGroups.clear();
 
-		DV_ENGINE_TRACE("리소스 매니져 셧다운에 성공하였습니다.");
+		DV_LOG(ResourceManager, trace, "리소스 매니져 셧다운에 성공하였습니다.");
 	}
 
 	Resource* ResourceManager::findResource(size_t typeHash, size_t nameHash)

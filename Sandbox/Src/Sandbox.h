@@ -3,6 +3,25 @@
 
 namespace Sandbox
 {
+	class Sandbox : public Dive::Application
+	{
+	public:
+		Sandbox();
+		~Sandbox();
+
+		void OnSetup() override;
+		void OnStart() override;
+		void OnTick() override;
+		void OnStop() override;
+
+		void HandleUpdate(const Dive::Event& e);
+
+	private:
+	private:
+
+	};
+
+	/*
 	enum eSceneType
 	{
 		Base,
@@ -20,6 +39,7 @@ namespace Sandbox
 
 		void OnSetup() override;
 		void OnStart() override;
+		void OnTick() override;
 		void OnStop() override;
 
 		void HandleUpdate(const Dive::Event& e);
@@ -57,4 +77,5 @@ namespace Sandbox
 
 		eSceneType m_SceneType;
 	};
+	*/
 }

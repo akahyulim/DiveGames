@@ -2,13 +2,21 @@
 #include "Scene.h"
 #include "GameObject.h"
 #include "Core/CoreDefs.h"
+#include "Core/Engine.h"
 #include "Components/Component.h"
 
 namespace Dive
 {
 	static constexpr uint64_t FIRST_ID = 0x1;
 	static constexpr uint64_t LAST_ID = 0xffffffffffffffff;
+	
+	uint32_t Scene::s_WorldCounter = 0;
 
+	Scene::Scene()
+	{
+	}
+
+	// 이건 일단 삭제 예정
 	Scene::Scene(int index, const std::string& name)
 		: m_Index(index)
 		, m_Name(name)
@@ -22,9 +30,12 @@ namespace Dive
 	{
 		Clear();
 
-		DV_ENGINE_TRACE("씬(index: {0:d}, name: {1:s}) 소멸", m_Index, m_Name);
+		DV_LOG(Scene, trace, "월드(index: {0:d}, name: {1:s}) 소멸", m_Index, m_Name);
 	}
 	
+	// 바로 삭제하면 안된다.
+	// 1. 프레임 업데이트 후
+	// 2. 스왑시 새로운 월드의 로드가 완료되어야 한다.
 	void Scene::Clear()
 	{
 		auto it = m_GameObjects.begin();
@@ -60,12 +71,12 @@ namespace Dive
 		auto id = getFreeGameObjectID();
 		if (id == 0)
 		{
-			DV_ENGINE_ERROR("더이상 새로운 GameObjecrt를 생성할 수 없습니다.");
+			DV_LOG(Scene, err, "더이상 새로운 GameObjecrt를 생성할 수 없습니다.");
 			return nullptr;
 		}
 
 		auto pNewGameObject = new GameObject(this, name);
-		DV_ENGINE_ASSERT(pNewGameObject);
+		DV_ASSERT(Scene, pNewGameObject);
 
 		m_GameObjects[id] = pNewGameObject;
 		pNewGameObject->SetID(id);
@@ -158,6 +169,25 @@ namespace Dive
 	uint64_t Scene::GetGameObjectsCount()
 	{
 		return static_cast<uint64_t>(m_GameObjects.size());
+	}
+
+	Scene* Scene::CreateWorld()
+	{
+		Scene* pNewWorld = new Scene;
+		pNewWorld->Rename("NewWorld_" + std::to_string(s_WorldCounter++));
+
+		GEngine->AddWorld(pNewWorld);
+
+		return pNewWorld;
+	}
+
+	void Scene::DestroyWorld(Scene* pWorld)
+	{
+		if (pWorld)
+		{
+			GEngine->RemoveWorld(pWorld);
+			pWorld->Clear();
+		}
 	}
 
 	uint64_t Scene::getFreeGameObjectID()

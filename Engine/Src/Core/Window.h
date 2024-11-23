@@ -5,27 +5,32 @@ namespace Dive
 	class Window
 	{
 	public:
-		Window();
-		~Window();
+		static bool Initialize();
+		static void Shutdown();
 
-		bool Create(uint32_t width, uint32_t height, bool borderless = false);
-		void Release();
+		static bool Run();
 
-		void Resize(uint32_t width, uint32_t height, bool borderless = false);
+		static bool Resize(uint32_t width, uint32_t height, bool Windowed = true);
 
-		HWND GetHandle() const { return m_hWnd; }
+		static DirectX::XMUINT2 GetSize();
+		static uint32_t GetWidth();
+		static uint32_t GetHeight();
 
-		LPCWSTR GetClassName() const { return m_ClassName.c_str(); }
-		void SetClassName(LPCWSTR name) { m_ClassName = name; }
+		static HWND GetHandle() { return s_hWnd; }
 
-		LPCWSTR GetTitle() const { return m_Title.c_str(); }
-		void SetTitle(LPCWSTR title) { m_Title = title; }
+		static LPCWSTR GetTitle() { return s_Title.c_str(); }
+		static void SetTitle(LPCWSTR title);
+
+		static bool IsWindowed() { return s_bWindowed; }
+
+		static void ShowWindow(int nCmdShow);
 
 	private:
+
 	private:
-		HINSTANCE m_hInstance;
-		HWND m_hWnd;
-		std::wstring m_ClassName;
-		std::wstring m_Title;
+		static HINSTANCE s_hInstance;
+		static HWND s_hWnd;
+		static std::wstring s_Title;
+		static bool s_bWindowed;
 	};
 }

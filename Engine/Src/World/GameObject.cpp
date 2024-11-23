@@ -27,7 +27,7 @@ namespace Dive
 		for (auto& it : m_Components)
 			DV_DELETE(it.second);
 
-		DV_ENGINE_TRACE("게임오브젝트({0:s}, {1:d}) 소멸", GetName(), GetID());
+		DV_LOG(GameObject, trace, "게임오브젝트({0:s}, {1:d}) 소멸", GetName(), GetID());
 	}
 
 	void GameObject::Update()
@@ -337,7 +337,7 @@ namespace Dive
 	{
 		if (DirectX::XMVector3Equal(target, GetPositionVector()))
 		{
-			DV_ENGINE_WARN("현재 위치를 바라볼 수 없습니다.");
+			DV_LOG(GameObject, warn, "현재 위치를 바라볼 수 없습니다.");
 			return;
 		}
 
@@ -346,7 +346,7 @@ namespace Dive
 
 		if (DirectX::XMVector3NearEqual(DirectX::XMVector3Dot(forwardVector, up), DirectX::XMVector3Length(up), DirectX::XMVectorReplicate(0.0001f)))
 		{
-			DV_ENGINE_WARN("바라보는 대상과 상향 벡터가 평행하여 적용이 불가능합니다.");
+			DV_LOG(GameObject, warn, "바라보는 대상과 상향 벡터가 평행하여 적용이 불가능합니다.");
 			return;
 		}
 
@@ -369,7 +369,7 @@ namespace Dive
 	{
 		if (!pTarget)
 		{
-			DV_ENGINE_WARN("바라보는 대상 게임오브젝트가 존재하지 않습니다.");
+			DV_LOG(GameObject, warn, "바라보는 대상 게임오브젝트가 존재하지 않습니다.");
 			return;
 		}
 
@@ -544,7 +544,7 @@ namespace Dive
 
 	bool GameObject::IsChildOf(GameObject* pParent) const
 	{
-		DV_ENGINE_ASSERT(pParent);
+		DV_ASSERT(GameObject, pParent);
 
 		if (pParent == this)
 			return true;

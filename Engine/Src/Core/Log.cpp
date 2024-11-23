@@ -3,41 +3,28 @@
 
 namespace Dive
 {
-	Log* Log::s_pInstance = nullptr;
+	std::string LogManager::s_Filename = "dive.log";
+	spdlog::level::level_enum LogManager::s_SetLevel = spdlog::level::trace;
+	spdlog::level::level_enum LogManager::s_FlushLevel = spdlog::level::err;
 
-	Log::Log()
-		: m_pEngineLogger(nullptr)
-		, m_pAppLogger(nullptr)
+	std::shared_ptr<spdlog::logger> LogManager::GetLogger(const std::string& category)
 	{
-	}
+		auto logger = spdlog::get(category);
+		if (!logger)
+		{
+			std::vector<spdlog::sink_ptr> logSinks;
+			logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
+			logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(s_Filename, true));
 
-	void Log::Initialize(spdlog::level::level_enum setLevel, spdlog::level::level_enum flushLevel)
-	{
-		std::vector<spdlog::sink_ptr> logSinks;
-		logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-		logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>("Dive.log", true));
+			logSinks[0]->set_pattern("%^[%T] %n: %v%$");
+			logSinks[1]->set_pattern("[%T] [%l] %n: %v");
 
-		logSinks[0]->set_pattern("%^[%T] %n: %v%$");
-		logSinks[1]->set_pattern("[%T] [%l] %n: %v");
+			logger = std::make_shared<spdlog::logger>(category, std::begin(logSinks), std::end(logSinks));
+			spdlog::register_logger(logger);
+			logger->set_level(s_SetLevel);
+			logger->flush_on(s_FlushLevel);
+		}
 
-		m_pEngineLogger = std::make_shared<spdlog::logger>("ENGINE", std::begin(logSinks), std::end(logSinks));
-		spdlog::register_logger(m_pEngineLogger);
-		m_pEngineLogger->set_level(setLevel);
-		m_pEngineLogger->flush_on(flushLevel);
-
-		m_pAppLogger = std::make_shared<spdlog::logger>("APP", std::begin(logSinks), std::end(logSinks));
-		spdlog::register_logger(m_pAppLogger);
-		m_pAppLogger->set_level(setLevel);
-		m_pAppLogger->flush_on(flushLevel);
-	}
-	
-	spdlog::logger* Log::GetEngineLogger()
-	{
-		return m_pEngineLogger.get();
-	}
-
-	spdlog::logger* Log::GetAppLogger()
-	{
-		return m_pAppLogger.get();
+		return logger;
 	}
 }

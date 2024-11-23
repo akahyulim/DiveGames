@@ -1,7 +1,7 @@
 #include "DivePch.h"
 #include "Component.h"
 #include "Core/CoreDefs.h"
-#include "Scene/GameObject.h"
+#include "World/GameObject.h"
 
 namespace Dive
 {

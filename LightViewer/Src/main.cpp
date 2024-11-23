@@ -5,14 +5,10 @@ int main()
 	LightViewer app;
 	if (app.Initialize())
 	{
-		DV_TRACE("시~작!");
-		while (app.Run())
-		{
-		}
-		DV_TRACE("중단!");
+		app.Run();
 	}
 
-	DV_TRACE("종료");
+	app.Release();
 
 	return 0;
 }

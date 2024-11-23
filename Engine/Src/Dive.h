@@ -1,8 +1,12 @@
 #pragma once
+
+// 미리 컴파일된 헤더
 #include "DivePch.h"
 
 // Core
 #include "Core/CoreDefs.h"
+#include "Core/FileUtils.h"
+#include "Core/StringUtils.h"
 #include "Core/Window.h"
 #include "Core/Object.h"
 #include "Core/EventHandler.h"
@@ -50,11 +54,12 @@
 #include "Resource/ResourceManager.h"
 
 // Scene
-#include "Scene/Scene.h"
-#include "Scene/SceneManager.h"
-#include "Scene/GameObject.h"
-#include "Scene/Components/Component.h"
-#include "Scene/Components/Camera.h"
-#include "Scene/Components/Light.h"
-#include "Scene/Components/Renderable.h"
+#include "World/Scene.h"
+#include "World/World.h"
+#include "World/SceneManager.h"
+#include "World/GameObject.h"
+#include "World/Components/Component.h"
+#include "World/Components/Camera.h"
+#include "World/Components/Light.h"
+#include "World/Components/Renderable.h"
 

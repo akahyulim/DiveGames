@@ -36,7 +36,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
 		{
-			DV_ERROR("VertexBuffer 생성에 실패하였습니다.");
+			DV_LOG(VerteBuffer, err, "VertexBuffer 생성에 실패하였습니다.");
 			return false;
 		}
 

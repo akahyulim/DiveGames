@@ -15,7 +15,7 @@ namespace Dive
 
     Material::~Material()
     {
-        DV_ENGINE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
+        DV_LOG(Material, trace, "resource destroy - {0:s}({1:d}), {2:s}({3:d})",
             GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
     }
 
@@ -85,7 +85,7 @@ namespace Dive
     {
         if (name.empty())
         {
-            DV_ENGINE_ERROR("잘못된 이름({:s})을 전달받았습니다.", name);
+            DV_LOG(Material, err, "잘못된 이름({:s})을 전달받았습니다.", name);
             return nullptr;
         }
 

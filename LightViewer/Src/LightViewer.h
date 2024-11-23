@@ -4,9 +4,16 @@
 class LightViewer
 {
 public:
+	LightViewer();
+	~LightViewer();
 
 	bool Initialize();
-	bool Run();
+	void Release();
+
+	void Run();
+
+private:
+	void initializeImGui();
 
 private:
 };

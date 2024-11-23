@@ -91,7 +91,7 @@ namespace Dive
 		void LookAt(const DirectX::XMVECTOR& target, const DirectX::XMVECTOR& up = { 0.0f, 1.0f, 0.0f, 1.0f });
 		void LookAt(const GameObject* pTarget, const DirectX::XMVECTOR& up = { 0.0f, 1.0f, 0.0f, 1.0f });
 
-		DirectX::XMFLOAT4X4 GetWorldTransform() const { return m_Transform; }	// 추후 이름에서 World 제거
+		DirectX::XMFLOAT4X4 GetWorldTransform() const { return m_Transform; }	// 추후 이름에서 Scene 제거
 		void SetTransform(const DirectX::XMFLOAT4X4& world);
 		DirectX::XMMATRIX GetMatrix() const { return DirectX::XMLoadFloat4x4(&m_Transform); }
 		void SetMatrix(const DirectX::XMMATRIX& world);

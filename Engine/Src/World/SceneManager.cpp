@@ -6,7 +6,7 @@
 namespace Dive
 {
 	SceneManager* SceneManager::s_pInstance = nullptr;
-
+	
 	SceneManager::SceneManager()
 		: m_pActiveScene(nullptr)
 	{
@@ -27,7 +27,7 @@ namespace Dive
 
 		m_pActiveScene = nullptr;
 
-		DV_ENGINE_TRACE("씬 매니져 셧다운에 성공하였습니다.");
+		DV_LOG(SceneManager, trace, "씬 매니져 셧다운에 성공하였습니다.");
 	}
 
 	Scene* SceneManager::CreateScene(const std::string& sceneName)
@@ -36,7 +36,7 @@ namespace Dive
 		{
 			if (pScene->GetName() == sceneName)
 			{
-				DV_ENGINE_WARN("동일한 이름의 씬({:s})이 이미 존재합니다.", sceneName);
+				DV_LOG(SceneManager, warn, "동일한 이름의 씬({:s})이 이미 존재합니다.", sceneName);
 				return nullptr;
 			}
 		}
@@ -55,7 +55,7 @@ namespace Dive
 	{
 		if (index < 0 || index >= m_Scenes.size())
 		{
-			DV_ENGINE_WARN("잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
+			DV_LOG(SceneManager, warn, "잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
 			return;
 		}
 
@@ -80,7 +80,7 @@ namespace Dive
 	{
 		if (index < 0 || index >= m_Scenes.size())
 		{
-			DV_ENGINE_WARN("잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
+			DV_LOG(SceneManager, warn, "잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
 			return false;
 		}
 
@@ -118,7 +118,7 @@ namespace Dive
 	{
 		if (index < 0 || index >= m_Scenes.size())
 		{
-			DV_ENGINE_WARN("잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
+			DV_LOG(SceneManager, warn, "잘못된 씬 인덱스({:d})를 전달받았습니다.", index);
 			return nullptr;
 		}
 

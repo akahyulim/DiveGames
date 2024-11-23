@@ -5,12 +5,12 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/ConstantBuffer.h"
 #include "Core/CoreDefs.h"
-#include "Scene/Scene.h"
-#include "Scene/SceneManager.h"
-#include "Scene/GameObject.h"
-#include "Scene/Components/Camera.h"
-#include "Scene/Components/Renderable.h"
-#include "Scene/Components/Light.h"
+#include "World/Scene.h"
+#include "World/SceneManager.h"
+#include "World/GameObject.h"
+#include "World/Components/Camera.h"
+#include "World/Components/Renderable.h"
+#include "World/Components/Light.h"
 
 
 #include "Graphics/Shader.h"
@@ -25,8 +25,8 @@ namespace Dive
 		, m_pCamera(pCamera)
 		, m_RenderPath(renderPath)
 	{
-		DV_ENGINE_ASSERT(m_pGraphics->IsInitialized());
-		DV_ENGINE_ASSERT(m_pRenderer->IsInitialized());
+		DV_ASSERT(ViewScreen, m_pGraphics->IsInitialized());
+		DV_ASSERT(ViewScreen, m_pRenderer->IsInitialized());
 
 		m_pActiveScene = GetSceneManager()->GetActiveScene();
 

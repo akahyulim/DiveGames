@@ -6,7 +6,7 @@
 namespace Dive
 {
 	Input* Input::s_pInstance = nullptr;
-
+	
 	Input::Input()
 		: m_pDirectInput(nullptr)
 		, m_pKeyboard(nullptr)
@@ -40,7 +40,7 @@ namespace Dive
 	{
 		if (!Graphics::GetInstance()->IsInitialized())
 		{
-			DV_ENGINE_ERROR("윈도우가 존재하지 않아 인풋 시스템을 초기화할 수 없습니다.");
+			DV_LOG(Input, err, "윈도우가 존재하지 않아 인풋 시스템을 초기화할 수 없습니다.");
 			return false;
 		}
 
@@ -49,7 +49,7 @@ namespace Dive
 
 		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&m_pDirectInput, nullptr)))
 		{
-			DV_ENGINE_ERROR("Input 초기화 과정 중 DirectInput 객체 생성에 실패하였습니다.");
+			DV_LOG(Input, err, "Input 초기화 과정 중 DirectInput 객체 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -57,25 +57,25 @@ namespace Dive
 		{
 			if (FAILED(m_pDirectInput->CreateDevice(GUID_SysKeyboard, &m_pKeyboard, nullptr)))
 			{
-				DV_ENGINE_ERROR("Input 초기화 과정 중 키보드 장치 객체 생성에 실패하였습니다.");
+				DV_LOG(Input, err, "Input 초기화 과정 중 키보드 장치 객체 생성에 실패하였습니다.");
 				return false;
 			}
 
 			if (FAILED(m_pKeyboard->SetDataFormat(&c_dfDIKeyboard)))
 			{
-				DV_ENGINE_ERROR("Input 초기화 과정 중 키보드 데이터 포멧 설정에 실패하였습니다.");
+				DV_LOG(Input, err, "Input 초기화 과정 중 키보드 데이터 포멧 설정에 실패하였습니다.");
 				return false;
 			}
 
 			if (FAILED(m_pKeyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
 			{
-				DV_ENGINE_ERROR("Input 초기화 과정 중 키보드 코퍼레이트 레벨 설정에 실패하였습니다.");
+				DV_LOG(Input, err, "Input 초기화 과정 중 키보드 코퍼레이트 레벨 설정에 실패하였습니다.");
 				return false;
 			}
 
 			if (FAILED(m_pKeyboard->Acquire()))
 			{
-				DV_ENGINE_ERROR("Input 초기화 과정 중 키보드 획득에 실패하였습니다.");
+				DV_LOG(Input, err, "Input 초기화 과정 중 키보드 획득에 실패하였습니다.");
 				return false;
 			}
 		}
@@ -84,30 +84,30 @@ namespace Dive
 		{
 			if (FAILED(m_pDirectInput->CreateDevice(GUID_SysMouse, &m_pMouse, NULL)))
 			{
-				DV_ENGINE_ERROR("Input 초기화 과정 중 마우스 장치 객체 생성에 실패하였습니다.");
+				DV_LOG(Input, err, "Input 초기화 과정 중 마우스 장치 객체 생성에 실패하였습니다.");
 				return false;
 			}
 
 			if (FAILED(m_pMouse->SetDataFormat(&c_dfDIMouse)))
 			{
-				DV_ENGINE_ERROR("Input 초기화 과정 중 마우스 데이터 포멧 설정에 실패하였습니다.");
+				DV_LOG(Input, err, "Input 초기화 과정 중 마우스 데이터 포멧 설정에 실패하였습니다.");
 				return false;
 			}
 
 			if (FAILED(m_pMouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
 			{
-				DV_ENGINE_ERROR("Input 초기화 과정 중 마우스 코퍼레이트 레벨 설정에 실패하였습니다.");
+				DV_LOG(Input, err, "Input 초기화 과정 중 마우스 코퍼레이트 레벨 설정에 실패하였습니다.");
 				return false;
 			}
 
 			if (FAILED(m_pMouse->Acquire()))
 			{
-				DV_ENGINE_ERROR("Input 초기화 과정 중 마우스 획득에 실패하였습니다.");
+				DV_LOG(Input, err, "Input 초기화 과정 중 마우스 획득에 실패하였습니다.");
 				return false;
 			}
 		}
 
-		DV_ENGINE_TRACE("인풋 시스템 초기화에 성공하였습니다.");
+		DV_LOG(Input, trace, "인풋 시스템 초기화에 성공하였습니다.");
 
 		return true;
 	}
@@ -128,7 +128,7 @@ namespace Dive
 
 		DV_RELEASE(m_pDirectInput);
 
-		DV_ENGINE_TRACE("인풋 시스템 셧다운에 성공하였습니다.");
+		DV_LOG(Input, trace, "인풋 시스템 셧다운에 성공하였습니다.");
 	}
 
 	void Input::Update()
@@ -153,7 +153,7 @@ namespace Dive
 				m_pKeyboard->Acquire();
 			else
 			{
-				DV_ENGINE_ASSERT("키보드 연결에 실패하였습니다.");
+				DV_ASSERT(Input, false, "키보드 연결에 실패하였습니다.");
 				return;
 			}
 		}
@@ -174,7 +174,7 @@ namespace Dive
 				m_pMouse->Acquire();
 			else
 			{
-				DV_ENGINE_ASSERT("마우스 연결에 실패하였습니다.");
+				DV_ASSERT(Input, "마우스 연결에 실패하였습니다.");
 				return;
 			}
 		}

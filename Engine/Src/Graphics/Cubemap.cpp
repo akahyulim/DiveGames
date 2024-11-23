@@ -31,7 +31,7 @@ namespace Dive
 
 		default:
 			m_Format = DXGI_FORMAT_UNKNOWN;
-			DV_ENGINE_ERROR("Cubemap 생성 도중 잘못된 깊이 비트를 전달받았습니다.");
+			DV_LOG(CubeMap, err, "Cubemap 생성 도중 잘못된 깊이 비트를 전달받았습니다.");
 			break;
 		}
 
@@ -60,7 +60,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
 			{
-				DV_ENGINE_ERROR("Cubemap의 ID3D11Texture2D 생성에 실패하였습니다.");
+				DV_LOG(CubeMap, err, "Cubemap의 ID3D11Texture2D 생성에 실패하였습니다.");
 				Release();
 				return false;
 			}
@@ -75,7 +75,7 @@ namespace Dive
 			
 			if (FAILED(m_pDevice->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pRenderTargetView)))
 			{
-				DV_ENGINE_ERROR("Cubemap의 ID3D11RenderTargetView 생성에 실패하였습니다.");
+				DV_LOG(CubeMap, err, "Cubemap의 ID3D11RenderTargetView 생성에 실패하였습니다.");
 				Release();
 				return false;
 			}
@@ -90,7 +90,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
 			{
-				DV_ENGINE_ERROR("Cubemap의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
+				DV_LOG(CubeMap, err, "Cubemap의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
 				Release();
 				return false;
 			}
@@ -117,7 +117,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateTexture2D(&desc, nullptr, &m_pTexture)))
 			{
-				DV_ENGINE_ERROR("Cubemap의 ID3D11Texture2D 생성에 실패하였습니다.");
+				DV_LOG(CubeMap, err, "Cubemap의 ID3D11Texture2D 생성에 실패하였습니다.");
 				Release();
 				return false;
 			}
@@ -133,7 +133,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pDepthStencilView)))
 			{
-				DV_ENGINE_ERROR("Cubemap의 ID3D11DepthStencilView 생성에 실패하였습니다.");
+				DV_LOG(CubeMap, err, "Cubemap의 ID3D11DepthStencilView 생성에 실패하였습니다.");
 				Release();
 				return false;
 			}
@@ -149,7 +149,7 @@ namespace Dive
 
 			if (FAILED(m_pDevice->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_pTexture), &desc, &m_pShaderResourceView)))
 			{
-				DV_ENGINE_ERROR("Cubemap의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
+				DV_LOG(CubeMap, err, "Cubemap의 ID3D11ShaderResourceView 생성에 실패하였습니다.");
 				Release();
 				return false;
 			}

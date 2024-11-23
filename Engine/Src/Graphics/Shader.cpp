@@ -40,7 +40,7 @@ namespace Dive
 			profile = "cs_5_0";
 			break;
 		default:
-			DV_ENGINE_ERROR("잘못된 셰이더 타입을 전달받아 셰이더 파일 컴파일에 실패하였습니다.");
+			DV_LOG(Shader, err, "잘못된 셰이더 타입을 전달받아 셰이더 파일 컴파일에 실패하였습니다.");
 			return nullptr;
 		}
 
@@ -58,9 +58,9 @@ namespace Dive
 			&pErrorMsgs)))
 		{
 			if (pErrorMsgs)
-				DV_ENGINE_ERROR("{:s}", (char*)pErrorMsgs->GetBufferPointer());
+				DV_LOG(Shader, err, "{:s}", (char*)pErrorMsgs->GetBufferPointer());
 			else
-				DV_ENGINE_ERROR("셰이더 파일({:s}) 컴파일에 실패하였습니다.", fileName);
+				DV_LOG(Shader, err, "셰이더 파일({:s}) 컴파일에 실패하였습니다.", fileName);
 
 			DV_RELEASE(pErrorMsgs);
 			DV_RELEASE(pShaderBlob);
@@ -106,7 +106,7 @@ namespace Dive
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			break;
 		default:
-			DV_ENGINE_ERROR("잘못된 입력 레이아웃 타입을 전달받아 입력 레이아웃 구성에 실패하였습니다.");
+			DV_LOG(Shader, err, "잘못된 입력 레이아웃 타입을 전달받아 입력 레이아웃 구성에 실패하였습니다.");
 			elements.clear();
 		}
 
@@ -124,7 +124,7 @@ namespace Dive
 		, m_pPixelShader(nullptr)
 		, m_pInputLayout(nullptr)
 	{
-		DV_ENGINE_ASSERT(m_pDevice);
+		DV_ASSERT(Shader, m_pDevice);
 	}
 	
 	Shader::~Shader()
@@ -137,7 +137,7 @@ namespace Dive
 		DV_RELEASE(m_pVertexShader);
 		DV_RELEASE(m_pInputLayout);
 
-		DV_ENGINE_TRACE("resource destroy - {0:s}({1:d}), {2:s}({3:d})",
+		DV_LOG(Shader, trace, "resource destroy - {0:s}({1:d}), {2:s}({3:d})",
 			GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
 	}
 
@@ -155,7 +155,7 @@ namespace Dive
 				NULL, 
 				&m_pVertexShader)))
 			{
-				DV_ENGINE_ERROR("VertexShader 생성에 실패하였습니다.");
+				DV_LOG(Shader, err, "VertexShader 생성에 실패하였습니다.");
 				return false;
 			}
 
@@ -172,7 +172,7 @@ namespace Dive
 				NULL, 
 				&m_pHullShader)))
 			{
-				DV_ENGINE_ERROR("HullShader 생성에 실패하였습니다.");
+				DV_LOG(Shader, err, "HullShader 생성에 실패하였습니다.");
 				return false;
 			}
 			break;
@@ -183,7 +183,7 @@ namespace Dive
 				NULL, 
 				&m_pDomainShader)))
 			{
-				DV_ENGINE_ERROR("DomainShader 생성에 실패하였습니다.");
+				DV_LOG(Shader, err, "DomainShader 생성에 실패하였습니다.");
 				return false;
 			}
 			break; 
@@ -194,7 +194,7 @@ namespace Dive
 					NULL,
 					&m_pGeometryShader)))
 				{
-					DV_ENGINE_ERROR("GeometryShader 생성에 실패하였습니다.");
+					DV_LOG(Shader, err, "GeometryShader 생성에 실패하였습니다.");
 					return false;
 				}
 				break;
@@ -205,7 +205,7 @@ namespace Dive
 				NULL, 
 				&m_pPixelShader)))
 			{
-				DV_ENGINE_ERROR("Pixel Shader 생성에 실패하였습니다.");
+				DV_LOG(Shader, err, "Pixel Shader 생성에 실패하였습니다.");
 				return false;
 			}
 			break;
@@ -216,12 +216,12 @@ namespace Dive
 				NULL,
 				&m_pComputeShader)))
 			{
-				DV_ENGINE_ERROR("ComputeShader 생성에 실패하였습니다.");
+				DV_LOG(Shader, err, "ComputeShader 생성에 실패하였습니다.");
 				return false;
 			}
 			break;
 		default:
-			DV_ENGINE_ERROR("잘못된 셰이더 타입을 전달받아 셰이더 생성에 실패하였습니다.");
+			DV_LOG(Shader, err, "잘못된 셰이더 타입을 전달받아 셰이더 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -234,8 +234,8 @@ namespace Dive
 	
 	bool Shader::createInputLayout(ID3D10Blob* pShaderBlob, eInputLayout layout)
 	{
-		DV_ENGINE_ASSERT(pShaderBlob);
-		//DV_ENGINE_ASSERT(layout != eInputLayout::None);
+		DV_ASSERT(Shader, pShaderBlob);
+		//DV_ASSERT(Shader, layout != eInputLayout::None);
 
 		auto inputElements = GetInputElements(layout);
 
@@ -246,7 +246,7 @@ namespace Dive
 			pShaderBlob->GetBufferSize(),
 			&m_pInputLayout)))
 		{
-			DV_ENGINE_ERROR("InputLayout 생성에 실패하였습니다.");
+			DV_LOG(Shader, err, "InputLayout 생성에 실패하였습니다.");
 			return false;
 		}
 

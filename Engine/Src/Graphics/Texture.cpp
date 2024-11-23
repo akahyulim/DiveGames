@@ -16,11 +16,11 @@ namespace Dive
         , m_MipLevels(1)
 		, m_bOpaque(true)
     {
-        m_pDevice = Graphics::GetInstance()->GetDevice();
-        DV_ASSERT(m_pDevice);
+		m_pDevice = Graphics::GetInstance()->GetDevice();
+        DV_ASSERT(Texture, m_pDevice);
 
         m_pDeviceContext = Graphics::GetInstance()->GetDeviceContext();
-        DV_ASSERT(m_pDeviceContext);
+        DV_ASSERT(Texture, m_pDeviceContext);
     }
     
     Texture::~Texture()

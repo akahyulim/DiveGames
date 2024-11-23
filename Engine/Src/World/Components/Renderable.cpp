@@ -1,6 +1,6 @@
 #include "divepch.h"
 #include "Renderable.h"
-#include "Scene/GameObject.h"
+#include "World/GameObject.h"
 #include "Core/CoreDefs.h"
 #include "Renderer/Mesh.h"
 #include "Renderer/Material.h"
@@ -149,7 +149,7 @@ namespace Dive
 
 		pMesh->SetGameObject(GetGameObject());
 
-		DV_ENGINE_DEBUG("vertex offset: {0:d}, indexOffset: {1:d}", vertexOffset, indexOffset);
+		DV_LOG(Renderable, info, "vertex offset: {0:d}, indexOffset: {1:d}", vertexOffset, indexOffset);
 	}
 
 	VertexBuffer* Renderable::GetVertexBuffer() const

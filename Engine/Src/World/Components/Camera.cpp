@@ -4,7 +4,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Texture2D.h"
 #include "Graphics/ConstantBuffer.h"
-#include "Scene/GameObject.h"
+#include "World/GameObject.h"
 
 namespace Dive
 {

@@ -7,9 +7,9 @@
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Math/Math.h"
-#include "Scene/SceneManager.h"
-#include "Scene/GameObject.h"
-#include "Scene/Components/Renderable.h"
+#include "World/SceneManager.h"
+#include "World/GameObject.h"
+#include "World/Components/Renderable.h"
 
 using namespace DirectX;
 

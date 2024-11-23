@@ -10,9 +10,9 @@
 #include "IO/FileSystem.h"
 #include "Math/BoundingBox.h"
 #include "Resource/ResourceManager.h"
-#include "Scene/SceneManager.h"
-#include "Scene/GameObject.h"
-#include "Scene/Components/Renderable.h"
+#include "World/SceneManager.h"
+#include "World/GameObject.h"
+#include "World/Components/Renderable.h"
 
 namespace Dive
 {
@@ -69,7 +69,7 @@ namespace Dive
             // 1. 뼈대가 4개를 초과할 경우 가장 작은 wegiht와 bone을 제거
             if (outBlendWeights[i].size() > 4)
             {
-                DV_WARN("{:d}번째 정점에 영향을 주는 뼈대가 4개 이상입니다.", i);
+                DV_LOG(ModelLoader, warn, "{:d}번째 정점에 영향을 주는 뼈대가 4개 이상입니다.", i);
 
                 while (outBlendWeights[i].size() > 4)
                 {
@@ -95,7 +95,7 @@ namespace Dive
                 sum += outBlendWeights[i][j];
             if (sum != 1.0f && sum != 0.0f)
             {
-                DV_WARN("Weight 총합이 1.0이 아니어서 정규화를 수행");
+                DV_LOG(ModelLoader, warn, "Weight 총합이 1.0이 아니어서 정규화를 수행");
 
                 for (uint32_t j = 0; j < static_cast<uint32_t>(outBlendWeights[i].size()); ++j)
                     outBlendWeights[i][j] /= sum;
@@ -125,14 +125,14 @@ namespace Dive
         s_aiScene = importer.ReadFile(fileName, flags);
         if (!s_aiScene || s_aiScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !s_aiScene->mRootNode)
         {
-            DV_ERROR("{:s}", importer.GetErrorString());
+            DV_LOG(ModelLoader, err, "{:s}", importer.GetErrorString());
             return false;
         }
 
         s_pActiveScene = SceneManager::GetInstance()->GetActiveScene();
         if (!s_pActiveScene)
         {
-            DV_ENGINE_ERROR("모델 파일을 저장할 활성화된 Scene이 존재하지 않습니다.");
+            DV_LOG(ModelLoader, err, "모델 파일을 저장할 활성화된 Scene이 존재하지 않습니다.");
             return false;
         }
 
@@ -439,7 +439,7 @@ namespace Dive
                 pDiffuseTex = ResourceManager::GetInstance()->GetResource<Texture2D>(diffuseTexturePath);
             }
             pMat->SetDvTexture(eTextureUnitType::Diffuse, pDiffuseTex);
-            DV_ENGINE_INFO("Load DiffuseMap");
+            DV_LOG(ModelLoader, info, "Load DiffuseMap");
         }
 
         // normal map
@@ -461,7 +461,7 @@ namespace Dive
                 pNormalTex = ResourceManager::GetInstance()->GetResource<Texture2D>(normalTexturePath);
             }
             pMat->SetDvTexture(eTextureUnitType::Normal, pNormalTex);
-            DV_ENGINE_INFO("Load NormalMap");
+            DV_LOG(ModelLoader, info, "Load NormalMap");
         }
         
         return pMat;

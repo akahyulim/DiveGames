@@ -2,7 +2,7 @@
 
 namespace Dive
 {
-	class FileSystem
+	class FileUtils
 	{
 	public:
 		// file and directory
@@ -26,17 +26,4 @@ namespace Dive
 		static bool Rename(const std::string& sourceFileName, const std::string& destFileName);
 		static bool Delete(const std::string& fileName);
 	};
-
-	// strings
-	std::string ToUpperCase(const std::string& str);
-	std::string ToLowerCase(const std::string& str);
-	std::string StringLeftTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
-	std::string StringRightTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
-	std::string StringTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
-	std::string AddTrailingSlash(const std::string& pathName);
-	std::string RemoveTrailingSlash(const std::string& pathName);
-	std::string StringReplace(const std::string& str, const std::string& target, const std::string& replace);
-	std::wstring StringToWstring(const std::string& str);
-	std::string WstringToString(const std::wstring& str);
-	std::vector<std::string> StringSplit(const std::string& str, char seperator);
 }

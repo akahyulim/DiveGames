@@ -5,49 +5,28 @@
 #include <spdlog/sinks/ostream_sink.h>
 #include <spdlog/sinks/basic_file_sink.h>
 
-#define DV_ENGINE_TRACE(...)	Dive::Log::GetInstance()->GetEngineLogger()->trace(__VA_ARGS__)
-#define DV_ENGINE_INFO(...)		Dive::Log::GetInstance()->GetEngineLogger()->info(__VA_ARGS__)
-#define DV_ENGINE_DEBUG(...)	Dive::Log::GetInstance()->GetEngineLogger()->debug(__VA_ARGS__)
-#define DV_ENGINE_WARN(...)		Dive::Log::GetInstance()->GetEngineLogger()->warn(__VA_ARGS__)
-#define DV_ENGINE_ERROR(...)	Dive::Log::GetInstance()->GetEngineLogger()->error(__VA_ARGS__)
-#define DV_ENGINE_CRITICAL(...)	Dive::Log::GetInstance()->GetEngineLogger()->critical(__VA_ARGS__)
-
-#define DV_TRACE(...)		    Dive::Log::GetInstance()->GetAppLogger()->trace(__VA_ARGS__)
-#define DV_INFO(...)			Dive::Log::GetInstance()->GetAppLogger()->info(__VA_ARGS__)
-#define DV_DEBUG(...)			Dive::Log::GetInstance()->GetAppLogger()->debug(__VA_ARGS__)
-#define DV_WARN(...)			Dive::Log::GetInstance()->GetAppLogger()->warn(__VA_ARGS__)
-#define DV_ERROR(...)			Dive::Log::GetInstance()->GetAppLogger()->error(__VA_ARGS__)
-#define DV_CRITICAL(...)		Dive::Log::GetInstance()->GetAppLogger()->critical(__VA_ARGS__)
+#define DV_LOG(CategoryName, Level, Format, ...) \
+	do { \
+		auto logger = Dive::LogManager::GetLogger(#CategoryName); \
+		logger->log(spdlog::level::Level, Format, ##__VA_ARGS__); \
+	} while (0)
 
 namespace Dive
 {
-	class Log
+	class LogManager
 	{
 	public:
-		Log(const Log&) = delete;
-		void operator=(const Log&) = delete;
+		static std::shared_ptr<spdlog::logger> GetLogger(const std::string& category);
 
-		static Log* GetInstance()
-		{
-			if (!s_pInstance)
-				s_pInstance = new Log;
-
-			return s_pInstance;
-		}
-
-		void Initialize(spdlog::level::level_enum setLevel = spdlog::level::err, spdlog::level::level_enum flushLevel = spdlog::level::err);
-
-		spdlog::logger* GetEngineLogger();
-		spdlog::logger* GetAppLogger();
+		// 반드시 로거 등록 전에 설정해야 한다.
+		static void SetLevels(spdlog::level::level_enum setLevel, spdlog::level::level_enum flushLevel) { s_SetLevel = setLevel; s_FlushLevel = flushLevel; }
+		static void SetFilename(const std::string& filename) { s_Filename = filename; }
+		// 경로 확인용(변경 불가)
+		static const std::string& GetFilename() { return s_Filename; }
 
 	private:
-		Log();
-		~Log() = default;
-
-	private:
-		static Log* s_pInstance;
-
-		std::shared_ptr<spdlog::logger> m_pEngineLogger;
-		std::shared_ptr<spdlog::logger> m_pAppLogger;
+		static std::string s_Filename;
+		static spdlog::level::level_enum s_SetLevel;
+		static spdlog::level::level_enum s_FlushLevel;
 	};
 }
