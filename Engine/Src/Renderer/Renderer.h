@@ -36,6 +36,10 @@ namespace Dive
 	public:
 		static bool Initialize();
 		static void Shutdown();
+		
+		static void Update();
+		static void Render();
+		static void Present();
 
 		static ID3D11RenderTargetView* GetScreenBufferView() { return s_pScreenRenderTargetView; }
 		static ID3D11DepthStencilView* GetScreenDepthStencilView() { return s_pScreenDepthStencilView; }
@@ -49,6 +53,14 @@ namespace Dive
 		static const DirectX::XMFLOAT2& GetScreenSize() { return s_ScreenSize; }
 		static void ChangeScreenSize(uint32_t width, uint32_t height);
 
+		static bool IsVSync() { return s_bVSync; }
+		static void SetVSync(bool use) { s_bVSync = use; }
+
+		// 추후 제거 대상
+		static void SetClearColor(float r, float g, float b, float a) {
+			s_ClearColor[0] = r;	s_ClearColor[1] = g;	s_ClearColor[2] = b;	s_ClearColor[3] = a;
+		}
+
 	private:
 		static bool createRenderTargets();
 		static bool updateScreenViews();
@@ -57,13 +69,16 @@ namespace Dive
 		static IDXGISwapChain* s_pSwapChain;
 		static ID3D11Device* s_pDevice;
 		static ID3D11DeviceContext* s_pDeviceContext;
-		static ID3D11RenderTargetView* s_pScreenRenderTargetView;			// 버퍼라는 이름이 마음에 들지 않는다.
+		static ID3D11RenderTargetView* s_pScreenRenderTargetView;
 		static ID3D11Texture2D* s_pScreenDepthStencilTexture;
 		static ID3D11DepthStencilView* s_pScreenDepthStencilView;
 
 		static DirectX::XMFLOAT2 s_RenerTargetSize;	// 직접 설정?
 		static DirectX::XMFLOAT2 s_ScreenSize;
-		static BOOL s_bWindowed;
+		static bool s_bVSync;
+
+		// 추후 제거 대상
+		static float s_ClearColor[4];	// 카메라에서 설정
 
 	};
 

@@ -9,7 +9,11 @@
 
 namespace Dive
 {
-	constexpr uint32_t BUFFER_COUNT = 2;
+	constexpr uint32_t DEFAULT_BUFFER_COUNT = 2;
+	constexpr uint32_t DEFAULT_REFRESHRATE_NUMERATOR = 60;
+	constexpr uint32_t DEFAULT_REFRESHRATE_DENOMINATOR = 1;
+	constexpr DXGI_FORMAT DEFAULT_FORMAT = DXGI_FORMAT_R8G8B8A8_UNORM;
+	constexpr BOOL DEFAULT_WINDOWED = TRUE;
 
 	IDXGISwapChain* DvRenderer::s_pSwapChain = nullptr;
 	ID3D11Device* DvRenderer::s_pDevice = nullptr;
@@ -20,7 +24,10 @@ namespace Dive
 
 	DirectX::XMFLOAT2 DvRenderer::s_RenerTargetSize = { 0.0f, 0.0f };
 	DirectX::XMFLOAT2 DvRenderer::s_ScreenSize = { 0.0f, 0.0f };
-	BOOL DvRenderer::s_bWindowed = TRUE;
+	bool DvRenderer::s_bVSync = false;
+
+	// 제거할 대상
+	float DvRenderer::s_ClearColor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 
 	bool DvRenderer::Initialize()
 	{
@@ -52,16 +59,16 @@ namespace Dive
 		pDxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&pDxgiFactory);
 
 		DXGI_SWAP_CHAIN_DESC desc{};
-		desc.BufferCount = BUFFER_COUNT;
+		desc.BufferCount = DEFAULT_BUFFER_COUNT;
 		desc.BufferDesc.Width = Window::GetWidth();
 		desc.BufferDesc.Height = Window::GetHeight();
-		desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;	// sRGB 적용 여부에 따라 달라진다.
-		desc.BufferDesc.RefreshRate.Denominator = 1;			// 추후 수정(vsync에 따라 달라진다?)
-		desc.BufferDesc.RefreshRate.Numerator = 0;
+		desc.BufferDesc.Format = DEFAULT_FORMAT;
+		desc.BufferDesc.RefreshRate.Denominator = DEFAULT_REFRESHRATE_DENOMINATOR;
+		desc.BufferDesc.RefreshRate.Numerator = DEFAULT_REFRESHRATE_NUMERATOR;
 		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		desc.SampleDesc.Count = 1;								// 멀티 샘플링 off
 		desc.SampleDesc.Quality = 0;
-		desc.Windowed = s_bWindowed;
+		desc.Windowed = DEFAULT_WINDOWED;
 		desc.OutputWindow = Window::GetHandle();
 		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
 
@@ -71,6 +78,11 @@ namespace Dive
 			DV_LOG(DvRenderer, err, "D3D11SwapChain 생성 실패");
 			return false;
 		}
+
+		// 추후 문제가 발생하면 지워보기
+		DV_RELEASE(pDxgiFactory);
+		DV_RELEASE(pDxgiAdapter);
+		DV_RELEASE(pDxgiDevice);
 
 		if (!updateScreenViews())
 			return false;
@@ -93,6 +105,26 @@ namespace Dive
 		DV_LOG(DvRenderer, trace, "셧다운 성공");
 	}
 
+	void DvRenderer::Update()
+	{
+	}
+
+	void DvRenderer::Render()
+	{
+		// 어찌되었든 백버퍼를 클리어하고 렌더타겟으로 설정하는 과정은 필요하다.
+		// 따라서 별도의 함수화도 생각할 수 있다.
+		{
+			s_pDeviceContext->ClearRenderTargetView(s_pScreenRenderTargetView, s_ClearColor);
+			s_pDeviceContext->ClearDepthStencilView(s_pScreenDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			s_pDeviceContext->OMSetRenderTargets(1, &s_pScreenRenderTargetView, s_pScreenDepthStencilView);
+		}
+	}
+
+	void DvRenderer::Present()
+	{
+		s_pSwapChain->Present(s_bVSync ? 1 : 0, 0);
+	}
+
 	void DvRenderer::SetRenderTargetSize(uint32_t width, uint32_t height)
 	{
 		// 전달받은 크기가 유효한지 확인 필요
@@ -103,7 +135,7 @@ namespace Dive
 		s_RenerTargetSize = { static_cast<float>(width), static_cast<float>(height) };
 		createRenderTargets();	// 굳이 메서드를 분리할 필요가 있나?
 
-		DV_LOG(DvRenderer, info, "Intermediate Resolution 변경 - {0:d}x{1:d}", width, height);
+		DV_LOG(DvRenderer, info, "렌더 타겟 크기 변경 - {0:d}x{1:d}", width, height);
 	}
 
 	
@@ -123,9 +155,9 @@ namespace Dive
 		DXGI_MODE_DESC desc{};
 		desc.Width = width;
 		desc.Height = height;
-		desc.RefreshRate.Numerator = 60;
-		desc.RefreshRate.Denominator = 1;
-		desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		desc.RefreshRate.Numerator = DEFAULT_REFRESHRATE_NUMERATOR;
+		desc.RefreshRate.Denominator = DEFAULT_REFRESHRATE_DENOMINATOR;
+		desc.Format = DEFAULT_FORMAT;
 
 		if (FAILED(s_pSwapChain->ResizeTarget(&desc)))
 		{
@@ -137,7 +169,7 @@ namespace Dive
 		DV_RELEASE(s_pScreenRenderTargetView);		// 정확히는 후면 버퍼를 참조해 만든 얘를 릴리즈 해야 한다.
 		s_pDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
 
-		if (FAILED(s_pSwapChain->ResizeBuffers(BUFFER_COUNT, width, height, DXGI_FORMAT_R8G8B8A8_UNORM, 0)))
+		if (FAILED(s_pSwapChain->ResizeBuffers(DEFAULT_BUFFER_COUNT, width, height, DEFAULT_FORMAT, 0)))
 		{
 			DV_LOG(DvRenderer, err, "후면 버퍼 크기 갱신 실패");
 			return;

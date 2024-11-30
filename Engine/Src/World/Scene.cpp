@@ -10,8 +10,6 @@ namespace Dive
 	static constexpr uint64_t FIRST_ID = 0x1;
 	static constexpr uint64_t LAST_ID = 0xffffffffffffffff;
 	
-	uint32_t Scene::s_WorldCounter = 0;
-
 	Scene::Scene()
 	{
 	}
@@ -169,25 +167,6 @@ namespace Dive
 	uint64_t Scene::GetGameObjectsCount()
 	{
 		return static_cast<uint64_t>(m_GameObjects.size());
-	}
-
-	Scene* Scene::CreateWorld()
-	{
-		Scene* pNewWorld = new Scene;
-		pNewWorld->Rename("NewWorld_" + std::to_string(s_WorldCounter++));
-
-		GEngine->AddWorld(pNewWorld);
-
-		return pNewWorld;
-	}
-
-	void Scene::DestroyWorld(Scene* pWorld)
-	{
-		if (pWorld)
-		{
-			GEngine->RemoveWorld(pWorld);
-			pWorld->Clear();
-		}
 	}
 
 	uint64_t Scene::getFreeGameObjectID()

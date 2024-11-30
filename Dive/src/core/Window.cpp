@@ -1,42 +1,30 @@
-#include "divepch.h"
+#include "stdafx.h"
 #include "Window.h"
 #include "Log.h"
-#include "Engine.h"
 
 namespace Dive
 {
-	constexpr LPCWSTR WND_CLASS_NAME = L"DiveWindow";
-	constexpr uint32_t WND_WIDTH = 800;
-	constexpr uint32_t WND_HEIGHT = 600;
+	constexpr LPCWSTR DV_WND_CLASS_NAME = L"DiveWindow";
+	constexpr uint32_t DV_WND_WIDTH = 800;
+	constexpr uint32_t DV_WND_HEIGHT = 600;
 
-	HINSTANCE Window::s_hInstance = nullptr;
-	HWND Window::s_hWnd = nullptr;
-	WNDPROC Window::s_WndProc = nullptr;
-	std::wstring Window::s_Title = L"Dive";
-	bool Window::s_bWindowed = true;
-
-	// 추후 Graphics의 WndProc 제거 후 이름 바꾸기
-	LRESULT CALLBACK DvWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	Window::Window()
+		: m_hInstance(nullptr)
+		, m_hWnd(nullptr)
+		, m_Title(L"Dive")
+		, m_bWindowed(true)
 	{
-		switch (msg)
-		{
-		case WM_CLOSE:
-		case WM_DESTROY:
-			PostQuitMessage(0);
-			return 0;
-		}
-
-		return ::DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
-	bool Window::Initialize()
+	bool Window::Initialize(HINSTANCE hInstance, uint32_t width, uint32_t height, LPCWSTR pTitle)
 	{
-		s_hInstance = ::GetModuleHandle(nullptr);
+		m_hInstance = hInstance;
+		m_Title = pTitle;
 
 		WNDCLASSEX wc{};
 		wc.style = 0;
-		wc.hInstance = s_hInstance;
-		wc.lpfnWndProc = s_WndProc ? s_WndProc : DvWndProc;
+		wc.hInstance = m_hInstance;
+		wc.lpfnWndProc = ::DefWindowProc;
 		wc.cbClsExtra = 0;
 		wc.cbWndExtra = 0;
 		wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
@@ -44,7 +32,7 @@ namespace Dive
 		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 		wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 		wc.lpszMenuName = NULL;
-		wc.lpszClassName = WND_CLASS_NAME;
+		wc.lpszClassName = DV_WND_CLASS_NAME;
 		wc.cbSize = sizeof(WNDCLASSEX);
 
 		if (!::RegisterClassEx(&wc))
@@ -54,40 +42,43 @@ namespace Dive
 		}
 
 		DWORD style = WS_OVERLAPPEDWINDOW;
-		s_bWindowed = true;
+		m_bWindowed = true;
 
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - static_cast<int>(WND_WIDTH)) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - static_cast<int>(WND_HEIGHT)) / 2;
+		int posX = (GetSystemMetrics(SM_CXSCREEN) - static_cast<int>(width)) / 2;
+		int posY = (GetSystemMetrics(SM_CYSCREEN) - static_cast<int>(height)) / 2;
 
-		s_hWnd = CreateWindowEx(
+		m_hWnd = CreateWindowEx(
 			WS_EX_APPWINDOW,
-			WND_CLASS_NAME,
-			s_Title.c_str(),
+			DV_WND_CLASS_NAME,
+			m_Title.c_str(),
 			style,
 			posX > 0 ? posX : 0,
 			posY > 0 ? posY : 0,
-			WND_WIDTH, WND_HEIGHT,
+			DV_WND_WIDTH, DV_WND_HEIGHT,			// 최초엔 디폴트 크기로 생성
 			NULL, NULL,
-			s_hInstance,
+			m_hInstance,
 			NULL);
 
-		if (!s_hWnd)
+		if (!m_hWnd)
 		{
 			DV_LOG(Window, critical, "윈도우 생성 실패");
 			return false;
 		}
 
-		return Resize(WND_WIDTH, WND_HEIGHT);
+		DV_LOG(Window, trace, "초기화 성공");
+
+		return Resize(width, height);
 	}
 
 	void Window::Shutdown()
 	{
 		::ShowCursor(TRUE);
 
-		::DestroyWindow(s_hWnd);
-		s_hWnd = nullptr;
+		::DestroyWindow(m_hWnd);
+		m_hWnd = nullptr;
 
-		::UnregisterClass(WND_CLASS_NAME, s_hInstance);
+		::UnregisterClass(DV_WND_CLASS_NAME, m_hInstance);
+		m_hInstance = nullptr;
 
 		DV_LOG(Window, trace, "셧다운 성공");
 	}
@@ -107,15 +98,15 @@ namespace Dive
 	// width, height를 각각 0으로 전달할 경우 창 or 보더리스 모드만 변경 
 	bool Window::Resize(uint32_t width, uint32_t height, bool windowed)
 	{
-		if (s_hWnd)
+		if (m_hWnd)
 		{
 			DWORD style = windowed ? WS_OVERLAPPEDWINDOW : WS_POPUP;
 
-			if (s_bWindowed != windowed)
+			if (m_bWindowed != windowed)
 			{
-				s_bWindowed = windowed;
+				m_bWindowed = windowed;
 
-				if (!::SetWindowLongPtr(s_hWnd, GWL_STYLE, style))
+				if (!::SetWindowLongPtr(m_hWnd, GWL_STYLE, style))
 				{
 					DV_LOG(Window, err, "윈도우 스타일 변경 실패");
 					return false;
@@ -137,7 +128,7 @@ namespace Dive
 			int posX = (::GetSystemMetrics(SM_CXSCREEN) - newWidth) / 2;
 			int posY = (::GetSystemMetrics(SM_CYSCREEN) - newHeight) / 2;
 
-			if (!::SetWindowPos(s_hWnd, NULL, posX, posY, newWidth, newHeight, SWP_DRAWFRAME))
+			if (!::SetWindowPos(m_hWnd, NULL, posX, posY, newWidth, newHeight, SWP_DRAWFRAME))
 			{
 				DV_LOG(Window, err, "윈도우 크기 변경 실패");
 				return false;
@@ -149,26 +140,13 @@ namespace Dive
 		return true;
 	}
 
-	void Window::SetWndProc(WNDPROC wndProc)
-	{
-		s_WndProc = wndProc;
-		if (s_hWnd)
-		{
-			if (!::SetWindowLongPtr(s_hWnd, GWLP_WNDPROC, (LONG_PTR)wndProc))
-			{
-				DV_LOG(Window, err, "윈도우 프로시져 함수 변경 실패");
-				return;
-			}
-		}
-	}
-
 	DirectX::XMUINT2 Window::GetSize()
 	{
-		if (!s_hWnd)
+		if (!m_hWnd)
 			return { 0, 0 };
 
 		RECT rt{};
-		::GetClientRect(s_hWnd, &rt);
+		::GetClientRect(m_hWnd, &rt);
 
 		return { static_cast<uint32_t>(rt.right - rt.left), static_cast<uint32_t>(rt.bottom - rt.top) };
 	}
@@ -187,15 +165,17 @@ namespace Dive
 	{
 		if (title != nullptr)
 		{
-			s_Title = title;
+			m_Title = title;
 
-			if (s_hWnd)
-				::SetWindowText(s_hWnd, title);
+			if (m_hWnd)
+			{
+				::SetWindowText(m_hWnd, title);
+			}
 		}
 	}
 
 	void Window::ShowWindow(int nCmdShow)
 	{
-		::ShowWindow(s_hWnd, nCmdShow);
+		::ShowWindow(m_hWnd, nCmdShow);
 	}
 }

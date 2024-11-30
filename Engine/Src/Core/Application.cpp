@@ -8,30 +8,14 @@
 namespace Dive
 {
 	Application::Application()
-	//	: m_pEngine(Engine::GetInstance())
-	//	, m_Title(L"Dive")
-		: m_Title(L"Dive")
+		: m_pEngine(Engine::GetInstance())
+		, m_Title(L"Dive")
 		, m_WindowWidth(800)
 		, m_WindowHeight(600)
 		, m_bFullscreen(false)
 	{
 	}
 
-	int Application::Run()
-	{
-		OnSetup();
-
-		OnStart();
-
-		while (GEngine->IsRun())
-			OnTick();
-
-		OnStop();
-		
-		return 0;
-	}
-
-	/*
 	int Application::Run()
 	{
 		OnSetup();
@@ -54,5 +38,4 @@ namespace Dive
 
 		return 0;
 	}
-	*/
 }

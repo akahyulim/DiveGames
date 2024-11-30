@@ -4,55 +4,7 @@ namespace Dive
 {
 	class Window;
 	class LogManager;
-	class DvGraphics;
-	//class Scene;
-
-	extern class DvEngine* GEngine;
-	extern class Scene* GWorld;
-
-	class DvEngine
-	{
-	public:
-		static DvEngine* GetInstance()
-		{
-			if (!s_pInstance)
-				s_pInstance = new DvEngine;
-
-			return s_pInstance;
-		}
-
-		bool Initialize(bool fullScreen = false);
-		bool Initialize(const std::wstring& title, uint32_t width, uint32_t height, bool fullScreen = false);
-
-		bool IsRun();
-
-		LRESULT MessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-		void Draw();
-		void Present();
-
-		Scene* GetWorldByName(const std::string& name) const;
-
-		void AddWorld(Scene* pWorld);
-		void RemoveWorld(Scene* pWorld);
-
-		Window& GetWindow() const { return *m_pAppWindow; }
-		DvGraphics& GetGraphics() const { return *m_pGraphics; }
-
-	private:
-		DvEngine();
-		~DvEngine();
-
-	private:
-		static DvEngine* s_pInstance;
-		
-		std::unique_ptr<Window> m_pAppWindow;
-		std::unique_ptr<DvGraphics> m_pGraphics;
-
-		std::vector<Scene*> m_Worlds;
-	};
-
-	//============================================================================================================================================
+	class Scene;
 
 	class Engine
 	{

@@ -16,13 +16,14 @@ namespace Dive
 		virtual void OnStart() {}	// 앱 설정
 		virtual void OnTick() {}	// 실행
 		virtual void OnStop() {}	// 앱 종료 처리
+		virtual void Shutdown() {}	// 엔진 셧다운
 
 		uint32_t GetWindowWidth() const { return m_WindowWidth; }
 		uint32_t GetWindowHeight() const { return m_WindowHeight; }
 		DirectX::XMFLOAT2 GetWindowSize() const { return { (float)m_WindowWidth, (float)m_WindowHeight }; }
 
 	protected:
-		//Engine* m_pEngine;
+		Engine* m_pEngine;
 
 		std::wstring m_Title;
 		uint32_t m_WindowWidth;			// 윈도우 크기라 명명하면 어울리지 않는다.

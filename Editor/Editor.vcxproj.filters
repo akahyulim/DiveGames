@@ -2,77 +2,77 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Src">
-      <UniqueIdentifier>{ec10709f-5437-4952-bc70-e9709d75529f}</UniqueIdentifier>
+      <UniqueIdentifier>{32d78859-8288-4362-9a2f-6df66634ede3}</UniqueIdentifier>
     </Filter>
     <Filter Include="External">
-      <UniqueIdentifier>{f8161976-7394-4f99-a0b3-7b2f5a760009}</UniqueIdentifier>
+      <UniqueIdentifier>{b9fe3649-05c9-4075-85e7-c703a9572b1d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\ImGui-Docking">
-      <UniqueIdentifier>{8f22c7b3-7f4e-4d82-a774-13966c879f61}</UniqueIdentifier>
+    <Filter Include="External\imgui-docking">
+      <UniqueIdentifier>{160a9bb1-94be-43f6-a2e0-a478070b40dc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\LightViewer.cpp">
+    <ClCompile Include="Src\Editor.cpp">
       <Filter>Src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\include\imgui-docking\imgui.cpp">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="..\External\include\imgui-docking\imgui_demo.cpp">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="..\External\include\imgui-docking\imgui_draw.cpp">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="..\External\include\imgui-docking\imgui_impl_dx11.cpp">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="..\External\include\imgui-docking\imgui_impl_win32.cpp">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="..\External\include\imgui-docking\imgui_stdlib.cpp">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="..\External\include\imgui-docking\imgui_tables.cpp">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="..\External\include\imgui-docking\imgui_widgets.cpp">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="Src\main.cpp">
       <Filter>Src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\LightViewer.h">
+    <ClInclude Include="Src\Editor.h">
       <Filter>Src</Filter>
     </ClInclude>
     <ClInclude Include="..\External\include\imgui-docking\imconfig.h">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="..\External\include\imgui-docking\imgui.h">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="..\External\include\imgui-docking\imgui_impl_dx11.h">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="..\External\include\imgui-docking\imgui_impl_win32.h">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="..\External\include\imgui-docking\imgui_internal.h">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="..\External\include\imgui-docking\imgui_stdlib.h">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="..\External\include\imgui-docking\imstb_rectpack.h">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="..\External\include\imgui-docking\imstb_textedit.h">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClInclude>
     <ClInclude Include="..\External\include\imgui-docking\imstb_truetype.h">
-      <Filter>External\ImGui-Docking</Filter>
+      <Filter>External\imgui-docking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

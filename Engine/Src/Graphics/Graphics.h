@@ -261,46 +261,6 @@ namespace Dive
 	class Shader;
 	class ConstantBuffer;
 
-	class DvGraphics
-	{
-	public:
-		DvGraphics();
-		~DvGraphics();
-
-		bool Initialize(uint32_t width, uint32_t height, HWND hWnd, bool fullScreen = false);
-
-		bool ResizeBackBuffers(uint32_t width, uint32_t height);
-		void ChangeResolution(uint32_t width, uint32_t height);
-
-		bool IsInitialized() const;
-		bool IsFullScreen() const;
-
-		IDXGISwapChain* GetSwapChain() const { return m_pSwapChain; }
-		ID3D11Device* GetDevice() const { return m_pDevice; }
-		ID3D11DeviceContext* GetDeviceContext() const { return m_pDeviceContext; }
-
-		ID3D11RenderTargetView* GetDefaultRenderTargetView() const { return m_pDefaultRenderTargetView; }
-		ID3D11DepthStencilView* GetDefaultDepthStencilView() const { return m_pDefaultDepthStencilView; }
-
-	private:
-		bool updateRenderResources();
-	
-	private:
-		IDXGISwapChain* m_pSwapChain;
-		ID3D11Device* m_pDevice;
-		ID3D11DeviceContext* m_pDeviceContext;
-
-		bool m_bFullScreen;
-		uint32_t m_Width;
-		uint32_t m_Height;
-
-		// 얘는 BackbufferRTV라고 칭할 수 있지만
-		ID3D11RenderTargetView* m_pDefaultRenderTargetView;
-		// 얘네는 Default라고 명명하기에 조금 부족하다.
-		ID3D11Texture2D* m_pDefaultDepthStencilBuffer;
-		ID3D11DepthStencilView* m_pDefaultDepthStencilView;
-	};
-	
 	// urho3d는 manages the application window, rendering state and gpu resources라고 설명해 놓았다.
 	class Graphics
 	{

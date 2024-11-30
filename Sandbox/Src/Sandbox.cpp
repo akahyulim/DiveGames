@@ -5,38 +5,6 @@ DEFINE_APPLICATION_MAIN(Sandbox::Sandbox)
 namespace Sandbox
 {
 	Sandbox::Sandbox()
-	{
-	}
-
-	Sandbox::~Sandbox()
-	{
-	}
-
-	// 실제로는 직접 설정 구조체를 채우거나 파일로 읽어야 한다.
-	// 엔진의 초기화는 이 다음에 자동으로 호출되는 게 맞다.
-	void Sandbox::OnSetup()
-	{
-		Dive::GEngine->Initialize(L"SANDBOX", 800, 600);
-	}
-
-	void Sandbox::OnStart()
-	{
-	}
-
-	void Sandbox::OnTick()
-	{
-	}
-
-	void Sandbox::OnStop()
-	{
-	}
-
-	void Sandbox::HandleUpdate(const Dive::Event& e)
-	{
-	}
-
-	/*
-	Sandbox::Sandbox()
 		: m_pGraphics(nullptr)
 		, m_pInput(nullptr)
 		, m_pMainCam(nullptr)
@@ -56,7 +24,6 @@ namespace Sandbox
 		, m_pFlashLight(nullptr)
 		, m_SceneType(eSceneType::Base)		// World을 런타임에서 바꾸고 싶다.
 	{
-		//DV_REGISTER_LOGGER(Sandbox);
 	}
 
 	Sandbox::~Sandbox()
@@ -906,5 +873,4 @@ namespace Sandbox
 
 		m_SceneType = eSceneType::Texture;
 	}
-	*/
 }

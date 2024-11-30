@@ -46,9 +46,6 @@ namespace Dive
 
 		int GetIndex() const { return m_Index; }
 
-		static Scene* CreateWorld();
-		static void DestroyWorld(Scene* pWorld);
-
 	private:
 		//Scene();
 		//~Scene();

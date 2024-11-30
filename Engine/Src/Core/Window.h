@@ -12,6 +12,8 @@ namespace Dive
 
 		static bool Resize(uint32_t width, uint32_t height, bool Windowed = true);
 
+		static void SetWndProc(WNDPROC wndProc);
+
 		static DirectX::XMUINT2 GetSize();
 		static uint32_t GetWidth();
 		static uint32_t GetHeight();
@@ -30,6 +32,7 @@ namespace Dive
 	private:
 		static HINSTANCE s_hInstance;
 		static HWND s_hWnd;
+		static WNDPROC s_WndProc;
 		static std::wstring s_Title;
 		static bool s_bWindowed;
 	};
