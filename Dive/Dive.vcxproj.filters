@@ -7,6 +7,12 @@
     <Filter Include="rendering">
       <UniqueIdentifier>{ed2e53b9-470f-4d28-8fa8-fbedba47c21b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="rendering\graphics">
+      <UniqueIdentifier>{b25adbd6-a187-4cbf-8335-5712982b2dc8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="resource">
+      <UniqueIdentifier>{d816e904-8b29-496e-afbe-4f8dcb42c43c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\dive.h" />
@@ -32,11 +38,20 @@
     <ClInclude Include="src\core\Engine.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\Graphics.h">
-      <Filter>rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\core\EventDispatcher.h">
       <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\graphics\Graphics.h">
+      <Filter>rendering\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\Resource.h">
+      <Filter>resource</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Object.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\ResourceManager.h">
+      <Filter>resource</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -59,11 +74,20 @@
     <ClCompile Include="src\core\Engine.cpp">
       <Filter>core</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\Graphics.cpp">
-      <Filter>rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\EventDispatcher.cpp">
       <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\graphics\Graphics.cpp">
+      <Filter>rendering\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource\Resource.cpp">
+      <Filter>resource</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Object.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource\ResourceManager.cpp">
+      <Filter>resource</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

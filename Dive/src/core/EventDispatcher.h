@@ -15,7 +15,7 @@ namespace Dive
 {
 	enum class eEventType
 	{
-		WindowResized,
+		WindowResized, Exit,
 
 		PreRender, PostRender,
 	};

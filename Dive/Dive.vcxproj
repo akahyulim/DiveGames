@@ -24,11 +24,14 @@
     <ClInclude Include="src\core\EventDispatcher.h" />
     <ClInclude Include="src\core\FileUtils.h" />
     <ClInclude Include="src\core\Log.h" />
+    <ClInclude Include="src\core\Object.h" />
     <ClInclude Include="src\core\StringUtils.h" />
     <ClInclude Include="src\core\Window.h" />
     <ClInclude Include="src\dive.h" />
-    <ClInclude Include="src\rendering\Graphics.h" />
+    <ClInclude Include="src\rendering\graphics\Graphics.h" />
     <ClInclude Include="src\rendering\Renderer.h" />
+    <ClInclude Include="src\resource\Resource.h" />
+    <ClInclude Include="src\resource\ResourceManager.h" />
     <ClInclude Include="src\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
@@ -36,10 +39,13 @@
     <ClCompile Include="src\core\EventDispatcher.cpp" />
     <ClCompile Include="src\core\FileUtils.cpp" />
     <ClCompile Include="src\core\Log.cpp" />
+    <ClCompile Include="src\core\Object.cpp" />
     <ClCompile Include="src\core\StringUtils.cpp" />
     <ClCompile Include="src\core\Window.cpp" />
+    <ClCompile Include="src\rendering\graphics\Graphics.cpp" />
     <ClCompile Include="src\rendering\Renderer.cpp" />
-    <ClCompile Include="src\rendering\Graphics.cpp" />
+    <ClCompile Include="src\resource\Resource.cpp" />
+    <ClCompile Include="src\resource\ResourceManager.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>

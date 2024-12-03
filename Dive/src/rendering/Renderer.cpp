@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Renderer.h"
-//#include "Graphics.h"
 #include "core/CoreDefs.h"
+//#include "graphics/Graphics.h"
 
 namespace Dive
 {

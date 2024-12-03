@@ -15,6 +15,8 @@ namespace Dive
 		void Run();
 		void Shutdown();
 
+		void OnExit();
+
 		HWND GetWindowHandle();
 		ID3D11Device* GetDevice();
 		ID3D11DeviceContext* GetDeviceContext();

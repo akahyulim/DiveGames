@@ -1,5 +1,5 @@
 #pragma once
-#include "Graphics.h"	// 추후 cpp로 옮기기
+#include "graphics/Graphics.h"	// 추후 cpp로 옮기기
 
 namespace Dive
 {
@@ -25,5 +25,7 @@ namespace Dive
 	private:
 	private:
 		std::unique_ptr<Graphics> m_pGraphics;
+
+
 	};
 }

@@ -10,6 +10,9 @@
     <Filter Include="External\imgui-docking">
       <UniqueIdentifier>{160a9bb1-94be-43f6-a2e0-a478070b40dc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Panels">
+      <UniqueIdentifier>{dba1d6d5-d24a-4973-a600-05755b89378e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Editor.cpp">
@@ -42,6 +45,15 @@
     <ClCompile Include="Src\main.cpp">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Panels\Panel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Panels\Menubar.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Panels\WorldView.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Editor.h">
@@ -73,6 +85,15 @@
     </ClInclude>
     <ClInclude Include="..\External\include\imgui-docking\imstb_truetype.h">
       <Filter>External\imgui-docking</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\Panel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\Menubar.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\WorldView.h">
+      <Filter>Src\Panels</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

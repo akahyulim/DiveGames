@@ -23,6 +23,8 @@ namespace Dive
 		if (!m_pRenderer->Initialize(width, height, m_pWindow->GetHandle()))
 			return false;
 
+		DV_SUBSCRIBE_EVENT(eEventType::Exit, DV_EVENT_HANDLER(OnExit));
+
 		DV_LOG(Engine, trace, "초기화 완료");
 
 		return true;
@@ -56,6 +58,11 @@ namespace Dive
 		m_pWindow->Shutdown();
 
 		DV_LOG(Engine, trace, "셧다운 종료");
+	}
+
+	void Engine::OnExit()
+	{
+		::PostQuitMessage(0);
 	}
 
 	HWND Engine::GetWindowHandle()

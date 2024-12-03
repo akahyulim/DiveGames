@@ -107,6 +107,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(SolutionDir)\External\include;$(SolutionDir)\Dive\Src;$(SolutionDir)\Engine\Src;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,6 +146,9 @@
     <ClCompile Include="..\External\include\imgui-docking\imgui_widgets.cpp" />
     <ClCompile Include="Src\Editor.cpp" />
     <ClCompile Include="Src\main.cpp" />
+    <ClCompile Include="Src\Panels\Menubar.cpp" />
+    <ClCompile Include="Src\Panels\Panel.cpp" />
+    <ClCompile Include="Src\Panels\WorldView.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\External\include\imgui-docking\imconfig.h" />
@@ -157,6 +161,9 @@
     <ClInclude Include="..\External\include\imgui-docking\imstb_textedit.h" />
     <ClInclude Include="..\External\include\imgui-docking\imstb_truetype.h" />
     <ClInclude Include="Src\Editor.h" />
+    <ClInclude Include="Src\Panels\Menubar.h" />
+    <ClInclude Include="Src\Panels\Panel.h" />
+    <ClInclude Include="Src\Panels\WorldView.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
