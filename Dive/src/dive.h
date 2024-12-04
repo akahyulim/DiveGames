@@ -12,6 +12,17 @@
 #include "core/Window.h"
 #include "core/Engine.h"
 
+// graphics
+#include "graphics/Graphics.h"
+#include "graphics/Texture.h"
+#include "graphics/Texture2D.h"
+#include "graphics/Texture2DArray.h"
+#include "graphics/Cubemap.h"
+
 // rendering
-#include "rendering/graphics/Graphics.h"
+#include "rendering/GBuffer.h"
 #include "rendering/Renderer.h"
+
+// resource
+#include "resource/Resource.h"
+#include "resource/ResourceManager.h"

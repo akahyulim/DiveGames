@@ -1,7 +1,8 @@
-#include "divepch.h"
+#include "stdafx.h"
 #include "Texture.h"
 #include "Graphics.h"
 #include "Core/CoreDefs.h"
+#include "core/Engine.h"
 
 namespace Dive
 {
@@ -16,10 +17,10 @@ namespace Dive
         , m_MipLevels(1)
 		, m_bOpaque(true)
     {
-		m_pDevice = Graphics::GetInstance()->GetDevice();
+		m_pDevice = GEngine->GetDevice();
         DV_ASSERT(Texture, m_pDevice);
 
-        m_pDeviceContext = Graphics::GetInstance()->GetDeviceContext();
+        m_pDeviceContext = GEngine->GetDeviceContext();
         DV_ASSERT(Texture, m_pDeviceContext);
     }
     

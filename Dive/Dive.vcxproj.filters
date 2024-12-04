@@ -7,11 +7,11 @@
     <Filter Include="rendering">
       <UniqueIdentifier>{ed2e53b9-470f-4d28-8fa8-fbedba47c21b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="rendering\graphics">
-      <UniqueIdentifier>{b25adbd6-a187-4cbf-8335-5712982b2dc8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="resource">
       <UniqueIdentifier>{d816e904-8b29-496e-afbe-4f8dcb42c43c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="graphics">
+      <UniqueIdentifier>{2b44d4ba-87e2-4f36-9a78-24be61b71238}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -41,9 +41,6 @@
     <ClInclude Include="src\core\EventDispatcher.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\graphics\Graphics.h">
-      <Filter>rendering\graphics</Filter>
-    </ClInclude>
     <ClInclude Include="src\resource\Resource.h">
       <Filter>resource</Filter>
     </ClInclude>
@@ -52,6 +49,24 @@
     </ClInclude>
     <ClInclude Include="src\resource\ResourceManager.h">
       <Filter>resource</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Graphics.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Texture.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Texture2D.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Cubemap.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Texture2DArray.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\GBuffer.h">
+      <Filter>rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -77,9 +92,6 @@
     <ClCompile Include="src\core\EventDispatcher.cpp">
       <Filter>core</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\graphics\Graphics.cpp">
-      <Filter>rendering\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\resource\Resource.cpp">
       <Filter>resource</Filter>
     </ClCompile>
@@ -88,6 +100,24 @@
     </ClCompile>
     <ClCompile Include="src\resource\ResourceManager.cpp">
       <Filter>resource</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Graphics.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Texture.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Texture2D.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Cubemap.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Texture2DArray.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\GBuffer.cpp">
+      <Filter>rendering</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

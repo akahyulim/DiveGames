@@ -39,11 +39,10 @@ namespace Dive
 		{
 			Dive::LogManager::SetFilename("dive_editor.log");
 
-			m_pEngine = std::make_unique<Dive::Engine>();
-			if (!m_pEngine->Initialize(::GetModuleHandle(nullptr), 1280, 720, L"Dive_Editor"))
+			if (!GEngine->Initialize(::GetModuleHandle(nullptr), 1280, 720, L"Dive_Editor"))
 				return 1;
 
-			if (!::SetWindowLongPtr(m_pEngine->GetWindowHandle(), GWLP_WNDPROC, (LONG_PTR)EditorMessageHandler))
+			if (!::SetWindowLongPtr(GEngine->GetWindowHandle(), GWLP_WNDPROC, (LONG_PTR)EditorMessageHandler))
 			{
 				DV_LOG(Window, err, "윈도우 프로시져 함수 변경 실패");
 				return 1;
@@ -57,7 +56,7 @@ namespace Dive
 		}
 
 		// 실행
-		m_pEngine->Run();
+		GEngine->Run();
 
 		// 에디터 셧다운
 		{
@@ -67,7 +66,7 @@ namespace Dive
 		}
 
 		// 엔진 셧다운
-		m_pEngine->Shutdown();
+		GEngine->Shutdown();
 
 		return 0;
 	}
@@ -100,8 +99,8 @@ namespace Dive
 		}
 
 		// Setup Platform/Renderer backends
-		ImGui_ImplWin32_Init(m_pEngine->GetWindowHandle());
-		ImGui_ImplDX11_Init(m_pEngine->GetDevice(), m_pEngine->GetDeviceContext());
+		ImGui_ImplWin32_Init(GEngine->GetWindowHandle());
+		ImGui_ImplDX11_Init(GEngine->GetDevice(), GEngine->GetDeviceContext());
 
 		// dark theme
 		auto& colors = ImGui::GetStyle().Colors;
@@ -210,6 +209,12 @@ namespace Dive
 		//m_pAsset->Tick();
 
 		ImGui::End();
+
+		// 일단 임시다.
+		auto* pDefaultRenderTargetView = GEngine->GetGraphics().GetBackbufferView();
+		const float clear_color_with_alpha[4]{ 0.1f, 0.1f, 0.1f, 0.0f };
+		GEngine->GetDeviceContext()->OMSetRenderTargets(1, &pDefaultRenderTargetView, NULL);
+		GEngine->GetDeviceContext()->ClearRenderTargetView(pDefaultRenderTargetView, clear_color_with_alpha);
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

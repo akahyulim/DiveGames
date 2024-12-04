@@ -13,5 +13,6 @@ namespace Dive
 
 	private:
 	private:
+		std::shared_ptr<Texture2D> m_pTex;
 	};
 }

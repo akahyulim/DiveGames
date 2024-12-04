@@ -1,4 +1,4 @@
-#include "divepch.h"
+#include "stdafx.h"
 #include "Texture2DArray.h"
 #include "Core/CoreDefs.h"
 

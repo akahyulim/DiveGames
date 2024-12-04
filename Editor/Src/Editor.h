@@ -20,8 +20,6 @@ namespace Dive
 		void renderImGui();
 
 	private:
-		std::unique_ptr<Engine> m_pEngine;
-
 		std::unique_ptr<Menubar> m_pMenubar;
 		std::unique_ptr<WorldView> m_pWorldView;
 	};

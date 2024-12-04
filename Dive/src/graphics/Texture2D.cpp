@@ -1,7 +1,8 @@
-#include "divepch.h"
+#include "stdafx.h"
 #include "Texture2D.h"
-#include "Core/CoreDefs.h"
-#include "IO/FileSystem.h"
+#include "core/CoreDefs.h"
+#include "core/FileUtils.h"
+#include "core/StringUtils.h"
 
 #include <DirectXTex/DirectXTex.h>
 
@@ -63,8 +64,8 @@ namespace Dive
 
 	Texture2D::Texture2D(const std::string& filename, bool mipChain)
 	{
-		auto file = StringToWstring(filename);
-		auto ext = FileSystem::GetExtension(filename);
+		auto file = StringUtils::StringToWString(filename);
+		auto ext = FileUtils::GetExtension(filename);
 		DirectX::ScratchImage img;
 		HRESULT hResult = 0;
 
@@ -95,7 +96,7 @@ namespace Dive
 
 		UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch));
 
-		SetName(FileSystem::GetFileName(filename));
+		SetName(FileUtils::GetFileName(filename));
 	}
 
 	Texture2D::Texture2D(const std::string& filename, uint32_t size, const void* pSource, bool mipChain)
@@ -103,7 +104,7 @@ namespace Dive
 		DirectX::ScratchImage img;
 		HRESULT hResult = 0;
 
-		auto extension = FileSystem::GetExtension(filename);
+		auto extension = FileUtils::GetExtension(filename);
 
 		if (extension == "dds")
 		{
@@ -131,13 +132,13 @@ namespace Dive
 
 		UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch));
 
-		SetName(FileSystem::GetFileName(filename));
+		SetName(FileUtils::GetFileName(filename));
 	}
 
 	bool Texture2D::LoadFromFile(const std::string& filename)
 	{
-		auto file = StringToWstring(filename);
-		auto ext = FileSystem::GetExtension(filename);
+		auto file = StringUtils::StringToWString(filename);
+		auto ext = FileUtils::GetExtension(filename);
 		DirectX::ScratchImage img;
 		HRESULT hResult = 0;
 
@@ -213,7 +214,7 @@ namespace Dive
 		if (!UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch)))
 			return false;
 
-		SetName(FileSystem::GetFileName(filename));
+		SetName(FileUtils::GetFileName(filename));
 
 		return true;
 	}
@@ -223,7 +224,7 @@ namespace Dive
 		DirectX::ScratchImage img;
 		HRESULT hResult = 0;
 
-		auto extension = FileSystem::GetExtension(filename);
+		auto extension = FileUtils::GetExtension(filename);
 
 		if (extension == "dds")
 		{
@@ -251,7 +252,7 @@ namespace Dive
 
 		UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch));
 
-		SetName(FileSystem::GetFileName(filename));
+		SetName(FileUtils::GetFileName(filename));
 
 		return true;
 	}

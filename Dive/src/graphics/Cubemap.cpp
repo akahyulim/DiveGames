@@ -1,4 +1,4 @@
-#include "divepch.h"
+#include "stdafx.h"
 #include "Cubemap.h"
 #include "Core/CoreDefs.h"
 

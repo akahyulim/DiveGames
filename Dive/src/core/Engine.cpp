@@ -3,12 +3,19 @@
 #include "CoreDefs.h"
 #include "Window.h"
 #include "EventDispatcher.h"
+#include "graphics/Graphics.h"
 #include "rendering/Renderer.h"
 
 namespace Dive
 {
+	Engine* GEngine = Engine::GetInstance();
+
+	Engine* Engine::s_pInstance = nullptr;
+	std::once_flag Engine::s_OnceFlag;
+
 	Engine::Engine()
 		: m_pWindow(std::make_unique<Window>())
+		, m_pGraphics(std::make_shared<Graphics>())
 		, m_pRenderer(std::make_unique<Renderer>())
 	{
 	}
@@ -20,7 +27,10 @@ namespace Dive
 		if (!m_pWindow->Initialize(hInstance, width, height, pTitle))
 			return false;
 
-		if (!m_pRenderer->Initialize(width, height, m_pWindow->GetHandle()))
+		if (!m_pGraphics->Initialize(width, height, m_pWindow->GetHandle()))
+			return false;
+
+		if (!m_pRenderer->Initialize(width, height, m_pGraphics))
 			return false;
 
 		DV_SUBSCRIBE_EVENT(eEventType::Exit, DV_EVENT_HANDLER(OnExit));
@@ -55,6 +65,7 @@ namespace Dive
 		DV_LOG(Engine, trace, "¼Ë´Ù¿î ½ÃÀÛ");
 	
 		m_pRenderer->Shutdown();
+		m_pGraphics->Shutdown();
 		m_pWindow->Shutdown();
 
 		DV_LOG(Engine, trace, "¼Ë´Ù¿î Á¾·á");
@@ -70,13 +81,18 @@ namespace Dive
 		return m_pWindow->GetHandle();
 	}
 
+	IDXGISwapChain* Engine::GetSwapChain()
+	{
+		return m_pGraphics->GetSwapChain();
+	}
+
 	ID3D11Device* Engine::GetDevice()
 	{
-		return m_pRenderer->GetDevice();
+		return m_pGraphics->GetDevice();
 	}
 	
 	ID3D11DeviceContext* Engine::GetDeviceContext()
 	{
-		return m_pRenderer->GetDeviceContext();
+		return m_pGraphics->GetDeviceContext();
 	}
 }
