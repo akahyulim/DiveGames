@@ -56,7 +56,7 @@ namespace Dive
 		}
 
 		// 실행
-		GEngine->Run();
+		GEngine->Tick();
 
 		// 에디터 셧다운
 		{

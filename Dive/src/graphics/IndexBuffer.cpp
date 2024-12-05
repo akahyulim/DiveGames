@@ -1,7 +1,8 @@
-#include "divepch.h"
+#include "stdafx.h"
 #include "IndexBuffer.h"
 #include "Graphics.h"
-#include "Core/CoreDefs.h"
+#include "core/CoreDefs.h"
+#include "core/Engine.h"
 
 namespace Dive
 {
@@ -30,7 +31,7 @@ namespace Dive
 		data.SysMemPitch = 0;
 		data.SysMemSlicePitch = 0;
 
-		if(FAILED(Graphics::GetInstance()->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
+		if(FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
 			DV_LOG(CubeMap, err, "IndexBuffer 생성에 실패하였습니다.");
 	}
 
@@ -53,7 +54,7 @@ namespace Dive
 		data.SysMemPitch = 0;
 		data.SysMemSlicePitch = 0;
 
-		if(FAILED(Graphics::GetInstance()->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
+		if(FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
 			DV_LOG(CubeMap, err, "IndexBuffer 생성에 실패하였습니다.");
 	}
 
@@ -98,7 +99,7 @@ namespace Dive
 		data.SysMemPitch = 0;
 		data.SysMemSlicePitch = 0;
 
-		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
+		if (FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
 		{
 			DV_LOG(CubeMap, err, "IndexBuffer 생성에 실패하였습니다.");
 			return false;

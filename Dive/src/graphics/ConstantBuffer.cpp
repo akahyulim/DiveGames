@@ -1,5 +1,7 @@
-#include "divepch.h"
+#include "stdafx.h"
 #include "ConstantBuffer.h"
+#include "core/CoreDefs.h"
+#include "core/Engine.h"
 
 namespace Dive
 {
@@ -31,7 +33,7 @@ namespace Dive
 		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateBuffer(&desc, nullptr, &m_pBuffer)))
+		if (FAILED(GEngine->GetDevice()->CreateBuffer(&desc, nullptr, &m_pBuffer)))
 		{
 			DV_LOG(ConstantBuffer, err, "ConstantBuffer({:s}) 생성에 실패하였습니다.", GetName());
 			return false;
@@ -50,7 +52,7 @@ namespace Dive
 		DV_ASSERT(ConstantBuffer, m_pBuffer);
 
 		D3D11_MAPPED_SUBRESOURCE mappedData;
-		if (FAILED(Graphics::GetInstance()->GetDeviceContext()->Map(
+		if (FAILED(GEngine->GetDeviceContext()->Map(
 			static_cast<ID3D11Resource*>(m_pBuffer),
 			0,
 			D3D11_MAP_WRITE_DISCARD,
@@ -66,6 +68,6 @@ namespace Dive
 
 	void ConstantBuffer::Unmap()
 	{
-		Graphics::GetInstance()->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer), 0);
+		GEngine->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer), 0);
 	}
 }

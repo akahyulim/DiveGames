@@ -17,6 +17,10 @@
 #include "graphics/Texture.h"
 #include "graphics/Texture2D.h"
 #include "graphics/Texture2DArray.h"
+#include "graphics/Shader.h"
+#include "graphics/VertexBuffer.h"
+#include "graphics/IndexBuffer.h"
+#include "graphics/ConstantBuffer.h"
 #include "graphics/Cubemap.h"
 
 // rendering

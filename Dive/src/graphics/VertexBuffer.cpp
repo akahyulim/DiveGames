@@ -1,7 +1,8 @@
-#include "divepch.h"
+#include "stdafx.h"
 #include "VertexBuffer.h"
 #include "Graphics.h"
-#include "Core/CoreDefs.h"
+#include "core/CoreDefs.h"
+#include "core/Engine.h"
 
 namespace Dive
 {
@@ -34,7 +35,7 @@ namespace Dive
 		data.SysMemPitch = 0;
 		data.SysMemSlicePitch = 0;
 
-		if (FAILED(Graphics::GetInstance()->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
+		if (FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
 		{
 			DV_LOG(VerteBuffer, err, "VertexBuffer 생성에 실패하였습니다.");
 			return false;

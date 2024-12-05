@@ -23,8 +23,9 @@ namespace Dive
 		}
 
 		bool Initialize(HINSTANCE hInstance, uint32_t width, uint32_t height, LPCWSTR pTitle);
-		void Run();
-		void Shutdown();
+		void Shutdown(); 
+
+		void Tick();
 
 		void OnExit();
 

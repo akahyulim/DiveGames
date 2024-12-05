@@ -40,7 +40,18 @@ namespace Dive
 		return true;
 	}
 
-	void Engine::Run()
+	void Engine::Shutdown()
+	{
+		DV_LOG(Engine, trace, "셧다운 시작");
+	
+		m_pRenderer->Shutdown();
+		m_pGraphics->Shutdown();
+		m_pWindow->Shutdown();
+
+		DV_LOG(Engine, trace, "셧다운 종료");
+	}
+
+	void Engine::Tick()
 	{
 		MSG msg{};
 		while (msg.message != WM_QUIT)
@@ -52,23 +63,13 @@ namespace Dive
 			}
 			else
 			{
-				DV_FIRE_EVENT(eEventType::PreRender);
-				m_pRenderer->Render();
-				DV_FIRE_EVENT(eEventType::PostRender);
-				m_pRenderer->Present();
+				// 모든 시스템의 함수를 Tick으로 통일하고
+				// update와 render의 구분은 개별 시스템 내부에서 분할하자.
+				// 이벤트 역시 시스템에서 호출하도록 하자.
+
+				m_pRenderer->Tick();
 			}
 		}
-	}
-
-	void Engine::Shutdown()
-	{
-		DV_LOG(Engine, trace, "셧다운 시작");
-	
-		m_pRenderer->Shutdown();
-		m_pGraphics->Shutdown();
-		m_pWindow->Shutdown();
-
-		DV_LOG(Engine, trace, "셧다운 종료");
 	}
 
 	void Engine::OnExit()

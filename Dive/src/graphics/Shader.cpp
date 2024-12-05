@@ -1,8 +1,10 @@
-#include "divepch.h"
+#include "stdafx.h"
 #include "Shader.h"
 #include "Graphics.h"
-#include "Core/CoreDefs.h"
-#include "IO/FileSystem.h"
+#include "core/CoreDefs.h"
+#include "core/FileUtils.h"
+#include "core/StringUtils.h"
+#include "core/Engine.h"
 
 namespace Dive
 {
@@ -44,7 +46,7 @@ namespace Dive
 			return nullptr;
 		}
 
-		std::wstring filePath = StringToWstring(fileName);
+		std::wstring filePath = StringUtils::StringToWString(fileName);
 
 		if (FAILED(D3DCompileFromFile(
 			filePath.c_str(),
@@ -115,7 +117,6 @@ namespace Dive
 
 	Shader::Shader()
 		: m_Type(eShaderType::Undefined)
-		, m_pDevice(Graphics::GetInstance()->GetDevice())
 		, m_pVertexShader(nullptr)
 		, m_pHullShader(nullptr)
 		, m_pDomainShader(nullptr)
@@ -124,7 +125,6 @@ namespace Dive
 		, m_pPixelShader(nullptr)
 		, m_pInputLayout(nullptr)
 	{
-		DV_ASSERT(Shader, m_pDevice);
 	}
 	
 	Shader::~Shader()
@@ -136,9 +136,6 @@ namespace Dive
 		DV_RELEASE(m_pHullShader);
 		DV_RELEASE(m_pVertexShader);
 		DV_RELEASE(m_pInputLayout);
-
-		DV_LOG(Shader, trace, "resource destroy - {0:s}({1:d}), {2:s}({3:d})",
-			GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
 	}
 
 	// pShaderBlob은 무조건 release 해줘야 한다.
@@ -149,7 +146,7 @@ namespace Dive
 		switch (type)
 		{
 		case eShaderType::Vertex:
-			if (FAILED(m_pDevice->CreateVertexShader(
+			if (FAILED(GEngine->GetDevice()->CreateVertexShader(
 				pShaderBlob->GetBufferPointer(), 
 				pShaderBlob->GetBufferSize(), 
 				NULL, 
@@ -166,7 +163,7 @@ namespace Dive
 			}
 			break;
 		case eShaderType::Hull:
-			if (FAILED(m_pDevice->CreateHullShader(
+			if (FAILED(GEngine->GetDevice()->CreateHullShader(
 				pShaderBlob->GetBufferPointer(), 
 				pShaderBlob->GetBufferSize(), 
 				NULL, 
@@ -177,7 +174,7 @@ namespace Dive
 			}
 			break;
 		case eShaderType::Domain:
-			if (FAILED(m_pDevice->CreateDomainShader(
+			if (FAILED(GEngine->GetDevice()->CreateDomainShader(
 				pShaderBlob->GetBufferPointer(), 
 				pShaderBlob->GetBufferSize(), 
 				NULL, 
@@ -188,7 +185,7 @@ namespace Dive
 			}
 			break; 
 		case eShaderType::Geometry:
-				if (FAILED(m_pDevice->CreateGeometryShader(
+				if (FAILED(GEngine->GetDevice()->CreateGeometryShader(
 					pShaderBlob->GetBufferPointer(),
 					pShaderBlob->GetBufferSize(),
 					NULL,
@@ -199,7 +196,7 @@ namespace Dive
 				}
 				break;
 		case eShaderType::Pixel:
-			if (FAILED(m_pDevice->CreatePixelShader(
+			if (FAILED(GEngine->GetDevice()->CreatePixelShader(
 				pShaderBlob->GetBufferPointer(), 
 				pShaderBlob->GetBufferSize(), 
 				NULL, 
@@ -210,7 +207,7 @@ namespace Dive
 			}
 			break;
 		case eShaderType::Compute:
-			if (FAILED(m_pDevice->CreateComputeShader(
+			if (FAILED(GEngine->GetDevice()->CreateComputeShader(
 				pShaderBlob->GetBufferPointer(),
 				pShaderBlob->GetBufferSize(),
 				NULL,
@@ -239,7 +236,7 @@ namespace Dive
 
 		auto inputElements = GetInputElements(layout);
 
-		if (FAILED(m_pDevice->CreateInputLayout(
+		if (FAILED(GEngine->GetDevice()->CreateInputLayout(
 			inputElements.data(),
 			static_cast<UINT>(inputElements.size()),
 			pShaderBlob->GetBufferPointer(),
