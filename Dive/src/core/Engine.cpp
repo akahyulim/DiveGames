@@ -5,6 +5,7 @@
 #include "EventDispatcher.h"
 #include "graphics/Graphics.h"
 #include "rendering/Renderer.h"
+#include "input/Input.h"
 
 namespace Dive
 {
@@ -17,6 +18,7 @@ namespace Dive
 		: m_pWindow(std::make_unique<Window>())
 		, m_pGraphics(std::make_shared<Graphics>())
 		, m_pRenderer(std::make_unique<Renderer>())
+		, m_pInput(std::make_unique<Input>())
 	{
 	}
 
@@ -33,6 +35,9 @@ namespace Dive
 		if (!m_pRenderer->Initialize(width, height, m_pGraphics))
 			return false;
 
+		if (!m_pInput->Initialize(hInstance, m_pWindow->GetHandle()))
+			return false;
+
 		DV_SUBSCRIBE_EVENT(eEventType::Exit, DV_EVENT_HANDLER(OnExit));
 
 		DV_LOG(Engine, trace, "초기화 완료");
@@ -44,6 +49,7 @@ namespace Dive
 	{
 		DV_LOG(Engine, trace, "셧다운 시작");
 	
+		m_pInput->Shutdown();
 		m_pRenderer->Shutdown();
 		m_pGraphics->Shutdown();
 		m_pWindow->Shutdown();
@@ -63,9 +69,7 @@ namespace Dive
 			}
 			else
 			{
-				// 모든 시스템의 함수를 Tick으로 통일하고
-				// update와 render의 구분은 개별 시스템 내부에서 분할하자.
-				// 이벤트 역시 시스템에서 호출하도록 하자.
+				m_pInput->Tick();
 
 				m_pRenderer->Tick();
 			}

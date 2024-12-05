@@ -23,6 +23,11 @@
 #include "graphics/ConstantBuffer.h"
 #include "graphics/Cubemap.h"
 
+// math
+#include "math/Math.h"
+#include "math/Frustum.h"
+//#include "math/BoundingBox.h"
+
 // rendering
 #include "rendering/GBuffer.h"
 #include "rendering/Renderer.h"

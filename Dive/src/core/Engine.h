@@ -7,6 +7,7 @@ namespace Dive
 	class Window;
 	class Graphics;
 	class Renderer;
+	class Input;
 
 	class Engine
 	{
@@ -41,6 +42,7 @@ namespace Dive
 		Window& GetWindow() const { return *m_pWindow.get(); }
 		Graphics& GetGraphics() const { return *m_pGraphics.get(); }
 		Renderer& GetRenderer() const { return *m_pRenderer.get(); }
+		Input& GetInput() const { return *m_pInput.get(); }
 
 	private:
 		Engine();
@@ -52,5 +54,6 @@ namespace Dive
 		std::unique_ptr<Window> m_pWindow;
 		std::shared_ptr<Graphics> m_pGraphics;
 		std::unique_ptr<Renderer> m_pRenderer;
+		std::unique_ptr<Input> m_pInput;
 	};
 }

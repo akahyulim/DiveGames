@@ -13,6 +13,12 @@
     <Filter Include="graphics">
       <UniqueIdentifier>{2b44d4ba-87e2-4f36-9a78-24be61b71238}</UniqueIdentifier>
     </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{f9b53f88-8239-44c7-bea5-21c6b9fb6b39}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="input">
+      <UniqueIdentifier>{36179512-5066-4952-b95f-972928882c9e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\dive.h" />
@@ -80,6 +86,15 @@
     <ClInclude Include="src\graphics\VertexBuffer.h">
       <Filter>graphics</Filter>
     </ClInclude>
+    <ClInclude Include="src\math\Frustum.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\Math.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input\Input.h">
+      <Filter>input</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -142,6 +157,15 @@
     </ClCompile>
     <ClCompile Include="src\graphics\VertexBuffer.cpp">
       <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math\Frustum.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math\Math.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input\Input.cpp">
+      <Filter>input</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
