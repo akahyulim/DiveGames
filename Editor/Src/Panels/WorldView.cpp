@@ -22,7 +22,7 @@ namespace Dive
 
 		ImGui::Image(
 			//m_pTex ? m_pTex->GetShaderResourceView() : nullptr,
-			GEngine->GetRenderer().GetGBuffer().GetDiffuseTex()->GetShaderResourceView(),
+			GEngine->GetRenderer().GetShaderResourceView(eRenderTargetType::FrameRender),
 			ImVec2(width, height));// ,
 			//ImVec2(0, 0),
 			//ImVec2(1, 1) ,

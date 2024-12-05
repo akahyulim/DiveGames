@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Renderer.h"
-//#include "GBuffer.h"
 #include "core/CoreDefs.h"
 #include "graphics/Graphics.h"
 #include "graphics/Texture2D.h"
@@ -8,11 +7,15 @@
 namespace Dive
 {
 	Renderer::Renderer()
-		: m_pGBuffer(std::make_unique<GBuffer>())
-		, m_Width(0)
+		: m_Width(0)
 		, m_Height(0)
 		, m_FrameCount(0)
 	{
+	}
+
+	Renderer::~Renderer()
+	{
+		Shutdown();
 	}
 
 	bool Renderer::Initialize(uint32_t width, uint32_t height, std::shared_ptr<Graphics> pGraphics)
@@ -28,8 +31,6 @@ namespace Dive
 
 	void Renderer::Shutdown()
 	{
-		m_pGBuffer->Shutdown();
-
 		DV_LOG(Renderer, trace, "셧다운 성공(frame count: {:d})", m_FrameCount);
 	}
 
@@ -47,14 +48,18 @@ namespace Dive
 
 			// render targets
 			ID3D11RenderTargetView* renderTargets[] = {
-				m_pGBuffer->GetDiffuseTex()->GetRenderTargetView(),
-				m_pGBuffer->GetNormalTex()->GetRenderTargetView(),
-				m_pGBuffer->GetSpecularTex()->GetRenderTargetView()
+				GetRenderTargetView(eRenderTargetType::GBuffer_Diffuse),
+				GetRenderTargetView(eRenderTargetType::GBuffer_Normal),
+				GetRenderTargetView(eRenderTargetType::GBuffer_Specular),
+				GetRenderTargetView(eRenderTargetType::FrameRender)
 			};
-			ID3D11DepthStencilView* pDepthStencilView = m_pGBuffer->GetDepthTex()->GetDepthStencilView();
 
-			float clearColor[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
-			for (int i = 0; i != 3; i++)
+			// 현재 GetDepthStencilView를 만들기엔 조금 애매하다.
+			// 텍스쳐와 enum class도 별도로 분리해야 할 것 같다.
+			ID3D11DepthStencilView* pDepthStencilView = m_RenderTargets[static_cast<size_t>(eRenderTargetType::GBuffer_DepthStencil)]->GetDepthStencilView();
+
+			float clearColor[4] = { 1.0f, 0.1f, 0.1f, 1.0f };
+			for (int i = 0; i != 4; i++)
 			{
 				m_pGraphics->GetDeviceContext()->ClearRenderTargetView(renderTargets[i], clearColor);
 			}
@@ -81,8 +86,41 @@ namespace Dive
 		m_Width = width;
 		m_Height = height;
 
-		m_pGBuffer->Resize(width, height);
+		// GBuffer
+		{
+			m_RenderTargets[static_cast<size_t>(eRenderTargetType::GBuffer_Diffuse)] = std::make_unique<Texture2D>(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+			m_RenderTargets[static_cast<size_t>(eRenderTargetType::GBuffer_Normal)] = std::make_unique<Texture2D>(width, height, DXGI_FORMAT_R11G11B10_FLOAT, false);
+			m_RenderTargets[static_cast<size_t>(eRenderTargetType::GBuffer_Specular)] = std::make_unique<Texture2D>(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+			m_RenderTargets[static_cast<size_t>(eRenderTargetType::GBuffer_DepthStencil)] = std::make_unique<Texture2D>(width, height, 24, true);
+		}
+
+		// 기타
+		{
+			m_RenderTargets[static_cast<size_t>(eRenderTargetType::FrameRender)] = std::make_unique<Texture2D>(width, height, DXGI_FORMAT_R8G8B8A8_UNORM, false);
+		}
 
 		DV_LOG(Renerer, info, "Resize targets - {0:d} x {1:d}", m_Width, m_Height);
+	}
+
+	ID3D11RenderTargetView* Renderer::GetRenderTargetView(eRenderTargetType type)
+	{
+		auto& pRenderTarget = m_RenderTargets[static_cast<size_t>(type)];
+		if (pRenderTarget)
+		{
+			return pRenderTarget->GetRenderTargetView();
+		}
+
+		return nullptr;
+	}
+
+	ID3D11ShaderResourceView* Renderer::GetShaderResourceView(eRenderTargetType type)
+	{
+		auto& pRenderTarget = m_RenderTargets[static_cast<size_t>(type)];
+		if (pRenderTarget)
+		{
+			return pRenderTarget->GetShaderResourceView();
+		}
+
+		return nullptr;
 	}
 }

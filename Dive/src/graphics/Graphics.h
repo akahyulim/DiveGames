@@ -7,7 +7,7 @@ namespace Dive
 	{
 	public:
 		Graphics();
-		~Graphics() = default;
+		~Graphics();
 
 		bool Initialize(uint32_t width, uint32_t height, HWND hWnd);
 		void Shutdown();

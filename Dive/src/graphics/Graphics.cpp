@@ -22,6 +22,11 @@ namespace Dive
 	{
 	}
 
+	Graphics::~Graphics()
+	{
+		Shutdown();
+	}
+
 	bool Graphics::Initialize(uint32_t width, uint32_t height, HWND hWnd)
 	{
 		m_Resolution = { width, height };

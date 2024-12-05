@@ -29,7 +29,6 @@
 //#include "math/BoundingBox.h"
 
 // rendering
-#include "rendering/GBuffer.h"
 #include "rendering/Renderer.h"
 
 // resource

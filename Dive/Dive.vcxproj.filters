@@ -71,9 +71,6 @@
     <ClInclude Include="src\graphics\Texture2DArray.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\GBuffer.h">
-      <Filter>rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\graphics\ConstantBuffer.h">
       <Filter>graphics</Filter>
     </ClInclude>
@@ -142,9 +139,6 @@
     </ClCompile>
     <ClCompile Include="src\graphics\Texture2DArray.cpp">
       <Filter>graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\GBuffer.cpp">
-      <Filter>rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\graphics\ConstantBuffer.cpp">
       <Filter>graphics</Filter>
