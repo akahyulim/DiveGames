@@ -19,6 +19,9 @@ namespace Dive
 		, m_pGraphics(std::make_shared<Graphics>())
 		, m_pRenderer(std::make_unique<Renderer>())
 		, m_pInput(std::make_unique<Input>())
+		, m_ElapsedTimeMS(0.0)
+		, m_DeltaTimeMS(0.0f)
+		, m_Fps(0)
 	{
 	}
 
@@ -29,14 +32,16 @@ namespace Dive
 		if (!m_pWindow->Initialize(hInstance, width, height, pTitle))
 			return false;
 
-		if (!m_pGraphics->Initialize(width, height, m_pWindow->GetHandle()))
+		if (!m_pGraphics->Initialize(width, height, GetWindowHandle()))
 			return false;
 
 		if (!m_pRenderer->Initialize(width, height, m_pGraphics))
 			return false;
 
-		if (!m_pInput->Initialize(hInstance, m_pWindow->GetHandle()))
+		if (!m_pInput->Initialize(hInstance, GetWindowHandle()))
 			return false;
+
+		m_LastTickTime = std::chrono::steady_clock::now();
 
 		DV_SUBSCRIBE_EVENT(eEventType::Exit, DV_EVENT_HANDLER(OnExit));
 
@@ -54,7 +59,7 @@ namespace Dive
 		m_pGraphics->Shutdown();
 		m_pWindow->Shutdown();
 
-		DV_LOG(Engine, trace, "¼Ë´Ù¿î Á¾·á");
+		DV_LOG(Engine, trace, "¼Ë´Ù¿î Á¾·á(elapsed time: {:.2f} sec)", GetElapsedTimeSec());
 	}
 
 	void Engine::Tick()
@@ -69,8 +74,22 @@ namespace Dive
 			}
 			else
 			{
-				m_pInput->Tick();
+				auto currentTickTime = std::chrono::steady_clock::now();
+				m_DeltaTimeMS = std::chrono::duration<float, std::milli>(currentTickTime - m_LastTickTime).count();
+				m_ElapsedTimeMS += m_DeltaTimeMS;
+				m_LastTickTime = currentTickTime;
 
+				static double lastTimeMS = 0;
+				static uint16_t frameCount = 0;
+				frameCount++;
+				if (m_ElapsedTimeMS - lastTimeMS >= 1000.0)
+				{
+					m_Fps = frameCount;
+					frameCount = 0;
+					lastTimeMS = m_ElapsedTimeMS;
+				}
+
+				m_pInput->Tick();
 				m_pRenderer->Tick();
 			}
 		}
@@ -99,5 +118,30 @@ namespace Dive
 	ID3D11DeviceContext* Engine::GetDeviceContext()
 	{
 		return m_pGraphics->GetDeviceContext();
+	}
+
+	double Engine::GetElapsedTimeMS() const
+	{
+		return m_ElapsedTimeMS;
+	}
+
+	double Engine::GetElapsedTimeSec() const
+	{
+		return m_ElapsedTimeMS / 1000.0;
+	}
+
+	float Engine::GetDeltaTimeMS() const
+	{
+		return m_DeltaTimeMS;
+	}
+
+	float Engine::GetDeltaTimeSec() const
+	{
+		return m_DeltaTimeMS / 1000.0f;
+	}
+
+	uint16_t Engine::GetFps() const
+	{
+		return m_Fps;
 	}
 }

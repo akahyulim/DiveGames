@@ -44,6 +44,13 @@ namespace Dive
 		Renderer& GetRenderer() const { return *m_pRenderer.get(); }
 		Input& GetInput() const { return *m_pInput.get(); }
 
+		// time & fps
+		double GetElapsedTimeMS() const;
+		double GetElapsedTimeSec() const;
+		float GetDeltaTimeMS() const;
+		float GetDeltaTimeSec() const;
+		uint16_t GetFps() const;
+
 	private:
 		Engine();
 
@@ -55,5 +62,10 @@ namespace Dive
 		std::shared_ptr<Graphics> m_pGraphics;
 		std::unique_ptr<Renderer> m_pRenderer;
 		std::unique_ptr<Input> m_pInput;
+
+		double m_ElapsedTimeMS;
+		float m_DeltaTimeMS;
+		std::chrono::steady_clock::time_point m_LastTickTime;
+		uint16_t m_Fps;
 	};
 }
