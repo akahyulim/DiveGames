@@ -5,7 +5,6 @@ namespace Dive
 	class FileUtils
 	{
 	public:
-		// file and directory
 		static std::string GetCurrentDir();
 		static void SetCurrentDir(const std::string& pathName);
 		static std::string GetProgramDir();

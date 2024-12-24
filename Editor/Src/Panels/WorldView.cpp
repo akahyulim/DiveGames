@@ -1,32 +1,38 @@
 #include "WorldView.h"
+#include "../Editor.h"
 
 namespace Dive
 {
 	WorldView::WorldView(Editor* pEditor)
 		: Panel(pEditor)
 	{
-		m_Title = "WorldView";
+		m_Title = "World";
 
-		m_pTex = GResourceManager->Load<Texture2D>("../../Assets/Textures/DokeV.jpeg");
+		// 유니티의 경우 카메라에서 렌더타겟을 가진다.
+		// 따라서 카메라별 리소스 뷰를 가져와서 그릴 수 있다.
+		// 좀 더 자세히 설명하자면 카메라의 렌더타겟이 백버퍼 바로 전에 출력되는 타겟이다.
+		// 실제로 Camera.Render()가 존재하는 듯 한데 이는 카메라 기준으로 렌더링이 수행된다고 볼 수도 있다.
+		// => Camera의 Render()는 자동으로 호출되나 사용자가 특정 시점에 직접 호출할 수도 있다.
+		// => 이 경우 호출이 중복될 수 있는데 이를 피하는 플래그가 존재한다.
+		// + Camera가 렌더타겟을 가지지 않을 수도 있다. 이 경우 백버퍼에 렌더링을 수행한다.
 	}
 
-	void WorldView::renderWindow()
+	void WorldView::renderView()
 	{
-		auto width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
-		auto height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
+		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
+		m_Height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
 
-		// srv를 그린다. 
-		// 창의 크기에 맞춰 texture를 resize해야 한다.
-		// renderer가 해당 texture를 관리한다.
-		GEngine->GetRenderer().ResizeTargets(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
-
-		ImGui::Image(
-			//m_pTex ? m_pTex->GetShaderResourceView() : nullptr,
-			GEngine->GetRenderer().GetShaderResourceView(eRenderTargetType::FrameRender),
-			ImVec2(width, height));// ,
-			//ImVec2(0, 0),
-			//ImVec2(1, 1) ,
-			//ImColor(255, 255, 255, 255),
-			//ImColor(50, 127, 166, 255));
+		// 프로젝트를 종료해도 남아있다...
+		// 엔진은 프로젝트의 구분없이 월드들을 관리하고 있기 때문이다.
+		auto pWorld = GEngine->GetActiveWorld();
+		if(pWorld)
+		{
+			ImGui::PushFont(m_pEditor->GetFont(eFontTypes::Default));
+			ImGui::Text("world name: %s", pWorld->GetName().c_str());
+			ImGui::Text("size: %dx%d", static_cast<uint32_t>(m_Width), static_cast<uint32_t>(m_Height));
+			ImGui::Text("fps: %.1f", ImGui::GetIO().Framerate);
+			ImGui::Text("num gameObjects: %d", pWorld->GetGameObjectsCount());
+			ImGui::PopFont();
+		}
 	}
 }

@@ -4,7 +4,7 @@
 #include "core/FileUtils.h"
 #include "core/StringUtils.h"
 
-#include <DirectXTex/DirectXTex.h>
+//#include <DirectXTex/DirectXTex.h>
 
 namespace Dive
 {
@@ -135,29 +135,28 @@ namespace Dive
 		SetName(FileUtils::GetFileName(filename));
 	}
 
-	bool Texture2D::LoadFromFile(const std::string& filename)
+	bool Texture2D::LoadFromFile(const std::filesystem::path& path)
 	{
-		auto file = StringUtils::StringToWString(filename);
-		auto ext = FileUtils::GetExtension(filename);
+		auto ext = path.extension();
 		DirectX::ScratchImage img;
 		HRESULT hResult = 0;
 
-		if (ext == ".dds")
+		if (ext == L".dds" || ext == L".DDS")
 		{
-			hResult = DirectX::LoadFromDDSFile(file.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
+			hResult = DirectX::LoadFromDDSFile(path.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
 		}
-		else if (ext == ".tga")
+		else if (ext == L".tga" || ext == L".TGA")
 		{
 			// 색 공간 정보를 포함하지 않는다.
-			hResult = DirectX::LoadFromTGAFile(file.c_str(), nullptr, img);
+			hResult = DirectX::LoadFromTGAFile(path.c_str(), nullptr, img);
 		}
 		else
 		{
-			hResult = DirectX::LoadFromWICFile(file.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
+			hResult = DirectX::LoadFromWICFile(path.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
 		}
 
 		if (FAILED(hResult))
-			DV_LOG(Texture2D, err, "Texture2D 생성 과정 중 파일 {:s} 로드에 실패하였습니다.", filename);
+			DV_LOG(Texture2D, err, "Texture2D 생성 과정 중 파일 {:s} 로드에 실패하였습니다.", path.string());
 
 		// 생성자에서 임의로 전달받은 데이터들을 실제 파일 데이터로 갱신
 		m_Width = static_cast<uint32_t>(img.GetImages()->width);
@@ -214,7 +213,8 @@ namespace Dive
 		if (!UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch)))
 			return false;
 
-		SetName(FileUtils::GetFileName(filename));
+		auto name = path.stem();
+		SetName(path.stem().string());//StringUtils::WStringToString(name.c_str()));
 
 		return true;
 	}

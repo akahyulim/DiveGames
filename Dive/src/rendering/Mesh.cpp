@@ -1,11 +1,10 @@
-#include "DivePch.h"
+#include "stdafx.h"
 #include "Mesh.h"
-#include "Core/CoreDefs.h"
-#include "Graphics/Graphics.h"
-#include "Graphics/Graphics.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/IndexBuffer.h"
-#include "Resource/Importer/ModelLoader.h"
+#include "core/CoreDefs.h"
+#include "graphics/Graphics.h"
+#include "graphics/Graphics.h"
+#include "graphics/VertexBuffer.h"
+#include "graphics/IndexBuffer.h"
 
 namespace Dive
 {

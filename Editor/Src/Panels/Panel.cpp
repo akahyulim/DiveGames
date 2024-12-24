@@ -30,7 +30,7 @@ namespace Dive
 		m_Width = ImGui::GetWindowWidth();
 		m_Height = ImGui::GetWindowHeight();
 
-		renderWindow();
+		renderView();
 
 		// end
 		ImGui::End();

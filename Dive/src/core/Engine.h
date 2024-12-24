@@ -8,6 +8,7 @@ namespace Dive
 	class Graphics;
 	class Renderer;
 	class Input;
+	class World;
 
 	class Engine
 	{
@@ -39,10 +40,17 @@ namespace Dive
 		ID3D11DeviceContext* GetDeviceContext();
 
 		// systems
-		Window& GetWindow() const { return *m_pWindow.get(); }
-		Graphics& GetGraphics() const { return *m_pGraphics.get(); }
-		Renderer& GetRenderer() const { return *m_pRenderer.get(); }
-		Input& GetInput() const { return *m_pInput.get(); }
+		std::shared_ptr<Window> GetWindow() const { return m_pWindow; }
+		std::shared_ptr<Graphics> GetGraphics() const { return m_pGraphics; }
+		std::shared_ptr<Renderer> GetRenderer() const { return m_pRenderer; }
+		std::shared_ptr<Input> GetInput() const { return m_pInput; }
+
+		// worlds
+		std::shared_ptr<World> CreateWorld(const std::string& name);
+		std::shared_ptr<World> OpenWorld(const std::filesystem::path& path);
+		void CloseWorld();
+		std::shared_ptr<World> GetActiveWorld() const { return m_pActiveWorld; }
+
 
 		// time & fps
 		double GetElapsedTimeMS() const;
@@ -58,10 +66,12 @@ namespace Dive
 		static Engine* s_pInstance;
 		static std::once_flag s_OnceFlag;
 
-		std::unique_ptr<Window> m_pWindow;
+		std::shared_ptr<Window> m_pWindow;
 		std::shared_ptr<Graphics> m_pGraphics;
-		std::unique_ptr<Renderer> m_pRenderer;
-		std::unique_ptr<Input> m_pInput;
+		std::shared_ptr<Renderer> m_pRenderer;
+		std::shared_ptr<Input> m_pInput;
+
+		std::shared_ptr<World> m_pActiveWorld;
 
 		double m_ElapsedTimeMS;
 		float m_DeltaTimeMS;

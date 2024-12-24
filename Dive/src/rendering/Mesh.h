@@ -3,6 +3,94 @@
 
 namespace Dive
 {
+	//-------------------------------------------------------------------------------------
+	// structures
+	//-------------------------------------------------------------------------------------
+	struct VertexStatic
+	{
+		VertexStatic() = default;
+		VertexStatic(
+			const DirectX::XMFLOAT3& position,
+			const DirectX::XMFLOAT2& texCoords,
+			const DirectX::XMFLOAT3& normal,
+			const DirectX::XMFLOAT3& tangent,
+			const DirectX::XMFLOAT3& bitangent)
+		{
+			this->position[0] = position.x;
+			this->position[1] = position.y;
+			this->position[2] = position.z;
+
+			this->texCoords[0] = texCoords.x;
+			this->texCoords[1] = texCoords.y;
+
+			this->normal[0] = normal.x;
+			this->normal[1] = normal.y;
+			this->normal[2] = normal.z;
+
+			this->tangent[0] = tangent.x;
+			this->tangent[1] = tangent.y;
+			this->tangent[2] = tangent.z;
+
+			this->bitangent[0] = bitangent.x;
+			this->bitangent[1] = bitangent.y;
+			this->bitangent[2] = bitangent.z;
+		}
+
+		float position[3]{};
+		float texCoords[2]{};
+		float normal[3]{};
+		float tangent[3]{};
+		float bitangent[3]{};
+	};
+
+	struct VertexSkinned
+	{
+		VertexSkinned() = default;
+		VertexSkinned(
+			const DirectX::XMFLOAT3& position,
+			const DirectX::XMFLOAT2& texCoords,
+			const DirectX::XMFLOAT3& normal,
+			const DirectX::XMFLOAT3& tangent,
+			const DirectX::XMUINT4& boneIDs,
+			const DirectX::XMFLOAT4& weights)
+		{
+			this->position[0] = position.x;
+			this->position[1] = position.y;
+			this->position[2] = position.z;
+
+			this->texCoords[0] = texCoords.x;
+			this->texCoords[1] = texCoords.y;
+
+			this->normal[0] = normal.x;
+			this->normal[1] = normal.y;
+			this->normal[2] = normal.z;
+
+			this->tangent[0] = tangent.x;
+			this->tangent[1] = tangent.y;
+			this->tangent[2] = tangent.z;
+
+			this->boneIDs[0] = boneIDs.x;
+			this->boneIDs[1] = boneIDs.y;
+			this->boneIDs[2] = boneIDs.z;
+			this->boneIDs[3] = boneIDs.w;
+
+			this->weights[0] = weights.x;
+			this->weights[1] = weights.y;
+			this->weights[2] = weights.z;
+			this->weights[3] = weights.w;
+		}
+
+		float position[3]{};
+		float texCoords[2]{};
+		float normal[3]{};
+		float tangent[3]{};
+		uint32_t boneIDs[4]{};
+		float weights[4]{};
+	};
+
+	//-------------------------------------------------------------------------------------
+	// forward declarations
+	//-------------------------------------------------------------------------------------
 	class VertexBuffer;
 	class IndexBuffer;
     struct VertexStatic;

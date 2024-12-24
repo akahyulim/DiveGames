@@ -44,6 +44,10 @@
     <ClInclude Include="src\resource\Resource.h" />
     <ClInclude Include="src\resource\ResourceManager.h" />
     <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\world\Components\Component.h" />
+    <ClInclude Include="src\world\Components\Transform.h" />
+    <ClInclude Include="src\world\GameObject.h" />
+    <ClInclude Include="src\world\World.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\Engine.cpp" />
@@ -71,6 +75,10 @@
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\world\Components\Component.cpp" />
+    <ClCompile Include="src\world\Components\Transform.cpp" />
+    <ClCompile Include="src\world\GameObject.cpp" />
+    <ClCompile Include="src\world\World.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -159,11 +167,11 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <AdditionalIncludeDirectories>src;$(SolutionDir)\External\include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;external\include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -171,8 +179,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>assimp-vc141-mtd.lib;DirectXTex_D.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\External\libs;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>yaml-cppd.lib;DirectXTexd.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>external\libs;</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

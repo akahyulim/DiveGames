@@ -16,6 +16,9 @@ namespace Dive
 
 		virtual void Update() {}
 
+		virtual void SaveToYaml(YAML::Node config) {}
+		virtual void LaodFromYaml(const YAML::Node& config) {}
+
 		// 이름을 GetVertexCBuffer()로 바꾸기
 		virtual ConstantBuffer* GetConstantBufferVS() { return nullptr; }
 		virtual ConstantBuffer* GetConstantBufferDS() { return nullptr; }

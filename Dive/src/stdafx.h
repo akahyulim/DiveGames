@@ -35,6 +35,9 @@
 #include <d3dcompiler.h>
 #include <dinput.h>
 
+#include <DirectXTex/DirectXTex.h>
+#include <yaml-cpp/yaml.h>
+
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")

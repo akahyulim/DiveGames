@@ -1,4 +1,4 @@
-#include "DivePch.h"
+#include "stdafx.h"
 #include "Component.h"
 #include "Core/CoreDefs.h"
 #include "World/GameObject.h"

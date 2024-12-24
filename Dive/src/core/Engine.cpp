@@ -6,6 +6,7 @@
 #include "graphics/Graphics.h"
 #include "rendering/Renderer.h"
 #include "input/Input.h"
+#include "world/World.h"
 
 namespace Dive
 {
@@ -15,10 +16,10 @@ namespace Dive
 	std::once_flag Engine::s_OnceFlag;
 
 	Engine::Engine()
-		: m_pWindow(std::make_unique<Window>())
+		: m_pWindow(std::make_shared<Window>())
 		, m_pGraphics(std::make_shared<Graphics>())
-		, m_pRenderer(std::make_unique<Renderer>())
-		, m_pInput(std::make_unique<Input>())
+		, m_pRenderer(std::make_shared<Renderer>())
+		, m_pInput(std::make_shared<Input>())
 		, m_ElapsedTimeMS(0.0)
 		, m_DeltaTimeMS(0.0f)
 		, m_Fps(0)
@@ -90,6 +91,7 @@ namespace Dive
 				}
 
 				m_pInput->Tick();
+				m_pActiveWorld->Tick();
 				m_pRenderer->Tick();
 			}
 		}
@@ -118,6 +120,43 @@ namespace Dive
 	ID3D11DeviceContext* Engine::GetDeviceContext()
 	{
 		return m_pGraphics->GetDeviceContext();
+	}
+
+	std::shared_ptr<World> Engine::CreateWorld(const std::string& name)
+	{
+		if (m_pActiveWorld)
+		{
+			m_pActiveWorld.reset();
+		}
+
+		m_pActiveWorld = std::make_shared<World>(name);
+
+		return m_pActiveWorld;
+	}
+
+	std::shared_ptr<World> Engine::OpenWorld(const std::filesystem::path& path)
+	{
+		if (m_pActiveWorld)
+		{
+			if (m_pActiveWorld->GetPath() == path)
+				return m_pActiveWorld;
+
+			m_pActiveWorld.reset();
+		}
+
+		m_pActiveWorld = std::make_shared<World>();
+		m_pActiveWorld->LoadFromFile(path);
+
+		return m_pActiveWorld;
+	}
+
+	void Engine::CloseWorld()
+	{
+		if (!m_pActiveWorld)
+			return;
+
+		m_pActiveWorld->Clear();
+		m_pActiveWorld.reset();
 	}
 
 	double Engine::GetElapsedTimeMS() const

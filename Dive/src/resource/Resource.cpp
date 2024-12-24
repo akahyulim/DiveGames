@@ -3,7 +3,13 @@
 #include "core/FileUtils.h"
 
 namespace Dive
-{	void Resource::SetFilepath(const std::string& filepath)
+{	
+	std::unordered_map<size_t, std::unordered_map<std::string, std::shared_ptr<DvResource>>> DvResource::s_Resources;
+	std::mutex DvResource::s_Mutex;
+
+	//===========================================================================================
+
+	void Resource::SetFilepath(const std::string& filepath)
 	{
 		m_Name = FileUtils::GetFileName(filepath);
 		// 추후 상대경로 저장 수정 필요

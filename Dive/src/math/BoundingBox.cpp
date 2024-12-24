@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "BoundingBox.h"
 #include "core/CoreDefs.h"
-#include "graphics/Graphics.h"	// VertexStatic
+#include "rendering/Mesh.h"
 
 namespace Dive
 {

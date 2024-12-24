@@ -19,6 +19,12 @@
     <Filter Include="input">
       <UniqueIdentifier>{36179512-5066-4952-b95f-972928882c9e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="world">
+      <UniqueIdentifier>{2f4191fb-50a8-4cd9-964b-6dca35aefbeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="world\components">
+      <UniqueIdentifier>{213bac85-a459-4aa7-88ac-cd5c39231163}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\dive.h" />
@@ -74,9 +80,6 @@
     <ClInclude Include="src\graphics\ConstantBuffer.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\IndexBuffer.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
     <ClInclude Include="src\graphics\Shader.h">
       <Filter>graphics</Filter>
     </ClInclude>
@@ -91,6 +94,21 @@
     </ClInclude>
     <ClInclude Include="src\input\Input.h">
       <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\World.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\IndexBuffer.h">
+      <Filter>input</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\GameObject.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Components\Component.h">
+      <Filter>world\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Components\Transform.h">
+      <Filter>world\components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -160,6 +178,18 @@
     </ClCompile>
     <ClCompile Include="src\input\Input.cpp">
       <Filter>input</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\World.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\GameObject.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Components\Component.cpp">
+      <Filter>world\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Components\Transform.cpp">
+      <Filter>world\components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -21,7 +21,7 @@ namespace Dive
 		virtual ~Texture2D() = default;
 
 		// 유니티의 LoadImage에 대응해야 한다.
-		bool LoadFromFile(const std::string& filename) override;
+		bool LoadFromFile(const std::filesystem::path& path) override;
 		bool LoadFromMemory(const std::string& filename, size_t size, const void* pSource);
 		bool UpdateSubresource(const void* pData, uint32_t size);
 

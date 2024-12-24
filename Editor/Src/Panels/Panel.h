@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
-#include "imgui-docking/imgui.h"
-#include "imgui-docking/imgui_internal.h"
-#include "imgui-docking/imgui_stdlib.h"
+#include "imgui.h"
 #include "dive.h"
 
 namespace Dive
@@ -27,7 +25,7 @@ namespace Dive
 		// 항상 그려져야 하는 것(ex. MenuBar)
 		virtual void renderAlways() {}
 		// 창 형태의 Panel
-		virtual void renderWindow() {}
+		virtual void renderView() {}
 
 	protected:
 		Editor* m_pEditor;

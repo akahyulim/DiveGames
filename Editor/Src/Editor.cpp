@@ -1,8 +1,13 @@
 #include "Editor.h"
-#include "imgui-docking/imgui.h"
-#include "imgui-docking/imgui_impl_win32.h"
-#include "imgui-docking/imgui_impl_dx11.h"
-//#include "Panels/Menubar.h"
+#include "imgui.h"
+#include "backends/imgui_impl_win32.h"
+#include "backends/imgui_impl_dx11.h"
+#include "Panels/Menubar.h"
+#include "Panels/WorldView.h"
+#include "Panels/GameView.h"
+#include "Panels/HierarchyView.h"
+#include "Panels/InspectorView.h"
+#include "Panels/AssetView.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -30,7 +35,12 @@ LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 namespace Dive
 {
 	Editor::Editor()
+		: m_bProjectLoaded(false)
 	{
+		for (auto& font : m_Fonts)
+		{
+			font = nullptr;
+		}
 	}
 
 	int Editor::Run()
@@ -47,6 +57,9 @@ namespace Dive
 				DV_LOG(Window, err, "윈도우 프로시져 함수 변경 실패");
 				return 1;
 			}
+
+			GEngine->GetWindow()->ShowWindow(SW_MAXIMIZE);
+
 		}
 
 		// 에디터 설정 및 초기화
@@ -75,6 +88,101 @@ namespace Dive
 	{
 		// 추후엔 백버퍼뷰를 직접 바인딩해야 한다.
 		renderImGui();
+	}
+
+	Panel& Editor::GetPanel(ePanelTypes type)
+	{
+		return *m_Panels[static_cast<size_t>(type)].get();
+	}
+
+	ImFont* Editor::GetFont(eFontTypes type)
+	{
+		return m_Fonts[static_cast<size_t>(type)];
+	}
+
+	bool Editor::CreateProject(const std::filesystem::path& path)
+	{
+		if (std::filesystem::exists(path))
+		{
+			DV_LOG(Editor, err, "이미 존재하는 경로({:s})에 새로운 프로젝트를 생성할 수 없습니다.", path.string());
+			return false;
+		}
+
+		m_ProjectSettings.path = path.string();
+		std::filesystem::create_directories(path);
+
+		m_ProjectSettings.name = path.filename().string();
+
+		// assets
+		m_ProjectSettings.materialsPath = path.string() + "\\Assets\\Materials";
+		std::filesystem::create_directories(m_ProjectSettings.materialsPath);
+		m_ProjectSettings.modelsPath = path.string() + "\\Assets\\Models";
+		std::filesystem::create_directories(m_ProjectSettings.modelsPath);
+		m_ProjectSettings.texturesPath = path.string() + "\\Assets\\Textures";
+		std::filesystem::create_directories(m_ProjectSettings.texturesPath);
+		m_ProjectSettings.worldsPath = path.string() + "\\Assets\\Worlds";
+		std::filesystem::create_directories(m_ProjectSettings.worldsPath);
+
+		// file
+		YAML::Node config;
+		config["Name"] = m_ProjectSettings.name;
+		config["Path"] = m_ProjectSettings.path;
+		config["MaterialsPath"] = m_ProjectSettings.materialsPath;
+		config["ModelsPath"] = m_ProjectSettings.modelsPath;
+		config["TexturesPath"] = m_ProjectSettings.texturesPath;
+		config["WorldsPath"] = m_ProjectSettings.worldsPath;
+
+		std::ofstream fout(m_ProjectSettings.name + ".proj");
+		fout << config;
+
+		m_bProjectLoaded = true;
+
+		SetTitle(m_ProjectSettings.name);
+
+		return true;
+	}
+
+	bool Editor::OpenProject(const std::filesystem::path& path)
+	{
+		if (!std::filesystem::exists(path))
+		{
+			DV_LOG(Editor, err, "파일({:s})이 존재하지 않습니다.", path.string());
+			return false;
+		}
+
+		YAML::Node config = YAML::LoadFile(path.string());
+		m_ProjectSettings.name = config["Name"].as<std::string>();
+		m_ProjectSettings.path = config["Path"].as<std::string>();
+		m_ProjectSettings.materialsPath = config["MaterialsPath"].as<std::string>();
+		m_ProjectSettings.modelsPath = config["ModelsPath"].as<std::string>();
+		m_ProjectSettings.texturesPath = config["TexturesPath"].as<std::string>();
+		m_ProjectSettings.worldsPath = config["WorldsPath"].as<std::string>();
+
+		m_bProjectLoaded = true;
+
+		SetTitle(m_ProjectSettings.name);
+
+		return true;
+	}
+
+	void Editor::CloseProject()
+	{
+		GEngine->CloseWorld();
+		m_bProjectLoaded = false;
+
+		SetTitle("");
+	}
+
+	void Editor::SetTitle(const std::string& projectName)
+	{
+		std::wstring title = L"Dive_Editor";
+
+		if (!projectName.empty())
+		{
+			title += L" - " + StringUtils::StringToWString(projectName);
+		}
+
+		GEngine->GetWindow()->SetTitle(title.c_str());
 	}
 
 	void Editor::initializeImGui()
@@ -133,14 +241,24 @@ namespace Dive
 		colors[ImGuiCol_TitleBgActive] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 		colors[ImGuiCol_TitleBgCollapsed] = ImVec4{ 0.15f, 0.1505f, 0.151f, 1.0f };
 
-		// load resources
-		float fontSize = 15.0f;
-		io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothic.ttf", fontSize);
-		io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothicBold.ttf", fontSize);
-
+		// load fonts
+		ImFontConfig config;
+		config.SizePixels = 19.0f;
+		m_Fonts[static_cast<size_t>(eFontTypes::Default)] = io.Fonts->AddFontDefault(&config);
+		float fontSize = 19.0f;
+		m_Fonts[static_cast<size_t>(eFontTypes::Normal)] = io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothic.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesKorean());
+		m_Fonts[static_cast<size_t>(eFontTypes::Bold)] = io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothicBold.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesKorean());
+		fontSize = 26.0f;
+		m_Fonts[static_cast<size_t>(eFontTypes::Large)] = io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothic.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesKorean());
+		m_Fonts[static_cast<size_t>(eFontTypes::Large_Bold)] = io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothicBold.ttf", fontSize, nullptr, io.Fonts->GetGlyphRangesKorean());
+		
 		// create panels
-		m_pMenubar = std::make_unique<Menubar>(this);
-		m_pWorldView = std::make_unique<WorldView>(this);
+		m_Panels[static_cast<size_t>(ePanelTypes::Menubar)] = std::make_unique<Menubar>(this);
+		m_Panels[static_cast<size_t>(ePanelTypes::WorldView)] = std::make_unique<WorldView>(this);
+		m_Panels[static_cast<size_t>(ePanelTypes::GameView)] = std::make_unique<GameView>(this);
+		m_Panels[static_cast<size_t>(ePanelTypes::HierarchyView)] = std::make_unique<HierarchyView>(this);
+		m_Panels[static_cast<size_t>(ePanelTypes::InspectorView)] = std::make_unique<InspectorView>(this);
+		m_Panels[static_cast<size_t>(ePanelTypes::AssetView)] = std::make_unique<AssetView>(this);
 
 		DV_LOG(Editor, trace, "ImGui 초기화를 수행하였습니다.");
 	}
@@ -182,7 +300,7 @@ namespace Dive
 		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise 
 		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+		ImGui::Begin("DockSpace", &dockspaceOpen, window_flags);
 		ImGui::PopStyleVar();
 
 		if (opt_fullscreen)
@@ -192,8 +310,7 @@ namespace Dive
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiStyle& style = ImGui::GetStyle();
 		float minWinSizeX = style.WindowMinSize.x;
-		// dock space에서의 최소 크기...
-		style.WindowMinSize.x = 200.0f;
+		style.WindowMinSize.x = 200.0f;	// dock space에서의 최소 크기...
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
@@ -202,16 +319,20 @@ namespace Dive
 		style.WindowMinSize.x = minWinSizeX;
 
 		// Render Panels
-		m_pMenubar->Tick();
-		m_pWorldView->Tick();
-		//m_pHierarchy->Tick();
-		//m_pInspector->Tick();
-		//m_pAsset->Tick();
+		for (auto& panel : m_Panels)
+		{
+			if (!panel)
+			{
+				DV_LOG(Editor, err, "panel이 존재하지 않습니다.");
+			}
+
+			panel->Tick();
+		}
 
 		ImGui::End();
 
 		// 일단 임시다.
-		auto* pDefaultRenderTargetView = GEngine->GetGraphics().GetBackbufferView();
+		auto* pDefaultRenderTargetView = GEngine->GetGraphics()->GetBackbufferView();
 		const float clear_color_with_alpha[4]{ 0.1f, 0.1f, 0.1f, 0.0f };
 		GEngine->GetDeviceContext()->OMSetRenderTargets(1, &pDefaultRenderTargetView, NULL);
 		GEngine->GetDeviceContext()->ClearRenderTargetView(pDefaultRenderTargetView, clear_color_with_alpha);

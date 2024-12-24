@@ -16,10 +16,19 @@ namespace Dive
 		void menuGameObject();
 		void menuComponent();
 		void menuTools();
-		void menuWindow();
+		void menuView();
 		void menuHelp();
 
-	private:
+		void showNewProject();
+		void showNewWorld();
 
+		void showOpenProject();
+		void showOpenWorld();
+
+	private:
+		bool m_bShowNewProject;
+		bool m_bShowNewWorld;
+		bool m_bShowOpenProject;
+		bool m_bShowOpenWorld;
 	};
 }

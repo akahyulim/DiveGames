@@ -29,8 +29,15 @@
 //#include "math/BoundingBox.h"
 
 // rendering
+//#include "rendering/Mesh.h"
 #include "rendering/Renderer.h"
 
 // resource
 #include "resource/Resource.h"
 #include "resource/ResourceManager.h"
+
+// world
+#include "World/Components/Component.h"
+#include "World/Components/Transform.h"
+#include "World/GameObject.h"
+#include "World/World.h"
