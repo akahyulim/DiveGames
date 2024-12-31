@@ -9,7 +9,7 @@ namespace Dive
 		HierarchyView(Editor* pEditor);
 		virtual ~HierarchyView();
 
-		void renderView() override;
+		void drawView() override;
 
 	private:
 		void drawNode(GameObject* pObject);

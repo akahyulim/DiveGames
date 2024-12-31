@@ -41,3 +41,4 @@
 #include "World/Components/Transform.h"
 #include "World/GameObject.h"
 #include "World/World.h"
+#include "world/WorldSerializer.h"

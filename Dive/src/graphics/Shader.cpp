@@ -60,10 +60,13 @@ namespace Dive
 			&pErrorMsgs)))
 		{
 			if (pErrorMsgs)
+			{
 				DV_LOG(Shader, err, "{:s}", (char*)pErrorMsgs->GetBufferPointer());
+			}
 			else
+			{
 				DV_LOG(Shader, err, "셰이더 파일({:s}) 컴파일에 실패하였습니다.", fileName);
-
+			}
 			DV_RELEASE(pErrorMsgs);
 			DV_RELEASE(pShaderBlob);
 

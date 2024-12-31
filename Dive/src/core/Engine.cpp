@@ -30,6 +30,8 @@ namespace Dive
 	{
 		DV_LOG(Engine, trace, "초기화 시작");
 
+		// 일반적으로 객체의 생성과 초기화는 생성자에서 수행한다.
+		// Initialize, Create 등은 싱글톤, 정적 클래스들에서 사용한다.
 		if (!m_pWindow->Initialize(hInstance, width, height, pTitle))
 			return false;
 
@@ -91,7 +93,7 @@ namespace Dive
 				}
 
 				m_pInput->Tick();
-				m_pActiveWorld->Tick();
+				//m_pActiveWorld->Tick();
 				m_pRenderer->Tick();
 			}
 		}

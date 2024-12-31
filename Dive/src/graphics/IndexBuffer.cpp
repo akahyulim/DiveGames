@@ -32,7 +32,7 @@ namespace Dive
 		data.SysMemSlicePitch = 0;
 
 		if(FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
-			DV_LOG(CubeMap, err, "IndexBuffer 생성에 실패하였습니다.");
+			DV_LOG(IndexBuffer, err, "IndexBuffer 생성에 실패하였습니다.");
 	}
 
 	IndexBuffer::IndexBuffer(uint32_t* pIndices, uint32_t count)
@@ -55,7 +55,7 @@ namespace Dive
 		data.SysMemSlicePitch = 0;
 
 		if(FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
-			DV_LOG(CubeMap, err, "IndexBuffer 생성에 실패하였습니다.");
+			DV_LOG(IndexBuffer, err, "IndexBuffer 생성에 실패하였습니다.");
 	}
 
 	IndexBuffer::~IndexBuffer()
@@ -101,7 +101,7 @@ namespace Dive
 
 		if (FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
 		{
-			DV_LOG(CubeMap, err, "IndexBuffer 생성에 실패하였습니다.");
+			DV_LOG(IndexBuffer, err, "IndexBuffer 생성에 실패하였습니다.");
 			return false;
 		}
 

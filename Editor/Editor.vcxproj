@@ -150,12 +150,14 @@
     <ClCompile Include="Src\Editor.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\Panels\AssetView.cpp" />
+    <ClCompile Include="Src\Panels\ContentBrowserPanel.cpp" />
     <ClCompile Include="Src\Panels\GameView.cpp" />
     <ClCompile Include="Src\Panels\HierarchyView.cpp" />
     <ClCompile Include="Src\Panels\InspectorView.cpp" />
-    <ClCompile Include="Src\Panels\Menubar.cpp" />
     <ClCompile Include="Src\Panels\Panel.cpp" />
     <ClCompile Include="Src\Panels\WorldView.cpp" />
+    <ClCompile Include="Src\Project\Project.cpp" />
+    <ClCompile Include="Src\Project\ProjectSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="externals\ImGuiFileDialog\ImGuiFileDialog.h" />
@@ -166,12 +168,14 @@
     <ClInclude Include="externals\imgui\imgui_internal.h" />
     <ClInclude Include="Src\Editor.h" />
     <ClInclude Include="Src\Panels\AssetView.h" />
+    <ClInclude Include="Src\Panels\ContentBrowserPanel.h" />
     <ClInclude Include="Src\Panels\GameView.h" />
     <ClInclude Include="Src\Panels\HierarchyView.h" />
     <ClInclude Include="Src\Panels\InspectorView.h" />
-    <ClInclude Include="Src\Panels\Menubar.h" />
     <ClInclude Include="Src\Panels\Panel.h" />
     <ClInclude Include="Src\Panels\WorldView.h" />
+    <ClInclude Include="Src\Project\Project.h" />
+    <ClInclude Include="Src\Project\ProjectSerializer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

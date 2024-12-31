@@ -13,7 +13,7 @@ namespace Dive
 	{
 	}
 
-	void HierarchyView::renderView()
+	void HierarchyView::drawView()
 	{
 		// 매 프레임 실행은 부담될 것 같다.
 		m_pActiveWorld = GEngine->GetActiveWorld();

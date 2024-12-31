@@ -13,7 +13,7 @@ namespace Dive
 		Panel(Editor* pEditor);
 		virtual ~Panel() = default;
 		
-		void Tick();
+		void Draw();
 
 		float GetWidth() const { return m_Width; }
 		float GetHeight() const { return m_Height; }
@@ -22,10 +22,7 @@ namespace Dive
 		void SetVisible(bool visible) { m_bVisible = visible; }
 
 	protected:
-		// 항상 그려져야 하는 것(ex. MenuBar)
-		virtual void renderAlways() {}
-		// 창 형태의 Panel
-		virtual void renderView() {}
+		virtual void drawView() {}
 
 	protected:
 		Editor* m_pEditor;
@@ -35,6 +32,5 @@ namespace Dive
 		float m_Width;
 		float m_Height;
 		bool m_bVisible;
-		bool m_bWindow;
 	};
 }

@@ -17,7 +17,7 @@ namespace Dive
 		// + Camera가 렌더타겟을 가지지 않을 수도 있다. 이 경우 백버퍼에 렌더링을 수행한다.
 	}
 
-	void WorldView::renderView()
+	void WorldView::drawView()
 	{
 		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		m_Height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;

@@ -9,7 +9,7 @@ namespace Dive
 		GameView(Editor* pEditor);
 		~GameView() = default;
 
-		void renderView() override;
+		void drawView() override;
 
 	private:
 	private:

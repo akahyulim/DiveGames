@@ -19,6 +19,9 @@
     <Filter Include="External\imgui\backends">
       <UniqueIdentifier>{055f89d3-6b97-453f-935b-d562c83307bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Project">
+      <UniqueIdentifier>{5fd1bb1f-8660-4682-b5fd-4f8b4fea14f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Src\Editor.cpp">
@@ -28,9 +31,6 @@
       <Filter>Src</Filter>
     </ClCompile>
     <ClCompile Include="Src\Panels\Panel.cpp">
-      <Filter>Src\Panels</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Panels\Menubar.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
     <ClCompile Include="Src\Panels\WorldView.cpp">
@@ -72,15 +72,21 @@
     <ClCompile Include="Src\Panels\AssetView.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
+    <ClCompile Include="Src\Panels\ContentBrowserPanel.cpp">
+      <Filter>Src\Panels</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Project\Project.cpp">
+      <Filter>Src\Project</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Project\ProjectSerializer.cpp">
+      <Filter>Src\Project</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Src\Editor.h">
       <Filter>Src</Filter>
     </ClInclude>
     <ClInclude Include="Src\Panels\Panel.h">
-      <Filter>Src\Panels</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Panels\Menubar.h">
       <Filter>Src\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Src\Panels\WorldView.h">
@@ -115,6 +121,15 @@
     </ClInclude>
     <ClInclude Include="Src\Panels\AssetView.h">
       <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Panels\ContentBrowserPanel.h">
+      <Filter>Src\Panels</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Project\Project.h">
+      <Filter>Src\Project</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Project\ProjectSerializer.h">
+      <Filter>Src\Project</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

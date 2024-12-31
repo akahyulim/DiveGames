@@ -9,7 +9,7 @@ namespace Dive
 		WorldView(Editor* pEditor);
 		~WorldView() = default;
 
-		void renderView() override;
+		void drawView() override;
 
 	private:
 	private:

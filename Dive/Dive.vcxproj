@@ -48,6 +48,7 @@
     <ClInclude Include="src\world\Components\Transform.h" />
     <ClInclude Include="src\world\GameObject.h" />
     <ClInclude Include="src\world\World.h" />
+    <ClInclude Include="src\world\WorldSerializer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\Engine.cpp" />
@@ -79,6 +80,7 @@
     <ClCompile Include="src\world\Components\Transform.cpp" />
     <ClCompile Include="src\world\GameObject.cpp" />
     <ClCompile Include="src\world\World.cpp" />
+    <ClCompile Include="src\world\WorldSerializer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -180,7 +182,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>yaml-cppd.lib;DirectXTexd.lib;</AdditionalDependencies>
-      <AdditionalLibraryDirectories>external\libs;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>external\libs;external;</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

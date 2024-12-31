@@ -4,6 +4,18 @@
 
 namespace Dive
 {
+	class Project;
+
+	struct ProjectSettings
+	{
+		std::string name;
+		std::string path;
+		std::string materialsPath;
+		std::string modelsPath;
+		std::string texturesPath;
+		std::string worldsPath;
+	};
+	
 	enum class eFontTypes
 	{
 		Default,
@@ -16,7 +28,6 @@ namespace Dive
 
 	enum class ePanelTypes
 	{
-		Menubar,
 		WorldView,
 		GameView,
 		HierarchyView,
@@ -25,27 +36,16 @@ namespace Dive
 		Max
 	};
 
-	struct ProjectSettings
-	{
-		std::string name;
-		std::string path;
-		std::string materialsPath;
-		std::string modelsPath;
-		std::string texturesPath;
-		std::string worldsPath;
-	};
-
 	class Editor
 	{
 	public:
 		Editor();
-		~Editor() = default;
+		~Editor();
 
 		int Run();
 
 		void OnPostRender();
 
-		Panel& GetPanel(ePanelTypes type);
 		ImFont* GetFont(eFontTypes type);
 
 		ProjectSettings& GetProjectSettings() { return m_ProjectSettings; }
@@ -65,14 +65,16 @@ namespace Dive
 		void SetTitle(const std::string& projectName);
 
 	private:
-		void initializeImGui();
-		void renderImGui();
+		void drawMenubar();
 
 	private:
-		std::array<std::unique_ptr<Panel>, static_cast<size_t>(ePanelTypes::Max)> m_Panels;
 		std::array<ImFont*, static_cast<size_t>(eFontTypes::Max)> m_Fonts;
+		std::array<std::unique_ptr<Panel>, static_cast<size_t>(ePanelTypes::Max)> m_Panels;
 
 		ProjectSettings m_ProjectSettings;
 		bool m_bProjectLoaded;
+
+		std::shared_ptr<Project> m_pActiveProject;
+		std::shared_ptr<World> m_pActiveWorld;
 	};
 }

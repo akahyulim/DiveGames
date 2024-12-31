@@ -10,7 +10,7 @@ namespace Dive
 		//m_pTex = GResourceManager->Load<Texture2D>("../../Assets/Textures/DokeV.jpeg");
 	}
 
-	void GameView::renderView()
+	void GameView::drawView()
 	{
 		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		m_Height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
