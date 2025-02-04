@@ -108,7 +108,7 @@
       <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>Externals\ImGuiFileDialog;Externals\imgui;$(SolutionDir)\Dive\External\include;$(SolutionDir)\Dive\Src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>Externals\imgui;$(SolutionDir)\Dive\External\include;$(SolutionDir)\Dive\Src</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -139,7 +139,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="externals\ImGuiFileDialog\ImGuiFileDialog.cpp" />
     <ClCompile Include="externals\imgui\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="externals\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
@@ -149,7 +148,7 @@
     <ClCompile Include="externals\imgui\imgui_widgets.cpp" />
     <ClCompile Include="Src\Editor.cpp" />
     <ClCompile Include="Src\main.cpp" />
-    <ClCompile Include="Src\Panels\AssetView.cpp" />
+    <ClCompile Include="Src\Panels\ProjectView.cpp" />
     <ClCompile Include="Src\Panels\ContentBrowserPanel.cpp" />
     <ClCompile Include="Src\Panels\GameView.cpp" />
     <ClCompile Include="Src\Panels\HierarchyView.cpp" />
@@ -157,17 +156,15 @@
     <ClCompile Include="Src\Panels\Panel.cpp" />
     <ClCompile Include="Src\Panels\WorldView.cpp" />
     <ClCompile Include="Src\Project\Project.cpp" />
-    <ClCompile Include="Src\Project\ProjectSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="externals\ImGuiFileDialog\ImGuiFileDialog.h" />
     <ClInclude Include="externals\imgui\backends\imgui_impl_dx11.h" />
     <ClInclude Include="externals\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="externals\imgui\imconfig.h" />
     <ClInclude Include="externals\imgui\imgui.h" />
     <ClInclude Include="externals\imgui\imgui_internal.h" />
     <ClInclude Include="Src\Editor.h" />
-    <ClInclude Include="Src\Panels\AssetView.h" />
+    <ClInclude Include="Src\Panels\ProjectView.h" />
     <ClInclude Include="Src\Panels\ContentBrowserPanel.h" />
     <ClInclude Include="Src\Panels\GameView.h" />
     <ClInclude Include="Src\Panels\HierarchyView.h" />
@@ -175,7 +172,6 @@
     <ClInclude Include="Src\Panels\Panel.h" />
     <ClInclude Include="Src\Panels\WorldView.h" />
     <ClInclude Include="Src\Project\Project.h" />
-    <ClInclude Include="Src\Project\ProjectSerializer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

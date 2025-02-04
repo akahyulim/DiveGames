@@ -50,7 +50,7 @@ namespace Dive
 	{
 		return StringLeftTrim(StringRightTrim(str, pTarget), pTarget);
 	}
-
+	/*
 	std::string StringUtils::AddTrailingSlash(const std::string& pathName)
 	{
 		if (pathName.empty())
@@ -64,7 +64,7 @@ namespace Dive
 
 		return ret;
 	}
-
+	*/
 	std::string StringUtils::RemoveTrailingSlash(const std::string& pathName)
 	{
 		if (pathName.empty())

@@ -1,3 +1,4 @@
+
 #pragma once
 #include "Resource.h"
 #include "core/CoreDefs.h"
@@ -22,13 +23,13 @@ namespace Dive
 		void Shutdown();
 
 		template<class T>
-		std::shared_ptr<T> Load(const std::string& filepath);
+		std::shared_ptr<T> Load(const std::filesystem::path& filepath);
 
 		template<class T>
 		std::shared_ptr<T> GetByName(const std::string& name);
 
 		template<class T>
-		std::shared_ptr<T> GetByPath(const std::string& filepath);
+		std::shared_ptr<T> GetByPath(const std::filesystem::path& filepath);
 
 		template<class T>
 		std::vector<std::shared_ptr<T>> GetByType();
@@ -54,7 +55,7 @@ namespace Dive
 	};
 
 	template<class T>
-	std::shared_ptr<T> ResourceManager::Load(const std::string& filepath)
+	std::shared_ptr<T> ResourceManager::Load(const std::filesystem::path& filepath)
 	{
 		std::lock_guard<std::mutex> guard(m_Mutex);
 
@@ -97,7 +98,7 @@ namespace Dive
 	}
 
 	template<class T>
-	std::shared_ptr<T> ResourceManager::GetByPath(const std::string& filepath)
+	std::shared_ptr<T> ResourceManager::GetByPath(const std::filesystem::path& filepath)
 	{
 		std::lock_guard<std::mutex> guard(m_Mutex);
 

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "World.h"
+#include "WorldSerializer.h"
 #include "GameObject.h"
 #include "Components/Transform.h"
 #include "core/CoreDefs.h"
@@ -10,16 +11,14 @@ namespace Dive
 	static constexpr uint64_t LAST_ID = 0xffffffffffffffff;
 
 	World::World()
-		: m_Name("empty_world")
+		: m_Name("New World")
 		, m_CurGameObjectID(FIRST_ID)
-		, m_bDirty(false)
 	{
 	}
 
 	World::World(const std::string& name)
 		: m_Name(name)
 		, m_CurGameObjectID(FIRST_ID)
-		, m_bDirty(false)
 	{
 	}
 
@@ -58,47 +57,6 @@ namespace Dive
 		{
 			pGameObject->Update();
 		}
-	}
-
-	void World::SaveToFile(const std::filesystem::path& filepath)
-	{
-		YAML::Node config;
-
-		config["Name"] = m_Name;
-
-		YAML::Node gameObjectsNode;
-		for (auto& [Id, pGameObject] : m_GameObjects)
-		{
-			YAML::Node gameObjectNode;
-			pGameObject->SaveToYaml(gameObjectNode);
-			gameObjectsNode.push_back(gameObjectNode);
-		}
-
-		config["GameObjects"] = gameObjectsNode;
-		
-		std::filesystem::path file = filepath / (m_Name + ".world");
-		std::ofstream fout(file);
-		fout << config;
-
-		m_Path = filepath;
-	}
-	
-	void World::LoadFromFile(const std::filesystem::path& filepath)
-	{
-		YAML::Node config = YAML::LoadFile(filepath.string());
-
-		m_Name = config["Name"].as<std::string>();
-
-		m_GameObjects.clear();
-		for (const auto& gameObjectNode : config["GameObjects"])
-		{
-			auto pGameObject = new GameObject(this);
-			pGameObject->LoadFromYaml(gameObjectNode);
-			m_GameObjects[pGameObject->GetID()] = pGameObject;
-		}
-
-		if (m_Path != filepath)
-			m_Path = filepath;
 	}
 
 	GameObject* World::CreateGameObject(const std::string& name)

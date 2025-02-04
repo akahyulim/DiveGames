@@ -16,13 +16,13 @@ namespace Dive
 		// 대신 리소스 매니저에서 파일을 전달받아 객체를 생성한다.
 		// => 실제로는 LoadImage라는 메서드로 로드된 데이터를 전달받아 생성할 수 있다.
 		// => 즉, 아래처럼 생성자를 통해 로드하는 게 잘못된 구현이다.
-		Texture2D(const std::string& filename, bool mipChain = true);
-		Texture2D(const std::string& filename, uint32_t size, const void* pSource, bool mipChain = true);
+		Texture2D(const std::filesystem::path& path, bool mipChain = true);
+		Texture2D(const std::filesystem::path& path, uint32_t size, const void* pSource, bool mipChain = true);
 		virtual ~Texture2D() = default;
 
 		// 유니티의 LoadImage에 대응해야 한다.
 		bool LoadFromFile(const std::filesystem::path& path) override;
-		bool LoadFromMemory(const std::string& filename, size_t size, const void* pSource);
+		bool LoadFromMemory(const std::filesystem::path& path, size_t size, const void* pSource);
 		bool UpdateSubresource(const void* pData, uint32_t size);
 
 	private:

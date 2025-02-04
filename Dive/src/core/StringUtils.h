@@ -10,7 +10,7 @@ namespace Dive
 		static std::string StringLeftTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
 		static std::string StringRightTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
 		static std::string StringTrim(const std::string& str, const char* pTarget = " \t\n\r\f\v");
-		static std::string AddTrailingSlash(const std::string& pathName);
+		//static std::string AddTrailingSlash(const std::string& pathName);
 		static std::string RemoveTrailingSlash(const std::string& pathName);
 		static std::string StringReplace(const std::string& str, const std::string& target, const std::string& replace);
 		static std::wstring StringToWString(const std::string& str);

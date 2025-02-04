@@ -15,7 +15,6 @@ namespace Dive
 		void drawNode(GameObject* pObject);
 
 	private:
-		std::shared_ptr<World> m_pActiveWorld;
 		GameObject* m_pSelectedObject;
 	};
 }

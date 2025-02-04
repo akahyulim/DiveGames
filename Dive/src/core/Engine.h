@@ -45,13 +45,6 @@ namespace Dive
 		std::shared_ptr<Renderer> GetRenderer() const { return m_pRenderer; }
 		std::shared_ptr<Input> GetInput() const { return m_pInput; }
 
-		// worlds
-		std::shared_ptr<World> CreateWorld(const std::string& name);
-		std::shared_ptr<World> OpenWorld(const std::filesystem::path& path);
-		void CloseWorld();
-		std::shared_ptr<World> GetActiveWorld() const { return m_pActiveWorld; }
-
-
 		// time & fps
 		double GetElapsedTimeMS() const;
 		double GetElapsedTimeSec() const;
@@ -70,8 +63,6 @@ namespace Dive
 		std::shared_ptr<Graphics> m_pGraphics;
 		std::shared_ptr<Renderer> m_pRenderer;
 		std::shared_ptr<Input> m_pInput;
-
-		std::shared_ptr<World> m_pActiveWorld;
 
 		double m_ElapsedTimeMS;
 		float m_DeltaTimeMS;

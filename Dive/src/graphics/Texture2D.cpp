@@ -62,29 +62,28 @@ namespace Dive
         createDepthBuffer(useReadOnly);
 	}
 
-	Texture2D::Texture2D(const std::string& filename, bool mipChain)
+	Texture2D::Texture2D(const std::filesystem::path& path, bool mipChain)
 	{
-		auto file = StringUtils::StringToWString(filename);
-		auto ext = FileUtils::GetExtension(filename);
+		auto extension = path.extension().string();
 		DirectX::ScratchImage img;
 		HRESULT hResult = 0;
 
-		if (ext == ".dds")
+		if (extension == ".dds")
 		{
-			hResult = DirectX::LoadFromDDSFile(file.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
+			hResult = DirectX::LoadFromDDSFile(path.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
 		}
-		else if (ext == ".tga")
+		else if (extension == ".tga")
 		{
 			// 색 공간 정보를 포함하지 않는다.
-			hResult = DirectX::LoadFromTGAFile(file.c_str(), nullptr, img);
+			hResult = DirectX::LoadFromTGAFile(path.c_str(), nullptr, img);
 		}
 		else
 		{
-			hResult = DirectX::LoadFromWICFile(file.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
+			hResult = DirectX::LoadFromWICFile(path.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
 		}
 
 		if (FAILED(hResult))
-			DV_LOG(Texture2D, err, "Texture2D 생성 과정 중 파일 {:s} 로드에 실패하였습니다.", filename);
+			DV_LOG(Texture2D, err, "Texture2D 생성 과정 중 파일 {:s} 로드에 실패하였습니다.", path.string());
 
 		m_Width = static_cast<uint32_t>(img.GetImages()->width);
 		m_Height = static_cast<uint32_t>(img.GetImages()->height);
@@ -96,15 +95,16 @@ namespace Dive
 
 		UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch));
 
-		SetName(FileUtils::GetFileName(filename));
+		SetName(path.stem().string());
+		SetFilepath(path);
 	}
 
-	Texture2D::Texture2D(const std::string& filename, uint32_t size, const void* pSource, bool mipChain)
+	Texture2D::Texture2D(const std::filesystem::path& path, uint32_t size, const void* pSource, bool mipChain)
 	{
 		DirectX::ScratchImage img;
 		HRESULT hResult = 0;
 
-		auto extension = FileUtils::GetExtension(filename);
+		auto extension = path.string();
 
 		if (extension == "dds")
 		{
@@ -132,20 +132,21 @@ namespace Dive
 
 		UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch));
 
-		SetName(FileUtils::GetFileName(filename));
+		SetName(path.stem().string());
+		SetFilepath(path);
 	}
 
 	bool Texture2D::LoadFromFile(const std::filesystem::path& path)
 	{
-		auto ext = path.extension();
+		auto extension = path.extension().string();
 		DirectX::ScratchImage img;
 		HRESULT hResult = 0;
 
-		if (ext == L".dds" || ext == L".DDS")
+		if (extension == ".dds")
 		{
 			hResult = DirectX::LoadFromDDSFile(path.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
 		}
-		else if (ext == L".tga" || ext == L".TGA")
+		else if (extension == ".tga")
 		{
 			// 색 공간 정보를 포함하지 않는다.
 			hResult = DirectX::LoadFromTGAFile(path.c_str(), nullptr, img);
@@ -213,18 +214,18 @@ namespace Dive
 		if (!UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch)))
 			return false;
 
-		auto name = path.stem();
-		SetName(path.stem().string());//StringUtils::WStringToString(name.c_str()));
+		SetName(path.stem().string());
+		SetFilepath(path);
 
 		return true;
 	}
 
-	bool Texture2D::LoadFromMemory(const std::string& filename, size_t size, const void* pSource)
+	bool Texture2D::LoadFromMemory(const std::filesystem::path& path, size_t size, const void* pSource)
 	{
 		DirectX::ScratchImage img;
 		HRESULT hResult = 0;
 
-		auto extension = FileUtils::GetExtension(filename);
+		auto extension = path.extension().string();
 
 		if (extension == "dds")
 		{
@@ -252,7 +253,8 @@ namespace Dive
 
 		UpdateSubresource((const void*)img.GetImages()->pixels, static_cast<uint32_t>(img.GetImages()->rowPitch));
 
-		SetName(FileUtils::GetFileName(filename));
+		SetName(path.stem().string());
+		SetFilepath(path);
 
 		return true;
 	}

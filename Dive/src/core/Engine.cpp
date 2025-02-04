@@ -124,43 +124,6 @@ namespace Dive
 		return m_pGraphics->GetDeviceContext();
 	}
 
-	std::shared_ptr<World> Engine::CreateWorld(const std::string& name)
-	{
-		if (m_pActiveWorld)
-		{
-			m_pActiveWorld.reset();
-		}
-
-		m_pActiveWorld = std::make_shared<World>(name);
-
-		return m_pActiveWorld;
-	}
-
-	std::shared_ptr<World> Engine::OpenWorld(const std::filesystem::path& path)
-	{
-		if (m_pActiveWorld)
-		{
-			if (m_pActiveWorld->GetPath() == path)
-				return m_pActiveWorld;
-
-			m_pActiveWorld.reset();
-		}
-
-		m_pActiveWorld = std::make_shared<World>();
-		m_pActiveWorld->LoadFromFile(path);
-
-		return m_pActiveWorld;
-	}
-
-	void Engine::CloseWorld()
-	{
-		if (!m_pActiveWorld)
-			return;
-
-		m_pActiveWorld->Clear();
-		m_pActiveWorld.reset();
-	}
-
 	double Engine::GetElapsedTimeMS() const
 	{
 		return m_ElapsedTimeMS;

@@ -3,6 +3,7 @@
 
 namespace Dive
 {
+	// ResourceManager를 통합한 버전인데 만들다 만 것 같다.
 	class DvResource : public Object
 	{
 		DV_CLASS(DvResource, Object)
@@ -52,13 +53,13 @@ namespace Dive
 		Resource() = default;
 		virtual ~Resource() = default;
 
-		const std::string& GetFilepath() const { return m_Filepath; }
-		void SetFilepath(const std::string& filepath);
+		const std::filesystem::path& GetFilepath() const { return m_Filepath; }
+		void SetFilepath(const std::filesystem::path& path);
 
 		virtual bool LoadFromFile(const std::filesystem::path& path) { return true; }
 		virtual bool SaveToFile(const std::filesystem::path& path) { return true; }
 
 	private:
-		std::string m_Filepath;
+		std::filesystem::path m_Filepath;
 	};
 }

@@ -10,9 +10,6 @@
     <Filter Include="Src\Panels">
       <UniqueIdentifier>{dba1d6d5-d24a-4973-a600-05755b89378e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\ImGuiFileDialog">
-      <UniqueIdentifier>{687ffb26-86c8-4f86-92af-139fe6b11260}</UniqueIdentifier>
-    </Filter>
     <Filter Include="External\imgui">
       <UniqueIdentifier>{b74d7f92-ff6e-45e2-8eb9-27eb5dea39b4}</UniqueIdentifier>
     </Filter>
@@ -60,25 +57,19 @@
     <ClCompile Include="externals\imgui\backends\imgui_impl_win32.cpp">
       <Filter>External\imgui\backends</Filter>
     </ClCompile>
-    <ClCompile Include="externals\ImGuiFileDialog\ImGuiFileDialog.cpp">
-      <Filter>External\ImGuiFileDialog</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Panels\HierarchyView.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
     <ClCompile Include="Src\Panels\InspectorView.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Panels\AssetView.cpp">
+    <ClCompile Include="Src\Panels\ProjectView.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
     <ClCompile Include="Src\Panels\ContentBrowserPanel.cpp">
       <Filter>Src\Panels</Filter>
     </ClCompile>
     <ClCompile Include="Src\Project\Project.cpp">
-      <Filter>Src\Project</Filter>
-    </ClCompile>
-    <ClCompile Include="Src\Project\ProjectSerializer.cpp">
       <Filter>Src\Project</Filter>
     </ClCompile>
   </ItemGroup>
@@ -110,25 +101,19 @@
     <ClInclude Include="externals\imgui\backends\imgui_impl_win32.h">
       <Filter>External\imgui\backends</Filter>
     </ClInclude>
-    <ClInclude Include="externals\ImGuiFileDialog\ImGuiFileDialog.h">
-      <Filter>External\ImGuiFileDialog</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Panels\HierarchyView.h">
       <Filter>Src\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Src\Panels\InspectorView.h">
       <Filter>Src\Panels</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Panels\AssetView.h">
+    <ClInclude Include="Src\Panels\ProjectView.h">
       <Filter>Src\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Src\Panels\ContentBrowserPanel.h">
       <Filter>Src\Panels</Filter>
     </ClInclude>
     <ClInclude Include="Src\Project\Project.h">
-      <Filter>Src\Project</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Project\ProjectSerializer.h">
       <Filter>Src\Project</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,4 +1,5 @@
 #include "HierarchyView.h"
+#include "../Editor.h"
 
 namespace Dive
 {
@@ -15,16 +16,14 @@ namespace Dive
 
 	void HierarchyView::drawView()
 	{
-		// 매 프레임 실행은 부담될 것 같다.
-		m_pActiveWorld = GEngine->GetActiveWorld();
-
-		if (!m_pActiveWorld)
+		auto pActiveWorld = m_pEditor->GetActiveWorld();
+		if (!pActiveWorld)
 		{
 			m_pSelectedObject = nullptr;
 			return;
 		}
 
-		if (ImGui::TreeNodeEx(m_pActiveWorld->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::TreeNodeEx(pActiveWorld->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			// 일단 이 곳이랑 가장 아래 부분에서
 			// Transform 참조 오류가 발생한다.
@@ -37,7 +36,7 @@ namespace Dive
 				if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 				{
 					auto pInstanceID = static_cast<unsigned long long*>(pPayload->Data);
-					auto pDroppedObject = m_pActiveWorld->GetGameObjectByID(*pInstanceID);
+					auto pDroppedObject = pActiveWorld->GetGameObjectByID(*pInstanceID);
 					if (pDroppedObject->HasComponent<Transform>())
 						pDroppedObject->GetComponent<Transform>()->SetParent(nullptr);
 				}
@@ -45,7 +44,7 @@ namespace Dive
 				ImGui::EndDragDropTarget();
 			}
 
-			auto pRoots = m_pActiveWorld->GetRootGameObjects();
+			auto pRoots = pActiveWorld->GetRootGameObjects();
 			if (!pRoots.empty())
 			{
 				for (auto pRoot : pRoots)
@@ -61,6 +60,10 @@ namespace Dive
 	void HierarchyView::drawNode(GameObject* pObject)
 	{
 		if (!pObject)
+			return;
+
+		auto pActiveWorld = m_pEditor->GetActiveWorld();
+		if (!pActiveWorld)
 			return;
 
 		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
@@ -96,7 +99,7 @@ namespace Dive
 			if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 			{
 				auto pId = static_cast<unsigned long long*>(pPayload->Data);
-				auto pDroppedObject = m_pActiveWorld->GetGameObjectByID(*pId);
+				auto pDroppedObject = pActiveWorld->GetGameObjectByID(*pId);
 
 				if (pDroppedObject != pObject)
 				{
@@ -125,7 +128,7 @@ namespace Dive
 			{
 				// 단일 제거는 먹히지만
 				// 계층구조를 지니는 대상은 에러가 발생한다.
-				m_pActiveWorld->RemoveGameObject(pObject);
+				pActiveWorld->RemoveGameObject(pObject);
 				if (m_pSelectedObject && (m_pSelectedObject == pObject))
 					m_pSelectedObject = nullptr;
 			}

@@ -6,16 +6,6 @@ namespace Dive
 {
 	class Project;
 
-	struct ProjectSettings
-	{
-		std::string name;
-		std::string path;
-		std::string materialsPath;
-		std::string modelsPath;
-		std::string texturesPath;
-		std::string worldsPath;
-	};
-	
 	enum class eFontTypes
 	{
 		Default,
@@ -32,7 +22,7 @@ namespace Dive
 		GameView,
 		HierarchyView,
 		InspectorView,
-		AssetView,
+		ProjectView,
 		Max
 	};
 
@@ -48,33 +38,42 @@ namespace Dive
 
 		ImFont* GetFont(eFontTypes type);
 
-		ProjectSettings& GetProjectSettings() { return m_ProjectSettings; }
-		bool CreateProject(const std::filesystem::path& path);
-		bool OpenProject(const std::filesystem::path& path);
-		void CloseProject();
+		void NewWorld();
+		void OpenWorld();
+		void SaveWorld();
+		void SaveWorldAs();
+		void NewProject();
+		void OpenProject();
+		void SaveProject();
+		void Exit();
 
-		std::string GetProjectName() const { return m_ProjectSettings.name; }
-		std::string GetProjectPath() const { return m_ProjectSettings.path; }
-		std::string GetProjectMaterialsPath() const { return m_ProjectSettings.materialsPath; }
-		std::string GetProjectModelsPath() const { return m_ProjectSettings.modelsPath; }
-		std::string GetProjectTexturesPath() const { return m_ProjectSettings.texturesPath; }
-		std::string GetProjectWorldsPath() const { return m_ProjectSettings.worldsPath; }
-
-		bool IsProjectLoaded() const { return m_bProjectLoaded; }
-
-		void SetTitle(const std::string& projectName);
+		World* GetActiveWorld() { return m_pActiveWorld; }
+		const std::filesystem::path GetActiveWorldFilePath() const;
+		const std::filesystem::path GetProjectDir() const;
 
 	private:
-		void drawMenubar();
+		void updateTitle();
+
+		void drawMainManubar();
+		void showPopups();
+
+		void activateSaveChanges(std::function<void()> confirmCallback);
 
 	private:
 		std::array<ImFont*, static_cast<size_t>(eFontTypes::Max)> m_Fonts;
-		std::array<std::unique_ptr<Panel>, static_cast<size_t>(ePanelTypes::Max)> m_Panels;
+		std::vector<std::unique_ptr<Panel>> m_Panels;
 
-		ProjectSettings m_ProjectSettings;
-		bool m_bProjectLoaded;
+		Project* m_pActiveProject;
+		World* m_pActiveWorld;
+		std::shared_ptr<GameObject> m_pSelectedGameObject;
 
-		std::shared_ptr<Project> m_pActiveProject;
-		std::shared_ptr<World> m_pActiveWorld;
+		bool m_bProjectChanged;
+		bool m_bWorldChanged;
+
+		bool m_bShowSaveChangesPopup;
+		bool m_bShowNewProjectPopup;
+		bool m_bShowNewWorldPopup;
+
+		std::function<void()> m_OnConfirm;
 	};
 }

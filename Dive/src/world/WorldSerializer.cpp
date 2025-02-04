@@ -20,7 +20,7 @@ namespace Dive
 		out << YAML::EndMap;
 	}
 
-	WorldSerializer::WorldSerializer(std::shared_ptr<World> pWorld)
+	WorldSerializer::WorldSerializer(World* pWorld)
 		: m_pWorld(pWorld)
 	{
 	}
@@ -29,14 +29,14 @@ namespace Dive
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
-		out << YAML::Key << "World" << YAML::Value << path.filename().c_str();
+		out << YAML::Key << "World" << YAML::Value << m_pWorld->m_Name;
 
 		out << YAML::EndMap;
 
 		std::ofstream fout(path);
 		fout << out.c_str();
 	}
-
+	
 	bool WorldSerializer::Deserialize(const std::filesystem::path& path)
 	{
 		YAML::Node data;
@@ -44,18 +44,16 @@ namespace Dive
 		{
 			data = YAML::LoadFile(path.string());
 		}
-		catch(YAML::ParserException e)
+		catch (YAML::ParserException e)
 		{
-			DV_LOG(WorldSerializer, err, "월드 파일({:s})을 로드에 실패하였습니다.", path.string());
+			DV_LOG(WorldSerializer, err, "월드 파일({:s})을 역직렬화에 실패하였습니다.", path.string());
 			return false;
 		}
 
 		if (!data["World"])
 			return false;
 
-		std::string worldName = data["World"].as<std::string>();
-		DV_LOG(WorldSerializer, trace, "{:s} 로드 성공", worldName);
-
+		m_pWorld->m_Name = data["World"].as<std::string>();
 
 		return true;
 	}

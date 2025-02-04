@@ -22,16 +22,14 @@ namespace Dive
 		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		m_Height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
 
-		// 프로젝트를 종료해도 남아있다...
-		// 엔진은 프로젝트의 구분없이 월드들을 관리하고 있기 때문이다.
-		auto pWorld = GEngine->GetActiveWorld();
-		if(pWorld)
+		auto pActiveWorld = m_pEditor->GetActiveWorld();
+		if(pActiveWorld)
 		{
 			ImGui::PushFont(m_pEditor->GetFont(eFontTypes::Default));
-			ImGui::Text("world name: %s", pWorld->GetName().c_str());
+			ImGui::Text("name: %s", pActiveWorld->GetName().c_str());
 			ImGui::Text("size: %dx%d", static_cast<uint32_t>(m_Width), static_cast<uint32_t>(m_Height));
 			ImGui::Text("fps: %.1f", ImGui::GetIO().Framerate);
-			ImGui::Text("num gameObjects: %d", pWorld->GetGameObjectsCount());
+			ImGui::Text("num gameObjects: %d", pActiveWorld->GetGameObjectsCount());
 			ImGui::PopFont();
 		}
 	}

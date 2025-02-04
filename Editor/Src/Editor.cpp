@@ -3,12 +3,13 @@
 #include "Panels/GameView.h"
 #include "Panels/HierarchyView.h"
 #include "Panels/InspectorView.h"
-#include "Panels/AssetView.h"
+#include "Panels/ProjectView.h"
 #include "Project/Project.h"
-#include "Project/ProjectSerializer.h"
 #include <imgui.h>
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
+
+static Dive::Editor* s_pEditor = nullptr;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -25,6 +26,10 @@ LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 		return 0;
 	}
 	case WM_CLOSE:
+	{
+		if (s_pEditor)
+			s_pEditor->Exit();
+	}
 	case WM_DESTROY:
 		PostQuitMessage(0);
 		return 0;
@@ -35,16 +40,25 @@ LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 
 namespace Dive
 {
+	static uint16_t s_WorldCounter = 0;
+
 	Editor::Editor()
-		: m_bProjectLoaded(false)
+		: m_pActiveProject(nullptr)
+		, m_bProjectChanged(false)
+		, m_bWorldChanged(false)
+		, m_bShowSaveChangesPopup(false)
+		, m_bShowNewProjectPopup(false)
+		, m_bShowNewWorldPopup(false)
 	{
+		s_pEditor = this;
+
 		// 로그 매니져 설정
 		Dive::LogManager::SetFilename("dive_editor.log");
 
 		// 엔진 초기화 및 윈도우 설정
-		GEngine->Initialize(::GetModuleHandle(nullptr), 1280, 720, L"Dive_Editor");
+		GEngine->Initialize(::GetModuleHandle(nullptr), 1600, 900, L"Dive Editor");
 		GEngine->GetWindow()->ChangeProc((LONG_PTR)EditorMessageHandler);
-		GEngine->GetWindow()->ShowWindow(SW_MAXIMIZE);
+		//GEngine->GetWindow()->ShowWindow(SW_MAXIMIZE);
 
 		// ImGui 초기화
 		{
@@ -112,11 +126,47 @@ namespace Dive
 			m_Fonts[static_cast<size_t>(eFontTypes::Large_Bold)] = io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothicBold.ttf", fontSize * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
 
 			// 패널 생성
-			m_Panels[static_cast<size_t>(ePanelTypes::WorldView)] = std::make_unique<WorldView>(this);
-			m_Panels[static_cast<size_t>(ePanelTypes::GameView)] = std::make_unique<GameView>(this);
-			m_Panels[static_cast<size_t>(ePanelTypes::HierarchyView)] = std::make_unique<HierarchyView>(this);
-			m_Panels[static_cast<size_t>(ePanelTypes::InspectorView)] = std::make_unique<InspectorView>(this);
-			m_Panels[static_cast<size_t>(ePanelTypes::AssetView)] = std::make_unique<AssetView>(this);
+			m_Panels.push_back(std::make_unique<WorldView>(this));
+			m_Panels.push_back(std::make_unique<GameView>(this));
+			m_Panels.push_back(std::make_unique<HierarchyView>(this));
+			m_Panels.push_back(std::make_unique<InspectorView>(this));
+			m_Panels.push_back(std::make_unique<ProjectView>(this));
+		}
+
+		// 임시 프로젝트 및 월드 생성
+		{
+			if (std::filesystem::exists("New Project"))
+			{
+				m_pActiveProject = Project::LoadFromFile("New Project/New Project.proj");
+				if (m_pActiveProject)
+				{
+					auto& openedWorldName = m_pActiveProject->GetOpenedWorldName();
+					std::filesystem::path worldFilePath;
+					if (!openedWorldName.empty())
+						worldFilePath = m_pActiveProject->GetWorldsPath() / (openedWorldName + ".world");
+					else
+						worldFilePath = m_pActiveProject->GetWorldsPath() / "New World.world";
+
+					m_pActiveWorld = new World(openedWorldName);
+					WorldSerializer serializer(m_pActiveWorld);
+					serializer.Deserialize(worldFilePath);
+				}
+			}
+			else
+			{
+				m_pActiveProject = Project::New(std::filesystem::current_path() / "New Project/New Project.proj");
+				if (m_pActiveProject)
+				{
+					Project::SaveToFile(m_pActiveProject);
+
+					m_pActiveWorld = new World("New World");
+					WorldSerializer serializer(m_pActiveWorld);
+					serializer.Serialize(GetActiveWorldFilePath());
+				}
+			}
+
+			updateTitle();
+			s_WorldCounter++;
 		}
 
 		DV_SUBSCRIBE_EVENT(Dive::eEventType::PostRender, DV_EVENT_HANDLER(OnPostRender));
@@ -124,6 +174,8 @@ namespace Dive
 
 	Editor::~Editor()
 	{
+		s_pEditor = nullptr;
+
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
@@ -133,6 +185,11 @@ namespace Dive
 
 	int Editor::Run()
 	{
+		// Engine에서 분리한 후
+		// 위치가 상당히 애매해졌다.
+		if (m_pActiveWorld)
+			m_pActiveWorld->Tick();
+
 		GEngine->Tick();
 
 		return 0;
@@ -198,12 +255,11 @@ namespace Dive
 
 		// Draw UI
 		{
-			drawMenubar();
+			drawMainManubar();
+			showPopups();
 
 			for (auto& pPanel : m_Panels)
-			{
 				pPanel->Draw();
-			}
 		}
 
 		// End UI
@@ -232,363 +288,157 @@ namespace Dive
 		return m_Fonts[static_cast<size_t>(type)];
 	}
 
-	bool Editor::CreateProject(const std::filesystem::path& path)
+	void Editor::updateTitle()
 	{
-		if (std::filesystem::exists(path))
-		{
-			DV_LOG(Editor, err, "이미 존재하는 경로({:s})에 새로운 프로젝트를 생성할 수 없습니다.", path.string());
-			return false;
-		}
-
-		m_ProjectSettings.path = path.string();
-		std::filesystem::create_directories(path);
-
-		m_ProjectSettings.name = path.filename().string();
-
-		// assets
-		m_ProjectSettings.materialsPath = path.string() + "\\Assets\\Materials";
-		std::filesystem::create_directories(m_ProjectSettings.materialsPath);
-		m_ProjectSettings.modelsPath = path.string() + "\\Assets\\Models";
-		std::filesystem::create_directories(m_ProjectSettings.modelsPath);
-		m_ProjectSettings.texturesPath = path.string() + "\\Assets\\Textures";
-		std::filesystem::create_directories(m_ProjectSettings.texturesPath);
-		m_ProjectSettings.worldsPath = path.string() + "\\Assets\\Worlds";
-		std::filesystem::create_directories(m_ProjectSettings.worldsPath);
-
-		// file
-		YAML::Node config;
-		config["Name"] = m_ProjectSettings.name;
-		config["Path"] = m_ProjectSettings.path;
-		config["MaterialsPath"] = m_ProjectSettings.materialsPath;
-		config["ModelsPath"] = m_ProjectSettings.modelsPath;
-		config["TexturesPath"] = m_ProjectSettings.texturesPath;
-		config["WorldsPath"] = m_ProjectSettings.worldsPath;
-
-		std::ofstream fout(m_ProjectSettings.name + ".proj");
-		fout << config;
-
-		m_bProjectLoaded = true;
-
-		SetTitle(m_ProjectSettings.name);
-
-		return true;
+		GEngine->GetWindow()->SetTitle(
+			m_pActiveProject ? m_pActiveProject->GetNameW().c_str() : L"Dive Editor"
+		);
 	}
 
-	bool Editor::OpenProject(const std::filesystem::path& path)
+	void Editor::drawMainManubar()
 	{
-		if (!std::filesystem::exists(path))
+		if (ImGui::BeginMainMenuBar())
 		{
-			DV_LOG(Editor, err, "파일({:s})이 존재하지 않습니다.", path.string());
-			return false;
-		}
-
-		YAML::Node config = YAML::LoadFile(path.string());
-		m_ProjectSettings.name = config["Name"].as<std::string>();
-		m_ProjectSettings.path = config["Path"].as<std::string>();
-		m_ProjectSettings.materialsPath = config["MaterialsPath"].as<std::string>();
-		m_ProjectSettings.modelsPath = config["ModelsPath"].as<std::string>();
-		m_ProjectSettings.texturesPath = config["TexturesPath"].as<std::string>();
-		m_ProjectSettings.worldsPath = config["WorldsPath"].as<std::string>();
-
-		m_bProjectLoaded = true;
-
-		SetTitle(m_ProjectSettings.name);
-
-		return true;
-	}
-
-	void Editor::CloseProject()
-	{
-		GEngine->CloseWorld();
-		m_bProjectLoaded = false;
-
-		SetTitle("");
-	}
-
-	void Editor::SetTitle(const std::string& projectName)
-	{
-		std::wstring title = L"Dive_Editor";
-
-		if (!projectName.empty())
-		{
-			title += L" - " + StringUtils::StringToWString(projectName);
-		}
-
-		GEngine->GetWindow()->SetTitle(title.c_str());
-	}
-
-	void Editor::drawMenubar()
-	{
-		ImGui::BeginMainMenuBar();
-
-		// FILE
-		{
-			if (ImGui::BeginMenu("File"))
+			// FILE
+			if (ImGui::BeginMenu(u8"파일"))
 			{
-				if (ImGui::BeginMenu("New"))
+				if (ImGui::MenuItem(u8"새로운 월드", nullptr, nullptr, m_pActiveProject))
 				{
-					if (ImGui::MenuItem("Project"))
+					NewWorld();
+				}
+				if (ImGui::MenuItem(u8"월드 열기", nullptr, nullptr, m_pActiveProject))
+				{
+					OpenWorld();
+				}
+				
+				ImGui::Separator();
+				
+				if (ImGui::MenuItem(u8"월드 저장", nullptr, nullptr, m_pActiveWorld && m_bWorldChanged))
+				{
+					SaveWorld();
+				}
+				if (ImGui::MenuItem(u8"다른 이름으로 월드 저장", nullptr, nullptr, m_pActiveWorld))
+				{
+					SaveWorldAs();
+				}
+
+				ImGui::Separator();
+				
+				if (ImGui::MenuItem(u8"새로운 프로젝트"))
+				{
+					NewProject();
+				}
+				if (ImGui::MenuItem(u8"프로젝트 열기"))
+				{
+					OpenProject();
+				}
+				if (ImGui::MenuItem(u8"프로젝트 저장", nullptr, nullptr, m_pActiveProject && m_bProjectChanged))
+				{
+					SaveProject();
+				}
+
+				ImGui::Separator();
+
+				if (ImGui::MenuItem(u8"끝내기"))
+				{
+					Exit();
+				}
+				ImGui::EndMenu();
+			}
+
+			// Game Object
+			if (ImGui::BeginMenu(u8"게임 오브젝트"))
+			{
+				if (ImGui::MenuItem(u8"빈 게임 오브젝트", nullptr, nullptr, (m_pActiveWorld != nullptr)))
+				{
+					auto pNewGameObject = m_pActiveWorld->CreateGameObject();
+					m_bWorldChanged = true;
+				}
+
+				if (ImGui::BeginMenu(u8"3D 오브젝트", (m_pActiveWorld != nullptr)))
+				{
+					if (ImGui::MenuItem(u8"상자"))
 					{
-						if (m_pActiveProject && m_pActiveProject->IsModified())
-						{
-
-						}
-					
-						//m_bShowNewProject = true;
-
 						
+						m_bWorldChanged = true;
 					}
-					if (ImGui::MenuItem("World", nullptr, nullptr, (m_pActiveProject != nullptr)))
+
+					if (ImGui::MenuItem(u8"구"))
 					{
-						if (m_pActiveWorld)
-						{
-
-						}
-
-						//m_bShowNewWorld = true;
+						
+						m_bWorldChanged = true;
 					}
+
+					if (ImGui::MenuItem(u8"평면"))
+					{
+						
+						m_bWorldChanged = true;
+					}
+
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::BeginMenu("Open"))
+				if (ImGui::BeginMenu(u8"라이트", (m_pActiveWorld != nullptr)))
 				{
-					if (ImGui::MenuItem("Project"))
+					if (ImGui::MenuItem(u8"디렉셔널 라이트"))
 					{
-						if (m_pActiveProject && m_pActiveProject->IsModified())
-						{
-
-						}
-
-						//ImGuiFileDialog::Instance()->OpenDialog("ChooseProject", "Choose Project", ".proj");
-
+						m_bWorldChanged = true;
 					}
-					if (ImGui::MenuItem("World", nullptr, nullptr, (m_pActiveProject != nullptr)))
+
+					if (ImGui::MenuItem(u8"포인트 라이트"))
 					{
-						if (m_pActiveWorld)
-						{
-
-						}
-
-						//ImGuiFileDialog::Instance()->OpenDialog("ChooseWorld", "Choose World", ".world",
-						//	{ m_pEditor->GetProjectWorldsPath() });
+						m_bWorldChanged = true;
 					}
+
+					if (ImGui::MenuItem(u8"스포트 라이트"))
+					{
+						m_bWorldChanged = true;
+					}
+
 					ImGui::EndMenu();
 				}
 
-				ImGui::Separator();
-
-				if (ImGui::MenuItem("Close World", nullptr ,nullptr, (m_pActiveWorld != nullptr)))
+				if (ImGui::BeginMenu(u8"카메라", (m_pActiveWorld != nullptr)))
 				{
-					GEngine->CloseWorld();
-				}
-				if (ImGui::MenuItem("Close Project", nullptr, nullptr, (m_pActiveProject != nullptr)))
-				{
-					//m_pEditor->CloseProject();
-				}
-
-				ImGui::Separator();
-
-				if (ImGui::MenuItem("Save", nullptr, nullptr, (m_pActiveProject != nullptr)))
-				{
-					//GEngine->GetActiveWorld()->SaveToFile(m_pEditor->GetProjectWorldsPath());
-				}
-
-				if (ImGui::MenuItem("Save As...", nullptr, nullptr, (m_pActiveProject != nullptr)))
-				{
-
-				}
-
-				ImGui::Separator();
-
-				if (ImGui::MenuItem("Exit"))
-				{
-					if (m_pActiveProject)
+					if (ImGui::MenuItem(u8"원근 투영"))
 					{
-						// 저장 여부 확인
+						m_bWorldChanged = true;
 					}
 
-					DV_FIRE_EVENT(eEventType::Exit);
+					if (ImGui::MenuItem(u8"직교 투영"))
+					{
+						m_bWorldChanged = true;
+					}
+
+					ImGui::EndMenu();
 				}
 
 				ImGui::EndMenu();
 			}
-		}
 
-		// Game Object
-		{
-			if (ImGui::BeginMenu("GameObject"))
+			// Component
+			// SelectedGameObject가 존재할 때 활성화
+			if (ImGui::BeginMenu(u8"컴포넌트"))
 			{
-				auto pActiveWorld = GEngine->GetActiveWorld();
-
-				if (ImGui::MenuItem("Create Empty", nullptr, nullptr, pActiveWorld != nullptr))
+				if (ImGui::MenuItem(u8"렌더러블", nullptr, nullptr, (m_pSelectedGameObject != nullptr)))
 				{
-					auto pNewGameObject = pActiveWorld->CreateGameObject();
+					m_bWorldChanged = true;
 				}
 
-				if (ImGui::BeginMenu("3D Object"))
+				if (ImGui::MenuItem(u8"라이트", nullptr, nullptr, (m_pSelectedGameObject != nullptr)))
 				{
-					if (ImGui::MenuItem("Cube"))
-					{
-						/*
-						if (m_pActiveWorld)
-						{
-							// 유니티에선 스크립트 차원에서 함수가 존재한다.
-							// GameObject의 CreatePrimitive였나...
-
-							// 가장 기본적인 형태는
-							// GameObject를 생성하고
-							// MeshRenderable을 추가한 후
-							// ResourceManager를 통해 Model을 Set하는 것이다.
-
-							Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cube.obj");
-						}
-						*/
-					}
-
-					if (ImGui::MenuItem("Sphere"))
-					{
-						/*
-						if (m_pActiveWorld)
-						{
-							Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Sphere.obj");
-						}
-						*/
-					}
-
-					if (ImGui::MenuItem("Cylinder"))
-					{
-						/*
-						if (m_pActiveWorld)
-						{
-							Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cylinder.obj");
-						}
-						*/
-					}
-
-					if (ImGui::MenuItem("Cone"))
-					{
-						/*
-						if (m_pActiveWorld)
-						{
-							Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Cone.obj");
-						}
-						*/
-					}
-
-					if (ImGui::MenuItem("Plane"))
-					{
-						/*
-						if (m_pActiveWorld)
-						{
-							Dive::ResourceManager::GetInstance().Load<Dive::Model>("Assets/Models/Base/Plane.obj");
-						}
-						*/
-					}
-
-					ImGui::EndMenu();
-				}
-
-				if (ImGui::BeginMenu("Light"))
-				{
-					if (ImGui::MenuItem("Directional"))
-					{
-						/*
-						if (m_pActiveWorld)
-						{
-							auto lightObj = m_pActiveWorld->CreateGameObject("Directional_Light");
-							lightObj->AddComponent<Dive::Transform>();
-							auto lightCom = lightObj->AddComponent<Dive::Light>();
-							lightCom->SetLightType(Dive::eLightType::Directional);
-						}
-						*/
-					}
-
-					if (ImGui::MenuItem("Point"))
-					{
-						/*
-						if (m_pActiveWorld)
-						{
-							auto lightObj = m_pActiveWorld->CreateGameObject("Point_Light");
-							lightObj->AddComponent<Dive::Transform>();
-							auto lightCom = lightObj->AddComponent<Dive::Light>();
-							lightCom->SetLightType(Dive::eLightType::Point);
-						}
-						*/
-					}
-
-					if (ImGui::MenuItem("Spot"))
-					{
-						/*
-						if (m_pActiveWorld)
-						{
-							auto lightObj = m_pActiveWorld->CreateGameObject("Spot_Light");
-							lightObj->AddComponent<Dive::Transform>();
-							auto lightCom = lightObj->AddComponent<Dive::Light>();
-							lightCom->SetLightType(Dive::eLightType::Spot);
-						}
-						*/
-					}
-
-					ImGui::EndMenu();
-				}
-
-				if (ImGui::BeginMenu("Camera"))
-				{
-					ImGui::EndMenu();
+					m_bWorldChanged = true;
 				}
 
 				ImGui::EndMenu();
 			}
-		}
 
-		// Component
-		{
-			if (ImGui::BeginMenu("Component"))
-			{
-				if (ImGui::MenuItem("SpriteRenderable"))
-				{
-					/*
-					if (m_pActiveWorld)
-					{
-						auto pSelected = m_pEditor->GetHierarchy()->GetSeletecedObject();
-						if (pSelected)
-						{
-							if (!pSelected->HasComponent<Dive::SpriteRenderable>())
-							{
-								pSelected->AddComponent<Dive::SpriteRenderable>();
-							}
-						}
-					}
-					*/
-				}
-
-				if (ImGui::MenuItem("Light"))
-				{
-					/*
-					if (m_pActiveWorld)
-					{
-						auto pSelected = m_pEditor->GetHierarchy()->GetSeletecedObject();
-						if (pSelected)
-						{
-							if (!pSelected->HasComponent<Dive::Light>())
-							{
-								pSelected->AddComponent<Dive::Light>();
-							}
-						}
-					}
-					*/
-				}
-
-				ImGui::EndMenu();
-			}
-		}
-
-		// Views
-		{
-			if (ImGui::BeginMenu("View"))
+			// Views
+			if (ImGui::BeginMenu(u8"창"))
 			{
 				static bool showView = true;
 
+				/*
 				showView = m_Panels[static_cast<size_t>(ePanelTypes::WorldView)]->IsVisible();
 				ImGui::Checkbox("WorldView", &showView);
 				m_Panels[static_cast<size_t>(ePanelTypes::WorldView)]->SetVisible(showView);
@@ -605,23 +455,345 @@ namespace Dive
 				ImGui::Checkbox("InspectorView", &showView);
 				m_Panels[static_cast<size_t>(ePanelTypes::InspectorView)]->SetVisible(showView);
 
-				showView = m_Panels[static_cast<size_t>(ePanelTypes::AssetView)]->IsVisible();
-				ImGui::Checkbox("AssetView", &showView);
-				m_Panels[static_cast<size_t>(ePanelTypes::AssetView)]->SetVisible(showView);
-
+				showView = m_Panels[static_cast<size_t>(ePanelTypes::ProjectView)]->IsVisible();
+				ImGui::Checkbox("ProjectView", &showView);
+				m_Panels[static_cast<size_t>(ePanelTypes::ProjectView)]->SetVisible(showView);
+				*/
 
 				ImGui::EndMenu();
 			}
-		}
 
-		// Help
-		{
-			if (ImGui::BeginMenu("Help"))
+			// Help
+			if (ImGui::BeginMenu(u8"도움말"))
 			{
 				ImGui::EndMenu();
 			}
+
+			ImGui::EndMainMenuBar();
+		}
+	}
+	
+	void Editor::showPopups() 
+	{
+		// SaveChangesPopup
+		if (m_bShowSaveChangesPopup) 
+		{ 
+			ImGui::OpenPopup("Save Changes?"); 
+			m_bShowSaveChangesPopup = false; 
+		} 
+		
+		if (ImGui::BeginPopupModal("Save Changes?", NULL, ImGuiWindowFlags_AlwaysAutoResize)) 
+		{
+			ImGui::Text(u8"변경사항이 존재합니다. 저장하시겠습니까?");
+			// 변경 사항이 있는 파일을 표시
+			if (ImGui::Button(u8"저장", ImVec2(120, 0)))
+			{
+				// 이건 미비하다. 다수의 월드가 수정되었을 수 있다.
+				// => 그렇다면 결국 월드별로 수정여부를 판단해야 한다는 건데?
+				if (m_pActiveWorld && m_bWorldChanged)
+				{
+					WorldSerializer serializer(m_pActiveWorld);
+					serializer.Serialize(GetActiveWorldFilePath());
+					m_pActiveProject->SetOpenedWorldName(m_pActiveWorld->GetName());
+				}
+				if(m_bProjectChanged)
+					Project::SaveToFile(m_pActiveProject);
+				if (m_OnConfirm) m_OnConfirm();
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(u8"저장 안함", ImVec2(120, 0)))
+			{
+				if (m_OnConfirm) m_OnConfirm();
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(u8"취소", ImVec2(120, 0)))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+
+			ImGui::EndPopup(); 
+		} 
+	
+		// NewProjectPopup
+		if (m_bShowNewProjectPopup)
+		{
+			ImGui::OpenPopup("New Project");
+			m_bShowNewProjectPopup = false;
 		}
 
-		ImGui::EndMainMenuBar();
+		if (ImGui::BeginPopupModal("New Project", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::PushFont(GetFont(eFontTypes::Large_Bold));
+			ImGui::Spacing();
+			ImGui::Text(u8"새로운 프로젝트");
+			ImGui::PopFont();
+
+			ImGui::Spacing();
+			ImGui::Spacing();
+			ImGui::Spacing();
+
+			// 생성 프로젝트 이름
+			static std::string projectName = "New_Project";
+			char projectNameBuffer[256];
+			strncpy_s(projectNameBuffer, projectName.c_str(), sizeof(projectNameBuffer));
+			ImGui::Text(u8"프로젝트 이름");
+			ImGui::PushItemWidth(400);
+			if (ImGui::InputText("##project_name", projectNameBuffer, sizeof(projectNameBuffer)))
+			{
+				projectName = std::string(projectNameBuffer);
+			}
+			ImGui::PopItemWidth();
+
+			ImGui::Spacing();
+
+			// 생성 프로젝트 위치
+			static std::filesystem::path projectPath = std::filesystem::current_path();
+			char projectPathBuffer[512];
+			strncpy_s(projectPathBuffer, projectPath.string().c_str(), sizeof(projectPathBuffer));
+			ImGui::Text(u8"위치");
+			ImGui::PushItemWidth(400);
+			if (ImGui::InputText("##location", projectPathBuffer, sizeof(projectPathBuffer)))
+			{
+				projectPath = std::string(projectPathBuffer);
+			}
+			ImGui::PopItemWidth();
+			ImGui::SameLine();
+			if (ImGui::Button(u8"..."))
+			{
+				projectPath = FileUtils::SelectFolder();
+			}
+
+			//ImVec2 window_size = ImGui::GetWindowSize();
+			//ImGui::SetCursorPos(ImVec2(window_size.x - 220, window_size.y - 40));
+			ImGui::Spacing();
+
+			if (ImGui::Button(u8"취소", ImVec2(100, 30)))
+			{
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button(u8"만들기", ImVec2(100, 30)))
+			{
+				// 해당 디렉토리가 이미 존재한다면 경고 대화상자를 띄워야 한다.
+				if (std::filesystem::exists(projectPath / projectName))
+				{
+					ImGui::OpenPopup("Exist same path");
+					//::MessageBox(nullptr, L"동일한 프로젝트 디렉토리가 이미 존재하여 생성할 수 없습니다.", L"경고", MB_OK);
+				}
+				else
+				{
+					// 새로운 프로젝트 생성
+					m_pActiveProject = Project::New(projectPath / projectName / (projectName + ".proj"));
+					updateTitle();
+
+					// 새로운 월드 생성
+					m_pActiveWorld = new World("New World");
+					WorldSerializer serializer(m_pActiveWorld);
+					serializer.Serialize(GetActiveWorldFilePath());
+
+					m_pActiveProject->SetOpenedWorldName(m_pActiveWorld->GetName());
+
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+			if (ImGui::BeginPopupModal("Exist same path", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+			{
+				ImGui::Text(u8"이미 존재하는 프로젝트 디렉토리에 생성할 수 없습니다.");
+				if (ImGui::Button(u8"확인"))
+				{
+					ImGui::CloseCurrentPopup();
+				}
+
+				ImGui::EndPopup();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
+	void Editor::activateSaveChanges(std::function<void()> confirmCallback)
+	{
+		m_OnConfirm = confirmCallback;
+		m_bShowSaveChangesPopup = true;
+	}
+
+	void Editor::NewWorld()
+	{
+		auto OnCreateNewWorld = [this]() {
+			DV_DELETE(m_pActiveWorld);
+			
+			m_pActiveWorld = new World("New World " + std::to_string(s_WorldCounter++));	// 이걸론 고유한 이름을 확보할 수 없다.
+				
+			WorldSerializer serializer(m_pActiveWorld);
+			serializer.Serialize(GetActiveWorldFilePath());
+
+			m_pActiveProject->SetOpenedWorldName(m_pActiveWorld->GetName());
+			m_bProjectChanged = true;
+			};
+
+		if (m_bWorldChanged)
+		{
+			activateSaveChanges(OnCreateNewWorld);
+			m_bWorldChanged = false;
+		}
+		else
+		{
+			OnCreateNewWorld();
+		}
+	}
+
+	void Editor::OpenWorld()
+	{
+		auto OnOpenWorld = [this]() {
+			DV_DELETE(m_pActiveWorld);
+
+			auto filePath = FileUtils::OpenFile(
+				"Dive World (*.world)\0*.world\0",
+				GEngine->GetWindowHandle(),
+				m_pActiveProject->GetWorldsPath().string().c_str()
+			);
+			if (filePath.empty()) return;
+
+			m_pActiveWorld = new World;
+			WorldSerializer serializer(m_pActiveWorld);
+			serializer.Deserialize(filePath);
+
+			m_pActiveProject->SetOpenedWorldName(filePath.stem().string());
+			m_bProjectChanged = true;
+			};
+
+		if (m_bWorldChanged)
+		{
+			activateSaveChanges(OnOpenWorld);
+			m_bWorldChanged = false;
+		}
+		else
+		{
+			OnOpenWorld();
+		}
+	}
+
+	void Editor::SaveWorld()
+	{
+		if (m_pActiveWorld)
+		{
+			WorldSerializer serializer(m_pActiveWorld);
+			serializer.Serialize(GetActiveWorldFilePath());
+			m_bWorldChanged = false;
+		}
+	}
+
+	void Editor::SaveWorldAs()
+	{
+		if (m_pActiveWorld)
+		{
+			FileUtils::SaveAs(
+				GetActiveWorldFilePath(),
+				"Dive World (*.world)\0*.world\0",
+				GEngine->GetWindowHandle()
+			);
+		}
+	}
+
+	void Editor::NewProject()
+	{
+		if (m_bProjectChanged || m_bWorldChanged)
+		{
+			activateSaveChanges(nullptr);
+			m_bShowNewProjectPopup = true;
+			m_bProjectChanged = false;
+			m_bWorldChanged = false;
+		}
+		else
+		{
+			m_bShowNewProjectPopup = true;
+			m_bProjectChanged = false;
+			m_bWorldChanged = false;
+		}
+	}
+
+	void Editor::OpenProject()
+	{
+		auto OnOpenProject = [this]() {
+			auto filePath = FileUtils::OpenFile(
+				"Dive Project (*.proj)\0*.proj\0",
+				GEngine->GetWindowHandle()
+			);
+
+			if (filePath.empty() || filePath.stem() == m_pActiveProject->GetName())
+				return;
+
+			DV_DELETE(m_pActiveWorld);
+			DV_DELETE(m_pActiveProject);
+
+			m_pActiveProject = Project::LoadFromFile(filePath);
+			updateTitle();
+
+			if (!m_pActiveProject->GetOpenedWorldName().empty())
+			{
+				std::filesystem::path worldFilePath = m_pActiveProject->GetWorldsPath() / (m_pActiveProject->GetOpenedWorldName() + ".world");
+
+				m_pActiveWorld = new World;
+				WorldSerializer serializer(m_pActiveWorld);
+				serializer.Deserialize(worldFilePath);
+			}
+
+			};
+
+		if (m_bProjectChanged || m_bWorldChanged)
+		{
+			activateSaveChanges(OnOpenProject);
+			m_bProjectChanged = false;
+			m_bWorldChanged = false;
+		}
+		else
+		{
+			OnOpenProject();
+		}
+	}
+
+	void Editor::SaveProject()
+	{
+		if (m_pActiveProject && m_bProjectChanged)
+		{
+			Project::SaveToFile(m_pActiveProject);
+			m_bProjectChanged = false;
+		}
+	}
+
+	void Editor::Exit()
+	{
+		auto OnExit = [this]() {
+			DV_DELETE(m_pActiveWorld);
+			DV_DELETE(m_pActiveProject);
+			DV_FIRE_EVENT(eEventType::Exit);
+			};
+
+		if (m_bProjectChanged || m_bWorldChanged)
+		{
+			activateSaveChanges(OnExit);
+			m_bProjectChanged = false;
+			m_bWorldChanged = false;
+		}
+		else
+		{
+			OnExit();
+		}
+	}
+
+	const std::filesystem::path Editor::GetActiveWorldFilePath() const
+	{
+		if(!m_pActiveProject || !m_pActiveWorld)
+			return std::filesystem::path();
+
+		return m_pActiveProject->GetWorldsPath() / (m_pActiveWorld->GetName() + ".world");
+	}
+
+	const std::filesystem::path Editor::GetProjectDir() const
+	{
+		return m_pActiveProject ? m_pActiveProject->GetFilePath().parent_path() : std::filesystem::path();
 	}
 }

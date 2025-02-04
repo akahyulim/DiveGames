@@ -18,10 +18,13 @@ namespace Dive
 		WindowResized, Exit,
 
 		PreRender, PostRender,
+
+		WorldCreated,
 	};
 
+	class World;
 	class GameObject;
-	using EventData = std::variant<int, void*, std::vector<std::shared_ptr<GameObject>>>;
+	using EventData = std::variant<int, void*, std::shared_ptr<World>>;
 
 	using EventListener = std::function<void(const EventData&)>;
 

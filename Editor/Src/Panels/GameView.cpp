@@ -1,4 +1,5 @@
 #include "GameView.h"
+#include "../Editor.h"
 
 namespace Dive
 {
@@ -7,7 +8,7 @@ namespace Dive
 	{
 		m_Title = "Game";
 
-		//m_pTex = GResourceManager->Load<Texture2D>("../../Assets/Textures/DokeV.jpeg");
+		m_pTex = GResourceManager->Load<Texture2D>("../../Assets/Textures/DokeV.jpeg");
 	}
 
 	void GameView::drawView()
@@ -20,7 +21,7 @@ namespace Dive
 		// renderer가 해당 texture를 관리한다.
 		//GEngine->GetRenderer().ResizeTargets(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
 
-		//ImTextureID textureID = (ImTextureID)( m_pTex ? m_pTex->GetShaderResourceView() : nullptr);
-		//ImGui::Image(textureID, ImVec2(m_Width, m_Height));
+		ImTextureID textureID = (ImTextureID)( m_pTex ? m_pTex->GetShaderResourceView() : nullptr);
+		ImGui::Image(textureID, ImVec2(m_Width, m_Height));
 	}
 }
