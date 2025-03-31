@@ -19,12 +19,14 @@ namespace Dive
 
 		PreRender, PostRender,
 
-		WorldCreated,
+		WorldCreated, WorldModified,
+
+		Collision, Trigger, KeyPress,
 	};
 
-	class World;
+	class Scene;
 	class GameObject;
-	using EventData = std::variant<int, void*, std::shared_ptr<World>>;
+	using EventData = std::variant<int, void*, GameObject*, std::shared_ptr<Scene>>;
 
 	using EventListener = std::function<void(const EventData&)>;
 

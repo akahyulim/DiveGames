@@ -20,10 +20,13 @@
       <UniqueIdentifier>{36179512-5066-4952-b95f-972928882c9e}</UniqueIdentifier>
     </Filter>
     <Filter Include="world">
-      <UniqueIdentifier>{2f4191fb-50a8-4cd9-964b-6dca35aefbeb}</UniqueIdentifier>
+      <UniqueIdentifier>{01dd24fd-4851-46b1-83d1-3a485fa9cae6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="world\components">
-      <UniqueIdentifier>{213bac85-a459-4aa7-88ac-cd5c39231163}</UniqueIdentifier>
+    <Filter Include="world\Components">
+      <UniqueIdentifier>{6cf0627d-721d-41ba-b7e7-cdfb8cfa7e6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="world\Components\NativeScript">
+      <UniqueIdentifier>{e5dd5fc8-4edf-4b31-87fa-39ac9b06d4e2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -41,15 +44,6 @@
     <ClInclude Include="src\core\StringUtils.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\Window.h">
-      <Filter>core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\rendering\Renderer.h">
-      <Filter>rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\Engine.h">
-      <Filter>core</Filter>
-    </ClInclude>
     <ClInclude Include="src\core\EventDispatcher.h">
       <Filter>core</Filter>
     </ClInclude>
@@ -61,21 +55,6 @@
     </ClInclude>
     <ClInclude Include="src\resource\ResourceManager.h">
       <Filter>resource</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\Graphics.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\Texture.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\Texture2D.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\Cubemap.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\Texture2DArray.h">
-      <Filter>graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\ConstantBuffer.h">
       <Filter>graphics</Filter>
@@ -92,26 +71,75 @@
     <ClInclude Include="src\math\Math.h">
       <Filter>math</Filter>
     </ClInclude>
+    <ClInclude Include="src\graphics\IndexBuffer.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Window.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Graphics.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\Renderer.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
     <ClInclude Include="src\input\Input.h">
       <Filter>input</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\World.h">
-      <Filter>world</Filter>
+    <ClInclude Include="src\core\Engine.h">
+      <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="src\world\GameObject.h">
       <Filter>world</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\Components\Component.h">
-      <Filter>world\components</Filter>
+    <ClInclude Include="src\world\World.h">
+      <Filter>world</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\Components\Transform.h">
-      <Filter>world\components</Filter>
+    <ClInclude Include="src\world\WorldManager.h">
+      <Filter>world</Filter>
     </ClInclude>
     <ClInclude Include="src\world\WorldSerializer.h">
       <Filter>world</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\IndexBuffer.h">
+    <ClInclude Include="src\world\Components\Camera.h">
+      <Filter>world\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Components\Component.h">
+      <Filter>world\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Components\Transform.h">
+      <Filter>world\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\RenderTexture.h">
       <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Texture.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Texture2D.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Cubemap.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\UUID.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Components\script\Player.h">
+      <Filter>world\Components\NativeScript</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Components\script\NativeScript.h" />
+    <ClInclude Include="src\rendering\Mesh.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\math\BoundingBox.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\Model.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\ModelFactory.h">
+      <Filter>rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,15 +153,6 @@
     <ClCompile Include="src\core\StringUtils.cpp">
       <Filter>core</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\Window.cpp">
-      <Filter>core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\Renderer.cpp">
-      <Filter>rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\Engine.cpp">
-      <Filter>core</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\EventDispatcher.cpp">
       <Filter>core</Filter>
     </ClCompile>
@@ -145,21 +164,6 @@
     </ClCompile>
     <ClCompile Include="src\resource\ResourceManager.cpp">
       <Filter>resource</Filter>
-    </ClCompile>
-    <ClCompile Include="src\graphics\Graphics.cpp">
-      <Filter>graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\graphics\Texture.cpp">
-      <Filter>graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\graphics\Texture2D.cpp">
-      <Filter>graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\graphics\Cubemap.cpp">
-      <Filter>graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\graphics\Texture2DArray.cpp">
-      <Filter>graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\graphics\ConstantBuffer.cpp">
       <Filter>graphics</Filter>
@@ -179,23 +183,71 @@
     <ClCompile Include="src\math\Math.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="src\core\Window.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Graphics.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\Renderer.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
     <ClCompile Include="src\input\Input.cpp">
       <Filter>input</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\World.cpp">
-      <Filter>world</Filter>
+    <ClCompile Include="src\core\Engine.cpp">
+      <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="src\world\GameObject.cpp">
       <Filter>world</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\Components\Component.cpp">
-      <Filter>world\components</Filter>
+    <ClCompile Include="src\world\World.cpp">
+      <Filter>world</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\Components\Transform.cpp">
-      <Filter>world\components</Filter>
+    <ClCompile Include="src\world\WorldManager.cpp">
+      <Filter>world</Filter>
     </ClCompile>
     <ClCompile Include="src\world\WorldSerializer.cpp">
       <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Components\Camera.cpp">
+      <Filter>world\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Components\Component.cpp">
+      <Filter>world\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Components\Transform.cpp">
+      <Filter>world\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\RenderTexture.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Texture2D.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Cubemap.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Texture.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\UUID.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Components\script\Player.cpp">
+      <Filter>world\Components\NativeScript</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\Mesh.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math\BoundingBox.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\Model.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\ModelFactory.cpp">
+      <Filter>rendering</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

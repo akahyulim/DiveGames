@@ -4,8 +4,8 @@
 
 #define DV_LOG(CategoryName, Level, Format, ...) \
 	do { \
-		auto pLogger = Dive::LogManager::GetLogger(#CategoryName); \
-		pLogger->log(spdlog::level::Level, Format, ##__VA_ARGS__); \
+		auto logger = Dive::LogManager::GetLogger(#CategoryName); \
+		logger->log(spdlog::level::Level, Format, ##__VA_ARGS__); \
 	} while (0)
 
 namespace Dive

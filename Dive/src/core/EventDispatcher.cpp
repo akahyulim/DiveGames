@@ -14,8 +14,6 @@ namespace Dive
 	{
 		auto& typeListener = s_Listeners[type];
 		for (auto& listener : typeListener)
-		{
 			listener(data);
-		}
 	}
 }

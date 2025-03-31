@@ -62,21 +62,21 @@ namespace Dive
 		auto it = m_Resources.find(T::GetTypeHashStatic());
 		if (it != m_Resources.end())
 		{
-			for (const auto& pResource : it->second)
+			for (const auto& resource : it->second)
 			{
-				if (pResource->GetFilepath() == filepath)
+				if (resource->GetFilepath() == filepath)
 				{
-					return std::dynamic_pointer_cast<T>(pResource);
+					return std::dynamic_pointer_cast<T>(resource);
 				}
 			}
 		}
 
-		auto pNewResource = std::make_shared<T>();
-		pNewResource->LoadFromFile(filepath);
+		auto resource = std::make_shared<T>();
+		resource->LoadFromFile(filepath);
 
-		m_Resources[T::GetTypeHashStatic()].push_back(std::static_pointer_cast<Resource>(pNewResource));
+		m_Resources[T::GetTypeHashStatic()].push_back(std::static_pointer_cast<Resource>(resource));
 
-		return pNewResource;
+		return resource;
 	}
 
 	template<class T>
@@ -87,10 +87,10 @@ namespace Dive
 		auto it = m_Resources.find(T::GetTypeHashStatic());
 		if (it != m_Resources.end())
 		{
-			for (const auto& pResource : it->second)
+			for (const auto& resource : it->second)
 			{
-				if (pResource->GetName() == name)
-					return std::dynamic_pointer_cast<T>(pResource);
+				if (resource->GetName() == name)
+					return std::dynamic_pointer_cast<T>(resource);
 			}
 		}
 
@@ -105,10 +105,10 @@ namespace Dive
 		auto it = m_Resources.find(T::GetTypeHashStatic());
 		if (it != m_Resources.end())
 		{
-			for (const auto& pResource : it->second)
+			for (const auto& resource : it->second)
 			{
-				if (pResource->GetFilepath() == filepath)
-					return std::dynamic_pointer_cast<T>(pResource);
+				if (resource->GetFilepath() == filepath)
+					return std::dynamic_pointer_cast<T>(resource);
 			}
 		}
 
@@ -125,9 +125,9 @@ namespace Dive
 		{
 			std::vector<std::shared_ptr<T>> resources;
 			resources.reserve(it->second.size());
-			for (const auto& pResource : it->second)
+			for (const auto& resource : it->second)
 			{
-				resources.push_back(std::dynamic_pointer_cast<T>(pResource));
+				resources.push_back(std::dynamic_pointer_cast<T>(resource));
 			}
 
 			return resources;
@@ -158,9 +158,9 @@ namespace Dive
 		auto it = m_Resources.find(T::GetTypeHashStatic());
 		if (it != m_Resources.end())
 		{
-			for (const auto& pResource : it->second)
+			for (const auto& resource : it->second)
 			{
-				if (pResource->GetFilepath() == filepath)
+				if (resource->GetFilepath() == filepath)
 					return true;
 			}
 		}

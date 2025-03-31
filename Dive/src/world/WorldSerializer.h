@@ -1,3 +1,4 @@
+
 #pragma once
 
 namespace Dive
@@ -7,13 +8,13 @@ namespace Dive
 	class WorldSerializer
 	{
 	public:
-		WorldSerializer(World* pWorld);
+		WorldSerializer(World* world);
 		~WorldSerializer() = default;
 
 		void Serialize(const std::filesystem::path& path);
 		bool Deserialize(const std::filesystem::path& path);
 
 	private:
-		World* m_pWorld;
+		World* m_World;
 	};
 }

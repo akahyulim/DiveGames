@@ -11,17 +11,14 @@ namespace Dive
 		enum class eSpace
 		{
 			Self,
-			World
+			Scene
 		};
 
 		DV_CLASS(Transform, Component);
 
 	public:
-		Transform(GameObject* pGameObject);
+		Transform(GameObject* gameObject);
 		~Transform() = default;
-
-		void SaveToYaml(YAML::Node config) override;
-		void LaodFromYaml(const YAML::Node& config) override;
 
 		DirectX::XMFLOAT3 GetPosition() const;
 		DirectX::XMVECTOR GetPositionVector() const;
@@ -71,7 +68,7 @@ namespace Dive
 		void LookAt(const DirectX::XMVECTOR& target, const DirectX::XMVECTOR& up = { 0.0f, 1.0f, 0.0f, 1.0f });
 		void LookAt(const Transform* pTarget, const DirectX::XMVECTOR& up = { 0.0f, 1.0f, 0.0f, 1.0f });
 
-		DirectX::XMFLOAT4X4 GetWorldTransform() const { return m_Transform; }	// 추후 이름에서 World 제거
+		DirectX::XMFLOAT4X4 GetSceneTransform() const { return m_Transform; }	// 추후 이름에서 Scene 제거
 		void SetTransform(const DirectX::XMFLOAT4X4& world);
 		DirectX::XMMATRIX GetMatrix() const { return DirectX::XMLoadFloat4x4(&m_Transform); }
 		void SetMatrix(const DirectX::XMMATRIX& world);
@@ -88,9 +85,13 @@ namespace Dive
 		DirectX::XMVECTOR GetRightwardVector() const;
 
 		// hiarachy
-		Transform* GetParent() const { return m_pParent; }
+		Transform* GetParent() const { return m_Parent; }
 		void SetParent(Transform* pParent);
-		bool IsRoot() const { return !m_pParent; }
+
+		const UINT64 GetParentID() const { return m_ParentID; }
+		void SetParentID(const UINT64 id) { m_ParentID = id; }	// 좀 애매하다. 사용자는 이로인해 계층구조가 생성된다 여길 수 있다.
+
+		bool IsRoot() const { return !m_Parent; }
 		Transform* GetRoot();
 		bool HasChild() const { return !m_Children.empty(); }
 		uint32_t GetChildCount() const { return static_cast<uint32_t>(m_Children.size()); }
@@ -110,7 +111,9 @@ namespace Dive
 		DirectX::XMFLOAT4X4 m_Transform;
 		DirectX::XMFLOAT4X4 m_LocalTransform;
 
-		Transform* m_pParent;
+		Transform* m_Parent;
 		std::vector<Transform*> m_Children;
+
+		UINT64 m_ParentID;
 	};
 }

@@ -5,18 +5,18 @@
 
 namespace Dive
 {
-	Component::Component(GameObject* pGameObject)
-		: m_pGameObject(pGameObject)
+	Component::Component(GameObject* gameObject)
+		: m_GameObject(gameObject)
 	{
 	}
 
 	std::string Component::GetName() const
 	{
-		return m_pGameObject->GetName();
+		return m_GameObject->GetName();
 	}
 
 	GameObject* Component::GetGameObject() const
 	{
-		return m_pGameObject;
+		return m_GameObject;
 	}
 }

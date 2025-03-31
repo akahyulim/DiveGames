@@ -2,126 +2,51 @@
 #include "IndexBuffer.h"
 #include "Graphics.h"
 #include "core/CoreDefs.h"
-#include "core/Engine.h"
 
 namespace Dive
 {
-	IndexBuffer::IndexBuffer()
-		: m_pBuffer(nullptr)
-		, m_Count(0)
-	{
-	}
-
-	IndexBuffer::IndexBuffer(uint16_t* pIndices, uint32_t count)
-		: m_Count(count)
-		, m_Format(DXGI_FORMAT_R16_UINT)
-	{
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.ByteWidth = sizeof(uint16_t) * count;
-		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		desc.CPUAccessFlags = 0;
-		desc.Usage = D3D11_USAGE_IMMUTABLE;
-		desc.MiscFlags = 0;
-		desc.StructureByteStride = 0;
-
-		D3D11_SUBRESOURCE_DATA data;
-		ZeroMemory(&data, sizeof(data));
-		data.pSysMem = pIndices;
-		data.SysMemPitch = 0;
-		data.SysMemSlicePitch = 0;
-
-		if(FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
-			DV_LOG(IndexBuffer, err, "IndexBuffer 생성에 실패하였습니다.");
-	}
-
-	IndexBuffer::IndexBuffer(uint32_t* pIndices, uint32_t count)
-		: m_Count(count)
-		, m_Format(DXGI_FORMAT_R32_UINT)
-	{
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.ByteWidth = sizeof(uint32_t) * count;
-		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		desc.CPUAccessFlags = 0;
-		desc.Usage = D3D11_USAGE_IMMUTABLE;
-		desc.MiscFlags = 0;
-		desc.StructureByteStride = 0;
-
-		D3D11_SUBRESOURCE_DATA data;
-		ZeroMemory(&data, sizeof(data));
-		data.pSysMem = pIndices;
-		data.SysMemPitch = 0;
-		data.SysMemSlicePitch = 0;
-
-		if(FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
-			DV_LOG(IndexBuffer, err, "IndexBuffer 생성에 실패하였습니다.");
-	}
-
 	IndexBuffer::~IndexBuffer()
 	{
-		Destroy();
+		Release();
 	}
 
-	bool IndexBuffer::SetSize(uint32_t count, bool dynamic)
+	bool IndexBuffer::Create(const void* data, UINT32 count)
 	{
-		// urho3d에 있는 메서드다.
-		// count, size, dynamic 여부를 저장하고 create 함수를 호출한다.
-		// create함수는 일단 버퍼를 생성한다.
+		Release();
 
-		return false;
-	}
-	// 외부에서 버퍼를 생성한 후 Mesh에 저장할 것이라면
-	// 굳이 이 SetSize+SetData 콤보를 사용할 필요는 없을 것 같다.
-	bool IndexBuffer::SetData(const void* pData)
-	{
-		// 생성된 버퍼에 데이터를 전달해 완성한다.
-		// dynamic이라면 map / unmap으로,
-		// 아니라면 UpdateSubResource로 처리한다.
+		const bool use32BitFormat = count > 65535;
 
-		return false;
-	}
+		D3D11_BUFFER_DESC bufferDesc{};
+		bufferDesc.ByteWidth = (use32BitFormat ? sizeof(UINT32) : sizeof(UINT16)) * count;
+		bufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 
-	bool IndexBuffer::CreateBuffer(const void* pData, uint32_t count)
-	{
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.ByteWidth = (count > 65535 ? sizeof(uint32_t) : sizeof(uint16_t)) * count;
-		desc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		desc.CPUAccessFlags = 0;
-		desc.Usage = D3D11_USAGE_IMMUTABLE;
-		desc.MiscFlags = 0;
-		desc.StructureByteStride = 0;
+		D3D11_SUBRESOURCE_DATA subresourceData{};
+		subresourceData.pSysMem = data;
 
-		D3D11_SUBRESOURCE_DATA data;
-		ZeroMemory(&data, sizeof(data));
-		data.pSysMem = pData;
-		data.SysMemPitch = 0;
-		data.SysMemSlicePitch = 0;
-
-		if (FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
+		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, &subresourceData, &m_Buffer))) 
 		{
 			DV_LOG(IndexBuffer, err, "IndexBuffer 생성에 실패하였습니다.");
 			return false;
 		}
 
+		m_Format = use32BitFormat ? DXGI_FORMAT_R32_UINT : DXGI_FORMAT_R16_UINT;
 		m_Count = count;
 
 		return true;
 	}
 
-	void IndexBuffer::Destroy()
+	void IndexBuffer::Release()
 	{
-		DV_RELEASE(m_pBuffer);
+		DV_RELEASE(m_Buffer);
 	}
 
-	IndexBuffer* IndexBuffer::Create(uint16_t* pIndices, uint32_t count)
+	std::shared_ptr<IndexBuffer> IndexBuffer::Generate(const void* data, UINT32 count)
 	{
-		return new IndexBuffer(pIndices, count);
-	}
+		auto indexBuffer = std::make_shared<IndexBuffer>();
+		if (!indexBuffer->Create(data, count)) 
+			return nullptr;
 
-	IndexBuffer* IndexBuffer::Create(uint32_t* pIndices, uint32_t count)
-	{
-		return new IndexBuffer(pIndices, count);
+		return indexBuffer;
 	}
 }

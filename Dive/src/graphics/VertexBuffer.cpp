@@ -2,40 +2,27 @@
 #include "VertexBuffer.h"
 #include "Graphics.h"
 #include "core/CoreDefs.h"
-#include "core/Engine.h"
 
 namespace Dive
 {
-	VertexBuffer::VertexBuffer()
-		: m_pBuffer(nullptr)
-		, m_Stride(0)
-		, m_Count(0)
-	{
-	}
-	
 	VertexBuffer::~VertexBuffer()
 	{
-		Destroy();
+		Release();
 	}
 
-	bool VertexBuffer::CreateBuffer(const void* pData, uint32_t stride, uint32_t count)
+	bool VertexBuffer::Create(const void* data, UINT32 stride, UINT32 count)
 	{
-		D3D11_BUFFER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
-		desc.ByteWidth = stride * count;
-		desc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		desc.CPUAccessFlags = 0;
-		desc.Usage = D3D11_USAGE_IMMUTABLE;
-		desc.MiscFlags = 0;
-		desc.StructureByteStride = 0;
+		Release();
 
-		D3D11_SUBRESOURCE_DATA data;
-		ZeroMemory(&data, sizeof(data));
-		data.pSysMem = pData;
-		data.SysMemPitch = 0;
-		data.SysMemSlicePitch = 0;
+		D3D11_BUFFER_DESC bufferDesc{};
+		bufferDesc.ByteWidth = stride * count;
+		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 
-		if (FAILED(GEngine->GetDevice()->CreateBuffer(&desc, &data, &m_pBuffer)))
+		D3D11_SUBRESOURCE_DATA subresourceData{};
+		subresourceData.pSysMem = data;
+
+		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, &subresourceData, &m_Buffer)))
 		{
 			DV_LOG(VerteBuffer, err, "VertexBuffer 생성에 실패하였습니다.");
 			return false;
@@ -47,17 +34,17 @@ namespace Dive
 		return true;
 	}
 
-	void VertexBuffer::Destroy()
+	void VertexBuffer::Release()
 	{
-		DV_RELEASE(m_pBuffer);
+		DV_RELEASE(m_Buffer);
 	}
 
-	VertexBuffer* VertexBuffer::Create(const void* pData, uint32_t stride, uint32_t count)
+	std::shared_ptr<VertexBuffer> VertexBuffer::Generate(const void* data, UINT32 stride, UINT32 count)
 	{
-		auto pVertexBuffer = new VertexBuffer();
-		if (!pVertexBuffer->CreateBuffer(pData, stride, count))
-			DV_DELETE(pVertexBuffer);
+		auto vertexBuffer = std::make_shared<VertexBuffer>();
+		if (!vertexBuffer->Create(data, stride, count))
+			return nullptr;
 
-		return pVertexBuffer;
+		return vertexBuffer;
 	}
 }

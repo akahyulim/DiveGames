@@ -1,10 +1,11 @@
-#include "DivePch.h"
+#include "stdafx.h"
 #include "Camera.h"
+#include "Transform.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/Graphics.h"
-#include "Graphics/Texture2D.h"
+#include "Graphics/RenderTexture.h"
 #include "Graphics/ConstantBuffer.h"
-#include "World/GameObject.h"
+#include "Scene/GameObject.h"
 
 namespace Dive
 {
@@ -31,93 +32,39 @@ namespace Dive
 	static constexpr float FOV_MIN = 1.0f;
 	static constexpr float FOV_MAX = 160.0f;
 
-	Camera::Camera(GameObject* pGameObject)
-		: Component(pGameObject)
-		, m_pRenderTargetTex(nullptr)
-		, m_pCBufferVS(nullptr)
-		, m_pCBufferDS(nullptr)
-		, m_pCBufferPS(nullptr)
+	Camera::Camera(GameObject* gameObject)
+		: Component(gameObject)
 	{
-		m_ProjectionType = eProjectionType::Perspective;
-		m_BackgroundColor = { 1.0f, 1.0, 1.0f, 1.0f };
-		m_FieldOfView = 45.0f;
-		m_NearClipPlane = 0.1f;
-		m_FarClipPlane = 1000.0f;
-		m_MoveSpeed = 10.0f;
-		m_RotateSpeed = 50.0f;
 	}
 
 	Camera::~Camera()
 	{
-		DV_DELETE(m_pCBufferPS);
-		DV_DELETE(m_pCBufferDS);
-		DV_DELETE(m_pCBufferVS);
-
-		// 렌더타겟은 외부에서 가져오기 때문에 직접 제거하는 건 에바다. 
+		// 렌더타겟은 외부에서 가져오기 때문에 직접 제거하는 건 에바다.
 	}
 
 	// 버퍼를 생성 및 관리하는 것은 맞지 않다.
 	// 갱신된 데이터로 버퍼를 업데이트하도록 구현해야 한다.
 	void Camera::Update()
 	{
-		return;
-
-		// vs constant buffer
-		{
-			if(!m_pCBufferVS)
-				m_pCBufferVS = ConstantBuffer::Create("CB_CAMERA_VS", sizeof(CB_CAMERA_VS));
-
-			auto pMappedData = static_cast<CB_CAMERA_VS*>(m_pCBufferVS->Map());
-			pMappedData->view = DirectX::XMMatrixTranspose(GetViewMatrix());
-			pMappedData->proj = DirectX::XMMatrixTranspose(GetProjectionMatrix());
-			m_pCBufferVS->Unmap();
-		}
-
-		// ds constant buffer
-		{
-			if(!m_pCBufferDS)
-				m_pCBufferDS = ConstantBuffer::Create("CB_CAMERA_DS", sizeof(CB_CAMERA_DS));
-
-			auto pMappedData = static_cast<CB_CAMERA_DS*>(m_pCBufferDS->Map());
-			pMappedData->viewProj = DirectX::XMMatrixTranspose(GetViewMatrix() * GetProjectionMatrix());
-			m_pCBufferDS->Unmap();
-		}
-
-		// ps constant buffer
-		{
-			if(!m_pCBufferPS)
-				m_pCBufferPS = ConstantBuffer::Create("CB_CAMERA_PS", sizeof(CB_CAMERA_PS));
-
-			auto pMappedData = reinterpret_cast<CB_CAMERA_PS*>(m_pCBufferPS->Map());
-			DirectX::XMFLOAT4X4 proj;
-			DirectX::XMStoreFloat4x4(&proj, GetProjectionMatrix());
-			pMappedData->perspectiveValue.x = 1.0f / proj._11;
-			pMappedData->perspectiveValue.y = 1.0f / proj._22;
-			pMappedData->perspectiveValue.z = proj._43;
-			pMappedData->perspectiveValue.w = -proj._33;
-			DirectX::XMMATRIX viewInv = DirectX::XMMatrixInverse(nullptr, GetViewMatrix());
-			pMappedData->viewInverse = DirectX::XMMatrixTranspose(m_pGameObject->GetMatrix());
-			m_pCBufferPS->Unmap();
-		}
 	}
 
 	DirectX::XMFLOAT3 Camera::GetPosition()
 	{
-		return m_pGameObject->GetPosition();
+		return m_GameObject->GetComponent<Transform>()->GetPosition();
 	}
 
-	DirectX::XMMATRIX Camera::GetWorldMatrix()
+	DirectX::XMMATRIX Camera::GetSceneMatrix()
 	{
-		return DirectX::XMMatrixTranslationFromVector(m_pGameObject->GetPositionVector());
+		return DirectX::XMMatrixTranslationFromVector(m_GameObject->GetComponent<Transform>()->GetPositionVector());
 	}
 
 	DirectX::XMMATRIX Camera::GetViewMatrix()
 	{
-		const auto& pos = m_pGameObject->GetPositionVector();
-		const auto& forward = m_pGameObject->GetForwardVector();
+		const auto& pos = m_GameObject->GetComponent<Transform>()->GetPositionVector();
+		const auto& forward = m_GameObject->GetComponent<Transform>()->GetForwardVector();
 		const auto& focus = DirectX::XMVectorAdd(pos, forward);
 
-		const auto& up = m_pGameObject->GetUpwardVector();
+		const auto& up = m_GameObject->GetComponent<Transform>()->GetUpwardVector();
 
 		return DirectX::XMMatrixLookAtLH(pos, focus, up);
 	}
@@ -130,11 +77,11 @@ namespace Dive
 	// 아직 제대로된 테스트도 못했다.
 	DirectX::XMMATRIX Camera::GetOrthographicProjMatrix() const
 	{
-		auto viewSize = GetRenderTargetSize();
+		auto viewSize = GetRenderTextureSize();
 
 		return DirectX::XMMatrixOrthographicLH(
-			viewSize.x,
-			viewSize.y,
+			static_cast<float>(viewSize.x),
+			static_cast<float>(viewSize.y),
 			m_NearClipPlane,
 			m_FarClipPlane);
 	}
@@ -155,8 +102,8 @@ namespace Dive
 
 	float Camera::GetAspectRatio() const
 	{
-		auto viewSize = GetRenderTargetSize();
-		return viewSize.x / viewSize.y;
+		auto viewSize = GetRenderTextureSize();
+		return static_cast<float>(viewSize.x / viewSize.y);
 	}
 
 	void Camera::SetFieldOfView(float fov)
@@ -169,62 +116,11 @@ namespace Dive
 			m_FieldOfView = fov;
 	}
 
-	ID3D11RenderTargetView* Camera::GetRenderTargetView() const
+	DirectX::XMUINT2 Camera::GetRenderTextureSize() const
 	{
-		return m_pRenderTargetTex ? m_pRenderTargetTex->GetRenderTargetView() : Graphics::GetInstance()->GetDefaultRenderTargetView();
-	}
-	
-	DirectX::XMFLOAT2 Camera::GetRenderTargetSize() const
-	{
-		return m_pRenderTargetTex ? m_pRenderTargetTex->GetSize() : Graphics::GetInstance()->GetResolution();
-	}
+		if (m_RenderTexture)
+			return { m_RenderTexture->GetWidth(), m_RenderTexture->GetHeight() };
 
-	ConstantBuffer* Camera::GetConstantBufferVS()
-	{
-		if (!m_pCBufferVS)
-			m_pCBufferVS = ConstantBuffer::Create("CB_CAMERA_VS", sizeof(CB_CAMERA_VS));
-
-		auto pMappedData = static_cast<CB_CAMERA_VS*>(m_pCBufferVS->Map());
-		{
-			pMappedData->view = DirectX::XMMatrixTranspose(GetViewMatrix());
-			pMappedData->proj = DirectX::XMMatrixTranspose(GetProjectionMatrix());
-		}
-		m_pCBufferVS->Unmap();
-
-		return m_pCBufferVS;
-	}
-	
-	ConstantBuffer* Camera::GetConstantBufferDS()
-	{
-		if (!m_pCBufferDS)
-			m_pCBufferDS = ConstantBuffer::Create("CB_CAMERA_DS", sizeof(CB_CAMERA_DS));
-
-		auto pMappedData = static_cast<CB_CAMERA_DS*>(m_pCBufferDS->Map());
-		{
-			pMappedData->viewProj = DirectX::XMMatrixTranspose(GetViewMatrix() * GetProjectionMatrix());
-		}
-		m_pCBufferDS->Unmap();
-		
-		return m_pCBufferDS;
-	}
-	
-	ConstantBuffer* Camera::GetConstantBufferPS()
-	{
-		if (!m_pCBufferPS)
-			m_pCBufferPS = ConstantBuffer::Create("CB_CAMERA_PS", sizeof(CB_CAMERA_PS));
-
-		auto pMappedData = reinterpret_cast<CB_CAMERA_PS*>(m_pCBufferPS->Map());
-		{
-			DirectX::XMFLOAT4X4 proj;
-			DirectX::XMStoreFloat4x4(&proj, GetProjectionMatrix());
-			pMappedData->perspectiveValue.x = 1.0f / proj._11;
-			pMappedData->perspectiveValue.y = 1.0f / proj._22;
-			pMappedData->perspectiveValue.z = proj._43;
-			pMappedData->perspectiveValue.w = -proj._33;
-			pMappedData->viewInverse = DirectX::XMMatrixTranspose(m_pGameObject->GetMatrix());
-		}
-		m_pCBufferPS->Unmap();
-
-		return m_pCBufferPS;
+		return {};
 	}
 }

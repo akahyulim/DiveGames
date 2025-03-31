@@ -4,10 +4,11 @@ namespace Dive
 {
 	class Model;
 
-	namespace ModelFactory
+	class ModelFactory
 	{
-		Model* CreateTriangle(float size);
-		Model* CreateCube(float size);
-		Model* CreatePlane(float length, float depth);
-	}
+	public:
+		static Model* CreateTriangle(float size);
+		static Model* CreateCube(float size);
+		static Model* CreatePlane(float length, float depth);
+	};
 }

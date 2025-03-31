@@ -2,58 +2,42 @@
 
 namespace Dive
 {
-	struct WindowData
-	{
-		WindowData(const std::wstring& title = L"dive", uint32_t width = 1600, uint32_t height = 900)
-			: Title(title), Width(width), Height(height)
-		{}
-
-		std::wstring Title;
-		uint32_t Width;
-		uint32_t Height;
-	};
-
 	class Window
 	{
 	public:
-		Window();
-		Window(const WindowData& data);
-		~Window() = default;
+		static void Initialize();
+		static void Shutdown();
 
-		bool Initialize(HINSTANCE hInstance, uint32_t width, uint32_t height, LPCWSTR pTitle);
-		void Shutdown();
+		static bool Tick();
 
-		bool Run();
+		static void SetMessageCallback(LONG_PTR callBack);
 
-		bool Resize(uint32_t width, uint32_t height, bool Windowed = true);
+		static bool Resize(const uint32_t width, const uint32_t height);
+		static uint32_t GetWidth();
+		static uint32_t GetHeight();
 
-		DirectX::XMUINT2 GetSize();
-		uint32_t GetWidth();
-		uint32_t GetHeight();
+		static HINSTANCE GetInstanceHandle() { return s_hInstance; }
+		static HWND GetWindowHandle() { return s_hWnd; }
+		
+		static void Show();
+		static void Hide();
+		static void Close();
+		
+		static bool IsFullScreen();
+		static void FullScreen();
+		
+		static void SetWindowed(bool windowed = true);
 
-		HWND GetHandle() { return m_hWnd; }
+		static void Minimize();
+		static void Maximize();
+		static void Restore();
+		static bool IsMaximize();
 
-		LPCWSTR GetTitle() { return m_Title.c_str(); }
-		void SetTitle(LPCWSTR title);
-
-		bool IsWindowed() { return m_bWindowed; }
-
-		void ShowWindow(int nCmdShow);
-
-		bool ChangeProc(LONG_PTR pWndProc);
-
-		static std::unique_ptr<Window> Create(const WindowData& data = WindowData());
-
-	private:
-		bool initialize();
-		void shutdown();
+		static void SetTitle(const std::wstring& title);
 
 	private:
-		HINSTANCE m_hInstance;
-		HWND m_hWnd;
-		std::wstring m_Title;
-		bool m_bWindowed;
-		uint32_t m_Width;
-		uint32_t m_Height;
+		static HINSTANCE s_hInstance;
+		static HWND s_hWnd;
+		static std::wstring s_Title;
 	};
 }

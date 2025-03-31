@@ -6,40 +6,42 @@ namespace Dive
 	class Graphics
 	{
 	public:
-		Graphics();
-		~Graphics();
+		static void Initialize();
+		static void Shutdown();
 
-		bool Initialize(uint32_t width, uint32_t height, HWND hWnd);
-		void Shutdown();
+		static void ChangeResolution(uint32_t width, uint32_t height);
 
-		DirectX::XMUINT2 GetResolution() { return m_Resolution; }
-		void ChangeResolution(uint32_t width, uint32_t height);
+		static void OnWindowResized(EventData data);
 
-		bool IsVSyncEnabled() { return m_bVSync; }
-		void SetVSyncEnabled(bool enabled) { m_bVSync = enabled; }
+		static void Present();
 
-		void OnWindowResized(EventData data);
+		static IDXGISwapChain* GetSwapChain();
+		static ID3D11Device* GetDevice();
+		static ID3D11DeviceContext* GetDeviceContext();
 
-		IDXGISwapChain* GetSwapChain() { return m_pSwapChain; }
-		ID3D11Device* GetDevice() { return m_pDevice; }
-		ID3D11DeviceContext* GetDeviceContext() { return m_pDeviceContext; }
+		static ID3D11RenderTargetView* GetBackbufferRTV();
+		static ID3D11DepthStencilView* GetBackbufferDSV();
 
-		ID3D11RenderTargetView* GetBackbufferView() { return m_pBackbufferView; }
-		ID3D11DepthStencilView* GetBackbufferDepthView() { return m_pBackbufferDepthView; }
+		static uint32_t GetResolutionWidth() { return s_ResolutionWidth; }
+		static uint32_t GetResolutionHeight() { return s_ResolutionHeight; }
 
-	private:
-		bool updateBackbuffer();
+		static bool IsVSyncEnabled() { return s_UseVSync; }
+		static void SetVSyncEnabled(bool enabled) { s_UseVSync = enabled; }
 
 	private:
-		IDXGISwapChain* m_pSwapChain;
-		ID3D11Device* m_pDevice;
-		ID3D11DeviceContext* m_pDeviceContext;
+		static void updateBackbuffer();
 
-		ID3D11RenderTargetView* m_pBackbufferView;
-		ID3D11Texture2D* m_pBackbufferDepthTex;
-		ID3D11DepthStencilView* m_pBackbufferDepthView;
+	private:
+		static IDXGISwapChain* s_SwapChain;
+		static ID3D11Device* s_Device;
+		static ID3D11DeviceContext* s_DeviceContext;
 
-		DirectX::XMUINT2 m_Resolution;
-		bool m_bVSync;
+		static ID3D11RenderTargetView* s_RenderTargetView;
+		static ID3D11Texture2D* s_DepthStencilTexture;
+		static ID3D11DepthStencilView* s_DEpthStencilView;
+
+		static uint32_t s_ResolutionWidth;
+		static uint32_t s_ResolutionHeight;
+		static bool s_UseVSync;
 	};
 }

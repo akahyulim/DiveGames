@@ -9,9 +9,9 @@
 namespace Dive
 {
 	Mesh::Mesh()
-		: m_pVertexBuffer(nullptr)
-		, m_pIndexBuffer(nullptr)
-		, m_pGameObject(nullptr)
+		: m_VertexBuffer(nullptr)
+		, m_IndexBuffer(nullptr)
+		, m_GameObject(nullptr)
 	{
 	}
 
@@ -24,15 +24,15 @@ namespace Dive
 	{
 		m_Vertices.clear();
 		m_Vertices.shrink_to_fit();
-		DV_DELETE(m_pVertexBuffer);
+		m_VertexBuffer.reset();
 
 		m_Indices.clear();
 		m_Indices.shrink_to_fit();
-		DV_DELETE(m_pIndexBuffer);
+		m_IndexBuffer.reset();
 	}
 
-	void Mesh::GetGeometry(uint32_t vertexOffset, uint32_t vertexCount,  uint32_t indexOffset, uint32_t indexCount,
-		std::vector<uint32_t>* indices, std::vector<VertexStatic>* vertices)
+	void Mesh::GetGeometry(UINT32 vertexOffset, UINT32 vertexCount,  UINT32 indexOffset, UINT32 indexCount,
+		std::vector<UINT32>* indices, std::vector<VertexStatic>* vertices)
 	{
 		if (vertices)
 		{
@@ -48,40 +48,40 @@ namespace Dive
 			
 			const auto index_first = m_Indices.begin() + indexOffset;
 			const auto index_last = m_Indices.begin() + indexOffset + indexCount;
-			*indices = std::vector<uint32_t>(index_first, index_last);
+			*indices = std::vector<UINT32>(index_first, index_last);
 		}
 	}
 
-	void Mesh::AddVertices(const std::vector<VertexStatic>& vertices, uint32_t* pOutVertexOffset)
+	void Mesh::AddVertices(const std::vector<VertexStatic>& vertices, UINT32* outVertexOffset)
 	{
 		// 현재 저장되어 있는 개수를 오프셋으로 리턴한다.
 		// 
-		if (pOutVertexOffset)
+		if (outVertexOffset)
 		{
-			*pOutVertexOffset = static_cast<uint32_t>(m_Vertices.size());
+			*outVertexOffset = static_cast<UINT32>(m_Vertices.size());
 		}
 
 		m_Vertices.insert(m_Vertices.end(), vertices.begin(), vertices.end());
 	}
 
-	void Mesh::AddIndices(const std::vector<uint32_t>& indices, uint32_t* pOutIndexOffset)
+	void Mesh::AddIndices(const std::vector<UINT32>& indices, UINT32* outIndexOffset)
 	{
-		if (pOutIndexOffset)
+		if (outIndexOffset)
 		{
-			*pOutIndexOffset = static_cast<uint32_t>(m_Indices.size());
+			*outIndexOffset = static_cast<UINT32>(m_Indices.size());
 		}
 
 		m_Indices.insert(m_Indices.end(), indices.begin(), indices.end());
 	}
 
-	uint32_t Mesh::GetVertexCount() const 
+	UINT32 Mesh::GetVertexCount() const 
 	{
-		return static_cast<uint32_t>(m_Vertices.size());
+		return static_cast<UINT32>(m_Vertices.size());
 	}
 
-	uint32_t Mesh::GetIndexCount() const 
+	UINT32 Mesh::GetIndexCount() const 
 	{
-		return static_cast<uint32_t>(m_Indices.size());
+		return static_cast<UINT32>(m_Indices.size());
 	}
 
 	void Mesh::CreateBuffers()
@@ -90,18 +90,19 @@ namespace Dive
 		// Mehs는 또 어떻게 해당 객체를 가지고 있느냐는 문제에 빠지게 된다.
 		// 1. 물론 메시는 Graphics나 ID3D11Device를 가지지 않고 이 함수의 매개변수에서 전달받을 순 있다.
 		// 2. 버퍼를 외부에서 생성하고 메시에 포함시키는 방법도 있다.
-		if(!m_Vertices.empty())
-			m_pVertexBuffer = VertexBuffer::Create(m_Vertices.data(), sizeof(VertexStatic), static_cast<uint32_t>(m_Vertices.size()));
+		if (!m_Vertices.empty())
+			m_VertexBuffer = VertexBuffer::Generate(m_Vertices.data(), sizeof(VertexStatic), static_cast<UINT32>(m_Vertices.size()));
 
-		if(!m_Indices.empty())
-			m_pIndexBuffer = IndexBuffer::Create(m_Indices.data(), static_cast<uint32_t>(m_Indices.size()));
+		if (!m_Indices.empty())
+			m_IndexBuffer = IndexBuffer::Generate(m_Indices.data(), static_cast<UINT32>(m_Indices.size()));
+
 	}
 
 	void Mesh::ComputeBouingBox()
 	{
 		DV_ASSERT(Mesh, !m_Vertices.empty());
 
-		m_BoundingBox = BoundingBox(static_cast<VertexStatic*>(m_Vertices.data()), static_cast<uint32_t>(m_Vertices.size()));
+		m_BoundingBox = BoundingBox(static_cast<VertexStatic*>(m_Vertices.data()), static_cast<UINT32>(m_Vertices.size()));
 	}
 }
 

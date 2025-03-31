@@ -16,8 +16,8 @@ namespace Dive
 	public:
 		BoundingBox();
 		BoundingBox(const DirectX::XMFLOAT3& min, const DirectX::XMFLOAT3& max);
-		BoundingBox(const DirectX::XMFLOAT3* pPoints, uint32_t pointCount);
-		BoundingBox(const VertexStatic* pVertices, uint32_t vertexCount);
+		BoundingBox(const DirectX::XMFLOAT3* points, UINT32 pointCount);
+		BoundingBox(const VertexStatic* vertices, UINT32 vertexCount);
 		~BoundingBox() = default;
 
 		BoundingBox& operator=(const BoundingBox&) = default;

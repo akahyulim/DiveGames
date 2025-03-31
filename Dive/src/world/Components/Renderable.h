@@ -1,7 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "Math/BoundingBox.h"
-#include "Renderer/Renderer.h"
+//#include "Renderer/Renderer.h"
 
 namespace Dive
 {

@@ -5,23 +5,21 @@ namespace Dive
 	class VertexBuffer
 	{
 	public:
-		VertexBuffer();
+		VertexBuffer() = default;
 		~VertexBuffer();
 
-		bool CreateBuffer(const void* pData, uint32_t stride, uint32_t count);
-		void Destroy();
+		bool Create(const void* data, UINT32 stride, UINT32 count);
+		void Release();
 
-		ID3D11Buffer* GetBuffer() const { return m_pBuffer; }
-		uint32_t GetStride() const { return m_Stride; }
-		uint32_t GetCount() const { return m_Count; }
+		ID3D11Buffer* GetBuffer() const { return m_Buffer; }
+		UINT32 GetStride() const { return m_Stride; }
+		UINT32 GetCount() const { return m_Count; }
 
-	public:
-		static VertexBuffer* Create(const void* pData, uint32_t stride, uint32_t count);
+		static std::shared_ptr<VertexBuffer> Generate(const void* data, UINT32 stride, UINT32 count);
 
 	private:
-		ID3D11Buffer* m_pBuffer;
-
-		uint32_t m_Stride;
-		uint32_t m_Count;
+		ID3D11Buffer* m_Buffer = nullptr;
+		UINT32 m_Stride = 0;
+		UINT32 m_Count = 0;
 	};
 }

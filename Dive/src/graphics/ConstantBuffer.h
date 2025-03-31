@@ -1,42 +1,30 @@
 #pragma once
 #include "Core/CoreDefs.h"
-#include "Graphics.h"
 
 namespace Dive
 {
 	class ConstantBuffer
 	{
 	public:
-		ConstantBuffer();
-		ConstantBuffer(const std::string& name, uint32_t stride);
+		ConstantBuffer() = default;
 		~ConstantBuffer();
 
 		bool GenerateBuffer();
+		bool Create(UINT32 stride);
 		void Release();
 		
 		void* Map();
 		void Unmap();
 
-		std::string GetName() const { return m_Name; }
-		void SetName(const std::string& name) { m_Name = name; }
-
-		uint32_t GetStride() const { return m_Stride; }
-		void SetStride(uint32_t stride) { m_Stride = stride; }
+		UINT32 GetStride() const { return m_Stride; }
+		void SetStride(UINT32 stride) { m_Stride = stride; }
 		
-		ID3D11Buffer* GetBuffer() const { return m_pBuffer; }
+		ID3D11Buffer* GetBuffer() const { return m_Buffer; }
 
-		static ConstantBuffer* Create(const std::string& name, uint32_t stride)
-		{
-			auto pNewCBuffer = new ConstantBuffer(name, stride);
-			if (!pNewCBuffer->GenerateBuffer())
-				DV_DELETE(pNewCBuffer);
-
-			return pNewCBuffer;
-		}
+		static std::shared_ptr<ConstantBuffer> Generate(UINT32 stride);
 
 	private:
-		ID3D11Buffer* m_pBuffer;
-		std::string m_Name;
-		uint32_t m_Stride;
+		ID3D11Buffer* m_Buffer = nullptr;
+		UINT32 m_Stride = 0;
 	};
 }

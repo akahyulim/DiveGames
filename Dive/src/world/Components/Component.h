@@ -11,13 +11,10 @@ namespace Dive
 		DV_CLASS(Component, Object)
 
 	public:
-		Component(GameObject* pGameObject);
+		Component(GameObject* gameObject);
 		~Component() override = default;
 
 		virtual void Update() {}
-
-		virtual void SaveToYaml(YAML::Node config) {}
-		virtual void LaodFromYaml(const YAML::Node& config) {}
 
 		// 이름을 GetVertexCBuffer()로 바꾸기
 		virtual ConstantBuffer* GetConstantBufferVS() { return nullptr; }
@@ -28,9 +25,9 @@ namespace Dive
 		std::string GetName() const;
 
 		GameObject* GetGameObject() const;
-		void SetGameObject(GameObject* pGameObject) { m_pGameObject = pGameObject; }
+		void SetGameObject(GameObject* gameObject) { m_GameObject = gameObject; }
 		
 	protected:
-		GameObject* m_pGameObject;
+		GameObject* m_GameObject;
 	};
 }

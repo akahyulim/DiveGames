@@ -8,52 +8,47 @@ namespace Dive
 	class Input
 	{
 	public:
-		Input();
-		~Input();
+		static void Initialize();
+		static void Shutdown();
 
-		bool Initialize(HINSTANCE hInstance, HWND hWnd);
-		void Shutdown();
+		static void Tick();
+		static void ReadKeyboard();
+		static void ReadMouse();
 
-		void Tick();
-		void ReadKeyboard();
-		void ReadMouse();
+		static bool KeyState(int key);
+		static bool KeyDown(int key);
+		static bool KeyUp(int key);
+		static bool KeyPress(int key);
 
-		bool KeyState(int key);
-		bool KeyDown(int key);
-		bool KeyUp(int key);
-		bool KeyPress(int key);
+		static bool MouseButtonState(int btn);
+		static bool MouseButtonDown(int btn);
+		static bool MouseButtonUp(int btn);
+		static bool MouseButtonPress(int btn);
 
-		bool MouseButtonState(int btn);
-		bool MouseButtonDown(int btn);
-		bool MouseButtonUp(int btn);
-		bool MouseButtonPress(int btn);
+		static const DirectX::XMFLOAT2& GetMouseMoveDelta();
 
-		const DirectX::XMFLOAT2& GetMouseMoveDelta();
+		static const DirectX::XMFLOAT2& GetMousePosition();
 
-		const DirectX::XMFLOAT2& GetMousePosition();
+		static bool GetMouseIsInValidRect();
 
-		bool GetMouseIsInValidRect();
+		static void SetMouseIsInValidRect(bool valid);
 
-		void SetMouseIsInValidRect(bool valid);
-	
 	private:
-	
-	private:
-		IDirectInput8* m_pDirectInput;
-		IDirectInputDevice8* m_pKeyboard;
-		IDirectInputDevice8* m_pMouse;
+		static IDirectInput8* s_DirectInput;
+		static IDirectInputDevice8* s_Keyboard;
+		static IDirectInputDevice8* s_Mouse;
 
-		uint8_t m_KeyStates[MAX_NUM_KEYS];
-		uint8_t m_OldKeyStates[MAX_NUM_KEYS];
+		static uint8_t s_KeyStates[MAX_NUM_KEYS];
+		static uint8_t s_OldKeyStates[MAX_NUM_KEYS];
 
-		DIMOUSESTATE m_MouseState;
+		static DIMOUSESTATE s_MouseState;
 
-		uint8_t m_MouseButtons[MAX_NUM_BUTTONS];
-		uint8_t m_OldMouseButtons[MAX_NUM_BUTTONS];
-		DirectX::XMFLOAT2 m_MousePosition;
-		DirectX::XMFLOAT2 m_OldMousePosition;
-		DirectX::XMFLOAT2 m_MouseDelta;
+		static uint8_t s_MouseButtons[MAX_NUM_BUTTONS];
+		static uint8_t s_OldMouseButtons[MAX_NUM_BUTTONS];
+		static DirectX::XMFLOAT2 s_MousePosition;
+		static DirectX::XMFLOAT2 s_OldMousePosition;
+		static DirectX::XMFLOAT2 s_MouseDelta;
 
-		bool m_MouseIsInValidRect;
+		static bool s_MouseIsInValidRect;
 	};
 }

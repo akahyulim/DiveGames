@@ -1,41 +1,28 @@
 #include "stdafx.h"
 #include "ConstantBuffer.h"
+#include "Graphics.h"
 #include "core/CoreDefs.h"
-#include "core/Engine.h"
 
 namespace Dive
 {
-	ConstantBuffer::ConstantBuffer()
-		: m_pBuffer(nullptr)
-		, m_Stride(0)
-	{
-	}
-
-	ConstantBuffer::ConstantBuffer(const std::string& name, uint32_t stride)
-		: m_pBuffer(nullptr)
-		, m_Name(name)
-		, m_Stride(stride)
-	{
-	}
-
 	ConstantBuffer::~ConstantBuffer()
 	{
 		Release();
 	}
 
-	bool ConstantBuffer::GenerateBuffer()
+	bool ConstantBuffer::Create(UINT32 stride)
 	{
 		Release();
 
-		D3D11_BUFFER_DESC desc{};
-		desc.Usage = D3D11_USAGE_DYNAMIC;
-		desc.ByteWidth = m_Stride;
-		desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		D3D11_BUFFER_DESC bufferDesc{};
+		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+		bufferDesc.ByteWidth = m_Stride;
+		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-		if (FAILED(GEngine->GetDevice()->CreateBuffer(&desc, nullptr, &m_pBuffer)))
+		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_Buffer)))
 		{
-			DV_LOG(ConstantBuffer, err, "ConstantBuffer({:s}) 생성에 실패하였습니다.", GetName());
+			DV_LOG(ConstantBuffer, err, "ConstantBuffer 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -44,22 +31,22 @@ namespace Dive
 
 	void ConstantBuffer::Release()
 	{
-		DV_RELEASE(m_pBuffer);
+		DV_RELEASE(m_Buffer);
 	}
 
 	void* ConstantBuffer::Map()
 	{
-		DV_ASSERT(ConstantBuffer, m_pBuffer);
+		DV_ASSERT(ConstantBuffer, m_Buffer);
 
-		D3D11_MAPPED_SUBRESOURCE mappedData;
-		if (FAILED(GEngine->GetDeviceContext()->Map(
-			static_cast<ID3D11Resource*>(m_pBuffer),
+		D3D11_MAPPED_SUBRESOURCE mappedData{};
+		if (FAILED(Graphics::GetDeviceContext()->Map(
+			static_cast<ID3D11Resource*>(m_Buffer),
 			0,
 			D3D11_MAP_WRITE_DISCARD,
 			0,
 			&mappedData)))
 		{
-			DV_LOG(ConstantBuffer, err, "ConstantBuffer({:s})의 Map에 실패하였습니다.", GetName());
+			DV_LOG(ConstantBuffer, err, "ConstantBuffer의 Map에 실패하였습니다.");
 			return nullptr;
 		}
 
@@ -68,6 +55,15 @@ namespace Dive
 
 	void ConstantBuffer::Unmap()
 	{
-		GEngine->GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_pBuffer), 0);
+		Graphics::GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_Buffer), 0);
+	}
+
+	std::shared_ptr<ConstantBuffer> ConstantBuffer::Generate(UINT32 stride)
+	{
+		auto constantBuffer = std::make_shared<ConstantBuffer>();
+		if (!constantBuffer->Create(stride))
+			return nullptr;
+
+		return constantBuffer;
 	}
 }

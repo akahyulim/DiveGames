@@ -1,42 +1,24 @@
 #include "stdafx.h"
 #include "Window.h"
-#include "Log.h"
+#include "CoreDefs.h"
 
 namespace Dive
 {
-	constexpr LPCWSTR DV_WND_CLASS_NAME = L"DiveWindow";
-	constexpr uint32_t DV_WND_WIDTH = 800;
-	constexpr uint32_t DV_WND_HEIGHT = 600;
+	constexpr LPCWCHAR WND_CLASS_NAME = L"DIVE_WINDOW";
+	constexpr int DEFAULT_WIDTH = 1280;
+	constexpr int DEFAULT_HEIGHT = 720;
 
-	Window::Window()
-		: m_hInstance(nullptr)
-		, m_hWnd(nullptr)
-		, m_Title(L"Dive")
-		, m_bWindowed(true)
-	{
-	}
+	HINSTANCE Window::s_hInstance = nullptr;
+	HWND Window::s_hWnd = nullptr;
+	std::wstring Window::s_Title = L"DIVE";
 
-	Window::Window(const WindowData& data)
-		: m_hInstance(::GetModuleHandle(nullptr))
-		, m_hWnd(nullptr)
-		, m_Title(data.Title)
-		, m_bWindowed(true)
-		, m_Width(data.Width)
-		, m_Height(data.Height)
+	void Window::Initialize()
 	{
-		if (!initialize()) {
-			throw std::runtime_error("윈도우 생성 및 초기화 실패");
-		}
-	}
-
-	bool Window::Initialize(HINSTANCE hInstance, uint32_t width, uint32_t height, LPCWSTR pTitle)
-	{
-		m_hInstance = hInstance;
-		m_Title = pTitle;
+		s_hInstance = ::GetModuleHandle(nullptr);
 
 		WNDCLASSEX wc{};
 		wc.style = 0;
-		wc.hInstance = m_hInstance;
+		wc.hInstance = s_hInstance;
 		wc.lpfnWndProc = ::DefWindowProc;
 		wc.cbClsExtra = 0;
 		wc.cbWndExtra = 0;
@@ -45,58 +27,53 @@ namespace Dive
 		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 		wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 		wc.lpszMenuName = NULL;
-		wc.lpszClassName = DV_WND_CLASS_NAME;
+		wc.lpszClassName = WND_CLASS_NAME;
 		wc.cbSize = sizeof(WNDCLASSEX);
 
-		if (!::RegisterClassEx(&wc))
+		if (!::RegisterClassEx(&wc)) 
 		{
 			DV_LOG(Window, err, "윈도우 클래스 등록 실패");
-			return false;
+			return;
 		}
 
 		DWORD style = WS_OVERLAPPEDWINDOW;
-		m_bWindowed = true;
 
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - static_cast<int>(width)) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - static_cast<int>(height)) / 2;
+		int posX = (GetSystemMetrics(SM_CXSCREEN) - DEFAULT_WIDTH) / 2;
+		int posY = (GetSystemMetrics(SM_CYSCREEN) - DEFAULT_HEIGHT) / 2;
 
-		m_hWnd = CreateWindowEx(
+		s_hWnd = CreateWindowEx(
 			WS_EX_APPWINDOW,
-			DV_WND_CLASS_NAME,
-			m_Title.c_str(),
+			WND_CLASS_NAME,
+			s_Title.c_str(),
 			style,
 			posX > 0 ? posX : 0,
 			posY > 0 ? posY : 0,
-			DV_WND_WIDTH, DV_WND_HEIGHT,			// 최초엔 디폴트 크기로 생성
+			DEFAULT_WIDTH, DEFAULT_HEIGHT,
 			NULL, NULL,
-			m_hInstance,
+			s_hInstance,
 			NULL);
 
-		if (!m_hWnd)
+		if (!s_hWnd)
 		{
 			DV_LOG(Window, critical, "윈도우 생성 실패");
-			return false;
+			return;
 		}
 
-		DV_LOG(Window, trace, "초기화 성공");
-
-		return Resize(width, height);
+		Show();
 	}
 
 	void Window::Shutdown()
 	{
 		::ShowCursor(TRUE);
 
-		::DestroyWindow(m_hWnd);
-		m_hWnd = nullptr;
+		::DestroyWindow(s_hWnd);
+		s_hWnd = nullptr;
 
-		::UnregisterClass(DV_WND_CLASS_NAME, m_hInstance);
-		m_hInstance = nullptr;
-
-		DV_LOG(Window, trace, "셧다운 성공");
+		::UnregisterClass(WND_CLASS_NAME, s_hInstance);
+		s_hInstance = nullptr;
 	}
 
-	bool Window::Run()
+	bool Window::Tick()
 	{
 		MSG msg{};
 		if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
@@ -108,159 +85,159 @@ namespace Dive
 		return msg.message != WM_QUIT;
 	}
 
-	// width, height를 각각 0으로 전달할 경우 창 or 보더리스 모드만 변경 
-	bool Window::Resize(uint32_t width, uint32_t height, bool windowed)
+	void Window::SetMessageCallback(LONG_PTR callBack)
 	{
-		if (m_hWnd)
+		if (!SetWindowLongPtr(s_hWnd, GWLP_WNDPROC, callBack))
+			DV_LOG(Window, err, "프로시져 함수 변경에 실패하였습니다.");
+	}
+
+	bool Window::Resize(const uint32_t width, const uint32_t height)
+	{
+		DV_ASSERT(Window, s_hWnd);
+
+		int posX = (::GetSystemMetrics(SM_CXSCREEN) - width) / 2;
+		int posY = (::GetSystemMetrics(SM_CYSCREEN) - height) / 2;
+		
+		if (!::SetWindowPos(s_hWnd, NULL, posX, posY, width, height, SWP_NOZORDER | SWP_DRAWFRAME))
 		{
-			DWORD style = windowed ? WS_OVERLAPPEDWINDOW : WS_POPUP;
-
-			if (m_bWindowed != windowed)
-			{
-				m_bWindowed = windowed;
-
-				if (!::SetWindowLongPtr(m_hWnd, GWL_STYLE, style))
-				{
-					DV_LOG(Window, err, "윈도우 스타일 변경 실패");
-					return false;
-				}
-			}
-
-			RECT rt = { 0, 0,
-				width != 0 ? static_cast<LONG>(width) : static_cast<LONG>(GetWidth()),
-				height != 0 ? static_cast<LONG>(height) : static_cast<LONG>(GetHeight()) };
-
-			if (!::AdjustWindowRect(&rt, style, FALSE))
-			{
-				DV_LOG(Window, err, "스타일에 맞춘 윈도우 크기 계산 실패");
-				return false;
-			}
-
-			int newWidth = rt.right - rt.left;
-			int newHeight = rt.bottom - rt.top;
-			int posX = (::GetSystemMetrics(SM_CXSCREEN) - newWidth) / 2;
-			int posY = (::GetSystemMetrics(SM_CYSCREEN) - newHeight) / 2;
-
-			if (!::SetWindowPos(m_hWnd, NULL, posX, posY, newWidth, newHeight, SWP_DRAWFRAME))
-			{
-				DV_LOG(Window, err, "윈도우 크기 변경 실패");
-				return false;
-			}
-
-			ShowWindow(SW_SHOW);
+			DV_LOG(Window, err, "윈도우 크기 변경 실패");
+			return false;
 		}
 
 		return true;
-	}
-
-	DirectX::XMUINT2 Window::GetSize()
-	{
-		if (!m_hWnd)
-			return { 0, 0 };
-
-		RECT rt{};
-		::GetClientRect(m_hWnd, &rt);
-
-		return { static_cast<uint32_t>(rt.right - rt.left), static_cast<uint32_t>(rt.bottom - rt.top) };
 	}
 
 	uint32_t Window::GetWidth()
 	{
-		return GetSize().x;
+		DV_ASSERT(Window, s_hWnd);
+
+		RECT rt{};
+		::GetClientRect(s_hWnd, &rt);
+
+		return static_cast<uint32_t>(rt.right - rt.left);
 	}
 
 	uint32_t Window::GetHeight()
 	{
-		return GetSize().y;
+		DV_ASSERT(Window, s_hWnd);
+
+		RECT rt{};
+		::GetClientRect(s_hWnd, &rt);
+
+		return static_cast<uint32_t>(rt.bottom - rt.top);
 	}
 
-	void Window::SetTitle(LPCWSTR title)
+	void Window::Show()
 	{
-		if (title != nullptr)
-		{
-			m_Title = title;
+		DV_ASSERT(Window, s_hWnd);
+		::ShowWindow(s_hWnd, SW_SHOW);
+		::SetForegroundWindow(s_hWnd);
+		::SetFocus(s_hWnd);
+	}
 
-			if (m_hWnd)
+	void Window::Hide()
+	{
+		DV_ASSERT(Window, s_hWnd);
+		::ShowWindow(s_hWnd, SW_HIDE);
+	}
+
+	void Window::Close()
+	{
+		DV_ASSERT(Window, s_hWnd);
+		::PostQuitMessage(0);
+	}
+
+	bool Window::IsFullScreen()
+	{
+		DV_ASSERT(Window, s_hWnd);
+
+		if (!(GetWindowLong(s_hWnd, GWL_STYLE) & WS_POPUP))
+			return false;
+
+		RECT rt{};
+		::GetClientRect(s_hWnd, &rt);
+
+		return (::GetSystemMetrics(SM_CXSCREEN) == static_cast<int>(rt.right - rt.left)) &&
+			(::GetSystemMetrics(SM_CYSCREEN) == static_cast<int>(rt.bottom - rt.top));
+	}
+	
+	void Window::FullScreen()
+	{
+		DV_ASSERT(Window, s_hWnd);
+
+		if (!IsFullScreen())
+		{
+			SetWindowLong(s_hWnd, GWL_STYLE, WS_POPUP);
+			SetWindowPos(s_hWnd, HWND_TOP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
+				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		}
+	}
+
+	void Window::SetWindowed(bool windowed)
+	{
+		DV_ASSERT(Window, s_hWnd);
+
+		LONG currentStyle = GetWindowLong(s_hWnd, GWL_STYLE);
+
+		if (windowed)
+		{
+			LONG newStyle = WS_POPUP;
+			if (currentStyle != newStyle)
 			{
-				::SetWindowText(m_hWnd, title);
+				SetWindowLong(s_hWnd, GWL_STYLE, newStyle);
+				SetWindowPos(s_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+			}
+		}
+		else
+		{
+			LONG newStyle = WS_OVERLAPPEDWINDOW;
+			if (currentStyle != newStyle)
+			{
+				SetWindowLong(s_hWnd, GWL_STYLE, newStyle);
+				SetWindowPos(s_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 			}
 		}
 	}
-
-	void Window::ShowWindow(int nCmdShow)
+	
+	void Window::Minimize()
 	{
-		::ShowWindow(m_hWnd, nCmdShow);
+		DV_ASSERT(Window, s_hWnd);
+
+		if (!::IsIconic(s_hWnd))
+			::ShowWindow(s_hWnd, SW_MINIMIZE);
+	}
+	
+	void Window::Maximize()
+	{
+		DV_ASSERT(Window, s_hWnd);
+
+		if (!::IsZoomed(s_hWnd))
+			::ShowWindow(s_hWnd, SW_MAXIMIZE);
 	}
 
-	bool Window::ChangeProc(LONG_PTR pWndProc)
+	void Window::Restore()
 	{
-		if (!SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, pWndProc))
-		{
-			DV_LOG(Window, err, "프로시져 함수 변경에 실패하였습니다.");
-			return false;
-		}
+		DV_ASSERT(Window, s_hWnd);
 
-		return true;
+		if (::IsZoomed(s_hWnd))
+			::ShowWindow(s_hWnd, SW_RESTORE);
 	}
 
-	std::unique_ptr<Window> Window::Create(const WindowData& data)
+	bool Window::IsMaximize()
 	{
-		try {
-			return std::make_unique<Window>(data);
-		}
-		catch (const std::exception&) {
-			return nullptr;
-		}
+		DV_ASSERT(Window, s_hWnd);
+		
+		return ::IsZoomed(s_hWnd);
 	}
 
-	bool Window::initialize()
+	void Window::SetTitle(const std::wstring& title)
 	{
-		WNDCLASSEX wc{};
-		wc.style = 0;
-		wc.hInstance = m_hInstance;
-		wc.lpfnWndProc = ::DefWindowProc;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
-		wc.hIconSm = wc.hIcon;
-		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-		wc.lpszMenuName = NULL;
-		wc.lpszClassName = DV_WND_CLASS_NAME;
-		wc.cbSize = sizeof(WNDCLASSEX);
+		DV_ASSERT(Window, s_hWnd);
 
-		if (!::RegisterClassEx(&wc))
+		if (s_Title != title)
 		{
-			DV_LOG(Window, err, "윈도우 클래스 등록 실패");
-			return false;
+			::SetWindowText(s_hWnd, title.c_str());
+			s_Title = title;
 		}
-
-		DWORD style = WS_OVERLAPPEDWINDOW;
-		m_bWindowed = true;
-
-		int posX = (GetSystemMetrics(SM_CXSCREEN) - static_cast<int>(m_Width)) / 2;
-		int posY = (GetSystemMetrics(SM_CYSCREEN) - static_cast<int>(m_Height)) / 2;
-
-		m_hWnd = CreateWindowEx(
-			WS_EX_APPWINDOW,
-			DV_WND_CLASS_NAME,
-			m_Title.c_str(),
-			style,
-			posX > 0 ? posX : 0,
-			posY > 0 ? posY : 0,
-			DV_WND_WIDTH, DV_WND_HEIGHT,			// 최초엔 디폴트 크기로 생성
-			NULL, NULL,
-			m_hInstance,
-			NULL);
-
-		if (!m_hWnd)
-		{
-			DV_LOG(Window, critical, "윈도우 생성 실패");
-			return false;
-		}
-
-		DV_LOG(Window, trace, "초기화 성공");
-
-		return Resize(m_Width, m_Height);
 	}
 }

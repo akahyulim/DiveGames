@@ -3,39 +3,39 @@
 
 namespace Dive
 {
-	TypeInfo::TypeInfo(const std::string& typeName, const TypeInfo* pBaseTypeInfo)
+	TypeInfo::TypeInfo(const std::string& typeName, const TypeInfo* baseTypeInfo)
 		: m_TypeHash(std::hash<std::string>{}(typeName))
 		, m_TypeName(typeName)
-		, m_pBaseTypeInfo(pBaseTypeInfo)
+		, m_BaseTypeInfo(baseTypeInfo)
 	{
 	}
 
 	bool TypeInfo::IsTypeOf(size_t typeHash) const
 	{
-		const TypeInfo* pCurrent = this;
-		while (pCurrent)
+		const TypeInfo* curTypeInfo = this;
+		while (curTypeInfo)
 		{
-			if (pCurrent->GetTypeHash() == typeHash)
+			if (curTypeInfo->GetTypeHash() == typeHash)
 				return true;
 
-			pCurrent = pCurrent->GetBaseTypeInfo();
+			curTypeInfo = curTypeInfo->GetBaseTypeInfo();
 		}
 
 		return false;
 	}
 
-	bool TypeInfo::IsTypeOf(const TypeInfo* pTypeInfo) const
+	bool TypeInfo::IsTypeOf(const TypeInfo* typeInfo) const
 	{
-		if (!pTypeInfo)
+		if (!typeInfo)
 			return false;
 
-		const TypeInfo* pCurrent = this;
-		while (pCurrent)
+		const TypeInfo* curTypeInfo = this;
+		while (curTypeInfo)
 		{
-			if (pCurrent == pTypeInfo || pCurrent->GetTypeHash() == pTypeInfo->GetTypeHash())
-				return true;
+			if (curTypeInfo == typeInfo || curTypeInfo->GetTypeHash() == typeInfo->GetTypeHash())
+				return true;	
 
-			pCurrent = pCurrent->GetBaseTypeInfo();
+			curTypeInfo = curTypeInfo->GetBaseTypeInfo();
 		}
 
 		return false;

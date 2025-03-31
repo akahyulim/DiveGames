@@ -3,23 +3,17 @@
 #include "WorldSerializer.h"
 #include "GameObject.h"
 #include "Components/Transform.h"
-#include "core/CoreDefs.h"
+#include "core/EventDispatcher.h"
+#include "core/UUID.h"
 
 namespace Dive
 {
-	static constexpr uint64_t FIRST_ID = 0x1;
-	static constexpr uint64_t LAST_ID = 0xffffffffffffffff;
-
-	World::World()
-		: m_Name("New World")
-		, m_CurGameObjectID(FIRST_ID)
-	{
-	}
-
 	World::World(const std::string& name)
 		: m_Name(name)
-		, m_CurGameObjectID(FIRST_ID)
+		, m_CurGameObjectID(0)
+		, m_IsDirty(true)
 	{
+		DV_SUBSCRIBE_EVENT(Dive::eEventType::WorldModified, DV_EVENT_HANDLER(OnModified));
 	}
 
 	World::~World()
@@ -29,101 +23,83 @@ namespace Dive
 
 	void World::Clear()
 	{
-		for (auto& [id, pGameObject] : m_GameObjects)
+		for (auto& [id, gameObject] : m_GameObjects)
 		{
-			DV_DELETE(pGameObject);
+			DV_DELETE(gameObject);
 		}
 		m_GameObjects.clear();
-		m_CurGameObjectID = FIRST_ID;
+		m_CurGameObjectID = 0;
+		m_IsDirty = true;
 	}
 
-	void World::Tick()
+	void World::Update()
 	{
-		auto it = m_GameObjects.begin();
-		for (it; it != m_GameObjects.end();)
+		for (auto& [id, gameObject] : m_GameObjects)
 		{
-			if (it->second->IsRemovedTarget())
-			{
-				DV_DELETE(it->second);
-				it = m_GameObjects.erase(it);
-			}
-			else 
-			{
-				++it;
-			}
-		}
-
-		for (auto& [id, pGameObject] : m_GameObjects)
-		{
-			pGameObject->Update();
+			gameObject->Update();
 		}
 	}
 
 	GameObject* World::CreateGameObject(const std::string& name)
 	{
-		auto id = getFreeGameObjectID();
-		if (id == 0)
+		return CreateGameObject(UUID(), name);
+	}
+
+	GameObject* World::CreateGameObject(UINT64 id, const std::string& name)
+	{
+		if (m_GameObjects.find(id) != m_GameObjects.end())
 		{
-			DV_LOG(World, err, "더이상 새로운 GameObjecrt를 생성할 수 없습니다.");
+			DV_LOG(World, warn, "이미 존재하는 ID: {}", id);
 			return nullptr;
 		}
 
-		auto pNewGameObject = new GameObject(this, name);
-		m_GameObjects[id] = pNewGameObject;
-		pNewGameObject->SetID(id);
+		auto gameObject = new GameObject(this, name);
+		m_GameObjects[id] = gameObject;
+		gameObject->SetID(id);
 
-		return pNewGameObject;
+		return gameObject;
 	}
 
-	void World::RemoveGameObject(GameObject* pGameObject)
+	void World::DeleteGameObject(GameObject* gameObject)
 	{
-		if (!pGameObject || m_GameObjects.empty())
+		if (!gameObject || m_GameObjects.empty())
 			return;
 
-		RemoveGameObjectByID(pGameObject->GetID());
+		DeleteGameObjectByID(gameObject->GetID());
 	}
 
-	void World::RemoveGameObjectByID(uint64_t id)
+	void World::DeleteGameObjectByID(UINT64 id)
 	{
-		if (!id || m_GameObjects.empty())
-			return;
-
 		auto it = m_GameObjects.find(id);
 		if (it != m_GameObjects.end())
 		{
-			auto pTransform = it->second->GetComponent<Transform>();
-			if (pTransform->HasChild())
+			for (auto child : it->second->GetTransform()->GetChildren())
 			{
-				for (auto pChild : pTransform->GetChildren())
-				{
-					RemoveGameObjectByID(pChild->GetGameObject()->GetID());
-				}
+				child->SetParent(nullptr);
+				DeleteGameObjectByID(child->GetGameObject()->GetID());
 			}
 
-			if (!pTransform->IsRoot())
-			{
-				pTransform->SetParent(nullptr);
-			}
-
-			it->second->MarkRemoveTarget();
+			DV_DELETE(it->second);
+			m_GameObjects.erase(it);
+			m_IsDirty = true;
 		}
 	}
 
-	GameObject* World::GetGameObjectByID(uint64_t id)
+	GameObject* World::GetGameObjectByID(UINT64 id)
 	{
 		auto it = m_GameObjects.find(id);
 		return it != m_GameObjects.end() ? it->second : nullptr;
 	}
 
-	bool World::ExistsGameObject(GameObject* pGameObject)
+	bool World::ExistsGameObject(GameObject* gameObject)
 	{
-		if (!pGameObject)
+		if (!gameObject)
 			return false;
 
-		return ExistsGameObjectByID(pGameObject->GetID());
+		return ExistsGameObjectByID(gameObject->GetID());
 	}
 
-	bool World::ExistsGameObjectByID(uint64_t id)
+	bool World::ExistsGameObjectByID(UINT64 id)
 	{
 		auto it = m_GameObjects.find(id);
 		return it != m_GameObjects.end();
@@ -154,28 +130,22 @@ namespace Dive
 		return allGameObjects;
 	}
 
-	uint64_t World::GetGameObjectsCount()
+	UINT64 World::GetGameObjectsCount()
 	{
-		return static_cast<uint64_t>(m_GameObjects.size());
+		return static_cast<UINT64>(m_GameObjects.size());
 	}
 
-	uint64_t World::getFreeGameObjectID()
+	void World::SetName(const std::string& name)
 	{
-		auto checkID = m_CurGameObjectID;
-
-		for (;;)
+		if (m_Name != name)
 		{
-			auto freeID = m_CurGameObjectID;
-
-			if (m_CurGameObjectID < LAST_ID)
-				++m_CurGameObjectID;
-			else
-				m_CurGameObjectID = FIRST_ID;
-
-			if (checkID == m_CurGameObjectID)
-				return 0;
-			else if (!m_GameObjects[freeID])
-				return freeID;
+			m_Name = name;
+			m_IsDirty = true;
 		}
+	}
+
+	void World::OnModified()
+	{
+		m_IsDirty = true;
 	}
 }

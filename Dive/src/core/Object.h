@@ -5,22 +5,22 @@ namespace Dive
 	class TypeInfo
 	{
 	public:
-		TypeInfo(const std::string& pTypeName, const TypeInfo* pBaseTypeInfo);
+		TypeInfo(const std::string& typeName, const TypeInfo* baseTypeInfo);
 		virtual ~TypeInfo() = default;
 
 		bool IsTypeOf(size_t typeHash) const;
-		bool IsTypeOf(const TypeInfo* pTypeInfo) const;
+		bool IsTypeOf(const TypeInfo* typeInfo) const;
 		template<typename T> bool IsTypeOf() const;
 
 		size_t GetTypeHash() const { return m_TypeHash; }
 		const std::string& GetTypeName() const { return m_TypeName; }
-		const TypeInfo* GetBaseTypeInfo() const { return m_pBaseTypeInfo; }
+		const TypeInfo* GetBaseTypeInfo() const { return m_BaseTypeInfo; }
 
 	private:
 		size_t m_TypeHash;
 		std::string m_TypeName;
 
-		const TypeInfo* m_pBaseTypeInfo;
+		const TypeInfo* m_BaseTypeInfo;
 	};
 
 	template<typename T>

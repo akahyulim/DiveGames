@@ -1,10 +1,9 @@
 #pragma once
 #include "Component.h"
-#include "Renderer/Renderer.h"
 
 namespace Dive
 {
-	class Texture2D;
+	class RenderTexture;
 	class ConstantBuffer;
 
 	class Camera : public Component
@@ -20,13 +19,14 @@ namespace Dive
 		DV_CLASS(Camera, Component)
 
 	public:
-		Camera(GameObject* pGameObject);
+		Camera(GameObject* gameObject);
 		~Camera() override;
 
 		void Update() override;
 
+		// 왜 이래 놨을까?
 		DirectX::XMFLOAT3 GetPosition();
-		DirectX::XMMATRIX GetWorldMatrix();
+		DirectX::XMMATRIX GetSceneMatrix();
 		DirectX::XMMATRIX GetViewMatrix();
 		DirectX::XMMATRIX GetProjectionMatrix() const;
 		DirectX::XMMATRIX GetOrthographicProjMatrix() const;
@@ -55,34 +55,21 @@ namespace Dive
 		float GetRotateSpeed() const { return m_RotateSpeed; }
 		void SetRotateSpeed(float speed) { m_RotateSpeed = speed; }
 
-		ID3D11RenderTargetView* GetRenderTargetView() const;
-		Texture2D* GetRenderTargetTex() const { return m_pRenderTargetTex; }
-		void SetRenderTargetTex(Texture2D* pRenderTarget) { m_pRenderTargetTex = pRenderTarget; }
-		DirectX::XMFLOAT2 GetRenderTargetSize() const;
-
-
-		// 위치 옮기기?
-		ConstantBuffer* GetConstantBufferVS() override;// { return m_pCBufferVS; }
-		ConstantBuffer* GetConstantBufferDS() override;// { return m_pCBufferDS; }
-		ConstantBuffer* GetConstantBufferPS() override;// { return m_pCBufferPS; }
+		
+		std::shared_ptr<RenderTexture> GetRenderTexture() const { return m_RenderTexture; }
+		void SetRenderTexture(std::shared_ptr<RenderTexture> renderTexture) { m_RenderTexture = renderTexture; }
+		DirectX::XMUINT2 GetRenderTextureSize() const;
 
 	protected:
-		eProjectionType m_ProjectionType;
+		eProjectionType m_ProjectionType = eProjectionType::Perspective;
 
-		DirectX::XMFLOAT4 m_BackgroundColor;
+		float m_FieldOfView = 45.0f;
+		float m_NearClipPlane = 0.1f;
+		float m_FarClipPlane = 1000.0f;
+		float m_MoveSpeed = 10.0f;
+		float m_RotateSpeed = 50.0f;
 
-		float m_FieldOfView;
-
-		float m_NearClipPlane;
-		float m_FarClipPlane;
-
-		float m_MoveSpeed;
-		float m_RotateSpeed;
-
-		Texture2D* m_pRenderTargetTex;
-
-		ConstantBuffer* m_pCBufferVS;
-		ConstantBuffer* m_pCBufferDS;
-		ConstantBuffer* m_pCBufferPS;
+		DirectX::XMFLOAT4 m_BackgroundColor = {1.0f, 1.0f, 1.0f, 1.0f};
+		std::shared_ptr<RenderTexture> m_RenderTexture;
 	};
 }

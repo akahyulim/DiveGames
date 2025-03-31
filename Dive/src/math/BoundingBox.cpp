@@ -17,37 +17,37 @@ namespace Dive
 	{
 	}
 
-	BoundingBox::BoundingBox(const DirectX::XMFLOAT3* pPoints, uint32_t pointCount)
+	BoundingBox::BoundingBox(const DirectX::XMFLOAT3* points, UINT32 pointCount)
 	{
 		m_Max = DirectX::XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		m_Min = DirectX::XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
 
-		for (uint32_t i = 0; i < pointCount; i++)
+		for (UINT32 i = 0; i < pointCount; i++)
 		{
-			m_Max.x = std::max(m_Max.x, pPoints[i].x);
-			m_Max.y = std::max(m_Max.y, pPoints[i].y);
-			m_Max.z = std::max(m_Max.z, pPoints[i].z);
+			m_Max.x = std::max(m_Max.x, points[i].x);
+			m_Max.y = std::max(m_Max.y, points[i].y);
+			m_Max.z = std::max(m_Max.z, points[i].z);
 
-			m_Min.x = std::min(m_Min.x, pPoints[i].x);
-			m_Min.y = std::min(m_Min.y, pPoints[i].y);
-			m_Min.z = std::min(m_Min.z, pPoints[i].z);
+			m_Min.x = std::min(m_Min.x, points[i].x);
+			m_Min.y = std::min(m_Min.y, points[i].y);
+			m_Min.z = std::min(m_Min.z, points[i].z);
 		}
 	}
 
-	BoundingBox::BoundingBox(const VertexStatic* pVertices, uint32_t vertexCount)
+	BoundingBox::BoundingBox(const VertexStatic* vertices, UINT32 vertexCount)
 	{
 		m_Max = DirectX::XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		m_Min = DirectX::XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
 
-		for (uint32_t i = 0; i < vertexCount; i++)
+		for (UINT32 i = 0; i < vertexCount; i++)
 		{
-			m_Max.x = std::max(m_Max.x, pVertices[i].position[0]);
-			m_Max.y = std::max(m_Max.y, pVertices[i].position[1]);
-			m_Max.z = std::max(m_Max.z, pVertices[i].position[2]);
+			m_Max.x = std::max(m_Max.x, vertices[i].position[0]);
+			m_Max.y = std::max(m_Max.y, vertices[i].position[1]);
+			m_Max.z = std::max(m_Max.z, vertices[i].position[2]);
 
-			m_Min.x = std::min(m_Min.x, pVertices[i].position[0]);
-			m_Min.y = std::min(m_Min.y, pVertices[i].position[1]);
-			m_Min.z = std::min(m_Min.z, pVertices[i].position[2]);
+			m_Min.x = std::min(m_Min.x, vertices[i].position[0]);
+			m_Min.y = std::min(m_Min.y, vertices[i].position[1]);
+			m_Min.z = std::min(m_Min.z, vertices[i].position[2]);
 		}
 	}
 

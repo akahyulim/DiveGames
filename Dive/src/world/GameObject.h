@@ -6,32 +6,34 @@ namespace Dive
 {
 	class World;
 	class Component;
-
+	class Transform;
+	
 	class GameObject
 	{
 	public:
-		GameObject(World* pWorld, const std::string& name = "GameObject");
+		GameObject(World* world, const std::string& name);
 		~GameObject();
 
 		void Update();
 
-		void SaveToYaml(YAML::Node& config);
-		void LoadFromYaml(const YAML::Node& config);
-
-		void SetName(const std::string& name) { m_Name = name; }
+		void SetName(const std::string& name);
 		const std::string& GetName() const { return m_Name; }
-		
-		void SetID(uint64_t id) { m_ID = id; }
-		uint64_t GetID() const { return m_ID; }
 
-		bool IsActive() const { return m_bActive; }
-		void SetActive(bool active) { m_bActive = active; }
+		const std::string& GetTag() const { return m_Tag; }
+		void SetTag(const std::string& tag) { m_Tag = tag; }
 
-		void MarkRemoveTarget() { m_bMarkedTarget = true; }
-		bool IsRemovedTarget() const { return m_bMarkedTarget; }
+		void SetID(UINT64 id) { m_ID = id; }
+		UINT64 GetID() const { return m_ID; }
+
+		bool IsActive() const { return m_IsActive; }
+		void SetActive(bool active) { m_IsActive = active; }
+
+		const Transform* GetTransform() const { return m_Transform; }	// 읽기 전용으로 전달
+
+		World* GetWorld() { return m_World; }
 
 		template<class T> T* AddComponent();
-		template<class T> bool AddComponent(T* pComponent);
+		bool AddComponent(Component* component);
 
 		template<class T> bool HasComponent();
 		bool HashComponent(size_t typeHash) const;
@@ -39,46 +41,38 @@ namespace Dive
 		template<class T> T* GetComponent() const;
 		Component* GetComponent(size_t typeHash) const;
 
-	private:
-		void updateTransform();
+		static bool ComponentValidator(GameObject* gameObject, Component* component);
+
+		// static
+		// Find : 이름으로 찾는 건데 좀 더 알아보자.
+		// FindGameObjectWithTag : 활성화됨 오브젝트 배열 리턴
+		// FindWithTag : 첫 번째 활성화된 게임 오브젝트 리턴
+		// GetWorld : 자신이 포함된 scene이라는데... 좀 더 알아보자.
 
 	private:
 		std::string m_Name;
-		uint64_t m_ID;
+		UINT64 m_ID = 0;
 
-		World* m_pWorld;
-		bool m_bActive;
-		bool m_bMarkedTarget;
+		std::string m_Tag = "Untagged";
+
+		World* m_World;
+		bool m_IsActive = true;
 		std::unordered_map<size_t, Component*> m_Components;
 
+		const Transform* const m_Transform;	// 읽기 전용
 	};
 
 	template<class T>
 	T* GameObject::AddComponent()
 	{
-		auto pExisted = GetComponent<T>();
-		if (pExisted)
-			return pExisted;
+		auto existed = GetComponent<T>();
+		if (existed)
+			return existed;
+		
+		auto component = new T(this);
+		m_Components[T::GetTypeHashStatic()] = static_cast<Component*>(component);
 
-		auto pNewComponent = new T(this);
-		m_Components[T::GetTypeHashStatic()] = static_cast<Component*>(pNewComponent);
-
-		return pNewComponent;
-	}
-
-	template<class T> 
-	bool GameObject::AddComponent(T* pComponent)
-	{
-		if (!pComponent)
-			return false;
-
-		auto pExisted = GetComponent<T>();
-		if (pExisted)
-			return false;
-
-		m_Components[T::GetTypeHashStatic()] = static_cast<Component*>(pComponent);
-		pComponent->SetGameObject(this);
-		return true;
+		return component;
 	}
 
 	template<class T>

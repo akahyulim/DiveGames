@@ -8,18 +8,26 @@ namespace Dive
 		DV_CLASS(Cubemap, Texture)
 
 	public:
-		Cubemap(uint32_t size, DXGI_FORMAT format, bool mipChain);
-		Cubemap(uint32_t size, uint32_t depth);
-		virtual ~Cubemap();
+		Cubemap() = delete;
+		Cubemap(UINT32 size, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
+		~Cubemap() override;
 
-		// 여섯장의 텍스쳐를 로드하여 완성
+		bool Create() override;
+		void Release() override;
+
+		UINT32 GetSize() const { return m_Size; }
+
+		void SetFaceData(UINT32 index, const void* pixels, size_t size);
+
+		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }
+
+		static std::shared_ptr<Cubemap> LoadFromFaceFiles(const std::vector<std::filesystem::path>& faceFilepaths, bool useMips = false);
+		static std::shared_ptr<Cubemap> LoadFromFile(const std::filesystem::path& filepath, bool useMips = false);
 
 	private:
-		// 렌더타겟용으로 생성
-		bool createColorBuffer();
-		// 깊이버퍼용으로 생성
-		bool createDepthBuffer();
+		UINT32 m_Size = 0;
 
-	private:
+		ID3D11RenderTargetView* m_RenderTargetView = nullptr;
+		std::array<std::vector<uint8_t>, 6> m_FaceData;
 	};
 }

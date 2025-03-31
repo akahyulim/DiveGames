@@ -222,7 +222,7 @@ namespace Dive
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
 		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		texDesc.SampleDesc.Count = 1;// static_cast<UINT>(screenParams_.multiSample_);
+		texDesc.SampleDesc.Count = 1;// static_cast<UINT32>(screenParams_.multiSample_);
 		texDesc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(texDesc.Format, screenParams_.multiSample_);
 		texDesc.Usage = D3D11_USAGE_DEFAULT;
 		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;

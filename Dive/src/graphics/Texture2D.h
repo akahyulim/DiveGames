@@ -8,25 +8,23 @@ namespace Dive
 		DV_CLASS(Texture2D, Texture)
 
 	public:
-		Texture2D();
-		Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool mipChain = true);
-		Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, uint32_t mipCount);
-		Texture2D(uint32_t width, uint32_t height, uint32_t depth, bool useReadOnly = false);
-		// 유니티에서는 개별 객체에서 직접 로드하는 함수를 제공하지 않는다.
-		// 대신 리소스 매니저에서 파일을 전달받아 객체를 생성한다.
-		// => 실제로는 LoadImage라는 메서드로 로드된 데이터를 전달받아 생성할 수 있다.
-		// => 즉, 아래처럼 생성자를 통해 로드하는 게 잘못된 구현이다.
-		Texture2D(const std::filesystem::path& path, bool mipChain = true);
-		Texture2D(const std::filesystem::path& path, uint32_t size, const void* pSource, bool mipChain = true);
-		virtual ~Texture2D() = default;
+		Texture2D() = delete;
+		Texture2D(UINT32 width, UINT32 height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
+		~Texture2D() override;
 
-		// 유니티의 LoadImage에 대응해야 한다.
-		bool LoadFromFile(const std::filesystem::path& path) override;
-		bool LoadFromMemory(const std::filesystem::path& path, size_t size, const void* pSource);
-		bool UpdateSubresource(const void* pData, uint32_t size);
+		bool Create() override;
+
+		UINT32 GetWidth() const { return m_Width; }
+		UINT32 GetHeight() const { return m_Height; }
+
+		void SetPixelData(const void* pixels, size_t size);
+
+		static std::shared_ptr<Texture2D> LoadFromFile(const std::filesystem::path& filepath, bool useMips = false);
+		static std::shared_ptr<Texture2D> LoadFromMemory(const std::filesystem::path& filepath, size_t size, const void* pSource, bool useMips = false);
 
 	private:
-		bool createColorBuffer();
-		bool createDepthBuffer(bool readOnly);
+		UINT32 m_Width = 0;
+		UINT32 m_Height = 0;
+		std::vector<uint8_t> m_PixelData;
 	};
 }

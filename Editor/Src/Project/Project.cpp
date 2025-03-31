@@ -17,39 +17,39 @@ namespace Dive
 
 	Project* Project::New(const std::filesystem::path& filePath)
 	{
-		Project* pNewProject = new Project;
-		pNewProject->m_FilePath = filePath;
-		pNewProject->m_Config.Materials = filePath.parent_path() / "Assets" / "Materials";
-		pNewProject->m_Config.Models = filePath.parent_path() / "Assets" / "Models";
-		pNewProject->m_Config.Textures = filePath.parent_path() / "Assets" / "Textures";
-		pNewProject->m_Config.Worlds = filePath.parent_path() / "Assets" / "Worlds";
+		auto project = new Project;
+		project->m_FilePath = filePath;
+		project->m_Config.MaterialDir = filePath.parent_path() / "Assets" / "Materials";
+		project->m_Config.ModelDir = filePath.parent_path() / "Assets" / "Models";
+		project->m_Config.TextureDir = filePath.parent_path() / "Assets" / "Textures";
+		project->m_Config.WorldDir = filePath.parent_path() / "Assets" / "Worlds";
 
 		try
 		{
-			std::filesystem::create_directories(pNewProject->m_Config.Materials);
-			std::filesystem::create_directories(pNewProject->m_Config.Models);
-			std::filesystem::create_directories(pNewProject->m_Config.Textures);
-			std::filesystem::create_directories(pNewProject->m_Config.Worlds);
+			std::filesystem::create_directories(project->m_Config.MaterialDir);
+			std::filesystem::create_directories(project->m_Config.ModelDir);
+			std::filesystem::create_directories(project->m_Config.TextureDir);
+			std::filesystem::create_directories(project->m_Config.WorldDir);
 		}
 		catch (const std::filesystem::filesystem_error& e)
 		{
 			DV_LOG(Project, err, "프로젝트 디렉토리 생성에 실패하였습니다 : {:s}", e.what());
-			DV_DELETE(pNewProject);
+			DV_DELETE(project);
 		}
 
 		// 생성 후 직렬화
-		if (!Project::SaveToFile(pNewProject))
+		if (!Project::SaveToFile(project))
 		{
 			std::filesystem::remove_all(filePath.parent_path());
-			DV_DELETE(pNewProject);
+			DV_DELETE(project);
 		}
 
-		return pNewProject;
+		return project;
 	}
 
-	bool Project::SaveToFile(Project* pProject)
+	bool Project::SaveToFile(Project* project)
 	{
-		if (!pProject || pProject->m_FilePath.empty())
+		if (!project || project->m_FilePath.empty())
 		{
 			DV_LOG(Project, warn, "직렬화할 수 있는 객체가 존재하지 않습니다.");
 			return false;
@@ -60,11 +60,11 @@ namespace Dive
 		out << YAML::Key << "Project" << YAML::Value;
 		{
 			out << YAML::BeginMap;
-			out << YAML::Key << "Materials" << YAML::Value << pProject->m_Config.Materials.string();
-			out << YAML::Key << "Models" << YAML::Value << pProject->m_Config.Models.string();
-			out << YAML::Key << "Textures" << YAML::Value << pProject->m_Config.Textures.string();
-			out << YAML::Key << "Worlds" << YAML::Value << pProject->m_Config.Worlds.string();
-			out << YAML::Key << "OpenedWorld" << YAML::Value << pProject->m_Config.OpenedWorld;
+			out << YAML::Key << "MaterialDir" << YAML::Value << project->m_Config.MaterialDir.string();
+			out << YAML::Key << "ModelDir" << YAML::Value << project->m_Config.ModelDir.string();
+			out << YAML::Key << "TextureDir" << YAML::Value << project->m_Config.TextureDir.string();
+			out << YAML::Key << "WorldDir" << YAML::Value << project->m_Config.WorldDir.string();
+			out << YAML::Key << "OpenedWorld" << YAML::Value << project->m_Config.OpenedWorld;
 		}
 		out << YAML::EndMap;
 
@@ -74,23 +74,23 @@ namespace Dive
 			return false;
 		}
 
-		std::ofstream fout(pProject->m_FilePath);
+		std::ofstream fout(project->m_FilePath);
 		if (!fout)
 		{
-			DV_LOG(Project, err, "파일({})을 열 수 없습니다.", pProject->m_FilePath.string());
+			DV_LOG(Project, err, "파일({})을 열 수 없습니다.", project->m_FilePath.string());
 			return false;
 		}
 		fout << out.c_str();
 
-		DV_LOG(Project, info, "프로젝트({}) 직렬화 성공", pProject->GetName());
+		DV_LOG(Project, info, "프로젝트({}) 직렬화 성공", project->GetName());
 
 		return true;
 	}
 
 	Project*  Project::LoadFromFile(const std::filesystem::path& filePath)
 	{
-		Project* pLoadedProject = new Project;
-		pLoadedProject->m_FilePath = filePath;
+		auto project = new Project;
+		project->m_FilePath = filePath;
 
 		YAML::Node data;
 		try
@@ -100,13 +100,13 @@ namespace Dive
 		catch (YAML::BadFile& e)
 		{
 			DV_LOG(Project, warn, "프로젝트 파일({}) 로드에 실패하였습니다. : {}", filePath, e.what());
-			DV_DELETE(pLoadedProject);
+			DV_DELETE(project);
 			return nullptr;
 		}
 		catch (YAML::ParserException& e)
 		{
 			DV_LOG(Project, warn, "YAML 파일({}) 파싱에 실패하였습니다. : {}", filePath, e.what());
-			DV_DELETE(pLoadedProject);
+			DV_DELETE(project);
 			return nullptr;
 		}
 
@@ -114,18 +114,18 @@ namespace Dive
 		if (!projectNode)
 		{
 			DV_LOG(Project, warn, "프로젝트 노드를 찾을 수 없습니다.");
-			DV_DELETE(pLoadedProject);
+			DV_DELETE(project);
 			return nullptr;
 		}
 
-		pLoadedProject->m_Config.Materials = projectNode["Materials"].as<std::string>();
-		pLoadedProject->m_Config.Models = projectNode["Models"].as<std::string>();
-		pLoadedProject->m_Config.Textures = projectNode["Textures"].as<std::string>();
-		pLoadedProject->m_Config.Worlds = projectNode["Worlds"].as<std::string>();
-		pLoadedProject->m_Config.OpenedWorld = projectNode["OpenedWorld"].as<std::string>();
+		project->m_Config.MaterialDir = projectNode["MaterialDir"].as<std::string>();
+		project->m_Config.ModelDir = projectNode["ModelDir"].as<std::string>();
+		project->m_Config.TextureDir = projectNode["TextureDir"].as<std::string>();
+		project->m_Config.WorldDir = projectNode["WorldDir"].as<std::string>();
+		project->m_Config.OpenedWorld = projectNode["OpenedWorld"].as<std::string>();
 
-		DV_LOG(Project, info, "프로젝트({}) 역직렬화 성공", pLoadedProject->GetName());
+		DV_LOG(Project, info, "프로젝트({}) 역직렬화 성공", project->GetName());
 
-		return pLoadedProject;
+		return project;
 	}
 }

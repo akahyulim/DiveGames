@@ -19,9 +19,7 @@ namespace Dive
 
 		uint32_t count = 0;
 		for (const auto& [typeId, resources] : m_Resources)
-		{
 			count += static_cast<uint32_t>(resources.size());
-		}
 
 		return count;
 	}
@@ -32,9 +30,9 @@ namespace Dive
 
 		for (const auto& [typeId, resources] : m_Resources)
 		{
-			for (const auto& pResource : resources)
+			for (const auto& resource : resources)
 			{
-				if (pResource->GetId() == id)
+				if (resource->GetId() == id)
 					return true;
 			}
 		}

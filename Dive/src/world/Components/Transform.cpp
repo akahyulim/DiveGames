@@ -1,15 +1,19 @@
 #include "stdafx.h"
 #include "Transform.h"
+#include "../GameObject.h"
+#include "../World.h"
 #include "core/CoreDefs.h"
+#include "core/EventDispatcher.h"
 #include "math/Math.h"
 
 using namespace DirectX;
 
 namespace Dive
 {
-	Transform::Transform(GameObject* pGameObject)
-		: Component(pGameObject)
-		, m_pParent(nullptr)
+	Transform::Transform(GameObject* gameObject)
+		: Component(gameObject)
+		, m_Parent(nullptr)
+		, m_ParentID(0)
 	{
 		m_LocalPosition = { 0.0f, 0.0f, 0.0f };
 		m_LocalRotation = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -17,15 +21,6 @@ namespace Dive
 
 		DirectX::XMStoreFloat4x4(&m_Transform, DirectX::XMMatrixIdentity());
 		DirectX::XMStoreFloat4x4(&m_LocalTransform, DirectX::XMMatrixIdentity());
-
-	}
-
-	void Transform::SaveToYaml(YAML::Node config)
-	{
-	}
-
-	void Transform::LaodFromYaml(const YAML::Node& config)
-	{
 	}
 
 	DirectX::XMFLOAT3 Transform::GetPosition() const
@@ -52,10 +47,10 @@ namespace Dive
 	{
 		DirectX::XMVECTOR localPosition = position;
 
-		if (m_pParent)
+		if (m_Parent)
 		{
-			const auto parentWorldTransformInverse = DirectX::XMMatrixInverse(nullptr, m_pParent->GetMatrix());
-			localPosition = DirectX::XMVector3Transform(position, parentWorldTransformInverse);
+			const auto parentSceneTransformInverse = DirectX::XMMatrixInverse(nullptr, m_Parent->GetMatrix());
+			localPosition = DirectX::XMVector3Transform(position, parentSceneTransformInverse);
 		}
 
 		SetLocalPosition(DirectX::XMVectorGetX(localPosition), DirectX::XMVectorGetY(localPosition), DirectX::XMVectorGetZ(localPosition));
@@ -82,6 +77,8 @@ namespace Dive
 		{
 			DirectX::XMStoreFloat3(&m_LocalPosition, position);
 			updateTransform();
+
+			DV_FIRE_EVENT(eEventType::WorldModified);
 		}
 	}
 
@@ -125,10 +122,10 @@ namespace Dive
 	{
 		DirectX::XMVECTOR localRotation = quaternion;
 
-		if (m_pParent)
+		if (m_Parent)
 		{
-			const auto parentWorldRotationInverse = DirectX::XMQuaternionInverse(m_pParent->GetRotationQuaternionVector());
-			localRotation = DirectX::XMQuaternionMultiply(parentWorldRotationInverse, quaternion);
+			const auto parentSceneRotationInverse = DirectX::XMQuaternionInverse(m_Parent->GetRotationQuaternionVector());
+			localRotation = DirectX::XMQuaternionMultiply(parentSceneRotationInverse, quaternion);
 		}
 
 		SetLocalRotation(localRotation);
@@ -166,6 +163,8 @@ namespace Dive
 		{
 			DirectX::XMStoreFloat4(&m_LocalRotation, quaternion);
 			updateTransform();
+
+			DV_FIRE_EVENT(eEventType::WorldModified);
 		}
 	}
 
@@ -197,9 +196,9 @@ namespace Dive
 	{
 		DirectX::XMVECTOR localScale = scale;
 
-		if (m_pParent)
+		if (m_Parent)
 		{
-			const auto parentScale = m_pParent->GetScaleVector();
+			const auto parentScale = m_Parent->GetScaleVector();
 			localScale = DirectX::XMVectorDivide(scale, parentScale);
 		}
 
@@ -227,12 +226,14 @@ namespace Dive
 		{
 			DirectX::XMStoreFloat3(&m_LocalScale, scale);
 			updateTransform();
+
+			DV_FIRE_EVENT(eEventType::WorldModified);
 		}
 	}
 
 	void Transform::Translate(float x, float y, float z, eSpace relativeTo)
 	{
-		if (relativeTo == eSpace::World)
+		if (relativeTo == eSpace::Scene)
 		{
 			auto position = GetPosition();
 			SetPosition(position.x + x, position.y + y, position.z + z);
@@ -254,17 +255,17 @@ namespace Dive
 	// 아래의 원본에 맞춰 수정해야 한다.
 	void Transform::Rotate(const DirectX::XMVECTOR& quaternion, eSpace relativeTo)
 	{
-		auto currentWorldRotationQuaternion = DirectX::XMLoadFloat4(&m_LocalRotation);
+		auto currentSceneRotationQuaternion = DirectX::XMLoadFloat4(&m_LocalRotation);
 
-		if (relativeTo == eSpace::World)
+		if (relativeTo == eSpace::Scene)
 		{
-			auto newWorldRotationQuaternion = DirectX::XMQuaternionMultiply(currentWorldRotationQuaternion, quaternion);
-			DirectX::XMStoreFloat4(&m_LocalRotation, newWorldRotationQuaternion);
+			auto newSceneRotationQuaternion = DirectX::XMQuaternionMultiply(currentSceneRotationQuaternion, quaternion);
+			DirectX::XMStoreFloat4(&m_LocalRotation, newSceneRotationQuaternion);
 		}
 		else
 		{
-			auto newWorldRotationQuaternion = DirectX::XMQuaternionMultiply(quaternion, currentWorldRotationQuaternion);
-			DirectX::XMStoreFloat4(&m_LocalRotation, newWorldRotationQuaternion);
+			auto newSceneRotationQuaternion = DirectX::XMQuaternionMultiply(quaternion, currentSceneRotationQuaternion);
+			DirectX::XMStoreFloat4(&m_LocalRotation, newSceneRotationQuaternion);
 		}
 
 		updateTransform();
@@ -279,19 +280,19 @@ namespace Dive
 		float yaw = DirectX::XMConvertToRadians(degreeZ);
 
 		auto rotationQuaternion = DirectX::XMQuaternionRotationRollPitchYaw(roll, pitch, yaw);
-		auto currentWorldRotationQuaternion = DirectX::XMLoadFloat4(&m_LocalRotation);
+		auto currentSceneRotationQuaternion = DirectX::XMLoadFloat4(&m_LocalRotation);
 
-		if (relativeTo == eSpace::World)
+		if (relativeTo == eSpace::Scene)
 		{
-			auto newWorldRotationQuaternion = DirectX::XMQuaternionMultiply(currentWorldRotationQuaternion, rotationQuaternion);
-			SetLocalRotation(newWorldRotationQuaternion);
-			//DirectX::XMStoreFloat4(&m_LocalRotation, newWorldRotationQuaternion);
+			auto newSceneRotationQuaternion = DirectX::XMQuaternionMultiply(currentSceneRotationQuaternion, rotationQuaternion);
+			SetLocalRotation(newSceneRotationQuaternion);
+			//DirectX::XMStoreFloat4(&m_LocalRotation, newSceneRotationQuaternion);
 		}
 		else
 		{
-			auto newWorldRotationQuaternion = DirectX::XMQuaternionMultiply(rotationQuaternion, currentWorldRotationQuaternion);
-			SetLocalRotation(newWorldRotationQuaternion);
-			//DirectX::XMStoreFloat4(&m_LocalRotation, newWorldRotationQuaternion);
+			auto newSceneRotationQuaternion = DirectX::XMQuaternionMultiply(rotationQuaternion, currentSceneRotationQuaternion);
+			SetLocalRotation(newSceneRotationQuaternion);
+			//DirectX::XMStoreFloat4(&m_LocalRotation, newSceneRotationQuaternion);
 		}
 
 		//updateTransform();
@@ -360,10 +361,10 @@ namespace Dive
 	{
 		DirectX::XMMATRIX localMatrix = world;
 
-		if (m_pParent)
+		if (m_Parent)
 		{
-			const auto parentWorldMatrixInverse = DirectX::XMMatrixInverse(nullptr, m_pParent->GetMatrix());
-			localMatrix = DirectX::XMMatrixMultiply(parentWorldMatrixInverse, world);
+			const auto parentSceneMatrixInverse = DirectX::XMMatrixInverse(nullptr, m_Parent->GetMatrix());
+			localMatrix = DirectX::XMMatrixMultiply(parentSceneMatrixInverse, world);
 		}
 
 		SetLocalMatrix(localMatrix);
@@ -431,42 +432,45 @@ namespace Dive
 
 	void Transform::SetParent(Transform* pParent)
 	{
+		if (pParent == this)
+			return;
+
+		DV_FIRE_EVENT(eEventType::WorldModified);
+
 		if (pParent)
 		{
-			if (pParent == this)
-				return;
-
-			if (m_pParent)
+			if (m_Parent)
 			{
-				if (m_pParent == pParent)
+				if (m_Parent == pParent)
 					return;
 
-				auto it = m_pParent->m_Children.begin();
-				for (it; it != m_pParent->m_Children.end(); ++it)
+				auto it = m_Parent->m_Children.begin();
+				for (it; it != m_Parent->m_Children.end(); ++it)
 				{
 					if ((*it) == this)
 					{
-						m_pParent->m_Children.erase(it);
+						m_Parent->m_Children.erase(it);
 						break;
 					}
 				}
 			}
 
-			m_pParent = pParent;
+			m_Parent = pParent;
+			m_ParentID = pParent->GetGameObject()->GetID();
 			pParent->m_Children.emplace_back(this);
 
 			// 로컬 값들을 계산
-			auto parentMatrix = DirectX::XMMatrixScalingFromVector(m_pParent->GetScaleVector()) *
-				DirectX::XMMatrixRotationQuaternion(m_pParent->GetRotationQuaternionVector());
+			auto parentMatrix = DirectX::XMMatrixScalingFromVector(m_Parent->GetScaleVector()) *
+				DirectX::XMMatrixRotationQuaternion(m_Parent->GetRotationQuaternionVector());
 
-			auto localPos = DirectX::XMVectorSubtract(GetPositionVector(), m_pParent->GetPositionVector());
+			auto localPos = DirectX::XMVectorSubtract(GetPositionVector(), m_Parent->GetPositionVector());
 			localPos = DirectX::XMVector3Transform(localPos, DirectX::XMMatrixInverse(nullptr, parentMatrix));
 			DirectX::XMStoreFloat3(&m_LocalPosition, localPos);
 
-			auto localRot = DirectX::XMQuaternionMultiply(GetRotationQuaternionVector(), DirectX::XMQuaternionInverse(m_pParent->GetRotationQuaternionVector()));
+			auto localRot = DirectX::XMQuaternionMultiply(GetRotationQuaternionVector(), DirectX::XMQuaternionInverse(m_Parent->GetRotationQuaternionVector()));
 			DirectX::XMStoreFloat4(&m_LocalRotation, localRot);
 
-			auto parentScale = m_pParent->GetScaleVector();
+			auto parentScale = m_Parent->GetScaleVector();
 			auto worldScale = GetScaleVector();
 			auto localScale = DirectX::XMVectorDivide(worldScale, parentScale);
 			DirectX::XMStoreFloat3(&m_LocalScale, localScale);
@@ -477,15 +481,16 @@ namespace Dive
 		}
 		else
 		{
-			if (m_pParent)
+			m_ParentID = 0;
+			if (m_Parent)
 			{
-				auto it = m_pParent->m_Children.begin();
-				for (it; it != m_pParent->m_Children.end(); ++it)
+				auto it = m_Parent->m_Children.begin();
+				for (it; it != m_Parent->m_Children.end(); ++it)
 				{
 					if ((*it) == this)
 					{
-						m_pParent->m_Children.erase(it);
-						m_pParent = nullptr;
+						m_Parent->m_Children.erase(it);
+						m_Parent = nullptr;
 
 						m_LocalPosition = GetPosition();
 						m_LocalRotation = GetRotationQuaternion();
@@ -502,10 +507,10 @@ namespace Dive
 
 	Transform* Transform::GetRoot()
 	{
-		if (!m_pParent)
+		if (!m_Parent)
 			return this;
 
-		return m_pParent->GetRoot();
+		return m_Parent->GetRoot();
 	}
 
 	Transform* Transform::GetChild(uint32_t index) const
@@ -521,17 +526,17 @@ namespace Dive
 		if (pParent == this)
 			return true;
 
-		if (!m_pParent)
+		if (!m_Parent)
 			return false;
 		else
-			return m_pParent->IsChildOf(pParent);
+			return m_Parent->IsChildOf(pParent);
 	}
 
 	void Transform::DetachChildren()
 	{
-		for (auto* pChild : m_Children)
+		for (auto* child : m_Children)
 		{
-			pChild->SetParent(nullptr);
+			child->SetParent(nullptr);
 		}
 		m_Children.clear();
 		m_Children.shrink_to_fit();
@@ -545,9 +550,9 @@ namespace Dive
 
 		DirectX::XMStoreFloat4x4(&m_LocalTransform, localMatrix);
 
-		if (m_pParent)
+		if (m_Parent)
 		{
-			const auto worldMatrix = DirectX::XMMatrixMultiply(localMatrix, m_pParent->GetMatrix());
+			const auto worldMatrix = DirectX::XMMatrixMultiply(localMatrix, m_Parent->GetMatrix());
 			DirectX::XMStoreFloat4x4(&m_Transform, worldMatrix);
 		}
 		else
@@ -555,7 +560,7 @@ namespace Dive
 			m_Transform = m_LocalTransform;
 		}
 
-		for (auto pChild : m_Children)
-			pChild->updateTransform();
+		for (auto child : m_Children)
+			child->updateTransform();
 	}
 }

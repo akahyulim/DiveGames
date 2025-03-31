@@ -4,172 +4,154 @@
 
 namespace Dive
 {
-	std::string StringUtils::ToUpperCase(const std::string& str)
+	std::string StringUtils::ToUpperCase(const std::string& input) 
 	{
-		auto copy = str;
-		for (int32_t i = 0; i < (int32_t)copy.size(); ++i)
+		auto result = input;
+		for (int32_t index = 0; index < static_cast<int32_t>(result.size()); ++index)
 		{
-			if ('a' <= copy[i] && 'z' >= copy[i])
-			{
-				copy[i] -= 32;
-			}
+			if ('a' <= result[index] && 'z' >= result[index])
+				result[index] -= 32;
 		}
-
-		return copy;
+		return result;
 	}
 
-	std::string StringUtils::ToLowerCase(const std::string& str)
+	std::string StringUtils::ToLowerCase(const std::string& input) 
 	{
-		auto copy = str;
-		for (int32_t i = 0; i < (int32_t)copy.size(); ++i)
+		auto result = input;
+		for (int32_t index = 0; index < static_cast<int32_t>(result.size()); ++index)
 		{
-			if ('A' <= copy[i] && 'Z' >= copy[i])
-				copy[i] += 32;
+			if ('A' <= result[index] && 'Z' >= result[index])
+				result[index] += 32;
 		}
-
-		return copy;
+		return result;
 	}
 
-	std::string StringUtils::StringLeftTrim(const std::string& str, const char* pTarget)
+	std::string StringUtils::StringLeftTrim(const std::string& input, const char* trimChars) 
 	{
-		auto copy = str;
-		copy.erase(0, copy.find_first_not_of(pTarget));
-
-		return copy;
+		auto result = input;
+		result.erase(0, result.find_first_not_of(trimChars));
+		return result;
 	}
 
-	std::string StringUtils::StringRightTrim(const std::string& str, const char* pTarget)
+	std::string StringUtils::StringRightTrim(const std::string& input, const char* trimChars) 
 	{
-		auto copy = str;
-		copy.erase(copy.find_last_not_of(pTarget) + 1);
-
-		return copy;
+		auto result = input;
+		result.erase(result.find_last_not_of(trimChars) + 1);
+		return result;
 	}
 
-	std::string StringUtils::StringTrim(const std::string& str, const char* pTarget)
+	std::string StringUtils::StringTrim(const std::string& input, const char* trimChars) 
 	{
-		return StringLeftTrim(StringRightTrim(str, pTarget), pTarget);
-	}
-	/*
-	std::string StringUtils::AddTrailingSlash(const std::string& pathName)
-	{
-		if (pathName.empty())
-			return std::string();
-
-		// \\를 모두 /로 변경
-		auto ret = FileUtils::GetInternalPath(pathName);
-
-		if (ret.back() != '/')
-			ret += '/';
-
-		return ret;
-	}
-	*/
-	std::string StringUtils::RemoveTrailingSlash(const std::string& pathName)
-	{
-		if (pathName.empty())
-			return std::string();
-
-		auto ret = pathName;
-
-		if (ret.back() == '/')
-			ret.resize(ret.length() - 1);
-
-		return ret;
+		return StringLeftTrim(StringRightTrim(input, trimChars), trimChars);
 	}
 
-	std::string StringUtils::StringReplace(const std::string& str, const std::string& target, const std::string& replace)
+	std::string StringUtils::RemoveTrailingSlash(const std::string& path) 
 	{
-		if (str.empty())
-			return std::string();
+		if (path.empty())
+			return {};
 
-		auto ret = str;
-		size_t pos = 0;
-		while ((pos = ret.find(target)) != std::string::npos)
-		{
-			ret.replace(pos, target.size(), replace);
-		}
+		auto result = path;
 
-		return ret;
+		if (result.back() == '/')
+			result.resize(result.length() - 1);
+
+		return result;
 	}
 
-	std::wstring StringUtils::StringToWString(const std::string& str)
+	std::string StringUtils::StringReplace(
+		const std::string& input,
+		const std::string& target,
+		const std::string& replacement
+	) 
 	{
-		if (str.empty())
-			return std::wstring();
+		if (input.empty())
+			return {};
+
+		auto result = input;
+		size_t position = 0;
+
+		while ((position = result.find(target)) != std::string::npos) 
+			result.replace(position, target.size(), replacement);
+
+		return result;
+	}
+
+	std::wstring StringUtils::StringToWString(const std::string& input) 
+	{
+		if (input.empty())
+			return {};
 
 		auto size = ::MultiByteToWideChar(
 			CP_ACP,
 			0,
-			str.c_str(),
-			static_cast<int32_t>(str.size()),
+			input.c_str(),
+			static_cast<int32_t>(input.size()),
 			nullptr,
 			0);
 
-		std::wstring ret;
-		ret.resize(size);
+		std::wstring result(size, L'\0');
 
 		::MultiByteToWideChar(
 			CP_ACP,
 			0,
-			str.c_str(),
-			static_cast<int32_t>(str.size()),
-			const_cast<wchar_t*>(ret.c_str()),
-			static_cast<int32_t>(ret.size()));
+			input.c_str(),
+			static_cast<int32_t>(input.size()),
+			result.data(),
+			static_cast<int32_t>(result.size()));
 
-		return ret;
+		return result;
 	}
 
-	std::string StringUtils::WStringToString(const std::wstring& str)
+	std::string StringUtils::WStringToString(const std::wstring& input) 
 	{
-		if (str.empty())
-			return std::string();
+		if (input.empty())
+			return {};
 
 		auto size = ::WideCharToMultiByte(
 			CP_ACP,
 			0,
-			str.c_str(),
-			static_cast<int32_t>(str.size()),
+			input.c_str(),
+			static_cast<int32_t>(input.size()),
 			nullptr,
 			0,
 			nullptr,
 			nullptr);
 
-		std::string ret;
-		ret.resize(size);
+		std::string result(size, '\0');
 
 		::WideCharToMultiByte(
 			CP_ACP,
 			0,
-			str.c_str(),
-			static_cast<int32_t>(str.size()),
-			const_cast<char*>(ret.c_str()),
-			static_cast<int32_t>(ret.size()),
+			input.c_str(),
+			static_cast<int32_t>(input.size()),
+			result.data(),
+			static_cast<int32_t>(result.size()),
 			nullptr,
 			nullptr);
 
-		return ret;
+		return result;
 	}
 
-	std::vector<std::string> StringUtils::StringSplit(const std::string& str, char seperator)
+	std::vector<std::string> StringUtils::StringSplit(const std::string& input, char separator) 
 	{
-		std::vector<std::string> ret;
+		std::vector<std::string> result;
 
 		size_t previous = 0;
-		size_t current = str.find(seperator);
+		size_t current = input.find(separator);
+
 		if (current == std::string::npos)
-			ret.emplace_back(str);
-		else
+			result.emplace_back(input);
+		else 
 		{
 			while (current != std::string::npos)
 			{
-				ret.emplace_back(str.substr(previous, current - previous));
+				result.emplace_back(input.substr(previous, current - previous));
 				previous = current + 1;
-				current = str.find(seperator, previous);
+				current = input.find(separator, previous);
 			}
-			ret.emplace_back(str.substr(previous, current - previous));
+			result.emplace_back(input.substr(previous));
 		}
 
-		return ret;
+		return result;
 	}
 }

@@ -1,8 +1,10 @@
 #pragma once
-#include "Dive.h"
-#include "Panels/Panel.h"
+#include <dive.h>
+#include <imgui.h>
 
-namespace Dive
+#include "Views/View.h"
+
+namespace Dive 
 {
 	class Project;
 
@@ -16,64 +18,45 @@ namespace Dive
 		Max
 	};
 
-	enum class ePanelTypes
-	{
-		WorldView,
-		GameView,
-		HierarchyView,
-		InspectorView,
-		ProjectView,
-		Max
-	};
-
 	class Editor
 	{
 	public:
 		Editor();
 		~Editor();
 
-		int Run();
+		void Run();
 
-		void OnPostRender();
+		template <typename T, typename std::enable_if<std::is_base_of<View, T>::value>::type* = nullptr>
+		std::shared_ptr<T> GetWidget();
 
-		ImFont* GetFont(eFontTypes type);
+		ImFont* GetFont(Dive::eFontTypes type);
 
-		void NewWorld();
-		void OpenWorld();
-		void SaveWorld();
-		void SaveWorldAs();
-		void NewProject();
-		void OpenProject();
-		void SaveProject();
-		void Exit();
-
-		World* GetActiveWorld() { return m_pActiveWorld; }
-		const std::filesystem::path GetActiveWorldFilePath() const;
-		const std::filesystem::path GetProjectDir() const;
+		void SetTitle(const std::wstring& text = L"");
 
 	private:
-		void updateTitle();
-
-		void drawMainManubar();
-		void showPopups();
-
-		void activateSaveChanges(std::function<void()> confirmCallback);
+		void loadResources();
+		void beginUI();
+		void endUI();
 
 	private:
-		std::array<ImFont*, static_cast<size_t>(eFontTypes::Max)> m_Fonts;
-		std::vector<std::unique_ptr<Panel>> m_Panels;
+		std::array<ImFont*, static_cast<size_t>(Dive::eFontTypes::Max)> m_Fonts;
 
-		Project* m_pActiveProject;
-		World* m_pActiveWorld;
-		std::shared_ptr<GameObject> m_pSelectedGameObject;
+		std::vector<std::shared_ptr<View>> m_Widgets;
 
-		bool m_bProjectChanged;
-		bool m_bWorldChanged;
-
-		bool m_bShowSaveChangesPopup;
-		bool m_bShowNewProjectPopup;
-		bool m_bShowNewWorldPopup;
-
-		std::function<void()> m_OnConfirm;
+		Dive::Project* m_pActiveProject;
 	};
+
+	template <typename T, typename std::enable_if<std::is_base_of<View, T>::value>::type*>
+	std::shared_ptr<T> Editor::GetWidget()
+	{
+		for (const auto& widget : m_Widgets)
+		{
+			if (std::shared_ptr<T> pWidget = std::dynamic_pointer_cast<T>(widget))
+			{
+				return pWidget;
+			}
+		}
+
+		return nullptr;
+	}
 }
