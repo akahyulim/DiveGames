@@ -1,4 +1,4 @@
-#include "HierarchyView.h"
+ï»¿#include "HierarchyView.h"
 #include "InspectorView.h"
 
 namespace Dive
@@ -24,16 +24,16 @@ namespace Dive
 
 		if (ImGui::IsMouseReleased(0))
 		{
-			// clicekd¿Í hovered¸¦ ºñ±³ÇÑ ÈÄ µ¿ÀÏÇÏ´Ù¸é 
-			// SetSelectedObject()¿¡ Àü´ŞÇÑ´Ù.
-			// ÀÌ´Â Ä«¸Ş¶ó¿¡ SelectedObject()¸¦ ¼³Á¤ÇÏ´Â °úÁ¤ÀÌ´Ù.
+			// clicekdì™€ hoveredë¥¼ ë¹„êµí•œ í›„ ë™ì¼í•˜ë‹¤ë©´ 
+			// SetSelectedObject()ì— ì „ë‹¬í•œë‹¤.
+			// ì´ëŠ” ì¹´ë©”ë¼ì— SelectedObject()ë¥¼ ì„¤ì •í•˜ëŠ” ê³¼ì •ì´ë‹¤.
 			setSelectedObject(m_SelectedGameObject);
 		}
 	}
 
 	void HierarchyView::showTree()
 	{
-		// ÀÏ´Ü ¿¡µğÅÍ ¸ğµå°¡ ¾Æ´Ï¸é ImGui::BeginDisabled(), EndDisabled()·Î ºñÈ°¼ºÈ­ ÇÑ´Ù.
+		// ì¼ë‹¨ ì—ë””í„° ëª¨ë“œê°€ ì•„ë‹ˆë©´ ImGui::BeginDisabled(), EndDisabled()ë¡œ ë¹„í™œì„±í™” í•œë‹¤.
 		std::vector<GameObject*> rootObjects = WorldManager::GetActiveWorld()->GetRootGameObjects();
 		for (auto gameObject : rootObjects)
 		{
@@ -42,14 +42,14 @@ namespace Dive
 		}
 	}
 
-	// ÀÌ °÷¿¡¼­ ¼³Á¤ÇÏ°í »ç¿ë ÁßÀÎ m_SelectedGameObject´Â ±¸¹öÀü ±¸ÇöÀÌ´Ù.
-	// »õ·Î¿î ¹öÀüÀ» ÀÌÇØÇÑ ÈÄ Àû¿ëÇÏÀÚ.
+	// ì´ ê³³ì—ì„œ ì„¤ì •í•˜ê³  ì‚¬ìš© ì¤‘ì¸ m_SelectedGameObjectëŠ” êµ¬ë²„ì „ êµ¬í˜„ì´ë‹¤.
+	// ìƒˆë¡œìš´ ë²„ì „ì„ ì´í•´í•œ í›„ ì ìš©í•˜ì.
 	void HierarchyView::addObjectToTree(GameObject* gameObject)
 	{
 		if (!gameObject || gameObject->GetTag() == "Editor_Only")
 			return;
 
-		auto activeWorld = WorldManager::GetActiveWorld();	// Â÷¶ó¸® ¸Å°³º¯¼ö·Î ¹Ş´Â ÆíÀÌ ³ªÀ» °Í °°´Ù.
+		auto activeWorld = WorldManager::GetActiveWorld();	// ì°¨ë¼ë¦¬ ë§¤ê°œë³€ìˆ˜ë¡œ ë°›ëŠ” í¸ì´ ë‚˜ì„ ê²ƒ ê°™ë‹¤.
 		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
 
 		std::vector<Dive::Transform*> children;
@@ -60,8 +60,8 @@ namespace Dive
 		if (m_SelectedGameObject)
 			nodeFlags |= (m_SelectedGameObject == gameObject) ? ImGuiTreeNodeFlags_Selected : 0;
 
-		// °¢ ³ëµå »çÀÌ¿¡ µå¶ø °¡´ÉÇÑ ¿µ¿ª Ãß°¡
-		ImGui::PushID(static_cast<int>(gameObject->GetID())); // °íÀ¯ ID Çª½Ã
+		// ê° ë…¸ë“œ ì‚¬ì´ì— ë“œë ê°€ëŠ¥í•œ ì˜ì—­ ì¶”ê°€
+		ImGui::PushID(static_cast<int>(gameObject->GetID())); // ê³ ìœ  ID í‘¸ì‹œ
 		ImGui::Selectable("##drop_target", false, ImGuiSelectableFlags_DontClosePopups, ImVec2(0, 2.0f));
 		if (ImGui::BeginDragDropTarget())
 		{
@@ -127,8 +127,8 @@ namespace Dive
 
 			if (ImGui::MenuItem("Delete"))
 			{
-				// ÇöÀç RemoveGameObject´Â ´ë»óÀ» Á¦°Å´ë»óÀ¸·Î ¸¶Å·ÇÒ »ÓÀÌ´Ù.
-				// ½ÇÁ¦ Á¦°Å´Â ´ÙÀ½ Update¿¡¼­ ¼öÇàÇÑ´Ù.
+				// í˜„ì¬ RemoveGameObjectëŠ” ëŒ€ìƒì„ ì œê±°ëŒ€ìƒìœ¼ë¡œ ë§ˆí‚¹í•  ë¿ì´ë‹¤.
+				// ì‹¤ì œ ì œê±°ëŠ” ë‹¤ìŒ Updateì—ì„œ ìˆ˜í–‰í•œë‹¤.
 				//activeWorld->RemoveGameObject(gameObject);
 				activeWorld->DeleteGameObject(gameObject);
 				if (m_SelectedGameObject && (m_SelectedGameObject == gameObject))
@@ -159,12 +159,12 @@ namespace Dive
 			ImGui::TreePop();
 		}
 
-		ImGui::PopID(); // °íÀ¯ ID ÆË
+		ImGui::PopID(); // ê³ ìœ  ID íŒ
 	}
 
 	void HierarchyView::setSelectedObject(GameObject* gameObject)
 	{
-		// editor camera¿¡¼­ select·Î ¼³Á¤ÇÑ´Ù.
+		// editor cameraì—ì„œ selectë¡œ ì„¤ì •í•œë‹¤.
 
 		InspectorView::Inspect(gameObject);
 	}

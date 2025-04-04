@@ -1,4 +1,4 @@
-#include "DivePch.h"
+ï»¿#include "DivePch.h"
 #include "OldTransform.h"
 #include "Scene/GameObject.h"
 #include "Math/Math.h"
@@ -52,7 +52,7 @@ namespace Dive
 		return true;
 	}
 
-	// Á» ¾Ö¸ÅÇÏ´Ù.
+	// ì¢€ ì• ë§¤í•˜ë‹¤.
 	void OldTransform::Update()
 	{
 		updateTransform();
@@ -325,7 +325,7 @@ namespace Dive
 		}
 		else
 		{
-			// ¾Æ, Çò°¥·Á¼­ ´õ ¸ð¸£°Ú´Ù.
+			// ì•„, í—·ê°ˆë ¤ì„œ ë” ëª¨ë¥´ê² ë‹¤.
 			auto m = XMMatrixRotationQuaternion(GetLocalRotation());
 			auto v = XMVector3Transform(translation, m);
 
@@ -383,8 +383,8 @@ namespace Dive
 	{
 		if (relativeTo == eSpace::World)
 		{
-			// ÀÏ´Ü ÀÌ°Ç È®½ÇÈ÷ Àß¸øµÈ µí º¸ÀÎ´Ù.
-			// spartanÀÇ °æ¿ì rotationLocal * GetRotation().Inverse() * delta * GetRotation()ÀÌ´Ù. 
+			// ì¼ë‹¨ ì´ê±´ í™•ì‹¤ížˆ ìž˜ëª»ëœ ë“¯ ë³´ì¸ë‹¤.
+			// spartanì˜ ê²½ìš° rotationLocal * GetRotation().Inverse() * delta * GetRotation()ì´ë‹¤. 
 			//SetRotationQuaternion(XMQuaternionNormalize(XMQuaternionMultiply(GetRotation(), delta)));
 		}
 		else
@@ -395,12 +395,12 @@ namespace Dive
 
 	DirectX::XMVECTOR OldTransform::GetLookAt()
 	{
-		// ½ºÆÄ¸£Å¸Àº ±×³É ÀÌ·¸´Ù.
+		// ìŠ¤íŒŒë¥´íƒ€ì€ ê·¸ëƒ¥ ì´ë ‡ë‹¤.
 		return XMVectorAdd(GetForward(), GetPosition());
 	}
 
-	// ÇöÀç À§Ä¡¿Í µ¿ÀÏÇÏ¸é ¾ÈµÈ´Ù.
-	// => ¿©±â¿¡¼­ ³Ê¹« Çì¸Ì´Ù. ÀÏ´Ü ³Ñ¾î°¡ÀÚ.
+	// í˜„ìž¬ ìœ„ì¹˜ì™€ ë™ì¼í•˜ë©´ ì•ˆëœë‹¤.
+	// => ì—¬ê¸°ì—ì„œ ë„ˆë¬´ í—¤ë§¸ë‹¤. ì¼ë‹¨ ë„˜ì–´ê°€ìž.
 	void OldTransform::LookAt(const OldTransform& target)
 	{
 		if (XMVector3Equal(GetPosition(), target.GetPosition()))
@@ -409,7 +409,7 @@ namespace Dive
 		XMStoreFloat3(&m_LookAt, target.GetPosition());
 	}
 
-	// ÇöÀç À§Ä¡¿Í µ¿ÀÏÇÏ¸é ¾ÈµÈ´Ù.
+	// í˜„ìž¬ ìœ„ì¹˜ì™€ ë™ì¼í•˜ë©´ ì•ˆëœë‹¤.
 	void OldTransform::LookAt(const DirectX::XMFLOAT3& worldPosition)
 	{
 		if (XMVector3Equal(GetPosition(), XMLoadFloat3(&worldPosition)))
@@ -418,7 +418,7 @@ namespace Dive
 		m_LookAt = worldPosition;
 	}
 
-	// À¯´ÏÆ¼¿¡¼­´Â ÀüºÎ ¿ùµå ½ºÆäÀÌ½º´Ù.
+	// ìœ ë‹ˆí‹°ì—ì„œëŠ” ì „ë¶€ ì›”ë“œ ìŠ¤íŽ˜ì´ìŠ¤ë‹¤.
 	DirectX::XMVECTOR OldTransform::GetForward() const
 	{
 		return XMVector3Transform(XMVectorSet(0.0f, 0.0f, 1.0f, 1.0f), XMMatrixRotationQuaternion(GetLocalRotation()));
@@ -451,7 +451,7 @@ namespace Dive
 				if (m_pParent->GetID() == pParent->GetID())
 					return;
 
-				// ÀÚ½ÄÀ» ºÎ¸ð·Î »ïÀ» ¼ö ¾ø´Ù.
+				// ìžì‹ì„ ë¶€ëª¨ë¡œ ì‚¼ì„ ìˆ˜ ì—†ë‹¤.
 				if (pParent->IsChildOf(this))
 					return;
 				else

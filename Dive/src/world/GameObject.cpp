@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "GameObject.h"
 #include "Core/CoreDefs.h"
 #include "core/EventDispatcher.h"
@@ -70,7 +70,7 @@ namespace Dive
 		return nullptr;
 	}
 
-	// Camera¿Í MeshRendererÃ³·³ À¯È¿ÇÏÁö ¾ÊÀº Á¶ÇÕÀ» °É·¯³»¾ß ÇÑ´Ù.
+	// Cameraì™€ MeshRendererì²˜ëŸ¼ ìœ íš¨í•˜ì§€ ì•Šì€ ì¡°í•©ì„ ê±¸ëŸ¬ë‚´ì•¼ í•œë‹¤.
 	bool GameObject::ComponentValidator(GameObject* gameObject, Component* component)
 	{
 		return false;

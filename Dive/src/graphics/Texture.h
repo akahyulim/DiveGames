@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Graphics.h"
 #include "core/CoreDefs.h"
 #include "resource/Resource.h"

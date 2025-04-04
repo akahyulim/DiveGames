@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Component.h"
 
 namespace Dive
@@ -68,7 +68,7 @@ namespace Dive
 		void LookAt(const DirectX::XMVECTOR& target, const DirectX::XMVECTOR& up = { 0.0f, 1.0f, 0.0f, 1.0f });
 		void LookAt(const Transform* pTarget, const DirectX::XMVECTOR& up = { 0.0f, 1.0f, 0.0f, 1.0f });
 
-		DirectX::XMFLOAT4X4 GetSceneTransform() const { return m_Transform; }	// ÃßÈÄ ÀÌ¸§¿¡¼­ Scene Á¦°Å
+		DirectX::XMFLOAT4X4 GetSceneTransform() const { return m_Transform; }	// ì¶”í›„ ì´ë¦„ì—ì„œ Scene ì œê±°
 		void SetTransform(const DirectX::XMFLOAT4X4& world);
 		DirectX::XMMATRIX GetMatrix() const { return DirectX::XMLoadFloat4x4(&m_Transform); }
 		void SetMatrix(const DirectX::XMMATRIX& world);
@@ -89,7 +89,7 @@ namespace Dive
 		void SetParent(Transform* pParent);
 
 		const UINT64 GetParentID() const { return m_ParentID; }
-		void SetParentID(const UINT64 id) { m_ParentID = id; }	// Á» ¾Ö¸ÅÇÏ´Ù. »ç¿ëÀÚ´Â ÀÌ·ÎÀÎÇØ °èÃş±¸Á¶°¡ »ı¼ºµÈ´Ù ¿©±æ ¼ö ÀÖ´Ù.
+		void SetParentID(const UINT64 id) { m_ParentID = id; }	// ì¢€ ì• ë§¤í•˜ë‹¤. ì‚¬ìš©ìëŠ” ì´ë¡œì¸í•´ ê³„ì¸µêµ¬ì¡°ê°€ ìƒì„±ëœë‹¤ ì—¬ê¸¸ ìˆ˜ ìˆë‹¤.
 
 		bool IsRoot() const { return !m_Parent; }
 		Transform* GetRoot();

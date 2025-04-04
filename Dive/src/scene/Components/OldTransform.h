@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Component.h"
 
 namespace Dive
@@ -57,7 +57,7 @@ namespace Dive
 		void SetLocalScale(const DirectX::XMFLOAT3& scale);
 		void SetLocalScale(const DirectX::XMVECTOR& scale);
 
-		// À¯´ÏÆ¼´Â LocalToWorldMatrix, WorldToLocalMatrix µÎ °³ÀÇ Çà·Ä¸¸ °ø°³ÇØ ³õ¾Ò´Ù.
+		// ìœ ë‹ˆí‹°ëŠ” LocalToWorldMatrix, WorldToLocalMatrix ë‘ ê°œì˜ í–‰ë ¬ë§Œ ê³µê°œí•´ ë†“ì•˜ë‹¤.
 		DirectX::XMMATRIX GetMatrix() const;
 		void SetMatrix(const DirectX::XMFLOAT4X4& matrix);
 		DirectX::XMMATRIX GetLocalMatrix() const;

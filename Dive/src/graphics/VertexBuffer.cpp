@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "VertexBuffer.h"
 #include "Graphics.h"
 #include "core/CoreDefs.h"
@@ -24,7 +24,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, &subresourceData, &m_Buffer)))
 		{
-			DV_LOG(VerteBuffer, err, "VertexBuffer »ı¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+			DV_LOG(VerteBuffer, err, "VertexBuffer ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 			return false;
 		}
 

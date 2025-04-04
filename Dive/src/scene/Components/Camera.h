@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Component.h"
 //#include "Renderer/Renderer.h"
 
@@ -10,7 +10,7 @@ namespace Dive
 	class Camera : public Component
 	{
 	public:
-		// ÀÌ°Ç ¿Ö ¶Ç ¾È¿¡ ³Ö¾î³ù³Ä...
+		// ì´ê±´ ì™œ ë˜ ì•ˆì— ë„£ì–´ë†¨ëƒ...
 		enum class eProjectionType
 		{
 			Perspective,
@@ -25,7 +25,7 @@ namespace Dive
 
 		void Update() override;
 
-		// ¿Ö ÀÌ·¡ ³ùÀ»±î?
+		// ì™œ ì´ë˜ ë†¨ì„ê¹Œ?
 		DirectX::XMFLOAT3 GetPosition();
 		DirectX::XMMATRIX GetSceneMatrix();
 		DirectX::XMMATRIX GetViewMatrix();
@@ -62,7 +62,7 @@ namespace Dive
 		DirectX::XMFLOAT2 GetRenderTargetSize() const;
 
 
-		// À§Ä¡ ¿Å±â±â?
+		// ìœ„ì¹˜ ì˜®ê¸°ê¸°?
 		ConstantBuffer* GetConstantBufferVS() override;// { return m_pCBufferVS; }
 		ConstantBuffer* GetConstantBufferDS() override;// { return m_pCBufferDS; }
 		ConstantBuffer* GetConstantBufferPS() override;// { return m_pCBufferPS; }

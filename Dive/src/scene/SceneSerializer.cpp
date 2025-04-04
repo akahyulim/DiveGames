@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SceneSerializer.h"
 #include "Scene.h"
 #include "GameObject.h"
@@ -147,7 +147,7 @@ namespace Dive
 			out << YAML::Key << "Camera";
 			out << YAML::BeginMap;
 
-			// µ¥ÀÌÅÍ ÀúÀå
+			// ë°ì´í„° ì €ìž¥
 
 			out << YAML::EndMap;
 		}
@@ -188,7 +188,7 @@ namespace Dive
 		}
 		catch (YAML::ParserException e)
 		{
-			DV_LOG(SceneSerializer, err, "¿ùµå ÆÄÀÏ({:s})À» ¿ªÁ÷·ÄÈ­¿¡ ½ÇÆÐÇÏ¿´½À´Ï´Ù.", path.string());
+			DV_LOG(SceneSerializer, err, "ì›”ë“œ íŒŒì¼({:s})ì„ ì—­ì§ë ¬í™”ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.", path.string());
 			return false;
 		}
 
@@ -223,7 +223,7 @@ namespace Dive
 				}
 			}
 
-			// °èÃþ±¸Á¶ ±¸¼º
+			// ê³„ì¸µêµ¬ì¡° êµ¬ì„±
 			for (auto pGameObject : m_pScene->GetAllGameObjects())
 			{
 				auto pTransform = pGameObject->GetComponent<Transform>();

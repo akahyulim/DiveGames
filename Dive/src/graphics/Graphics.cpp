@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Graphics.h"
 #include "core/CoreDefs.h"
 #include "core/Window.h"
@@ -38,7 +38,7 @@ namespace Dive
 			&s_DeviceContext))) 
 		{
 			Shutdown();
-			DV_LOG(Graphics, err, "D3D11Device & D3D11DeviceContext »ı¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+			DV_LOG(Graphics, err, "D3D11Device & D3D11DeviceContext ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 			return;
 		}
 
@@ -57,16 +57,16 @@ namespace Dive
 		desc.BufferDesc.RefreshRate.Denominator = DV_REFRESHRATE_DENOMINATOR;
 		desc.BufferDesc.RefreshRate.Numerator = DV_REFRESHRATE_NUMERATOR;
 		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		desc.SampleDesc.Count = 1;								// ¸ÖÆ¼ »ùÇÃ¸µ off
+		desc.SampleDesc.Count = 1;								// ë©€í‹° ìƒ˜í”Œë§ off
 		desc.SampleDesc.Quality = 0;
 		desc.Windowed = !Window::IsFullScreen();
 		desc.OutputWindow = Window::GetWindowHandle();
-		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek¿¡¼± 0ÀÌ°í ´Ù¸¥ °ªµé ¼³Á¤ÀÌ ³²¾Æ ÀÖ´Ù...
+		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertekì—ì„  0ì´ê³  ë‹¤ë¥¸ ê°’ë“¤ ì„¤ì •ì´ ë‚¨ì•„ ìˆë‹¤...
 
 		if (FAILED(dxgiFactory->CreateSwapChain(s_Device, &desc, &s_SwapChain)))
 		{
 			Shutdown();
-			DV_LOG(Graphics, err, "D3D11SwapChain »ı¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+			DV_LOG(Graphics, err, "D3D11SwapChain ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 			return;
 		}
 
@@ -106,7 +106,7 @@ namespace Dive
 	
 		if (FAILED(s_SwapChain->ResizeBuffers(DV_BUFFER_COUNT, width, height, DV_FORMAT, 0))) 
 		{
-			DV_LOG(Graphics, err, "ÈÄ¸é ¹öÆÛ Å©±â {0:d}x{1:d} º¯°æ¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.", width, height);
+			DV_LOG(Graphics, err, "í›„ë©´ ë²„í¼ í¬ê¸° {0:d}x{1:d} ë³€ê²½ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.", width, height);
 			return;
 		}
 
@@ -119,7 +119,7 @@ namespace Dive
 
 		if (FAILED(s_SwapChain->ResizeTarget(&desc))) 
 		{
-			DV_LOG(Graphics, err, "ÇØ»óµµ {0:d}x{1:d} º¯°æ¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.", width, height);
+			DV_LOG(Graphics, err, "í•´ìƒë„ {0:d}x{1:d} ë³€ê²½ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.", width, height);
 			return;
 		}
 
@@ -185,7 +185,7 @@ namespace Dive
 		ID3D11Texture2D* pBackbufferTexture{};
 		if (FAILED(s_SwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture))) 
 		{
-			DV_LOG(Graphics, err, "ÈÄ¸é¹öÆÛ ÅØ½ºÃÄ È¹µæ ½ÇÆĞ");
+			DV_LOG(Graphics, err, "í›„ë©´ë²„í¼ í…ìŠ¤ì³ íšë“ ì‹¤íŒ¨");
 			return;
 		}
 
@@ -195,7 +195,7 @@ namespace Dive
 			&s_RenderTargetView))) 
 		{
 			DV_RELEASE(s_RenderTargetView);
-			DV_LOG(Graphics, err, "ÈÄ¸é¹öÆÛ ·»´õÅ¸°Ùºä »ı¼º ½ÇÆĞ");
+			DV_LOG(Graphics, err, "í›„ë©´ë²„í¼ ë Œë”íƒ€ê²Ÿë·° ìƒì„± ì‹¤íŒ¨");
 			return;
 		}
 		DV_RELEASE(pBackbufferTexture);
@@ -218,7 +218,7 @@ namespace Dive
 
 		if (FAILED(s_Device->CreateTexture2D(&texDesc, nullptr, &s_DepthStencilTexture))) 
 		{
-			DV_LOG(Graphics, err, "ÈÄ¸é¹öÆÛ ±íÀÌ ½ºÅÙ½Ç ÅØ½ºÃÄ »ı¼º ½ÇÆĞ");
+			DV_LOG(Graphics, err, "í›„ë©´ë²„í¼ ê¹Šì´ ìŠ¤í…ì‹¤ í…ìŠ¤ì³ ìƒì„± ì‹¤íŒ¨");
 			return;
 		}
 
@@ -232,7 +232,7 @@ namespace Dive
 			&viewDesc,
 			&s_DEpthStencilView))) 
 		{
-			DV_LOG(Graphics, err, "ÈÄ¸é¹öÆÛ ±íÀÌ ½ºÅÙ½Ç ºä »ı¼º ½ÇÆĞ");
+			DV_LOG(Graphics, err, "í›„ë©´ë²„í¼ ê¹Šì´ ìŠ¤í…ì‹¤ ë·° ìƒì„± ì‹¤íŒ¨");
 			return;
 		}
 

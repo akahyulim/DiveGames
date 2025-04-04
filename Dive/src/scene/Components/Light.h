@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Component.h"
 #include "Renderer/Renderer.h"
 
@@ -32,7 +32,7 @@ namespace Dive
 
 		Texture* GetShadowMap() const { return m_pShadowMap; }
 
-		// °¡·Î, ¼¼·Î Å©±â°¡ ´Ù¸¦ ¼öµµ ÀÖÁö ¾ÊÀ»±î?
+		// ê°€ë¡œ, ì„¸ë¡œ í¬ê¸°ê°€ ë‹¤ë¥¼ ìˆ˜ë„ ìˆì§€ ì•Šì„ê¹Œ?
 		float GetShadowMapSize() const { return m_ShadowMapSize; }
 
 		virtual DirectX::XMMATRIX GetShadowViewProj();
@@ -95,8 +95,8 @@ namespace Dive
 		GameObject* m_pCamera;
 	};
 
-	// À¯´ÏÆ¼ÀÇ °æ¿ì µğ·º¼Å³Î ¶óÀÌÆ®¸¦ 2°³ ÀÌ»ó ¼³Á¤ÇÒ ¼ö ÀÖÁö¸¸ ±×¸²ÀÚ¸¦ ¸¸µå´Â °ÍÀº ÇÏ³ª·Î Á¦ÇÑµÈ´Ù.
-	// ¾ğ¸®¾óÀÇ °æ¿ì Æ÷¿öµå ¼ÎÀÌµùÀÇ °æ¿ì ÇÏ³ªÀÇ µğ·º¼Å³Î ¶óÀÌÆ®¸¸ »ç¿ëµÈ´Ù.
+	// ìœ ë‹ˆí‹°ì˜ ê²½ìš° ë””ë ‰ì…”ë„ ë¼ì´íŠ¸ë¥¼ 2ê°œ ì´ìƒ ì„¤ì •í•  ìˆ˜ ìˆì§€ë§Œ ê·¸ë¦¼ìë¥¼ ë§Œë“œëŠ” ê²ƒì€ í•˜ë‚˜ë¡œ ì œí•œëœë‹¤.
+	// ì–¸ë¦¬ì–¼ì˜ ê²½ìš° í¬ì›Œë“œ ì…°ì´ë”©ì˜ ê²½ìš° í•˜ë‚˜ì˜ ë””ë ‰ì…”ë„ ë¼ì´íŠ¸ë§Œ ì‚¬ìš©ëœë‹¤.
 	class DirectionalLight : public Light
 	{
 		DV_CLASS(DirectionalLight, Light)
@@ -110,7 +110,7 @@ namespace Dive
 
 		void Update() override;
 
-		// Å×½ºÆ®
+		// í…ŒìŠ¤íŠ¸
 		ConstantBuffer* GetConstantBufferVS() override;
 		ConstantBuffer* GetConstantBufferDS() override;// { return m_pCBufferDS; }
 		ConstantBuffer* GetConstantBufferGS() override;// { return m_pCBufferGS; }
@@ -133,7 +133,7 @@ namespace Dive
 
 		void Update() override;
 
-		// Å×½ºÆ®¿ë
+		// í…ŒìŠ¤íŠ¸ìš©
 		ConstantBuffer* GetConstantBufferDS() override;// { return m_pCBufferDS; }
 		ConstantBuffer* GetConstantBufferGS() override;// { return m_pCBufferGS; }
 		ConstantBuffer* GetConstantBufferPS() override;
@@ -161,7 +161,7 @@ namespace Dive
  
 		ConstantBuffer* GetConstantBufferDS() override { return m_pCBufferDS; }
 
-		// GetViewProjMatrix()°¡ ´õ ¾î¿ï¸°´Ù.
+		// GetViewProjMatrix()ê°€ ë” ì–´ìš¸ë¦°ë‹¤.
 		DirectX::XMMATRIX GetShadowViewProj() override;
 
 		float GetRange() const { return m_Range; }
@@ -177,7 +177,7 @@ namespace Dive
 
 	private:
 	private:
-		ConstantBuffer* m_pCBufferDS;	// m_pDomainCBuffer·Î º¯°æ
+		ConstantBuffer* m_pCBufferDS;	// m_pDomainCBufferë¡œ ë³€ê²½
 
 		float m_Range;
 		float m_InnerAngle;

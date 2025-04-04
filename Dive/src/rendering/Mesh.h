@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Math/BoundingBox.h"
 
 namespace Dive
@@ -104,8 +104,8 @@ namespace Dive
 
         void Clear();
 
-        // ÇöÀç »ç¿ëÇÏ´Â °÷ÀÌ ¾ø´Ù.
-        // ¸Ş½Ã¿¡¼­ Æ¯Á¤ ºÎºĞÀÇ Á¤Á¡, ÀÎµ¦½º¸¦ ¸®ÅÏ
+        // í˜„ì¬ ì‚¬ìš©í•˜ëŠ” ê³³ì´ ì—†ë‹¤.
+        // ë©”ì‹œì—ì„œ íŠ¹ì • ë¶€ë¶„ì˜ ì •ì , ì¸ë±ìŠ¤ë¥¼ ë¦¬í„´
         void GetGeometry(
             UINT32 vertexOffset,
             UINT32 vertexCount,
@@ -134,22 +134,22 @@ namespace Dive
         void ComputeBouingBox();
         const BoundingBox& GetBoundingBox() const { return m_BoundingBox; }
 
-        // mesh·ÎºÎÅÍ gameObject¿Í renderer±îÁö Á¢±ÙÇÒ ¼ö ÀÖ´Ù.
+        // meshë¡œë¶€í„° gameObjectì™€ rendererê¹Œì§€ ì ‘ê·¼í•  ìˆ˜ ìˆë‹¤.
         GameObject* GetGameObject() const { return m_GameObject; }
         void SetGameObject(GameObject* pGameObject) { m_GameObject = pGameObject; }
 
     private:
         std::string m_Name;
 
-        // 1. BonuingBox¸¦ ¸¸µé·Á¸é Àû¾îµµ Á¤Á¡ Á¤º¸´Â °¡Áö°í ÀÖ¾î¾ß ÇÏ´Â °ÍÀÌ ¸Â´Ù.
-        // 2. VertexSkinned¸¦ °ü¸®ÇÏ·Á¸é »ó¼Ó Å¬·¡½º¸¦ ¸¸µå´Â ÆíÀÌ ³ª¾Æº¸ÀÎ´Ù. 
+        // 1. BonuingBoxë¥¼ ë§Œë“¤ë ¤ë©´ ì ì–´ë„ ì •ì  ì •ë³´ëŠ” ê°€ì§€ê³  ìˆì–´ì•¼ í•˜ëŠ” ê²ƒì´ ë§ë‹¤.
+        // 2. VertexSkinnedë¥¼ ê´€ë¦¬í•˜ë ¤ë©´ ìƒì† í´ë˜ìŠ¤ë¥¼ ë§Œë“œëŠ” í¸ì´ ë‚˜ì•„ë³´ì¸ë‹¤. 
         std::vector<VertexStatic> m_Vertices;
         std::vector<UINT32> m_Indices;
 
-        // urhoÀÇ ±¸ÇöÀ» ÀÚ¼¼È÷ ¼³¸íÇÏÀÚ¸é
-        // importer¿¡¼­ Á¤º¸(Å©±â, Å¸ÀÔ, µ¥ÀÌÅ¸)¸¦ ÆÄ½ÌÇÑ ÈÄ ¹öÆÛ °´Ã¼¿¡ ÀúÀå¸¸ ÇÏ°í
-        // ModelÀÇ Save¿¡¼­ ÀÌ Á¤º¸µéÀ» ÆÄÀÏÈ­ÇÑ´Ù.
-        // ±×¸®°í ModelÀÇ Load, Clone¿¡¼­ ÀÌ Á¤º¸µéÀ» ÀÌ¿ëÇØ ¹öÆÛ¸¦ »ı¼ºÇÏ´Â °ÍÀÌ´Ù.
+        // urhoì˜ êµ¬í˜„ì„ ìì„¸íˆ ì„¤ëª…í•˜ìë©´
+        // importerì—ì„œ ì •ë³´(í¬ê¸°, íƒ€ì…, ë°ì´íƒ€)ë¥¼ íŒŒì‹±í•œ í›„ ë²„í¼ ê°ì²´ì— ì €ì¥ë§Œ í•˜ê³ 
+        // Modelì˜ Saveì—ì„œ ì´ ì •ë³´ë“¤ì„ íŒŒì¼í™”í•œë‹¤.
+        // ê·¸ë¦¬ê³  Modelì˜ Load, Cloneì—ì„œ ì´ ì •ë³´ë“¤ì„ ì´ìš©í•´ ë²„í¼ë¥¼ ìƒì„±í•˜ëŠ” ê²ƒì´ë‹¤.
         std::shared_ptr<VertexBuffer> m_VertexBuffer;
         std::shared_ptr<IndexBuffer> m_IndexBuffer;
 

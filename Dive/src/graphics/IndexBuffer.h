@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 
 namespace Dive
 {
-	// ÇöÀç ModelFactory¿Í Mesh¿¡¼­ UINT32·Î ±¸¼ºÇÏ±â ¶§¹®¿¡
-	// ¼¸ºÒ¸® void*·Î ¹Ù²Ü ¼ö°¡ ¾ø´Ù.
+	// í˜„ì¬ ModelFactoryì™€ Meshì—ì„œ UINT32ë¡œ êµ¬ì„±í•˜ê¸° ë•Œë¬¸ì—
+	// ì„¯ë¶ˆë¦¬ void*ë¡œ ë°”ê¿€ ìˆ˜ê°€ ì—†ë‹¤.
 	class IndexBuffer
 	{
 	public:

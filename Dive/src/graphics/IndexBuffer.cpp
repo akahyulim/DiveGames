@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "IndexBuffer.h"
 #include "Graphics.h"
 #include "core/CoreDefs.h"
@@ -26,7 +26,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, &subresourceData, &m_Buffer))) 
 		{
-			DV_LOG(IndexBuffer, err, "IndexBuffer »ı¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+			DV_LOG(IndexBuffer, err, "IndexBuffer ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 			return false;
 		}
 

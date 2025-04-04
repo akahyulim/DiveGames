@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Renderer.h"
 #include "core/CoreDefs.h"
 #include "core/EventDispatcher.h"
@@ -21,7 +21,7 @@ namespace Dive
 	{
 		Shutdown();
 
-		// °¢Á¾ ¸®¼Ò½º »ı¼º(·»´õÅ¸°Ù, states)
+		// ê°ì¢… ë¦¬ì†ŒìŠ¤ ìƒì„±(ë Œë”íƒ€ê²Ÿ, states)
 
 		s_RenderTarget = std::make_unique<RenderTexture>(s_Width, s_Height);
 	}
@@ -29,7 +29,7 @@ namespace Dive
 	void Renderer::Shutdown()
 	{
 
-		// »ı¼ºÇÑ ¸®¼Ò½º ¸±¸®Áî
+		// ìƒì„±í•œ ë¦¬ì†ŒìŠ¤ ë¦´ë¦¬ì¦ˆ
 	}
 
 	void Renderer::Update()
@@ -41,7 +41,7 @@ namespace Dive
 
 	void Renderer::Render()
 	{
-		// ·»´õ¸µ ÆĞ½º ¼öÇà
+		// ë Œë”ë§ íŒ¨ìŠ¤ ìˆ˜í–‰
 
 		DV_FIRE_EVENT(eEventType::PostRender);
 

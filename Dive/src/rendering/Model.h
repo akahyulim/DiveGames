@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Resource/Resource.h"
 
 namespace Dive
@@ -30,7 +30,7 @@ namespace Dive
 	private:
 		GameObject* m_RootGameObject;
 
-		// urho´Â geometry»Ó¸¸ ¾Æ´Ï¶ó ¸ğµç Bufferµµ °ü¸®ÇÑ´Ù.
+		// urhoëŠ” geometryë¿ë§Œ ì•„ë‹ˆë¼ ëª¨ë“  Bufferë„ ê´€ë¦¬í•œë‹¤.
 		std::vector<Mesh*> m_Meshes;
 	};
 }

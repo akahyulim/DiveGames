@@ -1,4 +1,4 @@
-#include "ProjectView.h"
+ï»¿#include "ProjectView.h"
 
 namespace Dive
 {
@@ -13,7 +13,7 @@ namespace Dive
             {
                 if (ImGui::TreeNode(entry.path().stem().string().c_str())) 
                 {
-                    DisplayFolder(entry.path());  // Àç±ÍÀûÀ¸·Î ÇÏÀ§ Æú´õ¸¦ Å½»ö
+                    DisplayFolder(entry.path());  // ì¬ê·€ì ìœ¼ë¡œ í•˜ìœ„ í´ë”ë¥¼ íƒìƒ‰
                     ImGui::TreePop();
                 }
             }

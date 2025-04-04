@@ -1,4 +1,4 @@
-#include "InspectorView.h"
+﻿#include "InspectorView.h"
 
 namespace Dive
 {

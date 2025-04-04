@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Material.h"
 #include "Graphics/Texture2D.h"
 #include "Core/CoreDefs.h"
@@ -43,21 +43,21 @@ namespace Dive
             if (pTexture)
                 m_DvTextures[unit] = pTexture;
             else
-                m_DvTextures.erase(unit); // ÀÌ°Ô ¸Â³ª ¸ğ¸£°Ú´Ù.
+                m_DvTextures.erase(unit); // ì´ê²Œ ë§ë‚˜ ëª¨ë¥´ê² ë‹¤.
         }
     }
 
-    // RenderableÀÇ Update¿¡¼­ ¸®¼Ò½º À¯¹«¸¦ ÆÄ¾ÇÇÏ´Âµ¥ »ç¿ë
+    // Renderableì˜ Updateì—ì„œ ë¦¬ì†ŒìŠ¤ ìœ ë¬´ë¥¼ íŒŒì•…í•˜ëŠ”ë° ì‚¬ìš©
     bool Material::HasTexture(eTextureUnitType unit) const
     {
         auto it = m_DvTextures.find(unit);
         return it != m_DvTextures.end() && it->second != nullptr;
     }
 
-    // urho´Â load¿¡¼­¸¸ ÅØ½ºÃÄ¸¦ ·ÎµåÇÏ±â¿¡ Á÷Á¢ ¸¸µé¾îºÃ´Ù.
-   // ±×·±µ¥ cache¿¡¼­ GetResourceÇÑ ÈÄ À§ÀÇ SetTextureÇÏ´Â°Ô ¸ÂÁö ¾Ê³ª ½Í´Ù.
-   // ÇÏÁö¸¸ ÀÌ ±¸ÇöÀÌ Èûµç°Ô CacheÀÇ GetResource´Â ÀÏ¹İ ¸®¼Ò½º ÆÄÀÏ°ú ¿£ÁøÀÇ ¼³Á¤ ÆÄÀÏÀ»
-   // ±¸ºĞÇÏ¿© ·ÎµåÇÒ ¼ö ÀÖ´Ù´Â °ÍÀÌ´Ù.
+    // urhoëŠ” loadì—ì„œë§Œ í…ìŠ¤ì³ë¥¼ ë¡œë“œí•˜ê¸°ì— ì§ì ‘ ë§Œë“¤ì–´ë´¤ë‹¤.
+   // ê·¸ëŸ°ë° cacheì—ì„œ GetResourceí•œ í›„ ìœ„ì˜ SetTextureí•˜ëŠ”ê²Œ ë§ì§€ ì•Šë‚˜ ì‹¶ë‹¤.
+   // í•˜ì§€ë§Œ ì´ êµ¬í˜„ì´ í˜ë“ ê²Œ Cacheì˜ GetResourceëŠ” ì¼ë°˜ ë¦¬ì†ŒìŠ¤ íŒŒì¼ê³¼ ì—”ì§„ì˜ ì„¤ì • íŒŒì¼ì„
+   // êµ¬ë¶„í•˜ì—¬ ë¡œë“œí•  ìˆ˜ ìˆë‹¤ëŠ” ê²ƒì´ë‹¤.
     void Material::AddTexture(eTextureUnitType unit, const std::string& name)
     {
         if (unit < eTextureUnitType::Count)
@@ -85,7 +85,7 @@ namespace Dive
     {
         if (name.empty())
         {
-            DV_LOG(Material, err, "Àß¸øµÈ ÀÌ¸§({:s})À» Àü´Ş¹Ş¾Ò½À´Ï´Ù.", name);
+            DV_LOG(Material, err, "ì˜ëª»ëœ ì´ë¦„({:s})ì„ ì „ë‹¬ë°›ì•˜ìŠµë‹ˆë‹¤.", name);
             return nullptr;
         }
 

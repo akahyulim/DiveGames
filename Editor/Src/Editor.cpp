@@ -1,4 +1,4 @@
-#include "Editor.h"
+ï»¿#include "Editor.h"
 #include "MenuBar.h"
 #include "Views/WorldView.h"
 #include "Views/GameView.h"
@@ -41,17 +41,17 @@ LRESULT CALLBACK DvEditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LP
 
 namespace Dive
 {
-	// mainÀ¸·ÎºÎÅÍ argc¸¦ ¹Ş¾Æ Ãß¸° ÈÄ ¿£Áø¿¡ Àü´ŞÇÑ´Ù.
+	// mainìœ¼ë¡œë¶€í„° argcë¥¼ ë°›ì•„ ì¶”ë¦° í›„ ì—”ì§„ì— ì „ë‹¬í•œë‹¤.
 	Editor::Editor()
 		: m_pActiveProject(nullptr)
 	{
-		// ÀÌ°Íµµ argc¿¡ Æ÷ÇÔ½ÃÄÑ ¿£Áø ÃÊ±âÈ­°úÁ¤¿¡ ÆíÀÔ½ÃÅ°´Â °Ô ¸Â´Ù.
+		// ì´ê²ƒë„ argcì— í¬í•¨ì‹œì¼œ ì—”ì§„ ì´ˆê¸°í™”ê³¼ì •ì— í¸ì…ì‹œí‚¤ëŠ” ê²Œ ë§ë‹¤.
 		LogManager::SetFilename("dive_editor.log");
 		Engine::Initialize();
 		Window::SetMessageCallback((LONG_PTR)DvEditorMessageHandler);
 		Window::Maximize();
 
-		// ImGui ÃÊ±âÈ­
+		// ImGui ì´ˆê¸°í™”
 		{
 			// Setup Dear ImGui context
 			IMGUI_CHECKVERSION();
@@ -75,7 +75,7 @@ namespace Dive
 			ImGui_ImplWin32_Init(Window::GetWindowHandle());
 			ImGui_ImplDX11_Init(Graphics::GetDevice(), Graphics::GetDeviceContext());
 
-			// ½ºÅ¸ÀÏ ¼öÁ¤
+			// ìŠ¤íƒ€ì¼ ìˆ˜ì •
 			{
 				auto& colors = ImGui::GetStyle().Colors;
 				colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
@@ -168,13 +168,13 @@ namespace Dive
 		// FONTS
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.FontDefault = m_Fonts[static_cast<size_t>(eFontTypes::Normal)] =
-			io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("../../../Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
 		m_Fonts[static_cast<size_t>(eFontTypes::Bold)] =
-			io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("../../../Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
 		m_Fonts[static_cast<size_t>(eFontTypes::Large)] =
-			io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("../../../Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
 		m_Fonts[static_cast<size_t>(eFontTypes::Large_Bold)] =
-			io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("../../../Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
 	}
 
 	void Editor::beginUI()
@@ -219,7 +219,7 @@ namespace Dive
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiStyle& style = ImGui::GetStyle();
 		float minWinSizeX = style.WindowMinSize.x;
-		style.WindowMinSize.x = 200.0f;	// dock space¿¡¼­ÀÇ ÃÖ¼Ò Å©±â...
+		style.WindowMinSize.x = 200.0f;	// dock spaceì—ì„œì˜ ìµœì†Œ í¬ê¸°...
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");

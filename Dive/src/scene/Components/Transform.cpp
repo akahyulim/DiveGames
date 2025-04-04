@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Transform.h"
 #include "../GameObject.h"
 #include "../Scene.h"
@@ -251,8 +251,8 @@ namespace Dive
 		}
 	}
 
-	// ÀÌ°Ç ±ÞÀÛ½º·¹ Ãß°¡ÇÑ °ÍÀÎµ¥
-	// ¾Æ·¡ÀÇ ¿øº»¿¡ ¸ÂÃç ¼öÁ¤ÇØ¾ß ÇÑ´Ù.
+	// ì´ê±´ ê¸‰ìž‘ìŠ¤ë ˆ ì¶”ê°€í•œ ê²ƒì¸ë°
+	// ì•„ëž˜ì˜ ì›ë³¸ì— ë§žì¶° ìˆ˜ì •í•´ì•¼ í•œë‹¤.
 	void Transform::Rotate(const DirectX::XMVECTOR& quaternion, eSpace relativeTo)
 	{
 		auto currentSceneRotationQuaternion = DirectX::XMLoadFloat4(&m_LocalRotation);
@@ -271,8 +271,8 @@ namespace Dive
 		updateTransform();
 	}
 
-	// TranslateÃ³·³ SetLocalRoatation()À» ÅëÇØ updateTransform()À» ¼öÇàÅä·Ï º¯°æÇß´Ù.
-	// Æ¯º°ÇÑ Ã³ÀÌÁ¡Àº ¾ø´Ù.
+	// Translateì²˜ëŸ¼ SetLocalRoatation()ì„ í†µí•´ updateTransform()ì„ ìˆ˜í–‰í† ë¡ ë³€ê²½í–ˆë‹¤.
+	// íŠ¹ë³„í•œ ì²˜ì´ì ì€ ì—†ë‹¤.
 	void Transform::Rotate(float degreeX, float degreeY, float degreeZ, eSpace relativeTo)
 	{
 		float roll = DirectX::XMConvertToRadians(degreeX);
@@ -312,7 +312,7 @@ namespace Dive
 	{
 		if (DirectX::XMVector3Equal(target, GetPositionVector()))
 		{
-			DV_LOG(GameObject, warn, "ÇöÀç À§Ä¡¸¦ ¹Ù¶óº¼ ¼ö ¾ø½À´Ï´Ù.");
+			DV_LOG(GameObject, warn, "í˜„ìž¬ ìœ„ì¹˜ë¥¼ ë°”ë¼ë³¼ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 			return;
 		}
 
@@ -321,7 +321,7 @@ namespace Dive
 
 		if (DirectX::XMVector3NearEqual(DirectX::XMVector3Dot(forwardVector, up), DirectX::XMVector3Length(up), DirectX::XMVectorReplicate(0.0001f)))
 		{
-			DV_LOG(GameObject, warn, "¹Ù¶óº¸´Â ´ë»ó°ú »óÇâ º¤ÅÍ°¡ ÆòÇàÇÏ¿© Àû¿ëÀÌ ºÒ°¡´ÉÇÕ´Ï´Ù.");
+			DV_LOG(GameObject, warn, "ë°”ë¼ë³´ëŠ” ëŒ€ìƒê³¼ ìƒí–¥ ë²¡í„°ê°€ í‰í–‰í•˜ì—¬ ì ìš©ì´ ë¶ˆê°€ëŠ¥í•©ë‹ˆë‹¤.");
 			return;
 		}
 
@@ -344,7 +344,7 @@ namespace Dive
 	{
 		if (!pTarget)
 		{
-			DV_LOG(GameObject, warn, "¹Ù¶óº¸´Â ´ë»ó °ÔÀÓ¿ÀºêÁ§Æ®°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.");
+			DV_LOG(GameObject, warn, "ë°”ë¼ë³´ëŠ” ëŒ€ìƒ ê²Œìž„ì˜¤ë¸Œì íŠ¸ê°€ ì¡´ìž¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
 			return;
 		}
 
@@ -459,7 +459,7 @@ namespace Dive
 			m_ParentID = pParent->GetGameObject()->GetID();
 			pParent->m_Children.emplace_back(this);
 
-			// ·ÎÄÃ °ªµéÀ» °è»ê
+			// ë¡œì»¬ ê°’ë“¤ì„ ê³„ì‚°
 			auto parentMatrix = DirectX::XMMatrixScalingFromVector(m_pParent->GetScaleVector()) *
 				DirectX::XMMatrixRotationQuaternion(m_pParent->GetRotationQuaternionVector());
 

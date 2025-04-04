@@ -1,4 +1,4 @@
-#include "divepch.h"
+ï»¿#include "divepch.h"
 #include "Renderable.h"
 #include "World/GameObject.h"
 #include "Core/CoreDefs.h"
@@ -53,8 +53,8 @@ namespace Dive
 
 	void Renderable::Update()
 	{
-		// ÀÌ ºÎºÐÀ» °Ç³Ê¶ç¸é ¾È±×·ÁÁö´Â °ÍÀÌ »ý±ä´Ù.
-		// ¾Æ¸¶µµ Material·Î È®ÀÎÇÏ´Â ÄÚµå ¶§¹®ÀÎ °Í °°´Ù.
+		// ì´ ë¶€ë¶„ì„ ê±´ë„ˆë„ë©´ ì•ˆê·¸ë ¤ì§€ëŠ” ê²ƒì´ ìƒê¸´ë‹¤.
+		// ì•„ë§ˆë„ Materialë¡œ í™•ì¸í•˜ëŠ” ì½”ë“œ ë•Œë¬¸ì¸ ê²ƒ ê°™ë‹¤.
 		if (!m_pMaterial)
 		{
 			m_pMaterial = new Material();
@@ -76,7 +76,7 @@ namespace Dive
 		
 		// ps constant buffer
 		{
-			// ¾ø´Ù¸é ÃÊ±âÈ­µÈ °ªÀ» Àü´ÞÇØ¾ß ÇÑ´Ù.
+			// ì—†ë‹¤ë©´ ì´ˆê¸°í™”ëœ ê°’ì„ ì „ë‹¬í•´ì•¼ í•œë‹¤.
 			if (!m_pMaterial)
 			{
 				m_pMaterial = new Material();
@@ -115,7 +115,7 @@ namespace Dive
 		if(!m_pCBufferPS)
 			m_pCBufferPS = ConstantBuffer::Create("CB_MATERIAL_PS", sizeof(CB_MATERIAL_PS));
 
-		// ¾ø´Ù¸é ÃÊ±âÈ­µÈ °ªÀ» Àü´ÞÇØ¾ß ÇÑ´Ù.
+		// ì—†ë‹¤ë©´ ì´ˆê¸°í™”ëœ ê°’ì„ ì „ë‹¬í•´ì•¼ í•œë‹¤.
 		if (!m_pMaterial)
 		{
 			m_pMaterial = new Material();
@@ -135,8 +135,8 @@ namespace Dive
 		return m_pCBufferPS;
 	}
 	
-	// ·»´õ·¯ºíÀÌ ±×¸± ¸Þ½ÃÀÇ Á¤º¸¸¦ ¹Þ´Â ¸Þ¼­µå´Ù.
-	// ¸Þ½Ã´Â ´ÜÀÏ Á¤Á¡ ¹öÆÛ¸¦ »ç¿ëÇÏ±â¿¡ ¿ÀÇÁ¼ÂÀº »ç½Ç»ó ÀüºÎ 0ÀÌ´Ù.
+	// ë Œë”ëŸ¬ë¸”ì´ ê·¸ë¦´ ë©”ì‹œì˜ ì •ë³´ë¥¼ ë°›ëŠ” ë©”ì„œë“œë‹¤.
+	// ë©”ì‹œëŠ” ë‹¨ì¼ ì •ì  ë²„í¼ë¥¼ ì‚¬ìš©í•˜ê¸°ì— ì˜¤í”„ì…‹ì€ ì‚¬ì‹¤ìƒ ì „ë¶€ 0ì´ë‹¤.
 	void Renderable::SetGeometry(Mesh* pMesh, uint32_t vertexOffset, uint32_t vertexCount, uint32_t indexOffset, uint32_t indexCount)
 	{
 		m_pMesh = pMesh;
@@ -180,7 +180,7 @@ namespace Dive
 		return m_TransformdBoundingBox;
 	}
 
-	// Á¦°Å´ë»ó - »ç¿ëÇÏÁö ¾Ê´Â´Ù.
+	// ì œê±°ëŒ€ìƒ - ì‚¬ìš©í•˜ì§€ ì•ŠëŠ”ë‹¤.
 	void Renderable::Draw(D3D11_PRIMITIVE_TOPOLOGY topology) const
 	{
 		if (GetIndexBuffer() && GetIndexCount() > 0)

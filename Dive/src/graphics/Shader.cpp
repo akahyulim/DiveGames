@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Shader.h"
 #include "Graphics.h"
 #include "core/CoreDefs.h"
@@ -46,7 +46,7 @@ namespace Dive
 				profile = "cs_5_0";
 				break;
 			default:
-				DV_LOG(Shader, err, "Àß¸øµÈ ¼ÎÀÌ´õ Å¸ÀÔÀ» Àü´Ş¹Ş¾Æ ¼ÎÀÌ´õ ÆÄÀÏ ÄÄÆÄÀÏ¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Shader, err, "ì˜ëª»ëœ ì…°ì´ë” íƒ€ì…ì„ ì „ë‹¬ë°›ì•„ ì…°ì´ë” íŒŒì¼ ì»´íŒŒì¼ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return nullptr;
 			}
 
@@ -61,7 +61,7 @@ namespace Dive
 				compiledShader.GetAddressOf(),
 				errorMessage.GetAddressOf())))
 			{
-				DV_LOG(Shader, err, "¼ÎÀÌ´õ ÄÄÆÄÀÏ ½ÇÆĞ: {:s}", 
+				DV_LOG(Shader, err, "ì…°ì´ë” ì»´íŒŒì¼ ì‹¤íŒ¨: {:s}", 
 					errorMessage ? static_cast<char*>(errorMessage->GetBufferPointer()) : filepath.string().c_str());
 				return nullptr;
 			}
@@ -103,7 +103,7 @@ namespace Dive
 				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 				break;
 			default:
-				DV_LOG(Shader, err, "Àß¸øµÈ ÀÔ·Â ·¹ÀÌ¾Æ¿ô Å¸ÀÔÀ» Àü´Ş¹Ş¾Æ ÀÔ·Â ·¹ÀÌ¾Æ¿ô ±¸¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Shader, err, "ì˜ëª»ëœ ì…ë ¥ ë ˆì´ì•„ì›ƒ íƒ€ì…ì„ ì „ë‹¬ë°›ì•„ ì…ë ¥ ë ˆì´ì•„ì›ƒ êµ¬ì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				elements.clear();
 			}
 
@@ -132,47 +132,47 @@ namespace Dive
 		case eShaderType::Vertex:
 			if (FAILED(Graphics::GetDevice()->CreateVertexShader(bufferPointer, bufferSize, NULL, &m_VertexShader)))
 			{
-				DV_LOG(Shader, err, "VertexShader »ı¼º ½ÇÆĞ");
+				DV_LOG(Shader, err, "VertexShader ìƒì„± ì‹¤íŒ¨");
 				return false;
 			}
 			break;
 		case eShaderType::Hull:
 			if (FAILED(Graphics::GetDevice()->CreateHullShader(bufferPointer, bufferSize, NULL, &m_HullShader)))
 			{
-				DV_LOG(Shader, err, "HullShader »ı¼º ½ÇÆĞ");
+				DV_LOG(Shader, err, "HullShader ìƒì„± ì‹¤íŒ¨");
 				return false;
 			}
 			break;
 		case eShaderType::Domain:
 			if (FAILED(Graphics::GetDevice()->CreateDomainShader(bufferPointer, bufferSize, NULL, &m_DomainShader)))
 			{
-				DV_LOG(Shader, err, "DomainShader »ı¼º ½ÇÆĞ");
+				DV_LOG(Shader, err, "DomainShader ìƒì„± ì‹¤íŒ¨");
 				return false;
 			}
 			break;
 		case eShaderType::Geometry:
 			if (FAILED(Graphics::GetDevice()->CreateGeometryShader(bufferPointer, bufferSize, NULL, &m_GeometryShader)))
 			{
-				DV_LOG(Shader, err, "GeometryShader »ı¼º ½ÇÆĞ");
+				DV_LOG(Shader, err, "GeometryShader ìƒì„± ì‹¤íŒ¨");
 				return false;
 			}
 			break;
 		case eShaderType::Pixel:
 			if (FAILED(Graphics::GetDevice()->CreatePixelShader(bufferPointer, bufferSize, NULL, &m_PixelShader)))
 			{
-				DV_LOG(Shader, err, "Pixel Shader »ı¼º ½ÇÆĞ");
+				DV_LOG(Shader, err, "Pixel Shader ìƒì„± ì‹¤íŒ¨");
 				return false;
 			}
 			break;
 		case eShaderType::Compute:
 			if (FAILED(Graphics::GetDevice()->CreateComputeShader(bufferPointer, bufferSize, NULL, &m_ComputeShader)))
 			{
-				DV_LOG(Shader, err, "ComputeShader »ı¼º ½ÇÆĞ");
+				DV_LOG(Shader, err, "ComputeShader ìƒì„± ì‹¤íŒ¨");
 				return false;
 			}
 			break;
 		default:
-			DV_LOG(Shader, err, "¼ÎÀÌ´õ »ı¼º ½ÇÆĞ: Àß¸øµÈ ¼ÎÀÌ´õ Å¸ÀÔ Àü´Ş");
+			DV_LOG(Shader, err, "ì…°ì´ë” ìƒì„± ì‹¤íŒ¨: ì˜ëª»ëœ ì…°ì´ë” íƒ€ì… ì „ë‹¬");
 			return false;
 		}
 
@@ -184,7 +184,7 @@ namespace Dive
 	{
 		if (!blob || layout == eInputLayout::None)
 		{
-			DV_LOG(Shader, err, "InputLayout »ı¼º ½ÇÆĞ: À¯È¿ÇÏÁö ¾ÊÀº ¸Å°³º¯¼ö Àü´Ş");
+			DV_LOG(Shader, err, "InputLayout ìƒì„± ì‹¤íŒ¨: ìœ íš¨í•˜ì§€ ì•Šì€ ë§¤ê°œë³€ìˆ˜ ì „ë‹¬");
 			return false;
 		}
 	
@@ -197,7 +197,7 @@ namespace Dive
 			blob->GetBufferSize(),
 			&m_InputLayout)))
 		{
-			DV_LOG(Shader, err, "InputLayout »ı¼º ½ÇÆĞ");
+			DV_LOG(Shader, err, "InputLayout ìƒì„± ì‹¤íŒ¨");
 			return false;
 		}
 

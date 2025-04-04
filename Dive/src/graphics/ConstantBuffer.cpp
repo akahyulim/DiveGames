@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "ConstantBuffer.h"
 #include "Graphics.h"
 #include "core/CoreDefs.h"
@@ -22,7 +22,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_Buffer)))
 		{
-			DV_LOG(ConstantBuffer, err, "ConstantBuffer »ı¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+			DV_LOG(ConstantBuffer, err, "ConstantBuffer ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 			return false;
 		}
 
@@ -46,7 +46,7 @@ namespace Dive
 			0,
 			&mappedData)))
 		{
-			DV_LOG(ConstantBuffer, err, "ConstantBufferÀÇ Map¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+			DV_LOG(ConstantBuffer, err, "ConstantBufferì˜ Mapì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 			return nullptr;
 		}
 

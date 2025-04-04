@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Input.h"
 #include "core/CoreDefs.h"
 #include "core/Window.h"
@@ -31,60 +31,60 @@ namespace Dive
 		DV_ASSERT(Input, hWnd);
  
 		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&s_DirectInput, nullptr))) {
-			DV_LOG(Input, err, "Input ÃÊ±âÈ­ °úÁ¤ Áß DirectDvInput °´Ã¼ »ı¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+			DV_LOG(Input, err, "Input ì´ˆê¸°í™” ê³¼ì • ì¤‘ DirectDvInput ê°ì²´ ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 			return;
 		}
 
-		// Å°º¸µå »ı¼º
+		// í‚¤ë³´ë“œ ìƒì„±
 		{
 			if (FAILED(s_DirectInput->CreateDevice(GUID_SysKeyboard, &s_Keyboard, nullptr)))
 			{
-				DV_LOG(Input, err, "Input ÃÊ±âÈ­ °úÁ¤ Áß Å°º¸µå ÀåÄ¡ °´Ã¼ »ı¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Input, err, "Input ì´ˆê¸°í™” ê³¼ì • ì¤‘ í‚¤ë³´ë“œ ì¥ì¹˜ ê°ì²´ ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return;
 			}
 
 			if (FAILED(s_Keyboard->SetDataFormat(&c_dfDIKeyboard)))
 			{
-				DV_LOG(Input, err, "Input ÃÊ±âÈ­ °úÁ¤ Áß Å°º¸µå µ¥ÀÌÅÍ Æ÷¸ä ¼³Á¤¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Input, err, "Input ì´ˆê¸°í™” ê³¼ì • ì¤‘ í‚¤ë³´ë“œ ë°ì´í„° í¬ë©§ ì„¤ì •ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return;
 			}
 
 			if (FAILED(s_Keyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
 			{
-				DV_LOG(Input, err, "Input ÃÊ±âÈ­ °úÁ¤ Áß Å°º¸µå ÄÚÆÛ·¹ÀÌÆ® ·¹º§ ¼³Á¤¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Input, err, "Input ì´ˆê¸°í™” ê³¼ì • ì¤‘ í‚¤ë³´ë“œ ì½”í¼ë ˆì´íŠ¸ ë ˆë²¨ ì„¤ì •ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return;
 			}
 
 			if (FAILED(s_Keyboard->Acquire()))
 			{
-				DV_LOG(Input, err, "Input ÃÊ±âÈ­ °úÁ¤ Áß Å°º¸µå È¹µæ¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Input, err, "Input ì´ˆê¸°í™” ê³¼ì • ì¤‘ í‚¤ë³´ë“œ íšë“ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return;
 			}
 		}
 
-		// ¸¶¿ì½º »ı¼º
+		// ë§ˆìš°ìŠ¤ ìƒì„±
 		{
 			if (FAILED(s_DirectInput->CreateDevice(GUID_SysMouse, &s_Mouse, NULL)))
 			{
-				DV_LOG(Input, err, "Input ÃÊ±âÈ­ °úÁ¤ Áß ¸¶¿ì½º ÀåÄ¡ °´Ã¼ »ı¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Input, err, "Input ì´ˆê¸°í™” ê³¼ì • ì¤‘ ë§ˆìš°ìŠ¤ ì¥ì¹˜ ê°ì²´ ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return;
 			}
 
 			if (FAILED(s_Mouse->SetDataFormat(&c_dfDIMouse)))
 			{
-				DV_LOG(Input, err, "Input ÃÊ±âÈ­ °úÁ¤ Áß ¸¶¿ì½º µ¥ÀÌÅÍ Æ÷¸ä ¼³Á¤¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Input, err, "Input ì´ˆê¸°í™” ê³¼ì • ì¤‘ ë§ˆìš°ìŠ¤ ë°ì´í„° í¬ë©§ ì„¤ì •ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return;
 			}
 
 			if (FAILED(s_Mouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
 			{
-				DV_LOG(Input, err, "Input ÃÊ±âÈ­ °úÁ¤ Áß ¸¶¿ì½º ÄÚÆÛ·¹ÀÌÆ® ·¹º§ ¼³Á¤¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Input, err, "Input ì´ˆê¸°í™” ê³¼ì • ì¤‘ ë§ˆìš°ìŠ¤ ì½”í¼ë ˆì´íŠ¸ ë ˆë²¨ ì„¤ì •ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return;
 			}
 
 			if (FAILED(s_Mouse->Acquire()))
 			{
-				DV_LOG(Input, err, "Input ÃÊ±âÈ­ °úÁ¤ Áß ¸¶¿ì½º È¹µæ¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Input, err, "Input ì´ˆê¸°í™” ê³¼ì • ì¤‘ ë§ˆìš°ìŠ¤ íšë“ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return;
 			}
 		}
@@ -109,7 +109,7 @@ namespace Dive
 
 	void Input::Tick()
 	{
-		// ¼ø¼­´ë·Î Ã³¸®ÇÏ¸é µ¿½Ã ÀÔ·ÂÀº ºÒ°¡´ÉÇÏÁö ¾ÊÀ»±î?
+		// ìˆœì„œëŒ€ë¡œ ì²˜ë¦¬í•˜ë©´ ë™ì‹œ ì…ë ¥ì€ ë¶ˆê°€ëŠ¥í•˜ì§€ ì•Šì„ê¹Œ?
 		ReadKeyboard();
 		ReadMouse();
 	}
@@ -130,7 +130,7 @@ namespace Dive
 				s_Keyboard->Acquire();
 			else
 			{
-				DV_ASSERT(Input, false, "Å°º¸µå ¿¬°á¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_ASSERT(Input, false, "í‚¤ë³´ë“œ ì—°ê²°ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return;
 			}
 		}
@@ -151,7 +151,7 @@ namespace Dive
 				s_Mouse->Acquire();
 			else
 			{
-				DV_ASSERT(Input, "¸¶¿ì½º ¿¬°á¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_ASSERT(Input, "ë§ˆìš°ìŠ¤ ì—°ê²°ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return;
 			}
 		}
@@ -163,7 +163,7 @@ namespace Dive
 		s_MousePosition.y += static_cast<float>(s_MouseState.lY);
 
 		/*
-		// ÃßÈÄ ÀÌº¥Æ®¸¦ ÅëÇØ °»½ÅÇÏÀÚ.
+		// ì¶”í›„ ì´ë²¤íŠ¸ë¥¼ í†µí•´ ê°±ì‹ í•˜ì.
 		DirectX::XMFLOAT2 windowSize = Renderer::GetResolutionRender();
 
 		if (s_MousePosition.x < 0)

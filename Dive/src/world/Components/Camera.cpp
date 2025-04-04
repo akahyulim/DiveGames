@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Camera.h"
 #include "Transform.h"
 #include "Core/CoreDefs.h"
@@ -39,11 +39,11 @@ namespace Dive
 
 	Camera::~Camera()
 	{
-		// ·»´õÅ¸°ÙÀº ¿ÜºÎ¿¡¼­ °¡Á®¿À±â ¶§¹®¿¡ Á÷Á¢ Á¦°ÅÇÏ´Â °Ç ¿¡¹Ù´Ù.
+		// ë Œë”íƒ€ê²Ÿì€ ì™¸ë¶€ì—ì„œ ê°€ì ¸ì˜¤ê¸° ë•Œë¬¸ì— ì§ì ‘ ì œê±°í•˜ëŠ” ê±´ ì—ë°”ë‹¤.
 	}
 
-	// ¹öÆÛ¸¦ »ı¼º ¹× °ü¸®ÇÏ´Â °ÍÀº ¸ÂÁö ¾Ê´Ù.
-	// °»½ÅµÈ µ¥ÀÌÅÍ·Î ¹öÆÛ¸¦ ¾÷µ¥ÀÌÆ®ÇÏµµ·Ï ±¸ÇöÇØ¾ß ÇÑ´Ù.
+	// ë²„í¼ë¥¼ ìƒì„± ë° ê´€ë¦¬í•˜ëŠ” ê²ƒì€ ë§ì§€ ì•Šë‹¤.
+	// ê°±ì‹ ëœ ë°ì´í„°ë¡œ ë²„í¼ë¥¼ ì—…ë°ì´íŠ¸í•˜ë„ë¡ êµ¬í˜„í•´ì•¼ í•œë‹¤.
 	void Camera::Update()
 	{
 	}
@@ -74,7 +74,7 @@ namespace Dive
 		return m_ProjectionType == eProjectionType::Orthographic ? GetOrthographicProjMatrix() : GetPerspectiveProjMatrix();
 	}
 
-	// ¾ÆÁ÷ Á¦´ë·ÎµÈ Å×½ºÆ®µµ ¸øÇß´Ù.
+	// ì•„ì§ ì œëŒ€ë¡œëœ í…ŒìŠ¤íŠ¸ë„ ëª»í–ˆë‹¤.
 	DirectX::XMMATRIX Camera::GetOrthographicProjMatrix() const
 	{
 		auto viewSize = GetRenderTextureSize();

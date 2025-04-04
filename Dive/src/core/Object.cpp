@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Object.h"
 
 namespace Dive
@@ -49,11 +49,11 @@ namespace Dive
 
 	uint64_t Object::GenerateId()
 	{
-		// ·£´ı ¿£Áø ¹× ºĞÆ÷ ¼³Á¤ 
+		// ëœë¤ ì—”ì§„ ë° ë¶„í¬ ì„¤ì • 
 		std::random_device rd; std::mt19937_64 eng(rd()); 
 		std::uniform_int_distribution<uint64_t> distr; 
 		
-		// °íÀ¯ÇÑ ¼ıÀÚ »ı¼º 
+		// ê³ ìœ í•œ ìˆ«ì ìƒì„± 
 		return distr(eng);
 	}
 }

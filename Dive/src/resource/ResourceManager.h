@@ -1,4 +1,4 @@
-
+﻿
 #pragma once
 #include "Resource.h"
 #include "core/CoreDefs.h"

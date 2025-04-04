@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Graphics/Graphics.h"
 #include "Resource/Resource.h"
 
@@ -7,9 +7,9 @@ namespace Dive
 	class Texture;
 	class Texture2D;
 
-	// ÇöÀç Texture´Â opaque ¿©ºÎ¸¦ ÆÇ´ÜÇÏÁö ¾Ê´Â´Ù.
-	// ÀÌ´Â À¯´ÏÆ¼ÀÇ ¼³Á¤À» µû¸¥ °ÍÀ¸·Î, À¯´ÏÆ¼ÀÇ °æ¿ì ¸ÓÆ¼¸®¾ó¿¡¼­ È®ÀÎÇÑ´Ù.
-	// ÇöÀç´Â legacy´Ù. ÃßÈÄ pbs°¡ Ãß°¡µÉ ¼ö ÀÖ´Ù.
+	// í˜„ì¬ TextureëŠ” opaque ì—¬ë¶€ë¥¼ íŒë‹¨í•˜ì§€ ì•ŠëŠ”ë‹¤.
+	// ì´ëŠ” ìœ ë‹ˆí‹°ì˜ ì„¤ì •ì„ ë”°ë¥¸ ê²ƒìœ¼ë¡œ, ìœ ë‹ˆí‹°ì˜ ê²½ìš° ë¨¸í‹°ë¦¬ì–¼ì—ì„œ í™•ì¸í•œë‹¤.
+	// í˜„ì¬ëŠ” legacyë‹¤. ì¶”í›„ pbsê°€ ì¶”ê°€ë  ìˆ˜ ìˆë‹¤.
 	class Material : public Resource
 	{
 		DV_CLASS(Material, Resource);

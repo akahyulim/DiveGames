@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "core/CoreDefs.h"
 
 namespace Dive
@@ -13,9 +13,9 @@ namespace Dive
 		SkinnedModel,
 	};
 
-	// À¯´ÏÆ¼¿¡¼­ÀÇ ÀÎÅÍÆäÀÌ½º¸¦ º¸¸é
-	// ±»ÀÌ World¿Í Editor¸¦ ±¸ºÐÇÒ ÇÊ¿ä°¡ ¾ø¾ú´Ù.
-	// dirty´Â ¹°·Ð filePath±îÁö Á÷Á¢ °ü¸®ÇÏ´Â ÆíÀÌ ³ª¾Æº¸ÀÎ´Ù.
+	// ìœ ë‹ˆí‹°ì—ì„œì˜ ì¸í„°íŽ˜ì´ìŠ¤ë¥¼ ë³´ë©´
+	// êµ³ì´ Worldì™€ Editorë¥¼ êµ¬ë¶„í•  í•„ìš”ê°€ ì—†ì—ˆë‹¤.
+	// dirtyëŠ” ë¬¼ë¡  filePathê¹Œì§€ ì§ì ‘ ê´€ë¦¬í•˜ëŠ” íŽ¸ì´ ë‚˜ì•„ë³´ì¸ë‹¤.
 	class World
 	{
 	public:
@@ -60,13 +60,13 @@ namespace Dive
 
 		friend class WorldSerializer;
 
-		// ÀÌÇÏ À¯´ÏÆ¼ ÀÎÅÍÆäÀÌ½º
-		// ·±Å¸ÀÓ µ¥ÀÌÅ¸ ±¸Á¶Ã¼¶ó°í ÇÑ´Ù.
+		// ì´í•˜ ìœ ë‹ˆí‹° ì¸í„°íŽ˜ì´ìŠ¤
+		// ëŸ°íƒ€ìž„ ë°ì´íƒ€ êµ¬ì¡°ì²´ë¼ê³  í•œë‹¤.
 		// buildIndex, isDirty, isLoaded, name, path, rootCount
 		// GetRootGameObjects, IsValid
-		// GameObject´Â »ý¼º½Ã ÀÚµ¿À¸·Î È°¼ºÈ­µÈ World¿¡ Ãß°¡µÈ´Ù. GameObject¿¡ sceneÀÌ¶ó´Â ¸â¹ö º¯¼öµµ ÀÖ´Ù.
-		// ¾ðÁ¦ºÎÅÍ¿´´ÂÁö ¸ð¸£°ÚÁö¸¸ WorldManager¶õ °ÍÀÌ ÀÖ´Ù.
+		// GameObjectëŠ” ìƒì„±ì‹œ ìžë™ìœ¼ë¡œ í™œì„±í™”ëœ Worldì— ì¶”ê°€ëœë‹¤. GameObjectì— sceneì´ë¼ëŠ” ë©¤ë²„ ë³€ìˆ˜ë„ ìžˆë‹¤.
+		// ì–¸ì œë¶€í„°ì˜€ëŠ”ì§€ ëª¨ë¥´ê² ì§€ë§Œ WorldManagerëž€ ê²ƒì´ ìžˆë‹¤.
 		
-		// => ÇöÀç ³»°¡ ±¸ÇöÇÑ World´Â ¾ð¸®¾óÀÇ ±¸Á¶¿¡ °¡±õ´Ù.
+		// => í˜„ìž¬ ë‚´ê°€ êµ¬í˜„í•œ WorldëŠ” ì–¸ë¦¬ì–¼ì˜ êµ¬ì¡°ì— ê°€ê¹ë‹¤.
 	};
 }

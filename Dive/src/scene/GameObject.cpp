@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "GameObject.h"
 #include "Core/CoreDefs.h"
 #include "core/EventDispatcher.h"
@@ -23,7 +23,7 @@ namespace Dive
 		for (auto& it : m_Components)
 			DV_DELETE(it.second);
 
-		DV_LOG(GameObject, trace, "°ÔÀÓ¿ÀºêÁ§Æ®({0:s}, {1:d}) ¼Ò¸ê", GetName(), GetID());
+		DV_LOG(GameObject, trace, "ê²Œì„ì˜¤ë¸Œì íŠ¸({0:s}, {1:d}) ì†Œë©¸", GetName(), GetID());
 	}
 
 	void GameObject::Update()

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #define DV_EVENT_HANDLER(function)						[this](Dive::EventData data) { function();}
 #define DV_EVENT_HANDLER_STATIC(function)				[](Dive::EventData data) { function();}

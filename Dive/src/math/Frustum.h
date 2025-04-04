@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 namespace Dive
 {
@@ -10,9 +10,9 @@ namespace Dive
 
 		void Construct(const DirectX::XMMATRIX& viewMatrix, const DirectX::XMMATRIX& projMatrix, float depth);
 
-		// SpratanÀº IsVisible¿¡¼­ center¿Í extend µÎ °³ÀÇ vector3 °ªÀ» Àü´Ş¹Ş°í
-		// CheckCube·Î È®ÀÎÇÑ´Ù.
-		// ±×¸®°í center°ú extend´Â Renderable¿¡¼­ BoundingBox·ÎºÎÅÍ ¾ò´Â´Ù.
+		// Spratanì€ IsVisibleì—ì„œ centerì™€ extend ë‘ ê°œì˜ vector3 ê°’ì„ ì „ë‹¬ë°›ê³ 
+		// CheckCubeë¡œ í™•ì¸í•œë‹¤.
+		// ê·¸ë¦¬ê³  centerê³¼ extendëŠ” Renderableì—ì„œ BoundingBoxë¡œë¶€í„° ì–»ëŠ”ë‹¤.
 		bool IsVisible(const DirectX::XMFLOAT3& center, const DirectX::XMFLOAT3& extent);
 		bool CheckPoint(float x, float y, float z) const;
 		bool CheckCube(float centerX, float centerY, float centerZ, float radius) const;

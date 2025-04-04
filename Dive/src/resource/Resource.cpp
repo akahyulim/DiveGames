@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Resource.h"
 #include "core/FileUtils.h"
 
@@ -7,9 +7,9 @@ namespace Dive
 	void Resource::SetFilepath(const std::filesystem::path& filepath)
 	{
 		m_Name = filepath.stem().string();
-		// ÃßÈÄ »ó´ë°æ·Î ÀúÀå ¼öÁ¤ ÇÊ¿ä
-		// ÀÌ¸¦ À§ÇØ¼­ FileUtils¿¡ °ü·Ã ÇÔ¼ö¸¦ ¸¸µé¾î¾ß ÇÏ´Âµ¥
-		// »ó´ë°æ·ÎÀÇ ±âÁØÀ¸ µÇ´Â WorkingDir ¼³Á¤µµ ÇÊ¿äÇÏ´Ù.
+		// ì¶”í›„ ìƒëŒ€ê²½ë¡œ ì €ì¥ ìˆ˜ì • í•„ìš”
+		// ì´ë¥¼ ìœ„í•´ì„œ FileUtilsì— ê´€ë ¨ í•¨ìˆ˜ë¥¼ ë§Œë“¤ì–´ì•¼ í•˜ëŠ”ë°
+		// ìƒëŒ€ê²½ë¡œì˜ ê¸°ì¤€ìœ¼ ë˜ëŠ” WorkingDir ì„¤ì •ë„ í•„ìš”í•˜ë‹¤.
 		m_Filepath = filepath;
 	}
 }

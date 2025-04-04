@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Component.h"
 
 namespace Dive
@@ -9,7 +9,7 @@ namespace Dive
 	class Camera : public Component
 	{
 	public:
-		// ÀÌ°Ç ¿Ö ¶Ç ¾È¿¡ ³Ö¾î³ù³Ä...
+		// ì´ê±´ ì™œ ë˜ ì•ˆì— ë„£ì–´ë†¨ëƒ...
 		enum class eProjectionType
 		{
 			Perspective,
@@ -24,7 +24,7 @@ namespace Dive
 
 		void Update() override;
 
-		// ¿Ö ÀÌ·¡ ³ùÀ»±î?
+		// ì™œ ì´ë˜ ë†¨ì„ê¹Œ?
 		DirectX::XMFLOAT3 GetPosition();
 		DirectX::XMMATRIX GetSceneMatrix();
 		DirectX::XMMATRIX GetViewMatrix();

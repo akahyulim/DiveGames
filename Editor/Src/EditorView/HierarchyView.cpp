@@ -1,4 +1,4 @@
-#include "HierarchyView.h"
+ï»¿#include "HierarchyView.h"
 
 namespace Dive
 {
@@ -82,8 +82,8 @@ namespace Dive
 			nodeFlags |= (m_pSelectedObject == pObject) ? ImGuiTreeNodeFlags_Selected : 0;
 		}
 
-		// °¢ ³ëµå »çÀÌ¿¡ µå¶ø °¡´ÉÇÑ ¿µ¿ª Ãß°¡
-		ImGui::PushID(static_cast<int>(pObject->GetID())); // °íÀ¯ ID Çª½Ã
+		// ê° ë…¸ë“œ ì‚¬ì´ì— ë“œë ê°€ëŠ¥í•œ ì˜ì—­ ì¶”ê°€
+		ImGui::PushID(static_cast<int>(pObject->GetID())); // ê³ ìœ  ID í‘¸ì‹œ
 		ImGui::Selectable("##drop_target", false, ImGuiSelectableFlags_DontClosePopups, ImVec2(0, 2.0f));
 		if (ImGui::BeginDragDropTarget())
 		{
@@ -96,7 +96,7 @@ namespace Dive
 				{
 					if (pDroppedObject->HasComponent<Dive::Transform>())
 					{
-						// µå¶øµÈ ¿ÀºêÁ§Æ®¸¦ ·çÆ® ³ëµå·Î ¼³Á¤
+						// ë“œëëœ ì˜¤ë¸Œì íŠ¸ë¥¼ ë£¨íŠ¸ ë…¸ë“œë¡œ ì„¤ì •
 						pDroppedObject->GetComponent<Dive::Transform>()->SetParent(nullptr);
 					}
 				}
@@ -152,8 +152,8 @@ namespace Dive
 		
 			if (ImGui::MenuItem("Delete"))
 			{
-				// ÇöÀç RemoveGameObject´Â ´ë»óÀ» Á¦°Å´ë»óÀ¸·Î ¸¶Å·ÇÒ »ÓÀÌ´Ù.
-				// ½ÇÁ¦ Á¦°Å´Â ´ÙÀ½ Update¿¡¼­ ¼öÇàÇÑ´Ù.
+				// í˜„ì¬ RemoveGameObjectëŠ” ëŒ€ìƒì„ ì œê±°ëŒ€ìƒìœ¼ë¡œ ë§ˆí‚¹í•  ë¿ì´ë‹¤.
+				// ì‹¤ì œ ì œê±°ëŠ” ë‹¤ìŒ Updateì—ì„œ ìˆ˜í–‰í•œë‹¤.
 				pActiveScene->RemoveGameObject(pObject);
 				if (m_pSelectedObject && (m_pSelectedObject == pObject))
 					m_pSelectedObject = nullptr;
@@ -185,6 +185,6 @@ namespace Dive
 			ImGui::TreePop();
 		}
 
-		ImGui::PopID(); // °íÀ¯ ID ÆË
+		ImGui::PopID(); // ê³ ìœ  ID íŒ
 	}
 }

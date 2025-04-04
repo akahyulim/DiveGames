@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Core/Object.h"
 #include "Scene.h"
 
@@ -31,7 +31,7 @@ namespace Dive
 		void MarkRemoveTarget() { m_bMarkedTarget = true; }
 		bool IsRemovedTarget() const { return m_bMarkedTarget; }
 
-		const Transform* GetTransform() const { return m_pTransform; }	// ÀĞ±â Àü¿ëÀ¸·Î Àü´Ş
+		const Transform* GetTransform() const { return m_pTransform; }	// ì½ê¸° ì „ìš©ìœ¼ë¡œ ì „ë‹¬
 
 		Scene* GetScene() { return m_pScene; }
 
@@ -45,10 +45,10 @@ namespace Dive
 		Component* GetComponent(size_t typeHash) const;
 
 		// static
-		// Find : ÀÌ¸§À¸·Î Ã£´Â °Çµ¥ Á» ´õ ¾Ë¾Æº¸ÀÚ.
-		// FindGameObjectWithTag : È°¼ºÈ­µÊ ¿ÀºêÁ§Æ® ¹è¿­ ¸®ÅÏ
-		// FindWithTag : Ã¹ ¹øÂ° È°¼ºÈ­µÈ °ÔÀÓ ¿ÀºêÁ§Æ® ¸®ÅÏ
-		// GetScene : ÀÚ½ÅÀÌ Æ÷ÇÔµÈ sceneÀÌ¶ó´Âµ¥... Á» ´õ ¾Ë¾Æº¸ÀÚ.
+		// Find : ì´ë¦„ìœ¼ë¡œ ì°¾ëŠ” ê±´ë° ì¢€ ë” ì•Œì•„ë³´ì.
+		// FindGameObjectWithTag : í™œì„±í™”ë¨ ì˜¤ë¸Œì íŠ¸ ë°°ì—´ ë¦¬í„´
+		// FindWithTag : ì²« ë²ˆì§¸ í™œì„±í™”ëœ ê²Œì„ ì˜¤ë¸Œì íŠ¸ ë¦¬í„´
+		// GetScene : ìì‹ ì´ í¬í•¨ëœ sceneì´ë¼ëŠ”ë°... ì¢€ ë” ì•Œì•„ë³´ì.
 
 	private:
 		std::string m_Name;
@@ -61,7 +61,7 @@ namespace Dive
 		bool m_bMarkedTarget;
 		std::unordered_map<size_t, Component*> m_Components;
 
-		const Transform* const m_pTransform;	// ÀĞ±â Àü¿ë
+		const Transform* const m_pTransform;	// ì½ê¸° ì „ìš©
 	};
 
 	template<class T>

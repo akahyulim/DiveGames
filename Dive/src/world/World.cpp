@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "World.h"
 #include "WorldSerializer.h"
 #include "GameObject.h"
@@ -49,7 +49,7 @@ namespace Dive
 	{
 		if (m_GameObjects.find(id) != m_GameObjects.end())
 		{
-			DV_LOG(World, warn, "ÀÌ¹Ì Á¸ÀçÇÏ´Â ID: {}", id);
+			DV_LOG(World, warn, "ì´ë¯¸ ì¡´ì¬í•˜ëŠ” ID: {}", id);
 			return nullptr;
 		}
 

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Model.h"
 #include "Mesh.h"
 #include "Core/CoreDefs.h"
@@ -40,7 +40,7 @@ namespace Dive
 	{
 		if (index >= static_cast<UINT32>(m_Meshes.size()))
 		{
-			DV_LOG(Model, warn, "Àß¸øµÈ ¸Ş½Ã ÄÁÅ×ÀÌ³Ê ÀÎµ¦½º¸¦ Àü´Ş¹Ş¾Ò½À´Ï´Ù.");
+			DV_LOG(Model, warn, "ì˜ëª»ëœ ë©”ì‹œ ì»¨í…Œì´ë„ˆ ì¸ë±ìŠ¤ë¥¼ ì „ë‹¬ë°›ì•˜ìŠµë‹ˆë‹¤.");
 			return nullptr;
 		}
 

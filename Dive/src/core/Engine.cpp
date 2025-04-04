@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Engine.h"
 #include "CoreDefs.h"
 #include "Window.h"
@@ -15,7 +15,7 @@ namespace Dive
 	std::chrono::steady_clock::time_point Engine::s_LastTickTime;
 	uint16_t Engine::s_Fps = 0;
 
-	// sprtanÀº editor·ÎºÎÅÍ args¸¦ ¹Ş´Â´Ù.
+	// sprtanì€ editorë¡œë¶€í„° argsë¥¼ ë°›ëŠ”ë‹¤.
 	void Engine::Initialize()
 	{
 		Window::Initialize();
@@ -25,7 +25,7 @@ namespace Dive
 
 		s_LastTickTime = std::chrono::steady_clock::now();
 
-		DV_LOG(Engine, trace, "ÃÊ±âÈ­ ¼º°ø");
+		DV_LOG(Engine, trace, "succed engine initialize");
 	}
 
 	void Engine::Shutdown()
@@ -35,7 +35,7 @@ namespace Dive
 		Graphics::Shutdown();
 		Window::Shutdown();
 
-		DV_LOG(Engine, trace, "¼Ë´Ù¿î ¼º°ø");
+		DV_LOG(Engine, trace, "succed enigne shutdown");
 		LogManager::Shutdown();
 	}
 

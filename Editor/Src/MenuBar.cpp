@@ -1,4 +1,4 @@
-#include "MenuBar.h"
+ï»¿#include "MenuBar.h"
 #include "Editor.h"
 
 namespace Dive
@@ -43,7 +43,7 @@ namespace Dive
 					auto activeWorld = WorldManager::LoadFromFile("NewProject/Assets/Worlds/NewWorld.dive");
 					isShowWorldMenu = true;
 
-					// ÇöÀç EditorCamera°¡ world ÆÄÀÏ¿¡ ÀúÀåµÇ¾î ÀÖ´Ù.
+					// í˜„ìž¬ EditorCameraê°€ world íŒŒì¼ì— ì €ìž¥ë˜ì–´ ìžˆë‹¤.
 					auto editorCameraGameObject = activeWorld->CreateGameObject("Editor Camera");
 					editorCameraGameObject->SetTag("Editor_Only");
 					s_EditorCamera = editorCameraGameObject->AddComponent<Camera>();

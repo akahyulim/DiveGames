@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Texture.h"
 #include "core/CoreDefs.h"
 
@@ -28,7 +28,7 @@ namespace Dive
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
 			return 16;
 		default:
-			DV_LOG("Texture", warn, "Áö¿øµÇÁö ¾Ê´Â DXGI_FORMATÀ» Àü´Ş¹Ş¾Ò½À´Ï´Ù.");
+			DV_LOG("Texture", warn, "ì§€ì›ë˜ì§€ ì•ŠëŠ” DXGI_FORMATì„ ì „ë‹¬ë°›ì•˜ìŠµë‹ˆë‹¤.");
 			return 0;
 		}
 	}

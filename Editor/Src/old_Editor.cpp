@@ -1,4 +1,4 @@
-#include "Editor.h"
+ï»¿#include "Editor.h"
 #include "Project/Project.h"
 #include "EditorView/EditorView.h"
 #include "EditorView/SceneView.h"
@@ -21,15 +21,15 @@ LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 		GetWindowRect(hWnd, &rect);
 		POINT pt = { LOWORD(lParam), HIWORD(lParam) };
 
-		// µå·¡±× °¡´ÉÇÑ ¿µ¿ª ¼¼ºĞÈ­
+		// ë“œë˜ê·¸ ê°€ëŠ¥í•œ ì˜ì—­ ì„¸ë¶„í™”
 		int border_margin = 300;
-		if (pt.y >= rect.top && pt.y < rect.top + 30) // »ó´Ü 30ÇÈ¼¿ ¿µ¿ª
+		if (pt.y >= rect.top && pt.y < rect.top + 30) // ìƒë‹¨ 30í”½ì…€ ì˜ì—­
 		{
-			if (pt.x < rect.left + border_margin || pt.x > rect.right - border_margin) // ÁÂ¿ì ¿©¹é
+			if (pt.x < rect.left + border_margin || pt.x > rect.right - border_margin) // ì¢Œìš° ì—¬ë°±
 			{
 				break;
 			}
-			return HTCAPTION; // Á¦¸ñ Ç¥½ÃÁÙ ¿µ¿ªÀ¸·Î Ã³¸®
+			return HTCAPTION; // ì œëª© í‘œì‹œì¤„ ì˜ì—­ìœ¼ë¡œ ì²˜ë¦¬
 		}
 		break;
 	}
@@ -63,16 +63,16 @@ namespace Dive
 		, m_bShowNewProjectPopup(false)
 		, m_bShowNewScenePopup(false)
 	{
-		// ·Î±× ¸Å´ÏÁ® ¼³Á¤
+		// ë¡œê·¸ ë§¤ë‹ˆì ¸ ì„¤ì •
 		Dive::LogManager::SetFilename("dive_editor.log");
 
-		// ¿£Áø ÃÊ±âÈ­ ¹× À©µµ¿ì ¼³Á¤
-		// => Initialize´Â ¸Å°³º¯¼ö ¾øÀÌ È£ÃâÇÏ°í
+		// ì—”ì§„ ì´ˆê¸°í™” ë° ìœˆë„ìš° ì„¤ì •
+		// => InitializeëŠ” ë§¤ê°œë³€ìˆ˜ ì—†ì´ í˜¸ì¶œí•˜ê³ 
 		GEngine->Initialize(::GetModuleHandle(nullptr), 1600, 900, L"Dive Editor");
-		// => ¿©±â¿¡ À©µµ¿ì Å©±â º¯°æ ÇÔ¼ö¸¦ È£ÃâÇÏµµ·Ï ÇÏÀÚ.
+		// => ì—¬ê¸°ì— ìœˆë„ìš° í¬ê¸° ë³€ê²½ í•¨ìˆ˜ë¥¼ í˜¸ì¶œí•˜ë„ë¡ í•˜ì.
 		Window::SetMessageCallback((LONG_PTR)EditorMessageHandler);
 
-		// ImGui ÃÊ±âÈ­
+		// ImGui ì´ˆê¸°í™”
 		{
 			// Setup Dear ImGui context
 			IMGUI_CHECKVERSION();
@@ -96,7 +96,7 @@ namespace Dive
 			ImGui_ImplWin32_Init(Window::GetWindowHandle());//GEngine->GetWindowHandle());
 			ImGui_ImplDX11_Init(Graphics::GetDevice(), Graphics::GetDeviceContext());//GEngine->GetDevice(), GEngine->GetDeviceContext());
 
-			// ½ºÅ¸ÀÏ ¼öÁ¤
+			// ìŠ¤íƒ€ì¼ ìˆ˜ì •
 			{
 				auto& colors = ImGui::GetStyle().Colors;
 				colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
@@ -145,7 +145,7 @@ namespace Dive
 		EditorView::CreateView<InspectorView>();
 		EditorView::CreateView<ProjectView>();
 
-		// ÀÓ½Ã ÇÁ·ÎÁ§Æ® ¹× ¾À »ı¼º
+		// ì„ì‹œ í”„ë¡œì íŠ¸ ë° ì”¬ ìƒì„±
 		{
 			if (std::filesystem::exists("NewProject"))
 			{
@@ -206,8 +206,8 @@ namespace Dive
 
 	int Editor::Run()
 	{
-		// Engine¿¡¼­ ºĞ¸®ÇÑ ÈÄ
-		// À§Ä¡°¡ »ó´çÈ÷ ¾Ö¸ÅÇØÁ³´Ù.
+		// Engineì—ì„œ ë¶„ë¦¬í•œ í›„
+		// ìœ„ì¹˜ê°€ ìƒë‹¹íˆ ì• ë§¤í•´ì¡Œë‹¤.
 		if (m_pEditScene)
 			m_pEditScene->Tick();
 
@@ -265,7 +265,7 @@ namespace Dive
 			ImGuiIO& io = ImGui::GetIO();
 			ImGuiStyle& style = ImGui::GetStyle();
 			float minWinSizeX = style.WindowMinSize.x;
-			style.WindowMinSize.x = 200.0f;	// dock space¿¡¼­ÀÇ ÃÖ¼Ò Å©±â...
+			style.WindowMinSize.x = 200.0f;	// dock spaceì—ì„œì˜ ìµœì†Œ í¬ê¸°...
 			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 			{
 				ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
@@ -384,7 +384,7 @@ namespace Dive
 			}
 
 			float availableWidth = ImGui::GetContentRegionAvail().x;
-			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + availableWidth - 250); // ¹öÆ° ³Êºñ¸¸Å­ Á¶Á¤
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + availableWidth - 250); // ë²„íŠ¼ ë„ˆë¹„ë§Œí¼ ì¡°ì •
 			if (ImGui::Button("Minimize"))
 			{
 				Window::Minimize();
@@ -413,46 +413,46 @@ namespace Dive
 		if (ImGui::BeginMainMenuBar())
 		{
 			// FILE
-			if (ImGui::BeginMenu(u8"ÆÄÀÏ"))
+			if (ImGui::BeginMenu(u8"íŒŒì¼"))
 			{
-				if (ImGui::MenuItem(u8"»õ·Î¿î ¾À", nullptr, nullptr, m_pActiveProject))
+				if (ImGui::MenuItem(u8"ìƒˆë¡œìš´ ì”¬", nullptr, nullptr, m_pActiveProject))
 				{
 					NewScene();
 				}
-				if (ImGui::MenuItem(u8"¾À ¿­±â", nullptr, nullptr, m_pActiveProject))
+				if (ImGui::MenuItem(u8"ì”¬ ì—´ê¸°", nullptr, nullptr, m_pActiveProject))
 				{
 					OpenScene();
 				}
 				
 				ImGui::Separator();
 				
-				if (ImGui::MenuItem(u8"¾À ÀúÀå", nullptr, nullptr, m_pEditScene && m_pEditScene->IsDirty()))
+				if (ImGui::MenuItem(u8"ì”¬ ì €ì¥", nullptr, nullptr, m_pEditScene && m_pEditScene->IsDirty()))
 				{
 					SaveScene();
 				}
-				if (ImGui::MenuItem(u8"´Ù¸¥ ÀÌ¸§À¸·Î ¾À ÀúÀå", nullptr, nullptr, m_pEditScene))
+				if (ImGui::MenuItem(u8"ë‹¤ë¥¸ ì´ë¦„ìœ¼ë¡œ ì”¬ ì €ì¥", nullptr, nullptr, m_pEditScene))
 				{
 					SaveSceneAs();
 				}
 
 				ImGui::Separator();
 				
-				if (ImGui::MenuItem(u8"»õ·Î¿î ÇÁ·ÎÁ§Æ®"))
+				if (ImGui::MenuItem(u8"ìƒˆë¡œìš´ í”„ë¡œì íŠ¸"))
 				{
 					NewProject();
 				}
-				if (ImGui::MenuItem(u8"ÇÁ·ÎÁ§Æ® ¿­±â"))
+				if (ImGui::MenuItem(u8"í”„ë¡œì íŠ¸ ì—´ê¸°"))
 				{
 					OpenProject();
 				}
-				if (ImGui::MenuItem(u8"ÇÁ·ÎÁ§Æ® ÀúÀå", nullptr, nullptr, m_pActiveProject && m_bProjectChanged))
+				if (ImGui::MenuItem(u8"í”„ë¡œì íŠ¸ ì €ì¥", nullptr, nullptr, m_pActiveProject && m_bProjectChanged))
 				{
 					SaveProject();
 				}
 
 				ImGui::Separator();
 
-				if (ImGui::MenuItem(u8"³¡³»±â"))
+				if (ImGui::MenuItem(u8"ëë‚´ê¸°"))
 				{
 					Exit();
 				}
@@ -460,26 +460,26 @@ namespace Dive
 			}
 
 			// Game Object
-			if (ImGui::BeginMenu(u8"°ÔÀÓ ¿ÀºêÁ§Æ®"))
+			if (ImGui::BeginMenu(u8"ê²Œì„ ì˜¤ë¸Œì íŠ¸"))
 			{
-				if (ImGui::MenuItem(u8"ºó °ÔÀÓ ¿ÀºêÁ§Æ®", nullptr, nullptr, (m_pEditScene != nullptr)))
+				if (ImGui::MenuItem(u8"ë¹ˆ ê²Œì„ ì˜¤ë¸Œì íŠ¸", nullptr, nullptr, (m_pEditScene != nullptr)))
 				{
 					auto pNewGameObject = m_pEditScene->CreateGameObject();
 				}
 
-				if (ImGui::BeginMenu(u8"3D ¿ÀºêÁ§Æ®", (m_pEditScene != nullptr)))
+				if (ImGui::BeginMenu(u8"3D ì˜¤ë¸Œì íŠ¸", (m_pEditScene != nullptr)))
 				{
-					if (ImGui::MenuItem(u8"»óÀÚ"))
+					if (ImGui::MenuItem(u8"ìƒì"))
 					{
 						
 					}
 
-					if (ImGui::MenuItem(u8"±¸"))
+					if (ImGui::MenuItem(u8"êµ¬"))
 					{
 						
 					}
 
-					if (ImGui::MenuItem(u8"Æò¸é"))
+					if (ImGui::MenuItem(u8"í‰ë©´"))
 					{
 						
 					}
@@ -487,32 +487,32 @@ namespace Dive
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::BeginMenu(u8"¶óÀÌÆ®", (m_pEditScene != nullptr)))
+				if (ImGui::BeginMenu(u8"ë¼ì´íŠ¸", (m_pEditScene != nullptr)))
 				{
-					if (ImGui::MenuItem(u8"µğ·º¼Å³Î ¶óÀÌÆ®"))
+					if (ImGui::MenuItem(u8"ë””ë ‰ì…”ë„ ë¼ì´íŠ¸"))
 					{
 					}
 
-					if (ImGui::MenuItem(u8"Æ÷ÀÎÆ® ¶óÀÌÆ®"))
+					if (ImGui::MenuItem(u8"í¬ì¸íŠ¸ ë¼ì´íŠ¸"))
 					{
 					}
 
-					if (ImGui::MenuItem(u8"½ºÆ÷Æ® ¶óÀÌÆ®"))
+					if (ImGui::MenuItem(u8"ìŠ¤í¬íŠ¸ ë¼ì´íŠ¸"))
 					{
 					}
 
 					ImGui::EndMenu();
 				}
 
-				if (ImGui::BeginMenu(u8"Ä«¸Ş¶ó", (m_pEditScene != nullptr)))
+				if (ImGui::BeginMenu(u8"ì¹´ë©”ë¼", (m_pEditScene != nullptr)))
 				{
-					if (ImGui::MenuItem(u8"¿ø±Ù Åõ¿µ"))
+					if (ImGui::MenuItem(u8"ì›ê·¼ íˆ¬ì˜"))
 					{
 						auto pCamera = m_pEditScene->CreateGameObject("Camera");
 						pCamera->AddComponent<Camera>();
 					}
 
-					if (ImGui::MenuItem(u8"Á÷±³ Åõ¿µ"))
+					if (ImGui::MenuItem(u8"ì§êµ íˆ¬ì˜"))
 					{
 					}
 
@@ -523,14 +523,14 @@ namespace Dive
 			}
 
 			// Component
-			// SelectedGameObject°¡ Á¸ÀçÇÒ ¶§ È°¼ºÈ­
-			if (ImGui::BeginMenu(u8"ÄÄÆ÷³ÍÆ®"))
+			// SelectedGameObjectê°€ ì¡´ì¬í•  ë•Œ í™œì„±í™”
+			if (ImGui::BeginMenu(u8"ì»´í¬ë„ŒíŠ¸"))
 			{
-				if (ImGui::MenuItem(u8"·»´õ·¯ºí", nullptr, nullptr, (m_pSelectedGameObject != nullptr)))
+				if (ImGui::MenuItem(u8"ë Œë”ëŸ¬ë¸”", nullptr, nullptr, (m_pSelectedGameObject != nullptr)))
 				{
 				}
 
-				if (ImGui::MenuItem(u8"¶óÀÌÆ®", nullptr, nullptr, (m_pSelectedGameObject != nullptr)))
+				if (ImGui::MenuItem(u8"ë¼ì´íŠ¸", nullptr, nullptr, (m_pSelectedGameObject != nullptr)))
 				{
 				}
 
@@ -538,7 +538,7 @@ namespace Dive
 			}
 
 			// Views
-			if (ImGui::BeginMenu(u8"Ã¢"))
+			if (ImGui::BeginMenu(u8"ì°½"))
 			{
 				static bool showView = true;
 
@@ -567,7 +567,7 @@ namespace Dive
 			}
 
 			// Help
-			if (ImGui::BeginMenu(u8"µµ¿ò¸»"))
+			if (ImGui::BeginMenu(u8"ë„ì›€ë§"))
 			{
 				ImGui::EndMenu();
 			}
@@ -588,12 +588,12 @@ namespace Dive
 		
 		if (ImGui::BeginPopupModal("Save Changes?", NULL, ImGuiWindowFlags_AlwaysAutoResize)) 
 		{
-			ImGui::Text(u8"º¯°æ»çÇ×ÀÌ Á¸ÀçÇÕ´Ï´Ù. ÀúÀåÇÏ½Ã°Ú½À´Ï±î?");
-			// º¯°æ »çÇ×ÀÌ ÀÖ´Â ÆÄÀÏÀ» Ç¥½Ã
-			if (ImGui::Button(u8"ÀúÀå", ImVec2(120, 0)))
+			ImGui::Text(u8"ë³€ê²½ì‚¬í•­ì´ ì¡´ì¬í•©ë‹ˆë‹¤. ì €ì¥í•˜ì‹œê² ìŠµë‹ˆê¹Œ?");
+			// ë³€ê²½ ì‚¬í•­ì´ ìˆëŠ” íŒŒì¼ì„ í‘œì‹œ
+			if (ImGui::Button(u8"ì €ì¥", ImVec2(120, 0)))
 			{
-				// ÀÌ°Ç ¹ÌºñÇÏ´Ù. ´Ù¼öÀÇ ¾À°¡ ¼öÁ¤µÇ¾úÀ» ¼ö ÀÖ´Ù.
-				// => ±×·¸´Ù¸é °á±¹ ¾Àº°·Î ¼öÁ¤¿©ºÎ¸¦ ÆÇ´ÜÇØ¾ß ÇÑ´Ù´Â °Çµ¥?
+				// ì´ê±´ ë¯¸ë¹„í•˜ë‹¤. ë‹¤ìˆ˜ì˜ ì”¬ê°€ ìˆ˜ì •ë˜ì—ˆì„ ìˆ˜ ìˆë‹¤.
+				// => ê·¸ë ‡ë‹¤ë©´ ê²°êµ­ ì”¬ë³„ë¡œ ìˆ˜ì •ì—¬ë¶€ë¥¼ íŒë‹¨í•´ì•¼ í•œë‹¤ëŠ” ê±´ë°?
 				if (m_pEditScene && m_pEditScene->IsDirty())
 				{
 					//SceneSerializer serializer(m_pEditScene);
@@ -607,13 +607,13 @@ namespace Dive
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
-			if (ImGui::Button(u8"ÀúÀå ¾ÈÇÔ", ImVec2(120, 0)))
+			if (ImGui::Button(u8"ì €ì¥ ì•ˆí•¨", ImVec2(120, 0)))
 			{
 				if (m_OnConfirm) m_OnConfirm();
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
-			if (ImGui::Button(u8"Ãë¼Ò", ImVec2(120, 0)))
+			if (ImGui::Button(u8"ì·¨ì†Œ", ImVec2(120, 0)))
 			{
 				ImGui::CloseCurrentPopup();
 			}
@@ -632,18 +632,18 @@ namespace Dive
 		{
 			ImGui::PushFont(GetFont(eFontTypes::Large_Bold));
 			ImGui::Spacing();
-			ImGui::Text(u8"»õ·Î¿î ÇÁ·ÎÁ§Æ®");
+			ImGui::Text(u8"ìƒˆë¡œìš´ í”„ë¡œì íŠ¸");
 			ImGui::PopFont();
 
 			ImGui::Spacing();
 			ImGui::Spacing();
 			ImGui::Spacing();
 
-			// »ı¼º ÇÁ·ÎÁ§Æ® ÀÌ¸§
+			// ìƒì„± í”„ë¡œì íŠ¸ ì´ë¦„
 			static std::string projectName = "New_Project";
 			char projectNameBuffer[256];
 			strncpy_s(projectNameBuffer, projectName.c_str(), sizeof(projectNameBuffer));
-			ImGui::Text(u8"ÇÁ·ÎÁ§Æ® ÀÌ¸§");
+			ImGui::Text(u8"í”„ë¡œì íŠ¸ ì´ë¦„");
 			ImGui::PushItemWidth(400);
 			if (ImGui::InputText("##project_name", projectNameBuffer, sizeof(projectNameBuffer)))
 			{
@@ -653,11 +653,11 @@ namespace Dive
 
 			ImGui::Spacing();
 
-			// »ı¼º ÇÁ·ÎÁ§Æ® À§Ä¡
+			// ìƒì„± í”„ë¡œì íŠ¸ ìœ„ì¹˜
 			static std::filesystem::path projectPath = std::filesystem::current_path();
 			char projectPathBuffer[512];
 			strncpy_s(projectPathBuffer, projectPath.string().c_str(), sizeof(projectPathBuffer));
-			ImGui::Text(u8"À§Ä¡");
+			ImGui::Text(u8"ìœ„ì¹˜");
 			ImGui::PushItemWidth(400);
 			if (ImGui::InputText("##location", projectPathBuffer, sizeof(projectPathBuffer)))
 			{
@@ -674,25 +674,25 @@ namespace Dive
 			//ImGui::SetCursorPos(ImVec2(window_size.x - 220, window_size.y - 40));
 			ImGui::Spacing();
 
-			if (ImGui::Button(u8"Ãë¼Ò", ImVec2(100, 30)))
+			if (ImGui::Button(u8"ì·¨ì†Œ", ImVec2(100, 30)))
 			{
 				ImGui::CloseCurrentPopup();
 			}
 			ImGui::SameLine();
-			if (ImGui::Button(u8"¸¸µé±â", ImVec2(100, 30)))
+			if (ImGui::Button(u8"ë§Œë“¤ê¸°", ImVec2(100, 30)))
 			{
-				// ÇØ´ç µğ·ºÅä¸®°¡ ÀÌ¹Ì Á¸ÀçÇÑ´Ù¸é °æ°í ´ëÈ­»óÀÚ¸¦ ¶ç¿ö¾ß ÇÑ´Ù.
+				// í•´ë‹¹ ë””ë ‰í† ë¦¬ê°€ ì´ë¯¸ ì¡´ì¬í•œë‹¤ë©´ ê²½ê³  ëŒ€í™”ìƒìë¥¼ ë„ì›Œì•¼ í•œë‹¤.
 				if (std::filesystem::exists(projectPath / projectName))
 				{
 					ImGui::OpenPopup("Exist same path");
-					//::MessageBox(nullptr, L"µ¿ÀÏÇÑ ÇÁ·ÎÁ§Æ® µğ·ºÅä¸®°¡ ÀÌ¹Ì Á¸ÀçÇÏ¿© »ı¼ºÇÒ ¼ö ¾ø½À´Ï´Ù.", L"°æ°í", MB_OK);
+					//::MessageBox(nullptr, L"ë™ì¼í•œ í”„ë¡œì íŠ¸ ë””ë ‰í† ë¦¬ê°€ ì´ë¯¸ ì¡´ì¬í•˜ì—¬ ìƒì„±í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", L"ê²½ê³ ", MB_OK);
 				}
 				else
 				{
-					// »õ·Î¿î ÇÁ·ÎÁ§Æ® »ı¼º
+					// ìƒˆë¡œìš´ í”„ë¡œì íŠ¸ ìƒì„±
 					m_pActiveProject = Project::New(projectPath / projectName / (projectName + ".dive"));
 
-					// »õ·Î¿î ¾À »ı¼º
+					// ìƒˆë¡œìš´ ì”¬ ìƒì„±
 					//m_pEditScene = new Scene("NewScene");
 					//SceneSerializer serializer(m_pEditScene);
 					//serializer.Serialize(GetActiveSceneFilePath());
@@ -707,8 +707,8 @@ namespace Dive
 
 			if (ImGui::BeginPopupModal("Exist same path", NULL, ImGuiWindowFlags_AlwaysAutoResize))
 			{
-				ImGui::Text(u8"ÀÌ¹Ì Á¸ÀçÇÏ´Â ÇÁ·ÎÁ§Æ® µğ·ºÅä¸®¿¡ »ı¼ºÇÒ ¼ö ¾ø½À´Ï´Ù.");
-				if (ImGui::Button(u8"È®ÀÎ"))
+				ImGui::Text(u8"ì´ë¯¸ ì¡´ì¬í•˜ëŠ” í”„ë¡œì íŠ¸ ë””ë ‰í† ë¦¬ì— ìƒì„±í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+				if (ImGui::Button(u8"í™•ì¸"))
 				{
 					ImGui::CloseCurrentPopup();
 				}
@@ -726,34 +726,34 @@ namespace Dive
 		m_bShowSaveChangesPopup = true;
 	}
 
-	// ÀÌ¸§Àº ÃßÈÄ º¯°æ ¿°µÎ
+	// ì´ë¦„ì€ ì¶”í›„ ë³€ê²½ ì—¼ë‘
 	void Editor::createEditorOnly()
 	{
 		if (!m_pEditScene)
 			return;
 
-		// Ä«¸Ş¶ó
+		// ì¹´ë©”ë¼
 		m_pEditorCamera = m_pEditScene->CreateGameObject("EditorCamera");
 		auto pCameraCom = m_pEditorCamera->AddComponent<Camera>();
 		m_pEditorCamera->SetTag("EditorOnly");
 
-		// ±×¸®µå
+		// ê·¸ë¦¬ë“œ
 	}
 
 	void Editor::NewScene()
 	{
 		auto OnCreateNewScene = [this]() {
-			SceneManager::UnloadScene();	// ÀÌ°Ô ¹®Á¦´Ù.
+			SceneManager::UnloadScene();	// ì´ê²Œ ë¬¸ì œë‹¤.
 			
-			//m_pEditScene = new Scene("NewScene_" + std::to_string(s_SceneCounter++));	// ÀÌ°É·Ğ °íÀ¯ÇÑ ÀÌ¸§À» È®º¸ÇÒ ¼ö ¾ø´Ù.
+			//m_pEditScene = new Scene("NewScene_" + std::to_string(s_SceneCounter++));	// ì´ê±¸ë¡  ê³ ìœ í•œ ì´ë¦„ì„ í™•ë³´í•  ìˆ˜ ì—†ë‹¤.
 			m_pEditScene = SceneManager::CreateScene("NewScene_" + std::to_string(s_SceneCounter++));
 
-			// ¸ŞÀÎ Ä«¸Ş¶ó
+			// ë©”ì¸ ì¹´ë©”ë¼
 			auto pMainCameraObj = m_pEditScene->CreateGameObject("Main Camera");
 			pMainCameraObj->AddComponent<Camera>();
 			
-			// ¿¡µğÅÍ Ä«¸Ş¶ó
-			// ¿©±âº¸´Ü ´Ù¸¥ °÷À» Ã£¾Æ¾ß ÇÒ µí ÇÏ´Ù.
+			// ì—ë””í„° ì¹´ë©”ë¼
+			// ì—¬ê¸°ë³´ë‹¨ ë‹¤ë¥¸ ê³³ì„ ì°¾ì•„ì•¼ í•  ë“¯ í•˜ë‹¤.
 			//auto pEditorCameraObj = m_pEditScene->CreateGameObject("Editor Camera");
 			//pEditorCameraObj->AddComponent<Camera>();
 			//pEditorCameraObj->SetTag("EditorOnly");

@@ -1,4 +1,4 @@
-#include "GameView.h"
+ï»¿#include "GameView.h"
 
 namespace Dive
 {
@@ -14,9 +14,9 @@ namespace Dive
 		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		m_Height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
 
-		// srv¸¦ ±×¸°´Ù. 
-		// Ã¢ÀÇ Å©±â¿¡ ¸ÂÃç texture¸¦ resizeÇØ¾ß ÇÑ´Ù.
-		// renderer°¡ ÇØ´ç texture¸¦ °ü¸®ÇÑ´Ù.
+		// srvë¥¼ ê·¸ë¦°ë‹¤. 
+		// ì°½ì˜ í¬ê¸°ì— ë§žì¶° textureë¥¼ resizeí•´ì•¼ í•œë‹¤.
+		// rendererê°€ í•´ë‹¹ textureë¥¼ ê´€ë¦¬í•œë‹¤.
 		//GEngine->GetRenderer().ResizeTargets(static_cast<uint32_t>(width), static_cast<uint32_t>(height));
 
 		ImTextureID textureID = (ImTextureID)( m_pTex ? m_pTex->GetShaderResourceView() : nullptr);

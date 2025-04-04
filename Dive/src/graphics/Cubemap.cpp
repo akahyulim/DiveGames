@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Cubemap.h"
 #include "core/CoreDefs.h"
 
@@ -26,7 +26,7 @@ namespace Dive
 	{
 		if (index > 5) 
 		{
-			DV_LOG(DvCubmap, err, "Àß¸øµÈ Face ÀÎµ¦½º({:d})¸¦ Àü´Ş¹Ş¾Ò½À´Ï´Ù.", index);
+			DV_LOG(DvCubmap, err, "ì˜ëª»ëœ Face ì¸ë±ìŠ¤({:d})ë¥¼ ì „ë‹¬ë°›ì•˜ìŠµë‹ˆë‹¤.", index);
 			return;
 		}
 
@@ -58,7 +58,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_Texture2D))) 
 			{
-				DV_LOG(Cubemap, err, "CubemapÀÇ ID3D11Texture2D »ı¼º ½ÇÆĞ");
+				DV_LOG(Cubemap, err, "Cubemapì˜ ID3D11Texture2D ìƒì„± ì‹¤íŒ¨");
 				Release();
 				return false;
 			}
@@ -66,7 +66,7 @@ namespace Dive
 			if (!m_FaceData[0].empty()) {
 				if (std::any_of(m_FaceData.begin(), m_FaceData.end(), [](const auto& data) { return data.empty(); }))
 				{
-					DV_LOG(Cubemap, err, "ºó Å¥ºê¸Ê Face µ¥ÀÌÅÍ°¡ Á¸ÀçÇÕ´Ï´Ù.");
+					DV_LOG(Cubemap, err, "ë¹ˆ íë¸Œë§µ Face ë°ì´í„°ê°€ ì¡´ì¬í•©ë‹ˆë‹¤.");
 					Release();
 					return false;
 				}
@@ -95,7 +95,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_RenderTargetView)))
 			{
-				DV_LOG(Cubemap, err, "CubemapÀÇ ID3D11RenderTargetView »ı¼º ½ÇÆĞ");
+				DV_LOG(Cubemap, err, "Cubemapì˜ ID3D11RenderTargetView ìƒì„± ì‹¤íŒ¨");
 				Release();
 				return false;
 			}
@@ -110,7 +110,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_ShaderResourceView)))
 			{
-				DV_LOG(Cubemap, err, "CubemapÀÇ ID3D11ShaderResourceView »ı¼º ½ÇÆĞ");
+				DV_LOG(Cubemap, err, "Cubemapì˜ ID3D11ShaderResourceView ìƒì„± ì‹¤íŒ¨");
 				Release();
 				return false;
 			}
@@ -126,7 +126,7 @@ namespace Dive
 	{
 		if (faceFilepaths.size() != 6) 
 		{
-			DV_LOG(Cubemap, err, "Àß¸øµÈ Å¥ºê¸Ê ÅØ½ºÃÄ °æ·Î¸¦ Àü´Ş ¹Ş¾Ò½À´Ï´Ù.", faceFilepaths.size());
+			DV_LOG(Cubemap, err, "ì˜ëª»ëœ íë¸Œë§µ í…ìŠ¤ì³ ê²½ë¡œë¥¼ ì „ë‹¬ ë°›ì•˜ìŠµë‹ˆë‹¤.", faceFilepaths.size());
 			return nullptr;
 		}
 
@@ -140,37 +140,37 @@ namespace Dive
 			const auto& filepath = faceFilepaths[i];
 			if (!std::filesystem::exists(filepath))
 			{
-				DV_LOG(Cubemap, err, "Å¥ºê¸Ê Face ÅØ½ºÃÄ ÆÄÀÏÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù: {}", filepath.string());
+				DV_LOG(Cubemap, err, "íë¸Œë§µ Face í…ìŠ¤ì³ íŒŒì¼ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤: {}", filepath.string());
 				return nullptr;
 			}
 
-			// ÅØ½ºÃ³ ·Îµå
+			// í…ìŠ¤ì²˜ ë¡œë“œ
 			DirectX::ScratchImage image;
 			if (FAILED(DirectX::LoadFromWICFile(filepath.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image)))
 			{
-				DV_LOG(Cubemap, err, "Å¥ºê¸Ê Face ÅØ½ºÃÄ ·Îµå ½ÇÆĞ: {}", filepath.string());
+				DV_LOG(Cubemap, err, "íë¸Œë§µ Face í…ìŠ¤ì³ ë¡œë“œ ì‹¤íŒ¨: {}", filepath.string());
 				return nullptr;
 			}
 
-			// Ã¹ ¹øÂ° Face¿¡¼­ Å©±â¿Í Æ÷¸Ë °áÁ¤
+			// ì²« ë²ˆì§¸ Faceì—ì„œ í¬ê¸°ì™€ í¬ë§· ê²°ì •
 			if (i == 0)
 			{
 				size = static_cast<UINT32>(image.GetMetadata().width);
 				format = image.GetMetadata().format;
 			}
 
-			// À¯È¿¼º °Ë»ç
+			// ìœ íš¨ì„± ê²€ì‚¬
 			if (image.GetMetadata().width != size || image.GetMetadata().height != size)
 			{
-				DV_LOG(Cubemap, err, "Å¥ºê¸Ê Face Å©±â°¡ ÀÏÄ¡ÇÏÁö ¾Ê½À´Ï´Ù. ({} != {})", image.GetMetadata().width, size);
+				DV_LOG(Cubemap, err, "íë¸Œë§µ Face í¬ê¸°ê°€ ì¼ì¹˜í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤. ({} != {})", image.GetMetadata().width, size);
 				return nullptr;
 			}
 
-			// Face µ¥ÀÌÅÍ ÀúÀå
+			// Face ë°ì´í„° ì €ì¥
 			const DirectX::Image* img = image.GetImage(0, 0, 0);
 			if (!img)
 			{
-				DV_LOG(Cubemap, err, "Å¥ºê¸Ê Face ÀÌ¹ÌÁö µ¥ÀÌÅÍ°¡ À¯È¿ÇÏÁö ¾Ê½À´Ï´Ù: {}", filepath.string());
+				DV_LOG(Cubemap, err, "íë¸Œë§µ Face ì´ë¯¸ì§€ ë°ì´í„°ê°€ ìœ íš¨í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤: {}", filepath.string());
 				return nullptr;
 			}
 
@@ -183,7 +183,7 @@ namespace Dive
 
 		if (!cubemap->Create())
 		{
-			DV_LOG(Cubemap, err, "Å¥ºê¸Ê GPU ¸®¼Ò½º »ı¼º ½ÇÆĞ");
+			DV_LOG(Cubemap, err, "íë¸Œë§µ GPU ë¦¬ì†ŒìŠ¤ ìƒì„± ì‹¤íŒ¨");
 			return nullptr;
 		}
 
@@ -194,46 +194,46 @@ namespace Dive
 	{
 		if (!std::filesystem::exists(filepath))
 		{
-			DV_LOG(Cubemap, err, "Å¥ºê¸Ê DDS ÆÄÀÏÀÌ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù: {}", filepath.string());
+			DV_LOG(Cubemap, err, "íë¸Œë§µ DDS íŒŒì¼ì´ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤: {}", filepath.string());
 			return nullptr;
 		}
 
-		// DDS ÆÄÀÏ ·Îµå
+		// DDS íŒŒì¼ ë¡œë“œ
 		DirectX::ScratchImage image;
 		if (FAILED(DirectX::LoadFromDDSFile(filepath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image)))
 		{
-			DV_LOG(Cubemap, err, "Å¥ºê¸Ê DDS ÆÄÀÏ ·Îµå ½ÇÆĞ: {}", filepath.string());
+			DV_LOG(Cubemap, err, "íë¸Œë§µ DDS íŒŒì¼ ë¡œë“œ ì‹¤íŒ¨: {}", filepath.string());
 			return nullptr;
 		}
 
-		// ¸ŞÅ¸µ¥ÀÌÅÍ È®ÀÎ
+		// ë©”íƒ€ë°ì´í„° í™•ì¸
 		const auto& metadata = image.GetMetadata();
 		if (!(metadata.miscFlags & DirectX::TEX_MISC_TEXTURECUBE))
 		{
-			DV_LOG(Cubemap, err, "DDS ÆÄÀÏÀÌ Å¥ºê¸Ê Çü½ÄÀÌ ¾Æ´Õ´Ï´Ù: {}", filepath.string());
+			DV_LOG(Cubemap, err, "DDS íŒŒì¼ì´ íë¸Œë§µ í˜•ì‹ì´ ì•„ë‹™ë‹ˆë‹¤: {}", filepath.string());
 			return nullptr;
 		}
 
-		// Å¥ºê¸Ê °´Ã¼ »ı¼º
+		// íë¸Œë§µ ê°ì²´ ìƒì„±
 		auto cubemap = std::make_shared<Cubemap>(static_cast<UINT32>(metadata.width), metadata.format, useMips);
 
-		// °¢ Face µ¥ÀÌÅÍ ¼³Á¤
+		// ê° Face ë°ì´í„° ì„¤ì •
 		for (UINT32 i = 0; i < 6; ++i) 
 		{
-			const DirectX::Image* img = image.GetImage(0, i, 0); // 6°³ÀÇ Face Áß ÇÏ³ª¸¦ °¡Á®¿È
+			const DirectX::Image* img = image.GetImage(0, i, 0); // 6ê°œì˜ Face ì¤‘ í•˜ë‚˜ë¥¼ ê°€ì ¸ì˜´
 			if (!img)
 			{
-				DV_LOG(Cubemap, err, "Å¥ºê¸Ê Face µ¥ÀÌÅÍ°¡ À¯È¿ÇÏÁö ¾Ê½À´Ï´Ù: {}", filepath.string());
+				DV_LOG(Cubemap, err, "íë¸Œë§µ Face ë°ì´í„°ê°€ ìœ íš¨í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤: {}", filepath.string());
 				return nullptr;
 			}
 
 			cubemap->SetFaceData(i, img->pixels, img->rowPitch * img->height);
 		}
 
-		// Å¥ºê¸Ê »ı¼º
+		// íë¸Œë§µ ìƒì„±
 		if (!cubemap->Create())
 		{
-			DV_LOG(Cubemap, err, "Å¥ºê¸Ê GPU ¸®¼Ò½º »ı¼º ½ÇÆĞ");
+			DV_LOG(Cubemap, err, "íë¸Œë§µ GPU ë¦¬ì†ŒìŠ¤ ìƒì„± ì‹¤íŒ¨");
 			return nullptr;
 		}
 

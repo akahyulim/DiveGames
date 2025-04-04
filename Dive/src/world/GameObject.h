@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Core/Object.h"
 #include "World.h"
 
@@ -28,7 +28,7 @@ namespace Dive
 		bool IsActive() const { return m_IsActive; }
 		void SetActive(bool active) { m_IsActive = active; }
 
-		const Transform* GetTransform() const { return m_Transform; }	// ÀĞ±â Àü¿ëÀ¸·Î Àü´Ş
+		const Transform* GetTransform() const { return m_Transform; }	// ì½ê¸° ì „ìš©ìœ¼ë¡œ ì „ë‹¬
 
 		World* GetWorld() { return m_World; }
 
@@ -44,10 +44,10 @@ namespace Dive
 		static bool ComponentValidator(GameObject* gameObject, Component* component);
 
 		// static
-		// Find : ÀÌ¸§À¸·Î Ã£´Â °Çµ¥ Á» ´õ ¾Ë¾Æº¸ÀÚ.
-		// FindGameObjectWithTag : È°¼ºÈ­µÊ ¿ÀºêÁ§Æ® ¹è¿­ ¸®ÅÏ
-		// FindWithTag : Ã¹ ¹øÂ° È°¼ºÈ­µÈ °ÔÀÓ ¿ÀºêÁ§Æ® ¸®ÅÏ
-		// GetWorld : ÀÚ½ÅÀÌ Æ÷ÇÔµÈ sceneÀÌ¶ó´Âµ¥... Á» ´õ ¾Ë¾Æº¸ÀÚ.
+		// Find : ì´ë¦„ìœ¼ë¡œ ì°¾ëŠ” ê±´ë° ì¢€ ë” ì•Œì•„ë³´ì.
+		// FindGameObjectWithTag : í™œì„±í™”ë¨ ì˜¤ë¸Œì íŠ¸ ë°°ì—´ ë¦¬í„´
+		// FindWithTag : ì²« ë²ˆì§¸ í™œì„±í™”ëœ ê²Œì„ ì˜¤ë¸Œì íŠ¸ ë¦¬í„´
+		// GetWorld : ìì‹ ì´ í¬í•¨ëœ sceneì´ë¼ëŠ”ë°... ì¢€ ë” ì•Œì•„ë³´ì.
 
 	private:
 		std::string m_Name;
@@ -59,7 +59,7 @@ namespace Dive
 		bool m_IsActive = true;
 		std::unordered_map<size_t, Component*> m_Components;
 
-		const Transform* const m_Transform;	// ÀĞ±â Àü¿ë
+		const Transform* const m_Transform;	// ì½ê¸° ì „ìš©
 	};
 
 	template<class T>

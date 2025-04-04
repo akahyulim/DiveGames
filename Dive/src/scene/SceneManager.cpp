@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SceneManager.h"
 #include "Scene.h"
 #include "SceneSerializer.h"
@@ -12,7 +12,7 @@ namespace Dive
 	{
 		if (s_pActiveScene && s_pActiveScene->GetName() == sceneName)
 		{
-			DV_LOG(SceneManager, warn, "ÀÌ¹Ì Á¸ÀçÇÏ´Â ¾À°ú µ¿ÀÏÇÑ ÀÌ¸§ÀÇ ¾ÀÀ» »ı¼ºÇÒ ¼ö ¾ø½À´Ï´Ù : {:s}", sceneName);
+			DV_LOG(SceneManager, warn, "ì´ë¯¸ ì¡´ì¬í•˜ëŠ” ì”¬ê³¼ ë™ì¼í•œ ì´ë¦„ì˜ ì”¬ì„ ìƒì„±í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤ : {:s}", sceneName);
 			return nullptr;
 		}
 

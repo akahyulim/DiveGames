@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Window.h"
 #include "CoreDefs.h"
 
@@ -32,7 +32,7 @@ namespace Dive
 
 		if (!::RegisterClassEx(&wc)) 
 		{
-			DV_LOG(Window, err, "À©µµ¿ì Å¬·¡½º µî·Ï ½ÇÆĞ");
+			DV_LOG(Window, err, "ìœˆë„ìš° í´ë˜ìŠ¤ ë“±ë¡ ì‹¤íŒ¨");
 			return;
 		}
 
@@ -55,7 +55,7 @@ namespace Dive
 
 		if (!s_hWnd)
 		{
-			DV_LOG(Window, critical, "À©µµ¿ì »ı¼º ½ÇÆĞ");
+			DV_LOG(Window, critical, "ìœˆë„ìš° ìƒì„± ì‹¤íŒ¨");
 			return;
 		}
 
@@ -88,7 +88,7 @@ namespace Dive
 	void Window::SetMessageCallback(LONG_PTR callBack)
 	{
 		if (!SetWindowLongPtr(s_hWnd, GWLP_WNDPROC, callBack))
-			DV_LOG(Window, err, "ÇÁ·Î½ÃÁ® ÇÔ¼ö º¯°æ¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+			DV_LOG(Window, err, "í”„ë¡œì‹œì ¸ í•¨ìˆ˜ ë³€ê²½ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 	}
 
 	bool Window::Resize(const uint32_t width, const uint32_t height)
@@ -100,7 +100,7 @@ namespace Dive
 		
 		if (!::SetWindowPos(s_hWnd, NULL, posX, posY, width, height, SWP_NOZORDER | SWP_DRAWFRAME))
 		{
-			DV_LOG(Window, err, "À©µµ¿ì Å©±â º¯°æ ½ÇÆĞ");
+			DV_LOG(Window, err, "ìœˆë„ìš° í¬ê¸° ë³€ê²½ ì‹¤íŒ¨");
 			return false;
 		}
 

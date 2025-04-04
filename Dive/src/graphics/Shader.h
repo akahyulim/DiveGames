@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "Resource/Resource.h"
 
 namespace Dive
@@ -33,7 +33,7 @@ namespace Dive
 		static std::vector<D3D11_INPUT_ELEMENT_DESC> GetInputElements(eInputLayout layout);
 	}
 
-	// Resource »ó¼ÓÀ» Á¦°ÅÇß´Ù.
+	// Resource ìƒì†ì„ ì œê±°í–ˆë‹¤.
 	class Shader
 	{
 	public:

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "WorldSerializer.h"
 #include "World.h"
 #include "GameObject.h"
@@ -147,7 +147,7 @@ namespace Dive
 			out << YAML::Key << "Camera";
 			out << YAML::BeginMap;
 
-			// µ¥ÀÌÅÍ ÀúÀå
+			// ë°ì´í„° ì €ìž¥
 
 			out << YAML::EndMap;
 		}
@@ -188,7 +188,7 @@ namespace Dive
 		}
 		catch (YAML::Exception& e)
 		{
-			DV_LOG(WorldSerializer, err, "¿ùµå ÆÄÀÏ ¿ªÁ÷·ÄÈ­ ½ÇÆÐ: {}", e.what());
+			DV_LOG(WorldSerializer, err, "ì›”ë“œ íŒŒì¼ ì—­ì§ë ¬í™” ì‹¤íŒ¨: {}", e.what());
 			return false;
 		}
 
@@ -226,7 +226,7 @@ namespace Dive
 				}
 			}
 
-			// °èÃþ±¸Á¶ ±¸¼º
+			// ê³„ì¸µêµ¬ì¡° êµ¬ì„±
 			for (auto gameObject : m_World->GetAllGameObjects())
 			{
 				auto transform = gameObject->GetComponent<Transform>();

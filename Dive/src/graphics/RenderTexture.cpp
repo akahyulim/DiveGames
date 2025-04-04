@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "RenderTexture.h"
 #include "core/CoreDefs.h"
 
@@ -21,7 +21,7 @@ namespace Dive
 	{
 		if (m_Format == DXGI_FORMAT_UNKNOWN)
 		{
-			DV_LOG(RenderTexture, err, "RenderTexture °´Ã¼ µ¥ÀÌÅÍ ¹Ì¼³Á¤");
+			DV_LOG(RenderTexture, err, "RenderTexture ê°ì²´ ë°ì´í„° ë¯¸ì„¤ì •");
 			return false;
 		}
 
@@ -45,7 +45,7 @@ namespace Dive
 
 				if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_Texture2D)))
 				{
-					DV_LOG(RenderTexture, err, "RenderTarget Texture »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "RenderTarget Texture ìƒì„± ì‹¤íŒ¨");
 					return false;
 				}
 			}
@@ -59,7 +59,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateRenderTargetView(
 					static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_RenderTargetView)))
 				{
-					DV_LOG(RenderTexture, err, "RenderTarget View »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "RenderTarget View ìƒì„± ì‹¤íŒ¨");
 					Release();
 					return false;
 				}
@@ -75,7 +75,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(
 					static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_ShaderResourceView)))
 				{
-					DV_LOG(RenderTexture, err, "RenderTarget ShaderResourceView »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "RenderTarget ShaderResourceView ìƒì„± ì‹¤íŒ¨");
 					Release();
 					return false;
 				}
@@ -103,7 +103,7 @@ namespace Dive
 
 				if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_DepthStencilTexture2D)))
 				{
-					DV_LOG(RenderTexture, err, "Depth/Stencil Texture »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "Depth/Stencil Texture ìƒì„± ì‹¤íŒ¨");
 					return false;
 				}
 			}
@@ -117,7 +117,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateDepthStencilView(
 					static_cast<ID3D11Resource*>(m_DepthStencilTexture2D), &desc, &m_DepthStencilView)))
 				{
-					DV_LOG(RenderTexture, err, "Depth/Stencil View »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "Depth/Stencil View ìƒì„± ì‹¤íŒ¨");
 					Release();
 					return false;
 				}
@@ -133,7 +133,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(
 					static_cast<ID3D11Resource*>(m_DepthStencilTexture2D), &desc, &m_DepthStencilShaderResourceView)))
 				{
-					DV_LOG(RenderTexture, err, "Depth/Stencil ShaderResourceView »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "Depth/Stencil ShaderResourceView ìƒì„± ì‹¤íŒ¨");
 					Release();
 					return false;
 				}

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Renderer.h"
 #include "Graphics/GBuffer.h"
 #include "Math/Frustum.h"

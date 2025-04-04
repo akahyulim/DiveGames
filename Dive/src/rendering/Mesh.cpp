@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Mesh.h"
 #include "core/CoreDefs.h"
 #include "graphics/Graphics.h"
@@ -54,7 +54,7 @@ namespace Dive
 
 	void Mesh::AddVertices(const std::vector<VertexStatic>& vertices, UINT32* outVertexOffset)
 	{
-		// ÇöÀç ÀúÀåµÇ¾î ÀÖ´Â °³¼ö¸¦ ¿ÀÇÁ¼ÂÀ¸·Î ¸®ÅÏÇÑ´Ù.
+		// í˜„ì¬ ì €ì¥ë˜ì–´ ìˆëŠ” ê°œìˆ˜ë¥¼ ì˜¤í”„ì…‹ìœ¼ë¡œ ë¦¬í„´í•œë‹¤.
 		// 
 		if (outVertexOffset)
 		{
@@ -86,10 +86,10 @@ namespace Dive
 
 	void Mesh::CreateBuffers()
 	{
-		// ¿©±â¿¡¼­ ¹öÆÛ »ı¼ºÀ» À§ÇØ °´Ã¼¿¡ ID3D11Device¸¦ Àü´ŞÇÑ´Ù¸é
-		// Mehs´Â ¶Ç ¾î¶»°Ô ÇØ´ç °´Ã¼¸¦ °¡Áö°í ÀÖ´À³Ä´Â ¹®Á¦¿¡ ºüÁö°Ô µÈ´Ù.
-		// 1. ¹°·Ğ ¸Ş½Ã´Â Graphics³ª ID3D11Device¸¦ °¡ÁöÁö ¾Ê°í ÀÌ ÇÔ¼öÀÇ ¸Å°³º¯¼ö¿¡¼­ Àü´Ş¹ŞÀ» ¼ø ÀÖ´Ù.
-		// 2. ¹öÆÛ¸¦ ¿ÜºÎ¿¡¼­ »ı¼ºÇÏ°í ¸Ş½Ã¿¡ Æ÷ÇÔ½ÃÅ°´Â ¹æ¹ıµµ ÀÖ´Ù.
+		// ì—¬ê¸°ì—ì„œ ë²„í¼ ìƒì„±ì„ ìœ„í•´ ê°ì²´ì— ID3D11Deviceë¥¼ ì „ë‹¬í•œë‹¤ë©´
+		// MehsëŠ” ë˜ ì–´ë–»ê²Œ í•´ë‹¹ ê°ì²´ë¥¼ ê°€ì§€ê³  ìˆëŠëƒëŠ” ë¬¸ì œì— ë¹ ì§€ê²Œ ëœë‹¤.
+		// 1. ë¬¼ë¡  ë©”ì‹œëŠ” Graphicsë‚˜ ID3D11Deviceë¥¼ ê°€ì§€ì§€ ì•Šê³  ì´ í•¨ìˆ˜ì˜ ë§¤ê°œë³€ìˆ˜ì—ì„œ ì „ë‹¬ë°›ì„ ìˆœ ìˆë‹¤.
+		// 2. ë²„í¼ë¥¼ ì™¸ë¶€ì—ì„œ ìƒì„±í•˜ê³  ë©”ì‹œì— í¬í•¨ì‹œí‚¤ëŠ” ë°©ë²•ë„ ìˆë‹¤.
 		if (!m_Vertices.empty())
 			m_VertexBuffer = VertexBuffer::Generate(m_Vertices.data(), sizeof(VertexStatic), static_cast<UINT32>(m_Vertices.size()));
 

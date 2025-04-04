@@ -1,7 +1,5 @@
-#include "Project.h"
+ï»¿#include "Project.h"
 #include "core/Engine.h"
-#include <yaml-cpp/yaml.h>
-#include <fstream>
 
 namespace Dive
 {
@@ -33,11 +31,11 @@ namespace Dive
 		}
 		catch (const std::filesystem::filesystem_error& e)
 		{
-			DV_LOG(Project, err, "ÇÁ·ÎÁ§Æ® µð·ºÅä¸® »ý¼º¿¡ ½ÇÆÐÇÏ¿´½À´Ï´Ù : {:s}", e.what());
+			DV_LOG(Project, err, "í”„ë¡œì íŠ¸ ë””ë ‰í† ë¦¬ ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤ : {:s}", e.what());
 			DV_DELETE(project);
 		}
 
-		// »ý¼º ÈÄ Á÷·ÄÈ­
+		// ìƒì„± í›„ ì§ë ¬í™”
 		if (!Project::SaveToFile(project))
 		{
 			std::filesystem::remove_all(filePath.parent_path());
@@ -51,7 +49,7 @@ namespace Dive
 	{
 		if (!project || project->m_FilePath.empty())
 		{
-			DV_LOG(Project, warn, "Á÷·ÄÈ­ÇÒ ¼ö ÀÖ´Â °´Ã¼°¡ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù.");
+			DV_LOG(Project, warn, "ì§ë ¬í™”í•  ìˆ˜ ìžˆëŠ” ê°ì²´ê°€ ì¡´ìž¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.");
 			return false;
 		}
 
@@ -70,19 +68,19 @@ namespace Dive
 
 		if (!out.good())
 		{
-			DV_LOG(Project, err, "YAML Á÷·ÄÈ­ µµÁß ¿À·ù°¡ ¹ß»ýÇÏ¿´½À´Ï´Ù.");
+			DV_LOG(Project, err, "YAML ì§ë ¬í™” ë„ì¤‘ ì˜¤ë¥˜ê°€ ë°œìƒí•˜ì˜€ìŠµë‹ˆë‹¤.");
 			return false;
 		}
 
 		std::ofstream fout(project->m_FilePath);
 		if (!fout)
 		{
-			DV_LOG(Project, err, "ÆÄÀÏ({})À» ¿­ ¼ö ¾ø½À´Ï´Ù.", project->m_FilePath.string());
+			DV_LOG(Project, err, "íŒŒì¼({})ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.", project->m_FilePath.string());
 			return false;
 		}
 		fout << out.c_str();
 
-		DV_LOG(Project, info, "ÇÁ·ÎÁ§Æ®({}) Á÷·ÄÈ­ ¼º°ø", project->GetName());
+		DV_LOG(Project, info, "í”„ë¡œì íŠ¸({}) ì§ë ¬í™” ì„±ê³µ", project->GetName());
 
 		return true;
 	}
@@ -99,13 +97,13 @@ namespace Dive
 		}
 		catch (YAML::BadFile& e)
 		{
-			DV_LOG(Project, warn, "ÇÁ·ÎÁ§Æ® ÆÄÀÏ({}) ·Îµå¿¡ ½ÇÆÐÇÏ¿´½À´Ï´Ù. : {}", filePath, e.what());
+			//DV_LOG(Project, warn, "í”„ë¡œì íŠ¸ íŒŒì¼({}) ë¡œë“œì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤. : {}", filePath, e.what());
 			DV_DELETE(project);
 			return nullptr;
 		}
 		catch (YAML::ParserException& e)
 		{
-			DV_LOG(Project, warn, "YAML ÆÄÀÏ({}) ÆÄ½Ì¿¡ ½ÇÆÐÇÏ¿´½À´Ï´Ù. : {}", filePath, e.what());
+			//DV_LOG(Project, warn, "YAML íŒŒì¼({}) íŒŒì‹±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤. : {}", filePath, e.what());
 			DV_DELETE(project);
 			return nullptr;
 		}
@@ -113,7 +111,7 @@ namespace Dive
 		auto projectNode = data["Project"];
 		if (!projectNode)
 		{
-			DV_LOG(Project, warn, "ÇÁ·ÎÁ§Æ® ³ëµå¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù.");
+			DV_LOG(Project, warn, "í”„ë¡œì íŠ¸ ë…¸ë“œë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 			DV_DELETE(project);
 			return nullptr;
 		}
@@ -124,7 +122,7 @@ namespace Dive
 		project->m_Config.WorldDir = projectNode["WorldDir"].as<std::string>();
 		project->m_Config.OpenedWorld = projectNode["OpenedWorld"].as<std::string>();
 
-		DV_LOG(Project, info, "ÇÁ·ÎÁ§Æ®({}) ¿ªÁ÷·ÄÈ­ ¼º°ø", project->GetName());
+		DV_LOG(Project, info, "í”„ë¡œì íŠ¸({}) ì—­ì§ë ¬í™” ì„±ê³µ", project->GetName());
 
 		return project;
 	}

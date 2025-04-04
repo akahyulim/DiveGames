@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "WorldManager.h"
 #include "World.h"
 #include "WorldSerializer.h"
@@ -12,7 +12,7 @@ namespace Dive
 	{
 		if (s_ActiveWorld && s_ActiveWorld->GetName() == name)
 		{
-			DV_LOG(WorldManager, warn, "ÀÌ¹Ì Á¸ÀçÇÏ´Â ¿ùµå°ú µ¿ÀÏÇÑ ÀÌ¸§ÀÇ ¿ùµåÀ» »ı¼ºÇÒ ¼ö ¾ø½À´Ï´Ù : {:s}", name);
+			DV_LOG(WorldManager, warn, "ì´ë¯¸ ì¡´ì¬í•˜ëŠ” ì›”ë“œê³¼ ë™ì¼í•œ ì´ë¦„ì˜ ì›”ë“œì„ ìƒì„±í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤ : {:s}", name);
 			return nullptr;
 		}
 
@@ -37,7 +37,7 @@ namespace Dive
 	{
 		if (path.empty() && s_ActiveWorld->GetFilePath().empty())
 		{
-			DV_LOG(WorldManager, warn, "¿ùµåÀÇ ÀúÀå °æ·Î¸¦ Àü´ŞÇØ¾ß ÇÕ´Ï´Ù.");
+			DV_LOG(WorldManager, warn, "ì›”ë“œì˜ ì €ì¥ ê²½ë¡œë¥¼ ì „ë‹¬í•´ì•¼ í•©ë‹ˆë‹¤.");
 			return;
 		}
 

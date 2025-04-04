@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "View.h"
 
 namespace Dive
@@ -19,8 +19,8 @@ namespace Dive
 
 
 	private:
-		// ½ºÆÄ¸£ÅºÀÇ °æ¿ì clicked¿Í hovered¸¸ °ü¸®ÇÑ´Ù.
-		// selectedÀÇ °æ¿ì camera¿¡¼­ °ü¸®ÇÑ´Ù.
+		// ìŠ¤íŒŒë¥´íƒ„ì˜ ê²½ìš° clickedì™€ hoveredë§Œ ê´€ë¦¬í•œë‹¤.
+		// selectedì˜ ê²½ìš° cameraì—ì„œ ê´€ë¦¬í•œë‹¤.
 		GameObject* m_SelectedGameObject;
 
 		bool m_IsEditedName = false;

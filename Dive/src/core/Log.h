@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
@@ -16,11 +16,11 @@ namespace Dive
 		static std::shared_ptr<spdlog::logger> GetLogger(const std::string& category);
 		static void Shutdown() { spdlog::shutdown(); }
 
-		// ¹İµå½Ã ·Î°Å µî·Ï Àü¿¡ ¼³Á¤ÇØ¾ß ÇÑ´Ù.
+		// ë°˜ë“œì‹œ ë¡œê±° ë“±ë¡ ì „ì— ì„¤ì •í•´ì•¼ í•œë‹¤.
 		static void SetLevels(spdlog::level::level_enum setLevel, spdlog::level::level_enum flushLevel) { s_SetLevel = setLevel; s_FlushLevel = flushLevel; }
 		static void SetFilename(const std::string& filename) { s_Filename = filename; }
 		
-		// °æ·Î È®ÀÎ¿ë(º¯°æ ºÒ°¡)
+		// ê²½ë¡œ í™•ì¸ìš©(ë³€ê²½ ë¶ˆê°€)
 		static const std::string& GetFilename() { return s_Filename; }
 
 	private:

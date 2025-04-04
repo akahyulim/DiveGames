@@ -1,4 +1,4 @@
-#include "LogView.h"
+﻿#include "LogView.h"
 
 namespace Dive
 {

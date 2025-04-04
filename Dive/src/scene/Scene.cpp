@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Scene.h"
 #include "SceneSerializer.h"
 #include "GameObject.h"
@@ -63,7 +63,7 @@ namespace Dive
 		auto id = getFreeGameObjectID();
 		if (id == 0)
 		{
-			DV_LOG(Scene, err, "´õÀÌ»ó »õ·Î¿î GameObject¸¦ »ı¼ºÇÒ ¼ö ¾ø½À´Ï´Ù.");
+			DV_LOG(Scene, err, "ë”ì´ìƒ ìƒˆë¡œìš´ GameObjectë¥¼ ìƒì„±í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
 			return nullptr;
 		}
 

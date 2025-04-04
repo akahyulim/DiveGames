@@ -1,4 +1,4 @@
-#include "DivePch.h"
+ï»¿#include "DivePch.h"
 #include "Light.h"
 #include "Core/CoreDefs.h"
 #include "Graphics/Texture2D.h"
@@ -115,7 +115,7 @@ namespace Dive
 			XMStoreFloat4x4(&m_ArrWorldToCascadeProj[i], worldToProj);
 		}
 
-		// »ó´çÈ÷ ÀÌ»óÇÏ´Ù.
+		// ìƒë‹¹íˆ ì´ìƒí•˜ë‹¤.
 		m_ToCascadeOffsetX[3] = 250.0f;
 		m_ToCascadeOffsetY[3] = 250.0f;
 		m_ToCascadeScale[3] = 0.1f;
@@ -230,7 +230,7 @@ namespace Dive
 		m_pShadowMap = static_cast<Texture*>(new Texture2DArray(1024, 1024, 32, 3));
 	}
 	
-	// »ı¼ºÀÚ¿¡ ³ÖÀ» ¼ö ¾ø¾î º°µµÀÇ ¸Ş¼­µå·Î ºĞ¸®Çß´Ù.
+	// ìƒì„±ìì— ë„£ì„ ìˆ˜ ì—†ì–´ ë³„ë„ì˜ ë©”ì„œë“œë¡œ ë¶„ë¦¬í–ˆë‹¤.
 	void DirectionalLight::InitializeCascadedMatrixSet(GameObject* pCamera)
 	{
 		m_CascadedMatrixSet.Initialize(1024, pCamera);
@@ -393,7 +393,7 @@ namespace Dive
 		return m_pCBufferDS;
 	}
 
-	// ÀÌ °ªÀº ¿ùµåº¯È¯µÈ ¿ÀºêÁ§Æ®¸¦ Å¥ºê¸ÊÀ» ÀÌ·ç´Â 6°³ÀÇ °¢ ¸éÀ¸·Î º¯È¯ÇÏ±â À§ÇÑ ºä, ÇÁ·ÎÁ§¼Ç Çà·ÄÀÌ´Ù.
+	// ì´ ê°’ì€ ì›”ë“œë³€í™˜ëœ ì˜¤ë¸Œì íŠ¸ë¥¼ íë¸Œë§µì„ ì´ë£¨ëŠ” 6ê°œì˜ ê° ë©´ìœ¼ë¡œ ë³€í™˜í•˜ê¸° ìœ„í•œ ë·°, í”„ë¡œì ì…˜ í–‰ë ¬ì´ë‹¤.
 	ConstantBuffer* PointLight::GetConstantBufferGS()
 	{
 		if (!m_pCBufferGS)
@@ -498,10 +498,10 @@ namespace Dive
 		, m_InnerAngle(0.0f)
 		, m_OuterAngle(0.0f)
 	{
-		// ÀÓ½Ã À§Ä¡
-		// ±âº»ÀûÀ¸·Î nullptrÀÌ ¸Â°í
-		// ±×¸²ÀÚ¸¦ Àû¿ëÇÏ°íÀÚ ÇÒ ¶§ »ı¼ºÇÏ´Â °ÍÀÌ ¸Â´Â µí ÇÏ´Ù.
-		// ´Ù¸¸ ÇöÀç Å©±â°¡ °íÁ¤µÇ¾î ÀÖ´Ù.
+		// ì„ì‹œ ìœ„ì¹˜
+		// ê¸°ë³¸ì ìœ¼ë¡œ nullptrì´ ë§ê³ 
+		// ê·¸ë¦¼ìë¥¼ ì ìš©í•˜ê³ ì í•  ë•Œ ìƒì„±í•˜ëŠ” ê²ƒì´ ë§ëŠ” ë“¯ í•˜ë‹¤.
+		// ë‹¤ë§Œ í˜„ì¬ í¬ê¸°ê°€ ê³ ì •ë˜ì–´ ìˆë‹¤.
 		m_ShadowMapSize = 1024.0f;
 		m_pShadowMap = static_cast<Texture*>(new Texture2D(1024, 1024, 32));
 	}
@@ -587,8 +587,8 @@ namespace Dive
 
 		auto proj = XMMatrixPerspectiveFovLH(
 			2.0f * XMConvertToRadians(m_OuterAngle),
-			1.0f,			// °¡·Î, ¼¼·Î ºñÀ²ÀÌ¶ó 1ÀÎµí ÇÏ´Ù.
-			s_NearPlane,			// Ã¥¿¡¼­µµ »ó¼ö¸¦ ¸â¹ö º¯¼ö·Î °ü¸®Çß´Ù. ShadowGen Rasterizer State¿Í °ü·ÃÀÌ ÀÖ³ª? => ¾Æ´Ñµí?
+			1.0f,			// ê°€ë¡œ, ì„¸ë¡œ ë¹„ìœ¨ì´ë¼ 1ì¸ë“¯ í•˜ë‹¤.
+			s_NearPlane,			// ì±…ì—ì„œë„ ìƒìˆ˜ë¥¼ ë©¤ë²„ ë³€ìˆ˜ë¡œ ê´€ë¦¬í–ˆë‹¤. ShadowGen Rasterizer Stateì™€ ê´€ë ¨ì´ ìˆë‚˜? => ì•„ë‹Œë“¯?
 			m_Range
 		);	
 

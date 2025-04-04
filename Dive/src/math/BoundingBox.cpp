@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "BoundingBox.h"
 #include "core/CoreDefs.h"
 #include "rendering/Mesh.h"

@@ -1,4 +1,4 @@
-#include "divepch.h"
+ï»¿#include "divepch.h"
 #include "ViewScreen.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -33,14 +33,14 @@ namespace Dive
 		m_GBuffer.Initialize(m_pGraphics->GetResolutionWidth(), m_pGraphics->GetResolutionHeight());
 	}
 
-	// ½ºÆÄ¸£ÅºÀº ÀÌº¥Æ® ÄÃ¸µ ÇÔ¼ö¿¡¼­ ±¸ÇöÇÑ´Ù.
+	// ìŠ¤íŒŒë¥´íƒ„ì€ ì´ë²¤íŠ¸ ì»¬ë§ í•¨ìˆ˜ì—ì„œ êµ¬í˜„í•œë‹¤.
 	void ViewScreen::Update()
 	{
 		if (!m_pActiveScene || m_pActiveScene->IsEmpty())
 			return;
 
-		// »õ·Ó°Ô Ãß°¡
-		// ÇÏ³ªÀÇ Scene¿¡ View°¡ ¿©·¯°³¶ó¸é ¹®Á¦°¡ µÈ´Ù.
+		// ìƒˆë¡­ê²Œ ì¶”ê°€
+		// í•˜ë‚˜ì˜ Sceneì— Viewê°€ ì—¬ëŸ¬ê°œë¼ë©´ ë¬¸ì œê°€ ëœë‹¤.
 		m_pActiveScene->Update();
 
 		for (auto it = m_Renderables.begin(); it != m_Renderables.end(); ++it)
@@ -72,14 +72,14 @@ namespace Dive
 			}
 		}
 
-		// ¹İÅõ¸í ¿ÀºêÁ§Æ®´Â Ä«¸Ş¶ó¿¡¼­ ¸Õ °Í ºÎÅÍ ±×·Á¾ß ÇÏ¹Ç·Î Á¤·ÄÀÌ ÇÊ¿äÇÏ´Ù°í ÇÑ´Ù.
-		// ½ºÆÄ¸£Åº¿¡¼­ ÇØ´ç ºÎºĞÀº ¾ÆÁ÷ Ã£Áö ¸øÇß´Ù.
+		// ë°˜íˆ¬ëª… ì˜¤ë¸Œì íŠ¸ëŠ” ì¹´ë©”ë¼ì—ì„œ ë¨¼ ê²ƒ ë¶€í„° ê·¸ë ¤ì•¼ í•˜ë¯€ë¡œ ì •ë ¬ì´ í•„ìš”í•˜ë‹¤ê³  í•œë‹¤.
+		// ìŠ¤íŒŒë¥´íƒ„ì—ì„œ í•´ë‹¹ ë¶€ë¶„ì€ ì•„ì§ ì°¾ì§€ ëª»í–ˆë‹¤.
 
 		m_Frustum.Construct(m_pCamera->GetViewMatrix(), m_pCamera->GetProjectionMatrix(), m_pCamera->GetFarClipPlane());
 	}
 	
-	// °á±¹ ÀÌ °÷¿¡¼­ Renderer¿Í Graphics¸¦ ÀüºÎ È°¿ëÇÏ±â ¶§¹®¿¡
-	// enum class »ç¿ë °úÁ¤ÀÌ ºñÈ¿À²ÀÌ´Ù.
+	// ê²°êµ­ ì´ ê³³ì—ì„œ Rendererì™€ Graphicsë¥¼ ì „ë¶€ í™œìš©í•˜ê¸° ë•Œë¬¸ì—
+	// enum class ì‚¬ìš© ê³¼ì •ì´ ë¹„íš¨ìœ¨ì´ë‹¤.
 	void ViewScreen::Render()
 	{
 		switch (m_RenderPath)
@@ -99,7 +99,7 @@ namespace Dive
 		}
 	}
 
-	// pass´Â µå·Î¿ìÄİ(¼ÎÀÌ´õ) ´ÜÀ§·Î ±¸ºĞµÈ´Ù.
+	// passëŠ” ë“œë¡œìš°ì½œ(ì…°ì´ë”) ë‹¨ìœ„ë¡œ êµ¬ë¶„ëœë‹¤.
 	void ViewScreen::forwardRender()
 	{
 		passLightDepth();
@@ -107,21 +107,21 @@ namespace Dive
 		passTransparentDraw();
 
 		/*
-		Ã¥¿¡¼­´Â light, scene, gbuffer °¢ÀÚÀÇ °´Ã¼¿¡¼­
-		passº° ¸Ş¼­µå¸¦ °¡Áö¸ç ÀÌ¸¦ Á¶ÇÕÇØ path¸¦ ±¸¼ºÇÑ´Ù.
+		ì±…ì—ì„œëŠ” light, scene, gbuffer ê°ìì˜ ê°ì²´ì—ì„œ
+		passë³„ ë©”ì„œë“œë¥¼ ê°€ì§€ë©° ì´ë¥¼ ì¡°í•©í•´ pathë¥¼ êµ¬ì„±í•œë‹¤.
 		
-		ÇöÀç passLightDepth¸¦ ¼¼ºĞÈ­
+		í˜„ì¬ passLightDepthë¥¼ ì„¸ë¶„í™”
 		lightManager::PrepareNextShadowLight
 		sceneManager::RenderSceneNoShaders
 
-		ÇöÀç passOpaqueDraw¸¦ ¼¼ºĞÈ­
+		í˜„ì¬ passOpaqueDrawë¥¼ ì„¸ë¶„í™”
 		gBuffer::PreRender
 		sceneManager::RenderSceneToGBuffer
 		gBuffer::PostRender
 		*/
 		
 		/*
-		½ºÆÄ¸£ÅºÀÇ ±¸¼º
+		ìŠ¤íŒŒë¥´íƒ„ì˜ êµ¬ì„±
 		Pass_Visibility(cmd_list);
         Pass_Depth_Prepass(cmd_list, false);
         Pass_GBuffer(cmd_list);
@@ -141,12 +141,12 @@ namespace Dive
 		*/
 	}
 
-	// ½ºÆÄ¸£ÅºÀº opaque¿Í transparent¸¦ ±¸ºĞÇÏ´Â °Í °°´Ù.
-	// ±¤¿øÀÇ ±×¸²ÀÚ¸ÊÀ» ±íÀÌ ¹öÆÛ·Î »ç¿ë
-	// ¿ÀºêÁ§Æ®¸¦ ±¤¿øÀÇ ºä, ÇÁ·ÎÁ§¼ÇÀ¸·Î º¯È¯ÇÑ ÈÄ ±â·Ï
+	// ìŠ¤íŒŒë¥´íƒ„ì€ opaqueì™€ transparentë¥¼ êµ¬ë¶„í•˜ëŠ” ê²ƒ ê°™ë‹¤.
+	// ê´‘ì›ì˜ ê·¸ë¦¼ìë§µì„ ê¹Šì´ ë²„í¼ë¡œ ì‚¬ìš©
+	// ì˜¤ë¸Œì íŠ¸ë¥¼ ê´‘ì›ì˜ ë·°, í”„ë¡œì ì…˜ìœ¼ë¡œ ë³€í™˜í•œ í›„ ê¸°ë¡
 	void ViewScreen::passLightDepth()
 	{
-		// Âü°íÇÁ·ÎÁ§Æ®¿¡¼± Ã£À» ¼ö ¾ø¾úÁö¸¸ ÄÚÆÄÀÏ·µÀº ÀÌ°Ô ÇÊ¿äÇÏ´Ù°í ÇÑ´Ù.
+		// ì°¸ê³ í”„ë¡œì íŠ¸ì—ì„  ì°¾ì„ ìˆ˜ ì—†ì—ˆì§€ë§Œ ì½”íŒŒì¼ëŸ¿ì€ ì´ê²Œ í•„ìš”í•˜ë‹¤ê³  í•œë‹¤.
 		m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::ShadowGen);
@@ -170,7 +170,7 @@ namespace Dive
 			{
 				m_pGraphics->SetRasterizerState(eRasterizerStateType::CascadedShadowGen);
 
-				// 3°³ÀÇ viewport
+				// 3ê°œì˜ viewport
 				auto size = pLightCom->GetShadowMapSize();
 				D3D11_VIEWPORT viewports[3] = { {0.0f, 0.0f, size, size, 0.0f, 1.0f}, 
 					{0.0f, 0.0f, size, size, 0.0f, 1.0f}, {0.0f, 0.0f, size, size, 0.0f, 1.0f} };
@@ -193,12 +193,12 @@ namespace Dive
 				D3D11_VIEWPORT viewports[6] = { {0.0f, 0.0f, size, size, 0.0f, 1.0f}, {0.0f, 0.0f, size, size, 0.0f, 1.0f}, {0.0f, 0.0f, size, size, 0.0f, 1.0f},
 				{0.0f, 0.0f, size, size, 0.0f, 1.0f}, {0.0f, 0.0f, size, size, 0.0f, 1.0f}, {0.0f, 0.0f, size, size, 0.0f, 1.0f} };
 				m_pGraphics->SetViewports(6, viewports);
-				// ÄÚÆÄÀÏ·µÀº µ¿ÀÏÇÑ ºäÆ÷Æ®¶ó¸é ±»ÀÌ 6°³¸¦ ¼³Á¤ÇÒ ÇÊ¿ä°¡ ¾ø´Ù°í ÇÑ´Ù.
+				// ì½”íŒŒì¼ëŸ¿ì€ ë™ì¼í•œ ë·°í¬íŠ¸ë¼ë©´ êµ³ì´ 6ê°œë¥¼ ì„¤ì •í•  í•„ìš”ê°€ ì—†ë‹¤ê³  í•œë‹¤.
 				//m_pGraphics->SetViewports(1, viewports);
 
 				m_pGraphics->GSBindConstantBuffer(pLightCom->GetConstantBufferGS(), 2);
 
-				// ¼ÎÀÌ´õ ÀÌ¸§À» PointShadowGenVS, GS ÀÌ·±½ÄÀ¸·Î ¹Ù²ÙÀÚ.
+				// ì…°ì´ë” ì´ë¦„ì„ PointShadowGenVS, GS ì´ëŸ°ì‹ìœ¼ë¡œ ë°”ê¾¸ì.
 				m_pGraphics->SetVertexShader(eVertexShaderType::PointLightDepth);
 				m_pGraphics->SetHullShader(eHullShaderType::Null);
 				m_pGraphics->SetDomainShader(eDomainShaderType::Null);
@@ -231,12 +231,12 @@ namespace Dive
 				auto* pRenderableCom = pOpaque->GetComponent<Renderable>();
 				const auto& boundingBox = pRenderableCom->GetBoundingBox();
 
-				// ÄÃ¸µ¶§¹®¿¡ ±×¸²ÀÚ°¡ »ç¶óÁø´Ù.
-				// ±íÀÌµµ ÄÃ¸µÀ» ÇØ¾ß ÇÏ³ª...?
+				// ì»¬ë§ë•Œë¬¸ì— ê·¸ë¦¼ìê°€ ì‚¬ë¼ì§„ë‹¤.
+				// ê¹Šì´ë„ ì»¬ë§ì„ í•´ì•¼ í•˜ë‚˜...?
 				if (!m_Frustum.IsVisible(boundingBox.GetCenter(), boundingBox.GetExtent()))
 					continue;
 
-				// ¿ùµå º¯È¯ Çà·Ä
+				// ì›”ë“œ ë³€í™˜ í–‰ë ¬
 				m_pGraphics->VSBindConstantBuffer(pRenderableCom->GetConstantBufferVS(), 1);
 
 				m_pGraphics->SetVertexBuffer(pRenderableCom->GetVertexBuffer());
@@ -268,7 +268,7 @@ namespace Dive
 
 	void ViewScreen::passOpaqueDraw()
 	{
-		// °á±¹ ViewScreenÀÇ Å©±â°¡ µÇ¾î¾ß ÇÏÁö ¾Ê³ª?
+		// ê²°êµ­ ViewScreenì˜ í¬ê¸°ê°€ ë˜ì–´ì•¼ í•˜ì§€ ì•Šë‚˜?
 		m_pGraphics->SetViewport(0, 0, (float)m_pGraphics->GetResolutionWidth(), (float)m_pGraphics->GetResolutionHeight());
 
 		m_pGraphics->BindRenderTargetView(m_pCamera->GetRenderTargetView(), 0);
@@ -290,13 +290,13 @@ namespace Dive
 			auto light = m_Renderables[eRenderableType::Light][i];
 			auto pLightCom = light->GetComponent<Light>();
 
-			// ¿©±â¿¡¼­µµ µÎ ¹øÂ° ±¤¿øºÎÅÍ °»½ÅÀÌ ¾ÈµÉ °Í °°Àºµ¥...
+			// ì—¬ê¸°ì—ì„œë„ ë‘ ë²ˆì§¸ ê´‘ì›ë¶€í„° ê°±ì‹ ì´ ì•ˆë  ê²ƒ ê°™ì€ë°...
 			//auto pLightBuffer = m_pRenderer->GetPSConstantBuffer(ePSConstBufType::Light);
 			//pLightBuffer->Update((void*)&pLightCom->GetCBufferPS());
 			//m_pGraphics->BindPSCBuffer(pLightBuffer);
 			m_pGraphics->PSBindConstantBuffer(pLightCom->GetConstantBufferPS(), 2);
 
-			// µÎ ¹øÂ° ±¤¿øºÎÅÍ´Â ÀÌÀü µå·Î¿ì Äİ °á°ú¸¦ È¥ÇÕÇÑ´Ù.
+			// ë‘ ë²ˆì§¸ ê´‘ì›ë¶€í„°ëŠ” ì´ì „ ë“œë¡œìš° ì½œ ê²°ê³¼ë¥¼ í˜¼í•©í•œë‹¤.
 			if(i == 1)
 				m_pGraphics->SetBlendState(eBlendStateType::Additive);
 			
@@ -311,10 +311,10 @@ namespace Dive
 					continue;
 
 				m_pGraphics->VSBindConstantBuffer(pRenderableCom->GetConstantBufferVS(), 1);
-				m_pGraphics->PSBindConstantBuffer(pRenderableCom->GetConstantBufferPS(), 5);	// ÃßÈÄ 1·Î ¹Ù²Ù¾î¾ß ÇÑ´Ù.
+				m_pGraphics->PSBindConstantBuffer(pRenderableCom->GetConstantBufferPS(), 5);	// ì¶”í›„ 1ë¡œ ë°”ê¾¸ì–´ì•¼ í•œë‹¤.
 
-				// À§ÀÇ »ùÇÃ·¯µµ ±×·¸°í ¸Å°³º¯¼ö ±¸¼ºÀÌ Á» º°·ç´Ù.
-				// »ó¼ö¹öÆÛÃ³·³ ÅØ½ºÃÄ°¡ slotÀ» °¡Áö¸é ±ò²ûÇØÁø´Ù.
+				// ìœ„ì˜ ìƒ˜í”ŒëŸ¬ë„ ê·¸ë ‡ê³  ë§¤ê°œë³€ìˆ˜ êµ¬ì„±ì´ ì¢€ ë³„ë£¨ë‹¤.
+				// ìƒìˆ˜ë²„í¼ì²˜ëŸ¼ í…ìŠ¤ì³ê°€ slotì„ ê°€ì§€ë©´ ê¹”ë”í•´ì§„ë‹¤.
 				m_pGraphics->BindPSResource(pMaterial->GetDvTexture(eTextureUnitType::Diffuse), eTextureUnitType::Diffuse);
 				m_pGraphics->BindPSResource(pMaterial->GetDvTexture(eTextureUnitType::Normal), eTextureUnitType::Normal);
 				if (pLightCom->GetType() == eLightType::Spot)
@@ -390,9 +390,9 @@ namespace Dive
 
 		// states
 		m_pGraphics->SetRasterizerState(eRasterizerStateType::FillSolid_CullBack);
-		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::GBuffer);		// Ã¥Àº ÀÌ State±îÁö GBuffer¿¡¼­ °ü¸®ÇÑ´Ù.
+		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::GBuffer);		// ì±…ì€ ì´ Stateê¹Œì§€ GBufferì—ì„œ ê´€ë¦¬í•œë‹¤.
 
-		// ÀÌ°É »ç¿ëÇÑ´Ù.
+		// ì´ê±¸ ì‚¬ìš©í•œë‹¤.
 		m_pGraphics->VSBindConstantBuffer(m_pCamera->GetConstantBufferVS(), 0);
 
 		// draw on g buffer
@@ -414,7 +414,7 @@ namespace Dive
 			m_pGraphics->SetVertexShader(eVertexShaderType::GBuffer);
 			m_pGraphics->SetHullShader(eHullShaderType::Null);
 			m_pGraphics->SetDomainShader(eDomainShaderType::Null);
-			m_pGraphics->SetGeometryShader(eGeometryShaderType::Null);	// ¿ª½Ã ÀÌ°Ô ¹®Á¦¿´´Ù.
+			m_pGraphics->SetGeometryShader(eGeometryShaderType::Null);	// ì—­ì‹œ ì´ê²Œ ë¬¸ì œì˜€ë‹¤.
 			m_pGraphics->SetPixelShader(ePixelShaderType::GBuffer);
 
 			m_pGraphics->SetVertexBuffer(pRenderableCom->GetVertexBuffer());
@@ -431,7 +431,7 @@ namespace Dive
 	void ViewScreen::passLight()
 	{
 		m_pGraphics->BindRenderTargetView(m_pCamera->GetRenderTargetView(), 0);
-		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());	// ÀĞ±â Àü¿ë
+		m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());	// ì½ê¸° ì „ìš©
 		m_pGraphics->ClearViews(eClearFlags::Color, m_pCamera->GetBackgroundColor());
 		m_pGraphics->SetViewport(0, 0, static_cast<float>(m_pGraphics->GetResolutionWidth()), static_cast<float>(m_pGraphics->GetResolutionHeight()));
 
@@ -466,8 +466,8 @@ namespace Dive
 			{
 			case eLightType::Directional:
 			{
-				// ¿¹Á¦¿¡¼­´Â 2¸¦ º¯¼ö·Î °ü¸®Çß´Ù.
-				// skybox¿Í °ü·ÃÀÖ´Â µí ÇÏ´Ù.
+				// ì˜ˆì œì—ì„œëŠ” 2ë¥¼ ë³€ìˆ˜ë¡œ ê´€ë¦¬í–ˆë‹¤.
+				// skyboxì™€ ê´€ë ¨ìˆëŠ” ë“¯ í•˜ë‹¤.
 				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteLessStencilMask);// , 2);
 				
 				m_pGraphics->SetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -494,7 +494,7 @@ namespace Dive
 				if (pLightCom->IsShadowEnabled())
 					m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetShaderResourceView(), eTextureUnitType::PointShadowMap);
 
-				// Ã¥¿¡´Â 1ÀÌÁö¸¸ Á¤È²»ó 2°¡ ¾î¿ï¸°´Ù. => Àû¿ëÇÏ¸é ¾È±×·ÁÁø´Ù.
+				// ì±…ì—ëŠ” 1ì´ì§€ë§Œ ì •í™©ìƒ 2ê°€ ì–´ìš¸ë¦°ë‹¤. => ì ìš©í•˜ë©´ ì•ˆê·¸ë ¤ì§„ë‹¤.
 				m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
 
 				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredPointLight);
@@ -513,7 +513,7 @@ namespace Dive
 			
 			case eLightType::Spot:
 			{
-				// Ä«¸Ş¶ó°¡ ¹üÀ§ ¾È¿¡ µé¾î°¡¸é ±¤¿ø Àû¿ëÀÌ ¾ÈµÈ´Ù.
+				// ì¹´ë©”ë¼ê°€ ë²”ìœ„ ì•ˆì— ë“¤ì–´ê°€ë©´ ê´‘ì› ì ìš©ì´ ì•ˆëœë‹¤.
 				m_pGraphics->SetDepthStencilState(eDepthStencilStateType::NoDepthWriteGreaterStencilMask);
 				m_pGraphics->SetRasterizerState(eRasterizerStateType::NoDepthClipFront);
 
@@ -527,7 +527,7 @@ namespace Dive
 				m_pGraphics->SetDomainShader(eDomainShaderType::DeferredSpotLight);
 				m_pGraphics->SetPixelShader(ePixelShaderType::DeferredSpotLight);
 
-				// BindDomainCBuffer·Î ÀÌ¸§ º¯°æ?
+				// BindDomainCBufferë¡œ ì´ë¦„ ë³€ê²½?
 				m_pGraphics->DSBindConstantBuffer(m_pCamera->GetConstantBufferDS(), 0);
 				m_pGraphics->DSBindConstantBuffer(pLightCom->GetConstantBufferDS(), 1);
 
@@ -543,14 +543,14 @@ namespace Dive
 	
 		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::Null);
 		m_pGraphics->SetBlendState(eBlendStateType::Null);
-		m_pGraphics->GetDeviceContext()->RSSetState(nullptr);	// ÃßÈÄ ¼öÁ¤ ÇÊ¿ä
+		m_pGraphics->GetDeviceContext()->RSSetState(nullptr);	// ì¶”í›„ ìˆ˜ì • í•„ìš”
 
 		m_pGraphics->SetVertexShader(eVertexShaderType::Null);
 		m_pGraphics->SetHullShader(eHullShaderType::Null);
 		m_pGraphics->SetDomainShader(eDomainShaderType::Null);
 		m_pGraphics->SetPixelShader(ePixelShaderType::Null);
 
-		// ÇöÀç Texture Å×½ºÆ® ¶§¹®¿¡ µ¿ÀÏÇÑ ÀÌ¸§ÀÇ ¸Ş¼­µå°¡ Á¸ÀçÇÑ´Ù.
+		// í˜„ì¬ Texture í…ŒìŠ¤íŠ¸ ë•Œë¬¸ì— ë™ì¼í•œ ì´ë¦„ì˜ ë©”ì„œë“œê°€ ì¡´ì¬í•œë‹¤.
 		//m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_Diffuse);
 		//m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_Normal);
 		//m_pGraphics->BindPSResource((Texture*)nullptr, eTextureUnitType::GBuffer_Specular);
@@ -565,7 +565,7 @@ namespace Dive
 	void ViewScreen::passDebugLight()
 	{
 		m_pGraphics->BindRenderTargetView(m_pCamera->GetRenderTargetView(), 0);
-		//m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());	// ÀĞ±â Àü¿ë
+		//m_pGraphics->BindDepthStencilView(m_GBuffer.GetDepthTex()->GetDepthStencilViewReadOnly());	// ì½ê¸° ì „ìš©
 		//m_pGraphics->ClearViews(eClearFlags::Color, m_pCamera->GetBackgroundColor());
 		m_pGraphics->SetViewport(0, 0, static_cast<float>(m_pGraphics->GetResolutionWidth()), static_cast<float>(m_pGraphics->GetResolutionHeight()));
 
@@ -608,7 +608,7 @@ namespace Dive
 				if (pLightCom->IsShadowEnabled())
 					m_pGraphics->BindPSResource(pLightCom->GetShadowMap()->GetShaderResourceView(), eTextureUnitType::PointShadowMap);
 
-				// Ã¥¿¡´Â 1ÀÌÁö¸¸ Á¤È²»ó 2°¡ ¾î¿ï¸°´Ù. => Àû¿ëÇÏ¸é ¾È±×·ÁÁø´Ù.
+				// ì±…ì—ëŠ” 1ì´ì§€ë§Œ ì •í™©ìƒ 2ê°€ ì–´ìš¸ë¦°ë‹¤. => ì ìš©í•˜ë©´ ì•ˆê·¸ë ¤ì§„ë‹¤.
 				m_pGraphics->SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_1_CONTROL_POINT_PATCHLIST);
 
 				m_pGraphics->SetVertexShader(eVertexShaderType::DeferredPointLight);
@@ -635,7 +635,7 @@ namespace Dive
 				m_pGraphics->SetHullShader(eHullShaderType::DeferredSpotLight);
 				m_pGraphics->SetDomainShader(eDomainShaderType::DeferredSpotLight);
 
-				// BindDomainCBuffer·Î ÀÌ¸§ º¯°æ?
+				// BindDomainCBufferë¡œ ì´ë¦„ ë³€ê²½?
 				m_pGraphics->DSBindConstantBuffer(m_pCamera->GetConstantBufferDS(), 0);
 				m_pGraphics->DSBindConstantBuffer(pLightCom->GetConstantBufferDS(), 1);
 
@@ -651,7 +651,7 @@ namespace Dive
 
 		m_pGraphics->SetDepthStencilState(eDepthStencilStateType::Null);
 		m_pGraphics->SetBlendState(eBlendStateType::Null);
-		m_pGraphics->GetDeviceContext()->RSSetState(nullptr);	// ÃßÈÄ ¼öÁ¤ ÇÊ¿ä
+		m_pGraphics->GetDeviceContext()->RSSetState(nullptr);	// ì¶”í›„ ìˆ˜ì • í•„ìš”
 
 		m_pGraphics->SetVertexShader(eVertexShaderType::Null);
 		m_pGraphics->SetHullShader(eHullShaderType::Null);
@@ -662,8 +662,8 @@ namespace Dive
 			m_pGraphics->BindPSResource((Texture*)nullptr, (Dive::eTextureUnitType)i);
 	}
 
-	// depthStencilState Ã³¸®°¡ ¹ÌºñÇÑ µí ÇÏ´Ù.
-	// Ã¥¿¡¼­´Â Direcitonal°ú Spot & PointÀÇ Depth Func°¡ ´Ù¸£´Ù.
+	// depthStencilState ì²˜ë¦¬ê°€ ë¯¸ë¹„í•œ ë“¯ í•˜ë‹¤.
+	// ì±…ì—ì„œëŠ” Direcitonalê³¼ Spot & Pointì˜ Depth Funcê°€ ë‹¤ë¥´ë‹¤.
 	void ViewScreen::deferredRender()
 	{
 		passLightDepth();

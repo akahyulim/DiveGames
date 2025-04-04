@@ -1,4 +1,4 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "ModelFactory.h"
 #include "Mesh.h"
 #include "Model.h"
@@ -25,7 +25,7 @@ namespace Dive
 		std::vector<UINT32> indices;
 		indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
 
-		// vb, ib¥¬ ¿Ã∑±Ωƒ¿∏∑Œ ª˝º∫«— »ƒ meshø° √ﬂ∞°«“ ºˆ ¿÷¥Ÿ.
+		// vb, ibÎäî Ïù¥Îü∞ÏãùÏúºÎ°ú ÏÉùÏÑ±Ìïú ÌõÑ meshÏóê Ï∂îÍ∞ÄÌï† Ïàò ÏûàÎã§.
 		VertexBuffer vb;
 		vb.Create(vertices.data(), sizeof(VertexStatic), static_cast<UINT32>(vertices.size()));
 
@@ -48,7 +48,7 @@ namespace Dive
 		// vertex buffer
 		std::vector<VertexStatic> vertices;
 
-		// ¿¸∏È
+		// Ï†ÑÎ©¥
 		vertices.emplace_back(XMFLOAT3(-size / 2.0f, -size / 2.0f, -size / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
 			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
 		vertices.emplace_back(XMFLOAT3(-size / 2.0f, size / 2.0f, -size / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
@@ -58,7 +58,7 @@ namespace Dive
 		vertices.emplace_back(XMFLOAT3(size / 2.0f, size / 2.0f, -size / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
 			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
 
-		// »ƒ∏È
+		// ÌõÑÎ©¥
 		vertices.emplace_back(XMFLOAT3(size / 2.0f, -size / 2.0f, size / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
 			, XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f));
 		vertices.emplace_back(XMFLOAT3(size / 2.0f, size / 2.0f, size / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
@@ -68,7 +68,7 @@ namespace Dive
 		vertices.emplace_back(XMFLOAT3(-size / 2.0f, size / 2.0f, size / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
 			, XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f));
 
-		// ¿ß
+		// ÏúÑ
 		vertices.emplace_back(XMFLOAT3(-size / 2.0f, size / 2.0f, -size / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
 			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f));
 		vertices.emplace_back(XMFLOAT3(-size / 2.0f, size / 2.0f, size / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
@@ -78,7 +78,7 @@ namespace Dive
 		vertices.emplace_back(XMFLOAT3(size / 2.0f, size / 2.0f, size / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
 			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f));
 
-		// æ∆∑°
+		// ÏïÑÎûò
 		vertices.emplace_back(XMFLOAT3(-size / 2.0f, -size / 2.0f, size / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
 			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f));
 		vertices.emplace_back(XMFLOAT3(-size / 2.0f, -size / 2.0f, -size / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
@@ -88,7 +88,7 @@ namespace Dive
 		vertices.emplace_back(XMFLOAT3(size / 2.0f, -size / 2.0f, -size / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
 			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f));
 
-		// øﬁ¬ 
+		// ÏôºÏ™Ω
 		vertices.emplace_back(XMFLOAT3(-size / 2.0f, -size / 2.0f, size / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
 			, XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
 		vertices.emplace_back(XMFLOAT3(-size / 2.0f, size / 2.0f, size / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
@@ -98,7 +98,7 @@ namespace Dive
 		vertices.emplace_back(XMFLOAT3(-size / 2.0f, size / 2.0f, -size / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
 			, XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
 
-		// ø¿∏•¬ 
+		// Ïò§Î•∏Ï™Ω
 		vertices.emplace_back(XMFLOAT3(size / 2.0f, -size / 2.0f, -size / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)
 			, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f));
 		vertices.emplace_back(XMFLOAT3(size / 2.0f, size / 2.0f, -size / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)
@@ -111,27 +111,27 @@ namespace Dive
 		// index buffer
 		std::vector<UINT32> indices;
 
-		// ¿¸∏È
+		// Ï†ÑÎ©¥
 		indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
 		indices.emplace_back(2);	indices.emplace_back(1);	indices.emplace_back(3);
 
-		// »ƒ∏È
+		// ÌõÑÎ©¥
 		indices.emplace_back(4);	indices.emplace_back(5);	indices.emplace_back(6);
 		indices.emplace_back(6);	indices.emplace_back(5);	indices.emplace_back(7);
 
-		// ¿ß
+		// ÏúÑ
 		indices.emplace_back(8);	indices.emplace_back(9);	indices.emplace_back(10);
 		indices.emplace_back(10);	indices.emplace_back(9);	indices.emplace_back(11);
 
-		// æ∆∑°
+		// ÏïÑÎûò
 		indices.emplace_back(12);	indices.emplace_back(13);	indices.emplace_back(14);
 		indices.emplace_back(14);	indices.emplace_back(13);	indices.emplace_back(15);
 
-		// øﬁ¬ 
+		// ÏôºÏ™Ω
 		indices.emplace_back(16);	indices.emplace_back(17);	indices.emplace_back(18);
 		indices.emplace_back(18);	indices.emplace_back(17);	indices.emplace_back(19);
 
-		// ø¿∏•¬ 
+		// Ïò§Î•∏Ï™Ω
 		indices.emplace_back(20);	indices.emplace_back(21);	indices.emplace_back(22);
 		indices.emplace_back(22);	indices.emplace_back(21);	indices.emplace_back(23);
 

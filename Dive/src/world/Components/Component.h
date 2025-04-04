@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include "Core/Object.h"
 
 namespace Dive
@@ -16,7 +16,7 @@ namespace Dive
 
 		virtual void Update() {}
 
-		// ¿Ã∏ß¿ª GetVertexCBuffer()∑Œ πŸ≤Ÿ±‚
+		// Ïù¥Î¶ÑÏùÑ GetVertexCBuffer()Î°ú Î∞îÍæ∏Í∏∞
 		virtual ConstantBuffer* GetConstantBufferVS() { return nullptr; }
 		virtual ConstantBuffer* GetConstantBufferDS() { return nullptr; }
 		virtual ConstantBuffer* GetConstantBufferGS() { return nullptr; }

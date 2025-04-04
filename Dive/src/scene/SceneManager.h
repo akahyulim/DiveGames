@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 
 namespace Dive
 {
 	class Scene;
 
-	// À¯´ÏÆ¼¿¡¼± SceneLoaded, SceneUnloaded, ActiveSceneChanged ¼¼ °³ÀÇ ÀÌº¥Æ®µµ ´Ù·é´Ù.
+	// ìœ ë‹ˆí‹°ì—ì„  SceneLoaded, SceneUnloaded, ActiveSceneChanged ì„¸ ê°œì˜ ì´ë²¤íŠ¸ë„ ë‹¤ë£¬ë‹¤.
 	class SceneManager
 	{
 	public:

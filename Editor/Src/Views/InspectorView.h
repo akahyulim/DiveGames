@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "View.h"
 
 namespace Dive
@@ -12,7 +12,7 @@ namespace Dive
 		void drawView() override;
 
 		static void Inspect(GameObject* gameObject);
-		// ¸ÓÆ¼¸®¾ó ¹öÀüµµ ÀÖ´Ù.
+		// ë¨¸í‹°ë¦¬ì–¼ ë²„ì „ë„ ìˆë‹¤.
 
 	private:
 		static GameObject* s_InspectedGameObject;

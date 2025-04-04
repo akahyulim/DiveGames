@@ -1,4 +1,4 @@
-#include "WorldView.h"
+ï»¿#include "WorldView.h"
 #include "../MenuBar.h"
 
 namespace Dive
@@ -30,7 +30,7 @@ namespace Dive
 				m_RenderTexture->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
 		}
 
-		// ÀÌ ºÎºÐÀº ±âº»ÀûÀ¸·Î Renderer¿¡¼­ ¼öÇàÇØ¾ß ÇÑ´Ù.
+		// ì´ ë¶€ë¶„ì€ ê¸°ë³¸ì ìœ¼ë¡œ Rendererì—ì„œ ìˆ˜í–‰í•´ì•¼ í•œë‹¤.
 		{
 			auto renderTargetView = m_RenderTexture->GetRenderTargetView();
 			Graphics::GetDeviceContext()->OMSetRenderTargets(1, &renderTargetView, nullptr);
