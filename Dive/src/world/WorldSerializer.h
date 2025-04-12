@@ -1,20 +1,18 @@
-﻿
 #pragma once
+#include "World.h"
 
 namespace Dive
 {
-	class World;
-
 	class WorldSerializer
 	{
 	public:
-		WorldSerializer(World* world);
+		WorldSerializer(const std::shared_ptr<World> world);
 		~WorldSerializer() = default;
 
-		void Serialize(const std::filesystem::path& path);
-		bool Deserialize(const std::filesystem::path& path);
+		void Serialize(const std::filesystem::path& filepath);
+		bool Deserialize(const std::filesystem::path& filepath);
 
 	private:
-		World* m_World;
+		std::shared_ptr<World> m_World;
 	};
 }

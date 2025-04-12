@@ -1,14 +1,12 @@
 ﻿#include "MenuBar.h"
 #include "Editor.h"
+#include "Views/HierarchyView.h"
 
 namespace Dive
 {
-	Editor* MenuBar::s_Editor = nullptr;
-	Camera* MenuBar::s_EditorCamera = nullptr;
-
-	void MenuBar::Initialize(Editor* editor)
+	MenuBar::MenuBar(Editor* editor)
+		: m_Editor(editor)
 	{
-		s_Editor = editor;
 	}
 
 	void MenuBar::Draw()
@@ -36,23 +34,16 @@ namespace Dive
 
 				if (ImGui::MenuItem("New World"))
 				{
-
+					m_ActiveWorld = std::make_shared<World>();
+					m_Editor->GetWidget<HierarchyView>()->SetWorld(m_ActiveWorld);
+					isShowWorldMenu = true;
 				}
 				if (ImGui::MenuItem("Open World"))
 				{
-					auto activeWorld = WorldManager::LoadFromFile("NewProject/Assets/Worlds/NewWorld.dive");
-					isShowWorldMenu = true;
-
-					// 현재 EditorCamera가 world 파일에 저장되어 있다.
-					auto editorCameraGameObject = activeWorld->CreateGameObject("Editor Camera");
-					editorCameraGameObject->SetTag("Editor_Only");
-					s_EditorCamera = editorCameraGameObject->AddComponent<Camera>();
-					s_EditorCamera->SetBackgroundColor(0.7f, 0.2f, 0.9f, 1.0f);
-					s_EditorCamera->SetRenderTexture(std::make_shared<RenderTexture>(1024, 760));
+					
 				}
 				if (ImGui::MenuItem("Save World", nullptr, nullptr, isShowWorldMenu))
 				{
-					WorldManager::SaveToFile();
 				}
 
 				if (ImGui::MenuItem("Save World As...", nullptr, nullptr, isShowWorldMenu))
@@ -75,12 +66,57 @@ namespace Dive
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("View"))
+			if (ImGui::BeginMenu("GameObject"))
 			{
+				if (ImGui::MenuItem("Create Empty", nullptr, nullptr, isShowWorldMenu))
+				{
+					m_ActiveWorld->CreateGameObject("GameObject");
+				}
+				if (ImGui::BeginMenu("3D Object"))
+				{
+					if (ImGui::MenuItem("Cube", nullptr, nullptr, isShowWorldMenu))
+					{
+
+					}
+					if (ImGui::MenuItem("Sphere", nullptr, nullptr, isShowWorldMenu))
+					{
+
+					}
+					if (ImGui::MenuItem("Plane", nullptr, nullptr, isShowWorldMenu))
+					{
+
+					}
+					if (ImGui::MenuItem("Quad", nullptr, nullptr, isShowWorldMenu))
+					{
+
+					}
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("Light"))
+				{
+					if (ImGui::MenuItem("Directional Light", nullptr, nullptr, isShowWorldMenu))
+					{
+
+					}
+					if (ImGui::MenuItem("Point Light", nullptr, nullptr, isShowWorldMenu))
+					{
+
+					}
+					if (ImGui::MenuItem("Spot Light", nullptr, nullptr, isShowWorldMenu))
+					{
+
+					}
+					ImGui::EndMenu();
+				}
+				if (ImGui::BeginMenu("Camera"))
+				{
+					ImGui::EndMenu();
+				}
+
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("Tool"))
+			if (ImGui::BeginMenu("View"))
 			{
 				ImGui::EndMenu();
 			}

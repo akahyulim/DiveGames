@@ -14,7 +14,7 @@ constexpr float DEFAULT_FONT_SIZE = 19.0f;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam);
 
-LRESULT CALLBACK DvEditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam)
 {
 	ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
@@ -48,8 +48,8 @@ namespace Dive
 		// 이것도 argc에 포함시켜 엔진 초기화과정에 편입시키는 게 맞다.
 		LogManager::SetFilename("dive_editor.log");
 		Engine::Initialize();
-		Window::SetMessageCallback((LONG_PTR)DvEditorMessageHandler);
-		Window::Maximize();
+		Window::SetMessageCallback((LONG_PTR)EditorMessageHandler);
+		//Window::Maximize();
 
 		// ImGui 초기화
 		{
@@ -113,20 +113,18 @@ namespace Dive
 
 		// create widgets
 		m_Widgets.emplace_back(std::make_shared<WorldView>(this));
-		m_Widgets.emplace_back(std::make_shared<GameView>(this));
+		//m_Widgets.emplace_back(std::make_shared<GameView>(this));
 		m_Widgets.emplace_back(std::make_shared<HierarchyView>(this));
 		m_Widgets.emplace_back(std::make_shared<InspectorView>(this));
-		m_Widgets.emplace_back(std::make_shared<LogView>(this));
-		m_Widgets.emplace_back(std::make_shared<ProjectView>(this));
-		MenuBar::Initialize(this);
+		//m_Widgets.emplace_back(std::make_shared<LogView>(this));
+		//m_Widgets.emplace_back(std::make_shared<ProjectView>(this));
+		m_MenuBar = std::make_shared<MenuBar>(this);
 
 		SetTitle();
 	}
 
 	Editor::~Editor()
 	{
-		WorldManager::UnloadWorld();
-
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
@@ -142,7 +140,7 @@ namespace Dive
 
 			beginUI();
 
-			MenuBar::Draw();
+			m_MenuBar->Draw();
 			for (auto& widget : m_Widgets)
 			{
 				widget->Draw();

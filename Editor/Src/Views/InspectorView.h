@@ -11,10 +11,9 @@ namespace Dive
 
 		void drawView() override;
 
-		static void Inspect(GameObject* gameObject);
-		// 머티리얼 버전도 있다.
+		void SetSelectedNode(GameObject node) { m_SelectedNode = node; }
 
 	private:
-		static GameObject* s_InspectedGameObject;
+		GameObject m_SelectedNode;
 	};
 }

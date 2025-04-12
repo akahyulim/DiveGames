@@ -15,6 +15,7 @@ namespace Dive
 
 	void GameView::drawView()
 	{
+		/*
 		if (!WorldManager::GetActiveWorld())
 			return;
 
@@ -24,5 +25,6 @@ namespace Dive
 		static auto tex = Texture2D::LoadFromFile("NewProject/Assets/Textures/sky_daytime_blue.jpg", true);
 		ImTextureID textureID = (ImTextureID)(tex ? tex->GetShaderResourceView() : nullptr);
 		ImGui::Image(textureID, ImVec2(m_Width, m_Height));
+		*/
 	}
 }

@@ -4,6 +4,7 @@
 //#define WIN32_LEAN_AND_MEAN             // 거의 사용되지 않는 내용을 Windows 헤더에서 제외합니다.
 #define DIRECTINPUT_VERSION 0x0800
 
+// 두 군데 이상에서 사용하는 것만으로 추려보자.
 #include <iostream>
 #include <string>
 #include <atlconv.h>
@@ -37,7 +38,6 @@
 
 #include <DirectXTex/DirectXTex.h>
 #include <yaml-cpp/yaml.h>
-#include <entt/entt.hpp>
 
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "d3d11.lib")
@@ -45,3 +45,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
+
+#include "core/CoreDefs.h"
+#include "core/Log.h"
+

@@ -32,6 +32,9 @@
 #include "math/Frustum.h"
 #include "math/BoundingBox.h"
 
+// transforms
+#include "transforms/transforms.h"
+
 // rendering
 #include "rendering/Mesh.h"
 #include "rendering/Model.h"
@@ -44,11 +47,6 @@
 
 // world
 #include "world/World.h"
-#include "world/WorldSerializer.h"
-#include "world/WorldManager.h"
 #include "world/GameObject.h"
-#include "world/Components/Component.h"
-#include "world/Components/Transform.h"
-#include "world/Components/Camera.h"
-#include "world/Components/script/NativeScript.h"
-#include "World/Components/script/Player.h"
+#include "world/Components.h"
+#include "world/WorldSerializer.h"

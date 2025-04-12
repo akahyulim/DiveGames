@@ -7,6 +7,7 @@
 namespace Dive 
 {
 	class Project;
+	class MenuBar;
 
 	enum class eFontTypes
 	{
@@ -33,6 +34,7 @@ namespace Dive
 
 		void SetTitle(const std::wstring& text = L"");
 
+
 	private:
 		void loadResources();
 		void beginUI();
@@ -41,6 +43,7 @@ namespace Dive
 	private:
 		std::array<ImFont*, static_cast<size_t>(Dive::eFontTypes::Max)> m_Fonts;
 
+		std::shared_ptr<MenuBar> m_MenuBar;
 		std::vector<std::shared_ptr<View>> m_Widgets;
 
 		Dive::Project* m_pActiveProject;

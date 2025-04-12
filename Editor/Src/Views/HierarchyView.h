@@ -3,26 +3,25 @@
 
 namespace Dive
 {
+	class World;
+
 	class HierarchyView : public View
 	{
 	public:
 		HierarchyView(Editor* editor);
 		virtual ~HierarchyView();
 
-		void drawView() override;
+		void SetWorld(std::weak_ptr<World> world);
+		void SetSelectedNode(GameObject node = {});
 
 	protected:
-		void showTree();
-		void addObjectToTree(GameObject* gameObject);
-		
-		void setSelectedObject(GameObject* gameObject);
-
+		void drawView() override;
 
 	private:
-		// 스파르탄의 경우 clicked와 hovered만 관리한다.
-		// selected의 경우 camera에서 관리한다.
-		GameObject* m_SelectedGameObject;
+		void showNode(GameObject node);
 
-		bool m_IsEditedName = false;
+	private:
+		std::weak_ptr<World> m_World;
+		GameObject m_SelectedNode;
 	};
 }

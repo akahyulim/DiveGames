@@ -2,12 +2,18 @@
 #include "Engine.h"
 #include "CoreDefs.h"
 #include "Window.h"
+#include "transforms/Transforms.h"
 #include "graphics/Graphics.h"
 #include "input/Input.h"
 #include "rendering/Renderer.h"
-#include "world/World.h"
-#include "world/WorldManager.h"
 
+// hazel은 Engine이 없다.
+// 대신 App에서 기본 시스템들을 생성 및 셧다운을 수행하고
+// 런타임은 Layer에서 App에 맞춰 구현한다.
+// Layer는 World을 생성 및 실행하고
+// World은 Tick에서 Script Component 업데이트, Physics, Renderer 시스템을 수행한다.
+// 여기에서 이해되지 않는 부분은 Layer를 Stack으로 관리한다는 것이다.
+// 덧붙여 World에서 system들을 사용하는 것도 ecs 관점에서 적절하지 않은 듯 하다.
 namespace Dive
 {
 	double Engine::s_ElapsedTimeMS = 0;
@@ -19,6 +25,7 @@ namespace Dive
 	void Engine::Initialize()
 	{
 		Window::Initialize();
+		Transforms::Initialize();
 		Graphics::Initialize();
 		Renderer::Initialize();
 		Input::Initialize();
@@ -33,6 +40,7 @@ namespace Dive
 		Input::Shutdown();
 		Renderer::Shutdown();
 		Graphics::Shutdown();
+		Transforms::Shutdown();
 		Window::Shutdown();
 
 		DV_LOG(Engine, trace, "succed enigne shutdown");
@@ -56,10 +64,10 @@ namespace Dive
 			lastTimeMS = s_ElapsedTimeMS;
 		}
 
+		// hazel의 경우 World에서 이들을 처리하는 듯 하다.
+		// 허나 이를 따를 필요는 없어보인다.
+		Transforms::Tick();
 		Input::Tick();
-		auto activeWorld = WorldManager::GetActiveWorld();
-		if(activeWorld)
-			activeWorld->Update();
 		Renderer::Tick();
 	}
 

@@ -9,6 +9,6 @@ namespace Dive
 		static bool CompareXMMATRIX(const DirectX::XMMATRIX& mat1, const DirectX::XMMATRIX& mat2);
 
 		static DirectX::XMFLOAT3 CalcuBiTangent(const DirectX::XMFLOAT3& normal, const DirectX::XMFLOAT3& tangent);
-		static DirectX::XMFLOAT3 QuaternionToEuler(const DirectX::XMVECTOR& quaternion);
+		static DirectX::XMFLOAT3 QuaternionToDegrees(const DirectX::XMFLOAT4& quaternion);
 	};
 }

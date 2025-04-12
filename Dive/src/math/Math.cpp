@@ -42,23 +42,23 @@ namespace Dive
 		return biTangent;
 	}
 
-	DirectX::XMFLOAT3 Math::QuaternionToEuler(const DirectX::XMVECTOR& quaternion)
+	DirectX::XMFLOAT3 Math::QuaternionToDegrees(const DirectX::XMFLOAT4& quaternion)
 	{
-		DirectX::XMFLOAT3 euler;
+		DirectX::XMFLOAT3 degrees{};
 
-		float q0 = DirectX::XMVectorGetW(quaternion);
-		float q1 = DirectX::XMVectorGetX(quaternion);
-		float q2 = DirectX::XMVectorGetY(quaternion);
-		float q3 = DirectX::XMVectorGetZ(quaternion);
+		float q0 = quaternion.w;
+		float q1 = quaternion.x;
+		float q2 = quaternion.y;
+		float q3 = quaternion.z;
 
 		float roll = atan2f(2.0f * (q0 * q1 + q2 * q3), 1.0f - 2.0f * (q1 * q1 + q2 * q2));
-		float pitch = asinf(2.0f * (q0 * q2 - q3 * q1));
+		float pitch = asinf(std::clamp(2.0f * (q0 * q2 - q3 * q1), -1.0f, 1.0f));
 		float yaw = atan2f(2.0f * (q0 * q3 + q1 * q2), 1.0f - 2.0f * (q2 * q2 + q3 * q3));
 
-		euler.x = DirectX::XMConvertToDegrees(roll);
-		euler.y = DirectX::XMConvertToDegrees(pitch);
-		euler.z = DirectX::XMConvertToDegrees(yaw);
+		degrees.x = DirectX::XMConvertToDegrees(roll);
+		degrees.y = DirectX::XMConvertToDegrees(pitch);
+		degrees.z = DirectX::XMConvertToDegrees(yaw);
 
-		return euler;
+		return degrees;
 	}
 }

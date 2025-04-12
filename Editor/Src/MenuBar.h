@@ -1,20 +1,25 @@
 ﻿#pragma once
+#include <memory>
 
 namespace Dive
 {
 	class Editor;
+	class World;
 	class Camera;
 
 	class MenuBar
 	{
 	public:
-		static void Initialize(Editor* editor);
-		static void Draw();
+		MenuBar(Editor* editor);
+		~MenuBar() = default;
 
-		static Camera* GetEditorCamera() { return s_EditorCamera; }
+		void Draw();
 
 	private:
-		static Editor* s_Editor;
-		static Camera* s_EditorCamera;
+		void newWorld();
+
+	private:
+		Editor* m_Editor = nullptr;
+		std::shared_ptr<World> m_ActiveWorld;
 	};
 }

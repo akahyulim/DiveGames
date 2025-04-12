@@ -4,11 +4,6 @@
 #include "core/EventDispatcher.h"
 #include "graphics/Graphics.h"
 #include "graphics/RenderTexture.h"
-#include "world/WorldManager.h"
-#include "world/World.h"
-#include "world/GameObject.h"
-#include "world/Components/Camera.h"
-#include "world/Components/Renderable.h"
 
 namespace Dive
 {
@@ -34,9 +29,7 @@ namespace Dive
 
 	void Renderer::Update()
 	{
-		auto activeWorld = WorldManager::GetActiveWorld();
-		if (!activeWorld)
-			return;
+	
 	}
 
 	void Renderer::Render()

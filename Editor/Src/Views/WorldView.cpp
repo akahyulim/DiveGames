@@ -16,6 +16,7 @@ namespace Dive
 
 	void WorldView::drawView()
 	{
+		/*
 		if (!WorldManager::GetActiveWorld())
 			return;
 
@@ -42,5 +43,6 @@ namespace Dive
 		static auto tex = Texture2D::LoadFromFile("NewProject/Assets/Textures/relaxed_morning.jpg", true);
 		ImTextureID textureID = (ImTextureID)(m_RenderTexture ? m_RenderTexture->GetShaderResourceView() : tex->GetShaderResourceView());
 		ImGui::Image(textureID, ImVec2(m_Width, m_Height));
+		*/
 	}
 }

@@ -1,11 +1,8 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "WorldSerializer.h"
 #include "World.h"
 #include "GameObject.h"
-#include "Components/Transform.h"
-#include "Components/Camera.h"
-#include "core/CoreDefs.h"
-
+#include "Components.h"
 #include <yaml-cpp/yaml.h>
 
 namespace YAML
@@ -98,146 +95,95 @@ namespace YAML
 
 namespace Dive
 {
-	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT3& v)
+	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT3& vec)
 	{
 		out << YAML::Flow;
-		out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
+		out << YAML::BeginSeq << vec.x << vec.y << vec.z << YAML::EndSeq;
 		return out;
 	}
 
-	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT4& v)
+	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT4& quat)
 	{
 		out << YAML::Flow;
-		out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
+		out << YAML::BeginSeq << quat.x << quat.y << quat.z << quat.w << YAML::EndSeq;
 		return out;
 	}
 
-	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT4X4& v)
+	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT4X4& mat)
 	{
 		out << YAML::Flow;
-		out << YAML::BeginSeq 
-			<< v._11 << v._12 << v._13 << v._14
-			<< v._21 << v._22 << v._23 << v._24 
-			<< v._31 << v._32 << v._33 << v._34 
-			<< v._41 << v._42 << v._43 << v._44 << YAML::EndSeq;
+		out << YAML::BeginSeq
+			<< mat._11 << mat._12 << mat._13 << mat._14
+			<< mat._21 << mat._22 << mat._23 << mat._24
+			<< mat._31 << mat._32 << mat._33 << mat._34
+			<< mat._41 << mat._42 << mat._43 << mat._44 << YAML::EndSeq;
 		return out;
 	}
 
-	static void SerializeGameObject(YAML::Emitter& out, GameObject* gameObject)
+	static void SerializeGameObject(YAML::Emitter& out, GameObject gameObject)
 	{
 		out << YAML::BeginMap;
+		out << YAML::Key << "GameObject" << YAML::Value << gameObject.GetUUID();
 
-		out << YAML::Key << "ID" << YAML::Value << gameObject->GetID();
-		out << YAML::Key << "Name" << YAML::Value << gameObject->GetName();
-		out << YAML::Key << "Tag" << YAML::Value << gameObject->GetTag();
-
-		out << YAML::Key << "Transform";
-		out << YAML::BeginMap;
-
-		auto transform = gameObject->GetComponent<Transform>();
-		out << YAML::Key << "Position" << YAML::Value << transform->GetPosition();
-		out << YAML::Key << "Rotation" << YAML::Value << transform->GetRotationQuaternion();
-		out << YAML::Key << "Scale" << YAML::Value << transform->GetScale();
-		out << YAML::Key << "ParentID" << YAML::Value << transform->GetParentID();
-
-		out << YAML::EndMap;
-
-		if (gameObject->HasComponent<Camera>())
+		if (gameObject.HasComponent<TagComponent>())
 		{
-			out << YAML::Key << "Camera";
+			out << YAML::Key << "TagComponent";
 			out << YAML::BeginMap;
 
-			// 데이터 저장
+			auto& tag = gameObject.GetComponent<TagComponent>().Tag;
+			out << YAML::Key << "Tag" << YAML::Value << tag;
+			out << YAML::EndMap;
+		}
 
+		if (gameObject.HasComponent<ActiveComponent>())
+		{
+			out << YAML::Key << "ActiveComponent";
+			out << YAML::BeginMap;
+
+			auto& active = gameObject.GetComponent<ActiveComponent>().IsActive;
+			out << YAML::Key << "IsActive" << YAML::Value << active;
+			out << YAML::EndMap;
+		}
+
+		if (gameObject.HasComponent<TransformComponent>())
+		{
+			out << YAML::Key << "TransformComponent";
+			out << YAML::BeginMap;
+
+			auto& tc = gameObject.GetComponent<TransformComponent>();
+			out << YAML::Key << "Position" << YAML::Value << tc.Position;
+			out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
+			out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
 			out << YAML::EndMap;
 		}
 
 		out << YAML::EndMap;
 	}
 
-	WorldSerializer::WorldSerializer(World* world)
+	WorldSerializer::WorldSerializer(const std::shared_ptr<World> world)
 		: m_World(world)
 	{
 	}
 
-	void WorldSerializer::Serialize(const std::filesystem::path& path)
+	void WorldSerializer::Serialize(const std::filesystem::path& filepath)
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "World" << YAML::Value << m_World->m_Name;
 		out << YAML::Key << "GameObjects" << YAML::Value << YAML::BeginSeq;
-		for (auto gameObject : m_World->GetAllGameObjects())
+		for (auto& gameObject : m_World->GetAllGameObjects())
 		{
 			SerializeGameObject(out, gameObject);
 		}
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
 
-		std::ofstream fout(path);
+		std::ofstream fout(filepath);
 		fout << out.c_str();
-
-		m_World->m_IsDirty = false;
 	}
 	
-	bool WorldSerializer::Deserialize(const std::filesystem::path& path)
+	bool WorldSerializer::Deserialize(const std::filesystem::path& filepath)
 	{
-		YAML::Node data;
-		try
-		{
-			data = YAML::LoadFile(path.string());
-		}
-		catch (YAML::Exception& e)
-		{
-			DV_LOG(WorldSerializer, err, "월드 파일 역직렬화 실패: {}", e.what());
-			return false;
-		}
-
-		m_World->m_FilePath = path;
-
-		if (!data["World"])
-			return false;
-
-		m_World->m_Name = data["World"].as<std::string>();
-
-		auto gameObjectsNode = data["GameObjects"];
-		if (gameObjectsNode)
-		{
-			for (auto gameObjectNode : gameObjectsNode)
-			{
-				auto id = gameObjectNode["ID"].as<UINT64>();
-				auto name = gameObjectNode["Name"].as<std::string>();
-				auto gameObject = m_World->CreateGameObject(id, name);
-				gameObject->SetTag(gameObjectNode["Tag"].as<std::string>());
-
-				auto transformNode = gameObjectNode["Transform"];
-				if (transformNode)
-				{
-					auto transform = gameObject->AddComponent<Transform>();
-					transform->SetPosition(transformNode["Position"].as<DirectX::XMFLOAT3>());
-					transform->SetRotation(transformNode["Rotation"].as<DirectX::XMFLOAT4>());
-					transform->SetScale(transformNode["Scale"].as<DirectX::XMFLOAT3>());
-					transform->SetParentID(transformNode["ParentID"].as<UINT64>());
-				}
-
-				auto cameraNode = gameObjectNode["Camera"];
-				if (cameraNode)
-				{
-					auto camera = gameObject->AddComponent<Camera>();
-				}
-			}
-
-			// 계층구조 구성
-			for (auto gameObject : m_World->GetAllGameObjects())
-			{
-				auto transform = gameObject->GetComponent<Transform>();
-				const auto parentID = transform->GetParentID();
-				if (parentID != 0)
-				{
-					transform->SetParent(m_World->GetGameObjectByID(parentID)->GetComponent<Transform>());
-				}
-			}
-		}
-
-		return true;
+		return false;
 	}
 }

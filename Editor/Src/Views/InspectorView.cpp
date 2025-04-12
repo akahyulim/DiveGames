@@ -2,8 +2,6 @@
 
 namespace Dive
 {
-	GameObject* InspectorView::s_InspectedGameObject = nullptr;
-
 	InspectorView::InspectorView(Editor* editor)
 		: View(editor)
 	{
@@ -13,15 +11,15 @@ namespace Dive
 	InspectorView::~InspectorView()
 	{
 	}
-
+	
 	void InspectorView::drawView()
 	{
-		if (!s_InspectedGameObject)
+		if (m_SelectedNode == GameObject{})
 			return;
-	}
 
-	void InspectorView::Inspect(GameObject* gameObject)
-	{
-		s_InspectedGameObject = gameObject;
+		if (ImGui::Button("Add Component"))
+		{
+
+		}
 	}
 }
