@@ -83,7 +83,7 @@
     <ClInclude Include="src\rendering\Renderer.h">
       <Filter>rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\input\Input.h">
+    <ClInclude Include="src\core\Input.h">
       <Filter>input</Filter>
     </ClInclude>
     <ClInclude Include="src\core\Engine.h">
@@ -127,6 +127,7 @@
     </ClInclude>
     <ClInclude Include="src\transforms\Transforms.h" />
     <ClInclude Include="src\world\WorldSerializer.h" />
+    <ClInclude Include="src\rendering\Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -178,7 +179,7 @@
     <ClCompile Include="src\rendering\Renderer.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\input\Input.cpp">
+    <ClCompile Include="src\core\Input.cpp">
       <Filter>input</Filter>
     </ClCompile>
     <ClCompile Include="src\core\Engine.cpp">
@@ -219,5 +220,6 @@
     </ClCompile>
     <ClCompile Include="src\transforms\Transforms.cpp" />
     <ClCompile Include="src\world\WorldSerializer.cpp" />
+    <ClCompile Include="src\rendering\Camera.cpp" />
   </ItemGroup>
 </Project>

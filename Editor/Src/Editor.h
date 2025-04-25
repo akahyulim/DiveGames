@@ -34,7 +34,6 @@ namespace Dive
 
 		void SetTitle(const std::wstring& text = L"");
 
-
 	private:
 		void loadResources();
 		void beginUI();

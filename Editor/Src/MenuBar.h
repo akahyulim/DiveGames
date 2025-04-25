@@ -20,6 +20,5 @@ namespace Dive
 
 	private:
 		Editor* m_Editor = nullptr;
-		std::shared_ptr<World> m_ActiveWorld;
 	};
 }

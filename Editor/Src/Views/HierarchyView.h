@@ -11,7 +11,6 @@ namespace Dive
 		HierarchyView(Editor* editor);
 		virtual ~HierarchyView();
 
-		void SetWorld(std::weak_ptr<World> world);
 		void SetSelectedNode(GameObject node = {});
 
 	protected:
@@ -21,7 +20,6 @@ namespace Dive
 		void showNode(GameObject node);
 
 	private:
-		std::weak_ptr<World> m_World;
 		GameObject m_SelectedNode;
 	};
 }

@@ -23,7 +23,7 @@ namespace Dive
 		static void Initialize();
 		static void Shutdown();
 
-		static void Tick();
+		static void Tick(std::vector<TransformComponent*>& transformList);
 
 		static void SetPosition(GameObject gameObject, const DirectX::XMFLOAT3& pos);
 		static void SetPosition(GameObject gameObject, float x, float y, float z);
@@ -64,17 +64,16 @@ namespace Dive
 		static GameObject GetParent(GameObject gameObject);
 		static void RemoveParent(GameObject child);
 
-		static std::vector<GameObject> GetChildren(GameObject gameObject);
+		static std::vector<GameObject> GetChildren(GameObject parent);
+		static bool IsChildOf(GameObject parent, GameObject other);
 
-		static std::vector<GameObject> GetRootNodes(std::vector<GameObject> entities);
+		static std::vector<GameObject> GetRootNodes(std::vector<GameObject> gameObjecs);
 
 		static bool HasParent(GameObject gameObject);
 		static bool HasChildren(GameObject gameObject);
 
-		static void Serialize(YAML::Emitter& out, const std::vector<GameObject>& gameObjects);
-		static bool Deserialize(YAML::Emitter& out);
-
 	private:
 		static std::unordered_map<entt::entity, HierarchyNode> s_Hierarchy;
+		
 	};
 }

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Input.h"
-#include "core/CoreDefs.h"
-#include "core/Window.h"
+#include "CoreDefs.h"
+#include "Window.h"
 
 namespace Dive
 {

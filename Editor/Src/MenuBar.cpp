@@ -34,16 +34,35 @@ namespace Dive
 
 				if (ImGui::MenuItem("New World"))
 				{
-					m_ActiveWorld = std::make_shared<World>();
-					m_Editor->GetWidget<HierarchyView>()->SetWorld(m_ActiveWorld);
+					// world
+					auto world = Engine::GenerateWorld();
+
+					// editor camera
+					auto editorCamera = world->CreateGameObject("EditorCamera");
+					auto& cc = editorCamera.AddComponent<CameraComponent>();
+					cc.RenderTarget = new RenderTexture(1, 1);
+					editorCamera.GetComponent<TagComponent>().Tag = eTag::EditorOnly;
+
 					isShowWorldMenu = true;
 				}
 				if (ImGui::MenuItem("Open World"))
 				{
-					
+					// world
+					auto world = Engine::GenerateWorld();
+					WorldSerializer serializer(world);
+					serializer.Deserialize("NewWorld.dive");
+
+					// editor camera
+					auto editorCamera = world->CreateGameObject("EditorCamera");
+					editorCamera.AddComponent<CameraComponent>();
+					editorCamera.GetComponent<TagComponent>().Tag = eTag::EditorOnly;
+
+					isShowWorldMenu = true;
 				}
 				if (ImGui::MenuItem("Save World", nullptr, nullptr, isShowWorldMenu))
 				{
+					WorldSerializer serializer(Engine::GetActiveWorld());
+					serializer.Serialize("NewWorld.dive");
 				}
 
 				if (ImGui::MenuItem("Save World As...", nullptr, nullptr, isShowWorldMenu))
@@ -70,7 +89,7 @@ namespace Dive
 			{
 				if (ImGui::MenuItem("Create Empty", nullptr, nullptr, isShowWorldMenu))
 				{
-					m_ActiveWorld->CreateGameObject("GameObject");
+					Engine::GetActiveWorld()->CreateGameObject("GameObject");
 				}
 				if (ImGui::BeginMenu("3D Object"))
 				{

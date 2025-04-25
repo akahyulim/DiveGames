@@ -15,13 +15,6 @@ namespace Dive
 	{
 
 	}
-
-	void HierarchyView::SetWorld(std::weak_ptr<World> world)
-	{
-		m_World = world;
-		SetSelectedNode();
-	}
-
 	void HierarchyView::SetSelectedNode(GameObject node)
 	{
 		if (m_SelectedNode != node)
@@ -32,17 +25,58 @@ namespace Dive
 
 	void HierarchyView::drawView()
 	{
-		if (m_World.lock())
+		if (Engine::GetActiveWorld())
+		{
+			if (ImGui::TreeNodeEx(Engine::GetActiveWorld()->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				// 일단 이 곳이랑 가장 아래 부분에서
+				// Transform 참조 오류가 발생한다.
+				// 현재 Transform이 없는 GameObject를 생성토록 하였으므로
+				// 이는 반드시 수정되어야 한다.
+				// => 수정했지만 여전히 버그가 발생한다. 다른 곳에서 SelectedObject의 Transform을 요구하는 것 같다.
+				// => ScenePanel에서 ImGuizmo 때문에 발생한 문제였다. 일단 수정 및 테스트를 완료했다.
+				if (ImGui::BeginDragDropTarget())
+				{
+					if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
+					{
+						auto pInstanceID = static_cast<unsigned long long*>(pPayload->Data);
+						auto droppedNode = Engine::GetActiveWorld()->GetGameObjectByUUID(*pInstanceID);
+						if (droppedNode.HasComponent<TransformComponent>())
+							Transforms::SetParent(droppedNode, GameObject{});
+					}
+
+					ImGui::EndDragDropTarget();
+				}
+
+				//auto pRoots = m_pActiveScene->GetRoots();
+				auto rootNodes = Transforms::GetRootNodes(Engine::GetActiveWorld()->GetAllGameObjects());
+				if (!rootNodes.empty())
+				{
+					for (auto& node : rootNodes)
+					{
+						if(node.GetTag() != eTag::EditorOnly)
+							showNode(node);
+					}
+				}
+
+				if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+					SetSelectedNode();
+
+				ImGui::TreePop();
+			}
+		}
+		/*
+		if (Engine::GetActiveWorld())
 		{
 			// World 노드로 드래그 앤 드랍하면 부모를 없애고 싶었으나 현재 되지 않는다.
 			ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
-			auto rootEntities = Transforms::GetRootNodes(m_World.lock()->GetAllGameObjects());
-			rootEntities.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
+			auto rootNodes = Transforms::GetRootNodes(Engine::GetActiveWorld()->GetAllGameObjects());
+			rootNodes.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_DefaultOpen;
 			
-			bool opened = ImGui::TreeNodeEx(m_World.lock()->GetName().c_str(), nodeFlags);
+			bool opened = ImGui::TreeNodeEx(Engine::GetActiveWorld()->GetName().c_str(), nodeFlags);
 			if (opened)
 			{
-				for (auto& node : rootEntities)
+				for (auto& node : rootNodes)
 				{
 					if (node.GetComponent<ActiveComponent>().IsActive)
 						showNode(node);
@@ -56,15 +90,15 @@ namespace Dive
 				if (ImGui::BeginPopupContextWindow())
 				{
 					if (ImGui::MenuItem("Add GameObject"))
-						m_World.lock()->CreateGameObject();
+						Engine::GetActiveWorld()->CreateGameObject();
 
 					ImGui::EndPopup();
 				}
-				*/
+				//
 
 				ImGui::TreePop();
 			}
-		}
+		}*/
 	}
 
 	void HierarchyView::showNode(GameObject node)
@@ -75,7 +109,7 @@ namespace Dive
 		children.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
 		nodeFlags |= (m_SelectedNode == node) ? ImGuiTreeNodeFlags_Selected : 0;
 
-		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)node, nodeFlags, node.GetComponent<TagComponent>().Tag.c_str());
+		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)node, nodeFlags, node.GetComponent<NameComponent>().Name.c_str());
 		if (ImGui::IsItemClicked())
 			SetSelectedNode(node);
 
@@ -91,7 +125,7 @@ namespace Dive
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 			{
 				auto id = static_cast<unsigned long long*>(payload->Data);
-				auto droppedNode = m_World.lock()->GetGameObjectByUUID(*id);
+				auto droppedNode = Engine::GetActiveWorld()->GetGameObjectByUUID(*id);
 
 				if (droppedNode != node)
 				{
@@ -137,13 +171,13 @@ namespace Dive
 		if (nodeAdded)
 		{
 			Transforms::SetParent(
-				m_World.lock()->CreateGameObject(),
+				Engine::GetActiveWorld()->CreateGameObject(),
 				m_SelectedNode);
 		}
 
 		if (nodeDeleted)
 		{
-			m_World.lock()->RemoveGameObject(node);
+			Engine::GetActiveWorld()->RemoveGameObject(node);
 			if (m_SelectedNode == node)
 				SetSelectedNode();
 		}

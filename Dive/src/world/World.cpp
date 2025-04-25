@@ -2,6 +2,8 @@
 #include "World.h"
 #include "GameObject.h"
 #include "transforms/Transforms.h"
+#include "transforms/Transforms.h"
+#include "rendering/Renderer.h"
 
 namespace Dive
 {
@@ -14,6 +16,39 @@ namespace Dive
 	{
 	}
 
+	void World::EditorTick(float deltaTime)
+	{
+		{
+			std::vector<TransformComponent*> transformList;
+			auto view = m_Registry.view<TransformComponent>();
+			for (auto entity : view)
+			{
+				auto& transformComponent = view.get<TransformComponent>(entity);
+				transformList.push_back(&transformComponent);
+			}
+			Transforms::Tick(transformList);
+
+		}
+
+		Renderer::RenderScene(m_Registry);
+	}
+
+	void World::RuntimeTick(float deltaTime)
+	{
+		// 일단 pause, stepFrame(최초 프레임) 확인
+		{
+			// Script
+			{
+
+			}
+
+			// Renderer
+			{
+				Renderer::RenderScene(m_Registry);
+			}
+		}
+	}
+
 	GameObject World::CreateGameObject(const std::string& name)
 	{
 		return CreateGameObjectWithUUID(UUID(), name);
@@ -23,10 +58,11 @@ namespace Dive
 	{
 		GameObject gameObject = { m_Registry.create(), this };
 		gameObject.AddComponent<IDComponent>(uuid);
-		auto& tag = gameObject.AddComponent<TagComponent>();
-		tag = name.empty() ? "GameObject" : name;
+		auto& nc = gameObject.AddComponent<NameComponent>();
+		nc.Name = name.empty() ? "GameObject" : name;
 		gameObject.AddComponent<ActiveComponent>();
 		gameObject.AddComponent<TransformComponent>();
+		gameObject.AddComponent<TagComponent>();
 		
 		m_GameObjects[uuid] = gameObject;
 
@@ -48,12 +84,12 @@ namespace Dive
 
 	GameObject World::GetGameObjectByName(const std::string& name)
 	{
-		auto view = m_Registry.view<TagComponent>();
-		for (auto gameObject : view)
+		auto view = m_Registry.view<NameComponent>();
+		for (auto entity : view)
 		{
-			const TagComponent& tag = view.get<TagComponent>(gameObject);
-			if (tag.Tag == name)
-				return GameObject{ gameObject, this };
+			const NameComponent& tag = view.get<NameComponent>(entity);
+			if (tag.Name == name)
+				return GameObject{ entity, this };
 		}
 
 		return {};

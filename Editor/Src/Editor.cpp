@@ -138,15 +138,19 @@ namespace Dive
 		{
 			Engine::Tick();
 
-			beginUI();
-
-			m_MenuBar->Draw();
-			for (auto& widget : m_Widgets)
 			{
-				widget->Draw();
+				beginUI();
+
+				m_MenuBar->Draw();
+				for (auto& widget : m_Widgets)
+				{
+					widget->Draw();
+				}
+
+				endUI();
 			}
 
-			endUI();
+			Renderer::Present();
 		}
 	}
 
@@ -230,10 +234,9 @@ namespace Dive
 	{
 		ImGui::End();
 
-		auto backbufferRenderTargetView = Graphics::GetBackbufferRTV();
-		const float clear_color_with_alpha[4]{ 0.1f, 0.1f, 0.1f, 0.0f };
-		Graphics::GetDeviceContext()->OMSetRenderTargets(1, &backbufferRenderTargetView, NULL);
-		Graphics::GetDeviceContext()->ClearRenderTargetView(backbufferRenderTargetView, clear_color_with_alpha);
+		auto renderTargetView = Graphics::GetRenderTargetView();
+		Graphics::GetDeviceContext()->OMSetRenderTargets(1, &renderTargetView, NULL);
+		Graphics::ClearRenderTargetView(Graphics::GetRenderTargetView(), { 0.1f, 0.1f, 0.1f, 0.0f });
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

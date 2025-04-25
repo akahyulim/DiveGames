@@ -58,7 +58,8 @@ namespace Dive
 		}
 
 		const UUID GetUUID() { return GetComponent<IDComponent>().ID; }
-		const std::string& GetName() { return GetComponent<TagComponent>().Tag; }
+		const std::string& GetName() { return GetComponent<NameComponent>().Name; }
+		const eTag GetTag() { return GetComponent<TagComponent>().Tag; }
 		
 	private:
 		entt::entity m_EntityHandle = entt::null;

@@ -113,7 +113,7 @@
       <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dive\src;$(SolutionDir)Dive\Third-Party\spdlog\include;$(SolutionDir)Dive\Third-Party\yaml-cpp\include;$(SolutionDir)Editor\Third-Party\imgui;$(SolutionDir)Dive\Third-Party\DirectXTex;$(SolutionDir)Dive\Third-Party\entt\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dive\src;$(SolutionDir)Dive\Third-Party\spdlog\include;$(SolutionDir)Dive\Third-Party\yaml-cpp\include;$(SolutionDir)Editor\Third-Party\imgui;$(SolutionDir)Dive\Third-Party\DirectXTex;$(SolutionDir)Dive\Third-Party\entt\single_include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>

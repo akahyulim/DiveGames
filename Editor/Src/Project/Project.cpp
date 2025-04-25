@@ -95,15 +95,9 @@ namespace Dive
 		{
 			data = YAML::LoadFile(filePath.string());
 		}
-		catch (YAML::BadFile& e)
-		{
-			//DV_LOG(Project, warn, "프로젝트 파일({}) 로드에 실패하였습니다. : {}", filePath, e.what());
-			DV_DELETE(project);
-			return nullptr;
-		}
 		catch (YAML::ParserException& e)
 		{
-			//DV_LOG(Project, warn, "YAML 파일({}) 파싱에 실패하였습니다. : {}", filePath, e.what());
+			DV_LOG(Project, warn, "YAML 파일 파싱 실패: '{0}'\n  {1}", filePath.string().c_str(), e.what());
 			DV_DELETE(project);
 			return nullptr;
 		}

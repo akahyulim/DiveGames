@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <entt/entt.hpp>
 
 namespace Dive
 {
@@ -10,18 +11,18 @@ namespace Dive
 		static void Initialize();
 		static void Shutdown();
 
-		static void Update();
-		static void Render();
-		static void Tick();
+		static void RenderScene(const entt::registry& registry);
+		
+		static void Present();
 
-		static void ResizeRenderTargets(uint32_t width, uint32_t height);
+		static void ResizeRenderTargets(UINT32 width, UINT32 height);
 		static RenderTexture* GetRenderTarget() { return s_RenderTarget.get(); }
 
 	private:
-		static uint64_t s_FrameCount;
 
-		static uint32_t s_Width;
-		static uint32_t s_Height;
+	private:
+		static UINT32 s_Width;
+		static UINT32 s_Height;
 
 		static std::unique_ptr<RenderTexture> s_RenderTarget;
 	};

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "core/UUID.h"
 #include <entt/entt.hpp>
 
@@ -11,6 +11,9 @@ namespace Dive
 	public:
 		World(const std::string& name = std::string());
 		~World();
+
+		void EditorTick(float deltaTime);
+		void RuntimeTick(float deltaTime);
 
 		GameObject CreateGameObject(const std::string& name = std::string());
 		GameObject CreateGameObjectWithUUID(UUID uuid, const std::string& name = std::string());

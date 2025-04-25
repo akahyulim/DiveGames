@@ -38,10 +38,11 @@
     <ClInclude Include="src\graphics\RenderTexture.h" />
     <ClInclude Include="src\graphics\Shader.h" />
     <ClInclude Include="src\graphics\VertexBuffer.h" />
-    <ClInclude Include="src\input\Input.h" />
+    <ClInclude Include="src\core\Input.h" />
     <ClInclude Include="src\math\BoundingBox.h" />
     <ClInclude Include="src\math\Frustum.h" />
     <ClInclude Include="src\math\Math.h" />
+    <ClInclude Include="src\rendering\Camera.h" />
     <ClInclude Include="src\rendering\Mesh.h" />
     <ClInclude Include="src\rendering\Model.h" />
     <ClInclude Include="src\rendering\ModelFactory.h" />
@@ -73,10 +74,11 @@
     <ClCompile Include="src\graphics\RenderTexture.cpp" />
     <ClCompile Include="src\graphics\Shader.cpp" />
     <ClCompile Include="src\graphics\VertexBuffer.cpp" />
-    <ClCompile Include="src\input\Input.cpp" />
+    <ClCompile Include="src\core\Input.cpp" />
     <ClCompile Include="src\math\BoundingBox.cpp" />
     <ClCompile Include="src\math\Frustum.cpp" />
     <ClCompile Include="src\math\Math.cpp" />
+    <ClCompile Include="src\rendering\Camera.cpp" />
     <ClCompile Include="src\rendering\Mesh.cpp" />
     <ClCompile Include="src\rendering\Model.cpp" />
     <ClCompile Include="src\rendering\ModelFactory.cpp" />

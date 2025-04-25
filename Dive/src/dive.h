@@ -11,6 +11,7 @@
 #include "core/FileUtils.h"
 #include "core/EventDispatcher.h"
 #include "core/Window.h"
+#include "core/Input.h"
 #include "core/Engine.h"
 
 // graphics
@@ -23,9 +24,6 @@
 #include "graphics/VertexBuffer.h"
 #include "graphics/IndexBuffer.h"
 #include "graphics/ConstantBuffer.h"
-
-// input
-#include "input/Input.h"
 
 // math
 #include "math/Math.h"
@@ -40,6 +38,7 @@
 #include "rendering/Model.h"
 #include "rendering/ModelFactory.h"
 #include "rendering/Renderer.h"
+#include "rendering/Camera.h"
 
 // resource
 #include "resource/Resource.h"

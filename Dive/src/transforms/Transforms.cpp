@@ -15,55 +15,74 @@ namespace Dive
 	{
 	}
 
-	void Transforms::Tick()
+	void Transforms::Tick(std::vector<TransformComponent*>& transformList)
 	{
+		for (auto tc : transformList)
+		{
+			if (tc->Dirty)
+			{
+				tc->WorldMatrix = tc->GetWorldMatrix();
+				tc->Dirty = false;
+			}
+		}	
 	}
-
 	void Transforms::SetPosition(GameObject gameObject, const DirectX::XMFLOAT3& pos)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
+		if (!HasParent(gameObject)) 
+		{
+			SetLocalPosition(gameObject, pos);
+			return;
+		}
+
 		auto& tc = gameObject.GetComponent<TransformComponent>();
-		tc.Position = pos;
+		auto parentWorldMat = DirectX::XMLoadFloat4x4(&tc.Parent->WorldMatrix);
+
+		auto localPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&pos),
+			DirectX::XMMatrixInverse(nullptr, parentWorldMat));
+
+		DirectX::XMFLOAT3 newPos;
+		DirectX::XMStoreFloat3(&newPos, localPos);
+
+		SetLocalPosition(gameObject, newPos);
 	}
 
 	void Transforms::SetPosition(GameObject gameObject, float x, float y, float z)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		SetPosition(gameObject, { x, y, z });
 	}
 
 	void Transforms::SetLocalPosition(GameObject gameObject, const DirectX::XMFLOAT3& pos)
 	{
-		if (!HasParent(gameObject))
-		{
-			SetPosition(gameObject, pos);
-			return;
-		}
+		DV_ASSERT(Transforms, gameObject);
 
-		auto parentTransform = GetTransform(GetParent(gameObject));
-		auto parentTransformMat = DirectX::XMLoadFloat4x4(&parentTransform);
-
-		auto localPositionVec = DirectX::XMLoadFloat3(&pos);
-
-		auto worldPositionVec = DirectX::XMVector3TransformCoord(localPositionVec, parentTransformMat);
-
-		DirectX::XMFLOAT3 worldPosition{};
-		DirectX::XMStoreFloat3(&worldPosition, worldPositionVec);
-
-		SetPosition(gameObject, worldPosition);
+		auto& tc = gameObject.GetComponent<TransformComponent>();
+		tc.Position = pos;
+		tc.MarkDirty();
 	}
 
 	void Transforms::SetLocalPosition(GameObject gameObject, float x, float y, float z)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		SetLocalPosition(gameObject, { x, y, z });
 	}
 
 	DirectX::XMFLOAT3 Transforms::GetPosition(GameObject gameObject)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		auto& tc = gameObject.GetComponent<TransformComponent>();
 		return tc.Position;
 	}
 
 	DirectX::XMFLOAT3 Transforms::GetLocalPosition(GameObject gameObject)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		if (!HasParent(gameObject))
 			return GetPosition(gameObject);
 
@@ -83,12 +102,16 @@ namespace Dive
 
 	void Transforms::SetRotationQuaternion(GameObject gameObject, const DirectX::XMFLOAT4& rot)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		auto& tc = gameObject.GetComponent<TransformComponent>();
 		tc.Rotation = rot;
 	}
 
 	void Transforms::SetRotationByDegrees(GameObject gameObject, const DirectX::XMFLOAT3& degrees)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		auto& tc = gameObject.GetComponent<TransformComponent>();
 
 		auto radiansX = DirectX::XMConvertToRadians(degrees.x);
@@ -103,11 +126,15 @@ namespace Dive
 
 	void Transforms::SetRotationByDegrees(GameObject gameObject, float x, float y, float z)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		SetRotationByDegrees(gameObject, { x, y, z });
 	}
 
 	void Transforms::SetLocalRotationQuaternion(GameObject gameObject, const DirectX::XMFLOAT4& rot)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		if (!HasParent(gameObject))
 		{
 			SetRotationQuaternion(gameObject, rot);
@@ -129,6 +156,8 @@ namespace Dive
 
 	void Transforms::SetLocalRotationByDegrees(GameObject gameObject, const DirectX::XMFLOAT3& degrees)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		if (!HasParent(gameObject))
 		{
 			SetRotationByDegrees(gameObject, degrees);
@@ -157,17 +186,23 @@ namespace Dive
 
 	void Transforms::SetLocalRotationByDegrees(GameObject gameObject, float x, float y, float z)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		SetLocalRotationByDegrees(gameObject, { x, y, z });
 	}
 
 	DirectX::XMFLOAT4 Transforms::GetRotationQuaternion(GameObject gameObject)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		auto& tc = gameObject.GetComponent<TransformComponent>();
 		return tc.Rotation;
 	}
 
 	DirectX::XMFLOAT4 Transforms::GetLocalRotationQuaternion(GameObject gameObject)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		if (!HasParent(gameObject))
 			return GetRotationQuaternion(gameObject);
 
@@ -188,28 +223,38 @@ namespace Dive
 
 	DirectX::XMFLOAT3 Transforms::GetRotationDegrees(GameObject gameObject)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		return Math::QuaternionToDegrees(GetRotationQuaternion(gameObject));
 	}
 
 	DirectX::XMFLOAT3 Transforms::GetLocalRotationDegrees(GameObject gameObject)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		return Math::QuaternionToDegrees(GetLocalRotationQuaternion(gameObject));
 	}
 
 	void Transforms::SetScale(GameObject gameObject, const DirectX::XMFLOAT3& scl)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		auto& tc = gameObject.GetComponent<TransformComponent>();
 		tc.Scale = scl;
 	}
 
 	void Transforms::SetScale(GameObject gameObject, float x, float y, float z)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		auto& tc = gameObject.GetComponent<TransformComponent>();
 		tc.Scale = { x, y, z };
 	}
 
 	void Transforms::Translate(GameObject gameObject, const DirectX::XMFLOAT3& move, eSpace space)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		auto& tc = gameObject.GetComponent<TransformComponent>();
 
 		if (space == eSpace::World)
@@ -248,11 +293,15 @@ namespace Dive
 
 	void Transforms::Translate(GameObject gameObject, float x, float y, float z, eSpace space)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		Translate(gameObject, { x, y, z }, space);
 	}
 
 	void Transforms::Rotate(GameObject gameObject, const DirectX::XMFLOAT3& degrees, eSpace space)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		auto& tc = gameObject.GetComponent<TransformComponent>();
 
 		auto radiansX = DirectX::XMConvertToRadians(degrees.x);
@@ -294,11 +343,15 @@ namespace Dive
 
 	void Transforms::Rotate(GameObject gameObject, float x, float y, float z, eSpace space)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		Rotate(gameObject, { x,y,z }, space);
 	}
 
 	DirectX::XMFLOAT4X4 Transforms::GetTransform(GameObject gameObject)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		if (!HasParent(gameObject))
 			return GetLocalTransform(gameObject);
 
@@ -316,6 +369,8 @@ namespace Dive
 
 	DirectX::XMFLOAT4X4 Transforms::GetLocalTransform(GameObject gameObject)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		auto& tc = gameObject.GetComponent<TransformComponent>();
 
 		auto transformMat = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&tc.Scale))
@@ -330,6 +385,12 @@ namespace Dive
 
 	void Transforms::SetParent(GameObject child, GameObject parent)
 	{
+		DV_ASSERT(Transforms, child);
+
+		// 새로운 부모가 자식인 경우 확인
+		if (parent && IsChildOf(child, parent))
+			return;
+
 		RemoveParent(child);
 
 		s_Hierarchy[child].Parent = parent;
@@ -338,14 +399,19 @@ namespace Dive
 
 	GameObject Transforms::GetParent(GameObject gameObject)
 	{
-		auto it = s_Hierarchy.find(gameObject);
-		DV_ASSERT(Transforms, it != s_Hierarchy.end());
+		DV_ASSERT(Transforms, gameObject);
 
-		return it->second.Parent;
+		auto it = s_Hierarchy.find(gameObject);
+		if (it != s_Hierarchy.end())
+			return it->second.Parent;
+
+		return {};
 	}
 	
 	void Transforms::RemoveParent(GameObject child)
 	{
+		DV_ASSERT(Transforms, child);
+
 		auto& node = s_Hierarchy[child];
 		if (node.Parent != GameObject())
 		{
@@ -358,20 +424,40 @@ namespace Dive
 		}
 	}
 
-	std::vector<GameObject> Transforms::GetChildren(GameObject gameObject)
+	std::vector<GameObject> Transforms::GetChildren(GameObject parent)
 	{
-		auto it = s_Hierarchy.find(gameObject);
+		DV_ASSERT(Transforms, parent);
+
+		auto it = s_Hierarchy.find(parent);
 		if (it != s_Hierarchy.end())
 			return it->second.Children;
 
 		return {};
 	}
 
-	std::vector<GameObject> Transforms::GetRootNodes(std::vector<GameObject> entities)
+	bool Transforms::IsChildOf(GameObject parent, GameObject other)
+	{
+		DV_ASSERT(Transforms, parent);
+		DV_ASSERT(Transforms, other);
+
+		if (HasChildren(parent))
+		{
+			auto& children = s_Hierarchy[parent].Children;
+			for (auto& child : children)
+			{
+				if (child == other || IsChildOf(child, other))
+					return true;
+			}
+		}
+
+		return false;
+	}
+
+	std::vector<GameObject> Transforms::GetRootNodes(std::vector<GameObject> gameObjects)
 	{
 		std::vector<GameObject> rootNodes{};
 
-		for (auto& gameObject : entities)
+		for (auto& gameObject : gameObjects)
 		{
 			auto it = s_Hierarchy.find(gameObject);
 			if(it == s_Hierarchy.end() || it->second.Parent == GameObject())
@@ -383,34 +469,23 @@ namespace Dive
 	
 	bool Transforms::HasParent(GameObject gameObject)
 	{
-		auto it = s_Hierarchy.find(gameObject);
-		DV_ASSERT(Transforms, it != s_Hierarchy.end());
+		DV_ASSERT(Transforms, gameObject);
 
-		return it->second.Parent;
+		auto it = s_Hierarchy.find(gameObject);
+		if (it == s_Hierarchy.end() || !it->second.Parent)
+			return false;
+
+		return true;
 	}
 
 	bool Transforms::HasChildren(GameObject gameObject)
 	{
+		DV_ASSERT(Transforms, gameObject);
+
 		auto it = s_Hierarchy.find(gameObject);
-		DV_ASSERT(Transform, it != s_Hierarchy.end());
+		if (it == s_Hierarchy.end() || it->second.Children.empty())
+			return false;
 
-		return !it->second.Children.empty();
-	}
-	
-	void Transforms::Serialize(YAML::Emitter& out, const std::vector<GameObject>& gameObjects)
-	{
-		out << YAML::Key << "TransformHierarchy";
-		out << YAML::Value << YAML::BeginSeq;
-		
-		for (auto& gameObject : gameObjects)
-		{
-			// 직렬화 대상은 부모의 ID로 충분하다.
-			//auto parentID = HasParent(gameObject) ? GetParent()
-		}
-	}
-
-	bool Transforms::Deserialize(YAML::Emitter& out)
-	{
-		return false;
+		return true;
 	}
 }

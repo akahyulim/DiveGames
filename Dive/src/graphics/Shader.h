@@ -49,6 +49,7 @@ namespace Dive
 		ID3D11GeometryShader* GetGeometryShader() const { return m_GeometryShader; }
 		ID3D11ComputeShader* GetComputeShader() const { return m_ComputeShader; }
 		ID3D11PixelShader* GetPixelShader() const { return m_PixelShader; }
+
 		ID3D11InputLayout* GetInputLayout() const { return m_InputLayout; }
 		
 		eShaderType GetType() const { return m_Type; }
