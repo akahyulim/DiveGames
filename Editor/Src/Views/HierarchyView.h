@@ -11,15 +11,15 @@ namespace Dive
 		HierarchyView(Editor* editor);
 		virtual ~HierarchyView();
 
-		void SetSelectedNode(GameObject node = {});
+		void SetSelectedNode(Entity node = {});
 
 	protected:
 		void drawView() override;
 
 	private:
-		void showNode(GameObject node);
+		void showNode(Entity node);
 
 	private:
-		GameObject m_SelectedNode;
+		Entity m_SelectedNode;
 	};
 }

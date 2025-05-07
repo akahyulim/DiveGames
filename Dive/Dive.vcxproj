@@ -50,9 +50,10 @@
     <ClInclude Include="src\resource\Resource.h" />
     <ClInclude Include="src\resource\ResourceManager.h" />
     <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\transforms\DvTransforms.h" />
     <ClInclude Include="src\transforms\Transforms.h" />
     <ClInclude Include="src\world\Components.h" />
-    <ClInclude Include="src\world\GameObject.h" />
+    <ClInclude Include="src\world\Entity.h" />
     <ClInclude Include="src\world\World.h" />
     <ClInclude Include="src\world\WorldSerializer.h" />
   </ItemGroup>
@@ -88,8 +89,9 @@
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\transforms\DvTransforms.cpp" />
     <ClCompile Include="src\transforms\Transforms.cpp" />
-    <ClCompile Include="src\world\GameObject.cpp" />
+    <ClCompile Include="src\world\Entity.cpp" />
     <ClCompile Include="src\world\World.cpp" />
     <ClCompile Include="src\world\WorldSerializer.cpp" />
   </ItemGroup>

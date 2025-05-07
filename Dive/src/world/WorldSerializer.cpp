@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "WorldSerializer.h"
 #include "World.h"
-#include "GameObject.h"
+#include "Entity.h"
 #include "Components.h"
 #include "transforms/Transforms.h"
 #include "core/CoreDefs.h"
@@ -122,60 +122,62 @@ namespace Dive
 		return out;
 	}
 
-	static void SerializeGameObject(YAML::Emitter& out, GameObject gameObject)
+	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
 		out << YAML::BeginMap;
-		out << YAML::Key << "GameObject" << YAML::Value << gameObject.GetUUID();
+		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
 
-		if (gameObject.HasComponent<NameComponent>())
+		if (entity.HasComponent<NameComponent>())
 		{
 			out << YAML::Key << "NameComponent";
 			out << YAML::BeginMap;
 
-			auto& name = gameObject.GetComponent<NameComponent>().Name;
+			auto& name = entity.GetComponent<NameComponent>().Name;
 			out << YAML::Key << "Name" << YAML::Value << name;
 			out << YAML::EndMap;
 		}
 
-		if (gameObject.HasComponent<ActiveComponent>())
+		if (entity.HasComponent<ActiveComponent>())
 		{
 			out << YAML::Key << "ActiveComponent";
 			out << YAML::BeginMap;
 
-			auto& active = gameObject.GetComponent<ActiveComponent>().IsActive;
+			auto& active = entity.GetComponent<ActiveComponent>().IsActive;
 			out << YAML::Key << "IsActive" << YAML::Value << active;
 			out << YAML::EndMap;
 		}
 
-		if (gameObject.HasComponent<TransformComponent>())
+		if (entity.HasComponent<TransformComponent>())
 		{
 			out << YAML::Key << "TransformComponent";
 			out << YAML::BeginMap;
 
-			auto& tc = gameObject.GetComponent<TransformComponent>();
+			auto& tc = entity.GetComponent<TransformComponent>();
 			out << YAML::Key << "Position" << YAML::Value << tc.Position;
 			out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
 			out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
 			out << YAML::EndMap;
 		}
 
-		if (Transforms::HasParent(gameObject))
+		if (Transforms::HasParent(entity))
 		{
 			out << YAML::Key << "Hierarchy";
 			out << YAML::BeginMap;
 
-			auto parentID = Transforms::GetParent(gameObject).GetUUID();
+			auto parentID = Transforms::GetParent(entity).GetUUID();
 			out << YAML::Key << "ParentID" << YAML::Value << parentID;
 			out << YAML::EndMap;
 		}
 
 		out << YAML::EndMap;
 
-		if (Transforms::HasChildren(gameObject))
+		// 역직렬화 과정에서 생성 순서가 중요해 이렇게 해놓았다.
+		// 차라리 역직렬화 과정에서 생성과 계층구조 설정 부분을 분리하는 게 낫지 않을까?
+		if (Transforms::HasChildren(entity))
 		{
-			for (auto& child : Transforms::GetChildren(gameObject))
+			for (auto& child : Transforms::GetChildren(entity))
 			{
-				SerializeGameObject(out, child);
+				SerializeEntity(out, child);
 			}
 		}
 	}
@@ -190,11 +192,11 @@ namespace Dive
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "World" << YAML::Value << m_World->m_Name;
-		out << YAML::Key << "GameObjects" << YAML::Value << YAML::BeginSeq;
+		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 		
-		for(auto& gameObject : Transforms::GetRootNodes(m_World->GetAllGameObjects()))
+		for(auto& entity : Transforms::GetRootNodes(m_World->GetAllEntities()))
 		{
-			SerializeGameObject(out, gameObject);
+			SerializeEntity(out, entity);
 		}
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
@@ -223,23 +225,23 @@ namespace Dive
 		m_World->m_Name = worldName;
 		DV_LOG(WorldSerializer, trace, "Deserializing World '{0}'", worldName);
 
-		auto gameObjects = data["GameObjects"];
+		auto gameObjects = data["Entities"];
 		if (gameObjects)
 		{
-			for (auto gameObject : gameObjects)
+			for (auto entity : gameObjects)
 			{
-				UINT64 uuid = gameObject["GameObject"].as<UINT64>();
+				UINT64 uuid = entity["Entity"].as<UINT64>();
 
 				std::string name;
-				auto nameComponent = gameObject["NameComponent"];
+				auto nameComponent = entity["NameComponent"];
 				if (nameComponent)
 					name = nameComponent["Name"].as<std::string>();
 
-				DV_LOG(WorldSerializer, trace, "Deserializerd GameObject with ID = {0}, name = {1}", uuid, name);
+				DV_LOG(WorldSerializer, trace, "Deserializerd Entity with ID = {0}, name = {1}", uuid, name);
 
-				GameObject deserializedGameObject = m_World->CreateGameObjectWithUUID(uuid, name);
+				Entity deserializedGameObject = m_World->CreateEntityWithUUID(uuid, name);
 
-				auto transformComponent = gameObject["TransformComponent"];
+				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)
 				{
 					auto& tc = deserializedGameObject.GetComponent<TransformComponent>();
@@ -248,11 +250,11 @@ namespace Dive
 					tc.Position = transformComponent["Scale"].as<DirectX::XMFLOAT3>();
 				}
 
-				auto hierarchy = gameObject["Hierarchy"];
+				auto hierarchy = entity["Hierarchy"];
 				if (hierarchy)
 				{
 					UINT64 parentID = hierarchy["ParentID"].as<UINT64>();
-					Transforms::SetParent(deserializedGameObject, m_World->GetGameObjectByUUID(parentID));
+					Transforms::SetParent(deserializedGameObject, m_World->GetEntityByUUID(parentID));
 				}
 			}
 		}

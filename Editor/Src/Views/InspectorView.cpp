@@ -14,7 +14,7 @@ namespace Dive
 	
 	void InspectorView::drawView()
 	{
-		if (m_SelectedNode == GameObject{})
+		if (m_SelectedNode == Entity{})
 			return;
 
 		if (ImGui::Button("Add Component"))

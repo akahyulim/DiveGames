@@ -32,6 +32,7 @@
 
 // transforms
 #include "transforms/transforms.h"
+#include "transforms/DvTransforms.h"
 
 // rendering
 #include "rendering/Mesh.h"
@@ -46,6 +47,6 @@
 
 // world
 #include "world/World.h"
-#include "world/GameObject.h"
+#include "world/Entity.h"
 #include "world/Components.h"
 #include "world/WorldSerializer.h"

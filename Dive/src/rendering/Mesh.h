@@ -94,7 +94,7 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
     struct VertexStatic;
-    class GameObject;
+    class Entity;
 
 	class Mesh
 	{
@@ -134,9 +134,9 @@ namespace Dive
         void ComputeBouingBox();
         const BoundingBox& GetBoundingBox() const { return m_BoundingBox; }
 
-        // mesh로부터 gameObject와 renderer까지 접근할 수 있다.
-        GameObject* GetGameObject() const { return m_GameObject; }
-        void SetGameObject(GameObject* pGameObject) { m_GameObject = pGameObject; }
+        // mesh로부터 entity와 renderer까지 접근할 수 있다.
+        Entity* GetGameObject() const { return m_GameObject; }
+        void SetGameObject(Entity* pGameObject) { m_GameObject = pGameObject; }
 
     private:
         std::string m_Name;
@@ -155,6 +155,6 @@ namespace Dive
 
         BoundingBox m_BoundingBox;
 
-        GameObject* m_GameObject;
+        Entity* m_GameObject;
 	};
 }

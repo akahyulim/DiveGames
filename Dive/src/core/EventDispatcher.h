@@ -25,8 +25,8 @@ namespace Dive
 	};
 
 	class Scene;
-	class GameObject;
-	using EventData = std::variant<int, void*, GameObject*, std::shared_ptr<Scene>>;
+	class Entity;
+	using EventData = std::variant<int, void*, Entity*, std::shared_ptr<Scene>>;
 
 	using EventListener = std::function<void(const EventData&)>;
 

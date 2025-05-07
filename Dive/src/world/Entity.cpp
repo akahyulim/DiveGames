@@ -1,9 +1,9 @@
 #include "stdafx.h"
-#include "GameObject.h"
+#include "Entity.h"
 
 namespace Dive
 {
-	GameObject::GameObject(entt::entity handle, World* world)
+	Entity::Entity(entt::entity handle, World* world)
 		: m_EntityHandle(handle)
 		, m_World(world)
 	{

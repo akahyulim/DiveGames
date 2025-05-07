@@ -5,6 +5,8 @@
 
 namespace Dive
 {
+	class Entity;
+
 	struct IDComponent
 	{
 		UUID ID = 0;
@@ -59,49 +61,12 @@ namespace Dive
 		DirectX::XMFLOAT4 Rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 		DirectX::XMFLOAT3 Scale = { 1.0f, 1.0f, 1.0f };
 
-		TransformComponent* Parent = nullptr;
-		DirectX::XMFLOAT4X4 WorldMatrix{
-			1.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1.0f,
-		};
+		Entity* Parent = nullptr;
+		std::vector<Entity*> Children;
+
+		DirectX::XMFLOAT4X4 WorldMatrix{};
 
 		bool Dirty = true;
-
-		DirectX::XMFLOAT4X4 GetLocalMatrix() const
-		{
-			auto localMat = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&Scale))
-				* DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&Rotation))
-				* DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&Position));
-
-			DirectX::XMFLOAT4X4 transform{};
-			DirectX::XMStoreFloat4x4(&transform, localMat);
-
-			return transform;
-		}
-
-		DirectX::XMFLOAT4X4 GetWorldMatrix() const
-		{
-			DirectX::XMFLOAT4X4 localMat = GetLocalMatrix();
-
-			if (Parent)
-			{
-				DirectX::XMFLOAT4X4 transform{};
-				auto parentWorldMat = Parent->GetWorldMatrix();
-				DirectX::XMStoreFloat4x4(&transform,
-					DirectX::XMMatrixMultiply(DirectX::XMLoadFloat4x4(&parentWorldMat), DirectX::XMLoadFloat4x4(&localMat)));
-
-				return transform;
-			}
-			return localMat;
-		}
-
-		void MarkDirty() { Dirty = true; }
-
-		TransformComponent() = default;
-		TransformComponent(const TransformComponent&) = default;
-		TransformComponent(const DirectX::XMFLOAT3& pos) : Position(pos) {}
 	};
 
 	struct CameraComponent

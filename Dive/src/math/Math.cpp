@@ -44,21 +44,28 @@ namespace Dive
 
 	DirectX::XMFLOAT3 Math::QuaternionToDegrees(const DirectX::XMFLOAT4& quaternion)
 	{
-		DirectX::XMFLOAT3 degrees{};
+		auto radians = QuaternionToRadians(quaternion);
 
-		float q0 = quaternion.w;
-		float q1 = quaternion.x;
-		float q2 = quaternion.y;
-		float q3 = quaternion.z;
+		return { 
+			DirectX::XMConvertToDegrees(radians.x),
+			DirectX::XMConvertToDegrees(radians.y),
+			DirectX::XMConvertToDegrees(radians.z) 
+		};
+	}
 
-		float roll = atan2f(2.0f * (q0 * q1 + q2 * q3), 1.0f - 2.0f * (q1 * q1 + q2 * q2));
-		float pitch = asinf(std::clamp(2.0f * (q0 * q2 - q3 * q1), -1.0f, 1.0f));
-		float yaw = atan2f(2.0f * (q0 * q3 + q1 * q2), 1.0f - 2.0f * (q2 * q2 + q3 * q3));
+	DirectX::XMFLOAT3 Math::QuaternionToRadians(const DirectX::XMFLOAT4& quaternion)
+	{
+		auto quat = DirectX::XMQuaternionNormalize(DirectX::XMLoadFloat4(&quaternion));
 
-		degrees.x = DirectX::XMConvertToDegrees(roll);
-		degrees.y = DirectX::XMConvertToDegrees(pitch);
-		degrees.z = DirectX::XMConvertToDegrees(yaw);
+		float qw = DirectX::XMVectorGetW(quat);
+		float qx = DirectX::XMVectorGetX(quat);
+		float qy = DirectX::XMVectorGetY(quat);
+		float qz = DirectX::XMVectorGetZ(quat);
 
-		return degrees;
+		float pitch = std::asin(std::clamp(2.0f * (qx * qy + qw * qz), -1.0f, 1.0f));
+		float yaw = std::atan2(2.0f * (qw * qy - qz * qx), 1.0f - 2.0f * (qy * qy + qz * qz));
+		float roll = std::atan2(2.0f * (qw * qx - qy * qz), 1.0f - 2.0f * (qx * qx + qz * qz));
+
+		return { pitch, yaw, roll };
 	}
 }

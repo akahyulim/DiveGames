@@ -21,22 +21,24 @@ namespace Dive
 		{
 			if (tc->Dirty)
 			{
-				tc->WorldMatrix = tc->GetWorldMatrix();
+				tc->WorldMatrix;
 				tc->Dirty = false;
 			}
 		}	
 	}
-	void Transforms::SetPosition(GameObject gameObject, const DirectX::XMFLOAT3& pos)
+	void Transforms::SetPosition(Entity entity, const DirectX::XMFLOAT3& pos)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		if (!HasParent(gameObject)) 
+		if (!HasParent(entity)) 
 		{
-			SetLocalPosition(gameObject, pos);
+			SetLocalPosition(entity, pos);
 			return;
 		}
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		// 이건 손대지 않은 것 같은데...
+		/*
+		auto& tc = entity.GetComponent<TransformComponent>();
 		auto parentWorldMat = DirectX::XMLoadFloat4x4(&tc.Parent->WorldMatrix);
 
 		auto localPos = DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&pos),
@@ -45,51 +47,52 @@ namespace Dive
 		DirectX::XMFLOAT3 newPos;
 		DirectX::XMStoreFloat3(&newPos, localPos);
 
-		SetLocalPosition(gameObject, newPos);
+		SetLocalPosition(entity, newPos);
+		*/
 	}
 
-	void Transforms::SetPosition(GameObject gameObject, float x, float y, float z)
+	void Transforms::SetPosition(Entity entity, float x, float y, float z)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		SetPosition(gameObject, { x, y, z });
+		SetPosition(entity, { x, y, z });
 	}
 
-	void Transforms::SetLocalPosition(GameObject gameObject, const DirectX::XMFLOAT3& pos)
+	void Transforms::SetLocalPosition(Entity entity, const DirectX::XMFLOAT3& pos)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 		tc.Position = pos;
-		tc.MarkDirty();
+		//tc.MarkDirty();
 	}
 
-	void Transforms::SetLocalPosition(GameObject gameObject, float x, float y, float z)
+	void Transforms::SetLocalPosition(Entity entity, float x, float y, float z)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		SetLocalPosition(gameObject, { x, y, z });
+		SetLocalPosition(entity, { x, y, z });
 	}
 
-	DirectX::XMFLOAT3 Transforms::GetPosition(GameObject gameObject)
+	DirectX::XMFLOAT3 Transforms::GetPosition(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 		return tc.Position;
 	}
 
-	DirectX::XMFLOAT3 Transforms::GetLocalPosition(GameObject gameObject)
+	DirectX::XMFLOAT3 Transforms::GetLocalPosition(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		if (!HasParent(gameObject))
-			return GetPosition(gameObject);
+		if (!HasParent(entity))
+			return GetPosition(entity);
 
-		auto parentTransform = GetTransform(GetParent(gameObject));
+		auto parentTransform = GetTransform(GetParent(entity));
 		auto parentTransformInverseMat = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&parentTransform));
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 		auto positionVec = DirectX::XMLoadFloat3(&tc.Position);
 
 		auto localPositionVec = DirectX::XMVector3TransformCoord(positionVec, parentTransformInverseMat);
@@ -100,19 +103,19 @@ namespace Dive
 		return localPosition;
 	}
 
-	void Transforms::SetRotationQuaternion(GameObject gameObject, const DirectX::XMFLOAT4& rot)
+	void Transforms::SetRotationQuaternion(Entity entity, const DirectX::XMFLOAT4& rot)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 		tc.Rotation = rot;
 	}
 
-	void Transforms::SetRotationByDegrees(GameObject gameObject, const DirectX::XMFLOAT3& degrees)
+	void Transforms::SetRotationByDegrees(Entity entity, const DirectX::XMFLOAT3& degrees)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 
 		auto radiansX = DirectX::XMConvertToRadians(degrees.x);
 		auto radiansY = DirectX::XMConvertToRadians(degrees.y);
@@ -124,24 +127,24 @@ namespace Dive
 		DirectX::XMStoreFloat4(&tc.Rotation, rotationVec);
 	}
 
-	void Transforms::SetRotationByDegrees(GameObject gameObject, float x, float y, float z)
+	void Transforms::SetRotationByDegrees(Entity entity, float x, float y, float z)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		SetRotationByDegrees(gameObject, { x, y, z });
+		SetRotationByDegrees(entity, { x, y, z });
 	}
 
-	void Transforms::SetLocalRotationQuaternion(GameObject gameObject, const DirectX::XMFLOAT4& rot)
+	void Transforms::SetLocalRotationQuaternion(Entity entity, const DirectX::XMFLOAT4& rot)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		if (!HasParent(gameObject))
+		if (!HasParent(entity))
 		{
-			SetRotationQuaternion(gameObject, rot);
+			SetRotationQuaternion(entity, rot);
 			return;
 		}
 
-		auto parentRotation = GetParent(gameObject).GetComponent<TransformComponent>().Rotation;
+		auto parentRotation = GetParent(entity).GetComponent<TransformComponent>().Rotation;
 		auto parentRotationVec = DirectX::XMLoadFloat4(&parentRotation);
 		auto localRotationVec = DirectX::XMLoadFloat4(&rot);
 
@@ -151,23 +154,23 @@ namespace Dive
 		DirectX::XMFLOAT4 worldRotation{};
 		DirectX::XMStoreFloat4(&worldRotation, worldRotationVec);
 
-		SetRotationQuaternion(gameObject, worldRotation);
+		SetRotationQuaternion(entity, worldRotation);
 	}
 
-	void Transforms::SetLocalRotationByDegrees(GameObject gameObject, const DirectX::XMFLOAT3& degrees)
+	void Transforms::SetLocalRotationByDegrees(Entity entity, const DirectX::XMFLOAT3& degrees)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		if (!HasParent(gameObject))
+		if (!HasParent(entity))
 		{
-			SetRotationByDegrees(gameObject, degrees);
+			SetRotationByDegrees(entity, degrees);
 			return;
 		}
 
-		auto parentRotation = GetParent(gameObject).GetComponent<TransformComponent>().Rotation;
+		auto parentRotation = GetParent(entity).GetComponent<TransformComponent>().Rotation;
 		auto parentRotationVec = DirectX::XMLoadFloat4(&parentRotation);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 
 		auto radiansX = DirectX::XMConvertToRadians(degrees.x);
 		auto radiansY = DirectX::XMConvertToRadians(degrees.y);
@@ -181,35 +184,35 @@ namespace Dive
 		DirectX::XMFLOAT4 worldRotation{};
 		DirectX::XMStoreFloat4(&worldRotation, worldRotationVec);
 
-		SetRotationQuaternion(gameObject, worldRotation);
+		SetRotationQuaternion(entity, worldRotation);
 	}
 
-	void Transforms::SetLocalRotationByDegrees(GameObject gameObject, float x, float y, float z)
+	void Transforms::SetLocalRotationByDegrees(Entity entity, float x, float y, float z)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		SetLocalRotationByDegrees(gameObject, { x, y, z });
+		SetLocalRotationByDegrees(entity, { x, y, z });
 	}
 
-	DirectX::XMFLOAT4 Transforms::GetRotationQuaternion(GameObject gameObject)
+	DirectX::XMFLOAT4 Transforms::GetRotationQuaternion(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 		return tc.Rotation;
 	}
 
-	DirectX::XMFLOAT4 Transforms::GetLocalRotationQuaternion(GameObject gameObject)
+	DirectX::XMFLOAT4 Transforms::GetLocalRotationQuaternion(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		if (!HasParent(gameObject))
-			return GetRotationQuaternion(gameObject);
+		if (!HasParent(entity))
+			return GetRotationQuaternion(entity);
 
-		auto parentRotation = GetParent(gameObject).GetComponent<TransformComponent>().Rotation;
+		auto parentRotation = GetParent(entity).GetComponent<TransformComponent>().Rotation;
 		auto parentRotationInverVec = DirectX::XMQuaternionInverse(DirectX::XMLoadFloat4(&parentRotation));
 
-		auto worldRotation = GetRotationQuaternion(gameObject);
+		auto worldRotation = GetRotationQuaternion(entity);
 		auto worldRotationVec = DirectX::XMLoadFloat4(&worldRotation);
 
 		auto localRotationVec = DirectX::XMQuaternionMultiply(worldRotationVec, parentRotationInverVec);
@@ -221,41 +224,41 @@ namespace Dive
 		return localRotation;
 	}
 
-	DirectX::XMFLOAT3 Transforms::GetRotationDegrees(GameObject gameObject)
+	DirectX::XMFLOAT3 Transforms::GetRotationDegrees(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		return Math::QuaternionToDegrees(GetRotationQuaternion(gameObject));
+		return Math::QuaternionToDegrees(GetRotationQuaternion(entity));
 	}
 
-	DirectX::XMFLOAT3 Transforms::GetLocalRotationDegrees(GameObject gameObject)
+	DirectX::XMFLOAT3 Transforms::GetLocalRotationDegrees(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		return Math::QuaternionToDegrees(GetLocalRotationQuaternion(gameObject));
+		return Math::QuaternionToDegrees(GetLocalRotationQuaternion(entity));
 	}
 
-	void Transforms::SetScale(GameObject gameObject, const DirectX::XMFLOAT3& scl)
+	void Transforms::SetScale(Entity entity, const DirectX::XMFLOAT3& scl)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 		tc.Scale = scl;
 	}
 
-	void Transforms::SetScale(GameObject gameObject, float x, float y, float z)
+	void Transforms::SetScale(Entity entity, float x, float y, float z)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 		tc.Scale = { x, y, z };
 	}
 
-	void Transforms::Translate(GameObject gameObject, const DirectX::XMFLOAT3& move, eSpace space)
+	void Transforms::Translate(Entity entity, const DirectX::XMFLOAT3& move, eSpace space)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 
 		if (space == eSpace::World)
 		{
@@ -266,7 +269,7 @@ namespace Dive
 		}
 		else
 		{
-			if (!HasParent(gameObject))
+			if (!HasParent(entity))
 			{
 				tc.Position.x += move.x;
 				tc.Position.y += move.y;
@@ -275,7 +278,7 @@ namespace Dive
 			}
 			else
 			{
-				auto parentTransform = GetTransform(GetParent(gameObject));
+				auto parentTransform = GetTransform(GetParent(entity));
 				auto parentInverseTransform = DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat4x4(&parentTransform));
 
 				auto worldMoveVec = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&move), parentInverseTransform);
@@ -291,18 +294,18 @@ namespace Dive
 		}
 	}
 
-	void Transforms::Translate(GameObject gameObject, float x, float y, float z, eSpace space)
+	void Transforms::Translate(Entity entity, float x, float y, float z, eSpace space)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		Translate(gameObject, { x, y, z }, space);
+		Translate(entity, { x, y, z }, space);
 	}
 
-	void Transforms::Rotate(GameObject gameObject, const DirectX::XMFLOAT3& degrees, eSpace space)
+	void Transforms::Rotate(Entity entity, const DirectX::XMFLOAT3& degrees, eSpace space)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 
 		auto radiansX = DirectX::XMConvertToRadians(degrees.x);
 		auto radiansY = DirectX::XMConvertToRadians(degrees.y);
@@ -319,7 +322,7 @@ namespace Dive
 		}
 		else
 		{
-			if (!HasParent(gameObject))
+			if (!HasParent(entity))
 			{
 				auto worldRotationVec = DirectX::XMQuaternionMultiply(DirectX::XMLoadFloat4(&tc.Rotation), rotationVec);
 				worldRotationVec = DirectX::XMQuaternionNormalize(worldRotationVec);
@@ -328,7 +331,7 @@ namespace Dive
 			}
 			else
 			{
-				auto parentRotation = GetParent(gameObject).GetComponent<TransformComponent>().Rotation;
+				auto parentRotation = GetParent(entity).GetComponent<TransformComponent>().Rotation;
 				auto parentRotationInverseVec = DirectX::XMQuaternionInverse(DirectX::XMLoadFloat4(&parentRotation));
 
 				auto localRotationVec = DirectX::XMQuaternionMultiply(rotationVec, parentRotationInverseVec);
@@ -341,22 +344,22 @@ namespace Dive
 		}
 	}
 
-	void Transforms::Rotate(GameObject gameObject, float x, float y, float z, eSpace space)
+	void Transforms::Rotate(Entity entity, float x, float y, float z, eSpace space)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		Rotate(gameObject, { x,y,z }, space);
+		Rotate(entity, { x,y,z }, space);
 	}
 
-	DirectX::XMFLOAT4X4 Transforms::GetTransform(GameObject gameObject)
+	DirectX::XMFLOAT4X4 Transforms::GetTransform(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		if (!HasParent(gameObject))
-			return GetLocalTransform(gameObject);
+		if (!HasParent(entity))
+			return GetLocalTransform(entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
-		auto parentTransform = GetTransform(GetParent(gameObject));
+		auto& tc = entity.GetComponent<TransformComponent>();
+		auto parentTransform = GetTransform(GetParent(entity));
 		auto transformMat = DirectX::XMLoadFloat4x4(&parentTransform) * DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&tc.Scale))
 			* DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&tc.Rotation))
 			* DirectX::XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&tc.Position));
@@ -367,11 +370,11 @@ namespace Dive
 		return transform;
 	}
 
-	DirectX::XMFLOAT4X4 Transforms::GetLocalTransform(GameObject gameObject)
+	DirectX::XMFLOAT4X4 Transforms::GetLocalTransform(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto& tc = gameObject.GetComponent<TransformComponent>();
+		auto& tc = entity.GetComponent<TransformComponent>();
 
 		auto transformMat = DirectX::XMMatrixScalingFromVector(DirectX::XMLoadFloat3(&tc.Scale))
 			* DirectX::XMMatrixRotationQuaternion(DirectX::XMLoadFloat4(&tc.Rotation))
@@ -383,7 +386,7 @@ namespace Dive
 		return transform;
 	}
 
-	void Transforms::SetParent(GameObject child, GameObject parent)
+	void Transforms::SetParent(Entity child, Entity parent)
 	{
 		DV_ASSERT(Transforms, child);
 
@@ -397,34 +400,34 @@ namespace Dive
 		s_Hierarchy[parent].Children.push_back(child);
 	}
 
-	GameObject Transforms::GetParent(GameObject gameObject)
+	Entity Transforms::GetParent(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto it = s_Hierarchy.find(gameObject);
+		auto it = s_Hierarchy.find(entity);
 		if (it != s_Hierarchy.end())
 			return it->second.Parent;
 
 		return {};
 	}
 	
-	void Transforms::RemoveParent(GameObject child)
+	void Transforms::RemoveParent(Entity child)
 	{
 		DV_ASSERT(Transforms, child);
 
 		auto& node = s_Hierarchy[child];
-		if (node.Parent != GameObject())
+		if (node.Parent != Entity())
 		{
 			auto& parentNode = s_Hierarchy[node.Parent];
 			parentNode.Children.erase(
 				std::remove(parentNode.Children.begin(), parentNode.Children.end(), child),
 				parentNode.Children.end()
 			);
-			node.Parent = GameObject();
+			node.Parent = Entity();
 		}
 	}
 
-	std::vector<GameObject> Transforms::GetChildren(GameObject parent)
+	std::vector<Entity> Transforms::GetChildren(Entity parent)
 	{
 		DV_ASSERT(Transforms, parent);
 
@@ -435,7 +438,7 @@ namespace Dive
 		return {};
 	}
 
-	bool Transforms::IsChildOf(GameObject parent, GameObject other)
+	bool Transforms::IsChildOf(Entity parent, Entity other)
 	{
 		DV_ASSERT(Transforms, parent);
 		DV_ASSERT(Transforms, other);
@@ -453,36 +456,36 @@ namespace Dive
 		return false;
 	}
 
-	std::vector<GameObject> Transforms::GetRootNodes(std::vector<GameObject> gameObjects)
+	std::vector<Entity> Transforms::GetRootNodes(std::vector<Entity> gameObjects)
 	{
-		std::vector<GameObject> rootNodes{};
+		std::vector<Entity> rootNodes{};
 
-		for (auto& gameObject : gameObjects)
+		for (auto& entity : gameObjects)
 		{
-			auto it = s_Hierarchy.find(gameObject);
-			if(it == s_Hierarchy.end() || it->second.Parent == GameObject())
-				rootNodes.push_back(gameObject);
+			auto it = s_Hierarchy.find(entity);
+			if(it == s_Hierarchy.end() || it->second.Parent == Entity())
+				rootNodes.push_back(entity);
 		}
 
 		return rootNodes;
 	}
 	
-	bool Transforms::HasParent(GameObject gameObject)
+	bool Transforms::HasParent(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto it = s_Hierarchy.find(gameObject);
+		auto it = s_Hierarchy.find(entity);
 		if (it == s_Hierarchy.end() || !it->second.Parent)
 			return false;
 
 		return true;
 	}
 
-	bool Transforms::HasChildren(GameObject gameObject)
+	bool Transforms::HasChildren(Entity entity)
 	{
-		DV_ASSERT(Transforms, gameObject);
+		DV_ASSERT(Transforms, entity);
 
-		auto it = s_Hierarchy.find(gameObject);
+		auto it = s_Hierarchy.find(entity);
 		if (it == s_Hierarchy.end() || it->second.Children.empty())
 			return false;
 

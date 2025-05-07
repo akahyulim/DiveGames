@@ -38,7 +38,7 @@ namespace Dive
 					auto world = Engine::GenerateWorld();
 
 					// editor camera
-					auto editorCamera = world->CreateGameObject("EditorCamera");
+					auto editorCamera = world->CreateEntity("EditorCamera");
 					auto& cc = editorCamera.AddComponent<CameraComponent>();
 					cc.RenderTarget = new RenderTexture(1, 1);
 					editorCamera.GetComponent<TagComponent>().Tag = eTag::EditorOnly;
@@ -53,7 +53,7 @@ namespace Dive
 					serializer.Deserialize("NewWorld.dive");
 
 					// editor camera
-					auto editorCamera = world->CreateGameObject("EditorCamera");
+					auto editorCamera = world->CreateEntity("EditorCamera");
 					editorCamera.AddComponent<CameraComponent>();
 					editorCamera.GetComponent<TagComponent>().Tag = eTag::EditorOnly;
 
@@ -85,11 +85,11 @@ namespace Dive
 				ImGui::EndMenu();
 			}
 
-			if (ImGui::BeginMenu("GameObject"))
+			if (ImGui::BeginMenu("Entity"))
 			{
 				if (ImGui::MenuItem("Create Empty", nullptr, nullptr, isShowWorldMenu))
 				{
-					Engine::GetActiveWorld()->CreateGameObject("GameObject");
+					Engine::GetActiveWorld()->CreateEntity("Entity");
 				}
 				if (ImGui::BeginMenu("3D Object"))
 				{

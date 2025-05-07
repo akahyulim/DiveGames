@@ -10,5 +10,6 @@ namespace Dive
 
 		static DirectX::XMFLOAT3 CalcuBiTangent(const DirectX::XMFLOAT3& normal, const DirectX::XMFLOAT3& tangent);
 		static DirectX::XMFLOAT3 QuaternionToDegrees(const DirectX::XMFLOAT4& quaternion);
+		static DirectX::XMFLOAT3 QuaternionToRadians(const DirectX::XMFLOAT4& quaternion);
 	};
 }

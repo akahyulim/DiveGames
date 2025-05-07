@@ -6,19 +6,19 @@
 
 namespace Dive
 {
-	class GameObject
+	class Entity
 	{
 	public:
-		GameObject() = default;
-		GameObject(entt::entity handle, World* world);
-		GameObject(const GameObject&) = default;
+		Entity() = default;
+		Entity(entt::entity handle, World* world);
+		Entity(const Entity&) = default;
 
-		bool operator==(const GameObject& other) const
+		bool operator==(const Entity& other) const
 		{
 			return m_EntityHandle == other.m_EntityHandle && m_World == other.m_World;
 		}
 
-		bool operator!=(const GameObject& other) const
+		bool operator!=(const Entity& other) const
 		{
 			return !(*this == other);
 		}
@@ -30,23 +30,23 @@ namespace Dive
 		template<typename T, typename... Args>
 		T& AddComponent(Args&... args)
 		{
-			// assert
+			DV_ASSERT(Entity, !HasComponent<T>());
 			T& component = m_World->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
-			// OnComponentAdded???
+		
 			return component;
 		}
 
 		template<typename T>
 		void RemoveComponent()
 		{
-			// assert
+			DV_ASSERT(Entity, HasComponent<T>());
 			m_World->m_Registry.remove<T>(m_EntityHandle);
 		}
 
 		template<typename T>
 		T& GetComponent()
 		{
-			// assert
+			DV_ASSERT(Entity, HasComponent<T>());
 			return m_World->m_Registry.get<T>(m_EntityHandle);
 		}
 
@@ -57,10 +57,12 @@ namespace Dive
 			return view.contains(m_EntityHandle);
 		}
 
-		const UUID GetUUID() { return GetComponent<IDComponent>().ID; }
+		UUID GetUUID() { return GetComponent<IDComponent>().ID; }
 		const std::string& GetName() { return GetComponent<NameComponent>().Name; }
-		const eTag GetTag() { return GetComponent<TagComponent>().Tag; }
+		eTag GetTag() { return GetComponent<TagComponent>().Tag; }
 		
+		World* GetWorld() const { return m_World; }
+
 	private:
 		entt::entity m_EntityHandle = entt::null;
 		World* m_World = nullptr;

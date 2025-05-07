@@ -15,7 +15,7 @@ namespace Dive
 	{
 
 	}
-	void HierarchyView::SetSelectedNode(GameObject node)
+	void HierarchyView::SetSelectedNode(Entity node)
 	{
 		if (m_SelectedNode != node)
 			m_SelectedNode = node;
@@ -31,7 +31,7 @@ namespace Dive
 			{
 				// 일단 이 곳이랑 가장 아래 부분에서
 				// Transform 참조 오류가 발생한다.
-				// 현재 Transform이 없는 GameObject를 생성토록 하였으므로
+				// 현재 Transform이 없는 Entity를 생성토록 하였으므로
 				// 이는 반드시 수정되어야 한다.
 				// => 수정했지만 여전히 버그가 발생한다. 다른 곳에서 SelectedObject의 Transform을 요구하는 것 같다.
 				// => ScenePanel에서 ImGuizmo 때문에 발생한 문제였다. 일단 수정 및 테스트를 완료했다.
@@ -40,16 +40,16 @@ namespace Dive
 					if (const ImGuiPayload* pPayload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 					{
 						auto pInstanceID = static_cast<unsigned long long*>(pPayload->Data);
-						auto droppedNode = Engine::GetActiveWorld()->GetGameObjectByUUID(*pInstanceID);
+						auto droppedNode = Engine::GetActiveWorld()->GetEntityByUUID(*pInstanceID);
 						if (droppedNode.HasComponent<TransformComponent>())
-							Transforms::SetParent(droppedNode, GameObject{});
+							Transforms::SetParent(droppedNode, Entity{});
 					}
 
 					ImGui::EndDragDropTarget();
 				}
 
 				//auto pRoots = m_pActiveScene->GetRoots();
-				auto rootNodes = Transforms::GetRootNodes(Engine::GetActiveWorld()->GetAllGameObjects());
+				auto rootNodes = Transforms::GetRootNodes(Engine::GetActiveWorld()->GetAllEntities());
 				if (!rootNodes.empty())
 				{
 					for (auto& node : rootNodes)
@@ -70,7 +70,7 @@ namespace Dive
 		{
 			// World 노드로 드래그 앤 드랍하면 부모를 없애고 싶었으나 현재 되지 않는다.
 			ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
-			auto rootNodes = Transforms::GetRootNodes(Engine::GetActiveWorld()->GetAllGameObjects());
+			auto rootNodes = Transforms::GetRootNodes(Engine::GetActiveWorld()->GetAllEntities());
 			rootNodes.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_DefaultOpen;
 			
 			bool opened = ImGui::TreeNodeEx(Engine::GetActiveWorld()->GetName().c_str(), nodeFlags);
@@ -89,8 +89,8 @@ namespace Dive
 				/*
 				if (ImGui::BeginPopupContextWindow())
 				{
-					if (ImGui::MenuItem("Add GameObject"))
-						Engine::GetActiveWorld()->CreateGameObject();
+					if (ImGui::MenuItem("Add Entity"))
+						Engine::GetActiveWorld()->CreateEntity();
 
 					ImGui::EndPopup();
 				}
@@ -101,7 +101,7 @@ namespace Dive
 		}*/
 	}
 
-	void HierarchyView::showNode(GameObject node)
+	void HierarchyView::showNode(Entity node)
 	{
 		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
 
@@ -125,7 +125,7 @@ namespace Dive
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 			{
 				auto id = static_cast<unsigned long long*>(payload->Data);
-				auto droppedNode = Engine::GetActiveWorld()->GetGameObjectByUUID(*id);
+				auto droppedNode = Engine::GetActiveWorld()->GetEntityByUUID(*id);
 
 				if (droppedNode != node)
 				{
@@ -171,13 +171,13 @@ namespace Dive
 		if (nodeAdded)
 		{
 			Transforms::SetParent(
-				Engine::GetActiveWorld()->CreateGameObject(),
+				Engine::GetActiveWorld()->CreateEntity(),
 				m_SelectedNode);
 		}
 
 		if (nodeDeleted)
 		{
-			Engine::GetActiveWorld()->RemoveGameObject(node);
+			Engine::GetActiveWorld()->RemoveEntity(node);
 			if (m_SelectedNode == node)
 				SetSelectedNode();
 		}

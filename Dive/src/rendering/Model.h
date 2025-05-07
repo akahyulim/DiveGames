@@ -4,7 +4,7 @@
 namespace Dive
 {
 	class Mesh;
-	class GameObject;
+	class Entity;
 
 	class Model : public Resource
 	{
@@ -19,8 +19,8 @@ namespace Dive
 
 		void Clear();
 
-		GameObject* GetRootObject() const { return m_RootGameObject; }
-		void SetRootObject(GameObject* rootGameObject) { m_RootGameObject = rootGameObject; }
+		Entity* GetRootObject() const { return m_RootGameObject; }
+		void SetRootObject(Entity* rootGameObject) { m_RootGameObject = rootGameObject; }
 
 		void AddMesh(Mesh* mesh) { m_Meshes.emplace_back(mesh); }
 		std::vector<Mesh*>& GetAllMeshes() { return m_Meshes; }
@@ -28,7 +28,7 @@ namespace Dive
 		Mesh* GetMeshByName(const std::string& name);
 
 	private:
-		GameObject* m_RootGameObject;
+		Entity* m_RootGameObject;
 
 		// urho는 geometry뿐만 아니라 모든 Buffer도 관리한다.
 		std::vector<Mesh*> m_Meshes;

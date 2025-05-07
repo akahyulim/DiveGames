@@ -116,9 +116,6 @@
     <ClInclude Include="src\rendering\ModelFactory.h">
       <Filter>rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\GameObject.h">
-      <Filter>world</Filter>
-    </ClInclude>
     <ClInclude Include="src\world\Components.h">
       <Filter>world</Filter>
     </ClInclude>
@@ -128,6 +125,8 @@
     <ClInclude Include="src\transforms\Transforms.h" />
     <ClInclude Include="src\world\WorldSerializer.h" />
     <ClInclude Include="src\rendering\Camera.h" />
+    <ClInclude Include="src\transforms\DvTransforms.h" />
+    <ClInclude Include="src\world\Entity.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -212,14 +211,13 @@
     <ClCompile Include="src\rendering\ModelFactory.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\GameObject.cpp">
-      <Filter>world</Filter>
-    </ClCompile>
     <ClCompile Include="src\world\World.cpp">
       <Filter>world</Filter>
     </ClCompile>
     <ClCompile Include="src\transforms\Transforms.cpp" />
     <ClCompile Include="src\world\WorldSerializer.cpp" />
     <ClCompile Include="src\rendering\Camera.cpp" />
+    <ClCompile Include="src\transforms\DvTransforms.cpp" />
+    <ClCompile Include="src\world\Entity.cpp" />
   </ItemGroup>
 </Project>

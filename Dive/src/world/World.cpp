@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "World.h"
-#include "GameObject.h"
+#include "Entity.h"
 #include "transforms/Transforms.h"
-#include "transforms/Transforms.h"
+#include "transforms/DvTransforms.h"
 #include "rendering/Renderer.h"
 
 namespace Dive
@@ -14,20 +14,29 @@ namespace Dive
 
 	World::~World()
 	{
+		Clear();
+	}
+
+	void World::Clear()
+	{
+		m_Registry.clear();
+		m_Entities.clear();
+		m_Dirty = true;
 	}
 
 	void World::EditorTick(float deltaTime)
 	{
 		{
-			std::vector<TransformComponent*> transformList;
 			auto view = m_Registry.view<TransformComponent>();
-			for (auto entity : view)
+			std::vector<TransformComponent*> transformList;
+			transformList.reserve(view.size());
+
+			for (auto& entity : view)
 			{
-				auto& transformComponent = view.get<TransformComponent>(entity);
-				transformList.push_back(&transformComponent);
+				auto& tc = view.get<TransformComponent>(entity);
+				transformList.push_back(&tc);
 			}
 			Transforms::Tick(transformList);
-
 		}
 
 		Renderer::RenderScene(m_Registry);
@@ -49,77 +58,77 @@ namespace Dive
 		}
 	}
 
-	GameObject World::CreateGameObject(const std::string& name)
+	Entity World::CreateEntity(const std::string& name)
 	{
-		return CreateGameObjectWithUUID(UUID(), name);
+		return CreateEntityWithUUID(UUID(), name);
 	}
 
-	GameObject World::CreateGameObjectWithUUID(UUID uuid, const std::string& name)
+	Entity World::CreateEntityWithUUID(UUID uuid, const std::string& name)
 	{
-		GameObject gameObject = { m_Registry.create(), this };
-		gameObject.AddComponent<IDComponent>(uuid);
-		auto& nc = gameObject.AddComponent<NameComponent>();
-		nc.Name = name.empty() ? "GameObject" : name;
-		gameObject.AddComponent<ActiveComponent>();
-		gameObject.AddComponent<TransformComponent>();
-		gameObject.AddComponent<TagComponent>();
+		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<IDComponent>(uuid);
+		auto& nc = entity.AddComponent<NameComponent>();
+		nc.Name = name.empty() ? "Entity" : name;
+		entity.AddComponent<ActiveComponent>();
+		entity.AddComponent<TransformComponent>();
+		entity.AddComponent<TagComponent>();
 		
-		m_GameObjects[uuid] = gameObject;
+		m_Entities[uuid] = entity;
 
-		return gameObject;
+		m_Dirty = true;
+
+		return entity;
 
 	}
 
-	void World::RemoveGameObject(GameObject gameObject)
+	void World::RemoveEntity(Entity entity)
 	{
-		for (auto& child : Transforms::GetChildren(gameObject))
+		for (auto& child : Transforms::GetChildren(entity))
 		{
-			RemoveGameObject(child);
+			RemoveEntity(child);
 		}
+		Transforms::RemoveParent(entity);
+		
+		m_Entities.erase(entity.GetUUID());
+		m_Registry.destroy(entity);
 
-		Transforms::RemoveParent(gameObject);
-		m_GameObjects.erase(gameObject.GetUUID());
-		m_Registry.destroy(gameObject);
+		m_Dirty = true;
 	}
 
-	GameObject World::GetGameObjectByName(const std::string& name)
+	Entity World::GetEntityByName(const std::string& name)
 	{
 		auto view = m_Registry.view<NameComponent>();
 		for (auto entity : view)
 		{
 			const NameComponent& tag = view.get<NameComponent>(entity);
 			if (tag.Name == name)
-				return GameObject{ entity, this };
+				return Entity{ entity, this };
 		}
 
 		return {};
 	}
 
-	GameObject World::GetGameObjectByUUID(UUID uuid)
+	Entity World::GetEntityByUUID(UUID uuid)
 	{
-		if (m_GameObjects.find(uuid) != m_GameObjects.end())
-			return { m_GameObjects.at(uuid), this };
+		if (m_Entities.find(uuid) != m_Entities.end())
+			return { m_Entities.at(uuid), this };
 
 		return {};
 	}
 
-	std::vector<GameObject> World::GetAllGameObjects()
+	std::vector<Entity> World::GetAllEntities()
 	{
-		std::vector<GameObject> entities{};
+		std::vector<Entity> gameObjects;
+		gameObjects.reserve(m_Entities.size());
 		
-		if (!m_GameObjects.empty())
+		if (!m_Entities.empty())
 		{
-			for (auto& [uuid, gameObject] : m_GameObjects)
+			for (auto& [uuid, entity] : m_Entities)
 			{
-				entities.emplace_back(gameObject, this);
+				gameObjects.emplace_back(entity, this);
 			}
 
 		}
-		return entities;
-	}
-
-	void World::SetName(const std::string& name)
-	{
-		m_Name = name;
+		return gameObjects;
 	}
 }

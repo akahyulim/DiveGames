@@ -11,9 +11,9 @@ namespace Dive
 
 		void drawView() override;
 
-		void SetSelectedNode(GameObject node) { m_SelectedNode = node; }
+		void SetSelectedNode(Entity node) { m_SelectedNode = node; }
 
 	private:
-		GameObject m_SelectedNode;
+		Entity m_SelectedNode;
 	};
 }
