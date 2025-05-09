@@ -2,7 +2,6 @@
 #include "World.h"
 #include "Entity.h"
 #include "transforms/Transforms.h"
-#include "transforms/DvTransforms.h"
 #include "rendering/Renderer.h"
 
 namespace Dive
@@ -26,20 +25,6 @@ namespace Dive
 
 	void World::EditorTick(float deltaTime)
 	{
-		{
-			auto view = m_Registry.view<TransformComponent>();
-			std::vector<TransformComponent*> transformList;
-			transformList.reserve(view.size());
-
-			for (auto& entity : view)
-			{
-				auto& tc = view.get<TransformComponent>(entity);
-				transformList.push_back(&tc);
-			}
-			Transforms::Tick(transformList);
-		}
-
-		Renderer::RenderScene(m_Registry);
 	}
 
 	void World::RuntimeTick(float deltaTime)

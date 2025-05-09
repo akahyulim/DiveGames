@@ -54,7 +54,7 @@ namespace Dive
 				{
 					for (auto& node : rootNodes)
 					{
-						if(node.GetTag() != eTag::EditorOnly)
+						//if(node.GetTag() != eTag::EditorOnly)
 							showNode(node);
 					}
 				}

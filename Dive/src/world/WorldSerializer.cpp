@@ -225,10 +225,10 @@ namespace Dive
 		m_World->m_Name = worldName;
 		DV_LOG(WorldSerializer, trace, "Deserializing World '{0}'", worldName);
 
-		auto gameObjects = data["Entities"];
-		if (gameObjects)
+		auto entities = data["Entities"];
+		if (entities)
 		{
-			for (auto entity : gameObjects)
+			for (auto entity : entities)
 			{
 				UINT64 uuid = entity["Entity"].as<UINT64>();
 
@@ -239,22 +239,22 @@ namespace Dive
 
 				DV_LOG(WorldSerializer, trace, "Deserializerd Entity with ID = {0}, name = {1}", uuid, name);
 
-				Entity deserializedGameObject = m_World->CreateEntityWithUUID(uuid, name);
+				Entity deserializedEntity = m_World->CreateEntityWithUUID(uuid, name);
 
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent)
 				{
-					auto& tc = deserializedGameObject.GetComponent<TransformComponent>();
+					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
 					tc.Position = transformComponent["Position"].as<DirectX::XMFLOAT3>();
 					tc.Rotation = transformComponent["Rotation"].as<DirectX::XMFLOAT4>();
-					tc.Position = transformComponent["Scale"].as<DirectX::XMFLOAT3>();
+					tc.Scale = transformComponent["Scale"].as<DirectX::XMFLOAT3>();
 				}
 
 				auto hierarchy = entity["Hierarchy"];
 				if (hierarchy)
 				{
 					UINT64 parentID = hierarchy["ParentID"].as<UINT64>();
-					Transforms::SetParent(deserializedGameObject, m_World->GetEntityByUUID(parentID));
+					Transforms::SetParent(deserializedEntity, m_World->GetEntityByUUID(parentID));
 				}
 			}
 		}

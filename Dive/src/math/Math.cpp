@@ -53,6 +53,16 @@ namespace Dive
 		};
 	}
 
+	DirectX::XMFLOAT4 Math::DegreesToQuaternion(const DirectX::XMFLOAT3& degrees)
+	{
+		DirectX::XMFLOAT3 radians;
+		radians.x = DirectX::XMConvertToRadians(degrees.x);
+		radians.y = DirectX::XMConvertToRadians(degrees.y);
+		radians.z = DirectX::XMConvertToRadians(degrees.z);
+
+		return RadiansToQuaternion(radians);
+	}
+
 	DirectX::XMFLOAT3 Math::QuaternionToRadians(const DirectX::XMFLOAT4& quaternion)
 	{
 		auto quat = DirectX::XMQuaternionNormalize(DirectX::XMLoadFloat4(&quaternion));
@@ -67,5 +77,16 @@ namespace Dive
 		float roll = std::atan2(2.0f * (qw * qx - qy * qz), 1.0f - 2.0f * (qx * qx + qz * qz));
 
 		return { pitch, yaw, roll };
+	}
+
+	DirectX::XMFLOAT4 Math::RadiansToQuaternion(const DirectX::XMFLOAT3& radians)
+	{
+		auto rotation = DirectX::XMQuaternionRotationRollPitchYaw(radians.x, radians.y, radians.z);
+		rotation = DirectX::XMQuaternionNormalize(rotation);
+
+		DirectX::XMFLOAT4 quaternion;
+		DirectX::XMStoreFloat4(&quaternion, rotation);
+
+		return quaternion;
 	}
 }

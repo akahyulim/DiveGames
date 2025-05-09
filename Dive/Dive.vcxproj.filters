@@ -125,8 +125,11 @@
     <ClInclude Include="src\transforms\Transforms.h" />
     <ClInclude Include="src\world\WorldSerializer.h" />
     <ClInclude Include="src\rendering\Camera.h" />
-    <ClInclude Include="src\transforms\DvTransforms.h" />
     <ClInclude Include="src\world\Entity.h" />
+    <ClInclude Include="src\systems\TransformSystem.h" />
+    <ClInclude Include="src\world\EntityManager.h" />
+    <ClInclude Include="src\world\DvWorld.h" />
+    <ClInclude Include="src\systems\SystemBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -217,7 +220,9 @@
     <ClCompile Include="src\transforms\Transforms.cpp" />
     <ClCompile Include="src\world\WorldSerializer.cpp" />
     <ClCompile Include="src\rendering\Camera.cpp" />
-    <ClCompile Include="src\transforms\DvTransforms.cpp" />
     <ClCompile Include="src\world\Entity.cpp" />
+    <ClCompile Include="src\systems\TransformSystem.cpp" />
+    <ClCompile Include="src\world\EntityManager.cpp" />
+    <ClCompile Include="src\world\DvWorld.cpp" />
   </ItemGroup>
 </Project>

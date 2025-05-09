@@ -2,10 +2,11 @@
 #include "core/UUID.h"
 #include "graphics/RenderTexture.h"
 #include <DirectXMath.h>
+#include <entt/entt.hpp>
 
 namespace Dive
 {
-	class Entity;
+	//class Entity;
 
 	struct IDComponent
 	{
@@ -61,12 +62,28 @@ namespace Dive
 		DirectX::XMFLOAT4 Rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 		DirectX::XMFLOAT3 Scale = { 1.0f, 1.0f, 1.0f };
 
-		Entity* Parent = nullptr;
-		std::vector<Entity*> Children;
-
 		DirectX::XMFLOAT4X4 WorldMatrix{};
 
 		bool Dirty = true;
+	};
+
+	struct DvTransformComponent
+	{
+		DirectX::XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT4 Rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
+		DirectX::XMFLOAT3 Scale = { 1.0f, 1.0f, 1.0f };
+
+		DirectX::XMFLOAT4X4 LocalToWorld{
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f
+		};
+	};
+
+	struct ParentComponent
+	{
+		entt::entity Parent{};
 	};
 
 	struct CameraComponent
