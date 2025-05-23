@@ -44,8 +44,6 @@ namespace Dive
 
 		std::shared_ptr<MenuBar> m_MenuBar;
 		std::vector<std::shared_ptr<View>> m_Widgets;
-
-		Dive::Project* m_pActiveProject;
 	};
 
 	template <typename T, typename std::enable_if<std::is_base_of<View, T>::value>::type*>

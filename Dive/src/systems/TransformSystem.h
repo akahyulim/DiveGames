@@ -1,16 +1,25 @@
-#pragma once
+﻿#pragma once
 #include "SystemBase.h"
 
 namespace Dive
 {
-	class DvWorld;
+	class World;
 
-	class TransformSystem : public SystemBase
+	class ParentSystem : public SystemBase
 	{
 	public:
-		TransformSystem(DvWorld* world);
-		~TransformSystem() = default;
+		ParentSystem(World* world) : SystemBase(world) {}
+		~ParentSystem() = default;
 
-		void OnUpdate() override;		
+		void OnUpdate() override;
+	};
+
+	class LocalToWorldSystem : public SystemBase
+	{
+	public:
+		LocalToWorldSystem(World* world) : SystemBase(world) {}
+		~LocalToWorldSystem() = default;
+
+		void OnUpdate() override;
 	};
 }

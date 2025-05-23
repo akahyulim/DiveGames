@@ -5,7 +5,6 @@
 #include "Views/HierarchyView.h"
 #include "Views/InspectorView.h"
 #include "Views/LogView.h"
-#include "Views/ProjectView.h"
 
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
@@ -43,7 +42,6 @@ namespace Dive
 {
 	// main으로부터 argc를 받아 추린 후 엔진에 전달한다.
 	Editor::Editor()
-		: m_pActiveProject(nullptr)
 	{
 		// 이것도 argc에 포함시켜 엔진 초기화과정에 편입시키는 게 맞다.
 		LogManager::SetFilename("dive_editor.log");
@@ -113,11 +111,10 @@ namespace Dive
 
 		// create widgets
 		m_Widgets.emplace_back(std::make_shared<WorldView>(this));
-		//m_Widgets.emplace_back(std::make_shared<GameView>(this));
+		m_Widgets.emplace_back(std::make_shared<GameView>(this));
 		m_Widgets.emplace_back(std::make_shared<HierarchyView>(this));
 		m_Widgets.emplace_back(std::make_shared<InspectorView>(this));
 		//m_Widgets.emplace_back(std::make_shared<LogView>(this));
-		//m_Widgets.emplace_back(std::make_shared<ProjectView>(this));
 		m_MenuBar = std::make_shared<MenuBar>(this);
 
 		SetTitle();

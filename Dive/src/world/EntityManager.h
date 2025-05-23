@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "core/UUID.h"
 #include "Components.h"
 
@@ -16,27 +16,25 @@ namespace Dive
 
 		entt::entity CreateEntity(const std::string& name = std::string());
 		entt::entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
-		void DestroyEntity(entt::entity entity);
+		void DeleteEntity(entt::entity entity);
 		
 		bool Exists(entt::entity entity);
 
 		entt::entity GetEntity(UUID uuid);
 		std::vector<entt::entity> GetEntities(const std::string& name);
 		std::vector<entt::entity> GetAllEntities();
+		
+		std::vector<entt::entity> GetRootEntities();
 
 		template<typename T, typename... Args>
 		T& AddComponent(entt::entity entity, Args&... args)
 		{
-			DV_ASSERT(Entity, !HasComponent<T>(entity));
-			T& component = m_Registry.emplace<T>(entity, std::forward<Args>(args)...);
-
-			return component;
+			return m_Registry.emplace<T>(entity, std::forward<Args>(args)...);
 		}
 
 		template<typename T>
 		void RemoveComponent(entt::entity entity)
 		{
-			DV_ASSERT(Entity, HasComponent<T>(entity));
 			m_Registry.remove<T>(entity);
 		}
 
@@ -44,12 +42,15 @@ namespace Dive
 		T& GetComponent(entt::entity entity)
 		{
 			DV_ASSERT(Entity, HasComponent<T>(entity));
+
 			return m_Registry.get<T>(entity);
 		}
 
 		template<typename T>
 		bool HasComponent(entt::entity entity)
 		{
+			DV_ASSERT(EntityManager, Exists(entity));
+
 			auto view = m_Registry.view<T>();
 			return view.contains(entity);
 		}
@@ -59,6 +60,9 @@ namespace Dive
 		{
 			return m_Registry.view<Components...>();
 		}
+
+		UUID GetUUID(entt::entity entity);
+		std::string GetName(entt::entity entity);
 
 	private:
 	private:

@@ -16,17 +16,11 @@
     <Filter Include="math">
       <UniqueIdentifier>{f9b53f88-8239-44c7-bea5-21c6b9fb6b39}</UniqueIdentifier>
     </Filter>
-    <Filter Include="input">
-      <UniqueIdentifier>{36179512-5066-4952-b95f-972928882c9e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="world">
       <UniqueIdentifier>{01dd24fd-4851-46b1-83d1-3a485fa9cae6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="world\Components">
-      <UniqueIdentifier>{6cf0627d-721d-41ba-b7e7-cdfb8cfa7e6d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="world\Components\NativeScript">
-      <UniqueIdentifier>{e5dd5fc8-4edf-4b31-87fa-39ac9b06d4e2}</UniqueIdentifier>
+    <Filter Include="systems">
+      <UniqueIdentifier>{e2e29c48-7bc4-4e38-94cc-da48eab50ba1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -83,9 +77,6 @@
     <ClInclude Include="src\rendering\Renderer.h">
       <Filter>rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\Input.h">
-      <Filter>input</Filter>
-    </ClInclude>
     <ClInclude Include="src\core\Engine.h">
       <Filter>core</Filter>
     </ClInclude>
@@ -122,14 +113,21 @@
     <ClInclude Include="src\world\World.h">
       <Filter>world</Filter>
     </ClInclude>
-    <ClInclude Include="src\transforms\Transforms.h" />
-    <ClInclude Include="src\world\WorldSerializer.h" />
-    <ClInclude Include="src\rendering\Camera.h" />
-    <ClInclude Include="src\world\Entity.h" />
-    <ClInclude Include="src\systems\TransformSystem.h" />
-    <ClInclude Include="src\world\EntityManager.h" />
-    <ClInclude Include="src\world\DvWorld.h" />
-    <ClInclude Include="src\systems\SystemBase.h" />
+    <ClInclude Include="src\world\EntityManager.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\WorldSerializer.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\SystemBase.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\TransformSystem.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Input.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -181,9 +179,6 @@
     <ClCompile Include="src\rendering\Renderer.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\Input.cpp">
-      <Filter>input</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\Engine.cpp">
       <Filter>core</Filter>
     </ClCompile>
@@ -217,12 +212,20 @@
     <ClCompile Include="src\world\World.cpp">
       <Filter>world</Filter>
     </ClCompile>
-    <ClCompile Include="src\transforms\Transforms.cpp" />
-    <ClCompile Include="src\world\WorldSerializer.cpp" />
-    <ClCompile Include="src\rendering\Camera.cpp" />
-    <ClCompile Include="src\world\Entity.cpp" />
-    <ClCompile Include="src\systems\TransformSystem.cpp" />
-    <ClCompile Include="src\world\EntityManager.cpp" />
-    <ClCompile Include="src\world\DvWorld.cpp" />
+    <ClCompile Include="src\world\Components.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\EntityManager.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\WorldSerializer.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\TransformSystem.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Input.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

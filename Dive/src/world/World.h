@@ -1,51 +1,43 @@
-﻿#pragma once
-#include "core/UUID.h"
-#include <entt/entt.hpp>
+#pragma once
+#include "EntityManager.h"
+#include "systems/TransformSystem.h"
 
 namespace Dive
 {
-	struct TransformComponent;
-	class Entity;
+	//class SystemBase;
 
 	class World
 	{
 	public:
-		World(const std::string& name = std::string());
-		~World();
+		World(const std::string& name);
+		virtual ~World();
 
 		void Clear();
 
-		void EditorTick(float deltaTime);
-		void RuntimeTick(float deltaTime);
-
-		Entity CreateEntity(const std::string& name = std::string());
-		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
-		void RemoveEntity(Entity entity);
-
-		Entity GetEntityByName(const std::string& name);
-		Entity GetEntityByUUID(UUID uuid);
-
-		std::vector<Entity> GetAllEntities();
+		void Update();
 
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
-		
-		template<typename... Components>
-		auto GetAllEntitiesWith()
+
+		EntityManager& GetEntityManager() { return m_EntityManager; }
+
+		template<typename T>
+		T* GetOrAddSystem() 
 		{
-			return m_Registry.view<Components...>();
+			for (auto system : m_Systems) 
+			{
+				if (auto castedSystem = dynamic_cast<T*>(system)) 
+					return castedSystem;
+			}
+
+			T* newSystem = new T(this);
+			m_Systems.emplace_back(newSystem);
+			return newSystem;
 		}
 
 	private:
-	private:
-		std::string m_Name;
-
-		entt::registry m_Registry;
-		std::unordered_map<UUID, entt::entity> m_Entities;
-	
-		bool m_Dirty = true;
-
-		friend class WorldSerializer;
-		friend class Entity;
+		std::string m_Name{};
+		EntityManager m_EntityManager;
+		std::vector<SystemBase*> m_Systems;
 	};
 }

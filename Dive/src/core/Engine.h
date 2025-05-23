@@ -25,8 +25,8 @@ namespace Dive
 
 		static UINT64 GetFrameCount() { return s_FrameCount; }
 
-		static std::shared_ptr<World> GenerateWorld(const std::string& name = "NewWorld");
-		static std::shared_ptr<World> GetActiveWorld() { return s_ActiveWorld; }
+		static World* CreateWorld(const std::string& name = "NewWorld");
+		static World* GetWorld() { return s_World; }
 
 	private:
 		static double s_ElapsedTimeMS;
@@ -36,6 +36,7 @@ namespace Dive
 		static UINT64 s_FrameCount;
 
 		// 일단 멤버 변수로 관리하자.
-		static std::shared_ptr<World> s_ActiveWorld;
+		static World* s_World;
+
 	};
 }

@@ -1,10 +1,10 @@
 ﻿#include "stdafx.h"
 #include "WorldSerializer.h"
 #include "World.h"
-#include "Entity.h"
+#include "EntityManager.h"
 #include "Components.h"
-#include "transforms/Transforms.h"
 #include "core/CoreDefs.h"
+
 #include <yaml-cpp/yaml.h>
 
 namespace YAML
@@ -122,81 +122,70 @@ namespace Dive
 		return out;
 	}
 
-	static void SerializeEntity(YAML::Emitter& out, Entity entity)
-	{
-		out << YAML::BeginMap;
-		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
-
-		if (entity.HasComponent<NameComponent>())
-		{
-			out << YAML::Key << "NameComponent";
-			out << YAML::BeginMap;
-
-			auto& name = entity.GetComponent<NameComponent>().Name;
-			out << YAML::Key << "Name" << YAML::Value << name;
-			out << YAML::EndMap;
-		}
-
-		if (entity.HasComponent<ActiveComponent>())
-		{
-			out << YAML::Key << "ActiveComponent";
-			out << YAML::BeginMap;
-
-			auto& active = entity.GetComponent<ActiveComponent>().IsActive;
-			out << YAML::Key << "IsActive" << YAML::Value << active;
-			out << YAML::EndMap;
-		}
-
-		if (entity.HasComponent<TransformComponent>())
-		{
-			out << YAML::Key << "TransformComponent";
-			out << YAML::BeginMap;
-
-			auto& tc = entity.GetComponent<TransformComponent>();
-			out << YAML::Key << "Position" << YAML::Value << tc.Position;
-			out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
-			out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
-			out << YAML::EndMap;
-		}
-
-		if (Transforms::HasParent(entity))
-		{
-			out << YAML::Key << "Hierarchy";
-			out << YAML::BeginMap;
-
-			auto parentID = Transforms::GetParent(entity).GetUUID();
-			out << YAML::Key << "ParentID" << YAML::Value << parentID;
-			out << YAML::EndMap;
-		}
-
-		out << YAML::EndMap;
-
-		// 역직렬화 과정에서 생성 순서가 중요해 이렇게 해놓았다.
-		// 차라리 역직렬화 과정에서 생성과 계층구조 설정 부분을 분리하는 게 낫지 않을까?
-		if (Transforms::HasChildren(entity))
-		{
-			for (auto& child : Transforms::GetChildren(entity))
-			{
-				SerializeEntity(out, child);
-			}
-		}
-	}
-
-	WorldSerializer::WorldSerializer(const std::shared_ptr<World> world)
+	WorldSerializer::WorldSerializer(World* world)
 		: m_World(world)
 	{
 	}
 
 	void WorldSerializer::Serialize(const std::filesystem::path& filepath)
 	{
+		auto& entityManager = m_World->GetEntityManager();
+
 		YAML::Emitter out;
 		out << YAML::BeginMap;
-		out << YAML::Key << "World" << YAML::Value << m_World->m_Name;
+		out << YAML::Key << "World" << YAML::Value << m_World->GetName();
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
-		
-		for(auto& entity : Transforms::GetRootNodes(m_World->GetAllEntities()))
+
+		for (auto& entity : entityManager.GetAllEntities())
 		{
-			SerializeEntity(out, entity);
+			out << YAML::BeginMap;
+
+			if (entityManager.HasComponent<IDComponent>(entity))
+			{
+				out << YAML::Key << "Entity" << YAML::Value << entityManager.GetComponent<IDComponent>(entity).ID;
+			}
+
+			if (entityManager.HasComponent<NameComponent>(entity))
+			{
+				out << YAML::Key << "NameComponent";
+				out << YAML::BeginMap;
+
+				out << YAML::Key << "Name" << YAML::Value << entityManager.GetComponent<NameComponent>(entity).Name;
+				out << YAML::EndMap;
+			}
+
+			if (entityManager.HasComponent<ActiveComponent>(entity))
+			{
+				out << YAML::Key << "ActiveComponent";
+				out << YAML::BeginMap;
+
+				out << YAML::Key << "IsActive" << YAML::Value << entityManager.GetComponent<ActiveComponent>(entity).IsActive;
+				out << YAML::EndMap;
+			}
+
+			if (entityManager.HasComponent<LocalTransform>(entity))
+			{
+				out << YAML::Key << "LocalTransform";
+				out << YAML::BeginMap;
+
+				auto& tc = entityManager.GetComponent<LocalTransform>(entity);
+				out << YAML::Key << "Position" << YAML::Value << tc.Position;
+				out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
+				out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
+				out << YAML::EndMap;
+			}
+
+			if (entityManager.HasComponent<ParentComponent>(entity))
+			{
+				out << YAML::Key << "ParentComponent";
+				out << YAML::BeginMap;
+
+				auto parent = entityManager.GetComponent<ParentComponent>(entity).Parent;
+				out << YAML::Key << "Parent" << YAML::Value << entityManager.GetUUID(parent);
+				out << YAML::EndMap;
+			}
+
+			out << YAML::EndMap;
 		}
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
@@ -204,57 +193,64 @@ namespace Dive
 		std::ofstream fout(filepath);
 		fout << out.c_str();
 	}
-	
+
 	bool WorldSerializer::Deserialize(const std::filesystem::path& filepath)
 	{
+		auto& entityManager = m_World->GetEntityManager();
 		YAML::Node data;
-		try
-		{
-			data = YAML::LoadFile(filepath.string());
-		}
+
+		try { data = YAML::LoadFile(filepath.string()); }
 		catch (YAML::ParserException& e)
 		{
 			DV_LOG(WorldSerializer, warn, "YAML 파일 파싱 실패: '{0}'\n {1}", filepath.string().c_str(), e.what());
 			return false;
 		}
 
-		if (!data["World"])
-			return false;
+		if (!data["World"]) return false;
 
 		std::string worldName = data["World"].as<std::string>();
-		m_World->m_Name = worldName;
+		m_World->SetName(worldName);
 		DV_LOG(WorldSerializer, trace, "Deserializing World '{0}'", worldName);
 
+		std::unordered_map<UUID, entt::entity> entityMap;
 		auto entities = data["Entities"];
+
 		if (entities)
 		{
 			for (auto entity : entities)
 			{
 				UINT64 uuid = entity["Entity"].as<UINT64>();
-
-				std::string name;
-				auto nameComponent = entity["NameComponent"];
-				if (nameComponent)
-					name = nameComponent["Name"].as<std::string>();
+				std::string name = entity["NameComponent"] ? entity["NameComponent"]["Name"].as<std::string>() : "";
 
 				DV_LOG(WorldSerializer, trace, "Deserializerd Entity with ID = {0}, name = {1}", uuid, name);
 
-				Entity deserializedEntity = m_World->CreateEntityWithUUID(uuid, name);
+				auto deserializedEntity = entityManager.CreateEntityWithUUID(uuid, name);
+				entityMap[uuid] = deserializedEntity;
 
-				auto transformComponent = entity["TransformComponent"];
-				if (transformComponent)
+				auto localTransform = entity["LocalTransform"];
+				if (localTransform)
 				{
-					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
-					tc.Position = transformComponent["Position"].as<DirectX::XMFLOAT3>();
-					tc.Rotation = transformComponent["Rotation"].as<DirectX::XMFLOAT4>();
-					tc.Scale = transformComponent["Scale"].as<DirectX::XMFLOAT3>();
+					auto& tc = entityManager.AddComponent<LocalTransform>(deserializedEntity);
+					tc.Position = localTransform["Position"].as<DirectX::XMFLOAT3>();
+					tc.Rotation = localTransform["Rotation"].as<DirectX::XMFLOAT4>();
+					tc.Scale = localTransform["Scale"].as<DirectX::XMFLOAT3>();
 				}
+			}
 
-				auto hierarchy = entity["Hierarchy"];
-				if (hierarchy)
+			for (auto entity : entities)
+			{
+				auto parentComponent = entity["ParentComponent"];
+				if (parentComponent)
 				{
-					UINT64 parentID = hierarchy["ParentID"].as<UINT64>();
-					Transforms::SetParent(deserializedEntity, m_World->GetEntityByUUID(parentID));
+					UINT64 uuid = entity["Entity"].as<UINT64>();
+					UINT64 parentUUID = parentComponent["Parent"].as<UINT64>();
+
+					if (entityMap.count(uuid) && entityMap.count(parentUUID))
+					{
+						auto deserializedEntity = entityMap[uuid];
+						auto& pc = entityManager.AddComponent<ParentComponent>(deserializedEntity);
+						pc.Parent = entityMap[parentUUID];
+					}
 				}
 			}
 		}

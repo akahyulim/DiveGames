@@ -34,34 +34,30 @@ namespace Dive
 
 				if (ImGui::MenuItem("New World"))
 				{
-					// world
-					auto world = Engine::GenerateWorld();
+					auto world = Engine::CreateWorld();
+					world->GetOrAddSystem<ParentSystem>();
+					world->GetOrAddSystem<LocalToWorldSystem>();
 
-					// editor camera
-					auto editorCamera = world->CreateEntity("EditorCamera");
-					auto& cc = editorCamera.AddComponent<CameraComponent>();
-					cc.RenderTarget = new RenderTexture(1, 1);
-					editorCamera.GetComponent<TagComponent>().Tag = eTag::EditorOnly;
+					// 추후 에디터 카메라 추가
 
 					isShowWorldMenu = true;
 				}
 				if (ImGui::MenuItem("Open World"))
 				{
-					// world
-					auto world = Engine::GenerateWorld();
+					auto world = Engine::CreateWorld();
+					world->GetOrAddSystem<ParentSystem>();
+					world->GetOrAddSystem<LocalToWorldSystem>();
+
 					WorldSerializer serializer(world);
 					serializer.Deserialize("NewWorld.dive");
-
-					// editor camera
-					auto editorCamera = world->CreateEntity("EditorCamera");
-					editorCamera.AddComponent<CameraComponent>();
-					editorCamera.GetComponent<TagComponent>().Tag = eTag::EditorOnly;
+					
+					// 역시 에디터 카메라 추가?
 
 					isShowWorldMenu = true;
 				}
 				if (ImGui::MenuItem("Save World", nullptr, nullptr, isShowWorldMenu))
 				{
-					WorldSerializer serializer(Engine::GetActiveWorld());
+					WorldSerializer serializer(Engine::GetWorld());
 					serializer.Serialize("NewWorld.dive");
 				}
 
@@ -89,7 +85,11 @@ namespace Dive
 			{
 				if (ImGui::MenuItem("Create Empty", nullptr, nullptr, isShowWorldMenu))
 				{
-					Engine::GetActiveWorld()->CreateEntity("Entity");
+					auto& entityManager = Engine::GetWorld()->GetEntityManager();
+					auto empty = entityManager.CreateEntity("Entity");
+					entityManager.AddComponent<ActiveComponent>(empty).IsActive = true;
+					entityManager.AddComponent<LocalTransform>(empty);
+
 				}
 				if (ImGui::BeginMenu("3D Object"))
 				{

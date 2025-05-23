@@ -31,7 +31,7 @@ namespace Dive
 		DV_ASSERT(Input, hWnd);
  
 		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&s_DirectInput, nullptr))) {
-			DV_LOG(Input, err, "Input 초기화 과정 중 DirectDvInput 객체 생성에 실패하였습니다.");
+			DV_LOG(Input, err, "Input 초기화 과정 중 DirectInput 객체 생성에 실패하였습니다.");
 			return;
 		}
 

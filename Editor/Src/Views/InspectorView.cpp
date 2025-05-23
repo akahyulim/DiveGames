@@ -1,6 +1,5 @@
 ﻿#include "InspectorView.h"
 #include "imgui_internal.h"
-//#include "imgui_stdlib.h""
 
 namespace Dive
 {
@@ -71,12 +70,14 @@ namespace Dive
 	}
 
 	template<typename T, typename UIFunction>
-	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
+	static void DrawComponent(const std::string& name, entt::entity entity, UIFunction uiFunction)
 	{
+		auto& entityManager = Engine::GetWorld()->GetEntityManager();
+
 		const ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
-		if (entity.HasComponent<T>())
+		if (entityManager.HasComponent<T>(entity))
 		{
-			auto& component = entity.GetComponent<T>();
+			auto& component = entityManager.GetComponent<T>(entity);
 			ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
 			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{ 4, 4 });
@@ -107,7 +108,7 @@ namespace Dive
 			}
 
 			if (removeComponent)
-				entity.RemoveComponent<T>();
+				entityManager.RemoveComponent<T>(entity);
 		}
 	}
 
@@ -123,17 +124,19 @@ namespace Dive
 	
 	void InspectorView::drawView()
 	{
-		if (m_SelectedNode == Entity{})
+		if (m_SelectedNode == entt::null)
 			return;
 
 		drawComponents(m_SelectedNode);
 	}
 
-	void InspectorView::drawComponents(Entity entity)
+	void InspectorView::drawComponents(entt::entity entity)
 	{	
-		if (entity.HasComponent<NameComponent>())
+		auto& entityManager = Engine::GetWorld()->GetEntityManager();
+
+		if (entityManager.HasComponent<NameComponent>(entity))
 		{
-			auto& name = entity.GetComponent<NameComponent>().Name;
+			auto& name = entityManager.GetComponent<NameComponent>(entity).Name;
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
@@ -144,23 +147,46 @@ namespace Dive
 			}
 		}
 
-		// 1. 인터페이스가 중구난방
-		// 2. tc가 초기화된 값이다. => 아무래도 역직렬화 과정에서 발생한 문제인 듯하다.
-		if (entity.HasComponent<TransformComponent>())
+		if (entityManager.HasComponent<LocalTransform>(entity))
 		{
-			auto& tc = entity.GetComponent<TransformComponent>();
-			
-			auto& position = tc.Position;
-			DrawVec3Control("Position", position);
-			Transforms::SetLocalPosition(entity, position);
-			
-			DirectX::XMFLOAT3 rotation = Transforms::GetLocalRotationDegrees(entity);
-			DrawVec3Control("Rotation", rotation);
-			Transforms::SetLocaldRotationDegrees(entity, rotation);
+			auto& localToWorld = entityManager.GetComponent<LocalToWorld>(entity);
 
-			auto& scale = tc.Scale;
-			DrawVec3Control("Scale", scale, 1.0f);
-			Transforms::SetLocalScale(entity, scale);
+			auto position = Math::GetPositionFromTransform(localToWorld.Value);
+			DrawVec3Control("Position", position);
+
+			auto rotation = Math::QuaternionToDegrees(Math::GetRotationFromTransform(localToWorld.Value)); 
+			DrawVec3Control("Rotation", rotation);
+
+			auto scale = Math::GetScaleFromTransform(localToWorld.Value);
+			DrawVec3Control("Scale", scale, 1.0f);	
+
+			if (entityManager.HasComponent<ParentComponent>(entity))
+			{
+				auto parent = entityManager.GetComponent<ParentComponent>(entity).Parent;
+				auto& parentLocalToWorld = entityManager.GetComponent<LocalToWorld>(parent);
+
+				auto parentPosition = Math::GetPositionFromTransform(parentLocalToWorld.Value);
+				DirectX::XMMATRIX inverseTranslation = DirectX::XMMatrixTranslation(-parentPosition.x, -parentPosition.y, -parentPosition.z);
+				auto localPosition = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&position), inverseTranslation);
+				DirectX::XMStoreFloat3(&position, localPosition);
+
+				auto parentRotation = Math::GetRotationFromTransform(parentLocalToWorld.Value);
+				DirectX::XMVECTOR inverseRotation = DirectX::XMQuaternionInverse(DirectX::XMLoadFloat4(&parentRotation));
+				DirectX::XMFLOAT4 localRotationQuaternion = Math::DegreesToQuaternion(rotation);
+				DirectX::XMVECTOR localRotation = DirectX::XMQuaternionMultiply(DirectX::XMLoadFloat4(&localRotationQuaternion), inverseRotation);
+				DirectX::XMStoreFloat4(&localRotationQuaternion, localRotation);
+				rotation = Math::QuaternionToDegrees(localRotationQuaternion);
+
+				auto parentScale = Math::GetScaleFromTransform(parentLocalToWorld.Value);
+				DirectX::XMMATRIX inverseScale = DirectX::XMMatrixScaling(1.0f / parentScale.x, 1.0f / parentScale.y, 1.0f / parentScale.z);
+				auto localScale = DirectX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&scale), inverseScale);
+				DirectX::XMStoreFloat3(&scale, localScale);
+			}
+
+			auto& localTransform = entityManager.GetComponent<LocalTransform>(entity);
+			localTransform.Position = position;
+			localTransform.Rotation = Math::DegreesToQuaternion(rotation);
+			localTransform.Scale = scale;
 		}
 
 		if (ImGui::Button("Add Component"))

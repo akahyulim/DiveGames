@@ -3,9 +3,9 @@
 #include "CoreDefs.h"
 #include "Window.h"
 #include "Input.h"
-#include "transforms/Transforms.h"
 #include "graphics/Graphics.h"
 #include "rendering/Renderer.h"
+#include "systems/TransformSystem.h"
 #include "world/World.h"
 
 namespace Dive
@@ -15,13 +15,13 @@ namespace Dive
 	std::chrono::steady_clock::time_point Engine::s_LastTickTime;
 	UINT16 Engine::s_Fps = 0;
 	UINT64 Engine::s_FrameCount = 0;
-	std::shared_ptr<World> Engine::s_ActiveWorld;
+	World* Engine::s_World = nullptr;
 
 	// sprtan은 editor로부터 args를 받는다.
 	void Engine::Initialize()
 	{
 		Window::Initialize();
-		Transforms::Initialize();
+		//Transforms::Initialize();
 		Graphics::Initialize();
 		Renderer::Initialize();
 		Input::Initialize();
@@ -34,7 +34,7 @@ namespace Dive
 		Input::Shutdown();
 		Renderer::Shutdown();
 		Graphics::Shutdown();
-		Transforms::Shutdown();
+		//Transforms::Shutdown();
 		Window::Shutdown();
 		LogManager::Shutdown();
 	}
@@ -56,18 +56,19 @@ namespace Dive
 			lastTimeMS = s_ElapsedTimeMS;
 		}
 
-		if (s_ActiveWorld)
+		if (s_World)
 		{
-			// 결국 엔진에서 Editor와 Runtime을 구분해야 한다.
-			s_ActiveWorld->EditorTick(s_DeltaTimeMS);
+			s_World->Update();
 		}
 
 		s_FrameCount++;
 	}
 
-	std::shared_ptr<World> Engine::GenerateWorld(const std::string& name)
+	World* Engine::CreateWorld(const std::string& name)
 	{
-		s_ActiveWorld = std::make_shared<World>(name);
-		return s_ActiveWorld;
+		DV_DELETE(s_World);
+	
+		s_World = new World(name);
+		return s_World;
 	}
 }

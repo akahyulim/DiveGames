@@ -30,22 +30,23 @@
 #include "math/Frustum.h"
 #include "math/BoundingBox.h"
 
-// transforms
-#include "transforms/transforms.h"
-
 // rendering
 #include "rendering/Mesh.h"
 #include "rendering/Model.h"
 #include "rendering/ModelFactory.h"
 #include "rendering/Renderer.h"
-#include "rendering/Camera.h"
+//#include "rendering/Camera.h"
 
 // resource
 #include "resource/Resource.h"
 #include "resource/ResourceManager.h"
 
+// systems
+#include "systems/SystemBase.h"
+#include "systems/TransformSystem.h"
+
 // world
-#include "world/World.h"
-#include "world/Entity.h"
 #include "world/Components.h"
+#include "world/World.h"
 #include "world/WorldSerializer.h"
+#include "world/EntityManager.h"

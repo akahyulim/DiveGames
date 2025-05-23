@@ -11,16 +11,16 @@ namespace Dive
 
 		void drawView() override;
 
-		void SetSelectedNode(Entity node) { m_SelectedNode = node; }
+		void SetSelectedNode(entt::entity node) { m_SelectedNode = node; }
 
 	private:
-		void drawComponents(Entity entity);
+		void drawComponents(entt::entity entity);
 
 		template<typename T>
 		void displayAddComponentEntry(const std::string& entryName);
 
 	private:
-		Entity m_SelectedNode;
+		entt::entity m_SelectedNode = entt::null;
 	};
 
 	template<typename T>

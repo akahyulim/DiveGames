@@ -26,7 +26,7 @@ namespace Dive
 	{
 		if (index > 5) 
 		{
-			DV_LOG(DvCubmap, err, "잘못된 Face 인덱스({:d})를 전달받았습니다.", index);
+			DV_LOG(Cubemap, err, "잘못된 Face 인덱스({:d})를 전달받았습니다.", index);
 			return;
 		}
 

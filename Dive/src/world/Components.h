@@ -1,13 +1,12 @@
 #pragma once
 #include "core/UUID.h"
 #include "graphics/RenderTexture.h"
+
 #include <DirectXMath.h>
 #include <entt/entt.hpp>
 
 namespace Dive
 {
-	//class Entity;
-
 	struct IDComponent
 	{
 		UUID ID = 0;
@@ -56,24 +55,29 @@ namespace Dive
 		ActiveComponent(bool active) : IsActive(active) {}
 	};
 
-	struct TransformComponent
+	struct LocalTransform
 	{
 		DirectX::XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT4 Rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
 		DirectX::XMFLOAT3 Scale = { 1.0f, 1.0f, 1.0f };
 
-		DirectX::XMFLOAT4X4 WorldMatrix{};
+		void FromMatrix(const DirectX::XMFLOAT4X4& matrix);
 
-		bool Dirty = true;
+		void Translate(const DirectX::XMFLOAT3& translation);
+
+		void Rotate(const DirectX::XMFLOAT4& quaternion);
+		void RotateX(float angle);
+		void RotateY(float angle);
+		void RotateZ(float angle);
+
+		DirectX::XMFLOAT3 Forward() const;
+		DirectX::XMFLOAT3 Up() const;
+		DirectX::XMFLOAT3 Right() const;
 	};
 
-	struct DvTransformComponent
+	struct LocalToWorld
 	{
-		DirectX::XMFLOAT3 Position = { 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT4 Rotation = { 0.0f, 0.0f, 0.0f, 1.0f };
-		DirectX::XMFLOAT3 Scale = { 1.0f, 1.0f, 1.0f };
-
-		DirectX::XMFLOAT4X4 LocalToWorld{
+		DirectX::XMFLOAT4X4 Value = {
 			1.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
@@ -83,7 +87,12 @@ namespace Dive
 
 	struct ParentComponent
 	{
-		entt::entity Parent{};
+		entt::entity Parent = entt::null;
+	};
+
+	struct Children
+	{
+		std::vector<entt::entity> entities;
 	};
 
 	struct CameraComponent

@@ -1,14 +1,16 @@
-#pragma once
+﻿#pragma once
 
 namespace Dive
 {
-	class DvWorld;
+	class World;
 
 	class SystemBase
 	{
 	public:
-		SystemBase(DvWorld* world) : m_World(world) {}
+		SystemBase(World* world) : m_World(world) {}
 		virtual ~SystemBase() = default;
+
+		void SetActiveWorld(World* world) { m_World = world; }
 
 		virtual void OnCreate() {}
 		virtual void OnStartRunning() {}
@@ -17,6 +19,7 @@ namespace Dive
 		virtual void OnDestroy() {}
 
 	protected:
-		DvWorld* m_World = nullptr;
+		// static으로 관리해도 될 듯하다.
+		World* m_World = nullptr;
 	};
 }

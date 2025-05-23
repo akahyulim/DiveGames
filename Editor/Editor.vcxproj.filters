@@ -21,9 +21,6 @@
     <ClCompile Include="Src\Views\InspectorView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Views\ProjectView.cpp">
-      <Filter>Views</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Views\View.cpp">
       <Filter>Views</Filter>
     </ClCompile>
@@ -69,9 +66,6 @@
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="Src\Views\InspectorView.h">
-      <Filter>Views</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Views\ProjectView.h">
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="Src\Views\View.h">

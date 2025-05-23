@@ -158,7 +158,6 @@
     <ClCompile Include="Src\Views\HierarchyView.cpp" />
     <ClCompile Include="Src\Views\InspectorView.cpp" />
     <ClCompile Include="Src\Views\LogView.cpp" />
-    <ClCompile Include="Src\Views\ProjectView.cpp" />
     <ClCompile Include="Src\Views\View.cpp" />
     <ClCompile Include="Src\Views\WorldView.cpp" />
     <ClCompile Include="Third-Party\imgui\backends\imgui_impl_dx11.cpp" />
@@ -177,7 +176,6 @@
     <ClInclude Include="Src\Views\HierarchyView.h" />
     <ClInclude Include="Src\Views\InspectorView.h" />
     <ClInclude Include="Src\Views\LogView.h" />
-    <ClInclude Include="Src\Views\ProjectView.h" />
     <ClInclude Include="Src\Views\View.h" />
     <ClInclude Include="Src\Views\WorldView.h" />
     <ClInclude Include="Third-Party\imgui\backends\imgui_impl_dx11.h" />
