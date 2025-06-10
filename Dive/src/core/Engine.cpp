@@ -4,9 +4,9 @@
 #include "Window.h"
 #include "Input.h"
 #include "graphics/Graphics.h"
-#include "rendering/Renderer.h"
-#include "systems/TransformSystem.h"
+#include "rendering/RenderingPipeline.h"
 #include "world/World.h"
+#include "resource/ResourceManager.h"
 
 namespace Dive
 {
@@ -21,9 +21,8 @@ namespace Dive
 	void Engine::Initialize()
 	{
 		Window::Initialize();
-		//Transforms::Initialize();
 		Graphics::Initialize();
-		Renderer::Initialize();
+		RenderingPipeline::Initialize();
 		Input::Initialize();
 
 		s_LastTickTime = std::chrono::steady_clock::now();
@@ -31,10 +30,10 @@ namespace Dive
 
 	void Engine::Shutdown()
 	{
+		ResourceManager::Clear();
 		Input::Shutdown();
-		Renderer::Shutdown();
+		RenderingPipeline::Shutdown();
 		Graphics::Shutdown();
-		//Transforms::Shutdown();
 		Window::Shutdown();
 		LogManager::Shutdown();
 	}

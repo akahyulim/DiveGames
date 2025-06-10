@@ -7,7 +7,6 @@
 namespace Dive
 {
 	Model::Model()
-		: m_RootGameObject(nullptr)
 	{
 	}
 

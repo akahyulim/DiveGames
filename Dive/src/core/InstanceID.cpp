@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "UUID.h"
+#include "InstanceID.h"
 
 namespace Dive
 {
@@ -7,13 +7,13 @@ namespace Dive
 	static std::mt19937_64 s_Engine(s_RandomDevice());
 	static std::uniform_int_distribution<UINT64> s_UniformDistribution;
 
-	UUID::UUID()
-		: m_UUID(s_UniformDistribution(s_Engine))
+	InstanceID::InstanceID()
+		: m_InstanceID(s_UniformDistribution(s_Engine))
 	{
 	}
 
-	UUID::UUID(UINT64 uuid)
-		: m_UUID(uuid)
+	InstanceID::InstanceID(UINT64 instanceID)
+		: m_InstanceID(instanceID)
 	{
 	}
 }

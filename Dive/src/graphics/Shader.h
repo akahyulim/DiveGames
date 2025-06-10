@@ -33,7 +33,6 @@ namespace Dive
 		static std::vector<D3D11_INPUT_ELEMENT_DESC> GetInputElements(eInputLayout layout);
 	}
 
-	// Resource 상속을 제거했다.
 	class Shader
 	{
 	public:

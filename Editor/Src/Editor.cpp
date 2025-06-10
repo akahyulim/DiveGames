@@ -147,7 +147,7 @@ namespace Dive
 				endUI();
 			}
 
-			Renderer::Present();
+			Graphics::Present();
 		}
 	}
 
@@ -231,9 +231,9 @@ namespace Dive
 	{
 		ImGui::End();
 
-		auto renderTargetView = Graphics::GetRenderTargetView();
+		auto renderTargetView = Graphics::GetBackBufferRTV();
 		Graphics::GetDeviceContext()->OMSetRenderTargets(1, &renderTargetView, NULL);
-		Graphics::ClearRenderTargetView(Graphics::GetRenderTargetView(), { 0.1f, 0.1f, 0.1f, 0.0f });
+		Graphics::ClearRenderTargetView(Graphics::GetBackBufferRTV(), { 0.1f, 0.1f, 0.1f, 0.0f });
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

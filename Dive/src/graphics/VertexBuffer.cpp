@@ -24,7 +24,6 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, &subresourceData, &m_Buffer)))
 		{
-			DV_LOG(VerteBuffer, err, "VertexBuffer 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -39,11 +38,11 @@ namespace Dive
 		DV_RELEASE(m_Buffer);
 	}
 
-	std::shared_ptr<VertexBuffer> VertexBuffer::Generate(const void* data, UINT32 stride, UINT32 count)
+	VertexBuffer* VertexBuffer::Generate(const void* data, UINT32 stride, UINT32 count)
 	{
-		auto vertexBuffer = std::make_shared<VertexBuffer>();
+		auto vertexBuffer = new VertexBuffer();
 		if (!vertexBuffer->Create(data, stride, count))
-			return nullptr;
+			DV_DELETE(vertexBuffer);
 
 		return vertexBuffer;
 	}

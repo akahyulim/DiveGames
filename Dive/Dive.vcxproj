@@ -21,12 +21,11 @@
   <ItemGroup>
     <ClInclude Include="src\core\CoreDefs.h" />
     <ClInclude Include="src\core\Engine.h" />
-    <ClInclude Include="src\core\UUID.h" />
+    <ClInclude Include="src\core\InstanceID.h" />
     <ClInclude Include="src\core\Window.h" />
     <ClInclude Include="src\core\EventDispatcher.h" />
     <ClInclude Include="src\core\FileUtils.h" />
     <ClInclude Include="src\core\Log.h" />
-    <ClInclude Include="src\core\Object.h" />
     <ClInclude Include="src\core\StringUtils.h" />
     <ClInclude Include="src\dive.h" />
     <ClInclude Include="src\graphics\ConstantBuffer.h" />
@@ -42,13 +41,16 @@
     <ClInclude Include="src\math\BoundingBox.h" />
     <ClInclude Include="src\math\Frustum.h" />
     <ClInclude Include="src\math\Math.h" />
+    <ClInclude Include="src\rendering\Material.h" />
     <ClInclude Include="src\rendering\Mesh.h" />
-    <ClInclude Include="src\rendering\Model.h" />
-    <ClInclude Include="src\rendering\ModelFactory.h" />
-    <ClInclude Include="src\rendering\Renderer.h" />
+    <ClInclude Include="src\rendering\MeshFactory.h" />
+    <ClInclude Include="src\rendering\RenderingPipeline.h" />
+    <ClInclude Include="src\rendering\SkinnedMesh.h" />
+    <ClInclude Include="src\rendering\StaticMesh.h" />
     <ClInclude Include="src\resource\Resource.h" />
     <ClInclude Include="src\resource\ResourceManager.h" />
     <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\systems\RenderingSystem.h" />
     <ClInclude Include="src\systems\SystemBase.h" />
     <ClInclude Include="src\systems\TransformSystem.h" />
     <ClInclude Include="src\world\Components.h" />
@@ -58,12 +60,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\Engine.cpp" />
-    <ClCompile Include="src\core\UUID.cpp" />
+    <ClCompile Include="src\core\InstanceID.cpp" />
     <ClCompile Include="src\core\Window.cpp" />
     <ClCompile Include="src\core\EventDispatcher.cpp" />
     <ClCompile Include="src\core\FileUtils.cpp" />
     <ClCompile Include="src\core\Log.cpp" />
-    <ClCompile Include="src\core\Object.cpp" />
     <ClCompile Include="src\core\StringUtils.cpp" />
     <ClCompile Include="src\graphics\ConstantBuffer.cpp" />
     <ClCompile Include="src\graphics\Cubemap.cpp" />
@@ -78,15 +79,18 @@
     <ClCompile Include="src\math\BoundingBox.cpp" />
     <ClCompile Include="src\math\Frustum.cpp" />
     <ClCompile Include="src\math\Math.cpp" />
+    <ClCompile Include="src\rendering\Material.cpp" />
     <ClCompile Include="src\rendering\Mesh.cpp" />
-    <ClCompile Include="src\rendering\Model.cpp" />
-    <ClCompile Include="src\rendering\ModelFactory.cpp" />
-    <ClCompile Include="src\rendering\Renderer.cpp" />
+    <ClCompile Include="src\rendering\MeshFactory.cpp" />
+    <ClCompile Include="src\rendering\RenderingPipeline.cpp" />
+    <ClCompile Include="src\rendering\SkinnedMesh.cpp" />
+    <ClCompile Include="src\rendering\StaticMesh.cpp" />
     <ClCompile Include="src\resource\Resource.cpp" />
     <ClCompile Include="src\resource\ResourceManager.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\systems\RenderingSystem.cpp" />
     <ClCompile Include="src\systems\TransformSystem.cpp" />
     <ClCompile Include="src\world\Components.cpp" />
     <ClCompile Include="src\world\World.cpp" />

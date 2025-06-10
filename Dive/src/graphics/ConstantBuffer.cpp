@@ -46,7 +46,7 @@ namespace Dive
 			0,
 			&mappedData)))
 		{
-			DV_LOG(ConstantBuffer, err, "ConstantBuffer의 Map에 실패하였습니다.");
+			DV_LOG(ConstantBuffer, err, "ConstantBuffer의 Map에 실패");
 			return nullptr;
 		}
 

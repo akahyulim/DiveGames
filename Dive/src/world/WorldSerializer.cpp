@@ -181,7 +181,25 @@ namespace Dive
 				out << YAML::BeginMap;
 
 				auto parent = entityManager.GetComponent<ParentComponent>(entity).Parent;
-				out << YAML::Key << "Parent" << YAML::Value << entityManager.GetUUID(parent);
+				out << YAML::Key << "Parent" << YAML::Value << entityManager.GetInstanceID(parent);
+				out << YAML::EndMap;
+			}
+
+			if (entityManager.HasComponent<TagComponent>(entity))
+			{
+				out << YAML::Key << "TagComponent";
+				out << YAML::BeginMap;
+				out << YAML::Key << "Tag" << YAML::Value << static_cast<int>(entityManager.GetComponent<TagComponent>(entity).Tag);
+				out << YAML::EndMap;
+			}
+
+			if (entityManager.HasComponent<CameraComponent>(entity))
+			{
+				out << YAML::Key << "CameraComponent";
+				out << YAML::BeginMap;
+				auto& cameraCom = entityManager.GetComponent<CameraComponent>(entity);
+				out << YAML::Key << "Type" << YAML::Value << static_cast<int>(cameraCom.Type);
+				out << YAML::Key << "ClearColor" << YAML::Value << cameraCom.ClearColor;
 				out << YAML::EndMap;
 			}
 
@@ -212,44 +230,66 @@ namespace Dive
 		m_World->SetName(worldName);
 		DV_LOG(WorldSerializer, trace, "Deserializing World '{0}'", worldName);
 
-		std::unordered_map<UUID, entt::entity> entityMap;
+		std::unordered_map<InstanceID, entt::entity> entityMap;
 		auto entities = data["Entities"];
 
 		if (entities)
 		{
 			for (auto entity : entities)
 			{
-				UINT64 uuid = entity["Entity"].as<UINT64>();
+				UINT64 instanceID = entity["Entity"].as<UINT64>();
 				std::string name = entity["NameComponent"] ? entity["NameComponent"]["Name"].as<std::string>() : "";
 
-				DV_LOG(WorldSerializer, trace, "Deserializerd Entity with ID = {0}, name = {1}", uuid, name);
+				DV_LOG(WorldSerializer, trace, "Deserializerd Entity with ID = {0}, name = {1}", instanceID, name);
 
-				auto deserializedEntity = entityManager.CreateEntityWithUUID(uuid, name);
-				entityMap[uuid] = deserializedEntity;
+				auto deserializedEntity = entityManager.CreateEntityWithUUID(instanceID, name);
+				entityMap[instanceID] = deserializedEntity;
+
+				auto active = entity["ActiveComponent"];
+				if (active)
+				{
+					auto& activeCom = entityManager.AddComponent<ActiveComponent>(deserializedEntity);
+					activeCom.IsActive = active["IsActive"].as<bool>();
+				}
 
 				auto localTransform = entity["LocalTransform"];
 				if (localTransform)
 				{
-					auto& tc = entityManager.AddComponent<LocalTransform>(deserializedEntity);
-					tc.Position = localTransform["Position"].as<DirectX::XMFLOAT3>();
-					tc.Rotation = localTransform["Rotation"].as<DirectX::XMFLOAT4>();
-					tc.Scale = localTransform["Scale"].as<DirectX::XMFLOAT3>();
+					auto& localTransformCom = entityManager.AddComponent<LocalTransform>(deserializedEntity);
+					localTransformCom.Position = localTransform["Position"].as<DirectX::XMFLOAT3>();
+					localTransformCom.Rotation = localTransform["Rotation"].as<DirectX::XMFLOAT4>();
+					localTransformCom.Scale = localTransform["Scale"].as<DirectX::XMFLOAT3>();
+				}
+
+				auto tag = entity["TagComponent"];
+				if (tag)
+				{
+					auto& tagCom = entityManager.AddComponent<TagComponent>(deserializedEntity);
+					tagCom.Tag = static_cast<TagComponent::eTag>(tag["Tag"].as<int>());
+				}
+
+				auto camera = entity["CameraComponent"];
+				if (camera)
+				{
+					auto& cameraCom = entityManager.AddComponent<CameraComponent>(deserializedEntity);
+					cameraCom.Type = static_cast<CameraComponent::eProjectionType>(camera["Type"].as<int>());
+					cameraCom.ClearColor = camera["ClearColor"].as<DirectX::XMFLOAT4>();
 				}
 			}
 
 			for (auto entity : entities)
 			{
-				auto parentComponent = entity["ParentComponent"];
-				if (parentComponent)
+				auto parent = entity["ParentComponent"];
+				if (parent)
 				{
-					UINT64 uuid = entity["Entity"].as<UINT64>();
-					UINT64 parentUUID = parentComponent["Parent"].as<UINT64>();
+					UINT64 instanceID = entity["Entity"].as<UINT64>();
+					UINT64 parentUUID = parent["Parent"].as<UINT64>();
 
-					if (entityMap.count(uuid) && entityMap.count(parentUUID))
+					if (entityMap.count(instanceID) && entityMap.count(parentUUID))
 					{
-						auto deserializedEntity = entityMap[uuid];
-						auto& pc = entityManager.AddComponent<ParentComponent>(deserializedEntity);
-						pc.Parent = entityMap[parentUUID];
+						auto deserializedEntity = entityMap[instanceID];
+						auto& parentCom = entityManager.AddComponent<ParentComponent>(deserializedEntity);
+						parentCom.Parent = entityMap[parentUUID];
 					}
 				}
 			}

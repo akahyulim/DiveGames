@@ -4,10 +4,9 @@
 #include "stdafx.h"
 
 // core
-#include "core/UUID.h"
+#include "core/InstanceID.h"
 #include "core/Log.h"
 #include "core/StringUtils.h"
-#include "core/Object.h"
 #include "core/FileUtils.h"
 #include "core/EventDispatcher.h"
 #include "core/Window.h"
@@ -32,10 +31,11 @@
 
 // rendering
 #include "rendering/Mesh.h"
-#include "rendering/Model.h"
-#include "rendering/ModelFactory.h"
-#include "rendering/Renderer.h"
-//#include "rendering/Camera.h"
+#include "rendering/StaticMesh.h"
+#include "rendering/SkinnedMesh.h"
+#include "rendering/MeshFactory.h"
+#include "rendering/Material.h"
+#include "rendering/RenderingPipeline.h"
 
 // resource
 #include "resource/Resource.h"
@@ -44,6 +44,7 @@
 // systems
 #include "systems/SystemBase.h"
 #include "systems/TransformSystem.h"
+#include "systems/RenderingSystem.h"
 
 // world
 #include "world/Components.h"

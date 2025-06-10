@@ -15,38 +15,23 @@ namespace Dive
 	{
 
 	}
-	/*
-	void HierarchyView::SetSelectedNode(Entity node)
-	{
-		if (m_SelectedNode != node)
-			m_SelectedNode = node;
-
-		m_Editor->GetWidget<InspectorView>()->SetSelectedNode(node);
-	}
-	*/
-	void HierarchyView::SetSelectedNode(entt::entity node)
-	{
-		if (m_SelectedNode != node)
-			m_SelectedNode = node;
-
-		m_Editor->GetWidget<InspectorView>()->SetSelectedNode(node);
-	}
 
 	void HierarchyView::drawView()
 	{
-		if (!Engine::GetWorld())
+		auto& editorContext = EditorContext::GetInstance();
+		if (!editorContext.ActiveWorld)
 			return;
 
-		if (ImGui::TreeNodeEx(Engine::GetWorld()->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::TreeNodeEx(editorContext.ActiveWorld->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			auto& entityManager = Engine::GetWorld()->GetEntityManager();
+			auto& entityManager = editorContext.ActiveWorld->GetEntityManager();
 
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 				{ 
-					auto uuid = static_cast<UUID*>(payload->Data);
-					auto draggedNode = entityManager.GetEntity(*uuid);
+					auto instanceID = static_cast<InstanceID*>(payload->Data);
+					auto draggedNode = entityManager.GetEntity(*instanceID);
 					entityManager.RemoveComponent<ParentComponent>(draggedNode);
 				}
 
@@ -58,12 +43,18 @@ namespace Dive
 			{
 				for (auto& node : rootNodes)
 				{
+					if (entityManager.HasComponent<TagComponent>(node) &&
+						entityManager.GetComponent<TagComponent>(node).Tag == TagComponent::eTag::EditorOnly)
+						continue;
+				
 					showNode(node);
 				}
 			}
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-				SetSelectedNode();
+			{
+				editorContext.Selected = entt::null;
+			}
 
 			ImGui::TreePop();
 		}
@@ -71,21 +62,27 @@ namespace Dive
 	
 	void HierarchyView::showNode(entt::entity node)
 	{
-		auto& entityManager = Engine::GetWorld()->GetEntityManager();
+		if (node == entt::null)
+			return;
+
+		auto& editorContext = EditorContext::GetInstance();
+		auto& entityManager = editorContext.ActiveWorld->GetEntityManager();
 
 		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
 		nodeFlags |=  (entityManager.HasComponent<Children>(node)) ?  ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf;
-		nodeFlags |= (m_SelectedNode == node) ? ImGuiTreeNodeFlags_Selected : 0;
+		nodeFlags |= (editorContext.Selected == node) ? ImGuiTreeNodeFlags_Selected : 0;
 
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)node, nodeFlags, entityManager.GetName(node).c_str());
 		{
 			if (ImGui::IsItemClicked())
-				SetSelectedNode(node);
+			{
+				editorContext.Selected = node;
+			}
 
 			if (ImGui::BeginDragDropSource())
 			{
-				auto uuid = entityManager.GetUUID(node);
-				ImGui::SetDragDropPayload("HIERARCHY_NODE", &uuid, sizeof(UUID));
+				auto instanceID = entityManager.GetInstanceID(node);
+				ImGui::SetDragDropPayload("HIERARCHY_NODE", &instanceID, sizeof(InstanceID));
 				ImGui::EndDragDropSource();
 			}
 
@@ -93,8 +90,8 @@ namespace Dive
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 				{
-					auto uuid = static_cast<UUID*>(payload->Data);
-					auto draggedNode = entityManager.GetEntity(*uuid);
+					auto instanceID = static_cast<InstanceID*>(payload->Data);
+					auto draggedNode = entityManager.GetEntity(*instanceID);
 
 					if (draggedNode != node)
 					{
@@ -152,7 +149,7 @@ namespace Dive
 			if (nodeDeleted)
 			{
 				entityManager.DeleteEntity(node);
-				SetSelectedNode();
+				editorContext.Selected = entt::null;
 			}
 
 			if (nodeCopied)

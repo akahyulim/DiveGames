@@ -15,12 +15,17 @@ namespace Dive
 	
 		// 부모의 갱신 처리
 		{
-			auto view = entityManager.GetEntityView<ParentComponent>();
+			auto view = entityManager.GetEntityView<ActiveComponent, ParentComponent>();
 
 			// 자식의 부모가 되는 경우 기존 부모의 Parent 제거
-			for (auto entity : view)
+			for (auto [entity, activeCom, parentCom] : view.each())
 			{
-				auto& parent = entityManager.GetComponent<ParentComponent>(entity).Parent;
+				if (!activeCom.IsActive)
+					continue;
+
+				auto& parent = parentCom.Parent;
+				//if (parent == entt::null || !entityManager.Exists(parent))
+				//	continue;
 
 				entt::entity current = parent;
 				while (entityManager.HasComponent<ParentComponent>(current))
@@ -33,10 +38,13 @@ namespace Dive
 					}
 				}
 			}
-
-			for(auto entity : view)
+			
+			for (auto [entity, activeCom, parentCom] : view.each())
 			{
-				auto& parent = entityManager.GetComponent<ParentComponent>(entity).Parent;
+				if (!activeCom.IsActive)
+					continue;
+
+				auto& parent = parentCom.Parent;
 
 				// 부모가 제거되었다면 자식도 제거
 				if (!entityManager.Exists(parent))
@@ -48,7 +56,7 @@ namespace Dive
 				{
 					auto& children = entityManager.HasComponent<Children>(parent) ?
 						entityManager.GetComponent<Children>(parent).entities : entityManager.AddComponent<Children>(parent).entities;
-				
+
 					if (children.end() == std::find(children.begin(), children.end(), entity))
 					{
 						children.emplace_back(entity);
@@ -59,15 +67,19 @@ namespace Dive
 
 		// 자식의 갱신 처리
 		{
-			auto view = entityManager.GetEntityView<Children>();
-			for (auto entity : view)
+			auto view = entityManager.GetEntityView<ActiveComponent, Children>();
+			for (auto [entity, activeCom, childrenCom] : view.each())
 			{
-				auto& children = entityManager.GetComponent<Children>(entity).entities;
+				if (!activeCom.IsActive)
+					continue;
+
+				auto& children = childrenCom.entities;
+				entt::entity currentEntity = entity;
 				children.erase(std::remove_if(children.begin(), children.end(), [&](entt::entity child) {
 					return !entityManager.Exists(child) ||
 						!entityManager.HasComponent<ParentComponent>(child) ||
-						entityManager.GetComponent<ParentComponent>(child).Parent != entity;
-					}), children.end());
+						entityManager.GetComponent<ParentComponent>(child).Parent != currentEntity;}), 
+					children.end());
 
 				if (children.empty())
 				{
@@ -117,7 +129,8 @@ namespace Dive
 		auto& entityManager = m_World->GetEntityManager();
 		for (auto rootEntity : entityManager.GetRootEntities())
 		{
-			CalcuLocalToWorld(rootEntity, entityManager);
+			if(entityManager.GetComponent<ActiveComponent>(rootEntity).IsActive)
+				CalcuLocalToWorld(rootEntity, entityManager);
 		}
 	}
 }

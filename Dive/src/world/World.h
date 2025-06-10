@@ -1,11 +1,9 @@
-#pragma once
+﻿#pragma once
 #include "EntityManager.h"
 #include "systems/TransformSystem.h"
 
 namespace Dive
 {
-	//class SystemBase;
-
 	class World
 	{
 	public:

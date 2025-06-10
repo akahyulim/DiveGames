@@ -15,7 +15,7 @@ namespace Dive
 		UINT32 GetStride() const { return m_Stride; }
 		UINT32 GetCount() const { return m_Count; }
 
-		static std::shared_ptr<VertexBuffer> Generate(const void* data, UINT32 stride, UINT32 count);
+		static VertexBuffer* Generate(const void* data, UINT32 stride, UINT32 count);
 
 	private:
 		ID3D11Buffer* m_Buffer = nullptr;

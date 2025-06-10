@@ -6,11 +6,18 @@
 
 namespace Dive
 {
+	Texture2D::Texture2D()
+	{
+		SetName("Texture2D");
+	}
+
 	Texture2D::Texture2D(UINT32 width, UINT32 height, DXGI_FORMAT format, bool useMips)
 		: m_Width(width), m_Height(height)
 	{
 		m_Format = format;
 		m_UseMips = useMips;
+
+		SetName("Texture2D");
 	}
 
 	Texture2D::~Texture2D()
@@ -22,6 +29,39 @@ namespace Dive
 	{
 		m_PixelData.resize(size);
 		std::copy(static_cast<const uint8_t*>(pixels), static_cast<const uint8_t*>(pixels) + size, m_PixelData.begin());
+	}
+
+	bool Texture2D::LoadFromFile(const std::filesystem::path& filepath)
+	{
+		auto extension = filepath.extension().string();
+
+		DirectX::ScratchImage img;
+		HRESULT result = 0;
+		if (extension == ".dds")
+			result = DirectX::LoadFromDDSFile(filepath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
+		else if (extension == ".tga")
+			result = DirectX::LoadFromTGAFile(filepath.c_str(), nullptr, img);
+		else
+			result = DirectX::LoadFromWICFile(filepath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
+
+		if (FAILED(result))
+		{
+			DV_LOG(Texture2D, err, "Texture2D 생성 과정 중 파일 {:s} 로드 실패", filepath.string());
+			return false;
+		}
+
+		m_Width = static_cast<UINT32>(img.GetImages()->width);
+		m_Height = static_cast<UINT32>(img.GetImages()->height);
+		m_Format = img.GetImages()->format;
+		m_UseMips = true;
+		
+		SetPixelData((const void*)img.GetImages()->pixels, img.GetImages()->rowPitch * img.GetImages()->height);
+		if (!Create())
+			return false;
+
+		SetFilepath(filepath);
+
+		return true;
 	}
 
 	bool Texture2D::Create()
@@ -90,7 +130,7 @@ namespace Dive
 
 		return true;
 	}
-
+	/*
 	std::shared_ptr<Texture2D> Texture2D::LoadFromFile(const std::filesystem::path& filepath, bool useMips)
 	{
 		auto extension = filepath.extension().string();
@@ -119,9 +159,11 @@ namespace Dive
 		if (!pNewTexture2D->Create())	
 			return nullptr;
 
+		pNewTexture2D->SetFilepath(filepath);
+
 		return pNewTexture2D;
 	}
-
+	*/
 	std::shared_ptr<Texture2D> Texture2D::LoadFromMemory(const std::filesystem::path& filepath, size_t size, const void* pSource, bool useMips)
 	{
 		/*

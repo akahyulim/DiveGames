@@ -12,6 +12,6 @@ namespace Dive
 		void drawView() override;
 
 	private:
-		std::shared_ptr<RenderTexture> m_RenderTexture;
+		RenderTexture* m_RenderTarget = nullptr;
 	};
 }

@@ -1,11 +1,22 @@
 ﻿#pragma once
-#include "core/UUID.h"
+#include "core/InstanceID.h"
 #include "Components.h"
 
 #include <entt/entt.hpp>
 
 namespace Dive
 {
+	enum class ePrimitiveType
+	{
+		None = 0,
+		Triangle,
+		Cube,
+		Plane,
+		Quad,
+		Sphere,
+		Capsule,
+	};
+
 	class EntityManager
 	{
 	public:
@@ -15,12 +26,20 @@ namespace Dive
 		void Clear();
 
 		entt::entity CreateEntity(const std::string& name = std::string());
-		entt::entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
+		entt::entity CreateEntityWithUUID(InstanceID instanceID, const std::string& name = std::string());
+		template<typename T, typename... Args>
+		entt::entity CreateEntityWithComponents()
+		{
+			entt::entity entity = CreateEntity();
+			(AddComponent<T>(entity), ..., AddComponent<Args>(entity));
+			return entity;
+		}
+
 		void DeleteEntity(entt::entity entity);
 		
 		bool Exists(entt::entity entity);
 
-		entt::entity GetEntity(UUID uuid);
+		entt::entity GetEntity(InstanceID instanceID);
 		std::vector<entt::entity> GetEntities(const std::string& name);
 		std::vector<entt::entity> GetAllEntities();
 		
@@ -61,12 +80,14 @@ namespace Dive
 			return m_Registry.view<Components...>();
 		}
 
-		UUID GetUUID(entt::entity entity);
+		InstanceID GetInstanceID(entt::entity entity);
 		std::string GetName(entt::entity entity);
+
+		entt::entity CreatePrimitive(ePrimitiveType type);
 
 	private:
 	private:
 		entt::registry m_Registry;
-		std::unordered_map<UUID, entt::entity> m_Entities;
+		std::unordered_map<InstanceID, entt::entity> m_Entities;
 	};
 }

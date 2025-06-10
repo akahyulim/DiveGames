@@ -1,5 +1,6 @@
 ﻿#include "InspectorView.h"
 #include "imgui_internal.h"
+#include "../Editor.h"
 
 namespace Dive
 {
@@ -124,45 +125,61 @@ namespace Dive
 	
 	void InspectorView::drawView()
 	{
-		if (m_SelectedNode == entt::null)
+		auto& editorContext = EditorContext::GetInstance();
+		if (!editorContext.ActiveWorld || editorContext.Selected == entt::null)
 			return;
 
-		drawComponents(m_SelectedNode);
-	}
+		auto& entityManager = editorContext.ActiveWorld->GetEntityManager();
 
-	void InspectorView::drawComponents(entt::entity entity)
-	{	
-		auto& entityManager = Engine::GetWorld()->GetEntityManager();
-
-		if (entityManager.HasComponent<NameComponent>(entity))
+		if (entityManager.HasComponent<NameComponent>(editorContext.Selected))
 		{
-			auto& name = entityManager.GetComponent<NameComponent>(entity).Name;
+			auto& name = entityManager.GetComponent<NameComponent>(editorContext.Selected).Name;
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
 			strncpy_s(buffer, sizeof(buffer), name.c_str(), sizeof(buffer));
-			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
+			if (ImGui::InputText("Name", buffer, sizeof(buffer)))
 			{
 				name = std::string(buffer);
 			}
 		}
 
-		if (entityManager.HasComponent<LocalTransform>(entity))
+		// 작동은 하지만 원하는 ui가 아니다.
+		if (entityManager.HasComponent<TagComponent>(editorContext.Selected))
 		{
-			auto& localToWorld = entityManager.GetComponent<LocalToWorld>(entity);
+			auto& tagCom = entityManager.GetComponent<TagComponent>(editorContext.Selected);
+
+			if (ImGui::BeginMenu("Tag"))
+			{
+				if (ImGui::MenuItem("Untagged", nullptr, tagCom.Tag == TagComponent::eTag::Untagged))
+					tagCom.Tag = TagComponent::eTag::Untagged;
+				if (ImGui::MenuItem("Editor Only", nullptr, tagCom.Tag == TagComponent::eTag::EditorOnly))
+					tagCom.Tag = TagComponent::eTag::EditorOnly;
+				if (ImGui::MenuItem("Main Camera", nullptr, tagCom.Tag == TagComponent::eTag::MainCamera))
+					tagCom.Tag = TagComponent::eTag::MainCamera;
+
+				ImGui::EndMenu();
+			}
+		}
+
+		if (entityManager.HasComponent<LocalTransform>(editorContext.Selected))
+		{
+			ImGui::Separator();
+
+			auto& localToWorld = entityManager.GetComponent<LocalToWorld>(editorContext.Selected);
 
 			auto position = Math::GetPositionFromTransform(localToWorld.Value);
 			DrawVec3Control("Position", position);
 
-			auto rotation = Math::QuaternionToDegrees(Math::GetRotationFromTransform(localToWorld.Value)); 
+			auto rotation = Math::QuaternionToDegrees(Math::GetRotationFromTransform(localToWorld.Value));
 			DrawVec3Control("Rotation", rotation);
 
 			auto scale = Math::GetScaleFromTransform(localToWorld.Value);
-			DrawVec3Control("Scale", scale, 1.0f);	
+			DrawVec3Control("Scale", scale, 1.0f);
 
-			if (entityManager.HasComponent<ParentComponent>(entity))
+			if (entityManager.HasComponent<ParentComponent>(editorContext.Selected))
 			{
-				auto parent = entityManager.GetComponent<ParentComponent>(entity).Parent;
+				auto parent = entityManager.GetComponent<ParentComponent>(editorContext.Selected).Parent;
 				auto& parentLocalToWorld = entityManager.GetComponent<LocalToWorld>(parent);
 
 				auto parentPosition = Math::GetPositionFromTransform(parentLocalToWorld.Value);
@@ -183,11 +200,22 @@ namespace Dive
 				DirectX::XMStoreFloat3(&scale, localScale);
 			}
 
-			auto& localTransform = entityManager.GetComponent<LocalTransform>(entity);
+			auto& localTransform = entityManager.GetComponent<LocalTransform>(editorContext.Selected);
 			localTransform.Position = position;
 			localTransform.Rotation = Math::DegreesToQuaternion(rotation);
 			localTransform.Scale = scale;
 		}
+
+		if (entityManager.HasComponent<CameraComponent>(editorContext.Selected))
+		{
+			ImGui::Separator();
+
+			auto& cameraCom = entityManager.GetComponent<CameraComponent>(editorContext.Selected);
+			ImGui::Text("Camera Type: %s", cameraCom.Type == CameraComponent::eProjectionType::Perspective ? "Perspective" : "Orthographic");
+			ImGui::ColorEdit4("Clear Color", &cameraCom.ClearColor.x);
+		}
+
+		ImGui::Separator();
 
 		if (ImGui::Button("Add Component"))
 			ImGui::OpenPopup("AddComponent");
@@ -198,5 +226,5 @@ namespace Dive
 
 			ImGui::EndPopup();
 		}
-	}
+	}	
 }

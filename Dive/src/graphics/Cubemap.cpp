@@ -9,6 +9,8 @@ namespace Dive
 	{
 		m_Format = format;
 		m_UseMips = useMips;
+
+		SetName("Cubemap");
 	}
 
 	Cubemap::~Cubemap()

@@ -5,7 +5,6 @@ namespace Dive
 {
 	class Editor;
 	class World;
-	class Camera;
 
 	class MenuBar
 	{

@@ -2,27 +2,30 @@
 #include "EntityManager.h"
 #include "core/CoreDefs.h"
 #include "core/EventDispatcher.h"
+#include "rendering/MeshFactory.h"
 
 namespace Dive
 {
 	void EntityManager::Clear()
 	{
-		for (auto& [uuid, entity] : m_Entities)
+		for (auto& [instanceID, entity] : m_Entities)
+		{
 			m_Registry.destroy(entity);
+		}
 		m_Entities.clear();
 	}
 
 	entt::entity EntityManager::CreateEntity(const std::string& name)
 	{
-		return CreateEntityWithUUID(UUID(), name);
+		return CreateEntityWithUUID(InstanceID(), name);
 	}
 
-	entt::entity EntityManager::CreateEntityWithUUID(UUID uuid, const std::string& name)
+	entt::entity EntityManager::CreateEntityWithUUID(InstanceID instanceID, const std::string& name)
 	{
 		entt::entity entity = m_Registry.create();
-		AddComponent<IDComponent>(entity).ID = uuid;
+		AddComponent<IDComponent>(entity).ID = instanceID;
 		AddComponent<NameComponent>(entity).Name = name;
-		m_Entities[uuid] = entity;
+		m_Entities[instanceID] = entity;
 
 		return entity;
 	}
@@ -44,11 +47,11 @@ namespace Dive
 		return m_Registry.valid(entity);
 	}
 
-	entt::entity EntityManager::GetEntity(UUID uuid) 
+	entt::entity EntityManager::GetEntity(InstanceID instanceID) 
 	{
-		DV_ASSERT(EntityManager, m_Entities.find(uuid) != m_Entities.end());
+		DV_ASSERT(EntityManager, m_Entities.find(instanceID) != m_Entities.end());
 
-		return m_Entities.at(uuid);
+		return m_Entities.at(instanceID);
 	}
 
 	std::vector<entt::entity> EntityManager::GetEntities(const std::string& name)
@@ -56,9 +59,9 @@ namespace Dive
 		std::vector<entt::entity> entities;
 
 		auto view = m_Registry.view<NameComponent>();
-		for (auto [entity, nc] : view.each())
+		for (auto [entity, nameCom] : view.each())
 		{
-			if (nc.Name == name)
+			if (nameCom.Name == name)
 				entities.emplace_back(entity);
 		}
 
@@ -70,7 +73,7 @@ namespace Dive
 		std::vector<entt::entity> entities;
 		entities.reserve(m_Entities.size());
 
-		for (auto& [uuid, entity] : m_Entities)
+		for (auto& [instanceID, entity] : m_Entities)
 		{
 			entities.emplace_back(entity);
 		}
@@ -83,7 +86,7 @@ namespace Dive
 	{
 		std::vector<entt::entity> roots;
 
-		for (auto& [uuid, entity] : m_Entities)
+		for (auto& [instanceID, entity] : m_Entities)
 		{
 			if (!HasComponent<ParentComponent>(entity))
 			{
@@ -94,7 +97,7 @@ namespace Dive
 		return roots;
 	}
 
-	UUID EntityManager::GetUUID(entt::entity entity)
+	InstanceID EntityManager::GetInstanceID(entt::entity entity)
 	{
 		DV_ASSERT(EntityManager, Exists(entity));
 
@@ -112,5 +115,49 @@ namespace Dive
 			return {};
 
 		return GetComponent<NameComponent>(entity).Name;
+	}
+
+	entt::entity EntityManager::CreatePrimitive(ePrimitiveType type)
+	{
+		entt::entity entity = CreateEntityWithComponents<ActiveComponent, LocalTransform, RenderMesh>();
+		switch (type)
+		{
+		case ePrimitiveType::Triangle:
+			GetComponent<NameComponent>(entity).Name = "Triangle";
+			GetComponent<RenderMesh>(entity).mesh = MeshFactory::CreateTriangle();
+			// material도 standard로 추가
+			break;
+		case ePrimitiveType::Quad:
+			GetComponent<NameComponent>(entity).Name = "Quad";
+			GetComponent<RenderMesh>(entity).mesh = MeshFactory::CreateQuad();
+			// material도 standard로 추가
+			break;
+		case ePrimitiveType::Plane:
+			GetComponent<NameComponent>(entity).Name = "Plane";
+			GetComponent<RenderMesh>(entity).mesh = MeshFactory::CreatePlane();
+			// material도 standard로 추가
+			break;
+		case ePrimitiveType::Cube:
+			GetComponent<NameComponent>(entity).Name = "Cube";
+			GetComponent<RenderMesh>(entity).mesh = MeshFactory::CreateCube();
+			// material도 standard로 추가
+			break;
+		case ePrimitiveType::Sphere:
+			GetComponent<NameComponent>(entity).Name = "Sphere";
+			GetComponent<RenderMesh>(entity).mesh = MeshFactory::CreateSphere();
+			// material도 standard로 추가
+			break;
+		case ePrimitiveType::Capsule:
+			GetComponent<NameComponent>(entity).Name = "Capsule";
+			GetComponent<RenderMesh>(entity).mesh = MeshFactory::CreateCapsule();
+			// material도 standard로 추가
+			break;
+
+		default:
+			DV_LOG(EntityManager, err, "지원하지 않는 primitive type: {0}", static_cast<int>(type));
+			return entt::null;
+		}
+
+		return entity;
 	}
 }

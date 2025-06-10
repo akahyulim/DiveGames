@@ -19,6 +19,22 @@ namespace Dive
 		Max
 	};
 
+	class EditorContext
+	{
+	public:
+		static EditorContext& GetInstance()
+		{
+			static EditorContext instance;
+			return instance;
+		}
+
+		World* ActiveWorld = nullptr;
+		
+		entt::entity Selected = entt::null;
+		entt::entity EditorCamera = entt::null;
+		entt::entity MainCamera = entt::null;
+	};
+
 	class Editor
 	{
 	public:

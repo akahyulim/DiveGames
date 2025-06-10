@@ -26,7 +26,6 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, &subresourceData, &m_Buffer))) 
 		{
-			DV_LOG(IndexBuffer, err, "IndexBuffer 생성에 실패하였습니다.");
 			return false;
 		}
 
@@ -41,11 +40,11 @@ namespace Dive
 		DV_RELEASE(m_Buffer);
 	}
 
-	std::shared_ptr<IndexBuffer> IndexBuffer::Generate(const void* data, UINT32 count)
+	IndexBuffer* IndexBuffer::Generate(const void* data, UINT32 count)
 	{
-		auto indexBuffer = std::make_shared<IndexBuffer>();
+		auto indexBuffer = new IndexBuffer();
 		if (!indexBuffer->Create(data, count)) 
-			return nullptr;
+			DV_DELETE(indexBuffer);
 
 		return indexBuffer;
 	}

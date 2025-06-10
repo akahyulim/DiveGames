@@ -44,9 +44,6 @@
     <ClInclude Include="src\resource\Resource.h">
       <Filter>resource</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\Object.h">
-      <Filter>core</Filter>
-    </ClInclude>
     <ClInclude Include="src\resource\ResourceManager.h">
       <Filter>resource</Filter>
     </ClInclude>
@@ -74,9 +71,6 @@
     <ClInclude Include="src\graphics\Graphics.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\Renderer.h">
-      <Filter>rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\core\Engine.h">
       <Filter>core</Filter>
     </ClInclude>
@@ -92,7 +86,7 @@
     <ClInclude Include="src\graphics\Cubemap.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\UUID.h">
+    <ClInclude Include="src\core\InstanceID.h">
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\Mesh.h">
@@ -101,10 +95,7 @@
     <ClInclude Include="src\math\BoundingBox.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\Model.h">
-      <Filter>rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\rendering\ModelFactory.h">
+    <ClInclude Include="src\rendering\MeshFactory.h">
       <Filter>rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\world\Components.h">
@@ -128,6 +119,17 @@
     <ClInclude Include="src\core\Input.h">
       <Filter>core</Filter>
     </ClInclude>
+    <ClInclude Include="src\rendering\Material.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\systems\RenderingSystem.h">
+      <Filter>systems</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\RenderingPipeline.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\StaticMesh.h" />
+    <ClInclude Include="src\rendering\SkinnedMesh.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -145,9 +147,6 @@
     </ClCompile>
     <ClCompile Include="src\resource\Resource.cpp">
       <Filter>resource</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\Object.cpp">
-      <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="src\resource\ResourceManager.cpp">
       <Filter>resource</Filter>
@@ -176,9 +175,6 @@
     <ClCompile Include="src\graphics\Graphics.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\Renderer.cpp">
-      <Filter>rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\Engine.cpp">
       <Filter>core</Filter>
     </ClCompile>
@@ -194,7 +190,7 @@
     <ClCompile Include="src\graphics\Texture.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\UUID.cpp">
+    <ClCompile Include="src\core\InstanceID.cpp">
       <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\Mesh.cpp">
@@ -203,10 +199,7 @@
     <ClCompile Include="src\math\BoundingBox.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\Model.cpp">
-      <Filter>rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\ModelFactory.cpp">
+    <ClCompile Include="src\rendering\MeshFactory.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\world\World.cpp">
@@ -227,5 +220,16 @@
     <ClCompile Include="src\core\Input.cpp">
       <Filter>core</Filter>
     </ClCompile>
+    <ClCompile Include="src\rendering\Material.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\systems\RenderingSystem.cpp">
+      <Filter>systems</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\RenderingPipeline.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\StaticMesh.cpp" />
+    <ClCompile Include="src\rendering\SkinnedMesh.cpp" />
   </ItemGroup>
 </Project>

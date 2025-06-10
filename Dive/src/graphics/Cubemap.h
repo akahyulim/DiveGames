@@ -19,7 +19,7 @@ namespace Dive
 
 		void SetFaceData(UINT32 index, const void* pixels, size_t size);
 
-		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }
+		ID3D11RenderTargetView* GetBackBufferRTV() const { return m_RenderTargetView; }
 
 		static std::shared_ptr<Cubemap> LoadFromFaceFiles(const std::vector<std::filesystem::path>& faceFilepaths, bool useMips = false);
 		static std::shared_ptr<Cubemap> LoadFromFile(const std::filesystem::path& filepath, bool useMips = false);

@@ -12,5 +12,6 @@ namespace Dive
 		void drawView() override;
 
 	private:
+		RenderTexture* m_RenderTarget = nullptr;
 	};
 }

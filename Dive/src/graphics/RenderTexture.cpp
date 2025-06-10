@@ -10,6 +10,8 @@ namespace Dive
 		m_Format = format;
 		m_DepthFormat = depth;
 		m_UseMips = useMips;
+
+		SetName("RenderTexture");
 	}
 
 	RenderTexture::~RenderTexture()
@@ -29,7 +31,10 @@ namespace Dive
 
 		m_MipLevels = CanGenerateMips(m_Format) ? (m_UseMips ? CalculateMipmapLevels(m_Width, m_Height) : 1) : 1;
 
-		// render target
+		// 현재 코드는 유니티의 RenderTexture api를 따른 것이다.
+		// 따라서 depth의 유무에 맞춰 렌더 타겟, 렌더 타겟 + 깊이 버퍼로 생성된다.
+		// 그러나 경우에 따라선 깊이 버퍼(+리소스 뷰)만 생성이 필요한 상황도 존재한다.
+		// 예를들면 GBuffer의 경우가 그렇다.
 		{
 			{
 				D3D11_TEXTURE2D_DESC desc{};
@@ -86,9 +91,7 @@ namespace Dive
 				Graphics::GetDeviceContext()->GenerateMips(m_ShaderResourceView);
 			}
 		}
-
-		// m_DepthFormat stencil
-		if (m_DepthFormat != eDepthFormat::None)
+		if(m_DepthFormat != eDepthFormat::None)
 		{
 			{
 				D3D11_TEXTURE2D_DESC desc{};

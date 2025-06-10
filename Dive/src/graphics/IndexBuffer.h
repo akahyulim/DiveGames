@@ -17,7 +17,7 @@ namespace Dive
 		DXGI_FORMAT GetFormat() const { return m_Format; }
 		UINT32 GetCount() const { return m_Count; }
 
-		static std::shared_ptr<IndexBuffer> Generate(const void* data, UINT32 count);
+		static IndexBuffer* Generate(const void* data, UINT32 count);
 
 	private:
 		ID3D11Buffer* m_Buffer = nullptr;

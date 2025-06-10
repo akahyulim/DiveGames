@@ -1,5 +1,6 @@
 ﻿#include "WorldView.h"
 #include "../MenuBar.h"
+#include "../Editor.h"
 
 namespace Dive
 {
@@ -12,35 +13,35 @@ namespace Dive
 
 	WorldView::~WorldView()
 	{
+		DV_DELETE(m_RenderTarget);
 	}
 
 	void WorldView::drawView()
 	{
-		if (!Engine::GetWorld())
+		auto& editorContext = EditorContext::GetInstance();
+		if (!editorContext.ActiveWorld || editorContext.EditorCamera == entt::null)
 			return;
 
 		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		m_Height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
-		
-		//auto editorCamera = MenuBar::GetEditorCamera();
-		//if (editorCamera)
+
+		if (!m_RenderTarget)
 		{
-		//	m_RenderTexture = editorCamera->GetRenderTexture();
-		//	if (m_RenderTexture && m_RenderTexture->GetWidth() != static_cast<UINT32>(m_Width) || m_RenderTexture->GetHeight() != static_cast<UINT32>(m_Height))
-		//		m_RenderTexture->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
+			m_RenderTarget = new RenderTexture(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
+			m_RenderTarget->Create();
+
+			auto& cameraCom = editorContext.ActiveWorld->GetEntityManager().GetComponent<CameraComponent>(editorContext.EditorCamera);
+			if (cameraCom.RenderTarget != m_RenderTarget)
+				cameraCom.RenderTarget = m_RenderTarget;
+		}
+		else
+		{
+			if(m_RenderTarget->GetWidth() != static_cast<UINT32>(m_Width) || m_RenderTarget->GetHeight() != static_cast<UINT32>(m_Height))
+				m_RenderTarget->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
 		}
 
-		// 이 부분은 기본적으로 Renderer에서 수행해야 한다.
-		{
-		//	auto renderTargetView = m_RenderTexture->GetRenderTargetView();
-		//	Graphics::GetDeviceContext()->OMSetRenderTargets(1, &renderTargetView, nullptr);
-		//	FLOAT clearColor[4]{editorCamera->GetBackgroundColor().x, editorCamera->GetBackgroundColor().y,
-		//		editorCamera->GetBackgroundColor().z, editorCamera->GetBackgroundColor().w };
-		//	Graphics::GetDeviceContext()->ClearRenderTargetView(renderTargetView, clearColor);
-		}
-
-		static auto tex = Texture2D::LoadFromFile("NewProject/Assets/Textures/relaxed_morning.jpg", true);
-		ImTextureID textureID = (ImTextureID)(m_RenderTexture ? m_RenderTexture->GetShaderResourceView() : tex->GetShaderResourceView());
+		auto DokeV = ResourceManager::GetByName<Texture2D>("DokeV");
+		ImTextureID textureID = (ImTextureID)(DokeV ? DokeV->GetShaderResourceView() : m_RenderTarget->GetShaderResourceView());
 		ImGui::Image(textureID, ImVec2(m_Width, m_Height));
 	}
 }

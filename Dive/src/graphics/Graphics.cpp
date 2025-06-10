@@ -23,9 +23,9 @@ namespace Dive
 	ID3D11Device* Graphics::s_Device = nullptr;
 	ID3D11DeviceContext* Graphics::s_DeviceContext = nullptr;
 
-	ID3D11RenderTargetView* Graphics::s_BackbufferRenderTarget = nullptr;
+	ID3D11RenderTargetView* Graphics::s_BackBufferRTV = nullptr;
 	ID3D11Texture2D* Graphics::s_BackbufferTexture = nullptr;
-	ID3D11DepthStencilView* Graphics::s_BackbufferDepthStencil = nullptr;
+	ID3D11DepthStencilView* Graphics::s_BackBufferDSV = nullptr;
 
 	ID3D11DepthStencilView* Graphics::s_CurrentDepthStencil = nullptr;
 
@@ -103,9 +103,9 @@ namespace Dive
 	
 	void Graphics::Shutdown()
 	{
-		DV_RELEASE(s_BackbufferDepthStencil);
+		DV_RELEASE(s_BackBufferDSV);
 		DV_RELEASE(s_BackbufferTexture);
-		DV_RELEASE(s_BackbufferRenderTarget);
+		DV_RELEASE(s_BackBufferRTV);
 		
 		DV_RELEASE(s_DeviceContext);
 		DV_RELEASE(s_Device);
@@ -124,7 +124,7 @@ namespace Dive
 		s_ResolutionWidth = width; 
 		s_ResolutionHeight = height;
 
-		DV_RELEASE(s_BackbufferRenderTarget);
+		DV_RELEASE(s_BackBufferRTV);
 	
 		if (FAILED(s_SwapChain->ResizeBuffers(DV_BUFFER_COUNT, width, height, DV_FORMAT, 0))) 
 		{
@@ -165,10 +165,16 @@ namespace Dive
 		s_SwapChain->Present(s_UseVSync ? 1 : 0, 0);
 	}
 
+	// 현재 렌더 타겟을 하나만 받는다.
 	void Graphics::SetRenderTarget(ID3D11RenderTargetView* renderTargetView, ID3D11DepthStencilView* depthStencilView)
 	{
 		DV_ASSERT(Graphics, s_DeviceContext);
-
+		
+		if (renderTargetView)
+		{
+			ID3D11RenderTargetView* renderTargetViews = { renderTargetView };
+			s_DeviceContext->OMSetRenderTargets(1, &renderTargetViews, nullptr);
+		}
 	}
 
 	void Graphics::ClearRenderTargetView(ID3D11RenderTargetView* renderTargetView, const DirectX::XMFLOAT4& color)
@@ -453,16 +459,16 @@ namespace Dive
 		return s_DeviceContext;
 	}
 
-	ID3D11RenderTargetView* Graphics::GetRenderTargetView()
+	ID3D11RenderTargetView* Graphics::GetBackBufferRTV()
 	{
-		DV_ASSERT(Graphics, s_BackbufferRenderTarget);
-		return s_BackbufferRenderTarget;
+		DV_ASSERT(Graphics, s_BackBufferRTV);
+		return s_BackBufferRTV;
 	}
 	
-	ID3D11DepthStencilView* Graphics::GetDepthStencilView()
+	ID3D11DepthStencilView* Graphics::GetBackBufferDSV()
 	{
-		DV_ASSERT(Graphics, s_BackbufferDepthStencil);
-		return s_BackbufferDepthStencil;
+		DV_ASSERT(Graphics, s_BackBufferDSV);
+		return s_BackBufferDSV;
 	}
 
 	void Graphics::updateBackbuffer()
@@ -470,27 +476,27 @@ namespace Dive
 		DV_ASSERT(Graphics, s_SwapChain);
 		DV_ASSERT(Graphics, s_Device);
 
-		DV_RELEASE(s_BackbufferRenderTarget);
+		DV_RELEASE(s_BackBufferRTV);
 		DV_RELEASE(s_BackbufferTexture);
-		DV_RELEASE(s_BackbufferDepthStencil);
+		DV_RELEASE(s_BackBufferDSV);
 
-		ID3D11Texture2D* pBackbufferTexture{};
-		if (FAILED(s_SwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture))) 
+		ID3D11Texture2D* backBufferTexture{};
+		if (FAILED(s_SwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backBufferTexture))) 
 		{
 			DV_LOG(Graphics, err, "후면버퍼 텍스쳐 획득 실패");
 			return;
 		}
 
 		if (FAILED(s_Device->CreateRenderTargetView(
-			static_cast<ID3D11Resource*>(pBackbufferTexture), 
+			static_cast<ID3D11Resource*>(backBufferTexture), 
 			nullptr, 
-			&s_BackbufferRenderTarget))) 
+			&s_BackBufferRTV))) 
 		{
-			DV_RELEASE(s_BackbufferRenderTarget);
+			DV_RELEASE(s_BackBufferRTV);
 			DV_LOG(Graphics, err, "후면버퍼 렌더타겟뷰 생성 실패");
 			return;
 		}
-		DV_RELEASE(pBackbufferTexture);
+		DV_RELEASE(backBufferTexture);
 
 		DXGI_SWAP_CHAIN_DESC desc{};
 		s_SwapChain->GetDesc(&desc);
@@ -522,7 +528,7 @@ namespace Dive
 		if (FAILED(s_Device->CreateDepthStencilView(
 			static_cast<ID3D11Resource*>(s_BackbufferTexture),
 			&viewDesc,
-			&s_BackbufferDepthStencil))) 
+			&s_BackBufferDSV))) 
 		{
 			DV_LOG(Graphics, err, "후면버퍼 깊이 스텐실 뷰 생성 실패");
 			return;

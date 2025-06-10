@@ -2,17 +2,14 @@
 #include "Mesh.h"
 #include "core/CoreDefs.h"
 #include "graphics/Graphics.h"
-#include "graphics/Graphics.h"
 #include "graphics/VertexBuffer.h"
 #include "graphics/IndexBuffer.h"
 
 namespace Dive
 {
 	Mesh::Mesh()
-		: m_VertexBuffer(nullptr)
-		, m_IndexBuffer(nullptr)
-		, m_GameObject(nullptr)
 	{
+		SetName("Mesh");
 	}
 
 	Mesh::~Mesh()
@@ -24,11 +21,11 @@ namespace Dive
 	{
 		m_Vertices.clear();
 		m_Vertices.shrink_to_fit();
-		m_VertexBuffer.reset();
+		DV_DELETE(m_VertexBuffer);	
 
 		m_Indices.clear();
 		m_Indices.shrink_to_fit();
-		m_IndexBuffer.reset();
+		DV_DELETE(m_IndexBuffer);
 	}
 
 	void Mesh::GetGeometry(UINT32 vertexOffset, UINT32 vertexCount,  UINT32 indexOffset, UINT32 indexCount,
@@ -86,10 +83,6 @@ namespace Dive
 
 	void Mesh::CreateBuffers()
 	{
-		// 여기에서 버퍼 생성을 위해 객체에 ID3D11Device를 전달한다면
-		// Mehs는 또 어떻게 해당 객체를 가지고 있느냐는 문제에 빠지게 된다.
-		// 1. 물론 메시는 Graphics나 ID3D11Device를 가지지 않고 이 함수의 매개변수에서 전달받을 순 있다.
-		// 2. 버퍼를 외부에서 생성하고 메시에 포함시키는 방법도 있다.
 		if (!m_Vertices.empty())
 			m_VertexBuffer = VertexBuffer::Generate(m_Vertices.data(), sizeof(VertexStatic), static_cast<UINT32>(m_Vertices.size()));
 

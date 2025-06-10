@@ -1,5 +1,6 @@
 ﻿#pragma once
-#include "Math/BoundingBox.h"
+#include "resource/Resource.h"
+#include "math/BoundingBox.h"
 
 namespace Dive
 {
@@ -94,13 +95,14 @@ namespace Dive
 	class VertexBuffer;
 	class IndexBuffer;
     struct VertexStatic;
-    class Entity;
 
-	class Mesh
+	class Mesh : public Resource
 	{
+		DV_CLASS(Mesh, Resource)
+
     public:
         Mesh();
-        ~Mesh();
+        ~Mesh() override;
 
         void Clear();
 
@@ -118,29 +120,20 @@ namespace Dive
         void AddVertices(const std::vector<VertexStatic>& vertices, UINT32* outVertexOffset = nullptr);
         void AddIndices(const std::vector<UINT32>& indices, UINT32* outIndexOffset = nullptr);
 
-        std::string GetName() const { return m_Name; }
-        void SetName(const std::string& name) { m_Name = name; }
-
-        std::vector<VertexStatic>& GetVertices() { return m_Vertices; }
+		std::vector<VertexStatic>& GetVertices() { return m_Vertices; }
         std::vector<UINT32>& GetIndices() { return m_Indices; }
 
         UINT32 GetVertexCount() const;
         UINT32 GetIndexCount() const;
 
         void CreateBuffers();
-		std::shared_ptr<VertexBuffer> GetVertexBuffer() { return m_VertexBuffer; }
-        std::shared_ptr<IndexBuffer> GetIndexBuffer() { return m_IndexBuffer; }
+		VertexBuffer* GetVertexBuffer() { return m_VertexBuffer; }
+        IndexBuffer* GetIndexBuffer() { return m_IndexBuffer; }
         
         void ComputeBouingBox();
         const BoundingBox& GetBoundingBox() const { return m_BoundingBox; }
 
-        // mesh로부터 entity와 renderer까지 접근할 수 있다.
-        Entity* GetGameObject() const { return m_GameObject; }
-        void SetGameObject(Entity* pGameObject) { m_GameObject = pGameObject; }
-
     private:
-        std::string m_Name;
-
         // 1. BonuingBox를 만들려면 적어도 정점 정보는 가지고 있어야 하는 것이 맞다.
         // 2. VertexSkinned를 관리하려면 상속 클래스를 만드는 편이 나아보인다. 
         std::vector<VertexStatic> m_Vertices;
@@ -150,11 +143,9 @@ namespace Dive
         // importer에서 정보(크기, 타입, 데이타)를 파싱한 후 버퍼 객체에 저장만 하고
         // Model의 Save에서 이 정보들을 파일화한다.
         // 그리고 Model의 Load, Clone에서 이 정보들을 이용해 버퍼를 생성하는 것이다.
-        std::shared_ptr<VertexBuffer> m_VertexBuffer;
-        std::shared_ptr<IndexBuffer> m_IndexBuffer;
+        VertexBuffer* m_VertexBuffer = nullptr;
+        IndexBuffer* m_IndexBuffer = nullptr;
 
         BoundingBox m_BoundingBox;
-
-        Entity* m_GameObject;
 	};
 }

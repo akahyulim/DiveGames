@@ -1,6 +1,8 @@
-#pragma once
-#include "core/UUID.h"
+﻿#pragma once
+#include "core/InstanceID.h"
 #include "graphics/RenderTexture.h"
+#include "rendering/Mesh.h"
+#include "rendering/Material.h"
 
 #include <DirectXMath.h>
 #include <entt/entt.hpp>
@@ -9,7 +11,7 @@ namespace Dive
 {
 	struct IDComponent
 	{
-		UUID ID = 0;
+		InstanceID ID = 0;
 
 		IDComponent() = default;
 		IDComponent(const IDComponent&) = default;
@@ -24,21 +26,21 @@ namespace Dive
 		NameComponent(const std::string& tag) : Name(tag) {}
 	};
 
-	enum class eTag
-	{
-		Untagged,
-		EditorOnly,
-		MainCamera,
-		Player,
-		Enemy,
-		Wall,
-		Item,
-		Respawn,
-		Finish
-	};
-
 	struct TagComponent
 	{
+		enum class eTag
+		{
+			Untagged,
+			EditorOnly,
+			MainCamera,
+			Player,
+			Enemy,
+			Wall,
+			Item,
+			Respawn,
+			Finish
+		};
+
 		eTag Tag = eTag::Untagged;
 
 		TagComponent() = default;
@@ -95,14 +97,20 @@ namespace Dive
 		std::vector<entt::entity> entities;
 	};
 
+	struct RenderMesh
+	{
+		std::shared_ptr<Mesh> mesh;
+		std::shared_ptr<Material> material;
+	};
+
 	struct CameraComponent
 	{
 		enum class eProjectionType { Perspective, Orthographic };
 		eProjectionType Type = eProjectionType::Perspective;
 
-		float FileOfView = 45.0f;
 		float NearClip = 0.1f;
 		float FarClip = 1000.0f;
+		float FileOfView = 45.0f;
 		float AspectRatio = 0.0f;
 		float OrthographicSize = 0.0f;
 
@@ -113,8 +121,11 @@ namespace Dive
 			0.0f, 0.0f, 0.0f, 1.0f
 		};
 
+		// x, y, width, height를 0.0 ~ 1.0 사이의 비율로 관리
+		DirectX::XMFLOAT4 Viewport{ 0.0f, 0.0f, 1.0f, 1.0f };
+
 		RenderTexture* RenderTarget = nullptr;
-		DirectX::XMFLOAT4 ClearColor{ 1.0f, 1.0f, 1.0f, 1.0f };
+		DirectX::XMFLOAT4 ClearColor{ 0.0f, 0.0f, 0.0f, 1.0f };
 
 		CameraComponent() = default;
 		CameraComponent(const CameraComponent&) = default;

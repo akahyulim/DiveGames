@@ -9,7 +9,6 @@ namespace Dive
 		ConstantBuffer() = default;
 		~ConstantBuffer();
 
-		bool GenerateBuffer();
 		bool Create(UINT32 stride);
 		void Release();
 		

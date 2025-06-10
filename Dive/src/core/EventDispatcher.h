@@ -25,9 +25,7 @@ namespace Dive
 		Collision, Trigger, KeyPress,
 	};
 
-	class Scene;
-	class Entity;
-	using EventData = std::variant<int, void*, Entity*, std::shared_ptr<Scene>, entt::entity>;
+	using EventData = std::variant<int, void*, entt::entity>;
 
 	using EventListener = std::function<void(const EventData&)>;
 

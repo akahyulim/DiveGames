@@ -51,8 +51,8 @@ namespace Dive
 		static ID3D11Device* GetDevice();
 		static ID3D11DeviceContext* GetDeviceContext();
 
-		static ID3D11RenderTargetView* GetRenderTargetView();
-		static ID3D11DepthStencilView* GetDepthStencilView();
+		static ID3D11RenderTargetView* GetBackBufferRTV();
+		static ID3D11DepthStencilView* GetBackBufferDSV();
 
 		static UINT32 GetResolutionWidth() { return s_ResolutionWidth; }
 		static UINT32 GetResolutionHeight() { return s_ResolutionHeight; }
@@ -72,9 +72,9 @@ namespace Dive
 		static ID3D11Device* s_Device;
 		static ID3D11DeviceContext* s_DeviceContext;
 
-		static ID3D11RenderTargetView* s_BackbufferRenderTarget;
+		static ID3D11RenderTargetView* s_BackBufferRTV;
 		static ID3D11Texture2D* s_BackbufferTexture;
-		static ID3D11DepthStencilView* s_BackbufferDepthStencil;
+		static ID3D11DepthStencilView* s_BackBufferDSV;
 
 		static ID3D11DepthStencilView* s_CurrentDepthStencil;
 

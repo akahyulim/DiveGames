@@ -1,31 +1,40 @@
 ﻿#pragma once
-#include "Graphics/Graphics.h"
-#include "Resource/Resource.h"
+#include "resource/Resource.h"
+#include "graphics/Graphics.h"
+#include "graphics/Shader.h"
 
 namespace Dive
 {
 	class Texture;
 	class Texture2D;
 
-	// 현재 Texture는 opaque 여부를 판단하지 않는다.
-	// 이는 유니티의 설정을 따른 것으로, 유니티의 경우 머티리얼에서 확인한다.
-	// 현재는 legacy다. 추후 pbs가 추가될 수 있다.
+	enum class eTextureUnitType
+	{
+		None = 0,
+		Diffuse,
+		Normal,
+		Specular,
+		Emissive,
+		Roughness,
+		MRAO, // Metalness, Roughness, AO
+		Count
+	};
+
 	class Material : public Resource
 	{
-		DV_CLASS(Material, Resource);
+		DV_CLASS(Material, Resource)
 
 	public:
 		Material();
-		~Material() override;
+		~Material() = default;
 
-		bool LoadFromFile(const std::string& fileName) override;
-		bool SaveToFile(const std::string& fileName) override;
+		bool LoadFromFile(const std::filesystem::path& filepath) override;
+		bool SaveToFile(const std::filesystem::path& filepath) override;
 
-		const std::unordered_map<eTextureUnitType, Texture2D*>& GetDvTextures() const { return m_DvTextures; }
-		Texture2D* GetDvTexture(eTextureUnitType unit) const;
-		void SetDvTexture(eTextureUnitType unit, Texture2D* pTexture);
+		const std::unordered_map<eTextureUnitType, Texture2D*>& GetTextures() const { return m_Textures; }
+		Texture2D* GetTexture(eTextureUnitType unit) const;
+		void SetTexture(eTextureUnitType unit, Texture2D* texture);
 		bool HasTexture(eTextureUnitType unit) const;
-		void AddTexture(eTextureUnitType unit, const std::string& name);
 
 		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_DiffuseColor; }
 		void SetDiffuseColor(float r, float g, float b, float a) { m_DiffuseColor = { r, g, b, a }; }
@@ -41,14 +50,27 @@ namespace Dive
 
 		bool IsOpaque() const;
 
-	private:
-		std::unordered_map<eTextureUnitType, Texture2D*> m_DvTextures;
-		
-		DirectX::XMFLOAT4 m_DiffuseColor;
-		DirectX::XMFLOAT2 m_Tiling;
-		DirectX::XMFLOAT2 m_Offset;
-	};
+		Shader* GetPixelShader() const { return m_PixelShader; }
+		void SetPixelShader(Shader* shader)
+		{
+			if (m_PixelShader != shader)
+			{
+				m_PixelShader = shader;
+			}
+		}
 
-	Material* LoadMaterialFromFile(const std::string& fileName);
-	Material* CreateMaterial(const std::string& name);
+		std::string GetName() const { return m_Name; }
+		void SetName(const std::string& name) { m_Name = name; }
+
+	private:
+		std::string m_Name{};
+
+		std::unordered_map<eTextureUnitType, Texture2D*> m_Textures;
+		
+		DirectX::XMFLOAT4 m_DiffuseColor{ 1.0f, 1.0f, 1.0f, 1.0f };		
+		DirectX::XMFLOAT2 m_Tiling{ 1.0f, 1.0f };
+		DirectX::XMFLOAT2 m_Offset{ 0.0f, 0.0f };
+
+		Shader* m_PixelShader = nullptr;
+	};
 }

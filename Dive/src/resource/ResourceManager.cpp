@@ -3,40 +3,56 @@
 
 namespace Dive
 {
-	ResourceManager* GResourceManager = ResourceManager::GetInstance();
+	std::unordered_map<size_t, std::vector<Resource*>> ResourceManager::s_Resources;
+	std::filesystem::path ResourceManager::s_ResourceFolder = "Assets";
 
-	ResourceManager* ResourceManager::s_pInstance = nullptr;
-	std::once_flag ResourceManager::s_OnceFlag;
-
-	void ResourceManager::Shutdown()
+	void ResourceManager::Clear()
 	{
-		m_Resources.clear();
+		for (auto& [typeId, resources] : s_Resources)
+		{
+			for (auto* resource : resources)
+			{
+				DV_DELETE(resource);
+			}
+			resources.clear();
+		}
+		s_Resources.clear();
 	}
 
-	uint32_t ResourceManager::GetAllResourceCount()
+	bool ResourceManager::IsCahed(InstanceID instanceID)
 	{
-		std::lock_guard<std::mutex> guard(m_Mutex);
+		for (const auto& [typeId, resources] : s_Resources)
+		{
+			for (const auto* resource : resources)
+			{
+				if (resource->GetInstanceID() == instanceID)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
-		uint32_t count = 0;
-		for (const auto& [typeId, resources] : m_Resources)
-			count += static_cast<uint32_t>(resources.size());
-
+	INT32 ResourceManager::GetAllResourceCount()
+	{
+		INT32 count = 0;
+		for (const auto& [typeId, resources] : s_Resources)
+		{
+			count += static_cast<INT32>(resources.size());
+		}
 		return count;
 	}
 
-	bool ResourceManager::IsCached(uint64_t id)
+	void ResourceManager::SetResourceFolder(const std::filesystem::path& path)
 	{
-		std::lock_guard<std::mutex> guard(m_Mutex);
-
-		for (const auto& [typeId, resources] : m_Resources)
+		if (!std::filesystem::is_directory(path) || !std::filesystem::exists(path))
 		{
-			for (const auto& resource : resources)
-			{
-				if (resource->GetId() == id)
-					return true;
-			}
+			DV_LOG(ResourceManager, err, "잘못된 에셋 폴더 경로 전달: {}", path.string());
+			return;
 		}
 
-		return false;
+		s_ResourceFolder = path;
+		std::filesystem::current_path(s_ResourceFolder);
 	}
 }
