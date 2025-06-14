@@ -35,6 +35,16 @@ namespace Dive
 		entt::entity MainCamera = entt::null;
 	};
 
+	class DvEditorContext
+	{
+	public:
+		static World* ActiveWorld;
+		
+		static GameObject* Selected;
+		static GameObject* EditorCamera;
+		static GameObject* MainCamera;
+	};
+
 	class Editor
 	{
 	public:

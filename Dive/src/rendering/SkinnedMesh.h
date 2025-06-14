@@ -5,8 +5,6 @@ namespace Dive
 {
 	class SkinnedMesh : public StaticMesh
 	{
-		DV_CLASS(SkinnedMesh, StaticMesh)
-
 	public:
 		SkinnedMesh();
 		~SkinnedMesh() override = default;
@@ -16,6 +14,8 @@ namespace Dive
 
 		void SetBoneWeights(const std::vector<DirectX::XMFLOAT4>& boneWeights) { m_BoneWeights = boneWeights; }
 		void SetBoneIndices(const std::vector<DirectX::XMFLOAT4>& boneIndices) { m_BoneIndices = boneIndices; }
+
+		static constexpr eResourceType GetType() { return eResourceType::SkinnedMesh; }
 
 	private:
 		std::vector<DirectX::XMFLOAT4> m_BoneWeights;

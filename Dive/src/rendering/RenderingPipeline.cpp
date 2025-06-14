@@ -32,7 +32,32 @@ namespace Dive
 
 	void RenderingPipeline::Shutdown()
 	{	
-		
+		DV_DELETE(s_GBufferRT0);
+		DV_DELETE(s_GBufferRT1);
+		DV_DELETE(s_GBufferRT2);
+		DV_DELETE(s_FrameRT);
+		DV_DELETE(s_OutputRT);
+
+		for (auto& rt : s_RenderTargets)
+		{
+			DV_DELETE(rt);
+			rt = nullptr;
+		}
+		for (auto& rs : s_RasterizerStates)
+		{
+			if (rs) rs->Release();
+			rs = nullptr;
+		}
+		for (auto& ds : s_DepthStencilStates)
+		{
+			if (ds) ds->Release();
+			ds = nullptr;
+		}
+		for (auto& bs : s_BlendStates)
+		{
+			if (bs) bs->Release();
+			bs = nullptr;
+		}
 	}
 
 	// 카메라, 렌더링 대상 메시들
@@ -97,26 +122,6 @@ namespace Dive
 		else
 		{
 			s_RenderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)]->Resize(width, height);
-		}
-
-		if (!s_RenderTargets[static_cast<size_t>(eRenderTarget::Editor_WorldView)])
-		{
-			s_RenderTargets[static_cast<size_t>(eRenderTarget::Editor_WorldView)] = new RenderTexture(width, height);
-			s_RenderTargets[static_cast<size_t>(eRenderTarget::Editor_WorldView)]->Create();
-		}
-		else
-		{
-			s_RenderTargets[static_cast<size_t>(eRenderTarget::Editor_WorldView)]->Resize(width, height);
-		}
-
-		if (!s_RenderTargets[static_cast<size_t>(eRenderTarget::Editor_GameView)])
-		{
-			s_RenderTargets[static_cast<size_t>(eRenderTarget::Editor_GameView)] = new RenderTexture(width, height);
-			s_RenderTargets[static_cast<size_t>(eRenderTarget::Editor_GameView)]->Create();
-		}
-		else
-		{
-			s_RenderTargets[static_cast<size_t>(eRenderTarget::Editor_GameView)]->Resize(width, height);
 		}
 
 		s_RenderTargetWidth = width;

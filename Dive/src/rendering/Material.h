@@ -22,8 +22,6 @@ namespace Dive
 
 	class Material : public Resource
 	{
-		DV_CLASS(Material, Resource)
-
 	public:
 		Material();
 		~Material() = default;
@@ -61,6 +59,8 @@ namespace Dive
 
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
+
+		static constexpr eResourceType GetType() { return eResourceType::Material; }
 
 	private:
 		std::string m_Name{};

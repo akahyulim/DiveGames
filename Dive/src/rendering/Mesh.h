@@ -98,9 +98,7 @@ namespace Dive
 
 	class Mesh : public Resource
 	{
-		DV_CLASS(Mesh, Resource)
-
-    public:
+	 public:
         Mesh();
         ~Mesh() override;
 

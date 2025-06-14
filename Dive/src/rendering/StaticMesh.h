@@ -17,8 +17,6 @@ namespace Dive
 	// => 코파일럿에게 물어보니 유니티 ecs의 경우 SkinnedMeshRendrerer는 별도의 시스템과 컴포넌트가 필요하다고 한다.
 	class StaticMesh : public Resource
 	{
-		DV_CLASS(StaticMesh, Resource)
-
 	public:
 		StaticMesh();
 		~StaticMesh() override;
@@ -33,6 +31,8 @@ namespace Dive
 		void SetColors(const std::vector<DirectX::XMFLOAT4>& colors) { m_Colors = colors; }
 
 		void SetIndices(const std::vector<UINT32>& indices) { m_Indices = indices; }
+
+		static constexpr eResourceType GetType() { return eResourceType::StaticMesh; }
 
 	protected:
 		bool createIndexBuffer();

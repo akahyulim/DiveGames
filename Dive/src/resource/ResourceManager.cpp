@@ -3,12 +3,12 @@
 
 namespace Dive
 {
-	std::unordered_map<size_t, std::vector<Resource*>> ResourceManager::s_Resources;
+	std::unordered_map<eResourceType, std::vector<Resource*>> ResourceManager::s_Resources;
 	std::filesystem::path ResourceManager::s_ResourceFolder = "Assets";
 
 	void ResourceManager::Clear()
 	{
-		for (auto& [typeId, resources] : s_Resources)
+		for (auto& [type, resources] : s_Resources)
 		{
 			for (auto* resource : resources)
 			{
@@ -19,9 +19,9 @@ namespace Dive
 		s_Resources.clear();
 	}
 
-	bool ResourceManager::IsCahed(InstanceID instanceID)
+	bool ResourceManager::IsCahed(UINT64 instanceID)
 	{
-		for (const auto& [typeId, resources] : s_Resources)
+		for (const auto& [type, resources] : s_Resources)
 		{
 			for (const auto* resource : resources)
 			{
@@ -37,7 +37,7 @@ namespace Dive
 	INT32 ResourceManager::GetAllResourceCount()
 	{
 		INT32 count = 0;
-		for (const auto& [typeId, resources] : s_Resources)
+		for (const auto& [type, resources] : s_Resources)
 		{
 			count += static_cast<INT32>(resources.size());
 		}

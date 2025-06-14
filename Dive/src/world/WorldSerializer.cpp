@@ -1,9 +1,10 @@
 ﻿#include "stdafx.h"
 #include "WorldSerializer.h"
 #include "World.h"
-#include "EntityManager.h"
-#include "Components.h"
+#include "GameObject.h"
+#include "Components/Transform.h"
 #include "core/CoreDefs.h"
+#include "core/InstanceID.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -122,89 +123,50 @@ namespace Dive
 		return out;
 	}
 
-	WorldSerializer::WorldSerializer(World* world)
+	DvWorldSerializer::DvWorldSerializer(World* world)
 		: m_World(world)
 	{
 	}
 
-	void WorldSerializer::Serialize(const std::filesystem::path& filepath)
+	void DvWorldSerializer::Serialize(const std::filesystem::path& filepath)
 	{
-		auto& entityManager = m_World->GetEntityManager();
-
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "World" << YAML::Value << m_World->GetName();
-		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
+		out << YAML::Key << "GameObjects" << YAML::Value << YAML::BeginSeq;
 
-		for (auto& entity : entityManager.GetAllEntities())
+		auto allGameObjects = m_World->GetAllGameObjects();
+		if (!allGameObjects.empty())
 		{
-			out << YAML::BeginMap;
-
-			if (entityManager.HasComponent<IDComponent>(entity))
+			for (auto& gameObject : allGameObjects)
 			{
-				out << YAML::Key << "Entity" << YAML::Value << entityManager.GetComponent<IDComponent>(entity).ID;
-			}
-
-			if (entityManager.HasComponent<NameComponent>(entity))
-			{
-				out << YAML::Key << "NameComponent";
 				out << YAML::BeginMap;
 
-				out << YAML::Key << "Name" << YAML::Value << entityManager.GetComponent<NameComponent>(entity).Name;
+				out << YAML::Key << "InstanceID" << YAML::Value << gameObject->GetInstanceID();
+				out << YAML::Key << "Name" << YAML::Value << gameObject->GetName();
+
+				if (gameObject->HasComponent<Transform>())
+				{
+					out << YAML::Key << "Transform";
+					out << YAML::BeginMap;
+
+					auto tc = gameObject->GetTransform();
+					out << YAML::Key << "Position" << YAML::Value << tc->GetLocalPosition();
+					out << YAML::Key << "Rotation" << YAML::Value << tc->GetLocalRotation();
+					out << YAML::Key << "Scale" << YAML::Value << tc->GetLocalScale();
+
+					if (tc->HasParent())
+					{
+						auto parentObject = tc->GetParent()->GetGameObject();
+						out << YAML::Key << "Parent" << YAML::Value << parentObject->GetInstanceID();
+					}
+					out << YAML::EndMap;
+				}
+
 				out << YAML::EndMap;
 			}
-
-			if (entityManager.HasComponent<ActiveComponent>(entity))
-			{
-				out << YAML::Key << "ActiveComponent";
-				out << YAML::BeginMap;
-
-				out << YAML::Key << "IsActive" << YAML::Value << entityManager.GetComponent<ActiveComponent>(entity).IsActive;
-				out << YAML::EndMap;
-			}
-
-			if (entityManager.HasComponent<LocalTransform>(entity))
-			{
-				out << YAML::Key << "LocalTransform";
-				out << YAML::BeginMap;
-
-				auto& tc = entityManager.GetComponent<LocalTransform>(entity);
-				out << YAML::Key << "Position" << YAML::Value << tc.Position;
-				out << YAML::Key << "Rotation" << YAML::Value << tc.Rotation;
-				out << YAML::Key << "Scale" << YAML::Value << tc.Scale;
-				out << YAML::EndMap;
-			}
-
-			if (entityManager.HasComponent<ParentComponent>(entity))
-			{
-				out << YAML::Key << "ParentComponent";
-				out << YAML::BeginMap;
-
-				auto parent = entityManager.GetComponent<ParentComponent>(entity).Parent;
-				out << YAML::Key << "Parent" << YAML::Value << entityManager.GetInstanceID(parent);
-				out << YAML::EndMap;
-			}
-
-			if (entityManager.HasComponent<TagComponent>(entity))
-			{
-				out << YAML::Key << "TagComponent";
-				out << YAML::BeginMap;
-				out << YAML::Key << "Tag" << YAML::Value << static_cast<int>(entityManager.GetComponent<TagComponent>(entity).Tag);
-				out << YAML::EndMap;
-			}
-
-			if (entityManager.HasComponent<CameraComponent>(entity))
-			{
-				out << YAML::Key << "CameraComponent";
-				out << YAML::BeginMap;
-				auto& cameraCom = entityManager.GetComponent<CameraComponent>(entity);
-				out << YAML::Key << "Type" << YAML::Value << static_cast<int>(cameraCom.Type);
-				out << YAML::Key << "ClearColor" << YAML::Value << cameraCom.ClearColor;
-				out << YAML::EndMap;
-			}
-
-			out << YAML::EndMap;
 		}
+
 		out << YAML::EndSeq;
 		out << YAML::EndMap;
 
@@ -212,15 +174,14 @@ namespace Dive
 		fout << out.c_str();
 	}
 
-	bool WorldSerializer::Deserialize(const std::filesystem::path& filepath)
+	bool DvWorldSerializer::Deserialize(const std::filesystem::path& filepath)
 	{
-		auto& entityManager = m_World->GetEntityManager();
 		YAML::Node data;
 
 		try { data = YAML::LoadFile(filepath.string()); }
 		catch (YAML::ParserException& e)
 		{
-			DV_LOG(WorldSerializer, warn, "YAML 파일 파싱 실패: '{0}'\n {1}", filepath.string().c_str(), e.what());
+			DV_LOG(DvWorldSerializer, warn, "YAML 파일 파싱 실패: '{0}'\n {1}", filepath.string().c_str(), e.what());
 			return false;
 		}
 
@@ -228,68 +189,45 @@ namespace Dive
 
 		std::string worldName = data["World"].as<std::string>();
 		m_World->SetName(worldName);
-		DV_LOG(WorldSerializer, trace, "Deserializing World '{0}'", worldName);
+		DV_LOG(DvWorldSerializer, trace, "Deserializing World '{0}'", worldName);
 
-		std::unordered_map<InstanceID, entt::entity> entityMap;
-		auto entities = data["Entities"];
+		std::unordered_map<InstanceID, GameObject*> gameObjectMap;
+		auto gameObjects = data["GameObjects"];
 
-		if (entities)
+		if (gameObjects)
 		{
-			for (auto entity : entities)
+			for (auto gameObject : gameObjects)
 			{
-				UINT64 instanceID = entity["Entity"].as<UINT64>();
-				std::string name = entity["NameComponent"] ? entity["NameComponent"]["Name"].as<std::string>() : "";
+				UINT64 instanceID = gameObject["InstanceID"].as<UINT64>();
+				std::string name = gameObject["Name"] ? gameObject["Name"].as<std::string>() : "";
 
-				DV_LOG(WorldSerializer, trace, "Deserializerd Entity with ID = {0}, name = {1}", instanceID, name);
+				DV_LOG(DvWorldSerializer, trace, "Deserializerd Entity with ID = {0}, name = {1}", instanceID, name);
 
-				auto deserializedEntity = entityManager.CreateEntityWithUUID(instanceID, name);
-				entityMap[instanceID] = deserializedEntity;
+				auto deserializedObject = m_World->CreateGameObjectWithInstanceID(instanceID, name);
+				gameObjectMap[instanceID] = deserializedObject;
 
-				auto active = entity["ActiveComponent"];
-				if (active)
+				auto transform = gameObject["Transform"];
+				if (transform)
 				{
-					auto& activeCom = entityManager.AddComponent<ActiveComponent>(deserializedEntity);
-					activeCom.IsActive = active["IsActive"].as<bool>();
-				}
-
-				auto localTransform = entity["LocalTransform"];
-				if (localTransform)
-				{
-					auto& localTransformCom = entityManager.AddComponent<LocalTransform>(deserializedEntity);
-					localTransformCom.Position = localTransform["Position"].as<DirectX::XMFLOAT3>();
-					localTransformCom.Rotation = localTransform["Rotation"].as<DirectX::XMFLOAT4>();
-					localTransformCom.Scale = localTransform["Scale"].as<DirectX::XMFLOAT3>();
-				}
-
-				auto tag = entity["TagComponent"];
-				if (tag)
-				{
-					auto& tagCom = entityManager.AddComponent<TagComponent>(deserializedEntity);
-					tagCom.Tag = static_cast<TagComponent::eTag>(tag["Tag"].as<int>());
-				}
-
-				auto camera = entity["CameraComponent"];
-				if (camera)
-				{
-					auto& cameraCom = entityManager.AddComponent<CameraComponent>(deserializedEntity);
-					cameraCom.Type = static_cast<CameraComponent::eProjectionType>(camera["Type"].as<int>());
-					cameraCom.ClearColor = camera["ClearColor"].as<DirectX::XMFLOAT4>();
+					auto tc = deserializedObject->GetTransform();
+					tc->SetLocalPosition(transform["Position"].as<DirectX::XMFLOAT3>());
+					tc->SetLocalRotation(transform["Rotation"].as<DirectX::XMFLOAT4>());
+					tc->SetLocalScale(transform["Scale"].as<DirectX::XMFLOAT3>());
 				}
 			}
 
-			for (auto entity : entities)
+			for (auto gameObject : gameObjects)
 			{
-				auto parent = entity["ParentComponent"];
-				if (parent)
+				auto transform = gameObject["Transform"];
+				if (transform && transform["Parent"])
 				{
-					UINT64 instanceID = entity["Entity"].as<UINT64>();
-					UINT64 parentUUID = parent["Parent"].as<UINT64>();
+					UINT64 instanceID = gameObject["InstanceID"].as<UINT64>();
+					UINT64 parentInstanceID = transform["Parent"].as<UINT64>();
 
-					if (entityMap.count(instanceID) && entityMap.count(parentUUID))
+					if (gameObjectMap.count(instanceID) && gameObjectMap.count(parentInstanceID))
 					{
-						auto deserializedEntity = entityMap[instanceID];
-						auto& parentCom = entityManager.AddComponent<ParentComponent>(deserializedEntity);
-						parentCom.Parent = entityMap[parentUUID];
+						auto deserializedObject = gameObjectMap[instanceID];
+						deserializedObject->GetTransform()->SetParent(gameObjectMap[parentInstanceID]->GetTransform());
 					}
 				}
 			}

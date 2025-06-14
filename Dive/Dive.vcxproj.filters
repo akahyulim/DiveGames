@@ -98,23 +98,11 @@
     <ClInclude Include="src\rendering\MeshFactory.h">
       <Filter>rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\Components.h">
-      <Filter>world</Filter>
-    </ClInclude>
     <ClInclude Include="src\world\World.h">
-      <Filter>world</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\EntityManager.h">
       <Filter>world</Filter>
     </ClInclude>
     <ClInclude Include="src\world\WorldSerializer.h">
       <Filter>world</Filter>
-    </ClInclude>
-    <ClInclude Include="src\systems\SystemBase.h">
-      <Filter>systems</Filter>
-    </ClInclude>
-    <ClInclude Include="src\systems\TransformSystem.h">
-      <Filter>systems</Filter>
     </ClInclude>
     <ClInclude Include="src\core\Input.h">
       <Filter>core</Filter>
@@ -122,14 +110,14 @@
     <ClInclude Include="src\rendering\Material.h">
       <Filter>rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\systems\RenderingSystem.h">
-      <Filter>systems</Filter>
-    </ClInclude>
     <ClInclude Include="src\rendering\RenderingPipeline.h">
       <Filter>rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\StaticMesh.h" />
     <ClInclude Include="src\rendering\SkinnedMesh.h" />
+    <ClInclude Include="src\world\GameObject.h" />
+    <ClInclude Include="src\world\Components\Component.h" />
+    <ClInclude Include="src\world\Components\Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -205,17 +193,8 @@
     <ClCompile Include="src\world\World.cpp">
       <Filter>world</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\Components.cpp">
-      <Filter>world</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\EntityManager.cpp">
-      <Filter>world</Filter>
-    </ClCompile>
     <ClCompile Include="src\world\WorldSerializer.cpp">
       <Filter>world</Filter>
-    </ClCompile>
-    <ClCompile Include="src\systems\TransformSystem.cpp">
-      <Filter>systems</Filter>
     </ClCompile>
     <ClCompile Include="src\core\Input.cpp">
       <Filter>core</Filter>
@@ -223,13 +202,12 @@
     <ClCompile Include="src\rendering\Material.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\systems\RenderingSystem.cpp">
-      <Filter>systems</Filter>
-    </ClCompile>
     <ClCompile Include="src\rendering\RenderingPipeline.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\StaticMesh.cpp" />
     <ClCompile Include="src\rendering\SkinnedMesh.cpp" />
+    <ClCompile Include="src\world\GameObject.cpp" />
+    <ClCompile Include="src\world\Components\Transform.cpp" />
   </ItemGroup>
 </Project>

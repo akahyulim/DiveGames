@@ -41,13 +41,9 @@
 #include "resource/Resource.h"
 #include "resource/ResourceManager.h"
 
-// systems
-#include "systems/SystemBase.h"
-#include "systems/TransformSystem.h"
-#include "systems/RenderingSystem.h"
-
 // world
-#include "world/Components.h"
+#include "world/Components/Component.h"
+#include "world/Components/Transform.h"
+#include "world/GameObject.h"
 #include "world/World.h"
 #include "world/WorldSerializer.h"
-#include "world/EntityManager.h"

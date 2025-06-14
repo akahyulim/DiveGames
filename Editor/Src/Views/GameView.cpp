@@ -29,9 +29,9 @@ namespace Dive
 			m_RenderTarget = new RenderTexture(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
 			m_RenderTarget->Create();
 
-			auto& cameraCom = editorContext.ActiveWorld->GetEntityManager().GetComponent<CameraComponent>(editorContext.MainCamera);
-			if (cameraCom.RenderTarget != m_RenderTarget)
-				cameraCom.RenderTarget = m_RenderTarget;
+			//auto& cameraCom = editorContext.ActiveWorld->GetEntityManager().GetComponent<CameraComponent>(editorContext.MainCamera);
+			//if (cameraCom.RenderTarget != m_RenderTarget)
+			//	cameraCom.RenderTarget = m_RenderTarget;
 		}
 		else
 		{

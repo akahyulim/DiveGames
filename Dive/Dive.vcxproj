@@ -50,12 +50,10 @@
     <ClInclude Include="src\resource\Resource.h" />
     <ClInclude Include="src\resource\ResourceManager.h" />
     <ClInclude Include="src\stdafx.h" />
-    <ClInclude Include="src\systems\RenderingSystem.h" />
-    <ClInclude Include="src\systems\SystemBase.h" />
-    <ClInclude Include="src\systems\TransformSystem.h" />
-    <ClInclude Include="src\world\Components.h" />
+    <ClInclude Include="src\world\Components\Component.h" />
+    <ClInclude Include="src\world\Components\Transform.h" />
+    <ClInclude Include="src\world\GameObject.h" />
     <ClInclude Include="src\world\World.h" />
-    <ClInclude Include="src\world\EntityManager.h" />
     <ClInclude Include="src\world\WorldSerializer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -90,11 +88,9 @@
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\systems\RenderingSystem.cpp" />
-    <ClCompile Include="src\systems\TransformSystem.cpp" />
-    <ClCompile Include="src\world\Components.cpp" />
+    <ClCompile Include="src\world\Components\Transform.cpp" />
+    <ClCompile Include="src\world\GameObject.cpp" />
     <ClCompile Include="src\world\World.cpp" />
-    <ClCompile Include="src\world\EntityManager.cpp" />
     <ClCompile Include="src\world\WorldSerializer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

@@ -13,7 +13,9 @@ namespace Dive
 		template<class T>
 		static T* Load(const std::filesystem::path& filepath)
 		{
-			auto it = s_Resources.find(T::GetTypeHashStatic());
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
 			{
 				for (const auto& resource : it->second)
@@ -26,14 +28,16 @@ namespace Dive
 			}
 			auto resource = new T();
 			resource->LoadFromFile(filepath);
-			s_Resources[T::GetTypeHashStatic()].push_back(resource);
+			s_Resources[T::GetType()].push_back(resource);
 			return resource;
 		}
 
 		template<class T>
 		static T* GetByName(const std::string& name)
 		{
-			auto it = s_Resources.find(T::GetTypeHashStatic());
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
 			{
 				for (const auto& resource : it->second)
@@ -50,7 +54,9 @@ namespace Dive
 		template<class T>
 		static T* GetByPath(const std::filesystem::path& filepath)
 		{
-			auto it = s_Resources.find(T::GetTypeHashStatic());
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
 			{
 				for (const auto& resource : it->second)
@@ -67,7 +73,9 @@ namespace Dive
 		template<class T>
 		static std::vector<T*> GetByType()
 		{
-			auto it = s_Resources.find(T::GetTypeHashStatic());
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
 			{
 				std::vector<T*> resources;
@@ -84,7 +92,9 @@ namespace Dive
 		template<class T>
 		static bool IsCached(const std::string& filepath)
 		{
-			auto it = s_Resources.find(T::GetTypeHashStatic());
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
 			{
 				for (const auto& resource : it->second)
@@ -98,12 +108,14 @@ namespace Dive
 			return false;
 		}
 
-		static bool IsCahed(InstanceID instanceID);
+		static bool IsCahed(UINT64 instanceID);
 
 		template<class T>
 		static INT32 GetResourceCount()
 		{
-			auto it = s_Resources.find(T::GetTypeHashStatic());
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
 			{
 				return static_cast<INT32>(it->second.size());
@@ -117,7 +129,7 @@ namespace Dive
 		static void SetResourceFolder(const std::filesystem::path& path);
 
 	private:
-		static std::unordered_map<size_t, std::vector<Resource*>> s_Resources;
+		static std::unordered_map<eResourceType, std::vector<Resource*>> s_Resources;
 		static std::filesystem::path s_ResourceFolder;
 	};
 }

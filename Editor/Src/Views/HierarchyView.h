@@ -15,7 +15,7 @@ namespace Dive
 		void drawView() override;
 
 	private:
-		void showNode(entt::entity node);
+		void showNode(GameObject* node);
 
 	private:
 	};

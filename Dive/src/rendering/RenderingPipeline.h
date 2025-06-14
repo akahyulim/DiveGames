@@ -40,8 +40,6 @@ namespace Dive
 	{
 		FrameRender,
 		FrameOutput,
-		Editor_WorldView,
-		Editor_GameView,
 		Count
 	};
 	

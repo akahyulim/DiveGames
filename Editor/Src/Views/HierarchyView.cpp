@@ -18,70 +18,62 @@ namespace Dive
 
 	void HierarchyView::drawView()
 	{
-		auto& editorContext = EditorContext::GetInstance();
-		if (!editorContext.ActiveWorld)
+		if (!DvEditorContext::ActiveWorld)
 			return;
 
-		if (ImGui::TreeNodeEx(editorContext.ActiveWorld->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::TreeNodeEx(DvEditorContext::ActiveWorld->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			auto& entityManager = editorContext.ActiveWorld->GetEntityManager();
-
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 				{ 
 					auto instanceID = static_cast<InstanceID*>(payload->Data);
-					auto draggedNode = entityManager.GetEntity(*instanceID);
-					entityManager.RemoveComponent<ParentComponent>(draggedNode);
+					auto draggedNode = DvEditorContext::ActiveWorld->GetGameObjectByInstanceID(*instanceID);
+					draggedNode->GetTransform()->SetParent(nullptr);
 				}
 
 				ImGui::EndDragDropTarget();
 			}
 
-			auto rootNodes = entityManager.GetRootEntities();
+			auto rootNodes = DvEditorContext::ActiveWorld->GetRootGameObjects();
 			if (!rootNodes.empty())
 			{
 				for (auto& node : rootNodes)
 				{
-					if (entityManager.HasComponent<TagComponent>(node) &&
-						entityManager.GetComponent<TagComponent>(node).Tag == TagComponent::eTag::EditorOnly)
-						continue;
-				
+					// Tag 컴포넌트 추가 후 EditorCamera는 넘기자.
+						
 					showNode(node);
 				}
 			}
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 			{
-				editorContext.Selected = entt::null;
+				DvEditorContext::Selected = nullptr;
 			}
 
 			ImGui::TreePop();
 		}
 	}
-	
-	void HierarchyView::showNode(entt::entity node)
+
+	void HierarchyView::showNode(GameObject* node)
 	{
-		if (node == entt::null)
+		if (node == nullptr)
 			return;
 
-		auto& editorContext = EditorContext::GetInstance();
-		auto& entityManager = editorContext.ActiveWorld->GetEntityManager();
-
 		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
-		nodeFlags |=  (entityManager.HasComponent<Children>(node)) ?  ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf;
-		nodeFlags |= (editorContext.Selected == node) ? ImGuiTreeNodeFlags_Selected : 0;
+		nodeFlags |= node->GetComponent<Transform>()->HasChildren() ? ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf;
+		nodeFlags |= (DvEditorContext::Selected == node) ? ImGuiTreeNodeFlags_Selected : 0;
 
-		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)node, nodeFlags, entityManager.GetName(node).c_str());
+		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)node, nodeFlags, node->GetName().c_str());
 		{
 			if (ImGui::IsItemClicked())
 			{
-				editorContext.Selected = node;
+				DvEditorContext::Selected = node;
 			}
 
 			if (ImGui::BeginDragDropSource())
 			{
-				auto instanceID = entityManager.GetInstanceID(node);
+				auto instanceID = node->GetInstanceID();
 				ImGui::SetDragDropPayload("HIERARCHY_NODE", &instanceID, sizeof(InstanceID));
 				ImGui::EndDragDropSource();
 			}
@@ -91,13 +83,11 @@ namespace Dive
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 				{
 					auto instanceID = static_cast<InstanceID*>(payload->Data);
-					auto draggedNode = entityManager.GetEntity(*instanceID);
+					auto draggedNode = DvEditorContext::ActiveWorld->GetGameObjectByInstanceID(*instanceID);
 
 					if (draggedNode != node)
 					{
-						auto& pc = entityManager.HasComponent<ParentComponent>(draggedNode) ?
-							entityManager.GetComponent<ParentComponent>(draggedNode) : entityManager.AddComponent<ParentComponent>(draggedNode);
-						pc.Parent = node;
+						draggedNode->GetTransform()->SetParent(node->GetTransform());
 					}
 				}
 
@@ -127,12 +117,12 @@ namespace Dive
 
 			if (opened)
 			{
-				if (entityManager.HasComponent<Children>(node))
+				if(node->GetTransform()->HasChildren())
 				{
-					auto& children = entityManager.GetComponent<Children>(node);
-					for (auto& child : children.entities)
+					auto children = node->GetTransform()->GetChildren();
+					for (auto& child : children)
 					{
-						showNode(child);
+						showNode(child->GetGameObject());
 					}
 				}
 
@@ -141,15 +131,13 @@ namespace Dive
 
 			if (nodeAdded)
 			{
-				auto addedNode = entityManager.CreateEntity("Entity");
-				entityManager.AddComponent<ActiveComponent>(addedNode).IsActive = true;
-				entityManager.AddComponent<LocalTransform>(addedNode);
+				auto addedNode = DvEditorContext::ActiveWorld->CreateGameObject("GameObject");
 			}
 
 			if (nodeDeleted)
 			{
-				entityManager.DeleteEntity(node);
-				editorContext.Selected = entt::null;
+				DvEditorContext::ActiveWorld->DeleteGameObject(node);
+				DvEditorContext::Selected = nullptr;
 			}
 
 			if (nodeCopied)

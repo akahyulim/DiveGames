@@ -9,6 +9,8 @@
 #include <string>
 #include <atlconv.h>
 #include <memory>
+#include <typeindex>
+#include <type_traits>
 #include <chrono>
 #include <random>
 #include <functional>

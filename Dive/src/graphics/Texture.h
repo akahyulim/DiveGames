@@ -7,8 +7,6 @@ namespace Dive
 {
 	class Texture : public Resource
 	{
-		DV_CLASS(Texture, Resource)
-
 	public:
 		Texture() = default;
 		virtual ~Texture() = default;

@@ -12,8 +12,6 @@ namespace Dive
 
 	class RenderTexture : public Texture
 	{
-		DV_CLASS(RenderTexture, Texture)
-
 	public:
 		RenderTexture() = delete;
 		RenderTexture(UINT32 width, UINT32 height, eDepthFormat depth = eDepthFormat::None, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
@@ -30,6 +28,8 @@ namespace Dive
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }
 		ID3D11DepthStencilView* GetDepthStencilView() const { return m_DepthStencilView; }
 		ID3D11ShaderResourceView* GetDepthStencilShaderResourceView() const { return m_DepthStencilShaderResourceView; }
+
+		static constexpr eResourceType GetType() { return eResourceType::RenderTexture; }
 
 	private:
 		UINT32 m_Width = 0;

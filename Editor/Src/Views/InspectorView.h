@@ -12,8 +12,6 @@ namespace Dive
 		void drawView() override;
 
 	private:
-		void drawComponents(entt::entity entity);
-
 		template<typename T>
 		void displayAddComponentEntry(const std::string& entryName);
 

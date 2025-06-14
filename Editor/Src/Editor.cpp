@@ -40,6 +40,11 @@ LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPAR
 
 namespace Dive
 {
+	World* DvEditorContext::ActiveWorld = nullptr;
+	GameObject* DvEditorContext::Selected = nullptr;
+	GameObject* DvEditorContext::EditorCamera = nullptr;
+	GameObject* DvEditorContext::MainCamera = nullptr;
+
 	// main으로부터 argc를 받아 추린 후 엔진에 전달한다.
 	Editor::Editor()
 	{

@@ -1,50 +1,27 @@
 ﻿#include "stdafx.h"
 #include "Resource.h"
 #include "core/FileUtils.h"
+#include "core/InstanceID.h"
 
 namespace Dive
 {
-	TypeInfo::TypeInfo(const std::string& typeName, const TypeInfo* baseTypeInfo)
-		: m_TypeHash(std::hash<std::string>{}(typeName))
-		, m_TypeName(typeName)
-		, m_BaseTypeInfo(baseTypeInfo)
+	Resource::Resource(const std::string& name)
+		: m_InstanceID(InstanceID())
+		, m_Name(name)
 	{
+		DV_LOG(Resource, trace, "Create Resource - name: {0}, instanceID: {1}", m_Name, m_InstanceID);
 	}
 
-	bool TypeInfo::IsTypeOf(size_t typeHash) const
-	{
-		const TypeInfo* curTypeInfo = this;
-		while (curTypeInfo)
-		{
-			if (curTypeInfo->GetTypeHash() == typeHash)
-				return true;
-
-			curTypeInfo = curTypeInfo->GetBaseTypeInfo();
-		}
-
-		return false;
-	}
-
-	bool TypeInfo::IsTypeOf(const TypeInfo* typeInfo) const
-	{
-		if (!typeInfo)
-			return false;
-
-		const TypeInfo* curTypeInfo = this;
-		while (curTypeInfo)
-		{
-			if (curTypeInfo == typeInfo || curTypeInfo->GetTypeHash() == typeInfo->GetTypeHash())
-				return true;
-
-			curTypeInfo = curTypeInfo->GetBaseTypeInfo();
-		}
-
-		return false;
+	Resource::Resource(UINT64 instanceID, const std::string& name)
+		: m_InstanceID(instanceID)
+		, m_Name(name)
+	{ 
+		DV_LOG(Resource, trace, "Create Resource - name: {0}, instanceID: {1}", m_Name, m_InstanceID);
 	}
 
 	Resource::~Resource()
 	{
-		DV_LOG(Resource, debug, "Delete Resource - name: {0}, instanceID: {1}", m_Name, m_InstanceID);
+		DV_LOG(Resource, trace, "Delete Resource - name: {0}, instanceID: {1}", m_Name, m_InstanceID);
 	}
 
 	void Resource::SetFilepath(const std::filesystem::path& filepath)
