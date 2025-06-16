@@ -9,7 +9,7 @@
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
 
-constexpr float DEFAULT_FONT_SIZE = 19.0f;
+constexpr float DEFAULT_FONT_SIZE = 13.0f;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam);
 
@@ -40,10 +40,10 @@ LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPAR
 
 namespace Dive
 {
-	World* DvEditorContext::ActiveWorld = nullptr;
-	GameObject* DvEditorContext::Selected = nullptr;
-	GameObject* DvEditorContext::EditorCamera = nullptr;
-	GameObject* DvEditorContext::MainCamera = nullptr;
+	World* EditorContext::ActiveWorld = nullptr;
+	GameObject* EditorContext::Selected = nullptr;
+	GameObject* EditorContext::EditorCamera = nullptr;
+	GameObject* EditorContext::MainCamera = nullptr;
 
 	// main으로부터 argc를 받아 추린 후 엔진에 전달한다.
 	Editor::Editor()
@@ -172,13 +172,13 @@ namespace Dive
 		// FONTS
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.FontDefault = m_Fonts[static_cast<size_t>(eFontTypes::Normal)] =
-			io.Fonts->AddFontFromFileTTF("../../../Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
 		m_Fonts[static_cast<size_t>(eFontTypes::Bold)] =
-			io.Fonts->AddFontFromFileTTF("../../../Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
 		m_Fonts[static_cast<size_t>(eFontTypes::Large)] =
-			io.Fonts->AddFontFromFileTTF("../../../Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
 		m_Fonts[static_cast<size_t>(eFontTypes::Large_Bold)] =
-			io.Fonts->AddFontFromFileTTF("../../../Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
 	}
 
 	void Editor::beginUI()

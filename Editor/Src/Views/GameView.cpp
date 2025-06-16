@@ -17,8 +17,7 @@ namespace Dive
 
 	void GameView::drawView()
 	{
-		auto& editorContext = EditorContext::GetInstance();
-		if (!editorContext.ActiveWorld || editorContext.MainCamera == entt::null)
+		if (!EditorContext::ActiveWorld)// || !EditorContext::MainCamera)
 			return;
 
 		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;

@@ -53,11 +53,13 @@ namespace Dive
 		Count
 	};
 
-	class RenderingPipeline
+	class Renderer
 	{
 	public:
 		static void Initialize();
 		static void Shutdown();
+
+		static void OnUpdate();
 
 		static void DeferredPass();
 		static void LightingPass();

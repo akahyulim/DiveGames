@@ -18,37 +18,38 @@ namespace Dive
 
 	void HierarchyView::drawView()
 	{
-		if (!DvEditorContext::ActiveWorld)
+		if (!EditorContext::ActiveWorld)
 			return;
 
-		if (ImGui::TreeNodeEx(DvEditorContext::ActiveWorld->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
+		if (ImGui::TreeNodeEx(EditorContext::ActiveWorld->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
 			if (ImGui::BeginDragDropTarget())
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 				{ 
 					auto instanceID = static_cast<InstanceID*>(payload->Data);
-					auto draggedNode = DvEditorContext::ActiveWorld->GetGameObjectByInstanceID(*instanceID);
+					auto draggedNode = EditorContext::ActiveWorld->GetGameObjectByInstanceID(*instanceID);
 					draggedNode->GetTransform()->SetParent(nullptr);
 				}
 
 				ImGui::EndDragDropTarget();
 			}
 
-			auto rootNodes = DvEditorContext::ActiveWorld->GetRootGameObjects();
+			auto rootNodes = EditorContext::ActiveWorld->GetRootGameObjects();
 			if (!rootNodes.empty())
 			{
 				for (auto& node : rootNodes)
 				{
-					// Tag 컴포넌트 추가 후 EditorCamera는 넘기자.
-						
+					if (node->GetTag() == "EditorOnly")
+						continue;
+
 					showNode(node);
 				}
 			}
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
 			{
-				DvEditorContext::Selected = nullptr;
+				EditorContext::Selected = nullptr;
 			}
 
 			ImGui::TreePop();
@@ -62,13 +63,13 @@ namespace Dive
 
 		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
 		nodeFlags |= node->GetComponent<Transform>()->HasChildren() ? ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf;
-		nodeFlags |= (DvEditorContext::Selected == node) ? ImGuiTreeNodeFlags_Selected : 0;
+		nodeFlags |= (EditorContext::Selected == node) ? ImGuiTreeNodeFlags_Selected : 0;
 
 		bool opened = ImGui::TreeNodeEx((void*)(uint64_t)node, nodeFlags, node->GetName().c_str());
 		{
 			if (ImGui::IsItemClicked())
 			{
-				DvEditorContext::Selected = node;
+				EditorContext::Selected = node;
 			}
 
 			if (ImGui::BeginDragDropSource())
@@ -83,7 +84,7 @@ namespace Dive
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 				{
 					auto instanceID = static_cast<InstanceID*>(payload->Data);
-					auto draggedNode = DvEditorContext::ActiveWorld->GetGameObjectByInstanceID(*instanceID);
+					auto draggedNode = EditorContext::ActiveWorld->GetGameObjectByInstanceID(*instanceID);
 
 					if (draggedNode != node)
 					{
@@ -131,13 +132,13 @@ namespace Dive
 
 			if (nodeAdded)
 			{
-				auto addedNode = DvEditorContext::ActiveWorld->CreateGameObject("GameObject");
+				auto addedNode = EditorContext::ActiveWorld->CreateGameObject("GameObject");
 			}
 
 			if (nodeDeleted)
 			{
-				DvEditorContext::ActiveWorld->DeleteGameObject(node);
-				DvEditorContext::Selected = nullptr;
+				EditorContext::ActiveWorld->DeleteGameObject(node);
+				EditorContext::Selected = nullptr;
 			}
 
 			if (nodeCopied)

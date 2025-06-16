@@ -144,6 +144,7 @@ namespace Dive
 
 				out << YAML::Key << "InstanceID" << YAML::Value << gameObject->GetInstanceID();
 				out << YAML::Key << "Name" << YAML::Value << gameObject->GetName();
+				out << YAML::Key << "Tag" << YAML::Value << gameObject->GetTag();
 
 				if (gameObject->HasComponent<Transform>())
 				{
@@ -205,6 +206,9 @@ namespace Dive
 
 				auto deserializedObject = m_World->CreateGameObjectWithInstanceID(instanceID, name);
 				gameObjectMap[instanceID] = deserializedObject;
+
+				std::string tag = gameObject["Tag"] ? gameObject["Tag"].as<std::string>() : "Untagged";
+				deserializedObject->SetTag(tag);
 
 				auto transform = gameObject["Transform"];
 				if (transform)

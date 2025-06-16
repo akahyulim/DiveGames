@@ -4,7 +4,7 @@
 #include "Window.h"
 #include "Input.h"
 #include "graphics/Graphics.h"
-#include "rendering/RenderingPipeline.h"
+#include "rendering/Renderer.h"
 #include "world/World.h"
 #include "resource/ResourceManager.h"
 
@@ -22,7 +22,7 @@ namespace Dive
 	{
 		Window::Initialize();
 		Graphics::Initialize();
-		RenderingPipeline::Initialize();
+		Renderer::Initialize();
 		Input::Initialize();
 
 		s_LastTickTime = std::chrono::steady_clock::now();
@@ -32,7 +32,7 @@ namespace Dive
 	{
 		ResourceManager::Clear();
 		Input::Shutdown();
-		RenderingPipeline::Shutdown();
+		Renderer::Shutdown();
 		Graphics::Shutdown();
 		Window::Shutdown();
 		LogManager::Shutdown();

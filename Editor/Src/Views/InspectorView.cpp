@@ -72,6 +72,7 @@ namespace Dive
 
 	InspectorView::InspectorView(Editor* editor)
 		: View(editor)
+		, m_TagList{ "Untagged", "EditorOnly", "MainCamera", "Player" }
 	{
 		m_Title = "Inspector";
 	}
@@ -82,22 +83,105 @@ namespace Dive
 	
 	void InspectorView::drawView()
 	{
-		if (!DvEditorContext::ActiveWorld || !DvEditorContext::Selected)
+		if (!EditorContext::ActiveWorld || !EditorContext::Selected)
 			return;
 
-		char buffer[256]{};
-		auto& name = DvEditorContext::Selected->GetName();
-		strncpy_s(buffer, sizeof(buffer), name.c_str(), sizeof(buffer));
-		if (ImGui::InputText("Name", buffer, sizeof(buffer)))
+		// Base Info
 		{
-			DvEditorContext::Selected->SetName(std::string(buffer));
+			// Active
+			{
+				bool isActive = EditorContext::Selected->IsActiveSelf();
+				if (ImGui::Checkbox("##Active", &isActive))
+				{
+					EditorContext::Selected->SetActive(isActive);
+				}
+			}
+
+			ImGui::SameLine();
+
+			// Name
+			{
+				char buffer[256]{};
+				auto& name = EditorContext::Selected->GetName();
+				strncpy_s(buffer, sizeof(buffer), name.c_str(), sizeof(buffer));
+				if (ImGui::InputText("##Name", buffer, sizeof(buffer)))
+				{
+					EditorContext::Selected->SetName(std::string(buffer));
+				}
+			}
+
+			// Tag
+			{
+				const std::string& currentTag = EditorContext::Selected->GetTag();
+				if (std::find(m_TagList.begin(), m_TagList.end(), currentTag) == m_TagList.end())
+					m_TagList.push_back(currentTag);
+
+				std::vector<const char*> tagLabels;
+				for (const auto& tag : m_TagList)
+					tagLabels.push_back(tag.c_str());
+				tagLabels.push_back("Add Tag...");
+
+				static int currentTagIndex = 0;
+				for (size_t i = 0; i < m_TagList.size(); ++i)
+				{
+					if (currentTag == m_TagList[i])
+					{
+						currentTagIndex = static_cast<int>(i);
+						break;
+					}
+				}
+
+				if (ImGui::Combo("Tag", &currentTagIndex, tagLabels.data(), static_cast<int>(tagLabels.size())))
+				{
+					if (currentTagIndex == static_cast<int>(tagLabels.size()) - 1)
+						ImGui::OpenPopup("Add Tag");
+					else
+						EditorContext::Selected->SetTag(m_TagList[currentTagIndex]);
+				}
+
+				if (ImGui::BeginPopup("Add Tag"))
+				{
+					static char newTagBuffer[64]{};
+
+					ImGui::InputText("New Tag", newTagBuffer, IM_ARRAYSIZE(newTagBuffer));
+
+					if (ImGui::Button("Add") && strlen(newTagBuffer) > 0)
+					{
+						std::string newTag = newTagBuffer;
+
+						if (std::find(m_TagList.begin(), m_TagList.end(), newTag) == m_TagList.end())
+						{
+							m_TagList.push_back(newTag);
+							EditorContext::Selected->SetTag(newTag);
+							currentTagIndex = static_cast<int>(m_TagList.size()) - 1;
+						}
+
+						newTagBuffer[0] = '\0';
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::SameLine();
+					if (ImGui::Button("Cancel"))
+					{
+						newTagBuffer[0] = '\0';
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+			}
+
+			// Layer
+			{
+			}
 		}
 
-		if (DvEditorContext::Selected->HasComponent<Transform>())
+		// Transform
+		if (EditorContext::Selected->HasComponent<Transform>())
 		{
 			ImGui::Separator();
 
-			auto tc = DvEditorContext::Selected->GetTransform();
+			auto tc = EditorContext::Selected->GetTransform();
 
 			auto position = tc->GetLocalPosition();
 			DrawVec3Control("Position", position);

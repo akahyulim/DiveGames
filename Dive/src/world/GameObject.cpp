@@ -32,6 +32,17 @@ namespace Dive
 		m_Components.clear();
 	}
 
+	void GameObject::Update()
+	{
+		if (!m_ActiveHierarchy)
+			return;
+
+		for (auto& [type, component] : m_Components)
+		{
+			component->Update();
+		}
+	}
+
 	void GameObject::RemoveComponentByType(eComponentType type)
 	{
 		if (!HasComponentByType(type))
@@ -62,5 +73,26 @@ namespace Dive
 			return nullptr;
 
 		return m_Components.at(type);
+	}
+
+	void GameObject::SetActive(bool value)
+	{
+		m_ActiveSelf = value;
+		bool parentHierarchy = m_Transform->HasParent() ? 
+			m_Transform->GetParent()->GetGameObject()->m_ActiveHierarchy : true;
+
+		updateActiveInHierarchy(parentHierarchy);
+	}
+
+	void GameObject::updateActiveInHierarchy(bool parentHierarchy)
+	{
+		m_ActiveHierarchy = parentHierarchy && m_ActiveSelf;
+
+		const auto& children = m_Transform->GetChildren();
+		for (auto child : children)
+		{
+			auto owner = child->GetGameObject();
+			owner->updateActiveInHierarchy(m_ActiveHierarchy);
+		}
 	}
 }

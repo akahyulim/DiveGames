@@ -110,7 +110,7 @@
     <ClInclude Include="src\rendering\Material.h">
       <Filter>rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\RenderingPipeline.h">
+    <ClInclude Include="src\rendering\Renderer.h">
       <Filter>rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\StaticMesh.h" />
@@ -202,7 +202,7 @@
     <ClCompile Include="src\rendering\Material.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\RenderingPipeline.cpp">
+    <ClCompile Include="src\rendering\Renderer.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\StaticMesh.cpp" />

@@ -1,27 +1,27 @@
 ﻿#include "stdafx.h"
-#include "RenderingPipeline.h"
+#include "Renderer.h"
 #include "graphics/RenderTexture.h"
 #include "graphics/Graphics.h"
 #include "core/CoreDefs.h"
 
 namespace Dive
 {
-	UINT32 RenderingPipeline::s_RenderTargetWidth = 0;
-	UINT32 RenderingPipeline::s_RenderTargetHeight = 0;
+	UINT32 Renderer::s_RenderTargetWidth = 0;
+	UINT32 Renderer::s_RenderTargetHeight = 0;
 
-	RenderTexture* RenderingPipeline::s_GBufferRT0 = nullptr;
-	RenderTexture* RenderingPipeline::s_GBufferRT1 = nullptr;
-	RenderTexture* RenderingPipeline::s_GBufferRT2 = nullptr;
+	RenderTexture* Renderer::s_GBufferRT0 = nullptr;
+	RenderTexture* Renderer::s_GBufferRT1 = nullptr;
+	RenderTexture* Renderer::s_GBufferRT2 = nullptr;
 
-	RenderTexture* RenderingPipeline::s_FrameRT = nullptr;
-	RenderTexture* RenderingPipeline::s_OutputRT = nullptr;
+	RenderTexture* Renderer::s_FrameRT = nullptr;
+	RenderTexture* Renderer::s_OutputRT = nullptr;
 
-	std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> RenderingPipeline::s_RenderTargets;
-	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> RenderingPipeline::s_RasterizerStates;
-	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> RenderingPipeline::s_DepthStencilStates;
-	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> RenderingPipeline::s_BlendStates;
+	std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> Renderer::s_RenderTargets;
+	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> Renderer::s_RasterizerStates;
+	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> Renderer::s_DepthStencilStates;
+	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> Renderer::s_BlendStates;
 
-	void RenderingPipeline::Initialize()
+	void Renderer::Initialize()
 	{
 		ResizeRenderBuffers(Graphics::GetResolutionWidth(), Graphics::GetResolutionHeight());
 
@@ -30,7 +30,7 @@ namespace Dive
 		createBlendStates();
 	}
 
-	void RenderingPipeline::Shutdown()
+	void Renderer::Shutdown()
 	{	
 		DV_DELETE(s_GBufferRT0);
 		DV_DELETE(s_GBufferRT1);
@@ -60,20 +60,24 @@ namespace Dive
 		}
 	}
 
+	void Renderer::OnUpdate()
+	{
+	}
+
 	// 카메라, 렌더링 대상 메시들
-	void RenderingPipeline::DeferredPass()
+	void Renderer::DeferredPass()
 	{
 		// clear gbuffer
 		// draw on gbuffer
 	}
 
-	void RenderingPipeline::LightingPass()
+	void Renderer::LightingPass()
 	{
 		// clear rendertarget
 		// draw light
 	}
 
-	void RenderingPipeline::ResizeRenderBuffers(UINT32 width, UINT32 height)
+	void Renderer::ResizeRenderBuffers(UINT32 width, UINT32 height)
 	{
 		if (s_RenderTargetWidth == width && s_RenderTargetHeight == height)
 			return;
@@ -128,7 +132,7 @@ namespace Dive
 		s_RenderTargetHeight = height;
 	}
 	
-	RenderTexture* RenderingPipeline::GetGBuffer(eGBuffer type)
+	RenderTexture* Renderer::GetGBuffer(eGBuffer type)
 	{
 		switch (type)
 		{
@@ -144,34 +148,34 @@ namespace Dive
 		}
 	}
 
-	RenderTexture* RenderingPipeline::GetRenderTarget(eRenderTarget type)
+	RenderTexture* Renderer::GetRenderTarget(eRenderTarget type)
 	{
 		return type != eRenderTarget::Count ? s_RenderTargets[static_cast<size_t>(type)] : nullptr;
 	}
 
-	ID3D11RasterizerState* RenderingPipeline::GetRasterizerState(eRasterizerState type)
+	ID3D11RasterizerState* Renderer::GetRasterizerState(eRasterizerState type)
 	{
 		return type != eRasterizerState::Count ? s_RasterizerStates[static_cast<size_t>(type)] : nullptr;
 	}
 
-	ID3D11DepthStencilState* RenderingPipeline::GetDepthStencilState(eDepthStencilState type)
+	ID3D11DepthStencilState* Renderer::GetDepthStencilState(eDepthStencilState type)
 	{
 		return type != eDepthStencilState::Count ? s_DepthStencilStates[static_cast<size_t>(type)] : nullptr;
 	}
 
-	ID3D11BlendState* RenderingPipeline::GetBlendState(eBlendState type) 
+	ID3D11BlendState* Renderer::GetBlendState(eBlendState type) 
 	{ 
 		return type != eBlendState::Count ? s_BlendStates[static_cast<size_t>(type)] : nullptr; 
 	}
 	
-	void RenderingPipeline::createShaders()
+	void Renderer::createShaders()
 	{
 		// vertex shaders
 
 		// pixel shaders
 	}
 
-	void RenderingPipeline::createRasterizerStates()
+	void Renderer::createRasterizerStates()
 	{
 		D3D11_RASTERIZER_DESC desc;
 		ZeroMemory(&desc, sizeof(desc));
@@ -190,18 +194,18 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &s_RasterizerStates[static_cast<size_t>(eRasterizerState::FillSolid_CullBack)])))
 		{
-			DV_LOG(RenderingPipeline, err, "RasterizerState FillSolid_CullBack 생성 실패");
+			DV_LOG(Renderer, err, "RasterizerState FillSolid_CullBack 생성 실패");
 		}
 
 		// FillSolid_CullNone
 		desc.CullMode = D3D11_CULL_NONE;
 		if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &s_RasterizerStates[static_cast<size_t>(eRasterizerState::FillSolid_CullNone)])))
 		{
-			DV_LOG(RenderingPipeline, err, "RasterizerState FillSolid_CullNode 생성 실패");
+			DV_LOG(Renderer, err, "RasterizerState FillSolid_CullNode 생성 실패");
 		}
 	}
 	
-	void RenderingPipeline::createDepthStencilStates()
+	void Renderer::createDepthStencilStates()
 	{
 		D3D11_DEPTH_STENCIL_DESC desc;
 
@@ -220,7 +224,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite)])))
 			{
-				DV_LOG(RenderingPipeline, err, "DepthStencilState DepthReadWrite 생성에 실패하였습니다.");
+				DV_LOG(Renderer, err, "DepthStencilState DepthReadWrite 생성에 실패하였습니다.");
 			}
 		}
 
@@ -244,7 +248,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite_StencilReadWrite)])))
 			{
-				DV_LOG(RenderingPipeline, err, "DepthStencilState DepthReadWrite_StencilReadWrite 생성에 실패하였습니다.");
+				DV_LOG(Renderer, err, "DepthStencilState DepthReadWrite_StencilReadWrite 생성에 실패하였습니다.");
 			}
 		}
 
@@ -265,7 +269,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::GBuffer)])))
 			{
-				DV_LOG(RenderingPipeline, err, "DepthStencilState GBuffer 생성에 실패하였습니다.");
+				DV_LOG(Renderer, err, "DepthStencilState GBuffer 생성에 실패하였습니다.");
 			}
 		}
 
@@ -289,7 +293,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthDiabled)])))
 			{
-				DV_LOG(RenderingPipeline, err, "DepthDisabledStencilState 생성에 실패하였습니다.");
+				DV_LOG(Renderer, err, "DepthDisabledStencilState 생성에 실패하였습니다.");
 			}
 		}
 
@@ -307,12 +311,12 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::ForwardLight)])))
 			{
-				DV_LOG(RenderingPipeline, err, "DepthDisabledStencilState 생성에 실패하였습니다.");
+				DV_LOG(Renderer, err, "DepthDisabledStencilState 생성에 실패하였습니다.");
 			}
 		}
 	}
 	
-	void RenderingPipeline::createBlendStates()
+	void Renderer::createBlendStates()
 	{
 		// Addictive
 		D3D11_BLEND_DESC desc{};
@@ -330,7 +334,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBlendState(&desc, &s_BlendStates[static_cast<size_t>(eBlendState::Addictive)])))
 		{
-			DV_LOG(RenderingPipeline, err, "BlandState Addictive 생성에 실패하였습니다.");
+			DV_LOG(Renderer, err, "BlandState Addictive 생성에 실패하였습니다.");
 		}
 	}
 }

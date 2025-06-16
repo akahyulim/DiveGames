@@ -35,7 +35,7 @@
 #include "rendering/SkinnedMesh.h"
 #include "rendering/MeshFactory.h"
 #include "rendering/Material.h"
-#include "rendering/RenderingPipeline.h"
+#include "rendering/Renderer.h"
 
 // resource
 #include "resource/Resource.h"

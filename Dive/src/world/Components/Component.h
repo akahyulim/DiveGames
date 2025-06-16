@@ -19,6 +19,8 @@ namespace Dive
 		Component(GameObject* gameObject) : m_GameObject(gameObject) {}
 		virtual ~Component() = default;
 
+		virtual void Update() {}
+
 		GameObject* GetGameObject() const { return m_GameObject; }
 
 		static constexpr eComponentType GetType() { return eComponentType::Undefined; }

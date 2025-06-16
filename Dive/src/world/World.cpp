@@ -27,6 +27,10 @@ namespace Dive
 
 	void World::Update()
 	{
+		for (auto& [instanceID, gameObject] : m_GameObjects)
+		{
+			gameObject->Update();
+		}
 	}
 
 	GameObject* World::CreateGameObject(const std::string& name)

@@ -11,31 +11,13 @@ namespace Dive
 
 	enum class eFontTypes
 	{
-		Default,
 		Normal,
 		Bold,
 		Large,
 		Large_Bold,
 		Max
 	};
-
 	class EditorContext
-	{
-	public:
-		static EditorContext& GetInstance()
-		{
-			static EditorContext instance;
-			return instance;
-		}
-
-		World* ActiveWorld = nullptr;
-		
-		entt::entity Selected = entt::null;
-		entt::entity EditorCamera = entt::null;
-		entt::entity MainCamera = entt::null;
-	};
-
-	class DvEditorContext
 	{
 	public:
 		static World* ActiveWorld;

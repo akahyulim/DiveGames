@@ -5,6 +5,11 @@ namespace Dive
 {
 	class Transform;
 
+	enum class eLayer : int
+	{
+
+	};
+
 	class GameObject
 	{
 	public:
@@ -12,10 +17,20 @@ namespace Dive
 		GameObject(UINT64 instanceID, const std::string& name = "GameObject");
 		~GameObject();
 
+		void Update();
+
 		UINT64 GetInstanceID() const { return m_InstanceID; }
 		
 		void SetName(const std::string& name) { m_Name = name; }
 		const std::string& GetName() const { return m_Name; }
+
+		void SetTag(const std::string& tag) { m_Tag = tag; }
+		std::string GetTag() const { return m_Tag; }
+		bool CompareTag(const std::string& tag) const { return m_Tag == tag; }
+
+		void SetActive(bool value);
+		bool IsActiveSelf() const { return m_ActiveSelf; }
+		bool IsActiveHierarchy() const { return m_ActiveHierarchy; }
 
 		template<typename T> T* AddComponent();
 
@@ -31,12 +46,20 @@ namespace Dive
 		Transform* GetTransform() const { return m_Transform; }
 
 	private:
+		void updateActiveInHierarchy(bool parentHierarchy);
+
 	private:
 		UINT64 m_InstanceID;
 		std::string m_Name;
+		
+		std::string m_Tag = "Untagged";
+		
+		bool m_ActiveSelf = true;
+		bool m_ActiveHierarchy = true;
 
 		std::unordered_map<eComponentType, Component*> m_Components;
 
+		// layer
 		Transform* m_Transform = nullptr;
 	};
 

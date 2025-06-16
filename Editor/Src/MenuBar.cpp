@@ -11,8 +11,6 @@ namespace Dive
 
 	void MenuBar::Draw()
 	{
-		auto& editorContext = EditorContext::GetInstance();
-		
 		static bool isShowWorldMenu = false;
 
 		if (ImGui::BeginMainMenuBar())
@@ -38,10 +36,10 @@ namespace Dive
 				{
 					// 기존 월드를 해제해야 한다.
 
-					DvEditorContext::ActiveWorld = Engine::CreateWorld();
+					EditorContext::ActiveWorld = Engine::CreateWorld();
 
-					DvEditorContext::EditorCamera = DvEditorContext::ActiveWorld->CreateGameObject("EditorCamera");
-					DvEditorContext::MainCamera = DvEditorContext::ActiveWorld->CreateGameObject("MainCamera");
+					EditorContext::EditorCamera = EditorContext::ActiveWorld->CreateGameObject("EditorCamera");
+					EditorContext::MainCamera = EditorContext::ActiveWorld->CreateGameObject("MainCamera");
 
 					// 임시
 					ResourceManager::SetResourceFolder("Assets");
@@ -53,19 +51,20 @@ namespace Dive
 					// 역시 기존 월드를 해제해야 한다.
 
 
-					DvEditorContext::ActiveWorld = Engine::CreateWorld();
-					DvWorldSerializer serializer(DvEditorContext::ActiveWorld);
+					EditorContext::ActiveWorld = Engine::CreateWorld();
+					DvWorldSerializer serializer(EditorContext::ActiveWorld);
 					serializer.Deserialize("Assets/NewWorld.dive");
 
 					// 임시 : 현재 작업디렉토리 때문에 직렬화, 역직렬화 대상 경로가 나뉘어져 버렸다.
 					// 임시로 역직렬화할 경우 경로에 Asset를 명시적으로 추가했다.
+					// 이때문에 imgui.ini의 로딩과 저장 시점이 달라진다.
 					ResourceManager::SetResourceFolder("Assets");
 
 					isShowWorldMenu = true;
 				}
 				if (ImGui::MenuItem("Save World", nullptr, nullptr, isShowWorldMenu))
 				{
-					DvWorldSerializer serializer(DvEditorContext::ActiveWorld);
+					DvWorldSerializer serializer(EditorContext::ActiveWorld);
 					serializer.Serialize("NewWorld.dive");
 				}
 
@@ -78,9 +77,14 @@ namespace Dive
 
 				if (ImGui::MenuItem("Exit"))
 				{
-					if (DvEditorContext::ActiveWorld)
+					if (EditorContext::ActiveWorld)
 					{
-						DvEditorContext::ActiveWorld->Clear();
+						EditorContext::Selected = nullptr;
+						EditorContext::EditorCamera = nullptr;
+						EditorContext::MainCamera = nullptr;
+					
+						EditorContext::ActiveWorld->Clear();
+						EditorContext::ActiveWorld = nullptr;
 					}
 					Window::Close();
 				}
@@ -97,7 +101,7 @@ namespace Dive
 			{
 				if (ImGui::MenuItem("Create Empty", nullptr, nullptr, isShowWorldMenu))
 				{
-					DvEditorContext::ActiveWorld->CreateGameObject("Empty");
+					EditorContext::ActiveWorld->CreateGameObject("Empty");
 				}
 				if (ImGui::BeginMenu("3D TypeInfo"))
 				{

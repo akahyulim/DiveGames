@@ -18,8 +18,7 @@ namespace Dive
 
 	void WorldView::drawView()
 	{
-		auto& editorContext = EditorContext::GetInstance();
-		if (!editorContext.ActiveWorld || editorContext.EditorCamera == entt::null)
+		if (!EditorContext::ActiveWorld)// || !EditorContext::EditorCamera)
 			return;
 
 		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;

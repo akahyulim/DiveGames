@@ -12,6 +12,7 @@
 
 // 결국 이건 크리티컬 오류가 발생했을 때 로그를 남기는 용도이다.
 // assert 랑은 성격이 다르다.
+// => 이건 지우고 assert, static_assert로 대체하자.
 #ifdef _DEBUG
 	#define DV_INTERNAL_ASSERT_IMPL(type, check, msg, ...) { if(!(check)) { DV_LOG(type, critical, msg, __VA_ARGS__); __debugbreak(); } }
 	#define DV_INTERNAL_ASSERT_WITH_MSG(type, check, ...) DV_INTERNAL_ASSERT_IMPL(type, check, "Assertion failed: {0}, file {1}, line {2}", __VA_ARGS__, std::filesystem::path(__FILE__).filename().string(), __LINE__)
