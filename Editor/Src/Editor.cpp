@@ -9,7 +9,7 @@
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
 
-constexpr float DEFAULT_FONT_SIZE = 13.0f;
+constexpr float DEFAULT_FONT_SIZE = 16.0f;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam);
 
@@ -41,9 +41,9 @@ LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPAR
 namespace Dive
 {
 	World* EditorContext::ActiveWorld = nullptr;
-	GameObject* EditorContext::Selected = nullptr;
-	GameObject* EditorContext::EditorCamera = nullptr;
-	GameObject* EditorContext::MainCamera = nullptr;
+	std::shared_ptr<GameObject> EditorContext::Selected;
+	std::shared_ptr<GameObject> EditorContext::EditorCamera;
+	std::shared_ptr<GameObject> EditorContext::MainCamera;
 
 	// main으로부터 argc를 받아 추린 후 엔진에 전달한다.
 	Editor::Editor()

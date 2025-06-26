@@ -25,18 +25,11 @@ namespace Dive
 
 		static UINT64 GetFrameCount() { return s_FrameCount; }
 
-		static World* CreateWorld(const std::string& name = "NewWorld");
-		static World* GetWorld() { return s_World; }
-
 	private:
 		static double s_ElapsedTimeMS;
 		static float s_DeltaTimeMS;
 		static std::chrono::steady_clock::time_point s_LastTickTime;
 		static UINT16 s_Fps;
 		static UINT64 s_FrameCount;
-
-		// 일단 멤버 변수로 관리하자.
-		static World* s_World;
-
 	};
 }

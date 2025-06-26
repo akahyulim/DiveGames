@@ -27,9 +27,6 @@
     <ClCompile Include="Src\Views\WorldView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Project\Project.cpp">
-      <Filter>Project</Filter>
-    </ClCompile>
     <ClCompile Include="Src\Views\LogView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
@@ -73,9 +70,6 @@
     </ClInclude>
     <ClInclude Include="Src\Views\WorldView.h">
       <Filter>Views</Filter>
-    </ClInclude>
-    <ClInclude Include="Src\Project\Project.h">
-      <Filter>Project</Filter>
     </ClInclude>
     <ClInclude Include="Src\Views\LogView.h">
       <Filter>Views</Filter>

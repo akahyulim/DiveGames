@@ -9,19 +9,19 @@ namespace Dive
 		: m_InstanceID(InstanceID())
 		, m_Name(name)
 	{
-		DV_LOG(Resource, trace, "Create Resource - name: {0}, instanceID: {1}", m_Name, m_InstanceID);
+		DV_LOG(Resource, trace, "Created: {}, {}", m_Name, m_InstanceID);
 	}
 
 	Resource::Resource(UINT64 instanceID, const std::string& name)
 		: m_InstanceID(instanceID)
 		, m_Name(name)
 	{ 
-		DV_LOG(Resource, trace, "Create Resource - name: {0}, instanceID: {1}", m_Name, m_InstanceID);
+		DV_LOG(Resource, trace, "Created: {}. {}", m_Name, m_InstanceID);
 	}
 
 	Resource::~Resource()
 	{
-		DV_LOG(Resource, trace, "Delete Resource - name: {0}, instanceID: {1}", m_Name, m_InstanceID);
+		DV_LOG(Resource, trace, "Destroyed: {}. {}", m_Name, m_InstanceID);
 	}
 
 	void Resource::SetFilepath(const std::filesystem::path& filepath)

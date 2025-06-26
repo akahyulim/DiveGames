@@ -163,7 +163,6 @@
     <ClCompile Include="Src\Editor.cpp" />
     <ClCompile Include="Src\main.cpp" />
     <ClCompile Include="Src\MenuBar.cpp" />
-    <ClCompile Include="Src\Project\Project.cpp" />
     <ClCompile Include="Src\Views\GameView.cpp" />
     <ClCompile Include="Src\Views\HierarchyView.cpp" />
     <ClCompile Include="Src\Views\InspectorView.cpp" />
@@ -181,7 +180,6 @@
   <ItemGroup>
     <ClInclude Include="Src\Editor.h" />
     <ClInclude Include="Src\MenuBar.h" />
-    <ClInclude Include="Src\Project\Project.h" />
     <ClInclude Include="Src\Views\GameView.h" />
     <ClInclude Include="Src\Views\HierarchyView.h" />
     <ClInclude Include="Src\Views\InspectorView.h" />

@@ -9,13 +9,14 @@ namespace Dive
 	{
 	public:
 		HierarchyView(Editor* editor);
-		virtual ~HierarchyView();
+		virtual ~HierarchyView() = default;
 
 	protected:
 		void drawView() override;
 
 	private:
-		void showNode(GameObject* node);
+		void showTree(std::shared_ptr<GameObject> gameObject);
+		void popupMenu();
 
 	private:
 	};

@@ -3,6 +3,7 @@
 #include "GameObject.h"
 #include "Components/Transform.h"
 #include "core/CoreDefs.h"
+#include "core/InstanceID.h"
 
 namespace Dive
 {
@@ -18,126 +19,142 @@ namespace Dive
 
 	void World::Clear()
 	{
-		for (auto& [id, gameObject] : m_GameObjects)
-		{
-			DV_DELETE(gameObject);
-		}
-		m_GameObjects.clear();
+		m_RootGameObjects.clear();
 	}
 
 	void World::Update()
 	{
-		for (auto& [instanceID, gameObject] : m_GameObjects)
-		{
+		for (auto& gameObject : m_RootGameObjects)
 			gameObject->Update();
-		}
+
+		FlushDestoryQueue();
 	}
 
-	GameObject* World::CreateGameObject(const std::string& name)
+	std::shared_ptr<GameObject> World::CreateGameObject(const std::string& name)
 	{
-		auto gameObject = new GameObject(name);
-		m_GameObjects[gameObject->GetInstanceID()] = gameObject;
-		return gameObject;
+		return CreateGameObject(InstanceID(), name);
 	}
 
-	GameObject* World::CreateGameObjectWithInstanceID(UINT64 instanceID, const std::string& name)
+	std::shared_ptr<GameObject> World::CreateGameObject(UINT64 instanceID, const std::string& name)
 	{
-		if (m_GameObjects.find(instanceID) != m_GameObjects.end())
-		{
-			DV_LOG(World, err, "GameObject with InstanceID {} already exists.", instanceID);
+		if (HasGameObject(instanceID))
 			return nullptr;
-		}
 
-		auto gameObject = new GameObject(instanceID, name);
-		m_GameObjects[instanceID] = gameObject;
-		return gameObject;
+		auto newGO = std::make_shared<GameObject>(instanceID, name);
+		m_GameObjectMap[instanceID] = newGO;
+		m_RootGameObjects.push_back(newGO);
+
+		return newGO;
 	}
 
-	void World::DeleteGameObject(GameObject* gameObject)
+	void World::AttachRoot(GameObject* gameObject)
 	{
-		if (!gameObject)
+		if (!gameObject) return;
+
+		if (!gameObject->GetTransform()->HasParent())
+			m_RootGameObjects.push_back(gameObject->GetSharedPtr());
+	}
+
+	void World::DetachRoot(GameObject* gameObject)
+	{
+		if (!gameObject) return;
+
+		auto it = std::find(m_RootGameObjects.begin(), m_RootGameObjects.end(), gameObject->GetSharedPtr());
+		if (it != m_RootGameObjects.end())
+			m_RootGameObjects.erase(it);
+	}
+
+	std::vector<std::shared_ptr<GameObject>> World::GetAllGameObjects()
+	{
+		std::vector<std::shared_ptr<GameObject>> allGameObjects;
+		allGameObjects.reserve(AllGameObjectCount());
+
+		for (auto& [instanceID, gameObject] : m_GameObjectMap)
+			allGameObjects.push_back(gameObject);
+
+		return allGameObjects;
+	}
+
+	void World::TraverseHierarchy(const std::function<void(GameObject*)>& visit)
+	{
+		for (auto& gameObject : m_RootGameObjects)
+			traverseRecursive(gameObject.get(), visit);
+	}
+
+	void World::DestroyGameObject(std::shared_ptr<GameObject> gameObject)
+	{
+		if (gameObject)
+			DestroyGameObject(gameObject->GetInstanceID());
+	}
+
+	void World::DestroyGameObject(UINT64 instanceID)
+	{
+		if (!HasGameObject(instanceID))
 			return;
 
-		DeleteGameObjectByInstanceID(gameObject->GetInstanceID());
+		auto gameObject = FindGameObject(instanceID);
+		if (gameObject && gameObject->IsDestroyed())
+			return;
+
+		if(gameObject)
+			gameObject->Destory();
 	}
-	
-	void World::DeleteGameObjectByInstanceID(UINT64 instanceID)
+
+	void World::QueueDestory(GameObject* gameObject)
 	{
-		auto it = m_GameObjects.find(instanceID);
-		if (it == m_GameObjects.end())
+		m_DestroyQueue.insert(gameObject->GetInstanceID());
+	}
+
+	void World::FlushDestoryQueue()
+	{
+		for (auto id : m_DestroyQueue)
 		{
-			DV_LOG(World, warn, "GameObject with InstanceID {} does not exist.", instanceID);
-		}
-		
-		auto transform = it->second->GetTransform();
-		if (transform->HasChildren())
-		{
-			auto children = transform->GetChildren();
-			for (auto child : children)
-			{
-				DeleteGameObjectByInstanceID(child->GetGameObject()->GetInstanceID());
-			}
-		}
-		
-		if (transform->HasParent())
-		{
-			transform->GetParent()->RemoveChild(transform);
+			auto it = m_GameObjectMap.find(id);
+			if (it != m_GameObjectMap.end())
+				m_GameObjectMap.erase(it);
 		}
 
-		DV_DELETE(it->second);
-		m_GameObjects.erase(it);	
+		m_DestroyQueue.clear();
 	}
 
-	GameObject* World::GetGameObjectByInstanceID(UINT64 instanceID)
+	bool World::HasGameObject(UINT64 instanceID)
 	{
-		auto it = m_GameObjects.find(instanceID);
-		if (it != m_GameObjects.end())
+		return m_GameObjectMap.find(instanceID) != m_GameObjectMap.end();
+	}
+
+	std::shared_ptr<GameObject> World::FindGameObject(UINT64 instanceID)
+	{
+		auto it = m_GameObjectMap.find(instanceID);
+		return it != m_GameObjectMap.end() ? it->second : nullptr;
+	}
+
+	void World::traverseRecursive(GameObject* gameObject, const std::function<void(GameObject*)>& visit)
+	{
+		if (!gameObject) return;
+
+		visit(gameObject);
+
+		for (auto childTransform : gameObject->GetTransform()->GetChildren())
 		{
-			return it->second;
+			if (auto childGO = childTransform->GetGameObject())
+				traverseRecursive(childGO, visit);
 		}
-		return nullptr;
 	}
 
-	bool World::ExistsGameObject(GameObject* gameObject)
-	{
-		if (!gameObject)
-			return false;;
+	World* WorldManager::s_ActiveWorld = nullptr;
 
-		return ExistsGameObjectByInstanceID(gameObject->GetInstanceID());
-	}
-	
-	bool World::ExistsGameObjectByInstanceID(UINT64 instanceID)
+	// 유니티의 경우 빈 이름, 이미 존재하는 Scene의 이름은 안된다.
+	World* WorldManager::CreateWorld(const std::string& name)
 	{
-		return m_GameObjects.find(instanceID) != m_GameObjects.end();
-	}
-	
-	std::vector<GameObject*> World::GetRootGameObjects()
-	{
-		std::vector<GameObject*> roots;
-		for (auto& [instanceID, gameObject] : m_GameObjects)
-		{
-			if (!gameObject->GetTransform()->HasParent())
-				roots.push_back(gameObject);
-		}
+		DV_DELETE(s_ActiveWorld);
 
-		return roots;
+		auto newWorld = new World(name);
+		s_ActiveWorld = newWorld;
+		return newWorld;
 	}
-	
-	std::vector<GameObject*> World::GetAllGameObjects()
-	{
-		std::vector<GameObject*> gameObjects;
-		gameObjects.reserve(m_GameObjects.size());
 
-		for (const auto& [id, gameObject] : m_GameObjects)
-		{
-			gameObjects.push_back(gameObject);
-		}
-
-		return gameObjects;
-	}
-	
-	UINT64 World::GameObjectsCount()
+	World* WorldManager::GetActiveWorld()
 	{
-		return static_cast<UINT64>(m_GameObjects.size());
+		return s_ActiveWorld;
 	}
 }

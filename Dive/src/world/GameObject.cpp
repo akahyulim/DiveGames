@@ -1,35 +1,47 @@
 ﻿#include "stdafx.h"
 #include "GameObject.h"
+#include "World.h"
 #include "components/Transform.h"
 #include "core/instanceID.h"
 
 namespace Dive
 {
-	GameObject::GameObject(const std::string& name)
-		: m_InstanceID(InstanceID())
-		, m_Name(name)
-		, m_Transform(AddComponent<Transform>())
-	{
-		DV_LOG(GameObject, trace, "GameObject '{}' with InstanceID {} is being created.", GetName(), GetInstanceID());
-	}
-
 	GameObject::GameObject(UINT64 instanceID, const std::string& name)
 		: m_InstanceID(instanceID)
 		, m_Name(name)
-		,m_Transform(AddComponent<Transform>())
+		, m_World(WorldManager::GetActiveWorld())
+		, m_Transform(AddComponent<Transform>())
 	{
-		DV_LOG(GameObject, trace, "GameObject '{}' with InstanceID {} is being created.", GetName(), GetInstanceID());
+		DV_LOG(GameObject, trace, "Created: {}, {}", m_Name, m_InstanceID);
 	}
 
 	GameObject::~GameObject()
 	{
-		DV_LOG(GameObject, trace, "GameObject '{}' with InstanceID {} is being destroyed.", GetName(), GetInstanceID());
-
 		for (auto& [type, component] : m_Components)
-		{
 			DV_DELETE(component);
-		}
+	
 		m_Components.clear();
+
+		DV_LOG(GameObject, trace, "Destroyed: {}, {}", m_Name, m_InstanceID);
+	}
+
+	void GameObject::Destory()
+	{
+		assert(m_World);
+
+		if (m_IsDestroyed) return;
+		m_IsDestroyed = true;
+	
+		for (auto child : m_Transform->GetChildren())
+		{
+			if (auto childGO = child->GetGameObject())
+				childGO->Destory();
+		}
+
+		if (!m_Transform->HasParent())
+			m_World->DetachRoot(this);
+
+		m_World->QueueDestory(this);
 	}
 
 	void GameObject::Update()

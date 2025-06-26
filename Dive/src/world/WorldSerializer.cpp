@@ -98,21 +98,21 @@ namespace YAML
 
 namespace Dive
 {
-	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT3& vec)
+	static YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT3& vec)
 	{
 		out << YAML::Flow;
 		out << YAML::BeginSeq << vec.x << vec.y << vec.z << YAML::EndSeq;
 		return out;
 	}
 
-	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT4& quat)
+	static YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT4& quat)
 	{
 		out << YAML::Flow;
 		out << YAML::BeginSeq << quat.x << quat.y << quat.z << quat.w << YAML::EndSeq;
 		return out;
 	}
 
-	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT4X4& mat)
+	static YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT4X4& mat)
 	{
 		out << YAML::Flow;
 		out << YAML::BeginSeq
@@ -123,118 +123,119 @@ namespace Dive
 		return out;
 	}
 
-	DvWorldSerializer::DvWorldSerializer(World* world)
+	static void SerializeGameObject(YAML::Emitter& out, std::shared_ptr<GameObject> gameObject)
+	{
+		out << YAML::BeginMap;
+
+		out << YAML::Key << "InstanceID" << YAML::Value << gameObject->GetInstanceID();
+		out << YAML::Key << "Name" << YAML::Value << gameObject->GetName();
+		out << YAML::Key << "Tag" << YAML::Value << gameObject->GetTag();
+
+		// Transform 저장
+		auto tc = gameObject->GetTransform();
+		out << YAML::Key << "Transform";
+		out << YAML::BeginMap;
+		out << YAML::Key << "Position" << YAML::Value << tc->GetLocalPosition();
+		out << YAML::Key << "Rotation" << YAML::Value << tc->GetLocalRotationQuaternion();
+		out << YAML::Key << "Scale" << YAML::Value << tc->GetLocalScale();
+		out << YAML::EndMap;
+		
+		// 재귀적으로 자식 저장
+		const auto& children = tc->GetChildren();
+		if (!children.empty())
+		{
+			out << YAML::Key << "Children" << YAML::Value << YAML::BeginSeq;
+			for (auto child : children)
+			{
+				auto childGO = child->GetGameObject()->GetSharedPtr();
+				SerializeGameObject(out, childGO);
+			}
+			out << YAML::EndSeq;
+		}
+
+		out << YAML::EndMap;
+	}
+
+	static void DeserializeGameObject(const YAML::Node& node, World* world, Transform* parent)
+	{
+		if (!node["InstanceID"] || !node["Name"])
+			return;
+
+		auto instanceID = node["InstanceID"].as<UINT64>();
+		auto name = node["Name"].as<std::string>();
+		auto tag = node["Tag"] ? node["Tag"].as<std::string>() : "Untagged";
+
+		auto gameObject = world->CreateGameObject(instanceID, name);
+		gameObject->SetTag(tag);
+
+		auto tc = gameObject->GetTransform();
+		if (parent)
+			tc->SetParent(parent);
+		
+		// Transform 값 복원
+		if (const auto& transformNode = node["Transform"])
+		{
+			if (transformNode["Position"])
+				tc->SetLocalPosition(transformNode["Position"].as<DirectX::XMFLOAT3>());
+
+			if (transformNode["Rotation"])
+				tc->SetLocalRotationQuaternion(transformNode["Rotation"].as<DirectX::XMFLOAT4>());
+
+			if (transformNode["Scale"])
+				tc->SetLocalScale(transformNode["Scale"].as<DirectX::XMFLOAT3>());
+		}
+
+		// 자식 노드 재귀 호출
+		if (node["Children"])
+		{
+			const auto& children = node["Children"];
+			for (size_t i = 0; i < children.size(); ++i)
+			{
+				DeserializeGameObject(children[i], world, tc);
+				tc->GetChildren()[i]->GetGameObject()->GetTransform()->SetSiblingIndex(static_cast<int>(i));
+			}
+		}
+	}
+
+	WorldSerializer::WorldSerializer(World* world)
 		: m_World(world)
 	{
 	}
 
-	void DvWorldSerializer::Serialize(const std::filesystem::path& filepath)
+	void WorldSerializer::Serialize(const std::filesystem::path& filepath)
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "World" << YAML::Value << m_World->GetName();
-		out << YAML::Key << "GameObjects" << YAML::Value << YAML::BeginSeq;
 
-		auto allGameObjects = m_World->GetAllGameObjects();
-		if (!allGameObjects.empty())
-		{
-			for (auto& gameObject : allGameObjects)
-			{
-				out << YAML::BeginMap;
-
-				out << YAML::Key << "InstanceID" << YAML::Value << gameObject->GetInstanceID();
-				out << YAML::Key << "Name" << YAML::Value << gameObject->GetName();
-				out << YAML::Key << "Tag" << YAML::Value << gameObject->GetTag();
-
-				if (gameObject->HasComponent<Transform>())
-				{
-					out << YAML::Key << "Transform";
-					out << YAML::BeginMap;
-
-					auto tc = gameObject->GetTransform();
-					out << YAML::Key << "Position" << YAML::Value << tc->GetLocalPosition();
-					out << YAML::Key << "Rotation" << YAML::Value << tc->GetLocalRotation();
-					out << YAML::Key << "Scale" << YAML::Value << tc->GetLocalScale();
-
-					if (tc->HasParent())
-					{
-						auto parentObject = tc->GetParent()->GetGameObject();
-						out << YAML::Key << "Parent" << YAML::Value << parentObject->GetInstanceID();
-					}
-					out << YAML::EndMap;
-				}
-
-				out << YAML::EndMap;
-			}
-		}
-
+		out << YAML::Key << "RootGameObjects" << YAML::Value << YAML::BeginSeq;
+		for (auto& root : m_World->GetRootGameObjects())
+			SerializeGameObject(out, root);
 		out << YAML::EndSeq;
+		
 		out << YAML::EndMap;
 
 		std::ofstream fout(filepath);
 		fout << out.c_str();
 	}
 
-	bool DvWorldSerializer::Deserialize(const std::filesystem::path& filepath)
+	bool WorldSerializer::Deserialize(const std::filesystem::path& filepath)
 	{
 		YAML::Node data;
-
 		try { data = YAML::LoadFile(filepath.string()); }
-		catch (YAML::ParserException& e)
+		catch (const YAML::ParserException& e)
 		{
-			DV_LOG(DvWorldSerializer, warn, "YAML 파일 파싱 실패: '{0}'\n {1}", filepath.string().c_str(), e.what());
+			DV_LOG(WorldSerializer, warn, "YAML 파싱 실패: {}", e.what());
 			return false;
 		}
 
-		if (!data["World"]) return false;
+		if (data["World"])
+			m_World->SetName(data["World"].as<std::string>());
 
-		std::string worldName = data["World"].as<std::string>();
-		m_World->SetName(worldName);
-		DV_LOG(DvWorldSerializer, trace, "Deserializing World '{0}'", worldName);
-
-		std::unordered_map<InstanceID, GameObject*> gameObjectMap;
-		auto gameObjects = data["GameObjects"];
-
-		if (gameObjects)
+		if (data["RootGameObjects"])
 		{
-			for (auto gameObject : gameObjects)
-			{
-				UINT64 instanceID = gameObject["InstanceID"].as<UINT64>();
-				std::string name = gameObject["Name"] ? gameObject["Name"].as<std::string>() : "";
-
-				DV_LOG(DvWorldSerializer, trace, "Deserializerd Entity with ID = {0}, name = {1}", instanceID, name);
-
-				auto deserializedObject = m_World->CreateGameObjectWithInstanceID(instanceID, name);
-				gameObjectMap[instanceID] = deserializedObject;
-
-				std::string tag = gameObject["Tag"] ? gameObject["Tag"].as<std::string>() : "Untagged";
-				deserializedObject->SetTag(tag);
-
-				auto transform = gameObject["Transform"];
-				if (transform)
-				{
-					auto tc = deserializedObject->GetTransform();
-					tc->SetLocalPosition(transform["Position"].as<DirectX::XMFLOAT3>());
-					tc->SetLocalRotation(transform["Rotation"].as<DirectX::XMFLOAT4>());
-					tc->SetLocalScale(transform["Scale"].as<DirectX::XMFLOAT3>());
-				}
-			}
-
-			for (auto gameObject : gameObjects)
-			{
-				auto transform = gameObject["Transform"];
-				if (transform && transform["Parent"])
-				{
-					UINT64 instanceID = gameObject["InstanceID"].as<UINT64>();
-					UINT64 parentInstanceID = transform["Parent"].as<UINT64>();
-
-					if (gameObjectMap.count(instanceID) && gameObjectMap.count(parentInstanceID))
-					{
-						auto deserializedObject = gameObjectMap[instanceID];
-						deserializedObject->GetTransform()->SetParent(gameObjectMap[parentInstanceID]->GetTransform());
-					}
-				}
-			}
+			for (const auto& root : data["RootGameObjects"])
+				DeserializeGameObject(root, m_World, nullptr);
 		}
 
 		return true;

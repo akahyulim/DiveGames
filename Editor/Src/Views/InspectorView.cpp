@@ -187,9 +187,9 @@ namespace Dive
 			DrawVec3Control("Position", position);
 			tc->SetLocalPosition(position);
 
-			auto rotation = Math::QuaternionToDegrees(tc->GetLocalRotation());
+			auto rotation = tc->GetLocalRotationDegrees();
 			DrawVec3Control("Rotation", rotation);
-			tc->SetLocalRotation(Math::DegreesToQuaternion(rotation));
+			tc->SetLocalRotationByDegrees(rotation);
 
 			auto scale = tc->GetLocalScale();
 			DrawVec3Control("Scale", scale, 1.0f);

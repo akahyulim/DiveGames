@@ -34,12 +34,13 @@ namespace Dive
 
 				if (ImGui::MenuItem("New World"))
 				{
-					// 기존 월드를 해제해야 한다.
-
-					EditorContext::ActiveWorld = Engine::CreateWorld();
-
+					// 이름을 먼저 입력받아야 한다.
+					
+					EditorContext::ActiveWorld = WorldManager::CreateWorld("NewWorld");
 					EditorContext::EditorCamera = EditorContext::ActiveWorld->CreateGameObject("EditorCamera");
+					EditorContext::EditorCamera->SetTag("EditorOnly");
 					EditorContext::MainCamera = EditorContext::ActiveWorld->CreateGameObject("MainCamera");
+					EditorContext::MainCamera->SetTag("MainCamera");
 
 					// 임시
 					ResourceManager::SetResourceFolder("Assets");
@@ -48,11 +49,10 @@ namespace Dive
 				}
 				if (ImGui::MenuItem("Open World"))
 				{
-					// 역시 기존 월드를 해제해야 한다.
-
-
-					EditorContext::ActiveWorld = Engine::CreateWorld();
-					DvWorldSerializer serializer(EditorContext::ActiveWorld);
+					// 추후 LoadWorld로 생성해야 한다.
+					
+					EditorContext::ActiveWorld = WorldManager::CreateWorld("NewWorld");
+					WorldSerializer serializer(EditorContext::ActiveWorld);
 					serializer.Deserialize("Assets/NewWorld.dive");
 
 					// 임시 : 현재 작업디렉토리 때문에 직렬화, 역직렬화 대상 경로가 나뉘어져 버렸다.
@@ -64,7 +64,7 @@ namespace Dive
 				}
 				if (ImGui::MenuItem("Save World", nullptr, nullptr, isShowWorldMenu))
 				{
-					DvWorldSerializer serializer(EditorContext::ActiveWorld);
+					WorldSerializer serializer(EditorContext::ActiveWorld);
 					serializer.Serialize("NewWorld.dive");
 				}
 
@@ -101,9 +101,9 @@ namespace Dive
 			{
 				if (ImGui::MenuItem("Create Empty", nullptr, nullptr, isShowWorldMenu))
 				{
-					EditorContext::ActiveWorld->CreateGameObject("Empty");
+					auto emptyGO = EditorContext::ActiveWorld->CreateGameObject("Empty");
 				}
-				if (ImGui::BeginMenu("3D TypeInfo"))
+				if (ImGui::BeginMenu("3D Object"))
 				{
 					if (ImGui::MenuItem("Triangle", nullptr, nullptr, isShowWorldMenu))
 					{

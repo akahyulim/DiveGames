@@ -4,11 +4,11 @@ namespace Dive
 {
 	class World;
 
-	class DvWorldSerializer
+	class WorldSerializer
 	{
 	public:
-		DvWorldSerializer(World* world);
-		~DvWorldSerializer() = default;
+		WorldSerializer(World* world);
+		~WorldSerializer() = default;
 
 		void Serialize(const std::filesystem::path& filepath);
 		bool Deserialize(const std::filesystem::path& filepath);

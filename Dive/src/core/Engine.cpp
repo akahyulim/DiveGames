@@ -15,7 +15,6 @@ namespace Dive
 	std::chrono::steady_clock::time_point Engine::s_LastTickTime;
 	UINT16 Engine::s_Fps = 0;
 	UINT64 Engine::s_FrameCount = 0;
-	World* Engine::s_World = nullptr;
 
 	// sprtan은 editor로부터 args를 받는다.
 	void Engine::Initialize()
@@ -55,19 +54,9 @@ namespace Dive
 			lastTimeMS = s_ElapsedTimeMS;
 		}
 
-		if (s_World)
-		{
-			s_World->Update();
-		}
-
-		s_FrameCount++;
-	}
-
-	World* Engine::CreateWorld(const std::string& name)
-	{
-		DV_DELETE(s_World);
+		if (WorldManager::GetActiveWorld())
+			WorldManager::GetActiveWorld()->Update();
 	
-		s_World = new World(name);
-		return s_World;
+		s_FrameCount++;
 	}
 }

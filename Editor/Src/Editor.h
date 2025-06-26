@@ -22,9 +22,9 @@ namespace Dive
 	public:
 		static World* ActiveWorld;
 		
-		static GameObject* Selected;
-		static GameObject* EditorCamera;
-		static GameObject* MainCamera;
+		static std::shared_ptr<GameObject> Selected;
+		static std::shared_ptr<GameObject> EditorCamera;
+		static std::shared_ptr<GameObject> MainCamera;
 	};
 
 	class Editor
