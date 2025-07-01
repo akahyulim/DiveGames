@@ -24,8 +24,8 @@ namespace Dive
 			{
 				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 				{ 
-					auto dragged = static_cast<GameObject*>(payload->Data);
-					dragged->GetTransform()->SetParent(nullptr);
+					auto draggedGO = static_cast<GameObject*>(payload->Data);
+					draggedGO->GetTransform()->SetParent(nullptr);
 				}
 
 				ImGui::EndDragDropTarget();
@@ -35,7 +35,7 @@ namespace Dive
 			auto root = EditorContext::ActiveWorld->GetRootGameObjects();
 			if (!root.empty())
 			{
-				for (auto& gameObject : root)
+				for (auto gameObject : root)
 				{
 					if (gameObject->GetTag() == "EditorOnly")
 						continue;
@@ -53,13 +53,13 @@ namespace Dive
 		}
 	}
 
-	void HierarchyView::showTree(std::shared_ptr<GameObject> gameObject)
+	void HierarchyView::showTree(GameObject* gameObject)
 	{
 		if (!gameObject) return;
 
 		auto transform = gameObject->GetTransform();
 
-		ImGui::PushID(gameObject.get());
+		ImGui::PushID(gameObject);
 		
 		// 드롭 슬롯 (노드 위)
 		float width = ImGui::GetContentRegionAvail().x;
@@ -69,10 +69,10 @@ namespace Dive
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 			{
-				auto dragged = *(GameObject**)payload->Data;
-				if (dragged && dragged != gameObject.get())
+				auto draggedGO = static_cast<GameObject*>(payload->Data);
+				if (draggedGO && draggedGO != gameObject)
 				{
-					auto draggedTransform = dragged->GetTransform();
+					auto draggedTransform = draggedGO->GetTransform();
 					auto targetTransform = transform;
 					auto parent = targetTransform->GetParent();
 
@@ -93,11 +93,12 @@ namespace Dive
 		flags |= transform->HasChildren() ? ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf;
 		flags |= (EditorContext::Selected == gameObject) ? ImGuiTreeNodeFlags_Selected : 0;
 
-		bool opened = ImGui::TreeNodeEx((void*)(intptr_t)gameObject.get(), flags, gameObject->GetName().c_str());
+		bool opened = ImGui::TreeNodeEx((void*)(intptr_t)gameObject, flags, gameObject->GetName().c_str());
 
 		if (ImGui::BeginDragDropSource())
 		{
-			ImGui::SetDragDropPayload("HIERARCHY_NODE", &gameObject, sizeof(GameObject*));
+			// 드래그 노드로 다룰 데이터의 포인터와 크기 설정
+			ImGui::SetDragDropPayload("HIERARCHY_NODE", gameObject, sizeof(GameObject));
 			ImGui::Text("Move %s", gameObject->GetName().c_str());
 			ImGui::EndDragDropSource();
 		}
@@ -106,12 +107,12 @@ namespace Dive
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 			{
-				auto dragged = *(GameObject**)payload->Data;
-				if (dragged && dragged != gameObject.get())
+				auto draggedGO = static_cast<GameObject*>(payload->Data);
+				if (draggedGO && draggedGO != gameObject)
 				{
-					auto draggedTr = dragged->GetTransform();
-					if (!transform->IsChildOf(draggedTr))
-						draggedTr->SetParent(transform);
+					auto draggedTransform = draggedGO->GetTransform();
+					if (!transform->IsChildOf(draggedTransform))
+						draggedTransform->SetParent(transform);
 				}
 			}
 			ImGui::EndDragDropTarget();
@@ -153,7 +154,7 @@ namespace Dive
 			// 역시 얕은 복사
 			auto childrenCopy = transform->GetChildren();
 			for (auto child : childrenCopy)
-				showTree(child->GetGameObject()->GetSharedPtr());
+				showTree(child->GetGameObject());
 			ImGui::TreePop();
 		}
 

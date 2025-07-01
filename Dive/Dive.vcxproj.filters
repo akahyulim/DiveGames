@@ -86,9 +86,6 @@
     <ClInclude Include="src\graphics\Cubemap.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\InstanceID.h">
-      <Filter>core</Filter>
-    </ClInclude>
     <ClInclude Include="src\rendering\Mesh.h">
       <Filter>rendering</Filter>
     </ClInclude>
@@ -118,6 +115,7 @@
     <ClInclude Include="src\world\GameObject.h" />
     <ClInclude Include="src\world\Components\Component.h" />
     <ClInclude Include="src\world\Components\Transform.h" />
+    <ClInclude Include="src\core\Object.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -178,9 +176,6 @@
     <ClCompile Include="src\graphics\Texture.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\InstanceID.cpp">
-      <Filter>core</Filter>
-    </ClCompile>
     <ClCompile Include="src\rendering\Mesh.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
@@ -209,5 +204,7 @@
     <ClCompile Include="src\rendering\SkinnedMesh.cpp" />
     <ClCompile Include="src\world\GameObject.cpp" />
     <ClCompile Include="src\world\Components\Transform.cpp" />
+    <ClCompile Include="src\core\Object.cpp" />
+    <ClCompile Include="src\world\Components\Component.cpp" />
   </ItemGroup>
 </Project>

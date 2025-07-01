@@ -2,51 +2,52 @@
 #include "GameObject.h"
 #include "World.h"
 #include "components/Transform.h"
-#include "core/instanceID.h"
 
 namespace Dive
 {
-	GameObject::GameObject(UINT64 instanceID, const std::string& name)
-		: m_InstanceID(instanceID)
-		, m_Name(name)
+	GameObject::GameObject(const std::string& name)
+		: Object(name)
 		, m_World(WorldManager::GetActiveWorld())
-		, m_Transform(AddComponent<Transform>())
 	{
-		DV_LOG(GameObject, trace, "Created: {}, {}", m_Name, m_InstanceID);
+		DV_LOG(GameObject, trace, "Created: {}, {}", GetName(), GetInstanceID());
 	}
 
 	GameObject::~GameObject()
 	{
-		for (auto& [type, component] : m_Components)
-			DV_DELETE(component);
-	
 		m_Components.clear();
 
-		DV_LOG(GameObject, trace, "Destroyed: {}, {}", m_Name, m_InstanceID);
+		DV_LOG(GameObject, trace, "Destroyed: {}, {}", GetName(), GetInstanceID());
 	}
 
 	void GameObject::Destory()
 	{
-		assert(m_World);
-
 		if (m_IsDestroyed) return;
 		m_IsDestroyed = true;
 	
-		for (auto child : m_Transform->GetChildren())
+		// 얕은 복사
+		auto children = GetTransform()->GetChildren();
+		for (auto child : children)
 		{
 			if (auto childGO = child->GetGameObject())
 				childGO->Destory();
 		}
 
-		if (!m_Transform->HasParent())
+		if (GetTransform()->HasParent())
+		{ 
+			auto& sibling = GetTransform()->GetParent()->GetChildren();
+			auto it = std::find(sibling.begin(), sibling.end(), GetTransform());
+			if (it != sibling.end())
+				sibling.erase(it);
+		}
+		else
 			m_World->DetachRoot(this);
 
-		m_World->QueueDestory(this);
+		m_World->QueueDestroy(this);
 	}
 
 	void GameObject::Update()
 	{
-		if (!m_ActiveHierarchy)
+		if (!m_ActiveHierarchy || m_IsDestroyed)
 			return;
 
 		for (auto& [type, component] : m_Components)
@@ -65,7 +66,7 @@ namespace Dive
 		auto it = m_Components.find(type);
 		if (it != m_Components.end())
 		{
-			DV_DELETE(it->second);
+			it->second.reset();
 			m_Components.erase(it);
 		}
 		else
@@ -81,17 +82,23 @@ namespace Dive
 
 	Component* GameObject::GetComponentByType(eComponentType type) const
 	{
-		if(!HasComponentByType(type))
-			return nullptr;
+		auto it = m_Components.find(type);
+		if (it != m_Components.end())
+			return it->second.get();
 
-		return m_Components.at(type);
+		return nullptr;
 	}
 
+	Transform* GameObject::GetTransform() const
+	{
+		return GetComponent<Transform>();
+	}
+	
 	void GameObject::SetActive(bool value)
 	{
 		m_ActiveSelf = value;
-		bool parentHierarchy = m_Transform->HasParent() ? 
-			m_Transform->GetParent()->GetGameObject()->m_ActiveHierarchy : true;
+		bool parentHierarchy = GetTransform()->HasParent() ? 
+			GetTransform()->GetParent()->GetGameObject()->m_ActiveHierarchy : true;
 
 		updateActiveInHierarchy(parentHierarchy);
 	}
@@ -100,7 +107,7 @@ namespace Dive
 	{
 		m_ActiveHierarchy = parentHierarchy && m_ActiveSelf;
 
-		const auto& children = m_Transform->GetChildren();
+		const auto& children = GetTransform()->GetChildren();
 		for (auto child : children)
 		{
 			auto owner = child->GetGameObject();

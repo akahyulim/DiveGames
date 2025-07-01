@@ -29,6 +29,12 @@ namespace Dive
 
 	void Engine::Shutdown()
 	{
+		// 임시: 윈도우 X 버튼을 눌렀을 때 대비
+		// =>  위치는 이 곳이 맞는 것 같다.
+		// 기존 MenuBar Exit에서 World를 Clear하는 게 이상했다.
+		if (WorldManager::GetActiveWorld())
+			WorldManager::GetActiveWorld()->Clear();
+
 		ResourceManager::Clear();
 		Input::Shutdown();
 		Renderer::Shutdown();

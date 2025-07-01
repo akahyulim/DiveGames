@@ -1,32 +1,23 @@
 ﻿#include "stdafx.h"
 #include "Resource.h"
 #include "core/FileUtils.h"
-#include "core/InstanceID.h"
 
 namespace Dive
 {
 	Resource::Resource(const std::string& name)
-		: m_InstanceID(InstanceID())
-		, m_Name(name)
+		: Object(name)
 	{
-		DV_LOG(Resource, trace, "Created: {}, {}", m_Name, m_InstanceID);
-	}
-
-	Resource::Resource(UINT64 instanceID, const std::string& name)
-		: m_InstanceID(instanceID)
-		, m_Name(name)
-	{ 
-		DV_LOG(Resource, trace, "Created: {}. {}", m_Name, m_InstanceID);
+		DV_LOG(Resource, trace, "Created: {}, {}", GetName(), GetInstanceID());
 	}
 
 	Resource::~Resource()
 	{
-		DV_LOG(Resource, trace, "Destroyed: {}. {}", m_Name, m_InstanceID);
+		DV_LOG(Resource, trace, "Destroyed: {}. {}", GetName(), GetInstanceID());
 	}
 
 	void Resource::SetFilepath(const std::filesystem::path& filepath)
 	{
-		m_Name = filepath.stem().string();
+		SetName(filepath.stem().string());
 		// 추후 상대경로 저장 수정 필요
 		// 이를 위해서 FileUtils에 관련 함수를 만들어야 하는데
 		// 상대경로의 기준으 되는 WorkingDir 설정도 필요하다.

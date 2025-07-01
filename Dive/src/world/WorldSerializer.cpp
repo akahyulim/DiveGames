@@ -4,7 +4,7 @@
 #include "GameObject.h"
 #include "Components/Transform.h"
 #include "core/CoreDefs.h"
-#include "core/InstanceID.h"
+//#include "core/UINT64.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -122,12 +122,12 @@ namespace Dive
 			<< mat._41 << mat._42 << mat._43 << mat._44 << YAML::EndSeq;
 		return out;
 	}
-
+	/*
 	static void SerializeGameObject(YAML::Emitter& out, std::shared_ptr<GameObject> gameObject)
 	{
 		out << YAML::BeginMap;
 
-		out << YAML::Key << "InstanceID" << YAML::Value << gameObject->GetInstanceID();
+		out << YAML::Key << "UINT64" << YAML::Value << gameObject->GetInstanceID();
 		out << YAML::Key << "Name" << YAML::Value << gameObject->GetName();
 		out << YAML::Key << "Tag" << YAML::Value << gameObject->GetTag();
 
@@ -156,16 +156,16 @@ namespace Dive
 		out << YAML::EndMap;
 	}
 
-	static void DeserializeGameObject(const YAML::Node& node, World* world, Transform* parent)
+	static void DeserializeGameObject(const YAML::Node& node, World* world, std::shared_ptr<Transform> parent)
 	{
-		if (!node["InstanceID"] || !node["Name"])
+		if (!node["UINT64"] || !node["Name"])
 			return;
 
-		auto instanceID = node["InstanceID"].as<UINT64>();
+		auto instanceID = node["UINT64"].as<UINT64>();
 		auto name = node["Name"].as<std::string>();
 		auto tag = node["Tag"] ? node["Tag"].as<std::string>() : "Untagged";
 
-		auto gameObject = world->CreateGameObject(instanceID, name);
+		auto gameObject = world->CreateGameObject(name);
 		gameObject->SetTag(tag);
 
 		auto tc = gameObject->GetTransform();
@@ -196,12 +196,12 @@ namespace Dive
 			}
 		}
 	}
-
+	*/
 	WorldSerializer::WorldSerializer(World* world)
 		: m_World(world)
 	{
 	}
-
+	/*
 	void WorldSerializer::Serialize(const std::filesystem::path& filepath)
 	{
 		YAML::Emitter out;
@@ -236,6 +236,142 @@ namespace Dive
 		{
 			for (const auto& root : data["RootGameObjects"])
 				DeserializeGameObject(root, m_World, nullptr);
+		}
+
+		return true;
+	}
+	*/
+	// =====================================================================================================================================
+
+	std::unordered_map<const void*, uint64_t> objectToFileID;
+	uint64_t currentID = 1;
+
+	uint64_t GetFileID(const Object* obj)
+	{
+		const void* key = static_cast<const void*>(obj);
+		auto [it, inserted] = objectToFileID.emplace(key, currentID);
+		if (inserted) currentID++;
+		return it->second;
+	}
+
+	// 루트부터 재귀적으로 all에 저장
+	// 순서를 유지하기 위해서이다.
+	void CollectHierarchy(GameObject* root, std::vector<GameObject*>& all)
+	{
+		all.push_back(root);
+
+		auto tf = root->GetTransform();
+		for (auto& child : tf->GetChildren())
+			CollectHierarchy(child->GetGameObject(), all);
+	}
+
+	void SerializeGameObjectsFlat(YAML::Emitter& out, const std::vector<GameObject*>& objects)
+	{
+		out << YAML::Key << "GameObjects" << YAML::Value << YAML::BeginSeq;
+
+		for (auto go : objects)
+		{
+			uint64_t goID = GetFileID(go);
+			uint64_t tfID = GetFileID(go->GetTransform());
+
+			out << YAML::BeginMap;
+
+			out << YAML::Key << "fileID" << YAML::Value << goID;
+			out << YAML::Key << "Name" << YAML::Value << go->GetName();
+			out << YAML::Key << "Tag" << YAML::Value << go->GetTag();
+
+			auto tf = go->GetTransform();
+			out << YAML::Key << "Transform" << YAML::Value << YAML::BeginMap;
+			out << YAML::Key << "fileID" << YAML::Value << tfID;
+			out << YAML::Key << "Position" << YAML::Value << tf->GetLocalPosition();
+			out << YAML::Key << "Rotation" << YAML::Value << tf->GetLocalRotationQuaternion();
+			out << YAML::Key << "Scale" << YAML::Value << tf->GetLocalScale();
+
+			if (auto parent = tf->GetParent())
+				out << YAML::Key << "Parent" << YAML::Value << GetFileID(parent);
+
+			out << YAML::EndMap; // Transform
+			out << YAML::EndMap; // GameObject
+		}
+
+		out << YAML::EndSeq;
+	}
+
+	void WorldSerializer::Serialize(const std::filesystem::path& filepath)
+	{
+		YAML::Emitter out;
+		out << YAML::BeginMap;
+		out << YAML::Key << "World" << YAML::Value << m_World->GetName();
+
+		std::vector<GameObject*> flatList;
+		for (auto& root : m_World->GetRootGameObjects())
+			CollectHierarchy(root, flatList);
+
+		SerializeGameObjectsFlat(out, flatList);
+
+		out << YAML::EndMap;
+
+		std::ofstream fout(filepath);
+		fout << out.c_str();
+	}
+
+	std::unordered_map<uint64_t, Object*> fileIDToObject;
+
+	bool WorldSerializer::Deserialize(const std::filesystem::path& filepath)
+	{
+		YAML::Node data;
+		try {
+			data = YAML::LoadFile(filepath.string());
+		}
+		catch (const YAML::ParserException& e) {
+			DV_LOG(WorldSerializer, warn, "YAML 파싱 실패: {}", e.what());
+			return false;
+		}
+
+		if (data["World"])
+			m_World->SetName(data["World"].as<std::string>());
+
+		const auto& nodes = data["GameObjects"];
+		if (!nodes || !nodes.IsSequence())
+			return false;
+
+		// 1차 패스: GameObject/Transform 생성 + fileID 등록
+		for (const auto& node : nodes)
+		{
+			auto goID = node["fileID"].as<uint64_t>();
+			auto name = node["Name"].as<std::string>();
+			auto tag = node["Tag"] ? node["Tag"].as<std::string>() : "Untagged";
+
+			auto go = m_World->CreateGameObject(name);
+			go->SetTag(tag);
+			fileIDToObject[goID] = go;
+
+			const auto& tfNode = node["Transform"];
+			auto tfID = tfNode["fileID"].as<uint64_t>();
+
+			auto tf = go->GetTransform(); // GameObject가 자동으로 Transform 생성한다고 가정
+			tf->SetLocalPosition(tfNode["Position"].as<DirectX::XMFLOAT3>());
+			tf->SetLocalRotationQuaternion(tfNode["Rotation"].as<DirectX::XMFLOAT4>());
+			tf->SetLocalScale(tfNode["Scale"].as<DirectX::XMFLOAT3>());
+			fileIDToObject[tfID] = tf;
+		}
+
+		// 2차 패스: Transform 부모 연결
+		for (const auto& node : nodes)
+		{
+			const auto& tfNode = node["Transform"];
+			if (!tfNode["fileID"]) continue;
+
+			auto tfID = tfNode["fileID"].as<uint64_t>();
+			auto tf = static_cast<Transform*>(fileIDToObject[tfID]);
+
+			if (tfNode["Parent"])
+			{
+				uint64_t parentID = tfNode["Parent"].as<uint64_t>();
+				auto parent = static_cast<Transform*>(fileIDToObject[parentID]);
+				if (parent)
+					tf->SetParent(parent);
+			}
 		}
 
 		return true;

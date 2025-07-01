@@ -4,7 +4,8 @@
 #include "stdafx.h"
 
 // core
-#include "core/InstanceID.h"
+#include "core/Object.h"
+//#include "core/UINT64.h"
 #include "core/Log.h"
 #include "core/StringUtils.h"
 #include "core/FileUtils.h"

@@ -41,9 +41,9 @@ LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPAR
 namespace Dive
 {
 	World* EditorContext::ActiveWorld = nullptr;
-	std::shared_ptr<GameObject> EditorContext::Selected;
-	std::shared_ptr<GameObject> EditorContext::EditorCamera;
-	std::shared_ptr<GameObject> EditorContext::MainCamera;
+	GameObject* EditorContext::Selected = nullptr;
+	GameObject* EditorContext::EditorCamera = nullptr;
+	GameObject* EditorContext::MainCamera = nullptr;
 
 	// main으로부터 argc를 받아 추린 후 엔진에 전달한다.
 	Editor::Editor()
@@ -115,12 +115,12 @@ namespace Dive
 		loadResources();
 
 		// create widgets
-		m_Widgets.emplace_back(std::make_shared<WorldView>(this));
-		m_Widgets.emplace_back(std::make_shared<GameView>(this));
-		m_Widgets.emplace_back(std::make_shared<HierarchyView>(this));
-		m_Widgets.emplace_back(std::make_shared<InspectorView>(this));
-		//m_Widgets.emplace_back(std::make_shared<LogView>(this));
-		m_MenuBar = std::make_shared<MenuBar>(this);
+		m_Widgets.emplace_back(std::make_unique<WorldView>(this));
+		m_Widgets.emplace_back(std::make_unique<GameView>(this));
+		m_Widgets.emplace_back(std::make_unique<HierarchyView>(this));
+		m_Widgets.emplace_back(std::make_unique<InspectorView>(this));
+		//m_Widgets.emplace_back(std::make_unique<LogView>(this));
+		m_MenuBar = std::make_unique<MenuBar>(this);
 
 		SetTitle();
 	}

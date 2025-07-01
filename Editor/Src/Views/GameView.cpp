@@ -38,7 +38,7 @@ namespace Dive
 				m_RenderTarget->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
 		}
 
-		auto dmc = ResourceManager::GetByPath<Texture2D>("Textures/dmc.jpg");
+		auto dmc = ResourceManager::GetByPath<Texture2D>("Textures/DokeV.jpeg");
 		ImTextureID textureID = (ImTextureID)(dmc ? dmc->GetShaderResourceView() : m_RenderTarget->GetShaderResourceView());
 		ImGui::Image(textureID, ImVec2(m_Width, m_Height));
 	}

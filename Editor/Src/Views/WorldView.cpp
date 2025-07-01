@@ -39,7 +39,7 @@ namespace Dive
 				m_RenderTarget->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
 		}
 
-		auto DokeV = ResourceManager::GetByName<Texture2D>("DokeV");
+		auto DokeV = ResourceManager::GetByName<Texture2D>("relaxed_morning");
 		ImTextureID textureID = (ImTextureID)(DokeV ? DokeV->GetShaderResourceView() : m_RenderTarget->GetShaderResourceView());
 		ImGui::Image(textureID, ImVec2(m_Width, m_Height));
 	}

@@ -15,7 +15,7 @@ namespace Dive
 		void drawView() override;
 
 	private:
-		void showTree(std::shared_ptr<GameObject> gameObject);
+		void showTree(GameObject* gameObject);
 		void popupMenu();
 
 	private:

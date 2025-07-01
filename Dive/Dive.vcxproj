@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClInclude Include="src\core\CoreDefs.h" />
     <ClInclude Include="src\core\Engine.h" />
-    <ClInclude Include="src\core\InstanceID.h" />
+    <ClInclude Include="src\core\Object.h" />
     <ClInclude Include="src\core\Window.h" />
     <ClInclude Include="src\core\EventDispatcher.h" />
     <ClInclude Include="src\core\FileUtils.h" />
@@ -58,7 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\core\Engine.cpp" />
-    <ClCompile Include="src\core\InstanceID.cpp" />
+    <ClCompile Include="src\core\Object.cpp" />
     <ClCompile Include="src\core\Window.cpp" />
     <ClCompile Include="src\core\EventDispatcher.cpp" />
     <ClCompile Include="src\core\FileUtils.cpp" />
@@ -88,6 +88,7 @@
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\world\Components\Component.cpp" />
     <ClCompile Include="src\world\Components\Transform.cpp" />
     <ClCompile Include="src\world\GameObject.cpp" />
     <ClCompile Include="src\world\World.cpp" />

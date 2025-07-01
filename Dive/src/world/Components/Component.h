@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "core/Object.h"
 
 namespace Dive
 {
@@ -13,19 +14,21 @@ namespace Dive
 		SkinnedMeshRenderer
 	};
 
-	class Component
+	class Component : public Object
 	{
 	public:
-		Component(GameObject* gameObject) : m_GameObject(gameObject) {}
+		Component(GameObject* gameObject);
 		virtual ~Component() = default;
+
+		std::string GetName() override;
 
 		virtual void Update() {}
 
-		GameObject* GetGameObject() const { return m_GameObject; }
+		GameObject* GetGameObject() const;
 
 		static constexpr eComponentType GetType() { return eComponentType::Undefined; }
 
 	protected:
-		GameObject* m_GameObject = nullptr;
+		GameObject* m_GameObject;
 	};
 }

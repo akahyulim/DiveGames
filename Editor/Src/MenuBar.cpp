@@ -82,8 +82,6 @@ namespace Dive
 						EditorContext::Selected = nullptr;
 						EditorContext::EditorCamera = nullptr;
 						EditorContext::MainCamera = nullptr;
-					
-						EditorContext::ActiveWorld->Clear();
 						EditorContext::ActiveWorld = nullptr;
 					}
 					Window::Close();

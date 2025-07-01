@@ -102,7 +102,7 @@ namespace Dive
 			// Name
 			{
 				char buffer[256]{};
-				auto& name = EditorContext::Selected->GetName();
+				auto name = EditorContext::Selected->GetName();
 				strncpy_s(buffer, sizeof(buffer), name.c_str(), sizeof(buffer));
 				if (ImGui::InputText("##Name", buffer, sizeof(buffer)))
 				{

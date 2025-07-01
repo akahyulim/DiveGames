@@ -8,19 +8,12 @@ namespace Dive
 	Transform::Transform(GameObject* gameObject)
 		: Component(gameObject)
 	{
-		DV_LOG(Transform, trace, "Created: {}, {}", gameObject->GetName(), gameObject->GetInstanceID());
+		DV_LOG(Transform, trace, "Created: {}, {}", GetName(), GetInstanceID());
 	}
 
 	Transform::~Transform()
 	{
-		//if (m_Parent)
-		{
-		//	auto it = std::find(m_Parent->m_Children.begin(), m_Parent->m_Children.end(), this);
-		//	if (it != m_Parent->m_Children.end())
-		//		m_Parent->m_Children.erase(it);
-		}
-		
-		DV_LOG(Transform, trace, "Destroyed: {}, {}", m_GameObject->GetName(), m_GameObject->GetInstanceID());
+		DV_LOG(Transform, trace, "Destroyed: {}, {}", GetName(), GetInstanceID());
 	}
 
 	DirectX::XMFLOAT3 Transform::GetPosition() const
@@ -333,8 +326,6 @@ namespace Dive
 
 	void Transform::SetParent(Transform* parent)
 	{
-		assert(m_GameObject);
-
 		if (parent == m_Parent || (parent != nullptr && parent->IsChildOf(this)))
 			return;
 
@@ -349,13 +340,13 @@ namespace Dive
 			}
 		}
 		else
-			m_GameObject->GetWorld()->DetachRoot(m_GameObject);
+			GetGameObject()->GetWorld()->DetachRoot(GetGameObject());
 
 		// 새로운 부모의 자식 혹은 루트 컨테이너에 추가
 		if (parent != nullptr)
 			parent->m_Children.push_back(this);
 		else
-			m_GameObject->GetWorld()->AttachRoot(m_GameObject);
+			GetGameObject()->GetWorld()->AttachRoot(GetGameObject());
 
 		m_Parent = parent;
 	}
@@ -380,7 +371,7 @@ namespace Dive
 
 	Transform* Transform::Find(const std::string& name)
 	{
-		for (auto child : m_Children)
+		for (auto& child : m_Children)
 		{
 			if (child->GetGameObject()->GetName() == name)
 				return child;
@@ -396,7 +387,7 @@ namespace Dive
 
 	void Transform::DetachChildren()
 	{
-		for (auto child : m_Children)
+		for (auto& child : m_Children)
 		{
 			child->m_Parent = nullptr;
 		}
@@ -417,7 +408,7 @@ namespace Dive
 
 	size_t Transform::GetSiblingIndex()
 	{
-		assert(m_GameObject);
+		assert(GetGameObject());
 
 		if (HasParent())
 		{
@@ -428,8 +419,8 @@ namespace Dive
 		}
 		else
 		{
-			const auto& roots = m_GameObject->GetWorld()->m_RootGameObjects;
-			auto it = std::find(roots.begin(), roots.end(), m_GameObject->GetSharedPtr());
+			const auto& roots = GetGameObject()->GetWorld()->m_RootGameObjects;
+			auto it = std::find(roots.begin(), roots.end(), GetGameObject());
 
 			return (it != roots.end()) ? std::distance(roots.begin(), it) : std::numeric_limits<size_t>::max();
 		}
@@ -437,7 +428,7 @@ namespace Dive
 
 	void Transform::SetSiblingIndex(size_t index)
 	{
-		assert(m_GameObject);
+		assert(GetGameObject());
 
 		if (HasParent())
 		{
@@ -454,15 +445,15 @@ namespace Dive
 		}
 		else
 		{
-			auto& roots = m_GameObject->GetWorld()->m_RootGameObjects;
+			auto& roots = GetGameObject()->GetWorld()->m_RootGameObjects;
 			if (index >= roots.size())
 				return;
 
-			auto it = std::find(roots.begin(), roots.end(), m_GameObject->GetSharedPtr());
+			auto it = std::find(roots.begin(), roots.end(), GetGameObject());
 			if (it != roots.end())
 			{
 				roots.erase(it);
-				roots.insert(roots.begin() + index, m_GameObject->GetSharedPtr());
+				roots.insert(roots.begin() + index, GetGameObject());
 			}
 		}
 	}
