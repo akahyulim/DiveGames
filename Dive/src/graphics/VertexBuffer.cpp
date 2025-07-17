@@ -5,17 +5,10 @@
 
 namespace Dive
 {
-	VertexBuffer::~VertexBuffer()
+	bool VertexBuffer::Create(const void* data, uint32_t stride, uint32_t count)
 	{
-		Release();
-	}
-
-	bool VertexBuffer::Create(const void* data, UINT32 stride, UINT32 count)
-	{
-		Release();
-
 		D3D11_BUFFER_DESC bufferDesc{};
-		bufferDesc.ByteWidth = stride * count;
+		bufferDesc.ByteWidth = static_cast<UINT>(stride * count);
 		bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
 
@@ -24,6 +17,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, &subresourceData, &m_Buffer)))
 		{
+			DV_LOG(VertexBuffer, err, "Failed to create vertex buffer");
 			return false;
 		}
 
@@ -31,19 +25,5 @@ namespace Dive
 		m_Count = count;
 
 		return true;
-	}
-
-	void VertexBuffer::Release()
-	{
-		DV_RELEASE(m_Buffer);
-	}
-
-	VertexBuffer* VertexBuffer::Generate(const void* data, UINT32 stride, UINT32 count)
-	{
-		auto vertexBuffer = new VertexBuffer();
-		if (!vertexBuffer->Create(data, stride, count))
-			DV_DELETE(vertexBuffer);
-
-		return vertexBuffer;
 	}
 }

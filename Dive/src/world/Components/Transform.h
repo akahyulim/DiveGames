@@ -44,12 +44,18 @@ namespace Dive
 
 		// 유니티에선 localToWorldMatrix, worldToLocalMatrix로 칭하는 듯 하다.
 		DirectX::XMFLOAT4X4 GetTransform() const;
+		DirectX::XMMATRIX GetTransformMatrix() const;
 		DirectX::XMFLOAT4X4 GetLocalTransform() const;
+		DirectX::XMMATRIX GetLocalTransformMatrix() const;
 
 		void Translate(const DirectX::XMFLOAT3& move, eSpace space = eSpace::Self);
 		void RotateByQuaternion(const DirectX::XMFLOAT4& quaternion, eSpace space = eSpace::Self);
 		void RotateByRadians(const DirectX::XMFLOAT3& radians, eSpace space = eSpace::Self);
 		void RotateByDegrees(const DirectX::XMFLOAT3& degrees, eSpace space = eSpace::Self);
+
+		DirectX::XMFLOAT3 GetForward() const;
+		DirectX::XMFLOAT3 GetRight() const;
+		DirectX::XMFLOAT3 GetUp() const;
 
 		// hierarhy
 		bool HasParent() const { return m_Parent != nullptr; }

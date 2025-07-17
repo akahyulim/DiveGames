@@ -15,6 +15,5 @@ namespace Dive
 		static std::wstring StringToWString(const std::string& input);
 		static std::string WStringToString(const std::wstring& input);
 		static std::vector<std::string> StringSplit(const std::string& input, char separator);
-
 	};
 }

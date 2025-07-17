@@ -11,7 +11,7 @@ namespace Dive
 		static void Clear();
 
 		template<class T>
-		static T* Load(const std::filesystem::path& filepath)
+		static std::shared_ptr<T> Load(const std::filesystem::path& filepath)
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
 
@@ -21,19 +21,17 @@ namespace Dive
 				for (const auto& resource : it->second)
 				{
 					if (resource->GetFilepath() == filepath)
-					{
-						return static_cast<T*>(resource);
-					}
+						return std::static_pointer_cast<T>(resource);
 				}
 			}
-			auto resource = new T();
+			auto resource = std::make_shared<T>();
 			resource->LoadFromFile(filepath);
 			s_Resources[T::GetType()].push_back(resource);
 			return resource;
 		}
 
 		template<class T>
-		static T* GetByName(const std::string& name)
+		static std::shared_ptr<T> GetByName(const std::string& name)
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
 
@@ -43,16 +41,14 @@ namespace Dive
 				for (const auto& resource : it->second)
 				{
 					if (resource->GetName() == name)
-					{
-						return static_cast<T*>(resource);
-					}
+						return std::dynamic_pointer_cast<T>(resource);
 				}
 			}
 			return nullptr;
 		}
 
 		template<class T>
-		static T* GetByPath(const std::filesystem::path& filepath)
+		static std::shared_ptr<T> GetByPath(const std::filesystem::path& filepath)
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
 
@@ -63,7 +59,7 @@ namespace Dive
 				{
 					if (resource->GetFilepath() == filepath)
 					{
-						return static_cast<T*>(resource);
+						return static_cast<std::shared_ptr<T>>(resource);
 					}
 				}
 			}
@@ -71,18 +67,18 @@ namespace Dive
 		}
 
 		template<class T>
-		static std::vector<T*> GetByType()
+		static std::vector<std::shared_ptr<T>> GetByType()
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
 
 			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
 			{
-				std::vector<T*> resources;
+				std::vector<std::shared_ptr<T>> resources;
 				resources.reserve(it->second.size());
 				for (const auto& resource : it->second)
 				{
-					resources.push_back(static_cast<T*>(resource));
+					resources.push_back(static_cast<std::shared_ptr<T>>(resource));
 				}
 				return resources;
 			}
@@ -123,13 +119,25 @@ namespace Dive
 			return 0;
 		}
 
+		template<class T>
+		static void RegisterResource(std::shared_ptr<T> resource)
+		{
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			if (resource)
+			{
+				s_Resources[T::GetType()].push_back(resource);
+				resource->SetFilepath(s_ResourceFolder / resource->GetName());
+			}
+		}
+
 		static INT32 GetAllResourceCount();
 
 		static std::string GetResourceFolder() { return s_ResourceFolder.string(); }
 		static void SetResourceFolder(const std::filesystem::path& path);
 
 	private:
-		static std::unordered_map<eResourceType, std::vector<Resource*>> s_Resources;
+		static std::unordered_map<eResourceType, std::vector<std::shared_ptr<Resource>>> s_Resources;
 		static std::filesystem::path s_ResourceFolder;
 	};
 }

@@ -8,7 +8,7 @@ namespace Dive
 	class Transform;
 
 	// https://docs.unity3d.com/ScriptReference/GameObject.html
-	class GameObject : public Object, public std::enable_shared_from_this<GameObject>
+	class GameObject : public Object//, public std::enable_shared_from_this<GameObject>
 	{
 	public:
 		GameObject(const std::string& name);

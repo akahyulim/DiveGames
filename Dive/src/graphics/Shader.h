@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Resource/Resource.h"
+#include "core/Object.h"
 
 namespace Dive
 {
@@ -23,24 +23,17 @@ namespace Dive
 		Pos,
 		Pos_Tex,
 		Pos_Tex_Nor,
-		Static_Model,
-		Skinned_Model
+		Static_Mesh,
+		Skinned_Mesh
 	};
 
-	namespace ShaderUtils 
-	{
-		static Microsoft::WRL::ComPtr<ID3DBlob> CompileShaderFile(const std::filesystem::path& filepath, eShaderType type);
-		static std::vector<D3D11_INPUT_ELEMENT_DESC> GetInputElements(eInputLayout layout);
-	}
-
-	class Shader
+	class Shader : public Object
 	{
 	public:
 		Shader() = default;
 		~Shader();
 
-		bool Create(Microsoft::WRL::ComPtr<ID3DBlob> compiledShader, eShaderType type);
-		bool CreateInputLayout(Microsoft::WRL::ComPtr<ID3DBlob> blob, eInputLayout layout);
+		bool Create(const std::filesystem::path& filepath, eShaderType type, eInputLayout inputLayout = eInputLayout::Static_Mesh);
 		
 		ID3D11VertexShader* GetVertexShader() const { return m_VertexShader; }
 		ID3D11HullShader* GetHullShader() const { return m_HullShader; }
@@ -52,8 +45,6 @@ namespace Dive
 		ID3D11InputLayout* GetInputLayout() const { return m_InputLayout; }
 		
 		eShaderType GetType() const { return m_Type; }
-
-		static std::shared_ptr<Shader> Generate(const std::filesystem::path& filepath, eShaderType type, eInputLayout layout = eInputLayout::None);
 
 	private:
 		eShaderType m_Type = eShaderType::Undefined;

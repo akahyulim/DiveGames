@@ -9,14 +9,14 @@ namespace Dive
 		: Object(name)
 		, m_World(WorldManager::GetActiveWorld())
 	{
-		DV_LOG(GameObject, trace, "Created: {}, {}", GetName(), GetInstanceID());
+		DV_LOG(GameObject, info, "생성 - {}, {}", GetName(), GetInstanceID());
 	}
 
 	GameObject::~GameObject()
 	{
 		m_Components.clear();
 
-		DV_LOG(GameObject, trace, "Destroyed: {}, {}", GetName(), GetInstanceID());
+		DV_LOG(GameObject, info, "소멸 - {}, {}", GetName(), GetInstanceID());
 	}
 
 	void GameObject::Destory()

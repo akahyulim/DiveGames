@@ -3,32 +3,25 @@
 
 namespace Dive
 {
-	std::unordered_map<eResourceType, std::vector<Resource*>> ResourceManager::s_Resources;
+	std::unordered_map<eResourceType, std::vector<std::shared_ptr<Resource>>> ResourceManager::s_Resources;
 	std::filesystem::path ResourceManager::s_ResourceFolder = "Assets";
 
 	void ResourceManager::Clear()
 	{
-		for (auto& [type, resources] : s_Resources)
-		{
-			for (auto* resource : resources)
-			{
-				DV_DELETE(resource);
-			}
-			resources.clear();
-		}
+		// shared_ptr 대신 unique_ptr, raw pointer 조합이 맞는 것 같다.
 		s_Resources.clear();
+
+		DV_LOG(ResourceManager, info, "클리어 완료");
 	}
 
 	bool ResourceManager::IsCahed(UINT64 instanceID)
 	{
 		for (const auto& [type, resources] : s_Resources)
 		{
-			for (const auto* resource : resources)
+			for (auto& resource : resources)
 			{
 				if (resource->GetInstanceID() == instanceID)
-				{
 					return true;
-				}
 			}
 		}
 		return false;

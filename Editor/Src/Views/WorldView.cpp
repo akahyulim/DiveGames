@@ -13,12 +13,11 @@ namespace Dive
 
 	WorldView::~WorldView()
 	{
-		DV_DELETE(m_RenderTarget);
 	}
 
 	void WorldView::drawView()
 	{
-		if (!EditorContext::ActiveWorld)// || !EditorContext::EditorCamera)
+		if (!EditorContext::ActiveWorld || !EditorContext::EditorCamera)
 			return;
 
 		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
@@ -26,21 +25,20 @@ namespace Dive
 
 		if (!m_RenderTarget)
 		{
-			m_RenderTarget = new RenderTexture(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
+			m_RenderTarget = std::make_unique<RenderTexture>(
+				static_cast<UINT32>(m_Width), 
+				static_cast<UINT32>(m_Height),
+				eDepthFormat::Depth24Stencil8
+		);
 			m_RenderTarget->Create();
 
-			//auto& cameraCom = editorContext.ActiveWorld->GetEntityManager().GetComponent<CameraComponent>(editorContext.EditorCamera);
-			//if (cameraCom.RenderTarget != m_RenderTarget)
-			//	cameraCom.RenderTarget = m_RenderTarget;
-		}
-		else
-		{
-			if(m_RenderTarget->GetWidth() != static_cast<UINT32>(m_Width) || m_RenderTarget->GetHeight() != static_cast<UINT32>(m_Height))
-				m_RenderTarget->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
+			EditorContext::EditorCamera->GetComponent<Camera>()->SetRenderTarget(m_RenderTarget.get());
 		}
 
-		auto DokeV = ResourceManager::GetByName<Texture2D>("relaxed_morning");
-		ImTextureID textureID = (ImTextureID)(DokeV ? DokeV->GetShaderResourceView() : m_RenderTarget->GetShaderResourceView());
+		if(m_RenderTarget->GetWidth() != static_cast<UINT32>(m_Width) || m_RenderTarget->GetHeight() != static_cast<UINT32>(m_Height))
+				m_RenderTarget->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
+
+		ImTextureID textureID = (ImTextureID)(m_RenderTarget->GetShaderResourceView());
 		ImGui::Image(textureID, ImVec2(m_Width, m_Height));
 	}
 }

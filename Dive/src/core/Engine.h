@@ -21,15 +21,15 @@ namespace Dive
 		static float GetDeltaTimeMS() { return s_DeltaTimeMS; }
 		static float GetDeltaTimeSec() { return s_DeltaTimeMS / 1000.0f; }
 		
-		static UINT16 GetFps() { return s_Fps; }
+		static uint16_t GetFps() { return s_Fps; }
 
-		static UINT64 GetFrameCount() { return s_FrameCount; }
+		static uint64_t GetFrameCount() { return s_FrameCount; }
 
 	private:
 		static double s_ElapsedTimeMS;
 		static float s_DeltaTimeMS;
 		static std::chrono::steady_clock::time_point s_LastTickTime;
-		static UINT16 s_Fps;
-		static UINT64 s_FrameCount;
+		static uint16_t s_Fps;
+		static uint64_t s_FrameCount;
 	};
 }

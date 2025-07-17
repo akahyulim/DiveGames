@@ -86,9 +86,6 @@
     <ClInclude Include="src\graphics\Cubemap.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\Mesh.h">
-      <Filter>rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\math\BoundingBox.h">
       <Filter>math</Filter>
     </ClInclude>
@@ -111,11 +108,16 @@
       <Filter>rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\rendering\StaticMesh.h" />
-    <ClInclude Include="src\rendering\SkinnedMesh.h" />
     <ClInclude Include="src\world\GameObject.h" />
     <ClInclude Include="src\world\Components\Component.h" />
     <ClInclude Include="src\world\Components\Transform.h" />
     <ClInclude Include="src\core\Object.h" />
+    <ClInclude Include="src\world\Components\Camera.h" />
+    <ClInclude Include="src\graphics\ShaderManager.h" />
+    <ClInclude Include="src\resource\YamlHelper.h" />
+    <ClInclude Include="src\rendering\RenderDefs.h" />
+    <ClInclude Include="src\rendering\RenderPass.h" />
+    <ClInclude Include="src\world\Components\MeshRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -176,9 +178,6 @@
     <ClCompile Include="src\graphics\Texture.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\Mesh.cpp">
-      <Filter>rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\math\BoundingBox.cpp">
       <Filter>math</Filter>
     </ClCompile>
@@ -201,10 +200,13 @@
       <Filter>rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\rendering\StaticMesh.cpp" />
-    <ClCompile Include="src\rendering\SkinnedMesh.cpp" />
     <ClCompile Include="src\world\GameObject.cpp" />
     <ClCompile Include="src\world\Components\Transform.cpp" />
     <ClCompile Include="src\core\Object.cpp" />
     <ClCompile Include="src\world\Components\Component.cpp" />
+    <ClCompile Include="src\world\Components\Camera.cpp" />
+    <ClCompile Include="src\graphics\ShaderManager.cpp" />
+    <ClCompile Include="src\rendering\RenderPass.cpp" />
+    <ClCompile Include="src\world\Components\MeshRenderer.cpp" />
   </ItemGroup>
 </Project>

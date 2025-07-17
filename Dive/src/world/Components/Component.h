@@ -11,7 +11,7 @@ namespace Dive
 		Transform,
 		Camera,
 		MeshRenderer,
-		SkinnedMeshRenderer
+		SkinnedMeshRender
 	};
 
 	class Component : public Object

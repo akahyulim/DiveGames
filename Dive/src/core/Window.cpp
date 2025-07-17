@@ -32,7 +32,7 @@ namespace Dive
 
 		if (!::RegisterClassEx(&wc)) 
 		{
-			DV_LOG(Window, err, "윈도우 클래스 등록 실패");
+			DV_LOG(Window, critical, "윈도우 클래스 등록 실패");
 			return;
 		}
 
@@ -60,6 +60,8 @@ namespace Dive
 		}
 
 		Show();
+
+		DV_LOG(Window, info, "초기화 완료");
 	}
 
 	void Window::Shutdown()
@@ -71,6 +73,8 @@ namespace Dive
 
 		::UnregisterClass(WND_CLASS_NAME, s_hInstance);
 		s_hInstance = nullptr;
+
+		DV_LOG(Window, info, "셧다운 완료");
 	}
 
 	bool Window::Tick()
@@ -88,12 +92,12 @@ namespace Dive
 	void Window::SetMessageCallback(LONG_PTR callBack)
 	{
 		if (!SetWindowLongPtr(s_hWnd, GWLP_WNDPROC, callBack))
-			DV_LOG(Window, err, "프로시져 함수 변경에 실패하였습니다.");
+			DV_LOG(Window, err, "프로시져 함수 변경 실패");
 	}
 
 	bool Window::Resize(const uint32_t width, const uint32_t height)
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 
 		int posX = (::GetSystemMetrics(SM_CXSCREEN) - width) / 2;
 		int posY = (::GetSystemMetrics(SM_CYSCREEN) - height) / 2;
@@ -109,7 +113,7 @@ namespace Dive
 
 	uint32_t Window::GetWidth()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 
 		RECT rt{};
 		::GetClientRect(s_hWnd, &rt);
@@ -119,7 +123,7 @@ namespace Dive
 
 	uint32_t Window::GetHeight()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 
 		RECT rt{};
 		::GetClientRect(s_hWnd, &rt);
@@ -129,7 +133,7 @@ namespace Dive
 
 	void Window::Show()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 		::ShowWindow(s_hWnd, SW_SHOW);
 		::SetForegroundWindow(s_hWnd);
 		::SetFocus(s_hWnd);
@@ -137,19 +141,19 @@ namespace Dive
 
 	void Window::Hide()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 		::ShowWindow(s_hWnd, SW_HIDE);
 	}
 
 	void Window::Close()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 		::PostQuitMessage(0);
 	}
 
 	bool Window::IsFullScreen()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 
 		if (!(GetWindowLong(s_hWnd, GWL_STYLE) & WS_POPUP))
 			return false;
@@ -163,7 +167,7 @@ namespace Dive
 	
 	void Window::FullScreen()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 
 		if (!IsFullScreen())
 		{
@@ -175,7 +179,7 @@ namespace Dive
 
 	void Window::SetWindowed(bool windowed)
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 
 		LONG currentStyle = GetWindowLong(s_hWnd, GWL_STYLE);
 
@@ -201,7 +205,7 @@ namespace Dive
 	
 	void Window::Minimize()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 
 		if (!::IsIconic(s_hWnd))
 			::ShowWindow(s_hWnd, SW_MINIMIZE);
@@ -209,7 +213,7 @@ namespace Dive
 	
 	void Window::Maximize()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 
 		if (!::IsZoomed(s_hWnd))
 			::ShowWindow(s_hWnd, SW_MAXIMIZE);
@@ -217,7 +221,7 @@ namespace Dive
 
 	void Window::Restore()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 
 		if (::IsZoomed(s_hWnd))
 			::ShowWindow(s_hWnd, SW_RESTORE);
@@ -225,14 +229,14 @@ namespace Dive
 
 	bool Window::IsMaximize()
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 		
 		return ::IsZoomed(s_hWnd);
 	}
 
 	void Window::SetTitle(const std::wstring& title)
 	{
-		DV_ASSERT(Window, s_hWnd);
+		assert(s_hWnd != 0);
 
 		if (s_Title != title)
 		{

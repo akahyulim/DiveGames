@@ -6,20 +6,17 @@ namespace Dive
 	{
 	public:
 		VertexBuffer() = default;
-		~VertexBuffer();
+		~VertexBuffer() = default;
 
-		bool Create(const void* data, UINT32 stride, UINT32 count);
-		void Release();
+		bool Create(const void* data, uint32_t stride, uint32_t count);
 
-		ID3D11Buffer* GetBuffer() const { return m_Buffer; }
-		UINT32 GetStride() const { return m_Stride; }
-		UINT32 GetCount() const { return m_Count; }
-
-		static VertexBuffer* Generate(const void* data, UINT32 stride, UINT32 count);
+		ID3D11Buffer* GetBuffer() const { return m_Buffer.Get(); }
+		uint32_t GetStride() const { return m_Stride; }
+		uint32_t GetCount() const { return m_Count; }
 
 	private:
-		ID3D11Buffer* m_Buffer = nullptr;
-		UINT32 m_Stride = 0;
-		UINT32 m_Count = 0;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
+		uint32_t m_Stride = 0;
+		uint32_t m_Count = 0;
 	};
 }

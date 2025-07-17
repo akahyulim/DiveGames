@@ -2,11 +2,17 @@
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
-#define DV_LOG(CategoryName, Level, Format, ...) \
-	do { \
-		auto logger = Dive::LogManager::GetLogger(#CategoryName); \
-		logger->log(spdlog::level::Level, Format, ##__VA_ARGS__); \
-	} while (0)
+#define DV_LOG(CategoryName, Level, Format, ...)                             \
+    do {                                                                     \
+        auto logger = Dive::LogManager::GetLogger(#CategoryName);           \
+        logger->log(spdlog::level::Level, Format, ##__VA_ARGS__);           \
+                                                                             \
+        if constexpr (spdlog::level::Level == spdlog::level::critical) {    \
+            std::wstring msg = L"치명적인 오류가 발생했습니다.\n프로그램을 종료합니다."; \
+            MessageBoxW(nullptr, msg.c_str(), L"Critical Error", MB_ICONERROR | MB_OK); \
+            std::exit(EXIT_FAILURE);                                        \
+        }                                                                   \
+    } while (0)
 
 namespace Dive
 {

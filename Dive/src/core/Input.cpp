@@ -3,11 +3,13 @@
 #include "CoreDefs.h"
 #include "Window.h"
 
+using Microsoft::WRL::ComPtr;
+
 namespace Dive
 {
-	IDirectInput8* Input::s_DirectInput = nullptr;
-	IDirectInputDevice8* Input::s_Keyboard = nullptr;
-	IDirectInputDevice8* Input::s_Mouse = nullptr;
+	Microsoft::WRL::ComPtr<IDirectInput8> Input::s_DirectInput;
+	Microsoft::WRL::ComPtr<IDirectInputDevice8> Input::s_Keyboard;
+	Microsoft::WRL::ComPtr<IDirectInputDevice8> Input::s_Mouse;
 
 	uint8_t Input::s_KeyStates[MAX_NUM_KEYS]{};
 	uint8_t Input::s_OldKeyStates[MAX_NUM_KEYS]{};
@@ -27,67 +29,70 @@ namespace Dive
 		HINSTANCE hInstance = Window::GetInstanceHandle();
 		HWND hWnd = Window::GetWindowHandle();
 
-		DV_ASSERT(Input, hInstance);
-		DV_ASSERT(Input, hWnd);
+		assert(hInstance);
+		assert(hWnd);
  
-		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&s_DirectInput, nullptr))) {
-			DV_LOG(Input, err, "Input 초기화 과정 중 DirectInput 객체 생성에 실패하였습니다.");
+		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)s_DirectInput.GetAddressOf(), nullptr))) 
+		{
+			DV_LOG(Input, critical, "DirectInput 객체 생성 실패!");
 			return;
 		}
 
 		// 키보드 생성
 		{
-			if (FAILED(s_DirectInput->CreateDevice(GUID_SysKeyboard, &s_Keyboard, nullptr)))
+			if (FAILED(s_DirectInput->CreateDevice(GUID_SysKeyboard, s_Keyboard.GetAddressOf(), nullptr)))
 			{
-				DV_LOG(Input, err, "Input 초기화 과정 중 키보드 장치 객체 생성에 실패하였습니다.");
+				DV_LOG(Input, critical, "키보드 장치 객체 생성 실패!");
 				return;
 			}
 
 			if (FAILED(s_Keyboard->SetDataFormat(&c_dfDIKeyboard)))
 			{
-				DV_LOG(Input, err, "Input 초기화 과정 중 키보드 데이터 포멧 설정에 실패하였습니다.");
+				DV_LOG(Input, critical, "키보드 데이터 포멧 설정 실패!");
 				return;
 			}
 
 			if (FAILED(s_Keyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
 			{
-				DV_LOG(Input, err, "Input 초기화 과정 중 키보드 코퍼레이트 레벨 설정에 실패하였습니다.");
+				DV_LOG(Input, critical, "키보드 코퍼레이트 레벨 설정 실패!");
 				return;
 			}
 
 			if (FAILED(s_Keyboard->Acquire()))
 			{
-				DV_LOG(Input, err, "Input 초기화 과정 중 키보드 획득에 실패하였습니다.");
+				DV_LOG(Input, critical, "키보드 획득 실패!");
 				return;
 			}
 		}
 
 		// 마우스 생성
 		{
-			if (FAILED(s_DirectInput->CreateDevice(GUID_SysMouse, &s_Mouse, NULL)))
+			if (FAILED(s_DirectInput->CreateDevice(GUID_SysMouse, s_Mouse.GetAddressOf(), NULL)))
 			{
-				DV_LOG(Input, err, "Input 초기화 과정 중 마우스 장치 객체 생성에 실패하였습니다.");
+				DV_LOG(Input, critical, "마우스 장치 객체 생성 실패!");
 				return;
 			}
 
 			if (FAILED(s_Mouse->SetDataFormat(&c_dfDIMouse)))
 			{
-				DV_LOG(Input, err, "Input 초기화 과정 중 마우스 데이터 포멧 설정에 실패하였습니다.");
+				DV_LOG(Input, critical, "마우스 데이터 포멧 설정 실패!");
 				return;
 			}
 
 			if (FAILED(s_Mouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
 			{
-				DV_LOG(Input, err, "Input 초기화 과정 중 마우스 코퍼레이트 레벨 설정에 실패하였습니다.");
+				DV_LOG(Input, critical, "마우스 코퍼레이트 레벨 설정 실패!");
 				return;
 			}
 
 			if (FAILED(s_Mouse->Acquire()))
 			{
-				DV_LOG(Input, err, "Input 초기화 과정 중 마우스 획득에 실패하였습니다.");
+				DV_LOG(Input, critical, "마우스 획득 실패!");
 				return;
 			}
 		}
+
+		DV_LOG(Input, info, "초기화 완료");
 	}
 
 	void Input::Shutdown()
@@ -95,16 +100,18 @@ namespace Dive
 		if (s_Mouse)
 		{
 			s_Mouse->Unacquire();
-			DV_RELEASE(s_Mouse);
-		}
-
-		if (s_Keyboard)
+			s_Mouse.Reset();
+		} 
+		
+		if(s_Keyboard)
 		{
 			s_Keyboard->Unacquire();
-			DV_RELEASE(s_Keyboard);
+			s_Keyboard.Reset();
 		}
+		
+		s_DirectInput.Reset();
 
-		DV_RELEASE(s_DirectInput);
+		DV_LOG(Input, info, "셧다운 완료");
 	}
 
 	void Input::Tick()
@@ -116,7 +123,7 @@ namespace Dive
 
 	void Input::ReadKeyboard()
 	{
-		if (!s_DirectInput && !s_Keyboard)
+		if (!s_DirectInput || !s_Keyboard)
 			return;
 
 		memcpy(s_OldKeyStates, s_KeyStates, sizeof(s_KeyStates));
@@ -129,16 +136,13 @@ namespace Dive
 			if ((result == DIERR_INPUTLOST) || (result == DIERR_NOTACQUIRED))
 				s_Keyboard->Acquire();
 			else
-			{
-				DV_ASSERT(Input, false, "키보드 연결에 실패하였습니다.");
-				return;
-			}
+				DV_LOG(Input, err, "키보드 연결에 실패하였습니다.");
 		}
 	}
 	
 	void Input::ReadMouse()
 	{
-		if (!s_DirectInput && !s_Mouse)
+		if (!s_DirectInput || !s_Mouse)
 			return;
 
 		memcpy(s_OldMouseButtons, s_MouseButtons, sizeof(s_MouseButtons));
@@ -151,7 +155,7 @@ namespace Dive
 				s_Mouse->Acquire();
 			else
 			{
-				DV_ASSERT(Input, "마우스 연결에 실패하였습니다.");
+				DV_LOG(Input, err, "마우스 연결에 실패하였습니다.");
 				return;
 			}
 		}

@@ -127,6 +127,10 @@ namespace Dive
 
 	Editor::~Editor()
 	{
+		for (auto& widget : m_Widgets)
+			widget.reset();
+		m_MenuBar.reset();
+
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
@@ -145,9 +149,7 @@ namespace Dive
 
 				m_MenuBar->Draw();
 				for (auto& widget : m_Widgets)
-				{
 					widget->Draw();
-				}
 
 				endUI();
 			}
@@ -236,9 +238,15 @@ namespace Dive
 	{
 		ImGui::End();
 
+		auto deviceContext = Graphics::GetDeviceContext();
+
 		auto renderTargetView = Graphics::GetBackBufferRTV();
-		Graphics::GetDeviceContext()->OMSetRenderTargets(1, &renderTargetView, NULL);
-		Graphics::ClearRenderTargetView(Graphics::GetBackBufferRTV(), { 0.1f, 0.1f, 0.1f, 0.0f });
+		auto depthStencilView = Graphics::GetBackBufferDSV();
+		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+
+		float clearColors[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
+		deviceContext->ClearRenderTargetView(Graphics::GetBackBufferRTV(), clearColors);
+		deviceContext->ClearDepthStencilView(Graphics::GetBackBufferDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

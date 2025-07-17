@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "FileUtils.h"
-#include "Log.h"
+#include "CoreDefs.h"
 #include <commdlg.h>
 #include <ShlObj.h>
 #include <combaseapi.h>

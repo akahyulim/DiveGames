@@ -5,7 +5,6 @@
 
 // core
 #include "core/Object.h"
-//#include "core/UINT64.h"
 #include "core/Log.h"
 #include "core/StringUtils.h"
 #include "core/FileUtils.h"
@@ -21,6 +20,7 @@
 #include "graphics/RenderTexture.h"
 #include "graphics/Cubemap.h"
 #include "graphics/Shader.h"
+#include "graphics/ShaderManager.h"
 #include "graphics/VertexBuffer.h"
 #include "graphics/IndexBuffer.h"
 #include "graphics/ConstantBuffer.h"
@@ -31,20 +31,24 @@
 #include "math/BoundingBox.h"
 
 // rendering
-#include "rendering/Mesh.h"
+#include "rendering/RenderDefs.h"
 #include "rendering/StaticMesh.h"
-#include "rendering/SkinnedMesh.h"
+//#include "rendering/SkinnedMesh.h"
 #include "rendering/MeshFactory.h"
 #include "rendering/Material.h"
 #include "rendering/Renderer.h"
+#include "rendering/RenderPass.h"
 
 // resource
 #include "resource/Resource.h"
 #include "resource/ResourceManager.h"
+#include "resource/YamlHelper.h"
 
 // world
 #include "world/Components/Component.h"
 #include "world/Components/Transform.h"
+#include "world/Components/Camera.h"
+#include "world/Components/MeshRenderer.h"
 #include "world/GameObject.h"
 #include "world/World.h"
 #include "world/WorldSerializer.h"

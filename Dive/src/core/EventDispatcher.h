@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <entt/entt.hpp>
 
 #define DV_EVENT_HANDLER(function)						[this](Dive::EventData data) { function();}
 #define DV_EVENT_HANDLER_STATIC(function)				[](Dive::EventData data) { function();}
@@ -25,7 +24,7 @@ namespace Dive
 		Collision, Trigger, KeyPress,
 	};
 
-	using EventData = std::variant<int, void*, entt::entity>;
+	using EventData = std::variant<int, void*>;
 
 	using EventListener = std::function<void(const EventData&)>;
 

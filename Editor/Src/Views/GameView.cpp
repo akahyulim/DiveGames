@@ -12,12 +12,11 @@ namespace Dive
 
 	GameView::~GameView()
 	{
-		DV_DELETE(m_RenderTarget);
 	}
 
 	void GameView::drawView()
 	{
-		if (!EditorContext::ActiveWorld)// || !EditorContext::MainCamera)
+		if (!EditorContext::ActiveWorld || !EditorContext::MainCamera)
 			return;
 
 		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
@@ -25,21 +24,20 @@ namespace Dive
 
 		if (!m_RenderTarget)
 		{
-			m_RenderTarget = new RenderTexture(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
+			m_RenderTarget = std::make_unique<RenderTexture>(
+				static_cast<UINT32>(m_Width),
+				static_cast<UINT32>(m_Height),
+				eDepthFormat::Depth24Stencil8
+			);
 			m_RenderTarget->Create();
 
-			//auto& cameraCom = editorContext.ActiveWorld->GetEntityManager().GetComponent<CameraComponent>(editorContext.MainCamera);
-			//if (cameraCom.RenderTarget != m_RenderTarget)
-			//	cameraCom.RenderTarget = m_RenderTarget;
-		}
-		else
-		{
-			if (m_RenderTarget->GetWidth() != static_cast<UINT32>(m_Width) || m_RenderTarget->GetHeight() != static_cast<UINT32>(m_Height))
-				m_RenderTarget->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
+			EditorContext::MainCamera->GetComponent<Camera>()->SetRenderTarget(m_RenderTarget.get());
 		}
 
-		auto dmc = ResourceManager::GetByPath<Texture2D>("Textures/DokeV.jpeg");
-		ImTextureID textureID = (ImTextureID)(dmc ? dmc->GetShaderResourceView() : m_RenderTarget->GetShaderResourceView());
+		if (m_RenderTarget->GetWidth() != static_cast<UINT32>(m_Width) || m_RenderTarget->GetHeight() != static_cast<UINT32>(m_Height))
+			m_RenderTarget->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
+
+		ImTextureID textureID = (ImTextureID)(m_RenderTarget->GetShaderResourceView());
 		ImGui::Image(textureID, ImVec2(m_Width, m_Height));
 	}
 }

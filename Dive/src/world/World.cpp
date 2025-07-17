@@ -2,6 +2,8 @@
 #include "World.h"
 #include "GameObject.h"
 #include "Components/Transform.h"
+#include "Components/Camera.h"
+#include "Components/MeshRenderer.h"
 #include "core/CoreDefs.h"
 
 namespace Dive
@@ -9,11 +11,13 @@ namespace Dive
 	World::World(const std::string& name)
 		: m_Name(name)
 	{
+		DV_LOG(World, info, "생성 - {}", m_Name);
 	}
 
 	World::~World()
 	{
 		Clear();
+		DV_LOG(World, info, "소멸 - {}", m_Name);
 	}
 
 	void World::Clear()
@@ -29,6 +33,57 @@ namespace Dive
 			gameObject->Update();
 
 		FlushDestoryQueue();
+	}
+
+	void World::CullAndSort(Camera* camera)
+	{
+		assert(camera);
+
+		m_OpaqueMeshRenderers.clear();
+		m_TransparentMeshRenderers.clear();
+
+		const auto& frustum = camera->GetFrustum();
+
+		for (auto& [instanceID, gameObject] : m_GameObjectMap)
+		{
+			if (gameObject->HasComponent<MeshRenderer>())
+			{
+				auto meshRenderer = gameObject->GetComponent<MeshRenderer>();
+				// boundingBox를 통해 Frustum Culling 확인
+
+				// 실제로는 정렬까지...?
+				if (meshRenderer->IsTransparent())
+					m_TransparentMeshRenderers.push_back(meshRenderer);
+				else
+					m_OpaqueMeshRenderers.push_back(meshRenderer);
+			}
+		}
+
+		// 코파일럿이 보여준 예
+		/*
+		ClearAllRenderQueues();
+
+		Frustum frustum = camera.ComputeFrustum();
+
+	    for (auto& go : m_GameObjects) {
+        if (go->meshRenderer && go->meshRenderer->IsVisible(frustum)) {
+            auto& renderer = *go->meshRenderer;
+            if (renderer.IsTransparent())
+                m_TransparentStatic.push_back(&renderer);
+            else
+                m_OpaqueStatic.push_back(&renderer);
+        }
+
+        if (go->skinnedRenderer && go->skinnedRenderer->IsVisible(frustum)) {
+            auto& renderer = *go->skinnedRenderer;
+            if (renderer.IsTransparent())
+                m_TransparentSkinned.push_back(&renderer);
+            else
+                m_OpaqueSkinned.push_back(&renderer);
+        }
+    }
+
+		*/
 	}
 
 	GameObject* World::CreateGameObject(const std::string& name)
@@ -99,7 +154,6 @@ namespace Dive
 		return allGameObjects;
 	}
 
-
 	void World::DestroyGameObject(GameObject* gameObject)
 	{
 		assert(gameObject);
@@ -144,7 +198,7 @@ namespace Dive
 			auto it = m_GameObjectMap.find(instanceID);
 			if (it != m_GameObjectMap.end())
 			{
-				DV_LOG(World, trace, "Destroying GameObject: {}, {}", it->second->GetName(), instanceID);
+				DV_LOG(World, info, "Destroying GameObject: {}, {}", it->second->GetName(), instanceID);
 				m_GameObjectMap.erase(it);
 			}
 		}
@@ -172,6 +226,14 @@ namespace Dive
 		
 		s_ActiveWorld = std::make_unique<World>(name);
 		return s_ActiveWorld.get();
+	}
+
+	void WorldManager::Clear()
+	{
+		if (s_ActiveWorld)
+			s_ActiveWorld.reset();
+
+		DV_LOG(WorldManager, info, "클리어 완료");
 	}
 
 	World* WorldManager::GetActiveWorld()

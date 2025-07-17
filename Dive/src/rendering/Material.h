@@ -1,14 +1,16 @@
 ﻿#pragma once
 #include "resource/Resource.h"
 #include "graphics/Graphics.h"
-#include "graphics/Shader.h"
 
 namespace Dive
 {
 	class Texture;
 	class Texture2D;
+	class Shader;
+	class ConstantBuffer;
+	class DvConstantBuffer;
 
-	enum class eTextureUnitType
+	enum class eTextureUnitType : UINT8
 	{
 		None = 0,
 		Diffuse,
@@ -20,6 +22,21 @@ namespace Dive
 		Count
 	};
 
+	enum class eBlendMode
+	{
+		Opqaue,
+		AlphaBlend,
+		Additive,
+		Multipy
+	};
+
+	struct MaterialConstants
+	{
+		DirectX::XMFLOAT4 diffuseColor;
+		DirectX::XMFLOAT2 tiling;
+		DirectX::XMFLOAT2 offset;
+	};
+
 	class Material : public Resource
 	{
 	public:
@@ -29,48 +46,46 @@ namespace Dive
 		bool LoadFromFile(const std::filesystem::path& filepath) override;
 		bool SaveToFile(const std::filesystem::path& filepath) override;
 
-		const std::unordered_map<eTextureUnitType, Texture2D*>& GetTextures() const { return m_Textures; }
-		Texture2D* GetTexture(eTextureUnitType unit) const;
-		void SetTexture(eTextureUnitType unit, Texture2D* texture);
-		bool HasTexture(eTextureUnitType unit) const;
+		void Bind(ID3D11DeviceContext* deviceContext);
 
-		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_DiffuseColor; }
-		void SetDiffuseColor(float r, float g, float b, float a) { m_DiffuseColor = { r, g, b, a }; }
-		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_DiffuseColor = color; }
+		std::shared_ptr<Texture2D> GetTexture(eTextureUnitType type);
+		void SetTexture(eTextureUnitType type, std::shared_ptr<Texture2D> texture);
+		void SetTexture(eTextureUnitType type, const std::string& textureName);
 
-		DirectX::XMFLOAT2 GetTiling() const { return m_Tiling; }
-		void SetTiling(DirectX::XMFLOAT2 tiling) { m_Tiling = tiling; }
-		void SetTiling(float x, float y) { m_Tiling.x = x; m_Tiling.y = y; }
+		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_CpuBuffer.diffuseColor; }
+		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_CpuBuffer.diffuseColor = color; m_Dirty = true; }
+		void SetDiffuseColor(float r, float g, float b, float a) { m_CpuBuffer.diffuseColor = { r, g, b, a };  m_Dirty = true; }
 
-		DirectX::XMFLOAT2 GetOffset() const { return m_Offset; }
-		void SetOffset(DirectX::XMFLOAT2 offset) { m_Offset = offset; }
-		void SetOffset(float x, float y) { m_Offset.x = x; m_Offset.y = y; }
+		DirectX::XMFLOAT2 GetTiling() const { return m_CpuBuffer.tiling; }
+		void SetTiling(float x, float y) { m_CpuBuffer.tiling = { x, y };  m_Dirty = true; }
 
-		bool IsOpaque() const;
+		DirectX::XMFLOAT2 GetOffset() const { return m_CpuBuffer.offset; }
+		void SetOffset(float x, float y) { m_CpuBuffer.offset = { x, y };  m_Dirty = true; }
 
-		Shader* GetPixelShader() const { return m_PixelShader; }
-		void SetPixelShader(Shader* shader)
-		{
-			if (m_PixelShader != shader)
-			{
-				m_PixelShader = shader;
-			}
-		}
+		Shader* GetPixelShader() const;
+		std::string GetPixelShaderName() const { return m_PixelShaderName; }
+		void SetPixelShaderName(const std::string& name) { m_PixelShaderName = name; }
 
-		std::string GetName() const { return m_Name; }
-		void SetName(const std::string& name) { m_Name = name; }
+		ConstantBuffer* GetConstantBuffer();
+
+		eBlendMode GetBlendMode() const { return m_BlendMode; }
+		void SetBlendMode(eBlendMode mode) { m_BlendMode = mode; }
+
+		bool IsTransparent() const;
 
 		static constexpr eResourceType GetType() { return eResourceType::Material; }
 
 	private:
-		std::string m_Name{};
+		std::unordered_map<UINT8, std::shared_ptr<Texture2D>> m_Textures;
 
-		std::unordered_map<eTextureUnitType, Texture2D*> m_Textures;
-		
-		DirectX::XMFLOAT4 m_DiffuseColor{ 1.0f, 1.0f, 1.0f, 1.0f };		
-		DirectX::XMFLOAT2 m_Tiling{ 1.0f, 1.0f };
-		DirectX::XMFLOAT2 m_Offset{ 0.0f, 0.0f };
+		std::string m_PixelShaderName = "Default_PS";
 
-		Shader* m_PixelShader = nullptr;
+		bool m_Dirty = true;
+
+		MaterialConstants m_CpuBuffer;
+		std::unique_ptr<ConstantBuffer> m_GpuBuffer;
+		std::unique_ptr<DvConstantBuffer> m_ConstantBuffer;
+
+		eBlendMode m_BlendMode = eBlendMode::Opqaue;
 	};
 }

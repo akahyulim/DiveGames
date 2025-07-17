@@ -5,6 +5,15 @@ namespace Dive
 {
 	class VertexBuffer;
 	class IndexBuffer;
+	class BoundingBox;
+	class Shader;
+
+	enum class eSourceType
+	{
+		None,
+		File,
+		Factory
+	};
 
 	enum class eMeshType
 	{
@@ -13,8 +22,19 @@ namespace Dive
 		Skinned
 	};
 
-	// RenderMesh에서 관리하려면 Mesh라는 Base가 필요하다.
-	// => 코파일럿에게 물어보니 유니티 ecs의 경우 SkinnedMeshRendrerer는 별도의 시스템과 컴포넌트가 필요하다고 한다.
+	struct StaticVertex
+	{
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT2 texCoords;
+		DirectX::XMFLOAT3 normal;
+		DirectX::XMFLOAT3 tangent;
+		
+		StaticVertex() = default;
+		StaticVertex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT2& tex, const DirectX::XMFLOAT3& norm, const DirectX::XMFLOAT3& tan)
+			: position(pos), texCoords(tex), normal(norm), tangent(tan)
+		{}
+	};
+
 	class StaticMesh : public Resource
 	{
 	public:
@@ -24,13 +44,37 @@ namespace Dive
 		virtual bool CreateBuffers();
 		virtual void Clear();
 
-		void SetPositions(const std::vector<DirectX::XMFLOAT3>& positions) { m_Positions = positions; }
-		void SetNormals(const std::vector<DirectX::XMFLOAT3>& normals) { m_Normals = normals; }
-		void SetTexCoords(const std::vector<DirectX::XMFLOAT2>& texCoords) { m_TexCoords = texCoords; }
-		void SetTangents(const std::vector<DirectX::XMFLOAT3>& tangents) { m_Tangents = tangents; }
-		void SetColors(const std::vector<DirectX::XMFLOAT4>& colors) { m_Colors = colors; }
+		void Draw(ID3D11DeviceContext* deviceContext);
 
-		void SetIndices(const std::vector<UINT32>& indices) { m_Indices = indices; }
+		void ComputeBouingBox();
+		
+		void AddVertices(const std::vector<StaticVertex>& vertices, uint32_t* outOffset = nullptr);
+		void AddIndices(const std::vector<uint32_t>& indices, uint32_t* outOffset = nullptr);
+
+		std::vector<StaticVertex> GetVertices() { return m_Vertices; }
+		std::vector<uint32_t> GetIndices() { return m_Indices; }
+
+		uint32_t GetVertexCount() const { return static_cast<uint32_t>(m_Vertices.size()); }
+		uint32_t GetIndexCount() const { return static_cast<uint32_t>(m_Indices.size()); }
+
+		VertexBuffer* GetVertexBuffer() const { return m_VertexBuffer.get(); }
+		IndexBuffer* GetIndexBuffer() const { return m_IndexBuffer.get(); }
+
+		BoundingBox* GetBoundingBox() const { return m_BoundingBox.get(); }
+
+		Shader* GetVertexShader() const;
+		std::string GetVertexShaderName() const { return m_VertexShaderName; }
+		void SetVertexShaderName(const std::string& name) { m_VertexShaderName = name; }
+
+		eSourceType GetSourceType() const { return m_SourceType; }
+		void SetSourceType(eSourceType type) { m_SourceType = type; }
+
+		std::filesystem::path GetFilepath() const { return m_Filepath; }
+
+		eMeshType GetMeshType() const { return m_Type; }
+
+		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { return m_PrimitiveTopology; }
+		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) { m_PrimitiveTopology; }
 
 		static constexpr eResourceType GetType() { return eResourceType::StaticMesh; }
 
@@ -38,17 +82,22 @@ namespace Dive
 		bool createIndexBuffer();
 
 	protected:
+		eSourceType m_SourceType = eSourceType::None;
+		std::filesystem::path m_Filepath;	// 좀 애매해다. 
+
 		eMeshType m_Type = eMeshType::None;
 
-		std::vector<DirectX::XMFLOAT3> m_Positions;
-		std::vector<DirectX::XMFLOAT3> m_Normals;
-		std::vector<DirectX::XMFLOAT2> m_TexCoords;
-		std::vector<DirectX::XMFLOAT3> m_Tangents;
-		std::vector<DirectX::XMFLOAT4> m_Colors;
+		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-		std::vector<UINT32> m_Indices;
+		std::vector<StaticVertex> m_Vertices;
+		std::vector<uint32_t> m_Indices;
 
-		VertexBuffer* m_VertexBuffer = nullptr;
-		IndexBuffer* m_IndexBuffer = nullptr;
+		std::unique_ptr<VertexBuffer> m_VertexBuffer;
+		std::unique_ptr<IndexBuffer> m_IndexBuffer;
+		
+		std::unique_ptr<BoundingBox> m_BoundingBox;
+
+		// 이것두 Material이 관리하도록 할 거다.
+		std::string m_VertexShaderName = "Default_VS";
 	};
 }

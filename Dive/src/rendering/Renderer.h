@@ -1,57 +1,12 @@
 ﻿#pragma once
+#include "RenderDefs.h"
 
 namespace Dive
 {
+	class ConstantBuffer;
 	class RenderTexture;
 	class Shader;
-
-	enum class eShader
-	{
-		DeferredPass_VS,
-		DeferredPass_PS,
-		LightingPass_VS,
-		LightingPass_PS,
-		DebugDraw_VS,
-		DebugDraw_PS,
-		Count
-	};
-
-	enum class eRasterizerState
-	{
-		FillSolid_CullBack,
-		FillSolid_CullNone,
-		Count
-	};
-
-	enum class eBlendState
-	{
-		Addictive,
-		Count
-	};
-
-	enum class eGBuffer
-	{
-		Rt0,
-		Rt1,
-		Rt2
-	};
-
-	enum class eRenderTarget
-	{
-		FrameRender,
-		FrameOutput,
-		Count
-	};
-	
-	enum class eDepthStencilState
-	{
-		DepthReadWrite,
-		DepthReadWrite_StencilReadWrite,
-		GBuffer,
-		DepthDiabled,   // skydome에서 off용으로...
-		ForwardLight,
-		Count
-	};
+	class RenderPass;
 
 	class Renderer
 	{
@@ -60,9 +15,6 @@ namespace Dive
 		static void Shutdown();
 
 		static void OnUpdate();
-
-		static void DeferredPass();
-		static void LightingPass();
 
 		static void ResizeRenderBuffers(UINT32 width, UINT32 height);
 
@@ -76,7 +28,7 @@ namespace Dive
 		static ID3D11BlendState* GetBlendState(eBlendState type);
 
 	private:
-		//static void createConstantBuffers();
+		static void createConstantBuffers();
 		static void createShaders();
 		static void createRasterizerStates();
 		static void createDepthStencilStates();
@@ -86,13 +38,8 @@ namespace Dive
 		static UINT32 s_RenderTargetWidth;
 		static UINT32 s_RenderTargetHeight;
 
-		// vertex shaders
-	
-		
-		// pixel shaders
-		
-
 		// 상수 버퍼
+		static ConstantBuffer* s_DefaultVSConstantBuffer;
 
 		// G-Buffer
 		static RenderTexture* s_GBufferRT0;
@@ -109,7 +56,6 @@ namespace Dive
 		static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> s_BlendStates;
 	
 
-		// camera
-		// viewport
+		static std::vector<std::unique_ptr<RenderPass>> s_RenderPasses;
 	};
 }

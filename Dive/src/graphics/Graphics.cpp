@@ -7,43 +7,27 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 
+using Microsoft::WRL::ComPtr;
+
 namespace Dive
 {
-	constexpr UINT32 DV_BUFFER_COUNT = 2;
-	constexpr UINT32 DV_REFRESHRATE_NUMERATOR = 60;
-	constexpr UINT32 DV_REFRESHRATE_DENOMINATOR = 1;
+	constexpr uint32_t DV_BUFFER_COUNT = 2;
+	constexpr uint32_t DV_REFRESHRATE_NUMERATOR = 60;
+	constexpr uint32_t DV_REFRESHRATE_DENOMINATOR = 1;
 	constexpr DXGI_FORMAT DV_FORMAT = DXGI_FORMAT_R8G8B8A8_UNORM;
 	constexpr BOOL DV_WINDOWED = TRUE;
 
-	UINT32 Graphics::s_ResolutionWidth = 0;
-	UINT32 Graphics::s_ResolutionHeight = 0;
+	uint32_t Graphics::s_ResolutionWidth = 0;
+	uint32_t Graphics::s_ResolutionHeight = 0;
 	bool Graphics::s_UseVSync = false;
 
-	IDXGISwapChain* Graphics::s_SwapChain = nullptr;
-	ID3D11Device* Graphics::s_Device = nullptr;
-	ID3D11DeviceContext* Graphics::s_DeviceContext = nullptr;
+	ComPtr<IDXGISwapChain> Graphics::s_SwapChain;
+	ComPtr<ID3D11Device> Graphics::s_Device;
+	ComPtr<ID3D11DeviceContext> Graphics::s_DeviceContext;
 
-	ID3D11RenderTargetView* Graphics::s_BackBufferRTV = nullptr;
-	ID3D11Texture2D* Graphics::s_BackbufferTexture = nullptr;
-	ID3D11DepthStencilView* Graphics::s_BackBufferDSV = nullptr;
-
-	ID3D11DepthStencilView* Graphics::s_CurrentDepthStencil = nullptr;
-
-	ID3D11DepthStencilState* Graphics::s_CurrentDepthStencilState = nullptr;
-	ID3D11RasterizerState* Graphics::s_CurrentRasterizerState = nullptr;
-	ID3D11BlendState* Graphics::s_CurrentBlendState = nullptr;
-
-	D3D11_PRIMITIVE_TOPOLOGY Graphics::s_PrimitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
-
-	Shader* Graphics::s_CurrentVertexShader = nullptr;
-	Shader* Graphics::s_CurrentHullShader = nullptr;
-	Shader* Graphics::s_CurrentDomainShader = nullptr;
-	Shader* Graphics::s_CurrentGeometryShader = nullptr;
-	Shader* Graphics::s_CurrentPixelShader = nullptr;
-	Shader* Graphics::s_CurrentComputeShader = nullptr;
-
-	VertexBuffer* Graphics::s_CurrentVertexBuffer = nullptr;
-	IndexBuffer* Graphics::s_CurrentIndexBuffer = nullptr;
+	ComPtr<ID3D11RenderTargetView> Graphics::s_BackBufferRTV;
+	ComPtr<ID3D11Texture2D> Graphics::s_BackbufferTexture;
+	ComPtr<ID3D11DepthStencilView> Graphics::s_BackBufferDSV;
 
 	void Graphics::Initialize()
 	{
@@ -55,12 +39,12 @@ namespace Dive
 			nullptr,
 			0,
 			D3D11_SDK_VERSION,
-			&s_Device,
+			s_Device.GetAddressOf(),
 			nullptr,
-			&s_DeviceContext))) 
+			s_DeviceContext.GetAddressOf()))) 
 		{
 			Shutdown();
-			DV_LOG(Graphics, err, "D3D11Device & D3D11DeviceContext 생성에 실패하였습니다.");
+			DV_LOG(Graphics, critical, "D3D11Device & D3D11DeviceContext 생성 실패!.");
 			return;
 		}
 
@@ -73,8 +57,8 @@ namespace Dive
 
 		DXGI_SWAP_CHAIN_DESC desc{};
 		desc.BufferCount = DV_BUFFER_COUNT;
-		desc.BufferDesc.Width = Window::GetWidth();
-		desc.BufferDesc.Height = Window::GetHeight();
+		desc.BufferDesc.Width = static_cast<UINT>(Window::GetWidth());
+		desc.BufferDesc.Height = static_cast<UINT>(Window::GetHeight());
 		desc.BufferDesc.Format = DV_FORMAT;
 		desc.BufferDesc.RefreshRate.Denominator = DV_REFRESHRATE_DENOMINATOR;
 		desc.BufferDesc.RefreshRate.Numerator = DV_REFRESHRATE_NUMERATOR;
@@ -85,10 +69,9 @@ namespace Dive
 		desc.OutputWindow = Window::GetWindowHandle();
 		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
 
-		if (FAILED(dxgiFactory->CreateSwapChain(s_Device, &desc, &s_SwapChain)))
+		if (FAILED(dxgiFactory->CreateSwapChain(s_Device.Get(), &desc, s_SwapChain.GetAddressOf())))
 		{
-			Shutdown();
-			DV_LOG(Graphics, err, "D3D11SwapChain 생성에 실패하였습니다.");
+			DV_LOG(Graphics, critical, "D3D11SwapChain 생성 실패!");
 			return;
 		}
 
@@ -99,22 +82,26 @@ namespace Dive
 		updateBackbuffer();
 
 		DV_SUBSCRIBE_EVENT(eEventType::WindowResized, DV_EVENT_HANDLER_DATA_STATIC(OnWindowResized));
+
+		DV_LOG(Graphics, info, "초기화 완료");
 	}
 	
 	void Graphics::Shutdown()
 	{
-		DV_RELEASE(s_BackBufferDSV);
-		DV_RELEASE(s_BackbufferTexture);
-		DV_RELEASE(s_BackBufferRTV);
+		s_BackBufferDSV.Reset();
+		s_BackbufferTexture.Reset();
+		s_BackBufferRTV.Reset();
 		
-		DV_RELEASE(s_DeviceContext);
-		DV_RELEASE(s_Device);
-		DV_RELEASE(s_SwapChain);
+		s_DeviceContext.Reset();
+		s_Device.Reset();
+		s_SwapChain.Reset();
+
+		DV_LOG(Graphics, info, "셧다운 완료");
 	}
 
-	void Graphics::ChangeResolution(UINT32 width, UINT32 height)
+	void Graphics::ChangeResolution(uint32_t width, uint32_t height)
 	{
-		DV_ASSERT(Graphics, s_SwapChain);
+		assert(s_SwapChain);
 
 		if (s_ResolutionWidth == width && s_ResolutionHeight == height) 
 			return;
@@ -123,25 +110,23 @@ namespace Dive
 
 		s_ResolutionWidth = width; 
 		s_ResolutionHeight = height;
-
-		DV_RELEASE(s_BackBufferRTV);
 	
-		if (FAILED(s_SwapChain->ResizeBuffers(DV_BUFFER_COUNT, width, height, DV_FORMAT, 0))) 
+		if (FAILED(s_SwapChain->ResizeBuffers(DV_BUFFER_COUNT, static_cast<UINT>(width), static_cast<UINT>(height), DV_FORMAT, 0)))
 		{
-			DV_LOG(Graphics, err, "후면 버퍼 크기 {0:d}x{1:d} 변경에 실패하였습니다.", width, height);
+			DV_LOG(Graphics, err, "후면 버퍼 크기 {0:d}x{1:d} 변경 실패", width, height);
 			return;
 		}
 
 		DXGI_MODE_DESC desc{};
-		desc.Width = width;
-		desc.Height = height;
+		desc.Width = static_cast<UINT>(width);
+		desc.Height = static_cast<UINT>(height);
 		desc.RefreshRate.Numerator = DV_REFRESHRATE_NUMERATOR;
 		desc.RefreshRate.Denominator = DV_REFRESHRATE_DENOMINATOR;
 		desc.Format = DV_FORMAT;
 
 		if (FAILED(s_SwapChain->ResizeTarget(&desc))) 
 		{
-			DV_LOG(Graphics, err, "해상도 {0:d}x{1:d} 변경에 실패하였습니다.", width, height);
+			DV_LOG(Graphics, err, "해상도 {0:d}x{1:d} 변경 실패", width, height);
 			return;
 		}
 
@@ -154,332 +139,51 @@ namespace Dive
 	{
 		if (auto pairData = std::get_if<void*>(&data)) 
 		{
-			auto actualData = static_cast<std::pair<UINT32, UINT32>*>(*pairData);
+			auto actualData = static_cast<std::pair<uint32_t, uint32_t>*>(*pairData);
 			ChangeResolution(actualData->first, actualData->second);
 		}
 	}
 
 	void Graphics::Present()
 	{
-		DV_ASSERT(Graphics, s_SwapChain);
+		assert(s_SwapChain.Get());
 		s_SwapChain->Present(s_UseVSync ? 1 : 0, 0);
-	}
-
-	// 현재 렌더 타겟을 하나만 받는다.
-	void Graphics::SetRenderTarget(ID3D11RenderTargetView* renderTargetView, ID3D11DepthStencilView* depthStencilView)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-		
-		if (renderTargetView)
-		{
-			ID3D11RenderTargetView* renderTargetViews = { renderTargetView };
-			s_DeviceContext->OMSetRenderTargets(1, &renderTargetViews, nullptr);
-		}
-	}
-
-	void Graphics::ClearRenderTargetView(ID3D11RenderTargetView* renderTargetView, const DirectX::XMFLOAT4& color)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (renderTargetView)
-		{
-			FLOAT clearColor[4]{ color.x, color.y, color.z, color.w };
-			s_DeviceContext->ClearRenderTargetView(renderTargetView, clearColor);
-		}
-	}
-
-	void Graphics::ClearDepthStencilView(ID3D11DepthStencilView* depthStencilView, uint8_t flags, float depth, uint8_t stencil)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (depthStencilView)
-			s_DeviceContext->ClearDepthStencilView(depthStencilView, flags, depth, stencil);
-	}
-
-
-	void Graphics::SetViewport(const RECT& rt)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		D3D11_VIEWPORT viewport{};
-		viewport.TopLeftX = (float)rt.left;
-		viewport.TopLeftY = (float)rt.top;
-		viewport.Width = (float)(rt.right - rt.left);
-		viewport.Height = (float)(rt.bottom - rt.top);
-		viewport.MinDepth = 0.0f;
-		viewport.MaxDepth = 1.0f;
-
-		s_DeviceContext->RSSetViewports(1, &viewport);
-	}
-
-	void Graphics::SetViewport(float width, float height, float x, float y)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		D3D11_VIEWPORT viewport{};
-		viewport.TopLeftX = x;
-		viewport.TopLeftY = y;
-		viewport.Width = width;
-		viewport.Height = height;
-		viewport.MinDepth = 0.0f; 
-		viewport.MaxDepth = 1.0f;
-
-		s_DeviceContext->RSSetViewports(1, &viewport);
-	}
-
-	void Graphics::SetDepthStencilState(ID3D11DepthStencilState* state)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (state != s_CurrentDepthStencilState)
-		{
-			s_DeviceContext->OMSetDepthStencilState(state, 0);
-			s_CurrentDepthStencilState = state;
-		}
-	}
-
-	void Graphics::SetRasterizerState(ID3D11RasterizerState* state)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (state != s_CurrentRasterizerState)
-		{
-			s_DeviceContext->RSSetState(state);
-			s_CurrentRasterizerState = state;
-		}
-	}
-
-	void Graphics::SetBlendState(ID3D11BlendState* state)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (state != s_CurrentBlendState)
-		{
-			float blendFactor[4]{};
-			s_DeviceContext->OMSetBlendState(state, blendFactor, 0xffffffff);
-			s_CurrentBlendState = state;
-		}
-	}
-
-	void Graphics::SetVertexShader(Shader* shader)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (s_CurrentVertexShader == shader)
-			return;
-
-		if (shader)
-		{
-			DV_ASSERT(Graphics, shader->GetType() == eShaderType::Vertex);
-
-			s_DeviceContext->IASetInputLayout(shader->GetInputLayout());
-			s_DeviceContext->VSSetShader(shader->GetVertexShader(), nullptr, 0);
-		}
-		else
-		{
-			s_DeviceContext->IASetInputLayout(nullptr);
-			s_DeviceContext->VSSetShader(nullptr, nullptr, 0);
-		}
-
-		s_CurrentVertexShader = shader;
-	}
-
-	void Graphics::SetHullShader(Shader* shader)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (s_CurrentHullShader == shader)
-			return;
-
-		if (shader)
-		{
-			DV_ASSERT(Graphics, shader->GetType() == eShaderType::Hull);
-			s_DeviceContext->HSSetShader(shader->GetHullShader(), nullptr, 0);
-		}
-		else
-			s_DeviceContext->HSSetShader(nullptr, nullptr, 0);
-
-		s_CurrentHullShader = shader;
-	}
-
-	void Graphics::SetDomainShader(Shader* shader)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (s_CurrentDomainShader == shader)
-			return;
-
-		if (shader)
-		{
-			DV_ASSERT(Graphics, shader->GetType() == eShaderType::Domain);
-			s_DeviceContext->DSSetShader(shader->GetDomainShader(), nullptr, 0);
-		}
-		else
-			s_DeviceContext->DSSetShader(nullptr, nullptr, 0);
-
-		s_CurrentDomainShader = shader;
-	}
-
-	void Graphics::SetGeometryShader(Shader* shader)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (s_CurrentGeometryShader == shader)
-			return;
-
-		if (shader)
-		{
-			DV_ASSERT(Graphics, shader->GetType() == eShaderType::Geometry);
-			s_DeviceContext->GSSetShader(shader->GetGeometryShader(), nullptr, 0);
-		}
-		else
-			s_DeviceContext->GSSetShader(nullptr, nullptr, 0);
-
-		s_CurrentGeometryShader = shader;
-	}
-
-	void Graphics::SetPixelShader(Shader* shader)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (s_CurrentPixelShader == shader)
-			return;
-
-		if (shader)
-		{
-			DV_ASSERT(Graphics, shader->GetType() == eShaderType::Pixel);
-			s_DeviceContext->PSSetShader(shader->GetPixelShader(), nullptr, 0);
-		}
-		else
-			s_DeviceContext->PSSetShader(nullptr, nullptr, 0);
-
-		s_CurrentPixelShader = shader;
-	}
-
-	void Graphics::SetComputeShader(Shader* shader)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (s_CurrentComputeShader == shader)
-			return;
-
-		if (shader)
-		{
-			DV_ASSERT(Graphics, shader->GetType() == eShaderType::Compute);
-			s_DeviceContext->CSSetShader(shader->GetComputeShader(), nullptr, 0);
-		}
-		else
-			s_DeviceContext->CSSetShader(nullptr, nullptr, 0);
-
-		s_CurrentComputeShader = shader;
-	}
-
-	void Graphics::SetVertexBuffer(VertexBuffer* buffer)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (s_CurrentVertexBuffer == buffer)
-			return;
-
-		if (buffer)
-		{
-			ID3D11Buffer* vertexBuffer = buffer->GetBuffer();
-			UINT stride = buffer->GetStride();
-			UINT offset = 0;
-
-			s_DeviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-		}
-		else
-		{
-			UINT stride = 0;
-			UINT offset = 0;
-
-			s_DeviceContext->IASetVertexBuffers(0, 1, nullptr, &stride, &offset);
-		}
-
-		s_CurrentVertexBuffer = buffer;
-	} 
-	
-	void Graphics::SetIndexBuffer(IndexBuffer* buffer)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (s_CurrentIndexBuffer == buffer)
-			return;
-
-		if (buffer)
-			s_DeviceContext->IASetIndexBuffer(buffer->GetBuffer(), buffer->GetFormat(), 0);
-		else
-			s_DeviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_UNKNOWN, 0);
-
-		s_CurrentIndexBuffer = buffer;
-	}
-
-	void Graphics::Draw(D3D11_PRIMITIVE_TOPOLOGY topology, UINT32 vertexCount, UINT32 vertexStart)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (s_PrimitiveTopology != topology)
-		{
-			s_DeviceContext->IASetPrimitiveTopology(topology);
-			s_PrimitiveTopology = topology;
-		}
-
-		s_DeviceContext->Draw(vertexCount, vertexStart);
-	}
-
-	void Graphics::DrawIndexed(D3D11_PRIMITIVE_TOPOLOGY topology, UINT32 indexCount, UINT32 indexStart)
-	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-
-		if (s_PrimitiveTopology != topology)
-		{
-			s_DeviceContext->IASetPrimitiveTopology(topology);
-			s_PrimitiveTopology = topology;
-		}
-
-		s_DeviceContext->DrawIndexed(indexCount, indexStart, 0);
 	}
 
 	IDXGISwapChain* Graphics::GetSwapChain()
 	{
-		DV_ASSERT(Graphics, s_SwapChain);
-		return s_SwapChain;
+		return s_SwapChain.Get();
 	}
 	
 	ID3D11Device* Graphics::GetDevice()
 	{
-		DV_ASSERT(Graphics, s_Device);
-		return s_Device;
+		return s_Device.Get();
 	}
 	
 	ID3D11DeviceContext* Graphics::GetDeviceContext()
 	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-		return s_DeviceContext;
+		return s_DeviceContext.Get();
 	}
 
 	ID3D11RenderTargetView* Graphics::GetBackBufferRTV()
 	{
-		DV_ASSERT(Graphics, s_BackBufferRTV);
-		return s_BackBufferRTV;
+		return s_BackBufferRTV.Get();
 	}
 	
 	ID3D11DepthStencilView* Graphics::GetBackBufferDSV()
 	{
-		DV_ASSERT(Graphics, s_BackBufferDSV);
-		return s_BackBufferDSV;
+		return s_BackBufferDSV.Get();
 	}
 
 	void Graphics::updateBackbuffer()
 	{
-		DV_ASSERT(Graphics, s_SwapChain);
-		DV_ASSERT(Graphics, s_Device);
+		assert(s_SwapChain.Get());
+		assert(s_Device.Get());
 
-		DV_RELEASE(s_BackBufferRTV);
-		DV_RELEASE(s_BackbufferTexture);
-		DV_RELEASE(s_BackBufferDSV);
-
+		s_BackBufferRTV.Reset();
+		s_BackbufferTexture.Reset();
+		s_BackBufferDSV.Reset();
+		
 		ID3D11Texture2D* backBufferTexture{};
 		if (FAILED(s_SwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backBufferTexture))) 
 		{
@@ -492,12 +196,10 @@ namespace Dive
 			nullptr, 
 			&s_BackBufferRTV))) 
 		{
-			DV_RELEASE(s_BackBufferRTV);
 			DV_LOG(Graphics, err, "후면버퍼 렌더타겟뷰 생성 실패");
 			return;
 		}
-		DV_RELEASE(backBufferTexture);
-
+		
 		DXGI_SWAP_CHAIN_DESC desc{};
 		s_SwapChain->GetDesc(&desc);
 
@@ -507,7 +209,7 @@ namespace Dive
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
 		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		texDesc.SampleDesc.Count = 1;// static_cast<UINT32>(screenParamm_.multiSample_);
+		texDesc.SampleDesc.Count = 1;// static_cast<uint32_t>(screenParamm_.multiSample_);
 		texDesc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(texDesc.Format, screenParamm_.multiSample_);
 		texDesc.Usage = D3D11_USAGE_DEFAULT;
 		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
@@ -526,15 +228,15 @@ namespace Dive
 		viewDesc.Texture2D.MipSlice = 0;
 
 		if (FAILED(s_Device->CreateDepthStencilView(
-			static_cast<ID3D11Resource*>(s_BackbufferTexture),
+			static_cast<ID3D11Resource*>(s_BackbufferTexture.Get()),
 			&viewDesc,
-			&s_BackBufferDSV))) 
+			s_BackBufferDSV.GetAddressOf()))) 
 		{
 			DV_LOG(Graphics, err, "후면버퍼 깊이 스텐실 뷰 생성 실패");
 			return;
 		}
 
-		s_ResolutionWidth = desc.BufferDesc.Width;
-		s_ResolutionHeight = desc.BufferDesc.Height;
+		s_ResolutionWidth = static_cast<uint32_t>(desc.BufferDesc.Width);
+		s_ResolutionHeight = static_cast<uint32_t>(desc.BufferDesc.Height);
 	}
 }

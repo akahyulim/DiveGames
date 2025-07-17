@@ -2,7 +2,9 @@
 
 namespace Dive
 {
+	class Camera;
 	class Transform;
+	class MeshRenderer;
 	class GameObject;
 
 	// https://docs.unity3d.com/6000.1/Documentation/ScriptReference/SceneManagement.Scene.html
@@ -15,6 +17,8 @@ namespace Dive
 		void Clear();
 
 		void Update();
+
+		void CullAndSort(Camera* camera);
 
 		GameObject* CreateGameObject(const std::string& name = "");
 
@@ -40,6 +44,9 @@ namespace Dive
 		size_t RootGameObjectCount() const { return m_RootGameObjects.size(); }
 		const std::vector<GameObject*>& GetRootGameObjects() { return m_RootGameObjects; }
 
+		const std::vector<MeshRenderer*>& GetTransparentMeshRenderers() const { return m_TransparentMeshRenderers; }
+		const std::vector<MeshRenderer*>& GetOpaqueMeshRenderers() const { return m_OpaqueMeshRenderers; }
+
 		std::string GetName() const { return m_Name; }
 		void SetName(const std::string& name) { m_Name = name; }
 
@@ -50,6 +57,9 @@ namespace Dive
 		std::vector<GameObject*> m_RootGameObjects;
 		std::unordered_set<UINT64> m_DestroyQueue;
 
+		std::vector<MeshRenderer*> m_TransparentMeshRenderers;
+		std::vector<MeshRenderer*> m_OpaqueMeshRenderers;
+
 		friend class Transform;
 	};
 
@@ -58,6 +68,8 @@ namespace Dive
 	{
 	public:
 		static World* CreateWorld(const std::string& name);
+		static void Clear();
+
 		static World* GetActiveWorld();
 
 	private:

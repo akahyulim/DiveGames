@@ -1,14 +1,16 @@
 ﻿#include "stdafx.h"
 #include "BoundingBox.h"
 #include "core/CoreDefs.h"
-#include "rendering/Mesh.h"
+#include "rendering/StaticMesh.h"
+
+using namespace DirectX;
 
 namespace Dive
 {
 	BoundingBox::BoundingBox()
 	{
-		m_Max = DirectX::XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-		m_Min = DirectX::XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
+		m_Max = XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		m_Min = XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
 	}
 
 	BoundingBox::BoundingBox(const DirectX::XMFLOAT3& min, const DirectX::XMFLOAT3& max)
@@ -19,8 +21,8 @@ namespace Dive
 
 	BoundingBox::BoundingBox(const DirectX::XMFLOAT3* points, UINT32 pointCount)
 	{
-		m_Max = DirectX::XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-		m_Min = DirectX::XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
+		m_Max = XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		m_Min = XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
 
 		for (UINT32 i = 0; i < pointCount; i++)
 		{
@@ -34,20 +36,20 @@ namespace Dive
 		}
 	}
 
-	BoundingBox::BoundingBox(const VertexStatic* vertices, UINT32 vertexCount)
+	BoundingBox::BoundingBox(const std::vector<StaticVertex>& vertices)
 	{
-		m_Max = DirectX::XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-		m_Min = DirectX::XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
+		m_Max = XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+		m_Min = XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
 
-		for (UINT32 i = 0; i < vertexCount; i++)
+		for (auto& vertex : vertices)
 		{
-			m_Max.x = std::max(m_Max.x, vertices[i].position[0]);
-			m_Max.y = std::max(m_Max.y, vertices[i].position[1]);
-			m_Max.z = std::max(m_Max.z, vertices[i].position[2]);
+			m_Max.x = std::max(m_Max.x, vertex.position.x);
+			m_Max.y = std::max(m_Max.y, vertex.position.y);
+			m_Max.z = std::max(m_Max.z, vertex.position.z);
 
-			m_Min.x = std::min(m_Min.x, vertices[i].position[0]);
-			m_Min.y = std::min(m_Min.y, vertices[i].position[1]);
-			m_Min.z = std::min(m_Min.z, vertices[i].position[2]);
+			m_Min.x = std::min(m_Min.x, vertex.position.x);
+			m_Min.y = std::min(m_Min.y, vertex.position.y);
+			m_Min.z = std::min(m_Min.z, vertex.position.z);
 		}
 	}
 
@@ -85,7 +87,7 @@ namespace Dive
 
 	BoundingBox BoundingBox::Transform(const DirectX::XMMATRIX& transform) const
 	{
-		DirectX::XMFLOAT3 corners[8] =
+		XMFLOAT3 corners[8] =
 		{
 			{ m_Min.x, m_Min.y, m_Min.z },
 			{ m_Min.x, m_Min.y, m_Max.z },
@@ -99,13 +101,13 @@ namespace Dive
 
 		for (int i = 0; i < 8; ++i)
 		{
-			DirectX::XMVECTOR point = DirectX::XMLoadFloat3(&corners[i]);
-			point = DirectX::XMVector3Transform(point, transform);
-			DirectX::XMStoreFloat3(&corners[i], point);
+			auto point = XMLoadFloat3(&corners[i]);
+			point = XMVector3Transform(point, transform);
+			XMStoreFloat3(&corners[i], point);
 		}
 
-		DirectX::XMFLOAT3 minPoint = corners[0];
-		DirectX::XMFLOAT3 maxPoint = corners[0];
+		XMFLOAT3 minPoint = corners[0];
+		XMFLOAT3 maxPoint = corners[0];
 
 		for (int i = 1; i < 8; ++i)
 		{

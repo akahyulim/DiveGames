@@ -39,8 +39,10 @@ namespace Dive
 					EditorContext::ActiveWorld = WorldManager::CreateWorld("NewWorld");
 					EditorContext::EditorCamera = EditorContext::ActiveWorld->CreateGameObject("EditorCamera");
 					EditorContext::EditorCamera->SetTag("EditorOnly");
+					EditorContext::EditorCamera->AddComponent<Camera>();
 					EditorContext::MainCamera = EditorContext::ActiveWorld->CreateGameObject("MainCamera");
 					EditorContext::MainCamera->SetTag("MainCamera");
+					EditorContext::MainCamera->AddComponent<Camera>();
 
 					// 임시
 					ResourceManager::SetResourceFolder("Assets");
@@ -51,14 +53,23 @@ namespace Dive
 				{
 					// 추후 LoadWorld로 생성해야 한다.
 					
-					EditorContext::ActiveWorld = WorldManager::CreateWorld("NewWorld");
-					WorldSerializer serializer(EditorContext::ActiveWorld);
-					serializer.Deserialize("Assets/NewWorld.dive");
-
 					// 임시 : 현재 작업디렉토리 때문에 직렬화, 역직렬화 대상 경로가 나뉘어져 버렸다.
 					// 임시로 역직렬화할 경우 경로에 Asset를 명시적으로 추가했다.
 					// 이때문에 imgui.ini의 로딩과 저장 시점이 달라진다.
 					ResourceManager::SetResourceFolder("Assets");
+
+					EditorContext::ActiveWorld = WorldManager::CreateWorld("NewWorld");
+					WorldSerializer serializer(EditorContext::ActiveWorld);
+					serializer.Deserialize("NewWorld.dive");
+
+					auto allCameras = Camera::GetAllCameras();
+					for (auto camera : allCameras)
+					{
+						if (camera->GetGameObject()->GetTag() == "EditorOnly")
+							EditorContext::EditorCamera = camera->GetGameObject();
+						else if (camera->GetGameObject()->GetTag() == "MainCamera")
+							EditorContext::MainCamera = camera->GetGameObject();
+					}
 
 					isShowWorldMenu = true;
 				}
@@ -105,24 +116,46 @@ namespace Dive
 				{
 					if (ImGui::MenuItem("Triangle", nullptr, nullptr, isShowWorldMenu))
 					{
-						//auto& entityManager = editorContext.ActiveWorld->GetEntityManager();
-						//entityManager.CreatePrimitive(ePrimitiveType::Triangle);
+						auto triangleGO = EditorContext::ActiveWorld->CreateGameObject("Triangle");
+						auto staticMeshRender = triangleGO->AddComponent<MeshRenderer>();
+						staticMeshRender->SetStaticMesh(MeshFactory::CreateTriangle());
+						staticMeshRender->SetMaterial(std::make_shared<Material>()); 	// 현재 ResourceManager가 관리하지 않는다.
 					}
 					if (ImGui::MenuItem("Quad", nullptr, nullptr, isShowWorldMenu))
 					{
+						auto quadGO = EditorContext::ActiveWorld->CreateGameObject("Quad");
+						auto staticMeshRender = quadGO->AddComponent<MeshRenderer>();
+						staticMeshRender->SetStaticMesh(MeshFactory::CreateQuad());
+						staticMeshRender->SetMaterial(std::make_shared<Material>());
 					}
 					
 					if (ImGui::MenuItem("Plane", nullptr, nullptr, isShowWorldMenu))
 					{
+						auto planeGO = EditorContext::ActiveWorld->CreateGameObject("Plane");
+						auto staticMeshRender = planeGO->AddComponent<MeshRenderer>();
+						staticMeshRender->SetStaticMesh(MeshFactory::CreatePlane());
+						staticMeshRender->SetMaterial(std::make_shared<Material>());
 					}
 					if (ImGui::MenuItem("Cube", nullptr, nullptr, isShowWorldMenu))
 					{
+						auto cubeGO = EditorContext::ActiveWorld->CreateGameObject("Cube");
+						auto staticMeshRender = cubeGO->AddComponent<MeshRenderer>();
+						staticMeshRender->SetStaticMesh(MeshFactory::CreateCube());
+						staticMeshRender->SetMaterial(std::make_shared<Material>());
 					}
 					if (ImGui::MenuItem("Sphere", nullptr, nullptr, isShowWorldMenu))
 					{
+						auto shpereGO = EditorContext::ActiveWorld->CreateGameObject("Sphere");
+						auto staticMeshRender = shpereGO->AddComponent<MeshRenderer>();
+						staticMeshRender->SetStaticMesh(MeshFactory::CreateSphere());
+						staticMeshRender->SetMaterial(std::make_shared<Material>());
 					}
 					if (ImGui::MenuItem("Capsule", nullptr, nullptr, isShowWorldMenu))
 					{
+						auto capsuleGO = EditorContext::ActiveWorld->CreateGameObject("Capsule");
+						auto staticMeshRender = capsuleGO->AddComponent<MeshRenderer>();
+						staticMeshRender->SetStaticMesh(MeshFactory::CreateCapsule());
+						staticMeshRender->SetMaterial(std::make_shared<Material>());
 					}
 
 					ImGui::EndMenu();
@@ -151,10 +184,16 @@ namespace Dive
 				{
 					if (ImGui::MenuItem("Perpective", nullptr, nullptr, isShowWorldMenu))
 					{
+						auto cameraGO = EditorContext::ActiveWorld->CreateGameObject("Camera");
+						auto cameraComponent = cameraGO->AddComponent<Camera>();
+						cameraComponent->SetProjectionType(eProjectionType::Perspective);
 					}
 
 					if (ImGui::MenuItem("Orthographic", nullptr, nullptr, isShowWorldMenu))
 					{
+						auto cameraGO = EditorContext::ActiveWorld->CreateGameObject("Camera");
+						auto cameraComponent = cameraGO->AddComponent<Camera>();
+						cameraComponent->SetProjectionType(eProjectionType::Orthographic);
 					}
 					ImGui::EndMenu();
 				}

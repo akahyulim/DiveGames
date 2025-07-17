@@ -2,7 +2,7 @@
 
 namespace Dive
 {
-	struct VertexStatic;
+	struct StaticVertex;
 
 	enum class eIntersection
 	{
@@ -17,7 +17,7 @@ namespace Dive
 		BoundingBox();
 		BoundingBox(const DirectX::XMFLOAT3& min, const DirectX::XMFLOAT3& max);
 		BoundingBox(const DirectX::XMFLOAT3* points, UINT32 pointCount);
-		BoundingBox(const VertexStatic* vertices, UINT32 vertexCount);
+		BoundingBox(const std::vector<StaticVertex>& vertices);
 		~BoundingBox() = default;
 
 		BoundingBox& operator=(const BoundingBox&) = default;

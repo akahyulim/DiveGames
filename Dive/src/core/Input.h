@@ -34,9 +34,9 @@ namespace Dive
 		static void SetMouseIsInValidRect(bool valid);
 
 	private:
-		static IDirectInput8* s_DirectInput;
-		static IDirectInputDevice8* s_Keyboard;
-		static IDirectInputDevice8* s_Mouse;
+		static Microsoft::WRL::ComPtr<IDirectInput8> s_DirectInput;
+		static Microsoft::WRL::ComPtr<IDirectInputDevice8> s_Keyboard;
+		static Microsoft::WRL::ComPtr<IDirectInputDevice8> s_Mouse;
 
 		static uint8_t s_KeyStates[MAX_NUM_KEYS];
 		static uint8_t s_OldKeyStates[MAX_NUM_KEYS];

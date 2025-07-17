@@ -1,8 +1,19 @@
 ﻿#include "stdafx.h"
 #include "Renderer.h"
+#include "StaticMesh.h"
+#include "Material.h"
+#include "RenderPass.h"
 #include "graphics/RenderTexture.h"
 #include "graphics/Graphics.h"
+#include "graphics/ConstantBuffer.h"
+#include "graphics/Shader.h"
+#include "graphics/ShaderManager.h"
 #include "core/CoreDefs.h"
+#include "world/World.h"
+#include "world/GameObject.h"
+#include "world/Components/Transform.h"
+#include "world/Components/Camera.h"
+#include "world/Components/MeshRenderer.h"
 
 namespace Dive
 {
@@ -21,6 +32,10 @@ namespace Dive
 	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> Renderer::s_DepthStencilStates;
 	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> Renderer::s_BlendStates;
 
+	ConstantBuffer* Renderer::s_DefaultVSConstantBuffer = nullptr;
+
+	std::vector<std::unique_ptr<RenderPass>> Renderer::s_RenderPasses;
+
 	void Renderer::Initialize()
 	{
 		ResizeRenderBuffers(Graphics::GetResolutionWidth(), Graphics::GetResolutionHeight());
@@ -28,6 +43,11 @@ namespace Dive
 		createRasterizerStates();
 		createDepthStencilStates();
 		createBlendStates();
+		createConstantBuffers();
+
+		s_RenderPasses.emplace_back(std::make_unique<TestPass>());
+
+		DV_LOG(Renderer, info, "초기화 완료");
 	}
 
 	void Renderer::Shutdown()
@@ -58,23 +78,29 @@ namespace Dive
 			if (bs) bs->Release();
 			bs = nullptr;
 		}
+
+		DV_LOG(Renderer, info, "셧다운 완료");
 	}
 
 	void Renderer::OnUpdate()
 	{
-	}
+		if (!WorldManager::GetActiveWorld())
+			return;
 
-	// 카메라, 렌더링 대상 메시들
-	void Renderer::DeferredPass()
-	{
-		// clear gbuffer
-		// draw on gbuffer
-	}
+		auto cameras = Camera::GetAllCameras();
+		for (auto camera : cameras)
+		{
+			WorldManager::GetActiveWorld()->CullAndSort(camera);
 
-	void Renderer::LightingPass()
-	{
-		// clear rendertarget
-		// draw light
+			auto deviceContext = Graphics::GetDeviceContext();
+			
+			// begin frame?
+
+			for (auto& pass : s_RenderPasses)
+				pass->Execute(deviceContext, camera);
+
+			// end frame?
+		}
 	}
 
 	void Renderer::ResizeRenderBuffers(UINT32 width, UINT32 height)
@@ -168,6 +194,12 @@ namespace Dive
 		return type != eBlendState::Count ? s_BlendStates[static_cast<size_t>(type)] : nullptr; 
 	}
 	
+	void Renderer::createConstantBuffers()
+	{
+		s_DefaultVSConstantBuffer = new ConstantBuffer();
+		s_DefaultVSConstantBuffer->Create(sizeof(DefaultVSConstant));
+	}
+
 	void Renderer::createShaders()
 	{
 		// vertex shaders
@@ -177,8 +209,7 @@ namespace Dive
 
 	void Renderer::createRasterizerStates()
 	{
-		D3D11_RASTERIZER_DESC desc;
-		ZeroMemory(&desc, sizeof(desc));
+		D3D11_RASTERIZER_DESC desc{};
 
 		// FillSolid_CullBack
 		desc.AntialiasedLineEnable = FALSE;
@@ -229,6 +260,7 @@ namespace Dive
 		}
 
 		// DepthReadWrite_StencilReadWrite => Skydome에서 on
+		// => rastertek에서 가장 최초에 사용하는 것
 		{
 			ZeroMemory(&desc, sizeof(desc));
 			desc.DepthEnable = TRUE;
