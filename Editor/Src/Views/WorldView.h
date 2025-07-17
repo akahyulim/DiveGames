@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "View.h"
 
 namespace Dive
@@ -12,6 +12,6 @@ namespace Dive
 		void drawView() override;
 
 	private:
-		std::shared_ptr<RenderTexture> m_RenderTexture;
+		std::unique_ptr<RenderTexture> m_RenderTarget;
 	};
 }

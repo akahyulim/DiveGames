@@ -1,126 +1,255 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "Camera.h"
 #include "Transform.h"
-#include "Core/CoreDefs.h"
-#include "Graphics/Graphics.h"
-#include "Graphics/RenderTexture.h"
-#include "Graphics/ConstantBuffer.h"
-#include "Scene/GameObject.h"
+#include "../GameObject.h"
+#include "graphics/RenderTexture.h"
+#include "rendering/Renderer.h"
+
+using namespace DirectX;
 
 namespace Dive
 {
-#pragma pack(push, 1)
-	struct CB_CAMERA_VS
-	{
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX proj;
-	};
-
-	struct CB_CAMERA_DS
-	{
-		DirectX::XMMATRIX viewProj;
-	};
-
-	struct CB_CAMERA_PS
-	{
-		DirectX::XMFLOAT4 perspectiveValue;
-
-		DirectX::XMMATRIX viewInverse;
-	};
-#pragma pack(pop)
-
 	static constexpr float FOV_MIN = 1.0f;
 	static constexpr float FOV_MAX = 160.0f;
+
+	static constexpr float NEAR_CLIP_PLANE = 0.1f;
+
+	std::vector<Camera*> Camera::s_AllCameras;
 
 	Camera::Camera(GameObject* gameObject)
 		: Component(gameObject)
 	{
+		s_AllCameras.push_back(this);
+		DV_LOG(Camera, info, "ÏÉùÏÑ± - {}, {}", GetName(), GetInstanceID());
 	}
 
 	Camera::~Camera()
 	{
-		// ∑ª¥ı≈∏∞Ÿ¿∫ ø‹∫Œø°º≠ ∞°¡Æø¿±‚ ∂ßπÆø° ¡˜¡¢ ¡¶∞≈«œ¥¬ ∞« ø°πŸ¥Ÿ.
+		auto it = std::find(s_AllCameras.begin(), s_AllCameras.end(), this);
+		if (it != s_AllCameras.end())
+			s_AllCameras.erase(it);
+		
+		DV_LOG(Camera, info, "ÏÜåÎ©∏ - {}, {}", GetName(), GetInstanceID());
 	}
 
-	// πˆ∆€∏¶ ª˝º∫ π◊ ∞¸∏Æ«œ¥¬ ∞Õ¿∫ ∏¬¡ˆ æ ¥Ÿ.
-	// ∞ªΩ≈µ» µ•¿Ã≈Õ∑Œ πˆ∆€∏¶ æ˜µ•¿Ã∆Æ«œµµ∑œ ±∏«ˆ«ÿæﬂ «—¥Ÿ.
 	void Camera::Update()
 	{
+		m_Frustum.Update(GetView(), GetProjection());
 	}
 
-	DirectX::XMFLOAT3 Camera::GetPosition()
+	void Camera::Bind(ID3D11DeviceContext* deviceContext) const
 	{
-		return m_GameObject->GetComponent<Transform>()->GetPosition();
+		assert(deviceContext);
+
+		auto renderTargetView = GetRenderTarget()->GetRenderTargetView();
+		auto depthStencilView = GetRenderTarget()->GetDepthStencilView();
+		auto color = GetBackgroundColor();
+
+		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+		FLOAT clearColor[4]{ color.x, color.y, color.z, color.w };
+		deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
+		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+		auto viewport = GetViewport();
+		deviceContext->RSSetViewports(1, &viewport);		
 	}
 
-	DirectX::XMMATRIX Camera::GetSceneMatrix()
+	DirectX::XMFLOAT4X4 Camera::GetView() const
 	{
-		return DirectX::XMMatrixTranslationFromVector(m_GameObject->GetComponent<Transform>()->GetPositionVector());
+		auto transform = GetGameObject()->GetTransform();
+
+		XMFLOAT3 position = transform->GetPosition();
+		XMVECTOR positionVec = XMLoadFloat3(&position);
+
+		XMFLOAT3 forward = transform->GetForward();
+		XMVECTOR forwardVec = XMLoadFloat3(&forward);
+		
+		XMFLOAT3 up = transform->GetUp();
+		XMVECTOR upVec = XMLoadFloat3(&up);
+
+		XMMATRIX viewMatrix = XMMatrixLookToLH(positionVec, forwardVec, upVec);
+		XMFLOAT4X4 view{};
+		XMStoreFloat4x4(&view, viewMatrix);	
+
+		return view;
 	}
 
-	DirectX::XMMATRIX Camera::GetViewMatrix()
+	DirectX::XMMATRIX Camera::GetViewMatrix() const
 	{
-		const auto& pos = m_GameObject->GetComponent<Transform>()->GetPositionVector();
-		const auto& forward = m_GameObject->GetComponent<Transform>()->GetForwardVector();
-		const auto& focus = DirectX::XMVectorAdd(pos, forward);
+		auto view = GetView();
+		return XMLoadFloat4x4(&view);
+	}
 
-		const auto& up = m_GameObject->GetComponent<Transform>()->GetUpwardVector();
+	DirectX::XMFLOAT4X4 Camera::GetProjection() const
+	{
+		XMFLOAT4X4 projection{};
 
-		return DirectX::XMMatrixLookAtLH(pos, focus, up);
+		if (m_ProjectionType == eProjectionType::Perspective)
+		{
+			auto projectionMatrix =  XMMatrixPerspectiveFovLH(
+				3.141592654f / 4.0f,//XMConvertToRadians(m_FieldOfView),
+				GetAspectRatio(),
+				m_NearClipPlane,
+				m_FarClipPlane);
+
+			XMStoreFloat4x4(&projection, projectionMatrix);
+		}
+		else if (m_ProjectionType == eProjectionType::Orthographic)
+		{
+			// ÏΩîÌååÏùºÎüøÏù¥ ÏûëÏÑ±Ìïú  ÏΩîÎìúÎã§.
+			// width, heightÍ∞Ä ÎßûÎäîÏßÄ Î™®Î•¥Í≤†Îã§.
+			auto projectionMatrix = XMMatrixOrthographicLH(
+				GetAspectRatio() * m_FarClipPlane,
+				m_FarClipPlane,
+				m_NearClipPlane,
+				m_FarClipPlane);
+
+			XMStoreFloat4x4(&projection, projectionMatrix);
+		}
+
+		return projection;
 	}
 
 	DirectX::XMMATRIX Camera::GetProjectionMatrix() const
 	{
-		return m_ProjectionType == eProjectionType::Orthographic ? GetOrthographicProjMatrix() : GetPerspectiveProjMatrix();
-	}
-
-	// æ∆¡˜ ¡¶¥Î∑Œµ» ≈◊Ω∫∆Æµµ ∏¯«ﬂ¥Ÿ.
-	DirectX::XMMATRIX Camera::GetOrthographicProjMatrix() const
-	{
-		auto viewSize = GetRenderTextureSize();
-
-		return DirectX::XMMatrixOrthographicLH(
-			static_cast<float>(viewSize.x),
-			static_cast<float>(viewSize.y),
-			m_NearClipPlane,
-			m_FarClipPlane);
-	}
-
-	DirectX::XMMATRIX Camera::GetPerspectiveProjMatrix() const
-	{
-		return DirectX::XMMatrixPerspectiveFovLH(
-			DirectX::XMConvertToRadians(m_FieldOfView),
-			GetAspectRatio(),
-			m_NearClipPlane,
-			m_FarClipPlane);
-	}
-
-	void Camera::SetBackgroundColor(float r, float g, float b, float a)
-	{
-		m_BackgroundColor = { r, g, b, a };
+		auto projection = GetProjection();
+		return XMLoadFloat4x4(&projection);
 	}
 
 	float Camera::GetAspectRatio() const
 	{
-		auto viewSize = GetRenderTextureSize();
-		return static_cast<float>(viewSize.x / viewSize.y);
+		auto viewport = GetViewport();
+		return (viewport.Width / viewport.Height);
 	}
-
+	
 	void Camera::SetFieldOfView(float fov)
 	{
 		if (fov < FOV_MIN)
-			m_FieldOfView = 1.0f;
+			m_FieldOfView = FOV_MIN;
 		else if (fov > FOV_MAX)
-			m_FieldOfView = 160.0f;
+			m_FieldOfView = FOV_MAX;
 		else
 			m_FieldOfView = fov;
 	}
 
-	DirectX::XMUINT2 Camera::GetRenderTextureSize() const
+	void Camera::SetNearClipPlane(float nearPlane)
 	{
-		if (m_RenderTexture)
-			return { m_RenderTexture->GetWidth(), m_RenderTexture->GetHeight() };
+		if (nearPlane < NEAR_CLIP_PLANE)
+		{
+			DV_LOG(Camera, warn, "Invalid near clip plane value: {}", nearPlane);
+			return;
+		}
+		m_NearClipPlane = nearPlane;
+	}
 
-		return {};
+	void Camera::SetFarClipPlane(float farPlane)
+	{
+		if (farPlane <= m_NearClipPlane)
+		{
+			DV_LOG(Camera, warn, "Invalid far clip plane value: {}", farPlane);
+			return;
+		}
+		m_FarClipPlane = farPlane;
+	}
+
+	void Camera::GetViewportRect(float& outLeft, float& outTop, float& outRight, float& outBottom) const
+	{
+		outLeft = m_ViewportLeft;
+		outTop = m_ViewportTop;
+		outRight = m_ViewportRight;
+		outBottom = m_ViewportBottom;
+	}
+
+	void Camera::SetViewportRect(float left, float top, float right, float bottom)
+	{
+		if (left < 0.0f || left > right ||
+			top < 0.0f || top > bottom ||
+			right <= left || right > 1.0f ||
+			bottom <= top || bottom > 1.0f)
+		{
+			DV_LOG(Camera, warn, "Invalid viewport rect values: {}, {}, {}, {}", left, top, right, bottom);
+			return;
+		}
+
+		m_ViewportLeft = left;
+		m_ViewportTop = top;
+		m_ViewportRight = right;
+		m_ViewportBottom = bottom;
+	}
+
+	void Camera::SetViewportTop(float top)
+	{
+		if (top < 0.0f || top > m_ViewportBottom)
+		{
+			DV_LOG(Camera, warn, "Invalid viewport top value: {}", top);
+			return;
+		}
+		m_ViewportTop = top;
+	}
+
+	void Camera::SetViewportLeft(float left)
+	{
+		if (left < 0.0f || left > m_ViewportRight)
+		{
+			DV_LOG(Camera, warn, "Invalid viewport left value: {}", left);
+			return;
+		}
+		m_ViewportLeft = left;
+	}
+
+	void Camera::SetViewportRight(float right)
+	{
+		if (right < m_ViewportLeft || right > 1.0f)
+		{
+			DV_LOG(Camera, warn, "Invalid viewport right value: {}", right);
+			return;
+		}
+		m_ViewportRight = right;
+	}
+
+	void Camera::SetViewportBottom(float bottom)
+	{
+		if (bottom < m_ViewportTop || bottom > 1.0f)
+		{
+			DV_LOG(Camera, warn, "Invalid viewport bottom value: {}", bottom);
+			return;
+		}
+		m_ViewportBottom = bottom;
+	}
+
+	D3D11_VIEWPORT Camera::GetViewport() const
+	{
+		auto renderTargetWidth = static_cast<float>(GetRenderTarget()->GetWidth());
+		auto renderTargetHeight = static_cast<float>(GetRenderTarget()->GetHeight());
+
+		float topLeftX = m_ViewportLeft * renderTargetWidth;
+		float topLeftY = m_ViewportTop * renderTargetHeight;
+		float width = (m_ViewportRight - m_ViewportLeft) * renderTargetWidth;
+		float height = (m_ViewportBottom - m_ViewportTop) * renderTargetHeight;
+
+		return D3D11_VIEWPORT{
+			topLeftX,
+			topLeftY,
+			width,
+			height,
+			0.0f,
+			1.0f
+		};
+	}
+
+	RenderTexture* Camera::GetRenderTarget() const
+	{
+		return m_RenderTarget ? m_RenderTarget : Renderer::GetRenderTarget(eRenderTarget::FrameOutput);
+	}
+
+	Camera* Camera::GetMainCamera()
+	{
+		for (auto camera : s_AllCameras)
+		{
+			if (camera->GetGameObject()->GetTag() == "MainCamera")
+				return camera;
+		}
+
+		return nullptr;
 	}
 }

@@ -1,72 +1,78 @@
-#pragma once
-#include "core/CoreDefs.h"
+Ôªø#pragma once
 
 namespace Dive
 {
+	class Camera;
+	class Transform;
+	class MeshRenderer;
 	class GameObject;
 
-	enum class eRenderableType
-	{
-		Unkonw,
-		Camera,
-		StaticModel,
-		SkinnedModel,
-	};
-
-	// ¿Ø¥œ∆ºø°º≠¿« ¿Œ≈Õ∆‰¿ÃΩ∫∏¶ ∫∏∏È
-	// ±ª¿Ã WorldøÕ Editor∏¶ ±∏∫–«“ « ø‰∞° æ¯æ˙¥Ÿ.
-	// dirty¥¬ π∞∑– filePath±Ó¡ˆ ¡˜¡¢ ∞¸∏Æ«œ¥¬ ∆Ì¿Ã ≥™æ∆∫∏¿Œ¥Ÿ.
+	// https://docs.unity3d.com/6000.1/Documentation/ScriptReference/SceneManagement.Scene.html
 	class World
 	{
 	public:
-		World(const std::string& name = "NewWorld");
+		World(const std::string& name);
 		~World();
 
 		void Clear();
 
 		void Update();
 
-		GameObject* CreateGameObject(const std::string& name = "GameObject");
-		GameObject* CreateGameObject(UINT64 id, const std::string& name = "GameObject");
-		void DeleteGameObject(GameObject* gameObject);
-		void DeleteGameObjectByID(UINT64 id);
-		GameObject* GetGameObjectByID(UINT64 id);
-		bool ExistsGameObject(GameObject* gameObject);
-		bool ExistsGameObjectByID(UINT64 id);
-		std::vector<GameObject*> GetRootGameObjects();
-		std::vector<GameObject*> GetAllGameObjects();
-		UINT64 GetGameObjectsCount();
+		void CullAndSort(Camera* camera);
 
-		bool IsEmpty() const { return m_GameObjects.empty(); }
+		GameObject* CreateGameObject(const std::string& name = "");
+
+		void DestroyGameObject(GameObject* gameObject);
+		void DestroyGameObject(UINT64 instanceID);
+		void QueueDestroy(GameObject* gameObject);
+		void QueueDestroy(UINT64 instanceID);
+		void FlushDestoryQueue();
+
+		bool HasGameObject(UINT64 instanceID);
+
+		GameObject* FindGameObject(UINT64 instanceID);
+
+		void AttachRoot(GameObject* gameObject);
+		void AttachRoot(UINT64 instanceID);
+	
+		void DetachRoot(GameObject* gameObject);
+		void DetachRoot(UINT64 instanceID);
+
+		size_t AllGameObjectCount() const { return m_GameObjectMap.size(); }
+		std::vector<GameObject*> GetAllGameObjects();
+
+		size_t RootGameObjectCount() const { return m_RootGameObjects.size(); }
+		const std::vector<GameObject*>& GetRootGameObjects() { return m_RootGameObjects; }
+
+		const std::vector<MeshRenderer*>& GetTransparentMeshRenderers() const { return m_TransparentMeshRenderers; }
+		const std::vector<MeshRenderer*>& GetOpaqueMeshRenderers() const { return m_OpaqueMeshRenderers; }
 
 		std::string GetName() const { return m_Name; }
-		void SetName(const std::string& name);
-
-		std::filesystem::path GetFilePath() const { return m_FilePath; }
-
-		bool IsDirty() const { return m_IsDirty; }
-
-		void OnModified();
+		void SetName(const std::string& name) { m_Name = name; }
 
 	private:
-		std::string m_Name;
-		std::filesystem::path m_FilePath;
+		std::string m_Name{};
 
-		UINT64 m_CurGameObjectID;
-		std::unordered_map<UINT64, GameObject*> m_GameObjects;
-		std::unordered_map<eRenderableType, std::vector<GameObject*>> m_Renderables;
+		std::unordered_map<UINT64, std::unique_ptr<GameObject>> m_GameObjectMap;
+		std::vector<GameObject*> m_RootGameObjects;
+		std::unordered_set<UINT64> m_DestroyQueue;
 
-		bool m_IsDirty;
+		std::vector<MeshRenderer*> m_TransparentMeshRenderers;
+		std::vector<MeshRenderer*> m_OpaqueMeshRenderers;
 
-		friend class WorldSerializer;
+		friend class Transform;
+	};
 
-		// ¿Ã«œ ¿Ø¥œ∆º ¿Œ≈Õ∆‰¿ÃΩ∫
-		// ∑±≈∏¿” µ•¿Ã≈∏ ±∏¡∂√º∂Û∞Ì «—¥Ÿ.
-		// buildIndex, isDirty, isLoaded, name, path, rootCount
-		// GetRootGameObjects, IsValid
-		// GameObject¥¬ ª˝º∫Ω√ ¿⁄µø¿∏∑Œ »∞º∫»≠µ» Worldø° √ﬂ∞°µ»¥Ÿ. GameObjectø° scene¿Ã∂Û¥¬ ∏‚πˆ ∫Øºˆµµ ¿÷¥Ÿ.
-		// æ¡¶∫Œ≈Õø¥¥¬¡ˆ ∏∏£∞⁄¡ˆ∏∏ WorldManager∂ı ∞Õ¿Ã ¿÷¥Ÿ.
-		
-		// => «ˆ¿Á ≥ª∞° ±∏«ˆ«— World¥¬ æ∏ÆæÛ¿« ±∏¡∂ø° ∞°±ı¥Ÿ.
+	//https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.html
+	class WorldManager
+	{
+	public:
+		static World* CreateWorld(const std::string& name);
+		static void Clear();
+
+		static World* GetActiveWorld();
+
+	private:
+		static std::unique_ptr<World> s_ActiveWorld;	// ÏùºÎã® Îã®Ïùº WorldÎ°ú Í¥ÄÎ¶¨
 	};
 }

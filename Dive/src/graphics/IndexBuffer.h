@@ -1,27 +1,25 @@
-#pragma once
+癤�#pragma once
 
 namespace Dive
 {
-	// 현재 ModelFactory와 Mesh에서 UINT32로 구성하기 때문에
-	// 섯불리 void*로 바꿀 수가 없다.
 	class IndexBuffer
 	{
 	public:
 		IndexBuffer() = default;
-		~IndexBuffer();
+		~IndexBuffer() = default;
 
-		bool Create(const void* data, UINT32 count);
-		void Release();
+		bool Create(const void* data, uint32_t indexCount, uint32_t vertexCount);
 
-		ID3D11Buffer* GetBuffer() const { return m_Buffer; }
+		ID3D11Buffer* GetBuffer() const { return m_Buffer.Get(); }
+
+		void SetFormat(DXGI_FORMAT format) { m_Format = format; }
 		DXGI_FORMAT GetFormat() const { return m_Format; }
-		UINT32 GetCount() const { return m_Count; }
-
-		static std::shared_ptr<IndexBuffer> Generate(const void* data, UINT32 count);
+		
+		uint32_t GetCount() const { return m_Count; }
 
 	private:
-		ID3D11Buffer* m_Buffer = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
 		DXGI_FORMAT m_Format = DXGI_FORMAT_UNKNOWN;
-		UINT32 m_Count = 0;
+		uint32_t m_Count = 0;
 	};
 }

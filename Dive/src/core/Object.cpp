@@ -1,59 +1,21 @@
-#include "stdafx.h"
+癤�#include "stdafx.h"
 #include "Object.h"
 
 namespace Dive
 {
-	TypeInfo::TypeInfo(const std::string& typeName, const TypeInfo* baseTypeInfo)
-		: m_TypeHash(std::hash<std::string>{}(typeName))
-		, m_TypeName(typeName)
-		, m_BaseTypeInfo(baseTypeInfo)
-	{
-	}
-
-	bool TypeInfo::IsTypeOf(size_t typeHash) const
-	{
-		const TypeInfo* curTypeInfo = this;
-		while (curTypeInfo)
-		{
-			if (curTypeInfo->GetTypeHash() == typeHash)
-				return true;
-
-			curTypeInfo = curTypeInfo->GetBaseTypeInfo();
-		}
-
-		return false;
-	}
-
-	bool TypeInfo::IsTypeOf(const TypeInfo* typeInfo) const
-	{
-		if (!typeInfo)
-			return false;
-
-		const TypeInfo* curTypeInfo = this;
-		while (curTypeInfo)
-		{
-			if (curTypeInfo == typeInfo || curTypeInfo->GetTypeHash() == typeInfo->GetTypeHash())
-				return true;	
-
-			curTypeInfo = curTypeInfo->GetBaseTypeInfo();
-		}
-
-		return false;
-	}
+	static std::random_device s_RandomDevice;
+	static std::mt19937_64 s_Engine(s_RandomDevice());
+	static std::uniform_int_distribution<uint64_t> s_UniformDistribution;
 
 	Object::Object()
-		: m_Id(GenerateId())
-		, m_Name("dive_object")
+		: m_InstanceID(s_UniformDistribution(s_Engine))
+		, m_Name("")
 	{
 	}
 
-	uint64_t Object::GenerateId()
+	Object::Object(const std::string& name)
+		: m_InstanceID(s_UniformDistribution(s_Engine))
+		, m_Name(name)
 	{
-		// 랜덤 엔진 및 분포 설정 
-		std::random_device rd; std::mt19937_64 eng(rd()); 
-		std::uniform_int_distribution<uint64_t> distr; 
-		
-		// 고유한 숫자 생성 
-		return distr(eng);
 	}
 }

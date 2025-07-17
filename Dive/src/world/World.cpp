@@ -1,151 +1,243 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "World.h"
-#include "WorldSerializer.h"
 #include "GameObject.h"
 #include "Components/Transform.h"
-#include "core/EventDispatcher.h"
-#include "core/UUID.h"
+#include "Components/Camera.h"
+#include "Components/MeshRenderer.h"
+#include "core/CoreDefs.h"
 
 namespace Dive
 {
 	World::World(const std::string& name)
 		: m_Name(name)
-		, m_CurGameObjectID(0)
-		, m_IsDirty(true)
 	{
-		DV_SUBSCRIBE_EVENT(Dive::eEventType::WorldModified, DV_EVENT_HANDLER(OnModified));
+		DV_LOG(World, info, "생성 - {}", m_Name);
 	}
 
 	World::~World()
 	{
 		Clear();
+		DV_LOG(World, info, "소멸 - {}", m_Name);
 	}
 
 	void World::Clear()
 	{
-		for (auto& [id, gameObject] : m_GameObjects)
-		{
-			DV_DELETE(gameObject);
-		}
-		m_GameObjects.clear();
-		m_CurGameObjectID = 0;
-		m_IsDirty = true;
+		m_DestroyQueue.clear();
+		m_RootGameObjects.clear();
+		m_GameObjectMap.clear();
 	}
 
 	void World::Update()
 	{
-		for (auto& [id, gameObject] : m_GameObjects)
-		{
+		for (auto& gameObject : m_RootGameObjects)
 			gameObject->Update();
+
+		FlushDestoryQueue();
+	}
+
+	void World::CullAndSort(Camera* camera)
+	{
+		assert(camera);
+
+		m_OpaqueMeshRenderers.clear();
+		m_TransparentMeshRenderers.clear();
+
+		const auto& frustum = camera->GetFrustum();
+
+		for (auto& [instanceID, gameObject] : m_GameObjectMap)
+		{
+			if (gameObject->HasComponent<MeshRenderer>())
+			{
+				auto meshRenderer = gameObject->GetComponent<MeshRenderer>();
+				// boundingBox를 통해 Frustum Culling 확인
+
+				// 실제로는 정렬까지...?
+				if (meshRenderer->IsTransparent())
+					m_TransparentMeshRenderers.push_back(meshRenderer);
+				else
+					m_OpaqueMeshRenderers.push_back(meshRenderer);
+			}
 		}
+
+		// 코파일럿이 보여준 예
+		/*
+		ClearAllRenderQueues();
+
+		Frustum frustum = camera.ComputeFrustum();
+
+	    for (auto& go : m_GameObjects) {
+        if (go->meshRenderer && go->meshRenderer->IsVisible(frustum)) {
+            auto& renderer = *go->meshRenderer;
+            if (renderer.IsTransparent())
+                m_TransparentStatic.push_back(&renderer);
+            else
+                m_OpaqueStatic.push_back(&renderer);
+        }
+
+        if (go->skinnedRenderer && go->skinnedRenderer->IsVisible(frustum)) {
+            auto& renderer = *go->skinnedRenderer;
+            if (renderer.IsTransparent())
+                m_TransparentSkinned.push_back(&renderer);
+            else
+                m_OpaqueSkinned.push_back(&renderer);
+        }
+    }
+
+		*/
 	}
 
 	GameObject* World::CreateGameObject(const std::string& name)
 	{
-		return CreateGameObject(UUID(), name);
+		auto gameObject = std::make_unique<GameObject>(name);
+		gameObject->AddComponent<Transform>();
+
+		GameObject* ptr = gameObject.get();
+		m_RootGameObjects.push_back(ptr);
+
+		m_GameObjectMap[gameObject->GetInstanceID()] = std::move(gameObject);
+	
+		return ptr;
 	}
 
-	GameObject* World::CreateGameObject(UINT64 id, const std::string& name)
+	void World::AttachRoot(GameObject* gameObject)
 	{
-		if (m_GameObjects.find(id) != m_GameObjects.end())
-		{
-			DV_LOG(World, warn, "�̹� �����ϴ� ID: {}", id);
-			return nullptr;
-		}
+		assert(gameObject);
 
-		auto gameObject = new GameObject(this, name);
-		m_GameObjects[id] = gameObject;
-		gameObject->SetID(id);
-
-		return gameObject;
-	}
-
-	void World::DeleteGameObject(GameObject* gameObject)
-	{
-		if (!gameObject || m_GameObjects.empty())
+		auto it = std::find(m_RootGameObjects.begin(), m_RootGameObjects.end(), gameObject);
+		if (it != m_RootGameObjects.end())
 			return;
 
-		DeleteGameObjectByID(gameObject->GetID());
+		m_RootGameObjects.push_back(gameObject);
 	}
 
-	void World::DeleteGameObjectByID(UINT64 id)
+	void World::AttachRoot(UINT64 instanceID)
 	{
-		auto it = m_GameObjects.find(id);
-		if (it != m_GameObjects.end())
-		{
-			for (auto child : it->second->GetTransform()->GetChildren())
-			{
-				child->SetParent(nullptr);
-				DeleteGameObjectByID(child->GetGameObject()->GetID());
-			}
+		if (!HasGameObject(instanceID))
+			return;
 
-			DV_DELETE(it->second);
-			m_GameObjects.erase(it);
-			m_IsDirty = true;
-		}
+		auto gameObject = FindGameObject(instanceID);
+		auto it = std::find(m_RootGameObjects.begin(), m_RootGameObjects.end(), gameObject);
+		if (it != m_RootGameObjects.end())
+			return;
+
+		m_RootGameObjects.push_back(gameObject);
 	}
 
-	GameObject* World::GetGameObjectByID(UINT64 id)
+	void World::DetachRoot(GameObject* gameObject)
 	{
-		auto it = m_GameObjects.find(id);
-		return it != m_GameObjects.end() ? it->second : nullptr;
+		assert(gameObject);
+
+		auto it = std::find(m_RootGameObjects.begin(), m_RootGameObjects.end(), gameObject);
+		if (it != m_RootGameObjects.end())
+			m_RootGameObjects.erase(it);
 	}
 
-	bool World::ExistsGameObject(GameObject* gameObject)
+	void World::DetachRoot(UINT64 instanceID)
 	{
-		if (!gameObject)
-			return false;
+		if (!HasGameObject(instanceID))
+			return;
 
-		return ExistsGameObjectByID(gameObject->GetID());
-	}
-
-	bool World::ExistsGameObjectByID(UINT64 id)
-	{
-		auto it = m_GameObjects.find(id);
-		return it != m_GameObjects.end();
-	}
-
-	std::vector<GameObject*> World::GetRootGameObjects()
-	{
-		std::vector<GameObject*> rootGameObjects;
-
-		auto it = m_GameObjects.begin();
-		for (it; it != m_GameObjects.end(); ++it)
-		{
-			if (it->second->GetComponent<Transform>()->IsRoot())
-				rootGameObjects.emplace_back(it->second);
-		}
-
-		return rootGameObjects;
+		auto gameObject = FindGameObject(instanceID);
+		auto it = std::find(m_RootGameObjects.begin(), m_RootGameObjects.end(), gameObject);
+		if (it != m_RootGameObjects.end())
+			m_RootGameObjects.erase(it);
 	}
 
 	std::vector<GameObject*> World::GetAllGameObjects()
 	{
 		std::vector<GameObject*> allGameObjects;
+		allGameObjects.reserve(AllGameObjectCount());
 
-		auto it = m_GameObjects.begin();
-		for (it; it != m_GameObjects.end(); ++it)
-			allGameObjects.emplace_back(it->second);
+		for (auto& [instanceID, gameObject] : m_GameObjectMap)
+			allGameObjects.push_back(gameObject.get());
 
 		return allGameObjects;
 	}
 
-	UINT64 World::GetGameObjectsCount()
+	void World::DestroyGameObject(GameObject* gameObject)
 	{
-		return static_cast<UINT64>(m_GameObjects.size());
+		assert(gameObject);
+		assert(HasGameObject(gameObject->GetInstanceID()));
+
+		gameObject->Destory();
 	}
 
-	void World::SetName(const std::string& name)
+	void World::DestroyGameObject(UINT64 instanceID)
 	{
-		if (m_Name != name)
+		if (!HasGameObject(instanceID))
+			return;
+
+		auto gameObject = FindGameObject(instanceID);
+		if (gameObject) return;
+
+		gameObject->Destory();
+	}
+
+	void World::QueueDestroy(GameObject* gameObject)
+	{
+		assert(gameObject);
+		assert(HasGameObject(gameObject->GetInstanceID()));
+
+		if (m_DestroyQueue.find(gameObject->GetInstanceID()) == m_DestroyQueue.end())
+			m_DestroyQueue.insert(gameObject->GetInstanceID());
+	}
+
+	void World::QueueDestroy(UINT64 instanceID)
+	{
+		if (!HasGameObject(instanceID))
+			return;
+
+		if (m_DestroyQueue.find(instanceID) == m_DestroyQueue.end())
+			m_DestroyQueue.insert(instanceID);
+	}
+
+	void World::FlushDestoryQueue()
+	{
+		for (auto instanceID : m_DestroyQueue)
 		{
-			m_Name = name;
-			m_IsDirty = true;
+			auto it = m_GameObjectMap.find(instanceID);
+			if (it != m_GameObjectMap.end())
+			{
+				DV_LOG(World, info, "Destroying GameObject: {}, {}", it->second->GetName(), instanceID);
+				m_GameObjectMap.erase(it);
+			}
 		}
+
+		m_DestroyQueue.clear();
 	}
 
-	void World::OnModified()
+	bool World::HasGameObject(UINT64 instanceID)
 	{
-		m_IsDirty = true;
+		return m_GameObjectMap.find(instanceID) != m_GameObjectMap.end();
+	}
+
+	GameObject* World::FindGameObject(UINT64 instanceID)
+	{
+		auto it = m_GameObjectMap.find(instanceID);
+		return it != m_GameObjectMap.end() ? it->second.get() : nullptr;
+	}
+
+	std::unique_ptr<World> WorldManager::s_ActiveWorld = nullptr;
+
+	// 유니티의 경우 빈 이름, 이미 존재하는 Scene의 이름은 안된다.
+	World* WorldManager::CreateWorld(const std::string& name)
+	{
+		if (s_ActiveWorld)	s_ActiveWorld.reset();
+		
+		s_ActiveWorld = std::make_unique<World>(name);
+		return s_ActiveWorld.get();
+	}
+
+	void WorldManager::Clear()
+	{
+		if (s_ActiveWorld)
+			s_ActiveWorld.reset();
+
+		DV_LOG(WorldManager, info, "클리어 완료");
+	}
+
+	World* WorldManager::GetActiveWorld()
+	{
+		return s_ActiveWorld.get();
 	}
 }

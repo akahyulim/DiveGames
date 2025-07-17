@@ -1,4 +1,4 @@
-#pragma once
+癤�#pragma once
 
 namespace Dive
 {
@@ -8,18 +8,12 @@ namespace Dive
 		Frustum() = default;
 		~Frustum() = default;
 
-		void Construct(const DirectX::XMMATRIX& viewMatrix, const DirectX::XMMATRIX& projMatrix, float depth);
+		void Update(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& proj);
 
-		// Spratan은 IsVisible에서 center와 extend 두 개의 vector3 값을 전달받고
-		// CheckCube로 확인한다.
-		// 그리고 center과 extend는 Renderable에서 BoundingBox로부터 얻는다.
-		bool IsVisible(const DirectX::XMFLOAT3& center, const DirectX::XMFLOAT3& extent);
-		bool CheckPoint(float x, float y, float z) const;
-		bool CheckCube(float centerX, float centerY, float centerZ, float radius) const;
-		bool CheckSphere(float centerX, float centerY, float centerZ, float radius) const;
-		bool CheckRectangle(float centerX, float centerY, float centerZ, float sizeX, float sizeY, float sizeZ) const;
+		bool CheckAABB(const DirectX::XMFLOAT3& center, const DirectX::XMFLOAT3& extents) const;
+		bool CheckSphere(const DirectX::XMFLOAT3& center, float radius) const;
 
 	private:
-		DirectX::XMFLOAT4 m_Planes[6];
+		DirectX::XMVECTOR m_Planes[6];
 	};
 }

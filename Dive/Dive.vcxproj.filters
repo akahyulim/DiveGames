@@ -16,17 +16,11 @@
     <Filter Include="math">
       <UniqueIdentifier>{f9b53f88-8239-44c7-bea5-21c6b9fb6b39}</UniqueIdentifier>
     </Filter>
-    <Filter Include="input">
-      <UniqueIdentifier>{36179512-5066-4952-b95f-972928882c9e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="world">
       <UniqueIdentifier>{01dd24fd-4851-46b1-83d1-3a485fa9cae6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="world\Components">
-      <UniqueIdentifier>{6cf0627d-721d-41ba-b7e7-cdfb8cfa7e6d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="world\Components\NativeScript">
-      <UniqueIdentifier>{e5dd5fc8-4edf-4b31-87fa-39ac9b06d4e2}</UniqueIdentifier>
+    <Filter Include="systems">
+      <UniqueIdentifier>{e2e29c48-7bc4-4e38-94cc-da48eab50ba1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -49,9 +43,6 @@
     </ClInclude>
     <ClInclude Include="src\resource\Resource.h">
       <Filter>resource</Filter>
-    </ClInclude>
-    <ClInclude Include="src\core\Object.h">
-      <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="src\resource\ResourceManager.h">
       <Filter>resource</Filter>
@@ -80,35 +71,8 @@
     <ClInclude Include="src\graphics\Graphics.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\Renderer.h">
-      <Filter>rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="src\input\Input.h">
-      <Filter>input</Filter>
-    </ClInclude>
     <ClInclude Include="src\core\Engine.h">
       <Filter>core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\GameObject.h">
-      <Filter>world</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\World.h">
-      <Filter>world</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\WorldManager.h">
-      <Filter>world</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\WorldSerializer.h">
-      <Filter>world</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\Components\Camera.h">
-      <Filter>world\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\Components\Component.h">
-      <Filter>world\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\Components\Transform.h">
-      <Filter>world\Components</Filter>
     </ClInclude>
     <ClInclude Include="src\graphics\RenderTexture.h">
       <Filter>graphics</Filter>
@@ -122,25 +86,38 @@
     <ClInclude Include="src\graphics\Cubemap.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\core\UUID.h">
-      <Filter>core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\Components\script\Player.h">
-      <Filter>world\Components\NativeScript</Filter>
-    </ClInclude>
-    <ClInclude Include="src\world\Components\script\NativeScript.h" />
-    <ClInclude Include="src\rendering\Mesh.h">
-      <Filter>rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\math\BoundingBox.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\Model.h">
+    <ClInclude Include="src\rendering\MeshFactory.h">
       <Filter>rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\ModelFactory.h">
+    <ClInclude Include="src\world\World.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\WorldSerializer.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Input.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\Material.h">
       <Filter>rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\rendering\Renderer.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\StaticMesh.h" />
+    <ClInclude Include="src\world\GameObject.h" />
+    <ClInclude Include="src\world\Components\Component.h" />
+    <ClInclude Include="src\world\Components\Transform.h" />
+    <ClInclude Include="src\core\Object.h" />
+    <ClInclude Include="src\world\Components\Camera.h" />
+    <ClInclude Include="src\graphics\ShaderManager.h" />
+    <ClInclude Include="src\resource\YamlHelper.h" />
+    <ClInclude Include="src\rendering\RenderDefs.h" />
+    <ClInclude Include="src\rendering\RenderPass.h" />
+    <ClInclude Include="src\world\Components\MeshRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -158,9 +135,6 @@
     </ClCompile>
     <ClCompile Include="src\resource\Resource.cpp">
       <Filter>resource</Filter>
-    </ClCompile>
-    <ClCompile Include="src\core\Object.cpp">
-      <Filter>core</Filter>
     </ClCompile>
     <ClCompile Include="src\resource\ResourceManager.cpp">
       <Filter>resource</Filter>
@@ -189,35 +163,8 @@
     <ClCompile Include="src\graphics\Graphics.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\Renderer.cpp">
-      <Filter>rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="src\input\Input.cpp">
-      <Filter>input</Filter>
-    </ClCompile>
     <ClCompile Include="src\core\Engine.cpp">
       <Filter>core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\GameObject.cpp">
-      <Filter>world</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\World.cpp">
-      <Filter>world</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\WorldManager.cpp">
-      <Filter>world</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\WorldSerializer.cpp">
-      <Filter>world</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\Components\Camera.cpp">
-      <Filter>world\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\Components\Component.cpp">
-      <Filter>world\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\Components\Transform.cpp">
-      <Filter>world\Components</Filter>
     </ClCompile>
     <ClCompile Include="src\graphics\RenderTexture.cpp">
       <Filter>graphics</Filter>
@@ -231,23 +178,35 @@
     <ClCompile Include="src\graphics\Texture.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\core\UUID.cpp">
-      <Filter>core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\world\Components\script\Player.cpp">
-      <Filter>world\Components\NativeScript</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\Mesh.cpp">
-      <Filter>rendering</Filter>
-    </ClCompile>
     <ClCompile Include="src\math\BoundingBox.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\Model.cpp">
+    <ClCompile Include="src\rendering\MeshFactory.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\ModelFactory.cpp">
+    <ClCompile Include="src\world\World.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\WorldSerializer.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Input.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\Material.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
+    <ClCompile Include="src\rendering\Renderer.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\StaticMesh.cpp" />
+    <ClCompile Include="src\world\GameObject.cpp" />
+    <ClCompile Include="src\world\Components\Transform.cpp" />
+    <ClCompile Include="src\core\Object.cpp" />
+    <ClCompile Include="src\world\Components\Component.cpp" />
+    <ClCompile Include="src\world\Components\Camera.cpp" />
+    <ClCompile Include="src\graphics\ShaderManager.cpp" />
+    <ClCompile Include="src\rendering\RenderPass.cpp" />
+    <ClCompile Include="src\world\Components\MeshRenderer.cpp" />
   </ItemGroup>
 </Project>

@@ -1,170 +1,143 @@
-
-#pragma once
+﻿#pragma once
 #include "Resource.h"
 #include "core/CoreDefs.h"
 #include "core/FileUtils.h"
 
 namespace Dive
 {
-	extern class ResourceManager* GResourceManager;
-
 	class ResourceManager
 	{
 	public:
-		static ResourceManager* GetInstance()
+		static void Clear();
+
+		template<class T>
+		static std::shared_ptr<T> Load(const std::filesystem::path& filepath)
 		{
-			std::call_once(s_OnceFlag, []()
-				{
-					s_pInstance = new ResourceManager;
-				});
-			return s_pInstance;
-		}
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
 
-		void Shutdown();
-
-		template<class T>
-		std::shared_ptr<T> Load(const std::filesystem::path& filepath);
-
-		template<class T>
-		std::shared_ptr<T> GetByName(const std::string& name);
-
-		template<class T>
-		std::shared_ptr<T> GetByPath(const std::filesystem::path& filepath);
-
-		template<class T>
-		std::vector<std::shared_ptr<T>> GetByType();
-
-		template<class T>
-		uint32_t GetResourceCount();
-		uint32_t GetAllResourceCount();
-		
-		template<class T>
-		bool IsCached(const std::string& filepath);
-		bool IsCached(uint64_t id);
-		
-	private:
-		ResourceManager() = default;
-		~ResourceManager() = default;
-
-	private:
-		static ResourceManager* s_pInstance;
-		static std::once_flag s_OnceFlag;
-
-		std::mutex m_Mutex;
-		std::unordered_map<size_t, std::vector<std::shared_ptr<Resource>>> m_Resources;
-	};
-
-	template<class T>
-	std::shared_ptr<T> ResourceManager::Load(const std::filesystem::path& filepath)
-	{
-		std::lock_guard<std::mutex> guard(m_Mutex);
-
-		auto it = m_Resources.find(T::GetTypeHashStatic());
-		if (it != m_Resources.end())
-		{
-			for (const auto& resource : it->second)
+			auto it = s_Resources.find(T::GetType());
+			if (it != s_Resources.end())
 			{
-				if (resource->GetFilepath() == filepath)
+				for (const auto& resource : it->second)
 				{
-					return std::dynamic_pointer_cast<T>(resource);
+					if (resource->GetFilepath() == filepath)
+						return std::static_pointer_cast<T>(resource);
 				}
 			}
+			auto resource = std::make_shared<T>();
+			resource->LoadFromFile(filepath);
+			s_Resources[T::GetType()].push_back(resource);
+			return resource;
 		}
 
-		auto resource = std::make_shared<T>();
-		resource->LoadFromFile(filepath);
-
-		m_Resources[T::GetTypeHashStatic()].push_back(std::static_pointer_cast<Resource>(resource));
-
-		return resource;
-	}
-
-	template<class T>
-	std::shared_ptr<T> ResourceManager::GetByName(const std::string& name)
-	{
-		std::lock_guard<std::mutex> guard(m_Mutex);
-
-		auto it = m_Resources.find(T::GetTypeHashStatic());
-		if (it != m_Resources.end())
+		template<class T>
+		static std::shared_ptr<T> GetByName(const std::string& name)
 		{
-			for (const auto& resource : it->second)
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
+			if (it != s_Resources.end())
 			{
-				if (resource->GetName() == name)
-					return std::dynamic_pointer_cast<T>(resource);
+				for (const auto& resource : it->second)
+				{
+					if (resource->GetName() == name)
+						return std::dynamic_pointer_cast<T>(resource);
+				}
+			}
+			return nullptr;
+		}
+
+		template<class T>
+		static std::shared_ptr<T> GetByPath(const std::filesystem::path& filepath)
+		{
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
+			if (it != s_Resources.end())
+			{
+				for (const auto& resource : it->second)
+				{
+					if (resource->GetFilepath() == filepath)
+					{
+						return static_cast<std::shared_ptr<T>>(resource);
+					}
+				}
+			}
+			return nullptr;
+		}
+
+		template<class T>
+		static std::vector<std::shared_ptr<T>> GetByType()
+		{
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
+			if (it != s_Resources.end())
+			{
+				std::vector<std::shared_ptr<T>> resources;
+				resources.reserve(it->second.size());
+				for (const auto& resource : it->second)
+				{
+					resources.push_back(static_cast<std::shared_ptr<T>>(resource));
+				}
+				return resources;
+			}
+			return {};
+		}
+
+		template<class T>
+		static bool IsCached(const std::string& filepath)
+		{
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
+			if (it != s_Resources.end())
+			{
+				for (const auto& resource : it->second)
+				{
+					if (resource->GetFilepath() == filepath)
+					{
+						return true;
+					}
+				}
+			}
+			return false;
+		}
+
+		static bool IsCahed(UINT64 instanceID);
+
+		template<class T>
+		static INT32 GetResourceCount()
+		{
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			auto it = s_Resources.find(T::GetType());
+			if (it != s_Resources.end())
+			{
+				return static_cast<INT32>(it->second.size());
+			}
+			return 0;
+		}
+
+		template<class T>
+		static void RegisterResource(std::shared_ptr<T> resource)
+		{
+			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+
+			if (resource)
+			{
+				s_Resources[T::GetType()].push_back(resource);
+				resource->SetFilepath(s_ResourceFolder / resource->GetName());
 			}
 		}
 
-		return nullptr;
-	}
+		static INT32 GetAllResourceCount();
 
-	template<class T>
-	std::shared_ptr<T> ResourceManager::GetByPath(const std::filesystem::path& filepath)
-	{
-		std::lock_guard<std::mutex> guard(m_Mutex);
+		static std::string GetResourceFolder() { return s_ResourceFolder.string(); }
+		static void SetResourceFolder(const std::filesystem::path& path);
 
-		auto it = m_Resources.find(T::GetTypeHashStatic());
-		if (it != m_Resources.end())
-		{
-			for (const auto& resource : it->second)
-			{
-				if (resource->GetFilepath() == filepath)
-					return std::dynamic_pointer_cast<T>(resource);
-			}
-		}
-
-		return nullptr;
-	}
-
-	template<class T>
-	std::vector<std::shared_ptr<T>> ResourceManager::GetByType()
-	{
-		std::lock_guard<std::mutex> guard(m_Mutex);
-
-		auto it = m_Resources.find(T::GetTypeHashStatic());
-		if (it != m_Resources.end())
-		{
-			std::vector<std::shared_ptr<T>> resources;
-			resources.reserve(it->second.size());
-			for (const auto& resource : it->second)
-			{
-				resources.push_back(std::dynamic_pointer_cast<T>(resource));
-			}
-
-			return resources;
-		}
-
-		return {};
-	}
-
-	template<class T>
-	uint32_t ResourceManager::GetResourceCount()
-	{
-		std::lock_guard<std::mutex> guard(m_Mutex);
-
-		auto it = m_Resources.find(T::GetTypeHashStatic());
-		if (it != m_Resources.end())
-		{
-			return static_cast<uint32_t>(it->second.size());
-		}
-
-		return 0;
-	}
-
-	template<class T>
-	bool ResourceManager::IsCached(const std::string& filepath)
-	{
-		std::lock_guard<std::mutex> guard(m_Mutex);
-
-		auto it = m_Resources.find(T::GetTypeHashStatic());
-		if (it != m_Resources.end())
-		{
-			for (const auto& resource : it->second)
-			{
-				if (resource->GetFilepath() == filepath)
-					return true;
-			}
-		}
-
-		return false;
-	}
+	private:
+		static std::unordered_map<eResourceType, std::vector<std::shared_ptr<Resource>>> s_Resources;
+		static std::filesystem::path s_ResourceFolder;
+	};
 }

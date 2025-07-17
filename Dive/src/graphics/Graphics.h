@@ -1,8 +1,14 @@
-#pragma once
+﻿#pragma once
 #include "core/EventDispatcher.h"
 
 namespace Dive
 {
+	class Shader;
+	class RenderTexture;
+	class VertexBuffer;
+	class IndexBuffer;
+	class ConstantBuffer;
+
 	class Graphics
 	{
 	public:
@@ -19,8 +25,8 @@ namespace Dive
 		static ID3D11Device* GetDevice();
 		static ID3D11DeviceContext* GetDeviceContext();
 
-		static ID3D11RenderTargetView* GetBackbufferRTV();
-		static ID3D11DepthStencilView* GetBackbufferDSV();
+		static ID3D11RenderTargetView* GetBackBufferRTV();
+		static ID3D11DepthStencilView* GetBackBufferDSV();
 
 		static uint32_t GetResolutionWidth() { return s_ResolutionWidth; }
 		static uint32_t GetResolutionHeight() { return s_ResolutionHeight; }
@@ -32,16 +38,16 @@ namespace Dive
 		static void updateBackbuffer();
 
 	private:
-		static IDXGISwapChain* s_SwapChain;
-		static ID3D11Device* s_Device;
-		static ID3D11DeviceContext* s_DeviceContext;
-
-		static ID3D11RenderTargetView* s_RenderTargetView;
-		static ID3D11Texture2D* s_DepthStencilTexture;
-		static ID3D11DepthStencilView* s_DEpthStencilView;
-
 		static uint32_t s_ResolutionWidth;
 		static uint32_t s_ResolutionHeight;
 		static bool s_UseVSync;
+
+		static Microsoft::WRL::ComPtr<IDXGISwapChain> s_SwapChain;
+		static Microsoft::WRL::ComPtr<ID3D11Device> s_Device;
+		static Microsoft::WRL::ComPtr<ID3D11DeviceContext> s_DeviceContext;
+
+		static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> s_BackBufferRTV;
+		static Microsoft::WRL::ComPtr<ID3D11Texture2D> s_BackbufferTexture;
+		static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> s_BackBufferDSV;
 	};
 }

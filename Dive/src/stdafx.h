@@ -1,13 +1,16 @@
-#pragma once
+ï»¿#pragma once
 
-// ÇöÀç timeGetTimeÀ» À§ÇØ ÁÖ¼®Ã³¸®
-//#define WIN32_LEAN_AND_MEAN             // °ÅÀÇ »ç¿ëµÇÁö ¾Ê´Â ³»¿ëÀ» Windows Çì´õ¿¡¼­ Á¦¿ÜÇÕ´Ï´Ù.
+// í˜„ì¬ timeGetTimeì„ ìœ„í•´ ì£¼ì„ì²˜ë¦¬
+//#define WIN32_LEAN_AND_MEAN             // ê±°ì˜ ì‚¬ìš©ë˜ì§€ ì•ŠëŠ” ë‚´ìš©ì„ Windows í—¤ë”ì—ì„œ ì œì™¸í•©ë‹ˆë‹¤.
 #define DIRECTINPUT_VERSION 0x0800
 
+// ë‘ êµ°ë° ì´ìƒì—ì„œ ì‚¬ìš©í•˜ëŠ” ê²ƒë§Œìœ¼ë¡œ ì¶”ë ¤ë³´ì.
 #include <iostream>
 #include <string>
 #include <atlconv.h>
 #include <memory>
+#include <typeindex>
+#include <type_traits>
 #include <chrono>
 #include <random>
 #include <functional>
@@ -44,3 +47,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
+
+#include "core/CoreDefs.h"
+#include "core/Log.h"
+

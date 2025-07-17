@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Math.h"
 
 namespace Dive
@@ -42,23 +42,86 @@ namespace Dive
 		return biTangent;
 	}
 
-	DirectX::XMFLOAT3 Math::QuaternionToEuler(const DirectX::XMVECTOR& quaternion)
+	DirectX::XMFLOAT3 Math::QuaternionToDegrees(const DirectX::XMFLOAT4& quaternion)
 	{
-		DirectX::XMFLOAT3 euler;
+		auto radians = QuaternionToRadians(quaternion);
 
-		float q0 = DirectX::XMVectorGetW(quaternion);
-		float q1 = DirectX::XMVectorGetX(quaternion);
-		float q2 = DirectX::XMVectorGetY(quaternion);
-		float q3 = DirectX::XMVectorGetZ(quaternion);
+		return { 
+			DirectX::XMConvertToDegrees(radians.x),
+			DirectX::XMConvertToDegrees(radians.y),
+			DirectX::XMConvertToDegrees(radians.z) 
+		};
+	}
 
-		float roll = atan2f(2.0f * (q0 * q1 + q2 * q3), 1.0f - 2.0f * (q1 * q1 + q2 * q2));
-		float pitch = asinf(2.0f * (q0 * q2 - q3 * q1));
-		float yaw = atan2f(2.0f * (q0 * q3 + q1 * q2), 1.0f - 2.0f * (q2 * q2 + q3 * q3));
+	DirectX::XMFLOAT4 Math::DegreesToQuaternion(const DirectX::XMFLOAT3& degrees)
+	{
+		DirectX::XMFLOAT3 radians{
+			DirectX::XMConvertToRadians(degrees.x),
+			DirectX::XMConvertToRadians(degrees.y),
+			DirectX::XMConvertToRadians(degrees.z)
+		};
+		return RadiansToQuaternion(radians);
+	}
 
-		euler.x = DirectX::XMConvertToDegrees(roll);
-		euler.y = DirectX::XMConvertToDegrees(pitch);
-		euler.z = DirectX::XMConvertToDegrees(yaw);
+	DirectX::XMFLOAT3 Math::QuaternionToRadians(const DirectX::XMFLOAT4& quaternion)
+	{
+		DirectX::XMVECTOR quat = DirectX::XMQuaternionNormalize(DirectX::XMLoadFloat4(&quaternion));
+		DirectX::XMMATRIX rotationMatrix = DirectX::XMMatrixRotationQuaternion(quat);
 
-		return euler;
+		float pitch = std::atan2(rotationMatrix.r[1].m128_f32[2], rotationMatrix.r[2].m128_f32[2]);
+		float yaw = std::atan2(-rotationMatrix.r[0].m128_f32[2],
+			std::sqrt(rotationMatrix.r[1].m128_f32[2] * rotationMatrix.r[1].m128_f32[2] +
+				rotationMatrix.r[2].m128_f32[2] * rotationMatrix.r[2].m128_f32[2]));
+		float roll = std::atan2(rotationMatrix.r[0].m128_f32[1], rotationMatrix.r[0].m128_f32[0]);
+
+		pitch = (std::fabs(pitch) < 1e-6) ? 0.0f : pitch;
+		yaw = (std::fabs(yaw) < 1e-6) ? 0.0f : yaw;
+		roll = (std::fabs(roll) < 1e-6) ? 0.0f : roll;
+
+		return { pitch, yaw, roll };
+	}
+
+	DirectX::XMFLOAT4 Math::RadiansToQuaternion(const DirectX::XMFLOAT3& radians)
+	{
+		auto rotation = DirectX::XMQuaternionRotationRollPitchYaw(radians.x, radians.y, radians.z);
+		rotation = DirectX::XMQuaternionNormalize(rotation);
+
+		DirectX::XMFLOAT4 quaternion;
+		DirectX::XMStoreFloat4(&quaternion, rotation);
+
+		return quaternion;
+	}
+
+	DirectX::XMFLOAT3 Math::GetPositionFromTransform(const DirectX::XMFLOAT4X4& transform)
+	{
+		DirectX::XMVECTOR pos, rot, scl;
+		DirectX::XMMatrixDecompose(&scl, &rot, &pos, DirectX::XMLoadFloat4x4(&transform));
+
+		DirectX::XMFLOAT3 position;
+		DirectX::XMStoreFloat3(&position, pos);
+		
+		return position;
+	}
+	
+	DirectX::XMFLOAT4 Math::GetRotationFromTransform(const DirectX::XMFLOAT4X4& transform)
+	{
+		DirectX::XMVECTOR pos, rot, scl;
+		DirectX::XMMatrixDecompose(&scl, &rot, &pos, DirectX::XMLoadFloat4x4(&transform));
+
+		DirectX::XMFLOAT4 rotation;
+		DirectX::XMStoreFloat4(&rotation, rot);
+
+		return rotation;
+	}
+	
+	DirectX::XMFLOAT3 Math::GetScaleFromTransform(const DirectX::XMFLOAT4X4& transform)
+	{
+		DirectX::XMVECTOR pos, rot, scl;
+		DirectX::XMMatrixDecompose(&scl, &rot, &pos, DirectX::XMLoadFloat4x4(&transform));
+
+		DirectX::XMFLOAT3 scale;
+		DirectX::XMStoreFloat3(&scale, scl);
+
+		return scale;
 	}
 }

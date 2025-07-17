@@ -1,78 +1,117 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "GameObject.h"
-#include "Core/CoreDefs.h"
-#include "core/EventDispatcher.h"
-#include "Components/Component.h"
-#include "Components/Transform.h"
-#include "Components/Camera.h"
+#include "World.h"
+#include "components/Transform.h"
 
 namespace Dive
 {
-	GameObject::GameObject(World* world, const std::string& name)
-		: m_Name(name)
-		, m_World(world)
-		, m_Transform(AddComponent<Transform>())
+	GameObject::GameObject(const std::string& name)
+		: Object(name)
+		, m_World(WorldManager::GetActiveWorld())
 	{
+		DV_LOG(GameObject, info, "ÏÉùÏÑ± - {}, {}", GetName(), GetInstanceID());
 	}
 
 	GameObject::~GameObject()
 	{
-		for (auto& it : m_Components)
-			DV_DELETE(it.second);
+		m_Components.clear();
 
-		DV_LOG(GameObject, debug, "deleted gameObject: {}", GetName());
+		DV_LOG(GameObject, info, "ÏÜåÎ©∏ - {}, {}", GetName(), GetInstanceID());
+	}
+
+	void GameObject::Destory()
+	{
+		if (m_IsDestroyed) return;
+		m_IsDestroyed = true;
+	
+		// ÏñïÏùÄ Î≥µÏÇ¨
+		auto children = GetTransform()->GetChildren();
+		for (auto child : children)
+		{
+			if (auto childGO = child->GetGameObject())
+				childGO->Destory();
+		}
+
+		if (GetTransform()->HasParent())
+		{ 
+			auto& sibling = GetTransform()->GetParent()->GetChildren();
+			auto it = std::find(sibling.begin(), sibling.end(), GetTransform());
+			if (it != sibling.end())
+				sibling.erase(it);
+		}
+		else
+			m_World->DetachRoot(this);
+
+		m_World->QueueDestroy(this);
 	}
 
 	void GameObject::Update()
 	{
-		if (!m_IsActive)
+		if (!m_ActiveHierarchy || m_IsDestroyed)
 			return;
 
-		for (auto& it : m_Components)
-			it.second->Update();
-	}
-
-	void GameObject::SetName(const std::string& name)
-	{
-		if (m_Name != name)
+		for (auto& [type, component] : m_Components)
 		{
-			m_Name = name;
-			DV_FIRE_EVENT(eEventType::WorldModified);
+			component->Update();
 		}
 	}
 
-	bool GameObject::AddComponent(Component* component)
+	void GameObject::RemoveComponentByType(eComponentType type)
 	{
-		DV_ASSERT(GameObject, component != nullptr);
-
-		size_t typeHash = component->GetTypeHash();
-		if(m_Components.find(typeHash)!= m_Components.end())
-			return false;
-
-		m_Components[typeHash] = component;
-		component->SetGameObject(this);
-
-		return true;
-	}
-
-	bool GameObject::HashComponent(size_t typeHash) const
-	{
-		auto it = m_Components.find(typeHash);
-		return it != m_Components.end();
-	}
-
-	Component* GameObject::GetComponent(size_t typeHash) const
-	{
-		auto it = m_Components.find(typeHash);
+		if (!HasComponentByType(type))
+		{
+			DV_LOG(GameObject, warn, "Component of type hash {} does not exist on GameObject '{}'.", (int)type, GetName());
+			return;
+		}
+		auto it = m_Components.find(type);
 		if (it != m_Components.end())
-			return it->second;
+		{
+			it->second.reset();
+			m_Components.erase(it);
+		}
+		else
+		{
+			DV_LOG(GameObject, warn, "Failed to remove component of type hash {} from GameObject '{}'.", (int)type, GetName());
+		}
+	}
+
+	bool GameObject::HasComponentByType(eComponentType type) const
+	{
+		return m_Components.find(type) != m_Components.end();
+	}
+
+	Component* GameObject::GetComponentByType(eComponentType type) const
+	{
+		auto it = m_Components.find(type);
+		if (it != m_Components.end())
+			return it->second.get();
 
 		return nullptr;
 	}
 
-	// CameraøÕ MeshRenderer√≥∑≥ ¿Ø»ø«œ¡ˆ æ ¿∫ ¡∂«’¿ª ∞…∑Ø≥ªæﬂ «—¥Ÿ.
-	bool GameObject::ComponentValidator(GameObject* gameObject, Component* component)
+	Transform* GameObject::GetTransform() const
 	{
-		return false;
+		return GetComponent<Transform>();
+	}
+	
+	void GameObject::SetActive(bool value)
+	{
+		m_ActiveSelf = value;
+		bool parentHierarchy = GetTransform()->HasParent() ? 
+			GetTransform()->GetParent()->GetGameObject()->m_ActiveHierarchy : true;
+
+		updateActiveInHierarchy(parentHierarchy);
+	}
+
+	void GameObject::updateActiveInHierarchy(bool parentHierarchy)
+	{
+		m_ActiveHierarchy = parentHierarchy && m_ActiveSelf;
+
+		const auto& children = GetTransform()->GetChildren();
+		for (auto child : children)
+		{
+			auto owner = child->GetGameObject();
+			owner->updateActiveInHierarchy(m_ActiveHierarchy);
+		}
 	}
 }

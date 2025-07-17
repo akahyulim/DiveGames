@@ -1,12 +1,13 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Engine.h"
 #include "CoreDefs.h"
 #include "Window.h"
+#include "Input.h"
 #include "graphics/Graphics.h"
-#include "input/Input.h"
+#include "graphics/ShaderManager.h"
 #include "rendering/Renderer.h"
 #include "world/World.h"
-#include "world/WorldManager.h"
+#include "resource/ResourceManager.h"
 
 namespace Dive
 {
@@ -14,28 +15,37 @@ namespace Dive
 	float Engine::s_DeltaTimeMS = 0.0f;
 	std::chrono::steady_clock::time_point Engine::s_LastTickTime;
 	uint16_t Engine::s_Fps = 0;
+	uint64_t Engine::s_FrameCount = 0;
 
-	// sprtanÀº editor·ÎºÎÅÍ args¸¦ ¹Þ´Â´Ù.
 	void Engine::Initialize()
 	{
+		DV_LOG(Engine, info, "ì´ˆê¸°í™” ì‹œìž‘ ---------------------------------------");
+
 		Window::Initialize();
 		Graphics::Initialize();
+		ShaderManager::Initialize();
 		Renderer::Initialize();
 		Input::Initialize();
 
 		s_LastTickTime = std::chrono::steady_clock::now();
 
-		DV_LOG(Engine, trace, "ÃÊ±âÈ­ ¼º°ø");
+		DV_LOG(Engine, info, "ì´ˆê¸°í™” ì™„ë£Œ ---------------------------------------");
 	}
 
 	void Engine::Shutdown()
 	{
+		DV_LOG(Engine, info, "ì…§ë‹¤ìš´ ì‹œìž‘ ---------------------------------------");
+
+		WorldManager::Clear();
+		ResourceManager::Clear();
 		Input::Shutdown();
 		Renderer::Shutdown();
 		Graphics::Shutdown();
 		Window::Shutdown();
 
-		DV_LOG(Engine, trace, "¼Ë´Ù¿î ¼º°ø");
+		DV_LOG(Engine, info, "ì…§ë‹¤ìš´ ì™„ë£Œ ---------------------------------------");
+
+		// í˜„ìž¬ ë¬¸ì œì—†ì´ ì¢…ë£Œëœë‹¤.
 		LogManager::Shutdown();
 	}
 
@@ -56,35 +66,11 @@ namespace Dive
 			lastTimeMS = s_ElapsedTimeMS;
 		}
 
-		Input::Tick();
-		auto activeWorld = WorldManager::GetActiveWorld();
-		if(activeWorld)
-			activeWorld->Update();
-		Renderer::Tick();
-	}
+		if (WorldManager::GetActiveWorld())
+			WorldManager::GetActiveWorld()->Update();
 
-	double Engine::GetElapsedTimeMS()
-	{
-		return s_ElapsedTimeMS;
-	}
+		Renderer::OnUpdate();
 
-	double Engine::GetElapsedTimeSec()
-	{
-		return s_ElapsedTimeMS / 1000.0;
-	}
-
-	float Engine::GetDeltaTimeMS()
-	{
-		return s_DeltaTimeMS;
-	}
-
-	float Engine::GetDeltaTimeSec()
-	{
-		return s_DeltaTimeMS / 1000.0f;
-	}
-
-	uint16_t Engine::GetFps()
-	{
-		return s_Fps;
+		s_FrameCount++;
 	}
 }

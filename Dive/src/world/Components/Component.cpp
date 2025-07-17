@@ -1,7 +1,6 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Component.h"
-#include "Core/CoreDefs.h"
-#include "World/GameObject.h"
+#include "../GameObject.h"
 
 namespace Dive
 {
@@ -10,13 +9,15 @@ namespace Dive
 	{
 	}
 
-	std::string Component::GetName() const
+	std::string Component::GetName()
 	{
+		assert(m_GameObject);
 		return m_GameObject->GetName();
 	}
 
 	GameObject* Component::GetGameObject() const
 	{
+		assert(m_GameObject);
 		return m_GameObject;
 	}
 }

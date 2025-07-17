@@ -1,94 +1,95 @@
-#pragma once
-#include "Core/Object.h"
-#include "World.h"
+癤�#pragma once
+#include "core/Object.h"
+#include "components/Component.h"
 
 namespace Dive
 {
 	class World;
-	class Component;
 	class Transform;
-	
-	class GameObject
+
+	// https://docs.unity3d.com/ScriptReference/GameObject.html
+	class GameObject : public Object//, public std::enable_shared_from_this<GameObject>
 	{
 	public:
-		GameObject(World* world, const std::string& name);
-		~GameObject();
+		GameObject(const std::string& name);
+		~GameObject() override;
+
+		void Destory();
 
 		void Update();
-
-		void SetName(const std::string& name);
-		const std::string& GetName() const { return m_Name; }
-
-		const std::string& GetTag() const { return m_Tag; }
-		void SetTag(const std::string& tag) { m_Tag = tag; }
-
-		void SetID(UINT64 id) { m_ID = id; }
-		UINT64 GetID() const { return m_ID; }
-
-		bool IsActive() const { return m_IsActive; }
-		void SetActive(bool active) { m_IsActive = active; }
-
-		const Transform* GetTransform() const { return m_Transform; }	// 읽기 전용으로 전달
-
-		World* GetWorld() { return m_World; }
-
-		template<class T> T* AddComponent();
-		bool AddComponent(Component* component);
-
-		template<class T> bool HasComponent();
-		bool HashComponent(size_t typeHash) const;
 		
-		template<class T> T* GetComponent() const;
-		Component* GetComponent(size_t typeHash) const;
+		bool IsDestroyed() const { return m_IsDestroyed; }
 
-		static bool ComponentValidator(GameObject* gameObject, Component* component);
+		void SetTag(const std::string& tag) { m_Tag = tag; }
+		std::string GetTag() const { return m_Tag; }
+		bool CompareTag(const std::string& tag) const { return m_Tag == tag; }
 
-		// static
-		// Find : 이름으로 찾는 건데 좀 더 알아보자.
-		// FindGameObjectWithTag : 활성화됨 오브젝트 배열 리턴
-		// FindWithTag : 첫 번째 활성화된 게임 오브젝트 리턴
-		// GetWorld : 자신이 포함된 scene이라는데... 좀 더 알아보자.
+		void SetActive(bool value);
+		bool IsActiveSelf() const { return m_ActiveSelf; }
+		bool IsActiveHierarchy() const { return m_ActiveHierarchy; }
+
+		template<typename T> T* AddComponent();
+
+		template<typename T> void RemoveComponent();
+		void RemoveComponentByType(eComponentType type);
+
+		template<typename T> bool HasComponent() const;
+		bool HasComponentByType(eComponentType type) const;
+
+		template<typename T> T* GetComponent() const;
+		Component* GetComponentByType(eComponentType type) const;
+
+		Transform* GetTransform() const;
+
+		World* GetWorld() const { return m_World; }
 
 	private:
-		std::string m_Name;
-		UINT64 m_ID = 0;
+		void updateActiveInHierarchy(bool parentHierarchy);
 
+	private:
+		bool m_IsDestroyed = false;
+		
 		std::string m_Tag = "Untagged";
+		// layer
+		
+		bool m_ActiveSelf = true;
+		bool m_ActiveHierarchy = true;
 
-		World* m_World;
-		bool m_IsActive = true;
-		std::unordered_map<size_t, Component*> m_Components;
+		World* m_World = nullptr;
 
-		const Transform* const m_Transform;	// 읽기 전용
+		std::unordered_map<eComponentType, std::unique_ptr<Component>> m_Components;
 	};
 
-	template<class T>
+	template<typename T>
 	T* GameObject::AddComponent()
 	{
-		auto existed = GetComponent<T>();
-		if (existed)
-			return existed;
-		
-		auto component = new T(this);
-		m_Components[T::GetTypeHashStatic()] = static_cast<Component*>(component);
+		static_assert(std::is_base_of<Component, T>::value, "T must be derived from Component");
 
-		return component;
+		auto type = T::GetType();
+		if (!HasComponentByType(type))
+			m_Components[type] = std::make_unique<T>(this);
+
+		return static_cast<T*>(m_Components[type].get());
 	}
 
-	template<class T>
-	bool GameObject::HasComponent()
+	template<typename T>
+	void GameObject::RemoveComponent()
 	{
-		auto it = m_Components.find(T::GetTypeHashStatic());
-		return it != m_Components.end();
+		static_assert(std::is_base_of<Component, T>::value, "T must be derived from Component");
+		RemoveComponentByType(T::GetType());
 	}
 
-	template<class T>
+	template<typename T>
+	bool GameObject::HasComponent() const
+	{
+		static_assert(std::is_base_of<Component, T>::value, "T must be derived from Component");
+		return HasComponentByType(T::GetType());
+	}
+
+	template<typename T>
 	T* GameObject::GetComponent() const
 	{
-		auto it = m_Components.find(T::GetTypeHashStatic());
-		if (it != m_Components.end())
-			return dynamic_cast<T*>(it->second);
-
-		return nullptr;
+		static_assert(std::is_base_of<Component, T>::value, "T must be derived from Component");
+		return static_cast<T*>(GetComponentByType(T::GetType()));
 	}
 }

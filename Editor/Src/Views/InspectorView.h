@@ -1,4 +1,4 @@
-#pragma once
+癤�#pragma once
 #include "View.h"
 
 namespace Dive
@@ -11,10 +11,17 @@ namespace Dive
 
 		void drawView() override;
 
-		static void Inspect(GameObject* gameObject);
-		// 머티리얼 버전도 있다.
+	private:
+		//template<typename T>
+		//void displayAddComponentEntry(const std::string& entryName);
 
 	private:
-		static GameObject* s_InspectedGameObject;
+		std::vector<std::string> m_TagList;
 	};
+
+	//template<typename T>
+	//void InspectorView::displayAddComponentEntry(const std::string& entryName)
+	//{
+
+	//}
 }

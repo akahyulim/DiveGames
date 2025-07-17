@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "RenderTexture.h"
 #include "core/CoreDefs.h"
 
@@ -10,6 +10,8 @@ namespace Dive
 		m_Format = format;
 		m_DepthFormat = depth;
 		m_UseMips = useMips;
+
+		SetName("RenderTexture");
 	}
 
 	RenderTexture::~RenderTexture()
@@ -21,7 +23,7 @@ namespace Dive
 	{
 		if (m_Format == DXGI_FORMAT_UNKNOWN)
 		{
-			DV_LOG(RenderTexture, err, "RenderTexture °´Ã¼ µ¥ÀÌÅÍ ¹Ì¼³Á¤");
+			DV_LOG(RenderTexture, err, "RenderTexture ê°ì²´ ë°ì´í„° ë¯¸ì„¤ì •");
 			return false;
 		}
 
@@ -29,7 +31,10 @@ namespace Dive
 
 		m_MipLevels = CanGenerateMips(m_Format) ? (m_UseMips ? CalculateMipmapLevels(m_Width, m_Height) : 1) : 1;
 
-		// render target
+		// í˜„ì¬ ì½”ë“œëŠ” ìœ ë‹ˆí‹°ì˜ RenderTexture apië¥¼ ë”°ë¥¸ ê²ƒì´ë‹¤.
+		// ë”°ë¼ì„œ depthì˜ ìœ ë¬´ì— ë§ì¶° ë Œë” íƒ€ê²Ÿ, ë Œë” íƒ€ê²Ÿ + ê¹Šì´ ë²„í¼ë¡œ ìƒì„±ëœë‹¤.
+		// ê·¸ëŸ¬ë‚˜ ê²½ìš°ì— ë”°ë¼ì„  ê¹Šì´ ë²„í¼(+ë¦¬ì†ŒìŠ¤ ë·°)ë§Œ ìƒì„±ì´ í•„ìš”í•œ ìƒí™©ë„ ì¡´ì¬í•œë‹¤.
+		// ì˜ˆë¥¼ë“¤ë©´ GBufferì˜ ê²½ìš°ê°€ ê·¸ë ‡ë‹¤.
 		{
 			{
 				D3D11_TEXTURE2D_DESC desc{};
@@ -45,7 +50,7 @@ namespace Dive
 
 				if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_Texture2D)))
 				{
-					DV_LOG(RenderTexture, err, "RenderTarget Texture »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "RenderTarget Texture ìƒì„± ì‹¤íŒ¨");
 					return false;
 				}
 			}
@@ -59,7 +64,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateRenderTargetView(
 					static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_RenderTargetView)))
 				{
-					DV_LOG(RenderTexture, err, "RenderTarget View »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "RenderTarget View ìƒì„± ì‹¤íŒ¨");
 					Release();
 					return false;
 				}
@@ -75,7 +80,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(
 					static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_ShaderResourceView)))
 				{
-					DV_LOG(RenderTexture, err, "RenderTarget ShaderResourceView »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "RenderTarget ShaderResourceView ìƒì„± ì‹¤íŒ¨");
 					Release();
 					return false;
 				}
@@ -86,9 +91,7 @@ namespace Dive
 				Graphics::GetDeviceContext()->GenerateMips(m_ShaderResourceView);
 			}
 		}
-
-		// m_DepthFormat stencil
-		if (m_DepthFormat != eDepthFormat::None)
+		if(m_DepthFormat != eDepthFormat::None)
 		{
 			{
 				D3D11_TEXTURE2D_DESC desc{};
@@ -103,7 +106,7 @@ namespace Dive
 
 				if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_DepthStencilTexture2D)))
 				{
-					DV_LOG(RenderTexture, err, "Depth/Stencil Texture »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "Depth/Stencil Texture ìƒì„± ì‹¤íŒ¨");
 					return false;
 				}
 			}
@@ -117,7 +120,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateDepthStencilView(
 					static_cast<ID3D11Resource*>(m_DepthStencilTexture2D), &desc, &m_DepthStencilView)))
 				{
-					DV_LOG(RenderTexture, err, "Depth/Stencil View »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "Depth/Stencil View ìƒì„± ì‹¤íŒ¨");
 					Release();
 					return false;
 				}
@@ -133,7 +136,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(
 					static_cast<ID3D11Resource*>(m_DepthStencilTexture2D), &desc, &m_DepthStencilShaderResourceView)))
 				{
-					DV_LOG(RenderTexture, err, "Depth/Stencil ShaderResourceView »ı¼º ½ÇÆĞ");
+					DV_LOG(RenderTexture, err, "Depth/Stencil ShaderResourceView ìƒì„± ì‹¤íŒ¨");
 					Release();
 					return false;
 				}

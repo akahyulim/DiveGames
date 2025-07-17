@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #define DV_EVENT_HANDLER(function)						[this](Dive::EventData data) { function();}
 #define DV_EVENT_HANDLER_STATIC(function)				[](Dive::EventData data) { function();}
@@ -19,14 +19,12 @@ namespace Dive
 
 		PreRender, PostRender,
 
-		WorldCreated, WorldModified,
+		WorldCreated, WorldModified, 
 
 		Collision, Trigger, KeyPress,
 	};
 
-	class Scene;
-	class GameObject;
-	using EventData = std::variant<int, void*, GameObject*, std::shared_ptr<Scene>>;
+	using EventData = std::variant<int, void*>;
 
 	using EventListener = std::function<void(const EventData&)>;
 

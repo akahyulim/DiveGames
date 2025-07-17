@@ -1,75 +1,92 @@
-#pragma once
+ï»¿#pragma once
 #include "Component.h"
+#include "math/Frustum.h"
 
 namespace Dive
 {
 	class RenderTexture;
-	class ConstantBuffer;
 
+	enum class eProjectionType
+	{
+		Perspective,
+		Orthographic
+	};
+
+	// https://docs.unity3d.com/ScriptReference/Camera.html
 	class Camera : public Component
 	{
 	public:
-		// ÀÌ°Ç ¿Ö ¶Ç ¾È¿¡ ³Ö¾î³ù³Ä...
-		enum class eProjectionType
-		{
-			Perspective,
-			Orthographic
-		};
-
-		DV_CLASS(Camera, Component)
-
-	public:
 		Camera(GameObject* gameObject);
-		~Camera() override;
+		~Camera()override;
 
 		void Update() override;
 
-		// ¿Ö ÀÌ·¡ ³ùÀ»±î?
-		DirectX::XMFLOAT3 GetPosition();
-		DirectX::XMMATRIX GetSceneMatrix();
-		DirectX::XMMATRIX GetViewMatrix();
+		void Bind(ID3D11DeviceContext* deviceContext) const;
+
+		DirectX::XMFLOAT4X4 GetView() const;
+		DirectX::XMMATRIX GetViewMatrix() const;
+		DirectX::XMFLOAT4X4 GetProjection() const;
 		DirectX::XMMATRIX GetProjectionMatrix() const;
-		DirectX::XMMATRIX GetOrthographicProjMatrix() const;
-		DirectX::XMMATRIX GetPerspectiveProjMatrix() const;
 
 		eProjectionType GetProjectionType() const { return m_ProjectionType; }
 		void SetProjectionType(eProjectionType type) { m_ProjectionType = type; }
-
-		const DirectX::XMFLOAT4& GetBackgroundColor() const { return m_BackgroundColor; }
-		void SetBackgroundColor(float r, float g, float b, float a);
-
+		
 		float GetAspectRatio() const;
 
 		float GetFieldOfView() const { return m_FieldOfView; }
 		void SetFieldOfView(float fov);
 
 		float GetNearClipPlane() const { return m_NearClipPlane; }
-		void SetNearClipPlane(float nearPlane) { m_NearClipPlane = nearPlane; }
+		void SetNearClipPlane(float nearPlane);
 
 		float GetFarClipPlane() const { return m_FarClipPlane; }
-		void SetFarClipPlane(float farPlane) { m_FarClipPlane = farPlane; }
+		void SetFarClipPlane(float farPlane);
 
-		float GetMoveSpeed() const { return m_MoveSpeed; }
-		void SetMoveSpeed(float speed) { m_MoveSpeed = speed; }
-
-		float GetRotateSpeed() const { return m_RotateSpeed; }
-		void SetRotateSpeed(float speed) { m_RotateSpeed = speed; }
-
+		void GetViewportRect(float& outLeft, float& outTop, float& outRight, float& outBottom) const;
+		float GetViewportLeft() const { return m_ViewportLeft; }
+		float GetViewportTop() const { return m_ViewportTop; }
+		float GetViewportRight() const { return m_ViewportRight; }
+		float GetViewportBottom() const { return m_ViewportBottom; }
+		void SetViewportRect(float left, float top, float right, float bottom);
+		void SetViewportTop(float top);
+		void SetViewportLeft(float left);
+		void SetViewportRight(float right);
+		void SetViewportBottom(float bottom);
 		
-		std::shared_ptr<RenderTexture> GetRenderTexture() const { return m_RenderTexture; }
-		void SetRenderTexture(std::shared_ptr<RenderTexture> renderTexture) { m_RenderTexture = renderTexture; }
-		DirectX::XMUINT2 GetRenderTextureSize() const;
+		D3D11_VIEWPORT GetViewport() const;
 
-	protected:
+		const Frustum& GetFrustum() const { return m_Frustum; }
+
+		DirectX::XMFLOAT4 GetBackgroundColor() const { return m_BackgroundColor; }
+		void SetBackgroundColor(const DirectX::XMFLOAT4& color) { m_BackgroundColor = color; }
+
+		RenderTexture* GetRenderTarget() const;
+		void SetRenderTarget(RenderTexture* pRenderTarget) { m_RenderTarget = pRenderTarget; }
+
+		static constexpr eComponentType GetType() { return eComponentType::Camera; }
+
+		static std::vector<Camera*> GetAllCameras() { return s_AllCameras; }
+		static UINT32 GetAllCameraCount() { return static_cast<UINT32>(s_AllCameras.size()); }
+		static Camera* GetMainCamera();
+
+	private:
 		eProjectionType m_ProjectionType = eProjectionType::Perspective;
-
+				
 		float m_FieldOfView = 45.0f;
+
 		float m_NearClipPlane = 0.1f;
-		float m_FarClipPlane = 1000.0f;
-		float m_MoveSpeed = 10.0f;
-		float m_RotateSpeed = 50.0f;
+		float m_FarClipPlane = 5000.0f;
+
+		float m_ViewportTop = 0.0f;
+		float m_ViewportLeft = 0.0f;
+		float m_ViewportRight = 1.0f;
+		float m_ViewportBottom = 1.0f;
+
+		Frustum m_Frustum;
 
 		DirectX::XMFLOAT4 m_BackgroundColor = {1.0f, 1.0f, 1.0f, 1.0f};
-		std::shared_ptr<RenderTexture> m_RenderTexture;
+		RenderTexture* m_RenderTarget = nullptr;
+
+		static std::vector<Camera*> s_AllCameras;
 	};
 }

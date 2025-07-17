@@ -1,15 +1,24 @@
-#pragma once
+﻿#pragma once
 #include "core/Object.h"
 
 namespace Dive
 {
+	enum class eResourceType
+	{
+		Undefined,
+		Texture2D,
+		RenderTexture,
+		Cubemap,
+		StaticMesh,
+		SkinnedMesh,
+		Material
+	};
+
 	class Resource : public Object
 	{
-		DV_CLASS(Resource, Object)
-
 	public:
-		Resource() = default;
-		virtual ~Resource() = default;
+		Resource(const std::string& name = "Resource");
+		virtual ~Resource();
 
 		const std::filesystem::path& GetFilepath() const { return m_Filepath; }
 		void SetFilepath(const std::filesystem::path& path);
@@ -17,7 +26,9 @@ namespace Dive
 		virtual bool LoadFromFile(const std::filesystem::path& path) { return true; }
 		virtual bool SaveToFile(const std::filesystem::path& path) { return true; }
 
-	private:
-		std::filesystem::path m_Filepath;
+		static constexpr eResourceType GetType() { return eResourceType::Undefined; }
+
+	protected:
+		std::filesystem::path m_Filepath{};
 	};
 }

@@ -1,20 +1,19 @@
-#include "Editor.h"
+ï»¿#include "Editor.h"
 #include "MenuBar.h"
 #include "Views/WorldView.h"
 #include "Views/GameView.h"
 #include "Views/HierarchyView.h"
 #include "Views/InspectorView.h"
 #include "Views/LogView.h"
-#include "Views/ProjectView.h"
 
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
 
-constexpr float DEFAULT_FONT_SIZE = 19.0f;
+constexpr float DEFAULT_FONT_SIZE = 16.0f;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam);
 
-LRESULT CALLBACK DvEditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam)
 {
 	ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 
@@ -41,17 +40,21 @@ LRESULT CALLBACK DvEditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LP
 
 namespace Dive
 {
-	// mainÀ¸·ÎºÎÅÍ argc¸¦ ¹Ş¾Æ Ãß¸° ÈÄ ¿£Áø¿¡ Àü´ŞÇÑ´Ù.
+	World* EditorContext::ActiveWorld = nullptr;
+	GameObject* EditorContext::Selected = nullptr;
+	GameObject* EditorContext::EditorCamera = nullptr;
+	GameObject* EditorContext::MainCamera = nullptr;
+
+	// mainìœ¼ë¡œë¶€í„° argcë¥¼ ë°›ì•„ ì¶”ë¦° í›„ ì—”ì§„ì— ì „ë‹¬í•œë‹¤.
 	Editor::Editor()
-		: m_pActiveProject(nullptr)
 	{
-		// ÀÌ°Íµµ argc¿¡ Æ÷ÇÔ½ÃÄÑ ¿£Áø ÃÊ±âÈ­°úÁ¤¿¡ ÆíÀÔ½ÃÅ°´Â °Ô ¸Â´Ù.
+		// ì´ê²ƒë„ argcì— í¬í•¨ì‹œì¼œ ì—”ì§„ ì´ˆê¸°í™”ê³¼ì •ì— í¸ì…ì‹œí‚¤ëŠ” ê²Œ ë§ë‹¤.
 		LogManager::SetFilename("dive_editor.log");
 		Engine::Initialize();
-		Window::SetMessageCallback((LONG_PTR)DvEditorMessageHandler);
-		Window::Maximize();
+		Window::SetMessageCallback((LONG_PTR)EditorMessageHandler);
+		//Window::Maximize();
 
-		// ImGui ÃÊ±âÈ­
+		// ImGui ì´ˆê¸°í™”
 		{
 			// Setup Dear ImGui context
 			IMGUI_CHECKVERSION();
@@ -75,7 +78,7 @@ namespace Dive
 			ImGui_ImplWin32_Init(Window::GetWindowHandle());
 			ImGui_ImplDX11_Init(Graphics::GetDevice(), Graphics::GetDeviceContext());
 
-			// ½ºÅ¸ÀÏ ¼öÁ¤
+			// ìŠ¤íƒ€ì¼ ìˆ˜ì •
 			{
 				auto& colors = ImGui::GetStyle().Colors;
 				colors[ImGuiCol_WindowBg] = ImVec4{ 0.1f, 0.105f, 0.11f, 1.0f };
@@ -112,20 +115,21 @@ namespace Dive
 		loadResources();
 
 		// create widgets
-		m_Widgets.emplace_back(std::make_shared<WorldView>(this));
-		m_Widgets.emplace_back(std::make_shared<GameView>(this));
-		m_Widgets.emplace_back(std::make_shared<HierarchyView>(this));
-		m_Widgets.emplace_back(std::make_shared<InspectorView>(this));
-		m_Widgets.emplace_back(std::make_shared<LogView>(this));
-		m_Widgets.emplace_back(std::make_shared<ProjectView>(this));
-		MenuBar::Initialize(this);
+		m_Widgets.emplace_back(std::make_unique<WorldView>(this));
+		m_Widgets.emplace_back(std::make_unique<GameView>(this));
+		m_Widgets.emplace_back(std::make_unique<HierarchyView>(this));
+		m_Widgets.emplace_back(std::make_unique<InspectorView>(this));
+		//m_Widgets.emplace_back(std::make_unique<LogView>(this));
+		m_MenuBar = std::make_unique<MenuBar>(this);
 
 		SetTitle();
 	}
 
 	Editor::~Editor()
 	{
-		WorldManager::UnloadWorld();
+		for (auto& widget : m_Widgets)
+			widget.reset();
+		m_MenuBar.reset();
 
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
@@ -140,15 +144,17 @@ namespace Dive
 		{
 			Engine::Tick();
 
-			beginUI();
-
-			MenuBar::Draw();
-			for (auto& widget : m_Widgets)
 			{
-				widget->Draw();
+				beginUI();
+
+				m_MenuBar->Draw();
+				for (auto& widget : m_Widgets)
+					widget->Draw();
+
+				endUI();
 			}
 
-			endUI();
+			Graphics::Present();
 		}
 	}
 
@@ -168,13 +174,13 @@ namespace Dive
 		// FONTS
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.FontDefault = m_Fonts[static_cast<size_t>(eFontTypes::Normal)] =
-			io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
 		m_Fonts[static_cast<size_t>(eFontTypes::Bold)] =
-			io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
 		m_Fonts[static_cast<size_t>(eFontTypes::Large)] =
-			io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
 		m_Fonts[static_cast<size_t>(eFontTypes::Large_Bold)] =
-			io.Fonts->AddFontFromFileTTF("../../Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
+			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
 	}
 
 	void Editor::beginUI()
@@ -219,7 +225,7 @@ namespace Dive
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiStyle& style = ImGui::GetStyle();
 		float minWinSizeX = style.WindowMinSize.x;
-		style.WindowMinSize.x = 200.0f;	// dock space¿¡¼­ÀÇ ÃÖ¼Ò Å©±â...
+		style.WindowMinSize.x = 200.0f;	// dock spaceì—ì„œì˜ ìµœì†Œ í¬ê¸°...
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
@@ -232,10 +238,15 @@ namespace Dive
 	{
 		ImGui::End();
 
-		auto backbufferRenderTargetView = Graphics::GetBackbufferRTV();
-		const float clear_color_with_alpha[4]{ 0.1f, 0.1f, 0.1f, 0.0f };
-		Graphics::GetDeviceContext()->OMSetRenderTargets(1, &backbufferRenderTargetView, NULL);
-		Graphics::GetDeviceContext()->ClearRenderTargetView(backbufferRenderTargetView, clear_color_with_alpha);
+		auto deviceContext = Graphics::GetDeviceContext();
+
+		auto renderTargetView = Graphics::GetBackBufferRTV();
+		auto depthStencilView = Graphics::GetBackBufferDSV();
+		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+
+		float clearColors[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
+		deviceContext->ClearRenderTargetView(Graphics::GetBackBufferRTV(), clearColors);
+		deviceContext->ClearDepthStencilView(Graphics::GetBackBufferDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

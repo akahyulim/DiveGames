@@ -1,42 +1,51 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "ResourceManager.h"
 
 namespace Dive
 {
-	ResourceManager* GResourceManager = ResourceManager::GetInstance();
+	std::unordered_map<eResourceType, std::vector<std::shared_ptr<Resource>>> ResourceManager::s_Resources;
+	std::filesystem::path ResourceManager::s_ResourceFolder = "Assets";
 
-	ResourceManager* ResourceManager::s_pInstance = nullptr;
-	std::once_flag ResourceManager::s_OnceFlag;
-
-	void ResourceManager::Shutdown()
+	void ResourceManager::Clear()
 	{
-		m_Resources.clear();
+		// shared_ptr 대신 unique_ptr, raw pointer 조합이 맞는 것 같다.
+		s_Resources.clear();
+
+		DV_LOG(ResourceManager, info, "클리어 완료");
 	}
 
-	uint32_t ResourceManager::GetAllResourceCount()
+	bool ResourceManager::IsCahed(UINT64 instanceID)
 	{
-		std::lock_guard<std::mutex> guard(m_Mutex);
-
-		uint32_t count = 0;
-		for (const auto& [typeId, resources] : m_Resources)
-			count += static_cast<uint32_t>(resources.size());
-
-		return count;
-	}
-
-	bool ResourceManager::IsCached(uint64_t id)
-	{
-		std::lock_guard<std::mutex> guard(m_Mutex);
-
-		for (const auto& [typeId, resources] : m_Resources)
+		for (const auto& [type, resources] : s_Resources)
 		{
-			for (const auto& resource : resources)
+			for (auto& resource : resources)
 			{
-				if (resource->GetId() == id)
+				if (resource->GetInstanceID() == instanceID)
 					return true;
 			}
 		}
-
 		return false;
+	}
+
+	INT32 ResourceManager::GetAllResourceCount()
+	{
+		INT32 count = 0;
+		for (const auto& [type, resources] : s_Resources)
+		{
+			count += static_cast<INT32>(resources.size());
+		}
+		return count;
+	}
+
+	void ResourceManager::SetResourceFolder(const std::filesystem::path& path)
+	{
+		if (!std::filesystem::is_directory(path) || !std::filesystem::exists(path))
+		{
+			DV_LOG(ResourceManager, err, "잘못된 에셋 폴더 경로 전달: {}", path.string());
+			return;
+		}
+
+		s_ResourceFolder = path;
+		std::filesystem::current_path(s_ResourceFolder);
 	}
 }

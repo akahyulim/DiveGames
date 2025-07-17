@@ -1,5 +1,6 @@
-#include "WorldView.h"
+癤�#include "WorldView.h"
 #include "../MenuBar.h"
+#include "../Editor.h"
 
 namespace Dive
 {
@@ -16,31 +17,28 @@ namespace Dive
 
 	void WorldView::drawView()
 	{
-		if (!WorldManager::GetActiveWorld())
+		if (!EditorContext::ActiveWorld || !EditorContext::EditorCamera)
 			return;
 
 		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		m_Height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
-		
-		auto editorCamera = MenuBar::GetEditorCamera();
-		if (editorCamera)
+
+		if (!m_RenderTarget)
 		{
-			m_RenderTexture = editorCamera->GetRenderTexture();
-			if (m_RenderTexture && m_RenderTexture->GetWidth() != static_cast<UINT32>(m_Width) || m_RenderTexture->GetHeight() != static_cast<UINT32>(m_Height))
-				m_RenderTexture->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
+			m_RenderTarget = std::make_unique<RenderTexture>(
+				static_cast<UINT32>(m_Width), 
+				static_cast<UINT32>(m_Height),
+				eDepthFormat::Depth24Stencil8
+		);
+			m_RenderTarget->Create();
+
+			EditorContext::EditorCamera->GetComponent<Camera>()->SetRenderTarget(m_RenderTarget.get());
 		}
 
-		// 이 부분은 기본적으로 Renderer에서 수행해야 한다.
-		{
-			auto renderTargetView = m_RenderTexture->GetRenderTargetView();
-			Graphics::GetDeviceContext()->OMSetRenderTargets(1, &renderTargetView, nullptr);
-			FLOAT clearColor[4]{editorCamera->GetBackgroundColor().x, editorCamera->GetBackgroundColor().y,
-				editorCamera->GetBackgroundColor().z, editorCamera->GetBackgroundColor().w };
-			Graphics::GetDeviceContext()->ClearRenderTargetView(renderTargetView, clearColor);
-		}
+		if(m_RenderTarget->GetWidth() != static_cast<UINT32>(m_Width) || m_RenderTarget->GetHeight() != static_cast<UINT32>(m_Height))
+				m_RenderTarget->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
 
-		static auto tex = Texture2D::LoadFromFile("NewProject/Assets/Textures/relaxed_morning.jpg", true);
-		ImTextureID textureID = (ImTextureID)(m_RenderTexture ? m_RenderTexture->GetShaderResourceView() : tex->GetShaderResourceView());
+		ImTextureID textureID = (ImTextureID)(m_RenderTarget->GetShaderResourceView());
 		ImGui::Image(textureID, ImVec2(m_Width, m_Height));
 	}
 }

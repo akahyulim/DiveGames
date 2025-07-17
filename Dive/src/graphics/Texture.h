@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Graphics.h"
 #include "core/CoreDefs.h"
 #include "resource/Resource.h"
@@ -7,8 +7,6 @@ namespace Dive
 {
 	class Texture : public Resource
 	{
-		DV_CLASS(Texture, Resource)
-
 	public:
 		Texture() = default;
 		virtual ~Texture() = default;

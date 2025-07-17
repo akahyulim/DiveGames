@@ -1,54 +1,91 @@
-#pragma once
-#include "Graphics/Graphics.h"
-#include "Resource/Resource.h"
+癤�#pragma once
+#include "resource/Resource.h"
+#include "graphics/Graphics.h"
 
 namespace Dive
 {
 	class Texture;
 	class Texture2D;
+	class Shader;
+	class ConstantBuffer;
+	class DvConstantBuffer;
 
-	// 현재 Texture는 opaque 여부를 판단하지 않는다.
-	// 이는 유니티의 설정을 따른 것으로, 유니티의 경우 머티리얼에서 확인한다.
-	// 현재는 legacy다. 추후 pbs가 추가될 수 있다.
-	class Material : public Resource
+	enum class eTextureUnitType : UINT8
 	{
-		DV_CLASS(Material, Resource);
-
-	public:
-		Material();
-		~Material() override;
-
-		bool LoadFromFile(const std::string& fileName) override;
-		bool SaveToFile(const std::string& fileName) override;
-
-		const std::unordered_map<eTextureUnitType, Texture2D*>& GetDvTextures() const { return m_DvTextures; }
-		Texture2D* GetDvTexture(eTextureUnitType unit) const;
-		void SetDvTexture(eTextureUnitType unit, Texture2D* pTexture);
-		bool HasTexture(eTextureUnitType unit) const;
-		void AddTexture(eTextureUnitType unit, const std::string& name);
-
-		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_DiffuseColor; }
-		void SetDiffuseColor(float r, float g, float b, float a) { m_DiffuseColor = { r, g, b, a }; }
-		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_DiffuseColor = color; }
-
-		DirectX::XMFLOAT2 GetTiling() const { return m_Tiling; }
-		void SetTiling(DirectX::XMFLOAT2 tiling) { m_Tiling = tiling; }
-		void SetTiling(float x, float y) { m_Tiling.x = x; m_Tiling.y = y; }
-
-		DirectX::XMFLOAT2 GetOffset() const { return m_Offset; }
-		void SetOffset(DirectX::XMFLOAT2 offset) { m_Offset = offset; }
-		void SetOffset(float x, float y) { m_Offset.x = x; m_Offset.y = y; }
-
-		bool IsOpaque() const;
-
-	private:
-		std::unordered_map<eTextureUnitType, Texture2D*> m_DvTextures;
-		
-		DirectX::XMFLOAT4 m_DiffuseColor;
-		DirectX::XMFLOAT2 m_Tiling;
-		DirectX::XMFLOAT2 m_Offset;
+		None = 0,
+		Diffuse,
+		Normal,
+		Specular,
+		Emissive,
+		Roughness,
+		MRAO, // Metalness, Roughness, AO
+		Count
 	};
 
-	Material* LoadMaterialFromFile(const std::string& fileName);
-	Material* CreateMaterial(const std::string& name);
+	enum class eBlendMode
+	{
+		Opqaue,
+		AlphaBlend,
+		Additive,
+		Multipy
+	};
+
+	struct MaterialConstants
+	{
+		DirectX::XMFLOAT4 diffuseColor;
+		DirectX::XMFLOAT2 tiling;
+		DirectX::XMFLOAT2 offset;
+	};
+
+	class Material : public Resource
+	{
+	public:
+		Material();
+		~Material() = default;
+
+		bool LoadFromFile(const std::filesystem::path& filepath) override;
+		bool SaveToFile(const std::filesystem::path& filepath) override;
+
+		void Bind(ID3D11DeviceContext* deviceContext);
+
+		std::shared_ptr<Texture2D> GetTexture(eTextureUnitType type);
+		void SetTexture(eTextureUnitType type, std::shared_ptr<Texture2D> texture);
+		void SetTexture(eTextureUnitType type, const std::string& textureName);
+
+		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_CpuBuffer.diffuseColor; }
+		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_CpuBuffer.diffuseColor = color; m_Dirty = true; }
+		void SetDiffuseColor(float r, float g, float b, float a) { m_CpuBuffer.diffuseColor = { r, g, b, a };  m_Dirty = true; }
+
+		DirectX::XMFLOAT2 GetTiling() const { return m_CpuBuffer.tiling; }
+		void SetTiling(float x, float y) { m_CpuBuffer.tiling = { x, y };  m_Dirty = true; }
+
+		DirectX::XMFLOAT2 GetOffset() const { return m_CpuBuffer.offset; }
+		void SetOffset(float x, float y) { m_CpuBuffer.offset = { x, y };  m_Dirty = true; }
+
+		Shader* GetPixelShader() const;
+		std::string GetPixelShaderName() const { return m_PixelShaderName; }
+		void SetPixelShaderName(const std::string& name) { m_PixelShaderName = name; }
+
+		ConstantBuffer* GetConstantBuffer();
+
+		eBlendMode GetBlendMode() const { return m_BlendMode; }
+		void SetBlendMode(eBlendMode mode) { m_BlendMode = mode; }
+
+		bool IsTransparent() const;
+
+		static constexpr eResourceType GetType() { return eResourceType::Material; }
+
+	private:
+		std::unordered_map<UINT8, std::shared_ptr<Texture2D>> m_Textures;
+
+		std::string m_PixelShaderName = "Default_PS";
+
+		bool m_Dirty = true;
+
+		MaterialConstants m_CpuBuffer;
+		std::unique_ptr<ConstantBuffer> m_GpuBuffer;
+		std::unique_ptr<DvConstantBuffer> m_ConstantBuffer;
+
+		eBlendMode m_BlendMode = eBlendMode::Opqaue;
+	};
 }

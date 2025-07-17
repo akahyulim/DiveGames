@@ -1,96 +1,105 @@
-#include "HierarchyView.h"
+ï»¿#include "HierarchyView.h"
 #include "InspectorView.h"
+#include "../Editor.h"
 
 namespace Dive
 {
-	HierarchyView::HierarchyView(Editor* editor)
-		: View(editor)
-		, m_SelectedGameObject(nullptr)
+	HierarchyView::HierarchyView(Editor* eidtor)
+		: View(eidtor)
 	{
 		m_Title = "Hierarchy";
 		m_Flags |= ImGuiWindowFlags_HorizontalScrollbar;
 	}
 
-	HierarchyView::~HierarchyView()
-	{
-	}
-
 	void HierarchyView::drawView()
-	{	
-		if (!WorldManager::GetActiveWorld())
+	{
+		if (!EditorContext::ActiveWorld)
 			return;
 
-		showTree();
+		popupMenu();
 
-		if (ImGui::IsMouseReleased(0))
+		if (ImGui::TreeNodeEx(EditorContext::ActiveWorld->GetName().c_str(), ImGuiTreeNodeFlags_DefaultOpen))
 		{
-			// clicekd¿Í hovered¸¦ ºñ±³ÇÑ ÈÄ µ¿ÀÏÇÏ´Ù¸é 
-			// SetSelectedObject()¿¡ Àü´ÞÇÑ´Ù.
-			// ÀÌ´Â Ä«¸Þ¶ó¿¡ SelectedObject()¸¦ ¼³Á¤ÇÏ´Â °úÁ¤ÀÌ´Ù.
-			setSelectedObject(m_SelectedGameObject);
+			if (ImGui::BeginDragDropTarget())
+			{
+				if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
+				{ 
+					auto draggedGO = static_cast<GameObject*>(payload->Data);
+					draggedGO->GetTransform()->SetParent(nullptr);
+				}
+
+				ImGui::EndDragDropTarget();
+			}
+
+			// ì´í„°ë ˆì´í„°ê°€ ê¼¬ì´ì§€ ì•Šê²Œ ì–•ì€ë³µì‚¬ë¡œ ì‚¬ìš©
+			auto root = EditorContext::ActiveWorld->GetRootGameObjects();
+			if (!root.empty())
+			{
+				for (auto gameObject : root)
+				{
+					if (gameObject->GetTag() == "EditorOnly")
+						continue;
+
+					showTree(gameObject);
+				}
+			}
+
+			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+			{
+				EditorContext::Selected = nullptr;
+			}
+
+			ImGui::TreePop();
 		}
 	}
 
-	void HierarchyView::showTree()
+	void HierarchyView::showTree(GameObject* gameObject)
 	{
-		// ÀÏ´Ü ¿¡µðÅÍ ¸ðµå°¡ ¾Æ´Ï¸é ImGui::BeginDisabled(), EndDisabled()·Î ºñÈ°¼ºÈ­ ÇÑ´Ù.
-		std::vector<GameObject*> rootObjects = WorldManager::GetActiveWorld()->GetRootGameObjects();
-		for (auto gameObject : rootObjects)
-		{
-			if (gameObject->IsActive())
-				addObjectToTree(gameObject);
-		}
-	}
+		if (!gameObject) return;
 
-	// ÀÌ °÷¿¡¼­ ¼³Á¤ÇÏ°í »ç¿ë ÁßÀÎ m_SelectedGameObject´Â ±¸¹öÀü ±¸ÇöÀÌ´Ù.
-	// »õ·Î¿î ¹öÀüÀ» ÀÌÇØÇÑ ÈÄ Àû¿ëÇÏÀÚ.
-	void HierarchyView::addObjectToTree(GameObject* gameObject)
-	{
-		if (!gameObject || gameObject->GetTag() == "Editor_Only")
-			return;
+		auto transform = gameObject->GetTransform();
 
-		auto activeWorld = WorldManager::GetActiveWorld();	// Â÷¶ó¸® ¸Å°³º¯¼ö·Î ¹Þ´Â ÆíÀÌ ³ªÀ» °Í °°´Ù.
-		ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_AllowItemOverlap;
+		ImGui::PushID(gameObject);
+		
+		// ë“œë¡­ ìŠ¬ë¡¯ (ë…¸ë“œ ìœ„)
+		float width = ImGui::GetContentRegionAvail().x;
+		ImGui::InvisibleButton("DropSlotBefore", ImVec2(width, 4));
 
-		std::vector<Dive::Transform*> children;
-		if (gameObject->HasComponent<Dive::Transform>())
-			children = gameObject->GetComponent<Dive::Transform>()->GetChildren();
-
-		children.empty() ? nodeFlags |= ImGuiTreeNodeFlags_Leaf : nodeFlags |= ImGuiTreeNodeFlags_OpenOnArrow;
-		if (m_SelectedGameObject)
-			nodeFlags |= (m_SelectedGameObject == gameObject) ? ImGuiTreeNodeFlags_Selected : 0;
-
-		// °¢ ³ëµå »çÀÌ¿¡ µå¶ø °¡´ÉÇÑ ¿µ¿ª Ãß°¡
-		ImGui::PushID(static_cast<int>(gameObject->GetID())); // °íÀ¯ ID Çª½Ã
-		ImGui::Selectable("##drop_target", false, ImGuiSelectableFlags_DontClosePopups, ImVec2(0, 2.0f));
 		if (ImGui::BeginDragDropTarget())
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 			{
-				auto pId = static_cast<unsigned long long*>(payload->Data);
-				auto droppedGameObject = activeWorld->GetGameObjectByID(*pId);
-
-				if (droppedGameObject && droppedGameObject != gameObject)
+				auto draggedGO = static_cast<GameObject*>(payload->Data);
+				if (draggedGO && draggedGO != gameObject)
 				{
-					if (droppedGameObject->HasComponent<Dive::Transform>())
-						droppedGameObject->GetComponent<Dive::Transform>()->SetParent(nullptr);
+					auto draggedTransform = draggedGO->GetTransform();
+					auto targetTransform = transform;
+					auto parent = targetTransform->GetParent();
+
+					if (draggedTransform != parent)
+					{
+						if (draggedTransform->GetParent() != parent)
+							draggedTransform->SetParent(parent);
+
+						auto insertIdx = targetTransform->GetSiblingIndex();
+						draggedTransform->SetSiblingIndex(insertIdx);
+					}
 				}
 			}
-
 			ImGui::EndDragDropTarget();
 		}
 
-		bool bNodeOpen = ImGui::TreeNodeEx((void*)(intptr_t)gameObject->GetID(), nodeFlags, gameObject->GetName().c_str());
+		ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_AllowItemOverlap;
+		flags |= transform->HasChildren() ? ImGuiTreeNodeFlags_OpenOnArrow : ImGuiTreeNodeFlags_Leaf;
+		flags |= (EditorContext::Selected == gameObject) ? ImGuiTreeNodeFlags_Selected : 0;
 
-		if (ImGui::IsItemClicked())
-		{
-			m_SelectedGameObject = gameObject;
-		}
+		bool opened = ImGui::TreeNodeEx((void*)(intptr_t)gameObject, flags, gameObject->GetName().c_str());
 
 		if (ImGui::BeginDragDropSource())
 		{
-			auto id = gameObject->GetID();
-			ImGui::SetDragDropPayload("HIERARCHY_NODE", &id, sizeof(unsigned long long));
+			// ë“œëž˜ê·¸ ë…¸ë“œë¡œ ë‹¤ë£° ë°ì´í„°ì˜ í¬ì¸í„°ì™€ í¬ê¸° ì„¤ì •
+			ImGui::SetDragDropPayload("HIERARCHY_NODE", gameObject, sizeof(GameObject));
+			ImGui::Text("Move %s", gameObject->GetName().c_str());
 			ImGui::EndDragDropSource();
 		}
 
@@ -98,75 +107,155 @@ namespace Dive
 		{
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("HIERARCHY_NODE"))
 			{
-				auto pId = static_cast<unsigned long long*>(payload->Data);
-				auto droppedGameObject = activeWorld->GetGameObjectByID(*pId);
-
-				if (droppedGameObject != gameObject)
+				auto draggedGO = static_cast<GameObject*>(payload->Data);
+				if (draggedGO && draggedGO != gameObject)
 				{
-					if (droppedGameObject->HasComponent<Dive::Transform>())
-					{
-						droppedGameObject->GetComponent<Dive::Transform>()->SetParent(
-							gameObject->GetComponent<Dive::Transform>());
-					}
+					auto draggedTransform = draggedGO->GetTransform();
+					if (!transform->IsChildOf(draggedTransform))
+						draggedTransform->SetParent(transform);
 				}
 			}
-
 			ImGui::EndDragDropTarget();
 		}
 
+		static bool isCopied = false;
+
 		if (ImGui::BeginPopupContextItem())
 		{
-			if (ImGui::MenuItem("Copy"))
-			{
-			}
-
-			if (ImGui::MenuItem("Rename"))
-			{
-				m_IsEditedName = true;
-			}
-
 			if (ImGui::MenuItem("Delete"))
 			{
-				// ÇöÀç RemoveGameObject´Â ´ë»óÀ» Á¦°Å´ë»óÀ¸·Î ¸¶Å·ÇÒ »ÓÀÌ´Ù.
-				// ½ÇÁ¦ Á¦°Å´Â ´ÙÀ½ Update¿¡¼­ ¼öÇàÇÑ´Ù.
-				//activeWorld->RemoveGameObject(gameObject);
-				activeWorld->DeleteGameObject(gameObject);
-				if (m_SelectedGameObject && (m_SelectedGameObject == gameObject))
-					m_SelectedGameObject = nullptr;
+				if (EditorContext::MainCamera == EditorContext::Selected)
+					EditorContext::MainCamera = nullptr;
+				EditorContext::ActiveWorld->DestroyGameObject(gameObject);
+				EditorContext::Selected = nullptr;
+			}
+			if (ImGui::MenuItem("Copy"))
+			{
+				// í•˜ìœ„ ê²Œìž„ì˜¤ë¸Œì íŠ¸ë“¤ê¹Œì§€ ê³„ì¸µêµ¬ì¡°ë¥¼ ìœ ì§€í•˜ì—¬ ë³µì‚¬ëœë‹¤.
+				// ìƒê°ë³´ë‹¤ ì¢€ ë³µìž¡í•˜ë‹¤.
+				// ì´ê±¸ ëˆ„ë¥¸ë‹¤ê³  ë°”ë¡œ ë¶™ì—¬ë„£ê¸°ê°€ ìˆ˜í–‰ë˜ëŠ” ê²Œ ì•„ë‹ˆë‹¤.
+				isCopied = true;
+			}
+			if (ImGui::MenuItem("Paste", nullptr, nullptr, isCopied))
+			{
+				// ì´ê±´ ë©”ë‰´ ìœ„ì¹˜ê°€ ì• ë§¤í•˜ë‹¤.
+				// í˜„ìž¬ êµ¬í˜„ì„ ìœ ì§€í•˜ë ¤ë©´ íŠ¸ë¦¬ ì•„ì´í…œ ìœ„ì—ì„œ ì´ ë©”ë‰´ë¥¼ ì„ íƒí•´ì•¼ í•˜ê³ 
+				// ë¶™ì—¬ë„£ê¸°ë˜ëŠ” ì§€ì ë„ ê°€ìž¥ ë§ˆì§€ë§‰ ë£¨íŠ¸ ë…¸ë“œì—¬ì•¼ í•œë‹¤.
+				// ì´ íŒì—…ì˜ ê²½ìš°ì—” Selected í•˜ìœ„ì— ë¶™ì—¬ë„£ê¸° í•˜ê³ 
+				// AddGameObject íŒì—…ì—ë„ Paset ë©”ë‰´ë¥¼ ì¶”ê°€í•´ ë£¨íŠ¸ë…¸ë“œì— ë¶™ì—¬ë„£ëŠ” ë°©ë²•ë„ ìžˆë‹¤.
 			}
 
 			ImGui::EndPopup();
 		}
 
-		if (bNodeOpen)
+		if (ImGui::IsItemClicked())
+			EditorContext::Selected = gameObject;
+
+		if (opened)
 		{
-			if (m_SelectedGameObject == gameObject && m_IsEditedName)
-			{
-				ImGui::SetKeyboardFocusHere();
-
-				char newName[256]{};
-				ImGui::InputText("##edit", newName, sizeof(newName));
-
-				if (ImGui::IsKeyPressed(ImGuiKey_Enter))
-				{
-					gameObject->SetName(newName);
-					m_IsEditedName = false;
-				}
-			}
-			for (auto childe : children)
-				addObjectToTree(childe->GetGameObject());
-
+			// ì—­ì‹œ ì–•ì€ ë³µì‚¬
+			auto childrenCopy = transform->GetChildren();
+			for (auto child : childrenCopy)
+				showTree(child->GetGameObject());
 			ImGui::TreePop();
 		}
 
-		ImGui::PopID(); // °íÀ¯ ID ÆË
+		ImGui::PopID();
 	}
 
-	void HierarchyView::setSelectedObject(GameObject* gameObject)
+	void HierarchyView::popupMenu()
 	{
-		// editor camera¿¡¼­ select·Î ¼³Á¤ÇÑ´Ù.
+		if (ImGui::IsWindowHovered() && !ImGui::IsAnyItemHovered())
+		{
+			if (ImGui::IsMouseReleased(ImGuiMouseButton_Right))
+				ImGui::OpenPopup("AddGameObject");
+		}
 
-		InspectorView::Inspect(gameObject);
+		if (ImGui::BeginPopupContextWindow("AddGameObject", ImGuiPopupFlags_MouseButtonRight))
+		{
+			if (ImGui::MenuItem("Add Empty"))
+				EditorContext::ActiveWorld->CreateGameObject("Empty");
+
+			ImGui::Separator();
+
+			if (ImGui::BeginMenu("3D Object"))
+			{
+				if (ImGui::MenuItem("Triangle", nullptr, nullptr))
+				{
+					auto triangleGO = EditorContext::ActiveWorld->CreateGameObject("Triangle");
+					auto staticMeshRender = triangleGO->AddComponent<MeshRenderer>();
+					staticMeshRender->SetStaticMesh(MeshFactory::CreateTriangle());
+					staticMeshRender->SetMaterial(std::make_shared<Material>());	// í˜„ìž¬ ResourceManagerê°€ ê´€ë¦¬í•˜ì§€ ì•ŠëŠ”ë‹¤.
+				}
+				if (ImGui::MenuItem("Quad", nullptr, nullptr))
+				{
+					auto quadGO = EditorContext::ActiveWorld->CreateGameObject("Quad");
+					auto staticMeshRender = quadGO->AddComponent<MeshRenderer>();
+					staticMeshRender->SetStaticMesh(MeshFactory::CreateQuad());
+					staticMeshRender->SetMaterial(std::make_shared<Material>());
+				}
+
+				if (ImGui::MenuItem("Plane", nullptr, nullptr))
+				{
+					auto planeGO = EditorContext::ActiveWorld->CreateGameObject("Plane");
+					auto staticMeshRender = planeGO->AddComponent<MeshRenderer>();
+					staticMeshRender->SetStaticMesh(MeshFactory::CreatePlane());
+					staticMeshRender->SetMaterial(std::make_shared<Material>());
+				}
+				if (ImGui::MenuItem("Cube", nullptr, nullptr))
+				{
+					auto cubeGO = EditorContext::ActiveWorld->CreateGameObject("Cube");
+					auto staticMeshRender = cubeGO->AddComponent<MeshRenderer>();
+					staticMeshRender->SetStaticMesh(MeshFactory::CreateCube());
+					staticMeshRender->SetMaterial(std::make_shared<Material>());
+				}
+				if (ImGui::MenuItem("Sphere", nullptr, nullptr))
+				{
+					auto sphereGO = EditorContext::ActiveWorld->CreateGameObject("Sphere");
+					auto staticMeshRender = sphereGO->AddComponent<MeshRenderer>();
+					staticMeshRender->SetStaticMesh(MeshFactory::CreateSphere());
+					staticMeshRender->SetMaterial(std::make_shared<Material>());
+				}
+				if (ImGui::MenuItem("Capsule", nullptr, nullptr))
+				{
+					auto capsuleGO = EditorContext::ActiveWorld->CreateGameObject("Capsule");
+					auto staticMeshRender = capsuleGO->AddComponent<MeshRenderer>();
+					staticMeshRender->SetStaticMesh(MeshFactory::CreateCapsule());
+					staticMeshRender->SetMaterial(std::make_shared<Material>());
+				}
+
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Light"))
+			{
+				if (ImGui::MenuItem("Directional Light", nullptr, nullptr))
+				{
+				}
+				if (ImGui::MenuItem("Point Light", nullptr, nullptr))
+				{
+				}
+				if (ImGui::MenuItem("Spot Light", nullptr, nullptr))
+				{
+
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::BeginMenu("Camera"))
+			{
+				if (ImGui::MenuItem("Perpective", nullptr, nullptr))
+				{
+					auto cameraGO = EditorContext::ActiveWorld->CreateGameObject("Camera");
+					auto cameraComponent = cameraGO->AddComponent<Camera>();
+					cameraComponent->SetProjectionType(eProjectionType::Perspective);
+				}
+
+				if (ImGui::MenuItem("Orthographic", nullptr, nullptr))
+				{
+				}
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndPopup();
+		}
 	}
-
 }

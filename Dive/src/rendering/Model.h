@@ -1,10 +1,9 @@
-#pragma once
+ï»¿#pragma once
 #include "Resource/Resource.h"
 
 namespace Dive
 {
 	class Mesh;
-	class GameObject;
 
 	class Model : public Resource
 	{
@@ -19,18 +18,13 @@ namespace Dive
 
 		void Clear();
 
-		GameObject* GetRootObject() const { return m_RootGameObject; }
-		void SetRootObject(GameObject* rootGameObject) { m_RootGameObject = rootGameObject; }
-
 		void AddMesh(Mesh* mesh) { m_Meshes.emplace_back(mesh); }
 		std::vector<Mesh*>& GetAllMeshes() { return m_Meshes; }
 		Mesh* GetMeshAt(UINT32 index = 0);
 		Mesh* GetMeshByName(const std::string& name);
 
 	private:
-		GameObject* m_RootGameObject;
-
-		// urho´Â geometry»Ó¸¸ ¾Æ´Ï¶ó ¸ğµç Bufferµµ °ü¸®ÇÑ´Ù.
+		// urhoëŠ” geometryë¿ë§Œ ì•„ë‹ˆë¼ ëª¨ë“  Bufferë„ ê´€ë¦¬í•œë‹¤.
 		std::vector<Mesh*> m_Meshes;
 	};
 }

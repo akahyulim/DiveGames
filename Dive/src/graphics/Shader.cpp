@@ -1,4 +1,4 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "Shader.h"
 #include "Graphics.h"
 #include "core/CoreDefs.h"
@@ -9,106 +9,44 @@ using Microsoft::WRL::ComPtr;
 
 namespace Dive
 {
-	namespace ShaderUtils 
+	static std::vector<D3D11_INPUT_ELEMENT_DESC> GetInputElements(eInputLayout layout)
 	{
-		Microsoft::WRL::ComPtr<ID3DBlob> CompileShaderFile(const std::filesystem::path& filepath, eShaderType type)
+		std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
+
+		switch (layout)
 		{
-			ComPtr<ID3DBlob> compiledShader;
-			ComPtr<ID3DBlob> errorMessage;
-
-			std::string entryPoint;
-			std::string profile;
-
-			switch (type)
-			{
-			case eShaderType::Vertex:
-				entryPoint = "MainVS";
-				profile = "vs_5_0";
-				break;
-			case eShaderType::Hull:
-				entryPoint = "MainHS";
-				profile = "hs_5_0";
-				break;
-			case eShaderType::Domain:
-				entryPoint = "MainDS";
-				profile = "ds_5_0";
-				break;
-			case eShaderType::Geometry:
-				entryPoint = "MainGS";
-				profile = "gs_5_0";
-				break;
-			case eShaderType::Pixel:
-				entryPoint = "MainPS";
-				profile = "ps_5_0";
-				break;
-			case eShaderType::Compute:
-				entryPoint = "MainCS";
-				profile = "cs_5_0";
-				break;
-			default:
-				DV_LOG(Shader, err, "¿ﬂ∏¯µ» ºŒ¿Ã¥ı ≈∏¿‘¿ª ¿¸¥ﬁπﬁæ∆ ºŒ¿Ã¥ı ∆ƒ¿œ ƒƒ∆ƒ¿œø° Ω«∆–«œø¥Ω¿¥œ¥Ÿ.");
-				return nullptr;
-			}
-
-			if (FAILED(D3DCompileFromFile(
-				filepath.c_str(),
-				nullptr,
-				D3D_COMPILE_STANDARD_FILE_INCLUDE,
-				entryPoint.c_str(),
-				profile.c_str(),
-				D3D10_SHADER_ENABLE_STRICTNESS,
-				0,
-				compiledShader.GetAddressOf(),
-				errorMessage.GetAddressOf())))
-			{
-				DV_LOG(Shader, err, "ºŒ¿Ã¥ı ƒƒ∆ƒ¿œ Ω«∆–: {:s}", 
-					errorMessage ? static_cast<char*>(errorMessage->GetBufferPointer()) : filepath.string().c_str());
-				return nullptr;
-			}
-
-			return compiledShader;
+		case eInputLayout::Pos:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			break;
+		case eInputLayout::Pos_Tex:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			break;
+		case eInputLayout::Pos_Tex_Nor:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			break;
+		case eInputLayout::Static_Mesh:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			break;
+		case eInputLayout::Skinned_Mesh:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			break;
+		default:
+			DV_LOG(Shader, err, "ÏûòÎ™ªÎêú ÏûÖÎ†• Î†àÏù¥ÏïÑÏõÉ ÌÉÄÏûÖÏùÑ Ï†ÑÎã¨Î∞õÏïÑ ÏûÖÎ†• Î†àÏù¥ÏïÑÏõÉ Íµ¨ÏÑ±Ïóê Ïã§Ìå®ÌïòÏòÄÏäµÎãàÎã§.");
+			elements.clear();
 		}
 
-		std::vector<D3D11_INPUT_ELEMENT_DESC> GetInputElements(eInputLayout layout)
-		{
-			std::vector<D3D11_INPUT_ELEMENT_DESC> elements;
-
-			switch (layout)
-			{
-			case eInputLayout::Pos:
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				break;
-			case eInputLayout::Pos_Tex:
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				break;
-			case eInputLayout::Pos_Tex_Nor:
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				break;
-			case eInputLayout::Static_Model:
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				break;
-			case eInputLayout::Skinned_Model:
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BLENDINDICES", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-				break;
-			default:
-				DV_LOG(Shader, err, "¿ﬂ∏¯µ» ¿‘∑¬ ∑π¿Ãæ∆øÙ ≈∏¿‘¿ª ¿¸¥ﬁπﬁæ∆ ¿‘∑¬ ∑π¿Ãæ∆øÙ ±∏º∫ø° Ω«∆–«œø¥Ω¿¥œ¥Ÿ.");
-				elements.clear();
-			}
-
-			return elements;
-		}
+		return elements;
 	}
 
 	Shader::~Shader()
@@ -120,106 +58,163 @@ namespace Dive
 		DV_RELEASE(m_HullShader);
 		DV_RELEASE(m_VertexShader);
 		DV_RELEASE(m_InputLayout);
+
+		// Î°úÍ±∞Î≥¥Îã§ ÎÇòÏ§ëÏóê ÏÜåÎ©∏ÎêòÎäî Í≤É Í∞ôÎã§.
+		//DV_LOG(Shader, info, "ÏÜåÎ©∏ - {}", GetName());
 	}
 
-	bool Shader::Create(Microsoft::WRL::ComPtr<ID3DBlob> compiledShader, eShaderType type)
+	bool Shader::Create(const std::filesystem::path& filepath, eShaderType type, eInputLayout inputLayout)
 	{
+		ID3D10Blob* compiledShader;
+		ID3D10Blob* errorMessage;
+
+		std::string entryPoint;
+		std::string profile;
+
+		switch (type)
+		{
+		case eShaderType::Vertex:
+			entryPoint = "MainVS";
+			profile = "vs_5_0";
+			break;
+		case eShaderType::Hull:
+			entryPoint = "MainHS";
+			profile = "hs_5_0";
+			break;
+		case eShaderType::Domain:
+			entryPoint = "MainDS";
+			profile = "ds_5_0";
+			break;
+		case eShaderType::Geometry:
+			entryPoint = "MainGS";
+			profile = "gs_5_0";
+			break;
+		case eShaderType::Pixel:
+			entryPoint = "MainPS";
+			profile = "ps_5_0";
+			break;
+		case eShaderType::Compute:
+			entryPoint = "MainCS";
+			profile = "cs_5_0";
+			break;
+		default:
+			DV_LOG(Shader, err, "ÏûòÎ™ªÎêú ÏÖ∞Ïù¥Îçî ÌÉÄÏûÖÏùÑ Ï†ÑÎã¨Î∞õÏïÑ ÏÖ∞Ïù¥Îçî ÌååÏùº Ïª¥ÌååÏùºÏóê Ïã§Ìå®");
+			return false;
+		}
+
+		if (FAILED(D3DCompileFromFile(
+			filepath.c_str(),
+			nullptr,
+			D3D_COMPILE_STANDARD_FILE_INCLUDE,
+			entryPoint.c_str(),
+			profile.c_str(),
+			D3D10_SHADER_ENABLE_STRICTNESS,
+			0,
+			&compiledShader,
+			&errorMessage)))
+		{
+			DV_LOG(Shader, err, "ÏÖ∞Ïù¥Îçî Ïª¥ÌååÏùº Ïã§Ìå®: {:s}",
+				errorMessage ? static_cast<char*>(errorMessage->GetBufferPointer()) : filepath.string().c_str());
+			return false;
+		}
+
+		std::string name = filepath.stem().string();
+
 		auto bufferPointer = compiledShader->GetBufferPointer();
 		auto bufferSize = compiledShader->GetBufferSize();
 
 		switch (type)
 		{
 		case eShaderType::Vertex:
+		{
 			if (FAILED(Graphics::GetDevice()->CreateVertexShader(bufferPointer, bufferSize, NULL, &m_VertexShader)))
 			{
-				DV_LOG(Shader, err, "VertexShader ª˝º∫ Ω«∆–");
+				DV_LOG(Shader, err, "VertexShader ÏÉùÏÑ± Ïã§Ìå®");
 				return false;
 			}
+			if (inputLayout == eInputLayout::None)
+			{
+				DV_LOG(Shader, err, "InputLayout ÏÉùÏÑ± Ïã§Ìå®: Ïú†Ìö®ÌïòÏßÄ ÏïäÏùÄ Îß§Í∞úÎ≥ÄÏàò Ï†ÑÎã¨");
+				return false;
+			}
+
+			auto inputElements = GetInputElements(inputLayout);
+
+			if (FAILED(Graphics::GetDevice()->CreateInputLayout(
+				inputElements.data(),
+				static_cast<UINT32>(inputElements.size()),
+				bufferPointer,
+				bufferSize,
+				&m_InputLayout)))
+			{
+				DV_LOG(Shader, err, "InputLayout ÏÉùÏÑ± Ïã§Ìå®");
+				return false;
+			}
+			name += "_VS";
 			break;
+		}
 		case eShaderType::Hull:
+		{
 			if (FAILED(Graphics::GetDevice()->CreateHullShader(bufferPointer, bufferSize, NULL, &m_HullShader)))
 			{
-				DV_LOG(Shader, err, "HullShader ª˝º∫ Ω«∆–");
+				DV_LOG(Shader, err, "HullShader ÏÉùÏÑ± Ïã§Ìå®");
 				return false;
 			}
+			name += "_HS";
 			break;
+		}
 		case eShaderType::Domain:
+		{
 			if (FAILED(Graphics::GetDevice()->CreateDomainShader(bufferPointer, bufferSize, NULL, &m_DomainShader)))
 			{
-				DV_LOG(Shader, err, "DomainShader ª˝º∫ Ω«∆–");
+				DV_LOG(Shader, err, "DomainShader ÏÉùÏÑ± Ïã§Ìå®");
 				return false;
 			}
+			name += "_DS";
 			break;
+		}
 		case eShaderType::Geometry:
+		{
 			if (FAILED(Graphics::GetDevice()->CreateGeometryShader(bufferPointer, bufferSize, NULL, &m_GeometryShader)))
 			{
-				DV_LOG(Shader, err, "GeometryShader ª˝º∫ Ω«∆–");
+				DV_LOG(Shader, err, "GeometryShader ÏÉùÏÑ± Ïã§Ìå®");
 				return false;
 			}
+			name += "_GS";
 			break;
+		}
 		case eShaderType::Pixel:
+		{
 			if (FAILED(Graphics::GetDevice()->CreatePixelShader(bufferPointer, bufferSize, NULL, &m_PixelShader)))
 			{
-				DV_LOG(Shader, err, "Pixel Shader ª˝º∫ Ω«∆–");
+				DV_LOG(Shader, err, "Pixel Shader ÏÉùÏÑ± Ïã§Ìå®");
 				return false;
 			}
+			name += "_PS";
 			break;
+		}
 		case eShaderType::Compute:
+		{
 			if (FAILED(Graphics::GetDevice()->CreateComputeShader(bufferPointer, bufferSize, NULL, &m_ComputeShader)))
 			{
-				DV_LOG(Shader, err, "ComputeShader ª˝º∫ Ω«∆–");
+				DV_LOG(Shader, err, "ComputeShader ÏÉùÏÑ± Ïã§Ìå®");
 				return false;
 			}
+			name += "_CS";
 			break;
+		}
 		default:
-			DV_LOG(Shader, err, "ºŒ¿Ã¥ı ª˝º∫ Ω«∆–: ¿ﬂ∏¯µ» ºŒ¿Ã¥ı ≈∏¿‘ ¿¸¥ﬁ");
+		{
+			DV_LOG(Shader, err, "ÏÖ∞Ïù¥Îçî ÏÉùÏÑ± Ïã§Ìå®: ÏûòÎ™ªÎêú ÏÖ∞Ïù¥Îçî ÌÉÄÏûÖ Ï†ÑÎã¨");
 			return false;
+		}
 		}
 
 		m_Type = type;
-		return true;
-	}
+		SetName(name);
 
-	bool Shader::CreateInputLayout(Microsoft::WRL::ComPtr<ID3DBlob> blob, eInputLayout layout)
-	{
-		if (!blob || layout == eInputLayout::None)
-		{
-			DV_LOG(Shader, err, "InputLayout ª˝º∫ Ω«∆–: ¿Ø»ø«œ¡ˆ æ ¿∫ ∏≈∞≥∫Øºˆ ¿¸¥ﬁ");
-			return false;
-		}
-	
-		auto inputElements = ShaderUtils::GetInputElements(layout);
-
-		if (FAILED(Graphics::GetDevice()->CreateInputLayout(
-			inputElements.data(),
-			static_cast<UINT32>(inputElements.size()),
-			blob->GetBufferPointer(),
-			blob->GetBufferSize(),
-			&m_InputLayout)))
-		{
-			DV_LOG(Shader, err, "InputLayout ª˝º∫ Ω«∆–");
-			return false;
-		}
+		DV_LOG(Shader, info, "ÏÉùÏÑ± - {}", GetName());
 
 		return true;
-	}
-
-	std::shared_ptr<Shader> Shader::Generate(const std::filesystem::path& filepath, eShaderType type, eInputLayout layout)
-	{
-		auto compiledShader = ShaderUtils::CompileShaderFile(filepath, type);
-		if (!compiledShader)
-			return nullptr;
-
-		auto shader = std::make_shared<Shader>();
-		if (!shader->Create(compiledShader, type))
-			return nullptr;
-
-		if (type == eShaderType::Vertex)
-		{
-			if (!shader->CreateInputLayout(compiledShader, layout))
-				return nullptr;
-		}
-
-		return shader;
 	}
 }

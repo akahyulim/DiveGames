@@ -1,108 +1,177 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Material.h"
-#include "Graphics/Texture2D.h"
-#include "Core/CoreDefs.h"
-#include "Resource/ResourceManager.h"
+#include "graphics/Texture2D.h"
+#include "graphics/ShaderManager.h"
+#include "graphics/ConstantBuffer.h"
+//#include "graphics/Graphics.h"
+#include "core/CoreDefs.h"
+#include "resource/YamlHelper.h"
+#include "resource/ResourceManager.h"
 
 namespace Dive
 {
     Material::Material()
-        : m_DiffuseColor(1.0f, 1.0f, 1.0f, 1.0f)
-        , m_Tiling(1.0f, 1.0f)
-        , m_Offset(0.0f, 0.0f)
     {
+        m_GpuBuffer = std::make_unique<ConstantBuffer>();
+        m_GpuBuffer->Create(sizeof(MaterialConstants));
+
+        m_ConstantBuffer = std::make_unique<DvConstantBuffer>(Graphics::GetDevice(), ePSConstantBufferSlot::PerMaterialPS, sizeof(MaterialConstants));
+
+        m_CpuBuffer.diffuseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
+        m_CpuBuffer.tiling = { 1.0f, 1.0f };
+        m_CpuBuffer.offset = { 0.0f, 0.0f };
+
+        m_Dirty = true;
+
+        SetName("Standard");
     }
 
-    Material::~Material()
+    bool Material::LoadFromFile(const std::filesystem::path& filepath)
     {
-        DV_LOG(Material, trace, "resource destroy - {0:s}({1:d}), {2:s}({3:d})",
-            GetTypeName(), GetTypeHash(), GetName(), GetNameHash());
-    }
+        YAML::Node data;
+        try
+        {
+            data = YAML::LoadFile(filepath.string());
+        }
+        catch (const YAML::ParserException& e)
+        {
+            DV_LOG(Material, warn, "YAML íŒŒì‹± ì‹¤íŒ¨: {}", e.what());
+            return false;
+        }
 
-    bool Material::LoadFromFile(const std::string& fileName)
-    {
+        if (data["Material"])
+            SetName(data["Material"].as<std::string>());
+
+        if (data["PixelShader"])
+            m_PixelShaderName = data["PixelShader"].as<std::string>();
+
+        if (data["DiffuseTexture"])
+            SetTexture(eTextureUnitType::Diffuse, data["DiffuseTexture"].as<std::string>());
+      
+        if (data["DiffuseColor"])
+            m_CpuBuffer.diffuseColor = data["DiffuseColor"].as<DirectX::XMFLOAT4>();
+
+        if (data["Tiling"])
+            m_CpuBuffer.tiling = data["Tiling"].as<DirectX::XMFLOAT2>();
+
+        if (data["Offset"])
+            m_CpuBuffer.offset = data["Offset"].as<DirectX::XMFLOAT2>();
+
         return true;
     }
 
-    bool Material::SaveToFile(const std::string& fileName)
+    bool Material::SaveToFile(const std::filesystem::path& filepath)
     {
+        const std::string& diffuseTexture = m_Textures[static_cast<UINT8>(eTextureUnitType::Diffuse)] ?
+			m_Textures[static_cast<UINT8>(eTextureUnitType::Diffuse)]->GetName() : "";
+
+        YAML::Emitter out;
+        out << YAML::BeginMap;
+        out << YAML::Key << "Material" << YAML::Value << GetName();
+
+        out << YAML::Key << "PixelShader" << YAML::Value << m_PixelShaderName;
+        out << YAML::Key << "DiffuseTexture" << YAML::Value << diffuseTexture;
+        out << YAML::Key << "DiffuseColor" << YAML::Value << m_CpuBuffer.diffuseColor;
+        out << YAML::Key << "Tiling" << YAML::Value << m_CpuBuffer.tiling;
+        out << YAML::Key << "Offset" << YAML::Value << m_CpuBuffer.offset;
+
+        out << YAML::EndMap;
+
+        std::ofstream fout(filepath);
+        fout << out.c_str();
+
+        SetFilepath(filepath);
+
         return true;
     }
 
-    Texture2D* Material::GetDvTexture(eTextureUnitType unit) const
+    void Material::Bind(ID3D11DeviceContext* deviceContext)
     {
-        auto it = m_DvTextures.find(unit);
+        assert(deviceContext);
 
-        return it != m_DvTextures.end() ? it->second : nullptr;
+        // vertex shader
+        ID3D11VertexShader* oldVS = nullptr;
+        deviceContext->VSGetShader(&oldVS, nullptr, nullptr);
+        auto currentVS = ShaderManager::GetShader("Default_VS")->GetVertexShader();
+        if (oldVS != currentVS)
+            deviceContext->VSSetShader(currentVS, nullptr, 0);
+
+        auto inputLayout = ShaderManager::GetShader("Default_VS")->GetInputLayout();
+        deviceContext->IASetInputLayout(inputLayout);
+
+        // pixel shader
+        ID3D11PixelShader* oldPS = nullptr;
+        deviceContext->PSGetShader(&oldPS, nullptr, nullptr);
+        auto currentPS = ShaderManager::GetShader(m_PixelShaderName)->GetPixelShader();
+        if (oldPS != currentPS)
+            deviceContext->PSSetShader(currentPS, nullptr, 0);
+
+        // constant buffer
+        MaterialConstants data{};
+        data.diffuseColor = GetDiffuseColor();
+        data.offset = GetOffset();
+        data.tiling = GetTiling();
+        m_ConstantBuffer->Update<MaterialConstants>(deviceContext, m_CpuBuffer);
+        m_ConstantBuffer->Bind(deviceContext);
+
+        // shader resources
     }
 
-    void Material::SetDvTexture(eTextureUnitType unit, Texture2D* pTexture)
+    std::shared_ptr<Texture2D> Material::GetTexture(eTextureUnitType type)
     {
-        if (unit < eTextureUnitType::Count)
+        assert(type != eTextureUnitType::None);
+		return m_Textures[static_cast<UINT8>(type)];
+    }
+
+    void Material::SetTexture(eTextureUnitType type, std::shared_ptr<Texture2D> texture)
+    {
+		assert(type != eTextureUnitType::None);
+
+        m_Textures[static_cast<UINT8>(type)] = texture;
+        
+        m_Dirty = true;
+    }
+
+    void Material::SetTexture(eTextureUnitType type, const std::string& textureName)
+    {
+        assert(type != eTextureUnitType::None);
+
+		auto diffuseTex = ResourceManager::GetByName<Texture2D>(textureName);
+		m_Textures[static_cast<UINT8>(type)] = diffuseTex;
+
+		m_Dirty = true;
+    }
+
+    Shader* Material::GetPixelShader() const
+    {
+        auto shader = ShaderManager::GetShader(m_PixelShaderName);
+		if (!shader || shader->GetType() != eShaderType::Pixel)
+		{
+			DV_LOG(Material, err, "Invalid pixel shader: {}", m_PixelShaderName);
+			return nullptr;
+		}
+
+        return shader;
+    }
+
+    ConstantBuffer* Material::GetConstantBuffer()
+    {
+        if (m_Dirty)
         {
-            if (pTexture)
-                m_DvTextures[unit] = pTexture;
-            else
-                m_DvTextures.erase(unit); // ÀÌ°Ô ¸Â³ª ¸ð¸£°Ú´Ù.
-        }
-    }
+            auto data = static_cast<MaterialConstants*>(m_GpuBuffer->Map());
+            data->diffuseColor = m_CpuBuffer.diffuseColor;
+            data->tiling = m_CpuBuffer.tiling;
+            data->offset = m_CpuBuffer.offset;
+            m_GpuBuffer->Unmap();
 
-    // RenderableÀÇ Update¿¡¼­ ¸®¼Ò½º À¯¹«¸¦ ÆÄ¾ÇÇÏ´Âµ¥ »ç¿ë
-    bool Material::HasTexture(eTextureUnitType unit) const
-    {
-        auto it = m_DvTextures.find(unit);
-        return it != m_DvTextures.end() && it->second != nullptr;
-    }
-
-    // urho´Â load¿¡¼­¸¸ ÅØ½ºÃÄ¸¦ ·ÎµåÇÏ±â¿¡ Á÷Á¢ ¸¸µé¾îºÃ´Ù.
-   // ±×·±µ¥ cache¿¡¼­ GetResourceÇÑ ÈÄ À§ÀÇ SetTextureÇÏ´Â°Ô ¸ÂÁö ¾Ê³ª ½Í´Ù.
-   // ÇÏÁö¸¸ ÀÌ ±¸ÇöÀÌ Èûµç°Ô CacheÀÇ GetResource´Â ÀÏ¹Ý ¸®¼Ò½º ÆÄÀÏ°ú ¿£ÁøÀÇ ¼³Á¤ ÆÄÀÏÀ»
-   // ±¸ºÐÇÏ¿© ·ÎµåÇÒ ¼ö ÀÖ´Ù´Â °ÍÀÌ´Ù.
-    void Material::AddTexture(eTextureUnitType unit, const std::string& name)
-    {
-        if (unit < eTextureUnitType::Count)
-        {
-            auto pTexture = ResourceManager::GetInstance()->GetResource<Texture2D>(name);
-            SetDvTexture(unit, pTexture);
-        }
-    }
-
-    Material* LoadMaterialFromFile(const std::string& fileName)
-    {
-        Material* pObject = new Material;
-        if (!pObject->LoadFromFile(fileName))
-        {
-            DV_DELETE(pObject);
-            return nullptr;
+            m_Dirty = false;
         }
 
-        pObject->SetName(fileName);
-
-        return pObject;
+        return m_GpuBuffer.get();
     }
 
-    Material* CreateMaterial(const std::string& name)
+    bool Material::IsTransparent() const
     {
-        if (name.empty())
-        {
-            DV_LOG(Material, err, "Àß¸øµÈ ÀÌ¸§({:s})À» Àü´Þ¹Þ¾Ò½À´Ï´Ù.", name);
-            return nullptr;
-        }
-
-        Material* pObject = new Material();
-        pObject->SetName(name);
-
-        return pObject;
-    }
-
-    bool Material::IsOpaque() const
-    {
-        auto it = m_DvTextures.find(eTextureUnitType::Diffuse);
-        if (it != m_DvTextures.end())
-        {
-            return it->second->IsOpaque();
-        }
-
-        return m_DiffuseColor.w == 1.0f;
+        return m_BlendMode != eBlendMode::Opqaue;
     }
 }

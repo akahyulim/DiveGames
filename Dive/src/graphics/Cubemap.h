@@ -1,12 +1,10 @@
-#pragma once
+﻿#pragma once
 #include "Texture.h"
 
 namespace Dive
 {
 	class Cubemap : public Texture
 	{
-		DV_CLASS(Cubemap, Texture)
-
 	public:
 		Cubemap() = delete;
 		Cubemap(UINT32 size, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
@@ -19,7 +17,9 @@ namespace Dive
 
 		void SetFaceData(UINT32 index, const void* pixels, size_t size);
 
-		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }
+		ID3D11RenderTargetView* GetBackBufferRTV() const { return m_RenderTargetView; }
+
+		static constexpr eResourceType GetType() { return eResourceType::Cubemap; }
 
 		static std::shared_ptr<Cubemap> LoadFromFaceFiles(const std::vector<std::filesystem::path>& faceFilepaths, bool useMips = false);
 		static std::shared_ptr<Cubemap> LoadFromFile(const std::filesystem::path& filepath, bool useMips = false);

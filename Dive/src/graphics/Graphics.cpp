@@ -1,7 +1,13 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "Graphics.h"
 #include "core/CoreDefs.h"
 #include "core/Window.h"
+#include "RenderTexture.h"
+#include "Shader.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+
+using Microsoft::WRL::ComPtr;
 
 namespace Dive
 {
@@ -11,17 +17,17 @@ namespace Dive
 	constexpr DXGI_FORMAT DV_FORMAT = DXGI_FORMAT_R8G8B8A8_UNORM;
 	constexpr BOOL DV_WINDOWED = TRUE;
 
-	IDXGISwapChain* Graphics::s_SwapChain = nullptr;
-	ID3D11Device* Graphics::s_Device = nullptr;
-	ID3D11DeviceContext* Graphics::s_DeviceContext = nullptr;
-
-	ID3D11RenderTargetView* Graphics::s_RenderTargetView = nullptr;
-	ID3D11Texture2D* Graphics::s_DepthStencilTexture = nullptr;
-	ID3D11DepthStencilView* Graphics::s_DEpthStencilView = nullptr;
-
 	uint32_t Graphics::s_ResolutionWidth = 0;
 	uint32_t Graphics::s_ResolutionHeight = 0;
 	bool Graphics::s_UseVSync = false;
+
+	ComPtr<IDXGISwapChain> Graphics::s_SwapChain;
+	ComPtr<ID3D11Device> Graphics::s_Device;
+	ComPtr<ID3D11DeviceContext> Graphics::s_DeviceContext;
+
+	ComPtr<ID3D11RenderTargetView> Graphics::s_BackBufferRTV;
+	ComPtr<ID3D11Texture2D> Graphics::s_BackbufferTexture;
+	ComPtr<ID3D11DepthStencilView> Graphics::s_BackBufferDSV;
 
 	void Graphics::Initialize()
 	{
@@ -33,12 +39,12 @@ namespace Dive
 			nullptr,
 			0,
 			D3D11_SDK_VERSION,
-			&s_Device,
+			s_Device.GetAddressOf(),
 			nullptr,
-			&s_DeviceContext))) 
+			s_DeviceContext.GetAddressOf()))) 
 		{
 			Shutdown();
-			DV_LOG(Graphics, err, "D3D11Device & D3D11DeviceContext ª˝º∫ø° Ω«∆–«œø¥Ω¿¥œ¥Ÿ.");
+			DV_LOG(Graphics, critical, "D3D11Device & D3D11DeviceContext ÏÉùÏÑ± Ïã§Ìå®!.");
 			return;
 		}
 
@@ -51,22 +57,21 @@ namespace Dive
 
 		DXGI_SWAP_CHAIN_DESC desc{};
 		desc.BufferCount = DV_BUFFER_COUNT;
-		desc.BufferDesc.Width = Window::GetWidth();
-		desc.BufferDesc.Height = Window::GetHeight();
+		desc.BufferDesc.Width = static_cast<UINT>(Window::GetWidth());
+		desc.BufferDesc.Height = static_cast<UINT>(Window::GetHeight());
 		desc.BufferDesc.Format = DV_FORMAT;
 		desc.BufferDesc.RefreshRate.Denominator = DV_REFRESHRATE_DENOMINATOR;
 		desc.BufferDesc.RefreshRate.Numerator = DV_REFRESHRATE_NUMERATOR;
 		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		desc.SampleDesc.Count = 1;								// ∏÷∆º ª˘«√∏µ off
+		desc.SampleDesc.Count = 1;								// Î©ÄÌã∞ ÏÉòÌîåÎßÅ off
 		desc.SampleDesc.Quality = 0;
 		desc.Windowed = !Window::IsFullScreen();
 		desc.OutputWindow = Window::GetWindowHandle();
-		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertekø°º± 0¿Ã∞Ì ¥Ÿ∏• ∞™µÈ º≥¡§¿Ã ≥≤æ∆ ¿÷¥Ÿ...
+		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertekÏóêÏÑ† 0Ïù¥Í≥† Îã§Î•∏ Í∞íÎì§ ÏÑ§Ï†ïÏù¥ ÎÇ®ÏïÑ ÏûàÎã§...
 
-		if (FAILED(dxgiFactory->CreateSwapChain(s_Device, &desc, &s_SwapChain)))
+		if (FAILED(dxgiFactory->CreateSwapChain(s_Device.Get(), &desc, s_SwapChain.GetAddressOf())))
 		{
-			Shutdown();
-			DV_LOG(Graphics, err, "D3D11SwapChain ª˝º∫ø° Ω«∆–«œø¥Ω¿¥œ¥Ÿ.");
+			DV_LOG(Graphics, critical, "D3D11SwapChain ÏÉùÏÑ± Ïã§Ìå®!");
 			return;
 		}
 
@@ -77,22 +82,26 @@ namespace Dive
 		updateBackbuffer();
 
 		DV_SUBSCRIBE_EVENT(eEventType::WindowResized, DV_EVENT_HANDLER_DATA_STATIC(OnWindowResized));
+
+		DV_LOG(Graphics, info, "Ï¥àÍ∏∞Ìôî ÏôÑÎ£å");
 	}
 	
 	void Graphics::Shutdown()
 	{
-		DV_RELEASE(s_DEpthStencilView);
-		DV_RELEASE(s_DepthStencilTexture);
-		DV_RELEASE(s_RenderTargetView);
+		s_BackBufferDSV.Reset();
+		s_BackbufferTexture.Reset();
+		s_BackBufferRTV.Reset();
 		
-		DV_RELEASE(s_DeviceContext);
-		DV_RELEASE(s_Device);
-		DV_RELEASE(s_SwapChain);
+		s_DeviceContext.Reset();
+		s_Device.Reset();
+		s_SwapChain.Reset();
+
+		DV_LOG(Graphics, info, "ÏÖßÎã§Ïö¥ ÏôÑÎ£å");
 	}
 
 	void Graphics::ChangeResolution(uint32_t width, uint32_t height)
 	{
-		DV_ASSERT(Graphics, s_SwapChain);
+		assert(s_SwapChain);
 
 		if (s_ResolutionWidth == width && s_ResolutionHeight == height) 
 			return;
@@ -101,25 +110,23 @@ namespace Dive
 
 		s_ResolutionWidth = width; 
 		s_ResolutionHeight = height;
-
-		DV_RELEASE(s_RenderTargetView);
 	
-		if (FAILED(s_SwapChain->ResizeBuffers(DV_BUFFER_COUNT, width, height, DV_FORMAT, 0))) 
+		if (FAILED(s_SwapChain->ResizeBuffers(DV_BUFFER_COUNT, static_cast<UINT>(width), static_cast<UINT>(height), DV_FORMAT, 0)))
 		{
-			DV_LOG(Graphics, err, "»ƒ∏È πˆ∆€ ≈©±‚ {0:d}x{1:d} ∫Ø∞Êø° Ω«∆–«œø¥Ω¿¥œ¥Ÿ.", width, height);
+			DV_LOG(Graphics, err, "ÌõÑÎ©¥ Î≤ÑÌçº ÌÅ¨Í∏∞ {0:d}x{1:d} Î≥ÄÍ≤Ω Ïã§Ìå®", width, height);
 			return;
 		}
 
 		DXGI_MODE_DESC desc{};
-		desc.Width = width;
-		desc.Height = height;
+		desc.Width = static_cast<UINT>(width);
+		desc.Height = static_cast<UINT>(height);
 		desc.RefreshRate.Numerator = DV_REFRESHRATE_NUMERATOR;
 		desc.RefreshRate.Denominator = DV_REFRESHRATE_DENOMINATOR;
 		desc.Format = DV_FORMAT;
 
 		if (FAILED(s_SwapChain->ResizeTarget(&desc))) 
 		{
-			DV_LOG(Graphics, err, "«ÿªÛµµ {0:d}x{1:d} ∫Ø∞Êø° Ω«∆–«œø¥Ω¿¥œ¥Ÿ.", width, height);
+			DV_LOG(Graphics, err, "Ìï¥ÏÉÅÎèÑ {0:d}x{1:d} Î≥ÄÍ≤Ω Ïã§Ìå®", width, height);
 			return;
 		}
 
@@ -139,67 +146,60 @@ namespace Dive
 
 	void Graphics::Present()
 	{
-		DV_ASSERT(Graphics, s_SwapChain);
+		assert(s_SwapChain.Get());
 		s_SwapChain->Present(s_UseVSync ? 1 : 0, 0);
 	}
 
 	IDXGISwapChain* Graphics::GetSwapChain()
 	{
-		DV_ASSERT(Graphics, s_SwapChain);
-		return s_SwapChain;
+		return s_SwapChain.Get();
 	}
 	
 	ID3D11Device* Graphics::GetDevice()
 	{
-		DV_ASSERT(Graphics, s_Device);
-		return s_Device;
+		return s_Device.Get();
 	}
 	
 	ID3D11DeviceContext* Graphics::GetDeviceContext()
 	{
-		DV_ASSERT(Graphics, s_DeviceContext);
-		return s_DeviceContext;
+		return s_DeviceContext.Get();
 	}
 
-	ID3D11RenderTargetView* Graphics::GetBackbufferRTV()
+	ID3D11RenderTargetView* Graphics::GetBackBufferRTV()
 	{
-		DV_ASSERT(Graphics, s_RenderTargetView);
-		return s_RenderTargetView;
+		return s_BackBufferRTV.Get();
 	}
 	
-	ID3D11DepthStencilView* Graphics::GetBackbufferDSV()
+	ID3D11DepthStencilView* Graphics::GetBackBufferDSV()
 	{
-		DV_ASSERT(Graphics, s_DEpthStencilView);
-		return s_DEpthStencilView;
+		return s_BackBufferDSV.Get();
 	}
 
 	void Graphics::updateBackbuffer()
 	{
-		DV_ASSERT(Graphics, s_SwapChain);
-		DV_ASSERT(Graphics, s_Device);
+		assert(s_SwapChain.Get());
+		assert(s_Device.Get());
 
-		DV_RELEASE(s_RenderTargetView);
-		DV_RELEASE(s_DepthStencilTexture);
-		DV_RELEASE(s_DEpthStencilView);
-
-		ID3D11Texture2D* pBackbufferTexture{};
-		if (FAILED(s_SwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&pBackbufferTexture))) 
+		s_BackBufferRTV.Reset();
+		s_BackbufferTexture.Reset();
+		s_BackBufferDSV.Reset();
+		
+		ID3D11Texture2D* backBufferTexture{};
+		if (FAILED(s_SwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backBufferTexture))) 
 		{
-			DV_LOG(Graphics, err, "»ƒ∏Èπˆ∆€ ≈ÿΩ∫√ƒ »πµÊ Ω«∆–");
+			DV_LOG(Graphics, err, "ÌõÑÎ©¥Î≤ÑÌçº ÌÖçÏä§Ï≥ê ÌöçÎìù Ïã§Ìå®");
 			return;
 		}
 
 		if (FAILED(s_Device->CreateRenderTargetView(
-			static_cast<ID3D11Resource*>(pBackbufferTexture), 
+			static_cast<ID3D11Resource*>(backBufferTexture), 
 			nullptr, 
-			&s_RenderTargetView))) 
+			&s_BackBufferRTV))) 
 		{
-			DV_RELEASE(s_RenderTargetView);
-			DV_LOG(Graphics, err, "»ƒ∏Èπˆ∆€ ∑ª¥ı≈∏∞Ÿ∫‰ ª˝º∫ Ω«∆–");
+			DV_LOG(Graphics, err, "ÌõÑÎ©¥Î≤ÑÌçº Î†åÎçîÌÉÄÍ≤üÎ∑∞ ÏÉùÏÑ± Ïã§Ìå®");
 			return;
 		}
-		DV_RELEASE(pBackbufferTexture);
-
+		
 		DXGI_SWAP_CHAIN_DESC desc{};
 		s_SwapChain->GetDesc(&desc);
 
@@ -209,16 +209,16 @@ namespace Dive
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
 		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		texDesc.SampleDesc.Count = 1;// static_cast<UINT32>(screenParamm_.multiSample_);
+		texDesc.SampleDesc.Count = 1;// static_cast<uint32_t>(screenParamm_.multiSample_);
 		texDesc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(texDesc.Format, screenParamm_.multiSample_);
 		texDesc.Usage = D3D11_USAGE_DEFAULT;
 		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		texDesc.CPUAccessFlags = 0;
 		texDesc.MiscFlags = 0;
 
-		if (FAILED(s_Device->CreateTexture2D(&texDesc, nullptr, &s_DepthStencilTexture))) 
+		if (FAILED(s_Device->CreateTexture2D(&texDesc, nullptr, &s_BackbufferTexture))) 
 		{
-			DV_LOG(Graphics, err, "»ƒ∏Èπˆ∆€ ±Ì¿Ã Ω∫≈ŸΩ« ≈ÿΩ∫√ƒ ª˝º∫ Ω«∆–");
+			DV_LOG(Graphics, err, "ÌõÑÎ©¥Î≤ÑÌçº ÍπäÏù¥ Ïä§ÌÖêÏã§ ÌÖçÏä§Ï≥ê ÏÉùÏÑ± Ïã§Ìå®");
 			return;
 		}
 
@@ -228,15 +228,15 @@ namespace Dive
 		viewDesc.Texture2D.MipSlice = 0;
 
 		if (FAILED(s_Device->CreateDepthStencilView(
-			static_cast<ID3D11Resource*>(s_DepthStencilTexture),
+			static_cast<ID3D11Resource*>(s_BackbufferTexture.Get()),
 			&viewDesc,
-			&s_DEpthStencilView))) 
+			s_BackBufferDSV.GetAddressOf()))) 
 		{
-			DV_LOG(Graphics, err, "»ƒ∏Èπˆ∆€ ±Ì¿Ã Ω∫≈ŸΩ« ∫‰ ª˝º∫ Ω«∆–");
+			DV_LOG(Graphics, err, "ÌõÑÎ©¥Î≤ÑÌçº ÍπäÏù¥ Ïä§ÌÖêÏã§ Î∑∞ ÏÉùÏÑ± Ïã§Ìå®");
 			return;
 		}
 
-		s_ResolutionWidth = desc.BufferDesc.Width;
-		s_ResolutionHeight = desc.BufferDesc.Height;
+		s_ResolutionWidth = static_cast<uint32_t>(desc.BufferDesc.Width);
+		s_ResolutionHeight = static_cast<uint32_t>(desc.BufferDesc.Height);
 	}
 }

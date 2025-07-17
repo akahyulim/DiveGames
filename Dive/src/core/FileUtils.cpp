@@ -1,6 +1,6 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "FileUtils.h"
-#include "Log.h"
+#include "CoreDefs.h"
 #include <commdlg.h>
 #include <ShlObj.h>
 #include <combaseapi.h>
@@ -58,7 +58,7 @@ namespace Dive
             }
             catch (const std::filesystem::filesystem_error& e)
             {
-                DV_LOG(FileUtils, err, "Save As¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù: {:s}", e.what());
+                DV_LOG(FileUtils, err, "Save Asì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤: {:s}", e.what());
             }
         }
 

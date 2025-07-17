@@ -1,5 +1,4 @@
-
-#pragma once
+﻿#pragma once
 
 namespace Dive
 {
@@ -11,8 +10,8 @@ namespace Dive
 		WorldSerializer(World* world);
 		~WorldSerializer() = default;
 
-		void Serialize(const std::filesystem::path& path);
-		bool Deserialize(const std::filesystem::path& path);
+		void Serialize(const std::filesystem::path& filepath);
+		bool Deserialize(const std::filesystem::path& filepath);
 
 	private:
 		World* m_World;

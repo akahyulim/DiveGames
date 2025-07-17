@@ -1,32 +1,33 @@
-#pragma once
-#include "Core/Object.h"
+Ôªø#pragma once
+#include "core/Object.h"
 
 namespace Dive
 {
-	class ConstantBuffer;
 	class GameObject;
+
+	enum class eComponentType
+	{
+		Undefined,
+		Transform,
+		Camera,
+		MeshRenderer,
+		SkinnedMeshRender
+	};
 
 	class Component : public Object
 	{
-		DV_CLASS(Component, Object)
-
 	public:
 		Component(GameObject* gameObject);
-		~Component() override = default;
+		virtual ~Component() = default;
+
+		std::string GetName() override;
 
 		virtual void Update() {}
 
-		// ¿Ã∏ß¿ª GetVertexCBuffer()∑Œ πŸ≤Ÿ±‚
-		virtual ConstantBuffer* GetConstantBufferVS() { return nullptr; }
-		virtual ConstantBuffer* GetConstantBufferDS() { return nullptr; }
-		virtual ConstantBuffer* GetConstantBufferGS() { return nullptr; }
-		virtual ConstantBuffer* GetConstantBufferPS() { return nullptr; }
-
-		std::string GetName() const;
-
 		GameObject* GetGameObject() const;
-		void SetGameObject(GameObject* gameObject) { m_GameObject = gameObject; }
-		
+
+		static constexpr eComponentType GetType() { return eComponentType::Undefined; }
+
 	protected:
 		GameObject* m_GameObject;
 	};

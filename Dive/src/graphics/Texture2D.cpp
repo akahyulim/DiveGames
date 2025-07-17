@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "Texture2D.h"
 #include "core/CoreDefs.h"
 #include "core/FileUtils.h"
@@ -6,11 +6,18 @@
 
 namespace Dive
 {
+	Texture2D::Texture2D()
+	{
+		SetName("Texture2D");
+	}
+
 	Texture2D::Texture2D(UINT32 width, UINT32 height, DXGI_FORMAT format, bool useMips)
 		: m_Width(width), m_Height(height)
 	{
 		m_Format = format;
 		m_UseMips = useMips;
+
+		SetName("Texture2D");
 	}
 
 	Texture2D::~Texture2D()
@@ -24,11 +31,44 @@ namespace Dive
 		std::copy(static_cast<const uint8_t*>(pixels), static_cast<const uint8_t*>(pixels) + size, m_PixelData.begin());
 	}
 
+	bool Texture2D::LoadFromFile(const std::filesystem::path& filepath)
+	{
+		auto extension = filepath.extension().string();
+
+		DirectX::ScratchImage img;
+		HRESULT result = 0;
+		if (extension == ".dds")
+			result = DirectX::LoadFromDDSFile(filepath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, img);
+		else if (extension == ".tga")
+			result = DirectX::LoadFromTGAFile(filepath.c_str(), nullptr, img);
+		else
+			result = DirectX::LoadFromWICFile(filepath.c_str(), DirectX::WIC_FLAGS_NONE, nullptr, img);
+
+		if (FAILED(result))
+		{
+			DV_LOG(Texture2D, err, "Texture2D ìƒì„± ê³¼ì • ì¤‘ íŒŒì¼ {:s} ë¡œë“œ ì‹¤íŒ¨", filepath.string());
+			return false;
+		}
+
+		m_Width = static_cast<UINT32>(img.GetImages()->width);
+		m_Height = static_cast<UINT32>(img.GetImages()->height);
+		m_Format = img.GetImages()->format;
+		m_UseMips = true;
+		
+		SetPixelData((const void*)img.GetImages()->pixels, img.GetImages()->rowPitch * img.GetImages()->height);
+		if (!Create())
+			return false;
+
+		SetFilepath(filepath);
+
+		return true;
+	}
+
 	bool Texture2D::Create()
 	{
 		if (m_PixelData.empty())
 		{
-			DV_LOG(Texture2D, err, "Texture2D ÇÈ¼¿ µ¥ÀÌÅÍ ¹Ì¼³Á¤");
+			DV_LOG(Texture2D, err, "Texture2D í”½ì…€ ë°ì´í„° ë¯¸ì„¤ì •");
 			return false;
 		}
 
@@ -53,7 +93,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_Texture2D)))
 			{
-				DV_LOG(Texture2D, err, "Texture2DÀÇ ID3D11Texture2D »ı¼º¿¡ ½ÇÆĞÇÏ¿´½À´Ï´Ù.");
+				DV_LOG(Texture2D, err, "Texture2Dì˜ ID3D11Texture2D ìƒì„±ì— ì‹¤íŒ¨í•˜ì˜€ìŠµë‹ˆë‹¤.");
 				return false;
 			}
 
@@ -76,7 +116,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_ShaderResourceView)))
 			{
-				DV_LOG(Texture2D, err, "Texture2DÀÇ ID3D11ShaderResourceView »ı¼º ½ÇÆĞ");
+				DV_LOG(Texture2D, err, "Texture2Dì˜ ID3D11ShaderResourceView ìƒì„± ì‹¤íŒ¨");
 				Release();
 				return false;
 			}
@@ -90,7 +130,7 @@ namespace Dive
 
 		return true;
 	}
-
+	/*
 	std::shared_ptr<Texture2D> Texture2D::LoadFromFile(const std::filesystem::path& filepath, bool useMips)
 	{
 		auto extension = filepath.extension().string();
@@ -106,7 +146,7 @@ namespace Dive
 
 		if (FAILED(result))
 		{
-			DV_LOG(Texture2D, err, "Texture2D »ı¼º °úÁ¤ Áß ÆÄÀÏ {:s} ·Îµå ½ÇÆĞ", filepath.string());
+			DV_LOG(Texture2D, err, "Texture2D ìƒì„± ê³¼ì • ì¤‘ íŒŒì¼ {:s} ë¡œë“œ ì‹¤íŒ¨", filepath.string());
 			return nullptr;
 		}
 
@@ -119,11 +159,14 @@ namespace Dive
 		if (!pNewTexture2D->Create())	
 			return nullptr;
 
+		pNewTexture2D->SetFilepath(filepath);
+
 		return pNewTexture2D;
 	}
-
+	*/
 	std::shared_ptr<Texture2D> Texture2D::LoadFromMemory(const std::filesystem::path& filepath, size_t size, const void* pSource, bool useMips)
 	{
+		/*
 		auto extension = filepath.extension().string();
 
 		DirectX::ScratchImage img;
@@ -137,7 +180,7 @@ namespace Dive
 
 		if (FAILED(result))
 		{
-			DV_LOG(Texture2D, err, "Texture2D »ı¼º °úÁ¤ Áß ¸Ş¸ğ¸® ·Îµå ½ÇÆĞ");
+			DV_LOG(Texture2D, err, "Texture2D ìƒì„± ê³¼ì • ì¤‘ ë©”ëª¨ë¦¬ ë¡œë“œ ì‹¤íŒ¨");
 			return nullptr;
 		}
 
@@ -151,5 +194,7 @@ namespace Dive
 			return nullptr;
 
 		return pNewTexture2D;
+		*/
+		return nullptr;
 	}
 }
