@@ -16,7 +16,7 @@ namespace Dive
 	public:
 		BoundingBox();
 		BoundingBox(const DirectX::XMFLOAT3& min, const DirectX::XMFLOAT3& max);
-		BoundingBox(const DirectX::XMFLOAT3* points, UINT32 pointCount);
+		BoundingBox(const DirectX::XMFLOAT3* points, uint32_t pointCount);
 		BoundingBox(const std::vector<StaticVertex>& vertices);
 		~BoundingBox() = default;
 

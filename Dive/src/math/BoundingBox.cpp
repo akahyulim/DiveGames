@@ -19,12 +19,12 @@ namespace Dive
 	{
 	}
 
-	BoundingBox::BoundingBox(const DirectX::XMFLOAT3* points, UINT32 pointCount)
+	BoundingBox::BoundingBox(const DirectX::XMFLOAT3* points, uint32_t pointCount)
 	{
 		m_Max = XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		m_Min = XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
 
-		for (UINT32 i = 0; i < pointCount; i++)
+		for (uint32_t i = 0; i < pointCount; i++)
 		{
 			m_Max.x = std::max(m_Max.x, points[i].x);
 			m_Max.y = std::max(m_Max.y, points[i].y);

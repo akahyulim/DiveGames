@@ -18,10 +18,10 @@ namespace Dive
 	{
 	}
 	
-	std::unordered_map<const void*, UINT64> objectToFileID;
-	UINT64 currentID = 1;
+	std::unordered_map<const void*, uint64_t> objectToFileID;
+	uint64_t currentID = 1;
 
-	UINT64 GetFileID(const Object* obj)
+	static uint64_t GetFileID(const Object* obj)
 	{
 		const void* key = static_cast<const void*>(obj);
 		auto [it, inserted] = objectToFileID.emplace(key, currentID);
@@ -31,7 +31,7 @@ namespace Dive
 
 	// 루트부터 재귀적으로 all에 저장
 	// 순서를 유지하기 위해서이다.
-	void CollectHierarchy(GameObject* root, std::vector<GameObject*>& all)
+	static void CollectHierarchy(GameObject* root, std::vector<GameObject*>& all)
 	{
 		all.push_back(root);
 
@@ -46,7 +46,7 @@ namespace Dive
 
 		for (auto go : objects)
 		{
-			UINT64 goID = GetFileID(go);
+			uint64_t goID = GetFileID(go);
 
 			out << YAML::BeginMap;
 
@@ -55,7 +55,7 @@ namespace Dive
 			out << YAML::Key << "Tag" << YAML::Value << go->GetTag();
 
 
-			UINT64 transformID = GetFileID(go->GetTransform());
+			uint64_t transformID = GetFileID(go->GetTransform());
 			auto transform = go->GetTransform();
 			out << YAML::Key << "Transform" << YAML::Value << YAML::BeginMap;
 			out << YAML::Key << "fileID" << YAML::Value << transformID;
@@ -70,7 +70,7 @@ namespace Dive
 
 			if (go->HasComponent<Camera>())
 			{
-				UINT64 cameraID = GetFileID(go->GetComponent<Camera>());
+				uint64_t cameraID = GetFileID(go->GetComponent<Camera>());
 				auto camera = go->GetComponent<Camera>();
 				out << YAML::Key << "Camera" << YAML::Value << YAML::BeginMap;
 				out << YAML::Key << "fileID" << YAML::Value << cameraID;
@@ -88,7 +88,7 @@ namespace Dive
 
 			if (go->HasComponent<MeshRenderer>())
 			{
-				UINT64 staticMeshID = GetFileID(go->GetComponent<MeshRenderer>());
+				uint64_t staticMeshID = GetFileID(go->GetComponent<MeshRenderer>());
 				auto meshRenderer = go->GetComponent<MeshRenderer>();
 				auto staticMesh = meshRenderer->GetStaticMesh();
 				auto material = meshRenderer->GetMaterial();
@@ -127,7 +127,7 @@ namespace Dive
 		DV_LOG(WorldSerializer, info, "월드 직렬화 완료 - {}", m_World->GetName());
 	}
 
-	std::unordered_map<UINT64, Object*> fileIDToObject;
+	std::unordered_map<uint64_t, Object*> fileIDToObject;
 
 	bool WorldSerializer::Deserialize(const std::filesystem::path& filepath)
 	{
@@ -150,7 +150,7 @@ namespace Dive
 		// 1차 패스: GameObject/Transform 생성 + fileID 등록
 		for (const auto& node : nodes)
 		{
-			auto goID = node["fileID"].as<UINT64>();
+			auto goID = node["fileID"].as<uint64_t>();
 			auto name = node["Name"].as<std::string>();
 			auto tag = node["Tag"] ? node["Tag"].as<std::string>() : "Untagged";
 
@@ -159,7 +159,7 @@ namespace Dive
 			fileIDToObject[goID] = go;
 
 			const auto& transformNode = node["Transform"];
-			auto transformID = transformNode["fileID"].as<UINT64>();
+			auto transformID = transformNode["fileID"].as<uint64_t>();
 
 			auto transform = go->GetTransform(); // GameObject가 자동으로 Transform 생성한다고 가정
 			transform->SetLocalPosition(transformNode["Position"].as<DirectX::XMFLOAT3>());
@@ -169,7 +169,7 @@ namespace Dive
 
 			if (const auto& cameraNode = node["Camera"])
 			{
-				auto cameraID = cameraNode["fileID"].as<UINT64>();
+				auto cameraID = cameraNode["fileID"].as<uint64_t>();
 				auto camera = go->AddComponent<Camera>();
 				camera->SetProjectionType(static_cast<eProjectionType>(cameraNode["ProjectionType"].as<int>()));
 				camera->SetFieldOfView(cameraNode["FieldOfView"].as<float>());
@@ -185,7 +185,7 @@ namespace Dive
 
 			if (const auto& meshRendererNode = node["MeshRenderer"])
 			{
-				auto staticMeshID = meshRendererNode["fileID"].as<UINT64>();
+				auto staticMeshID = meshRendererNode["fileID"].as<uint64_t>();
 				auto meshRenderer = go->AddComponent<MeshRenderer>();
 				std::string staticMeshName = meshRendererNode["StaticMesh"].as<std::string>();
 				
@@ -217,12 +217,12 @@ namespace Dive
 			const auto& transformNode = node["Transform"];
 			if (!transformNode["fileID"]) continue;
 
-			auto transformID = transformNode["fileID"].as<UINT64>();
+			auto transformID = transformNode["fileID"].as<uint64_t>();
 			auto transform = static_cast<Transform*>(fileIDToObject[transformID]);
 
 			if (transformNode["Parent"])
 			{
-				UINT64 parentID = transformNode["Parent"].as<UINT64>();
+				uint64_t parentID = transformNode["Parent"].as<uint64_t>();
 				auto parent = static_cast<Transform*>(fileIDToObject[parentID]);
 				if (parent)
 					transform->SetParent(parent);

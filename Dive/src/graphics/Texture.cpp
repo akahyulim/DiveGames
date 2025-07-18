@@ -10,12 +10,12 @@ namespace Dive
 		DV_RELEASE(m_Texture2D);
 	}
 
-	UINT32 Texture::CalculateMipmapLevels(UINT32 width, UINT32 height)
+	uint32_t Texture::CalculateMipmapLevels(uint32_t width, uint32_t height)
 	{
-		return std::max(1u, static_cast<UINT32>(std::log2(std::max(width, height))) + 1);
+		return std::max(1u, static_cast<uint32_t>(std::log2(std::max(width, height))) + 1);
 	}
 
-	UINT32 Texture::GetPixelSize(DXGI_FORMAT format)
+	uint32_t Texture::GetPixelSize(DXGI_FORMAT format)
 	{
 		switch (format) 
 		{

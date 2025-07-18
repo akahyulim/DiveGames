@@ -3,7 +3,6 @@
 #include "graphics/Texture2D.h"
 #include "graphics/ShaderManager.h"
 #include "graphics/ConstantBuffer.h"
-//#include "graphics/Graphics.h"
 #include "core/CoreDefs.h"
 #include "resource/YamlHelper.h"
 #include "resource/ResourceManager.h"

@@ -107,14 +107,14 @@ namespace Dive
 		static bool IsCahed(UINT64 instanceID);
 
 		template<class T>
-		static INT32 GetResourceCount()
+		static uint32_t GetResourceCount()
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
 
 			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
 			{
-				return static_cast<INT32>(it->second.size());
+				return static_cast<uint32_t>(it->second.size());
 			}
 			return 0;
 		}
@@ -131,7 +131,7 @@ namespace Dive
 			}
 		}
 
-		static INT32 GetAllResourceCount();
+		static uint32_t GetAllResourceCount();
 
 		static std::string GetResourceFolder() { return s_ResourceFolder.string(); }
 		static void SetResourceFolder(const std::filesystem::path& path);
