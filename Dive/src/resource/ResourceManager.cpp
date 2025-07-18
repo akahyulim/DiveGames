@@ -27,12 +27,12 @@ namespace Dive
 		return false;
 	}
 
-	INT32 ResourceManager::GetAllResourceCount()
+	uint32_t ResourceManager::GetAllResourceCount()
 	{
-		INT32 count = 0;
+		uint32_t count = 0;
 		for (const auto& [type, resources] : s_Resources)
 		{
-			count += static_cast<INT32>(resources.size());
+			count += static_cast<uint32_t>(resources.size());
 		}
 		return count;
 	}

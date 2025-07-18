@@ -14,16 +14,16 @@ namespace Dive
 	{
 	public:
 		RenderTexture() = delete;
-		RenderTexture(UINT32 width, UINT32 height, eDepthFormat depth = eDepthFormat::None, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
+		RenderTexture(uint32_t width, uint32_t height, eDepthFormat depth = eDepthFormat::None, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
 		~RenderTexture() override;
 
 		bool Create() override;
 		void Release() override;
 		
-		bool Resize(UINT32 width, UINT32 height, eDepthFormat depth = eDepthFormat::None, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
+		bool Resize(uint32_t width, uint32_t height, eDepthFormat depth = eDepthFormat::None, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
 
-		UINT32 GetWidth() const { return m_Width; }
-		UINT32 GetHeight() const { return m_Height; }
+		uint32_t GetWidth() const { return m_Width; }
+		uint32_t GetHeight() const { return m_Height; }
 
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }
 		ID3D11DepthStencilView* GetDepthStencilView() const { return m_DepthStencilView; }
@@ -32,8 +32,8 @@ namespace Dive
 		static constexpr eResourceType GetType() { return eResourceType::RenderTexture; }
 
 	private:
-		UINT32 m_Width = 0;
-		UINT32 m_Height = 0;
+		uint32_t m_Width = 0;
+		uint32_t m_Height = 0;
 
 		ID3D11RenderTargetView* m_RenderTargetView = nullptr;
 

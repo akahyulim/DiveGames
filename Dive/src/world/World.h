@@ -23,20 +23,20 @@ namespace Dive
 		GameObject* CreateGameObject(const std::string& name = "");
 
 		void DestroyGameObject(GameObject* gameObject);
-		void DestroyGameObject(UINT64 instanceID);
+		void DestroyGameObject(uint64_t instanceID);
 		void QueueDestroy(GameObject* gameObject);
-		void QueueDestroy(UINT64 instanceID);
+		void QueueDestroy(uint64_t instanceID);
 		void FlushDestoryQueue();
 
-		bool HasGameObject(UINT64 instanceID);
+		bool HasGameObject(uint64_t instanceID);
 
-		GameObject* FindGameObject(UINT64 instanceID);
+		GameObject* FindGameObject(uint64_t instanceID);
 
 		void AttachRoot(GameObject* gameObject);
-		void AttachRoot(UINT64 instanceID);
+		void AttachRoot(uint64_t instanceID);
 	
 		void DetachRoot(GameObject* gameObject);
-		void DetachRoot(UINT64 instanceID);
+		void DetachRoot(uint64_t instanceID);
 
 		size_t AllGameObjectCount() const { return m_GameObjectMap.size(); }
 		std::vector<GameObject*> GetAllGameObjects();
@@ -53,9 +53,9 @@ namespace Dive
 	private:
 		std::string m_Name{};
 
-		std::unordered_map<UINT64, std::unique_ptr<GameObject>> m_GameObjectMap;
+		std::unordered_map<uint64_t, std::unique_ptr<GameObject>> m_GameObjectMap;
 		std::vector<GameObject*> m_RootGameObjects;
-		std::unordered_set<UINT64> m_DestroyQueue;
+		std::unordered_set<uint64_t> m_DestroyQueue;
 
 		std::vector<MeshRenderer*> m_TransparentMeshRenderers;
 		std::vector<MeshRenderer*> m_OpaqueMeshRenderers;

@@ -4,7 +4,7 @@
 
 namespace Dive
 {
-	Cubemap::Cubemap(UINT32 size, DXGI_FORMAT format, bool useMips)
+	Cubemap::Cubemap(uint32_t size, DXGI_FORMAT format, bool useMips)
 		: m_Size(size), m_FaceData{}
 	{
 		m_Format = format;
@@ -24,7 +24,7 @@ namespace Dive
 		Texture::Release();
 	}
 
-	void Cubemap::SetFaceData(UINT32 index, const void* pixels, size_t size)
+	void Cubemap::SetFaceData(uint32_t index, const void* pixels, size_t size)
 	{
 		if (index > 5) 
 		{
@@ -48,9 +48,9 @@ namespace Dive
 		{
 			D3D11_TEXTURE2D_DESC desc{};
 			desc.Format = m_Format;
-			desc.Width = m_Size;
-			desc.Height = m_Size;
-			desc.MipLevels = m_MipLevels;
+			desc.Width = static_cast<UINT>(m_Size);
+			desc.Height = static_cast<UINT>(m_Size);
+			desc.MipLevels = static_cast<UINT>(m_MipLevels);
 			desc.ArraySize = 6;
 			desc.SampleDesc.Count = 1;
 			desc.SampleDesc.Quality = 0;
@@ -73,16 +73,16 @@ namespace Dive
 					return false;
 				}
 
-				UINT32 rowPitch = m_Size * GetPixelSize(m_Format);
+				UINT rowPitch = static_cast<UINT>(m_Size * GetPixelSize(m_Format));
 				for (int i = 0; i < 6; ++i) 
 				{
 					Graphics::GetDeviceContext()->UpdateSubresource(
 						m_Texture2D,
-						D3D11CalcSubresource(0, static_cast<UINT32>(i), m_MipLevels),
+						D3D11CalcSubresource(0, static_cast<UINT>(i), m_MipLevels),
 						nullptr,
 						(const void*)m_FaceData[i].data(),
 						rowPitch,
-						rowPitch * m_Size);
+						rowPitch * m_Size);	// 조금 의심스럽다. 나중에 확인
 				}
 			}
 		}
@@ -132,12 +132,12 @@ namespace Dive
 			return nullptr;
 		}
 
-		UINT32 size = 0;
+		uint32_t size = 0;
 		DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
 
 		std::array<std::vector<uint8_t>, 6> faceData;
 
-		for (UINT32 i = 0; i < 6; ++i)
+		for (uint32_t i = 0; i < 6; ++i)
 		{
 			const auto& filepath = faceFilepaths[i];
 			if (!std::filesystem::exists(filepath))
@@ -157,7 +157,7 @@ namespace Dive
 			// 첫 번째 Face에서 크기와 포맷 결정
 			if (i == 0)
 			{
-				size = static_cast<UINT32>(image.GetMetadata().width);
+				size = static_cast<uint32_t>(image.GetMetadata().width);
 				format = image.GetMetadata().format;
 			}
 
@@ -180,7 +180,7 @@ namespace Dive
 		}
 
 		auto cubemap = std::make_shared<Cubemap>(size, format, useMips);
-		for (UINT32 i = 0; i < 6; ++i)
+		for (uint32_t i = 0; i < 6; ++i)
 			cubemap->SetFaceData(i, faceData[i].data(), faceData[i].size());
 
 		if (!cubemap->Create())
@@ -217,10 +217,10 @@ namespace Dive
 		}
 
 		// 큐브맵 객체 생성
-		auto cubemap = std::make_shared<Cubemap>(static_cast<UINT32>(metadata.width), metadata.format, useMips);
+		auto cubemap = std::make_shared<Cubemap>(static_cast<uint32_t>(metadata.width), metadata.format, useMips);
 
 		// 각 Face 데이터 설정
-		for (UINT32 i = 0; i < 6; ++i) 
+		for (uint32_t i = 0; i < 6; ++i) 
 		{
 			const DirectX::Image* img = image.GetImage(0, i, 0); // 6개의 Face 중 하나를 가져옴
 			if (!img)

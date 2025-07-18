@@ -4,7 +4,7 @@
 
 namespace Dive
 {
-	RenderTexture::RenderTexture(UINT32 width, UINT32 height, eDepthFormat depth, DXGI_FORMAT format, bool useMips)
+	RenderTexture::RenderTexture(uint32_t width, uint32_t height, eDepthFormat depth, DXGI_FORMAT format, bool useMips)
 		: m_Width(width), m_Height(height)
 	{
 		m_Format = format;
@@ -39,9 +39,9 @@ namespace Dive
 			{
 				D3D11_TEXTURE2D_DESC desc{};
 				desc.Format = m_Format;
-				desc.Width = m_Width;
-				desc.Height = m_Height;
-				desc.MipLevels = m_MipLevels;
+				desc.Width = static_cast<UINT>(m_Width);
+				desc.Height = static_cast<UINT>(m_Height);
+				desc.MipLevels = static_cast<UINT>(m_MipLevels);
 				desc.ArraySize = 1;
 				desc.SampleDesc.Count = 1;
 				desc.Usage = D3D11_USAGE_DEFAULT;
@@ -96,8 +96,8 @@ namespace Dive
 			{
 				D3D11_TEXTURE2D_DESC desc{};
 				desc.Format = (m_DepthFormat == eDepthFormat::Depth16) ? DXGI_FORMAT_R16_TYPELESS : DXGI_FORMAT_R24G8_TYPELESS;
-				desc.Width = m_Width;
-				desc.Height = m_Height;
+				desc.Width = static_cast<UINT>(m_Width);
+				desc.Height = static_cast<UINT>(m_Height);
 				desc.MipLevels = 1;
 				desc.ArraySize = 1;
 				desc.SampleDesc.Count = 1;
@@ -146,7 +146,7 @@ namespace Dive
 		return true;
 	}
 
-	bool RenderTexture::Resize(UINT32 width, UINT32 height, eDepthFormat depth, DXGI_FORMAT format, bool useMips)
+	bool RenderTexture::Resize(uint32_t width, uint32_t height, eDepthFormat depth, DXGI_FORMAT format, bool useMips)
 	{
 		m_Width = width;
 		m_Height = height;

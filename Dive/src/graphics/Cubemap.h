@@ -7,15 +7,15 @@ namespace Dive
 	{
 	public:
 		Cubemap() = delete;
-		Cubemap(UINT32 size, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
+		Cubemap(uint32_t size, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
 		~Cubemap() override;
 
 		bool Create() override;
 		void Release() override;
 
-		UINT32 GetSize() const { return m_Size; }
+		uint32_t GetSize() const { return m_Size; }
 
-		void SetFaceData(UINT32 index, const void* pixels, size_t size);
+		void SetFaceData(uint32_t index, const void* pixels, size_t size);
 
 		ID3D11RenderTargetView* GetBackBufferRTV() const { return m_RenderTargetView; }
 
@@ -25,7 +25,7 @@ namespace Dive
 		static std::shared_ptr<Cubemap> LoadFromFile(const std::filesystem::path& filepath, bool useMips = false);
 
 	private:
-		UINT32 m_Size = 0;
+		uint32_t m_Size = 0;
 
 		ID3D11RenderTargetView* m_RenderTargetView = nullptr;
 		std::array<std::vector<uint8_t>, 6> m_FaceData;

@@ -11,9 +11,9 @@ using Microsoft::WRL::ComPtr;
 
 namespace Dive
 {
-	constexpr uint32_t DV_BUFFER_COUNT = 2;
-	constexpr uint32_t DV_REFRESHRATE_NUMERATOR = 60;
-	constexpr uint32_t DV_REFRESHRATE_DENOMINATOR = 1;
+	constexpr UINT DV_BUFFER_COUNT = 2;
+	constexpr UINT DV_REFRESHRATE_NUMERATOR = 60;
+	constexpr UINT DV_REFRESHRATE_DENOMINATOR = 1;
 	constexpr DXGI_FORMAT DV_FORMAT = DXGI_FORMAT_R8G8B8A8_UNORM;
 	constexpr BOOL DV_WINDOWED = TRUE;
 
@@ -209,8 +209,8 @@ namespace Dive
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
 		texDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		texDesc.SampleDesc.Count = 1;// static_cast<uint32_t>(screenParamm_.multiSample_);
-		texDesc.SampleDesc.Quality = 0;//impl->GetMultiSampleQuality(texDesc.Format, screenParamm_.multiSample_);
+		texDesc.SampleDesc.Count = 1;
+		texDesc.SampleDesc.Quality = 0;
 		texDesc.Usage = D3D11_USAGE_DEFAULT;
 		texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 		texDesc.CPUAccessFlags = 0;

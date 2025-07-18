@@ -16,10 +16,10 @@ namespace Dive
 
 		static void OnUpdate();
 
-		static void ResizeRenderBuffers(UINT32 width, UINT32 height);
+		static void ResizeRenderBuffers(uint32_t width, uint32_t height);
 
-		static UINT32 GetRenderTargetWidth() { return s_RenderTargetWidth; }
-		static UINT32 GetRenderTargetHeight() { return s_RenderTargetHeight; }
+		static uint32_t GetRenderTargetWidth() { return s_RenderTargetWidth; }
+		static uint32_t GetRenderTargetHeight() { return s_RenderTargetHeight; }
 
 		static RenderTexture* GetGBuffer(eGBuffer type);
 		static RenderTexture* GetRenderTarget(eRenderTarget type);
@@ -35,8 +35,8 @@ namespace Dive
 		static void createBlendStates();
 		
 	private:
-		static UINT32 s_RenderTargetWidth;
-		static UINT32 s_RenderTargetHeight;
+		static uint32_t s_RenderTargetWidth;
+		static uint32_t s_RenderTargetHeight;
 
 		// 상수 버퍼
 		static ConstantBuffer* s_DefaultVSConstantBuffer;

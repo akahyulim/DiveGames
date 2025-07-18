@@ -110,7 +110,7 @@ namespace Dive
 		m_RootGameObjects.push_back(gameObject);
 	}
 
-	void World::AttachRoot(UINT64 instanceID)
+	void World::AttachRoot(uint64_t instanceID)
 	{
 		if (!HasGameObject(instanceID))
 			return;
@@ -132,7 +132,7 @@ namespace Dive
 			m_RootGameObjects.erase(it);
 	}
 
-	void World::DetachRoot(UINT64 instanceID)
+	void World::DetachRoot(uint64_t instanceID)
 	{
 		if (!HasGameObject(instanceID))
 			return;
@@ -162,7 +162,7 @@ namespace Dive
 		gameObject->Destory();
 	}
 
-	void World::DestroyGameObject(UINT64 instanceID)
+	void World::DestroyGameObject(uint64_t instanceID)
 	{
 		if (!HasGameObject(instanceID))
 			return;
@@ -182,7 +182,7 @@ namespace Dive
 			m_DestroyQueue.insert(gameObject->GetInstanceID());
 	}
 
-	void World::QueueDestroy(UINT64 instanceID)
+	void World::QueueDestroy(uint64_t instanceID)
 	{
 		if (!HasGameObject(instanceID))
 			return;
@@ -206,12 +206,12 @@ namespace Dive
 		m_DestroyQueue.clear();
 	}
 
-	bool World::HasGameObject(UINT64 instanceID)
+	bool World::HasGameObject(uint64_t instanceID)
 	{
 		return m_GameObjectMap.find(instanceID) != m_GameObjectMap.end();
 	}
 
-	GameObject* World::FindGameObject(UINT64 instanceID)
+	GameObject* World::FindGameObject(uint64_t instanceID)
 	{
 		auto it = m_GameObjectMap.find(instanceID);
 		return it != m_GameObjectMap.end() ? it->second.get() : nullptr;

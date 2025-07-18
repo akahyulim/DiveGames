@@ -17,8 +17,8 @@
 
 namespace Dive
 {
-	UINT32 Renderer::s_RenderTargetWidth = 0;
-	UINT32 Renderer::s_RenderTargetHeight = 0;
+	uint32_t Renderer::s_RenderTargetWidth = 0;
+	uint32_t Renderer::s_RenderTargetHeight = 0;
 
 	RenderTexture* Renderer::s_GBufferRT0 = nullptr;
 	RenderTexture* Renderer::s_GBufferRT1 = nullptr;
@@ -103,7 +103,7 @@ namespace Dive
 		}
 	}
 
-	void Renderer::ResizeRenderBuffers(UINT32 width, UINT32 height)
+	void Renderer::ResizeRenderBuffers(uint32_t width, uint32_t height)
 	{
 		if (s_RenderTargetWidth == width && s_RenderTargetHeight == height)
 			return;

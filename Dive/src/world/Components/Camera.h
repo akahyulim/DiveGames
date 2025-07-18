@@ -66,7 +66,7 @@ namespace Dive
 		static constexpr eComponentType GetType() { return eComponentType::Camera; }
 
 		static std::vector<Camera*> GetAllCameras() { return s_AllCameras; }
-		static UINT32 GetAllCameraCount() { return static_cast<UINT32>(s_AllCameras.size()); }
+		static uint32_t GetAllCameraCount() { return static_cast<uint32_t>(s_AllCameras.size()); }
 		static Camera* GetMainCamera();
 
 	private:

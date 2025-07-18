@@ -7,13 +7,13 @@ namespace Dive
 	{
 	public:
 		Texture2D();
-		Texture2D(UINT32 width, UINT32 height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
+		Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
 		~Texture2D() override;
 
 		bool Create() override;
 
-		UINT32 GetWidth() const { return m_Width; }
-		UINT32 GetHeight() const { return m_Height; }
+		uint32_t GetWidth() const { return m_Width; }
+		uint32_t GetHeight() const { return m_Height; }
 
 		// 임시...
 		bool IsOpaque() const { return m_Format != DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; }
@@ -22,14 +22,13 @@ namespace Dive
 
 		bool LoadFromFile(const std::filesystem::path& filepath) override;
 
-		//static std::shared_ptr<Texture2D> LoadFromFile(const std::filesystem::path& filepath, bool useMips = false);
 		static std::shared_ptr<Texture2D> LoadFromMemory(const std::filesystem::path& filepath, size_t size, const void* pSource, bool useMips = false);
 
 		static constexpr eResourceType GetType() { return eResourceType::Texture2D; }
 
 	private:
-		UINT32 m_Width = 0;
-		UINT32 m_Height = 0;
+		uint32_t m_Width = 0;
+		uint32_t m_Height = 0;
 		std::vector<uint8_t> m_PixelData;
 	};
 }
