@@ -9,14 +9,14 @@ namespace Dive
 		: Object(name)
 		, m_World(WorldManager::GetActiveWorld())
 	{
-		DV_LOG(GameObject, info, "생성 - {}, {}", GetName(), GetInstanceID());
+		DV_LOG(GameObject, info, "생성: {}, {}", GetName(), GetInstanceID());
 	}
 
 	GameObject::~GameObject()
 	{
 		m_Components.clear();
 
-		DV_LOG(GameObject, info, "소멸 - {}, {}", GetName(), GetInstanceID());
+		DV_LOG(GameObject, info, "소멸: {}, {}", GetName(), GetInstanceID());
 	}
 
 	void GameObject::Destory()
@@ -60,9 +60,10 @@ namespace Dive
 	{
 		if (!HasComponentByType(type))
 		{
-			DV_LOG(GameObject, warn, "Component of type hash {} does not exist on GameObject '{}'.", (int)type, GetName());
+			DV_LOG(GameObject, warn, "유효하지 않은 타입을 전달하여 컴포넌트 제거 시도: {}, {}", GetName(), (int)type);
 			return;
 		}
+
 		auto it = m_Components.find(type);
 		if (it != m_Components.end())
 		{
@@ -71,7 +72,7 @@ namespace Dive
 		}
 		else
 		{
-			DV_LOG(GameObject, warn, "Failed to remove component of type hash {} from GameObject '{}'.", (int)type, GetName());
+			DV_LOG(GameObject, warn, "가지고 있지 않은 타입의 컴포넌트 제거 시도: {}, {}", GetName(), (int)type);
 		}
 	}
 

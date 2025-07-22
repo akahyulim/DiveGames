@@ -2,12 +2,15 @@
 
 int main(int argc, char* argv[])
 {
-	//std::locale::global(std::locale(""));  // 로케일 설정
-	//std::wcout.imbue(std::locale(""));     // 유니코드 출력 지원
 	SetConsoleOutputCP(CP_UTF8);
 
-	Dive::Editor editor;
-	editor.Run();
+	try {
+		Dive::Editor editor;
+		editor.Run();
+	} catch (const std::exception& e) {
+		DV_LOG(Main, critical, "Editor 초기화 실패: {}", e.what());
+		return EXIT_FAILURE;
+	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }

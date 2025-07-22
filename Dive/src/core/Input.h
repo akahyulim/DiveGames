@@ -8,7 +8,7 @@ namespace Dive
 	class Input
 	{
 	public:
-		static void Initialize();
+		static bool Initialize();
 		static void Shutdown();
 
 		static void Tick();

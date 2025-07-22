@@ -7,12 +7,12 @@ namespace Dive
 	Resource::Resource(const std::string& name)
 		: Object(name)
 	{
-		DV_LOG(Resource, info, "생성 - {}, {}", GetName(), GetInstanceID());
+		DV_LOG(Resource, info, "생성: {}, {}", GetName(), GetInstanceID());
 	}
 
 	Resource::~Resource()
 	{
-		DV_LOG(Resource, info, "소멸 - {}. {}", GetName(), GetInstanceID());
+		DV_LOG(Resource, info, "소멸: {}. {}", GetName(), GetInstanceID());
 	}
 
 	void Resource::SetFilepath(const std::filesystem::path& filepath)

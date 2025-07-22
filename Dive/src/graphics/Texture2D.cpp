@@ -46,7 +46,7 @@ namespace Dive
 
 		if (FAILED(result))
 		{
-			DV_LOG(Texture2D, err, "Texture2D 생성 과정 중 파일 {:s} 로드 실패", filepath.string());
+			DV_LOG(Texture2D, err, "파일 읽기 실패: {}", filepath.string());
 			return false;
 		}
 
@@ -57,7 +57,10 @@ namespace Dive
 		
 		SetPixelData((const void*)img.GetImages()->pixels, img.GetImages()->rowPitch * img.GetImages()->height);
 		if (!Create())
+		{
+			DV_LOG(Texture2D, err, "생성 실패");
 			return false;
+		}
 
 		SetFilepath(filepath);
 
@@ -68,7 +71,7 @@ namespace Dive
 	{
 		if (m_PixelData.empty())
 		{
-			DV_LOG(Texture2D, err, "Texture2D 픽셀 데이터 미설정");
+			DV_LOG(Texture2D, err, "빈 픽셀 데이터");
 			return false;
 		}
 
@@ -93,7 +96,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_Texture2D)))
 			{
-				DV_LOG(Texture2D, err, "Texture2D의 ID3D11Texture2D 생성에 실패하였습니다.");
+				DV_LOG(Texture2D, err, "ID3D11Texture2D 생성 실패");
 				return false;
 			}
 
@@ -116,7 +119,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_ShaderResourceView)))
 			{
-				DV_LOG(Texture2D, err, "Texture2D의 ID3D11ShaderResourceView 생성 실패");
+				DV_LOG(Texture2D, err, "ID3D11ShaderResourceView 생성 실패");
 				Release();
 				return false;
 			}

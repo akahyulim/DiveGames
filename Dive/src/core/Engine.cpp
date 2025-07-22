@@ -17,24 +17,41 @@ namespace Dive
 	uint16_t Engine::s_Fps = 0;
 	uint64_t Engine::s_FrameCount = 0;
 
-	void Engine::Initialize()
+	bool Engine::Initialize()
 	{
-		DV_LOG(Engine, info, "초기화 시작 ---------------------------------------");
+		DV_LOG(Engine, info, "초기화 시작");
 
-		Window::Initialize();
-		Graphics::Initialize();
+		if (!Window::Initialize())
+		{
+			DV_LOG(Engine, err, "Window 초기화 실패");
+			return false;
+		}
+
+		if (!Graphics::Initialize())
+		{
+			DV_LOG(Engine, err, "Graphics 초기화 실패");
+			return false;
+		}
+
 		ShaderManager::Initialize();
+
 		Renderer::Initialize();
-		Input::Initialize();
+
+		if (!Input::Initialize())
+		{
+			DV_LOG(Engine, err, "Input 초기화 실패");
+			return false;
+		}
 
 		s_LastTickTime = std::chrono::steady_clock::now();
+		DV_LOG(Engine, info, "초기화 완료");
 
-		DV_LOG(Engine, info, "초기화 완료 ---------------------------------------");
+		return true;
 	}
 
 	void Engine::Shutdown()
 	{
-		DV_LOG(Engine, info, "셧다운 시작 ---------------------------------------");
+		DV_LOG(Engine, info, "셧다운 시작");
 
 		WorldManager::Clear();
 		ResourceManager::Clear();
@@ -43,9 +60,8 @@ namespace Dive
 		Graphics::Shutdown();
 		Window::Shutdown();
 
-		DV_LOG(Engine, info, "셧다운 완료 ---------------------------------------");
+		DV_LOG(Engine, info, "셧다운 완료");
 
-		// 현재 문제없이 종료된다.
 		LogManager::Shutdown();
 	}
 

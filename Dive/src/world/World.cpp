@@ -11,13 +11,13 @@ namespace Dive
 	World::World(const std::string& name)
 		: m_Name(name)
 	{
-		DV_LOG(World, info, "생성 - {}", m_Name);
+		DV_LOG(World, info, "생성: {}", m_Name);
 	}
 
 	World::~World()
 	{
 		Clear();
-		DV_LOG(World, info, "소멸 - {}", m_Name);
+		DV_LOG(World, info, "소멸: {}", m_Name);
 	}
 
 	void World::Clear()
@@ -198,7 +198,7 @@ namespace Dive
 			auto it = m_GameObjectMap.find(instanceID);
 			if (it != m_GameObjectMap.end())
 			{
-				DV_LOG(World, info, "Destroying GameObject: {}, {}", it->second->GetName(), instanceID);
+				DV_LOG(World, info, "게임 오브젝트 제거: {}, {}", it->second->GetName(), instanceID);
 				m_GameObjectMap.erase(it);
 			}
 		}

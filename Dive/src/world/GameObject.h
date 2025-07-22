@@ -63,7 +63,7 @@ namespace Dive
 	template<typename T>
 	T* GameObject::AddComponent()
 	{
-		static_assert(std::is_base_of<Component, T>::value, "T must be derived from Component");
+		static_assert(std::is_base_of<Component, T>::value, "T는 반드시 Component를 상속하여야 한다.");
 
 		auto type = T::GetType();
 		if (!HasComponentByType(type))
@@ -75,21 +75,21 @@ namespace Dive
 	template<typename T>
 	void GameObject::RemoveComponent()
 	{
-		static_assert(std::is_base_of<Component, T>::value, "T must be derived from Component");
+		static_assert(std::is_base_of<Component, T>::value, "T는 반드시 Component를 상속하여야 한다.");
 		RemoveComponentByType(T::GetType());
 	}
 
 	template<typename T>
 	bool GameObject::HasComponent() const
 	{
-		static_assert(std::is_base_of<Component, T>::value, "T must be derived from Component");
+		static_assert(std::is_base_of<Component, T>::value, "T는 반드시 Component를 상속하여야 한다.");
 		return HasComponentByType(T::GetType());
 	}
 
 	template<typename T>
 	T* GameObject::GetComponent() const
 	{
-		static_assert(std::is_base_of<Component, T>::value, "T must be derived from Component");
+		static_assert(std::is_base_of<Component, T>::value, "T는 반드시 Component를 상속하여야 한다.");
 		return static_cast<T*>(GetComponentByType(T::GetType()));
 	}
 }

@@ -10,12 +10,12 @@ namespace Dive
 	Transform::Transform(GameObject* gameObject)
 		: Component(gameObject)
 	{
-		DV_LOG(Transform, info, "생성 - {}, {}", GetName(), GetInstanceID());
+		DV_LOG(Transform, info, "생성: {}, {}", GetName(), GetInstanceID());
 	}
 
 	Transform::~Transform()
 	{
-		DV_LOG(Transform, info, "소멸 - {}, {}", GetName(), GetInstanceID());
+		DV_LOG(Transform, info, "소멸: {}, {}", GetName(), GetInstanceID());
 	}
 
 	DirectX::XMFLOAT3 Transform::GetPosition() const

@@ -124,7 +124,7 @@ namespace Dive
 		std::ofstream fout(filepath);
 		fout << out.c_str();
 
-		DV_LOG(WorldSerializer, info, "월드 직렬화 완료 - {}", m_World->GetName());
+		DV_LOG(WorldSerializer, info, "월드 직렬화 완료: {}", m_World->GetName());
 	}
 
 	std::unordered_map<uint64_t, Object*> fileIDToObject;
@@ -229,7 +229,7 @@ namespace Dive
 			}
 		}
 
-		DV_LOG(WorldSerializer, info, "월드 역직렬화 완료 - {}", m_World->GetName());
+		DV_LOG(WorldSerializer, info, "월드 역직렬화 완료: {}", m_World->GetName());
 
 		return true;
 	}

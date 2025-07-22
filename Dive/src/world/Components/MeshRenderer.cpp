@@ -19,12 +19,12 @@ namespace Dive
 	{
 		m_ObjectBuffer = std::make_unique<DvConstantBuffer>(Graphics::GetDevice(), eVSConstantBufferSlot::Object, sizeof(ObjectData));
 
-		DV_LOG(MeshRenderer, info, "생성 - {}, {}", GetName(), GetInstanceID());
+		DV_LOG(MeshRenderer, info, "생성: {}, {}", GetName(), GetInstanceID());
 	}
 
 	MeshRenderer::~MeshRenderer()
 	{
-		DV_LOG(MeshRenderer, info, "소멸 - {}, {}", GetName(), GetInstanceID());
+		DV_LOG(MeshRenderer, info, "소멸: {}, {}", GetName(), GetInstanceID());
 	}
 
 	void MeshRenderer::Render(ID3D11DeviceContext* deviceContext, const Camera* camera)

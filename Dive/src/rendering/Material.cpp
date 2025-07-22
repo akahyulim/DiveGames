@@ -146,7 +146,7 @@ namespace Dive
         auto shader = ShaderManager::GetShader(m_PixelShaderName);
 		if (!shader || shader->GetType() != eShaderType::Pixel)
 		{
-			DV_LOG(Material, err, "Invalid pixel shader: {}", m_PixelShaderName);
+			DV_LOG(Material, err, "픽셀 셰이더 획득 실패: {}", m_PixelShaderName);
 			return nullptr;
 		}
 

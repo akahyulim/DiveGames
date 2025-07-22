@@ -17,7 +17,7 @@ namespace Dive
 		DvConstantBuffer(ID3D11Device* device, ePSConstantBufferSlot slot, size_t size);
 
 		template<typename T>
-		void Update(ID3D11DeviceContext* deviceContext, const T& data);
+		bool Update(ID3D11DeviceContext* deviceContext, const T& data);
 		void Bind(ID3D11DeviceContext* deviceContext);
 
 	private:
@@ -28,7 +28,7 @@ namespace Dive
 
 
 	template<typename T>
-	void DvConstantBuffer::Update(ID3D11DeviceContext* deviceContext, const T& data)
+	bool DvConstantBuffer::Update(ID3D11DeviceContext* deviceContext, const T& data)
 	{
 		assert(deviceContext);
 		assert(m_Buffer);
@@ -41,13 +41,14 @@ namespace Dive
 			0,
 			&mappedData)))
 		{
-			DV_LOG(ConstantBuffer, err, "ConstantBuffer의 Map에 실패");
-			return;
+			DV_LOG(ConstantBuffer, err, "버퍼 Map 실패");
+			return false;
 		}
 
 		std::memcpy(mappedData.pData, &data, sizeof(T));
-
 		deviceContext->Unmap(m_Buffer.Get(), 0);
+
+		return true;
 	}
 
 	// ========================================================================================

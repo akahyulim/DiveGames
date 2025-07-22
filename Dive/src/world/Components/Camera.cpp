@@ -20,7 +20,7 @@ namespace Dive
 		: Component(gameObject)
 	{
 		s_AllCameras.push_back(this);
-		DV_LOG(Camera, info, "생성 - {}, {}", GetName(), GetInstanceID());
+		DV_LOG(Camera, info, "생성: {}, {}", GetName(), GetInstanceID());
 	}
 
 	Camera::~Camera()
@@ -29,7 +29,7 @@ namespace Dive
 		if (it != s_AllCameras.end())
 			s_AllCameras.erase(it);
 		
-		DV_LOG(Camera, info, "소멸 - {}, {}", GetName(), GetInstanceID());
+		DV_LOG(Camera, info, "소멸: {}, {}", GetName(), GetInstanceID());
 	}
 
 	void Camera::Update()
@@ -136,7 +136,7 @@ namespace Dive
 	{
 		if (nearPlane < NEAR_CLIP_PLANE)
 		{
-			DV_LOG(Camera, warn, "Invalid near clip plane value: {}", nearPlane);
+			DV_LOG(Camera, warn, "유효하지 않은 Near Clip 값 전달: {}", nearPlane);
 			return;
 		}
 		m_NearClipPlane = nearPlane;
@@ -146,7 +146,7 @@ namespace Dive
 	{
 		if (farPlane <= m_NearClipPlane)
 		{
-			DV_LOG(Camera, warn, "Invalid far clip plane value: {}", farPlane);
+			DV_LOG(Camera, warn, "유효하지 않은 Far Clip 값 전달: {}", farPlane);
 			return;
 		}
 		m_FarClipPlane = farPlane;
@@ -167,7 +167,7 @@ namespace Dive
 			right <= left || right > 1.0f ||
 			bottom <= top || bottom > 1.0f)
 		{
-			DV_LOG(Camera, warn, "Invalid viewport rect values: {}, {}, {}, {}", left, top, right, bottom);
+			DV_LOG(Camera, warn, "유효하지 않은 뷰포트 설정값 전달: {}, {}, {}, {}", left, top, right, bottom);
 			return;
 		}
 
@@ -181,7 +181,7 @@ namespace Dive
 	{
 		if (top < 0.0f || top > m_ViewportBottom)
 		{
-			DV_LOG(Camera, warn, "Invalid viewport top value: {}", top);
+			DV_LOG(Camera, warn, "유효하지 않은 뷰포트 Top 값 전달: {}", top);
 			return;
 		}
 		m_ViewportTop = top;
@@ -191,7 +191,7 @@ namespace Dive
 	{
 		if (left < 0.0f || left > m_ViewportRight)
 		{
-			DV_LOG(Camera, warn, "Invalid viewport left value: {}", left);
+			DV_LOG(Camera, warn, "유효하지 않은 뷰포트 Left 값 전달: {}", left);
 			return;
 		}
 		m_ViewportLeft = left;
@@ -201,7 +201,7 @@ namespace Dive
 	{
 		if (right < m_ViewportLeft || right > 1.0f)
 		{
-			DV_LOG(Camera, warn, "Invalid viewport right value: {}", right);
+			DV_LOG(Camera, warn, "유효하지 않은 뷰포트 Right 값 전달: {}", right);
 			return;
 		}
 		m_ViewportRight = right;
@@ -211,7 +211,7 @@ namespace Dive
 	{
 		if (bottom < m_ViewportTop || bottom > 1.0f)
 		{
-			DV_LOG(Camera, warn, "Invalid viewport bottom value: {}", bottom);
+			DV_LOG(Camera, warn, "유효하지 않은 뷰포트 Bottom 값 전달: {}", bottom);
 			return;
 		}
 		m_ViewportBottom = bottom;

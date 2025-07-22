@@ -23,7 +23,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, &subresourceData, &m_Buffer))) 
 		{
-			DV_LOG(IndexBuffer, err, "Failed to create index buffer");
+			DV_LOG(IndexBuffer, err, "버퍼 생성 실패");
 			return false;
 		}
 

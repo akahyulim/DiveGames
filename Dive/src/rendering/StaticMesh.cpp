@@ -21,7 +21,7 @@ namespace Dive
 	{
 		if (m_Vertices.empty())
 		{
-			DV_LOG(StaticMesh, err, "vertices empty");
+			DV_LOG(StaticMesh, err, "정점 empty");
 			return false;
 		}
 
@@ -33,13 +33,13 @@ namespace Dive
 			sizeof(StaticVertex),
 			static_cast<uint32_t>(m_Vertices.size())))
 		{
-			DV_LOG(StaticMesh, err, "fail to create vertex buffer");
+			DV_LOG(StaticMesh, err, "정점 버퍼 생성 실패");
 			return false;
 		}
 
 		if (!createIndexBuffer())
 		{
-			DV_LOG(StaticMesh, err, "fail to create index buffer");
+			DV_LOG(StaticMesh, err, "인덱스 버퍼 생성 실패");
 			return false;
 		}
 
@@ -113,7 +113,7 @@ namespace Dive
 		auto shader = ShaderManager::GetShader(m_VertexShaderName);
 		if (!shader || shader->GetType() != eShaderType::Vertex)
 		{
-			DV_LOG(StaticMesh, err, "Invalid vertex shader: {}", m_VertexShaderName);
+			DV_LOG(StaticMesh, err, "정점 셰이더 획득 실패: {}", m_VertexShaderName);
 			return nullptr;
 		}
 
@@ -135,7 +135,10 @@ namespace Dive
 			m_Indices.data(),
 			static_cast<uint32_t>(m_Indices.size()),
 			static_cast<uint32_t>(m_Vertices.size())))
+		{
+			DV_LOG(StaticMesh, err, "인덱스 버퍼 생성 실패");
 			return false;
+		}
 
 		return true;
 	}
