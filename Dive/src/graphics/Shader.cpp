@@ -42,7 +42,7 @@ namespace Dive
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			break;
 		default:
-			DV_LOG(Shader, err, "잘못된 입력 레이아웃 타입을 전달받아 입력 레이아웃 구성에 실패하였습니다.");
+			DV_LOG(Shader, err, "잘못된 입력 레이아웃 타입 전달");
 			elements.clear();
 		}
 
@@ -60,7 +60,7 @@ namespace Dive
 		DV_RELEASE(m_InputLayout);
 
 		// 로거보다 나중에 소멸되는 것 같다.
-		//DV_LOG(Shader, info, "소멸 - {}", GetName());
+		//DV_LOG(Shader, info, "소멸: {}", GetName());
 	}
 
 	bool Shader::Create(const std::filesystem::path& filepath, eShaderType type, eInputLayout inputLayout)
@@ -98,7 +98,7 @@ namespace Dive
 			profile = "cs_5_0";
 			break;
 		default:
-			DV_LOG(Shader, err, "잘못된 셰이더 타입을 전달받아 셰이더 파일 컴파일에 실패");
+			DV_LOG(Shader, err, "잘못된 셰이더 타입 전달");
 			return false;
 		}
 
@@ -213,7 +213,7 @@ namespace Dive
 		m_Type = type;
 		SetName(name);
 
-		DV_LOG(Shader, info, "생성 - {}", GetName());
+		DV_LOG(Shader, info, "생성: {}", GetName());
 
 		return true;
 	}

@@ -50,7 +50,11 @@ namespace Dive
 	{
 		// 이것도 argc에 포함시켜 엔진 초기화과정에 편입시키는 게 맞다.
 		LogManager::SetFilename("dive_editor.log");
-		Engine::Initialize();
+		if (!Engine::Initialize())
+		{
+			DV_LOG(Editor, critical, "Engine 초기화 실패");
+			throw std::runtime_error("Engine 초기화 실패");
+		}
 		Window::SetMessageCallback((LONG_PTR)EditorMessageHandler);
 		//Window::Maximize();
 

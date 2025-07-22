@@ -28,7 +28,7 @@ namespace Dive
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
 			return 16;
 		default:
-			DV_LOG("Texture", warn, "지원되지 않는 DXGI_FORMAT을 전달받았습니다.");
+			DV_LOG("Texture", warn, "잘못된 포멧 전달");
 			return 0;
 		}
 	}

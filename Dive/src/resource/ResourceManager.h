@@ -13,7 +13,7 @@ namespace Dive
 		template<class T>
 		static std::shared_ptr<T> Load(const std::filesystem::path& filepath)
 		{
-			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
 			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
@@ -33,7 +33,7 @@ namespace Dive
 		template<class T>
 		static std::shared_ptr<T> GetByName(const std::string& name)
 		{
-			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
 			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
@@ -50,7 +50,7 @@ namespace Dive
 		template<class T>
 		static std::shared_ptr<T> GetByPath(const std::filesystem::path& filepath)
 		{
-			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
 			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
@@ -69,7 +69,7 @@ namespace Dive
 		template<class T>
 		static std::vector<std::shared_ptr<T>> GetByType()
 		{
-			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
 			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
@@ -88,7 +88,7 @@ namespace Dive
 		template<class T>
 		static bool IsCached(const std::string& filepath)
 		{
-			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
 			auto it = s_Resources.find(T::GetType());
 			if (it != s_Resources.end())
@@ -122,7 +122,7 @@ namespace Dive
 		template<class T>
 		static void RegisterResource(std::shared_ptr<T> resource)
 		{
-			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
+			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
 			if (resource)
 			{

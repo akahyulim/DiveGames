@@ -9,6 +9,7 @@ namespace Dive
 		: m_Slot(static_cast<UINT>(slot))
 		, m_Stage(eShaderStage::VertexShader)
 	{
+		assert(device);
 		assert(slot < eVSConstantBufferSlot::Count);
 
 		D3D11_BUFFER_DESC bufferDesc{};
@@ -18,13 +19,14 @@ namespace Dive
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 		if (FAILED(device->CreateBuffer(&bufferDesc, nullptr, &m_Buffer)))
-			DV_LOG(ConstantBuffer, err, "ConstantBuffer 생성에 실패하였습니다.");
+			DV_LOG(ConstantBuffer, err, "버퍼 생성 실패");
 	}
 
 	DvConstantBuffer::DvConstantBuffer(ID3D11Device* device, ePSConstantBufferSlot slot, size_t size)
 		: m_Slot(static_cast<UINT>(slot))
 		, m_Stage(eShaderStage::PixelShader)
 	{
+		assert(device);
 		assert(slot < ePSConstantBufferSlot::Count);
 
 		D3D11_BUFFER_DESC bufferDesc{};
@@ -34,7 +36,7 @@ namespace Dive
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
 		if (FAILED(device->CreateBuffer(&bufferDesc, nullptr, &m_Buffer)))
-			DV_LOG(ConstantBuffer, err, "ConstantBuffer 생성에 실패하였습니다.");
+			DV_LOG(ConstantBuffer, err, "버퍼 생성 실패");
 	}
 
 	void DvConstantBuffer::Bind(ID3D11DeviceContext* deviceContext)
@@ -73,7 +75,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_Buffer)))
 		{
-			DV_LOG(ConstantBuffer, err, "ConstantBuffer 생성에 실패하였습니다.");
+			DV_LOG(ConstantBuffer, err, "버퍼 생성 실패");
 			return false;
 		}
 
@@ -97,7 +99,7 @@ namespace Dive
 			0,
 			&mappedData)))
 		{
-			DV_LOG(ConstantBuffer, err, "ConstantBuffer의 Map에 실패");
+			DV_LOG(ConstantBuffer, err, "버퍼 Map 실패");
 			return nullptr;
 		}
 

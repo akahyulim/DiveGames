@@ -5,7 +5,7 @@ namespace Dive
 	class Window
 	{
 	public:
-		static void Initialize();
+		static bool Initialize();
 		static void Shutdown();
 
 		static bool Tick();
@@ -33,7 +33,7 @@ namespace Dive
 		static void Restore();
 		static bool IsMaximize();
 
-		static void SetTitle(const std::wstring& title);
+		static bool SetTitle(const std::wstring& title);
 
 	private:
 		static HINSTANCE s_hInstance;

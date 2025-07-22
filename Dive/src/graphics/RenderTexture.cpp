@@ -23,7 +23,7 @@ namespace Dive
 	{
 		if (m_Format == DXGI_FORMAT_UNKNOWN)
 		{
-			DV_LOG(RenderTexture, err, "RenderTexture 객체 데이터 미설정");
+			DV_LOG(RenderTexture, err, "잘못된 포멧");
 			return false;
 		}
 
@@ -50,7 +50,7 @@ namespace Dive
 
 				if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_Texture2D)))
 				{
-					DV_LOG(RenderTexture, err, "RenderTarget Texture 생성 실패");
+					DV_LOG(RenderTexture, err, "ID3D11Texture2D 생성 실패");
 					return false;
 				}
 			}
@@ -64,7 +64,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateRenderTargetView(
 					static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_RenderTargetView)))
 				{
-					DV_LOG(RenderTexture, err, "RenderTarget View 생성 실패");
+					DV_LOG(RenderTexture, err, "ID3D11RenderTargetView 생성 실패");
 					Release();
 					return false;
 				}
@@ -80,7 +80,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(
 					static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_ShaderResourceView)))
 				{
-					DV_LOG(RenderTexture, err, "RenderTarget ShaderResourceView 생성 실패");
+					DV_LOG(RenderTexture, err, "ID3D11ShaderResourceView 생성 실패");
 					Release();
 					return false;
 				}
@@ -106,7 +106,7 @@ namespace Dive
 
 				if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_DepthStencilTexture2D)))
 				{
-					DV_LOG(RenderTexture, err, "Depth/Stencil Texture 생성 실패");
+					DV_LOG(RenderTexture, err, "Depth/Stencil ID3D11Texture2D 생성 실패");
 					return false;
 				}
 			}
@@ -120,7 +120,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateDepthStencilView(
 					static_cast<ID3D11Resource*>(m_DepthStencilTexture2D), &desc, &m_DepthStencilView)))
 				{
-					DV_LOG(RenderTexture, err, "Depth/Stencil View 생성 실패");
+					DV_LOG(RenderTexture, err, "Depth/Stencil ID3D11DepthStencilView 생성 실패");
 					Release();
 					return false;
 				}
@@ -136,7 +136,7 @@ namespace Dive
 				if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(
 					static_cast<ID3D11Resource*>(m_DepthStencilTexture2D), &desc, &m_DepthStencilShaderResourceView)))
 				{
-					DV_LOG(RenderTexture, err, "Depth/Stencil ShaderResourceView 생성 실패");
+					DV_LOG(RenderTexture, err, "Depth/Stencil ID3D11ShaderResourceView 생성 실패");
 					Release();
 					return false;
 				}

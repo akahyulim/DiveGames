@@ -47,7 +47,7 @@ namespace Dive
 
 		s_RenderPasses.emplace_back(std::make_unique<TestPass>());
 
-		DV_LOG(Renderer, info, "초기화 완료");
+		DV_LOG(Renderer, info, "초기화 성공");
 	}
 
 	void Renderer::Shutdown()
@@ -79,7 +79,7 @@ namespace Dive
 			bs = nullptr;
 		}
 
-		DV_LOG(Renderer, info, "셧다운 완료");
+		DV_LOG(Renderer, info, "셧다운 성공");
 	}
 
 	void Renderer::OnUpdate()
@@ -255,7 +255,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite)])))
 			{
-				DV_LOG(Renderer, err, "DepthStencilState DepthReadWrite 생성에 실패하였습니다.");
+				DV_LOG(Renderer, err, "DepthStencilState DepthReadWrite 생성 실패");
 			}
 		}
 
@@ -280,7 +280,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite_StencilReadWrite)])))
 			{
-				DV_LOG(Renderer, err, "DepthStencilState DepthReadWrite_StencilReadWrite 생성에 실패하였습니다.");
+				DV_LOG(Renderer, err, "DepthStencilState DepthReadWrite_StencilReadWrite 생성 실패");
 			}
 		}
 
@@ -301,7 +301,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::GBuffer)])))
 			{
-				DV_LOG(Renderer, err, "DepthStencilState GBuffer 생성에 실패하였습니다.");
+				DV_LOG(Renderer, err, "DepthStencilState GBuffer 생성 실패");
 			}
 		}
 
@@ -325,7 +325,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthDiabled)])))
 			{
-				DV_LOG(Renderer, err, "DepthDisabledStencilState 생성에 실패하였습니다.");
+				DV_LOG(Renderer, err, "DepthDisabledStencilState 생성 실패");
 			}
 		}
 
@@ -343,7 +343,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::ForwardLight)])))
 			{
-				DV_LOG(Renderer, err, "DepthDisabledStencilState 생성에 실패하였습니다.");
+				DV_LOG(Renderer, err, "DepthDisabledStencilState 생성 실패");
 			}
 		}
 	}
@@ -366,7 +366,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBlendState(&desc, &s_BlendStates[static_cast<size_t>(eBlendState::Addictive)])))
 		{
-			DV_LOG(Renderer, err, "BlandState Addictive 생성에 실패하였습니다.");
+			DV_LOG(Renderer, err, "BlandState Addictive 생성 실패");
 		}
 	}
 }

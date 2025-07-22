@@ -29,7 +29,7 @@ namespace Dive
 	ComPtr<ID3D11Texture2D> Graphics::s_BackbufferTexture;
 	ComPtr<ID3D11DepthStencilView> Graphics::s_BackBufferDSV;
 
-	void Graphics::Initialize()
+	bool Graphics::Initialize()
 	{
 		if (FAILED(::D3D11CreateDevice(
 			nullptr,
@@ -43,9 +43,8 @@ namespace Dive
 			nullptr,
 			s_DeviceContext.GetAddressOf()))) 
 		{
-			Shutdown();
-			DV_LOG(Graphics, critical, "D3D11Device & D3D11DeviceContext 생성 실패!.");
-			return;
+			DV_LOG(Graphics, err, "D3D11Device & D3D11DeviceContext 생성 실패");
+			return false;
 		}
 
 		IDXGIDevice* dxgiDevice{};
@@ -71,8 +70,8 @@ namespace Dive
 
 		if (FAILED(dxgiFactory->CreateSwapChain(s_Device.Get(), &desc, s_SwapChain.GetAddressOf())))
 		{
-			DV_LOG(Graphics, critical, "D3D11SwapChain 생성 실패!");
-			return;
+			DV_LOG(Graphics, err, "D3D11SwapChain 생성 실패");
+			return false;
 		}
 
 		DV_RELEASE(dxgiFactory);
@@ -83,7 +82,9 @@ namespace Dive
 
 		DV_SUBSCRIBE_EVENT(eEventType::WindowResized, DV_EVENT_HANDLER_DATA_STATIC(OnWindowResized));
 
-		DV_LOG(Graphics, info, "초기화 완료");
+		DV_LOG(Graphics, info, "초기화 성공");
+
+		return true;
 	}
 	
 	void Graphics::Shutdown()
@@ -113,7 +114,7 @@ namespace Dive
 	
 		if (FAILED(s_SwapChain->ResizeBuffers(DV_BUFFER_COUNT, static_cast<UINT>(width), static_cast<UINT>(height), DV_FORMAT, 0)))
 		{
-			DV_LOG(Graphics, err, "후면 버퍼 크기 {0:d}x{1:d} 변경 실패", width, height);
+			DV_LOG(Graphics, err, "후면 버퍼 크기 변경 실패: {} x {}", width, height);
 			return;
 		}
 
@@ -126,7 +127,7 @@ namespace Dive
 
 		if (FAILED(s_SwapChain->ResizeTarget(&desc))) 
 		{
-			DV_LOG(Graphics, err, "해상도 {0:d}x{1:d} 변경 실패", width, height);
+			DV_LOG(Graphics, err, "해상도 변경 실패: {} x {}", width, height);
 			return;
 		}
 

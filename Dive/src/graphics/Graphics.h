@@ -12,7 +12,7 @@ namespace Dive
 	class Graphics
 	{
 	public:
-		static void Initialize();
+		static bool Initialize();
 		static void Shutdown();
 
 		static void ChangeResolution(uint32_t width, uint32_t height);

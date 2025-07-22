@@ -24,7 +24,7 @@ namespace Dive
 
 	bool Input::s_MouseIsInValidRect;
 
-	void Input::Initialize()
+	bool Input::Initialize()
 	{
 		HINSTANCE hInstance = Window::GetInstanceHandle();
 		HWND hWnd = Window::GetWindowHandle();
@@ -34,34 +34,34 @@ namespace Dive
  
 		if (FAILED(DirectInput8Create(hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)s_DirectInput.GetAddressOf(), nullptr))) 
 		{
-			DV_LOG(Input, critical, "DirectInput 객체 생성 실패!");
-			return;
+			DV_LOG(Input, err, "DirectInput 객체 생성 실패");
+			return false;
 		}
 
 		// 키보드 생성
 		{
 			if (FAILED(s_DirectInput->CreateDevice(GUID_SysKeyboard, s_Keyboard.GetAddressOf(), nullptr)))
 			{
-				DV_LOG(Input, critical, "키보드 장치 객체 생성 실패!");
-				return;
+				DV_LOG(Input, err, "키보드 장치 객체 생성 실패");
+				return false;
 			}
 
 			if (FAILED(s_Keyboard->SetDataFormat(&c_dfDIKeyboard)))
 			{
-				DV_LOG(Input, critical, "키보드 데이터 포멧 설정 실패!");
-				return;
+				DV_LOG(Input, err, "키보드 데이터 포멧 설정 실패");
+				return false;
 			}
 
 			if (FAILED(s_Keyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
 			{
-				DV_LOG(Input, critical, "키보드 코퍼레이트 레벨 설정 실패!");
-				return;
+				DV_LOG(Input, err, "키보드 코퍼레이트 레벨 설정 실패");
+				return false;
 			}
 
 			if (FAILED(s_Keyboard->Acquire()))
 			{
-				DV_LOG(Input, critical, "키보드 획득 실패!");
-				return;
+				DV_LOG(Input, err, "키보드 획득 실패");
+				return false;
 			}
 		}
 
@@ -69,30 +69,31 @@ namespace Dive
 		{
 			if (FAILED(s_DirectInput->CreateDevice(GUID_SysMouse, s_Mouse.GetAddressOf(), NULL)))
 			{
-				DV_LOG(Input, critical, "마우스 장치 객체 생성 실패!");
-				return;
+				DV_LOG(Input, err, "마우스 장치 객체 생성 실패");
+				return false;
 			}
 
 			if (FAILED(s_Mouse->SetDataFormat(&c_dfDIMouse)))
 			{
-				DV_LOG(Input, critical, "마우스 데이터 포멧 설정 실패!");
-				return;
+				DV_LOG(Input, err, "마우스 데이터 포멧 설정 실패");
+				return false;
 			}
 
 			if (FAILED(s_Mouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE)))
 			{
-				DV_LOG(Input, critical, "마우스 코퍼레이트 레벨 설정 실패!");
-				return;
+				DV_LOG(Input, err, "마우스 코퍼레이트 레벨 설정 실패");
+				return false;
 			}
 
 			if (FAILED(s_Mouse->Acquire()))
 			{
-				DV_LOG(Input, critical, "마우스 획득 실패!");
-				return;
+				DV_LOG(Input, err, "마우스 획득 실패");
+				return false;
 			}
 		}
 
-		DV_LOG(Input, info, "초기화 완료");
+		DV_LOG(Input, info, "초기화 성공");
+		return true;
 	}
 
 	void Input::Shutdown()

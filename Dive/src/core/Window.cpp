@@ -12,7 +12,7 @@ namespace Dive
 	HWND Window::s_hWnd = nullptr;
 	std::wstring Window::s_Title = L"DIVE";
 
-	void Window::Initialize()
+	bool Window::Initialize()
 	{
 		s_hInstance = ::GetModuleHandle(nullptr);
 
@@ -32,8 +32,8 @@ namespace Dive
 
 		if (!::RegisterClassEx(&wc)) 
 		{
-			DV_LOG(Window, critical, "윈도우 클래스 등록 실패");
-			return;
+			DV_LOG(Window, err, "윈도우 클래스 등록 실패");
+			return false;
 		}
 
 		DWORD style = WS_OVERLAPPEDWINDOW;
@@ -55,13 +55,15 @@ namespace Dive
 
 		if (!s_hWnd)
 		{
-			DV_LOG(Window, critical, "윈도우 생성 실패");
-			return;
+			DV_LOG(Window, err, "윈도우 생성 실패");
+			return false;
 		}
 
 		Show();
 
-		DV_LOG(Window, info, "초기화 완료");
+		DV_LOG(Window, info, "초기화 성공");
+
+		return true;
 	}
 
 	void Window::Shutdown()
@@ -234,14 +236,20 @@ namespace Dive
 		return ::IsZoomed(s_hWnd);
 	}
 
-	void Window::SetTitle(const std::wstring& title)
+	bool Window::SetTitle(const std::wstring& title)
 	{
 		assert(s_hWnd != 0);
 
-		if (s_Title != title)
+		if (s_Title == title)
+			return true;
+		
+		if (!::SetWindowTextW(s_hWnd, title.c_str()))
 		{
-			::SetWindowText(s_hWnd, title.c_str());
-			s_Title = title;
+			DV_LOG(Window, err, "타이틀 변경 실패");
+			return false;
 		}
+
+		s_Title = title;
+		return true;
 	}
 }

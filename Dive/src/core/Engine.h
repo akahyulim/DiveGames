@@ -4,13 +4,10 @@ namespace Dive
 {
 	class World;
 
-	// Hazel 구조로 보자면 이게 결국 Application이다.
-	// 근데 개인적으론 Hazel의 구현이 더 마음에 든다.
-	// 문제는 Layer이다.
 	class Engine
 	{
 	public:
-		static void Initialize();
+		static bool Initialize();
 		static void Shutdown();
 
 		static void Tick();

@@ -28,7 +28,7 @@ namespace Dive
 	{
 		if (index > 5) 
 		{
-			DV_LOG(Cubemap, err, "잘못된 Face 인덱스({:d})를 전달받았습니다.", index);
+			DV_LOG(Cubemap, err, "잘못된 Face 인덱스 전달: {}", index);
 			return;
 		}
 
@@ -60,7 +60,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_Texture2D))) 
 			{
-				DV_LOG(Cubemap, err, "Cubemap의 ID3D11Texture2D 생성 실패");
+				DV_LOG(Cubemap, err, "ID3D11Texture2D 생성 실패");
 				Release();
 				return false;
 			}
@@ -68,7 +68,7 @@ namespace Dive
 			if (!m_FaceData[0].empty()) {
 				if (std::any_of(m_FaceData.begin(), m_FaceData.end(), [](const auto& data) { return data.empty(); }))
 				{
-					DV_LOG(Cubemap, err, "빈 큐브맵 Face 데이터가 존재합니다.");
+					DV_LOG(Cubemap, err, "빈 큐브맵 Face 데이터");
 					Release();
 					return false;
 				}
@@ -97,7 +97,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_RenderTargetView)))
 			{
-				DV_LOG(Cubemap, err, "Cubemap의 ID3D11RenderTargetView 생성 실패");
+				DV_LOG(Cubemap, err, "ID3D11RenderTargetView 생성 실패");
 				Release();
 				return false;
 			}
@@ -112,7 +112,7 @@ namespace Dive
 
 			if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_ShaderResourceView)))
 			{
-				DV_LOG(Cubemap, err, "Cubemap의 ID3D11ShaderResourceView 생성 실패");
+				DV_LOG(Cubemap, err, "ID3D11ShaderResourceView 생성 실패");
 				Release();
 				return false;
 			}
@@ -128,7 +128,7 @@ namespace Dive
 	{
 		if (faceFilepaths.size() != 6) 
 		{
-			DV_LOG(Cubemap, err, "잘못된 큐브맵 텍스쳐 경로를 전달 받았습니다.", faceFilepaths.size());
+			DV_LOG(Cubemap, err, "잘못된 경로 전달: {}", faceFilepaths.size());
 			return nullptr;
 		}
 
@@ -142,7 +142,7 @@ namespace Dive
 			const auto& filepath = faceFilepaths[i];
 			if (!std::filesystem::exists(filepath))
 			{
-				DV_LOG(Cubemap, err, "큐브맵 Face 텍스쳐 파일이 존재하지 않습니다: {}", filepath.string());
+				DV_LOG(Cubemap, err, "존재하지 않는 파일 전달: {}", filepath.string());
 				return nullptr;
 			}
 
@@ -150,7 +150,7 @@ namespace Dive
 			DirectX::ScratchImage image;
 			if (FAILED(DirectX::LoadFromWICFile(filepath.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image)))
 			{
-				DV_LOG(Cubemap, err, "큐브맵 Face 텍스쳐 로드 실패: {}", filepath.string());
+				DV_LOG(Cubemap, err, "WIC 파일 로드 실패: {}", filepath.string());
 				return nullptr;
 			}
 
@@ -164,7 +164,7 @@ namespace Dive
 			// 유효성 검사
 			if (image.GetMetadata().width != size || image.GetMetadata().height != size)
 			{
-				DV_LOG(Cubemap, err, "큐브맵 Face 크기가 일치하지 않습니다. ({} != {})", image.GetMetadata().width, size);
+				DV_LOG(Cubemap, err, "잘못된 크기 설정: {} != {}", image.GetMetadata().width, size);
 				return nullptr;
 			}
 
@@ -172,7 +172,7 @@ namespace Dive
 			const DirectX::Image* img = image.GetImage(0, 0, 0);
 			if (!img)
 			{
-				DV_LOG(Cubemap, err, "큐브맵 Face 이미지 데이터가 유효하지 않습니다: {}", filepath.string());
+				DV_LOG(Cubemap, err, "유효하지 않은 이미지 데이터: {}", filepath.string());
 				return nullptr;
 			}
 
@@ -196,7 +196,7 @@ namespace Dive
 	{
 		if (!std::filesystem::exists(filepath))
 		{
-			DV_LOG(Cubemap, err, "큐브맵 DDS 파일이 존재하지 않습니다: {}", filepath.string());
+			DV_LOG(Cubemap, err, "존재하지 않는 파일 경로 전달: {}", filepath.string());
 			return nullptr;
 		}
 
@@ -204,7 +204,7 @@ namespace Dive
 		DirectX::ScratchImage image;
 		if (FAILED(DirectX::LoadFromDDSFile(filepath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image)))
 		{
-			DV_LOG(Cubemap, err, "큐브맵 DDS 파일 로드 실패: {}", filepath.string());
+			DV_LOG(Cubemap, err, "DDS 파일 로드 실패: {}", filepath.string());
 			return nullptr;
 		}
 
@@ -212,7 +212,7 @@ namespace Dive
 		const auto& metadata = image.GetMetadata();
 		if (!(metadata.miscFlags & DirectX::TEX_MISC_TEXTURECUBE))
 		{
-			DV_LOG(Cubemap, err, "DDS 파일이 큐브맵 형식이 아닙니다: {}", filepath.string());
+			DV_LOG(Cubemap, err, "잘못된 타입 전달: {}", filepath.string());
 			return nullptr;
 		}
 
@@ -225,7 +225,7 @@ namespace Dive
 			const DirectX::Image* img = image.GetImage(0, i, 0); // 6개의 Face 중 하나를 가져옴
 			if (!img)
 			{
-				DV_LOG(Cubemap, err, "큐브맵 Face 데이터가 유효하지 않습니다: {}", filepath.string());
+				DV_LOG(Cubemap, err, "유효하지 않은 Face Data: {}", filepath.string());
 				return nullptr;
 			}
 
@@ -235,7 +235,7 @@ namespace Dive
 		// 큐브맵 생성
 		if (!cubemap->Create())
 		{
-			DV_LOG(Cubemap, err, "큐브맵 GPU 리소스 생성 실패");
+			DV_LOG(Cubemap, err, "GPU 리소스 생성 실패");
 			return nullptr;
 		}
 

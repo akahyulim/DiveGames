@@ -17,7 +17,7 @@ namespace Dive
 
 		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, &subresourceData, &m_Buffer)))
 		{
-			DV_LOG(VertexBuffer, err, "Failed to create vertex buffer");
+			DV_LOG(VertexBuffer, err, "버퍼 생성 실패");
 			return false;
 		}
 
