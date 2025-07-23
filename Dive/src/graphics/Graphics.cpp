@@ -80,7 +80,7 @@ namespace Dive
 
 		updateBackbuffer();
 
-		DV_SUBSCRIBE_EVENT(eEventType::WindowResized, DV_EVENT_HANDLER_DATA_STATIC(OnWindowResized));
+		DV_SUBSCRIBE_EVENT(eEventType::WindowResized, DV_EVENT_HANDLER_STATIC(OnResizeBuffer));
 
 		DV_LOG(Graphics, info, "초기화 성공");
 
@@ -100,23 +100,12 @@ namespace Dive
 		DV_LOG(Graphics, info, "셧다운 완료");
 	}
 
-	void Graphics::ChangeResolution(uint32_t width, uint32_t height)
+	// 윈도우 모드에서는 크기,
+	// 전체화면 모드에서는 해상도를 갱신
+	// 후 wm_size 발생
+	void Graphics::Resize(uint32_t  width, uint32_t height)
 	{
 		assert(s_SwapChain);
-
-		if (s_ResolutionWidth == width && s_ResolutionHeight == height) 
-			return;
-
-		Window::Hide();
-
-		s_ResolutionWidth = width; 
-		s_ResolutionHeight = height;
-	
-		if (FAILED(s_SwapChain->ResizeBuffers(DV_BUFFER_COUNT, static_cast<UINT>(width), static_cast<UINT>(height), DV_FORMAT, 0)))
-		{
-			DV_LOG(Graphics, err, "후면 버퍼 크기 변경 실패: {} x {}", width, height);
-			return;
-		}
 
 		DXGI_MODE_DESC desc{};
 		desc.Width = static_cast<UINT>(width);
@@ -125,24 +114,30 @@ namespace Dive
 		desc.RefreshRate.Denominator = DV_REFRESHRATE_DENOMINATOR;
 		desc.Format = DV_FORMAT;
 
-		if (FAILED(s_SwapChain->ResizeTarget(&desc))) 
+		HRESULT hResult = s_SwapChain->ResizeTarget(&desc);
+		if (FAILED(hResult))
 		{
-			DV_LOG(Graphics, err, "해상도 변경 실패: {} x {}", width, height);
+			DV_LOG(Graphics, err, "[::Resize] ResizeTarget 실패: {:#x}", static_cast<uint32_t>(hResult));
+			return;
+		}
+	}
+
+	void Graphics::OnResizeBuffer()
+	{
+		assert(s_SwapChain);
+		assert(s_DeviceContext);
+
+		s_DeviceContext->OMSetRenderTargets(0, NULL, NULL);
+		s_BackBufferRTV.Reset();
+		
+		HRESULT hResult = s_SwapChain->ResizeBuffers(0, 0, 0, DV_FORMAT, 0);
+		if (FAILED(hResult))
+		{
+			DV_LOG(Graphics, err, "[::OnResizeBuffer] ResizeBuffers 실패: {:#x}", static_cast<uint32_t>(hResult));
 			return;
 		}
 
 		updateBackbuffer();
-
-		Window::Show();
-	}
-
-	void Graphics::OnWindowResized(EventData data)
-	{
-		if (auto pairData = std::get_if<void*>(&data)) 
-		{
-			auto actualData = static_cast<std::pair<uint32_t, uint32_t>*>(*pairData);
-			ChangeResolution(actualData->first, actualData->second);
-		}
 	}
 
 	void Graphics::Present()
@@ -200,6 +195,8 @@ namespace Dive
 			DV_LOG(Graphics, err, "후면버퍼 렌더타겟뷰 생성 실패");
 			return;
 		}
+
+		backBufferTexture->Release();
 		
 		DXGI_SWAP_CHAIN_DESC desc{};
 		s_SwapChain->GetDesc(&desc);

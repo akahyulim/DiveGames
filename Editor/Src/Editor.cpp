@@ -21,8 +21,7 @@ LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPAR
 	{
 	case WM_SIZE:
 	{
-		auto data = std::make_unique<std::pair<uint32_t, uint32_t>>(LOWORD(lParam), HIWORD(lParam));
-		DV_FIRE_EVENT_DATA(Dive::eEventType::WindowResized, (void*)data.get());
+		DV_FIRE_EVENT(Dive::eEventType::WindowResized);
 		return 0;
 	}
 	case WM_CLOSE:
@@ -249,8 +248,8 @@ namespace Dive
 		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
 		float clearColors[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
-		deviceContext->ClearRenderTargetView(Graphics::GetBackBufferRTV(), clearColors);
-		deviceContext->ClearDepthStencilView(Graphics::GetBackBufferDSV(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		deviceContext->ClearRenderTargetView(renderTargetView, clearColors);
+		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
