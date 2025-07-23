@@ -15,9 +15,8 @@ namespace Dive
 		static bool Initialize();
 		static void Shutdown();
 
-		static void ChangeResolution(uint32_t width, uint32_t height);
-
-		static void OnWindowResized(EventData data);
+		static void Resize(uint32_t  width, uint32_t height);
+		static void OnResizeBuffer();
 
 		static void Present();
 
