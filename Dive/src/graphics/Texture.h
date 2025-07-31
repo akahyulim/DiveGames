@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include "Graphics.h"
-#include "core/CoreDefs.h"
 #include "resource/Resource.h"
 
 namespace Dive
@@ -14,23 +12,29 @@ namespace Dive
 		virtual bool Create() = 0;
 		virtual void Release();
 
-		DXGI_FORMAT GetFormat() const { return m_Format; }
-		bool IsGenerateMips() const { return m_UseMips; }
-		uint32_t GetMipLevels() const { return m_MipLevels; }
+		uint32_t GetWidth() const { return m_width; }
+		uint32_t GetHeight() const { return m_height; }
 
-		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_ShaderResourceView; }
+		DXGI_FORMAT GetFormat() const { return m_format; }
+		bool IsGenerateMips() const { return m_useMips; }
+		uint32_t GetMipLevels() const { return m_mipLevels; }
+
+		ID3D11ShaderResourceView* GetShaderResourceView() const { return m_shaderResourceView.Get(); }
 
 		static uint32_t CalculateMipmapLevels(uint32_t width, uint32_t height);
 		static uint32_t GetPixelSize(DXGI_FORMAT format);
 		static bool CanGenerateMips(DXGI_FORMAT format);
 
 	protected:
-		DXGI_FORMAT m_Format = DXGI_FORMAT_UNKNOWN;
-		
-		uint32_t m_MipLevels = 1;
-		bool m_UseMips = false;
+		uint32_t m_width = 1;
+		uint32_t m_height = 1;
 
-		ID3D11Texture2D* m_Texture2D = nullptr;
-		ID3D11ShaderResourceView* m_ShaderResourceView = nullptr;
+		DXGI_FORMAT m_format = DXGI_FORMAT_UNKNOWN;
+		
+		uint32_t m_mipLevels = 1;
+		bool m_useMips = false;
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texture;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_shaderResourceView;
 	};
 }

@@ -26,9 +26,6 @@
   <ItemGroup>
     <ClInclude Include="src\dive.h" />
     <ClInclude Include="src\stdafx.h" />
-    <ClInclude Include="src\core\CoreDefs.h">
-      <Filter>core</Filter>
-    </ClInclude>
     <ClInclude Include="src\core\FileUtils.h">
       <Filter>core</Filter>
     </ClInclude>
@@ -53,17 +50,11 @@
     <ClInclude Include="src\graphics\Shader.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\VertexBuffer.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
     <ClInclude Include="src\math\Frustum.h">
       <Filter>math</Filter>
     </ClInclude>
     <ClInclude Include="src\math\Math.h">
       <Filter>math</Filter>
-    </ClInclude>
-    <ClInclude Include="src\graphics\IndexBuffer.h">
-      <Filter>graphics</Filter>
     </ClInclude>
     <ClInclude Include="src\core\Window.h">
       <Filter>core</Filter>
@@ -118,6 +109,11 @@
     <ClInclude Include="src\rendering\RenderDefs.h" />
     <ClInclude Include="src\rendering\RenderPass.h" />
     <ClInclude Include="src\world\Components\MeshRenderer.h" />
+    <ClInclude Include="src\Common.h" />
+    <ClInclude Include="src\graphics\Buffer.h" />
+    <ClInclude Include="src\graphics\ShaderProgram.h" />
+    <ClInclude Include="src\graphics\Vertex.h" />
+    <ClInclude Include="src\graphics\InputLayoutKey.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -142,13 +138,7 @@
     <ClCompile Include="src\graphics\ConstantBuffer.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\graphics\IndexBuffer.cpp">
-      <Filter>graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\graphics\Shader.cpp">
-      <Filter>graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\graphics\VertexBuffer.cpp">
       <Filter>graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\math\Frustum.cpp">
@@ -208,5 +198,7 @@
     <ClCompile Include="src\graphics\ShaderManager.cpp" />
     <ClCompile Include="src\rendering\RenderPass.cpp" />
     <ClCompile Include="src\world\Components\MeshRenderer.cpp" />
+    <ClCompile Include="src\graphics\Buffer.cpp" />
+    <ClCompile Include="src\graphics\ShaderProgram.cpp" />
   </ItemGroup>
 </Project>

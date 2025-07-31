@@ -9,7 +9,7 @@ namespace Dive
 	{
 	}
 
-	std::string Component::GetName()
+	std::string Component::GetName() const
 	{
 		assert(m_GameObject);
 		return m_GameObject->GetName();

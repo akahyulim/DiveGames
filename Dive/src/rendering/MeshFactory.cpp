@@ -1,11 +1,7 @@
 ﻿#include "stdafx.h"
 #include "MeshFactory.h"
+#include "graphics/Vertex.h"
 #include "StaticMesh.h"
-#include "Core/CoreDefs.h"
-#include "Graphics/Graphics.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/IndexBuffer.h"
-#include "Math/Math.h"
 
 using namespace DirectX;
 
@@ -19,80 +15,84 @@ namespace Dive
 	constexpr float CAPSULE_RADIUS = 0.5f;
 	constexpr float CAPSULE_HEIGHT = 1.0f;
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreateTriangle()
+	std::shared_ptr<StaticMesh> MeshFactory::CreateTriangle(ID3D11Device* device)
 	{
-		std::vector<StaticVertex> vertices;
+		assert(device);
+
+		std::vector<LitVertex> vertices;
 		vertices.resize(3);
 
 		// 좌하단
 		vertices[0] = {
 			XMFLOAT3(-TRIANGLE_SIZE / 2.0f, -TRIANGLE_SIZE / 2.0f, 0.0f),
-			XMFLOAT2(0.0f, 1.0f),
 			XMFLOAT3(0.0f, 0.0f, -1.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(0.0f, 1.0f) };
 
 		// 상단
 		vertices[1] = {
 			XMFLOAT3(0.0f, TRIANGLE_SIZE / 2.0f, 0.0f),
-			XMFLOAT2(0.5f, 0.0f),
 			XMFLOAT3(0.0f, 0.0f, -1.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(0.5f, 0.0f) };
 
 		// 우하단
 		vertices[2] = {
 			XMFLOAT3(TRIANGLE_SIZE / 2.0f, -TRIANGLE_SIZE / 2.0f, 0.0f),
-			XMFLOAT2(1.0f, 1.0f),
 			XMFLOAT3(0.0f, 0.0f, -1.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(1.0f, 1.0f) };
 
-		std::vector<UINT32> indices;
+		std::vector<uint32_t> indices;
 		indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
 
 		auto mesh = std::make_shared<StaticMesh>();
 		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers();
+		mesh->CreateBuffers(device);
 		mesh->ComputeBouingBox();
 		mesh->SetName("TriangleMesh");
 
 		return mesh;
 	}
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreateQuad()
+	std::shared_ptr<StaticMesh> MeshFactory::CreateQuad(ID3D11Device* device)
 	{
-		std::vector<StaticVertex> vertices;
+		assert(device);
+
+		std::vector<LitVertex> vertices;
 		vertices.resize(4);
 
 		// 좌하단
 		vertices[0] = {
 			XMFLOAT3(-QUAD_SIZE / 2.0f, -QUAD_SIZE / 2.0f, 0.0f),
-			XMFLOAT2(0.0f, 1.0f),
 			XMFLOAT3(0.0f, 0.0f, -1.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(0.0f, 1.0f) };
 
 		// 좌상단
 		vertices[1] = {
 			XMFLOAT3(-QUAD_SIZE / 2.0f, QUAD_SIZE / 2.0f, 0.0f),
-			XMFLOAT2(0.0f, 0.0f),
 			XMFLOAT3(0.0f, 0.0f, -1.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(0.0f, 0.0f) };
 
 		// 우하단
 		vertices[2] = {
 			XMFLOAT3(QUAD_SIZE / 2.0f, -QUAD_SIZE / 2.0f, 0.0f),
-			XMFLOAT2(1.0f, 1.0f),
 			XMFLOAT3(0.0f, 0.0f, -1.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(1.0f, 1.0f) };
 
 		// 우상단
 		vertices[3] = {
 			XMFLOAT3(QUAD_SIZE / 2.0f, QUAD_SIZE / 2.0f, 0.0f),
-			XMFLOAT2(1.0f, 0.0f),
 			XMFLOAT3(0.0f, 0.0f, -1.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(1.0f, 0.0f) };
 
-		std::vector<UINT32> indices;
+		std::vector<uint32_t> indices;
 		indices.resize(6);
 		indices[0] = 0;	indices[1] = 1;	indices[2] = 2;
 		indices[3] = 2;	indices[4] = 1;	indices[5] = 3;
@@ -101,47 +101,49 @@ namespace Dive
 		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers();
+		mesh->CreateBuffers(device);
 		mesh->ComputeBouingBox();
 		mesh->SetName("QuadMesh");
 
 		return mesh;
 	}
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreatePlane()
+	std::shared_ptr<StaticMesh> MeshFactory::CreatePlane(ID3D11Device* device)
 	{
-		std::vector<StaticVertex> vertices;
+		assert(device);
+
+		std::vector<LitVertex> vertices;
 		vertices.resize(4);
 
 		// 좌후면
 		vertices[0] = {
 			XMFLOAT3(-PLANE_SIZE / 2.0f, 0.0f, PLANE_SIZE / 2.0f),
-			XMFLOAT2(0.0f, 0.0f),
 			XMFLOAT3(0.0f, 1.0f, 0.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(0.0f, 0.0f) };
 
 		// 우후면
 		vertices[1] = {
 			XMFLOAT3(PLANE_SIZE / 2.0f, 0.0f, PLANE_SIZE / 2.0f),
-			XMFLOAT2(1.0f, 0.0f),
 			XMFLOAT3(0.0f, 1.0f, 0.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(1.0f, 0.0f) };
 
 		// 좌전면
 		vertices[2] = {
 			XMFLOAT3(-PLANE_SIZE / 2.0f, 0.0f, -PLANE_SIZE / 2.0f),
-			XMFLOAT2(0.0f, 1.0f),
 			XMFLOAT3(0.0f, 1.0f, 0.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(0.0f, 1.0f) };
 
 		// 우전면
 		vertices[3] = {
 			XMFLOAT3(PLANE_SIZE / 2.0f, 0.0f, -PLANE_SIZE / 2.0f),
-			XMFLOAT2(1.0f, 1.0f),
 			XMFLOAT3(0.0f, 1.0f, 0.0f),
-			XMFLOAT3(1.0f, 0.0f, 0.0f) };
+			XMFLOAT3(1.0f, 0.0f, 0.0f),
+			XMFLOAT2(1.0f, 1.0f) };
 
-		std::vector<UINT32> indices;
+		std::vector<uint32_t> indices;
 		indices.resize(6);
 
 		indices[0] = 0;	indices[1] = 1;	indices[2] = 2;
@@ -151,78 +153,80 @@ namespace Dive
 		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers();
+		mesh->CreateBuffers(device);
 		mesh->ComputeBouingBox();
 		mesh->SetName("PlaneMesh");
 
 		return mesh;
 	}
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreateCube()
+	std::shared_ptr<StaticMesh> MeshFactory::CreateCube(ID3D11Device* device)
 	{
-		std::vector<StaticVertex> vertices;
+		assert(device);
+
+		std::vector<LitVertex> vertices;
 
 		// 전면
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
 
 		// 후면
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
-			, XMFLOAT3(-1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
-			, XMFLOAT3(-1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
-			, XMFLOAT3(-1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
-			, XMFLOAT3(-1.0f, 0.0f, 0.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
+			, XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
+			, XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
+			, XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 0.0f, 1.0f)
+			, XMFLOAT3(-1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
 
 		// 위
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 1.0f, 0.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
 
 		// 아래
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
-			, XMFLOAT3(1.0f, 0.0f, 0.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(0.0f, 0.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, -1.0f, 0.0f)
+			, XMFLOAT3(1.0f, 0.0f, 0.0f), XMFLOAT2(1.0f, 0.0f));
 
 		// 왼쪽
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
-			, XMFLOAT3(0.0f, 0.0f, -1.0f));
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
-			, XMFLOAT3(0.0f, 0.0f, -1.0f));
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
-			, XMFLOAT3(0.0f, 0.0f, -1.0f));
-		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
-			, XMFLOAT3(0.0f, 0.0f, -1.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
+			, XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
+			, XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(0.0f, 0.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
+			, XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(-1.0f, 0.0f, 0.0f)
+			, XMFLOAT3(0.0f, 0.0f, -1.0f), XMFLOAT2(1.0f, 0.0f));
 
 		// 오른쪽
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)
-			, XMFLOAT3(0.0f, 0.0f, 1.0f));
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT2(0.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)
-			, XMFLOAT3(0.0f, 0.0f, 1.0f));
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 1.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)
-			, XMFLOAT3(0.0f, 0.0f, 1.0f));
-		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT2(1.0f, 0.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)
-			, XMFLOAT3(0.0f, 0.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)
+			, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)
+			, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(0.0f, 0.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)
+			, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 1.0f));
+		vertices.emplace_back(XMFLOAT3(CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f, CUBE_SIZE / 2.0f), XMFLOAT3(1.0f, 0.0f, 0.0f)
+			, XMFLOAT3(0.0f, 0.0f, 1.0f), XMFLOAT2(1.0f, 0.0f));
 
-		std::vector<UINT32> indices;
+		std::vector<uint32_t> indices;
 
 		// 전면
 		indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
@@ -252,16 +256,18 @@ namespace Dive
 		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers();
+		mesh->CreateBuffers(device);
 		mesh->ComputeBouingBox();
 		mesh->SetName("CubeMesh");
 
 		return mesh;
 	}
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreateSphere()
+	std::shared_ptr<StaticMesh> MeshFactory::CreateSphere(ID3D11Device* device)
 	{
-		std::vector<StaticVertex> vertices;
+		assert(device);
+
+		std::vector<LitVertex> vertices;
 		constexpr int latitudeBands = 30;
 		constexpr int longitudeBands = 30;
 		vertices.reserve((latitudeBands + 1) * (longitudeBands + 1));
@@ -280,15 +286,15 @@ namespace Dive
 					SPHERE_RADIUS * cosTheta,
 					SPHERE_RADIUS * sinPhi * sinTheta
 				);
-				XMFLOAT2 texCoords(longNumber / static_cast<float>(longitudeBands), latNumber / static_cast<float>(latitudeBands));
 				XMFLOAT3 normal(cosPhi * sinTheta, cosTheta, sinPhi * sinTheta);
 				XMStoreFloat3(&normal, XMVector3Normalize(XMLoadFloat3(&normal)));
 				XMFLOAT3 tangent(-sinPhi, 0.0f, cosPhi);
-				vertices.emplace_back(position, texCoords, normal, tangent);
+				XMFLOAT2 texCoords(longNumber / static_cast<float>(longitudeBands), latNumber / static_cast<float>(latitudeBands));
+				vertices.emplace_back(position, normal, tangent, texCoords);
 			}
 		}
 
-		std::vector<UINT32> indices;
+		std::vector<uint32_t> indices;
 		for (int latNumber = 0; latNumber < latitudeBands; ++latNumber)
 		{
 			for (int longNumber = 0; longNumber < longitudeBands; ++longNumber)
@@ -308,16 +314,18 @@ namespace Dive
 		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers();
+		mesh->CreateBuffers(device);
 		mesh->ComputeBouingBox();
 		mesh->SetName("SphereMesh");
 
 		return mesh;
 	}
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreateCapsule()
+	std::shared_ptr<StaticMesh> MeshFactory::CreateCapsule(ID3D11Device* device)
 	{
-		std::vector<StaticVertex> vertices;
+		assert(device);
+
+		std::vector<LitVertex> vertices;
 		constexpr int latitudeBands = 30;
 		constexpr int longitudeBands = 30;
 		vertices.reserve((latitudeBands + 1) * (longitudeBands + 1) * 2 + (longitudeBands + 1) * 2);
@@ -340,17 +348,17 @@ namespace Dive
 					CAPSULE_RADIUS * cosTheta + CAPSULE_HEIGHT / 2.0f,
 					CAPSULE_RADIUS * sinPhi * sinTheta);
 
-				XMFLOAT2 texCoords(longNumber / static_cast<float>(longitudeBands), latNumber / static_cast<float>(latitudeBands));
 				XMFLOAT3 normal(cosPhi * sinTheta, cosTheta, sinPhi * sinTheta);
 				XMStoreFloat3(&normal, XMVector3Normalize(XMLoadFloat3(&normal)));
 				XMFLOAT3 tangent(-sinPhi, 0.0f, cosPhi);
+				XMFLOAT2 texCoords(longNumber / static_cast<float>(longitudeBands), latNumber / static_cast<float>(latitudeBands));
 
 				// 위쪽 반구
-				vertices.emplace_back(position, texCoords, normal, tangent);
+				vertices.emplace_back(position, normal, tangent, texCoords);
 
 				// 아래쪽 반구
 				position.y -= CAPSULE_HEIGHT;
-				vertices.emplace_back(position, texCoords, normal, tangent);
+				vertices.emplace_back(position, normal, tangent, texCoords);
 			}
 		}
 
@@ -363,17 +371,17 @@ namespace Dive
 
 			XMFLOAT3 topPos(CAPSULE_RADIUS * cosPhi, CAPSULE_HEIGHT / 2.0f, CAPSULE_RADIUS * sinPhi);
 			XMFLOAT3 bottomPos(CAPSULE_RADIUS * cosPhi, -CAPSULE_HEIGHT / 2.0f, CAPSULE_RADIUS * sinPhi);
-			XMFLOAT2 texCoord(longNumber / static_cast<float>(longitudeBands), 0.5f);
-
+			
 			XMFLOAT3 normal(cosPhi, 0.0f, sinPhi);
 			XMStoreFloat3(&normal, XMVector3Normalize(XMLoadFloat3(&normal)));
 			XMFLOAT3 tangent(-sinPhi, 0.0f, cosPhi);
+			XMFLOAT2 texCoord(longNumber / static_cast<float>(longitudeBands), 0.5f);
 
-			vertices.emplace_back(topPos, texCoord, normal, tangent);
-			vertices.emplace_back(bottomPos, texCoord, normal, tangent);
+			vertices.emplace_back(topPos, normal, tangent, texCoord);
+			vertices.emplace_back(bottomPos, normal, tangent, texCoord);
 		}
 
-		std::vector<UINT32> indices;
+		std::vector<uint32_t> indices;
 		for (int latNumber = 0; latNumber < latitudeBands; ++latNumber)
 		{
 			for (int longNumber = 0; longNumber < longitudeBands; ++longNumber) {
@@ -419,27 +427,24 @@ namespace Dive
 		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers();
+		mesh->CreateBuffers(device);
 		mesh->ComputeBouingBox();
 		mesh->SetName("CapsuleMesh");
 
 		return mesh;
 	}
-	std::shared_ptr<StaticMesh> MeshFactory::Create(const std::string& meshName)
-	{
-		if (meshName == "TriangleMesh")
-			return CreateTriangle();
-		else if (meshName == "QuadMesh")
-			return CreateQuad();
-		else if (meshName == "PlaneMesh")
-			return CreatePlane();
-		else if (meshName == "CubeMesh")
-			return CreateCube();
-		else if (meshName == "SphereMesh")
-			return CreateSphere();
-		else if (meshName == "CapsuleMesh")
-			return CreateCapsule();
 
-		return std::shared_ptr<StaticMesh>();
+	std::shared_ptr<StaticMesh> MeshFactory::Create(ID3D11Device* device, const std::string& meshName)
+	{
+		assert(device);
+
+		if (meshName == "TriangleMesh")	return CreateTriangle(device);
+		if (meshName == "QuadMesh")		return CreateQuad(device);
+		if (meshName == "PlaneMesh")	return CreatePlane(device);
+		if (meshName == "CubeMesh")		return CreateCube(device);
+		if (meshName == "SphereMesh")	return CreateSphere(device);
+		if (meshName == "CapsuleMesh")	return CreateCapsule(device);
+
+		return nullptr;
 	}
 }

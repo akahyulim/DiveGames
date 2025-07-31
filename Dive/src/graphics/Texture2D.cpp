@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Texture2D.h"
-#include "core/CoreDefs.h"
+#include "Graphics.h"
 #include "core/FileUtils.h"
 #include "core/StringUtils.h"
 
@@ -12,10 +12,11 @@ namespace Dive
 	}
 
 	Texture2D::Texture2D(uint32_t width, uint32_t height, DXGI_FORMAT format, bool useMips)
-		: m_Width(width), m_Height(height)
 	{
-		m_Format = format;
-		m_UseMips = useMips;
+		m_width = width;
+		m_height = height;
+		m_format = format;
+		m_useMips = useMips;
 
 		SetName("Texture2D");
 	}
@@ -27,8 +28,8 @@ namespace Dive
 
 	void Texture2D::SetPixelData(const void* pixels, size_t size)
 	{
-		m_PixelData.resize(size);
-		std::copy(static_cast<const uint8_t*>(pixels), static_cast<const uint8_t*>(pixels) + size, m_PixelData.begin());
+		m_pixelData.resize(size);
+		std::copy(static_cast<const uint8_t*>(pixels), static_cast<const uint8_t*>(pixels) + size, m_pixelData.begin());
 	}
 
 	bool Texture2D::LoadFromFile(const std::filesystem::path& filepath)
@@ -46,19 +47,19 @@ namespace Dive
 
 		if (FAILED(result))
 		{
-			DV_LOG(Texture2D, err, "파일 읽기 실패: {}", filepath.string());
+			DV_LOG(Texture2D, err, "[::LoadFromFile] 파일 읽기 실패: {}", filepath.string());
 			return false;
 		}
 
-		m_Width = static_cast<uint32_t>(img.GetImages()->width);
-		m_Height = static_cast<uint32_t>(img.GetImages()->height);
-		m_Format = img.GetImages()->format;
-		m_UseMips = true;
+		m_width = static_cast<uint32_t>(img.GetImages()->width);
+		m_height = static_cast<uint32_t>(img.GetImages()->height);
+		m_format = img.GetImages()->format;
+		m_useMips = true;
 		
 		SetPixelData((const void*)img.GetImages()->pixels, img.GetImages()->rowPitch * img.GetImages()->height);
 		if (!Create())
 		{
-			DV_LOG(Texture2D, err, "생성 실패");
+			DV_LOG(Texture2D, err, "[::LoadFromFile] 리소스 생성 실패");
 			return false;
 		}
 
@@ -69,102 +70,98 @@ namespace Dive
 
 	bool Texture2D::Create()
 	{
-		if (m_PixelData.empty())
+		auto device = Graphics::GetDevice();
+		auto deviceContext = Graphics::GetDeviceContext();
+
+		if (m_pixelData.empty())
 		{
-			DV_LOG(Texture2D, err, "빈 픽셀 데이터");
+			DV_LOG(Texture2D, err, "[::Create] 빈 픽셀 데이터로 시도");
 			return false;
 		}
 
-		Release();
-
-		m_MipLevels = CanGenerateMips(m_Format) ? (m_UseMips ? CalculateMipmapLevels(m_Width, m_Height) : 1) : 1;
+		m_mipLevels = CanGenerateMips(m_format) ? (m_useMips ? CalculateMipmapLevels(m_width, m_height) : 1) : 1;
 
 		// texture2d
+		D3D11_TEXTURE2D_DESC texDesc{};
+		texDesc.Format = m_format;
+		texDesc.Width = static_cast<UINT>(m_width);
+		texDesc.Height = static_cast<UINT>(m_height);
+		texDesc.ArraySize = 1;
+		texDesc.MipLevels = static_cast<UINT>(m_mipLevels);
+		texDesc.SampleDesc.Count = 1;
+		texDesc.SampleDesc.Quality = 0;
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+		texDesc.MiscFlags = m_useMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+		texDesc.CPUAccessFlags = 0;
+
+		auto hr = device->CreateTexture2D(&texDesc, nullptr, m_texture.GetAddressOf());
+		if (FAILED(hr))
 		{
-			D3D11_TEXTURE2D_DESC desc{};
-			desc.Format = m_Format;
-			desc.Width = static_cast<UINT>(m_Width);
-			desc.Height = static_cast<UINT>(m_Height);
-			desc.ArraySize = 1;
-			desc.MipLevels = static_cast<UINT>(m_MipLevels);
-			desc.SampleDesc.Count = 1;
-			desc.SampleDesc.Quality = 0;
-			desc.Usage = D3D11_USAGE_DEFAULT;
-			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-			desc.MiscFlags = m_UseMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
-			desc.CPUAccessFlags = 0;
-
-			if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_Texture2D)))
-			{
-				DV_LOG(Texture2D, err, "ID3D11Texture2D 생성 실패");
-				return false;
-			}
-
-			uint32_t rowPitch = m_Width * GetPixelSize(m_Format);
-			Graphics::GetDeviceContext()->UpdateSubresource(
-				m_Texture2D,
-				0, nullptr,
-				m_PixelData.data(),
-				rowPitch,
-				0);
+			DV_LOG(Texture2D, err, "[::Create] CreateTexture2D 실패: {}", ErrorUtils::ToVerbose(hr));
+			return false;
 		}
+
+		uint32_t rowPitch = m_width * GetPixelSize(m_format);
+		deviceContext->UpdateSubresource(
+			static_cast<ID3D11Resource*>(m_texture.Get()),
+			0, nullptr,
+			m_pixelData.data(),
+			rowPitch,
+			0);
 
 		// ShaderResourceView
-		{
-			D3D11_SHADER_RESOURCE_VIEW_DESC desc{};
-			desc.Format = m_Format;
-			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			desc.Texture2D.MipLevels = static_cast<UINT>(m_MipLevels);
-			desc.Texture2D.MostDetailedMip = 0;
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+		srvDesc.Format = m_format;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MipLevels = static_cast<UINT>(m_mipLevels);
+		srvDesc.Texture2D.MostDetailedMip = 0;
 
-			if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_ShaderResourceView)))
-			{
-				DV_LOG(Texture2D, err, "ID3D11ShaderResourceView 생성 실패");
-				Release();
-				return false;
-			}
+		hr = device->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_texture.Get()), &srvDesc, m_shaderResourceView.GetAddressOf());
+		if (FAILED(hr))
+		{
+			DV_LOG(Texture2D, err, "[::Create] CreateShaderReosurceView 실패: {}", ErrorUtils::ToVerbose(hr));
+			return false;
 		}
 
-		if (m_UseMips && m_ShaderResourceView)
-			Graphics::GetDeviceContext()->GenerateMips(m_ShaderResourceView);
+		if (m_useMips && m_shaderResourceView)	deviceContext->GenerateMips(m_shaderResourceView.Get());
 
-		m_PixelData.clear();
-		m_PixelData.shrink_to_fit();
+		m_pixelData.clear();
+		m_pixelData.shrink_to_fit();
 
 		return true;
 	}
 
-	std::shared_ptr<Texture2D> Texture2D::LoadFromMemory(const std::filesystem::path& filepath, size_t size, const void* pSource, bool useMips)
+	bool Texture2D::LoadFromMemory(const std::filesystem::path& filepath, const void* sourceData, size_t size, bool useMips)
 	{
-		/*
 		auto extension = filepath.extension().string();
 
 		DirectX::ScratchImage img;
-		HRESULT result = 0;
+		HRESULT hr = 0;
 		if (extension == "dds")
-			result = DirectX::LoadFromDDSMemory(pSource, size, DirectX::DDS_FLAGS_NONE, nullptr, img);
+			hr = DirectX::LoadFromDDSMemory((const std::byte*)sourceData, size, DirectX::DDS_FLAGS_NONE, nullptr, img);
 		else if (extension == "tga")
-			result = DirectX::LoadFromTGAMemory(pSource, size, nullptr, img);
+			hr = DirectX::LoadFromTGAMemory((const uint8_t*)sourceData, size, nullptr, img);
 		else
-			result = DirectX::LoadFromWICMemory(pSource, size, DirectX::WIC_FLAGS_NONE, nullptr, img);
+			hr = DirectX::LoadFromWICMemory((const std::byte*)sourceData, size, DirectX::WIC_FLAGS_NONE, nullptr, img);
 
-		if (FAILED(result))
+		if (FAILED(hr))
 		{
-			DV_LOG(Texture2D, err, "Texture2D 생성 과정 중 메모리 로드 실패");
-			return nullptr;
+			DV_LOG(Texture2D, err, "[::LoadFromMemory] 텍스쳐 메모리 로드 실패: {}", ErrorUtils::ToVerbose(hr));
+			return false;
 		}
 
-		auto pNewTexture2D = std::make_shared<Texture2D>(
-			static_cast<uint32_t>(img.GetImages()->width),
-			static_cast<uint32_t>(img.GetImages()->height),
-			img.GetImages()->format,
-			useMips);
-		pNewTexture2D->SetPixelData((const void*)img.GetImages()->pixels, img.GetImages()->rowPitch * img.GetImages()->height);
-		if (!pNewTexture2D->Create())
-			return nullptr;
+		m_width = static_cast<uint32_t>(img.GetImages()->width);
+		m_height = static_cast<uint32_t>(img.GetImages()->height);
+		m_format = img.GetImages()->format;
+		m_useMips = useMips;
+		SetPixelData((const void*)img.GetImages()->pixels, img.GetImages()->rowPitch * img.GetImages()->height);
+		if (!Create())
+		{
+			DV_LOG(Texture2D, err, "[::LoadFromMemory] 리소스 생성 실패");
+			return false;
+		}
 
-		return pNewTexture2D;
-		*/
-		return nullptr;
+		return true;
 	}
 }

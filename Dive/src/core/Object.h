@@ -12,7 +12,7 @@ namespace Dive
 
 		uint64_t GetInstanceID() const { return m_InstanceID; }
 
-		virtual std::string GetName() { return m_Name; }
+		virtual std::string GetName() const { return m_Name; }
 		virtual void SetName(const std::string& name) { m_Name = name; }
 
 		bool operator==(const Object& other) const { return m_InstanceID == other.m_InstanceID; }

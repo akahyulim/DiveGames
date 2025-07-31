@@ -6,7 +6,7 @@ namespace Dive
 {
 	class StaticMesh;
 	class Material;
-	class DvConstantBuffer;
+	class ConstantBuffer;
 	class Camera;
 
 	struct ObjectData
@@ -26,18 +26,18 @@ namespace Dive
 		bool IsVisible(const Frustum& frustum);
 		bool IsTransparent() const;
 
-		std::shared_ptr<StaticMesh> GetStaticMesh() const { return m_StaticMesh; }
-		void SetStaticMesh(std::shared_ptr<StaticMesh> staticMesh) { m_StaticMesh = staticMesh; }
+		std::shared_ptr<StaticMesh> GetStaticMesh() const { return m_staticMesh; }
+		void SetStaticMesh(std::shared_ptr<StaticMesh> staticMesh) { m_staticMesh = staticMesh; }
 
-		std::shared_ptr<Material> GetMaterial() const { return m_Material; }
-		void SetMaterial(std::shared_ptr<Material> material) { m_Material = material; }
+		std::shared_ptr<Material> GetMaterial() const { return m_material; }
+		void SetMaterial(std::shared_ptr<Material> material) { m_material = material; }
 
 		static constexpr eComponentType GetType() { return eComponentType::MeshRenderer; }
 
 	private:
-		std::shared_ptr<StaticMesh> m_StaticMesh;
-		std::shared_ptr<Material> m_Material;
+		std::shared_ptr<StaticMesh> m_staticMesh;
+		std::shared_ptr<Material> m_material;
 
-		std::unique_ptr<DvConstantBuffer> m_ObjectBuffer;
+		std::unique_ptr<ConstantBuffer> m_gpuBuffer;
 	};
 }

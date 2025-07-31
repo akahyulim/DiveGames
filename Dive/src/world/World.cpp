@@ -4,7 +4,7 @@
 #include "Components/Transform.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
-#include "core/CoreDefs.h"
+#include "Common.h"
 
 namespace Dive
 {

@@ -1,13 +1,12 @@
 ﻿#include "stdafx.h"
 #include "Texture.h"
-#include "core/CoreDefs.h"
 
 namespace Dive
 {
 	void Texture::Release()
 	{
-		DV_RELEASE(m_ShaderResourceView);
-		DV_RELEASE(m_Texture2D);
+		m_shaderResourceView.Reset();
+		m_texture.Reset();
 	}
 
 	uint32_t Texture::CalculateMipmapLevels(uint32_t width, uint32_t height)
@@ -28,7 +27,7 @@ namespace Dive
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
 			return 16;
 		default:
-			DV_LOG("Texture", warn, "잘못된 포멧 전달");
+			DV_LOG("Texture", warn, "[::GetPixelSize] 잘못된 포멧 전달");
 			return 0;
 		}
 	}

@@ -5,10 +5,9 @@
 #include "RenderPass.h"
 #include "graphics/RenderTexture.h"
 #include "graphics/Graphics.h"
-#include "graphics/ConstantBuffer.h"
 #include "graphics/Shader.h"
 #include "graphics/ShaderManager.h"
-#include "core/CoreDefs.h"
+#include "Common.h"
 #include "world/World.h"
 #include "world/GameObject.h"
 #include "world/Components/Transform.h"
@@ -17,63 +16,60 @@
 
 namespace Dive
 {
-	uint32_t Renderer::s_RenderTargetWidth = 0;
-	uint32_t Renderer::s_RenderTargetHeight = 0;
+	uint32_t Renderer::s_renderTargetWidth = 0;
+	uint32_t Renderer::s_renderTargetHeight = 0;
 
-	RenderTexture* Renderer::s_GBufferRT0 = nullptr;
-	RenderTexture* Renderer::s_GBufferRT1 = nullptr;
-	RenderTexture* Renderer::s_GBufferRT2 = nullptr;
+	RenderTexture* Renderer::s_gBufferRT0 = nullptr;
+	RenderTexture* Renderer::s_gBufferRT1 = nullptr;
+	RenderTexture* Renderer::s_gBufferRT2 = nullptr;
 
-	RenderTexture* Renderer::s_FrameRT = nullptr;
-	RenderTexture* Renderer::s_OutputRT = nullptr;
+	RenderTexture* Renderer::s_frameRenderTarget = nullptr;
+	RenderTexture* Renderer::s_outputRenderTarget = nullptr;
 
-	std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> Renderer::s_RenderTargets;
-	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> Renderer::s_RasterizerStates;
-	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> Renderer::s_DepthStencilStates;
-	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> Renderer::s_BlendStates;
+	std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> Renderer::s_renderTargets;
+	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> Renderer::s_rasterizerStates;
+	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> Renderer::s_depthSteniclStates;
+	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> Renderer::s_blendStates;
 
-	ConstantBuffer* Renderer::s_DefaultVSConstantBuffer = nullptr;
-
-	std::vector<std::unique_ptr<RenderPass>> Renderer::s_RenderPasses;
+	std::vector<std::unique_ptr<RenderPass>> Renderer::s_renderPasses;
 
 	void Renderer::Initialize()
 	{
-		ResizeRenderBuffers(Graphics::GetResolutionWidth(), Graphics::GetResolutionHeight());
+		ResizeRenderBuffers(Graphics::GetWidth(), Graphics::GetHeight());
 
 		createRasterizerStates();
 		createDepthStencilStates();
 		createBlendStates();
-		createConstantBuffers();
 
-		s_RenderPasses.emplace_back(std::make_unique<TestPass>());
+		s_renderPasses.emplace_back(std::make_unique<TestPass>());
 
 		DV_LOG(Renderer, info, "초기화 성공");
 	}
 
 	void Renderer::Shutdown()
 	{	
-		DV_DELETE(s_GBufferRT0);
-		DV_DELETE(s_GBufferRT1);
-		DV_DELETE(s_GBufferRT2);
-		DV_DELETE(s_FrameRT);
-		DV_DELETE(s_OutputRT);
+		DV_DELETE(s_gBufferRT0);
+		DV_DELETE(s_gBufferRT1);
+		DV_DELETE(s_gBufferRT2);
+		DV_DELETE(s_frameRenderTarget);
+		DV_DELETE(s_outputRenderTarget);
 
-		for (auto& rt : s_RenderTargets)
+		for (auto& rt : s_renderTargets)
 		{
 			DV_DELETE(rt);
 			rt = nullptr;
 		}
-		for (auto& rs : s_RasterizerStates)
+		for (auto& rs : s_rasterizerStates)
 		{
 			if (rs) rs->Release();
 			rs = nullptr;
 		}
-		for (auto& ds : s_DepthStencilStates)
+		for (auto& ds : s_depthSteniclStates)
 		{
 			if (ds) ds->Release();
 			ds = nullptr;
 		}
-		for (auto& bs : s_BlendStates)
+		for (auto& bs : s_blendStates)
 		{
 			if (bs) bs->Release();
 			bs = nullptr;
@@ -96,7 +92,7 @@ namespace Dive
 			
 			// begin frame?
 
-			for (auto& pass : s_RenderPasses)
+			for (auto& pass : s_renderPasses)
 				pass->Execute(deviceContext, camera);
 
 			// end frame?
@@ -105,57 +101,57 @@ namespace Dive
 
 	void Renderer::ResizeRenderBuffers(uint32_t width, uint32_t height)
 	{
-		if (s_RenderTargetWidth == width && s_RenderTargetHeight == height)
+		if (s_renderTargetWidth == width && s_renderTargetHeight == height)
 			return;
 		
 		// G-Buffer
 		{
-			if (!s_GBufferRT0)
+			if (!s_gBufferRT0)
 			{
-				s_GBufferRT0 = new RenderTexture(width, height);
-				s_GBufferRT0->Create();
+				s_gBufferRT0 = new RenderTexture(width, height);
+				s_gBufferRT0->Create();
 			}
 			else
 			{
-				s_GBufferRT0->Resize(width, height);
+				s_gBufferRT0->Resize(width, height);
 			}
 
-			if (!s_GBufferRT1)
+			if (!s_gBufferRT1)
 			{
-				s_GBufferRT1 = new RenderTexture(width, height);
-				s_GBufferRT1->Create();
+				s_gBufferRT1 = new RenderTexture(width, height);
+				s_gBufferRT1->Create();
 			}
 			else
 			{
-				s_GBufferRT1->Resize(width, height);
+				s_gBufferRT1->Resize(width, height);
 			}
 
-			if (!s_GBufferRT2)
+			if (!s_gBufferRT2)
 			{
-				s_GBufferRT2 = new RenderTexture(width, height);
-				s_GBufferRT2->Create();
+				s_gBufferRT2 = new RenderTexture(width, height);
+				s_gBufferRT2->Create();
 			}
 			else
 			{
-				s_GBufferRT2->Resize(width, height);
+				s_gBufferRT2->Resize(width, height);
 			}
 		}
 
 		// FrameRender
 		// FrameOutput
 		
-		if (!s_RenderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)])
+		if (!s_renderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)])
 		{
-			s_RenderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)] = new RenderTexture(width, height);
-			s_RenderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)]->Create();
+			s_renderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)] = new RenderTexture(width, height);
+			s_renderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)]->Create();
 		}
 		else
 		{
-			s_RenderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)]->Resize(width, height);
+			s_renderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)]->Resize(width, height);
 		}
 
-		s_RenderTargetWidth = width;
-		s_RenderTargetHeight = height;
+		s_renderTargetWidth = width;
+		s_renderTargetHeight = height;
 	}
 	
 	RenderTexture* Renderer::GetGBuffer(eGBuffer type)
@@ -163,11 +159,11 @@ namespace Dive
 		switch (type)
 		{
 		case eGBuffer::Rt0:
-			return s_GBufferRT0;
+			return s_gBufferRT0;
 		case eGBuffer::Rt1:
-			return s_GBufferRT1;
+			return s_gBufferRT1;
 		case eGBuffer::Rt2:
-			return s_GBufferRT2;
+			return s_gBufferRT2;
 
 		default:
 			return nullptr;
@@ -176,28 +172,22 @@ namespace Dive
 
 	RenderTexture* Renderer::GetRenderTarget(eRenderTarget type)
 	{
-		return type != eRenderTarget::Count ? s_RenderTargets[static_cast<size_t>(type)] : nullptr;
+		return type != eRenderTarget::Count ? s_renderTargets[static_cast<size_t>(type)] : nullptr;
 	}
 
 	ID3D11RasterizerState* Renderer::GetRasterizerState(eRasterizerState type)
 	{
-		return type != eRasterizerState::Count ? s_RasterizerStates[static_cast<size_t>(type)] : nullptr;
+		return type != eRasterizerState::Count ? s_rasterizerStates[static_cast<size_t>(type)] : nullptr;
 	}
 
 	ID3D11DepthStencilState* Renderer::GetDepthStencilState(eDepthStencilState type)
 	{
-		return type != eDepthStencilState::Count ? s_DepthStencilStates[static_cast<size_t>(type)] : nullptr;
+		return type != eDepthStencilState::Count ? s_depthSteniclStates[static_cast<size_t>(type)] : nullptr;
 	}
 
 	ID3D11BlendState* Renderer::GetBlendState(eBlendState type) 
 	{ 
-		return type != eBlendState::Count ? s_BlendStates[static_cast<size_t>(type)] : nullptr; 
-	}
-	
-	void Renderer::createConstantBuffers()
-	{
-		s_DefaultVSConstantBuffer = new ConstantBuffer();
-		s_DefaultVSConstantBuffer->Create(sizeof(DefaultVSConstant));
+		return type != eBlendState::Count ? s_blendStates[static_cast<size_t>(type)] : nullptr; 
 	}
 
 	void Renderer::createShaders()
@@ -223,14 +213,14 @@ namespace Dive
 		desc.ScissorEnable = FALSE;
 		desc.SlopeScaledDepthBias = 0.0f;
 
-		if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &s_RasterizerStates[static_cast<size_t>(eRasterizerState::FillSolid_CullBack)])))
+		if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &s_rasterizerStates[static_cast<size_t>(eRasterizerState::FillSolid_CullBack)])))
 		{
 			DV_LOG(Renderer, err, "RasterizerState FillSolid_CullBack 생성 실패");
 		}
 
 		// FillSolid_CullNone
 		desc.CullMode = D3D11_CULL_NONE;
-		if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &s_RasterizerStates[static_cast<size_t>(eRasterizerState::FillSolid_CullNone)])))
+		if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &s_rasterizerStates[static_cast<size_t>(eRasterizerState::FillSolid_CullNone)])))
 		{
 			DV_LOG(Renderer, err, "RasterizerState FillSolid_CullNode 생성 실패");
 		}
@@ -253,7 +243,7 @@ namespace Dive
 			desc.FrontFace = stencilMarkOp;
 			desc.BackFace = stencilMarkOp;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthSteniclStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite)])))
 			{
 				DV_LOG(Renderer, err, "DepthStencilState DepthReadWrite 생성 실패");
 			}
@@ -278,7 +268,7 @@ namespace Dive
 			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite_StencilReadWrite)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthSteniclStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite_StencilReadWrite)])))
 			{
 				DV_LOG(Renderer, err, "DepthStencilState DepthReadWrite_StencilReadWrite 생성 실패");
 			}
@@ -299,7 +289,7 @@ namespace Dive
 			desc.FrontFace = stencilMarkOp;
 			desc.BackFace = stencilMarkOp;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::GBuffer)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthSteniclStates[static_cast<size_t>(eDepthStencilState::GBuffer)])))
 			{
 				DV_LOG(Renderer, err, "DepthStencilState GBuffer 생성 실패");
 			}
@@ -323,7 +313,7 @@ namespace Dive
 			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::DepthDiabled)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthSteniclStates[static_cast<size_t>(eDepthStencilState::DepthDiabled)])))
 			{
 				DV_LOG(Renderer, err, "DepthDisabledStencilState 생성 실패");
 			}
@@ -341,7 +331,7 @@ namespace Dive
 			desc.FrontFace = noSkyStencilOp;
 			desc.BackFace = noSkyStencilOp;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_DepthStencilStates[static_cast<size_t>(eDepthStencilState::ForwardLight)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthSteniclStates[static_cast<size_t>(eDepthStencilState::ForwardLight)])))
 			{
 				DV_LOG(Renderer, err, "DepthDisabledStencilState 생성 실패");
 			}
@@ -364,7 +354,7 @@ namespace Dive
 		for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
 			desc.RenderTarget[i] = defaultRenderTargetBlendDesc;
 
-		if (FAILED(Graphics::GetDevice()->CreateBlendState(&desc, &s_BlendStates[static_cast<size_t>(eBlendState::Addictive)])))
+		if (FAILED(Graphics::GetDevice()->CreateBlendState(&desc, &s_blendStates[static_cast<size_t>(eBlendState::Addictive)])))
 		{
 			DV_LOG(Renderer, err, "BlandState Addictive 생성 실패");
 		}

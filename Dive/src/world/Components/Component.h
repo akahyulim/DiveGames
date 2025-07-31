@@ -20,7 +20,7 @@ namespace Dive
 		Component(GameObject* gameObject);
 		virtual ~Component() = default;
 
-		std::string GetName() override;
+		std::string GetName() const override;
 
 		virtual void Update() {}
 

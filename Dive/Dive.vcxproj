@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\core\CoreDefs.h" />
+    <ClInclude Include="src\Common.h" />
     <ClInclude Include="src\core\Engine.h" />
     <ClInclude Include="src\core\Object.h" />
     <ClInclude Include="src\core\Window.h" />
@@ -28,17 +28,19 @@
     <ClInclude Include="src\core\Log.h" />
     <ClInclude Include="src\core\StringUtils.h" />
     <ClInclude Include="src\dive.h" />
+    <ClInclude Include="src\graphics\Buffer.h" />
     <ClInclude Include="src\graphics\ConstantBuffer.h" />
     <ClInclude Include="src\graphics\Cubemap.h" />
+    <ClInclude Include="src\graphics\InputLayoutKey.h" />
     <ClInclude Include="src\graphics\ShaderManager.h" />
+    <ClInclude Include="src\graphics\ShaderProgram.h" />
     <ClInclude Include="src\graphics\Texture.h" />
     <ClInclude Include="src\graphics\Texture2D.h" />
     <ClInclude Include="src\graphics\Graphics.h" />
-    <ClInclude Include="src\graphics\IndexBuffer.h" />
     <ClInclude Include="src\graphics\RenderTexture.h" />
     <ClInclude Include="src\graphics\Shader.h" />
-    <ClInclude Include="src\graphics\VertexBuffer.h" />
     <ClInclude Include="src\core\Input.h" />
+    <ClInclude Include="src\graphics\Vertex.h" />
     <ClInclude Include="src\math\BoundingBox.h" />
     <ClInclude Include="src\math\Frustum.h" />
     <ClInclude Include="src\math\Math.h" />
@@ -68,16 +70,16 @@
     <ClCompile Include="src\core\FileUtils.cpp" />
     <ClCompile Include="src\core\Log.cpp" />
     <ClCompile Include="src\core\StringUtils.cpp" />
+    <ClCompile Include="src\graphics\Buffer.cpp" />
     <ClCompile Include="src\graphics\ConstantBuffer.cpp" />
     <ClCompile Include="src\graphics\Cubemap.cpp" />
     <ClCompile Include="src\graphics\ShaderManager.cpp" />
+    <ClCompile Include="src\graphics\ShaderProgram.cpp" />
     <ClCompile Include="src\graphics\Texture.cpp" />
     <ClCompile Include="src\graphics\Texture2D.cpp" />
     <ClCompile Include="src\graphics\Graphics.cpp" />
-    <ClCompile Include="src\graphics\IndexBuffer.cpp" />
     <ClCompile Include="src\graphics\RenderTexture.cpp" />
     <ClCompile Include="src\graphics\Shader.cpp" />
-    <ClCompile Include="src\graphics\VertexBuffer.cpp" />
     <ClCompile Include="src\core\Input.cpp" />
     <ClCompile Include="src\math\BoundingBox.cpp" />
     <ClCompile Include="src\math\Frustum.cpp" />

@@ -1,122 +1,59 @@
 ﻿#include "stdafx.h"
 #include "ConstantBuffer.h"
 #include "Graphics.h"
-#include "core/CoreDefs.h"
+#include "Common.h"
 
 namespace Dive
 {
-	DvConstantBuffer::DvConstantBuffer(ID3D11Device* device, eVSConstantBufferSlot slot, size_t size)
-		: m_Slot(static_cast<UINT>(slot))
-		, m_Stage(eShaderStage::VertexShader)
+	ConstantBuffer::ConstantBuffer(ID3D11Device* device, eVSConstantBufferSlot slot, uint32_t stride)
+		: m_vsSlot(slot)
+		, m_shaderStage(eShaderStage::VertexShader)
 	{
 		assert(device);
 		assert(slot < eVSConstantBufferSlot::Count);
 
 		D3D11_BUFFER_DESC bufferDesc{};
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		bufferDesc.ByteWidth = static_cast<UINT>(size);
+		bufferDesc.ByteWidth = static_cast<UINT>(stride);
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-		if (FAILED(device->CreateBuffer(&bufferDesc, nullptr, &m_Buffer)))
-			DV_LOG(ConstantBuffer, err, "버퍼 생성 실패");
+		auto hr = device->CreateBuffer(&bufferDesc, nullptr, &m_buffer);
+		if (FAILED(hr))	DV_LOG(ConstantBuffer, err, "[::ConstantBuffer] CreateBuffer 실패: {}", ErrorUtils::ToVerbose(hr));
 	}
 
-	DvConstantBuffer::DvConstantBuffer(ID3D11Device* device, ePSConstantBufferSlot slot, size_t size)
-		: m_Slot(static_cast<UINT>(slot))
-		, m_Stage(eShaderStage::PixelShader)
+	ConstantBuffer::ConstantBuffer(ID3D11Device* device, ePSConstantBufferSlot slot, uint32_t stride)
+		: m_psSlot(slot)
+		, m_shaderStage(eShaderStage::PixelShader)
 	{
 		assert(device);
 		assert(slot < ePSConstantBufferSlot::Count);
 
 		D3D11_BUFFER_DESC bufferDesc{};
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		bufferDesc.ByteWidth = static_cast<UINT>(size);
+		bufferDesc.ByteWidth = static_cast<UINT>(stride);
 		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-		if (FAILED(device->CreateBuffer(&bufferDesc, nullptr, &m_Buffer)))
-			DV_LOG(ConstantBuffer, err, "버퍼 생성 실패");
+		auto hr = device->CreateBuffer(&bufferDesc, nullptr, &m_buffer);
+		if (FAILED(hr))	DV_LOG(ConstantBuffer, err, "[::ConstantBuffer] CreateBuffer 실패: {}", ErrorUtils::ToVerbose(hr));
 	}
 
-	void DvConstantBuffer::Bind(ID3D11DeviceContext* deviceContext)
+	void ConstantBuffer::Bind(ID3D11DeviceContext* deviceContext)
 	{
 		assert(deviceContext);
 
-		switch (m_Stage)
+		switch (m_shaderStage)
 		{
 		case eShaderStage::VertexShader:
-			deviceContext->VSSetConstantBuffers(static_cast<UINT>(m_Slot), 1, m_Buffer.GetAddressOf());
+			deviceContext->VSSetConstantBuffers(static_cast<UINT>(m_vsSlot), 1, m_buffer.GetAddressOf());
 			break;
 		case eShaderStage::PixelShader:
-			deviceContext->PSSetConstantBuffers(static_cast<UINT>(m_Slot), 1, m_Buffer.GetAddressOf());
+			deviceContext->PSSetConstantBuffers(static_cast<UINT>(m_psSlot), 1, m_buffer.GetAddressOf());
 			break;
 		default:
+			assert(false && "지원하지 않는 셰이더 스테이지");
 			break;
 		}
-	}
-
-	// ====================================================================================================================
-
-	ConstantBuffer::~ConstantBuffer()
-	{
-		Release();
-	}
-
-	bool ConstantBuffer::Create(UINT32 stride)
-	{
-		Release();
-
-		D3D11_BUFFER_DESC bufferDesc{};
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		bufferDesc.ByteWidth = m_Stride = stride;
-		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-		if (FAILED(Graphics::GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_Buffer)))
-		{
-			DV_LOG(ConstantBuffer, err, "버퍼 생성 실패");
-			return false;
-		}
-
-		return true;
-	}
-
-	void ConstantBuffer::Release()
-	{
-		DV_RELEASE(m_Buffer);
-	}
-
-	void* ConstantBuffer::Map()
-	{
-		assert(m_Buffer);
-
-		D3D11_MAPPED_SUBRESOURCE mappedData{};
-		if (FAILED(Graphics::GetDeviceContext()->Map(
-			static_cast<ID3D11Resource*>(m_Buffer),
-			0,
-			D3D11_MAP_WRITE_DISCARD,
-			0,
-			&mappedData)))
-		{
-			DV_LOG(ConstantBuffer, err, "버퍼 Map 실패");
-			return nullptr;
-		}
-
-		return mappedData.pData;
-	}
-
-	void ConstantBuffer::Unmap()
-	{
-		Graphics::GetDeviceContext()->Unmap(static_cast<ID3D11Resource*>(m_Buffer), 0);
-	}
-
-	std::shared_ptr<ConstantBuffer> ConstantBuffer::Generate(UINT32 stride)
-	{
-		auto constantBuffer = std::make_shared<ConstantBuffer>();
-		if (!constantBuffer->Create(stride))
-			return nullptr;
-
-		return constantBuffer;
 	}
 }

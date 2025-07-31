@@ -1,11 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Graphics.h"
-#include "core/CoreDefs.h"
 #include "core/Window.h"
-#include "RenderTexture.h"
-#include "Shader.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
+#include "core/EventDispatcher.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -17,21 +13,22 @@ namespace Dive
 	constexpr DXGI_FORMAT DV_FORMAT = DXGI_FORMAT_R8G8B8A8_UNORM;
 	constexpr BOOL DV_WINDOWED = TRUE;
 
-	uint32_t Graphics::s_ResolutionWidth = 0;
-	uint32_t Graphics::s_ResolutionHeight = 0;
-	bool Graphics::s_UseVSync = false;
+	uint32_t Graphics::s_width = 0;
+	uint32_t Graphics::s_height = 0;
+	bool Graphics::m_useSync = false;
 
-	ComPtr<IDXGISwapChain> Graphics::s_SwapChain;
-	ComPtr<ID3D11Device> Graphics::s_Device;
-	ComPtr<ID3D11DeviceContext> Graphics::s_DeviceContext;
+	ComPtr<IDXGISwapChain> Graphics::s_swapChain;
+	ComPtr<ID3D11Device> Graphics::s_device;
+	ComPtr<ID3D11DeviceContext> Graphics::s_deviceContext;
 
-	ComPtr<ID3D11RenderTargetView> Graphics::s_BackBufferRTV;
-	ComPtr<ID3D11Texture2D> Graphics::s_BackbufferTexture;
-	ComPtr<ID3D11DepthStencilView> Graphics::s_BackBufferDSV;
+	ComPtr<ID3D11RenderTargetView> Graphics::s_renderTargetView;
+	ComPtr<ID3D11Texture2D> Graphics::s_depthStencilBuffer;
+	ComPtr<ID3D11DepthStencilView> Graphics::s_depthStencilView;
 
 	bool Graphics::Initialize()
 	{
-		if (FAILED(::D3D11CreateDevice(
+
+		HRESULT hr = ::D3D11CreateDevice(
 			nullptr,
 			D3D_DRIVER_TYPE_HARDWARE,
 			nullptr,
@@ -39,16 +36,17 @@ namespace Dive
 			nullptr,
 			0,
 			D3D11_SDK_VERSION,
-			s_Device.GetAddressOf(),
+			s_device.GetAddressOf(),
 			nullptr,
-			s_DeviceContext.GetAddressOf()))) 
+			s_deviceContext.GetAddressOf());
+		if(FAILED(hr))
 		{
-			DV_LOG(Graphics, err, "D3D11Device & D3D11DeviceContext 생성 실패");
+			DV_LOG(Graphics, err, "[::Initialize] D3D11CreateDevice 실패: {}", ErrorUtils::ToVerbose(hr));
 			return false;
 		}
 
 		IDXGIDevice* dxgiDevice{};
-		s_Device->QueryInterface(IID_IDXGIDevice, (void**)&dxgiDevice);
+		s_device->QueryInterface(IID_IDXGIDevice, (void**)&dxgiDevice);
 		IDXGIAdapter* dxgiAdapter{};
 		dxgiDevice->GetParent(IID_IDXGIAdapter, (void**)&dxgiAdapter);
 		IDXGIFactory* dxgiFactory{};
@@ -68,9 +66,10 @@ namespace Dive
 		desc.OutputWindow = Window::GetWindowHandle();
 		desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;	// rastertek에선 0이고 다른 값들 설정이 남아 있다...
 
-		if (FAILED(dxgiFactory->CreateSwapChain(s_Device.Get(), &desc, s_SwapChain.GetAddressOf())))
+		hr = dxgiFactory->CreateSwapChain(s_device.Get(), &desc, s_swapChain.GetAddressOf());
+		if(FAILED(hr))
 		{
-			DV_LOG(Graphics, err, "D3D11SwapChain 생성 실패");
+			DV_LOG(Graphics, err, "[::Initialize] CreateSwapChain 실패: {}", ErrorUtils::ToVerbose(hr));
 			return false;
 		}
 
@@ -78,9 +77,9 @@ namespace Dive
 		DV_RELEASE(dxgiAdapter);
 		DV_RELEASE(dxgiDevice);
 
-		updateBackbuffer();
+		SetupViews();
 
-		DV_SUBSCRIBE_EVENT(eEventType::WindowResized, DV_EVENT_HANDLER_STATIC(OnResizeBuffer));
+		DV_SUBSCRIBE_EVENT(eEventType::WindowResized, DV_EVENT_HANDLER_STATIC(OnResizeViews));
 
 		DV_LOG(Graphics, info, "초기화 성공");
 
@@ -89,13 +88,13 @@ namespace Dive
 	
 	void Graphics::Shutdown()
 	{
-		s_BackBufferDSV.Reset();
-		s_BackbufferTexture.Reset();
-		s_BackBufferRTV.Reset();
+		s_depthStencilView.Reset();
+		s_depthStencilBuffer.Reset();
+		s_renderTargetView.Reset();
 		
-		s_DeviceContext.Reset();
-		s_Device.Reset();
-		s_SwapChain.Reset();
+		s_deviceContext.Reset();
+		s_device.Reset();
+		s_swapChain.Reset();
 
 		DV_LOG(Graphics, info, "셧다운 완료");
 	}
@@ -105,7 +104,7 @@ namespace Dive
 	// 후 wm_size 발생
 	void Graphics::Resize(uint32_t  width, uint32_t height)
 	{
-		assert(s_SwapChain);
+		assert(s_swapChain);
 
 		DXGI_MODE_DESC desc{};
 		desc.Width = static_cast<UINT>(width);
@@ -114,92 +113,92 @@ namespace Dive
 		desc.RefreshRate.Denominator = DV_REFRESHRATE_DENOMINATOR;
 		desc.Format = DV_FORMAT;
 
-		HRESULT hResult = s_SwapChain->ResizeTarget(&desc);
-		if (FAILED(hResult))
+		HRESULT hr = s_swapChain->ResizeTarget(&desc);
+		if (FAILED(hr))
 		{
-			DV_LOG(Graphics, err, "[::Resize] ResizeTarget 실패: {:#x}", static_cast<uint32_t>(hResult));
+			DV_LOG(Graphics, err, "[::Resize] ResizeTarget 실패: {}", ErrorUtils::ToVerbose(hr));
 			return;
 		}
 	}
 
-	void Graphics::OnResizeBuffer()
+	void Graphics::OnResizeViews()
 	{
-		assert(s_SwapChain);
-		assert(s_DeviceContext);
-
-		s_DeviceContext->OMSetRenderTargets(0, NULL, NULL);
-		s_BackBufferRTV.Reset();
-		
-		HRESULT hResult = s_SwapChain->ResizeBuffers(0, 0, 0, DV_FORMAT, 0);
-		if (FAILED(hResult))
+		if (!ResizeSwapChain())
 		{
-			DV_LOG(Graphics, err, "[::OnResizeBuffer] ResizeBuffers 실패: {:#x}", static_cast<uint32_t>(hResult));
+			DV_LOG(Graphics, err, "[::OnResizeViews] 스왑체인 리사이즈 실패");
 			return;
 		}
 
-		updateBackbuffer();
+		if(!SetupViews())
+		{
+			DV_LOG(Graphics, err, "[::OnResizeViews] 뷰 재생성 실패");
+			return;
+		}
 	}
 
 	void Graphics::Present()
 	{
-		assert(s_SwapChain.Get());
-		s_SwapChain->Present(s_UseVSync ? 1 : 0, 0);
+		assert(s_swapChain);
+		s_swapChain->Present(m_useSync ? 1 : 0, 0);
 	}
 
 	IDXGISwapChain* Graphics::GetSwapChain()
 	{
-		return s_SwapChain.Get();
+		return s_swapChain.Get();
 	}
 	
 	ID3D11Device* Graphics::GetDevice()
 	{
-		return s_Device.Get();
+		assert(s_device);
+		return s_device.Get();
 	}
 	
 	ID3D11DeviceContext* Graphics::GetDeviceContext()
 	{
-		return s_DeviceContext.Get();
+		assert(s_deviceContext);
+		return s_deviceContext.Get();
 	}
 
-	ID3D11RenderTargetView* Graphics::GetBackBufferRTV()
+	ID3D11RenderTargetView* Graphics::GetRenderTargetView()
 	{
-		return s_BackBufferRTV.Get();
+		assert(s_renderTargetView);
+		return s_renderTargetView.Get();
 	}
 	
-	ID3D11DepthStencilView* Graphics::GetBackBufferDSV()
+	ID3D11DepthStencilView* Graphics::GetDepthStencilView()
 	{
-		return s_BackBufferDSV.Get();
+		assert(s_depthStencilView);
+		return s_depthStencilView.Get();
 	}
 
-	void Graphics::updateBackbuffer()
+	bool Graphics::SetupViews()
 	{
-		assert(s_SwapChain.Get());
-		assert(s_Device.Get());
+		assert(s_swapChain.Get());
+		assert(s_device.Get());
 
-		s_BackBufferRTV.Reset();
-		s_BackbufferTexture.Reset();
-		s_BackBufferDSV.Reset();
+		s_renderTargetView.Reset();
+		s_depthStencilBuffer.Reset();
+		s_depthStencilView.Reset();
 		
-		ID3D11Texture2D* backBufferTexture{};
-		if (FAILED(s_SwapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backBufferTexture))) 
+		ID3D11Texture2D* backBuffer = nullptr;
+		HRESULT hr = s_swapChain->GetBuffer(0, IID_ID3D11Texture2D, (void**)&backBuffer);
+		if(FAILED(hr))
 		{
-			DV_LOG(Graphics, err, "후면버퍼 텍스쳐 획득 실패");
-			return;
+			DV_LOG(Graphics, err, "[::SetViews] GetBuffer 실패: {}", ErrorUtils::ToVerbose(hr));
+			return false;
 		}
 
-		if (FAILED(s_Device->CreateRenderTargetView(
-			static_cast<ID3D11Resource*>(backBufferTexture), 
-			nullptr, 
-			&s_BackBufferRTV))) 
+		hr = s_device->CreateRenderTargetView(static_cast<ID3D11Resource*>(backBuffer), nullptr, s_renderTargetView.GetAddressOf());
+		if(FAILED(hr))
 		{
-			DV_LOG(Graphics, err, "후면버퍼 렌더타겟뷰 생성 실패");
-			return;
+			DV_LOG(Graphics, err, "[::SetViews] CreateRenderTargetView 실패: {}", ErrorUtils::ToVerbose(hr));
+			return false;
 		}
-
-		backBufferTexture->Release();
+		// 반드시 릴리즈!!!
+		backBuffer->Release();
 		
 		DXGI_SWAP_CHAIN_DESC desc{};
-		s_SwapChain->GetDesc(&desc);
+		s_swapChain->GetDesc(&desc);
 
 		D3D11_TEXTURE2D_DESC texDesc{};
 		texDesc.Width = desc.BufferDesc.Width;
@@ -214,10 +213,11 @@ namespace Dive
 		texDesc.CPUAccessFlags = 0;
 		texDesc.MiscFlags = 0;
 
-		if (FAILED(s_Device->CreateTexture2D(&texDesc, nullptr, &s_BackbufferTexture))) 
+		hr = s_device->CreateTexture2D(&texDesc, nullptr, s_depthStencilBuffer.GetAddressOf());
+		if(FAILED(hr))
 		{
-			DV_LOG(Graphics, err, "후면버퍼 깊이 스텐실 텍스쳐 생성 실패");
-			return;
+			DV_LOG(Graphics, err, "[::SetViews] CreateTexture2D 실패: {}", ErrorUtils::ToVerbose(hr));
+			return false;
 		}
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC viewDesc{};
@@ -225,16 +225,34 @@ namespace Dive
 		viewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		viewDesc.Texture2D.MipSlice = 0;
 
-		if (FAILED(s_Device->CreateDepthStencilView(
-			static_cast<ID3D11Resource*>(s_BackbufferTexture.Get()),
-			&viewDesc,
-			s_BackBufferDSV.GetAddressOf()))) 
+		hr = s_device->CreateDepthStencilView(static_cast<ID3D11Resource*>(s_depthStencilBuffer.Get()), &viewDesc, s_depthStencilView.GetAddressOf());
+		if(FAILED(hr))
 		{
-			DV_LOG(Graphics, err, "후면버퍼 깊이 스텐실 뷰 생성 실패");
-			return;
+			DV_LOG(Graphics, err, "[::SetViews] CreateDepthStencilView 실패: {}", ErrorUtils::ToVerbose(hr));
+			return false;
 		}
 
-		s_ResolutionWidth = static_cast<uint32_t>(desc.BufferDesc.Width);
-		s_ResolutionHeight = static_cast<uint32_t>(desc.BufferDesc.Height);
+		s_width = static_cast<uint32_t>(desc.BufferDesc.Width);
+		s_height = static_cast<uint32_t>(desc.BufferDesc.Height);
+
+		return true;
+	}
+
+	bool Graphics::ResizeSwapChain()
+	{
+		assert(s_swapChain);
+		assert(s_deviceContext);
+
+		s_deviceContext->OMSetRenderTargets(0, NULL, NULL);
+		s_renderTargetView.Reset();
+
+		HRESULT hr = s_swapChain->ResizeBuffers(0, 0, 0, DV_FORMAT, 0);
+		if (FAILED(hr))
+		{
+			DV_LOG(Graphics, err, "[::ResizeSwapChain] ResizeBuffers 실패: {}", ErrorUtils::ToVerbose(hr));
+			return false;
+		}
+
+		return true;
 	}
 }

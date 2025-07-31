@@ -1,14 +1,13 @@
 ﻿#include "stdafx.h"
 #include "StaticMesh.h"
-#include "graphics/VertexBuffer.h"
-#include "graphics/IndexBuffer.h"
+#include "graphics/Buffer.h"
 #include "graphics/ShaderManager.h"
 #include "math/BoundingBox.h"
 
 namespace Dive
 {
 	StaticMesh::StaticMesh()
-		: m_Type(eMeshType::Static)
+		: m_type(eMeshType::Static)
 	{
 	}
 
@@ -17,30 +16,48 @@ namespace Dive
 		Clear();
 	}
 
-	bool StaticMesh::CreateBuffers()
+	bool StaticMesh::CreateBuffers(ID3D11Device* device)
 	{
-		if (m_Vertices.empty())
+		assert(device);
+
+		// 정점 버퍼 생성
 		{
-			DV_LOG(StaticMesh, err, "정점 empty");
-			return false;
+			if (m_vertices.empty())
+			{
+				DV_LOG(StaticMesh, err, "[::CreateBuffers] 정점이 존재하지 않아 실패");
+				return false;
+			}
+
+			m_vb.reset();
+			m_vb = std::make_shared<Buffer>(
+				device,
+				eBufferType::VertexBuffer,
+				m_vertices.data(),
+				static_cast<uint32_t>(sizeof(LitVertex)),
+				static_cast<uint32_t>(m_vertices.size()));
+			if (!m_vb)
+			{
+				DV_LOG(StaticMesh, err, "[::CreateBuffers] VertexBuffer 생성 실패");
+				m_vb.reset();
+				return false;
+			}
 		}
 
-		m_VertexBuffer.reset();
-
-		m_VertexBuffer = std::make_unique<VertexBuffer>();
-		if (!m_VertexBuffer->Create(
-			m_Vertices.data(),
-			sizeof(StaticVertex),
-			static_cast<uint32_t>(m_Vertices.size())))
+		// 인덱스 버퍼 생성
+		if(!m_indices.empty())
 		{
-			DV_LOG(StaticMesh, err, "정점 버퍼 생성 실패");
-			return false;
-		}
-
-		if (!createIndexBuffer())
-		{
-			DV_LOG(StaticMesh, err, "인덱스 버퍼 생성 실패");
-			return false;
+			m_ib.reset();
+			m_ib = std::make_shared<Buffer>(
+				device,
+				eBufferType::IndexBuffer,
+				m_indices.data(),
+				static_cast<uint32_t>(sizeof(uint32_t)),
+				static_cast<uint32_t>(m_indices.size()));
+			if (!m_ib)
+			{
+				DV_LOG(StaticMesh, err, "[::CreateBuffers] IndexBuffer 생성 실패");
+				return false;
+			}
 		}
 
 		return true;
@@ -48,98 +65,60 @@ namespace Dive
 
 	void StaticMesh::Clear()
 	{
-		m_BoundingBox.reset();
-		m_IndexBuffer.reset();
-		m_VertexBuffer.reset();
+		m_boundingBox.reset();
+		m_ib.reset();
+		m_vb.reset();
 
-		m_Indices.clear();
-		m_Indices.shrink_to_fit();
+		m_indices.clear();
+		m_indices.shrink_to_fit();
 
-		m_Vertices.clear();
-		m_Vertices.shrink_to_fit();
+		m_vertices.clear();
+		m_vertices.shrink_to_fit();
 	}
 
 	void StaticMesh::Draw(ID3D11DeviceContext* deviceContext)
 	{
 		assert(deviceContext);
-		assert(m_VertexBuffer);
+		assert(m_vb);
 
-		deviceContext->IASetPrimitiveTopology(m_PrimitiveTopology);
+		deviceContext->IASetPrimitiveTopology(m_primitiveTopology);
 
-		ID3D11Buffer* vertexBuffer = m_VertexBuffer->GetBuffer();
-		UINT stride = m_VertexBuffer->GetStride();
-		UINT offset = 0;
-		deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+		m_vb->Bind(deviceContext);
 
-		if (m_IndexBuffer)
+		if (m_ib)
 		{
-			deviceContext->IASetIndexBuffer(m_IndexBuffer->GetBuffer(), m_IndexBuffer->GetFormat(), 0);
-			deviceContext->DrawIndexed(m_IndexBuffer->GetCount(), 0, 0);
+			m_ib->Bind(deviceContext);
+			deviceContext->DrawIndexed(m_ib->GetCount(), 0, 0);
 		}
 		else
-			deviceContext->Draw(m_VertexBuffer->GetCount(), 0);
+			deviceContext->Draw(m_vb->GetCount(), 0);
 	}
 
 	void StaticMesh::ComputeBouingBox()
 	{
-		if (m_Vertices.empty())
+		if (m_vertices.empty())
 		{
 			DV_LOG(StaticMesh, err, "vertices empty");
 			return;
 		}
 
-		m_BoundingBox = std::make_unique<BoundingBox>(m_Vertices);
+		m_boundingBox = std::make_unique<BoundingBox>(m_vertices);
 	}
 
-	void StaticMesh::AddVertices(const std::vector<StaticVertex>& vertices, uint32_t* outOffset)
+	void StaticMesh::AddVertices(const std::vector<LitVertex>& vertices, uint32_t* outOffset)
 	{
 		// 현재 저장되어 있는 개수 리턴
 		if (outOffset)
-			*outOffset = static_cast<uint32_t>(m_Vertices.size());
+			*outOffset = static_cast<uint32_t>(m_vertices.size());
 
-		m_Vertices.insert(m_Vertices.end(), vertices.begin(), vertices.end());
+		m_vertices.insert(m_vertices.end(), vertices.begin(), vertices.end());
 	}
 
 	void StaticMesh::AddIndices(const std::vector<uint32_t>& indices, uint32_t* outOffset)
 	{
 		if (outOffset)
-			*outOffset = static_cast<uint32_t>(m_Indices.size());
+			*outOffset = static_cast<uint32_t>(m_indices.size());
 
-		m_Indices.insert(m_Indices.end(), indices.begin(), indices.end());
-	}
-
-	Shader* StaticMesh::GetVertexShader() const
-	{
-		auto shader = ShaderManager::GetShader(m_VertexShaderName);
-		if (!shader || shader->GetType() != eShaderType::Vertex)
-		{
-			DV_LOG(StaticMesh, err, "정점 셰이더 획득 실패: {}", m_VertexShaderName);
-			return nullptr;
-		}
-
-		return shader;
-	}
-
-	bool StaticMesh::createIndexBuffer()
-	{
-		if (m_Indices.empty())
-		{
-			DV_LOG(StaticMesh, err, "indices empty");
-			return false;
-		}
-
-		m_IndexBuffer.reset();
-
-		m_IndexBuffer = std::make_unique<IndexBuffer>();
-		if (!m_IndexBuffer->Create(
-			m_Indices.data(),
-			static_cast<uint32_t>(m_Indices.size()),
-			static_cast<uint32_t>(m_Vertices.size())))
-		{
-			DV_LOG(StaticMesh, err, "인덱스 버퍼 생성 실패");
-			return false;
-		}
-
-		return true;
+		m_indices.insert(m_indices.end(), indices.begin(), indices.end());
 	}
 }
