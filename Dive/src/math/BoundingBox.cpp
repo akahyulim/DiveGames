@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "BoundingBox.h"
-#include "core/CoreDefs.h"
+#include "graphics/Vertex.h"
 #include "rendering/StaticMesh.h"
 
 using namespace DirectX;
@@ -36,20 +36,20 @@ namespace Dive
 		}
 	}
 
-	BoundingBox::BoundingBox(const std::vector<StaticVertex>& vertices)
+	BoundingBox::BoundingBox(const std::vector<LitVertex>& vertices)
 	{
 		m_Max = XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		m_Min = XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
 
 		for (auto& vertex : vertices)
 		{
-			m_Max.x = std::max(m_Max.x, vertex.position.x);
-			m_Max.y = std::max(m_Max.y, vertex.position.y);
-			m_Max.z = std::max(m_Max.z, vertex.position.z);
+			m_Max.x = std::max(m_Max.x, vertex.Position.x);
+			m_Max.y = std::max(m_Max.y, vertex.Position.y);
+			m_Max.z = std::max(m_Max.z, vertex.Position.z);
 
-			m_Min.x = std::min(m_Min.x, vertex.position.x);
-			m_Min.y = std::min(m_Min.y, vertex.position.y);
-			m_Min.z = std::min(m_Min.z, vertex.position.z);
+			m_Min.x = std::min(m_Min.x, vertex.Position.x);
+			m_Min.y = std::min(m_Min.y, vertex.Position.y);
+			m_Min.z = std::min(m_Min.z, vertex.Position.z);
 		}
 	}
 

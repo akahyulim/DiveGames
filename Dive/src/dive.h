@@ -15,14 +15,15 @@
 
 // graphics
 #include "graphics/Graphics.h"
+#include "graphics/Vertex.h"
 #include "graphics/Texture.h"
 #include "graphics/Texture2D.h"
 #include "graphics/RenderTexture.h"
 #include "graphics/Cubemap.h"
+#include "graphics/InputLayoutKey.h"
 #include "graphics/Shader.h"
 #include "graphics/ShaderManager.h"
-#include "graphics/VertexBuffer.h"
-#include "graphics/IndexBuffer.h"
+#include "graphics/Buffer.h"
 #include "graphics/ConstantBuffer.h"
 
 // math

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Window.h"
-#include "CoreDefs.h"
+#include "Common.h"
 
 namespace Dive
 {

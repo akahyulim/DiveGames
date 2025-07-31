@@ -1,6 +1,5 @@
 ﻿#pragma once
-#include "Core/CoreDefs.h"
-#include "rendering/RenderDefs.h"
+#include "Common.h"
 
 namespace Dive
 {
@@ -10,70 +9,60 @@ namespace Dive
 		PixelShader,
 	};
 
-	class DvConstantBuffer
+	enum class eVSConstantBufferSlot : uint8_t
+	{
+		Object,
+		Frame,
+		Count
+	};
+
+	enum class ePSConstantBufferSlot : uint8_t
+	{
+		Material,
+		Light,
+		Count
+	};
+
+	class ConstantBuffer
 	{
 	public:
-		DvConstantBuffer(ID3D11Device* device, eVSConstantBufferSlot slot, size_t size);
-		DvConstantBuffer(ID3D11Device* device, ePSConstantBufferSlot slot, size_t size);
+		ConstantBuffer(ID3D11Device* device, eVSConstantBufferSlot slot, uint32_t stride);
+		ConstantBuffer(ID3D11Device* device, ePSConstantBufferSlot slot, uint32_t stride);
 
 		template<typename T>
 		bool Update(ID3D11DeviceContext* deviceContext, const T& data);
 		void Bind(ID3D11DeviceContext* deviceContext);
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D11Buffer> m_Buffer;
-		UINT m_Slot;
-		eShaderStage m_Stage;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
+		eVSConstantBufferSlot m_vsSlot;
+		ePSConstantBufferSlot m_psSlot;
+		eShaderStage m_shaderStage;
 	};
 
 
 	template<typename T>
-	bool DvConstantBuffer::Update(ID3D11DeviceContext* deviceContext, const T& data)
+	bool ConstantBuffer::Update(ID3D11DeviceContext* deviceContext, const T& data)
 	{
 		assert(deviceContext);
-		assert(m_Buffer);
+		assert(m_buffer);
 
 		D3D11_MAPPED_SUBRESOURCE mappedData{};
-		if (FAILED(deviceContext->Map(
-			static_cast<ID3D11Resource*>(m_Buffer.Get()),
+		auto hr = deviceContext->Map(
+			static_cast<ID3D11Resource*>(m_buffer.Get()),
 			0,
 			D3D11_MAP_WRITE_DISCARD,
 			0,
-			&mappedData)))
+			&mappedData);
+		if (FAILED(hr))
 		{
-			DV_LOG(ConstantBuffer, err, "버퍼 Map 실패");
+			DV_LOG(ConstantBuffer, err, "[::Update] Map 실패: {}", ErrorUtils::ToVerbose(hr));
 			return false;
 		}
 
 		std::memcpy(mappedData.pData, &data, sizeof(T));
-		deviceContext->Unmap(m_Buffer.Get(), 0);
+		deviceContext->Unmap(m_buffer.Get(), 0);
 
 		return true;
 	}
-
-	// ========================================================================================
-
-	class ConstantBuffer
-	{
-	public:
-		ConstantBuffer() = default;
-		~ConstantBuffer();
-
-		bool Create(UINT32 stride);
-		void Release();
-
-		void* Map();
-		void Unmap();
-
-		UINT32 GetStride() const { return m_Stride; }
-		void SetStride(UINT32 stride) { m_Stride = stride; }
-
-		ID3D11Buffer* GetBuffer() const { return m_Buffer; }
-
-		static std::shared_ptr<ConstantBuffer> Generate(UINT32 stride);
-
-	private:
-		ID3D11Buffer* m_Buffer = nullptr;
-		UINT32 m_Stride = 0;
-	};
 }

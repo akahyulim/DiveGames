@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "resource/Resource.h"
+#include "graphics/Vertex.h"
 
 namespace Dive
 {
-	class VertexBuffer;
-	class IndexBuffer;
+	class Buffer;
 	class BoundingBox;
 	class Shader;
 
@@ -22,82 +22,56 @@ namespace Dive
 		Skinned
 	};
 
-	struct StaticVertex
-	{
-		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT2 texCoords;
-		DirectX::XMFLOAT3 normal;
-		DirectX::XMFLOAT3 tangent;
-		
-		StaticVertex() = default;
-		StaticVertex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT2& tex, const DirectX::XMFLOAT3& norm, const DirectX::XMFLOAT3& tan)
-			: position(pos), texCoords(tex), normal(norm), tangent(tan)
-		{}
-	};
-
 	class StaticMesh : public Resource
 	{
 	public:
 		StaticMesh();
 		~StaticMesh() override;
 
-		virtual bool CreateBuffers();
-		virtual void Clear();
+		bool CreateBuffers(ID3D11Device* device);
+		void Clear();
 
 		void Draw(ID3D11DeviceContext* deviceContext);
 
 		void ComputeBouingBox();
 		
-		void AddVertices(const std::vector<StaticVertex>& vertices, uint32_t* outOffset = nullptr);
+		void AddVertices(const std::vector<LitVertex>& vertices, uint32_t* outOffset = nullptr);
 		void AddIndices(const std::vector<uint32_t>& indices, uint32_t* outOffset = nullptr);
 
-		std::vector<StaticVertex> GetVertices() { return m_Vertices; }
-		std::vector<uint32_t> GetIndices() { return m_Indices; }
+		std::vector<LitVertex> GetVertices() { return m_vertices; }
+		std::vector<uint32_t> GetIndices() { return m_indices; }
 
-		uint32_t GetVertexCount() const { return static_cast<uint32_t>(m_Vertices.size()); }
-		uint32_t GetIndexCount() const { return static_cast<uint32_t>(m_Indices.size()); }
+		uint32_t GetVertexCount() const { return static_cast<uint32_t>(m_vertices.size()); }
+		uint32_t GetIndexCount() const { return static_cast<uint32_t>(m_indices.size()); }
 
-		VertexBuffer* GetVertexBuffer() const { return m_VertexBuffer.get(); }
-		IndexBuffer* GetIndexBuffer() const { return m_IndexBuffer.get(); }
+		BoundingBox* GetBoundingBox() const { return m_boundingBox.get(); }
 
-		BoundingBox* GetBoundingBox() const { return m_BoundingBox.get(); }
+		eSourceType GetSourceType() const { return m_sourceType; }
+		void SetSourceType(eSourceType type) { m_sourceType = type; }
 
-		Shader* GetVertexShader() const;
-		std::string GetVertexShaderName() const { return m_VertexShaderName; }
-		void SetVertexShaderName(const std::string& name) { m_VertexShaderName = name; }
+		std::filesystem::path GetFilepath() const { return m_filepath; }
 
-		eSourceType GetSourceType() const { return m_SourceType; }
-		void SetSourceType(eSourceType type) { m_SourceType = type; }
+		eMeshType GetMeshType() const { return m_type; }
 
-		std::filesystem::path GetFilepath() const { return m_Filepath; }
-
-		eMeshType GetMeshType() const { return m_Type; }
-
-		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { return m_PrimitiveTopology; }
-		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) { m_PrimitiveTopology; }
+		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { return m_primitiveTopology; }
+		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) { m_primitiveTopology; }
 
 		static constexpr eResourceType GetType() { return eResourceType::StaticMesh; }
 
-	protected:
-		bool createIndexBuffer();
+	private:
+		eSourceType m_sourceType = eSourceType::None;
+		std::filesystem::path m_filepath;	// 좀 애매해다. 
 
-	protected:
-		eSourceType m_SourceType = eSourceType::None;
-		std::filesystem::path m_Filepath;	// 좀 애매해다. 
+		eMeshType m_type = eMeshType::None;
 
-		eMeshType m_Type = eMeshType::None;
+		D3D11_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-		D3D11_PRIMITIVE_TOPOLOGY m_PrimitiveTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+		std::vector<LitVertex> m_vertices;
+		std::vector<uint32_t> m_indices;
 
-		std::vector<StaticVertex> m_Vertices;
-		std::vector<uint32_t> m_Indices;
-
-		std::unique_ptr<VertexBuffer> m_VertexBuffer;
-		std::unique_ptr<IndexBuffer> m_IndexBuffer;
+		std::shared_ptr<Buffer> m_vb;
+		std::shared_ptr<Buffer> m_ib;
 		
-		std::unique_ptr<BoundingBox> m_BoundingBox;
-
-		// 이것두 Material이 관리하도록 할 거다.
-		std::string m_VertexShaderName = "Default_VS";
+		std::shared_ptr<BoundingBox> m_boundingBox;
 	};
 }

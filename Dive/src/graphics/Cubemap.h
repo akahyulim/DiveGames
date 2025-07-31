@@ -17,7 +17,7 @@ namespace Dive
 
 		void SetFaceData(uint32_t index, const void* pixels, size_t size);
 
-		ID3D11RenderTargetView* GetBackBufferRTV() const { return m_RenderTargetView; }
+		ID3D11RenderTargetView* GetRenderTargetView() const { return m_renderTargetView.Get(); }
 
 		static constexpr eResourceType GetType() { return eResourceType::Cubemap; }
 
@@ -27,7 +27,7 @@ namespace Dive
 	private:
 		uint32_t m_Size = 0;
 
-		ID3D11RenderTargetView* m_RenderTargetView = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
 		std::array<std::vector<uint8_t>, 6> m_FaceData;
 	};
 }

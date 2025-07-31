@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Engine.h"
-#include "CoreDefs.h"
+#include "Common.h"
 #include "Window.h"
 #include "Input.h"
 #include "graphics/Graphics.h"
@@ -33,7 +33,11 @@ namespace Dive
 			return false;
 		}
 
-		ShaderManager::Initialize();
+		if (!ShaderManager::Initialize(Graphics::GetDevice()))
+		{
+			DV_LOG("Engine", err, "ShaderManager 초기화 실패");
+			return false;
+		}
 
 		Renderer::Initialize();
 
@@ -55,6 +59,7 @@ namespace Dive
 
 		WorldManager::Clear();
 		ResourceManager::Clear();
+		ShaderManager::Clear();
 		Input::Shutdown();
 		Renderer::Shutdown();
 		Graphics::Shutdown();

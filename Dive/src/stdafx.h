@@ -1,19 +1,25 @@
 ﻿#pragma once
 
-// 현재 timeGetTime을 위해 주석처리
-//#define WIN32_LEAN_AND_MEAN             // 거의 사용되지 않는 내용을 Windows 헤더에서 제외합니다.
+// 프로젝트 전역 설정
 #define DIRECTINPUT_VERSION 0x0800
 
-// 두 군데 이상에서 사용하는 것만으로 추려보자.
+// 표준 라이브러리
 #include <iostream>
+#include <fstream>
 #include <string>
-#include <atlconv.h>
+#include <locale>
+#include <filesystem>
+
 #include <memory>
+#include <functional>
 #include <typeindex>
 #include <type_traits>
 #include <chrono>
 #include <random>
-#include <functional>
+#include <variant>
+#include <thread>
+#include <mutex>
+
 #include <array>
 #include <vector>
 #include <list>
@@ -22,25 +28,24 @@
 #include <map>
 #include <unordered_map>
 #include <algorithm>
-#include <fstream>
-#include <filesystem>
-#include <locale>
-#include <variant>
-#include <thread>
-#include <mutex>
 
+// Windows 시스템 헤더
 #include <Windows.h>
+#include <atlconv.h>  // CString 변환 관련
 
-#include <wrl/client.h> 
+// DirectX 관련 헤더
+#include <wrl/client.h>
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
 #include <DirectXMath.h>
 #include <d3dcompiler.h>
 #include <dinput.h>
 
+// 외부 라이브러리
 #include <DirectXTex/DirectXTex.h>
 #include <yaml-cpp/yaml.h>
 
+// 링커 라이브러리 설정
 #pragma comment(lib, "winmm.lib")
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -48,6 +53,6 @@
 #pragma comment(lib, "dxguid.lib")
 #pragma comment(lib, "dinput8.lib")
 
-#include "core/CoreDefs.h"
+// 프로젝트 공용 헤더
+#include "Common.h"
 #include "core/Log.h"
-

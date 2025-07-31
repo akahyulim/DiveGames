@@ -24,22 +24,6 @@ namespace Dive
 		Count
 	};
 
-	enum class eVSConstantBufferSlot : uint8_t
-	{
-		Object,
-		Frame,
-		Camera,	// Frame에 흡수
-		Count
-	};
-
-	enum class ePSConstantBufferSlot : uint8_t
-	{
-		PerMaterialPS,
-		Material,
-		Light,
-		Count
-	};
-
 	// 엔진은 uint8_t로, 윈도우 api 사용시엔 타입변환
 	enum class eShaderTextureSlot : uint8_t
 	{
@@ -112,14 +96,5 @@ namespace Dive
 		DepthDiabled,   // skydome에서 off용으로...
 		ForwardLight,
 		Count
-	};
-
-	// 이것도 Camera라서 선언 및 관리하는 것이 맞다고 한다.
-	// 다만 world는 분리해야 한다.
-	struct DefaultVSConstant
-	{
-		DirectX::XMMATRIX world;
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX projection;
 	};
 }

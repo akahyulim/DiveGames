@@ -22,25 +22,19 @@ namespace Dive
 		
 		bool Resize(uint32_t width, uint32_t height, eDepthFormat depth = eDepthFormat::None, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
 
-		uint32_t GetWidth() const { return m_Width; }
-		uint32_t GetHeight() const { return m_Height; }
-
-		ID3D11RenderTargetView* GetRenderTargetView() const { return m_RenderTargetView; }
-		ID3D11DepthStencilView* GetDepthStencilView() const { return m_DepthStencilView; }
-		ID3D11ShaderResourceView* GetDepthStencilShaderResourceView() const { return m_DepthStencilShaderResourceView; }
+		ID3D11RenderTargetView* GetRenderTargetView() const { return m_renderTargetView.Get(); }
+		ID3D11DepthStencilView* GetDepthStencilView() const { return m_DepthDSV.Get(); }
+		ID3D11ShaderResourceView* GetDepthStencilShaderResourceView() const { return m_depthSRV.Get(); }
 
 		static constexpr eResourceType GetType() { return eResourceType::RenderTexture; }
 
 	private:
-		uint32_t m_Width = 0;
-		uint32_t m_Height = 0;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
 
-		ID3D11RenderTargetView* m_RenderTargetView = nullptr;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depthTexture;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DepthDSV;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_depthSRV;
 
-		ID3D11Texture2D* m_DepthStencilTexture2D = nullptr;
-		ID3D11DepthStencilView* m_DepthStencilView = nullptr;
-		ID3D11ShaderResourceView* m_DepthStencilShaderResourceView = nullptr;
-
-		eDepthFormat m_DepthFormat = eDepthFormat::None;
+		eDepthFormat m_depthFormat = eDepthFormat::None;
 	};
 }

@@ -1,14 +1,7 @@
 ﻿#pragma once
-#include "core/EventDispatcher.h"
 
 namespace Dive
 {
-	class Shader;
-	class RenderTexture;
-	class VertexBuffer;
-	class IndexBuffer;
-	class ConstantBuffer;
-
 	class Graphics
 	{
 	public:
@@ -16,7 +9,7 @@ namespace Dive
 		static void Shutdown();
 
 		static void Resize(uint32_t  width, uint32_t height);
-		static void OnResizeBuffer();
+		static void OnResizeViews();
 
 		static void Present();
 
@@ -24,29 +17,30 @@ namespace Dive
 		static ID3D11Device* GetDevice();
 		static ID3D11DeviceContext* GetDeviceContext();
 
-		static ID3D11RenderTargetView* GetBackBufferRTV();
-		static ID3D11DepthStencilView* GetBackBufferDSV();
+		static ID3D11RenderTargetView* GetRenderTargetView();
+		static ID3D11DepthStencilView* GetDepthStencilView();
 
-		static uint32_t GetResolutionWidth() { return s_ResolutionWidth; }
-		static uint32_t GetResolutionHeight() { return s_ResolutionHeight; }
+		static uint32_t GetWidth() { return s_width; }
+		static uint32_t GetHeight() { return s_height; }
 
-		static bool IsVSyncEnabled() { return s_UseVSync; }
-		static void SetVSyncEnabled(bool enabled) { s_UseVSync = enabled; }
-
-	private:
-		static void updateBackbuffer();
+		static bool IsVSyncEnabled() { return m_useSync; }
+		static void SetVSyncEnabled(bool enabled) { m_useSync = enabled; }
 
 	private:
-		static uint32_t s_ResolutionWidth;
-		static uint32_t s_ResolutionHeight;
-		static bool s_UseVSync;
+		static bool SetupViews();
+		static bool ResizeSwapChain();
 
-		static Microsoft::WRL::ComPtr<IDXGISwapChain> s_SwapChain;
-		static Microsoft::WRL::ComPtr<ID3D11Device> s_Device;
-		static Microsoft::WRL::ComPtr<ID3D11DeviceContext> s_DeviceContext;
+	private:
+		static uint32_t s_width;
+		static uint32_t s_height;
+		static bool m_useSync;
 
-		static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> s_BackBufferRTV;
-		static Microsoft::WRL::ComPtr<ID3D11Texture2D> s_BackbufferTexture;
-		static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> s_BackBufferDSV;
+		static Microsoft::WRL::ComPtr<IDXGISwapChain> s_swapChain;
+		static Microsoft::WRL::ComPtr<ID3D11Device> s_device;
+		static Microsoft::WRL::ComPtr<ID3D11DeviceContext> s_deviceContext;
+
+		static Microsoft::WRL::ComPtr<ID3D11RenderTargetView> s_renderTargetView;
+		static Microsoft::WRL::ComPtr<ID3D11Texture2D> s_depthStencilBuffer;
+		static Microsoft::WRL::ComPtr<ID3D11DepthStencilView> s_depthStencilView;
 	};
 }

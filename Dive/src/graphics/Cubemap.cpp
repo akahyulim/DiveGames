@@ -1,14 +1,14 @@
 ﻿#include "stdafx.h"
 #include "Cubemap.h"
-#include "core/CoreDefs.h"
+#include "Graphics.h"
 
 namespace Dive
 {
 	Cubemap::Cubemap(uint32_t size, DXGI_FORMAT format, bool useMips)
 		: m_Size(size), m_FaceData{}
 	{
-		m_Format = format;
-		m_UseMips = useMips;
+		m_format = format;
+		m_useMips = useMips;
 
 		SetName("Cubemap");
 	}
@@ -20,7 +20,7 @@ namespace Dive
 
 	void Cubemap::Release()
 	{
-		DV_RELEASE(m_RenderTargetView);
+		m_renderTargetView.Reset();
 		Texture::Release();
 	}
 
@@ -28,98 +28,87 @@ namespace Dive
 	{
 		if (index > 5) 
 		{
-			DV_LOG(Cubemap, err, "잘못된 Face 인덱스 전달: {}", index);
+			DV_LOG(Cubemap, warn, "[::SetFaceData] 잘못된 Face 인덱스 전달: {}", index);
 			return;
 		}
 
 		m_FaceData[index].resize(size);
-		std::copy(static_cast<const uint8_t*>(pixels),
-			static_cast<const uint8_t*>(pixels) + size,
-			m_FaceData[index].begin());
+		std::copy(static_cast<const uint8_t*>(pixels), static_cast<const uint8_t*>(pixels) + size, m_FaceData[index].begin());
 	}
 
 	bool Cubemap::Create()
 	{
-		Release();
+		auto device = Graphics::GetDevice();
+		auto deviceContext = Graphics::GetDeviceContext();
 
-		m_MipLevels = CanGenerateMips(m_Format) ? (m_UseMips ? CalculateMipmapLevels(m_Size, m_Size) : 1) : 1;
+		m_mipLevels = CanGenerateMips(m_format) ? (m_useMips ? CalculateMipmapLevels(m_Size, m_Size) : 1) : 1;
 
-		// texture2d
+		D3D11_TEXTURE2D_DESC texDesc{};
+		texDesc.Format = m_format;
+		texDesc.Width = static_cast<UINT>(m_Size);
+		texDesc.Height = static_cast<UINT>(m_Size);
+		texDesc.MipLevels = static_cast<UINT>(m_mipLevels);
+		texDesc.ArraySize = 6;
+		texDesc.SampleDesc.Count = 1;
+		texDesc.SampleDesc.Quality = 0;
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		texDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE | (m_useMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0);
+
+		auto hr = device->CreateTexture2D(&texDesc, nullptr, m_texture.GetAddressOf());
+		if(FAILED(hr))
 		{
-			D3D11_TEXTURE2D_DESC desc{};
-			desc.Format = m_Format;
-			desc.Width = static_cast<UINT>(m_Size);
-			desc.Height = static_cast<UINT>(m_Size);
-			desc.MipLevels = static_cast<UINT>(m_MipLevels);
-			desc.ArraySize = 6;
-			desc.SampleDesc.Count = 1;
-			desc.SampleDesc.Quality = 0;
-			desc.Usage = D3D11_USAGE_DEFAULT;
-			desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-			desc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE | (m_UseMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0);
+			DV_LOG(Cubemap, err, "[::Create] CreateTexture2D 실패: {}", ErrorUtils::ToVerbose(hr));
+			return false;
+		}
 
-			if (FAILED(Graphics::GetDevice()->CreateTexture2D(&desc, nullptr, &m_Texture2D))) 
+		if (!m_FaceData[0].empty()) 
+		{
+			if (std::any_of(m_FaceData.begin(), m_FaceData.end(), [](const auto& data) { return data.empty(); }))
 			{
-				DV_LOG(Cubemap, err, "ID3D11Texture2D 생성 실패");
-				Release();
+				DV_LOG(Cubemap, err, "[::Create] 빈 규브맵 데이터");
 				return false;
 			}
 
-			if (!m_FaceData[0].empty()) {
-				if (std::any_of(m_FaceData.begin(), m_FaceData.end(), [](const auto& data) { return data.empty(); }))
-				{
-					DV_LOG(Cubemap, err, "빈 큐브맵 Face 데이터");
-					Release();
-					return false;
-				}
-
-				UINT rowPitch = static_cast<UINT>(m_Size * GetPixelSize(m_Format));
-				for (int i = 0; i < 6; ++i) 
-				{
-					Graphics::GetDeviceContext()->UpdateSubresource(
-						m_Texture2D,
-						D3D11CalcSubresource(0, static_cast<UINT>(i), m_MipLevels),
-						nullptr,
-						(const void*)m_FaceData[i].data(),
-						rowPitch,
-						rowPitch * m_Size);	// 조금 의심스럽다. 나중에 확인
-				}
-			}
-		}
-
-		// render target view
-		{
-			D3D11_RENDER_TARGET_VIEW_DESC desc{};
-			desc.Format = m_Format;
-			desc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
-			desc.Texture2DArray.FirstArraySlice = 0;
-			desc.Texture2DArray.ArraySize = 6;
-
-			if (FAILED(Graphics::GetDevice()->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_RenderTargetView)))
+			UINT rowPitch = static_cast<UINT>(m_Size * GetPixelSize(m_format));
+			for (int i = 0; i < 6; ++i)
 			{
-				DV_LOG(Cubemap, err, "ID3D11RenderTargetView 생성 실패");
-				Release();
-				return false;
+				deviceContext->UpdateSubresource(
+					m_texture.Get(),
+					D3D11CalcSubresource(0, static_cast<UINT>(i), m_mipLevels),
+					nullptr,
+					(const void*)m_FaceData[i].data(),
+					rowPitch,
+					rowPitch * m_Size);	// 조금 의심스럽다. 나중에 확인
 			}
 		}
 
-		// shader resource view
+		D3D11_RENDER_TARGET_VIEW_DESC rtvDesc{};
+		rtvDesc.Format = m_format;
+		rtvDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+		rtvDesc.Texture2DArray.FirstArraySlice = 0;
+		rtvDesc.Texture2DArray.ArraySize = 6;
+
+		hr = device->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_texture.Get()), &rtvDesc, m_renderTargetView.GetAddressOf());
+		if(FAILED(hr))
 		{
-			D3D11_SHADER_RESOURCE_VIEW_DESC desc{};
-			desc.Format = m_Format;
-			desc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-			desc.TextureCube.MipLevels = m_MipLevels;
-
-			if (FAILED(Graphics::GetDevice()->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_Texture2D), &desc, &m_ShaderResourceView)))
-			{
-				DV_LOG(Cubemap, err, "ID3D11ShaderResourceView 생성 실패");
-				Release();
-				return false;
-			}
+			DV_LOG(Cubemap, err, "[::Create] CreateRenderTargetView 실패: {}", ErrorUtils::ToVerbose(hr));
+			return false;
 		}
 
-		if (m_UseMips && m_ShaderResourceView)
-			Graphics::GetDeviceContext()->GenerateMips(m_ShaderResourceView);
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+		srvDesc.Format = m_format;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+		srvDesc.TextureCube.MipLevels = m_mipLevels;
+
+		hr = device->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_texture.Get()), &srvDesc, m_shaderResourceView.GetAddressOf());
+		if(FAILED(hr))
+		{
+			DV_LOG(Cubemap, err, "[::Create] CreateShaderResourceView 실패 : {}", ErrorUtils::ToVerbose(hr));
+			return false;
+		}
+
+		if (m_useMips && m_shaderResourceView)	deviceContext->GenerateMips(m_shaderResourceView.Get());
 
 		return true;
 	}
@@ -128,7 +117,7 @@ namespace Dive
 	{
 		if (faceFilepaths.size() != 6) 
 		{
-			DV_LOG(Cubemap, err, "잘못된 경로 전달: {}", faceFilepaths.size());
+			DV_LOG(Cubemap, err, "[::LoadFromFaceFiles] 잘못된 경로 전달: {}", faceFilepaths.size());
 			return nullptr;
 		}
 
@@ -142,7 +131,7 @@ namespace Dive
 			const auto& filepath = faceFilepaths[i];
 			if (!std::filesystem::exists(filepath))
 			{
-				DV_LOG(Cubemap, err, "존재하지 않는 파일 전달: {}", filepath.string());
+				DV_LOG(Cubemap, err, "[::LoadFromFaceFiles] 존재하지 않는 파일 전달: {}", filepath.string());
 				return nullptr;
 			}
 
@@ -150,7 +139,7 @@ namespace Dive
 			DirectX::ScratchImage image;
 			if (FAILED(DirectX::LoadFromWICFile(filepath.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image)))
 			{
-				DV_LOG(Cubemap, err, "WIC 파일 로드 실패: {}", filepath.string());
+				DV_LOG(Cubemap, err, "[::LoadFromFaceFiles] WIC 파일 로드 실패: {}", filepath.string());
 				return nullptr;
 			}
 
@@ -164,7 +153,7 @@ namespace Dive
 			// 유효성 검사
 			if (image.GetMetadata().width != size || image.GetMetadata().height != size)
 			{
-				DV_LOG(Cubemap, err, "잘못된 크기 설정: {} != {}", image.GetMetadata().width, size);
+				DV_LOG(Cubemap, err, "[::LoadFromFaceFiles] 잘못된 크기 설정: {} != {}", image.GetMetadata().width, size);
 				return nullptr;
 			}
 
@@ -172,7 +161,7 @@ namespace Dive
 			const DirectX::Image* img = image.GetImage(0, 0, 0);
 			if (!img)
 			{
-				DV_LOG(Cubemap, err, "유효하지 않은 이미지 데이터: {}", filepath.string());
+				DV_LOG(Cubemap, err, "[::LoadFromFaceFiles] 유효하지 않은 이미지 데이터: {}", filepath.string());
 				return nullptr;
 			}
 
@@ -185,7 +174,7 @@ namespace Dive
 
 		if (!cubemap->Create())
 		{
-			DV_LOG(Cubemap, err, "큐브맵 GPU 리소스 생성 실패");
+			DV_LOG(Cubemap, err, "[::LoadFromFaceFiles] 큐브맵 GPU 리소스 생성 실패");
 			return nullptr;
 		}
 
@@ -196,7 +185,7 @@ namespace Dive
 	{
 		if (!std::filesystem::exists(filepath))
 		{
-			DV_LOG(Cubemap, err, "존재하지 않는 파일 경로 전달: {}", filepath.string());
+			DV_LOG(Cubemap, err, "[::LoadFrmoFile] 존재하지 않는 파일 경로 전달: {}", filepath.string());
 			return nullptr;
 		}
 
@@ -204,7 +193,7 @@ namespace Dive
 		DirectX::ScratchImage image;
 		if (FAILED(DirectX::LoadFromDDSFile(filepath.c_str(), DirectX::DDS_FLAGS_NONE, nullptr, image)))
 		{
-			DV_LOG(Cubemap, err, "DDS 파일 로드 실패: {}", filepath.string());
+			DV_LOG(Cubemap, err, "[::LoadFrmoFile] DDS 파일 로드 실패: {}", filepath.string());
 			return nullptr;
 		}
 
@@ -212,7 +201,7 @@ namespace Dive
 		const auto& metadata = image.GetMetadata();
 		if (!(metadata.miscFlags & DirectX::TEX_MISC_TEXTURECUBE))
 		{
-			DV_LOG(Cubemap, err, "잘못된 타입 전달: {}", filepath.string());
+			DV_LOG(Cubemap, err, "[::LoadFrmoFile] 잘못된 타입 전달: {}", filepath.string());
 			return nullptr;
 		}
 
@@ -225,7 +214,7 @@ namespace Dive
 			const DirectX::Image* img = image.GetImage(0, i, 0); // 6개의 Face 중 하나를 가져옴
 			if (!img)
 			{
-				DV_LOG(Cubemap, err, "유효하지 않은 Face Data: {}", filepath.string());
+				DV_LOG(Cubemap, err, "[::LoadFrmoFile] 유효하지 않은 Face Data: {}", filepath.string());
 				return nullptr;
 			}
 
@@ -235,7 +224,7 @@ namespace Dive
 		// 큐브맵 생성
 		if (!cubemap->Create())
 		{
-			DV_LOG(Cubemap, err, "GPU 리소스 생성 실패");
+			DV_LOG(Cubemap, err, "[::LoadFrmoFile] GPU 리소스 생성 실패");
 			return nullptr;
 		}
 

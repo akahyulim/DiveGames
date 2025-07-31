@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Input.h"
-#include "CoreDefs.h"
+#include "Common.h"
 #include "Window.h"
 
 using Microsoft::WRL::ComPtr;

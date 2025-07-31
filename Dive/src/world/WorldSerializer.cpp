@@ -8,13 +8,13 @@
 #include "rendering/StaticMesh.h"
 #include "rendering/Material.h"
 #include "rendering/MeshFactory.h"
-#include "core/CoreDefs.h"
+#include "Common.h"
 #include "resource/YamlHelper.h"
 
 namespace Dive
 {
 	WorldSerializer::WorldSerializer(World* world)
-		: m_World(world)
+		: m_world(world)
 	{
 	}
 	
@@ -111,10 +111,10 @@ namespace Dive
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
-		out << YAML::Key << "World" << YAML::Value << m_World->GetName();
+		out << YAML::Key << "World" << YAML::Value << m_world->GetName();
 
 		std::vector<GameObject*> flatList;
-		for (auto& root : m_World->GetRootGameObjects())
+		for (auto& root : m_world->GetRootGameObjects())
 			CollectHierarchy(root, flatList);
 
 		SerializeGameObjectsFlat(out, flatList);
@@ -124,13 +124,15 @@ namespace Dive
 		std::ofstream fout(filepath);
 		fout << out.c_str();
 
-		DV_LOG(WorldSerializer, info, "월드 직렬화 완료: {}", m_World->GetName());
+		DV_LOG(WorldSerializer, info, "월드 직렬화 완료: {}", m_world->GetName());
 	}
 
 	std::unordered_map<uint64_t, Object*> fileIDToObject;
 
-	bool WorldSerializer::Deserialize(const std::filesystem::path& filepath)
+	bool WorldSerializer::Deserialize(ID3D11Device* device, const std::filesystem::path& filepath)
 	{
+		assert(device);
+
 		YAML::Node data;
 		try {
 			data = YAML::LoadFile(filepath.string());
@@ -141,7 +143,7 @@ namespace Dive
 		}
 
 		if (data["World"])
-			m_World->SetName(data["World"].as<std::string>());
+			m_world->SetName(data["World"].as<std::string>());
 
 		const auto& nodes = data["GameObjects"];
 		if (!nodes || !nodes.IsSequence())
@@ -154,7 +156,7 @@ namespace Dive
 			auto name = node["Name"].as<std::string>();
 			auto tag = node["Tag"] ? node["Tag"].as<std::string>() : "Untagged";
 
-			auto go = m_World->CreateGameObject(name);
+			auto go = m_world->CreateGameObject(name);
 			go->SetTag(tag);
 			fileIDToObject[goID] = go;
 
@@ -195,7 +197,7 @@ namespace Dive
 				case eSourceType::File:
 					break;
 				case eSourceType::Factory:
-					staticMesh = MeshFactory::Create(staticMeshName);
+					staticMesh = MeshFactory::Create(device, staticMeshName);
 					break;
 				default:
 					break;
@@ -203,7 +205,7 @@ namespace Dive
 				meshRenderer->SetStaticMesh(staticMesh);
 				
 				// 이것두 default는 리소스 매니져에서, file은 직접?
-				std::shared_ptr<Material> material = std::make_shared<Material>();
+				std::shared_ptr<Material> material = std::make_shared<Material>(device);
 				material->LoadFromFile("Materials/" + meshRendererNode["Material"].as<std::string>() + ".mat");
 				meshRenderer->SetMaterial(material);
 				
@@ -229,7 +231,7 @@ namespace Dive
 			}
 		}
 
-		DV_LOG(WorldSerializer, info, "월드 역직렬화 완료: {}", m_World->GetName());
+		DV_LOG(WorldSerializer, info, "월드 역직렬화 완료: {}", m_world->GetName());
 
 		return true;
 	}

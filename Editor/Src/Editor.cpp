@@ -241,15 +241,15 @@ namespace Dive
 	{
 		ImGui::End();
 
-		auto deviceContext = Graphics::GetDeviceContext();
+		auto dc = Graphics::GetDeviceContext();
 
-		auto renderTargetView = Graphics::GetBackBufferRTV();
-		auto depthStencilView = Graphics::GetBackBufferDSV();
-		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+		auto renderTargetView = Graphics::GetRenderTargetView();
+		auto depthStencilView = Graphics::GetDepthStencilView();
+		dc->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 
 		float clearColors[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
-		deviceContext->ClearRenderTargetView(renderTargetView, clearColors);
-		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+		dc->ClearRenderTargetView(renderTargetView, clearColors);
+		dc->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

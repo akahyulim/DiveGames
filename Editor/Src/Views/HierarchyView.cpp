@@ -184,44 +184,44 @@ namespace Dive
 				{
 					auto triangleGO = EditorContext::ActiveWorld->CreateGameObject("Triangle");
 					auto staticMeshRender = triangleGO->AddComponent<MeshRenderer>();
-					staticMeshRender->SetStaticMesh(MeshFactory::CreateTriangle());
-					staticMeshRender->SetMaterial(std::make_shared<Material>());	// 현재 ResourceManager가 관리하지 않는다.
+					staticMeshRender->SetStaticMesh(MeshFactory::CreateTriangle(Graphics::GetDevice()));
+					staticMeshRender->SetMaterial(std::make_shared<Material>(Graphics::GetDevice()));	// 현재 ResourceManager가 관리하지 않는다.
 				}
 				if (ImGui::MenuItem("Quad", nullptr, nullptr))
 				{
 					auto quadGO = EditorContext::ActiveWorld->CreateGameObject("Quad");
 					auto staticMeshRender = quadGO->AddComponent<MeshRenderer>();
-					staticMeshRender->SetStaticMesh(MeshFactory::CreateQuad());
-					staticMeshRender->SetMaterial(std::make_shared<Material>());
+					staticMeshRender->SetStaticMesh(MeshFactory::CreateQuad(Graphics::GetDevice()));
+					staticMeshRender->SetMaterial(std::make_shared<Material>(Graphics::GetDevice()));
 				}
 
 				if (ImGui::MenuItem("Plane", nullptr, nullptr))
 				{
 					auto planeGO = EditorContext::ActiveWorld->CreateGameObject("Plane");
 					auto staticMeshRender = planeGO->AddComponent<MeshRenderer>();
-					staticMeshRender->SetStaticMesh(MeshFactory::CreatePlane());
-					staticMeshRender->SetMaterial(std::make_shared<Material>());
+					staticMeshRender->SetStaticMesh(MeshFactory::CreatePlane(Graphics::GetDevice()));
+					staticMeshRender->SetMaterial(std::make_shared<Material>(Graphics::GetDevice()));
 				}
 				if (ImGui::MenuItem("Cube", nullptr, nullptr))
 				{
 					auto cubeGO = EditorContext::ActiveWorld->CreateGameObject("Cube");
 					auto staticMeshRender = cubeGO->AddComponent<MeshRenderer>();
-					staticMeshRender->SetStaticMesh(MeshFactory::CreateCube());
-					staticMeshRender->SetMaterial(std::make_shared<Material>());
+					staticMeshRender->SetStaticMesh(MeshFactory::CreateCube(Graphics::GetDevice()));
+					staticMeshRender->SetMaterial(std::make_shared<Material>(Graphics::GetDevice()));
 				}
 				if (ImGui::MenuItem("Sphere", nullptr, nullptr))
 				{
 					auto sphereGO = EditorContext::ActiveWorld->CreateGameObject("Sphere");
 					auto staticMeshRender = sphereGO->AddComponent<MeshRenderer>();
-					staticMeshRender->SetStaticMesh(MeshFactory::CreateSphere());
-					staticMeshRender->SetMaterial(std::make_shared<Material>());
+					staticMeshRender->SetStaticMesh(MeshFactory::CreateSphere(Graphics::GetDevice()));
+					staticMeshRender->SetMaterial(std::make_shared<Material>(Graphics::GetDevice()));
 				}
 				if (ImGui::MenuItem("Capsule", nullptr, nullptr))
 				{
 					auto capsuleGO = EditorContext::ActiveWorld->CreateGameObject("Capsule");
 					auto staticMeshRender = capsuleGO->AddComponent<MeshRenderer>();
-					staticMeshRender->SetStaticMesh(MeshFactory::CreateCapsule());
-					staticMeshRender->SetMaterial(std::make_shared<Material>());
+					staticMeshRender->SetStaticMesh(MeshFactory::CreateCapsule(Graphics::GetDevice()));
+					staticMeshRender->SetMaterial(std::make_shared<Material>(Graphics::GetDevice()));
 				}
 
 				ImGui::EndMenu();

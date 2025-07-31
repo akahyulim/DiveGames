@@ -7,10 +7,10 @@ namespace Dive
 	class Texture;
 	class Texture2D;
 	class Shader;
+	class ShaderProgram;
 	class ConstantBuffer;
-	class DvConstantBuffer;
 
-	enum class eTextureUnitType : UINT8
+	enum class eTextureUnitType : uint8_t
 	{
 		None = 0,
 		Diffuse,
@@ -40,7 +40,7 @@ namespace Dive
 	class Material : public Resource
 	{
 	public:
-		Material();
+		Material(ID3D11Device* device);
 		~Material() = default;
 
 		bool LoadFromFile(const std::filesystem::path& filepath) override;
@@ -52,40 +52,35 @@ namespace Dive
 		void SetTexture(eTextureUnitType type, std::shared_ptr<Texture2D> texture);
 		void SetTexture(eTextureUnitType type, const std::string& textureName);
 
-		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_CpuBuffer.diffuseColor; }
-		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_CpuBuffer.diffuseColor = color; m_Dirty = true; }
-		void SetDiffuseColor(float r, float g, float b, float a) { m_CpuBuffer.diffuseColor = { r, g, b, a };  m_Dirty = true; }
+		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_cpuBuffer.diffuseColor; }
+		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_cpuBuffer.diffuseColor = color; m_isDirty = true; }
+		void SetDiffuseColor(float r, float g, float b, float a) { m_cpuBuffer.diffuseColor = { r, g, b, a };  m_isDirty = true; }
 
-		DirectX::XMFLOAT2 GetTiling() const { return m_CpuBuffer.tiling; }
-		void SetTiling(float x, float y) { m_CpuBuffer.tiling = { x, y };  m_Dirty = true; }
+		DirectX::XMFLOAT2 GetTiling() const { return m_cpuBuffer.tiling; }
+		void SetTiling(float x, float y) { m_cpuBuffer.tiling = { x, y };  m_isDirty = true; }
 
-		DirectX::XMFLOAT2 GetOffset() const { return m_CpuBuffer.offset; }
-		void SetOffset(float x, float y) { m_CpuBuffer.offset = { x, y };  m_Dirty = true; }
+		DirectX::XMFLOAT2 GetOffset() const { return m_cpuBuffer.offset; }
+		void SetOffset(float x, float y) { m_cpuBuffer.offset = { x, y };  m_isDirty = true; }
 
-		Shader* GetPixelShader() const;
-		std::string GetPixelShaderName() const { return m_PixelShaderName; }
-		void SetPixelShaderName(const std::string& name) { m_PixelShaderName = name; }
+		void SetShaders(ShaderProgram* shaders) { m_shaders = shaders; }
 
-		ConstantBuffer* GetConstantBuffer();
-
-		eBlendMode GetBlendMode() const { return m_BlendMode; }
-		void SetBlendMode(eBlendMode mode) { m_BlendMode = mode; }
+		eBlendMode GetBlendMode() const { return m_blendMode; }
+		void SetBlendMode(eBlendMode mode) { m_blendMode = mode; }
 
 		bool IsTransparent() const;
 
 		static constexpr eResourceType GetType() { return eResourceType::Material; }
 
 	private:
-		std::unordered_map<UINT8, std::shared_ptr<Texture2D>> m_Textures;
+		std::unordered_map<uint8_t, std::shared_ptr<Texture2D>> m_textures;
 
-		std::string m_PixelShaderName = "Default_PS";
+		bool m_isDirty = true;
 
-		bool m_Dirty = true;
+		MaterialConstants m_cpuBuffer;
+		std::unique_ptr<ConstantBuffer> m_gpuBuffer;
 
-		MaterialConstants m_CpuBuffer;
-		std::unique_ptr<ConstantBuffer> m_GpuBuffer;
-		std::unique_ptr<DvConstantBuffer> m_ConstantBuffer;
+		ShaderProgram* m_shaders = nullptr;
 
-		eBlendMode m_BlendMode = eBlendMode::Opqaue;
+		eBlendMode m_blendMode = eBlendMode::Opqaue;
 	};
 }

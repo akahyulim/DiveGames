@@ -7,13 +7,13 @@ namespace Dive
 	class MeshFactory
 	{
 	public:
-		static std::shared_ptr<StaticMesh> CreateTriangle();
-		static std::shared_ptr<StaticMesh> CreateQuad();
-		static std::shared_ptr<StaticMesh> CreatePlane();
-		static std::shared_ptr<StaticMesh> CreateCube();
-		static std::shared_ptr<StaticMesh> CreateSphere();
-		static std::shared_ptr<StaticMesh> CreateCapsule();
+		static std::shared_ptr<StaticMesh> CreateTriangle(ID3D11Device* device);
+		static std::shared_ptr<StaticMesh> CreateQuad(ID3D11Device* device);
+		static std::shared_ptr<StaticMesh> CreatePlane(ID3D11Device* device);
+		static std::shared_ptr<StaticMesh> CreateCube(ID3D11Device* device);
+		static std::shared_ptr<StaticMesh> CreateSphere(ID3D11Device* device);
+		static std::shared_ptr<StaticMesh> CreateCapsule(ID3D11Device* device);
 
-		static std::shared_ptr<StaticMesh> Create(const std::string& meshName);
+		static std::shared_ptr<StaticMesh> Create(ID3D11Device* device, const std::string& meshName);
 	};
 }
