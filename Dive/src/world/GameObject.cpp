@@ -7,22 +7,22 @@ namespace Dive
 {
 	GameObject::GameObject(const std::string& name)
 		: Object(name)
-		, m_World(WorldManager::GetActiveWorld())
+		, m_world(WorldManager::GetActiveWorld())
 	{
 		DV_LOG(GameObject, info, "생성: {}, {}", GetName(), GetInstanceID());
 	}
 
 	GameObject::~GameObject()
 	{
-		m_Components.clear();
+		m_components.clear();
 
 		DV_LOG(GameObject, info, "소멸: {}, {}", GetName(), GetInstanceID());
 	}
 
 	void GameObject::Destory()
 	{
-		if (m_IsDestroyed) return;
-		m_IsDestroyed = true;
+		if (m_isDestroyed) return;
+		m_isDestroyed = true;
 	
 		// 얕은 복사
 		auto children = GetTransform()->GetChildren();
@@ -40,17 +40,17 @@ namespace Dive
 				sibling.erase(it);
 		}
 		else
-			m_World->DetachRoot(this);
+			m_world->DetachRoot(this);
 
-		m_World->QueueDestroy(this);
+		m_world->QueueDestroy(this);
 	}
 
 	void GameObject::Update()
 	{
-		if (!m_ActiveHierarchy || m_IsDestroyed)
+		if (!m_ActiveHierarchy || m_isDestroyed)
 			return;
 
-		for (auto& [type, component] : m_Components)
+		for (auto& [type, component] : m_components)
 		{
 			component->Update();
 		}
@@ -58,33 +58,26 @@ namespace Dive
 
 	void GameObject::RemoveComponentByType(eComponentType type)
 	{
-		if (!HasComponentByType(type))
+		if (HasComponentByType(type))
 		{
-			DV_LOG(GameObject, warn, "유효하지 않은 타입을 전달하여 컴포넌트 제거 시도: {}, {}", GetName(), (int)type);
-			return;
-		}
-
-		auto it = m_Components.find(type);
-		if (it != m_Components.end())
-		{
-			it->second.reset();
-			m_Components.erase(it);
-		}
-		else
-		{
-			DV_LOG(GameObject, warn, "가지고 있지 않은 타입의 컴포넌트 제거 시도: {}, {}", GetName(), (int)type);
+			auto it = m_components.find(type);
+			if (it != m_components.end())
+			{
+				it->second.reset();
+				m_components.erase(it);
+			}
 		}
 	}
 
 	bool GameObject::HasComponentByType(eComponentType type) const
 	{
-		return m_Components.find(type) != m_Components.end();
+		return m_components.find(type) != m_components.end();
 	}
 
 	Component* GameObject::GetComponentByType(eComponentType type) const
 	{
-		auto it = m_Components.find(type);
-		if (it != m_Components.end())
+		auto it = m_components.find(type);
+		if (it != m_components.end())
 			return it->second.get();
 
 		return nullptr;
@@ -97,7 +90,7 @@ namespace Dive
 	
 	void GameObject::SetActive(bool value)
 	{
-		m_ActiveSelf = value;
+		m_activeSelf = value;
 		bool parentHierarchy = GetTransform()->HasParent() ? 
 			GetTransform()->GetParent()->GetGameObject()->m_ActiveHierarchy : true;
 
@@ -106,7 +99,7 @@ namespace Dive
 
 	void GameObject::updateActiveInHierarchy(bool parentHierarchy)
 	{
-		m_ActiveHierarchy = parentHierarchy && m_ActiveSelf;
+		m_ActiveHierarchy = parentHierarchy && m_activeSelf;
 
 		const auto& children = GetTransform()->GetChildren();
 		for (auto child : children)

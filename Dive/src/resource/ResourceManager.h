@@ -15,8 +15,8 @@ namespace Dive
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
-			auto it = s_Resources.find(T::GetType());
-			if (it != s_Resources.end())
+			auto it = s_resources.find(T::GetType());
+			if (it != s_resources.end())
 			{
 				for (const auto& resource : it->second)
 				{
@@ -26,7 +26,7 @@ namespace Dive
 			}
 			auto resource = std::make_shared<T>();
 			resource->LoadFromFile(filepath);
-			s_Resources[T::GetType()].push_back(resource);
+			s_resources[T::GetType()].push_back(resource);
 			return resource;
 		}
 
@@ -35,8 +35,8 @@ namespace Dive
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
-			auto it = s_Resources.find(T::GetType());
-			if (it != s_Resources.end())
+			auto it = s_resources.find(T::GetType());
+			if (it != s_resources.end())
 			{
 				for (const auto& resource : it->second)
 				{
@@ -52,8 +52,8 @@ namespace Dive
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
-			auto it = s_Resources.find(T::GetType());
-			if (it != s_Resources.end())
+			auto it = s_resources.find(T::GetType());
+			if (it != s_resources.end())
 			{
 				for (const auto& resource : it->second)
 				{
@@ -71,8 +71,8 @@ namespace Dive
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
-			auto it = s_Resources.find(T::GetType());
-			if (it != s_Resources.end())
+			auto it = s_resources.find(T::GetType());
+			if (it != s_resources.end())
 			{
 				std::vector<std::shared_ptr<T>> resources;
 				resources.reserve(it->second.size());
@@ -90,8 +90,8 @@ namespace Dive
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T는 반드시 Resource 상속 타입이어야 한다.");
 
-			auto it = s_Resources.find(T::GetType());
-			if (it != s_Resources.end())
+			auto it = s_resources.find(T::GetType());
+			if (it != s_resources.end())
 			{
 				for (const auto& resource : it->second)
 				{
@@ -111,8 +111,8 @@ namespace Dive
 		{
 			static_assert(std::is_base_of<Resource, T>::value, "T must be derived from Resource");
 
-			auto it = s_Resources.find(T::GetType());
-			if (it != s_Resources.end())
+			auto it = s_resources.find(T::GetType());
+			if (it != s_resources.end())
 			{
 				return static_cast<uint32_t>(it->second.size());
 			}
@@ -126,18 +126,18 @@ namespace Dive
 
 			if (resource)
 			{
-				s_Resources[T::GetType()].push_back(resource);
-				resource->SetFilepath(s_ResourceFolder / resource->GetName());
+				s_resources[T::GetType()].push_back(resource);
+				resource->SetFilepath(s_resourceFolder / resource->GetName());
 			}
 		}
 
 		static uint32_t GetAllResourceCount();
 
-		static std::string GetResourceFolder() { return s_ResourceFolder.string(); }
+		static std::string GetResourceFolder() { return s_resourceFolder.string(); }
 		static void SetResourceFolder(const std::filesystem::path& path);
 
 	private:
-		static std::unordered_map<eResourceType, std::vector<std::shared_ptr<Resource>>> s_Resources;
-		static std::filesystem::path s_ResourceFolder;
+		static std::unordered_map<eResourceType, std::vector<std::shared_ptr<Resource>>> s_resources;
+		static std::filesystem::path s_resourceFolder;
 	};
 }

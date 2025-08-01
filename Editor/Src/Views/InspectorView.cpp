@@ -155,7 +155,7 @@ namespace Dive
 		: View(editor)
 		, m_TagList{ "Untagged", "EditorOnly", "MainCamera", "Player" }
 	{
-		m_Title = "Inspector";
+		m_title = "Inspector";
 	}
 
 	InspectorView::~InspectorView()

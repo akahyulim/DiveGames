@@ -22,9 +22,9 @@ namespace Dive
 	{
 		if (HasParent())
 		{
-			auto parentTransform = m_Parent->GetTransform();
+			auto parentTransform = m_parent->GetTransform();
 			auto parentMat = XMLoadFloat4x4(&parentTransform);
-			auto localPosVec = XMLoadFloat3(&m_LocalPosition);
+			auto localPosVec = XMLoadFloat3(&m_localPosition);
 			auto worldPosVec = XMVector3Transform(localPosVec, parentMat);
 
 			XMFLOAT3 worldPos;
@@ -33,24 +33,24 @@ namespace Dive
 			return worldPos;
 		}
 
-		return m_LocalPosition;
+		return m_localPosition;
 	}
 
 	void Transform::SetPosition(const DirectX::XMFLOAT3& position)
 	{
 		if (HasParent())
 		{
-			auto parentTransform = m_Parent->GetTransform();
+			auto parentTransform = m_parent->GetTransform();
 			auto parentMat = XMLoadFloat4x4(&parentTransform);
 			auto parentInvMat = XMMatrixInverse(nullptr, parentMat);
 			auto worldPosVec = XMLoadFloat3(&position);
 			auto localPosVec = XMVector3TransformCoord(worldPosVec, parentInvMat);
 
-			XMStoreFloat3(&m_LocalPosition, localPosVec);
+			XMStoreFloat3(&m_localPosition, localPosVec);
 		}
 		else
 		{
-			m_LocalPosition = position;
+			m_localPosition = position;
 		}
 	}
 
@@ -58,9 +58,9 @@ namespace Dive
 	{
 		if (HasParent())
 		{
-			auto parentRotQuat = m_Parent->GetRotationQuaternion();
+			auto parentRotQuat = m_parent->GetRotationQuaternion();
 			auto parentRotVec = XMLoadFloat4(&parentRotQuat);
-			auto localRotVec = XMLoadFloat4(&m_LocalRotation);
+			auto localRotVec = XMLoadFloat4(&m_localRotation);
 			auto worldRotVec = XMQuaternionMultiply(localRotVec, parentRotVec);
 
 			XMFLOAT4 worldRot;
@@ -69,7 +69,7 @@ namespace Dive
 			return worldRot;
 		}
 
-		return m_LocalRotation;
+		return m_localRotation;
 	}
 
 	DirectX::XMFLOAT3 Transform::GetRotationRadians() const
@@ -102,7 +102,7 @@ namespace Dive
 
 		if (HasParent())
 		{
-			auto parentRotQuat = m_Parent->GetRotationQuaternion();
+			auto parentRotQuat = m_parent->GetRotationQuaternion();
 			auto parentRotVec = XMLoadFloat4(&parentRotQuat);
 			auto parentInvRotVec = XMQuaternionInverse(parentRotVec);
 			localRotVec = XMQuaternionMultiply(parentInvRotVec, XMLoadFloat4(&quaternion));
@@ -113,7 +113,7 @@ namespace Dive
 		}
 
 		localRotVec = XMQuaternionNormalize(localRotVec);
-		XMStoreFloat4(&m_LocalRotation, localRotVec);
+		XMStoreFloat4(&m_localRotation, localRotVec);
 	}
 
 	void Transform::SetRotationByRadians(const DirectX::XMFLOAT3& radians)
@@ -162,13 +162,13 @@ namespace Dive
 	{
 		auto localRotVec = XMLoadFloat4(&quaternion);
 		localRotVec = XMQuaternionNormalize(localRotVec);
-		XMStoreFloat4(&m_LocalRotation, localRotVec);
+		XMStoreFloat4(&m_localRotation, localRotVec);
 	}
 
 	void Transform::SetLocalRotationByRadians(const DirectX::XMFLOAT3& radians)
 	{
 		auto rotVec = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&radians));
-		XMStoreFloat4(&m_LocalRotation, rotVec);
+		XMStoreFloat4(&m_localRotation, rotVec);
 	}
 
 	void Transform::SetLocalRotationByDegrees(const DirectX::XMFLOAT3& degrees)
@@ -184,9 +184,9 @@ namespace Dive
 	{
 		if (HasParent())
 		{
-			auto parentScale = m_Parent->GetScale();
+			auto parentScale = m_parent->GetScale();
 			auto parentScaleVec = XMLoadFloat3(&parentScale);
-			auto localScaleVec = XMLoadFloat3(&m_LocalScale);
+			auto localScaleVec = XMLoadFloat3(&m_localScale);
 			auto worldScaleVec = XMVectorMultiply(localScaleVec, parentScaleVec);
 
 			XMFLOAT3 worldScale;
@@ -196,7 +196,7 @@ namespace Dive
 		}
 		else
 		{
-			return m_LocalScale;
+			return m_localScale;
 		}
 	}
 
@@ -204,16 +204,16 @@ namespace Dive
 	{
 		if (HasParent())
 		{
-			auto parentScale = m_Parent->GetScale();
+			auto parentScale = m_parent->GetScale();
 			auto parentScaleVec = XMLoadFloat3(&parentScale);
 			auto localScaleVec = XMVectorDivide(XMLoadFloat3(&scale), parentScaleVec);
 
-			XMStoreFloat3(&m_LocalScale, localScaleVec);
+			XMStoreFloat3(&m_localScale, localScaleVec);
 
 		}
 		else
 		{
-			m_LocalScale = scale;
+			m_localScale = scale;
 		}
 	}
 	
@@ -221,11 +221,11 @@ namespace Dive
 	{
 		if (HasParent())
 		{
-			auto parentTransform = m_Parent->GetTransform();
+			auto parentTransform = m_parent->GetTransform();
 			auto parentMat = XMLoadFloat4x4(&parentTransform);
-			auto localMat = XMMatrixScalingFromVector(XMLoadFloat3(&m_LocalScale))
-				* XMMatrixRotationQuaternion(XMLoadFloat4(&m_LocalRotation))
-				* XMMatrixTranslationFromVector(XMLoadFloat3(&m_LocalPosition));
+			auto localMat = XMMatrixScalingFromVector(XMLoadFloat3(&m_localScale))
+				* XMMatrixRotationQuaternion(XMLoadFloat4(&m_localRotation))
+				* XMMatrixTranslationFromVector(XMLoadFloat3(&m_localPosition));
 
 			XMFLOAT4X4 worldTransform;
 			XMStoreFloat4x4(&worldTransform, parentMat * localMat);
@@ -244,9 +244,9 @@ namespace Dive
 
 	DirectX::XMFLOAT4X4 Transform::GetLocalTransform() const
 	{
-		auto localMat = XMMatrixScalingFromVector(XMLoadFloat3(&m_LocalScale))
-			* XMMatrixRotationQuaternion(XMLoadFloat4(&m_LocalRotation))
-			* XMMatrixTranslationFromVector(XMLoadFloat3(&m_LocalPosition));
+		auto localMat = XMMatrixScalingFromVector(XMLoadFloat3(&m_localScale))
+			* XMMatrixRotationQuaternion(XMLoadFloat4(&m_localRotation))
+			* XMMatrixTranslationFromVector(XMLoadFloat3(&m_localPosition));
 
 		XMFLOAT4X4 localTransform;
 		XMStoreFloat4x4(&localTransform, localMat);
@@ -273,13 +273,13 @@ namespace Dive
 
 			if (HasParent())
 			{
-				auto parentRotQuat = m_Parent->GetRotationQuaternion();
+				auto parentRotQuat = m_parent->GetRotationQuaternion();
 				auto parentRotVec = XMLoadFloat4(&parentRotQuat);
 				translationVec = XMVector3Rotate(translationVec, parentRotVec);
 			}
 
-			auto newLocalPos = XMVectorAdd(XMLoadFloat3(&m_LocalPosition), translationVec);
-			XMStoreFloat3(&m_LocalPosition, newLocalPos);
+			auto newLocalPos = XMVectorAdd(XMLoadFloat3(&m_localPosition), translationVec);
+			XMStoreFloat3(&m_localPosition, newLocalPos);
 		}
 	}
 
@@ -295,26 +295,26 @@ namespace Dive
 
 			if (HasParent())
 			{
-				auto parentRotQuat = m_Parent->GetRotationQuaternion();
+				auto parentRotQuat = m_parent->GetRotationQuaternion();
 				auto parentInvRotVec = XMQuaternionInverse(XMLoadFloat4(&parentRotQuat));
 				newWorldRot = XMQuaternionMultiply(parentInvRotVec, newWorldRot);
 			}
 
 			newWorldRot = XMQuaternionNormalize(newWorldRot);
-			XMStoreFloat4(&m_LocalRotation, newWorldRot);
+			XMStoreFloat4(&m_localRotation, newWorldRot);
 		}
 		else
 		{
 			if (HasParent())
 			{
-				auto parentRotQuat = m_Parent->GetRotationQuaternion();
+				auto parentRotQuat = m_parent->GetRotationQuaternion();
 				auto parentRotVec = XMLoadFloat4(&parentRotQuat);
 				auto parentInvRotVec = XMQuaternionInverse(parentRotVec);
 				rotationVec = XMQuaternionMultiply(parentInvRotVec, rotationVec);
 			}
 
 			rotationVec = XMQuaternionNormalize(rotationVec);
-			XMStoreFloat4(&m_LocalRotation, rotationVec);
+			XMStoreFloat4(&m_localRotation, rotationVec);
 		}
 	}
 
@@ -382,17 +382,17 @@ namespace Dive
 
 	void Transform::SetParent(Transform* parent)
 	{
-		if (parent == m_Parent || (parent != nullptr && parent->IsChildOf(this)))
+		if (parent == m_parent || (parent != nullptr && parent->IsChildOf(this)))
 			return;
 
 		// 기존 부모의 자식 혹은 루트 컨테이너에서 제거
-		if (m_Parent != nullptr)
+		if (m_parent != nullptr)
 		{
-			auto it = std::find(m_Parent->m_Children.begin(), m_Parent->m_Children.end(), this);
-			if (it != m_Parent->m_Children.end())
+			auto it = std::find(m_parent->m_children.begin(), m_parent->m_children.end(), this);
+			if (it != m_parent->m_children.end())
 			{
-				m_Parent->m_Children.erase(it);
-				m_Parent = nullptr;
+				m_parent->m_children.erase(it);
+				m_parent = nullptr;
 			}
 		}
 		else
@@ -400,34 +400,34 @@ namespace Dive
 
 		// 새로운 부모의 자식 혹은 루트 컨테이너에 추가
 		if (parent != nullptr)
-			parent->m_Children.push_back(this);
+			parent->m_children.push_back(this);
 		else
 			GetGameObject()->GetWorld()->AttachRoot(GetGameObject());
 
-		m_Parent = parent;
+		m_parent = parent;
 	}
 
 	bool Transform::IsChildOf(Transform* parent)
 	{
 		assert(parent != nullptr);
 
-		if(m_Parent == nullptr)
+		if(m_parent == nullptr)
 			return false;
 
-		if (m_Parent == parent)
+		if (m_parent == parent)
 			return true;
 		
-		return m_Parent->IsChildOf(parent);
+		return m_parent->IsChildOf(parent);
 	}
 
 	Transform* Transform::GetChild(size_t index)
 	{
-		return m_Children.size() > index ? m_Children[index] : nullptr;
+		return m_children.size() > index ? m_children[index] : nullptr;
 	}
 
 	Transform* Transform::Find(const std::string& name)
 	{
-		for (auto& child : m_Children)
+		for (auto& child : m_children)
 		{
 			if (child->GetGameObject()->GetName() == name)
 				return child;
@@ -438,16 +438,16 @@ namespace Dive
 
 	size_t Transform::GetChildCount()
 	{
-		return m_Children.size();
+		return m_children.size();
 	}
 
 	void Transform::DetachChildren()
 	{
-		for (auto& child : m_Children)
+		for (auto& child : m_children)
 		{
-			child->m_Parent = nullptr;
+			child->m_parent = nullptr;
 		}
-		m_Children.clear();
+		m_children.clear();
 	}
 
 	void Transform::RemoveChild(Transform* child)
@@ -455,11 +455,11 @@ namespace Dive
 		if (!child)
 			return;
 
-		auto it = std::find(m_Children.begin(), m_Children.end(), child);
-		if (it == m_Children.end())
+		auto it = std::find(m_children.begin(), m_children.end(), child);
+		if (it == m_children.end())
 			return;
 
-		m_Children.erase(it);
+		m_children.erase(it);
 	}
 
 	size_t Transform::GetSiblingIndex()
@@ -468,14 +468,14 @@ namespace Dive
 
 		if (HasParent())
 		{
-			const auto& sibling = m_Parent->GetChildren();
+			const auto& sibling = m_parent->GetChildren();
 			auto it = std::find(sibling.begin(), sibling.end(), this);
 			
 			return (it != sibling.end()) ? std::distance(sibling.begin(), it) : std::numeric_limits<size_t>::max();
 		}
 		else
 		{
-			const auto& roots = GetGameObject()->GetWorld()->m_RootGameObjects;
+			const auto& roots = GetGameObject()->GetWorld()->m_rootGameObjects;
 			auto it = std::find(roots.begin(), roots.end(), GetGameObject());
 
 			return (it != roots.end()) ? std::distance(roots.begin(), it) : std::numeric_limits<size_t>::max();
@@ -488,7 +488,7 @@ namespace Dive
 
 		if (HasParent())
 		{
-			auto& sibling = m_Parent->GetChildren();
+			auto& sibling = m_parent->GetChildren();
 			if (index >= sibling.size())
 				return;
 
@@ -501,7 +501,7 @@ namespace Dive
 		}
 		else
 		{
-			auto& roots = GetGameObject()->GetWorld()->m_RootGameObjects;
+			auto& roots = GetGameObject()->GetWorld()->m_rootGameObjects;
 			if (index >= roots.size())
 				return;
 

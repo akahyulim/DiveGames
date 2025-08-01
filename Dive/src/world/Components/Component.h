@@ -29,6 +29,6 @@ namespace Dive
 		static constexpr eComponentType GetType() { return eComponentType::Undefined; }
 
 	protected:
-		GameObject* m_GameObject;
+		GameObject* m_gameObject;
 	};
 }

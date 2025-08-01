@@ -28,17 +28,17 @@ namespace Dive
 				return false;
 			}
 
-			m_vb.reset();
-			m_vb = std::make_shared<Buffer>(
+			m_vertexBuffer.reset();
+			m_vertexBuffer = std::make_shared<Buffer>(
 				device,
 				eBufferType::VertexBuffer,
 				m_vertices.data(),
 				static_cast<uint32_t>(sizeof(LitVertex)),
 				static_cast<uint32_t>(m_vertices.size()));
-			if (!m_vb)
+			if (!m_vertexBuffer)
 			{
 				DV_LOG(StaticMesh, err, "[::CreateBuffers] VertexBuffer 생성 실패");
-				m_vb.reset();
+				m_vertexBuffer.reset();
 				return false;
 			}
 		}
@@ -46,14 +46,14 @@ namespace Dive
 		// 인덱스 버퍼 생성
 		if(!m_indices.empty())
 		{
-			m_ib.reset();
-			m_ib = std::make_shared<Buffer>(
+			m_indexBuffer.reset();
+			m_indexBuffer = std::make_shared<Buffer>(
 				device,
 				eBufferType::IndexBuffer,
 				m_indices.data(),
 				static_cast<uint32_t>(sizeof(uint32_t)),
 				static_cast<uint32_t>(m_indices.size()));
-			if (!m_ib)
+			if (!m_indexBuffer)
 			{
 				DV_LOG(StaticMesh, err, "[::CreateBuffers] IndexBuffer 생성 실패");
 				return false;
@@ -66,8 +66,8 @@ namespace Dive
 	void StaticMesh::Clear()
 	{
 		m_boundingBox.reset();
-		m_ib.reset();
-		m_vb.reset();
+		m_indexBuffer.reset();
+		m_vertexBuffer.reset();
 
 		m_indices.clear();
 		m_indices.shrink_to_fit();
@@ -79,26 +79,26 @@ namespace Dive
 	void StaticMesh::Draw(ID3D11DeviceContext* deviceContext)
 	{
 		assert(deviceContext);
-		assert(m_vb);
+		assert(m_vertexBuffer);
 
 		deviceContext->IASetPrimitiveTopology(m_primitiveTopology);
 
-		m_vb->Bind(deviceContext);
+		m_vertexBuffer->Bind(deviceContext);
 
-		if (m_ib)
+		if (m_indexBuffer)
 		{
-			m_ib->Bind(deviceContext);
-			deviceContext->DrawIndexed(m_ib->GetCount(), 0, 0);
+			m_indexBuffer->Bind(deviceContext);
+			deviceContext->DrawIndexed(m_indexBuffer->GetCount(), 0, 0);
 		}
 		else
-			deviceContext->Draw(m_vb->GetCount(), 0);
+			deviceContext->Draw(m_vertexBuffer->GetCount(), 0);
 	}
 
 	void StaticMesh::ComputeBouingBox()
 	{
 		if (m_vertices.empty())
 		{
-			DV_LOG(StaticMesh, err, "vertices empty");
+			DV_LOG(StaticMesh, err, "[::ComputeBouingBox] 빈 정점 정보");
 			return;
 		}
 

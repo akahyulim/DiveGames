@@ -8,7 +8,7 @@ namespace Dive
 	class Transform;
 
 	// https://docs.unity3d.com/ScriptReference/GameObject.html
-	class GameObject : public Object//, public std::enable_shared_from_this<GameObject>
+	class GameObject : public Object
 	{
 	public:
 		GameObject(const std::string& name);
@@ -18,14 +18,14 @@ namespace Dive
 
 		void Update();
 		
-		bool IsDestroyed() const { return m_IsDestroyed; }
+		bool IsDestroyed() const { return m_isDestroyed; }
 
-		void SetTag(const std::string& tag) { m_Tag = tag; }
-		std::string GetTag() const { return m_Tag; }
-		bool CompareTag(const std::string& tag) const { return m_Tag == tag; }
+		void SetTag(const std::string& tag) { m_tag = tag; }
+		std::string GetTag() const { return m_tag; }
+		bool CompareTag(const std::string& tag) const { return m_tag == tag; }
 
 		void SetActive(bool value);
-		bool IsActiveSelf() const { return m_ActiveSelf; }
+		bool IsActiveSelf() const { return m_activeSelf; }
 		bool IsActiveHierarchy() const { return m_ActiveHierarchy; }
 
 		template<typename T> T* AddComponent();
@@ -41,23 +41,21 @@ namespace Dive
 
 		Transform* GetTransform() const;
 
-		World* GetWorld() const { return m_World; }
+		World* GetWorld() const { return m_world; }
 
 	private:
 		void updateActiveInHierarchy(bool parentHierarchy);
 
 	private:
-		bool m_IsDestroyed = false;
-		
-		std::string m_Tag = "Untagged";
+		std::string m_tag = "Untagged";
 		// layer
-		
-		bool m_ActiveSelf = true;
+
+		bool m_isDestroyed = false;
+		bool m_activeSelf = true;
 		bool m_ActiveHierarchy = true;
 
-		World* m_World = nullptr;
-
-		std::unordered_map<eComponentType, std::unique_ptr<Component>> m_Components;
+		World* m_world = nullptr;
+		std::unordered_map<eComponentType, std::unique_ptr<Component>> m_components;
 	};
 
 	template<typename T>
@@ -67,9 +65,9 @@ namespace Dive
 
 		auto type = T::GetType();
 		if (!HasComponentByType(type))
-			m_Components[type] = std::make_unique<T>(this);
+			m_components[type] = std::make_unique<T>(this);
 
-		return static_cast<T*>(m_Components[type].get());
+		return static_cast<T*>(m_components[type].get());
 	}
 
 	template<typename T>

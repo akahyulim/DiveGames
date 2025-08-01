@@ -6,8 +6,8 @@ namespace Dive
 	GameView::GameView(Editor* editor)
 		: View(editor)
 	{
-		m_Title = "Game";
-		m_Flags |= ImGuiWindowFlags_NoScrollbar;
+		m_title = "Game";
+		m_flags |= ImGuiWindowFlags_NoScrollbar;
 	}
 
 	GameView::~GameView()
@@ -19,25 +19,25 @@ namespace Dive
 		if (!EditorContext::ActiveWorld || !EditorContext::MainCamera)
 			return;
 
-		m_Width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
-		m_Height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
+		m_width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
+		m_height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
 
-		if (!m_RenderTarget)
+		if (!m_renderTarget)
 		{
-			m_RenderTarget = std::make_unique<RenderTexture>(
-				static_cast<UINT32>(m_Width),
-				static_cast<UINT32>(m_Height),
+			m_renderTarget = std::make_unique<RenderTexture>(
+				static_cast<UINT32>(m_width),
+				static_cast<UINT32>(m_height),
 				eDepthFormat::Depth24Stencil8
 			);
-			m_RenderTarget->Create();
+			m_renderTarget->Create();
 
-			EditorContext::MainCamera->GetComponent<Camera>()->SetRenderTarget(m_RenderTarget.get());
+			EditorContext::MainCamera->GetComponent<Camera>()->SetRenderTarget(m_renderTarget.get());
 		}
 
-		if (m_RenderTarget->GetWidth() != static_cast<UINT32>(m_Width) || m_RenderTarget->GetHeight() != static_cast<UINT32>(m_Height))
-			m_RenderTarget->Resize(static_cast<UINT32>(m_Width), static_cast<UINT32>(m_Height));
+		if (m_renderTarget->GetWidth() != static_cast<UINT32>(m_width) || m_renderTarget->GetHeight() != static_cast<UINT32>(m_height))
+			m_renderTarget->Resize(static_cast<UINT32>(m_width), static_cast<UINT32>(m_height));
 
-		ImTextureID textureID = (ImTextureID)(m_RenderTarget->GetShaderResourceView());
-		ImGui::Image(textureID, ImVec2(m_Width, m_Height));
+		ImTextureID textureID = (ImTextureID)(m_renderTarget->GetShaderResourceView());
+		ImGui::Image(textureID, ImVec2(m_width, m_height));
 	}
 }

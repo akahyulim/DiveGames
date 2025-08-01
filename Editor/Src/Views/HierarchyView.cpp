@@ -7,8 +7,8 @@ namespace Dive
 	HierarchyView::HierarchyView(Editor* eidtor)
 		: View(eidtor)
 	{
-		m_Title = "Hierarchy";
-		m_Flags |= ImGuiWindowFlags_HorizontalScrollbar;
+		m_title = "Hierarchy";
+		m_flags |= ImGuiWindowFlags_HorizontalScrollbar;
 	}
 
 	void HierarchyView::drawView()

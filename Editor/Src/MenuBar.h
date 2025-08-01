@@ -18,6 +18,6 @@ namespace Dive
 		void newWorld();
 
 	private:
-		Editor* m_Editor = nullptr;
+		Editor* m_editor = nullptr;
 	};
 }

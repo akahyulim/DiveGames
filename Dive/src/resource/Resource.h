@@ -20,7 +20,7 @@ namespace Dive
 		Resource(const std::string& name = "Resource");
 		virtual ~Resource();
 
-		const std::filesystem::path& GetFilepath() const { return m_Filepath; }
+		const std::filesystem::path& GetFilepath() const { return m_filepath; }
 		void SetFilepath(const std::filesystem::path& path);
 
 		virtual bool LoadFromFile(const std::filesystem::path& path) { return true; }
@@ -29,6 +29,6 @@ namespace Dive
 		static constexpr eResourceType GetType() { return eResourceType::Undefined; }
 
 	protected:
-		std::filesystem::path m_Filepath{};
+		std::filesystem::path m_filepath{};
 	};
 }
