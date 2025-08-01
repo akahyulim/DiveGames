@@ -8,14 +8,14 @@ namespace Dive
 	static std::uniform_int_distribution<uint64_t> s_UniformDistribution;
 
 	Object::Object()
-		: m_InstanceID(s_UniformDistribution(s_Engine))
-		, m_Name("")
+		: m_instanceID(s_UniformDistribution(s_Engine))
+		, m_name("")
 	{
 	}
 
 	Object::Object(const std::string& name)
-		: m_InstanceID(s_UniformDistribution(s_Engine))
-		, m_Name(name)
+		: m_instanceID(s_UniformDistribution(s_Engine))
+		, m_name(name)
 	{
 	}
 }

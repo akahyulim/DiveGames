@@ -10,17 +10,17 @@ namespace Dive
 		Object(const std::string& name);
 		virtual ~Object() = default;
 
-		uint64_t GetInstanceID() const { return m_InstanceID; }
+		uint64_t GetInstanceID() const { return m_instanceID; }
 
-		virtual std::string GetName() const { return m_Name; }
-		virtual void SetName(const std::string& name) { m_Name = name; }
+		virtual std::string GetName() const { return m_name; }
+		virtual void SetName(const std::string& name) { m_name = name; }
 
-		bool operator==(const Object& other) const { return m_InstanceID == other.m_InstanceID; }
-		bool operator!=(const Object& other) const { return m_InstanceID != other.m_InstanceID; }
+		bool operator==(const Object& other) const { return m_instanceID == other.m_instanceID; }
+		bool operator!=(const Object& other) const { return m_instanceID != other.m_instanceID; }
 
 	private:
-		uint64_t m_InstanceID;
-		std::string m_Name;
+		uint64_t m_instanceID;
+		std::string m_name;
 	};
 
 	inline bool operator==(const Object& lhs, const Object& rhs)

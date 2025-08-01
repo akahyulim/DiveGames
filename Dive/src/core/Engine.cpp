@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "Engine.h"
-#include "Common.h"
 #include "Window.h"
 #include "Input.h"
 #include "graphics/Graphics.h"
@@ -11,11 +10,11 @@
 
 namespace Dive
 {
-	double Engine::s_ElapsedTimeMS = 0;
-	float Engine::s_DeltaTimeMS = 0.0f;
-	std::chrono::steady_clock::time_point Engine::s_LastTickTime;
-	uint16_t Engine::s_Fps = 0;
-	uint64_t Engine::s_FrameCount = 0;
+	double Engine::s_elapsedTimeMS = 0;
+	float Engine::s_deltaTimeMS = 0.0f;
+	std::chrono::steady_clock::time_point Engine::s_lastTickTime;
+	uint16_t Engine::s_fps = 0;
+	uint64_t Engine::s_frameCount = 0;
 
 	bool Engine::Initialize()
 	{
@@ -23,19 +22,19 @@ namespace Dive
 
 		if (!Window::Initialize())
 		{
-			DV_LOG(Engine, err, "Window 초기화 실패");
+			DV_LOG(Engine, err, "[::Initialize] Window 초기화 실패");
 			return false;
 		}
 
 		if (!Graphics::Initialize())
 		{
-			DV_LOG(Engine, err, "Graphics 초기화 실패");
+			DV_LOG(Engine, err, "[::Initialize] Graphics 초기화 실패");
 			return false;
 		}
 
 		if (!ShaderManager::Initialize(Graphics::GetDevice()))
 		{
-			DV_LOG("Engine", err, "ShaderManager 초기화 실패");
+			DV_LOG(Engine, err, "[::Initialize] ShaderManager 초기화 실패");
 			return false;
 		}
 
@@ -43,11 +42,11 @@ namespace Dive
 
 		if (!Input::Initialize())
 		{
-			DV_LOG(Engine, err, "Input 초기화 실패");
+			DV_LOG(Engine, err, "[::Initialize] Input 초기화 실패");
 			return false;
 		}
 
-		s_LastTickTime = std::chrono::steady_clock::now();
+		s_lastTickTime = std::chrono::steady_clock::now();
 		DV_LOG(Engine, info, "초기화 완료");
 
 		return true;
@@ -73,18 +72,18 @@ namespace Dive
 	void Engine::Tick()
 	{
 		auto currentTickTime = std::chrono::steady_clock::now();
-		s_DeltaTimeMS = std::chrono::duration<float, std::milli>(currentTickTime - s_LastTickTime).count();
-		s_ElapsedTimeMS += s_DeltaTimeMS;
-		s_LastTickTime = currentTickTime;
+		s_deltaTimeMS = std::chrono::duration<float, std::milli>(currentTickTime - s_lastTickTime).count();
+		s_elapsedTimeMS += s_deltaTimeMS;
+		s_lastTickTime = currentTickTime;
 
 		static double lastTimeMS = 0;
 		static uint16_t frameCount = 0;
 		frameCount++;
-		if (s_ElapsedTimeMS - lastTimeMS >= 1000.0)
+		if (s_elapsedTimeMS - lastTimeMS >= 1000.0)
 		{
-			s_Fps = frameCount;
+			s_fps = frameCount;
 			frameCount = 0;
-			lastTimeMS = s_ElapsedTimeMS;
+			lastTimeMS = s_elapsedTimeMS;
 		}
 
 		if (WorldManager::GetActiveWorld())
@@ -92,6 +91,6 @@ namespace Dive
 
 		Renderer::OnUpdate();
 
-		s_FrameCount++;
+		s_frameCount++;
 	}
 }

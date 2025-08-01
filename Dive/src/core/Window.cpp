@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "Window.h"
-#include "Common.h"
 
 namespace Dive
 {
@@ -10,7 +9,7 @@ namespace Dive
 
 	HINSTANCE Window::s_hInstance = nullptr;
 	HWND Window::s_hWnd = nullptr;
-	std::wstring Window::s_Title = L"DIVE";
+	std::wstring Window::s_title = L"DIVE";
 
 	bool Window::Initialize()
 	{
@@ -32,7 +31,7 @@ namespace Dive
 
 		if (!::RegisterClassEx(&wc)) 
 		{
-			DV_LOG(Window, err, "윈도우 클래스 등록 실패");
+			DV_LOG(Window, err, "[::Initialize] 윈도우 클래스 등록 실패");
 			return false;
 		}
 
@@ -44,7 +43,7 @@ namespace Dive
 		s_hWnd = CreateWindowEx(
 			WS_EX_APPWINDOW,
 			WND_CLASS_NAME,
-			s_Title.c_str(),
+			s_title.c_str(),
 			style,
 			posX > 0 ? posX : 0,
 			posY > 0 ? posY : 0,
@@ -55,7 +54,7 @@ namespace Dive
 
 		if (!s_hWnd)
 		{
-			DV_LOG(Window, err, "윈도우 생성 실패");
+			DV_LOG(Window, err, "[::Initialize] CreateWindowEx 실패");
 			return false;
 		}
 
@@ -94,7 +93,7 @@ namespace Dive
 	void Window::SetMessageCallback(LONG_PTR callBack)
 	{
 		if (!SetWindowLongPtr(s_hWnd, GWLP_WNDPROC, callBack))
-			DV_LOG(Window, err, "프로시져 함수 변경 실패");
+			DV_LOG(Window, err, "[::SetMessageCallback] SetWindowLongPtr 실패");
 	}
 
 	bool Window::Resize(const uint32_t width, const uint32_t height)
@@ -106,7 +105,7 @@ namespace Dive
 		
 		if (!::SetWindowPos(s_hWnd, NULL, posX, posY, width, height, SWP_NOZORDER | SWP_DRAWFRAME))
 		{
-			DV_LOG(Window, err, "윈도우 크기 변경 실패");
+			DV_LOG(Window, err, "[::Resize] SetWindowPos 실패");
 			return false;
 		}
 
@@ -240,16 +239,16 @@ namespace Dive
 	{
 		assert(s_hWnd != 0);
 
-		if (s_Title == title)
+		if (s_title == title)
 			return true;
 		
 		if (!::SetWindowTextW(s_hWnd, title.c_str()))
 		{
-			DV_LOG(Window, err, "타이틀 변경 실패");
+			DV_LOG(Window, err, "[::Setitle] SetWindowTextW 실패");
 			return false;
 		}
 
-		s_Title = title;
+		s_title = title;
 		return true;
 	}
 }

@@ -29,26 +29,25 @@ namespace Dive
 
 		static const DirectX::XMFLOAT2& GetMousePosition();
 
-		static bool GetMouseIsInValidRect();
-
-		static void SetMouseIsInValidRect(bool valid);
+		static bool IsInValidRect();
+		static void SetValid(bool valid);
 
 	private:
-		static Microsoft::WRL::ComPtr<IDirectInput8> s_DirectInput;
-		static Microsoft::WRL::ComPtr<IDirectInputDevice8> s_Keyboard;
-		static Microsoft::WRL::ComPtr<IDirectInputDevice8> s_Mouse;
+		static Microsoft::WRL::ComPtr<IDirectInput8> s_directInput;
+		static Microsoft::WRL::ComPtr<IDirectInputDevice8> s_keyboard;
+		static Microsoft::WRL::ComPtr<IDirectInputDevice8> s_mouse;
 
-		static uint8_t s_KeyStates[MAX_NUM_KEYS];
-		static uint8_t s_OldKeyStates[MAX_NUM_KEYS];
+		static uint8_t s_keyStates[MAX_NUM_KEYS];
+		static uint8_t s_oldKeyStates[MAX_NUM_KEYS];
 
-		static DIMOUSESTATE s_MouseState;
+		static DIMOUSESTATE s_mouseState;
 
-		static uint8_t s_MouseButtons[MAX_NUM_BUTTONS];
-		static uint8_t s_OldMouseButtons[MAX_NUM_BUTTONS];
-		static DirectX::XMFLOAT2 s_MousePosition;
-		static DirectX::XMFLOAT2 s_OldMousePosition;
-		static DirectX::XMFLOAT2 s_MouseDelta;
+		static uint8_t s_mouseButtons[MAX_NUM_BUTTONS];
+		static uint8_t s_oldMouseButtons[MAX_NUM_BUTTONS];
+		static DirectX::XMFLOAT2 s_mousePosition;
+		static DirectX::XMFLOAT2 s_oldMousePosition;
+		static DirectX::XMFLOAT2 s_mouseDelta;
 
-		static bool s_MouseIsInValidRect;
+		static bool s_IsInValidRect;
 	};
 }

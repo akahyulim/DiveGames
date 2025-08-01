@@ -13,6 +13,3 @@
 [submodule "Editor/Third-Party/imgui"]
 	path = Editor/Third-Party/imgui
 	url = https://github.com/ocornut/imgui.git
-[submodule "Dive/third-party/entt"]
-	path = Dive/third-party/entt
-	url = https://github.com/skypjack/entt.git
