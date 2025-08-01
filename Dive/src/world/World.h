@@ -1,0 +1,78 @@
+﻿#pragma once
+
+namespace Dive
+{
+	class Camera;
+	class Transform;
+	class MeshRenderer;
+	class GameObject;
+
+	// https://docs.unity3d.com/6000.1/Documentation/ScriptReference/SceneManagement.Scene.html
+	class World
+	{
+	public:
+		World(const std::string& name);
+		~World();
+
+		void Clear();
+
+		void Update();
+
+		void CullAndSort(Camera* camera);
+
+		GameObject* CreateGameObject(const std::string& name = "");
+
+		void DestroyGameObject(GameObject* gameObject);
+		void DestroyGameObject(uint64_t instanceID);
+		void QueueDestroy(GameObject* gameObject);
+		void QueueDestroy(uint64_t instanceID);
+		void FlushDestoryQueue();
+
+		bool HasGameObject(uint64_t instanceID);
+
+		GameObject* FindGameObject(uint64_t instanceID);
+
+		void AttachRoot(GameObject* gameObject);
+		void AttachRoot(uint64_t instanceID);
+	
+		void DetachRoot(GameObject* gameObject);
+		void DetachRoot(uint64_t instanceID);
+
+		size_t AllGameObjectCount() const { return m_GameObjectMap.size(); }
+		std::vector<GameObject*> GetAllGameObjects();
+
+		size_t RootGameObjectCount() const { return m_RootGameObjects.size(); }
+		const std::vector<GameObject*>& GetRootGameObjects() { return m_RootGameObjects; }
+
+		const std::vector<MeshRenderer*>& GetTransparentMeshRenderers() const { return m_TransparentMeshRenderers; }
+		const std::vector<MeshRenderer*>& GetOpaqueMeshRenderers() const { return m_OpaqueMeshRenderers; }
+
+		std::string GetName() const { return m_Name; }
+		void SetName(const std::string& name) { m_Name = name; }
+
+	private:
+		std::string m_Name{};
+
+		std::unordered_map<uint64_t, std::unique_ptr<GameObject>> m_GameObjectMap;
+		std::vector<GameObject*> m_RootGameObjects;
+		std::unordered_set<uint64_t> m_DestroyQueue;
+
+		std::vector<MeshRenderer*> m_TransparentMeshRenderers;
+		std::vector<MeshRenderer*> m_OpaqueMeshRenderers;
+
+		friend class Transform;
+	};
+
+	//https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.html
+	class WorldManager
+	{
+	public:
+		static World* CreateWorld(const std::string& name);
+		static void Clear();
+
+		static World* GetActiveWorld();
+
+	private:
+		static std::unique_ptr<World> s_ActiveWorld;	// 일단 단일 World로 관리
+	};
+}

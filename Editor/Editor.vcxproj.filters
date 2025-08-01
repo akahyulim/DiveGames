@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Project">
+      <UniqueIdentifier>{6c1353f7-791d-405e-8749-95024422b1c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Views">
+      <UniqueIdentifier>{38716fe9-4da2-41c3-a183-3e4b8e470671}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{ae9e82dd-cbb2-4164-8f74-95c8920cab98}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Src\Views\GameView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Views\HierarchyView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Views\InspectorView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Views\View.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Views\WorldView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Views\LogView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Editor.cpp" />
+    <ClCompile Include="Src\main.cpp" />
+    <ClCompile Include="Src\MenuBar.cpp" />
+    <ClCompile Include="Third-Party\imgui\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\imgui\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\imgui\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\imgui\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\imgui\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\imgui\backends\imgui_impl_dx11.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="Third-Party\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Src\Views\GameView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Views\HierarchyView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Views\InspectorView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Views\View.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Views\WorldView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Views\LogView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Editor.h" />
+    <ClInclude Include="Src\MenuBar.h" />
+    <ClInclude Include="Third-Party\imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Third-Party\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Third-Party\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Third-Party\imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Third-Party\imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Third-Party\imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Third-Party\imgui\backends\imgui_impl_dx11.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Third-Party\imgui\backends\imgui_impl_win32.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

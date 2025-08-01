@@ -1,0 +1,18 @@
+[submodule "Dive/external/spdlog"]
+	path = Dive/external/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "Dive/third-party/spdlog"]
+	path = Dive/third-party/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "Dive/third-party/yaml-cpp"]
+	path = Dive/third-party/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "Dive/third-party/DirectXTex"]
+	path = Dive/third-party/DirectXTex
+	url = https://github.com/microsoft/DirectXTex.git
+[submodule "Editor/Third-Party/imgui"]
+	path = Editor/Third-Party/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "Dive/third-party/entt"]
+	path = Dive/third-party/entt
+	url = https://github.com/skypjack/entt.git

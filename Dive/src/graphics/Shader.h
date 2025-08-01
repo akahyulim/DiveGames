@@ -1,0 +1,53 @@
+﻿#pragma once
+#include "core/Object.h"
+
+namespace Dive
+{
+	//-------------------------------------------------------------------------------------
+	// enum class
+	//-------------------------------------------------------------------------------------
+	enum class eInputLayout : uint8_t
+	{
+		None = 0,
+		PN,
+		PNT,
+		Lit,
+		Skinned
+	};
+
+	class IShader : public Object
+	{
+	public:
+		virtual ~IShader() = default;
+		virtual bool LoadFromFile(const std::filesystem::path& path, ID3D11Device* device) = 0;
+		virtual void Bind(ID3D11DeviceContext* deviceContext) = 0;
+	};
+
+	class VertexShader : public IShader
+	{
+	public:
+		~VertexShader() override;
+		bool LoadFromFile(const std::filesystem::path& path, ID3D11Device* device) override;
+		void Bind(ID3D11DeviceContext* deviceContext) override;
+
+		ID3D11VertexShader* GetShader() const { return m_shader.Get(); }
+		ID3DBlob* GetBytecode() const { return m_blob.Get(); };
+
+	private:
+		Microsoft::WRL::ComPtr<ID3D11VertexShader> m_shader;
+		Microsoft::WRL::ComPtr<ID3DBlob> m_blob;
+	};
+
+	class PixelShader : public IShader
+	{
+	public:
+		~PixelShader() override;
+		bool LoadFromFile(const std::filesystem::path& path, ID3D11Device* device) override;
+		void Bind(ID3D11DeviceContext* deviceContext) override;
+
+		ID3D11PixelShader* GetShader() const { return m_shader.Get(); }
+
+	private:
+		Microsoft::WRL::ComPtr<ID3D11PixelShader> m_shader;
+	};
+}
