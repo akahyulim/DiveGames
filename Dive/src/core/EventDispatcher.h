@@ -35,6 +35,6 @@ namespace Dive
 		static void Dispatch(eEventType type, EventData data = 0);
 
 	private:
-		static std::unordered_map<eEventType, std::vector<EventListener>> s_Listeners;
+		static std::unordered_map<eEventType, std::vector<EventListener>> s_listeners;
 	};
 }

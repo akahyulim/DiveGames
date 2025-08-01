@@ -12,21 +12,21 @@ namespace Dive
 
 		static void Tick();
 
-		static double GetElapsedTimeMS() { return s_ElapsedTimeMS; }
-		static double GetElapsedTimeSec() { return s_ElapsedTimeMS / 1000.0; }
+		static double GetElapsedTimeMS() { return s_elapsedTimeMS; }
+		static double GetElapsedTimeSec() { return s_elapsedTimeMS / 1000.0; }
 		
-		static float GetDeltaTimeMS() { return s_DeltaTimeMS; }
-		static float GetDeltaTimeSec() { return s_DeltaTimeMS / 1000.0f; }
+		static float GetDeltaTimeMS() { return s_deltaTimeMS; }
+		static float GetDeltaTimeSec() { return s_deltaTimeMS / 1000.0f; }
 		
-		static uint16_t GetFps() { return s_Fps; }
+		static uint16_t GetFps() { return s_fps; }
 
-		static uint64_t GetFrameCount() { return s_FrameCount; }
+		static uint64_t GetFrameCount() { return s_frameCount; }
 
 	private:
-		static double s_ElapsedTimeMS;
-		static float s_DeltaTimeMS;
-		static std::chrono::steady_clock::time_point s_LastTickTime;
-		static uint16_t s_Fps;
-		static uint64_t s_FrameCount;
+		static double s_elapsedTimeMS;
+		static float s_deltaTimeMS;
+		static std::chrono::steady_clock::time_point s_lastTickTime;
+		static uint16_t s_fps;
+		static uint64_t s_frameCount;
 	};
 }

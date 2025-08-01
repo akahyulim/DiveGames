@@ -38,6 +38,6 @@ namespace Dive
 	private:
 		static HINSTANCE s_hInstance;
 		static HWND s_hWnd;
-		static std::wstring s_Title;
+		static std::wstring s_title;
 	};
 }
