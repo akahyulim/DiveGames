@@ -49,8 +49,6 @@ namespace Dive
 		eSourceType GetSourceType() const { return m_sourceType; }
 		void SetSourceType(eSourceType type) { m_sourceType = type; }
 
-		std::filesystem::path GetFilepath() const { return m_filepath; }
-
 		eMeshType GetMeshType() const { return m_type; }
 
 		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { return m_primitiveTopology; }
@@ -60,7 +58,6 @@ namespace Dive
 
 	private:
 		eSourceType m_sourceType = eSourceType::None;
-		std::filesystem::path m_filepath;	// 좀 애매해다. 
 
 		eMeshType m_type = eMeshType::None;
 
@@ -69,8 +66,8 @@ namespace Dive
 		std::vector<LitVertex> m_vertices;
 		std::vector<uint32_t> m_indices;
 
-		std::shared_ptr<Buffer> m_vb;
-		std::shared_ptr<Buffer> m_ib;
+		std::shared_ptr<Buffer> m_vertexBuffer;
+		std::shared_ptr<Buffer> m_indexBuffer;
 		
 		std::shared_ptr<BoundingBox> m_boundingBox;
 	};

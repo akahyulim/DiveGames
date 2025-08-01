@@ -14,27 +14,27 @@ namespace Dive
 
 	static constexpr float NEAR_CLIP_PLANE = 0.1f;
 
-	std::vector<Camera*> Camera::s_AllCameras;
+	std::vector<Camera*> Camera::s_allCameras;
 
 	Camera::Camera(GameObject* gameObject)
 		: Component(gameObject)
 	{
-		s_AllCameras.push_back(this);
+		s_allCameras.push_back(this);
 		DV_LOG(Camera, info, "생성: {}, {}", GetName(), GetInstanceID());
 	}
 
 	Camera::~Camera()
 	{
-		auto it = std::find(s_AllCameras.begin(), s_AllCameras.end(), this);
-		if (it != s_AllCameras.end())
-			s_AllCameras.erase(it);
+		auto it = std::find(s_allCameras.begin(), s_allCameras.end(), this);
+		if (it != s_allCameras.end())
+			s_allCameras.erase(it);
 		
 		DV_LOG(Camera, info, "소멸: {}, {}", GetName(), GetInstanceID());
 	}
 
 	void Camera::Update()
 	{
-		m_Frustum.Update(GetView(), GetProjection());
+		m_frustum.Update(GetView(), GetProjection());
 	}
 
 	void Camera::Bind(ID3D11DeviceContext* deviceContext) const
@@ -84,25 +84,25 @@ namespace Dive
 	{
 		XMFLOAT4X4 projection{};
 
-		if (m_ProjectionType == eProjectionType::Perspective)
+		if (m_projectionType == eProjectionType::Perspective)
 		{
 			auto projectionMatrix =  XMMatrixPerspectiveFovLH(
-				3.141592654f / 4.0f,//XMConvertToRadians(m_FieldOfView),
+				3.141592654f / 4.0f,//XMConvertToRadians(m_fieldOfView),
 				GetAspectRatio(),
-				m_NearClipPlane,
-				m_FarClipPlane);
+				m_nearClipPlane,
+				m_farClipPlane);
 
 			XMStoreFloat4x4(&projection, projectionMatrix);
 		}
-		else if (m_ProjectionType == eProjectionType::Orthographic)
+		else if (m_projectionType == eProjectionType::Orthographic)
 		{
 			// 코파일럿이 작성한  코드다.
 			// width, height가 맞는지 모르겠다.
 			auto projectionMatrix = XMMatrixOrthographicLH(
-				GetAspectRatio() * m_FarClipPlane,
-				m_FarClipPlane,
-				m_NearClipPlane,
-				m_FarClipPlane);
+				GetAspectRatio() * m_farClipPlane,
+				m_farClipPlane,
+				m_nearClipPlane,
+				m_farClipPlane);
 
 			XMStoreFloat4x4(&projection, projectionMatrix);
 		}
@@ -125,39 +125,39 @@ namespace Dive
 	void Camera::SetFieldOfView(float fov)
 	{
 		if (fov < FOV_MIN)
-			m_FieldOfView = FOV_MIN;
+			m_fieldOfView = FOV_MIN;
 		else if (fov > FOV_MAX)
-			m_FieldOfView = FOV_MAX;
+			m_fieldOfView = FOV_MAX;
 		else
-			m_FieldOfView = fov;
+			m_fieldOfView = fov;
 	}
 
 	void Camera::SetNearClipPlane(float nearPlane)
 	{
 		if (nearPlane < NEAR_CLIP_PLANE)
 		{
-			DV_LOG(Camera, warn, "유효하지 않은 Near Clip 값 전달: {}", nearPlane);
+			DV_LOG(Camera, warn, "[::SetNearClipPlane] 유효하지 않은 Near Clip 값: {}", nearPlane);
 			return;
 		}
-		m_NearClipPlane = nearPlane;
+		m_nearClipPlane = nearPlane;
 	}
 
 	void Camera::SetFarClipPlane(float farPlane)
 	{
-		if (farPlane <= m_NearClipPlane)
+		if (farPlane <= m_nearClipPlane)
 		{
 			DV_LOG(Camera, warn, "유효하지 않은 Far Clip 값 전달: {}", farPlane);
 			return;
 		}
-		m_FarClipPlane = farPlane;
+		m_farClipPlane = farPlane;
 	}
 
 	void Camera::GetViewportRect(float& outLeft, float& outTop, float& outRight, float& outBottom) const
 	{
-		outLeft = m_ViewportLeft;
-		outTop = m_ViewportTop;
-		outRight = m_ViewportRight;
-		outBottom = m_ViewportBottom;
+		outLeft = m_viewportLeft;
+		outTop = m_viewportTop;
+		outRight = m_viewportRight;
+		outBottom = m_viewportBottom;
 	}
 
 	void Camera::SetViewportRect(float left, float top, float right, float bottom)
@@ -167,54 +167,54 @@ namespace Dive
 			right <= left || right > 1.0f ||
 			bottom <= top || bottom > 1.0f)
 		{
-			DV_LOG(Camera, warn, "유효하지 않은 뷰포트 설정값 전달: {}, {}, {}, {}", left, top, right, bottom);
+			DV_LOG(Camera, warn, "[::SetViewportRect] 유효하지 않은 뷰포트 설정값: {}, {}, {}, {}", left, top, right, bottom);
 			return;
 		}
 
-		m_ViewportLeft = left;
-		m_ViewportTop = top;
-		m_ViewportRight = right;
-		m_ViewportBottom = bottom;
+		m_viewportLeft = left;
+		m_viewportTop = top;
+		m_viewportRight = right;
+		m_viewportBottom = bottom;
 	}
 
 	void Camera::SetViewportTop(float top)
 	{
-		if (top < 0.0f || top > m_ViewportBottom)
+		if (top < 0.0f || top > m_viewportBottom)
 		{
-			DV_LOG(Camera, warn, "유효하지 않은 뷰포트 Top 값 전달: {}", top);
+			DV_LOG(Camera, warn, "[::SetViewportTop] 유효하지 않은 값: {}", top);
 			return;
 		}
-		m_ViewportTop = top;
+		m_viewportTop = top;
 	}
 
 	void Camera::SetViewportLeft(float left)
 	{
-		if (left < 0.0f || left > m_ViewportRight)
+		if (left < 0.0f || left > m_viewportRight)
 		{
-			DV_LOG(Camera, warn, "유효하지 않은 뷰포트 Left 값 전달: {}", left);
+			DV_LOG(Camera, warn, "[::SetViewportLeft] 유효하지 않은 값: {}", left);
 			return;
 		}
-		m_ViewportLeft = left;
+		m_viewportLeft = left;
 	}
 
 	void Camera::SetViewportRight(float right)
 	{
-		if (right < m_ViewportLeft || right > 1.0f)
+		if (right < m_viewportLeft || right > 1.0f)
 		{
-			DV_LOG(Camera, warn, "유효하지 않은 뷰포트 Right 값 전달: {}", right);
+			DV_LOG(Camera, warn, "[::SetViewportRight] 유효하지 않은 값: {}", right);
 			return;
 		}
-		m_ViewportRight = right;
+		m_viewportRight = right;
 	}
 
 	void Camera::SetViewportBottom(float bottom)
 	{
-		if (bottom < m_ViewportTop || bottom > 1.0f)
+		if (bottom < m_viewportTop || bottom > 1.0f)
 		{
-			DV_LOG(Camera, warn, "유효하지 않은 뷰포트 Bottom 값 전달: {}", bottom);
+			DV_LOG(Camera, warn, "[::SetViewportBottom] 유효하지 않은 값: {}", bottom);
 			return;
 		}
-		m_ViewportBottom = bottom;
+		m_viewportBottom = bottom;
 	}
 
 	D3D11_VIEWPORT Camera::GetViewport() const
@@ -222,10 +222,10 @@ namespace Dive
 		auto renderTargetWidth = static_cast<float>(GetRenderTarget()->GetWidth());
 		auto renderTargetHeight = static_cast<float>(GetRenderTarget()->GetHeight());
 
-		float topLeftX = m_ViewportLeft * renderTargetWidth;
-		float topLeftY = m_ViewportTop * renderTargetHeight;
-		float width = (m_ViewportRight - m_ViewportLeft) * renderTargetWidth;
-		float height = (m_ViewportBottom - m_ViewportTop) * renderTargetHeight;
+		float topLeftX = m_viewportLeft * renderTargetWidth;
+		float topLeftY = m_viewportTop * renderTargetHeight;
+		float width = (m_viewportRight - m_viewportLeft) * renderTargetWidth;
+		float height = (m_viewportBottom - m_viewportTop) * renderTargetHeight;
 
 		return D3D11_VIEWPORT{
 			topLeftX,
@@ -239,12 +239,12 @@ namespace Dive
 
 	RenderTexture* Camera::GetRenderTarget() const
 	{
-		return m_RenderTarget ? m_RenderTarget : Renderer::GetRenderTarget(eRenderTarget::FrameOutput);
+		return m_renderTarget ? m_renderTarget : Renderer::GetRenderTarget(eRenderTarget::FrameOutput);
 	}
 
 	Camera* Camera::GetMainCamera()
 	{
-		for (auto camera : s_AllCameras)
+		for (auto camera : s_allCameras)
 		{
 			if (camera->GetGameObject()->GetTag() == "MainCamera")
 				return camera;

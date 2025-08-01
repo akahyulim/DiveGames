@@ -118,21 +118,21 @@ namespace Dive
 		loadResources();
 
 		// create widgets
-		m_Widgets.emplace_back(std::make_unique<WorldView>(this));
-		m_Widgets.emplace_back(std::make_unique<GameView>(this));
-		m_Widgets.emplace_back(std::make_unique<HierarchyView>(this));
-		m_Widgets.emplace_back(std::make_unique<InspectorView>(this));
-		//m_Widgets.emplace_back(std::make_unique<LogView>(this));
-		m_MenuBar = std::make_unique<MenuBar>(this);
+		m_widgets.emplace_back(std::make_unique<WorldView>(this));
+		m_widgets.emplace_back(std::make_unique<GameView>(this));
+		m_widgets.emplace_back(std::make_unique<HierarchyView>(this));
+		m_widgets.emplace_back(std::make_unique<InspectorView>(this));
+		//m_widgets.emplace_back(std::make_unique<LogView>(this));
+		m_menuBar = std::make_unique<MenuBar>(this);
 
 		SetTitle();
 	}
 
 	Editor::~Editor()
 	{
-		for (auto& widget : m_Widgets)
+		for (auto& widget : m_widgets)
 			widget.reset();
-		m_MenuBar.reset();
+		m_menuBar.reset();
 
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
@@ -150,8 +150,8 @@ namespace Dive
 			{
 				beginUI();
 
-				m_MenuBar->Draw();
-				for (auto& widget : m_Widgets)
+				m_menuBar->Draw();
+				for (auto& widget : m_widgets)
 					widget->Draw();
 
 				endUI();
@@ -163,7 +163,7 @@ namespace Dive
 
 	ImFont* Editor::GetFont(eFontTypes type)
 	{
-		return m_Fonts[static_cast<size_t>(type)];
+		return m_fonts[static_cast<size_t>(type)];
 	}
 
 	void Editor::SetTitle(const std::wstring& text)
@@ -176,13 +176,13 @@ namespace Dive
 	{
 		// FONTS
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.FontDefault = m_Fonts[static_cast<size_t>(eFontTypes::Normal)] =
+		io.FontDefault = m_fonts[static_cast<size_t>(eFontTypes::Normal)] =
 			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
-		m_Fonts[static_cast<size_t>(eFontTypes::Bold)] =
+		m_fonts[static_cast<size_t>(eFontTypes::Bold)] =
 			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
-		m_Fonts[static_cast<size_t>(eFontTypes::Large)] =
+		m_fonts[static_cast<size_t>(eFontTypes::Large)] =
 			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
-		m_Fonts[static_cast<size_t>(eFontTypes::Large_Bold)] =
+		m_fonts[static_cast<size_t>(eFontTypes::Large_Bold)] =
 			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
 	}
 

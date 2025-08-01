@@ -46,9 +46,9 @@ namespace Dive
 		void endUI();
 
 	private:
-		std::array<ImFont*, static_cast<size_t>(Dive::eFontTypes::Max)> m_Fonts;
+		std::array<ImFont*, static_cast<size_t>(Dive::eFontTypes::Max)> m_fonts;
 
-		std::unique_ptr<MenuBar> m_MenuBar;
-		std::vector<std::unique_ptr<View>> m_Widgets;
+		std::unique_ptr<MenuBar> m_menuBar;
+		std::vector<std::unique_ptr<View>> m_widgets;
 	};
 }

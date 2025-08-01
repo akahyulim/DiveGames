@@ -14,23 +14,23 @@ namespace Dive
 		
 		void Draw();
 
-		float GetWidth() const { return m_Width; }
-		float GetHeight() const { return m_Height; }
+		float GetWidth() const { return m_width; }
+		float GetHeight() const { return m_height; }
 
-		bool IsVisible() const { return m_IsVisible; }
-		void SetVisible(bool visible) { m_IsVisible = visible; }
+		bool IsVisible() const { return m_isVisible; }
+		void SetVisible(bool visible) { m_isVisible = visible; }
 
 	protected:
 		virtual void drawView() {}
 
 	protected:
-		std::string m_Title;
+		std::string m_title;
 
-		float m_Width;
-		float m_Height;
-		bool m_IsVisible;
-		int m_Flags;
+		float m_width;
+		float m_height;
+		bool m_isVisible;
+		int m_flags;
 
-		Editor* m_Editor;
+		Editor* m_editor;
 	};
 }

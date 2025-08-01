@@ -138,7 +138,7 @@ namespace Dive
 			data = YAML::LoadFile(filepath.string());
 		}
 		catch (const YAML::ParserException& e) {
-			DV_LOG(WorldSerializer, warn, "YAML 파싱 실패: {}", e.what());
+			DV_LOG(WorldSerializer, warn, "[::Deserialize] 파싱 실패: {}", e.what());
 			return false;
 		}
 

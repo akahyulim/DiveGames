@@ -38,7 +38,7 @@ namespace Dive
         }
         catch (const YAML::ParserException& e)
         {
-            DV_LOG(Material, warn, "YAML 파싱 실패: {}", e.what());
+            DV_LOG(Material, err, "[::LoadFromFile] YAML 파싱 실패: {}", e.what());
             return false;
         }
 

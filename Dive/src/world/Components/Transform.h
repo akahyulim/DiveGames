@@ -21,8 +21,8 @@ namespace Dive
 		// transform
 		DirectX::XMFLOAT3 GetPosition() const;
 		void SetPosition(const DirectX::XMFLOAT3& position);
-		DirectX::XMFLOAT3 GetLocalPosition() const { return m_LocalPosition; }
-		void SetLocalPosition(const DirectX::XMFLOAT3& position) { m_LocalPosition = position; }
+		DirectX::XMFLOAT3 GetLocalPosition() const { return m_localPosition; }
+		void SetLocalPosition(const DirectX::XMFLOAT3& position) { m_localPosition = position; }
 
 		DirectX::XMFLOAT4 GetRotationQuaternion() const;
 		DirectX::XMFLOAT3 GetRotationRadians() const;
@@ -30,7 +30,7 @@ namespace Dive
 		void SetRotationByQuaternion(const DirectX::XMFLOAT4& quaternion);
 		void SetRotationByRadians(const DirectX::XMFLOAT3& radians);
 		void SetRotationByDegrees(const DirectX::XMFLOAT3& degrees);
-		DirectX::XMFLOAT4 GetLocalRotationQuaternion() const { return m_LocalRotation; }
+		DirectX::XMFLOAT4 GetLocalRotationQuaternion() const { return m_localRotation; }
 		DirectX::XMFLOAT3 GetLocalRotationRadians() const;
 		DirectX::XMFLOAT3 GetLocalRotationDegrees() const;
 		void SetLocalRotationQuaternion(const DirectX::XMFLOAT4& quaternion);
@@ -39,8 +39,8 @@ namespace Dive
 
 		DirectX::XMFLOAT3 GetScale() const;
 		void SetScale(const DirectX::XMFLOAT3& scale);
-		DirectX::XMFLOAT3 GetLocalScale() const { return m_LocalScale; }
-		void SetLocalScale(const DirectX::XMFLOAT3& scale) { m_LocalScale = scale; }
+		DirectX::XMFLOAT3 GetLocalScale() const { return m_localScale; }
+		void SetLocalScale(const DirectX::XMFLOAT3& scale) { m_localScale = scale; }
 
 		// 유니티에선 localToWorldMatrix, worldToLocalMatrix로 칭하는 듯 하다.
 		DirectX::XMFLOAT4X4 GetTransform() const;
@@ -58,12 +58,12 @@ namespace Dive
 		DirectX::XMFLOAT3 GetUp() const;
 
 		// hierarhy
-		bool HasParent() const { return m_Parent != nullptr; }
-		Transform* GetParent() const { return m_Parent; }
+		bool HasParent() const { return m_parent != nullptr; }
+		Transform* GetParent() const { return m_parent; }
 		void SetParent(Transform* parent);
 
-		bool HasChildren() const { return !m_Children.empty(); }
-		std::vector<Transform*>& GetChildren() { return m_Children; }
+		bool HasChildren() const { return !m_children.empty(); }
+		std::vector<Transform*>& GetChildren() { return m_children; }
 
 		bool IsChildOf(Transform* parent);
 
@@ -79,11 +79,11 @@ namespace Dive
 		void SetSiblingIndex(size_t index);
 
 	private:
-		DirectX::XMFLOAT3 m_LocalPosition{ 0.0f, 0.0f, 0.0f };
-		DirectX::XMFLOAT4 m_LocalRotation{ 0.0f, 0.0f, 0.0f, 1.0f };	// quaternion
-		DirectX::XMFLOAT3 m_LocalScale{ 1.0f, 1.0f, 1.0f };
+		DirectX::XMFLOAT3 m_localPosition{ 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT4 m_localRotation{ 0.0f, 0.0f, 0.0f, 1.0f };	// quaternion
+		DirectX::XMFLOAT3 m_localScale{ 1.0f, 1.0f, 1.0f };
 
-		Transform* m_Parent = nullptr;
-		std::vector<Transform*> m_Children;
+		Transform* m_parent = nullptr;
+		std::vector<Transform*> m_children;
 	};
 }

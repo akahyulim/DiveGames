@@ -5,7 +5,7 @@
 namespace Dive
 {
 	MenuBar::MenuBar(Editor* editor)
-		: m_Editor(editor)
+		: m_editor(editor)
 	{
 	}
 
