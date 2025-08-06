@@ -4,19 +4,22 @@
 #include "Components/Transform.h"
 #include "Components/Camera.h"
 #include "Components/MeshRenderer.h"
-#include "Common.h"
+#include "resource/ResourceManager.h"
 
 namespace Dive
 {
 	World::World(const std::string& name)
 		: m_name(name)
 	{
+		ResourceManager::Initialize();
+
 		DV_LOG(World, info, "생성: {}", m_name);
 	}
 
 	World::~World()
 	{
 		Clear();
+		ResourceManager::Clear();
 		DV_LOG(World, info, "소멸: {}", m_name);
 	}
 

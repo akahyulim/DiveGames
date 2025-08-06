@@ -1,8 +1,15 @@
-﻿#pragma once
+#pragma once
 #include "resource/Resource.h"
 
 namespace Dive
 {
+	enum class eShaderResourceSlot
+	{
+		DiffuseMap = 0,
+		NormalMap,
+		Count
+	};
+
 	class Texture : public Resource
 	{
 	public:
@@ -11,6 +18,8 @@ namespace Dive
 
 		virtual bool Create() = 0;
 		virtual void Release();
+
+		void Bind(ID3D11DeviceContext* deviceContext, eShaderResourceSlot slot);
 
 		uint32_t GetWidth() const { return m_width; }
 		uint32_t GetHeight() const { return m_height; }

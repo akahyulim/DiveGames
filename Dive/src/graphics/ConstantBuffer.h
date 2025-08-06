@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Common.h"
 
 namespace Dive
@@ -35,8 +35,8 @@ namespace Dive
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
-		eVSConstantBufferSlot m_vsSlot;
-		ePSConstantBufferSlot m_psSlot;
+		eVSConstantBufferSlot m_vsSlot = eVSConstantBufferSlot::Count;
+		ePSConstantBufferSlot m_psSlot = ePSConstantBufferSlot::Count;
 		eShaderStage m_shaderStage;
 	};
 
@@ -44,8 +44,11 @@ namespace Dive
 	template<typename T>
 	bool ConstantBuffer::Update(ID3D11DeviceContext* deviceContext, const T& data)
 	{
-		assert(deviceContext);
-		assert(m_buffer);
+		if (!m_buffer)
+		{
+			DV_LOG(ConstantBuffer, err, "[::Update] 버퍼 미생성");
+			return false;
+		}
 
 		D3D11_MAPPED_SUBRESOURCE mappedData{};
 		auto hr = deviceContext->Map(

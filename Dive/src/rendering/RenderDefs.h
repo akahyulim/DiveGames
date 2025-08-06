@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 namespace Dive
 {
@@ -24,6 +24,7 @@ namespace Dive
 		Count
 	};
 
+	// 현재 Texture의 eShaderResourceSlot과 동일한 역할이다.
 	// 엔진은 uint8_t로, 윈도우 api 사용시엔 타입변환
 	enum class eShaderTextureSlot : uint8_t
 	{
@@ -71,6 +72,15 @@ namespace Dive
 	enum class eBlendState
 	{
 		Addictive,
+		Count
+	};
+
+	enum class eSamplerState
+	{
+		WrapLinear,
+		ClampPoint,
+		ClampCubeLinear,
+		ShadowCompare,
 		Count
 	};
 

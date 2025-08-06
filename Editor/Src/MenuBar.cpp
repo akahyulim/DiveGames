@@ -43,9 +43,6 @@ namespace Dive
 					EditorContext::MainCamera = EditorContext::ActiveWorld->CreateGameObject("MainCamera");
 					EditorContext::MainCamera->SetTag("MainCamera");
 					EditorContext::MainCamera->AddComponent<Camera>();
-
-					// 임시
-					ResourceManager::SetResourceFolder("Assets");
 			
 					isShowWorldMenu = true;
 				}
@@ -56,8 +53,6 @@ namespace Dive
 					// 임시 : 현재 작업디렉토리 때문에 직렬화, 역직렬화 대상 경로가 나뉘어져 버렸다.
 					// 임시로 역직렬화할 경우 경로에 Asset를 명시적으로 추가했다.
 					// 이때문에 imgui.ini의 로딩과 저장 시점이 달라진다.
-					ResourceManager::SetResourceFolder("Assets");
-
 					EditorContext::ActiveWorld = WorldManager::CreateWorld("NewWorld");
 					WorldSerializer serializer(EditorContext::ActiveWorld);
 					serializer.Deserialize(Graphics::GetDevice(), "NewWorld.dive");
@@ -169,10 +164,6 @@ namespace Dive
 					}
 					if (ImGui::MenuItem("Point Light", nullptr, nullptr, isShowWorldMenu))
 					{
-						ResourceManager::Load<Texture2D>("Textures/dmc.jpg");
-						ResourceManager::Load<Texture2D>("Textures/DokeV.jpeg");
-						ResourceManager::Load<Texture2D>("Textures/relaxed_morning.jpg");
-						ResourceManager::Load<Texture2D>("Textures/sky_daytime_blue.jpg");
 					}
 					if (ImGui::MenuItem("Spot Light", nullptr, nullptr, isShowWorldMenu))
 					{

@@ -10,9 +10,8 @@ namespace Dive
 	class ShaderProgram;
 	class ConstantBuffer;
 
-	enum class eTextureUnitType : uint8_t
+	enum class eMapType : uint8_t
 	{
-		None = 0,
 		Diffuse,
 		Normal,
 		Specular,
@@ -30,37 +29,40 @@ namespace Dive
 		Multipy
 	};
 
-	struct MaterialConstants
+	struct alignas(16) MaterialData
 	{
 		DirectX::XMFLOAT4 diffuseColor;
 		DirectX::XMFLOAT2 tiling;
 		DirectX::XMFLOAT2 offset;
+		uint32_t propertices;
+		DirectX::XMUINT3 padding;
 	};
 
 	class Material : public Resource
 	{
 	public:
 		Material(ID3D11Device* device);
-		~Material() = default;
+		~Material() override = default;
 
 		bool LoadFromFile(const std::filesystem::path& filepath) override;
 		bool SaveToFile(const std::filesystem::path& filepath) override;
 
 		void Bind(ID3D11DeviceContext* deviceContext);
 
-		std::shared_ptr<Texture2D> GetTexture(eTextureUnitType type);
-		void SetTexture(eTextureUnitType type, std::shared_ptr<Texture2D> texture);
-		void SetTexture(eTextureUnitType type, const std::string& textureName);
+		Texture2D* GetMap(eMapType type);
+		void SetMap(eMapType type, Texture2D* texture);
+		void SetMap(eMapType type, const std::string& textureName);
+		void SetMap(eMapType type, const std::filesystem::path& filepath);
 
 		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_cpuBuffer.diffuseColor; }
-		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_cpuBuffer.diffuseColor = color; m_isDirty = true; }
-		void SetDiffuseColor(float r, float g, float b, float a) { m_cpuBuffer.diffuseColor = { r, g, b, a };  m_isDirty = true; }
+		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_cpuBuffer.diffuseColor = color; }
+		void SetDiffuseColor(float r, float g, float b, float a) { m_cpuBuffer.diffuseColor = { r, g, b, a }; }
 
 		DirectX::XMFLOAT2 GetTiling() const { return m_cpuBuffer.tiling; }
-		void SetTiling(float x, float y) { m_cpuBuffer.tiling = { x, y };  m_isDirty = true; }
+		void SetTiling(float x, float y) { m_cpuBuffer.tiling = { x, y }; }
 
 		DirectX::XMFLOAT2 GetOffset() const { return m_cpuBuffer.offset; }
-		void SetOffset(float x, float y) { m_cpuBuffer.offset = { x, y };  m_isDirty = true; }
+		void SetOffset(float x, float y) { m_cpuBuffer.offset = { x, y }; }
 
 		void SetShaders(ShaderProgram* shaders) { m_shaders = shaders; }
 
@@ -72,11 +74,9 @@ namespace Dive
 		static constexpr eResourceType GetType() { return eResourceType::Material; }
 
 	private:
-		std::unordered_map<uint8_t, std::shared_ptr<Texture2D>> m_textures;
+		std::array<Texture2D*, static_cast<size_t>(eMapType::Count)> m_maps;
 
-		bool m_isDirty = true;
-
-		MaterialConstants m_cpuBuffer;
+		MaterialData m_cpuBuffer;
 		std::unique_ptr<ConstantBuffer> m_gpuBuffer;
 
 		ShaderProgram* m_shaders = nullptr;

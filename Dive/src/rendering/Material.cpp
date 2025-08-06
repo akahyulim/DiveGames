@@ -12,20 +12,13 @@ namespace Dive
 {
     Material::Material(ID3D11Device* device)
     {
-        assert(device);
-
+        memset(&m_cpuBuffer, 0, sizeof(MaterialData));
         m_gpuBuffer = std::make_unique<ConstantBuffer>(
             device, 
             ePSConstantBufferSlot::Material, 
-            static_cast<uint32_t>(sizeof(MaterialConstants)));
+            static_cast<uint32_t>(sizeof(MaterialData)));
         if (!m_gpuBuffer) DV_LOG(Material, err, "[::Material] ConstantBuffer 생성 실패");
-
-        m_cpuBuffer.diffuseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-        m_cpuBuffer.tiling = { 1.0f, 1.0f };
-        m_cpuBuffer.offset = { 0.0f, 0.0f };
-
-        m_isDirty = true;
-
+        
         SetName("Standard");
     }
 
@@ -38,44 +31,36 @@ namespace Dive
         }
         catch (const YAML::ParserException& e)
         {
-            DV_LOG(Material, err, "[::LoadFromFile] YAML 파싱 실패: {}", e.what());
+            DV_LOG(Material, err, "[::LoadFromFile] YAML LoadFile 실패: {}", e.what());
             return false;
         }
 
         if (data["Material"])
             SetName(data["Material"].as<std::string>());
-
-        // 셰이더 이름을 읽어야 한다.
        
-        if (data["DiffuseTexture"])
-            SetTexture(eTextureUnitType::Diffuse, data["DiffuseTexture"].as<std::string>());
-      
-        if (data["DiffuseColor"])
-            m_cpuBuffer.diffuseColor = data["DiffuseColor"].as<DirectX::XMFLOAT4>();
-
-        if (data["Tiling"])
-            m_cpuBuffer.tiling = data["Tiling"].as<DirectX::XMFLOAT2>();
-
-        if (data["Offset"])
-            m_cpuBuffer.offset = data["Offset"].as<DirectX::XMFLOAT2>();
+        if (data["DiffuseMap"])     SetMap(eMapType::Diffuse, data["DiffuseMap"].as<std::string>());
+        if (data["DiffuseColor"])   m_cpuBuffer.diffuseColor = data["DiffuseColor"].as<DirectX::XMFLOAT4>();
+        if (data["Tiling"])         m_cpuBuffer.tiling = data["Tiling"].as<DirectX::XMFLOAT2>();
+        if (data["Offset"])         m_cpuBuffer.offset = data["Offset"].as<DirectX::XMFLOAT2>();
+        if (data["Propertices"])    m_cpuBuffer.propertices = data["Propertices"].as<uint32_t>();
 
         return true;
     }
 
     bool Material::SaveToFile(const std::filesystem::path& filepath)
     {
-        const std::string& diffuseTexture = m_textures[static_cast<uint8_t>(eTextureUnitType::Diffuse)] ?
-			m_textures[static_cast<uint8_t>(eTextureUnitType::Diffuse)]->GetName() : "";
+        const std::string& diffuseTexture = m_maps[static_cast<uint8_t>(eMapType::Diffuse)] ?
+			m_maps[static_cast<uint8_t>(eMapType::Diffuse)]->GetName() : "";
 
         YAML::Emitter out;
         out << YAML::BeginMap;
         out << YAML::Key << "Material" << YAML::Value << GetName();
 
-        // 셰이더 이름을 저장해야 한다.
-        out << YAML::Key << "DiffuseTexture" << YAML::Value << diffuseTexture;
+        out << YAML::Key << "DiffuseMap" << YAML::Value << diffuseTexture;
         out << YAML::Key << "DiffuseColor" << YAML::Value << m_cpuBuffer.diffuseColor;
         out << YAML::Key << "Tiling" << YAML::Value << m_cpuBuffer.tiling;
         out << YAML::Key << "Offset" << YAML::Value << m_cpuBuffer.offset;
+        out << YAML::Key << "Propertices" << YAML::Value << m_cpuBuffer.propertices;
 
         out << YAML::EndMap;
 
@@ -91,48 +76,103 @@ namespace Dive
     {
         assert(deviceContext);
 
+        ShaderManager::BindInputLayout("Unlit_VS", eInputLayout::Lit, deviceContext);
         ShaderManager::GetShader("Unlit_VS")->Bind(deviceContext);
         ShaderManager::GetShader("Unlit_PS")->Bind(deviceContext);
-        ShaderManager::BindInputLayout("Unlit_VS", eInputLayout::Lit, deviceContext);
 
-        // 결국엔 이걸 사용해야 할 거다.
         //if (m_shaders)
         //    m_shaders->Bind(deviceContext);
 
-        // constant buffer
-        MaterialConstants data{};
-        data.diffuseColor = GetDiffuseColor();
-        data.offset = GetOffset();
-        data.tiling = GetTiling();
-        m_gpuBuffer->Update<MaterialConstants>(deviceContext, m_cpuBuffer);
-        m_gpuBuffer->Bind(deviceContext);
-
         // shader resources
+        if (m_maps[static_cast<size_t>(eMapType::Diffuse)])
+            m_maps[static_cast<size_t>(eMapType::Diffuse)]->Bind(deviceContext, eShaderResourceSlot::DiffuseMap);
+
+        // constant buffer
+        m_gpuBuffer->Update<MaterialData>(deviceContext, m_cpuBuffer);
+        m_gpuBuffer->Bind(deviceContext);
     }
 
-    std::shared_ptr<Texture2D> Material::GetTexture(eTextureUnitType type)
+    Texture2D* Material::GetMap(eMapType type)
     {
-        assert(type != eTextureUnitType::None);
-		return m_textures[static_cast<uint8_t>(type)];
+        if (type == eMapType::Count)
+        {
+            DV_LOG(Material, err, "[::GetMap] 잘못된 MapType 전달");
+            return nullptr;
+        }
+
+		return m_maps[static_cast<size_t>(type)];
     }
 
-    void Material::SetTexture(eTextureUnitType type, std::shared_ptr<Texture2D> texture)
+    void Material::SetMap(eMapType type, Texture2D* texture)
     {
-		assert(type != eTextureUnitType::None);
+        if (type == eMapType::Count)
+        {
+            DV_LOG(Material, err, "[::SetMap] 잘못된 MapType 전달");
+            return;
+        }
 
-        m_textures[static_cast<uint8_t>(type)] = texture;
-        
-        m_isDirty = true;
+        m_maps[static_cast<size_t>(type)] = texture;
+
+        switch (type)
+        {
+        case eMapType::Diffuse:
+            m_cpuBuffer.propertices = m_maps[static_cast<size_t>(type)] ? (1U << 0) : 0;
+            break;
+        case eMapType::Normal:
+            m_cpuBuffer.propertices = m_maps[static_cast<size_t>(type)] ? (1U << 1) : 0;
+            break;
+        default:
+            break;
+        }
+
     }
 
-    void Material::SetTexture(eTextureUnitType type, const std::string& textureName)
+    void Material::SetMap(eMapType type, const std::string& textureName)
     {
-        assert(type != eTextureUnitType::None);
+        if (type == eMapType::Count)
+        {
+            DV_LOG(Material, err, "[::SetMap] 잘못된 MapType 전달");
+            return;
+        }
 
-		auto diffuseTex = ResourceManager::GetByName<Texture2D>(textureName);
-		m_textures[static_cast<uint8_t>(type)] = diffuseTex;
+		auto mapTexture = ResourceManager::GetByName<Texture2D>(textureName);
+        m_maps[static_cast<size_t>(type)] = mapTexture;
 
-		m_isDirty = true;
+        switch (type)
+        {
+        case eMapType::Diffuse:
+            m_cpuBuffer.propertices |= mapTexture ? (1U << 0) : 0;
+            break;
+        case eMapType::Normal:
+            m_cpuBuffer.propertices |= mapTexture ? (1U << 1) : 0;
+            break;
+        default:
+            break;
+        }
+    }
+
+    void Material::SetMap(eMapType type, const std::filesystem::path& filepath)
+    {
+        if (type == eMapType::Count)
+        {
+            DV_LOG(Material, err, "[::SetMap] 잘못된 MapType 전달");
+            return;
+        }
+
+        auto mapTexture = ResourceManager::GetOrLoadByPath<Texture2D>(filepath);
+        m_maps[static_cast<size_t>(type)] = mapTexture;
+
+        switch (type)
+        {
+        case eMapType::Diffuse:
+            m_cpuBuffer.propertices |= mapTexture ? (1U << 0) : 0;
+            break;
+        case eMapType::Normal:
+            m_cpuBuffer.propertices |= mapTexture ? (1U << 1) : 0;
+            break;
+        default:
+            break;
+        }
     }
 
     bool Material::IsTransparent() const
