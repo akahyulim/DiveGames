@@ -97,7 +97,7 @@ namespace Dive
 				out << YAML::Key << "SourceType" << YAML::Value << static_cast<int>(staticMesh->GetSourceType());
 				out << YAML::Key << "StaticMesh" << YAML::Value << staticMesh->GetName();
 				out << YAML::Key << "Material" << YAML::Value << material->GetName();
-				material->SaveToFile("Materials/" + material->GetName() + ".mat");
+				material->SaveToFile("Assets/Materials/" + material->GetName() + ".mat");
 				out << YAML::EndMap; // MeshRenderer
 			}
 
@@ -206,7 +206,7 @@ namespace Dive
 				
 				// 이것두 default는 리소스 매니져에서, file은 직접?
 				std::shared_ptr<Material> material = std::make_shared<Material>(device);
-				material->LoadFromFile("Materials/" + meshRendererNode["Material"].as<std::string>() + ".mat");
+				material->LoadFromFile("Assets/Materials/" + meshRendererNode["Material"].as<std::string>() + ".mat");
 				meshRenderer->SetMaterial(material);
 				
 				fileIDToObject[staticMeshID] = meshRenderer;

@@ -1,0 +1,3 @@
+Material:
+  DiffuseMap: "Assets/Textures/no_texture.png"
+  DiffuseColor: [1, 1, 1, 1]

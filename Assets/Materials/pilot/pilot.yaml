@@ -1,0 +1,3 @@
+Material:
+  AlbedoMap: "Assets/Textures/pilot/Material.002_Base_Color.png"
+  AlbedoColor: [1, 1, 1, 1]
