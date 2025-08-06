@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "RenderDefs.h"
 
 namespace Dive
@@ -25,12 +25,16 @@ namespace Dive
 		static ID3D11RasterizerState* GetRasterizerState(eRasterizerState type);
 		static ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilState type);
 		static ID3D11BlendState* GetBlendState(eBlendState type);
+		// 이게 아니라 그냥 배열로 전달하는 편이 나을 것 같다.
+		// 아니면 아에 PSSetSmaplerState를 구성해 놓는 편이 나을지도...
+		static ID3D11SamplerState* GetSamplerState(eSamplerState type);
+		static void BindSamplerStates();
 
 	private:
-		static void createShaders();
-		static void createRasterizerStates();
-		static void createDepthStencilStates();
-		static void createBlendStates();
+		static void CreateRasterizerStates();
+		static void CreateDepthStencilStates();
+		static void CreateBlendStates();
+		static void CreateSamplerStates();
 		
 	private:
 		static uint32_t s_renderTargetWidth;
@@ -49,8 +53,8 @@ namespace Dive
 		static std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> s_rasterizerStates;
 		static std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> s_depthSteniclStates;
 		static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> s_blendStates;
+		static std::array<Microsoft::WRL::ComPtr<ID3D11SamplerState>, static_cast<size_t>(eSamplerState::Count)> s_samplerStates;
 	
-
 		static std::vector<std::unique_ptr<RenderPass>> s_renderPasses;
 	};
 }

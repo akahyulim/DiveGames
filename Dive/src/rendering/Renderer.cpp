@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "Renderer.h"
 #include "StaticMesh.h"
 #include "Material.h"
@@ -30,6 +30,7 @@ namespace Dive
 	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> Renderer::s_rasterizerStates;
 	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> Renderer::s_depthSteniclStates;
 	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> Renderer::s_blendStates;
+	std::array<Microsoft::WRL::ComPtr<ID3D11SamplerState>, static_cast<size_t>(eSamplerState::Count)> Renderer::s_samplerStates;
 
 	std::vector<std::unique_ptr<RenderPass>> Renderer::s_renderPasses;
 
@@ -37,9 +38,10 @@ namespace Dive
 	{
 		ResizeRenderBuffers(Graphics::GetWidth(), Graphics::GetHeight());
 
-		createRasterizerStates();
-		createDepthStencilStates();
-		createBlendStates();
+		CreateRasterizerStates();
+		CreateDepthStencilStates();
+		CreateBlendStates();
+		CreateSamplerStates();
 
 		s_renderPasses.emplace_back(std::make_unique<TestPass>());
 
@@ -47,7 +49,7 @@ namespace Dive
 	}
 
 	void Renderer::Shutdown()
-	{	
+	{
 		DV_DELETE(s_gBufferRT0);
 		DV_DELETE(s_gBufferRT1);
 		DV_DELETE(s_gBufferRT2);
@@ -89,7 +91,7 @@ namespace Dive
 			WorldManager::GetActiveWorld()->CullAndSort(camera);
 
 			auto deviceContext = Graphics::GetDeviceContext();
-			
+
 			// begin frame?
 
 			for (auto& pass : s_renderPasses)
@@ -103,7 +105,7 @@ namespace Dive
 	{
 		if (s_renderTargetWidth == width && s_renderTargetHeight == height)
 			return;
-		
+
 		// G-Buffer
 		{
 			if (!s_gBufferRT0)
@@ -139,7 +141,7 @@ namespace Dive
 
 		// FrameRender
 		// FrameOutput
-		
+
 		if (!s_renderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)])
 		{
 			s_renderTargets[static_cast<size_t>(eRenderTarget::FrameOutput)] = new RenderTexture(width, height);
@@ -153,7 +155,7 @@ namespace Dive
 		s_renderTargetWidth = width;
 		s_renderTargetHeight = height;
 	}
-	
+
 	RenderTexture* Renderer::GetGBuffer(eGBuffer type)
 	{
 		switch (type)
@@ -185,19 +187,27 @@ namespace Dive
 		return type != eDepthStencilState::Count ? s_depthSteniclStates[static_cast<size_t>(type)] : nullptr;
 	}
 
-	ID3D11BlendState* Renderer::GetBlendState(eBlendState type) 
-	{ 
-		return type != eBlendState::Count ? s_blendStates[static_cast<size_t>(type)] : nullptr; 
-	}
-
-	void Renderer::createShaders()
+	ID3D11BlendState* Renderer::GetBlendState(eBlendState type)
 	{
-		// vertex shaders
-
-		// pixel shaders
+		return type != eBlendState::Count ? s_blendStates[static_cast<size_t>(type)] : nullptr;
 	}
 
-	void Renderer::createRasterizerStates()
+	ID3D11SamplerState* Renderer::GetSamplerState(eSamplerState type)
+	{
+		return type != eSamplerState::Count ? s_samplerStates[static_cast<size_t>(type)].Get() : nullptr;
+	}
+
+	void Renderer::BindSamplerStates()
+	{
+		auto deviceContext = Graphics::GetDeviceContext();
+		std::array<ID3D11SamplerState*, static_cast<size_t>(eSamplerState::Count)> samplerStates{};
+		for (size_t i = 0; i < samplerStates.size(); ++i)
+			samplerStates[i] = s_samplerStates[i].Get();
+
+		deviceContext->PSSetSamplers(0, static_cast<UINT>(samplerStates.size()), samplerStates.data());
+	}
+
+	void Renderer::CreateRasterizerStates()
 	{
 		D3D11_RASTERIZER_DESC desc{};
 
@@ -225,8 +235,8 @@ namespace Dive
 			DV_LOG(Renderer, err, "RasterizerState FillSolid_CullNode 생성 실패");
 		}
 	}
-	
-	void Renderer::createDepthStencilStates()
+
+	void Renderer::CreateDepthStencilStates()
 	{
 		D3D11_DEPTH_STENCIL_DESC desc;
 
@@ -337,8 +347,8 @@ namespace Dive
 			}
 		}
 	}
-	
-	void Renderer::createBlendStates()
+
+	void Renderer::CreateBlendStates()
 	{
 		// Addictive
 		D3D11_BLEND_DESC desc{};
@@ -357,6 +367,84 @@ namespace Dive
 		if (FAILED(Graphics::GetDevice()->CreateBlendState(&desc, &s_blendStates[static_cast<size_t>(eBlendState::Addictive)])))
 		{
 			DV_LOG(Renderer, err, "BlandState Addictive 생성 실패");
+		}
+	}
+
+	void Renderer::CreateSamplerStates()
+	{
+		auto device = Graphics::GetDevice();
+
+		// WrapLinear
+		{
+			D3D11_SAMPLER_DESC samplerDesc{};
+			samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+			samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+			samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+			
+			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::WrapLinear)].GetAddressOf());
+			if (FAILED(hr))
+			{
+				DV_LOG(Renderer, err, "[::CreateSamplerStates] WrapLinear SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return;
+			}
+		}
+
+		// ClampPoint
+		{
+			D3D11_SAMPLER_DESC samplerDesc{};
+			samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+			samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+			
+			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::ClampPoint)].GetAddressOf());
+			if (FAILED(hr))
+			{
+				DV_LOG(Renderer, err, "[::CreateSamplerStates] ClampPoint SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return;
+			}
+		}
+
+		// ClampCubeLinear
+		{
+			D3D11_SAMPLER_DESC samplerDesc{};
+			samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+			samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+			
+			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::ClampCubeLinear)].GetAddressOf());
+			if (FAILED(hr))
+			{
+				DV_LOG(Renderer, err, "[::CreateSamplerStates] ClampCubeLinear SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return;
+			}
+		}
+
+		// ShadowCompare
+		{
+			D3D11_SAMPLER_DESC samplerDesc{};
+			samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+			samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+			samplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS;
+			samplerDesc.BorderColor[0] = 1.0f;
+			samplerDesc.BorderColor[1] = 1.0f;
+			samplerDesc.BorderColor[2] = 1.0f;
+			samplerDesc.BorderColor[3] = 1.0f;
+			samplerDesc.MinLOD = 0.0f;
+			samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+			samplerDesc.MipLODBias = 0.0f;
+
+			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::ShadowCompare)].GetAddressOf());
+			if (FAILED(hr))
+			{
+				DV_LOG(Renderer, err, "[::CreateSamplerStates] ShadowCompare SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return;
+			}
 		}
 	}
 }

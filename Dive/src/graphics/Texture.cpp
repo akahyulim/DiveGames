@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "Texture.h"
 
 namespace Dive
@@ -7,6 +7,17 @@ namespace Dive
 	{
 		m_shaderResourceView.Reset();
 		m_texture.Reset();
+	}
+
+	void Texture::Bind(ID3D11DeviceContext* deviceContext, eShaderResourceSlot slot)
+	{
+		if (slot == eShaderResourceSlot::Count)
+		{
+			DV_LOG(Texture, err, "[::Bind] 잘못된 슬롯 지정");
+			return;
+		}
+
+		deviceContext->PSSetShaderResources(static_cast<UINT>(slot), 1, m_shaderResourceView.GetAddressOf());
 	}
 
 	uint32_t Texture::CalculateMipmapLevels(uint32_t width, uint32_t height)

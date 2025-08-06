@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Component.h"
 #include "math/Frustum.h"
 
@@ -9,7 +9,7 @@ namespace Dive
 	class ConstantBuffer;
 	class Camera;
 
-	struct ObjectData
+	struct alignas(16) ObjectData
 	{
 		DirectX::XMMATRIX model;
 		DirectX::XMMATRIX View;

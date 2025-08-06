@@ -6,7 +6,6 @@
 #include "graphics/ShaderManager.h"
 #include "rendering/Renderer.h"
 #include "world/World.h"
-#include "resource/ResourceManager.h"
 
 namespace Dive
 {
@@ -57,7 +56,6 @@ namespace Dive
 		DV_LOG(Engine, info, "셧다운 시작");
 
 		WorldManager::Clear();
-		ResourceManager::Clear();
 		ShaderManager::Clear();
 		Input::Shutdown();
 		Renderer::Shutdown();

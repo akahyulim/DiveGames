@@ -1,14 +1,28 @@
 ﻿#include "stdafx.h"
 #include "ResourceManager.h"
+#include "graphics/Texture2D.h"
 
 namespace Dive
 {
-	std::unordered_map<eResourceType, std::vector<std::shared_ptr<Resource>>> ResourceManager::s_resources;
+	std::unordered_map<eResourceType, std::vector<std::unique_ptr<Resource>>> ResourceManager::s_resources;
 	std::filesystem::path ResourceManager::s_resourceFolder = "Assets";
+
+	bool ResourceManager::Initialize()
+	{
+		SetResourceFolder("Assets");
+
+		// texture2D
+		Load<Texture2D>("Textures/dmc.jpg");
+		Load<Texture2D>("Textures/DokeV.jpeg");
+		Load<Texture2D>("Textures/relaxed_morning.jpg");
+		Load<Texture2D>("Textures/sky_daytime_blue.jpg");
+		Load<Texture2D>("Textures/stone01.tga");
+
+		return true;
+	}
 
 	void ResourceManager::Clear()
 	{
-		// shared_ptr 대신 unique_ptr, raw pointer 조합이 맞는 것 같다.
 		s_resources.clear();
 
 		DV_LOG(ResourceManager, info, "클리어 완료");
@@ -31,9 +45,7 @@ namespace Dive
 	{
 		uint32_t count = 0;
 		for (const auto& [type, resources] : s_resources)
-		{
 			count += static_cast<uint32_t>(resources.size());
-		}
 		return count;
 	}
 

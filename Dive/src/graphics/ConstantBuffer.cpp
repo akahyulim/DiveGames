@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "ConstantBuffer.h"
 #include "Graphics.h"
 #include "Common.h"
@@ -9,8 +9,11 @@ namespace Dive
 		: m_vsSlot(slot)
 		, m_shaderStage(eShaderStage::VertexShader)
 	{
-		assert(device);
-		assert(slot < eVSConstantBufferSlot::Count);
+		if (slot == eVSConstantBufferSlot::Count)
+		{
+			DV_LOG(ConstantBuffer, err, "[::ConstantBuffer] 잘못된 버퍼 슬롯으로 초기화");
+			return;
+		}
 
 		D3D11_BUFFER_DESC bufferDesc{};
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -26,8 +29,11 @@ namespace Dive
 		: m_psSlot(slot)
 		, m_shaderStage(eShaderStage::PixelShader)
 	{
-		assert(device);
-		assert(slot < ePSConstantBufferSlot::Count);
+		if(slot == ePSConstantBufferSlot::Count)
+		{
+			DV_LOG(ConstantBuffer, err, "[::ConstantBuffer] 잘못된 버퍼 슬롯으로 초기화");
+			return;
+		}
 
 		D3D11_BUFFER_DESC bufferDesc{};
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -41,7 +47,11 @@ namespace Dive
 
 	void ConstantBuffer::Bind(ID3D11DeviceContext* deviceContext)
 	{
-		assert(deviceContext);
+		if (!m_buffer)
+		{
+			DV_LOG(ConstantBuffer, err, "[::Bind] 버퍼 미생성");
+			return;
+		}
 
 		switch (m_shaderStage)
 		{
@@ -52,7 +62,7 @@ namespace Dive
 			deviceContext->PSSetConstantBuffers(static_cast<UINT>(m_psSlot), 1, m_buffer.GetAddressOf());
 			break;
 		default:
-			assert(false && "지원하지 않는 셰이더 스테이지");
+			DV_LOG(ConstantBuffer, err, "[::Bind] 잘못된 셰이더 스테이지 적용");
 			break;
 		}
 	}
