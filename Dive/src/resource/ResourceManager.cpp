@@ -5,18 +5,17 @@
 namespace Dive
 {
 	std::unordered_map<eResourceType, std::vector<std::unique_ptr<Resource>>> ResourceManager::s_resources;
-	std::filesystem::path ResourceManager::s_resourceFolder = "Assets";
 
 	bool ResourceManager::Initialize()
 	{
-		SetResourceFolder("Assets");
+		//SetResourceFolder("Assets");
 
 		// texture2D
-		Load<Texture2D>("Textures/dmc.jpg");
-		Load<Texture2D>("Textures/DokeV.jpeg");
-		Load<Texture2D>("Textures/relaxed_morning.jpg");
-		Load<Texture2D>("Textures/sky_daytime_blue.jpg");
-		Load<Texture2D>("Textures/stone01.tga");
+		Load<Texture2D>("Assets/Textures/dmc.jpg");
+		Load<Texture2D>("Assets/Textures/DokeV.jpeg");
+		Load<Texture2D>("Assets/Textures/relaxed_morning.jpg");
+		Load<Texture2D>("Assets/Textures/sky_daytime_blue.jpg");
+		Load<Texture2D>("Assets/Textures/stone01.tga");
 
 		return true;
 	}
@@ -47,17 +46,5 @@ namespace Dive
 		for (const auto& [type, resources] : s_resources)
 			count += static_cast<uint32_t>(resources.size());
 		return count;
-	}
-
-	void ResourceManager::SetResourceFolder(const std::filesystem::path& path)
-	{
-		if (!std::filesystem::is_directory(path) || !std::filesystem::exists(path))
-		{
-			DV_LOG(ResourceManager, err, "[::SetResourceFolder] 잘못된 에셋 폴더 경로 전달: {}", path.string());
-			return;
-		}
-
-		s_resourceFolder = path;
-		std::filesystem::current_path(s_resourceFolder);
 	}
 }

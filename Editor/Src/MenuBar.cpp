@@ -55,7 +55,7 @@ namespace Dive
 					// 이때문에 imgui.ini의 로딩과 저장 시점이 달라진다.
 					EditorContext::ActiveWorld = WorldManager::CreateWorld("NewWorld");
 					WorldSerializer serializer(EditorContext::ActiveWorld);
-					serializer.Deserialize(Graphics::GetDevice(), "NewWorld.dive");
+					serializer.Deserialize(Graphics::GetDevice(), "Assets/Worlds/NewWorld.dive");
 
 					auto allCameras = Camera::GetAllCameras();
 					for (auto camera : allCameras)
@@ -71,7 +71,7 @@ namespace Dive
 				if (ImGui::MenuItem("Save World", nullptr, nullptr, isShowWorldMenu))
 				{
 					WorldSerializer serializer(EditorContext::ActiveWorld);
-					serializer.Serialize("NewWorld.dive");
+					serializer.Serialize("Assets/Worlds/NewWorld.dive");
 				}
 
 				if (ImGui::MenuItem("Save World As...", nullptr, nullptr, isShowWorldMenu))

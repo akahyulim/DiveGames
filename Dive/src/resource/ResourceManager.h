@@ -111,11 +111,7 @@ namespace Dive
 
 		static uint32_t GetAllResourceCount();
 
-		static std::string GetResourceFolder() { return s_resourceFolder.string(); }
-		static void SetResourceFolder(const std::filesystem::path& path);
-
 	private:
 		static std::unordered_map<eResourceType, std::vector<std::unique_ptr<Resource>>> s_resources;
-		static std::filesystem::path s_resourceFolder;
 	};
 }

@@ -1,0 +1,123 @@
+World: NewWorld
+GameObjects:
+  - fileID: 1
+    Name: EditorCamera
+    Tag: EditorOnly
+    Transform:
+      fileID: 2
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0, 1]
+      Scale: [1, 1, 1]
+    Camera:
+      fileID: 3
+      ProjectionType: 0
+      FieldOfView: 45
+      NearClipPlane: 0.1
+      FarClipPlane: 5000
+      ViewportLeft: 0
+      ViewportTop: 0
+      ViewportRight: 1
+      ViewportBottom: 1
+      BackgroundColor: [1, 1, 1, 1]
+  - fileID: 4
+    Name: MainCamera
+    Tag: MainCamera
+    Transform:
+      fileID: 5
+      Position: [0, 5, -15]
+      Rotation: [0.1736481, -0, 0, 0.9848078]
+      Scale: [1, 1, 1]
+    Camera:
+      fileID: 6
+      ProjectionType: 0
+      FieldOfView: 45
+      NearClipPlane: 0.1
+      FarClipPlane: 5000
+      ViewportLeft: 0
+      ViewportTop: 0
+      ViewportRight: 1
+      ViewportBottom: 1
+      BackgroundColor: [0.078760415, 0.038455375, 0.30379748, 1]
+  - fileID: 7
+    Name: Plane
+    Tag: Untagged
+    Transform:
+      fileID: 8
+      Position: [0, -3, 0]
+      Rotation: [0, -0, 0, 1]
+      Scale: [1, 1, 1]
+    MeshRenderer:
+      fileID: 9
+      SourceType: 2
+      StaticMesh: PlaneMesh
+      Material: Gray
+  - fileID: 10
+    Name: Quad
+    Tag: Untagged
+    Transform:
+      fileID: 11
+      Position: [-3, 4, 0]
+      Rotation: [0, -0, 0, 1]
+      Scale: [1, 1, 1]
+      Parent: 8
+    MeshRenderer:
+      fileID: 12
+      SourceType: 2
+      StaticMesh: QuadMesh
+      Material: Blue
+  - fileID: 13
+    Name: Triangle
+    Tag: Untagged
+    Transform:
+      fileID: 14
+      Position: [0, 2, -5]
+      Rotation: [0, -0, 0, 1]
+      Scale: [1, 1, 1]
+      Parent: 8
+    MeshRenderer:
+      fileID: 15
+      SourceType: 2
+      StaticMesh: TriangleMesh
+      Material: Red
+  - fileID: 16
+    Name: Cube
+    Tag: Untagged
+    Transform:
+      fileID: 17
+      Position: [0, 4, 0]
+      Rotation: [0, 0.38268337, 0, 0.92387956]
+      Scale: [1, 1, 1]
+      Parent: 8
+    MeshRenderer:
+      fileID: 18
+      SourceType: 2
+      StaticMesh: CubeMesh
+      Material: Yellow
+  - fileID: 19
+    Name: Sphere
+    Tag: Untagged
+    Transform:
+      fileID: 20
+      Position: [3, 3, -7]
+      Rotation: [0, -0, 0, 1]
+      Scale: [1, 1, 1]
+      Parent: 8
+    MeshRenderer:
+      fileID: 21
+      SourceType: 2
+      StaticMesh: SphereMesh
+      Material: Black
+  - fileID: 22
+    Name: Capsule
+    Tag: Untagged
+    Transform:
+      fileID: 23
+      Position: [2, 6, 0]
+      Rotation: [0, -0, 0, 1]
+      Scale: [1, 1, 1]
+      Parent: 8
+    MeshRenderer:
+      fileID: 24
+      SourceType: 2
+      StaticMesh: CapsuleMesh
+      Material: Wierd
