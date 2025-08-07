@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "Material.h"
 #include "graphics/Texture2D.h"
 #include "graphics/ShaderManager.h"
@@ -12,12 +12,13 @@ namespace Dive
 {
     Material::Material(ID3D11Device* device)
     {
-        memset(&m_cpuBuffer, 0, sizeof(MaterialData));
         m_gpuBuffer = std::make_unique<ConstantBuffer>(
             device, 
             ePSConstantBufferSlot::Material, 
             static_cast<uint32_t>(sizeof(MaterialData)));
         if (!m_gpuBuffer) DV_LOG(Material, err, "[::Material] ConstantBuffer 생성 실패");
+
+        m_maps.fill(nullptr);
         
         SetName("Standard");
     }
@@ -35,14 +36,12 @@ namespace Dive
             return false;
         }
 
-        if (data["Material"])
-            SetName(data["Material"].as<std::string>());
+        if (data["Material"])       SetName(data["Material"].as<std::string>());
        
         if (data["DiffuseMap"])     SetMap(eMapType::Diffuse, data["DiffuseMap"].as<std::string>());
         if (data["DiffuseColor"])   m_cpuBuffer.diffuseColor = data["DiffuseColor"].as<DirectX::XMFLOAT4>();
         if (data["Tiling"])         m_cpuBuffer.tiling = data["Tiling"].as<DirectX::XMFLOAT2>();
         if (data["Offset"])         m_cpuBuffer.offset = data["Offset"].as<DirectX::XMFLOAT2>();
-        if (data["Propertices"])    m_cpuBuffer.propertices = data["Propertices"].as<uint32_t>();
 
         return true;
     }
@@ -60,7 +59,6 @@ namespace Dive
         out << YAML::Key << "DiffuseColor" << YAML::Value << m_cpuBuffer.diffuseColor;
         out << YAML::Key << "Tiling" << YAML::Value << m_cpuBuffer.tiling;
         out << YAML::Key << "Offset" << YAML::Value << m_cpuBuffer.offset;
-        out << YAML::Key << "Propertices" << YAML::Value << m_cpuBuffer.propertices;
 
         out << YAML::EndMap;
 
@@ -96,7 +94,7 @@ namespace Dive
     {
         if (type == eMapType::Count)
         {
-            DV_LOG(Material, err, "[::GetMap] 잘못된 MapType 전달");
+            DV_LOG(Material, err, "[::GetMap] 잘못된 맵 타입");
             return nullptr;
         }
 
@@ -107,7 +105,7 @@ namespace Dive
     {
         if (type == eMapType::Count)
         {
-            DV_LOG(Material, err, "[::SetMap] 잘못된 MapType 전달");
+            DV_LOG(Material, err, "[::SetMap] 잘못된 맵 타입");
             return;
         }
 
@@ -116,10 +114,10 @@ namespace Dive
         switch (type)
         {
         case eMapType::Diffuse:
-            m_cpuBuffer.propertices = m_maps[static_cast<size_t>(type)] ? (1U << 0) : 0;
+            m_cpuBuffer.textureMask = m_maps[static_cast<size_t>(type)] ? (1U << 0) : 0;
             break;
         case eMapType::Normal:
-            m_cpuBuffer.propertices = m_maps[static_cast<size_t>(type)] ? (1U << 1) : 0;
+            m_cpuBuffer.textureMask = m_maps[static_cast<size_t>(type)] ? (1U << 1) : 0;
             break;
         default:
             break;
@@ -131,7 +129,7 @@ namespace Dive
     {
         if (type == eMapType::Count)
         {
-            DV_LOG(Material, err, "[::SetMap] 잘못된 MapType 전달");
+            DV_LOG(Material, err, "[::SetMap] 잘못된 맵 타입");
             return;
         }
 
@@ -141,10 +139,10 @@ namespace Dive
         switch (type)
         {
         case eMapType::Diffuse:
-            m_cpuBuffer.propertices |= mapTexture ? (1U << 0) : 0;
+            m_cpuBuffer.textureMask |= mapTexture ? (1U << 0) : 0;
             break;
         case eMapType::Normal:
-            m_cpuBuffer.propertices |= mapTexture ? (1U << 1) : 0;
+            m_cpuBuffer.textureMask |= mapTexture ? (1U << 1) : 0;
             break;
         default:
             break;
@@ -155,7 +153,7 @@ namespace Dive
     {
         if (type == eMapType::Count)
         {
-            DV_LOG(Material, err, "[::SetMap] 잘못된 MapType 전달");
+            DV_LOG(Material, err, "[::SetMap] 잘못된 맵 타입");
             return;
         }
 
@@ -165,10 +163,10 @@ namespace Dive
         switch (type)
         {
         case eMapType::Diffuse:
-            m_cpuBuffer.propertices |= mapTexture ? (1U << 0) : 0;
+            m_cpuBuffer.textureMask |= mapTexture ? (1U << 0) : 0;
             break;
         case eMapType::Normal:
-            m_cpuBuffer.propertices |= mapTexture ? (1U << 1) : 0;
+            m_cpuBuffer.textureMask |= mapTexture ? (1U << 1) : 0;
             break;
         default:
             break;

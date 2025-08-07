@@ -382,7 +382,7 @@ namespace Dive
 			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
 			samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-			
+
 			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::WrapLinear)].GetAddressOf());
 			if (FAILED(hr))
 			{
@@ -398,7 +398,7 @@ namespace Dive
 			samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-			
+
 			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::ClampPoint)].GetAddressOf());
 			if (FAILED(hr))
 			{
@@ -414,7 +414,7 @@ namespace Dive
 			samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-			
+
 			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::ClampCubeLinear)].GetAddressOf());
 			if (FAILED(hr))
 			{
