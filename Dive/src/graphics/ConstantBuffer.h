@@ -40,7 +40,6 @@ namespace Dive
 		eShaderStage m_shaderStage;
 	};
 
-
 	template<typename T>
 	bool ConstantBuffer::Update(ID3D11DeviceContext* deviceContext, const T& data)
 	{

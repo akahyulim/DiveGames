@@ -29,7 +29,7 @@ namespace Dive
 		: m_psSlot(slot)
 		, m_shaderStage(eShaderStage::PixelShader)
 	{
-		if(slot == ePSConstantBufferSlot::Count)
+		if (slot == ePSConstantBufferSlot::Count)
 		{
 			DV_LOG(ConstantBuffer, err, "[::ConstantBuffer] 잘못된 버퍼 슬롯으로 초기화");
 			return;

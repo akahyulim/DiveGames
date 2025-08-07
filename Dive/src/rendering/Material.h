@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "resource/Resource.h"
 #include "graphics/Graphics.h"
 
@@ -31,11 +31,11 @@ namespace Dive
 
 	struct alignas(16) MaterialData
 	{
-		DirectX::XMFLOAT4 diffuseColor;
-		DirectX::XMFLOAT2 tiling;
-		DirectX::XMFLOAT2 offset;
-		uint32_t propertices;
-		DirectX::XMUINT3 padding;
+		DirectX::XMFLOAT4 diffuseColor{0.0f, 0.0f, 0.0f, 1.0f};
+		DirectX::XMFLOAT2 tiling{1.0f, 1.0f};
+		DirectX::XMFLOAT2 offset{0.0f, 0.0f};
+		uint32_t textureMask{};
+		uint32_t padding[3]{};
 	};
 
 	class Material : public Resource
