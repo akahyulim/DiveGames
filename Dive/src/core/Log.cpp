@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Log.h"
 #include <spdlog/sinks/stdout_color_sinks.h>
-#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/daily_file_sink.h>
 
 namespace Dive
 {
@@ -15,14 +15,16 @@ namespace Dive
 		
 		if (!logger)
 		{
-			std::vector<spdlog::sink_ptr> logSinks;
-			logSinks.emplace_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-			logSinks.emplace_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(s_filename, true));
+			static std::vector<spdlog::sink_ptr> sharedSinks =
+			{
+				std::make_shared<spdlog::sinks::stdout_color_sink_mt>(),
+				std::make_shared<spdlog::sinks::daily_file_sink_mt>(s_filename, 0, 0)
+			};
 
-			logSinks[0]->set_pattern("%^[%T] [%n] %v%$");
-			logSinks[1]->set_pattern("[%T] [%l] [%n] %v");
+			sharedSinks[0]->set_pattern("%^[%T] [%n] %v%$");
+			sharedSinks[1]->set_pattern("[%T] [%l] [%n] %v");
 
-			logger = std::make_shared<spdlog::logger>(category, std::begin(logSinks), std::end(logSinks));
+			logger = std::make_shared<spdlog::logger>(category, std::begin(sharedSinks), std::end(sharedSinks));
 			logger->set_level(s_setLevel);
 			logger->flush_on(s_flushLevel);
 			spdlog::register_logger(logger);
