@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Material.h"
 #include "graphics/Texture2D.h"
 #include "graphics/ShaderManager.h"
@@ -74,9 +74,9 @@ namespace Dive
     {
         assert(deviceContext);
 
-        ShaderManager::BindInputLayout("Unlit_VS", eInputLayout::Lit, deviceContext);
-        ShaderManager::GetShader("Unlit_VS")->Bind(deviceContext);
-        ShaderManager::GetShader("Unlit_PS")->Bind(deviceContext);
+        ShaderManager::BindInputLayout("UnlitVS", eInputLayout::Unlit, deviceContext);
+        ShaderManager::GetShader("UnlitVS")->Bind(deviceContext);
+        ShaderManager::GetShader("UnlitPS")->Bind(deviceContext);
 
         //if (m_shaders)
         //    m_shaders->Bind(deviceContext);

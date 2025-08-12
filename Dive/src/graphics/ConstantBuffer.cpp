@@ -1,7 +1,6 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "ConstantBuffer.h"
 #include "Graphics.h"
-#include "Common.h"
 
 namespace Dive
 {

@@ -19,8 +19,8 @@
     <Filter Include="world">
       <UniqueIdentifier>{01dd24fd-4851-46b1-83d1-3a485fa9cae6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="systems">
-      <UniqueIdentifier>{e2e29c48-7bc4-4e38-94cc-da48eab50ba1}</UniqueIdentifier>
+    <Filter Include="world\components">
+      <UniqueIdentifier>{b347dc1a-d3e0-44d7-b4b9-04ce8a5a0d23}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -98,22 +98,52 @@
     <ClInclude Include="src\rendering\Renderer.h">
       <Filter>rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\StaticMesh.h" />
-    <ClInclude Include="src\world\GameObject.h" />
-    <ClInclude Include="src\world\Components\Component.h" />
-    <ClInclude Include="src\world\Components\Transform.h" />
-    <ClInclude Include="src\core\Object.h" />
-    <ClInclude Include="src\world\Components\Camera.h" />
-    <ClInclude Include="src\graphics\ShaderManager.h" />
-    <ClInclude Include="src\resource\YamlHelper.h" />
-    <ClInclude Include="src\rendering\RenderDefs.h" />
-    <ClInclude Include="src\rendering\RenderPass.h" />
-    <ClInclude Include="src\world\Components\MeshRenderer.h" />
     <ClInclude Include="src\Common.h" />
-    <ClInclude Include="src\graphics\Buffer.h" />
-    <ClInclude Include="src\graphics\ShaderProgram.h" />
-    <ClInclude Include="src\graphics\Vertex.h" />
-    <ClInclude Include="src\graphics\InputLayoutKey.h" />
+    <ClInclude Include="src\world\Components\Camera.h">
+      <Filter>world\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Components\Component.h">
+      <Filter>world\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Components\MeshRenderer.h">
+      <Filter>world\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\Components\Transform.h">
+      <Filter>world\components</Filter>
+    </ClInclude>
+    <ClInclude Include="src\world\GameObject.h">
+      <Filter>world</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\Object.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\ShaderProgram.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\ShaderManager.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Buffer.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\InputLayoutKey.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\graphics\Vertex.h">
+      <Filter>graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\YamlHelper.h">
+      <Filter>resource</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\RenderPass.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\RenderDefs.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rendering\StaticMesh.h">
+      <Filter>rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -189,16 +219,38 @@
     <ClCompile Include="src\rendering\Renderer.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\rendering\StaticMesh.cpp" />
-    <ClCompile Include="src\world\GameObject.cpp" />
-    <ClCompile Include="src\world\Components\Transform.cpp" />
-    <ClCompile Include="src\core\Object.cpp" />
-    <ClCompile Include="src\world\Components\Component.cpp" />
-    <ClCompile Include="src\world\Components\Camera.cpp" />
-    <ClCompile Include="src\graphics\ShaderManager.cpp" />
-    <ClCompile Include="src\rendering\RenderPass.cpp" />
-    <ClCompile Include="src\world\Components\MeshRenderer.cpp" />
-    <ClCompile Include="src\graphics\Buffer.cpp" />
-    <ClCompile Include="src\graphics\ShaderProgram.cpp" />
+    <ClCompile Include="src\world\Components\Camera.cpp">
+      <Filter>world\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Components\Component.cpp">
+      <Filter>world\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Components\MeshRenderer.cpp">
+      <Filter>world\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\Components\Transform.cpp">
+      <Filter>world\components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world\GameObject.cpp">
+      <Filter>world</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\Object.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\ShaderProgram.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\ShaderManager.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\graphics\Buffer.cpp">
+      <Filter>graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\RenderPass.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rendering\StaticMesh.cpp">
+      <Filter>rendering</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

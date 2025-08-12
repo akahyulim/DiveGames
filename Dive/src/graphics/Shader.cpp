@@ -20,20 +20,10 @@ namespace Dive
 
 		ComPtr<ID3DBlob> errorBlob;
 
-		auto hr = D3DCompileFromFile(
-			path.c_str(),
-			nullptr,
-			D3D_COMPILE_STANDARD_FILE_INCLUDE,
-			"MainVS",
-			"vs_5_0",
-			D3D10_SHADER_ENABLE_STRICTNESS,
-			0,
-			m_blob.GetAddressOf(),
-			errorBlob.GetAddressOf());
-		if(FAILED(hr))
+		auto hr = D3DReadFileToBlob(path.c_str(), m_blob.GetAddressOf());
+		if (FAILED(hr))
 		{
-			DV_LOG(VertexShader, err, "[::LoadFromFile] D3DCompileFromFile 실패: {}",
-				errorBlob ? static_cast<char*>(errorBlob->GetBufferPointer()) : ErrorUtils::ToVerbose(hr));
+			DV_LOG(VertexShader, err, "[::LoadFromFile] cso 파일 읽기 실패: {}", ErrorUtils::ToVerbose(hr));
 			return false;
 		}
 
@@ -44,7 +34,7 @@ namespace Dive
 			return false;
 		}
 
-		SetName(path.stem().string() + "_VS");
+		SetName(path.stem().string());
 
 		return true;
 	}
@@ -67,20 +57,10 @@ namespace Dive
 		ComPtr<ID3DBlob> compiledBlob;
 		ComPtr<ID3DBlob> errorBlob;
 
-		auto hr = D3DCompileFromFile(
-			path.c_str(),
-			nullptr,
-			D3D_COMPILE_STANDARD_FILE_INCLUDE,
-			"MainPS",
-			"ps_5_0",
-			D3D10_SHADER_ENABLE_STRICTNESS,
-			0,
-			compiledBlob.GetAddressOf(),
-			errorBlob.GetAddressOf());
-
-		if (FAILED(hr)) {
-			DV_LOG(PixelShader, err, "[::LoadFromFile] D3DCompileFromFile 실패: {}",
-				errorBlob ? static_cast<char*>(errorBlob->GetBufferPointer()) : ErrorUtils::ToVerbose(hr));
+		auto hr = D3DReadFileToBlob(path.c_str(), compiledBlob.GetAddressOf());
+		if (FAILED(hr))
+		{
+			DV_LOG(PixelShader, err, "[::LoadFromFile] cso 파일 읽기 실패: {}", ErrorUtils::ToVerbose(hr));
 			return false;
 		}
 
@@ -95,7 +75,7 @@ namespace Dive
 			return false;
 		}
 
-		SetName(path.stem().string() + "_PS");
+		SetName(path.stem().string());
 
 		return true;
 	}

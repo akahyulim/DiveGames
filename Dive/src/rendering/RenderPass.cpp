@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "RenderPass.h"
 #include "Renderer.h"
 #include "graphics/Graphics.h"
@@ -20,17 +20,17 @@ namespace Dive
 			return;
 
 		const auto world = WorldManager::GetActiveWorld();
-		
+
 		// camera
 		camera->Bind(deviceContext);
-		
+
 		// pipelineState를 살려야하나..
 		deviceContext->RSSetState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
 		deviceContext->OMSetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::DepthReadWrite_StencilReadWrite), 0);
-		
+
 		// 일단 한 번에 바인딩 해봤다.
 		Renderer::BindSamplerStates();
-		
+
 		// opaque
 		for (auto meshRenderer : world->GetOpaqueMeshRenderers())
 			meshRenderer->Render(deviceContext, camera);

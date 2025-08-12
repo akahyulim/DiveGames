@@ -11,6 +11,7 @@ namespace Dive
 		None = 0,
 		PN,
 		PNT,
+		Unlit,
 		Lit,
 		Skinned
 	};

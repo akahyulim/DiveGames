@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "ShaderManager.h"
 
 namespace Dive
@@ -20,6 +20,10 @@ namespace Dive
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			break;
+		case eInputLayout::Unlit:
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			break;
 		case eInputLayout::Lit:
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
@@ -50,13 +54,13 @@ namespace Dive
 		// vertex shader & inputLayout 
 		{
 			auto unlit_vs = std::make_unique<VertexShader>();
-			if (!unlit_vs->LoadFromFile("Assets/Shaders/Unlit.hlsl", device))
+			if (!unlit_vs->LoadFromFile("Assets/Shaders/UnlitVS.cso", device))
 			{
 				DV_LOG(ShaderManager, err, "[::Initialize] LoadFromFile 실패");
 				return false;
 			}
 
-			if (!CreateInputLayout(unlit_vs.get(), eInputLayout::Lit, device))
+			if (!CreateInputLayout(unlit_vs.get(), eInputLayout::Unlit, device))
 			{
 				DV_LOG(ShaderManager, err, "[::Initialize] CreateInputLayout 실패");
 				return false;
@@ -70,7 +74,7 @@ namespace Dive
 		// pixel shaders
 		{
 			auto unlit_ps = std::make_unique<PixelShader>();
-			if (!unlit_ps->LoadFromFile("Assets/Shaders/Unlit.hlsl", device))
+			if (!unlit_ps->LoadFromFile("Assets/Shaders/UnlitPS.cso", device))
 			{
 				DV_LOG(ShaderManager, err, "[::Initialize] LoadFromFile 실패");
 				return false;
@@ -112,7 +116,7 @@ namespace Dive
 
 		auto hr = device->CreateInputLayout(
 			inputElements.data(),
-			static_cast<UINT32>(inputElements.size()),
+			static_cast<UINT>(inputElements.size()),
 			byteCode->GetBufferPointer(),
 			byteCode->GetBufferSize(),
 			inputLayout.GetAddressOf());

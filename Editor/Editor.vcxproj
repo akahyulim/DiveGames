@@ -135,7 +135,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /E /I /D "$(SolutionDir)Assets" "$(OutDir)Assets"</Command>
+      <Command>robocopy "$(SolutionDir)Assets" "$(OutDir)Assets" /E /XF *.hlsl *.hlsli || exit 0
+
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -20,7 +20,7 @@ namespace Dive
 		bool Create() override;
 		void Release() override;
 		
-		bool Resize(uint32_t width, uint32_t height, eDepthFormat depth = eDepthFormat::None, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
+		bool Resize(uint32_t width, uint32_t height);
 
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_renderTargetView.Get(); }
 		ID3D11DepthStencilView* GetDepthStencilView() const { return m_DepthDSV.Get(); }

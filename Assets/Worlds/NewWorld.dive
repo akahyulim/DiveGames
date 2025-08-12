@@ -5,8 +5,8 @@ GameObjects:
     Tag: EditorOnly
     Transform:
       fileID: 2
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0, 1]
+      Position: [0, 5, -15]
+      Rotation: [0.1736481, -0, 0, 0.9848078]
       Scale: [1, 1, 1]
     Camera:
       fileID: 3
@@ -18,7 +18,7 @@ GameObjects:
       ViewportTop: 0
       ViewportRight: 1
       ViewportBottom: 1
-      BackgroundColor: [1, 1, 1, 1]
+      BackgroundColor: [0.078760415, 0.038455375, 0.30379748, 1]
   - fileID: 4
     Name: MainCamera
     Tag: MainCamera
