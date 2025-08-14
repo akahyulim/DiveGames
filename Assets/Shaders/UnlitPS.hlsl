@@ -17,7 +17,7 @@ float4 MainPS(PSInput input) : SV_TARGET
     }
     else
     {
-        outColor = cb_Material.diffuseColor;
+        outColor = cbMaterial.diffuseColor;
     }
     
     return outColor;

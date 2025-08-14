@@ -9,10 +9,22 @@ struct MatrixData
 
 cbuffer MatrixBuffer : register(b0)
 {
-    MatrixData cb_Matrix;
+    MatrixData cbMatrix;
 }
 
 // Pixel Shader =====================================================
+struct CameraData
+{
+    float3 position;
+    float padding;
+    float4 perspectiveValue;
+    matrix viewInverse;
+};
+
+cbuffer CameraBuffer : register(b0)
+{
+    CameraData cbCamera;
+}
 struct MaterialData
 {
     float4 diffuseColor;
@@ -22,17 +34,54 @@ struct MaterialData
     uint3 padding;
 };
 
-cbuffer MaterialBuffer : register(b0)
+cbuffer MaterialBuffer : register(b1)
 {
-    MaterialData cb_Material;
+    MaterialData cbMaterial;
 }
 
 bool HasDiffuseMap()
 {
-    return cb_Material.properties & uint(1U << 0);
+    return cbMaterial.properties & uint(1U << 0);
 }
 
 bool HasNormalMap()
 {
-    return cb_Material.properties & uint(1U << 1);
+    return cbMaterial.properties & uint(1U << 1);
+}
+
+struct LightData
+{
+    float3 color;
+    float outerConeAngle;
+    
+    float3 position;
+    float rangeRcp;
+    
+    float3 direction;
+    float innerConeAngle;
+    
+    uint options;
+    int shadowEnabled;
+    float2 padding;
+    
+    matrix shadow;
+};
+
+cbuffer LightBuffer : register(b2)
+{
+    LightData cbLight;
+}
+
+// cbLightPixel options
+bool IsDirectionalLight()
+{
+    return (cbLight.options & 1) != 0;
+}
+bool IsPointLight()
+{
+    return (cbLight.options & 2) != 0;
+}
+bool IsSpotLight()
+{
+    return (cbLight.options & 4) != 0;
 }

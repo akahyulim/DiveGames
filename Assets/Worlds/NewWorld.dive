@@ -37,87 +37,99 @@ GameObjects:
       ViewportTop: 0
       ViewportRight: 1
       ViewportBottom: 1
-      BackgroundColor: [0.078760415, 0.038455375, 0.30379748, 1]
+      BackgroundColor: [0, 0, 0, 1]
   - fileID: 7
-    Name: Plane
+    Name: Directional Light
     Tag: Untagged
     Transform:
       fileID: 8
+      Position: [0, 0, 0]
+      Rotation: [0.1736481, -0, 0, 0.9848078]
+      Scale: [1, 1, 1]
+    Light:
+      fileID: 9
+      LightType: 1
+      LightColor: [1, 1, 1]
+  - fileID: 10
+    Name: Plane
+    Tag: Untagged
+    Transform:
+      fileID: 11
       Position: [0, -3, 0]
       Rotation: [0, -0, 0, 1]
       Scale: [1, 1, 1]
     MeshRenderer:
-      fileID: 9
+      fileID: 12
       SourceType: 2
       StaticMesh: PlaneMesh
       Material: Gray
-  - fileID: 10
+  - fileID: 13
     Name: Quad
     Tag: Untagged
     Transform:
-      fileID: 11
+      fileID: 14
       Position: [-3, 4, 0]
       Rotation: [0, -0, 0, 1]
       Scale: [1, 1, 1]
-      Parent: 8
-    MeshRenderer:
-      fileID: 12
-      SourceType: 2
-      StaticMesh: QuadMesh
-      Material: Blue
-  - fileID: 13
-    Name: Triangle
-    Tag: Untagged
-    Transform:
-      fileID: 14
-      Position: [0, 2, -5]
-      Rotation: [0, -0, 0, 1]
-      Scale: [1, 1, 1]
-      Parent: 8
+      Parent: 11
     MeshRenderer:
       fileID: 15
       SourceType: 2
-      StaticMesh: TriangleMesh
-      Material: Red
+      StaticMesh: QuadMesh
+      Material: Blue
   - fileID: 16
-    Name: Cube
+    Name: Triangle
     Tag: Untagged
     Transform:
       fileID: 17
-      Position: [0, 4, 0]
-      Rotation: [0, 0.38268337, 0, 0.92387956]
+      Position: [0, 2, -5]
+      Rotation: [0, -0, 0, 1]
       Scale: [1, 1, 1]
-      Parent: 8
+      Parent: 11
     MeshRenderer:
       fileID: 18
       SourceType: 2
-      StaticMesh: CubeMesh
-      Material: Yellow
+      StaticMesh: TriangleMesh
+      Material: Red
   - fileID: 19
-    Name: Sphere
+    Name: Cube
     Tag: Untagged
     Transform:
       fileID: 20
-      Position: [3, 3, -7]
-      Rotation: [0, -0, 0, 1]
+      Position: [0, 4, 0]
+      Rotation: [0, 0.38268337, 0, 0.92387956]
       Scale: [1, 1, 1]
-      Parent: 8
+      Parent: 11
     MeshRenderer:
       fileID: 21
       SourceType: 2
-      StaticMesh: SphereMesh
-      Material: Black
+      StaticMesh: CubeMesh
+      Material: Yellow
   - fileID: 22
-    Name: Capsule
+    Name: Sphere
     Tag: Untagged
     Transform:
       fileID: 23
+      Position: [3, 3, -7]
+      Rotation: [0, -0, 0, 1]
+      Scale: [1, 1, 1]
+      Parent: 11
+    MeshRenderer:
+      fileID: 24
+      SourceType: 2
+      StaticMesh: SphereMesh
+      Material: Green
+  - fileID: 25
+    Name: Capsule
+    Tag: Untagged
+    Transform:
+      fileID: 26
       Position: [2, 6, 0]
       Rotation: [0, -0, 0, 1]
       Scale: [1, 1, 1]
-      Parent: 8
+      Parent: 11
     MeshRenderer:
-      fileID: 24
+      fileID: 27
       SourceType: 2
       StaticMesh: CapsuleMesh
       Material: Wierd

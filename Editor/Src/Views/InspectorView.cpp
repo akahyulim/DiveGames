@@ -391,6 +391,25 @@ namespace Dive
 			}
 		}
 
+		if (EditorContext::Selected->HasComponent<Light>())
+		{
+			ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+			if (ImGui::CollapsingHeader("Light"))
+			{
+				auto light = EditorContext::Selected->GetComponent<Light>();
+
+				// light color
+				ImVec4 color = { light->GetColor().x, light->GetColor().y, light->GetColor().z, 1.0f };
+				ImGui::Columns(2);
+				ImGui::SetColumnWidth(0, 115.0f);
+				ImGui::Text("Light Color");
+				ImGui::NextColumn();
+				ImGui::ColorEdit3("##LightColor", (float*)&color);
+				light->SetColor(color.x, color.y, color.z);
+				ImGui::Columns(1);
+			}
+		}
+
 		if (ImGui::Button("Add Component"))
 			ImGui::OpenPopup("AddComponent");
 

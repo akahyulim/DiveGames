@@ -50,6 +50,7 @@
 #include "world/Components/Transform.h"
 #include "world/Components/Camera.h"
 #include "world/Components/MeshRenderer.h"
+#include "world/Components/Light.h"
 #include "world/GameObject.h"
 #include "world/World.h"
 #include "world/WorldSerializer.h"

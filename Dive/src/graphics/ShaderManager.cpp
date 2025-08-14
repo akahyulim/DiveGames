@@ -53,6 +53,7 @@ namespace Dive
 
 		// vertex shader & inputLayout 
 		{
+			// unlit
 			auto unlit_vs = std::make_unique<VertexShader>();
 			if (!unlit_vs->LoadFromFile("Assets/Shaders/UnlitVS.cso", device))
 			{
@@ -69,10 +70,29 @@ namespace Dive
 			auto name = unlit_vs->GetName();
 			auto raw_ptr = unlit_vs.release();
 			s_shaders.emplace(name, std::unique_ptr<IShader>(raw_ptr));
+
+			// forward light
+			auto forwardLight_vs = std::make_unique<VertexShader>();
+			if (!forwardLight_vs->LoadFromFile("Assets/Shaders/ForwardLightVS.cso", device))
+			{
+				DV_LOG(ShaderManager, err, "[::Initialize] LoadFromFile 실패");
+				return false;
+			}
+
+			if (!CreateInputLayout(forwardLight_vs.get(), eInputLayout::Lit, device))
+			{
+				DV_LOG(ShaderManager, err, "[::Initialize] CreateInputLayout 실패");
+				return false;
+			}
+
+			name = forwardLight_vs->GetName();
+			raw_ptr = forwardLight_vs.release();
+			s_shaders.emplace(name, std::unique_ptr<IShader>(raw_ptr));
 		}
 
 		// pixel shaders
 		{
+			// unlit
 			auto unlit_ps = std::make_unique<PixelShader>();
 			if (!unlit_ps->LoadFromFile("Assets/Shaders/UnlitPS.cso", device))
 			{
@@ -82,6 +102,18 @@ namespace Dive
 
 			auto name = unlit_ps->GetName();
 			auto raw_ptr = unlit_ps.release();
+			s_shaders.emplace(name, std::unique_ptr<IShader>(raw_ptr));
+
+			// forward light
+			auto forwardLight_ps = std::make_unique<PixelShader>();
+			if (!forwardLight_ps->LoadFromFile("Assets/Shaders/ForwardLightPS.cso", device))
+			{
+				DV_LOG(ShaderManager, err, "[::Initialize] LoadFromFile 실패");
+				return false;
+			}
+
+			name = forwardLight_ps->GetName();
+			raw_ptr = forwardLight_ps.release();
 			s_shaders.emplace(name, std::unique_ptr<IShader>(raw_ptr));
 		}
 

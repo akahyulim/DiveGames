@@ -56,6 +56,7 @@
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\world\Components\Camera.h" />
     <ClInclude Include="src\world\Components\Component.h" />
+    <ClInclude Include="src\world\Components\Light.h" />
     <ClInclude Include="src\world\Components\MeshRenderer.h" />
     <ClInclude Include="src\world\Components\Transform.h" />
     <ClInclude Include="src\world\GameObject.h" />
@@ -96,6 +97,7 @@
     </ClCompile>
     <ClCompile Include="src\world\Components\Camera.cpp" />
     <ClCompile Include="src\world\Components\Component.cpp" />
+    <ClCompile Include="src\world\Components\Light.cpp" />
     <ClCompile Include="src\world\Components\MeshRenderer.cpp" />
     <ClCompile Include="src\world\Components\Transform.cpp" />
     <ClCompile Include="src\world\GameObject.cpp" />

@@ -267,49 +267,77 @@ namespace Dive
 	{
 		assert(device);
 
-		std::vector<LitVertex> vertices;
 		constexpr int latitudeBands = 30;
 		constexpr int longitudeBands = 30;
-		vertices.reserve((latitudeBands + 1) * (longitudeBands + 1));
-		for (int latNumber = 0; latNumber <= latitudeBands; ++latNumber)
+		constexpr float radius = SPHERE_RADIUS;
+
+		std::vector<LitVertex> vertices;
+		std::vector<uint32_t> indices;
+
+		XMVECTOR upVec = XMVectorSet(0, 1, 0, 0);
+		XMFLOAT3 center(0.0f, 0.0f, 0.0f);
+
+		// 정점 생성
+		for (int lat = 0; lat <= latitudeBands; ++lat)
 		{
-			float theta = latNumber * XM_PI / latitudeBands;
+			float theta = XM_PI * (lat / static_cast<float>(latitudeBands)); // 0 ~ π
 			float sinTheta = sinf(theta);
 			float cosTheta = cosf(theta);
-			for (int longNumber = 0; longNumber <= longitudeBands; ++longNumber)
+
+			for (int lon = 0; lon <= longitudeBands; ++lon)
 			{
-				float phi = longNumber * 2.0f * XM_PI / longitudeBands;
+				float phi = 2.0f * XM_PI * (lon / static_cast<float>(longitudeBands)); // 0 ~ 2π
 				float sinPhi = sinf(phi);
 				float cosPhi = cosf(phi);
+
+				XMFLOAT3 offset(cosPhi * sinTheta, cosTheta, sinPhi * sinTheta);
 				XMFLOAT3 position(
-					SPHERE_RADIUS * cosPhi * sinTheta,
-					SPHERE_RADIUS * cosTheta,
-					SPHERE_RADIUS * sinPhi * sinTheta
-				);
-				XMFLOAT3 normal(cosPhi * sinTheta, cosTheta, sinPhi * sinTheta);
-				XMStoreFloat3(&normal, XMVector3Normalize(XMLoadFloat3(&normal)));
-				XMFLOAT3 tangent(-sinPhi, 0.0f, cosPhi);
-				XMFLOAT2 texCoords(longNumber / static_cast<float>(longitudeBands), latNumber / static_cast<float>(latitudeBands));
-				vertices.emplace_back(position, normal, tangent, texCoords);
+					radius * offset.x,
+					radius * offset.y,
+					radius * offset.z);
+
+				XMVECTOR posVec = XMLoadFloat3(&position);
+				XMVECTOR centerVec = XMLoadFloat3(&center);
+				XMVECTOR normalVec = XMVector3Normalize(posVec - centerVec);
+				XMFLOAT3 normal;
+				XMStoreFloat3(&normal, normalVec);
+
+				XMVECTOR tangentVec = XMVector3Normalize(XMVector3Cross(normalVec, upVec));
+				XMFLOAT3 tangent;
+				XMStoreFloat3(&tangent, tangentVec);
+
+				float u = lon / static_cast<float>(longitudeBands);
+				float v = lat / static_cast<float>(latitudeBands);
+
+				vertices.emplace_back(position, normal, tangent, XMFLOAT2(u, v));
 			}
 		}
 
-		std::vector<uint32_t> indices;
-		for (int latNumber = 0; latNumber < latitudeBands; ++latNumber)
-		{
-			for (int longNumber = 0; longNumber < longitudeBands; ++longNumber)
+		// 인덱스 연결
+		auto connectBands = [&](int start, int bands) {
+			for (int lat = 0; lat < bands; ++lat)
 			{
-				int first = (latNumber * (longitudeBands + 1)) + longNumber;
-				int second = first + longitudeBands + 1;
-				indices.emplace_back(first);
-				indices.emplace_back(second);
-				indices.emplace_back(first + 1);
-				indices.emplace_back(second);
-				indices.emplace_back(second + 1);
-				indices.emplace_back(first + 1);
-			}
-		}
+				for (int lon = 0; lon < longitudeBands; ++lon)
+				{
+					int i0 = start + lat * (longitudeBands + 1) + lon;
+					int i1 = i0 + 1;
+					int i2 = i0 + (longitudeBands + 1);
+					int i3 = i2 + 1;
 
+					indices.push_back(i0);
+					indices.push_back(i1);
+					indices.push_back(i2);
+					indices.push_back(i1);
+					indices.push_back(i3);
+					indices.push_back(i2);
+				}
+			}
+			};
+
+		int startIndex = 0;
+		connectBands(startIndex, latitudeBands);
+
+		// 메시 생성
 		auto mesh = std::make_shared<StaticMesh>();
 		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
@@ -321,108 +349,172 @@ namespace Dive
 		return mesh;
 	}
 
+
 	std::shared_ptr<StaticMesh> MeshFactory::CreateCapsule(ID3D11Device* device)
 	{
 		assert(device);
 
-		std::vector<LitVertex> vertices;
 		constexpr int latitudeBands = 30;
 		constexpr int longitudeBands = 30;
-		vertices.reserve((latitudeBands + 1) * (longitudeBands + 1) * 2 + (longitudeBands + 1) * 2);
+		constexpr float radius = CAPSULE_RADIUS;
+		constexpr float height = CAPSULE_HEIGHT;
 
-		// 반구 생성
-		for (int latNumber = 0; latNumber <= latitudeBands; ++latNumber)
+		std::vector<LitVertex> vertices;
+		std::vector<uint32_t> indices;
+
+		XMVECTOR upVec = XMVectorSet(0, 1, 0, 0);
+		XMFLOAT3 centerTop(0.0f, height / 2.0f, 0.0f);
+		XMFLOAT3 centerBottom(0.0f, -height / 2.0f, 0.0f);
+
+		// 위쪽 반구
+		for (int lat = 0; lat <= latitudeBands; ++lat)
 		{
-			float theta = latNumber * XM_PI / latitudeBands;
+			float theta = XM_PI / 2.0f * (lat / static_cast<float>(latitudeBands));
 			float sinTheta = sinf(theta);
 			float cosTheta = cosf(theta);
 
-			for (int longNumber = 0; longNumber <= longitudeBands; ++longNumber)
+			for (int lon = 0; lon <= longitudeBands; ++lon)
 			{
-				float phi = longNumber * 2.0f * XM_PI / longitudeBands;
+				float phi = 2.0f * XM_PI * (lon / static_cast<float>(longitudeBands));
 				float sinPhi = sinf(phi);
 				float cosPhi = cosf(phi);
 
+				XMFLOAT3 offset(cosPhi * sinTheta, cosTheta, sinPhi * sinTheta);
 				XMFLOAT3 position(
-					CAPSULE_RADIUS * cosPhi * sinTheta,
-					CAPSULE_RADIUS * cosTheta + CAPSULE_HEIGHT / 2.0f,
-					CAPSULE_RADIUS * sinPhi * sinTheta);
+					radius * offset.x,
+					centerTop.y + radius * offset.y,
+					radius * offset.z);
 
-				XMFLOAT3 normal(cosPhi * sinTheta, cosTheta, sinPhi * sinTheta);
-				XMStoreFloat3(&normal, XMVector3Normalize(XMLoadFloat3(&normal)));
-				XMFLOAT3 tangent(-sinPhi, 0.0f, cosPhi);
-				XMFLOAT2 texCoords(longNumber / static_cast<float>(longitudeBands), latNumber / static_cast<float>(latitudeBands));
+				XMVECTOR posVec = XMLoadFloat3(&position);
+				XMVECTOR centerVec = XMLoadFloat3(&centerTop);
+				XMVECTOR normalVec = XMVector3Normalize(posVec - centerVec);
+				XMFLOAT3 normal;
+				XMStoreFloat3(&normal, normalVec);
 
-				// 위쪽 반구
-				vertices.emplace_back(position, normal, tangent, texCoords);
+				XMVECTOR tangentVec = XMVector3Normalize(XMVector3Cross(normalVec, upVec));
+				XMFLOAT3 tangent;
+				XMStoreFloat3(&tangent, tangentVec);
 
-				// 아래쪽 반구
-				position.y -= CAPSULE_HEIGHT;
-				vertices.emplace_back(position, normal, tangent, texCoords);
+				float u = lon / static_cast<float>(longitudeBands);
+				float v = lat / static_cast<float>(latitudeBands) * 0.25f;
+
+				vertices.emplace_back(position, normal, tangent, XMFLOAT2(u, v));
 			}
 		}
 
-		// 실린더 부분 추가
-		for (int longNumber = 0; longNumber <= longitudeBands; ++longNumber)
+		// 실린더
+		for (int yStep = 0; yStep <= 1; ++yStep)
 		{
-			float phi = longNumber * 2.0f * XM_PI / longitudeBands;
-			float sinPhi = sinf(phi);
-			float cosPhi = cosf(phi);
+			float y = centerTop.y - yStep * height;
 
-			XMFLOAT3 topPos(CAPSULE_RADIUS * cosPhi, CAPSULE_HEIGHT / 2.0f, CAPSULE_RADIUS * sinPhi);
-			XMFLOAT3 bottomPos(CAPSULE_RADIUS * cosPhi, -CAPSULE_HEIGHT / 2.0f, CAPSULE_RADIUS * sinPhi);
-			
-			XMFLOAT3 normal(cosPhi, 0.0f, sinPhi);
-			XMStoreFloat3(&normal, XMVector3Normalize(XMLoadFloat3(&normal)));
-			XMFLOAT3 tangent(-sinPhi, 0.0f, cosPhi);
-			XMFLOAT2 texCoord(longNumber / static_cast<float>(longitudeBands), 0.5f);
+			for (int lon = 0; lon <= longitudeBands; ++lon)
+			{
+				float phi = 2.0f * XM_PI * (lon / static_cast<float>(longitudeBands));
+				float sinPhi = sinf(phi);
+				float cosPhi = cosf(phi);
 
-			vertices.emplace_back(topPos, normal, tangent, texCoord);
-			vertices.emplace_back(bottomPos, normal, tangent, texCoord);
-		}
+				XMFLOAT3 position(radius * cosPhi, y, radius * sinPhi);
+				XMFLOAT3 normal(cosPhi, 0.0f, sinPhi);
 
-		std::vector<uint32_t> indices;
-		for (int latNumber = 0; latNumber < latitudeBands; ++latNumber)
-		{
-			for (int longNumber = 0; longNumber < longitudeBands; ++longNumber) {
-				int first = (latNumber * (longitudeBands + 1) * 2) + longNumber * 2;
-				int second = first + longitudeBands * 2 + 2;
+				XMVECTOR normalVec = XMVector3Normalize(XMLoadFloat3(&normal));
+				XMVECTOR tangentVec = XMVector3Normalize(XMVector3Cross(normalVec, upVec));
+				XMFLOAT3 tangent;
+				XMStoreFloat3(&tangent, tangentVec);
 
-				// 위쪽 반구
-				indices.emplace_back(first);
-				indices.emplace_back(second);
-				indices.emplace_back(first + 1);
-				indices.emplace_back(second);
-				indices.emplace_back(second + 1);
-				indices.emplace_back(first + 1);
+				float u = lon / static_cast<float>(longitudeBands);
+				float v = 0.25f + yStep * 0.5f;
 
-				// 아래쪽 반구
-				first += longitudeBands * 2 + 2;
-				second += longitudeBands * 2 + 2;
-
-				indices.emplace_back(first);
-				indices.emplace_back(second);
-				indices.emplace_back(first + 1);
-				indices.emplace_back(second);
-				indices.emplace_back(second + 1);
-				indices.emplace_back(first + 1);
+				vertices.emplace_back(position, normal, tangent, XMFLOAT2(u, v));
 			}
 		}
 
-		// 실린더 인덱스 추가
-		for (int longNumber = 0; longNumber < longitudeBands; ++longNumber)
+		// 아래쪽 반구
+		for (int lat = 0; lat <= latitudeBands; ++lat)
 		{
-			int first = (latitudeBands + 1) * (longitudeBands + 1) * 2 + longNumber * 2;
-			int second = first + 2;
+			float theta = XM_PI / 2.0f * (lat / static_cast<float>(latitudeBands));
+			float sinTheta = sinf(theta);
+			float cosTheta = cosf(theta);
 
-			indices.emplace_back(first);
-			indices.emplace_back(second);
-			indices.emplace_back(first + 1);
-			indices.emplace_back(second);
-			indices.emplace_back(second + 1);
-			indices.emplace_back(first + 1);
+			for (int lon = 0; lon <= longitudeBands; ++lon)
+			{
+				float phi = 2.0f * XM_PI * (lon / static_cast<float>(longitudeBands));
+				float sinPhi = sinf(phi);
+				float cosPhi = cosf(phi);
+
+				XMFLOAT3 offset(cosPhi * sinTheta, -cosTheta, sinPhi * sinTheta);
+				XMFLOAT3 position(
+					radius * offset.x,
+					centerBottom.y + radius * offset.y,
+					radius * offset.z);
+
+				XMVECTOR posVec = XMLoadFloat3(&position);
+				XMVECTOR centerVec = XMLoadFloat3(&centerBottom);
+				XMVECTOR normalVec = XMVector3Normalize(posVec - centerVec);
+				XMFLOAT3 normal;
+				XMStoreFloat3(&normal, normalVec);
+
+				XMVECTOR tangentVec = XMVector3Normalize(XMVector3Cross(normalVec, upVec));
+				XMFLOAT3 tangent;
+				XMStoreFloat3(&tangent, tangentVec);
+
+				float u = lon / static_cast<float>(longitudeBands);
+				float v = 0.75f + lat / static_cast<float>(latitudeBands) * 0.25f;
+
+				vertices.emplace_back(position, normal, tangent, XMFLOAT2(u, v));
+			}
 		}
 
+		// 인덱스 연결 함수들
+		auto connectBands = [&](int start, int bands) {
+			for (int lat = 0; lat < bands; ++lat)
+			{
+				for (int lon = 0; lon < longitudeBands; ++lon)
+				{
+					int i0 = start + lat * (longitudeBands + 1) + lon;
+					int i1 = i0 + 1;
+					int i2 = i0 + (longitudeBands + 1);
+					int i3 = i2 + 1;
+
+					indices.push_back(i0);
+					indices.push_back(i1);
+					indices.push_back(i2);
+					indices.push_back(i1);
+					indices.push_back(i3);
+					indices.push_back(i2);
+				}
+			}
+			};
+
+		auto connectBandsReversed = [&](int start, int bands) {
+			for (int lat = 0; lat < bands; ++lat)
+			{
+				for (int lon = 0; lon < longitudeBands; ++lon)
+				{
+					int i0 = start + lat * (longitudeBands + 1) + lon;
+					int i1 = i0 + 1;
+					int i2 = i0 + (longitudeBands + 1);
+					int i3 = i2 + 1;
+
+					indices.push_back(i0);
+					indices.push_back(i2);
+					indices.push_back(i1);
+					indices.push_back(i1);
+					indices.push_back(i2);
+					indices.push_back(i3);
+				}
+			}
+			};
+
+		// 인덱스 연결
+		int topStart = 0;
+		int cylinderStart = topStart + (latitudeBands + 1) * (longitudeBands + 1);
+		int bottomStart = cylinderStart + 2 * (longitudeBands + 1);
+
+		connectBands(topStart, latitudeBands);               // 위쪽 반구
+		connectBands(cylinderStart, 1);                      // 실린더
+		connectBandsReversed(bottomStart, latitudeBands);    // 아래쪽 반구 (반전)
+
+		// 메시 생성
 		auto mesh = std::make_shared<StaticMesh>();
 		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);

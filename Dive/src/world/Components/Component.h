@@ -4,12 +4,14 @@
 namespace Dive
 {
 	class GameObject;
+	class Transform;
 
 	enum class eComponentType
 	{
 		Undefined,
 		Transform,
 		Camera,
+		Light,
 		MeshRenderer,
 		SkinnedMeshRender
 	};
@@ -25,6 +27,7 @@ namespace Dive
 		virtual void Update() {}
 
 		GameObject* GetGameObject() const;
+		Transform* GetTransform() const;
 
 		static constexpr eComponentType GetType() { return eComponentType::Undefined; }
 

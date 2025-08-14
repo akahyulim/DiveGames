@@ -144,6 +144,7 @@
     <ClInclude Include="src\rendering\StaticMesh.h">
       <Filter>rendering</Filter>
     </ClInclude>
+    <ClInclude Include="src\world\Components\Light.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -252,5 +253,6 @@
     <ClCompile Include="src\rendering\StaticMesh.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
+    <ClCompile Include="src\world\Components\Light.cpp" />
   </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@
 namespace Dive
 {
 	class Camera;
+	class Light;
 	class Transform;
 	class MeshRenderer;
 	class GameObject;
@@ -44,6 +45,8 @@ namespace Dive
 		size_t RootGameObjectCount() const { return m_rootGameObjects.size(); }
 		const std::vector<GameObject*>& GetRootGameObjects() { return m_rootGameObjects; }
 
+		const std::vector<Light*>& GetLights() const { return m_lights; }
+
 		const std::vector<MeshRenderer*>& GetTransparentMeshRenderers() const { return m_transparentMeshRenderers; }
 		const std::vector<MeshRenderer*>& GetOpaqueMeshRenderers() const { return m_opaqueMeshRenderers; }
 
@@ -56,6 +59,8 @@ namespace Dive
 		std::unordered_map<uint64_t, std::unique_ptr<GameObject>> m_gameObjectMap;
 		std::vector<GameObject*> m_rootGameObjects;
 		std::unordered_set<uint64_t> m_destroyQueue;
+
+		std::vector<Light*> m_lights;
 
 		std::vector<MeshRenderer*> m_transparentMeshRenderers;
 		std::vector<MeshRenderer*> m_opaqueMeshRenderers;

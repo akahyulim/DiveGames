@@ -3,6 +3,8 @@
 #include "Transform.h"
 #include "../GameObject.h"
 #include "graphics/RenderTexture.h"
+#include "graphics/ConstantBuffer.h"
+#include "graphics/Graphics.h"
 #include "rendering/Renderer.h"
 
 using namespace DirectX;
@@ -20,6 +22,13 @@ namespace Dive
 		: Component(gameObject)
 	{
 		s_allCameras.push_back(this);
+
+		m_cbCamera = std::make_unique<ConstantBuffer>(
+			Graphics::GetDevice(),
+			ePSConstantBufferSlot::Camera,
+			static_cast<uint32_t>(sizeof(CameraData)));
+		if (!m_cbCamera) DV_LOG(MeshRenderer, err, "[::Camera] Camera Buffer 생성 실패");
+
 		DV_LOG(Camera, info, "생성: {}, {}", GetName(), GetInstanceID());
 	}
 
@@ -52,6 +61,13 @@ namespace Dive
 
 		auto viewport = GetViewport();
 		deviceContext->RSSetViewports(1, &viewport);		
+
+		CameraData cpuBuffer{};
+		cpuBuffer.position = GetTransform()->GetPosition();
+		cpuBuffer.perspectiveValue;
+		cpuBuffer.viewInverse;
+		m_cbCamera->Update<CameraData>(deviceContext, cpuBuffer);
+		m_cbCamera->Bind(deviceContext);
 	}
 
 	DirectX::XMFLOAT4X4 Camera::GetView() const

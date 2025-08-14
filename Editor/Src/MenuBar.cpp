@@ -159,15 +159,21 @@ namespace Dive
 				{
 					if (ImGui::MenuItem("Directional Light", nullptr, nullptr, isShowWorldMenu))
 					{
-						auto current_path = std::filesystem::current_path();
-						DV_LOG(MenuBar, debug, "Current Path: {}", current_path.string());
+						auto dirLightGO = EditorContext::ActiveWorld->CreateGameObject("Directional Light");
+						auto light = dirLightGO->AddComponent<Light>();
+						light->SetLightType(eLightType::Directional);
 					}
 					if (ImGui::MenuItem("Point Light", nullptr, nullptr, isShowWorldMenu))
 					{
+						auto pointLightGO = EditorContext::ActiveWorld->CreateGameObject("Point Light");
+						auto light = pointLightGO->AddComponent<Light>();
+						light->SetLightType(eLightType::Point);
 					}
 					if (ImGui::MenuItem("Spot Light", nullptr, nullptr, isShowWorldMenu))
 					{
-
+						auto spotLightGO = EditorContext::ActiveWorld->CreateGameObject("Spot Light");
+						auto light = spotLightGO->AddComponent<Light>();
+						light->SetLightType(eLightType::Spot);
 					}
 					ImGui::EndMenu();
 				}

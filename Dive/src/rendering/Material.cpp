@@ -74,9 +74,9 @@ namespace Dive
     {
         assert(deviceContext);
 
-        ShaderManager::BindInputLayout("UnlitVS", eInputLayout::Unlit, deviceContext);
-        ShaderManager::GetShader("UnlitVS")->Bind(deviceContext);
-        ShaderManager::GetShader("UnlitPS")->Bind(deviceContext);
+        ShaderManager::BindInputLayout("ForwardLightVS", eInputLayout::Lit, deviceContext);
+        ShaderManager::GetShader("ForwardLightVS")->Bind(deviceContext);
+        ShaderManager::GetShader("ForwardLightPS")->Bind(deviceContext);
 
         //if (m_shaders)
         //    m_shaders->Bind(deviceContext);

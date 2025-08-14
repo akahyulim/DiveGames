@@ -20,4 +20,10 @@ namespace Dive
 		assert(m_gameObject);
 		return m_gameObject;
 	}
+
+	Transform* Component::GetTransform() const
+	{
+		assert(m_gameObject);
+		return m_gameObject->GetTransform();
+	}
 }

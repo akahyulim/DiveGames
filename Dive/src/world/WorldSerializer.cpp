@@ -2,13 +2,13 @@
 #include "WorldSerializer.h"
 #include "World.h"
 #include "GameObject.h"
-#include "Components/Transform.h"
-#include "Components/Camera.h"
-#include "Components/MeshRenderer.h"
+#include "components/Transform.h"
+#include "components/Camera.h"
+#include "components/MeshRenderer.h"
+#include "components/Light.h"
 #include "rendering/StaticMesh.h"
 #include "rendering/Material.h"
 #include "rendering/MeshFactory.h"
-#include "Common.h"
 #include "resource/YamlHelper.h"
 
 namespace Dive
@@ -70,8 +70,8 @@ namespace Dive
 
 			if (go->HasComponent<Camera>())
 			{
-				uint64_t cameraID = GetFileID(go->GetComponent<Camera>());
 				auto camera = go->GetComponent<Camera>();
+				uint64_t cameraID = GetFileID(camera);
 				out << YAML::Key << "Camera" << YAML::Value << YAML::BeginMap;
 				out << YAML::Key << "fileID" << YAML::Value << cameraID;
 				out << YAML::Key << "ProjectionType" << YAML::Value << static_cast<int>(camera->GetProjectionType());
@@ -88,8 +88,8 @@ namespace Dive
 
 			if (go->HasComponent<MeshRenderer>())
 			{
-				uint64_t staticMeshID = GetFileID(go->GetComponent<MeshRenderer>());
 				auto meshRenderer = go->GetComponent<MeshRenderer>();
+				uint64_t staticMeshID = GetFileID(meshRenderer);
 				auto staticMesh = meshRenderer->GetStaticMesh();
 				auto material = meshRenderer->GetMaterial();
 				out << YAML::Key << "MeshRenderer" << YAML::Value << YAML::BeginMap;
@@ -99,6 +99,17 @@ namespace Dive
 				out << YAML::Key << "Material" << YAML::Value << material->GetName();
 				material->SaveToFile("Assets/Materials/" + material->GetName() + ".mat");
 				out << YAML::EndMap; // MeshRenderer
+			}
+
+			if (go->HasComponent<Light>())
+			{
+				auto light = go->GetComponent<Light>();
+				uint64_t lightID = GetFileID(light);
+				out << YAML::Key << "Light" << YAML::Value << YAML::BeginMap;
+				out << YAML::Value << "fileID" << YAML::Value << lightID;
+				out << YAML::Value << "LightType" << YAML::Value << static_cast<int>(light->GetLightType());
+				out << YAML::Value << "LightColor" << YAML::Value << light->GetColor();
+				out << YAML::EndMap; // Light
 			}
 
 			out << YAML::EndMap; // GameObject
@@ -190,7 +201,7 @@ namespace Dive
 				auto staticMeshID = meshRendererNode["fileID"].as<uint64_t>();
 				auto meshRenderer = go->AddComponent<MeshRenderer>();
 				std::string staticMeshName = meshRendererNode["StaticMesh"].as<std::string>();
-				
+
 				std::shared_ptr<StaticMesh> staticMesh = nullptr;
 				switch (static_cast<eSourceType>(meshRendererNode["SourceType"].as<int>()))
 				{
@@ -203,13 +214,21 @@ namespace Dive
 					break;
 				}
 				meshRenderer->SetStaticMesh(staticMesh);
-				
+
 				// 이것두 default는 리소스 매니져에서, file은 직접?
 				std::shared_ptr<Material> material = std::make_shared<Material>(device);
 				material->LoadFromFile("Assets/Materials/" + meshRendererNode["Material"].as<std::string>() + ".mat");
 				meshRenderer->SetMaterial(material);
-				
+
 				fileIDToObject[staticMeshID] = meshRenderer;
+			}
+
+			if (const auto& lightNode = node["Light"])
+			{
+				auto lightID = lightNode["fileID"].as<uint64_t>();
+				auto light = go->AddComponent<Light>();
+				light->SetLightType(static_cast<eLightType>(lightNode["LightType"].as<int>()));
+				light->SetColor(lightNode["LightColor"].as<DirectX::XMFLOAT3>());
 			}
 		}
 

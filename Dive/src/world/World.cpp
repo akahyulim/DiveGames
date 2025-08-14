@@ -1,9 +1,10 @@
 ﻿#include "stdafx.h"
 #include "World.h"
 #include "GameObject.h"
-#include "Components/Transform.h"
-#include "Components/Camera.h"
-#include "Components/MeshRenderer.h"
+#include "components/Transform.h"
+#include "components/Camera.h"
+#include "components/Light.h"
+#include "components/MeshRenderer.h"
 #include "resource/ResourceManager.h"
 
 namespace Dive
@@ -42,6 +43,7 @@ namespace Dive
 	{
 		assert(camera);
 
+		m_lights.clear();
 		m_opaqueMeshRenderers.clear();
 		m_transparentMeshRenderers.clear();
 
@@ -49,7 +51,11 @@ namespace Dive
 
 		for (auto& [instanceID, gameObject] : m_gameObjectMap)
 		{
-			if (gameObject->HasComponent<MeshRenderer>())
+			if (gameObject->HasComponent<Light>())
+			{
+				m_lights.push_back(gameObject->GetComponent<Light>());
+			}
+			else if (gameObject->HasComponent<MeshRenderer>())
 			{
 				auto meshRenderer = gameObject->GetComponent<MeshRenderer>();
 				// boundingBox를 통해 Frustum Culling 확인

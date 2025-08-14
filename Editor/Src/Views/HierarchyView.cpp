@@ -230,13 +230,21 @@ namespace Dive
 			{
 				if (ImGui::MenuItem("Directional Light", nullptr, nullptr))
 				{
+					auto dirLightGO = EditorContext::ActiveWorld->CreateGameObject("Directional Light");
+					auto light = dirLightGO->AddComponent<Light>();
+					light->SetLightType(eLightType::Directional);
 				}
 				if (ImGui::MenuItem("Point Light", nullptr, nullptr))
 				{
+					auto pointLightGO = EditorContext::ActiveWorld->CreateGameObject("Point Light");
+					auto light = pointLightGO->AddComponent<Light>();
+					light->SetLightType(eLightType::Point);
 				}
 				if (ImGui::MenuItem("Spot Light", nullptr, nullptr))
 				{
-
+					auto spotLightGO = EditorContext::ActiveWorld->CreateGameObject("Spot Light");
+					auto light = spotLightGO->AddComponent<Light>();
+					light->SetLightType(eLightType::Spot);
 				}
 				ImGui::EndMenu();
 			}

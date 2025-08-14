@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Common.h"
 
 namespace Dive
@@ -18,6 +18,7 @@ namespace Dive
 
 	enum class ePSConstantBufferSlot : uint8_t
 	{
+		Camera,
 		Material,
 		Light,
 		Count
