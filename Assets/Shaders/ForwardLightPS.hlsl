@@ -101,23 +101,19 @@ float4 MainPS(PSInput input) : SV_TARGET
     float4 diffColor;
  
     if (!HasDiffuseMap())
-    {
         diffColor = cbMaterial.diffuseColor;
-    }
     else
-    {
         diffColor = DiffuseMap.Sample(WrapLinearSampler, input.UV);
-    }
 
     float3 normal = input.Normal;
 
     float3 lightColor;
-    //if (IsDirectionalLight())
+    if (IsDirectionalLight())
         lightColor = CalcuDirLight(input.WorldPos, normal, diffColor.rgb);
-    //if (IsPointLight())
-    //    lightColor = CalcuPointLight(input.WorldPos, normal, diffColor.rgb);
-    //if (IsSpotLight())
-    //    lightColor = CalcuSpotLight(input.WorldPos, normal, diffColor.rgb);
+    else if (IsPointLight())
+        lightColor = CalcuPointLight(input.WorldPos, normal, diffColor.rgb);
+    else if (IsSpotLight())
+        lightColor = CalcuSpotLight(input.WorldPos, normal, diffColor.rgb);
     
     //return float4(sqrt(lightColor.rgb), diffColor.a);
     return float4(lightColor.rgb, diffColor.a);

@@ -12,27 +12,27 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Views\GameView.cpp">
+    <ClCompile Include="src\Views\GameView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Views\HierarchyView.cpp">
+    <ClCompile Include="src\Views\HierarchyView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Views\InspectorView.cpp">
+    <ClCompile Include="src\Views\InspectorView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Views\View.cpp">
+    <ClCompile Include="src\Views\View.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Views\WorldView.cpp">
+    <ClCompile Include="src\Views\WorldView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Views\LogView.cpp">
+    <ClCompile Include="src\Views\LogView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="Src\Editor.cpp" />
-    <ClCompile Include="Src\main.cpp" />
-    <ClCompile Include="Src\MenuBar.cpp" />
+    <ClCompile Include="src\Editor.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MenuBar.cpp" />
     <ClCompile Include="Third-Party\imgui\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -56,26 +56,26 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Views\GameView.h">
+    <ClInclude Include="src\Views\GameView.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Views\HierarchyView.h">
+    <ClInclude Include="src\Views\HierarchyView.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Views\InspectorView.h">
+    <ClInclude Include="src\Views\InspectorView.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Views\View.h">
+    <ClInclude Include="src\Views\View.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Views\WorldView.h">
+    <ClInclude Include="src\Views\WorldView.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Views\LogView.h">
+    <ClInclude Include="src\Views\LogView.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Editor.h" />
-    <ClInclude Include="Src\MenuBar.h" />
+    <ClInclude Include="src\Editor.h" />
+    <ClInclude Include="src\MenuBar.h" />
     <ClInclude Include="Third-Party\imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>

@@ -166,15 +166,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Src\Editor.cpp" />
-    <ClCompile Include="Src\main.cpp" />
-    <ClCompile Include="Src\MenuBar.cpp" />
-    <ClCompile Include="Src\Views\GameView.cpp" />
-    <ClCompile Include="Src\Views\HierarchyView.cpp" />
-    <ClCompile Include="Src\Views\InspectorView.cpp" />
-    <ClCompile Include="Src\Views\LogView.cpp" />
-    <ClCompile Include="Src\Views\View.cpp" />
-    <ClCompile Include="Src\Views\WorldView.cpp" />
+    <ClCompile Include="src\Editor.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MenuBar.cpp" />
+    <ClCompile Include="src\Views\GameView.cpp" />
+    <ClCompile Include="src\Views\HierarchyView.cpp" />
+    <ClCompile Include="src\Views\InspectorView.cpp" />
+    <ClCompile Include="src\Views\LogView.cpp" />
+    <ClCompile Include="src\Views\View.cpp" />
+    <ClCompile Include="src\Views\WorldView.cpp" />
     <ClCompile Include="Third-Party\imgui\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="Third-Party\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="Third-Party\imgui\imgui.cpp" />
@@ -184,14 +184,14 @@
     <ClCompile Include="Third-Party\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Src\Editor.h" />
-    <ClInclude Include="Src\MenuBar.h" />
-    <ClInclude Include="Src\Views\GameView.h" />
-    <ClInclude Include="Src\Views\HierarchyView.h" />
-    <ClInclude Include="Src\Views\InspectorView.h" />
-    <ClInclude Include="Src\Views\LogView.h" />
-    <ClInclude Include="Src\Views\View.h" />
-    <ClInclude Include="Src\Views\WorldView.h" />
+    <ClInclude Include="src\Editor.h" />
+    <ClInclude Include="src\MenuBar.h" />
+    <ClInclude Include="src\Views\GameView.h" />
+    <ClInclude Include="src\Views\HierarchyView.h" />
+    <ClInclude Include="src\Views\InspectorView.h" />
+    <ClInclude Include="src\Views\LogView.h" />
+    <ClInclude Include="src\Views\View.h" />
+    <ClInclude Include="src\Views\WorldView.h" />
     <ClInclude Include="Third-Party\imgui\backends\imgui_impl_dx11.h" />
     <ClInclude Include="Third-Party\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="Third-Party\imgui\imconfig.h" />

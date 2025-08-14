@@ -47,10 +47,14 @@ namespace Dive
         void SetColor(float r, float g, float b) { m_color = { r, g, b }; }
         void SetColor(const DirectX::XMFLOAT3& color) { m_color = color; }
 
+        float GetRange() const { return m_range; }
+        void SetRange(float range) { m_range = range; }
+
     private:
 	private:
         eLightType m_lightType;
         DirectX::XMFLOAT3 m_color;
+        float m_range;
         uint32_t m_options;
 
         std::unique_ptr<ConstantBuffer> m_cbLight;

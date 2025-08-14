@@ -51,6 +51,9 @@ namespace Dive
 
 		for (auto& [instanceID, gameObject] : m_gameObjectMap)
 		{
+			if (!gameObject->IsActiveSelf())
+				continue;
+
 			if (gameObject->HasComponent<Light>())
 			{
 				m_lights.push_back(gameObject->GetComponent<Light>());

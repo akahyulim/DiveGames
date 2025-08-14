@@ -10,6 +10,7 @@ namespace Dive
 		: Component(gameObject)
 		, m_lightType(eLightType::Directional)
 		, m_color(1.0f, 1.0f, 1.0f)
+		, m_range(50.0f)
 		, m_options(0)
 	{
 		m_cbLight = std::make_unique<ConstantBuffer>(
@@ -23,8 +24,10 @@ namespace Dive
 	{
 		LightData cpuBuffer{};
 		cpuBuffer.color = m_color;
+		cpuBuffer.position = GetTransform()->GetPosition();
+		cpuBuffer.rangeRcp = 1.0f / m_range;
 		cpuBuffer.direction = GetTransform()->GetForward();
-		cpuBuffer.options = m_lightType == eLightType::Directional ? 1 : (m_lightType == eLightType::Point ? 2 : 4);
+		cpuBuffer.options = static_cast<uint32_t>(m_lightType);
 		m_cbLight->Update<LightData>(deviceContext, cpuBuffer);
 		m_cbLight->Bind(deviceContext);
 	}

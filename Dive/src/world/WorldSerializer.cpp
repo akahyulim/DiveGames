@@ -53,6 +53,7 @@ namespace Dive
 			out << YAML::Key << "fileID" << YAML::Value << goID;
 			out << YAML::Key << "Name" << YAML::Value << go->GetName();
 			out << YAML::Key << "Tag" << YAML::Value << go->GetTag();
+			out << YAML::Key << "Active" << YAML::Value << go->IsActiveSelf();
 
 
 			uint64_t transformID = GetFileID(go->GetTransform());
@@ -109,6 +110,7 @@ namespace Dive
 				out << YAML::Value << "fileID" << YAML::Value << lightID;
 				out << YAML::Value << "LightType" << YAML::Value << static_cast<int>(light->GetLightType());
 				out << YAML::Value << "LightColor" << YAML::Value << light->GetColor();
+				out << YAML::Value << "LightRange" << YAML::Value << light->GetRange();
 				out << YAML::EndMap; // Light
 			}
 
@@ -166,9 +168,11 @@ namespace Dive
 			auto goID = node["fileID"].as<uint64_t>();
 			auto name = node["Name"].as<std::string>();
 			auto tag = node["Tag"] ? node["Tag"].as<std::string>() : "Untagged";
+			auto active = node["Active"].as<bool>();
 
 			auto go = m_world->CreateGameObject(name);
 			go->SetTag(tag);
+			go->SetActive(active);
 			fileIDToObject[goID] = go;
 
 			const auto& transformNode = node["Transform"];
@@ -229,6 +233,7 @@ namespace Dive
 				auto light = go->AddComponent<Light>();
 				light->SetLightType(static_cast<eLightType>(lightNode["LightType"].as<int>()));
 				light->SetColor(lightNode["LightColor"].as<DirectX::XMFLOAT3>());
+				light->SetRange(lightNode["LightRange"].as<float>());
 			}
 		}
 

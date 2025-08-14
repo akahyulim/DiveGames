@@ -99,16 +99,16 @@
       <Filter>rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\Common.h" />
-    <ClInclude Include="src\world\Components\Camera.h">
+    <ClInclude Include="src\world\components\Camera.h">
       <Filter>world\components</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\Components\Component.h">
+    <ClInclude Include="src\world\components\Component.h">
       <Filter>world\components</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\Components\MeshRenderer.h">
+    <ClInclude Include="src\world\components\MeshRenderer.h">
       <Filter>world\components</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\Components\Transform.h">
+    <ClInclude Include="src\world\components\Transform.h">
       <Filter>world\components</Filter>
     </ClInclude>
     <ClInclude Include="src\world\GameObject.h">
@@ -144,7 +144,7 @@
     <ClInclude Include="src\rendering\StaticMesh.h">
       <Filter>rendering</Filter>
     </ClInclude>
-    <ClInclude Include="src\world\Components\Light.h" />
+    <ClInclude Include="src\world\components\Light.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -220,16 +220,16 @@
     <ClCompile Include="src\rendering\Renderer.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\Components\Camera.cpp">
+    <ClCompile Include="src\world\components\Camera.cpp">
       <Filter>world\components</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\Components\Component.cpp">
+    <ClCompile Include="src\world\components\Component.cpp">
       <Filter>world\components</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\Components\MeshRenderer.cpp">
+    <ClCompile Include="src\world\components\MeshRenderer.cpp">
       <Filter>world\components</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\Components\Transform.cpp">
+    <ClCompile Include="src\world\components\Transform.cpp">
       <Filter>world\components</Filter>
     </ClCompile>
     <ClCompile Include="src\world\GameObject.cpp">
@@ -253,6 +253,6 @@
     <ClCompile Include="src\rendering\StaticMesh.cpp">
       <Filter>rendering</Filter>
     </ClCompile>
-    <ClCompile Include="src\world\Components\Light.cpp" />
+    <ClCompile Include="src\world\components\Light.cpp" />
   </ItemGroup>
 </Project>

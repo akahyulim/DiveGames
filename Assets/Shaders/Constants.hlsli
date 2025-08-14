@@ -75,13 +75,13 @@ cbuffer LightBuffer : register(b2)
 // cbLightPixel options
 bool IsDirectionalLight()
 {
-    return (cbLight.options & 1) != 0;
+    return cbLight.options == 0;
 }
 bool IsPointLight()
 {
-    return (cbLight.options & 2) != 0;
+    return cbLight.options == 1;
 }
 bool IsSpotLight()
 {
-    return (cbLight.options & 4) != 0;
+    return cbLight.options == 2;
 }

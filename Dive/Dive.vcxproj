@@ -54,11 +54,11 @@
     <ClInclude Include="src\resource\ResourceManager.h" />
     <ClInclude Include="src\resource\YamlHelper.h" />
     <ClInclude Include="src\stdafx.h" />
-    <ClInclude Include="src\world\Components\Camera.h" />
-    <ClInclude Include="src\world\Components\Component.h" />
-    <ClInclude Include="src\world\Components\Light.h" />
-    <ClInclude Include="src\world\Components\MeshRenderer.h" />
-    <ClInclude Include="src\world\Components\Transform.h" />
+    <ClInclude Include="src\world\components\Camera.h" />
+    <ClInclude Include="src\world\components\Component.h" />
+    <ClInclude Include="src\world\components\Light.h" />
+    <ClInclude Include="src\world\components\MeshRenderer.h" />
+    <ClInclude Include="src\world\components\Transform.h" />
     <ClInclude Include="src\world\GameObject.h" />
     <ClInclude Include="src\world\World.h" />
     <ClInclude Include="src\world\WorldSerializer.h" />
@@ -95,11 +95,11 @@
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\world\Components\Camera.cpp" />
-    <ClCompile Include="src\world\Components\Component.cpp" />
-    <ClCompile Include="src\world\Components\Light.cpp" />
-    <ClCompile Include="src\world\Components\MeshRenderer.cpp" />
-    <ClCompile Include="src\world\Components\Transform.cpp" />
+    <ClCompile Include="src\world\components\Camera.cpp" />
+    <ClCompile Include="src\world\components\Component.cpp" />
+    <ClCompile Include="src\world\components\Light.cpp" />
+    <ClCompile Include="src\world\components\MeshRenderer.cpp" />
+    <ClCompile Include="src\world\components\Transform.cpp" />
     <ClCompile Include="src\world\GameObject.cpp" />
     <ClCompile Include="src\world\World.cpp" />
     <ClCompile Include="src\world\WorldSerializer.cpp" />
