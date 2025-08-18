@@ -16,7 +16,7 @@ namespace Dive
 		Transform(GameObject* gameObject);
 		~Transform() override;
 
-		static constexpr eComponentType GetType() { return eComponentType::Transform; }
+		static constexpr eComponentType GetComponentType() { return eComponentType::Transform; }
 
 		// transform
 		DirectX::XMFLOAT3 GetPosition() const;

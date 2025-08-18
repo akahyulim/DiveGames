@@ -169,12 +169,12 @@
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MenuBar.cpp" />
-    <ClCompile Include="src\Views\GameView.cpp" />
-    <ClCompile Include="src\Views\HierarchyView.cpp" />
-    <ClCompile Include="src\Views\InspectorView.cpp" />
-    <ClCompile Include="src\Views\LogView.cpp" />
-    <ClCompile Include="src\Views\View.cpp" />
-    <ClCompile Include="src\Views\WorldView.cpp" />
+    <ClCompile Include="src\views\GameView.cpp" />
+    <ClCompile Include="src\views\HierarchyView.cpp" />
+    <ClCompile Include="src\views\InspectorView.cpp" />
+    <ClCompile Include="src\views\LogView.cpp" />
+    <ClCompile Include="src\views\View.cpp" />
+    <ClCompile Include="src\views\WorldView.cpp" />
     <ClCompile Include="Third-Party\imgui\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="Third-Party\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="Third-Party\imgui\imgui.cpp" />
@@ -186,12 +186,12 @@
   <ItemGroup>
     <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\MenuBar.h" />
-    <ClInclude Include="src\Views\GameView.h" />
-    <ClInclude Include="src\Views\HierarchyView.h" />
-    <ClInclude Include="src\Views\InspectorView.h" />
-    <ClInclude Include="src\Views\LogView.h" />
-    <ClInclude Include="src\Views\View.h" />
-    <ClInclude Include="src\Views\WorldView.h" />
+    <ClInclude Include="src\views\GameView.h" />
+    <ClInclude Include="src\views\HierarchyView.h" />
+    <ClInclude Include="src\views\InspectorView.h" />
+    <ClInclude Include="src\views\LogView.h" />
+    <ClInclude Include="src\views\View.h" />
+    <ClInclude Include="src\views\WorldView.h" />
     <ClInclude Include="Third-Party\imgui\backends\imgui_impl_dx11.h" />
     <ClInclude Include="Third-Party\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="Third-Party\imgui\imconfig.h" />

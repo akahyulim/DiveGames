@@ -14,20 +14,17 @@ namespace Dive
 
     struct alignas(16) LightData
     {
+        uint32_t type;
         DirectX::XMFLOAT3 color;
-        float outerConeAngle;
-
+       
         DirectX::XMFLOAT3 position;
         float rangeRcp;
 
         DirectX::XMFLOAT3 direction;
-        float innerConeAngle;
+        float innerAngle;
 
-        uint32_t options;
-        int shadowEnabled;
-        DirectX::XMFLOAT2 padding;
-
-        DirectX::XMFLOAT4X4 shadow;
+        float outerAngle;
+        DirectX::XMFLOAT3 padding;
     };
 
 	class Light : public Component
@@ -36,9 +33,7 @@ namespace Dive
         Light(GameObject* gameObject);
         ~Light() = default;
 
-        static constexpr eComponentType GetType() { return eComponentType::Light; }
-
-        void Bind(ID3D11DeviceContext* deviceContext);
+        static constexpr eComponentType GetComponentType() { return eComponentType::Light; }
 
         eLightType GetLightType() const { return m_lightType; }
         void SetLightType(eLightType type) { m_lightType = type; }
@@ -48,15 +43,28 @@ namespace Dive
         void SetColor(const DirectX::XMFLOAT3& color) { m_color = color; }
 
         float GetRange() const { return m_range; }
+        float GetRangeRcp() const { return 1.0f / m_range; }
         void SetRange(float range) { m_range = range; }
+
+        float GetInnerAngleRadians() const { return m_innerAngle; }
+        float GetInnerAngleDegrees() const { return DirectX::XMConvertToDegrees(m_innerAngle); }
+        void SetInnerAngleRadians(float radian) { m_innerAngle = radian; }
+        void SetInnerAngleDegrees(float degree) { m_innerAngle = DirectX::XMConvertToRadians(degree); }
+
+        float GetOuterAngleRadians() const { return m_outerAngle; }
+        float GetOuterAngleDegrees() const { return DirectX::XMConvertToDegrees(m_outerAngle); }
+        void SetOuterAngleRandians(float radian) { m_outerAngle = radian; }
+        void SetOuterAngleDegrees(float degree) { m_outerAngle = DirectX::XMConvertToRadians(degree); }
+
+        DirectX::XMFLOAT3 GetPosition() const;
+        DirectX::XMFLOAT3 GetDirection() const;
 
     private:
 	private:
         eLightType m_lightType;
         DirectX::XMFLOAT3 m_color;
         float m_range;
-        uint32_t m_options;
-
-        std::unique_ptr<ConstantBuffer> m_cbLight;
+        float m_innerAngle;
+        float m_outerAngle;
 	};
 }

@@ -1,6 +1,7 @@
-#pragma once
+﻿#pragma once
 #include "resource/Resource.h"
 #include "graphics/Graphics.h"
+#include "graphics/ConstantBuffer.h"
 
 namespace Dive
 {
@@ -8,7 +9,6 @@ namespace Dive
 	class Texture2D;
 	class Shader;
 	class ShaderProgram;
-	class ConstantBuffer;
 
 	enum class eMapType : uint8_t
 	{

@@ -63,7 +63,7 @@ namespace Dive
 	{
 		static_assert(std::is_base_of<Component, T>::value, "T는 반드시 Component를 상속하여야 한다.");
 
-		auto type = T::GetType();
+		auto type = T::GetComponentType();
 		if (!HasComponentByType(type))
 			m_components[type] = std::make_unique<T>(this);
 
@@ -74,20 +74,20 @@ namespace Dive
 	void GameObject::RemoveComponent()
 	{
 		static_assert(std::is_base_of<Component, T>::value, "T는 반드시 Component를 상속하여야 한다.");
-		RemoveComponentByType(T::GetType());
+		RemoveComponentByType(T::GetComponentType());
 	}
 
 	template<typename T>
 	bool GameObject::HasComponent() const
 	{
 		static_assert(std::is_base_of<Component, T>::value, "T는 반드시 Component를 상속하여야 한다.");
-		return HasComponentByType(T::GetType());
+		return HasComponentByType(T::GetComponentType());
 	}
 
 	template<typename T>
 	T* GameObject::GetComponent() const
 	{
 		static_assert(std::is_base_of<Component, T>::value, "T는 반드시 Component를 상속하여야 한다.");
-		return static_cast<T*>(GetComponentByType(T::GetType()));
+		return static_cast<T*>(GetComponentByType(T::GetComponentType()));
 	}
 }

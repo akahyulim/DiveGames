@@ -1,13 +1,11 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Renderer.h"
 #include "StaticMesh.h"
 #include "Material.h"
-#include "RenderPass.h"
 #include "graphics/RenderTexture.h"
 #include "graphics/Graphics.h"
 #include "graphics/Shader.h"
 #include "graphics/ShaderManager.h"
-#include "Common.h"
 #include "world/World.h"
 #include "world/GameObject.h"
 #include "world/Components/Transform.h"
@@ -33,6 +31,7 @@ namespace Dive
 	std::array<Microsoft::WRL::ComPtr<ID3D11SamplerState>, static_cast<size_t>(eSamplerState::Count)> Renderer::s_samplerStates;
 
 	std::vector<std::unique_ptr<RenderPass>> Renderer::s_renderPasses;
+	std::unique_ptr<LightManager> Renderer::s_lightManager;
 
 	void Renderer::Initialize()
 	{
@@ -43,7 +42,9 @@ namespace Dive
 		CreateBlendStates();
 		CreateSamplerStates();
 
-		s_renderPasses.emplace_back(std::make_unique<TestPass>());
+		s_renderPasses.emplace_back(std::make_unique<ForwardLighting>());
+
+		s_lightManager = std::make_unique<LightManager>(Graphics::GetDevice());
 
 		DV_LOG(Renderer, info, "초기화 성공");
 	}
@@ -80,6 +81,8 @@ namespace Dive
 		DV_LOG(Renderer, info, "셧다운 성공");
 	}
 
+	// Render를 분할하고 싶다.
+	// 분류도 이 곳에서 하고 싶다.
 	void Renderer::OnUpdate()
 	{
 		if (!WorldManager::GetActiveWorld())
@@ -89,13 +92,21 @@ namespace Dive
 		for (auto camera : cameras)
 		{
 			WorldManager::GetActiveWorld()->CullAndSort(camera);
+			// 위치가 애매하다. 하지만 바로 위에서 업데이트된 후에 호출하는 게 맞다.
+			s_lightManager->Update(WorldManager::GetActiveWorld());
 
 			auto deviceContext = Graphics::GetDeviceContext();
 
 			// begin frame?
 
+			// pass의 묶음은 path이다.
+			// 추후 Forward, Deferred로 나뉘어야 한다.
 			for (auto& pass : s_renderPasses)
+			{
+				// 역시 위치가 애매하다.
+				s_lightManager->Bind(deviceContext);
 				pass->Execute(deviceContext, camera);
+			}
 
 			// end frame?
 		}

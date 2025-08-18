@@ -11,24 +11,20 @@ namespace Dive
 		, m_lightType(eLightType::Directional)
 		, m_color(1.0f, 1.0f, 1.0f)
 		, m_range(50.0f)
-		, m_options(0)
+		, m_innerAngle(DirectX::XMConvertToRadians(15.0f))
+		, m_outerAngle(DirectX::XMConvertToRadians(30.0f))
 	{
-		m_cbLight = std::make_unique<ConstantBuffer>(
-			Graphics::GetDevice(),
-			ePSConstantBufferSlot::Light,
-			static_cast<uint32_t>(sizeof(LightData)));
-		if (!m_cbLight) DV_LOG(Light, err, "[::Light] Light Buffer 생성 실패");
 	}
 
-	void Light::Bind(ID3D11DeviceContext* deviceContext)
+	DirectX::XMFLOAT3 Light::GetPosition() const
 	{
-		LightData cpuBuffer{};
-		cpuBuffer.color = m_color;
-		cpuBuffer.position = GetTransform()->GetPosition();
-		cpuBuffer.rangeRcp = 1.0f / m_range;
-		cpuBuffer.direction = GetTransform()->GetForward();
-		cpuBuffer.options = static_cast<uint32_t>(m_lightType);
-		m_cbLight->Update<LightData>(deviceContext, cpuBuffer);
-		m_cbLight->Bind(deviceContext);
+		assert(GetTransform());
+		return GetTransform()->GetPosition();
+	}
+	
+	DirectX::XMFLOAT3 Light::GetDirection() const
+	{
+		assert(GetTransform());
+		return GetTransform()->GetForward();
 	}
 }

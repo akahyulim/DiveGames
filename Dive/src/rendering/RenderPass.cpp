@@ -12,7 +12,7 @@
 namespace Dive
 {
 	// GameObject가 아닌 Camera로 받아도 될 듯하다.
-	void TestPass::Execute(ID3D11DeviceContext* deviceContext, const Camera* camera)
+	void ForwardLighting::Execute(ID3D11DeviceContext* deviceContext, const Camera* camera)
 	{
 		assert(deviceContext);
 		assert(camera);
@@ -32,11 +32,11 @@ namespace Dive
 		// 일단 한 번에 바인딩 해봤다.
 		Renderer::BindSamplerStates();
 
-		for (auto light : world->GetLights())
+		//for (auto light : world->GetLights())
 		{
 			// DirLight는 하나인 것이 좋고
 			// 나머지 Light들은 다시 그린 후 합쳐야 한다.
-			light->Bind(deviceContext);
+			//light->Bind(deviceContext);
 
 			// opaque
 			for (auto meshRenderer : world->GetOpaqueMeshRenderers())

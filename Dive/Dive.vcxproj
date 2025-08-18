@@ -44,6 +44,7 @@
     <ClInclude Include="src\math\BoundingBox.h" />
     <ClInclude Include="src\math\Frustum.h" />
     <ClInclude Include="src\math\Math.h" />
+    <ClInclude Include="src\rendering\LightManager.h" />
     <ClInclude Include="src\rendering\Material.h" />
     <ClInclude Include="src\rendering\MeshFactory.h" />
     <ClInclude Include="src\rendering\Renderer.h" />
@@ -85,6 +86,7 @@
     <ClCompile Include="src\math\BoundingBox.cpp" />
     <ClCompile Include="src\math\Frustum.cpp" />
     <ClCompile Include="src\math\Math.cpp" />
+    <ClCompile Include="src\rendering\LightManager.cpp" />
     <ClCompile Include="src\rendering\Material.cpp" />
     <ClCompile Include="src\rendering\MeshFactory.cpp" />
     <ClCompile Include="src\rendering\Renderer.cpp" />

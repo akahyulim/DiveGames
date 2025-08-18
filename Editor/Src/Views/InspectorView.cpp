@@ -193,6 +193,11 @@ namespace Dive
 
 			// Tag
 			{
+				ImGui::Columns(2);
+				ImGui::SetColumnWidth(0, 115.0f);
+				ImGui::Text("Tag");
+				ImGui::NextColumn();
+
 				const std::string& currentTag = EditorContext::Selected->GetTag();
 				if (std::find(m_TagList.begin(), m_TagList.end(), currentTag) == m_TagList.end())
 					m_TagList.push_back(currentTag);
@@ -212,7 +217,7 @@ namespace Dive
 					}
 				}
 
-				if (ImGui::Combo("Tag", &currentTagIndex, tagLabels.data(), static_cast<int>(tagLabels.size())))
+				if (ImGui::Combo("##Tag", &currentTagIndex, tagLabels.data(), static_cast<int>(tagLabels.size())))
 				{
 					if (currentTagIndex == static_cast<int>(tagLabels.size()) - 1)
 						ImGui::OpenPopup("Add Tag");
@@ -259,6 +264,7 @@ namespace Dive
 
 					ImGui::EndPopup();
 				}
+				ImGui::Columns(1);
 			}
 
 			// Layer
@@ -275,15 +281,15 @@ namespace Dive
 				auto transform = EditorContext::Selected->GetTransform();
 
 				auto position = transform->GetLocalPosition();
-				DrawVec3Control("Position", position);
+				DrawVec3Control("Position", position, 0.0f, 115.0f);
 				transform->SetLocalPosition(position);
 
 				auto rotation = transform->GetLocalRotationDegrees();
-				DrawVec3Control("Rotation", rotation);
+				DrawVec3Control("Rotation", rotation, 0.0f, 115.0f);
 				transform->SetLocalRotationByDegrees(rotation);
 
 				auto scale = transform->GetLocalScale();
-				DrawVec3Control("Scale", scale, 1.0f);
+				DrawVec3Control("Scale", scale, 1.0f, 115.0f);
 				transform->SetLocalScale(scale);
 			}
 		}
@@ -398,11 +404,50 @@ namespace Dive
 			{
 				auto light = EditorContext::Selected->GetComponent<Light>();
 
-				// light color
+				// type
+				ImGui::Columns(2);
+				ImGui::SetColumnWidth(0, 115.0f);
+				ImGui::Text("Type");
+				ImGui::NextColumn();
+				std::vector<const char*> lightTypes;
+				lightTypes.push_back("Direcitonal");
+				lightTypes.push_back("Point");
+				lightTypes.push_back("Spot");
+				int currentType = static_cast<int>(light->GetLightType());
+				ImGui::Combo("##LightType", &currentType, lightTypes.data(), static_cast<int>(lightTypes.size()));
+				light->SetLightType(static_cast<eLightType>(currentType));
+				ImGui::Columns(1);
+
+				if (currentType != static_cast<int>(eLightType::Directional))
+				{
+					// range
+					ImGui::Columns(2);
+					ImGui::SetColumnWidth(0, 115.0f);
+					ImGui::Text("Range");
+					ImGui::NextColumn();
+					float range = light->GetRange();
+					ImGui::DragFloat("##LightRange", &range, 0.1f, 0.0f, 0.0f, "%.2f");
+					range = std::max(range, 0.0f); // 음수 보정
+					light->SetRange(range);
+					ImGui::Columns(1);
+
+					if (currentType == static_cast<int>(eLightType::Spot))
+					{
+						// spot angles
+						static DirectX::XMFLOAT2 spotAngles = { 0.0f, 0.0f };
+						spotAngles.x = light->GetInnerAngleDegrees();
+						spotAngles.y = light->GetOuterAngleDegrees();
+						DrawVec2Control("Spot Angles", spotAngles, 0.0f, 115.0f, "I", "O");
+						light->SetInnerAngleDegrees(spotAngles.x);
+						light->SetOuterAngleDegrees(spotAngles.y);
+					}
+				}
+
+				// color
 				ImVec4 color = { light->GetColor().x, light->GetColor().y, light->GetColor().z, 1.0f };
 				ImGui::Columns(2);
 				ImGui::SetColumnWidth(0, 115.0f);
-				ImGui::Text("Light Color");
+				ImGui::Text("Color");
 				ImGui::NextColumn();
 				ImGui::ColorEdit3("##LightColor", (float*)&color);
 				light->SetColor(color.x, color.y, color.z);

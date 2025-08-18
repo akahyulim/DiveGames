@@ -12,22 +12,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Views\GameView.cpp">
+    <ClCompile Include="src\views\GameView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\HierarchyView.cpp">
+    <ClCompile Include="src\views\HierarchyView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\InspectorView.cpp">
+    <ClCompile Include="src\views\InspectorView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\View.cpp">
+    <ClCompile Include="src\views\View.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\WorldView.cpp">
+    <ClCompile Include="src\views\WorldView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\Views\LogView.cpp">
+    <ClCompile Include="src\views\LogView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
     <ClCompile Include="src\Editor.cpp" />
@@ -56,22 +56,22 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Views\GameView.h">
+    <ClInclude Include="src\views\GameView.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\HierarchyView.h">
+    <ClInclude Include="src\views\HierarchyView.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\InspectorView.h">
+    <ClInclude Include="src\views\InspectorView.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\View.h">
+    <ClInclude Include="src\views\View.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\WorldView.h">
+    <ClInclude Include="src\views\WorldView.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\Views\LogView.h">
+    <ClInclude Include="src\views\LogView.h">
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="src\Editor.h" />

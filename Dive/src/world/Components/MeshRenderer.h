@@ -32,7 +32,7 @@ namespace Dive
 		std::shared_ptr<Material> GetMaterial() const { return m_material; }
 		void SetMaterial(std::shared_ptr<Material> material) { m_material = material; }
 
-		static constexpr eComponentType GetType() { return eComponentType::MeshRenderer; }
+		static constexpr eComponentType GetComponentType() { return eComponentType::MeshRenderer; }
 
 	private:
 		std::shared_ptr<StaticMesh> m_staticMesh;

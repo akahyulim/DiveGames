@@ -1,3 +1,5 @@
+#define MAX_LIGHTS 16
+
 
 // Vertex Shader ====================================================
 struct MatrixData
@@ -51,37 +53,28 @@ bool HasNormalMap()
 
 struct LightData
 {
+    uint type;
     float3 color;
-    float outerConeAngle;
-    
+
     float3 position;
     float rangeRcp;
-    
+
     float3 direction;
-    float innerConeAngle;
-    
-    uint options;
-    int shadowEnabled;
-    float2 padding;
-    
-    matrix shadow;
+    float innerAngle;
+
+    float outerAngle;
+    float3 padding;
 };
 
-cbuffer LightBuffer : register(b2)
+struct ForwardLight
 {
-    LightData cbLight;
-}
+    float4 ambientColor;
+    int lightCount;
+    float3 padding;
+    LightData lights[MAX_LIGHTS];
+};
 
-// cbLightPixel options
-bool IsDirectionalLight()
+cbuffer ForwardLightBuffer : register(b2)
 {
-    return cbLight.options == 0;
-}
-bool IsPointLight()
-{
-    return cbLight.options == 1;
-}
-bool IsSpotLight()
-{
-    return cbLight.options == 2;
+    ForwardLight cbForwardLight;
 }

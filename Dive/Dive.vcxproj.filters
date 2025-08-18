@@ -145,6 +145,7 @@
       <Filter>rendering</Filter>
     </ClInclude>
     <ClInclude Include="src\world\components\Light.h" />
+    <ClInclude Include="src\rendering\LightManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -254,5 +255,6 @@
       <Filter>rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\world\components\Light.cpp" />
+    <ClCompile Include="src\rendering\LightManager.cpp" />
   </ItemGroup>
 </Project>

@@ -29,7 +29,7 @@ namespace Dive
 		GameObject* GetGameObject() const;
 		Transform* GetTransform() const;
 
-		static constexpr eComponentType GetType() { return eComponentType::Undefined; }
+		static constexpr eComponentType GetComponentType() { return eComponentType::Undefined; }
 
 	protected:
 		GameObject* m_gameObject;

@@ -13,7 +13,7 @@ namespace Dive
 		virtual void Execute(ID3D11DeviceContext* deviceContext, const Camera* camera) = 0;
 	};
 
-	class TestPass : public RenderPass
+	class ForwardLighting : public RenderPass
 	{
 	public:
 		void Execute(ID3D11DeviceContext* deviceContext, const Camera* camera) override;

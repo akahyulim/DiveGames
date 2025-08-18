@@ -1,11 +1,14 @@
-#pragma once
+﻿#pragma once
 #include "RenderDefs.h"
+#include "RenderPass.h"
+#include "LightManager.h"
 
 namespace Dive
 {
 	class RenderTexture;
 	class Shader;
-	class RenderPass;
+	//class RenderPass;
+	//class LightManager;
 
 	class Renderer
 	{
@@ -56,5 +59,6 @@ namespace Dive
 		static std::array<Microsoft::WRL::ComPtr<ID3D11SamplerState>, static_cast<size_t>(eSamplerState::Count)> s_samplerStates;
 	
 		static std::vector<std::unique_ptr<RenderPass>> s_renderPasses;
+		static std::unique_ptr<LightManager> s_lightManager;
 	};
 }

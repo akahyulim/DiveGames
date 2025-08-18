@@ -1,89 +1,90 @@
 #include "Constants.hlsli"
 #include "Resources.hlsli"
 
-float3 CalcuDirLight(float3 worldPos, float3 normal, float3 diffColor)
+float3 CalcuDirLight(float3 worldPos, float3 normal, LightData data)
 {
-    float3 finalColor;
-    
-    // Ambient
-    float3 ambientColor = float3(0.05f, 0.05f, 0.05f);
-    finalColor = ambientColor;
+    float3 finalColor = {0.0, 0.0, 0.0};
     
     // Phong diffuse
-    float NDotL = saturate(dot(-cbLight.direction, normal));
+    float NDotL = saturate(dot(-data.direction, normal));
     if (NDotL > 0.0f)
     {
-        finalColor += cbLight.color * NDotL;
+        finalColor += data.color * NDotL;
     }
-    
+
 	// Blinn specular
     float3 toEye = cbCamera.position - worldPos;
     toEye = normalize(toEye);
-    float3 halfWay = normalize(toEye + -cbLight.direction);
+    float3 halfWay = normalize(toEye + -data.direction);
     float NDotH = saturate(dot(halfWay, normal));
     
-    finalColor += cbLight.color * pow(NDotH, 250.0f) * 0.25f;
-    
-    return diffColor * finalColor;
-}
-
-float3 CalcuPointLight(float3 worldPos, float3 normal, float3 diffColor)
-{
-    float3 toLight = cbLight.position - worldPos;
-    float3 toEye = cbCamera.position - worldPos;
-    float distance = length(toLight);
-    
-    // phong diffuse
-    toLight /= distance;
-    float NDotL = saturate(dot(toLight, normal));
-    float3 finalColor = cbLight.color * NDotL;
-    
-    // blinn specular
-    toEye = normalize(toEye);
-    float3 halfWay = normalize(toEye + toLight);
-    float NDotH = saturate(dot(halfWay, normal));
-    finalColor += cbLight.color * pow(NDotH, 250.0f) * 0.25f;
-    
-    // attenuation
-    float distToLightNorm = 1.0f - saturate(distance * cbLight.rangeRcp);
-    float attn = distToLightNorm * distToLightNorm;
-    
-    finalColor *= diffColor * attn;
+    finalColor += data.color * pow(NDotH, 250.0f) * 0.25f;
     
     return finalColor;
 }
 
-float3 CalcuSpotLight(float3 worldPos, float3 normal, float3 diffColor)
+float3 CalcuPointLight(float3 worldPos, float3 normal, LightData data)
 {
-    float3 toLight = cbLight.position - worldPos;
+    float3 toLight = data.position - worldPos;
     float3 toEye = cbCamera.position - worldPos;
     float distance = length(toLight);
     
     // phong diffuse
     toLight /= distance;
     float NDotL = saturate(dot(toLight, normal));
-    float3 finalColor = cbLight.color * NDotL;
+    float3 finalColor = data.color * NDotL;
     
     // blinn specular
     toEye = normalize(toEye);
     float3 halfWay = normalize(toEye + toLight);
     float NDotH = saturate(dot(halfWay, normal));
-    finalColor += cbLight.color * pow(NDotH, 250.0f) * 0.25f;
+    finalColor += data.color * pow(NDotH, 250.0f) * 0.25f;
     
     // attenuation
-    float distToLightNorm = 1.0f - saturate(distance * cbLight.rangeRcp);
-    float distAttn = distToLightNorm * distToLightNorm;
+    float distToLightNorm = 1.0f - saturate(distance * data.rangeRcp);
+    float attn = distToLightNorm * distToLightNorm;
     
-    // cone attenuation
-    float cosAng = acos(dot(-cbLight.direction, toLight));
-    float coneAtt = 1.0f * smoothstep(cbLight.outerConeAngle, cbLight.innerConeAngle, cosAng);
-    
-    float shadowAtt = 1.0f;
-    //if(cbLight.shadowEnabled)
-    //    shadowAtt = SpotShadowPCF(worldPos);
-    
-    finalColor *= diffColor * distAttn * coneAtt * shadowAtt;
-    
+    finalColor *= attn;
+    return finalColor;
+}
+
+float3 CalcuSpotLight(float3 worldPos, float3 normal, LightData data)
+{
+    float3 toLight = data.position - worldPos;
+    float distance = length(toLight);
+    float3 lightDir = normalize(toLight);
+
+    // Spot factor: 픽셀 방향과 빛 방향 사이의 각도
+    float spotFactor = dot(lightDir, -data.direction);
+
+    // Inner/Outer cutoff
+    float innerCutoff = cos(data.innerAngle);
+    float outerCutoff = cos(data.outerAngle);
+
+    // Spot attenuation 계산
+    float spotAttn = saturate((spotFactor - outerCutoff) / (innerCutoff - outerCutoff));
+    spotAttn *= spotAttn; // falloff 부드럽게
+
+    // 조명 영향 없음
+    if (spotAttn <= 0.0f)
+        return float3(0.0, 0.0, 0.0);
+
+    // Phong diffuse
+    float NDotL = saturate(dot(lightDir, normal));
+    float3 finalColor = data.color * NDotL;
+
+    // Blinn specular
+    float3 toEye = normalize(cbCamera.position - worldPos);
+    float3 halfWay = normalize(toEye + lightDir);
+    float NDotH = saturate(dot(halfWay, normal));
+    finalColor += data.color * pow(NDotH, 250.0f) * 0.25f;
+
+    // 거리 기반 감쇠
+    float distNorm = 1.0f - saturate(distance * data.rangeRcp);
+    float attn = distNorm * distNorm;
+
+    // 최종 색상
+    finalColor *= attn * spotAttn;
     return finalColor;
 }
 
@@ -98,25 +99,20 @@ struct PSInput
 
 float4 MainPS(PSInput input) : SV_TARGET
 {
-    float4 diffColor;
- 
-    if (!HasDiffuseMap())
-        diffColor = cbMaterial.diffuseColor;
-    else
-        diffColor = DiffuseMap.Sample(WrapLinearSampler, input.UV);
-
     float3 normal = input.Normal;
+    float4 diffColor = HasDiffuseMap() ?
+        DiffuseMap.Sample(WrapLinearSampler, input.UV) : cbMaterial.diffuseColor;
+    float3 lightColor = cbForwardLight.ambientColor;
 
-    float3 lightColor;
-    if (IsDirectionalLight())
-        lightColor = CalcuDirLight(input.WorldPos, normal, diffColor.rgb);
-    else if (IsPointLight())
-        lightColor = CalcuPointLight(input.WorldPos, normal, diffColor.rgb);
-    else if (IsSpotLight())
-        lightColor = CalcuSpotLight(input.WorldPos, normal, diffColor.rgb);
-    
-    //return float4(sqrt(lightColor.rgb), diffColor.a);
-    return float4(lightColor.rgb, diffColor.a);
-    //return diffColor;
-    //return float4(normal * 0.5 + 0.5, 1.0);
+    for (int i = 0; i < cbForwardLight.lightCount; ++i)
+    {
+        switch (cbForwardLight.lights[i].type)
+        {
+            case 0: lightColor += CalcuDirLight(input.WorldPos, normal, cbForwardLight.lights[i]); break;
+            case 1: lightColor += CalcuPointLight(input.WorldPos, normal, cbForwardLight.lights[i]); break;
+            case 2: lightColor += CalcuSpotLight(input.WorldPos, normal, cbForwardLight.lights[i]); break;
+        }
+    }
+
+    return float4(diffColor.xyz * lightColor, diffColor.a);
 }

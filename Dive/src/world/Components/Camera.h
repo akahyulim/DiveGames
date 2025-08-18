@@ -72,7 +72,7 @@ namespace Dive
 		RenderTexture* GetRenderTarget() const;
 		void SetRenderTarget(RenderTexture* pRenderTarget) { m_renderTarget = pRenderTarget; }
 
-		static constexpr eComponentType GetType() { return eComponentType::Camera; }
+		static constexpr eComponentType GetComponentType() { return eComponentType::Camera; }
 
 		static std::vector<Camera*> GetAllCameras() { return s_allCameras; }
 		static uint32_t GetAllCameraCount() { return static_cast<uint32_t>(s_allCameras.size()); }
