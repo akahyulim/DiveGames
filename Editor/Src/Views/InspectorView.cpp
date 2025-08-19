@@ -182,12 +182,10 @@ namespace Dive
 
 			// Name
 			{
-				char buffer[256]{};
-				auto name = EditorContext::Selected->GetName();
-				strncpy_s(buffer, sizeof(buffer), name.c_str(), sizeof(buffer));
-				if (ImGui::InputText("##Name", buffer, sizeof(buffer)))
+				std::string goName = EditorContext::Selected->GetName();
+				if (ImGui::InputText("##Name", &goName))
 				{
-					EditorContext::Selected->SetName(std::string(buffer));
+					EditorContext::Selected->SetName(goName);
 				}
 			}
 
@@ -368,11 +366,14 @@ namespace Dive
 					auto material = staticMeshRender->GetMaterial();
 
 					// name
-					char buffer[256]{};
-					auto name = material->GetName();
-					strncpy_s(buffer, sizeof(buffer), name.c_str(), sizeof(buffer));
-					ImGui::InputText("Material Name", buffer, sizeof(buffer));
-					material->SetName(std::string(buffer));
+					std::string mtrlName = material->GetName();
+					ImGui::Columns(2);
+					ImGui::SetColumnWidth(0, 115.0f);
+					ImGui::Text("Material");
+					ImGui::NextColumn();
+					ImGui::InputText("##MtrlName", &mtrlName);
+					material->SetName(mtrlName);
+					ImGui::Columns(1);
 
 					// diffuse color
 					ImVec4 diffuseColor = XMFloat4ToImVec4(material->GetDiffuseColor());
@@ -389,10 +390,14 @@ namespace Dive
 				{
 					auto mesh = staticMeshRender->GetStaticMesh();
 
-					char buffer[256]{};
-					auto name = mesh->GetName();
-					strncpy_s(buffer, sizeof(buffer), name.c_str(), sizeof(buffer));
-					ImGui::InputText("Mesh Name", buffer, sizeof(buffer));
+					std::string meshName = mesh->GetName();
+					ImGui::Columns(2);
+					ImGui::SetColumnWidth(0, 115.0f);
+					ImGui::Text("Mesh");
+					ImGui::NextColumn();
+					ImGui::InputText("##MeshName", &meshName);
+					mesh->SetName(meshName);
+					ImGui::Columns(1);
 				}
 			}
 		}

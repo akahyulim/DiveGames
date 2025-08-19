@@ -168,7 +168,7 @@ GameObjects:
       Parent: 30
     MeshRenderer:
       fileID: 33
-      SourceType: 1
+      SourceType: 2
       StaticMesh: CubeMesh
       Material: Cube
   - fileID: 34
@@ -183,7 +183,7 @@ GameObjects:
       Parent: 30
     MeshRenderer:
       fileID: 36
-      SourceType: 1
+      SourceType: 2
       StaticMesh: SphereMesh
       Material: Sphere
   - fileID: 37
@@ -198,7 +198,7 @@ GameObjects:
       Parent: 30
     MeshRenderer:
       fileID: 39
-      SourceType: 1
+      SourceType: 2
       StaticMesh: CapsuleMesh
       Material: Capsule
   - fileID: 40
@@ -213,7 +213,7 @@ GameObjects:
       Parent: 30
     MeshRenderer:
       fileID: 42
-      SourceType: 1
+      SourceType: 2
       StaticMesh: PlaneMesh
       Material: Wall
   - fileID: 43
@@ -228,6 +228,6 @@ GameObjects:
       Parent: 30
     MeshRenderer:
       fileID: 45
-      SourceType: 1
+      SourceType: 2
       StaticMesh: PlaneMesh
       Material: Bottom

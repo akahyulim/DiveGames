@@ -8,7 +8,6 @@
 #include "components/Light.h"
 #include "rendering/StaticMesh.h"
 #include "rendering/Material.h"
-#include "rendering/MeshFactory.h"
 #include "resource/YamlHelper.h"
 
 namespace Dive
@@ -86,7 +85,7 @@ namespace Dive
 				out << YAML::Key << "BackgroundColor" << YAML::Value << camera->GetBackgroundColor();
 				out << YAML::EndMap; // Camera
 			}
-
+			
 			if (go->HasComponent<MeshRenderer>())
 			{
 				auto meshRenderer = go->GetComponent<MeshRenderer>();
@@ -95,13 +94,13 @@ namespace Dive
 				auto material = meshRenderer->GetMaterial();
 				out << YAML::Key << "MeshRenderer" << YAML::Value << YAML::BeginMap;
 				out << YAML::Key << "fileID" << YAML::Value << staticMeshID;
-				out << YAML::Key << "SourceType" << YAML::Value << static_cast<int>(staticMesh->GetSourceType());
 				out << YAML::Key << "StaticMesh" << YAML::Value << staticMesh->GetName();
+				staticMesh->SaveToFile("Assets/Models/" + staticMesh->GetName() + ".mesh");
 				out << YAML::Key << "Material" << YAML::Value << material->GetName();
 				material->SaveToFile("Assets/Materials/" + material->GetName() + ".mat");
 				out << YAML::EndMap; // MeshRenderer
 			}
-
+			
 			if (go->HasComponent<Light>())
 			{
 				auto light = go->GetComponent<Light>();
@@ -205,18 +204,9 @@ namespace Dive
 				auto staticMeshID = meshRendererNode["fileID"].as<uint64_t>();
 				auto meshRenderer = go->AddComponent<MeshRenderer>();
 				std::string staticMeshName = meshRendererNode["StaticMesh"].as<std::string>();
-
-				std::shared_ptr<StaticMesh> staticMesh = nullptr;
-				switch (static_cast<eSourceType>(meshRendererNode["SourceType"].as<int>()))
-				{
-				case eSourceType::File:
-					break;
-				case eSourceType::Factory:
-					staticMesh = MeshFactory::Create(device, staticMeshName);
-					break;
-				default:
-					break;
-				}
+				auto staticMesh = std::make_shared<StaticMesh>();
+				staticMesh->LoadFromFile("Assets/Models/" + staticMeshName + ".mesh");
+				staticMesh->CreateBuffers(device);
 				meshRenderer->SetStaticMesh(staticMesh);
 
 				// 이것두 default는 리소스 매니져에서, file은 직접?

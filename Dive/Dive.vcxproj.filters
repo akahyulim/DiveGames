@@ -80,9 +80,6 @@
     <ClInclude Include="src\math\BoundingBox.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="src\rendering\MeshFactory.h">
-      <Filter>rendering</Filter>
-    </ClInclude>
     <ClInclude Include="src\world\World.h">
       <Filter>world</Filter>
     </ClInclude>
@@ -202,9 +199,6 @@
     </ClCompile>
     <ClCompile Include="src\math\BoundingBox.cpp">
       <Filter>math</Filter>
-    </ClCompile>
-    <ClCompile Include="src\rendering\MeshFactory.cpp">
-      <Filter>rendering</Filter>
     </ClCompile>
     <ClCompile Include="src\world\World.cpp">
       <Filter>world</Filter>

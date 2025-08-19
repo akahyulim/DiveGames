@@ -35,7 +35,6 @@
 #include "rendering/RenderDefs.h"
 #include "rendering/StaticMesh.h"
 //#include "rendering/SkinnedMesh.h"
-#include "rendering/MeshFactory.h"
 #include "rendering/Material.h"
 #include "rendering/Renderer.h"
 #include "rendering/RenderPass.h"

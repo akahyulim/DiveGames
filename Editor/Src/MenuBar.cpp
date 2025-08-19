@@ -1,5 +1,6 @@
 ﻿#include "MenuBar.h"
 #include "Editor.h"
+#include "MeshFactory.h"
 #include "Views/HierarchyView.h"
 
 namespace Dive

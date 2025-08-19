@@ -1,7 +1,4 @@
-﻿#include "stdafx.h"
-#include "MeshFactory.h"
-#include "graphics/Vertex.h"
-#include "StaticMesh.h"
+﻿#include "MeshFactory.h"
 
 using namespace DirectX;
 
@@ -47,7 +44,6 @@ namespace Dive
 		indices.emplace_back(0);	indices.emplace_back(1);	indices.emplace_back(2);
 
 		auto mesh = std::make_shared<StaticMesh>();
-		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers(device);
@@ -98,7 +94,6 @@ namespace Dive
 		indices[3] = 2;	indices[4] = 1;	indices[5] = 3;
 
 		auto mesh = std::make_shared<StaticMesh>();
-		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers(device);
@@ -150,7 +145,6 @@ namespace Dive
 		indices[3] = 1;	indices[4] = 3;	indices[5] = 2;
 
 		auto mesh = std::make_shared<StaticMesh>();
-		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers(device);
@@ -253,7 +247,6 @@ namespace Dive
 		indices.emplace_back(22);	indices.emplace_back(21);	indices.emplace_back(23);
 
 		auto mesh = std::make_shared<StaticMesh>();
-		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers(device);
@@ -339,7 +332,6 @@ namespace Dive
 
 		// 메시 생성
 		auto mesh = std::make_shared<StaticMesh>();
-		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers(device);
@@ -516,7 +508,6 @@ namespace Dive
 
 		// 메시 생성
 		auto mesh = std::make_shared<StaticMesh>();
-		mesh->SetSourceType(eSourceType::Factory);
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers(device);

@@ -15,12 +15,24 @@ namespace Dive
 		DV_LOG(Resource, info, "소멸: {}. {}", GetName(), GetInstanceID());
 	}
 
-	void Resource::SetFilepath(const std::filesystem::path& filepath)
+	std::string Resource::GetName() const
 	{
-		SetName(filepath.stem().string());
-		// 추후 상대경로 저장 수정 필요
-		// 이를 위해서 FileUtils에 관련 함수를 만들어야 하는데
-		// 상대경로의 기준으 되는 WorkingDir 설정도 필요하다.
-		m_filepath = filepath;
+		if (m_filepath.empty())
+			return Object::GetName();
+
+		return m_filepath.stem().string();
+	}
+
+	void Resource::SetName(const std::string& name)
+	{
+		if (m_filepath.empty())
+		{
+			Object::SetName(name);
+			return;
+		}
+
+		auto extension = m_filepath.extension().string();
+		std::string newName = name + extension;
+		m_filepath.replace_filename(newName);
 	}
 }

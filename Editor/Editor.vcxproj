@@ -169,6 +169,7 @@
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MenuBar.cpp" />
+    <ClCompile Include="src\MeshFactory.cpp" />
     <ClCompile Include="src\views\GameView.cpp" />
     <ClCompile Include="src\views\HierarchyView.cpp" />
     <ClCompile Include="src\views\InspectorView.cpp" />
@@ -182,10 +183,12 @@
     <ClCompile Include="Third-Party\imgui\imgui_draw.cpp" />
     <ClCompile Include="Third-Party\imgui\imgui_tables.cpp" />
     <ClCompile Include="Third-Party\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="Third-Party\imgui\misc\cpp\imgui_stdlib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\MenuBar.h" />
+    <ClInclude Include="src\MeshFactory.h" />
     <ClInclude Include="src\views\GameView.h" />
     <ClInclude Include="src\views\HierarchyView.h" />
     <ClInclude Include="src\views\InspectorView.h" />
@@ -200,6 +203,7 @@
     <ClInclude Include="Third-Party\imgui\imstb_rectpack.h" />
     <ClInclude Include="Third-Party\imgui\imstb_textedit.h" />
     <ClInclude Include="Third-Party\imgui\imstb_truetype.h" />
+    <ClInclude Include="Third-Party\imgui\misc\cpp\imgui_stdlib.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

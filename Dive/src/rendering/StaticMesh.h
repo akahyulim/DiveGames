@@ -8,13 +8,6 @@ namespace Dive
 	class BoundingBox;
 	class Shader;
 
-	enum class eSourceType
-	{
-		None,
-		File,
-		Factory
-	};
-
 	enum class eMeshType
 	{
 		None,
@@ -46,9 +39,6 @@ namespace Dive
 
 		BoundingBox* GetBoundingBox() const { return m_boundingBox.get(); }
 
-		eSourceType GetSourceType() const { return m_sourceType; }
-		void SetSourceType(eSourceType type) { m_sourceType = type; }
-
 		eMeshType GetMeshType() const { return m_type; }
 
 		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { return m_primitiveTopology; }
@@ -56,9 +46,10 @@ namespace Dive
 
 		static constexpr eResourceType GetType() { return eResourceType::StaticMesh; }
 
-	private:
-		eSourceType m_sourceType = eSourceType::None;
+		bool LoadFromFile(const std::filesystem::path& filepath) override;
+		bool SaveToFile(const std::filesystem::path& filepath) override;
 
+	private:
 		eMeshType m_type = eMeshType::None;
 
 		D3D11_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;

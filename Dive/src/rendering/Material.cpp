@@ -72,7 +72,7 @@ namespace Dive
     void Material::Bind(ID3D11DeviceContext* deviceContext)
     {
         assert(deviceContext);
-
+        
         ShaderManager::BindInputLayout("ForwardLightVS", eInputLayout::Lit, deviceContext);
         ShaderManager::GetShader("ForwardLightVS")->Bind(deviceContext);
         ShaderManager::GetShader("ForwardLightPS")->Bind(deviceContext);

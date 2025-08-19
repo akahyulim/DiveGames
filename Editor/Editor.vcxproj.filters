@@ -54,6 +54,8 @@
     <ClCompile Include="Third-Party\imgui\backends\imgui_impl_win32.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="src\MeshFactory.cpp" />
+    <ClCompile Include="Third-Party\imgui\misc\cpp\imgui_stdlib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\views\GameView.h">
@@ -100,5 +102,7 @@
     <ClInclude Include="Third-Party\imgui\backends\imgui_impl_win32.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="src\MeshFactory.h" />
+    <ClInclude Include="Third-Party\imgui\misc\cpp\imgui_stdlib.h" />
   </ItemGroup>
 </Project>

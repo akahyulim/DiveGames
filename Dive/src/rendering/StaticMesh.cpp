@@ -121,4 +121,89 @@ namespace Dive
 
 		m_indices.insert(m_indices.end(), indices.begin(), indices.end());
 	}
+
+	bool StaticMesh::LoadFromFile(const std::filesystem::path& filepath)
+	{
+		std::ifstream fin(filepath, std::ios::binary);
+		if (!fin.is_open())
+		{
+			DV_LOG(StaticMesh, err, "[::LoadFromFile] 파일 열기 실패: {}", filepath.string());
+			return false;
+		}
+
+		// 🔹 헤더 읽기
+		char magic[4];
+		uint32_t version = 0;
+		uint32_t vertexCount = 0;
+		uint32_t indexCount = 0;
+
+		fin.read(magic, sizeof(magic));
+		if (std::strncmp(magic, "MESH", 4) != 0)
+		{
+			DV_LOG(StaticMesh, err, "[::LoadFromFile] Magic 헤더 불일치");
+			return false;
+		}
+
+		fin.read(reinterpret_cast<char*>(&version), sizeof(version));
+		fin.read(reinterpret_cast<char*>(&vertexCount), sizeof(vertexCount));
+		fin.read(reinterpret_cast<char*>(&indexCount), sizeof(indexCount));
+
+		// 🔹 버텍스 버퍼 읽기
+		m_vertices.resize(vertexCount);
+		for (uint32_t i = 0; i < vertexCount; ++i)
+		{
+			LitVertex& v = m_vertices[i];
+			fin.read(reinterpret_cast<char*>(&v.Position), sizeof(v.Position));
+			fin.read(reinterpret_cast<char*>(&v.Normal), sizeof(v.Normal));
+			fin.read(reinterpret_cast<char*>(&v.Tangent), sizeof(v.Tangent));
+			fin.read(reinterpret_cast<char*>(&v.TexCoord), sizeof(v.TexCoord));
+		}
+
+		// 🔹 인덱스 버퍼 읽기
+		m_indices.resize(indexCount);
+		fin.read(reinterpret_cast<char*>(m_indices.data()), sizeof(uint32_t) * indexCount);
+		fin.close();
+
+		SetFilepath(filepath);
+
+		DV_LOG(StaticMesh, info, "[::LoadFromFile] 메시 로딩 완료: {}", filepath.string());
+		return true;
+	}
+
+	bool StaticMesh::SaveToFile(const std::filesystem::path& filepath)
+	{
+		std::ofstream fout(filepath, std::ios::binary);
+		if (!fout.is_open())
+		{
+			DV_LOG(StaticMesh, err, "[::SaveToFile] 파일 열기 실패: {}", filepath.string());
+			return false;
+		}
+
+		// 🔹 헤더 작성
+		const char magic[4] = { 'M', 'E', 'S', 'H' };
+		uint32_t version = 1;
+		uint32_t vertexCount = static_cast<uint32_t>(m_vertices.size());
+		uint32_t indexCount = static_cast<uint32_t>(m_indices.size());
+
+		fout.write(magic, sizeof(magic));
+		fout.write(reinterpret_cast<const char*>(&version), sizeof(version));
+		fout.write(reinterpret_cast<const char*>(&vertexCount), sizeof(vertexCount));
+		fout.write(reinterpret_cast<const char*>(&indexCount), sizeof(indexCount));
+
+		// 🔹 버텍스 버퍼 저장
+		for (const LitVertex& v : m_vertices)
+		{
+			fout.write(reinterpret_cast<const char*>(&v.Position), sizeof(v.Position));
+			fout.write(reinterpret_cast<const char*>(&v.Normal), sizeof(v.Normal));
+			fout.write(reinterpret_cast<const char*>(&v.Tangent), sizeof(v.Tangent));
+			fout.write(reinterpret_cast<const char*>(&v.TexCoord), sizeof(v.TexCoord));
+		}
+
+		// 🔹 인덱스 버퍼 저장
+		fout.write(reinterpret_cast<const char*>(m_indices.data()), sizeof(uint32_t) * indexCount);
+		fout.close();
+
+		DV_LOG(StaticMesh, info, "[::SaveToFile] 메시 저장 완료: {}", filepath.string());
+		return true;
+	}
 }

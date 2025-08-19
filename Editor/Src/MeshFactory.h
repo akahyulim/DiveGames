@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "dive.h"
 
 namespace Dive
 {

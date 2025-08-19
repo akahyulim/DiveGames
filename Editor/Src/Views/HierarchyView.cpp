@@ -1,6 +1,7 @@
 ﻿#include "HierarchyView.h"
 #include "InspectorView.h"
 #include "../Editor.h"
+#include "../MeshFactory.h"
 
 namespace Dive
 {

@@ -46,7 +46,6 @@
     <ClInclude Include="src\math\Math.h" />
     <ClInclude Include="src\rendering\LightManager.h" />
     <ClInclude Include="src\rendering\Material.h" />
-    <ClInclude Include="src\rendering\MeshFactory.h" />
     <ClInclude Include="src\rendering\Renderer.h" />
     <ClInclude Include="src\rendering\RenderDefs.h" />
     <ClInclude Include="src\rendering\RenderPass.h" />
@@ -88,7 +87,6 @@
     <ClCompile Include="src\math\Math.cpp" />
     <ClCompile Include="src\rendering\LightManager.cpp" />
     <ClCompile Include="src\rendering\Material.cpp" />
-    <ClCompile Include="src\rendering\MeshFactory.cpp" />
     <ClCompile Include="src\rendering\Renderer.cpp" />
     <ClCompile Include="src\rendering\RenderPass.cpp" />
     <ClCompile Include="src\rendering\StaticMesh.cpp" />
