@@ -12,7 +12,7 @@ namespace Dive
 	{
 	}
 	
-	void View::Draw()
+	void View::ComposeUI()
 	{
 		if (!IsVisible())
 			return;
@@ -23,7 +23,7 @@ namespace Dive
 			m_height = ImGui::GetWindowHeight();
 		}
 
-		drawView();
+		renderContent();
 
 		ImGui::End();
 	}

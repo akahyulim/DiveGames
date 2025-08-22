@@ -49,6 +49,6 @@ namespace Dive
 		std::array<ImFont*, static_cast<size_t>(Dive::eFontTypes::Max)> m_fonts;
 
 		std::unique_ptr<MenuBar> m_menuBar;
-		std::vector<std::unique_ptr<View>> m_widgets;
+		std::vector<std::unique_ptr<View>> m_views;
 	};
 }

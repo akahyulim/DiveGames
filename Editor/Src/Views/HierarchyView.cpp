@@ -12,7 +12,7 @@ namespace Dive
 		m_flags |= ImGuiWindowFlags_HorizontalScrollbar;
 	}
 
-	void HierarchyView::drawView()
+	void HierarchyView::renderContent()
 	{
 		if (!EditorContext::ActiveWorld)
 			return;

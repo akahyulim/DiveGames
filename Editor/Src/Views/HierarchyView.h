@@ -12,7 +12,7 @@ namespace Dive
 		virtual ~HierarchyView() = default;
 
 	protected:
-		void drawView() override;
+		void renderContent() override;
 
 	private:
 		void showTree(GameObject* gameObject);

@@ -12,8 +12,8 @@ namespace Dive
 	public:
 		View(Editor* editor);
 		virtual ~View() = default;
-		
-		void Draw();
+	
+		void ComposeUI();
 
 		float GetWidth() const { return m_width; }
 		float GetHeight() const { return m_height; }
@@ -22,7 +22,7 @@ namespace Dive
 		void SetVisible(bool visible) { m_isVisible = visible; }
 
 	protected:
-		virtual void drawView() {}
+		virtual void renderContent() {}
 
 	protected:
 		std::string m_title;

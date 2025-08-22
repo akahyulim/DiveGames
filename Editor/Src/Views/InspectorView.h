@@ -9,7 +9,7 @@ namespace Dive
 		InspectorView(Editor* editor);
 		virtual ~InspectorView();
 
-		void drawView() override;
+		void renderContent() override;
 
 	private:
 		//template<typename T>

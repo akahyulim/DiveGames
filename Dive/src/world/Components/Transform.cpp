@@ -285,38 +285,44 @@ namespace Dive
 
 	void Transform::RotateByQuaternion(const DirectX::XMFLOAT4& quaternion, eSpace space)
 	{
-		XMVECTOR rotationVec = XMLoadFloat4(&quaternion);
+		using namespace DirectX;
+
+		XMVECTOR inputRot = XMLoadFloat4(&quaternion);
 
 		if (space == eSpace::World)
 		{
-			auto worldRotQuat = GetRotationQuaternion();
-			auto currentWorldRot = XMLoadFloat4(&worldRotQuat);
-			auto newWorldRot = XMQuaternionMultiply(rotationVec, currentWorldRot);
+			// 현재 월드 회전 가져오기
+			auto rotQuat = m_parent->GetRotationQuaternion();
+			XMVECTOR currentWorldRot = XMLoadFloat4(&rotQuat);
 
+			// 입력 quaternion을 누적 회전으로 적용
+			XMVECTOR newWorldRot = XMQuaternionMultiply(inputRot, currentWorldRot);
+
+			// 부모가 있다면 월드 회전을 로컬 회전으로 변환
 			if (HasParent())
 			{
 				auto parentRotQuat = m_parent->GetRotationQuaternion();
-				auto parentInvRotVec = XMQuaternionInverse(XMLoadFloat4(&parentRotQuat));
-				newWorldRot = XMQuaternionMultiply(parentInvRotVec, newWorldRot);
+				XMVECTOR parentWorldRot = XMLoadFloat4(&parentRotQuat);
+				XMVECTOR parentInvRot = XMQuaternionInverse(parentWorldRot);
+				newWorldRot = XMQuaternionMultiply(parentInvRot, newWorldRot);
 			}
 
 			newWorldRot = XMQuaternionNormalize(newWorldRot);
 			XMStoreFloat4(&m_localRotation, newWorldRot);
 		}
-		else
+		else // Local 공간 기준
 		{
-			if (HasParent())
-			{
-				auto parentRotQuat = m_parent->GetRotationQuaternion();
-				auto parentRotVec = XMLoadFloat4(&parentRotQuat);
-				auto parentInvRotVec = XMQuaternionInverse(parentRotVec);
-				rotationVec = XMQuaternionMultiply(parentInvRotVec, rotationVec);
-			}
+			// 현재 로컬 회전 가져오기
+			XMVECTOR currentLocalRot = XMLoadFloat4(&m_localRotation);
 
-			rotationVec = XMQuaternionNormalize(rotationVec);
-			XMStoreFloat4(&m_localRotation, rotationVec);
+			// 입력 quaternion을 누적 회전으로 적용
+			XMVECTOR newLocalRot = XMQuaternionMultiply(inputRot, currentLocalRot);
+
+			newLocalRot = XMQuaternionNormalize(newLocalRot);
+			XMStoreFloat4(&m_localRotation, newLocalRot);
 		}
 	}
+
 
 	void Transform::RotateByRadians(const DirectX::XMFLOAT3& radians, eSpace space)
 	{
@@ -352,6 +358,20 @@ namespace Dive
 		return result;
 	}
 
+	DirectX::XMFLOAT3 Transform::GetBackward() const
+	{
+		const XMVECTOR localUpVec = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+
+		auto worldTransform = GetTransform();
+		XMMATRIX worldMatrix = XMLoadFloat4x4(&worldTransform);
+		XMVECTOR worldForward = XMVector3TransformNormal(localUpVec, worldMatrix);
+		worldForward = XMVector3Normalize(worldForward);
+
+		XMFLOAT3 result;
+		XMStoreFloat3(&result, worldForward);
+		return result;
+	}
+
 	DirectX::XMFLOAT3 Transform::GetRight() const
 	{
 		const XMVECTOR localRightVec = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
@@ -366,9 +386,37 @@ namespace Dive
 		return result;
 	}
 
+	DirectX::XMFLOAT3 Transform::GetLeft() const
+	{
+		const XMVECTOR localUpVec = XMVectorSet(-1.0f, 0.0f, 0.0f, 0.0f);
+
+		auto worldTransform = GetTransform();
+		XMMATRIX worldMatrix = XMLoadFloat4x4(&worldTransform);
+		XMVECTOR worldForward = XMVector3TransformNormal(localUpVec, worldMatrix);
+		worldForward = XMVector3Normalize(worldForward);
+
+		XMFLOAT3 result;
+		XMStoreFloat3(&result, worldForward);
+		return result;
+	}
+
 	DirectX::XMFLOAT3 Transform::GetUp() const
 	{
 		const XMVECTOR localUpVec = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+
+		auto worldTransform = GetTransform();
+		XMMATRIX worldMatrix = XMLoadFloat4x4(&worldTransform);
+		XMVECTOR worldForward = XMVector3TransformNormal(localUpVec, worldMatrix);
+		worldForward = XMVector3Normalize(worldForward);
+
+		XMFLOAT3 result;
+		XMStoreFloat3(&result, worldForward);
+		return result;
+	}
+
+	DirectX::XMFLOAT3 Transform::GetDown() const
+	{
+		const XMVECTOR localUpVec = XMVectorSet(0.0f, -1.0f, 0.0f, 0.0f);
 
 		auto worldTransform = GetTransform();
 		XMMATRIX worldMatrix = XMLoadFloat4x4(&worldTransform);

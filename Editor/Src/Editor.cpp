@@ -118,11 +118,11 @@ namespace Dive
 		loadResources();
 
 		// create widgets
-		m_widgets.emplace_back(std::make_unique<WorldView>(this));
-		m_widgets.emplace_back(std::make_unique<GameView>(this));
-		m_widgets.emplace_back(std::make_unique<HierarchyView>(this));
-		m_widgets.emplace_back(std::make_unique<InspectorView>(this));
-		//m_widgets.emplace_back(std::make_unique<LogView>(this));
+		m_views.emplace_back(std::make_unique<WorldView>(this));
+		m_views.emplace_back(std::make_unique<GameView>(this));
+		m_views.emplace_back(std::make_unique<HierarchyView>(this));
+		m_views.emplace_back(std::make_unique<InspectorView>(this));
+		//m_views.emplace_back(std::make_unique<LogView>(this));
 		m_menuBar = std::make_unique<MenuBar>(this);
 
 		SetTitle();
@@ -130,7 +130,7 @@ namespace Dive
 
 	Editor::~Editor()
 	{
-		for (auto& widget : m_widgets)
+		for (auto& widget : m_views)
 			widget.reset();
 		m_menuBar.reset();
 
@@ -147,12 +147,13 @@ namespace Dive
 		{
 			Engine::Tick();
 
+			// ImGui
 			{
 				beginUI();
 
-				m_menuBar->Draw();
-				for (auto& widget : m_widgets)
-					widget->Draw();
+				m_menuBar->ComposeUI();
+				for (auto& view : m_views)
+					view->ComposeUI();
 
 				endUI();
 			}

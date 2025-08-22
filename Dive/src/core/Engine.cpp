@@ -84,6 +84,8 @@ namespace Dive
 			lastTimeMS = s_elapsedTimeMS;
 		}
 
+		Input::Tick();
+
 		if (WorldManager::GetActiveWorld())
 			WorldManager::GetActiveWorld()->Update();
 

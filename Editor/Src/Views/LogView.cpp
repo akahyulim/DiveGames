@@ -12,7 +12,7 @@ namespace Dive
 	{
 	}
 
-	void LogView::drawView()
+	void LogView::renderContent()
 	{
 	}
 }

@@ -7,11 +7,20 @@ namespace Dive
 	{
 	public:
 		WorldView(Editor* editor);
-		~WorldView();
+		~WorldView() override = default;
 
-		void drawView() override;
+		float GetCameraSpeed() const { return m_cameraSpeed; }
+		void SetCameraSpeed(float speed);
+		void AddCameraSpeed(int delta);
+
+	protected:
+		void renderContent() override;
+
+	private:
+		void cameraControll();
 
 	private:
 		std::unique_ptr<RenderTexture> m_renderTarget;
+		float m_cameraSpeed = 1.0f;
 	};
 }

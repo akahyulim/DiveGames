@@ -54,8 +54,11 @@ namespace Dive
 		void RotateByDegrees(const DirectX::XMFLOAT3& degrees, eSpace space = eSpace::Self);
 
 		DirectX::XMFLOAT3 GetForward() const;
+		DirectX::XMFLOAT3 GetBackward() const;
 		DirectX::XMFLOAT3 GetRight() const;
+		DirectX::XMFLOAT3 GetLeft() const;
 		DirectX::XMFLOAT3 GetUp() const;
+		DirectX::XMFLOAT3 GetDown() const;
 
 		// hierarhy
 		bool HasParent() const { return m_parent != nullptr; }

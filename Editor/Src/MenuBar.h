@@ -12,10 +12,7 @@ namespace Dive
 		MenuBar(Editor* editor);
 		~MenuBar() = default;
 
-		void Draw();
-
-	private:
-		void newWorld();
+		void ComposeUI();
 
 	private:
 		Editor* m_editor = nullptr;

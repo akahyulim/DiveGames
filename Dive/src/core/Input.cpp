@@ -17,11 +17,6 @@ namespace Dive
 
 	uint8_t Input::s_mouseButtons[MAX_NUM_BUTTONS]{};
 	uint8_t Input::s_oldMouseButtons[MAX_NUM_BUTTONS]{};
-	DirectX::XMFLOAT2 Input::s_mousePosition{};
-	DirectX::XMFLOAT2 Input::s_oldMousePosition{};
-	DirectX::XMFLOAT2 Input::s_mouseDelta{};
-
-	bool Input::s_IsInValidRect = false;
 
 	bool Input::Initialize()
 	{
@@ -118,38 +113,40 @@ namespace Dive
 
 	void Input::Tick()
 	{
-		// 순서대로 처리하면 동시 입력은 불가능하지 않을까?
-		ReadKeyboard();
-		ReadMouse();
+		if (!ReadKeyboard())
+		{
+			DV_LOG(Input, err, "[::Tick] 키보드 입력 읽기 실패");
+			return;
+		}
+
+		if (!ReadMouse())
+		{
+			DV_LOG(Input, err, "[::Tick] 마우스 입력 읽기 실패");
+			return;
+		}
+
+		ProcessInput();
 	}
 
-	void Input::ReadKeyboard()
+	bool Input::ReadKeyboard()
 	{
-		if (!s_directInput || !s_keyboard)
-			return;
-
-		memcpy(s_oldKeyStates, s_keyStates, sizeof(s_keyStates));
-
 		auto hr = s_keyboard->GetDeviceState(sizeof(s_keyStates), static_cast<LPVOID>(&s_keyStates));
 		if (FAILED(hr))
 		{
-			ZeroMemory(&s_keyStates, sizeof(s_keyStates));
-
 			if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED))
 				s_keyboard->Acquire();
 			else
+			{
 				DV_LOG(Input, err, "[::ReadKeyboard] 키보드 연결 실패: {}", ErrorUtils::ToVerbose(hr));
+				return false;
+			}
 		}
+
+		return true;
 	}
 	
-	void Input::ReadMouse()
+	bool Input::ReadMouse()
 	{
-		if (!s_directInput || !s_mouse)
-			return;
-
-		memcpy(s_oldMouseButtons, s_mouseButtons, sizeof(s_mouseButtons));
-		s_oldMousePosition = s_mousePosition;
-
 		auto hr = s_mouse->GetDeviceState(sizeof(DIMOUSESTATE), static_cast<LPVOID>(&s_mouseState));
 		if (FAILED(hr))
 		{
@@ -158,32 +155,20 @@ namespace Dive
 			else
 			{
 				DV_LOG(Input, err, "[::ReadMouse] 마우스 연결 실패: {}", ErrorUtils::ToVerbose(hr));
-				return;
+				return false;
 			}
 		}
 
+		return true;
+	}
+
+	void Input::ProcessInput()
+	{
+		memcpy(s_oldKeyStates, s_keyStates, sizeof(s_keyStates));
+		memcpy(s_oldMouseButtons, s_mouseButtons, sizeof(s_mouseButtons));
+
 		for (int i = 0; i < MAX_NUM_BUTTONS; ++i)
 			s_mouseButtons[i] = s_mouseState.rgbButtons[i] ? 1 : 0;
-
-		s_mousePosition.x += static_cast<float>(s_mouseState.lX);
-		s_mousePosition.y += static_cast<float>(s_mouseState.lY);
-
-		/*
-		// 추후 이벤트를 통해 갱신하자.
-		DirectX::XMFLOAT2 windowSize = Renderer::GetResolutionRender();
-
-		if (s_mousePosition.x < 0)
-			s_mousePosition.x = 0;
-		if (s_mousePosition.x > windowSize.x)
-			s_mousePosition.x = windowSize.x;
-
-		if (s_mousePosition.y < 0)
-			s_mousePosition.y = 0;
-		if (s_mousePosition.y > windowSize.y)
-			s_mousePosition.y = windowSize.y;
-		*/
-		s_mouseDelta.x = s_mousePosition.x - s_oldMousePosition.x;
-		s_mouseDelta.y = s_mousePosition.y - s_oldMousePosition.y;
 	}
 	
 	bool Input::KeyState(int key)
@@ -226,23 +211,13 @@ namespace Dive
 		return (s_mouseButtons[btn] == 1) && (s_oldMouseButtons[btn] == 1);
 	}
 	
-	const DirectX::XMFLOAT2& Input::GetMouseMoveDelta()
+	DirectX::XMFLOAT2 Input::GetMouseMoveDelta()
 	{
-		return s_mouseDelta;
+		return { static_cast<float>(s_mouseState.lX), static_cast<float>(s_mouseState.lY) };
 	}
-	
-	const DirectX::XMFLOAT2& Input::GetMousePosition()
+
+	int Input::GetMouseWheelDelta()
 	{
-		return s_mousePosition;
-	}
-	
-	bool Input::IsInValidRect()
-	{
-		return s_IsInValidRect;
-	}
-	
-	void Input::SetValid(bool valid)
-	{
-		s_IsInValidRect = valid;
+		return static_cast<int>(s_mouseState.lZ);
 	}
 }

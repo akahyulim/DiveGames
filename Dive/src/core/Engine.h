@@ -2,8 +2,6 @@
 
 namespace Dive
 {
-	class World;
-
 	class Engine
 	{
 	public:

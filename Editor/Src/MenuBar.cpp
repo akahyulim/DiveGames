@@ -10,7 +10,7 @@ namespace Dive
 	{
 	}
 
-	void MenuBar::Draw()
+	void MenuBar::ComposeUI()
 	{
 		static bool isShowWorldMenu = false;
 

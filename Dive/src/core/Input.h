@@ -12,8 +12,9 @@ namespace Dive
 		static void Shutdown();
 
 		static void Tick();
-		static void ReadKeyboard();
-		static void ReadMouse();
+		static bool ReadKeyboard();
+		static bool ReadMouse();
+		static void ProcessInput();
 
 		static bool KeyState(int key);
 		static bool KeyDown(int key);
@@ -25,12 +26,8 @@ namespace Dive
 		static bool MouseButtonUp(int btn);
 		static bool MouseButtonPress(int btn);
 
-		static const DirectX::XMFLOAT2& GetMouseMoveDelta();
-
-		static const DirectX::XMFLOAT2& GetMousePosition();
-
-		static bool IsInValidRect();
-		static void SetValid(bool valid);
+		static DirectX::XMFLOAT2 GetMouseMoveDelta();
+		static int GetMouseWheelDelta();
 
 	private:
 		static Microsoft::WRL::ComPtr<IDirectInput8> s_directInput;
@@ -41,13 +38,7 @@ namespace Dive
 		static uint8_t s_oldKeyStates[MAX_NUM_KEYS];
 
 		static DIMOUSESTATE s_mouseState;
-
 		static uint8_t s_mouseButtons[MAX_NUM_BUTTONS];
 		static uint8_t s_oldMouseButtons[MAX_NUM_BUTTONS];
-		static DirectX::XMFLOAT2 s_mousePosition;
-		static DirectX::XMFLOAT2 s_oldMousePosition;
-		static DirectX::XMFLOAT2 s_mouseDelta;
-
-		static bool s_IsInValidRect;
 	};
 }

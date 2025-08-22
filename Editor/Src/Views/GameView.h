@@ -9,7 +9,7 @@ namespace Dive
 		GameView(Editor* editor);
 		~GameView();
 
-		void drawView() override;
+		void renderContent() override;
 
 	private:
 		std::unique_ptr<RenderTexture> m_renderTarget;

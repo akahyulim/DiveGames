@@ -9,7 +9,7 @@ namespace Dive
 		LogView(Editor* editor);
 		~LogView();
 
-		void drawView() override;
+		void renderContent() override;
 
 	private:
 	};

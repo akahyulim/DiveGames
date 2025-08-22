@@ -162,7 +162,7 @@ namespace Dive
 	{
 	}
 	
-	void InspectorView::drawView()
+	void InspectorView::renderContent()
 	{
 		if (!EditorContext::ActiveWorld || !EditorContext::Selected)
 			return;

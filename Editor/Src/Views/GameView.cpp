@@ -14,7 +14,7 @@ namespace Dive
 	{
 	}
 
-	void GameView::drawView()
+	void GameView::renderContent()
 	{
 		if (!EditorContext::ActiveWorld || !EditorContext::MainCamera)
 			return;
