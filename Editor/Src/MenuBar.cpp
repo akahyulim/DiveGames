@@ -67,6 +67,8 @@ namespace Dive
 							EditorContext::MainCamera = camera->GetGameObject();
 					}
 
+					m_editor->SetTitle(StringUtils::StringToWString(EditorContext::ActiveWorld->GetName()));
+
 					isShowWorldMenu = true;
 				}
 				if (ImGui::MenuItem("Save World", nullptr, nullptr, isShowWorldMenu))

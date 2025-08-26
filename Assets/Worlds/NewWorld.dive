@@ -6,7 +6,7 @@ GameObjects:
     Active: true
     Transform:
       fileID: 2
-      Position: [0, 5, -15]
+      Position: [0, 14.4292755, -27.644087]
       Rotation: [0.1736481, -0, 0, 0.9848078]
       Scale: [1, 1, 1]
     Camera:
@@ -168,7 +168,6 @@ GameObjects:
       Parent: 30
     MeshRenderer:
       fileID: 33
-      SourceType: 1
       StaticMesh: CubeMesh
       Material: Cube
   - fileID: 34
@@ -183,7 +182,6 @@ GameObjects:
       Parent: 30
     MeshRenderer:
       fileID: 36
-      SourceType: 1
       StaticMesh: SphereMesh
       Material: Sphere
   - fileID: 37
@@ -198,7 +196,6 @@ GameObjects:
       Parent: 30
     MeshRenderer:
       fileID: 39
-      SourceType: 1
       StaticMesh: CapsuleMesh
       Material: Capsule
   - fileID: 40
@@ -209,11 +206,10 @@ GameObjects:
       fileID: 41
       Position: [0, 5, 10]
       Rotation: [-0.7071068, 0, 0, 0.7071067]
-      Scale: [2, 2, 2]
+      Scale: [2, 1, 1]
       Parent: 30
     MeshRenderer:
       fileID: 42
-      SourceType: 1
       StaticMesh: PlaneMesh
       Material: Wall
   - fileID: 43
@@ -228,6 +224,5 @@ GameObjects:
       Parent: 30
     MeshRenderer:
       fileID: 45
-      SourceType: 1
       StaticMesh: PlaneMesh
-      Material: Bottom
+      Material: Gray

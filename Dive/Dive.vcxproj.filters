@@ -143,6 +143,8 @@
     </ClInclude>
     <ClInclude Include="src\world\components\Light.h" />
     <ClInclude Include="src\rendering\LightManager.h" />
+    <ClInclude Include="src\core\Timer.h" />
+    <ClInclude Include="src\core\Application.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.cpp" />
@@ -250,5 +252,7 @@
     </ClCompile>
     <ClCompile Include="src\world\components\Light.cpp" />
     <ClCompile Include="src\rendering\LightManager.cpp" />
+    <ClCompile Include="src\core\Timer.cpp" />
+    <ClCompile Include="src\core\Application.cpp" />
   </ItemGroup>
 </Project>

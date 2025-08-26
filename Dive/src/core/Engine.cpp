@@ -2,6 +2,8 @@
 #include "Engine.h"
 #include "Window.h"
 #include "Input.h"
+#include "Timer.h"
+#include "EventDispatcher.h"
 #include "graphics/Graphics.h"
 #include "graphics/ShaderManager.h"
 #include "rendering/Renderer.h"
@@ -9,43 +11,54 @@
 
 namespace Dive
 {
-	double Engine::s_elapsedTimeMS = 0;
-	float Engine::s_deltaTimeMS = 0.0f;
-	std::chrono::steady_clock::time_point Engine::s_lastTickTime;
-	uint16_t Engine::s_fps = 0;
-	uint64_t Engine::s_frameCount = 0;
-
 	bool Engine::Initialize()
 	{
 		DV_LOG(Engine, info, "초기화 시작");
 
+		Timer::Initialize();
+
 		if (!Window::Initialize())
 		{
 			DV_LOG(Engine, err, "[::Initialize] Window 초기화 실패");
+			m_bExit = true;
 			return false;
 		}
 
 		if (!Graphics::Initialize())
 		{
 			DV_LOG(Engine, err, "[::Initialize] Graphics 초기화 실패");
+			m_bExit = true;
 			return false;
 		}
 
 		if (!ShaderManager::Initialize(Graphics::GetDevice()))
 		{
 			DV_LOG(Engine, err, "[::Initialize] ShaderManager 초기화 실패");
+			m_bExit = true;
 			return false;
 		}
 
-		Renderer::Initialize();
+		if (!Renderer::Initialize())
+		{
+			DV_LOG(Engine, err, "[::Initialize] Renderer 초기화 실패");
+			m_bExit = true;
+			return false;
+		}
 
 		if (!Input::Initialize())
 		{
 			DV_LOG(Engine, err, "[::Initialize] Input 초기화 실패");
+			m_bExit = true;
 			return false;
 		}
 
-		s_lastTickTime = std::chrono::steady_clock::now();
+		if (!WorldManager::Initialize())
+		{
+			DV_LOG(Engine, err, "[::Initialize] WorldManager 초기화 실패");
+			m_bExit = true;
+			return false;
+		}
+
 		DV_LOG(Engine, info, "초기화 완료");
 
 		return true;
@@ -67,30 +80,43 @@ namespace Dive
 		LogManager::Shutdown();
 	}
 
-	void Engine::Tick()
+	void Engine::RunFrame()
 	{
-		auto currentTickTime = std::chrono::steady_clock::now();
-		s_deltaTimeMS = std::chrono::duration<float, std::milli>(currentTickTime - s_lastTickTime).count();
-		s_elapsedTimeMS += s_deltaTimeMS;
-		s_lastTickTime = currentTickTime;
+		// 서브 시스템의 초기화를 확인
+		// urho3d는 graphics의 초기화여부로 m_bExit 판별
+		if (m_bExit)
+			return;
 
-		static double lastTimeMS = 0;
-		static uint16_t frameCount = 0;
-		frameCount++;
-		if (s_elapsedTimeMS - lastTimeMS >= 1000.0)
+		if (Window::Run())
 		{
-			s_fps = frameCount;
-			frameCount = 0;
-			lastTimeMS = s_elapsedTimeMS;
+			DV_FIRE_EVENT(eEventType::BeginFrame);
+
+			// Update
+			{
+				Timer::Tick();
+			
+				DV_FIRE_EVENT_DATA(eEventType::PreUpdate, Timer::GetDeltaTimeSec());
+				DV_FIRE_EVENT_DATA(eEventType::Update, Timer::GetDeltaTimeSec());
+				DV_FIRE_EVENT_DATA(eEventType::PostUpdate, Timer::GetDeltaTimeSec());
+			}
+
+			// Render
+			{
+				DV_FIRE_EVENT_DATA(eEventType::PreRender, Timer::GetDeltaTimeSec());
+				DV_FIRE_EVENT_DATA(eEventType::Render, Timer::GetDeltaTimeSec());
+				DV_FIRE_EVENT_DATA(eEventType::PostRender, Timer::GetDeltaTimeSec());
+			}
+
+			Graphics::Present();
+
+			DV_FIRE_EVENT(eEventType::EndFrame);
 		}
+		else
+			DoExit();
+	}
 
-		Input::Tick();
-
-		if (WorldManager::GetActiveWorld())
-			WorldManager::GetActiveWorld()->Update();
-
-		Renderer::OnUpdate();
-
-		s_frameCount++;
+	void Engine::DoExit()
+	{
+		m_bExit = true;
 	}
 }

@@ -17,14 +17,19 @@ namespace Dive
 	{
 		WindowResized, Exit,
 
-		PreRender, PostRender,
+		BeginFrame, 
+
+		PreUpdate, Update, PostUpdate, 
+		PreRender, Render, PostRender,
+
+		EndFrame,
 
 		WorldCreated, WorldModified, 
 
 		Collision, Trigger, KeyPress,
 	};
 
-	using EventData = std::variant<int, void*>;
+	using EventData = std::variant<float, int, void*>;
 
 	using EventListener = std::function<void(const EventData&)>;
 

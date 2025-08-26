@@ -30,7 +30,6 @@
     <ClCompile Include="src\views\LogView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MenuBar.cpp" />
     <ClCompile Include="Third-Party\imgui\imgui.cpp">
@@ -56,6 +55,7 @@
     </ClCompile>
     <ClCompile Include="src\MeshFactory.cpp" />
     <ClCompile Include="Third-Party\imgui\misc\cpp\imgui_stdlib.cpp" />
+    <ClCompile Include="src\Editor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\views\GameView.h">
@@ -76,7 +76,6 @@
     <ClInclude Include="src\views\LogView.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\MenuBar.h" />
     <ClInclude Include="Third-Party\imgui\imconfig.h">
       <Filter>imgui</Filter>
@@ -104,5 +103,6 @@
     </ClInclude>
     <ClInclude Include="src\MeshFactory.h" />
     <ClInclude Include="Third-Party\imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="src\Editor.h" />
   </ItemGroup>
 </Project>

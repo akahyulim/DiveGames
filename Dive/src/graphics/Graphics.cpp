@@ -136,9 +136,17 @@ namespace Dive
 		}
 	}
 
+	// BeginFrame
+	// 1. 윈도우 상태 확인(크기 변경시 모드 재설정, 최소화 상태라면 렌더링 건너 뛰기)
+	// 2. 렌더 타겟 초기화
+	// 3. PreRender 이벤트 발생
+
+	// urho3d의 EndFrame
 	void Graphics::Present()
 	{
 		assert(s_swapChain);
+
+		DV_FIRE_EVENT(eEventType::PostRender);
 		s_swapChain->Present(m_useSync ? 1 : 0, 0);
 	}
 

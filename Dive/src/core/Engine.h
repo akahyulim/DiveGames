@@ -5,26 +5,18 @@ namespace Dive
 	class Engine
 	{
 	public:
-		static bool Initialize();
-		static void Shutdown();
+		Engine() = default;
+		~Engine() = default;
 
-		static void Tick();
+		bool Initialize();
+		void Shutdown();
 
-		static double GetElapsedTimeMS() { return s_elapsedTimeMS; }
-		static double GetElapsedTimeSec() { return s_elapsedTimeMS / 1000.0; }
-		
-		static float GetDeltaTimeMS() { return s_deltaTimeMS; }
-		static float GetDeltaTimeSec() { return s_deltaTimeMS / 1000.0f; }
-		
-		static uint16_t GetFps() { return s_fps; }
+		void RunFrame();
 
-		static uint64_t GetFrameCount() { return s_frameCount; }
+		bool IsExit() { return m_bExit; }
+		void DoExit();
 
 	private:
-		static double s_elapsedTimeMS;
-		static float s_deltaTimeMS;
-		static std::chrono::steady_clock::time_point s_lastTickTime;
-		static uint16_t s_fps;
-		static uint64_t s_frameCount;
+		bool m_bExit = false;
 	};
 }

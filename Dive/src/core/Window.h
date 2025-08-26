@@ -8,7 +8,7 @@ namespace Dive
 		static bool Initialize();
 		static void Shutdown();
 
-		static bool Tick();
+		static bool Run();
 
 		static void SetMessageCallback(LONG_PTR callBack);
 

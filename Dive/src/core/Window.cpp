@@ -78,7 +78,7 @@ namespace Dive
 		DV_LOG(Window, info, "셧다운 완료");
 	}
 
-	bool Window::Tick()
+	bool Window::Run()
 	{
 		MSG msg{};
 		if (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))

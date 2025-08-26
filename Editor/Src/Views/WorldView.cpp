@@ -64,7 +64,7 @@ namespace Dive
 		if (ImGui::IsWindowFocused())
 		{
 			auto transform = EditorContext::EditorCamera->GetTransform();
-			float moveSpeed = m_cameraSpeed * Engine::GetDeltaTimeSec();
+			float moveSpeed = m_cameraSpeed * Timer::GetDeltaTimeSec();
 			if (Input::KeyPress(DIK_LSHIFT))
 				moveSpeed *= BOOST_SPEED;
 

@@ -88,6 +88,8 @@ namespace Dive
 			return false;
 		}
 
+		DV_SUBSCRIBE_EVENT(eEventType::BeginFrame, DV_EVENT_HANDLER_STATIC(OnBeginFrame));
+
 		DV_LOG(Input, info, "초기화 성공");
 		return true;
 	}
@@ -111,17 +113,23 @@ namespace Dive
 		DV_LOG(Input, info, "셧다운 완료");
 	}
 
-	void Input::Tick()
+	void Input::OnBeginFrame()
+	{	
+		// urho3d는 input begin/end 이벤트로 감싼다.
+		Update();
+	}
+
+	void Input::Update()
 	{
 		if (!ReadKeyboard())
 		{
-			DV_LOG(Input, err, "[::Tick] 키보드 입력 읽기 실패");
+			DV_LOG(Input, err, "[::Update] 키보드 입력 읽기 실패");
 			return;
 		}
 
 		if (!ReadMouse())
 		{
-			DV_LOG(Input, err, "[::Tick] 마우스 입력 읽기 실패");
+			DV_LOG(Input, err, "[::Update] 마우스 입력 읽기 실패");
 			return;
 		}
 

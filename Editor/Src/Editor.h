@@ -1,10 +1,9 @@
 ﻿#pragma once
 #include <dive.h>
 #include <imgui.h>
+#include "views/view.h"
 
-#include "Views/View.h"
-
-namespace Dive 
+namespace Dive
 {
 	class Project;
 	class MenuBar;
@@ -17,33 +16,30 @@ namespace Dive
 		Large_Bold,
 		Max
 	};
-	
+
 	class EditorContext
 	{
 	public:
 		static World* ActiveWorld;
-		
+
 		static GameObject* Selected;
 		static GameObject* EditorCamera;
 		static GameObject* MainCamera;
 	};
 
-	class Editor
+	class Editor : public Application
 	{
 	public:
 		Editor();
-		~Editor();
+		~Editor() override = default;
 
-		void Run();
+		void Setup() override;
+		void Start() override;
+		void Stop() override;
 
-		ImFont* GetFont(Dive::eFontTypes type);
+		void OnPostRender();
 
-		void SetTitle(const std::wstring& text = L"");
-
-	private:
-		void loadResources();
-		void beginUI();
-		void endUI();
+		void SetTitle(const std::wstring& worldName = std::wstring());
 
 	private:
 		std::array<ImFont*, static_cast<size_t>(Dive::eFontTypes::Max)> m_fonts;

@@ -13,12 +13,15 @@ namespace Dive
 	class Renderer
 	{
 	public:
-		static void Initialize();
+		static bool Initialize();
 		static void Shutdown();
 
-		static void OnUpdate();
+		static void OnRender();
+		static void Render();
 
 		static void ResizeRenderBuffers(uint32_t width, uint32_t height);
+
+		static uint64_t GetFrameCount() { return s_frameCount; }
 
 		static uint32_t GetRenderTargetWidth() { return s_renderTargetWidth; }
 		static uint32_t GetRenderTargetHeight() { return s_renderTargetHeight; }
@@ -40,6 +43,8 @@ namespace Dive
 		static void CreateSamplerStates();
 		
 	private:
+		static uint64_t s_frameCount;
+
 		static uint32_t s_renderTargetWidth;
 		static uint32_t s_renderTargetHeight;
 

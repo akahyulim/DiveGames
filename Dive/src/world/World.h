@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "core/EventDispatcher.h"
 
 namespace Dive
 {
@@ -72,8 +73,12 @@ namespace Dive
 	class WorldManager
 	{
 	public:
+		static bool Initialize();
+
 		static World* CreateWorld(const std::string& name);
 		static void Clear();
+
+		static void OnUpdate(EventData data);
 
 		static World* GetActiveWorld();
 

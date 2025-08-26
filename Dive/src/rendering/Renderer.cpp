@@ -2,6 +2,7 @@
 #include "Renderer.h"
 #include "StaticMesh.h"
 #include "Material.h"
+#include "core/EventDispatcher.h"
 #include "graphics/RenderTexture.h"
 #include "graphics/Graphics.h"
 #include "graphics/Shader.h"
@@ -14,6 +15,8 @@
 
 namespace Dive
 {
+	uint64_t Renderer::s_frameCount = 0;
+
 	uint32_t Renderer::s_renderTargetWidth = 0;
 	uint32_t Renderer::s_renderTargetHeight = 0;
 
@@ -33,7 +36,7 @@ namespace Dive
 	std::vector<std::unique_ptr<RenderPass>> Renderer::s_renderPasses;
 	std::unique_ptr<LightManager> Renderer::s_lightManager;
 
-	void Renderer::Initialize()
+	bool Renderer::Initialize()
 	{
 		ResizeRenderBuffers(Graphics::GetWidth(), Graphics::GetHeight());
 
@@ -46,7 +49,11 @@ namespace Dive
 
 		s_lightManager = std::make_unique<LightManager>(Graphics::GetDevice());
 
+		DV_SUBSCRIBE_EVENT(eEventType::Render, DV_EVENT_HANDLER_STATIC(OnRender));
+
 		DV_LOG(Renderer, info, "초기화 성공");
+
+		return true;
 	}
 
 	void Renderer::Shutdown()
@@ -81,9 +88,14 @@ namespace Dive
 		DV_LOG(Renderer, info, "셧다운 성공");
 	}
 
+	void Renderer::OnRender()
+	{
+		Render();
+	}
+
 	// Render를 분할하고 싶다.
 	// 분류도 이 곳에서 하고 싶다.
-	void Renderer::OnUpdate()
+	void Renderer::Render()
 	{
 		if (!WorldManager::GetActiveWorld())
 			return;
@@ -110,6 +122,8 @@ namespace Dive
 
 			// end frame?
 		}
+
+		s_frameCount++;
 	}
 
 	void Renderer::ResizeRenderBuffers(uint32_t width, uint32_t height)

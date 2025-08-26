@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "EventDispatcher.h"
 
 namespace Dive
 {
@@ -11,7 +12,9 @@ namespace Dive
 		static bool Initialize();
 		static void Shutdown();
 
-		static void Tick();
+		static void OnBeginFrame();
+
+		static void Update();
 		static bool ReadKeyboard();
 		static bool ReadMouse();
 		static void ProcessInput();

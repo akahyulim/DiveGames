@@ -1,14 +1,14 @@
 ﻿#include "Editor.h"
 #include "MenuBar.h"
-#include "Views/WorldView.h"
-#include "Views/GameView.h"
-#include "Views/HierarchyView.h"
-#include "Views/InspectorView.h"
-#include "Views/LogView.h"
+#include "views/WorldView.h"
+#include "views/GameView.h"
+#include "views/HierarchyView.h"
+#include "views/InspectorView.h"
 
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
 
+constexpr LPCWCH DV_TITLE = L"Dive Editor";
 constexpr float DEFAULT_FONT_SIZE = 16.0f;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam);
@@ -44,19 +44,22 @@ namespace Dive
 	GameObject* EditorContext::EditorCamera = nullptr;
 	GameObject* EditorContext::MainCamera = nullptr;
 
-	// main으로부터 argc를 받아 추린 후 엔진에 전달한다.
 	Editor::Editor()
 	{
-		// 이것도 argc에 포함시켜 엔진 초기화과정에 편입시키는 게 맞다.
+		DV_SUBSCRIBE_EVENT(eEventType::PostRender, DV_EVENT_HANDLER(OnPostRender));
+	}
+
+	void Editor::Setup()
+	{
 		LogManager::SetFilename("dive_editor.log");
-		if (!Engine::Initialize())
-		{
-			DV_LOG(Editor, critical, "Engine 초기화 실패");
-			throw std::runtime_error("Engine 초기화 실패");
-		}
+	}
+	
+	void Editor::Start()
+	{
+		SetTitle();
 		Window::SetMessageCallback((LONG_PTR)EditorMessageHandler);
 		//Window::Maximize();
-
+		
 		// ImGui 초기화
 		{
 			// Setup Dear ImGui context
@@ -115,9 +118,21 @@ namespace Dive
 			}
 		}
 
-		loadResources();
+		// Load Resources
+		{
+			// FONTS
+			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			io.FontDefault = m_fonts[static_cast<size_t>(eFontTypes::Normal)] =
+				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
+			m_fonts[static_cast<size_t>(eFontTypes::Bold)] =
+				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
+			m_fonts[static_cast<size_t>(eFontTypes::Large)] =
+				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
+			m_fonts[static_cast<size_t>(eFontTypes::Large_Bold)] =
+				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
+		}
 
-		// create widgets
+		// create views
 		m_views.emplace_back(std::make_unique<WorldView>(this));
 		m_views.emplace_back(std::make_unique<GameView>(this));
 		m_views.emplace_back(std::make_unique<HierarchyView>(this));
@@ -125,10 +140,10 @@ namespace Dive
 		//m_views.emplace_back(std::make_unique<LogView>(this));
 		m_menuBar = std::make_unique<MenuBar>(this);
 
-		SetTitle();
+		DV_LOG(Editor, info, "초기화 성공");
 	}
 
-	Editor::~Editor()
+	void Editor::Stop()
 	{
 		for (auto& widget : m_views)
 			widget.reset();
@@ -138,128 +153,103 @@ namespace Dive
 		ImGui_ImplWin32_Shutdown();
 		ImGui::DestroyContext();
 
-		Engine::Shutdown();
+		DV_LOG(Editor, info, "셧다운 성공");
+
+		m_engine->Shutdown();
 	}
 
-	void Editor::Run()
+	void Editor::OnPostRender()
 	{
-		while (Window::Tick())
+		// Begin UI Frame
 		{
-			Engine::Tick();
+			ImGui_ImplDX11_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
 
-			// ImGui
+			static bool dockspaceOpen = true;
+			static bool opt_fullscreen_persistant = true;
+			bool opt_fullscreen = opt_fullscreen_persistant;
+			static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+
+			ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+			if (opt_fullscreen)
 			{
-				beginUI();
-
-				m_menuBar->ComposeUI();
-				for (auto& view : m_views)
-					view->ComposeUI();
-
-				endUI();
+				ImGuiViewport* viewport = ImGui::GetMainViewport();
+				ImGui::SetNextWindowPos(viewport->Pos);
+				ImGui::SetNextWindowSize(viewport->Size);
+				ImGui::SetNextWindowViewport(viewport->ID);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+				ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+				window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+				window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 			}
 
-			Graphics::Present();
+			if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+			{
+				window_flags |= ImGuiWindowFlags_NoBackground;
+			}
+
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+			ImGui::Begin("DockSpace", &dockspaceOpen, window_flags);
+			ImGui::PopStyleVar();
+
+			if (opt_fullscreen)
+			{
+				ImGui::PopStyleVar(2);
+			}
+
+			// DockSpace
+			ImGuiIO& io = ImGui::GetIO();
+			ImGuiStyle& style = ImGui::GetStyle();
+			float minWinSizeX = style.WindowMinSize.x;
+			style.WindowMinSize.x = 200.0f;	// dock space에서의 최소 크기...
+			if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+			{
+				ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+				ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+			}
+			style.WindowMinSize.x = minWinSizeX;
+		}
+
+		// Compose UI
+		{
+			m_menuBar->ComposeUI();
+			for (auto& view : m_views)
+				view->ComposeUI();
+		}
+
+		// End UI Fmame
+		{
+			ImGui::End();
+
+			auto dc = Graphics::GetDeviceContext();
+
+			auto renderTargetView = Graphics::GetRenderTargetView();
+			auto depthStencilView = Graphics::GetDepthStencilView();
+			dc->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+
+			float clearColors[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
+			dc->ClearRenderTargetView(renderTargetView, clearColors);
+			dc->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+			ImGui::Render();
+			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+			ImGuiIO& io = ImGui::GetIO(); (void)io;
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				ImGui::UpdatePlatformWindows();
+				ImGui::RenderPlatformWindowsDefault();
+			}
 		}
 	}
 
-	ImFont* Editor::GetFont(eFontTypes type)
+	void Editor::SetTitle(const std::wstring& worldName)
 	{
-		return m_fonts[static_cast<size_t>(type)];
-	}
+		std::wstring title = DV_TITLE;
+		if (!worldName.empty()) 
+			title += L" - " + worldName;
 
-	void Editor::SetTitle(const std::wstring& text)
-	{
-		std::wstring title = text.empty() ? L"Dive Editor" : L"Dive Editor - " + text;
 		Window::SetTitle(title);
-	}
-
-	void Editor::loadResources()
-	{
-		// FONTS
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.FontDefault = m_fonts[static_cast<size_t>(eFontTypes::Normal)] =
-			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
-		m_fonts[static_cast<size_t>(eFontTypes::Bold)] =
-			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
-		m_fonts[static_cast<size_t>(eFontTypes::Large)] =
-			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
-		m_fonts[static_cast<size_t>(eFontTypes::Large_Bold)] =
-			io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
-	}
-
-	void Editor::beginUI()
-	{
-		ImGui_ImplDX11_NewFrame();
-		ImGui_ImplWin32_NewFrame();
-		ImGui::NewFrame();
-
-		static bool dockspaceOpen = true;
-		static bool opt_fullscreen_persistant = true;
-		bool opt_fullscreen = opt_fullscreen_persistant;
-		static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
-
-		ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-		if (opt_fullscreen)
-		{
-			ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(viewport->Pos);
-			ImGui::SetNextWindowSize(viewport->Size);
-			ImGui::SetNextWindowViewport(viewport->ID);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-		}
-
-		if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
-		{
-			window_flags |= ImGuiWindowFlags_NoBackground;
-		}
-
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace", &dockspaceOpen, window_flags);
-		ImGui::PopStyleVar();
-
-		if (opt_fullscreen)
-		{
-			ImGui::PopStyleVar(2);
-		}
-
-		// DockSpace
-		ImGuiIO& io = ImGui::GetIO();
-		ImGuiStyle& style = ImGui::GetStyle();
-		float minWinSizeX = style.WindowMinSize.x;
-		style.WindowMinSize.x = 200.0f;	// dock space에서의 최소 크기...
-		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
-		{
-			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
-			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
-		}
-		style.WindowMinSize.x = minWinSizeX;
-	}
-
-	void Editor::endUI()
-	{
-		ImGui::End();
-
-		auto dc = Graphics::GetDeviceContext();
-
-		auto renderTargetView = Graphics::GetRenderTargetView();
-		auto depthStencilView = Graphics::GetDepthStencilView();
-		dc->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-
-		float clearColors[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
-		dc->ClearRenderTargetView(renderTargetView, clearColors);
-		dc->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-		ImGui::Render();
-		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-		}
 	}
 }

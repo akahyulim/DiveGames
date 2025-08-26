@@ -10,8 +10,10 @@
 #include "core/FileUtils.h"
 #include "core/EventDispatcher.h"
 #include "core/Window.h"
+#include "core/Timer.h"
 #include "core/Input.h"
 #include "core/Engine.h"
+#include "core/Application.h"
 
 // graphics
 #include "graphics/Graphics.h"
