@@ -141,10 +141,8 @@ namespace Dive
 
 	std::unordered_map<uint64_t, Object*> fileIDToObject;
 
-	bool WorldSerializer::Deserialize(ID3D11Device* device, const std::filesystem::path& filepath)
+	bool WorldSerializer::Deserialize(const std::filesystem::path& filepath)
 	{
-		assert(device);
-
 		YAML::Node data;
 		try {
 			data = YAML::LoadFile(filepath.string());
@@ -206,11 +204,11 @@ namespace Dive
 				std::string staticMeshName = meshRendererNode["StaticMesh"].as<std::string>();
 				auto staticMesh = std::make_shared<StaticMesh>();
 				staticMesh->LoadFromFile("Assets/Models/" + staticMeshName + ".mesh");
-				staticMesh->CreateBuffers(device);
+				staticMesh->CreateBuffers();
 				meshRenderer->SetStaticMesh(staticMesh);
 
 				// 이것두 default는 리소스 매니져에서, file은 직접?
-				std::shared_ptr<Material> material = std::make_shared<Material>(device);
+				std::shared_ptr<Material> material = std::make_shared<Material>();
 				material->LoadFromFile("Assets/Materials/" + meshRendererNode["Material"].as<std::string>() + ".mat");
 				meshRenderer->SetMaterial(material);
 

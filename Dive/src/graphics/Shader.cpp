@@ -14,10 +14,8 @@ namespace Dive
 		m_shader.Reset();
 	}
 
-	bool VertexShader::LoadFromFile(const std::filesystem::path& path, ID3D11Device* device)
+	bool VertexShader::LoadFromFile(const std::filesystem::path& path)
 	{
-		assert(device);
-
 		ComPtr<ID3DBlob> errorBlob;
 
 		auto hr = D3DReadFileToBlob(path.c_str(), m_blob.GetAddressOf());
@@ -27,7 +25,7 @@ namespace Dive
 			return false;
 		}
 
-		hr = device->CreateVertexShader(m_blob->GetBufferPointer(), m_blob->GetBufferSize(), nullptr, m_shader.GetAddressOf());
+		hr = Graphics::GetDevice()->CreateVertexShader(m_blob->GetBufferPointer(), m_blob->GetBufferSize(), nullptr, m_shader.GetAddressOf());
 		if (FAILED(hr))
 		{
 			DV_LOG(VertexShader, err, "[::LoadFromFile] CreateVertexShader 실패: {}", ErrorUtils::ToVerbose(hr));
@@ -39,10 +37,9 @@ namespace Dive
 		return true;
 	}
 
-	void VertexShader::Bind(ID3D11DeviceContext* deviceContext)
+	void VertexShader::Bind()
 	{
-		assert(deviceContext);
-		deviceContext->VSSetShader(m_shader.Get(), nullptr, 0);
+		Graphics::GetDeviceContext()->VSSetShader(m_shader.Get(), nullptr, 0);
 	}
 
 	PixelShader::~PixelShader()
@@ -50,10 +47,8 @@ namespace Dive
 		m_shader.Reset();
 	}
 
-	bool PixelShader::LoadFromFile(const std::filesystem::path& path, ID3D11Device* device)
+	bool PixelShader::LoadFromFile(const std::filesystem::path& path)
 	{
-		assert(device);
-
 		ComPtr<ID3DBlob> compiledBlob;
 		ComPtr<ID3DBlob> errorBlob;
 
@@ -64,7 +59,7 @@ namespace Dive
 			return false;
 		}
 
-		hr = device->CreatePixelShader(
+		hr = Graphics::GetDevice()->CreatePixelShader(
 			compiledBlob->GetBufferPointer(),
 			compiledBlob->GetBufferSize(),
 			nullptr,
@@ -80,9 +75,8 @@ namespace Dive
 		return true;
 	}
 
-	void PixelShader::Bind(ID3D11DeviceContext* deviceContext)
+	void PixelShader::Bind()
 	{
-		assert(deviceContext);
-		deviceContext->PSSetShader(m_shader.Get(), nullptr, 0);
+		Graphics::GetDeviceContext()->PSSetShader(m_shader.Get(), nullptr, 0);
 	}
 }

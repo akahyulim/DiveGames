@@ -8,6 +8,7 @@
 #include "graphics/Shader.h"
 #include "graphics/ShaderManager.h"
 #include "world/World.h"
+#include "world/WorldManager.h"
 #include "world/GameObject.h"
 #include "world/Components/Transform.h"
 #include "world/Components/Camera.h"
@@ -47,7 +48,7 @@ namespace Dive
 
 		s_renderPasses.emplace_back(std::make_unique<ForwardLighting>());
 
-		s_lightManager = std::make_unique<LightManager>(Graphics::GetDevice());
+		s_lightManager = std::make_unique<LightManager>();
 
 		DV_SUBSCRIBE_EVENT(eEventType::Render, DV_EVENT_HANDLER_STATIC(OnRender));
 
@@ -107,8 +108,6 @@ namespace Dive
 			// 위치가 애매하다. 하지만 바로 위에서 업데이트된 후에 호출하는 게 맞다.
 			s_lightManager->Update(WorldManager::GetActiveWorld());
 
-			auto deviceContext = Graphics::GetDeviceContext();
-
 			// begin frame?
 
 			// pass의 묶음은 path이다.
@@ -116,8 +115,8 @@ namespace Dive
 			for (auto& pass : s_renderPasses)
 			{
 				// 역시 위치가 애매하다.
-				s_lightManager->Bind(deviceContext);
-				pass->Execute(deviceContext, camera);
+				s_lightManager->Bind();
+				pass->Execute(camera);
 			}
 
 			// end frame?

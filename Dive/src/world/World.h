@@ -13,6 +13,7 @@ namespace Dive
 	class World
 	{
 	public:
+		World() = default;
 		World(const std::string& name);
 		~World();
 
@@ -57,7 +58,7 @@ namespace Dive
 	private:
 		std::string m_name{};
 
-		std::unordered_map<uint64_t, std::unique_ptr<GameObject>> m_gameObjectMap;
+		std::unordered_map<uint64_t, GameObject*> m_gameObjectMap;
 		std::vector<GameObject*> m_rootGameObjects;
 		std::unordered_set<uint64_t> m_destroyQueue;
 
@@ -67,22 +68,5 @@ namespace Dive
 		std::vector<MeshRenderer*> m_opaqueMeshRenderers;
 
 		friend class Transform;
-	};
-
-	//https://docs.unity3d.com/ScriptReference/SceneManagement.SceneManager.html
-	class WorldManager
-	{
-	public:
-		static bool Initialize();
-
-		static World* CreateWorld(const std::string& name);
-		static void Clear();
-
-		static void OnUpdate(EventData data);
-
-		static World* GetActiveWorld();
-
-	private:
-		static std::unique_ptr<World> s_activeWorld;	// 일단 단일 World로 관리
 	};
 }

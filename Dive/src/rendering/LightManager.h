@@ -13,11 +13,11 @@ namespace Dive
 	class LightManager
 	{ 
 	public:
-		LightManager(ID3D11Device* device);
+		LightManager();
 		~LightManager() = default;
 
 		void Update(World* world);
-		void Bind(ID3D11DeviceContext* deviceContext);
+		void Bind();
 
 		// 얘가 가지는 게 맞을까나...
 		DirectX::XMFLOAT4 GetAmbientColor() const { return m_ambientColor; }

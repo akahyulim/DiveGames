@@ -1,26 +1,23 @@
 ﻿#include "stdafx.h"
 #include "World.h"
+#include "WorldSerializer.h"
 #include "GameObject.h"
 #include "components/Transform.h"
 #include "components/Camera.h"
 #include "components/Light.h"
 #include "components/MeshRenderer.h"
-#include "resource/ResourceManager.h"
 
 namespace Dive
 {
 	World::World(const std::string& name)
 		: m_name(name)
 	{
-		ResourceManager::Initialize();
-
 		DV_LOG(World, info, "생성: {}", m_name);
 	}
 
 	World::~World()
 	{
 		Clear();
-		ResourceManager::Clear();
 		DV_LOG(World, info, "소멸: {}", m_name);
 	}
 
@@ -74,15 +71,13 @@ namespace Dive
 
 	GameObject* World::CreateGameObject(const std::string& name)
 	{
-		auto gameObject = std::make_unique<GameObject>(name);
+		auto gameObject = new GameObject(this, name);
 		gameObject->AddComponent<Transform>();
 
-		GameObject* ptr = gameObject.get();
-		m_rootGameObjects.push_back(ptr);
-
-		m_gameObjectMap[gameObject->GetInstanceID()] = std::move(gameObject);
+		m_rootGameObjects.push_back(gameObject);
+		m_gameObjectMap[gameObject->GetInstanceID()] = gameObject;
 	
-		return ptr;
+		return gameObject;
 	}
 
 	void World::AttachRoot(GameObject* gameObject)
@@ -135,7 +130,7 @@ namespace Dive
 		allGameObjects.reserve(AllGameObjectCount());
 
 		for (auto& [instanceID, gameObject] : m_gameObjectMap)
-			allGameObjects.push_back(gameObject.get());
+			allGameObjects.push_back(gameObject);
 
 		return allGameObjects;
 	}
@@ -183,7 +178,10 @@ namespace Dive
 		{
 			auto it = m_gameObjectMap.find(instanceID);
 			if (it != m_gameObjectMap.end())
+			{
+				DV_DELETE(it->second);
 				m_gameObjectMap.erase(it);
+			}
 		}
 		m_destroyQueue.clear();
 	}
@@ -196,45 +194,6 @@ namespace Dive
 	GameObject* World::FindGameObject(uint64_t instanceID)
 	{
 		auto it = m_gameObjectMap.find(instanceID);
-		return it != m_gameObjectMap.end() ? it->second.get() : nullptr;
-	}
-
-	std::unique_ptr<World> WorldManager::s_activeWorld = nullptr;
-
-	bool WorldManager::Initialize()
-	{
-		DV_SUBSCRIBE_EVENT(eEventType::Update, DV_EVENT_HANDLER_DATA_STATIC(OnUpdate));
-
-		return true;
-	}
-
-	// 유니티의 경우 빈 이름, 이미 존재하는 Scene의 이름은 안된다.
-	World* WorldManager::CreateWorld(const std::string& name)
-	{
-		if (s_activeWorld)	s_activeWorld.reset();
-		
-		s_activeWorld = std::make_unique<World>(name);
-		return s_activeWorld.get();
-	}
-
-	void WorldManager::Clear()
-	{
-		if (s_activeWorld)
-			s_activeWorld.reset();
-
-		DV_LOG(WorldManager, info, "클리어 완료");
-	}
-
-	void WorldManager::OnUpdate(EventData data)
-	{
-		if (!s_activeWorld)
-			return;
-
-		s_activeWorld->Update();
-	}
-
-	World* WorldManager::GetActiveWorld()
-	{
-		return s_activeWorld.get();
+		return it != m_gameObjectMap.end() ? it->second : nullptr;
 	}
 }

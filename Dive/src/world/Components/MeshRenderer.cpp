@@ -18,7 +18,6 @@ namespace Dive
 		: Component(gameObject)
 	{
 		m_gpuBuffer = std::make_unique<ConstantBuffer>(
-			Graphics::GetDevice(), 
 			eVSConstantBufferSlot::Object, 
 			static_cast<uint32_t>(sizeof(ObjectData)));
 		if (!m_gpuBuffer) DV_LOG(MeshRenderer, err, "[::MeshRenderer] ConstantBuffer 생성 실패");
@@ -29,21 +28,20 @@ namespace Dive
 		m_gpuBuffer.reset();
 	}
 
-	void MeshRenderer::Render(ID3D11DeviceContext* deviceContext, const Camera* camera)
+	void MeshRenderer::Render(const Camera* camera)
 	{
-		assert(deviceContext);
 		assert(camera);
 		
 		ObjectData objectData{};
 		objectData.model = XMMatrixTranspose(GetGameObject()->GetTransform()->GetTransformMatrix());
 		objectData.View = XMMatrixTranspose(camera->GetViewMatrix());
 		objectData.Proj = XMMatrixTranspose(camera->GetProjectionMatrix());
-		m_gpuBuffer->Update<ObjectData>(deviceContext, objectData);
-		m_gpuBuffer->Bind(deviceContext);
+		m_gpuBuffer->Update<ObjectData>(objectData);
+		m_gpuBuffer->Bind();
 
-		m_material->Bind(deviceContext);
+		m_material->Bind();
 
-		m_staticMesh->Draw(deviceContext);
+		m_staticMesh->Draw();
 	}
 
 	bool MeshRenderer::IsVisible(const Frustum& frustum)

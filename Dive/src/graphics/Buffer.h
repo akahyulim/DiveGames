@@ -11,10 +11,10 @@ namespace Dive
 	class Buffer
 	{
 	public:
-		Buffer(ID3D11Device* device, eBufferType type, const void* rawData, uint32_t stride, uint32_t count);
+		Buffer(eBufferType type, const void* rawData, uint32_t stride, uint32_t count);
 		~Buffer();
 
-		void Bind(ID3D11DeviceContext* deviceContext) const;
+		void Bind() const;
 
 		ID3D11Buffer* GetBuffer() const { return m_buffer.Get(); }
 		eBufferType GetType() const { return m_type; }

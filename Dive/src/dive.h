@@ -55,3 +55,4 @@
 #include "world/GameObject.h"
 #include "world/World.h"
 #include "world/WorldSerializer.h"
+#include "world/WorldManager.h"

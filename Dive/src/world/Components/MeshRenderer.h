@@ -22,7 +22,7 @@ namespace Dive
 		MeshRenderer(GameObject* gameObject);
 		~MeshRenderer() override;
 
-		virtual void Render(ID3D11DeviceContext* deviceContext, const Camera* camera);
+		virtual void Render(const Camera* camera);
 		bool IsVisible(const Frustum& frustum);
 		bool IsTransparent() const;
 

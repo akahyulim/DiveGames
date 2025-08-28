@@ -5,9 +5,9 @@
 
 namespace Dive
 {
-	GameObject::GameObject(const std::string& name)
+	GameObject::GameObject(World* world, const std::string& name)
 		: Object(name)
-		, m_world(WorldManager::GetActiveWorld())
+		, m_world(world)
 	{
 		DV_LOG(GameObject, info, "생성: {}, {}", GetName(), GetInstanceID());
 	}
@@ -21,8 +21,8 @@ namespace Dive
 
 	void GameObject::Destory()
 	{
-		if (m_isDestroyed) return;
-		m_isDestroyed = true;
+		if (m_destroyed) return;
+		m_destroyed = true;
 	
 		// 얕은 복사
 		auto children = GetTransform()->GetChildren();
@@ -47,7 +47,7 @@ namespace Dive
 
 	void GameObject::Update()
 	{
-		if (!m_ActiveHierarchy || m_isDestroyed)
+		if (!m_activeHierarchy || m_destroyed)
 			return;
 
 		for (auto& [type, component] : m_components)
@@ -92,20 +92,20 @@ namespace Dive
 	{
 		m_activeSelf = value;
 		bool parentHierarchy = GetTransform()->HasParent() ? 
-			GetTransform()->GetParent()->GetGameObject()->m_ActiveHierarchy : true;
+			GetTransform()->GetParent()->GetGameObject()->m_activeHierarchy : true;
 
 		updateActiveInHierarchy(parentHierarchy);
 	}
 
 	void GameObject::updateActiveInHierarchy(bool parentHierarchy)
 	{
-		m_ActiveHierarchy = parentHierarchy && m_activeSelf;
+		m_activeHierarchy = parentHierarchy && m_activeSelf;
 
 		const auto& children = GetTransform()->GetChildren();
 		for (auto child : children)
 		{
 			auto owner = child->GetGameObject();
-			owner->updateActiveInHierarchy(m_ActiveHierarchy);
+			owner->updateActiveInHierarchy(m_activeHierarchy);
 		}
 	}
 }

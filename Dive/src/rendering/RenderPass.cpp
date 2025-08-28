@@ -3,6 +3,7 @@
 #include "Renderer.h"
 #include "graphics/Graphics.h"
 #include "world/World.h"
+#include "world/WorldManager.h"
 #include "world/GameObject.h"
 #include "world/components/Camera.h"
 #include "world/Components/Light.h"
@@ -12,9 +13,8 @@
 namespace Dive
 {
 	// GameObject가 아닌 Camera로 받아도 될 듯하다.
-	void ForwardLighting::Execute(ID3D11DeviceContext* deviceContext, const Camera* camera)
+	void ForwardLighting::Execute(const Camera* camera)
 	{
-		assert(deviceContext);
 		assert(camera);
 
 		if (!WorldManager::GetActiveWorld())
@@ -23,11 +23,11 @@ namespace Dive
 		const auto world = WorldManager::GetActiveWorld();
 
 		// camera
-		camera->Bind(deviceContext);
+		camera->Bind();
 
 		// pipelineState를 살려야하나..
-		deviceContext->RSSetState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
-		deviceContext->OMSetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::DepthReadWrite_StencilReadWrite), 0);
+		Graphics::GetDeviceContext()->RSSetState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
+		Graphics::GetDeviceContext()->OMSetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::DepthReadWrite_StencilReadWrite), 0);
 
 		// 일단 한 번에 바인딩 해봤다.
 		Renderer::BindSamplerStates();
@@ -40,7 +40,7 @@ namespace Dive
 
 			// opaque
 			for (auto meshRenderer : world->GetOpaqueMeshRenderers())
-				meshRenderer->Render(deviceContext, camera);
+				meshRenderer->Render(camera);
 		}
 	}
 }

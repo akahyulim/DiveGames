@@ -10,14 +10,14 @@ namespace Dive
 	class ShaderManager
 	{
 	public:
-		static bool Initialize(ID3D11Device* device);
+		static bool Initialize();
 		static void Clear();
 
-		static bool CreateInputLayout(const VertexShader* vs, eInputLayout type, ID3D11Device* device);
+		static bool CreateInputLayout(const VertexShader* vs, eInputLayout type);
 
 		static IShader* GetShader(const std::string& name);
 		static ID3D11InputLayout* GetInputLayout(const std::string& shaderName, eInputLayout inputLayoutType);
-		static void BindInputLayout(const std::string& shaderName, eInputLayout inputLayoutType, ID3D11DeviceContext* deviceContext);
+		static void BindInputLayout(const std::string& shaderName, eInputLayout inputLayoutType);
 
 	private:
 		static std::unordered_map<std::string, std::unique_ptr<IShader>> s_shaders;

@@ -1,14 +1,14 @@
 ﻿#include "stdafx.h"
 #include "Buffer.h"
+#include "Graphics.h"
 
 namespace Dive
 {
-	Buffer::Buffer(ID3D11Device* device, eBufferType type, const void* rawData, uint32_t stride, uint32_t count)
+	Buffer::Buffer(eBufferType type, const void* rawData, uint32_t stride, uint32_t count)
 		: m_type(type)
 		, m_stride(stride)
 		, m_count(count)
 	{
-		assert(device);
 		assert(rawData);
 
 		D3D11_BUFFER_DESC bufferDesc{};
@@ -19,7 +19,7 @@ namespace Dive
 		D3D11_SUBRESOURCE_DATA subresourceData{};
 		subresourceData.pSysMem = rawData;
 
-		HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, &m_buffer);
+		HRESULT hr = Graphics::GetDevice()->CreateBuffer(&bufferDesc, &subresourceData, &m_buffer);
 		if (FAILED(hr))	DV_LOG(VertexBuffer, err, "[::Buffer] CreateBuffer 실패: {}", ErrorUtils::ToVerbose(hr));
 	}
 
@@ -28,18 +28,16 @@ namespace Dive
 		m_buffer.Reset();
 	}
 
-	void Buffer::Bind(ID3D11DeviceContext* deviceContext) const
+	void Buffer::Bind() const
 	{
-		assert(deviceContext);
-
 		if (m_type == eBufferType::VertexBuffer)
 		{
 			UINT offsets = 0;
-			deviceContext->IASetVertexBuffers(0, 1, m_buffer.GetAddressOf(), &m_stride, &offsets);
+			Graphics::GetDeviceContext()->IASetVertexBuffers(0, 1, m_buffer.GetAddressOf(), &m_stride, &offsets);
 		}
 		else if (m_type == eBufferType::IndexBuffer)
 		{
-			deviceContext->IASetIndexBuffer(m_buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+			Graphics::GetDeviceContext()->IASetIndexBuffer(m_buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		}
 	}
 }

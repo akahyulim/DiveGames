@@ -2,6 +2,7 @@
 #include "StaticMesh.h"
 #include "graphics/Buffer.h"
 #include "graphics/ShaderManager.h"
+#include "graphics/Graphics.h"
 #include "math/BoundingBox.h"
 
 namespace Dive
@@ -16,10 +17,8 @@ namespace Dive
 		Clear();
 	}
 
-	bool StaticMesh::CreateBuffers(ID3D11Device* device)
+	bool StaticMesh::CreateBuffers()
 	{
-		assert(device);
-
 		// 정점 버퍼 생성
 		{
 			if (m_vertices.empty())
@@ -30,7 +29,6 @@ namespace Dive
 
 			m_vertexBuffer.reset();
 			m_vertexBuffer = std::make_shared<Buffer>(
-				device,
 				eBufferType::VertexBuffer,
 				m_vertices.data(),
 				static_cast<uint32_t>(sizeof(LitVertex)),
@@ -48,7 +46,6 @@ namespace Dive
 		{
 			m_indexBuffer.reset();
 			m_indexBuffer = std::make_shared<Buffer>(
-				device,
 				eBufferType::IndexBuffer,
 				m_indices.data(),
 				static_cast<uint32_t>(sizeof(uint32_t)),
@@ -76,22 +73,21 @@ namespace Dive
 		m_vertices.shrink_to_fit();
 	}
 
-	void StaticMesh::Draw(ID3D11DeviceContext* deviceContext)
+	void StaticMesh::Draw()
 	{
-		assert(deviceContext);
 		assert(m_vertexBuffer);
 
-		deviceContext->IASetPrimitiveTopology(m_primitiveTopology);
+		Graphics::GetDeviceContext()->IASetPrimitiveTopology(m_primitiveTopology);
 
-		m_vertexBuffer->Bind(deviceContext);
+		m_vertexBuffer->Bind();
 
 		if (m_indexBuffer)
 		{
-			m_indexBuffer->Bind(deviceContext);
-			deviceContext->DrawIndexed(m_indexBuffer->GetCount(), 0, 0);
+			m_indexBuffer->Bind();
+			Graphics::GetDeviceContext()->DrawIndexed(m_indexBuffer->GetCount(), 0, 0);
 		}
 		else
-			deviceContext->Draw(m_vertexBuffer->GetCount(), 0);
+			Graphics::GetDeviceContext()->Draw(m_vertexBuffer->GetCount(), 0);
 	}
 
 	void StaticMesh::ComputeBouingBox()

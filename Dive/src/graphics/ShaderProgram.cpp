@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "ShaderProgram.h"
+#include "Graphics.h"
 
 namespace Dive
 {
@@ -14,15 +15,13 @@ namespace Dive
 		m_shaders[type] = shader;
 	}
 
-	void ShaderProgram::Bind(ID3D11DeviceContext* deviceContext)
+	void ShaderProgram::Bind()
 	{
-		assert(deviceContext);
-
-		deviceContext->IASetInputLayout(m_inputLayout);
+		Graphics::GetDeviceContext()->IASetInputLayout(m_inputLayout);
 
 		for (const auto& [stage, shader] : m_shaders)
 		{
-			if (shader)	shader->Bind(deviceContext);
+			if (shader)	shader->Bind();
 		}
 	}
 }

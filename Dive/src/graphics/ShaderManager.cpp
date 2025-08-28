@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "ShaderManager.h"
+#include "Graphics.h"
 
 namespace Dive
 {
@@ -47,21 +48,19 @@ namespace Dive
 		return elements;
 	}
 
-	bool ShaderManager::Initialize(ID3D11Device* device)
+	bool ShaderManager::Initialize()
 	{
-		assert(device);
-
 		// vertex shader & inputLayout 
 		{
 			// unlit
 			auto unlit_vs = std::make_unique<VertexShader>();
-			if (!unlit_vs->LoadFromFile("Assets/Shaders/UnlitVS.cso", device))
+			if (!unlit_vs->LoadFromFile("Assets/Shaders/UnlitVS.cso"))
 			{
 				DV_LOG(ShaderManager, err, "[::Initialize] LoadFromFile 실패");
 				return false;
 			}
 
-			if (!CreateInputLayout(unlit_vs.get(), eInputLayout::Unlit, device))
+			if (!CreateInputLayout(unlit_vs.get(), eInputLayout::Unlit))
 			{
 				DV_LOG(ShaderManager, err, "[::Initialize] CreateInputLayout 실패");
 				return false;
@@ -73,13 +72,13 @@ namespace Dive
 
 			// forward light
 			auto forwardLight_vs = std::make_unique<VertexShader>();
-			if (!forwardLight_vs->LoadFromFile("Assets/Shaders/ForwardLightVS.cso", device))
+			if (!forwardLight_vs->LoadFromFile("Assets/Shaders/ForwardLightVS.cso"))
 			{
 				DV_LOG(ShaderManager, err, "[::Initialize] LoadFromFile 실패");
 				return false;
 			}
 
-			if (!CreateInputLayout(forwardLight_vs.get(), eInputLayout::Lit, device))
+			if (!CreateInputLayout(forwardLight_vs.get(), eInputLayout::Lit))
 			{
 				DV_LOG(ShaderManager, err, "[::Initialize] CreateInputLayout 실패");
 				return false;
@@ -94,7 +93,7 @@ namespace Dive
 		{
 			// unlit
 			auto unlit_ps = std::make_unique<PixelShader>();
-			if (!unlit_ps->LoadFromFile("Assets/Shaders/UnlitPS.cso", device))
+			if (!unlit_ps->LoadFromFile("Assets/Shaders/UnlitPS.cso"))
 			{
 				DV_LOG(ShaderManager, err, "[::Initialize] LoadFromFile 실패");
 				return false;
@@ -106,7 +105,7 @@ namespace Dive
 
 			// forward light
 			auto forwardLight_ps = std::make_unique<PixelShader>();
-			if (!forwardLight_ps->LoadFromFile("Assets/Shaders/ForwardLightPS.cso", device))
+			if (!forwardLight_ps->LoadFromFile("Assets/Shaders/ForwardLightPS.cso"))
 			{
 				DV_LOG(ShaderManager, err, "[::Initialize] LoadFromFile 실패");
 				return false;
@@ -137,16 +136,15 @@ namespace Dive
 		DV_LOG(ShaderManager, info, "클리어 완료");
 	}
 
-	bool ShaderManager::CreateInputLayout(const VertexShader* vs, eInputLayout type, ID3D11Device* device)
+	bool ShaderManager::CreateInputLayout(const VertexShader* vs, eInputLayout type)
 	{
-		assert(device);
 		assert(vs && vs->GetBytecode());
 
 		auto inputElements = GetInputElements(type);
 		auto byteCode = vs->GetBytecode();
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 
-		auto hr = device->CreateInputLayout(
+		auto hr = Graphics::GetDevice()->CreateInputLayout(
 			inputElements.data(),
 			static_cast<UINT>(inputElements.size()),
 			byteCode->GetBufferPointer(),
@@ -177,9 +175,8 @@ namespace Dive
 		return it->second.Get();
 	}
 
-	void ShaderManager::BindInputLayout(const std::string& shaderName, eInputLayout inputLayoutType, ID3D11DeviceContext* deviceContext)
+	void ShaderManager::BindInputLayout(const std::string& shaderName, eInputLayout inputLayoutType)
 	{
-		assert(deviceContext);
-		deviceContext->IASetInputLayout(s_inputLayouts[InputLayoutKey(shaderName, inputLayoutType)].Get());
+		Graphics::GetDeviceContext()->IASetInputLayout(s_inputLayouts[InputLayoutKey(shaderName, inputLayoutType)].Get());
 	}
 }

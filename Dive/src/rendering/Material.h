@@ -52,16 +52,16 @@ namespace Dive
 	class Material : public Resource
 	{
 	public:
-		Material(ID3D11Device* device);
+		Material();
 		~Material() override = default;
 
 		bool LoadFromFile(const std::filesystem::path& filepath) override;
 		bool SaveToFile(const std::filesystem::path& filepath) override;
 
-		void Bind(ID3D11DeviceContext* deviceContext);
+		void Bind();
 
-		Texture2D* GetMap(eMapType type);
-		void SetMap(eMapType type, Texture2D* texture);
+		std::shared_ptr<Texture2D> GetMap(eMapType type);
+		void SetMap(eMapType type, std::shared_ptr<Texture2D> texture);
 		void SetMap(eMapType type, const std::string& textureName);
 		void SetMap(eMapType type, const std::filesystem::path& filepath);
 
@@ -85,7 +85,7 @@ namespace Dive
 		static constexpr eResourceType GetType() { return eResourceType::Material; }
 
 	private:
-		std::array<Texture2D*, static_cast<size_t>(eMapType::Count)> m_maps;
+		std::array<std::shared_ptr<Texture2D>, static_cast<size_t>(eMapType::Count)> m_maps;
 
 		MaterialData m_cpuBuffer;
 		std::unique_ptr<ConstantBuffer> m_gpuBuffer;

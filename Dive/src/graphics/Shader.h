@@ -20,16 +20,16 @@ namespace Dive
 	{
 	public:
 		virtual ~IShader() = default;
-		virtual bool LoadFromFile(const std::filesystem::path& path, ID3D11Device* device) = 0;
-		virtual void Bind(ID3D11DeviceContext* deviceContext) = 0;
+		virtual bool LoadFromFile(const std::filesystem::path& path) = 0;
+		virtual void Bind() = 0;
 	};
 
 	class VertexShader : public IShader
 	{
 	public:
 		~VertexShader() override;
-		bool LoadFromFile(const std::filesystem::path& path, ID3D11Device* device) override;
-		void Bind(ID3D11DeviceContext* deviceContext) override;
+		bool LoadFromFile(const std::filesystem::path& path) override;
+		void Bind() override;
 
 		ID3D11VertexShader* GetShader() const { return m_shader.Get(); }
 		ID3DBlob* GetBytecode() const { return m_blob.Get(); };
@@ -43,8 +43,8 @@ namespace Dive
 	{
 	public:
 		~PixelShader() override;
-		bool LoadFromFile(const std::filesystem::path& path, ID3D11Device* device) override;
-		void Bind(ID3D11DeviceContext* deviceContext) override;
+		bool LoadFromFile(const std::filesystem::path& path) override;
+		void Bind() override;
 
 		ID3D11PixelShader* GetShader() const { return m_shader.Get(); }
 

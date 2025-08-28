@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include <dive.h>
-#include <imgui.h>
 #include "views/view.h"
 
 namespace Dive
@@ -20,8 +19,15 @@ namespace Dive
 	class EditorContext
 	{
 	public:
-		static World* ActiveWorld;
+		static void Clear()
+		{
+			ActiveWorld = nullptr;
+			Selected = nullptr;
+			EditorCamera = nullptr;
+			MainCamera = nullptr;
+		}
 
+		static World* ActiveWorld;
 		static GameObject* Selected;
 		static GameObject* EditorCamera;
 		static GameObject* MainCamera;

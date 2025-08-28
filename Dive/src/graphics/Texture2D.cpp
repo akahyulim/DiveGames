@@ -70,9 +70,6 @@ namespace Dive
 
 	bool Texture2D::Create()
 	{
-		auto device = Graphics::GetDevice();
-		auto deviceContext = Graphics::GetDeviceContext();
-
 		if (m_pixelData.empty())
 		{
 			DV_LOG(Texture2D, err, "[::Create] 빈 픽셀 데이터로 시도");
@@ -95,7 +92,7 @@ namespace Dive
 		texDesc.MiscFlags = m_useMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 		texDesc.CPUAccessFlags = 0;
 
-		auto hr = device->CreateTexture2D(&texDesc, nullptr, m_texture.GetAddressOf());
+		auto hr = Graphics::GetDevice()->CreateTexture2D(&texDesc, nullptr, m_texture.GetAddressOf());
 		if (FAILED(hr))
 		{
 			DV_LOG(Texture2D, err, "[::Create] CreateTexture2D 실패: {}", ErrorUtils::ToVerbose(hr));
@@ -103,7 +100,7 @@ namespace Dive
 		}
 
 		uint32_t rowPitch = m_width * GetPixelSize(m_format);
-		deviceContext->UpdateSubresource(
+		Graphics::GetDeviceContext()->UpdateSubresource(
 			static_cast<ID3D11Resource*>(m_texture.Get()),
 			0, nullptr,
 			m_pixelData.data(),
@@ -117,14 +114,14 @@ namespace Dive
 		srvDesc.Texture2D.MipLevels = static_cast<UINT>(m_mipLevels);
 		srvDesc.Texture2D.MostDetailedMip = 0;
 
-		hr = device->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_texture.Get()), &srvDesc, m_shaderResourceView.GetAddressOf());
+		hr = Graphics::GetDevice()->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_texture.Get()), &srvDesc, m_shaderResourceView.GetAddressOf());
 		if (FAILED(hr))
 		{
 			DV_LOG(Texture2D, err, "[::Create] CreateShaderReosurceView 실패: {}", ErrorUtils::ToVerbose(hr));
 			return false;
 		}
 
-		if (m_useMips && m_shaderResourceView)	deviceContext->GenerateMips(m_shaderResourceView.Get());
+		if (m_useMips && m_shaderResourceView)	Graphics::GetDeviceContext()->GenerateMips(m_shaderResourceView.Get());
 
 		m_pixelData.clear();
 		m_pixelData.shrink_to_fit();

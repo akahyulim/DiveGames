@@ -7,7 +7,7 @@
 #include "graphics/Graphics.h"
 #include "graphics/ShaderManager.h"
 #include "rendering/Renderer.h"
-#include "world/World.h"
+#include "world/WorldManager.h"
 
 namespace Dive
 {
@@ -31,7 +31,7 @@ namespace Dive
 			return false;
 		}
 
-		if (!ShaderManager::Initialize(Graphics::GetDevice()))
+		if (!ShaderManager::Initialize())
 		{
 			DV_LOG(Engine, err, "[::Initialize] ShaderManager 초기화 실패");
 			m_bExit = true;

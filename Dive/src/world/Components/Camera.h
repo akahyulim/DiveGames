@@ -30,7 +30,7 @@ namespace Dive
 
 		void Update() override;
 
-		void Bind(ID3D11DeviceContext* deviceContext) const;
+		void Bind() const;
 
 		DirectX::XMFLOAT4X4 GetView() const;
 		DirectX::XMMATRIX GetViewMatrix() const;

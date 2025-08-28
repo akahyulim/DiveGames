@@ -24,7 +24,7 @@ namespace Dive
 
 		EndFrame,
 
-		WorldCreated, WorldModified, 
+		WorldCreated, WorldModified, WorldLoaded, WorldUnloaded,
 
 		Collision, Trigger, KeyPress,
 	};

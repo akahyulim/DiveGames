@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "LightManager.h"
+#include "graphics/Graphics.h"
 #include "graphics/ConstantBuffer.h"
 #include "world/World.h"
 #include "world/components/Light.h"
@@ -17,10 +18,9 @@ namespace Dive
 		LightData lights[MAX_LIGHTS]{};
 	};
 
-	LightManager::LightManager(ID3D11Device* device)
+	LightManager::LightManager()
 	{
 		m_cbLights = std::make_unique<ConstantBuffer>(
-			device,
 			ePSConstantBufferSlot::Light,
 			static_cast<uint32_t>(sizeof(Lights)));
 		if(!m_cbLights) DV_LOG(LightManager, err, "[::LightManager] Lights Buffer 생성 실패");
@@ -38,10 +38,8 @@ namespace Dive
 			});
 	}
 
-	void LightManager::Bind(ID3D11DeviceContext* deviceContext)
+	void LightManager::Bind()
 	{
-		assert(deviceContext);
-
 		Lights data{};
 		data.ambientColor = m_ambientColor;
 		data.lightCount = static_cast<int>(m_lights.size());
@@ -56,7 +54,7 @@ namespace Dive
 			data.lights[i].outerAngle = m_lights[i]->GetOuterAngleRadians();
 		}
 		
-		m_cbLights->Update<Lights>(deviceContext, data);
-		m_cbLights->Bind(deviceContext);
+		m_cbLights->Update<Lights>(data);
+		m_cbLights->Bind();
 	}
 }

@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Material.h"
+#include "graphics/Graphics.h"
 #include "graphics/Texture2D.h"
 #include "graphics/ShaderManager.h"
 #include "graphics/ShaderProgram.h"
@@ -9,10 +10,9 @@
 
 namespace Dive
 {
-    Material::Material(ID3D11Device* device)
+    Material::Material()
     {
         m_gpuBuffer = std::make_unique<ConstantBuffer>(
-            device, 
             ePSConstantBufferSlot::Material, 
             static_cast<uint32_t>(sizeof(MaterialData)));
         if (!m_gpuBuffer) DV_LOG(Material, err, "[::Material] ConstantBuffer 생성 실패");
@@ -28,6 +28,11 @@ namespace Dive
         try
         {
             data = YAML::LoadFile(filepath.string());
+        }
+        catch (const YAML::BadFile& e) 
+        {
+            DV_LOG(Material, err, "[::LoadFromFile] 파일 열기 실패: {}", e.what());
+            return false;
         }
         catch (const YAML::ParserException& e)
         {
@@ -69,27 +74,25 @@ namespace Dive
         return true;
     }
 
-    void Material::Bind(ID3D11DeviceContext* deviceContext)
+    void Material::Bind()
     {
-        assert(deviceContext);
-        
-        ShaderManager::BindInputLayout("ForwardLightVS", eInputLayout::Lit, deviceContext);
-        ShaderManager::GetShader("ForwardLightVS")->Bind(deviceContext);
-        ShaderManager::GetShader("ForwardLightPS")->Bind(deviceContext);
+        ShaderManager::BindInputLayout("ForwardLightVS", eInputLayout::Lit);
+        ShaderManager::GetShader("ForwardLightVS")->Bind();
+        ShaderManager::GetShader("ForwardLightPS")->Bind();
 
         //if (m_shaders)
         //    m_shaders->Bind(deviceContext);
 
         // shader resources
         if (m_maps[static_cast<size_t>(eMapType::Diffuse)])
-            m_maps[static_cast<size_t>(eMapType::Diffuse)]->Bind(deviceContext, eShaderResourceSlot::DiffuseMap);
+            m_maps[static_cast<size_t>(eMapType::Diffuse)]->Bind(eShaderResourceSlot::DiffuseMap);
 
         // constant buffer
-        m_gpuBuffer->Update<MaterialData>(deviceContext, m_cpuBuffer);
-        m_gpuBuffer->Bind(deviceContext);
+        m_gpuBuffer->Update<MaterialData>(m_cpuBuffer);
+        m_gpuBuffer->Bind();
     }
 
-    Texture2D* Material::GetMap(eMapType type)
+    std::shared_ptr<Texture2D> Material::GetMap(eMapType type)
     {
         if (type == eMapType::Count)
         {
@@ -100,7 +103,7 @@ namespace Dive
 		return m_maps[static_cast<size_t>(type)];
     }
 
-    void Material::SetMap(eMapType type, Texture2D* texture)
+    void Material::SetMap(eMapType type, std::shared_ptr<Texture2D> texture)
     {
         if (type == eMapType::Count)
         {
@@ -156,7 +159,7 @@ namespace Dive
             return;
         }
 
-        auto mapTexture = ResourceManager::GetOrLoadByPath<Texture2D>(filepath);
+        auto mapTexture = ResourceManager::GetOrLoad<Texture2D>(filepath);
         m_maps[static_cast<size_t>(type)] = mapTexture;
 
         switch (type)

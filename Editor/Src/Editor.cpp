@@ -5,11 +5,12 @@
 #include "views/HierarchyView.h"
 #include "views/InspectorView.h"
 
+#include <imgui.h>
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
 
 constexpr LPCWCH DV_TITLE = L"Dive Editor";
-constexpr float DEFAULT_FONT_SIZE = 16.0f;
+constexpr float DEFAULT_FONT_SIZE = 20.0f;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam);
 
@@ -45,6 +46,7 @@ namespace Dive
 	GameObject* EditorContext::MainCamera = nullptr;
 
 	Editor::Editor()
+		: m_fonts{}
 	{
 		DV_SUBSCRIBE_EVENT(eEventType::PostRender, DV_EVENT_HANDLER(OnPostRender));
 	}
@@ -58,7 +60,7 @@ namespace Dive
 	{
 		SetTitle();
 		Window::SetMessageCallback((LONG_PTR)EditorMessageHandler);
-		//Window::Maximize();
+		Window::Maximize();
 		
 		// ImGui 초기화
 		{
@@ -120,7 +122,7 @@ namespace Dive
 
 		// Load Resources
 		{
-			// FONTS
+			// fonts
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
 			io.FontDefault = m_fonts[static_cast<size_t>(eFontTypes::Normal)] =
 				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
@@ -130,6 +132,13 @@ namespace Dive
 				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
 			m_fonts[static_cast<size_t>(eFontTypes::Large_Bold)] =
 				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
+
+			// texture2D
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/dmc.jpg");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/DokeV.jpeg");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/relaxed_morning.jpg");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/sky_daytime_blue.jpg");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/stone01.tga");
 		}
 
 		// create views

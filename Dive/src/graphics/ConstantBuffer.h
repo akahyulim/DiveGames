@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Common.h"
+#include "Graphics.h"
 
 namespace Dive
 {
@@ -27,12 +28,12 @@ namespace Dive
 	class ConstantBuffer
 	{
 	public:
-		ConstantBuffer(ID3D11Device* device, eVSConstantBufferSlot slot, uint32_t stride);
-		ConstantBuffer(ID3D11Device* device, ePSConstantBufferSlot slot, uint32_t stride);
+		ConstantBuffer(eVSConstantBufferSlot slot, uint32_t stride);
+		ConstantBuffer(ePSConstantBufferSlot slot, uint32_t stride);
 
 		template<typename T>
-		bool Update(ID3D11DeviceContext* deviceContext, const T& data);
-		void Bind(ID3D11DeviceContext* deviceContext);
+		bool Update(const T& data);
+		void Bind();
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
@@ -42,7 +43,7 @@ namespace Dive
 	};
 
 	template<typename T>
-	bool ConstantBuffer::Update(ID3D11DeviceContext* deviceContext, const T& data)
+	bool ConstantBuffer::Update(const T& data)
 	{
 		if (!m_buffer)
 		{
@@ -51,7 +52,7 @@ namespace Dive
 		}
 
 		D3D11_MAPPED_SUBRESOURCE mappedData{};
-		auto hr = deviceContext->Map(
+		auto hr = Graphics::GetDeviceContext()->Map(
 			static_cast<ID3D11Resource*>(m_buffer.Get()),
 			0,
 			D3D11_MAP_WRITE_DISCARD,
@@ -64,7 +65,7 @@ namespace Dive
 		}
 
 		std::memcpy(mappedData.pData, &data, sizeof(T));
-		deviceContext->Unmap(m_buffer.Get(), 0);
+		Graphics::GetDeviceContext()->Unmap(m_buffer.Get(), 0);
 
 		return true;
 	}

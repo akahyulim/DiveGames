@@ -56,3 +56,4 @@
 // 프로젝트 공용 헤더
 #include "Common.h"
 #include "core/Log.h"
+#include "core/EventDispatcher.h"

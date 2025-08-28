@@ -18,7 +18,7 @@ namespace Dive
 	{
 	public:
 		Resource(const std::string& name = "Resource");
-		virtual ~Resource();
+		virtual ~Resource() = default;
 
 		const std::filesystem::path& GetFilepath() const { return m_filepath; }
 		void SetFilepath(const std::filesystem::path& path) { m_filepath = path; }

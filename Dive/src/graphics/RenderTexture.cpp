@@ -22,9 +22,6 @@ namespace Dive
 
 	bool RenderTexture::Create()
 	{
-		auto device = Graphics::GetDevice();
-		auto deviceContext = Graphics::GetDeviceContext();
-
 		if (m_format == DXGI_FORMAT_UNKNOWN)
 		{
 			DV_LOG(RenderTexture, err, "[::Create] 잘못된 포멧 설정");
@@ -44,7 +41,7 @@ namespace Dive
 		texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 		texDesc.MiscFlags = m_useMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
-		auto hr = device->CreateTexture2D(&texDesc, nullptr, m_texture.GetAddressOf());
+		auto hr = Graphics::GetDevice()->CreateTexture2D(&texDesc, nullptr, m_texture.GetAddressOf());
 		if (FAILED(hr))
 		{
 			DV_LOG(RenderTexture, err, "[::Create] CreateTexture2D 실패: {}", ErrorUtils::ToVerbose(hr));
@@ -56,7 +53,7 @@ namespace Dive
 		rtvDesc.Texture2D.MipSlice = 0;
 		rtvDesc.Format = m_format;
 
-		hr = device->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_texture.Get()), &rtvDesc, m_renderTargetView.GetAddressOf());
+		hr = Graphics::GetDevice()->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_texture.Get()), &rtvDesc, m_renderTargetView.GetAddressOf());
 		if(FAILED(hr))
 		{
 			DV_LOG(RenderTexture, err, "[::Create] CreateRenderTargetView 실패: {}", ErrorUtils::ToVerbose(hr));
@@ -69,14 +66,14 @@ namespace Dive
 		dsvDesc.Texture2D.MipLevels = m_mipLevels;
 		dsvDesc.Texture2D.MostDetailedMip = 0;
 
-		hr = device->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_texture.Get()), &dsvDesc, m_shaderResourceView.GetAddressOf());
+		hr = Graphics::GetDevice()->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_texture.Get()), &dsvDesc, m_shaderResourceView.GetAddressOf());
 		if(FAILED(hr))
 		{
 			DV_LOG(RenderTexture, err, "[::Create] CreateShaderResourceView 실패 : {}", ErrorUtils::ToVerbose(hr));
 			return false;
 		}
 
-		if (m_useMips && m_shaderResourceView)	deviceContext->GenerateMips(m_shaderResourceView.Get());
+		if (m_useMips && m_shaderResourceView)	Graphics::GetDeviceContext()->GenerateMips(m_shaderResourceView.Get());
 		
 		if(m_depthFormat != eDepthFormat::None)
 		{
@@ -90,7 +87,7 @@ namespace Dive
 			texDesc.Usage = D3D11_USAGE_DEFAULT;
 			texDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
 
-			hr = device->CreateTexture2D(&texDesc, nullptr, m_depthTexture.GetAddressOf());
+			hr = Graphics::GetDevice()->CreateTexture2D(&texDesc, nullptr, m_depthTexture.GetAddressOf());
 			if(FAILED(hr))
 			{
 				DV_LOG(RenderTexture, err, "[::Create] CreateTexture2D 실패 : {}", ErrorUtils::ToVerbose(hr));
@@ -102,7 +99,7 @@ namespace Dive
 			dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			dsvDesc.Texture2D.MipSlice = 0;
 
-			hr = device->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_depthTexture.Get()), &dsvDesc, m_DepthDSV.GetAddressOf());
+			hr = Graphics::GetDevice()->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_depthTexture.Get()), &dsvDesc, m_DepthDSV.GetAddressOf());
 			if(FAILED(hr))
 			{
 				DV_LOG(RenderTexture, err, "[::Create] CreateDepthSteniclView 실패 : {}", ErrorUtils::ToVerbose(hr));
@@ -115,7 +112,7 @@ namespace Dive
 			srvDesc.Texture2D.MipLevels = 1;
 			srvDesc.Texture2D.MostDetailedMip = 0;
 
-			hr = device->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_depthTexture.Get()), &srvDesc, m_depthSRV.GetAddressOf());
+			hr = Graphics::GetDevice()->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_depthTexture.Get()), &srvDesc, m_depthSRV.GetAddressOf());
 			if(FAILED(hr))
 			{
 				DV_LOG(RenderTexture, err, "[::Create] CreateShaderResourceView 실패 : {}", ErrorUtils::ToVerbose(hr));

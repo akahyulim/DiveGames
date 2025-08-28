@@ -25,7 +25,7 @@ namespace Dive
 		void SetShaderStage(eShaderType type, IShader* shader);
 		void SetInputLayout(ID3D11InputLayout* inputLayout) { m_inputLayout = inputLayout; }
 
-		void Bind(ID3D11DeviceContext* deviceContext);
+		void Bind();
 
 	private:
 		std::unordered_map<eShaderType, IShader*> m_shaders;

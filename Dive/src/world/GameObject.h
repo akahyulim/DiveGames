@@ -11,14 +11,14 @@ namespace Dive
 	class GameObject : public Object
 	{
 	public:
-		GameObject(const std::string& name);
+		GameObject(World* world, const std::string& name);
 		~GameObject() override;
 
 		void Destory();
 
 		void Update();
 		
-		bool IsDestroyed() const { return m_isDestroyed; }
+		bool IsDestroyed() const { return m_destroyed; }
 
 		void SetTag(const std::string& tag) { m_tag = tag; }
 		std::string GetTag() const { return m_tag; }
@@ -26,7 +26,7 @@ namespace Dive
 
 		void SetActive(bool value);
 		bool IsActiveSelf() const { return m_activeSelf; }
-		bool IsActiveHierarchy() const { return m_ActiveHierarchy; }
+		bool IsActiveHierarchy() const { return m_activeHierarchy; }
 
 		template<typename T> T* AddComponent();
 
@@ -50,9 +50,9 @@ namespace Dive
 		std::string m_tag = "Untagged";
 		// layer
 
-		bool m_isDestroyed = false;
+		bool m_destroyed = false;
 		bool m_activeSelf = true;
-		bool m_ActiveHierarchy = true;
+		bool m_activeHierarchy = true;
 
 		World* m_world = nullptr;
 		std::unordered_map<eComponentType, std::unique_ptr<Component>> m_components;

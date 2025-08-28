@@ -4,30 +4,20 @@
 
 namespace Dive
 {
-	std::unordered_map<eResourceType, std::vector<std::unique_ptr<Resource>>> ResourceManager::s_resources;
-
-	bool ResourceManager::Initialize()
-	{
-		//SetResourceFolder("Assets");
-
-		// texture2D
-		Load<Texture2D>("Assets/Textures/dmc.jpg");
-		Load<Texture2D>("Assets/Textures/DokeV.jpeg");
-		Load<Texture2D>("Assets/Textures/relaxed_morning.jpg");
-		Load<Texture2D>("Assets/Textures/sky_daytime_blue.jpg");
-		Load<Texture2D>("Assets/Textures/stone01.tga");
-
-		return true;
-	}
+	std::unordered_map<eResourceType, std::vector<std::shared_ptr<Resource>>> ResourceManager::s_resources;
 
 	void ResourceManager::Clear()
 	{
 		s_resources.clear();
-
-		DV_LOG(ResourceManager, info, "클리어 완료");
 	}
 
-	bool ResourceManager::IsCahed(UINT64 instanceID)
+	bool ResourceManager::IsCached(std::shared_ptr<Resource> resource)
+	{
+		assert(resource);
+		return IsCached(resource->GetInstanceID());
+	}
+
+	bool ResourceManager::IsCached(uint64_t instanceID)
 	{
 		for (const auto& [type, resources] : s_resources)
 		{

@@ -12,10 +12,8 @@ namespace Dive
 	constexpr float CAPSULE_RADIUS = 0.5f;
 	constexpr float CAPSULE_HEIGHT = 1.0f;
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreateTriangle(ID3D11Device* device)
+	std::shared_ptr<StaticMesh> MeshFactory::CreateTriangle()
 	{
-		assert(device);
-
 		std::vector<LitVertex> vertices;
 		vertices.resize(3);
 
@@ -46,17 +44,15 @@ namespace Dive
 		auto mesh = std::make_shared<StaticMesh>();
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers(device);
+		mesh->CreateBuffers();
 		mesh->ComputeBouingBox();
 		mesh->SetName("TriangleMesh");
 
 		return mesh;
 	}
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreateQuad(ID3D11Device* device)
+	std::shared_ptr<StaticMesh> MeshFactory::CreateQuad()
 	{
-		assert(device);
-
 		std::vector<LitVertex> vertices;
 		vertices.resize(4);
 
@@ -96,17 +92,15 @@ namespace Dive
 		auto mesh = std::make_shared<StaticMesh>();
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers(device);
+		mesh->CreateBuffers();
 		mesh->ComputeBouingBox();
 		mesh->SetName("QuadMesh");
 
 		return mesh;
 	}
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreatePlane(ID3D11Device* device)
+	std::shared_ptr<StaticMesh> MeshFactory::CreatePlane()
 	{
-		assert(device);
-
 		std::vector<LitVertex> vertices;
 		vertices.resize(4);
 
@@ -147,17 +141,15 @@ namespace Dive
 		auto mesh = std::make_shared<StaticMesh>();
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers(device);
+		mesh->CreateBuffers();
 		mesh->ComputeBouingBox();
 		mesh->SetName("PlaneMesh");
 
 		return mesh;
 	}
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreateCube(ID3D11Device* device)
+	std::shared_ptr<StaticMesh> MeshFactory::CreateCube()
 	{
-		assert(device);
-
 		std::vector<LitVertex> vertices;
 
 		// 전면
@@ -249,17 +241,15 @@ namespace Dive
 		auto mesh = std::make_shared<StaticMesh>();
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers(device);
+		mesh->CreateBuffers();
 		mesh->ComputeBouingBox();
 		mesh->SetName("CubeMesh");
 
 		return mesh;
 	}
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreateSphere(ID3D11Device* device)
+	std::shared_ptr<StaticMesh> MeshFactory::CreateSphere()
 	{
-		assert(device);
-
 		constexpr int latitudeBands = 30;
 		constexpr int longitudeBands = 30;
 		constexpr float radius = SPHERE_RADIUS;
@@ -334,7 +324,7 @@ namespace Dive
 		auto mesh = std::make_shared<StaticMesh>();
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers(device);
+		mesh->CreateBuffers();
 		mesh->ComputeBouingBox();
 		mesh->SetName("SphereMesh");
 
@@ -342,10 +332,8 @@ namespace Dive
 	}
 
 
-	std::shared_ptr<StaticMesh> MeshFactory::CreateCapsule(ID3D11Device* device)
+	std::shared_ptr<StaticMesh> MeshFactory::CreateCapsule()
 	{
-		assert(device);
-
 		constexpr int latitudeBands = 30;
 		constexpr int longitudeBands = 30;
 		constexpr float radius = CAPSULE_RADIUS;
@@ -510,23 +498,21 @@ namespace Dive
 		auto mesh = std::make_shared<StaticMesh>();
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
-		mesh->CreateBuffers(device);
+		mesh->CreateBuffers();
 		mesh->ComputeBouingBox();
 		mesh->SetName("CapsuleMesh");
 
 		return mesh;
 	}
 
-	std::shared_ptr<StaticMesh> MeshFactory::Create(ID3D11Device* device, const std::string& meshName)
+	std::shared_ptr<StaticMesh> MeshFactory::Create(const std::string& meshName)
 	{
-		assert(device);
-
-		if (meshName == "TriangleMesh")	return CreateTriangle(device);
-		if (meshName == "QuadMesh")		return CreateQuad(device);
-		if (meshName == "PlaneMesh")	return CreatePlane(device);
-		if (meshName == "CubeMesh")		return CreateCube(device);
-		if (meshName == "SphereMesh")	return CreateSphere(device);
-		if (meshName == "CapsuleMesh")	return CreateCapsule(device);
+		if (meshName == "TriangleMesh")	return CreateTriangle();
+		if (meshName == "QuadMesh")		return CreateQuad();
+		if (meshName == "PlaneMesh")	return CreatePlane();
+		if (meshName == "CubeMesh")		return CreateCube();
+		if (meshName == "SphereMesh")	return CreateSphere();
+		if (meshName == "CapsuleMesh")	return CreateCapsule();
 
 		return nullptr;
 	}

@@ -6,7 +6,7 @@ GameObjects:
     Active: true
     Transform:
       fileID: 2
-      Position: [0, 14.4292755, -27.644087]
+      Position: [-0.38679188, 11.117586, -23.57536]
       Rotation: [0.1736481, -0, 0, 0.9848078]
       Scale: [1, 1, 1]
     Camera:
@@ -43,11 +43,11 @@ GameObjects:
   - fileID: 7
     Name: Directional Light
     Tag: Untagged
-    Active: false
+    Active: true
     Transform:
       fileID: 8
       Position: [0, 0, 0]
-      Rotation: [0.1736481, -0, 0, 0.9848078]
+      Rotation: [0.5, -0, 0, 0.8660254]
       Scale: [1, 1, 1]
     Light:
       fileID: 9

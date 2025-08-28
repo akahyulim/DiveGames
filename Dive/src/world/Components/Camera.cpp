@@ -24,7 +24,6 @@ namespace Dive
 		s_allCameras.push_back(this);
 
 		m_cbCamera = std::make_unique<ConstantBuffer>(
-			Graphics::GetDevice(),
 			ePSConstantBufferSlot::Camera,
 			static_cast<uint32_t>(sizeof(CameraData)));
 		if (!m_cbCamera) DV_LOG(MeshRenderer, err, "[::Camera] Camera Buffer 생성 실패");
@@ -46,28 +45,26 @@ namespace Dive
 		m_frustum.Update(GetView(), GetProjection());
 	}
 
-	void Camera::Bind(ID3D11DeviceContext* deviceContext) const
+	void Camera::Bind() const
 	{
-		assert(deviceContext);
-
 		auto renderTargetView = GetRenderTarget()->GetRenderTargetView();
 		auto depthStencilView = GetRenderTarget()->GetDepthStencilView();
 		auto color = GetBackgroundColor();
 
-		deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
+		Graphics::GetDeviceContext()->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
 		FLOAT clearColor[4]{ color.x, color.y, color.z, color.w };
-		deviceContext->ClearRenderTargetView(renderTargetView, clearColor);
-		deviceContext->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+		Graphics::GetDeviceContext()->ClearRenderTargetView(renderTargetView, clearColor);
+		Graphics::GetDeviceContext()->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		auto viewport = GetViewport();
-		deviceContext->RSSetViewports(1, &viewport);		
+		Graphics::GetDeviceContext()->RSSetViewports(1, &viewport);		
 
 		CameraData cpuBuffer{};
 		cpuBuffer.position = GetTransform()->GetPosition();
 		cpuBuffer.perspectiveValue;
 		cpuBuffer.viewInverse;
-		m_cbCamera->Update<CameraData>(deviceContext, cpuBuffer);
-		m_cbCamera->Bind(deviceContext);
+		m_cbCamera->Update<CameraData>(cpuBuffer);
+		m_cbCamera->Bind();
 	}
 
 	DirectX::XMFLOAT4X4 Camera::GetView() const

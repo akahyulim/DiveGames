@@ -21,10 +21,10 @@ namespace Dive
 		StaticMesh();
 		~StaticMesh() override;
 
-		bool CreateBuffers(ID3D11Device* device);
+		bool CreateBuffers();
 		void Clear();
 
-		void Draw(ID3D11DeviceContext* deviceContext);
+		void Draw();
 
 		void ComputeBouingBox();
 		

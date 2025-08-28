@@ -38,9 +38,6 @@ namespace Dive
 
 	bool Cubemap::Create()
 	{
-		auto device = Graphics::GetDevice();
-		auto deviceContext = Graphics::GetDeviceContext();
-
 		m_mipLevels = CanGenerateMips(m_format) ? (m_useMips ? CalculateMipmapLevels(m_Size, m_Size) : 1) : 1;
 
 		D3D11_TEXTURE2D_DESC texDesc{};
@@ -55,7 +52,7 @@ namespace Dive
 		texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 		texDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE | (m_useMips ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0);
 
-		auto hr = device->CreateTexture2D(&texDesc, nullptr, m_texture.GetAddressOf());
+		auto hr = Graphics::GetDevice()->CreateTexture2D(&texDesc, nullptr, m_texture.GetAddressOf());
 		if(FAILED(hr))
 		{
 			DV_LOG(Cubemap, err, "[::Create] CreateTexture2D 실패: {}", ErrorUtils::ToVerbose(hr));
@@ -73,7 +70,7 @@ namespace Dive
 			UINT rowPitch = static_cast<UINT>(m_Size * GetPixelSize(m_format));
 			for (int i = 0; i < 6; ++i)
 			{
-				deviceContext->UpdateSubresource(
+				Graphics::GetDeviceContext()->UpdateSubresource(
 					m_texture.Get(),
 					D3D11CalcSubresource(0, static_cast<UINT>(i), m_mipLevels),
 					nullptr,
@@ -89,7 +86,7 @@ namespace Dive
 		rtvDesc.Texture2DArray.FirstArraySlice = 0;
 		rtvDesc.Texture2DArray.ArraySize = 6;
 
-		hr = device->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_texture.Get()), &rtvDesc, m_renderTargetView.GetAddressOf());
+		hr = Graphics::GetDevice()->CreateRenderTargetView(static_cast<ID3D11Resource*>(m_texture.Get()), &rtvDesc, m_renderTargetView.GetAddressOf());
 		if(FAILED(hr))
 		{
 			DV_LOG(Cubemap, err, "[::Create] CreateRenderTargetView 실패: {}", ErrorUtils::ToVerbose(hr));
@@ -101,14 +98,14 @@ namespace Dive
 		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 		srvDesc.TextureCube.MipLevels = m_mipLevels;
 
-		hr = device->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_texture.Get()), &srvDesc, m_shaderResourceView.GetAddressOf());
+		hr = Graphics::GetDevice()->CreateShaderResourceView(static_cast<ID3D11Resource*>(m_texture.Get()), &srvDesc, m_shaderResourceView.GetAddressOf());
 		if(FAILED(hr))
 		{
 			DV_LOG(Cubemap, err, "[::Create] CreateShaderResourceView 실패 : {}", ErrorUtils::ToVerbose(hr));
 			return false;
 		}
 
-		if (m_useMips && m_shaderResourceView)	deviceContext->GenerateMips(m_shaderResourceView.Get());
+		if (m_useMips && m_shaderResourceView)	Graphics::GetDeviceContext()->GenerateMips(m_shaderResourceView.Get());
 
 		return true;
 	}
