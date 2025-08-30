@@ -37,11 +37,8 @@ namespace Dive
 				{
 					if (EditorContext::ActiveWorld)
 					{
-						// 이게 아니다. ActiveWorld를 Unload해야 한다.
-						WorldManager::Clear();
-						
-						// World 별로 ResourceManager도 Clear 하는 게 맞지만
-						// 이걸 World 안에서 호출하지 아니면 여기에서 할지 좀 더 생각해보자.
+						WorldManager::UnloadWorld();
+						EditorContext::Clear();
 					}
 
 					// 이름을 먼저 입력받아야 한다.
@@ -60,6 +57,12 @@ namespace Dive
 				if (ImGui::MenuItem("Open World"))
 				{
 					// 폴더에서 파일 선택
+
+					if (EditorContext::ActiveWorld)
+					{
+						WorldManager::UnloadWorld();
+						EditorContext::Clear();
+					}
 
 					EditorContext::ActiveWorld = WorldManager::LoadWorld("Assets/Worlds/NewWorld.dive");
 					for (auto camera : Camera::GetAllCameras())

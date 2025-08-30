@@ -2,13 +2,12 @@
 #include "resource/Resource.h"
 #include "graphics/Graphics.h"
 #include "graphics/ConstantBuffer.h"
+#include "graphics/ShaderProgram.h"
 
 namespace Dive
 {
 	class Texture;
 	class Texture2D;
-	class Shader;
-	class ShaderProgram;
 
 	// 일단 world view용 그리드 혹은 hazel 구현 참조부터!!!
 
@@ -75,7 +74,11 @@ namespace Dive
 		DirectX::XMFLOAT2 GetOffset() const { return m_cpuBuffer.offset; }
 		void SetOffset(float x, float y) { m_cpuBuffer.offset = { x, y }; }
 
-		void SetShaders(ShaderProgram* shaders) { m_shaders = shaders; }
+		std::shared_ptr<ShaderProgram> GetShaderProgram() const { return m_shaderProgram; }
+		void SetShaderProgram(std::shared_ptr<ShaderProgram> program) { m_shaderProgram = program; }
+		
+		std::string GetShaderProgramName() const;
+		void SetShaderProgramByName(const std::string& name);
 
 		eBlendMode GetBlendMode() const { return m_blendMode; }
 		void SetBlendMode(eBlendMode mode) { m_blendMode = mode; }
@@ -90,7 +93,7 @@ namespace Dive
 		MaterialData m_cpuBuffer;
 		std::unique_ptr<ConstantBuffer> m_gpuBuffer;
 
-		ShaderProgram* m_shaders = nullptr;
+		std::shared_ptr<ShaderProgram> m_shaderProgram;
 
 		eBlendMode m_blendMode = eBlendMode::Opqaue;
 	};

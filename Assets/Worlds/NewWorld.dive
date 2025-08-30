@@ -43,7 +43,7 @@ GameObjects:
   - fileID: 7
     Name: Directional Light
     Tag: Untagged
-    Active: true
+    Active: false
     Transform:
       fileID: 8
       Position: [0, 0, 0]
@@ -55,7 +55,7 @@ GameObjects:
       LightColor: [1, 1, 1]
       LightRange: 0
   - fileID: 10
-    Name: PointLights
+    Name: SpotLights
     Tag: Untagged
     Active: true
     Transform:
@@ -64,91 +64,89 @@ GameObjects:
       Rotation: [0, -0, 0, 1]
       Scale: [1, 1, 1]
   - fileID: 12
-    Name: RedPoint
+    Name: LeftWhiteSpot
     Tag: Untagged
-    Active: true
+    Active: false
     Transform:
       fileID: 13
-      Position: [-5, 3, -5]
-      Rotation: [0, -0, 0, 1]
+      Position: [-5, 0, -10]
+      Rotation: [-0.1305262, 0, 0, 0.9914449]
       Scale: [1, 1, 1]
       Parent: 11
     Light:
       fileID: 14
-      LightType: 1
-      LightColor: [1, 0, 0]
-      LightRange: 20
+      LightType: 2
+      LightColor: [1, 1, 1]
+      LightRange: 100
   - fileID: 15
-    Name: GreenPoint
+    Name: RightWhiteSpot
     Tag: Untagged
-    Active: true
+    Active: false
     Transform:
       fileID: 16
-      Position: [0, 3, 0]
-      Rotation: [0, -0, 0, 1]
+      Position: [5, 15, 9]
+      Rotation: [0.70710653, -0, 0, 0.70710707]
       Scale: [1, 1, 1]
       Parent: 11
     Light:
       fileID: 17
-      LightType: 1
-      LightColor: [0, 1, 0]
-      LightRange: 10
+      LightType: 2
+      LightColor: [1, 1, 1]
+      LightRange: 50
   - fileID: 18
-    Name: BluePoint
+    Name: Obects
     Tag: Untagged
     Active: true
     Transform:
       fileID: 19
-      Position: [5, 10, -5]
-      Rotation: [0, -0, 0, 1]
-      Scale: [1, 1, 1]
-      Parent: 11
-    Light:
-      fileID: 20
-      LightType: 1
-      LightColor: [0, 0, 1]
-      LightRange: 20
-  - fileID: 21
-    Name: SpotLights
-    Tag: Untagged
-    Active: true
-    Transform:
-      fileID: 22
       Position: [0, 0, 0]
       Rotation: [0, -0, 0, 1]
       Scale: [1, 1, 1]
+  - fileID: 20
+    Name: Cube
+    Tag: Untagged
+    Active: true
+    Transform:
+      fileID: 21
+      Position: [3, 2, -10]
+      Rotation: [0, 0.38268337, 0, 0.92387956]
+      Scale: [1, 1, 1]
+      Parent: 19
+    MeshRenderer:
+      fileID: 22
+      StaticMesh: CubeMesh
+      Material: Cube
   - fileID: 23
-    Name: LeftWhiteSpot
+    Name: BluePoint
     Tag: Untagged
     Active: true
     Transform:
       fileID: 24
-      Position: [-5, 0, -10]
-      Rotation: [-0.1305262, 0, 0, 0.9914449]
+      Position: [0, 0, 0]
+      Rotation: [0, -0, 0, 1]
       Scale: [1, 1, 1]
-      Parent: 22
+      Parent: 21
     Light:
       fileID: 25
-      LightType: 2
-      LightColor: [1, 1, 1]
-      LightRange: 100
+      LightType: 1
+      LightColor: [0, 0, 1]
+      LightRange: 20
   - fileID: 26
-    Name: RightWhiteSpot
+    Name: Sphere
     Tag: Untagged
     Active: true
     Transform:
       fileID: 27
-      Position: [5, 15, 9]
-      Rotation: [0.70710653, -0, 0, 0.70710707]
-      Scale: [1, 1, 1]
-      Parent: 22
-    Light:
+      Position: [7, 3, 9.2]
+      Rotation: [0, -0, 0, 1]
+      Scale: [3, 3, 3]
+      Parent: 19
+    MeshRenderer:
       fileID: 28
-      LightType: 2
-      LightColor: [1, 1, 1]
-      LightRange: 50
+      StaticMesh: SphereMesh
+      Material: Sphere
   - fileID: 29
-    Name: Obects
+    Name: GreenPoint
     Tag: Untagged
     Active: true
     Transform:
@@ -156,73 +154,66 @@ GameObjects:
       Position: [0, 0, 0]
       Rotation: [0, -0, 0, 1]
       Scale: [1, 1, 1]
-  - fileID: 31
-    Name: Cube
-    Tag: Untagged
-    Active: true
-    Transform:
-      fileID: 32
-      Position: [3, 4, -10]
-      Rotation: [0, 0.38268337, 0, 0.92387956]
-      Scale: [1, 1, 1]
-      Parent: 30
-    MeshRenderer:
-      fileID: 33
-      StaticMesh: CubeMesh
-      Material: Cube
-  - fileID: 34
-    Name: Sphere
-    Tag: Untagged
-    Active: true
-    Transform:
-      fileID: 35
-      Position: [7, 3, 9.2]
-      Rotation: [0, -0, 0, 1]
-      Scale: [3, 3, 3]
-      Parent: 30
-    MeshRenderer:
-      fileID: 36
-      StaticMesh: SphereMesh
-      Material: Sphere
-  - fileID: 37
+      Parent: 27
+    Light:
+      fileID: 31
+      LightType: 1
+      LightColor: [0, 1, 0]
+      LightRange: 30
+  - fileID: 32
     Name: Capsule
     Tag: Untagged
     Active: true
     Transform:
-      fileID: 38
+      fileID: 33
       Position: [-5, 3, 2.5]
       Rotation: [0, -0, 0, 1]
       Scale: [1, 1, 1]
-      Parent: 30
+      Parent: 19
     MeshRenderer:
-      fileID: 39
+      fileID: 34
       StaticMesh: CapsuleMesh
       Material: Capsule
-  - fileID: 40
+  - fileID: 35
+    Name: RedPoint
+    Tag: Untagged
+    Active: true
+    Transform:
+      fileID: 36
+      Position: [0, 0, 0]
+      Rotation: [0, -0, 0, 1]
+      Scale: [1, 1, 1]
+      Parent: 33
+    Light:
+      fileID: 37
+      LightType: 1
+      LightColor: [1, 0, 0]
+      LightRange: 20
+  - fileID: 38
     Name: Wall
     Tag: Untagged
     Active: true
     Transform:
-      fileID: 41
+      fileID: 39
       Position: [0, 5, 10]
       Rotation: [-0.7071068, 0, 0, 0.7071067]
       Scale: [2, 1, 1]
-      Parent: 30
+      Parent: 19
     MeshRenderer:
-      fileID: 42
+      fileID: 40
       StaticMesh: PlaneMesh
       Material: Wall
-  - fileID: 43
+  - fileID: 41
     Name: Bottom
     Tag: Untagged
     Active: true
     Transform:
-      fileID: 44
+      fileID: 42
       Position: [0, 0, 0]
       Rotation: [0, -0, 0, 1]
       Scale: [2, 1, 2]
-      Parent: 30
+      Parent: 19
     MeshRenderer:
-      fileID: 45
+      fileID: 43
       StaticMesh: PlaneMesh
-      Material: Gray
+      Material: Bottom

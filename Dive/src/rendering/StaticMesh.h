@@ -28,10 +28,10 @@ namespace Dive
 
 		void ComputeBouingBox();
 		
-		void AddVertices(const std::vector<LitVertex>& vertices, uint32_t* outOffset = nullptr);
+		void AddVertices(const std::vector<StaticVertex>& vertices, uint32_t* outOffset = nullptr);
 		void AddIndices(const std::vector<uint32_t>& indices, uint32_t* outOffset = nullptr);
 
-		std::vector<LitVertex> GetVertices() { return m_vertices; }
+		std::vector<StaticVertex> GetVertices() { return m_vertices; }
 		std::vector<uint32_t> GetIndices() { return m_indices; }
 
 		uint32_t GetVertexCount() const { return static_cast<uint32_t>(m_vertices.size()); }
@@ -54,7 +54,7 @@ namespace Dive
 
 		D3D11_PRIMITIVE_TOPOLOGY m_primitiveTopology = D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 
-		std::vector<LitVertex> m_vertices;
+		std::vector<StaticVertex> m_vertices;
 		std::vector<uint32_t> m_indices;
 
 		std::shared_ptr<Buffer> m_vertexBuffer;

@@ -1,5 +1,6 @@
-Material: Gray
-DiffuseMap: "stone01"
-DiffuseColor: [0.5021097, 0.4978725, 0.4978725, 1]
+Material: Bottom
+DiffuseMap: stone01
+DiffuseColor: [1, 1, 1, 1]
 Tiling: [1, 1]
 Offset: [0, 0]
+Shader: ForwardLight

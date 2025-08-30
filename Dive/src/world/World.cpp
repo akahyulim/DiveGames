@@ -48,7 +48,7 @@ namespace Dive
 
 		for (auto& [instanceID, gameObject] : m_gameObjectMap)
 		{
-			if (!gameObject->IsActiveSelf())
+			if (!gameObject->IsActiveSelf() || !gameObject->IsActiveHierarchy())
 				continue;
 
 			if (gameObject->HasComponent<Light>())

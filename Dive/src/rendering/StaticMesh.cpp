@@ -31,7 +31,7 @@ namespace Dive
 			m_vertexBuffer = std::make_shared<Buffer>(
 				eBufferType::VertexBuffer,
 				m_vertices.data(),
-				static_cast<uint32_t>(sizeof(LitVertex)),
+				static_cast<uint32_t>(sizeof(StaticVertex)),
 				static_cast<uint32_t>(m_vertices.size()));
 			if (!m_vertexBuffer)
 			{
@@ -101,7 +101,7 @@ namespace Dive
 		m_boundingBox = std::make_unique<BoundingBox>(m_vertices);
 	}
 
-	void StaticMesh::AddVertices(const std::vector<LitVertex>& vertices, uint32_t* outOffset)
+	void StaticMesh::AddVertices(const std::vector<StaticVertex>& vertices, uint32_t* outOffset)
 	{
 		// 현재 저장되어 있는 개수 리턴
 		if (outOffset)
@@ -148,7 +148,7 @@ namespace Dive
 		m_vertices.resize(vertexCount);
 		for (uint32_t i = 0; i < vertexCount; ++i)
 		{
-			LitVertex& v = m_vertices[i];
+			StaticVertex& v = m_vertices[i];
 			fin.read(reinterpret_cast<char*>(&v.Position), sizeof(v.Position));
 			fin.read(reinterpret_cast<char*>(&v.Normal), sizeof(v.Normal));
 			fin.read(reinterpret_cast<char*>(&v.Tangent), sizeof(v.Tangent));
@@ -187,7 +187,7 @@ namespace Dive
 		fout.write(reinterpret_cast<const char*>(&indexCount), sizeof(indexCount));
 
 		// 🔹 버텍스 버퍼 저장
-		for (const LitVertex& v : m_vertices)
+		for (const StaticVertex& v : m_vertices)
 		{
 			fout.write(reinterpret_cast<const char*>(&v.Position), sizeof(v.Position));
 			fout.write(reinterpret_cast<const char*>(&v.Normal), sizeof(v.Normal));

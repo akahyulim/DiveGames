@@ -123,9 +123,6 @@
     <ClInclude Include="src\graphics\Buffer.h">
       <Filter>graphics</Filter>
     </ClInclude>
-    <ClInclude Include="src\graphics\InputLayoutKey.h">
-      <Filter>graphics</Filter>
-    </ClInclude>
     <ClInclude Include="src\graphics\Vertex.h">
       <Filter>graphics</Filter>
     </ClInclude>

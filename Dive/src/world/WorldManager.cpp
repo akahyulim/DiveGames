@@ -7,18 +7,6 @@ namespace Dive
 {
 	World* WorldManager::s_activeWorld = nullptr;
 
-	bool WorldManager::Initialize()
-	{
-		DV_SUBSCRIBE_EVENT(eEventType::Update, DV_EVENT_HANDLER_DATA_STATIC(OnUpdate));
-
-		return true;
-	}
-
-	void WorldManager::Clear()
-	{
-		DV_LOG(WorldManager, info, "클리어 완료");
-	}
-
 	// 유니티의 경우 빈 이름, 이미 존재하는 Scene의 이름은 안된다.
 	World* WorldManager::CreateWorld(const std::string& name)
 	{
@@ -45,7 +33,7 @@ namespace Dive
 		if (!s_activeWorld)
 			return;
 
-		// ResourceManager를 어떻게 할 것인가...
+		DV_DELETE(s_activeWorld);
 
 		DV_FIRE_EVENT(eEventType::WorldUnloaded);
 	}

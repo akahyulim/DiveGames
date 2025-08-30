@@ -384,6 +384,31 @@ namespace Dive
 					ImGui::ColorEdit3("##DiffuseColor", (float*)&diffuseColor);
 					material->SetDiffuseColor(ImVec4ToXMFloat4(diffuseColor));
 					ImGui::Columns(1);
+
+					// shader program
+					std::string selectedShaderName = material->GetShaderProgram()->GetName();
+					const auto& programs = ShaderManager::GetAllPrograms();
+
+					ImGui::Columns(2);
+					ImGui::SetColumnWidth(0, 115.0f);
+					ImGui::Text("Shader");
+					ImGui::NextColumn();
+					if (ImGui::BeginCombo("##Shader", selectedShaderName.c_str()))
+					{
+						for (const auto& [name, program] : programs)
+						{
+							bool isSelected = (selectedShaderName == name);
+							if (ImGui::Selectable(name.c_str(), isSelected))
+							{
+								selectedShaderName = name;
+								material->SetShaderProgram(program);
+							}
+							if (isSelected)
+								ImGui::SetItemDefaultFocus();
+						}
+						ImGui::EndCombo();
+					}
+					ImGui::Columns(1);
 				}
 
 				// mesh

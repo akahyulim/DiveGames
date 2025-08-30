@@ -14,7 +14,7 @@ namespace Dive
 
 	std::shared_ptr<StaticMesh> MeshFactory::CreateTriangle()
 	{
-		std::vector<LitVertex> vertices;
+		std::vector<StaticVertex> vertices;
 		vertices.resize(3);
 
 		// 좌하단
@@ -53,7 +53,7 @@ namespace Dive
 
 	std::shared_ptr<StaticMesh> MeshFactory::CreateQuad()
 	{
-		std::vector<LitVertex> vertices;
+		std::vector<StaticVertex> vertices;
 		vertices.resize(4);
 
 		// 좌하단
@@ -101,7 +101,7 @@ namespace Dive
 
 	std::shared_ptr<StaticMesh> MeshFactory::CreatePlane()
 	{
-		std::vector<LitVertex> vertices;
+		std::vector<StaticVertex> vertices;
 		vertices.resize(4);
 
 		// 좌후면
@@ -150,7 +150,7 @@ namespace Dive
 
 	std::shared_ptr<StaticMesh> MeshFactory::CreateCube()
 	{
-		std::vector<LitVertex> vertices;
+		std::vector<StaticVertex> vertices;
 
 		// 전면
 		vertices.emplace_back(XMFLOAT3(-CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f, -CUBE_SIZE / 2.0f), XMFLOAT3(0.0f, 0.0f, -1.0f)
@@ -254,7 +254,7 @@ namespace Dive
 		constexpr int longitudeBands = 30;
 		constexpr float radius = SPHERE_RADIUS;
 
-		std::vector<LitVertex> vertices;
+		std::vector<StaticVertex> vertices;
 		std::vector<uint32_t> indices;
 
 		XMVECTOR upVec = XMVectorSet(0, 1, 0, 0);
@@ -339,7 +339,7 @@ namespace Dive
 		constexpr float radius = CAPSULE_RADIUS;
 		constexpr float height = CAPSULE_HEIGHT;
 
-		std::vector<LitVertex> vertices;
+		std::vector<StaticVertex> vertices;
 		std::vector<uint32_t> indices;
 
 		XMVECTOR upVec = XMVectorSet(0, 1, 0, 0);

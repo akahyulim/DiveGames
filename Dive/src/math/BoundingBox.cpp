@@ -36,7 +36,7 @@ namespace Dive
 		}
 	}
 
-	BoundingBox::BoundingBox(const std::vector<LitVertex>& vertices)
+	BoundingBox::BoundingBox(const std::vector<StaticVertex>& vertices)
 	{
 		m_Max = XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 		m_Min = XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);

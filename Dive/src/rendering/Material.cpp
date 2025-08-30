@@ -3,7 +3,6 @@
 #include "graphics/Graphics.h"
 #include "graphics/Texture2D.h"
 #include "graphics/ShaderManager.h"
-#include "graphics/ShaderProgram.h"
 #include "graphics/Buffer.h"
 #include "resource/YamlHelper.h"
 #include "resource/ResourceManager.h"
@@ -20,6 +19,8 @@ namespace Dive
         m_maps.fill(nullptr);
         
         SetName("Standard");
+
+        m_shaderProgram = ShaderManager::GetProgram("ForwardLight");
     }
 
     bool Material::LoadFromFile(const std::filesystem::path& filepath)
@@ -47,6 +48,8 @@ namespace Dive
         if (data["Tiling"])         m_cpuBuffer.tiling = data["Tiling"].as<DirectX::XMFLOAT2>();
         if (data["Offset"])         m_cpuBuffer.offset = data["Offset"].as<DirectX::XMFLOAT2>();
 
+        if (data["Shader"])         m_shaderProgram = ShaderManager::GetProgram(data["Shader"].as<std::string>());
+
         return true;
     }
 
@@ -64,6 +67,8 @@ namespace Dive
         out << YAML::Key << "Tiling" << YAML::Value << m_cpuBuffer.tiling;
         out << YAML::Key << "Offset" << YAML::Value << m_cpuBuffer.offset;
 
+        out << YAML::Key << "Shader" << YAML::Value << m_shaderProgram->GetName();
+
         out << YAML::EndMap;
 
         std::ofstream fout(filepath);
@@ -73,15 +78,12 @@ namespace Dive
 
         return true;
     }
-
+    
     void Material::Bind()
     {
-        ShaderManager::BindInputLayout("ForwardLightVS", eInputLayout::Lit);
-        ShaderManager::GetShader("ForwardLightVS")->Bind();
-        ShaderManager::GetShader("ForwardLightPS")->Bind();
-
-        //if (m_shaders)
-        //    m_shaders->Bind(deviceContext);
+        if (!m_shaderProgram)
+            return;
+        m_shaderProgram->Bind();
 
         // shader resources
         if (m_maps[static_cast<size_t>(eMapType::Diffuse)])
@@ -173,6 +175,19 @@ namespace Dive
         default:
             break;
         }
+    }
+
+    std::string Material::GetShaderProgramName() const
+    {
+        if(!m_shaderProgram)
+            return std::string();
+
+        return m_shaderProgram->GetName();
+    }
+
+    void Material::SetShaderProgramByName(const std::string& name)
+    {
+        m_shaderProgram = ShaderManager::GetProgram(name);
     }
 
     bool Material::IsTransparent() const

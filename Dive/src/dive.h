@@ -22,7 +22,6 @@
 #include "graphics/Texture2D.h"
 #include "graphics/RenderTexture.h"
 #include "graphics/Cubemap.h"
-#include "graphics/InputLayoutKey.h"
 #include "graphics/Shader.h"
 #include "graphics/ShaderManager.h"
 #include "graphics/Buffer.h"

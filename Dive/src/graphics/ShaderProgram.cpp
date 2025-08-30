@@ -4,24 +4,19 @@
 
 namespace Dive
 {
-	void ShaderProgram::SetShaderStage(eShaderType type, IShader* shader)
+	ShaderProgram::ShaderProgram(std::shared_ptr<VertexShader> vs, std::shared_ptr<PixelShader> ps, Microsoft::WRL::ComPtr<ID3D11InputLayout> il,
+		const std::string& name)
+		: m_vs(vs)
+		, m_ps(ps)
+		, m_il(il)
+		, m_name(name)
 	{
-		assert(type != eShaderType::Undefined);
-		assert(shader);
-
-		if (m_shaders[type] != nullptr)
-			DV_LOG(ShaderProgram, warn, "[::SetShaderStage] ShaderStage 덮어 쓰기 발생");
-
-		m_shaders[type] = shader;
 	}
 
 	void ShaderProgram::Bind()
 	{
-		Graphics::GetDeviceContext()->IASetInputLayout(m_inputLayout);
-
-		for (const auto& [stage, shader] : m_shaders)
-		{
-			if (shader)	shader->Bind();
-		}
+		Graphics::GetDeviceContext()->IASetInputLayout(m_il.Get());
+		m_vs->Bind();
+		m_ps->Bind();
 	}
 }

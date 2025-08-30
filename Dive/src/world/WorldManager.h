@@ -8,9 +8,6 @@ namespace Dive
 	class WorldManager
 	{
 	public:
-		static bool Initialize();
-		static void Clear();
-
 		static World* CreateWorld(const std::string& name);
 
 		static World* LoadWorld(const std::filesystem::path& filepath);
