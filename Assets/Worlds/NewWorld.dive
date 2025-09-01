@@ -66,11 +66,11 @@ GameObjects:
   - fileID: 12
     Name: LeftWhiteSpot
     Tag: Untagged
-    Active: false
+    Active: true
     Transform:
       fileID: 13
-      Position: [-5, 0, -10]
-      Rotation: [-0.1305262, 0, 0, 0.9914449]
+      Position: [-5, 12.7, -5.3]
+      Rotation: [0.70710653, -0, 0, 0.70710707]
       Scale: [1, 1, 1]
       Parent: 11
     Light:

@@ -191,8 +191,9 @@ namespace Dive
 
 			// Tag
 			{
+				ImGui::PushID("Tag");
 				ImGui::Columns(2);
-				ImGui::SetColumnWidth(0, 115.0f);
+				ImGui::SetColumnWidth(0, 150.0f);
 				ImGui::Text("Tag");
 				ImGui::NextColumn();
 
@@ -263,6 +264,7 @@ namespace Dive
 					ImGui::EndPopup();
 				}
 				ImGui::Columns(1);
+				ImGui::PopID();
 			}
 
 			// Layer
@@ -279,15 +281,15 @@ namespace Dive
 				auto transform = EditorContext::Selected->GetTransform();
 
 				auto position = transform->GetLocalPosition();
-				DrawVec3Control("Position", position, 0.0f, 115.0f);
+				DrawVec3Control("Position", position, 0.0f, 150.0f);
 				transform->SetLocalPosition(position);
 
 				auto rotation = transform->GetLocalRotationDegrees();
-				DrawVec3Control("Rotation", rotation, 0.0f, 115.0f);
+				DrawVec3Control("Rotation", rotation, 0.0f, 150.0f);
 				transform->SetLocalRotationByDegrees(rotation);
 
 				auto scale = transform->GetLocalScale();
-				DrawVec3Control("Scale", scale, 1.0f, 115.0f);
+				DrawVec3Control("Scale", scale, 1.0f, 150.0f);
 				transform->SetLocalScale(scale);
 			}
 		}
@@ -303,14 +305,16 @@ namespace Dive
 				// type
 
 				// Field of View
+				ImGui::PushID("FieldOfView");
 				ImGui::Columns(2);
-				ImGui::SetColumnWidth(0, 115.0f);
+				ImGui::SetColumnWidth(0, 150.0f);
 				ImGui::Text("Field of View");
 				ImGui::NextColumn();
 				static int fov = static_cast<int>(camera->GetFieldOfView());
 				ImGui::SliderInt("##Field of View", &fov, 1, 160);
 				camera->SetFieldOfView(static_cast<float>(fov));
 				ImGui::Columns(1);
+				ImGui::PopID();
 
 				ImGui::Separator();
 
@@ -319,7 +323,7 @@ namespace Dive
 
 				clippingPlanes.x = camera->GetNearClipPlane();
 				clippingPlanes.y = camera->GetFarClipPlane();
-				DrawVec2Control("Clipping Planes", clippingPlanes, 0.0f, 115.0f, "N", "F");
+				DrawVec2Control("Clipping Planes", clippingPlanes, 0.0f, 150.0f, "N", "F");
 				camera->SetNearClipPlane(clippingPlanes.x);
 				camera->SetFarClipPlane(clippingPlanes.y);
 
@@ -330,8 +334,8 @@ namespace Dive
 				static DirectX::XMFLOAT2 bottomRight = { 1.0f, 1.0f };
 
 				camera->GetViewportRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
-				DrawVec2Control("Viewport Rect", topLeft, 0.0f, 115.0f);
-				DrawVec2Control("", bottomRight, 1.0f, 115.0f, "W", "H");
+				DrawVec2Control("Viewport Rect", topLeft, 0.0f, 150.0f);
+				DrawVec2Control("", bottomRight, 1.0f, 150.0f, "W", "H");
 				if (topLeft.x >= 0.0f && topLeft.x <= bottomRight.x &&
 					topLeft.y >= 0.0f && topLeft.y <= bottomRight.y &&
 					bottomRight.x >= topLeft.x && bottomRight.x <= 1.0f &&
@@ -342,14 +346,16 @@ namespace Dive
 				ImGui::Separator();
 
 				// Background
+				ImGui::PushID("Background");
 				static ImVec4 clearColor = XMFloat4ToImVec4(camera->GetBackgroundColor());
 				ImGui::Columns(2);
-				ImGui::SetColumnWidth(0, 115.0f);
+				ImGui::SetColumnWidth(0, 150.0f);
 				ImGui::Text("Background");
 				ImGui::NextColumn();
 				ImGui::ColorEdit3("##Background", (float*)&clearColor);
 				camera->SetBackgroundColor(ImVec4ToXMFloat4(clearColor));
 				ImGui::Columns(1);
+				ImGui::PopID();
 			}
 		}
 		
@@ -366,31 +372,36 @@ namespace Dive
 					auto material = staticMeshRender->GetMaterial();
 
 					// name
+					ImGui::PushID("MaterialName");
 					std::string mtrlName = material->GetName();
 					ImGui::Columns(2);
-					ImGui::SetColumnWidth(0, 115.0f);
+					ImGui::SetColumnWidth(0, 150.0f);
 					ImGui::Text("Material");
 					ImGui::NextColumn();
 					ImGui::InputText("##MtrlName", &mtrlName);
 					material->SetName(mtrlName);
 					ImGui::Columns(1);
+					ImGui::PopID();
 
 					// diffuse color
+					ImGui::PushID("DiffuseColor");
 					ImVec4 diffuseColor = XMFloat4ToImVec4(material->GetDiffuseColor());
 					ImGui::Columns(2);
-					ImGui::SetColumnWidth(0, 115.0f);
+					ImGui::SetColumnWidth(0, 150.0f);
 					ImGui::Text("Diffuse Color");
 					ImGui::NextColumn();
 					ImGui::ColorEdit3("##DiffuseColor", (float*)&diffuseColor);
 					material->SetDiffuseColor(ImVec4ToXMFloat4(diffuseColor));
 					ImGui::Columns(1);
+					ImGui::PopID();
 
 					// shader program
 					std::string selectedShaderName = material->GetShaderProgram()->GetName();
 					const auto& programs = ShaderManager::GetAllPrograms();
 
+					ImGui::PushID("Shader");
 					ImGui::Columns(2);
-					ImGui::SetColumnWidth(0, 115.0f);
+					ImGui::SetColumnWidth(0, 150.0f);
 					ImGui::Text("Shader");
 					ImGui::NextColumn();
 					if (ImGui::BeginCombo("##Shader", selectedShaderName.c_str()))
@@ -409,20 +420,23 @@ namespace Dive
 						ImGui::EndCombo();
 					}
 					ImGui::Columns(1);
+					ImGui::PopID();
 				}
 
 				// mesh
 				{
 					auto mesh = staticMeshRender->GetStaticMesh();
 
+					ImGui::PushID("MeshName");
 					std::string meshName = mesh->GetName();
 					ImGui::Columns(2);
-					ImGui::SetColumnWidth(0, 115.0f);
+					ImGui::SetColumnWidth(0, 150.0f);
 					ImGui::Text("Mesh");
 					ImGui::NextColumn();
 					ImGui::InputText("##MeshName", &meshName);
 					mesh->SetName(meshName);
 					ImGui::Columns(1);
+					ImGui::PopID();
 				}
 			}
 		}
@@ -435,8 +449,9 @@ namespace Dive
 				auto light = EditorContext::Selected->GetComponent<Light>();
 
 				// type
+				ImGui::PushID("LightType");
 				ImGui::Columns(2);
-				ImGui::SetColumnWidth(0, 115.0f);
+				ImGui::SetColumnWidth(0, 150.0f);
 				ImGui::Text("Type");
 				ImGui::NextColumn();
 				std::vector<const char*> lightTypes;
@@ -447,12 +462,14 @@ namespace Dive
 				ImGui::Combo("##LightType", &currentType, lightTypes.data(), static_cast<int>(lightTypes.size()));
 				light->SetLightType(static_cast<eLightType>(currentType));
 				ImGui::Columns(1);
+				ImGui::PopID();
 
 				if (currentType != static_cast<int>(eLightType::Directional))
 				{
 					// range
+					ImGui::PushID("LightRange");
 					ImGui::Columns(2);
-					ImGui::SetColumnWidth(0, 115.0f);
+					ImGui::SetColumnWidth(0, 150.0f);
 					ImGui::Text("Range");
 					ImGui::NextColumn();
 					float range = light->GetRange();
@@ -460,6 +477,7 @@ namespace Dive
 					range = std::max(range, 0.0f); // 음수 보정
 					light->SetRange(range);
 					ImGui::Columns(1);
+					ImGui::PopID();
 
 					if (currentType == static_cast<int>(eLightType::Spot))
 					{
@@ -467,21 +485,23 @@ namespace Dive
 						static DirectX::XMFLOAT2 spotAngles = { 0.0f, 0.0f };
 						spotAngles.x = light->GetInnerAngleDegrees();
 						spotAngles.y = light->GetOuterAngleDegrees();
-						DrawVec2Control("Spot Angles", spotAngles, 0.0f, 115.0f, "I", "O");
+						DrawVec2Control("Spot Angles", spotAngles, 0.0f, 150.0f, "I", "O");
 						light->SetInnerAngleDegrees(spotAngles.x);
 						light->SetOuterAngleDegrees(spotAngles.y);
 					}
 				}
 
 				// color
+				ImGui::PushID("LightColor");
 				ImVec4 color = { light->GetColor().x, light->GetColor().y, light->GetColor().z, 1.0f };
 				ImGui::Columns(2);
-				ImGui::SetColumnWidth(0, 115.0f);
+				ImGui::SetColumnWidth(0, 150.0f);
 				ImGui::Text("Color");
 				ImGui::NextColumn();
 				ImGui::ColorEdit3("##LightColor", (float*)&color);
 				light->SetColor(color.x, color.y, color.z);
 				ImGui::Columns(1);
+				ImGui::PopID();
 			}
 		}
 
