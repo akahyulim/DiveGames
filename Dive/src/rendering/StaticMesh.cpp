@@ -150,9 +150,10 @@ namespace Dive
 		{
 			StaticVertex& v = m_vertices[i];
 			fin.read(reinterpret_cast<char*>(&v.Position), sizeof(v.Position));
+			fin.read(reinterpret_cast<char*>(&v.TexCoord), sizeof(v.TexCoord));
 			fin.read(reinterpret_cast<char*>(&v.Normal), sizeof(v.Normal));
 			fin.read(reinterpret_cast<char*>(&v.Tangent), sizeof(v.Tangent));
-			fin.read(reinterpret_cast<char*>(&v.TexCoord), sizeof(v.TexCoord));
+			fin.read(reinterpret_cast<char*>(&v.BiNormal), sizeof(v.BiNormal));
 		}
 
 		// 🔹 인덱스 버퍼 읽기
@@ -190,9 +191,10 @@ namespace Dive
 		for (const StaticVertex& v : m_vertices)
 		{
 			fout.write(reinterpret_cast<const char*>(&v.Position), sizeof(v.Position));
+			fout.write(reinterpret_cast<const char*>(&v.TexCoord), sizeof(v.TexCoord));
 			fout.write(reinterpret_cast<const char*>(&v.Normal), sizeof(v.Normal));
 			fout.write(reinterpret_cast<const char*>(&v.Tangent), sizeof(v.Tangent));
-			fout.write(reinterpret_cast<const char*>(&v.TexCoord), sizeof(v.TexCoord));
+			fout.write(reinterpret_cast<const char*>(&v.BiNormal), sizeof(v.BiNormal));
 		}
 
 		// 🔹 인덱스 버퍼 저장

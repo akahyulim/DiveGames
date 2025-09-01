@@ -91,18 +91,37 @@ float3 CalcuSpotLight(float3 worldPos, float3 normal, LightData data)
 struct PSInput
 {
     float4 Position : SV_POSITION;
-    float3 Normal : NORMAL;
-    float3 Tangent : TANGENT;
     float2 UV : TEXCOORD0;
     float3 WorldPos : TEXCOORD1;
+    float3 Normal : NORMAL;
+    float3 Tangent : TANGENT;
+    float3 BiNormal : BINORMAL;
 };
 
 float4 MainPS(PSInput input) : SV_TARGET
 {
-    float3 normal = input.Normal;
+    float3 lightColor = cbForwardLight.ambientColor;
+
     float4 diffColor = HasDiffuseMap() ?
         DiffuseMap.Sample(WrapLinearSampler, input.UV) : cbMaterial.diffuseColor;
-    float3 lightColor = cbForwardLight.ambientColor;
+
+    float3 normal = input.Normal;
+    if (HasNormalMap())
+    {
+       // 노멀 맵 샘플링
+        float3 bumpMap = NormalMap.Sample(WrapLinearSampler, input.UV).xyz;
+        bumpMap = bumpMap * 2.0f - 1.0f; // [-1, 1] 범위로 변환
+
+        // TBN 행렬 구성 (이미 월드 공간 기준)
+        float3x3 TBN = float3x3(
+            input.Tangent,
+            input.BiNormal,
+            input.Normal
+        );
+
+        // Tangent Space → World Space 변환
+        normal = normalize(mul(bumpMap, TBN));
+    }
 
     for (int i = 0; i < cbForwardLight.lightCount; ++i)
     {

@@ -214,7 +214,7 @@ namespace Dive
 
 				fileIDToObject[staticMeshID] = meshRenderer;
 			}
-
+			
 			if (const auto& lightNode = node["Light"])
 			{
 				auto lightID = lightNode["fileID"].as<uint64_t>();

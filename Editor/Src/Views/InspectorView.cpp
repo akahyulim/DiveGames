@@ -363,7 +363,7 @@ namespace Dive
 		if (EditorContext::Selected->HasComponent<MeshRenderer>())
 		{
 			ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-			if (ImGui::CollapsingHeader("Mesh Render"))
+			if (ImGui::CollapsingHeader("Mesh Renderer"))
 			{
 				auto staticMeshRender = EditorContext::Selected->GetComponent<MeshRenderer>();
 
@@ -398,7 +398,7 @@ namespace Dive
 					// shader program
 					std::string selectedShaderName = material->GetShaderProgram()->GetName();
 					const auto& programs = ShaderManager::GetAllPrograms();
-
+					
 					ImGui::PushID("Shader");
 					ImGui::Columns(2);
 					ImGui::SetColumnWidth(0, 150.0f);

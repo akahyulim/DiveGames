@@ -4,10 +4,11 @@
 struct VSOutput
 {
     float4 Position : SV_POSITION;
-    float3 Normal : NORMAL;
-    float3 Tangent : TANGENT;
     float2 UV : TEXCOORD0;
     float3 WorldPos : TEXCOORD1;
+    float3 Normal : NORMAL;
+    float3 Tangent : TANGENT;
+    float3 BiNormal : BINORMAL;
 };
 
 VSOutput MainVS(VSInput_Lit input)
@@ -22,12 +23,14 @@ VSOutput MainVS(VSInput_Lit input)
     output.Position = mul(output.Position, cbMatrix.viewMatrix);
     output.Position = mul(output.Position, cbMatrix.projMatrix);
 
+    output.UV = input.UV;
+
     output.Normal = mul(input.Normal, (float3x3)cbMatrix.modelMatrix);
     output.Normal = normalize(output.Normal);
     output.Tangent = mul(input.Tangent, (float3x3)cbMatrix.modelMatrix);
     output.Tangent = normalize(output.Tangent);
-
-    output.UV = input.UV;
+    output.BiNormal = mul(input.BiNormal, (float3x3)cbMatrix.modelMatrix);
+    output.BiNormal = normalize(output.BiNormal);
     
     return output;
 }

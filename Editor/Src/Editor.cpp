@@ -11,7 +11,7 @@
 
 constexpr LPCWCH DV_TITLE = L"Dive Editor";
 constexpr float DEFAULT_FONT_SIZE = 20.0f;
-
+ 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK EditorMessageHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam)
@@ -139,6 +139,7 @@ namespace Dive
 			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/relaxed_morning.jpg");
 			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/sky_daytime_blue.jpg");
 			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/stone01.tga");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/normal01.tga");
 		}
 
 		// create views
