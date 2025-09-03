@@ -17,14 +17,15 @@ namespace Dive
         uint32_t type;
         DirectX::XMFLOAT3 color;
        
+        float intensity;
         DirectX::XMFLOAT3 position;
+        
         float rangeRcp;
-
         DirectX::XMFLOAT3 direction;
+        
         float innerAngle;
-
         float outerAngle;
-        DirectX::XMFLOAT3 padding;
+        DirectX::XMFLOAT2 padding;
     };
 
 	class Light : public Component
@@ -36,11 +37,14 @@ namespace Dive
         static constexpr eComponentType GetComponentType() { return eComponentType::Light; }
 
         eLightType GetLightType() const { return m_lightType; }
-        void SetLightType(eLightType type) { m_lightType = type; }
+        void SetLightType(eLightType type);
 
         DirectX::XMFLOAT3 GetColor() const { return m_color; }
         void SetColor(float r, float g, float b) { m_color = { r, g, b }; }
         void SetColor(const DirectX::XMFLOAT3& color) { m_color = color; }
+
+        float GetIntensity() const { return m_intensity; }
+        void SetIntensity(float intensity) { m_intensity = intensity; }
 
         float GetRange() const { return m_range; }
         float GetRangeRcp() const { return 1.0f / m_range; }
@@ -63,6 +67,7 @@ namespace Dive
 	private:
         eLightType m_lightType;
         DirectX::XMFLOAT3 m_color;
+        float m_intensity;
         float m_range;
         float m_innerAngle;
         float m_outerAngle;

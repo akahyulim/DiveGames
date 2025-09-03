@@ -27,6 +27,7 @@ cbuffer CameraBuffer : register(b0)
 {
     CameraData cbCamera;
 }
+
 struct MaterialData
 {
     float4 diffuseColor;
@@ -56,14 +57,15 @@ struct LightData
     uint type;
     float3 color;
 
+    float intensity;
     float3 position;
+
     float rangeRcp;
-
     float3 direction;
-    float innerAngle;
 
+    float innerAngle;
     float outerAngle;
-    float3 padding;
+    float2 padding;
 };
 
 struct ForwardLight

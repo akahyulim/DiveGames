@@ -26,6 +26,7 @@ namespace Dive
 		if(!m_cbLights) DV_LOG(LightManager, err, "[::LightManager] Lights Buffer 생성 실패");
 	}
 
+	// Base와 Add 선별 및 정렬
 	void LightManager::Update(World* world)
 	{
 		assert(world);
@@ -48,6 +49,7 @@ namespace Dive
 			data.lights[i].type = static_cast<uint32_t>(m_lights[i]->GetLightType());
 			data.lights[i].color = m_lights[i]->GetColor();
 			data.lights[i].position = m_lights[i]->GetPosition();
+			data.lights[i].intensity = m_lights[i]->GetIntensity();
 			data.lights[i].rangeRcp = m_lights[i]->GetRangeRcp();
 			data.lights[i].direction = m_lights[i]->GetDirection();
 			data.lights[i].innerAngle = m_lights[i]->GetInnerAngleRadians();

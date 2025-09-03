@@ -4,12 +4,13 @@
 float3 CalcuDirLight(float3 worldPos, float3 normal, LightData data)
 {
     float3 finalColor = {0.0, 0.0, 0.0};
+    float3 lightColor = data.color * data.intensity;
     
     // Phong diffuse
     float NDotL = saturate(dot(-data.direction, normal));
     if (NDotL > 0.0f)
     {
-        finalColor += data.color * NDotL;
+        finalColor += lightColor * NDotL;
     }
 
 	// Blinn specular
@@ -18,13 +19,14 @@ float3 CalcuDirLight(float3 worldPos, float3 normal, LightData data)
     float3 halfWay = normalize(toEye + -data.direction);
     float NDotH = saturate(dot(halfWay, normal));
     
-    finalColor += data.color * pow(NDotH, 250.0f) * 0.25f;
+    finalColor += lightColor * pow(NDotH, 250.0f) * 0.25f;
     
     return finalColor;
 }
 
 float3 CalcuPointLight(float3 worldPos, float3 normal, LightData data)
 {
+    float3 lightColor = data.color * data.intensity;
     float3 toLight = data.position - worldPos;
     float3 toEye = cbCamera.position - worldPos;
     float distance = length(toLight);
@@ -32,13 +34,13 @@ float3 CalcuPointLight(float3 worldPos, float3 normal, LightData data)
     // phong diffuse
     toLight /= distance;
     float NDotL = saturate(dot(toLight, normal));
-    float3 finalColor = data.color * NDotL;
+    float3 finalColor = lightColor * NDotL;
     
     // blinn specular
     toEye = normalize(toEye);
     float3 halfWay = normalize(toEye + toLight);
     float NDotH = saturate(dot(halfWay, normal));
-    finalColor += data.color * pow(NDotH, 250.0f) * 0.25f;
+    finalColor += lightColor * pow(NDotH, 250.0f) * 0.25f;
     
     // attenuation
     float distToLightNorm = 1.0f - saturate(distance * data.rangeRcp);
@@ -50,6 +52,7 @@ float3 CalcuPointLight(float3 worldPos, float3 normal, LightData data)
 
 float3 CalcuSpotLight(float3 worldPos, float3 normal, LightData data)
 {
+    float3 lightColor = data.color * data.intensity;
     float3 toLight = data.position - worldPos;
     float distance = length(toLight);
     float3 lightDir = normalize(toLight);
@@ -71,13 +74,13 @@ float3 CalcuSpotLight(float3 worldPos, float3 normal, LightData data)
 
     // Phong diffuse
     float NDotL = saturate(dot(lightDir, normal));
-    float3 finalColor = data.color * NDotL;
+    float3 finalColor = lightColor * NDotL;
 
     // Blinn specular
     float3 toEye = normalize(cbCamera.position - worldPos);
     float3 halfWay = normalize(toEye + lightDir);
     float NDotH = saturate(dot(halfWay, normal));
-    finalColor += data.color * pow(NDotH, 250.0f) * 0.25f;
+    finalColor += lightColor * pow(NDotH, 250.0f) * 0.25f;
 
     // 거리 기반 감쇠
     float distNorm = 1.0f - saturate(distance * data.rangeRcp);

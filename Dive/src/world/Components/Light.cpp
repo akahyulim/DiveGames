@@ -10,10 +10,22 @@ namespace Dive
 		: Component(gameObject)
 		, m_lightType(eLightType::Directional)
 		, m_color(1.0f, 1.0f, 1.0f)
+		, m_intensity(0.5f)
 		, m_range(50.0f)
 		, m_innerAngle(DirectX::XMConvertToRadians(15.0f))
 		, m_outerAngle(DirectX::XMConvertToRadians(30.0f))
 	{
+	}
+
+	void Light::SetLightType(eLightType type)
+	{
+		if (m_lightType != type)
+		{
+			m_lightType = type;
+
+			// 유니티 설정 참조
+			m_intensity = type == eLightType::Directional ? 0.5f : 1.0f;
+		}
 	}
 
 	DirectX::XMFLOAT3 Light::GetPosition() const

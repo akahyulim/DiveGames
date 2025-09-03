@@ -12,8 +12,8 @@
 
 namespace Dive
 {
-	// GameObject가 아닌 Camera로 받아도 될 듯하다.
-	void ForwardLighting::Execute(const Camera* camera)
+	// Main Directional Light만 적용한다.
+	void ForwardBase::Execute(const Camera* camera)
 	{
 		assert(camera);
 
@@ -42,5 +42,10 @@ namespace Dive
 			for (auto meshRenderer : world->GetOpaqueMeshRenderers())
 				meshRenderer->Render(camera);
 		}
+	}
+
+	// 나머지 Light들을 차례로 적용한다.
+	void ForwardAdd::Execute(const Camera* camera)
+	{
 	}
 }

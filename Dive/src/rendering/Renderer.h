@@ -63,7 +63,6 @@ namespace Dive
 		static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> s_blendStates;
 		static std::array<Microsoft::WRL::ComPtr<ID3D11SamplerState>, static_cast<size_t>(eSamplerState::Count)> s_samplerStates;
 	
-		static std::vector<std::unique_ptr<RenderPass>> s_renderPasses;
 		static std::unique_ptr<LightManager> s_lightManager;
 	};
 }

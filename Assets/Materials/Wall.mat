@@ -3,4 +3,4 @@ DiffuseMap: DokeV
 DiffuseColor: [1, 1, 1, 1]
 Tiling: [1, 1]
 Offset: [0, 0]
-Shader: ForwardLight
+Shader: Legacy

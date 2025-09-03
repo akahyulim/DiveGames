@@ -48,6 +48,8 @@ namespace Dive
 		uint32_t padding[3]{};
 	};
 
+	// 유니티의 경우 파생 클래스로 나뉘지 않는다.
+	// Shader에 따라 Inspector에서 제어하는 데이터들이 다를 뿐이다.
 	class Material : public Resource
 	{
 	public:

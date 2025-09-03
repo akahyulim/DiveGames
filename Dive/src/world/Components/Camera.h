@@ -7,6 +7,12 @@ namespace Dive
 	class RenderTexture;
 	class ConstantBuffer;
 
+	enum class eRenderingPath
+	{
+		Forward,
+		Deferred,
+	};
+
 	enum class eProjectionType
 	{
 		Perspective,

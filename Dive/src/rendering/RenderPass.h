@@ -13,7 +13,15 @@ namespace Dive
 		virtual void Execute(const Camera* camera) = 0;
 	};
 
-	class ForwardLighting : public RenderPass
+	class ForwardBase : public RenderPass
+	{
+	public:
+		void Execute(const Camera* camera) override;
+
+	private:
+	};
+
+	class ForwardAdd : public RenderPass
 	{
 	public:
 		void Execute(const Camera* camera) override;

@@ -34,7 +34,6 @@ namespace Dive
 	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> Renderer::s_blendStates;
 	std::array<Microsoft::WRL::ComPtr<ID3D11SamplerState>, static_cast<size_t>(eSamplerState::Count)> Renderer::s_samplerStates;
 
-	std::vector<std::unique_ptr<RenderPass>> Renderer::s_renderPasses;
 	std::unique_ptr<LightManager> Renderer::s_lightManager;
 
 	bool Renderer::Initialize()
@@ -45,8 +44,6 @@ namespace Dive
 		CreateDepthStencilStates();
 		CreateBlendStates();
 		CreateSamplerStates();
-
-		s_renderPasses.emplace_back(std::make_unique<ForwardLighting>());
 
 		s_lightManager = std::make_unique<LightManager>();
 
@@ -100,26 +97,41 @@ namespace Dive
 	{
 		if (!WorldManager::GetActiveWorld())
 			return;
-
+		
 		auto cameras = Camera::GetAllCameras();
 		for (auto camera : cameras)
 		{
 			WorldManager::GetActiveWorld()->CullAndSort(camera);
 			// 위치가 애매하다. 하지만 바로 위에서 업데이트된 후에 호출하는 게 맞다.
 			s_lightManager->Update(WorldManager::GetActiveWorld());
+			
+			// forward rendering path
+			// Camera에서 RenderingPath를 구분
+				{
+					// Shadow pass
+					{
 
-			// begin frame?
+					}
 
-			// pass의 묶음은 path이다.
-			// 추후 Forward, Deferred로 나뉘어야 한다.
-			for (auto& pass : s_renderPasses)
-			{
-				// 역시 위치가 애매하다.
-				s_lightManager->Bind();
-				pass->Execute(camera);
-			}
+					// ForwardBase pass
+					// 하나의 Directional Light만 적용
+					{
+						s_lightManager->Bind();
+						ForwardBase pass;
+						pass.Execute(camera);
+					}
 
-			// end frame?
+					// ForwardAdd pass
+					// Point, Spot Light를 적용
+					{
+
+					}
+
+					// Transparent pass
+					{
+
+					}
+				}
 		}
 
 		s_frameCount++;

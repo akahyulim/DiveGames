@@ -474,7 +474,6 @@ namespace Dive
 					ImGui::NextColumn();
 					float range = light->GetRange();
 					ImGui::DragFloat("##LightRange", &range, 0.1f, 0.0f, 0.0f, "%.2f");
-					range = std::max(range, 0.0f); // 음수 보정
 					light->SetRange(range);
 					ImGui::Columns(1);
 					ImGui::PopID();
@@ -500,6 +499,18 @@ namespace Dive
 				ImGui::NextColumn();
 				ImGui::ColorEdit3("##LightColor", (float*)&color);
 				light->SetColor(color.x, color.y, color.z);
+				ImGui::Columns(1);
+				ImGui::PopID();
+
+				// intensity
+				ImGui::PushID("LightIntensity");
+				ImGui::Columns(2);
+				ImGui::SetColumnWidth(0, 150.0f);
+				ImGui::Text("Intensity");
+				ImGui::NextColumn();
+				float intensity = light->GetIntensity();
+				ImGui::DragFloat("##LightIntensity", &intensity, 0.1f, 0.0f, 8.0f, "%.2f");
+				light->SetIntensity(intensity);
 				ImGui::Columns(1);
 				ImGui::PopID();
 			}

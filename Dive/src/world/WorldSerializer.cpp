@@ -109,6 +109,7 @@ namespace Dive
 				out << YAML::Value << "fileID" << YAML::Value << lightID;
 				out << YAML::Value << "LightType" << YAML::Value << static_cast<int>(light->GetLightType());
 				out << YAML::Value << "LightColor" << YAML::Value << light->GetColor();
+				out << YAML::Value << "LightIntensity" << YAML::Value << light->GetIntensity();
 				out << YAML::Value << "LightRange" << YAML::Value << light->GetRange();
 				out << YAML::EndMap; // Light
 			}
@@ -221,6 +222,7 @@ namespace Dive
 				auto light = go->AddComponent<Light>();
 				light->SetLightType(static_cast<eLightType>(lightNode["LightType"].as<int>()));
 				light->SetColor(lightNode["LightColor"].as<DirectX::XMFLOAT3>());
+				light->SetIntensity(lightNode["LightIntensity"].as<float>());
 				light->SetRange(lightNode["LightRange"].as<float>());
 			}
 		}
