@@ -17,7 +17,6 @@ namespace Dive
 		static void Shutdown();
 
 		static void OnRender();
-		static void Render();
 
 		static void ResizeRenderBuffers(uint32_t width, uint32_t height);
 
@@ -30,10 +29,10 @@ namespace Dive
 		static RenderTexture* GetRenderTarget(eRenderTarget type);
 		static ID3D11RasterizerState* GetRasterizerState(eRasterizerState type);
 		static ID3D11DepthStencilState* GetDepthStencilState(eDepthStencilState type);
-		static ID3D11BlendState* GetBlendState(eBlendState type);
+		static Microsoft::WRL::ComPtr<ID3D11BlendState> GetBlendState(eBlendState type);
 		// 이게 아니라 그냥 배열로 전달하는 편이 나을 것 같다.
 		// 아니면 아에 PSSetSmaplerState를 구성해 놓는 편이 나을지도...
-		static ID3D11SamplerState* GetSamplerState(eSamplerState type);
+		static Microsoft::WRL::ComPtr<ID3D11SamplerState> GetSamplerState(eSamplerState type);
 		static void BindSamplerStates();
 
 	private:
@@ -59,8 +58,8 @@ namespace Dive
 		
 		static std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> s_renderTargets;
 		static std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> s_rasterizerStates;
-		static std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> s_depthSteniclStates;
-		static std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> s_blendStates;
+		static std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> s_depthStencilStates;
+		static std::array<Microsoft::WRL::ComPtr<ID3D11BlendState>, static_cast<size_t>(eBlendState::Count)> s_blendStates;
 		static std::array<Microsoft::WRL::ComPtr<ID3D11SamplerState>, static_cast<size_t>(eSamplerState::Count)> s_samplerStates;
 	
 		static std::unique_ptr<LightManager> s_lightManager;

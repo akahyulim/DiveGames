@@ -68,15 +68,21 @@ namespace Dive
 		void SetViewportRight(float right);
 		void SetViewportBottom(float bottom);
 		
+		void SetViewport(float topLeftX, float topLeftY, float width, float height, float minDepth = 0.0f, float maxDepth = 1.0f);
 		D3D11_VIEWPORT GetViewport() const;
 
 		const Frustum& GetFrustum() const { return m_frustum; }
 
-		DirectX::XMFLOAT4 GetBackgroundColor() const { return m_backgroundColor; }
-		void SetBackgroundColor(const DirectX::XMFLOAT4& color) { m_backgroundColor = color; }
+		// 추후 const로 다시 바꾸고 DirectX::XMFLOAT3를 리턴하는 걸 추가하자.
+		//=> 이 부분 때문에 직렬화가 오류난다.
+		const float* GetBackgroundColor() const { return m_backgroundColor; }
+		DirectX::XMFLOAT4 GetBackgroundColorByXMFLOAT4() const;
+		void SetBackgroundColor(float r, float g, float b, float a);
+		void SetBackgroundColor(const float* color);
+		void SetBackgroundColor(const DirectX::XMFLOAT4& color);
 
 		RenderTexture* GetRenderTarget() const;
-		void SetRenderTarget(RenderTexture* pRenderTarget) { m_renderTarget = pRenderTarget; }
+		void SetRenderTarget(RenderTexture* renderTarget);
 
 		static constexpr eComponentType GetComponentType() { return eComponentType::Camera; }
 
@@ -97,9 +103,11 @@ namespace Dive
 		float m_viewportRight = 1.0f;
 		float m_viewportBottom = 1.0f;
 
+		D3D11_VIEWPORT m_viewport;
+
 		Frustum m_frustum;
 
-		DirectX::XMFLOAT4 m_backgroundColor = {1.0f, 1.0f, 1.0f, 1.0f};
+		float m_backgroundColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		RenderTexture* m_renderTarget = nullptr;
 
 		std::unique_ptr<ConstantBuffer> m_cbCamera;

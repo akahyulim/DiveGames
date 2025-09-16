@@ -18,9 +18,9 @@ namespace Dive
 
         m_maps.fill(nullptr);
         
-        SetName("Standard");
+        SetName("Legacy");
 
-        m_shaderProgram = ShaderManager::GetProgram("ForwardLight");
+        m_shaderProgram = ShaderManager::GetProgram("Legacy");
     }
 
     bool Material::LoadFromFile(const std::filesystem::path& filepath)
@@ -42,14 +42,16 @@ namespace Dive
         }
 
         if (data["Material"])       SetName(data["Material"].as<std::string>());
+
+        if (data["Shader"])         m_shaderProgram = ShaderManager::GetProgram(data["Shader"].as<std::string>());
+        
+        if (data["RenderingMode"])  SetRenderingMode(static_cast<eRenderingMode>(data["RenderingMode"].as<int>()));
        
         if (data["DiffuseMap"])     SetMap(eMapType::Diffuse, data["DiffuseMap"].as<std::string>());
         if (data["NormalMap"])      SetMap(eMapType::Normal, data["NormalMap"].as<std::string>()); 
         if (data["DiffuseColor"])   m_cpuBuffer.diffuseColor = data["DiffuseColor"].as<DirectX::XMFLOAT4>();
         if (data["Tiling"])         m_cpuBuffer.tiling = data["Tiling"].as<DirectX::XMFLOAT2>();
         if (data["Offset"])         m_cpuBuffer.offset = data["Offset"].as<DirectX::XMFLOAT2>();
-
-        if (data["Shader"])         m_shaderProgram = ShaderManager::GetProgram(data["Shader"].as<std::string>());
 
         return true;
     }
@@ -65,13 +67,15 @@ namespace Dive
         out << YAML::BeginMap;
         out << YAML::Key << "Material" << YAML::Value << GetName();
 
+        out << YAML::Key << "Shader" << YAML::Value << m_shaderProgram->GetName();
+
+        out << YAML::Key << "RenderingMode" << YAML::Value << static_cast<int>(m_renderingMode);
+
         out << YAML::Key << "DiffuseMap" << YAML::Value << diffuseTexture;
         out << YAML::Key << "NormalMap" << YAML::Value << normalTexture;
         out << YAML::Key << "DiffuseColor" << YAML::Value << m_cpuBuffer.diffuseColor;
         out << YAML::Key << "Tiling" << YAML::Value << m_cpuBuffer.tiling;
         out << YAML::Key << "Offset" << YAML::Value << m_cpuBuffer.offset;
-
-        out << YAML::Key << "Shader" << YAML::Value << m_shaderProgram->GetName();
 
         out << YAML::EndMap;
 
@@ -91,7 +95,7 @@ namespace Dive
 
         // shader resources
         if (m_maps[static_cast<size_t>(eMapType::Diffuse)])
-            m_maps[static_cast<size_t>(eMapType::Diffuse)]->Bind(eShaderResourceSlot::DiffuseMap);
+            m_maps[static_cast<size_t>(eMapType::Diffuse)]->Bind(eShaderResourceSlot::Diffuse);
         if (m_maps[static_cast<size_t>(eMapType::Normal)])
             m_maps[static_cast<size_t>(eMapType::Normal)]->Bind(eShaderResourceSlot::NormalMap);
 
@@ -198,6 +202,6 @@ namespace Dive
 
     bool Material::IsTransparent() const
     {
-        return m_blendMode != eBlendMode::Opqaue;
+        return m_renderingMode != eRenderingMode::Opqaue;
     }
 }

@@ -6,6 +6,7 @@
 #include "components/Camera.h"
 #include "components/Light.h"
 #include "components/MeshRenderer.h"
+#include "rendering/Material.h"
 
 namespace Dive
 {
@@ -36,6 +37,9 @@ namespace Dive
 		FlushDestoryQueue();
 	}
 
+	// 정렬 및 절두체 컬링을 위해 카메라를 사용하므로
+	// Update가 아니 개별 호출 메서드로 만들었다.
+	// 허나 현재 위의 기능을 하지 못한다.
 	void World::CullAndSort(Camera* camera)
 	{
 		assert(camera);
@@ -58,13 +62,21 @@ namespace Dive
 			else if (gameObject->HasComponent<MeshRenderer>())
 			{
 				auto meshRenderer = gameObject->GetComponent<MeshRenderer>();
+				auto material = meshRenderer->GetMaterial();
 				// boundingBox를 통해 Frustum Culling 확인
 
 				// 실제로는 정렬까지...?
-				if (meshRenderer->IsTransparent())
-					m_transparentMeshRenderers.push_back(meshRenderer);
-				else
+				switch (material->GetRenderingMode())
+				{
+				case eRenderingMode::Opqaue:
 					m_opaqueMeshRenderers.push_back(meshRenderer);
+					break;
+				case eRenderingMode::Transparent:
+					m_transparentMeshRenderers.push_back(meshRenderer);
+					break;
+				default:
+					break;
+				}
 			}
 		}
 	}

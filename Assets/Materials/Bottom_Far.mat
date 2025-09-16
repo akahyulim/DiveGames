@@ -1,0 +1,8 @@
+Material: Bottom_Far
+Shader: Legacy
+RenderingMode: 1
+DiffuseMap: ""
+NormalMap: ""
+DiffuseColor: [0.16078432, 0.16078432, 0.16078432, 0.4509804]
+Tiling: [1, 1]
+Offset: [0, 0]

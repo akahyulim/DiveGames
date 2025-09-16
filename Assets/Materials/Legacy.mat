@@ -1,8 +1,8 @@
-Material: Sphere
-Shader: Unlit
+Material: Legacy
+Shader: Legacy
 RenderingMode: 0
 DiffuseMap: ""
 NormalMap: ""
-DiffuseColor: [1, 0, 0, 1]
+DiffuseColor: [1, 1, 1, 1]
 Tiling: [1, 1]
 Offset: [0, 0]

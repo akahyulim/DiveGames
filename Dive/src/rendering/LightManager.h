@@ -19,9 +19,6 @@ namespace Dive
 		void Update(World* world);
 		void Bind();
 
-		void BindBase();
-		void BindAdd();
-
 		// 얘가 가지는 게 맞을까나...
 		DirectX::XMFLOAT4 GetAmbientColor() const { return m_ambientColor; }
 		void SetAmbientColor(float r, float g, float b, float a) { m_ambientColor = { r, g, b, a }; }
@@ -30,8 +27,6 @@ namespace Dive
 	private:
 	private:
 		DirectX::XMFLOAT4 m_ambientColor = { 0.1f, 0.1f, 0.1f, 1.0f };
-		Light* m_BaseLight;
-		std::vector<Light*> m_AddLights;
 		std::vector<Light*> m_lights;
 		std::unique_ptr<ConstantBuffer> m_cbLights;
 	};

@@ -208,7 +208,7 @@ namespace Dive
 					auto cubeGO = EditorContext::ActiveWorld->CreateGameObject("Cube");
 					auto staticMeshRender = cubeGO->AddComponent<MeshRenderer>();
 					staticMeshRender->SetStaticMesh(MeshFactory::CreateCube());
-					staticMeshRender->SetMaterial(std::make_shared<Material>());
+					staticMeshRender->SetMaterial(std::make_shared<Material>());	// 이러면 매번 새로운 머티리얼이 생성된다.
 				}
 				if (ImGui::MenuItem("Sphere", nullptr, nullptr))
 				{

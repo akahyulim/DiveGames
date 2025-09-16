@@ -28,6 +28,13 @@ namespace Dive
 			static_cast<uint32_t>(sizeof(CameraData)));
 		if (!m_cbCamera) DV_LOG(MeshRenderer, err, "[::Camera] Camera Buffer 생성 실패");
 
+		m_viewport.TopLeftX = 0.0f;
+		m_viewport.TopLeftY = 0.0f;
+		m_viewport.Width = static_cast<float>(Graphics::GetWidth());
+		m_viewport.Height = static_cast<float>(Graphics::GetHeight());
+		m_viewport.MinDepth = 0.0f;
+		m_viewport.MaxDepth = 1.0f;
+
 		DV_LOG(Camera, info, "생성: {}, {}", GetName(), GetInstanceID());
 	}
 
@@ -47,17 +54,14 @@ namespace Dive
 
 	void Camera::Bind() const
 	{
-		auto renderTargetView = GetRenderTarget()->GetRenderTargetView();
-		auto depthStencilView = GetRenderTarget()->GetDepthStencilView();
-		auto color = GetBackgroundColor();
+		auto rtv = m_renderTarget ? m_renderTarget->GetRenderTargetView() : Graphics::GetRenderTargetView();
+		auto dsv = m_renderTarget? m_renderTarget->GetDepthStencilView() : Graphics::GetDepthStencilView();
 
-		Graphics::GetDeviceContext()->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-		FLOAT clearColor[4]{ color.x, color.y, color.z, color.w };
-		Graphics::GetDeviceContext()->ClearRenderTargetView(renderTargetView, clearColor);
-		Graphics::GetDeviceContext()->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+		Graphics::GetDeviceContext()->OMSetRenderTargets(1, &rtv, dsv);
+		Graphics::GetDeviceContext()->ClearRenderTargetView(rtv, m_backgroundColor);
+		Graphics::GetDeviceContext()->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-		auto viewport = GetViewport();
-		Graphics::GetDeviceContext()->RSSetViewports(1, &viewport);		
+		Graphics::GetDeviceContext()->RSSetViewports(1, &m_viewport);
 
 		CameraData cpuBuffer{};
 		cpuBuffer.position = GetTransform()->GetPosition();
@@ -131,8 +135,7 @@ namespace Dive
 
 	float Camera::GetAspectRatio() const
 	{
-		auto viewport = GetViewport();
-		return (viewport.Width / viewport.Height);
+		return (m_viewport.Width / m_viewport.Height);
 	}
 	
 	void Camera::SetFieldOfView(float fov)
@@ -230,29 +233,61 @@ namespace Dive
 		m_viewportBottom = bottom;
 	}
 
+	void Camera::SetViewport(float topLeftX, float topLeftY, float width, float height, float minDepth, float maxDepth)
+	{
+		m_viewport.TopLeftX = topLeftX;
+		m_viewport.TopLeftY = topLeftY;
+		m_viewport.Width = width;
+		m_viewport.Height = height;
+		m_viewport.MinDepth = minDepth;
+		m_viewport.MaxDepth = maxDepth;
+	}
+
 	D3D11_VIEWPORT Camera::GetViewport() const
 	{
-		auto renderTargetWidth = static_cast<float>(GetRenderTarget()->GetWidth());
-		auto renderTargetHeight = static_cast<float>(GetRenderTarget()->GetHeight());
+		return m_viewport;
+	}
 
-		float topLeftX = m_viewportLeft * renderTargetWidth;
-		float topLeftY = m_viewportTop * renderTargetHeight;
-		float width = (m_viewportRight - m_viewportLeft) * renderTargetWidth;
-		float height = (m_viewportBottom - m_viewportTop) * renderTargetHeight;
+	DirectX::XMFLOAT4 Camera::GetBackgroundColorByXMFLOAT4() const
+	{
+		return { m_backgroundColor[0], m_backgroundColor[1], m_backgroundColor[2], m_backgroundColor[3] };
+	}
 
-		return D3D11_VIEWPORT{
-			topLeftX,
-			topLeftY,
-			width,
-			height,
-			0.0f,
-			1.0f
-		};
+	void Camera::SetBackgroundColor(float r, float g, float b, float a)
+	{
+		m_backgroundColor[0] = r;
+		m_backgroundColor[1] = g;
+		m_backgroundColor[2] = b;
+		m_backgroundColor[3] = a;
+	}
+
+	void Camera::SetBackgroundColor(const float* color)
+	{
+		m_backgroundColor[0] = color[0];
+		m_backgroundColor[1] = color[1];
+		m_backgroundColor[2] = color[2];
+		m_backgroundColor[3] = color[3];
+	}
+
+	void Camera::SetBackgroundColor(const DirectX::XMFLOAT4& color)
+	{
+		m_backgroundColor[0] = color.x;
+		m_backgroundColor[1] = color.y;
+		m_backgroundColor[2] = color.z;
+		m_backgroundColor[3] = color.w;
 	}
 
 	RenderTexture* Camera::GetRenderTarget() const
 	{
-		return m_renderTarget ? m_renderTarget : Renderer::GetRenderTarget(eRenderTarget::FrameOutput);
+		return m_renderTarget ? m_renderTarget : nullptr;// Renderer::GetRenderTarget(eRenderTarget::FrameOutput);
+	}
+
+
+	void Camera::SetRenderTarget(RenderTexture* renderTarget)
+	{
+		m_renderTarget = renderTarget;
+
+		SetViewport(0.0f, 0.0f, static_cast<float>(m_renderTarget->GetWidth()), static_cast<float>(m_renderTarget->GetHeight()));
 	}
 
 	Camera* Camera::GetMainCamera()

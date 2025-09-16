@@ -52,6 +52,13 @@ namespace Dive
 			return false;
 		}
 
+		if (!WorldManager::Initialize())
+		{
+			DV_LOG(Engine, err, "[::Initialize] WorldManager 초기화 실패");
+			m_bExit = true;
+			return false;
+		}
+
 		DV_LOG(Engine, info, "초기화 완료");
 
 		return true;
@@ -61,6 +68,7 @@ namespace Dive
 	{
 		DV_LOG(Engine, info, "셧다운 시작");
 
+		WorldManager::Shutdown();
 		Input::Shutdown();
 		Renderer::Shutdown();
 		Graphics::Shutdown();

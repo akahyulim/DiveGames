@@ -18,7 +18,7 @@ namespace Dive
 		
 		case eInputLayout::Unlit:
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
-			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 48, D3D11_INPUT_PER_VERTEX_DATA, 0 });
+			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 			break;
 		case eInputLayout::Lit:
 			elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 });
@@ -57,6 +57,11 @@ namespace Dive
 			DV_LOG(ShaderManager, err, "LitVS 생성 실패");
 			return false;
 		}
+		if (!CreateVertexShaderAndInputLayout("Assets/Shaders/ResolveSceneVS.cso", eInputLayout::None))
+		{
+			DV_LOG(ShaderManager, err, "ResolbeSceneVS 생성 실패");
+			return false;
+		}
 
 		// pixel shader
 		if(!CreatePixelShader("Assets/Shaders/UnlitPS.cso"))
@@ -67,6 +72,11 @@ namespace Dive
 		if(!CreatePixelShader("Assets/Shaders/LegacyPS.cso"))
 		{
 			DV_LOG(ShaderManager, err, "LegacyPS 생성 실패");
+			return false;
+		}
+		if (!CreatePixelShader("Assets/Shaders/ResolveScenePS.cso"))
+		{
+			DV_LOG(ShaderManager, err, "ResolveScenePS 생성 실패");
 			return false;
 		}
 
@@ -81,6 +91,13 @@ namespace Dive
 			DV_LOG(ShaderManager, err, "Legacy ShaderProgram 생성 실패");
 			return false;
 		}
+		if (!CreateShaderProgram("ResolveSceneVS", "ResolveScenePS", "ResolveScene"))
+		{
+			DV_LOG(ShaderManager, err, "ResolveScene ShaderProgram 생성 실패");
+			return false;
+		}
+
+
 		return true;
 	}
 
@@ -88,8 +105,10 @@ namespace Dive
 	{
 		auto it = s_spCache.find(name);
 		if (it == s_spCache.end())
+		{
+			DV_LOG(ShaderProgram, warn, "존재하지 않는 셰이더 프로그램 요청: {}", name);
 			return nullptr;
-
+		}
 		return it->second;
 	}
 
@@ -102,22 +121,27 @@ namespace Dive
 			return false;
 		}
 
-		Microsoft::WRL::ComPtr<ID3D11InputLayout> il;
-		auto inputElements = GetInputElements(type);
-		auto byteCode = vs->GetBytecode();
-		auto hr = Graphics::GetDevice()->CreateInputLayout(
-			inputElements.data(),
-			static_cast<UINT>(inputElements.size()),
-			byteCode->GetBufferPointer(),
-			byteCode->GetBufferSize(),
-			il.GetAddressOf());
-		if (FAILED(hr))
+		if (type != eInputLayout::None)
 		{
-			DV_LOG(ShaderManager, err, "[::CreateVertexShaderAndInputLayout] InputLayout 생성 실패: {}", ErrorUtils::ToVerbose(hr));
-			return false;
-		}
+			Microsoft::WRL::ComPtr<ID3D11InputLayout> il;
+			auto inputElements = GetInputElements(type);
+			auto byteCode = vs->GetBytecode();
+			auto hr = Graphics::GetDevice()->CreateInputLayout(
+				inputElements.data(),
+				static_cast<UINT>(inputElements.size()),
+				byteCode->GetBufferPointer(),
+				byteCode->GetBufferSize(),
+				il.GetAddressOf());
+			if (FAILED(hr))
+			{
+				DV_LOG(ShaderManager, err, "[::CreateVertexShaderAndInputLayout] InputLayout 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return false;
+			}
 
-		s_vss[vs->GetName()] = {vs, il};
+			s_vss[vs->GetName()] = { vs, il };
+		}
+		else 
+			s_vss[vs->GetName()] = { vs, nullptr };
 
 		return true;
 	}

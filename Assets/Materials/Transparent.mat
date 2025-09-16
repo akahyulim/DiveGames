@@ -1,8 +1,8 @@
-Material: Bottom
+Material: Transparent
 Shader: Legacy
 RenderingMode: 0
-DiffuseMap: stone01
-NormalMap: normal01
+DiffuseMap: spnza_bricks_a_diff
+NormalMap: spnza_bricks_a_ddn
 DiffuseColor: [1, 1, 1, 1]
 Tiling: [1, 1]
 Offset: [0, 0]

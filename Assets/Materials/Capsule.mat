@@ -1,6 +1,8 @@
 Material: Capsule
+Shader: Unlit
+RenderingMode: 0
 DiffuseMap: ""
-DiffuseColor: [1, 0, 0, 1]
+NormalMap: ""
+DiffuseColor: [1, 1, 1, 1]
 Tiling: [1, 1]
 Offset: [0, 0]
-Shader: Unlit

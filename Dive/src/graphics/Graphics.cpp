@@ -251,7 +251,8 @@ namespace Dive
 		assert(s_swapChain);
 		assert(s_deviceContext);
 
-		s_deviceContext->OMSetRenderTargets(0, NULL, NULL);
+		ID3D11RenderTargetView* nullRTV[1] = { nullptr };
+		s_deviceContext->OMSetRenderTargets(1, nullRTV, nullptr);
 		s_renderTargetView.Reset();
 
 		HRESULT hr = s_swapChain->ResizeBuffers(0, 0, 0, DV_FORMAT, 0);

@@ -38,6 +38,9 @@ namespace Dive
 
 		cameraControll();
 
+		auto pos = ImGui::GetWindowPos();
+		auto size = ImGui::GetWindowSize();
+		
 		m_width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 		m_height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
 
@@ -56,7 +59,7 @@ namespace Dive
 			m_renderTarget->Resize(static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height));
 
 		ImTextureID textureID = (ImTextureID)(m_renderTarget->GetShaderResourceView());
-		ImGui::Image(textureID, ImVec2(m_width, m_height));
+		ImGui::Image(textureID, ImVec2(m_width, m_height));		
 	}
 
 	void WorldView::cameraControll()

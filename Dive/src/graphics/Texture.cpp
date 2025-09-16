@@ -18,6 +18,8 @@ namespace Dive
 			return;
 		}
 
+		assert(m_shaderResourceView);
+
 		Graphics::GetDeviceContext()->PSSetShaderResources(static_cast<UINT>(slot), 1, m_shaderResourceView.GetAddressOf());
 	}
 
@@ -32,6 +34,7 @@ namespace Dive
 		{
 		case DXGI_FORMAT_R8G8B8A8_UNORM:
 		case DXGI_FORMAT_B8G8R8A8_UNORM:
+		case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB:
 		case DXGI_FORMAT_R32_FLOAT:
 			return 4;
 		case DXGI_FORMAT_R16G16B16A16_FLOAT:
@@ -39,7 +42,7 @@ namespace Dive
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
 			return 16;
 		default:
-			DV_LOG("Texture", warn, "[::GetPixelSize] 잘못된 포멧 전달");
+			DV_LOG(Texture, warn, "[::GetPixelSize] 잘못된 포멧 전달");
 			return 0;
 		}
 	}

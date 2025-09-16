@@ -67,6 +67,8 @@ namespace Dive
 		std::vector<MeshRenderer*> m_transparentMeshRenderers;
 		std::vector<MeshRenderer*> m_opaqueMeshRenderers;
 
+		// 메인 카메라 정도는 관리했으면 좋겠다.
+
 		friend class Transform;
 	};
 }

@@ -15,7 +15,10 @@ namespace Dive
 
 	void ShaderProgram::Bind()
 	{
-		Graphics::GetDeviceContext()->IASetInputLayout(m_il.Get());
+		assert(m_vs);
+		assert(m_ps);
+
+		Graphics::GetDeviceContext()->IASetInputLayout(m_il ? m_il.Get() : nullptr);
 		m_vs->Bind();
 		m_ps->Bind();
 	}

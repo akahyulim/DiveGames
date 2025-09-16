@@ -28,14 +28,12 @@ namespace Dive
 		m_gpuBuffer.reset();
 	}
 
-	void MeshRenderer::Render(const Camera* camera)
+	void MeshRenderer::Render(const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj)
 	{
-		assert(camera);
-		
 		ObjectData objectData{};
 		objectData.model = XMMatrixTranspose(GetGameObject()->GetTransform()->GetTransformMatrix());
-		objectData.View = XMMatrixTranspose(camera->GetViewMatrix());
-		objectData.Proj = XMMatrixTranspose(camera->GetProjectionMatrix());
+		objectData.View = XMMatrixTranspose(view);
+		objectData.Proj = XMMatrixTranspose(proj);
 		m_gpuBuffer->Update<ObjectData>(objectData);
 		m_gpuBuffer->Bind();
 
@@ -49,11 +47,5 @@ namespace Dive
 		assert(m_staticMesh);
 		const auto boundingBox = m_staticMesh->GetBoundingBox();
 		return frustum.CheckAABB(boundingBox->GetCenter(), boundingBox->GetExtent());
-	}
-	
-	bool MeshRenderer::IsTransparent() const
-	{
-		assert(m_material);
-		return m_material->IsTransparent();
 	}
 }

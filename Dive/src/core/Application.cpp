@@ -25,6 +25,8 @@ namespace Dive
 
 		Stop();
 
+		m_engine->Shutdown();
+
 		return 0;
 	}
 }

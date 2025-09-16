@@ -79,7 +79,7 @@ namespace Dive
 			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 			{
 				style.WindowRounding = 0.0f;
-				style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+				style.Colors[ImGuiCol_WindowBg].w = 0.5f;//1.0f;
 			}
 
 			// Setup Platform/Renderer backends
@@ -140,11 +140,26 @@ namespace Dive
 			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/sky_daytime_blue.jpg");
 			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/stone01.tga");
 			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/normal01.tga");
+			
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/WornWood/WornWood_Albedo.tga");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Textures/WornWood/WornWood_Normal.tga");
+
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/tree/Textures/Leaf_Oak_Gum_AE3D_10302022-A.png");
+
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/Sponza/Textures/lion.tga");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/Sponza/Textures/lion_ddn.tga");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/Sponza/Textures/spnza_bricks_a_diff.tga");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/Sponza/Textures/spnza_bricks_a_ddn.tga");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/Sponza/Textures/sponza_ceiling_a_diff.tga");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/Sponza/Textures/sponza_ceiling_a_ddn.tga");
+
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/Cube/Textures/Cube_diffuse.jpg");
+			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/Cube/Textures/Cube_normal.jpg");
 		}
 
 		// create views
 		m_views.emplace_back(std::make_unique<WorldView>(this));
-		m_views.emplace_back(std::make_unique<GameView>(this));
+		//m_views.emplace_back(std::make_unique<GameView>(this));
 		m_views.emplace_back(std::make_unique<HierarchyView>(this));
 		m_views.emplace_back(std::make_unique<InspectorView>(this));
 		//m_views.emplace_back(std::make_unique<LogView>(this));
@@ -164,8 +179,6 @@ namespace Dive
 		ImGui::DestroyContext();
 
 		DV_LOG(Editor, info, "셧다운 성공");
-
-		m_engine->Shutdown();
 	}
 
 	void Editor::OnPostRender()
@@ -237,9 +250,10 @@ namespace Dive
 			auto renderTargetView = Graphics::GetRenderTargetView();
 			auto depthStencilView = Graphics::GetDepthStencilView();
 			dc->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-
-			float clearColors[4] = { 0.1f, 0.1f, 0.1f, 0.0f };
-			dc->ClearRenderTargetView(renderTargetView, clearColors);
+			
+			float clearColor[4]{ 0.0f, 0.0f, 0.0f, 1.0f };
+			dc->ClearRenderTargetView(renderTargetView, EditorContext::EditorCamera ? 
+				EditorContext::EditorCamera->GetComponent<Camera>()->GetBackgroundColor() : clearColor);
 			dc->ClearDepthStencilView(depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 			ImGui::Render();

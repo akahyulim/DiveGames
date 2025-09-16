@@ -7,7 +7,7 @@ namespace Dive
 		: View(editor)
 	{
 		m_title = "Game";
-		m_flags |= ImGuiWindowFlags_NoScrollbar;
+		m_flags |= ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBackground;
 	}
 
 	GameView::~GameView()

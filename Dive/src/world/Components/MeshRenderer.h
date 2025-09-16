@@ -22,9 +22,8 @@ namespace Dive
 		MeshRenderer(GameObject* gameObject);
 		~MeshRenderer() override;
 
-		virtual void Render(const Camera* camera);
+		virtual void Render(const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj);
 		bool IsVisible(const Frustum& frustum);
-		bool IsTransparent() const;
 
 		std::shared_ptr<StaticMesh> GetStaticMesh() const { return m_staticMesh; }
 		void SetStaticMesh(std::shared_ptr<StaticMesh> staticMesh) { m_staticMesh = staticMesh; }

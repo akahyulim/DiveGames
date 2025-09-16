@@ -276,7 +276,7 @@ namespace Dive
 		if (EditorContext::Selected->HasComponent<Transform>())
 		{
 			ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-			if (ImGui::CollapsingHeader("Transform"))
+			if (ImGui::CollapsingHeader("TRANSFORM"))
 			{
 				auto transform = EditorContext::Selected->GetTransform();
 
@@ -298,7 +298,7 @@ namespace Dive
 		if(EditorContext::Selected->HasComponent<Camera>())
 		{
 			ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-			if (ImGui::CollapsingHeader("Camera"))
+			if (ImGui::CollapsingHeader("CAMERA"))
 			{
 				auto camera = EditorContext::Selected->GetComponent<Camera>();
 
@@ -347,13 +347,18 @@ namespace Dive
 
 				// Background
 				ImGui::PushID("Background");
-				static ImVec4 clearColor = XMFloat4ToImVec4(camera->GetBackgroundColor());
+				//static float clearColor[4] = camera->GetBackgroundColor();
 				ImGui::Columns(2);
 				ImGui::SetColumnWidth(0, 150.0f);
 				ImGui::Text("Background");
 				ImGui::NextColumn();
-				ImGui::ColorEdit3("##Background", (float*)&clearColor);
-				camera->SetBackgroundColor(ImVec4ToXMFloat4(clearColor));
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_NoInputs;
+				ImGui::ColorEdit3("##Background", (float*)camera->GetBackgroundColor(), flags);
+				//camera->SetBackgroundColor(ImVec4ToXMFloat4(clearColor));
+				// 굳이 이렇게 두 개로 나눌 필요가 있나 하는 생각이 든다.
+				// 렌더타겟까지 동일하게 설정하고 카메라의 위치만 바꾸면 충분히 가능할 것 같은데
+				if (EditorContext::Selected == EditorContext::MainCamera)
+					EditorContext::EditorCamera->GetComponent<Camera>()->SetBackgroundColor(camera->GetBackgroundColor());
 				ImGui::Columns(1);
 				ImGui::PopID();
 			}
@@ -363,9 +368,25 @@ namespace Dive
 		if (EditorContext::Selected->HasComponent<MeshRenderer>())
 		{
 			ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-			if (ImGui::CollapsingHeader("Mesh Renderer"))
+			if (ImGui::CollapsingHeader("MESH RENDERER"))
 			{
 				auto staticMeshRender = EditorContext::Selected->GetComponent<MeshRenderer>();
+
+				// mesh
+				{
+					auto mesh = staticMeshRender->GetStaticMesh();
+
+					ImGui::PushID("MeshName");
+					std::string meshName = mesh->GetName();
+					ImGui::Columns(2);
+					ImGui::SetColumnWidth(0, 150.0f);
+					ImGui::Text("Mesh");
+					ImGui::NextColumn();
+					ImGui::InputText("##MeshName", &meshName);
+					mesh->SetName(meshName);
+					ImGui::Columns(1);
+					ImGui::PopID();
+				}
 
 				// material
 				{
@@ -383,22 +404,10 @@ namespace Dive
 					ImGui::Columns(1);
 					ImGui::PopID();
 
-					// diffuse color
-					ImGui::PushID("DiffuseColor");
-					ImVec4 diffuseColor = XMFloat4ToImVec4(material->GetDiffuseColor());
-					ImGui::Columns(2);
-					ImGui::SetColumnWidth(0, 150.0f);
-					ImGui::Text("Diffuse Color");
-					ImGui::NextColumn();
-					ImGui::ColorEdit3("##DiffuseColor", (float*)&diffuseColor);
-					material->SetDiffuseColor(ImVec4ToXMFloat4(diffuseColor));
-					ImGui::Columns(1);
-					ImGui::PopID();
-
 					// shader program
 					std::string selectedShaderName = material->GetShaderProgram()->GetName();
 					const auto& programs = ShaderManager::GetAllPrograms();
-					
+
 					ImGui::PushID("Shader");
 					ImGui::Columns(2);
 					ImGui::SetColumnWidth(0, 150.0f);
@@ -421,20 +430,55 @@ namespace Dive
 					}
 					ImGui::Columns(1);
 					ImGui::PopID();
-				}
 
-				// mesh
-				{
-					auto mesh = staticMeshRender->GetStaticMesh();
-
-					ImGui::PushID("MeshName");
-					std::string meshName = mesh->GetName();
+					// rendering mode
+					ImGui::PushID("RenderingMode");
 					ImGui::Columns(2);
 					ImGui::SetColumnWidth(0, 150.0f);
-					ImGui::Text("Mesh");
+					ImGui::Text("Rendering Mode");
 					ImGui::NextColumn();
-					ImGui::InputText("##MeshName", &meshName);
-					mesh->SetName(meshName);
+					std::vector<const char*> renderingModes;
+					renderingModes.push_back("Opaque");
+					renderingModes.push_back("Transparent");
+					int currentMode = static_cast<int>(material->GetRenderingMode());
+					ImGui::Combo("##RenderingMode", &currentMode, renderingModes.data(), static_cast<int>(renderingModes.size()));
+					material->SetRenderingMode(static_cast<eRenderingMode>(currentMode));
+					ImGui::Columns(1);
+					ImGui::PopID();
+
+					// albedo
+					ImGui::PushID("Albedo");
+					ImVec4 albedo = XMFloat4ToImVec4(material->GetDiffuseColor());
+					ImTextureID textureID = (ImTextureID)(material->GetMap(eMapType::Diffuse) ? 
+						material->GetMap(eMapType::Diffuse)->GetShaderResourceView() : 0);
+					ImGui::Columns(2);
+					ImGui::SetColumnWidth(0, 150.0f);
+					if (ImGui::ImageButton("", textureID, ImVec2(20, 20)))
+					{
+
+					}
+					ImGui::SameLine();
+					ImGui::Text("Albedo");
+					ImGui::NextColumn();
+					ImGuiColorEditFlags flags = ImGuiColorEditFlags_NoInputs;
+					ImGui::ColorEdit4("##AlbedoColor", (float*)&albedo, flags);
+					material->SetDiffuseColor(ImVec4ToXMFloat4(albedo));
+					ImGui::Columns(1);
+					ImGui::PopID();
+					
+					// normal map
+					ImGui::PushID("NormalMap");
+					textureID = (ImTextureID)(material->GetMap(eMapType::Normal) ?
+						material->GetMap(eMapType::Normal)->GetShaderResourceView() : 0);
+					ImGui::Columns(2);
+					ImGui::SetColumnWidth(0, 150.0f);
+					if (ImGui::ImageButton("", textureID, ImVec2(20, 20)))
+					{
+
+					}
+					ImGui::SameLine();
+					ImGui::Text("Normal Map");
+					ImGui::NextColumn();
 					ImGui::Columns(1);
 					ImGui::PopID();
 				}
@@ -444,7 +488,7 @@ namespace Dive
 		if (EditorContext::Selected->HasComponent<Light>())
 		{
 			ImGui::SetNextItemOpen(true, ImGuiCond_Once);
-			if (ImGui::CollapsingHeader("Light"))
+			if (ImGui::CollapsingHeader("LIGHT"))
 			{
 				auto light = EditorContext::Selected->GetComponent<Light>();
 
@@ -496,8 +540,9 @@ namespace Dive
 				ImGui::Columns(2);
 				ImGui::SetColumnWidth(0, 150.0f);
 				ImGui::Text("Color");
-				ImGui::NextColumn();
-				ImGui::ColorEdit3("##LightColor", (float*)&color);
+				ImGui::NextColumn(); 
+				ImGuiColorEditFlags flags = ImGuiColorEditFlags_NoInputs;
+				ImGui::ColorEdit3("##LightColor", (float*)&color, flags);
 				light->SetColor(color.x, color.y, color.z);
 				ImGui::Columns(1);
 				ImGui::PopID();

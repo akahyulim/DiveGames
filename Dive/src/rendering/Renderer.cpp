@@ -14,6 +14,9 @@
 #include "world/Components/Camera.h"
 #include "world/Components/MeshRenderer.h"
 
+#include "resource/ResourceManager.h"
+#include "graphics/Texture2D.h"
+
 namespace Dive
 {
 	uint64_t Renderer::s_frameCount = 0;
@@ -30,8 +33,8 @@ namespace Dive
 
 	std::array<RenderTexture*, static_cast<size_t>(eRenderTarget::Count)> Renderer::s_renderTargets;
 	std::array<ID3D11RasterizerState*, static_cast<size_t>(eRasterizerState::Count)> Renderer::s_rasterizerStates;
-	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> Renderer::s_depthSteniclStates;
-	std::array<ID3D11BlendState*, static_cast<size_t>(eBlendState::Count)> Renderer::s_blendStates;
+	std::array<ID3D11DepthStencilState*, static_cast<size_t>(eDepthStencilState::Count)> Renderer::s_depthStencilStates;
+	std::array<Microsoft::WRL::ComPtr<ID3D11BlendState>, static_cast<size_t>(eBlendState::Count)> Renderer::s_blendStates;
 	std::array<Microsoft::WRL::ComPtr<ID3D11SamplerState>, static_cast<size_t>(eSamplerState::Count)> Renderer::s_samplerStates;
 
 	std::unique_ptr<LightManager> Renderer::s_lightManager;
@@ -72,15 +75,10 @@ namespace Dive
 			if (rs) rs->Release();
 			rs = nullptr;
 		}
-		for (auto& ds : s_depthSteniclStates)
+		for (auto& ds : s_depthStencilStates)
 		{
 			if (ds) ds->Release();
 			ds = nullptr;
-		}
-		for (auto& bs : s_blendStates)
-		{
-			if (bs) bs->Release();
-			bs = nullptr;
 		}
 
 		DV_LOG(Renderer, info, "셧다운 성공");
@@ -88,52 +86,65 @@ namespace Dive
 
 	void Renderer::OnRender()
 	{
-		Render();
-	}
-
-	// Render를 분할하고 싶다.
-	// 분류도 이 곳에서 하고 싶다.
-	void Renderer::Render()
-	{
 		if (!WorldManager::GetActiveWorld())
 			return;
+
+		Renderer::BindSamplerStates();
+
+		const auto world = WorldManager::GetActiveWorld();
 		
 		auto cameras = Camera::GetAllCameras();
-		for (auto camera : cameras)
+		for (auto cameraCom : cameras)
 		{
-			WorldManager::GetActiveWorld()->CullAndSort(camera);
+			// 임시: 에디터 모드가 아니라면 이걸 실행시키는 게 맞다.
+			// 좀 더 생각해보니 Editor와 Main 둘 중 하나만 그리는 게 맞다.
+			// 물론 그외의 것들이 존재할 수 있다.
+			//if (cameraCom->GetGameObject()->GetTag() == "EditorOnly")
+			//	continue;
+
+			WorldManager::GetActiveWorld()->CullAndSort(cameraCom);
 			// 위치가 애매하다. 하지만 바로 위에서 업데이트된 후에 호출하는 게 맞다.
 			s_lightManager->Update(WorldManager::GetActiveWorld());
 			
 			// forward rendering path
 			// Camera에서 RenderingPath를 구분
+			{
+				cameraCom->Bind();	// RenerTarget Clear 포함
+				s_lightManager->Bind();
+				
+				// Shadow pass
 				{
-					// Shadow pass
-					{
 
-					}
-
-					// ForwardBase pass
-					// 하나의 Directional Light만 적용
-					{
-						s_lightManager->Bind();
-						ForwardBase pass;
-						pass.Execute(camera);
-					}
-
-					// ForwardAdd pass
-					// Point, Spot Light를 적용
-					{
-
-					}
-
-					// Transparent pass
-					{
-
-					}
 				}
-		}
 
+				// ForwardBase pass
+				// 하나의 Directional Light만 적용
+				{
+					ForwardBase pass;
+					pass.Execute(cameraCom);
+				}
+
+				// ForwardAdd pass
+				// Point, Spot Light를 적용
+				{
+
+				}
+
+				
+				// Transparent pass
+				{
+					Transparent pass;
+					pass.Execute(cameraCom);
+				}
+
+				// ResolveScene
+				{
+				//	ResolveScene pass;
+				//	pass.Execute(cameraCom);
+				}
+			}
+		}
+		
 		s_frameCount++;
 	}
 
@@ -220,17 +231,17 @@ namespace Dive
 
 	ID3D11DepthStencilState* Renderer::GetDepthStencilState(eDepthStencilState type)
 	{
-		return type != eDepthStencilState::Count ? s_depthSteniclStates[static_cast<size_t>(type)] : nullptr;
+		return type != eDepthStencilState::Count ? s_depthStencilStates[static_cast<size_t>(type)] : nullptr;
 	}
 
-	ID3D11BlendState* Renderer::GetBlendState(eBlendState type)
+	Microsoft::WRL::ComPtr<ID3D11BlendState> Renderer::GetBlendState(eBlendState type)
 	{
 		return type != eBlendState::Count ? s_blendStates[static_cast<size_t>(type)] : nullptr;
 	}
 
-	ID3D11SamplerState* Renderer::GetSamplerState(eSamplerState type)
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> Renderer::GetSamplerState(eSamplerState type)
 	{
-		return type != eSamplerState::Count ? s_samplerStates[static_cast<size_t>(type)].Get() : nullptr;
+		return type != eSamplerState::Count ? s_samplerStates[static_cast<size_t>(type)] : nullptr;
 	}
 
 	void Renderer::BindSamplerStates()
@@ -289,7 +300,7 @@ namespace Dive
 			desc.FrontFace = stencilMarkOp;
 			desc.BackFace = stencilMarkOp;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthSteniclStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthStencilStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite)])))
 			{
 				DV_LOG(Renderer, err, "DepthStencilState DepthReadWrite 생성 실패");
 			}
@@ -314,7 +325,7 @@ namespace Dive
 			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthSteniclStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite_StencilReadWrite)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthStencilStates[static_cast<size_t>(eDepthStencilState::DepthReadWrite_StencilReadWrite)])))
 			{
 				DV_LOG(Renderer, err, "DepthStencilState DepthReadWrite_StencilReadWrite 생성 실패");
 			}
@@ -335,7 +346,7 @@ namespace Dive
 			desc.FrontFace = stencilMarkOp;
 			desc.BackFace = stencilMarkOp;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthSteniclStates[static_cast<size_t>(eDepthStencilState::GBuffer)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthStencilStates[static_cast<size_t>(eDepthStencilState::GBuffer)])))
 			{
 				DV_LOG(Renderer, err, "DepthStencilState GBuffer 생성 실패");
 			}
@@ -359,7 +370,7 @@ namespace Dive
 			desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 			desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthSteniclStates[static_cast<size_t>(eDepthStencilState::DepthDiabled)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthStencilStates[static_cast<size_t>(eDepthStencilState::DepthDiabled)])))
 			{
 				DV_LOG(Renderer, err, "DepthDisabledStencilState 생성 실패");
 			}
@@ -377,39 +388,104 @@ namespace Dive
 			desc.FrontFace = noSkyStencilOp;
 			desc.BackFace = noSkyStencilOp;
 
-			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthSteniclStates[static_cast<size_t>(eDepthStencilState::ForwardLight)])))
+			if (FAILED(Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthStencilStates[static_cast<size_t>(eDepthStencilState::ForwardLight)])))
 			{
 				DV_LOG(Renderer, err, "DepthDisabledStencilState 생성 실패");
+			}
+		}
+
+		{
+			ZeroMemory(&desc, sizeof(desc));
+			desc.DepthEnable = TRUE;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+			desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+			auto hr = Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthStencilStates[static_cast<size_t>(eDepthStencilState::Transparent)]);
+			if (FAILED(hr))
+			{
+				DV_LOG(Renderer, err, "[::CreateDepthStencilStates] Transparent 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return;
 			}
 		}
 	}
 
 	void Renderer::CreateBlendStates()
 	{
-		// Addictive
-		D3D11_BLEND_DESC desc{};
-		desc.AlphaToCoverageEnable = FALSE;
-		desc.IndependentBlendEnable = FALSE;
-		const D3D11_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc =
+		// Alpha
 		{
-			TRUE,
-			D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD,
-			D3D11_BLEND_ONE, D3D11_BLEND_ONE, D3D11_BLEND_OP_ADD,
-			D3D11_COLOR_WRITE_ENABLE_ALL,
-		};
-		for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
-			desc.RenderTarget[i] = defaultRenderTargetBlendDesc;
+			D3D11_BLEND_DESC desc{};
+			desc.AlphaToCoverageEnable = FALSE;
+			desc.IndependentBlendEnable = FALSE;
 
-		if (FAILED(Graphics::GetDevice()->CreateBlendState(&desc, &s_blendStates[static_cast<size_t>(eBlendState::Addictive)])))
+			const D3D11_RENDER_TARGET_BLEND_DESC alphaBlendDesc =
+			{
+				TRUE,                                // BlendEnable
+				D3D11_BLEND_SRC_ALPHA,               // SrcBlend
+				D3D11_BLEND_INV_SRC_ALPHA,           // DestBlend
+				D3D11_BLEND_OP_ADD,                  // BlendOp
+
+				D3D11_BLEND_ONE,                     // SrcBlendAlpha
+				D3D11_BLEND_INV_SRC_ALPHA,           // DestBlendAlpha
+				D3D11_BLEND_OP_ADD,                  // BlendOpAlpha
+
+				D3D11_COLOR_WRITE_ENABLE_ALL         // RenderTargetWriteMask
+			};
+
+			for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+				desc.RenderTarget[i] = alphaBlendDesc;
+			
+			HRESULT hr = Graphics::GetDevice()->CreateBlendState(&desc, &s_blendStates[static_cast<size_t>(eBlendState::AlphaEnabled)]);
+			if (FAILED(hr))
+			{
+				DV_LOG(Renderer, err, "[::CreateBlendState] AlphaEnabled 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return;
+			}
+
+			for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+				desc.RenderTarget[i].BlendEnable = FALSE;
+
+			hr = Graphics::GetDevice()->CreateBlendState(&desc, &s_blendStates[static_cast<size_t>(eBlendState::AlphaDisabled)]);
+			if (FAILED(hr))
+			{
+				DV_LOG(Renderer, err, "[::CreateBlendState] AlpahDisabled 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return;
+			}
+		}
+
+		// Addictive
 		{
-			DV_LOG(Renderer, err, "BlandState Addictive 생성 실패");
+			D3D11_BLEND_DESC desc{};
+			desc.AlphaToCoverageEnable = FALSE;
+			desc.IndependentBlendEnable = FALSE;
+			const D3D11_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc =
+			{
+				TRUE,
+				D3D11_BLEND_ONE, 
+				D3D11_BLEND_ONE, 
+				D3D11_BLEND_OP_ADD,
+				
+				D3D11_BLEND_ONE, 
+				D3D11_BLEND_ONE, 
+				D3D11_BLEND_OP_ADD,
+				
+				D3D11_COLOR_WRITE_ENABLE_ALL,
+			};
+			for (UINT i = 0; i < D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i)
+				desc.RenderTarget[i] = defaultRenderTargetBlendDesc;
+
+			auto hr = Graphics::GetDevice()->CreateBlendState(&desc, &s_blendStates[static_cast<size_t>(eBlendState::Addictive)]);
+			if(FAILED(hr))
+			{
+				DV_LOG(Renderer, err, "[::CreateBlendState] Addictive 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return;
+			}
 		}
 	}
 
 	void Renderer::CreateSamplerStates()
 	{
 		auto device = Graphics::GetDevice();
-
+		
 		// WrapLinear
 		{
 			D3D11_SAMPLER_DESC samplerDesc{};
@@ -417,6 +493,14 @@ namespace Dive
 			samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
 			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+			samplerDesc.MipLODBias = 0.0f;
+			samplerDesc.MaxAnisotropy = 1;
+			samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+			samplerDesc.BorderColor[0] = 0;
+			samplerDesc.BorderColor[1] = 0;
+			samplerDesc.BorderColor[2] = 0;
+			samplerDesc.BorderColor[3] = 0;
+			samplerDesc.MinLOD = 0;
 			samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::WrapLinear)].GetAddressOf());
@@ -443,7 +527,7 @@ namespace Dive
 			}
 		}
 
-		// ClampCubeLinear
+		// ClampLinear
 		{
 			D3D11_SAMPLER_DESC samplerDesc{};
 			samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -451,10 +535,10 @@ namespace Dive
 			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 
-			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::ClampCubeLinear)].GetAddressOf());
+			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::ClampLinear)].GetAddressOf());
 			if (FAILED(hr))
 			{
-				DV_LOG(Renderer, err, "[::CreateSamplerStates] ClampCubeLinear SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Renderer, err, "[::CreateSamplerStates] ClampLinear SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
 				return;
 			}
 		}

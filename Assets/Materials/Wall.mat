@@ -1,6 +1,8 @@
 Material: Wall
-DiffuseMap: DokeV
+Shader: Legacy
+RenderingMode: 1
+DiffuseMap: lion
+NormalMap: lion_ddn
 DiffuseColor: [1, 1, 1, 1]
 Tiling: [1, 1]
 Offset: [0, 0]
-Shader: Legacy

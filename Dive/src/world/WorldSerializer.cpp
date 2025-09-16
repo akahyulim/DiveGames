@@ -82,7 +82,7 @@ namespace Dive
 				out << YAML::Key << "ViewportTop" << YAML::Value << camera->GetViewportTop();
 				out << YAML::Key << "ViewportRight" << YAML::Value << camera->GetViewportRight();
 				out << YAML::Key << "ViewportBottom" << YAML::Value << camera->GetViewportBottom();
-				out << YAML::Key << "BackgroundColor" << YAML::Value << camera->GetBackgroundColor();
+				out << YAML::Key << "BackgroundColor" << YAML::Value << camera->GetBackgroundColorByXMFLOAT4();
 				out << YAML::EndMap; // Camera
 			}
 			

@@ -2,6 +2,12 @@
 
 namespace Dive
 {
+	enum class eEngineMode
+	{
+		Editor,
+		Runtime,
+	};
+
 	class Engine
 	{
 	public:

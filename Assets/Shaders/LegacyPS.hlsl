@@ -103,10 +103,8 @@ struct PSInput
 
 float4 MainPS(PSInput input) : SV_TARGET
 {
-    float3 lightColor = cbForwardLight.ambientColor;
-
-    float4 diffColor = HasDiffuseMap() ?
-        DiffuseMap.Sample(WrapLinearSampler, input.UV) : cbMaterial.diffuseColor;
+    float4 mtrlColor = HasDiffuseMap() ?
+        DiffuseMap.Sample(WrapLinearSampler, input.UV) * cbMaterial.diffuseColor : cbMaterial.diffuseColor;
 
     float3 normal = input.Normal;
     if (HasNormalMap())
@@ -126,6 +124,7 @@ float4 MainPS(PSInput input) : SV_TARGET
         normal = normalize(mul(bumpMap, TBN));
     }
 
+    float3 lightColor = cbForwardLight.ambientColor;
     for (int i = 0; i < cbForwardLight.lightCount; ++i)
     {
         switch (cbForwardLight.lights[i].type)
@@ -136,5 +135,5 @@ float4 MainPS(PSInput input) : SV_TARGET
         }
     }
 
-    return float4(diffColor.xyz * lightColor, diffColor.a);
+    return float4(mtrlColor.rgb * lightColor.rgb, mtrlColor.a);
 }

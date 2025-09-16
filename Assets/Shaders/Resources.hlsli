@@ -1,7 +1,7 @@
 // samplers
 SamplerState WrapLinearSampler : register(s0);
 SamplerState ClampPointSampler : register(s1);
-SamplerState ClampCubeLinear : register(s2);
+SamplerState ClampLinearSampler : register(s2);
 SamplerState ShadowCompare : register(s3);
 
 // Material Textures (t0 ~ t5)

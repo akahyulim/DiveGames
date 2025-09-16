@@ -99,7 +99,7 @@ namespace Dive
 			dsvDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			dsvDesc.Texture2D.MipSlice = 0;
 
-			hr = Graphics::GetDevice()->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_depthTexture.Get()), &dsvDesc, m_DepthDSV.GetAddressOf());
+			hr = Graphics::GetDevice()->CreateDepthStencilView(static_cast<ID3D11Resource*>(m_depthTexture.Get()), &dsvDesc, m_depthDSV.GetAddressOf());
 			if(FAILED(hr))
 			{
 				DV_LOG(RenderTexture, err, "[::Create] CreateDepthSteniclView 실패 : {}", ErrorUtils::ToVerbose(hr));
@@ -134,7 +134,7 @@ namespace Dive
 	void RenderTexture::Release()
 	{
 		m_depthSRV.Reset();
-		m_DepthDSV.Reset();
+		m_depthDSV.Reset();
 		m_depthTexture.Reset();
 		m_renderTargetView.Reset();
 
