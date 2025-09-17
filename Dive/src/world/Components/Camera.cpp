@@ -23,6 +23,11 @@ namespace Dive
 	{
 		s_allCameras.push_back(this);
 
+		m_cbCameraVS = std::make_unique<ConstantBuffer>(
+			eVSConstantBufferSlot::Frame,	// 임시.. 1이라서 상관은 없다.
+			static_cast<uint32_t>(sizeof(CameraDataVS)));
+		if (!m_cbCameraVS) DV_LOG(MeshRenderer, err, "[::Camera] Camera Buffer 생성 실패");
+
 		m_cbCamera = std::make_unique<ConstantBuffer>(
 			ePSConstantBufferSlot::Camera,
 			static_cast<uint32_t>(sizeof(CameraData)));
@@ -54,6 +59,12 @@ namespace Dive
 
 	void Camera::Bind() const
 	{
+		CameraDataVS objectData{};
+		objectData.View = XMMatrixTranspose(GetViewMatrix());
+		objectData.Proj = XMMatrixTranspose(GetProjectionMatrix());
+		m_cbCameraVS->Update<CameraDataVS>(objectData);
+		m_cbCameraVS->Bind();
+
 		auto rtv = m_renderTarget ? m_renderTarget->GetRenderTargetView() : Graphics::GetRenderTargetView();
 		auto dsv = m_renderTarget? m_renderTarget->GetDepthStencilView() : Graphics::GetDepthStencilView();
 
@@ -65,8 +76,7 @@ namespace Dive
 
 		CameraData cpuBuffer{};
 		cpuBuffer.position = GetTransform()->GetPosition();
-		cpuBuffer.perspectiveValue;
-		cpuBuffer.viewInverse;
+		cpuBuffer.backgroundColor = GetBackgroundColorByXMFLOAT4();
 		m_cbCamera->Update<CameraData>(cpuBuffer);
 		m_cbCamera->Bind();
 	}

@@ -14,13 +14,23 @@ cbuffer MatrixBuffer : register(b0)
     MatrixData cbMatrix;
 }
 
+struct CameraDataVS
+{
+    matrix viewMatrix;
+    matrix projMatrix;
+};
+
+cbuffer CameraVSBuffer : register(b1)
+{
+    CameraDataVS cbCameraVS;
+}
+
 // Pixel Shader =====================================================
 struct CameraData
 {
     float3 position;
     float padding;
-    float4 perspectiveValue;
-    matrix viewInverse;
+    float4 backgroundColor;
 };
 
 cbuffer CameraBuffer : register(b0)

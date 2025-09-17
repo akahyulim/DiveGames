@@ -62,6 +62,11 @@ namespace Dive
 			DV_LOG(ShaderManager, err, "ResolbeSceneVS 생성 실패");
 			return false;
 		}
+		if (!CreateVertexShaderAndInputLayout("Assets/Shaders/GridVS.cso", eInputLayout::None))
+		{
+			DV_LOG(ShaderManager, err, "GridVS 생성 실패");
+			return false;
+		}
 
 		// pixel shader
 		if(!CreatePixelShader("Assets/Shaders/UnlitPS.cso"))
@@ -79,6 +84,11 @@ namespace Dive
 			DV_LOG(ShaderManager, err, "ResolveScenePS 생성 실패");
 			return false;
 		}
+		if (!CreatePixelShader("Assets/Shaders/GridPS.cso"))
+		{
+			DV_LOG(ShaderManager, err, "GridPS 생성 실패");
+			return false;
+		}
 
 		// shader program
 		if(!CreateShaderProgram("UnlitVS", "UnlitPS", "Unlit"))
@@ -94,6 +104,11 @@ namespace Dive
 		if (!CreateShaderProgram("ResolveSceneVS", "ResolveScenePS", "ResolveScene"))
 		{
 			DV_LOG(ShaderManager, err, "ResolveScene ShaderProgram 생성 실패");
+			return false;
+		}
+		if (!CreateShaderProgram("GridVS", "GridPS", "Grid"))
+		{
+			DV_LOG(ShaderManager, err, "Grid ShaderProgram 생성 실패");
 			return false;
 		}
 

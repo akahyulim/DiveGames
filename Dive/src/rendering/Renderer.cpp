@@ -112,6 +112,24 @@ namespace Dive
 				cameraCom->Bind();	// RenerTarget Clear 포함
 				s_lightManager->Bind();
 				
+				// grid
+				{
+					assert(cameraCom);
+					
+					Graphics::GetDeviceContext()->RSSetState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullNone));
+
+					ShaderManager::GetProgram("Grid")->Bind();
+
+					Graphics::GetDeviceContext()->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+					Graphics::GetDeviceContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+					Graphics::GetDeviceContext()->Draw(4, 0);
+				}
+
+				// sky box
+				{
+
+				}
+
 				// Shadow pass
 				{
 

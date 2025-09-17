@@ -19,12 +19,17 @@ namespace Dive
 		Orthographic
 	};
 
+	struct alignas(16) CameraDataVS
+	{
+		DirectX::XMMATRIX View;
+		DirectX::XMMATRIX Proj;
+	};
+
 	struct alignas(16) CameraData
 	{
 		DirectX::XMFLOAT3 position;
 		float padding;
-		DirectX::XMFLOAT3 perspectiveValue;
-		DirectX::XMFLOAT4X4 viewInverse;
+		DirectX::XMFLOAT4 backgroundColor;
 	};
 
 	// https://docs.unity3d.com/ScriptReference/Camera.html
@@ -110,6 +115,7 @@ namespace Dive
 		float m_backgroundColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		RenderTexture* m_renderTarget = nullptr;
 
+		std::unique_ptr<ConstantBuffer> m_cbCameraVS;
 		std::unique_ptr<ConstantBuffer> m_cbCamera;
 
 		static std::vector<Camera*> s_allCameras;
