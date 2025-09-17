@@ -17,25 +17,21 @@ namespace Dive
 	MeshRenderer::MeshRenderer(GameObject* gameObject)
 		: Component(gameObject)
 	{
-		m_gpuBuffer = std::make_unique<ConstantBuffer>(
-			eVSConstantBufferSlot::Object, 
-			static_cast<uint32_t>(sizeof(ObjectData)));
-		if (!m_gpuBuffer) DV_LOG(MeshRenderer, err, "[::MeshRenderer] ConstantBuffer 생성 실패");
+		m_cbObjectVS = std::make_unique<ConstantBuffer>(static_cast<uint32_t>(sizeof(ObjectData)));
+		if (!m_cbObjectVS) DV_LOG(MeshRenderer, err, "[::MeshRenderer] cbObjectVS 생성 실패");
 	}
 
 	MeshRenderer::~MeshRenderer()
 	{
-		m_gpuBuffer.reset();
+		m_cbObjectVS.reset();
 	}
 
 	void MeshRenderer::Render(const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj)
 	{
 		ObjectData objectData{};
-		objectData.model = XMMatrixTranspose(GetGameObject()->GetTransform()->GetTransformMatrix());
-		objectData.View = XMMatrixTranspose(view);
-		objectData.Proj = XMMatrixTranspose(proj);
-		m_gpuBuffer->Update<ObjectData>(objectData);
-		m_gpuBuffer->Bind();
+		objectData.worldMatrix = XMMatrixTranspose(GetGameObject()->GetTransform()->GetTransformMatrix());
+		m_cbObjectVS->Update<ObjectData>(objectData);
+		m_cbObjectVS->BindVS(eCBufferSlotVS::Object);
 
 		m_material->Bind();
 

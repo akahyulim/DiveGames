@@ -20,9 +20,7 @@ namespace Dive
 
 	LightManager::LightManager()
 	{
-		m_cbLights = std::make_unique<ConstantBuffer>(
-			ePSConstantBufferSlot::Light,
-			static_cast<uint32_t>(sizeof(Lights)));
+		m_cbLights = std::make_unique<ConstantBuffer>(static_cast<uint32_t>(sizeof(Lights)));
 		if(!m_cbLights) DV_LOG(LightManager, err, "[::LightManager] Lights Buffer 생성 실패");
 	}
 
@@ -57,6 +55,6 @@ namespace Dive
 		}
 		
 		m_cbLights->Update<Lights>(data);
-		m_cbLights->Bind();
+		m_cbLights->BindPS(eCBufferSlotPS::Light);
 	}
 }

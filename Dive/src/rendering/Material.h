@@ -27,7 +27,7 @@ namespace Dive
 		DirectX::XMFLOAT4 diffuseColor{0.0f, 0.0f, 0.0f, 1.0f};
 		DirectX::XMFLOAT2 tiling{1.0f, 1.0f};
 		DirectX::XMFLOAT2 offset{0.0f, 0.0f};
-		uint32_t textureMask{};
+		uint32_t flags{};
 		uint32_t padding[3]{};
 	};
 
@@ -49,15 +49,15 @@ namespace Dive
 		void SetMap(eMapType type, const std::string& textureName);
 		void SetMap(eMapType type, const std::filesystem::path& filepath);
 
-		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_cpuBuffer.diffuseColor; }
-		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_cpuBuffer.diffuseColor = color; }
-		void SetDiffuseColor(float r, float g, float b, float a) { m_cpuBuffer.diffuseColor = { r, g, b, a }; }
+		DirectX::XMFLOAT4 GetDiffuseColor() const { return m_diffuseColor; }
+		void SetDiffuseColor(const DirectX::XMFLOAT4& color) { m_diffuseColor = color; }
+		void SetDiffuseColor(float r, float g, float b, float a) { m_diffuseColor = { r, g, b, a }; }
 
-		DirectX::XMFLOAT2 GetTiling() const { return m_cpuBuffer.tiling; }
-		void SetTiling(float x, float y) { m_cpuBuffer.tiling = { x, y }; }
+		DirectX::XMFLOAT2 GetTiling() const { return m_tiling; }
+		void SetTiling(float x, float y) { m_tiling = { x, y }; }
 
-		DirectX::XMFLOAT2 GetOffset() const { return m_cpuBuffer.offset; }
-		void SetOffset(float x, float y) { m_cpuBuffer.offset = { x, y }; }
+		DirectX::XMFLOAT2 GetOffset() const { return m_offset; }
+		void SetOffset(float x, float y) { m_offset = { x, y }; }
 
 		std::shared_ptr<ShaderProgram> GetShaderProgram() const { return m_shaderProgram; }
 		void SetShaderProgram(std::shared_ptr<ShaderProgram> program) { m_shaderProgram = program; }
@@ -75,8 +75,12 @@ namespace Dive
 	private:
 		std::array<std::shared_ptr<Texture2D>, static_cast<size_t>(eMapType::Count)> m_maps;
 
-		MaterialData m_cpuBuffer;
-		std::unique_ptr<ConstantBuffer> m_gpuBuffer;
+		DirectX::XMFLOAT4 m_diffuseColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+		DirectX::XMFLOAT2 m_tiling = { 1.0f, 1.0f };
+		DirectX::XMFLOAT2 m_offset = { 0.0f, 0.0f };
+		uint32_t m_flags = 0;
+
+		std::unique_ptr<ConstantBuffer> m_cbMaterialPS;
 
 		std::shared_ptr<ShaderProgram> m_shaderProgram;
 

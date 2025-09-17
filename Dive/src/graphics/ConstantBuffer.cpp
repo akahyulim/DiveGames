@@ -3,16 +3,8 @@
 
 namespace Dive
 {
-	ConstantBuffer::ConstantBuffer(eVSConstantBufferSlot slot, uint32_t stride)
-		: m_vsSlot(slot)
-		, m_shaderStage(eShaderStage::VertexShader)
+	ConstantBuffer::ConstantBuffer(uint32_t stride)
 	{
-		if (slot == eVSConstantBufferSlot::Count)
-		{
-			DV_LOG(ConstantBuffer, err, "[::ConstantBuffer] 잘못된 버퍼 슬롯으로 초기화");
-			return;
-		}
-
 		D3D11_BUFFER_DESC bufferDesc{};
 		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 		bufferDesc.ByteWidth = static_cast<UINT>(stride);
@@ -23,45 +15,19 @@ namespace Dive
 		if (FAILED(hr))	DV_LOG(ConstantBuffer, err, "[::ConstantBuffer] CreateBuffer 실패: {}", ErrorUtils::ToVerbose(hr));
 	}
 
-	ConstantBuffer::ConstantBuffer(ePSConstantBufferSlot slot, uint32_t stride)
-		: m_psSlot(slot)
-		, m_shaderStage(eShaderStage::PixelShader)
+	void ConstantBuffer::BindVS(eCBufferSlotVS slot)
 	{
-		if (slot == ePSConstantBufferSlot::Count)
-		{
-			DV_LOG(ConstantBuffer, err, "[::ConstantBuffer] 잘못된 버퍼 슬롯으로 초기화");
-			return;
-		}
+		assert(m_buffer);
+		assert(slot < eCBufferSlotVS::Count);
 
-		D3D11_BUFFER_DESC bufferDesc{};
-		bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-		bufferDesc.ByteWidth = static_cast<UINT>(stride);
-		bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-
-		auto hr = Graphics::GetDevice()->CreateBuffer(&bufferDesc, nullptr, &m_buffer);
-		if (FAILED(hr))	DV_LOG(ConstantBuffer, err, "[::ConstantBuffer] CreateBuffer 실패: {}", ErrorUtils::ToVerbose(hr));
+		Graphics::GetDeviceContext()->VSSetConstantBuffers(static_cast<UINT>(slot), 1, m_buffer.GetAddressOf());
 	}
-
-	void ConstantBuffer::Bind()
+	
+	void ConstantBuffer::BindPS(eCBufferSlotPS slot)
 	{
-		if (!m_buffer)
-		{
-			DV_LOG(ConstantBuffer, err, "[::Bind] 버퍼 미생성");
-			return;
-		}
+		assert(m_buffer);
+		assert(slot < eCBufferSlotPS::Count);
 
-		switch (m_shaderStage)
-		{
-		case eShaderStage::VertexShader:
-			Graphics::GetDeviceContext()->VSSetConstantBuffers(static_cast<UINT>(m_vsSlot), 1, m_buffer.GetAddressOf());
-			break;
-		case eShaderStage::PixelShader:
-			Graphics::GetDeviceContext()->PSSetConstantBuffers(static_cast<UINT>(m_psSlot), 1, m_buffer.GetAddressOf());
-			break;
-		default:
-			DV_LOG(ConstantBuffer, err, "[::Bind] 잘못된 셰이더 스테이지 적용");
-			break;
-		}
+		Graphics::GetDeviceContext()->PSSetConstantBuffers(static_cast<UINT>(slot), 1, m_buffer.GetAddressOf());
 	}
 }

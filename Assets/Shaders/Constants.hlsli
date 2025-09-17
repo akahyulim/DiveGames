@@ -1,92 +1,70 @@
 #define MAX_LIGHTS 16
 
-
-// Vertex Shader ====================================================
-struct MatrixData
-{
-    matrix modelMatrix;
-    matrix viewMatrix;
-    matrix projMatrix;    
-};
-
-cbuffer MatrixBuffer : register(b0)
-{
-    MatrixData cbMatrix;
-}
-
-struct CameraDataVS
+// Common ===========================================================
+struct Camera
 {
     matrix viewMatrix;
     matrix projMatrix;
-};
-
-cbuffer CameraVSBuffer : register(b1)
-{
-    CameraDataVS cbCameraVS;
-}
-
-// Pixel Shader =====================================================
-struct CameraData
-{
-    float3 position;
-    float padding;
+    matrix viewProjMatrix;
+    float4 position;
     float4 backgroundColor;
 };
 
 cbuffer CameraBuffer : register(b0)
 {
-    CameraData cbCamera;
+    Camera cbCamera;
 }
 
-struct MaterialData
+// Vertex Shader ====================================================
+struct ObjectVS
+{
+    matrix worldMatrix;
+};
+
+cbuffer ObjectBuffer : register(b1)
+{
+    ObjectVS cbObjectVS;
+}
+
+
+// Pixel Shader =====================================================
+struct MaterialPS
 {
     float4 diffuseColor;
     float2 tiling;
     float2 offset;
-    uint properties;
+    uint flags;
     uint3 padding;
 };
 
 cbuffer MaterialBuffer : register(b1)
 {
-    MaterialData cbMaterial;
+    MaterialPS cbMaterialPS;
 }
 
-bool HasDiffuseMap()
-{
-    return cbMaterial.properties & uint(1U << 0);
-}
+bool HasDiffuseMap()  { return cbMaterialPS.flags & (1 << 0); }
+bool HasNormalMap()   { return cbMaterialPS.flags & (1 << 1); }
 
-bool HasNormalMap()
-{
-    return cbMaterial.properties & uint(1U << 1);
-}
-
-struct LightData
+struct Light
 {
     uint type;
     float3 color;
-
     float intensity;
     float3 position;
-
     float rangeRcp;
     float3 direction;
-
     float innerAngle;
     float outerAngle;
-    float2 padding;
 };
 
-struct ForwardLight
+struct ForwardLightPS
 {
     float4 ambientColor;
     int lightCount;
-    float3 padding;
-    LightData lights[MAX_LIGHTS];
+    Light lights[MAX_LIGHTS];
 };
 
 cbuffer ForwardLightBuffer : register(b2)
 {
-    ForwardLight cbForwardLight;
+    ForwardLightPS cbForwardLightPS;
 }

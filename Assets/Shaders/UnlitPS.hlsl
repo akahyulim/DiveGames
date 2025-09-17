@@ -10,5 +10,5 @@ struct PSInput
 float4 MainPS(PSInput input) : SV_TARGET
 {
     return HasDiffuseMap() ?
-        DiffuseMap.Sample(WrapLinearSampler, input.UV) * cbMaterial.diffuseColor : cbMaterial.diffuseColor;
+        DiffuseMap.Sample(WrapLinearSampler, input.UV) * cbMaterialPS.diffuseColor : cbMaterialPS.diffuseColor;
 }

@@ -19,16 +19,12 @@ namespace Dive
 		Orthographic
 	};
 
-	struct alignas(16) CameraDataVS
-	{
-		DirectX::XMMATRIX View;
-		DirectX::XMMATRIX Proj;
-	};
-
 	struct alignas(16) CameraData
 	{
-		DirectX::XMFLOAT3 position;
-		float padding;
+		DirectX::XMMATRIX viewMatrix;
+		DirectX::XMMATRIX projMatrix;
+		DirectX::XMMATRIX viewProjMatrix;
+		DirectX::XMFLOAT4 cameraPosition;
 		DirectX::XMFLOAT4 backgroundColor;
 	};
 
@@ -41,7 +37,7 @@ namespace Dive
 
 		void Update() override;
 
-		void Bind() const;
+		void Bind();
 
 		DirectX::XMFLOAT4X4 GetView() const;
 		DirectX::XMMATRIX GetViewMatrix() const;
@@ -78,8 +74,6 @@ namespace Dive
 
 		const Frustum& GetFrustum() const { return m_frustum; }
 
-		// 추후 const로 다시 바꾸고 DirectX::XMFLOAT3를 리턴하는 걸 추가하자.
-		//=> 이 부분 때문에 직렬화가 오류난다.
 		const float* GetBackgroundColor() const { return m_backgroundColor; }
 		DirectX::XMFLOAT4 GetBackgroundColorByXMFLOAT4() const;
 		void SetBackgroundColor(float r, float g, float b, float a);
@@ -115,7 +109,6 @@ namespace Dive
 		float m_backgroundColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		RenderTexture* m_renderTarget = nullptr;
 
-		std::unique_ptr<ConstantBuffer> m_cbCameraVS;
 		std::unique_ptr<ConstantBuffer> m_cbCamera;
 
 		static std::vector<Camera*> s_allCameras;

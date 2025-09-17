@@ -4,42 +4,34 @@
 
 namespace Dive
 {
-	enum class eShaderStage
+	enum class eCBufferSlotVS : uint8_t
 	{
-		VertexShader,
-		PixelShader,
-	};
-
-	enum class eVSConstantBufferSlot : uint8_t
-	{
-		Object,
-		Frame,
+		Camera = 0,
+		Object = 1,
 		Count
 	};
 
-	enum class ePSConstantBufferSlot : uint8_t
+	enum class eCBufferSlotPS : uint8_t
 	{
-		Camera,
-		Material,
-		Light,
+		Camera = 0,
+		Material = 1,
+		Light = 2,
 		Count
 	};
 
 	class ConstantBuffer
 	{
 	public:
-		ConstantBuffer(eVSConstantBufferSlot slot, uint32_t stride);
-		ConstantBuffer(ePSConstantBufferSlot slot, uint32_t stride);
+		ConstantBuffer(uint32_t stride);
 
 		template<typename T>
 		bool Update(const T& data);
-		void Bind();
+		
+		void BindVS(eCBufferSlotVS slot);
+		void BindPS(eCBufferSlotPS slot);
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_buffer;
-		eVSConstantBufferSlot m_vsSlot = eVSConstantBufferSlot::Count;
-		ePSConstantBufferSlot m_psSlot = ePSConstantBufferSlot::Count;
-		eShaderStage m_shaderStage;
 	};
 
 	template<typename T>

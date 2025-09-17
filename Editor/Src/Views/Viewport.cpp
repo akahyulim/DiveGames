@@ -1,4 +1,4 @@
-﻿#include "WorldView.h"
+﻿#include "Viewport.h"
 #include "../MenuBar.h"
 #include "../Editor.h"
 
@@ -8,14 +8,14 @@ namespace Dive
 	constexpr float MIN_SPEED = 0.5f;
 	constexpr float MAX_SPEED = 99.0f;
 
-	WorldView::WorldView(Editor* editor)
+	Viewport::Viewport(Editor* editor)
 		: View(editor)
 	{
-		m_title = "World";
+		m_title = "View";
 		m_flags |= ImGuiWindowFlags_NoScrollbar;
 	}
 
-	void WorldView::SetCameraSpeed(float speed)
+	void Viewport::SetCameraSpeed(float speed)
 	{
 		if (speed < MIN_SPEED)
 			m_cameraSpeed = MIN_SPEED;
@@ -25,13 +25,13 @@ namespace Dive
 			m_cameraSpeed = speed;
 	}
 
-	void WorldView::AddCameraSpeed(int delta)
+	void Viewport::AddCameraSpeed(int delta)
 	{
 		float speed = m_cameraSpeed + static_cast<float>(delta);
 		SetCameraSpeed(speed);
 	}
 
-	void WorldView::renderContent()
+	void Viewport::renderContent()
 	{
 		if (!EditorContext::ActiveWorld || !EditorContext::EditorCamera)
 			return;
@@ -62,7 +62,7 @@ namespace Dive
 		ImGui::Image(textureID, ImVec2(m_width, m_height));		
 	}
 
-	void WorldView::cameraControll()
+	void Viewport::cameraControll()
 	{
 		if (ImGui::IsWindowFocused())
 		{

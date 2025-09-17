@@ -12,9 +12,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\views\GameView.cpp">
-      <Filter>Views</Filter>
-    </ClCompile>
     <ClCompile Include="src\views\HierarchyView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
@@ -24,7 +21,7 @@
     <ClCompile Include="src\views\View.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\views\WorldView.cpp">
+    <ClCompile Include="src\views\Viewport.cpp">
       <Filter>Views</Filter>
     </ClCompile>
     <ClCompile Include="src\views\LogView.cpp">
@@ -58,9 +55,6 @@
     <ClCompile Include="src\Editor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\views\GameView.h">
-      <Filter>Views</Filter>
-    </ClInclude>
     <ClInclude Include="src\views\HierarchyView.h">
       <Filter>Views</Filter>
     </ClInclude>
@@ -70,7 +64,7 @@
     <ClInclude Include="src\views\View.h">
       <Filter>Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\views\WorldView.h">
+    <ClInclude Include="src\views\Viewport.h">
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="src\views\LogView.h">

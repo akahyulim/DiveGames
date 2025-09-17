@@ -18,18 +18,17 @@ VSOutput MainVS(VSInput_Lit input)
     float4 position = input.Position;
     position.w = 1.0f;
     
-    output.Position = mul(position, cbMatrix.modelMatrix);
+    output.Position = mul(position, cbObjectVS.worldMatrix);
     output.WorldPos = output.Position.xyz;
-    output.Position = mul(output.Position, cbMatrix.viewMatrix);
-    output.Position = mul(output.Position, cbMatrix.projMatrix);
+    output.Position = mul(output.Position, cbCamera.viewProjMatrix);
 
     output.UV = input.UV;
 
-    output.Normal = mul(input.Normal, (float3x3)cbMatrix.modelMatrix);
+    output.Normal = mul(input.Normal, (float3x3)cbObjectVS.worldMatrix);
     output.Normal = normalize(output.Normal);
-    output.Tangent = mul(input.Tangent, (float3x3)cbMatrix.modelMatrix);
+    output.Tangent = mul(input.Tangent, (float3x3)cbObjectVS.worldMatrix);
     output.Tangent = normalize(output.Tangent);
-    output.BiNormal = mul(input.BiNormal, (float3x3)cbMatrix.modelMatrix);
+    output.BiNormal = mul(input.BiNormal, (float3x3)cbObjectVS.worldMatrix);
     output.BiNormal = normalize(output.BiNormal);
     
     return output;

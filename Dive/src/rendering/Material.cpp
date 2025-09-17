@@ -11,10 +11,8 @@ namespace Dive
 {
     Material::Material()
     {
-        m_gpuBuffer = std::make_unique<ConstantBuffer>(
-            ePSConstantBufferSlot::Material, 
-            static_cast<uint32_t>(sizeof(MaterialData)));
-        if (!m_gpuBuffer) DV_LOG(Material, err, "[::Material] ConstantBuffer 생성 실패");
+        m_cbMaterialPS = std::make_unique<ConstantBuffer>(static_cast<uint32_t>(sizeof(MaterialData)));
+        if (!m_cbMaterialPS) DV_LOG(Material, err, "[::Material] cbMaterialPS 생성 실패");
 
         m_maps.fill(nullptr);
         
@@ -49,9 +47,9 @@ namespace Dive
        
         if (data["DiffuseMap"])     SetMap(eMapType::Diffuse, data["DiffuseMap"].as<std::string>());
         if (data["NormalMap"])      SetMap(eMapType::Normal, data["NormalMap"].as<std::string>()); 
-        if (data["DiffuseColor"])   m_cpuBuffer.diffuseColor = data["DiffuseColor"].as<DirectX::XMFLOAT4>();
-        if (data["Tiling"])         m_cpuBuffer.tiling = data["Tiling"].as<DirectX::XMFLOAT2>();
-        if (data["Offset"])         m_cpuBuffer.offset = data["Offset"].as<DirectX::XMFLOAT2>();
+        if (data["DiffuseColor"])   m_diffuseColor = data["DiffuseColor"].as<DirectX::XMFLOAT4>();
+        if (data["Tiling"])         m_tiling = data["Tiling"].as<DirectX::XMFLOAT2>();
+        if (data["Offset"])         m_offset = data["Offset"].as<DirectX::XMFLOAT2>();
 
         return true;
     }
@@ -73,9 +71,9 @@ namespace Dive
 
         out << YAML::Key << "DiffuseMap" << YAML::Value << diffuseTexture;
         out << YAML::Key << "NormalMap" << YAML::Value << normalTexture;
-        out << YAML::Key << "DiffuseColor" << YAML::Value << m_cpuBuffer.diffuseColor;
-        out << YAML::Key << "Tiling" << YAML::Value << m_cpuBuffer.tiling;
-        out << YAML::Key << "Offset" << YAML::Value << m_cpuBuffer.offset;
+        out << YAML::Key << "DiffuseColor" << YAML::Value << m_diffuseColor;
+        out << YAML::Key << "Tiling" << YAML::Value << m_tiling;
+        out << YAML::Key << "Offset" << YAML::Value << m_offset;
 
         out << YAML::EndMap;
 
@@ -100,8 +98,14 @@ namespace Dive
             m_maps[static_cast<size_t>(eMapType::Normal)]->Bind(eShaderResourceSlot::NormalMap);
 
         // constant buffer
-        m_gpuBuffer->Update<MaterialData>(m_cpuBuffer);
-        m_gpuBuffer->Bind();
+        MaterialData data{};
+        data.diffuseColor = m_diffuseColor;
+        data.tiling = m_tiling;
+        data.offset = m_offset;
+        data.flags = m_flags;
+
+        m_cbMaterialPS->Update<MaterialData>(data);
+        m_cbMaterialPS->BindPS(eCBufferSlotPS::Material);
     }
 
     std::shared_ptr<Texture2D> Material::GetMap(eMapType type)
@@ -128,10 +132,10 @@ namespace Dive
         switch (type)
         {
         case eMapType::Diffuse:
-            m_cpuBuffer.textureMask = m_maps[static_cast<size_t>(type)] ? (1U << 0) : 0;
+            m_flags = m_maps[static_cast<size_t>(type)] ? (1U << 0) : 0;
             break;
         case eMapType::Normal:
-            m_cpuBuffer.textureMask = m_maps[static_cast<size_t>(type)] ? (1U << 1) : 0;
+            m_flags = m_maps[static_cast<size_t>(type)] ? (1U << 1) : 0;
             break;
         default:
             break;
@@ -153,10 +157,10 @@ namespace Dive
         switch (type)
         {
         case eMapType::Diffuse:
-            m_cpuBuffer.textureMask |= mapTexture ? (1U << 0) : 0;
+            m_flags |= mapTexture ? (1U << 0) : 0;
             break;
         case eMapType::Normal:
-            m_cpuBuffer.textureMask |= mapTexture ? (1U << 1) : 0;
+            m_flags |= mapTexture ? (1U << 1) : 0;
             break;
         default:
             break;
@@ -177,10 +181,10 @@ namespace Dive
         switch (type)
         {
         case eMapType::Diffuse:
-            m_cpuBuffer.textureMask |= mapTexture ? (1U << 0) : 0;
+            m_flags |= mapTexture ? (1U << 0) : 0;
             break;
         case eMapType::Normal:
-            m_cpuBuffer.textureMask |= mapTexture ? (1U << 1) : 0;
+            m_flags |= mapTexture ? (1U << 1) : 0;
             break;
         default:
             break;

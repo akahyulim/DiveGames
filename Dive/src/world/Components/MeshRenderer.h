@@ -11,9 +11,7 @@ namespace Dive
 
 	struct alignas(16) ObjectData
 	{
-		DirectX::XMMATRIX model;
-		DirectX::XMMATRIX View;
-		DirectX::XMMATRIX Proj;
+		DirectX::XMMATRIX worldMatrix;
 	};
 
 	class MeshRenderer : public Component
@@ -37,6 +35,6 @@ namespace Dive
 		std::shared_ptr<StaticMesh> m_staticMesh;
 		std::shared_ptr<Material> m_material;
 
-		std::unique_ptr<ConstantBuffer> m_gpuBuffer;
+		std::unique_ptr<ConstantBuffer> m_cbObjectVS;
 	};
 }

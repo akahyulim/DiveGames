@@ -23,15 +23,8 @@ namespace Dive
 	{
 		s_allCameras.push_back(this);
 
-		m_cbCameraVS = std::make_unique<ConstantBuffer>(
-			eVSConstantBufferSlot::Frame,	// 임시.. 1이라서 상관은 없다.
-			static_cast<uint32_t>(sizeof(CameraDataVS)));
-		if (!m_cbCameraVS) DV_LOG(MeshRenderer, err, "[::Camera] Camera Buffer 생성 실패");
-
-		m_cbCamera = std::make_unique<ConstantBuffer>(
-			ePSConstantBufferSlot::Camera,
-			static_cast<uint32_t>(sizeof(CameraData)));
-		if (!m_cbCamera) DV_LOG(MeshRenderer, err, "[::Camera] Camera Buffer 생성 실패");
+		m_cbCamera = std::make_unique<ConstantBuffer>(static_cast<uint32_t>(sizeof(CameraData)));
+		if (!m_cbCamera) DV_LOG(MeshRenderer, err, "[::Camera] cbCamera 생성 실패");
 
 		m_viewport.TopLeftX = 0.0f;
 		m_viewport.TopLeftY = 0.0f;
@@ -57,13 +50,26 @@ namespace Dive
 		m_frustum.Update(GetView(), GetProjection());
 	}
 
-	void Camera::Bind() const
+	void Camera::Bind()
 	{
-		CameraDataVS objectData{};
-		objectData.View = XMMatrixTranspose(GetViewMatrix());
-		objectData.Proj = XMMatrixTranspose(GetProjectionMatrix());
-		m_cbCameraVS->Update<CameraDataVS>(objectData);
-		m_cbCameraVS->Bind();
+		CameraData data{};
+
+		const auto view = GetViewMatrix();
+		const auto proj = GetProjectionMatrix();
+		const auto viewProj = view * proj;
+
+		data.viewMatrix = XMMatrixTranspose(view);
+		data.projMatrix = XMMatrixTranspose(proj);
+		data.viewProjMatrix = XMMatrixTranspose(viewProj);
+
+		const auto& pos = GetTransform()->GetPosition();
+		data.cameraPosition = XMFLOAT4(pos.x, pos.y, pos.z, 1.0f);
+
+		data.backgroundColor = GetBackgroundColorByXMFLOAT4();
+
+		m_cbCamera->Update<CameraData>(data);
+		m_cbCamera->BindVS(eCBufferSlotVS::Camera);
+		m_cbCamera->BindPS(eCBufferSlotPS::Camera);
 
 		auto rtv = m_renderTarget ? m_renderTarget->GetRenderTargetView() : Graphics::GetRenderTargetView();
 		auto dsv = m_renderTarget? m_renderTarget->GetDepthStencilView() : Graphics::GetDepthStencilView();
@@ -72,13 +78,9 @@ namespace Dive
 		Graphics::GetDeviceContext()->ClearRenderTargetView(rtv, m_backgroundColor);
 		Graphics::GetDeviceContext()->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
+		// RenderTarget이 Resize되면 Viewport도 달라져야 한다.
+		SetViewport(0.0f, 0.0f, static_cast<float>(m_renderTarget->GetWidth()), static_cast<float>(m_renderTarget->GetHeight()));
 		Graphics::GetDeviceContext()->RSSetViewports(1, &m_viewport);
-
-		CameraData cpuBuffer{};
-		cpuBuffer.position = GetTransform()->GetPosition();
-		cpuBuffer.backgroundColor = GetBackgroundColorByXMFLOAT4();
-		m_cbCamera->Update<CameraData>(cpuBuffer);
-		m_cbCamera->Bind();
 	}
 
 	DirectX::XMFLOAT4X4 Camera::GetView() const

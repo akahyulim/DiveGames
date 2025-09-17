@@ -3,11 +3,11 @@
 
 namespace Dive
 {
-	class WorldView : public View
+	class Viewport : public View
 	{
 	public:
-		WorldView(Editor* editor);
-		~WorldView() override = default;
+		Viewport(Editor* editor);
+		~Viewport() override = default;
 
 		float GetCameraSpeed() const { return m_cameraSpeed; }
 		void SetCameraSpeed(float speed);

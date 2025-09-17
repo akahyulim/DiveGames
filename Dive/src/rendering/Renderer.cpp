@@ -102,6 +102,10 @@ namespace Dive
 			//if (cameraCom->GetGameObject()->GetTag() == "EditorOnly")
 			//	continue;
 
+			// editor mode일때
+			if (cameraCom->GetGameObject()->GetTag() == "MainCamera")
+				continue;
+
 			WorldManager::GetActiveWorld()->CullAndSort(cameraCom);
 			// 위치가 애매하다. 하지만 바로 위에서 업데이트된 후에 호출하는 게 맞다.
 			s_lightManager->Update(WorldManager::GetActiveWorld());
@@ -112,19 +116,6 @@ namespace Dive
 				cameraCom->Bind();	// RenerTarget Clear 포함
 				s_lightManager->Bind();
 				
-				// grid
-				{
-					assert(cameraCom);
-					
-					Graphics::GetDeviceContext()->RSSetState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullNone));
-
-					ShaderManager::GetProgram("Grid")->Bind();
-
-					Graphics::GetDeviceContext()->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
-					Graphics::GetDeviceContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-					Graphics::GetDeviceContext()->Draw(4, 0);
-				}
-
 				// sky box
 				{
 

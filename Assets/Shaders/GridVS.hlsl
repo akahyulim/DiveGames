@@ -19,8 +19,8 @@ PSInput MainVS(uint VertexID : SV_VertexID)
     PSInput output;
     float3 pos = arrBasePos[VertexID] * 100.0;
     output.worldPos = pos;
-    output.position = mul(float4(pos, 1.0f), cbCameraVS.viewMatrix);
-    output.position = mul(output.position, cbCameraVS.projMatrix);
+    output.position = mul(float4(pos, 1.0f), cbCamera.viewMatrix);
+    output.position = mul(output.position, cbCamera.projMatrix);
     
     return output;
 }

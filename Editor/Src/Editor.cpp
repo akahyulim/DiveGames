@@ -1,7 +1,6 @@
 ﻿#include "Editor.h"
 #include "MenuBar.h"
-#include "views/WorldView.h"
-#include "views/GameView.h"
+#include "views/Viewport.h"
 #include "views/HierarchyView.h"
 #include "views/InspectorView.h"
 
@@ -70,7 +69,7 @@ namespace Dive
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
 			io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 			io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-			io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-WorldView / Platform Windows
+			io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
 			// Setup Dear ImGui style
 			ImGui::StyleColorsDark();
@@ -158,8 +157,7 @@ namespace Dive
 		}
 
 		// create views
-		m_views.emplace_back(std::make_unique<WorldView>(this));
-		//m_views.emplace_back(std::make_unique<GameView>(this));
+		m_views.emplace_back(std::make_unique<Viewport>(this));
 		m_views.emplace_back(std::make_unique<HierarchyView>(this));
 		m_views.emplace_back(std::make_unique<InspectorView>(this));
 		//m_views.emplace_back(std::make_unique<LogView>(this));
