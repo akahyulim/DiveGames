@@ -70,7 +70,8 @@ namespace Dive
 
 		bool IsTransparent() const;
 
-		static constexpr eResourceType GetType() { return eResourceType::Material; }
+		eResourceType GetType() override { return eResourceType::Material; }
+		static constexpr eResourceType StaticType() { return eResourceType::Material; }
 
 	private:
 		std::array<std::shared_ptr<Texture2D>, static_cast<size_t>(eMapType::Count)> m_maps;

@@ -11,7 +11,7 @@ namespace Dive
 
 	struct alignas(16) ObjectData
 	{
-		DirectX::XMMATRIX worldMatrix;
+		DirectX::XMFLOAT4X4 worldMatrix;
 	};
 
 	class MeshRenderer : public Component

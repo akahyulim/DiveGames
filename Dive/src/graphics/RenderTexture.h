@@ -26,7 +26,8 @@ namespace Dive
 		ID3D11DepthStencilView* GetDepthStencilView() const { return m_depthDSV.Get(); }
 		ID3D11ShaderResourceView* GetDepthStencilShaderResourceView() const { return m_depthSRV.Get(); }
 
-		static constexpr eResourceType GetType() { return eResourceType::RenderTexture; }
+		eResourceType GetType() override { return eResourceType::RenderTexture; }
+		static constexpr eResourceType StaticType() { return eResourceType::RenderTexture; }
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;

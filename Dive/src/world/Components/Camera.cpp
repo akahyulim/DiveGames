@@ -53,21 +53,18 @@ namespace Dive
 	void Camera::Bind()
 	{
 		CameraData data{};
-
-		const auto view = GetViewMatrix();
-		const auto proj = GetProjectionMatrix();
-		const auto viewProj = view * proj;
-
-		data.viewMatrix = XMMatrixTranspose(view);
-		data.projMatrix = XMMatrixTranspose(proj);
-		data.viewProjMatrix = XMMatrixTranspose(viewProj);
-
+		
+		XMStoreFloat4x4(&data.viewMatrix, XMMatrixTranspose(GetViewMatrix()));
+		XMStoreFloat4x4(&data.projMatrix, XMMatrixTranspose(GetProjectionMatrix()));
+		XMStoreFloat4x4(&data.viewProjMatrix, XMMatrixTranspose(GetViewMatrix() * GetProjectionMatrix()));
+		
 		const auto& pos = GetTransform()->GetPosition();
 		data.cameraPosition = XMFLOAT4(pos.x, pos.y, pos.z, 1.0f);
-
+		
 		data.backgroundColor = GetBackgroundColorByXMFLOAT4();
 
 		m_cbCamera->Update<CameraData>(data);
+
 		m_cbCamera->BindVS(eCBufferSlotVS::Camera);
 		m_cbCamera->BindPS(eCBufferSlotPS::Camera);
 
@@ -85,64 +82,46 @@ namespace Dive
 
 	DirectX::XMFLOAT4X4 Camera::GetView() const
 	{
-		auto transform = GetGameObject()->GetTransform();
-
-		XMFLOAT3 position = transform->GetPosition();
-		XMVECTOR positionVec = XMLoadFloat3(&position);
-
-		XMFLOAT3 forward = transform->GetForward();
-		XMVECTOR forwardVec = XMLoadFloat3(&forward);
-		
-		XMFLOAT3 up = transform->GetUp();
-		XMVECTOR upVec = XMLoadFloat3(&up);
-
-		XMMATRIX viewMatrix = XMMatrixLookToLH(positionVec, forwardVec, upVec);
-		XMFLOAT4X4 view{};
-		XMStoreFloat4x4(&view, viewMatrix);	
-
-		return view;
+		XMFLOAT4X4 result;
+		XMStoreFloat4x4(&result, GetViewMatrix());
+		return result;
 	}
 
 	DirectX::XMMATRIX Camera::GetViewMatrix() const
 	{
-		auto view = GetView();
-		return XMLoadFloat4x4(&view);
+		auto transform = GetGameObject()->GetTransform();
+		assert(transform);
+
+		return XMMatrixLookToLH(transform->GetPositionVector(), transform->GetLocalForward(), transform->GetLocalUp());
 	}
 
 	DirectX::XMFLOAT4X4 Camera::GetProjection() const
 	{
-		XMFLOAT4X4 projection{};
-
-		if (m_projectionType == eProjectionType::Perspective)
-		{
-			auto projectionMatrix =  XMMatrixPerspectiveFovLH(
-				3.141592654f / 4.0f,//XMConvertToRadians(m_fieldOfView),
-				GetAspectRatio(),
-				m_nearClipPlane,
-				m_farClipPlane);
-
-			XMStoreFloat4x4(&projection, projectionMatrix);
-		}
-		else if (m_projectionType == eProjectionType::Orthographic)
-		{
-			// 코파일럿이 작성한  코드다.
-			// width, height가 맞는지 모르겠다.
-			auto projectionMatrix = XMMatrixOrthographicLH(
-				GetAspectRatio() * m_farClipPlane,
-				m_farClipPlane,
-				m_nearClipPlane,
-				m_farClipPlane);
-
-			XMStoreFloat4x4(&projection, projectionMatrix);
-		}
-
-		return projection;
+		XMFLOAT4X4 result;
+		XMStoreFloat4x4(&result, GetProjectionMatrix());
+		return result;
 	}
 
 	DirectX::XMMATRIX Camera::GetProjectionMatrix() const
 	{
-		auto projection = GetProjection();
-		return XMLoadFloat4x4(&projection);
+		if (m_projectionType == eProjectionType::Perspective)
+		{
+			return XMMatrixPerspectiveFovLH(
+				XMConvertToRadians(m_fieldOfView),
+				GetAspectRatio(),
+				m_nearClipPlane,
+				m_farClipPlane);
+		}
+		else
+		{		
+			// 코파일럿이 작성한  코드다.
+			// width, height가 맞는지 모르겠다.
+			return XMMatrixOrthographicLH(
+				GetAspectRatio() * m_farClipPlane,
+				m_farClipPlane,
+				m_nearClipPlane,
+				m_farClipPlane);
+		}
 	}
 
 	float Camera::GetAspectRatio() const

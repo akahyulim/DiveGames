@@ -2,7 +2,8 @@
 SamplerState WrapLinearSampler : register(s0);
 SamplerState ClampPointSampler : register(s1);
 SamplerState ClampLinearSampler : register(s2);
-SamplerState ShadowCompare : register(s3);
+SamplerState SkyboxSampler : register(s2);
+SamplerState ShadowCompare : register(s4);
 
 // Material Textures (t0 ~ t5)
 Texture2D DiffuseMap : register(t0);
@@ -22,7 +23,7 @@ Texture2D<uint> GBuffer_MaterialID : register(t15);
 
 // Shadow & Lighting Maps (t20 ~ t25)
 Texture2D<float> ShadowMap : register(t20);
-Texture2D<float> SSAOMap : register(t21);
+TextureCube Skymap : register(t21);
 TextureCube<float4> EnvironmentMap : register(t22);
 TextureCube<float3> IBL_Irradiance : register(t23);
 TextureCube<float3> IBL_Specular : register(t24);

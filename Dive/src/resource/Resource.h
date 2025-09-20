@@ -26,7 +26,8 @@ namespace Dive
 		virtual bool LoadFromFile(const std::filesystem::path& path) { return true; }
 		virtual bool SaveToFile(const std::filesystem::path& path) { return true; }
 
-		static constexpr eResourceType GetType() { return eResourceType::Undefined; }
+		virtual eResourceType GetType() { return eResourceType::Undefined; }
+		static constexpr eResourceType StaticType() { return eResourceType::Undefined; }
 
 		std::string GetName() const override;
 		void SetName(const std::string& name) override;

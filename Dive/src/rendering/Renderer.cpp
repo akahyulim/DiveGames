@@ -16,6 +16,7 @@
 
 #include "resource/ResourceManager.h"
 #include "graphics/Texture2D.h"
+#include "graphics/Cubemap.h"
 
 namespace Dive
 {
@@ -118,7 +119,17 @@ namespace Dive
 				
 				// sky box
 				{
+					Graphics::GetDeviceContext()->OMSetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::Skybox), 0);
+					Graphics::GetDeviceContext()->RSSetState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullFront));
+					
+					auto cubemap = ResourceManager::GetByName<Cubemap>("cloudy_skybox");
+					cubemap->Bind(eShaderResourceSlot::SkyMap);
 
+					ShaderManager::GetProgram("Skybox")->Bind();
+
+					Graphics::GetDeviceContext()->IASetVertexBuffers(0, 0, NULL, NULL, NULL);
+					Graphics::GetDeviceContext()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+					Graphics::GetDeviceContext()->Draw(36, 0);
 				}
 
 				// Shadow pass
@@ -267,18 +278,26 @@ namespace Dive
 	{
 		D3D11_RASTERIZER_DESC desc{};
 
-		// FillSolid_CullBack
-		desc.AntialiasedLineEnable = FALSE;
-		desc.CullMode = D3D11_CULL_BACK;
+		// FillSolid_CullFront
+		desc.FillMode = D3D11_FILL_SOLID;
+		desc.CullMode = D3D11_CULL_FRONT;
+		desc.FrontCounterClockwise = TRUE;
 		desc.DepthBias = 0;
 		desc.DepthBiasClamp = 0.0f;
-		desc.DepthClipEnable = TRUE;
-		desc.FillMode = D3D11_FILL_SOLID;
-		desc.FrontCounterClockwise = FALSE;
-		desc.MultisampleEnable = FALSE;
-		desc.ScissorEnable = FALSE;
 		desc.SlopeScaledDepthBias = 0.0f;
+		desc.DepthClipEnable = TRUE;
+		desc.ScissorEnable = FALSE;
+		desc.MultisampleEnable = FALSE;
+		desc.AntialiasedLineEnable = FALSE;
 
+		if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &s_rasterizerStates[static_cast<size_t>(eRasterizerState::FillSolid_CullFront)])))
+		{
+			DV_LOG(Renderer, err, "RasterizerState FillSolid_CullFront 생성 실패");
+		}
+
+		// FillSolid_CullBack
+		desc.FrontCounterClockwise = FALSE;
+		desc.CullMode = D3D11_CULL_BACK;
 		if (FAILED(Graphics::GetDevice()->CreateRasterizerState(&desc, &s_rasterizerStates[static_cast<size_t>(eRasterizerState::FillSolid_CullBack)])))
 		{
 			DV_LOG(Renderer, err, "RasterizerState FillSolid_CullBack 생성 실패");
@@ -361,7 +380,6 @@ namespace Dive
 			}
 		}
 
-		// skydome에서 depth off용
 		{
 			ZeroMemory(&desc, sizeof(desc));
 			desc.DepthEnable = FALSE;
@@ -415,6 +433,22 @@ namespace Dive
 				DV_LOG(Renderer, err, "[::CreateDepthStencilStates] Transparent 생성 실패: {}", ErrorUtils::ToVerbose(hr));
 				return;
 			}
+		}
+
+		{
+			ZeroMemory(&desc, sizeof(desc));
+			desc.DepthEnable = FALSE;
+			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+			desc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+			desc.StencilEnable = FALSE;
+
+			auto hr = Graphics::GetDevice()->CreateDepthStencilState(&desc, &s_depthStencilStates[static_cast<size_t>(eDepthStencilState::Skybox)]);
+			if (FAILED(hr))
+			{
+				DV_LOG(Renderer, err, "[::CreateDepthStencilStates] Skybox 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return;
+			}
+
 		}
 	}
 
@@ -515,7 +549,7 @@ namespace Dive
 			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::WrapLinear)].GetAddressOf());
 			if (FAILED(hr))
 			{
-				DV_LOG(Renderer, err, "[::CreateSamplerStates] WrapLinear SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Renderer, err, "[::CreateSamplerStates] WrapLinear Sampler 생성 실패: {}", ErrorUtils::ToVerbose(hr));
 				return;
 			}
 		}
@@ -531,7 +565,7 @@ namespace Dive
 			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::ClampPoint)].GetAddressOf());
 			if (FAILED(hr))
 			{
-				DV_LOG(Renderer, err, "[::CreateSamplerStates] ClampPoint SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Renderer, err, "[::CreateSamplerStates] ClampPoint Sampler 생성 실패: {}", ErrorUtils::ToVerbose(hr));
 				return;
 			}
 		}
@@ -544,10 +578,30 @@ namespace Dive
 			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
 
+
 			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::ClampLinear)].GetAddressOf());
 			if (FAILED(hr))
 			{
-				DV_LOG(Renderer, err, "[::CreateSamplerStates] ClampLinear SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Renderer, err, "[::CreateSamplerStates] ClampLinear Sampler 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				return;
+			}
+		}
+
+		// Skybox
+		{
+			D3D11_SAMPLER_DESC samplerDesc{};
+			samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+			samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+			samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+			samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP; 
+			samplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+			samplerDesc.MinLOD = 0;
+			samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::Skybox)].GetAddressOf());
+			if (FAILED(hr))
+			{
+				DV_LOG(Renderer, err, "[::CreateSamplerStates] Skybox Sampler 생성 실패: {}", ErrorUtils::ToVerbose(hr));
 				return;
 			}
 		}
@@ -571,7 +625,7 @@ namespace Dive
 			auto hr = device->CreateSamplerState(&samplerDesc, s_samplerStates[static_cast<size_t>(eSamplerState::ShadowCompare)].GetAddressOf());
 			if (FAILED(hr))
 			{
-				DV_LOG(Renderer, err, "[::CreateSamplerStates] ShadowCompare SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Renderer, err, "[::CreateSamplerStates] ShadowCompare Sampler 생성 실패: {}", ErrorUtils::ToVerbose(hr));
 				return;
 			}
 		}

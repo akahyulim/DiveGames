@@ -37,6 +37,9 @@ namespace Dive
 	DirectX::XMFLOAT3 Light::GetDirection() const
 	{
 		assert(GetTransform());
-		return GetTransform()->GetForward();
+
+		DirectX::XMFLOAT3 result;
+		XMStoreFloat3(&result, GetTransform()->GetLocalForward());
+		return result;
 	}
 }

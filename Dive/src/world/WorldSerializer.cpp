@@ -60,7 +60,7 @@ namespace Dive
 			out << YAML::Key << "Transform" << YAML::Value << YAML::BeginMap;
 			out << YAML::Key << "fileID" << YAML::Value << transformID;
 			out << YAML::Key << "Position" << YAML::Value << transform->GetLocalPosition();
-			out << YAML::Key << "Rotation" << YAML::Value << transform->GetLocalRotationQuaternion();
+			out << YAML::Key << "Rotation" << YAML::Value << transform->GetLocalRotation();
 			out << YAML::Key << "Scale" << YAML::Value << transform->GetLocalScale();
 
 			if (auto parent = transform->GetParent())
@@ -178,7 +178,7 @@ namespace Dive
 
 			auto transform = go->GetTransform(); // GameObject가 자동으로 Transform 생성한다고 가정
 			transform->SetLocalPosition(transformNode["Position"].as<DirectX::XMFLOAT3>());
-			transform->SetLocalRotationQuaternion(transformNode["Rotation"].as<DirectX::XMFLOAT4>());
+			transform->SetLocalRotation(transformNode["Rotation"].as<DirectX::XMFLOAT4>());
 			transform->SetLocalScale(transformNode["Scale"].as<DirectX::XMFLOAT3>());
 			fileIDToObject[transformID] = transform;
 

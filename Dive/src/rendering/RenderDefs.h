@@ -18,6 +18,7 @@ namespace Dive
 
 	enum class eRasterizerState
 	{
+		FillSolid_CullFront,
 		FillSolid_CullBack,
 		FillSolid_CullNone,
 		Count
@@ -36,6 +37,7 @@ namespace Dive
 		WrapLinear,
 		ClampPoint,
 		ClampLinear,
+		Skybox,
 		ShadowCompare,
 		Count
 	};
@@ -48,6 +50,7 @@ namespace Dive
 		DepthDiabled,   // skydome에서 off용으로...
 		ForwardLight,
 		Transparent,
+		Skybox,
 		Count
 	};
 }

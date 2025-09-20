@@ -11,7 +11,7 @@ namespace Dive
 		template<class T>
 		static std::shared_ptr<T> GetOrLoad(const std::filesystem::path& filepath)
 		{
-			auto& vec = s_resources[T::GetType()];
+			auto& vec = s_resources[T::StaticType()];
 			for (const auto& resource : vec)
 			{
 				if (resource->GetFilepath() == filepath)
@@ -29,6 +29,15 @@ namespace Dive
 			return resource;
 		}
 		
+		template<class T>
+		static void Register(std::shared_ptr<T> resource)
+		{
+			if (IsCached(resource))
+				return;
+
+			s_resources[T::StaticType()].push_back(std::static_pointer_cast<Resource>(resource));
+		}
+
 		static void Register(std::shared_ptr<Resource> resource)
 		{
 			if (IsCached(resource))
@@ -42,7 +51,7 @@ namespace Dive
 		template<class T>
 		static std::shared_ptr<T> GetByName(const std::string& name)
 		{
-			auto it = s_resources.find(T::GetType());
+			auto it = s_resources.find(T::StaticType());
 			if (it != s_resources.end())
 			{
 				for (const auto& resource : it->second)
@@ -57,7 +66,7 @@ namespace Dive
 		template<class T>
 		static std::vector<std::shared_ptr<T>> GetByType()
 		{
-			auto it = s_resources.find(T::GetType());
+			auto it = s_resources.find(T::StaticType());
 			if (it != s_resources.end())
 			{
 				std::vector<std::shared_ptr<T>> resources;
@@ -73,7 +82,7 @@ namespace Dive
 		template<class T>
 		static bool IsCached(const std::filesystem::path& filepath)
 		{
-			auto it = s_resources.find(T::GetType());
+			auto it = s_resources.find(T::StaticType());
 			if (it != s_resources.end())
 			{
 				for (const auto& resource : it->second)
@@ -91,7 +100,7 @@ namespace Dive
 		template<class T>
 		static uint32_t GetResourceCount()
 		{
-			auto it = s_resources.find(T::GetType());
+			auto it = s_resources.find(T::StaticType());
 			return it != s_resources.end() ? static_cast<uint32_t>(it->second.size()) : 0;
 		}
 

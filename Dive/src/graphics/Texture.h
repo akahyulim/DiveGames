@@ -23,7 +23,7 @@ namespace Dive
 
 		// 🔸 조명/쉐도우/환경맵
 		ShadowMap = 20,
-		SSAOMap = 21,
+		SkyMap = 21,
 		EnvironmentMap = 22,
 		IBL_Irradiance = 23,
 		IBL_Specular = 24,

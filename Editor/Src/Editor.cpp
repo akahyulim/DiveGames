@@ -154,6 +154,25 @@ namespace Dive
 
 			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/Cube/Textures/Cube_diffuse.jpg");
 			ResourceManager::GetOrLoad<Texture2D>("Assets/Models/Cube/Textures/Cube_normal.jpg");
+
+			// skybox
+			{
+				std::vector<std::filesystem::path> brightDay;
+				brightDay.push_back("Assets/Textures/Skybox/BrightDay1_PosX.dds");
+				brightDay.push_back("Assets/Textures/Skybox/BrightDay1_NegX.dds");
+				brightDay.push_back("Assets/Textures/Skybox/BrightDay1_PosY.dds");
+				brightDay.push_back("Assets/Textures/Skybox/BrightDay1_NegY.dds");
+				brightDay.push_back("Assets/Textures/Skybox/BrightDay1_PosZ.dds");
+				brightDay.push_back("Assets/Textures/Skybox/BrightDay1_NegZ.dds");
+
+				auto cubemap = Cubemap::LoadFromFaceFiles(brightDay);
+				cubemap->SetName("BrightDay");
+				ResourceManager::Register(cubemap);
+
+				cubemap = Cubemap::LoadFromFile("Assets/Textures/Skybox/cloudy_skybox.dds");
+				cubemap->SetName("cloudy_skybox");
+				ResourceManager::Register(cubemap);
+			}
 		}
 
 		// create views

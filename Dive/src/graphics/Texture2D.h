@@ -18,7 +18,8 @@ namespace Dive
 
 		bool LoadFromMemory(const std::filesystem::path& filepath, const void* sourceData, size_t size, bool useMips = false);
 
-		static constexpr eResourceType GetType() { return eResourceType::Texture2D; }
+		eResourceType GetType() override { return eResourceType::Texture2D; }
+		static constexpr eResourceType StaticType() { return eResourceType::Texture2D; }
 
 	private:
 		std::vector<uint8_t> m_pixelData;

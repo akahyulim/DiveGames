@@ -7,7 +7,7 @@ namespace Dive
 	{
 	public:
 		Cubemap() = delete;
-		Cubemap(uint32_t size, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = false);
+		Cubemap(uint32_t size, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM, bool useMips = true);
 		~Cubemap() override;
 
 		bool Create() override;
@@ -19,10 +19,11 @@ namespace Dive
 
 		ID3D11RenderTargetView* GetRenderTargetView() const { return m_renderTargetView.Get(); }
 
-		static constexpr eResourceType GetType() { return eResourceType::Cubemap; }
+		eResourceType GetType() override { return eResourceType::Cubemap; }
+		static constexpr eResourceType StaticType() { return eResourceType::Cubemap; }
 
-		static std::shared_ptr<Cubemap> LoadFromFaceFiles(const std::vector<std::filesystem::path>& faceFilepaths, bool useMips = false);
-		static std::shared_ptr<Cubemap> LoadFromFile(const std::filesystem::path& filepath, bool useMips = false);
+		static std::shared_ptr<Cubemap> LoadFromFaceFiles(const std::vector<std::filesystem::path>& faceFilepaths, bool useMips = true);
+		static std::shared_ptr<Cubemap> LoadFromFile(const std::filesystem::path& filepath, bool useMips = true);
 
 	private:
 		uint32_t m_Size = 0;

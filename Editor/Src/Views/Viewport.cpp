@@ -4,7 +4,7 @@
 
 namespace Dive
 {
-	constexpr float BOOST_SPEED = 5.0f;
+	constexpr float BOOST_SPEED = 10.0f;
 	constexpr float MIN_SPEED = 0.5f;
 	constexpr float MAX_SPEED = 99.0f;
 
@@ -61,7 +61,7 @@ namespace Dive
 		ImTextureID textureID = (ImTextureID)(m_renderTarget->GetShaderResourceView());
 		ImGui::Image(textureID, ImVec2(m_width, m_height));		
 	}
-
+	
 	void Viewport::cameraControll()
 	{
 		if (ImGui::IsWindowFocused())
@@ -86,7 +86,7 @@ namespace Dive
 					if (mouseWheelDelta != 0.0f)
 						transform->Translate(DirectX::XMFLOAT3(0.0f, 0.0f, mouseWheelDelta * moveSpeed));
 				}
-
+			}
 				if (Input::KeyPress(DIK_W))
 				{
 					transform->Translate(DirectX::XMFLOAT3(0.0f, 0.0f, moveSpeed));
@@ -111,13 +111,30 @@ namespace Dive
 				{
 					transform->Translate(DirectX::XMFLOAT3(0.0f, moveSpeed, 0.0f));
 				}
-			}
-			else
+		//	}
+			//else
 			{
 				auto mouseWheelDelta = Input::GetMouseWheelDelta();
 				if (mouseWheelDelta != 0.0f)
 				{
 					AddCameraSpeed(mouseWheelDelta);
+				}
+
+				if (Input::KeyPress(DIK_LEFT))
+				{
+					transform->RotateByDegrees(DirectX::XMFLOAT3(0.0f, -moveSpeed * 2.0f, 0.0f));
+				}
+				if (Input::KeyPress(DIK_RIGHT))
+				{
+					transform->RotateByDegrees(DirectX::XMFLOAT3(0.0f, moveSpeed * 2.0f, 0.0f));
+				}
+				if (Input::KeyPress(DIK_UP))
+				{
+					transform->RotateByDegrees(DirectX::XMFLOAT3(-moveSpeed * 2.0f, 0.0f, 0.0f));
+				}
+				if (Input::KeyPress(DIK_DOWN))
+				{
+					transform->RotateByDegrees(DirectX::XMFLOAT3(moveSpeed * 2.0f, 0.0f, 0.0f));
 				}
 			}
 		}

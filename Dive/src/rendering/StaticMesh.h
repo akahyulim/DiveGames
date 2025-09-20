@@ -44,7 +44,8 @@ namespace Dive
 		D3D11_PRIMITIVE_TOPOLOGY GetPrimitiveTopology() const { return m_primitiveTopology; }
 		void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY primitiveTopology) { m_primitiveTopology; }
 
-		static constexpr eResourceType GetType() { return eResourceType::StaticMesh; }
+		eResourceType GetType() override { return eResourceType::StaticMesh; }
+		static constexpr eResourceType StaticType() { return eResourceType::StaticMesh; }
 
 		bool LoadFromFile(const std::filesystem::path& filepath) override;
 		bool SaveToFile(const std::filesystem::path& filepath) override;

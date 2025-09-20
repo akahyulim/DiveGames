@@ -114,7 +114,7 @@ namespace Dive
 	{
 		if (faceFilepaths.size() != 6) 
 		{
-			DV_LOG(Cubemap, err, "[::LoadFromFaceFiles] 잘못된 경로 전달: {}", faceFilepaths.size());
+			DV_LOG(Cubemap, err, "[::LoadFromFaceFiles] 모자란 개수 전달: {}", faceFilepaths.size());
 			return nullptr;
 		}
 

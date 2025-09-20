@@ -21,9 +21,9 @@ namespace Dive
 
 	struct alignas(16) CameraData
 	{
-		DirectX::XMMATRIX viewMatrix;
-		DirectX::XMMATRIX projMatrix;
-		DirectX::XMMATRIX viewProjMatrix;
+		DirectX::XMFLOAT4X4 viewMatrix;
+		DirectX::XMFLOAT4X4 projMatrix;
+		DirectX::XMFLOAT4X4 viewProjMatrix;
 		DirectX::XMFLOAT4 cameraPosition;
 		DirectX::XMFLOAT4 backgroundColor;
 	};

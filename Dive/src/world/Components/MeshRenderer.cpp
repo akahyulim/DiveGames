@@ -29,7 +29,7 @@ namespace Dive
 	void MeshRenderer::Render(const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj)
 	{
 		ObjectData objectData{};
-		objectData.worldMatrix = XMMatrixTranspose(GetGameObject()->GetTransform()->GetTransformMatrix());
+		XMStoreFloat4x4(&objectData.worldMatrix, XMMatrixTranspose(GetGameObject()->GetTransform()->GetTransformMatrix()));
 		m_cbObjectVS->Update<ObjectData>(objectData);
 		m_cbObjectVS->BindVS(eCBufferSlotVS::Object);
 
