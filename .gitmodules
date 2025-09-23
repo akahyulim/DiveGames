@@ -13,3 +13,6 @@
 [submodule "Editor/Third-Party/imgui"]
 	path = Editor/Third-Party/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "Editor/Third-Party/ImGuizmo"]
+	path = Editor/Third-Party/ImGuizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo
