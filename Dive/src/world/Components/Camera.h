@@ -44,25 +44,25 @@ namespace Dive
 		DirectX::XMFLOAT4X4 GetProjection() const;
 		DirectX::XMMATRIX GetProjectionMatrix() const;
 
-		eProjectionType GetProjectionType() const { return m_projectionType; }
-		void SetProjectionType(eProjectionType type) { m_projectionType = type; }
+		eProjectionType GetProjectionType() const { return m_ProjectionType; }
+		void SetProjectionType(eProjectionType type) { m_ProjectionType = type; }
 		
 		float GetAspectRatio() const;
 
-		float GetFieldOfView() const { return m_fieldOfView; }
+		float GetFieldOfView() const { return m_FieldOfView; }
 		void SetFieldOfView(float fov);
 
-		float GetNearClipPlane() const { return m_nearClipPlane; }
+		float GetNearClipPlane() const { return m_NearClip; }
 		void SetNearClipPlane(float nearPlane);
 
-		float GetFarClipPlane() const { return m_farClipPlane; }
+		float GetFarClipPlane() const { return m_FarClip; }
 		void SetFarClipPlane(float farPlane);
 
 		void GetViewportRect(float& outLeft, float& outTop, float& outRight, float& outBottom) const;
-		float GetViewportLeft() const { return m_viewportLeft; }
-		float GetViewportTop() const { return m_viewportTop; }
-		float GetViewportRight() const { return m_viewportRight; }
-		float GetViewportBottom() const { return m_viewportBottom; }
+		float GetViewportLeft() const { return m_ViewportLeft; }
+		float GetViewportTop() const { return m_ViewportTop; }
+		float GetViewportRight() const { return m_ViewportRight; }
+		float GetViewportBottom() const { return m_ViewportBottom; }
 		void SetViewportRect(float left, float top, float right, float bottom);
 		void SetViewportTop(float top);
 		void SetViewportLeft(float left);
@@ -72,9 +72,9 @@ namespace Dive
 		void SetViewport(float topLeftX, float topLeftY, float width, float height, float minDepth = 0.0f, float maxDepth = 1.0f);
 		D3D11_VIEWPORT GetViewport() const;
 
-		const Frustum& GetFrustum() const { return m_frustum; }
+		const Frustum& GetFrustum() const { return m_Frustum; }
 
-		const float* GetBackgroundColor() const { return m_backgroundColor; }
+		const float* GetBackgroundColor() const { return m_BackgroundColor; }
 		DirectX::XMFLOAT4 GetBackgroundColorByXMFLOAT4() const;
 		void SetBackgroundColor(float r, float g, float b, float a);
 		void SetBackgroundColor(const float* color);
@@ -90,24 +90,24 @@ namespace Dive
 		static Camera* GetMainCamera();
 
 	private:
-		eProjectionType m_projectionType = eProjectionType::Perspective;
+		eProjectionType m_ProjectionType = eProjectionType::Perspective;
 				
-		float m_fieldOfView = 45.0f;
+		float m_FieldOfView = 45.0f;
 
-		float m_nearClipPlane = 0.1f;
-		float m_farClipPlane = 5000.0f;
+		float m_NearClip = 0.1f;
+		float m_FarClip = 5000.0f;
 
-		float m_viewportTop = 0.0f;
-		float m_viewportLeft = 0.0f;
-		float m_viewportRight = 1.0f;
-		float m_viewportBottom = 1.0f;
+		float m_ViewportTop = 0.0f;
+		float m_ViewportLeft = 0.0f;
+		float m_ViewportRight = 1.0f;
+		float m_ViewportBottom = 1.0f;
 
-		D3D11_VIEWPORT m_viewport;
+		D3D11_VIEWPORT m_Viewport;
 
-		Frustum m_frustum;
+		Frustum m_Frustum;
 
-		float m_backgroundColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		RenderTexture* m_renderTarget = nullptr;
+		float m_BackgroundColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		RenderTexture* m_RenderTarget = nullptr;
 
 		std::unique_ptr<ConstantBuffer> m_cbCamera;
 

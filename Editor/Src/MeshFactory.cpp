@@ -51,7 +51,6 @@ namespace Dive
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers();
-		mesh->ComputeBouingBox();
 		mesh->SetName("TriangleMesh");
 
 		return mesh;
@@ -107,7 +106,6 @@ namespace Dive
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers();
-		mesh->ComputeBouingBox();
 		mesh->SetName("QuadMesh");
 
 		return mesh;
@@ -164,7 +162,6 @@ namespace Dive
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers();
-		mesh->ComputeBouingBox();
 		mesh->SetName("PlaneMesh");
 
 		return mesh;
@@ -240,7 +237,6 @@ namespace Dive
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers();
-		mesh->ComputeBouingBox();
 		mesh->SetName("CubeMesh");
 
 		return mesh;
@@ -327,7 +323,6 @@ namespace Dive
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers();
-		mesh->ComputeBouingBox();
 		mesh->SetName("SphereMesh");
 
 		return mesh;
@@ -514,7 +509,6 @@ namespace Dive
 		mesh->AddVertices(vertices);
 		mesh->AddIndices(indices);
 		mesh->CreateBuffers();
-		mesh->ComputeBouingBox();
 		mesh->SetName("CapsuleMesh");
 
 		return mesh;

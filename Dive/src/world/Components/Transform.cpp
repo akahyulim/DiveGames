@@ -22,12 +22,13 @@ namespace Dive
 
 	void Transform::Update()
 	{
-		if (!m_HasChanged)
-			return;
+		m_WasUpdated = m_HasChanged;
 
-		CalculateLocalTransform();
-
-		m_HasChanged = false;
+		if (m_HasChanged)
+		{
+			CalculateLocalTransform();
+			m_HasChanged = false;
+		}
 	}
 
 	DirectX::XMVECTOR Transform::GetPositionVector() const

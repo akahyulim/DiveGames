@@ -102,7 +102,7 @@ namespace Dive
 		size_t GetSiblingIndex();
 		void SetSiblingIndex(size_t index);
 
-		bool HasChanged() const { return m_HasChanged; }
+		bool WasUpdated() const { return m_WasUpdated; }
 
 	private:
 		DirectX::XMFLOAT3 m_LocalPosition{ 0.0f, 0.0f, 0.0f };
@@ -113,6 +113,7 @@ namespace Dive
 		Transform* m_Parent = nullptr;
 		std::vector<Transform*> m_Children;
 
-		bool m_HasChanged = false;
+		bool m_HasChanged = true;
+		bool m_WasUpdated = true;
 	};
 }

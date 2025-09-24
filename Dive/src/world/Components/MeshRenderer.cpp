@@ -5,7 +5,6 @@
 #include "rendering/RenderDefs.h"
 #include "rendering/StaticMesh.h"
 #include "rendering/Material.h"
-#include "math/BoundingBox.h"
 #include "world/GameObject.h"
 #include "world/Components/Camera.h"
 #include "world/Components/Transform.h"
@@ -26,22 +25,36 @@ namespace Dive
 		m_cbObjectVS.reset();
 	}
 
+	void MeshRenderer::Update()
+	{
+		// 일단 이걸 무조건 통과한다.
+		// 컴포넌트의 생성순서 때문인 듯하다.
+		if (!GetTransform()->WasUpdated())
+			return;
+
+		m_BoundingBox = m_StaticMesh->GetLocalBoundingBox().Transform(GetTransform()->GetTransformMatrix());
+	}
+
 	void MeshRenderer::Render(const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj)
 	{
 		ObjectData objectData{};
-		XMStoreFloat4x4(&objectData.worldMatrix, XMMatrixTranspose(GetGameObject()->GetTransform()->GetTransformMatrix()));
+		XMStoreFloat4x4(&objectData.worldMatrix, XMMatrixTranspose(GetTransform()->GetTransformMatrix()));
 		m_cbObjectVS->Update<ObjectData>(objectData);
 		m_cbObjectVS->BindVS(eCBufferSlotVS::Object);
 
-		m_material->Bind();
+		m_Material->Bind();
 
-		m_staticMesh->Draw();
+		m_StaticMesh->Draw();
 	}
 
 	bool MeshRenderer::IsVisible(const Frustum& frustum)
 	{
-		assert(m_staticMesh);
-		const auto boundingBox = m_staticMesh->GetBoundingBox();
-		return frustum.CheckAABB(boundingBox->GetCenter(), boundingBox->GetExtent());
+		return frustum.CheckAABB(m_BoundingBox.GetCenter(), m_BoundingBox.GetExtent());
+	}
+
+	void MeshRenderer::SetStaticMesh(std::shared_ptr<StaticMesh> staticMesh)
+	{
+		m_StaticMesh = staticMesh;
+		m_BoundingBox = staticMesh->GetLocalBoundingBox();
 	}
 }

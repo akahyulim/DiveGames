@@ -3,12 +3,11 @@
 #include "graphics/Buffer.h"
 #include "graphics/ShaderManager.h"
 #include "graphics/Graphics.h"
-#include "math/BoundingBox.h"
 
 namespace Dive
 {
 	StaticMesh::StaticMesh()
-		: m_type(eMeshType::Static)
+		: m_Type(eMeshType::Static)
 	{
 	}
 
@@ -21,36 +20,38 @@ namespace Dive
 	{
 		// 정점 버퍼 생성
 		{
-			if (m_vertices.empty())
+			if (m_Vertices.empty())
 			{
 				DV_LOG(StaticMesh, err, "[::CreateBuffers] 정점이 존재하지 않아 실패");
 				return false;
 			}
 
-			m_vertexBuffer.reset();
-			m_vertexBuffer = std::make_shared<Buffer>(
+			m_VertexBuffer.reset();
+			m_VertexBuffer = std::make_shared<Buffer>(
 				eBufferType::VertexBuffer,
-				m_vertices.data(),
+				m_Vertices.data(),
 				static_cast<uint32_t>(sizeof(StaticVertex)),
-				static_cast<uint32_t>(m_vertices.size()));
-			if (!m_vertexBuffer)
+				static_cast<uint32_t>(m_Vertices.size()));
+			if (!m_VertexBuffer)
 			{
 				DV_LOG(StaticMesh, err, "[::CreateBuffers] VertexBuffer 생성 실패");
-				m_vertexBuffer.reset();
+				m_VertexBuffer.reset();
 				return false;
 			}
+
+			m_LocalBoundingBox = BoundingBox(m_Vertices);
 		}
 
 		// 인덱스 버퍼 생성
-		if(!m_indices.empty())
+		if(!m_Inidices.empty())
 		{
-			m_indexBuffer.reset();
-			m_indexBuffer = std::make_shared<Buffer>(
+			m_IndexBuffer.reset();
+			m_IndexBuffer = std::make_shared<Buffer>(
 				eBufferType::IndexBuffer,
-				m_indices.data(),
+				m_Inidices.data(),
 				static_cast<uint32_t>(sizeof(uint32_t)),
-				static_cast<uint32_t>(m_indices.size()));
-			if (!m_indexBuffer)
+				static_cast<uint32_t>(m_Inidices.size()));
+			if (!m_IndexBuffer)
 			{
 				DV_LOG(StaticMesh, err, "[::CreateBuffers] IndexBuffer 생성 실패");
 				return false;
@@ -62,60 +63,48 @@ namespace Dive
 
 	void StaticMesh::Clear()
 	{
-		m_boundingBox.reset();
-		m_indexBuffer.reset();
-		m_vertexBuffer.reset();
+		m_IndexBuffer.reset();
+		m_VertexBuffer.reset();
 
-		m_indices.clear();
-		m_indices.shrink_to_fit();
+		m_Inidices.clear();
+		m_Inidices.shrink_to_fit();
 
-		m_vertices.clear();
-		m_vertices.shrink_to_fit();
+		m_Vertices.clear();
+		m_Vertices.shrink_to_fit();
 	}
 
 	void StaticMesh::Draw()
 	{
-		assert(m_vertexBuffer);
+		assert(m_VertexBuffer);
 
-		Graphics::GetDeviceContext()->IASetPrimitiveTopology(m_primitiveTopology);
+		Graphics::GetDeviceContext()->IASetPrimitiveTopology(m_PrimitiveTopology);
 
-		m_vertexBuffer->Bind();
+		m_VertexBuffer->Bind();
 
-		if (m_indexBuffer)
+		if (m_IndexBuffer)
 		{
-			m_indexBuffer->Bind();
-			Graphics::GetDeviceContext()->DrawIndexed(m_indexBuffer->GetCount(), 0, 0);
+			m_IndexBuffer->Bind();
+			Graphics::GetDeviceContext()->DrawIndexed(m_IndexBuffer->GetCount(), 0, 0);
 		}
 		else
-			Graphics::GetDeviceContext()->Draw(m_vertexBuffer->GetCount(), 0);
-	}
-
-	void StaticMesh::ComputeBouingBox()
-	{
-		if (m_vertices.empty())
-		{
-			DV_LOG(StaticMesh, err, "[::ComputeBouingBox] 빈 정점 정보");
-			return;
-		}
-
-		m_boundingBox = std::make_unique<BoundingBox>(m_vertices);
+			Graphics::GetDeviceContext()->Draw(m_VertexBuffer->GetCount(), 0);
 	}
 
 	void StaticMesh::AddVertices(const std::vector<StaticVertex>& vertices, uint32_t* outOffset)
 	{
 		// 현재 저장되어 있는 개수 리턴
 		if (outOffset)
-			*outOffset = static_cast<uint32_t>(m_vertices.size());
+			*outOffset = static_cast<uint32_t>(m_Vertices.size());
 
-		m_vertices.insert(m_vertices.end(), vertices.begin(), vertices.end());
+		m_Vertices.insert(m_Vertices.end(), vertices.begin(), vertices.end());
 	}
 
 	void StaticMesh::AddIndices(const std::vector<uint32_t>& indices, uint32_t* outOffset)
 	{
 		if (outOffset)
-			*outOffset = static_cast<uint32_t>(m_indices.size());
+			*outOffset = static_cast<uint32_t>(m_Inidices.size());
 
-		m_indices.insert(m_indices.end(), indices.begin(), indices.end());
+		m_Inidices.insert(m_Inidices.end(), indices.begin(), indices.end());
 	}
 
 	bool StaticMesh::LoadFromFile(const std::filesystem::path& filepath)
@@ -145,10 +134,10 @@ namespace Dive
 		fin.read(reinterpret_cast<char*>(&indexCount), sizeof(indexCount));
 
 		// 🔹 버텍스 버퍼 읽기
-		m_vertices.resize(vertexCount);
+		m_Vertices.resize(vertexCount);
 		for (uint32_t i = 0; i < vertexCount; ++i)
 		{
-			StaticVertex& v = m_vertices[i];
+			StaticVertex& v = m_Vertices[i];
 			fin.read(reinterpret_cast<char*>(&v.Position), sizeof(v.Position));
 			fin.read(reinterpret_cast<char*>(&v.TexCoord), sizeof(v.TexCoord));
 			fin.read(reinterpret_cast<char*>(&v.Normal), sizeof(v.Normal));
@@ -157,8 +146,8 @@ namespace Dive
 		}
 
 		// 🔹 인덱스 버퍼 읽기
-		m_indices.resize(indexCount);
-		fin.read(reinterpret_cast<char*>(m_indices.data()), sizeof(uint32_t) * indexCount);
+		m_Inidices.resize(indexCount);
+		fin.read(reinterpret_cast<char*>(m_Inidices.data()), sizeof(uint32_t) * indexCount);
 		fin.close();
 
 		SetFilepath(filepath);
@@ -179,8 +168,8 @@ namespace Dive
 		// 🔹 헤더 작성
 		const char magic[4] = { 'M', 'E', 'S', 'H' };
 		uint32_t version = 1;
-		uint32_t vertexCount = static_cast<uint32_t>(m_vertices.size());
-		uint32_t indexCount = static_cast<uint32_t>(m_indices.size());
+		uint32_t vertexCount = static_cast<uint32_t>(m_Vertices.size());
+		uint32_t indexCount = static_cast<uint32_t>(m_Inidices.size());
 
 		fout.write(magic, sizeof(magic));
 		fout.write(reinterpret_cast<const char*>(&version), sizeof(version));
@@ -188,7 +177,7 @@ namespace Dive
 		fout.write(reinterpret_cast<const char*>(&indexCount), sizeof(indexCount));
 
 		// 🔹 버텍스 버퍼 저장
-		for (const StaticVertex& v : m_vertices)
+		for (const StaticVertex& v : m_Vertices)
 		{
 			fout.write(reinterpret_cast<const char*>(&v.Position), sizeof(v.Position));
 			fout.write(reinterpret_cast<const char*>(&v.TexCoord), sizeof(v.TexCoord));
@@ -198,7 +187,7 @@ namespace Dive
 		}
 
 		// 🔹 인덱스 버퍼 저장
-		fout.write(reinterpret_cast<const char*>(m_indices.data()), sizeof(uint32_t) * indexCount);
+		fout.write(reinterpret_cast<const char*>(m_Inidices.data()), sizeof(uint32_t) * indexCount);
 		fout.close();
 
 		DV_LOG(StaticMesh, info, "[::SaveToFile] 메시 저장 완료: {}", filepath.string());

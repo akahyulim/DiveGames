@@ -7,6 +7,7 @@
 #include <imgui.h>
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
+#include <ImGuizmo.h>
 
 constexpr LPCWCH DV_TITLE = L"Dive Editor";
 constexpr float DEFAULT_FONT_SIZE = 20.0f;
@@ -45,7 +46,7 @@ namespace Dive
 	GameObject* EditorContext::MainCamera = nullptr;
 
 	Editor::Editor()
-		: m_fonts{}
+		: m_Fonts{}
 	{
 		DV_SUBSCRIBE_EVENT(eEventType::PostRender, DV_EVENT_HANDLER(OnPostRender));
 	}
@@ -123,13 +124,13 @@ namespace Dive
 		{
 			// fonts
 			ImGuiIO& io = ImGui::GetIO(); (void)io;
-			io.FontDefault = m_fonts[static_cast<size_t>(eFontTypes::Normal)] =
+			io.FontDefault = m_Fonts[static_cast<size_t>(eFontTypes::Normal)] =
 				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
-			m_fonts[static_cast<size_t>(eFontTypes::Bold)] =
+			m_Fonts[static_cast<size_t>(eFontTypes::Bold)] =
 				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE, nullptr, io.Fonts->GetGlyphRangesKorean());
-			m_fonts[static_cast<size_t>(eFontTypes::Large)] =
+			m_Fonts[static_cast<size_t>(eFontTypes::Large)] =
 				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothic.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
-			m_fonts[static_cast<size_t>(eFontTypes::Large_Bold)] =
+			m_Fonts[static_cast<size_t>(eFontTypes::Large_Bold)] =
 				io.Fonts->AddFontFromFileTTF("Assets/Fonts/NanumBarunGothicBold.ttf", DEFAULT_FONT_SIZE * 1.5f, nullptr, io.Fonts->GetGlyphRangesKorean());
 
 			// texture2D
@@ -176,20 +177,20 @@ namespace Dive
 		}
 
 		// create views
-		m_views.emplace_back(std::make_unique<Viewport>(this));
-		m_views.emplace_back(std::make_unique<HierarchyView>(this));
-		m_views.emplace_back(std::make_unique<InspectorView>(this));
-		//m_views.emplace_back(std::make_unique<LogView>(this));
-		m_menuBar = std::make_unique<MenuBar>(this);
+		m_Views.emplace_back(std::make_unique<Viewport>(this));
+		m_Views.emplace_back(std::make_unique<HierarchyView>(this));
+		m_Views.emplace_back(std::make_unique<InspectorView>(this));
+		//m_Views.emplace_back(std::make_unique<LogView>(this));
+		m_MenuBar = std::make_unique<MenuBar>(this);
 
 		DV_LOG(Editor, info, "초기화 성공");
 	}
 
 	void Editor::Stop()
 	{
-		for (auto& widget : m_views)
+		for (auto& widget : m_Views)
 			widget.reset();
-		m_menuBar.reset();
+		m_MenuBar.reset();
 
 		ImGui_ImplDX11_Shutdown();
 		ImGui_ImplWin32_Shutdown();
@@ -205,6 +206,11 @@ namespace Dive
 			ImGui_ImplDX11_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
+
+			// 추후 위치 다시 확인
+			//ImGuizmo::BeginFrame();
+			//ImGuizmo::SetOrthographic(false);
+			//ImGuizmo::SetDrawlist();
 
 			static bool dockspaceOpen = true;
 			static bool opt_fullscreen_persistant = true;
@@ -253,8 +259,8 @@ namespace Dive
 
 		// Compose UI
 		{
-			m_menuBar->ComposeUI();
-			for (auto& view : m_views)
+			m_MenuBar->ComposeUI();
+			for (auto& view : m_Views)
 				view->ComposeUI();
 		}
 

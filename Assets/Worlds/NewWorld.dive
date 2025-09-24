@@ -6,8 +6,8 @@ GameObjects:
     Active: true
     Transform:
       fileID: 2
-      Position: [0.0789423, 11.650391, -23.69153]
-      Rotation: [0.1736481, -0, 0, 0.9848078]
+      Position: [0.0789423, 17.305347, -40.094475]
+      Rotation: [0.16523483, 0, 0, 0.98625433]
       Scale: [1, 1, 1]
     Camera:
       fileID: 3
@@ -47,7 +47,7 @@ GameObjects:
     Transform:
       fileID: 8
       Position: [0, 0, 0]
-      Rotation: [0, -0, 0, 1]
+      Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
     Light:
       fileID: 9
@@ -58,7 +58,7 @@ GameObjects:
   - fileID: 10
     Name: LeftWhiteSpot
     Tag: Untagged
-    Active: false
+    Active: true
     Transform:
       fileID: 11
       Position: [-5, 14.5, -5]
@@ -73,11 +73,11 @@ GameObjects:
   - fileID: 13
     Name: RightWhiteSpot
     Tag: Untagged
-    Active: false
+    Active: true
     Transform:
       fileID: 14
       Position: [5, 1.2, -5]
-      Rotation: [0, -0.25881904, 0, 0.9659258]
+      Rotation: [0, -0.25881907, 0, 0.9659259]
       Scale: [1, 1, 1]
     Light:
       fileID: 15
@@ -92,7 +92,7 @@ GameObjects:
     Transform:
       fileID: 17
       Position: [-5, 5, 10]
-      Rotation: [0, -0, 0, 1]
+      Rotation: [0, 0, 0, 1]
       Scale: [10, 10, 1]
     MeshRenderer:
       fileID: 18
@@ -105,7 +105,7 @@ GameObjects:
     Transform:
       fileID: 20
       Position: [5, 5, 10]
-      Rotation: [0, -0, 0, 1]
+      Rotation: [0, 0, 0, 1]
       Scale: [10, 10, 1]
     MeshRenderer:
       fileID: 21
@@ -118,7 +118,7 @@ GameObjects:
     Transform:
       fileID: 23
       Position: [0, 0, 5]
-      Rotation: [0, -0, 0, 1]
+      Rotation: [0, 0, 0, 1]
       Scale: [2, 1, 1]
     MeshRenderer:
       fileID: 24
@@ -131,7 +131,7 @@ GameObjects:
     Transform:
       fileID: 26
       Position: [0, 0, -5]
-      Rotation: [0, -0, 0, 1]
+      Rotation: [0, 0, 0, 1]
       Scale: [2, 1, 1]
     MeshRenderer:
       fileID: 27
@@ -140,11 +140,11 @@ GameObjects:
   - fileID: 28
     Name: Sphere
     Tag: Untagged
-    Active: false
+    Active: true
     Transform:
       fileID: 29
-      Position: [9, 10, 7]
-      Rotation: [0, -0, 0, 1]
+      Position: [9, 6, 7]
+      Rotation: [0, 0, 0, 1]
       Scale: [3, 3, 3]
     MeshRenderer:
       fileID: 30
@@ -157,7 +157,7 @@ GameObjects:
     Transform:
       fileID: 32
       Position: [0, 0, 0]
-      Rotation: [0, -0, 0, 1]
+      Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
       Parent: 29
     Light:
@@ -165,7 +165,7 @@ GameObjects:
       LightType: 1
       LightColor: [1, 0, 0]
       LightIntensity: 5
-      LightRange: 30
+      LightRange: 10
   - fileID: 34
     Name: Capsule
     Tag: Untagged
@@ -173,7 +173,7 @@ GameObjects:
     Transform:
       fileID: 35
       Position: [-4, 0, 5.5]
-      Rotation: [0, -0, 0, 1]
+      Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
     MeshRenderer:
       fileID: 36
@@ -182,11 +182,11 @@ GameObjects:
   - fileID: 37
     Name: WhitePoint
     Tag: Untagged
-    Active: true
+    Active: false
     Transform:
       fileID: 38
       Position: [0, 0, 0]
-      Rotation: [0, -0, 0, 1]
+      Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
       Parent: 35
     Light:
@@ -198,10 +198,10 @@ GameObjects:
   - fileID: 40
     Name: Cube
     Tag: Untagged
-    Active: false
+    Active: true
     Transform:
       fileID: 41
-      Position: [2.4, 3.3, -5.9]
+      Position: [3, 0, -3]
       Rotation: [0, 0.38268337, 0, 0.92387956]
       Scale: [3, 3, 3]
     MeshRenderer:
@@ -211,11 +211,11 @@ GameObjects:
   - fileID: 43
     Name: YellowPoint
     Tag: Untagged
-    Active: true
+    Active: false
     Transform:
       fileID: 44
       Position: [0, 0, 0]
-      Rotation: [0, -0, 0, 1]
+      Rotation: [0, 0, 0, 1]
       Scale: [1, 1, 1]
       Parent: 41
     Light:

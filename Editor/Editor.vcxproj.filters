@@ -10,6 +10,9 @@
     <Filter Include="imgui">
       <UniqueIdentifier>{ae9e82dd-cbb2-4164-8f74-95c8920cab98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImGuizmo">
+      <UniqueIdentifier>{cc5453cb-7ea1-4d76-99fb-4eec3eab205e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\views\HierarchyView.cpp">
@@ -53,6 +56,9 @@
     <ClCompile Include="src\MeshFactory.cpp" />
     <ClCompile Include="Third-Party\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="src\Editor.cpp" />
+    <ClCompile Include="Third-Party\ImGuizmo\ImGuizmo.cpp">
+      <Filter>ImGuizmo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\views\HierarchyView.h">

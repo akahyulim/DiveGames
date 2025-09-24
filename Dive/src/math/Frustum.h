@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "BoundingBox.h"
 
 namespace Dive
 {
@@ -8,8 +9,9 @@ namespace Dive
 		Frustum() = default;
 		~Frustum() = default;
 
-		void Update(const DirectX::XMFLOAT4X4& view, const DirectX::XMFLOAT4X4& proj);
+		void Update(const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj);
 
+		bool CheckCenter(const DirectX::XMFLOAT3& center) const;
 		bool CheckAABB(const DirectX::XMFLOAT3& center, const DirectX::XMFLOAT3& extents) const;
 		bool CheckSphere(const DirectX::XMFLOAT3& center, float radius) const;
 

@@ -28,8 +28,14 @@ namespace Dive
 			Graphics::GetDeviceContext()->OMSetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::DepthReadWrite), 1);
 			Graphics::GetDeviceContext()->RSSetState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullBack));
 
+			const auto& frustum = cameraCom->GetFrustum();
 			for (auto meshRenderer : world->GetOpaqueMeshRenderers())
-				meshRenderer->Render(cameraCom->GetViewMatrix(), cameraCom->GetProjectionMatrix());
+			{
+				if (meshRenderer->IsVisible(frustum))
+					meshRenderer->Render(cameraCom->GetViewMatrix(), cameraCom->GetProjectionMatrix());
+				else
+					DV_LOG(ForwardBase, debug, "Culling Target: {}", meshRenderer->GetName());
+			}
 		}
 	}
 
@@ -54,9 +60,14 @@ namespace Dive
 			Graphics::GetDeviceContext()->OMSetDepthStencilState(Renderer::GetDepthStencilState(eDepthStencilState::Transparent), 1);
 			Graphics::GetDeviceContext()->RSSetState(Renderer::GetRasterizerState(eRasterizerState::FillSolid_CullNone));
 
+			const auto& frustum = cameraCom->GetFrustum();
 			for (auto meshRenderer : world->GetTransparentMeshRenderers())
-				meshRenderer->Render(cameraCom->GetViewMatrix(), cameraCom->GetProjectionMatrix());
-
+			{
+				if (meshRenderer->IsVisible(frustum))
+					meshRenderer->Render(cameraCom->GetViewMatrix(), cameraCom->GetProjectionMatrix());
+				else
+					DV_LOG(Transparent, debug, "Culling Target: {}", meshRenderer->GetName());
+			}
 			Graphics::GetDeviceContext()->OMSetBlendState(Renderer::GetBlendState(eBlendState::AlphaDisabled).Get(), nullptr, 0xffffffff);
 		}
 	}

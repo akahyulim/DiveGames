@@ -48,9 +48,9 @@ namespace Dive
 		void SetTitle(const std::wstring& worldName = std::wstring());
 
 	private:
-		std::array<ImFont*, static_cast<size_t>(Dive::eFontTypes::Max)> m_fonts;
+		std::array<ImFont*, static_cast<size_t>(Dive::eFontTypes::Max)> m_Fonts;
 
-		std::unique_ptr<MenuBar> m_menuBar;
-		std::vector<std::unique_ptr<View>> m_views;
+		std::unique_ptr<MenuBar> m_MenuBar;
+		std::vector<std::unique_ptr<View>> m_Views;
 	};
 }
