@@ -18,6 +18,8 @@ namespace Dive
 		float GetWidth() const { return m_width; }
 		float GetHeight() const { return m_height; }
 
+		DirectX::XMUINT2 GetMousePosition() const;
+
 		bool IsVisible() const { return m_isVisible; }
 		void SetVisible(bool visible) { m_isVisible = visible; }
 

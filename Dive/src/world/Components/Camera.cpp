@@ -285,6 +285,56 @@ namespace Dive
 		SetViewport(0.0f, 0.0f, static_cast<float>(m_RenderTarget->GetWidth()), static_cast<float>(m_RenderTarget->GetHeight()));
 	}
 
+	Ray Camera::ScreenPointToRay(const DirectX::XMUINT2& mousePosition) const
+	{
+		return ScreenPointToRay(mousePosition.x, mousePosition.y);
+	}
+
+	Ray Camera::ScreenPointToRay(uint32_t mousePositionX, uint32_t mousePositionY) const
+	{
+		// 1. 마우스 좌표 → NDC 변환
+		float x = (2.0f * mousePositionX) / GetRenderTarget()->GetWidth() - 1.0f;
+		float y = 1.0f - (2.0f * mousePositionY) / GetRenderTarget()->GetHeight();
+
+		XMVECTOR ndcNear = XMVectorSet(x, y, 0.0f, 1.0f);
+		XMVECTOR ndcFar = XMVectorSet(x, y, 1.0f, 1.0f);
+
+		// 2. ViewProjection 역행렬 계산
+		XMMATRIX viewProj =  GetViewMatrix() * GetProjectionMatrix();
+		XMMATRIX invViewProj = XMMatrixInverse(nullptr, viewProj);
+
+		// 3. NDC → 월드 공간 변환
+		XMVECTOR worldNearVec = XMVector4Transform(ndcNear, invViewProj);
+		XMVECTOR worldFarVec = XMVector4Transform(ndcFar, invViewProj);
+
+		XMFLOAT4 worldNear, worldFar;
+		XMStoreFloat4(&worldNear, worldNearVec);
+		XMStoreFloat4(&worldFar, worldFarVec);
+
+		XMFLOAT3 origin = {
+			worldNear.x / worldNear.w,
+			worldNear.y / worldNear.w,
+			worldNear.z / worldNear.w
+		};
+
+		XMFLOAT3 farPoint = {
+			worldFar.x / worldFar.w,
+			worldFar.y / worldFar.w,
+			worldFar.z / worldFar.w
+		};
+
+		XMFLOAT3 direction = {
+			farPoint.x - origin.x,
+			farPoint.y - origin.y,
+			farPoint.z - origin.z
+		};
+
+		XMStoreFloat3(&direction, XMVector3Normalize(XMLoadFloat3(&direction)));
+
+		return Ray(origin, direction);
+	}
+
+
 	Camera* Camera::GetMainCamera()
 	{
 		for (auto camera : s_allCameras)

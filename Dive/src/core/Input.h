@@ -29,6 +29,7 @@ namespace Dive
 		static bool MouseButtonUp(int btn);
 		static bool MouseButtonPress(int btn);
 
+		static DirectX::XMUINT2 GetMousePosition();
 		static DirectX::XMFLOAT2 GetMouseMoveDelta();
 		static int GetMouseWheelDelta();
 

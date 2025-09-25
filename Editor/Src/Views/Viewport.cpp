@@ -1,6 +1,9 @@
 ﻿#include "Viewport.h"
 #include "../MenuBar.h"
 #include "../Editor.h"
+#include <ImGuizmo.h>
+
+using namespace DirectX;
 
 namespace Dive
 {
@@ -12,7 +15,7 @@ namespace Dive
 		: View(editor)
 	{
 		m_title = "View";
-		m_flags |= ImGuiWindowFlags_NoScrollbar;
+		m_flags |= ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoBringToFrontOnFocus;
 	}
 
 	void Viewport::SetCameraSpeed(float speed)
@@ -31,38 +34,7 @@ namespace Dive
 		SetCameraSpeed(speed);
 	}
 
-	void Viewport::renderContent()
-	{
-		if (!EditorContext::ActiveWorld || !EditorContext::EditorCamera)
-			return;
-
-		cameraControll();
-
-		auto pos = ImGui::GetWindowPos();
-		auto size = ImGui::GetWindowSize();
-		
-		m_width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
-		m_height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
-
-		if (!m_renderTarget)
-		{
-			m_renderTarget = std::make_unique<RenderTexture>(
-				static_cast<uint32_t>(m_width), 
-				static_cast<uint32_t>(m_height),
-				eDepthFormat::Depth24Stencil8);
-			m_renderTarget->Create();
-
-			EditorContext::EditorCamera->GetComponent<Camera>()->SetRenderTarget(m_renderTarget.get());
-		}
-
-		if (m_renderTarget->GetWidth() != static_cast<uint32_t>(m_width) || m_renderTarget->GetHeight() != static_cast<uint32_t>(m_height))
-			m_renderTarget->Resize(static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height));
-
-		ImTextureID textureID = (ImTextureID)(m_renderTarget->GetShaderResourceView());
-		ImGui::Image(textureID, ImVec2(m_width, m_height));		
-	}
-	
-	void Viewport::cameraControll()
+	void Viewport::CameraControll()
 	{
 		if (ImGui::IsWindowFocused())
 		{
@@ -87,32 +59,44 @@ namespace Dive
 						transform->Translate(DirectX::XMFLOAT3(0.0f, 0.0f, mouseWheelDelta * moveSpeed));
 				}
 			}
-				if (Input::KeyPress(DIK_W))
+
+			if (Input::MouseButtonDown(0))
+			{
+				if (ImGui::IsWindowHovered())
 				{
-					transform->Translate(DirectX::XMFLOAT3(0.0f, 0.0f, moveSpeed));
+					Ray ray = EditorContext::EditorCamera->GetComponent<Camera>()->ScreenPointToRay(GetMousePosition());
+					RaycastHit hit;
+					EditorContext::Selected =
+						EditorContext::ActiveWorld->Raycast(ray, &hit) ? hit.hitObject : nullptr;
 				}
-				if (Input::KeyPress(DIK_S))
-				{
-					transform->Translate(DirectX::XMFLOAT3(0.0f, 0.0f, -moveSpeed));
-				}
-				if (Input::KeyPress(DIK_A))
-				{
-					transform->Translate(DirectX::XMFLOAT3(-moveSpeed, 0.0f, 0.0f));
-				}
-				if (Input::KeyPress(DIK_D))
-				{
-					transform->Translate(DirectX::XMFLOAT3(moveSpeed, 0.0f, 0.0f));
-				}
-				if (Input::KeyPress(DIK_Q))
-				{
-					transform->Translate(DirectX::XMFLOAT3(0.0f, -moveSpeed, 0.0f));
-				}
-				if (Input::KeyPress(DIK_E))
-				{
-					transform->Translate(DirectX::XMFLOAT3(0.0f, moveSpeed, 0.0f));
-				}
-		//	}
-			//else
+			}
+
+			if (Input::KeyPress(DIK_W))
+			{
+				transform->Translate(DirectX::XMFLOAT3(0.0f, 0.0f, moveSpeed));
+			}
+			if (Input::KeyPress(DIK_S))
+			{
+				transform->Translate(DirectX::XMFLOAT3(0.0f, 0.0f, -moveSpeed));
+			}
+			if (Input::KeyPress(DIK_A))
+			{
+				transform->Translate(DirectX::XMFLOAT3(-moveSpeed, 0.0f, 0.0f));
+			}
+			if (Input::KeyPress(DIK_D))
+			{
+				transform->Translate(DirectX::XMFLOAT3(moveSpeed, 0.0f, 0.0f));
+			}
+			if (Input::KeyPress(DIK_Q))
+			{
+				transform->Translate(DirectX::XMFLOAT3(0.0f, -moveSpeed, 0.0f));
+			}
+			if (Input::KeyPress(DIK_E))
+			{
+				transform->Translate(DirectX::XMFLOAT3(0.0f, moveSpeed, 0.0f));
+			}
+			//	}
+				//else
 			{
 				auto mouseWheelDelta = Input::GetMouseWheelDelta();
 				if (mouseWheelDelta != 0.0f)
@@ -138,5 +122,73 @@ namespace Dive
 				}
 			}
 		}
+	}
+
+	void Viewport::DrawTransformGizmo()
+	{
+		if (!EditorContext::Selected)
+			return;
+
+		ImGuizmo::Enable(true);
+		ImGuizmo::SetOrthographic(false);
+		ImGuizmo::BeginFrame();
+		ImGuizmo::SetDrawlist();
+
+		ImGuizmo::SetRect(
+			ImGui::GetWindowPos().x + ImGui::GetWindowContentRegionMin().x,
+			ImGui::GetWindowPos().y + ImGui::GetWindowContentRegionMin().y,
+			m_width, m_height
+		);
+
+		auto transform = EditorContext::Selected->GetComponent<Transform>();
+		auto camera = EditorContext::EditorCamera->GetComponent<Camera>();
+
+		XMMATRIX view = camera->GetViewMatrix();
+		XMMATRIX proj = camera->GetProjectionMatrix();
+		XMMATRIX model = transform->GetLocalTransformMatrix();
+
+		// 유니티의 snap: ctrl + drag
+		// translate 1, rotate 15, scale 0.1
+		// 이외에도 툴바를 통해 translate, rotate, scale 및 local/world 설정
+		ImGuizmo::Manipulate(
+			reinterpret_cast<float*>(&view),
+			reinterpret_cast<float*>(&proj),
+			ImGuizmo::TRANSLATE,
+			ImGuizmo::LOCAL,
+			reinterpret_cast<float*>(&model)
+		);
+
+		if (ImGuizmo::IsUsing())
+			transform->SetLocalTransformMatrix(model);
+	}
+
+	void Viewport::renderContent()
+	{
+		if (!EditorContext::ActiveWorld || !EditorContext::EditorCamera)
+			return;
+
+		m_width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
+		m_height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
+
+		if (!m_renderTarget)
+		{
+			m_renderTarget = std::make_unique<RenderTexture>(
+				static_cast<uint32_t>(m_width),
+				static_cast<uint32_t>(m_height),
+				eDepthFormat::Depth24Stencil8);
+			m_renderTarget->Create();
+
+			EditorContext::EditorCamera->GetComponent<Camera>()->SetRenderTarget(m_renderTarget.get());
+		}
+
+		if (m_renderTarget->GetWidth() != static_cast<uint32_t>(m_width) || m_renderTarget->GetHeight() != static_cast<uint32_t>(m_height))
+			m_renderTarget->Resize(static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height));
+
+		ImTextureID textureID = (ImTextureID)(m_renderTarget->GetShaderResourceView());
+		ImGui::Image(textureID, ImVec2(m_width, m_height));
+		ImGui::SetItemAllowOverlap();
+
+		CameraControll();
+		DrawTransformGizmo();
 	}
 }

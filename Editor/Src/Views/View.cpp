@@ -27,4 +27,16 @@ namespace Dive
 
 		ImGui::End();
 	}
+
+	DirectX::XMUINT2 View::GetMousePosition() const
+	{
+		ImVec2 screenMousePos = ImGui::GetMousePos();
+		ImVec2 contentMin = ImGui::GetWindowContentRegionMin();
+		ImVec2 windowPos = ImGui::GetWindowPos();
+
+		ImVec2 contentPos = { windowPos.x + contentMin.x, windowPos.y + contentMin.y };
+		ImVec2 localMousePos = { screenMousePos.x - contentPos.x, screenMousePos.y - contentPos.y };
+
+		return { (uint32_t)localMousePos.x, (uint32_t)localMousePos.y };
+	}
 }

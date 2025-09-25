@@ -2,6 +2,7 @@
 #include "BoundingBox.h"
 #include "graphics/Vertex.h"
 #include "rendering/StaticMesh.h"
+#include "world/components/Camera.h"
 
 using namespace DirectX;
 
@@ -72,6 +73,57 @@ namespace Dive
 			return eIntersection::Intersect;
 		else
 			return eIntersection::Inside;
+	}
+
+	bool BoundingBox::Intersects(const Ray& ray, float* outDistance, DirectX::XMFLOAT3* outNormal) const
+	{
+		float tMin = 0.0f;
+		float tMax = FLT_MAX;
+		int hitAxis = -1;
+		float sign = 0.0f;
+
+		for (int i = 0; i < 3; ++i)
+		{
+			float origin = (&ray.origin.x)[i];
+			float direction = (&ray.direction.x)[i];
+			float minBound = (&m_Min.x)[i];
+			float maxBound = (&m_Max.x)[i];
+
+			if (fabs(direction) < 1e-6f)
+			{
+				if (origin < minBound || origin > maxBound)
+					return false;
+			}
+			else
+			{
+				float invDir = 1.0f / direction;
+				float t1 = (minBound - origin) * invDir;
+				float t2 = (maxBound - origin) * invDir;
+
+				if (t1 > t2) std::swap(t1, t2);
+
+				if (t1 > tMin)
+				{
+					tMin = t1;
+					hitAxis = i;
+					sign = (direction > 0.0f) ? -1.0f : 1.0f;
+				}
+
+				tMax = std::min(tMax, t2);
+				if (tMin > tMax)
+					return false;
+			}
+		}
+
+		if (outDistance) *outDistance = tMin;
+
+		if (outNormal)
+		{
+			*outNormal = { 0, 0, 0 };
+			(&outNormal->x)[hitAxis] = sign;
+		}
+
+		return true;
 	}
 
 	void BoundingBox::Merge(const BoundingBox& box)

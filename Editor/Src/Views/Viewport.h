@@ -13,6 +13,9 @@ namespace Dive
 		void SetCameraSpeed(float speed);
 		void AddCameraSpeed(int delta);
 
+		void CameraControll();
+		void DrawTransformGizmo();
+
 	protected:
 		void renderContent() override;
 

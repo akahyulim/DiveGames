@@ -24,7 +24,9 @@ namespace Dive
 		void Update() override;
 
 		virtual void Render(const DirectX::XMMATRIX& view, const DirectX::XMMATRIX& proj);
-		bool IsVisible(const Frustum& frustum);
+		
+		bool IsVisible(const Frustum& frustum) const;
+		bool Intersects(const Ray& ray, float* outDistance, DirectX::XMFLOAT3* outPoint, DirectX::XMFLOAT3* outNormal) const;
 
 		std::shared_ptr<StaticMesh> GetStaticMesh() const { return m_StaticMesh; }
 		void SetStaticMesh(std::shared_ptr<StaticMesh> staticMesh);

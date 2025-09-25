@@ -47,9 +47,23 @@ namespace Dive
 		m_StaticMesh->Draw();
 	}
 
-	bool MeshRenderer::IsVisible(const Frustum& frustum)
+	bool MeshRenderer::IsVisible(const Frustum& frustum) const
 	{
 		return frustum.CheckAABB(m_BoundingBox.GetCenter(), m_BoundingBox.GetExtent());
+	}
+
+	bool MeshRenderer::Intersects(const Ray& ray, float* outDistance, DirectX::XMFLOAT3* outPoint, DirectX::XMFLOAT3* outNormal) const
+	{
+		if (!m_BoundingBox.Intersects(ray, outDistance, outNormal))
+			return false;
+
+		*outPoint = {
+			ray.origin.x + ray.direction.x * (*outDistance), 
+			ray.origin.y + ray.direction.y * (*outDistance), 
+			ray.origin.z + ray.direction.z * (*outDistance)
+		};
+
+		return true;
 	}
 
 	void MeshRenderer::SetStaticMesh(std::shared_ptr<StaticMesh> staticMesh)

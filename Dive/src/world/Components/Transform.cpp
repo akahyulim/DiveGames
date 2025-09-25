@@ -2,6 +2,7 @@
 #include "Transform.h"
 #include "world/GameObject.h"
 #include "world/World.h"
+#include "math/Math.h"
 
 using namespace DirectX;
 
@@ -173,12 +174,12 @@ namespace Dive
 
 	void Transform::SetLocalRotationVector(const DirectX::XMVECTOR& quaternion)
 	{
-		XMVECTOR current = XMLoadFloat4(&m_LocalRotation);;
+		XMVECTOR current = XMLoadFloat4(&m_LocalRotationQuat);;
 		XMVECTOR normalized = XMQuaternionNormalize(quaternion);
 		if (XMVector4NearEqual(current, normalized, XMVectorSet(1e-5f, 1e-5f, 1e-5f, 1e-5f)))
 			return;
 
-		XMStoreFloat4(&m_LocalRotation, normalized);
+		XMStoreFloat4(&m_LocalRotationQuat, normalized);
 		m_HasChanged = true;
 	}
 
@@ -366,6 +367,48 @@ namespace Dive
 		return transform;
 	}
 
+	void Transform::SetTransformMatrix(const DirectX::XMMATRIX& transform)
+	{
+		if (Math::XMMatrixNearEqual(GetLocalTransformMatrix(), transform))
+			return;
+
+		XMVECTOR scale, rotationQuat, translation;
+		if (!XMMatrixDecompose(&scale, &rotationQuat, &translation, transform))
+			return;
+
+		SetPositionVector(translation);
+		SetRotationVector(rotationQuat);
+		SetScaleVector(scale);
+
+		m_HasChanged = true;
+	}
+
+	void Transform::SetTransform(const DirectX::XMFLOAT4X4& transform)
+	{
+		SetTransformMatrix(XMLoadFloat4x4(&transform));
+	}
+
+	void Transform::SetLocalTransformMatrix(const XMMATRIX& transform)
+	{
+		if (Math::XMMatrixNearEqual(GetLocalTransformMatrix(), transform))
+			return;
+
+		XMVECTOR scale, rotationQuat, translation;
+		if (!XMMatrixDecompose(&scale, &rotationQuat, &translation, transform))
+			return;
+
+		XMStoreFloat3(&m_LocalPosition, translation);
+		XMStoreFloat4(&m_LocalRotationQuat, rotationQuat);
+		XMStoreFloat3(&m_LocalScale, scale);
+
+		m_HasChanged = true;
+	}
+
+	void Transform::SetLocalTransform(const DirectX::XMFLOAT4X4& transform)
+	{
+		SetLocalTransformMatrix(XMLoadFloat4x4(&transform));
+	}
+
 	DirectX::XMVECTOR Transform::GetLocalForward() const
 	{
 		XMVECTOR localForward = XMVector3TransformNormal(GetForward(), GetTransformMatrix());
@@ -499,7 +542,7 @@ namespace Dive
 		}
 		else
 		{
-			const auto& roots = GetGameObject()->GetWorld()->m_rootGameObjects;
+			const auto& roots = GetGameObject()->GetWorld()->m_RootGameObjects;
 			auto it = std::find(roots.begin(), roots.end(), GetGameObject());
 
 			return (it != roots.end()) ? std::distance(roots.begin(), it) : std::numeric_limits<size_t>::max();
@@ -525,7 +568,7 @@ namespace Dive
 		}
 		else
 		{
-			auto& roots = GetGameObject()->GetWorld()->m_rootGameObjects;
+			auto& roots = GetGameObject()->GetWorld()->m_RootGameObjects;
 			if (index >= roots.size())
 				return;
 

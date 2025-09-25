@@ -5,30 +5,26 @@ using namespace DirectX;
 
 namespace Dive
 {
-	bool Math::CompareXMFLOAT4X4(const DirectX::XMFLOAT4X4& a, const DirectX::XMFLOAT4X4& b)
+	bool Math::XMMatrixEqual(const DirectX::XMMATRIX& a, const DirectX::XMMATRIX& b)
 	{
 		for (int i = 0; i < 4; ++i)
 		{
-			for (int j = 0; j < 4; ++j)
-			{
-				if (a.m[i][j] != b.m[i][j])
-				{
-					return false;
-				}
-			}
+			if (!XMVector4Equal(a.r[i], b.r[i]))
+				return false;
 		}
-
 		return true;
 	}
 
-	bool Math::CompareXMMATRIX(const DirectX::XMMATRIX& mat1, const DirectX::XMMATRIX& mat2)
+	bool Math::XMMatrixNearEqual(const DirectX::XMMATRIX& a, const DirectX::XMMATRIX& b, float epsilon)
 	{
-		XMFLOAT4X4 a, b;
-		XMStoreFloat4x4(&a, mat1);
-		XMStoreFloat4x4(&b, mat2);
-
-		return CompareXMFLOAT4X4(a, b);
+		for (int i = 0; i < 4; ++i)
+		{
+			if (!XMVector4NearEqual(a.r[i], b.r[i], XMVectorReplicate(epsilon)))
+				return false;
+		}
+		return true;
 	}
+
 
 	DirectX::XMFLOAT3 Math::CalcuBiTangent(const DirectX::XMFLOAT3& normal, const DirectX::XMFLOAT3& tangent)
 	{

@@ -219,6 +219,15 @@ namespace Dive
 		return (s_mouseButtons[btn] == 1) && (s_oldMouseButtons[btn] == 1);
 	}
 	
+	DirectX::XMUINT2 Input::GetMousePosition()
+	{
+		POINT point;
+		GetCursorPos(&point);
+		ScreenToClient(Window::GetWindowHandle(), &point);
+
+		return DirectX::XMUINT2(static_cast<uint32_t>(point.x), static_cast<uint32_t>(point.y));
+	}
+
 	DirectX::XMFLOAT2 Input::GetMouseMoveDelta()
 	{
 		return { static_cast<float>(s_mouseState.lX), static_cast<float>(s_mouseState.lY) };

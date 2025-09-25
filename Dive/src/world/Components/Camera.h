@@ -28,6 +28,25 @@ namespace Dive
 		DirectX::XMFLOAT4 backgroundColor;
 	};
 
+	struct Ray
+	{
+		Ray(const DirectX::XMFLOAT3& org, const DirectX::XMFLOAT3 dir)
+			: origin(org)
+			, direction(dir)
+		{}
+
+		DirectX::XMFLOAT3 origin;
+		DirectX::XMFLOAT3 direction;
+	};
+
+	struct RaycastHit
+	{
+		GameObject* hitObject;
+		DirectX::XMFLOAT3 point;
+		DirectX::XMFLOAT3 normal;
+		float distance;
+	};
+
 	// https://docs.unity3d.com/ScriptReference/Camera.html
 	class Camera : public Component
 	{
@@ -82,6 +101,9 @@ namespace Dive
 
 		RenderTexture* GetRenderTarget() const;
 		void SetRenderTarget(RenderTexture* renderTarget);
+
+		Ray ScreenPointToRay(const DirectX::XMUINT2& mousePosition) const;
+		Ray ScreenPointToRay(uint32_t mousePositionX, uint32_t mousePositionY) const;
 
 		static constexpr eComponentType GetComponentType() { return eComponentType::Camera; }
 

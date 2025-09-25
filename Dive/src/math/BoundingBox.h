@@ -3,6 +3,7 @@
 namespace Dive
 {
 	struct StaticVertex;
+	struct Ray;
 
 	enum class eIntersection
 	{
@@ -24,6 +25,8 @@ namespace Dive
 
 		eIntersection IsIntersect(const DirectX::XMFLOAT3& point) const;
 		eIntersection IsIntersect(const BoundingBox& box) const;
+
+		bool Intersects(const Ray& ray, float* outDistance, DirectX::XMFLOAT3* outNormal) const;
 
 		void Merge(const BoundingBox& box);
 
