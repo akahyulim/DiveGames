@@ -5,7 +5,7 @@ namespace Dive
 	LogView::LogView(Editor* editor)
 		: View(editor)
 	{
-		m_title = "Log";
+		m_Title = "Log";
 	}
 
 	LogView::~LogView()

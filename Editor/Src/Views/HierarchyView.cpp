@@ -1,15 +1,15 @@
 ﻿#include "HierarchyView.h"
 #include "InspectorView.h"
 #include "../Editor.h"
-#include "../MeshFactory.h"
+#include "../Tools/MeshFactory.h"
 
 namespace Dive
 {
 	HierarchyView::HierarchyView(Editor* eidtor)
 		: View(eidtor)
 	{
-		m_title = "Hierarchy";
-		m_flags |= ImGuiWindowFlags_HorizontalScrollbar;
+		m_Title = "Hierarchy";
+		m_Flags |= ImGuiWindowFlags_HorizontalScrollbar;
 	}
 
 	void HierarchyView::renderContent()

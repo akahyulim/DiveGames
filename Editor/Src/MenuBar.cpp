@@ -1,12 +1,12 @@
 ﻿#include "MenuBar.h"
 #include "Editor.h"
-#include "MeshFactory.h"
+#include "Tools/MeshFactory.h"
 #include "Views/HierarchyView.h"
 
 namespace Dive
 {
 	MenuBar::MenuBar(Editor* editor)
-		: m_editor(editor)
+		: m_Editor(editor)
 	{
 	}
 
@@ -73,7 +73,7 @@ namespace Dive
 							EditorContext::MainCamera = camera->GetGameObject();
 					}
 
-					m_editor->SetTitle(StringUtils::StringToWString(EditorContext::ActiveWorld->GetName()));
+					m_Editor->SetTitle(StringUtils::StringToWString(EditorContext::ActiveWorld->GetName()));
 
 					isShowWorldMenu = true;
 				}
@@ -209,6 +209,20 @@ namespace Dive
 
 			if (ImGui::BeginMenu("View"))
 			{
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Tools"))
+			{
+				if (ImGui::MenuItem("Import"))
+				{
+			
+				}
+
+				if (ImGui::MenuItem("Terrain"))
+				{
+				}
+
 				ImGui::EndMenu();
 			}
 

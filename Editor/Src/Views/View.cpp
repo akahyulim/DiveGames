@@ -3,12 +3,12 @@
 namespace Dive
 {
 	View::View(Editor* editor)
-		: m_title("title")
-		, m_width(0)
-		, m_height(0)
-		, m_isVisible(true)
-		, m_flags(ImGuiWindowFlags_NoCollapse)
-		, m_editor(editor)
+		: m_Title("title")
+		, m_Width(0)
+		, m_Height(0)
+		, m_IsVisible(true)
+		, m_Flags(ImGuiWindowFlags_NoCollapse)
+		, m_Editor(editor)
 	{
 	}
 	
@@ -17,10 +17,10 @@ namespace Dive
 		if (!IsVisible())
 			return;
 
-		if (ImGui::Begin(m_title.c_str(), &m_isVisible, m_flags))
+		if (ImGui::Begin(m_Title.c_str(), &m_IsVisible, m_Flags))
 		{
-			m_width = ImGui::GetWindowWidth();
-			m_height = ImGui::GetWindowHeight();
+			m_Width = ImGui::GetWindowWidth();
+			m_Height = ImGui::GetWindowHeight();
 		}
 
 		renderContent();

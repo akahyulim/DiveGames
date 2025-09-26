@@ -123,7 +123,7 @@
       <PreprocessorDefinitions>YAML_CPP_STATIC_DEFINE;NOMINMAX;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Dive\src;$(SolutionDir)Dive\Third-Party\spdlog\include;$(SolutionDir)Dive\Third-Party\yaml-cpp\include;$(SolutionDir)Editor\Third-Party\ImGuizmo;$(SolutionDir)Editor\Third-Party\imgui;$(SolutionDir)Dive\Third-Party\DirectXTex</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Dive\src;$(SolutionDir)Dive\Third-Party\spdlog\include;$(SolutionDir)Dive\Third-Party\yaml-cpp\include;$(SolutionDir)Editor\Third-Party\ImGuizmo;$(SolutionDir)Editor\Third-Party\assimp\include;$(SolutionDir)Editor\Third-Party\imgui;$(SolutionDir)Dive\Third-Party\DirectXTex</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
@@ -131,7 +131,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>Dive.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Dive.lib;assimp-vc143-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)bin\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -170,7 +170,8 @@
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MenuBar.cpp" />
-    <ClCompile Include="src\MeshFactory.cpp" />
+    <ClCompile Include="src\tools\MeshFactory.cpp" />
+    <ClCompile Include="src\tools\ModelImporter.cpp" />
     <ClCompile Include="src\views\HierarchyView.cpp" />
     <ClCompile Include="src\views\InspectorView.cpp" />
     <ClCompile Include="src\views\LogView.cpp" />
@@ -189,7 +190,8 @@
   <ItemGroup>
     <ClInclude Include="src\Editor.h" />
     <ClInclude Include="src\MenuBar.h" />
-    <ClInclude Include="src\MeshFactory.h" />
+    <ClInclude Include="src\tools\MeshFactory.h" />
+    <ClInclude Include="src\tools\ModelImporter.h" />
     <ClInclude Include="src\views\HierarchyView.h" />
     <ClInclude Include="src\views\InspectorView.h" />
     <ClInclude Include="src\views\LogView.h" />

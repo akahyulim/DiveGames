@@ -53,12 +53,13 @@
     <ClCompile Include="Third-Party\imgui\backends\imgui_impl_win32.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\MeshFactory.cpp" />
+    <ClCompile Include="src\tools\MeshFactory.cpp" />
     <ClCompile Include="Third-Party\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="src\Editor.cpp" />
     <ClCompile Include="Third-Party\ImGuizmo\ImGuizmo.cpp">
       <Filter>ImGuizmo</Filter>
     </ClCompile>
+    <ClCompile Include="src\tools\ModelImporter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\views\HierarchyView.h">
@@ -101,8 +102,9 @@
     <ClInclude Include="Third-Party\imgui\backends\imgui_impl_win32.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\MeshFactory.h" />
+    <ClInclude Include="src\tools\MeshFactory.h" />
     <ClInclude Include="Third-Party\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="src\Editor.h" />
+    <ClInclude Include="src\tools\ModelImporter.h" />
   </ItemGroup>
 </Project>

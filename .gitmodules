@@ -16,3 +16,6 @@
 [submodule "Editor/Third-Party/ImGuizmo"]
 	path = Editor/Third-Party/ImGuizmo
 	url = https://github.com/CedricGuillemet/ImGuizmo
+[submodule "Editor/Third-Party/assimp"]
+	path = Editor/Third-Party/assimp
+	url = https://github.com/assimp/assimp.git

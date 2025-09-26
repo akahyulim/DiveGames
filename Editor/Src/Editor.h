@@ -16,6 +16,7 @@ namespace Dive
 		Max
 	};
 
+	// Guizmo Settings 추가
 	class EditorContext
 	{
 	public:

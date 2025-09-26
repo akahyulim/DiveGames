@@ -15,6 +15,6 @@ namespace Dive
 		void ComposeUI();
 
 	private:
-		Editor* m_editor = nullptr;
+		Editor* m_Editor = nullptr;
 	};
 }

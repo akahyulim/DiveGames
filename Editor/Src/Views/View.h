@@ -15,25 +15,25 @@ namespace Dive
 	
 		void ComposeUI();
 
-		float GetWidth() const { return m_width; }
-		float GetHeight() const { return m_height; }
+		float GetWidth() const { return m_Width; }
+		float GetHeight() const { return m_Height; }
 
 		DirectX::XMUINT2 GetMousePosition() const;
 
-		bool IsVisible() const { return m_isVisible; }
-		void SetVisible(bool visible) { m_isVisible = visible; }
+		bool IsVisible() const { return m_IsVisible; }
+		void SetVisible(bool visible) { m_IsVisible = visible; }
 
 	protected:
 		virtual void renderContent() {}
 
 	protected:
-		std::string m_title;
+		std::string m_Title;
 
-		float m_width;
-		float m_height;
-		bool m_isVisible;
-		int m_flags;
+		float m_Width;
+		float m_Height;
+		bool m_IsVisible;
+		int m_Flags;
 
-		Editor* m_editor;
+		Editor* m_Editor;
 	};
 }
