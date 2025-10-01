@@ -1,6 +1,7 @@
 ﻿#include "MenuBar.h"
 #include "Editor.h"
 #include "Tools/MeshFactory.h"
+#include "tools/ModelImporter.h"
 #include "Views/HierarchyView.h"
 
 namespace Dive
@@ -216,7 +217,9 @@ namespace Dive
 			{
 				if (ImGui::MenuItem("Import"))
 				{
-			
+					ModelImporter modelImporter;
+					if (!modelImporter.ImportFromFile("Assets/Models/Sponza/Sponza.obj"))
+						DV_LOG(MenuBar, err, "Failed to Import Model File");
 				}
 
 				if (ImGui::MenuItem("Terrain"))

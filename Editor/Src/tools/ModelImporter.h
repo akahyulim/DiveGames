@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include <dive.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/version.h>
@@ -8,19 +9,13 @@
 
 namespace Dive
 {
-	struct ModelParams
-	{
-		std::string name;
-		std::string filepath;
-		const aiScene* pAiScene = nullptr;
-		//Model* pModel = nullptr;
-	};
-
 	class ModelImporter
 	{
 	public:
-		ModelImporter();
-		~ModelImporter();
+		ModelImporter() = default;
+		~ModelImporter() = default;
+
+		bool ImportFromFile(const std::filesystem::path& filepath);
 
 		//bool Load(Model* pModel, const std::string& filepath);
 

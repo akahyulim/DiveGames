@@ -1,110 +1,123 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Project">
+    <Filter Include="src">
+      <UniqueIdentifier>{7c95d6b7-9628-4ddb-b07f-5914cefe0c91}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Project">
       <UniqueIdentifier>{6c1353f7-791d-405e-8749-95024422b1c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Views">
+    <Filter Include="src\Tools">
+      <UniqueIdentifier>{9e3f82cb-d489-4fba-91d1-6e153ec881b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Views">
       <UniqueIdentifier>{38716fe9-4da2-41c3-a183-3e4b8e470671}</UniqueIdentifier>
     </Filter>
-    <Filter Include="imgui">
+    <Filter Include="external">
+      <UniqueIdentifier>{6226db60-1337-4498-9124-7c354ea82f66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="external\imgui">
       <UniqueIdentifier>{ae9e82dd-cbb2-4164-8f74-95c8920cab98}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ImGuizmo">
+    <Filter Include="external\ImGuizmo">
       <UniqueIdentifier>{cc5453cb-7ea1-4d76-99fb-4eec3eab205e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\views\HierarchyView.cpp">
-      <Filter>Views</Filter>
+    <ClCompile Include="src\Views\HierarchyView.cpp">
+      <Filter>src\Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\views\InspectorView.cpp">
-      <Filter>Views</Filter>
+    <ClCompile Include="src\Views\InspectorView.cpp">
+      <Filter>src\Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\views\View.cpp">
-      <Filter>Views</Filter>
+    <ClCompile Include="src\Views\View.cpp">
+      <Filter>src\Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\views\Viewport.cpp">
-      <Filter>Views</Filter>
+    <ClCompile Include="src\Views\Viewport.cpp">
+      <Filter>src\Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\views\LogView.cpp">
-      <Filter>Views</Filter>
+    <ClCompile Include="src\Views\LogView.cpp">
+      <Filter>src\Views</Filter>
     </ClCompile>
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\MenuBar.cpp" />
-    <ClCompile Include="Third-Party\imgui\imgui.cpp">
-      <Filter>imgui</Filter>
+    <ClCompile Include="..\External\ImGuizmo\ImGuizmo.cpp">
+      <Filter>external\ImGuizmo</Filter>
     </ClCompile>
-    <ClCompile Include="Third-Party\imgui\imgui_demo.cpp">
-      <Filter>imgui</Filter>
+    <ClCompile Include="..\External\imgui\imgui.cpp">
+      <Filter>external\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Third-Party\imgui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
+    <ClCompile Include="..\External\imgui\imgui_draw.cpp">
+      <Filter>external\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Third-Party\imgui\imgui_tables.cpp">
-      <Filter>imgui</Filter>
+    <ClCompile Include="..\External\imgui\imgui_tables.cpp">
+      <Filter>external\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Third-Party\imgui\imgui_widgets.cpp">
-      <Filter>imgui</Filter>
+    <ClCompile Include="..\External\imgui\imgui_widgets.cpp">
+      <Filter>external\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Third-Party\imgui\backends\imgui_impl_dx11.cpp">
-      <Filter>imgui</Filter>
+    <ClCompile Include="src\Editor.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Third-Party\imgui\backends\imgui_impl_win32.cpp">
-      <Filter>imgui</Filter>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\tools\MeshFactory.cpp" />
-    <ClCompile Include="Third-Party\imgui\misc\cpp\imgui_stdlib.cpp" />
-    <ClCompile Include="src\Editor.cpp" />
-    <ClCompile Include="Third-Party\ImGuizmo\ImGuizmo.cpp">
-      <Filter>ImGuizmo</Filter>
+    <ClCompile Include="src\tools\MeshFactory.cpp">
+      <Filter>src\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="src\tools\ModelImporter.cpp" />
+    <ClCompile Include="src\tools\ModelImporter.cpp">
+      <Filter>src\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\backends\imgui_impl_dx11.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\backends\imgui_impl_win32.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui\misc\cpp\imgui_stdlib.cpp">
+      <Filter>external\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MenuBar.cpp">
+      <Filter>src\Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\views\HierarchyView.h">
-      <Filter>Views</Filter>
+    <ClInclude Include="src\Views\HierarchyView.h">
+      <Filter>src\Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\views\InspectorView.h">
-      <Filter>Views</Filter>
+    <ClInclude Include="src\Views\InspectorView.h">
+      <Filter>src\Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\views\View.h">
-      <Filter>Views</Filter>
+    <ClInclude Include="src\Views\View.h">
+      <Filter>src\Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\views\Viewport.h">
-      <Filter>Views</Filter>
+    <ClInclude Include="src\Views\Viewport.h">
+      <Filter>src\Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\views\LogView.h">
-      <Filter>Views</Filter>
+    <ClInclude Include="src\Views\LogView.h">
+      <Filter>src\Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\MenuBar.h" />
-    <ClInclude Include="Third-Party\imgui\imconfig.h">
-      <Filter>imgui</Filter>
+    <ClInclude Include="src\Editor.h">
+      <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="Third-Party\imgui\imgui.h">
-      <Filter>imgui</Filter>
+    <ClInclude Include="src\tools\MeshFactory.h">
+      <Filter>src\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Third-Party\imgui\imgui_internal.h">
-      <Filter>imgui</Filter>
+    <ClInclude Include="src\tools\ModelImporter.h">
+      <Filter>src\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="Third-Party\imgui\imstb_rectpack.h">
-      <Filter>imgui</Filter>
+    <ClInclude Include="..\External\imgui\backends\imgui_impl_dx11.h">
+      <Filter>external\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Third-Party\imgui\imstb_textedit.h">
-      <Filter>imgui</Filter>
+    <ClInclude Include="..\External\imgui\backends\imgui_impl_win32.h">
+      <Filter>external\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Third-Party\imgui\imstb_truetype.h">
-      <Filter>imgui</Filter>
+    <ClInclude Include="..\External\imgui\imgui.h">
+      <Filter>external\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Third-Party\imgui\backends\imgui_impl_dx11.h">
-      <Filter>imgui</Filter>
+    <ClInclude Include="..\External\imgui\misc\cpp\imgui_stdlib.h">
+      <Filter>external\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Third-Party\imgui\backends\imgui_impl_win32.h">
-      <Filter>imgui</Filter>
+    <ClInclude Include="src\MenuBar.h">
+      <Filter>src\Views</Filter>
     </ClInclude>
-    <ClInclude Include="src\tools\MeshFactory.h" />
-    <ClInclude Include="Third-Party\imgui\misc\cpp\imgui_stdlib.h" />
-    <ClInclude Include="src\Editor.h" />
-    <ClInclude Include="src\tools\ModelImporter.h" />
   </ItemGroup>
 </Project>
