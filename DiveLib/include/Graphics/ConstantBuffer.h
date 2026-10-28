@@ -3,9 +3,11 @@
 #include <d3d11.h>
 #include <cstdint>
 #include <cstring>
+#include <assert.h>
 #include <spdlog/spdlog.h>
 
-#include "core/Common.h"
+#include "Core/Common.h"
+#include "Types.h"
 #include "Graphics.h"
 #include "Shader.h"
 

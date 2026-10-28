@@ -1,7 +1,8 @@
-#include "pch.h"
-#include "Shader.h"
+#include "Graphics/Shader.h"
+#include "Graphics/Graphics.h"
 #include "Core/Common.h"
-#include "Graphics.h"
+#include <assert.h>
+#include <spdlog/spdlog.h>
 
 namespace Dive
 {

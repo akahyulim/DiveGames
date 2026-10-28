@@ -3,7 +3,10 @@
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/InputLayout.h"
+#include "Core/Common.h"
 #include "Core/Window.h"
+#include <assert.h>
+#include <spdlog/spdlog.h>
 
 namespace Dive
 {
@@ -115,9 +118,6 @@ namespace Dive
 
 	void Graphics::ClearBackbuffer()
 	{
-		// Begin
-		// => m_current들을 전부 nullptr로 초기화한다.
-		// 매 프레임 한 번은 초기화하고, 내부 pass 과정에서 참조하는 듯하다.
 		{
 			m_currentVS = nullptr;
 			m_currentHS = nullptr;

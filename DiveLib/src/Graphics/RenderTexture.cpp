@@ -1,6 +1,8 @@
-#include "pch.h"
-#include "RenderTexture.h"
-#include "Graphics.h"
+#include "Graphics/RenderTexture.h"
+#include "Graphics/Graphics.h"
+#include "Core/Common.h"
+#include <assert.h>
+#include <spdlog/spdlog.h>
 
 namespace Dive
 {

@@ -1,6 +1,8 @@
-#include "pch.h"
-#include "InputLayout.h"
-#include "Graphics.h"
+#include "Graphics/InputLayout.h"
+#include "Graphics/Graphics.h"
+#include "Core/Common.h"
+#include <assert.h>
+#include <spdlog/spdlog.h>
 
 namespace Dive
 {

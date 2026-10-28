@@ -2,6 +2,7 @@
 #include <wrl/client.h>
 #include <d3d11.h>
 #include <DXGI1_3.h>
+#include <cstdint>
 
 namespace Dive
 {

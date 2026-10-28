@@ -4,7 +4,7 @@
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
 
-#include "Core/Types.h"
+#include "Types.h"
 #include "Shader.h"
 #include "RenderPass.h"
 
@@ -33,7 +33,7 @@ namespace Dive
 		void ClearBackbuffer();
 		void ResizeBackbuffer(uint32_t width, uint32_t height);
 
-		void SwapBuffers(bool vSync);
+		void SwapBuffers(bool vSync = false);
 
 		// 의외로 이 두 메서드가 adrian엔 없다...
 		uint32_t GetWidth() const { return m_width; }

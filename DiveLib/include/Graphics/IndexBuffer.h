@@ -3,7 +3,7 @@
 #include <wrl/client.h>
 #include <d3d11.h>
 
-#include "Core/Types.h"
+#include "Types.h"
 
 namespace Dive
 {

@@ -19,24 +19,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Core\Common.h" />
     <ClInclude Include="include\Core\Window.h" />
     <ClInclude Include="include\Graphics\ConstantBuffer.h" />
-    <ClInclude Include="include\Graphics\ConstantBufferDatas.h" />
     <ClInclude Include="include\Graphics\Geometry.h" />
     <ClInclude Include="include\Graphics\Graphics.h" />
     <ClInclude Include="include\Graphics\IndexBuffer.h" />
     <ClInclude Include="include\Graphics\InputLayout.h" />
-    <ClInclude Include="include\Graphics\PipelineState.h" />
     <ClInclude Include="include\Graphics\RenderPass.h" />
     <ClInclude Include="include\Graphics\RenderTexture.h" />
     <ClInclude Include="include\Graphics\Shader.h" />
     <ClInclude Include="include\Graphics\ShaderProgram.h" />
     <ClInclude Include="include\Graphics\StructuredBuffer.h" />
+    <ClInclude Include="include\Graphics\Types.h" />
     <ClInclude Include="include\Graphics\VertexBuffer.h" />
     <ClInclude Include="include\Utilities\Delegate.h" />
     <ClInclude Include="include\Utilities\EventDispatcher.h" />
     <ClInclude Include="include\Utilities\StringUtils.h" />
-    <ClInclude Include="src\Graphics\PipelineState.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Window.cpp" />
@@ -135,10 +134,10 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;WIN32_LEAN_AND_MEAN;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Vendor\spdlog\include;$(ProjectDir)include;</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -147,6 +146,9 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalDependencies>dinput8.lib;dxguid.lib;d3d11.lib;dinput8.lib;</AdditionalDependencies>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>

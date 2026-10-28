@@ -1,6 +1,9 @@
-#include "pch.h"
-#include "IndexBuffer.h"
-#include "Graphics.h"
+#include "Graphics/IndexBuffer.h"
+#include "Graphics/Graphics.h"
+#include "Graphics/Types.h"
+#include "Core/Common.h"
+#include <assert.h>
+#include <spdlog/spdlog.h>
 
 namespace Dive
 {

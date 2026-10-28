@@ -1,8 +1,8 @@
-﻿#pragma once
+#pragma once
 #include <cstdint>
 #include <memory>
 
-#include "Core/Types.h"
+#include "Types.h"
 
 namespace Dive
 {
