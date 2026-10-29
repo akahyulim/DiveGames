@@ -20,19 +20,24 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Common.h" />
+    <ClInclude Include="include\Core\Object.h" />
     <ClInclude Include="include\Core\Window.h" />
     <ClInclude Include="include\Graphics\ConstantBuffer.h" />
     <ClInclude Include="include\Graphics\Geometry.h" />
     <ClInclude Include="include\Graphics\Graphics.h" />
     <ClInclude Include="include\Graphics\IndexBuffer.h" />
     <ClInclude Include="include\Graphics\InputLayout.h" />
+    <ClInclude Include="include\Graphics\Mesh.h" />
     <ClInclude Include="include\Graphics\RenderPass.h" />
     <ClInclude Include="include\Graphics\RenderTexture.h" />
     <ClInclude Include="include\Graphics\Shader.h" />
+    <ClInclude Include="include\Graphics\ShaderManager.h" />
     <ClInclude Include="include\Graphics\ShaderProgram.h" />
     <ClInclude Include="include\Graphics\StructuredBuffer.h" />
     <ClInclude Include="include\Graphics\Types.h" />
     <ClInclude Include="include\Graphics\VertexBuffer.h" />
+    <ClInclude Include="include\Input\Input.h" />
+    <ClInclude Include="include\Resource\Resource.h" />
     <ClInclude Include="include\Utilities\Delegate.h" />
     <ClInclude Include="include\Utilities\EventDispatcher.h" />
     <ClInclude Include="include\Utilities\StringUtils.h" />
@@ -42,10 +47,14 @@
     <ClCompile Include="src\Graphics\Graphics.cpp" />
     <ClCompile Include="src\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="src\Graphics\InputLayout.cpp" />
+    <ClCompile Include="src\Graphics\Mesh.cpp" />
     <ClCompile Include="src\Graphics\RenderTexture.cpp" />
     <ClCompile Include="src\Graphics\Shader.cpp" />
+    <ClCompile Include="src\Graphics\ShaderManager.cpp" />
     <ClCompile Include="src\Graphics\ShaderProgram.cpp" />
     <ClCompile Include="src\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="src\Input\Input.cpp" />
+    <ClCompile Include="src\Resource\Resource.cpp" />
     <ClCompile Include="src\Utilities\EventDispatcher.cpp" />
     <ClCompile Include="src\Utilities\StringUtils.cpp" />
   </ItemGroup>

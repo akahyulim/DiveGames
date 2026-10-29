@@ -2,5 +2,12 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\GamePlay.cpp" />
+    <ClCompile Include="Source\Camera.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Stage.h" />
+    <ClInclude Include="Source\GamePlay.h" />
+    <ClInclude Include="Source\Camera.h" />
   </ItemGroup>
 </Project>

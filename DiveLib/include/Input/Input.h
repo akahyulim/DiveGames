@@ -13,12 +13,6 @@ namespace Dive
 	class Input
 	{
 	public:
-		static Input& Get()
-		{
-			static Input instance;
-			return instance;
-		}
-
 		Input(HWND hWnd);
 		~Input();
 
@@ -47,10 +41,6 @@ namespace Dive
 		DirectX::XMUINT2 GetMousePosition(HWND hWnd);
 		DirectX::XMFLOAT2 GetMouseMoveDelta();
 		int GetMouseWheelDelta();
-
-	private:
-		Input() = default;
-		//virtual ~Input();
 
 	private:
 		HWND m_hWnd{};

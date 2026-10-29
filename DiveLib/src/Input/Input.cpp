@@ -1,10 +1,13 @@
-#include "pch.h"
-#include "Input.h"
+#include "Input/Input.h"
+#include "Core/Common.h"
+#include <spdlog/spdlog.h>
 
 using Microsoft::WRL::ComPtr;
 
 namespace Dive
 {
+	// Initialize와 기능이 중복된다.
+	// 싱글톤의 잔재인 듯하다.
 	Input::Input(HWND hWnd)
 		: m_hWnd(hWnd)
 	{
@@ -79,8 +82,6 @@ namespace Dive
 			spdlog::error("[::Input] 마우스 Acquire 실패: {}", ErrorUtils::ToVerbose(hr));
 			return;
 		}
-
-		spdlog::info("초기화 성공");
 	}
 
 	Input::~Input()
