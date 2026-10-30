@@ -156,7 +156,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>dinput8.lib;dxguid.lib;d3d11.lib;dinput8.lib;</AdditionalDependencies>
+      <AdditionalDependencies>d3dcompiler.lib;dinput8.lib;dxguid.lib;d3d11.lib;dinput8.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

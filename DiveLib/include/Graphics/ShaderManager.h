@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <memory>
+#include <map>
 #include <unordered_map>
 #include <filesystem>
 
@@ -28,6 +29,17 @@ namespace Dive
 
 	class Graphics;
 
+	struct ShaderProgramDesc
+	{
+		std::string name = "";
+		std::filesystem::path vsPath = "";
+		std::filesystem::path psPath = "";
+		std::filesystem::path dsPath = "";
+		std::filesystem::path hsPath = "";
+		std::filesystem::path gsPath = "";
+		eInputLayout ilType = eInputLayout::Lit;
+	};
+
 	class ShaderManager
 	{
 	public:
@@ -46,26 +58,58 @@ namespace Dive
 		bool Initialize(Graphics* graphics);
 		void Shutdown();
 
-		ShaderProgram* GetShaderProgram(eShaderPrograms sp);
+		ShaderProgram* CreateShaderProgram(Graphics* graphics, ShaderProgramDesc& desc);
+		ShaderProgram* GetShaderProgram(const std::string name);
+
+		ComputeShader* CreateComputeShader(Graphics* graphics, const std::filesystem::path& path);
+		ComputeShader* GetComputeShader(const std::filesystem::path& path);
 
 	private:
 		ShaderManager() = default;
 		~ShaderManager();
 
-		bool createVertexShaderAndInputLayout(Graphics* graphics, const std::filesystem::path& path, eInputLayout type);
-		bool createHullShader(Graphics* graphics, const std::filesystem::path& path);
-		bool createDomainShader(Graphics* graphics, const std::filesystem::path& path);
-		bool createPixelShader(Graphics* graphics, const std::filesystem::path& path);
-		bool createComputeShader(Graphics* graphics, const std::filesystem::path& path);
-		bool createShaderProgram(const std::string& vsName, const std::string& psName, eShaderPrograms sp);
+		//bool createShaderProgram(const std::string& vsName, const std::string& psName, eShaderPrograms sp);
+
+		Microsoft::WRL::ComPtr<ID3DBlob> compileShader(const std::filesystem::path& filepath, eShaderStage stage);
+
+		VertexShader* createVertexShaderAndInputLayout(Graphics* graphics, const std::filesystem::path& path, eInputLayout type);
+
+		template<typename T>
+		T* createShaderInternal(Graphics* graphics, const std::filesystem::path& path, eShaderStage stage,
+			std::unordered_map<std::filesystem::path, std::unique_ptr<T>>& shaderMap);
 
 	private:
-		std::unordered_map<std::string, std::unique_ptr<VertexShader>> m_vss;
-		std::unordered_map<std::string, std::unique_ptr<HullShader>> m_hss;
-		std::unordered_map<std::string, std::unique_ptr<DomainShader>> m_dss;
-		std::unordered_map<std::string, std::unique_ptr<PixelShader>> m_pss;
-		std::unordered_map<std::string, std::unique_ptr<ComputeShader>> m_css;
-		std::unordered_map<std::string, std::unique_ptr<InputLayout>> m_ils;
-		std::unordered_map<eShaderPrograms, std::unique_ptr<ShaderProgram>> m_shaderPrograms;
+		std::unordered_map<std::filesystem::path, std::unique_ptr<VertexShader>> m_vsMap;
+		std::unordered_map<std::filesystem::path, std::unique_ptr<HullShader>> m_hsMap;
+		std::unordered_map<std::filesystem::path, std::unique_ptr<DomainShader>> m_dsMap;
+		std::unordered_map<std::filesystem::path, std::unique_ptr<PixelShader>> m_psMap;
+		std::unordered_map<std::filesystem::path, std::unique_ptr<ComputeShader>> m_csMap;
+
+		using InputLayoutKey = std::pair<std::filesystem::path, eInputLayout>;
+		std::map<InputLayoutKey, std::unique_ptr<InputLayout>> m_ilMap;
+
+		std::unordered_map<std::string, std::unique_ptr<ShaderProgram>> m_shaderProgramMap;
 	};
+
+	template<typename T>
+	inline T* ShaderManager::createShaderInternal(
+		Graphics* graphics, 
+		const std::filesystem::path& path, 
+		eShaderStage stage, 
+		std::unordered_map<std::filesystem::path, std::unique_ptr<T>>& shaderMap)
+	{
+		if (path.empty())
+			return nullptr;
+
+		auto it = shaderMap.find(path);
+		if (it != shaderMap.end())
+			return it->second.get();
+
+		auto blob = compileShader(path, stage);
+		if (blob == nullptr)
+			return nullptr;
+
+		shaderMap[path] = std::make_unique<T>(graphics, blob.Get());
+		return shaderMap[path].get();
+	}
 }

@@ -5,6 +5,8 @@
 #include "Stage.h"
 #include "GamePlay.h"
 
+#include "Graphics/ShaderManager.h"	// test
+
 int main()
 {
 	Dive::WindowInit windowData{};
@@ -17,6 +19,8 @@ int main()
 	auto input = std::make_unique<Dive::Input>(window->GetWindowHandle());
 
 	Sokoban::GamePlay gamePlay;
+
+	Dive::ShaderManager::Get().Initialize(graphics.get());	// test
 
 	while (window->Run())
 	{

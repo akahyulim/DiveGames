@@ -14,6 +14,8 @@ namespace Sokoban
 		GamePlay();
 		~GamePlay();
 
+		void TestStage();
+
 		void LoadStage(const Stage& stage);
 		void LoadStage(const std::string& filepath);
 

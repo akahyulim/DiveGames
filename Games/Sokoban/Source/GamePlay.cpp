@@ -12,6 +12,10 @@ namespace Sokoban
 	}
 
 	GamePlay::~GamePlay() = default;
+
+	void GamePlay::TestStage()
+	{
+	}
 	
 	void GamePlay::LoadStage(const Stage& stage)
 	{
