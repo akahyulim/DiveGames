@@ -20,7 +20,13 @@ int main()
 
 	Sokoban::GamePlay gamePlay;
 
-	Dive::ShaderManager::Get().Initialize(graphics.get());	// test
+	// graphics 때문에 위치가 애매하다.
+	Dive::ShaderProgramDesc desc;
+	desc.name = "Test";
+	desc.vsPath = "Assets/Shaders/Test.hlsl";
+	desc.psPath = "Assets/Shaders/Test.hlsl";
+	desc.ilType = Dive::eInputLayout::None;
+	Dive::ShaderManager::Get().CreateShaderProgram(graphics.get(), desc);
 
 	while (window->Run())
 	{
@@ -32,7 +38,7 @@ int main()
 		graphics->ClearBackbuffer();
 		graphics->SetBackbuffer();
 
-		gamePlay.Render();
+		gamePlay.Render(graphics.get());
 
 		graphics->EndRenderPass();
 		graphics->SwapBuffers();

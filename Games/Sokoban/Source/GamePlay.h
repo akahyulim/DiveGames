@@ -8,6 +8,8 @@
 
 namespace Sokoban
 {
+	class Dive::Graphics;
+
 	class GamePlay
 	{
 	public:
@@ -21,7 +23,7 @@ namespace Sokoban
 
 		void Update();
 
-		void Render() const;
+		void Render(Dive::Graphics* graphics) const;
 
 		void CreateWallMesh(const Dive::Color& color);
 		void CreateCrateMesh(const Dive::Color& color);

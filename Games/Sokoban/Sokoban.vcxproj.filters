@@ -10,4 +10,14 @@
     <ClInclude Include="Source\GamePlay.h" />
     <ClInclude Include="Source\Camera.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{98296b58-c79d-44eb-b00a-15b6bdaacc09}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Assets\Shaders\Test.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+  </ItemGroup>
 </Project>

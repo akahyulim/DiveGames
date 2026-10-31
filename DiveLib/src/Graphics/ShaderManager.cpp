@@ -15,8 +15,8 @@ namespace Dive
 		{
 			ShaderProgramDesc desc{};
 			desc.name = "GBuffer";
-			desc.vsPath = "src/Shaders/GBuffer.hlsl";
-			desc.psPath = "src/Shaders/GBuffer.hlsl";
+			desc.vsPath = "Assets/Shaders/GBuffer.hlsl";
+			desc.psPath = "Assets/Shaders/GBuffer.hlsl";
 			desc.ilType = eInputLayout::Lit;
 
 			if (!CreateShaderProgram(graphics, desc))
@@ -26,10 +26,10 @@ namespace Dive
 		{
 			ShaderProgramDesc desc{};
 			desc.name = "GBufferTessellation";
-			desc.vsPath = "src/Shaders/GBufferTessellation.hlsl";
-			desc.psPath = "src/Shaders/GBufferTessellation.hlsl";
-			desc.hsPath = "src/Shaders/GBufferTessellation.hlsl";
-			desc.dsPath = "src/Shaders/GBufferTessellation.hlsl";
+			desc.vsPath = "Assets/Shaders/GBufferTessellation.hlsl";
+			desc.psPath = "Assets/Shaders/GBufferTessellation.hlsl";
+			desc.hsPath = "Assets/Shaders/GBufferTessellation.hlsl";
+			desc.dsPath = "Assets/Shaders/GBufferTessellation.hlsl";
 			desc.ilType = eInputLayout::Lit;
 			
 			if (!CreateShaderProgram(graphics, desc))
@@ -38,9 +38,9 @@ namespace Dive
 
 		{
 			ShaderProgramDesc desc{};
-			desc.name = "DeferredLigting";
-			desc.vsPath = "src/Shaders/DeferredLigting.hlsl";
-			desc.psPath = "src/Shaders/DeferredLigting.hlsl";
+			desc.name = "DeferredLighting";
+			desc.vsPath = "Assets/Shaders/DeferredLighting.hlsl";
+			desc.psPath = "Assets/Shaders/DeferredLighting.hlsl";
 			desc.ilType = eInputLayout::None;
 
 			if (!CreateShaderProgram(graphics, desc))
@@ -50,8 +50,8 @@ namespace Dive
 		{
 			ShaderProgramDesc desc{};
 			desc.name = "Forward";
-			desc.vsPath = "src/Shaders/Forward.hlsl";
-			desc.psPath = "src/Shaders/Forward.hlsl";
+			desc.vsPath = "Assets/Shaders/Forward.hlsl";
+			desc.psPath = "Assets/Shaders/Forward.hlsl";
 			desc.ilType = eInputLayout::Lit;
 
 			if (!CreateShaderProgram(graphics, desc))
@@ -67,8 +67,8 @@ namespace Dive
 		{
 			ShaderProgramDesc desc{};
 			desc.name = "Skybox";
-			desc.vsPath = "src/Shaders/Skybox.hlsl";
-			desc.psPath = "src/Shaders/Skybox.hlsl";
+			desc.vsPath = "Assets/Shaders/Skybox.hlsl";
+			desc.psPath = "Assets/Shaders/Skybox.hlsl";
 			desc.ilType = eInputLayout::Position;
 
 			if (!CreateShaderProgram(graphics, desc))
@@ -78,8 +78,8 @@ namespace Dive
 		{
 			ShaderProgramDesc desc{};
 			desc.name = "SkySphere";
-			desc.vsPath = "src/Shaders/SkySphere.hlsl";
-			desc.psPath = "src/Shaders/SkySphere.hlsl";
+			desc.vsPath = "Assets/Shaders/SkySphere.hlsl";
+			desc.psPath = "Assets/Shaders/SkySphere.hlsl";
 			desc.ilType = eInputLayout::Position;
 
 			if (!CreateShaderProgram(graphics, desc))
@@ -89,8 +89,8 @@ namespace Dive
 		{
 			ShaderProgramDesc desc{};
 			desc.name = "UniformSky";
-			desc.vsPath = "src/Shaders/SkySphere.hlsl";
-			desc.psPath = "src/Shaders/UniformSky.hlsl";
+			desc.vsPath = "Assets/Shaders/SkySphere.hlsl";
+			desc.psPath = "Assets/Shaders/UniformSky.hlsl";
 			desc.ilType = eInputLayout::Position;
 
 			if (!CreateShaderProgram(graphics, desc))
@@ -100,171 +100,18 @@ namespace Dive
 		{
 			ShaderProgramDesc desc{};
 			desc.name = "Resolve";
-			desc.vsPath = "src/Shaders/ResolveScene.hlsl";
-			desc.psPath = "src/Shaders/ResolveScene.hlsl";
+			desc.vsPath = "Assets/Shaders/ResolveScene.hlsl";
+			desc.psPath = "Assets/Shaders/ResolveScene.hlsl";
 			desc.ilType = eInputLayout::None;
 
 			if (!CreateShaderProgram(graphics, desc))
 				return false;
 		}
 
-		auto pickerCS = createShaderInternal(graphics, "src/Shaders/Picker.hlsl", eShaderStage::CS, m_csMap);
+		auto pickerCS = createShaderInternal(graphics, "Assets/Shaders/Picker.hlsl", eShaderStage::CS, m_csMap);
 		if (!pickerCS)
 			return false;
-		/*
-		if (!createVertexShaderAndInputLayout(graphics, "Source/Shaders/GBuffer.hlsl", eInputLayout::Lit))
-		{
-			spdlog::error("GBuffer VS 생성 실패");
-			return false;
-		}
-		if (!createVertexShaderAndInputLayout(graphics, "Source/Shaders/GBufferTessellation.hlsl", eInputLayout::Lit))
-		{
-			spdlog::error("GBufferTessellation VS 생성 실패");
-			return false;
-		}
-		if (!createVertexShaderAndInputLayout(graphics, "Source/Shaders/DeferredLighting.hlsl", eInputLayout::None))
-		{
-			spdlog::error("DeferredLighting VS 생성 실패");
-			return false;
-		}
-		if (!createVertexShaderAndInputLayout(graphics, "Source/Shaders/Forward.hlsl", eInputLayout::Lit))
-		{
-			spdlog::error("Forward VS 생성 실패");
-			return false;
-		}
-		if (!createVertexShaderAndInputLayout(graphics, "Source/Shaders/Skybox.hlsl", eInputLayout::Position))
-		{
-			spdlog::error("Skybox VS 생성 실패");
-			return false;
-		}
-		if (!createVertexShaderAndInputLayout(graphics, "Source/Shaders/SkySphere.hlsl", eInputLayout::Position))
-		{
-			spdlog::error("SkySphere VS 생성 실패");
-			return false;
-		}
-		if (!createVertexShaderAndInputLayout(graphics, "Source/Shaders/ResolveScene.hlsl", eInputLayout::None))
-		{
-			spdlog::error("ResolveScene VS 생성 실패");
-			return false;
-		}
-
-		// hull shader
-		if (!createHullShader(graphics, "Source/Shaders/GBufferTessellation.hlsl"))
-		{
-			spdlog::error("GBufferTessellation HS 생성 실패");
-			return false;
-		}
-
-		// domain shader
-		if (!createDomainShader(graphics, "Source/Shaders/GBufferTessellation.hlsl"))
-		{
-			spdlog::error("GBufferTessellation DS 생성 실패");
-			return false;
-		}
-
-		// pixel shader
-		if(!createPixelShader(graphics, "Source/Shaders/GBuffer.hlsl"))
-		{
-			spdlog::error("GBuffer PS 생성 실패");
-			return false;
-		}
-		if (!createPixelShader(graphics, "Source/Shaders/GBufferTessellation.hlsl"))
-		{
-			spdlog::error("GBufferTessellation PS 생성 실패");
-			return false;
-		}
-		if (!createPixelShader(graphics, "Source/Shaders/DeferredLighting.hlsl"))
-		{
-			spdlog::error("DeferredLighting PS 생성 실패");
-			return false;
-		}
-		if (!createPixelShader(graphics, "Source/Shaders/Forward.hlsl"))
-		{
-			spdlog::error("Forward PS 생성 실패");
-			return false;
-		}
-		if (!createPixelShader(graphics, "Source/Shaders/Skybox.hlsl"))
-		{
-			spdlog::error("Skybox PS 생성 실패");
-			return false;
-		}
-		if (!createPixelShader(graphics, "Source/Shaders/SkySphere.hlsl"))
-		{
-			spdlog::error("SkySphere PS 생성 실패");
-			return false;
-		}
-		if (!createPixelShader(graphics, "Source/Shaders/UniformSky.hlsl"))
-		{
-			spdlog::error("UniformSky PS 생성 실패");
-			return false;
-		}
-		if (!createPixelShader(graphics, "Source/Shaders/ResolveScene.hlsl"))
-		{
-			spdlog::error("ResolveScene PS 생성 실패");
-			return false;
-		}
-
-		// computeShader
-		if (!createComputeShader(graphics, "Source/Shaders/Picker.hlsl"))
-		{
-			spdlog::error("Picking CS 생성 실패");
-			return false;
-		}
-
-		// shader program
-		if(!createShaderProgram("GBuffer", "GBuffer", eShaderPrograms::GBuffer))
-		{
-			spdlog::error("GBuffer ShaderProgram 생성 실패");
-			return false;
-		}
-		{
-			if (!createShaderProgram("GBufferTessellation", "GBufferTessellation", eShaderPrograms::GBufferTessellation))
-			{
-				spdlog::error("GBufferTessellation ShaderProgram 생성 실패");
-				return false;
-			}
-
-			m_shaderProgramMap[eShaderPrograms::GBufferTessellation]->SetHullShader(m_hsMap.find("GBufferTessellation")->second.get());
-			m_shaderProgramMap[eShaderPrograms::GBufferTessellation]->SetDomainShader(m_dsMap.find("GBufferTessellation")->second.get());
-		}
-		if (!createShaderProgram("DeferredLighting", "DeferredLighting", eShaderPrograms::DeferredLighting))
-		{
-			spdlog::error("DeferredLighting ShaderProgram 생성 실패");
-			return false;
-		}
-		if (!createShaderProgram("Forward", "Forward", eShaderPrograms::Forward))
-		{
-			spdlog::error("Forward ShaderProgram 생성 실패");
-			return false;
-		}
-		// 하나의 hlsl파일에 vs, ps를 모두 구현하면 이렇게 동일한 이름으로 저장된다.
-		// enum class로 미리 선언해놓는 것도 하나의 방법이다.
-		if (!createShaderProgram("Skybox", "Skybox", eShaderPrograms::Skybox))
-		{
-			spdlog::error("Skybox ShaderProgram 생성 실패");
-			return false;
-		}
-		if (!createShaderProgram("SkySphere", "SkySphere", eShaderPrograms::SkySphere))
-		{
-			spdlog::error("SkySphere ShaderProgram 생성 실패");
-			return false;
-		}
-		if (!createShaderProgram("SkySphere", "UniformSky", eShaderPrograms::UniformSky))
-		{
-			spdlog::error("UniformSky ShaderProgram 생성 실패");
-			return false;
-		}
-		if (!createShaderProgram("ResolveScene", "ResolveScene", eShaderPrograms::Resolve))
-		{
-			spdlog::error("ResloveScene ShaderProgram 생성 실패");
-			return false;
-		}
 		
-		m_shaderProgramMap[eShaderPrograms::Picking] = std::make_unique<ShaderProgram>(m_csMap.find("Picker")->second.get());
-
-		spdlog::info("ShaderManager 초기화 완료");
-		*/
-
 		spdlog::info("ShaderManager 초기화 완료");
 
 		return true;

@@ -1,4 +1,7 @@
 #include "GamePlay.h"
+#include "Graphics/Types.h"
+#include "Graphics/Graphics.h"
+#include "Graphics/ShaderManager.h"
 
 namespace Sokoban
 {
@@ -30,10 +33,12 @@ namespace Sokoban
 	{
 	}
 	
-	void GamePlay::Render() const
+	void GamePlay::Render(Dive::Graphics* graphics) const
 	{
 		// 셰이더를 바인딩해야 한다.
 		// 여기서도 ShaderProgram를 사용하면 된다.
+		auto sp = Dive::ShaderManager::Get().GetShaderProgram("Test");
+		sp->Bind(graphics);
 
 		for (int y = 0; y < m_currentStage.height; ++y)
 		{
@@ -44,5 +49,9 @@ namespace Sokoban
 				//tileType에 맞는 Mesh Draw
 			}
 		}
+
+		graphics->SetTopology(Dive::ePrimitiveTopology::TriangleStrip);
+		graphics->SetVertexBuffer(nullptr);
+		graphics->Draw(4);
 	}
 }
