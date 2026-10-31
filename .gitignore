@@ -1,17 +1,15 @@
-# Assets
-[Ff]onts/
-[Mm]odels/
-[Tt]extures/
-
 # Visual Studio 가상 파일 및 캐시
 .vs/
 *.user
 *.suo
 *.db
 *.opendb
+*.ipch
+*.log
 
-# 빌드 결과물 및 임시 폴더
+# 빌드 결과물 및 임시 폴더 (대소문자 모두 방어)
 bin/
+Bin/
 bin-int/
 Debug/
 Release/
@@ -22,3 +20,10 @@ x86/
 *.pdb
 *.obj
 *.ilk
+*.exp
+*.lib
+
+# 운영체제 생성 임시 파일
+.DS_Store
+Thumbs.db
+Desktop.ini
