@@ -10,6 +10,7 @@ namespace Dive
 	enum class eInputLayout : uint8_t
 	{
 		None = 0,
+		Color,
 		Position,
 		Unlit,
 		Lit,

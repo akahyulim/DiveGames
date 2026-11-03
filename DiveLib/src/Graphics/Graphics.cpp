@@ -113,7 +113,7 @@ namespace Dive
 	void Graphics::SetBackbuffer()
 	{
 		SetViewport(m_width, m_height);
-		m_deviceContext->OMSetRenderTargets(1, m_backbufferRTV.GetAddressOf(), nullptr);
+		m_deviceContext->OMSetRenderTargets(1, m_backbufferRTV.GetAddressOf(), m_backbufferDSV.Get());
 	}
 
 	void Graphics::ClearBackbuffer()
@@ -133,6 +133,8 @@ namespace Dive
 
 			m_currentTopology = ePrimitiveTopology::None;
 		}
+
+		m_deviceContext->ClearDepthStencilView(m_backbufferDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		m_deviceContext->ClearRenderTargetView(m_backbufferRTV.Get(), clearColor);
@@ -526,6 +528,9 @@ namespace Dive
 		if (m_backbufferRTV)
 			m_backbufferRTV.Reset();
 
+		if (m_backbufferDSV)
+			m_backbufferDSV.Reset();
+
 		m_swapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
 
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
@@ -533,6 +538,23 @@ namespace Dive
 
 		m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_backbufferRTV.GetAddressOf());
 
-		m_deviceContext->OMSetRenderTargets(1, m_backbufferRTV.GetAddressOf(), nullptr);
+		D3D11_TEXTURE2D_DESC depthDesc = {};
+		depthDesc.Width = width;
+		depthDesc.Height = height;
+		depthDesc.MipLevels = 1;
+		depthDesc.ArraySize = 1;
+		depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthDesc.SampleDesc.Count = 1;
+		depthDesc.SampleDesc.Quality = 0;
+		depthDesc.Usage = D3D11_USAGE_DEFAULT;
+		depthDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		depthDesc.CPUAccessFlags = 0;
+		depthDesc.MiscFlags = 0;
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
+		m_device->CreateTexture2D(&depthDesc, nullptr, depthStencilBuffer.GetAddressOf());
+		m_device->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, m_backbufferDSV.GetAddressOf());
+
+		m_deviceContext->OMSetRenderTargets(1, m_backbufferRTV.GetAddressOf(), m_backbufferDSV.Get());
 	}
 }

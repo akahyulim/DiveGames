@@ -1,19 +1,37 @@
 #pragma once
 #include <string>
 #include <memory>
+#include <DirectXMath.h>
+#include <d3d11.h>
+#include <wrl/client.h>
 #include "Graphics/Types.h"
 #include "Graphics/Mesh.h"
+#include "Graphics/ConstantBuffer.h"
 #include "Stage.h"
 #include "Camera.h"
+#include "BlockManager.h"
+
+#include "Input/Input.h"
 
 namespace Sokoban
 {
 	class Dive::Graphics;
+	//class Dive::Input;
+
+	struct FrameData
+	{
+		DirectX::XMMATRIX viewProj;
+	};
+
+	struct ObjectData
+	{
+		DirectX::XMMATRIX model;
+	};
 
 	class GamePlay
 	{
 	public:
-		GamePlay();
+		GamePlay(Dive::Graphics* graphics);
 		~GamePlay();
 
 		void TestStage();
@@ -21,24 +39,23 @@ namespace Sokoban
 		void LoadStage(const Stage& stage);
 		void LoadStage(const std::string& filepath);
 
-		void Update();
-
+		void Update(Dive::Graphics* graphics, Dive::Input* input);
 		void Render(Dive::Graphics* graphics) const;
 
-		void CreateWallMesh(const Dive::Color& color);
-		void CreateCrateMesh(const Dive::Color& color);
+		int FindCrateAt(int x, int y);
 
 	private:
-
+		void checkAndMovePlayer(int nextX, int nextY, int dx, int dy);
 
 	private:
 		Stage m_currentStage;
 		Camera m_camera;
 
-		std::unique_ptr<Dive::Mesh> m_wallMesh;
-		std::unique_ptr<Dive::Mesh> m_floorMesh;
-		std::unique_ptr<Dive::Mesh> m_goalMesh;
-		std::unique_ptr<Dive::Mesh> m_crateMesh;
-		std::unique_ptr<Dive::Mesh> m_playerMesh;
+		BlockManager m_blockManager;
+
+		std::unique_ptr<Dive::ConstantBuffer<FrameData>> m_cbFrame;
+		std::unique_ptr<Dive::ConstantBuffer<ObjectData>> m_cbObject;
+
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_dss;
 	};
 }

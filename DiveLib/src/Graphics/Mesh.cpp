@@ -5,6 +5,18 @@
 
 namespace Dive
 {
+	Mesh::Mesh(Graphics* graphics, const std::vector<ColorVertex>& vertices, const std::vector<uint32_t>& indices)
+		: m_isSkinned(false)
+	{
+		assert(!vertices.empty());
+
+		uint32_t stride = static_cast<uint32_t>(sizeof(ColorVertex));
+		uint32_t count = static_cast<uint32_t>(vertices.size());
+		m_vb = std::make_unique<VertexBuffer>(graphics, stride, count, vertices.data());
+
+		createIndexBuffer(graphics, indices);
+	}
+
 	Mesh::Mesh(Graphics* graphics, const std::vector<StaticVertex>& vertices, const std::vector<uint32_t>& indices)
 		: m_isSkinned(false)
 	{

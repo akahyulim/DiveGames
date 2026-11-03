@@ -1,20 +1,9 @@
 #pragma once
 #include <vector>
+#include "Types.h"
 
 namespace Sokoban
 {
-	class Mesh;
-
-	enum class eTileType
-	{
-		Empty,
-		Floor,
-		Wall,
-		Goal,
-		Crate,
-		Player
-	};
-
 	struct GridPosition
 	{
 		int x;
@@ -25,9 +14,9 @@ namespace Sokoban
 	{
 		int width;
 		int height;
-		std::vector<eTileType> m_gridTiles;
+		std::vector<eBlockType> gridTiles;
 
-		GridPosition m_playerPosition;
-		std::vector<GridPosition> m_cratePositions;
+		GridPosition playerPos;
+		std::vector<GridPosition> cratePosList;
 	};
 }

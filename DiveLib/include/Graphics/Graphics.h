@@ -99,6 +99,7 @@ namespace Dive
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
 
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_backbufferRTV;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_backbufferDSV;
 
 		VertexShader* m_currentVS = nullptr;
 		HullShader* m_currentHS = nullptr;

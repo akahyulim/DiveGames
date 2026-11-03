@@ -17,6 +17,7 @@ namespace Dive
 	{
 	public:
 		Mesh() = delete;
+		Mesh(Graphics* graphics, const std::vector<ColorVertex>& vertices, const std::vector<uint32_t>& indices);
 		Mesh(Graphics* graphics, const std::vector<StaticVertex>& vertices, const std::vector<uint32_t>& indices);
 		Mesh(Graphics* graphics, const std::vector<SkinnedVertex>& vertices, const std::vector<uint32_t>& indices);
 		Mesh(const Mesh&) = delete;
