@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cstdint>
 #include "Types.h"
 
 namespace Sokoban
@@ -14,7 +15,7 @@ namespace Sokoban
 	{
 		int width;
 		int height;
-		std::vector<eBlockType> gridTiles;
+		std::vector<uint8_t> gridTiles;
 
 		GridPosition playerPos;
 		std::vector<GridPosition> cratePosList;

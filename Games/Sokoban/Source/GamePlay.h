@@ -9,7 +9,7 @@
 #include "Graphics/ConstantBuffer.h"
 #include "Stage.h"
 #include "Camera.h"
-#include "BlockManager.h"
+#include "MeshManager.h"
 
 #include "Input/Input.h"
 
@@ -34,8 +34,6 @@ namespace Sokoban
 		GamePlay(Dive::Graphics* graphics);
 		~GamePlay();
 
-		void TestStage();
-
 		void LoadStage(const Stage& stage);
 		void LoadStage(const std::string& filepath);
 
@@ -46,12 +44,17 @@ namespace Sokoban
 
 	private:
 		void checkAndMovePlayer(int nextX, int nextY, int dx, int dy);
+		bool checkGameClear();
+
+		void firstStage();
+		void secondStage();
+		void thirdStage();
 
 	private:
 		Stage m_currentStage;
 		Camera m_camera;
 
-		BlockManager m_blockManager;
+		MeshManager m_blockManager;
 
 		std::unique_ptr<Dive::ConstantBuffer<FrameData>> m_cbFrame;
 		std::unique_ptr<Dive::ConstantBuffer<ObjectData>> m_cbObject;

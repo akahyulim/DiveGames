@@ -10,8 +10,10 @@ namespace Sokoban
 	{
 		m_camera.SetPerspective(DirectX::XM_PIDIV4, 800.0f / 600.0f, 0.1f, 100.0f);
 		//m_camera.LookAt({ 0.0f, 10.0f, -8.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
-		//m_camera.LookAt({ 0.0f, 15.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
-		m_camera.LookAt({ 0.0f, 0.5f, -10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+		m_camera.LookAt({ 0.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
+		//m_camera.LookAt({ 0.0f, 0.5f, -10.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+		//m_camera.LookAt({ 0.0f, 8.0f, -8.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+		//m_camera.LookAt({ 6.0f, 9.0f, -6.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
 
 		// 셰이더 생성은 ShaderManager로 생성해 ShaderPrograme으로 받는다.
 		// 기존 Initialize가 무겁기 때문에 필요한 것만 생성하는 기능을 추가해야 한다.
@@ -37,32 +39,12 @@ namespace Sokoban
 
 		m_dss = graphics->CreateDepthStencilState(desc);
 
-		TestStage();
+		//firstStage();
+		secondStage();
+		//thirdStage();
 	}
 
 	GamePlay::~GamePlay() = default;
-
-	void GamePlay::TestStage()
-	{
-		m_currentStage.width = 7;
-		m_currentStage.height = 7;
-
-		// 1. 고정된 배경 지도 (Goal이 포함됨!)
-		m_currentStage.gridTiles =
-		{
-			eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor, eBlockType::Floor,  eBlockType::Floor,
-			eBlockType::Floor,  eBlockType::Goal,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,
-			eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor, eBlockType::Floor, eBlockType::Floor, eBlockType::Floor,  eBlockType::Floor,
-			eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor, eBlockType::Floor, eBlockType::Goal,  eBlockType::Floor,  eBlockType::Floor,
-			eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor, eBlockType::Floor, eBlockType::Floor, eBlockType::Floor,  eBlockType::Floor,
-			eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,
-			eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor,  eBlockType::Floor, eBlockType::Floor,  eBlockType::Floor,
-		};
-
-		// 2. 플레이어와 상자의 초기 위치 별도 지정
-		m_currentStage.playerPos = { 1, 3 };
-		m_currentStage.cratePosList = { {4, 2}, { 2, 2 } };
-	}
 	
 	void GamePlay::LoadStage(const Stage& stage)
 	{
@@ -75,6 +57,9 @@ namespace Sokoban
 	
 	void GamePlay::Update(Dive::Graphics* graphics, Dive::Input* input)
 	{
+		if (checkGameClear())
+			return;
+
 		FrameData data = {};
         data.viewProj = DirectX::XMMatrixTranspose(m_camera.GetViewMatrix() * m_camera.GetProjectionMatrix());
 		m_cbFrame->Update(graphics, data);
@@ -97,11 +82,11 @@ namespace Sokoban
 			}
 			else if (input->KeyDown(DIK_UP) || input->KeyDown(DIK_W))
 			{
-				dy = 1; // 화면 좌표계나 배열 인덱스 방향에 따라 -1 또는 +1
+				dy = -1; // 화면 좌표계나 배열 인덱스 방향에 따라 -1 또는 +1
 			}
 			else if (input->KeyDown(DIK_DOWN) || input->KeyDown(DIK_S))
 			{
-				dy = -1;
+				dy = 1;
 			}
 
 			// 3. 입력이 발생했다면 그리드 로직 처리
@@ -146,8 +131,8 @@ namespace Sokoban
 		{
 			for (int x = 0; x < m_currentStage.width; ++x)
 			{
-				eBlockType type = m_currentStage.gridTiles[y * m_currentStage.width + x];
-				auto block = m_blockManager.GetBlock(type);
+				uint8_t type = m_currentStage.gridTiles[y * m_currentStage.width + x];
+				auto block = m_blockManager.GetTile(type);
 				if (!block) continue;
 
 				int invertedY = m_currentStage.height - 1 - y;
@@ -166,13 +151,14 @@ namespace Sokoban
 		// ==========================================
 		// 3. 상자(Crates) 렌더링
 		// ==========================================
-		auto crateBlock = m_blockManager.GetBlock(eBlockType::Crate);
+		auto crateBlock = m_blockManager.GetCrate();
 		if (crateBlock)
 		{
 			for (const auto& cratePos : m_currentStage.cratePosList)
 			{
-				// 상자 높이 보정 (예: 0.4f)
-				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(cratePos.x, cratePos.y, 0.0f);//0.4f);
+				// 배경과 동일하게 Y축 반전 적용!
+				int invertedY = m_currentStage.height - 1 - cratePos.y;
+				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(cratePos.x, invertedY, 0.0f); // 필요시 높이 오프셋(예: 0.4f) 복원
 
 				ObjectData data = {};
 				data.model = DirectX::XMMatrixTranspose(worldMatrix);
@@ -183,15 +169,16 @@ namespace Sokoban
 				graphics->DrawIndexed(crateBlock->GetIndexCount());
 			}
 		}
-		
+
 		// ==========================================
 		// 4. 플레이어(Player) 렌더링
 		// ==========================================
-		auto playerBlock = m_blockManager.GetBlock(eBlockType::Player);
+		auto playerBlock = m_blockManager.GetPlayer();
 		if (playerBlock)
 		{
-			// 플레이어 높이 보정 (예: 0.65f)
-			DirectX::XMMATRIX worldMatrix = GetWorldMatrix(m_currentStage.playerPos.x, m_currentStage.playerPos.y, 0.0f);//0.65f);
+			// 배경과 동일하게 Y축 반전 적용!
+			int invertedY = m_currentStage.height - 1 - m_currentStage.playerPos.y;
+			DirectX::XMMATRIX worldMatrix = GetWorldMatrix(m_currentStage.playerPos.x, invertedY, 0.0f); // 필요시 높이 오프셋(예: 0.65f) 복원
 
 			ObjectData data = {};
 			data.model = DirectX::XMMatrixTranspose(worldMatrix);
@@ -226,10 +213,10 @@ namespace Sokoban
 		}
 
 		// 2. 이동하려는 칸의 타일 타입 확인
-		eBlockType nextTileType = m_currentStage.gridTiles[nextY * m_currentStage.width + nextX];
+		uint8_t nextTileType = m_currentStage.gridTiles[nextY * m_currentStage.width + nextX];
 
 		// Case A: 벽(Wall)인 경우 -> 이동 불가
-		if (nextTileType == eBlockType::Wall)
+		if (nextTileType == TileType::Empty || nextTileType == TileType::Wall)
 		{
 			return;
 		}
@@ -249,8 +236,8 @@ namespace Sokoban
 				return;
 			}
 
-			eBlockType crateDestinationType = m_currentStage.gridTiles[nextCrateY * m_currentStage.width + nextCrateX];
-			if (crateDestinationType == eBlockType::Wall || FindCrateAt(nextCrateX, nextCrateY) != -1)
+			uint8_t crateDestinationType = m_currentStage.gridTiles[nextCrateY * m_currentStage.width + nextCrateX];
+			if (crateDestinationType == TileType::Empty || crateDestinationType == TileType::Wall ||  FindCrateAt(nextCrateX, nextCrateY) != -1)
 			{
 				return; // 막혀서 못 밀음
 			}
@@ -263,8 +250,134 @@ namespace Sokoban
 		// Case C: 빈 바닥(또는 목표 지점 등)인 경우 -> 플레이어 이동 완료!
 		m_currentStage.playerPos.x = nextX;
 		m_currentStage.playerPos.y = nextY;
+	}
 
-		// (선택) 클리어 조건 체크 등 추가 가능
-		//CheckGameClear();
+	bool GamePlay::checkGameClear()
+	{
+		if (m_currentStage.cratePosList.empty())
+			return false;
+
+		for (const auto& cratePos : m_currentStage.cratePosList)
+		{
+			int index = cratePos.y * m_currentStage.width + cratePos.x;
+
+			if (m_currentStage.gridTiles[index] != TileType::Goal)
+				return false;
+		}
+
+		return true;
+	}
+
+	void GamePlay::firstStage()
+	{
+		//m_camera.LookAt({ 0.0f, 13.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
+
+		m_currentStage.width = 7;
+		m_currentStage.height = 11;
+		
+		m_currentStage.gridTiles =
+		{
+			1,  1,  1,  1,  1,  1,  1,
+			1,  2,  2,	2,	2,	2,	1,
+			1,  2,	2,	2,	2,	2,	1,
+			1,  2,	2,	2,  1,	3,  1,
+			1,  2,	1,	3,	1,	3,	1,
+			1,  2,	1,	3,  1,	3,  1,
+			1,  3,	1,	3,	1,	2,	1,
+			1,  3,  1,	2,	2,	2,	1,
+			1,  2,  2,  2,  2,  2,  1,
+			1,  2,  2,  2,  2,	2,  1,
+			1,  1,  1,  1,  1,	1,  1,
+		};
+
+		m_currentStage.playerPos = { 3, 5 };
+		m_currentStage.cratePosList = { {1, 2}, {2, 2}, {4, 2}, {2, 3}, {2, 8}, {3, 8}, {4, 8}, {4, 7} };
+	}
+	
+	void GamePlay::secondStage()
+	{
+		m_currentStage.width = 15;
+		m_currentStage.height = 15;
+
+		m_currentStage.gridTiles =
+		{
+			1,  1,  1,  1,  1,  0,  0,  0,  1,	1,	1,	1,	1,	1,	1,
+			1,  2,  2,	2,	1,	1,	1,	1,  1,	2,	2,	2,	2,	2,	1,
+			1,  2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	1,
+			1,  2,	2,	2,  2,	2,  2,	2,	2,	2,	2,	2,	2,	2,	1,
+			1,  2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	2,	1,
+			1,  2,	2,	2,  2,	2,  2,	2,	1,	2,	2,	2,	2,	2,	1,
+			1,  2,	2,	2,	1,	1,	1,	1,	1,	2,	2,	2,	2,	2,	1,
+			1,  2,  2,	2,	1,	2,	2,	2,  2,	2,	2,	2,	2,	2,	1,
+			1,  2,  2,  2,  2,  2,  2,  2,  2,	2,	2,	2,	2,	2,	1,
+			1,  2,  2,  2,  2,	2,  2,  2,  2,	2,	2,	2,	2,	2,	1,
+			1,  2,  2,  2,  1,	1,  1,  1,  1,	2,	2,	2,	2,	2,	1,
+			1,  2,  2,  2,  1,	0,  0,  0,  1,	2,	2,	2,	2,	2,	1,
+			1,  2,  2,  2,  1,	0,  0,  0,  1,	2,	2,	2,	2,	2,	1,
+			1,  2,  2,  2,  1,	0,  0,  0,  1,	2,	2,	2,	2,	2,	1,
+			1,  1,  1,  1,  1,	0,  0,  0,  1,	1,	1,	1,	1,	1,	1,
+		};
+
+		m_currentStage.playerPos = { 6, 2 };
+		m_currentStage.cratePosList = {  };
+	}
+
+	void GamePlay::thirdStage()
+	{
+		m_currentStage.width = 20;
+		m_currentStage.height = 20;
+		
+		m_currentStage.gridTiles =
+		{
+			// z = 0
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+			// z = 1
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 2
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 3
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 4
+			1, 2, 2, 2, 3,  2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3,  2, 2, 2, 1,
+			// z = 5
+			1, 2, 2, 2, 2, 1,  2, 2, 2, 2, 1,  2, 2, 2, 2, 1,  2, 2, 2, 1,
+			// z = 6
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 7
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 8
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 9
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 10
+			1, 2, 2, 2, 2, 1,  2, 2, 2, 2, 2,  2, 2, 2, 2, 1,  2, 2, 2, 1,
+			// z = 11
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 12
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 13
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 14
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 15
+			1, 2, 2, 2, 3,  1,  2, 2, 2, 2, 1,  2, 2, 2, 2, 3,  2, 2, 2, 1,
+			// z = 16
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 17
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 18
+			1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1,
+			// z = 19
+			1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+		};
+
+		m_currentStage.playerPos = { 10, 10 };
+		m_currentStage.cratePosList =
+		{
+			{ 9, 10 },
+			{ 11, 10 },
+			{ 10, 9 },
+			{ 10, 11 }
+		};
 	}
 }

@@ -136,13 +136,13 @@ if %errorlevel% leq 8 exit 0</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\BlockManager.cpp" />
+    <ClCompile Include="Source\MeshManager.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\GamePlay.cpp" />
     <ClCompile Include="Source\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\BlockManager.h" />
+    <ClInclude Include="Source\MeshManager.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\GamePlay.h" />
     <ClInclude Include="Source\Stage.h" />
