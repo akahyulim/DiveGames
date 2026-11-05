@@ -85,6 +85,9 @@ namespace Dive
 		void Draw(uint32_t vertexCount, uint32_t startVertexLocation = 0);
 		void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
 
+		// ImGui
+		void InitImGui();
+		void ShutdownImGui();
 
 	private:
 		void createBackbufferResources(uint32_t width, uint32_t height);

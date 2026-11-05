@@ -1,9 +1,54 @@
 #include "Core/Window.h"
 #include "Utilities/StringUtils.h"
 #include <assert.h>
+#include <backends/imgui_impl_win32.h>
+
+// 1. ImGui Win32 백엔드 핸들러 선언 (보통 .cpp 상단이나 헤더에 위치)
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Dive
 {
+	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) // UINT32 대신 표준 Win32 타입인 UINT로 맞추는 것이 좋습니다
+	{
+		// [핵심] 2. 윈도우 메시지가 오자마자 ImGui가 먼저 처리할 기회를 줍니다.
+		// 마우스 클릭, 드래그, 키 입력 등을 ImGui 창 위에서 할 때 게임으로 입력이 새어나가지 않게 막아줍니다.
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+		{
+			return true; // ImGui가 이 메시지를 소비(처리)했다면 그대로 반환
+		}
+
+		LRESULT result = 0ll;
+
+		LONG_PTR ptr = ::GetWindowLongPtr(hWnd, GWLP_USERDATA);
+		Window* window = reinterpret_cast<Window*>(ptr);
+
+		WindowEventData data{};
+		data.handle = hWnd;
+		data.msg = static_cast<uint32_t>(msg);
+		data.wParam = static_cast<uint64_t>(wParam);
+		data.lParam = static_cast<uint64_t>(lParam);
+		data.width = window ? static_cast<float>(window->GetWidth()) : 0.0f;
+		data.height = window ? static_cast<float>(window->GetHeight()) : 0.0f;
+
+		if (msg == WM_CLOSE || msg == WM_DESTROY)
+		{
+			::PostQuitMessage(0);
+			return 0;
+		}
+		else if (msg == WM_DISPLAYCHANGE || msg == WM_SIZE)
+		{
+			data.width = static_cast<float>(lParam & 0xffff);
+			data.height = static_cast<float>((lParam >> 16) & 0xffff);
+		}
+		else
+			result = ::DefWindowProc(hWnd, msg, wParam, lParam);
+
+		if (window)
+			window->broadcastEvents(data);
+
+		return result;
+	}
+	/*
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam)
 	{
 		LRESULT result = 0ll;
@@ -37,7 +82,7 @@ namespace Dive
 
 		return result;
 	}
-
+	*/
 	Window::Window(const WindowInit& init)
 	{
 		HINSTANCE hInstance = ::GetModuleHandle(nullptr);

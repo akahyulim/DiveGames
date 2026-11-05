@@ -9,6 +9,8 @@ namespace Sokoban
 
 	void Sokoban::Initialize()
 	{
+		GetGraphics()->InitImGui();
+
 		{
 			Dive::ShaderProgramDesc desc;
 			desc.name = "Sokoban";
@@ -226,6 +228,7 @@ namespace Sokoban
 	
 	void Sokoban::Shutdown()
 	{
+		GetGraphics()->ShutdownImGui();
 	}
 
 	void Sokoban::checkAndMovePlayer(int nextX, int nextY, int dx, int dy)

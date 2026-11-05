@@ -2,6 +2,9 @@
 #include "Core/Window.h"
 #include "Graphics/Graphics.h"
 #include "Input/Input.h"
+#include <imgui.h>
+#include <backends/imgui_impl_dx11.h>
+#include <backends/imgui_impl_win32.h>
 
 namespace Dive
 {
@@ -22,17 +25,32 @@ namespace Dive
 
 		while (m_window->Run())
 		{
-			m_input->Update();
+			ImGui_ImplDX11_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
 
-			Update(0.016f);
+			// OnUpdate
+			{
+				m_input->Update();
+				Update(0.016f);
+			}
 
-			m_graphics->ClearBackbuffer();
-			m_graphics->SetBackbuffer();
+			// OnRenderUI()
 
-			Render();
+			ImGui::Render();
 
-			m_graphics->EndRenderPass();
-			m_graphics->SwapBuffers();
+			// Render
+			{
+				m_graphics->ClearBackbuffer();
+				m_graphics->SetBackbuffer();
+
+				Render();
+
+				ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+				m_graphics->EndRenderPass();
+				m_graphics->SwapBuffers();
+			}
 		}
 
 		Shutdown();

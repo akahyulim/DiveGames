@@ -7,6 +7,9 @@
 #include "Core/Window.h"
 #include <assert.h>
 #include <spdlog/spdlog.h>
+#include <imgui.h>
+#include <backends/imgui_impl_win32.h>
+#include <backends/imgui_impl_dx11.h>
 
 namespace Dive
 {
@@ -519,6 +522,23 @@ namespace Dive
 	void Graphics::DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
 	{
 		m_deviceContext->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
+	}
+
+	void Graphics::InitImGui()
+	{
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+
+		ImGui_ImplWin32_Init(m_window->GetWindowHandle());
+		ImGui_ImplDX11_Init(m_device.Get(), m_deviceContext.Get());
+	}
+
+	void Graphics::ShutdownImGui()
+	{
+		ImGui_ImplDX11_Shutdown();
+		ImGui_ImplWin32_Shutdown();
+		ImGui::DestroyContext();
 	}
 
 	void Graphics::createBackbufferResources(uint32_t width, uint32_t height)
