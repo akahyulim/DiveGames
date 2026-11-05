@@ -1,22 +1,23 @@
 #pragma once
-#include <string>
 #include <memory>
+#include <string>
+#include <stack>
 #include <DirectXMath.h>
 #include <d3d11.h>
 #include <wrl/client.h>
 #include "Graphics/Types.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/ConstantBuffer.h"
-#include "Stage.h"
-#include "Camera.h"
-#include "MeshManager.h"
 
-#include "Input/Input.h"
+#include "Core/Application.h"
+#include "Camera.h"
+#include "Stage.h"
+#include "MeshManager.h"
 
 namespace Sokoban
 {
 	class Dive::Graphics;
-	//class Dive::Input;
+	class Dive::Input;
 
 	struct FrameData
 	{
@@ -28,33 +29,45 @@ namespace Sokoban
 		DirectX::XMMATRIX model;
 	};
 
-	class GamePlay
+	// GridPosition는 DirectX::XMINT가 나을 듯하다.
+	struct StateRecord
+	{
+		GridPosition playerPos;
+		std::vector<GridPosition> cratePositions;
+		int moveCount;
+	};
+
+	class Sokoban : public Dive::Application
 	{
 	public:
-		GamePlay(Dive::Graphics* graphics);
-		~GamePlay();
+		Sokoban() = default;
+		~Sokoban() override;
 
 		void LoadStage(const Stage& stage);
 		void LoadStage(const std::string& filepath);
 
-		void Update(Dive::Graphics* graphics, Dive::Input* input);
-		void Render(Dive::Graphics* graphics) const;
-
 		int FindCrateAt(int x, int y);
 
+	protected:
+		void Initialize() override;
+		void Update(float deltaTime) override;
+		void Render() override;
+		void Shutdown() override;
+	
 	private:
 		void checkAndMovePlayer(int nextX, int nextY, int dx, int dy);
 		bool checkGameClear();
 
-		void firstStage();
-		void secondStage();
-		void thirdStage();
+		void undo();
 
 	private:
 		Stage m_currentStage;
 		Camera m_camera;
 
 		MeshManager m_blockManager;
+
+		int m_moveCount = 0;
+		std::stack<StateRecord> m_recordStack;
 
 		std::unique_ptr<Dive::ConstantBuffer<FrameData>> m_cbFrame;
 		std::unique_ptr<Dive::ConstantBuffer<ObjectData>> m_cbObject;

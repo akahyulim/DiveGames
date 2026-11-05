@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <DirectXMath.h>
 #include "Graphics/Mesh.h"
-#include "Types.h"
+#include "Stage.h"
 
 namespace Sokoban
 {

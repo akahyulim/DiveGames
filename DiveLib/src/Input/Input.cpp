@@ -6,8 +6,6 @@ using Microsoft::WRL::ComPtr;
 
 namespace Dive
 {
-	// Initialize와 기능이 중복된다.
-	// 싱글톤의 잔재인 듯하다.
 	Input::Input(HWND hWnd)
 		: m_hWnd(hWnd)
 	{
@@ -99,86 +97,6 @@ namespace Dive
 		}
 
 		m_directInput.Reset();
-	}
-
-	bool Input::Initialize(HWND hWnd)
-	{
-		if (!IsWindow(hWnd))
-		{
-			spdlog::error("[::Initialize] 잘못된 윈도우 핸들");
-			return false;
-		}
-
-		HINSTANCE hInst = ::GetModuleHandle(nullptr);
-		auto hr = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)m_directInput.GetAddressOf(), nullptr);
-		if(FAILED(hr))
-		{
-			spdlog::error("[::Initialize] DirectInput8Create 실패: {}", ErrorUtils::ToVerbose(hr));
-			return false;
-		}
-
-		// 키보드 생성
-		hr = m_directInput->CreateDevice(GUID_SysKeyboard, m_keyboard.GetAddressOf(), nullptr);
-		if (FAILED(hr))
-		{
-			spdlog::error("[::Initialize] 키보드 CreateDevice 실패: {}", ErrorUtils::ToVerbose(hr));
-			return false;
-		}
-
-		hr = m_keyboard->SetDataFormat(&c_dfDIKeyboard);
-		if (FAILED(hr))
-		{
-			spdlog::error("[::Initialize] 키보드 SetDataFormat 실패: {}", ErrorUtils::ToVerbose(hr));
-			return false;
-		}
-
-		hr = m_keyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-		if (FAILED(hr))
-		{
-			spdlog::error("[::Initialize] 키보드 SetCooperativeLevel 실패: {}", ErrorUtils::ToVerbose(hr));
-			return false;
-		}
-
-		hr = m_keyboard->Acquire();
-		if (FAILED(hr))
-		{
-			spdlog::error("[::Initialize] 키보드 Acquire 실패: {}", ErrorUtils::ToVerbose(hr));
-			return false;
-		}
-
-		// 마우스 생성
-		hr = m_directInput->CreateDevice(GUID_SysMouse, m_mouse.GetAddressOf(), NULL);
-		if (FAILED(hr))
-		{
-			spdlog::error("[::Initialize] 마우스 CreateDevice 실패: {}", ErrorUtils::ToVerbose(hr));
-			return false;
-		}
-
-		hr = m_mouse->SetDataFormat(&c_dfDIMouse);
-		if (FAILED(hr))
-		{
-			spdlog::error("[::Initialize] 마우스 SetDataFormat 실패: {}", ErrorUtils::ToVerbose(hr));
-			return false;
-		}
-
-		hr = m_mouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
-		if (FAILED(hr))
-		{
-			spdlog::error("[::Initialize] 마우스 SetCooperativeLevel 실패: {}", ErrorUtils::ToVerbose(hr));
-			return false;
-		}
-
-		hr = m_mouse->Acquire();
-		if (FAILED(hr))
-		{
-			spdlog::error("[::Initialize] 마우스 Acquire 실패: {}", ErrorUtils::ToVerbose(hr));
-			return false;
-		}
-
-		m_hWnd = hWnd;
-
-		spdlog::info("초기화 성공");
-		return true;
 	}
 
 	void Input::Update()

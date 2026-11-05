@@ -20,8 +20,6 @@ namespace Dive
 		Input(Input&&) = delete;
 		Input& operator=(const Input&) = delete;
 		Input& operator=(Input&&) = delete;
-
-		bool Initialize(HWND hWnd);
 		
 		void Update();
 		bool ReadKeyboard();

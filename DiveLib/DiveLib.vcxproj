@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Core\Application.h" />
     <ClInclude Include="include\Core\Common.h" />
     <ClInclude Include="include\Core\Object.h" />
     <ClInclude Include="include\Core\Window.h" />
@@ -43,6 +44,7 @@
     <ClInclude Include="include\Utilities\StringUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Graphics\Graphics.cpp" />
     <ClCompile Include="src\Graphics\IndexBuffer.cpp" />

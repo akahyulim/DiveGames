@@ -2,16 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\GamePlay.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\MeshManager.cpp" />
+    <ClCompile Include="Source\Sokoban.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Stage.h" />
-    <ClInclude Include="Source\GamePlay.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\MeshManager.h" />
-    <ClInclude Include="Source\Types.h" />
+    <ClInclude Include="Source\Sokoban.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
@@ -19,9 +18,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Assets\Shaders\Test.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="Assets\Shaders\Sokoban.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
