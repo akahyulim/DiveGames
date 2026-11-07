@@ -27,7 +27,6 @@
     <ClInclude Include="..\Vendor\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\Vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="..\Vendor\imgui\imstb_truetype.h" />
-    <ClInclude Include="include\Core\Application.h" />
     <ClInclude Include="include\Core\Common.h" />
     <ClInclude Include="include\Core\Object.h" />
     <ClInclude Include="include\Core\Window.h" />
@@ -45,11 +44,13 @@
     <ClInclude Include="include\Graphics\StructuredBuffer.h" />
     <ClInclude Include="include\Graphics\Types.h" />
     <ClInclude Include="include\Graphics\VertexBuffer.h" />
+    <ClInclude Include="include\ImGui\ImGuiHelper.h" />
+    <ClInclude Include="include\ImGui\ImGuiManager.h" />
     <ClInclude Include="include\Input\Input.h" />
     <ClInclude Include="include\Resource\Resource.h" />
     <ClInclude Include="include\Utilities\Delegate.h" />
-    <ClInclude Include="include\Utilities\EventDispatcher.h" />
     <ClInclude Include="include\Utilities\StringUtils.h" />
+    <ClInclude Include="include\Utilities\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Vendor\imgui\backends\imgui_impl_dx11.cpp" />
@@ -58,7 +59,6 @@
     <ClCompile Include="..\Vendor\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\Vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\Vendor\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Graphics\Graphics.cpp" />
     <ClCompile Include="src\Graphics\IndexBuffer.cpp" />
@@ -69,10 +69,12 @@
     <ClCompile Include="src\Graphics\ShaderManager.cpp" />
     <ClCompile Include="src\Graphics\ShaderProgram.cpp" />
     <ClCompile Include="src\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="src\ImGui\ImGuiHelper.cpp" />
+    <ClCompile Include="src\ImGui\ImGuiManager.cpp" />
     <ClCompile Include="src\Input\Input.cpp" />
     <ClCompile Include="src\Resource\Resource.cpp" />
-    <ClCompile Include="src\Utilities\EventDispatcher.cpp" />
     <ClCompile Include="src\Utilities\StringUtils.cpp" />
+    <ClCompile Include="src\Utilities\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Constants.hlsli">

@@ -1,18 +1,10 @@
 #pragma once
 #include <Windows.h>
 #include <string>
-
 #include "Utilities/Delegate.h"
 
 namespace Dive
 {
-	struct WindowInit
-	{
-		int width, height;
-		LPCWSTR title;
-		BOOL maximize;
-	};
-
 	struct WindowEventData
 	{
 		void* handle = nullptr;
@@ -31,10 +23,13 @@ namespace Dive
 		friend LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 	public:
-		Window(const WindowInit& init);
+		Window(int width, int height, const wchar_t* title);
 		~Window();
 
+		LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 		bool Run();
+		void PollEvents();
 
 		void SetMessageCallback(LONG_PTR callBack) const;
 
@@ -60,6 +55,8 @@ namespace Dive
 		void Restore() const;
 		bool IsMaximize() const;
 
+		bool ShouldClose() const { return m_shouldClose; }
+
 		void SetTitle(const std::string& title) const;
 
 		WindowEvent& GetWindowEvent() { return m_windowEvent; }
@@ -70,9 +67,11 @@ namespace Dive
 
 	private:
 		HWND m_hWnd{};
+		bool m_shouldClose = false;
+		bool m_isResizing = false;
+
 		WindowEvent m_windowEvent;
 		ResizedEvent m_resizedEvent;
 
-		bool m_isResizing = false;
 	};
 }

@@ -8,8 +8,8 @@
 #include "Graphics/Types.h"
 #include "Graphics/Mesh.h"
 #include "Graphics/ConstantBuffer.h"
+#include "Input/input.h"	// 계속 이게 문제다.
 
-#include "Core/Application.h"
 #include "Camera.h"
 #include "Stage.h"
 #include "MeshManager.h"
@@ -17,7 +17,7 @@
 namespace Sokoban
 {
 	class Dive::Graphics;
-	class Dive::Input;
+	//class Dive::Input;
 
 	struct FrameData
 	{
@@ -37,22 +37,23 @@ namespace Sokoban
 		int moveCount;
 	};
 
-	class Sokoban : public Dive::Application
+	class Sokoban
 	{
 	public:
-		Sokoban() = default;
-		~Sokoban() override;
+		Sokoban(Dive::Graphics* graphics, Dive::Input* input);
+		~Sokoban();
+
+		void Update(float deltaTime);
+		void Render();
+		void RenderUI();
+		void Shutdown();
 
 		void LoadStage(const Stage& stage);
 		void LoadStage(const std::string& filepath);
 
 		int FindCrateAt(int x, int y);
 
-	protected:
-		void Initialize() override;
-		void Update(float deltaTime) override;
-		void Render() override;
-		void Shutdown() override;
+		//void OnWindowEvent(const Dive::WindowEventData& data);
 	
 	private:
 		void checkAndMovePlayer(int nextX, int nextY, int dx, int dy);
@@ -61,6 +62,9 @@ namespace Sokoban
 		void undo();
 
 	private:
+		Dive::Graphics* m_graphics = nullptr;
+		Dive::Input* m_input = nullptr;
+
 		Stage m_currentStage;
 		Camera m_camera;
 

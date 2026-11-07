@@ -3,7 +3,6 @@
 #include <span>
 #include <d3d11_3.h>
 #include <DXGI1_3.h>
-
 #include "Types.h"
 #include "Shader.h"
 #include "RenderPass.h"
@@ -19,10 +18,15 @@ namespace Dive
 	class BlendState;
 	class SamplerState;
 
+	struct GraphicsDesc
+	{
+		bool enableVSync = false;
+	};
+
 	class Graphics
 	{
 	public:
-		explicit Graphics(Window* window);
+		explicit Graphics(Window* window, const GraphicsDesc& desc = GraphicsDesc{});
 		Graphics(Graphics const&) = delete;
 		Graphics(Graphics&&) = default;
 		Graphics& operator=(Graphics const&) = delete;
@@ -33,9 +37,11 @@ namespace Dive
 		void ClearBackbuffer();
 		void ResizeBackbuffer(uint32_t width, uint32_t height);
 
-		void SwapBuffers(bool vSync = false);
+		void SwapBuffers();
 
-		// 의외로 이 두 메서드가 adrian엔 없다...
+		bool EnabledVSync() const { return m_vSync; }
+		void SetVSync(bool enable) { m_vSync = enable; }
+
 		uint32_t GetWidth() const { return m_width; }
 		uint32_t GetHeight() const { return m_height; }
 
@@ -85,10 +91,6 @@ namespace Dive
 		void Draw(uint32_t vertexCount, uint32_t startVertexLocation = 0);
 		void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
 
-		// ImGui
-		void InitImGui();
-		void ShutdownImGui();
-
 	private:
 		void createBackbufferResources(uint32_t width, uint32_t height);
 
@@ -96,6 +98,8 @@ namespace Dive
 		Window* m_window = nullptr;
 		uint32_t m_width;
 		uint32_t m_height;
+
+		bool m_vSync = false;
 
 		Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
 		Microsoft::WRL::ComPtr<ID3D11Device> m_device;

@@ -7,9 +7,6 @@
 #include "Core/Window.h"
 #include <assert.h>
 #include <spdlog/spdlog.h>
-#include <imgui.h>
-#include <backends/imgui_impl_win32.h>
-#include <backends/imgui_impl_dx11.h>
 
 namespace Dive
 {
@@ -51,8 +48,9 @@ namespace Dive
 		}
 	}
 
-	Graphics::Graphics(Window* window)
-		: m_window(window)
+	Graphics::Graphics(Window* window, const GraphicsDesc& desc)
+		: m_window(window),
+		m_vSync(desc.enableVSync)
 	{
 		m_width = window->GetWidth();
 		m_height = window->GetHeight();
@@ -81,23 +79,23 @@ namespace Dive
 		IDXGIFactory* dxgiFactory{};
 		dxgiAdapter->GetParent(IID_IDXGIFactory, (void**)&dxgiFactory);
 
-		DXGI_SWAP_CHAIN_DESC desc{};
-		desc.BufferDesc.Width = 0;
-		desc.BufferDesc.Height = 0;
-		desc.BufferDesc.Format = DV_FORMAT;
-		desc.BufferDesc.RefreshRate.Numerator = 0;
-		desc.BufferDesc.RefreshRate.Denominator = 0;
-		desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-		desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-		desc.SampleDesc.Count = 1;
-		desc.SampleDesc.Quality = 0;
-		desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-		desc.BufferCount = DV_BACKBUFFER_COUNT;
-		desc.OutputWindow = window->GetWindowHandle();
-		desc.Windowed = TRUE;
-		desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+		DXGI_SWAP_CHAIN_DESC swapChainDesc{};
+		swapChainDesc.BufferDesc.Width = 0;
+		swapChainDesc.BufferDesc.Height = 0;
+		swapChainDesc.BufferDesc.Format = DV_FORMAT;
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = 0;
+		swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+		swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+		swapChainDesc.SampleDesc.Count = 1;
+		swapChainDesc.SampleDesc.Quality = 0;
+		swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+		swapChainDesc.BufferCount = DV_BACKBUFFER_COUNT;
+		swapChainDesc.OutputWindow = window->GetWindowHandle();
+		swapChainDesc.Windowed = TRUE;
+		swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
-		hr = dxgiFactory->CreateSwapChain(m_device.Get(), &desc, m_swapChain.GetAddressOf());
+		hr = dxgiFactory->CreateSwapChain(m_device.Get(), &swapChainDesc, m_swapChain.GetAddressOf());
 		if (FAILED(hr))
 		{
 			spdlog::error("그래픽스 스왑체인 생성 실패");
@@ -155,9 +153,9 @@ namespace Dive
 		}
 	}
 
-	void Graphics::SwapBuffers(bool vSync)
+	void Graphics::SwapBuffers()
 	{
-		m_swapChain->Present(vSync ? 1 : 0, 0);
+		m_swapChain->Present(m_vSync ? 1 : 0, 0);
 	}
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> Graphics::CreateDepthStencilState(const D3D11_DEPTH_STENCIL_DESC& desc)
@@ -522,23 +520,6 @@ namespace Dive
 	void Graphics::DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation, int32_t baseVertexLocation)
 	{
 		m_deviceContext->DrawIndexed(indexCount, startIndexLocation, baseVertexLocation);
-	}
-
-	void Graphics::InitImGui()
-	{
-		IMGUI_CHECKVERSION();
-		ImGui::CreateContext();
-		ImGuiIO& io = ImGui::GetIO(); (void)io;
-
-		ImGui_ImplWin32_Init(m_window->GetWindowHandle());
-		ImGui_ImplDX11_Init(m_device.Get(), m_deviceContext.Get());
-	}
-
-	void Graphics::ShutdownImGui()
-	{
-		ImGui_ImplDX11_Shutdown();
-		ImGui_ImplWin32_Shutdown();
-		ImGui::DestroyContext();
 	}
 
 	void Graphics::createBackbufferResources(uint32_t width, uint32_t height)

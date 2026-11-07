@@ -28,15 +28,15 @@
     <Filter Include="Vendor\ImGui">
       <UniqueIdentifier>{8a9330d3-b0d1-4040-9d7c-21bb0652b5bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{b462c071-4ca9-4e7c-8534-222f99592ca6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Utilities\Delegate.h">
       <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="include\Utilities\StringUtils.h">
-      <Filter>Utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Utilities\EventDispatcher.h">
       <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\Window.h">
@@ -96,9 +96,6 @@
     <ClInclude Include="include\Graphics\Mesh.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\Application.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="..\Vendor\imgui\imconfig.h">
       <Filter>Vendor\ImGui</Filter>
     </ClInclude>
@@ -123,12 +120,18 @@
     <ClInclude Include="..\Vendor\imgui\backends\imgui_impl_win32.h">
       <Filter>Vendor\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="include\ImGui\ImGuiHelper.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ImGui\ImGuiManager.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utilities\Timer.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utilities\StringUtils.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Utilities\EventDispatcher.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Window.cpp">
@@ -167,9 +170,6 @@
     <ClCompile Include="src\Graphics\Mesh.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="src\Application.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="..\Vendor\imgui\imgui.cpp">
       <Filter>Vendor\ImGui</Filter>
     </ClCompile>
@@ -187,6 +187,15 @@
     </ClCompile>
     <ClCompile Include="..\Vendor\imgui\backends\imgui_impl_win32.cpp">
       <Filter>Vendor\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImGui\ImGuiHelper.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ImGui\ImGuiManager.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\Timer.cpp">
+      <Filter>Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

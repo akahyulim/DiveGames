@@ -1,95 +1,41 @@
 #include "Core/Window.h"
 #include "Utilities/StringUtils.h"
 #include <assert.h>
-#include <backends/imgui_impl_win32.h>
-
-// 1. ImGui Win32 백엔드 핸들러 선언 (보통 .cpp 상단이나 헤더에 위치)
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Dive
 {
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) // UINT32 대신 표준 Win32 타입인 UINT로 맞추는 것이 좋습니다
+	LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
-		// [핵심] 2. 윈도우 메시지가 오자마자 ImGui가 먼저 처리할 기회를 줍니다.
-		// 마우스 클릭, 드래그, 키 입력 등을 ImGui 창 위에서 할 때 게임으로 입력이 새어나가지 않게 막아줍니다.
-		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+		Window* window = nullptr;
+
+		if (msg == WM_NCCREATE)
 		{
-			return true; // ImGui가 이 메시지를 소비(처리)했다면 그대로 반환
-		}
+			// 창이 생성되는 최초 순간에 this 포인터를 받아와서 GWLP_USERDATA에 저장
+			auto* createStruct = reinterpret_cast<CREATESTRUCT*>(lParam);
+			window = reinterpret_cast<Window*>(createStruct->lpCreateParams);
+			window->m_hWnd = hWnd;
 
-		LRESULT result = 0ll;
-
-		LONG_PTR ptr = ::GetWindowLongPtr(hWnd, GWLP_USERDATA);
-		Window* window = reinterpret_cast<Window*>(ptr);
-
-		WindowEventData data{};
-		data.handle = hWnd;
-		data.msg = static_cast<uint32_t>(msg);
-		data.wParam = static_cast<uint64_t>(wParam);
-		data.lParam = static_cast<uint64_t>(lParam);
-		data.width = window ? static_cast<float>(window->GetWidth()) : 0.0f;
-		data.height = window ? static_cast<float>(window->GetHeight()) : 0.0f;
-
-		if (msg == WM_CLOSE || msg == WM_DESTROY)
-		{
-			::PostQuitMessage(0);
-			return 0;
-		}
-		else if (msg == WM_DISPLAYCHANGE || msg == WM_SIZE)
-		{
-			data.width = static_cast<float>(lParam & 0xffff);
-			data.height = static_cast<float>((lParam >> 16) & 0xffff);
+			::SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(window));
 		}
 		else
-			result = ::DefWindowProc(hWnd, msg, wParam, lParam);
-
-		if (window)
-			window->broadcastEvents(data);
-
-		return result;
-	}
-	/*
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam)
-	{
-		LRESULT result = 0ll;
-
-		LONG_PTR ptr = ::GetWindowLongPtr(hWnd, GWLP_USERDATA);
-		Window* window = reinterpret_cast<Window*>(ptr);
-
-		WindowEventData data{};
-		data.handle = hWnd;
-		data.msg = static_cast<uint32_t>(msg);
-		data.wParam = static_cast<uint64_t>(wParam);
-		data.lParam = static_cast<uint64_t>(lParam);
-		data.width = window ? static_cast<float>(window->GetWidth()) : 0.0f;
-		data.height = window ? static_cast<float>(window->GetHeight()) : 0.0f;
-
-		if (msg == WM_CLOSE || msg == WM_DESTROY)
 		{
-			::PostQuitMessage(0);
-			return 0;
+			// 이후부터는 저장해둔 포인터를 가져옴
+			window = reinterpret_cast<Window*>(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
 		}
-		else if (msg == WM_DISPLAYCHANGE || msg == WM_SIZE)
-		{
-			data.width = static_cast<float>(lParam & 0xffff);
-			data.height = static_cast<float>((lParam >> 16) & 0xffff);
-		}
-		else
-			result = ::DefWindowProc(hWnd, msg, wParam, lParam);
 
+		// 창 객체가 존재한다면 멤버 함수로 메시지 토스
 		if (window)
-			window->broadcastEvents(data);
+		{
+			return window->HandleMessage(hWnd, msg, wParam, lParam);
+		}
 
-		return result;
+		return ::DefWindowProc(hWnd, msg, wParam, lParam);
 	}
-	*/
-	Window::Window(const WindowInit& init)
+
+	Window::Window(int width, int height, const wchar_t* title)
 	{
 		HINSTANCE hInstance = ::GetModuleHandle(nullptr);
 
-		LPCWSTR title = init.title;
-		const int width = init.width;
-		const int height = init.height;
 		LPCWSTR className = L"WindowClass";
 
 		WNDCLASSEX wc{};
@@ -98,11 +44,11 @@ namespace Dive
 		wc.lpfnWndProc = WndProc;
 		wc.cbClsExtra = 0;
 		wc.cbWndExtra = 0;
-		wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+		wc.hIcon = LoadIcon(nullptr, IDI_WINLOGO);
 		wc.hIconSm = wc.hIcon;
-		wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+		wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
 		wc.hbrBackground = (HBRUSH)::GetStockObject(GRAY_BRUSH);
-		wc.lpszMenuName = NULL;
+		wc.lpszMenuName = nullptr;
 		wc.lpszClassName = className;
 		wc.cbSize = sizeof(WNDCLASSEX);
 
@@ -120,10 +66,11 @@ namespace Dive
 			className,
 			title,
 			WS_OVERLAPPEDWINDOW,
-			CW_USEDEFAULT,CW_USEDEFAULT,
-			rt.right - rt.left, 
+			CW_USEDEFAULT, CW_USEDEFAULT,
+			rt.right - rt.left,
 			rt.bottom - rt.top,
-			NULL, NULL, hInstance, NULL
+			nullptr, nullptr, hInstance,
+			this
 		);
 
 		if (!m_hWnd)
@@ -134,7 +81,7 @@ namespace Dive
 
 		::SetWindowLongPtr(m_hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 
-		::ShowWindow(m_hWnd, init.maximize ? SW_SHOWMAXIMIZED : SW_SHOWNORMAL);
+		::ShowWindow(m_hWnd, SW_SHOWNORMAL);
 		::UpdateWindow(m_hWnd);
 		::SetFocus(m_hWnd);
 	}
@@ -145,10 +92,49 @@ namespace Dive
 			::DestroyWindow(m_hWnd);
 	}
 
+	LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+	{
+		WindowEventData data{};
+		data.handle = hWnd;
+		data.msg = static_cast<uint32_t>(msg);
+		data.wParam = static_cast<uint64_t>(wParam);
+		data.lParam = static_cast<uint64_t>(lParam);
+		data.width = static_cast<float>(GetWidth());
+		data.height = static_cast<float>(GetHeight());
+
+		LRESULT result = 0;
+
+		switch (msg)
+		{
+		case WM_CLOSE:
+		case WM_DESTROY:
+			m_shouldClose = true;
+			::PostQuitMessage(0);
+			result = 0;
+			break;
+
+		case WM_SIZE:
+			data.width = static_cast<float>(LOWORD(lParam));
+			data.height = static_cast<float>(HIWORD(lParam));
+			// 필요하다면 여기서 내부 크기 멤버 갱신 처리
+			result = ::DefWindowProc(hWnd, msg, wParam, lParam);
+			break;
+
+		default:
+			result = ::DefWindowProc(hWnd, msg, wParam, lParam);
+			break;
+		}
+
+		// 이벤트 브로드캐스트
+		broadcastEvents(data);
+
+		return result;
+	}
+
 	bool Window::Run()
 	{
 		MSG msg{};
-		while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		while (::PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 		{
 			::TranslateMessage(&msg);
 			::DispatchMessageW(&msg);
@@ -158,6 +144,19 @@ namespace Dive
 		}
 
 		return true;
+	}
+
+	void Window::PollEvents()
+	{
+		MSG msg{};
+		while (::PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			if (msg.message == WM_QUIT)
+				m_shouldClose = true;
+
+			::TranslateMessage(&msg);
+			::DispatchMessageW(&msg);
+		}
 	}
 
 	void Window::SetMessageCallback(LONG_PTR callBack) const
@@ -176,7 +175,7 @@ namespace Dive
 		int posX = (::GetSystemMetrics(SM_CXSCREEN) - width) / 2;
 		int posY = (::GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 
-		if (!::SetWindowPos(m_hWnd, NULL, posX, posY, width, height, SWP_NOZORDER | SWP_DRAWFRAME))
+		if (!::SetWindowPos(m_hWnd, nullptr, posX, posY, width, height, SWP_NOZORDER | SWP_DRAWFRAME))
 		{
 			::MessageBox(nullptr, L"윈도우 크기 변경 실패", L"Fatal Error!", MB_ICONEXCLAMATION | MB_OK);
 			return false;

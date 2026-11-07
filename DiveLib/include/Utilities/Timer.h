@@ -4,28 +4,25 @@
 
 namespace Dive
 {
-	class Engine;
-
-	class Time
+	class Timer
 	{
-		friend Engine;
-
 	public:
-		static double GetElapsedTime() { return s_elapsedTime; }
-		static float GetDeltaTime() { return s_deltaTime; }
-		
-		uint16_t GetFps() const { return s_fps; }
+		Timer();
+		~Timer() = default;
+
+		 void Tick();
+
+		 float GetDeltaTime() { return m_deltaTime; }
+		 double GetElapsedTime() { return m_elapsedTime; }
+		 uint16_t GetFps() const { return m_fps; }
 
 	private:
-		Time();
-		~Time() = default;
+		 std::chrono::steady_clock::time_point m_lastTickTime;
+		 float m_deltaTime;
+		 double m_elapsedTime;
 
-		static void tick();
-
-	private:
-		static std::chrono::steady_clock::time_point s_lastTickTime;
-		static float s_deltaTime;
-		static double s_elapsedTime;
-		static uint16_t s_fps;
+		 uint32_t m_frameCount = 0;
+		 float m_fpsTimer = 0.0f;
+		 uint16_t m_fps;
 	};
 }

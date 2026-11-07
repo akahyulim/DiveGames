@@ -1,31 +1,30 @@
 #include "Sokoban.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/ShaderManager.h"
-#include "Input/Input.h"
+//#include "Input/Input.h"
+#include "ImGui/ImGuiManager.h"
 
 namespace Sokoban
 {
-	Sokoban::~Sokoban() = default;
-
-	void Sokoban::Initialize()
+	Sokoban::Sokoban(Dive::Graphics* graphics, Dive::Input* input)
+		: m_graphics(graphics),
+		m_input(input)
 	{
-		GetGraphics()->InitImGui();
-
 		{
 			Dive::ShaderProgramDesc desc;
 			desc.name = "Sokoban";
 			desc.vsPath = "Assets/Shaders/Sokoban.hlsl";
 			desc.psPath = "Assets/Shaders/Sokoban.hlsl";
 			desc.ilType = Dive::eInputLayout::Color;
-			Dive::ShaderManager::Get().CreateShaderProgram(GetGraphics(), desc);
+			Dive::ShaderManager::Get().CreateShaderProgram(m_graphics, desc);
 		}
 
 		m_camera.SetPerspective(DirectX::XM_PIDIV4, 800.0f / 600.0f, 0.1f, 100.0f);
 		m_camera.LookAt({ 0.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
-		
-		m_blockManager.Initialize(GetGraphics());
-		m_cbFrame = std::make_unique<Dive::ConstantBuffer<FrameData>>(GetGraphics());
-		m_cbObject = std::make_unique<Dive::ConstantBuffer<ObjectData>>(GetGraphics());
+
+		m_blockManager.Initialize(m_graphics);
+		m_cbFrame = std::make_unique<Dive::ConstantBuffer<FrameData>>(m_graphics);
+		m_cbObject = std::make_unique<Dive::ConstantBuffer<ObjectData>>(m_graphics);
 
 		{
 			D3D11_DEPTH_STENCIL_DESC desc{};
@@ -43,10 +42,167 @@ namespace Sokoban
 			desc.FrontFace = stencilOp;
 			desc.BackFace = stencilOp;
 
-			m_dss = GetGraphics()->CreateDepthStencilState(desc);
+			m_dss = m_graphics->CreateDepthStencilState(desc);
 		}
 
 		LoadStage(LevelOne());
+	}
+
+	Sokoban::~Sokoban() = default;
+
+	// 게임 플레이 타임은 deltaTime을 누적해서 계산한다.
+	void Sokoban::Update(float deltaTime)
+	{
+		if (checkGameClear())
+			return;
+
+		FrameData data = {};
+		data.viewProj = DirectX::XMMatrixTranspose(m_camera.GetViewMatrix() * m_camera.GetProjectionMatrix());
+		m_cbFrame->Update(m_graphics, data);
+
+		{
+			if (m_input->KeyDown(DIK_R))
+			{
+				LoadStage(LevelOne());
+				return;
+			}
+
+			if (m_input->KeyDown(DIK_U) || m_input->KeyDown(DIK_BACKSPACE))
+			{
+				undo();
+				return;
+			}
+
+			// 1. 이동 방향 벡터 초기화 (X, Y)
+			int dx = 0;
+			int dy = 0;
+
+			// 2. 입력 체크 (VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN 또는 WASD)
+			// DirectInput이나 Win32 가상 키 코드 기준에 맞춰 설정하세요.
+			if (m_input->KeyDown(DIK_LEFT) || m_input->KeyDown(DIK_A))
+			{
+				dx = -1;
+			}
+			else if (m_input->KeyDown(DIK_RIGHT) || m_input->KeyDown(DIK_D))
+			{
+				dx = 1;
+			}
+			else if (m_input->KeyDown(DIK_UP) || m_input->KeyDown(DIK_W))
+			{
+				dy = -1; // 화면 좌표계나 배열 인덱스 방향에 따라 -1 또는 +1
+			}
+			else if (m_input->KeyDown(DIK_DOWN) || m_input->KeyDown(DIK_S))
+			{
+				dy = 1;
+			}
+
+			// 3. 입력이 발생했다면 그리드 로직 처리
+			if (dx != 0 || dy != 0)
+			{
+				int nextX = m_currentStage.playerPos.x + dx;
+				int nextY = m_currentStage.playerPos.y + dy;
+
+				// [핵심 로직] 이동하려는 칸의 상태 검사 (벽인지, 상자인지 등)
+				checkAndMovePlayer(nextX, nextY, dx, dy);
+			}
+		}
+	}
+
+	void Sokoban::Render()
+	{
+		m_graphics->SetDepthStencilState(m_dss.Get(), 1);
+
+		auto sp = Dive::ShaderManager::Get().GetShaderProgram("Sokoban");
+		sp->Bind(m_graphics);
+
+		m_cbFrame->Bind(m_graphics, Dive::eShaderStage::VS, 0);
+		m_cbFrame->Bind(m_graphics, Dive::eShaderStage::PS, 0);
+
+		m_graphics->SetTopology(Dive::ePrimitiveTopology::TriangleList);
+
+		// 📌 1. 중앙 정렬을 위한 오프셋 계산 (전체 크기의 절반)
+		float offsetX = static_cast<float>(m_currentStage.width) * 0.5f;
+		float offsetZ = static_cast<float>(m_currentStage.height) * 0.5f;
+
+		// 공통으로 쓸 변환 람다 함수 (그리드 (x, y)와 Y축 높이를 받아 월드 행렬 반환)
+		auto GetWorldMatrix = [offsetX, offsetZ](int x, int y, float heightOffset) {
+			float worldX = static_cast<float>(x) - offsetX + 0.5f; // 타일 중앙 정렬용 +0.5
+			float worldZ = static_cast<float>(y) - offsetZ + 0.5f;
+			return DirectX::XMMatrixTranslation(worldX, heightOffset, worldZ);
+			};
+
+		// ==========================================
+		// 2. 배경 레이어 렌더링 (Floor, Wall, Goal)
+		// ==========================================
+		for (int y = 0; y < m_currentStage.height; ++y)
+		{
+			for (int x = 0; x < m_currentStage.width; ++x)
+			{
+				uint8_t type = m_currentStage.gridTiles[y * m_currentStage.width + x];
+				auto block = m_blockManager.GetTile(type);
+				if (!block) continue;
+
+				int invertedY = m_currentStage.height - 1 - y;
+				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(x, invertedY, 0.0f);
+
+				ObjectData data = {};
+				data.model = DirectX::XMMatrixTranspose(worldMatrix);
+				m_cbObject->Update(m_graphics, data);
+				m_cbObject->Bind(m_graphics, Dive::eShaderStage::VS, 1);
+
+				block->Bind(m_graphics);
+				m_graphics->DrawIndexed(block->GetIndexCount());
+			}
+		}
+
+		// ==========================================
+		// 3. 상자(Crates) 렌더링
+		// ==========================================
+		auto crateBlock = m_blockManager.GetCrate();
+		if (crateBlock)
+		{
+			for (const auto& cratePos : m_currentStage.cratePosList)
+			{
+				// 배경과 동일하게 Y축 반전 적용!
+				int invertedY = m_currentStage.height - 1 - cratePos.y;
+				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(cratePos.x, invertedY, 0.0f); // 필요시 높이 오프셋(예: 0.4f) 복원
+
+				ObjectData data = {};
+				data.model = DirectX::XMMatrixTranspose(worldMatrix);
+				m_cbObject->Update(m_graphics, data);
+				m_cbObject->Bind(m_graphics, Dive::eShaderStage::VS, 1);
+
+				crateBlock->Bind(m_graphics);
+				m_graphics->DrawIndexed(crateBlock->GetIndexCount());
+			}
+		}
+
+		// ==========================================
+		// 4. 플레이어(Player) 렌더링
+		// ==========================================
+		auto playerBlock = m_blockManager.GetPlayer();
+		if (playerBlock)
+		{
+			// 배경과 동일하게 Y축 반전 적용!
+			int invertedY = m_currentStage.height - 1 - m_currentStage.playerPos.y;
+			DirectX::XMMATRIX worldMatrix = GetWorldMatrix(m_currentStage.playerPos.x, invertedY, 0.0f); // 필요시 높이 오프셋(예: 0.65f) 복원
+
+			ObjectData data = {};
+			data.model = DirectX::XMMatrixTranspose(worldMatrix);
+			m_cbObject->Update(m_graphics, data);
+			m_cbObject->Bind(m_graphics, Dive::eShaderStage::VS, 1);
+
+			playerBlock->Bind(m_graphics);
+			m_graphics->DrawIndexed(playerBlock->GetIndexCount());
+		}
+	}
+
+	void Sokoban::RenderUI()
+	{
+	}
+
+	void Sokoban::Shutdown()
+	{
 	}
 
 	void Sokoban::LoadStage(const Stage& stage)
@@ -80,156 +236,11 @@ namespace Sokoban
 		return -1; // 해당 좌표에 상자가 없음
 	}
 
-	void Sokoban::Update(float deltaTime)
-	{
-		if (checkGameClear())
-			return;
-
-		FrameData data = {};
-		data.viewProj = DirectX::XMMatrixTranspose(m_camera.GetViewMatrix() * m_camera.GetProjectionMatrix());
-		m_cbFrame->Update(GetGraphics(), data);
-
-		{
-			if (GetInput()->KeyDown(DIK_R))
-			{
-				LoadStage(LevelOne());
-				return;
-			}
-
-			if (GetInput()->KeyDown(DIK_U) || GetInput()->KeyDown(DIK_BACKSPACE))
-			{
-				undo();
-				return;
-			}
-
-			// 1. 이동 방향 벡터 초기화 (X, Y)
-			int dx = 0;
-			int dy = 0;
-
-			// 2. 입력 체크 (VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN 또는 WASD)
-			// DirectInput이나 Win32 가상 키 코드 기준에 맞춰 설정하세요.
-			if (GetInput()->KeyDown(DIK_LEFT) || GetInput()->KeyDown(DIK_A))
-			{
-				dx = -1;
-			}
-			else if (GetInput()->KeyDown(DIK_RIGHT) || GetInput()->KeyDown(DIK_D))
-			{
-				dx = 1;
-			}
-			else if (GetInput()->KeyDown(DIK_UP) || GetInput()->KeyDown(DIK_W))
-			{
-				dy = -1; // 화면 좌표계나 배열 인덱스 방향에 따라 -1 또는 +1
-			}
-			else if (GetInput()->KeyDown(DIK_DOWN) || GetInput()->KeyDown(DIK_S))
-			{
-				dy = 1;
-			}
-
-			// 3. 입력이 발생했다면 그리드 로직 처리
-			if (dx != 0 || dy != 0)
-			{
-				int nextX = m_currentStage.playerPos.x + dx;
-				int nextY = m_currentStage.playerPos.y + dy;
-
-				// [핵심 로직] 이동하려는 칸의 상태 검사 (벽인지, 상자인지 등)
-				checkAndMovePlayer(nextX, nextY, dx, dy);
-			}
-		}
-	}
-	
-	void Sokoban::Render()
-	{
-		GetGraphics()->SetDepthStencilState(m_dss.Get(), 1);
-
-		auto sp = Dive::ShaderManager::Get().GetShaderProgram("Sokoban");
-		sp->Bind(GetGraphics());
-
-		m_cbFrame->Bind(GetGraphics(), Dive::eShaderStage::VS, 0);
-		m_cbFrame->Bind(GetGraphics(), Dive::eShaderStage::PS, 0);
-
-		GetGraphics()->SetTopology(Dive::ePrimitiveTopology::TriangleList);
-
-		// 📌 1. 중앙 정렬을 위한 오프셋 계산 (전체 크기의 절반)
-		float offsetX = static_cast<float>(m_currentStage.width) * 0.5f;
-		float offsetZ = static_cast<float>(m_currentStage.height) * 0.5f;
-
-		// 공통으로 쓸 변환 람다 함수 (그리드 (x, y)와 Y축 높이를 받아 월드 행렬 반환)
-		auto GetWorldMatrix = [offsetX, offsetZ](int x, int y, float heightOffset) {
-			float worldX = static_cast<float>(x) - offsetX + 0.5f; // 타일 중앙 정렬용 +0.5
-			float worldZ = static_cast<float>(y) - offsetZ + 0.5f;
-			return DirectX::XMMatrixTranslation(worldX, heightOffset, worldZ);
-			};
-
-		// ==========================================
-		// 2. 배경 레이어 렌더링 (Floor, Wall, Goal)
-		// ==========================================
-		for (int y = 0; y < m_currentStage.height; ++y)
-		{
-			for (int x = 0; x < m_currentStage.width; ++x)
-			{
-				uint8_t type = m_currentStage.gridTiles[y * m_currentStage.width + x];
-				auto block = m_blockManager.GetTile(type);
-				if (!block) continue;
-
-				int invertedY = m_currentStage.height - 1 - y;
-				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(x, invertedY, 0.0f);
-
-				ObjectData data = {};
-				data.model = DirectX::XMMatrixTranspose(worldMatrix);
-				m_cbObject->Update(GetGraphics(), data);
-				m_cbObject->Bind(GetGraphics(), Dive::eShaderStage::VS, 1);
-
-				block->Bind(GetGraphics());
-				GetGraphics()->DrawIndexed(block->GetIndexCount());
-			}
-		}
-
-		// ==========================================
-		// 3. 상자(Crates) 렌더링
-		// ==========================================
-		auto crateBlock = m_blockManager.GetCrate();
-		if (crateBlock)
-		{
-			for (const auto& cratePos : m_currentStage.cratePosList)
-			{
-				// 배경과 동일하게 Y축 반전 적용!
-				int invertedY = m_currentStage.height - 1 - cratePos.y;
-				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(cratePos.x, invertedY, 0.0f); // 필요시 높이 오프셋(예: 0.4f) 복원
-
-				ObjectData data = {};
-				data.model = DirectX::XMMatrixTranspose(worldMatrix);
-				m_cbObject->Update(GetGraphics(), data);
-				m_cbObject->Bind(GetGraphics(), Dive::eShaderStage::VS, 1);
-
-				crateBlock->Bind(GetGraphics());
-				GetGraphics()->DrawIndexed(crateBlock->GetIndexCount());
-			}
-		}
-
-		// ==========================================
-		// 4. 플레이어(Player) 렌더링
-		// ==========================================
-		auto playerBlock = m_blockManager.GetPlayer();
-		if (playerBlock)
-		{
-			// 배경과 동일하게 Y축 반전 적용!
-			int invertedY = m_currentStage.height - 1 - m_currentStage.playerPos.y;
-			DirectX::XMMATRIX worldMatrix = GetWorldMatrix(m_currentStage.playerPos.x, invertedY, 0.0f); // 필요시 높이 오프셋(예: 0.65f) 복원
-
-			ObjectData data = {};
-			data.model = DirectX::XMMatrixTranspose(worldMatrix);
-			m_cbObject->Update(GetGraphics(), data);
-			m_cbObject->Bind(GetGraphics(), Dive::eShaderStage::VS, 1);
-
-			playerBlock->Bind(GetGraphics());
-			GetGraphics()->DrawIndexed(playerBlock->GetIndexCount());
-		}
-	}
-	
-	void Sokoban::Shutdown()
-	{
-		GetGraphics()->ShutdownImGui();
-	}
+	//void Sokoban::OnWindowEvent(const Dive::WindowEventData& data)
+	//{
+		//if(GetImGuiManager()->IsVisible())
+		//	GetImGuiManager()->HandleWindowMessage(data);
+	//}
 
 	void Sokoban::checkAndMovePlayer(int nextX, int nextY, int dx, int dy)
 	{
