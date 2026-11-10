@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <cstdint>
-//#include "Types.h"
+#include <DirectXMath.h>
 
 namespace Sokoban
 {
@@ -13,27 +13,19 @@ namespace Sokoban
 		constexpr uint8_t Goal = 3;
 	}
 
-	struct GridPosition
-	{
-		int x;
-		int y;
-	};
-	
 	struct Stage
 	{
-		int width;
-		int height;
+		DirectX::XMINT2 size;
 		std::vector<uint8_t> gridTiles;
 
-		GridPosition playerPos;
-		std::vector<GridPosition> cratePosList;
+		DirectX::XMINT2 playerPos;
+		std::vector<DirectX::XMINT2> cratePosList;
 	};
 
 	inline Stage LevelOne()
 	{
 		Stage stage;
-		stage.width = 7;
-		stage.height = 11;
+		stage.size = { 7, 11 };
 
 		stage.gridTiles =
 		{
@@ -59,8 +51,7 @@ namespace Sokoban
 	inline Stage LevelTwo()
 	{
 		Stage stage;
-		stage.width = 15;
-		stage.height = 15;
+		stage.size = { 15, 15 };
 
 		stage.gridTiles =
 		{
@@ -90,8 +81,7 @@ namespace Sokoban
 	inline Stage LevelThree()
 	{
 		Stage stage;
-		stage.width = 20;
-		stage.height = 20;
+		stage.size = { 20, 20 };
 
 		stage.gridTiles =
 		{

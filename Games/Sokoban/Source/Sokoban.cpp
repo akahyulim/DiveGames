@@ -1,14 +1,18 @@
 #include "Sokoban.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/ShaderManager.h"
+#include "Graphics/RenderPass.h"
 //#include "Input/Input.h"
-#include "ImGui/ImGuiManager.h"
+//#include "ImGui/ImGuiManager.h"
+#include <imgui.h>
+#include <imgui_internal.h>
 
 namespace Sokoban
 {
-	Sokoban::Sokoban(Dive::Graphics* graphics, Dive::Input* input)
+	Sokoban::Sokoban(Dive::Graphics* graphics, Dive::Input* input, Dive::ImGuiManager* imGuiMng)
 		: m_graphics(graphics),
-		m_input(input)
+		m_input(input),
+		m_imGuiMng(imGuiMng)
 	{
 		{
 			Dive::ShaderProgramDesc desc;
@@ -17,21 +21,67 @@ namespace Sokoban
 			desc.psPath = "Assets/Shaders/Sokoban.hlsl";
 			desc.ilType = Dive::eInputLayout::Color;
 			Dive::ShaderManager::Get().CreateShaderProgram(m_graphics, desc);
+
+			desc = {};
+			desc.name = "Resolve";
+			desc.vsPath = "Assets/Shaders/ResolveScene.hlsl";
+			desc.psPath = "Assets/Shaders/ResolveScene.hlsl";
+			desc.ilType = Dive::eInputLayout::None;
+			Dive::ShaderManager::Get().CreateShaderProgram(m_graphics, desc);
 		}
 
 		m_camera.SetPerspective(DirectX::XM_PIDIV4, 800.0f / 600.0f, 0.1f, 100.0f);
 		m_camera.LookAt({ 0.0f, 30.0f, 0.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f });
 
 		m_blockManager.Initialize(m_graphics);
+
 		m_cbFrame = std::make_unique<Dive::ConstantBuffer<FrameData>>(m_graphics);
 		m_cbObject = std::make_unique<Dive::ConstantBuffer<ObjectData>>(m_graphics);
+		
+		{
+			// TextureManager로 텍스쳐를 읽은 후
+			// ImGui의 image 출력 다시 테스트
+
+			{
+				D3D11_TEXTURE2D_DESC desc{};
+				desc.Width = m_graphics->GetWidth();
+				desc.Height = m_graphics->GetHeight();
+				desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+				desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+				desc.MipLevels = 1;
+				desc.ArraySize = 1;
+				desc.SampleDesc.Count = 1;
+				desc.Usage = D3D11_USAGE_DEFAULT;
+				desc.MiscFlags = 0;
+				m_rt = std::make_unique<Dive::RenderTexture>(m_graphics, desc);
+				
+				desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+				desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+				m_ds = std::make_unique<Dive::RenderTexture>(m_graphics, desc);
+			}
+
+			Dive::RenderTargetDesc rtDesc{};
+			rtDesc.RenderTargetView = m_rt->GetRenderTargetView();
+			rtDesc.ClearColor[0] = 0.0f;
+			rtDesc.ClearColor[1] = 0.0f;
+			rtDesc.ClearColor[2] = 0.0f;
+			rtDesc.ClearColor[3] = 0.0f;
+			rtDesc.AccessType = Dive::eLoadAccessOp::Clear;
+
+			Dive::DepthStencilDesc dsDesc{};
+			dsDesc.DepthStencilView = m_ds->GetDetphStencilView();
+			dsDesc.ClearFlags = D3D11_CLEAR_DEPTH;
+			dsDesc.AccessType = Dive::eLoadAccessOp::Clear;
+
+			Dive::RenderPassDesc desc{};
+			desc.renderTargetDescs.push_back(rtDesc);
+			desc.depthStencilDesc = dsDesc;
+			m_offScreenResolvePass = desc;
+		}
 
 		{
 			D3D11_DEPTH_STENCIL_DESC desc{};
 			D3D11_DEPTH_STENCILOP_DESC stencilOp{};
-
-			// 1. Default (기본 뎁스 읽기/쓰기)
-			ZeroMemory(&desc, sizeof(desc));
 			desc.DepthEnable = true;
 			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 			desc.DepthFunc = D3D11_COMPARISON_LESS;
@@ -73,12 +123,9 @@ namespace Sokoban
 				return;
 			}
 
-			// 1. 이동 방향 벡터 초기화 (X, Y)
 			int dx = 0;
 			int dy = 0;
 
-			// 2. 입력 체크 (VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN 또는 WASD)
-			// DirectInput이나 Win32 가상 키 코드 기준에 맞춰 설정하세요.
 			if (m_input->KeyDown(DIK_LEFT) || m_input->KeyDown(DIK_A))
 			{
 				dx = -1;
@@ -89,27 +136,28 @@ namespace Sokoban
 			}
 			else if (m_input->KeyDown(DIK_UP) || m_input->KeyDown(DIK_W))
 			{
-				dy = -1; // 화면 좌표계나 배열 인덱스 방향에 따라 -1 또는 +1
+				dy = -1;
 			}
 			else if (m_input->KeyDown(DIK_DOWN) || m_input->KeyDown(DIK_S))
 			{
 				dy = 1;
 			}
 
-			// 3. 입력이 발생했다면 그리드 로직 처리
 			if (dx != 0 || dy != 0)
 			{
 				int nextX = m_currentStage.playerPos.x + dx;
 				int nextY = m_currentStage.playerPos.y + dy;
 
-				// [핵심 로직] 이동하려는 칸의 상태 검사 (벽인지, 상자인지 등)
 				checkAndMovePlayer(nextX, nextY, dx, dy);
 			}
 		}
 	}
 
+	// m_offScreenResolvePass는 m_rt, m_ds에 그리는 거다.
 	void Sokoban::Render()
 	{
+		m_graphics->BeginRenderPass(m_offScreenResolvePass);
+
 		m_graphics->SetDepthStencilState(m_dss.Get(), 1);
 
 		auto sp = Dive::ShaderManager::Get().GetShaderProgram("Sokoban");
@@ -120,29 +168,27 @@ namespace Sokoban
 
 		m_graphics->SetTopology(Dive::ePrimitiveTopology::TriangleList);
 
-		// 📌 1. 중앙 정렬을 위한 오프셋 계산 (전체 크기의 절반)
-		float offsetX = static_cast<float>(m_currentStage.width) * 0.5f;
-		float offsetZ = static_cast<float>(m_currentStage.height) * 0.5f;
+		// 중앙 정렬
+		float offsetX = static_cast<float>(m_currentStage.size.x) * 0.5f;
+		float offsetZ = static_cast<float>(m_currentStage.size.y) * 0.5f;
 
-		// 공통으로 쓸 변환 람다 함수 (그리드 (x, y)와 Y축 높이를 받아 월드 행렬 반환)
+		// 월드 변환 행렬 계산
 		auto GetWorldMatrix = [offsetX, offsetZ](int x, int y, float heightOffset) {
-			float worldX = static_cast<float>(x) - offsetX + 0.5f; // 타일 중앙 정렬용 +0.5
+			float worldX = static_cast<float>(x) - offsetX + 0.5f;
 			float worldZ = static_cast<float>(y) - offsetZ + 0.5f;
 			return DirectX::XMMatrixTranslation(worldX, heightOffset, worldZ);
 			};
 
-		// ==========================================
-		// 2. 배경 레이어 렌더링 (Floor, Wall, Goal)
-		// ==========================================
-		for (int y = 0; y < m_currentStage.height; ++y)
+		// Floor, Goal, Wall 그리기
+		for (int y = 0; y < m_currentStage.size.y; ++y)
 		{
-			for (int x = 0; x < m_currentStage.width; ++x)
+			for (int x = 0; x < m_currentStage.size.x; ++x)
 			{
-				uint8_t type = m_currentStage.gridTiles[y * m_currentStage.width + x];
+				uint8_t type = m_currentStage.gridTiles[y * m_currentStage.size.x + x];
 				auto block = m_blockManager.GetTile(type);
 				if (!block) continue;
 
-				int invertedY = m_currentStage.height - 1 - y;
+				int invertedY = m_currentStage.size.y - 1 - y;
 				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(x, invertedY, 0.0f);
 
 				ObjectData data = {};
@@ -155,17 +201,14 @@ namespace Sokoban
 			}
 		}
 
-		// ==========================================
-		// 3. 상자(Crates) 렌더링
-		// ==========================================
+		// 상자 그리기
 		auto crateBlock = m_blockManager.GetCrate();
 		if (crateBlock)
 		{
 			for (const auto& cratePos : m_currentStage.cratePosList)
 			{
-				// 배경과 동일하게 Y축 반전 적용!
-				int invertedY = m_currentStage.height - 1 - cratePos.y;
-				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(cratePos.x, invertedY, 0.0f); // 필요시 높이 오프셋(예: 0.4f) 복원
+				int invertedY = m_currentStage.size.y - 1 - cratePos.y;
+				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(cratePos.x, invertedY, 0.0f);
 
 				ObjectData data = {};
 				data.model = DirectX::XMMatrixTranspose(worldMatrix);
@@ -177,15 +220,12 @@ namespace Sokoban
 			}
 		}
 
-		// ==========================================
-		// 4. 플레이어(Player) 렌더링
-		// ==========================================
+		// 플레이어(캡슐) 그리기
 		auto playerBlock = m_blockManager.GetPlayer();
 		if (playerBlock)
 		{
-			// 배경과 동일하게 Y축 반전 적용!
-			int invertedY = m_currentStage.height - 1 - m_currentStage.playerPos.y;
-			DirectX::XMMATRIX worldMatrix = GetWorldMatrix(m_currentStage.playerPos.x, invertedY, 0.0f); // 필요시 높이 오프셋(예: 0.65f) 복원
+			int invertedY = m_currentStage.size.y - 1 - m_currentStage.playerPos.y;
+			DirectX::XMMATRIX worldMatrix = GetWorldMatrix(m_currentStage.playerPos.x, invertedY, 0.0f);
 
 			ObjectData data = {};
 			data.model = DirectX::XMMatrixTranspose(worldMatrix);
@@ -195,10 +235,64 @@ namespace Sokoban
 			playerBlock->Bind(m_graphics);
 			m_graphics->DrawIndexed(playerBlock->GetIndexCount());
 		}
+
+		m_graphics->EndRenderPass();
 	}
 
+	// m_rt에 그린 걸 srv로 13번에 할당한 후 백버퍼에 그린다.
+	// imgui를 사용한다면 resolve가 필요없다.
+	// img에 m_rt의 srv를 전달하여 그리고
+	// imgui 자체는 backbuffer에 그린다.
 	void Sokoban::RenderUI()
-	{
+	{	
+		m_graphics->ClearBackbuffer();
+		m_graphics->SetBackbuffer();
+
+		m_imGuiMng->Begin();
+		{
+			const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+			static ImVec2 lastWorkSize = ImVec2(0, 0);
+			static ImVec2 lastWorkPos = ImVec2(0, 0);
+
+			if (lastWorkSize.x != viewport->WorkSize.x || lastWorkSize.y != viewport->WorkSize.y ||
+				lastWorkPos.x != viewport->WorkPos.x || lastWorkPos.y != viewport->WorkPos.y)
+			{
+				ImGui::SetNextWindowPos(viewport->WorkPos);
+				ImGui::SetNextWindowSize(viewport->WorkSize);
+
+				lastWorkSize = viewport->WorkSize;
+				lastWorkPos = viewport->WorkPos;
+			}
+
+			ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar |
+				ImGuiWindowFlags_NoScrollWithMouse |
+				ImGuiWindowFlags_NoTitleBar |
+				ImGuiWindowFlags_NoResize |
+				ImGuiWindowFlags_NoMove |
+				ImGuiWindowFlags_NoBringToFrontOnFocus |
+				ImGuiWindowFlags_NoNavFocus;
+
+			if (ImGui::Begin("SceneView", nullptr, windowFlags))
+			{
+				ImVec2 viewportPos = ImGui::GetCursorScreenPos();
+				ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+
+				auto srv = m_rt->GetShaderResourceView();
+				//m_engine->GetRenderer()->GetOffScreenTexture()->GetShaderResourceView();
+				ImGui::Image((ImTextureID)srv, viewportSize);
+			}
+
+			ImGui::End();
+		}
+		m_imGuiMng->End();
+
+		//auto srv = m_rt->GetShaderResourceView();
+		//m_graphics->SetShaderResourceView(Dive::eShaderStage::PS, 13, &srv);
+		//Dive::ShaderManager::Get().GetShaderProgram("Resolve")->Bind(m_graphics);
+		//m_graphics->SetTopology(Dive::ePrimitiveTopology::TriangleStrip);
+		//m_graphics->SetVertexBuffer(nullptr);
+		//m_graphics->Draw(4);
 	}
 
 	void Sokoban::Shutdown()
@@ -224,16 +318,15 @@ namespace Sokoban
 
 	int Sokoban::FindCrateAt(int x, int y)
 	{
-		// m_crates는 관리 중인 상자들의 리스트 (std::vector<Crate>)
-		for (size_t i = 0; i < m_currentStage.cratePosList.size(); ++i)
+		for (int i = 0; i < m_currentStage.cratePosList.size(); ++i)
 		{
 			if (m_currentStage.cratePosList[i].x == x && m_currentStage.cratePosList[i].y == y)
 			{
-				return static_cast<int>(i); // 상자를 찾았다면 벡터의 인덱스 반환
+				return static_cast<int>(i);
 			}
 		}
 
-		return -1; // 해당 좌표에 상자가 없음
+		return -1;
 	}
 
 	//void Sokoban::OnWindowEvent(const Dive::WindowEventData& data)
@@ -244,52 +337,49 @@ namespace Sokoban
 
 	void Sokoban::checkAndMovePlayer(int nextX, int nextY, int dx, int dy)
 	{
-		// 1. 맵 범위를 벗어나는지 체크
-		if (nextX < 0 || nextX >= m_currentStage.width || nextY < 0 || nextY >= m_currentStage.height)
+		// 맵 밖으로 이동 불가
+		if (nextX < 0 || nextX >= m_currentStage.size.x || nextY < 0 || nextY >= m_currentStage.size.y)
 		{
-			return; // 맵 밖으로 이동 불가
+			return;
 		}
 
-		// 2. 이동하려는 칸의 타일 타입 확인
-		uint8_t nextTileType = m_currentStage.gridTiles[nextY * m_currentStage.width + nextX];
+		uint8_t nextTileType = m_currentStage.gridTiles[nextY * m_currentStage.size.x + nextX];
 
-		// Case A: 벽(Wall)인 경우 -> 이동 불가
+		// 벽 이동 불가
 		if (nextTileType == TileType::Empty || nextTileType == TileType::Wall)
 		{
 			return;
 		}
 
-		// Case B: 상자(Crate)가 있는 경우 -> 상자를 밀 수 있는지 검사
-		int crateIndex = FindCrateAt(nextX, nextY); // 해당 좌표에 상자가 있는지 찾는 함수 (별도 관리 중이시라면 그에 맞게 수정)
-		if (crateIndex != -1) // 상자가 존재함!
+		int crateIndex = FindCrateAt(nextX, nextY);
+		if (crateIndex != -1)
 		{
-			// 상자가 밀려날 그 다음 칸 좌표
 			int nextCrateX = nextX + dx;
 			int nextCrateY = nextY + dy;
 
-			// 2-1. 상자가 밀려날 곳이 맵 밖이거나, 또 벽이거나, 혹은 다른 상자가 있다면 -> 밀기 불가
-			if (nextCrateX < 0 || nextCrateX >= m_currentStage.width ||
-				nextCrateY < 0 || nextCrateY >= m_currentStage.height)
+			// 상자의 다음칸이 맵 밖이면 이동 불가
+			if (nextCrateX < 0 || nextCrateX >= m_currentStage.size.x ||
+				nextCrateY < 0 || nextCrateY >= m_currentStage.size.y)
 			{
 				return;
 			}
 
-			uint8_t crateDestinationType = m_currentStage.gridTiles[nextCrateY * m_currentStage.width + nextCrateX];
+			// 상자의 다음칸이 벽이거나 다른 상자면 이동 불가  
+			uint8_t crateDestinationType = m_currentStage.gridTiles[nextCrateY * m_currentStage.size.x + nextCrateX];
 			if (crateDestinationType == TileType::Empty || crateDestinationType == TileType::Wall || FindCrateAt(nextCrateX, nextCrateY) != -1)
 			{
-				return; // 막혀서 못 밀음
+				return;
 			}
 
-			// 2-2. 상자를 한 칸 이동시킴
 			m_currentStage.cratePosList[crateIndex].x = nextCrateX;
 			m_currentStage.cratePosList[crateIndex].y = nextCrateY;
 		}
 
-		// Case C: 빈 바닥(또는 목표 지점 등)인 경우 -> 플레이어 이동 완료!
 		m_currentStage.playerPos.x = nextX;
 		m_currentStage.playerPos.y = nextY;
 		m_moveCount++;
 
+		// 이동 결과 저장
 		StateRecord record;
 		record.playerPos = m_currentStage.playerPos;
 		record.cratePositions = m_currentStage.cratePosList;
@@ -304,7 +394,7 @@ namespace Sokoban
 
 		for (const auto& cratePos : m_currentStage.cratePosList)
 		{
-			int index = cratePos.y * m_currentStage.width + cratePos.x;
+			int index = cratePos.y * m_currentStage.size.x + cratePos.x;
 
 			if (m_currentStage.gridTiles[index] != TileType::Goal)
 				return false;

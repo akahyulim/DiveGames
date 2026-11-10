@@ -10,11 +10,11 @@ int main()
 {
 	Dive::Window window(800, 600, L"SOKOBAN");
 	Dive::Graphics graphics(&window);
-	//Dive::ImGuiManager imGuiMng(&graphics);
+	Dive::ImGuiManager imGuiMng(&graphics);
 	Dive::Input input(window.GetWindowHandle());
 	Dive::Timer timer;
 
-	Sokoban::Sokoban game(&graphics, &input);
+	Sokoban::Sokoban game(&graphics, &input, &imGuiMng);
 
 	while (!window.ShouldClose())
 	{
@@ -25,13 +25,19 @@ int main()
 
 		game.Update(timer.GetDeltaTime());
 
-		graphics.ClearBackbuffer();
-		graphics.SetBackbuffer();
+		if (imGuiMng.IsVisible())
+		{
+			game.Render();
+			game.RenderUI();
 
-		game.Render();
-
-		graphics.EndRenderPass();
-		graphics.SwapBuffers();
+			graphics.SwapBuffers();
+		}
+		else
+		{
+			//m_engine->Run();
+			//m_engine->Present();	// Present가 SwapBuffers()다.
+			graphics.SwapBuffers();
+		}
 	}
 
 	game.Shutdown();

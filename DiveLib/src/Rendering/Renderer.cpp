@@ -1,8 +1,8 @@
-#include "pch.h"
-#include "Renderer.h"
-#include "TextureManager.h"
-#include "Material.h"
-#include "ShaderManager.h"
+#include "Rendering/Renderer.h"
+//#include "TextureManager.h"
+//#include "Material.h"
+#include "Graphics/ShaderManager.h"
+#include "Graphics/Types.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/ConstantBufferDatas.h"
 #include "Graphics/ShaderProgram.h"
@@ -11,13 +11,8 @@
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/Geometry.h"
 
-#include "Scene/Scene.h"
-#include "Scene/GameObject.h"
-#include "Scene/Components/Transform.h"
-#include "Scene/Components/Camera.h"
-#include "Scene/Components/MeshRenderer.h"
-#include "Scene/Components/Light.h"
-
+// 일단 scene-gameobject-component를 사용하는 pass들을 모두 제거한 후
+// raylib의 인터페이스를 참조해 2d, 3d(forwrad - pbs) 렌더링으로 가보자.
 namespace Dive
 {
 	Renderer::Renderer(Graphics* graphics, uint32_t width, uint32_t height)
