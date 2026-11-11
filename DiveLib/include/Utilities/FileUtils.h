@@ -1,6 +1,7 @@
-﻿#pragma once
+#pragma once
 #include <string>
 #include <Windows.h>
+#include <filesystem>
 
 namespace Dive
 {

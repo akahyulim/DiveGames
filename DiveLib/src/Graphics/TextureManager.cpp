@@ -1,9 +1,11 @@
-#include "pch.h"
-#include "TextureManager.h"
+#include "Graphics/TextureManager.h"
 #include "Core/Common.h"
 #include "Graphics/Graphics.h"
 #include "Utilities/FileUtils.h"
 #include "Utilities/StringUtils.h"
+#include <spdlog/spdlog.h>
+#include <filesystem>
+#include <DirectXTex/DirectXTex.h>
 
 namespace Dive
 {

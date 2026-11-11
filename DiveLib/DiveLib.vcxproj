@@ -42,6 +42,7 @@
     <ClInclude Include="include\Graphics\ShaderManager.h" />
     <ClInclude Include="include\Graphics\ShaderProgram.h" />
     <ClInclude Include="include\Graphics\StructuredBuffer.h" />
+    <ClInclude Include="include\Graphics\TextureManager.h" />
     <ClInclude Include="include\Graphics\Types.h" />
     <ClInclude Include="include\Graphics\VertexBuffer.h" />
     <ClInclude Include="include\ImGui\ImGuiHelper.h" />
@@ -49,6 +50,7 @@
     <ClInclude Include="include\Input\Input.h" />
     <ClInclude Include="include\Resource\Resource.h" />
     <ClInclude Include="include\Utilities\Delegate.h" />
+    <ClInclude Include="include\Utilities\FileUtils.h" />
     <ClInclude Include="include\Utilities\StringUtils.h" />
     <ClInclude Include="include\Utilities\Timer.h" />
   </ItemGroup>
@@ -68,11 +70,13 @@
     <ClCompile Include="src\Graphics\Shader.cpp" />
     <ClCompile Include="src\Graphics\ShaderManager.cpp" />
     <ClCompile Include="src\Graphics\ShaderProgram.cpp" />
+    <ClCompile Include="src\Graphics\TextureManager.cpp" />
     <ClCompile Include="src\Graphics\VertexBuffer.cpp" />
     <ClCompile Include="src\ImGui\ImGuiHelper.cpp" />
     <ClCompile Include="src\ImGui\ImGuiManager.cpp" />
     <ClCompile Include="src\Input\Input.cpp" />
     <ClCompile Include="src\Resource\Resource.cpp" />
+    <ClCompile Include="src\Utilities\FileUtils.cpp" />
     <ClCompile Include="src\Utilities\StringUtils.cpp" />
     <ClCompile Include="src\Utilities\Timer.cpp" />
   </ItemGroup>
@@ -204,7 +208,7 @@
       <PreprocessorDefinitions>NOMINMAX;WIN32_LEAN_AND_MEAN;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Vendor\imgui;$(SolutionDir)Vendor\spdlog\include;$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Vendor\DirectXTex;$(SolutionDir)Vendor\imgui;$(SolutionDir)Vendor\spdlog\include;$(ProjectDir)include</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -214,7 +218,8 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3dcompiler.lib;dinput8.lib;dxguid.lib;d3d11.lib;dinput8.lib;</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTex.lib;d3dcompiler.lib;dinput8.lib;dxguid.lib;d3d11.lib;dinput8.lib;</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)Vendor\Libs\$(Configuration)\</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

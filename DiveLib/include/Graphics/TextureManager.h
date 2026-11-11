@@ -5,9 +5,13 @@
 #include <d3d11.h>
 #include <memory>
 #include <wrl/client.h>
-#include <DirectXTex/DirectXTex.h>
-
 #include <vector>
+
+namespace DirectX
+{
+	class ScratchImage;
+	struct TexMetadata;
+}
 
 namespace Dive
 {

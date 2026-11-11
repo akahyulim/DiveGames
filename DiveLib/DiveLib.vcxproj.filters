@@ -19,9 +19,6 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{13ec2b28-cc7d-41e3-95c7-2f5f6ca01f7e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Rendering">
-      <UniqueIdentifier>{a4e0475c-8677-4191-a291-974b9e8274d7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Vendor">
       <UniqueIdentifier>{5a376d52-1236-4b4c-be14-88f206e39b45}</UniqueIdentifier>
     </Filter>
@@ -30,6 +27,9 @@
     </Filter>
     <Filter Include="ImGui">
       <UniqueIdentifier>{b462c071-4ca9-4e7c-8534-222f99592ca6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{a4e0475c-8677-4191-a291-974b9e8274d7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +129,12 @@
     <ClInclude Include="include\Utilities\Timer.h">
       <Filter>Utilities</Filter>
     </ClInclude>
+    <ClInclude Include="include\Graphics\TextureManager.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utilities\FileUtils.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utilities\StringUtils.cpp">
@@ -195,6 +201,12 @@
       <Filter>ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Utilities\Timer.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Graphics\TextureManager.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Utilities\FileUtils.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
   </ItemGroup>

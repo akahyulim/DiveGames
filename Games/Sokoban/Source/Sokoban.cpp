@@ -4,6 +4,7 @@
 #include "Graphics/RenderPass.h"
 //#include "Input/Input.h"
 //#include "ImGui/ImGuiManager.h"
+#include <Graphics/TextureManager.h>
 #include <imgui.h>
 #include <imgui_internal.h>
 
@@ -41,6 +42,9 @@ namespace Sokoban
 		{
 			// TextureManager로 텍스쳐를 읽은 후
 			// ImGui의 image 출력 다시 테스트
+			{
+				//auto handle = Dive::TextureManager::Get().LoadTexture("Assets/Textures/DokeV.jpeg");
+			}
 
 			{
 				D3D11_TEXTURE2D_DESC desc{};
@@ -278,8 +282,8 @@ namespace Sokoban
 				ImVec2 viewportPos = ImGui::GetCursorScreenPos();
 				ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
+				//auto srv = Dive::TextureManager::Get().GetTextureViewByPath("Assets/Textures/DokeV.jpeg");
 				auto srv = m_rt->GetShaderResourceView();
-				//m_engine->GetRenderer()->GetOffScreenTexture()->GetShaderResourceView();
 				ImGui::Image((ImTextureID)srv, viewportSize);
 			}
 
