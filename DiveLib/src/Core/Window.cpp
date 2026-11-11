@@ -88,8 +88,10 @@ namespace Dive
 
 	Window::~Window()
 	{
-		if(m_hWnd)
+		if (m_hWnd)
+		{
 			::DestroyWindow(m_hWnd);
+		}
 	}
 
 	LRESULT Window::HandleMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -129,21 +131,6 @@ namespace Dive
 		broadcastEvents(data);
 
 		return result;
-	}
-
-	bool Window::Run()
-	{
-		MSG msg{};
-		while (::PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-		{
-			::TranslateMessage(&msg);
-			::DispatchMessageW(&msg);
-			
-			if (msg.message == WM_QUIT)
-				return false;
-		}
-
-		return true;
 	}
 
 	void Window::PollEvents()

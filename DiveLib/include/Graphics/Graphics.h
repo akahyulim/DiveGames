@@ -18,15 +18,10 @@ namespace Dive
 	class BlendState;
 	class SamplerState;
 
-	struct GraphicsDesc
-	{
-		bool enableVSync = false;
-	};
-
 	class Graphics
 	{
 	public:
-		explicit Graphics(Window* window, const GraphicsDesc& desc = GraphicsDesc{});
+		explicit Graphics(Window* window, bool vSync = false);
 		Graphics(Graphics const&) = delete;
 		Graphics(Graphics&&) = default;
 		Graphics& operator=(Graphics const&) = delete;

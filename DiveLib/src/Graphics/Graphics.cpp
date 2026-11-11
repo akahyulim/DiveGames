@@ -48,9 +48,9 @@ namespace Dive
 		}
 	}
 
-	Graphics::Graphics(Window* window, const GraphicsDesc& desc)
+	Graphics::Graphics(Window* window, bool vSync)
 		: m_window(window),
-		m_vSync(desc.enableVSync)
+		m_vSync(vSync)
 	{
 		m_width = window->GetWidth();
 		m_height = window->GetHeight();

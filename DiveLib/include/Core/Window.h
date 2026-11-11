@@ -28,7 +28,6 @@ namespace Dive
 
 		LRESULT HandleMessage(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-		bool Run();
 		void PollEvents();
 
 		void SetMessageCallback(LONG_PTR callBack) const;

@@ -12,9 +12,9 @@
 #include "Input/input.h"	// 계속 이게 문제다.
 #include "ImGui/ImGuiManager.h"
 
-#include "Camera.h"
 #include "Stage.h"
-#include "MeshManager.h"
+#include "Graphics/Camera.h"
+#include "Graphics/MeshManager.h"
 
 namespace Sokoban
 {

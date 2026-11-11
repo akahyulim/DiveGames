@@ -2,19 +2,44 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\Camera.cpp" />
-    <ClCompile Include="Source\MeshManager.cpp" />
     <ClCompile Include="Source\Sokoban.cpp" />
+    <ClCompile Include="Source\Graphics\Camera.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\MeshManager.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Game.cpp" />
+    <ClCompile Include="Source\Scenes\TitleScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Stage.h" />
-    <ClInclude Include="Source\Camera.h" />
-    <ClInclude Include="Source\MeshManager.h" />
     <ClInclude Include="Source\Sokoban.h" />
+    <ClInclude Include="Source\Graphics\Camera.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\MeshManager.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Game.h" />
+    <ClInclude Include="Source\Scenes\Scene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\TitleScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
       <UniqueIdentifier>{98296b58-c79d-44eb-b00a-15b6bdaacc09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{e0c521d3-3e5e-43d9-ba2c-c2b751d68cd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{90e14933-8ca0-4c82-afa6-baa512ecc742}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

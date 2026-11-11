@@ -1,12 +1,12 @@
-#include <memory>
-#include "Core/Window.h"
-#include "Graphics/Graphics.h"
-#include "Graphics/TextureManager.h"
-#include "ImGui/ImGuiManager.h"
-#include "Input/Input.h"
-#include "Utilities/Timer.h"
-#include "Sokoban.h"
+#include "Game.h"
 
+int main(int argc, char* argv[])
+{
+	Sokoban::Game game;
+	return game.Run();
+}
+
+/*
 int main()
 {
 	Dive::Window window(800, 600, L"SOKOBAN");
@@ -46,25 +46,4 @@ int main()
 	game.Shutdown();
 
 	return 0;
-	/*
-		while (!window.ShouldClose())
-		{
-			window.PollEvents();
-
-			// UI 프레임 시작
-			imguiManager.BeginFrame();
-
-			// 게임 로직 및 UI 렌더링
-			ImGui::Begin("Sokoban Controls");
-			// ... 각종 UI 조작 ...
-			ImGui::End();
-
-			// 렌더링
-			graphics.Clear(0.1f, 0.1f, 0.1f, 1.0f);
-			// ... 게임 오브젝트 드로우 ...
-        
-			imguiManager.EndFrame();
-			graphics.SwapBuffers();
-		}
-	*/
-}
+}*/

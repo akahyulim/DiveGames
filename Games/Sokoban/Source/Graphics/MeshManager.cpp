@@ -1,6 +1,7 @@
 #include "MeshManager.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/Geometry.h"
+#include "../Stage.h"
 
 using namespace DirectX;
 
