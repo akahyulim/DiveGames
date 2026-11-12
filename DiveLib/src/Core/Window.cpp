@@ -1,4 +1,5 @@
 #include "Core/Window.h"
+#include "Core/LogManager.h"
 #include "Utilities/StringUtils.h"
 #include <assert.h>
 
@@ -34,6 +35,8 @@ namespace Dive
 
 	Window::Window(int width, int height, const wchar_t* title)
 	{
+		DV_LOG(Window, info, "Initializing Win32 Window (Width: {}, Height: {})...", width, height);
+
 		HINSTANCE hInstance = ::GetModuleHandle(nullptr);
 
 		LPCWSTR className = L"WindowClass";
@@ -54,6 +57,7 @@ namespace Dive
 
 		if (!::RegisterClassEx(&wc))
 		{
+			DV_LOG(Window, err, "Failed to register window class.");
 			::MessageBoxA(nullptr, "윈도우 클래스 등록 실패", "Fatal Error!", MB_ICONEXCLAMATION | MB_OK);
 			return;
 		}
@@ -75,6 +79,7 @@ namespace Dive
 
 		if (!m_hWnd)
 		{
+			DV_LOG(Window, err, "Failed to create window handle.");
 			::MessageBox(nullptr, L"윈도우 생성 실패", L"Fatal Error!", MB_ICONEXCLAMATION | MB_OK);
 			return;
 		}
@@ -84,13 +89,18 @@ namespace Dive
 		::ShowWindow(m_hWnd, SW_SHOWNORMAL);
 		::UpdateWindow(m_hWnd);
 		::SetFocus(m_hWnd);
+
+		DV_LOG(Window, info, "Win32 Window initialized successfully. (HWND: {})", static_cast<void*>(m_hWnd));
 	}
 
 	Window::~Window()
 	{
 		if (m_hWnd)
 		{
+			DV_LOG(Window, info, "Destroying Win32 Window (HWND: {})...", static_cast<void*>(m_hWnd));
 			::DestroyWindow(m_hWnd);
+			m_hWnd = nullptr;
+			DV_LOG(Window, info, "Win32 Window destroyed successfully.");
 		}
 	}
 
@@ -150,20 +160,24 @@ namespace Dive
 	{
 		if (!::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, callBack))
 		{
+			DV_LOG(Window, err, "Failed to set window message callback (WndProc).");
 			::MessageBox(nullptr, L"윈도우 콜백 교체 실패", L"Fatal Error!", MB_ICONEXCLAMATION | MB_OK);
 			return;
 		}
+		DV_LOG(Window, info, "Window message callback successfully updated.");
 	}
 
 	bool Window::Resize(uint32_t width, uint32_t height) const
 	{
 		assert(m_hWnd);
+		DV_LOG(Window, info, "Resizing window to {}x{}...", width, height);
 
 		int posX = (::GetSystemMetrics(SM_CXSCREEN) - width) / 2;
 		int posY = (::GetSystemMetrics(SM_CYSCREEN) - height) / 2;
 
 		if (!::SetWindowPos(m_hWnd, nullptr, posX, posY, width, height, SWP_NOZORDER | SWP_DRAWFRAME))
 		{
+			DV_LOG(Window, err, "Failed to resize window position/size.");
 			::MessageBox(nullptr, L"윈도우 크기 변경 실패", L"Fatal Error!", MB_ICONEXCLAMATION | MB_OK);
 			return false;
 		}
@@ -236,9 +250,30 @@ namespace Dive
 
 		if (IsWindowed())
 		{
+			DV_LOG(Window, info, "Switching window to FullScreen mode.");
 			::SetWindowLong(m_hWnd, GWL_STYLE, WS_POPUP);
 			::SetWindowPos(m_hWnd, HWND_TOP, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN),
 				SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+		}
+	}
+
+	void Window::Minimize() const
+	{
+		assert(m_hWnd != 0);
+		if (!::IsIconic(m_hWnd))
+		{
+			DV_LOG(Window, info, "Minimizing window.");
+			::ShowWindow(m_hWnd, SW_MINIMIZE);
+		}
+	}
+
+	void Window::Maximize() const
+	{
+		assert(m_hWnd != 0);
+		if (!::IsZoomed(m_hWnd))
+		{
+			DV_LOG(Window, info, "Maximizing window.");
+			::ShowWindow(m_hWnd, SW_MAXIMIZE);
 		}
 	}
 
@@ -266,20 +301,6 @@ namespace Dive
 				::SetWindowPos(m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
 			}
 		}
-	}
-
-	void Window::Minimize() const
-	{
-		assert(m_hWnd != 0);
-		if (!::IsIconic(m_hWnd))
-			::ShowWindow(m_hWnd, SW_MINIMIZE);
-	}
-
-	void Window::Maximize() const
-	{
-		assert(m_hWnd != 0);
-		if (!::IsZoomed(m_hWnd))
-			::ShowWindow(m_hWnd, SW_MAXIMIZE);
 	}
 
 	void Window::Restore() const

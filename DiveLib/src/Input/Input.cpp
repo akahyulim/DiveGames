@@ -1,6 +1,6 @@
 #include "Input/Input.h"
 #include "Core/Common.h"
-#include <spdlog/spdlog.h>
+#include "Core/LogManager.h"
 
 using Microsoft::WRL::ComPtr;
 
@@ -9,9 +9,11 @@ namespace Dive
 	Input::Input(HWND hWnd)
 		: m_hWnd(hWnd)
 	{
-		if (!IsWindow(hWnd))
+		DV_LOG(Input, info, "Initializing DirectInput8 System (HWND: {})...", static_cast<void*>(hWnd));
+
+		if (!::IsWindow(hWnd))
 		{
-			spdlog::error("[::Input] 잘못된 윈도우 핸들");
+			DV_LOG(Input, err, "Invalid window handle provided for Input system.");
 			return;
 		}
 
@@ -19,71 +21,82 @@ namespace Dive
 		auto hr = DirectInput8Create(hInst, DIRECTINPUT_VERSION, IID_IDirectInput8, (LPVOID*)m_directInput.GetAddressOf(), nullptr);
 		if (FAILED(hr))
 		{
-			spdlog::error("[::Input] DirectInput8Create 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Input, err, "Failed to create DirectInput8 interface: {}", ErrorUtils::ToVerbose(hr));
 			return;
 		}
+		DV_LOG(Input, info, "DirectInput8 interface created successfully.");
 
-		// 키보드 생성
+		// 키보드 생성 및 설정
 		hr = m_directInput->CreateDevice(GUID_SysKeyboard, m_keyboard.GetAddressOf(), nullptr);
 		if (FAILED(hr))
 		{
-			spdlog::error("[::Input] 키보드 CreateDevice 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Input, err, "Failed to create keyboard device: {}", ErrorUtils::ToVerbose(hr));
 			return;
 		}
 
 		hr = m_keyboard->SetDataFormat(&c_dfDIKeyboard);
 		if (FAILED(hr))
 		{
-			spdlog::error("[::Input] 키보드 SetDataFormat 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Input, err, "Failed to set keyboard data format: {}", ErrorUtils::ToVerbose(hr));
 			return;
 		}
 
 		hr = m_keyboard->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 		if (FAILED(hr))
 		{
-			spdlog::error("[::Input] 키보드 SetCooperativeLevel 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Input, err, "Failed to set keyboard cooperative level: {}", ErrorUtils::ToVerbose(hr));
 			return;
 		}
 
 		hr = m_keyboard->Acquire();
 		if (FAILED(hr))
 		{
-			spdlog::error("[::Input] 키보드 Acquire 실패: {}", ErrorUtils::ToVerbose(hr));
-			return;
+			DV_LOG(Input, warn, "Initial keyboard acquire failed (will retry on update): {}", ErrorUtils::ToVerbose(hr));
+		}
+		else
+		{
+			DV_LOG(Input, info, "Keyboard device initialized and acquired successfully.");
 		}
 
-		// 마우스 생성
+		// 마우스 생성 및 설정
 		hr = m_directInput->CreateDevice(GUID_SysMouse, m_mouse.GetAddressOf(), NULL);
 		if (FAILED(hr))
 		{
-			spdlog::error("[::Input] 마우스 CreateDevice 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Input, err, "Failed to create mouse device: {}", ErrorUtils::ToVerbose(hr));
 			return;
 		}
 
 		hr = m_mouse->SetDataFormat(&c_dfDIMouse);
 		if (FAILED(hr))
 		{
-			spdlog::error("[::Input] 마우스 SetDataFormat 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Input, err, "Failed to set mouse data format: {}", ErrorUtils::ToVerbose(hr));
 			return;
 		}
 
 		hr = m_mouse->SetCooperativeLevel(hWnd, DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
 		if (FAILED(hr))
 		{
-			spdlog::error("[::Input] 마우스 SetCooperativeLevel 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Input, err, "Failed to set mouse cooperative level: {}", ErrorUtils::ToVerbose(hr));
 			return;
 		}
 
 		hr = m_mouse->Acquire();
 		if (FAILED(hr))
 		{
-			spdlog::error("[::Input] 마우스 Acquire 실패: {}", ErrorUtils::ToVerbose(hr));
-			return;
+			DV_LOG(Input, warn, "Initial mouse acquire failed (will retry on update): {}", ErrorUtils::ToVerbose(hr));
 		}
+		else
+		{
+			DV_LOG(Input, info, "Mouse device initialized and acquired successfully.");
+		}
+
+		DV_LOG(Input, info, "Input system initialization completed.");
 	}
 
 	Input::~Input()
 	{
+		DV_LOG(Input, info, "Shutting down Input system...");
+
 		if (m_mouse)
 		{
 			m_mouse->Unacquire();
@@ -97,6 +110,7 @@ namespace Dive
 		}
 
 		m_directInput.Reset();
+		DV_LOG(Input, info, "Input system shut down successfully.");
 	}
 
 	void Input::Update()
@@ -117,27 +131,33 @@ namespace Dive
 		if (FAILED(hr))
 		{
 			if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED))
+			{
+				DV_LOG(Input, warn, "Keyboard focus lost. Re-acquiring device...");
 				m_keyboard->Acquire();
+			}
 			else
 			{
-				spdlog::error("[::ReadKeyboard] 키보드 연결 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Input, err, "Failed to read keyboard device state: {}", ErrorUtils::ToVerbose(hr));
 				return false;
 			}
 		}
 
 		return true;
 	}
-	
+
 	bool Input::ReadMouse()
 	{
 		auto hr = m_mouse->GetDeviceState(sizeof(DIMOUSESTATE), static_cast<LPVOID>(&m_mouseState));
 		if (FAILED(hr))
 		{
 			if ((hr == DIERR_INPUTLOST) || (hr == DIERR_NOTACQUIRED))
+			{
+				DV_LOG(Input, warn, "Mouse focus lost. Re-acquiring device...");
 				m_mouse->Acquire();
+			}
 			else
 			{
-				spdlog::error("[::ReadMouse] 마우스 연결 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Input, err, "Failed to read mouse device state: {}", ErrorUtils::ToVerbose(hr));
 				return false;
 			}
 		}
@@ -149,17 +169,17 @@ namespace Dive
 	{
 		return m_keyStates[key] & 0X80;
 	}
-	
+
 	bool Input::KeyDown(int key)
 	{
 		return (m_keyStates[key] & 0X80) && !(m_oldKeyStates[key] & 0X80);
 	}
-	
+
 	bool Input::KeyUp(int key)
 	{
 		return !(m_keyStates[key] & 0X80) && (m_oldKeyStates[key] & 0X80);
 	}
-	
+
 	bool Input::KeyPress(int key)
 	{
 		return (m_keyStates[key] & 0X80) && (m_oldKeyStates[key] & 0X80);
@@ -169,22 +189,22 @@ namespace Dive
 	{
 		return m_mouseButtons[btn] == 1;
 	}
-	
+
 	bool Input::MouseButtonDown(int btn)
 	{
 		return (m_mouseButtons[btn] == 1) && !(m_oldMouseButtons[btn] == 1);
 	}
-	
+
 	bool Input::MouseButtonUp(int btn)
 	{
 		return !(m_mouseButtons[btn] == 1) && (m_oldMouseButtons[btn] == 1);
 	}
-	
+
 	bool Input::MouseButtonPress(int btn)
 	{
 		return (m_mouseButtons[btn] == 1) && (m_oldMouseButtons[btn] == 1);
 	}
-	
+
 	DirectX::XMUINT2 Input::GetMousePosition()
 	{
 		return GetMousePosition(m_hWnd);

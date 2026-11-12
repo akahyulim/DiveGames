@@ -4,9 +4,9 @@
 #include "Graphics/IndexBuffer.h"
 #include "Graphics/InputLayout.h"
 #include "Core/Common.h"
+#include "Core/LogManager.h"
 #include "Core/Window.h"
 #include <assert.h>
-#include <spdlog/spdlog.h>
 
 namespace Dive
 {
@@ -55,6 +55,9 @@ namespace Dive
 		m_width = window->GetWidth();
 		m_height = window->GetHeight();
 
+		DV_LOG(Graphics, info, "Initializing DirectX 11 Graphics System (Resolution:{}x{}, VSync: {})...",
+			m_width, m_height, m_vSync ? "True" : "False");
+
 		HRESULT hr = ::D3D11CreateDevice(
 			nullptr,
 			D3D_DRIVER_TYPE_HARDWARE,
@@ -68,9 +71,10 @@ namespace Dive
 			m_deviceContext.GetAddressOf());
 		if (FAILED(hr))
 		{
-			spdlog::error("Graphics::Graphics - 그래픽스 디바이스 생성 실패");
+			DV_LOG(Graphics, err, "Failed to create D3D11 device. (HRESULT:  {})", ErrorUtils::ToVerbose(hr));
 			return;
 		}
+		DV_LOG(Graphics, info, "D3D11 device and device context created successfully.");
 
 		IDXGIDevice* dxgiDevice{};
 		m_device->QueryInterface(IID_IDXGIDevice, (void**)&dxgiDevice);
@@ -98,18 +102,31 @@ namespace Dive
 		hr = dxgiFactory->CreateSwapChain(m_device.Get(), &swapChainDesc, m_swapChain.GetAddressOf());
 		if (FAILED(hr))
 		{
-			spdlog::error("그래픽스 스왑체인 생성 실패");
+			DV_LOG(Graphics, err, "Failed to create DXGI swap chain. (HRESULT: {})", ErrorUtils::ToVerbose(hr));
 			return;
 		}
+		DV_LOG(Graphics, info, "DXGI swap chain created successfully.");
 
 		DV_RELEASE(dxgiFactory);
 		DV_RELEASE(dxgiAdapter);
 		DV_RELEASE(dxgiDevice);
 
 		createBackbufferResources(m_width, m_height);
+		DV_LOG(Graphics, info, "Graphics system initialization completed successfully.");
 	}
 
-	Graphics::~Graphics() = default;
+	Graphics::~Graphics()
+	{
+		DV_LOG(Graphics, info, "Shutting down Graphics system...");
+
+		m_backbufferRTV.Reset();
+		m_backbufferDSV.Reset();
+		m_swapChain.Reset();
+		m_deviceContext.Reset();
+		m_device.Reset();
+
+		DV_LOG(Graphics, info, "Graphics system shut down successfully.");
+	}
 
 	void Graphics::SetBackbuffer()
 	{
@@ -146,6 +163,7 @@ namespace Dive
 		if ((m_width != width || m_height != height)
 			&& width > 0 && height > 0)
 		{
+			DV_LOG(Graphics, info, "Resizing backbuffer resources from {}x{} to {}x{}...", m_width, m_height, width, height);
 			m_width = width;
 			m_height = height;
 
@@ -165,7 +183,7 @@ namespace Dive
 		auto hr = m_device->CreateDepthStencilState(&desc, state.GetAddressOf());
 		if (FAILED(hr))
 		{
-			spdlog::error("DepthStencilState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to create DepthStencilState: {}", ErrorUtils::ToVerbose(hr));
 			return nullptr;
 		}
 
@@ -179,7 +197,7 @@ namespace Dive
 		auto hr = m_device->CreateRasterizerState(&desc, state.GetAddressOf());
 		if (FAILED(hr))
 		{
-			spdlog::error("RasterizerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to create RasterizerState: {}", ErrorUtils::ToVerbose(hr));
 			return nullptr;
 		}
 
@@ -193,7 +211,7 @@ namespace Dive
 		auto hr = m_device->CreateBlendState(&desc, state.GetAddressOf());
 		if (FAILED(hr))
 		{
-			spdlog::error("BlendState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to create BlendState: {}", ErrorUtils::ToVerbose(hr));
 			return nullptr;
 		}
 
@@ -207,7 +225,7 @@ namespace Dive
 		auto hr = m_device->CreateSamplerState(&desc, state.GetAddressOf());
 		if (FAILED(hr))
 		{
-			spdlog::error("SamplerState 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to create SamplerState: {}", ErrorUtils::ToVerbose(hr));
 			return nullptr;
 		}
 
@@ -228,7 +246,7 @@ namespace Dive
 
 		if (FAILED(hr))
 		{
-			spdlog::error("상수버퍼 맵 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to map constant/vertex buffer: {}", ErrorUtils::ToVerbose(hr));
 			return;
 		}
 
@@ -381,7 +399,7 @@ namespace Dive
 		if (cs != m_currentCS)
 		{
 			m_currentCS = cs;
-			m_deviceContext->CSSetShader(cs ? *cs: nullptr, nullptr, 0);
+			m_deviceContext->CSSetShader(cs ? *cs : nullptr, nullptr, 0);
 		}
 	}
 
@@ -394,12 +412,7 @@ namespace Dive
 		}
 	}
 
-	// 임시
-	// 1. 단일로 제한
-	// 2. ppSrv로 전달
-	// 3. switch - case로 구현
-	// Views로 할 때 배열로 전달하고 std::span으로 받으면 배열의 사이즈와 데이터를 분리할 수 있다.
-	void Graphics::SetShaderResourceView(eShaderStage stage, uint32_t slot, ID3D11ShaderResourceView * const* ppSrv)
+	void Graphics::SetShaderResourceView(eShaderStage stage, uint32_t slot, ID3D11ShaderResourceView* const* ppSrv)
 	{
 		ID3D11ShaderResourceView* nullSrv = nullptr;
 
@@ -532,12 +545,27 @@ namespace Dive
 		if (m_backbufferDSV)
 			m_backbufferDSV.Reset();
 
-		m_swapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+		HRESULT hr = m_swapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+		if (FAILED(hr))
+		{
+			DV_LOG(Graphics, err, "Failed to resize swap chain buffers: {}", ErrorUtils::ToVerbose(hr));
+			return;
+		}
 
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
-		m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)backBuffer.GetAddressOf());
+		hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)backBuffer.GetAddressOf());
+		if (FAILED(hr))
+		{
+			DV_LOG(Graphics, err, "Failed to get swap chain back buffer texture: {}", ErrorUtils::ToVerbose(hr));
+			return;
+		}
 
-		m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_backbufferRTV.GetAddressOf());
+		hr = m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_backbufferRTV.GetAddressOf());
+		if (FAILED(hr))
+		{
+			DV_LOG(Graphics, err, "Failed to create back buffer RTV: {}", ErrorUtils::ToVerbose(hr));
+			return;
+		}
 
 		D3D11_TEXTURE2D_DESC depthDesc = {};
 		depthDesc.Width = width;
@@ -553,9 +581,21 @@ namespace Dive
 		depthDesc.MiscFlags = 0;
 
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
-		m_device->CreateTexture2D(&depthDesc, nullptr, depthStencilBuffer.GetAddressOf());
-		m_device->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, m_backbufferDSV.GetAddressOf());
+		hr = m_device->CreateTexture2D(&depthDesc, nullptr, depthStencilBuffer.GetAddressOf());
+		if (FAILED(hr))
+		{
+			DV_LOG(Graphics, err, "Failed to create depth stencil buffer texture: {}", ErrorUtils::ToVerbose(hr));
+			return;
+		}
+
+		hr = m_device->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, m_backbufferDSV.GetAddressOf());
+		if (FAILED(hr))
+		{
+			DV_LOG(Graphics, err, "Failed to create back buffer DSV: {}", ErrorUtils::ToVerbose(hr));
+			return;
+		}
 
 		m_deviceContext->OMSetRenderTargets(1, m_backbufferRTV.GetAddressOf(), m_backbufferDSV.Get());
+		DV_LOG(Graphics, info, "Backbuffer resources successfully recreated for resolution {}x{}.", width, height);
 	}
 }

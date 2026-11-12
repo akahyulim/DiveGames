@@ -2,6 +2,7 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/IndexBuffer.h"
+#include "Core/LogManager.h"
 
 namespace Dive
 {
@@ -15,6 +16,7 @@ namespace Dive
 		m_vb = std::make_unique<VertexBuffer>(graphics, stride, count, vertices.data());
 
 		createIndexBuffer(graphics, indices);
+		DV_LOG(Graphics, info, "Created ColorMesh (Vertices: {}, Indices: {}, Skinned: False)", count, indices.size());
 	}
 
 	Mesh::Mesh(Graphics* graphics, const std::vector<StaticVertex>& vertices, const std::vector<uint32_t>& indices)
@@ -25,8 +27,9 @@ namespace Dive
 		uint32_t stride = static_cast<uint32_t>(sizeof(StaticVertex));
 		uint32_t count = static_cast<uint32_t>(vertices.size());
 		m_vb = std::make_unique<VertexBuffer>(graphics, stride, count, vertices.data());
-		
+
 		createIndexBuffer(graphics, indices);
+		DV_LOG(Graphics, info, "Created StaticMesh (Vertices: {}, Indices: {}, Skinned: False)", count, indices.size());
 	}
 
 	Mesh::Mesh(Graphics* graphics, const std::vector<SkinnedVertex>& vertices, const std::vector<uint32_t>& indices)
@@ -39,6 +42,7 @@ namespace Dive
 		m_vb = std::make_unique<VertexBuffer>(graphics, stride, count, vertices.data());
 
 		createIndexBuffer(graphics, indices);
+		DV_LOG(Graphics, info, "Created SkinnedMesh (Vertices: {}, Indices: {}, Skinned: True)", count, indices.size());
 	}
 
 	Mesh::~Mesh() = default;

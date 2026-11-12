@@ -1,5 +1,6 @@
 #include "TitleScene.h"
 #include "Core/Window.h"
+#include "Graphics/TextureManager.h"
 #include <imgui.h>
 
 namespace Sokoban
@@ -15,6 +16,7 @@ namespace Sokoban
 	
 	void TitleScene::Initialize()
 	{
+        Dive::TextureManager::Get().LoadTexture("Assets/Textures/dmc.jpg");
 	}
 	
 	void TitleScene::Cleanup()
@@ -32,6 +34,38 @@ namespace Sokoban
 	void TitleScene::RenderUI()
 	{
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+		static ImVec2 lastWorkSize = ImVec2(0, 0);
+		static ImVec2 lastWorkPos = ImVec2(0, 0);
+
+		if (lastWorkSize.x != viewport->WorkSize.x || lastWorkSize.y != viewport->WorkSize.y ||
+			lastWorkPos.x != viewport->WorkPos.x || lastWorkPos.y != viewport->WorkPos.y)
+		{
+			ImGui::SetNextWindowPos(viewport->WorkPos);
+			ImGui::SetNextWindowSize(viewport->WorkSize);
+
+			lastWorkSize = viewport->WorkSize;
+			lastWorkPos = viewport->WorkPos;
+		}
+
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar |
+			ImGuiWindowFlags_NoScrollWithMouse |
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_NoBringToFrontOnFocus |
+			ImGuiWindowFlags_NoNavFocus |
+			ImGuiWindowFlags_NoInputs;
+
+		if (ImGui::Begin("SceneView", nullptr, windowFlags))
+		{
+			ImVec2 viewportPos = ImGui::GetCursorScreenPos();
+			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+
+			auto srv = Dive::TextureManager::Get().GetTextureViewByPath("Assets/Textures/dmc.jpg");
+			ImGui::Image((ImTextureID)srv, viewportSize);
+		}
+		ImGui::End();
 
         ImVec2 windowSize = { 240.0f, 220.0f };
         ImGui::SetNextWindowSize(windowSize);
@@ -62,6 +96,7 @@ namespace Sokoban
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
             if (ImGui::Button("Start", ImVec2(buttonWidth, buttonHeight)))
             {
+				m_gameContext.changeScene(eSceneType::Play);
             }
 
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
@@ -70,8 +105,9 @@ namespace Sokoban
             }
 
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
-            if (ImGui::Button("Edit", ImVec2(buttonWidth, buttonHeight)))
+            if (ImGui::Button("Editor", ImVec2(buttonWidth, buttonHeight)))
             {
+				m_gameContext.changeScene(eSceneType::Editor);
             }
 
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);

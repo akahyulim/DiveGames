@@ -1,12 +1,12 @@
 #include "Graphics/InputLayout.h"
 #include "Graphics/Graphics.h"
 #include "Core/Common.h"
+#include "Core/LogManager.h"
 #include <assert.h>
-#include <spdlog/spdlog.h>
 
 namespace Dive
 {
-	namespace 
+	namespace
 	{
 		std::vector<D3D11_INPUT_ELEMENT_DESC> GetInputElements(eInputLayout type)
 		{
@@ -45,7 +45,7 @@ namespace Dive
 				elements.emplace_back(D3D11_INPUT_ELEMENT_DESC{ "BLENDWEIGHT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 });
 				break;
 			default:
-				spdlog::error("잘못된 입력 레이아웃 타입 전달");
+				DV_LOG(Graphics, err, "Invalid input layout type provided.");
 				break;
 			}
 
@@ -68,7 +68,7 @@ namespace Dive
 
 		if (FAILED(hr))
 		{
-			spdlog::error("InputLayout 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to create InputLayout: {}", ErrorUtils::ToVerbose(hr));
 			assert(false && "InputLayout 생성 실패!");
 		}
 	}

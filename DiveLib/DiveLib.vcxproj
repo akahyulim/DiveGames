@@ -28,6 +28,7 @@
     <ClInclude Include="..\Vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="..\Vendor\imgui\imstb_truetype.h" />
     <ClInclude Include="include\Core\Common.h" />
+    <ClInclude Include="include\Core\LogManager.h" />
     <ClInclude Include="include\Core\Object.h" />
     <ClInclude Include="include\Core\Window.h" />
     <ClInclude Include="include\Graphics\ConstantBuffer.h" />
@@ -61,6 +62,7 @@
     <ClCompile Include="..\Vendor\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\Vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\Vendor\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\Core\LogManager.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Graphics\Graphics.cpp" />
     <ClCompile Include="src\Graphics\IndexBuffer.cpp" />

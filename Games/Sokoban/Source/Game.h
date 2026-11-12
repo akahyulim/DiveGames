@@ -21,7 +21,8 @@ namespace Sokoban
 	{
 		Title,
 		Play,
-		Editor
+		Editor,
+		ScoreBoard
 	};
 
 	struct GameContext

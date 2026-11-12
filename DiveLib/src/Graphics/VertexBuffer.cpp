@@ -1,8 +1,8 @@
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/Graphics.h"
 #include "Core/Common.h"
+#include "Core/LogManager.h"
 #include <assert.h>
-#include <spdlog/spdlog.h>
 
 namespace Dive
 {
@@ -25,7 +25,8 @@ namespace Dive
         auto hr = graphics->GetDevice()->CreateBuffer(&desc, &subData, m_buffer.GetAddressOf());
         if (FAILED(hr))
         {
-            spdlog::error("VertexBuffer 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+            DV_LOG(Graphics, err, "Failed to create VertexBuffer: (HRESULT: {})", ErrorUtils::ToVerbose(hr));
+            assert(false && "VertexBuffer 생성 실패!");
         }
     }
 

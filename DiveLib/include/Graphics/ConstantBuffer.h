@@ -4,9 +4,8 @@
 #include <cstdint>
 #include <cstring>
 #include <assert.h>
-#include <spdlog/spdlog.h>
-
 #include "Core/Common.h"
+#include "Core/LogManager.h"
 #include "Types.h"
 #include "Graphics.h"
 #include "Shader.h"
@@ -43,8 +42,8 @@ namespace Dive
 		HRESULT hr = device->CreateBuffer(&desc, nullptr, m_buffer.GetAddressOf());
 		if (FAILED(hr))
 		{
-			spdlog::error("ConstantBuffer 생성 실패: {}", ErrorUtils::ToVerbose(hr));
-			assert(false && "ConstantBuffe 생성 실패!");
+			DV_LOG(Graphics, err, "Failed to create ConstantBuffer: (HRESULT: {})", ErrorUtils::ToVerbose(hr));
+			assert(false && "ConstantBuffer 생성 실패!");
 		}
 	}
 

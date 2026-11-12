@@ -4,11 +4,6 @@
 
 namespace Dive
 {
-	enum class eLogLevel : int
-	{
-		Trace = 0, Debug, Info, Warn, Err, Critical, Off
-	};
-
 	enum class ePrimitiveTopology
 	{
 		None,

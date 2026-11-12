@@ -2,7 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\Sokoban.cpp" />
     <ClCompile Include="Source\Graphics\Camera.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -13,10 +12,18 @@
     <ClCompile Include="Source\Scenes\TitleScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\PlayScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\EditorScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Scenes\ScoreBoardScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Stage.h" />
-    <ClInclude Include="Source\Sokoban.h" />
     <ClInclude Include="Source\Graphics\Camera.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -28,6 +35,15 @@
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scenes\TitleScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\PlayScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\EditorScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\ScoreBoardScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,8 +2,8 @@
 #include "Graphics/Graphics.h"
 #include "Graphics/Types.h"
 #include "Core/Common.h"
+#include "Core/LogManager.h"
 #include <assert.h>
-#include <spdlog/spdlog.h>
 
 namespace Dive
 {
@@ -26,7 +26,8 @@ namespace Dive
 		auto hr = graphics->GetDevice()->CreateBuffer(&desc, &subData, m_buffer.GetAddressOf());
 		if (FAILED(hr))
 		{
-			spdlog::error("IndexBuffer 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to create IndexBuffer: (HRESULT: {})", ErrorUtils::ToVerbose(hr));
+			assert(false && "IndexBuffer 생성 실패!");
 		}
 	}
 

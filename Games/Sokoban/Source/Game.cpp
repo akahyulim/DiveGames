@@ -1,11 +1,15 @@
 #include "Game.h"
+#include "Core/LogManager.h"
 #include "Core/Window.h"
 #include "Graphics/Graphics.h"
+#include "Graphics/TextureManager.h"
 #include "ImGui/ImGuiManager.h"
 #include "Input/Input.h"
 #include "Utilities/Timer.h"
-//#include "Scenes/Scene.h"
 #include "Scenes/TitleScene.h"
+#include "Scenes/PlayScene.h"
+#include "Scenes/EditorScene.h"
+#include "Scenes/ScoreBoardScene.h"
 
 namespace Sokoban
 {
@@ -15,13 +19,19 @@ namespace Sokoban
 
 	void Game::Setup()
 	{
+		Dive::LogManager::SetFilename("sokoban.log");
+		DV_LOG(Game, info, "Sokoban Application Setup Started");
+
 		m_window = std::make_unique<Dive::Window>(800, 600, L"SOKOBAN");
 		m_graphics = std::make_unique<Dive::Graphics>(m_window.get());
+		Dive::TextureManager::Get().Initialize(m_graphics.get());
 		m_gui = std::make_unique<Dive::ImGuiManager>(m_graphics.get());
 		m_input = std::make_unique<Dive::Input>(m_window->GetWindowHandle());
 		m_timer = std::make_unique<Dive::Timer>();
 
 		m_window->GetWindowEvent().Add([&](const Dive::WindowEventData& data) { OnWindowEvent(data); });
+
+		DV_LOG(Game, info, "Sokoban Application Setup Completed");
 	}
 
 	void Game::Start()
@@ -34,11 +44,42 @@ namespace Sokoban
 		context.changeScene = [this](eSceneType next) { this->ChangeScene(next); };
 
 		m_currentScene = std::make_unique<TitleScene>(context);
+		m_currentScene->Initialize();
 	}
 
 	void Game::Stop()
 	{
+		DV_LOG(Game, info, "Shutting down DiveLib Subsystems...");
 
+		if (m_currentScene)
+		{
+			m_currentScene->Cleanup();
+			m_currentScene.reset();
+		}
+
+		if (m_gui)
+		{
+			m_gui.reset();
+		}
+
+		if (m_input)
+		{
+			m_input.reset();
+		}
+
+		if (m_graphics)
+		{
+			m_graphics.reset();
+		}
+
+		if (m_window)
+		{
+			m_window.reset();
+		}
+
+		DV_LOG(Game, info, "All DiveLib Subsystems Shut Down Successfully.");
+
+		Dive::LogManager::Shutdown();
 	}
 
 	int Game::Run()
@@ -96,6 +137,19 @@ namespace Sokoban
 		{
 		case eSceneType::Title:
 			m_currentScene = std::make_unique<TitleScene>(context);
+			break;
+		case eSceneType::Play:
+			m_currentScene = std::make_unique<PlayScene>(context);
+			break;
+		case eSceneType::Editor:
+			m_currentScene = std::make_unique<EditorScene>(context);
+			break;
+		case eSceneType::ScoreBoard:
+			m_currentScene = std::make_unique<ScoreBoardScene>(context);
+			break;
+		default:
+			assert(false && "잘못된 타입 전달!!!");
+			break;
 		}
 
 		m_currentScene->Initialize();

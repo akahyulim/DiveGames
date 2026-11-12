@@ -316,36 +316,4 @@ namespace Dive
 
 		return m_vsMap[path].get();
 	}
-	/*
-	bool ShaderManager::createShaderProgram(const std::string& vsName, const std::string& psName, eShaderPrograms sp)
-	{
-		VertexShader* vs = nullptr;
-		{
-			auto it = m_vsMap.find(vsName);
-			if (it != m_vsMap.end())
-				vs = it->second.get();
-			else
-				return false;
-		}
-
-		PixelShader* ps = nullptr;
-		{
-			auto it = m_psMap.find(psName);
-			if (it != m_psMap.end())
-				ps = it->second.get();
-			else
-				return false;
-		}
-
-		InputLayout* il = nullptr;
-		{
-			auto it = m_ilMap.find(vsName);
-			if (it != m_ilMap.end())
-				il = it->second.get();
-		}
-
-		m_shaderProgramMap[sp] = std::make_unique<ShaderProgram>(vs, ps, il);
-
-		return true;
-	}*/
 }

@@ -1,8 +1,8 @@
 #include "Graphics/RenderTexture.h"
 #include "Graphics/Graphics.h"
 #include "Core/Common.h"
+#include "Core/LogManager.h"
 #include <assert.h>
-#include <spdlog/spdlog.h>
 
 namespace Dive
 {
@@ -79,11 +79,14 @@ namespace Dive
 		: m_graphics(graphics)
 		, m_desc(desc)
 	{
+		DV_LOG(Graphics, info, "Creating RenderTexture (Width: {}, Height: {}, MipLevels: {}, ArraySize: {}, Format: {})",
+			desc.Width, desc.Height, desc.MipLevels, desc.ArraySize, static_cast<int>(desc.Format));
+
 		auto device = graphics->GetDevice();
 		auto hr = device->CreateTexture2D(&desc, data, m_texture2D.GetAddressOf());
 		if (FAILED(hr))
 		{
-			spdlog::error("ID3D11Texture2D 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to create ID3D11Texture2D: {}", ErrorUtils::ToVerbose(hr));
 			assert(false && "ID3D11Texture2D 생성 실패!");
 		}
 
@@ -95,11 +98,18 @@ namespace Dive
 		{
 			createRenderTargetViews();
 		}
-		
+
 		if (desc.BindFlags & D3D11_BIND_DEPTH_STENCIL)
 		{
 			createDepthStencilViews();
 		}
+
+		if (desc.BindFlags & D3D11_BIND_UNORDERED_ACCESS)
+		{
+			createUnorderedAccessView();
+		}
+
+		DV_LOG(Graphics, info, "RenderTexture successfully created and initialized.");
 	}
 
 	ID3D11RenderTargetView* RenderTexture::GetRenderTargetView(uint32_t index) const
@@ -117,7 +127,7 @@ namespace Dive
 
 		return m_depthStencilViews[index].Get();
 	}
-	
+
 	void RenderTexture::createShaderResourceView()
 	{
 		auto device = m_graphics->GetDevice();
@@ -156,7 +166,7 @@ namespace Dive
 
 		if (FAILED(hr))
 		{
-			spdlog::error("ShaderResourceView 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to create ShaderResourceView: {}", ErrorUtils::ToVerbose(hr));
 			assert(false && "ID3D11ShaderResourceView 생성 실패!");
 		}
 	}
@@ -186,7 +196,7 @@ namespace Dive
 
 				if (FAILED(hr))
 				{
-					spdlog::error("RenderTargetView (Index: {}) 생성 실패: {}", i, ErrorUtils::ToVerbose(hr));
+					DV_LOG(Graphics, err, "Failed to create RenderTargetView (Index: {}): {}", i, ErrorUtils::ToVerbose(hr));
 					assert(false && "ID3D11RenderTargetView 생성 실패!");
 				}
 			}
@@ -204,7 +214,7 @@ namespace Dive
 
 			if (FAILED(hr))
 			{
-				spdlog::error("RenderTargetView 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Graphics, err, "Failed to create RenderTargetView: {}", ErrorUtils::ToVerbose(hr));
 				assert(false && "ID3D11RenderTargetView 생성 실패!");
 			}
 		}
@@ -235,7 +245,7 @@ namespace Dive
 
 				if (FAILED(hr))
 				{
-					spdlog::error("DepthStencilView (Index: {}) 생성 실패: {}", i, ErrorUtils::ToVerbose(hr));
+					DV_LOG(Graphics, err, "Failed to create DepthStencilView (Index: {}): {}", i, ErrorUtils::ToVerbose(hr));
 					assert(false && "ID3D11DepthStencilView 생성 실패!");
 				}
 			}
@@ -253,7 +263,7 @@ namespace Dive
 
 			if (FAILED(hr))
 			{
-				spdlog::error("DepthStencilView 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Graphics, err, "Failed to create DepthStencilView: {}", ErrorUtils::ToVerbose(hr));
 				assert(false && "ID3D11DepthStencilView 생성 실패!");
 			}
 		}
@@ -280,7 +290,7 @@ namespace Dive
 
 			if (FAILED(hr))
 			{
-				spdlog::error("UnorderedAccessView (Array) 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Graphics, err, "Failed to create UnorderedAccessView (Array): {}", ErrorUtils::ToVerbose(hr));
 				assert(false && "ID3D11UnorderedAccessView 생성 실패!");
 			}
 		}
@@ -296,7 +306,7 @@ namespace Dive
 
 			if (FAILED(hr))
 			{
-				spdlog::error("UnorderedAccessView 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Graphics, err, "Failed to create UnorderedAccessView: {}", ErrorUtils::ToVerbose(hr));
 				assert(false && "ID3D11UnorderedAccessView 생성 실패!");
 			}
 		}
