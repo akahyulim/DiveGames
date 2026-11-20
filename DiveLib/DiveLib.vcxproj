@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Vendor\ImGuizmo\src\ImGuizmo.h" />
     <ClInclude Include="..\Vendor\imgui\backends\imgui_impl_dx11.h" />
     <ClInclude Include="..\Vendor\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="..\Vendor\imgui\imconfig.h" />
@@ -27,6 +28,7 @@
     <ClInclude Include="..\Vendor\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\Vendor\imgui\imstb_textedit.h" />
     <ClInclude Include="..\Vendor\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\Vendor\imgui\misc\cpp\imgui_stdlib.h" />
     <ClInclude Include="include\Core\Common.h" />
     <ClInclude Include="include\Core\LogManager.h" />
     <ClInclude Include="include\Core\Object.h" />
@@ -49,6 +51,7 @@
     <ClInclude Include="include\ImGui\ImGuiHelper.h" />
     <ClInclude Include="include\ImGui\ImGuiManager.h" />
     <ClInclude Include="include\Input\Input.h" />
+    <ClInclude Include="include\Rendering\Renderer2D.h" />
     <ClInclude Include="include\Resource\Resource.h" />
     <ClInclude Include="include\Utilities\Delegate.h" />
     <ClInclude Include="include\Utilities\FileUtils.h" />
@@ -56,12 +59,14 @@
     <ClInclude Include="include\Utilities\Timer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\Vendor\ImGuizmo\src\ImGuizmo.cpp" />
     <ClCompile Include="..\Vendor\imgui\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="..\Vendor\imgui\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="..\Vendor\imgui\imgui.cpp" />
     <ClCompile Include="..\Vendor\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\Vendor\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\Vendor\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\Vendor\imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="src\Core\LogManager.cpp" />
     <ClCompile Include="src\Core\Window.cpp" />
     <ClCompile Include="src\Graphics\Graphics.cpp" />
@@ -77,12 +82,16 @@
     <ClCompile Include="src\ImGui\ImGuiHelper.cpp" />
     <ClCompile Include="src\ImGui\ImGuiManager.cpp" />
     <ClCompile Include="src\Input\Input.cpp" />
+    <ClCompile Include="src\Rendering\Renderer2D.cpp" />
     <ClCompile Include="src\Resource\Resource.cpp" />
     <ClCompile Include="src\Utilities\FileUtils.cpp" />
     <ClCompile Include="src\Utilities\StringUtils.cpp" />
     <ClCompile Include="src\Utilities\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\2D\Common.hlsli">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="Assets\Shaders\Constants.hlsli">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </None>
@@ -94,6 +103,31 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Assets\Shaders\2D\DebugPrimitive.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\2D\ResolveScreen.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\2D\Sprite2D.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Geometry</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">4.0</ShaderModel>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="Assets\Shaders\DeferredLighting.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
@@ -210,7 +244,7 @@
       <PreprocessorDefinitions>NOMINMAX;WIN32_LEAN_AND_MEAN;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)Vendor\DirectXTex;$(SolutionDir)Vendor\imgui;$(SolutionDir)Vendor\spdlog\include;$(ProjectDir)include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Vendor\DirectXTex;$(SolutionDir)Vendor\ImGuizmo\src;$(SolutionDir)Vendor\imgui;$(SolutionDir)Vendor\spdlog\include;$(ProjectDir)include</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>

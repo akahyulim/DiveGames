@@ -8,7 +8,7 @@
     <ClCompile Include="Source\Graphics\MeshManager.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Game.cpp" />
+    <ClCompile Include="Source\Sokoban.cpp" />
     <ClCompile Include="Source\Scenes\TitleScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
@@ -30,7 +30,7 @@
     <ClInclude Include="Source\Graphics\MeshManager.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Game.h" />
+    <ClInclude Include="Source\Sokoban.h" />
     <ClInclude Include="Source\Scenes\Scene.h">
       <Filter>Scenes</Filter>
     </ClInclude>

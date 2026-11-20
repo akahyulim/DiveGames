@@ -9,8 +9,12 @@ namespace Dive
 	namespace ImGuiHelper
 	{
         void DrawFloatControl(const std::string& label, float& value, float resetValue = 0.0f, float columnWidth = 100.0f);
+        
         void DrawVec2Control(const std::string& label, DirectX::XMFLOAT2& values, float resetValue = 0.0f, float columnWidth = 100.0f,
             const std::string& a = "X", const std::string& b = "Y");
+        void DrawVec2Control(const std::string& label, DirectX::XMUINT2& values, unsigned int resetValue = 0.0f, float columnWidth = 100.0f,
+            const std::string& a = "X", const std::string& b = "Y");
+        
         void DrawVec3Control(const std::string& label, DirectX::XMFLOAT3& values, float resetValue = 0.0f, float columnWidth = 100.0f);
       
         DirectX::XMFLOAT4 ConvertXMFloat4(const ImVec4& value);

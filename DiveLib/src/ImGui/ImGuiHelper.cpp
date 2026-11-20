@@ -20,12 +20,71 @@ namespace Dive
 
             ImGui::PopID();
         }
-
+        
         void DrawVec2Control(const std::string& label, DirectX::XMFLOAT2& values, float resetValue, float columnWidth,
             const std::string& a, const std::string& b)
         {
             ImGuiIO& io = ImGui::GetIO();
-            auto pBoldFont = io.Fonts->Fonts[1];
+            auto boldFont = io.Fonts->Fonts[0];
+
+            ImGui::PushID(label.c_str());
+
+            ImGui::Columns(2);
+            ImGui::SetColumnWidth(0, columnWidth);
+            ImGui::Text(label.c_str());
+            ImGui::NextColumn();
+
+            // Vec2이므로 총 2개 세트(X쌍, Y쌍)의 너비 할당
+            ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
+            ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+            float lineHeight = ImGui::GetFontSize() + GImGui->Style.FramePadding.y * 2.0f;
+            ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
+
+            // --- X 축 ---
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+            ImGui::PushFont(boldFont);
+            if (ImGui::Button(a.c_str(), buttonSize))
+                values.x = resetValue;
+            ImGui::PopFont();
+            ImGui::PopStyleColor(3);
+
+            ImGui::SameLine();
+            // PushMultiItemsWidths(2)의 첫 번째 너비 적용 및 PopItemWidth 수행
+            ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+            ImGui::PopItemWidth();
+
+            ImGui::SameLine();
+
+            // --- Y 축 ---
+            ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+            ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+            ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+            ImGui::PushFont(boldFont);
+            if (ImGui::Button(b.c_str(), buttonSize))
+                values.y = resetValue;
+            ImGui::PopFont();
+            ImGui::PopStyleColor(3);
+
+            ImGui::SameLine();
+            // PushMultiItemsWidths(2)의 두 번째 너비 적용 및 PopItemWidth 수행
+            ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+            ImGui::PopItemWidth();
+
+            ImGui::PopStyleVar();
+
+            ImGui::Columns(1);
+
+            ImGui::PopID();
+        }
+
+        void DrawVec2Control(const std::string& label, DirectX::XMUINT2& values, unsigned int resetValue, float columnWidth,
+            const std::string& a, const std::string& b)
+        {
+            ImGuiIO& io = ImGui::GetIO();
+            auto boldFont = io.Fonts->Fonts[0];
 
             ImGui::PushID(label.c_str());
 
@@ -37,41 +96,42 @@ namespace Dive
             ImGui::PushMultiItemsWidths(2, ImGui::CalcItemWidth());
             ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
 
-            //float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
             float lineHeight = ImGui::GetFontSize() + GImGui->Style.FramePadding.y * 2.0f;
             ImVec2 buttonSize = { lineHeight + 3.0f, lineHeight };
 
+            // --- X 축 ---
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-            ImGui::PushFont(pBoldFont);
+            ImGui::PushFont(boldFont);
             if (ImGui::Button(a.c_str(), buttonSize))
                 values.x = resetValue;
             ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+            // unsigned int는 DragScalar를 사용합니다. (ImGuiDataType_U32)
+            ImGui::DragScalar("##X", ImGuiDataType_U32, &values.x, 1.0f, nullptr, nullptr, "%u");
             ImGui::PopItemWidth();
+
             ImGui::SameLine();
 
+            // --- Y 축 ---
             ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-            ImGui::PushFont(pBoldFont);
+            ImGui::PushFont(boldFont);
             if (ImGui::Button(b.c_str(), buttonSize))
                 values.y = resetValue;
             ImGui::PopFont();
             ImGui::PopStyleColor(3);
 
             ImGui::SameLine();
-            ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+            ImGui::DragScalar("##Y", ImGuiDataType_U32, &values.y, 1.0f, nullptr, nullptr, "%u");
             ImGui::PopItemWidth();
 
             ImGui::PopStyleVar();
-
             ImGui::Columns(1);
-
             ImGui::PopID();
         }
 

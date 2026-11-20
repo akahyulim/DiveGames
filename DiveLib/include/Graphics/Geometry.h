@@ -15,13 +15,24 @@ namespace Dive
 		DirectX::XMFLOAT3 Position{ 0.0f, 0.0f, 0.0f };
 	};
 
+	struct DebugVertex
+	{
+		DebugVertex() = default;
+		DebugVertex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT4& color)
+			: Position(pos), Color(color)
+		{}
+
+		DirectX::XMFLOAT3 Position{ 0.0f, 0.0f, 0.0f };
+		DirectX::XMFLOAT4 Color{ 0.0f, 0.0f, 0.0f, 1.0f };
+	};
+
 	struct ColorVertex
 	{
 		ColorVertex() = default;
 		ColorVertex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT4& color, const DirectX::XMFLOAT3& nor,
 			const DirectX::XMFLOAT3& tan, const DirectX::XMFLOAT3& biNormal)
-			: Position(pos), Color(color), Normal(nor), Tangent(tan), BiNormal(biNormal) {
-		}
+			: Position(pos), Color(color), Normal(nor), Tangent(tan), BiNormal(biNormal) 
+		{}
 
 		DirectX::XMFLOAT3 Position{ 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT4 Color{ 0.0f, 0.0f, 0.0f, 1.0f };
@@ -35,8 +46,8 @@ namespace Dive
 		StaticVertex() = default;
 		StaticVertex(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT2& tex, const DirectX::XMFLOAT3& nor,
 			const DirectX::XMFLOAT3& tan, const DirectX::XMFLOAT3& biNormal)
-			: Position(pos), TexCoord(tex), Normal(nor), Tangent(tan), BiNormal(biNormal) {
-		}
+			: Position(pos), TexCoord(tex), Normal(nor), Tangent(tan), BiNormal(biNormal) 
+		{}
 
 		DirectX::XMFLOAT3 Position{ 0.0f, 0.0f, 0.0f };
 		DirectX::XMFLOAT2 TexCoord{ 0.0f, 0.0f };

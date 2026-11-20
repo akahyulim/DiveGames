@@ -55,6 +55,7 @@ namespace Dive
 		ShaderManager& operator=(const ShaderManager&) = delete;
 		ShaderManager& operator=(ShaderManager&&) = default;
 
+		bool Initialize2D(Graphics* graphics);
 		bool Initialize(Graphics* graphics);
 		void Shutdown();
 

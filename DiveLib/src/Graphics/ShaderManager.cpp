@@ -1,12 +1,54 @@
 #include "Graphics/ShaderManager.h"
 #include "Graphics/Graphics.h"
 #include "Core/Common.h"
+#include "Core/LogManager.h"
 #include <d3dcompiler.h>
-#include <spdlog/spdlog.h>
+#include <spdlog/spdlog.h>	// 아직 LogManager로 전부 고치지 못했다.
 
 namespace Dive
 {
 	ShaderManager::~ShaderManager() = default;
+
+	bool ShaderManager::Initialize2D(Graphics* graphics)
+	{
+		// Sprite2D
+		{
+			ShaderProgramDesc desc;
+			desc.name = "Sprite2D";
+			desc.vsPath = "Assets/Shaders/2D/Sprite2D.hlsl";
+			desc.psPath = "Assets/Shaders/2D/Sprite2D.hlsl";
+			desc.ilType = Dive::eInputLayout::Sprite;
+
+			if (!CreateShaderProgram(graphics, desc))
+				return false;
+		}
+
+		// Debug Primitive
+		{
+			ShaderProgramDesc desc;
+			desc.name = "DebugPrimitive";
+			desc.vsPath = "Assets/Shaders/2D/DebugPrimitive.hlsl";
+			desc.psPath = "Assets/Shaders/2D/DebugPrimitive.hlsl";
+			desc.ilType = Dive::eInputLayout::Debug;
+
+			if (!CreateShaderProgram(graphics, desc))
+				return false;
+		}
+
+		// ResolveScreen
+		{
+			ShaderProgramDesc desc;
+			desc.name = "ResolveScreen";
+			desc.vsPath = "Assets/Shaders/2D/ResolveScreen.hlsl";
+			desc.psPath = "Assets/Shaders/2D/ResolveScreen.hlsl";
+			desc.ilType = Dive::eInputLayout::None;
+
+			if (!CreateShaderProgram(graphics, desc))
+				return false;
+		}
+
+		return true;
+	}
 
 	bool ShaderManager::Initialize(Graphics* graphics)
 	{
@@ -139,7 +181,11 @@ namespace Dive
 
 		if (m_vsMap.find(desc.vsPath) == m_vsMap.end())
 		{
-			createVertexShaderAndInputLayout(graphics, desc.vsPath, desc.ilType);
+			if (!createVertexShaderAndInputLayout(graphics, desc.vsPath, desc.ilType))
+			{
+				DV_LOG(Graphics, err, "Failed to create ShaderProgram: {}", desc.name);
+				return nullptr;
+			}
 		}
 
 		auto vs = m_vsMap[desc.vsPath].get();
@@ -307,11 +353,21 @@ namespace Dive
 			return nullptr;
 
 		m_vsMap[path] = std::make_unique<VertexShader>(graphics, blob.Get());
+		if (m_vsMap[path] == nullptr)
+		{
+			DV_LOG(Graphics, err, "Failed to create VertexShader");
+			return nullptr;
+		}
 
 		if (type != eInputLayout::None)
 		{
 			auto key = std::make_pair(path, type);
 			m_ilMap[key] = std::make_unique<InputLayout>(graphics, type, blob.Get());
+			if (m_ilMap[key] == nullptr)
+			{
+				DV_LOG(Graphics, err, "Failed to create InputLayout");
+				return nullptr;
+			}
 		}
 
 		return m_vsMap[path].get();

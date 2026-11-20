@@ -10,6 +10,7 @@ namespace Sokoban
 		~Camera() = default;
 
         void SetPerspective(float fovAngleY, float aspectRatio, float nearZ, float farZ);
+		void SetOrthographic(float viewWidth, float viewHeight, float nearZ, float farZ);
 
 		void LookAt(DirectX::XMFLOAT3 eye, DirectX::XMFLOAT3 target, DirectX::XMFLOAT3 up);
 

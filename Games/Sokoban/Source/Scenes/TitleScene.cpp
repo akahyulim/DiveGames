@@ -16,7 +16,7 @@ namespace Sokoban
 	
 	void TitleScene::Initialize()
 	{
-        Dive::TextureManager::Get().LoadTexture("Assets/Textures/dmc.jpg");
+        Dive::TextureManager::Get().LoadTexture("Assets/Textures/DokeV.jpeg");
 	}
 	
 	void TitleScene::Cleanup()
@@ -62,17 +62,17 @@ namespace Sokoban
 			ImVec2 viewportPos = ImGui::GetCursorScreenPos();
 			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-			auto srv = Dive::TextureManager::Get().GetTextureViewByPath("Assets/Textures/dmc.jpg");
+			auto srv = Dive::TextureManager::Get().GetTextureViewByPath("Assets/Textures/DokeV.jpeg");
 			ImGui::Image((ImTextureID)srv, viewportSize);
 		}
 		ImGui::End();
 
-        ImVec2 windowSize = { 240.0f, 220.0f };
+        ImVec2 windowSize = { 240.0f, 260.0f };
         ImGui::SetNextWindowSize(windowSize);
         ImGui::SetNextWindowPos(
             {
                 viewport->WorkPos.x + (viewport->WorkSize.x - windowSize.x) * 0.5f,
-                viewport->WorkPos.y + (viewport->WorkSize.y - windowSize.y) * 0.5f
+                viewport->WorkPos.y + (viewport->WorkSize.y - windowSize.y) * 0.5f + 150.0f
             },
             ImGuiCond_Always
         );
@@ -109,6 +109,13 @@ namespace Sokoban
             {
 				m_gameContext.changeScene(eSceneType::Editor);
             }
+
+			ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
+			if (ImGui::Button("Score Board", ImVec2(buttonWidth, buttonHeight)))
+			{
+				// 그냥 현재 화면에서 board를 출력??
+				//m_gameContext.changeScene(eSceneType::ScoreBoard);
+			}
 
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
             if (ImGui::Button("Quit", ImVec2(buttonWidth, buttonHeight)))

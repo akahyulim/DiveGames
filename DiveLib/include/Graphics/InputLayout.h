@@ -9,12 +9,14 @@ namespace Dive
 	// 좀 더 다듬기
 	enum class eInputLayout : uint8_t
 	{
-		None = 0,
-		Color,
-		Position,
+		Position = 0,
 		Unlit,
+		Sprite,
+		Debug,
+		Color,
 		Lit,
-		Skinned
+		Skinned,
+		None
 	};
 
 	class Graphics;

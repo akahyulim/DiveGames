@@ -201,8 +201,14 @@ namespace Dive
 			return DirectX::XMLoadFloat4(&temp);
 		}
 
+		static const Color Red;
+		static const Color Green;
+		static const Color Blue;
 		static const Color Black;
 		static const Color White;
+		static const Color Yellow;
+		static const Color Magenta;
+		static const Color Cyan;
 		static const Color Gray;
 		static const Color MidnightGray;
 		static const Color IndustrialBlue;
@@ -212,8 +218,14 @@ namespace Dive
 		static const Color LightSkyBlue;
 	};
 
+	inline const Color Color::Red = Color(1.0f, 0.0f, 0.0f, 1.0f);
+	inline const Color Color::Green = Color(0.0f, 1.0f, 0.0f, 1.0f);
+	inline const Color Color::Blue = Color(0.0f, 0.0f, 1.0f, 1.0f);
 	inline const Color Color::Black = Color(0.0f, 0.0f, 0.0f, 1.0f);
 	inline const Color Color::White = Color(1.0f, 1.0f, 1.0f, 1.0f);
+	inline const Color Color::Yellow = Color(1.0f, 1.0f, 0.0f, 1.0f);
+	inline const Color Color::Magenta = Color(1.0f, 0.0f, 1.0f, 1.0f);
+	inline const Color Color::Cyan = Color(0.0f, 1.0f, 1.0f, 1.0f);
 	inline const Color Color::Gray = Color(0.5f, 0.5f, 0.5f, 1.0f);
 	inline const Color Color::MidnightGray = Color(0.15f, 0.16f, 0.18f, 1.0f);		// #26292E
 	inline const Color Color::IndustrialBlue = Color(0.22f, 0.24f, 0.28f, 1.0f);	// #383D47

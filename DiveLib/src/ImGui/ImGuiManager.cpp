@@ -5,7 +5,7 @@
 #include <imgui_internal.h>
 #include <backends/imgui_impl_dx11.h>
 #include <backends/imgui_impl_win32.h>
-//#include <imgui/ImGuizmo.h>
+#include <ImGuizmo.h>
 
 IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT32 msg, WPARAM wParam, LPARAM lParam);
 
@@ -18,6 +18,8 @@ namespace Dive
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 		ImFontConfig fontConfig{};
 		std::string fontPath = "Assets/Fonts/NanumBarunGothicLight.ttf";
@@ -78,7 +80,7 @@ namespace Dive
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
-		//ImGuizmo::BeginFrame();
+		ImGuizmo::BeginFrame();
 	}
 	
 	void ImGuiManager::End() const
@@ -87,15 +89,16 @@ namespace Dive
 		if (m_visible)
 		{
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+			
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				HWND backup_current_window = ::GetActiveWindow();
+				ImGui::UpdatePlatformWindows();
+				ImGui::RenderPlatformWindowsDefault();
+				::SetActiveWindow(backup_current_window);
+			}
 		}
-
-		/*
-		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-		{
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-		}
-		*/
 	}
 	
 	void ImGuiManager::HandleWindowMessage(const WindowEventData& data) const

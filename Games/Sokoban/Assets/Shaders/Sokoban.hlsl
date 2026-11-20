@@ -11,7 +11,7 @@ cbuffer ObjectData : register(b1)
 struct VSInput
 {
     float4 Position : POSITION;
-    float4 Color : TEXCOORD0;
+    float4 Color : COLOR;
     float3 Normal : NORMAL;
     float3 Tangent : TANGENT;
     float3 BiNormal : BINORMAL;
@@ -20,7 +20,7 @@ struct VSInput
 struct VSToPS
 {
     float4 Position : SV_POSITION;
-    float4 Color : TEXCOORD0;
+    float4 Color : COLOR;
     float3 Normal : NORMAL;
     float3 Tangent : TANGENT;
     float3 BiNormal : BINORMAL;

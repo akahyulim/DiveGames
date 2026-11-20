@@ -28,8 +28,14 @@
     <Filter Include="ImGui">
       <UniqueIdentifier>{b462c071-4ca9-4e7c-8534-222f99592ca6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Renderer">
+    <Filter Include="Rendering">
       <UniqueIdentifier>{a4e0475c-8677-4191-a291-974b9e8274d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Vendor\ImGuizmo">
+      <UniqueIdentifier>{424ea076-0639-4521-9d56-8d4e7355c9bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\2D">
+      <UniqueIdentifier>{31440428-fba3-4dbd-900f-e5693294e8ab}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -138,6 +144,15 @@
     <ClInclude Include="include\Core\LogManager.h">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="..\Vendor\imgui\misc\cpp\imgui_stdlib.h">
+      <Filter>Vendor\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Rendering\Renderer2D.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Vendor\ImGuizmo\src\ImGuizmo.h">
+      <Filter>Vendor\ImGuizmo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Utilities\StringUtils.cpp">
@@ -215,6 +230,15 @@
     <ClCompile Include="src\Core\LogManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="..\Vendor\imgui\misc\cpp\imgui_stdlib.cpp">
+      <Filter>Vendor\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rendering\Renderer2D.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Vendor\ImGuizmo\src\ImGuizmo.cpp">
+      <Filter>Vendor\ImGuizmo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\Shaders\Constants.hlsli">
@@ -225,6 +249,9 @@
     </None>
     <None Include="Assets\Shaders\Resources.hlsli">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="Assets\Shaders\2D\Common.hlsli">
+      <Filter>Shaders\2D</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -254,6 +281,15 @@
     </FxCompile>
     <FxCompile Include="Assets\Shaders\UniformSky.hlsl">
       <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\2D\DebugPrimitive.hlsl">
+      <Filter>Shaders\2D</Filter>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\2D\Sprite2D.hlsl">
+      <Filter>Shaders\2D</Filter>
+    </FxCompile>
+    <FxCompile Include="Assets\Shaders\2D\ResolveScreen.hlsl">
+      <Filter>Shaders\2D</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
