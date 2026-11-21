@@ -43,15 +43,19 @@ namespace Dive
 		TextureHandle LoadTexture(const std::string& filepath, bool mips = true);
 		TextureHandle LoadCubemap(const std::wstring& filepath);
 
+		TextureHandle GetWhiteTexture() const { return m_whiteTextureHandle; }
+
 		void SetFaceData(uint32_t index, const void* pixels, size_t size);
 
 		std::string GetTextureFilepath(TextureHandle handle) const;
 		std::wstring GetTextureFilepathW(TextureHandle handle) const;
 		std::string GetTextureName(TextureHandle handle) const;
+
 		ID3D11ShaderResourceView* GetTextureView(TextureHandle handle) const;
 		ID3D11ShaderResourceView* GetTextureViewByPath(const std::wstring& filepath) const;
 		ID3D11ShaderResourceView* GetTextureViewByPath(const std::string& filepath) const;
 		ID3D11ShaderResourceView* GetTextureViewByName(const std::string& name) const;
+		ID3D11ShaderResourceView* GetWhiteTextureView() const;
 
 		const std::unordered_map<std::wstring, TextureHandle>& GetPathMap() const { return m_pathMap; }
 		
@@ -64,6 +68,8 @@ namespace Dive
 		TextureManager& operator=(const TextureManager&) = delete;
 		TextureManager& operator=(TextureManager&&) = default;
 
+		TextureHandle createWhiteTexture();
+
 		TextureHandle loadDDSTexture(const std::wstring& filepath, bool mips);
 		TextureHandle loadTGATexture(const std::wstring& filepath, bool mips);
 		TextureHandle loadWICTexture(const std::wstring& filepath, bool mips);
@@ -74,6 +80,7 @@ namespace Dive
 		Graphics* m_graphics = nullptr;
 		
 		TextureHandle m_handle = INVALID_TEXTURE_HANDLE;
+		TextureHandle m_whiteTextureHandle = INVALID_TEXTURE_HANDLE;
 		std::unordered_map<TextureHandle, TextureInfo> m_textures;
 		std::unordered_map<std::wstring, TextureHandle> m_pathMap;
 		std::unordered_map<std::string, TextureHandle> m_nameMap;

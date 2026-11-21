@@ -3,15 +3,19 @@
 struct VS_INPUT
 {
     float3 position : POSITION;
-    float2 uv : TEXCOORD0;
     float4 color : COLOR;
+    float2 uv : TEXCOORD0;
+    float2 tiling : TEXCOORD1;
+    float texIndex : TEXCOORD2;
 };
 
 struct PS_INPUT
 {
     float4 position : SV_POSITION;
-    float2 uv : TEXCOORD0;
     float4 color : COLOR;
+    float2 uv : TEXCOORD0;
+    float2 tiling : TEXCOORD1;
+    float texIndex : TEXCOORD2;
 };
 
 PS_INPUT MainVS(VS_INPUT input)
@@ -20,8 +24,10 @@ PS_INPUT MainVS(VS_INPUT input)
     
     float4 pos = float4(input.position, 1.0f);
     output.position = mul(pos, viewProjection);
-    output.uv = input.uv;
     output.color = input.color;
+    output.uv = input.uv;
+    output.tiling = input.tiling;
+    output.texIndex = input.texIndex;
     
     return output;
 }

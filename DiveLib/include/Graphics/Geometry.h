@@ -26,6 +26,15 @@ namespace Dive
 		DirectX::XMFLOAT4 Color{ 0.0f, 0.0f, 0.0f, 1.0f };
 	};
 
+	struct SpriteVertex
+	{
+		DirectX::XMFLOAT3 Position{0.0f, 0.0f, 0.0f};
+		DirectX::XMFLOAT4 Color{ 0.0f, 0.0f, 0.0f, 1.0f };
+		DirectX::XMFLOAT2 TexCoord{ 0.0f, 0.0f };
+		DirectX::XMFLOAT2 Tiling{ 1.0f, 1.0f };
+		float TexIndex = 0;
+	};
+
 	struct ColorVertex
 	{
 		ColorVertex() = default;

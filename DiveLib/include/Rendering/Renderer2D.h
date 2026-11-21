@@ -16,6 +16,7 @@ namespace Dive
 {
 	class Graphics;
 	class VertexBuffer;
+	class IndexBuffer;
 
 	struct FrameData
 	{
@@ -80,8 +81,10 @@ namespace Dive
 
 		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, const Color& color);
 		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, const Color& color);
-		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, TextureHandle texture, float tilingFactor = 1.0f, const Color& tintColor = Color::White);
-		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle texture, float tilingFactor = 1.0f, const Color& tintColor = Color::White);
+		void DrawQuad(const DirectX::XMFLOAT4X4& transform, const Color& color);
+		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, TextureHandle texture, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
+		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle texture, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
+		void DrawQuad(const DirectX::XMFLOAT4X4& taransform, TextureHandle texture, const DirectX::XMFLOAT2& tiling, const Color& tintColor = Color::White);
 
 		// DrawSprite
 
@@ -116,8 +119,10 @@ namespace Dive
 
 		// quad
 		uint32_t m_quadVertexCount = 0;
-		std::unique_ptr<DebugVertex[]> m_quadVertices;
+		uint32_t m_quadIndexCount = 0;
+		std::unique_ptr<SpriteVertex[]> m_quadVertices;
 		std::unique_ptr<VertexBuffer> m_quadVertexBuffer;
+		std::unique_ptr<IndexBuffer> m_quadIndexBuffer;
 
 		std::unique_ptr<ConstantBuffer<FrameData>> m_cbFrame;
 

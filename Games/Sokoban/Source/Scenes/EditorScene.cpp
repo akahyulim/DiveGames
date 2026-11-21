@@ -49,16 +49,14 @@ namespace Sokoban
 		m_gameContext.renderer->BeginScene(
 			DirectX::XMMatrixTranspose(
 				m_gameContext.camera->GetViewMatrix() *
-			m_gameContext.camera->GetProjectionMatrix()));
+				m_gameContext.camera->GetProjectionMatrix()));
 
-		m_gameContext.renderer->DrawRect({ 0.0f, 0.0f }, { 5.0f, 5.0f }, Dive::Color::White);
+		m_gameContext.renderer->DrawRect({ 0.0f, 0.0f }, { 800.0f, 600.0f }, Dive::Color::White);
 
-		m_gameContext.renderer->DrawLine({ -100.0f, 5.0f }, { 100.0f, 5.0f }, Dive::Color::Red);
-		m_gameContext.renderer->DrawLine({ -10.0f, 0.0f }, { 10.0f, 0.0f }, Dive::Color::Green);
-		m_gameContext.renderer->DrawLine({ -100.0f, -5.0f }, { 100.0f, -5.0f }, Dive::Color::Blue);
-
-		m_gameContext.renderer->DrawTriangle({-500.0f, -250.0f}, {0.0f, 250.0f}, { 500.0f, -250.0f }, Dive::Color::Cyan);
-
+		m_gameContext.renderer->DrawQuad({ 0.0f, -100.0f }, { 200.0f, 200.0f }, Dive::Color::Magenta);
+		m_gameContext.renderer->DrawQuad({ -100.0f, 100.0f }, { 200.0f, 200.0f }, Dive::Color::Yellow);
+		m_gameContext.renderer->DrawQuad({ 100.0f, 100.0f }, { 200.0f, 200.0f }, Dive::Color::Cyan);
+	
 		m_gameContext.renderer->EndScene();
 	}
 

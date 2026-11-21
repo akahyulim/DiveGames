@@ -1,9 +1,9 @@
 #include "Graphics/TextureManager.h"
 #include "Core/Common.h"
+#include "Core/LogManager.h"
 #include "Graphics/Graphics.h"
 #include "Utilities/FileUtils.h"
 #include "Utilities/StringUtils.h"
-#include <spdlog/spdlog.h>
 #include <filesystem>
 #include <DirectXTex/DirectXTex.h>
 
@@ -81,7 +81,7 @@ namespace Dive
 			case DXGI_FORMAT_R32G32B32A32_FLOAT:
 				return 16;
 			default:
-				spdlog::warn("[::GetPixelSize] 잘못된 포멧 전달");
+				DV_LOG(Graphics, warn, "[::GetPixelSize] Passed wrong format index.");
 				return 0;
 			}
 		}
@@ -90,6 +90,8 @@ namespace Dive
 	void TextureManager::Initialize(Graphics* graphics)
 	{
 		m_graphics = graphics;
+
+		m_whiteTextureHandle = createWhiteTexture();
 	}
 	
 	void TextureManager::Shutdown()
@@ -126,7 +128,7 @@ namespace Dive
 			return loadWICTexture(filepath, mips);
 		case TextureFormat::NotSupported:
 		default:
-			spdlog::error("지원하지 않는 텍스쳐 포멧");
+			DV_LOG(Graphcis, err, "지원하지 않는 텍스쳐 포멧");
 		}
 
 		return INVALID_TEXTURE_HANDLE;
@@ -152,13 +154,13 @@ namespace Dive
 		HRESULT hr = DirectX::LoadFromDDSFile(filepath.c_str(), DirectX::DDS_FLAGS_NONE, &metadata, scratchImage);
 		if (FAILED(hr))
 		{
-			spdlog::error("DDS 파일 로드 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to load dds file: {}", ErrorUtils::ToVerbose(hr));
 			return INVALID_TEXTURE_HANDLE;
 		}
 
 		if (!metadata.IsCubemap())
 		{
-			spdlog::error("큐브맵 텍스쳐가 아닙니다: {}", StringUtils::ToString(filepath));
+			DV_LOG(Graphics, err, "Not cubemap texture: {}", StringUtils::ToString(filepath));
 			return INVALID_TEXTURE_HANDLE;
 		}
 
@@ -176,7 +178,7 @@ namespace Dive
 		);
 		if (FAILED(hr))
 		{
-			spdlog::error("큐브맵 텍스쳐 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Fail to create cubemap texture: {}", ErrorUtils::ToVerbose(hr));
 			return INVALID_TEXTURE_HANDLE;
 		}
 
@@ -189,7 +191,7 @@ namespace Dive
 		hr = device->CreateShaderResourceView(texture.Get(), &srvDesc, srv.GetAddressOf());
 		if (FAILED(hr))
 		{
-			spdlog::error("큐브맵 SRV 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to create cubemap's srv: {}", ErrorUtils::ToVerbose(hr));
 			return INVALID_TEXTURE_HANDLE;
 		}
 
@@ -264,6 +266,73 @@ namespace Dive
 		return nullptr;
 	}
 
+	ID3D11ShaderResourceView* TextureManager::GetWhiteTextureView() const
+	{
+		auto it = m_textures.find(m_whiteTextureHandle);
+		if (it != m_textures.end())
+			return it->second.srv.Get();
+
+		return nullptr;
+	}
+
+	TextureHandle TextureManager::createWhiteTexture()
+	{
+		ID3D11Device* device = m_graphics->GetDevice();
+
+		constexpr uint32_t kWhitePixel = 0xFFFFFFFF;
+
+		D3D11_TEXTURE2D_DESC texDesc{};
+		texDesc.Width = 1;
+		texDesc.Height = 1;
+		texDesc.MipLevels = 1;
+		texDesc.ArraySize = 1;
+		texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		texDesc.SampleDesc.Count = 1;
+		texDesc.SampleDesc.Quality = 0;
+		texDesc.Usage = D3D11_USAGE_IMMUTABLE;
+		texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+		D3D11_SUBRESOURCE_DATA initData{};
+		initData.pSysMem = &kWhitePixel;
+		initData.SysMemPitch = sizeof(kWhitePixel);
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
+		HRESULT hr = device->CreateTexture2D(&texDesc, &initData, texture.GetAddressOf());
+		if (FAILED(hr))
+		{
+			DV_LOG(Graphics, err, "Failed to create white Texture2D: {}", ErrorUtils::ToVerbose(hr));
+			return INVALID_TEXTURE_HANDLE;;
+		}
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+		srvDesc.Format = texDesc.Format;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.MipLevels = 1;
+
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> srv;
+		hr = device->CreateShaderResourceView(texture.Get(), &srvDesc, srv.GetAddressOf());
+		if (FAILED(hr))
+		{
+			DV_LOG(Graphics, err, "Failed to create white texture SRV: {}", ErrorUtils::ToVerbose(hr));
+			return INVALID_TEXTURE_HANDLE;
+		}
+
+		TextureHandle handle = ++m_handle;
+		if (handle == INVALID_TEXTURE_HANDLE)
+			handle = ++m_handle;
+
+		TextureInfo info{};
+		info.filepath = L"";
+		info.name = "__builtin_white";
+		info.srv = std::move(srv);
+
+		m_textures[handle] = std::move(info);
+		m_nameMap[info.name] = handle;
+
+		return handle;
+	}
+
 	TextureHandle TextureManager::loadDDSTexture(const std::wstring& filepath, bool mips)
 	{
 		DirectX::TexMetadata metaData{};
@@ -278,7 +347,7 @@ namespace Dive
 
 		if (FAILED(hr))
 		{
-			spdlog::error("Load DDS File 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to load DDS File: {}", ErrorUtils::ToVerbose(hr));
 			return INVALID_TEXTURE_HANDLE;
 		}
 
@@ -298,7 +367,7 @@ namespace Dive
 		);
 		if (FAILED(hr))
 		{
-			spdlog::error("Load TAG Texture 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to load TAG texture: {}", ErrorUtils::ToVerbose(hr));
 			return INVALID_TEXTURE_HANDLE;
 		}
 
@@ -318,7 +387,7 @@ namespace Dive
 		);
 		if (FAILED(hr))
 		{
-			spdlog::error("Load WIC Texture 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to load WIC Texture: {}", ErrorUtils::ToVerbose(hr));
 			return INVALID_TEXTURE_HANDLE;
 		}
 
@@ -337,7 +406,7 @@ namespace Dive
 		);
 		if (FAILED(hr))
 		{
-			spdlog::error("Load HDR Texture 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to load HDR Texture: {}", ErrorUtils::ToVerbose(hr));
 			return INVALID_TEXTURE_HANDLE;
 		}
 
@@ -349,7 +418,7 @@ namespace Dive
 		{
 			if (metaData.IsCubemap())
 			{
-				spdlog::info("cubemap: {}", StringUtils::ToString(filepath));
+				DV_LOG(Graphics, info, "cubemap: {}", StringUtils::ToString(filepath));
 			}
 		}
 
@@ -367,7 +436,7 @@ namespace Dive
 
 			if (FAILED(hr))
 			{
-				spdlog::error("밉맵 생성 실패: {}", ErrorUtils::ToVerbose(hr));
+				DV_LOG(Graphics, err, "Failed to generate mipmaps: {}", ErrorUtils::ToVerbose(hr));
 				return INVALID_TEXTURE_HANDLE;
 			}
 			else
@@ -389,7 +458,7 @@ namespace Dive
 
 		if (FAILED(hr))
 		{
-			spdlog::error("Create ShaderResourceView 실패: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to create ShaderResourceView: {}", ErrorUtils::ToVerbose(hr));
 			return INVALID_TEXTURE_HANDLE;
 		}
 
@@ -413,7 +482,7 @@ namespace Dive
 	{
 		if (index > 5)
 		{
-			spdlog::warn("잘못된 Face 인덱스 전달: {}", index);
+			DV_LOG(Graphics, warn, "Passed wrong face index: {}", index);
 			return;
 		}
 

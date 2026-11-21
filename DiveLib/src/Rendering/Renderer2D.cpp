@@ -2,6 +2,7 @@
 #include "Core/LogManager.h"
 #include "Graphics/Graphics.h"
 #include "Graphics/VertexBuffer.h"
+#include "Graphics/IndexBuffer.h"
 #include "Graphics/Geometry.h"
 #include "Graphics/ShaderManager.h"
 #include "Graphics/Shader.h"
@@ -22,6 +23,7 @@ namespace Dive
 		, m_height(graphics->GetHeight())
 	{
 		{
+			// lines
 			{
 				m_lineVertexBuffer = std::make_unique<VertexBuffer>(
 					graphics,
@@ -31,6 +33,42 @@ namespace Dive
 				);
 				m_lineVertices = std::make_unique<DebugVertex[]>(MaxVertices);
 				m_lineVertexCount = 0;
+			}
+
+			// quads
+			{
+				m_quadVertexBuffer = std::make_unique<VertexBuffer>(
+					graphics,
+					sizeof(SpriteVertex),
+					MaxVertices,
+					true
+				);
+				m_quadVertices = std::make_unique<SpriteVertex[]>(MaxVertices);
+				m_quadVertexCount = 0;
+
+				std::vector<uint32_t> quadIndices;
+				quadIndices.reserve(MaxIndices);
+
+				uint32_t offset = 0;
+				for (uint32_t i = 0; i < MaxQuads; ++i)
+				{
+					quadIndices.push_back(offset + 0);
+					quadIndices.push_back(offset + 1);
+					quadIndices.push_back(offset + 2);
+
+					quadIndices.push_back(offset + 0);
+					quadIndices.push_back(offset + 2);
+					quadIndices.push_back(offset + 3);
+
+					offset += 4;
+				}
+
+				m_quadIndexBuffer = std::make_unique<IndexBuffer>(
+					graphics,
+					eFormat::R32_UINT,
+					MaxIndices,
+					quadIndices.data()
+				);
 			}
 
 			m_cbFrame = std::make_unique<Dive::ConstantBuffer<FrameData>>(graphics);
@@ -48,6 +86,8 @@ namespace Dive
 		createSamplers();
 		createResolutionDependantResources(graphics->GetWidth(), graphics->GetHeight());
 
+		// Set/Clear RenderTarget이 없어 기존 pass를 사용했다.
+		// 추후 Set/Clear를 추가해야 한다.
 		{
 			Dive::RenderTargetDesc rtDesc{};
 			rtDesc.RenderTargetView = m_screenRenderTarget->GetRenderTargetView();	// 생성 후 연결해야 한다.
@@ -57,14 +97,8 @@ namespace Dive
 			rtDesc.ClearColor[3] = 1.0f;
 			rtDesc.AccessType = Dive::eLoadAccessOp::Clear;
 
-			//Dive::DepthStencilDesc dsDesc{};
-			//dsDesc.DepthStencilView = m_dsv->GetDetphStencilView();
-			//dsDesc.ClearFlags = D3D11_CLEAR_DEPTH;
-			//dsDesc.AccessType = Dive::eLoadAccessOp::Clear;
-
 			Dive::RenderPassDesc desc{};
 			desc.renderTargetDescs.push_back(rtDesc);
-			//desc.depthStencilDesc = dsDesc;
 			m_pass = desc;
 		}
 
@@ -114,6 +148,22 @@ namespace Dive
 
 		// 현재 Set/Clear RenderTarget이 없다.
 		m_graphics->BeginRenderPass(m_pass);
+
+		// 이건 사실 한 번만 하면 된다.
+		// 셰이더들도 마찬가지?
+		{
+			auto context = m_graphics->GetDeviceContext();
+			ID3D11SamplerState* samplers[static_cast<size_t>(eSamplerState::Count)] =
+			{
+				m_samplerStates[static_cast<size_t>(eSamplerState::WrapPoint)].Get(),
+				m_samplerStates[static_cast<size_t>(eSamplerState::WrapLinear)].Get(),
+				m_samplerStates[static_cast<size_t>(eSamplerState::ClampPoint)].Get(),
+				m_samplerStates[static_cast<size_t>(eSamplerState::ClampLinear)].Get()
+			};
+
+			context->DSSetSamplers(0, static_cast<UINT>(eSamplerState::Count), samplers);
+			context->PSSetSamplers(0, static_cast<UINT>(eSamplerState::Count), samplers);
+		}
 
 		startBatch();
 	}
@@ -186,17 +236,81 @@ namespace Dive
 
 	void Renderer2D::DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, const Color& color)
 	{
-		// transform 계산 후 transform, color를 전달
+		const DirectX::XMMATRIX matTransform =
+			DirectX::XMMatrixScaling(size.x, size.y, 1.0f) *
+			DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+
+		DirectX::XMFLOAT4X4 transform{};
+		DirectX::XMStoreFloat4x4(&transform, matTransform);
+
+		DrawQuad(transform, color);
 	}
 
-	void Renderer2D::DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, TextureHandle texture, float tilingFactor, const Color& tintColor)
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT4X4& transform, const Color& color)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor);
+		constexpr size_t quadVertexCount = 4;
+		constexpr size_t quadIndexCount = 6;
+		constexpr float textureIndex = 0.0f;
+
+		if (m_quadIndexCount > MaxIndices)
+			nextBatch();
+
+		// 단위 쿼드 로컬 좌표 (중심 원점 기준 한 변 길이 1)
+		static constexpr DirectX::XMFLOAT3 quadVertexPosition[4] = {
+			{ -0.5f, -0.5f, 0.0f },
+			{ -0.5f,  0.5f, 0.0f },
+			{  0.5f,  0.5f, 0.0f },
+			{  0.5f, -0.5f, 0.0f }
+		};
+
+		static constexpr DirectX::XMFLOAT2 texCoords[4] = {
+			{ 0.0f, 0.0f },
+			{ 1.0f, 0.0f },
+			{ 1.0f, 1.0f },
+			{ 0.0f, 1.0f }
+		};
+
+		const DirectX::XMMATRIX worldMatrix = DirectX::XMLoadFloat4x4(&transform);
+		const DirectX::XMFLOAT2 tiling = { 1.0f, 1.0f };
+
+		// 2. 4개 정점 변환 및 배치 버퍼 기록
+		for (size_t i = 0; i < quadVertexCount; ++i)
+		{
+			const DirectX::XMVECTOR localPos = DirectX::XMLoadFloat3(&quadVertexPosition[i]);
+			const DirectX::XMVECTOR worldPos = DirectX::XMVector3TransformCoord(localPos, worldMatrix);
+
+			SpriteVertex& vertex = m_quadVertices[m_quadVertexCount++];
+			DirectX::XMStoreFloat3(&vertex.Position, worldPos);
+			vertex.Color = color;
+			vertex.TexCoord = texCoords[i];
+			vertex.TexIndex = textureIndex;
+			vertex.Tiling = tiling;
+		}
+
+		m_quadIndexCount += quadIndexCount;
 	}
 
-	void Renderer2D::DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle texture, float tilingFactor, const Color& tintColor)
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, TextureHandle texture, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
 	{
-		// 역시 transform 계산 후 전달 호출 
+		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tiling, tintColor);
+	}
+
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle texture, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
+	{
+		const DirectX::XMMATRIX matTransform =
+			DirectX::XMMatrixScaling(size.x, size.y, 1.0f) *
+			DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+
+		DirectX::XMFLOAT4X4 transform{};
+		DirectX::XMStoreFloat4x4(&transform, matTransform);
+
+		DrawQuad(transform, texture, tiling, tintColor);
+	}
+
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT4X4& taransform, TextureHandle texture, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
+	{
+		// texture로부터 texId를 획득해야 한다.
+		// hazel은 일단 배열에 전부 넣어놓았고 여기에서 비교한 후 index를 찾아낸다.
 	}
 
 	void Renderer2D::createDepthStencilStates()
@@ -379,7 +493,10 @@ namespace Dive
 
 	void Renderer2D::startBatch()
 	{
-		m_lineVertexCount = 0;
+		m_lineVertexCount = 0;	
+		
+		m_quadVertexCount = 0;
+		m_quadIndexCount = 0;
 	}
 
 	void Renderer2D::flush()
@@ -397,12 +514,39 @@ namespace Dive
 			auto sp = ShaderManager::Get().GetShaderProgram("DebugPrimitive");
 			sp->Bind(m_graphics);
 
-			m_cbFrame->Bind(m_graphics, Dive::eShaderStage::VS, 0);
+			m_cbFrame->Bind(m_graphics, eShaderStage::VS, 0);
 
 			m_graphics->SetVertexBuffer(m_lineVertexBuffer.get());
 			m_graphics->SetTopology(ePrimitiveTopology::LineList);
 
 			m_graphics->Draw(m_lineVertexCount, 0);
+		}
+
+		if (m_quadIndexCount > 0)
+		{
+			m_quadVertexBuffer->SetData(
+				m_graphics,
+				m_quadVertices.get(),
+				m_quadVertexCount
+			);
+
+			auto sp = ShaderManager::Get().GetShaderProgram("Sprite2D");
+			sp->Bind(m_graphics);
+
+			m_cbFrame->Bind(m_graphics, eShaderStage::VS, 0);
+			//m_cbFrame->Bind(m_graphics, eShaderStage::PS, 0);
+
+			// 0번(흰색)부터 m_textureSlotIndex - 1번까지 사용된 SRV 배열 바인딩
+			// (m_graphics에 배열 바인딩 오버로드나 래퍼가 없다면 context->PSSetShaderResources(0, m_textureSlotIndex, srvs) 형태로 맞춰 사용)
+			//m_graphics->SetShaderResourceViews(eShaderStage::PS, 0, m_textureSlotIndex, m_textureSlots);
+			auto srv = TextureManager::Get().GetWhiteTextureView();
+			m_graphics->SetShaderResourceView(eShaderStage::PS, 0, &srv);
+
+			m_graphics->SetVertexBuffer(m_quadVertexBuffer.get());
+			m_graphics->SetIndexBuffer(m_quadIndexBuffer.get());
+			m_graphics->SetTopology(ePrimitiveTopology::TriangleList);
+
+			m_graphics->DrawIndexed(m_quadIndexCount);
 		}
 	}
 
