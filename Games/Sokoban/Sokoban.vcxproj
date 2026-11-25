@@ -136,6 +136,7 @@ if %errorlevel% leq 8 exit 0</Command>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Scenes\PlayScene2D.cpp" />
     <ClCompile Include="Source\Sokoban.cpp" />
     <ClCompile Include="Source\Graphics\Camera.cpp" />
     <ClCompile Include="Source\Graphics\MeshManager.cpp" />
@@ -146,6 +147,7 @@ if %errorlevel% leq 8 exit 0</Command>
     <ClCompile Include="Source\Scenes\TitleScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Scenes\PlayScene2D.h" />
     <ClInclude Include="Source\Sokoban.h" />
     <ClInclude Include="Source\Graphics\Camera.h" />
     <ClInclude Include="Source\Graphics\MeshManager.h" />

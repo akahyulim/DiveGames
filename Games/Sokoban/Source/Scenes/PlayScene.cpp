@@ -142,6 +142,12 @@ namespace Sokoban
 				return;
 			}
 
+			if (input->KeyDown(DIK_G))
+			{
+				m_gameContext.changeScene(eSceneType::Play2D);
+				return;
+			}
+
 			int dx = 0;
 			int dy = 0;
 

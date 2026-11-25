@@ -74,6 +74,7 @@ namespace Dive
 		void SetInputLayout(InputLayout* il);
 
 		void SetShaderResourceView(eShaderStage stage, uint32_t slot, ID3D11ShaderResourceView* const* ppSrv);
+		void SetShaderResourceViews(eShaderStage stage, uint32_t startSlot, uint32_t count, ID3D11ShaderResourceView* const* srvs);
 
 		void SetTopology(ePrimitiveTopology topology);
 		void SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
@@ -82,6 +83,10 @@ namespace Dive
 
 		void BeginRenderPass(const RenderPassDesc& desc);
 		void EndRenderPass();
+
+		// SetRenderTargetView
+		// SetDepthStencilView
+		// Clear
 
 		void Draw(uint32_t vertexCount, uint32_t startVertexLocation = 0);
 		void DrawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);

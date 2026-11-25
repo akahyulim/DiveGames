@@ -282,7 +282,7 @@
     <FxCompile Include="Assets\Shaders\UniformSky.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Assets\Shaders\2D\DebugPrimitive.hlsl">
+    <FxCompile Include="Assets\Shaders\2D\Line.hlsl">
       <Filter>Shaders\2D</Filter>
     </FxCompile>
     <FxCompile Include="Assets\Shaders\2D\Sprite2D.hlsl">

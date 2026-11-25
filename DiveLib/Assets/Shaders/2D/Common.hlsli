@@ -2,15 +2,15 @@
 // Constatnt Buffer
 cbuffer FrameData : register(b0)
 {
-    float4x4 viewProjection;
+    float4x4 g_viewProjection;
 };
 
 // Samplers
-SamplerState WrapPointSampler : register(s0);
-SamplerState WrapLinearSampler : register(s1);
-SamplerState ClampPointSampler : register(s2);
-SamplerState ClampLinearSampler : register(s3);
+SamplerState g_wrapPointSampler : register(s0);
+SamplerState g_wrapLinearSampler : register(s1);
+SamplerState g_clampPointSampler : register(s2);
+SamplerState g_clampLinearSampler : register(s3);
 
 // SRV
-Texture2D SpriteTex : register(t0);
-Texture2D<float4> ScreenRenderTarget : register(t1);
+Texture2D g_spriteTex[32] : register(t0);
+Texture2D<float4> g_screenRenderTarget : register(t32);

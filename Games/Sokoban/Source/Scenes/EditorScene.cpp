@@ -4,6 +4,7 @@
 #include "Graphics/Graphics.h"
 #include "Rendering/Renderer2D.h"
 #include "Graphics/Types.h"
+#include "Graphics/TextureManager.h"
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <ImGuizmo.h>
@@ -53,9 +54,38 @@ namespace Sokoban
 
 		m_gameContext.renderer->DrawRect({ 0.0f, 0.0f }, { 800.0f, 600.0f }, Dive::Color::White);
 
-		m_gameContext.renderer->DrawQuad({ 0.0f, -100.0f }, { 200.0f, 200.0f }, Dive::Color::Magenta);
-		m_gameContext.renderer->DrawQuad({ -100.0f, 100.0f }, { 200.0f, 200.0f }, Dive::Color::Yellow);
-		m_gameContext.renderer->DrawQuad({ 100.0f, 100.0f }, { 200.0f, 200.0f }, Dive::Color::Cyan);
+		m_gameContext.renderer->DrawQuad({ -200.0f, 100.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/crates/crate_01.png"));
+		m_gameContext.renderer->DrawQuad({ -100.0f, 100.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/crates/crate_02.png"));
+		m_gameContext.renderer->DrawQuad({ 0.0f, 100.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/crates/crate_03.png"));
+		m_gameContext.renderer->DrawQuad({ 100.0f, 100.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/crates/crate_04.png"));
+		m_gameContext.renderer->DrawQuad({ 200.0f, 100.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/crates/crate_05.png"));
+
+		m_gameContext.renderer->DrawQuad({ -200.0f, 0.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/environment/environment_01.png"));
+		m_gameContext.renderer->DrawQuad({ -100.0f, 0.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/environment/environment_02.png"));
+		m_gameContext.renderer->DrawQuad({ 0.0f, 0.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/environment/environment_03.png"));
+		m_gameContext.renderer->DrawQuad({ 100.0f, 0.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/environment/environment_04.png"));
+		m_gameContext.renderer->DrawQuad({ 200.0f, 0.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/environment/environment_05.png"));
+
+		m_gameContext.renderer->DrawQuad({ -200.0f, -100.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/player/player_01.png"));
+		m_gameContext.renderer->DrawQuad({ -100.0f, -100.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/player/player_14.png"));
+		m_gameContext.renderer->DrawQuad({ 0.0f, -100.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/player/player_03.png"));
+		m_gameContext.renderer->DrawQuad({ 100.0f, -100.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/player/player_17.png"));
+		m_gameContext.renderer->DrawQuad({ 200.0f, -100.0f }, { 100.0f, 100.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/kenney_sokoban-pack/png/Default size/player/player_05.png"));
 	
 		m_gameContext.renderer->EndScene();
 	}

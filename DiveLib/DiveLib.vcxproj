@@ -103,7 +103,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Assets\Shaders\2D\DebugPrimitive.hlsl">
+    <FxCompile Include="Assets\Shaders\2D\Line.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="Assets\Shaders\2D\ResolveScreen.hlsl">

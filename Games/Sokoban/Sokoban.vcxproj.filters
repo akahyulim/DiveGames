@@ -21,6 +21,9 @@
     <ClCompile Include="Source\Scenes\ScoreBoardScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Scenes\PlayScene2D.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Stage.h" />
@@ -44,6 +47,9 @@
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scenes\ScoreBoardScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Scenes\PlayScene2D.h">
       <Filter>Scenes</Filter>
     </ClInclude>
   </ItemGroup>

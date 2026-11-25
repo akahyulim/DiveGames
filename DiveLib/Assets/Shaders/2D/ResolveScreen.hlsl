@@ -29,5 +29,5 @@ float4 MainPS(VSToPS input) : SV_Target
     float2 uv = input.cpPos * 0.5 + 0.5;
     uv.y = 1.0 - uv.y;
     
-    return ScreenRenderTarget.Sample(ClampLinearSampler, uv);
+    return g_screenRenderTarget.Sample(g_clampLinearSampler, uv);
 }

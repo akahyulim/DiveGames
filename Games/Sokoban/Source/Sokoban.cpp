@@ -10,6 +10,7 @@
 #include "Utilities/Timer.h"
 #include "Scenes/TitleScene.h"
 #include "Scenes/PlayScene.h"
+#include "Scenes/PlayScene2D.h"
 #include "Scenes/EditorScene.h"
 #include "Scenes/ScoreBoardScene.h"
 
@@ -163,7 +164,10 @@ namespace Sokoban
 		case eSceneType::Title:
 			m_currentScene = std::make_unique<TitleScene>(context);
 			break;
-		case eSceneType::Play:
+		case eSceneType::Play2D:
+			m_currentScene = std::make_unique<PlayScene2D>(context);
+			break;
+		case eSceneType::Play3D:
 			m_currentScene = std::make_unique<PlayScene>(context);
 			break;
 		case eSceneType::Editor:

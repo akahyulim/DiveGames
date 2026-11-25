@@ -433,6 +433,34 @@ namespace Dive
 		}
 	}
 
+	void Graphics::SetShaderResourceViews(eShaderStage stage, uint32_t startSlot, uint32_t count, ID3D11ShaderResourceView* const* srvs)
+	{
+		if (count == 0 || srvs == nullptr)
+			return;
+
+		switch (stage)
+		{
+		case eShaderStage::VS:
+			m_deviceContext->VSSetShaderResources(startSlot, count, srvs);
+			break;
+		case eShaderStage::HS:
+			m_deviceContext->HSSetShaderResources(startSlot, count, srvs);
+			break;
+		case eShaderStage::DS:
+			m_deviceContext->DSSetShaderResources(startSlot, count, srvs);
+			break;
+		case eShaderStage::GS:
+			m_deviceContext->GSSetShaderResources(startSlot, count, srvs);
+			break;
+		case eShaderStage::PS:
+			m_deviceContext->PSSetShaderResources(startSlot, count, srvs);
+			break;
+		case eShaderStage::CS:
+			m_deviceContext->CSSetShaderResources(startSlot, count, srvs);
+			break;
+		}
+	}
+
 	void Graphics::SetTopology(ePrimitiveTopology topology)
 	{
 		if (m_currentTopology != topology)

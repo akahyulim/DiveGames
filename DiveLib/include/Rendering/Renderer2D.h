@@ -77,23 +77,25 @@ namespace Dive
 		void DrawTriangle(const DirectX::XMFLOAT3& v0, const DirectX::XMFLOAT3& v1, const DirectX::XMFLOAT3& v2, const Color& color);
 		void DrawRect(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, const Color& color);
 		void DrawRect(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, const Color& color);
-		void DrawRect(const DirectX::XMFLOAT4X4& taransform, const Color& color);
+		void DrawRect(const DirectX::XMFLOAT4X4& transform, const Color& color);
 
 		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, const Color& color);
 		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, const Color& color);
 		void DrawQuad(const DirectX::XMFLOAT4X4& transform, const Color& color);
-		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, TextureHandle texture, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
-		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle texture, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
-		void DrawQuad(const DirectX::XMFLOAT4X4& taransform, TextureHandle texture, const DirectX::XMFLOAT2& tiling, const Color& tintColor = Color::White);
+		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, TextureHandle handle, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
+		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle handle, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
+		void DrawQuad(const DirectX::XMFLOAT4X4& transform, TextureHandle handle, const DirectX::XMFLOAT2& tiling, const Color& tintColor = Color::White);
 
 		// DrawSprite
 
 	private:
-		void createDepthStencilStates();
 		void createRasterizerStates();
 		void createBlendStates();
 		void createSamplers();
+		void createBuffers();
 		void createResolutionDependantResources(uint32_t width, uint32_t height);
+
+		void bindGlobals();
 		
 		void startBatch();
 		void flush(); 
@@ -126,6 +128,10 @@ namespace Dive
 
 		std::unique_ptr<ConstantBuffer<FrameData>> m_cbFrame;
 
-		RenderPassDesc m_pass;
+		static constexpr uint32_t MaxTextureSlots = 32;
+		std::array<TextureHandle, MaxTextureSlots> m_textureHandles;
+		uint32_t m_textureSlotCount = 1;	// 흰색은 고정
+
+		RenderPassDesc m_pass;	// 임시.. graphics에 rtv, dsv의 Set / Clear가 없어서다.
 	};
 }

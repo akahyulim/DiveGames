@@ -1,6 +1,7 @@
 #include "TitleScene.h"
 #include "Core/Window.h"
 #include "Graphics/TextureManager.h"
+#include "Rendering/Renderer2D.h"
 #include <imgui.h>
 
 namespace Sokoban
@@ -14,9 +15,17 @@ namespace Sokoban
 	{
 	}
 	
+	// 카메라는 한 곳에서만 설정하면 될 거 같다.
 	void TitleScene::Initialize()
 	{
-        Dive::TextureManager::Get().LoadTexture("Assets/Textures/DokeV.jpeg");
+		auto camera = m_gameContext.camera;// ->LookAt({ 0.0f, 0.0f, -30.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+		// 예시: (x, y) 위치에 있는 2D 카메라
+		camera->LookAt(
+			{ 0.0f, 0.0f, -10.0f }, // eye
+			{ 0.0f, 0.0f,   0.0f }, // target
+			{ 0.0f, 1.0f,   0.0f }  // up (+Y가 위쪽)
+		);
+		camera->SetOrthographic(1280, 720, 0.1f, 100.0f);
 	}
 	
 	void TitleScene::Cleanup()
@@ -29,10 +38,59 @@ namespace Sokoban
 	
 	void TitleScene::Render()
 	{
+		if (m_gameContext.renderer == nullptr)
+			return;
+
+		auto graphics = m_gameContext.graphics;
+
+		m_gameContext.renderer->BeginScene(
+			DirectX::XMMatrixTranspose(
+				m_gameContext.camera->GetViewMatrix() *
+				m_gameContext.camera->GetProjectionMatrix()));
+
+		m_gameContext.renderer->DrawQuad({ 0.0f, 0.0f }, { 1280.0f, 720.0f },
+			Dive::TextureManager::Get().LoadTexture("Assets/Textures/dokev.jpeg"));
+
+		m_gameContext.renderer->EndScene();
 	}
 	
 	void TitleScene::RenderUI()
 	{
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+
+		static ImVec2 lastWorkSize = ImVec2(0, 0);
+		static ImVec2 lastWorkPos = ImVec2(0, 0);
+
+		if (lastWorkSize.x != viewport->WorkSize.x || lastWorkSize.y != viewport->WorkSize.y ||
+			lastWorkPos.x != viewport->WorkPos.x || lastWorkPos.y != viewport->WorkPos.y)
+		{
+			ImGui::SetNextWindowPos(viewport->WorkPos);
+			ImGui::SetNextWindowSize(viewport->WorkSize);
+
+			lastWorkSize = viewport->WorkSize;
+			lastWorkPos = viewport->WorkPos;
+		}
+
+		ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoScrollbar |
+			ImGuiWindowFlags_NoScrollWithMouse |
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_NoBringToFrontOnFocus |
+			ImGuiWindowFlags_NoNavFocus;
+
+		if (ImGui::Begin("SceneView", nullptr, windowFlags))
+		{
+			ImVec2 viewportPos = ImGui::GetCursorScreenPos();
+			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
+
+			auto srv = m_gameContext.renderer->GetShaderResourceView();
+			ImGui::Image((ImTextureID)srv, viewportSize);
+		}
+
+		ImGui::End();
+
+		/*
         const ImGuiViewport* viewport = ImGui::GetMainViewport();
 
 		static ImVec2 lastWorkSize = ImVec2(0, 0);
@@ -62,11 +120,12 @@ namespace Sokoban
 			ImVec2 viewportPos = ImGui::GetCursorScreenPos();
 			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-			auto srv = Dive::TextureManager::Get().GetTextureViewByPath("Assets/Textures/DokeV.jpeg");
+			//auto srv = Dive::TextureManager::Get().GetTextureViewByPath("Assets/Textures/DokeV.jpeg");
+			auto srv = m_gameContext.renderer->GetShaderResourceView();
 			ImGui::Image((ImTextureID)srv, viewportSize);
 		}
 		ImGui::End();
-
+		*/
         ImVec2 windowSize = { 240.0f, 260.0f };
         ImGui::SetNextWindowSize(windowSize);
         ImGui::SetNextWindowPos(
@@ -96,7 +155,7 @@ namespace Sokoban
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
             if (ImGui::Button("Start", ImVec2(buttonWidth, buttonHeight)))
             {
-				m_gameContext.changeScene(eSceneType::Play);
+				m_gameContext.changeScene(eSceneType::Play2D);
             }
 
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);

@@ -17,7 +17,7 @@ PS_INPUT MainVS(VS_INPUT input)
     PS_INPUT output;
     
     float4 pos = float4(input.position, 1.0f);
-    output.position = mul(pos, viewProjection);    
+    output.position = mul(pos, g_viewProjection);    
     output.color = input.color;
     
     return output;

@@ -15,6 +15,23 @@ namespace Dive
 		constexpr uint32_t MaxVertices = MaxQuads * 4;
 		constexpr uint32_t MaxIndices = MaxQuads * 6;
 		constexpr uint32_t MaxTextureSlots = 32;
+
+		constexpr size_t QuadVertexCount = 4;
+		constexpr size_t QuadIndexCount = 6;
+
+		static constexpr DirectX::XMFLOAT3 QuadVertexPosition[4] = {
+			{ -0.5f, -0.5f, 0.0f },
+			{ -0.5f,  0.5f, 0.0f },
+			{  0.5f,  0.5f, 0.0f },
+			{  0.5f, -0.5f, 0.0f }
+		};
+
+		static constexpr DirectX::XMFLOAT2 QuadTexCoords[4] = {
+			{ 0.0f, 1.0f },
+			{ 0.0f, 0.0f },
+			{ 1.0f, 0.0f },
+			{ 1.0f, 1.0f }
+		};
 	}
 
 	Renderer2D::Renderer2D(Graphics* graphics)
@@ -22,68 +39,12 @@ namespace Dive
 		, m_width(graphics->GetWidth())
 		, m_height(graphics->GetHeight())
 	{
-		{
-			// lines
-			{
-				m_lineVertexBuffer = std::make_unique<VertexBuffer>(
-					graphics,
-					sizeof(DebugVertex),
-					MaxVertices,
-					true
-				);
-				m_lineVertices = std::make_unique<DebugVertex[]>(MaxVertices);
-				m_lineVertexCount = 0;
-			}
-
-			// quads
-			{
-				m_quadVertexBuffer = std::make_unique<VertexBuffer>(
-					graphics,
-					sizeof(SpriteVertex),
-					MaxVertices,
-					true
-				);
-				m_quadVertices = std::make_unique<SpriteVertex[]>(MaxVertices);
-				m_quadVertexCount = 0;
-
-				std::vector<uint32_t> quadIndices;
-				quadIndices.reserve(MaxIndices);
-
-				uint32_t offset = 0;
-				for (uint32_t i = 0; i < MaxQuads; ++i)
-				{
-					quadIndices.push_back(offset + 0);
-					quadIndices.push_back(offset + 1);
-					quadIndices.push_back(offset + 2);
-
-					quadIndices.push_back(offset + 0);
-					quadIndices.push_back(offset + 2);
-					quadIndices.push_back(offset + 3);
-
-					offset += 4;
-				}
-
-				m_quadIndexBuffer = std::make_unique<IndexBuffer>(
-					graphics,
-					eFormat::R32_UINT,
-					MaxIndices,
-					quadIndices.data()
-				);
-			}
-
-			m_cbFrame = std::make_unique<Dive::ConstantBuffer<FrameData>>(graphics);
-			if (m_cbFrame == nullptr)
-			{
-				DV_LOG(Renderer, err, "Fail to create a FrameData constant buffer.");
-			}
-		}
-
 		ShaderManager::Get().Initialize2D(graphics);
 		
-		createDepthStencilStates();
 		createRasterizerStates();
 		createBlendStates();
 		createSamplers();
+		createBuffers();
 		createResolutionDependantResources(graphics->GetWidth(), graphics->GetHeight());
 
 		// Set/Clear RenderTarget이 없어 기존 pass를 사용했다.
@@ -102,6 +63,8 @@ namespace Dive
 			m_pass = desc;
 		}
 
+		m_textureHandles[0] = TextureManager::Get().GetWhiteTexture();
+
 		DV_LOG(Renderer, info, "Renderer system initialization completed successfully.");
 	}
 
@@ -115,7 +78,7 @@ namespace Dive
 		m_graphics->SetBackbuffer();
 
 		auto srv = m_screenRenderTarget->GetShaderResourceView();
-		m_graphics->SetShaderResourceView(eShaderStage::PS, 1, &srv);
+		m_graphics->SetShaderResourceView(eShaderStage::PS, 32, &srv);
 		ShaderManager::Get().GetShaderProgram("ResolveScreen")->Bind(m_graphics);	// enum class로 하지 않았다. 추후 추가할수도..
 		m_graphics->SetTopology(ePrimitiveTopology::TriangleStrip);
 		m_graphics->SetVertexBuffer(nullptr);
@@ -142,6 +105,10 @@ namespace Dive
 	// 기본적으로는 카메라를 전달받지만 일단은 이렇게 사용
 	void Renderer2D::BeginScene(const DirectX::XMMATRIX& viewProj)
 	{
+		// 카메라를 전달받고 여기에서 적용하는 게 맞을 거 같다.
+
+		// 이건 여기에서 구성한 후
+		// bindGlobals()에서 바인딩 해야 한다.
 		FrameData data = {};
 		data.viewProj = viewProj;
 		m_cbFrame->Update(m_graphics, data);
@@ -149,22 +116,7 @@ namespace Dive
 		// 현재 Set/Clear RenderTarget이 없다.
 		m_graphics->BeginRenderPass(m_pass);
 
-		// 이건 사실 한 번만 하면 된다.
-		// 셰이더들도 마찬가지?
-		{
-			auto context = m_graphics->GetDeviceContext();
-			ID3D11SamplerState* samplers[static_cast<size_t>(eSamplerState::Count)] =
-			{
-				m_samplerStates[static_cast<size_t>(eSamplerState::WrapPoint)].Get(),
-				m_samplerStates[static_cast<size_t>(eSamplerState::WrapLinear)].Get(),
-				m_samplerStates[static_cast<size_t>(eSamplerState::ClampPoint)].Get(),
-				m_samplerStates[static_cast<size_t>(eSamplerState::ClampLinear)].Get()
-			};
-
-			context->DSSetSamplers(0, static_cast<UINT>(eSamplerState::Count), samplers);
-			context->PSSetSamplers(0, static_cast<UINT>(eSamplerState::Count), samplers);
-		}
-
+		bindGlobals();
 		startBatch();
 	}
 
@@ -224,7 +176,7 @@ namespace Dive
 		DrawLine(v3, v0, color);
 	}
 
-	void Renderer2D::DrawRect(const DirectX::XMFLOAT4X4& taransform, const Color& color)
+	void Renderer2D::DrawRect(const DirectX::XMFLOAT4X4& transform, const Color& color)
 	{
 		// 디폴트 QuadVertexPositions의 네 정점을 변환 후 DrawLine으로 전달
 	}
@@ -248,54 +200,36 @@ namespace Dive
 
 	void Renderer2D::DrawQuad(const DirectX::XMFLOAT4X4& transform, const Color& color)
 	{
-		constexpr size_t quadVertexCount = 4;
-		constexpr size_t quadIndexCount = 6;
-		constexpr float textureIndex = 0.0f;
-
-		if (m_quadIndexCount > MaxIndices)
+		if (m_quadIndexCount + QuadIndexCount > MaxIndices)
 			nextBatch();
 
-		// 단위 쿼드 로컬 좌표 (중심 원점 기준 한 변 길이 1)
-		static constexpr DirectX::XMFLOAT3 quadVertexPosition[4] = {
-			{ -0.5f, -0.5f, 0.0f },
-			{ -0.5f,  0.5f, 0.0f },
-			{  0.5f,  0.5f, 0.0f },
-			{  0.5f, -0.5f, 0.0f }
-		};
-
-		static constexpr DirectX::XMFLOAT2 texCoords[4] = {
-			{ 0.0f, 0.0f },
-			{ 1.0f, 0.0f },
-			{ 1.0f, 1.0f },
-			{ 0.0f, 1.0f }
-		};
+		constexpr float textureIndex = 0.0f;					// 흰색 고정
+		constexpr DirectX::XMFLOAT2 tiling = { 1.0f, 1.0f };	// 타일링 고정
 
 		const DirectX::XMMATRIX worldMatrix = DirectX::XMLoadFloat4x4(&transform);
-		const DirectX::XMFLOAT2 tiling = { 1.0f, 1.0f };
-
-		// 2. 4개 정점 변환 및 배치 버퍼 기록
-		for (size_t i = 0; i < quadVertexCount; ++i)
+		
+		for (size_t i = 0; i < QuadVertexCount; ++i)
 		{
-			const DirectX::XMVECTOR localPos = DirectX::XMLoadFloat3(&quadVertexPosition[i]);
+			const DirectX::XMVECTOR localPos = DirectX::XMLoadFloat3(&QuadVertexPosition[i]);
 			const DirectX::XMVECTOR worldPos = DirectX::XMVector3TransformCoord(localPos, worldMatrix);
 
 			SpriteVertex& vertex = m_quadVertices[m_quadVertexCount++];
 			DirectX::XMStoreFloat3(&vertex.Position, worldPos);
 			vertex.Color = color;
-			vertex.TexCoord = texCoords[i];
+			vertex.TexCoord = QuadTexCoords[i];
 			vertex.TexIndex = textureIndex;
 			vertex.Tiling = tiling;
 		}
 
-		m_quadIndexCount += quadIndexCount;
+		m_quadIndexCount += QuadIndexCount;
 	}
 
-	void Renderer2D::DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, TextureHandle texture, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, TextureHandle handle, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
 	{
-		DrawQuad({ position.x, position.y, 0.0f }, size, texture, tiling, tintColor);
+		DrawQuad({ position.x, position.y, 0.0f }, size, handle, tiling, tintColor);
 	}
 
-	void Renderer2D::DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle texture, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle handle, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
 	{
 		const DirectX::XMMATRIX matTransform =
 			DirectX::XMMatrixScaling(size.x, size.y, 1.0f) *
@@ -304,17 +238,56 @@ namespace Dive
 		DirectX::XMFLOAT4X4 transform{};
 		DirectX::XMStoreFloat4x4(&transform, matTransform);
 
-		DrawQuad(transform, texture, tiling, tintColor);
+		DrawQuad(transform, handle, tiling, tintColor);
 	}
 
-	void Renderer2D::DrawQuad(const DirectX::XMFLOAT4X4& taransform, TextureHandle texture, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT4X4& transform, TextureHandle handle, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
 	{
-		// texture로부터 texId를 획득해야 한다.
-		// hazel은 일단 배열에 전부 넣어놓았고 여기에서 비교한 후 index를 찾아낸다.
-	}
+		if (m_quadIndexCount + QuadIndexCount > MaxIndices)
+			nextBatch();
 
-	void Renderer2D::createDepthStencilStates()
-	{
+		float textureIndex = 0.0f;
+		bool found = false;
+
+		// 동일한 srv 핸들의 슬롯 찾기
+		for (uint32_t i = 1; i < m_textureSlotCount; ++i)
+		{
+			if (m_textureHandles[i] == handle)
+			{
+				textureIndex = static_cast<float>(i);
+				found = true;
+				break;
+			}
+		}
+
+		// 등록되지 않은 srv 핸들이라면 추가
+		if (!found)
+		{
+			if (m_textureSlotCount >= MaxTextureSlots)
+				nextBatch();
+
+			const uint32_t slotIndex = m_textureSlotCount;
+			textureIndex = static_cast<float>(slotIndex);
+			m_textureHandles[slotIndex] = handle;
+			m_textureSlotCount = slotIndex + 1;
+		}
+
+		const DirectX::XMMATRIX worldMatrix = DirectX::XMLoadFloat4x4(&transform);
+		
+		for (size_t i = 0; i < QuadVertexCount; ++i)
+		{
+			const DirectX::XMVECTOR localPos = DirectX::XMLoadFloat3(&QuadVertexPosition[i]);
+			const DirectX::XMVECTOR worldPos = DirectX::XMVector3TransformCoord(localPos, worldMatrix);
+
+			SpriteVertex& vertex = m_quadVertices[m_quadVertexCount++];
+			DirectX::XMStoreFloat3(&vertex.Position, worldPos);
+			vertex.Color = tintColor;
+			vertex.TexCoord = QuadTexCoords[i];
+			vertex.Tiling = tiling;
+			vertex.TexIndex = textureIndex;
+		}
+
+		m_quadIndexCount += QuadIndexCount;
 	}
 
 	void Renderer2D::createRasterizerStates()
@@ -475,6 +448,63 @@ namespace Dive
 		m_samplerStates[static_cast<size_t>(eSamplerState::ClampLinear)] = m_graphics->CreateSamplerState(desc);
 	}
 
+	void Renderer2D::createBuffers()
+	{
+		// lines
+		{
+			m_lineVertexBuffer = std::make_unique<VertexBuffer>(
+				m_graphics,
+				sizeof(DebugVertex),
+				MaxVertices,
+				true
+			);
+			m_lineVertices = std::make_unique<DebugVertex[]>(MaxVertices);
+			m_lineVertexCount = 0;
+		}
+
+		// quads
+		{
+			m_quadVertexBuffer = std::make_unique<VertexBuffer>(
+				m_graphics,
+				sizeof(SpriteVertex),
+				MaxVertices,
+				true
+			);
+			m_quadVertices = std::make_unique<SpriteVertex[]>(MaxVertices);
+			m_quadVertexCount = 0;
+
+			std::vector<uint32_t> quadIndices;
+			quadIndices.reserve(MaxIndices);
+
+			uint32_t offset = 0;
+			for (uint32_t i = 0; i < MaxQuads; ++i)
+			{
+				quadIndices.push_back(offset + 0);
+				quadIndices.push_back(offset + 1);
+				quadIndices.push_back(offset + 2);
+
+				quadIndices.push_back(offset + 0);
+				quadIndices.push_back(offset + 2);
+				quadIndices.push_back(offset + 3);
+
+				offset += 4;
+			}
+
+			m_quadIndexBuffer = std::make_unique<IndexBuffer>(
+				m_graphics,
+				eFormat::R32_UINT,
+				MaxIndices,
+				quadIndices.data()
+			);
+		}
+
+		m_cbFrame = std::make_unique<Dive::ConstantBuffer<FrameData>>(m_graphics);
+		if (m_cbFrame == nullptr)
+		{
+			DV_LOG(Renderer, err, "Fail to create a FrameData constant buffer.");
+		}
+	}
+
 	void Renderer2D::createResolutionDependantResources(uint32_t width, uint32_t height)
 	{
 		D3D11_TEXTURE2D_DESC desc{};
@@ -491,12 +521,40 @@ namespace Dive
 		m_screenRenderTarget = std::make_unique<RenderTexture>(m_graphics, desc);
 	}
 
+	void Renderer2D::bindGlobals()
+	{
+		static bool called = false;
+
+		if (!called)
+		{
+			auto deviceContext = m_graphics->GetDeviceContext();
+
+			m_cbFrame->Bind(m_graphics, eShaderStage::VS, 0);
+			m_cbFrame->Bind(m_graphics, eShaderStage::PS, 0);
+
+			ID3D11SamplerState* samplers[static_cast<size_t>(eSamplerState::Count)] =
+			{
+				m_samplerStates[static_cast<size_t>(eSamplerState::WrapPoint)].Get(),
+				m_samplerStates[static_cast<size_t>(eSamplerState::WrapLinear)].Get(),
+				m_samplerStates[static_cast<size_t>(eSamplerState::ClampPoint)].Get(),
+				m_samplerStates[static_cast<size_t>(eSamplerState::ClampLinear)].Get()
+			};
+			deviceContext->PSSetSamplers(0, static_cast<UINT>(eSamplerState::Count), samplers);
+
+			m_graphics->SetBlendState(m_blendStates[static_cast<size_t>(eBlendState::Alpha)].Get());
+
+			called = true;
+		}
+	}
+
 	void Renderer2D::startBatch()
 	{
 		m_lineVertexCount = 0;	
 		
 		m_quadVertexCount = 0;
 		m_quadIndexCount = 0;
+
+		m_textureSlotCount = 1;
 	}
 
 	void Renderer2D::flush()
@@ -511,10 +569,8 @@ namespace Dive
 				m_lineVertexCount
 			);
 
-			auto sp = ShaderManager::Get().GetShaderProgram("DebugPrimitive");
+			auto sp = ShaderManager::Get().GetShaderProgram("Line");
 			sp->Bind(m_graphics);
-
-			m_cbFrame->Bind(m_graphics, eShaderStage::VS, 0);
 
 			m_graphics->SetVertexBuffer(m_lineVertexBuffer.get());
 			m_graphics->SetTopology(ePrimitiveTopology::LineList);
@@ -533,14 +589,12 @@ namespace Dive
 			auto sp = ShaderManager::Get().GetShaderProgram("Sprite2D");
 			sp->Bind(m_graphics);
 
-			m_cbFrame->Bind(m_graphics, eShaderStage::VS, 0);
-			//m_cbFrame->Bind(m_graphics, eShaderStage::PS, 0);
-
-			// 0번(흰색)부터 m_textureSlotIndex - 1번까지 사용된 SRV 배열 바인딩
-			// (m_graphics에 배열 바인딩 오버로드나 래퍼가 없다면 context->PSSetShaderResources(0, m_textureSlotIndex, srvs) 형태로 맞춰 사용)
-			//m_graphics->SetShaderResourceViews(eShaderStage::PS, 0, m_textureSlotIndex, m_textureSlots);
-			auto srv = TextureManager::Get().GetWhiteTextureView();
-			m_graphics->SetShaderResourceView(eShaderStage::PS, 0, &srv);
+			ID3D11ShaderResourceView* srvs[MaxTextureSlots] = {};
+			for (uint32_t i = 0; i < m_textureSlotCount; ++i)
+			{
+				srvs[i] = TextureManager::Get().GetTextureView(m_textureHandles[i]);
+			}
+			m_graphics->SetShaderResourceViews(eShaderStage::PS, 0, m_textureSlotCount, srvs);
 
 			m_graphics->SetVertexBuffer(m_quadVertexBuffer.get());
 			m_graphics->SetIndexBuffer(m_quadIndexBuffer.get());

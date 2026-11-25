@@ -26,9 +26,9 @@ namespace Dive
 		// Debug Primitive
 		{
 			ShaderProgramDesc desc;
-			desc.name = "DebugPrimitive";
-			desc.vsPath = "Assets/Shaders/2D/DebugPrimitive.hlsl";
-			desc.psPath = "Assets/Shaders/2D/DebugPrimitive.hlsl";
+			desc.name = "Line";
+			desc.vsPath = "Assets/Shaders/2D/Line.hlsl";
+			desc.psPath = "Assets/Shaders/2D/Line.hlsl";
 			desc.ilType = Dive::eInputLayout::Debug;
 
 			if (!CreateShaderProgram(graphics, desc))
