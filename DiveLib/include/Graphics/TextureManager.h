@@ -3,6 +3,7 @@
 #include <array>
 #include <unordered_map>
 #include <d3d11.h>
+#include <DirectXMath.h>
 #include <memory>
 #include <wrl/client.h>
 #include <vector>
@@ -56,6 +57,8 @@ namespace Dive
 		ID3D11ShaderResourceView* GetTextureViewByPath(const std::string& filepath) const;
 		ID3D11ShaderResourceView* GetTextureViewByName(const std::string& name) const;
 		ID3D11ShaderResourceView* GetWhiteTextureView() const;
+
+		DirectX::XMUINT2 GetSize(TextureHandle handle) const;
 
 		const std::unordered_map<std::wstring, TextureHandle>& GetPathMap() const { return m_pathMap; }
 		

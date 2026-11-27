@@ -80,13 +80,16 @@ namespace Dive
 		void DrawRect(const DirectX::XMFLOAT4X4& transform, const Color& color);
 
 		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, const Color& color);
+		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, float rotation, const Color& color);
 		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, const Color& color);
+		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, float rotation,  const Color& color);
 		void DrawQuad(const DirectX::XMFLOAT4X4& transform, const Color& color);
-		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, TextureHandle handle, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
-		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle handle, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
-		void DrawQuad(const DirectX::XMFLOAT4X4& transform, TextureHandle handle, const DirectX::XMFLOAT2& tiling, const Color& tintColor = Color::White);
 
-		// DrawSprite
+		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, TextureHandle handle, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
+		void DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, float rotation, TextureHandle handle, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
+		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle handle, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
+		void DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, float rotation, TextureHandle handle, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
+		void DrawQuad(const DirectX::XMFLOAT4X4& transform, TextureHandle handle, const DirectX::XMFLOAT2& tiling = { 1.0f, 1.0f }, const Color& tintColor = Color::White);
 
 	private:
 		void createRasterizerStates();

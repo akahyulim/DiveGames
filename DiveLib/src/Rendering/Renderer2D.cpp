@@ -186,10 +186,28 @@ namespace Dive
 		DrawQuad({ position.x, position.y, 0.0f }, size, color);
 	}
 
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, float rotation, const Color& color)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, color);
+	}
+
 	void Renderer2D::DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, const Color& color)
 	{
 		const DirectX::XMMATRIX matTransform =
 			DirectX::XMMatrixScaling(size.x, size.y, 1.0f) *
+			DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+
+		DirectX::XMFLOAT4X4 transform{};
+		DirectX::XMStoreFloat4x4(&transform, matTransform);
+
+		DrawQuad(transform, color);
+	}
+
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, float rotation, const Color& color)
+	{
+		const DirectX::XMMATRIX matTransform =
+			DirectX::XMMatrixScaling(size.x, size.y, 1.0f) *
+			DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(rotation)) *
 			DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 
 		DirectX::XMFLOAT4X4 transform{};
@@ -229,10 +247,28 @@ namespace Dive
 		DrawQuad({ position.x, position.y, 0.0f }, size, handle, tiling, tintColor);
 	}
 
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT2& position, const DirectX::XMFLOAT2& size, float rotation, TextureHandle handle, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
+	{
+		DrawQuad({ position.x, position.y, 0.0f }, size, rotation, handle, tiling, tintColor);
+	}
+
 	void Renderer2D::DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, TextureHandle handle, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
 	{
 		const DirectX::XMMATRIX matTransform =
 			DirectX::XMMatrixScaling(size.x, size.y, 1.0f) *
+			DirectX::XMMatrixTranslation(position.x, position.y, position.z);
+
+		DirectX::XMFLOAT4X4 transform{};
+		DirectX::XMStoreFloat4x4(&transform, matTransform);
+
+		DrawQuad(transform, handle, tiling, tintColor);
+	}
+
+	void Renderer2D::DrawQuad(const DirectX::XMFLOAT3& position, const DirectX::XMFLOAT2& size, float rotation, TextureHandle handle, const DirectX::XMFLOAT2& tiling, const Color& tintColor)
+	{
+		const DirectX::XMMATRIX matTransform =
+			DirectX::XMMatrixScaling(size.x, size.y, 1.0f) *
+			DirectX::XMMatrixRotationZ(DirectX::XMConvertToRadians(rotation)) *
 			DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 
 		DirectX::XMFLOAT4X4 transform{};

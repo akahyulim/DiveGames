@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include "../Player.h"
 #include "../Stage.h"
 #include "../Graphics/MeshManager.h"
 #include "Graphics/ConstantBuffer.h"
@@ -7,33 +8,46 @@
 #include <DirectXMath.h>
 #include <vector>
 #include <stack>
+#include <array>
 
 namespace Dive
 {
+	using TextureHandle = uint64_t;
 	class RenderTexture;
 }
 
 namespace Sokoban
 {
-	struct FrameData
+	enum class eSpriteId : uint8_t
 	{
-		DirectX::XMMATRIX viewProj;
-	};
-
-	struct ObjectData
-	{
-		DirectX::XMMATRIX model;
-	};
-
-	struct StateRecord
-	{
-		DirectX::XMINT2 playerPos;
-		std::vector<DirectX::XMINT2> cratePositions;
-		int moveCount;
+		Wall,
+		Path,
+		Goal,
+		Crate,
+		Player,
+		None,
+		Count
 	};
 
 	class PlayScene : public Scene
 	{
+		struct FrameData
+		{
+			DirectX::XMMATRIX viewProj;
+		};
+
+		struct ObjectData
+		{
+			DirectX::XMMATRIX model;
+		};
+
+		struct StateRecord
+		{
+			DirectX::XMINT2 playerPos;
+			std::vector<DirectX::XMINT2> cratePositions;
+			int moveCount;
+		};
+
 	public:
 		PlayScene(const GameContext& context);
 		~PlayScene() override;
@@ -51,6 +65,9 @@ namespace Sokoban
 
 		int FindCrateAt(int x, int y);
 
+		eSpriteId TileTypeToSpriteId(uint8_t) const;
+		Dive::TextureHandle GetTexture(eSpriteId id) const;
+
 	private:
 		void checkAndMovePlayer(int nextX, int nextY, int dx, int dy);
 		bool checkGameClear();
@@ -64,19 +81,13 @@ namespace Sokoban
 		int m_stageLevel = 0;
 		Stage m_currentStage;
 
-		MeshManager m_blockManager;
-
 		int m_moveCount = 0;
 		std::stack<StateRecord> m_recordStack;
 
-		std::unique_ptr<Dive::ConstantBuffer<FrameData>> m_cbFrame;
-		std::unique_ptr<Dive::ConstantBuffer<ObjectData>> m_cbObject;
-
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_dss;
-		std::unique_ptr<Dive::RenderTexture> m_rt;
-		std::unique_ptr<Dive::RenderTexture> m_dsv;
-		Dive::RenderPassDesc m_offScreenResolvePass;
-
 		bool m_showDialog = false;
+
+		std::array<Dive::TextureHandle, static_cast<size_t>(eSpriteId::Count)> m_sprites;
+
+		Player m_player;
 	};
 }

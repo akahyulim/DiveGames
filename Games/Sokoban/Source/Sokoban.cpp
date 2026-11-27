@@ -10,7 +10,6 @@
 #include "Utilities/Timer.h"
 #include "Scenes/TitleScene.h"
 #include "Scenes/PlayScene.h"
-#include "Scenes/PlayScene2D.h"
 #include "Scenes/EditorScene.h"
 #include "Scenes/ScoreBoardScene.h"
 
@@ -25,7 +24,7 @@ namespace Sokoban
 		Dive::LogManager::SetFilename("sokoban.log");
 		DV_LOG(Sokoban, info, "Sokoban Application Setup Started");
 
-		m_window = std::make_unique<Dive::Window>(1280, 720, L"SOKOBAN");
+		m_window = std::make_unique<Dive::Window>(1600, 900, L"SOKOBAN");
 		m_graphics = std::make_unique<Dive::Graphics>(m_window.get());
 		Dive::TextureManager::Get().Initialize(m_graphics.get());
 		m_gui = std::make_unique<Dive::ImGuiManager>(m_graphics.get());
@@ -164,10 +163,7 @@ namespace Sokoban
 		case eSceneType::Title:
 			m_currentScene = std::make_unique<TitleScene>(context);
 			break;
-		case eSceneType::Play2D:
-			m_currentScene = std::make_unique<PlayScene2D>(context);
-			break;
-		case eSceneType::Play3D:
+		case eSceneType::Play:
 			m_currentScene = std::make_unique<PlayScene>(context);
 			break;
 		case eSceneType::Editor:

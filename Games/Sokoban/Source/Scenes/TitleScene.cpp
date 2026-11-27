@@ -25,7 +25,7 @@ namespace Sokoban
 			{ 0.0f, 0.0f,   0.0f }, // target
 			{ 0.0f, 1.0f,   0.0f }  // up (+Y가 위쪽)
 		);
-		camera->SetOrthographic(1280, 720, 0.1f, 100.0f);
+		camera->SetOrthographic(1600, 900, 0.1f, 100.0f);
 	}
 	
 	void TitleScene::Cleanup()
@@ -48,7 +48,7 @@ namespace Sokoban
 				m_gameContext.camera->GetViewMatrix() *
 				m_gameContext.camera->GetProjectionMatrix()));
 
-		m_gameContext.renderer->DrawQuad({ 0.0f, 0.0f }, { 1280.0f, 720.0f },
+		m_gameContext.renderer->DrawQuad({ 0.0f, 0.0f }, { 1600.0f, 900.0f },
 			Dive::TextureManager::Get().LoadTexture("Assets/Textures/dokev.jpeg"));
 
 		m_gameContext.renderer->EndScene();
@@ -155,7 +155,7 @@ namespace Sokoban
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
             if (ImGui::Button("Start", ImVec2(buttonWidth, buttonHeight)))
             {
-				m_gameContext.changeScene(eSceneType::Play2D);
+				m_gameContext.changeScene(eSceneType::Play);
             }
 
             ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);

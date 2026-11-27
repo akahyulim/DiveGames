@@ -23,8 +23,7 @@ namespace Sokoban
 	{
 		None,
 		Title,
-		Play2D,
-		Play3D,
+		Play,
 		Editor,
 		ScoreBoard
 	};

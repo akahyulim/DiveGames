@@ -6,6 +6,7 @@
 #include "Graphics/RenderTexture.h"
 #include "Input/Input.h"
 #include "Core/LogManager.h"
+#include "Rendering/Renderer2D.h"
 #include <imgui.h>
 
 namespace Sokoban
@@ -21,83 +22,46 @@ namespace Sokoban
 
 	void PlayScene::Initialize()
 	{
-		auto graphics = m_gameContext.graphics;
-
-		// App에서 Graphics를 직접 다루는 건 지양해야 한다.
-		// Renderer를 통해야 한다.
 		{
-			Dive::ShaderProgramDesc desc;
-			desc.name = "Sokoban";
-			desc.vsPath = "Assets/Shaders/Sokoban.hlsl";
-			desc.psPath = "Assets/Shaders/Sokoban.hlsl";
-			desc.ilType = Dive::eInputLayout::Color;
-			Dive::ShaderManager::Get().CreateShaderProgram(graphics, desc);
+			auto camera = m_gameContext.camera;// ->LookAt({ 0.0f, 0.0f, -30.0f }, { 0.0f, 0.0f, 0.0f }, { 0.0f, 1.0f, 0.0f });
+			// 예시: (x, y) 위치에 있는 2D 카메라
+			camera->LookAt(
+				{ 0.0f,	0.0f, -10.0f }, // eye
+				{ 0.0f, 0.0f, 0.0f }, // target
+				{ 0.0f, 1.0f, 0.0f }  // up (+Y가 위쪽)
+			);
+			camera->SetOrthographic(1600, 900, 0.1f, 100.0f);
+			constexpr float aspectRatio = 1280.0f / 720.0f;
+			constexpr float orthoHeight = 16.0f;//12.0f;
+			constexpr float orthoWidth = orthoHeight * aspectRatio; // 약 21.333f
 
-			desc = {};
-			desc.name = "Resolve";
-			desc.vsPath = "Assets/Shaders/ResolveScene.hlsl";
-			desc.psPath = "Assets/Shaders/ResolveScene.hlsl";
-			desc.ilType = Dive::eInputLayout::None;
-			Dive::ShaderManager::Get().CreateShaderProgram(graphics, desc);
-		}
-
-		m_blockManager.Initialize(graphics);
-
-		m_cbFrame = std::make_unique<Dive::ConstantBuffer<FrameData>>(graphics);
-		m_cbObject = std::make_unique<Dive::ConstantBuffer<ObjectData>>(graphics);
-
-		{
-			{
-				D3D11_TEXTURE2D_DESC desc{};
-				desc.Width = graphics->GetWidth();
-				desc.Height = graphics->GetHeight();
-				desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-				desc.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-				desc.MipLevels = 1;
-				desc.ArraySize = 1;
-				desc.SampleDesc.Count = 1;
-				desc.Usage = D3D11_USAGE_DEFAULT;
-				desc.MiscFlags = 0;
-				m_rt = std::make_unique<Dive::RenderTexture>(graphics, desc);
-
-				desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-				desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-				m_dsv = std::make_unique<Dive::RenderTexture>(graphics, desc);
-			}
-
-			Dive::RenderTargetDesc rtDesc{};
-			rtDesc.RenderTargetView = m_rt->GetRenderTargetView();
-			rtDesc.ClearColor[0] = 0.0f;
-			rtDesc.ClearColor[1] = 0.0f;
-			rtDesc.ClearColor[2] = 0.0f;
-			rtDesc.ClearColor[3] = 1.0f;
-			rtDesc.AccessType = Dive::eLoadAccessOp::Clear;
-
-			Dive::DepthStencilDesc dsDesc{};
-			dsDesc.DepthStencilView = m_dsv->GetDetphStencilView();
-			dsDesc.ClearFlags = D3D11_CLEAR_DEPTH;
-			dsDesc.AccessType = Dive::eLoadAccessOp::Clear;
-
-			Dive::RenderPassDesc desc{};
-			desc.renderTargetDescs.push_back(rtDesc);
-			desc.depthStencilDesc = dsDesc;
-			m_offScreenResolvePass = desc;
+			//camera->SetOrthographic(orthoWidth, orthoHeight, 0.1f, 100.0f);
 		}
 
 		{
-			D3D11_DEPTH_STENCIL_DESC desc{};
-			D3D11_DEPTH_STENCILOP_DESC stencilOp{};
-			desc.DepthEnable = true;
-			desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-			desc.DepthFunc = D3D11_COMPARISON_LESS;
-			desc.StencilEnable = false;
-			desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
-			desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
-			stencilOp = { D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_COMPARISON_ALWAYS };
-			desc.FrontFace = stencilOp;
-			desc.BackFace = stencilOp;
+			const std::filesystem::path dir = "Assets/Textures/kenney_sokoban-pack/PNG/Default size";
+			m_sprites[static_cast<size_t>(eSpriteId::Wall)] = Dive::TextureManager::Get().LoadTexture(dir / "Blocks/block_03.png");
+			m_sprites[static_cast<size_t>(eSpriteId::Path)] = Dive::TextureManager::Get().LoadTexture(dir / "Ground/ground_06.png"); 
+			m_sprites[static_cast<size_t>(eSpriteId::Goal)] = Dive::TextureManager::Get().LoadTexture(dir / "Ground/ground_03.png");
+			m_sprites[static_cast<size_t>(eSpriteId::Crate)] = Dive::TextureManager::Get().LoadTexture(dir / "Crates/crate_03.png");
+			m_sprites[static_cast<size_t>(eSpriteId::Player)] = Dive::TextureManager::Get().LoadTexture(dir / "Player/player_01.png");
+			m_sprites[static_cast<size_t>(eSpriteId::None)] = Dive::INVALID_TEXTURE_HANDLE;
 
-			m_dss = graphics->CreateDepthStencilState(desc);
+			m_player.SetFrameHandle(ePlayerDir::Down, 0, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_05.png"));
+			m_player.SetFrameHandle(ePlayerDir::Down, 1, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_06.png"));
+			m_player.SetFrameHandle(ePlayerDir::Down, 2, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_07.png"));
+
+			m_player.SetFrameHandle(ePlayerDir::Up, 0, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_08.png"));
+			m_player.SetFrameHandle(ePlayerDir::Up, 1, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_09.png"));
+			m_player.SetFrameHandle(ePlayerDir::Up, 2, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_10.png"));
+
+			m_player.SetFrameHandle(ePlayerDir::Left, 0, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_20.png"));
+			m_player.SetFrameHandle(ePlayerDir::Left, 1, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_21.png"));
+			m_player.SetFrameHandle(ePlayerDir::Left, 2, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_22.png"));
+
+			m_player.SetFrameHandle(ePlayerDir::Right, 0, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_17.png"));
+			m_player.SetFrameHandle(ePlayerDir::Right, 1, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_18.png"));
+			m_player.SetFrameHandle(ePlayerDir::Right, 2, Dive::TextureManager::Get().LoadTexture(dir / "Player/player_19.png"));
 		}
 
 		{
@@ -105,7 +69,7 @@ namespace Sokoban
 			m_stages.push_back(LevelTwo());
 			m_stages.push_back(LevelThree());
 
-			LoadStage(2);
+			LoadStage(0);
 		}
 	}
 
@@ -123,12 +87,9 @@ namespace Sokoban
 			LoadStage(++m_stageLevel);
 		}
 
-		auto graphics = m_gameContext.graphics;
 		auto input = m_gameContext.input;
 
-		FrameData data = {};
-		data.viewProj = DirectX::XMMatrixTranspose(m_gameContext.camera->GetViewMatrix() * m_gameContext.camera->GetProjectionMatrix());
-		m_cbFrame->Update(graphics, data);
+		m_player.Update(deltaTime);
 
 		{
 			if (input->KeyDown(DIK_ESCAPE))
@@ -144,7 +105,9 @@ namespace Sokoban
 
 			if (input->KeyDown(DIK_G))
 			{
-				m_gameContext.changeScene(eSceneType::Play2D);
+				// 아직은 이르다. 
+				// 스왑이 가능하려면 Shader, Constant Buffer 등을 정리해야 한다.
+				//m_gameContext.changeScene(eSceneType::Play3D);
 				return;
 			}
 
@@ -180,89 +143,89 @@ namespace Sokoban
 
 	void PlayScene::Render()
 	{
-		auto graphics = m_gameContext.graphics;
+		if (m_gameContext.renderer == nullptr || m_gameContext.camera == nullptr)
+			return;
 
-		graphics->BeginRenderPass(m_offScreenResolvePass);
+		m_gameContext.renderer->BeginScene(
+			DirectX::XMMatrixTranspose(
+				m_gameContext.camera->GetViewMatrix() *
+				m_gameContext.camera->GetProjectionMatrix()));
 
-		graphics->SetDepthStencilState(m_dss.Get(), 1);
-
-		auto sp = Dive::ShaderManager::Get().GetShaderProgram("Sokoban");
-		sp->Bind(graphics);
-
-		m_cbFrame->Bind(graphics, Dive::eShaderStage::VS, 0);
-		m_cbFrame->Bind(graphics, Dive::eShaderStage::PS, 0);
-
-		graphics->SetTopology(Dive::ePrimitiveTopology::TriangleList);
-
-		// 중앙 정렬
-		float offsetX = static_cast<float>(m_currentStage.size.x) * 0.5f;
-		float offsetZ = static_cast<float>(m_currentStage.size.y) * 0.5f;
-
-		// 월드 변환 행렬 계산
-		auto GetWorldMatrix = [offsetX, offsetZ](int x, int y, float heightOffset) {
-			float worldX = static_cast<float>(x) - offsetX + 0.5f;
-			float worldZ = static_cast<float>(y) - offsetZ + 0.5f;
-			return DirectX::XMMatrixTranslation(worldX, heightOffset, worldZ);
-			};
-
-		// Floor, Goal, Wall 그리기
-		for (int y = 0; y < m_currentStage.size.y; ++y)
 		{
-			for (int x = 0; x < m_currentStage.size.x; ++x)
+			// 카메라가 1280x720 픽셀 단위 투영을 쓰면 tileSize를 64.0f 정도로,
+			// 카메라 ortho 범위를 ~20x11 월드 단위로 줄였다면 tileSize를 1.0f로 두면 됩니다.
+			constexpr float tileSize = 64.0f;
+
+			const float halfWidth = static_cast<float>(m_currentStage.size.x) * 0.5f;
+			const float halfHeight = static_cast<float>(m_currentStage.size.y) * 0.5f;
+
+			// 스테이지 전체가 (0, 0) 중심에 오도록 2D(XY) 평면 좌표 계산
+			auto GetTileWorldPos = [halfWidth, halfHeight, tileSize](int x, int invertedY, float zOffset)
+				{
+					const float worldX = (static_cast<float>(x) - halfWidth + 0.5f) * tileSize;
+					const float worldY = (static_cast<float>(invertedY) - halfHeight + 0.5f) * tileSize;
+					return DirectX::XMFLOAT3{ worldX, worldY, zOffset };
+				};
+
+			// 보간된 실수 격자(gridX, invertedGridY) 기준 월드 좌표 계산
+			auto GetInterpolatedWorldPos = [halfWidth, halfHeight, tileSize](float gridX, float invertedGridY, float zOffset)
+				{
+					const float worldX = (gridX - halfWidth + 0.5f) * tileSize;
+					const float worldY = (invertedGridY - halfHeight + 0.5f) * tileSize;
+					return DirectX::XMFLOAT3{ worldX, worldY, zOffset };
+				};
+
+			// Floor, Goal, Wall 그리기
+			for (int y = 0; y < m_currentStage.size.y; ++y)
 			{
-				uint8_t type = m_currentStage.gridTiles[y * m_currentStage.size.x + x];
-				auto block = m_blockManager.GetTile(type);
-				if (!block) continue;
+				for (int x = 0; x < m_currentStage.size.x; ++x)
+				{
+					const uint8_t type = m_currentStage.gridTiles[y * m_currentStage.size.x + x];
+					const Dive::TextureHandle sprite = GetTexture(TileTypeToSpriteId(type));
+					if (sprite == Dive::INVALID_TEXTURE_HANDLE)
+						continue;
 
-				int invertedY = m_currentStage.size.y - 1 - y;
-				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(x, invertedY, 0.0f);
+					const int invertedY = m_currentStage.size.y - 1 - y;
+					const DirectX::XMFLOAT3 pos = GetTileWorldPos(x, invertedY, 0.0f);
 
-				ObjectData data = {};
-				data.model = DirectX::XMMatrixTranspose(worldMatrix);
-				m_cbObject->Update(graphics, data);
-				m_cbObject->Bind(graphics, Dive::eShaderStage::VS, 1);
+					m_gameContext.renderer->DrawQuad(pos, {tileSize, tileSize}, sprite);
+				}
+			}
 
-				block->Bind(graphics);
-				graphics->DrawIndexed(block->GetIndexCount());
+			// 플레이어와 박스도 같은 좌표 규칙으로 위에 얹기
+			/*
+			if (m_sprites[static_cast<size_t>(eSpriteId::Player)] != Dive::INVALID_TEXTURE_HANDLE)
+			{
+				const int playerInvY = m_currentStage.size.y - 1 - m_currentStage.playerPos.y;
+				const DirectX::XMFLOAT3 playerPos = GetTileWorldPos(m_currentStage.playerPos.x, playerInvY, -0.1f);
+				m_gameContext.renderer->DrawQuad(playerPos, { tileSize, tileSize }, m_sprites[static_cast<size_t>(eSpriteId::Player)]);
+			}
+			*/
+
+			// 플레이어(보간 좌표 + 현재 3프레임 핸들) 그리기
+			const Dive::TextureHandle playerSprite = m_player.GetCurrentHandle();
+			if (playerSprite != Dive::INVALID_TEXTURE_HANDLE)
+			{
+				const DirectX::XMFLOAT2 renderGridPos = m_player.GetRenderGridPos();
+				const float playerInvY = static_cast<float>(m_currentStage.size.y - 1) - m_currentStage.playerPos.y; //renderGridPos.y;
+				//const DirectX::XMFLOAT3 playerWorldPos = GetInterpolatedWorldPos(renderGridPos.x, playerInvY, -0.1f);
+				const DirectX::XMFLOAT3 playerPos = GetTileWorldPos(m_currentStage.playerPos.x, (int)playerInvY, -0.1f);
+
+				m_gameContext.renderer->DrawQuad(playerPos, { tileSize, tileSize }, playerSprite);
+			}
+
+			if (m_sprites[static_cast<size_t>(eSpriteId::Crate)] != Dive::INVALID_TEXTURE_HANDLE)
+			{
+				for (const auto& cratePos : m_currentStage.cratePosList)
+				{
+					const int crateInvY = m_currentStage.size.y - 1 - cratePos.y;
+					const DirectX::XMFLOAT3 pos = GetTileWorldPos(cratePos.x, crateInvY, -0.1f);
+					m_gameContext.renderer->DrawQuad(pos, { tileSize, tileSize }, m_sprites[static_cast<size_t>(eSpriteId::Crate)]);
+				}
 			}
 		}
 
-		// 상자 그리기
-		auto crateBlock = m_blockManager.GetCrate();
-		if (crateBlock)
-		{
-			for (const auto& cratePos : m_currentStage.cratePosList)
-			{
-				int invertedY = m_currentStage.size.y - 1 - cratePos.y;
-				DirectX::XMMATRIX worldMatrix = GetWorldMatrix(cratePos.x, invertedY, 0.0f);
-
-				ObjectData data = {};
-				data.model = DirectX::XMMatrixTranspose(worldMatrix);
-				m_cbObject->Update(graphics, data);
-				m_cbObject->Bind(graphics, Dive::eShaderStage::VS, 1);
-
-				crateBlock->Bind(graphics);
-				graphics->DrawIndexed(crateBlock->GetIndexCount());
-			}
-		}
-
-		// 플레이어(캡슐) 그리기
-		auto playerBlock = m_blockManager.GetPlayer();
-		if (playerBlock)
-		{
-			int invertedY = m_currentStage.size.y - 1 - m_currentStage.playerPos.y;
-			DirectX::XMMATRIX worldMatrix = GetWorldMatrix(m_currentStage.playerPos.x, invertedY, 0.0f);
-
-			ObjectData data = {};
-			data.model = DirectX::XMMatrixTranspose(worldMatrix);
-			m_cbObject->Update(graphics, data);
-			m_cbObject->Bind(graphics, Dive::eShaderStage::VS, 1);
-
-			playerBlock->Bind(graphics);
-			graphics->DrawIndexed(playerBlock->GetIndexCount());
-		}
-
-		graphics->EndRenderPass();
+		m_gameContext.renderer->EndScene();
 	}
 
 	void PlayScene::RenderUI()
@@ -295,7 +258,7 @@ namespace Sokoban
 			ImVec2 viewportPos = ImGui::GetCursorScreenPos();
 			ImVec2 viewportSize = ImGui::GetContentRegionAvail();
 
-			auto srv = m_rt->GetShaderResourceView();
+			auto srv = m_gameContext.renderer->GetShaderResourceView();
 			ImGui::Image((ImTextureID)srv, viewportSize);
 		}
 
@@ -318,7 +281,7 @@ namespace Sokoban
 
 		m_stageLevel = level;
 		m_currentStage = m_stages[level];
-		
+
 		std::stack<StateRecord>().swap(m_recordStack);
 
 		StateRecord record;
@@ -326,6 +289,8 @@ namespace Sokoban
 		record.cratePositions = m_currentStage.cratePosList;
 		record.moveCount = m_moveCount = 0;
 		m_recordStack.push(record);
+
+		m_player.SnapToGrid(m_currentStage.playerPos);
 	}
 
 	void PlayScene::LoadStage(const std::string& filepath)
@@ -343,6 +308,23 @@ namespace Sokoban
 		}
 
 		return -1;
+	}
+
+	eSpriteId PlayScene::TileTypeToSpriteId(uint8_t tileType) const
+	{
+		switch (tileType)
+		{
+		case TileType::Wall:	return eSpriteId::Wall;
+		case TileType::Floor:	return eSpriteId::Path;
+		case TileType::Goal:	return eSpriteId::Goal;
+		case TileType::Empty:
+		default:				return eSpriteId::None;
+		}
+	}
+
+	Dive::TextureHandle PlayScene::GetTexture(eSpriteId id) const
+	{
+		return m_sprites[static_cast<size_t>(id)];
 	}
 
 	void PlayScene::checkAndMovePlayer(int nextX, int nextY, int dx, int dy)
@@ -385,6 +367,8 @@ namespace Sokoban
 			m_currentStage.cratePosList[crateIndex].y = nextCrateY;
 		}
 
+		const DirectX::XMINT2 prevPos = m_currentStage.playerPos;
+
 		m_currentStage.playerPos.x = nextX;
 		m_currentStage.playerPos.y = nextY;
 		m_moveCount++;
@@ -395,6 +379,14 @@ namespace Sokoban
 		record.cratePositions = m_currentStage.cratePosList;
 		record.moveCount = m_moveCount;
 		m_recordStack.push(record);
+
+		ePlayerDir dir = m_player.GetDirection();
+		if (dx < 0)      dir = ePlayerDir::Left;
+		else if (dx > 0) dir = ePlayerDir::Right;
+		else if (dy < 0) dir = ePlayerDir::Up;
+		else if (dy > 0) dir = ePlayerDir::Down;
+
+		m_player.StartMove(prevPos, m_currentStage.playerPos, dir);
 	}
 
 	bool PlayScene::checkGameClear()
@@ -425,6 +417,8 @@ namespace Sokoban
 		m_currentStage.playerPos = previousRecord.playerPos;
 		m_currentStage.cratePosList = previousRecord.cratePositions;
 		m_moveCount = previousRecord.moveCount;
+
+		m_player.SnapToGrid(m_currentStage.playerPos);
 	}
 
 	void PlayScene::showDialogBox()
@@ -478,7 +472,7 @@ namespace Sokoban
 			{
 				m_showDialog = false;
 			}
-			
+
 			ImGui::SetCursorPosX((windowWidth - buttonWidth) * 0.5f);
 			if (ImGui::Button("Exit", ImVec2(buttonWidth, buttonHeight)))
 			{

@@ -12,18 +12,16 @@
     <ClCompile Include="Source\Scenes\TitleScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Scenes\PlayScene.cpp">
-      <Filter>Scenes</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Scenes\EditorScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="Source\Scenes\ScoreBoardScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Scenes\PlayScene2D.cpp">
+    <ClCompile Include="Source\Scenes\PlayScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Stage.h" />
@@ -40,18 +38,16 @@
     <ClInclude Include="Source\Scenes\TitleScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Scenes\PlayScene.h">
-      <Filter>Scenes</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Scenes\EditorScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Source\Scenes\ScoreBoardScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Scenes\PlayScene2D.h">
+    <ClInclude Include="Source\Scenes\PlayScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Player.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Shaders">
@@ -63,10 +59,5 @@
     <Filter Include="Graphics">
       <UniqueIdentifier>{90e14933-8ca0-4c82-afa6-baa512ecc742}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Assets\Shaders\Sokoban.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
   </ItemGroup>
 </Project>

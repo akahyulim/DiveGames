@@ -275,6 +275,27 @@ namespace Dive
 		return nullptr;
 	}
 
+	DirectX::XMUINT2 TextureManager::GetSize(TextureHandle handle) const
+	{
+		auto srv = GetTextureView(handle);
+		if (!srv)
+			return {};
+
+		Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+		srv->GetResource(resource.GetAddressOf());
+		if (!resource)
+			return {};
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> tex2D;
+		if (FAILED(resource.As(&tex2D)))
+			return {};
+
+		D3D11_TEXTURE2D_DESC desc{};
+		tex2D->GetDesc(&desc);
+
+		return { static_cast<uint32_t>(desc.Width), static_cast<uint32_t>(desc.Height) };
+	}
+
 	TextureHandle TextureManager::createWhiteTexture()
 	{
 		ID3D11Device* device = m_graphics->GetDevice();
@@ -387,7 +408,7 @@ namespace Dive
 		);
 		if (FAILED(hr))
 		{
-			DV_LOG(Graphics, err, "Failed to load WIC Texture: {}", ErrorUtils::ToVerbose(hr));
+			DV_LOG(Graphics, err, "Failed to load WIC Texture: {} - {}", ErrorUtils::ToVerbose(hr), StringUtils::ToString(filepath));
 			return INVALID_TEXTURE_HANDLE;
 		}
 
